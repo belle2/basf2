@@ -1,32 +1,68 @@
-name=`echo ${1,,}`
-bigname=`echo ${1^^}`
-classname=`echo ${name^}`
+if [ $# -ne 1 ];then 
+echo "Usage : make_rcnode.sh <nodename>"
+exit
+fi
+
+name=`perl -e "print lc(${1})"`
+bigname=`perl -e "print lcfirst(${1})"`
+classname=`perl -e "print ucfirst(${name})"`
 
 dir=${BELLE2_LOCAL_DIR}/daq/slc/apps
 
-mkdir $dir/${name}d/
-mkdir $dir/${name}d/include
-mkdir $dir/${name}d/src
-mkdir $dir/${name}d/tools
+appdir=${dir}/${name}d
 
-sed "s/RCTemplate/$classname/g" $dir/rctemplated/include/RCTemplateCallback.h | \
-sed "s/rctemplate/${name}/g" > $dir/${name}d/include/${classname}Callback.h 
+if [ ! -e  ${appdir} ]; then
 
-sed "s/RCTemplate/$classname/g" $dir/rctemplated/src/RCTemplateCallback.cc | \
-sed "s/rctemplate/${name}/g"  > $dir/${name}d/src/${classname}Callback.cc 
+mkdir ${appdir}/
+mkdir ${appdir}/include
+mkdir ${appdir}/src
+mkdir ${appdir}/tools
 
-sed "s/RCTemplate/$classname/g" $dir/rctemplated/tools/rctemplated.cc | \
-sed "s/rctemplate/${name}/g" > $dir/${name}d/tools/${name}d.cc
+filename=${appdir}/include/${classname}Callback.h 
+echo "create header file : ${filename}"
+sed "s/RCTemplate/${classname}/g" ${dir}/rctemplated/include/RCTemplateCallback.h | \
+sed "s/rctemplate/${name}/g" > ${filename}
 
-sed "s/rctemplate/${name}/g" $dir/rctemplated/Makefile > $dir/${name}d/Makefile
-sed "s/rctemplate/${name}/g" $dir/rctemplated/SConscript > $dir/${name}d/SConscript
-sed "s/rctemplate/${name}/g" $dir/rctemplated/tools/Makefile > $dir/${name}d/tools/Makefile
-sed "s/rctemplate/${name}/g" $dir/rctemplated/tools/SConscript > $dir/${name}d/tools/SConscript
+filename=${appdir}/src/${classname}Callback.cc 
+echo "create source file : ${filename}"
+sed "s/RCTemplate/${classname}/g" ${dir}/rctemplated/src/RCTemplateCallback.cc | \
+sed "s/rctemplate/${name}/g"  > ${filename}
+
+filename=${appdir}/tools/${name}d.cc
+echo "create main file : ${filename}"
+sed "s/RCTemplate/${classname}/g" ${dir}/rctemplated/tools/rctemplated.cc | \
+sed "s/rctemplate/${name}/g" > ${filename}
+
+filename=${appdir}/Makefile
+echo "create Makefile for library : ${filename}"
+sed "s/rctemplate/${name}/g" ${dir}/rctemplated/Makefile > ${filename}
+
+filename=${appdir}/SConscript
+echo "create SConscript for library : ${filename}"
+sed "s/rctemplate/${name}/g" ${dir}/rctemplated/SConscript > ${filename}
+
+filename=${appdir}/tools/Makefile
+echo "create Makefile for executable: ${filename}"
+sed "s/rctemplate/${name}/g" ${dir}/rctemplated/tools/Makefile > ${filename}
+
+filename=${appdir}/tools/SConscript
+echo "create SConscript for executable : ${filename}"
+sed "s/rctemplate/${name}/g" ${dir}/rctemplated/tools/SConscript > ${filename}
+
+else 
+echo "directory ${appdir} already exsists"
+fi
 
 dir=${BELLE2_LOCAL_DIR}/daq/slc/data/config
-
-sed "s/rctemplate/${name}/g" $dir/rctemplate.conf | sed "s/RCTEMPLATE/$bigname/g" > $dir/${name}.conf
+filename=${dir}/${name}.conf
+echo "create NSM configuration file : ${filename}"
+sed "s/rctemplate/${name}/g" ${dir}/rctemplate.conf | \
+sed "s/RCTEMPLATE/$bigname/g" > ${filename}
 
 dir=${BELLE2_LOCAL_DIR}/daq/slc/data/database
+filename=${dir}/${name}d.conf
+echo "create database input file : ${filename}"
+sed "s/rctemplate/${name}/g" ${dir}/rctemplated.conf | \
+sed "s/RCTEMPLATE/$bigname/g" > ${filename}
 
-sed "s/rctemplate/${name}/g" $dir/rctemplated.conf | sed "s/RCTEMPLATE/$bigname/g" > $dir/${name}d.conf
+echo "make_rcnode: done"

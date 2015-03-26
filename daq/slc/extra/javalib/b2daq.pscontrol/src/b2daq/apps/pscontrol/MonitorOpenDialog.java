@@ -39,7 +39,6 @@ public class MonitorOpenDialog {
             dialog.setResizable(false);
             dialog.setTitle("Open crate monitor");
             dialog.showAndWait();
-            dialog.hide();
         } catch (IOException ex) {
             Logger.getLogger(MonitorOpenDialog.class.getName()).log(Level.SEVERE, null, ex);
         }

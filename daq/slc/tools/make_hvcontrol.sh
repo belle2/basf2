@@ -1,28 +1,71 @@
-name=`echo ${1,,}`
-bigname=`echo ${1^^}`
-classname=`echo ${name^}`HV
+if [ $# -ne 1 ];then 
+echo "Usage : make_rcnode.sh <nodename>"
+exit
+fi
 
-dir=${BELLE2_DAQ_SLC}/hvcontrol
+name=`perl -e "print lc(${1})"`
+bigname=`perl -e "print uc(${1})"`
+classname=`perl -e "print ucfirst(${name})"`
 
-mkdir $dir/$name/
-mkdir $dir/$name/include
-mkdir $dir/$name/src
-mkdir $dir/$name/tools
+dir=${BELLE2_LOCAL_DIR}/daq/slc/hvcontrol
 
-sed "s/TemplateHV/$classname/g" $dir/template/include/TemplateHVControlCallback.h | \
-sed "s/template/$name/g" > $dir/$name/include/${classname}ControlCallback.h 
+appdir=${dir}/${name}
 
-sed "s/TemplateHV/$classname/g" $dir/template/src/TemplateHVControlCallback.cc | \
-sed "s/template/$name/g"  > $dir/$name/src/${classname}ControlCallback.cc 
+if [ ! -e  ${appdir} ]; then
 
-sed "s/TemplateHV/$classname/g" $dir/template/tools/templatehvd.cc | \
-sed "s/template/$name/g" > $dir/$name/tools/${name}hvd.cc
+mkdir ${appdir}/
+mkdir ${appdir}/include
+mkdir ${appdir}/src
+mkdir ${appdir}/tools
 
-sed "s/template/$name/g" $dir/template/Makefile > $dir/$name/Makefile
-sed "s/template/$name/g" $dir/template/tools/Makefile > $dir/$name/tools/Makefile
-sed "s/template/$name/g" $dir/template/tools/SConscript > $dir/$name/tools/SConscript
+filename=${appdir}/include/${classname}ControlCallback.h 
+echo "create header file : ${filename}"
+sed "s/TemplateHV/${classname}/g" ${dir}/template/include/TemplateHVControlCallback.h | \
+sed "s/template/${name}/g" > ${filename}
 
-dir=${BELLE2_DAQ_SLC}/data/hvcontrol
+filename=${appdir}/src/${classname}ControlCallback.cc 
+echo "create source file : ${filename}"
+sed "s/TemplateHV/${classname}/g" ${dir}/template/src/TemplateHVControlCallback.cc | \
+sed "s/template/${name}/g"  > ${filename}
 
-sed "s/template/$name/g" $dir/template.conf | sed "s/TEMPLATE/$bigname/g" > $dir/$name.conf
-sed "s/template/$name/g" $dir/template-input.conf | sed "s/TEMPLATE/$bigname/g" > $dir/$name-input.conf
+filename=${appdir}/tools/${name}hvd.cc
+echo "create main file : ${filename}"
+sed "s/TemplateHV/${classname}/g" ${dir}/template/tools/templatehvd.cc | \
+sed "s/template/${name}/g" > ${appdir}/tools/${name}hvd.cc
+
+filename=${appdir}/Makefile
+echo "create Makefile for library : ${filename}"
+sed "s/template/${name}/g" ${dir}/template/Makefile > ${filename}
+
+filename=${appdir}/tools/Makefile
+echo "create Makefile for executable: ${filename}"
+sed "s/template/${name}/g" ${dir}/template/tools/Makefile > ${filename}
+filename=${appdir}/tools/SConscript
+echo "create SConscript for executable: ${filename}"
+sed "s/template/${name}/g" ${dir}/template/tools/SConscript > ${filename}
+
+else 
+echo "directory ${appdir} already exsists"
+fi
+
+dir=${BELLE2_LOCAL_DIR}/daq/slc/data/hvcontrol
+
+filename=${dir}/${name}.conf
+if [ -e ${filename} ]; then
+echo "config file ${filename} alredy exsists"
+else
+echo "create NSM configuration file : ${filename}"
+sed "s/template/${name}/g" ${dir}/template.conf | \
+sed "s/TEMPLATE/$bigname/g" > ${filename}
+fi
+
+filename=${dir}/${name}-input.conf
+if [ -e ${filename} ]; then
+echo "dbinput file ${filename} alredy exsists"
+else
+echo "create database input file : ${filename}"
+sed "s/template/${name}/g" ${dir}/template-input.conf | \
+sed "s/TEMPLATE/$bigname/g" > ${filename}
+fi
+
+echo "make_hvcontrol: done"

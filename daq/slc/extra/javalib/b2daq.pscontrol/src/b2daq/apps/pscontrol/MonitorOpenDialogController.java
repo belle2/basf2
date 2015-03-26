@@ -45,7 +45,7 @@ public class MonitorOpenDialogController implements Initializable {
     private PSSettingMainPanelController m_pmain;
     private CanvasPanel canvas;
     private final HashMap<String, TimedGraph1D> gr = new HashMap<>();
-    private Color[] color = {
+    private final Color[] color = {
         Color.BLACK, Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.LIGHTGRAY,
         Color.ORANGE, Color.LIGHTSTEELBLUE, Color.DARKSLATEBLUE, Color.ORANGERED,
         Color.BLUEVIOLET, Color.CHOCOLATE
@@ -58,14 +58,13 @@ public class MonitorOpenDialogController implements Initializable {
     public void setSettingMainPanel(PSSettingMainPanelController pmain) {
         m_pmain = pmain;
         for (PSCrateSettingPanelController c : m_pmain.getCrates()) {
-            String name = c.getName();
-            System.out.println("konno:" + name);
-            combo.getItems().add(name);
+            combo.getItems().add(c.getName());
         }
     }
 
     @FXML
     protected void handleOpenButton() {
+        openButton.getScene().getWindow().hide();
         String name = (String) combo.getSelectionModel().getSelectedItem();
         PSCrateSettingPanelController pcrate = m_pmain.getCrate(name);
         if (pcrate != null) {
@@ -113,20 +112,14 @@ public class MonitorOpenDialogController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        openButton.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent ke) {
-                if (ke.getCode().equals(KeyCode.ENTER)) {
-                    handleCloseAction(true);
-                }
+        openButton.setOnKeyPressed((KeyEvent ke) -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                handleCloseAction(true);
             }
         });
-        cancelButton.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent ke) {
-                if (ke.getCode().equals(KeyCode.ENTER)) {
-                    handleCloseAction(false);
-                }
+        cancelButton.setOnKeyPressed((KeyEvent ke) -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                handleCloseAction(false);
             }
         });
     }

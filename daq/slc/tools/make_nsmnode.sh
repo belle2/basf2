@@ -1,29 +1,66 @@
-name=`echo ${1,,}`
-bigname=`echo ${1^^}`
-classname=`echo ${name^}`
+if [ $# -ne 1 ];then 
+echo "Usage : make_rcnode.sh <nodename>"
+exit
+fi
+
+name=`perl -e "print lc(${1})"`
+bigname=`perl -e "print uc(${1})"`
+classname=`perl -e "print ucfirst(${name})"`
 
 dir=${BELLE2_LOCAL_DIR}/daq/slc/apps
+appdir=${dir}/${name}d
 
-mkdir $dir/${name}d/
-mkdir $dir/${name}d/include
-mkdir $dir/${name}d/src
-mkdir $dir/${name}d/tools
+if [ ! -e  ${appdir} ]; then
+mkdir ${appdir}/
+mkdir ${appdir}/include
+mkdir ${appdir}/src
+mkdir ${appdir}/tools
 
-sed "s/NSMTemplate/$classname/g" $dir/nsmtemplated/include/NSMTemplateCallback.h | \
-sed "s/nsmtemplate/${name}/g" > $dir/${name}d/include/${classname}Callback.h 
+filename=${appdir}/include/${classname}Callback.h 
+echo "create header file : ${filename}"
+sed "s/NSMTemplate/$classname/g" ${dir}/nsmtemplated/include/NSMTemplateCallback.h | \
+sed "s/nsmtemplate/${name}/g" > ${filename}
 
-sed "s/NSMTemplate/$classname/g" $dir/nsmtemplated/src/NSMTemplateCallback.cc | \
-sed "s/nsmtemplate/${name}/g"  > $dir/${name}d/src/${classname}Callback.cc 
+filename=${appdir}/src/${classname}Callback.cc 
+echo "create source file : ${filename}"
+sed "s/NSMTemplate/$classname/g" ${dir}/nsmtemplated/src/NSMTemplateCallback.cc | \
+sed "s/nsmtemplate/${name}/g"  > ${filename}
 
-sed "s/NSMTemplate/$classname/g" $dir/nsmtemplated/tools/nsmtemplated.cc | \
-sed "s/nsmtemplate/${name}/g" > $dir/${name}d/tools/${name}d.cc
+filename=${appdir}/tools/${name}d.cc
+echo "create main file : ${filename}"
+sed "s/NSMTemplate/$classname/g" ${dir}/nsmtemplated/tools/nsmtemplated.cc | \
+sed "s/nsmtemplate/${name}/g" > ${filename}
 
-sed "s/nsmtemplate/${name}/g" $dir/nsmtemplated/Makefile > $dir/${name}d/Makefile
-sed "s/nsmtemplate/${name}/g" $dir/nsmtemplated/SConscript > $dir/${name}d/SConscript
-sed "s/nsmtemplate/${name}/g" $dir/nsmtemplated/tools/Makefile > $dir/${name}d/tools/Makefile
-sed "s/nsmtemplate/${name}/g" $dir/nsmtemplated/tools/SConscript > $dir/${name}d/tools/SConscript
+filename=${appdir}/Makefile
+echo "create Makefile for library : ${filename}"
+sed "s/nsmtemplate/${name}/g" ${dir}/nsmtemplated/Makefile > ${filename}
+
+filename=${appdir}/SConscript
+echo "create SConscript for library : ${filename}"
+sed "s/nsmtemplate/${name}/g" ${dir}/nsmtemplated/SConscript > ${filename}
+
+filename=${appdir}/tools/Makefile
+echo "create Makefile for executable: ${filename}"
+sed "s/nsmtemplate/${name}/g" ${dir}/nsmtemplated/tools/Makefile > ${filename}
+
+filename=${appdir}/tools/SConscript
+echo "create SConscript for executable: ${filename}"
+sed "s/nsmtemplate/${name}/g" ${dir}/nsmtemplated/tools/SConscript > ${filename}
+
+else 
+echo "directory ${appdir} already exsists"
+fi
+
 
 dir=${BELLE2_LOCAL_DIR}/daq/slc/data/config
 
-sed "s/nsmtemplate/${name}/g" $dir/nsmtemplate.conf | sed "s/NSMTEMPLATE/$bigname/g" > $dir/${name}.conf
+filename=${dir}/${name}.conf
+if [ -e ${filename} ]; then
+echo "config file ${filename} alredy exsists"
+else
+echo "create NSM configuration file : ${filename}"
+sed "s/nsmtemplate/${name}/g" ${dir}/nsmtemplate.conf | \
+sed "s/NSMTEMPLATE/$bigname/g" > ${filename}
+fi
 
+echo "make_nsmnode: done"

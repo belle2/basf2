@@ -45,7 +45,7 @@ CalibrationManager::CalibrationManager() : m_numberOfIterations(0)
   if (ProcHandler::EvtProcID() != -1)
     B2FATAL("CalibrationManager was initialized out of the main process.");
 
-  m_CalibrationModules.clear();
+  m_calibrationModules.clear();
 }
 //---------------------------------------------------------------------------------------
 
@@ -66,10 +66,10 @@ void CalibrationManager::register_module(CalibrationModule* module)
     B2FATAL("Dependencies not fullfiled.");
   }
 
-  m_CalibrationModules.push_back(module);
+  m_calibrationModules.push_back(module);
 
   // Refresh states of all registered modules
-  for (CalibrationModule* mod : m_CalibrationModules) {
+  for (CalibrationModule* mod : m_calibrationModules) {
     if (!checkDependencies(mod, false))
       mod->setState(CalibrationModule::c_Waiting);
     else
@@ -81,7 +81,7 @@ bool CalibrationManager::checkDependencies(CalibrationModule* module, bool ignor
 {
   for (auto& dep : module->getDependencies()) {
     bool depOK = false;
-    for (CalibrationModule* mod : m_CalibrationModules) {
+    for (CalibrationModule* mod : m_calibrationModules) {
       if ((mod->getName() == dep.first)) {
         if (ignoreState)
           depOK = true;

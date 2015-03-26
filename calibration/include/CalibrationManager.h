@@ -42,10 +42,8 @@ namespace Belle2 {
        * NEVER try to call CalibrationManager::Instance in some destructor!
        * If your destructor would be called upon program exit, the singleton
        * might already be destroyed (if the singleton was created after your object).
-       * This should be also ensured by telling users they have to include
-       * CalibrationManager Module in the path (near the top) to ensure early
-       * initialization.
-       * It must also be initialized from the main thread, otherwise I am not
+       *
+       * It must also be initialized from the main process, otherwise I am not
        * sure what could happen if some other thread (which would initialize it)
        * terminates, while other ones would still like to access it.
        *
@@ -135,7 +133,7 @@ namespace Belle2 {
       /** Number of iterations for calibration or alignment procedures */
       int m_numberOfIterations;
       /** Registered calibration modules */
-      std::vector<CalibrationModule*> m_CalibrationModules;
+      std::vector<CalibrationModule*> m_calibrationModules;
 
     };
   } //end of namespace calibration

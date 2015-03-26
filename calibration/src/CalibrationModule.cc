@@ -26,20 +26,21 @@ using namespace calibration;
 
 CalibrationModule::CalibrationModule() : Module(),
   m_mode("offline"),
-  m_state(CalibrationModule::c_Done),
+  m_state(CalibrationModule::c_Waiting),
   m_iterationNumber(0),
   m_datasetCategory(""),
   m_granularityOfCalibration("run"),
   m_numberOfIterations(0),
   m_calibrationFileName(""),
-  m_calibrationModuleInitialized(false),
-  m_calibrationManagerInitialized(false),
+  //m_calibrationModuleInitialized(false),
+  //m_calibrationManagerInitialized(false),
   m_dependencyList("")
 {
 
+  // This describtion has to overriden by implementing module
   setDescription("A standard calibration module");
-  setPropertyFlags(c_ParallelProcessingCertified);
 
+  // Default parameters of the base module
   addParam("datasetCategory", m_datasetCategory,
            "Used dataset category", string("data"));
   addParam("granularityOfCalibration", m_granularityOfCalibration,
@@ -91,7 +92,7 @@ void CalibrationModule::initialize()
       }
       boost::trim(module);
       boost::trim(state);
-      ModuleDependency moduleDependency = std::make_pair(module, stringToState(state));
+      ModuleDependency moduleDependency = std::make_pair(module, CalibrationModule::stringToState(state));
       m_dependencies.push_back(moduleDependency);
     }
   }
@@ -163,45 +164,28 @@ CalibrationModule::ECalibrationModuleMonitoringResult CalibrationModule::Monitor
 
 bool CalibrationModule::StoreInDataBase() { return true;}
 
-string CalibrationModule::stateToString(CalibrationModule::ECalibrationModuleState state) const
+CalibrationModule::ECalibrationModuleState CalibrationModule::stringToState(string state)
 {
-  std::string modeName = "";
-  switch (state) {
-    case calibration::CalibrationModule::c_Done:
-      modeName = "done";
-      break;
-    case calibration::CalibrationModule::c_Failed:
-      modeName = "failed";
-      break;
-    case calibration::CalibrationModule::c_Monitoring:
-      modeName = "monitoring";
-      break;
-    case calibration::CalibrationModule::c_Running:
-      modeName = "running";
-      break;
-    case calibration::CalibrationModule::c_Waiting:
-      modeName = "waiting";
-      break;
-    default: // in case someone would static_cast invalid int to ECalibrationModuleState
-      B2FATAL("stateToString: Unknown CalibrationModule state!");
+  std::map<ECalibrationModuleState, std::string> stateNames;
+  stateNames.insert(std::make_pair(c_Waiting, "waiting"));
+  stateNames.insert(std::make_pair(c_Running, "running"));
+  stateNames.insert(std::make_pair(c_Monitoring, "monitoring"));
+  stateNames.insert(std::make_pair(c_Done, "done"));
+  stateNames.insert(std::make_pair(c_Failed, "failed"));
+  for (auto stateName : stateNames) {
+    if (stateName.second == state)
+      return stateName.first;
   }
-  return modeName;
-}
-
-CalibrationModule::ECalibrationModuleState CalibrationModule::stringToState(string state) const
-{
-  if (state == "done")
-    return calibration::CalibrationModule::c_Done;
-  if (state == "failed")
-    return calibration::CalibrationModule::c_Failed;
-  if (state == "monitoring")
-    return calibration::CalibrationModule::c_Monitoring;
-  if (state == "running")
-    return calibration::CalibrationModule::c_Running;
-  if (state == "waiting")
-    return calibration::CalibrationModule::c_Waiting;
 
   B2FATAL("stringToState: Unknown CalibrationModule state!");
 }
+
+void CalibrationModule::addDefaultDependencyList(string list)
+{
+  addParam("Dependencies", m_dependencyList,
+           "Sets dependencies on other calibration modules. Separate module names by comma. If the state of the module has to differ from 'done', use "
+           "ModuleName:state where state=done|waiting|monitoring|failed|running", std::string(list));
+}
+
 
 

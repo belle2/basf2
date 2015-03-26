@@ -159,20 +159,12 @@ namespace Belle2 {
       }
 
       /**
-       * @brief Convert state from enum to string
-       *
-       * @param state Module state
-       * @return std::string
-       */
-      std::string stateToString(ECalibrationModuleState state) const;
-
-      /**
        * @brief Convert state from string to enum
        *
        * @param state ...
        * @return Belle2::calibration::CalibrationModule::ECalibrationModuleState
        */
-      ECalibrationModuleState stringToState(std::string state) const;
+      static ECalibrationModuleState stringToState(std::string state);
 
 
     protected:
@@ -183,12 +175,7 @@ namespace Belle2 {
        *
        * @return void
        */
-      void addDefaultDependencyList(std::string list)
-      {
-        addParam("Dependencies", m_dependencyList,
-                 "Sets dependencies on other calibration modules. Separate module names by comma. If the state of the module has to differ from 'done', use "
-                 "ModuleName:state where state=done|waiting|monitoring|failed|running", std::string(list));
-      }
+      void addDefaultDependencyList(std::string list = "");
 
     private:
       /**
@@ -227,12 +214,12 @@ namespace Belle2 {
       /**
        * True if Calibration Module is already initialized
        */
-      bool m_calibrationModuleInitialized;
+      //bool m_calibrationModuleInitialized;
 
       /**
        * True if Calibration Manager is already initialized
        */
-      bool m_calibrationManagerInitialized;
+      //bool m_calibrationManagerInitialized;
       /**
        * @brief Dependencies of the module to be set on initialization
        * from module parameter "Dependencies"

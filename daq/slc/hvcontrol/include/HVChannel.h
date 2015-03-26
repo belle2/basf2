@@ -24,7 +24,8 @@ namespace Belle2 {
         m_climit(config.m_climit),
         m_state(config.m_state),
         m_vmon(config.m_vmon),
-        m_cmon(config.m_cmon) {}
+        m_cmon(config.m_cmon),
+        m_state(0) {}
     ~HVChannel() throw() {}
 
   public:
@@ -63,9 +64,9 @@ namespace Belle2 {
     float m_vdemand;
     float m_vlimit;
     float m_climit;
-    int m_state;
     float m_vmon;
     float m_cmon;
+    int m_state;
 
   };
 

@@ -72,7 +72,8 @@ namespace Belle2 {
     static double getTraversedLength(const SVDCluster* hit, const HelixHelper* helix);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const;
+    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits,
+                                              const std::vector<int>& hit_indices) const;
 
 
     /** for all particles, save log-likelihood values into 'logl'.
@@ -85,7 +86,8 @@ namespace Belle2 {
     void saveLogLikelihood(float(&logl)[Const::ChargedStable::c_SetSize], float p, float dedx, TH2F* const* pdf) const;
 
     /** should info from this detector be included in likelihood? */
-    bool detectorEnabled(Dedx::Detector d) const {
+    bool detectorEnabled(Dedx::Detector d) const
+    {
       return (d == Dedx::c_PXD and m_usePXD) or (d == Dedx::c_SVD and m_useSVD) or (d == Dedx::c_CDC and m_useCDC);
     }
 

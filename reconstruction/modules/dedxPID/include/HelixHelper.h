@@ -32,13 +32,14 @@ namespace Belle2 {
     /** construct a helix with given helix parameters, as defined for Track objects */
     HelixHelper(float z0, float d0, float omega, float cotTheta, float phi):
       z0(z0), d0(d0), omega(omega), cotTheta(cotTheta), phi(phi),
-      poca(d0* sin(phi), -d0* cos(phi), z0)
+      poca(d0 * sin(phi), -d0 * cos(phi), z0)
     { }
 
 
     /** construct a helix at an arbitrary position 'poca' (helices built at different points are not comparable) */
     HelixHelper(const TVector3& poca, const TVector3& momentum_in_poca, int charge):
-      poca(poca) {
+      poca(poca)
+    {
       const double pt = momentum_in_poca.Pt();
       const double R = pt / c_cTimesB; //c and magnetic field, should come from some common database later...
 
@@ -63,7 +64,8 @@ namespace Belle2 {
      *
      * a path length of 0 corresponds to p = poca
      */
-    double pathLengthToPoint(const TVector3& p) const {
+    double pathLengthToPoint(const TVector3& p) const
+    {
       minimize_distance_to_point = p;
       helix_object = this; //ok, this is ugly
       //TODO create a functor object to wrap everything up
@@ -81,7 +83,8 @@ namespace Belle2 {
     /** returns the path length (along the helix) to the helix point closest to the line
      *  going through points a and b.
      */
-    double pathLengthToLine(const TVector3& a, const TVector3& b) const {
+    double pathLengthToLine(const TVector3& a, const TVector3& b) const
+    {
       minimize_distance_to_line_a = a;
       minimize_distance_to_line_b = b;
 
@@ -102,7 +105,8 @@ namespace Belle2 {
     /** momentum of the particle, at the helix point
      *  corresponding to a flown path length s (from poca).
      */
-    TVector3 momentum(double s = 0) const {
+    TVector3 momentum(double s = 0) const
+    {
       const float pt = c_cTimesB / TMath::Abs(omega);
       return TVector3(
                pt * cos(phi - 2 * omega * s),
@@ -112,7 +116,8 @@ namespace Belle2 {
     }
 
     /** point on helix corresponding to a flown path length s (from poca) */
-    TVector3 position(double s) const {
+    TVector3 position(double s) const
+    {
       //aproximation (but it does work for straight tracks)
       return poca + TVector3(
                s * s * omega / 2 * sin(phi) + s * cos(phi),
@@ -138,15 +143,18 @@ namespace Belle2 {
     TVector3 poca;
 
     /** minimization function, calculates distance to minimize_distance_to_point */
-    static double distanceToPoint(double s) {
+    static double distanceToPoint(double s)
+    {
       return (helix_object->position(s) - minimize_distance_to_point).Mag();
     }
 
     /** same as distanceToPoint, but ignoring z coordinate */
-    static double distanceToLine(double s) {
+    static double distanceToLine(double s)
+    {
       const TVector3& p = helix_object->position(s);
       // d = |(p-a) \times (p-b)| / |b-a|
-      return ((p - minimize_distance_to_line_a).Cross(p - minimize_distance_to_line_b)).Mag() / (minimize_distance_to_line_b - minimize_distance_to_line_a).Mag();
+      return ((p - minimize_distance_to_line_a).Cross(p - minimize_distance_to_line_b)).Mag() / (minimize_distance_to_line_b -
+             minimize_distance_to_line_a).Mag();
     }
 
     /** user supplied point we're trying to find the nearest helix point to */

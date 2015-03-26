@@ -69,16 +69,16 @@ class FlavorTaggerInfoFiller(Module):
                     categoryProb = particle.getExtraInfo('IsRightCategory('
                                                          + category + ')')  # Prob of belonging to a cat
 
-    # Find Mother of MCTruth - if B (511) give True -- temporally used
-                MCparticle = particle.getRelated('MCParticles')
-                MCMother = MCparticle.getMother()
-                if not MCMother:
-                    B2ERROR(category)
-                    break
-                if MCMother.getPDG() == 511 or MCMother.getPDG() == -511:
-                    isIt = True
-                else:
-                    isIt = False
+    # Find Mother of MCTruth - if B (511) give True -- temporally use
+                isIt = False
+                if category != 'Lambda':
+                    MCparticle = particle.getRelated('MCParticles')
+                    MCMother = MCparticle.getMother()
+                    if not MCMother:
+                        B2ERROR(category)
+                        break
+                    if MCMother.getPDG() == 511 or MCMother.getPDG() == -511:
+                        isIt = True
 
     # Save information in the FlavorTagInfo DataObject
                 FlavorTaggerInfo.setIsB(isIt)
@@ -128,8 +128,9 @@ class RemoveExtraInfoModule(Module):
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)
                 particle.removeExtraInfo()
-        info = Belle2.PyStoreObj('EventExtraInfo')
-        info.obj().removeExtraInfo()
+        if ModeCode == 1:
+            info = Belle2.PyStoreObj('EventExtraInfo')
+            info.obj().removeExtraInfo()
 
 
 class MoveTaggerInformationToBExtraInfoModule(Module):
@@ -449,6 +450,9 @@ variables['FSC'] = [
 def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     B2INFO('TRACK LEVEL')
     ReadyMethods = 0
+
+    fillParticleList('pi+:MaximumP*ROE', 'isInRestOfEvent > 0.5', path=path)
+
     for (particleList, category) in TrackLevelParticleLists:
         methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
         targetVariable = 'IsRightTrack(' + category + ')'
@@ -474,7 +478,8 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                              '1.00<=M<=1.23', 1, path=path)
             reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', 1, path=path)
             fitVertex(particleList, 0.01, fitter='kfitter', path=path)
-            matchMCTruth(particleList, path=path)
+            if mode != 'Expert':
+                matchMCTruth(particleList, path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
 
         if not isTMVAMethodAvailable(workingDirectory + '/'
@@ -518,8 +523,6 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     for (particleList, category) in EventLevelParticleLists:
         methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
         targetVariable = 'IsRightCategory(' + category + ')'
-        if category == 'MaximumP*':
-            fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=path)
 
         if not isTMVAMethodAvailable(workingDirectory + '/'
                                      + methodPrefixEventLevel):
@@ -540,19 +543,6 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         else:
             # if category == 'KinLepton':
                 # applyCuts(particleList, 'isInElectronOrMuonCat < 0.5', path=path)
-            if category == 'KaonPion':
-                applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                          + 'IsRightTrack(Kaon)) > 0.5', path=path)
-            elif category == 'FSC':
-                applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                          + 'IsRightTrack(SlowPion)) > 0.5', path=path)
-            elif category == 'Lambda':
-                applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                          + 'IsRightTrack(Lambda)) > 0.5', path=path)
-            else:
-                applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                          + 'IsRightTrack(' + category + ')) > 0.5', path=path)
-
             B2INFO('PROCESSING: applyTMVAMethod on event level')
             applyTMVAMethod(
                 particleList,
@@ -563,6 +553,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 workingDirectory=workingDirectory,
                 path=path,
             )
+
             ReadyMethods += 1
 
     if ReadyMethods != len(EventLevelParticleLists):
@@ -607,6 +598,26 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
                 workingDirectory=workingDirectory,
                 path=path,
             )
+
+            # Cuts to extract the target particle with the highest probability for each ParticleList
+            # This is needed for FlavorTaggerInfoFiller
+            for (particleList, category) in EventLevelParticleLists:
+                methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
+                targetVariable = 'IsRightCategory(' + category + ')'
+
+                if category == 'KaonPion':
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
+                              + 'IsRightTrack(Kaon)) > 0.5', path=path)
+                elif category == 'FSC':
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
+                              + 'IsRightTrack(SlowPion)) > 0.5', path=path)
+                elif category == 'Lambda':
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
+                              + 'IsRightTrack(Lambda)) > 0.5', path=path)
+                else:
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
+                              + 'IsRightTrack(' + category + ')) > 0.5', path=path)
+
         return True
 
 
@@ -666,8 +677,9 @@ def FlavorTagger(
         FlavorTagInfoBuilder = register_module('FlavorTagInfoBuilder')
         FlavorTagInfoBuilder.param('particleList', recoParticle)
         path.add_module(FlavorTagInfoBuilder)
+        # Add FlavorTag Info filler to roe_path
+        roe_path.add_module(FlavorTaggerInfoFiller())
 
-        roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
-        roe_path.add_module(RemoveExtraInfoModule())  # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+    roe_path.add_module(RemoveExtraInfoModule())  # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

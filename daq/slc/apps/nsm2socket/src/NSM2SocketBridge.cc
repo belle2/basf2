@@ -9,9 +9,6 @@
 #include <daq/slc/database/DAQLogDB.h>
 #include <daq/slc/database/PostgreSQLInterface.h>
 
-#include <daq/slc/runcontrol/RCCommand.h>
-#include <daq/slc/hvcontrol/HVCommand.h>
-
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/PThread.h>
 

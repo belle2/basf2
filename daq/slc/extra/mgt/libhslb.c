@@ -353,21 +353,25 @@ bootfpga(int fd, const char *file, int verbose, int forced, int m012)
 
 int writefee(int fd, int addr, int val)
 {
-  writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
-  writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
-  writefn(fd, addr, val);    //HSREG_FEECONT
-  writefn(fd, HSREG_CSR,     0x0a); /* parameter write */
-  return 1;
+  int ret = 0;
+  ret |= writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
+  ret |= writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
+  ret |= writefn(fd, addr, val);    //HSREG_FEECONT
+  ret |= writefn(fd, HSREG_CSR,     0x0a); /* parameter write */
+  return ret;
 }
 
-int readfee(int fd, int addr)
+int readfee(int fd, int addr, int* val)
 {
-  writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
-  writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
-  writefn(fd, addr, 0x02);    //HSREG_FEECONT
-  writefn(fd, HSREG_CSR,     0x07); /* parameter write */
-  if (hswait(fd) < 0) return -1;
-  return readfn(fd, addr);
+  int ret = 0;
+  ret |= writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
+  ret |= writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
+  ret |= writefn(fd, addr, *val);    //HSREG_FEECONT
+  ret |= writefn(fd, HSREG_CSR,     0x07); /* parameter read */
+  if (ret != 0) return ret;
+  if (hswait_quiet(fd) < 0) return -1;
+  *val = (readfn(fd, HSREG_STAT) & 0xff);
+  return 0;
 }
 
 int linkfee(int fd)
@@ -390,53 +394,43 @@ int trgonfee(int fd)
   return writefee(fd, HSREG_FEECONT, 0x04);
 }
 
-int writefee16a(int fd, int addr, int nvals, 
-		const int* wval, int* rval)
+int writefee16a(int fd, int addr, int nvals, const int* val)
 {
   writefn(fd, HSREG_CSR, 0x05); /* reset read fifo */
   int i = 0;
   for (; i < nvals; i++) {
-    writefn(fd, addr + i * 2, wval[i] & 0xff);
-    writefn(fd, addr + i * 2 + 1, (wval[i]>>8) & 0xff);
+    writefn(fd, addr + i * 2, val[i] & 0xff);
+    writefn(fd, addr + i * 2 + 1, (val[i]>>8) & 0xff);
   }
-  if (rval != NULL) {
-    writefn(fd, HSREG_CSR,   0x07); /* parameter read */
-    if (hswait(fd) < 0) return 0;
-    i = 0;
-    for (; i < nvals; i++) {
-      rval[i] = readfn(fd, addr + i * 2) & 0xff;
-      rval[i] |= ((readfn(fd, addr + i * 2 + 1) & 0xff) << 8);
-    }
-  } else {
-    writefn(fd, HSREG_CSR, 0x0a); /* parameter write */
-  }
+  writefn(fd, HSREG_CSR, 0x0a); /* parameter write */
   return 1;
 }
 
-int writefee16(int fd, int addr, int wval, int* rval)
-{
-  return writefee16a(fd, addr, 1, &wval, rval);
-}
-
-int writefee8a(int fd, int addr, int nvals, 
-	       const int* wval, int* rval)
+int readfee16a(int fd, int addr, int nvals, int* val)
 {
   writefn(fd, HSREG_CSR, 0x05); /* reset read fifo */
   int i = 0;
   for (; i < nvals; i++) {
-    writefn(fd, addr + i, wval[i] & 0xff);
+    writefn(fd, addr + i * 2, val[i] & 0xff);
+    writefn(fd, addr + i * 2 + 1, (val[i]>>8) & 0xff);
   }
-  if (rval != NULL) {
-    writefn(fd, HSREG_CSR,   0x07); /* parameter read */
-    if (hswait(fd) < 0) return 0;
-    i = 0;
-    for (; i < nvals; i++) {
-      rval[i] = readfn(fd, addr + i) & 0xff;
-    }
-  } else {
-    writefn(fd, HSREG_CSR, 0x0a); /* parameter write */
+  writefn(fd, HSREG_CSR,   0x07); /* parameter read */
+  if (hswait(fd) < 0) return 0;
+  for (i = 0; i < nvals; i++) {
+    val[i] = readfn(fd, addr + i * 2) & 0xff;
+    val[i] |= ((readfn(fd, addr + i * 2 + 1) & 0xff) << 8);
   }
   return 1;
+}
+
+int writefee16(int fd, int addr, int val)
+{
+  return writefee16a(fd, addr, 1, &val);
+}
+
+int readfee16(int fd, int addr, int* val)
+{
+  return readfee16a(fd, addr, 1, val);
 }
 
 int checkfee(struct hslb_info* hslb)

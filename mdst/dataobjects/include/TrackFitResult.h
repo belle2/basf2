@@ -36,6 +36,10 @@ namespace Belle2 {
    *  4) z0 which is the distance of the perigee from the origin in the r-z plane
    *  5) tanLambda which is the inverse slope of the track in the r-z plane
    *
+   *  These are the parameters used by BaBar, see D.N. Brown et al., The BaBar
+   *  Track Fitting Algorithm, appendix A, eq. (15).
+   *  Available at http://rhicii-science.bnl.gov/public/comp/reco/babar.ps
+   *
    *  The class is able to return the track fit result as either perigee parameters or
    *  cartesian parameters (x,y,z,px,py,pz)
    */

@@ -39,13 +39,13 @@ namespace Belle2 {
     int writefn32(int adr, int val) throw();
     int hswait_quiet() throw();
     int hswait() throw();
-    int readfee(int adr) throw();
-    int writefee(int adr, int val) throw();
     int readfee8(int adr) throw();
     int writefee8(int adr, int val) throw();
     int readfee32(int adr, int* valp) throw();
     int writefee32(int adr, int val) throw();
     int writestream(const char* filename) throw();
+    bool writefee(int adr, int val) throw();
+    int readfee(int adr) throw();
     bool checkfee() throw();
     bool linkfee() throw();
     bool unlinkfee() throw();

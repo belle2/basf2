@@ -58,6 +58,8 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
       if (!o_hslb.getBool("used")) continue;
+      HSLB& hslb(m_hslb[i]);
+      hslb.open(i);
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
@@ -69,6 +71,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
                                       o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
       vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerInt(vname + ".reg.adr", true, true, 0));
+      add(new NSMVHandlerInt(vname + ".reg.size", true, true, 0));
       add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
       FEEConfig fconf;
       int j = 0;
@@ -83,6 +86,8 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           std::string pname = StringUtil::tolower(reg.name);
           std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
           add(new NSMVHandlerInt(vname, true, false, reg.adr));
+          vname = StringUtil::form("fee[%d].reg[%d].size", i, j);
+          add(new NSMVHandlerInt(vname, true, false, reg.size));
           vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
           add(new NSMVHandlerHSLBRegValue(*this, vname, i, reg.adr, reg.size));
         }

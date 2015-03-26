@@ -47,20 +47,15 @@ void ECLFEE::load(HSLB& hslb, const FEEConfig& conf)
   for (FEEConfig::RegList::const_iterator it = regs.begin();
        it != regs.end(); it++) {
     const FEEConfig::Reg& reg(*it);
-    LogFile::debug("write address %s(%d) (val=%d, size = %d)",
-                   reg.name.c_str(), reg.adr, reg.val, reg.size);
-    if (reg.size == 1) {
-      hslb.writefee8(reg.adr, reg.val);
-    } else if (reg.size == 4) {
-      hslb.writefee32(reg.adr, reg.val);
-    }
+    LogFile::debug("writefee adr=%d, val=%d", reg.adr, reg.val);
+    hslb.writefee(reg.adr, reg.val);
   }
   hslb.writefee(0x30, 0x0d);
-  LogFile::debug("write address %d (val=%d)", 0x30, 0x0d);
+  LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x0d);
   hslb.writefee(0x30, 0x09);
-  LogFile::debug("write address %d (val=%d)", 0x30, 0x09);
+  LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x09);
   hslb.writefee(0x30, 0x03);
-  LogFile::debug("write address %d (val=%d)", 0x30, 0x03);
+  LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x03);
 }
 
 extern "C" {

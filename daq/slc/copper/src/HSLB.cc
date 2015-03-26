@@ -132,16 +132,6 @@ int HSLB::hswait() throw()
   return ::hswait(m_hslb.fd);
 }
 
-int HSLB::readfee(int adr) throw()
-{
-  return ::readfee(m_hslb.fd, adr);
-}
-
-int HSLB::writefee(int adr, int val) throw()
-{
-  return ::writefee(m_hslb.fd, adr, val);
-}
-
 int HSLB::readfee8(int adr) throw()
 {
   return ::readfee8(m_hslb.fd, adr);
@@ -172,24 +162,38 @@ bool HSLB::checkfee() throw()
   return ::checkfee(&m_hslb) > 0;
 }
 
+bool HSLB::writefee(int adr, int val) throw()
+{
+  return ::writefee(m_hslb.fd, adr, val) == 0;
+}
+
+int HSLB::readfee(int adr) throw()
+{
+  int val = -1;
+  if (::readfee(m_hslb.fd, adr, &val) == 0) {
+    return val;
+  }
+  return -1;
+}
+
 bool HSLB::linkfee() throw()
 {
-  return ::linkfee(m_hslb.fd);
+  return ::linkfee(m_hslb.fd) == 0;
 }
 
 bool HSLB::unlinkfee() throw()
 {
-  return ::unlinkfee(m_hslb.fd);
+  return ::unlinkfee(m_hslb.fd) == 0;
 }
 
 bool HSLB::trgofffee() throw()
 {
-  return ::trgofffee(m_hslb.fd);
+  return ::trgofffee(m_hslb.fd) == 0;
 }
 
 bool HSLB::trgonfee() throw()
 {
-  return ::trgonfee(m_hslb.fd);
+  return ::trgonfee(m_hslb.fd) == 0;
 }
 
 bool HSLB::bootfpga(const std::string& firmware) throw()

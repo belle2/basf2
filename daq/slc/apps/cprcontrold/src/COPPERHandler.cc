@@ -118,18 +118,16 @@ bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
 {
   try {
     std::string vname = StringUtil::replace(getName(), ".par.val", ".reg.adr");
-    if (m_adr < 0) m_callback.get(vname, m_adr);
-    if (m_size > 0) {
-      std::string vname = StringUtil::replace(getName(), "par.val", "reg.size");
-      m_callback.get(vname, m_size);
-    }
+    m_callback.get(vname, m_adr);
+    vname = StringUtil::replace(getName(), "par.val", "reg.size");
+    m_callback.get(vname, m_size);
     if (m_adr > 0) {
       if (m_size == 1) {
         m_callback.getHSLB(m_hslb).writefee8(m_adr, val);
       } else if (m_size == 4) {
         m_callback.getHSLB(m_hslb).writefee32(m_adr, val);
       }
-      LogFile::debug("wrting %d-th HSLB : %d >> %s=%d", m_hslb, val, vname.c_str(), m_adr);
+      LogFile::debug("wrting HSLB-%c : %d to (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
       return true;
     }
   } catch (const std::exception& e) {
@@ -142,18 +140,19 @@ bool NSMVHandlerHSLBRegValue::handleGetInt(int& val)
 {
   try {
     std::string vname = StringUtil::replace(getName(), ".par.val", ".reg.adr");
-    if (m_adr < 0) m_callback.get(vname, m_adr);
-    if (m_size > 0) {
-      std::string vname = StringUtil::replace(getName(), "par.val", "reg.size");
-      m_callback.get(vname, m_size);
-    }
-    if (m_adr > 0) {
+    m_callback.get(vname, m_adr);
+    vname = StringUtil::replace(getName(), "par.val", "reg.size");
+    m_callback.get(vname, m_size);
+    if (m_adr >= 0) {
+      val = 0;
       if (m_size == 1) {
         val = m_callback.getHSLB(m_hslb).readfee8(m_adr);
       } else if (m_size == 4) {
         m_callback.getHSLB(m_hslb).readfee32(m_adr, &val);
+      } else {
+        val = m_callback.getHSLB(m_hslb).readfn(m_adr);
+        LogFile::debug("reading HSLB-%c : %d from (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
       }
-      LogFile::debug("reading %d-th HSLB : %d (%s=%d)", m_hslb, val, vname.c_str(), m_adr);
       return true;
     }
   } catch (const std::exception& e) {

@@ -1230,8 +1230,12 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TStri
 void EVEVisualization::addECLCluster(const ECLCluster* cluster)
 {
   const float phi = cluster->getPhi();
-  const float dPhi = cluster->getErrorPhi();
-  const float dTheta = cluster->getErrorTheta();
+  float dPhi = cluster->getErrorPhi();
+  float dTheta = cluster->getErrorTheta();
+  if (dPhi == 1.0 and dTheta == 1.0 and cluster->getErrorEnergy() == 1.0) {
+    B2WARNING("Found ECL cluster with unit matrix instead of proper errors. Using 0.05 as error in phi/theta");
+    dPhi = dTheta = 0.05;
+  }
 
   if (!std::isfinite(dPhi) or !std::isfinite(dTheta)) {
     B2ERROR("ECLCluster phi or theta error is NaN or infinite, skipping cluster!");

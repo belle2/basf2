@@ -3,13 +3,13 @@ Import('env')
 import commands
 import os.path
 if os.path.exists("/etc/redhat-release"):
-   osver = commands.getoutput("cat /etc/redhat-release | awk '{print $4}'")
-   if osver < 6:
+   osver = float(commands.getoutput("cat /etc/redhat-release | awk '{print $4}'"))
+   if osver < 6.0:
       env['TOOLS_LIBS']['rcview'] = ['pthread', 'ncurses', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
-   elif osver > 6:
+   elif osver > 6.0:
       env['TOOLS_LIBS']['rcview'] = ['pthread', 'ncurses', 'tinfo', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 else:
-      env['TOOLS_LIBS']['rcview'] = ['pthread', 'ncurses', 'tinfo', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+      env['TOOLS_LIBS']['rcview'] = ['pthread', 'ncurses', 'readline', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 env['TOOLS_LIBS']['rcrequest'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 

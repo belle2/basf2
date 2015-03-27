@@ -34,7 +34,8 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "Cluster filter investigates hit clusters and lets only hits pass that that are not background."
            "Valid values are: "
            "\"all\" (all hits are valid), "
-           "\"tmva\" (test clusters for background with a tmva method).",
+           "\"tmva\" (test clusters for background with a tmva method)."
+           "\"recording\" (record cluster variables to a TTree).",
            string("all"));
 
   addParam("ClusterFilterParameters",
@@ -71,22 +72,25 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
 void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
-  BaseClusterFilter* ptrClusterFilter = nullptr;
+  std::unique_ptr<BaseClusterFilter> ptrClusterFilter = nullptr;
 
   if (m_param_clusterFilter == string("all")) {
-    ptrClusterFilter = new AllClusterFilter();
+    ptrClusterFilter.reset(new AllClusterFilter());
   } else if (m_param_clusterFilter == string("tmva")) {
-    ptrClusterFilter = new TMVAClusterFilter();
+    ptrClusterFilter.reset(new TMVAClusterFilter());
+  } else if (m_param_clusterFilter == string("recording")) {
+    ptrClusterFilter.reset(new RecordingClusterFilter());
   } else {
     B2ERROR("Unrecognised ClusterFilter option " << m_param_clusterFilter <<
             ". Allowed values are " <<
             "\"all\", " <<
+            "\"recording\", " <<
             "\"tmva\"."
            );
   }
 
   // Takes ownership
-  setClusterFilter(std::unique_ptr<BaseClusterFilter>(ptrClusterFilter));
+  setClusterFilter(std::move(ptrClusterFilter));
   getClusterFilter()->setParameters(m_param_clusterFilterParameters);
 
   // Set the filters before they get initialized in the base module.

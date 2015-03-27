@@ -13,8 +13,6 @@
 
 namespace Belle2 {
 
-
-
   /// Module for the cellular automaton tracking for the CDC on regular events
   class SegmentFinderCDCFacetAutomatonDevModule: public Belle2::TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule<> {
 
@@ -33,6 +31,7 @@ namespace Belle2 {
     Valid values are:
     + "all" (all hits are valid),
     + "tmva"
+    + "recording"
     */
     std::string m_param_clusterFilter;
 

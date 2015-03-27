@@ -25,17 +25,31 @@ void MWReaderCallback::init(NSMCommunicator&) throw()
 
 void MWReaderCallback::timeout(NSMCommunicator&) throw()
 {
+  static unsigned long long count = 0;
   try {
     NSMData& data(getData());
     if (!m_reader.get() && data.isAvailable()) {
-      LogFile::debug("set reader");
       m_reader.set((mwreader*)data.get());
-      LogFile::debug("init reader");
       m_reader.init();
     }
     if (m_reader.get()) {
-      LogFile::debug("update reader");
       m_reader.update();
+      mwreader* reader = (mwreader*)data.get();
+      const int nitem = reader->nitem;
+      for (int i = 0; i < nitem; i++) {
+        mwreader::mwdata& mdata(reader->data[i]);
+        std::string vname = StringUtil::form("data[%d].", i);
+        if (count == 0) {
+          add(new NSMVHandlerText(vname + "unit", true, false, mdata.unit));
+          add(new NSMVHandlerText(vname + "alarm", true, false, mdata.alarm));
+          add(new NSMVHandlerText(vname + "cond", true, false, mdata.cond));
+        } else {
+          set(vname + "unit", mdata.unit);
+          set(vname + "alarm", mdata.alarm);
+          set(vname + "cond", mdata.cond);
+        }
+      }
+      count++;
     }
   } catch (const IOException& e) {
     LogFile::error(e.what());

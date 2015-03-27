@@ -9,6 +9,9 @@
  **************************************************************************/
 #pragma once
 
+#ifndef CDCOBSERVATIONS2D_H_
+#define CDCOBSERVATIONS2D_H_
+
 #ifndef __CINT__
 #include <Eigen/Dense>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
@@ -456,3 +459,5 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2
+
+#endif

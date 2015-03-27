@@ -100,6 +100,31 @@ namespace Belle2 {
     virtual ~SpacePoint() {}
 
 
+    /** Comparison for equality with another SpacePoint.
+    *
+    * no matter whether the compared SPs are actually the same SpacePoint of the same storeArray,
+    * this comparison only checks the global position and error.
+    * WARNING float/double comparison, could suffer from rounding errors. Better ideas?
+    * */
+    inline bool operator == (const SpacePoint& b) const
+    {
+      return (
+               this->getPosition() == b.getPosition() &&
+               this->getPositionError() == b.getPositionError()
+             );
+    }
+
+
+    /** Comparison for inequality with another SpacePoint.
+     *
+     * no matter whether the compared SPs are actually the same SpacePoint of the same storeArray,
+     * this comparison only checks the global position and error.
+     * */
+    inline bool operator != (const SpacePoint& b) const
+    {
+      return !(*this == b);
+    }
+
 
 // getter:
 

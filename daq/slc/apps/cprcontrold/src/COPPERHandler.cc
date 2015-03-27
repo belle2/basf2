@@ -259,7 +259,7 @@ bool NSMVHandlerHSLBCheckFee::handleGetText(std::string& val)
     const hslb_info& info(hslb.getInfo());
     m_callback.set(vname + ".hw", info.feehw);
     m_callback.set(vname + ".serial", info.feeserial);
-    m_callback.set(vname + ".type", HSLB::getFEEType(info.feetype));
+    m_callback.set(vname + ".type", HSLB::getFEEType(info.feehw));
     m_callback.set(vname + ".ver", info.feever);
     m_callback.set(vname + ".hslbid", info.hslbid);
     m_callback.set(vname + ".hslbver", info.hslbver);

@@ -106,7 +106,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
         add(new NSMVHandlerInt(vname + ".hw", true, false, checked ? info.feehw : -1));
         add(new NSMVHandlerInt(vname + ".serial", true, false, checked ? info.feeserial : -1));
         add(new NSMVHandlerText(vname + ".type", true, false,
-                                checked ? HSLB::getFEEType(info.feetype) : "UNKNOWN"));
+                                checked ? HSLB::getFEEType(info.feehw) : "UNKNOWN"));
         add(new NSMVHandlerInt(vname + ".ver", true, false, checked ? info.feever : -1));
         add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
         add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));

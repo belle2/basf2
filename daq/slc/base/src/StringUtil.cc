@@ -104,7 +104,8 @@ bool StringUtil::isdigit(const std::string& s)
 {
   if (s.find("0x") == 0) return true;
   for (size_t i = 0; i < s.size(); i++) {
+    if (i == 0 && s.at(0) == '-') continue;
     if (!::isdigit(s.at(i))) return false;
   }
-  return s.size() > 0;
+  return s.size() > 0 && s != "-";
 }

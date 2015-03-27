@@ -155,7 +155,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   if ((m_param_facetFilter == string("mc")) or
       (m_param_facetFilter == string("mc_symmetric")) or
       (m_param_facetNeighborChooser == string("mc")) or
-      (m_param_facetNeighborChooser == string("mc_symmetric"))) {
+      (m_param_facetNeighborChooser == string("mc_symmetric")) or
+      getClusterFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -168,7 +169,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::event()
   if ((m_param_facetFilter == string("mc")) or
       (m_param_facetFilter == string("mc_symmetric")) or
       (m_param_facetNeighborChooser == string("mc")) or
-      (m_param_facetNeighborChooser == string("mc_symmetric"))) {
+      (m_param_facetNeighborChooser == string("mc_symmetric")) or
+      getClusterFilter()->needsTruthInformation()) {
 
     CDCMCManager::getInstance().fill();
   }

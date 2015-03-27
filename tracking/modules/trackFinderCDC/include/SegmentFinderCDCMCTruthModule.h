@@ -27,7 +27,7 @@ namespace Belle2 {
 
   public:
     /// Generates the segment from Monte Carlo information. Default orientation is the flight direction.
-    virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
+    virtual void generateSegments(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
 
   private:
     /// Minimum number of CDC hits per segment.

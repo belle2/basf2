@@ -148,7 +148,7 @@ namespace Belle2 {
       }
 
       /// Generates the segment from Monte Carlo information. Default orientation is the flight direction.
-      virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
+      virtual void generateSegments(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
       // implementation below
 
 
@@ -292,7 +292,7 @@ namespace Belle2 {
     ClusterFilter,
     FacetFilter,
     FacetNeighborChooser
-    >::generate(std::vector<CDCRecoSegment2D>& segments)
+    >::generateSegments(std::vector<CDCRecoSegment2D>& segments)
     {
       /// Attain super cluster vector on the DataStore if needed.
       std::vector<CDCWireHitCluster>* ptrSuperClusters = nullptr;

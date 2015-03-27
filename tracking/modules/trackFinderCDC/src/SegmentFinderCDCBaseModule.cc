@@ -83,7 +83,7 @@ void SegmentFinderCDCBaseModule::event()
   // Generate the segments
   std::vector<CDCRecoSegment2D> generatedSegments;
   generatedSegments.reserve(90);
-  generate(generatedSegments);
+  generateSegments(generatedSegments);
 
   // Fit the segments if requested
   if (m_param_fitSegments) {

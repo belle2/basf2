@@ -34,7 +34,7 @@ void SegmentFinderCDCMCTruthModule::initialize()
 }
 
 
-void SegmentFinderCDCMCTruthModule::generate(std::vector<CDCRecoSegment2D>& outputSegments)
+void SegmentFinderCDCMCTruthModule::generateSegments(std::vector<CDCRecoSegment2D>& outputSegments)
 {
   CDCMCManager::getInstance().fill();
 
@@ -51,11 +51,11 @@ void SegmentFinderCDCMCTruthModule::generate(std::vector<CDCRecoSegment2D>& outp
     // Reserve double the space if both orientations shall be generated
     outputSegments.reserve(mcSegments.size());
 
-    for (const CDCHitVector & mcSegment : mcSegments) {
+    for (const CDCHitVector& mcSegment : mcSegments) {
       outputSegments.push_back(CDCRecoSegment2D());
       CDCRecoSegment2D& recoSegment2D = outputSegments.back();
 
-      for (const CDCHit * ptrHit : mcSegment) {
+      for (const CDCHit* ptrHit : mcSegment) {
         CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit);
         recoSegment2D.push_back(recoHit2D);
       }

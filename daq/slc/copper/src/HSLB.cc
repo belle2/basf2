@@ -207,6 +207,20 @@ bool HSLB::trgonfee() throw()
   return ::trgonfee(m_hslb.fd) == 0;
 }
 
+int HSLB::readfee16(int adr) throw()
+{
+  int val = 0;
+  if (::readfee16(m_hslb.fd, adr, &val)) {
+    return val;
+  }
+  return -1;
+}
+
+bool HSLB::writefee16(int adr, int val) throw()
+{
+  return ::writefee16(m_hslb.fd, adr, val);
+}
+
 bool HSLB::bootfpga(const std::string& firmware) throw()
 {
   return ::bootfpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) == 0;

@@ -54,6 +54,8 @@ namespace Belle2 {
     bool trgofffee() throw();
     bool trgonfee() throw();
     bool bootfpga(const std::string& firmware) throw();
+    bool writefee16(int adr, int val) throw();
+    int readfee16(int adr) throw();
 
   public:
     bool boot(const std::string& firmware) throw();

@@ -20,11 +20,20 @@ void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
   const char* firmware = conf.getFirmware();
   if (firmware && File::exist(firmware)) {
     LogFile::info("Loading CDC FEE firmware: %s", firmware);
-    std::string cmd = StringUtil::form("cd ~b2daq/run/cdc/; sh impact-batch.sh %s",
+    std::string cmd = StringUtil::form("ssh ropc01 \"cd ~b2daq/run/cdc/; sh impact-batch.sh %s\"",
                                        firmware);
     system(cmd.c_str());
   } else {
     LogFile::debug("CDC FEE firmware not exists : %s", firmware);
+  }
+  std::string s;
+  if ((s = hslb.checkfee()) != "UNKNOWN") {
+    StringList ss = StringUtil::split(s, '\n');
+    for (size_t i = 0; i < ss.size(); i++) {
+      LogFile::info(ss[i]);
+    }
+  } else {
+    LogFile::error("Check FEE error");
   }
 }
 
@@ -35,12 +44,13 @@ void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
   for (FEEConfig::RegList::const_iterator it = regs.begin();
        it != regs.end(); it++) {
     const FEEConfig::Reg& reg(*it);
+    if (reg.val < 0) continue;
     LogFile::debug("write address %s(%d) (val=%d, size = %d)",
                    reg.name.c_str(), reg.adr, reg.val, reg.size);
     if (reg.size == 1) {
       hslb.writefee8(reg.adr, reg.val);
-    } else if (reg.size == 4) {
-      hslb.writefee32(reg.adr, reg.val);
+    } else if (reg.size == 2) {
+      hslb.writefee16(reg.adr, reg.val);
     }
   }
 }

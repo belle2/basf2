@@ -7,7 +7,7 @@ using namespace Belle2;
 bool FEEConfig::read(const DBObject& obj)
 {
   m_regs = RegList();
-  if (obj.hasText("firm")) m_stream = obj.getText("firm");
+  if (obj.hasText("firm")) m_firmware = obj.getText("firm");
   if (obj.hasText("stream")) m_stream = obj.getText("stream");
   if (obj.hasObject("reg") && obj.hasObject("par")) {
     const DBObjectList& oregs(obj.getObjects("reg"));

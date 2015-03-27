@@ -20,9 +20,11 @@ void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
   const char* firmware = conf.getFirmware();
   if (firmware && File::exist(firmware)) {
     LogFile::info("Loading CDC FEE firmware: %s", firmware);
-    std::string cmd = StringUtil::form("cd ~/run/cdc/; sh impact-batch.sh %s",
+    std::string cmd = StringUtil::form("cd ~b2daq/run/cdc/; sh impact-batch.sh %s",
                                        firmware);
     system(cmd.c_str());
+  } else {
+    LogFile::debug("CDC FEE firmware not exists : %s", firmware);
   }
 }
 

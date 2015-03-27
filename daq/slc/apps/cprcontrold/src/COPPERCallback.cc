@@ -79,18 +79,20 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       if (m_fee[i] != NULL && fconf.read(o_fee)) {
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
-        const FEEConfig::RegList& regs(fconf.getRegList());
-        for (FEEConfig::RegList::const_iterator it = regs.begin();
-             it != regs.end(); it++) {
-          const FEEConfig::Reg& reg(*it);
-          std::string pname = StringUtil::tolower(reg.name);
-          std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
-          add(new NSMVHandlerInt(vname, true, false, reg.adr));
-          vname = StringUtil::form("fee[%d].reg[%d].size", i, j);
-          add(new NSMVHandlerInt(vname, true, false, reg.size));
-          vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
-          add(new NSMVHandlerHSLBRegValue(*this, vname, i, reg.adr, reg.size));
-        }
+        /*
+              const FEEConfig::RegList& regs(fconf.getRegList());
+              for (FEEConfig::RegList::const_iterator it = regs.begin();
+                   it != regs.end(); it++) {
+                const FEEConfig::Reg& reg(*it);
+                std::string pname = StringUtil::tolower(reg.name);
+                std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
+                add(new NSMVHandlerInt(vname, true, false, reg.adr));
+                vname = StringUtil::form("fee[%d].reg[%d].size", i, j);
+                add(new NSMVHandlerInt(vname, true, false, reg.size));
+                vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
+                add(new NSMVHandlerInt(vname, i, reg.adr, reg.size));
+              }
+        */
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
                                      o_fee.hasText("stream") ? o_fee.getText("stream") : ""));

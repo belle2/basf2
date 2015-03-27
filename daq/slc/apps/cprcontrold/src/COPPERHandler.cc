@@ -126,7 +126,7 @@ bool NSMVHandlerFEEBoot::handleSetInt(int val)
   DBObject& obj(m_callback.getDBObject());
   m_callback.get(obj);
   if (val > 0 && m_callback.getFEE(m_hslb) &&
-      fconf.read(obj)) {
+      fconf.read(obj("fee", m_hslb))) {
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
     try {

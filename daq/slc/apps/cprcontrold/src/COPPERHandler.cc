@@ -5,6 +5,8 @@
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 using namespace Belle2;
 
 bool NSMVHandlerFifoEmpty::handleGetInt(int& val)
@@ -251,7 +253,20 @@ bool NSMVHandlerHSLBTrgOffFee::handleSetInt(int val)
 bool NSMVHandlerHSLBCheckFee::handleGetText(std::string& val)
 {
   LogFile::info("check FEE (HSLB:%c)", m_hslb + 'a');
-  val = m_callback.getHSLB(m_hslb).checkfee();
+  HSLB& hslb(m_callback.getHSLB(m_hslb));
+  if ((val = hslb.checkfee()) != "UNKNOWN") {
+    std::string vname = StringUtil::split(m_name, '.')[0];
+    const hslb_info& info(hslb.getInfo());
+    m_callback.set(vname + ".hw", info.feehw);
+    m_callback.set(vname + ".serial", info.feeserial);
+    m_callback.set(vname + ".type", HSLB::getFEEType(info.feetype));
+    m_callback.set(vname + ".ver", info.feever);
+    m_callback.set(vname + ".hslbid", info.hslbid);
+    m_callback.set(vname + ".hslbver", info.hslbver);
+    LogFile::info(StringUtil::replace(val.c_str(), "\n", ", "));
+  } else {
+    LogFile::error("check FEE error");
+  }
   return true;
 }
 

@@ -101,6 +101,15 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
         add(new NSMVHandlerHSLBTrgOnFee(*this, vname + ".trigon", i));
         add(new NSMVHandlerHSLBTrgOffFee(*this, vname + ".trigoff", i));
         add(new NSMVHandlerHSLBCheckFee(*this, vname + ".checkfee", i));
+        bool checked = hslb.checkfee() != "UNKNOWN";
+        const hslb_info& info(hslb.getInfo());
+        add(new NSMVHandlerInt(vname + ".hw", true, false, checked ? info.feehw : -1));
+        add(new NSMVHandlerInt(vname + ".serial", true, false, checked ? info.feeserial : -1));
+        add(new NSMVHandlerText(vname + ".type", true, false,
+                                checked ? HSLB::getFEEType(info.feetype) : "UNKNOWN"));
+        add(new NSMVHandlerInt(vname + ".ver", true, false, checked ? info.feever : -1));
+        add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
+        add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
       }
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fmver", i, 0x81, 5));
       add(new NSMVHandlerHSLBRegFixed(*this, vname + ".b2lstat", i, 0x83, 5));

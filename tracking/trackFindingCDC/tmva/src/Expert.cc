@@ -10,23 +10,51 @@
 #include <tracking/trackFindingCDC/tmva/Expert.h>
 #include <framework/utilities/FileSystem.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Expert::Expert(const std::string& weightFolder, const std::string& name) : m_reader("!Silent")
+Expert::Expert(const std::string& weightFolderName, const std::string& trainingName) :
+  m_reader("!Silent"),
+  m_weightFolderName(weightFolderName),
+  m_trainingName(trainingName)
 {
   TMVAUtilities::loadPlugins("FastBDT");
-  std::string fileName = name + "_FastBDT.weights.xml";
-  m_weightFileName = FileSystem::findFile(weightFolder + "/" + fileName);
+}
+
+std::string Expert::getAbsWeightFilePath()
+{
+  std::string weightFilePath =
+    m_weightFolderName == "" ?
+    getWeightFileName() : m_weightFolderName + "/" + getWeightFileName();
+
+  std::string absWeightFilePath = FileSystem::findFile(weightFilePath);
+  return absWeightFilePath;
 }
 
 void Expert::initializeReader(const std::function<void(TMVA::Reader&)> setReaderAddresses)
 {
   setReaderAddresses(m_reader);
-  m_reader.BookMVA("FastBDT", m_weightFileName);
+  m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
 }
 
-double Expert::useWeight()
+void Expert::initializeReader(std::vector<NamedFloatTuple*> allVariables)
+{
+  for (NamedFloatTuple* variables : allVariables) {
+    size_t nVars = variables->size();
+    for (size_t iVar = 0; iVar < nVars; ++iVar) {
+      std::string name = variables->getNameWithPrefix(iVar);
+      TString tName(name.c_str());
+      Float_t& value = (*variables)[iVar];
+      m_reader.AddVariable(tName, &value);
+    }
+  }
+
+  m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
+}
+
+double Expert::predict()
 {
   return m_reader.EvaluateMVA("FastBDT");
 }

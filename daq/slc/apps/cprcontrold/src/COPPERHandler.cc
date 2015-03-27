@@ -248,7 +248,7 @@ bool NSMVHandlerHSLBTrgOffFee::handleSetInt(int val)
   return false;
 }
 
-bool NSMVHandlerHSLBCheckFee::handleGetInt(int& val)
+bool NSMVHandlerHSLBCheckFee::handleGetText(std::string& val)
 {
   LogFile::info("check FEE (HSLB:%c)", m_hslb + 'a');
   val = m_callback.getHSLB(m_hslb).checkfee();

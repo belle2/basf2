@@ -2,6 +2,8 @@
 
 #include <daq/slc/system/File.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 #include <mgt/libhslb.h>
 #include <mgt/hsreg.h>
 
@@ -44,7 +46,7 @@ bool HSLB::load() throw()
 {
   if (m_hslb.fd < 0) return false;
   linkfee();
-  return (!isError()) && checkfee();
+  return (!isError()) && checkfee() != "UNKNOWN";
 }
 
 bool HSLB::monitor() throw()
@@ -157,9 +159,18 @@ int HSLB::writestream(const char* filename) throw()
   return ::writestream(m_hslb.fd, (char*)filename);
 }
 
-bool HSLB::checkfee() throw()
+std::string HSLB::checkfee() throw()
 {
-  return ::checkfee(&m_hslb) > 0;
+  static const char* feetype[] = {
+    "UNDEF", "SVD", "CDC", "BPID", "EPID", "ECL", "KLM", "TRG",
+    "UNKNOWN-8", "UNKNOWN-9", "UNKNOWN-10", "UNKNOWN-11",
+    "UNKNOWN-12", "UNKNOWN-13", "DEMO", "TEST"
+  };
+  if (::checkfee(&m_hslb) > 0 && m_hslb.feehw < 16 && m_hslb.feetype >= 0) {
+    return StringUtil::form("FEE type: %s \nserial: %d \nfirm type: %d \nfirm version: %d",
+                            feetype[m_hslb.feehw], m_hslb.feeserial, m_hslb.feetype, m_hslb.feever);
+  }
+  return std::string("UNKNOWN");
 }
 
 bool HSLB::writefee(int adr, int val) throw()

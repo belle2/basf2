@@ -16,10 +16,10 @@ ECLFEE::ECLFEE()
 {
 }
 
-void ECLFEE::boot(HSLB& hslb,  const FEEConfig& conf)
+void ECLFEE::boot(HSLB& hslb,  const FEEConfig&)
 {
   hslb.writefn(0x30, 0);
-  for (int ntry = 0; !hslb.checkfee(); ntry++) {
+  for (int ntry = 0; hslb.checkfee() == "UNKNOWN"; ntry++) {
     hslb.writefn32(0x82, 0x1000);
     usleep(100);
     hslb.writefn32(0x82, 0x10);

@@ -5,6 +5,8 @@
 
 #include <mgt/hslb_info.h>
 
+#include <string>
+
 namespace Belle2 {
 
   class HSLB {
@@ -46,7 +48,7 @@ namespace Belle2 {
     int writestream(const char* filename) throw();
     bool writefee(int adr, int val) throw();
     int readfee(int adr) throw();
-    bool checkfee() throw();
+    std::string checkfee() throw();
     bool linkfee() throw();
     bool unlinkfee() throw();
     bool trgofffee() throw();

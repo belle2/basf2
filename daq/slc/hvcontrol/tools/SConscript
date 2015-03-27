@@ -3,7 +3,7 @@ Import('env')
 import commands
 import os.path
 if os.path.exists("/etc/redhat-release"):
-   ss = (commands.getoutput("cat /etc/redhat-release | awk '{print $5}'")).split(" ")
+   ss = (commands.getoutput("cat /etc/redhat-release")).split(" ")
    osver = 0.0
    for s in ss:
       try:

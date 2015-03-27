@@ -48,6 +48,16 @@
     virtual bool handleSetText(const std::string& val); \
   }
 
+#define CPRHANDLER_TEXT_GET(CLASS)       \
+  class CLASS : public NSMVHandlerText, HandlerCPR {     \
+  public:                  \
+    CLASS(COPPERCallback& callback, const std::string& name, int hslb)        \
+      : NSMVHandlerText(name, true, true),       \
+        HandlerCPR(callback, hslb, -1, -1) {}       \
+    virtual ~CLASS() throw() {}              \
+    virtual bool handleGetText(std::string& val); \
+  }
+
 namespace Belle2 {
 
   class COPPERCallback;
@@ -81,7 +91,7 @@ namespace Belle2 {
   CPRHANDLER_INT_SET(NSMVHandlerHSLBUnLinkFee);
   CPRHANDLER_INT_SET(NSMVHandlerHSLBTrgOnFee);
   CPRHANDLER_INT_SET(NSMVHandlerHSLBTrgOffFee);
-  CPRHANDLER_INT_GET(NSMVHandlerHSLBCheckFee);
+  CPRHANDLER_TEXT_GET(NSMVHandlerHSLBCheckFee);
   CPRHANDLER_TEXT(NSMVHandlerTTRXFirmware);
   CPRHANDLER_TEXT(NSMVHandlerHSLBFirmware);
   CPRHANDLER_TEXT(NSMVHandlerFEEStream);

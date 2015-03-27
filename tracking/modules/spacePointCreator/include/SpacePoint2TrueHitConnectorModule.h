@@ -62,9 +62,11 @@ namespace Belle2 {
 
     virtual void terminate(); /**< terminate: print some summary information */
 
-    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster, "Found no related TrueHit for a Cluster!"); /**< Exception for when no related TrueHit can be found for a Cluster */
+    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster,
+                            "Found no related TrueHit for a Cluster!"); /**< Exception for when no related TrueHit can be found for a Cluster */
 
-    BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint, "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
+    BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint,
+                            "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
 
     /** helper struct to access root variables inside the module */
     struct RootVariables {
@@ -86,6 +88,18 @@ namespace Belle2 {
       std::vector<unsigned short int> HitVxdID; /**< VxdID of the SpacePoint/TrueHit */
       std::vector<unsigned short int> RelationStatus; /**< different flags of the relation stored in here (see c_relationStatus) */
       std::vector<unsigned int> NRelations; /**< Number of related TrueHits to a SpacePoint */
+
+      // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
+      std::vector<unsigned int> ClusterSizeU;
+      std::vector<unsigned int> ClusterSizeV;
+
+      std::vector<double> SpacePointErrorU; /**< position error of SpacePoint in U direction */
+      std::vector<double> SpacePointErrorV; /**< position error of SpacePoint in V direction */
+
+      std::vector<double> SpacePointErrorX; /**< positiion error of SpacePoint in X direction (global) */
+      std::vector<double> SpacePointErrorY; /**< positiion error of SpacePoint in Y direction (global) */
+      std::vector<double> SpacePointErrorZ; /**< positiion error of SpacePoint in Z direction (global) */
+      // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
     }; // end RootVariables
 
   protected:
@@ -119,7 +133,8 @@ namespace Belle2 {
 
     std::vector<std::string> m_PARAMspacePointNames; /**< names of containers of SpacePoints */
 
-    std::vector<std::string> m_PARAMdetectorTypes; /**< detector type names as strings to determine which name belongs to which detector type */
+    std::vector<std::string>
+    m_PARAMdetectorTypes; /**< detector type names as strings to determine which name belongs to which detector type */
 
     std::vector<std::string> m_PARAMclusterNames; /**< names of containers of Clusters */
 
@@ -143,7 +158,8 @@ namespace Belle2 {
 
     // ================================================= INTERMALLY USED MEMBERS ==================================================
 
-    unsigned int m_nContainers; /**< number of passed containers -> storing the size of an input vector for not having to obtain it every time */
+    unsigned int
+    m_nContainers; /**< number of passed containers -> storing the size of an input vector for not having to obtain it every time */
 
     std::vector<e_detTypes> m_detectorTypes; /**< storing the detector types for each container in vector, needed in initialize */
 
@@ -155,13 +171,15 @@ namespace Belle2 {
 
     Belle2::StoreArray<Belle2::SVDCluster> m_SVDClusters; /**< PXDClusters StoreArray used throughout the module */
 
-    std::vector<std::pair<Belle2::StoreArray<Belle2::SpacePoint>, e_detTypes> > m_inputSpacePoints; /**< StoreArray of all input SpacePoints */
+    std::vector<std::pair<Belle2::StoreArray<Belle2::SpacePoint>, e_detTypes> >
+    m_inputSpacePoints; /**< StoreArray of all input SpacePoints */
 
     std::vector<Belle2::StoreArray<Belle2::SpacePoint> > m_outputSpacePoints; /**< StoreArray of all output SpacePoints */
 
     double m_maxGlobalDiff; /**< storing the squared value of m_PARAMmaxGlobalDiff here to not alter the parameter input */
 
-    unsigned int m_iCont; /**< 'helper variable' needed to not have to pass one integer down to processSpacePoint only to have a handle in cases where an exception gets caught! */
+    /** 'helper variable' needed to not have to pass one integer down to processSpacePoint only to have a handle in cases where an exception gets caught */
+    unsigned int m_iCont;
 
     RootVariables m_rootVariables; /**< Root variables used for collecting data eventwise */
 
@@ -173,17 +191,21 @@ namespace Belle2 {
     // ================================================= COUNTERS =================================================================
     std::vector<unsigned int> m_SpacePointsCtr; /**< Number of SpacePoints presented to the module */
 
-    std::vector<std::array<unsigned int, 5> > m_nRelTrueHitsCtr; /**< counting different numbers of related TrueHits (to a SpacePoint) with one variable */
+    std::vector<std::array<unsigned int, 5> >
+    m_nRelTrueHitsCtr; /**< counting different numbers of related TrueHits (to a SpacePoint) with one variable */
 
-    std::vector<unsigned int> m_noClusterCtr; /**< Number of SpacePoints without relation to a Cluster (i.e. counts how many times the NoClusterTrueHit exception gets thrown) */
+    /** Number of SpacePoints without relation to a Cluster (i.e. counts how many times the NoClusterTrueHit exception gets thrown) */
+    std::vector<unsigned int> m_noClusterCtr;
 
     std::vector<unsigned int> m_regRelationsCtr; /**< Number of registered relations */
 
     std::vector<unsigned int> m_ghostHitCtr; /**< Number of SpacePoints that are considered ghost hits */
 
-    std::vector<unsigned int> m_noTrueHitCtr; /**< Number of SpacePoints that contained a Cluster to which no TrueHit could be found (i.e. counts how many times the NoTrueHitToCluster exception gets thrown) */
+    /** Number of SpacePoints that contained a Cluster to which no TrueHit could be found (i.e. counts how many times the NoTrueHitToCluster exception gets thrown) */
+    std::vector<unsigned int> m_noTrueHitCtr;
 
-    std::vector<unsigned int> m_rejectedRelsCtr; /**< Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned NULL) */
+    /** Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned NULL) */
+    std::vector<unsigned int> m_rejectedRelsCtr;
 
     unsigned int m_weightTooSmallCtr; /**< Count the omitted relations because of a too small weight */
 
@@ -213,48 +235,6 @@ namespace Belle2 {
 
     void initializeCounters(); /**< initialize all counters to 0 */
 
-    // COULDDO: place the (rather) general functions below into a header to make it accessible to more than just this module
-
-    /**
-     * get the contents of the map as string. NOTE: only templated to such a degree that is actually needed in this module! should compile without warning for any map (e.g. map, multimap, unordered_map,...) with key and values of a type that have a defined stream insertion operator (only tested for multimap and unordered_multimap!)
-     */
-    template <typename MapType>
-    std::string printMap(const MapType& aMap);
-
-    /**
-     * get the unique keys of a map
-     */
-    template <typename MapType>
-    std::vector<typename MapType::key_type> getUniqueKeys(const MapType& aMap);
-
-    /**
-     * get the number of unique keys inside the map
-     */
-    template <typename MapType>
-    unsigned int getUniqueSize(const MapType& aMap) { return getUniqueKeys<MapType>(aMap).size(); }
-
-    /**
-     * get the unique keys of a map together with the number of values associated to each key. first elements are keys, second are number of values
-     */
-    template <typename MapType>
-    std::vector<std::pair<typename MapType::key_type, unsigned int> > getNValuesPerKey(const MapType& aMap);
-
-    /**
-     * get all values stored in the map for a given key
-     */
-    template <typename MapType>
-    std::vector<typename MapType::mapped_type> getValuesToKey(const MapType& aMap, typename MapType::key_type aKey);
-
-    /**
-     * get the key value pairs stored in the map, sorted after the following scheme (descending order)
-     * 1) the number of associated values to one key
-     * 2) the sum of the associated values to that key
-     * @returns a vector of tuples where get<0> is the key, get<1> is the sum of the values to the key and get<2> is the number of weights to the key
-     */
-    template <typename MapType>
-    std::vector<std::tuple<typename MapType::key_type, typename MapType::mapped_type, unsigned int> >
-    getSortedKeyValuePairs(const MapType& aMap);
-
     /**
      * get the TrueHit from information that is stored in the map (conditions are checked in the following order):
      * + if there is only one TrueHit in the map, return a pointer to it and as weight the sum of the weights of the relations between the Clusters and the TrueHits
@@ -265,7 +245,8 @@ namespace Belle2 {
      * NOTE: the possible return of a NULL pointer has to be handled!
      */
     template <typename MapType, typename TrueHitType>
-    std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits, Belle2::SpacePoint* spacePoint, e_detTypes detType);
+    std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits,
+                                                    Belle2::SpacePoint* spacePoint, e_detTypes detType);
 
     /**
      * compares the TrueHit and the SpacePoint positions (global) to decide whether they are compatible
@@ -308,16 +289,19 @@ namespace Belle2 {
      * register all the relations to Clusters that origSpacePoint had for newSpacePoint
      */
     template<typename ClusterType>
-    void reRegisterClusterRelations(Belle2::SpacePoint* origSpacePoint, Belle2::SpacePoint* newSpacePoint, std::string clusterName = "ALL");
+    void
+    reRegisterClusterRelations(Belle2::SpacePoint* origSpacePoint, Belle2::SpacePoint* newSpacePoint, std::string clusterName = "ALL");
 
     /**
      * get the pointers to the related Clusters and the weight of the original Relations between the spacePoint and these Clusters
      */
     template<typename ClusterType>
-    std::vector<std::pair<ClusterType*, double> > getRelatedClusters(Belle2::SpacePoint* spacePoint, std::string clusterName = "ALL");
+    std::vector<std::pair<ClusterType*, double> >
+    getRelatedClusters(Belle2::SpacePoint* spacePoint, std::string clusterName = "ALL");
 
     /**
-     * register the relation between a SpacePoint and the TrueHit (passed by index in the correspoinding TrueHit Array) with the passed weight
+     * register the relation between a SpacePoint and the TrueHit (passed by index in the correspoinding TrueHit Array)
+     * with the passed weight
      * NOTE: defining a function here mainly to avoid having duplicate code for every TrueHitType
      */
     template<typename TrueHitType>
@@ -348,6 +332,18 @@ namespace Belle2 {
 
     /** close root file */
     void closeRootFile();
+
+    // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
+    /** get the sizes of the related Clusters of a SpacePoint
+     * @returns .first is U cluster size, .second is V cluster size
+     */
+    std::pair<unsigned short int, unsigned short int> getClusterSizes(Belle2::SpacePoint* spacePoint, e_detTypes detType);
+
+    /** get the position error of SpacePoints in local coordinates
+     * @retuns .first is U position error, .second is V position error
+     */
+    std::pair<double, double> getLocalError(Belle2::SpacePoint* spacePoint);
+    // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for testing at the moment (i.e. do not commit)
   }; // end module
 
   /** helper class for setting up a bitfield that can be used to store several flags in one variable

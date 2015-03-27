@@ -72,7 +72,14 @@ bool NSMVHandlerTTRXLinkUpError::handleGetInt(int& val)
 bool NSMVHandlerTTRXFirmware::handleSetText(const std::string& firmware)
 {
   if (File::exist(firmware)) {
-    return m_callback.getTTRX().boot(firmware);
+    LogFile::info("Loading TTRX firmware: " + firmware);
+    bool ret;
+    if ((ret = m_callback.getTTRX().boot(firmware))) {
+      LogFile::info("Succeded");
+    } else {
+      LogFile::error("Failed");
+    }
+    return ret;
   } else {
     LogFile::error("TTRX firmware %s not exists", firmware.c_str());
   }
@@ -82,7 +89,14 @@ bool NSMVHandlerTTRXFirmware::handleSetText(const std::string& firmware)
 bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
 {
   if (File::exist(firmware)) {
-    return m_callback.getHSLB(m_hslb).bootfpga(firmware);
+    LogFile::info("Loading HSLB firmware: " + firmware);
+    bool ret;
+    if ((ret = m_callback.getHSLB(m_hslb).bootfpga(firmware))) {
+      LogFile::info("Succeded");
+    } else {
+      LogFile::error("Failed");
+    }
+    return ret;
   } else {
     LogFile::error("HSLB firmware %s not exists", firmware.c_str());
   }
@@ -92,7 +106,14 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
 bool NSMVHandlerFEEStream::handleSetText(const std::string& stream)
 {
   if (File::exist(stream)) {
-    return m_callback.getHSLB(m_hslb).writestream(stream.c_str());
+    LogFile::info("Streaming file: " + stream);
+    bool ret;
+    if ((ret = m_callback.getHSLB(m_hslb).writestream(stream.c_str()))) {
+      LogFile::info("Succeded");
+    } else {
+      LogFile::error("Failed");
+    }
+    return ret;
   } else {
     LogFile::error("FEE stream file %s not exists", stream.c_str());
   }

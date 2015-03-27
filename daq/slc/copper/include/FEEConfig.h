@@ -26,6 +26,8 @@ namespace Belle2 {
     ~FEEConfig() {}
 
   public:
+    void setFirmware(const std::string& firmware) { m_firmware = firmware; }
+    const char* getFirmware() const { return m_firmware.c_str(); }
     void setStream(const std::string& stream) { m_stream = stream; }
     const char* getStream() const { return m_stream.c_str(); }
     RegList& getRegList() { return m_regs; }
@@ -33,6 +35,7 @@ namespace Belle2 {
     bool read(const DBObject& obj);
 
   private:
+    std::string m_firmware;
     std::string m_stream;
     RegList m_regs;
 

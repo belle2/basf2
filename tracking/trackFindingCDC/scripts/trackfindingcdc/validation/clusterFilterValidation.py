@@ -10,7 +10,7 @@ import basf2
 
 from ROOT import gSystem
 gSystem.Load('libtracking')
-gSystem.Load('libtrackFindingCDC')
+gSystem.Load('libtracking_trackFindingCDC')
 
 from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
@@ -77,11 +77,17 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
     def __init__(self, output_file_name):
         super(ClusterFilterValidationModule, self).__init__(foreach="CDCWireHitClusterVector",
                                                             output_file_name=output_file_name)
-
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
+        prefix = ""
+        self.cluster_varset = Belle2.TrackFindingCDC.CDCWireHitClusterVarSet(prefix)
 
     def initialize(self):
+        self.cluster_varset.initialize()
         super(ClusterFilterValidationModule, self).initialize()
+
+    def terminate(self):
+        self.cluster_varset.terminate()
+        super(ClusterFilterValidationModule, self).terminate()
 
     def prepare(self):
         self.mc_hit_lookup.fill()
@@ -92,41 +98,29 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
     def peel(self, cluster):
         mc_hit_lookup = self.mc_hit_lookup
 
-        superlayer_id = cluster.getISuperLayer()
-        size = cluster.size()
+        self.cluster_varset.extract(cluster)
+        cluster_crops = self.cluster_varset.getNamedValuesWithPrefix()
+        cluster_crops = dict(cluster_crops)
 
+        # Truth variables
         n_background = 0
-        total_n_neighbors = 0
-
         for wireHit in cluster.items():
             cdcHit = wireHit.getHit()
             if mc_hit_lookup.isBackground(cdcHit):
                 n_background += 1
 
-            # Clusterizer writes the number of neighbors into the cell weight
-            n_neighbors = wireHit.getAutomatonCell().getCellWeight()
-            total_n_neighbors += n_neighbors
-
-            # Drift circle information
-            wireHit.getRefPos2D()
-            wireHit.getRefDriftLength()
-            wireHit.getRefDriftLengthVariance()
-
-        # etc.....
-
-        # When do we actually want to reject a cluster?
-
-        return dict(
-            superlayer_id=superlayer_id,
-            size=size,
-            n_background=n_background,
-            background_fraction=1.0 * n_background / size,
-            total_n_neighbors=total_n_neighbors,
-            avg_n_neignbors=1.0 * total_n_neighbors / size,
+        truth_dict = dict(
+            n_background_truth=n_background,
+            background_fraction_truth=1.0 * n_background / cluster.size()
         )
 
+        cluster_crops.update(truth_dict)
+        return cluster_crops
+
     save_tree = refiners.save_tree(folder_name="tree")
-    # save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True, folder_name="histograms")
+    save_histograms = refiners.save_histograms(outlier_z_score=5.0,
+                                               allow_discrete=True,
+                                               folder_name="histograms")
 
 
 def main():

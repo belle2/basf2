@@ -150,6 +150,11 @@ namespace Belle2 {
       /// Getter for the outer radius of the layer as retrived from the CDCGeometryPar by the outer most layer
       FloatType getOuterCylindricalR() const { return last().getOuterCylindricalR(); }
 
+      /// Getter for the radius in the middle of the layer.
+      FloatType getMiddleCylindricalR() const
+      { return (getOuterCylindricalR() + getInnerCylindricalR()) / 2.0; }
+
+
       /// Getter for the (fitted) z of the reference wire reference points at the inner cylindricalR of this super layer.
       FloatType getInnerRefZ() const { return m_innerRefZ; }
 

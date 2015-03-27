@@ -1,0 +1,128 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+#include "FixedSizeNamedFloatTuple.h"
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
+#include <vector>
+#include <string>
+#include <assert.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    /** Generic class that generates some named float values from a given object.
+     *  This object template provides the memory and the names of the float values.
+     *  The filling from the complex object is specialised in the derived class
+     *
+     *  As a template parameter it takes class with three containing parameters.
+     *  Object - The class of the complex object from which to extract the variable.
+     *  nNames - Number of variables that will be extracted from the complex object.
+     *  names - Array of names which contain the nNames names of the float values.
+     **/
+    template<class ObjectVarNames>
+    class VarSet {
+
+    private:
+      /// Number of floating point values represented by this class.
+      static const size_t nVars = ObjectVarNames::nNames;
+    public:
+      typedef typename ObjectVarNames::Object Object;
+
+    public:
+      /// Constructure taking a optional prefix that can be attached to the names if request.
+      VarSet(const std::string& prefix = "") :
+        m_variables(prefix)
+      {;}
+
+      /// Virtual destructor
+      virtual ~VarSet() {;}
+
+      /// Main method that extracts the variable values from the complex object.
+      virtual bool extract(const typename ObjectVarNames::Object* obj) = 0;
+
+      /** Initialize the variable set before event processing.
+       *  Can be specialised if the derived variable set has setup work to do.
+       */
+      virtual void initialize() {;}
+
+      /** Terminate the variable set after event processing.
+       *  Can be specialised if the derived variable set has to tear down aquired resources.
+       */
+      virtual void terminate() {;}
+
+      /** Getter for the named tuples storing the values of all the (possibly nested) VarSets
+       *  Base implementation returns the  named tuple of this variable set.
+       */
+      virtual std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables()
+      {
+        return std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*>(1, &m_variables);
+      }
+
+      /** Const getter for the named tuples storing the values of all the (possibly nested)
+       *  variable sets. Base implementation returns the named tuple of this variable set.
+       */
+      virtual std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const
+      {
+        return std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*>(1, &m_variables);
+      }
+
+      /// Getter for a map of all name including the optional prefix and value pairs
+      std::map<std::string, Float_t> getNamedValuesWithPrefix() const
+      {
+        std::map<std::string, Float_t> namedValues;
+        std::vector<const NamedFloatTuple*> allVariables = getAllVariables();
+        for (const NamedFloatTuple* variables : allVariables) {
+          size_t nVariables = variables->size();
+          for (size_t iVariable = 0; iVariable < nVariables; ++iVariable) {
+            std::string name = variables->getNameWithPrefix(iVariable);
+            Float_t value = variables->get(iVariable);
+            namedValues[name] = value;
+          }
+        }
+        return namedValues;
+      }
+
+    protected:
+      /** Getter for the index from the name.
+       *  Looks through the associated names and returns the right index if found
+       *  Returns nVars (one after the last element) if not found.
+       *
+       *  @param name       Name of the sought variable
+       *  @return           Index of the name, nVars if not found.
+       */
+      IF_NOT_CINT(constexpr)
+      static int named(const char* const name)
+      {
+        return index(ObjectVarNames::names, name);
+      }
+
+      /// Getter for the value of the ith variable. Static version.
+      template<int iValue>
+      Float_t get() const
+      {
+        return m_variables.get(iValue);
+      }
+
+      /// Reference getter for the value of the ith variable. Static version.
+      template<int iValue>
+      Float_t& var()
+      {
+        return m_variables[iValue];
+      }
+
+    public:
+      /// Memory for nNames floating point values.
+      FixedSizeNamedFloatTuple<ObjectVarNames> m_variables;
+
+    }; //end class
+  } //end namespace TrackFindingCDC
+} //end namespace Belle2

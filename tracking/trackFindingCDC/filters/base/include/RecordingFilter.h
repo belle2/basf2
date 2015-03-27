@@ -27,7 +27,7 @@ namespace Belle2 {
     public:
       /// Constructor of the filter.
       RecordingFilter(const std::string& defaultRootFileName = "records.root",
-                      const std::string& defaultTreeName = "recorded_tree") :
+                      const std::string& defaultTreeName = "records") :
         FilterOnVarSet<VarSet_>(),
         m_recorder(nullptr),
         m_rootFileName(defaultRootFileName),

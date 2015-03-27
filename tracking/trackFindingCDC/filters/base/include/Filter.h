@@ -19,12 +19,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Base class for filters on a generic object type.
-    template<class T>
+    template<class Object_>
     class Filter {
 
     public:
       /// Type of the object to be analysed.
-      typedef T Object;
+      typedef Object_ Object;
 
     public:
       /// Constructor of the filter.
@@ -64,6 +64,12 @@ namespace Belle2 {
       virtual std::map<std::string, std::string> getParameterDescription()
       {
         return std::map<std::string, std::string>();
+      }
+
+      /// Indicates if the filter requires Monte Carlo information.
+      virtual bool needsTruthInformation()
+      {
+        return false;
       }
 
     public:

@@ -96,6 +96,12 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
                                      o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
         add(new NSMVHandlerFEEBoot(*this, vname + ".boot", i));
         vname = StringUtil::form("hslb[%d]", i);
+        add(new NSMVHandlerHSLBRegFixed(*this, vname + ".firmver", i, 0x81, 5));
+        add(new NSMVHandlerHSLBRegFixed(*this, vname + ".b2lstat", i, 0x83, 5));
+        add(new NSMVHandlerHSLBRegFixed(*this, vname + ".rxdata", i, 0x84, 5));
+        add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwevt", i, 0x85, 5));
+        add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwclk", i, 0x86, 5));
+        add(new NSMVHandlerHSLBRegFixed(*this, vname + ".cntsec", i, 0x87, 5));
         add(new NSMVHandlerHSLBLinkFee(*this, vname + ".linkfee", i));
         add(new NSMVHandlerHSLBUnLinkFee(*this, vname + ".unlinkfee", i));
         add(new NSMVHandlerHSLBTrgOnFee(*this, vname + ".trgonfee", i));

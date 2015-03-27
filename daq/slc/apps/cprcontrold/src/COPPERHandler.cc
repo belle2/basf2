@@ -127,7 +127,7 @@ bool NSMVHandlerHSLBRegValue::handleSetInt(int val)
       } else if (m_size == 4) {
         m_callback.getHSLB(m_hslb).writefee32(m_adr, val);
       }
-      LogFile::debug("wrting HSLB-%c : %d to (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
+      LogFile::info("wrting HSLB-%c : %d to (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
       return true;
     }
   } catch (const std::exception& e) {
@@ -149,10 +149,53 @@ bool NSMVHandlerHSLBRegValue::handleGetInt(int& val)
         val = m_callback.getHSLB(m_hslb).readfee8(m_adr);
       } else if (m_size == 4) {
         m_callback.getHSLB(m_hslb).readfee32(m_adr, &val);
-      } else {
+      } else if (m_adr < 0x80) {
         val = m_callback.getHSLB(m_hslb).readfn(m_adr);
-        LogFile::debug("reading HSLB-%c : %d from (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
+      } else {
+        val = m_callback.getHSLB(m_hslb).readfn32(m_adr);
       }
+      LogFile::info("reading HSLB-%c : %d from (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
+      return true;
+    }
+  } catch (const std::exception& e) {
+    LogFile::error(e.what());
+  }
+  return false;
+}
+
+bool NSMVHandlerHSLBRegFixed::handleSetInt(int val)
+{
+  try {
+    if (m_adr > 0) {
+      if (m_size == 1) {
+        m_callback.getHSLB(m_hslb).writefee8(m_adr, val);
+      } else if (m_size == 4) {
+        m_callback.getHSLB(m_hslb).writefee32(m_adr, val);
+      }
+      LogFile::info("wrting HSLB-%c : %d to (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
+      return true;
+    }
+  } catch (const std::exception& e) {
+    LogFile::error(e.what());
+  }
+  return false;
+}
+
+bool NSMVHandlerHSLBRegFixed::handleGetInt(int& val)
+{
+  try {
+    if (m_adr >= 0) {
+      val = 0;
+      if (m_size == 1) {
+        val = m_callback.getHSLB(m_hslb).readfee8(m_adr);
+      } else if (m_size == 4) {
+        m_callback.getHSLB(m_hslb).readfee32(m_adr, &val);
+      } else if (m_adr < 0x80) {
+        val = m_callback.getHSLB(m_hslb).readfn(m_adr);
+      } else {
+        val = m_callback.getHSLB(m_hslb).readfn32(m_adr);
+      }
+      LogFile::info("reading HSLB-%c : %d from (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);
       return true;
     }
   } catch (const std::exception& e) {

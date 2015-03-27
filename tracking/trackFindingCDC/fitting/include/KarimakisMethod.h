@@ -9,13 +9,12 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declarations.
-    class CDCTrajectory2D;
-    class CDCObservations2D;
-    class UncertainPerigeeCircle;
-
     /// Class implementing the Karimaki fit for two dimensional trajectory circle
     class KarimakisMethod {
 

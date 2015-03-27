@@ -9,10 +9,6 @@
  **************************************************************************/
 #include "../include/KarimakisMethod.h"
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-
 #include "TMatrixDSym.h"
 #include <Eigen/Dense>
 

@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Forward declarations.
-    class CDCTrajectory2D;
-    class CDCObservations2D;
-    class UncertainPerigeeCircle;
-
     /// Class implementing the Riemann fit for two dimensional trajectory circle
     class ExtendedRiemannsMethod {
 
@@ -24,7 +22,8 @@ namespace Belle2 {
       /// Constructor setting the default constraints.
       ExtendedRiemannsMethod();
 
-      /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
+      /// Executes the fit and updates the trajectory parameters
+      /// This may render the information in the observation object.
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
     private:

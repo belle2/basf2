@@ -22,10 +22,9 @@ namespace Belle2 {
         m_vdemand(config.m_vdemand),
         m_vlimit(config.m_vlimit),
         m_climit(config.m_climit),
-        m_state(config.m_state),
         m_vmon(config.m_vmon),
         m_cmon(config.m_cmon),
-        m_state(0) {}
+        m_state(config.m_state) {}
     ~HVChannel() throw() {}
 
   public:

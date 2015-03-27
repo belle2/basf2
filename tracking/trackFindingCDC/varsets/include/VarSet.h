@@ -128,17 +128,21 @@ namespace Belle2 {
       }
 
       /// Getter for the value of the ith variable. Static version.
-      template<int iValue>
+      template<int iVar>
       Float_t get() const
       {
-        return m_variables.get(iValue);
+        IF_NOT_CINT(static_assert(iVar < nVars,
+                                  "Requested variable index exceeds number variables.");)
+        return m_variables.get(iVar);
       }
 
       /// Reference getter for the value of the ith variable. Static version.
-      template<int iValue>
+      template<int iVar>
       Float_t& var()
       {
-        return m_variables[iValue];
+        IF_NOT_CINT(static_assert(iVar < nVars,
+                                  "Requested variable index exceeds number variables.");)
+        return m_variables[iVar];
       }
 
     public:

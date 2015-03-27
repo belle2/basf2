@@ -9,24 +9,25 @@
  **************************************************************************/
 #pragma once
 
-#include "Filter.h"
+#include "FilterOnVarSet.h"
 #include <tracking/trackFindingCDC/tmva/Expert.h>
+#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter based on a tmva method.
-    template<class VarSet>
-    class TMVAFilter: public Filter<typename VarSet::Object> {
+    template<class VarSet_>
+    class TMVAFilter: public FilterOnVarSet<VarSet_> {
 
     public:
       /// Type of the object to be analysed.
-      typedef typename VarSet::Object Object;
+      typedef typename VarSet_::Object Object;
 
     public:
       /// Constructor of the filter.
       TMVAFilter(const std::string& defaultTrainingName = "") :
-        Filter<Object>(),
+        FilterOnVarSet<VarSet_>(),
         m_param_cut(NAN),
         m_expert("data/tracking", defaultTrainingName)
       {;}
@@ -34,16 +35,10 @@ namespace Belle2 {
       /// Initialize the expert before event processing.
       virtual void initialize() override
       {
-        m_varset.initialize();
-        m_expert.initializeReader(m_varset.getAllVariables());
+        FilterOnVarSet<VarSet_>::initialize();
+        VarSet_& varSet = FilterOnVarSet<VarSet_>::getVarSet();
+        m_expert.initializeReader(varSet.getAllVariables());
       }
-
-      /// Initialize the terminate after event processing.
-      virtual void terminate() override
-      {
-        m_varset.terminate();
-      }
-
 
       /** Set the parameter with key to values.
        *
@@ -65,7 +60,7 @@ namespace Belle2 {
           B2INFO("Filter received parameter 'training_name' = " << m_expert.getTrainingName());
 
         } else {
-          Filter<Object>::setParameter(key, value);
+          FilterOnVarSet<VarSet_>::setParameter(key, value);
         }
       }
 
@@ -73,7 +68,7 @@ namespace Belle2 {
        */
       virtual std::map<std::string, std::string> getParameterDescription()
       {
-        std::map<std::string, std::string> des = Filter<Object>::getParameterDescription();
+        std::map<std::string, std::string> des = FilterOnVarSet<VarSet_>::getParameterDescription();
         des["cut"] =  "The cut value of the mva output below which the object is rejected.";
         des["folder_weight"] = "The name of the folder to look for weight files from trainings.";
         des["training_name"] = "The name of the training that should be used for the prediction.";
@@ -83,10 +78,13 @@ namespace Belle2 {
       /// Function to evaluate the cluster for its backgroundness.
       virtual CellWeight operator()(const Object& obj) override final
       {
-        bool extracted = m_varset.extract(&obj);
-        if (not extracted) return NOT_A_CELL;
-        double prediction = m_expert.predict();
-        return prediction < m_param_cut ? NOT_A_CELL : prediction;
+        CellWeight extracted = FilterOnVarSet<VarSet_>::operator()(obj);
+        if (isNotACell(extracted)) {
+          return NOT_A_CELL;
+        } else {
+          double prediction = m_expert.predict();
+          return prediction < m_param_cut ? NOT_A_CELL : prediction;
+        }
       }
 
     private:
@@ -95,9 +93,6 @@ namespace Belle2 {
 
       /// TMVA Expert to decide if a cluster is background or not.
       Expert m_expert;
-
-      /// VarSet to generate the variables from the object
-      VarSet m_varset;
     };
   }
 }

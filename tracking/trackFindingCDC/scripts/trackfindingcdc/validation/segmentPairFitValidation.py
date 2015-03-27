@@ -21,6 +21,8 @@ from tracking.validation.plot import ValidationPlot
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
 
+import trackfindingcdc.validation.cdc_peelers as cdc_peelers
+
 from trackfindingcdc import SegmentFitterModule, AxialStereoPairFitterModule
 
 import logging
@@ -44,7 +46,8 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
         "SegmentPairNeighborChooser": "none",
     })
     fit_method_name = "fuse-xy"
-    output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
+    # Specification for BrowseTFileOnTerminateRunMixin
+    output_file_name = "SegmentPairFitValidation.root"
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(SegmentPairFitValidationRun, self).create_argument_parser(**kwds)
@@ -67,10 +70,16 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
             default=self.fit_method_name,
             dest="fit_method_name",
             help=("Choose which fit positional information of the segment should be used. \n"
-                  "* 'zreco' means the z coordinate is reconstructed and a linear sz fit is made. No covariance between the circle and the linear sz part can be made.\n"
-                  "* 'fuse-simple' means the axial-stereo fusion technique is used without a prior z reconstruction step.\n"
-                  "* 'fuse-xy-priority' means the axial-stereo fusion technique is used with a prior z reconstruction step and a linear sz fit, on which the fusion technique acts as a correction..\n"
-                  "* 'fuse-sz-priority' is like 'fuse-xy-priority' but the z position is reestimated after the sz linear fit has been performed, which means that the residuals become visible in xy plane again.")
+                  "* 'zreco' means the z coordinate is reconstructed and a linear sz fit is made. "
+                  "No covariance between the circle and the linear sz part can be made.\n"
+                  "* 'fuse-simple' means the axial-stereo fusion technique is used "
+                  "without a prior z reconstruction step.\n"
+                  "* 'fuse-xy-priority' means the axial-stereo fusion technique is used "
+                  "with a prior z reconstruction step and a linear sz fit, "
+                  "on which the fusion technique acts as a correction..\n"
+                  "* 'fuse-sz-priority' is like 'fuse-xy-priority' but the z position is "
+                  "reestimated after the sz linear fit has been performed, "
+                  "which means that the residuals become visible in xy plane again.")
         )
 
         return argument_parser
@@ -130,11 +139,14 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
 
 class SegmentPairFitValidationModule(harvesting.HarvestingModule):
 
-    """Module to collect information about the generated segment pairs and compose validation plots on terminate."""
+    """Module to collect information about the generated segment pairs and
+    compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
-        super(SegmentPairFitValidationModule, self).__init__(output_file_name=output_file_name,
-                                                             foreach="CDCAxialStereoSegmentPairVector")
+        super(SegmentPairFitValidationModule, self).__init__(
+            output_file_name=output_file_name,
+            foreach="CDCAxialStereoSegmentPairVector"
+        )
         self.mc_segment_lookup = None
 
     def initialize(self):
@@ -164,43 +176,15 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
 
         # Take the fit best at the middle of the segment pair
         fit3d_truth = mc_segment_lookup.getTrajectory3D(end_segment)
-        fit3d = axial_stereo_segment_pair.getTrajectory3D()
-        start_fit2d = start_segment.getTrajectory2D()
-        end_fit2d = end_segment.getTrajectory2D()
-        i_curv = 0
-        i_tan_lambda = 3
 
-        chi2 = fit3d.getChi2()
-        ndf = fit3d.getNDF()
-        curvature_truth = fit3d_truth.getCurvatureXY()
-        curvature_estimate = fit3d.getCurvatureXY()
-
-        start_superlayer_id = start_segment.getISuperLayer()
-        end_superlayer_id = end_segment.getISuperLayer()
-
-        sorted_superlayer_ids = sorted([start_superlayer_id, end_superlayer_id])
-
-        superlayer_id_pair = 10.0 * sorted_superlayer_ids[1] + sorted_superlayer_ids[0]
-
-        return dict(
-            start_superlayer_id=start_superlayer_id,
-            end_superlayer_id=end_superlayer_id,
-            superlayer_id_pair=superlayer_id_pair,
-            start_curvature_estimate=start_fit2d.getCurvature(),
-            end_curvature_estimate=end_fit2d.getCurvature(),
-
-            curvature_truth=curvature_truth,
-            curvature_estimate=curvature_estimate,
-            curvature_variance=fit3d.getLocalVariance(i_curv),
-
+        truth_crops = dict(
+            curvature_truth=fit3d_truth.getCurvatureXY(),
             tan_lambda_truth=fit3d_truth.getTanLambda(),
-            tan_lambda_estimate=fit3d.getTanLambda(),
-            tan_lambda_variance=fit3d.getLocalVariance(i_tan_lambda),
-
-            chi2=chi2,
-            ndf=ndf,
-            p_value=prob(chi2, ndf),
         )
+
+        segment_pair_crops = cdc_peelers.peel_axial_stereo_segment_pair(axial_stereo_segment_pair)
+        segment_pair_crops.update(truth_crops)
+        return segment_pair_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
     save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
@@ -237,27 +221,21 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         description="Distribution of {part_name} in the segment fits",
     )
 
-    @refiners.context(groupby=[None, "superlayer_id_pair"])
-    def plot(self, crops, tdirectory, **kwds):
-        tan_lambda_truths = crops["tan_lambda_truth"]
-        p_values = crops["p_value"]
-
-        validation_plots = []
-
-        # P value versus tan lambda profile
-        p_values_by_tan_lambda_truths_profile = ValidationPlot("p_values_versus_tan_lambda_truths")
-        p_values_by_tan_lambda_truths_profile.profile(tan_lambda_truths, p_values)
-        p_values_by_tan_lambda_truths_profile.xlabel = "true tan #lambda"
-        p_values_by_tan_lambda_truths_profile.ylabel = "p-value"
-        p_values_by_tan_lambda_truths_profile.title = "Fit p-value versus tan #lambda truths"
-        p_values_by_tan_lambda_truths_profile.contact = CONTACT
-        p_values_by_tan_lambda_truths_profile.check = "The residuals should be essentially the same over the whole range of the tan lambda spectrum"
-        p_values_by_tan_lambda_truths_profile.description = "Investigating the reconstruction quality for different tan lambda regions of the CDC."
-        p_values_by_tan_lambda_truths_profile.fit_line()
-        validation_plots.append(p_values_by_tan_lambda_truths_profile)
-
-        for plot in validation_plots:
-            plot.write(tdirectory)
+    save_fit_quality_by_tan_lambda_profiles = refiners.save_profiles(
+        select={
+            "p_value": "fit p-value",
+            "tan_lambda_truth": "true tan #lambda",
+        },
+        groupby=[None, "superlayer_id_pair"],
+        x="true tan #lambda",
+        y="fit p-value",
+        check=("The {y_part_name} should be essentially the same over"
+               "the whole range of the tan lambda spectrum"),
+        description = ("Investigating the reconstruction quality for different "
+                       "tan lambda regions of the CDC. Most notably is the superlayer dependency."
+                       "For stereo superlayers the curve is not flat but has distinct slope."),
+        fit='line',
+    )
 
 
 def main():

@@ -253,6 +253,7 @@ class SaveProfilesRefiner(Refiner):
                  upper_bound=None,
                  bins=None,
                  outlier_z_score=None,
+                 fit=None,
                  skip_single_valued=False,
                  allow_discrete=False):
 
@@ -275,6 +276,8 @@ class SaveProfilesRefiner(Refiner):
 
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
+
+        self.fit = fit
 
         self.skip_single_valued = skip_single_valued
 
@@ -359,6 +362,14 @@ class SaveProfilesRefiner(Refiner):
                 profile_plot.xlabel = compose_axis_label(x_part_name)
                 profile_plot.ylabel = compose_axis_label(y_part_name, self.y_unit)
 
+                if self.fit:
+                    fit_method_name = 'fit_' + str(self.fit)
+                    try:
+                        fit_method = getattr(profile_plot, fit_method_name)
+                    except:
+                        profile_plot.fit(str(fit))
+                    else:
+                        fit_method()
                 if tdirectory:
                     profile_plot.write(tdirectory)
 

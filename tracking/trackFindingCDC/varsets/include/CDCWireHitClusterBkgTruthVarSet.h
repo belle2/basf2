@@ -21,7 +21,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 3;
+      static const size_t nNames = 4;
 
       /// Names of the variables to be generated.
       IF_NOT_CINT(constexpr)
@@ -29,6 +29,7 @@ namespace Belle2 {
         "n_background_hits_truth",
         "background_fraction_truth",
         "weight",
+        "truth"
         // Note: Variables with Monte Carlo information should carry truth in their name.
       };
 

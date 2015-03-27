@@ -19,6 +19,19 @@
 #include <TDatabasePDG.h>
 #include <TRandom3.h>
 
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+#include <generators/utilities/cm2LabBoost.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <string>
+#include <queue>
+
+#include <EvtGenExternal/EvtExternalGenList.hh>
+#include <EvtGenBase/EvtAbsRadCorr.hh>
+#include <EvtGenBase/EvtDecayBase.hh>
+
 using namespace std;
 using namespace Belle2;
 using namespace Pythia8;
@@ -58,16 +71,17 @@ void FragmentationModule::initialize()
   // with one line per change. This should be done between the creation of the Pythia object
   // and the init call for it.
 
+  // Switch off ProcessLevel (skips PartonLevel as well)
+  pythia.readString("ProcessLevel:all = off");
+
   // Read the PYTHIA input file, overrides parameters
   pythia.readFile(m_parameterfile);
-
-  pythia.readString("ProcessLevel:all = off"); // The trick! Key requirement: switch off ProcessLevel, and thereby also PartonLevel
 
   // Set framework generator
   FragmentationRndm* fragRndm = new FragmentationRndm();
   pythia.setRndmEnginePtr(fragRndm);
 
-  // Initialization
+  // Initialize PYTHIA
   pythia.init();
 
   // Set EvtGen (after pythia.init())
@@ -98,8 +112,10 @@ void FragmentationModule::event()
   // Reset PYTHIA event record to allow for new event
   PythiaEvent.reset();
 
-  // Reset counter for added quarks
-  nAddedQuarks = 0;
+  // Reset counter for added quarks and vphos
+  nAdded  = 0;
+  nQuarks = 0;
+  nVpho   = 0;
 
   // Store which MCParticle index belongs to which Pythia index
   std::map<int, int> indexPYTHIA;
@@ -117,13 +133,28 @@ void FragmentationModule::event()
 
     //returns quark id if it finds a quark, zero otherwise
     //increments a counter for the number of found quarks
-    int pythiaIndex = addQuarkToPYTHIA(*currParticle);
+    int pythiaIndex = addParticleToPYTHIA(*currParticle);
 
     if (pythiaIndex != 0) {
-      indexPYTHIA[nAddedQuarks] = iPart;
+      indexPYTHIA[nAdded] = iPart;
       if (pythiaIndex > 0) quarkPosition = iPart;
     }
   }
+
+  // Check needed if virtual exchange boson and two quarks are present
+  if (nQuarks != 2) {
+    B2FATAL("Invalid number of quarks: " << nQuarks << " (should be 2)!");
+  }
+
+  if (nVpho != 1) {
+    B2WARNING("No virtual exchange particle given, no PYTHIA FSR in Decays");
+  } else {
+    // Adding QCD and QED FSR
+    pythia.forceTimeShower(2, 3, 20.00);
+  }
+
+  // Check needed if event is energetically possible
+  // ...
 
   // Do the fragmentation using PYTHIA
   if (!pythia.next()) {
@@ -211,18 +242,23 @@ void FragmentationModule::event()
 }
 
 //-----------------------------------------------------------------
-//                 addQuarkToPYTHIA
+//                 addParticleToPYTHIA
 //-----------------------------------------------------------------
-int FragmentationModule::addQuarkToPYTHIA(MCParticle& mcParticle)
+int FragmentationModule::addParticleToPYTHIA(MCParticle& mcParticle)
 {
   //get PDG code
   const int id = mcParticle.getPDG();
 
-  //check that this particle is a quark
-  if (abs(id) < 1 || abs(id) > 4) return 0;
+  //check that this particle is a quark or a virtual photon(-like)
+  bool isVPho  = false;
+  bool isQuark = false;
+  if (abs(id) >= 1 && abs(id) <= 4) isQuark = true;
+  if (id == 23) isVPho = true;
 
-  //check that there is no daughter
-  if (mcParticle.getDaughters().size()) {
+  if (!(isVPho || isQuark)) return 0;
+
+  //check that there is no daughter for the quarks
+  if (isQuark && mcParticle.getDaughters().size()) {
     B2WARNING("Quark already has a daughter!");
     return 0;
   }
@@ -232,14 +268,21 @@ int FragmentationModule::addQuarkToPYTHIA(MCParticle& mcParticle)
   const TVector3& p   = mcParticle.getMomentum();
   const double energy = sqrt(mass * mass + p.Mag2());
 
+//   int Event::append(int id, int status, int mother1, int mother2, int daughter1, int daughter2, int col, int acol, Vec4 p, double m = 0., double scale = 0.)
+
   //add this (anti)quark to the PythiaEvent
-  if (id > 0) {
-    PythiaEvent.append(id, 23, 101, 0, p.X(), p.Y(), p.Z(), energy, mass);
+  if (id == 23) {
+    PythiaEvent.append(23, -22, 0, 0, 2, 3, 0, 0, p.X(), p.Y(), p.Z(), energy, mass);
+    nVpho++;
+  } else if (id > 0) {
+    PythiaEvent.append(id, 23, 1, 0, 0, 0, 101, 0, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
+    nQuarks++;
   } else if (id < 0) {
-    PythiaEvent.append(id, 23, 0, 101, p.X(), p.Y(), p.Z(), energy, mass);
+    PythiaEvent.append(id, 23, 1, 0, 0, 0, 0, 101, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
+    nQuarks++;
   }
 
-  nAddedQuarks++;
+  nAdded++;
 
   return id;
 }
@@ -251,7 +294,6 @@ FragmentationRndm::FragmentationRndm() : Pythia8::RndmEngine()
 {
 
 }
-
 double FragmentationRndm::flat()
 {
   double value = gRandom->Rndm();

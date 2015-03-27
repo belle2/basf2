@@ -76,8 +76,10 @@ namespace Belle2 {
 
     void initialize();
 
-    int nAddedQuarks;  /**< number of added quarks. */
-    int addQuarkToPYTHIA(MCParticle& mcParticle);   /**< picks quark/antiquark and adds them to a pythia event. */
+    int nAdded;  /**< number of added particles. */
+    int addParticleToPYTHIA(MCParticle& mcParticle);   /**< picks particles and adds them to a pythia event. */
+    int nQuarks;
+    int nVpho;
 
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */

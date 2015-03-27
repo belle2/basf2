@@ -36,7 +36,7 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "Valid values are: "
            "\"all\" (all hits are valid), "
            "\"tmva\" (test clusters for background with a tmva method).",
-           string("simple"));
+           string("all"));
 
   addParam("ClusterFilterParameters",
            m_param_clusterFilterParameters,
@@ -55,7 +55,7 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"fitless_hard\" (also exclude the boarder line feasable combinations), "
            "\"simple\" (mc free with simple criteria)."
            "\"realistic\" (mc free with more realistic criteria).",
-           string("simple"));
+           string("realistic"));
 
   addParam("FacetNeighborChooser",
            m_param_facetNeighborChooser,

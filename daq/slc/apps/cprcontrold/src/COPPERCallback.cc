@@ -70,8 +70,8 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerHSLBFirmware(*this, vname + ".firm", i,
                                       o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
       vname = StringUtil::form("hslb[%d]", i);
-      add(new NSMVHandlerInt(vname + ".reg.adr", true, true, 0));
-      add(new NSMVHandlerInt(vname + ".reg.size", true, true, 0));
+      add(new NSMVHandlerInt(vname + ".reg.adr", true, true, -1));
+      add(new NSMVHandlerInt(vname + ".reg.size", true, true, -1));
       add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
       FEEConfig fconf;
       int j = 0;

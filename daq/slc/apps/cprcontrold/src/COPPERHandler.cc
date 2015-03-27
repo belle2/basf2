@@ -151,7 +151,7 @@ bool NSMVHandlerHSLBRegValue::handleGetInt(int& val)
         m_callback.getHSLB(m_hslb).readfee32(m_adr, &val);
       } else if (m_adr < 0x80) {
         val = m_callback.getHSLB(m_hslb).readfn(m_adr);
-      } else {
+      } else if (m_size > 0) {
         val = m_callback.getHSLB(m_hslb).readfn32(m_adr);
       }
       LogFile::info("reading HSLB-%c : %d from (adr=%d, size=%d)", ('a' + m_hslb), val, m_adr, m_size);

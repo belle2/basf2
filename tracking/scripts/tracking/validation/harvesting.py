@@ -6,6 +6,7 @@ import collections
 
 import array
 import numpy as np
+import types
 
 import basf2
 import ROOT
@@ -30,7 +31,8 @@ def get_logger():
 
 class AttributeDict(dict):
 
-    """Class that enables access to the dictionaries items by attribute lookup in addition to normal item lookup."""
+    """Class that enables access to the dictionaries items by attribute lookup
+    in addition to normal item lookup."""
 
     def __getattr__(self, name):
         """If the name is not an attribute of the object, try to look it up as an item instead."""
@@ -65,7 +67,7 @@ def harvest(foreach="", pick=None, name=None, output_file_name=None):
 
     def harvest_decorator(peel_func):
         name_or_default = name or peel_func.__name__
-        output_file_name_or_default = output_file_name or "%s.root" % name
+        output_file_name_or_default = output_file_name or "{}.root".format(name)
         harvesting_module = HarvestingModule(foreach=foreach,
                                              output_file_name=output_file_name_or_default,
                                              name=name_or_default)
@@ -89,18 +91,22 @@ class HarvestingModule(basf2.Module):
     -----
     Methods to be overwritten
     ``prepare``
-        Method called at the start of each event, that may prepare things (e.g. setup lookup tables or precomputed list)
-        used in the following methods.
+        Method called at the start of each event, that may prepare things
+        (e.g. setup lookup tables or precomputed list) used in the following methods.
     ``pick``
-        Method called with each object in the StoreArray. Returns a False value if the object should be skipped.
-    ``peel``
-        Method called with each object in the StoreArray. Extractes the parts relevant for analysis and
-        returns them as MutableMapping (e.g. a dict) of part_name and values. Currently only float values
-        or values convertable to floats are supported. If requested that can change in the future.
+        Method called with each object in the StoreArray.
+        Returns a False value if the object should be skipped.
 
-    On termination all the collected values are recasted to numpy arrays and the whole ``crops`` of the harvest
-    are casted to MutableMapping of numpy.array with the same part_name and the same MutableMapping class
-    as returned from peel.
+    ``peel``
+        Method called with each object in the StoreArray.
+        Extractes the parts relevant for analysis and
+        returns them as MutableMapping (e.g. a dict) of part_name and values.
+        Currently only float values or values convertable to floats are supported.
+        If requested that can change in the future.
+
+    On termination all the collected values are recasted to numpy arrays and
+    the whole ``crops`` of the harvest are casted to MutableMapping of numpy.array
+    with the same part_name and the same MutableMapping class as returned from peel.
 
     Also in the termination phase refiners a invoked with the aggregated crops.
     Refiners can be given in two ways.
@@ -111,11 +117,12 @@ class HarvestingModule(basf2.Module):
         def plot(self, crops, tdirectory, **kwds):
             ...
 
-    where self is the module instance, crops is the MutableMapping of numpy arrays and tdirectory is the current tdirectory to which
-    the current output shall be written. The additional kwds leave room for future additional arguments.
+    where self is the module instance, crops is the MutableMapping of numpy arrays and tdirectory
+    is the current tdirectory to which the current output shall be written.
+    The additional kwds leave room for future additional arguments.
 
-    Second way is to define the refiner method (like plot) out of line and add it to the harvesting module instance refiners list like
-    harvesting_module.refiners.append(plot).
+    Second way is to define the refiner method (like plot) out of line and add it to
+    the harvesting module instance refiners list like harvesting_module.refiners.append(plot).
 
     Other specialised decorators to mark a function as a Refiner such as
 
@@ -150,14 +157,17 @@ class HarvestingModule(basf2.Module):
     output_file_name : string
         Name of the ROOT file to which the results should be written
     name : string, optional
-        Name of the harvest that is used in the names of ROOT plots and trees. Defaults to the class name.
+        Name of the harvest that is used in the names of ROOT plots and trees.
+        Defaults to the class name.
     title : string, optional
         Name of the harvest that is used in the title of ROOT plots and trees. Defaults to the name.
     contact : string, optional
         Contact email adress to be used in the validation plots contact. Defaults to None.
     expert_level : int, optional
-        Expert level that can be used to switch on more plots. Generally the higher the more detailed to analysis.
-        Meaning depends entirely on the subclass implementing a certain policy. Defaults to default_expert_level.
+        Expert level that can be used to switch on more plots.
+        Generally the higher the more detailed to analysis.
+        Meaning depends entirely on the subclass implementing a certain policy.
+        Defaults to default_expert_level.
 
 
     Attributes
@@ -219,13 +229,18 @@ class HarvestingModule(basf2.Module):
         run.execute()
 
     def initialize(self):
-        if isinstance(self.output_file_name, basestring) and self.output_file_name.startswith("datastore://"):
+        if (isinstance(self.output_file_name, basestring) and
+                self.output_file_name.startswith("datastore://")):
+
             # Check if the tfile was registered on the datastore before
             datastore_output_file_name = self.output_file_name[len("datastore://"):]
             persistent = 1
             stored_tfile = Belle2.PyStoreObj(datastore_output_file_name, persistent)
             if not stored_tfile:
-                raise KeyError("No TFile with name %s created on the DataStore." % datastore_output_file_name)
+                msg = "No TFile with name {} created on the DataStore.".format(
+                    datastore_output_file_name
+                )
+                raise KeyError(msg)
 
         # prepare the barn to receive the harvested crops
         self.stash = self.barn()
@@ -238,7 +253,12 @@ class HarvestingModule(basf2.Module):
         for crop in self.gather():
             if pick(crop):
                 crop = peel(crop)
-                stash(crop)
+                if isinstance(crop, types.GeneratorType):
+                    many_crops = crop
+                    for crop in many_crops:
+                        stash(crop)
+                else:
+                    stash(crop)
 
     def terminate(self):
         self.stash.close()
@@ -280,7 +300,11 @@ class HarvestingModule(basf2.Module):
                     crops[part_name] = np.array(parts)
 
         else:
-            raise ValueError("Unrecognised crop %s of type %s" % (crop, type(crop)))
+            msg = "Unrecognised crop {} of type {}".format(
+                crop,
+                type(crop)
+            )
+            raise ValueError(msg)
 
         self.raw_crops = raw_crops
         self.crops = crops
@@ -309,7 +333,10 @@ class HarvestingModule(basf2.Module):
                     yield store_obj.obj()
 
             else:
-                raise KeyError("Name %s does not refer to a valid object on the data store" % self.foreach)
+                msg = "Name {} does not refer to a valid object on the data store".format(
+                    self.foreach
+                )
+                raise KeyError(msg)
         else:
             yield None
 
@@ -334,7 +361,10 @@ class HarvestingModule(basf2.Module):
                 persistent = 1
                 stored_tfile = Belle2.PyStoreObj(datastore_output_file_name, persistent)
                 if not stored_tfile:
-                    raise KeyError("No TFile with name %s created on the DataStore." % datastore_output_file_name)
+                    msg = "No TFile with name {} created on the DataStore.".format(
+                        datastore_output_file_name
+                    )
+                    raise KeyError(msg)
                 output_tdirectory = stored_tfile.obj()
             else:
                 output_tfile = ROOT.TFile(self.output_file_name, 'recreate')
@@ -359,7 +389,8 @@ class HarvestingModule(basf2.Module):
         finally:
             # If we opened the TFile ourself, close it again
             if self.output_file_name:
-                if isinstance(self.output_file_name, basestring) and not self.output_file_name.startswith("datastore://"):
+                if (isinstance(self.output_file_name, basestring) and
+                        not self.output_file_name.startswith("datastore://")):
                     output_tfile.Close()
 
     @staticmethod
@@ -388,10 +419,25 @@ def test():
 
     # Proposed syntax for quick generation of overview plots
     @save_fom(aggregation=np.mean, select=["energy", "pt"], name="physics", key="mean_{part_name}")
-    @save_histograms(outlier_z_score=5.0, allow_discrete=True, filter=lambda xs: xs != 0.0, filter_on="is_secondary", select=["pt", "is_secondary"], folder_name="secondary_pt")
-    @save_histograms(outlier_z_score=5.0, allow_discrete=True, groupby="status", select=["is_secondary", "pt"])
-    @save_histograms(outlier_z_score=5.0, allow_discrete=True, select=["is_secondary", "pt"], stackby="is_secondary", folder_name="pt_stackby_is_secondary/nested_test")
-    @save_histograms(outlier_z_score=5.0, allow_discrete=True, select={'pt': '$p_t$'}, title="Distribution of p_{t}")
+    @save_histograms(outlier_z_score=5.0,
+                     allow_discrete=True,
+                     filter=lambda xs: xs != 0.0,
+                     filter_on="is_secondary",
+                     select=["pt", "is_secondary"],
+                     folder_name="secondary_pt")
+    @save_histograms(outlier_z_score=5.0,
+                     allow_discrete=True,
+                     groupby="status",
+                     select=["is_secondary", "pt"])
+    @save_histograms(outlier_z_score=5.0,
+                     allow_discrete=True,
+                     select=["is_secondary", "pt"],
+                     stackby="is_secondary",
+                     folder_name="pt_stackby_is_secondary/nested_test")
+    @save_histograms(outlier_z_score=5.0,
+                     allow_discrete=True,
+                     select={'pt': '$p_t$'},
+                     title="Distribution of p_{t}")
     @save_tree()
     @harvest(foreach="MCParticles",
              pick=primaries_seen_in_detector,
@@ -402,7 +448,8 @@ def test():
         secondary_process = mc_particle.getSecondaryPhysicsProcess()
 
         return AttributeDict(
-            tan_lambda=np.divide(1.0, np.tan(momentum_tvector3.Theta())),  # Save divide not throwing an ZeroDivisionError
+            # Save divide not throwing an ZeroDivisionError
+            tan_lambda=np.divide(1.0, np.tan(momentum_tvector3.Theta())),
             pt=momentum_tvector3.Pt(),
             secondary_process=secondary_process,
             is_secondary=secondary_process != 0,

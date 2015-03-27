@@ -124,7 +124,7 @@ namespace Belle2 {
      *
      * Changes to existing arrays / objects will be available to all modules after the for_each(),
      * including those made to the loop variable (it will simply modify the i'th item in the array looped over.)
-     * Arrays / objects created inside the loop will however be limited to the validity of the loop variable. That is,
+     * Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
      * creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
      * to the next MCParticle or exiting the loop.
      */

@@ -248,3 +248,14 @@ bool NSMVHandlerHSLBTrgOffFee::handleSetInt(int val)
   return false;
 }
 
+bool NSMVHandlerHSLBCheckFee::handleSetInt(int val)
+{
+  if (val > 0) {
+    LogFile::info("check FEE (HSLB:%c)", m_hslb + 'a');
+    return m_callback.getHSLB(m_hslb).checkfee();
+  } else {
+    LogFile::error("Failed to trg off FEE (HSLB:%c)", m_hslb + 'a');
+  }
+  return false;
+}
+

@@ -2,6 +2,8 @@
 A set of common purose translators from complex framework objects to flat dictionaries
 """
 
+import functools
+
 import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
@@ -10,7 +12,25 @@ from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKe
 formatter = TolerateMissingKeyFormatter()
 
 
-def peel_mc_particle(mc_particle):
+def format_crop_keys(peel_func):
+    @functools.wraps(peel_func)
+    def peel_func_formatted_keys(obj, key="{part_name}"):
+        crops = peel_func(obj, key=key)
+        if key:
+            crops_with_formatted_keys = dict()
+            for part_name, value in crops.items():
+                formatted_key = formatter.format(key, part_name=part_name)
+                crops_with_formatted_keys[formatted_key] = value
+            return crops_with_formatted_keys
+
+        else:
+            return crops
+
+    return peel_func_formatted_keys
+
+
+@format_crop_keys
+def peel_mc_particle(mc_particle, key="{part_name}"):
     if mc_particle:
         helix = get_helix_from_mc_particle(mc_particle)
         momentum = mc_particle.getMomentum()
@@ -68,7 +88,8 @@ def peel_mc_particle(mc_particle):
         )
 
 
-def peel_track_cand_hit_content(track_cand):
+@format_crop_keys
+def peel_track_cand_hit_content(track_cand, key="{part_name}"):
     n_pxd_hits = track_cand.getHitIDs(Belle2.Const.PXD).size()
     n_svd_hits = track_cand.getHitIDs(Belle2.Const.SVD).size()
     n_cdc_hits = track_cand.getHitIDs(Belle2.Const.CDC).size()
@@ -82,7 +103,8 @@ def peel_track_cand_hit_content(track_cand):
     )
 
 
-def peel_track_cand_seed(track_cand):
+@format_crop_keys
+def peel_track_cand_seed(track_cand, key="{part_name}"):
     if track_cand:
         # Need those? Make congruent with the mc_particle variables above
         # seed_position = track_cand.getPosSeed()
@@ -100,6 +122,7 @@ def peel_track_cand_seed(track_cand):
         return peel_fit_result(None, key="seed_{part_name}")
 
 
+@format_crop_keys
 def peel_fit_result(fit_result, key="{part_name}"):
     nan = float("nan")
     if fit_result:
@@ -132,18 +155,11 @@ def peel_fit_result(fit_result, key="{part_name}"):
             is_fitted=False,
         )
 
-    if key:
-        fit_crops_with_formatted_keys = dict()
-        for part_name, value in fit_crops.items():
-            formatted_key = formatter.format(key, part_name=part_name)
-            fit_crops_with_formatted_keys[formatted_key] = value
-        return fit_crops_with_formatted_keys
-
-    else:
-        return fit_crops
+    return fit_crops
 
 
-def get_helix_from_mc_particle(mc_particle):
+@format_crop_keys
+def get_helix_from_mc_particle(mc_particle, key="{part_name}"):
     position = mc_particle.getVertex()
     momentum = mc_particle.getMomentum()
     charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
@@ -153,7 +169,8 @@ def get_helix_from_mc_particle(mc_particle):
     return seed_helix
 
 
-def get_seed_track_fit_result(track_cand):
+@format_crop_keys
+def get_seed_track_fit_result(track_cand, key="{part_name}"):
     position = track_cand.getPosSeed()
     momentum = track_cand.getMomSeed()
     cartesian_covariance = track_cand.getCovSeed()

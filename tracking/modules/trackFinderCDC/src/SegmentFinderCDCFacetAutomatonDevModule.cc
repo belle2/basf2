@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonDevModule.h>
 
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>

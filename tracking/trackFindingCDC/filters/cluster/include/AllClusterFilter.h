@@ -7,22 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ALLCLUSTERFILTER_H_
-#define ALLCLUSTERFILTER_H_
+#pragma once
 
-#include "BaseClusterFilter.h"
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class AllClusterFilter : public BaseClusterFilter {
+    /// Filter accepting all clusters
+    class AllClusterFilter : public Filter<CDCWireHitCluster> {
 
     public:
       /// Basic filter method to override. All implementation rejects all clusters.
-      virtual CellWeight isGoodCluster(const CDCWireHitCluster& cluster) override final;
+      virtual CellWeight operator()(const CDCWireHitCluster& cluster) override final;
 
     };
   }
 }
-
-#endif // ALLCLUSTERFILTER_H_

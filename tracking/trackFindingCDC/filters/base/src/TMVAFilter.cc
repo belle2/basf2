@@ -7,7 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/BaseClusterFilter.h"
+#include "../include/TMVAFilter.h"
+
+#include <assert.h>
 
 using namespace std;
 using namespace Belle2;

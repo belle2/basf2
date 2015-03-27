@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
 #include <tracking/trackFindingCDC/filters/wirehit_wirehit/WholeWireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
@@ -112,7 +113,7 @@ namespace Belle2 {
                  std::string("CDCRecoTangentSegmentVector"));
       }
 
-      ///  Initialize the Module before event processing
+      /// Initialize the Module before event processing
       virtual void initialize() override
       {
         SegmentFinderCDCBaseModule::initialize();
@@ -381,7 +382,7 @@ namespace Belle2 {
             assert(std::is_sorted(std::begin(cluster), std::end(cluster)));
 
             B2DEBUG(100, "Analyse the cluster for background");
-            CellWeight clusterWeight = m_ptrClusterFilter->isGoodCluster(cluster);
+            CellWeight clusterWeight = (*m_ptrClusterFilter)(cluster);
             if (isNotACell(clusterWeight)) {
               // Cluster detected as background
               for (const CDCWireHit* wireHit : cluster) {

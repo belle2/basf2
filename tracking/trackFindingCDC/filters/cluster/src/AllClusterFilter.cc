@@ -9,13 +9,10 @@
  **************************************************************************/
 #include "../include/AllClusterFilter.h"
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight AllClusterFilter::isGoodCluster(const CDCWireHitCluster& cluster)
+CellWeight AllClusterFilter::operator()(const CDCWireHitCluster& cluster)
 {
   return cluster.size();
 }
-

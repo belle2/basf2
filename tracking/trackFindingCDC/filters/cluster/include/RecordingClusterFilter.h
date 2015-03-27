@@ -10,18 +10,18 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/varsets/CDCWireHitClusterVarSet.h>
+#include <tracking/trackFindingCDC/varsets/CDCWireHitClusterBkgTruthVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitClusters.
-    class RecordingClusterFilter: public RecordingFilter<CDCWireHitClusterVarSet> {
+    class RecordingClusterFilter: public RecordingFilter<CDCWireHitClusterBkgTruthVarSet> {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
       RecordingClusterFilter() :
-        RecordingFilter<CDCWireHitClusterVarSet>("BackgroundHitFinder.root")
+        RecordingFilter<CDCWireHitClusterBkgTruthVarSet>("BackgroundHitFinder.root")
       {;}
 
     };

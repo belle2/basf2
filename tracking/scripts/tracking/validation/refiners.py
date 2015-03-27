@@ -841,19 +841,28 @@ def context(refiner=None,
     def context_decorator(wrapped_refiner):
         # Apply meta refiners in the reverse order that they shall be executed
         if exclude is not None or select is not None:
-            wrapped_refiner = SelectRefiner(wrapped_refiner, select=select, exclude=exclude)
+            wrapped_refiner = SelectRefiner(wrapped_refiner,
+                                            select=select, exclude=exclude)
 
         if folder_name is not None or groupby is not None or folder_groupby_addition is not None:
-            wrapped_refiner = CdRefiner(wrapped_refiner, folder_name=folder_name, groupby_addition=folder_groupby_addition)
+            wrapped_refiner = CdRefiner(wrapped_refiner,
+                                        folder_name=folder_name,
+                                        groupby_addition=folder_groupby_addition)
 
         if groupby is not None:
-            wrapped_refiner = GroupByRefiner(wrapped_refiner, by=groupby, exclude_by=exclude_groupby)
+            wrapped_refiner = GroupByRefiner(wrapped_refiner,
+                                             by=groupby,
+                                             exclude_by=exclude_groupby)
 
         if filter is not None or filter_on is not None:
-            wrapped_refiner = FilterRefiner(wrapped_refiner, filter=filter, on=filter_on)
+            wrapped_refiner = FilterRefiner(wrapped_refiner,
+                                            filter=filter,
+                                            on=filter_on)
 
         if above_expert_level is not None or below_expert_level is not None:
-            wrapped_refiner = ExpertLevelRefiner(wrapped_refiner, above_expert_level=above_expert_level, below_expert_level=below_expert_level)
+            wrapped_refiner = ExpertLevelRefiner(wrapped_refiner,
+                                                 above_expert_level=above_expert_level,
+                                                 below_expert_level=below_expert_level)
 
         if not isinstance(wrapped_refiner, Refiner):
             wrapped_refiner = Refiner(wrapped_refiner)
@@ -933,7 +942,9 @@ def select_crop_parts(crops, select=[], exclude=[]):
         if select:
             not_selected_part_names = [name for name in part_names if name not in select]
 
-            select_not_in_part_names = [name for name in select if name not in part_names]
+            # if the selection item is a callable function do not count it as not selectable yet
+            select_not_in_part_names = [name for name in select
+                                        if not callable(name) and name not in part_names]
             if select_not_in_part_names:
                 get_logger().warning("Cannot select %s, because they are not in crop part names %s",
                                      select_not_in_part_names, sorted(part_names))
@@ -955,7 +966,9 @@ def select_crop_parts(crops, select=[], exclude=[]):
         if isinstance(select, collections.Mapping):
             # select is a rename mapping
             for part_name, new_part_name in select.items():
-                if part_name in selected_crops:
+                if callable(part_name):
+                    selected_crops[new_part_name] = part_name(**crops)
+                elif part_name in selected_crops:
                     parts = selected_crops[part_name]
                     del selected_crops[part_name]
                     selected_crops[new_part_name] = parts

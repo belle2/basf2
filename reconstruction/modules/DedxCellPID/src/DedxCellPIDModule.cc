@@ -386,9 +386,10 @@ void DedxCellPIDModule::event()
           int driftT = cdcHits[cdcIDx]->getTDCCount();
 
           RealisticTDCCountTranslator realistictdc;
-          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
-          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, poca.z(), pocaMom.Phi(),
-                                      pocaMom.Theta());
+          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID);
+          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID);
+          //          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
+          //          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
 
           // now calculate the path length for this hit
           double celldx = c.dx(doca, entAng);

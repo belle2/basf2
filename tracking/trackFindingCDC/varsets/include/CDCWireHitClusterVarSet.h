@@ -9,7 +9,9 @@
  **************************************************************************/
 #pragma once
 
+#include "EmptyVarSet.h"
 #include "VarSet.h"
+#include "VarNames.h"
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
@@ -23,13 +25,12 @@ namespace Belle2 {
     /// Forward declaration of the CDCWireHitCluster.
     class CDCWireHitCluster;
 
-    /// Class that specifies the names of the variables that should be generated from a wire hits cluster.
-    class CDCWireHitClusterVarNames {
+    /** Class that specifies the names of the variables
+     *  that should be generated from a wire hits cluster.
+     */
+    class CDCWireHitClusterVarNames : public VarNames<CDCWireHitCluster> {
 
     public:
-      /// Basic type from which the variables are generated.
-      typedef CDCWireHitCluster Object;
-
       /// Number of variables to be generated.
       static const size_t nNames = 11;
 
@@ -66,7 +67,7 @@ namespace Belle2 {
       virtual void initialize() IF_NOT_CINT(override final);
 
     private:
-      // Prepare the super layer center array with information coming from the CDCWireTopology object.
+      /// Prepare the superlayer center array with information coming from the CDCWireTopology.
       void prepareSuperLayerCenterArray();
 
     private:

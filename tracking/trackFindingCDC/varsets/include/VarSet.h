@@ -34,37 +34,57 @@ namespace Belle2 {
     private:
       /// Number of floating point values represented by this class.
       static const size_t nVars = ObjectVarNames::nNames;
+
     public:
+      /// Object type from which variables shall be extracted.
       typedef typename ObjectVarNames::Object Object;
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
       VarSet(const std::string& prefix = "") :
-        m_variables(prefix)
+        m_variables(prefix),
+        m_nestedVarSet(prefix)
       {;}
 
       /// Virtual destructor
       virtual ~VarSet() {;}
 
+      /// Extract the nested variables next
+      bool extractNested(const Object* obj)
+      {
+        return m_nestedVarSet.extract(ObjectVarNames::getNested(obj));
+      }
+
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const typename ObjectVarNames::Object* obj) = 0;
+      virtual bool extract(const Object* obj)
+      {
+        return extractNested(obj);
+      }
 
       /** Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
        */
-      virtual void initialize() {;}
+      virtual void initialize()
+      {
+        m_nestedVarSet.initialize();
+      }
 
       /** Terminate the variable set after event processing.
        *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
-      virtual void terminate() {;}
+      virtual void terminate()
+      {
+        m_nestedVarSet.terminate();
+      }
 
       /** Getter for the named tuples storing the values of all the (possibly nested) VarSets
        *  Base implementation returns the  named tuple of this variable set.
        */
       virtual std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables()
       {
-        return std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*>(1, &m_variables);
+        std::vector<NamedFloatTuple*> result = m_nestedVarSet.getAllVariables();
+        result.push_back(&m_variables);
+        return result;
       }
 
       /** Const getter for the named tuples storing the values of all the (possibly nested)
@@ -72,7 +92,9 @@ namespace Belle2 {
        */
       virtual std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const
       {
-        return std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*>(1, &m_variables);
+        std::vector<const NamedFloatTuple*> result = m_nestedVarSet.getAllVariables();
+        result.push_back(&m_variables);
+        return result;
       }
 
       /// Getter for a map of all name including the optional prefix and value pairs
@@ -122,6 +144,9 @@ namespace Belle2 {
     public:
       /// Memory for nNames floating point values.
       FixedSizeNamedFloatTuple<ObjectVarNames> m_variables;
+
+      /// Nested VarSet implementing a chain of sets until EmptyVarSet terminates the sequence.
+      typename ObjectVarNames::NestedVarSet m_nestedVarSet;
 
     }; //end class
   } //end namespace TrackFindingCDC

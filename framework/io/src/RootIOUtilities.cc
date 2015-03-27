@@ -25,7 +25,8 @@ const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
 const std::string RootIOUtilities::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
 const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
 
-std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
+std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter,
+                                                      const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)
 {
   set<string> branchSet, excludeBranchSet;
   for (string b : branches) {
@@ -68,7 +69,7 @@ std::vector<std::string> RootIOUtilities::expandWordExpansions(const std::vector
   vector<string> out;
   wordexp_t expansions;
   wordexp("", &expansions, 0);
-  for (const string & pattern : filenames) {
+  for (const string& pattern : filenames) {
     if (wordexp(pattern.c_str(), &expansions, WRDE_APPEND | WRDE_NOCMD | WRDE_UNDEF) != 0) {
       B2ERROR("Failed to expand pattern '" << pattern << "'!");
     }
@@ -137,6 +138,10 @@ bool RootIOUtilities::hasCustomStreamer(TClass* cl)
 
 void RootIOUtilities::loadDictionaries()
 {
+  static bool loaded = false;
+  if (loaded)
+    return;
+
   gSystem->Load("libdataobjects");
   gSystem->Load("libTreePlayer");
   gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
@@ -144,4 +149,5 @@ void RootIOUtilities::loadDictionaries()
   gSystem->Load("libsvd");
   gSystem->Load("libpxd");
   gSystem->Load("libcdc");
+  loaded = true;
 }

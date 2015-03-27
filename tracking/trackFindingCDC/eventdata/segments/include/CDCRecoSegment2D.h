@@ -199,11 +199,21 @@ namespace Belle2 {
       { return back().getBackRecoPos2D(trajectory2D); }
 
 
+      /// Getter for the global super cluster id.
+      const size_t& getISuperCluster() const
+      { return m_iSuperCluster; }
+
+      /// Setter for the globale super cluster id.
+      void setISuperCluster(const size_t& iSuperCluster)
+      { m_iSuperCluster = iSuperCluster; }
 
     private:
       mutable AutomatonCell
       m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
       mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
+
+      /// Memory for the global super cluster id.
+      size_t m_iSuperCluster;
 
     private:
       /// ROOT Macro to make CDCRecoSegment2D a ROOT class.

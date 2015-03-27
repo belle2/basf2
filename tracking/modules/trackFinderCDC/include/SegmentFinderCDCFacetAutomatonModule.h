@@ -333,6 +333,9 @@ namespace Belle2 {
       const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
       const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
+      // Event global super cluster id for each super cluster.
+      int iSuperCluster = -1;
+
       for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
 
         const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
@@ -354,6 +357,7 @@ namespace Belle2 {
         B2DEBUG(100, "Created " << m_superClustersInSuperLayer.size() << " CDCWireHit superclusters in superlayer");
 
         for (CDCWireHitCluster& superCluster : m_superClustersInSuperLayer) {
+          ++iSuperCluster;
           std::sort(std::begin(superCluster), std::end(superCluster));
           assert(std::is_sorted(std::begin(superCluster), std::end(superCluster)));
 
@@ -422,6 +426,7 @@ namespace Belle2 {
             segments.reserve(segments.size() + m_facetPaths.size());
             for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
               segments.push_back(CDCRecoSegment2D::condense(facetPath));
+              segments.back().setISuperCluster(iSuperCluster);
             }
 
             // Copy tangent segments to the DataStore

@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/tmva/Expert.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -41,16 +39,17 @@ void Expert::initializeReader(const std::function<void(TMVA::Reader&)> setReader
 
 void Expert::initializeReader(std::vector<NamedFloatTuple*> allVariables)
 {
-  for (NamedFloatTuple* variables : allVariables) {
-    size_t nVars = variables->size();
-    for (size_t iVar = 0; iVar < nVars; ++iVar) {
-      std::string name = variables->getNameWithPrefix(iVar);
-      TString tName(name.c_str());
-      Float_t& value = (*variables)[iVar];
-      m_reader.AddVariable(tName, &value);
+  initializeReader([&allVariables](TMVA::Reader & reader) {
+    for (NamedFloatTuple* variables : allVariables) {
+      size_t nVars = variables->size();
+      for (size_t iVar = 0; iVar < nVars; ++iVar) {
+        std::string name = variables->getNameWithPrefix(iVar);
+        TString tName(name.c_str());
+        Float_t& value = (*variables)[iVar];
+        reader.AddVariable(tName, &value);
+      }
     }
-  }
-
+  });
   m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
 }
 

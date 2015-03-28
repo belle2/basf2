@@ -18,7 +18,7 @@
 #include "globals.hh"
 #include "TString.h"
 #include "Riostream.h"
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
 
 class G4Box;
 class G4Tubs;
@@ -51,7 +51,7 @@ namespace Belle2 {
       SensitiveDetector* m_sensitive;  /**<  SensitiveDetector CSI */
 
       /** Builds the crystals enclosures **/
-      void BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, string side, int iEnclosure);
+      void BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, std::string side, int iEnclosure);
 
       /** Builds the crystals and their wrapping (foil) **/
       void PutCrystal(const GearDir& content,  G4AssemblyVolume* assembly, G4Transform3D position,  int iEnclosure, int iCry);

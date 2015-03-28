@@ -140,6 +140,8 @@ namespace Belle2 {
       /** array for calculation of random noise for FitA[31]      */
       float m_vmat[31][31];
 
+      /** Module parameters */
+      bool m_background;
     };
   }//ECL
 }//Belle2

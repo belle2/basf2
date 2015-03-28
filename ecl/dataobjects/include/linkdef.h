@@ -16,6 +16,8 @@
 #pragma link C++ class Belle2::ECLPi0+;
 #pragma link C++ class Belle2::ECLShower+;
 #pragma link C++ class Belle2::ECLPidLikelihood+;
-
-
+#pragma link C++ class Belle2::ECLWaveformData+;
+#pragma link C++ class Belle2::ECLWFAlgoParams+;
+#pragma link C++ class Belle2::ECLNoiseData+;
+#pragma link C++ class Belle2::ECLLookupTable+;
 #endif

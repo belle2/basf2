@@ -13,14 +13,14 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-//ecl package headers
-#include <ecl/dataobjects/ECLHit.h>
+#include <framework/utilities/FileSystem.h>
 
 //C++ STL
 #include <cstdlib>
@@ -36,6 +36,8 @@
 // ROOT
 #include <TVector3.h>
 #include <TRandom.h>
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -55,7 +57,7 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
   setPropertyFlags(c_ParallelProcessingCertified);
-
+  addParam("Background", m_background, "Flag to use the Digitizer configuration with backgrounds; Default is no background", false);
 //  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
 
 }
@@ -68,6 +70,98 @@ ECLDigitizerModule::~ECLDigitizerModule()
 
 void ECLDigitizerModule::initialize()
 {
+  string dataFileName;
+  if (m_background)
+    dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
+  else
+    dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
+
+  assert(! dataFileName.empty());
+  if (! dataFileName.empty()) {
+
+    StoreArray<ECLWaveformData> eclWaveformData("ECLWaveformData", DataStore::c_Persistent);
+    eclWaveformData.registerInDataStore();
+    StoreObjPtr< ECLLookupTable > eclWaveformDataTable("ECLWaveformDataTable", DataStore::c_Persistent);;
+    eclWaveformDataTable.registerInDataStore();
+    eclWaveformDataTable.create();
+    StoreArray<ECLWFAlgoParams> eclWFAlgoParams("ECLWFAlgoParams", DataStore::c_Persistent);
+    eclWFAlgoParams.registerInDataStore();
+    StoreObjPtr< ECLLookupTable> eclWFAlgoParamsTable("ECLWFAlgoParamsTable", DataStore::c_Persistent);
+    eclWFAlgoParamsTable.registerInDataStore();
+    eclWFAlgoParamsTable.create();
+    StoreArray<ECLNoiseData> eclNoiseData("ECLNoiseData", DataStore::c_Persistent);
+    eclNoiseData.registerInDataStore();
+    StoreObjPtr< ECLLookupTable > eclNoiseDataTable("ECLNoiseDataTable", DataStore::c_Persistent);;
+    eclNoiseDataTable.registerInDataStore();
+    eclNoiseDataTable.create();
+
+    TFile f(dataFileName.c_str());
+    TTree* t = (TTree*) f.Get("EclWF");
+    TTree* t2 = (TTree*) f.Get("EclAlgo");
+    TTree* t3 = (TTree*) f.Get("EclNoise");
+
+    if (t == 0 || t2 == 0 || t3 == 0)
+      B2FATAL("Data not found");
+
+    Int_t ncellId;
+    Int_t cellId[8736];
+    Int_t ncellId2;
+    Int_t cellId2[8736];
+    Int_t ncellId3;
+    Int_t cellId3[8736];
+
+
+    t->GetBranch("CovarianceM")->SetAutoDelete(kFALSE);
+    t->SetBranchAddress("ncellId", &ncellId);
+    t->SetBranchAddress("cellId", cellId);
+
+    t2->GetBranch("Algopars")->SetAutoDelete(kFALSE);
+    t2->SetBranchAddress("ncellId", &ncellId2);
+    t2->SetBranchAddress("cellId", cellId2);
+
+    t3->GetBranch("NoiseM")->SetAutoDelete(kFALSE);
+    t3->SetBranchAddress("ncellId", &ncellId3);
+    t3->SetBranchAddress("cellId", cellId3);
+
+    ECLWaveformData* info = new ECLWaveformData;
+    t->SetBranchAddress("CovarianceM", &info);
+    Long64_t nentries = t->GetEntries();
+    for (Long64_t ev = 0; ev < nentries; ev++) {
+      t->GetEntry(ev);
+      eclWaveformData.appendNew(*info);
+      for (Int_t i = 0; i < ncellId; ++i)
+        (*eclWaveformDataTable) [cellId[i]] = ev;
+    }
+
+    ECLWFAlgoParams* algo = new ECLWFAlgoParams;
+    t2->SetBranchAddress("Algopars", &algo);
+    nentries = t2->GetEntries();
+    for (Long64_t ev = 0; ev < nentries; ev++) {
+      t2->GetEntry(ev);
+      eclWFAlgoParams.appendNew(*algo);
+      for (Int_t i = 0; i < ncellId2; ++i)
+        (*eclWFAlgoParamsTable) [cellId2[i]] = ev;
+    }
+
+    ECLNoiseData* noise = new ECLNoiseData;
+    t3->SetBranchAddress("NoiseM", &noise);
+    nentries = t3->GetEntries();
+    for (Long64_t ev = 0; ev < nentries; ev++) {
+      t3->GetEntry(ev);
+      eclNoiseData.appendNew(*noise);
+      if (ncellId3 == 0) {
+        for (int i = 1; i <= 8736; i++)(*eclNoiseDataTable)[i] = 0;
+        break;
+      } else {
+        for (Int_t i = 0; i < ncellId3; ++i)
+          (*eclNoiseDataTable)[cellId3[i]] = ev;
+      }
+    }
+
+    f.Close();
+  }
+
+
   m_nEvent  = 0 ;
 
   readDSPDB();
@@ -88,6 +182,42 @@ void ECLDigitizerModule::beginRun()
 
 void ECLDigitizerModule::event()
 {
+  //Get the waveform, covariance matrix and fit algoritm parameters from the Event Store
+
+  StoreArray<ECLWaveformData> eclWaveformData("ECLWaveformData", DataStore::c_Persistent);;
+  StoreObjPtr< ECLLookupTable > eclWaveformDataTable("ECLWaveformDataTable", DataStore::c_Persistent);
+  StoreArray<ECLWFAlgoParams> eclWFAlgoParams("ECLWFAlgoParams", DataStore::c_Persistent);;
+  StoreObjPtr< ECLLookupTable> eclWFAlgoParamsTable("ECLWFAlgoParamsTable", DataStore::c_Persistent);
+  StoreArray<ECLNoiseData> eclNoiseData("ECLNoiseData", DataStore::c_Persistent);
+  StoreObjPtr< ECLLookupTable > eclNoiseDataTable("ECLNoiseDataTable", DataStore::c_Persistent);
+
+  // the following is just a test to show how to get
+  // the correct ECLWaveformData object associated
+  // to a crystal cellId
+  // we loop over all the cellId and verify that a
+  // all the required objects exist in memory
+  // Moreover it shows how to get configuration data needed
+  // by the Digitizer for a given crystal.
+
+  static bool firstEvent = true;
+  if (firstEvent) {
+    firstEvent = false;
+    for (int aCellId = 1; aCellId <= 8736; ++aCellId) {
+      B2INFO("Checking ECL crystal id == " << aCellId);
+      const ECLWaveformData* eclWFData = eclWaveformData[(*eclWaveformDataTable)[ aCellId ] ];
+      B2INFO("ECLWaveformData address: " << eclWFData);
+      const ECLWFAlgoParams* eclWFAlgo = eclWFAlgoParams[(*eclWFAlgoParamsTable)[ aCellId ] ];
+      B2INFO("ECLAlgoParams address: " << eclWFAlgo);
+      const ECLNoiseData* eclNoise = eclNoiseData[(*eclNoiseDataTable)[ aCellId ] ];
+      B2INFO("ECLNoise address: " << eclNoise);
+    }
+  }
+  // end of the test
+
+
+
+
+
   //Input Array
   StoreArray<ECLHit>  eclArray;
   if (!eclArray) {
@@ -125,7 +255,8 @@ void ECLDigitizerModule::event()
 
     for (int T_clock = 0; T_clock < 31; T_clock++) {
       double timeInt =  DeltaT * 12. / 508.; //us
-      sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32 ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
+      sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
+                   ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
       //test_A[T_clock] = ShaperDSP(sampleTime);
       DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
       HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
@@ -164,7 +295,8 @@ void ECLDigitizerModule::event()
       if (m_ttrig < 0)m_ttrig = 0;
       if (m_ttrig > 23)m_ttrig = 23;
 
-      shapeFitter(&(m_id[0][0]), &(m_f[0][0]), &(m_f1[0][0]), &(m_fg41[0][0]), &(m_fg43[0][0]), &(m_fg31[0][0]), &(m_fg32[0][0]), &(m_fg33[0][0]), &(FitA[0]), &m_ttrig,  &m_n16, &m_ch, &m_lar, &m_ltr, &m_lq);
+      shapeFitter(&(m_id[0][0]), &(m_f[0][0]), &(m_f1[0][0]), &(m_fg41[0][0]), &(m_fg43[0][0]), &(m_fg31[0][0]), &(m_fg32[0][0]),
+                  &(m_fg33[0][0]), &(FitA[0]), &m_ttrig,  &m_n16, &m_ch, &m_lar, &m_ltr, &m_lq);
 
       energyFit[iECLCell] = m_lar; //fit output : Amplitude 18-bits
       tFit[iECLCell] = m_ltr;    //fit output : T_ave 12 bits
@@ -377,7 +509,8 @@ double  ECLDigitizerModule::Sv123(double t, double t01, double tb1, double t02, 
 }
 
 
-void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq)
+void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y,
+                                     int* ttrig, int* n16, int* ch, int* lar, int* ltr, int* lq)
 {
 
 

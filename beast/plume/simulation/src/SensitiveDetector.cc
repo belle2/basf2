@@ -52,6 +52,7 @@ namespace Belle2 {
       current_nielDep = 0.;
       current_thetaAngle = 0.;   // local sensor frame - degree
       current_phiAngle = 0.;
+      current_globalTime = 0.;
 
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;

@@ -33,15 +33,19 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    He3tubeSimHit(): m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0), m_GlTime(0), m_tkPos(), m_tkMom(), m_tkMomDir() {}
+    He3tubeSimHit(): m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0), m_GlTime(0), m_tkPos(), m_tkMom(),
+      m_tkMomDir(), m_neuProc(false) {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      * @param neuProc boolean which tells whether or not a process was a neutron process
      */
-    He3tubeSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos, const float* tkMom, const float* tkMomDir, bool neuProc):
-      SimHitBase(), m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb), m_GlTime(GlTime), m_neuProc(neuProc) {
+    He3tubeSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos,
+                  const float* tkMom, const float* tkMomDir, bool neuProc):
+      SimHitBase(), m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb),
+      m_GlTime(GlTime), m_neuProc(neuProc)
+    {
       std::copy(tkPos, tkPos + 3, m_tkPos);
       std::copy(tkMom, tkMom + 3, m_tkMom);
       std::copy(tkMomDir, tkMomDir + 3, m_tkMomDir);

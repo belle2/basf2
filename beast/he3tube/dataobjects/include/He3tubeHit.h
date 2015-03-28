@@ -20,7 +20,13 @@
 #include <vector>
 
 namespace Belle2 {
-
+  /**
+  * ClassHe3Hit - digitization simulated hit for the He3tube detector.
+  *
+  * This class holds particle hit data from digitization simulation. As the simulated
+  * hit classes are used to generate detector response, they contain _local_
+  * information.
+  */
   class He3tubeHit : public SimHitBase {
   public:
     //typedef std::vector<unsigned int>::iterator iterator;
@@ -33,7 +39,8 @@ namespace Belle2 {
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    He3tubeHit(double energyDep, int detNb, double peakV, double time) {
+    He3tubeHit(double energyDep, int detNb, double peakV, double time)
+    {
       m_energyDep = energyDep;
       m_detNb = detNb;
       m_peakV = peakV;

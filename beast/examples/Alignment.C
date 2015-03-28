@@ -108,8 +108,8 @@ void Alignment()
 	      Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
             }
 	  }
-	  cout << " TPC " << TPCpos[i][j]; 
-	  cout << " Tub " << Tubpos[i][j]; 
+	  cout << " TPC " << TPCpos[i][j] << " r " << sqrt(TPCpos[i][0]*TPCpos[i][0]+TPCpos[i][1]*TPCpos[i][1])<< endl;; 
+	  cout << " Tub " << Tubpos[i][j] << " r " << endl; 
 	}
       cout << endl;
     }

@@ -52,26 +52,45 @@ namespace Belle2 {
       thetaAngle(a_thetaAngle), phiAngle(a_phiAngle), globalTime(a_globalTime)
     {
     }
-
+    /** particle PDG id */
     int getpdgID()              const { return pdgID; }
+    /** sensor ID */
     int getsensorID()           const { return sensorID; }
+    /** track ID */
     int gettrackID()            const { return trackID; }
+    /** deposited energy in electrons */
     float getenergyDep()        const { return energyDep; }
+    /** non ionizing deposited energy */
     float getnielDep()          const { return nielDep; }
+    /** incoming track position x ref G4*/
     float getposIN_x()          const { return posIN_x; }
+    /** incoming track position y ref G4*/
     float getposIN_y()      const { return posIN_y; }
+    /** incoming track position z ref G4*/
     float getposIN_z()      const { return posIN_z; }
+    /** incoming track position u ref mimosa*/
     float getposIN_u()      const { return posIN_u; }
+    /** incoming track position v ref mimosa*/
     float getposIN_v()          const { return posIN_v; }
+    /** incoming track position w ref mimosa*/
     float getposIN_w()          const { return posIN_w; }
+    /** outgoing track position u ref mimosa*/
     float getposOUT_u()   const { return posOUT_u; }
+    /** outgoing track position v ref mimosa*/
     float getposOUT_v()   const { return posOUT_v; }
+    /** outgoing track position w ref mimosa*/
     float getposOUT_w()     const { return posOUT_w; }
+    /** incoming track momentum x*/
     float getmomentum_x()       const { return momentum_x; }
+    /** incoming track momentum y*/
     float getmomentum_y()       const { return momentum_y; }
+    /** incoming track momentum z*/
     float getmomentum_z()       const { return momentum_z; }
+    /** local theta angle (out of plane) */
     float getthetaAngle()       const { return thetaAngle; }
+    /** local phi angle (in plane) */
     float getphiAngle()         const { return phiAngle; }
+    /** global time */
     float getglobalTime()       const { return globalTime; }
 
 
@@ -85,21 +104,31 @@ namespace Belle2 {
     int trackID;
     /** deposited energy in electrons */
     float energyDep;
+    /** non ionizing deposited energy */
     float nielDep;
-    /** incoming track position */
+    /** incoming track position x ref G4*/
     float posIN_x;
+    /** incoming track position y ref G4*/
     float posIN_y;
+    /** incoming track position z ref G4*/
     float posIN_z;
+    /** incoming track position u ref mimosa*/
     float posIN_u;
+    /** incoming track position v ref mimosa*/
     float posIN_v;
+    /** incoming track position w ref mimosa*/
     float posIN_w;
-    /** outgoing track position */
+    /** outgoing track position u ref mimosa */
     float posOUT_u;
+    /** outgoing track position v ref mimosa */
     float posOUT_v;
+    /** outgoing track position w ref mimosa */
     float posOUT_w;
-    /** incoming track momentum */
+    /** incoming track momentum x*/
     float momentum_x;
+    /** incoming track momentum y*/
     float momentum_y;
+    /** incoming track momentum z*/
     float momentum_z;
     /** local theta angle (out of plane) */
     float thetaAngle;

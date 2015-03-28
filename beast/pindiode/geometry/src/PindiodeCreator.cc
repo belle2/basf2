@@ -173,6 +173,7 @@ namespace Belle2 {
         new G4PVPlacement(transform, l_cover2, "p_cover2", &topVolume, false, 0);
 
         //Create PIN plastic subtrate
+        /*
         h_hole = 0.6 / 2.*CLHEP::cm;
         sA_hole = 0.*deg;
         spA_hole = 180.*deg;
@@ -180,11 +181,11 @@ namespace Belle2 {
         G4LogicalVolume* l_pinsubtrate = new G4LogicalVolume(s_pinsubtrate, geometry::Materials::get("G4_POLYSTYRENE"), "l_pinsubtrate");
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
                     G4Translate3D((0.5 - 0.315) * InchtoCm, (0.187 - 0.250 / 2.) * InchtoCm, -(0.5 - 0.382) * InchtoCm) * G4RotateZ3D(360.0);
-        //new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_1", &topVolume, false, 0);
+        new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_1", &topVolume, false, 0);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
                     G4Translate3D(-(0.5 - 0.315) * InchtoCm, (0.187 - 0.250 / 2.) * InchtoCm, -(0.5 - 0.382) * InchtoCm) * G4RotateZ3D(360.0);
-        //new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_2", &topVolume, false, 0);
-
+        new G4PVPlacement(transform, l_pinsubtrate, "p_pinsubtrate_2", &topVolume, false, 0);
+        */
 
         //Sensitive area
         G4double dx_pin = 2.65 / 2.*CLHEP::mm;

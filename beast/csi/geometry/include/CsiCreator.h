@@ -18,6 +18,7 @@
 #include "globals.hh"
 #include "TString.h"
 #include "Riostream.h"
+#include <boost/algorithm/string.hpp>
 
 class G4Box;
 class G4Tubs;

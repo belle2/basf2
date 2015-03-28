@@ -69,7 +69,7 @@ void He3tubeStudyModule::defineHisto()
 
 
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 8, -0.5, 7.5);
-  h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube ", 8, -0.5, 7.5);
+  h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 8, -0.5, 7.5);
 
   h_Edep1H3H =       new TH1F("Edep1H3H"     , "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
   h_Edep1H3H_detNB = new TH1F("Edep1H3H_tube", "Energy deposited by Proton and Tritium in each tube;Tube Num; MeV", 8, -0.5, 7.5);
@@ -159,7 +159,7 @@ void He3tubeStudyModule::event()
 
   for (int detNB = 0; detNB < 8; detNB++) {
     if (NeutronProcess[detNB]) {
-      B2INFO("He3tubeStudyModule: Neutron in tube #" << detNB);
+      B2DEBUG(80, "He3tubeStudyModule: Neutron in tube #" << detNB);
       nNeutronHits++;
       h_NeutronHits->Fill(detNB);                      //number of neutrons in each tube
       h_NeutronRate->Fill(detNB, 1 / rateCorrection);  //rate in Hz for each tube

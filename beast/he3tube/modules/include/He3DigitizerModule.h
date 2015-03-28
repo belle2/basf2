@@ -49,6 +49,9 @@ namespace Belle2 {
       /**  */
       virtual void terminate();
 
+
+    private:
+
       /** Reads drift data from file */
       virtual void getDriftData();
 
@@ -58,11 +61,8 @@ namespace Belle2 {
       /** Produces the impulse response function */
       virtual void impulseResponse();
 
-      /** Convolves the raw waveform with the impulse response function */
-      virtual void convolveWaveform(double* waveform, double* convolvedWaveform);
-
-      /** gets the peak of the waveform from a given detector number */
-      double findPeak(double* convolvedWaveform);
+      /** Convolves the raw waveform with the impulse response function and returns the peak of the convolved waveform */
+      double convolveWaveform(double* waveform);
 
       /** print the convolved wafeform to file. Useful for debugging */
       virtual void printConvWaveform(int eventNum, int detNB, double* convolvedWaveform);
@@ -70,15 +70,14 @@ namespace Belle2 {
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
 
-    private:
       /** filename of drift datafile */
       std::string m_driftDataFile;
       /** sigma of impulse response */
       double m_impulseSigma;
       /** distance from center of tube */
-      double radius_drift[248];
+      std::vector<double> radius_drift;
       /** drift time for each distance from center of tube */
-      double time_drift[248];
+      std::vector<double> time_drift;
       /** size of waveforms */
       static const int waveformSize = 15000;
       /** number of detectors. Read from HE3TUBE.xml*/

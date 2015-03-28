@@ -28,7 +28,8 @@ namespace Belle2 {
        */
       bool step(G4Step* step, G4TouchableHistory*);
     private:
-      G4EmSaturation* saturationEngine; /** needed to call Birk's law*/
+      /** needed to call Birk's law*/
+      G4EmSaturation* saturationEngine;
     };
 
   } //claw namespace

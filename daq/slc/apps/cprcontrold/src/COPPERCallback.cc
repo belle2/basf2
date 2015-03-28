@@ -74,24 +74,24 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerInt(vname + ".reg.size", true, true, -1));
       add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
       FEEConfig fconf;
-      int j = 0;
       const DBObject o_fee(obj("fee", i));
       if (m_fee[i] != NULL && fconf.read(o_fee)) {
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
         /*
-              const FEEConfig::RegList& regs(fconf.getRegList());
-              for (FEEConfig::RegList::const_iterator it = regs.begin();
-                   it != regs.end(); it++) {
-                const FEEConfig::Reg& reg(*it);
-                std::string pname = StringUtil::tolower(reg.name);
-                std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
-                add(new NSMVHandlerInt(vname, true, false, reg.adr));
-                vname = StringUtil::form("fee[%d].reg[%d].size", i, j);
-                add(new NSMVHandlerInt(vname, true, false, reg.size));
-                vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
-                add(new NSMVHandlerInt(vname, i, reg.adr, reg.size));
-              }
+        int j = 0;
+        const FEEConfig::RegList& regs(fconf.getRegList());
+        for (FEEConfig::RegList::const_iterator it = regs.begin();
+        it != regs.end(); it++) {
+        const FEEConfig::Reg& reg(*it);
+        std::string pname = StringUtil::tolower(reg.name);
+        std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
+        add(new NSMVHandlerInt(vname, true, false, reg.adr));
+        vname = StringUtil::form("fee[%d].reg[%d].size", i, j);
+        add(new NSMVHandlerInt(vname, true, false, reg.size));
+        vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
+        add(new NSMVHandlerInt(vname, i, reg.adr, reg.size));
+        }
         */
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
@@ -139,6 +139,7 @@ void COPPERCallback::term() throw()
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
   m_ttrx.open();
+  m_ttrx.monitor();
   if (m_ttrx.isError()) {
     m_ttrx.close();
     throw (RCHandlerException("TTRX Link error"));
@@ -146,21 +147,19 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
   try {
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
-      if (o_hslb.getBool("used")) {
+      FEEConfig fconf;
+      if (o_hslb.getBool("used") && m_fee[i] != NULL  &&
+          obj.hasObject("fee") && fconf.read(obj("fee", i))) {
         HSLB& hslb(m_hslb[i]);
         hslb.open(i);
         if (!hslb.load()) {
           throw (RCHandlerException("Failed to load HSLB:%c", i + 'a'));
         }
-        FEEConfig fconf;
-        if (m_fee[i] != NULL && obj.hasObject("fee") &&
-            fconf.read(obj("fee", i))) {
-          FEE& fee(*m_fee[i]);
-          try {
-            fee.load(hslb, fconf);
-          } catch (const IOException& e) {
-            throw (RCHandlerException(e.what()));
-          }
+        FEE& fee(*m_fee[i]);
+        try {
+          fee.load(hslb, fconf);
+        } catch (const IOException& e) {
+          throw (RCHandlerException(e.what()));
         }
       }
     }
@@ -206,6 +205,7 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
     va_start(ap, str);
     vsprintf(ss, str, ap);
     va_end(ap);
+    LogFile::put(pri, ss);
     reply(NSMMessage(DAQLogMessage(getNode().getName(), pri, ss)));
     if (pri >= LogFile::ERROR)
       setState(RCState::NOTREADY_S);
@@ -277,7 +277,7 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     int flag = 0;
     for (size_t i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj.getObject("hslb", i));
-      if (o_hslb.getBool("use")) flag += 1 << i;
+      if (o_hslb.getBool("used")) flag += 1 << i;
     }
     m_con.clearArguments();
     m_con.setExecutable("basf2");

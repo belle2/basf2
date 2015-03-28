@@ -31,6 +31,8 @@ int main(int argc, char** argv)
                          libname.c_str(), funcname.c_str(), e.what());
           return 1;
         }
+      } else {
+        fee[i] = NULL;
       }
     }
     RCNodeDaemon(config, new COPPERCallback(fee)).run();

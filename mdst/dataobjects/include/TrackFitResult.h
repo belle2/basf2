@@ -210,21 +210,23 @@ namespace Belle2 {
     /** Chi2 Probability of the fit. */
     const Double32_t m_pValue;
 
-    /** \defgroup TFRStorageSizes Constants for Storage sizes
-     *  @{
+    /** \name TFRStorageSizes
+     *  Constants for Storage sizes */
+    /**@{
      *  A helix has five parameters and the covariance matrix is a
      *  symmetric five-by-five matrix.  */
-    static const unsigned int c_NPars = 5;
-    static const unsigned int c_NCovEntries = 5 * 6 / 2;
+    static const unsigned int c_NPars = 5; ///< Number of helix parameters
+    static const unsigned int c_NCovEntries = 5 * 6 / 2; ///< Number of covariance entries
     /**@}*/
 
-    /** \defgroup TFRParName Names for the parameter indices.
-     *  @{ */
-    static const unsigned int iD0 = 0;
-    static const unsigned int iPhi0 = 1;
-    static const unsigned int iOmega = 2;
-    static const unsigned int iZ0 = 3;
-    static const unsigned int iTanLambda = 4;
+    /** \name TFRParName
+     *  Names for the parameter indices into m_tau.  */
+    /**@{ */
+    static const unsigned int iD0 = 0;        ///< Index for d0
+    static const unsigned int iPhi0 = 1;      ///< Index for phi0
+    static const unsigned int iOmega = 2;     ///< Index for omega
+    static const unsigned int iZ0 = 3;        ///< Index for z0
+    static const unsigned int iTanLambda = 4; ///< Index tan lambda
     /**@}*/
 
     /** perigee helix parameters; tau = d0, phi0, omega, z0, tanLambda. */

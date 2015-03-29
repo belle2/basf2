@@ -55,7 +55,7 @@ namespace Belle2 {
     void print() const;
 
 
-    static const size_t c_nElements = 136; /** number of independent matrix elements*/
+    static const size_t c_nElements = 136; /** number of independent matrix elements N(N+1)/2 with N=16*/
     static const size_t c_nParams = 10; /** number of parameters defining the waveform shape*/
   private:
     Float_t m_matrixElement[c_nElements];
@@ -97,7 +97,7 @@ namespace Belle2 {
       assert(i < c_nElements);
       return m_matrixElement[i];
     }
-    static const size_t c_nElements = 136; /** number of independent elements */
+    static const size_t c_nElements = 496; /** number of independent elements N(N+1)/2  with N=31 */
     Float_t m_matrixElement[c_nElements]; /** electronic noise matrix */
 
     ClassDef(ECLNoiseData, 1)

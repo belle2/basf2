@@ -227,10 +227,10 @@ void He3DigitizerModule::getDriftData()
 double He3DigitizerModule::getDriftTime(double R)
 {
 
-  int lowIndex = -1;
+  //int lowIndex = -1;
   std::vector<double>::iterator it;
   it = lower_bound(radius_drift.begin(), radius_drift.end(), R);
-  lowIndex = (it - 1) - radius_drift.begin();
+  int lowIndex = (it - 1) - radius_drift.begin();
 
   if (lowIndex == 247) return time_drift[247];
 

@@ -20,7 +20,7 @@ using namespace std;
 
 void Alignment()
 {
-  char Name[500];
+  //char Name[500];
 
   TString odir[] = { "ph1sustr" , "microtpc" , "he3tube" };
   TString ifn[] = { "tmp_PH1SUSTR.xml" , "tmp_MICROTPC.xml" , "tmp_HE3TUBE.xml" };

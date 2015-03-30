@@ -7,40 +7,74 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef MCFACETFILTER_H_
-#define MCFACETFILTER_H_
+#pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
-
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-
     /// Filter for the constuction of good facets based on monte carlo information
-    class MCFacetFilter : public BaseFacetFilter {
+    class MCFacetFilter : public Filter<CDCRecoFacet> {
+    private:
+      /// Type of the super class
+      typedef Filter<CDCRecoFacet> Super;
 
     public:
-      /// Constructor also setting the switch if the reversed version of a facet (in comparision to MC truth) shall be accepted.
-      MCFacetFilter(bool allowReverse = true) : m_allowReverse(allowReverse) {;}
+      /// Marking  destructor virtual
+      virtual ~MCFacetFilter() {;}
 
     public:
-      /// Main filter method returning the weight of the facet. Returns NOT_A_CELL if the cell shall be rejected.
-      virtual CellWeight isGoodFacet(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
+      /** Constructor also setting the switch ,
+       *  if the reversed version of a facet (in comparision to MC truth) shall be accepted.
+       */
+      MCFacetFilter(bool allowReverse = true) : m_param_allowReverse(allowReverse) {;}
+
+    public:
+      /** Main filter method returning the weight of the facet.
+       *  Returns NOT_A_CELL if the cell shall be rejected.
+       */
+      virtual CellWeight operator()(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
+
+      /** Set the parameter with key to value.
+       *
+       *  Parameters are:
+       *  symmetric -  Accept the facet if the reverse facet is correct
+       *               preserving the progagation reversal symmetry on this level of detail.
+       *               Allowed values "true", "false". Default is "true".
+       */
+      virtual
+      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+
+      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
+       */
+      virtual
+      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
+
+      /// Indicates that the filter requires Monte Carlo information.
+      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
-      bool isCorrect(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999) const;
+      bool operator()(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999);
+
+    public:
+      /// Setter for the allow reverse parameter
+      void setAllowReverse(bool allowReverse)
+      { m_param_allowReverse = allowReverse; }
+
+      /// Getter for the allow reverse parameter
+      bool getAllowReverse() const
+      { return m_param_allowReverse; }
 
     private:
-      /// Switch to indicate if the reversed version of the facet shall also be accepted (default is true).
-      bool m_allowReverse;
+      /** Switch to indicate if the reversed version of the facet
+       *  shall also be accepted (default is true).
+       */
+      bool m_param_allowReverse;
 
     }; // end class MCFacetFilter
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //MCFACETFILTER_H_

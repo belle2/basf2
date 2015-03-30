@@ -123,7 +123,7 @@ namespace Belle2 {
               //Obtain a constant interface to pass to the filter method following
               const CDCRecoFacet& constFacet = facet;
 
-              CellState cellWeight = facetFilter.isGoodFacet(constFacet);
+              CellState cellWeight = facetFilter(constFacet);
 
               if (not isNotACell(cellWeight)) {
                 facet.getAutomatonCell().setCellWeight(cellWeight);

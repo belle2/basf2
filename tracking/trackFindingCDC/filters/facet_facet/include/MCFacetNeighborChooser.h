@@ -26,7 +26,8 @@ namespace Belle2 {
     public:
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
-                                            const CDCRecoFacet& neighborFacet) override final {
+                                            const CDCRecoFacet& neighborFacet) override final
+      {
 
         //the last wire of the neighbor should not be the same as the start wire of the facet
         if (facet.getStartWire() == neighborFacet.getEndWire()) {
@@ -35,8 +36,8 @@ namespace Belle2 {
 
         // Despite of that two facets are neighbors if both are true facets
         // That also implies the correct tof alignment of the hits not common to both facets
-        CellWeight facetWeight = m_mcFacetFilter.isGoodFacet(facet);
-        CellWeight neighborWeight = m_mcFacetFilter.isGoodFacet(neighborFacet);
+        CellWeight facetWeight = m_mcFacetFilter(facet);
+        CellWeight neighborWeight = m_mcFacetFilter(neighborFacet);
 
         bool mcDecision = (not isNotACell(facetWeight)) and (not isNotACell(neighborWeight));
 

@@ -10,24 +10,44 @@
 
 #include "../include/FitlessFacetFilter.h"
 
-#include <cmath>
-#include <framework/logging/Logger.h>
-
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FitlessFacetFilter::FitlessFacetFilter(bool hard) :
-  m_hard(hard)
+FitlessFacetFilter::FitlessFacetFilter(bool hardCut) :
+  m_param_hardCut(hardCut)
 {
 }
 
+void FitlessFacetFilter::setParameter(const std::string& key, const std::string& value)
+{
+  if (key == "hard_fitless_cut") {
+    if (value == "true") {
+      setHardCut(true);
+    } else if (value == "false") {
+      setHardCut(false);
+    } else {
+      Super::setParameter(key, value);
+      return;
+    }
+    B2INFO("Filter received parameter '" << key << "' " << value);
+  } else {
+    Super::setParameter(key, value);
+  }
+}
+
+std::map<std::string, std::string> FitlessFacetFilter::getParameterDescription()
+{
+  std::map<std::string, std::string> des = Super::getParameterDescription();
+  des["hard_fitless_cut"] = "Switch to disallow the boarderline possible hit and "
+                            "right left passage information. "
+                            "Allowed values 'true', 'false'. Default is 'true'.";
+  return des;
+}
 
 
-CellState FitlessFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
+CellState FitlessFacetFilter::operator()(const CDCRecoFacet& facet)
 {
   CDCRecoFacet::Shape shape = facet.getShape();
 
@@ -46,7 +66,7 @@ CellState FitlessFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
     selectFitless = (middleRLInfo * shape > 0 and
                      (middleRLInfo != startRLInfo or middleRLInfo != endRLInfo));
 
-    if (not m_hard) {
+    if (not m_param_hardCut) {
       selectFitless |= (middleRLInfo == startRLInfo and middleRLInfo == endRLInfo);
     }
 

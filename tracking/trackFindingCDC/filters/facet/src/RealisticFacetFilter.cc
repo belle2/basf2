@@ -28,19 +28,38 @@ namespace {
 
 RealisticFacetFilter::RealisticFacetFilter():
   m_fitlessFacetFilter(true),
-  m_phiPullCut(11)
+  m_param_phiPullCut(11)
 {
 }
 
 RealisticFacetFilter::RealisticFacetFilter(FloatType phiPullCut):
   m_fitlessFacetFilter(true),
-  m_phiPullCut(phiPullCut)
+  m_param_phiPullCut(phiPullCut)
 {
 }
 
-CellWeight RealisticFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
+void RealisticFacetFilter::setParameter(const std::string& key, const std::string& value)
 {
-  CellWeight fitlessWeight = m_fitlessFacetFilter.isGoodFacet(facet);
+  if (key == "phi_pull_cut") {
+    m_param_phiPullCut = stod(value);
+    B2INFO("Filter received parameter '" << key << "' " << value);
+  } else {
+    m_fitlessFacetFilter.setParameter(key, value);
+  }
+}
+
+std::map<std::string, std::string> RealisticFacetFilter::getParameterDescription()
+{
+  std::map<std::string, std::string> des = m_fitlessFacetFilter.getParameterDescription();
+  des["phi_pull_cut"] = "Acceptable angle pull in the angle of adjacent tangents to the "
+                        "drift circles.";
+  return des;
+}
+
+
+CellWeight RealisticFacetFilter::operator()(const CDCRecoFacet& facet)
+{
+  CellWeight fitlessWeight = m_fitlessFacetFilter(facet);
   if (isNotACell(fitlessWeight)) return NOT_A_CELL;
 
   facet.adjustLines();
@@ -103,9 +122,9 @@ CellWeight RealisticFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
   double endPhiPull = endPhi / endPhiSigma;
 
   /* cut on the angle of */
-  if (startPhiPull < m_phiPullCut and
-      middlePhiPull <  m_phiPullCut and
-      endPhiPull < m_phiPullCut) {
+  if (startPhiPull < m_param_phiPullCut and
+      middlePhiPull <  m_param_phiPullCut and
+      endPhiPull < m_param_phiPullCut) {
 
     //Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

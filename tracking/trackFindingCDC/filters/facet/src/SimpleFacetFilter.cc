@@ -25,7 +25,7 @@ using namespace TrackFindingCDC;
 
 SimpleFacetFilter::SimpleFacetFilter():
   m_fitlessFacetFilter(true),
-  m_allowedDeviationCos(cos(PI / 180.0 * 9))
+  m_param_deviationCosCut(cos(PI / 180.0 * 9))
 {
 }
 
@@ -33,19 +33,33 @@ SimpleFacetFilter::SimpleFacetFilter():
 
 
 
-SimpleFacetFilter::SimpleFacetFilter(FloatType allowedDeviationCos):
+SimpleFacetFilter::SimpleFacetFilter(FloatType deviationCosCut):
   m_fitlessFacetFilter(true),
-  m_allowedDeviationCos(allowedDeviationCos)
+  m_param_deviationCosCut(deviationCosCut)
 {
 }
 
-
-
-
-
-CellWeight SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
+void SimpleFacetFilter::setParameter(const std::string& key, const std::string& value)
 {
-  CellWeight fitlessWeight = m_fitlessFacetFilter.isGoodFacet(facet);
+  if (key == "deviation_cos_cut") {
+    m_param_deviationCosCut = stod(value);
+    B2INFO("Filter received parameter '" << key << "' " << value);
+  } else {
+    m_fitlessFacetFilter.setParameter(key, value);
+  }
+}
+
+std::map<std::string, std::string> SimpleFacetFilter::getParameterDescription()
+{
+  std::map<std::string, std::string> des = m_fitlessFacetFilter.getParameterDescription();
+  des["deviation_cos_cut"] = "Acceptable deviation cosine in the angle of adjacent tangents to the "
+                             "drift circles.";
+  return des;
+}
+
+CellWeight SimpleFacetFilter::operator()(const CDCRecoFacet& facet)
+{
+  CellWeight fitlessWeight = m_fitlessFacetFilter(facet);
   if (isNotACell(fitlessWeight)) return NOT_A_CELL;
 
   facet.adjustLines();
@@ -59,7 +73,7 @@ CellWeight SimpleFacetFilter::isGoodFacet(const CDCRecoFacet& facet)
   const FloatType endCos = startToEnd.tangential().cosWith(middleToEnd.tangential());
 
   /* cut on the angle of */
-  if (startCos > m_allowedDeviationCos and endCos > m_allowedDeviationCos) {
+  if (startCos > m_param_deviationCosCut and endCos > m_param_deviationCosCut) {
 
     //Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

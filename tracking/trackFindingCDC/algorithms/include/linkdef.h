@@ -14,19 +14,19 @@
 //for testing
 #pragma link C++ class Belle2::TrackFindingCDC::SortableVector<int>-;
 #pragma link C++ class Belle2::TrackFindingCDC::SortableVector<float>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCGenHit>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCGenHit>-;
 
 //to use
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCWire>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const CDCWire*>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCWireHit>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const CDCWireHit*>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRLWireHit>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const CDCRLWireHit*>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoHit2D>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoTangent>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoFacet>-;
-#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<CDCRecoHit3D>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCWire>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const Belle2::TrackFindingCDC::CDCWire*>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCWireHit>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const Belle2::TrackFindingCDC::CDCWireHit*>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRLWireHit>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<const Belle2::TrackFindingCDC::CDCRLWireHit*>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRecoHit2D>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRecoTangent>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRecoFacet>-;
+#pragma link C++ class Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCRecoHit3D>-;
 
 #endif
 

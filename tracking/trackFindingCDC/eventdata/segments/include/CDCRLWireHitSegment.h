@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include "genfit/TrackCand.h"
 
 namespace Belle2 {
@@ -44,9 +44,10 @@ namespace Belle2 {
       { return wireSuperLayer.getISuperLayer() < rlWireHitSegment.getISuperLayer(); }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const {
+      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const
+      {
         std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
-        for (const CDCRLWireHit * ptrRLWireHit : *this) {
+        for (const CDCRLWireHit* ptrRLWireHit : *this) {
           ptrRLWireHit ? wireSegment.push_back(&(ptrRLWireHit->getWire())) : wireSegment.push_back(nullptr);
         }
         return wireSegment;

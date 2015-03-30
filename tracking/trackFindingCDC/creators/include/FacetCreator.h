@@ -16,6 +16,7 @@
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/algorithms/SortableVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 namespace Belle2 {

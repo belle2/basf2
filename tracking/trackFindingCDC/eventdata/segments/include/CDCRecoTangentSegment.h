@@ -11,6 +11,8 @@
 #define CDCRECOTANGENTSEGMENT_H
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoTangentVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

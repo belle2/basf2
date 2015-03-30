@@ -15,14 +15,13 @@
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
+#include <framework/logging/Logger.h>
 //Unpacked version for ROOT dictionary generation
 #include <tracking/trackFindingCDC/topology/CDCWireUnpackedFromNamespaces.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCEntitiesUnpackedFromNamespaces.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
-
     /// A generic vector which keeps track if its elements are sorted and speeds up lookups accordingly.
     template<class T>
     class SortableVector : public SwitchableRootificationBase {
@@ -65,7 +64,8 @@ namespace Belle2 {
       class const_range : public std::pair<const_iterator, const_iterator> {
       public:
         /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
-        const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>(iterator_pair) {;}
+        const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>
+          (iterator_pair) {;}
 
         /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
         const_range(const const_iterator& begin, const const_iterator& end) : std::pair<const_iterator, const_iterator>(begin, end) {;}
@@ -196,7 +196,8 @@ namespace Belle2 {
       /// Getter for the element by its position for easy read access from python.
       /** This gets the an element by its position in the vector. Returns a default \n
        *  constructed element for indices outside the valid range. */
-      const Item at(size_t idx) const {
+      const Item at(size_t idx) const
+      {
         if (idx < size()) {
           const_iterator itItem = begin();
           std::advance(itItem, idx);
@@ -238,7 +239,8 @@ namespace Belle2 {
       input_iterator input() { return input_iterator(*this); }
 
       /// Appends a new elements to the vector. Keeps track if the elements are still sorted
-      void push_back(Item const& item) {
+      void push_back(Item const& item)
+      {
         //if the vector was empty and there is only one element added it is sorted
         //else it remains sorted if the added element is not lower than the last
         //this also asures that the m_isSorted field acquires the right value as soon as an element gets added
@@ -269,7 +271,8 @@ namespace Belle2 {
       { m_isSorted = false; return m_items.insert(pos, item); }
 
       /// Sorts the vector
-      void sort() {
+      void sort()
+      {
         std::sort(m_items.begin(), m_items.end());
         m_isSorted = true;
       }
@@ -278,7 +281,8 @@ namespace Belle2 {
       bool isSorted() const { return empty() or m_isSorted; }
 
       /// Explicitly checks a the sort state of the vector by a single iteration over it.
-      bool checkSorted() const {
+      bool checkSorted() const
+      {
         if (empty()) return true;
         bool result = true;
 
@@ -298,7 +302,8 @@ namespace Belle2 {
 
       /// Establishes a state where each element is only present once inside the vector. This may change the order of elements!
       /** Removes all duplicated entries, but may has to sort the vector first, to detect them. */
-      void ensureUnique() {
+      void ensureUnique()
+      {
         ensureSorted();
         iterator last = std::unique(m_items.begin(), m_items.end());
         //erase remove idiom (here with unique)
@@ -309,7 +314,8 @@ namespace Belle2 {
       /// Returns an iterator to the found element. end() if not found.
       /** For unsorted vectors this is rather slow. But if the isSorted state is set the look up is \n
        *  as fast as for sets. */
-      const_iterator find(const Item& item) const {
+      const_iterator find(const Item& item) const
+      {
         if (isSorted()) {
           const_iterator found = lower_bound(item);
           return (found != m_items.end() and (*found) == item) ? found : end();
@@ -327,7 +333,8 @@ namespace Belle2 {
        *  Note: Although considering the memory address this operation is as fail safe as the normal find operation.
        *  If the address does not point to a proper object inside the vector this method will fail as would the normal find.
        */
-      const_iterator findFast(const Item& item) const {
+      const_iterator findFast(const Item& item) const
+      {
         if (containsPointer(&item)) {
           const_iterator itBegin = begin();
           const Item* ptrItem = &item;
@@ -376,7 +383,8 @@ namespace Belle2 {
       /// Erases an item from the vector
       /** Before erasing the item the item has to be found. For sorted vectors this is a bit faster, \n
           but still the whole method is rather inefficient for vectors*/
-      void erase(const Item& item) {
+      void erase(const Item& item)
+      {
         if (isSorted()) {
           range rangeToRemove = equal_range(item);
           erase(rangeToRemove.first, rangeToRemove.second);
@@ -389,7 +397,8 @@ namespace Belle2 {
       /// Evaluates how many times the item is in the collection
       /** This normally takes a whole iteration over the vector to find all elements.
        *  Speeded up for sorted vectors. */
-      size_t count(const Item& item) const {
+      size_t count(const Item& item) const
+      {
         if (isSorted()) {
           const_range rangeToCount = equal_range(item);
           return std::distance(rangeToCount.first, rangeToCount.second);
@@ -403,7 +412,8 @@ namespace Belle2 {
 
       /// Evaluate if the given collection is completelly contained in *this*
       /** Inefficient only if both vectors are sorted. */
-      bool contains(const SortableVector<T>& items) const {
+      bool contains(const SortableVector<T>& items) const
+      {
         if (isSorted() and items.isSorted()) {
           return std::includes(begin(), end(), items.begin(), items.end());
         } else {
@@ -416,7 +426,8 @@ namespace Belle2 {
 
 
       /// Evaluates if the pointer address of the given object points to a place inside the containers range
-      bool containsPointer(const T* item) const {
+      bool containsPointer(const T* item) const
+      {
         // Note size_t is required to be large enough to contain any of the platform's memory addresses
         size_t instanceAddress = (size_t)item;
 

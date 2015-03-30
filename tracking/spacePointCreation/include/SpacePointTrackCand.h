@@ -107,8 +107,8 @@ namespace Belle2 {
     bool checkOverlap(const SpacePointTrackCand& rhs);
 
     /**
-       * get hits (space points) of track candidate
-       */
+     * get hits (space points) of track candidate
+     */
     const std::vector<const Belle2::SpacePoint*>& getHits() const { return m_trackSpacePoints; }
 
     /**
@@ -362,7 +362,7 @@ namespace Belle2 {
      * + If the TrackCandidate is not curling this value is set to 0.
      * + If it is not yet checked if the TrackCand is curling it is set to -1.
      * + If it is a curling TrackCand the counter starts at 1, indicating that this is the first outgoing part of the TrackCand.
-     * COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)sv
+     * COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)
      */
     int m_iTrackStub;
 
@@ -379,7 +379,7 @@ namespace Belle2 {
      * */
     double m_qualityIndex;
 
-    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
+    // last members added: m_qualityIndex(6), m_refereeStatuts(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
     ClassDef(SpacePointTrackCand, 6)
   };
 }

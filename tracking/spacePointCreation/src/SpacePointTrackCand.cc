@@ -256,6 +256,8 @@ std::string SpacePointTrackCand::getRefereeStatusString(std::string delimiter) c
   if (hasRefereeStatus(c_curlingTrack)) statusString += "curlingTrack" + delimiter;
   if (hasRefereeStatus(c_omittedClusters)) statusString += "omittedClusters" + delimiter;
   if (hasRefereeStatus(c_singleClustersSPs)) statusString += "singleClusterSPs" + delimiter;
+  if (hasRefereeStatus(c_isActive)) statusString += "isActive" + delimiter;
+  if (hasRefereeStatus(c_isReserved)) statusString += "isReserved" + delimiter;
 
   statusString.erase(statusString.end() - delimiter.size(),
                      statusString.end()); // remove last delimiter -> no error catching SHOULD be neccessary since the case of an empty (==0) refereeStatus is already dealt with above!

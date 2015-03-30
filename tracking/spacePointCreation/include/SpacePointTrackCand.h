@@ -3,7 +3,7 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Thomas Madlener                                           *
+* Contributors: Thomas Madlener, Jakob Lettenbichler                     *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -86,12 +86,27 @@ namespace Belle2 {
     SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
                         int mcTrackID = -1);
 
-    // destructor
+    /** destructor */
     virtual ~SpacePointTrackCand();
 
+
     /**
-     * get hits (space points) of track candidate
+     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!)
+     * NOTE: returns false if both TrackCands do not contain any SpacePoints
      */
+    bool operator == (const SpacePointTrackCand& rhs);
+
+
+    /**
+     * Compares two track candidates and determines if they share hits.
+     * If at least one Hit is shared, return value is true -> tracks are overlapping.
+     * Return value is false if no hits are shared.
+     * */
+    bool checkOverlap(const SpacePointTrackCand& rhs);
+
+    /**
+       * get hits (space points) of track candidate
+       */
     const std::vector<const Belle2::SpacePoint*>& getHits() const { return m_trackSpacePoints; }
 
     /**
@@ -165,6 +180,11 @@ namespace Belle2 {
     bool hasRefereeStatus(unsigned int short bitmask) const { return (m_refereeStatus & bitmask) == bitmask; }
 
     /**
+    * returns the current status of the estimated quality of this track candidate.
+    * */
+    double getQualityIndex() const { return m_qualityIndex; }
+
+    /**
      * Check if the SpacePointTrackCand contains consecutive SpacePoints that are on the same sensor
      * WARNING: does not check if this has actually been assigned!
      */
@@ -223,12 +243,6 @@ namespace Belle2 {
     std::string getRefereeStatusString(std::string delimiter = " ") const;
 
     /**
-     * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!)
-     * NOTE: returns false if both TrackCands do not contain any SpacePoints
-     */
-    bool operator == (const SpacePointTrackCand& rhs);
-
-    /**
      * set the sorting parameters
      */
     void setSortingParameters(const std::vector<double>& sortParams);
@@ -247,6 +261,11 @@ namespace Belle2 {
      * set the covariance matrix seed
      */
     void setCovSeed(const TMatrixDSym& cov) { m_cov6D = cov; }
+
+    /**
+    * sets the new status of the estimated quality of this track candidate.
+    * */
+    double setQualityIndex(double newIndex) { m_qualityIndex = newIndex; }
 
     /**
      * add a new space point to the track candidate
@@ -347,7 +366,15 @@ namespace Belle2 {
      */
     unsigned short int m_refereeStatus;
 
-    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
-    ClassDef(SpacePointTrackCand, 5)
+    /**
+     * An estimation for the quality of the track.
+     *
+     * Normally defined between 0-1 to describe the propability that this track is real(istic).
+     * The quality of the track has to be determined by another function or module.
+     * */
+    double m_qualityIndex;
+
+    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
+    ClassDef(SpacePointTrackCand, 6)
   };
 }

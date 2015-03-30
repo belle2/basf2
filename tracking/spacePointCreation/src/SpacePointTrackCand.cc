@@ -70,6 +70,58 @@ SpacePointTrackCand::~SpacePointTrackCand()
 //   m_trackSpacePoints.clear();
 }
 
+
+bool SpacePointTrackCand::checkOverlap(const SpacePointTrackCand& rhs)
+{
+  const auto& lhsHits = this->getHits();
+  const auto& rhsHits = rhs.getHits();
+
+  // if one TrackCand has no SpacePoint, equality is not possible and further comparing is not needed
+  if (lhsHits.size() == 0 || rhsHits.size() == 0) {
+    B2DEBUG(80, "At least one of the SpacePointTrackCands does not contain any SpacePoints");
+    return false;
+  }
+
+
+  for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
+    auto pos = std::find(rhsHits.begin(), rhsHits.end(), lhsHits[iSP]);
+    if (pos != rhsHits.end()) {
+      B2DEBUG(80, "SpacePointTrackCands are overlaping at hit number: " << iSP << "");
+      return true;
+    }
+  }
+  return false;
+}
+
+// 'Equal To' operator for easier comparison of SpacePointTrackCands (e.g. for testing this class)
+// bool operator== (SpacePointTrackCand& lhs, SpacePointTrackCand& rhs)
+bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
+{
+  const auto& lhsHits = this->getHits();
+  const auto& rhsHits = rhs.getHits();
+
+  // if one TrackCand has no SpacePoint, equality is not possible and further comparing is not needed
+  if (lhsHits.size() == 0 || rhsHits.size() == 0) {
+    B2DEBUG(80, "At least one of the SpacePointTrackCands does not contain any SpacePoints");
+    return false;
+  }
+
+  // compare number of SpacePoints in TrackCandidate, return false if not equal
+  if (lhsHits.size() != rhsHits.size()) {
+    B2DEBUG(80, "Numbers of SpacePoints in SpacePointTrackCands do not match");
+    return false;
+  }
+
+  // compare pointers to SpacePoint, if one is not equal, return false
+  for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
+    if (lhsHits[iSP] != rhsHits[iSP]) {
+      B2DEBUG(80, "SpacePoints " << iSP << " do not match");
+      return false;
+    }
+  }
+  return true;
+}
+
 // get SpacePoints in range
 const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange(int firstInd, int lastInd) const
 {
@@ -115,35 +167,6 @@ void SpacePointTrackCand::setPdgCode(int pdgCode)
   m_pdg = pdgCode;
   TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(m_pdg);
   m_q = part->Charge() / (3.); // charge returned in units of |e|/3 by TParticlePDG -> Charge()
-}
-
-// 'Equal To' operator for easier comparison of SpacePointTrackCands (e.g. for testing this class)
-// bool operator== (SpacePointTrackCand& lhs, SpacePointTrackCand& rhs)
-bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
-{
-  const auto lhsHits = this->getHits();
-  const auto rhsHits = rhs.getHits();
-
-  // if one TrackCand has no SpacePoint, equality is not possible and further comparing is not needed
-  if (lhsHits.size() == 0 || rhsHits.size() == 0) {
-    B2DEBUG(80, "At least one of the SpacePointTrackCands does not contain any SpacePoints");
-    return false;
-  }
-
-  // compare number of SpacePoints in TrackCandidate, return false if not equal
-  if (lhsHits.size() != rhsHits.size()) {
-    B2DEBUG(80, "Numbers of SpacePoints in SpacePointTrackCands do not match");
-    return false;
-  }
-
-  // compare pointers to SpacePoint, if one is not equal, return false
-  for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
-    if (lhsHits[iSP] != rhsHits[iSP]) {
-      B2DEBUG(80, "SpacePoints " << iSP << " do not match");
-      return false;
-    }
-  }
-  return true;
 }
 
 // set sorting parameters

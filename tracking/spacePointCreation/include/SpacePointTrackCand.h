@@ -70,6 +70,8 @@ namespace Belle2 {
       /** bit 9: Not all Clusters of the genfit::TrackCand have been used to create this SpacePointTrackCand */
       c_omittedClusters = 512,
       c_singleClustersSPs = 1024, /**< bit 10: The SpacePointTrackCand contains single Cluster SpacePoints */
+      c_isActive =  2048, /**< bit 11: SPTC is active (i.e. if false, some module rejected it for further use */
+      c_isReserved = 4096, /**< bit 12: SPTC is reserved (i.e. should not be altered and should be treated with high priority) */
     };
 
     /**

@@ -14,6 +14,7 @@
 
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/Environment.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -70,9 +71,9 @@ void CalibrationManager::register_module(CalibrationModule* module)
 
   // Refresh states of all registered modules
   for (CalibrationModule* mod : m_calibrationModules) {
-    if (!checkDependencies(mod, false))
-      mod->setState(CalibrationModule::c_Waiting);
-    else
+    // Only if the module is in waiting state (default), set it
+    // to running state (if done/failed/monitoring - do not change the state)
+    if (checkDependencies(mod, false) && mod->getState() == CalibrationModule::c_Waiting)
       mod->setState(CalibrationModule::c_Running);
   }
 }

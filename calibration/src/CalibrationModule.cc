@@ -12,8 +12,13 @@
 #include <calibration/CalibrationModule.h>
 #include <calibration/CalibrationManager.h>
 #include <framework/core/Environment.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/pcore/ProcHandler.h>
 #include <boost/algorithm/string.hpp>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/RootMergeable.h>
+#include <TSystem.h>
 
 using namespace std;
 using namespace Belle2;
@@ -29,13 +34,16 @@ CalibrationModule::CalibrationModule() : Module(),
   m_state(CalibrationModule::c_Waiting),
   m_iterationNumber(0),
   m_datasetCategory(""),
-  m_granularityOfCalibration("run"),
+  m_granularityOfCalibration("experiment"),
   m_numberOfIterations(0),
   m_calibrationFileName(""),
   //m_calibrationModuleInitialized(false),
   //m_calibrationManagerInitialized(false),
-  m_dependencyList("")
+  m_dependencyList(""),
+  m_calibrationFile(nullptr)
 {
+
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   // This describtion has to overriden by implementing module
   setDescription("A standard calibration module");
@@ -44,31 +52,32 @@ CalibrationModule::CalibrationModule() : Module(),
   addParam("datasetCategory", m_datasetCategory,
            "Used dataset category", string("data"));
   addParam("granularityOfCalibration", m_granularityOfCalibration,
-           "Granularity of calibration: run, experiment, or other", string("run"));
+           "Granularity of calibration: run, experiment, or other", string("data"));
   addParam("numberOfIterations", m_numberOfIterations,
            "Maximal number of iterations", int(1));
-  addParam("calibrationFileName", m_calibrationFileName, "Name of the calibration output file", string("CalibrationFile.root"));
+  addParam("calibrationFileName", m_calibrationFileName,
+           "Name of the calibration output file. If empty, no file will be created. If '*' (default), it will be sed to module_name.root",
+           string("*"));
 
   m_dependencies.clear();
+
+
 }
 
 CalibrationModule::~CalibrationModule()
 {
-  if (ProcHandler::EvtProcID() == -1) {   // should be called from main proc.
-    if (Environment::Instance().getNumberProcesses() > 0 && ProcHandler::EvtProcID() == -1) {
-      // Adding histogram files
-      // Add an option later in case the calibration file is not a root tree/histogram
-      //calibration::CalibrationManager::Instance().hadd();
-    }
-  }
+
 }
 
 void CalibrationModule::initialize()
 {
-  // First parse the dependency list
+  // Init calibration file name
+  if (m_calibrationFileName == "*")
+    m_calibrationFileName = getName() + ".root";
+
+  // Parse the dependency list
   std::vector<std::string> dependencies;
   // Split by ","
-
   if (m_dependencyList != "") {
     boost::algorithm::split(dependencies, m_dependencyList, boost::is_any_of(","));
     for (auto dependency : dependencies) {
@@ -98,47 +107,17 @@ void CalibrationModule::initialize()
   }
 
   CalibrationManager::getInstance().register_module(this);
-  //calibration::CalibrationManager::Instance().init(Environment::Instance().getNumberProcesses(), m_CalibrationFileName.c_str());
   // calibManager.setNumberOfIterations(m_numberOfIterations);
+
+  // also register histograms/ntuples:
   Prepare();
+
   m_iterationNumber = 0;
 }
 
 void CalibrationModule::beginRun()
 {
-  //if (!CalibrationManager::getInstance().checkDependencies(this))
-  //  B2FATAL("Dependencies not fullfiled");
-}
 
-void CalibrationModule::endRun()
-{
-  if (m_granularityOfCalibration == "run") {
-    ECalibrationModuleResult calibrationResult;
-    calibrationResult = Calibrate();
-    if (calibrationResult == c_Success) {
-      StoreInDataBase();
-      setState(CalibrationModule::c_Monitoring);
-      ECalibrationModuleMonitoringResult result = Monitor();
-
-      if (result == c_MonitoringSuccess)
-        setState(CalibrationModule::c_Done);
-      else if (result == c_MonitoringIterateCalibration)
-        setState(CalibrationModule::c_Running);
-      else if (result == c_MonitoringIterateMonitor)
-        setState(CalibrationModule::c_Running);
-      else
-        setState(CalibrationModule::c_Failed);
-
-    } else {
-      if (calibrationResult == calibration::CalibrationModule::c_Failure)
-        B2ERROR("Calibration failed.");
-      if (calibrationResult == calibration::CalibrationModule::c_NotEnoughData)
-        B2ERROR("Insufficient data for calibration.");
-      if (calibrationResult == calibration::CalibrationModule::c_NoChange)
-        B2INFO("No change in calibration.");
-    }
-    m_iterationNumber++;
-  }
 }
 
 void CalibrationModule::event()
@@ -146,11 +125,27 @@ void CalibrationModule::event()
   if (getState() == CalibrationModule::c_Running)
     CollectData();
 
+
+  if (m_granularityOfCalibration == "other") {
+    if (tryStartCalibration())
+      m_iterationNumber++;
+  }
+}
+
+void CalibrationModule::endRun()
+{
+  if (m_granularityOfCalibration == "run") {
+    if (tryStartCalibration())
+      m_iterationNumber++;
+  }
 }
 
 void CalibrationModule::terminate()
 {
-  //calibration::CalibrationManager::Instance().terminate();
+  if (m_granularityOfCalibration == "data") {
+    if (tryStartCalibration())
+      m_iterationNumber++;
+  }
 
 }
 
@@ -187,5 +182,91 @@ void CalibrationModule::addDefaultDependencyList(string list)
            "ModuleName:state where state=done|waiting|monitoring|failed|running", std::string(list));
 }
 
+TFile* CalibrationModule::getCalibrationFile()
+{
+  return m_calibrationFile;
+}
+
+
+bool CalibrationModule::tryStartCalibration()
+{
+  if (!CalibrationManager::getInstance().checkDependencies(this))
+    return false;
+
+  // If MP, only calibrate in output process at TERMINATE
+  // but in event processes, try to close possible opened files (opened by each process individually at Collect Data)
+  if (ProcHandler::parallelProcessingUsed() and !ProcHandler::isOutputProcess()) {
+    if (ProcHandler::isEventProcess())
+      closeParallelFiles();
+    return false;
+  }
+
+  if (getCalibrationFileName() != "")  {
+    m_calibrationFile = new TFile(getCalibrationFileName().c_str(), "RECREATE");
+    m_calibrationFile->cd();
+  }
+
+  ECalibrationModuleResult calibrationResult;
+  calibrationResult = Calibrate();
+
+  if (m_calibrationFile) {
+    m_calibrationFile->Close();
+    delete m_calibrationFile;
+    m_calibrationFile = nullptr;
+  }
+
+  if (calibrationResult == c_Success) {
+
+    if (getCalibrationFileName() != "")  {
+      m_calibrationFile = new TFile(getCalibrationFileName().c_str(), "RECREATE");
+      m_calibrationFile->cd();
+    }
+
+    StoreInDataBase();
+    setState(CalibrationModule::c_Monitoring);
+    ECalibrationModuleMonitoringResult result = Monitor();
+
+    if (m_calibrationFile) {
+      m_calibrationFile->Close();
+      delete m_calibrationFile;
+      m_calibrationFile = nullptr;
+    }
+
+    if (result == c_MonitoringSuccess)
+      setState(CalibrationModule::c_Done);
+    else if (result == c_MonitoringIterateCalibration)
+      setState(CalibrationModule::c_Running);
+    else if (result == c_MonitoringIterateMonitor)
+      setState(CalibrationModule::c_Running);
+    else
+      //TODO: cannot happen
+      setState(CalibrationModule::c_Failed);
+
+  } else {
+
+    if (m_calibrationFile) {
+      m_calibrationFile->Close();
+      delete m_calibrationFile;
+      m_calibrationFile = nullptr;
+    }
+
+    if (calibrationResult == calibration::CalibrationModule::c_Failure) {
+      B2ERROR("Calibration failed.");
+      setState(CalibrationModule::c_Failed);
+      return false;
+    }
+    if (calibrationResult == calibration::CalibrationModule::c_NotEnoughData) {
+      B2WARNING("Insufficient data for calibration.");
+      setState(CalibrationModule::c_Waiting);
+      return false;
+    }
+    if (calibrationResult == calibration::CalibrationModule::c_NoChange) {
+      B2INFO("No change in calibration.");
+      setState(CalibrationModule::c_Done);
+      return false;
+    }
+  }
+  return true;
+}
 
 

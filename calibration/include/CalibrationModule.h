@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
+#include <TFile.h>
 
 namespace Belle2 {
   namespace calibration {
@@ -177,7 +178,17 @@ namespace Belle2 {
        */
       void addDefaultDependencyList(std::string list = "");
 
+      TFile* getCalibrationFile();
+
+      virtual void closeParallelFiles() {};
+
+      std::string getCalibrationFileName() const
+      {
+        return m_calibrationFileName;
+      }
+
     private:
+      bool tryStartCalibration();
       /**
        * Calibration mode: online or offline.
        */
@@ -231,6 +242,9 @@ namespace Belle2 {
        * Calibration parameter: dependencies on other calibration modules.
        */
       std::string m_dependencyList;
+
+      TFile* m_calibrationFile;
+
     };
   }
 } //Belle2 namespace

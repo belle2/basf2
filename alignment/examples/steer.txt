@@ -1,0 +1,27 @@
+Cfiles
+belle.mille0
+belle.mille1
+belle.mille2
+belle.mille3
+
+Parameters
+! This would fix one PXD
+84801 0. -1.
+84802 0. -1.
+84803 0. -1.
+84804 0. -1.
+84805 0. -1.
+84806 0. -1.
+
+threads 4 4
+printrecord 150 -1
+!maxrecords 5000 ! Number of records to be processed
+!memorydebug
+!entries 50
+chiscut 30. 6. ! Outlier removal. Comment this in heavily misaligned geometry
+outlierdownweighting 3 ! Down-weighting of outliers - number of iterations
+dwfractioncut 0.1
+method inversion  2  0.1   ! solution by inversion
+!histprint
+
+end ! Nothing after this command will be processed

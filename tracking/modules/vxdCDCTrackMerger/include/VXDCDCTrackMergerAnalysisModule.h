@@ -63,6 +63,7 @@ namespace Belle2 {
     double m_trk_mrg_eff;
     std::vector<int>* m_match_vec;
     std::vector<int>* m_true_match_vec;
+    std::vector<int>* m_true_match_mc;
     std::vector<int>* m_right_match_vec;
     std::vector<int>* m_loop_match_vec;
     std::vector<float>* m_chi2_vec;

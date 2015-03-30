@@ -35,10 +35,12 @@ namespace Belle2 {
       * Default constructor.
       * All private members are set to 0 (all vectors are empty).
       */
-    Vertex() {
+    Vertex()
+    {
       m_tagVertex(0) = 0; m_tagVertex(1) = 0; m_tagVertex(2) = 0;
       m_tagVertexPval = 0;
       m_deltaT = 0;
+      m_MCdeltaT = 0;
       m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();

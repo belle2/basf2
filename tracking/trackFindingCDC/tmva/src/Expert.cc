@@ -10,6 +10,8 @@
 #include <tracking/trackFindingCDC/tmva/Expert.h>
 #include <framework/utilities/FileSystem.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -18,7 +20,9 @@ Expert::Expert(const std::string& weightFolderName, const std::string& trainingN
   m_weightFolderName(weightFolderName),
   m_trainingName(trainingName)
 {
+  B2INFO("load plugin");
   TMVAUtilities::loadPlugins("FastBDT");
+  B2INFO("finished load plugin");
 }
 
 std::string Expert::getAbsWeightFilePath()
@@ -34,6 +38,7 @@ std::string Expert::getAbsWeightFilePath()
 void Expert::initializeReader(const std::function<void(TMVA::Reader&)> setReaderAddresses)
 {
   setReaderAddresses(m_reader);
+  B2INFO("book method");
   m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
 }
 
@@ -50,7 +55,6 @@ void Expert::initializeReader(std::vector<NamedFloatTuple*> allVariables)
       }
     }
   });
-  m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
 }
 
 double Expert::predict()

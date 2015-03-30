@@ -18,6 +18,7 @@
 // #include <map> // only testing unordered maps here, but should be the same for maps (only slower)
 #include <complex>
 #include <cmath>
+#include <tuple>
 #include <boost/concept_check.hpp>
 
 using namespace std;
@@ -27,51 +28,61 @@ namespace Belle2 {
   typedef std::unordered_multimap<int, double> i2dMultiMap; /**< typedef for less writing effort */
   typedef std::unordered_map<int, double> i2dMap; /**< typedef for less writing effort */
 
-  /** create a multimap with @param nEntries entries, that show possibly problematic behavior (concerning strict weak ordering)
-   * the i-th entry is: [(i % 6), std::acos( (i % 5) * 0.3 )
-   * NOTE: that the value can be NaN for some cases!
+  /** create a multimap with
+   * @param nEntries entries.
+   * @param funct Function object which values are used to determine the keys by the return value of funct.operator()
+   * NOTE: funct.operator has to take an int and return a double
    */
   template<typename Functor>
-  i2dMultiMap createMultiMap(unsigned int nEntries, Functor funct)
+  i2dMultiMap createMultiMap(int nEntries, Functor funct)
   {
     i2dMultiMap map;
-    for (unsigned int i = 0; i < nEntries; ++i) {
+    for (int i = 0; i < nEntries; ++i) {
       map.insert(std::make_pair((i % 6), funct.operator()(i)));
     }
     return map;
   }
 
   /** create a multimap with
-   * @param nEntries entries,
-   * @param funct Function Object that determines how the value to a given key is calculated (
-   * for this method to work: operator must take an unsigned int as argument and return a double from that)
-   * NOTE: that the value can be NaN for some cases!
+   *@param nEntries entries.
+   * @param funct Function object which values are used to determine the keys by the return value of funct.operator()
+   * NOTE: funct.operator has to take an int and return a double
    */
   template<typename Functor>
-  i2dMap createMap(unsigned int nEntries, Functor funct)
+  i2dMap createMap(int nEntries, Functor funct)
   {
     i2dMap map;
-    for (unsigned int i = 0; i < nEntries; ++i) {
+    for (int i = 0; i < nEntries; ++i) {
       map.insert(std::make_pair(i, funct.operator()(i)));
     }
     return map;
   }
 
-  /** function object that implements: acos( ( i % 5) * .3 ), which produces some NaNs but no negative numbers */
-  struct {
-    double operator()(unsigned int i)
-    {
-      return std::acos((i % 5) * .3);
-    }
-  } acosMod5;
+//   /** function object that implements: acos( ( i % 5) * .3 ), which produces some NaNs but no negative numbers */
+//   struct {
+//     double operator()(int i)
+//     {
+//       return std::acos((i % 5) * .3);
+//     }
+//   } acosMod5;
 
-  /** function object that implementes sin(i/2). This does give positive and negative weights, but no NaNs */
+  /** function object that implements sin(i/2). This does give positive and negative weights, but no NaNs */
   struct {
-    double operator()(unsigned int i)
+    double operator()(int i)
     {
       return std::sin(i * .5);
     }
   } sinHalf;
+
+  /** function object that implements sin(i * .3) / i (= sinus cardinalis more or less)
+   * NOTE: although sin(x)/x at x = 0 is 1 (de l'Hoptital) this should give a NaN since it is a division by zero
+   */
+  struct {
+    double operator()(int i)
+    {
+      return std::sin(i * .3) / i;
+    }
+  } sinCardp3;
 
   /**
    * class for testing the helper functions from MapHelperFunctions.h
@@ -83,15 +94,15 @@ namespace Belle2 {
       _nEntries = 20;
       _map = createMap(_nEntries, sinHalf);
       _multimap = createMultiMap(_nEntries, sinHalf);
-      _nanMap = createMap(_nEntries, acosMod5);
-      _nanMultiMap = createMultiMap(_nEntries, acosMod5);
+      _nanMap = createMap(_nEntries, sinCardp3);
+      _nanMultiMap = createMultiMap(_nEntries, sinCardp3);
     }
 
     i2dMap _map;
     i2dMultiMap _multimap;
     i2dMultiMap _nanMultiMap;
     i2dMap _nanMap;
-    unsigned int _nEntries;
+    int _nEntries;
   };
 
   /** test the methods that are use to create the maps for the later tests */
@@ -103,6 +114,8 @@ namespace Belle2 {
     EXPECT_EQ(N, _multimap.size());
     EXPECT_EQ(N, _map.size());
 
+    EXPECT_TRUE(std::isnan(sinCardp3.operator()((int)0)));   // check if the function object actually creates a NaN
+
 //     std::cout << printMap(_nanMap) << std::endl;
 //     std::cout << printMap(_nanMultiMap) << std::endl;
 //     std::cout << printMap(_multimap) << std::endl;
@@ -111,43 +124,53 @@ namespace Belle2 {
     // do some hard-coded queries to see if the _nanMaps were filled according to specified method
     std::vector<int> possibleKeys = { 0, 1, 2, 3, 4, 5 };
     for (int key : possibleKeys) {
-      std::cout << " key " << key << std::endl;
-      auto range = _nanMultiMap.equal_range(key);
-      i2dMultiMap::iterator multiMapIt = range.first;
-      for (int i = std::distance(range.first, range.second) - 1; i != 0; --i) {
-        if (std::isnan(multiMapIt->second)) {
-          B2INFO("Not Comparing value to key " << i << " because value is NaN! (on purpose!)")
-          continue;
+      std::vector<double> nanPossibleValues, possibleValues;
+      for (int arg = key; arg < _nEntries; arg += 6) {
+        nanPossibleValues.push_back(sinCardp3.operator()(arg));
+        possibleValues.push_back(sinHalf.operator()(arg));
+      }
+      // test the multimap with nan first
+      auto keyRange = _nanMultiMap.equal_range(key);
+      // check the numbers of stored values and of possible values
+      EXPECT_EQ(nanPossibleValues.size(), std::distance(keyRange.first, keyRange.second));
+      i2dMultiMap::iterator multiMapIt = keyRange.first;
+      for (int i = 0; i < std::distance(keyRange.first, keyRange.second); ++i) {
+        if (!std::isnan(multiMapIt->second)) { // cannot find nan value with std::find (NaN == NaN is always false)
+          auto findIt = std::find(nanPossibleValues.begin(), nanPossibleValues.end(), multiMapIt->second);
+          EXPECT_FALSE(findIt == nanPossibleValues.end()); // all stored values have to be possible
+        } else { // check if there is at least on NaN value in the possible Values
+          EXPECT_TRUE(std::count_if(nanPossibleValues.begin(), nanPossibleValues.end(),
+          [](const double & val) { return std::isnan(val); }) > 0);
         }
-        EXPECT_DOUBLE_EQ(multiMapIt->second, acosMod5.operator()(key + i));
         ++multiMapIt;
       }
-
-      // TODO: test second multimap creation
-//       range = _multimap.equal_range(key);
-//       multiMapIt = range.first;
-//       for(int i = std::distance(range.first, range.second) - 1; i != 0; --i) {
-//  EXPECT_DOUBLE_EQ(multiMapIt->second, sinHalf.operator()(key*5 + i));
-//  ++multiMapIt;
-//       }
+      keyRange = _multimap.equal_range(key);
+      EXPECT_EQ(possibleValues.size(), std::distance(keyRange.first, keyRange.second));
+      multiMapIt = keyRange.first;
+      for (int i = 0; i < std::distance(keyRange.first, keyRange.second); ++i) {
+        auto findIt = std::find(possibleValues.begin(), possibleValues.end(), multiMapIt->second);
+        EXPECT_FALSE(findIt == possibleValues.end());
+        ++multiMapIt;
+      }
     }
 
     i2dMap::iterator _nanMapIt;
     for (unsigned int i = 0; i < N; ++i) {
       auto range = _nanMap.equal_range(i);
       i2dMap::iterator mapIt = range.first;
-      for (unsigned int j = 0; j < std::distance(range.first, range.second); ++j) {
+      for (int j = 0; j < std::distance(range.first, range.second); ++j) {
         if (std::isnan(mapIt->second)) {
-          B2INFO("Not Comparing value to key " << i << " because acos( " << i << " % 5) *. 3) is NaN! (on purpose!)");
+          B2INFO("Not Comparing value to key " << i << " because value is NaN, checking if the functor returns NaN for this key");
+          EXPECT_TRUE(std::isnan(sinCardp3.operator()(i))); // expect a NaN value from the operator
           continue; // do not compare NaNs! (will always fail due to their nature)
         }
-        EXPECT_DOUBLE_EQ(mapIt->second, acosMod5.operator()(i));
+        EXPECT_DOUBLE_EQ(mapIt->second, sinCardp3.operator()(i));
         ++mapIt;
       }
 
       range = _map.equal_range(i);
       mapIt = range.first;
-      for (unsigned int j = 0; j < std::distance(range.first, range.second); ++j) {
+      for (int j = 0; j < std::distance(range.first, range.second); ++j) {
         EXPECT_DOUBLE_EQ(mapIt->second, sinHalf.operator()(i));
       }
     }
@@ -176,15 +199,120 @@ namespace Belle2 {
     }
   }
 
+  /** test if the 'getValuesToKey' method returns the right values to a given key */
+  TEST_F(MapHelperFunctionsTest, testGetValuesToKey)
+  {
+    // multimap
+    std::vector<int> possibleKeys = { 0, 1, 2, 3, 4, 5 };
+    for (int key : possibleKeys) {
+      std::vector<double> expectedValues;
+      for (int arg = key; arg < _nEntries; arg += 6) { expectedValues.push_back(sinHalf.operator()(arg)); }
+      std::vector<double> actualValues = getValuesToKey(_multimap, key);
+      EXPECT_EQ(expectedValues.size(), actualValues.size());
+
+      // check if all values are present
+      for (const double& d : actualValues) {
+        EXPECT_FALSE(std::find(expectedValues.begin(), expectedValues.end(), d) == expectedValues.end());
+      }
+      expectedValues.clear();
+      for (int arg = key; arg < _nEntries; arg += 6) { expectedValues.push_back(sinCardp3.operator()(arg)); }
+      actualValues = getValuesToKey(_nanMultiMap, key);
+      EXPECT_EQ(expectedValues.size(), actualValues.size());
+
+      // check if all values are present
+      for (const double& d : actualValues) {
+        if (std::isnan(d)) {
+          B2INFO("Not comparing NaN value!")
+          continue;
+        }
+        EXPECT_FALSE(std::find(expectedValues.begin(), expectedValues.end(), d) == expectedValues.end());
+      }
+    }
+
+    // map
+    for (int i = 0; i < _nEntries; ++i) {
+      std::vector<double> values = getValuesToKey(_map, i);
+      EXPECT_EQ(values.size(), 1);
+      EXPECT_DOUBLE_EQ(values[0], sinHalf.operator()(i));
+
+      values = getValuesToKey(_nanMap, i);
+      EXPECT_EQ(values.size(), 1);
+      if (!std::isnan(values[0])) { // not checking here (already checked, that the functor leads to this above)
+        EXPECT_DOUBLE_EQ(values[0], sinCardp3.operator()(i));
+      }
+    }
+  }
+
   /** test the 'getNValuesPerKey' method */
   TEST_F(MapHelperFunctionsTest, testGetNValuesPerKey)
   {
-    // TODO
+    std::vector<std::pair<int, unsigned int> > mapKeys = getNValuesPerKey(_map);
+    unsigned int oneKey2Value = std::count_if(mapKeys.begin(), mapKeys.end(),
+    [](const std::pair<int, unsigned int>& pair) { return pair.second == 1; });
+    EXPECT_EQ(_map.size(), oneKey2Value); // all keys should only be there once in a map!
+
+    mapKeys = getNValuesPerKey(_nanMap);
+    oneKey2Value = std::count_if(mapKeys.begin(), mapKeys.end(),
+    [](const std::pair<int, unsigned int>& pair) { return pair.second == 1; });
+    EXPECT_EQ(_nanMap.size(), oneKey2Value);
+
+    // multimaps (NOTE: hardcoded expectations because of knowledge how the maps should be filled!)
+    mapKeys = getNValuesPerKey(_nanMultiMap);
+    EXPECT_EQ(mapKeys.size(), 6);
+    for (const auto& key : mapKeys) {
+      EXPECT_EQ(key.second, key.first < 2 ? 4 : 3);
+    }
+
+    mapKeys = getNValuesPerKey(_multimap);
+    EXPECT_EQ(mapKeys.size(), 6);
+    for (const auto& key : mapKeys) {
+      EXPECT_EQ(key.second, key.first < 2 ? 4 : 3);
+    }
   }
 
   /** test if the 'getSortedKeyValuePairs' method actually works as advertised */
   TEST_F(MapHelperFunctionsTest, testGetSortedKeyValuePairs)
   {
-    // TODO
+    // multimap without nans first
+    std::vector<int> possibleKeys = { 0, 1, 2, 3, 4, 5 };
+    std::vector<double> summedValues;
+    std::vector<double> summedNanValues;
+    for (int key : possibleKeys) {
+      std::vector<double> possibleValues;
+      std::vector<double> possibleNanValues;
+      for (int arg = key; arg < _nEntries; arg += 6) {
+        possibleValues.push_back(sinHalf.operator()(arg));
+        possibleNanValues.push_back(sinCardp3.operator()(arg));
+      }
+      summedNanValues.push_back(std::accumulate(possibleNanValues.begin(), possibleNanValues.end(), 0.0));
+      summedValues.push_back(std::accumulate(possibleValues.begin(), possibleValues.end(), 0.0));
+    }
+
+    std::vector<std::tuple<int, double, unsigned int> > keyValPairs = getSortedKeyValuePairs(_nanMultiMap);
+
+    EXPECT_EQ(keyValPairs.size(), 6);
+    // hardcoded checking here (only sampling here! not checking the whole thing!)
+    EXPECT_EQ(get<0>(keyValPairs[0]), 0);
+    EXPECT_TRUE(std::isnan(get<1>(keyValPairs[0])));
+    EXPECT_EQ(get<2>(keyValPairs[0]), 4);
+
+    // all the other checks with multimap without NaNs
+    keyValPairs = getSortedKeyValuePairs(_multimap);
+    EXPECT_EQ(keyValPairs.size(), 6);
+
+    EXPECT_EQ(get<0>(keyValPairs[0]), 0);
+    EXPECT_DOUBLE_EQ(get<1>(keyValPairs[0]), summedValues[0]);
+    EXPECT_EQ(get<2>(keyValPairs[0]), 4);
+
+    EXPECT_EQ(get<0>(keyValPairs[2]), 3);
+    EXPECT_DOUBLE_EQ(get<1>(keyValPairs[2]), summedValues[3]);
+    EXPECT_EQ(get<2>(keyValPairs[2]), 3);
+
+    keyValPairs = getSortedKeyValuePairs(_map);
+    EXPECT_EQ(get<0>(keyValPairs[0]), 3); // sin(x/2) has its maximum at x = n*pi, 3 is the value that comes closest to this
+    EXPECT_DOUBLE_EQ(get<1>(keyValPairs[0]), sinHalf.operator()(3));
+
+    EXPECT_EQ(get<0>(keyValPairs[19]), 9);
+    EXPECT_DOUBLE_EQ(get<1>(keyValPairs[19]), sinHalf.operator()(9));
   }
 }

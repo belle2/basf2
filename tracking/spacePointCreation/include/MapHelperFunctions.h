@@ -91,6 +91,7 @@ namespace Belle2 {
    * 1) the number of associated values to one key
    * 2) the sum of the associated values to that key
    * NOTE: for a non-multimap this returns the content of the map ordered by valued
+   * CAUTION: if one of the values to a key is NaN this key will be the first (of the ones with the same number of associated values)
    * @returns a vector of tuples where get<0> is the key, get<1> is the sum of the values to the key and get<2> is the number of weights to the key
    */
   template <typename MapType>
@@ -115,7 +116,7 @@ namespace Belle2 {
     // sort using a lambda function (using std::tie as std::tuple has a defined operator < that ensures strict weak ordering)
     std::sort(keyValuePairs.begin(), keyValuePairs.end(),
               [](const std::tuple<keyT, mapT, unsigned int>& lTuple, const std::tuple<keyT, mapT, unsigned int>& rTuple)
-    { return std::tie(std::get<2>(rTuple), std::get<1>(lTuple)) < std::tie(std::get<2>(lTuple), std::get<1>(lTuple)); }
+    { return std::tie(std::get<2>(rTuple), std::get<1>(rTuple)) < std::tie(std::get<2>(lTuple), std::get<1>(lTuple)); }
              );
 
     return keyValuePairs;

@@ -119,14 +119,6 @@ namespace Belle2 {
     /** This is a list of temperatures, applied in sequence.  The DAF always processes the whole list.  */
     std::vector<double> m_dafTemperatures;
 
-    bool m_energyLossBetheBloch;                     /**< Determines if calculation of energy loss is on/off in Genfit */
-    bool m_noiseBetheBloch;                          /**< Determines if calculation of energy loss variance is on/off in Genfit */
-    bool m_noiseCoulomb;                             /**< Determines if calculation of multiple scattering covariance matrix on/off in Genfit */
-    bool m_energyLossBrems;                          /**< Determines if calculation of bremsstrahlung energy loss is on/off in Genfit */
-    bool m_noiseBrems;                               /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
-    bool m_noEffects;                                /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
-    std::string m_mscModel;                          /**< Multiple scattering model */
-
     //! How to resolve the wire ambiguity
     /** Determines how the ambiguity of wire measurements should be dealt with.
      *  If this is set to 'default', we use 'weightedAverage' for the DAF,

@@ -31,7 +31,8 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
 
   addParam("ClusterFilter",
            m_param_clusterFilter,
-           "Cluster filter investigates hit clusters and lets only hits pass that that are not background."
+           "Cluster filter investigates hit clusters and lets only hits pass "
+           "that are not background."
            "Valid values are: "
            "\"all\" (all hits are valid), "
            "\"tmva\" (test clusters for background with a tmva method)."
@@ -57,6 +58,11 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"realistic\" (mc free with more realistic criteria).",
            string("realistic"));
 
+  addParam("FacetFilterParameters",
+           m_param_facetFilterParameters,
+           "Key - Value pairs depending on the facet filter",
+           map<string, string>());
+
   addParam("FacetNeighborChooser",
            m_param_facetNeighborChooser,
            "Facet neighbor chooser to be used during the construction of the graph. "
@@ -67,12 +73,17 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"mc_symmetric\" (monte carlo truth and the reversed version are excepted), "
            "\"simple\" (mc free with simple criteria).",
            string("simple"));
+
+  addParam("FacetNeighborChooserParameters",
+           m_param_facetNeighborChooserParameters,
+           "Key - Value pairs depending on the facet neighbor chooser",
+           map<string, string>());
 }
 
 void SegmentFinderCDCFacetAutomatonDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseClusterFilter> ptrClusterFilter = nullptr;
+  std::unique_ptr<BaseClusterFilter> ptrClusterFilter(new BaseClusterFilter());
 
   if (m_param_clusterFilter == string("all")) {
     ptrClusterFilter.reset(new AllClusterFilter());
@@ -94,84 +105,69 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   getClusterFilter()->setParameters(m_param_clusterFilterParameters);
 
   // Set the filters before they get initialized in the base module.
-  BaseFacetFilter* ptrFacetFilter = nullptr;
+  std::unique_ptr<BaseFacetFilter> ptrFacetFilter(new BaseFacetFilter());;
 
   if (m_param_facetFilter == string("none")) {
-    ptrFacetFilter = new BaseFacetFilter();
+    ptrFacetFilter.reset(new BaseFacetFilter());
   } else if (m_param_facetFilter == string("all")) {
-    ptrFacetFilter = new AllFacetFilter();
+    ptrFacetFilter.reset(new AllFacetFilter());
   } else if (m_param_facetFilter == string("mc")) {
-    ptrFacetFilter = new MCFacetFilter(false);
-  } else if (m_param_facetFilter == string("mc_symmetric")) {
-    ptrFacetFilter = new MCFacetFilter(true);
+    ptrFacetFilter.reset(new MCFacetFilter());
   } else if (m_param_facetFilter == string("fitless")) {
-    ptrFacetFilter = new FitlessFacetFilter(false);
-  } else if (m_param_facetFilter == string("fitless_hard")) {
-    ptrFacetFilter = new FitlessFacetFilter(true);
+    ptrFacetFilter.reset(new FitlessFacetFilter());
   } else if (m_param_facetFilter == string("simple")) {
-    ptrFacetFilter = new SimpleFacetFilter();
+    ptrFacetFilter.reset(new SimpleFacetFilter());
   } else if (m_param_facetFilter == string("realistic")) {
-    ptrFacetFilter = new RealisticFacetFilter();
+    ptrFacetFilter.reset(new RealisticFacetFilter());
   } else {
     B2ERROR("Unrecognised FacetFilter option " << m_param_facetFilter <<
             ". Allowed values are " <<
             "\"all\", " <<
             "\"mc\", " <<
-            "\"mc_symmetric\", " <<
             "\"fitless\", " <<
-            "\"fitless_hard\", " <<
             "\"realistic\" or " <<
             "\"simple\"."
            );
   }
 
-  if (ptrFacetFilter) {
-    // Takes ownership
-    setFacetFilter(std::unique_ptr<BaseFacetFilter>(ptrFacetFilter));
-  }
+  // Takes ownership
+  setFacetFilter(std::move(ptrFacetFilter));
+  getFacetFilter()->setParameters(m_param_facetFilterParameters);
 
-  BaseFacetNeighborChooser* ptrFacetNeighborChooser = nullptr;
+  std::unique_ptr<BaseFacetNeighborChooser> ptrFacetNeighborChooser(new BaseFacetNeighborChooser());
   if (m_param_facetNeighborChooser == string("none")) {
-    ptrFacetNeighborChooser = new BaseFacetNeighborChooser();
+    ptrFacetNeighborChooser.reset(new BaseFacetNeighborChooser());
   } else if (m_param_facetNeighborChooser == string("all")) {
-    ptrFacetNeighborChooser = new AllFacetNeighborChooser();
+    ptrFacetNeighborChooser.reset(new AllFacetNeighborChooser());
   } else if (m_param_facetNeighborChooser == string("mc")) {
-    ptrFacetNeighborChooser = new MCFacetNeighborChooser(false);
-  } else if (m_param_facetNeighborChooser == string("mc_symmetric")) {
-    ptrFacetNeighborChooser = new MCFacetNeighborChooser(true);
+    ptrFacetNeighborChooser.reset(new MCFacetNeighborChooser());
   } else if (m_param_facetNeighborChooser == string("simple")) {
-    ptrFacetNeighborChooser = new SimpleFacetNeighborChooser();
+    ptrFacetNeighborChooser.reset(new SimpleFacetNeighborChooser());
   } else {
     B2ERROR("Unrecognised FacetNeighborChooser option " << m_param_facetNeighborChooser <<
-            ". Allowed values are \"none\", \"all\", \"mc\", \"mc_symmetric\" and \"simple\".");
+            ". Allowed values are \"none\", \"all\", \"mc\", and \"simple\".");
   }
-  if (ptrFacetNeighborChooser) {
-    // Takes ownership
-    setFacetNeighborChooser(std::unique_ptr<BaseFacetNeighborChooser>(ptrFacetNeighborChooser));
-  }
+
+  // Takes ownership
+  setFacetNeighborChooser(std::move(ptrFacetNeighborChooser));
+  getFacetNeighborChooser()->setParameters(m_param_facetNeighborChooserParameters);
 
   SegmentFinderCDCFacetAutomatonImplModule<>::initialize();
 
-  if ((m_param_facetFilter == string("mc")) or
-      (m_param_facetFilter == string("mc_symmetric")) or
-      (m_param_facetNeighborChooser == string("mc")) or
-      (m_param_facetNeighborChooser == string("mc_symmetric")) or
-      getClusterFilter()->needsTruthInformation()) {
+  if (getClusterFilter()->needsTruthInformation() or
+      getFacetFilter()->needsTruthInformation() or
+      getFacetNeighborChooser()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
-
 }
 
 
 void SegmentFinderCDCFacetAutomatonDevModule::event()
 {
-  if ((m_param_facetFilter == string("mc")) or
-      (m_param_facetFilter == string("mc_symmetric")) or
-      (m_param_facetNeighborChooser == string("mc")) or
-      (m_param_facetNeighborChooser == string("mc_symmetric")) or
-      getClusterFilter()->needsTruthInformation()) {
-
+  if (getClusterFilter()->needsTruthInformation() or
+      getFacetFilter()->needsTruthInformation() or
+      getFacetNeighborChooser()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 

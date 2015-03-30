@@ -14,7 +14,8 @@
 namespace Belle2 {
 
   /// Module for the cellular automaton tracking for the CDC on regular events
-  class SegmentFinderCDCFacetAutomatonDevModule: public Belle2::TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule<> {
+  class SegmentFinderCDCFacetAutomatonDevModule:
+    public Belle2::TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule<> {
 
   public:
     /// Constructor of the module. Setting up parameters and description.
@@ -45,12 +46,15 @@ namespace Belle2 {
     + "none" (no facet is valid, stop at cluster generation.)
     + "all" (all facets are valid)
     + "mc" (monte carlo truth)
-    + "mc_symmetric" (monte carlo truth and their mirror image)
     + "fitless" (only checking the feasability of right left passage information)
-    + "fitless_hard" (also exclude the boarder line feasable combinations)
     + "simple" (mc free with simple criteria)
     */
     std::string m_param_facetFilter;
+
+    /** Parameter: Facet filter parameters forwarded to the facet filter
+     *  Meaning of the Key - Value pairs depend on the facet filter
+     */
+    std::map<std::string, std::string> m_param_facetFilterParameters;
 
     /** Parameter: Facet neighbor chooser to be used during the construction of the graph.
     Valid values are:
@@ -58,14 +62,15 @@ namespace Belle2 {
     + "none" (no neighbor is correct, stops segment generation)
     + "all" (all possible neighbors are valid)
     + "mc" (monte carlo truth)
-    + "mc_symmetric" (monte carlo truth and the reversed version are excepted)
     + "simple" (mc free with simple criteria)
     + "realistic" (mc free with more realistic criteria)
     */
     std::string m_param_facetNeighborChooser;
 
+    /** Parameter: Facet neighbor chooser parameters forwarded to the facet neighbor chooser
+     *  Meaning of the Key - Value pairs depend on the facet neighbor chooser
+     */
+    std::map<std::string, std::string> m_param_facetNeighborChooserParameters;
 
   }; // end class
 } // end namespace Belle2
-
-

@@ -92,17 +92,19 @@ namespace Belle2 {
 
       /// Make the wire hit automatically castable to its underlying cdcHit
       operator const Belle2::CDCHit* () const
-      { return (const CDCHit*)getRLWireHit(); }
+      { return static_cast<const CDCHit*>(getRLWireHit()); }
 
 
       /// Equality comparision based on the oriented wire hit and displacement.
-      bool operator==(const CDCRecoHit2D& other) const {
+      bool operator==(const CDCRecoHit2D& other) const
+      {
         return getRLWireHit() == other.getRLWireHit() and
                getRecoDisp2D() == other.getRecoDisp2D();
       }
 
       /// Total ordering relation based on wire hit, left right passage information and displacement in this order of importance.
-      bool operator<(const CDCRecoHit2D& other) const {
+      bool operator<(const CDCRecoHit2D& other) const
+      {
         return getRLWireHit() <  other.getRLWireHit() or (
                  getRLWireHit() == other.getRLWireHit() and
                  getRecoDisp2D() < other.getRecoDisp2D());
@@ -121,7 +123,8 @@ namespace Belle2 {
       friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D) { return wireHit < recoHit2D.getWireHit(); }
 
       /// Output operator. Help debugging.
-      friend std::ostream& operator<<(std::ostream& output, const CDCRecoHit2D& recohit) {
+      friend std::ostream& operator<<(std::ostream& output, const CDCRecoHit2D& recohit)
+      {
         output << "CDCRecoHit2D(" << recohit.getRLWireHit() << ","
                << recohit.getRecoDisp2D() << ")" ;
         return output;

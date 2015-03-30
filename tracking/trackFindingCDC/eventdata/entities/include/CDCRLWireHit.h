@@ -48,16 +48,17 @@ namespace Belle2 {
 
       /// Make the wire hit automatically castable to its underlying cdcHit
       operator const Belle2::CDCHit* () const
-      { return (const CDCHit*) getWireHit(); }
-
+      { return getWireHit().getHit(); }
 
       /// Equality comparision based on wire hit, left right passage information.
-      bool operator==(const CDCRLWireHit& other) const {
+      bool operator==(const CDCRLWireHit& other) const
+      {
         return getWireHit() == other.getWireHit() and getRLInfo() == other.getRLInfo();
       }
 
       /// Total ordering relation based on wire hit and left right passage information in this order of importance.
-      bool operator<(const CDCRLWireHit& other) const {
+      bool operator<(const CDCRLWireHit& other) const
+      {
         return getWireHit() <  other.getWireHit() or (
                  getWireHit() == other.getWireHit() and (
                    getRLInfo() < other.getRLInfo()));
@@ -165,13 +166,15 @@ namespace Belle2 {
       { return getRecoPos2D(trajectory2D); }
 
       /// Calculates the squared distance of the oriented hit to a circle as see from the transvers plane.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const {
+      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
+      {
         FloatType correctedDistance = trajectory2D.getDist2D(getRefPos2D()) - getRLInfo() * getRefDriftLength();
         return correctedDistance * correctedDistance;
       }
 
       /// Output operator. Help debugging.
-      friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit) {
+      friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
+      {
         output << "CDCRLWireHit(" << rlWireHit.getWireHit() << ","
                << rlWireHit.getRLInfo() << ")" ;
         return output;

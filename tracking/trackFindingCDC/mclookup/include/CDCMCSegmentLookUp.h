@@ -70,13 +70,14 @@ namespace Belle2 {
     private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.
       template<class CDCHitPtrRange>
-      std::map<ITrackType, size_t> getHitCountByMCTrackId(const CDCHitPtrRange& ptrHits) const {
+      std::map<ITrackType, size_t> getHitCountByMCTrackId(const CDCHitPtrRange& ptrHits) const
+      {
 
         const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
         std::map<ITrackType, size_t> hitCountByMCTrackId;
-        for (const auto & convertableToPtrHit : ptrHits) {
-          const CDCHit* ptrHit = (const CDCHit*) convertableToPtrHit;
+        for (const auto& convertableToPtrHit : ptrHits) {
+          const CDCHit* ptrHit = convertableToPtrHit;
           ITrackType mcTrackId = mcHitLookUp.getMCTrackId(ptrHit);
           if (hitCountByMCTrackId.count(mcTrackId) == 0) hitCountByMCTrackId[mcTrackId] = 0;
           ++(hitCountByMCTrackId[mcTrackId]);
@@ -87,7 +88,8 @@ namespace Belle2 {
 
       /// Get the track id with the highest corresponding purity.
       template<class CDCHitPtrRange>
-      MCTrackIdPurityPair getHighestPurity(const CDCHitPtrRange& ptrHits) const {
+      MCTrackIdPurityPair getHighestPurity(const CDCHitPtrRange& ptrHits) const
+      {
 
         std::map<ITrackType, size_t>&& hitCountByMCTrackId = getHitCountByMCTrackId(ptrHits);
 
@@ -191,7 +193,7 @@ namespace Belle2 {
 
     private:
       /// Storage for the map from reconstructed segments to their matched Monte Carlo Track Id
-      mutable std::map<const CDCRecoSegment2D* , ITrackType> m_mcTrackIds;
+      mutable std::map<const CDCRecoSegment2D*, ITrackType> m_mcTrackIds;
 
 
 

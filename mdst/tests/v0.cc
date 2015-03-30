@@ -33,7 +33,8 @@ namespace Belle2 {
       DataStore::Instance().reset();
     }
 
-    short m_default_index = -1; /** Default index in constructor if no tracks/tfrs are given */
+    /** Default index in constructor if no tracks/tfrs are given */
+    short m_default_index = -1;
 
   };
 

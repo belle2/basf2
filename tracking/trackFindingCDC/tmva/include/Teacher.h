@@ -23,10 +23,14 @@ namespace Belle2 {
     class Teacher {
     public:
       Teacher();
-      void createWeights(const std::string& weightFolder, TFile& outputFile, TTree& eventTree,
-                         const std::vector<std::string>& variableNames, const std::vector<std::string>& spectatorNames,
-                         const TCut& signalCut, const TCut& backgroundCut,
-                         const std::string optionString = "NTrees=100:Shrinkage=0.1:RandRatio=0.5:NCutLevel=7");
+      void createWeights(const std::string& weightFolder,
+                         TFile& outputFile,
+                         TTree& eventTree,
+                         const std::vector<std::string>& variableNames,
+                         const std::vector<std::string>& spectatorNames,
+                         const TCut& signalCut,
+                         const TCut& backgroundCut,
+                         const std::string& optionString = "NTrees=100:Shrinkage=0.1:RandRatio=0.5:NCutLevel=7");
     };
 
   }

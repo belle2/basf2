@@ -16,17 +16,20 @@ Teacher::Teacher()
   TMVAUtilities::loadPlugins("FastBDT");
 }
 
-void Teacher::createWeights(const std::string& weightFolder, TFile& outputFile, TTree& eventTree,
-                            const std::vector<std::string>& variableNames, const std::vector<std::string>& spectatorNames,
-                            const TCut& signalCut, const TCut& backgroundCut, const std::string optionString)
+void Teacher::createWeights(const std::string& weightFolder,
+                            TFile& outputFile,
+                            TTree& eventTree,
+                            const std::vector<std::string>& variableNames,
+                            const std::vector<std::string>& spectatorNames,
+                            const TCut& signalCut,
+                            const TCut& backgroundCut,
+                            const std::string& optionString)
 {
-
   TMVA::Tools::Instance();
   TMVA::gConfig().GetIONames().fWeightFileDir = FileSystem::findFile(weightFolder);
 
   std::string jobName = "TMVAFactory";
   outputFile.cd();
-  std::string oldDirectory = gSystem->WorkingDirectory();
   TMVA::Factory factory(jobName, &outputFile, "!V:!Silent:Transformations=I");
 
   for (const std::string variable : variableNames) {
@@ -41,7 +44,8 @@ void Teacher::createWeights(const std::string& weightFolder, TFile& outputFile, 
   factory.AddBackgroundTree(&eventTree);
   factory.PrepareTrainingAndTestTree(signalCut, backgroundCut, "SplitMode=Random");
 
-  factory.BookMethod(TMVA::Types::kPlugins, "FastBDT", "!H:!V:IgnoreNegWeightsInTraining:" + optionString);
+  const std::string fastBDTOptionString = "!H:!V:IgnoreNegWeightsInTraining:" + optionString;
+  factory.BookMethod(TMVA::Types::kPlugins, "FastBDT", fastBDTOptionString);
 
   factory.TrainAllMethods();
   factory.TestAllMethods();

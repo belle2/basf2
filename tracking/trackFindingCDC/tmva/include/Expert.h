@@ -46,7 +46,7 @@ namespace Belle2 {
        *  @param setReaderAddresses    Function invoked with the underlying reader which is supposed
        *                               to add the variable names and adresses.
        */
-      void initializeReader(const std::function<void(TMVA::Reader&)> setReaderAddresses);
+      void initializeReader(const std::function<void(TMVA::Reader&)>& setReaderAddresses);
 
       /// Setter for the folder of the weight files
       void setWeightFolderName(const std::string& weightFolderName)

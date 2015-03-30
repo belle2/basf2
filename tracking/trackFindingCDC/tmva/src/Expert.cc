@@ -35,7 +35,7 @@ std::string Expert::getAbsWeightFilePath()
   return absWeightFilePath;
 }
 
-void Expert::initializeReader(const std::function<void(TMVA::Reader&)> setReaderAddresses)
+void Expert::initializeReader(const std::function<void(TMVA::Reader&)>& setReaderAddresses)
 {
   setReaderAddresses(m_reader);
   B2INFO("book method");

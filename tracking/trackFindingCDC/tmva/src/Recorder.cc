@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Recorder::Recorder(const std::function<void(TTree&)> setBranches,
+Recorder::Recorder(const std::function<void(TTree&)>& setBranches,
                    const std::string& rootFileName,
                    const std::string& treeName) :
   m_tFile(nullptr),

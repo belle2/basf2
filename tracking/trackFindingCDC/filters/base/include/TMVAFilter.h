@@ -20,6 +20,10 @@ namespace Belle2 {
     template<class VarSet_>
     class TMVAFilter: public FilterOnVarSet<VarSet_> {
 
+    private:
+      /// Type of the super class
+      typedef FilterOnVarSet<VarSet_> Super;
+
     public:
       /// Type of the object to be analysed.
       typedef typename VarSet_::Object Object;
@@ -27,7 +31,7 @@ namespace Belle2 {
     public:
       /// Constructor of the filter.
       TMVAFilter(const std::string& defaultTrainingName = "") :
-        FilterOnVarSet<VarSet_>(),
+        Super(),
         m_param_cut(NAN),
         m_expert("data/tracking", defaultTrainingName)
       {;}
@@ -35,8 +39,8 @@ namespace Belle2 {
       /// Initialize the expert before event processing.
       virtual void initialize() override
       {
-        FilterOnVarSet<VarSet_>::initialize();
-        VarSet_& varSet = FilterOnVarSet<VarSet_>::getVarSet();
+        Super::initialize();
+        VarSet_& varSet = Super::getVarSet();
         m_expert.initializeReader(varSet.getAllVariables());
       }
 
@@ -60,7 +64,7 @@ namespace Belle2 {
           B2INFO("Filter received parameter 'training_name' = " << m_expert.getTrainingName());
 
         } else {
-          FilterOnVarSet<VarSet_>::setParameter(key, value);
+          Super::setParameter(key, value);
         }
       }
 
@@ -68,7 +72,7 @@ namespace Belle2 {
        */
       virtual std::map<std::string, std::string> getParameterDescription()
       {
-        std::map<std::string, std::string> des = FilterOnVarSet<VarSet_>::getParameterDescription();
+        std::map<std::string, std::string> des = Super::getParameterDescription();
         des["cut"] =  "The cut value of the mva output below which the object is rejected.";
         des["folder_weight"] = "The name of the folder to look for weight files from trainings.";
         des["training_name"] = "The name of the training that should be used for the prediction.";
@@ -78,7 +82,7 @@ namespace Belle2 {
       /// Function to evaluate the cluster for its backgroundness.
       virtual CellWeight operator()(const Object& obj) override final
       {
-        CellWeight extracted = FilterOnVarSet<VarSet_>::operator()(obj);
+        CellWeight extracted = Super::operator()(obj);
         if (isNotACell(extracted)) {
           return NOT_A_CELL;
         } else {

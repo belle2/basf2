@@ -20,6 +20,10 @@ namespace Belle2 {
     template<class VarSet_>
     class RecordingFilter: public FilterOnVarSet<VarSet_> {
 
+    private:
+      /// Type of the super class
+      typedef FilterOnVarSet<VarSet_> Super;
+
     public:
       /// Type of the object to be analysed.
       typedef typename VarSet_::Object Object;
@@ -28,7 +32,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       RecordingFilter(const std::string& defaultRootFileName = "records.root",
                       const std::string& defaultTreeName = "records") :
-        FilterOnVarSet<VarSet_>(),
+        Super(),
         m_recorder(nullptr),
         m_rootFileName(defaultRootFileName),
         m_treeName(defaultTreeName)
@@ -37,8 +41,8 @@ namespace Belle2 {
       /// Initialize the recorder before event processing.
       virtual void initialize() override
       {
-        FilterOnVarSet<VarSet_>::initialize();
-        VarSet_& varSet = FilterOnVarSet<VarSet_>::getVarSet();
+        Super::initialize();
+        VarSet_& varSet = Super::getVarSet();
         m_recorder.reset(new Recorder(varSet.getAllVariables(), m_rootFileName, m_treeName));
       }
 
@@ -47,7 +51,7 @@ namespace Belle2 {
       {
         m_recorder->write();
         m_recorder.reset();
-        FilterOnVarSet<VarSet_>::terminate();
+        Super::terminate();
       }
 
       /** Set the parameter with key to values.
@@ -67,7 +71,7 @@ namespace Belle2 {
           B2INFO("Filter received parameter 'tree_name' = " << m_treeName);
 
         } else {
-          FilterOnVarSet<VarSet_>::setParameter(key, value);
+          Super::setParameter(key, value);
         }
       }
 
@@ -75,7 +79,7 @@ namespace Belle2 {
        */
       virtual std::map<std::string, std::string> getParameterDescription()
       {
-        std::map<std::string, std::string> des = FilterOnVarSet<VarSet_>::getParameterDescription();
+        std::map<std::string, std::string> des = Super::getParameterDescription();
         des["cut"] =  "The cut value of the mva output below which the object is rejected.";
         des["root_file_name"] = "Name of the ROOT file to be written.";
         des["tree_name"] = "Name of the Tree to be written.";
@@ -85,7 +89,7 @@ namespace Belle2 {
       /// Function to evaluate the cluster for its backgroundness.
       virtual CellWeight operator()(const Object& obj) override final
       {
-        CellWeight extracted = FilterOnVarSet<VarSet_>::operator()(obj);
+        CellWeight extracted = Super::operator()(obj);
         if (not isNotACell(extracted)) {
           m_recorder->capture();
         }

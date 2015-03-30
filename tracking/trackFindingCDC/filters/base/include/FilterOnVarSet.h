@@ -19,6 +19,10 @@ namespace Belle2 {
     template<class VarSet_>
     class FilterOnVarSet: public Filter<typename VarSet_::Object> {
 
+    private:
+      /// Type of the super class
+      typedef Filter<typename VarSet_::Object> Super;
+
     public:
       /// Type of the object to be analysed.
       typedef typename VarSet_::Object Object;

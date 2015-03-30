@@ -26,6 +26,7 @@ KFitBase::KFitBase(void)
   m_MagneticField = KFitConst::kDefaultMagneticField;
   m_NDF = 0;
   m_CHIsq = -1;
+  m_NecessaryTrackCount = -1;
   m_TrackCount = 0;
 }
 
@@ -36,8 +37,7 @@ KFitBase::~KFitBase(void)
 
 
 enum KFitError::ECode
-KFitBase::addTrack(const KFitTrack& p)
-{
+KFitBase::addTrack(const KFitTrack& p) {
   m_Tracks.push_back(p);
   m_TrackCount = m_Tracks.size();
 
@@ -46,9 +46,9 @@ KFitBase::addTrack(const KFitTrack& p)
 
 
 enum KFitError::ECode
-KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q)
-{
-  if (e.num_row() != KFitConst::kNumber7) {
+KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q) {
+  if (e.num_row() != KFitConst::kNumber7)
+  {
     m_ErrorCode = KFitError::kBadMatrixSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -59,9 +59,9 @@ KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymM
 
 
 enum KFitError::ECode
-KFitBase::setCorrelation(const HepMatrix& e)
-{
-  if (e.num_row() != KFitConst::kNumber7) {
+KFitBase::setCorrelation(const HepMatrix& e) {
+  if (e.num_row() != KFitConst::kNumber7)
+  {
     m_ErrorCode = KFitError::kBadMatrixSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -74,8 +74,7 @@ KFitBase::setCorrelation(const HepMatrix& e)
 
 
 enum KFitError::ECode
-KFitBase::setZeroCorrelation(void)
-{
+KFitBase::setZeroCorrelation(void) {
   HepMatrix zero(KFitConst::kNumber7, KFitConst::kNumber7, 0);
 
   return this->setCorrelation(zero);
@@ -83,8 +82,7 @@ KFitBase::setZeroCorrelation(void)
 
 
 enum KFitError::ECode
-KFitBase::setMagneticField(const double mf)
-{
+KFitBase::setMagneticField(const double mf) {
   m_MagneticField = mf;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -92,8 +90,7 @@ KFitBase::setMagneticField(const double mf)
 
 
 enum KFitError::ECode
-KFitBase::getErrorCode(void) const
-{
+KFitBase::getErrorCode(void) const {
   return m_ErrorCode;
 }
 
@@ -189,7 +186,8 @@ KFitBase::getCorrelation(const int id1, const int id2, const int flag) const
       return makeError1(
                getTrackMomentum(id1),
                getTrackMomentum(id2),
-               m_V_al_1.sub(KFitConst::kNumber6 * id1 + 1, KFitConst::kNumber6 * (id1 + 1), KFitConst::kNumber6 * id2 + 1, KFitConst::kNumber6 * (id2 + 1))
+               m_V_al_1.sub(KFitConst::kNumber6 * id1 + 1, KFitConst::kNumber6 * (id1 + 1), KFitConst::kNumber6 * id2 + 1,
+                            KFitConst::kNumber6 * (id2 + 1))
              );
 
     default:
@@ -355,7 +353,8 @@ KFitBase::makeError3(const HepLorentzVector& p, const HepMatrix& e, const bool i
 
 
 const HepMatrix
-KFitBase::makeError3(const HepLorentzVector& p1, const HepLorentzVector& p2, const HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const
+KFitBase::makeError3(const HepLorentzVector& p1, const HepLorentzVector& p2, const HepMatrix& e, const bool is_fix_mass1,
+                     const bool is_fix_mass2) const
 {
   // track and track
   // Error(7x7,e) ==> Error(7x7,output(hm)) using Momentum(p1&p2).
@@ -451,9 +450,9 @@ KFitBase::makeError4(const HepLorentzVector& p, const HepMatrix& e) const
 
 
 enum KFitError::ECode
-KFitBase::prepareCorrelation(void)
-{
-  if (m_BeforeCorrelation.size() != (double)m_TrackCount * ((double)m_TrackCount - 1)*.5) {
+KFitBase::prepareCorrelation(void) {
+  if (m_BeforeCorrelation.size() != (double)m_TrackCount * ((double)m_TrackCount - 1)*.5)
+  {
     m_ErrorCode = KFitError::kBadCorrelationSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -462,7 +461,8 @@ KFitBase::prepareCorrelation(void)
   HepMatrix tmp_hm(KFitConst::kNumber6, KFitConst::kNumber6, 0);
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; it++) {
+  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; it++)
+  {
     const HepMatrix& hm = *it;
 
     row++;
@@ -495,11 +495,11 @@ KFitBase::prepareCorrelation(void)
 
 
 enum KFitError::ECode
-KFitBase::doFit1(void)
-{
+KFitBase::doFit1(void) {
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
-  if (m_TrackCount < m_NecessaryTrackCount) {
+  if (m_TrackCount < m_NecessaryTrackCount)
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -520,7 +520,8 @@ KFitBase::doFit1(void)
   HepMatrix tmp_al_a(m_al_a);
 
 
-  for (int i = 0; i < KFitConst::kMaxIterationCount; i++) {
+  for (int i = 0; i < KFitConst::kMaxIterationCount; i++)
+  {
     if (makeCoreMatrix() != KFitError::kNoError) return m_ErrorCode;
 
     m_V_D = (m_V_al_0.similarity(m_D)).inverse(err_inverse);
@@ -570,11 +571,11 @@ KFitBase::doFit1(void)
 
 
 enum KFitError::ECode
-KFitBase::doFit2(void)
-{
+KFitBase::doFit2(void) {
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
-  if (m_TrackCount < m_NecessaryTrackCount) {
+  if (m_TrackCount < m_NecessaryTrackCount)
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -601,7 +602,8 @@ KFitBase::doFit2(void)
   HepMatrix tmp2_lam0(m_lam0), tmp2_v_a(m_v_a), tmp2_v(m_v_a);
 
 
-  for (int j = 0; j < KFitConst::kMaxIterationCount; j++) { // j'th loop start
+  for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
+  {
 
     tmp_chisq = KFitConst::kInitialCHIsq;
 

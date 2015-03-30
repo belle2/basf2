@@ -35,6 +35,7 @@ VertexFitKFit::VertexFitKFit(void)
   m_V_E = HepMatrix(3, 3, 0);
   m_v   = HepMatrix(3, 1, 0);
   m_v_a = HepMatrix(3, 1, 0);
+  m_EachCHIsq[KFitConst::kMaxTrackCount2] = {0};
 }
 
 VertexFitKFit::~VertexFitKFit(void)
@@ -43,8 +44,7 @@ VertexFitKFit::~VertexFitKFit(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::setInitialVertex(const HepPoint3D& v)
-{
+VertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   m_BeforeVertex = v;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -52,9 +52,9 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v)
 
 
 enum KFitError::ECode
-VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe)
-{
-  if (m_FlagTube) {
+VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe) {
+  if (m_FlagTube)
+  {
     char buf[1024];
     sprintf(buf, "%s:%s(): already constrained to IPtube", __FILE__, __func__);
     B2FATAL(buf);
@@ -69,9 +69,9 @@ VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe)
 
 
 enum KFitError::ECode
-VertexFitKFit::setIpTubeProfile(const KFitTrack& p)
-{
-  if (m_FlagBeam) {
+VertexFitKFit::setIpTubeProfile(const KFitTrack& p) {
+  if (m_FlagBeam)
+  {
     char buf[1024];
     sprintf(buf, "%s:%s(): already constrained to IP", __FILE__, __func__);
     B2FATAL(buf);
@@ -85,8 +85,7 @@ VertexFitKFit::setIpTubeProfile(const KFitTrack& p)
 
 
 enum KFitError::ECode
-VertexFitKFit::setKnownVertex(const bool flag)
-{
+VertexFitKFit::setKnownVertex(const bool flag) {
   m_FlagKnownVertex = flag;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -94,8 +93,7 @@ VertexFitKFit::setKnownVertex(const bool flag)
 
 
 enum KFitError::ECode
-VertexFitKFit::setCorrelationMode(const bool m)
-{
+VertexFitKFit::setCorrelationMode(const bool m) {
   m_CorrelationMode = m;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -205,8 +203,7 @@ VertexFitKFit::getTrackPartNDF(void) const
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit(void)
-{
+VertexFitKFit::doFit(void) {
   if (m_FlagTube) this->appendTube();
 
   if (m_FlagBeam) m_ErrorCode = this->doFit4();
@@ -226,12 +223,12 @@ VertexFitKFit::doFit(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit3(void)
-{
+VertexFitKFit::doFit3(void) {
   // use small Matrix --> No Correlation
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
-  if (m_TrackCount < m_NecessaryTrackCount) {
+  if (m_TrackCount < m_NecessaryTrackCount)
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -260,7 +257,8 @@ VertexFitKFit::doFit3(void)
   double tmp_each_chisq[KFitConst::kMaxTrackCount2];
   double tmp2_each_chisq[KFitConst::kMaxTrackCount2];
 
-  for (int j = 0; j < KFitConst::kMaxIterationCount; j++) { // j'th loop start
+  for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
+  {
 
     tmp_chisq = KFitConst::kInitialCHIsq;
 
@@ -275,7 +273,8 @@ VertexFitKFit::doFit3(void)
       for (int k = 0; k < m_TrackCount; k++) { // k'th loop start
 
         HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
-        HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1, (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+        HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
+        (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
         if (err_inverse) {
           m_ErrorCode = KFitError::kCannotGetMatrixInverse;
           KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -392,12 +391,12 @@ VertexFitKFit::doFit3(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit4(void)
-{
+VertexFitKFit::doFit4(void) {
   // included beam position constraint (only no correlation)
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
-  if (m_TrackCount < m_NecessaryTrackCount - 1) {
+  if (m_TrackCount < m_NecessaryTrackCount - 1)
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -428,7 +427,8 @@ VertexFitKFit::doFit4(void)
   // to avoid overestimation of vertex-z error.
   bool it_flag = false;
 
-  for (int i = 0; i < KFitConst::kMaxIterationCount ; i++) {
+  for (int i = 0; i < KFitConst::kMaxIterationCount ; i++)
+  {
 
     if (makeCoreMatrix() != KFitError::kNoError) return m_ErrorCode;
 
@@ -447,8 +447,10 @@ VertexFitKFit::doFit4(void)
       HepMatrix tDeltaAl = (m_al_0 - m_al_1).sub(KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1), 1, 1); // 6x1
       HepMatrix td = m_d.sub(2 * k + 1, 2 * (k + 1), 1, 1); // 2x1
       HepMatrix tE = m_E.sub(2 * k + 1, 2 * (k + 1), 1, 3); // 2x3
-      chisq += ((m_lam.sub(2 * k + 1, 2 * (k + 1), 1, 1).T()) * (tD * tDeltaAl + tE * (m_v - m_v_a) + td))(1, 1); // 1x2x(2x6x6x1+2x3x3x1+2x1)
-      m_EachCHIsq[k] = (m_lam.sub(2 * k + 1, 2 * (k + 1), 1, 1).T() * tD * m_V_al_0.sub(KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)) * (tD.T()) * m_lam.sub(2 * k + 1, 2 * (k + 1), 1, 1))(1, 1);
+      chisq += ((m_lam.sub(2 * k + 1, 2 * (k + 1), 1, 1).T()) * (tD * tDeltaAl + tE * (m_v - m_v_a) + td))(1,
+               1); // 1x2x(2x6x6x1+2x3x3x1+2x1)
+      m_EachCHIsq[k] = (m_lam.sub(2 * k + 1, 2 * (k + 1), 1, 1).T() * tD * m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
+                        KFitConst::kNumber6 * (k + 1)) * (tD.T()) * m_lam.sub(2 * k + 1, 2 * (k + 1), 1, 1))(1, 1);
     }
 
     m_CHIsqVertex = (m_lam.T() * m_E * m_BeamError * (m_E.T()) * m_lam)(1, 1);
@@ -491,7 +493,8 @@ VertexFitKFit::doFit4(void)
   m_v_a  = m_v - m_BeamError * (m_E.T()) * m_lam;
   HepMatrix tV_Dtin = m_V_al_0.similarity(m_D) + m_BeamError.similarity(m_E);
   m_V_Dt = tV_Dtin.inverse(err_inverse);
-  if (err_inverse) {
+  if (err_inverse)
+  {
     m_ErrorCode = KFitError::kCannotGetMatrixInverse;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -512,12 +515,12 @@ VertexFitKFit::doFit4(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::doFit5(void)
-{
+VertexFitKFit::doFit5(void) {
   // known vertex --> do not find vertex. (only no correlation)
   if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
 
-  if (m_TrackCount < m_NecessaryTrackCount - 1) {
+  if (m_TrackCount < m_NecessaryTrackCount - 1)
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -539,7 +542,8 @@ VertexFitKFit::doFit5(void)
 
   double tmp_each_chisq[KFitConst::kMaxTrackCount2];
 
-  for (int i = 0; i < KFitConst::kMaxIterationCount; i++) {
+  for (int i = 0; i < KFitConst::kMaxIterationCount; i++)
+  {
 
     if (makeCoreMatrix() != KFitError::kNoError) return m_ErrorCode;
 
@@ -547,7 +551,8 @@ VertexFitKFit::doFit5(void)
 
     for (int k = 0; k < m_TrackCount; k++) {
       HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
-      HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1, (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+      HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
+      (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
       if (err_inverse) {
         m_ErrorCode = KFitError::kCannotGetMatrixInverse;
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -602,16 +607,17 @@ VertexFitKFit::doFit5(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::prepareInputMatrix(void)
-{
-  if (!m_CorrelationMode || m_FlagBeam || m_FlagKnownVertex) {
+VertexFitKFit::prepareInputMatrix(void) {
+  if (!m_CorrelationMode || m_FlagBeam || m_FlagKnownVertex)
+  {
     if (m_TrackCount > KFitConst::kMaxTrackCount2) {
       m_ErrorCode = KFitError::kBadTrackSize;
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
   } else {
-    if (m_TrackCount > KFitConst::kMaxTrackCount) {
+    if (m_TrackCount > KFitConst::kMaxTrackCount)
+    {
       m_ErrorCode = KFitError::kBadTrackSize;
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
@@ -625,7 +631,8 @@ VertexFitKFit::prepareInputMatrix(void)
   HepMatrix    tmp_property(m_TrackCount, 3, 0);
 
 
-  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++) {
+  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  {
     // momentum x,y,z and position x,y,z
     for (int j = 0; j < KFitConst::kNumber6; j++)
       tmp_al_0[index * KFitConst::kNumber6 + j][0] = it->getFitParameter(j, KFitConst::kBeforeFit);
@@ -642,7 +649,8 @@ VertexFitKFit::prepareInputMatrix(void)
 
   // error between tarck and track
   m_V_al_0 = tmp_V_al_0;
-  if (!m_FlagKnownVertex && !m_FlagBeam && m_CorrelationMode) {
+  if (!m_FlagKnownVertex && !m_FlagBeam && m_CorrelationMode)
+  {
     if (m_FlagCorrelation) {
       this->prepareCorrelation();
       if (m_ErrorCode != KFitError::kNoError) {
@@ -678,10 +686,10 @@ VertexFitKFit::prepareInputMatrix(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::prepareInputSubMatrix(void)
-{
+VertexFitKFit::prepareInputSubMatrix(void) {
   // vertex
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++)
+  {
     m_v[i][0] = m_v_a[i][0];
   }
   return m_ErrorCode = KFitError::kNoError;
@@ -689,12 +697,12 @@ VertexFitKFit::prepareInputSubMatrix(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::prepareOutputMatrix(void)
-{
+VertexFitKFit::prepareOutputMatrix(void) {
   Hep3Vector h3v;
   unsigned index = 0;
 
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++) {
+  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  {
     KFitTrack& pdata = *it;
     // tracks
     // momentum
@@ -704,17 +712,17 @@ VertexFitKFit::prepareOutputMatrix(void)
     pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-                        m_al_1[index * KFitConst::kNumber6 + 3][0],
-                        m_al_1[index * KFitConst::kNumber6 + 4][0],
-                        m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
+      m_al_1[index * KFitConst::kNumber6 + 3][0],
+      m_al_1[index * KFitConst::kNumber6 + 4][0],
+      m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(makeError1(pdata.getMomentum(),
-                              m_V_al_1.sub(
-                                index    * KFitConst::kNumber6 + 1,
-                                (index + 1)*KFitConst::kNumber6,
-                                index    * KFitConst::kNumber6 + 1,
-                                (index + 1)*KFitConst::kNumber6)),
-                   KFitConst::kAfterFit);
+    m_V_al_1.sub(
+      index    * KFitConst::kNumber6 + 1,
+      (index + 1)*KFitConst::kNumber6,
+      index    * KFitConst::kNumber6 + 1,
+      (index + 1)*KFitConst::kNumber6)),
+    KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -725,12 +733,14 @@ VertexFitKFit::prepareOutputMatrix(void)
   m_AfterVertex.setZ(m_v_a[2][0]);
 
   // error of the vertex
-  for (int i = 0; i < 3; i++) for (int j = i; j < 3; j++) {
+  for (int i = 0; i < 3; i++) for (int j = i; j < 3; j++)
+    {
       m_AfterVertexError[i][j] = m_V_E[i][j];
     }
 
   // error between vertex and tracks
-  for (int i = 0; i < m_TrackCount; i++) {
+  for (int i = 0; i < m_TrackCount; i++)
+  {
     HepMatrix hm(3, KFitConst::kNumber6, 0);
     for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber6; k++) {
         hm[j][k] = m_Cov_v_al_1[j][KFitConst::kNumber6 * i + k];
@@ -743,14 +753,14 @@ VertexFitKFit::prepareOutputMatrix(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::makeCoreMatrix(void)
-{
+VertexFitKFit::makeCoreMatrix(void) {
   // vertex fit
   double px, py, pz, x, y, z, a;
   double pt, invPt, invPt2, dlx, dly, dlz, a1, a2, r2d2, B, Rx, Ry, S, U;
   double sininv, sqrtag;
 
-  for (int i = 0; i < m_TrackCount; i++) {
+  for (int i = 0; i < m_TrackCount; i++)
+  {
     px = m_al_1[i * KFitConst::kNumber6 + 0][0];
     py = m_al_1[i * KFitConst::kNumber6 + 1][0];
     pz = m_al_1[i * KFitConst::kNumber6 + 2][0];
@@ -838,8 +848,7 @@ VertexFitKFit::makeCoreMatrix(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::calculateNDF(void)
-{
+VertexFitKFit::calculateNDF(void) {
   if (m_FlagBeam) m_NDF = 2 * m_TrackCount;
   else if (m_FlagTube) m_NDF = 2 * (m_TrackCount - 1) - 1;
   else if (m_FlagKnownVertex) m_NDF = 2 * m_TrackCount;
@@ -850,11 +859,11 @@ VertexFitKFit::calculateNDF(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::appendTube(void)
-{
+VertexFitKFit::appendTube(void) {
   if (!m_FlagTube) return m_ErrorCode = KFitError::kNoError;
 
-  if (m_iTrackTube != -1) {
+  if (m_iTrackTube != -1)
+  {
     char buf[1024];
     sprintf(buf, "%s:%s(): internal error; duplicated appendTube() call?", __FILE__, __func__);
     B2FATAL(buf);
@@ -869,11 +878,11 @@ VertexFitKFit::appendTube(void)
 
 
 enum KFitError::ECode
-VertexFitKFit::deleteTube(void)
-{
+VertexFitKFit::deleteTube(void) {
   if (!m_FlagTube) return m_ErrorCode = KFitError::kNoError;
 
-  if (m_iTrackTube == -1) {
+  if (m_iTrackTube == -1)
+  {
     char buf[1024];
     sprintf(buf, "%s:%s(): internal error; duplicated deleteTube() call?", __FILE__, __func__);
     B2FATAL(buf);

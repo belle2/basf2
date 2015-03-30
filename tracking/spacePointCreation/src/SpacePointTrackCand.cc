@@ -35,7 +35,8 @@ SpacePointTrackCand::SpacePointTrackCand() :
   m_q(0),
   m_flightDirection(true),
   m_iTrackStub(-1),
-  m_refereeStatus(0)
+  m_refereeStatus(0),
+  m_qualityIndex(0.5)
 {
 
 }
@@ -46,7 +47,8 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
   m_cov6D(6),
   m_flightDirection(true),
   m_iTrackStub(-1),
-  m_refereeStatus(0)
+  m_refereeStatus(0),
+  m_qualityIndex(0.5)
 {
   m_pdg = pdgCode;
   m_q = charge;

@@ -264,8 +264,11 @@ namespace Belle2 {
 
     /**
     * sets the new status of the estimated quality of this track candidate.
+    * valid are values in range [0;1]
+    * if value < 0, the track candidate is invalid and one should not use it anymore.
+    * 0.5 is the standard value if not been set otherwise
     * */
-    double setQualityIndex(double newIndex) { m_qualityIndex = newIndex; }
+    void setQualityIndex(double newIndex) { m_qualityIndex = newIndex; }
 
     /**
      * add a new space point to the track candidate

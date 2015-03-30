@@ -172,7 +172,6 @@ namespace Belle2 {
      *  @return              The two dimensional arc length traversed to reach the cylindrical radius. NAN if it can not be reached.
      */
     double getArcLength2DAtCylindricalR(const double& cylindricalR) const;
-    double getArcLengthAtCylindricalR(const double& cylindricalR) const __attribute__((deprecated)) { return getArcLength2DAtCylindricalR(cylindricalR); }
 
     /** Calculates the two dimensional arc length at which the circle in the xy projection is closest to the point
      *
@@ -192,7 +191,6 @@ namespace Belle2 {
      *  @param arcLength2D       Two dimensional arc length to be traversed.
      */
     TVector3 getPositionAtArcLength2D(const double& arcLength2D) const;
-    TVector3 getPositionAtArcLength(const double& arcLength2D) const __attribute__((deprecated)) { return getPositionAtArcLength2D(arcLength2D); }
 
     /** Calculates the tangential vector to the helix curve at the given two dimensional arc length.
      *
@@ -218,7 +216,6 @@ namespace Belle2 {
      *  @param bz                Magnetic field strength in the z direction.
      */
     TVector3 getMomentumAtArcLength2D(const double& arcLength2D, const double& bz) const;
-    TVector3 getMomentumAtArcLength(const double& arcLength2D, const double& bz) const __attribute__((deprecated)) { return getMomentumAtArcLength2D(arcLength2D, bz); }
 
     /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.
      *

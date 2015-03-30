@@ -17,6 +17,15 @@
 
 #include <map>
 
+// Feature-extraction results
+struct FPGAFitParams {
+  double startTime;       //< Start of signal
+  double peakTime;        //< Peak time
+  double area;            //< Signal area (background-subtracted)
+  double amplitude;       //< Signal peak amplitude (background-subtracted)
+  double bgAmplitude;     //< Background amplitude.
+};
+
 namespace Belle2 {
 
   class BKLMSimHit;
@@ -62,7 +71,7 @@ namespace Belle2 {
      * @param[out] nPE Number of surviving photoelectrons
      * @return Fit status
      */
-    enum EKLM::FPGAFitStatus processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, EKLM::FPGAFitParams& fitParams, int& nPE);
+    void processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, BKLMDigit* bklmDigit);
 
     /**
      * Calculate pulse(s) histogram at the MPPC end of the strip
@@ -107,7 +116,7 @@ namespace Belle2 {
     double m_fiberDeExcitationTime;
 
     //! Speed of internally-reflected light in fiber (cm/us)
-    double m_firstPhotonlightSpeed;
+    double m_fiberLightSpeed;
 
     //! Attenuation length in fiber (cm)
     double m_attenuationLength;
@@ -118,11 +127,14 @@ namespace Belle2 {
     //! Mean noise level in MPPC
     int m_meanSiPMNoise;
 
+    //! Time resolution (ns)
+    double m_timeResolution;
+
     //! Flag to enable constant noise in MPPC
     bool m_enableConstBkg;
 
-    //! FPGA fitter
-    EKLM::FPGAFitter* m_fitter;
+    //! FPGA's ADC range (# of channels for full range)
+    int m_ADCRange;
 
     //! User parameter: Discriminator threshold (# of photoelectrons)
     double m_discriminatorThreshold;

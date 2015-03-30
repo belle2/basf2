@@ -13,6 +13,14 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Names of the variables to be generated.
+    IF_NOT_CINT(constexpr)
+    static char const* const clusterBkgTruthNames[4] = {
+      "n_background_hits_truth",
+      "background_fraction_truth",
+      "weight",
+      "truth"
+    };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
@@ -24,14 +32,20 @@ namespace Belle2 {
       static const size_t nNames = 4;
 
       /// Names of the variables to be generated.
+      // IF_NOT_CINT(constexpr)
+      // static char const* const names[nNames] = {
+      //   "n_background_hits_truth",
+      //   "background_fraction_truth",
+      //   "weight",
+      //   "truth"
+      //   // Note: Variables with Monte Carlo information should carry truth in their name.
+      // };
+
       IF_NOT_CINT(constexpr)
-      static char const* const names[nNames] = {
-        "n_background_hits_truth",
-        "background_fraction_truth",
-        "weight",
-        "truth"
-        // Note: Variables with Monte Carlo information should carry truth in their name.
-      };
+      static char const* getName(int iName)
+      {
+        return clusterBkgTruthNames[iName];
+      }
 
       /// Marking that the basic cluster variables should be included.
       typedef CDCWireHitClusterVarSet NestedVarSet;

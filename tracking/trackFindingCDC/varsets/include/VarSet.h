@@ -124,7 +124,7 @@ namespace Belle2 {
       IF_NOT_CINT(constexpr)
       static int named(const char* const name)
       {
-        return index(ObjectVarNames::names, name);
+        return index<nVars>(ObjectVarNames::getName, name);
       }
 
       /// Getter for the value of the ith variable. Static version.

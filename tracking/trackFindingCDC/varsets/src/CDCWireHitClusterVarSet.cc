@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 /// Important to define the constexpr here such that it gains external linkage.
-constexpr const char* const CDCWireHitClusterVarNames::names[nNames];
+//constexpr const char* const TrackFindingCDC::clusterNames[11];
 
 CDCWireHitClusterVarSet::CDCWireHitClusterVarSet(const std::string& prefix) :
   VarSet<CDCWireHitClusterVarNames>(prefix),

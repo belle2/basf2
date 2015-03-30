@@ -25,6 +25,23 @@ namespace Belle2 {
     /// Forward declaration of the CDCWireHitCluster.
     class CDCWireHitCluster;
 
+
+    /// Names of the variables to be generated.
+    IF_NOT_CINT(constexpr)
+    static char const* const clusterNames[11] = {
+      "avg_n_neignbors", // TODO: correct name and ordering once we can retrain the analysis.
+      "distance_to_superlayer_center",
+      "is_stereo",
+      "mean_drift_length",
+      "mean_inner_distance",
+      "size",
+      "superlayer_id",
+      "total_drift_length",
+      "total_inner_distance",
+      "total_n_neighbors",
+      "variance_drift_length",
+    };
+
     /** Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
      */
@@ -35,20 +52,26 @@ namespace Belle2 {
       static const size_t nNames = 11;
 
       /// Names of the variables to be generated.
+      // IF_NOT_CINT(constexpr)
+      // static char const* const clusterNames[11] = {
+      //  "avg_n_neignbors", // TODO: correct name and ordering once we can retrain the analysis.
+      //  "distance_to_superlayer_center",
+      //  "is_stereo",
+      //  "mean_drift_length",
+      //  "mean_inner_distance",
+      //  "size",
+      //  "superlayer_id",
+      //  "total_drift_length",
+      //  "total_inner_distance",
+      //  "total_n_neighbors",
+      //  "variance_drift_length",
+      // };
+
       IF_NOT_CINT(constexpr)
-      static char const* const names[nNames] = {
-        "avg_n_neignbors", // TODO: correct name and ordering once we can retrain the analysis.
-        "distance_to_superlayer_center",
-        "is_stereo",
-        "mean_drift_length",
-        "mean_inner_distance",
-        "size",
-        "superlayer_id",
-        "total_drift_length",
-        "total_inner_distance",
-        "total_n_neighbors",
-        "variance_drift_length",
-      };
+      static char const* getName(int iName)
+      {
+        return clusterNames[iName];
+      }
     };
 
     /** Class that computes floating point variables from a wire hit clusters.

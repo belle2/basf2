@@ -52,6 +52,27 @@ namespace Belle2 {
               strequal(names[iName], name) ? iName : index(names, name, iName + 1));
     }
 
+    /** Const expression that can search through an array of string at compile time and find the
+     *  index of the string.
+     *
+     *  @param names   An array of cstrings
+     *  @param name    The sought string
+     *  @param iName   Optional index at which the search should begin.
+     *  @return        The index at which the string was found.
+     *                 nNames if not found, which points to one after the array.
+     */
+    template<size_t nNames>
+    constexpr
+    int index(const char* (getName(int)),
+              const char* const name,
+              const size_t iName = 0)
+    {
+      return ((nNames == iName) ?
+              iName :
+              strequal(getName(iName), name) ? iName : index<nNames>(getName, name, iName + 1));
+    }
+
+
     /** Generic class that contains a fixed number of named float values.
      *  This object template provides the memory and the names of the float values.
      *
@@ -79,7 +100,7 @@ namespace Belle2 {
       IF_NOT_CINT(constexpr)
       static int named(const char* const name)
       {
-        return index(Names::names, name);
+        return index<nNames>(Names::getName, name);
       }
 
     public:
@@ -111,7 +132,7 @@ namespace Belle2 {
       {
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
-        return Names::names[iValue];
+        return Names::getName(iValue);
       }
 
     public:

@@ -98,7 +98,6 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   bool endIsReassigned = mcHitLookUp.isReassignedSecondary(endWireHit);
 
 
-
   //Now check the alignement in track
   bool distanceInTrackIsSufficientlyLow = true;
 
@@ -110,7 +109,10 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   int middleToEndInTrackDistance =  endInTrackId - middleInTrackId;
   int startToEndInTrackDistance =  endInTrackId - startInTrackId;
 
-  if (true or (not startIsReassigned and not middleIsReassigned and not endIsReassigned)) {
+  const bool makeNoDifferenceForReassignedSecondaries = true;
+
+  if (makeNoDifferenceForReassignedSecondaries or
+      (not startIsReassigned and not middleIsReassigned and not endIsReassigned)) {
 
     distanceInTrackIsSufficientlyLow =
       0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= inTrackHitDistanceTolerance and

@@ -87,8 +87,8 @@ namespace Belle2 {
           zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
         }
 
-        FloatType weight = 1.0;
-        weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
+        //FloatType weight = 1.0;
+        FloatType weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
 
         size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z(), weight);
         // if (not appended_hit){

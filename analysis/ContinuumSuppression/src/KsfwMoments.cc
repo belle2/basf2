@@ -65,6 +65,9 @@ namespace Belle2 {
                            double et[2]
                           )
   {
+    // Private member needs to be initialized. Here it is initalized to -1 (illegal value).
+    m_uf = -1;
+
     m_et[0] = et[0];
     m_et[1] = et[1];
 

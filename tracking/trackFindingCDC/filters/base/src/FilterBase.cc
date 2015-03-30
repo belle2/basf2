@@ -7,17 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include "../include/FilterBase.h"
 
-#include "FilterBase.h"
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-
-    /// Class for filters on a generic object type.
-    template<class Object_>
-    class Filter : public FilterBase<Object_> {
-
-    };
-  }
-}
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;

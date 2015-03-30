@@ -59,7 +59,8 @@ namespace Belle2 {
     MCToPR::MatchInfo extractMCToPRMatchInfo(const genfit::TrackCand* prTrackCand, const float& efficiency);
 
     /// Helper function to assume the correct matching category for the pattern recognition tracks from the information purity relation.
-    PRToMC::MatchInfo extractPRToMCMatchInfo(const genfit::TrackCand& prTrackCand, const genfit::TrackCand* mcTrackCand, const float& purity);
+    PRToMC::MatchInfo extractPRToMCMatchInfo(const genfit::TrackCand& prTrackCand, const genfit::TrackCand* mcTrackCand,
+                                             const float& purity);
 
 
   public:
@@ -87,7 +88,8 @@ namespace Belle2 {
     float getMatchedEfficiency(const genfit::TrackCand& trackCand);
 
     /// Gets the matching category of Monte Carlo track. Is one of PRToMC::MATCHED, MERGED, MISSING, INVALID.
-    MCToPR::MatchInfo getMCToPRMatchInfo(const genfit::TrackCand& mcTrackCand) {
+    MCToPR::MatchInfo getMCToPRMatchInfo(const genfit::TrackCand& mcTrackCand)
+    {
       float efficiency = NAN;
       const genfit::TrackCand* prTrackCand = getRelatedPRTrackCand(mcTrackCand, efficiency);
       return extractMCToPRMatchInfo(prTrackCand, efficiency);
@@ -114,7 +116,8 @@ namespace Belle2 {
 
   public:
     /// Gets the matching category of pattern recognition track. Is one of PRToMC::MATCHED, CLONE, BACKGROUND, GHOST, INVALID.
-    PRToMC::MatchInfo getPRToMCMatchInfo(const genfit::TrackCand& prTrackCand) {
+    PRToMC::MatchInfo getPRToMCMatchInfo(const genfit::TrackCand& prTrackCand)
+    {
       float purity = NAN;
       const genfit::TrackCand* mcTrackCand = getRelatedMCTrackCand(prTrackCand, purity);
       return extractPRToMCMatchInfo(prTrackCand, mcTrackCand, purity);

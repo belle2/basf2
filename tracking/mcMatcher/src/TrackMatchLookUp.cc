@@ -31,7 +31,8 @@ namespace {
     if (!fromObject) return nullptr;
     DataStore::StoreEntry* storeEntry = nullptr;
     int index = -1;
-    RelationEntry toEntry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, fromObject, storeEntry, index, TO::Class(), toName);
+    RelationEntry toEntry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, fromObject, storeEntry, index, TO::Class(),
+                            toName);
     TO* toObject = static_cast<TO*>(toEntry.object);
 
     if (toObject) weight = toEntry.weight;
@@ -92,7 +93,8 @@ bool TrackMatchLookUp::isPRTrackCand(const genfit::TrackCand& trackCand)
 const genfit::TrackCand* TrackMatchLookUp::getRelatedMCTrackCand(const genfit::TrackCand& prTrackCand, float& purity)
 {
   double double_purity = 0; //help variable because DataStore expects double
-  const genfit::TrackCand* mcTrackCand = getRelatedFromObj<genfit::TrackCand >(&prTrackCand, double_purity, getMCTracksStoreArrayName());
+  const genfit::TrackCand* mcTrackCand = getRelatedFromObj<genfit::TrackCand >(&prTrackCand, double_purity,
+                                         getMCTracksStoreArrayName());
   if (mcTrackCand) {
     purity = double_purity;
   } else {
@@ -108,7 +110,8 @@ const genfit::TrackCand* TrackMatchLookUp::getRelatedMCTrackCand(const genfit::T
 const genfit::TrackCand* TrackMatchLookUp::getRelatedPRTrackCand(const genfit::TrackCand& mcTrackCand, float& efficiency)
 {
   double double_efficiency = 0; //help variable because DataStore expects double
-  const genfit::TrackCand* prTrackCand = getRelatedFromObj<genfit::TrackCand >(&mcTrackCand, double_efficiency, getPRTracksStoreArrayName());
+  const genfit::TrackCand* prTrackCand = getRelatedFromObj<genfit::TrackCand >(&mcTrackCand, double_efficiency,
+                                         getPRTracksStoreArrayName());
   if (prTrackCand) {
     efficiency = double_efficiency;
   } else {
@@ -132,7 +135,8 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const genfit::TrackCand* prTrackCand, c
 }
 
 TrackMatchLookUp::PRToMC::MatchInfo
-TrackMatchLookUp::extractPRToMCMatchInfo(const genfit::TrackCand& prTrackCand, const genfit::TrackCand* mcTrackCand, const float& purity)
+TrackMatchLookUp::extractPRToMCMatchInfo(const genfit::TrackCand& prTrackCand, const genfit::TrackCand* mcTrackCand,
+                                         const float& purity)
 {
 
   if (!mcTrackCand) {

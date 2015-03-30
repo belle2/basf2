@@ -19,7 +19,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <genfit/TrackCand.h>
-#include <tracking/mcTrackMatcher/TrackMatchLookUp.h>
+#include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 
 using namespace Belle2;

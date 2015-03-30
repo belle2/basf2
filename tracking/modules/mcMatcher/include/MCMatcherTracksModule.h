@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef MCTRACKMATCHER_H_
-#define MCTRACKMATCHER_H_
+#ifndef MCMATCHERTRACKSMODULE_H_
+#define MCMATCHERTRACKSMODULE_H_
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -117,13 +117,13 @@ namespace Belle2 {
    *
    */
 
-  class MCTrackMatcherModule : public Module {
+  class MCMatcherTracksModule : public Module {
 
   public:
 
-    MCTrackMatcherModule();
+    MCMatcherTracksModule();
 
-    virtual ~MCTrackMatcherModule();
+    virtual ~MCMatcherTracksModule();
 
     virtual void initialize();
 
@@ -171,7 +171,8 @@ namespace Belle2 {
     //Other variables
 
     typedef int NDF;
-    std::map<int, NDF> m_ndf_by_detId;            /**< Map storing the standard number degrees of freedom for a single hit by detector */
+    std::map<int, NDF>
+    m_ndf_by_detId;            /**< Map storing the standard number degrees of freedom for a single hit by detector */
     /*{
     std::make_pair(Const::PXD, 2),
     std::make_pair(Const::SVD, 2),
@@ -181,5 +182,5 @@ namespace Belle2 {
   }; // end class
 } // end namespace Belle2
 
-#endif /* MCTRACKMATCHER_H_ */
+#endif /* MCMATCHERTRACKSMODULE_H_ */
 

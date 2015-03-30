@@ -9,7 +9,7 @@
 
 
 #include <framework/gearbox/Const.h>
-#include <tracking/mcTrackMatcher/TrackMatchLookUp.h>
+#include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 #include <cmath>
 
@@ -29,7 +29,8 @@ using namespace TrackFindingCDC;
 NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& trackColName,
                          std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
                          bool drawCands, std::string& mcParticlesColName):
-  m_TrackCandColName(TrackCandColName), m_mcTrackCandColName(std::string("")), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
+  m_TrackCandColName(TrackCandColName), m_mcTrackCandColName(std::string("")), m_trackColName(trackColName), m_HitColName(HitColName),
+  m_StoreDirectory(StoreDirectory),
   m_drawMCSignal(drawMCSignal), m_drawCands(drawCands), m_mcParticlesColName(mcParticlesColName)
 {
 
@@ -38,7 +39,8 @@ NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& trackColNam
 NiceDrawing::NiceDrawing(std::string& TrackCandColName, std::string& mcTrackCandColName, std::string& trackColName,
                          std::string& HitColName, std::string& StoreDirectory, bool drawMCSignal,
                          bool drawCands, std::string& mcParticlesColName):
-  m_TrackCandColName(TrackCandColName), m_mcTrackCandColName(mcTrackCandColName), m_trackColName(trackColName), m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
+  m_TrackCandColName(TrackCandColName), m_mcTrackCandColName(mcTrackCandColName), m_trackColName(trackColName),
+  m_HitColName(HitColName), m_StoreDirectory(StoreDirectory),
   m_drawMCSignal(drawMCSignal), m_drawCands(drawCands), m_mcParticlesColName(mcParticlesColName)
 {
 
@@ -141,7 +143,8 @@ void NiceDrawing::initFig(DrawStatus drawStatus)
 
   m_fig.open(ss.str().c_str());
 
-  m_fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
+  m_fig << "<?xml version=\"1.0\" ?> \n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\""
+        << m_max << "pt\" height=\"" << m_max << "pt\" viewBox=\"0 0 " << m_max << " " << m_max << "\" version=\"1.1\">\n";
   m_fig << "<text x=\"0\" y=\"10\" fill=\"black\">" << suffix << "</text>\n";
 
   if (drawStatus != DrawStatus::draw_tracks) {
@@ -221,7 +224,8 @@ TVector2 NiceDrawing::getWirePosition(int iLayer, int iWire)
   return TVector2(WireX, WireY);
 }
 
-void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge, std::string color, double linewidth, double opacity)
+void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVector2 center, double radius, int charge,
+                          std::string color, double linewidth, double opacity)
 {
   std::pair<TVector2, TVector2> intersect_both = getIntersect(center, position);
 
@@ -244,14 +248,17 @@ void NiceDrawing::drawArc(std::stringstream& drawString, TVector2 position, TVec
 
   drawString << arc_new[0] << " " << arc_new[1] << "\" ";
 
-  drawString << "fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" stroke-opacity=\"" << opacity << "\" />\n";
+  drawString << "fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" stroke-opacity=\"" << opacity <<
+             "\" />\n";
 }
 
-void NiceDrawing::drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth, double opacity)
+void NiceDrawing::drawCircle(std::stringstream& drawString, TVector2 position, double radius, std::string color, double linewidth,
+                             double opacity)
 {
   TVector3 circle_new = translateCircle(position, radius);
 
-  drawString << "<circle cx=\"" << circle_new[0] << "\" cy=\"" << circle_new[1] << "\" r=\"" << circle_new[2] << "\" fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" stroke-opacity=\"" << opacity << "\" />\n";
+  drawString << "<circle cx=\"" << circle_new[0] << "\" cy=\"" << circle_new[1] << "\" r=\"" << circle_new[2] <<
+             "\" fill=\"none\" stroke=\"" << color << "\" stroke-width=\"" << linewidth << "\" stroke-opacity=\"" << opacity << "\" />\n";
 }
 
 TVector3 NiceDrawing::translateCircle(TVector2 center, double radius)
@@ -355,7 +362,8 @@ void NiceDrawing::drawTrackCand(std::stringstream& drawString, const genfit::Tra
   drawAnyTrack(drawString, momentum, charge, trackColor, position);
 }
 
-void NiceDrawing::drawAnyTrack(std::stringstream& drawString, TVector2 momentum, int charge, std::string trackColor, TVector2 position, int linewidth)
+void NiceDrawing::drawAnyTrack(std::stringstream& drawString, TVector2 momentum, int charge, std::string trackColor,
+                               TVector2 position, int linewidth)
 {
   double radius = sqrt(momentum.X() * momentum.X() + momentum.Y() * momentum.Y()) / (1.5 * 0.00299792458);
 
@@ -505,7 +513,7 @@ void NiceDrawing::drawMCTracks()
     if (part->hasStatus(MCParticle::c_StableInGenerator) && fabs(part->getCharge()) > 0.001) {
       drawMCTrack(ss, part, "lightblue");
 
-      for (const CDCHit & hit :  part->getRelationsTo<CDCHit>()) {
+      for (const CDCHit& hit :  part->getRelationsTo<CDCHit>()) {
         drawCDCHit(ss, &hit, "lightsteelblue");
       }
     }
@@ -564,7 +572,9 @@ std::string NiceDrawing::getQualityEstimationOfPTTrackCandidate(const genfit::Tr
   return ss.str();
 }
 
-void NiceDrawing::drawDescribingQualityText(std::stringstream& drawString, std::string& qualityEstimation, std::string& trackColor, double yPosition)
+void NiceDrawing::drawDescribingQualityText(std::stringstream& drawString, std::string& qualityEstimation, std::string& trackColor,
+                                            double yPosition)
 {
-  drawString << "<text x=\"0\" y=\"" << yPosition << "\" fill=\"" << trackColor << "\"> Track Quality " << qualityEstimation << "</text>\n";
+  drawString << "<text x=\"0\" y=\"" << yPosition << "\" fill=\"" << trackColor << "\"> Track Quality " << qualityEstimation <<
+             "</text>\n";
 }

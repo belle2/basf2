@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Christian Roca                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -36,7 +36,7 @@ REG_MODULE(FlavorTagInfoBuilder)
 FlavorTagInfoBuilderModule::FlavorTagInfoBuilderModule() : Module()
 {
   // Set module properties
-  setDescription("Initializes the FlavorTagInfo DataObject to be used during the Flavor Tagging. Information filling is done in the FlavorTagger.py script");
+  setDescription("Initializes the FlavorTagInfo DataObject that will be used during the Flavor Tagging. Filling is done in the FlavorTagger.py script");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
@@ -46,13 +46,13 @@ FlavorTagInfoBuilderModule::FlavorTagInfoBuilderModule() : Module()
 
 void FlavorTagInfoBuilderModule::initialize()
 {
-  // input
+  // input: Particles and RestOfEvent
   StoreObjPtr<ParticleList>::required(m_particleList);
   StoreArray<Particle> particles;
   StoreArray<RestOfEvent> roeArray;
   particles.isRequired();
 
-  // output
+  // output: FlavorTagInfo
   StoreArray<FlavorTagInfo> flavTagArray;
   flavTagArray.registerInDataStore();
   particles.registerRelationTo(flavTagArray);
@@ -73,10 +73,10 @@ void FlavorTagInfoBuilderModule::event()
     const Particle* particle = plist->getParticle(i);
     const RestOfEvent* roe = roeArray[i];
 
-    // create RestOfEvent and FlavorTagInfo objects
+    // create FlavorTagInfo object
     FlavorTagInfo* flavTag = flavTagArray.appendNew();
 
-    // create relations: Particle <-> RestOfEvent , Particle <-> FlavorTagInfo , RestOfEvent <-> FlavorTagInfo
+    // create relations: Particle <-> FlavorTagInfo , RestOfEvent <-> FlavorTagInfo
     particle->addRelationTo(flavTag);
     roe->addRelationTo(flavTag);
 

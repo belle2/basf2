@@ -14,4 +14,59 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-//only here to trigger a compilation of the source file
+
+void SimpleFacetNeighborChooser::setParameter(const std::string& key, const std::string& value)
+{
+  if (key == "deviation_cos_cut") {
+    m_param_deviationCosCut = stod(value);
+    B2INFO("Filter received parameter '" << key << "' " << value);
+  } else {
+    Super::setParameter(key, value);
+  }
+}
+
+std::map<std::string, std::string> SimpleFacetNeighborChooser::getParameterDescription()
+{
+  std::map<std::string, std::string> des = Super::getParameterDescription();
+  des["deviation_cos_cut"] = "Acceptable deviation cosine in the angle of adjacent tangents to the "
+                             "drift circles.";
+  return des;
+}
+
+
+
+NeighborWeight SimpleFacetNeighborChooser::operator()(const CDCRecoFacet& fromFacet,
+                                                      const CDCRecoFacet& toFacet)
+{
+
+  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NOT_A_NEIGHBOR;
+
+  // the compatibility of the short legs or all?
+  // start end to continuation middle end
+  // start middle to continuation start end
+
+  const ParameterLine2D& fromStartToMiddle = fromFacet.getStartToMiddleLine();
+  const ParameterLine2D& fromStartToEnd    = fromFacet.getStartToEndLine();
+
+  const ParameterLine2D& toStartToEnd   = toFacet.getStartToEndLine();
+  const ParameterLine2D& toMiddleToEnd  = toFacet.getMiddleToEndLine();
+
+  const FloatType fromMiddleCos = fromStartToMiddle.tangential().cosWith(toStartToEnd.tangential());
+  const FloatType toMiddleCos = fromStartToEnd.tangential().cosWith(toMiddleToEnd.tangential());
+
+  // check both
+  if (fromMiddleCos > m_param_deviationCosCut and toMiddleCos > m_param_deviationCosCut) {
+
+    // the weight must be -2 because the overlap of the facets is two points
+    // so the amount of two facets is 4 points hence the cellular automat
+    // must calculate 3 + (-2) + 3 = 4 as cellstate
+    // this can of course be adjusted for a more realistic information measure
+    // ( together with the facet creator filter)
+    return -2;
+
+  } else {
+
+    return NOT_A_NEIGHBOR;
+
+  }
+}

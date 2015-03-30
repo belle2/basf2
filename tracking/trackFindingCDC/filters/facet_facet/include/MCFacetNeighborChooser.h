@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef MCFACETNEIGHBORCHOOSER_H_
-#define MCFACETNEIGHBORCHOOSER_H_
+#pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 #include "BaseFacetNeighborChooser.h"
@@ -17,44 +15,48 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     ///Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetNeighborChooser : public BaseFacetNeighborChooser {
+    class MCFacetNeighborChooser : public Filter<Relation<CDCRecoFacet>> {
+
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCRecoFacet>> Super;
 
     public:
-      /// Constructor also setting the switch if the reversed version of a facet (in comparision to MC truth) shall be accepted.
+      /** Constructor also setting the switch if the reversed version of a facet
+       *  (in comparision to MC truth) shall be accepted.
+       */
       MCFacetNeighborChooser(bool allowReverse = true) : m_mcFacetFilter(allowReverse) {;}
 
     public:
-      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
-                                            const CDCRecoFacet& neighborFacet) override final
-      {
+      /** Set the parameter with key to value.
+       *
+       *  Parameters are:
+       *  symmetric -  Accept the relation facet if the reverse relation facet is correct
+       *               preserving the progagation reversal symmetry on this level of detail.
+       *               Allowed values "true", "false". Default is "true".
+       */
+      virtual
+      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
 
-        //the last wire of the neighbor should not be the same as the start wire of the facet
-        if (facet.getStartWire() == neighborFacet.getEndWire()) {
-          return NOT_A_NEIGHBOR;
-        }
+      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
+       */
+      virtual
+      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
 
-        // Despite of that two facets are neighbors if both are true facets
-        // That also implies the correct tof alignment of the hits not common to both facets
-        CellWeight facetWeight = m_mcFacetFilter(facet);
-        CellWeight neighborWeight = m_mcFacetFilter(neighborFacet);
+      /// Indicates that the filter requires Monte Carlo information.
+      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
 
-        bool mcDecision = (not isNotACell(facetWeight)) and (not isNotACell(neighborWeight));
-
-        // the weight must be -2 because the overlap of the facets is two points
-        // so the amount of two facets is 4 points hence the cellular automat
-        // must calculate 3 + (-2) + 3 = 4 as cellstate
-        // this can of course be adjusted for a more realistic information measure
-        // ( together with the facet creator filter)
-        return mcDecision ? -2.0 : NOT_A_NEIGHBOR;
-
-      }
+    public:
+      /** Main filter method returning the weight of the neighborhood relation.
+       *  Return NOT_A_NEIGHBOR if relation shall be rejected.
+       */
+      virtual NeighborWeight operator()(const CDCRecoFacet& fromFacet,
+                                        const CDCRecoFacet& toFacet) override final;
 
     private:
-      MCFacetFilter m_mcFacetFilter; ///< Monte Carlo cell filter to reject neighborhoods have false cells
+      /// Monte Carlo cell filter to reject neighborhoods have false cells
+      MCFacetFilter m_mcFacetFilter;
 
     }; // end class
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //MCFACETNEIGHBORCHOOSER_H_

@@ -7,66 +7,58 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef SIMPLEFACETNEIGHBORCHOOSER_H_
-#define SIMPLEFACETNEIGHBORCHOOSER_H_
+#pragma once
 
 #include "BaseFacetNeighborChooser.h"
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    ///Class filtering the neighborhood of facets based on simple criterions.
-    class SimpleFacetNeighborChooser : public BaseFacetNeighborChooser {
+    /// Class filtering the neighborhood of facets based on simple criterions.
+    class SimpleFacetNeighborChooser : public Filter<Relation<CDCRecoFacet>> {
+
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCRecoFacet>> Super;
 
     public:
       /// Constructor using default direction of flight deviation cut off.
-      SimpleFacetNeighborChooser() : m_allowedDeviationCos(cos(PI / 180.0 * 180.0))
+      SimpleFacetNeighborChooser() : m_param_deviationCosCut(cos(PI / 180.0 * 180.0))
       {;}
 
       /// Constructor using given direction of flight deviation cut off.
-      SimpleFacetNeighborChooser(FloatType allowedDeviationCos) : m_allowedDeviationCos(allowedDeviationCos)
+      SimpleFacetNeighborChooser(FloatType deviationCosCut) :
+        m_param_deviationCosCut(deviationCosCut)
       {;}
 
-      virtual inline NeighborWeight isGoodNeighbor(const CDCRecoFacet& facet,
-                                                   const CDCRecoFacet& neighborFacet) override final {
+    public:
+      /** Set the parameter with key to value.
+       *
+       *  Parameters are:
+       *  deviation_cos_cut - Acceptable deviation cosine in the angle of adjacent tangents to the
+       *                      drift circles.
+       */
+      virtual
+      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
 
-        if (facet.getStartWire() == neighborFacet.getEndWire()) return NOT_A_NEIGHBOR;
+      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
+       */
+      virtual
+      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
 
-        //the compatibility of the short legs or all?
-        //start end to continuation middle end
-        //start middle to continuation start end
 
-        const ParameterLine2D& firstStartToMiddle = facet.getStartToMiddleLine();
-        const ParameterLine2D& firstStartToEnd    = facet.getStartToEndLine();
-
-        const ParameterLine2D& secondStartToEnd   = neighborFacet.getStartToEndLine();
-        const ParameterLine2D& secondMiddleToEnd   = neighborFacet.getMiddleToEndLine();
-
-        //check both
-        if (firstStartToMiddle.tangential().cosWith(secondStartToEnd.tangential()) > m_allowedDeviationCos and
-            firstStartToEnd.tangential().cosWith(secondMiddleToEnd.tangential()) > m_allowedDeviationCos) {
-
-          // the weight must be -2 because the overlap of the facets is two points
-          // so the amount of two facets is 4 points hence the cellular automat must calculate 3 + (-2) + 3 = 4 as cellstate
-          // this can of course be adjusted for a more realistic information measure ( together with the facet creator filter)
-          return -2;
-
-        } else {
-
-          return NOT_A_NEIGHBOR;
-
-        }
-
-      }
+    public:
+      /** Main filter method returning the weight of the neighborhood relation.*/
+      virtual NeighborWeight operator()(const CDCRecoFacet& fromFacet,
+                                        const CDCRecoFacet& toFacet) override final;
 
     private:
-      FloatType m_allowedDeviationCos;  ///< Memory for the used direction of flight deviation.
+      /// Memory for the used direction of flight deviation.
+      FloatType m_param_deviationCosCut;
 
     }; // end class
 
-
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //SIMPLEFACETNEIGHBORCHOOSER_H_

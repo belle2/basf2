@@ -33,6 +33,9 @@ namespace Belle2 {
       /// Making destructor virtual
       ~FilterBase() {;}
 
+      /// Clears information from former events
+      virtual void clear() {;}
+
       /// Initialize the filter before event processing.
       virtual void initialize() {;}
 

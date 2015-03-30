@@ -69,7 +69,7 @@ void NtupleRecoStatsTool::eval(const  Particle*)
 
       // is it good cluster?
       double energy = cluster->getEnergy();
-      double e9e25  = cluster->getE9oE25();
+      //double e9e25  = cluster->getE9oE25();
       int    region = 0;
       double timing = cluster->getTiming();
 

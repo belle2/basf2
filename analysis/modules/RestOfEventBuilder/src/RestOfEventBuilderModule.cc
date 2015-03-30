@@ -127,7 +127,7 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
     if (m_onlyGoodECLClusters) {
       // TODO: make this steerable
       double energy = shower->getEnergy();
-      double e9e25  = shower->getE9oE25();
+      //double e9e25  = shower->getE9oE25();
       int    region = 0;
 
       float theta = shower->getTheta();

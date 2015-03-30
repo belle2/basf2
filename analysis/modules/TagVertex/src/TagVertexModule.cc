@@ -50,7 +50,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitPval(0)
+    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_MCdeltaT(0)
   {
     // Set module properties
     setDescription("Tag side Vertex Fitter for modular analysis");
@@ -58,7 +58,8 @@ namespace Belle2 {
     // Parameter definitions
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit", 0.001);
+             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
+             0.001);
     addParam("MCAssociation", m_useMCassociation,
              "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
     addParam("useConstraint", m_useConstraint,

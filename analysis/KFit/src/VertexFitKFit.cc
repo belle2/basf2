@@ -10,6 +10,7 @@
 
 
 #include <stdio.h>
+#include <algorithm>
 
 #include <analysis/KFit/VertexFitKFit.h>
 
@@ -35,7 +36,8 @@ VertexFitKFit::VertexFitKFit(void)
   m_V_E = HepMatrix(3, 3, 0);
   m_v   = HepMatrix(3, 1, 0);
   m_v_a = HepMatrix(3, 1, 0);
-  m_EachCHIsq[KFitConst::kMaxTrackCount2] = {0};
+
+  fill_n(m_EachCHIsq, KFitConst::kMaxTrackCount2, 0);
 }
 
 VertexFitKFit::~VertexFitKFit(void)

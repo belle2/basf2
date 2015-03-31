@@ -31,7 +31,8 @@ PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_s
   //Set module properties
   setDescription("Monitor raw PXD");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed", std::string("pxdraw"));
+  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+           std::string("pxdraw"));
 }
 
 void PXDRawDQMModule::defineHisto()
@@ -42,19 +43,28 @@ void PXDRawDQMModule::defineHisto()
 
   hrawPxdPackets = new TH1F("hrawPxdPackets", "Pxd Raw Packet Nr;Nr per Event", 16, 0, 16);
   hrawPxdPacketSize = new TH1F("hrawPxdPacketSize", "Pxd Raw Packetsize;Words per packet", 1024, 0, 1024);
-  hrawPxdHitMapAll  = new TH2F("hrawPxdHitMapAll", "Pxd Raw Hit Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370, 0, 3700, 350, 0, 3500);
-  hrawPxdAdcMapAll  = new TH2F("hrawPxdAdcMapAll", "Pxd Raw Adc Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 3700, 0, 3700, 3500, 0, 3500);
-  hrawPxdPedestalMapAll  = new TH2F("hrawPxdPedestalMapAll", "Pxd Raw Pedestal Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 3700, 0, 3700, 3500, 0, 3500);
+  hrawPxdHitMapAll  = new TH2F("hrawPxdHitMapAll",
+                               "Pxd Raw Hit Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 370, 0, 3700, 350, 0, 3500);
+  hrawPxdAdcMapAll  = new TH2F("hrawPxdAdcMapAll",
+                               "Pxd Raw Adc Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 3700, 0, 3700, 3500, 0, 3500);
+  hrawPxdPedestalMapAll  = new TH2F("hrawPxdPedestalMapAll",
+                                    "Pxd Raw Pedestal Map Overview;column+(ladder-1)*300+100;row+850*((layer-1)*2+(sensor-1))", 3700, 0, 3700, 3500, 0, 3500);
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
   for (auto i = 0; i < 64; i++) {
-    std::string s = boost::str(boost::format("Sensor %d:%d:%d (DHH ID $%02X)") % (((i >> 5) & 0x1) + 1) % ((i >> 1) & 0xF) % ((i & 0x1) + 1) % i);
+    //cppcheck-suppress zerodiv
+    std::string s = boost::str(boost::format("Sensor %d:%d:%d (DHH ID $%02X)") % (((i >> 5) & 0x1) + 1) % ((i >> 1) & 0xF) % ((
+                                 i & 0x1) + 1) % i);
 
-    hrawPxdHitMap[i]  = new TH2F(("hrawPxdHitMap" + s).c_str(), ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0, 786);
-    hrawPxdChargeMap[i]  = new TH2F(("hrawPxdChargeMap" + s).c_str(), ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0, 786);
+    hrawPxdHitMap[i]  = new TH2F(("hrawPxdHitMap" + s).c_str(), ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0,
+                                 786);
+    hrawPxdChargeMap[i]  = new TH2F(("hrawPxdChargeMap" + s).c_str(), ("Pxd Raw Charge Map, " + s + ";column;row").c_str(), 256, 0, 256,
+                                    786, 0, 786);
     hrawPxdHitsCharge[i]  = new TH1F(("hrawPxdHitsCharge" + s).c_str(), ("Pxd Raw Hit Charge, " + s + ";Charge").c_str(), 256, 0, 256);
-    hrawPxdHitsCommonMode[i]  = new TH1F(("hrawPxdHitsCommonMode" + s).c_str(), ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(), 256, 0, 256);
-    hrawPxdHitsTimeWindow[i]  = new TH1F(("hrawPxdHitsTimeWindow" + s).c_str(), ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 8192, -1024, 8192 - 1024);
+    hrawPxdHitsCommonMode[i]  = new TH1F(("hrawPxdHitsCommonMode" + s).c_str(), ("Pxd Raw Hit Common Mode, " + s + ";Value").c_str(),
+                                         256, 0, 256);
+    hrawPxdHitsTimeWindow[i]  = new TH1F(("hrawPxdHitsTimeWindow" + s).c_str(),
+                                         ("Pxd Raw Hit Time Window (framenr*1024-startrow), " + s + ";Time [a.u.]").c_str(), 8192, -1024, 8192 - 1024);
   }
 
   // cd back to root directory
@@ -90,13 +100,13 @@ void PXDRawDQMModule::event()
 {
   hrawPxdPackets->Fill(m_storeRawPxdrarray.getEntries());
 
-  for (auto & it : m_storeRawPxdrarray) {
+  for (auto& it : m_storeRawPxdrarray) {
     hrawPxdPacketSize->Fill(it.size());
   }
 
   hrawPxdHitsCount->Fill(m_storeRawHits.getEntries());
 
-  for (auto & it : m_storeRawHits) {
+  for (auto& it : m_storeRawHits) {
     int dhh_id;
     // calculate DHH id from Vxd Id
     unsigned int layer, ladder, sensor;//, segment;
@@ -119,7 +129,7 @@ void PXDRawDQMModule::event()
     hrawPxdHitsTimeWindow[dhh_id]->Fill(it.getFrameNr() * 1024 - it.getStartRow());
   }
 
-  for (auto & it : m_storeRawAdcs) {
+  for (auto& it : m_storeRawAdcs) {
     int dhh_id;
     // calculate DHH id from Vxd Id
     unsigned int layer, ladder, sensor;//, segment;
@@ -144,7 +154,7 @@ void PXDRawDQMModule::event()
       }
     }
   }
-  for (auto & it : m_storeRawPedestals) {
+  for (auto& it : m_storeRawPedestals) {
     int dhh_id;
     // calculate DHH id from Vxd Id
     unsigned int layer, ladder, sensor;//, segment;

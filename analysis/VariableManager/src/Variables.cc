@@ -479,6 +479,75 @@ namespace Belle2 {
     }
 
     // MC related ------------------------------------------------------------
+    double particleMCVirtualParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_IsVirtual;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
+      } else {
+        return -1;
+      }
+    }
+
+    double particleMCInitialParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_Initial;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
+      } else {
+        return -1;
+      }
+    }
+
+    double particleMCISRParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_IsISRPhoton;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
+      } else {
+        return -1;
+      }
+    }
+
+    double particleMCFSRParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_IsFSRPhoton;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
+      } else {
+        return -1;
+      }
+    }
+
+    double particleMCPhotosParticle(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
+        if (mcp->hasStatus(bitmask))
+          return 1;
+        else
+          return 0;
+      } else {
+        return -1;
+      }
+    }
 
     double isSignal(const Particle* part)
     {
@@ -1646,6 +1715,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
+
+    REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
+                      "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("mcInitial", particleMCInitialParticle,
+                      "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("mcISR", particleMCISRParticle,
+                      "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non-ISR MCParticle, -1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("mcFSR", particleMCFSRParticle,
+                      "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
+                      "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle.")
 
     VARIABLE_GROUP("Flavour tagging");
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,

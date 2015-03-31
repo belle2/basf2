@@ -224,6 +224,31 @@ namespace Belle2 {
     double cosTPTO(const Particle* part);
 
     /**
+     * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCInitialParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCVirtualParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCFSRParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCPhotosParticle(const Particle* particle);
+
+    /**
+     * return 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non-ISR MCParticle, -1 if Particle is not related to MCParticle
+     */
+    double particleMCISRParticle(const Particle* particle);
+
+    /**
      * returns the PDG code of the correspondig B0/B0bar when found in RoE, 0 otherwise
      */
     double McFlavorOfTagSide(const Particle* part);

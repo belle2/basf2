@@ -5,7 +5,6 @@
 # and run bash install_basf2.sh inside your install directory.
 
 #TODO: could start cloning at beginning, while tools are being installed...
-#TODO v00-05-04 has a different set of binaries (ubuntu1204 gone, 1404, sl5-32bit added)
 
 #abort on errors
 set -e
@@ -32,23 +31,26 @@ then
   exit 1
 fi
 
-echo "================================================================================"
 if [ ! -d basf2 ]; then
-  echo "Looking for current basf2 version..."
+  echo -n "Looking for current basf2 version..."
   CURRENT_REV=`svn log https://belle2.cc.kek.jp/svn/trunk/software | head -2 | tail -1 | awk '{print $1}'`
-  echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Ctrl-c to abort."
-  select SVN_CLONE_FROM in "all" $CURRENT_REV; do
-    echo "Selected: $SVN_CLONE_FROM"
-    break
-  done
+  echo " $CURRENT_REV"
 else
   echo "basf2/ already exists."
 fi
 
-echo "================================================================================"
-echo "Looking for current externals version..."
+echo -n "Looking for current externals version..."
 EXTERNALS_VERSION=`svn cat https://belle2.cc.kek.jp/svn/trunk/software/.externals`
-echo "Will install externals version $EXTERNALS_VERSION."
+echo " $EXTERNALS_VERSION."
+
+if [ ! -d basf2 ]; then
+  echo "================================================================================"
+  echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Press Ctrl-c to abort."
+  select SVN_CLONE_FROM in "all" $CURRENT_REV; do
+    echo "Selected: $SVN_CLONE_FROM"
+    break
+  done
+fi
 
 #echo "Looking for available externals..."
 #AVAILABLE_EXTERNALS=`get_externals.sh | head -n -1` #skip development, added manually
@@ -65,8 +67,9 @@ then
   if [ "$EXTERNALS_VERSION" == "development" ]; then
     BINARY_VARIANT=""
   else
-    echo "Select a binary variant of the externals for your system, or 'source' to compile them from source. All variants are for 64 bit unless mentioned otherwise. Ctrl-c to abort."
-    select BINARY_VARIANT in "source" sl5 debian6 fedora16 ubuntu1004 ubuntu1204 ubuntu1204_32bit; do
+    echo "================================================================================"
+    echo "Select a binary variant of the externals for your system, or 'source' to compile them from source. All variants are for 64 bit unless mentioned otherwise. Press Ctrl-c to abort."
+    select BINARY_VARIANT in "source" sl5 sl6 ubuntu1404 ubuntu1404_32bit; do
       if [ "$BINARY_VARIANT" == "source" ]; then
         BINARY_VARIANT=""
       fi

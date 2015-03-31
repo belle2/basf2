@@ -17,15 +17,6 @@
 
 #include <map>
 
-// Feature-extraction results
-struct FPGAFitParams {
-  double startTime;       //< Start of signal
-  double peakTime;        //< Peak time
-  double area;            //< Signal area (background-subtracted)
-  double amplitude;       //< Signal peak amplitude (background-subtracted)
-  double bgAmplitude;     //< Background amplitude.
-};
-
 namespace Belle2 {
 
   class BKLMSimHit;

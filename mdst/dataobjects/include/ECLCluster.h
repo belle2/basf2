@@ -12,12 +12,12 @@
 #define ECLCLUSTER_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
 
 #include <TVector3.h>
-#include <cmath>
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
+
+#include <cmath>
 
 namespace Belle2 {
 
@@ -400,12 +400,17 @@ namespace Belle2 {
     TMatrixFSym getError3x3() const
     {
       TMatrixFSym errorecl(3);
-      errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
-      errorecl[1][0] = m_Error[1];
-      errorecl[1][1] = m_Error[2] * m_Error[2]; // Phi
-      errorecl[2][0] = m_Error[3];
-      errorecl[2][1] = m_Error[4];
-      errorecl[2][2] = m_Error[5] * m_Error[5]; // Theta
+      errorecl(0, 0) = m_Error[0] * m_Error[0]; //Energy
+      errorecl(1, 0) = m_Error[1];
+      errorecl(1, 1) = m_Error[2] * m_Error[2]; // Phi
+      errorecl(2, 0) = m_Error[3];
+      errorecl(2, 1) = m_Error[4];
+      errorecl(2, 2) = m_Error[5] * m_Error[5]; // Theta
+
+      //make symmetric
+      for (int i = 0; i < 3; i++)
+        for (int j = 0; j < i ; j++)
+          errorecl(j, i) = errorecl(i, j);
       return errorecl;
     }
 
@@ -421,12 +426,7 @@ namespace Belle2 {
     /*! Return true if cluster has no match with cluster, otherwise
       return false if cluster has match with track.
      */
-    bool isNeutral() const
-    {
-      if (m_isTrack) {
-        return false;
-      } else { return true; }
-    }
+    bool isNeutral() const { return !m_isTrack; }
 
 
     //..... For FUTURE (to DO)

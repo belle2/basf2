@@ -172,23 +172,37 @@ namespace Belle2 {
 
       /**
        * @brief Add default list of module dependencies as parameter to the module
-       * Parameter name, describtion and binding to variable is done automatically.
+       * Parameter name, description and binding to variable is done automatically.
        *
        * @return void
        */
       void addDefaultDependencyList(std::string list = "");
 
+      /**
+       * Get the calibration file.
+       */
       TFile* getCalibrationFile();
 
+      /**
+       * A function to close files in parallel processing.
+       */
       virtual void closeParallelFiles() {};
 
+      /**
+       * Get the calibration file name.
+       */
       std::string getCalibrationFileName() const
       {
         return m_calibrationFileName;
       }
 
     private:
+
+      /**
+        * Try to start calibration.
+        */
       bool tryStartCalibration();
+
       /**
        * Calibration mode: online or offline.
        */
@@ -243,6 +257,9 @@ namespace Belle2 {
        */
       std::string m_dependencyList;
 
+      /**
+       * File for the calibration.
+       */
       TFile* m_calibrationFile;
 
     };

@@ -19,7 +19,13 @@
 #include <vector>
 
 namespace Belle2 {
-
+  /**
+  * ClassPlumeHit - digitization simulated hit for the Microtpc detector.
+  *
+  * This class holds particle hit data from digitization simulation. As the simulated
+  * hit classes are used to generate detector response, they contain _local_
+  * information.
+  */
   class PlumeHit : public SimHitBase {
   public:
     //typedef std::vector<unsigned int>::iterator iterator;
@@ -51,9 +57,11 @@ namespace Belle2 {
     /** impact position in sensor u,v frame, in mm */
     float getpos_u()        const { return m_posmm_u; }
     float getpos_v()        const { return m_posmm_v; }
-    /** impact position in G4 x,y,z frame, in mm */
+    /** impact position in G4 x frame, in mm */
     float getpos_x()        const { return m_posmm_x; }
+    /** impact position in G4 y frame, in mm */
     float getpos_y()        const { return m_posmm_y; }
+    /** impact position in G4 z frame, in mm */
     float getpos_z()        const { return m_posmm_z; }
 
   private:
@@ -61,12 +69,15 @@ namespace Belle2 {
     int m_sensorID;
     /** cluster size */
     int m_nofPixels;
-    /** impact position in sensor u,v frame, in mm */
+    /** impact position in sensor u frame, in mm */
     float m_posmm_u;
+    /** impact position in sensor v frame, in mm */
     float m_posmm_v;
-    /** impact position in G4 x,y,z frame, in mm */
+    /** impact position in G4 x frame, in mm */
     float m_posmm_x;
+    /** impact position in G4 y frame, in mm */
     float m_posmm_y;
+    /** impact position in G4 z frame, in mm */
     float m_posmm_z;
 
     ClassDef(PlumeHit, 1)

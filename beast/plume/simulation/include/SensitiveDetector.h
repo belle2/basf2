@@ -31,31 +31,58 @@ namespace Belle2 {
        */
       bool step(G4Step* step, G4TouchableHistory*);
     private:
+
+      /** particle PDG id */
       int current_pdgID;
+      /** sensor ID */
       int current_sensorID;
-      float current_trackVertex_x;
-      float current_trackVertex_y;
-      float current_trackVertex_z;
+      /** track ID */
       int current_trackID;
+      /** track production vertex x coordinates in G4 ref */
+      float current_trackVertex_x;
+      /** track production vertex y coordinates in G4 ref */
+      float current_trackVertex_y;
+      /** track production vertex z coordinates in G4 ref */
+      float current_trackVertex_z;
+      /** deposited energy in MeV */
       float current_energyDep;
+      /** non ionizing deposited energy */
       float current_nielDep;
+      /** incoming track position x in G4 ref, in mm */
       float current_posIN_x;
+      /** incoming track position y in G4 ref, in mm */
       float current_posIN_y;
+      /** incoming track position z in G4 ref, in mm */
       float current_posIN_z;
+      /** incoming track position u in sensor ref,  in mm */
       float current_posIN_u;
+      /** incoming track position v in sensor ref,  in mm */
       float current_posIN_v;
+      /** incoming track position w in sensor ref,  in mm */
       float current_posIN_w;
-      float current_posOUT_x;
-      float current_posOUT_y;
-      float current_posOUT_z;
+      /** outcoming track position u in sensor ref,  in mm */
       float current_posOUT_u;
+      /** outcoming track position v in sensor ref,  in mm */
       float current_posOUT_v;
+      /** outcoming track position w in sensor ref,  in mm */
       float current_posOUT_w;
+      /** outcoming track position x in sensor ref,  in mm */
+      float current_posOUT_x;
+      /** outcoming track position y in sensor ref,  in mm */
+      float current_posOUT_y;
+      /** outcoming track position z in sensor ref,  in mm */
+      float current_posOUT_z;
+      /** incoming track momentum, x coordinates in G4 ref, in GeV */
       float current_momentum_x;
+      /** incoming track momentum, y coordinates in G4 ref, in GeV */
       float current_momentum_y;
+      /** incoming track momentum, z coordinates in G4 ref, in GeV */
       float current_momentum_z;
+      /** local (sensor ref) theta angle, out of sensor plane, in degree */
       float current_thetaAngle;
+      /** local (sensor ref) phi angle, in sensor plane, in degree */
       float current_phiAngle;
+      /** global time */
       float current_globalTime;
 
     };

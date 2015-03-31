@@ -63,29 +63,39 @@ namespace Belle2 {
     int getsensorID()           const { return m_sensorID; }
     /** track ID */
     int gettrackID()            const { return m_trackID; }
-    /** track production vertex x,y,z coordinates in G4 ref */
+    /** track production vertex x coordinates in G4 ref */
     float gettrackVx_x()        const { return m_trackVx_x; }
+    /** track production vertex y coordinates in G4 ref */
     float gettrackVx_y()        const { return m_trackVx_y; }
+    /** track production vertex z coordinates in G4 ref */
     float gettrackVx_z()        const { return m_trackVx_z; }
     /** deposited energy in MeV */
     float getenergyDep()        const { return m_energyDepMeV; }
     /** non ionizing deposited energy */
     float getnielDep()          const { return m_nielDepMeV; }
-    /** incoming track position x,y,z in G4 ref, in mm */
+    /** incoming track position x in G4 ref, in mm */
     float getposIN_x()          const { return m_posINmm_x; }
+    /** incoming track position y in G4 ref, in mm */
     float getposIN_y()      const { return m_posINmm_y; }
+    /** incoming track position z in G4 ref, in mm */
     float getposIN_z()      const { return m_posINmm_z; }
-    /** incoming track position u,v,w in sensor ref,  in mm */
+    /** incoming track position u in sensor ref,  in mm */
     float getposIN_u()      const { return m_posINmm_u; }
+    /** incoming track position v in sensor ref,  in mm */
     float getposIN_v()          const { return m_posINmm_v; }
+    /** incoming track position w in sensor ref,  in mm */
     float getposIN_w()          const { return m_posINmm_w; }
-    /** outcoming track position u,v,w in sensor ref,  in mm */
+    /** outcoming track position u in sensor ref,  in mm */
     float getposOUT_u()   const { return m_posOUTmm_u; }
+    /** outcoming track position v in sensor ref,  in mm */
     float getposOUT_v()   const { return m_posOUTmm_v; }
+    /** outcoming track position w in sensor ref,  in mm */
     float getposOUT_w()     const { return m_posOUTmm_w; }
-    /** incoming track momentum, x,y,z coordinates in G4 ref, in GeV */
+    /** incoming track momentum, x coordinates in G4 ref, in GeV */
     float getmomentum_x()       const { return m_momGeV_x; }
+    /** incoming track momentum, y coordinates in G4 ref, in GeV */
     float getmomentum_y()       const { return m_momGeV_y; }
+    /** incoming track momentum, z coordinates in G4 ref, in GeV */
     float getmomentum_z()       const { return m_momGeV_z; }
     /** local (sensor ref) theta angle, out of sensor plane, in degree */
     float getthetaAngle()       const { return m_thetaLoc; }
@@ -103,29 +113,39 @@ namespace Belle2 {
     int m_sensorID;
     /** track ID */
     int m_trackID;
-    /** track production vertex x,y,z coordinates in G4 ref */
+    /** track production vertex x coordinates in G4 ref */
     float m_trackVx_x;
+    /** track production vertex y coordinates in G4 ref */
     float m_trackVx_y;
+    /** track production vertex z coordinates in G4 ref */
     float m_trackVx_z;
     /** deposited energy in MeV */
     float m_energyDepMeV;
     /** non ionizing deposited energy */
     float m_nielDepMeV;
-    /** incoming track position x,y,z in G4 ref, in mm */
+    /** incoming track position x in G4 ref, in mm */
     float m_posINmm_x;
+    /** incoming track position y in G4 ref, in mm */
     float m_posINmm_y;
+    /** incoming track position z in G4 ref, in mm */
     float m_posINmm_z;
-    /** incoming track position u,v,w in sensor ref,  in mm */
+    /** incoming track position u in sensor ref,  in mm */
     float m_posINmm_u;
+    /** incoming track position v in sensor ref,  in mm */
     float m_posINmm_v;
+    /** incoming track position w in sensor ref,  in mm */
     float m_posINmm_w;
-    /** outcoming track position u,v,w in sensor ref,  in mm */
+    /** outcoming track position u in sensor ref,  in mm */
     float m_posOUTmm_u;
+    /** outcoming track position v in sensor ref,  in mm */
     float m_posOUTmm_v;
+    /** outcoming track position w in sensor ref,  in mm */
     float m_posOUTmm_w;
-    /** incoming track momentum, x,y,z coordinates in G4 ref, in GeV */
+    /** incoming track momentum, x coordinates in G4 ref, in GeV */
     float m_momGeV_x;
+    /** incoming track momentum, y coordinates in G4 ref, in GeV */
     float m_momGeV_y;
+    /** incoming track momentum, z coordinates in G4 ref, in GeV */
     float m_momGeV_z;
     /** local (sensor ref) theta angle, out of sensor plane, in degree */
     float m_thetaLoc;

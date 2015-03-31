@@ -310,20 +310,14 @@ namespace Belle2 {
 
     TMatrixFSym getError4x4() const
     {
-      TMatrixFSym errorecl(3);
-      errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
-      errorecl[1][0] = m_Error[1];
-      errorecl[1][1] = m_Error[2] * m_Error[2]; // Phi
-      errorecl[2][0] = m_Error[3];
-      errorecl[2][1] = m_Error[4];
-      errorecl[2][2] = m_Error[5] * m_Error[5]; // Theta
+      TMatrixFSym errorecl = getError3x3();
 
       TMatrixF  jacobian(4, 3);
-      float  cosPhi = cos(m_Phi);
-      float  sinPhi = sin(m_Phi);
-      float  cosTheta = cos(m_Theta);
-      float  sinTheta = sin(m_Theta);
-      float   E = m_Energy;
+      float cosPhi = cos(m_Phi);
+      float sinPhi = sin(m_Phi);
+      float cosTheta = cos(m_Theta);
+      float sinTheta = sin(m_Theta);
+      float E = m_Energy;
 
       jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
       jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
@@ -344,59 +338,26 @@ namespace Belle2 {
     //__________________________
 
 
-    /*! Return TMatrixFsym 7x7  error matrix
+    /*! Return TMatrixFsym 7x7  error matrix (order should be: px,py,pz,E,x,y,z)
      */
     TMatrixFSym getError7x7() const
     {
-      TMatrixFSym errorecl(3);
-      errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
-      errorecl[1][0] = m_Error[1];
-      errorecl[1][1] = m_Error[2] * m_Error[2]; // Phi
-      errorecl[2][0] = m_Error[3];
-      errorecl[2][1] = m_Error[4];
-      errorecl[2][2] = m_Error[5] * m_Error[5]; // Theta
+      TMatrixFSym errCart = getError4x4();
 
-      TMatrixFSym ErrorMatrix(7);
-      TMatrixF  jacobian(4, 3);
-      float  cosPhi = cos(m_Phi);
-      float  sinPhi = sin(m_Phi);
-      float  cosTheta = cos(m_Theta);
-      float  sinTheta = sin(m_Theta);
-      float   E = m_Energy;
-
-      jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
-      jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
-      jacobian[ 0 ][ 2 ] =        E * cosPhi * cosTheta;
-      jacobian[ 1 ][ 0 ] =            sinPhi * sinTheta;
-      jacobian[ 1 ][ 1 ] =        E * cosPhi * sinTheta;
-      jacobian[ 1 ][ 2 ] =        E * sinPhi * cosTheta;
-      jacobian[ 2 ][ 0 ] =                     cosTheta;
-      jacobian[ 2 ][ 1 ] =           0.0;
-      jacobian[ 2 ][ 2 ] =  -1.0 * E          * sinTheta;
-      jacobian[ 3 ][ 0 ] =           1.0;
-      jacobian[ 3 ][ 1 ] =           0.0;
-      jacobian[ 3 ][ 2 ] =           0.0;
-      TMatrixFSym errCart(4);
-      errCart = errorecl.Similarity(jacobian);
+      TMatrixFSym errorMatrix(7);
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j <= i ; j++) {
-          ErrorMatrix[i][j] = errCart[i][j];
+          errorMatrix(i, j) = errCart(i, j);
         }
       }
-      for (int i = 4; i <= 6; ++i) {
-        ErrorMatrix[i][i] = 1.0; // 1.0*1.0 cm^2 (default treatment as Belle ?)
+      for (int i = 4; i < 7; ++i) {
+        errorMatrix(i, i) = 1.0; // 1.0*1.0 cm^2 (default treatment as Belle ?)
       }
-      return ErrorMatrix;
+      return errorMatrix;
     }
-
-
-
-
-
 
     /*! Return TMatrixFsym 3x3 error matrix for E, Phi and Theta
      */
-
     TMatrixFSym getError3x3() const
     {
       TMatrixFSym errorecl(3);

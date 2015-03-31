@@ -342,12 +342,12 @@ namespace Belle2 {
      */
     TMatrixFSym getError7x7() const
     {
-      TMatrixFSym errCart = getError4x4();
+      const TMatrixFSym errCart = getError4x4();
 
       TMatrixFSym errorMatrix(7);
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j <= i ; j++) {
-          errorMatrix(i, j) = errCart(i, j);
+          errorMatrix(i, j) = errorMatrix(j, i) = errCart(i, j);
         }
       }
       for (int i = 4; i < 7; ++i) {
@@ -417,9 +417,6 @@ namespace Belle2 {
     {
       return 0;
     }
-
-
-
 
   private:
 

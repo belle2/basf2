@@ -100,7 +100,7 @@ namespace Belle2 {
      *
      * @param bField Magnetic field at the perigee
      */
-    Double32_t getTransverseMomentum(const float bField = 1.5) const
+    double getTransverseMomentum(const float bField = 1.5) const
     { return getHelix().getTransverseMomentum(bField); }
 
     /** Position and Momentum Covariance Matrix.  */
@@ -117,7 +117,7 @@ namespace Belle2 {
     short getChargeSign() const { return getOmega() >= 0 ? 1 : -1; }
 
     /** Getter for Chi2 Probability of the track fit. */
-    Double32_t getPValue() const { return m_pValue; }
+    double getPValue() const { return m_pValue; }
 
     //------------------------------------------------------------------------
     // --- Getters for perigee helix parameters
@@ -126,38 +126,38 @@ namespace Belle2 {
      *
      *  @return
      */
-    Double32_t getD0() const { return m_tau[iD0]; }
+    double getD0() const { return m_tau[iD0]; }
 
     /** Getter for phi0. This is the angle of the transverse momentum in the r-phi plane.
      *
      *  @return
      */
-    Double32_t getPhi0() const { return m_tau[iPhi0]; }
+    double getPhi0() const { return m_tau[iPhi0]; }
 
     /** Getter for phi0 with CDF naming convention.  */
-    Double32_t getPhi() const { return getPhi0(); }
+    double getPhi() const { return getPhi0(); }
 
     /** Getter for omega. This is the curvature of the track. It's
      * sign is defined by the charge of the particle.
      *
      *  @return
      */
-    Double32_t getOmega() const { return m_tau[iOmega]; }
+    double getOmega() const { return m_tau[iOmega]; }
 
     /** Getter for z0. This is the z coordinate of the perigee.
      *
      *  @return
      */
-    Double32_t getZ0() const { return m_tau[iZ0]; }
+    double getZ0() const { return m_tau[iZ0]; }
 
     /** Getter for tanLambda. This is the slope of the track in the r-z plane.
      *
      *  @return
      */
-    Double32_t getTanLambda() const { return m_tau[iTanLambda]; }
+    double getTanLambda() const { return m_tau[iTanLambda]; }
 
     /** Getter for tanLambda with CDF naming convention.  */
-    Double32_t getCotTheta() const { return getTanLambda(); }
+    double getCotTheta() const { return getTanLambda(); }
 
     /** Getter for all perigee parameters
      *

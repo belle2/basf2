@@ -1,6 +1,8 @@
 #ifndef _Belle2_FEEConfig_h
 #define _Belle2_FEEConfig_h
 
+#include <daq/slc/database/DBObject.h>
+
 #include <vector>
 #include <string>
 
@@ -33,11 +35,13 @@ namespace Belle2 {
     RegList& getRegList() { return m_regs; }
     const RegList& getRegList() const { return m_regs; }
     bool read(const DBObject& obj);
+    const DBObject& operator()() const { return m_obj; }
 
   private:
     std::string m_firmware;
     std::string m_stream;
     RegList m_regs;
+    DBObject m_obj;
 
   };
 

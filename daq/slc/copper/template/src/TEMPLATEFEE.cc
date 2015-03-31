@@ -11,6 +11,11 @@ TEMPLATEFEE::TEMPLATEFEE()
 {
 }
 
+void TEMPLATEFEE::init(RCCallback& callback)
+{
+
+}
+
 void TEMPLATEFEE::boot(HSLB& hslb,  const FEEConfig& conf)
 {
 

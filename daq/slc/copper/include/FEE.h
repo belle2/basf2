@@ -1,6 +1,8 @@
 #ifndef _Belle2_FEE_h
 #define _Belle2_FEE_h
 
+#include <daq/slc/runcontrol/RCCallback.h>
+
 #include <daq/slc/copper/FEEConfig.h>
 #include <daq/slc/copper/HSLB.h>
 
@@ -13,6 +15,7 @@ namespace Belle2 {
     virtual ~FEE() throw() {}
 
   public:
+    virtual void init(RCCallback& callback) {}
     virtual void boot(HSLB& hslb, const FEEConfig& conf) = 0;
     virtual void load(HSLB& hslb, const FEEConfig& conf) = 0;
 

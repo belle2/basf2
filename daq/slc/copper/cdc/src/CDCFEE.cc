@@ -15,13 +15,18 @@ CDCFEE::CDCFEE()
 {
 }
 
+void CDCFEE::init(RCCallback& callback)
+{
+
+}
+
 void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
 {
   const char* firmware = conf.getFirmware();
   if (firmware && File::exist(firmware)) {
     LogFile::info("Loading CDC FEE firmware: %s", firmware);
-    std::string cmd = StringUtil::form("ssh ropc01 \"cd ~b2daq/run/cdc/; sh impact-batch.sh %s\"",
-                                       firmware);
+    std::string cmd = StringUtil::form("ssh ropc01 \"cd ~b2daq/run/cdc/; "
+                                       "sh impact-batch.sh %s\"", firmware);
     system(cmd.c_str());
   } else {
     LogFile::debug("CDC FEE firmware not exists : %s", firmware);
@@ -39,25 +44,37 @@ void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
 
 void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
 {
-  hslb.writefn(HSREG_CSR,     0x05); // reset read fifo
-  hslb.writefn(HSREG_CSR,     0x06); // reset read ack
-  //hslb.writefn(HSREG_CDCCONT, 0x07); // suppress mode
-  hslb.writefn(HSREG_CDCCONT, 0x08); // raw mode
-  hslb.writefn(HSREG_CSR,     0x0a); // parameter write
+  const DBObject& obj(conf());
+  // setting CDC control (data format, window and delay)
+  int val = 0;
+  std::string mode = StringUtil::tolower(obj.getText("mode"));
+  if (mode == "suppress") {
+    LogFile::info("suppress mode");
+    val = 1 << 24;
+  } else if (mode == "raw") {
+    LogFile::info("raw mode");
+    val = 2 << 24;
+  } else if (mode == "raw_suppress") {
+    LogFile::info("raw-suppress mode");
+    val = 3 << 24;
+  } else {
+    LogFile::warning("no readout");
+    val = 0;
+  }
+  val |= (obj.getInt("window") & 0xF) << 8;
+  val |= obj.getInt("delay") & 0xF;
+  hslb.writefee32(0x0012, val);
 
-  // writing parameters to registers
-  const FEEConfig::RegList& regs(conf.getRegList());
-  for (FEEConfig::RegList::const_iterator it = regs.begin();
-       it != regs.end(); it++) {
-    const FEEConfig::Reg& reg(*it);
-    if (reg.val < 0) continue;
-    LogFile::debug("write address %s(%d) (val=%d, size = %d)",
-                   reg.name.c_str(), reg.adr, reg.val, reg.size);
-    if (reg.size == 1) {
-      hslb.writefee8(reg.adr, reg.val);
-    } else if (reg.size == 2) {
-      hslb.writefee16(reg.adr, reg.val);
-    }
+  // setting ADC threshold
+  val = obj.getInt("adcth") & 0xFF;
+  hslb.writefee32(0x0013, val);
+
+  // setting Pedestals
+  const DBObjectList o_ped(obj.getObjects("ped"));
+  for (size_t i = 0; i < o_ped.size() / 2; i++) {
+    val = o_ped[2 * i].getInt("val") & 0xF;
+    val = (o_ped[2 * i + 1].getInt("val") << 16 & 0xF);
+    hslb.writefee32(0x0020 + i * 2, val);
   }
 }
 

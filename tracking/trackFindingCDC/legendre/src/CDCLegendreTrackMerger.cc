@@ -238,18 +238,16 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
   std::pair<double, double> ref_point = std::make_pair(0., 0.);
   std::pair<double, double> track_par = std::make_pair(-999, -999); // theta; R
 
-  double chi2_temp;
-
   // Approach the best fit
-  chi2_temp = trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
+  trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
   removeStrangeHits(5, commonHitListOfTwoTracks, track_par, ref_point);
-  chi2_temp = trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
+  trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
   removeStrangeHits(3, commonHitListOfTwoTracks, track_par, ref_point);
-  chi2_temp = trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
+  trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
   removeStrangeHits(1, commonHitListOfTwoTracks, track_par, ref_point);
-  chi2_temp = trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
+  trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
   removeStrangeHits(1, commonHitListOfTwoTracks, track_par, ref_point);
-  chi2_temp = trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
+  double chi2_temp = trackFitter.fitTrackCandidateFast(commonHitListOfTwoTracks, track_par, ref_point);
 
   int charge = TrackCandidate::getChargeAssumption(track_par.first, track_par.second, commonHitListOfTwoTracks);
 

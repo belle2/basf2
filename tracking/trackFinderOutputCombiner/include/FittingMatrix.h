@@ -35,6 +35,10 @@ namespace Belle2 {
     typedef unsigned int SegmentCounter;
     typedef int TrackCounter;
 
+    FittingMatrix() : m_param_maximum_theta(0), m_param_maximum_distance_z(0),
+      m_param_minimal_z_difference(0), m_param_minimal_chi2_stereo(0),
+      m_param_minimal_theta_difference(0), m_param_minimal_chi2(0) {}
+
     enum SegmentStatus {
       ABOVE_TRACK, BENEATH_TRACK, IN_TRACK, MIX_WITH_TRACK, NAN_IN_CALCULATION
     };
@@ -79,7 +83,7 @@ namespace Belle2 {
       double zReference = getZ(referenceSegment, trackCounter);
       double zDistReference = getDistZ(referenceSegment, trackCounter);
 
-      return isGoodEntry(segmentCounter, trackCounter) > 0
+      return isGoodEntry(segmentCounter, trackCounter)
              and std::abs(m_zMatrix(segmentCounter, trackCounter) - zReference)
              < m_param_minimal_theta_difference / 2
              and std::abs(m_zDistMatrix(segmentCounter, trackCounter) - zDistReference)

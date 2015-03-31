@@ -196,12 +196,13 @@ void NotAssignedHitsCombinerModule::event()
     status.reserve(resultTrackCands.getEntries());
 
     for (const genfit::TrackCand& resultTrackCand : resultTrackCands) {
-      double meanDistanceToTrack = 0;
       CDCTrajectory3D trajectory(resultTrackCand.getPosSeed(), resultTrackCand.getMomSeed(), resultTrackCand.getChargeSeed());
       const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
 
       // if it is axial, we can check the mean distance to the track in the xy-plane
       if (stereoType == AXIAL) {
+        double meanDistanceToTrack = 0;
+
         for (const CDCRecoHit2D& recoHit : recoSegment) {
           meanDistanceToTrack += recoHit.getSquaredDist2D(trajectory2D);
         }

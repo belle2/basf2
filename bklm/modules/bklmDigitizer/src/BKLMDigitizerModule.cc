@@ -287,8 +287,10 @@ int BKLMDigitizerModule::fillAmplitude(int nPEsample, double timeShift,
     double f = 0.0;
     if (hitTime >= 0.0) {
       jMin = (unsigned int)(hitTime / m_ADCSamplingTime);
-      f = exp(-m_PEAttenuationFreq * (jMin * m_ADCSamplingTime - hitTime));
-      hist[jMin] += 1.0 - f * attenuation; // partial bin
+      if (jMin < m_nDigitizations) {
+        f = exp(-m_PEAttenuationFreq * (jMin * m_ADCSamplingTime - hitTime));
+        hist[jMin] += 1.0 - f * attenuation; // partial bin
+      }
     } else {
       f = exp(m_PEAttenuationFreq * hitTime);
       hist[0] += norm * f; // full bin starting at t=0

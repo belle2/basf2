@@ -57,7 +57,8 @@ namespace Belle2 {
     // Add parameters
     addParam("listName", m_listName, "name of particle list", string(""));
     addParam("confidenceLevel", m_confidenceLevel,
-             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit", 0.001);
+             "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
+             0.001);
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
     addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, iptubecut", string(""));
@@ -232,7 +233,8 @@ namespace Belle2 {
   }
 
 
-  bool ParticleVertexFitterModule::fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children)
+  bool ParticleVertexFitterModule::fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
+                                                    std::vector<const Particle*>& pi0Children)
   {
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       const Particle* child = mother->getDaughter(ichild);
@@ -688,6 +690,18 @@ namespace Belle2 {
           if (tracksVertex[itrack] == mother) mothSel = true;
         }
 
+
+        // Fit one particle constrained to originate from the beam spot
+        bool mothIPfit = false;
+        if (tracksVertex.size() == 1 && mothSel == true && m_withConstraint == "ipprofile" && nTrk == 0) {
+          rsf.addTrack(tracksVertex[0]);
+          if (tracksVertex[0] != mother)
+            B2FATAL("ParticleVertexFitterModule: FATAL Error in IP constrained mother fit");
+          nTrk++;
+          mothIPfit = true;
+        }
+
+
         TVector3 pos;
         TMatrixDSym RerrMatrix(3);
         int nvert = 0;
@@ -710,7 +724,22 @@ namespace Belle2 {
                   else {errMatrix[i][j] = 0;}
                 }
               }
-              mother->updateMomentum(mom, pos, errMatrix, prob);
+              if (mothIPfit) {
+                mother->addExtraInfo("prodVertX", pos.X());
+                mother->addExtraInfo("prodVertY", pos.Y());
+                mother->addExtraInfo("prodVertZ", pos.Z());
+                mother->addExtraInfo("prodVertSxx", RerrMatrix[0][0]);
+                mother->addExtraInfo("prodVertSxy", RerrMatrix[0][1]);
+                mother->addExtraInfo("prodVertSxz", RerrMatrix[0][2]);
+                mother->addExtraInfo("prodVertSyx", RerrMatrix[1][0]);
+                mother->addExtraInfo("prodVertSyy", RerrMatrix[1][1]);
+                mother->addExtraInfo("prodVertSyz", RerrMatrix[1][2]);
+                mother->addExtraInfo("prodVertSzx", RerrMatrix[2][0]);
+                mother->addExtraInfo("prodVertSzy", RerrMatrix[2][1]);
+                mother->addExtraInfo("prodVertSzz", RerrMatrix[2][2]);
+              } else {
+                mother->updateMomentum(mom, pos, errMatrix, prob);
+              }
               return true;
             } else {return false;}
           }

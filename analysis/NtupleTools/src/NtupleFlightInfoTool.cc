@@ -21,13 +21,23 @@ void NtupleFlightInfoTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
 
-  //flight distance
-  m_tree->Branch((strNames[1] + "_FD").c_str(), &m_fD, (strNames[1] + "FD/F").c_str());
-  m_tree->Branch((strNames[1] + "_FDE").c_str(), &m_fDE, (strNames[1] + "_FDE/F").c_str());
+  if (strNames.size() == 2) {
+    //flight distance
+    m_tree->Branch((strNames[1] + "_FD").c_str(), &m_fD, (strNames[1] + "_FD/F").c_str());
+    m_tree->Branch((strNames[1] + "_FDE").c_str(), &m_fDE, (strNames[1] + "_FDE/F").c_str());
 
-  //flight time
-  m_tree->Branch((strNames[1] + "_FT").c_str(), &m_fT, (strNames[1] + "FT/F").c_str());
-  m_tree->Branch((strNames[1] + "_FTE").c_str(), &m_fTE, (strNames[1] + "_FTE/F").c_str());
+    //flight time
+    m_tree->Branch((strNames[1] + "_FT").c_str(), &m_fT, (strNames[1] + "_FT/F").c_str());
+    m_tree->Branch((strNames[1] + "_FTE").c_str(), &m_fTE, (strNames[1] + "_FTE/F").c_str());
+  } else {
+    m_tree->Branch((strNames[0] + "_FD").c_str(), &m_fD, (strNames[0] + "_FD/F").c_str());
+    m_tree->Branch((strNames[0] + "_FDE").c_str(), &m_fDE, (strNames[0] + "_FDE/F").c_str());
+
+    //flight time
+    m_tree->Branch((strNames[0] + "_FT").c_str(), &m_fT, (strNames[0] + "_FT/F").c_str());
+    m_tree->Branch((strNames[0] + "_FTE").c_str(), &m_fTE, (strNames[0] + "_FTE/F").c_str());
+  }
+
 
 }
 
@@ -42,8 +52,8 @@ void NtupleFlightInfoTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  if (selparticles.size() != 2) {
-    B2ERROR("NtupleFlightInfoTool::eval - you must to select exactly 2 particles in the decay (mother and daughter)!");
+  if (selparticles.size() != 1 && selparticles.size() != 2) {
+    B2ERROR("NtupleFlightInfoTool::eval - you must to select 1 (mother) or 2 particles (+ daughter) in the decay!");
     return;
   }
 
@@ -51,7 +61,9 @@ void NtupleFlightInfoTool::eval(const Particle* particle)
   const Particle*  mother = selparticles[0];
 
   //get the DAUGHTER
-  const Particle*  daughter = selparticles[1];
+  const Particle*  daughter = NULL;
+  if (selparticles.size() == 2) daughter = selparticles[1];
+  if (selparticles.size() == 1) daughter = mother;
 
   evalFlightDistance(mother, daughter);
 
@@ -67,11 +79,27 @@ void NtupleFlightInfoTool::evalFlightDistance(const Particle* mother, const Part
 {
 
   TMatrixFSym mumCov = mother->getVertexErrorMatrix();   //order: x,y,z
+  if (mother == daughter) {
+    if (mother->hasExtraInfo("prodVertSxx")) mumCov[0][0] = mother->getExtraInfo("prodVertSxx");
+    if (mother->hasExtraInfo("prodVertSxy")) mumCov[0][0] = mother->getExtraInfo("prodVertSxy");
+    if (mother->hasExtraInfo("prodVertSxz")) mumCov[0][0] = mother->getExtraInfo("prodVertSxz");
+    if (mother->hasExtraInfo("prodVertSyx")) mumCov[0][0] = mother->getExtraInfo("prodVertSyx");
+    if (mother->hasExtraInfo("prodVertSyy")) mumCov[0][0] = mother->getExtraInfo("prodVertSyy");
+    if (mother->hasExtraInfo("prodVertSyz")) mumCov[0][0] = mother->getExtraInfo("prodVertSyz");
+    if (mother->hasExtraInfo("prodVertSzx")) mumCov[0][0] = mother->getExtraInfo("prodVertSzx");
+    if (mother->hasExtraInfo("prodVertSzy")) mumCov[0][0] = mother->getExtraInfo("prodVertSzy");
+    if (mother->hasExtraInfo("prodVertSzz")) mumCov[0][0] = mother->getExtraInfo("prodVertSzz");
+  }
 
   //mother vertex
   double mumvtxX = mother->getX();
   double mumvtxY = mother->getY();
   double mumvtxZ = mother->getZ();
+  if (mother == daughter) {
+    if (mother->hasExtraInfo("prodVertX")) mumvtxX = mother->getExtraInfo("prodVertX");
+    if (mother->hasExtraInfo("prodVertY")) mumvtxY = mother->getExtraInfo("prodVertY");
+    if (mother->hasExtraInfo("prodVertZ")) mumvtxZ = mother->getExtraInfo("prodVertZ");
+  }
 
   //daughter vertex
   double vtxX =  daughter->getX();
@@ -141,11 +169,27 @@ void NtupleFlightInfoTool::evalFlightTime(const Particle* mother, const Particle
 {
 
   TMatrixFSym mumCov = mother->getVertexErrorMatrix();   //order: x,y,z
+  if (mother == daughter) {
+    if (mother->hasExtraInfo("prodVertSxx")) mumCov[0][0] = mother->getExtraInfo("prodVertSxx");
+    if (mother->hasExtraInfo("prodVertSxy")) mumCov[0][0] = mother->getExtraInfo("prodVertSxy");
+    if (mother->hasExtraInfo("prodVertSxz")) mumCov[0][0] = mother->getExtraInfo("prodVertSxz");
+    if (mother->hasExtraInfo("prodVertSyx")) mumCov[0][0] = mother->getExtraInfo("prodVertSyx");
+    if (mother->hasExtraInfo("prodVertSyy")) mumCov[0][0] = mother->getExtraInfo("prodVertSyy");
+    if (mother->hasExtraInfo("prodVertSyz")) mumCov[0][0] = mother->getExtraInfo("prodVertSyz");
+    if (mother->hasExtraInfo("prodVertSzx")) mumCov[0][0] = mother->getExtraInfo("prodVertSzx");
+    if (mother->hasExtraInfo("prodVertSzy")) mumCov[0][0] = mother->getExtraInfo("prodVertSzy");
+    if (mother->hasExtraInfo("prodVertSzz")) mumCov[0][0] = mother->getExtraInfo("prodVertSzz");
+  }
 
   //mother vertex
   double mumvtxX = mother->getX();
   double mumvtxY = mother->getY();
   double mumvtxZ = mother->getZ();
+  if (mother == daughter) {
+    if (mother->hasExtraInfo("prodVertX")) mumvtxX = mother->getExtraInfo("prodVertX");
+    if (mother->hasExtraInfo("prodVertY")) mumvtxY = mother->getExtraInfo("prodVertY");
+    if (mother->hasExtraInfo("prodVertZ")) mumvtxZ = mother->getExtraInfo("prodVertZ");
+  }
 
   //daughter vertex
   double vtxX =  daughter->getX();

@@ -29,7 +29,8 @@ namespace Belle2 {
 
     /*! default constructor */
 
-    ARICHLikelihood(): m_flag(0) {
+    ARICHLikelihood(): m_flag(0)
+    {
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_logL[i] = 0;
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_expPhot[i] = 0;
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_detPhot[i] = 0;
@@ -46,7 +47,8 @@ namespace Belle2 {
                     const double* logL,
                     const int* detPhot,
                     const double* expPhot
-                   ) {
+                   )
+    {
       m_flag = flag;
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
         m_logL[i] = logL[i];
@@ -66,7 +68,8 @@ namespace Belle2 {
      * @param part charged stable particle
      * @return log likelihood
      */
-    float getLogL(const Const::ChargedStable& part) const {
+    float getLogL(const Const::ChargedStable& part) const
+    {
       return m_logL[part.getIndex()];
     }
 
@@ -75,7 +78,8 @@ namespace Belle2 {
      * @param part charged stable particle
      * @return detected photon number
      */
-    float getDetPhot(const Const::ChargedStable& part) const {
+    float getDetPhot(const Const::ChargedStable& part) const
+    {
       return m_detPhot[part.getIndex()];
     }
 
@@ -84,7 +88,8 @@ namespace Belle2 {
      * @param part charged stable particle
      * @return detected photon number
      */
-    float getExpPhot(const Const::ChargedStable& part) const {
+    float getExpPhot(const Const::ChargedStable& part) const
+    {
       return m_expPhot[part.getIndex()];
     }
 

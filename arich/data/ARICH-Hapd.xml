@@ -9,14 +9,16 @@
   <padSize desc="Size of HAPD pad" unit="mm">5.1</padSize>
   <chipGap desc="Gap between the APD chips" unit="mm">1.5</chipGap>
   <padXNum desc="Number of pads in one direction">12</padXNum>
+  <qeScale desc="Scaling factor for quantum efficiency curve for photons internally reflected in HAPD window">0.1</qeScale>
+  <windowAbsorbtion desc="Probability that internally reflected photon in the HAPD window is absorbed (killed)">0.1</windowAbsorbtion>
   <Bottom desc="Parameters of HAPD bottom plane (to imitate APD chips)">
-    <thickness desc="Thickness of the HAPD reflective bottom" unit="mm">0.5</thickness>
+    <thickness desc="Thickness of the HAPD reflective bottom" unit="mm">6.0</thickness>
     <material desc="Material of HAPD reflective bottom">ARICH_Silicon</material> 
     <Surface name="bottomSurface" desc="Surface of APDs is reflective">
       <Properties>
 	<Property name="REFLECTIVITY" unit="eV">
-	  <value energy="1.0">1</value> 
-	  <value energy="5.8">1</value>
+	  <value energy="1.0">0.15</value> 
+	  <value energy="5.8">0.15</value>
 	</Property>
       </Properties>
       <Type>dielectric_metal</Type>

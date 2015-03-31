@@ -35,7 +35,8 @@ namespace Belle2 {
   public:
     //! Default Constructor
     ARICHTracking():
-      atdc(0) {
+      atdc(0)
+    {
       for (int i = 0; i < 4; i++) tdc[i] = 0;
       for (int i = 0; i < 2; i++) {
         slp[i] = 0;
@@ -77,7 +78,8 @@ namespace Belle2 {
     //! Reconstructed position of the hit
     double reco[3];
     //!  Debug printouts
-    void Print() {
+    void Print()
+    {
       printf("----------------------------------------------------------------\n");
       for (int i = 0; i < 4; i++) printf("tdc%d= %d\t", i, tdc[i]); printf("\n");
       for (int i = 0; i < 1; i++) printf("atdc%d= %d\t", i, atdc); printf("\n");

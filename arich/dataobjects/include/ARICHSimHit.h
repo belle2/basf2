@@ -32,7 +32,8 @@ namespace Belle2 {
       m_x(0.0),
       m_y(0.0),
       m_globalTime(0.0),
-      m_energy(0.0) {
+      m_energy(0.0)
+    {
       /*! Does nothing */
     }
 
@@ -49,7 +50,8 @@ namespace Belle2 {
       int moduleID,
       TVector2 position,
       double globalTime,
-      double energy): SimHitBase() {
+      double energy): SimHitBase()
+    {
       m_moduleID = moduleID;
       m_x = (float) position.X();
       m_y = (float) position.Y();

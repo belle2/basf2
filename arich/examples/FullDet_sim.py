@@ -50,7 +50,7 @@ geometry.param('components', [
     'SVD',
     'CDC',
     'ARICH',
-    ])
+])
 
 # Particle gun module
 particlegun = register_module('ParticleGun')
@@ -112,7 +112,7 @@ arichRELATE = register_module('ARICHRelate')
 output = register_module('RootOutput')
 output.param('outputFileName', filename)
 output.param('branchNames', ['ARICHAeroHits', 'ARICHSimHits', 'ExtHits',
-             'ARICHAeroHitsToExtHits'])
+                             'ARICHAeroHitsToExtHits'])
 
 # Do the simulation
 # =============================================================================

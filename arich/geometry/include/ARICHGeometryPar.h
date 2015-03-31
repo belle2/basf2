@@ -124,6 +124,10 @@ namespace Belle2 {
     double getDetectorZPosition();
     //! get number of pads of detector module (in one direction)
     int getDetectorXPadNumber();
+    //! get QE scaling factor for photons internally reflected in HAPD window
+    double getQEScaling();
+    //! get absorbtion probability for photons internally reflected in HAPD window
+    double getWindowAbsorbtion();
     //! set transmission length of "ilayer" aerogel layer
     void setAeroTransLength(int ilayer, double trlen);
     //! set refractive index of "ilayer" aerogel layer
@@ -151,7 +155,8 @@ namespace Belle2 {
 
     //! Return a set of copper ID's
 
-    const std::unordered_set<unsigned int>& getCopperIDs() const {
+    const std::unordered_set<unsigned int>& getCopperIDs() const
+    {
       return m_copperIDs;
     }
 
@@ -188,6 +193,8 @@ namespace Belle2 {
     double m_LambdaFirst;                 /*!< wavelength [nm]: first QE data point */
     double m_LambdaStep;                  /*!< wavelength [nm]: step */
     int m_NpointsQE;                      /*!< number of QE data points */
+    double m_qeScale;                     /*!< QE scale factor for photons internally reflected in HAPD window */
+    double m_windowAbsorbtion;            /*!< absorbtion probability for photons internally reflected in HAPD window */
     double m_QE[MAXPTS_QE];               /*!< quantum efficiency curve */
 
 
@@ -205,7 +212,10 @@ namespace Belle2 {
     //! calculates parameters of all mirror planes (normal vector and point on plane)
 
     //! Calculates mirror positions (normal vectors and on point of every mirror plate) and stores them.
-    void mirrorPositions();
+    void mirrorPositions(const GearDir& content);
+
+    //! Reads mirror plates alignment parameters
+    void readMirrorAlignment(const GearDir& content);
 
     //! Gets mirrors positions directly from xml file (in case of simple "beamtest" geometry).
     void mirrorPositionSimple(const GearDir& content);
@@ -216,7 +226,8 @@ namespace Belle2 {
 
     // vectors holding information on HAPDs and chips and pads positions.
 
-    std::vector<int> m_ncol;         /*!<  m_ncol[i] gives number of detector modules in i-th detector ring (first one is the outer most) */
+    std::vector<int>
+    m_ncol;         /*!<  m_ncol[i] gives number of detector modules in i-th detector ring (first one is the outer most) */
     std::vector<double> m_fDFi;     /*!< angle covered by one detector module in ring */
     std::vector<double> m_fDR;      /*!< minimal distance between detector modules in radial direction */
     int m_nrow;                     /*!< number of detector rings */
@@ -334,6 +345,18 @@ namespace Belle2 {
   {
     return m_detZpos;
   }
+
+  inline double ARICHGeometryPar::getQEScaling()
+  {
+    return m_qeScale;
+  }
+
+  inline double ARICHGeometryPar::getWindowAbsorbtion()
+  {
+    return m_windowAbsorbtion;
+  }
+
+
 
 } // end of namespace Belle2
 

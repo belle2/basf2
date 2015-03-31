@@ -12,6 +12,11 @@
 #include <framework/logging/Logger.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 
+// geant4
+#include <G4OpBoundaryProcess.hh>
+#include <G4ProcessManager.hh>
+
+
 #include <simulation/kernel/UserInfo.h>
 #include <G4Track.hh>
 #include <G4Step.hh>
@@ -55,6 +60,44 @@ namespace Belle2 {
         return false;
       }
 
+      const G4StepPoint& postStep  = *aStep->GetPostStepPoint();
+      const G4ThreeVector& postworldPosition = postStep.GetPosition();
+
+      const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
+      const G4ThreeVector& preworldPosition = preStep.GetPosition();
+
+      // direction of photon (+1 is into hapd)
+      int dir = -1;
+      if (postworldPosition.z() - preworldPosition.z() > 0) dir = +1;
+
+      // trigger only on window geometrical boundary
+      if (dir == 1 && postStep.GetStepStatus() != fGeomBoundary) { return false;}
+      if (dir == -1 && preStep.GetStepStatus() != fGeomBoundary) { return false;}
+
+      if ((track.GetNextVolume())->GetName() == "moduleWall") return false;
+
+      // Check if photon is internally reflected in HAPD window
+      G4OpBoundaryProcessStatus theStatus = Undefined;
+
+      G4ProcessManager* OpManager = G4OpticalPhoton::OpticalPhoton()->GetProcessManager();
+
+      if (OpManager) {
+        G4int MAXofPostStepLoops =
+          OpManager->GetPostStepProcessVector()->entries();
+        G4ProcessVector* fPostStepDoItVector =
+          OpManager->GetPostStepProcessVector(typeDoIt);
+        for (G4int i = 0; i < MAXofPostStepLoops; i++) {
+          G4VProcess* fCurrentProcess = (*fPostStepDoItVector)[i];
+          G4OpBoundaryProcess* opProcess = dynamic_cast<G4OpBoundaryProcess*>(fCurrentProcess);
+          if (opProcess) { theStatus = opProcess->GetStatus(); break;}
+        }
+      }
+
+      // if photon is internally reflected and going backward, do nothing
+      if (theStatus == 3 && dir < 0) return 0;
+
+
+
       // apply quantum efficiency if not yet done
       bool applyQE = true;
       Simulation::TrackInfo* info =
@@ -64,20 +107,24 @@ namespace Belle2 {
         double energy = track.GetKineticEnergy() * Unit::MeV / Unit::eV;
         double qeffi  = m_arichgp->QE(energy) * m_arichgp->getColEffi();
         double fraction = info->getFraction();
+        //correct Q.E. for internally reflected photons
+        if (theStatus == 3) qeffi *= m_arichgp->getQEScaling();
         if (gRandom->Uniform() * fraction > qeffi) {
-          track.SetTrackStatus(fStopAndKill);
+          // apply possible absorbtion in HAPD window (for internally reflected photons only)
+          if (theStatus == 3 && gRandom->Uniform() < m_arichgp->getWindowAbsorbtion()) track.SetTrackStatus(fStopAndKill);
           return false;
         }
       }
 
-      //Get step information
-      const G4StepPoint& preStep  = *aStep->GetPreStepPoint();
-      //Get world position
-      const G4ThreeVector& worldPosition = preStep.GetPosition();
-      //Transform to local position
-      const G4ThreeVector localPosition = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
       //Get module ID number
-      const G4int moduleID = preStep.GetTouchableHandle()->GetReplicaNumber(1);
+      const G4int moduleID = dir > 0 ? postStep.GetTouchableHandle()->GetReplicaNumber(0) :
+                             preStep.GetTouchableHandle()->GetReplicaNumber(1);
+
+      //Transform to local position
+      G4ThreeVector localPosition = dir > 0 ? postStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(
+                                      postworldPosition) :
+                                    preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(preworldPosition);
+
       //Get photon energy
       const G4double energy = track.GetKineticEnergy() / CLHEP::eV;
 

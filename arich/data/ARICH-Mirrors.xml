@@ -4,7 +4,8 @@
   <nMirrors desc="Mirrors are placed as regular nMirrors-sided polygon">18</nMirrors>
   <outerRadius desc="Radius of outscribed circle to mirrors polygon" unit="mm">1123</outerRadius>
   <mirrorThickness desc="Thickness of mirror plates" unit="mm">3</mirrorThickness>
-  <mirrorLength desc="Length of mirror plates" unit="mm">148</mirrorLength>
+  <mirrorWidth desc="Width of mirror plates" unit="mm">148</mirrorWidth>
+  <mirrorLength desc="Length of mirror plates" unit="mm">380</mirrorLength>
   <Zposition desc="position of mirrors in Z direction (starting point)" unit="mm">1710</Zposition>
   <startAngle desc="Angle of the first corner of mirror plates polygon" unit="deg">10.0</startAngle>
   <Surface>
@@ -27,4 +28,96 @@
     <Finish>polished</Finish>
     <Model>glisur</Model>
   </Surface>
+  <Alignment>
+    <Plate id="1">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="2">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="3">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="4">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="5">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="6">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="7">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="8">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="9">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="10">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="11">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="12">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="13">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="14">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="15">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="16">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="17">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+    <Plate id="18">
+      <dr unit="mm" >0.00000000e+00</dr> 
+      <dphi unit="deg" >0.00000000e+00</dphi> 
+      <dtheta unit="deg" >0.00000000e+00</dtheta> 
+    </Plate>
+  </Alignment>
 </Mirrors>

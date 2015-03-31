@@ -34,7 +34,8 @@ namespace Belle2 {
       m_z(0.0),
       m_px(0.0),
       m_py(0.0),
-      m_pz(0.0) {
+      m_pz(0.0)
+    {
       /*! does nothing */
     }
 
@@ -47,7 +48,8 @@ namespace Belle2 {
     */
     ARICHAeroHit(int particleId,
                  TVector3 position,
-                 TVector3 momentum) {
+                 TVector3 momentum)
+    {
       m_particleID = particleId;
       m_x = (float) position.x();
       m_y = (float) position.y();

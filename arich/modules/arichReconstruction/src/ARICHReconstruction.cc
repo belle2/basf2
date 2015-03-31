@@ -308,7 +308,7 @@ namespace Belle2 {
 
     if (first) {
       const Const::ParticleSet set = Const::chargedStableSet;
-      for (const Const::ChargedStable & pdgIter : set) {
+      for (const Const::ChargedStable& pdgIter : set) {
         p_mass[pdgIter.getIndex()] =  pdgIter.getMass();
       }
 
@@ -464,7 +464,8 @@ namespace Belle2 {
             // calculate fi_ch for a given track refl
             TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
-            if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel) < 0)  continue;
+            if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &refractiveInd[iAerogel], &zaero[iAerogel],
+                                nAerogelLayers - iAerogel) < 0)  continue;
 
             TVector3 dirch = TransformToFixed(edir) * photonDirection;
             double fi_cer = dirch.Phi();
@@ -472,7 +473,8 @@ namespace Belle2 {
 
             if (th_cer > 0.5 /*|| th_cer < 0.05*/) continue;
 
-            if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getPDGEncoding(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(), epoint.x(), epoint.y(), track->getReconstructedMomentum());
+            if (ncount < m_storeHist) m_hitstuple->Fill(ncount, track->getPDGEncoding(), iAerogel, mirr, th_cer, fi_cer, hitpos.x(), hitpos.y(),
+                                                          epoint.x(), epoint.y(), track->getReconstructedMomentum());
             if (m_beamtest) continue;
             if (fi_cer < 0) fi_cer += 2 * M_PI;
             double fii = fi_cer;
@@ -497,7 +499,8 @@ namespace Belle2 {
               if (!m_arichGeoParameters->isSimple()) {
                 detector_position = FastTracking(photonDirection1, epoint, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel);
               } else {
-                detector_position = FastTrackingSimple(photonDirection1, epoint, &refractiveInd[iAerogel], &zaero[iAerogel], nAerogelLayers - iAerogel);
+                detector_position = FastTrackingSimple(photonDirection1, epoint, &refractiveInd[iAerogel], &zaero[iAerogel],
+                                                       nAerogelLayers - iAerogel);
               }
               TVector3 meanr             = detector_position - epoint;
               double   path              = meanr.Mag();
@@ -570,7 +573,8 @@ namespace Belle2 {
         static const Const::ParticleSet set =  Const::chargedStableSet;
         Const::ParticleType part = set.find(abs(track->getPDGEncoding()));
         int id = part.getIndex();
-        m_tracktuple->Fill(track->getPDGEncoding(), track->getReconstructedMomentum(), nSig[id][nAerogelLayers], acceptance[id][0], nDetPhotons[id], logL[0], logL[1], logL[2], logL[3], logL[4]);
+        m_tracktuple->Fill(track->getPDGEncoding(), track->getReconstructedMomentum(), nSig[id][nAerogelLayers], acceptance[id][0],
+                           nDetPhotons[id], logL[0], logL[1], logL[2], logL[3], logL[4]);
       }
 
     } // for (unsigned  int i=0; i< nTracks; i++){

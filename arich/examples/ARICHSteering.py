@@ -89,7 +89,7 @@ geometry.param('components', [
     'SVD',
     'CDC',
     'ARICH',
-    ])
+])
 # If you comment this out all subdetectors will be built. If you want to
 # include just some of them do for example ['ARICH','TOP','CDC'].
 # ============================================================================

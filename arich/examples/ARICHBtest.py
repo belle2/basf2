@@ -39,7 +39,7 @@ parser.add_option(
     default=outroot,
     help='Output filename',
     metavar='FILE',
-    )
+)
 
 parser.add_option('-n', '--neve', dest='neve', default=20000,
                   help='Number of events to process')
@@ -125,7 +125,7 @@ g4sim.param('EnableVisualization', True)
 # This creates VRML file,
 # change VRML2FILE to HepRepFile to create HepRep file.
 g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-            '/vis/scene/add/axes 0 0 0 100 mm'])
+                           '/vis/scene/add/axes 0 0 0 100 mm'])
 
 # Saves the geometry as a Root file
 geosaver = register_module('ExportGeometry')

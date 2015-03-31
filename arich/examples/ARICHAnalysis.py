@@ -52,7 +52,7 @@ geometry.param('components', [
     'SVD',
     'CDC',
     'ARICH',
-    ])
+])
 main.add_module(geometry)
 
 # Particle gun module

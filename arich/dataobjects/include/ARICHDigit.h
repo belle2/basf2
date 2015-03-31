@@ -29,7 +29,8 @@ namespace Belle2 {
     ARICHDigit():
       m_moduleID(-1),
       m_channelID(-1),
-      m_globalTime(0.0) {
+      m_globalTime(0.0)
+    {
       /*! does nothing */
     }
 
@@ -39,14 +40,16 @@ namespace Belle2 {
       \param channelID Id number of hit channel
       \param globalTime global time of hit
      */
-    ARICHDigit(int moduleID, int channelID, double globalTime) {
+    ARICHDigit(int moduleID, int channelID, double globalTime)
+    {
       m_moduleID = moduleID;
       m_channelID = channelID;
       m_globalTime = (float) globalTime;
     }
 
     //! Destructor
-    ~ARICHDigit() {
+    ~ARICHDigit()
+    {
       /*! Does nothing */
     }
 

@@ -452,7 +452,9 @@ namespace Belle2 {
         //----------------------------------------
         r[1]  = -r.y();
         dir[1] = -dir.y();
-        B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<   rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<   dir.z());
+        B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<
+                rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<
+                dir.z());
 
         // Add new ARIHCAeroHit to datastore
         arichAeroHits.appendNew(particleId, r, dir);
@@ -507,7 +509,8 @@ namespace Belle2 {
     if (m_events % 1000 == 0)  {
       time_t m_time;
       time(&m_time);
-      B2INFO("neve= [" << m_events << "] in " << (double)(m_time - m_timestart) / 60. << " min (" << int(m_time - m_timestart) << "s) from " << *m_runCurrent);
+      B2INFO("neve= [" << m_events << "] in " << (double)(m_time - m_timestart) / 60. << " min (" << int(
+               m_time - m_timestart) << "s) from " << *m_runCurrent);
 
     }
     m_events++;
@@ -589,7 +592,8 @@ namespace Belle2 {
     }
     for (int i = 0; i < 4; i++) {
       //ARICHTracking* w = &m_mwpc[i];
-      B2INFO(i << " a1=" << m_mwpc[i].tdc[0] << " a2="  << m_mwpc[i].tdc[1] << " a3=" << m_mwpc[i].tdc[2] << " a2="  << m_mwpc[i].tdc[3] << " A=" << m_mwpc[i].atdc);
+      B2INFO(i << " a1=" << m_mwpc[i].tdc[0] << " a2="  << m_mwpc[i].tdc[1] << " a3=" << m_mwpc[i].tdc[2] << " a2="  << m_mwpc[i].tdc[3]
+             << " A=" << m_mwpc[i].atdc);
     }
 
   }

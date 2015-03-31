@@ -78,8 +78,10 @@ namespace Belle2 {
     addParam("inputExtHits", m_inputExtHits, "ExtHits collection name", string(""));
     addParam("outputLikelihoods", m_outputLikelihoods, "ARICHLikelihoods collection name",  string(""));
     addParam("outfileName", m_outfileName, "File to store individual photon information",  string("thc.root"));
-    addParam("trackPositionResolution", m_trackPositionResolution, "Resolution of track position on aerogel plane (for additional smearing of MC tracks)", 1.0 * Unit::mm);
-    addParam("trackAngleResolution", m_trackAngleResolution, "Resolution of track direction angle on aerogel plane (for additional smearing of MC tracks)", 2.0 * Unit::mrad);
+    addParam("trackPositionResolution", m_trackPositionResolution,
+             "Resolution of track position on aerogel plane (for additional smearing of MC tracks)", 1.0 * Unit::mm);
+    addParam("trackAngleResolution", m_trackAngleResolution,
+             "Resolution of track direction angle on aerogel plane (for additional smearing of MC tracks)", 2.0 * Unit::mrad);
     addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
     addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.010 * Unit::rad);
     addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);

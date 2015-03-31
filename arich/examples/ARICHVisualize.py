@@ -80,9 +80,9 @@ simulation.param('PhotonFraction', 0.3)
 # vrml viewer (freewrl,...)
 simulation.param('EnableVisualization', True)
 simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-                 '/vis/scene/add/axes 0 0 0 100 mm',
-                 '/vis/scene/add/trajectories smooth',
-                 '/vis/modeling/trajectories/create/drawByCharge'])
+                                '/vis/scene/add/axes 0 0 0 100 mm',
+                                '/vis/scene/add/trajectories smooth',
+                                '/vis/modeling/trajectories/create/drawByCharge'])
 # =============================================================================
 
 # Do the simulation

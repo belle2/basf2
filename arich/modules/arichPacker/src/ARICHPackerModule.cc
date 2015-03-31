@@ -90,7 +90,7 @@ namespace Belle2 {
 
     vector<const ARICHDigit*>* sortedDigits = new vector<const ARICHDigit*>[nModules];
 
-    for (const auto & digit : digits) {
+    for (const auto& digit : digits) {
       int boardID = digit.getModuleID();
       sortedDigits[boardID - 1].push_back(&digit);
     }
@@ -100,7 +100,7 @@ namespace Belle2 {
 
     int buffer[4][bufferDim];
 
-    for (const auto & copperID : m_arichgp->getCopperIDs()) {
+    for (const auto& copperID : m_arichgp->getCopperIDs()) {
       int bufferSize[4] = {0, 0, 0, 0};
       for (int finesse = 0; finesse < 4; finesse++) {
 
@@ -136,7 +136,7 @@ namespace Belle2 {
             buf[i] = unsigned(18 * 4); // 144ch * 4bit
             i++;
             // write data
-            for (const auto & digit : sortedDigits[boardID - 1]) {
+            for (const auto& digit : sortedDigits[boardID - 1]) {
               unsigned chn = digit->getChannelID();
               unsigned chan_n = chn / 8;
               unsigned chan_i = chn % 8;
@@ -151,7 +151,7 @@ namespace Belle2 {
             i++;
             int j = 1;
             // write data
-            for (const auto & digit : sortedDigits[boardID - 1]) {
+            for (const auto& digit : sortedDigits[boardID - 1]) {
               unsigned chn = digit->getChannelID();
               unsigned chn_data =  m_bitMask + (chn << 8);
               if (j % 2 == 1) buf[i] = (chn_data << 16);

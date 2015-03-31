@@ -33,7 +33,7 @@ parser.add_option(
     default=outroot,
     help='Output filename',
     metavar='FILE',
-    )
+)
 
 parser.add_option('-n', '--neve', dest='neve', default=20000,
                   help='Number of events to process')

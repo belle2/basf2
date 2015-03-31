@@ -55,7 +55,7 @@ namespace Belle2 {
       mirrorPositionSimple(mirrorcontent);
     } else {
       modulesPosition(content);
-      mirrorPositions();
+      mirrorPositions(content);
       frontEndMapping(content);
     }
     chipLocPosition();
@@ -103,6 +103,8 @@ namespace Belle2 {
     m_LambdaFirst = 0.;
     m_LambdaStep = 0.;
     m_NpointsQE = 0;
+    m_qeScale = 0.;
+    m_windowAbsorbtion = 0.;
     for (int i = 0; i < MAXPTS_QE; i++) {m_QE[i] = 0.;}
   }
 
@@ -121,6 +123,8 @@ namespace Belle2 {
     m_padSize = detParams.getLength("Module/padSize");
     m_chipGap = detParams.getLength("Module/chipGap");
     m_detZpos = detParams.getLength("Plane/zPosition");
+    m_qeScale = detParams.getDouble("Module/qeScale");
+    m_windowAbsorbtion = detParams.getDouble("Module/windowAbsorbtion");
     string Type = content.getString("@type", "");
     if (Type == "beamtest") return;
     m_detInnerRadius = detParams.getLength("Plane/tubeInnerRadius");
@@ -157,7 +161,7 @@ namespace Belle2 {
 
     GearDir mapping(content, "FrontEndMapping");
 
-    for (const GearDir & merger : mapping.getNodes("Merger")) {
+    for (const GearDir& merger : mapping.getNodes("Merger")) {
       unsigned mergerID = (unsigned) merger.getInt("@id");
 
       auto testMer = m_mergerIDs.find(mergerID);
@@ -169,7 +173,7 @@ namespace Belle2 {
       m_mergerIDs.insert(mergerID);
 
       std::vector<unsigned> boardIDs;
-      for (const GearDir & board : merger.getNodes("FEboards/FEboard")) {
+      for (const GearDir& board : merger.getNodes("FEboards/FEboard")) {
         unsigned boardID = board.getInt();
         auto testBor = m_boardIDs.find(boardID);
         if (testBor != m_boardIDs.end()) {
@@ -437,14 +441,16 @@ namespace Belle2 {
     }
   }
 
-  void ARICHGeometryPar::mirrorPositions()
+  void ARICHGeometryPar::mirrorPositions(const GearDir& content)
   {
     double rmir = m_mirrorOuterRad * cos(M_PI / m_nMirrors) - m_mirrorThickness;
     for (int i = 0; i < m_nMirrors; i++) {
-      TVector3 norm(cos(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), sin(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), 0);
+      TVector3 norm(cos(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng),
+                    sin(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), 0);
       m_mirrornorm.push_back(norm);
       m_mirrorpoint.push_back(rmir * norm);
     }
+    readMirrorAlignment(content);
   }
 
   void ARICHGeometryPar::mirrorPositionSimple(const GearDir& content)
@@ -526,5 +532,22 @@ namespace Belle2 {
     int idx = ch / 32;
     return    m_DetectorMask[idx] & (1 << bit);
   }
+
+  void ARICHGeometryPar::readMirrorAlignment(const GearDir& content)
+  {
+    GearDir modParams(content, "Mirrors/Alignment");
+
+    BOOST_FOREACH(const GearDir & plate, modParams.getNodes("Plate")) {
+      int id = atoi(plate.getString("@id").c_str());
+      double dr = plate.getLength("dr");
+      double dphi = plate.getAngle("dphi");
+      double dtheta = plate.getAngle("dtheta");
+      m_mirrorpoint[id - 1].SetMag(m_mirrorpoint[id - 1].Mag() + dr);
+      m_mirrornorm[id - 1].SetTheta(m_mirrornorm[id - 1].Theta() + dtheta);
+      m_mirrornorm[id - 1].SetPhi(m_mirrornorm[id - 1].Phi() + dphi);
+    }
+  }
+
+
 
 } // namespace Belle2

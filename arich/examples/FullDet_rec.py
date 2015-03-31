@@ -38,11 +38,11 @@ gearbox = register_module('Gearbox')
 
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['ARICH'])  #    'MagneticField',
-                                         #    'BeamPipe',
-                                         #    'PXD',
-                                         #    'SVD',
-                                         #    'CDC',
+geometry.param('Components', ['ARICH'])  # 'MagneticField',
+#    'BeamPipe',
+#    'PXD',
+#    'SVD',
+#    'CDC',
 
 # ARICH digitization module
 arichDIGI = register_module('ARICHDigitizer')

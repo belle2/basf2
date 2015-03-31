@@ -238,7 +238,8 @@ namespace Belle2 {
 
       // check that module window material has specified refractive index
       double wref = getAvgRINDEX(windowMaterial);
-      if (!wref) B2WARNING("Material '" << winMat << "', required for ARICH photon detector window as no specified refractive index. Continuing, but no photons in ARICH will be detected.");
+      if (!wref) B2WARNING("Material '" << winMat <<
+                             "', required for ARICH photon detector window as no specified refractive index. Continuing, but no photons in ARICH will be detected.");
       ARICHGeometryPar* m_arichgp = ARICHGeometryPar::Instance();
       m_arichgp->setWindowRefIndex(wref);
       // get module dimensions
@@ -250,15 +251,18 @@ namespace Belle2 {
       double botThick =  Module.getLength("Bottom/thickness") / Unit::mm;
 
       // some trivial checks of overlaps
-      if (sensXsize > modXsize - 2 * wallThick) B2FATAL("ARICH photon detector module: Sensitive surface is too big. Doesn't fit into module box.");
-      if (winThick + botThick > modZsize) B2FATAL("ARICH photon detector module: window + bottom thickness larger than module thickness.");
+      if (sensXsize > modXsize - 2 * wallThick)
+        B2FATAL("ARICH photon detector module: Sensitive surface is too big. Doesn't fit into module box.");
+      if (winThick + botThick > modZsize)
+        B2FATAL("ARICH photon detector module: window + bottom thickness larger than module thickness.");
 
       // module master volume
       G4Box* moduleBox = new G4Box("Box", modXsize / 2., modXsize / 2., modZsize / 2.);
       G4LogicalVolume* lmoduleBox = new G4LogicalVolume(moduleBox, boxFill, "moduleBox");
 
       // build and place module wall
-      G4Box* tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick, modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
+      G4Box* tempBox = new G4Box("tempBox", modXsize / 2. - wallThick, modXsize / 2. - wallThick,
+                                 modZsize / 2. + 0.1); // Dont't care about "+0.1", needs to be there.
       G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", moduleBox, tempBox);
       G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "moduleWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
@@ -379,7 +383,8 @@ namespace Belle2 {
       double zoffset = boxParams.getLength("beamcenter/z")  * CLHEP::mm  / Unit::mm - zBox / 2.;
       G4ThreeVector roffset(xoffset, yoffset, zoffset);
 
-      TVector3 sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"), boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
+      TVector3 sh(boxParams.getLength("beamcenter/x"), boxParams.getLength("beamcenter/y"),
+                  boxParams.getLength("beamcenter/z") - boxParams.getLength("zSize") / 2.);
       m_arichbtgp->setOffset(sh);
 
       string boxMat = boxParams.getString("material");
@@ -415,7 +420,8 @@ namespace Belle2 {
 
         G4Box* mwpcBox = new G4Box("MwpcBox", x / 2., y / 2., z / 2.);
         G4LogicalVolume* mwpcVol = new G4LogicalVolume(mwpcBox, Materials::get(mwpc.getString("material"))  , "ARICH.mwpc");
-        new G4PVPlacement(G4Transform3D(G4RotationMatrix(), G4ThreeVector(px, py, pz) + roffset), mwpcVol, "ARICH.mwpc", topVolume, false, 1);
+        new G4PVPlacement(G4Transform3D(G4RotationMatrix(), G4ThreeVector(px, py, pz) + roffset), mwpcVol, "ARICH.mwpc", topVolume, false,
+                          1);
         //setVisibility(*mwpc, true);
 
         int id = mwpc.getInt("@id", -1);
@@ -483,7 +489,8 @@ namespace Belle2 {
       new G4PVPlacement(frameTransformation, lenvBox, "ARICH.frame", topVolume, false, 1);
       //setVisibility(*lenvBox, false);
 
-      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / CLHEP::mm, frameOrigin0.y() *  Unit::mm / CLHEP::mm,  frameOrigin0.z() *  Unit::mm / CLHEP::mm);
+      TVector3 rotationCenter =  TVector3(frameOrigin0.x() *  Unit::mm / CLHEP::mm, frameOrigin0.y() *  Unit::mm / CLHEP::mm,
+                                          frameOrigin0.z() *  Unit::mm / CLHEP::mm);
       m_arichbtgp->setFrameRotation(m_rotation1 * CLHEP::degree);
       m_arichbtgp->setRotationCenter(rotationCenter);
 

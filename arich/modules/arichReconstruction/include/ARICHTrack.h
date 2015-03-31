@@ -47,7 +47,8 @@ namespace Belle2 {
       m_trackID(-1),
       m_extHitID(-1),
       m_aeroIndex(-1),
-      m_flag(1) {
+      m_flag(1)
+    {
       /*! does nothing */
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i] = 0;
@@ -83,7 +84,8 @@ namespace Belle2 {
       m_trackID(trackID),
       m_extHitID(-1),
       m_aeroIndex(-1),
-      m_flag(1) {
+      m_flag(1)
+    {
       for (int i = 0; i < c_noOfHypotheses; i++) {
         m_lkh[i]  = 0;
         m_expectedPhotons[i] = 0;
@@ -103,7 +105,8 @@ namespace Belle2 {
     ARICHTrack(const ExtHit* extHit, int charge, int pdgCode, int trackID, int aeroHitIndex);
 
     //! destructor
-    ~ARICHTrack() {
+    ~ARICHTrack()
+    {
       /*! does nothing */
     }
 
@@ -188,7 +191,8 @@ namespace Belle2 {
 
     //! sets the reconstructed value of track parameters.
     // "r" is position of track, "dir" direction and "p" momentum of track on aerogel plane.
-    void   setReconstructedValues(TVector3 r, TVector3 dir, double p) {
+    void   setReconstructedValues(TVector3 r, TVector3 dir, double p)
+    {
       m_reconstructedPosition = r;
       m_reconstructedDirection = dir;
       m_reconstructedMomentum = p;
@@ -210,7 +214,8 @@ namespace Belle2 {
     const TVector3& getMeanEmissionDirection(int) const {return m_reconstructedDirection;};
 
     //! Returns track position at the aergel exit (exit from last layer).
-    const TVector3 getAerogelExit(void) const {
+    const TVector3 getAerogelExit(void) const
+    {
       return getAerogelExit(2);
     }
 
@@ -221,7 +226,8 @@ namespace Belle2 {
     const TVector3 getAerogelInput(int i) const ;
 
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
-    const TVector3& getDirectionAtZ(double) const {
+    const TVector3& getDirectionAtZ(double) const
+    {
       return m_originalDirection;
     }
 

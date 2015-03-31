@@ -1,7 +1,7 @@
 #ifndef _Belle2_ZipDeflater_hh
 #define _Belle2_ZipDeflater_hh
 
-#include "daq/slc/system/BufferedWriter.h"
+#include <daq/slc/system/BufferedWriter.h>
 
 #include <string>
 #include <zlib.h>

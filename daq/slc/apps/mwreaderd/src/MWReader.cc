@@ -75,6 +75,7 @@ void MWReader::init() throw(IOException)
 
 void MWReader::update() throw(IOException)
 {
+  m_index = 0;
   for (int ic = 0 ; ic < MW100NUM ; ic++) {
     sprintf(m_buf, "FD0,001,030\r\n");
     int len = strlen(m_buf);
@@ -202,9 +203,9 @@ void MWReader::read(int ic, int mode) throw(IOException)
 
       //printf("DATA:%s  %d *%s *%s %f %d \n", cond, chan,
       //       alarm, unit, value, m_index );
-      strncpy(m_reader->data[m_index].cond, cond, 1);
-      strncpy(m_reader->data[m_index].alarm, alarm, 4);
-      strncpy(m_reader->data[m_index].unit, unit, 6);
+      memcpy(m_reader->data[m_index].cond, cond, 1);
+      memcpy(m_reader->data[m_index].alarm, alarm, 4);
+      memcpy(m_reader->data[m_index].unit, unit, 6);
       m_reader->data[m_index].chan = chan;
       m_reader->data[m_index].value = value;
       m_index++;
@@ -223,9 +224,9 @@ void MWReader::read(int ic, int mode) throw(IOException)
       chan = ic * 100 + 1000 + chan;
       //printf("DATA:%s  %d *%s *%s %f \n", cond, chan,
       //       alarm, unit, value );
-      strncpy(m_reader->data[m_index].cond, cond, 2);
-      strncpy(m_reader->data[m_index].alarm, alarm, 5);
-      strncpy(m_reader->data[m_index].unit, unit, 7);
+      memcpy(m_reader->data[m_index].cond, cond, 2);
+      memcpy(m_reader->data[m_index].alarm, alarm, 5);
+      memcpy(m_reader->data[m_index].unit, unit, 7);
       m_reader->data[m_index].chan = chan;
       m_reader->data[m_index].value = value;
       m_index++;
@@ -251,9 +252,9 @@ void MWReader::read(int ic, int mode) throw(IOException)
           chan = ic * 100 + 2000 + chan;
           //  printf("DATA:%s  %d *%s *%s %f %d\n", cond, chan,
           //  alarm, unit, value, ival2 );
-          strncpy(m_reader->data[m_index].cond, cond, 2);
-          strncpy(m_reader->data[m_index].alarm, alarm, 5);
-          strncpy(m_reader->data[m_index].unit, unit, 7);
+          memcpy(m_reader->data[m_index].cond, cond, 2);
+          memcpy(m_reader->data[m_index].alarm, alarm, 5);
+          memcpy(m_reader->data[m_index].unit, unit, 7);
           m_reader->data[m_index].chan = chan;
           m_reader->data[m_index].value = value;
           m_index++;

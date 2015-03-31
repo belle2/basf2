@@ -12,7 +12,7 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lz -lrt
+LIBS    += -lm -lpthread -ldl -lrt
 ifneq ($(NOT_USE_PSQL),yes)
 LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
 endif

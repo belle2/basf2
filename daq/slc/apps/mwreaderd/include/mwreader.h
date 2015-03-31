@@ -3,16 +3,15 @@
 
 #define MWMAXITEM 600
 
-const int mwreader_revision = 1;
+const int mwreader_revision = 2;
 
 struct mwreader {
   struct mwdata {
-    char unit[8];
-    char alarm[8];
-    char cond[4];
     int chan;
     float value;
-    int reserved;
+    char unit[8];
+    char alarm[8];
+    char cond[8];
   } data[MWMAXITEM];
   int date;
   int time;

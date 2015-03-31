@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     std::string name = config.get("nsm.nodename");
     int timeout = config.getInt("timeout");
     if (timeout <= 0) timeout = 5;
-    NSMNodeDaemon(new MWReaderCallback(name), host, port).run();
+    NSMNodeDaemon(new MWReaderCallback(name, timeout), host, port).run();
   }
   return 0;
 }

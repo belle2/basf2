@@ -17,10 +17,8 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
                                          int port) throw()
   : DBInterface(host, database, user, password, port)
 {
-#ifndef NOT_USE_PSQL
   m_sq_conn = NULL;
   m_sq_result = NULL;
-#endif
 }
 
 void PostgreSQLInterface::connect() throw(DBHandlerException)
@@ -60,6 +58,8 @@ throw(DBHandlerException)
     throw (DBHandlerException("Failed to execute command : %s (%s)",
                               command, PQerrorMessage(m_sq_conn)));
   }
+#else
+  throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
@@ -90,6 +90,8 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
     m_record_v.push_back(record);
   }
   return m_record_v;
+#else
+  throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
@@ -100,6 +102,8 @@ void PostgreSQLInterface::clear() throw()
     PQclear(m_sq_result);
   }
   m_sq_result = NULL;
+#else
+  throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
@@ -111,6 +115,8 @@ void PostgreSQLInterface::close() throw(DBHandlerException)
     PQfinish(m_sq_conn);
     m_sq_conn = NULL;
   }
+#else
+  throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
@@ -121,6 +127,8 @@ bool PostgreSQLInterface::checkTable(const std::string& tablename) throw(DBHandl
           tablename.c_str());
   DBRecordList ret(loadRecords());
   return ret.size() > 0;
+#else
+  throw (DBHandlerException("libpg is not available"));
 #endif
 }
 
@@ -138,5 +146,7 @@ throw(DBHandlerException)
                                               ret[i].get("typname")));
   }
   return name_m;
+#else
+  throw (DBHandlerException("libpg is not available"));
 #endif
 }

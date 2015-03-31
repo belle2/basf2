@@ -1,8 +1,8 @@
 #include "daq/slc/apps/dqmviewd/HistSender.h"
 
 #include "daq/slc/apps/dqmviewd/DQMViewCallback.h"
+#include "daq/slc/apps/daqmviewd/ZipDeflater.h"
 
-#include <daq/slc/system/ZipDeflater.h>
 #include <daq/slc/system/BufferedWriter.h>
 #include <daq/slc/system/StreamSizeCounter.h>
 #include <daq/slc/system/TCPSocketWriter.h>

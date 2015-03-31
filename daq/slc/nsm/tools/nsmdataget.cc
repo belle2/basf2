@@ -4,6 +4,8 @@
 
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/ConfigFile.h>
+
 #include <cstdlib>
 
 using namespace Belle2;
@@ -15,7 +17,10 @@ int main(int argc, char** argv)
     return 1;
   }
   NSMCommunicator com;
-  com.init(NSMNode(argv[1]), "b2slow2.kek.jp", 9122);
+  ConfigFile config("slowcontrol");
+  const std::string hostname = config.get("nsm.host");
+  const int port = config.getInt("nsm.port");
+  com.init(NSMNode(argv[1]), hostname, port);
   NSMData data(argv[2], argv[3], -1);
   data.open(com);
   DBField::Type type;

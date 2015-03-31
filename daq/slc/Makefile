@@ -1,4 +1,4 @@
-.PHONY : all clean tools base system database nsm readout copper dqm runcontrol hvcontrol apps/nsm2socket apps/runcontrold apps apps/rocontrold apps/cprcontrold apps/rctemplated 
+.PHONY : all clean tools base system database nsm readout copper dqm runcontrol hvcontrol
 
 SRCDIR=./src
 INCDIR=./include/daq/slc/
@@ -6,15 +6,22 @@ LIBDIR=./lib
 BINDIR=./bin
 TMPDIR=./tmp
 
-APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/rctemplated 
-
-SUBPACKAGES = base system database nsm readout copper runcontrol hvcontrol $(APPS)
+SUBPACKAGES = base system database nsm readout copper runcontrol hvcontrol
 
 all: copyinc $(SUBPACKAGES) tool
 	@ make -C tools/
 	@ install -m 755 -p ./tools/*.sh ${BINDIR}/
 
 full: all
+
+runcontrold:
+	@ make -C apps/runcontrold
+
+nsm2socket:
+	@ make -C apps/nsm2socket
+
+rctemplated:
+	@ make -C apps/rctemplated
 
 copyinc:
 	@ mkdir -p bin

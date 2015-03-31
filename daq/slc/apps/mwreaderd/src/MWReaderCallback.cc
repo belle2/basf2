@@ -43,12 +43,18 @@ void MWReaderCallback::timeout(NSMCommunicator&) throw()
           add(new NSMVHandlerText(vname + "unit", true, false, mdata.unit));
           add(new NSMVHandlerText(vname + "alarm", true, false, mdata.alarm));
           add(new NSMVHandlerText(vname + "cond", true, false, mdata.cond));
+          add(new NSMVHandlerFloat(vname + "value", true, false, mdata.value));
+          add(new NSMVHandlerInt(vname + "chan", true, false, mdata.chan));
         } else {
           set(vname + "unit", mdata.unit);
+          // Send error (or warning) when string has value
           set(vname + "alarm", mdata.alarm);
           set(vname + "cond", mdata.cond);
+          set(vname + "value", mdata.value);
+          set(vname + "chan", mdata.chan);
         }
       }
+      LogFile::debug("count=%llu", count);
       count++;
     }
   } catch (const IOException& e) {

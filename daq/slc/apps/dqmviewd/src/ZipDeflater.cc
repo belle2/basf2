@@ -1,7 +1,9 @@
-#include "daq/slc/system/ZipDeflater.h"
-#include "daq/slc/system/LogFile.h"
+#include "daq/slc/apps/dqmviewd/ZipDeflater.h"
 
-#include <stdio.h>
+#include <daq/slc/system/LogFile.h>
+
+#include <cstdio>
+
 #include <zlib.h>
 
 using namespace Belle2;

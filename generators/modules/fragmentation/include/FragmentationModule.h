@@ -53,7 +53,7 @@ namespace Belle2 {
     FragmentationModule();
 
     /** Destructor. */
-    virtual ~FragmentationModule() {}
+    virtual ~FragmentationModule();
 
     virtual void event();
 

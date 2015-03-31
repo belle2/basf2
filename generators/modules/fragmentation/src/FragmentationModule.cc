@@ -1,3 +1,4 @@
+
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -47,7 +48,7 @@ REG_MODULE(Fragmentation)
 FragmentationModule::FragmentationModule() : Module()
 {
   //Set module properties
-  setDescription("Fragmention of light (u/d/s/c) quarks using PYTHIA8");
+  setDescription("Fragmention of (u/d/s/c) quarks using PYTHIA8");
 
   //Parameter definition
   addParam("ParameterFile", m_parameterfile, "Input parameter file for PYTHIA",
@@ -57,6 +58,13 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string("../modules/fragmentation/data/ccbar.dec"));
+}
+
+
+FragmentationModule::~FragmentationModule()
+{
+  // print internal pythia error statistics
+  pythia.stat();
 }
 
 //-----------------------------------------------------------------
@@ -71,7 +79,7 @@ void FragmentationModule::initialize()
   // with one line per change. This should be done between the creation of the Pythia object
   // and the init call for it.
 
-  // Switch off ProcessLevel (skips PartonLevel as well)
+  // Switch off ProcessLevel
   pythia.readString("ProcessLevel:all = off");
 
   // Read the PYTHIA input file, overrides parameters
@@ -86,10 +94,13 @@ void FragmentationModule::initialize()
 
   // Set EvtGen (after pythia.init())
   evtgen = 0;
+//   EvtExternalGenList genlist; //COMMENT IN FOR PYTHIA8.206+
+//   EvtAbsRadCorr *radCorrEngine = genlist.getPhotosModel(); //COMMENT IN FOR PYTHIA8.206+
 
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
-    evtgen = new EvtGenDecays(&pythia, m_DecFile, m_EvtPdl);
+    evtgen = new EvtGenDecays(&pythia, m_DecFile, m_EvtPdl); //COMMENT OUT FOR PYTHIA8.206+
+    //evtgen = new EvtGenDecays(&pythia, m_DecFile, m_EvtPdl, &genlist, radCorrEngine); //COMMENT IN FOR PYTHIA8.206+
     evtgen->readDecayFile(m_UserDecFile);
   }
 
@@ -267,8 +278,6 @@ int FragmentationModule::addParticleToPYTHIA(MCParticle& mcParticle)
   const double mass   = mcParticle.getMass();
   const TVector3& p   = mcParticle.getMomentum();
   const double energy = sqrt(mass * mass + p.Mag2());
-
-//   int Event::append(int id, int status, int mother1, int mother2, int daughter1, int daughter2, int col, int acol, Vec4 p, double m = 0., double scale = 0.)
 
   //add this (anti)quark to the PythiaEvent
   if (id == 23) {

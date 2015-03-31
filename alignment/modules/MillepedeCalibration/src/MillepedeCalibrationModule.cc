@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <alignment/modules/MillepedeCalibration/MillepedeCalibrationModule.h>
-#include <alignment/modules/GBLfit/GBLfitModule.h>
 
 #include <calibration/CalibrationManager.h>
 #include <calibration/CalibrationModule.h>

@@ -95,24 +95,13 @@ int main(int argc, char* argv[])
     B2FATAL("Cannot remove SIGPIPE signal handler");
   }
 
-  //Check for Belle2 environment variables
-  const char* belle2LocalDir = getenv("BELLE2_LOCAL_DIR");
-  const char* belle2ReleaseDir = getenv("BELLE2_RELEASE_DIR");
-  if (!belle2LocalDir && !belle2ReleaseDir) {
-    B2ERROR("The basf2 environment is not set up. Please execute the 'setuprel' script first.");
-    return 1;
-  }
+  //Check for Belle2 environment variables (during environment initialisation)
+  Environment::Instance();
 
-  //also set when just sourcing setup_belle2.sh (which is why we also check for local/release dir)
+  //Get the lib path (checked for NULL in Environment)
   const char* belle2SubDir = getenv("BELLE2_SUBDIR");
-  if (!belle2SubDir) {
-    B2ERROR("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.");
-    return 1;
-  }
-
-  //Get the lib path
   boost::filesystem::path libPath = "lib";
-  libPath /=  belle2SubDir;
+  libPath /= belle2SubDir;
 
   bool runInteractiveMode = true;
   string runModuleIOVisualization(""); //nothing done if empty
@@ -346,7 +335,9 @@ int main(int argc, char* argv[])
 
     //Search in local or central lib/ if this isn't a direct path
     if (!boost::filesystem::exists(pythonFile)) {
-      pythonFile = FileSystem::findFile((libPath / pythonFile).string());
+      std::string libFile = FileSystem::findFile((libPath / pythonFile).string());
+      if (!libFile.empty())
+        pythonFile = libFile;
     }
 
     try {

@@ -61,6 +61,7 @@ Environment::Environment() :
     B2FATAL("The basf2 environment is not set up. Please execute the 'setuprel' script first.");
   }
 
+  //also set when just sourcing setup_belle2.sh (which is why we also check for local/release dir)
   const char* envarSubDir = getenv("BELLE2_SUBDIR");
   if (!envarSubDir) {
     B2FATAL("The environment variable BELLE2_SUBDIR is not set. Please execute the 'setuprel' script first.");

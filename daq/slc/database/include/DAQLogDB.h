@@ -4,7 +4,7 @@
 #include <daq/slc/database/DAQLogMessage.h>
 #include <daq/slc/database/DBInterface.h>
 
-#include <daq/slc/base/StringUtil.h>
+#include <vector>
 
 namespace Belle2 {
 

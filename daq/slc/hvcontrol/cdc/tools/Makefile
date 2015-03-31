@@ -8,7 +8,7 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lz -lrt -lpq -lreadline -lncurses -L$(PGSQL_LIB_PATH)/lib -lpq
+LIBS    += -lm -lpthread -ldl -lz -lrt -lreadline -lncurses -L$(PGSQL_LIB_PATH)/lib -lpq
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_hvcontrol -ldaq_slc_hvcontrol_cdc
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 

@@ -42,7 +42,7 @@ clean:
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ echo '<< creating executable $@ >>'
-	$(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
+	@ $(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
 

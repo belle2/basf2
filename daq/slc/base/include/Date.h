@@ -10,6 +10,7 @@ namespace Belle2 {
 
   public:
     Date(time_t time);
+    Date(const Date& date);
     Date();
     ~Date() throw();
 
@@ -25,9 +26,17 @@ namespace Belle2 {
     int getYear() const throw();
     const char* toString(const char* format = NULL) const throw();
 
+  public:
+    const Date& operator=(const Date& date)
+    {
+      set(date.m_time);
+      return *this;
+    }
+
   private:
     time_t m_time;
     struct tm* m_tm;
+    mutable char m_str[31];
 
   };
 

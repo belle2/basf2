@@ -16,9 +16,6 @@ LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
-ifneq ($(NOT_USE_PSQL),yes)
-CFLAGS  += -I$(PGSQL_LIB_PATH)/include
-endif
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 
 MAINS   = $(wildcard *.cc)

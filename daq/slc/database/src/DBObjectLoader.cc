@@ -269,27 +269,26 @@ bool DBObjectLoader::createDB(DBInterface& db,
     return false;
   }
   try {
-    db.execute("create table %s \n"
-               "(name  varchar(64) \n"
-               "check (replace(name, '.', '') = name) not null, \n"
-               "path varchar(256) not null, \n"
-               "id bigserial, \n"
-               "record_time timestamp with time zone default current_timestamp, \n"
-               "value_b boolean default NULL, \n"
-               "value_c char default NULL, \n"
-               "value_s smallint default NULL, \n"
-               "value_i int default NULL, \n"
-               "value_l bigint default NULL, \n"
-               "value_f float default NULL, \n"
-               "value_d double precision default NULL, \n"
-               "value_t text default NULL, \n"
-               "value_o varchar(256) default NULL, \n"
-               "UNIQUE (path)); ", tablename.c_str());
-    db.execute("create index %s_id_index on %s(id);",
-               tablename.c_str(), tablename.c_str());
-  } catch (const DBHandlerException& e) {
-  }
-  try {
+    if (!db.checkTable(tablename)) {
+      db.execute("create table %s \n"
+                 "(name  varchar(64) \n"
+                 "check (replace(name, '.', '') = name) not null, \n"
+                 "path varchar(256) not null, \n"
+                 "id bigserial, \n"
+                 "record_time timestamp with time zone default current_timestamp, \n"
+                 "value_b boolean default NULL, \n"
+                 "value_c char default NULL, \n"
+                 "value_s smallint default NULL, \n"
+                 "value_i int default NULL, \n"
+                 "value_l bigint default NULL, \n"
+                 "value_f float default NULL, \n"
+                 "value_d double precision default NULL, \n"
+                 "value_t text default NULL, \n"
+                 "value_o varchar(256) default NULL, \n"
+                 "UNIQUE (path)); ", tablename.c_str());
+      db.execute("create index %s_id_index on %s(id);",
+                 tablename.c_str(), tablename.c_str());
+    }
     db.execute(ss.str().c_str());
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());

@@ -10,9 +10,6 @@ APPS = apps/nsm2socket apps/runcontrold apps/rocontrold apps/cprcontrold apps/rc
 
 SUBPACKAGES = base system database nsm readout copper runcontrol hvcontrol $(APPS)
 
-## set NOT_USE_PSQL yes if postreSQL is not available
-#NOT_USE_PSQL = yes
-
 all: copyinc $(SUBPACKAGES) tool
 	@ make -C tools/
 	@ install -m 755 -p ./tools/*.sh ${BINDIR}/

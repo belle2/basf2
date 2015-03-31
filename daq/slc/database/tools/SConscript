@@ -8,5 +8,7 @@ env['TOOLS_LIBS']['dbprovider'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['dbremove'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['addParamConfig'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['runnumberget'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['monitoradd'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['monitorget'] = ['daq', 'framework', '$PGSQL_LIBS']
 
 Return('env')

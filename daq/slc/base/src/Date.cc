@@ -11,6 +11,11 @@ Date::Date(time_t time)
   set(time);
 }
 
+Date::Date(const Date& date)
+{
+  set(date.m_time);
+}
+
 Date::Date()
 {
   set();
@@ -62,11 +67,11 @@ int Date::getYear() const throw()
 
 const char* Date::toString(const char* format) const throw()
 {
-  static char ss[256];
+  memset(m_str, 0, sizeof(m_str));
   if (format == NULL) {
-    strftime(ss, 255, "%Y-%m-%d %H:%M:%S", m_tm);
+    strftime(m_str, 31, "%Y-%m-%d %H:%M:%S", m_tm);
   } else {
-    strftime(ss, 255, format, m_tm);
+    strftime(m_str, 31, format, m_tm);
   }
-  return ss;
+  return m_str;
 }

@@ -35,10 +35,6 @@ bool DAQLogDB::createLog(DBInterface& db, const std::string& tablename,
       db.execute("create index %s_id_index on %s(id);",
                  tablename.c_str(), tablename.c_str());
     }
-  } catch (const DBHandlerException& e) {
-    //LogFile::error(e.what());
-  }
-  try {
     db.execute("insert into %s (node, priority, date, message) values "
                "('%s', '%s', to_timestamp(%d), '%s');",
                tablename.c_str(), log.getNodeName().c_str(), log.getPriorityText().c_str(),

@@ -2,6 +2,7 @@
 #define _Belle2_NSMVar_h
 
 #include <daq/slc/base/Serializable.h>
+#include <daq/slc/base/Date.h>
 
 #include <vector>
 
@@ -45,6 +46,7 @@ namespace Belle2 {
     {
       copy(var.m_name, var.m_type, var.m_len, var.m_value, var.m_id, var.m_rev);
       m_node = var.m_node;
+      m_date = var.m_date;
       return *this;
     }
     const NSMVar& operator=(int val)
@@ -90,6 +92,9 @@ namespace Belle2 {
     int getRevision() const { return m_rev; }
     void setId(int id) { m_id = id; }
     void setRevision(int rev) { m_rev = rev; }
+    void setDate(int date) { m_date = date; }
+    void setDate(const Date& date) { m_date = date.get(); }
+    int getDate() const { return m_date; }
 
   public:
     virtual void readObject(Reader&) throw(IOException);
@@ -107,6 +112,7 @@ namespace Belle2 {
     void* m_value;
     int m_id;
     int m_rev;
+    int m_date;
 
   };
 

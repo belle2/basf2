@@ -231,6 +231,7 @@ bool NSMVHandlerHSLBRegFixed::handleGetInt(int& val)
 
 bool NSMVHandlerHSLBLinkFee::handleSetInt(int val)
 {
+  LogFile::info("trgon FEE (HSLB:%c)", m_hslb + 'a');
   if (val > 0) {
     LogFile::info("link FEE (HSLB:%c)", m_hslb + 'a');
     return m_callback.getHSLB(m_hslb).linkfee();

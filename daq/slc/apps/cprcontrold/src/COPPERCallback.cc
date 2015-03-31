@@ -57,7 +57,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
-      if (!o_hslb.getBool("used")) continue;
+      if (!m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
       std::string vname = StringUtil::form("hslb[%d]", i);
@@ -231,6 +231,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
       logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");
       for (int i = 0; i < 4; i++) {
+        if (!m_fee[i]) continue;
         int used = 0;
         get(StringUtil::form("hslb[%d].used", i), used);
         if (used) {
@@ -277,7 +278,7 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     int flag = 0;
     for (size_t i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj.getObject("hslb", i));
-      if (o_hslb.getBool("used")) flag += 1 << i;
+      if (m_fee[i] != NULL && o_hslb.getBool("used")) flag += 1 << i;
     }
     m_con.clearArguments();
     m_con.setExecutable("basf2");

@@ -46,7 +46,8 @@ bool HSLB::load() throw()
 {
   if (m_hslb.fd < 0) return false;
   linkfee();
-  return (!isError()) && checkfee() != "UNKNOWN";
+  monitor();
+  return /*(!isError()) &&*/ checkfee() != "UNKNOWN";
 }
 
 bool HSLB::monitor() throw()

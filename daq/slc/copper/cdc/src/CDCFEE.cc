@@ -39,6 +39,12 @@ void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
 
 void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
 {
+  hslb.writefn(HSREG_CSR,     0x05); // reset read fifo
+  hslb.writefn(HSREG_CSR,     0x06); // reset read ack
+  //hslb.writefn(HSREG_CDCCONT, 0x07); // suppress mode
+  hslb.writefn(HSREG_CDCCONT, 0x08); // raw mode
+  hslb.writefn(HSREG_CSR,     0x0a); // parameter write
+
   // writing parameters to registers
   const FEEConfig::RegList& regs(conf.getRegList());
   for (FEEConfig::RegList::const_iterator it = regs.begin();

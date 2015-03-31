@@ -201,7 +201,7 @@ void ECLDigitizerModule::event()
 
   static bool firstEvent = true;
   if (firstEvent) {
-    firstEvent = false;
+    firstEvent = false;/*
     for (int aCellId = 1; aCellId <= 8736; ++aCellId) {
       B2INFO("Checking ECL crystal id == " << aCellId);
       const ECLWaveformData* eclWFData = eclWaveformData[(*eclWaveformDataTable)[ aCellId ] ];
@@ -210,7 +210,7 @@ void ECLDigitizerModule::event()
       B2INFO("ECLAlgoParams address: " << eclWFAlgo);
       const ECLNoiseData* eclNoise = eclNoiseData[(*eclNoiseDataTable)[ aCellId ] ];
       B2INFO("ECLNoise address: " << eclNoise);
-    }
+      }*/
   }
   // end of the test
 

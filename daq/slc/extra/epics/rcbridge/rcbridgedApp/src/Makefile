@@ -33,21 +33,20 @@ rcbridged_SRCS_DEFAULT += rcbridgedMain.cpp
 rcbridged_SRCS_vxWorks += -nil-
 
 # Add support from base/src/vxWorks if needed
-#rcbridged_OBJS_vxWorks += $(EPICS_BASE_BIN)/vxComLibrary
 
 # Finally link to the EPICS Base libraries
 rcbridged_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #===========================
 
-daq_slc_base_DIR = $(BELLE2_DAQ_SLC_LIB_DIR)
+daq_slc_base_DIR = $(BELLE2_DAQ_SLC)/lib
 pq_DIR = $(PGSQL_LIB_PATH)/lib
 
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD RULES AFTER THIS LINE
 
-USR_INCLUDES += -I$(BELLE2_DAQ_SLC_INCLUDE)
+USR_INCLUDES += -I$(BELLE2_DAQ_SLC)/include
 USR_LIBS += daq_slc_base daq_slc_system daq_slc_database daq_slc_nsm daq_slc_runcontrol
 USR_LIBS += nsm2_corelib nsm2_b2lib
 USR_LIBS += nsm2_corelib nsm2_b2lib

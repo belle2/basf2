@@ -46,6 +46,7 @@ PhaseSpaceAnalysisModule::PhaseSpaceAnalysisModule() : Module()
 
   // initialize pointers to NULL (cppcheck)
   m_rootFilePtr = NULL;
+  initializeCounters(0);
 }
 
 // ===================================================== INITIALIZE ===============================================================

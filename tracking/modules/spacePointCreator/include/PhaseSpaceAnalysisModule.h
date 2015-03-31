@@ -46,7 +46,7 @@ namespace Belle2 {
       std::vector<double> MomY; /**< y momentum */
       std::vector<double> MomZ; /**< z momentum */
 
-      /**<pseuod rapidity. could also be calculated from momentum variables afterwards. here only for convienience */
+      /** pseudo rapidity. could also be calculated from momentum variables afterwards. here only for convienience */
       std::vector<double> Eta;
       /** transverse momentum. could also be calculated from momentum variables afterwards. here only for convienience */
       std::vector<double> pT;
@@ -73,7 +73,7 @@ namespace Belle2 {
   protected:
 
     // ======================================== PARAMETERS ========================================================================
-    std::vector<std::string> m_PARAMcontainerNames; /** collection name of trackCands to be investigated */
+    std::vector<std::string> m_PARAMcontainerNames; /**< collection name of trackCands to be investigated */
 
     std::vector<std::string> m_PARAMtrackCandTypes; /**< types of the track candidates in containerNames */
 
@@ -88,9 +88,10 @@ namespace Belle2 {
     RootVariables m_rootVariables; /**< root variables used for collecting data event-wise */
 
     std::vector<TTree*> m_treePtrs; /**< each container name gets its own tree in the root file */
+
     TFile* m_rootFilePtr; /**< Pointer to root file */
 
-    std::vector<std::string> m_treeNames;
+    std::vector<std::string> m_treeNames;  /**< names of the trees that are stored in the root file */
     // ==================================================== COUNTERS ==============================================================
     unsigned int m_noMcPartCtr; /**< Counter for NULL pointers to MC Particles (should always be zero. just a safety measure) */
 

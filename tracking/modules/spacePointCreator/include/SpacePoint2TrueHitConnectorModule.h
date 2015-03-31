@@ -90,8 +90,8 @@ namespace Belle2 {
       std::vector<unsigned int> NRelations; /**< Number of related TrueHits to a SpacePoint */
 
       // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
-      std::vector<unsigned int> ClusterSizeU;
-      std::vector<unsigned int> ClusterSizeV;
+      std::vector<unsigned int> ClusterSizeU; /**< size of the u-cluster (resp. in u-direction) */
+      std::vector<unsigned int> ClusterSizeV; /**< size of the v-cluster (resp. in v-direction) */
 
       std::vector<double> SpacePointErrorU; /**< position error of SpacePoint in U direction */
       std::vector<double> SpacePointErrorV; /**< position error of SpacePoint in V direction */
@@ -233,7 +233,10 @@ namespace Belle2 {
 //     unsigned int m_moreThan2Weights; /**< Count the cases whith more than two weights */
 //
 
-    void initializeCounters(); /**< initialize all counters to 0 */
+    /** initialize all counters to 0
+     * WARNING: only call in constructor of module!
+     */
+    void initializeCounters();
 
     /**
      * get the TrueHit from information that is stored in the map (conditions are checked in the following order):

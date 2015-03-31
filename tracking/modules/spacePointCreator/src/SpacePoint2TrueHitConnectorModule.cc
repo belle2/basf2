@@ -79,8 +79,11 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   addParam("minWeight", m_PARAMminWeight,
            "Define a minimal weight a relation between a Cluster and a TrueHit has to have for the TrueHit to be considered as possible candidate.",
            0.);
+
   // initialize all couters
   initializeCounters();
+  m_rootFilePtr = NULL;
+  m_treePtr = NULL;
 }
 
 // ================================================================ INITIALIZE ====================================================
@@ -366,6 +369,12 @@ void SpacePoint2TrueHitConnectorModule::initializeCounters()
 
   m_weightTooSmallCtr = 0;
   m_rejectedNoPrimaryCtr = 0;
+
+  // initialize the following here because of cppcheck complaining (not initialized in constructor)
+  m_nContainers = 0;
+  m_maxGlobalDiff = 0.;
+  m_iCont = 0;
+
 //   m_negWeightCtr = 0;
 //   m_totWeightsCtr = 0;
 //   m_moreThan2Weights = 0;
@@ -811,7 +820,7 @@ void SpacePoint2TrueHitConnectorModule::initializeRootFile()
 // ========================================================= CLOSE ROOT FILE ======================================================
 void SpacePoint2TrueHitConnectorModule::closeRootFile()
 {
-  if (m_treePtr != NULL) {
+  if (m_treePtr != NULL && m_rootFilePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_treePtr->Write();
     m_rootFilePtr->Close();

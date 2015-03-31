@@ -57,12 +57,17 @@ namespace Belle2 {
 
     private:
       int Event = 0;
-
+      /** number of pixels */
       int m_nofPixels;
+      /** local position u */
       float m_posmm_u;
+      /** local position v */
       float m_posmm_v;
+      /** G4 position x */
       float m_posmm_x;
+      /** G4 position y */
       float m_posmm_y;
+      /** G4 position z */
       float m_posmm_z;
 
     };

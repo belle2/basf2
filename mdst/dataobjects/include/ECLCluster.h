@@ -31,8 +31,10 @@ namespace Belle2 {
     /**
      *default constructor : all values are set to 0
      */
-    ECLCluster() {
-      m_isTrack = false; /**< To store relation to tracks [true] or not [false] (for timebeing, Pleaseuse function  isNeutral() [as it is for future] */
+    ECLCluster()
+    {
+      m_isTrack =
+        false; /**< To store relation to tracks [true] or not [false] (for timebeing, Pleaseuse function  isNeutral() [as it is for future] */
       m_Energy = 0;   /**< Corrected energy (GeV) */
       m_EnedepSum = 0; /**< Uncorrected Energy Deposited in a shower (GeV) */
       m_Theta = 0;     /**< Theta (in radian) */
@@ -119,13 +121,15 @@ namespace Belle2 {
 
     /*! Set Crystal health (Not now)
      */
-    void setCrystHealth(int CrystHealth) {
+    void setCrystHealth(int CrystHealth)
+    {
       m_CrystHealth = CrystHealth;
     }
 
     /*! Set high momentum pi0 likelihood
      */
-    void setMergedPi0(float MergedPi0) {
+    void setMergedPi0(float MergedPi0)
+    {
       m_MergedPi0 = MergedPi0;
     }
 
@@ -135,7 +139,8 @@ namespace Belle2 {
       [2]->Error on Phi
       [5]->Error on Theta
     */
-    void setError(float ErrorArray[6]) {
+    void setError(float ErrorArray[6])
+    {
       for (int i = 0; i < 6; ++i) {
         m_Error[i] = ErrorArray[i];
       }
@@ -144,7 +149,8 @@ namespace Belle2 {
 
     /*! Set m_isTrack true if the cluster matches with cluster
      */
-    void setisTrack(bool istrack) {
+    void setisTrack(bool istrack)
+    {
       m_isTrack = istrack;
     }
 
@@ -229,19 +235,22 @@ namespace Belle2 {
 
     /*! Return Px (GeV/c)
      */
-    float getPx() const {
+    float getPx() const
+    {
       return float(m_Energy * sin(m_Theta) * cos(m_Phi));
     }
 
     /*! Return Py (GeV/c)
      */
-    float getPy() const {
+    float getPy() const
+    {
       return float(m_Energy * sin(m_Theta) * sin(m_Phi));
     }
 
     /*! Return Pz (GeV/c)
      */
-    float getPz() const {
+    float getPz() const
+    {
       return float(m_Energy * cos(m_Theta));
     }
 
@@ -250,7 +259,8 @@ namespace Belle2 {
 
     /*! Return TVector3 momentum (Px,Py,Pz)
      */
-    TVector3 getMomentum() const {
+    TVector3 getMomentum() const
+    {
 
       return TVector3(float(m_Energy * sin(m_Theta) * cos(m_Phi)),
                       float(m_Energy * sin(m_Theta) * sin(m_Phi)),
@@ -261,7 +271,8 @@ namespace Belle2 {
 
     /*! Return 4Vector  (Px,Py,Pz,E)
      */
-    TLorentzVector get4Vector() const {
+    TLorentzVector get4Vector() const
+    {
       return TLorentzVector(float(m_Energy * sin(m_Theta) * cos(m_Phi)),
                             float(m_Energy * sin(m_Theta) * sin(m_Phi)),
                             float(m_Energy * cos(m_Theta)),
@@ -272,7 +283,8 @@ namespace Belle2 {
 
     /*! Return TVector3 on cluster position /Shower center (x,y,z)
      */
-    TVector3 getclusterPosition() const {
+    TVector3 getclusterPosition() const
+    {
       float cluster_x =  m_R * sin(m_Theta) * cos(m_Phi);
       float cluster_y =  m_R * sin(m_Theta) * sin(m_Phi);
       float cluster_z =  m_R * cos(m_Theta);
@@ -282,7 +294,8 @@ namespace Belle2 {
     /*! Return TVector3 on  position on gamma's production
       By default the position of gamma's production is (0,0,0)
     */
-    TVector3 getPosition() const {
+    TVector3 getPosition() const
+    {
       float x, y, z;
       x = y = z = 0.0;
       return TVector3(x, y, z);
@@ -295,7 +308,8 @@ namespace Belle2 {
     /*! Return TMatrixFsym 4x4  error matrix
     */
 
-    TMatrixFSym getError4x4() const {
+    TMatrixFSym getError4x4() const
+    {
       TMatrixFSym errorecl(3);
       errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
       errorecl[1][0] = m_Error[1];
@@ -332,7 +346,8 @@ namespace Belle2 {
 
     /*! Return TMatrixFsym 7x7  error matrix
      */
-    TMatrixFSym getError7x7() const {
+    TMatrixFSym getError7x7() const
+    {
       TMatrixFSym errorecl(3);
       errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
       errorecl[1][0] = m_Error[1];
@@ -382,7 +397,8 @@ namespace Belle2 {
     /*! Return TMatrixFsym 3x3 error matrix for E, Phi and Theta
      */
 
-    TMatrixFSym getError3x3() const {
+    TMatrixFSym getError3x3() const
+    {
       TMatrixFSym errorecl(3);
       errorecl[0][0] = m_Error[0] * m_Error[0]; //Energy
       errorecl[1][0] = m_Error[1];
@@ -397,14 +413,16 @@ namespace Belle2 {
       false (for time being). Please use isNeutral function (as it will be kept
       for future)
      */
-    bool getisTrack() const {
+    bool getisTrack() const
+    {
       return m_isTrack;
     }
 
     /*! Return true if cluster has no match with cluster, otherwise
       return false if cluster has match with track.
      */
-    bool isNeutral() const {
+    bool isNeutral() const
+    {
       if (m_isTrack) {
         return false;
       } else { return true; }
@@ -415,23 +433,27 @@ namespace Belle2 {
 
     /*! Return pi0Likelihood for a shower (for future, Not available now)
      */
-    float getpi0Likelihood() const {
+    float getpi0Likelihood() const
+    {
       return 0.5;
     }
     /*! Return etaLikelihood for a shower (for future, Not available now)
      */
-    float getetaLikelihood() const {
+    float getetaLikelihood() const
+    {
       return 0.5;
     }
 
     /*! Return deltaL for shower shape (for future, Not available now)
      */
-    float getdeltaL() const {
+    float getdeltaL() const
+    {
       return 0;
     }
     /*! Return beta for shower shape (for future, Not available now)
      */
-    float getbeta() const {
+    float getbeta() const
+    {
       return 0;
     }
 

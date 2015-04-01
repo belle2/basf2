@@ -36,6 +36,7 @@ void RCCallback::init(NSMCommunicator&) throw()
   NSMNode& node(getNode());
   node.setState(RCState::NOTREADY_S);
   reset();
+  add(new NSMVHandlerText("dbtable", true, false, m_table));
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcrequest", true, false, ""));
   if (m_table.size() == 0 || m_rcconfig.size() == 0) {
@@ -209,6 +210,7 @@ throw(IOException)
     }
     m_table = table;
     m_rcconfig = config;
+    set("dbtable", m_table);
   }
   if (m_table.size() > 0 && m_rcconfig.size() > 0) {
     if (getDB()) {

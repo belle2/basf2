@@ -9,10 +9,8 @@ import b2daq.database.ConfigObject;
 import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMDBListSetHandler;
 import b2daq.nsm.NSMDBSetHandler;
-import b2daq.nsm.NSMMessage;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
-import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
 import b2daq.runcontrol.ui.RCStateLabel;
 import java.io.IOException;
@@ -45,6 +43,7 @@ public class RCStateViewPane extends GridPane {
     private int m_index = 0;
     private final HashMap<String, RCStateLabel> m_rclabel = new HashMap<>();
     private final HashMap<String, String> m_rcconfig = new HashMap<>();
+    private final HashMap<String, String> m_table = new HashMap<>();
     private String m_nodename = "";
     private final RunControlMainPane m_main;
 
@@ -85,6 +84,15 @@ public class RCStateViewPane extends GridPane {
                                 public boolean handleVSet(NSMVar var2) {
                                     String node = var2.getName().replace(".rcconfig", "");
                                     m_rcconfig.put(node, var2.getText());
+                                    return true;
+                                }
+                            };
+                            NSMCommunicator.get().add(handler1);
+                            handler1 = new NSMVSetHandler(false, m_nodename, node + ".dbtable", NSMVar.TEXT) {
+                                @Override
+                                public boolean handleVSet(NSMVar var2) {
+                                    String node = var2.getName().replace(".dbtable", "");
+                                    m_table.put(node, var2.getText());
                                     return true;
                                 }
                             };
@@ -184,7 +192,8 @@ public class RCStateViewPane extends GridPane {
             if (state.equals(RCState.NOTREADY_S) || state.equals(RCState.READY_S)) {
                 menu.getItems().add(vset);
                 vset.setOnAction((ActionEvent event) -> {
-                    VSetDialog.showDialog(null, "NSMV Set"+m_node, "NSM Variable at "+m_node, m_node);
+                    VSetDialog.showDialog(null, "NSMV Set "+m_node, 
+                            "NSM Variable at "+m_node, m_node);
                 });
             }
             if (state.equals(RCState.NOTREADY_S) || state.equals(RCState.READY_S)
@@ -211,7 +220,8 @@ public class RCStateViewPane extends GridPane {
                         public boolean handleVSet(NSMVar var) {
                             m_config = var.getText();
                             String nodename = var.getName().replace(".rcconfig", "").toUpperCase();
-                            NSMCommunicator.get().add(new NSMDBListSetHandler(true, nodename, "RC:") {
+                            String table = m_table.get(nodename.toLowerCase());
+                            NSMCommunicator.get().add(new NSMDBListSetHandler(true, table, nodename, "RC:") {
                                 @Override
                                 public boolean handleDBListSet(String[] list) {
                                     String message = "RC Config for " + nodename;
@@ -275,7 +285,8 @@ public class RCStateViewPane extends GridPane {
             MenuItem item1 = (MenuItem) t.getSource();
             String node1 = item1.getText();
             String config = m_rcconfig.get(node1.toLowerCase());
-            NSMDBSetHandler handler = new NSMDBSetHandler(node1, config, true) {
+            String table = m_table.get(node1.toLowerCase());
+            NSMDBSetHandler handler = new NSMDBSetHandler(table, node1, config, true) {
                 @Override
                 public boolean handleDBSet(ConfigObject obj) {
                     ConfigViewPane dialog = new ConfigViewPane(obj);

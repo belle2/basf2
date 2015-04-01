@@ -225,6 +225,9 @@ void RunControlCallback::update() throw()
             logging(getNode(), LogFile::NOTICE, "%s got up (state=%s).",
                     node.getName().c_str(), cstate.getLabel());
             setState(node, cstate);
+            std::string table = "";
+            get(node, "dbtable", table, 1);
+            set(StringUtil::tolower(node.getName()) + ".dbtable", table);
           }
         } catch (const TimeoutException& e) {
           LogFile::debug("%s timeout", node.getName().c_str());
@@ -371,11 +374,16 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
     RCNode& node(m_node_v[i]);
     std::string vname = StringUtil::form("node[%d]", (int)i);
     add(new NSMVHandlerText(vname + ".name", true, false, node.getName()));
+    std::string table = "";
+    try {
+      get(node, "dbtable", table, 1);
+    } catch (const TimeoutException& e) {}
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
+    add(new NSMVHandlerText(vname + ".dbtable", true, false, table));
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));

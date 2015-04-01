@@ -103,8 +103,9 @@ public class NSMCommunicator extends Thread {
                     NSMCommand cmd = new NSMCommand(msg.getReqName());
                     ArrayList<NSMRequestHandler> handlers = new ArrayList();
                     synchronized (m_handler) {
-                        for (NSMRequestHandler handler : m_handler) {
-                            handlers.add(handler);
+                        int nhandlers = m_handler.size();
+                        for (int i = 0; i < nhandlers; i++) {
+                            handlers.add(m_handler.get(i));
                         }
                         for (NSMRequestHandler handler : handlers) {
                             Platform.runLater(() -> {

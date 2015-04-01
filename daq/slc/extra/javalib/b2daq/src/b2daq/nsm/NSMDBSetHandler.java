@@ -14,27 +14,29 @@ import java.io.IOException;
  */
 public abstract class NSMDBSetHandler extends NSMRequestHandler {
 
+    protected String m_table = "";
     protected String m_node = "";
     protected String m_name = "";
     protected boolean m_isfull = false;
     
-    public NSMDBSetHandler(boolean once, String node, String name, boolean isfull) {
+    public NSMDBSetHandler(boolean once, String table, String node, String name, boolean isfull) {
         super(once);
+        m_table = table;
         m_node = node.toUpperCase();
         m_name = name;
         m_isfull = isfull;
     }
 
-    public NSMDBSetHandler(boolean once, String node, boolean isfull) {
-        this(once, node, "", isfull);
+    public NSMDBSetHandler(boolean once, String table, String node, boolean isfull) {
+        this(once, table, node, "", isfull);
     }
 
-    public NSMDBSetHandler(String node, String name, boolean isfull) {
-        this(true, node, name, isfull);
+    public NSMDBSetHandler(String table, String node, String name, boolean isfull) {
+        this(true, table, node, name, isfull);
     }
 
-    public NSMDBSetHandler(String node, boolean isfull) {
-        this(true, node, "", isfull);
+    public NSMDBSetHandler(String table, String node, boolean isfull) {
+        this(true, table, node, "", isfull);
     }
 
     @Override
@@ -52,7 +54,7 @@ public abstract class NSMDBSetHandler extends NSMRequestHandler {
     @Override
     public boolean connected() {
         try {
-            NSMCommunicator.get().requestDBGet("ecl/" + m_node + "@" + m_name, m_isfull);
+            NSMCommunicator.get().requestDBGet(m_table + "/" + m_node + "@" + m_name, m_isfull);
         } catch (IOException e) {
             e.printStackTrace();
         }

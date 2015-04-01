@@ -15,23 +15,25 @@ public abstract class NSMDBListSetHandler extends NSMRequestHandler {
 
     protected String m_node = "";
     protected String m_name = "";
+    protected String m_table = "";
 
-    public NSMDBListSetHandler(boolean once, String node, String name) {
+    public NSMDBListSetHandler(boolean once, String table, String node, String name) {
         super(once);
+        m_table = table;
         m_node = node.toUpperCase();
         m_name = name;
     }
 
-    public NSMDBListSetHandler(boolean once, String node) {
-        this(once, node, "");
+    public NSMDBListSetHandler(boolean once, String table, String node) {
+        this(once, table, node, "");
     }
 
-    public NSMDBListSetHandler(String node, String name) {
-        this(true, node, name);
+    public NSMDBListSetHandler(String table, String node, String name) {
+        this(true, table, node, name);
     }
 
-    public NSMDBListSetHandler(String node) {
-        this(true, node, "");
+    public NSMDBListSetHandler(String table, String node) {
+        this(true, table, node, "");
     }
 
     @Override
@@ -48,7 +50,7 @@ public abstract class NSMDBListSetHandler extends NSMRequestHandler {
     @Override
     public boolean connected() {
         try {
-            NSMCommunicator.get().requestList("ecl", m_node, m_name);
+            NSMCommunicator.get().requestList(m_table, m_node, m_name);
         } catch (IOException e) {
             e.printStackTrace();
         }

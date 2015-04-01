@@ -30,6 +30,7 @@ public class RCButtonPane extends VBox {
 
     private NSMNode m_node;
     private String m_config;
+    private String m_table;
     private final Button m_button_configure;
     private final Button m_button_load;
     private final Button m_button_start;
@@ -129,23 +130,30 @@ public class RCButtonPane extends VBox {
     }
 
     public final void handleConfigure() {
-        NSMCommunicator.get().add(new NSMVSetHandler(true, m_node.getName(), "rcconfig", NSMVar.TEXT) {
+        NSMCommunicator.get().add(new NSMVSetHandler(true, m_node.getName(), "dbtable", NSMVar.TEXT) {
             @Override
             public boolean handleVSet(NSMVar var) {
-                m_config = var.getText();
-                NSMCommunicator.get().add(new NSMDBListSetHandler(true, m_node, "RC:") {
+                m_table = var.getText();
+                NSMCommunicator.get().add(new NSMVSetHandler(true, m_node, "rcconfig", NSMVar.TEXT) {
                     @Override
-                    public boolean handleDBListSet(String[] list) {
-                        String conf = RunConfigDialog.showDialog(getScene(), "RC Config for " + m_node, "RC Config for " + m_node, m_config, list);
-                        if (conf == null) {
-                            return true;
-                        }
-                        m_config = conf;
-                        try {
-                            NSMCommunicator.get().request(new NSMMessage(m_node, RCCommand.CONFIGURE, m_config));
-                        } catch (IOException e) {
-                            Logger.getLogger(RCButtonPane.class.getName()).log(Level.SEVERE, null, e);
-                        }
+                    public boolean handleVSet(NSMVar var) {
+                        m_config = var.getText();
+                        NSMCommunicator.get().add(new NSMDBListSetHandler(true, m_table, m_node, "RC:") {
+                            @Override
+                            public boolean handleDBListSet(String[] list) {
+                                String conf = RunConfigDialog.showDialog(getScene(), "RC Config for " + m_node, "RC Config for " + m_node, m_config, list);
+                                if (conf == null) {
+                                    return true;
+                                }
+                                m_config = conf;
+                                try {
+                                    NSMCommunicator.get().request(new NSMMessage(m_node, RCCommand.CONFIGURE, m_config));
+                                } catch (IOException e) {
+                                    Logger.getLogger(RCButtonPane.class.getName()).log(Level.SEVERE, null, e);
+                                }
+                                return true;
+                            }
+                        });
                         return true;
                     }
                 });

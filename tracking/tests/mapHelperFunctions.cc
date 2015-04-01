@@ -44,7 +44,7 @@ namespace Belle2 {
   }
 
   /** create a multimap with
-   *@param nEntries entries.
+   * @param nEntries entries.
    * @param funct Function object which values are used to determine the keys by the return value of funct.operator()
    * NOTE: funct.operator has to take an int and return a double
    */
@@ -59,7 +59,8 @@ namespace Belle2 {
   }
 
   /** function object that implements cosecans(x) == 1/cos(x) by tan(x) / sin(x).
-   * This construction should give a NaN if the argument is 0 (but hopefully cppcheck can be fooled to not raise a division by zero warning)
+   * This construction should give a NaN if the argument is 0 (but hopefully cppcheck can be fooled to not raise a division by zero error)
+   * NOTE: it is tested if this actually is the case!
    */
   struct {
     double operator()(int i)
@@ -68,14 +69,6 @@ namespace Belle2 {
     }
   } secans;
 
-//   /** function object that implements: acos( ( i % 5) * .3 ), which produces some NaNs but no negative numbers */
-//   struct {
-//     double operator()(int i)
-//     {
-//       return std::acos((i % 5) * .3);
-//     }
-//   } acosMod5;
-
   /** function object that implements sin(i/2). This does give positive and negative weights, but no NaNs */
   struct {
     double operator()(int i)
@@ -83,17 +76,6 @@ namespace Belle2 {
       return std::sin(i * .5);
     }
   } sinHalf;
-
-//   /** function object that implements sin(i * .3) / i (= sinus cardinalis more or less)
-//    * NOTE: although sin(x)/x at x = 0 is 1 (de l'Hoptital) this should give a NaN since it is a division by zero
-//    * (This gives a cppcheck error: division by zero!)
-//    */
-//   struct {
-//     double operator()(int i)
-//     {
-//       return std::sin(i * .3) / i;
-//     }
-//   } sinCardp3;
 
   /**
    * class for testing the helper functions from MapHelperFunctions.h
@@ -105,16 +87,14 @@ namespace Belle2 {
       _nEntries = 20;
       _map = createMap(_nEntries, sinHalf);
       _multimap = createMultiMap(_nEntries, sinHalf);
-//       _nanMap = createMap(_nEntries, sinCardp3);
-//       _nanMultiMap = createMultiMap(_nEntries, sinCardp3);
       _nanMap = createMap(_nEntries, secans);
       _nanMultiMap = createMultiMap(_nEntries, secans);
     }
 
     i2dMap _map; /**< map filled with values obtained by sinHalf functor */
     i2dMultiMap _multimap; /**< multimap filled with values obtained by sinHalf functor */
-    i2dMultiMap _nanMultiMap; /**< multimap filled with values obtained by sinCardp3 functor -> contains a NaN! */
-    i2dMap _nanMap; /**< map filled with values obtained by sinCardp3 functor -> contains a NaN! */
+    i2dMultiMap _nanMultiMap; /**< multimap filled with values obtained by secans functor -> contains a NaN! */
+    i2dMap _nanMap; /**< map filled with values obtained by secans functor -> contains a NaN! */
     int _nEntries; /**< the number of pairs that will be put into the maps for the tests */
   };
 
@@ -127,8 +107,7 @@ namespace Belle2 {
     EXPECT_EQ(N, _multimap.size());
     EXPECT_EQ(N, _map.size());
 
-//     EXPECT_TRUE(std::isnan(sinCardp3.operator()((int)0))); // check if the function object actually creates a NaN
-    EXPECT_TRUE(std::isnan(secans.operator()(0))) << "For the following tests to work properly this is expected to return a NaN (-nan)";
+    ASSERT_TRUE(std::isnan(secans.operator()(0))) << "For the following tests to work properly this is expected to return a NaN (-nan)";
 
 //     std::cout << printMap(_nanMap) << std::endl;
 //     std::cout << printMap(_nanMultiMap) << std::endl;
@@ -140,7 +119,6 @@ namespace Belle2 {
     for (int key : possibleKeys) {
       std::vector<double> nanPossibleValues, possibleValues;
       for (int arg = key; arg < _nEntries; arg += 6) {
-//         nanPossibleValues.push_back(sinCardp3.operator()(arg));
         nanPossibleValues.push_back(secans.operator()(arg));
         possibleValues.push_back(sinHalf.operator()(arg));
       }
@@ -179,7 +157,6 @@ namespace Belle2 {
           EXPECT_TRUE(std::isnan(secans.operator()(i))); // expect a NaN value from the operator
           continue; // do not compare NaNs! (will always fail due to their nature)
         }
-//         EXPECT_DOUBLE_EQ(mapIt->second, sinCardp3.operator()(i));
         EXPECT_DOUBLE_EQ(mapIt->second, secans.operator()(i));
         ++mapIt;
       }
@@ -232,7 +209,6 @@ namespace Belle2 {
       }
       expectedValues.clear();
       for (int arg = key; arg < _nEntries; arg += 6) {
-//  expectedValues.push_back(sinCardp3.operator()(arg));
         expectedValues.push_back(secans.operator()(arg));
       }
       actualValues = getValuesToKey(_nanMultiMap, key);
@@ -257,7 +233,6 @@ namespace Belle2 {
       values = getValuesToKey(_nanMap, i);
       EXPECT_EQ(values.size(), 1);
       if (!std::isnan(values[0])) { // not checking here (already checked, that the functor leads to this above)
-//         EXPECT_DOUBLE_EQ(values[0], sinCardp3.operator()(i));
         EXPECT_DOUBLE_EQ(values[0], secans.operator()(i));
       }
     }
@@ -302,7 +277,6 @@ namespace Belle2 {
       std::vector<double> possibleNanValues;
       for (int arg = key; arg < _nEntries; arg += 6) {
         possibleValues.push_back(sinHalf.operator()(arg));
-//         possibleNanValues.push_back(sinCardp3.operator()(arg));
         possibleNanValues.push_back(secans.operator()(arg));
       }
       summedNanValues.push_back(std::accumulate(possibleNanValues.begin(), possibleNanValues.end(), 0.0));

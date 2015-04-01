@@ -64,10 +64,10 @@ void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
   std::string mode = StringUtil::tolower(obj.getText("mode"));
   if (mode == "suppress") {
     LogFile::info("suppress mode");
-    val = 1 << 24;
+    val = 2 << 24;
   } else if (mode == "raw") {
     LogFile::info("raw mode");
-    val = 2 << 24;
+    val = 1 << 24;
   } else if (mode == "raw-suppress") {
     LogFile::info("raw-suppress mode");
     val = 3 << 24;
@@ -75,19 +75,23 @@ void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
     LogFile::warning("no readout");
     val = 0;
   }
-  val |= (obj.getInt("window") & 0xF) << 8;
-  val |= obj.getInt("delay") & 0xF;
+  val |= (obj.getInt("window") & 0xFF) << 8;
+  val |= obj.getInt("delay") & 0xFF;
   hslb.writefee32(0x0012, val);
 
   // setting ADC threshold
-  val = obj.getInt("adcth") & 0xFF;
+  val = obj.getInt("adcth") & 0xFFFF;
   hslb.writefee32(0x0013, val);
+
+  // setting DAC control
+  val = obj.getInt("tdcth") & 0x7FFF;
+  hslb.writefee32(0x0015, val);
 
   // setting Pedestals
   const DBObjectList o_ped(obj.getObjects("ped"));
   for (size_t i = 0; i < o_ped.size() / 2; i++) {
-    val = o_ped[2 * i].getInt("val") & 0xF;
-    val = (o_ped[2 * i + 1].getInt("val") << 16 & 0xF);
+    val = o_ped[2 * i].getInt("val") & 0xFFFF
+          | (o_ped[2 * i + 1].getInt("val") << 16) & 0xFFFF;
     hslb.writefee32(0x0020 + i * 2, val);
   }
 }

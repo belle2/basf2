@@ -11,10 +11,10 @@ bool CDCDateHandler::handleGetText(std::string& val)
 {
   try {
     int ival = m_hslb.readfee32(0x0010);
-    int year = (ival >> 24) & 0xF;
-    int month = (ival >> 16) & 0xF;
-    int day = (ival >> 8) & 0xF;
-    int revision = ival & 0xF;
+    int year = (ival >> 24) & 0xFF;
+    int month = (ival >> 16) & 0xFF;
+    int day = (ival >> 8) & 0xFF;
+    int revision = ival & 0xFF;
     val = StringUtil::form("synthesized date = %d/%02d/%02d (revision=%d)",
                            year, month, day, revision);
     LogFile::info(val);
@@ -27,7 +27,7 @@ bool CDCDateHandler::handleGetText(std::string& val)
 bool CDCFirmwareHandler::handleGetInt(int& val)
 {
   try {
-    val = m_hslb.readfee32(0x0011) & 0xF;
+    val = m_hslb.readfee32(0x0011) & 0xFF;
     LogFile::info("CDC FEE Firmware version : %d", val);
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -40,8 +40,8 @@ bool CDCDataFormatHandler::handleGetText(std::string& val)
   try {
     int ival = (m_hslb.readfee32(0x0012) >> 24) & 0x3;
     switch (ival) {
-      case 0x1: val = "suppress"; break;
-      case 0x2: val = "raw"; break;
+      case 0x1: val = "raw"; break;
+      case 0x2: val = "suppress"; break;
       case 0x3: val = "raw-suppress"; break;
       default: val = "no readout"; break;
     }
@@ -55,7 +55,7 @@ bool CDCDataFormatHandler::handleGetText(std::string& val)
 bool CDCWindowHandler::handleGetInt(int& val)
 {
   try {
-    val = (m_hslb.readfee32(0x0012) >> 8) & 0xF;
+    val = (m_hslb.readfee32(0x0012) >> 8) & 0xFF;
     LogFile::info("CDC FEE Window : %d", val);
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -66,7 +66,7 @@ bool CDCWindowHandler::handleGetInt(int& val)
 bool CDCDelayHandler::handleGetInt(int& val)
 {
   try {
-    val = (m_hslb.readfee32(0x0012)) & 0xF;
+    val = (m_hslb.readfee32(0x0012)) & 0xFF;
     LogFile::info("CDC FEE Trigger Delay : %d", val);
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -77,7 +77,7 @@ bool CDCDelayHandler::handleGetInt(int& val)
 bool CDCADCThresholdHandler::handleGetInt(int& val)
 {
   try {
-    val = (m_hslb.readfee32(0x0013)) & 0xFF;
+    val = (m_hslb.readfee32(0x0013)) & 0xFFFF;
     LogFile::info("CDC FEE ADC threshold : %d", val);
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -100,7 +100,7 @@ bool CDCIndirectADCAccessHandler::handleGetInt(int& val)
 bool CDCDACControlHandler::handleGetInt(int& val)
 {
   try {
-    val = (m_hslb.readfee32(0x0015)) & (0xFF >> 4);
+    val = (m_hslb.readfee32(0x0015)) & (0xFFFF >> 4);
     LogFile::info("CDC FEE DAQ control : %d", val);
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -126,9 +126,9 @@ bool CDCPedestalHandler::handleGetInt(int& val)
     int i = m_index / 2;
     val = m_hslb.readfee32(0x0020 + i * 2);
     if (m_index % 2 == 0) {
-      val = val & (0xFF >> 6);
+      val = val & (0xFFFF >> 6);
     } else {
-      val = (val >> 16) & (0xFF >> 6);
+      val = (val >> 16) & (0xFFFF >> 6);
     }
     LogFile::info("CDC FEE Pedestal[%d] : %d", m_index, val);
   } catch (const IOException& e) {

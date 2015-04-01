@@ -79,21 +79,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       if (m_fee[i] != NULL && fconf.read(o_fee)) {
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
-        /*
-        int j = 0;
-        const FEEConfig::RegList& regs(fconf.getRegList());
-        for (FEEConfig::RegList::const_iterator it = regs.begin();
-        it != regs.end(); it++) {
-        const FEEConfig::Reg& reg(*it);
-        std::string pname = StringUtil::tolower(reg.name);
-        std::string vname = StringUtil::form("fee[%d].reg[%d].adr", i, j);
-        add(new NSMVHandlerInt(vname, true, false, reg.adr));
-        vname = StringUtil::form("fee[%d].reg[%d].size", i, j);
-        add(new NSMVHandlerInt(vname, true, false, reg.size));
-        vname = StringUtil::form("fee[%d].par[%d].val", i, j++);
-        add(new NSMVHandlerInt(vname, i, reg.adr, reg.size));
-        }
-        */
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
                                      o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
@@ -113,12 +98,12 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
         add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
         add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
       }
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fmver", i, 0x81, 5));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".b2lstat", i, 0x83, 5));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".rxdata", i, 0x84, 5));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwevt", i, 0x85, 5));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwclk", i, 0x86, 5));
-      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".cntsec", i, 0x87, 5));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fmver", i, 0x81, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".b2lstat", i, 0x83, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".rxdata", i, 0x84, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwevt", i, 0x85, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".fwclk", i, 0x86, 4));
+      add(new NSMVHandlerHSLBRegFixed(*this, vname + ".cntsec", i, 0x87, 4));
     }
   } catch (const std::exception& e) {
     throw (RCHandlerException(e.what()));

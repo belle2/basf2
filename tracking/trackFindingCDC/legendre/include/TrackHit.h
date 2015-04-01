@@ -71,7 +71,7 @@ namespace Belle2 {
       void performConformalTransformation();
 
 #ifndef __CINT__
-      /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. */
+      /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
       std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0);
 #endif
 

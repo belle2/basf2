@@ -55,6 +55,11 @@ namespace Belle2 {
        */
       TrackCandidate* createLegendreTrackCandidateFromQuadNode(QuadTreeLegendre* node);
 
+      /**
+       * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
+       */
+      TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
+
       /** Create tracklet using vector of hits and store it
        * UNUSED AS THE CLASS PATTERN_CHECKER IS UNUSED*/
       TrackCandidate* createLegendreTracklet(std::vector<TrackHit*>& hits);
@@ -185,10 +190,6 @@ namespace Belle2 {
        */
       void processTrack(TrackCandidate* track);
 
-      /**
-       * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
-       */
-      TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
     };
   }
 }

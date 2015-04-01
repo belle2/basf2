@@ -144,6 +144,77 @@ namespace Belle2 {
         }
       }
 
+
+      void fillNodeWithRespectToGivenPoint(QuadTreeTemplate<float, float, TrackFindingCDC::TrackHit>* m_node,
+                                           std::vector<TrackHit*>& m_hits, std::pair<double, double>& ref_point) const
+      {
+
+        int sizeX = 2;
+        int sizeY = 2;
+        double dist_1[3][3];
+        double dist_2[3][3];
+        const size_t neededSize = 2 * m_hits.size();
+        m_node->reserveHitsVector(neededSize);
+
+
+
+        //Voting within the four bins
+        for (TrackHit* hit : m_hits) {
+          //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
+          if (hit->getHitUsage() != TrackHit::not_used)
+            continue;
+
+          std::tuple<double, double, double> confCoords = hit->performConformalTransformWithRespectToPoint(ref_point.first, ref_point.second);
+
+
+          for (int t_index = 0; t_index < sizeX; ++t_index) {
+            for (int r_index = 0; r_index < sizeY; ++r_index) {
+
+              float r_temp_min = std::get<0>(confCoords) * cos(m_node->getXMin())
+                                 + std::get<1>(confCoords) * sin(m_node->getXMin());
+              float r_temp_max = std::get<0>(confCoords) * cos(m_node->getXMax())
+                                 + std::get<1>(confCoords) * sin(m_node->getXMax());
+
+              float r_min1 = r_temp_min - std::get<2>(confCoords);
+              float r_min2 = r_temp_min + std::get<2>(confCoords);
+              float r_max1 = r_temp_max - std::get<2>(confCoords);
+              float r_max2 = r_temp_max + std::get<2>(confCoords);
+
+              float m_rMin = m_node->getYMin();
+              float m_rMax = m_node->getYMax();
+
+              dist_1[0][0] = m_rMin - r_min1;
+              dist_1[0][1] = m_rMin - r_max1;
+              dist_1[1][0] = m_rMax - r_min1;
+              dist_1[1][1] = m_rMax - r_max1;
+
+              dist_2[0][0] = m_rMin - r_min2;
+              dist_2[0][1] = m_rMin - r_max2;
+              dist_2[1][0] = m_rMax - r_min2;
+              dist_2[1][1] = m_rMax - r_max2;
+
+
+              //curves are assumed to be straight lines, might be a reasonable assumption locally
+              if (!FastHough::sameSign(dist_1[0][0], dist_1[0][1],
+                                       dist_1[1][0], dist_1[1][1])) {
+                //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+                m_node->insertItem(hit);
+              } else if (!FastHough::sameSign(dist_2[0][0], dist_2[0][1],
+                                              dist_2[1][0], dist_2[1][1])) {
+                //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+                m_node->insertItem(hit);
+              }
+
+
+
+            }
+          }
+          //B2DEBUG(100, "MOVING to next hit");
+        }
+
+      }
+
+
       void initializeChildren(QuadTreeLegendre* node, QuadTreeLegendre::Children* m_children) const
       {
 

@@ -97,8 +97,9 @@ namespace Belle2 {
     bool m_mergeTracksWhileFinding;   /**< Try to merge tracks while finding*/
     bool m_mergeTracksInTheEnd;       /**< Try to merge tracks in the end. */
     bool m_doPostprocessingOften;     /**< Repeat the postprocessing mode after every tree search. */
+    bool m_increasePerformance;       /**< Repeat the postprocessing mode after every tree search. */
     int m_treeFindingNumber;          /**< Repeat the whole process that many times. */
-    bool m_batchMode;             /**< Sets ROOT to batch mode (don't show canvases) */
+    bool m_batchMode;                 /**< Sets ROOT to batch mode (don't show canvases) */
 
     int m_treeFinder;
     int m_steppedFinder;
@@ -140,6 +141,8 @@ namespace Belle2 {
      */
     void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
                       unsigned int);
+
+
 
   };
 

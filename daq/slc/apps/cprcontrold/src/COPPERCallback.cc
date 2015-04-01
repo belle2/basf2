@@ -60,6 +60,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       if (!m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
+      m_fee[i]->init(*this, hslb);
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
@@ -99,7 +100,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
         add(new NSMVHandlerFEEBoot(*this, vname + ".boot", i));
         vname = StringUtil::form("hslb[%d]", i);
         add(new NSMVHandlerHSLBLinkFee(*this, vname + ".link", i));
-        add(new NSMVHandlerHSLBUnLinkFee(*this, vname + ".unlink", i));
         add(new NSMVHandlerHSLBTrgOnFee(*this, vname + ".trigon", i));
         add(new NSMVHandlerHSLBTrgOffFee(*this, vname + ".trigoff", i));
         add(new NSMVHandlerHSLBCheckFee(*this, vname + ".checkfee", i));
@@ -152,8 +152,10 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           obj.hasObject("fee") && fconf.read(obj("fee", i))) {
         HSLB& hslb(m_hslb[i]);
         hslb.open(i);
-        if (!hslb.load()) {
-          throw (RCHandlerException("Failed to load HSLB:%c", i + 'a'));
+        try {
+          hslb.load();
+        } catch (const HSLBHandlerException& e) {
+          throw (RCHandlerException("Failed to load: %s", e.what()));
         }
         FEE& fee(*m_fee[i]);
         try {

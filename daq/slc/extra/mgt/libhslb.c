@@ -33,6 +33,13 @@ static const char *feetype[] = {
 static const char *demotype[] = {
   "UNDEF", "HSLB-B2L", "SP605-B2L", "ML605-B2L", "AC701-B2L" };
 
+static char errmsg[1024];
+
+const char* hslberr() 
+{
+  return errmsg;
+}
+
 /* ---------------------------------------------------------------------- *\
    openfn
 \* ---------------------------------------------------------------------- */
@@ -44,7 +51,7 @@ openfn(int fin, int readonly)
   sprintf(DEVICE, "/dev/copper/fngeneric:%c", 'a' + fin);
   
   if ((fd = open(DEVICE, o_mode)) < 0) {
-    fprintf(stderr, "cannot open %s: %s\n",
+    sprintf(errmsg, "cannot open %s: %s\n",
             DEVICE, strerror(errno));
   }
   return fd;
@@ -57,7 +64,7 @@ readfn(int fd, int adr)
 {
   int val = 0;
   if (ioctl(fd, FNGENERICIO_GET(adr), &val) < 0) {
-    fprintf(stderr, "cannot read %s: %s\n",
+    sprintf(errmsg, "cannot read %s: %s\n",
 	    DEVICE, strerror(errno));
     return -1;
   }
@@ -70,7 +77,7 @@ int
 writefn(int fd, int adr, int val)
 {
   if (ioctl(fd, FNGENERICIO_SET(adr), val) < 0) {
-    fprintf(stderr, "cannot write %s: %s\n",
+    sprintf(errmsg, "cannot write %s: %s\n",
 	    DEVICE, strerror(errno));
       return -1;
   }
@@ -272,7 +279,7 @@ bootfpga(int fd, const char *file, int verbose, int forced, int m012)
 
   /* -- open the file -- */
   if (! (fp = fopen(file, "r"))) {
-    printf("cannot open file: %s\n", file);
+    sprintf(errmsg, "cannot open file: %s\n", file);
     return -1;
   }
   
@@ -285,7 +292,7 @@ bootfpga(int fd, const char *file, int verbose, int forced, int m012)
   conf = readfn(fd, HSREG_CONF) & 7;
   if (verbose || conf != m012) dumpfpga(conf, "(set M012)");
   if (conf != m012) {
-    printf("cannot set FPGA to the download mode (M012=%d?).\n", conf);
+    sprintf(errmsg, "cannot set FPGA to the download mode (M012=%d?).\n", conf);
     if (! forced) return -1;
   }
   
@@ -297,7 +304,7 @@ bootfpga(int fd, const char *file, int verbose, int forced, int m012)
   conf = readfn(fd, HSREG_CONF);
   if (verbose || (conf & 0x80)) dumpfpga(conf, "(PRGM<=1)");
   if (conf & 0x80) {
-    printf("cannot set FPGA to the programming mode.\n");
+    sprintf(errmsg, "cannot set FPGA to the programming mode.\n");
     if (! forced) return -1;
   }
 
@@ -317,7 +324,7 @@ bootfpga(int fd, const char *file, int verbose, int forced, int m012)
   }
   if (verbose) putchar('\n');
   if (ch == EOF) {
-    printf("immature EOF for %s\n", file);
+    sprintf(errmsg, "immature EOF for %s\n", file);
     return -1;
   }
 
@@ -351,88 +358,6 @@ bootfpga(int fd, const char *file, int verbose, int forced, int m012)
   }
 }
 
-int writefee(int fd, int addr, int val)
-{
-  int ret = 0;
-  ret |= writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
-  ret |= writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
-  ret |= writefn(fd, addr, val);    //HSREG_FEECONT
-  ret |= writefn(fd, HSREG_CSR,     0x0a); /* parameter write */
-  return ret;
-}
-
-int readfee(int fd, int addr, int* val)
-{
-  int ret = 0;
-  ret |= writefn(fd, HSREG_CSR,     0x05); /* reset read fifo */
-  ret |= writefn(fd, HSREG_CSR,     0x06); /* reset read ack */
-  ret |= writefn(fd, addr, *val);    //HSREG_FEECONT
-  ret |= writefn(fd, HSREG_CSR,     0x07); /* parameter read */
-  if (ret != 0) return ret;
-  if (hswait_quiet(fd) < 0) return -1;
-  *val = (readfn(fd, HSREG_STAT) & 0xff);
-  return 0;
-}
-
-int linkfee(int fd)
-{
-  return writefee(fd, HSREG_FEECONT, 0x01);
-}
-
-int unlinkfee(int fd)
-{
-  return writefee(fd, HSREG_FEECONT, 0x02);
-}
-
-int trgofffee(int fd)
-{
-  return writefee(fd, HSREG_FEECONT, 0x03);
-}
-
-int trgonfee(int fd)
-{
-  return writefee(fd, HSREG_FEECONT, 0x04);
-}
-
-int writefee16a(int fd, int addr, int nvals, const int* val)
-{
-  writefn(fd, HSREG_CSR, 0x05); /* reset read fifo */
-  int i = 0;
-  for (; i < nvals; i++) {
-    writefn(fd, addr + i * 2, val[i] & 0xff);
-    writefn(fd, addr + i * 2 + 1, (val[i]>>8) & 0xff);
-  }
-  writefn(fd, HSREG_CSR, 0x0a); /* parameter write */
-  return 1;
-}
-
-int readfee16a(int fd, int addr, int nvals, int* val)
-{
-  writefn(fd, HSREG_CSR, 0x05); /* reset read fifo */
-  int i = 0;
-  for (; i < nvals; i++) {
-    writefn(fd, addr + i * 2, val[i] & 0xff);
-    writefn(fd, addr + i * 2 + 1, (val[i]>>8) & 0xff);
-  }
-  writefn(fd, HSREG_CSR,   0x07); /* parameter read */
-  if (hswait(fd) < 0) return 0;
-  for (i = 0; i < nvals; i++) {
-    val[i] = readfn(fd, addr + i * 2) & 0xff;
-    val[i] |= ((readfn(fd, addr + i * 2 + 1) & 0xff) << 8);
-  }
-  return 1;
-}
-
-int writefee16(int fd, int addr, int val)
-{
-  return writefee16a(fd, addr, 1, &val);
-}
-
-int readfee16(int fd, int addr, int* val)
-{
-  return readfee16a(fd, addr, 1, val);
-}
-
 int checkfee(struct hslb_info* hslb)
 {
   int ret;
@@ -442,7 +367,7 @@ int checkfee(struct hslb_info* hslb)
   writefn(fd, HSREG_CSR, 0x05); /* reset address fifo */
   writefn(fd, HSREG_CSR, 0x06); /* reset status register */
   if ((ret = readfn(fd, HSREG_STAT))) {
-    printf("checkfee: cannot clear HSREG_STAT=%02x\n", ret);
+    sprintf(errmsg, "checkfee: cannot clear HSREG_STAT=%02x\n", ret);
     return 0;
   }
   writefn(fd, HSREG_FEEHWTYPE, 0x02); /* dummy value write */

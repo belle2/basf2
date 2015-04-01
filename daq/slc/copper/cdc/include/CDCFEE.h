@@ -12,7 +12,7 @@ namespace Belle2 {
     virtual ~CDCFEE() throw() {}
 
   public:
-    virtual void init(RCCallback& callback);
+    virtual void init(RCCallback& callback, HSLB& hslb);
     virtual void boot(HSLB& hslb, const FEEConfig& conf);
     virtual void load(HSLB& hslb, const FEEConfig& conf);
 

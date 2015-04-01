@@ -23,36 +23,41 @@ const char* HSLB::getFEEType(int type)
   return NULL;
 }
 
-bool HSLB::open(int fin) throw()
+int HSLB::open(int fin) throw(HSLBHandlerException)
 {
   if (m_hslb.fd < 0) {
     m_hslb.fd = openfn(fin, false);
     m_hslb.fin = (m_hslb.fd < 0) ? -1 : fin;
   }
-  if (m_hslb.fd < 0) return false;
-  return true;
+  if (m_hslb.fd < 0) {
+    throw (HSLBHandlerException("open failed %s", hslberr()));
+  }
+  return m_hslb.fd;
 }
 
-bool HSLB::close() throw()
+void HSLB::close() throw()
 {
-  if (m_hslb.fd < 0) return false;
-  unlinkfee();
+  if (m_hslb.fd < 0) return;
   ::close(m_hslb.fd);
   m_hslb.fd = -1;
-  return true;
 }
 
-bool HSLB::load() throw()
+void HSLB::load() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd < 0) return false;
+  if (m_hslb.fd < 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   linkfee();
-  monitor();
-  return /*(!isError()) &&*/ checkfee() != "UNKNOWN";
+  if (checkfee() == "UNKNOWN") {
+    throw (HSLBHandlerException("fee on hslb-%c is not available", m_hslb.fin + 'a'));
+  }
 }
 
-bool HSLB::monitor() throw()
+bool HSLB::monitor() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd <= 0) return true;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   m_hslb.b2lstat = readfn32(HSREGL_STAT);
   m_hslb.rxdata = readfn32(HSREGL_RXDATA);
   m_hslb.fwevt = readfn32(0x085);
@@ -61,107 +66,205 @@ bool HSLB::monitor() throw()
   return true;
 }
 
-bool HSLB::boot(const std::string& firmware) throw()
+void HSLB::boot(const std::string& firmware)
+throw(HSLBHandlerException)
 {
-  if (m_hslb.fd <= 0) return true;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return bootfpga(firmware);
 }
 
-bool HSLB::isError() throw()
+bool HSLB::isError() throw(HSLBHandlerException)
 {
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return isBelle2LinkDown() ||
          isCOPPERFifoFull() ||
          isFifoFull() ||
          isCOPPERLengthFifoFull();
 }
 
-bool HSLB::isBelle2LinkDown() throw()
+bool HSLB::isBelle2LinkDown() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd < 0) return false;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return (m_hslb.b2lstat & 0x1);
 }
 
-bool HSLB::isCOPPERFifoFull() throw()
+bool HSLB::isCOPPERFifoFull() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd < 0) return false;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return (m_hslb.b2lstat >> 2 & 0x1);
 }
 
-bool HSLB::isCOPPERLengthFifoFull() throw()
+bool HSLB::isCOPPERLengthFifoFull() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd < 0) return false;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return (m_hslb.b2lstat >> 4 & 0x1);
 }
 
-bool HSLB::isFifoFull() throw()
+bool HSLB::isFifoFull() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd < 0) return false;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return (m_hslb.b2lstat >> 3 & 0x1);
 }
 
-bool HSLB::isCRCError() throw()
+bool HSLB::isCRCError() throw(HSLBHandlerException)
 {
-  if (m_hslb.fd < 0) return false;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   return (m_hslb.rxdata >> 16 > 0);
 }
 
-int HSLB::readfn(int adr) throw()
+int HSLB::readfn(int adr) throw(HSLBHandlerException)
 {
-  return ::readfn(m_hslb.fd, adr);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  int val;
+  if ((val = ::readfn(m_hslb.fd, adr)) < 0) {
+    throw (HSLBHandlerException("error : readfn hslb-%c : %s", m_hslb.fin + 'a', hslberr()));
+  }
+  return val;
 }
 
-int HSLB::writefn(int adr, int val) throw()
+void HSLB::writefn(int adr, int val) throw(HSLBHandlerException)
 {
-  return ::writefn(m_hslb.fd, adr, val);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  if (::writefn(m_hslb.fd, adr, val) < 0) {
+    throw (HSLBHandlerException("error : writefn hslb-%c : %s", m_hslb.fin + 'a', hslberr()));
+  }
 }
 
-int HSLB::readfn32(int adr) throw()
+int HSLB::readfn32(int adr) throw(HSLBHandlerException)
 {
-  return ::readfn32(m_hslb.fd, adr);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  //return ::readfn32(m_hslb.fd, adr);
+  int val = 0;
+  writefn(0x6f, adr & 0x7f);
+  val |= (readfn(0x6e) << 0);
+  val |= (readfn(0x6e) << 8);
+  val |= (readfn(0x6e) << 16);
+  val |= (readfn(0x6e) << 24);
+  return val;
 }
 
-int HSLB::writefn32(int adr, int val) throw()
+void HSLB::writefn32(int adr, int val) throw(HSLBHandlerException)
 {
-  return ::writefn32(m_hslb.fd, adr, val);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  writefn(0x6e, (val >> 24) & 0xff);
+  writefn(0x6e, (val >> 16) & 0xff);
+  writefn(0x6e, (val >>  8) & 0xff);
+  writefn(0x6e, (val >>  0) & 0xff);
+  writefn(0x6f, adr & 0xff);
+  //return ::writefn32(m_hslb.fd, adr, val);
 }
 
-int HSLB::hswait_quiet() throw()
+void HSLB::hswait_quiet() throw(HSLBHandlerException)
 {
-  return ::hswait_quiet(m_hslb.fd);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  if (::hswait_quiet(m_hslb.fd) < 0) {
+    throw (HSLBHandlerException("timeout of hswait_quiet on hslb-%c", m_hslb.fin + 'a'));
+  }
 }
 
-int HSLB::hswait() throw()
+void HSLB::hswait() throw(HSLBHandlerException)
 {
-  return ::hswait(m_hslb.fd);
+  hswait_quiet();
 }
 
-int HSLB::readfee8(int adr) throw()
+int HSLB::readfee8(int adr) throw(HSLBHandlerException)
 {
-  return ::readfee8(m_hslb.fd, adr);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  writefn(HSREG_CSR, 0x05); /* reset read fifo */
+  writefn(adr, 0);          /* dummy value write to pass address */
+  writefn(HSREG_CSR, 0x07); /* parameter read */
+  hswait_quiet();
+  return readfn(adr);
+  //return ::readfee8(m_hslb.fd, adr);
 }
 
-int HSLB::writefee8(int adr, int val) throw()
+void HSLB::writefee8(int adr, int val) throw(HSLBHandlerException)
 {
-  return ::writefee8(m_hslb.fd, adr, val);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  writefn(HSREG_CSR, 0x05); /* reset read fifo */
+  writefn(adr, val & 0xff);
+  writefn(HSREG_CSR, 0x0a); /* parameter write */
+  //return ::writefee8(m_hslb.fd, adr, val);
 }
 
-int HSLB::readfee32(int adr, int* valp) throw()
+int HSLB::readfee32(int adr) throw(HSLBHandlerException)
 {
-  return ::readfee32(m_hslb.fd, adr, valp);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  writefn(HSREG_CSR,    0x05); /* reset read fifo */
+  writefn(HSREG_CSR,    0x0c); /* 32-bit parameter read */
+  writefn(HSREG_SERIAL, (adr >> 8) & 0xff);
+  writefn(HSREG_SERIAL, (adr >> 0) & 0xff);
+  writefn(HSREG_CSR,    0x08); /* end of stream */
+  hswait_quiet();
+  return ((readfn(HSREG_D32D) & 0xff) << 24) |
+         ((readfn(HSREG_D32C) & 0xff) << 16) |
+         ((readfn(HSREG_D32B) & 0xff) <<  8) |
+         ((readfn(HSREG_D32A) & 0xff) <<  0);
+  //return ::readfee32(m_hslb.fd, adr, valp);
 }
 
-int HSLB::writefee32(int adr, int val) throw()
+void HSLB::writefee32(int adr, int val) throw(HSLBHandlerException)
 {
-  return ::writefee32(m_hslb.fd, adr, val);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  writefn(HSREG_CSR,    0x05); /* reset read fifo */
+  writefn(HSREG_CSR,    0x0b); /* 32-bit parameter write */
+  writefn(HSREG_SERIAL, (adr >>  8) & 0xff);
+  writefn(HSREG_SERIAL, (adr >>  0) & 0xff);
+  writefn(HSREG_SERIAL, (val >> 24) & 0xff);
+  writefn(HSREG_SERIAL, (val >> 16) & 0xff);
+  writefn(HSREG_SERIAL, (val >>  8) & 0xff);
+  writefn(HSREG_SERIAL, (val >>  0) & 0xff);
+  writefn(HSREG_CSR,    0x08); /* end of stream */
+  //return ::writefee32(m_hslb.fd, adr, val);
 }
 
-int HSLB::writestream(const char* filename) throw()
+void HSLB::writestream(const char* filename) throw(HSLBHandlerException)
 {
-  return ::writestream(m_hslb.fd, (char*)filename);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  if (::writestream(m_hslb.fd, (char*)filename) < 0) {
+    throw (HSLBHandlerException("Failed to write stream to hslb-%c : %s", m_hslb.fin + 'a'), hslberr());
+  }
 }
 
-std::string HSLB::checkfee() throw()
+std::string HSLB::checkfee() throw(HSLBHandlerException)
 {
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
   static const char* feetype[] = {
     "UNDEF", "SVD", "CDC", "BPID", "EPID", "ECL", "KLM", "TRG",
     "UNKNOWN-8", "UNKNOWN-9", "UNKNOWN-10", "UNKNOWN-11",
@@ -174,55 +277,45 @@ std::string HSLB::checkfee() throw()
   return std::string("UNKNOWN");
 }
 
-bool HSLB::writefee(int adr, int val) throw()
+void HSLB::linkfee() throw(HSLBHandlerException)
 {
-  return ::writefee(m_hslb.fd, adr, val) == 0;
-}
-
-int HSLB::readfee(int adr) throw()
-{
-  int val = -1;
-  if (::readfee(m_hslb.fd, adr, &val) == 0) {
-    return val;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  return -1;
+  writefn(HSREG_CSR,     0x05); // reset read fifo
+  writefn(HSREG_CSR,     0x06); // reset read ack
+  writefn(HSREG_FEECONT, 0x01); // HSREG_FEECONT
+  writefn(HSREG_CSR,     0x0a); // parameter write
 }
 
-bool HSLB::linkfee() throw()
+void HSLB::trgofffee() throw(HSLBHandlerException)
 {
-  return ::linkfee(m_hslb.fd) == 0;
-}
-
-bool HSLB::unlinkfee() throw()
-{
-  return ::unlinkfee(m_hslb.fd) == 0;
-}
-
-bool HSLB::trgofffee() throw()
-{
-  return ::trgofffee(m_hslb.fd) == 0;
-}
-
-bool HSLB::trgonfee() throw()
-{
-  return ::trgonfee(m_hslb.fd) == 0;
-}
-
-int HSLB::readfee16(int adr) throw()
-{
-  int val = 0;
-  if (::readfee16(m_hslb.fd, adr, &val)) {
-    return val;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  return -1;
+  writefn(HSREG_CSR,     0x05); // reset read fifo
+  writefn(HSREG_CSR,     0x06); // reset read ack
+  writefn(HSREG_FEECONT, 0x03); // HSREG_FEECONT
+  writefn(HSREG_CSR,     0x0a); // parameter write
 }
 
-bool HSLB::writefee16(int adr, int val) throw()
+void HSLB::trgonfee() throw(HSLBHandlerException)
 {
-  return ::writefee16(m_hslb.fd, adr, val);
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  writefn(HSREG_CSR,     0x05); // reset read fifo
+  writefn(HSREG_CSR,     0x06); // reset read ack
+  writefn(HSREG_FEECONT, 0x03); // HSREG_FEECONT
+  writefn(HSREG_CSR,     0x0a); // parameter write
 }
 
-bool HSLB::bootfpga(const std::string& firmware) throw()
+void HSLB::bootfpga(const std::string& firmware) throw(HSLBHandlerException)
 {
-  return ::bootfpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) == 0;
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  if (::bootfpga(m_hslb.fd, firmware.c_str(), 0, 0, M012_SELECTMAP) < 0) {
+    throw (HSLBHandlerException("Failed to boot FPGA on hslb-%c : %s", m_hslb.fin + 'a', hslberr()));
+  }
 }

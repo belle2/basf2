@@ -14,6 +14,7 @@ extern "C" {
 #define M012_SERIAL      7
 #define M012_SELECTMAP   6
 
+const char* hslberr();
 int openfn(int fd, int readonly);
 int readfn(int fd, int adr);
 int writefn(int fd, int adr, int val);
@@ -31,16 +32,6 @@ void dumpfpga(int conf, char* str);
 int bootfpga(int fndev, const char* file,
              int verbose, int forced, int m012);
 int checkfee(hslb_info* hslb);
-int writefee(int fd, int addr, int val);
-int readfee(int fd, int addr, int* val);
-int linkfee(int fd);
-int unlinkfee(int fd);
-int trgofffee(int fd);
-int trgonfee(int fd);
-int writefee16a(int fd, int addr, int nvals, const int* wval);
-int writefee16(int fd, int addr, int wval);
-int readfee16a(int fd, int addr, int nvals, int* val);
-int readfee16(int fd, int addr, int* val);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {

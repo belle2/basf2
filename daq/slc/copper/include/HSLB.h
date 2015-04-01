@@ -2,6 +2,7 @@
 #define _Belle2_HSLB_h
 
 #include <daq/slc/copper/FEEConfig.h>
+#include <daq/slc/copper/HSLBHandlerException.h>
 
 #include <mgt/hslb_info.h>
 
@@ -19,54 +20,44 @@ namespace Belle2 {
     ~HSLB() throw() {}
 
   public:
-    bool open(int id) throw();
-    bool close() throw();
-    bool load() throw();
-    bool monitor() throw();
-    bool isError() throw();
-    bool isBelle2LinkDown() throw();
-    bool isCOPPERFifoFull() throw();
-    bool isCOPPERLengthFifoFull() throw();
-    bool isFifoFull() throw();
-    bool isCRCError() throw();
+    int open(int fin) throw(HSLBHandlerException);
+    void close() throw();
+    void load() throw(HSLBHandlerException);
+    bool monitor() throw(HSLBHandlerException);
+    void boot(const std::string& firmware) throw(HSLBHandlerException);
+    bool isError() throw(HSLBHandlerException);
+    bool isBelle2LinkDown() throw(HSLBHandlerException);
+    bool isCOPPERFifoFull() throw(HSLBHandlerException);
+    bool isCOPPERLengthFifoFull() throw(HSLBHandlerException);
+    bool isFifoFull() throw(HSLBHandlerException);
+    bool isCRCError() throw(HSLBHandlerException);
 
   public:
     const hslb_info& getInfo() const throw() { return m_hslb; }
     int fd() const throw() { return m_hslb.fd; }
     int get_finid() const throw() { return m_hslb.fin; }
     operator int() const throw() { return m_hslb.fd; }
-    int readfn(int adr) throw();
-    int writefn(int adr, int val) throw();
-    int readfn32(int adr) throw();
-    int writefn32(int adr, int val) throw();
-    int hswait_quiet() throw();
-    int hswait() throw();
-    int readfee8(int adr) throw();
-    int writefee8(int adr, int val) throw();
-    int readfee32(int adr, int* valp) throw();
-    int writefee32(int adr, int val) throw();
-    int writestream(const char* filename) throw();
-    bool writefee(int adr, int val) throw();
-    int readfee(int adr) throw();
-    std::string checkfee() throw();
-    bool linkfee() throw();
-    bool unlinkfee() throw();
-    bool trgofffee() throw();
-    bool trgonfee() throw();
-    bool bootfpga(const std::string& firmware) throw();
-    bool writefee16(int adr, int val) throw();
-    int readfee16(int adr) throw();
 
   public:
-    bool boot(const std::string& firmware) throw();
-    const std::string getErrMessage()
-    {
-      return m_errmsg;
-    }
+    int readfn(int adr) throw(HSLBHandlerException);
+    void writefn(int adr, int val) throw(HSLBHandlerException);
+    int readfn32(int adr) throw(HSLBHandlerException);
+    void writefn32(int adr, int val) throw(HSLBHandlerException);
+    void hswait_quiet() throw(HSLBHandlerException);
+    void hswait() throw(HSLBHandlerException);
+    int readfee8(int adr) throw(HSLBHandlerException);
+    void writefee8(int adr, int val) throw(HSLBHandlerException);
+    int readfee32(int adr) throw(HSLBHandlerException);
+    void writefee32(int adr, int val) throw(HSLBHandlerException);
+    void writestream(const char* filename) throw(HSLBHandlerException);
+    std::string checkfee() throw(HSLBHandlerException);
+    void linkfee() throw(HSLBHandlerException);
+    void trgofffee() throw(HSLBHandlerException);
+    void trgonfee() throw(HSLBHandlerException);
+    void bootfpga(const std::string& firmware) throw(HSLBHandlerException);
 
   private:
     hslb_info m_hslb;
-    std::string m_errmsg;
 
   };
 

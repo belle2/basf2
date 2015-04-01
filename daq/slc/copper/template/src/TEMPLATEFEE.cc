@@ -11,7 +11,7 @@ TEMPLATEFEE::TEMPLATEFEE()
 {
 }
 
-void TEMPLATEFEE::init(RCCallback& callback)
+void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb)
 {
 
 }

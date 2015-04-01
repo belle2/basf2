@@ -1,4 +1,5 @@
 #include "daq/slc/copper/cdc/CDCFEE.h"
+#include "daq/slc/copper/cdc/CDCFEEHandler.h"
 
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
@@ -15,9 +16,22 @@ CDCFEE::CDCFEE()
 {
 }
 
-void CDCFEE::init(RCCallback& callback)
+void CDCFEE::init(RCCallback& callback, HSLB& hslb)
 {
-
+  std::string vname = StringUtil::form("cdc[%d]", hslb.get_finid());
+  callback.add(new CDCDateHandler(vname + ".date", callback, hslb, *this));
+  callback.add(new CDCFirmwareHandler(vname + ".firmver", callback, hslb, *this));
+  callback.add(new CDCDataFormatHandler(vname + ".dataformat", callback, hslb, *this));
+  callback.add(new CDCWindowHandler(vname + ".window", callback, hslb, *this));
+  callback.add(new CDCDelayHandler(vname + ".delay", callback, hslb, *this));
+  callback.add(new CDCADCThresholdHandler(vname + ".adcth", callback, hslb, *this));
+  callback.add(new CDCIndirectADCAccessHandler(vname + ".indirectadc", callback, hslb, *this));
+  callback.add(new CDCDACControlHandler(vname + ".dac", callback, hslb, *this));
+  callback.add(new CDCIndirectMonitorAccessHandler(vname + ".indirectmon", callback, hslb, *this));
+  for (int i = 0; i < 48; i++) {
+    std::string vname = StringUtil::form("cdc[%d].ped[%d]", hslb.get_finid(), i);
+    callback.add(new CDCPedestalHandler(vname, callback, hslb, *this, i));
+  }
 }
 
 void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
@@ -54,7 +68,7 @@ void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
   } else if (mode == "raw") {
     LogFile::info("raw mode");
     val = 2 << 24;
-  } else if (mode == "raw_suppress") {
+  } else if (mode == "raw-suppress") {
     LogFile::info("raw-suppress mode");
     val = 3 << 24;
   } else {

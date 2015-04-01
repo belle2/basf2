@@ -12,6 +12,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
+#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
+
 #include <genfit/TrackCand.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -206,7 +208,8 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
     std::pair<double, double> track_par;
     std::pair<double, double> ref_point;
-    double chi2 = m_cdcLegendreTrackFitter.fitTrackCandidateFast(qt->getItemsVector(), track_par, ref_point);
+    TrackFitter cdcLegendreTrackFitter;
+    double chi2 = cdcLegendreTrackFitter.fitTrackCandidateFast(qt->getItemsVector(), track_par, ref_point);
     double D = pow(ref_point.first * ref_point.first + ref_point.second * ref_point.second, 0.5);
 
     if (not increaseThreshold)
@@ -251,7 +254,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     {
       trackHitsTemp.push_back(hit);
     }
-    double chi2New = m_cdcLegendreTrackFitter.fitTrackCandidateFast(trackHitsTemp, track_par, ref_point);
+    double chi2New = cdcLegendreTrackFitter.fitTrackCandidateFast(trackHitsTemp, track_par, ref_point);
 
 //    if(chi2New != chi2) B2INFO("Chi2 = " << chi2 << "; chi2New = " << chi2New);
 

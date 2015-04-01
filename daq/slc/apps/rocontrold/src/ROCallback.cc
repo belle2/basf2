@@ -111,7 +111,7 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
 void ROCallback::start(int expno, int runno) throw(RCHandlerException)
 {
   try {
-    m_eb0.start(expno, runno);
+    if (m_eb0.isUsed()) m_eb0.start(expno, runno);
   } catch (const RCHandlerException& e) {
     LogFile::warning("eb0 did not start : %s", e.what());
   }

@@ -36,8 +36,9 @@ namespace Belle2 {
     typedef int TrackCounter;
 
     FittingMatrix() : m_param_maximum_theta(0), m_param_maximum_distance_z(0),
-      m_param_minimal_z_difference(0), m_param_minimal_chi2_stereo(0),
-      m_param_minimal_theta_difference(0), m_param_minimal_chi2(0) {}
+      m_param_minimal_theta_difference(0),
+      m_param_minimal_z_difference(0), m_param_minimal_chi2(0),
+      m_param_minimal_chi2_stereo(0) {}
 
     enum SegmentStatus {
       ABOVE_TRACK, BENEATH_TRACK, IN_TRACK, MIX_WITH_TRACK, NAN_IN_CALCULATION

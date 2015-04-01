@@ -15,6 +15,7 @@
 
 #include <framework/core/PathIterator.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/database/DBStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
@@ -80,7 +81,8 @@ void EventProcessor::writeToStdErr(const char msg[])
 }
 
 
-EventProcessor::EventProcessor() : m_master(NULL), m_mainRNG(NULL), m_processStatisticsPtr("", DataStore::c_Persistent), m_inRun(false)
+EventProcessor::EventProcessor() : m_master(NULL), m_mainRNG(NULL), m_processStatisticsPtr("", DataStore::c_Persistent),
+  m_inRun(false)
 {
 
 }
@@ -242,7 +244,8 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
     if ((m_eventMetaDataPtr && (m_eventMetaDataPtr->isEndOfData())) ||
         ((module == m_master) && !m_eventMetaDataPtr)) {
       if (module != m_master) {
-        B2WARNING("Event processing stopped by module '" << module->getName() << "', which is not in control of event processing (does not provide EventMetaData)");
+        B2WARNING("Event processing stopped by module '" << module->getName() <<
+                  "', which is not in control of event processing (does not provide EventMetaData)");
       }
       return true;
     }
@@ -280,7 +283,8 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
     //Check for a module condition, evaluate it and if it is true switch to a new path
     if (module->evalCondition()) {
       PathPtr condPath = module->getConditionPath();
-      if (module->getAfterConditionPath() == Module::EAfterConditionPath::c_Continue) { //continue with parent Path after condition path is executed?
+      if (module->getAfterConditionPath() ==
+          Module::EAfterConditionPath::c_Continue) { //continue with parent Path after condition path is executed?
         moduleIter = PathIterator(condPath, moduleIter);
       } else {
         moduleIter = PathIterator(condPath);
@@ -363,6 +367,8 @@ void EventProcessor::processBeginRun()
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
+
+  DBStore::Instance().update();
 
   for (listIter = m_moduleList.begin(); listIter != m_moduleList.end(); ++listIter) {
     Module* module = listIter->get();

@@ -81,7 +81,8 @@ namespace VXDTFDynamicObserversTest {
     FancyValueCarrier() :
       m_countedChanges(0),
       m_myVal(0),
-      m_identifier(std::numeric_limits<unsigned int>::max()) {}
+      m_identifier(std::numeric_limits<unsigned int>::max()),
+      m_lockIdentifier(false) {}
 
 
     /** this is the member function matching the std::function-pattern of ObservableState<ValueType>.
@@ -94,6 +95,7 @@ namespace VXDTFDynamicObserversTest {
       B2INFO("ValueType::updateMyVal was updated (change revision " << m_countedChanges << ")! old value: " << get() << ", new value: " <<
              newVal)
       m_myVal = newVal;
+      B2INFO("ValueType::updateMyVal: new value with get again: " << get())
     }
 
 

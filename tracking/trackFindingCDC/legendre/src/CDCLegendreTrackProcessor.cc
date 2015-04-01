@@ -60,6 +60,21 @@ TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNodeList(con
   return trackCandidate;
 }
 
+TrackCandidate* TrackProcessor::createTracklet(std::vector<TrackHit*>& hits)
+{
+  std::pair<double, double> track_par;
+  std::pair<double, double> ref_point;
+  TrackFitter cdcLegendreTrackFitter;
+  cdcLegendreTrackFitter.fitTrackCandidateFast(hits, track_par, ref_point);
+  int m_charge = TrackCandidate::getChargeAssumption(track_par.first, track_par.second, hits);
+
+  TrackCandidate* trackCandidate = new TrackCandidate(track_par.first, track_par.second, m_charge, hits);
+  processTrack(trackCandidate);
+
+  trackCandidate->setCandidateType(TrackCandidate::tracklet);
+  return trackCandidate;
+}
+
 void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 {
   //check if the number has enough axial hits (might be less due to the curvature check).

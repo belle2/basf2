@@ -94,7 +94,7 @@ void PatternChecker::checkCurler(
 
 bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
 {
-  return false;
+//  return false;
   if (track->getTrackHits().size() < 1) return false;
   HitPatternCDC trackHitPattern = track->getHitPattern();
   B2DEBUG(100, "Initial pattern: " << trackHitPattern.getBitSet());
@@ -171,7 +171,7 @@ bool PatternChecker::checkCandidate(TrackCandidate* track, int minNHitsSLayer)
     for (TrackHit* hit : track->getTrackHits()) {
       if (patterns[ii].hasLayer(hit->getLayerId())) trackletHits.push_back(hit);
     }
-    if (trackletHits.size() > 0) m_cdcLegendreTrackProcessor->createLegendreTracklet(trackletHits)->setCandidateType(
+    if (trackletHits.size() > 0) m_cdcLegendreTrackProcessor->createTracklet(trackletHits)->setCandidateType(
         TrackCandidate::tracklet);
     trackletHits.clear();
   }

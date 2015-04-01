@@ -27,7 +27,7 @@ REG_MODULE(CDCLegendreTracking)
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   Module(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
   m_cdcLegendreTrackProcessor(),
-  m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr)
+  m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr), m_treeFinder(0), eventNumber(0)
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -379,7 +379,6 @@ void CDCLegendreTrackingModule::postprocessTracks()
 void CDCLegendreTrackingModule::endRun()
 {
   B2INFO("Tree finder had " << m_treeFinder << " calls");
-  B2INFO("Stepped finder had " << m_steppedFinder << " calls");
 }
 
 void CDCLegendreTrackingModule::terminate()

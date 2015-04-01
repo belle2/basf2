@@ -175,7 +175,7 @@ double TrackCandidate::getZMomentumEstimation(TVector2 mom2) const
 
   double zmom = tan(medianTheta) * sqrt(mom2.X() * mom2.X() + mom2.Y() * mom2.Y());
 
-  double theta_mean = 0;
+  double __attribute__((unused)) theta_mean = 0;
   int nStereo = 0;
 
   for (TrackHit* hit : m_TrackHits) {

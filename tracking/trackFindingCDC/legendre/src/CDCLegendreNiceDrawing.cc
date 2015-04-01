@@ -451,7 +451,6 @@ void NiceDrawing::drawTrackCandidatesMinusMCTracks()
   StoreArray<CDCHit> HitArray(m_HitColName);
 
   std::stringstream ss;
-  double yPosition = 100;
 
   for (int iTrack = 0; iTrack < particleTrackCandidates.getEntries(); ++iTrack) {
     genfit::TrackCand* trackCandidate = particleTrackCandidates[iTrack];
@@ -462,7 +461,6 @@ void NiceDrawing::drawTrackCandidatesMinusMCTracks()
     //std::string qualityEstimation = getQualityEstimationOfPTTrackCandidate(trackCandidate);
 
     //drawDescribingQualityText(ss, qualityEstimation, trackColor, yPosition);
-    yPosition += 15;
 
     if (mcMatchingStatus >= 0) {
       // A good mc track candidate is related to this pattern track candidate

@@ -47,7 +47,6 @@ namespace Belle2 {
     {
       eventNumber = 0;
       m_treeFinder = 0;
-      m_steppedFinder = 0;
     }
 
     /** This method is the core of the module.
@@ -84,7 +83,7 @@ namespace Belle2 {
     std::string m_param_cdcHitsColumnName; /**< Input digitized hits collection name (output of CDCDigitizer module) */
     std::string m_param_trackCandidatesColumnName; /**< Output genfit track candidates collection name*/
     unsigned int m_param_threshold;         /**< Threshold for votes in the legendre plane, parameter of the module*/
-    double m_thresholdUnique;     /**< Threshold of unique TrackHits for track building*/
+//    double m_thresholdUnique;     /**< Threshold of unique TrackHits for track building*/
     double m_stepScale;           /**< Scale of steps for SteppedHough*/
     int m_maxLevel;               /**< Maximum Level of FastHough Algorithm*/
     bool m_reconstructCurler;     /**< Stores, curlers shall be reconstructed*/
@@ -102,7 +101,6 @@ namespace Belle2 {
     bool m_batchMode;                 /**< Sets ROOT to batch mode (don't show canvases) */
 
     int m_treeFinder;
-    int m_steppedFinder;
 
     int eventNumber;
 

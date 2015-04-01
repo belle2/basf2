@@ -132,7 +132,7 @@ namespace Belle2 {
       bool approach2(const TrackCandidate&);
 
       /** Sets the position of the hit to given point in 3D space.*/
-      void setPosition(const TVector3 position)
+      void setPosition(const TVector3& position)
       {
         m_wirePosition = position;
         performConformalTransformation();

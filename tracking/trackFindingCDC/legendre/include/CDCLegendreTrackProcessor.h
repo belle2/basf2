@@ -62,7 +62,7 @@ namespace Belle2 {
 
       /** Create tracklet using vector of hits and store it
        * UNUSED AS THE CLASS PATTERN_CHECKER IS UNUSED*/
-      TrackCandidate* createLegendreTracklet(std::vector<TrackHit*>& hits);
+      TrackCandidate* createTracklet(std::vector<TrackHit*>& hits);
 
       /** Creates GeantFit Track Candidates from the stored CDCLegendreTrackCandidates */
       void createGFTrackCandidates(const string& m_gfTrackCandsColName);

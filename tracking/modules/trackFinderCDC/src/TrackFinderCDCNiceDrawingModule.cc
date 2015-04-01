@@ -28,7 +28,7 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(CDCNiceDrawing)
 
-CDCNiceDrawingModule::CDCNiceDrawingModule() : Module()
+CDCNiceDrawingModule::CDCNiceDrawingModule() : Module(), m_cdcLegendreNiceDrawing(nullptr)
 {
 
   setDescription("Nice Tracking Drawing Module");
@@ -63,9 +63,11 @@ CDCNiceDrawingModule::CDCNiceDrawingModule() : Module()
 void CDCNiceDrawingModule::initialize()
 {
   if (m_drawAlsoDifference) {
-    m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_MCTrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
+    m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_MCTrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory,
+                                               m_drawMCSignal, m_drawCands, m_mcParticlesColName);
   } else {
-    m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal, m_drawCands, m_mcParticlesColName);
+    m_cdcLegendreNiceDrawing = new NiceDrawing(m_TrackCandColName, m_trackColName, m_HitColName, m_StoreDirectory, m_drawMCSignal,
+                                               m_drawCands, m_mcParticlesColName);
   }
 
   m_cdcLegendreNiceDrawing->initialize();

@@ -338,24 +338,10 @@ void FastHough::FastHoughCustomReferencePoint(
 
   }
 
-  unsigned int max_value = 0;
-  std::pair<int, int> max_value_bin = std::make_pair(0, 0);
-
   bool binUsed[2][2];
   for (int ii = 0; ii < 2; ii++)
     for (int jj = 0; jj < 2; jj++)
       binUsed[ii][jj] = false;
-
-
-  for (int t_index = 0; t_index < 2; ++t_index) {
-    for (int r_index = 0; r_index < 2; ++r_index) {
-      if (max_value  < voted_hits[t_index][r_index].size()) {
-        max_value = voted_hits[t_index][r_index].size();
-        max_value_bin = std::make_pair(t_index, r_index);
-      }
-    }
-  }
-
 
 //Processing, which bins are further investigated
   for (int bin_loop = 0; bin_loop < 4; bin_loop++) {

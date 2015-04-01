@@ -298,15 +298,6 @@ namespace Belle2 {
         m_children->apply(lmd);
       };
 
-      /** Check if we reach limitation on dr and dtheta; returns true when reached limit */
-      bool checkLimitsR()
-      {
-        if (m_level == 13)
-          return true;
-
-        return false;
-      };
-
       std::vector<typeData*> m_items;  /**< Vector of hits which belongs to the node */
 
       ThisType* m_parent;  /**< Pointer to the parent node */

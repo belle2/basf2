@@ -11,7 +11,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-StereohitsProcesser::StereohitsProcesser() : m_cdcLegendreQuadTree(-0.15, 0.15,  0, 8192, 0, NULL)
+StereohitsProcesser::StereohitsProcesser() : m_cdcLegendreQuadTree(0, 8192, -0.15, 0.15,  0, NULL)
 {
 }
 
@@ -241,7 +241,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 //    canv1.SaveAs(Form("tmp/stereohits/efficiency/ev_%i_tr_%i_2d_hipt.root", eventnr, tracknr));
 
   int maxBin = hist.GetMaximumBin();
-  double meanTheta = hist.GetMean() * 3.1415 / 180.;
+  double meanTheta(0);
 //    double range1 = binWidth*(maxBin-2);
 //    double range2 = binWidth*(maxBin+2);
 //    double range1 = meanTheta - binWidth * 2;
@@ -692,7 +692,7 @@ double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, dou
   double alpha = acos(1. - (SQR(pos.first - cand->getReferencePoint().X()) + SQR(pos.second - cand->getReferencePoint().Y())) /
                       (2.*SQR(cand->getRadius())));
 
-  double hitPhi = 0.;
+  double hitPhi(0.);
   hitPhi = atan(pos.second / pos.first);
 
   //distribute the phi values from 0 to 2pi

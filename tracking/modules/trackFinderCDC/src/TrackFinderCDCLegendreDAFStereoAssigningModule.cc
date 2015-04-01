@@ -438,9 +438,9 @@ void CDCLegendreDAFStereoAssigningModule::event()
 
         //gfTrack.Print();
         bool fitSuccess = gfTrack->hasFitStatus(trackRep);
-        genfit::FitStatus* fs = 0;
         genfit::KalmanFitStatus* kfs = 0;
         if (fitSuccess) {
+          genfit::FitStatus* fs = 0;
           fs = gfTrack->getFitStatus(trackRep);
           fitSuccess = fitSuccess && fs->isFitted();
           fitSuccess = fitSuccess && fs->isFitConverged();

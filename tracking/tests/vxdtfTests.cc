@@ -29,6 +29,7 @@
 
 /// for the redesign:
 #include "vxdtfRedesign/observers.cc"
+#include "vxdtfRedesign/observersDynamic.cc"
 #include "vxdtfRedesign/oldVSNewSegFinderFilters.cc"
 #include "vxdtfRedesign/twoHitFilters.cc"
 

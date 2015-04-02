@@ -52,7 +52,8 @@ namespace Belle2 {
     }
 
     /** add a single hit to the object */
-    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, bool extrapFailed, float drift_length = 0.0)
+    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, float translenergydep, bool extrapFailed,
+                float drift_length = 0.0)
     {
       wx.push_back(pos.X());
       wy.push_back(pos.Y());
@@ -61,6 +62,7 @@ namespace Belle2 {
       sensorUID.push_back(sensorid);
       phiWireTrack.push_back(phi);
       edep.push_back(energydep);
+      tedep.push_back(translenergydep);
       extrapolationFailed.push_back(extrapFailed);
       driftLength.push_back(drift_length);
       if ((layer < 0 and layer < m_last_layer) or (layer >= 0 and layer > m_last_layer))
@@ -111,6 +113,7 @@ namespace Belle2 {
 
     //arrays with one entry per hit
     std::vector<float> edep; /**< uncorrected energy deposition (or charge for CDC hits) */
+    std::vector<float> tedep; /**< translated energy deposition (or charge for CDC hits) */
     std::vector<int> flayer; /**< full layer id, -1..-2 for PXD -2..-6 for SVD */
     std::vector<float> phiWireTrack; /**< for PXD/SVD: angle between sensor normal and track; for CDC angle of track in x/y plane */
     std::vector<float> wx; /**< hit position */
@@ -132,7 +135,7 @@ namespace Belle2 {
     float m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< CDC log likelihood for each particle, not including momentum prior */
     float m_svdLogl[Const::ChargedStable::c_SetSize]; /**< SVD log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxTrack, 6); /**< Debug output for DedxPID module. */
+    ClassDef(DedxTrack, 7); /**< Debug output for DedxPID module. */
   };
 }
 #endif

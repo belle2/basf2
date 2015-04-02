@@ -4,6 +4,7 @@
 import os
 import random
 from basf2 import *
+from simulation import add_simulation
 
 # change to True if you want to use PXD hits (fairly small benefit, if any)
 use_pxd = False
@@ -14,7 +15,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [20])
+eventinfosetter.param('evtNumList', [50])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
@@ -42,6 +43,7 @@ main.add_module(geometry)
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 
+
 if use_pxd:
     main.add_module(register_module('PXDDigitizer'))
     main.add_module(register_module('PXDClusterizer'))
@@ -66,8 +68,8 @@ main.add_module(genfit)
 dedx = register_module('DedxPID')
 dedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': True,
-    'removeLowest': 0.0,
-    'removeHighest': 0.8,
+    'removeLowest': 0.05,
+    'removeHighest': 0.25,
     'onlyPrimaryParticles': False,
     'usePXD': use_pxd,
     'useSVD': True,
@@ -75,7 +77,7 @@ dedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'trackDistanceThreshold': 4.0,
     'enableDebugOutput': True,
     'ignoreMissingParticles': False,
-    }
+}
 dedx.param(dedx_params)
 main.add_module(dedx)
 output = register_module('RootOutput')

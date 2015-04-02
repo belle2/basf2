@@ -44,15 +44,15 @@ class TreeWriterModule(Module):
 
         super(TreeWriterModule, self).__init__()
 
-        ## Output ROOT file.
+        # Output ROOT file.
         self.file = ROOT.TFile('PID_TTree.root', 'recreate')
-        ## TTree for output data
+        # TTree for output data
         self.tree = ROOT.TTree('tree', '')
-        ## Instance of EventData class
+        # Instance of EventData class
         self.data = TreeStruct()
         # Declare tree branches
         for key in TreeStruct.__dict__.keys():
-            if not '__' in key:
+            if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'

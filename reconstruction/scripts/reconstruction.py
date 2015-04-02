@@ -12,7 +12,7 @@ class PruneGenfitTracks(Module):
     This needs to be done after the dE/dx PID.
     """
 
-    ## See genfit::Track::prune() doc, empty string for no pruning
+    # See genfit::Track::prune() doc, empty string for no pruning
     m_flags = 'FL'
 
     def __init__(self):
@@ -149,21 +149,17 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=1):
         vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
         if components is not None and 'PXD' not in components:
             vxd_trackfinder.param('sectorSetup',
-                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD'
-                                  ,
-                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD'
-                                  ,
-                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'
-                                  ])
+                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
+                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
+                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'
+                                   ])
             vxd_trackfinder.param('tuneCutoffs', 0.06)
         else:
             vxd_trackfinder.param('sectorSetup',
-                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
-                                  ,
-                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
-                                  ,
-                                  'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
-                                  ])
+                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
+                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+                                   ])
             vxd_trackfinder.param('tuneCutoffs', 0.22)
         path.add_module(vxd_trackfinder)
 
@@ -278,7 +274,7 @@ def add_mdst_output(
     mc=True,
     filename='mdst.root',
     additionalBranches=[],
-    ):
+):
     """
     This function adds the mdst output modules to a path.
     """
@@ -296,12 +292,10 @@ def add_mdst_output(
         'KLMClusters',
         'KLMClustersToTracks',
         'TRGSummary',
-        ]
+    ]
     if mc:
         branches += ['MCParticles', 'TracksToMCParticles',
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
     branches += additionalBranches
     output.param('branchNames', branches)
     path.add_module(output)
-
-

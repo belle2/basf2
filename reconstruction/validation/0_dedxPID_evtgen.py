@@ -37,7 +37,7 @@ generator.param('nTracks', 8.0)
 generator.param('pdgCodes', pdgs)
 main.add_module(generator)
 
-#only up to CDC
+# only up to CDC
 components = [
     'MagneticFieldConstant4LimitedRCDC',
     'BeamPipe',
@@ -49,7 +49,7 @@ add_simulation(main, components)
 
 add_reconstruction(main, components)
 
-#enable debug output for the module added by add_reconstruction()
+# enable debug output for the module added by add_reconstruction()
 for m in main.modules():
     if m.name() == 'DedxPID':
         m.param('enableDebugOutput', True)

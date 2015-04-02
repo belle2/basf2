@@ -359,11 +359,11 @@ void DedxCellPIDModule::event()
         double cellHalfWidth = PI * wirePosF.Perp() / nWires;
 
         // first construct the boundary lines, then create the cell
-        const Point tl = Point(-topHalfWidth, topHeight);
-        const Point tr = Point(topHalfWidth, topHeight);
-        const Point br = Point(bottomHalfWidth, -bottomHeight);
-        const Point bl = Point(-bottomHalfWidth, -bottomHeight);
-        Cell c = Cell(tl, tr, br, bl);
+        const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
+        const DedxPoint tr = DedxPoint(topHalfWidth, topHeight);
+        const DedxPoint br = DedxPoint(bottomHalfWidth, -bottomHeight);
+        const DedxPoint bl = DedxPoint(-bottomHalfWidth, -bottomHeight);
+        DedxDriftCell c = DedxDriftCell(tl, tr, br, bl);
 
         // determine the doca for this hit
         try {
@@ -388,6 +388,7 @@ void DedxCellPIDModule::event()
           RealisticTDCCountTranslator realistictdc;
           double driftDRealistic = realistictdc.getDriftLength(driftT, wireID);
           double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID);
+          // if instead we want to use measured angles, etc:
           //          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
           //          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
 
@@ -468,6 +469,7 @@ void DedxCellPIDModule::event()
       DedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxCell->m_cdcLogl, dedxCell->m_svdLogl);
       track->addRelationTo(likelihoodObj);
     }
+
   } // end of loop over tracks
 }
 

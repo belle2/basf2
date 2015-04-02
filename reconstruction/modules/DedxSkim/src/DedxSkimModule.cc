@@ -41,11 +41,14 @@ DedxSkimModule::DedxSkimModule() : Module()
   m_EoverP = {0.85, 1.15};
   m_EccOverEcm = {0.75, 1.15};
 
-  addParam("eventType", m_eventType, "Event type: (-1) clean up tracks, (0) bhabha, (1) radiative bhabha, (2) two photon (e+e-), (3) di-muon, (4) radiative di-muon (5) D-decays (D*->D0 pi; D0 -> K pi)", m_eventType);
+  addParam("eventType", m_eventType,
+           "Event type: (-1) clean up tracks, (0) bhabha, (1) radiative bhabha, (2) two photon (e+e-), (3) di-muon, (4) radiative di-muon (5) D-decays (D*->D0 pi; D0 -> K pi)",
+           m_eventType);
 
   addParam("unmatchedCluster", m_unmatchedCluster, "number of unmatched clusters per event", int(0));
   addParam("EoverP", m_EoverP, "range for E/p per track", m_EoverP);
-  addParam("EccOverEcm", m_EccOverEcm, "ranger for total energy depostied in the calorimeter divided by the cm energy per event", m_EccOverEcm);
+  addParam("EccOverEcm", m_EccOverEcm, "ranger for total energy depostied in the calorimeter divided by the cm energy per event",
+           m_EccOverEcm);
 
   m_eventID = -1;
   m_trackID = 0;

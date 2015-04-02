@@ -6,7 +6,7 @@ from basf2 import *
 from ROOT import Belle2
 from ROOT import TH1F, TH2F, TCanvas
 
-## the histograms to fill
+# the histograms to fill
 hist = [TH2F(
     'hist' + str(i),
     'hist' + str(i),
@@ -16,7 +16,7 @@ hist = [TH2F(
     50,
     -100,
     100,
-    ) for i in range(4)]
+) for i in range(4)]
 
 hist[0].SetTitle('True pions, dE/dx')
 hist[1].SetTitle('True kaons, dE/dx')

@@ -30,7 +30,7 @@ components = [
     'ARICH',
     'BKLM',
     'ECL',
-    ]
+]
 add_simulation(main, components)
 # or add_simulation(main) to simulate all detectors
 

@@ -122,7 +122,7 @@ namespace Belle2 {
   {
     if (logl->getFlag() != 1) return;
 
-    for (const auto & chargedStable : Const::chargedStableSet) {
+    for (const auto& chargedStable : Const::chargedStableSet) {
       m_pid->setLogLikelihood(Const::TOP, chargedStable, logl->getLogL(chargedStable));
     }
 
@@ -133,7 +133,7 @@ namespace Belle2 {
   {
     if (logl->getFlag() != 1) return;
 
-    for (const auto & chargedStable : Const::chargedStableSet) {
+    for (const auto& chargedStable : Const::chargedStableSet) {
       m_pid->setLogLikelihood(Const::ARICH, chargedStable, logl->getLogL(chargedStable));
     }
 
@@ -143,7 +143,7 @@ namespace Belle2 {
   void MdstPIDModule::setLikelihoods(const DedxLikelihood* logl)
   {
 
-    for (const auto & chargedStable : Const::chargedStableSet) {
+    for (const auto& chargedStable : Const::chargedStableSet) {
       m_pid->setLogLikelihood(Const::SVD, chargedStable, logl->getSVDLogLikelihood(chargedStable));
       m_pid->setLogLikelihood(Const::CDC, chargedStable, logl->getCDCLogLikelihood(chargedStable));
     }
@@ -154,7 +154,7 @@ namespace Belle2 {
   void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl)
   {
 
-    for (const auto & chargedStable : Const::chargedStableSet) {
+    for (const auto& chargedStable : Const::chargedStableSet) {
       m_pid->setLogLikelihood(Const::ECL, chargedStable, logl->getLogLikelihood(chargedStable));
     }
 

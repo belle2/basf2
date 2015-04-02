@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
 
   if (argc < 2 or argc > 3) {
     std::cerr << "Usage: " << argv[0] << " INPUT_FILE [OUTPUT_FILE]\n\n";
-    std::cerr << "Generates PDFs for the DedxPID module, requires an input .root file created by running DedxPID with enableDebug=True.\n";
+    std::cerr <<
+              "Generates PDFs for the DedxPID module, requires an input .root file created by running DedxPID with enableDebug=True.\n";
     std::cerr << "If OUTPUT_FILE is not given, histograms will be drawn instead of being saved.\n";
     return 1;
   }
@@ -143,7 +144,8 @@ int main(int argc, char* argv[])
 
           //normalize this pbin to 1
           for (int d = 0; d < Dedx::c_num_detectors; d++) {
-            const double normal_width = -(hists[d]->GetYaxis()->GetBinLowEdge(1) - hists[d]->GetYaxis()->GetBinUpEdge(num_dedx_bins)) / num_dedx_bins;
+            const double normal_width = -(hists[d]->GetYaxis()->GetBinLowEdge(1) - hists[d]->GetYaxis()->GetBinUpEdge(
+                                            num_dedx_bins)) / num_dedx_bins;
 
             for (int dedxbin = 0; dedxbin <= num_dedx_bins + 1; dedxbin++) {
               hists[d]->SetBinContent(pbin, dedxbin,

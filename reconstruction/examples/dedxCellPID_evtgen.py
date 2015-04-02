@@ -18,7 +18,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate events
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [10])
+eventinfosetter.param('evtNumList', [50])
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -69,11 +69,11 @@ main.add_module(genfit)
 dedx = register_module('DedxCellPID')
 dedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': False,
-    'removeLowest': 0.0,
-    'removeHighest': 0.2,
+    'removeLowest': 0.05,
+    'removeHighest': 0.25,
     'enableDebugOutput': True,
     'ignoreMissingParticles': False,
-    }
+}
 dedx.param(dedx_params)
 main.add_module(dedx)
 

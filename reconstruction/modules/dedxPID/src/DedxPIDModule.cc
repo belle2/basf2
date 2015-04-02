@@ -16,6 +16,8 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
+#include <cdc/translators/LinearGlobalADCCountTranslator.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
@@ -326,6 +328,7 @@ void DedxPIDModule::event()
         const int current_layer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 +
                                                                layer); //this is essentially the layer ID you'd get from a CDCRecoHit
         const int wire = cdcHits[cdc_idx]->getIWire();
+        WireID wireID(cdcHits[cdc_idx]->getID());
 
         static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
         const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(current_layer, wire);
@@ -356,12 +359,14 @@ void DedxPIDModule::event()
         // deactivate the helix helper due to bugs...
         const bool helix_accurate = false;
 
+        float pocaZ;
         if (!track_extrapolation_failed && !helix_accurate) {
           try {
             TVector3 wire_dir = (wire_pos_b - wire_pos_f).Unit();
             trackrep->extrapolateToLine(pocaState, wire_pos_f, wire_dir);
             TVector3 poca = trackrep->getPos(pocaState);
             TVector3 pocaMom = trackrep->getMom(pocaState);
+            pocaZ = poca.z();
 
             //update cdchelix
             cdchelix = HelixHelper(poca, pocaMom, dedxTrack->m_charge);
@@ -384,11 +389,15 @@ void DedxPIDModule::event()
 
         const float phi = hit_pos.Phi() - local_momentum.Phi();
 
+        LinearGlobalADCCountTranslator translator;
         const float hit_charge = cdcHits[cdc_idx]->getADCCount();
+        const float translated_charge = translator.getCharge(hit_charge, wireID, false,
+                                                             pocaZ, local_momentum.Phi());
+
 
         if (m_enableDebugOutput)
-          dedxTrack->addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, track_extrapolation_failed,
-                            cdcHits[cdc_idx]->getTDCCount());
+          dedxTrack->addHit(hit_pos, current_layer, wire, (hit_pos - hit_pos_helix).Perp(), hit_charge, translated_charge,
+                            track_extrapolation_failed, cdcHits[cdc_idx]->getTDCCount());
 
         num_hits_in_current_layer++;
         layer_charge += hit_charge;
@@ -651,7 +660,7 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
     }
 
     if (m_enableDebugOutput) {
-      track->addHit(TVector3(0, 0, 0), layer, currentSensor, 0, charge, false);
+      track->addHit(TVector3(0, 0, 0), layer, currentSensor, 0, charge, charge, false);
     }
   }
 

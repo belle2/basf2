@@ -122,11 +122,11 @@ void DedxScanModule::event()
     double cellHalfWidth = PI * wirePosF.Perp() / nWires;
 
     // first construct the boundary lines, then create the cell
-    const Point tl = Point(-topHalfWidth, topHeight);
-    const Point tr = Point(topHalfWidth, topHeight);
-    const Point br = Point(bottomHalfWidth, -bottomHeight);
-    const Point bl = Point(-bottomHalfWidth, -bottomHeight);
-    Cell c = Cell(tl, tr, br, bl);
+    const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
+    const DedxPoint tr = DedxPoint(topHalfWidth, topHeight);
+    const DedxPoint br = DedxPoint(bottomHalfWidth, -bottomHeight);
+    const DedxPoint bl = DedxPoint(-bottomHalfWidth, -bottomHeight);
+    DedxDriftCell c = DedxDriftCell(tl, tr, br, bl);
 
     for (int j = 0; j < 100; ++j) {
       for (int k = 0; k < 100; ++k) {

@@ -87,7 +87,7 @@ namespace Belle2 {
     int m_nTrackCutMax_tau;
     int m_nTrackCutMin_tau;
     float m_EsumCutMax_tau;
-    float m_AngleTTCut_tau; /**the angle of the 1st and 2nd highest momentum tracks in center-of-mass energy */
+    //float m_AngleTTCut_tau; /**the angle of the 1st and 2nd highest momentum tracks in center-of-mass energy */
 
     /**bhabha criteria*/
     int m_nTrackCutMin_bhabha;

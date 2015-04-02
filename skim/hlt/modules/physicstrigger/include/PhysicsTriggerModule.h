@@ -134,6 +134,10 @@ namespace Belle2 {
     float m_p2;
     int m_ip1;
     int m_ip2;
+    float m_e1; /**the most energitic cluster*/
+    float m_e2; /**the most energitic cluster*/
+    int m_ie1;
+    int m_ie2;
     int m_Charge;
     float m_ECLClusterE;
     float m_ECLClusterTheta;
@@ -141,10 +145,6 @@ namespace Belle2 {
     float m_ECLClusterTiming;
 
     float m_Esum; /**the energy sum of good ECL clusters*/
-    float m_e1; /**the most energitic cluster*/
-    float m_e2; /**the most energitic cluster*/
-    int m_ie1;
-    int m_ie2;
 
 
   };

@@ -74,6 +74,7 @@ void PhysicsTriggerModule::initialize()
   StoreArray<PhysicsTriggerInformation>::registerPersistent();
   ReadParameters();
   m_cut.init(m_userCustomCut);
+  initializeForEvent();
 }
 
 void PhysicsTriggerModule::beginRun()
@@ -289,18 +290,15 @@ void PhysicsTriggerModule::initializeForEvent()
   m_nKLMClusters = 0;
   m_Evis = 0.;
   m_Pzvis = 0.;
-  m_p = -1.;
-  m_costheta = -10.;
-  m_phi = -10.;
-  m_ECLClusterE = -1.;
-  m_ECLClusterTheta = -10.;
-  m_ECLClusterPhi = -10.;
-  m_ECLClusterTiming = -9999.;
-  m_Esum = 0.;
-  //m_Elargest = 0.;
   m_angleTT = -10.;
   m_maxangleTT = -10.;
   m_angleGG = -10.;
+  m_dr = -1.;
+  m_dz = -1.;
+  m_pt = -1.;
+  m_p = -1.;
+  m_costheta = -10.;
+  m_phi = -10.;
   m_p1 = -1.;
   m_p2 = -1.;
   m_ip1 = -1;
@@ -309,6 +307,12 @@ void PhysicsTriggerModule::initializeForEvent()
   m_e2 = -1.;
   m_ie1 = -1;
   m_ie2 = -1;
+  m_Charge = -3;
+  m_ECLClusterE = -1.;
+  m_ECLClusterTheta = -10.;
+  m_ECLClusterPhi = -10.;
+  m_ECLClusterTiming = -9999.;
+  m_Esum = 0.;
 
 }
 

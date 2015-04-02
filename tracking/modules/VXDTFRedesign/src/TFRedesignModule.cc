@@ -13,6 +13,7 @@
 // framework
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h> // needed for reading xml-files
+#include <framework/core/Environment.h> // getNumberProcesses
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <tracking/dataobjects/VXDTFSecMap.h>
@@ -586,6 +587,10 @@ TFRedesignModule::TFRedesignModule() : Module()
            m_PARAMdisplayCollector,
            "Collector operating flag: 0 = no collector, 1 = collect for analysis, 2 = collect for display",
            int(0));
+
+  if (m_PARAMwriteToRoot == true and Environment::Instance().getNumberProcesses() > 0) {
+    B2WARNING("VXDTF::initialize: writeToRoot enabled and basf2 is running in multi-threaded mode - this can cause nondeterministic behavior if VXDTF was not manually set to vxdtf.set_property_flags(0) in the steering file!")
+  }
 }
 
 

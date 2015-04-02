@@ -29,6 +29,9 @@ namespace Belle2 {
   class ObservableState {
   protected:
 
+    /** unique counter of collected observers */
+    unsigned int m_nObservers;
+
 
     /** contains the state to be observed */
     StateType m_state;
@@ -42,8 +45,6 @@ namespace Belle2 {
     std::list< std::pair<unsigned int, std::function<void(StateType)> > > m_observers;
 
 
-    /** unique counter of collected observers */
-    unsigned int m_nObservers;
   public:
 
     /** ************************* CONSTRUCTORS ************************* */
@@ -56,13 +57,38 @@ namespace Belle2 {
 
     /** constructor initializing state via given state */
     ObservableState(StateType aState) :
-      m_state(aState),
-      m_nObservers(0) {}
+      m_nObservers(0),
+      m_state(aState) {}
 
 
     /** ************************* OPERATORS ************************* */
 
-    // TODO assignment: type conversion ObservableState <-> StateType, comparison & equality
+
+    /** Assignment via StateType */
+    inline ObservableState<StateType>& operator = (const StateType& b)
+    {
+      set(b);
+      return *this;
+    }
+
+
+    /** type conversion in StateType */
+    operator StateType() const { return get(); }
+
+
+    /** Comparison for equality with another ObservableState.
+    *
+    * compares state only and ignores observers.
+    */
+    inline bool operator == (const ObservableState<StateType>& b) const { return (this->get() == b.get()); }
+
+
+    /** Comparison != with another ObservableState.
+     *
+     * compares state only and ignores observers.
+     */
+    inline bool operator != (const ObservableState<StateType>& b) const { return (this->get() != b.get()); }
+
 
     /** ************************* MEMBER FUNCTIONS ************************* */
 

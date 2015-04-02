@@ -61,7 +61,7 @@ namespace Belle2 {
       /** bit 8: Particle is an radiative photon from PHOTOS */
       c_IsPHOTOSPhoton    = 1 << 8,
       /** combined flag to test whether the particle is radiative */
-      c_IsRadiativePhoton = c_IsFSRPhoton | c_IsFSRPhoton | c_IsPHOTOSPhoton,
+      c_IsRadiativePhoton = c_IsISRPhoton | c_IsFSRPhoton | c_IsPHOTOSPhoton,
     };
 
 

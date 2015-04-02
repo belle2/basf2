@@ -29,15 +29,21 @@ RFOutputServer::RFOutputServer(string conffile)
   chdir(execdir.c_str());
 
   // 2. Initialize local shared memory
-  m_shm = new RFSharedMem(nodename);
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(nodename);
+  m_shm = new RFSharedMem((char*)shmname.c_str());
 
   // 3. Initialize RingBuffers
-  char* rbufin = m_conf->getconf("collector", "ringbufin");
+  //  char* rbufin = m_conf->getconf("collector", "ringbufin");
+  string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
+                  string(m_conf->getconf("collector", "ringbufin"));
   int rbinsize = m_conf->getconfi("collector", "ringbufinsize");
-  m_rbufin = new RingBuffer(rbufin, rbinsize);
-  char* rbufout = m_conf->getconf("collector", "ringbufout");
+  m_rbufin = new RingBuffer(rbufin.c_str(), rbinsize);
+  //  char* rbufout = m_conf->getconf("collector", "ringbufout");
+  string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("collector", "ringbufout"));
   int rboutsize = m_conf->getconfi("collector", "ringbufoutsize");
-  m_rbufout = new RingBuffer(rbufout, rboutsize);
+  m_rbufout = new RingBuffer(rbufout.c_str(), rboutsize);
 
   // 4. Initialize process manager
   m_proc = new RFProcessManager(nodename);
@@ -46,7 +52,7 @@ RFOutputServer::RFOutputServer(string conffile)
   m_log = new RFLogManager(nodename);
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat(nodename);
+  m_flow = new RFFlowStat((char*)shmname.c_str());
 
 }
 
@@ -69,10 +75,16 @@ int RFOutputServer::Configure(NSMmsg*, NSMcontext*)
   // Start processes from down stream
 
   // 0. Get common parameters
-  char* rbufin = m_conf->getconf("collector", "ringbufin");
-  char* rbufout = m_conf->getconf("collector", "ringbufout");
+  //  char* rbufin = m_conf->getconf("collector", "ringbufin");
+  string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
+                  string(m_conf->getconf("collector", "ringbufin"));
+  //  char* rbufout = m_conf->getconf("collector", "ringbufout");
+  string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("collector", "ringbufout"));
 
-  char* shmname = m_conf->getconf("collector", "nodename");
+  //  char* shmname = m_conf->getconf("collector", "nodename");
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("collector", "nodename"));
 
   // 1. Histogram Receiver
   char* hrecv = m_conf->getconf("collector", "historecv", "script");
@@ -95,20 +107,20 @@ int RFOutputServer::Configure(NSMmsg*, NSMcontext*)
     char* port = m_conf->getconf("collector", "sender", "port");
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_OUTPUT_ID);
-    m_pid_sender = m_proc->Execute(sender, rbufout, port, shmname, idbuf);
+    m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), idbuf);
   } else if (strstr(src, "file") != 0) {
     // Run file writer
     char* writer = m_conf->getconf("collector", "writer", "script");
     char* file = m_conf->getconf("collector", "writer", "filename");
     char* nnode = m_conf->getconf("processor", "nnodes");
-    m_pid_sender = m_proc->Execute(writer, rbufout, file, nnode);
+    m_pid_sender = m_proc->Execute(writer, (char*)rbufout.c_str(), file, nnode);
   } else {
     // Do not run anything
   }
 
   // 4. Run basf2
   char* basf2 = m_conf->getconf("collector", "basf2", "script");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, rbufout, hport);
+  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
 
   // 5. Run receiver
   m_nnodes = 0;
@@ -127,7 +139,7 @@ int RFOutputServer::Configure(NSMmsg*, NSMcontext*)
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       sprintf(hostname, "%s%2.2d", hostbase, idbase + i);
-      m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, rbufin, hostname, port, shmname, shmid);
+      m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, (char*)rbufin.c_str(), hostname, port, (char*)shmname.c_str(), shmid);
       m_nnodes++;
     }
   }

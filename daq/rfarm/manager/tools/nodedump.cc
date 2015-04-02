@@ -78,7 +78,9 @@ int main(int argc, char** argv)
     strcpy(item[1], "OUT   ");
     nid = 2;
   }
-  RFFlowStat flow(nodename);
+  string shmname = string(conf.getconf("system", "unitname")) + ":" +
+                   string(nodename);
+  RFFlowStat flow((char*)shmname.c_str());
 
   printf("nodename = %s, nid = %d\n", nodename, nid);
   printf("id range : %d to %d\n", idlist[0], idlist[nid - 1]);

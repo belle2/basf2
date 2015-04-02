@@ -22,7 +22,7 @@ RFMaster::RFMaster(string conffile)
   //  gethostname ( nodename, sizeof(nodename) );
 
   // 1. Initialize local shared memory
-  m_shm = new RFSharedMem(nodename);
+  //  m_shm = new RFSharedMem(nodename);
 
   // 2. Set execution directory
   string execdir = string(m_conf->getconf("system", "execdir_base")) + "/master";
@@ -38,7 +38,7 @@ RFMaster::RFMaster(string conffile)
 RFMaster::~RFMaster()
 {
   delete m_log;
-  delete m_shm;
+  //  delete m_shm;
   delete m_conf;
 }
 

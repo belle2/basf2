@@ -46,24 +46,32 @@ RFEventProcessor::RFEventProcessor(string conffile)
   chdir(execdir.c_str());
 
   // 2. Initialize local shared memory
-  m_shm = new RFSharedMem(m_nodename);
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_nodename);
+  m_shm = new RFSharedMem((char*)shmname.c_str());
 
   // 3. Initialize process manager
   m_proc = new RFProcessManager(m_nodename);
 
   // 4. Initialize RingBuffers
-  char* rbufin = m_conf->getconf("processor", "ringbufin");
+  //  char* rbufin = m_conf->getconf("processor", "ringbufin");
+  string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
+                  string(m_conf->getconf("processor", "ringbufin"));
   int rbinsize = m_conf->getconfi("processor", "ringbufinsize");
-  m_rbufin = new RingBuffer(rbufin, rbinsize);
-  char* rbufout = m_conf->getconf("processor", "ringbufout");
+  //  m_rbufin = new RingBuffer(rbufin, rbinsize);
+  m_rbufin = new RingBuffer(rbufin.c_str(), rbinsize);
+  //  char* rbufout = m_conf->getconf("processor", "ringbufout");
+  string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("processor", "ringbufout"));
   int rboutsize = m_conf->getconfi("processor", "ringbufoutsize");
-  m_rbufout = new RingBuffer(rbufout, rboutsize);
+  //  m_rbufout = new RingBuffer(rbufout, rboutsize);
+  m_rbufout = new RingBuffer(rbufout.c_str(), rboutsize);
 
   // 5. Initialize LogManager
   m_log = new RFLogManager(m_nodename);
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat(m_nodename);
+  m_flow = new RFFlowStat((char*)shmname.c_str());
 
 }
 
@@ -86,8 +94,15 @@ int RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   // Start processes from down stream
 
   // 0. Get common parameters
-  char* rbufin = m_conf->getconf("processor", "ringbufin");
-  char* rbufout = m_conf->getconf("processor", "ringbufout");
+  //  char* rbufin = m_conf->getconf("processor", "ringbufin");
+  string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
+                  string(m_conf->getconf("processor", "ringbufin"));
+  //  char* rbufout = m_conf->getconf("processor", "ringbufout");
+  string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("processor", "ringbufout"));
+
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_nodename);
 
   // 1. Histogram Receiver
   char* hrecv = m_conf->getconf("processor", "historecv", "script");
@@ -107,11 +122,11 @@ int RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   // 3. Run sender / logger
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
-  m_pid_sender = m_proc->Execute(sender, rbufout, port, m_nodename, (char*)"1");
+  m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), (char*)"1");
 
   // 4. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
-  m_pid_basf2 = m_proc->Execute(basf2, rbufin, rbufout, hport);
+  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
 
   // 5. Run receiver
   char* receiver = m_conf->getconf("processor", "receiver", "script");
@@ -132,7 +147,7 @@ int RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   rport += portbase;
   char portchar[256];
   sprintf(portchar, "%d", rport);
-  m_pid_receiver = m_proc->Execute(receiver, rbufin, srchost, portchar, m_nodename, (char*)"0");
+  m_pid_receiver = m_proc->Execute(receiver, (char*)rbufin.c_str(), srchost, portchar, (char*)shmname.c_str(), (char*)"0");
 
   fflush(stdout);
   return 0;

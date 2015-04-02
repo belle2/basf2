@@ -32,21 +32,25 @@ RFEventServer::RFEventServer(string conffile)
   chdir(execdir.c_str());
 
   // 2. Initialize local shared memory
-  m_shm = new RFSharedMem(nodename);
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("distributor", "nodename"));
+  m_shm = new RFSharedMem((char*)shmname.c_str());
 
   // 3. Initialize process manager
   m_proc = new RFProcessManager(nodename);
 
   // 4. Initialize RingBuffers
-  char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+  //  char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+  string ringbuf = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("distributor", "ringbuffer"));
   int rbufsize = m_conf->getconfi("distributor", "ringbuffersize");
-  m_rbufin = new RingBuffer(ringbuf, rbufsize);
+  m_rbufin = new RingBuffer(ringbuf.c_str(), rbufsize);
 
   // 5. Initialize LogManager
   m_log = new RFLogManager(nodename);
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat(nodename);
+  m_flow = new RFFlowStat((char*)shmname.c_str());
 
 }
 
@@ -80,7 +84,13 @@ RFEventServer& RFEventServer::Instance()
 int RFEventServer::Configure(NSMmsg*, NSMcontext*)
 {
   // 0. Global parameters
-  char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+  //  char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+  string ringbuf = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("distributor", "ringbuffer"));
+
+  //  char* shmname = m_conf->getconf("distributor", "nodename");
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("distributor", "nodename"));
 
   // 2. Run sender
   m_nnodes = 0;
@@ -92,7 +102,6 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   char* sender = m_conf->getconf("distributor", "sender", "script");
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
-  char* shmname = m_conf->getconf("distributor", "nodename");
 
   char hostname[512], idname[3], shmid[3];
   for (int i = 0; i < maxnodes; i++) {
@@ -103,7 +112,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
       int port = (idbase + i) + portbase;
       char portchar[256];
       sprintf(portchar, "%d", port);
-      m_pid_sender[m_nnodes] = m_proc->Execute(sender, ringbuf, portchar, shmname, shmid);
+      m_pid_sender[m_nnodes] = m_proc->Execute(sender, (char*)ringbuf.c_str(), portchar, (char*)shmname.c_str(), shmid);
       m_nnodes++;
     }
   }
@@ -115,17 +124,17 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     char* receiver = m_conf->getconf("distributor", "receiver", "script");
     char* src = m_conf->getconf("distributor", "receiver", "host");
     char* port = m_conf->getconf("distributor", "receiver", "port");
-    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+    //    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_INPUT_ID);
-    m_pid_recv = m_proc->Execute(receiver, ringbuf, src, port, shmname, idbuf);
+    m_pid_recv = m_proc->Execute(receiver, (char*)ringbuf.c_str(), src, port, (char*)shmname.c_str(), idbuf);
   } else if (strstr(src, "file") != 0) {
     // Run file reader
     char* filein = m_conf->getconf("distributor", "fileinput", "script");
     char* file = m_conf->getconf("distributor", "fileinput", "filename");
-    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
+    //    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
     char* nnodechr = m_conf->getconf("distributor", "nnodes");
-    m_pid_recv = m_proc->Execute(filein, ringbuf, file, nnodechr);
+    m_pid_recv = m_proc->Execute(filein, (char*)ringbuf.c_str(), file, nnodechr);
   }
   // else none
   return 0;

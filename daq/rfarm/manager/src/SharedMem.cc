@@ -87,6 +87,7 @@ SharedMem::~SharedMem(void)
     unlink(m_strbuf);
     delete[] m_strbuf;
   }
+  printf("SharedMem: destructor called for %s\n", m_strbuf);
 }
 
 void* SharedMem::ptr(void)

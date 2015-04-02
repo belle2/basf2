@@ -653,12 +653,11 @@ namespace Belle2 {
     std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.begin();
     std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.end();
 
-    unsigned short sClayer     = 0;
-    unsigned short sSuperLayer = 0;
-    unsigned short sLayer      = 0;
-    unsigned short sWire       = 0;
-
-    CDCSimHit* fHit = nullptr;
+    //    unsigned short sClayer     = 0;
+    //    unsigned short sSuperLayer = 0;
+    //    unsigned short sLayer      = 0;
+    //    unsigned short sWire       = 0;
+    //    CDCSimHit* fHit = nullptr;
 
     //Find a primary track close to the input 2'ndary hit in question
     for (std::vector<CDCSimHit*>::iterator nIt = m_hitWithNegWeight.begin(), nItEnd = m_hitWithNegWeight.end(); nIt != nItEnd; ++nIt) {
@@ -666,12 +665,16 @@ namespace Belle2 {
       sHit = *nIt;
       sPos    = sHit->getPosTrack();
       sWireId = sHit->getWireID();
-      sClayer     = sWireId.getICLayer();
-      sSuperLayer = sWireId.getISuperLayer();
-      sLayer      = sWireId.getILayer();
-      sWire       = sWireId.getIWire();
-
-      fHit = sHit;
+      //      sClayer     = sWireId.getICLayer();
+      //      sSuperLayer = sWireId.getISuperLayer();
+      //      sLayer      = sWireId.getILayer();
+      //      sWire       = sWireId.getIWire();
+      //      fHit = sHit;
+      unsigned short sClayer     = sWireId.getICLayer();
+      unsigned short sSuperLayer = sWireId.getISuperLayer();
+      unsigned short sLayer      = sWireId.getILayer();
+      unsigned short sWire       = sWireId.getIWire();
+      CDCSimHit*     fHit = sHit;
 
       pItBegin = m_hitWithPosWeight.find(sSuperLayer);
       pItEnd   = m_hitWithPosWeight.find(sSuperLayer + 1);

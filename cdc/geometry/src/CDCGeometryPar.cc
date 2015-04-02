@@ -1251,7 +1251,7 @@ int CDCGeometryPar::getThetaBin(const double theta) const
   return itheta;
 }
 
-double CDCGeometryPar::ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut,
+double CDCGeometryPar::ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
                                        TVector3& hitPosition, TVector3& wirePosition) const
 {
   //----------------------------------------------------------
@@ -1327,7 +1327,7 @@ const signed short CCW_IN_NEIGHBOR  = 7; // Constant for counterclockwise inward
 const signed short CCW_NEIGHBOR     = 9; // Constant for counterclockwise
 const signed short CCW_OUT_NEIGHBOR = 11; // Constant for counterclockwise outwards
 
-unsigned short CDCGeometryPar::areNeighbors(const WireID wireId, const WireID otherWireId) const
+unsigned short CDCGeometryPar::areNeighbors(const WireID& wireId, const WireID& otherWireId) const
 {
   //require within the same super-layer
   if (otherWireId.getISuperLayer() != wireId.getISuperLayer()) return 0;
@@ -1390,7 +1390,7 @@ unsigned short CDCGeometryPar::areNeighbors(const WireID wireId, const WireID ot
 }
 
 unsigned short CDCGeometryPar::areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer,
-                                            unsigned short iWire, const WireID otherWireId) const
+                                            unsigned short iWire, const WireID& otherWireId) const
 {
   //require within the same super-layer
   if (otherWireId.getISuperLayer() != iSuperLayer) return 0;

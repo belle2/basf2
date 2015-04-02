@@ -618,7 +618,8 @@ namespace Belle2 {
        * @param wirePosition[out] wire position corresp. to the closetst distance
        */
 
-      double ClosestApproach(const TVector3 bwp, const TVector3 fwp, const TVector3 posIn, const TVector3 posOut, TVector3& hitPosition,
+      double ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
+                             TVector3& hitPosition,
                              TVector3& wirePosition) const;
 
       /**
@@ -627,7 +628,7 @@ namespace Belle2 {
        * @param[in] otherWireId another wire-id. in question
        */
 
-      unsigned short areNeighbors(const WireID wireId, const WireID otherWireId) const;
+      unsigned short areNeighbors(const WireID& wireId, const WireID& otherWireId) const;
 
       /**
        * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
@@ -639,7 +640,7 @@ namespace Belle2 {
        */
 
       unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire,
-                                  const WireID otherWireId) const;
+                                  const WireID& otherWireId) const;
 
       /**
        * Set the desizend wire parameters.

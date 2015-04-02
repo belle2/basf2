@@ -57,9 +57,6 @@ namespace Belle2 {
 
   private:
 
-    //! No. of sent events
-    int m_nevt;
-    int* m_buffer;
 
     //! Histograms
     TH1F* h_NTrack;
@@ -83,7 +80,7 @@ namespace Belle2 {
     //histograms for cluster information
     TH1F* h_ClusterE;
     TH1F* h_ClusterTheta;
-    TH1F* h_ClusterPhi;
+    //TH1F* h_ClusterPhi;
     TH1F* h_ClusterTiming;
 
   };

@@ -19,6 +19,7 @@ import random
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
+from simulation import add_simulation
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -44,8 +45,8 @@ geometry.param('components', [
     'PXD',
     'SVD',
     'CDC',
-    'ECL',
-    ])
+    #    'ECL',
+])
 
 # EvtGen generator
 evtgeninput = register_module('EvtGenInput')
@@ -71,7 +72,7 @@ param_pGun = {  # ---    'momentumParams': [0.4, 1.6],
     'xVertexParams': [0., 0.],
     'yVertexParams': [0., 0.],
     'zVertexParams': [0., 0.],
-    }
+}
 pGun.param(param_pGun)
 
 # simulation
@@ -105,9 +106,9 @@ si_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
     'UseSVDHits': 1,
     'UsePXDHits': 0,
     'GFTrackCandidatesColName': 'VXDTracksCand',
-    }
-        # 'Force2DSVDClusters': 1,
-        # 'forceExisting2DClusters4SVD': 0
+}
+# 'Force2DSVDClusters': 1,
+# 'forceExisting2DClusters4SVD': 0
 si_mctrackfinder.param(si_mctrackfinder_param)
 
 vxd_trackfinder = register_module('VXDTF')
@@ -120,12 +121,10 @@ vxd_trackfinder.param('GFTrackCandidatesColName', 'VXDTracksCand')
 #    vxd_trackfinder.param('tuneCutoffs', 0.06)
 # else:
 vxd_trackfinder.param('sectorSetup',
-                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD'
-                      ,
-                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD'
-                      ,
-                      'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
-                      ])
+                      ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+                       'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
+                       'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+                       ])
 vxd_trackfinder.param('tuneCutoffs', 0.22)
 # path.add_module(vxd_trackfinder)
 
@@ -140,18 +139,18 @@ cdc_mctrackfinder_param = {  # ---        'MinimalNDF': 6,
     'UseSVDHits': 0,
     'UsePXDHits': 0,
     'GFTrackCandidatesColName': 'CDCTracksCand',
-    }
-        # 'Force2DSVDClusters': 1,
-        # 'forceExisting2DClusters4SVD': 0
+}
+# 'Force2DSVDClusters': 1,
+# 'forceExisting2DClusters4SVD': 0
 cdc_mctrackfinder.param(cdc_mctrackfinder_param)
 
 cdc_trackfinder = register_module('Trasan')
 cdc_trackfinder.logging.log_level = LogLevel.WARNING
 cdc_trackfinder_param = {'GFTrackCandidatesColName': 'CDCTracksCand'}  # 'UseCDCHits': 1,
-                                                                       # 'UseSVDHits': 0,
-                                                                       # 'UsePXDHits': 0,
-        # 'Force2DSVDClusters': 1,
-        # 'forceExisting2DClusters4SVD': 0
+# 'UseSVDHits': 0,
+# 'UsePXDHits': 0,
+# 'Force2DSVDClusters': 1,
+# 'forceExisting2DClusters4SVD': 0
 cdc_trackfinder.param(cdc_trackfinder_param)
 
 cand_merger = register_module('TrackCandMerger')
@@ -166,8 +165,8 @@ cand_merger.param(cand_merger_param)
 # si_fitting_param = {  # ---    'FilterId': 1,
 #    'GFTrackCandidatesColName': 'mcTracksCand',
 #    'GFTracksColName': 'si_mcGFTracks',
-    # 'TracksColName': 'si_mcTracks',
-    # 'PDGCodes': [],
+# 'TracksColName': 'si_mcTracks',
+# 'PDGCodes': [],
 #    'NMaxIterations': 10,
 #    'ProbCut': 0.001,
 #    }
@@ -183,7 +182,7 @@ fitting_param = {  # ---    'FilterId': 1,
     'GFTracksColName': 'GFTracks',
     'NMaxIterations': 10,
     'ProbCut': 0.001,
-    }
+}
 fitting.logging.log_level = LogLevel.WARNING
 fitting.param(fitting_param)
 
@@ -193,7 +192,7 @@ track_splitter_param = {
     'CDCGFTracksColName': 'CDCTracks',
     'GFTracksColName': 'GFTracks',
     'storeTrackCandName': 'TracksCand',
-    }
+}
 # 'CDCHitColName' :
 track_splitter.param(track_splitter_param)
 
@@ -213,7 +212,7 @@ trackMerger_param = {  # (in cm) use cdc inner wall
     'TrackCandColName': 'TracksCand',
     'relMatchedTracks': 'MatchedTracksIdx',
     'chi2_max': 100,
-    }
+}
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
 
 vxd_cdcTracksMerger.param(trackMerger_param)
@@ -234,7 +233,7 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'root_output_filename': '../VXDCDCMergerSinglePartTruthFinder.root',
     'chi2_max': 100,
     'merge_radius': 2.0,
-    }
+}
 vxd_cdcTracksMergerAnalysis.param(trackMergerAnalysis_param)
 vxd_cdcTracksMergerAnalysis.logging.log_level = LogLevel.DEBUG
 
@@ -259,18 +258,18 @@ class HighlighterModule(Module):
             # if abs(p.getPDGCode()) == 413:
             B2WARNING('Highlighting merged tracks')
             displayData.obj().select(p)
-                # daughters = p.getFinalStateDaughters()
-                # for d in daughters:
-                    # selecting the MCParticle also gets the tracks
-                    # mcp = d.getRelated('MCParticles')
-                    # displayData.obj().select(mcp)
+            # daughters = p.getFinalStateDaughters()
+            # for d in daughters:
+            # selecting the MCParticle also gets the tracks
+            # mcp = d.getRelated('MCParticles')
+            # displayData.obj().select(mcp)
             break  # only one
 
 
 display = register_module('Display')
 display.param('useClusters', True)
 display.param('showTrackLevelObjects', True)
-    # 'showTrackCandidates' : True)
+# 'showTrackCandidates' : True)
 display.param('options', 'DHMPS')
 # display.param(display_param)
 
@@ -278,7 +277,7 @@ display.param('options', 'DHMPS')
 mcparticleprinter = register_module('PrintMCParticles')
 mcparticleprinter.param('maxLevel', -1)
 
-## match the found track candidates with MCParticles
+# match the found track candidates with MCParticles
 # cdcmcmatching = register_module('CDCMCMatching')
 # param_cdcmcmatching = {'GFTrackCandidatesColName': 'CDCTracksCand'}
 # cdcmcmatching.param(param_cdcmcmatching)
@@ -300,17 +299,18 @@ main = create_path()
 # Add modules to paths
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
-main.add_module(gearbox)
-main.add_module(geometry)
+# main.add_module(gearbox)
+# main.add_module(geometry)
 main.add_module(pGun)
 # main.add_module(mcparticleprinter)
 # main.add_module(evtgeninput)
-main.add_module(g4sim)
-main.add_module(pxdDigitizer)
-main.add_module(pxdClusterizer)
-main.add_module(svdDigitizer)
-main.add_module(svdClusterizer)
-main.add_module(cdcDigitizer)
+# main.add_module(g4sim)
+# main.add_module(pxdDigitizer)
+# main.add_module(pxdClusterizer)
+# main.add_module(svdDigitizer)
+# main.add_module(svdClusterizer)
+# main.add_module(cdcDigitizer)
+add_simulation(main)
 main.add_module(si_mctrackfinder)
 # main.add_module(vxd_trackfinder)
 main.add_module(cdc_mctrackfinder)

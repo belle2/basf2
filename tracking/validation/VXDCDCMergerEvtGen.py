@@ -19,6 +19,7 @@ import random
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
+from simulation import add_simulation
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -38,14 +39,14 @@ geometry = register_module('Geometry')
 
 # simulate only tracking detectors to simulate the whole detector included in
 # BelleII.xml, comment the next line out
-geometry.param('components', [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'ECL',
-])
+# geometry.param('components', [
+#    'MagneticField',
+#    'BeamPipe',
+#    'PXD',
+#    'SVD',
+#    'CDC',
+#    'ECL',
+# ])
 
 # EvtGen generator
 evtgeninput = register_module('EvtGenInput')
@@ -298,17 +299,18 @@ main = create_path()
 # Add modules to paths
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
-main.add_module(gearbox)
-main.add_module(geometry)
+# main.add_module(gearbox)
+# main.add_module(geometry)
 # main.add_module(pGun)
 # main.add_module(mcparticleprinter)
 main.add_module(evtgeninput)
-main.add_module(g4sim)
-main.add_module(pxdDigitizer)
-main.add_module(pxdClusterizer)
-main.add_module(svdDigitizer)
-main.add_module(svdClusterizer)
-main.add_module(cdcDigitizer)
+# main.add_module(g4sim)
+add_simulation(main)
+# main.add_module(pxdDigitizer)
+# main.add_module(pxdClusterizer)
+# main.add_module(svdDigitizer)
+# main.add_module(svdClusterizer)
+# main.add_module(cdcDigitizer)
 # main.add_module(si_mctrackfinder)
 main.add_module(vxd_trackfinder)
 # main.add_module(cdc_mctrackfinder)

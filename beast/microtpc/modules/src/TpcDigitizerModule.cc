@@ -434,7 +434,7 @@ void TpcDigitizerModule::getXMLData()
   m_GasAbs = content.getDouble("GasAbs");
 
   B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
-  B2INFO("              from MICROTPC.xml. There are " << nTPC << " tubes implemented");
+  B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");
 
 }
 

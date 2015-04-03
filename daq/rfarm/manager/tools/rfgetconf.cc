@@ -1,5 +1,5 @@
 //+
-// File : rfconfig.cc
+// File : rfgetconf.cc
 // Description : Retrieve configuration for given item
 //
 // Author : Ryosuke Itoh, IPNS, KEK
@@ -19,7 +19,7 @@ int main(int argc, char** argv)
   // Usage : getconf conffile arg1 arg2 arg3
 
   if (argc < 3) {
-    printf("Usage : rfconfig configfile arg1 arg2 arg3\n");
+    printf("Usage : rfgetconf configfile arg1 arg2 arg3\n");
     exit(-1);
   }
 

@@ -62,21 +62,6 @@ namespace Belle2 {
 
     private:
 
-      /** Reads drift data from file */
-      virtual void getDriftData();
-
-      /** interpolates the drift time for a given distance from the wire */
-      double getDriftTime(double R);
-
-      /** Produces the impulse response function */
-      virtual void impulseResponse();
-
-      /** Convolves the raw waveform with the impulse response function and returns the peak of the convolved waveform */
-      double convolveWaveform(double* waveform);
-
-      /** print the convolved wafeform to file. Useful for debugging */
-      virtual void printConvWaveform(int eventNum, int detNB, double* convolvedWaveform);
-
       /** reads data from MICROTPC.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
 

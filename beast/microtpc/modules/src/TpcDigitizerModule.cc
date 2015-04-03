@@ -151,8 +151,6 @@ void TpcDigitizerModule::initialize()
 
   //get the garfield drift data and create impulse response function
   getXMLData();
-  if (m_driftDataFile != "") getDriftData();
-  impulseResponse();
 
 }
 

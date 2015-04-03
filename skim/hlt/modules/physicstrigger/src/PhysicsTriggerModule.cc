@@ -61,6 +61,7 @@ PhysicsTriggerModule::PhysicsTriggerModule() : Module()
   addParam("UserCustomOpen", m_userCustomOpen, "the switch of customing the selection criteria by user", 0);
   Variable::Cut::Parameter emptyCut;
   addParam("UserCustomCut", m_userCustomCut, "the user-custom selection criteria", emptyCut);
+  initializeForEvent();
 }
 
 PhysicsTriggerModule::~PhysicsTriggerModule()
@@ -74,7 +75,6 @@ void PhysicsTriggerModule::initialize()
   StoreArray<PhysicsTriggerInformation>::registerPersistent();
   ReadParameters();
   m_cut.init(m_userCustomCut);
-  initializeForEvent();
 }
 
 void PhysicsTriggerModule::beginRun()

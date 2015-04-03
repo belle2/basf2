@@ -389,8 +389,8 @@ void TpcDigitizerModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    TPCCenter.push_back(TVector3(activeParams.getLength("x_microtpc"), activeParams.getLength("y_microtpc"),
-                                 activeParams.getLength("z_microtpc")));
+    TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
+                                 activeParams.getLength("TPCpos_z")));
     nTPC++;
   }
 

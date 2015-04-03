@@ -58,7 +58,7 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   // Set module properties
   setDescription("Microtpc digitizer module");
 
-  //Default values of these exist in MICROTPC.xml. If the user prefers, they can try different drift data files or impulse responses.
+  //Default values are set here. New values can be in MICROTPC.xml.
   addParam("GEMGain1", m_GEMGain1, "GEM1 gain", 10.0);
   addParam("GEMGain2", m_GEMGain2, "GEM1 gain", 20.0);
   addParam("GainRMS1", m_GEMGainRMS1, "GEM1 rms", 0.2);
@@ -398,8 +398,8 @@ void TpcDigitizerModule::getXMLData()
   m_GEMGain2 = content.getDouble("GEMGain2");
   m_GEMGainRMS1 = content.getDouble("GEMGainRMS1");
   m_GEMGainRMS2 = content.getDouble("GEMGainRMS2");
-  m_ScaleGain1 = content.getDouble("GEMScale1");
-  m_ScaleGain2 = content.getDouble("GEMScale2");
+  m_ScaleGain1 = content.getDouble("ScaleGain1");
+  m_ScaleGain2 = content.getDouble("ScaleGain2");
   m_GEMpitch = content.getDouble("GEMpitch");
   m_PixelThreshold = content.getInt("PixelThreshold");
   m_PixelThresholdRMS = content.getInt("PixelThresholdRMS");

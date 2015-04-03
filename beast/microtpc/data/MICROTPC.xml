@@ -40,6 +40,7 @@ whitespace, comma or semi-colon -->
 <TOTQ2>57.</TOTQ2>
 <Workfct>35.075</Workfct>
 <Fanofac>0.19</Fanofac>
+<GasAbs>0.05</GasAbs>
 <P_vessel>1</P_vessel>
 <z_DG>12.0</z_DG>
 <z_TG>0.28</z_TG>
@@ -53,7 +54,6 @@ whitespace, comma or semi-colon -->
 <v_DG>0.00100675</v_DG>
 <v_TG>0.0004079</v_TG>
 <v_CG>0.00038828</v_CG>
-
 <Active>
 <MaterialVessel>MICROTPC-Material</MaterialVessel>
 <MaterialGas>MICROTPC-Material</MaterialGas>

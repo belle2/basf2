@@ -97,13 +97,13 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
            "TOT factor C 1. Default taken from MICROTPC.xml");
   addParam("TOTQ1", m_TOTQ1,
            "TOT factor Q 1. Default taken from MICROTPC.xml");
-  addParam("TOTA1", m_TOTA1,
+  addParam("TOTA2", m_TOTA2,
            "TOT factor A 2. Default taken from MICROTPC.xml");
-  addParam("TOTB1", m_TOTB1,
+  addParam("TOTB2", m_TOTB2,
            "TOT factor B 2. Default taken from MICROTPC.xml");
-  addParam("TOTC1", m_TOTC1,
+  addParam("TOTC2", m_TOTC2,
            "TOT factor C 2. Default taken from MICROTPC.xml");
-  addParam("TOTQ1", m_TOTQ1,
+  addParam("TOTQ2", m_TOTQ2,
            "TOT factor Q 2. Default taken from MICROTPC.xml");
   addParam("z_DG", m_z_DG,
            "Drift gap distance [cm]. Default taken from MICROTPC.xml");
@@ -148,6 +148,12 @@ void TpcDigitizerModule::initialize()
 {
   B2INFO("TpcDigitizer: Initializing");
   StoreArray<MicrotpcHit>::registerPersistent();
+
+  fctToT_Calib1 = new TF1("fctToT_Calib1", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
+  fctToT_Calib1->SetParameters(m_TOTA1, m_TOTB1, m_TOTC1, m_TOTQ1);
+
+  fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
+  fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
 
   //get the garfield drift data and create impulse response function
   getXMLData();

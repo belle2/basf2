@@ -101,14 +101,14 @@ namespace Belle2 {
       int m_PixelThreshold;
       /** Pixel threshold RMS */
       int m_PixelThresholdRMS;
-      /** Chip row number */
-      int m_ChipRowNb;
       /** Chip column number */
       int m_ChipColumnNb;
-      /** Chip row y dimension */
-      int m_ChipRowY;
+      /** Chip row number */
+      int m_ChipRowNb;
       /** Chip column x dimension */
-      int m_ChipColumnX;
+      double m_ChipColumnX;
+      /** Chip row y dimension */
+      double m_ChipRowY;
       /** Pixel time number of bin */
       int m_PixelTimeBinNb;
       /** Pixel time bin */
@@ -163,23 +163,10 @@ namespace Belle2 {
       double m_GasAbs;
       /** chip store arrays */
       int dchip[10][80][336][MAXtSIZE];
-
-      /** filename of drift datafile */
-      std::string m_driftDataFile;
-      /** sigma of impulse response */
-      double m_impulseSigma;
-      /** distance from center of tube */
-      std::vector<double> radius_drift;
-      /** drift time for each distance from center of tube */
-      std::vector<double> time_drift;
-      /** size of waveforms */
-      static const int waveformSize = 15000;
       /** number of detectors. Read from MICROTPC.xml*/
       int nTPC = 0;
       /** TPC coordinate */
       std::vector<TVector3> TPCCenter;
-      /** Impulse response function */
-      double iResponse[2400] = {0};
       /** Event counter */
       int Event = 0;
 

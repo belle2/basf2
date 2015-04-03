@@ -22,6 +22,7 @@ whitespace, comma or semi-colon -->
 <GEMGainRMS2>0.2</GEMGainRMS2>
 <ScaleGain1>4</ScaleGain1>
 <ScaleGain2>2</ScaleGain2>
+<GEMpitch>0.014</GEMpitch>
 <PixelThreshold>3000</PixelThreshold>
 <PixelThresholdRMS>150</PixelThresholdRMS>
 <ChipColumnNb>80</ChipColumnNb>

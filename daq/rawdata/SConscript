@@ -6,7 +6,7 @@ env['SUBLIB'] = True
 #               'boost_python', 'boost_filesystem',
 #               '$PYTHON_LIBS', '$XML_LIBS']
 
-env['LIBS'] = ['$ROOT_LIBS', 'framework', '$PYTHON_LIBS' ]
+env['LIBS'] = ['$ROOT_LIBS', 'framework', '$PYTHON_LIBS', 'rawdata' ]
 
 
 Return('env')

@@ -21,7 +21,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/core/RandomNumbers.h>
 
 //c++
 #include <cmath>
@@ -70,8 +70,8 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   addParam("PixelThresholdRMS", m_PixelThresholdRMS, "Pixel threshold rms in [e]", 150);
   addParam("ChipRowNb", m_ChipRowNb, "Chip number of row", 226);
   addParam("ChipColumnNb", m_ChipColumnNb, "Chip number of column", 80);
-  addParam("ChipColumnX", m_ChipColumnX, "Chip x dimension in cm / 2", 0.86);
-  addParam("ChipRowY", m_ChipRowY, "Chip y dimension in cm / 2", 1.0);
+  addParam("ChipColumnX", m_ChipColumnX, "Chip x dimension in cm / 2", 1.0);
+  addParam("ChipRowY", m_ChipRowY, "Chip y dimension in cm / 2", 0.86);
   addParam("PixelTimeBinNb", m_PixelTimeBinNb, "Pixel number of time bin", 256);
   addParam("PixelTimeBin", m_PixelTimeBin, "Pixel time bin in ns", 25.0);
   addParam("TOTA1", m_TOTA1, "TOT factor A 1", 24.4678);
@@ -144,20 +144,26 @@ void TpcDigitizerModule::event()
 
   //Determine T0 for each TPC
   int nentries = TpcSimHits.getEntries();
+
   double T0[nTPC];
+  bool PixelFired[nTPC];
   for (int i = 0; i < nTPC; i++) {
-    T0[i] = 10000;
+    T0[i] = 1000000.;
+    PixelFired[i] = false;
   }
   for (int i = 0; i < nentries; i++) {
     MicrotpcSimHit* aHit = TpcSimHits[i];
     int detNb = aHit->getdetNb();
-    TVector3 posn = aHit->gettkPos();
-    double T = posn.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
+    TVector3 posn = aHit->gettkPos() ;
+    double T = posn.Z() / 100. + (TPCCenter[detNb].Z() + 10.) + m_z_DG;
     if (T < T0[detNb])T0[detNb] = T;
   }
   for (int i = 0; i < nTPC; i++) {
-    T0[i] = T0[i] / m_v_DG - 1000.;
+    if (0. < T0[i] && T0[i] < 1000000.) {
+      T0[i] = T0[i] / m_v_DG;
+    } else T0[i] = -1.;
   }
+
   //loop on all entries to store in 3D the ionization for each TPC
   for (int i = 0; i < nentries; i++) {
     MicrotpcSimHit* aHit = TpcSimHits[i];
@@ -168,21 +174,21 @@ void TpcDigitizerModule::event()
         for (int k = 0; k < MAXtSIZE; k++)
           dchip[detNb][i][j][k] = 0;
 
-
     double edep = aHit->getEnergyDep();
     double niel = aHit->getEnergyNiel();
     TVector3 position = aHit->gettkPos();
-    double xpos = position.X() - TPCCenter[detNb].X();
-    double ypos = position.Y() - TPCCenter[detNb].Y();
-    double zpos = position.Z() - TPCCenter[detNb].Z();
+    double xpos = position.X() / 100. - TPCCenter[detNb].X();
+    double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
+    double zpos = position.Z() / 100. + (TPCCenter[detNb].Z() + 10) + m_z_DG;
+
     if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
         (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
-        (0. < zpos && zpos <  m_z_DG)) {
+        (0. < zpos && zpos <  m_z_DG) &&
+        (0. < T0[detNb] && T0[detNb] < 1000000.)) {
 
       //ionization energy
       //MeV -> keV
       double ionEn = (edep - niel) * 1e3;
-
       // check if enough energy to ionize if not break
       // keV -> eV
       if ((ionEn * 1e3) <  m_Workfct) break;
@@ -193,10 +199,9 @@ void TpcDigitizerModule::event()
 
         double meanEl = ionEn * 1e3 /  m_Workfct;
         double sigma = sqrt(m_Fanofac * meanEl);
-        int NbEle = (int)fRandom->Gaus(meanEl, sigma);
+        int NbEle = (int)gRandom->Gaus(meanEl, sigma);
         double  NbEle_real = 0;
-        NbEle_real  = NbEle - NbEle * m_GasAbs * ypos;
-
+        NbEle_real  = NbEle - NbEle * m_GasAbs * zpos;
         // start loop on the number of electron-ion-pairs at each interaction point
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
           double x_DG, y_DG, z_DG, t_DG;
@@ -204,16 +209,14 @@ void TpcDigitizerModule::event()
                 ypos,
                 zpos,
                 x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
-          double GEM_gain1 = fRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
-          double GEM_gain2 = fRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
+          double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+          double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
 
           ///////////////////////////////
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
-
             double x_GEM1, y_GEM1;
             GEMGeo1(x_DG, y_DG, x_GEM1, y_GEM1);
-
             double x_TG, y_TG, z_TG, t_TG;
             Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
 
@@ -222,22 +225,22 @@ void TpcDigitizerModule::event()
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
               double x_GEM2, y_GEM2;
               GEMGeo2(x_TG, y_TG, x_GEM2, y_GEM2);
-
               double x_CG, y_CG, z_CG, t_CG;
               Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
 
-              int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / m_ChipColumnNb));
-              int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / m_ChipRowNb));
+              int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
+              int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
               int pix = col +  m_ChipColumnNb * row;
-              int quT = fRandom->Uniform(-1, 1);
-              int bci = (int)((t_DG + t_TG + t_CG - T0[detNb]) / m_PixelTimeBin) + quT;
+              int quT = gRandom->Uniform(-1, 1);
+              int bci = (int)((t_DG + t_TG + t_CG - T0[detNb]) / (double)m_PixelTimeBin) + quT;
+              if (bci < 0)bci = 0;
 
               //check if amplified drifted electron are within pixel boundaries
               if ((0 <= col && col < m_ChipColumnNb) &&
                   (0 <= row && row < m_ChipRowNb) &&
                   (0 <= pix && pix < m_ChipColumnNb * m_ChipRowNb)  &&
                   (0 <= bci && bci < MAXtSIZE)) {
-                //PixelFired = true;
+                PixelFired[detNb] = true;
                 dchip[detNb][col][row][bci] += m_ScaleGain1 * m_ScaleGain2;
               }
             }
@@ -246,9 +249,12 @@ void TpcDigitizerModule::event()
       }
     }
   }
+
+  //Pixelization of the 3D ionization cloud
   for (int i = 0; i < nTPC; i++) {
-    if (T0[i] < 10000)
+    if (0. < T0[i] && T0[i] < 1000000. && PixelFired[i]) {
       Pixelization(i);
+    }
   }
 
   Event++;
@@ -260,10 +266,10 @@ void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, doub
 {
   //check if
   if (z1 > 0.) {
-    x2 = x1 + fRandom->Gaus(0., sqrt(y1) * st);
-    y2 = y1 + fRandom->Gaus(0., sqrt(y1) * st);
-    z2 = z1 + fRandom->Gaus(0., sqrt(y1) * sl);
-    t2 = y2 / vd;
+    x2 = x1 + gRandom->Gaus(0., sqrt(z1) * st);
+    y2 = y1 + gRandom->Gaus(0., sqrt(z1) * st);
+    z2 = z1 + gRandom->Gaus(0., sqrt(z1) * sl);
+    t2 = z2 / vd;
   } else {
     x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
   }
@@ -307,8 +313,8 @@ bool TpcDigitizerModule::Pixelization(int detNb)
     //loop on row
     for (int j = 0; j < (int)m_ChipRowNb; j++) {
       int k0 = -10;
-      int quE = fRandom->Uniform(0, 2);
-      double thresEl = m_PixelThreshold + fRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
+      int quE = gRandom->Uniform(0, 2);
+      double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
       //determined t0 ie first time above pixel threshold
       for (int k = 0; k < MAXtSIZE; k++) {
         if (dchip[detNb][i][j][k] > thresEl) {
@@ -374,10 +380,9 @@ bool TpcDigitizerModule::Pixelization(int detNb)
       TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb));
     }
     //end on loop nb of hit
-
-
   }
   //end if entry
+
   return PixHit;
 }
 

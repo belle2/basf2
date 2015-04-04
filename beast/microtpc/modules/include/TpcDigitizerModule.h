@@ -78,7 +78,7 @@ namespace Belle2 {
       virtual void GEMGeo2(double, double, double&, double&);
 
       /** Define random variable */
-      TRandom3* fRandom;
+      //TRandom3* fRandom;
       /** Define ToT calib 1 */
       TF1* fctToT_Calib1;
       /** Define ToT calib 2 */

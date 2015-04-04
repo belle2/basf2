@@ -26,14 +26,14 @@ set_log_level(LogLevel.ERROR)
 # Modules
 receiver = register_module('DeSerializer')
 dump = register_module('PrintCollections')
-perf = register_module('DAQPerf')
+# perf = register_module('DAQPerf')
 output = register_module('RootOutput')
 
 # RxSocket
 receiver.param('Port', [99999])
 
 # Perf
-perf.param('Cycle', 100000)
+# perf.param('Cycle', 100000)
 
 # Output
 output.param('outputFileName', 'rawcopperM.root')
@@ -45,7 +45,7 @@ main = create_path()
 main.add_module(receiver)
 # main.add_module(dump)
 main.add_module(output)
-main.add_module(perf)
+# main.add_module(perf)
 
 # Process all events
 process(main)

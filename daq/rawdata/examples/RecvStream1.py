@@ -22,7 +22,7 @@ set_log_level(LogLevel.ERROR)
 # Modules
 receiver = register_module('DeSerializerPC')
 dump = register_module('RootOutput')
-perf = register_module('DAQPerf')
+# perf = register_module('DAQPerf')
 converter = register_module('Convert2RawDet')
 output = register_module('PrintData')
 
@@ -50,8 +50,8 @@ sender.param('DestPort', 36000)
 sender.param('LocalHostName', 'localhost')
 
 # Perf
-perf.param('Cycle', 100000)
-perf.param('MonitorSize', True)
+# perf.param('Cycle', 100000)
+# perf.param('MonitorSize', True)
 
 # Create main path
 main = create_path()
@@ -60,8 +60,8 @@ main = create_path()
 main.add_module(receiver)
 # main.add_module(monitor)
 # main.add_module(converter)
-# main.add_module(dump)
-main.add_module(sender)
+main.add_module(dump)
+# main.add_module(sender)
 # main.add_module(output)
 # main.add_module(perf)
 

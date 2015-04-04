@@ -261,7 +261,8 @@ int* DeSerializerModule::getPreAllocBuf()
     m_num_usedbuf++;
   } else {
     char err_buf[500];
-    sprintf(err_buf, "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
+    sprintf(err_buf,
+            "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
             m_num_usedbuf, NUM_PREALLOC_BUF);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -310,12 +311,20 @@ void DeSerializerModule::openRunStopNshm()
 
 int DeSerializerModule::checkRunStop()
 {
-  if (*m_ptr) { return 1; } else { return 0;}
+  if (*m_ptr) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 int DeSerializerModule::checkRunRecovery()
 {
-  if (*m_ptr) { return 0; } else { return 1;}
+  if (*m_ptr) {
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 void DeSerializerModule::restartRun()

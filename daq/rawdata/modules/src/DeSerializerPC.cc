@@ -259,8 +259,9 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
     } else if (*num_events_in_sendblock != temp_num_events) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
-              *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      sprintf(err_buf,
+              "CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
+              *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);

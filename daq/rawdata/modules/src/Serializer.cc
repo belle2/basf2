@@ -58,7 +58,9 @@ void SerializerModule::initialize()
 #endif
 
   if (m_shmflag != 0) {
-    char temp_char1[100] = "/cpr_config"; char temp_char2[100] = "/cpr_status";  shmOpen(temp_char1, temp_char2);
+    char temp_char1[100] = "/cpr_config";
+    char temp_char2[100] = "/cpr_status";
+    shmOpen(temp_char1, temp_char2);
     // Status format : status_flag
     m_cfg_buf = shmGet(m_shmfd_cfg, 4);
     m_cfg_sta = shmGet(m_shmfd_sta, 4);
@@ -440,7 +442,8 @@ void SerializerModule::Accept()
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100] = "Failed to set TIMEOUT. Exiting...";
+      print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
   }
@@ -517,12 +520,20 @@ void SerializerModule::openRunStopNshm()
 
 int SerializerModule::checkRunStop()
 {
-  if (*m_ptr) { return 1; } else { return 0;}
+  if (*m_ptr) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 int SerializerModule::checkRunRecovery()
 {
-  if (*m_ptr) { return 0; } else { return 1;}
+  if (*m_ptr) {
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 void SerializerModule::restartRun()

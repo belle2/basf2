@@ -171,9 +171,11 @@ void DeSerializerCOPPERModule::initializeCOPPER()
 #endif
 
 #ifndef YAMADA_DUMMY
-  B2INFO("Opening COPPER...");      fflush(stderr);
+  B2INFO("Opening COPPER...");
+  fflush(stderr);
   openCOPPER();
-  B2INFO("Done.\n");    fflush(stderr);
+  B2INFO("Done.\n");
+  fflush(stderr);
 #endif
 
 
@@ -465,9 +467,11 @@ void DeSerializerCOPPERModule::event()
   if (m_start_flag == 0) {
     // Use shared memory to start(for HSLB dummy data)
 #ifdef YAMADA_DUMMY
-    B2INFO("Opening COPPER...");      fflush(stderr);
+    B2INFO("Opening COPPER...");
+    fflush(stderr);
     openCOPPER();
-    B2INFO("Done.\n");    fflush(stderr);
+    B2INFO("Done.\n");
+    fflush(stderr);
 #endif
     if (g_status.isAvailable()) {
       B2INFO("DeSerializerCOPPER: Waiting for Start...\n");

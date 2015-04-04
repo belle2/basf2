@@ -79,7 +79,7 @@ void DeSerializerPXDModule::event()
 
   // Get a record from socket
   int stat = 0;
-  for (auto&   it : m_recvs) {
+  for (auto&    it : m_recvs) {
     do {
       stat = it->recv_pxd_buffer((char*)m_buffer);
       if (stat <= 0) {

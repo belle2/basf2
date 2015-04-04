@@ -103,7 +103,8 @@ int* DesSerPrePC::getNewBuffer(int nwords, int* delete_flag)
 
 void DesSerPrePC::initialize()
 {
-  printf("Checkinit1 1\n") ; fflush(stdout);
+  printf("Checkinit1 1\n") ;
+  fflush(stdout);
 
   B2INFO("DeSerializerPrePC: initialize() started.");
 
@@ -138,7 +139,8 @@ void DesSerPrePC::initialize()
   m_prev_copper_ctr = 0xFFFFFFFF;
   m_prev_evenum = 0xFFFFFFFF;
 
-  printf("Checkinit1 2\n") ; fflush(stdout);
+  printf("Checkinit1 2\n") ;
+  fflush(stdout);
   B2INFO("DeSerializerPrePC: initialize() done.");
 }
 
@@ -168,7 +170,8 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
 
 int DesSerPrePC::Connect()
 {
-  printf("Check1.5 %d\n", m_num_connections); fflush(stdout);
+  printf("Check1.5 %d\n", m_num_connections);
+  fflush(stdout);
   for (int i = 0; i < m_num_connections; i++) {
     //
     // Connect to a downstream node
@@ -276,15 +279,14 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
     temp_num_events = send_hdr.GetNumEventsinPacket();
     temp_num_nodes = send_hdr.GetNumNodesinPacket();
 
-
-
     if (i == 0) {
       *num_events_in_sendblock = temp_num_events;
     } else if (*num_events_in_sendblock != temp_num_events) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Different # of events or nodes over data sources( %d %d %d %d ). Exiting...\n",
-              *num_events_in_sendblock , temp_num_events , *num_nodes_in_sendblock , temp_num_nodes);
+      sprintf(err_buf,
+              "CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
+              *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -596,7 +598,8 @@ void DesSerPrePC::DataAcquisition()
 {
   // For data check
 
-  printf("Check1 \n"); fflush(stdout);
+  printf("Check1 \n");
+  fflush(stdout);
   unsigned int eve_copper_0 = 0;
   initialize();
   initialize2();
@@ -614,7 +617,8 @@ void DesSerPrePC::DataAcquisition()
     n_basf2evt = 0;
   }
 
-  printf("Check2 \n"); fflush(stdout);
+  printf("Check2 \n");
+  fflush(stdout);
   while (1) {
     clearNumUsedBuf();
     //
@@ -921,7 +925,8 @@ void DesSerPrePC::event2()
 
 void DesSerPrePC::initialize2()
 {
-  printf("Checkinit2 1\n") ; fflush(stdout);
+  printf("Checkinit2 1\n") ;
+  fflush(stdout);
   //Set module properties
   //  setDescription("Encode DataStore into RingBuffer");
   //  addParam("DestPort", m_port_to, "Destination port", BASE_PORT_ROPC_COPPER);
@@ -942,7 +947,9 @@ void DesSerPrePC::initialize2()
 #endif
 
   if (m_shmflag != 0) {
-    char temp_char1[100] = "/cpr_config"; char temp_char2[100] = "/cpr_status";  shmOpen(temp_char1, temp_char2);
+    char temp_char1[100] = "/cpr_config";
+    char temp_char2[100] = "/cpr_status";
+    shmOpen(temp_char1, temp_char2);
     // Status format : status_flag
     m_cfg_buf = shmGet(m_shmfd_cfg, 4);
     m_cfg_sta = shmGet(m_shmfd_sta, 4);
@@ -951,7 +958,8 @@ void DesSerPrePC::initialize2()
 
   // Create Message Handler
 
-  printf("Checkinit2 2\n") ; fflush(stdout);
+  printf("Checkinit2 2\n") ;
+  fflush(stdout);
 
   Accept();
 
@@ -967,7 +975,8 @@ void DesSerPrePC::initialize2()
 #endif
 
   B2INFO("Tx initialized.");
-  printf("Checkinit2 3\n") ; fflush(stdout);
+  printf("Checkinit2 3\n") ;
+  fflush(stdout);
 }
 
 
@@ -1176,7 +1185,8 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
 void DesSerPrePC::Accept()
 {
 
-  printf("ACCept 1\n"); fflush(stdout);
+  printf("ACCept 1\n");
+  fflush(stdout);
   //
   // Connect to cprtb01
   //
@@ -1230,7 +1240,8 @@ void DesSerPrePC::Accept()
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
-  printf("ACCept 2\n"); fflush(stdout);
+  printf("ACCept 2\n");
+  fflush(stdout);
   //
   // Accept
   //
@@ -1240,7 +1251,8 @@ void DesSerPrePC::Accept()
   fflush(stdout);
   //  B2INFO("Accepting... : port " << m_port_to << " server " << m_hostname_local.c_str() );
   B2INFO("Accepting...");
-  printf("ACCept 3\n"); fflush(stdout);
+  printf("ACCept 3\n");
+  fflush(stdout);
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
     sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
@@ -1249,14 +1261,16 @@ void DesSerPrePC::Accept()
   } else {
     //    B2INFO("Connection is established: port " << htons(sock_accept.sin_port) << " address " <<  sock_accept.sin_addr.s_addr );
     B2INFO("Done.");
-    printf("Done"); fflush(stdout);
+    printf("Done");
+    fflush(stdout);
     //    set timepout option
     struct timeval timeout;
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char temp_char[100] = "Failed to set TIMEOUT. Exiting..."; print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      char temp_char[100] = "Failed to set TIMEOUT. Exiting...";
+      print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
   }
@@ -1333,12 +1347,20 @@ void DesSerPrePC::openRunStopNshm()
 
 int DesSerPrePC::checkRunStop()
 {
-  if (*m_ptr) { return 1; } else { return 0;}
+  if (*m_ptr) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 int DesSerPrePC::checkRunRecovery()
 {
-  if (*m_ptr) { return 0; } else { return 1;}
+  if (*m_ptr) {
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 void DesSerPrePC::restartRun()

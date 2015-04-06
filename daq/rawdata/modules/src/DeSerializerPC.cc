@@ -283,7 +283,8 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
     //
     if (rawblk_nwords > (int)(2.5e6)) {
       printf("[DEBUG] *******HDR**********\n");
-      printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
+      //      printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
+      printData(send_hdr_buf, 100);
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
               send_hdr.GetTotalNwords());

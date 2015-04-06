@@ -292,32 +292,80 @@ namespace Belle2 {
 
   private:
 
-    int m_userCustomOpen;/**switch of custom seletion cretria for user*/
+    /**switch of custom seletion cretria for user*/
+    int m_userCustomOpen;
 
-    int m_ngoodTracks;/**the number of good tracks*/
-    int m_ngoodECLClusters; /*the number of good ECL clusters*/
-    float m_Pzvis; /**the total absolute of Pz momenta*/
-    float m_Evis; /**the total visible energy*/
-    std::vector<float> m_dr; /**dr*/
-    std::vector<float> m_dz; /**dz*/
-    std::vector<float> m_pt; /**transverse momentum of tracks*/
-    std::vector<float> m_p; /**track momenta*/
-    std::vector<float> m_costheta; /**the polar angle of tracks*/
-    std::vector<float> m_phi; /**the azimuth angle of tracks*/
-    std::vector<int> m_Charge; /**chage*/
-    std::vector<float> m_ECLClusterE; /**the cluster energy*/
-    std::vector<float> m_ECLClusterTheta; /**the polar angle of cluster*/
-    std::vector<float> m_ECLClusterPhi; /**the azimuth angle of the cluster*/
-    std::vector<float> m_ECLClusterTiming; /**the timing of the cluster*/
-    float m_Esum; /**the sum of cluster energy*/
-    float m_MaxAngleTT; /*the maximum angle between the charged tracks in the rest frame*/
-    float m_AngleTT; /*the angle between the first and second largest momentum tracks in the rest frame*/
-    float m_AngleGG;/**the angle between the first and second energetic cluster*/
-    float m_P1; /**the largest momentum of the tracks*/
-    float m_P2; /**the second largest momentum of the tracks*/
-    float m_E1; /**the largest energetic cluster*/
-    float m_E2; /**the second largest energtic cluster*/
-    int  m_nKLMClusters; /**the number of KLM clusters*/
+    /**the number of good tracks*/
+    int m_ngoodTracks;
+
+    /*the number of good ECL clusters*/
+    int m_ngoodECLClusters;
+
+    /**the total absolute of Pz momenta*/
+    float m_Pzvis;
+
+    /**the total visible energy*/
+    float m_Evis;
+
+    /**dr*/
+    std::vector<float> m_dr;
+
+    /**dz*/
+    std::vector<float> m_dz;
+
+    /**transverse momentum of tracks*/
+    std::vector<float> m_pt;
+
+    /**track momenta*/
+    std::vector<float> m_p;
+
+    /**the polar angle of tracks*/
+    std::vector<float> m_costheta;
+
+    /**the azimuth angle of tracks*/
+    std::vector<float> m_phi;
+
+    /**charge*/
+    std::vector<int> m_Charge;
+
+    /**the cluster energy*/
+    std::vector<float> m_ECLClusterE;
+
+    /**the polar angle of cluster*/
+    std::vector<float> m_ECLClusterTheta;
+
+    /**the azimuth angle of the cluster*/
+    std::vector<float> m_ECLClusterPhi;
+
+    /**the timing of the cluster*/
+    std::vector<float> m_ECLClusterTiming;
+
+    /**the sum of cluster energy*/
+    float m_Esum;
+
+    /*the maximum angle between the charged tracks in the rest frame*/
+    float m_MaxAngleTT;
+
+    /*the angle between the first and second largest momentum tracks in the rest frame*/
+    float m_AngleTT;
+
+    /**the angle between the first and second energetic cluster*/
+    float m_AngleGG;
+
+    /**the largest momentum of the tracks*/
+    float m_P1;
+
+    /**the second largest momentum of the tracks*/
+    float m_P2;
+
+    /**the largest energetic cluster*/
+    float m_E1;
+
+    /**the second largest energtic cluster*/
+    float m_E2;
+
+    /**the number of KLM clusters*/
+    int  m_nKLMClusters;
 
     ClassDef(PhysicsTriggerInformation, 1)
   };

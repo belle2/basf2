@@ -72,6 +72,7 @@ namespace Belle2 {
     virtual void setLeftRightResolution(int lr) { m_leftRight = lr; }
 
     virtual bool isLeftRightMeasurement() const override { return true; }
+    /** Getter for left/right passage flag. */
     virtual int getLeftRightResolution() const override { return m_leftRight; }
 
 
@@ -138,6 +139,7 @@ namespace Belle2 {
     /** Pointer to the CDCHit used to created this CDCRecoHit */
     const CDCHit* m_cdcHit;  //!
 
+    /** Flag showing left/right passage */
     signed char m_leftRight;
 
     /** ROOT Macro.*/

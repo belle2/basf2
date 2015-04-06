@@ -101,6 +101,7 @@ namespace Belle2 {
       m_momentum = momentum;
     }
 
+    /** ROOT Macro. */
     ClassDef(CDCEBSimHit, 1);
   };
 } // end namespace Belle2

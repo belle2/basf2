@@ -62,6 +62,7 @@ PhysicsTriggerModule::PhysicsTriggerModule() : Module()
   Variable::Cut::Parameter emptyCut;
   addParam("UserCustomCut", m_userCustomCut, "the user-custom selection criteria", emptyCut);
   initializeForEvent();
+//  ReadParameters();
 }
 
 PhysicsTriggerModule::~PhysicsTriggerModule()

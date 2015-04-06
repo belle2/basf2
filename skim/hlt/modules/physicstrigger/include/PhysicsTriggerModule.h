@@ -64,6 +64,7 @@ namespace Belle2 {
     /**Access the selection criteria from xml file with Gearbox*/
     void ReadParameters();
 
+    /**Classify the event with the slection criteria from xml file*/
     bool eventUserSelect();
 
   private:
@@ -71,42 +72,81 @@ namespace Belle2 {
     /**Control the condition of the physics trigger menu*/
     int m_parameterCutIndex;
 
+    /**Switch of customing the selection criteria by user.*/
     int m_userCustomOpen;
 
+    /**Access users' cut */
     Variable::Cut::Parameter m_userCustomCut;
+
+    /**Access users' cut*/
     Variable::Cut m_cut;
+
     /**hadron criteria*/
 
-    int m_nTrackCutMin_had;/**the number of tracks*/
-    int m_nECLClusterCutMin_had; /**the number of ECL clusters*/
-    float m_EvisCutMin_had; /**the total visible energy*/
-    float m_EsumCutMin_had;/**the total deposit energy in ECL*/
-    float m_EsumCutMax_had;/**the total deposit energy in ECL*/
+    /**the number of tracks*/
+    int m_nTrackCutMin_had;
+    /**the number of ECL clusters*/
+    int m_nECLClusterCutMin_had;
+
+    /**the total visible energy*/
+    float m_EvisCutMin_had;
+    /**the total deposit energy in ECL*/
+    float m_EsumCutMin_had;
+    /**the total deposit energy in ECL*/
+    float m_EsumCutMax_had;
 
     /**tautau criteria*/
+
+    /**the maximum number of tracks*/
     int m_nTrackCutMax_tau;
+    /**the minimum number of tracks*/
     int m_nTrackCutMin_tau;
+    /**the maximum ECL deposited energy*/
     float m_EsumCutMax_tau;
     //float m_AngleTTCut_tau; /**the angle of the 1st and 2nd highest momentum tracks in center-of-mass energy */
 
     /**bhabha criteria*/
-    int m_nTrackCutMin_bhabha;
+    int m_nTrackCutMin_bhabha;/**the min number of tracks*/
+
+    /**the min number of ECL clusters*/
     int m_nECLClusterCutMin_bhabha;
-    float m_ECLClusterE1CutMin_bhabha;/**the largest deposity energy cluster in ECL*/
+
+    /**the largest deposity energy cluster in ECL*/
+    float m_ECLClusterE1CutMin_bhabha;
+
+    /**the min deposited energy in ECL*/
     float m_EsumCutMin_bhabha;
+
+    /**the largest angle between the charged tracks*/
     float m_AngleTTCutMax_bhabha;
 
     /**Mu-pair criteria*/
+
+    /**the min number of tracks*/
     int m_nTrackCutMin_dimu;
+
+    /**the min total deposited energy*/
     float m_EsumCutMin_dimu;
+
+    /**the largest angle between the ECL clusters*/
     float m_AngleTTCutMax_dimu;
 
     /**Gamma-pair criteria*/
+
+    /**the max max number of tracks*/
     int m_nTrackCutMax_digamma;
+
+    /**the min number of ECL clusters */
     int m_nECLClusterCutMin_digamma;
+
+    /**the min number of ECL clusters*/
     float m_ECLClusterE1CutMin_digamma;
+
+    /**the min total ECL deposited energy*/
     float m_EsumCutMin_digamma;
-    float m_AngleGGCutMax_digamma;/**the angle between the 1st and 2nd highest cluster in center-of-mass energy*/
+
+    /**the angle between the 1st and 2nd highest cluster in center-of-mass energy*/
+    float m_AngleGGCutMax_digamma;
 
     /**two photon criteria*/
 
@@ -114,37 +154,91 @@ namespace Belle2 {
     /**Hadronic: 0-dr, 1-dz*/
     //std::vector<float> m_parameterCutHadronic;
     //std::vector<float> m_parameterCutTautau;
-
+    /**summarize the trigger results*/
     int m_summary;
-    int m_ngoodTracks;
-    int m_ngoodECLClusters;
-    int m_nKLMClusters;
-    float m_Evis;
-    float m_Pzvis;
-    float m_angleTT;
-    float m_maxangleTT;
-    float m_angleGG;
-    float m_dr;
-    float m_dz;
-    float m_pt;
-    float m_p;
-    float m_costheta;
-    float m_phi;
-    float m_p1;
-    float m_p2;
-    int m_ip1;
-    int m_ip2;
-    float m_e1; /**the most energitic cluster*/
-    float m_e2; /**the most energitic cluster*/
-    int m_ie1;
-    int m_ie2;
-    int m_Charge;
-    float m_ECLClusterE;
-    float m_ECLClusterTheta;
-    float m_ECLClusterPhi;
-    float m_ECLClusterTiming;
 
-    float m_Esum; /**the energy sum of good ECL clusters*/
+    /**the number of good tracks*/
+    int m_ngoodTracks;
+
+    /**the number of good clusters in ECL*/
+    int m_ngoodECLClusters;
+
+    /**the number of goog clusters in KLM*/
+    int m_nKLMClusters;
+
+    /**the total visible energy*/
+    float m_Evis;
+
+    /**the absolote total momentum in z coodinate*/
+    float m_Pzvis;
+
+    /**the angle between two charged tracks*/
+    float m_angleTT;
+
+    /**the max angle between two charged tracks*/
+    float m_maxangleTT;
+
+    /**the angle between two clusters*/
+    float m_angleGG;
+
+    /**Dr*/
+    float m_dr;
+
+    /**Dz*/
+    float m_dz;
+
+    /**the transverse momentum*/
+    float m_pt;
+
+    /**the momentum*/
+    float m_p;
+
+    /**the cos polar angle*/
+    float m_costheta;
+
+    /**azimuthal angle*/
+    float m_phi;
+
+    /**the largest momentum*/
+    float m_p1;
+
+    /**the second largest momentum*/
+    float m_p2;
+
+    /**the track ID with the largest momentum*/
+    int m_ip1;
+
+    /**the track ID with the socond largest momentum*/
+    int m_ip2;
+
+    /**the most energetic cluster*/
+    float m_e1;
+
+    /**the second most energetic cluster*/
+    float m_e2;
+
+    /**the cluster ID with the most energetic cluster*/
+    int m_ie1;
+
+    /**the cluster ID with the second most energetic cluster*/
+    int m_ie2;
+
+    /**charge*/
+    int m_Charge;
+
+    /**the energy of ECL cluster*/
+    float m_ECLClusterE;
+
+    /**the polar angle of ECL cluster*/
+    float m_ECLClusterTheta;
+
+    /**the azimuthal angle of ECL cluster*/
+    float m_ECLClusterPhi;
+
+    /**the timing of ECL cluster*/
+    float m_ECLClusterTiming;
+    /**the energy sum of good ECL clusters*/
+    float m_Esum;
 
 
   };

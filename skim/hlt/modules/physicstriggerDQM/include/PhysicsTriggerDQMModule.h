@@ -59,13 +59,28 @@ namespace Belle2 {
 
 
     //! Histograms
+    /**the number of tracks*/
     TH1F* h_NTrack;
+
+    /**the number of ECL clusters*/
     TH1F* h_NCluster;
+
+    /**the total deposited energy in ECL*/
     TH1F* h_ESum;
+
+    /**the total visible energy*/
     TH1F* h_EVis;
+
+    /**the largest momentum*/
     TH1F* h_P1;
+
+    /**the largest energy of clusters*/
     TH1F* h_E1;
+
+    /**the maximum angle between tracks*/
     TH1F* h_MaxAngleTT;
+
+    /**the maximum angle between clusters*/
     TH1F* h_MaxAngleGG;
 
 
@@ -73,14 +88,26 @@ namespace Belle2 {
     TH1F* h_TrackP;
 //    TH1F* h_TrackCharge;
     TH1F* h_TrackCostheta;
+
+    /**the azimuthal angle of tracks*/
     TH1F* h_TrackPhi;
+
+    /**the Dr*/
     TH1F* h_TrackDr;
+
+    /**Dz*/
     TH1F* h_TrackDz;
 
     //histograms for cluster information
+    /**the energy of clusters*/
     TH1F* h_ClusterE;
+
+    /**the polar angle of clusters*/
     TH1F* h_ClusterTheta;
+
+
     //TH1F* h_ClusterPhi;
+    /**the timing of clusters*/
     TH1F* h_ClusterTiming;
 
   };

@@ -30,8 +30,13 @@ RFMaster::RFMaster(string conffile)
   mkdir(execdir.c_str(), 0755);
   chdir(execdir.c_str());
 
-  // 5. Initialize LogManager
+  // 3. Initialize LogManager
   m_log = new RFLogManager(nodename);
+
+  // 4. Leave PID file
+  FILE* f = fopen("pid.data", "w");
+  fprintf(f, "%d", getpid());
+  fclose(f);
 
 }
 

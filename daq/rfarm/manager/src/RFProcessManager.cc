@@ -10,6 +10,7 @@
 #include "daq/rfarm/manager/RFNSM.h"
 #include "daq/slc/nsm/NSMCommunicator.h"
 #include <time.h>
+#include <stdio.h>
 
 extern "C" {
 #include <nsm2/nsmlib2.h>
@@ -32,6 +33,9 @@ RFProcessManager::RFProcessManager(char* nodename)
     perror("pipe");
     m_iopipe[0] = -1; m_iopipe[1] = -1;
   }
+  FILE* f = fopen("pid.data", "w");
+  fprintf(f, "%d", getpid());
+  fclose(f);
 }
 
 RFProcessManager::~RFProcessManager()

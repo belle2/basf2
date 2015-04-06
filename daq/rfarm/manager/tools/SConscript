@@ -11,5 +11,6 @@ env['TOOLS_LIBS']['rfctl'] = ['nsm2_b2lib', 'nsm2_corelib', 'readline', 'curses'
 env['TOOLS_LIBS']['nodedump'] = ['daq', 'framework']
 env['TOOLS_LIBS']['rf_monitor'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['rfgetconf'] = ['daq', 'framework']
+env['TOOLS_LIBS']['rfcommand'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 
 Return('env')

@@ -73,6 +73,9 @@ namespace Belle2 {
     //! dump error data
     virtual void printData(int* buf, int nwords);
 
+    //! dump error data
+    virtual void printASCIIData(int* buf, int nwords);
+
   protected :
 
     // Event Meta Data
@@ -151,7 +154,8 @@ namespace Belle2 {
     //! calculate checksum
     unsigned int calcXORChecksum(int* buf, int nwords);
 
-    virtual void clearNumUsedBuf() {
+    virtual void clearNumUsedBuf()
+    {
       m_num_usedbuf = 0;
       return ;
     }
@@ -252,7 +256,8 @@ namespace Belle2 {
   private:
 
   public:
-    static RunInfoBuffer& getStatus() {
+    static RunInfoBuffer& getStatus()
+    {
       return g_status;
     }
 

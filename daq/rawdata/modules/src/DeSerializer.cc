@@ -228,6 +228,23 @@ void DeSerializerModule::printData(int* buf, int nwords)
   return;
 }
 
+void DeSerializerModule::printASCIIData(int* buf, int nwords)
+{
+  char ascii_code[128];
+  sprintf(ascii_code,
+          "                                 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[ ]^_'abcdefghijklmnopqrstuvwxyz{|}~ ");
+  printf("[DEBUG]");
+  for (int i = 0; i < nwords; i++) {
+    for (int j = 0 ; j < 4; j++) {
+      printf("%c", ascii_code[(buf[ i ] >> j * 8) & 0x7f ]);
+    }
+    if (i % 10 == 9) printf("\n[DEBUG]");
+  }
+  printf("\n[DEBUG]");
+  printf("\n");
+  return;
+}
+
 int* DeSerializerModule::getNewBuffer(int nwords, int* delete_flag)
 {
 

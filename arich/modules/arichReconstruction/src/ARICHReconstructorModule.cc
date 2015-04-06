@@ -150,6 +150,7 @@ namespace Belle2 {
 
       std::vector<ARICHTrack> arichTracks;
       getTracks(arichTracks, Const::pion);
+
       B2DEBUG(100, "Number of tracks from ext" << arichTracks.size());
       if (arichTracks.empty()) return;
 
@@ -272,8 +273,9 @@ namespace Belle2 {
       int charge = fitResult->getChargeSign();
       B2DEBUG(50, "Track.Charge " << charge);
       const MCParticle* particle = track->getRelated<MCParticle>(m_inputTracks);
-      ARICHAeroHit* aeroHit = particle->getRelated<ARICHAeroHit>(m_inputAeroHits);
 
+      ARICHAeroHit* aeroHit = NULL;
+      if (particle) aeroHit = particle->getRelated<ARICHAeroHit>(m_inputAeroHits);
       int aeroHitIndex = -1;
       int truePDGCode = 0;
 

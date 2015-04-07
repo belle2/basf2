@@ -27,6 +27,7 @@ int main(int argc, char** argv)
       LogFile::error("failed to open server socket %d", port);
       exit(1);
     }
+    LogFile::debug("Open port %d for %s", port, "0.0.0.0");
     PostgreSQLInterface db(config.get("database.host"),
                            config.get("database.dbname"),
                            config.get("database.user"),

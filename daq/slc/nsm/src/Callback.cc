@@ -30,8 +30,8 @@ int Callback::add(NSMVHandler* handler)
         return i + 1;
       }
     }
-    if (handler->getNode().size() == 0)
-      LogFile::debug("added %s", handler->getName().c_str());
+    //if (handler->getNode().size() == 0)
+    //  LogFile::debug("added %s", handler->getName().c_str());
     m_handler.push_back(handler);
     return m_handler.size();
   }

@@ -49,7 +49,6 @@ int TCPSocket::connect() throw (IOException)
   if (host == NULL) {
     unsigned long ip_address = inet_addr(m_ip.c_str());
     if ((signed long) ip_address < 0) {
-      throw (std::exception());
       throw (IOException("Wrong host name or ip"));
     } else {
       host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);

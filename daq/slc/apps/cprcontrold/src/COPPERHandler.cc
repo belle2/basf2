@@ -11,6 +11,18 @@
 
 using namespace Belle2;
 
+bool NSMVHandlerOutputPort::handleGetInt(int& val)
+{
+  val = (int)m_callback.getProcess().getInfo().getOutputPort();
+  return true;
+}
+
+bool NSMVHandlerCOPPERROPID::handleGetInt(int& val)
+{
+  val = (int)m_callback.getProcess().getProcess().get_id();
+  return true;
+}
+
 bool NSMVHandlerFifoEmpty::handleGetInt(int& val)
 {
   val = (int)m_callback.getCopper().isFifoEmpty();

@@ -34,6 +34,34 @@ namespace Belle2 {
     ROController& m_con;
   };
 
+  class NSMVHandlerROInputPort : public NSMVHandlerInt {
+  public:
+    NSMVHandlerROInputPort(ROController& con, const std::string& name)
+      : NSMVHandlerInt(name, true, false), m_con(con) {}
+    virtual ~NSMVHandlerROInputPort() throw() {}
+    bool handleGetInt(int& val)
+    {
+      val = m_con.getControl().getInfo().getInputPort();
+      return true;
+    }
+  private:
+    ROController& m_con;
+  };
+
+  class NSMVHandlerROOutputPort : public NSMVHandlerInt {
+  public:
+    NSMVHandlerROOutputPort(ROController& con, const std::string& name)
+      : NSMVHandlerInt(name, true, false), m_con(con) {}
+    virtual ~NSMVHandlerROOutputPort() throw() {}
+    bool handleGetInt(int& val)
+    {
+      val = m_con.getControl().getInfo().getOutputPort();
+      return true;
+    }
+  private:
+    ROController& m_con;
+  };
+
 }
 
 using namespace Belle2;
@@ -60,6 +88,8 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerROPID(m_eb0, "eb0.pid"));
     m_stream1.init(this, 1, "stream1", obj);
     add(new NSMVHandlerROPID(m_stream1, "stream1.pid"));
+    add(new NSMVHandlerROInputPort(m_stream1, "stream1.input.port"));
+    add(new NSMVHandlerROOutputPort(m_stream1, "stream1.output.port"));
     m_stream0 = std::vector<Stream0Controller>();
     for (size_t i = 0; i < senders.size(); i++) {
       m_stream0.push_back(Stream0Controller());
@@ -67,7 +97,9 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
     for (size_t i = 0; i < m_stream0.size(); i++) {
       std::string name = StringUtil::form("stream0_%d", (int)i);
       m_stream0[i].init(this, i + 2, name, obj);
-      add(new NSMVHandlerROPID(m_stream0[i], StringUtil::form("stream0.sender[%d].pid", (int)i)));
+      add(new NSMVHandlerROPID(m_stream0[i], StringUtil::form("stream0[%d].pid", (int)i)));
+      add(new NSMVHandlerROInputPort(m_stream0[i], StringUtil::form("stream0[%d].input.port", (int)i)));
+      add(new NSMVHandlerROOutputPort(m_stream0[i], StringUtil::form("stream0[%d].output.port", (int)i)));
     }
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
@@ -95,7 +127,7 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
     if (!m_stream0[i].load(obj, 10)) {
       throw (RCHandlerException("Faield to boot stream0-%d", (int)i));
     }
-    std::string vname = StringUtil::form("stream0.sender[%d].pid", (int)i);
+    std::string vname = StringUtil::form("stream0[%d].pid", (int)i);
     set(vname, m_stream0[i].getControl().getProcess().get_id());
     LogFile::debug("Booted %d-th stream0", i);
     try_wait();

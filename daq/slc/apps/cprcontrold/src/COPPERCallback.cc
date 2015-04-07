@@ -48,6 +48,8 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
+    add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
+    add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
     add(new NSMVHandlerFifoFull(*this, "copper.err.fifofull"));
     add(new NSMVHandlerLengthFifoFull(*this, "copper.err.lengthfifofull"));

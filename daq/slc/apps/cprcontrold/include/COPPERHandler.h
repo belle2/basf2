@@ -74,6 +74,8 @@ namespace Belle2 {
     int m_size;
   };
 
+  CPRHANDLER_INT_GET(NSMVHandlerOutputPort);
+  CPRHANDLER_INT_GET(NSMVHandlerCOPPERROPID);
   CPRHANDLER_INT_GET(NSMVHandlerFifoEmpty);
   CPRHANDLER_INT_GET(NSMVHandlerFifoFull);
   CPRHANDLER_INT_GET(NSMVHandlerLengthFifoFull);

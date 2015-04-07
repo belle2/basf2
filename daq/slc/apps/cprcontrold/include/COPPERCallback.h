@@ -38,6 +38,7 @@ namespace Belle2 {
     FEE* getFEE(int i) { return m_fee[i]; }
     TTRX& getTTRX() { return m_ttrx; }
     COPPER& getCopper() { return m_copper; }
+    ProcessController& getProcess() { return m_con; }
 
   private:
     ProcessController m_con;

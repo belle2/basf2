@@ -90,8 +90,8 @@ void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
   // setting Pedestals
   const DBObjectList o_ped(obj.getObjects("ped"));
   for (size_t i = 0; i < o_ped.size() / 2; i++) {
-    val = o_ped[2 * i].getInt("val") & 0xFFFF
-          | (o_ped[2 * i + 1].getInt("val") << 16) & 0xFFFF;
+    val = (o_ped[2 * i].getInt("val") & 0xFFFF)
+          | ((o_ped[2 * i + 1].getInt("val") << 16) & 0xFFFF);
     hslb.writefee32(0x0020 + i * 2, val);
   }
 }

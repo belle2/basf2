@@ -359,7 +359,7 @@ void DedxPIDModule::event()
         // deactivate the helix helper due to bugs...
         const bool helix_accurate = false;
 
-        float pocaZ;
+        float pocaZ = 0.0;
         if (!track_extrapolation_failed && !helix_accurate) {
           try {
             TVector3 wire_dir = (wire_pos_b - wire_pos_f).Unit();

@@ -12,7 +12,7 @@ class PruneGenfitTracks(Module):
     This needs to be done after the dE/dx PID.
     """
 
-    # See genfit::Track::prune() doc, empty string for no pruning
+    """ See genfit::Track::prune() doc, empty string for no pruning """
     m_flags = 'FL'
 
     def __init__(self):

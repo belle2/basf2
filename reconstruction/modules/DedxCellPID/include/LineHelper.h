@@ -195,18 +195,11 @@ namespace Belle2 {
 
     /** Construct a DedxDriftCell from four different DedxLines (sides) */
     DedxDriftCell(const DedxLine& left, const DedxLine& top, const DedxLine& right, const DedxLine& bot) : m_Left(left), m_Top(top),
-      m_Right(right), m_Bot(bot),
-      m_isValid(true) {}
+      m_Right(right), m_Bot(bot), m_isValid(true) {}
 
     /** Construct a DedxDriftCell from four different DedxPoints (corners) */
-    DedxDriftCell(const DedxPoint& tl, const DedxPoint& tr, const DedxPoint& br, const DedxPoint& bl)
-    {
-      m_Left    = DedxLine(bl, tl);
-      m_Top     = DedxLine(tl, tr);
-      m_Right   = DedxLine(tr, br);
-      m_Bot     = DedxLine(br, bl);
-      m_isValid = true;
-    }
+    DedxDriftCell(const DedxPoint& tl, const DedxPoint& tr, const DedxPoint& br, const DedxPoint& bl) :  m_Left(bl, tl), m_Top(tl, tr),
+      m_Right(tr, br), m_Bot(br, bl), m_isValid(true) {}
 
     /** Check if this is a valid calculation (number of intersections = 2) */
     bool isValid() { return m_isValid; }

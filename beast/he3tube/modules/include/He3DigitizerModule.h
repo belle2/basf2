@@ -90,6 +90,8 @@ namespace Belle2 {
       double iResponse[2400] = {0};
       /** Event counter */
       int Event = 0;
+      /** Conversion to ADC counts*/
+      double m_ConversionFactor = 6828 / 0.3538;
 
     };
 

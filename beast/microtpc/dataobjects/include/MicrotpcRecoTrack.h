@@ -76,7 +76,7 @@ namespace Belle2 {
     const float* getimpact_y() const { return m_impact_y; }
     /** Return which side was/were hit */
     //void getside(int ** side) const { m_side = side; return m_side; }
-    const int* getside() const { return m_side[5]; }
+    const int* getside() const { return m_side[4]; }
 
   private:
     /** detector number */

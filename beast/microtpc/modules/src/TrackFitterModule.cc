@@ -110,7 +110,7 @@ TrackFitterModule::~TrackFitterModule()
 void TrackFitterModule::initialize()
 {
   B2INFO("TrackFitter: Initializing");
-  StoreArray<MicrotpcHit>::registerPersistent();
+  StoreArray<MicrotpcRecoTrack>::registerPersistent();
 
   //get the garfield drift data, gas, and TPC paramters
   getXMLData();

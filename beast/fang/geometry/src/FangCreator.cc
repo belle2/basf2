@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <beast/claw/geometry/ClawCreator.h>
-#include <beast/claw/simulation/SensitiveDetector.h>
+#include <beast/fang/geometry/FangCreator.h>
+#include <beast/fang/simulation/SensitiveDetector.h>
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
@@ -17,7 +17,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-//#include <claw/simulation/SensitiveDetector.h>
+//#include <fang/simulation/SensitiveDetector.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -45,24 +45,24 @@ using namespace boost;
 
 namespace Belle2 {
 
-  /** Namespace to encapsulate code needed for simulation and reconstrucion of the CLAW detector */
-  namespace claw {
+  /** Namespace to encapsulate code needed for simulation and reconstrucion of the FANG detector */
+  namespace fang {
 
     // Register the creator
-    /** Creator creates the CLAW geometry */
-    geometry::CreatorFactory<ClawCreator> ClawFactory("CLAWCreator");
+    /** Creator creates the FANG geometry */
+    geometry::CreatorFactory<FangCreator> FangFactory("FANGCreator");
 
-    ClawCreator::ClawCreator(): m_sensitive(0)
+    FangCreator::FangCreator(): m_sensitive(0)
     {
       m_sensitive = new SensitiveDetector();
     }
 
-    ClawCreator::~ClawCreator()
+    FangCreator::~FangCreator()
     {
       if (m_sensitive) delete m_sensitive;
     }
 
-    void ClawCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
+    void FangCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
@@ -111,8 +111,8 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-        G4double r = activeParams.getLength("r_claw") * CLHEP::cm;
-        G4double z = activeParams.getLength("z_claw") * CLHEP::cm;
+        G4double r = activeParams.getLength("r_fang") * CLHEP::cm;
+        G4double z = activeParams.getLength("z_fang") * CLHEP::cm;
         G4double phi = activeParams.getAngle("Phi");
         G4double thetaZ = activeParams.getAngle("ThetaZ");
         G4double dx_board = activeParams.getLength("dx_board") / 2.*CLHEP::cm;
@@ -136,7 +136,7 @@ namespace Belle2 {
         G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
         new G4PVPlacement(transform, l_air, "p_air", &topVolume, false, 1);
         */
-        //create claw G10 board
+        //create fang G10 board
         G4Box* s_board = new G4Box("s_board", dx_board, dy_board, dz_board);
 
         G4LogicalVolume* l_board = new G4LogicalVolume(s_board, geometry::Materials::get("G10"), "l_board");
@@ -182,5 +182,5 @@ namespace Belle2 {
         }
       }
     }
-  } // claw namespace
+  } // fang namespace
 } // Belle2 namespace

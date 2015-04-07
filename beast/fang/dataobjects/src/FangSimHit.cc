@@ -3,13 +3,13 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Igal Jaegle                                              *
+ * Contributors: Andreas Moll, Peter Kvasnicka, Martin Ritter             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <beast/microtpc/dataobjects/MicrotpcHit.h>
+#include <beast/fang/dataobjects/FangSimHit.h>
 
 using namespace Belle2;
 
-ClassImp(MicrotpcHit)
+ClassImp(FangSimHit)

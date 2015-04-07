@@ -9,18 +9,18 @@ from modularAnalysis import *
 
 def stdFSParticles(path=analysis_main):
 
-  # Nominal PID
+    # Nominal PID
     stdK(path)
     stdPi(path)
 
-  # MDST standard
+    # MDST standard
     stdPhoton(path)
 
-  # reconstruct standard pi0
+    # reconstruct standard pi0
     stdPi0(path)
-  # reconstruct standard Ks
+    # reconstruct standard Ks
     stdKs()
-  # Egamma > 1.5 GeV
+    # Egamma > 1.5 GeV
     stdHighEPhoton(path)
 
 
@@ -68,7 +68,7 @@ def goodPi0(path=analysis_main):
 
 def stdPhoton(path=analysis_main):
     fillParticleList('gamma:all', '', True, path)
-    calibratePhotonEnergy('gamma:all', path)
+    calibratePhotonEnergy('gamma:all', 0.030, path)
 
 
 def goodPhoton(path=analysis_main):

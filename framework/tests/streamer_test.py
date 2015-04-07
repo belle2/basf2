@@ -3,10 +3,6 @@
 
 from basf2 import *
 
-# avoid race conditions beetween pyroot and GUI thread
-from ROOT import PyConfig
-PyConfig.StartGuiThread = False
-
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -29,14 +25,13 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 
-# detecor simulation
+# detector simulation
 components = ['MagneticField',
               'BeamPipe',
-              #'PXD',
-              #'SVD',
+              # 'PXD',
+              # 'SVD',
               'CDC']
 add_simulation(main, components)
-# or add_simulation(main) to simulate all detectors
 
 add_reconstruction(main, components)
 
@@ -46,13 +41,13 @@ main.add_module(output)
 process(main)
 
 
-#load file and see if it can be read properly
+# load file and see if it can be read properly
 from ROOT import TFile
 from ROOT import TTree
 file = TFile('streamer_test.root')
 tree = file.Get('tree')
 
-#seems to be ok, most of the time
+# seems to be ok, most of the time
 tree.Project("", "MCParticles.m_pdg")
 
 # Used to create problems when genfit::AbsTrackRep didn't have schema

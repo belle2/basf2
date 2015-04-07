@@ -323,7 +323,7 @@ namespace Belle2 {
      * Note that parameters are shared, so changing them on a cloned module will also affect
      * the original module.
      */
-    boost::shared_ptr<PathElement> clone() const;
+    boost::shared_ptr<PathElement> clone() const override;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -153,7 +153,8 @@ namespace Belle2 {
      *
      * @param value The parameter value which should be assigned to the parameter.
      */
-    void setValue(T value) {
+    void setValue(T value)
+    {
       m_paramVariable = value;
       m_setInSteering = true;
     }
@@ -163,7 +164,8 @@ namespace Belle2 {
      *
      * @param defaultValue The parameter default value of the parameter.
      */
-    void setDefaultValue(T defaultValue) {
+    void setDefaultValue(T defaultValue)
+    {
       m_defaultValue = defaultValue;
       m_paramVariable = defaultValue;
       m_setInSteering = false;
@@ -192,7 +194,7 @@ namespace Belle2 {
      *
      * @param pyObject The object which should be converted and stored as the parameter value.
      */
-    virtual void setValueFromPythonObject(const boost::python::object& pyObject) { setValue(PyObjConvUtils::convertPythonObject(pyObject, getDefaultValue())); }
+    virtual void setValueFromPythonObject(const boost::python::object& pyObject) override { setValue(PyObjConvUtils::convertPythonObject(pyObject, getDefaultValue())); }
 
     /**
      * Returns a python object containing the value or the default value of the given parameter.
@@ -200,11 +202,12 @@ namespace Belle2 {
      * @param pyObject Reference to the python object which is set to the parameter value.
      * @param defaultValues If true returns default value otherwise parameter value.
      */
-    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) const { pyObject = PyObjConvUtils::convertToPythonObject((defaultValues) ? m_defaultValue : m_paramVariable); }
+    virtual void setValueToPythonObject(boost::python::object& pyObject, bool defaultValues = false) const override { pyObject = PyObjConvUtils::convertToPythonObject((defaultValues) ? m_defaultValue : m_paramVariable); }
 
 
     /** Set value from other ModuleParam of same type. */
-    virtual void setValueFromParam(const ModuleParamBase& param) override {
+    virtual void setValueFromParam(const ModuleParamBase& param) override
+    {
       const ModuleParam<T>* p = dynamic_cast<const ModuleParam<T>*>(&param);
       if (p) {
         m_defaultValue = p->m_defaultValue;
@@ -216,7 +219,8 @@ namespace Belle2 {
     /**
      * Resets the parameter value by assigning the default value to the parameter value.
      */
-    void resetValue() {
+    void resetValue()
+    {
       m_paramVariable = m_defaultValue;
       m_setInSteering = false;
     };

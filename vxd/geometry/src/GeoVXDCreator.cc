@@ -19,7 +19,6 @@
 #include <framework/gearbox/GearDir.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
 #include <G4ReflectionFactory.hh>
@@ -57,7 +56,7 @@ namespace Belle2 {
       //Lets assume that it cannot be that only one part of the vxd gets destroyed
       // FIXME: This causes problems: VXD::GeoCache::getInstance().clear();
       //Delete all sensitive detectors
-      BOOST_FOREACH(Simulation::SensitiveDetectorBase * sensitive, m_sensitive) {
+      for (Simulation::SensitiveDetectorBase* sensitive : m_sensitive) {
         delete sensitive;
       }
       m_sensitive.clear();
@@ -74,7 +73,7 @@ namespace Belle2 {
     vector<GeoVXDPlacement> GeoVXDCreator::getSubComponents(GearDir path)
     {
       vector<GeoVXDPlacement> result;
-      BOOST_FOREACH(const GearDir & component, path.getNodes("Component")) {
+      for (const GearDir& component : path.getNodes("Component")) {
         string type;
         if (!component.exists("@type")) {
           type = component.getString("@name");
@@ -151,7 +150,7 @@ namespace Belle2 {
       bool widthResize  = component.width <= 0;
       bool lengthResize = component.length <= 0;
       bool heightResize = component.height <= 0;
-      BOOST_FOREACH(GeoVXDPlacement & p, placements) {
+      for (GeoVXDPlacement& p : placements) {
 
         GeoVXDComponent sub = getComponent(p.name);
         B2DEBUG(100, "SubComponent " << p.name);
@@ -315,7 +314,7 @@ namespace Belle2 {
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(ladder);
 
       vector<G4Point3D> lastSensorEdge;
-      BOOST_FOREACH(GeoVXDSensorPlacement & p, m_ladder.sensors) {
+      for (GeoVXDSensorPlacement& p : m_ladder.sensors) {
         VxdID sensorID(ladder);
         sensorID.setSensorNumber(p.sensorID);
 
@@ -496,7 +495,7 @@ namespace Belle2 {
       G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment(m_prefix), envelope, m_prefix + ".Envelope", &topVolume, false, 1);
 
       //Read the definition of all sensor types
-      BOOST_FOREACH(const GearDir & paramsSensor, m_components.getNodes("Sensor")) {
+      for (const GearDir& paramsSensor : m_components.getNodes("Sensor")) {
         string sensorTypeID = paramsSensor.getString("@type");
         GeoVXDSensor sensor(
           paramsSensor.getString("Material"),
@@ -529,7 +528,7 @@ namespace Belle2 {
 
       //Build all ladders including Sensors
       GeoVXDAssembly shellSupport = createHalfShellSupport(support);
-      BOOST_FOREACH(const GearDir & shell, content.getNodes("HalfShell")) {
+      for (const GearDir& shell : content.getNodes("HalfShell")) {
         string shellName =  shell.getString("@name");
         B2INFO("Building " << m_prefix << " half-shell " << shellName);
         G4Transform3D shellAlignment = getAlignment(m_prefix + "." + shellName);
@@ -538,7 +537,7 @@ namespace Belle2 {
         double shellAngle = shell.getAngle("shellAngle", 0);
         if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
 
-        BOOST_FOREACH(const GearDir & layer, shell.getNodes("Layer")) {
+        for (const GearDir& layer : shell.getNodes("Layer")) {
           int layerID = layer.getInt("@id");
           setCurrentLayer(layerID);
 
@@ -548,7 +547,7 @@ namespace Belle2 {
           GeoVXDAssembly ladderSupport = createLadderSupport(layerID, support);
 
           //Loop over defined ladders
-          BOOST_FOREACH(const GearDir & ladder, layer.getNodes("Ladder")) {
+          for (const GearDir& ladder : layer.getNodes("Ladder")) {
             int ladderID = ladder.getInt("@id");
             double phi = ladder.getAngle("phi", 0);
             G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment);
@@ -589,7 +588,7 @@ namespace Belle2 {
                    paramsLadder.getString("Glue/Material", "")
                  );
 
-      BOOST_FOREACH(const GearDir & sensorInfo, paramsLadder.getNodes("Sensor")) {
+      for (const GearDir& sensorInfo : paramsLadder.getNodes("Sensor")) {
         m_ladder.sensors.push_back(GeoVXDSensorPlacement(
                                      sensorInfo.getInt("@id"),
                                      sensorInfo.getString("@type"),

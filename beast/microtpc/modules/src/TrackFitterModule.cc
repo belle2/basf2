@@ -58,7 +58,7 @@ REG_MODULE(TrackFitter)
 TrackFitterModule::TrackFitterModule() : Module()
 {
   // Set module properties
-  setDescription("Microtpc digitizer module");
+  setDescription("Track fitter module");
 
   //Default values are set here. New values can be in MICROTPC.xml.
   addParam("GEMGain1", m_GEMGain1, "GEM1 gain", 10.0);
@@ -154,7 +154,7 @@ void TrackFitterModule::event()
   //int i_tpc1[8];
   //int i_tpc2[8];
   for (int i = 0; i < nTPC; i++) {
-    StoreArray<MicrotpcRecoTrack> RecoTrack;
+    StoreArray<MicrotpcRecoTrack> RecoTracks;
 
     i_tpc[i] = 0;
 
@@ -365,8 +365,8 @@ void TrackFitterModule::event()
         TMath::Sort(fpxhits, L, iL, false);
         m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
 
-        RecoTrack.appendNew(i, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov, m_impact_x,
-                            m_impact_y, m_side);
+        RecoTracks.appendNew(i, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov, m_impact_x,
+                             m_impact_y, m_side);
 
         delete min;
         Track->Delete();

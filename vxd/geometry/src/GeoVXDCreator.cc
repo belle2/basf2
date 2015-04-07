@@ -485,14 +485,17 @@ namespace Belle2 {
       //Build envelope
       G4LogicalVolume* envelope(0);
       GearDir envelopeParams(content, "Envelope");
+      G4VPhysicalVolume* physEnvelope{nullptr};
       if (!envelopeParams) {
-        B2FATAL("Could not find definition for VXD Envelope.");
+        B2INFO("Could not find definition for " + m_prefix + " Envelope, placing directly in top volume");
+        envelope = &topVolume;
+      } else {
+        double minZ(0), maxZ(0);
+        G4Polycone* envelopeCone = geometry::createRotationSolid("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
+        envelope = new G4LogicalVolume(envelopeCone, material, m_prefix + ".Envelope");
+        setVisibility(*envelope, false);
+        physEnvelope = new G4PVPlacement(getAlignment(m_prefix), envelope, m_prefix + ".Envelope", &topVolume, false, 1);
       }
-      double minZ(0), maxZ(0);
-      G4Polycone* envelopeCone = geometry::createRotationSolid("Envelope", GearDir(content, "Envelope/"), minZ, maxZ);
-      envelope = new G4LogicalVolume(envelopeCone, material, m_prefix + ".Envelope");
-      setVisibility(*envelope, false);
-      G4VPhysicalVolume* physEnvelope = new G4PVPlacement(getAlignment(m_prefix), envelope, m_prefix + ".Envelope", &topVolume, false, 1);
 
       //Read the definition of all sensor types
       for (const GearDir& paramsSensor : m_components.getNodes("Sensor")) {
@@ -557,7 +560,15 @@ namespace Belle2 {
       }
 
       //Now build cache with all transformations
-      VXD::GeoCache::getInstance().findVolumes(physEnvelope);
+      if (physEnvelope) {
+        VXD::GeoCache::getInstance().findVolumes(physEnvelope);
+      } else {
+        //create a temporary placement of the top volume.
+        G4PVPlacement topPlacement(nullptr, G4ThreeVector(0, 0, 0), &topVolume,
+                                   "temp_Top", nullptr, false, 1, false);
+        //and search for all VXD sensitive sensors within
+        VXD::GeoCache::getInstance().findVolumes(&topPlacement);
+      }
 
       //Create diamond radiation sensors if defined and in background mode
       GearDir radiationDir(content, "RadiationSensors");

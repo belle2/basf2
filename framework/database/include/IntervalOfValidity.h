@@ -51,6 +51,23 @@ namespace Belle2 {
      */
     bool empty() const {return (!m_experimentLow && !m_experimentHigh);};
 
+    /**
+     * Check whether two intervals of validity are identical.
+     */
+    virtual bool operator==(const IntervalOfValidity& other)
+    {
+      return (m_experimentLow == other.m_experimentLow) && (m_runLow == other.m_runLow) &&
+             (m_experimentHigh == other.m_experimentHigh) && (m_runHigh == other.m_runHigh);
+    }
+
+    /**
+     * Check whether two intervals of validity are different.
+     */
+    virtual bool operator!=(const IntervalOfValidity& other)
+    {
+      return !(*this == other);
+    }
+
   private:
 
     /** Lowest experiment number. 0 means no bound.

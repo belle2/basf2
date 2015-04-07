@@ -35,6 +35,7 @@ namespace Belle2 {
                    bool isArray)
     {
       m_entry = DBStore::Instance().getEntry(name, objClass, isArray);
+      m_iov = m_entry->iov;
     };
 
     /**
@@ -72,9 +73,22 @@ namespace Belle2 {
       return !(*this == other);
     }
 
+    /**
+     * Check whether the object has changed since the last call to hasChanged  of the accessor).
+     */
+    bool hasChanged()
+    {
+      bool result = (m_iov != m_entry->iov);
+      m_iov = m_entry->iov;
+      return result;
+    }
+
   protected:
     /** Pointer to the entry in the DBStore. */
     DBEntry* m_entry;
+
+    /** IoV at last call to hasChanged. */
+    IntervalOfValidity m_iov;
 
   };
 }

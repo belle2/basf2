@@ -123,7 +123,6 @@ DBEntry* DBStore::getEntry(const std::string& name, const TClass* objClass, bool
   // If no object was obtained from the database yet, but it should be available, get it
   if (m_event.isValid()) {
     auto objectIov = Database::Instance().getData(*m_event, name);
-    objectIov.first->Dump();
     if (!objectIov.first) return &dbEntry;
     dbEntry.object = objectIov.first;
     dbEntry.iov = objectIov.second;

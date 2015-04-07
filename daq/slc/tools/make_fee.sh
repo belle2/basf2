@@ -41,29 +41,24 @@ dir=${BELLE2_LOCAL_DIR}/daq/slc/data/database
 
 mkdir -p $dir/${name}
 
-filename=${dir}/${name}/${name}.reg.conf
-echo "create dbinput file for register : ${filename}"
-sed "s/Template/$bigname/g" $dir/example/fee.reg.conf | \
-sed "s/template/${name}/g"  > ${filename}
-
-filename=$dir/${name}/${name}.par.cpr${id}.a.conf
+filename=$dir/${name}/${name}.cpr${id}.a.conf
 echo "create dbinput file for parameter (HSLB-a) : ${filename}"
-sed "s/Template/$bigname/g" $dir/example/fee.par.cpr001.a.conf | \
+sed "s/Template/$bigname/g" $dir/example/fee.cpr001.a.conf | \
 sed "s/cpr001/cpr${id}/g" | sed "s/template/${name}/g"  > ${filename}
 
-filename=$dir/${name}/${name}.par.cpr${id}.b.conf
+filename=$dir/${name}/${name}.cpr${id}.b.conf
 echo "create dbinput file for parameter (HSLB-b) : ${filename}"
-sed "s/Template/$bigname/g" $dir/example/fee.par.cpr001.b.conf | \
+sed "s/Template/$bigname/g" $dir/example/fee.cpr001.b.conf | \
 sed "s/cpr001/cpr${id}/g" | sed "s/template/${name}/g"  > ${filename}
 
-filename=$dir/${name}/${name}.par.cpr${id}.c.conf
+filename=$dir/${name}/${name}.cpr${id}.c.conf
 echo "create dbinput file for parameter (HSLB-c) : ${filename}"
-sed "s/Template/$bigname/g" $dir/example/fee.par.cpr001.c.conf | \
+sed "s/Template/$bigname/g" $dir/example/fee.cpr001.c.conf | \
 sed "s/cpr001/cpr${id}/g" | sed "s/template/${name}/g"  > ${filename}
 
-filename=$dir/${name}/${name}.par.cpr${id}.d.conf
+filename=$dir/${name}/${name}.cpr${id}.d.conf
 echo "create dbinput file for parameter (HSLB-d) : ${filename}"
-sed "s/Template/$bigname/g" $dir/example/fee.par.cpr001.d.conf | \
+sed "s/Template/$bigname/g" $dir/example/fee.cpr001.d.conf | \
 sed "s/cpr001/cpr${id}/g" | sed "s/template/${name}/g"  > ${filename}
 
 filename=$dir/${name}/cpr${id}.conf

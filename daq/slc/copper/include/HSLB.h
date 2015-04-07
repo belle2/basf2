@@ -1,7 +1,6 @@
 #ifndef _Belle2_HSLB_h
 #define _Belle2_HSLB_h
 
-#include <daq/slc/copper/FEEConfig.h>
 #include <daq/slc/copper/HSLBHandlerException.h>
 
 #include <mgt/hslb_info.h>

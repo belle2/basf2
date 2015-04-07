@@ -16,7 +16,7 @@ ECLFEE::ECLFEE()
 {
 }
 
-void ECLFEE::boot(HSLB& hslb,  const FEEConfig&)
+void ECLFEE::boot(HSLB& hslb,  const DBObject&)
 {
   hslb.writefn(0x30, 0);
   for (int ntry = 0; hslb.checkfee() == "UNKNOWN"; ntry++) {
@@ -40,15 +40,17 @@ void ECLFEE::boot(HSLB& hslb,  const FEEConfig&)
   }
 }
 
-void ECLFEE::load(HSLB& hslb, const FEEConfig& conf)
+void ECLFEE::load(HSLB& hslb, const DBObject& obj)
 {
   // writing parameters to registers
-  const FEEConfig::RegList& regs(conf.getRegList());
-  for (FEEConfig::RegList::const_iterator it = regs.begin();
-       it != regs.end(); it++) {
-    const FEEConfig::Reg& reg(*it);
-    LogFile::debug("writefee adr=%d, val=%d", reg.adr, reg.val);
-    hslb.writefee32(reg.adr, reg.val);
+  const DBObjectList objs(obj.getObjects("par"));
+  for (DBObjectList::const_iterator it = objs.begin();
+       it != objs.end(); it++) {
+    const DBObject& o_par(*it);
+    int adr = o_par.getInt("adr");
+    int val = o_par.getInt("val");
+    LogFile::debug("writefee adr=%d, val=%d", adr, val);
+    hslb.writefee32(adr, val);
   }
   hslb.writefee32(0x30, 0x0d);
   LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x0d);

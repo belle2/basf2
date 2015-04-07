@@ -3,7 +3,8 @@
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
-#include <daq/slc/copper/FEEConfig.h>
+#include <daq/slc/database/DBObject.h>
+
 #include <daq/slc/copper/HSLB.h>
 
 namespace Belle2 {
@@ -16,8 +17,8 @@ namespace Belle2 {
 
   public:
     virtual void init(RCCallback& /*callback*/, HSLB& /*hslb*/) {}
-    virtual void boot(HSLB& hslb, const FEEConfig& conf) = 0;
-    virtual void load(HSLB& hslb, const FEEConfig& conf) = 0;
+    virtual void boot(HSLB& hslb, const DBObject& obj) = 0;
+    virtual void load(HSLB& hslb, const DBObject& obj) = 0;
 
   public:
     void setName(const std::string& name) { m_name = name; }

@@ -12,8 +12,8 @@ namespace Belle2 {
     virtual ~ECLFEE() throw() {}
 
   public:
-    virtual void boot(HSLB& hslb, const FEEConfig& conf);
-    virtual void load(HSLB& hslb, const FEEConfig& conf);
+    virtual void boot(HSLB& hslb, const DBObject& obj);
+    virtual void load(HSLB& hslb, const DBObject& obj);
 
   };
 

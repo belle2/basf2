@@ -76,9 +76,8 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerInt(vname + ".reg.adr", true, true, -1));
       add(new NSMVHandlerInt(vname + ".reg.size", true, true, -1));
       add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
-      FEEConfig fconf;
-      const DBObject o_fee(obj("fee", i));
-      if (m_fee[i] != NULL && fconf.read(o_fee)) {
+      if (m_fee[i] != NULL && obj.hasObject("fee")) {
+        const DBObject& o_fee(obj("fee", i));
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
         vname = StringUtil::form("fee[%d]", i);
@@ -134,9 +133,8 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
   try {
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
-      FEEConfig fconf;
       if (o_hslb.getBool("used") && m_fee[i] != NULL  &&
-          obj.hasObject("fee") && fconf.read(obj("fee", i))) {
+          obj.hasObject("fee")) {
         HSLB& hslb(m_hslb[i]);
         hslb.open(i);
         try {
@@ -146,7 +144,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
         }
         FEE& fee(*m_fee[i]);
         try {
-          fee.load(hslb, fconf);
+          fee.load(hslb, obj("fee", i));
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
         }

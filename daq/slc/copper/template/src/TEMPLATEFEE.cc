@@ -16,30 +16,31 @@ void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb)
 
 }
 
-void TEMPLATEFEE::boot(HSLB& hslb,  const FEEConfig& conf)
+void TEMPLATEFEE::boot(HSLB& hslb,  const DBObject& obj)
 {
 
 }
 
-void TEMPLATEFEE::load(HSLB& hslb, const FEEConfig& conf)
+void TEMPLATEFEE::load(HSLB& hslb, const DBObject& obj)
 {
-  // file streaming
-  const char* stream = conf.getStream();
-  if (stream && File::exist(stream)) {
-    hslb.writestream(stream);
+  // writing stream file to FEE
+  const std::string stream = obj.getText("stream");
+  if (File::exist(stream)) {
+    hslb.writestream(stream.c_str());
+  } else {
+    LogFile::warning("file %s not exsits", stream.c_str());
   }
+
   // writing parameters to registers
-  const FEEConfig::RegList& regs(conf.getRegList());
-  for (FEEConfig::RegList::const_iterator it = regs.begin();
-       it != regs.end(); it++) {
-    const FEEConfig::Reg& reg(*it);
-    LogFile::debug("write address %s(%d) (val=%d, size = %d)",
-                   reg.name.c_str(), reg.adr, reg.val, reg.size);
-    if (reg.size == 1) {
-      hslb.writefee8(reg.adr, reg.val);
-    } else if (reg.size == 4) {
-      hslb.writefee32(reg.adr, reg.val);
-    }
+  const DBObjectList objs(obj.getObjects("par"));
+  for (DBObjectList::const_iterator it = objs.begin();
+       it != objs.end(); it++) {
+    const DBObject& o_par(*it);
+    const std::string name = o_par.getText("name");
+    int adr = o_par.getInt("adr");
+    int val = o_par.getInt("val");
+    LogFile::debug("writefee  val=%d to %s(adr=%d)", val, name.c_str(), adr);
+    hslb.writefee32(adr, val);
   }
 }
 

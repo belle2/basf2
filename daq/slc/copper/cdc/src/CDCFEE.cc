@@ -20,8 +20,8 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("cdc[%d]", hslb.get_finid());
   callback.add(new CDCDateHandler(vname + ".date", callback, hslb, *this));
-  callback.add(new CDCFirmwareHandler(vname + ".firmver", callback, hslb, *this));
-  callback.add(new CDCDataFormatHandler(vname + ".dataformat", callback, hslb, *this));
+  callback.add(new CDCFirmwareHandler(vname + ".fmver", callback, hslb, *this));
+  callback.add(new CDCDataFormatHandler(vname + ".mode", callback, hslb, *this));
   callback.add(new CDCWindowHandler(vname + ".window", callback, hslb, *this));
   callback.add(new CDCDelayHandler(vname + ".delay", callback, hslb, *this));
   callback.add(new CDCADCThresholdHandler(vname + ".adcth", callback, hslb, *this));
@@ -34,16 +34,16 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb)
   }
 }
 
-void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
+void CDCFEE::boot(HSLB& hslb,  const DBObject& obj)
 {
-  const char* firmware = conf.getFirmware();
-  if (firmware && File::exist(firmware)) {
-    LogFile::info("Loading CDC FEE firmware: %s", firmware);
-    std::string cmd = StringUtil::form("ssh ropc01 \"cd ~b2daq/run/cdc/; "
-                                       "sh impact-batch.sh %s\"", firmware);
+  const std::string firmware = obj.getText("firm");
+  if (File::exist(firmware)) {
+    LogFile::info("Loading CDC FEE firmware: %s", firmware.c_str());
+    std::string cmd = "ssh ropc01 \"cd ~b2daq/run/cdc/; sh impact-batch.sh " +
+                      firmware + "\"";
     system(cmd.c_str());
   } else {
-    LogFile::debug("CDC FEE firmware not exists : %s", firmware);
+    LogFile::debug("CDC FEE firmware not exists : %s", firmware.c_str());
   }
   std::string s;
   if ((s = hslb.checkfee()) != "UNKNOWN") {
@@ -56,9 +56,8 @@ void CDCFEE::boot(HSLB& hslb,  const FEEConfig& conf)
   }
 }
 
-void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
+void CDCFEE::load(HSLB& hslb, const DBObject& obj)
 {
-  const DBObject& obj(conf());
   // setting CDC control (data format, window and delay)
   int val = 0;
   std::string mode = StringUtil::tolower(obj.getText("mode"));
@@ -75,16 +74,16 @@ void CDCFEE::load(HSLB& hslb, const FEEConfig& conf)
     LogFile::warning("no readout");
     val = 0;
   }
-  val |= (obj.getInt("window") & 0xFF) << 8;
-  val |= obj.getInt("delay") & 0xFF;
+  val |= (obj("window").getInt("val") & 0xFF) << 8;
+  val |= obj("delay").getInt("val") & 0xFF;
   hslb.writefee32(0x0012, val);
 
   // setting ADC threshold
-  val = obj.getInt("adcth") & 0xFFFF;
+  val = obj("adcth").getInt("val") & 0xFFFF;
   hslb.writefee32(0x0013, val);
 
   // setting DAC control
-  val = obj.getInt("tdcth") & 0x7FFF;
+  val = obj("tdcth").getInt("val") & 0x7FFF;
   hslb.writefee32(0x0015, val);
 
   // setting Pedestals

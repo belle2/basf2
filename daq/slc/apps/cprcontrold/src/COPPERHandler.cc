@@ -136,15 +136,13 @@ bool NSMVHandlerFEEStream::handleSetText(const std::string& stream)
 
 bool NSMVHandlerFEEBoot::handleSetInt(int val)
 {
-  FEEConfig fconf;
   DBObject& obj(m_callback.getDBObject());
   m_callback.get(obj);
-  if (val > 0 && m_callback.getFEE(m_hslb) &&
-      fconf.read(obj("fee", m_hslb))) {
+  if (val > 0 && m_callback.getFEE(m_hslb)) {
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
     try {
-      fee.boot(hslb, fconf);
+      fee.boot(hslb, obj("fee", m_hslb));
       return true;
     } catch (const IOException& e) {
       LogFile::error(e.what());

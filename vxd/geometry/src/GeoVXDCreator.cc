@@ -61,7 +61,7 @@ namespace Belle2 {
         delete sensitive;
       }
       m_sensitive.clear();
-      for (G4UserLimits * userLimit : m_UserLimits) delete userLimit;
+      for (G4UserLimits* userLimit : m_UserLimits) delete userLimit;
       m_UserLimits.clear();
     }
 
@@ -139,7 +139,8 @@ namespace Belle2 {
       return c;
     }
 
-    GeoVXDAssembly GeoVXDCreator::createSubComponents(const string& name, GeoVXDComponent& component, vector<GeoVXDPlacement> placements, bool originCenter, bool allowOutside)
+    GeoVXDAssembly GeoVXDCreator::createSubComponents(const string& name, GeoVXDComponent& component,
+                                                      vector<GeoVXDPlacement> placements, bool originCenter, bool allowOutside)
     {
       GeoVXDAssembly assembly;
       B2DEBUG(100, "Creating component " << name);
@@ -201,7 +202,8 @@ namespace Belle2 {
         component.volume = new G4LogicalVolume(componentShape, Materials::get(component.material), name);
       }
 
-      B2DEBUG(100, boost::format("Component %1% dimensions: %2%x%3%x%4% cm") % name % component.width % component.length % component.height);
+      B2DEBUG(100, boost::format("Component %1% dimensions: %2%x%3%x%4% cm") % name % component.width % component.length %
+              component.height);
 
       //Ok, all volumes set up, now add them together
       for (size_t i = 0; i < placements.size(); ++i) {
@@ -248,7 +250,8 @@ namespace Belle2 {
       return G4Transform3D(rotation, translation);
     }
 
-    G4Transform3D GeoVXDCreator::getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter, const GeoVXDPlacement& placement, bool originCenter)
+    G4Transform3D GeoVXDCreator::getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter,
+                                             const GeoVXDPlacement& placement, bool originCenter)
     {
       double u(placement.u), v(placement.v), w(0);
       switch (placement.w) {
@@ -276,7 +279,8 @@ namespace Belle2 {
     }
 
 
-    G4VSolid* GeoVXDCreator::createTrapezoidal(const string& name, double width, double width2, double length, double& height, double angle)
+    G4VSolid* GeoVXDCreator::createTrapezoidal(const string& name, double width, double width2, double length, double& height,
+                                               double angle)
     {
       double offset(0);
       if (angle > 0) {
@@ -370,8 +374,10 @@ namespace Belle2 {
         setColor(*active, s.activeArea.color);
         //The coordinates of the active region are given as the distance between the corners, not to the center
         //Place the active area
-        G4Transform3D activePosition = G4Translate3D(s.activeArea.width / 2.0, s.activeArea.length / 2.0, 0) * getPosition(s, s.activeArea, s.activePlacement, false);
-        G4ReflectionFactory::Instance()->Place(activePosition * reflection, name + ".Active", active, s.volume, false, (int)sensorID, false);
+        G4Transform3D activePosition = G4Translate3D(s.activeArea.width / 2.0, s.activeArea.length / 2.0, 0) *
+                                       getPosition(s, s.activeArea, s.activePlacement, false);
+        G4ReflectionFactory::Instance()->Place(activePosition * reflection, name + ".Active", active, s.volume,
+                                               false, (int)sensorID, false);
 
         //Now create all the other components and place the Sensor
         GeoVXDAssembly assembly;

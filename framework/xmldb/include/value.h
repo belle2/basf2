@@ -23,16 +23,19 @@ namespace Belle2 {
        *  @param _xpath The XPath pointing to the requested datum.
        */
       Value(const Tree* _t, const std::string& _xpath)
-        : node_(_t->getNodeData(_t->findNode(_xpath))) {
+        : node_(_t->getNodeData(_t->findNode(_xpath)))
+      {
       }
 
       /** Assign a new value. */
-      T operator=(const T& _newValue) throw (std::logic_error) {
+      T operator=(const T& _newValue) throw (std::logic_error)
+      {
         throw std::logic_error("Generic = is not implemented.");
       }
 
       /** Get the current value. */
-      T operator()() throw (std::logic_error) {
+      T operator()() throw (std::logic_error)
+      {
         throw std::logic_error("Generic () is not implemented.");
       }
 

@@ -65,7 +65,8 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Return the used output file, taking into account -o argument to basf2. */
-    std::string getOutputFile() const {
+    std::string getOutputFile() const
+    {
       if (m_ignoreCommandLineOverride)
         return m_outputFileName;
       const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();

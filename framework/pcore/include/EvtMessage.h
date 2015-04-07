@@ -120,7 +120,8 @@ namespace Belle2 {
   class InMessage : public TMessage {
   public:
     /** Constructor to build a message */
-    InMessage(void* buf, int len) : TMessage(buf, len) {
+    InMessage(void* buf, int len) : TMessage(buf, len)
+    {
       //std::cout << "MSG BUILD: " << len << std::endl;
       //std::cout << "MSG: " << buf << std::endl;
       this->SetBit(kIsOwner, false);

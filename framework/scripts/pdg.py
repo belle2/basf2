@@ -8,8 +8,8 @@ usage in the steering file
 
 from ROOT import TDatabasePDG
 
-## the particle database (filled from evt.pdl by framework)
-database = TDatabasePDG.Instance()
+# the particle database (filled from evt.pdl by framework)
+_database = TDatabasePDG.Instance()
 
 
 def get(name):
@@ -20,7 +20,7 @@ def get(name):
     Will throw an LookupError of no such particle exists.
     """
 
-    p = database.GetParticle(name)
+    p = _database.GetParticle(name)
     if not p:
         raise LookupError("No particle with name '%s'" % name)
 
@@ -82,7 +82,5 @@ def conjugate(name):
 
     try:
         return to_name(-from_name(name))
-    except LookupError, e:
+    except LookupError as e:
         return name
-
-

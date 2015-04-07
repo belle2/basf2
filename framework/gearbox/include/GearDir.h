@@ -30,17 +30,20 @@ namespace Belle2 {
   class GearDir: public gearbox::Interface {
   public:
     /** Create a GearDir starting at a given base path and appending some subpath and optionally an index */
-    GearDir(const gearbox::Interface& start, const std::string& path, int index = 0) {
+    GearDir(const gearbox::Interface& start, const std::string& path, int index = 0)
+    {
       m_path = ensurePath(start.getPath()) + path;
       if (index > 0) m_path = addIndex(m_path, index);
     }
     /** Create a GearDir with an absolute path and optionally appending an index */
-    GearDir(const std::string& path = "", int index = 0) {
+    GearDir(const std::string& path = "", int index = 0)
+    {
       m_path = path;
       if (index > 0) m_path = addIndex(path, index);
     }
     /** Copy constructor */
-    GearDir(const GearDir& other): gearbox::Interface(other) {
+    GearDir(const GearDir& other): gearbox::Interface(other)
+    {
       m_path = other.m_path;
     }
 
@@ -51,7 +54,8 @@ namespace Belle2 {
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */
-    virtual int getNumberNodes(const std::string& path = "") const {
+    virtual int getNumberNodes(const std::string& path = "") const
+    {
       return Gearbox::getInstance().getNumberNodes(ensurePath(m_path) + path);
     }
 
@@ -61,7 +65,8 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    {
       return Gearbox::getInstance().getString(ensurePath(m_path) + path);
     }
 
@@ -73,7 +78,8 @@ namespace Belle2 {
      * @param defaultValue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
-    std::string getString(const std::string& path, const std::string& defaultValue) const {
+    std::string getString(const std::string& path, const std::string& defaultValue) const
+    {
       return gearbox::Interface::getString(path, defaultValue);
     }
 
@@ -88,7 +94,8 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    {
       return Gearbox::getInstance().getStringWithUnit(ensurePath(m_path) + path);
     }
 
@@ -101,7 +108,8 @@ namespace Belle2 {
      *         be deleted once it is no longer valid (e.g. after the current
      *         run if it belongs to this run)
      */
-    virtual const TObject* getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError) {
+    virtual const TObject* getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError)
+    {
       return Gearbox::getInstance().getTObject(ensurePath(m_path) + path);
     }
   };

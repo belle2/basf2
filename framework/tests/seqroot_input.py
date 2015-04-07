@@ -10,6 +10,7 @@ from ROOT import Belle2
 
 
 class TestModule(Module):
+
     """Test to read relations in the input files."""
 
     def event(self):

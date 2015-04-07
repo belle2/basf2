@@ -65,7 +65,7 @@ boost::python::list* ModuleParamList::getParamInfoListPython() const
 
 void ModuleParamList::setParameters(const ModuleParamList& params)
 {
-  for (const auto & param : params.m_paramMap) {
+  for (const auto& param : params.m_paramMap) {
     auto& myParam = m_paramMap.at(param.first);
     myParam->setValueFromParam(*param.second.get());
   }

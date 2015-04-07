@@ -17,7 +17,7 @@ steeringFile = Belle2.FileSystem.findFile('framework/tests/module_paths.py')
 assert 0 != os.system('basf2 --dump-path ' + pathFile.name + ' ' + steeringFile)
 
 
-#test actual execution
+# test actual execution
 outputFile = tempfile.NamedTemporaryFile(prefix='b2pathtest_')
 
 path = create_path()
@@ -25,19 +25,19 @@ path.add_module('EventInfoSetter', evtNumList=[2, 1], expList=[1, 1], runList=[1
 path.add_module('RootOutput', outputFileName=outputFile.name)
 
 
-#equivalent to --dump-path
+# equivalent to --dump-path
 fw.set_pickle_path(pathFile.name)
 process(path)
 
-#path dumped, but not executed
+# path dumped, but not executed
 pathSize = os.stat(pathFile.name).st_size
 assert 0 != pathSize
 assert 0 == os.stat(outputFile.name).st_size
 
-#equivalent to --execute-path
+# equivalent to --execute-path
 assert fw.get_pickle_path() == pathFile.name
 process(None)
 
-#path unmodified, output file created
+# path unmodified, output file created
 assert pathSize == os.stat(pathFile.name).st_size
 assert 0 != os.stat(outputFile.name).st_size

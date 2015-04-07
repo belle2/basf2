@@ -94,12 +94,14 @@ namespace Belle2 {
     void clearBackends();
 
     /** Add an override for a given XPath expression */
-    void addOverride(const PathOverride& poverride) {
+    void addOverride(const PathOverride& poverride)
+    {
       m_overrides.push_back(poverride);
     }
 
     /** Clear all existing overrides */
-    void clearOverrides() {
+    void clearOverrides()
+    {
       m_overrides.clear();
     }
 
@@ -124,7 +126,8 @@ namespace Belle2 {
      * Return the number of nodes a given path will expand to
      * @return number of nodes, 0 if path does not exist
      */
-    virtual int getNumberNodes(const std::string& path = "") const {
+    virtual int getNumberNodes(const std::string& path = "") const
+    {
       return getPathValue(path).numNodes;
     }
 
@@ -134,7 +137,8 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    {
       PathValue p = getPathValue(path);
       if (p.numNodes == 0) throw gearbox::PathEmptyError() << path;
       return p.value;
@@ -148,7 +152,8 @@ namespace Belle2 {
      * @param defaultValue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
-    std::string getString(const std::string& path, const std::string& defaultValue) const {
+    std::string getString(const std::string& path, const std::string& defaultValue) const
+    {
       return gearbox::Interface::getString(path, defaultValue);
     }
 
@@ -163,7 +168,8 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError) {
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    {
       PathValue p = getPathValue(path);
       if (!p.numNodes) throw gearbox::PathEmptyError() << path;
       return make_pair(p.value, p.unit);
@@ -195,7 +201,8 @@ namespace Belle2 {
      * @param factory Pointer to the factory function which will return an
      *               instance of the handler
      */
-    static void registerInputHandler(std::string prefix, gearbox::InputHandler::Factory* factory) {
+    static void registerInputHandler(std::string prefix, gearbox::InputHandler::Factory* factory)
+    {
       getInstance().m_registeredHandlers[prefix] = factory;
     }
 
@@ -222,7 +229,8 @@ namespace Belle2 {
      * @param mountMode the mount mode (overlay or merge nodes)
      * @return a handle to the specific Backend mount state
      */
-    gearbox::BackendMountHandlePtr mountBackend(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode);
+    gearbox::BackendMountHandlePtr mountBackend(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint,
+                                                gearbox::EMountMode mountMode);
 
     /**
      * Wrapper for mountBackend without return value (for python export)
@@ -232,7 +240,8 @@ namespace Belle2 {
      * @param mountMode the mount mode (overlay or merge nodes)
      * @param mountMode
      */
-    void mountBackendAndForgetHandle(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode);
+    void mountBackendAndForgetHandle(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint,
+                                     gearbox::EMountMode mountMode);
 
     /**
      * Unmounts a backend (but does not destroy it!)
@@ -346,11 +355,13 @@ namespace Belle2 {
   /** Helper class to easily register new input handlers */
   template<class T> struct InputHandlerFactory {
     /** constructor, used by B2_GEARBOX_REGISTER_INPUTHANDLER macro.*/
-    InputHandlerFactory(const std::string& prefix) {
+    InputHandlerFactory(const std::string& prefix)
+    {
       Gearbox::registerInputHandler(prefix, factory);
     }
     /** create a new InputHandler of type T for given URI. */
-    static gearbox::InputHandler* factory(const std::string& uri) {
+    static gearbox::InputHandler* factory(const std::string& uri)
+    {
       return new T(uri);
     }
   };

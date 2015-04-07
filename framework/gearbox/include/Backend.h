@@ -28,7 +28,8 @@ namespace Belle2 {
     template <typename Iterator>
     struct QueryParamsParser : qi::grammar<Iterator, queryParams_t()> {
 
-      QueryParamsParser() : QueryParamsParser::base_type(query) {
+      QueryParamsParser() : QueryParamsParser::base_type(query)
+    {
       query =  pair >> *(qi::lit(';') >> pair);
       pair  =  key >> '=' >> value;
       key   =  qi::char_("a-zA-Z_") >> *qi::char_("a-zA-Z_0-9");

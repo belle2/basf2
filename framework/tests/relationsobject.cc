@@ -14,7 +14,8 @@ namespace {
   class RelationsObjectTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       evtData.registerInDataStore();
       profileData.registerInDataStore();
       relObjData.registerInDataStore();
@@ -27,7 +28,8 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
 

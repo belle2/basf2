@@ -31,7 +31,7 @@ namespace {
     while (!nodes.empty() and iterations < 10000) {
       GearDir node = nodes.front();
       nodes.pop();
-      for (const GearDir & child : node.getNodes("*")) {
+      for (const GearDir& child : node.getNodes("*")) {
         nodes.push(child);
       }
       iterations++;

@@ -187,14 +187,16 @@ namespace Belle2 {
    */
   template < typename StoredClass >
   class SelectSubset : public SelectSubsetBase {
-    static_assert(std::is_base_of<RelationsObject, StoredClass>::value, "SelectSubset<T> only works with classes T inheriting from RelationsObject.");
+    static_assert(std::is_base_of<RelationsObject, StoredClass>::value,
+                  "SelectSubset<T> only works with classes T inheriting from RelationsObject.");
   public:
     /** Constructor */
     SelectSubset(): SelectSubsetBase(), m_set(nullptr), m_subset(nullptr)
     {};
 
     /** Destructor */
-    ~SelectSubset() {
+    ~SelectSubset()
+    {
       delete m_set;
       delete m_subset;
     }
@@ -204,7 +206,8 @@ namespace Belle2 {
      *
      *  @param set         The StoreArray<StoredClass> from which to retain only selected elements
      */
-    void registerSubset(const StoreArray< StoredClass >& set) {
+    void registerSubset(const StoreArray< StoredClass >& set)
+    {
       m_reduceExistingSet = true;
       registerSubset(set, set.getName() + "_tmpSubset", DataStore::c_DontWriteOut);
 
@@ -216,7 +219,9 @@ namespace Belle2 {
      *  @param subsetName  The name of the StoreArray<StoredClass> that will contain the selected elements
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      */
-    void registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName, DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered) {
+    void registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName,
+                        DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered)
+    {
       if (m_set or m_subset) {
         B2FATAL("SelectSubset::registerSubset() can only be called once!");
       }
@@ -234,7 +239,8 @@ namespace Belle2 {
      * You can specify an unlimited number of arrays as arguments to this function.
      */
     template<class T, class ... MoreArguments >
-    void inheritRelationsFrom(const StoreArray<T>& array, MoreArguments... moreArgs) {
+    void inheritRelationsFrom(const StoreArray<T>& array, MoreArguments... moreArgs)
+    {
       if (array.getName() == m_set->getName()) {
         m_inheritToSelf = true;
         inheritRelationsFrom(*m_subset, moreArgs...);
@@ -258,7 +264,8 @@ namespace Belle2 {
      * You can specify an unlimited number of arrays as arguments to this function.
      */
     template<class T, class ... MoreArguments >
-    void inheritRelationsTo(const StoreArray<T>& array, MoreArguments... moreArgs) {
+    void inheritRelationsTo(const StoreArray<T>& array, MoreArguments... moreArgs)
+    {
       if (array.getName() == m_set->getName()) {
         m_inheritToSelf = true;
         inheritRelationsTo(*m_subset, moreArgs...);
@@ -283,7 +290,8 @@ namespace Belle2 {
      *
      * Note: Do not combine with inheritRelationsFrom() and inheritRelationsTo().
      */
-    void inheritAllRelations() {
+    void inheritAllRelations()
+    {
       auto arrays = DataStore::Instance().getListOfRelatedArrays(*m_set);
 
       for (std::string arrayName : arrays) {
@@ -335,7 +343,7 @@ namespace Belle2 {
   SelectSubset< StoredClass >::copySetWithRelations(std::function<bool (const StoredClass*)> f)
   {
     std::map<int, int> oldToNew;
-    for (const StoredClass & setObject : *m_set) {
+    for (const StoredClass& setObject : *m_set) {
       if (!f(&setObject))
         continue;
 
@@ -347,7 +355,7 @@ namespace Belle2 {
 
 
     //TODO this is the slow bit, can probably be improved by directly dealing with indices
-    for (const auto & oldToNewPair : oldToNew) {
+    for (const auto& oldToNewPair : oldToNew) {
       const StoredClass* setObject = (*m_set)[oldToNewPair.first];
       const StoredClass* subsetObject = (*m_subset)[oldToNewPair.second];
 
@@ -373,7 +381,7 @@ namespace Belle2 {
   void
   SelectSubset< StoredClass >::copyRelationsToSelf()
   {
-    for (const StoredClass & subsetObject1 : *m_subset) {
+    for (const StoredClass& subsetObject1 : *m_subset) {
       //TODO: change relation direction to set -> subset?
       const StoredClass* setObject1 = subsetObject1.template getRelatedFrom<StoredClass>(m_set->getName());
 

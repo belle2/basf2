@@ -14,7 +14,8 @@ namespace {
   class RelationsInternal : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       DataStore::Instance().setInitializeActive(true);
       evtData.registerInDataStore();
       profileData.registerInDataStore();
@@ -29,7 +30,8 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
 
@@ -195,7 +197,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (auto & e : relIndex.getElementsFrom((evtData)[0])) {
+      for (auto& e : relIndex.getElementsFrom((evtData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -205,7 +207,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (auto & e : relIndex.getElementsTo((profileData)[0])) {
+      for (auto& e : relIndex.getElementsTo((profileData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -215,7 +217,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (const auto & e : relIndex.getElementsTo((profileData)[4])) {
+      for (const auto& e : relIndex.getElementsTo((profileData)[4])) {
         ++size;
         allweights += e.weight;
       }
@@ -300,7 +302,7 @@ namespace {
 
     //test range-based for over RelationVector
     int i = 0;
-    for (const ProfileInfo & prof : toRels) {
+    for (const ProfileInfo& prof : toRels) {
       (void)prof; //variable unused
       i++;
     }

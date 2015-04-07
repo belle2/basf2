@@ -63,7 +63,8 @@ namespace Belle2 {
     virtual ~RootMergeable() { delete m_wrapped; }
 
     /** Replace wrapped object with p (takes ownership). */
-    void assign(T* p) {
+    void assign(T* p)
+    {
       delete m_wrapped;
       m_wrapped = p;
     }
@@ -80,7 +81,8 @@ namespace Belle2 {
      *
      * \note wrapped object must already be in 'file' before filled, or not part of any file at all. This function will throw an error and might crash if this is not the case.
      */
-    void write(TFile* file) {
+    void write(TFile* file)
+    {
       if (m_wrapped->GetDirectory() != nullptr and m_wrapped->GetDirectory() != file) {
         B2ERROR("RootMergeable: wrapped object belongs to other file, Write() might crash. Make sure your histogram/ntuple already belongs to the file you want to save it to before filling (e.g. in initialize())");
       }
@@ -96,7 +98,8 @@ namespace Belle2 {
      *
      * Note that 'other' will be deleted after the merge, so make sure you copy all data from it that you will need.
      */
-    virtual void merge(const Mergeable* other) {
+    virtual void merge(const Mergeable* other)
+    {
       auto* otherMergeable = const_cast<RootMergeable<T>*>(static_cast<const RootMergeable<T>*>(other));
       TList list;
       list.SetOwner(false);
@@ -110,7 +113,8 @@ namespace Belle2 {
      * Called after sending the objects to another process. If no clearing is performed, the same data (e.g. histogram
      * entries) might be added again and again in each event.
      */
-    virtual void clear() {
+    virtual void clear()
+    {
       m_wrapped->Reset();
     }
 
@@ -119,7 +123,8 @@ namespace Belle2 {
      * Main use case is to detach any attached TFile from this object. In the output process,
      * it can stay attached (and grow as much as it likes).
      */
-    virtual void removeSideEffects() {
+    virtual void removeSideEffects()
+    {
       m_wrapped->SetDirectory(NULL);
     }
   private:

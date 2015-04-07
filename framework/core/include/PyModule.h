@@ -33,7 +33,8 @@ namespace Belle2 {
     /** constructor */
     PyModule(PyObject* p):
       Module(),
-      m_self(p) {
+      m_self(p)
+    {
       setName(p->ob_type->tp_name);
       setType("PyModule");
     }
@@ -41,7 +42,8 @@ namespace Belle2 {
     /** copy constructor */
     PyModule(PyObject* p, const Module& m):
       Module(m),
-      m_self(p) {
+      m_self(p)
+    {
       setName(p->ob_type->tp_name);
       setType("PyModule");
     }

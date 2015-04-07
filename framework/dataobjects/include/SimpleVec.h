@@ -51,7 +51,8 @@ namespace Belle2 {
      *
      *  @par AVector Vector to be saved. Keep in mind the initial template instantiation.
      */
-    void setVector(const std::vector<T>& AVector) {
+    void setVector(const std::vector<T>& AVector)
+    {
       m_vector = AVector;
     }
 
@@ -59,7 +60,8 @@ namespace Belle2 {
      *
      *  @return Vector, that was internally saved.
      */
-    const std::vector<T>& getVector() const {
+    const std::vector<T>& getVector() const
+    {
       return m_vector;
     }
 

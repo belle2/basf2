@@ -63,7 +63,8 @@ std::ostream& LogMessage::print(std::ostream& out) const
   if (!m_logInfo || (m_logInfo & LogConfig::c_Message)) {
     out << m_message;
   }
-  bool printLocation = (!m_logInfo || (m_logInfo & (LogConfig::c_Module + LogConfig::c_Package + LogConfig::c_Function + LogConfig::c_File + LogConfig::c_Line)));
+  bool printLocation = (!m_logInfo
+                        || (m_logInfo & (LogConfig::c_Module + LogConfig::c_Package + LogConfig::c_Function + LogConfig::c_File + LogConfig::c_Line)));
   if (printLocation) {
     out << "  {";
   }

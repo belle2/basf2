@@ -16,7 +16,8 @@ namespace {
   class DataStoreTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       StoreObjPtr<EventMetaData> evtPtr;
       StoreArray<EventMetaData> evtData;
       StoreArray<EventMetaData> evtDataDifferentName("EventMetaDatas_2");
@@ -58,7 +59,8 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
 
@@ -338,7 +340,7 @@ namespace {
 
     //range-based for
     i = 0;
-    for (EventMetaData & emd : evtDataNonConst) {
+    for (EventMetaData& emd : evtDataNonConst) {
       EXPECT_TRUE(&emd == evtData[i]);
       i++;
     }
@@ -346,7 +348,7 @@ namespace {
 
     //range-based for (const)
     i = 0;
-    for (const EventMetaData & emd : evtData) {
+    for (const EventMetaData& emd : evtData) {
       EXPECT_TRUE(&emd == evtData[i]);
       i++;
     }

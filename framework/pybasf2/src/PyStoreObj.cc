@@ -22,7 +22,8 @@ PyStoreObj::PyStoreObj(const std::string& name, int durability):
 
 void PyStoreObj::attach()
 {
-  DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(m_name, DataStore::EDurability(m_durability), TObject::Class(), false));
+  DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(m_name, DataStore::EDurability(m_durability),
+                                 TObject::Class(), false));
   if (entry) {
     m_storeObjPtr = &(entry->ptr);
     m_class = entry->object->IsA();
@@ -35,7 +36,8 @@ TClass* PyStoreObj::getClass(const std::string& name)
   if (!cl)
     cl = TClass::GetClass(name.c_str());
   if (!cl) {
-    B2ERROR("Class 'Belle2::" << name << "' (or '" << name << "') not found! Note that you may need to load the corresponding library first, e.g. for some PXD object:\n  from ROOT import gSystem\n  gSystem.Load('libpxd_dataobjects')\nAfterwards, creating objects of this type should work.");
+    B2ERROR("Class 'Belle2::" << name << "' (or '" << name <<
+            "') not found! Note that you may need to load the corresponding library first, e.g. for some PXD object:\n  from ROOT import gSystem\n  gSystem.Load('libpxd_dataobjects')\nAfterwards, creating objects of this type should work.");
   }
   return cl;
 }
@@ -45,7 +47,8 @@ bool PyStoreObj::create(bool replace)
   if (!m_class)
     return false;
 
-  if (!DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), m_class, false)))
+  if (!DataStore::Instance().createObject(0, replace, StoreAccessorBase(m_name, DataStore::EDurability(m_durability), m_class,
+                                          false)))
     return false;
 
   attach();
@@ -65,7 +68,7 @@ vector<string> PyStoreObj::list(int durability)
 {
   vector<string> list;
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
-  for (const auto & entrypair : map) {
+  for (const auto& entrypair : map) {
     if (!entrypair.second.isArray) {
       const TObject* obj = entrypair.second.object;
       if (obj and dynamic_cast<const RelationContainer*>(obj))

@@ -52,7 +52,9 @@ AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandl
   m_wrappedModule = ModuleManager::Instance().registerModule(moduleType);
   setParamList(m_wrappedModule->getParamList()); //inherit parameters from wrapped module
 
-  addParam("discardOldEvents", m_discardOldEvents, "Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation)", true);
+  addParam("discardOldEvents", m_discardOldEvents,
+           "Discard old events when buffer is full. If false, the main process will wait until there is enough space in the buffer. (i.e. synchronous operation)",
+           true);
 }
 
 AsyncWrapper::~AsyncWrapper()

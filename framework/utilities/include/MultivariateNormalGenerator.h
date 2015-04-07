@@ -32,21 +32,24 @@ namespace Belle2 {
      * @param mean pointer to the n mean values of the distribution
      * @param cov pointer to the n*n covariance values in row major layout
      */
-    MultivariateNormalGenerator(int n, const double* mean, const double* cov) {
+    MultivariateNormalGenerator(int n, const double* mean, const double* cov)
+    {
       setMeanCov(n, mean, cov);
     }
     /** constructor with Eigen matrix interface.
      * @param mean Vector of mean values
      * @param cov Matrix containing the covariance values
      */
-    MultivariateNormalGenerator(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov) {
+    MultivariateNormalGenerator(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov)
+    {
       setMeanCov(mean, cov);
     }
     /** Generate a set of correlated random numbers with the previouly set
      * mean and covariance
      * @return Vector containing the generated random numbers
      */
-    Eigen::VectorXd generate() const {
+    Eigen::VectorXd generate() const
+    {
       //To get the correlated multivariate normal distribution, we
       //multiply standard normal distributed values (mean=0, sigma=1)
       //with the cholesky decomposition and add the mean values. Since we
@@ -60,7 +63,8 @@ namespace Belle2 {
      * mean and covariance and store them in buffer output.
      * @param output pointer to array where generated values will be stored.
      */
-    void generate(double* output) const {
+    void generate(double* output) const
+    {
       Eigen::VectorXd x = generate();
       for (int i = 0; i < x.rows(); ++i) { output[i] = x(i); }
     }

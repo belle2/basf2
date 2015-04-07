@@ -70,7 +70,8 @@ namespace Belle2 {
      * Returns an pointer to the next free memory segment, allocating additional memory if necessary.
      * @return Pointer to the next free memory segment.
      */
-    T* add() {
+    T* add()
+    {
       if (m_entries / chunkSize >= m_chunks.size()) {
         m_chunks.push_back(reinterpret_cast<T*>(malloc(chunkSize * sizeof(T))));
       }
@@ -81,7 +82,8 @@ namespace Belle2 {
      * Make sure there is enough memory allocated for n elements.
      * @param n The number of elements for which memory should be made available.
      */
-    void reserve(size_t n) {
+    void reserve(size_t n)
+    {
       size_t needed_chunks = n / chunkSize + 1;
       m_chunks.reserve(needed_chunks);
       while (m_chunks.size() < needed_chunks) {
@@ -92,8 +94,9 @@ namespace Belle2 {
     /**
      * Release all allocated memory, called automatically upon destruction.
      */
-    void release_memory() {
-      for (T * ptr : m_chunks) {
+    void release_memory()
+    {
+      for (T* ptr : m_chunks) {
         free(reinterpret_cast<void*>(ptr));
       }
       m_chunks.clear();

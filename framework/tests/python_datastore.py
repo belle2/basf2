@@ -15,7 +15,7 @@ for obj in objList:
     assert not obj
     assert not obj.create()
 
-    #class unknown
+    # class unknown
     assert not obj.registerInDataStore()
 
     assert obj.registerInDataStore("EventMetaData")
@@ -27,7 +27,7 @@ for obj in objList:
 assert len(Belle2.PyStoreObj.list()) == 1
 assert len(Belle2.PyStoreObj.list(1)) == 1
 
-#arrays
+# arrays
 arrayList = (Belle2.PyStoreArray("TestArray"),
              Belle2.PyStoreArray("PersistentArray", 1))
 

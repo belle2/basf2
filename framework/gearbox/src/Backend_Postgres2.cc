@@ -50,7 +50,8 @@ namespace Belle2 {
         this->uniqueHash = genRandomString(GEARBOX_BACKEND_UNIQUEHASH_AUTOLENGTH);
 
         pqxx::work wta(*this->DBConnection);
-        wta.exec("INSERT INTO " + boost::get<std::string>(this->params["meta_table"]) + " (prop_type, key, value) VALUES ('unique_backend_hash','','" + this->uniqueHash + "')");
+        wta.exec("INSERT INTO " + boost::get<std::string>(this->params["meta_table"]) +
+                 " (prop_type, key, value) VALUES ('unique_backend_hash','','" + this->uniqueHash + "')");
         wta.commit();
 
       }
@@ -75,11 +76,13 @@ namespace Belle2 {
         }
 
         pqxx::read_transaction ta(*this->DBConnection);
-        pqxx::result res = ta.exec("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '" + boost::get<std::string>(this->params["schema"]) + "'");
+        pqxx::result res = ta.exec("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '" + boost::get<std::string>
+                                   (this->params["schema"]) + "'");
         ta.commit();
 
         if (res.size() < 1) {
-          throw (std::string("Gearbox::Backend_Postgres2: schema '" + boost::get<std::string>(this->params["schema"]) + "' not found in database"));
+          throw (std::string("Gearbox::Backend_Postgres2: schema '" + boost::get<std::string>(this->params["schema"]) +
+                             "' not found in database"));
         }
 
       }
@@ -93,11 +96,13 @@ namespace Belle2 {
         }
 
         pqxx::read_transaction ta(*this->DBConnection);
-        pqxx::result res = ta.exec("SELECT * FROM information_schema.tables WHERE table_schema = current_schema() and table_name = '" + boost::get<std::string>(this->params["meta_table"]) + "'");
+        pqxx::result res = ta.exec("SELECT * FROM information_schema.tables WHERE table_schema = current_schema() and table_name = '" +
+                                   boost::get<std::string>(this->params["meta_table"]) + "'");
         ta.commit();
 
         if (res.size() < 1) {
-          throw (std::string("Gearbox::Backend_Postgres2: backend configuration table '" + boost::get<std::string>(this->params["meta_table"]) + "' not found in database"));
+          throw (std::string("Gearbox::Backend_Postgres2: backend configuration table '" + boost::get<std::string>
+                             (this->params["meta_table"]) + "' not found in database"));
         }
 
       }
@@ -131,7 +136,8 @@ namespace Belle2 {
 
     }
 
-    void Backend_Postgres2::query(const std::string& xPath, QryResultSet& connectNode, std::string /*internalUpToPath*/, GBResult& theGBResult)
+    void Backend_Postgres2::query(const std::string& xPath, QryResultSet& connectNode, std::string /*internalUpToPath*/,
+                                  GBResult& theGBResult)
     {
 
       // all previous xpath labels are removed by the mount code -> remaining label corresponds to
@@ -244,7 +250,8 @@ namespace Belle2 {
 
         } else {
 
-          QryResultSet& thisnode = theGBResult.createEmptyNode(connectNode, extraction[1] , uniqueID_base + rowIt[uniqueID_col].as<std::string>());
+          QryResultSet& thisnode = theGBResult.createEmptyNode(connectNode, extraction[1] ,
+                                                               uniqueID_base + rowIt[uniqueID_col].as<std::string>());
 
           for (auto fieldIt = rowIt->begin(); fieldIt != rowIt.end(); ++fieldIt) {
 

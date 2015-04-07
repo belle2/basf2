@@ -97,7 +97,8 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
     /** Constructor, forwards all arguments to BASE constructor. */
-    template<class ...Args> RelationsInterface(Args&& ... params) : BASE(std::forward<Args>(params)...), m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) { }
+    template<class ...Args> RelationsInterface(Args&& ... params) : BASE(std::forward<Args>(params)...), m_cacheDataStoreEntry(NULL),
+      m_cacheArrayIndex(-1) { }
 #endif
 
     /** Copy constructor.
@@ -105,7 +106,8 @@ namespace Belle2 {
      *  Cached values are cleared.
      *  @param relationsInterface  The object that should be copied.
      */
-    RelationsInterface(const RelationsInterface& relationsInterface): BASE(relationsInterface), m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) {}
+    RelationsInterface(const RelationsInterface& relationsInterface): BASE(relationsInterface), m_cacheDataStoreEntry(NULL),
+      m_cacheArrayIndex(-1) {}
 
     /** Assignment operator.
      *
@@ -120,10 +122,12 @@ namespace Belle2 {
      *  @param object  The object to which the relation should point.
      *  @param weight  The weight of the relation.
      */
-    void addRelationTo(const RelationsInterface<BASE>* object, double weight = 1.0) const {
+    void addRelationTo(const RelationsInterface<BASE>* object, double weight = 1.0) const
+    {
       if (!object)
         return;
-      DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, object->m_cacheDataStoreEntry, object->m_cacheArrayIndex, weight);
+      DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, object->m_cacheDataStoreEntry,
+                                        object->m_cacheArrayIndex, weight);
     }
 
     /** Add a relation from this object to another object.
@@ -131,7 +135,8 @@ namespace Belle2 {
      *  @param object  The object to which the relation should point.
      *  @param weight  The weight of the relation.
      */
-    void addRelationTo(const TObject* object, double weight = 1.0) const {
+    void addRelationTo(const TObject* object, double weight = 1.0) const
+    {
       StoreEntry* toEntry = nullptr;
       int toIndex = -1;
       DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, toEntry, toIndex, weight);
@@ -148,8 +153,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        A vector of relations.
      */
-    template <class TO> RelationVector<TO> getRelationsTo(const std::string& name = "") const {
-      return RelationVector<TO>(DataStore::Instance().getRelationsWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name));
+    template <class TO> RelationVector<TO> getRelationsTo(const std::string& name = "") const
+    {
+      return RelationVector<TO>(DataStore::Instance().getRelationsWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry,
+                                m_cacheArrayIndex, TO::Class(), name));
     }
 
     /** Get the relations that point from another store array to this object.
@@ -160,8 +167,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        A vector of relations.
      */
-    template <class FROM> RelationVector<FROM> getRelationsFrom(const std::string& name = "") const {
-      return RelationVector<FROM>(DataStore::Instance().getRelationsWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name));
+    template <class FROM> RelationVector<FROM> getRelationsFrom(const std::string& name = "") const
+    {
+      return RelationVector<FROM>(DataStore::Instance().getRelationsWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry,
+                                  m_cacheArrayIndex, FROM::Class(), name));
     }
 
     /** Get the relations between this object and another store array.
@@ -174,8 +183,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        A vector of relations.
      */
-    template <class T> RelationVector<T> getRelationsWith(const std::string& name = "") const {
-      return RelationVector<T>(DataStore::Instance().getRelationsWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name));
+    template <class T> RelationVector<T> getRelationsWith(const std::string& name = "") const
+    {
+      return RelationVector<T>(DataStore::Instance().getRelationsWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry,
+                               m_cacheArrayIndex, T::Class(), name));
     }
 
     //====================================================================================================
@@ -189,8 +200,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        The first related object or a null pointer.
      */
-    template <class TO> TO* getRelatedTo(const std::string& name = "") const {
-      return static_cast<TO*>(DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name).object);
+    template <class TO> TO* getRelatedTo(const std::string& name = "") const
+    {
+      return static_cast<TO*>(DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
+                              TO::Class(), name).object);
     }
 
     /** Get the object from which this object has a relation.
@@ -201,8 +214,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        The first related object or a null pointer.
      */
-    template <class FROM> FROM* getRelatedFrom(const std::string& name = "") const {
-      return static_cast<FROM*>(DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name).object);
+    template <class FROM> FROM* getRelatedFrom(const std::string& name = "") const
+    {
+      return static_cast<FROM*>(DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry,
+                                m_cacheArrayIndex, FROM::Class(), name).object);
     }
 
     /** Get the object to or from which this object has a relation.
@@ -213,8 +228,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        The first related object or a null pointer.
      */
-    template <class T> T* getRelated(const std::string& name = "") const {
-      return static_cast<T*>(DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name).object);
+    template <class T> T* getRelated(const std::string& name = "") const
+    {
+      return static_cast<T*>(DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
+                             T::Class(), name).object);
     }
 
 
@@ -229,8 +246,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
      */
-    template <class TO> std::pair<TO*, double> getRelatedToWithWeight(const std::string& name = "") const {
-      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, TO::Class(), name);
+    template <class TO> std::pair<TO*, double> getRelatedToWithWeight(const std::string& name = "") const
+    {
+      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
+                                                                  TO::Class(), name);
       return std::make_pair(static_cast<TO*>(entry.object), entry.weight);
     }
 
@@ -242,8 +261,10 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
      */
-    template <class FROM> std::pair<FROM*, double> getRelatedFromWithWeight(const std::string& name = "") const {
-      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex, FROM::Class(), name);
+    template <class FROM> std::pair<FROM*, double> getRelatedFromWithWeight(const std::string& name = "") const
+    {
+      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
+                                                                  FROM::Class(), name);
       return std::make_pair(static_cast<FROM*>(entry.object), entry.weight);
     }
 
@@ -255,20 +276,24 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
      */
-    template <class T> std::pair<T*, double> getRelatedWithWeight(const std::string& name = "") const {
-      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex, T::Class(), name);
+    template <class T> std::pair<T*, double> getRelatedWithWeight(const std::string& name = "") const
+    {
+      RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
+                                                                  T::Class(), name);
       return std::make_pair(static_cast<T*>(entry.object), entry.weight);
     }
 
     /** Get name of array this object is stored in, or "" if not found. */
-    std::string getArrayName() const {
+    std::string getArrayName() const
+    {
       DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
       return m_cacheDataStoreEntry ? m_cacheDataStoreEntry->name : "";
     }
 
 
     /** Returns this object's array index (in StoreArray), or -1 if not found. */
-    int getArrayIndex() const {
+    int getArrayIndex() const
+    {
       DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
       return m_cacheArrayIndex;
     }
@@ -280,13 +305,16 @@ namespace Belle2 {
      * @{
      * Define versions without template arguments, only available from python modules.
      */
-    RelationVector<TObject> getRelationsTo(const std::string& name) const {
+    RelationVector<TObject> getRelationsTo(const std::string& name) const
+    {
       return getRelationsTo<TObject>(name);
     }
-    RelationVector<TObject> getRelationsFrom(const std::string& name) const {
+    RelationVector<TObject> getRelationsFrom(const std::string& name) const
+    {
       return getRelationsFrom<TObject>(name);
     }
-    RelationVector<TObject> getRelationsWith(const std::string& name) const {
+    RelationVector<TObject> getRelationsWith(const std::string& name) const
+    {
       return getRelationsWith<TObject>(name);
     }
     TObject* getRelatedTo(const std::string& name) const { return getRelatedTo<TObject>(name); }
@@ -297,7 +325,8 @@ namespace Belle2 {
   protected:
 
     /** Returns the pointer to the store array holding this object (protected since these arrays are easy to misuse). */
-    TClonesArray* getArrayPointer() const {
+    TClonesArray* getArrayPointer() const
+    {
       DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
       if (!m_cacheDataStoreEntry)
         return nullptr;
@@ -318,7 +347,8 @@ namespace Belle2 {
     ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
   };
 
-  template <class BASE> RelationsInterface<BASE>& RelationsInterface<BASE>::operator = (const RelationsInterface<BASE>& relationsInterface)
+  template <class BASE> RelationsInterface<BASE>& RelationsInterface<BASE>::operator = (const RelationsInterface<BASE>&
+      relationsInterface)
   {
     if (this != &relationsInterface) {
       this->BASE::operator=(relationsInterface);

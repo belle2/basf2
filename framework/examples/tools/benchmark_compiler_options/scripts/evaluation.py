@@ -43,4 +43,3 @@ def read(optlevel):
 optlevel = ['gcc-O0', 'gcc-O3', 'gcc-O3-native']
 for i in optlevel:
     read(i)
-

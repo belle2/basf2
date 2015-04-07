@@ -65,14 +65,14 @@ void GearboxModule::initialize()
   StoreObjPtr<EventMetaData>::required();
 
   Gearbox& gearbox = Gearbox::getInstance();
-  for (auto & unit : m_unitOverrides) {
+  for (auto& unit : m_unitOverrides) {
     Gearbox::PathOverride poverride;
     poverride.path = m_overridePrefix + std::get<0>(unit);
     poverride.value = std::get<1>(unit);
     poverride.unit = std::get<2>(unit);
     gearbox.addOverride(poverride);
   }
-  for (auto & multiple : m_multipleOverrides) {
+  for (auto& multiple : m_multipleOverrides) {
     Gearbox::PathOverride poverride;
     poverride.path = m_overridePrefix + std::get<0>(multiple);
     poverride.value = std::get<1>(multiple);

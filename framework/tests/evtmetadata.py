@@ -6,10 +6,12 @@ from ROOT import Belle2
 
 
 class NoopModule(Module):
+
     """Doesn't do anything."""
 
 
 class EvtMetaDataTest(Module):
+
     """Prints EventMetaData objects and stops event processing in event 3."""
 
     def __init__(self):

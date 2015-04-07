@@ -122,7 +122,7 @@ void DataStoreStreamer::mergeIntoExisting(TObject* existing, const TObject* rece
 void DataStoreStreamer::removeSideEffects()
 {
   DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
-  for (auto & entryPair : map) {
+  for (auto& entryPair : map) {
     DataStore::StoreEntry& entry = entryPair.second;
     if (isMergeable(entry.object)) {
       static_cast<Mergeable*>(entry.object)->removeSideEffects();

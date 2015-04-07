@@ -46,7 +46,8 @@ namespace Belle2 {
     ArrayIterator<ArrayType, ValueType>& operator++() { ++m_index; return *this; }
 
     /** postfix increment. */
-    ArrayIterator<ArrayType, ValueType> operator++(int) {
+    ArrayIterator<ArrayType, ValueType> operator++(int)
+    {
       ArrayIterator<ArrayType, ValueType> old(*this);
       ++(*this);
       return old;

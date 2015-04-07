@@ -256,7 +256,8 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getLength(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
+      double getLength(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      {
         return getWithUnit(path);
       }
 
@@ -277,7 +278,8 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getLength(const std::string& path, double defaultValue) const throw(ConversionError) {
+      double getLength(const std::string& path, double defaultValue) const throw(ConversionError)
+      {
         return getWithUnit(path, defaultValue);
       }
 
@@ -294,7 +296,8 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getAngle(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
+      double getAngle(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      {
         return getWithUnit(path);
       }
 
@@ -315,7 +318,8 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getAngle(const std::string& path, double defaultValue) const throw(ConversionError) {
+      double getAngle(const std::string& path, double defaultValue) const throw(ConversionError)
+      {
         return getWithUnit(path, defaultValue);
       }
 
@@ -332,7 +336,8 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getEnergy(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
+      double getEnergy(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      {
         return getWithUnit(path);
       }
 
@@ -353,7 +358,8 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getEnergy(const std::string& path, double defaultValue) const throw(ConversionError) {
+      double getEnergy(const std::string& path, double defaultValue) const throw(ConversionError)
+      {
         return getWithUnit(path, defaultValue);
       }
 
@@ -370,7 +376,8 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getDensity(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
+      double getDensity(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      {
         return getWithUnit(path);
       }
 
@@ -391,7 +398,8 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getDensity(const std::string& path, double defaultValue) const throw(ConversionError) {
+      double getDensity(const std::string& path, double defaultValue) const throw(ConversionError)
+      {
         return getWithUnit(path, defaultValue);
       }
 
@@ -408,7 +416,8 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getTime(const std::string& path = "") const throw(PathEmptyError, ConversionError) {
+      double getTime(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      {
         return getWithUnit(path);
       }
 
@@ -429,7 +438,8 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getTime(const std::string& path, double defaultValue) const throw(ConversionError) {
+      double getTime(const std::string& path, double defaultValue) const throw(ConversionError)
+      {
         return getWithUnit(path, defaultValue);
       }
 

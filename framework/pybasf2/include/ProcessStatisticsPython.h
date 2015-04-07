@@ -67,7 +67,8 @@ namespace Belle2 {
      *               to be defined
      * @param name   Name to show in statistics
      */
-    void setModuleName(Module* module, const std::string& name) {
+    void setModuleName(Module* module, const std::string& name)
+    {
       getWrapped()->getStatistics(module).setName(name);
     }
 

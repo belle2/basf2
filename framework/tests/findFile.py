@@ -5,10 +5,10 @@ from basf2 import *
 from ROOT import Belle2
 import os
 
-#returns empty string if not found
+# returns empty string if not found
 assert '' == Belle2.FileSystem.findFile('framework/tests/ThisFileDoesntExist')
 
-#find ourselves relative to basf2 dir
+# find ourselves relative to basf2 dir
 abspath = Belle2.FileSystem.findFile('framework/tests/findFile.py')
 assert len(abspath) > 0
 
@@ -26,7 +26,7 @@ assert len(testdir) > 0
 os.chdir(testdir)
 assert abspath == Belle2.FileSystem.findFile('findFile.py')
 
-#try finding relative to basf2 dir again (from different location)
+# try finding relative to basf2 dir again (from different location)
 os.chdir('/')
 assert abspath == Belle2.FileSystem.findFile('framework/tests/findFile.py')
 assert abspath == Belle2.FileSystem.findFile('/framework/tests/findFile.py')

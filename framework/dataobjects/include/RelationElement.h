@@ -59,7 +59,8 @@ namespace Belle2 {
      *                 std::pair<index_type,weight_type> or compatible
      */
     template <class InputIterator> RelationElement(index_type from, const InputIterator& begin, const InputIterator& end):
-      TObject(), m_from(from) {
+      TObject(), m_from(from)
+    {
       setToIndices(begin, end);
     }
 
@@ -88,7 +89,8 @@ namespace Belle2 {
     void setFromIndex(index_type from) { m_from = from; }
 
     /** Set index we point to, converts relation to 1:1 and discards all existing to-indices. */
-    void setToIndex(index_type to, weight_type weight = 1.0) {
+    void setToIndex(index_type to, weight_type weight = 1.0)
+    {
       m_to = std::vector<index_type>(1, to);
       m_weights = std::vector<weight_type>(1, weight);
     }
@@ -100,7 +102,8 @@ namespace Belle2 {
      *  @param end     iterator pointing to the end of a sequence of
      *                 std::pair<index_type,weight_type> or compatible
      */
-    template<class InputIterator> void setToIndices(InputIterator begin, const InputIterator& end) {
+    template<class InputIterator> void setToIndices(InputIterator begin, const InputIterator& end)
+    {
       for (; begin != end; ++begin) {
         m_to.push_back(begin->first);
         m_weights.push_back(begin->second);

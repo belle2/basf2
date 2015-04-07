@@ -96,7 +96,7 @@ namespace Belle2 {
   gearbox::InputContext* Gearbox::openXmlUri(const string& uri) const
   {
     //Check input handlers one by one
-    for (gearbox::InputHandler * handler : m_handlers) {
+    for (gearbox::InputHandler* handler : m_handlers) {
       //try to create context for uri, return if success
       gearbox::InputContext* context = handler->open(uri);
       if (context) return context;
@@ -108,7 +108,7 @@ namespace Belle2 {
   void Gearbox::setBackends(const vector<string>& backends)
   {
     clearBackends();
-    for (const string & backend : backends) {
+    for (const string& backend : backends) {
       B2DEBUG(300, "Adding InputHandler for '" << backend << "'");
       //Find correct InputHandler, assuming file backend by default if there is no colon in the
       //uri
@@ -135,7 +135,7 @@ namespace Belle2 {
 
   void Gearbox::clearBackends()
   {
-    for (gearbox::InputHandler * handler : m_handlers) delete handler;
+    for (gearbox::InputHandler* handler : m_handlers) delete handler;
     m_handlers.clear();
   }
 
@@ -179,7 +179,7 @@ namespace Belle2 {
     if (!m_xpathContext) B2FATAL("Could not create XPath context");
 
     //Apply overrides
-    for (const auto & poverride : m_overrides) {
+    for (const auto& poverride : m_overrides) {
       overridePathValue(poverride);
     }
 
@@ -197,7 +197,7 @@ namespace Belle2 {
     m_xpathContext = 0;
     m_xmlDocument = 0;
 
-    for (auto & entry : m_ownedObjects) {
+    for (auto& entry : m_ownedObjects) {
       delete entry.second;
     }
     m_ownedObjects.clear();
@@ -440,7 +440,8 @@ namespace Belle2 {
 
     class_<Gearbox, boost::noncopyable>("Gearbox", no_init)
     .def("create_backend", createBackendPython, return_value_policy<boost::python::manage_new_object>())
-    .def("mount_backend", &Gearbox::mountBackendAndForgetHandle) // even with boost::python::iterator the BackendMountHandle (which is a list iterator) can not get exported or unsufficient documentation
+    .def("mount_backend",
+         &Gearbox::mountBackendAndForgetHandle) // even with boost::python::iterator the BackendMountHandle (which is a list iterator) can not get exported or unsufficient documentation
     .def("testQuery", &Gearbox::testQuery)
     .def("unmount_backend", &Gearbox::unmountBackend)
     .def("printBackendUseCount", &Gearbox::printBackendUseCount)
@@ -452,7 +453,8 @@ namespace Belle2 {
     global.attr("gearbox") = object(ptr(&instance));
   }
 
-  void Gearbox::mountBackendAndForgetHandle(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode)
+  void Gearbox::mountBackendAndForgetHandle(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint,
+                                            gearbox::EMountMode mountMode)
   {
     this->mountBackend(backend, std::move(mountPath), std::move(mountPoint), mountMode);
   }
@@ -466,7 +468,8 @@ namespace Belle2 {
     //B2INFO("Use count of shared_ptr is '"+ std::to_string(p.use_count()-1) +"' (python itself consumes 1)");
   }
 
-  gearbox::BackendMountHandlePtr Gearbox::mountBackend(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint, gearbox::EMountMode mountMode)
+  gearbox::BackendMountHandlePtr Gearbox::mountBackend(gearbox::BackendPtr backend, std::string mountPath, std::string mountPoint,
+                                                       gearbox::EMountMode mountMode)
   {
 
     if (mountPath.front() != '/')
@@ -510,7 +513,7 @@ namespace Belle2 {
 
     try {
 
-      for (auto & xp_single : xpath_parts) {
+      for (auto& xp_single : xpath_parts) {
         this->dispatchQuery(xp_single, res);
       }
 
@@ -551,7 +554,8 @@ namespace Belle2 {
 
     for (auto xPath_actPart = xPath_parts.cbegin(); xPath_actPart != xPath_parts.cend(); ++xPath_actPart) {
 
-      B2DEBUG(2, "Gearbox::matchXPath2Path: matchlevel '" + std::to_string(xPath_matchLevel) + "' xPath_actPart is '" + *xPath_actPart + "' and path_actPart is '" + *path_actPart + "'");
+      B2DEBUG(2, "Gearbox::matchXPath2Path: matchlevel '" + std::to_string(xPath_matchLevel) + "' xPath_actPart is '" + *xPath_actPart +
+              "' and path_actPart is '" + *path_actPart + "'");
 
       if ((*xPath_actPart == "" && xPath_actPart == xPath_parts.cend() - 1)
           ||      // xpath or path have an empty label at the end => is not relevant for comparison!
@@ -582,7 +586,7 @@ namespace Belle2 {
 
     // loop forwards over all mounts and check,
     // whether they match the query
-    for (auto & mI : this->mountInfo) {
+    for (auto& mI : this->mountInfo) {
 
       if (this->matchXPath2Path(xPath, mI.mountPoint, matchlevel)) {
 

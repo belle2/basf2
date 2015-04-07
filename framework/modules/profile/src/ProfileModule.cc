@@ -31,7 +31,8 @@ REG_MODULE(Profile)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ProfileModule::ProfileModule() : Module(), m_outputFileName(""), m_timeOffset(Utils::getClock() / Unit::s), m_nEvents(0), m_step(1), m_eventInfo(k_maxPoints)
+ProfileModule::ProfileModule() : Module(), m_outputFileName(""), m_timeOffset(Utils::getClock() / Unit::s), m_nEvents(0), m_step(1),
+  m_eventInfo(k_maxPoints)
 {
   // Set module properties
   setDescription("Records execution time and memory usage in ProfileInfo objects for each event. Can also graph memory usage.");

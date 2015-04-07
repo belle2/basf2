@@ -164,9 +164,9 @@ main.add_module(simulation)
 # output path
 main.add_module(output)
 main.add_module(progress)
-#main.add_module('PrintCollections')
+# main.add_module('PrintCollections')
 
-#test wether flags are what we expect
+# test wether flags are what we expect
 if particlegun.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
     B2FATAL("ParticleGun has pp flag?")
 if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):

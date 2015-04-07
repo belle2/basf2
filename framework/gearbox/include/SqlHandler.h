@@ -32,7 +32,8 @@ namespace Belle2 {
       /** Reset the statement to be ready for execution again */
       virtual ~SqlContext();
       /** Read a block of data */
-      virtual int readXmlData(char* buffer, int buffsize) {
+      virtual int readXmlData(char* buffer, int buffsize)
+      {
         B2DEBUG(100, "readXmlData:  buffsize=" <<  buffsize);
         m_stream.read(buffer, buffsize);
         B2DEBUG(100, "readXmlData: Bytes read from m_stream " << m_stream.gcount());

@@ -22,7 +22,8 @@ namespace Belle2 {
       /** Take an XML fragment as parameter and create a context for it */
       StringContext(const std::string& data): m_stream(data) {};
       /** Return a block of the data */
-      virtual int readXmlData(char* buffer, int buffsize) {
+      virtual int readXmlData(char* buffer, int buffsize)
+      {
         m_stream.read(buffer, buffsize);
         return m_stream.gcount();
       }

@@ -45,10 +45,10 @@ def read(optlevel, b, name):
         sigma[i] = np.std(readvalue)
         u = range(0, len(readvalue))
         z = 0
-        if cut == True:
+        if cut:
             for j in u:
                 if readvalue[j - z] > 1.5 * value[i] or readvalue[j - z] < 0.5 \
-                    * value[i]:
+                        * value[i]:
                     del readvalue[j - z]
                     z = z + 1
             sigma[i] = np.std(readvalue)
@@ -67,7 +67,7 @@ def read(optlevel, b, name):
         fmt='_',
         ecolor='black',
         label='normed time',
-        )
+    )
     (locs, labels) = plt.xticks(t, optlevel)
     plt.setp(labels, rotation=90)
     plt.xlim([-0.5, len(optlevel) - 0.5])
@@ -79,13 +79,12 @@ def read(optlevel, b, name):
     fobj = open('plots/' + name + '.out', 'w')
     for i in t:
         fobj.write(optlevel[i] + '&' + str(n[i]) + '&' + str('%.3f'
-                   % value[i]) + ' & ' + str('%.3f' % sigma[i]) + '&'
+                                                             % value[i]) + ' & ' + str('%.3f' % sigma[i]) + '&'
                    + str('%.4f' % valuenormed[i]) + '&' + str('%.4f'
-                   % sigmanormed[i]) + '\\\\\n')
+                                                              % sigmanormed[i]) + '\\\\\n')
         fobj.write("\hline\n")
 
 
 name = 'CDCLegendreTracking'
 optlevel = ['gcc-O0', 'gcc-O3', 'gcc-O3-native']
 read(optlevel, 0, name)
-

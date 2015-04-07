@@ -83,8 +83,10 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = true) {
-      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
+                                   bool errorIfExisting = true)
+    {
+      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false,
+                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
     }
 
     /** Register an object, that should not be written to the output by default, in the data store.
@@ -97,8 +99,10 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = true) {
-      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
+                                  bool errorIfExisting = true)
+    {
+      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false,
+                                                 DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
     }
 
     /** Check whether an object was registered before.
@@ -110,7 +114,8 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of object in question.
      *  @return            True if the object exists.
      */
-    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
+    {
       std::string objName = DataStore::objectName<T>(name);
       return DataStore::Instance().requireInput(StoreAccessorBase(objName, durability, T::Class(), false));
     }
@@ -124,7 +129,8 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of object in question.
      *  @return            True if the object exists.
      */
-    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
+    {
       std::string objName = DataStore::objectName<T>(name);
       return DataStore::Instance().optionalInput(StoreAccessorBase(objName, durability, T::Class(), false));
     }
@@ -150,7 +156,8 @@ namespace Belle2 {
      *
      *  @return          True if the creation succeeded.
      **/
-    template<class ...Args> bool construct(Args&& ... params) {
+    template<class ...Args> bool construct(Args&& ... params)
+    {
       T* t = new T(std::forward<Args>(params)...);
       return assign(t, false);
     }
@@ -161,7 +168,8 @@ namespace Belle2 {
      *
      *  @return          True if the creation succeeded.
      **/
-    template<class ...Args> bool constructAndReplace(Args&& ... params) {
+    template<class ...Args> bool constructAndReplace(Args&& ... params)
+    {
       T* t = new T(std::forward<Args>(params)...);
       return assign(t, true);
     }
@@ -177,7 +185,8 @@ namespace Belle2 {
 
   private:
     /** Ensure that this object is attached. */
-    inline void ensureAttached() const {
+    inline void ensureAttached() const
+    {
       if (!m_storeObjPtr) {
         const_cast<StoreObjPtr*>(this)->m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(*this));
       }

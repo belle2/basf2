@@ -35,7 +35,8 @@ bool StoreAccessorBase::assign(TObject* object, bool replace)
 {
   bool success;
   if (object != nullptr and object->IsA() != getClass()) {
-    B2ERROR("Cannot assign() an object of type '" << object->IsA()->GetName() << "' to " << readableName() << " of type '" << getClass()->GetName() << "'!");
+    B2ERROR("Cannot assign() an object of type '" << object->IsA()->GetName() << "' to " << readableName() << " of type '" <<
+            getClass()->GetName() << "'!");
     success = false;
   } else {
     success = DataStore::Instance().createObject(object, replace, *this);

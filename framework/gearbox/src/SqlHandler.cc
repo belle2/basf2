@@ -65,7 +65,8 @@ namespace Belle2 {
         keyquote = "";
       }
 
-      sqlstring.Form("SELECT %skey%s, %skeyid%s, %stype%s, %sdata%s FROM GEOMETRY ", keyquote.Data(), keyquote.Data(), keyquote.Data(),  keyquote.Data(), keyquote.Data(),
+      sqlstring.Form("SELECT %skey%s, %skeyid%s, %stype%s, %sdata%s FROM GEOMETRY ", keyquote.Data(), keyquote.Data(), keyquote.Data(),
+                     keyquote.Data(), keyquote.Data(),
                      keyquote.Data(), keyquote.Data(), keyquote.Data());
 
       TString urloptions = url->GetOptions();

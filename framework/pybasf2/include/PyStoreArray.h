@@ -72,7 +72,8 @@ namespace Belle2 {
 
     /** Allow iteration using for in Python.
      **/
-    TIter __iter__() const {
+    TIter __iter__() const
+    {
       //will create empty iterator if NULL pointer
       return TIter(m_storeArray);
     }

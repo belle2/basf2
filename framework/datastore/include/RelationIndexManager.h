@@ -40,7 +40,8 @@ namespace Belle2 {
      *  @param relation Relation to build an index for
      *  @returns A RelationIndexContainer
      */
-    template<class FROM, class TO> const std::shared_ptr<RelationIndexContainer<FROM, TO>> get(const RelationArray& relation) {
+    template<class FROM, class TO> const std::shared_ptr<RelationIndexContainer<FROM, TO>> get(const RelationArray& relation)
+    {
       const static bool doTypeCheck = (FROM::Class() != TObject::Class() or TO::Class() != TObject::Class());
       if (doTypeCheck)
         relation.isValid();
@@ -83,7 +84,9 @@ namespace Belle2 {
      *
      * The index is not rebuilt, which makes this mostly useful to do minor changes to the index in DataStore::addRelation().
      */
-    template<class FROM, class TO> std::shared_ptr<RelationIndexContainer<FROM, TO>> getIndexIfExists(const std::string& name, DataStore::EDurability durability) const {
+    template<class FROM, class TO> std::shared_ptr<RelationIndexContainer<FROM, TO>> getIndexIfExists(const std::string& name,
+        DataStore::EDurability durability) const
+    {
       const RelationMap& relations =  m_cache[durability];
       RelationMap::const_iterator it = relations.find(name);
       if (it != relations.end()) {
@@ -94,7 +97,8 @@ namespace Belle2 {
     }
 
     /** Clean cache on exit. */
-    ~RelationIndexManager() {
+    ~RelationIndexManager()
+    {
       for (int i = 0; i < DataStore::c_NDurabilityTypes; i++)
         clear((DataStore::EDurability)i);
     }

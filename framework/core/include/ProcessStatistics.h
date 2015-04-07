@@ -83,7 +83,9 @@ namespace Belle2 {
   class ProcessStatistics : public Mergeable {
   public:
     /** Constructor. */
-    ProcessStatistics(): m_global("Total"), m_globalTime(0), m_globalMemory(0), m_moduleTime(0), m_moduleMemory(0), m_suspendedTime(0), m_suspendedMemory(0) { }
+    ProcessStatistics():
+      m_global("Total"), m_globalTime(0), m_globalMemory(0), m_moduleTime(0), m_moduleMemory(0), m_suspendedTime(0),
+      m_suspendedMemory(0) { }
 
     /**
      * Return string with statistics for all modules.
@@ -113,31 +115,36 @@ namespace Belle2 {
     /** Suspend timer for global measurement, needed for newRun.
      * resumeGlobal should be called once endRun/newRun handling is
      * finished */
-    void suspendGlobal() {
+    void suspendGlobal()
+    {
       setCounters(m_suspendedTime, m_suspendedMemory,
                   m_globalTime, m_globalMemory);
     }
 
     /** Resume timer after call to suspendGlobal() */
-    void resumeGlobal() {
+    void resumeGlobal()
+    {
       setCounters(m_globalTime, m_globalMemory,
                   m_suspendedTime, m_suspendedMemory);
     }
 
     /** Stop global timer and add values to the statistic counter */
-    void stopGlobal(ModuleStatistics::EStatisticCounters type) {
+    void stopGlobal(ModuleStatistics::EStatisticCounters type)
+    {
       setCounters(m_globalTime, m_globalMemory,
                   m_globalTime, m_globalMemory);
       m_global.add(type, m_globalTime, m_globalMemory);
     }
 
     /** Start module timer */
-    void startModule() {
+    void startModule()
+    {
       setCounters(m_moduleTime, m_moduleMemory);
     }
 
     /** Stop module counter and attribute values to appropriate module */
-    void stopModule(const Module* module, ModuleStatistics::EStatisticCounters type) {
+    void stopModule(const Module* module, ModuleStatistics::EStatisticCounters type)
+    {
       setCounters(m_moduleTime, m_moduleMemory,
                   m_moduleTime, m_moduleMemory);
       m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
@@ -154,7 +161,8 @@ namespace Belle2 {
      * @param module Shared pointer to the Module for which the
      *               statistics should be obtained
      */
-    ModuleStatistics& getStatistics(const Module* module) {
+    ModuleStatistics& getStatistics(const Module* module)
+    {
       return m_stats[getIndex(module)];
     }
 

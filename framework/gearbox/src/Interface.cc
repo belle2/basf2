@@ -133,7 +133,7 @@ namespace Belle2 {
       tokenizer tokens(value.first, sep);
       vector<double> result;
       double numValue(0);
-      for (const string & tok : tokens) {
+      for (const string& tok : tokens) {
         try {
           numValue = boost::lexical_cast<double>(tok);
         } catch (boost::bad_lexical_cast&) {

@@ -28,7 +28,8 @@ namespace Belle2 {
        */
       FileContext(const std::string& filename, bool compressed);
       /** Return a block of the data */
-      virtual int readXmlData(char* buffer, int buffsize) {
+      virtual int readXmlData(char* buffer, int buffsize)
+      {
         m_stream.read(buffer, buffsize);
         return m_stream.gcount();
       }

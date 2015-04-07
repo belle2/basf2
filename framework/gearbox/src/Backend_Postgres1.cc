@@ -29,7 +29,8 @@ namespace Belle2 {
 
       if (this->uniqueHash.empty()) {
         pqxx::work writeTransaction(*this->DBConnection);
-        writeTransaction.exec("INSERT INTO config_t (param, val) VALUES ('uniqueHash','" + (this->uniqueHash = genRandomString(GEARBOX_BACKEND_UNIQUEHASH_AUTOLENGTH)) + "')");
+        writeTransaction.exec("INSERT INTO config_t (param, val) VALUES ('uniqueHash','" + (this->uniqueHash = genRandomString(
+                                GEARBOX_BACKEND_UNIQUEHASH_AUTOLENGTH)) + "')");
         writeTransaction.commit();
       }
 
@@ -95,7 +96,8 @@ namespace Belle2 {
 
     }
 
-    void Backend_Postgres1::query(const std::string& xPath, QryResultSet& connectNode, std::string internalUpToPath, GBResult& theGBResult)
+    void Backend_Postgres1::query(const std::string& xPath, QryResultSet& connectNode, std::string internalUpToPath,
+                                  GBResult& theGBResult)
     {
 
       std::vector<std::string> connectPathVec;
@@ -179,7 +181,9 @@ namespace Belle2 {
         nodePathVec.pop_back();
         QryResultSet& parent = this->ensurePath(nodePathVec, nodeIDPathVec, connectPathVec, connectNode, theGBResult);
 
-        B2DEBUG(4, "Gearbox::Backend_Postgres1::query: processing '" + (*i)["path"].as<std::string>() + "', id '" + this->uniqueHash + (*i)["nodeid"].as<std::string>() + "', parentID '" + getUniqueNodeId(parent) + "', value '" + (*i)["value_" + (*i)["valuetype"].as<std::string>()].as<std::string>() + "'");
+        B2DEBUG(4, "Gearbox::Backend_Postgres1::query: processing '" + (*i)["path"].as<std::string>() + "', id '" + this->uniqueHash +
+                (*i)["nodeid"].as<std::string>() + "', parentID '" + getUniqueNodeId(parent) + "', value '" + (*i)["value_" +
+                    (*i)["valuetype"].as<std::string>()].as<std::string>() + "'");
 
         theGBResult.submitNode(parent,
                                existState,
@@ -195,7 +199,8 @@ namespace Belle2 {
     }
 
 
-    QryResultSet& Backend_Postgres1::ensurePath(std::vector<std::string>& nodePathVec, std::vector<std::string>& nodeIDPathVec, const std::vector<std::string>& connectPathVec, QryResultSet& upperNode, GBResult& theGBResult)
+    QryResultSet& Backend_Postgres1::ensurePath(std::vector<std::string>& nodePathVec, std::vector<std::string>& nodeIDPathVec,
+                                                const std::vector<std::string>& connectPathVec, QryResultSet& upperNode, GBResult& theGBResult)
     {
 
       QryResultSet* nodeAtPath;

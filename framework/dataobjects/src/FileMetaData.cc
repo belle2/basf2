@@ -86,7 +86,8 @@ void FileMetaData::Print(Option_t* option) const
   if (all)
     cout << "  GUID   : " << m_guid << endl;
   cout << "  #event : " << m_events << endl;
-  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow << " - "  << m_experimentHigh << "/" << m_runHigh << "/" << m_eventHigh << endl;
+  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow << " - "  << m_experimentHigh << "/" << m_runHigh
+       << "/" << m_eventHigh << endl;
   cout << "  parents:";
   for (int parent : m_parents) cout << " " << parent;
   cout << endl;

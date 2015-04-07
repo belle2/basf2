@@ -83,7 +83,8 @@ namespace Belle2 {
        * @param theGBResult the GBResult-Object, which holds the nodes
        * @return the node, which corresponds to the ensured path
        */
-      QryResultSet& ensurePath(std::vector<std::string>& nodePathVec, std::vector<std::string>& nodeIDPathVec, const std::vector<std::string>& connectPathVec, QryResultSet& upperNode, GBResult& theGBResult);
+      QryResultSet& ensurePath(std::vector<std::string>& nodePathVec, std::vector<std::string>& nodeIDPathVec,
+                               const std::vector<std::string>& connectPathVec, QryResultSet& upperNode, GBResult& theGBResult);
 
     }; // class Backend_Postgres1
 

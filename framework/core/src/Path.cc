@@ -71,7 +71,7 @@ std::list<ModulePtr> Path::getModules() const
 ModulePtrList Path::buildModulePathList(bool unique) const
 {
   ModulePtrList modList;
-  for (const ModulePtr & module : getModules()) {
+  for (const ModulePtr& module : getModules()) {
     if (!unique or find(modList.begin(), modList.end(), module) == modList.end()) {
       modList.push_back(module);
 
@@ -110,7 +110,7 @@ bool Path::contains(std::string moduleType) const
 boost::shared_ptr<PathElement> Path::clone() const
 {
   PathPtr path(new Path);
-  for (const auto & elem : m_elements) {
+  for (const auto& elem : m_elements) {
     const Module* m = dynamic_cast<const Module*>(elem.get());
     if (m and m->getType() == "PyModule") {
       //B2WARNING("Python module " << m->getName() << " encountered, please make sure it correctly reinitialises itself to ensure multiple process() calls work.");
@@ -151,7 +151,7 @@ boost::python::list _getModulesPython(const Path* path)
 {
   boost::python::list returnList;
 
-  for (const ModulePtr & module : path->getModules())
+  for (const ModulePtr& module : path->getModules())
     returnList.append(boost::python::object(ModulePtr(module)));
 
   return returnList;

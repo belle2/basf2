@@ -98,7 +98,8 @@ namespace Belle2 {
 
       /** Constructor accepting all members */
       BackendMountHandle(BackendPtr backend, std::string mountPath, std::string mountPoint, EMountMode mountMode)
-        : backend(backend), mountPath(std::move(mountPath)), mountPoint(std::move(mountPoint)), mountMode(mountMode) {
+        : backend(backend), mountPath(std::move(mountPath)), mountPoint(std::move(mountPoint)), mountMode(mountMode)
+      {
 
       }
 

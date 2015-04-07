@@ -33,7 +33,8 @@ namespace Belle2 {
      *
      *  @param event The current event number.
      */
-    void setEvent(unsigned long event) {
+    void setEvent(unsigned long event)
+    {
       m_event = event;
     }
 
@@ -41,7 +42,8 @@ namespace Belle2 {
      *
      *  @param run The number of the current run.
      */
-    void setRun(unsigned long run) {
+    void setRun(unsigned long run)
+    {
       m_run = run;
     }
 
@@ -49,7 +51,8 @@ namespace Belle2 {
      *
      *  @param subrun The number of the current sub run.
      */
-    void setSubrun(unsigned long subrun) {
+    void setSubrun(unsigned long subrun)
+    {
       m_subrun = subrun;
     }
 
@@ -57,7 +60,8 @@ namespace Belle2 {
      *
      *  @param experiment The number of the current experiment.
      */
-    void setExperiment(unsigned long experiment) {
+    void setExperiment(unsigned long experiment)
+    {
       m_experiment = experiment;
     }
 
@@ -65,7 +69,8 @@ namespace Belle2 {
      *
      *  @param time The time when the event was recorded.
      */
-    void setTime(unsigned long long int time) {
+    void setTime(unsigned long long int time)
+    {
       m_time = time;
     }
 
@@ -88,7 +93,8 @@ namespace Belle2 {
      *
      *  @param index The index of the current parent file.
      */
-    void setParentIndex(int index) {
+    void setParentIndex(int index)
+    {
       m_parent_index = index;
     }
 
@@ -96,7 +102,8 @@ namespace Belle2 {
      *
      *  @param weight The weight produced by the event generator
      */
-    void setGeneratedWeight(double weight) {
+    void setGeneratedWeight(double weight)
+    {
       m_generated_weight = weight;
     }
 
@@ -104,7 +111,8 @@ namespace Belle2 {
      *
      *  @return The number of the current event.
      */
-    unsigned long getEvent() const {
+    unsigned long getEvent() const
+    {
       return m_event;
     }
 
@@ -112,7 +120,8 @@ namespace Belle2 {
      *
      *  @return The number of the current run.
      */
-    unsigned long getRun() const {
+    unsigned long getRun() const
+    {
       return m_run;
     }
 
@@ -120,7 +129,8 @@ namespace Belle2 {
      *
      *  @return The number of the current sub run.
      */
-    unsigned long getSubrun() const {
+    unsigned long getSubrun() const
+    {
       return m_subrun;
     }
 
@@ -128,7 +138,8 @@ namespace Belle2 {
      *
      *  @return The number of the current experiment.
      */
-    unsigned long getExperiment() const {
+    unsigned long getExperiment() const
+    {
       return m_experiment;
     }
 
@@ -136,7 +147,8 @@ namespace Belle2 {
      *
      *  @return The time when the event was recorded.
      */
-    unsigned long long int getTime() const {
+    unsigned long long int getTime() const
+    {
       return m_time;
     }
 
@@ -144,7 +156,8 @@ namespace Belle2 {
      *
      *  @return The index of the current parent file, or UINT_MAX if not set.
      */
-    int getParentIndex() const {
+    int getParentIndex() const
+    {
       return m_parent_index;
     }
 
@@ -152,7 +165,8 @@ namespace Belle2 {
      *
      *  @return The weight produced by the event generator
      */
-    double getGeneratedWeight() const {
+    double getGeneratedWeight() const
+    {
       return m_generated_weight;
     }
 

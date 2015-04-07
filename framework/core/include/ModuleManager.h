@@ -122,7 +122,8 @@ namespace Belle2 {
      * @param sharedLibPath Optional: The shared library from which the module should be registered (not a map file!).
      * @return A shared pointer to the created module instance.
      */
-    boost::shared_ptr<Module> registerModule(const std::string& moduleName, const std::string& sharedLibPath = "") throw(ModuleNotCreatedError);
+    boost::shared_ptr<Module> registerModule(const std::string& moduleName,
+                                             const std::string& sharedLibPath = "") throw(ModuleNotCreatedError);
 
     /**
      * Returns a reference to the list of created modules.
@@ -141,16 +142,20 @@ namespace Belle2 {
      * @param propertyFlags The flags for the module properties.
      * @return A list containing those modules which carry property flags matching the specified ones.
      */
-    std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList, unsigned int propertyFlags) const;
+    std::list< boost::shared_ptr<Module> > getModulesByProperties(const std::list< boost::shared_ptr<Module> >& modulePathList,
+        unsigned int propertyFlags) const;
 
     /** Delete all created modules. */
     void reset();
 
 
   private:
+    /** List of all checked and validated filepaths that are searched for map files. */
+    std::list<std::string> m_moduleSearchPathList;
 
-    std::list<std::string> m_moduleSearchPathList;                /**< List of all checked and validated filepaths that are searched for map files. */
-    std::map<std::string, std::string> m_moduleNameLibMap;        /**< Maps the module name to the filename of the shared library which containes the module. */
+    /** Maps the module name to the filename of the shared library which containes the module. */
+    std::map<std::string, std::string> m_moduleNameLibMap;
+
     std::map<std::string, ModuleProxyBase*> m_registeredProxyMap; /**< Maps the module name to a pointer of its proxy. */
     std::list< boost::shared_ptr<Module> > m_createdModulesList;  /**< List of all created modules. */
 
@@ -162,7 +167,8 @@ namespace Belle2 {
      * @param moduleNameLibMap map to be filled.
      * @param mapPath The filename (path+name) of the map file which should be parsed for module names.
      */
-    static void fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap, const boost::filesystem::directory_entry& mapPath);
+    static void fillModuleNameLibMap(std::map<std::string, std::string>& moduleNameLibMap,
+                                     const boost::filesystem::directory_entry& mapPath);
 
     /**
      * The constructor is hidden to avoid that someone creates an instance of this class.

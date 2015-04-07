@@ -16,10 +16,13 @@ namespace Belle2 {
     /** Return ptr cast to TClonesArray. If this is not an array, return null. */
     TClonesArray* getPtrAsArray() const;
 
-    bool        isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
-    bool        dontWriteOut; /**< Flag that indicates whether the object should be written to the output by default **/
-    TObject*    object;      /**< The pointer to the actual object. Associated memory may exceed object durability, and is kept until the object is replaced.  **/
-    TObject*    ptr;         /**< The pointer to the returned object, either equal to 'object' or 0, depending on wether the object was created in the current event **/
-    std::string name;        /**< Name of the entry. Equal to the key in the map. **/
+    bool isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
+    bool dontWriteOut; /**< Flag that indicates whether the object should be written to the output by default **/
+    /** The pointer to the actual object. Associated memory may exceed object durability, and is kept until the object is replaced. **/
+    TObject* object;
+
+    /** The pointer to the returned object, either equal to 'object' or 0, depending on wether the object was created in the current event **/
+    TObject* ptr;
+    std::string name; /**< Name of the entry. Equal to the key in the map. **/
   };
 }

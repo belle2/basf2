@@ -55,14 +55,14 @@ gearbox.param({
 # prefix is the same for all overrides so this would interfere with the
 # examples above
 
-#gearbox.param({
+# gearbox.param({
 #    "overridePrefix": "//DetectorComponent[@name='PXD']/Content/",
 #    "override": [
 #        ("ActiveChips", "true", ""),
 #        ("SeeNeutrons", "true", ""),
 #        ("SensitiveThreshold", "0", "eV"),
 #    ],
-#})
+# })
 
 main = create_path()
 

@@ -55,7 +55,8 @@ namespace Belle2 {
      *                          from the ROOT::physics Vector package, that translates a TLorentzVector from
      *                          the center of mass system of the beam interaction into the laboratory system.
      */
-    static inline TLorentzRotation getCMS2LabBoost(const float& energyLER     = 4. * Unit::GeV,  const float& energyHER = 7.   * Unit::GeV,
+    static inline TLorentzRotation getCMS2LabBoost(const float& energyLER = 4. * Unit::GeV,
+                                                   const float& energyHER = 7. * Unit::GeV,
                                                    const float& crossingAngle = 83.* Unit::mrad, const float& angleLER  = 41.5 * Unit::mrad);
 
     /** Get Lorentz boost for transformation from lab to CMS system.

@@ -17,12 +17,14 @@
 
 using namespace Belle2;
 
-inline TLorentzRotation Boosts::getCMS2LabBoost(const float& energyLER, const float& energyHER, const float& crossingAngle, const float& angleLER)
+inline TLorentzRotation Boosts::getCMS2LabBoost(const float& energyLER, const float& energyHER, const float& crossingAngle,
+                                                const float& angleLER)
 {
   return getLab2CMSBoost(energyLER, energyHER, crossingAngle, angleLER).Inverse();
 }
 
-TLorentzRotation Boosts::getLab2CMSBoost(const float& energyLER, const float& energyHER, const float& crossingAngle, const float& angleLER)
+TLorentzRotation Boosts::getLab2CMSBoost(const float& energyLER, const float& energyHER, const float& crossingAngle,
+                                         const float& angleLER)
 {
   // Lab frame Z axis is defined by B field;
   // its positive direction close to direction of

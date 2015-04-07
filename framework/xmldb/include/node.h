@@ -32,12 +32,14 @@ namespace Belle2 {
       bool isDirty() const MUST_USE_RESULT;
 
       /** @return True, iff the node has a predecessor in the database. */
-      inline bool hasPredecessor() const MUST_USE_RESULT {
+      inline bool hasPredecessor() const MUST_USE_RESULT
+      {
         return predecessor_ != -1;
       }
 
       /** @return The id of the node in the database. */
-      inline int64_t id() const MUST_USE_RESULT {
+      inline int64_t id() const MUST_USE_RESULT
+      {
         return id_;
       } // id
 
@@ -69,7 +71,8 @@ namespace Belle2 {
       Node* parent() const MUST_USE_RESULT;
 
       /** Get the database id of the node's predecessor, or -1. */
-      inline int64_t predecessor() const MUST_USE_RESULT {
+      inline int64_t predecessor() const MUST_USE_RESULT
+      {
         return predecessor_;
       }
 

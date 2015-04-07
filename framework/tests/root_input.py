@@ -8,6 +8,7 @@ from ROOT import Belle2
 
 
 class NoopModule(Module):
+
     """Doesn't do anything."""
 
 

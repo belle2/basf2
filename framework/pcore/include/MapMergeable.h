@@ -54,9 +54,10 @@ namespace Belle2 {
      *
      * Note that 'other' will be deleted after the merge, so make sure you copy all data from it that you will need.
      */
-    virtual void merge(const Mergeable* other) {
+    virtual void merge(const Mergeable* other)
+    {
       auto* otherMergeable = static_cast<const MapMergeable*>(other);
-      for (const auto & element : otherMergeable->get()) {
+      for (const auto& element : otherMergeable->get()) {
         auto it = m_wrapped.find(element.first);
         if (it != m_wrapped.end()) {
           it->second += element.second;
@@ -71,7 +72,8 @@ namespace Belle2 {
      * Called after sending the objects to another process. If no clearing is performed, the same data (e.g. histogram
      * entries) might be added again and again in each event.
      */
-    virtual void clear() {
+    virtual void clear()
+    {
       m_wrapped.clear();
     }
 

@@ -23,7 +23,7 @@ for i in range(0, len(input_data)):
     if input_data[i].startswith('elif option == \'opt\':'):
         a = True
         print 'line found'
-    if a == True:
+    if a:
         if input_data[i].startswith('    global_env.Append(CCFLAGS'):
             output.append(option)
             a = False

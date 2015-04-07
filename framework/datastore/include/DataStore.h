@@ -110,45 +110,53 @@ namespace Belle2 {
     static std::string defaultObjectName(std::string classname);
 
     /** Return the default storage name for an object of the given type. */
-    template<class T> static std::string defaultObjectName() {
+    template<class T> static std::string defaultObjectName()
+    {
       const static std::string s = defaultObjectName(T::Class_Name());
       return s;
     }
 
     /** Return the storage name for an object of the given type and name. */
-    template<class T> static std::string objectName(const std::string& name) {
+    template<class T> static std::string objectName(const std::string& name)
+    {
       return ((name.empty()) ? defaultObjectName<T>() : name);
     }
 
     /** Return the default storage name for an given class name. */
-    static std::string defaultArrayName(const std::string& classname) {
+    static std::string defaultArrayName(const std::string& classname)
+    {
       return defaultObjectName(classname) + 's';
     }
 
     /** Return the default storage name for an array of the given type. */
-    template<class T> static std::string defaultArrayName() {
+    template<class T> static std::string defaultArrayName()
+    {
       const static std::string s = defaultObjectName<T>() + 's';
       return s;
     }
 
     /** Return the storage name for an object of the given type and name. */
-    template<class T> static std::string arrayName(const std::string& name) {
+    template<class T> static std::string arrayName(const std::string& name)
+    {
       return ((name.empty()) ? defaultArrayName<T>() : name);
     }
 
     /** Return the default storage name for a relation between the given types. */
-    template<class FROM, class TO> static std::string defaultRelationName() {
+    template<class FROM, class TO> static std::string defaultRelationName()
+    {
       const static std::string s = defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
       return s;
     }
 
     /** Return the storage name for a relation with given name between the given types. */
-    template<class FROM, class TO> static std::string relationName(const std::string& name) {
+    template<class FROM, class TO> static std::string relationName(const std::string& name)
+    {
       return ((name.empty()) ? defaultArrayName<FROM, TO>() : name);
     }
 
     /** Return storage name for a relation between two arrays of the given names. */
-    static std::string relationName(const std::string& fromName, const std::string& toName) {
+    static std::string relationName(const std::string& fromName, const std::string& toName)
+    {
       return fromName + "To" + toName;
     }
 
@@ -176,7 +184,8 @@ namespace Belle2 {
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return           True if the registration succeeded.
      */
-    bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability, EStoreFlags storeFlags);
+    bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                          EStoreFlags storeFlags);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
@@ -260,7 +269,8 @@ namespace Belle2 {
      *  @param toIndex        Index in TClonesArray that contains the toObject. Used for caching. Will be set if < 0.
      *  @param weight         Weight of the relation.
      */
-    void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry, int& toIndex, double weight);
+    void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry,
+                     int& toIndex, double weight);
 
 
     /** Get the relations between an object and other objects in a store array.
@@ -276,7 +286,8 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               Vector of relation entry objects.
      */
-    std::vector<Belle2::RelationEntry> getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName);
+    std::vector<Belle2::RelationEntry> getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
+                                                        const TClass* withClass, const std::string& withName);
 
     /** Get the first relation between an object and another object in a store array.
      *
@@ -290,7 +301,8 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               The entry of the first related object.
      */
-    Belle2::RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index, const TClass* withClass, const std::string& withName);
+    Belle2::RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
+                                          const TClass* withClass, const std::string& withName);
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
@@ -301,7 +313,8 @@ namespace Belle2 {
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
      */
-    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1.0) {
+    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1.0)
+    {
       DataStore::StoreEntry* fromEntry = nullptr;
       int fromIndex = -1;
       StoreEntry* toEntry = nullptr;
@@ -321,7 +334,8 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class TO> static RelationVector<TO> getRelationsFromObj(const TObject* fromObject, const std::string& toName = "") {
+    template <class TO> static RelationVector<TO> getRelationsFromObj(const TObject* fromObject, const std::string& toName = "")
+    {
       StoreEntry* storeEntry = nullptr;
       int index = -1;
       return RelationVector<TO>(Instance().getRelationsWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName));
@@ -339,7 +353,8 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class FROM> static RelationVector<FROM> getRelationsToObj(const TObject* toObject, const std::string& fromName = "") {
+    template <class FROM> static RelationVector<FROM> getRelationsToObj(const TObject* toObject, const std::string& fromName = "")
+    {
       StoreEntry* storeEntry = nullptr;
       int index = -1;
       return RelationVector<FROM>(Instance().getRelationsWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName));
@@ -359,7 +374,8 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return               Vector of relation entry objects.
      */
-    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "") {
+    template <class T> static RelationVector<T> getRelationsWithObj(const TObject* object, const std::string& name = "")
+    {
       StoreEntry* storeEntry = nullptr;
       int index = -1;
       return RelationVector<T>(Instance().getRelationsWith(c_BothSides, object, storeEntry, index, T::Class(), name));
@@ -377,7 +393,8 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class TO> static TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "") {
+    template <class TO> static TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "")
+    {
       if (!fromObject) return nullptr;
       StoreEntry* storeEntry = nullptr;
       int index = -1;
@@ -396,11 +413,13 @@ namespace Belle2 {
      *                  If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return         The related object or a null pointer.
      */
-    template <class FROM> static FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "") {
+    template <class FROM> static FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "")
+    {
       if (!toObject) return nullptr;
       StoreEntry* storeEntry = nullptr;
       int index = -1;
-      return static_cast<FROM*>(DataStore::Instance().getRelationWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName).object);
+      return static_cast<FROM*>(DataStore::Instance().getRelationWith(c_FromSide, toObject, storeEntry, index, FROM::Class(),
+                                fromName).object);
     }
 
     /** Get the object to or from which another object has a relation.
@@ -414,7 +433,8 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        The related object or a null pointer.
      */
-    template <class T> static T* getRelated(const TObject* object, const std::string& name = "") {
+    template <class T> static T* getRelated(const TObject* object, const std::string& name = "")
+    {
       if (!object) return nullptr;
       StoreEntry* storeEntry = nullptr;
       int index = -1;
@@ -427,13 +447,16 @@ namespace Belle2 {
      * @{
      * Define versions without template arguments, only available from python modules.
      */
-    static RelationVector<TObject> getRelationsToObj(const TObject* toObject, const std::string& name) {
+    static RelationVector<TObject> getRelationsToObj(const TObject* toObject, const std::string& name)
+    {
       return getRelationsToObj<TObject>(toObject, name);
     }
-    static RelationVector<TObject> getRelationsFromObj(const TObject* fromObject, const std::string& name) {
+    static RelationVector<TObject> getRelationsFromObj(const TObject* fromObject, const std::string& name)
+    {
       return getRelationsFromObj<TObject>(fromObject, name);
     }
-    static RelationVector<TObject> getRelationsWithObj(const TObject* object, const std::string& name) {
+    static RelationVector<TObject> getRelationsWithObj(const TObject* object, const std::string& name)
+    {
       return getRelationsWithObj<TObject>(object, name);
     }
     static TObject* getRelatedToObj(const TObject* toObject, const std::string& name) { return getRelatedToObj<TObject>(toObject, name); }
@@ -526,7 +549,8 @@ namespace Belle2 {
      *  @param arrayName  A given array name, the special string "ALL" for all arrays deriving from the given class, or an empty string for the default array name.
      *  @param arrayClass The class of the array(s).
      */
-    void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass, EDurability durability = c_Event) const;
+    void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass,
+                       EDurability durability = c_Event) const;
 
     /** For an array containing RelationsObjects, update index and entry cache for entire contents.
      *

@@ -8,6 +8,7 @@ from ROOT import Belle2
 
 
 class SelectOddEvents(Module):
+
     """For events with an odd event number, set module return value to False"""
 
     def event(self):
@@ -28,6 +29,7 @@ class SelectOddEvents(Module):
 
 
 class ReturnFalse(Module):
+
     """Always return false"""
 
     def event(self):
@@ -36,6 +38,7 @@ class ReturnFalse(Module):
 
 
 class PrintName(Module):
+
     """Print name in event"""
 
     def __init__(self, name):
@@ -111,7 +114,6 @@ main.add_module(PrintName("final"))
 process(main)
 
 B2INFO("second process() call follows...")
-#wee
 process(main)
 
 print main

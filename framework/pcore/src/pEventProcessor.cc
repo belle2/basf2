@@ -346,7 +346,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 
   bool createAllPaths = false; //usually we might not need e.g. an output path
   int stage = 0; //0: in, 1: event/main, 2: out
-  for (const ModulePtr & module : path->getModules()) {
+  for (const ModulePtr& module : path->getModules()) {
     bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
     //entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
@@ -456,7 +456,7 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
 ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
-  for (const ModulePtr & m : modules) {
+  for (const ModulePtr& m : modules) {
     if (m->hasProperties(flag))
       tmpModuleList.push_back(m);
   }
@@ -466,7 +466,7 @@ ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, 
 ModulePtrList pEventProcessor::getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
-  for (const ModulePtr & m : modules) {
+  for (const ModulePtr& m : modules) {
     if (!m->hasProperties(flag))
       tmpModuleList.push_back(m);
   }
@@ -475,7 +475,7 @@ ModulePtrList pEventProcessor::getModulesWithoutFlag(const ModulePtrList& module
 
 void pEventProcessor::prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules)
 {
-  for (const ModulePtr & m : prependModules) {
+  for (const ModulePtr& m : prependModules) {
     if (std::find(modules->begin(), modules->end(), m) == modules->end()) { //not present
       modules->push_front(m);
     }

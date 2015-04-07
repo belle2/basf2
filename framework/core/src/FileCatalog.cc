@@ -163,7 +163,8 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
   // check whether a file with this name is already registered
   for (auto entry : fileMap) {
     if (fileName.compare(entry.second.getLfn()) == 0) {
-      if (metaData.getId() <= 0) B2WARNING("A file " << fileName << " is already registered in with ID " << entry.first << " and will be overwritten in the catalog.");
+      if (metaData.getId() <= 0) B2WARNING("A file " << fileName << " is already registered in with ID " << entry.first <<
+                                             " and will be overwritten in the catalog.");
       fileMap.erase(entry.first);
       break;
     }

@@ -13,7 +13,7 @@ if len(sys.argv) < 2:
     sys.exit(0)
 
 
-#define main() for building executables
+# define main() for building executables
 maincc = tempfile.mkstemp(suffix='.cc')
 mainccfd = open(maincc[1], 'w+')
 mainccfd.write("int main() { return 0; }\n")
@@ -34,7 +34,7 @@ def checkLinks(subdir):
         if not lib.endswith('.so'):
             continue  # not a shared object
 
-        #try linking an executable with the given library
+        # try linking an executable with the given library
         tmpfile = tempfile.NamedTemporaryFile()
         try:
             os.system("g++ -o %s -L%s -l:%s %s" %

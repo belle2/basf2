@@ -70,7 +70,9 @@ namespace Belle2 {
     template< typename T> struct VariadicType<T> { /** type name. */ static std::string name() { return Type<T>::name(); } };
     /** Recursively convert multiple types to type names (used for tuples). */
     template< typename T, typename... Types> struct VariadicType {
-      /** type name. */ static std::string name() {
+      /** type name. */
+      static std::string name()
+      {
         return Type<T>::name() + ", " + VariadicType<Types...>::name();
       }
     };
@@ -212,7 +214,8 @@ namespace Belle2 {
       if (valueProxy.check()) {
         tmpValue = static_cast<Scalar>(valueProxy);
       } else {
-        throw std::runtime_error(std::string("Could not set module parameter: Expected type '") + Type<Scalar>::name() + "' instead of '" + pyObject.ptr()->ob_type->tp_name + "'.");
+        throw std::runtime_error(std::string("Could not set module parameter: Expected type '") + Type<Scalar>::name() + "' instead of '" +
+                                 pyObject.ptr()->ob_type->tp_name + "'.");
       }
       return tmpValue;
 
@@ -282,7 +285,8 @@ namespace Belle2 {
     {
       static const unsigned N = std::tuple_size<TupleType>::value;
       if ((unsigned)boost::python::len(pyTuple) != N) {
-        throw std::runtime_error(std::string("Given python tuple has length ") + std::to_string(boost::python::len(pyTuple)) + ", expected " + std::to_string(N));
+        throw std::runtime_error(std::string("Given python tuple has length ") + std::to_string(boost::python::len(
+                                   pyTuple)) + ", expected " + std::to_string(N));
       }
       SetTuple(tuple, pyTuple, SizeT<N>());
     }

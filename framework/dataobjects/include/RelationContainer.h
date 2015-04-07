@@ -57,7 +57,8 @@ namespace Belle2 {
     void setModified(bool modified)             { m_modified = modified; }
 
     /** Returns true if no information was set yet. */
-    bool isDefaultConstructed() const {
+    bool isDefaultConstructed() const
+    {
       return (m_fromName == "" and m_toName == ""
               and getEntries() == 0 and
               m_fromDurability == -1 and m_toDurability == -1);

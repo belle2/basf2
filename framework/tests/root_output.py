@@ -11,7 +11,7 @@ output = register_module('RootOutput')
 
 # Set module parameters
 params_eventinfosetter = {'expList': [1, 1], 'runList': [1, 2],
-                    'evtNumList': [100, 100]}
+                          'evtNumList': [100, 100]}
 eventinfosetter.param(params_eventinfosetter)
 
 output.param('outputFileName', 'root_output_test.root')

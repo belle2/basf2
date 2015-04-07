@@ -18,7 +18,8 @@ class TClass;
 
 namespace Belle2 {
 
-  typedef std::pair<std::string, DataStore::EDurability> AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
+  typedef std::pair<std::string, DataStore::EDurability>
+  AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
 
   /** Base class for StoreObjPtr and StoreArray for easier common treatment.
    *
@@ -47,7 +48,8 @@ namespace Belle2 {
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) {
+    bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut)
+    {
       return DataStore::Instance().registerEntry(m_name, m_durability, getClass(), isArray(), storeFlags);
     }
 
@@ -58,7 +60,8 @@ namespace Belle2 {
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) {
+    bool registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut)
+    {
       if (!name.empty())
         m_name = name;
       return DataStore::Instance().registerEntry(m_name, m_durability, getClass(), isArray(), storeFlags);
@@ -71,7 +74,8 @@ namespace Belle2 {
      *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerInDataStore("myName") in initialize(), this object will continue refer to 'myName' in event().
      *  @return            True if the object/array exists.
      */
-    bool isRequired(const std::string& name = "") {
+    bool isRequired(const std::string& name = "")
+    {
       if (!name.empty())
         m_name = name;
       return DataStore::Instance().requireInput(*this);
@@ -85,7 +89,8 @@ namespace Belle2 {
      *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerInDataStore("myName") in initialize(), this object will continue refer to 'myName' in event().
      *  @return            True if the object/array exists.
      */
-    bool isOptional(const std::string& name = "") {
+    bool isOptional(const std::string& name = "")
+    {
       if (!name.empty())
         m_name = name;
       return DataStore::Instance().optionalInput(*this);
@@ -98,7 +103,8 @@ namespace Belle2 {
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/
-    bool create(bool replace = false) {
+    bool create(bool replace = false)
+    {
       return DataStore::Instance().createObject(0, replace, *this);
     };
 
@@ -111,7 +117,8 @@ namespace Belle2 {
     bool assign(TObject* object, bool replace = false);
 
     /** Clear contents of this object. */
-    virtual void clear() {
+    virtual void clear()
+    {
       create(true);
     }
 
@@ -126,12 +133,14 @@ namespace Belle2 {
     AccessorParams getAccessorParams() const { return make_pair(m_name, m_durability);};
 
     /** Check if two store accessors point to the same object/array. */
-    virtual bool operator==(const StoreAccessorBase& other) {
+    virtual bool operator==(const StoreAccessorBase& other)
+    {
       return getAccessorParams() == other.getAccessorParams();
     }
 
     /** Check if two store accessors point to a different object/array. */
-    virtual bool operator!=(const StoreAccessorBase& other) {
+    virtual bool operator!=(const StoreAccessorBase& other)
+    {
       return !(*this == other);
     }
 

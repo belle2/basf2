@@ -46,7 +46,11 @@ namespace Belle2 {
     static const double rad;          /**< Standard of [angle] */
     static const double GeV;          /**< Standard of [energy, momentum, mass] */
     static const double K;            /**< Standard of [temperature] */
-    static const double T;            /**< Standard of [magnetic field], WARNING: This is inconsistent with the other standard units. Use TinStdUnits for conversion. */
+    /** Standard of [magnetic field].
+     *
+     * \warning This is inconsistent with the other standard units. Use TinStdUnits for conversion.
+     */
+    static const double T;
     static const double e;            /**< Standard of [electric charge] */
     static const double g_cm3;        /**< Standard of [density] */
 

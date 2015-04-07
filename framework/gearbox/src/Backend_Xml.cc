@@ -72,11 +72,13 @@ namespace Belle2 {
       if (!(this->ifctlXmlNS = xmlSearchNsByHref(this->doc, rootNode, (const xmlChar*) IFCTL_NAMESPACE_URI)))
         this->ifctlXmlNS = xmlNewNs(rootNode, (const xmlChar*) IFCTL_NAMESPACE_URI, (const xmlChar*)"ifctl");
 
-      const char* uniqueHashPropVal = (const char*) xmlGetNsProp(rootNode, (const xmlChar*) "uniqueHash", (const xmlChar*) IFCTL_NAMESPACE_URI);
+      const char* uniqueHashPropVal = (const char*) xmlGetNsProp(rootNode, (const xmlChar*) "uniqueHash",
+                                                                 (const xmlChar*) IFCTL_NAMESPACE_URI);
       if (uniqueHashPropVal != NULL)
         this->uniqueHash = std::string(uniqueHashPropVal);
       else {
-        (xmlNewProp(rootNode, (const xmlChar*)"uniqueHash", (const xmlChar*)(this->uniqueHash = genRandomString(GEARBOX_BACKEND_UNIQUEHASH_AUTOLENGTH)).c_str()))->ns = this->ifctlXmlNS;
+        (xmlNewProp(rootNode, (const xmlChar*)"uniqueHash",
+                    (const xmlChar*)(this->uniqueHash = genRandomString(GEARBOX_BACKEND_UNIQUEHASH_AUTOLENGTH)).c_str()))->ns = this->ifctlXmlNS;
       }
 
       if (boost::get<int>(this->params["disableUniqueIdCheck"]) != 1)
@@ -118,7 +120,8 @@ namespace Belle2 {
     void Backend_Xml::query(const std::string& xPath, QryResultSet& connectNode, std::string internalUpToPath, GBResult& theGBResult)
     {
 
-      B2INFO("Gearbox::Backend_Xml::query: received xPath '" + xPath + "' and connect to '" + getUniqueNodeId(connectNode) + "' at internal path '" + internalUpToPath + "'");
+      B2INFO("Gearbox::Backend_Xml::query: received xPath '" + xPath + "' and connect to '" + getUniqueNodeId(
+               connectNode) + "' at internal path '" + internalUpToPath + "'");
 
       if (internalUpToPath[internalUpToPath.length() - 1] == '/' && internalUpToPath.length() > 1)
         internalUpToPath.pop_back();
@@ -197,7 +200,8 @@ namespace Belle2 {
 
     }
 
-    QryResultSet& Backend_Xml::ensurePath(xmlNodePtr actNode, std::string& internalUpToPath, QryResultSet& mountPathNode, GBResult& theGBResult)
+    QryResultSet& Backend_Xml::ensurePath(xmlNodePtr actNode, std::string& internalUpToPath, QryResultSet& mountPathNode,
+                                          GBResult& theGBResult)
     {
 
       QryResultSet* ret;

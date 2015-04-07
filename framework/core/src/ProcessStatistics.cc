@@ -49,13 +49,14 @@ void ProcessStatistics::initModule(const Module* module)
   stats.setIndex(index);
 }
 
-string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode, const std::vector<ModuleStatistics>* modules) const
+string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounters mode,
+                                              const std::vector<ModuleStatistics>* modules) const
 {
   const ModuleStatistics& global = getGlobal();
   if (!modules) modules = &(getAll());
   int moduleNameLength = 21; //minimum: 80 characters
   const int lengthOfRest = 80 - moduleNameLength;
-  for (const ModuleStatistics & stats : *modules) {
+  for (const ModuleStatistics& stats : *modules) {
     int len = stats.getName().length();
     if (len > moduleNameLength)
       moduleNameLength = len;
@@ -74,7 +75,7 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
 
   ModuleStatistics::value_type maxcalls = 0;
-  for (const ModuleStatistics & stats : modulesSortedByIndex) {
+  for (const ModuleStatistics& stats : modulesSortedByIndex) {
     const ModuleStatistics::value_type calls = stats.getCalls(mode);
     if (calls > maxcalls)
       maxcalls = calls;
@@ -124,7 +125,8 @@ void ProcessStatistics::appendUnmergedModules(const ProcessStatistics* otherObje
     if (myStats.getName() == otherStats.getName()) {
       myStats.update(otherStats);
     } else {
-      B2ERROR("mismatch in module names in statistics (" << myStats.getName() << " vs. " << otherStats.getName() << "). ProcessStatistics::merge() can only merge statistics that contain exactly the same modules.");
+      B2ERROR("mismatch in module names in statistics (" << myStats.getName() << " vs. " << otherStats.getName() <<
+              "). ProcessStatistics::merge() can only merge statistics that contain exactly the same modules.");
     }
   }
 
@@ -178,7 +180,7 @@ void ProcessStatistics::setTransientCounters(const ProcessStatistics* otherObjec
 void ProcessStatistics::clear()
 {
   m_global.clear();
-  for (auto & stats : m_stats) { stats.clear(); }
+  for (auto& stats : m_stats) { stats.clear(); }
 }
 
 void ProcessStatistics::setCounters(double& time, double& memory,

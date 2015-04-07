@@ -28,7 +28,8 @@ namespace boost {
        * @param value The QryResultNode, whose value is to be fetched
        * @return the value of the QryResultNode
        */
-      boost::optional<external_type> get_value(const internal_type& value) {
+      boost::optional<external_type> get_value(const internal_type& value)
+      {
 
         boost::optional<external_type> res;
 
@@ -47,7 +48,8 @@ namespace boost {
        * @param value the value that is to be converted
        * @return the QryResultNode, that has been produced using that value
        */
-      internal_type put_value(const external_type& value) {
+      internal_type put_value(const external_type& value)
+      {
         return internal_type(Belle2::gearbox::nodeId_t(Belle2::gearbox::genRandomString(16)), Belle2::gearbox::nodeValue_t(value));
       }
 
@@ -101,7 +103,8 @@ namespace Belle2 {
        * @param The node, whose unique ID should be extracted
        * @return the unique node ID
        */
-      boost::optional<std::string> get_value(const QryResultNode& value) {
+      boost::optional<std::string> get_value(const QryResultNode& value)
+      {
         return boost::optional<std::string>(value.first);
       }
 
@@ -150,7 +153,8 @@ namespace Belle2 {
        * @param refNodeId for node existStates, that are related to another node (e.g. modify), the unique ID of it
        * @param isAttrib whether the submitted not is an attribute or not
        */
-      void submitNodeVariant(QryResultSet& parent, nodeExistenceState existState, const std::string label, const nodeValue_t value, const nodeId_t uniqueId, const nodeId_t refNodeId, const bool isAttrib);
+      void submitNodeVariant(QryResultSet& parent, nodeExistenceState existState, const std::string label, const nodeValue_t value,
+                             const nodeId_t uniqueId, const nodeId_t refNodeId, const bool isAttrib);
 
 
       /**
@@ -200,7 +204,9 @@ namespace Belle2 {
        * @param isAttrib whether the submitted not is an attribute or not
        */
       template <typename valueType>
-      void submitNode(QryResultSet& parent, nodeExistenceState existState, const std::string label, const valueType value, const nodeId_t uniqueId = genRandomString(16), const nodeId_t refNodeId = "", const bool isAttrib = false) {
+      void submitNode(QryResultSet& parent, nodeExistenceState existState, const std::string label, const valueType value,
+                      const nodeId_t uniqueId = genRandomString(16), const nodeId_t refNodeId = "", const bool isAttrib = false)
+      {
         this->submitNodeVariant(parent, existState, std::move(label), nodeValue_t(value), uniqueId, refNodeId, isAttrib);
       }
 
@@ -214,7 +220,9 @@ namespace Belle2 {
        * @return the QryResultObject, that references to the newly created node
        */
       template <typename valueType>
-      QryResultSet& createNode(QryResultSet& parent, std::string label, valueType value, nodeId_t uniqueId = genRandomString(16), bool isAttrib = false) {
+      QryResultSet& createNode(QryResultSet& parent, std::string label, valueType value, nodeId_t uniqueId = genRandomString(16),
+                               bool isAttrib = false)
+      {
         return this->createNodeVariant(parent, std::move(label), nodeValue_t(value), uniqueId, isAttrib);
       }
 

@@ -98,8 +98,10 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                   bool errorIfExisting = false) {
-      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
+                                   bool errorIfExisting = false)
+    {
+      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true,
+                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
 
     }
 
@@ -112,8 +114,10 @@ namespace Belle2 {
      *  @return            True if the registration succeeded.
      */
     static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = false) {
-      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true, DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
+                                  bool errorIfExisting = false)
+    {
+      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true,
+                                                 DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
     }
 
     /** Check whether an array was registered before.
@@ -124,7 +128,8 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of array in question.
      *  @return            True if the array exists.
      */
-    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+    static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
+    {
       std::string arrayName = DataStore::arrayName<T>(name);
       return DataStore::Instance().requireInput(StoreAccessorBase(arrayName, durability, T::Class(), true));
     }
@@ -138,7 +143,8 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of array in question.
      *  @return            True if the array exists.
      */
-    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+    static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
+    {
       std::string arrayName = DataStore::arrayName<T>(name);
       return DataStore::Instance().optionalInput(StoreAccessorBase(arrayName, durability, T::Class(), true));
     }
@@ -162,7 +168,9 @@ namespace Belle2 {
      * @param durability Durability of the relation.
      * @param storeFlags ORed combination of DataStore::EStoreFlag flags
      */
-    template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event, DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) const {
+    template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event,
+                                                DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) const
+    {
       return DataStore::Instance().registerRelation(*this, toArray, durability, storeFlags);
     }
 
@@ -174,7 +182,9 @@ namespace Belle2 {
      * @param durability Durability of the relation.
      * @return            True if the relations exists.
      */
-    template <class TO> bool requireRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event) const {
+    template <class TO> bool requireRelationTo(const StoreArray<TO>& toArray,
+                                               DataStore::EDurability durability = DataStore::c_Event) const
+    {
       return DataStore::Instance().requireRelation(*this, toArray, durability);
     }
 
@@ -187,7 +197,9 @@ namespace Belle2 {
      * @param durability Durability of the relation.
      * @return            True if the relations exists.
      */
-    template <class TO> bool optionalRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event) const {
+    template <class TO> bool optionalRelationTo(const StoreArray<TO>& toArray,
+                                                DataStore::EDurability durability = DataStore::c_Event) const
+    {
       return DataStore::Instance().optionalRelation(*this, toArray, durability);
     }
 
@@ -195,7 +207,8 @@ namespace Belle2 {
      *
      * TODO: currently produces dangling relations if any were created
      */
-    void clear() override {
+    void clear() override
+    {
       if (isValid())
         (*m_storeArray)->Delete();
     }
@@ -204,7 +217,8 @@ namespace Belle2 {
      *
      *  @return          True if the array exists.
      **/
-    inline bool isValid() const {
+    inline bool isValid() const
+    {
       ensureAttached();
       return m_storeArray && *m_storeArray;
     }
@@ -222,7 +236,8 @@ namespace Belle2 {
      *  \param i Array index, should be in 0..getEntries()-1
      *  \return pointer to the object
      */
-    inline T* operator [](int i) const {
+    inline T* operator [](int i) const
+    {
       ensureCreated();
       //At() checks for out-of-range and returns NULL in that case
       TObject* obj = (*m_storeArray)->At(i);
@@ -261,13 +276,15 @@ namespace Belle2 {
      *
      *  \return pointer to the created object
      */
-    template<class ...Args> T* appendNew(Args&& ... params) {
+    template<class ...Args> T* appendNew(Args&& ... params)
+    {
       return new(nextFreeAdress()) T(std::forward<Args>(params)...);
     }
 
 
     /** Return list of array names with matching type.  */
-    static std::vector<std::string> getArrayList(DataStore::EDurability durability = DataStore::c_Event) {
+    static std::vector<std::string> getArrayList(DataStore::EDurability durability = DataStore::c_Event)
+    {
       return DataStore::Instance().getListOfArrays(T::Class(), durability);
     }
 
@@ -296,13 +313,15 @@ namespace Belle2 {
      *
      *  \return pointer to address just past the last array element
      */
-    inline T* nextFreeAdress() {
+    inline T* nextFreeAdress()
+    {
       ensureCreated();
       return static_cast<T*>((*m_storeArray)->AddrAt(getEntries()));
     }
 
     /** Ensure that this object is attached. */
-    inline void ensureAttached() const {
+    inline void ensureAttached() const
+    {
       if (!m_storeArray) {
         const_cast<StoreArray*>(this)->m_storeArray = reinterpret_cast<TClonesArray**>(DataStore::Instance().getObject(*this));
       }
@@ -311,7 +330,8 @@ namespace Belle2 {
      *
      * Called automatically by write operations.
      */
-    inline void ensureCreated() const {
+    inline void ensureCreated() const
+    {
       if (!isValid()) {
         const_cast<StoreArray*>(this)->create();
       }

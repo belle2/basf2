@@ -23,7 +23,7 @@ from basf2 import *
 eventinfosetter = register_module('EventInfoSetter')
 
 evtrunlists = {'expList': [71, 71, 73, 73, 73], 'runList': [3, 4, 10, 20, 30],
-              'evtNumList': [4, 6, 2, 5, 3]}
+               'evtNumList': [4, 6, 2, 5, 3]}
 eventinfosetter.param(evtrunlists)
 
 # EventInfoPrinter - show event meta info

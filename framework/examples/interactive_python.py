@@ -6,6 +6,7 @@ from ROOT import Belle2
 
 
 class MinModule(Module):
+
     """
     Example module to drop into ipython and create some objects to look at.
     If you just want to start IPython and create PyStoreArray etc.

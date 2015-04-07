@@ -60,7 +60,7 @@ for stats in statistics.modules:
     for stat_counter, stat_name in statistic_counters:
         print ' -> %12s: %10.3f ms, %4d calls, %10.3f +-%10.3f ms/call' % (
             stat_name,
-            #Time is in the default time unit which happens to be ns
+            # Time is in the default time unit which happens to be ns
             stats.time_sum(stat_counter) / 1e6,
             stats.calls(stat_counter),
             stats.time_mean(stat_counter) / 1e6,
@@ -84,7 +84,7 @@ for stats in statistics.modules:
 stats = statistics.get(eventinfosetter)
 eventinfo_total = stats.time_sum(statistics.TOTAL)
 print 'EventInfoSetter needed %.3f ms in total' % (eventinfo_total / 1e6)
-#Now we can also set the name since we have the correct object
+# Now we can also set the name since we have the correct object
 stats.name = "FooBar"
 
 # Print total processing time

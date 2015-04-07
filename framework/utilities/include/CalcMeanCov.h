@@ -42,7 +42,8 @@ namespace Belle2 {
     typedef RealType value_type;
 
     /** Clear all values */
-    void clear() {
+    void clear()
+    {
       m_entries = 0;
       for (int i = 0; i < N; i++)
         m_mean[i] = 0;
@@ -56,7 +57,8 @@ namespace Belle2 {
      * @param values values for all parameters. The number of parameters
      * must be equal to N
      */
-    template<class... T> void addWeighted(value_type weight, T... values) {
+    template<class... T> void addWeighted(value_type weight, T... values)
+    {
       static_assert(sizeof...(values) == N,
                     "Number of arguments must be equal N");
       m_entries += weight;
@@ -67,12 +69,14 @@ namespace Belle2 {
      * @param values values for all parameters. The number of Parameters
      * must be equal to N
      */
-    template<class... T> void add(T... values) {
+    template<class... T> void add(T... values)
+    {
       addWeighted(1.0, values...);
     }
 
     /** Merge the data set in 'other' into this one. */
-    void add(const CalcMeanCov<N, RealType>& other) {
+    void add(const CalcMeanCov<N, RealType>& other)
+    {
       const value_type n = m_entries + other.m_entries;
       if (n == 0)
         return;
@@ -94,7 +98,8 @@ namespace Belle2 {
      * @param weight weight of entry
      * @param values pointer to the first value
      */
-    void addWeightedArray(value_type weight, value_type* values) {
+    void addWeightedArray(value_type weight, value_type* values)
+    {
       m_entries += weight;
       addArrayValues(weight, values);
     }
@@ -102,7 +107,8 @@ namespace Belle2 {
     /** Update mean and covariance by adding a new entry.
      * @param values pointer to the first value
      */
-    void addArray(value_type* values) {
+    void addArray(value_type* values)
+    {
       addWeightedArray(1.0, values);
     }
 
@@ -116,12 +122,14 @@ namespace Belle2 {
     /** Return the mean for parameter i */
     value_type getMean(int i) const { return m_mean[i]; }
     /** Return the covariance between parameters i and j */
-    value_type getCovariance(int i, int j) const {
+    value_type getCovariance(int i, int j) const
+    {
       if (m_entries == 0.0) return 0.0;
       return m_covariance[getIndex(i, j)] / m_entries;
     }
     /** Return the correlation coefficient between parameters i and j */
-    value_type getCorrelation(int i, int j) const {
+    value_type getCorrelation(int i, int j) const
+    {
       if (i == j) return 1.0;
       if (m_entries == 0.0) return 0.0;
       return getCovariance(i, j) / (getStddev(i) * getStddev(j));
@@ -142,33 +150,39 @@ namespace Belle2 {
     /**@{*/
 
     /** Return the mean for parameter i */
-    template <int i = 0> value_type getMean() const {
+    template <int i = 0> value_type getMean() const
+    {
       static_assert(i >= 0 && i < N, "index i out of range");
       return m_mean[i];
     }
     /** Return the covariance between parameters i and j */
-    template <int i, int j> value_type getCovariance() const {
+    template <int i, int j> value_type getCovariance() const
+    {
       static_assert(i >= 0 && i < N, "index i out of range");
       static_assert(j >= 0 && j < N, "index j out of range");
       if (m_entries == 0.0) return 0.0;
       return m_covariance[getIndex(i, j)] / m_entries;
     }
     /** Return the correlation coefficient between parameters i and j */
-    template <int i, int j> value_type getCorrelation() const {
+    template <int i, int j> value_type getCorrelation() const
+    {
       if (i == j) return 1.0;
       if (m_entries == 0.0) return 0.0;
       return getCovariance<i, j>() / (getStddev<i>() * getStddev<j>());
     }
     /** Return the variance for paramter i */
-    template <int i = 0> value_type getVariance() const {
+    template <int i = 0> value_type getVariance() const
+    {
       return getCovariance<i, i>();
     }
     /** Return the standard deviation for parameter i */
-    template <int i = 0> value_type getStddev() const {
+    template <int i = 0> value_type getStddev() const
+    {
       return std::sqrt(getVariance<i>());
     }
     /** Return the weighted sum values for parameter i */
-    template <int i = 0> value_type getSum() const {
+    template <int i = 0> value_type getSum() const
+    {
       return getMean<i>() * m_entries;
     }
 
@@ -185,7 +199,8 @@ namespace Belle2 {
      * @param values remaining values to be added recursively
      */
     template<int i, class... T>
-    void addValue(value_type weight, value_type x, T... values) {
+    void addValue(value_type weight, value_type x, T... values)
+    {
       const value_type delta = (x - m_mean[i]);
       //Update covariance elements
       updateCov<i, i>(weight, delta, x, values...);
@@ -208,7 +223,8 @@ namespace Belle2 {
      */
     template<int i, int j, class... T>
     void updateCov(value_type weight, value_type delta, value_type x,
-                   T... values) {
+                   T... values)
+    {
       const value_type delta2 = (x - m_mean[j]);
       m_covariance[getIndex(i, j)] += (m_entries - weight) * weight
                                       / m_entries * delta * delta2;
@@ -224,7 +240,8 @@ namespace Belle2 {
      * @param weight weight of the entry
      * @param x pointer to the actual values
      */
-    void addArrayValues(value_type weight, value_type* x) {
+    void addArrayValues(value_type weight, value_type* x)
+    {
       for (int i = 0; i < N; ++i) {
         const value_type delta = (x[i] - m_mean[i]);
         //Update covariance matrix
@@ -243,7 +260,8 @@ namespace Belle2 {
      * symmetric matrix including diagonal elements if the elements are
      * stored in a continous array of size n(n+1)/2
      */
-    constexpr int getIndex(unsigned int i, unsigned int j) const {
+    constexpr int getIndex(unsigned int i, unsigned int j) const
+    {
       //swap indices if i >= j
       return (i < j) ? ((j + 1) * j / 2 + i) : ((i + 1) * i / 2 + j);
     }

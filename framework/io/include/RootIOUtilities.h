@@ -33,7 +33,8 @@ namespace Belle2 {
      * @param excludeBranches branches that should never end up in output (takes precedence over everything else)
      * @param durability Durability being filtered (used for messages only)
      */
-    std::set<std::string> filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability);
+    std::set<std::string> filterBranches(const std::set<std::string>& branchesToFilter, const std::vector<std::string>& branches,
+                                         const std::vector<std::string>& excludeBranches, int durability);
 
     /** Performs wildcard expansion using wordexp(), returns matches. */
     std::vector<std::string> expandWordExpansions(const std::vector<std::string>& filenames);

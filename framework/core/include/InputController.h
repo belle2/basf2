@@ -70,7 +70,8 @@ namespace Belle2 {
     static std::string getCurrentFileName();
 
     /** Indicate that an event (in the given entry) was loaded and reset all members related to the next entry. */
-    static void eventLoaded(long entry) {
+    static void eventLoaded(long entry)
+    {
       s_nextEntry = -1;
       s_nextExperiment = -1;
       s_nextRun = -1;

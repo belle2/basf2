@@ -119,7 +119,8 @@ void RingBuffer::openSHM(int size)
     B2WARNING("RingBuffer: shmget(" << oldSizeBytes << ") failed, limiting to system maximum: " << sizeBytes);
     m_shmid = shmget(IPC_PRIVATE, sizeBytes, IPC_CREAT | 0600);
     if (m_shmid < 0) {
-      B2FATAL("RingBuffer: shmget(" << size * sizeof(int) << ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
+      B2FATAL("RingBuffer: shmget(" << size * sizeof(int) <<
+              ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     }
   }
   m_shmadr = (int*) shmat(m_shmid, 0, 0);
@@ -210,7 +211,8 @@ int RingBuffer::insq(const int* buf, int size)
     m_bufinfo->wptr = 0;
     m_bufinfo->rptr = 0;
     if (size > m_bufinfo->size + 2) {
-      throw std::runtime_error("[RingBuffer::insq ()] Inserted item (size: " + std::to_string(size) + ") is larger than RingBuffer (size: " + std::to_string(m_bufinfo->size + 2) + ")!");
+      throw std::runtime_error("[RingBuffer::insq ()] Inserted item (size: " + std::to_string(size) +
+                               ") is larger than RingBuffer (size: " + std::to_string(m_bufinfo->size + 2) + ")!");
       return -1;
     }
     m_bufinfo->mode = 0;

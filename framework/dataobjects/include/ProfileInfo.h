@@ -35,7 +35,8 @@ namespace Belle2 {
      *
      *  @return The memory size in kB.
      */
-    unsigned long getMemory() const {
+    unsigned long getMemory() const
+    {
       return m_memory;
     }
 
@@ -43,7 +44,8 @@ namespace Belle2 {
      *
      *  @return The time in seconds.
      */
-    double getTimeInSec() const {
+    double getTimeInSec() const
+    {
       return m_timeInSec;
     }
 

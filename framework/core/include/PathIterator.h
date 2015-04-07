@@ -30,7 +30,8 @@ namespace Belle2 {
       m_path(path),
       m_iter(path->m_elements.begin()),
       m_end(path->m_elements.end()),
-      m_parentIterator() {
+      m_parentIterator()
+    {
       descendIfNecessary();
     }
 
@@ -39,19 +40,22 @@ namespace Belle2 {
       m_path(path),
       m_iter(path->m_elements.begin()),
       m_end(path->m_elements.end()),
-      m_parentIterator(new PathIterator(parentIterator)) {
+      m_parentIterator(new PathIterator(parentIterator))
+    {
       descendIfNecessary();
     }
 
     /** increment. */
-    void next() {
+    void next()
+    {
       if (!isDone())
         ++m_iter;
       descendIfNecessary();
     }
 
     /** Check if we're pointing to another path and descend if that is the case. */
-    void descendIfNecessary() {
+    void descendIfNecessary()
+    {
       if (!isDone() and dynamic_cast<Path*>(m_iter->get())) {
         //we're pointing to another Path
         *this = PathIterator(boost::static_pointer_cast<Path>(*m_iter), *this);

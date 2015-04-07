@@ -21,7 +21,7 @@ namespace Belle2 {
 
     Tree::~Tree()
     {
-      for (const auto & i : node_data_map) {
+      for (const auto& i : node_data_map) {
         delete i.second;
       }
       if (doc_) {

@@ -17,7 +17,8 @@ namespace Belle2 {
       virtual DataType type() const;
 
       /** @return The the datum stored in the node. */
-      inline ConfigInt value() const MUST_USE_RESULT {
+      inline ConfigInt value() const MUST_USE_RESULT
+      {
         return value_;
       };
 

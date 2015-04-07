@@ -13,7 +13,8 @@ namespace {
   class RelationConsolidateTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       evtData = new StoreArray<EventMetaData>;
       profileData = new StoreArray<ProfileInfo>;
       DataStore::Instance().setInitializeActive(true);
@@ -37,7 +38,8 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
       delete evtData;
       delete profileData;

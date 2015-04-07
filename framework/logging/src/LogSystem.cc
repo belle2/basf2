@@ -189,7 +189,7 @@ void LogSystem::printErrorSummary()
   std::vector<LogMessage> uniqueLog;
   uniqueLog.reserve(100);
 
-  for (const LogMessage & msg : m_errorLog) {
+  for (const LogMessage& msg : m_errorLog) {
     int count = errorCount[msg]++;
 
     if (count == 0) //this is the first time we see this message
@@ -197,7 +197,7 @@ void LogSystem::printErrorSummary()
   }
   m_errorLog.clear();
 
-  for (const LogMessage & msg : uniqueLog) {
+  for (const LogMessage& msg : uniqueLog) {
     sendMessage(msg);
 
     int count = errorCount[msg];

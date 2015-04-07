@@ -108,7 +108,8 @@ namespace Belle2 {
      *                    the given types
      *  @param durability Durabiliy of the relation
      */
-    explicit RelationIndex(const std::string& name = (DataStore::defaultRelationName<FROM, TO>()), DataStore::EDurability durability = DataStore::c_Event):
+    explicit RelationIndex(const std::string& name = (DataStore::defaultRelationName<FROM, TO>()),
+                           DataStore::EDurability durability = DataStore::c_Event):
       m_index(RelationIndexManager::Instance().get<FROM, TO>(RelationArray(name, durability))),
       m_from(m_index->index().template get<0>()),
       m_to(m_index->index().template get<1>()) {}
@@ -194,7 +195,8 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstElementFrom(const FROM* from) const {
+    const Element* getFirstElementFrom(const FROM* from) const
+    {
       iterator_from it = m_from.find(from);
       if (it == m_from.end()) return 0;
       return &(*it);
@@ -216,7 +218,8 @@ namespace Belle2 {
      *  @returns Pointer to the RelationIndex<FROM,TO>::Element, can be
      *           NULL if no relation exists
      */
-    const Element* getFirstElementTo(const TO* to) const {
+    const Element* getFirstElementTo(const TO* to) const
+    {
       iterator_to it = m_to.find(to);
       if (it == m_to.end()) return 0;
       return &(*it);

@@ -283,8 +283,8 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
     //Check for a module condition, evaluate it and if it is true switch to a new path
     if (module->evalCondition()) {
       PathPtr condPath = module->getConditionPath();
-      if (module->getAfterConditionPath() ==
-          Module::EAfterConditionPath::c_Continue) { //continue with parent Path after condition path is executed?
+      //continue with parent Path after condition path is executed?
+      if (module->getAfterConditionPath() == Module::EAfterConditionPath::c_Continue) {
         moduleIter = PathIterator(condPath, moduleIter);
       } else {
         moduleIter = PathIterator(condPath);

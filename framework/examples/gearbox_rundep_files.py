@@ -20,9 +20,9 @@ eventinfosetter.param({
 
 gearbox = register_module("Gearbox")
 gearbox.param({
-    #For each xml file "foo/bar.xml" requested the gearbox will look for
+    # For each xml file "foo/bar.xml" requested the gearbox will look for
     "backends": [
-        #rundata-071-0003/foo/bar.xml{.gz}
+        # rundata-071-0003/foo/bar.xml{.gz}
         "file:rundata-{EXP:3}-{RUN:4}/",
         # {EXP} and {RUN} will be replaced by actual exp/run number
         # {EXP:n} and {RUN:n} will be replaced with exp/run number with n
@@ -32,16 +32,16 @@ gearbox.param({
         #   rundata-071-0003/foo-bar.xml{.gz}
         #   rundata-071-0003-foo-bar.xml{.gz}
 
-        #$BELLE2_RUN_DIR/data/foo/bar.xml{.gz}
+        # $BELLE2_RUN_DIR/data/foo/bar.xml{.gz}
         "file:"
     ],
 })
-#If it cannot find the file in the first backend it will fall back to the
+# If it cannot find the file in the first backend it will fall back to the
 # second and so on, e.g. one could have a
 # rundata-071-0003-pxd-PXD-Alignment.xml
 # to override the pxd/PXD-Alignment.xml
 
-#LogLevel.INFO will print all filenames if opend by a run-dependent backend
+# LogLevel.INFO will print all filenames if opend by a run-dependent backend
 gearbox.set_log_level(LogLevel.INFO)
 
 main = create_path()

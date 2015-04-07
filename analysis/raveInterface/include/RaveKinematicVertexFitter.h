@@ -26,6 +26,8 @@
 #include <rave/Track.h>
 #include <rave/KinematicTree.h>
 
+#include <iostream>
+
 namespace Belle2 {
 
   namespace analysis {
@@ -75,7 +77,8 @@ namespace Belle2 {
       TMatrixDSym getVertexErrorMatrix();
 
       /** Overwrite the global option in ReveSetup that tells the fitter if beam spot info should be used or not. The beam spot pos and cov must still be set in the RaveSetup class if you what to use it */
-      void useBeamSpot(bool beamSpot = true) {
+      void useBeamSpot(bool beamSpot = true)
+      {
         if (beamSpot == true) {
           if (RaveSetup::getRawInstance()->m_useBeamSpot == false) {
             B2ERROR("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
@@ -94,7 +97,8 @@ namespace Belle2 {
       void updateMother();
 
       /** Delete all information of previously added tracks and fitted results*/
-      void clearTracks() {
+      void clearTracks()
+      {
         m_inputParticles.clear();
         m_motherParticlePtr = NULL;
       }
@@ -106,7 +110,8 @@ namespace Belle2 {
       void setVertFit(bool isVertFit = true);
 
       /** Print all attributes of this object to terminal*/
-      void Print() const {
+      void Print() const
+      {
         std::cout << "useBeamSpot: " << m_useBeamSpot << std::endl;
         std::cout << "number of rave::Tracks: " << m_inputParticles.size() << std::endl;
       }

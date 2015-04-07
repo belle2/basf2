@@ -9,11 +9,8 @@
 //-
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <framework/datastore/DataStore.h>
-
 #include <TObject.h>
+
 
 namespace Belle2 {
 

@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/UncertainHelix.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 
 using namespace Belle2;
 
@@ -82,4 +85,14 @@ TMatrixDSym TrackFitResult::getCovariance5() const
   }
   assert(counter == c_NCovEntries);
   return cov5;
+}
+
+HitPatternCDC TrackFitResult::getHitPatternCDC() const
+{
+  return HitPatternCDC(m_hitPatternCDCInitializer);
+}
+
+HitPatternVXD TrackFitResult::getHitPatternVXD() const
+{
+  return HitPatternVXD(m_hitPatternVXDInitializer);
 }

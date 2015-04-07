@@ -22,6 +22,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -93,11 +95,16 @@ void TrackingPerformanceEvaluationModule::initialize()
 
   //multiplicity histograms
   m_multiplicityTracks = createHistogram1D("h1nTrk", "number of tracks per MC Particle", 8, -0.5, 7.5, "# tracks", m_histoList);
-  m_multiplicityFittedTracks = createHistogram1D("h1nFitTrk", "number of fitted tracks per MC Particle", 5, -0.5, 4.5, "# fitted tracks", m_histoList);
-  m_multiplicityFittedTracksPerMCTC = createHistogram1D("h1nFitTrkMCTC", "number of fitted tracks per MCTrackCand", 5, -0.5, 4.5, "# fitted tracks", m_histoList);
-  m_multiplicityMCParticles = createHistogram1D("h1nMCPrtcl", "number of MCParticles per fitted tracks", 5, -0.5, 4.5, "# MCParticles", m_histoList);
-  m_multiplicityTrackCands = createHistogram1D("h1nTrackCand", "number of TrackCand per MCTrackCand", 5, -0.5, 4.5, "# TrackCand", m_histoList);
-  m_multiplicityMCTrackCands = createHistogram1D("h1nMCTrackCand", "number of MCTrackCand per TrackCand", 5, -0.5, 4.5, "# MCTrackCand", m_histoList);
+  m_multiplicityFittedTracks = createHistogram1D("h1nFitTrk", "number of fitted tracks per MC Particle", 5, -0.5, 4.5,
+                                                 "# fitted tracks", m_histoList);
+  m_multiplicityFittedTracksPerMCTC = createHistogram1D("h1nFitTrkMCTC", "number of fitted tracks per MCTrackCand", 5, -0.5, 4.5,
+                                                        "# fitted tracks", m_histoList);
+  m_multiplicityMCParticles = createHistogram1D("h1nMCPrtcl", "number of MCParticles per fitted tracks", 5, -0.5, 4.5,
+                                                "# MCParticles", m_histoList);
+  m_multiplicityTrackCands = createHistogram1D("h1nTrackCand", "number of TrackCand per MCTrackCand", 5, -0.5, 4.5, "# TrackCand",
+                                               m_histoList);
+  m_multiplicityMCTrackCands = createHistogram1D("h1nMCTrackCand", "number of MCTrackCand per TrackCand", 5, -0.5, 4.5,
+                                                 "# MCTrackCand", m_histoList);
 
   //track parameters errors
   m_h1_d0_err = createHistogram1D("h1d0err", "d0 error", 100, 0, 0.1, "#sigma_{d0} (cm)", m_histoList);
@@ -140,16 +147,23 @@ void TrackingPerformanceEvaluationModule::initialize()
   //hits used in the fit
 
 
-  m_h2_TrackPointFitWeightVXD = createHistogram2D("h2TPFitWeightVXD", "VXD TrackPoint Fit Weight", 6, 0.5, 6.5, "VXD layer", 20, 0, 1, "weight", m_histoList);
-  m_h2_TrackPointFitWeightCDC = createHistogram2D("h2TPFitWeightCDC", "CDC TrackPoint Fit Weight", 56, -0.5, 55.5, "CDC layer", 20, 0, 1, "weight", m_histoList);
+  m_h2_TrackPointFitWeightVXD = createHistogram2D("h2TPFitWeightVXD", "VXD TrackPoint Fit Weight", 6, 0.5, 6.5, "VXD layer", 20, 0, 1,
+                                                  "weight", m_histoList);
+  m_h2_TrackPointFitWeightCDC = createHistogram2D("h2TPFitWeightCDC", "CDC TrackPoint Fit Weight", 56, -0.5, 55.5, "CDC layer", 20, 0,
+                                                  1, "weight", m_histoList);
 
   m_h1_nHitDetID = createHistogram1D("h1nHitDetID", "detector ID per hit", 4, -0.5, 3.5, "0=PXD, 1=SVD2D, 2=SVD,3=CDC", m_histoList);
-  m_h1_nCDChitsPR = createHistogram1D("h1nCDCHitsPR", "number of CDC hits from PR per Layer", 56, -0.5, 55.5, "CDC Layer", m_histoList);
-  m_h1_nCDChitsWeighted = (TH1F*)duplicateHistogram("h1nCDCHitsWeighted", "CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList);
-  m_h1_nCDChitsUsed = (TH1F*)duplicateHistogram("h1nCDCHitsUsed", "approximated number of CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList);
+  m_h1_nCDChitsPR = createHistogram1D("h1nCDCHitsPR", "number of CDC hits from PR per Layer", 56, -0.5, 55.5, "CDC Layer",
+                                      m_histoList);
+  m_h1_nCDChitsWeighted = (TH1F*)duplicateHistogram("h1nCDCHitsWeighted", "CDC hits used in the fit per Layer, weighted",
+                                                    m_h1_nCDChitsPR, m_histoList);
+  m_h1_nCDChitsUsed = (TH1F*)duplicateHistogram("h1nCDCHitsUsed",
+                                                "approximated number of CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList);
   m_h1_nVXDhitsPR = createHistogram1D("h1nVXDHitsPR", "number of VXD hits from PR per Layer", 6, 0.5, 6.5, "VXD Layer", m_histoList);
-  m_h1_nVXDhitsWeighted = (TH1F*)duplicateHistogram("h1nVXDHitsWeighted", "number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList);
-  m_h1_nVXDhitsUsed = (TH1F*)duplicateHistogram("h1nVXDHitsUsed", "approximate number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList);
+  m_h1_nVXDhitsWeighted = (TH1F*)duplicateHistogram("h1nVXDHitsWeighted", "number of VXD hits used in the fit per Layer, weighted",
+                                                    m_h1_nVXDhitsPR, m_histoList);
+  m_h1_nVXDhitsUsed = (TH1F*)duplicateHistogram("h1nVXDHitsUsed",
+                                                "approximate number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList);
   m_h2_VXDhitsPR_xy = createHistogram2D("h2hitsPRXY", "Pattern Recognition hits, transverse plane",
                                         2000, -15, 15, "x (cm)",
                                         2000, -15, 15, "y (cm)",
@@ -168,18 +182,22 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      100, 0, 0.1, "#sigma_{z0} (cm)",
                                      m_histoList);
 
-  m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt, m_histoList);
+  m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt,
+                                                  m_histoList);
 
-  m_h2_z0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits", m_h2_z0errVSpt, m_histoList);
+  m_h2_z0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits", m_h2_z0errVSpt,
+                                                   m_histoList);
 
   m_h2_d0errVSpt = createHistogram2D("h2d0errVSpt", "#sigma_{d0} VS p_{t}",
                                      100, 0, 2, "p_{t} (GeV/c)",
                                      100, 0, 0.1, "#sigma_{d0} (cm)",
                                      m_histoList);
 
-  m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt, m_histoList);
+  m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt,
+                                                  m_histoList);
 
-  m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt, m_histoList);
+  m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt,
+                                                   m_histoList);
 
   m_h2_d0errMSVSpt = createHistogram2D("h2d0errMSVSpt", "#sigma_{d0} * #betapsin^{3/2}#theta VS p_{t}",
                                        50, 0, 2.5, "p_{t} (GeV/c)",
@@ -247,9 +265,11 @@ void TrackingPerformanceEvaluationModule::initialize()
                                                               m_h3_MCParticle /*, m_histoList*/);
 
   //histograms to produce efficiency plots
-  m_h1_HitsTrackCandPerMCTrackCand = createHistogram1D("h1hitsTCperMCTC", "TrackCand per MCTrackCand Hit in VXD layers", 6, 0.5, 6.5, "# VXD layer" /*, m_histoList*/);
+  m_h1_HitsTrackCandPerMCTrackCand = createHistogram1D("h1hitsTCperMCTC", "TrackCand per MCTrackCand Hit in VXD layers", 6, 0.5, 6.5,
+                                                       "# VXD layer" /*, m_histoList*/);
 
-  m_h1_HitsMCTrackCand = (TH1F*) duplicateHistogram("h1hitsMCTC", " MCTrackCand Hit in VXD layers", m_h1_HitsTrackCandPerMCTrackCand /*,  m_histoList*/);
+  m_h1_HitsMCTrackCand = (TH1F*) duplicateHistogram("h1hitsMCTC", " MCTrackCand Hit in VXD layers",
+                                                    m_h1_HitsTrackCandPerMCTrackCand /*,  m_histoList*/);
 
 
   //histograms to produce purity plots
@@ -304,7 +324,8 @@ void TrackingPerformanceEvaluationModule::event()
     //1. retrieve all the Tracks related to the MCParticle
 
     //1.0 check if there is an MCTrackCand
-    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle, m_MCTrackCandsName);
+    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle,
+        m_MCTrackCandsName);
     if (MCTrackCands_fromMCParticle.size() > 0) {
       m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
 
@@ -466,7 +487,8 @@ void TrackingPerformanceEvaluationModule::event()
     for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) {
 
       //3.b retrieve all TrackCands related to the MCTrackCand
-      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(MCParticles_fromMCTrackCand[mcp]);
+      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
+          (MCParticles_fromMCTrackCand[mcp]);
 
       B2DEBUG(99, "~~~~~ " << TrackCands_fromMCParticle.size() << " TrackCands related to this MCParticle");
       for (int tc = 0; tc < (int)TrackCands_fromMCParticle.size(); tc++)
@@ -531,7 +553,8 @@ void TrackingPerformanceEvaluationModule::event()
     for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++) {
 
       //4.b retrieve all MCTrackCands related to the TrackCand
-      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(MCParticles_fromTrackCand[mcp], m_MCTrackCandsName);
+      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
+          (MCParticles_fromTrackCand[mcp], m_MCTrackCandsName);
 
       B2DEBUG(99, "~~~~~ " << mcTrackCands_fromMCParticle.size() << " MCTrackCands related to this MCParticle");
       for (int mctc = 0; mctc < (int)mcTrackCands_fromMCParticle.size(); mctc++) {
@@ -853,7 +876,8 @@ TH1F* TrackingPerformanceEvaluationModule::createHistogramsRatio(const char* nam
 
 }
 
-void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const TrackFitResult* fitResult, MCParticleInfo mcParticleInfo)
+void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const TrackFitResult* fitResult,
+    MCParticleInfo mcParticleInfo)
 {
 
   //track parameters errors
@@ -1073,23 +1097,29 @@ void TrackingPerformanceEvaluationModule::addInefficiencyPlots(TList* histoList)
 {
 
   //normalized to MCParticles
-  TH1F* h_ineff_pt = createHistogramsRatio("hineffpt", "inefficiency VS pt, normalized to MCParticles", m_h3_TracksPerMCParticle, m_h3_MCParticle, false, 0);
+  TH1F* h_ineff_pt = createHistogramsRatio("hineffpt", "inefficiency VS pt, normalized to MCParticles", m_h3_TracksPerMCParticle,
+                                           m_h3_MCParticle, false, 0);
   histoList->Add(h_ineff_pt);
 
-  TH1F* h_ineff_theta = createHistogramsRatio("hinefftheta", "inefficiency VS #theta, normalized to MCParticles", m_h3_TracksPerMCParticle, m_h3_MCParticle, false, 1);
+  TH1F* h_ineff_theta = createHistogramsRatio("hinefftheta", "inefficiency VS #theta, normalized to MCParticles",
+                                              m_h3_TracksPerMCParticle, m_h3_MCParticle, false, 1);
   histoList->Add(h_ineff_theta);
 
-  TH1F* h_ineff_phi = createHistogramsRatio("hineffphi", "inefficiency VS #phi, normalized to MCParticles", m_h3_TracksPerMCParticle, m_h3_MCParticle, false, 2);
+  TH1F* h_ineff_phi = createHistogramsRatio("hineffphi", "inefficiency VS #phi, normalized to MCParticles", m_h3_TracksPerMCParticle,
+                                            m_h3_MCParticle, false, 2);
   histoList->Add(h_ineff_phi);
 
   //normalized to MCTrackCands
-  TH1F* h_ineffMCTC_pt = createHistogramsRatio("hineffMCTCpt", "inefficiency VS pt, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 0);
+  TH1F* h_ineffMCTC_pt = createHistogramsRatio("hineffMCTCpt", "inefficiency VS pt, normalized to MCTrackCand",
+                                               m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 0);
   histoList->Add(h_ineffMCTC_pt);
 
-  TH1F* h_ineffMCTC_theta = createHistogramsRatio("hineffMCTCtheta", "inefficiency VS #theta, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 1);
+  TH1F* h_ineffMCTC_theta = createHistogramsRatio("hineffMCTCtheta", "inefficiency VS #theta, normalized to MCTrackCand",
+                                                  m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 1);
   histoList->Add(h_ineffMCTC_theta);
 
-  TH1F* h_ineffMCTC_phi = createHistogramsRatio("hineffMCTCphi", "inefficiency VS #phi, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 2);
+  TH1F* h_ineffMCTC_phi = createHistogramsRatio("hineffMCTCphi", "inefficiency VS #phi, normalized to MCTrackCand",
+                                                m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 2);
   histoList->Add(h_ineffMCTC_phi);
 
 }
@@ -1100,81 +1130,102 @@ void TrackingPerformanceEvaluationModule::addEfficiencyPlots(TList* histoList)
 
 
   //normalized to MCParticles
-  TH1F* h_eff_pt = createHistogramsRatio("heffpt", "efficiency VS pt, normalized to MCParticles", m_h3_TracksPerMCParticle, m_h3_MCParticle, true, 0);
+  TH1F* h_eff_pt = createHistogramsRatio("heffpt", "efficiency VS pt, normalized to MCParticles", m_h3_TracksPerMCParticle,
+                                         m_h3_MCParticle, true, 0);
   histoList->Add(h_eff_pt);
   //  B2INFO(" efficiency in pt, NUM =  "<<m_nFittedTracks<<", DEN = "<<m_nMCParticles<<", eff integrata = "<<(double)m_nFittedTracks/m_nMCParticles);
 
-  TH1F* h_eff_theta = createHistogramsRatio("hefftheta", "efficiency VS #theta, normalized to MCParticles", m_h3_TracksPerMCParticle, m_h3_MCParticle, true, 1);
+  TH1F* h_eff_theta = createHistogramsRatio("hefftheta", "efficiency VS #theta, normalized to MCParticles", m_h3_TracksPerMCParticle,
+                                            m_h3_MCParticle, true, 1);
   histoList->Add(h_eff_theta);
 
-  TH1F* h_eff_phi = createHistogramsRatio("heffphi", "efficiency VS #phi, normalized to MCParticles", m_h3_TracksPerMCParticle, m_h3_MCParticle, true, 2);
+  TH1F* h_eff_phi = createHistogramsRatio("heffphi", "efficiency VS #phi, normalized to MCParticles", m_h3_TracksPerMCParticle,
+                                          m_h3_MCParticle, true, 2);
   histoList->Add(h_eff_phi);
 
   //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt = createHistogramsRatio("heffMCTCpt", "efficiency VS pt, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 0);
+  TH1F* h_effMCTC_pt = createHistogramsRatio("heffMCTCpt", "efficiency VS pt, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand,
+                                             m_h3_MCTrackCand, true, 0);
   histoList->Add(h_effMCTC_pt);
 
-  TH1F* h_effMCTC_theta = createHistogramsRatio("heffMCTCtheta", "efficiency VS #theta, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 1);
+  TH1F* h_effMCTC_theta = createHistogramsRatio("heffMCTCtheta", "efficiency VS #theta, normalized to MCTrackCand",
+                                                m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 1);
   histoList->Add(h_effMCTC_theta);
 
-  TH1F* h_effMCTC_phi = createHistogramsRatio("heffMCTCphi", "efficiency VS #phi, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 2);
+  TH1F* h_effMCTC_phi = createHistogramsRatio("heffMCTCphi", "efficiency VS #phi, normalized to MCTrackCand",
+                                              m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 2);
   histoList->Add(h_effMCTC_phi);
 
   // plus
 
   //normalized to MCParticles
-  TH1F* h_eff_pt_plus = createHistogramsRatio("heffpt_plus", "efficiency VS pt, normalized to positive MCParticles", m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 0);
+  TH1F* h_eff_pt_plus = createHistogramsRatio("heffpt_plus", "efficiency VS pt, normalized to positive MCParticles",
+                                              m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 0);
   histoList->Add(h_eff_pt_plus);
   //  B2INFO(" efficiency in pt, NUM =  "<<m_nFittedTracks<<", DEN = "<<m_nMCParticles<<", eff integrata = "<<(double)m_nFittedTracks/m_nMCParticles);
 
-  TH1F* h_eff_theta_plus = createHistogramsRatio("hefftheta_plus", "efficiency VS #theta, normalized to positive MCParticles", m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 1);
+  TH1F* h_eff_theta_plus = createHistogramsRatio("hefftheta_plus", "efficiency VS #theta, normalized to positive MCParticles",
+                                                 m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 1);
   histoList->Add(h_eff_theta_plus);
 
-  TH1F* h_eff_phi_plus = createHistogramsRatio("heffphi_plus", "efficiency VS #phi, normalized to positive  MCParticles", m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 2);
+  TH1F* h_eff_phi_plus = createHistogramsRatio("heffphi_plus", "efficiency VS #phi, normalized to positive  MCParticles",
+                                               m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 2);
   histoList->Add(h_eff_phi_plus);
 
   //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt_plus = createHistogramsRatio("heffMCTCpt_plus", "efficiency VS pt, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 0);
+  TH1F* h_effMCTC_pt_plus = createHistogramsRatio("heffMCTCpt_plus", "efficiency VS pt, normalized to positive MCTrackCand",
+                                                  m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 0);
   histoList->Add(h_effMCTC_pt_plus);
 
-  TH1F* h_effMCTC_theta_plus = createHistogramsRatio("heffMCTCtheta_plus", "efficiency VS #theta, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 1);
+  TH1F* h_effMCTC_theta_plus = createHistogramsRatio("heffMCTCtheta_plus", "efficiency VS #theta, normalized to positive MCTrackCand",
+                                                     m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 1);
   histoList->Add(h_effMCTC_theta_plus);
 
-  TH1F* h_effMCTC_phi_plus = createHistogramsRatio("heffMCTCphi_plus", "efficiency VS #phi, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 2);
+  TH1F* h_effMCTC_phi_plus = createHistogramsRatio("heffMCTCphi_plus", "efficiency VS #phi, normalized to positive MCTrackCand",
+                                                   m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 2);
   histoList->Add(h_effMCTC_phi_plus);
 
   // minus
 
   //normalized to MCParticles
-  TH1F* h_eff_pt_minus = createHistogramsRatio("heffpt_minus", "efficiency VS pt, normalized to positive MCParticles", m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 0);
+  TH1F* h_eff_pt_minus = createHistogramsRatio("heffpt_minus", "efficiency VS pt, normalized to positive MCParticles",
+                                               m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 0);
   histoList->Add(h_eff_pt_minus);
   //  B2INFO(" efficiency in pt, NUM =  "<<m_nFittedTracks<<", DEN = "<<m_nMCParticles<<", eff integrata = "<<(double)m_nFittedTracks/m_nMCParticles);
 
-  TH1F* h_eff_theta_minus = createHistogramsRatio("hefftheta_minus", "efficiency VS #theta, normalized to positive MCParticles", m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 1);
+  TH1F* h_eff_theta_minus = createHistogramsRatio("hefftheta_minus", "efficiency VS #theta, normalized to positive MCParticles",
+                                                  m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 1);
   histoList->Add(h_eff_theta_minus);
 
-  TH1F* h_eff_phi_minus = createHistogramsRatio("heffphi_minus", "efficiency VS #phi, normalized to positive  MCParticles", m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 2);
+  TH1F* h_eff_phi_minus = createHistogramsRatio("heffphi_minus", "efficiency VS #phi, normalized to positive  MCParticles",
+                                                m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 2);
   histoList->Add(h_eff_phi_minus);
 
   //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt_minus = createHistogramsRatio("heffMCTCpt_minus", "efficiency VS pt, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 0);
+  TH1F* h_effMCTC_pt_minus = createHistogramsRatio("heffMCTCpt_minus", "efficiency VS pt, normalized to positive MCTrackCand",
+                                                   m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 0);
   histoList->Add(h_effMCTC_pt_minus);
 
-  TH1F* h_effMCTC_theta_minus = createHistogramsRatio("heffMCTCtheta_minus", "efficiency VS #theta, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 1);
+  TH1F* h_effMCTC_theta_minus = createHistogramsRatio("heffMCTCtheta_minus",
+                                                      "efficiency VS #theta, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 1);
   histoList->Add(h_effMCTC_theta_minus);
 
-  TH1F* h_effMCTC_phi_minus = createHistogramsRatio("heffMCTCphi_minus", "efficiency VS #phi, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 2);
+  TH1F* h_effMCTC_phi_minus = createHistogramsRatio("heffMCTCphi_minus", "efficiency VS #phi, normalized to positive MCTrackCand",
+                                                    m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 2);
   histoList->Add(h_effMCTC_phi_minus);
 
   //pattern recognition efficiency
-  TH1F* h_effPR = createHistogramsRatio("heffPR", "PR efficiency VS VXD Layer, normalized to MCTrackCand", m_h1_HitsTrackCandPerMCTrackCand, m_h1_HitsMCTrackCand, true, 0);
+  TH1F* h_effPR = createHistogramsRatio("heffPR", "PR efficiency VS VXD Layer, normalized to MCTrackCand",
+                                        m_h1_HitsTrackCandPerMCTrackCand, m_h1_HitsMCTrackCand, true, 0);
   histoList->Add(h_effPR);
 
   //tracks used in the fit
-  TH1F* h_effVXDHitFit = createHistogramsRatio("heffVXDHitFit", "weighted hits used in the fit VS VXD Layer, normalized to hits form PR", m_h1_nVXDhitsWeighted, m_h1_nVXDhitsPR, true, 0);
+  TH1F* h_effVXDHitFit = createHistogramsRatio("heffVXDHitFit",
+                                               "weighted hits used in the fit VS VXD Layer, normalized to hits form PR", m_h1_nVXDhitsWeighted, m_h1_nVXDhitsPR, true, 0);
   histoList->Add(h_effVXDHitFit);
 
-  TH1F* h_effCDCHitFit = createHistogramsRatio("heffCDCHitFit", "weighted hits used in the fit VS CDC Layer, normalized to hits form PR", m_h1_nCDChitsWeighted, m_h1_nCDChitsPR, true, 0);
+  TH1F* h_effCDCHitFit = createHistogramsRatio("heffCDCHitFit",
+                                               "weighted hits used in the fit VS CDC Layer, normalized to hits form PR", m_h1_nCDChitsWeighted, m_h1_nCDChitsPR, true, 0);
   histoList->Add(h_effCDCHitFit);
 
 }

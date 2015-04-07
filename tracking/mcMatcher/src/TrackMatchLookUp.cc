@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationEntry.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;

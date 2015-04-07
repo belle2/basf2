@@ -12,7 +12,7 @@
 #define TRGSUMMARY_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/gearbox/Const.h>
+//#include <framework/gearbox/Const.h>
 
 
 namespace Belle2 {
@@ -38,7 +38,8 @@ namespace Belle2 {
     TRGSummary(unsigned int inputBits[10],
                unsigned int ftdlBits[10],
                unsigned int psnmBits[10],
-               unsigned int timTypeBits) {
+               unsigned int timTypeBits)
+    {
       for (int i = 0; i < 10; i++) {
         m_inputBits[i] = inputBits[i];
         m_ftdlBits[i] = ftdlBits[i];
@@ -60,7 +61,8 @@ namespace Belle2 {
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
      * @return     input bits
      */
-    unsigned int getInputBits(const unsigned i) const {
+    unsigned int getInputBits(const unsigned i) const
+    {
       return m_inputBits[i];
     }
 
@@ -68,7 +70,8 @@ namespace Belle2 {
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
      * @return     ftdl bits
      */
-    unsigned int getFtdlBits(const unsigned i) const {
+    unsigned int getFtdlBits(const unsigned i) const
+    {
       return m_ftdlBits[i];
     }
 
@@ -76,14 +79,16 @@ namespace Belle2 {
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
      * @return     psnm bits
      */
-    unsigned int getPsnmBits(const unsigned i) const {
+    unsigned int getPsnmBits(const unsigned i) const
+    {
       return m_psnmBits[i];
     }
 
     /*! get timing source information
      * @return     timing source bits
      */
-    unsigned int getTimTypeBits() const {
+    unsigned int getTimTypeBits() const
+    {
       return m_timTypeBits;
     }
 

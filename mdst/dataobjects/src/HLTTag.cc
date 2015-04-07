@@ -9,6 +9,9 @@
 //#include "rawdata/dataobjects/HLTTag.h"
 #include "mdst/dataobjects/HLTTag.h"
 
+#include <cstdio>
+#include <cstdlib>
+
 using namespace Belle2;
 using namespace std;
 

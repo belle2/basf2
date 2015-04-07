@@ -16,6 +16,7 @@
 namespace genfit { class Track; }
 
 namespace Belle2 {
+  class TrackFitResult;
   /** Class that bundles various TrackFitResults.
    *
    *  As the genfit::Track has a lot of information that is only necessary during the fit,
@@ -29,7 +30,8 @@ namespace Belle2 {
      *  The array with the indices for the TrackFitResults is initialized with -1,
      *  which is an invalid index.
      */
-    Track() {
+    Track()
+    {
       std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }
 
@@ -56,7 +58,8 @@ namespace Belle2 {
      *
      *  @param chargedStable  Determines the hypothesis for which you want to store the index or unavailability-code.
      */
-    void setTrackFitResultIndex(const Const::ChargedStable& chargedStable, short index) {
+    void setTrackFitResultIndex(const Const::ChargedStable& chargedStable, short index)
+    {
       m_trackFitIndices[chargedStable.getIndex()] = index;
     }
 

@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/dataobjects/Helix.h>
-#include <TMath.h>
 
 #include <framework/logging/Logger.h>
 
 #include <boost/math/special_functions/sign.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
+
+#include <TMath.h>
+#include <TMatrixD.h>
 
 #include <assert.h>
 

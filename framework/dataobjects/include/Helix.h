@@ -12,9 +12,8 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TMatrixD.h>
+#include <TMatrixDfwd.h>
 
-#include <cstdlib>
 #include <cmath>
 
 namespace Belle2 {

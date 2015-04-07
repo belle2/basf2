@@ -9,15 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/gearbox/Const.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
+#include <framework/dataobjects/Helix.h>
 
-#include <TVector3.h>
-#include <TMatrixD.h>
 #include <TMatrixDSym.h>
 
-#include "Helix.h"
+
+class TVector3;
 
 namespace Belle2 {
 

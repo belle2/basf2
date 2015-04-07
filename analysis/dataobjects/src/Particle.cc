@@ -11,14 +11,16 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/logging/Logger.h>
+
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
@@ -649,7 +651,7 @@ void Particle::print() const
     }
     const ParticleExtraInfoMap::IndexMap& map = extraInfoMap->getMap(m_extraInfo[0]);
     const unsigned int nVars = m_extraInfo.size();
-    for (const auto & pair : map) {
+    for (const auto& pair : map) {
       if (pair.second < nVars) {
         std::cout << pair.first << "=" << m_extraInfo[pair.second] << " ";
       }

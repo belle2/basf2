@@ -20,7 +20,7 @@ SharedMem::SharedMem(char* name, int size)
     m_file = true;
     m_pathname = string("/tmp/") + string(getenv("USER"))
                  + string("_SHM_") + string(name);
-    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
+    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
     if (m_pathfd > 0) {   // a new shared memory file created
       printf("SharedMem: Creating a shared memory with key %s\n", name);
       m_new = true;
@@ -54,6 +54,7 @@ SharedMem::SharedMem(char* name, int size)
 
   // 3. Leave id of shm and semaphore in file name
   if (m_new) {
+    /*
     m_strbuf = new char[1024];
     sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-SHM_%s", m_shmid, 0, name);
     int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
@@ -62,6 +63,13 @@ SharedMem::SharedMem(char* name, int size)
     } else {
       close(fd);
     }
+    */
+    printf("SharedMem: leaving shmid in the path file %d fd=%d\n", m_shmid, m_pathfd);
+    char shminfo[256];
+    sprintf(shminfo, "%d\n", m_shmid);
+    int is = write(m_pathfd, shminfo, strlen(shminfo));
+    if (is < 0) perror("write");
+    close(m_pathfd);
   }
 
 }

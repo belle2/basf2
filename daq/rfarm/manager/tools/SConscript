@@ -12,5 +12,7 @@ env['TOOLS_LIBS']['nodedump'] = ['daq', 'framework']
 env['TOOLS_LIBS']['rf_monitor'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['rfgetconf'] = ['daq', 'framework']
 env['TOOLS_LIBS']['rfcommand'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['createshm'] = ['daq', 'framework']
+env['TOOLS_LIBS']['removeshm'] = ['daq', 'framework']
 
 Return('env')

@@ -1194,6 +1194,7 @@ unsigned short CDCGeometryPar::getNewLeftRightRaw(const TVector3& posOnWire, con
   return lr;
 }
 
+//N.B. The following alpha and theta calculations are directly implemented in CDCRecoHit.cc tentatively to avoid a circular dependence betw cdc_dataobjects and cdclib. So be careful when changing the calculations !
 double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momentum) const
 {
   const double wx = posOnWire.x();

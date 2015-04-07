@@ -10,7 +10,8 @@
 
 #include <cdc/dataobjects/CDCRecoHit.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
+//Comment out the following line since it introduces dependence on cdclib (or circular dependence betw. cdc_objects and cdclib).
+//#include <cdc/geometry/CDCGeometryPar.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/AbsTrackRep.h>
 #include <genfit/RKTrackRep.h>
@@ -134,8 +135,32 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
   const TVector3& p = state.getMom();
   // Calculate alpha and theta.  A description was given by H. Ozaki in
   // https://indico.mpp.mpg.de/getFile.py/access?contribId=5&sessionId=3&resId=0&materialId=slides&confId=3195
-  double alpha = CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
-  double theta = CDCGeometryPar::Instance().getTheta(p);
+
+//Comment out the following 2 lines since they introduce dependence on cdclib (or circular dependence betw. cdc_objects and cdclib).
+//  double alpha = CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
+//  double theta = CDCGeometryPar::Instance().getTheta(p);
+
+//N.B. The folowing 8 lines are tentative to avoid the circular dependence mentioned above ! The definitions of alpha and theta should be identical to those defined in CDCGeometryPar.
+  const double wx = state.getPlane()->getO().x();
+  const double wy = state.getPlane()->getO().y();
+  const double px = p.x();
+  const double py = p.y();
+  const double cross = wx * py - wy * px;
+  const double dot   = wx * px + wy * py;
+  double alpha = atan2(cross, dot);
+  double theta = atan2(p.Perp(), p.z());
+  /*
+  double alpha0 =  CDCGeometryPar::Instance().getAlpha(state.getPlane()->getO(), p);
+  double theta0 =  CDCGeometryPar::Instance().getTheta(p);
+  if (alpha != alpha0) {
+    std::cout <<"alpha,alpha0= " << alpha <<" "<< alpha0 << std::endl;
+    exit(-1);
+  }
+  if (theta != theta0) {;
+    std::cout <<"theta,theta0= " << theta <<" "<< theta0 << std::endl;
+    exit(-2);
+  }
+  */
 
   double trackTime = s_useTrackTime ? state.getTime() : 0;
 

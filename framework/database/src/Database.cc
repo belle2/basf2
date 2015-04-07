@@ -35,26 +35,39 @@ Database::Database(): m_globalTag("database.root"),  m_dbFile(0)
 
 Database::~Database()
 {
+  m_dbFile->Write();
   delete m_dbFile;
 }
 
+
+bool Database::connectDatabase()
+{
+  if (!m_dbFile) {
+    string fileName = FileSystem::findFile(m_globalTag);
+    if (fileName.empty()) {
+      B2WARNING("The database file " << m_globalTag << " was not found. Creating a new database file.");
+      fileName = m_globalTag;
+    }
+    TDirectory* saveDir = gDirectory;
+    m_dbFile = TFile::Open(fileName.c_str(), "UPDATE");
+    saveDir->cd();
+    if (!m_dbFile || !m_dbFile->IsOpen()) {
+      B2ERROR("Could not open database file " << m_globalTag << ".");
+      return false;
+    }
+  }
+
+  return true;
+}
 
 pair<TObject*, IntervalOfValidity> Database::getData(const EventMetaData& event, const string& name)
 {
   pair<TObject*, IntervalOfValidity> result;
   result.first = 0;
 
-  if (!m_dbFile) {
-    string fileName = FileSystem::findFile(m_globalTag);
-    if (fileName.empty()) {
-      B2ERROR("Failed to get " << name << " from database. The database file " << m_globalTag << " was not found.");
-      return result;
-    }
-    m_dbFile = TFile::Open(fileName.c_str());
-    if (!m_dbFile || !m_dbFile->IsOpen()) {
-      B2ERROR("Failed to get " << name << " from database. Could not open database file " << m_globalTag << ".");
-      return result;
-    }
+  if (!connectDatabase()) {
+    B2ERROR("Failed to get " << name << " from database.");
+    return result;
   }
 
   TTree* tree = (TTree*) m_dbFile->Get(name.c_str());
@@ -88,6 +101,41 @@ void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)
     entry.object = objectIov.first;
     entry.iov = objectIov.second;
   }
+}
+
+bool Database::storeData(const std::string& name, TObject* object, IntervalOfValidity& iov)
+{
+  if (!connectDatabase()) {
+    B2ERROR("Failed to store " << name << " in database.");
+    return false;
+  }
+
+  TTree* tree = (TTree*) m_dbFile->Get(name.c_str());
+  if (!tree) {
+    TDirectory* saveDir = gDirectory;
+    m_dbFile->cd();
+    tree = new TTree(name.c_str(), "");
+    tree->Branch("object", &object);
+    tree->Branch("iov", &iov);
+    saveDir->cd();
+  } else {
+    tree->SetBranchAddress("object", &object);
+    IntervalOfValidity* piov = &iov;
+    tree->SetBranchAddress("iov", &piov);
+  }
+
+  tree->Fill();
+
+  return true;
+}
+
+bool Database::storeData(std::list<DBQuery>& query)
+{
+  bool result = true;
+  for (auto& entry : query) {
+    result = result && storeData(entry.name, entry.object, entry.iov);
+  }
+  return result;
 }
 
 

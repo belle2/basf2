@@ -40,7 +40,7 @@ void plot(const TString &input_filename)
   TFile *output_file = new TFile("dedx_LLdiff_pi_K.root", "RECREATE");
   output_file->cd();
 
-  const int num_particles = 6;
+  //  const int num_particles = 6;
   const int pdg_codes[] = { 11, 13, 211, 321, 2212, 1000010020 };
   const char* pdg_names[] = { "electrons", "muons", "pions", "kaons", "protons", "deuterons" };
   for (int det = 0; det < 2; det++) {

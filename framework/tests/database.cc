@@ -52,7 +52,6 @@ namespace {
     /** clear datastore */
     virtual void TearDown()
     {
-      DataStore::Instance().reset();
       remove("TestDatabase.root");
     }
 

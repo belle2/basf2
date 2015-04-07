@@ -26,19 +26,19 @@ namespace Belle2 {
   class BackgroundHitFinderModule: public Belle2::TrackFinderCDCBaseModule {
 
     struct TMVAVariables {
-      float superlayerID;
-      float size;
-      float totalNNeighbors;
-      float meanNNeighbors;
+      float superlayerID,
+            size,
+            totalNNeighbors,
+            meanNNeighbors,
 
-      float totalDriftLength;
-      float meanDriftLength;
-      float varianceDriftLength;
+            totalDriftLength,
+            meanDriftLength,
+            varianceDriftLength,
 
-      float totalInnerDistance;
-      float meanInnerDistance;
-      float isStereo;
-      float distanceToSuperlayerCenter;
+            totalInnerDistance,
+            meanInnerDistance,
+            isStereo,
+            distanceToSuperlayerCenter = 0.0f;
     } tmvaVariables;
 
   public:

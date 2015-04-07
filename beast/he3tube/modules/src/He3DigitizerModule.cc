@@ -167,7 +167,7 @@ void He3DigitizerModule::event()
     }
 
     //convolve waveform, find peak
-    peak[detNB] = convolveWaveform(waveform[detNB]);
+    peak[detNB] = m_ConversionFactor * convolveWaveform(waveform[detNB]);
 
   }
 
@@ -179,8 +179,9 @@ void He3DigitizerModule::event()
       He3Hits.appendNew(He3tubeHit(edepDet[i], i, peak[i], lowTime[i]));
 
       //if peak is likely from a neutron hit, print to console (only in debug mode)
-      if (peak[i] > 0.09) B2DEBUG(80, "He3Digitizer: " << edepDet[i] << "MeV deposited in tube #" << i << " with waveform peak of " <<
-                                    peak[i]);
+      if (peak[i] > 0.09 * m_ConversionFactor) B2DEBUG(80,
+                                                         "He3Digitizer: " << edepDet[i] << "MeV deposited in tube #" << i << " with waveform peak of " <<
+                                                         peak[i]);
     }
   }
 

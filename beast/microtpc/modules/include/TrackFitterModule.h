@@ -8,42 +8,49 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TPCDIGITIZERMODULE_H
-#define TPCDIGITIZERMODULE_H
+#ifndef TRACKFITTERMODULE_H
+#define TRACKFITTERMODULE_H
 
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
 
 //ROOT
+#include "TMath.h"
 #include <TRandom3.h>
 #include <TF1.h>
 #include <TVector3.h>
+#include "TGraph2DErrors.h"
+#include <TGraph2DErrors.h>
+#include <TVirtualFitter.h>
+#include <Math/Vector3D.h>
+#include <TPolyLine3D.h>
+#include <assert.h>
+#include <ctime>
+#include <TMinuit.h>
 
-/** size of hit */
-const Int_t MAXSIZE         = 10000;
-/** size of pixel hit */
-const Int_t MAXtSIZE        = 1000;
+using namespace ROOT::Math;
+static void SumDistance2_angles(int&, double*, double&, double*, int);
 
 namespace Belle2 {
   namespace microtpc {
     /**
-     * Tpc tube digitizer
      *
-     * Creates TpcHits from TpcSimHits
+     *
+     * Creates TrackFitter from TpcHits
      *
      */
-    class TpcDigitizerModule : public Module {
+    class TrackFitterModule : public Module {
 
     public:
 
       /**
        * Constructor: Sets the description, the properties and the parameters of the module.
        */
-      TpcDigitizerModule();
+      TrackFitterModule();
 
       /**  */
-      virtual ~TpcDigitizerModule();
+      virtual ~TrackFitterModule();
 
       /**  */
       virtual void initialize();
@@ -65,24 +72,15 @@ namespace Belle2 {
       /** reads data from MICROTPC.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
 
-      /** Produces the pixelization */
-      virtual bool Pixelization(int);
-
-      /** Drift ionization */
-      virtual void Drift(double, double, double, double&, double&, double&, double&, double, double, double);
-
-      /** GEMazition of GEM1 */
-      virtual void GEMGeo1(double, double, double&, double&);
-
-      /** GEMazition of GEM2 */
-      virtual void GEMGeo2(double, double, double&, double&);
+      /** Calculate distance squared */
+      double distance2_angles(double , double , double , double*);
 
       /** Define random variable */
       //TRandom3* fRandom;
-      /** Define ToT calib 1 */
-      TF1* fctToT_Calib1;
-      /** Define ToT calib 2 */
-      TF1* fctToT_Calib2;
+      /** Define Q calib 1 */
+      TF1* fctQ_Calib1;
+      /** Define Q calib 2 */
+      TF1* fctQ_Calib2;
       /** GEM 1 gain */
       double m_GEMGain1;
       /** GEM 1 RMS */
@@ -154,7 +152,7 @@ namespace Belle2 {
       /** Drift velocity in collection gap */
       double m_v_CG;
       /** Pressure in vessel */
-      double m_P_vessel;
+      //double m_P_vessel;
       /** Work function */
       double m_Workfct;
       /** Fano factor */
@@ -177,9 +175,58 @@ namespace Belle2 {
       std::vector<int> totArray;
       /** bci vector */
       std::vector<int> bciArray;
+      /** detector number */
+      int m_detNb;
+      /** chi^2 of the fit */
+      float m_chi2;
+      /** Polar angle theta in degrees */
+      float m_theta;
+      /** Azimuthal angle phi in degrees */
+      float m_phi;
+      /** total ionization energy */
+      float m_esum;
+      /** TOT sum */
+      int m_totsum;
+      /** track length */
+      float m_trl;
+      /** Trigger/time length */
+      int m_time_range;
+      /** Fit parameters */
+      float m_parFit[5];
+      /** Fit paramteter errors */
+      float m_parFit_err[5];
+      /** Covariant errors */
+      float m_cov[5][5];
+      /** Impact parameter x */
+      float m_impact_x[4];
+      /** Impact parameter y */
+      float m_impact_y[4];
+      /** Which side was/were hit */
+      int m_side[5][4];
+      /** x point of the track */
+      float x[MAXSIZE];
+      /** y point of the track */
+      float y[MAXSIZE];
+      /** z point of the track */
+      float z[MAXSIZE];
+      /** e point of the track */
+      float e[MAXSIZE];
+      /** TGraphErrors track */
+      TGraph2DErrors* Track;
+      /** track length */
+      float* L; //!
+      /** index ix */
+      int* ix; //!
+      /** index iy */
+      int* iy; //!
+      /** index iz */
+      int* iz; //!
+      /** index L */
+      int* iL; //!
+
     };
 
   }
 }
 
-#endif /* TPCDIGITIZERMODULE_H */
+#endif /* TRACKFITTERMODULE_H */

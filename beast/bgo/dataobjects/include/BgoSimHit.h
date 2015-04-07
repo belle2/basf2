@@ -31,7 +31,8 @@ namespace Belle2 {
   class BgoSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    BgoSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0, 0) {;}
+    BgoSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0,
+          0) {;}
     //! Useful Constructor
     BgoSimHit(
       int CellId,            /**< Cell ID */
@@ -41,7 +42,8 @@ namespace Belle2 {
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position        /**< Position */
-    ): SimHitBase() {
+    ): SimHitBase()
+    {
       m_CellId = CellId;
       m_TrackId = TrackId;
       m_Pdg = Pdg;

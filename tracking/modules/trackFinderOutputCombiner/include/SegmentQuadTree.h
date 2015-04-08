@@ -14,58 +14,39 @@
 #include <vector>
 
 #include <framework/core/Module.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
+#include <tracking/modules/trackFinderCDC/TrackFinderCDCFromSegmentsModule.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
+    class CDCTrack;
   }
 
-  class SegmentQuadTreeModule : public Module {
+  class SegmentQuadTreeModule : public TrackFinderCDCFromSegmentsModule {
 
-    typedef TrackFindingCDC::QuadTreeTemplate<int, float, TrackFindingCDC::QuadTreeItem<TrackFindingCDC::CDCRecoSegment2D>>
-        SegmentQuadTree;
+    typedef TrackFindingCDC::QuadTreeProcessorSegments::QuadTree SegmentQuadTree;
 
   public:
 
-    /**
-     * Constructor to set the module parameters.
-     */
     SegmentQuadTreeModule();
 
-    /**
-     * Initialize the module. Create the StoreArray.
-     */
-    void initialize();
-
-    /**
-     * Empty begin run.
-     */
-    void beginRun() {};
-
-    /**
-     * In the event the hits are sorted.
-     */
-    void event();
-
-    /**
-     * Empty end run.
-     */
-    void endRun() {};
-
-    /**
-     * Empty terminate.
-     */
-    void terminate() {};
+    void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks);
 
   private:
-    std::string m_param_recoSegments;           /**< Name of the Store Array for the segments from the local track finder. */
     const double m_rMin = -0.15; /**< Minimum in r direction*/
     const double m_rMax = 0.15; /**< Maximum in r direction*/
     const int m_nbinsTheta = 8192;
     SegmentQuadTree m_quadTree;
 
-    void quadTreeSearch(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments);
+    unsigned int m_param_level;
+    unsigned int m_param_minimumItems;
+
+    void quadTreeSearch(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, std::vector<TrackFindingCDC::CDCTrack>& tracks);
+
+    void printDebugInformation();
+
+    void printQuadTree(SegmentQuadTree* node);
   };
 }

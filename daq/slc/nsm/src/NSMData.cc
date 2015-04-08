@@ -15,6 +15,7 @@ extern "C" {
 #include <nsm2/nsmlib2.h>
 }
 
+#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -24,7 +25,7 @@ using namespace Belle2;
 
 NSMData::NSMData(const std::string& dataname,
                  const std::string& format, int revision)
-throw() : DBObject(), m_allocated(false),
+throw() : AbstractDBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
   setName(dataname);
@@ -33,14 +34,14 @@ throw() : DBObject(), m_allocated(false),
 }
 
 NSMData::NSMData()
-throw() : DBObject(), m_allocated(false),
+throw() : AbstractDBObject(), m_allocated(false),
   m_pdata(NULL), m_size(0), m_offset(0)
 {
   setRevision(-1);
 }
 
 NSMData::NSMData(const NSMData& data) throw()
-  : DBObject(data)
+  : AbstractDBObject(data)
 {
   m_allocated = data.m_allocated;
   m_size = data.m_size;
@@ -84,7 +85,7 @@ NSMData::~NSMData() throw()
 
 void NSMData::reset() throw()
 {
-  DBObject::reset();
+  AbstractDBObject::reset();
   if (m_allocated && m_pdata != NULL) {
     free(m_pdata);
     m_pdata = NULL;
@@ -226,16 +227,16 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length,
     else if (type == 'f') type = DBField::FLOAT;
     else if (type == '(') {
       NSMData data(getName(), getFormat() + "." + name, getRevision());
-      data.m_pdata = (void*)((char*)m_pdata + offset);
+      char* pdata  = ((char*)m_pdata + offset);
+      data.m_pdata = pdata;
       ptr = data.parse(ptr->next, length, name);
       data.setFormat(getFormat() + "." + name);
       int len = (length == 0) ? 1 : length;
       NSMDataList data_v;
       for (int i = 0; i < len; i++) {
-        NSMData cdata(data);
-        cdata.setIndex(i);
-        cdata.m_pdata = (void*)((char*)data.get() + i * data.getSize());
-        data_v.push_back(cdata);
+        data.setIndex(i);
+        data.m_pdata = (void*)(pdata + i * data.getSize());
+        data_v.push_back(data);
       }
       m_data_v_m.insert(NSMDataListMap::value_type(name, data_v));
       type = DBField::OBJECT;
@@ -358,6 +359,23 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
 
 void NSMData::print(const std::string& name_in) const throw()
 {
+  NameValueList map;
+  search(map, name_in);
+  size_t length = 0;
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    if (it->name.size() > length) length = it->name.size();
+  }
+  for (NameValueList::iterator it = map.begin();
+       it != map.end(); it++) {
+    printf(StringUtil::form("%%-%ds : %%s\n", length).c_str(),
+           it->name.c_str(), it->value.c_str());
+  }
+}
+
+void NSMData::search(NSMData::NameValueList& map,
+                     const std::string& name_in) const throw()
+{
   const FieldNameList& name_v(getFieldNames());
   for (FieldNameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
@@ -372,54 +390,49 @@ void NSMData::print(const std::string& name_in) const throw()
       if (pro.getType() == DBField::OBJECT) {
         const NSMDataList& data_v(getObjects(name));
         for (size_t i = 0; i < length; i++) {
-          data_v[i].print(StringUtil::form("%s[%d]", name_out.c_str(), i));
+          data_v[i].search(map, StringUtil::form("%s[%d]", name_out.c_str(), i));
         }
       } else {
         const void* buf = getValue(name);
-        const char* name_c = name_out.c_str();
         if (pro.getType() == DBField::CHAR) {
-          printf("%s : %s\n", name_c, (char*)buf);
-        }
-        for (int i = 0; i < (int)length; i++) {
-          switch (pro.getType()) {
-            case DBField::CHAR:
-              break;
-            case DBField::SHORT:
-              printf("%s[%d] : %d\n", name_c, i, ((int16*)buf)[i]); break;
-            case DBField::INT:
-              printf("%s[%d] : %d\n", name_c, i, ((int32*)buf)[i]); break;
-            case DBField::LONG:
-              printf("%s[%d] : %ld\n", name_c, i, ((int64*)buf)[i]); break;
-            case DBField::FLOAT:
-              printf("%s[%d] : %f\n", name_c, i, ((float*)buf)[i]); break;
-            case DBField::DOUBLE:
-              printf("%s[%d] : %f\n", name_c, i, ((double*)buf)[i]); break;
-            default : break;
+          NameValue nv;
+          nv.name = name_out;
+          nv.value = (char*)buf;
+          map.push_back(nv);
+        } else {
+          const char* name_c = name_out.c_str();
+          for (int i = 0; i < (int)length; i++) {
+            std::string vname = StringUtil::form("%s[%d]", name_c, i);
+            std::string val;
+            switch (pro.getType()) {
+              case DBField::SHORT:
+                val = StringUtil::form("%d", ((int16*)buf)[i]); break;
+              case DBField::INT:
+                val = StringUtil::form("%d", ((int32*)buf)[i]); break;
+              case DBField::LONG:
+                val = StringUtil::form("%ld", ((int64*)buf)[i]); break;
+              case DBField::FLOAT:
+                val = StringUtil::form("%f", ((float*)buf)[i]); break;
+              case DBField::DOUBLE:
+                val = StringUtil::form("%d", ((double*)buf)[i]); break;
+              default : break;
+            }
+            NameValue nv;
+            nv.name = vname;
+            nv.value = val;
+            map.push_back(nv);
           }
         }
       }
     } else {
       if (pro.getType() == DBField::OBJECT) {
         const NSMDataList& data_v(getObjects(name));
-        data_v[0].print(name_out);
+        data_v[0].search(map, name_out);
       } else {
-        const void* buf = getValue(name);
-        const char* name_c = name_out.c_str();
-        switch (pro.getType()) {
-          case DBField::CHAR:
-            printf("%s : %d\n", name_c, *(char*)buf); break;
-          case DBField::SHORT:
-            printf("%s : %d\n", name_c, *(int16*)buf); break;
-          case DBField::INT:
-            printf("%s : %d\n", name_c, *(int32*)buf); break;
-          case DBField::LONG:
-            printf("%s : %ld\n", name_c, *(int64*)buf); break;
-          case DBField::FLOAT:
-            printf("%s : %f\n", name_c, *(float*)buf); break;
-          case DBField::DOUBLE:
-            printf("%s : %f\n", name_c, *(double*)buf); break;
-          default : break;
-        }
+        NameValue nv;
+        nv.name = name_out;
+        nv.value = getValueText(name);
+        map.push_back(nv);
       }
     }
   }

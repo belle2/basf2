@@ -3,7 +3,7 @@
 
 #include "daq/slc/nsm/NSMHandlerException.h"
 
-#include <daq/slc/database/DBObject.h>
+#include <daq/slc/base/AbstractDBObject.h>
 #include <daq/slc/base/StringUtil.h>
 
 extern "C" {
@@ -20,10 +20,19 @@ namespace Belle2 {
 
   class NSMCommunicator;
 
-  class NSMData : public DBObject {
+  class NSMData : public AbstractDBObject {
 
     typedef std::vector<NSMData> NSMDataList;
     typedef std::map<std::string, NSMDataList> NSMDataListMap;
+
+  public:
+    struct NameValue {
+      std::string name;
+      std::string value;
+      void* buf;
+      DBField::Type type;
+    };
+    typedef std::vector<NameValue> NameValueList;
 
   public:
     NSMData(const std::string& dataname,
@@ -62,6 +71,7 @@ namespace Belle2 {
     void print(const std::string& name_in = "") const throw();
     void printPV(const std::string& name_in = "") const throw();
     const void* find(const std::string& name_in, DBField::Type& type) const throw();
+    void search(NameValueList& map, const std::string& name = "") const throw();
 
   public:
     virtual void* getValue(const std::string& name) throw(std::out_of_range);

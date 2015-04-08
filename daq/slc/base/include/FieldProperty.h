@@ -28,6 +28,8 @@ namespace Belle2 {
       Property():  m_type(), m_length(0), m_offset(0) {}
       Property(Type type, int length, int offset = 0)
         : m_type(type), m_length(length), m_offset(offset) {}
+      Property(const Property& pro)
+        : m_type(pro.m_type), m_length(pro.m_length), m_offset(pro.m_offset) {}
       ~Property() {}
 
     public:

@@ -7,7 +7,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     template<typename typeX, typename typeY, class typeData, int binCountX, int binCountY>
-    class MyOwnProcessor {
+    class QuadTreeProcessorTemplate {
 
     public:
       typedef QuadTreeItem<typeData> QuadTreeItem;
@@ -15,11 +15,15 @@ namespace Belle2 {
       typedef typename QuadTree::CandidateProcessorLambda CandidateProcessorLambda;
       typedef typename QuadTree::Children QuadTreeChildren;
 
-    public:
-      MyOwnProcessor(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
-      virtual ~MyOwnProcessor() { }
+      typedef std::pair<typeX, typeX> rangeX;
+      typedef std::pair<typeY, typeY> rangeY;
+      typedef std::pair<rangeX, rangeY> ChildRanges;
 
-      virtual QuadTree* createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const = 0;
+    public:
+      QuadTreeProcessorTemplate(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
+      virtual ~QuadTreeProcessorTemplate() { }
+
+      virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const = 0;
       virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int xIndex, unsigned int yIndex) const = 0;
 
       virtual void cleanUpItems(std::vector<QuadTreeItem*>& items) const final
@@ -48,7 +52,8 @@ namespace Belle2 {
       virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
                                  bool checkThreshold) const final
       {
-        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << "hits at level " << node->getLevel());
+        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
+                (node->getLevel()));
         if (node->getItemsVector().size() < nItemsThreshold)
           return;
         if (checkThreshold) {
@@ -119,7 +124,8 @@ namespace Belle2 {
 
           for (int t_index = 0; t_index < binCountX; ++t_index) {
             for (int r_index = 0; r_index < binCountY; ++r_index) {
-              if (insertItemInNode(node, item->getPointer(), t_index, r_index)) {
+              if (insertItemInNode(node->getChildren()->get(t_index, r_index), item->getPointer(), t_index, r_index)) {
+                B2DEBUG(110, "Inserting new item in node (" << t_index << ", " << r_index << ")")
                 node->getChildren()->get(t_index, r_index)->insertItem(item);
               }
             }
@@ -131,7 +137,13 @@ namespace Belle2 {
       {
         for (unsigned int i = 0; i < binCountX; ++i) {
           for (unsigned int j = 0; j < binCountY; ++j) {
-            m_children->set(i, j, createChildWithParent(node, i, j));
+            const ChildRanges& childRanges = createChildWithParent(node, i, j);
+            const rangeX& rangeX = childRanges.first;
+            const rangeY& rangeY = childRanges.second;
+
+            B2DEBUG(110, "Creating new child on level " << static_cast<unsigned int>(node->getLevel()) << " with ranges ("
+                    << rangeX.first << ", " << rangeX.second << ") - (" << rangeY.first << ", " << rangeY.second << ")")
+            m_children->set(i, j, new QuadTree(rangeX.first, rangeX.second, rangeY.first, rangeY.second, node->getLevel() + 1, node));
           }
         }
       }

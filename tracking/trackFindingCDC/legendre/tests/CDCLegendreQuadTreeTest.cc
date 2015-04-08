@@ -11,8 +11,7 @@
 #include <tracking/trackFindingCDC/legendre/tests_fixtures/CDCLegendreTestFixture.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
 #include <set>
@@ -42,10 +41,10 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 
   QuadTreeLegendreTemp::NodeList candidateNodes;
 
-  QuadTreeProcessorTemp qtProcessor(13);
+  HitQuadTreeProcessor qtProcessor(13);
   qt.provideItemsSet(qtProcessor, items_set);
 
-  QuadTreeProcessorTemp::CandidateProcessorLambda lmdProcessor = [&candidateNodes](
+  HitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidateNodes](
   QuadTreeTemplate<int, float, QuadTreeItem<TrackHit>>* qt) {
     std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](LegendreQuadTreeItem * th) {th->setUsedFlag();});
     candidateNodes.push_back(qt);

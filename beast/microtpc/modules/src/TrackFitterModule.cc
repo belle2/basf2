@@ -190,7 +190,7 @@ void TrackFitterModule::event()
           i_tpc[i]++;
         }
       }
-
+      if (i_tpc[i] == 0)continue;
       //int fpxhits = i_tpc1[i];
       int fpxhits = i_tpc[i];
       int time[fpxhits];

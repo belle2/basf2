@@ -122,6 +122,8 @@ int TemplateHVControlCallback::getState(int crate, int slot, int channel) throw(
     OCP: trip due to over current
     OVP: trip due to over voltage
     ERR: another error
+    RAMPUP: ramping up voltage
+    RAMPDOWN: ramping down voltage
   */
   return HVMessage::OFF;
 }

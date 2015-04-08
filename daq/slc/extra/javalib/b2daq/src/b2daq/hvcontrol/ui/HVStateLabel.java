@@ -49,7 +49,7 @@ public final class HVStateLabel extends Pane {
         c.setFill(font);
         c.setTextAlign(TextAlignment.CENTER);
         c.setTextBaseline(VPos.CENTER);
-        c.setFont(Font.font("Sans", FontWeight.BOLD, 13));
+        c.setFont(Font.font("Sans", FontWeight.BOLD, 12));
         c.fillText(text.get(), Math.round(width / 2), Math.round(height / 2));
     }
 
@@ -110,6 +110,10 @@ public final class HVStateLabel extends Pane {
         if (state.equals(HVState.OFF_S)) {
             set(state.getLabel(), Color.RED, Color.RED, Color.BLACK);
         } else if (state.equals(HVState.STANDBY_S)) {
+            set(state.getLabel(), Color.YELLOW, Color.YELLOW, Color.BLACK);
+        } else if (state.equals(HVState.RAMPUP_TS)) {
+            set(state.getLabel(), Color.YELLOW, Color.YELLOW, Color.BLACK);
+        } else if (state.equals(HVState.RAMPDOWN_TS)) {
             set(state.getLabel(), Color.YELLOW, Color.YELLOW, Color.BLACK);
         } else if (state.equals(HVState.SHOULDER_S)) {
             set(state.getLabel(), Color.rgb(0, 176, 80), Color.rgb(0, 176, 80), Color.BLACK);

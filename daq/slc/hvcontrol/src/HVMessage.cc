@@ -55,6 +55,10 @@ HVMessage::State HVMessage::getState(const char* pstate)
     return OCP;
   } else if (pname == "err") {
     return ERR;
+  } else if (pname == "rampdown") {
+    return RAMPDOWN;
+  } else if (pname == "rampup") {
+    return RAMPUP;
   }
   return ERR;
 }
@@ -67,6 +71,8 @@ const std::string HVMessage::getStateText(HVMessage::State state)
     case OVP: return "OVP";
     case OCP: return "OCP";
     case ERR: return "ERR";
+    case RAMPUP: return "RAMPUP";
+    case RAMPDOWN: return "RAMPDOWN";
   }
   return "UNKNOWN";
 }

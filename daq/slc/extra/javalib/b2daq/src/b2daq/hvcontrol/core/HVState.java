@@ -12,8 +12,8 @@ public class HVState extends NSMState {
     final static public HVState SHOULDER_S = new HVState(13, "SHOULDER");
     final static public HVState PEAK_S = new HVState(14, "PEAK");
     final static public HVState TRANSITION_TS = new HVState(31, "TRANSITION");
-    final static public HVState RAMPINGUP_TS = new HVState(32, "RAMPINGUP");
-    final static public HVState RAMPINGDOWN_TS = new HVState(33, "RAMPINGDOWN");
+    final static public HVState RAMPUP_TS = new HVState(32, "RAMPUP");
+    final static public HVState RAMPDOWN_TS = new HVState(33, "RAMPDOWN");
     final static public HVState ERROR_ES = new HVState(41, "ERROR");
     final static public HVState TRIP_ES = new HVState(42, "TRIP");
     final static public HVState OCP = new HVState(43, "OCP");
@@ -34,7 +34,7 @@ public class HVState extends NSMState {
     }
 
     public boolean isTransition() {
-        return getId() > PEAK_S.getId() && getId() <= RAMPINGDOWN_TS.getId();
+        return getId() > PEAK_S.getId() && getId() <= RAMPDOWN_TS.getId();
     }
 
     public boolean isError() {
@@ -73,10 +73,10 @@ public class HVState extends NSMState {
             copy(PEAK_S);
         } else if (label.matches(TRANSITION_TS._label)) {
             copy(TRANSITION_TS);
-        } else if (label.matches(RAMPINGUP_TS._label)) {
-            copy(RAMPINGUP_TS);
-        } else if (label.matches(RAMPINGDOWN_TS._label)) {
-            copy(RAMPINGDOWN_TS);
+        } else if (label.matches(RAMPUP_TS._label)) {
+            copy(RAMPUP_TS);
+        } else if (label.matches(RAMPDOWN_TS._label)) {
+            copy(RAMPDOWN_TS);
         } else if (label.matches(ERROR_ES._label)) {
             copy(ERROR_ES);
         } else if (label.matches(TRIP_ES._label)) {
@@ -106,10 +106,10 @@ public class HVState extends NSMState {
             copy(PEAK_S);
         } else if (id == TRANSITION_TS._id) {
             copy(TRANSITION_TS);
-        } else if (id == RAMPINGUP_TS._id) {
-            copy(RAMPINGUP_TS);
-        } else if (id == RAMPINGDOWN_TS._id) {
-            copy(RAMPINGDOWN_TS);
+        } else if (id == RAMPUP_TS._id) {
+            copy(RAMPUP_TS);
+        } else if (id == RAMPDOWN_TS._id) {
+            copy(RAMPDOWN_TS);
         } else if (id == ERROR_ES._id) {
             copy(ERROR_ES);
         } else if (id == TRIP_ES._id) {

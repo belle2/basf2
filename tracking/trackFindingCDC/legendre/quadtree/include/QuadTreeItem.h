@@ -65,7 +65,7 @@ namespace Belle2 {
       /**
        * Const version of getPointer() above.
        */
-      virtual const typeData* const getPointer() const final
+      virtual const typeData* getPointer() const final
       {
         return m_pointer;
       }

@@ -30,7 +30,7 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      bool insertItemInNode(QuadTree* node, TrackHit* hit, unsigned int t_index, unsigned int r_index) const override
+      bool insertItemInNode(QuadTree* node, TrackHit* hit, unsigned int /*t_index*/, unsigned int /*r_index*/) const override
       {
         float dist_1[2][2];
         float dist_2[2][2];
@@ -111,7 +111,7 @@ namespace Belle2 {
 
       QuadTreeProcessorSegments(unsigned int lastLevel) : QuadTreeProcessorTemplate(lastLevel) { }
 
-      bool insertItemInNode(QuadTree* node, CDCRecoSegment2D* segment, unsigned int t_index, unsigned int r_index) const override
+      bool insertItemInNode(QuadTree* node, CDCRecoSegment2D* segment, unsigned int /*t_index*/, unsigned int /*r_index*/) const override
       {
         float distFront[2][2];
         float distBack[2][2];

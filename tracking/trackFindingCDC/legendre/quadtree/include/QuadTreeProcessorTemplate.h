@@ -26,8 +26,8 @@ namespace Belle2 {
     class QuadTreeProcessorTemplate {
 
     public:
-      typedef QuadTreeItem<typeData> QuadTreeItem; /**< The QuadTree will only see items of this type */
-      typedef QuadTreeTemplate<typeX, typeY, QuadTreeItem, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
+      typedef QuadTreeItem<typeData> ItemType; /**< The QuadTree will only see items of this type */
+      typedef QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
       typedef typename QuadTree::CandidateProcessorLambda
       CandidateProcessorLambda; /**< This lambda function can be used for postprocessing */
       typedef typename QuadTree::Children QuadTreeChildren; /**< A typedef for the QuadTree Children */
@@ -99,9 +99,9 @@ namespace Belle2 {
 
       virtual void provideItemsSet(QuadTree& tree, std::vector<typeData*>& itemsVector)
       {
-        std::vector<QuadTreeItem*>& quadtreeItemsVector = tree.getItemsVector();
+        std::vector<ItemType*>& quadtreeItemsVector = tree.getItemsVector();
         for (typeData* item : itemsVector) {
-          quadtreeItemsVector.push_back(new QuadTreeItem(item));
+          quadtreeItemsVector.push_back(new ItemType(item));
         }
       }
 
@@ -110,8 +110,8 @@ namespace Belle2 {
        */
       virtual void clear(QuadTree& tree)
       {
-        const std::vector<QuadTreeItem*>& quadtreeItemsVector = tree.getItemsVector();
-        for (QuadTreeItem* item : quadtreeItemsVector) {
+        const std::vector<ItemType*>& quadtreeItemsVector = tree.getItemsVector();
+        for (ItemType* item : quadtreeItemsVector) {
           delete item;
         }
         tree.clearTree();
@@ -127,10 +127,10 @@ namespace Belle2 {
       }
 
     private:
-      virtual void cleanUpItems(std::vector<QuadTreeItem*>& items) const final
+      virtual void cleanUpItems(std::vector<ItemType*>& items) const final
       {
         items.erase(std::remove_if(items.begin(), items.end(),
-        [&](QuadTreeItem * hit) {return hit->isUsed();}),
+        [&](ItemType * hit) {return hit->isUsed();}),
         items.end());
       };
 
@@ -196,13 +196,13 @@ namespace Belle2 {
         }
       }
 
-      virtual void fillChildren(QuadTree* node, std::vector<QuadTreeItem*>& items) const final
+      virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items) const final
       {
         const size_t neededSize = 2 * items.size();
         node->getChildren()->apply([neededSize](QuadTree * qt) {qt->reserveHitsVector(neededSize);});
 
         //Voting within the four bins
-        for (QuadTreeItem* item : items) {
+        for (ItemType* item : items) {
           if (item->isUsed())
             continue;
 
@@ -233,12 +233,12 @@ namespace Belle2 {
       }
 
       // depricated
-      virtual void provideItemsSet(const std::set<QuadTreeItem*>& items_set, std::vector<QuadTreeItem*>& items_vector) const final
+      virtual void provideItemsSet(const std::set<ItemType*>& items_set, std::vector<ItemType*>& items_vector) const final
       {
         items_vector.clear();
         items_vector.reserve(items_set.size());
         std::copy_if(items_set.begin(), items_set.end(), std::back_inserter(items_vector),
-        [&](QuadTreeItem * item) {return not item->isUsed();});
+        [&](ItemType * item) {return not item->isUsed();});
       };
 
     private:

@@ -9,3 +9,4 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>

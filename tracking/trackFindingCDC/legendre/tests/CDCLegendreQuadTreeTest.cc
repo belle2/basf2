@@ -28,18 +28,23 @@ using namespace TrackFindingCDC;
 
 TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
-  QuadTreeLegendre qt(0, std::pow(2, 13), -1.5, 1.5, 0, nullptr);
+  QuadTreeLegendreTemp qt(0, std::pow(2, 13), -1.5, 1.5, 0, nullptr);
 
   markAllHitsAsUnused();
   std::set<TrackHit*>& hits_set = getHitSet();
 
-  QuadTreeLegendre::NodeList candidateNodes;
+  std::set<QuadTreeItem<TrackHit>*> items_set;
+  for (TrackHit* hit : hits_set) {
+    items_set.insert(new QuadTreeItem<TrackHit>(*hit));
+  }
 
-  QuadTreeProcessor qtProcessor(13);
-  qt.provideItemsSet(qtProcessor, hits_set);
+  QuadTreeLegendreTemp::NodeList candidateNodes;
 
-  QuadTreeLegendre::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTreeLegendre * qt) {
-    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](TrackHit * th) {th->setHitUsage(TrackHit::used_in_track);});
+  QuadTreeProcessorTemp qtProcessor(13);
+  qt.provideItemsSet(qtProcessor, items_set);
+
+  QuadTreeProcessorTemp::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTreeLegendreTemp * qt) {
+    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](QuadTreeItem<TrackHit>* th) {th->setUsedFlag();});
     candidateNodes.push_back(qt);
   };
 

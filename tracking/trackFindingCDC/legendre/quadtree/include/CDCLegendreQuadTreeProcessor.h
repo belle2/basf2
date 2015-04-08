@@ -49,6 +49,8 @@
 #include <cmath>
 #include <functional>
 
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -338,5 +340,163 @@ namespace Belle2 {
 
       unsigned char m_lastLevel;
     };
+
+    class QuadTreeProcessorTemp : public MyOwnProcessor<int, float, TrackHit, 2, 2> {
+
+    public:
+
+      QuadTreeProcessorTemp(unsigned int lastLevel) : MyOwnProcessor(lastLevel) { }
+
+      bool insertItemInNode(QuadTree* node, TrackHit* hit, unsigned int t_index, unsigned int r_index) const override
+      {
+
+        float dist_1[2][2];
+        float dist_2[2][2];
+
+        float r_temp_min = hit->getConformalX()
+                           * TrigonometricalLookupTable::Instance().cosTheta(node->getChildren()->get(t_index, r_index)->getXMin())
+                           + hit->getConformalY()
+                           * TrigonometricalLookupTable::Instance().sinTheta(node->getChildren()->get(t_index, r_index)->getXMin());
+        float r_temp_max = hit->getConformalX()
+                           * TrigonometricalLookupTable::Instance().cosTheta(node->getChildren()->get(t_index, r_index)->getXMax())
+                           + hit->getConformalY()
+                           * TrigonometricalLookupTable::Instance().sinTheta(node->getChildren()->get(t_index, r_index)->getXMax());
+
+        float r_min1 = r_temp_min - hit->getConformalDriftLength();
+        float r_min2 = r_temp_min + hit->getConformalDriftLength();
+        float r_max1 = r_temp_max - hit->getConformalDriftLength();
+        float r_max2 = r_temp_max + hit->getConformalDriftLength();
+
+        float m_rMin = node->getChildren()->get(t_index, r_index)->getYMin();
+        float m_rMax = node->getChildren()->get(t_index, r_index)->getYMax();
+
+        dist_1[0][0] = m_rMin - r_min1;
+        dist_1[0][1] = m_rMin - r_max1;
+        dist_1[1][0] = m_rMax - r_min1;
+        dist_1[1][1] = m_rMax - r_max1;
+
+        dist_2[0][0] = m_rMin - r_min2;
+        dist_2[0][1] = m_rMin - r_max2;
+        dist_2[1][0] = m_rMax - r_min2;
+        dist_2[1][1] = m_rMax - r_max2;
+
+
+        //curves are assumed to be straight lines, might be a reasonable assumption locally
+        if (!FastHough::sameSign(dist_1[0][0], dist_1[0][1],
+                                 dist_1[1][0], dist_1[1][1]) or
+            !FastHough::sameSign(dist_2[0][0], dist_2[0][1],
+                                 dist_2[1][0], dist_2[1][1])) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      QuadTree* createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
+      {
+        if ((node->getLevel() > (getLastLevel() - 7)) && (fabs(node->getYMean()) > 0.005)) {
+          if (node->getLevel() < (getLastLevel() - 5)) {
+            float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
+            float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 4.;
+            int theta1 = node->getXBin(i) - std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 4.);
+            int theta2 = node->getXBin(i + 1) + std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 4.);
+
+            if (theta1 < 0)
+              theta1 = node->getXBin(i);
+            if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
+              theta2 = node->getXBin(i + 1);
+
+            return new QuadTree(theta1, theta2, r1, r2, node->getLevel() + 1, node);
+          } else {
+            float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
+            float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 8.;
+            int theta1 = node->getXBin(i) - std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 8.);
+            int theta2 = node->getXBin(i + 1) + std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 8.);
+
+            if (theta1 < 0)
+              theta1 = node->getXBin(i);
+            if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
+              theta2 = node->getXBin(i + 1);
+
+            return new QuadTree(theta1, theta2, r1, r2, node->getLevel() + 1, node);
+          }
+        } else {
+          return new QuadTree(node->getXBin(i), node->getXBin(i + 1), node->getYBin(j),
+                              node->getYBin(j + 1), node->getLevel() + 1, node);
+        }
+      }
+
+      void fillNodeWithRespectToGivenPoint(QuadTreeTemplate<float, float, TrackFindingCDC::TrackHit>* m_node,
+                                           std::vector<TrackHit*>& m_hits, std::pair<double, double>& ref_point) const
+      {
+
+        int sizeX = 2;
+        int sizeY = 2;
+        double dist_1[3][3];
+        double dist_2[3][3];
+        const size_t neededSize = 2 * m_hits.size();
+        m_node->reserveHitsVector(neededSize);
+
+
+
+        //Voting within the four bins
+        for (TrackHit* hit : m_hits) {
+          //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
+          if (hit->getHitUsage() != TrackHit::not_used)
+            continue;
+
+          std::tuple<double, double, double> confCoords = hit->performConformalTransformWithRespectToPoint(ref_point.first, ref_point.second);
+
+
+          for (int t_index = 0; t_index < sizeX; ++t_index) {
+            for (int r_index = 0; r_index < sizeY; ++r_index) {
+
+              float r_temp_min = std::get<0>(confCoords) * cos(m_node->getXMin())
+                                 + std::get<1>(confCoords) * sin(m_node->getXMin());
+              float r_temp_max = std::get<0>(confCoords) * cos(m_node->getXMax())
+                                 + std::get<1>(confCoords) * sin(m_node->getXMax());
+
+              float r_min1 = r_temp_min - std::get<2>(confCoords);
+              float r_min2 = r_temp_min + std::get<2>(confCoords);
+              float r_max1 = r_temp_max - std::get<2>(confCoords);
+              float r_max2 = r_temp_max + std::get<2>(confCoords);
+
+              float m_rMin = m_node->getYMin();
+              float m_rMax = m_node->getYMax();
+
+              dist_1[0][0] = m_rMin - r_min1;
+              dist_1[0][1] = m_rMin - r_max1;
+              dist_1[1][0] = m_rMax - r_min1;
+              dist_1[1][1] = m_rMax - r_max1;
+
+              dist_2[0][0] = m_rMin - r_min2;
+              dist_2[0][1] = m_rMin - r_max2;
+              dist_2[1][0] = m_rMax - r_min2;
+              dist_2[1][1] = m_rMax - r_max2;
+
+
+              //curves are assumed to be straight lines, might be a reasonable assumption locally
+              if (!FastHough::sameSign(dist_1[0][0], dist_1[0][1],
+                                       dist_1[1][0], dist_1[1][1])) {
+                //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+                m_node->insertItem(hit);
+              } else if (!FastHough::sameSign(dist_2[0][0], dist_2[0][1],
+                                              dist_2[1][0], dist_2[1][1])) {
+                //B2DEBUG(100, "INSERT hit in " << t_index << ";" << r_index << " bin");
+                m_node->insertItem(hit);
+              }
+
+
+
+            }
+          }
+          //B2DEBUG(100, "MOVING to next hit");
+        }
+
+      }
+
+    };
+
+
   }
 }

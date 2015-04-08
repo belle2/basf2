@@ -49,6 +49,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    template<typename data> class QuadTreeItem;
+
     template<typename quadChild>
     class QuadChildrenTemplate {
     public:
@@ -315,5 +317,6 @@ namespace Belle2 {
 
     // a special instance
     typedef TrackFindingCDC::QuadTreeTemplate<int, float, TrackFindingCDC::TrackHit> QuadTreeLegendre;
+    typedef TrackFindingCDC::QuadTreeTemplate<int, float, QuadTreeItem<TrackFindingCDC::TrackHit>> QuadTreeLegendreTemp;
   }
 }

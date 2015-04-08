@@ -25,18 +25,30 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+
+  if (argc < 2) {
+    printf("Usage : nodedump unitname nodename\n");
+    return -1;
+  }
+
   char host[256];
   gethostname(host, sizeof(host));
 
-  char* conffile = getenv("RFARM_CONFFILE");
-  RFConf conf(conffile);
+  char* confdir = getenv("RFARM_CONFDIR");
+  string confpath = string(confdir) + "/" + string(argv[1]) + ".conf";
+
+  RFConf conf(confpath.c_str());
+
+  //  char* conffile = getenv("RFARM_CONFFILE");
+  //  RFConf conf(conffile);
 
   char nodename[256];
   int nid = 0;
   int idlist[256];
   char item[256][7];
-  if (argc >= 2) {
-    if (strstr(argv[1], "dist") != NULL) {      // distributor
+
+  if (argc >= 3) {
+    if (strstr(argv[2], "dist") != NULL) {      // distributor
       strcpy(nodename, "distributor");
       int nnodes = conf.getconfi("processor", "nnodes");
       idlist[0] = RF_INPUT_ID;
@@ -46,7 +58,7 @@ int main(int argc, char** argv)
         sprintf(item[i + 1], "OUT%2.2d ", i);
       }
       nid = nnodes + 1;
-    } else if (strstr(argv[1], "col") != NULL) {    // collector
+    } else if (strstr(argv[2], "col") != NULL) {    // collector
       strcpy(nodename, "collector");
       int nnodes = conf.getconfi("processor", "nnodes");
       for (int i = 0; i < nnodes; i++) {

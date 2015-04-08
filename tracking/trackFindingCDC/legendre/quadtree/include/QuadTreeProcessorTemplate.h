@@ -1,3 +1,13 @@
+/**************************************************************************
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2014 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Viktor Trusov, Thomas Hauth, Nils Braun                  *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
+
 #pragma once
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
@@ -6,48 +16,123 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * This abstract class serves as a base class for all implementations of track processors.
+     * It provides some functions to create, fill, clear and postprocess a quad tree.
+     * If you want to use your own class as a quad tree item, you have to overload this processor (not the quad tree itself as it is templated).
+     * You have provide only the two functions insertItemInNode and createChildWithParent.
+     */
     template<typename typeX, typename typeY, class typeData, int binCountX, int binCountY>
     class QuadTreeProcessorTemplate {
 
     public:
-      typedef QuadTreeItem<typeData> QuadTreeItem;
-      typedef QuadTreeTemplate<typeX, typeY, QuadTreeItem, binCountX, binCountY> QuadTree;
-      typedef typename QuadTree::CandidateProcessorLambda CandidateProcessorLambda;
-      typedef typename QuadTree::Children QuadTreeChildren;
+      typedef QuadTreeItem<typeData> QuadTreeItem; /**< The QuadTree will only see items of this type */
+      typedef QuadTreeTemplate<typeX, typeY, QuadTreeItem, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
+      typedef typename QuadTree::CandidateProcessorLambda
+      CandidateProcessorLambda; /**< This lambda function can be used for postprocessing */
+      typedef typename QuadTree::Children QuadTreeChildren; /**< A typedef for the QuadTree Children */
 
-      typedef std::pair<typeX, typeX> rangeX;
-      typedef std::pair<typeY, typeY> rangeY;
-      typedef std::pair<rangeX, rangeY> ChildRanges;
+      typedef std::pair<typeX, typeX> rangeX;   /**< This pair describes the range in X for a node */
+      typedef std::pair<typeY, typeY> rangeY;   /**< This pair describes the range in Y for a node */
+      typedef std::pair<rangeX, rangeY> ChildRanges; /**< This pair of ranges describes the range of a node */
+
+      friend QuadTree;
 
     public:
+      /**
+       * Constructor is very simple. The QuadTree has to be constructed elsewhere.
+       * @param lastLevel describing the last search level for the quad tree creation.
+       */
       QuadTreeProcessorTemplate(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
-      virtual ~QuadTreeProcessorTemplate() { }
 
-      virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const = 0;
-      virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int xIndex, unsigned int yIndex) const = 0;
+      /**
+       * Destructor is empty.
+       */
+      virtual ~QuadTreeProcessorTemplate() {}
 
+    protected:
+      /**
+       * Implement that function if you want to provide a new processor. It decides which node-ranges the n * m children of the node should have.
+       * It is called when creating the nodes. The two indices iX and iY tell you where the new node will be created (as node.children[iX][iY]).
+       * You can check some information on the level or the x- or y-values by using the methods implemented for node.
+       * @return a ChildRange pair of a x- and a y-range that the new child range should have.
+       * If you don nt want to provide custom ranges, just return ChildRanges(rangeX(node->getXBin(iX), node->getXBin(iX + 1)),
+       * rangeY(node->getYBin(iY), node->getYBin(iY + 1)));
+       */
+      virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const = 0;
+
+      /**
+       * Implement that function if you want to provide a new processor. It is called when filling the quad tree after creation.
+       * For every item in a node and every child node this function gets called and should decide, if the item should go into this child node or not.
+       * @param node = child node
+       * @param item = item to be filled into the child node or not
+       * @param iX, iY the indices of the child node.
+       * @return true if this item belongs into this node.
+       */
+      virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int iX, unsigned int iY) const = 0;
+
+    public:
+      /**
+       * Start filling the already created tree.
+       * @param tree the tree to fill
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       * @param rThreshold the threshold in the y variable
+       */
+      virtual void fillGivenTree(QuadTree& tree, CandidateProcessorLambda& lmdProcessor,
+                                 unsigned int nHitsThreshold, typeY rThreshold) const final
+      {
+        fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
+      }
+
+      /**
+       * Start filling the already created tree.
+       * @param tree the tree to fill
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       */
+      virtual void fillGivenTree(QuadTree& tree, CandidateProcessorLambda& lmdProcessor,
+                                 unsigned int nHitsThreshold) const final
+      {
+        fillGivenTree(&tree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
+      }
+
+      virtual void provideItemsSet(QuadTree& tree, std::vector<typeData*>& itemsVector)
+      {
+        std::vector<QuadTreeItem*>& quadtreeItemsVector = tree.getItemsVector();
+        for (typeData* item : itemsVector) {
+          quadtreeItemsVector.push_back(new QuadTreeItem(item));
+        }
+      }
+
+      /**
+       * Delete all the QuadTreeItems in the tree and clear the tree.
+       */
+      virtual void clear(QuadTree& tree)
+      {
+        const std::vector<QuadTreeItem*>& quadtreeItemsVector = tree.getItemsVector();
+        for (QuadTreeItem* item : quadtreeItemsVector) {
+          delete item;
+        }
+        tree.clearTree();
+      }
+
+    protected:
+      /**
+       * Return the parameter last level.
+       */
+      virtual unsigned int getLastLevel() const final
+      {
+        return m_lastLevel;
+      }
+
+    private:
       virtual void cleanUpItems(std::vector<QuadTreeItem*>& items) const final
       {
         items.erase(std::remove_if(items.begin(), items.end(),
         [&](QuadTreeItem * hit) {return hit->isUsed();}),
         items.end());
       };
-
-      // version with a threshold on y
-      virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor,
-                                 unsigned int nHitsThreshold, typeY rThreshold) const final
-      {
-        fillGivenTree(node, lmdProcessor, nHitsThreshold, rThreshold, true);
-      }
-
-      // version without a threshold on y
-      virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor,
-                                 unsigned int nHitsThreshold) const final
-      {
-        fillGivenTree(node, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
-      }
-
-    private:
 
       virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
                                  bool checkThreshold) const final
@@ -111,7 +196,6 @@ namespace Belle2 {
         }
       }
 
-    public:
       virtual void fillChildren(QuadTree* node, std::vector<QuadTreeItem*>& items) const final
       {
         const size_t neededSize = 2 * items.size();
@@ -148,7 +232,7 @@ namespace Belle2 {
         }
       }
 
-
+      // depricated
       virtual void provideItemsSet(const std::set<QuadTreeItem*>& items_set, std::vector<QuadTreeItem*>& items_vector) const final
       {
         items_vector.clear();
@@ -157,13 +241,8 @@ namespace Belle2 {
         [&](QuadTreeItem * item) {return not item->isUsed();});
       };
 
-      virtual unsigned int getLastLevel() const final
-      {
-        return m_lastLevel;
-      }
-
     private:
-      unsigned int m_lastLevel;
+      unsigned int m_lastLevel; /**< The last level to be filled */
     };
   }
 }

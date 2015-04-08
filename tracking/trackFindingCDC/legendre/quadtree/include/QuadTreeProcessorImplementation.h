@@ -3,17 +3,10 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Viktor Trusov, Thomas Hauth                              *
+* Contributors: Viktor Trusov, Thomas Hauth, Nils Braun                  *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-/*
- * Object which can store pointers to hits while processing FastHogh algorithm
- *
- * TODO: check if it's possible to store in each hit list of nodes in which we can meet it.
- *
- */
 
 
 #pragma once
@@ -27,12 +20,16 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class TrackHit;
 
+    /** A QuadTreeProcessor for TrackHits */
     class HitQuadTreeProcessor : public QuadTreeProcessorTemplate<int, float, TrackHit, 2, 2> {
 
     public:
 
       HitQuadTreeProcessor(unsigned int lastLevel) : QuadTreeProcessorTemplate(lastLevel) { }
 
+      /**
+       * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
+       */
       bool insertItemInNode(QuadTree* node, TrackHit* hit, unsigned int t_index, unsigned int r_index) const override
       {
         float dist_1[2][2];
@@ -71,6 +68,9 @@ namespace Belle2 {
                 !FastHough::sameSign(dist_2[0][0], dist_2[0][1], dist_2[1][0], dist_2[1][1]));
       }
 
+      /**
+       * Return
+       */
       ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
       {
         if ((node->getLevel() > (getLastLevel() - 7)) && (fabs(node->getYMean()) > 0.005)) {

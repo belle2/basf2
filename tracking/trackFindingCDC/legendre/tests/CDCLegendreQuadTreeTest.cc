@@ -29,31 +29,29 @@ using namespace TrackFindingCDC;
 
 TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
-  QuadTreeLegendreTemp qt(0, std::pow(2, 13), -1.5, 1.5, 0, nullptr);
-
   markAllHitsAsUnused();
   std::set<TrackHit*>& hits_set = getHitSet();
-  std::set<LegendreQuadTreeItem*> items_set;
+  std::vector<TrackHit*> hitVector;
 
   for (TrackHit* trackHit : hits_set) {
-    items_set.insert(new LegendreQuadTreeItem(trackHit));
+    hitVector.push_back(trackHit);
   }
 
-  QuadTreeLegendreTemp::NodeList candidateNodes;
-
   HitQuadTreeProcessor qtProcessor(13);
-  qt.provideItemsSet(qtProcessor, items_set);
+  HitQuadTreeProcessor::QuadTree qt(0, std::pow(2, 13), -1.5, 1.5, 0, nullptr);
+  HitQuadTreeProcessor::QuadTree::NodeList candidateNodes;
 
-  HitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidateNodes](
-  QuadTreeTemplate<int, float, QuadTreeItem<TrackHit>>* qt) {
-    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](LegendreQuadTreeItem * th) {th->setUsedFlag();});
+  qtProcessor.provideItemsSet(qt, hitVector);
+
+  HitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidateNodes](HitQuadTreeProcessor::QuadTree * qt) {
+    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](QuadTreeItem<TrackHit>* th) {th->setUsedFlag();});
     candidateNodes.push_back(qt);
   };
 
   auto now = std::chrono::high_resolution_clock::now();
 
   // actual filling of the hits into the quad tree structure
-  qtProcessor.fillGivenTree(&qt, lmdProcessor, 55);
+  qtProcessor.fillGivenTree(qt, lmdProcessor, 55);
   auto later = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(numberOfPossibleTrackCandidate, candidateNodes.size());
@@ -65,5 +63,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   // The actual hit numbers are more than 50, but this is somewhat a lower bound
   EXPECT_GE(candidateNodes[0]->getNItems(), 50);
   EXPECT_GE(candidateNodes[1]->getNItems(), 50);
+
+  qtProcessor.clear(qt);
 }
 

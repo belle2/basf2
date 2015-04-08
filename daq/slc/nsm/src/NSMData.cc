@@ -377,20 +377,23 @@ void NSMData::print(const std::string& name_in) const throw()
       } else {
         const void* buf = getValue(name);
         const char* name_c = name_out.c_str();
+        if (pro.getType() == DBField::CHAR) {
+          printf("%s : %s\n", name_c, (char*)buf);
+        }
         for (int i = 0; i < (int)length; i++) {
           switch (pro.getType()) {
             case DBField::CHAR:
-              printf("%s[%d] : char(%d)\n", name_c, i, ((char*)buf)[i]); break;
+              break;
             case DBField::SHORT:
-              printf("%s[%d] : short(%d)\n", name_c, i, ((int16*)buf)[i]); break;
+              printf("%s[%d] : %d\n", name_c, i, ((int16*)buf)[i]); break;
             case DBField::INT:
-              printf("%s[%d] : int(%d)\n", name_c, i, ((int32*)buf)[i]); break;
+              printf("%s[%d] : %d\n", name_c, i, ((int32*)buf)[i]); break;
             case DBField::LONG:
-              printf("%s[%d] : long(%ld)\n", name_c, i, ((int64*)buf)[i]); break;
+              printf("%s[%d] : %ld\n", name_c, i, ((int64*)buf)[i]); break;
             case DBField::FLOAT:
-              printf("%s[%d] : float(%f)\n", name_c, i, ((float*)buf)[i]); break;
+              printf("%s[%d] : %f\n", name_c, i, ((float*)buf)[i]); break;
             case DBField::DOUBLE:
-              printf("%s[%d] : double(%f)\n", name_c, i, ((double*)buf)[i]); break;
+              printf("%s[%d] : %f\n", name_c, i, ((double*)buf)[i]); break;
             default : break;
           }
         }
@@ -404,17 +407,17 @@ void NSMData::print(const std::string& name_in) const throw()
         const char* name_c = name_out.c_str();
         switch (pro.getType()) {
           case DBField::CHAR:
-            printf("%s : char(%d)\n", name_c, *(char*)buf); break;
+            printf("%s : %d\n", name_c, *(char*)buf); break;
           case DBField::SHORT:
-            printf("%s : short(%d)\n", name_c, *(int16*)buf); break;
+            printf("%s : %d\n", name_c, *(int16*)buf); break;
           case DBField::INT:
-            printf("%s : int(%d)\n", name_c, *(int32*)buf); break;
+            printf("%s : %d\n", name_c, *(int32*)buf); break;
           case DBField::LONG:
-            printf("%s : long(%ld)\n", name_c, *(int64*)buf); break;
+            printf("%s : %ld\n", name_c, *(int64*)buf); break;
           case DBField::FLOAT:
-            printf("%s : float(%f)\n", name_c, *(float*)buf); break;
+            printf("%s : %f\n", name_c, *(float*)buf); break;
           case DBField::DOUBLE:
-            printf("%s : double(%f)\n", name_c, *(double*)buf); break;
+            printf("%s : %f\n", name_c, *(double*)buf); break;
           default : break;
         }
       }

@@ -29,14 +29,16 @@ Database& Database::Instance()
   return instance;
 }
 
-Database::Database(): m_globalTag("database.root"),  m_dbFile(0)
+Database::Database(): m_globalTag("database.root"),  m_dbFile(nullptr)
 {
 }
 
 Database::~Database()
 {
-  m_dbFile->Write();
-  delete m_dbFile;
+  if (m_dbFile) {
+    m_dbFile->Write();
+    delete m_dbFile;
+  }
 }
 
 

@@ -1,40 +1,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    template<class typeData>
-    class QuadTreeItem {
-    public:
-      QuadTreeItem(typeData& pointer) : m_pointer(pointer), m_usedFlag(false) { }
-
-      ~QuadTreeItem();
-      bool isUsed() const
-      {
-        return m_usedFlag;
-      }
-
-      void setUsedFlag(bool usedFlag = true)
-      {
-        m_usedFlag = usedFlag;
-      }
-
-      void unsetUsedFlag()
-      {
-        setUsedFlag(false);
-      }
-
-      typeData* getPointer()
-      {
-        return &m_pointer;
-      }
-
-    private:
-      typeData& m_pointer;
-      bool m_usedFlag;
-    };
 
     template<typename typeX, typename typeY, class typeData, int binCountX, int binCountY>
     class MyOwnProcessor {
@@ -52,7 +22,6 @@ namespace Belle2 {
       virtual QuadTree* createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const = 0;
       virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int xIndex, unsigned int yIndex) const = 0;
 
-      // Final
       virtual void cleanUpItems(std::vector<QuadTreeItem*>& items) const final
       {
         items.erase(std::remove_if(items.begin(), items.end(),
@@ -176,7 +145,7 @@ namespace Belle2 {
         [&](QuadTreeItem * item) {return not item->isUsed();});
       };
 
-      unsigned int getLastLevel() const
+      virtual unsigned int getLastLevel() const final
       {
         return m_lastLevel;
       }

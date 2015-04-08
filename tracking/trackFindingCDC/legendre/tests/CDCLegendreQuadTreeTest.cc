@@ -11,7 +11,9 @@
 #include <tracking/trackFindingCDC/legendre/tests_fixtures/CDCLegendreTestFixture.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
 #include <set>
 #include <cmath>
@@ -32,10 +34,10 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 
   markAllHitsAsUnused();
   std::set<TrackHit*>& hits_set = getHitSet();
+  std::set<LegendreQuadTreeItem*> items_set;
 
-  std::set<QuadTreeItem<TrackHit>*> items_set;
-  for (TrackHit* hit : hits_set) {
-    items_set.insert(new QuadTreeItem<TrackHit>(*hit));
+  for (TrackHit* trackHit : hits_set) {
+    items_set.insert(new LegendreQuadTreeItem(trackHit));
   }
 
   QuadTreeLegendreTemp::NodeList candidateNodes;
@@ -43,8 +45,9 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   QuadTreeProcessorTemp qtProcessor(13);
   qt.provideItemsSet(qtProcessor, items_set);
 
-  QuadTreeProcessorTemp::CandidateProcessorLambda lmdProcessor = [&candidateNodes](QuadTreeLegendreTemp * qt) {
-    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](QuadTreeItem<TrackHit>* th) {th->setUsedFlag();});
+  QuadTreeProcessorTemp::CandidateProcessorLambda lmdProcessor = [&candidateNodes](
+  QuadTreeTemplate<int, float, QuadTreeItem<TrackHit>>* qt) {
+    std::for_each(qt->getItemsVector().begin(), qt->getItemsVector().end(), [](LegendreQuadTreeItem * th) {th->setUsedFlag();});
     candidateNodes.push_back(qt);
   };
 
@@ -54,7 +57,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   qtProcessor.fillGivenTree(&qt, lmdProcessor, 55);
   auto later = std::chrono::high_resolution_clock::now();
 
-  EXPECT_EQ(numberOfPossibleTrackCandidate, candidateNodes.size());
+  ASSERT_EQ(numberOfPossibleTrackCandidate, candidateNodes.size());
 
   std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(later - now);
   B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidateNodes.size() << " candidates");

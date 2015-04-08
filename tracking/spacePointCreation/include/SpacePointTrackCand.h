@@ -379,7 +379,7 @@ namespace Belle2 {
      * */
     double m_qualityIndex;
 
-    // last members added: m_qualityIndex(6), m_refereeStatuts(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2)
+    // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
     ClassDef(SpacePointTrackCand, 6)
   };
 }

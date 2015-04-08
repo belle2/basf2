@@ -145,7 +145,7 @@ void TrackFitterModule::event()
     Event++;
     return;
   }
-
+  int nentries = TpcHits.getEntries();
   //auto columnArray = new vector<int>[nTPC](); //column
   //auto rowArray = new vector<int>[nTPC](); //row
   //auto bcidArray = new vector<int>[nTPC](); //BCID
@@ -153,138 +153,137 @@ void TrackFitterModule::event()
   int i_tpc[8];
   //int i_tpc1[8];
   //int i_tpc2[8];
-  for (int i = 0; i < nTPC; i++) {
-    StoreArray<MicrotpcRecoTrack> RecoTracks;
+  if (nentries > 0) {
 
-    i_tpc[i] = 0;
+    for (int i = 0; i < nTPC; i++) {
 
-    for (int j = 0; j < MAXSIZE; j++) {
-      x[j] = 0;
-      y[j] = 0;
-      z[j] = 0;
-      e[j] = 0;
-    }
+      i_tpc[i] = 0;
 
-
-    for (int j = 0; j < 5; j++)for (int k = 0; k < 4; k++)m_side[j][k] = 0;
-
-    Track = new TGraph2DErrors();
-
-    int xnpts[4];
-    int ynpts[4];
-    for (int j = 0; j < 4; j++) {
-      m_impact_x[j] = 0;
-      m_impact_y[j] = 0;
-      xnpts[j] = 0;
-      ynpts[j] = 0;
-    }
-
-    //Determine T0 for each TPC
-    int nentries = TpcHits.getEntries();
-    //i_tpc1[i]=0;
-    i_tpc[i] = 0;
-    for (int j = 0; j < nentries; j++) {
-      MicrotpcHit* aHit = TpcHits[j];
-      int detNb = aHit->getdetNb();
-      if (detNb == i) {
-        //i_tpc1[i]++;
-        i_tpc[i]++;
+      for (int j = 0; j < MAXSIZE; j++) {
+        x[j] = 0;
+        y[j] = 0;
+        z[j] = 0;
+        e[j] = 0;
       }
-    }
 
-    //int fpxhits = i_tpc1[i];
-    int fpxhits = i_tpc[i];
-    int time[fpxhits];
-    //i_tpc2[i]=0;
-    i_tpc[i] = 0;
-    for (int j = 0; j < nentries; j++) {
+      Track = new TGraph2DErrors();
 
-      MicrotpcHit* aHit = TpcHits[j];
-      int detNb = aHit->getdetNb();
-      int bcid = aHit->getBCID();
+      for (int j = 0; j < 5; j++)for (int k = 0; k < 4; k++)m_side[j][k] = 0;
 
-      if (detNb == i) {
-        time[i_tpc[i]] = bcid;
-        //i_tpc2[i]++;
-        i_tpc[i]++;
+      int xnpts[4];
+      int ynpts[4];
+      for (int j = 0; j < 4; j++) {
+        m_impact_x[j] = 0;
+        m_impact_y[j] = 0;
+        xnpts[j] = 0;
+        ynpts[j] = 0;
       }
-    }
-    i_tpc[i] = 0;
-    int itime[fpxhits];
-    TMath::Sort(fpxhits, time, itime, false);
-    m_time_range = fabs(time[itime[0]] - time[itime[fpxhits - 1]]);
 
-    int m_totsum = 0;
-    float m_esum = 0;
-    //loop on all entries to store in 3D the ionization for each TPC
-    for (int j = 0; j < nentries; j++) {
-
-      MicrotpcHit* aHit = TpcHits[j];
-      int detNb = aHit->getdetNb();
-      int col = aHit->getcolumn();
-      int row = aHit->getrow();
-      int tot = aHit->getTOT();
-      int bcid = aHit->getBCID();
-
-      if (detNb == i) {
-
-        x[i_tpc[i]] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX;
-        y[i_tpc[i]] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY;
-        z[i_tpc[i]] = (m_PixelTimeBin / 2. + m_PixelTimeBin * (bcid - time[itime[0]])) * m_v_DG;
-        m_totsum += tot;
-        if (tot < 3) e[i_tpc[i]] = fctQ_Calib1->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
-        else e[i_tpc[i]] = fctQ_Calib2->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
-        m_esum += e[i_tpc[i]];
-
-        Track->SetPoint(i_tpc[i], x[i_tpc[i]], y[i_tpc[i]], z[i_tpc[i]]);
-        //Track->SetPointError(i,0,0,e[i]);
-        Track->SetPointError(i_tpc[i], 0, 0, 1.);
-
-        for (int k = 0; k < 5; k++) {
-          if (0 <= col && col <= k)m_side[k][0] = k + 1;
-          if (80 - k <= col && col <= 80)m_side[k][1] = k + 1;
-          if (0 <= row && row <= 5 * k)m_side[k][2] = k + 1;
-          if (336 - 5 * k <= row && row <= 336)m_side[k][3] = k + 1;
+      //Determine T0 for each TPC
+      //i_tpc1[i]=0;
+      i_tpc[i] = 0;
+      for (int j = 0; j < nentries; j++) {
+        MicrotpcHit* aHit = TpcHits[j];
+        int detNb = aHit->getdetNb();
+        if (detNb == i) {
+          //i_tpc1[i]++;
+          i_tpc[i]++;
         }
-
-        if (col == 0) {
-          m_impact_y[0] += y[i_tpc[i]];
-          ynpts[0]++;
-        }
-        if (col == 1) {
-          m_impact_y[1] += y[i_tpc[i]];
-          ynpts[1]++;
-        }
-        if (col == 80) {
-          m_impact_y[2] += y[i_tpc[i]];
-          ynpts[2]++;
-        }
-        if (col == 79) {
-          m_impact_y[3] += y[i_tpc[i]];
-          ynpts[3]++;
-        }
-        if (row == 0) {
-          m_impact_x[0] += x[i_tpc[i]];
-          xnpts[0]++;
-        }
-        if (row == 1) {
-          m_impact_x[1] += x[i_tpc[i]];
-          xnpts[1]++;
-        }
-        if (row == 2) {
-          m_impact_x[2] += x[i_tpc[i]];
-          xnpts[2]++;
-        }
-        if (row == 3) {
-          m_impact_x[3] += x[i_tpc[i]];
-          xnpts[3]++;
-        }
-        i_tpc[i]++;
       }
+
+      //int fpxhits = i_tpc1[i];
+      int fpxhits = i_tpc[i];
+      int time[fpxhits];
+      //i_tpc2[i]=0;
+      i_tpc[i] = 0;
+      for (int j = 0; j < nentries; j++) {
+
+        MicrotpcHit* aHit = TpcHits[j];
+        int detNb = aHit->getdetNb();
+        int bcid = aHit->getBCID();
+
+        if (detNb == i) {
+          time[i_tpc[i]] = bcid;
+          //i_tpc2[i]++;
+          i_tpc[i]++;
+        }
+      }
+      i_tpc[i] = 0;
+      int itime[fpxhits];
+      TMath::Sort(fpxhits, time, itime, false);
+      m_time_range = fabs(time[itime[0]] - time[itime[fpxhits - 1]]);
+
+      int m_totsum = 0;
+      float m_esum = 0;
+      //loop on all entries to store in 3D the ionization for each TPC
+      for (int j = 0; j < nentries; j++) {
+
+        MicrotpcHit* aHit = TpcHits[j];
+        int detNb = aHit->getdetNb();
+        int col = aHit->getcolumn();
+        int row = aHit->getrow();
+        int tot = aHit->getTOT();
+        int bcid = aHit->getBCID();
+
+        if (detNb == i) {
+
+          x[i_tpc[i]] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX;
+          y[i_tpc[i]] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY;
+          z[i_tpc[i]] = (m_PixelTimeBin / 2. + m_PixelTimeBin * (bcid - time[itime[0]])) * m_v_DG;
+          m_totsum += tot;
+          if (tot < 3) e[i_tpc[i]] = fctQ_Calib1->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
+          else e[i_tpc[i]] = fctQ_Calib2->Eval(tot) / (m_GEMGain1 * m_GEMGain2) * m_Workfct * 1e-3;
+          m_esum += e[i_tpc[i]];
+
+          Track->SetPoint(i_tpc[i], x[i_tpc[i]], y[i_tpc[i]], z[i_tpc[i]]);
+          //Track->SetPointError(i_tpc[i],0,0,e[i_tpc[i]]);
+          Track->SetPointError(i_tpc[i], 0, 0, 1.);
+
+          for (int k = 0; k < 5; k++) {
+            if (0 <= col && col <= k)m_side[k][0] = k + 1;
+            if (80 - k <= col && col <= 80)m_side[k][1] = k + 1;
+            if (0 <= row && row <= 5 * k)m_side[k][2] = k + 1;
+            if (336 - 5 * k <= row && row <= 336)m_side[k][3] = k + 1;
+          }
+
+          if (col == 0) {
+            m_impact_y[0] += y[i_tpc[i]];
+            ynpts[0]++;
+          }
+          if (col == 1) {
+            m_impact_y[1] += y[i_tpc[i]];
+            ynpts[1]++;
+          }
+          if (col == 80) {
+            m_impact_y[2] += y[i_tpc[i]];
+            ynpts[2]++;
+          }
+          if (col == 79) {
+            m_impact_y[3] += y[i_tpc[i]];
+            ynpts[3]++;
+          }
+          if (row == 0) {
+            m_impact_x[0] += x[i_tpc[i]];
+            xnpts[0]++;
+          }
+          if (row == 1) {
+            m_impact_x[1] += x[i_tpc[i]];
+            xnpts[1]++;
+          }
+          if (row == 2) {
+            m_impact_x[2] += x[i_tpc[i]];
+            xnpts[2]++;
+          }
+          if (row == 3) {
+            m_impact_x[3] += x[i_tpc[i]];
+            xnpts[3]++;
+          }
+          i_tpc[i]++;
+        }
+      }
+      fpxhits = i_tpc[i];
 
       if (fpxhits > 0) {
-
-        //int fpxhits = i_tpc[i];
 
         for (int j = 0; j < 4; j++) {
           if (xnpts[j] > 0)m_impact_x[j] = m_impact_x[j] / ((double)xnpts[j]);
@@ -313,7 +312,6 @@ void TrackFitterModule::event()
         float init_theta = 0.;
         float init_phi = 0.;
         float pStart[5] = {0, 0, 0, 0, 0};
-        //cout << x[ix[fpxhits-1]]-x[ix[0]] << endl;
         temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]], z[iz[fpxhits - 1]] - z[iz[0]]);
         init_theta = temp_vector3.Theta();
         init_phi   = temp_vector3.Phi();
@@ -338,14 +336,14 @@ void TrackFitterModule::event()
         min->GetStats(amin, edm, errdef, nvpar, nparx);
         m_chi2 = amin;
 
-        for (int i = 0; i < 5; i++) {
-          m_parFit[i] = 0;
-          m_parFit_err[i] = 0;
-          m_parFit[i] = min->GetParameter(i);
-          m_parFit_err[i] = min->GetParError(i);
-          for (int j = 0; j < 5; j++) {
-            m_cov[i][j] = 0;
-            m_cov[i][j] = min->GetCovarianceMatrixElement(i, j);
+        for (int j = 0; j < 5; j++) {
+          m_parFit[j] = 0;
+          m_parFit_err[j] = 0;
+          m_parFit[j] = min->GetParameter(j);
+          m_parFit_err[i] = min->GetParError(j);
+          for (int k = 0; k < 5; k++) {
+            m_cov[j][k] = 0;
+            m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
           }
         }
 
@@ -356,26 +354,28 @@ void TrackFitterModule::event()
         m_theta = m_parFit[3] * TMath::RadToDeg();
         m_phi   = m_parFit[4] * TMath::RadToDeg();
 
-        for (int i = 0; i < fpxhits; i++) {
-          TVector3 Point(x[i], y[i], z[i]);
-          L[i] = Point * TrackDir.Unit();
+        for (int j = 0; j < fpxhits; j++) {
+          TVector3 Point(x[j], y[j], z[j]);
+          L[j] = Point * TrackDir.Unit();
         }
 
         iL = new int [fpxhits];
         TMath::Sort(fpxhits, L, iL, false);
         m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
 
+        StoreArray<MicrotpcRecoTrack> RecoTracks;
         RecoTracks.appendNew(i, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov, m_impact_x,
                              m_impact_y, m_side);
 
+        delete [] iL;
         delete min;
-        Track->Delete();
         delete [] L;
         delete [] ix;
         delete [] iy;
         delete [] iz;
-        delete [] iL;
+
       }
+      Track->Delete();
     }
   }
 

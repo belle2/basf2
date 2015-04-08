@@ -17,17 +17,17 @@ whitespace, comma or semi-colon -->
 </bar>
 <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
 <GEMGain1>40</GEMGain1>
-<GEMGain2>20</GEMGain2>
+<GEMGain2>50</GEMGain2>
 <GEMGainRMS1>0.2</GEMGainRMS1>
 <GEMGainRMS2>0.2</GEMGainRMS2>
-<ScaleGain1>4</ScaleGain1>
-<ScaleGain2>2</ScaleGain2>
+<ScaleGain1>10</ScaleGain1>
+<ScaleGain2>10</ScaleGain2>
 <GEMpitch>0.014</GEMpitch>
 <PixelThreshold>3000</PixelThreshold>
 <PixelThresholdRMS>150</PixelThresholdRMS>
 <ChipColumnNb>80</ChipColumnNb>
 <ChipColumnX>1</ChipColumnX>
-<ChipRowNb>226</ChipRowNb>
+<ChipRowNb>336</ChipRowNb>
 <ChipRowY>0.84</ChipRowY>
 <PixelTimeBinNb>256</PixelTimeBinNb>
 <PixelTimeBin>25</PixelTimeBin>
@@ -111,6 +111,22 @@ whitespace, comma or semi-colon -->
 <TPCpos_y unit="cm">-39.92000</TPCpos_y>
 <TPCpos_z unit="cm">-40.00000</TPCpos_z>
 </Active>
+<!--
+<Active>
+<MaterialVessel>MICROTPC-Material</MaterialVessel>
+<MaterialGas>MICROTPC-Material</MaterialGas>
+<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+<Material>MICROTPC-Material</Material>
+<dx_Vessel unit="cm">12.7</dx_Vessel>
+<dy_Vessel unit="cm">10.16</dy_Vessel>
+<dz_Vessel unit="cm">30.0</dz_Vessel>
+<AngleX unit="deg">0.0</AngleX>
+<AngleZ unit="deg">90.0</AngleZ>
+<TPCpos_x unit="cm">0</TPCpos_x>
+<TPCpos_y unit="cm">0</TPCpos_y>
+<TPCpos_z unit="cm">0</TPCpos_z>
+</Active>
+-->
 </Content>
 </DetectorComponent>
 

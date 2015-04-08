@@ -141,6 +141,13 @@ void TpcDigitizerModule::event()
   //auto rowArray = new vector<int>[nTPC](); //row
   //auto bcidArray = new vector<int>[nTPC](); //BCID
   //auto totArray = new vector<int>[nTPC](); //TOT
+  /** Initialize 3D array */
+  for (int i = 0; i < nTPC; i++)
+    for (int j = 0; j < 80; j++)
+      for (int k = 0; k < 336; k++)
+        for (int l = 0; l < MAXtSIZE; l++)
+          dchip[i][j][k][l] = 0;
+
 
   //Determine T0 for each TPC
   int nentries = TpcSimHits.getEntries();
@@ -155,7 +162,8 @@ void TpcDigitizerModule::event()
     MicrotpcSimHit* aHit = TpcSimHits[i];
     int detNb = aHit->getdetNb();
     TVector3 posn = aHit->gettkPos() ;
-    double T = posn.Z() / 100. + (TPCCenter[detNb].Z() + 10.) + m_z_DG;
+    //double T = posn.Z() / 100. + (TPCCenter[detNb].Z() + 10.) + m_z_DG;
+    double T = posn.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
     if (T < T0[detNb])T0[detNb] = T;
   }
   for (int i = 0; i < nTPC; i++) {
@@ -169,21 +177,17 @@ void TpcDigitizerModule::event()
     MicrotpcSimHit* aHit = TpcSimHits[i];
     int detNb = aHit->getdetNb();
 
-    for (int i = 0; i < 80; i++)
-      for (int j = 0; j < 336; j++)
-        for (int k = 0; k < MAXtSIZE; k++)
-          dchip[detNb][i][j][k] = 0;
-
     double edep = aHit->getEnergyDep();
     double niel = aHit->getEnergyNiel();
     TVector3 position = aHit->gettkPos();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
-    double zpos = position.Z() / 100. + (TPCCenter[detNb].Z() + 10) + m_z_DG;
+    //double zpos = position.Z() / 100. + (TPCCenter[detNb].Z() + 10) + m_z_DG;
+    double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
 
     if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
         (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
-        (0. < zpos && zpos <  m_z_DG) &&
+        (0. < zpos && zpos <  m_z_DG * 2.) &&
         (0. < T0[detNb] && T0[detNb] < 1000000.)) {
 
       //ionization energy
@@ -241,7 +245,7 @@ void TpcDigitizerModule::event()
                   (0 <= pix && pix < m_ChipColumnNb * m_ChipRowNb)  &&
                   (0 <= bci && bci < MAXtSIZE)) {
                 PixelFired[detNb] = true;
-                dchip[detNb][col][row][bci] += m_ScaleGain1 * m_ScaleGain2;
+                dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
               }
             }
           }
@@ -299,7 +303,6 @@ void TpcDigitizerModule::GEMGeo2(double x1, double y1, double& x2, double& y2)
 //Make pixel hit
 bool TpcDigitizerModule::Pixelization(int detNb)
 {
-
   vector <int> t0; t0.clear();
   vector <int> col; col.clear();
   vector <int> row; row.clear();
@@ -323,6 +326,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
         }
       }
       //determined nb of bc per pixel
+
       //if good t0
       if (k0 != -10) {
         int ik = 0;
@@ -341,10 +345,10 @@ bool TpcDigitizerModule::Pixelization(int detNb)
             else if (NbOfEl > 800.*m_TOTQ1)
               tot = 14;
             if (tot > 13)tot = 14;
-            if (tot > 0) {
+            if (tot >= 0) {
               int nbofel = NbOfEl;
               ran.push_back(nbofel);
-              ToT.push_back(tot - 1);
+              ToT.push_back(tot);
 
               //find start time
               t0.push_back(k0);
@@ -366,7 +370,6 @@ bool TpcDigitizerModule::Pixelization(int detNb)
   bool PixHit = false;
   //if entry
   if (bci.size() > 0) {
-
     PixHit = true;
     //find start time
     sort(t0.begin(), t0.end());

@@ -726,6 +726,7 @@ HitPatternVXD GenFitterModule::getHitPatternVXD(genfit::Track track)
 
   //hits used in the fit
   int nHits = track.getNumPointsWithMeasurement();
+  int nNotFittedVXDhits = 0;
 
   for (int i = 0; i < nHits; i++) {
     genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
@@ -742,7 +743,7 @@ HitPatternVXD GenFitterModule::getHitPatternVXD(genfit::Track track)
         weights = kalmanInfo->getWeights();
         weight = weights.at(mea);
       } else {
-        B2WARNING(" No KalmanFitterInfo associated to the TrackPoint, not filling the HitPatternVXD");
+        ++nNotFittedVXDhits;
         continue;
       }
 
@@ -785,7 +786,10 @@ HitPatternVXD GenFitterModule::getHitPatternVXD(genfit::Track track)
     //maximum number of hits checked inside the HitPatternVXD
     aHitPatternVXD.setSVDLayer(l, SVD_uHits[l], SVD_vHits[l]);
 
-
+  if (nNotFittedVXDhits > 0) {
+    B2WARNING(" No KalmanFitterInfo associated to some TrackPoints with VXD hits, not filling the HitPatternVXD");
+    B2DEBUG(100, nNotFittedVXDhits << " had no FitterInfo");
+  }
   return aHitPatternVXD;
 }
 
@@ -797,7 +801,7 @@ HitPatternCDC GenFitterModule::getHitPatternCDC(genfit::Track track)
   //hits used in the fit
   int nHits = track.getNumPointsWithMeasurement();
   int nCDChits = 0;
-
+  int nNotFittedCDChits = 0;
   for (int i = 0; i < nHits; i++) {
     genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
 
@@ -814,7 +818,7 @@ HitPatternCDC GenFitterModule::getHitPatternCDC(genfit::Track track)
         weights = kalmanInfo->getWeights();
         weight = weights.at(mea);
       } else {
-        B2WARNING(" No KalmanFitterInfo associated to the TrackPoint, not filling the HitPatternCDC");
+        ++nNotFittedCDChits;
         continue;
       }
 
@@ -833,7 +837,10 @@ HitPatternCDC GenFitterModule::getHitPatternCDC(genfit::Track track)
     }
 
   }
-
+  if (nNotFittedCDChits > 0) {
+    B2WARNING(" No KalmanFitterInfo associated to some TrackPoints with CDC hits, not filling the HitPatternCDC");
+    B2DEBUG(100, nNotFittedCDChits << " out of " << nCDChits << " had no FitterInfo");
+  }
   aHitPatternCDC.setNHits(nCDChits);
 
   return aHitPatternCDC;

@@ -89,6 +89,7 @@ DBObject DBObjectLoader::load(DBInterface& db,
              tablename.c_str(), rootnode.c_str());
   DBRecordList record_v(db.loadRecords());
   DBObject obj;
+  if (record_v.size() == 0) return obj;
   obj.setName(configname);
   for (size_t i = 0; i < record_v.size(); i++) {
     DBRecord& record(record_v[i]);
@@ -237,11 +238,19 @@ bool DBObjectLoader::setObject(DBObject& obj, StringList& str,
       case DBField::TEXT:   obj.addText(name, value); break;
       case DBField::OBJECT: {
         DBObject cobj(value);
+        std::string config_out = config_in;
         if (db) {
-          cobj = DBObjectLoader::load(*db, table_in, config_in, true);
+          cobj = DBObjectLoader::load(*db, table_in, config_out, true);
+          if (cobj.getName().size() == 0) {
+            StringList list = DBObjectLoader::getDBlist(*db, table_in, config_out);
+            if (list.size() > 0) {
+              config_out = list[0];
+              cobj = DBObjectLoader::load(*db, table_in, config_out, true);
+            }
+          }
         }
         if (cobj.hasObject(name)) {
-          cobj.getObject(name).setPath(table_in + "/" + config_in);
+          cobj.getObject(name).setPath(table_in + "/" + config_out);
           obj.addObjects(name, cobj.getObjects(name));
         } else {
           cobj.setName(name);
@@ -269,6 +278,10 @@ bool DBObjectLoader::createDB(DBInterface& db,
     return false;
   }
   try {
+    if (obj.getName().size() == 0) {
+      LogFile::error("Configname is null. createDB canceled.");
+      return false;
+    }
     if (!db.checkTable(tablename)) {
       db.execute("create table %s \n"
                  "(name  varchar(64) \n"
@@ -299,28 +312,20 @@ bool DBObjectLoader::createDB(DBInterface& db,
 
 StringList DBObjectLoader::getDBlist(DBInterface& db,
                                      const std::string& tablename,
-                                     const std::string& nodename,
                                      const std::string& grep)
 {
   StringList str;
   try {
     if (!db.isConnected()) db.connect();
-    if (nodename.size() > 0) {
-      if (grep.size() > 0) {
-        db.execute("select name from %s where name = REPLACE(path, '.', '') and name like '%s@%s_%';",
-                   tablename.c_str(), nodename.c_str(), grep.c_str());
-      } else {
-        db.execute("select name from %s where name = REPLACE(path, '.', '') and name like '%s@_%';",
-                   tablename.c_str(), nodename.c_str());
-      }
+    if (grep.size() > 0) {
+      const char* prefix = grep.c_str();
+      db.execute("select name from %s where name = REPLACE(path, '.', '') "
+                 "and (name like '_%%%s_%%' or name like '_%%%s' or "
+                 "name like '%s_%%' or name = '%s') order by id desc;",
+                 tablename.c_str(), prefix, prefix, prefix, prefix);
     } else {
-      if (grep.size() > 0) {
-        db.execute("select name from %s where name = REPLACE(path, '.', '') and name like '_%%@%s_%';",
-                   tablename.c_str(), grep.c_str());
-      } else {
-        db.execute("select name from %s where name = REPLACE(path, '.', '');",
-                   tablename.c_str());
-      }
+      db.execute("select name from %s where name = REPLACE(path, '.', '') "
+                 "order by id desc;", tablename.c_str());
     }
     DBRecordList record_v(db.loadRecords());
     for (size_t i = 0; i < record_v.size(); i++) {
@@ -328,7 +333,7 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
       str.push_back(record.get("name"));
     }
   } catch (const DBHandlerException& e) {
-
+    LogFile::error(e.what());
   }
   return str;
 }

@@ -1,5 +1,5 @@
 //+
-// File : StorageOutput.cc
+// File : StorageSerializer.cc
 // Description : Sequential ROOT output module for pbasf2
 //
 // Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
@@ -9,7 +9,7 @@
 //-
 
 
-#include <daq/storage/modules/StorageOutput.h>
+#include <daq/storage/modules/StorageSerializer.h>
 #include <daq/storage/modules/StorageDeserializer.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
@@ -21,13 +21,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(StorageOutput)
+REG_MODULE(StorageSerializer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-StorageOutputModule::StorageOutputModule() : Module()
+StorageSerializerModule::StorageSerializerModule() : Module()
 {
   //Set module properties
   setDescription("SeqROOT output module");
@@ -36,13 +36,13 @@ StorageOutputModule::StorageOutputModule() : Module()
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 1);
   addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
   addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 100000000);
-  B2DEBUG(1, "StorageOutput: Constructor done.");
+  B2DEBUG(1, "StorageSerializer: Constructor done.");
 }
 
 
-StorageOutputModule::~StorageOutputModule() { }
+StorageSerializerModule::~StorageSerializerModule() { }
 
-void StorageOutputModule::initialize()
+void StorageSerializerModule::initialize()
 {
   m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
@@ -54,16 +54,16 @@ void StorageOutputModule::initialize()
     B2ERROR("Failed to load arguments for shared buffer (" <<
             m_obuf_name.c_str() << ":" << m_obuf_size << ")");
   }
-  B2INFO("StorageOutput: initialized.");
+  B2INFO("StorageSerializer: initialized.");
 }
 
 
-void StorageOutputModule::beginRun()
+void StorageSerializerModule::beginRun()
 {
-  B2INFO("StorageOutput: beginRun called.");
+  B2INFO("StorageSerializer: beginRun called.");
 }
 
-void StorageOutputModule::event()
+void StorageSerializerModule::event()
 {
   StoreObjPtr<EventMetaData> evtmetadata;
   unsigned int expno = evtmetadata->getExperiment();
@@ -110,13 +110,13 @@ void StorageOutputModule::event()
   m_count++;
 }
 
-void StorageOutputModule::endRun()
+void StorageSerializerModule::endRun()
 {
-  B2INFO("StorageOutput : endRun called");
+  B2INFO("StorageSerializer : endRun called");
 }
 
 
-void StorageOutputModule::terminate()
+void StorageSerializerModule::terminate()
 {
   B2INFO("terminate called")
 }

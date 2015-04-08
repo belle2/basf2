@@ -37,14 +37,14 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class StorageOutputModule : public Module {
+  class StorageSerializerModule : public Module {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    StorageOutputModule();
-    virtual ~StorageOutputModule();
+    StorageSerializerModule();
+    virtual ~StorageSerializerModule();
 
     //! Module functions to be called from main process
     virtual void initialize();

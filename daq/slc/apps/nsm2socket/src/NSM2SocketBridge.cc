@@ -119,7 +119,11 @@ void NSM2SocketBridge::dblistget(const std::string& table,
 {
   DBInterface& db(getDB());
   try {
-    StringList ss = DBObjectLoader::getDBlist(db, table, node.getName(), grep);
+    std::string nodename = node.getName();
+    std::string prefix;
+    if (nodename.size() > 0) prefix = nodename + "@";
+    prefix += grep;
+    StringList ss = DBObjectLoader::getDBlist(db, table, prefix);
     std::string list = StringUtil::join(ss, "\n");
     send(NSMMessage(NSMNode(node), NSMCommand::DBLISTSET, ss.size(), list));
   } catch (const DBHandlerException& e) {

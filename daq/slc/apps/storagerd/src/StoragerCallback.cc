@@ -57,12 +57,13 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
       m_con.push_back(ProcessController(this));
     }
     m_eb2rx = ProcessController(this);
-    m_eb2rx.init("eb2rx", 1);
-    m_con[0].init("storagein", 2);
-    m_con[1].init("storagerecord", 3);
-    m_con[2].init("storageout", 4);
+    std::string nodename = StringUtil::tolower(getNode().getName());
+    m_eb2rx.init(nodename + "_eb2rx", 1);
+    m_con[0].init(nodename + "_storagein", 2);
+    m_con[1].init(nodename + "_storagerecord", 3);
+    m_con[2].init(nodename + "_storageout", 4);
     for (size_t i = 3; i < m_con.size(); i++) {
-      m_con[i].init(StringUtil::form("storagebasf2_%d", i - 3), i + 2);
+      m_con[i].init(nodename + StringUtil::form("_storagebasf2_%d", i - 3), i + 2);
     }
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException("Bad configuration : %s", e.what()));
@@ -116,13 +117,15 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     LogFile::notice("eb2rx is off");
   }
 
+  const std::string nodename = StringUtil::tolower(getNode().getName());
+
   m_con[0].clearArguments();
   m_con[0].setExecutable("storagein");
   m_con[0].addArgument(ibuf.getText("name"));
   m_con[0].addArgument("%d", ibuf.getInt("size"));
   m_con[0].addArgument(isocket.getText("host"));
   m_con[0].addArgument("%d", isocket.getInt("port"));
-  m_con[0].addArgument("storagein");
+  m_con[0].addArgument(nodename + "_storagein");
   m_con[0].addArgument("2");
   if (!m_con[0].load(10)) {
     std::string emsg = "storagein: Failed to connect to eb2rx";
@@ -142,7 +145,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   m_con[1].addArgument(file.getText("dbtmp"));
   m_con[1].addArgument(obuf.getText("name"));
   m_con[1].addArgument("%d", obuf.getInt("size"));
-  m_con[1].addArgument("storagerecord");
+  m_con[1].addArgument(nodename + "_storagerecord");
   m_con[1].addArgument("3");
   if (!m_con[1].load(30)) {
     std::string emsg = "storagerecord: Failed to start";
@@ -158,7 +161,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[2].addArgument(obuf.getInt("oname"));
     m_con[2].addArgument("%d", obuf.getInt("size"));
     m_con[2].addArgument("%d", osocket.getInt("port"));
-    m_con[2].addArgument("storageout");
+    m_con[2].addArgument(nodename + "_storageout");
     m_con[2].addArgument("4");
     if (!m_con[2].load(10)) {
       LogFile::warning("storageout: Not accepted connection from EXPRECO");
@@ -178,7 +181,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[i].addArgument("%d", ibuf.getInt("size"));
     m_con[i].addArgument(rbuf.getText("name"));
     m_con[i].addArgument("%d", rbuf.getInt("size"));
-    m_con[i].addArgument("storagebasf2_%d", i - 3);
+    m_con[i].addArgument("%s_storagebasf2_%d", nodename.c_str(), i - 3);
     m_con[i].addArgument("%d", i + 2);
     m_con[i].addArgument("1");
     if (!m_con[i].load(10)) {
@@ -282,9 +285,10 @@ void StoragerCallback::monitor() throw(RCHandlerException)
     info->state = 0;
   }
   struct statvfs statfs;
-  if (m_file.hasKey("record.ndisks")) {
-    std::string dir = m_file.get("record.dir");
-    info->ndisks = m_file.getInt("record.ndisks");
+  const DBObject& record(getDBObject()("record"));
+  if (record.hasValue("ndisks")) {
+    std::string dir = record.getText("dir");
+    info->ndisks = record.getInt("ndisks");
     for (unsigned int i = 0; i < info->ndisks; i++) {
       std::string path = StringUtil::form("%s%02d", dir.c_str(), i + 1);
       statvfs(path.c_str(), &statfs);

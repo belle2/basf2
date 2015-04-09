@@ -123,47 +123,38 @@ void ECLBackgroundModule::defineHisto()
 
 
   //Radiation dose
-  h_CrystalRadDose      = new TH1F("Crystal_Rad_Dose",        "Crystal Radiation Dose vs #theta_{ID};#theta_{ID};Gy/yr",
-                                   69, -0.5, 68.5);
-  h_CrystalRadDoseTheta = new TH1F("Crystal_Rad_Dose_Theta",  "Crystal Radiation Dose vs #theta;#theta (deg);Gy/yr",
-                                   100,   12, 152);
-  h_CrystalThetaID2     = new TH1F("Crystal_Dose_ThetaID_2",  "Crystal Radiation Dose vs #phi_{ID}, #theta_{ID}=2; #phi_{ID};Gy/yr",
-                                   64, -0.5, 63.5);
-  h_CrystalThetaID67    = new TH1F("Crystal_Dose_ThetaID_67", "Crystal Radiation Dose vs #phi_{ID}, #theta_{ID}=67; #phi_{ID};Gy/yr",
-                                   64, -0.5, 63.5);
-  h_BarrelDose          = new TH1F("Crystal_Dose_Barrel",     "Crystal Radiation Dose in Barrel, 12<#theta_{ID}<59; #phi_{ID}; Gy/yr",
-                                   144, -0.5, 143.5);
-  h_DiodeRadDose        = new TH1F("Diode_Rad_Dose",          "Diode Radiation Dose vs #theta_{ID};#theta_{ID};Gy/yr",
-                                   69, -0.5, 68.5);
+  h_CrystalRadDose = new TH1F("Crystal_Rad_Dose", "Crystal Radiation Dose vs #theta_{ID};#theta_{ID};Gy/yr", 69, -0.5, 68.5);
+  h_CrystalRadDoseTheta = new TH1F("Crystal_Rad_Dose_Theta", "Crystal Radiation Dose vs #theta;#theta (deg);Gy/yr", 100,   12, 152);
+  h_CrystalThetaID2 = new TH1F("Crystal_Dose_ThetaID_2", "Crystal Radiation Dose vs #phi_{ID}, #theta_{ID}=2; #phi_{ID};Gy/yr", 64,
+                               -0.5, 63.5);
+  h_CrystalThetaID67 = new TH1F("Crystal_Dose_ThetaID_67", "Crystal Radiation Dose vs #phi_{ID}, #theta_{ID}=67; #phi_{ID};Gy/yr", 64,
+                                -0.5, 63.5);
+  h_BarrelDose = new TH1F("Crystal_Dose_Barrel", "Crystal Radiation Dose in Barrel, 12<#theta_{ID}<59; #phi_{ID}; Gy/yr", 144, -0.5,
+                          143.5);
+  h_DiodeRadDose = new TH1F("Diode_Rad_Dose", "Diode Radiation Dose vs #theta_{ID};#theta_{ID};Gy/yr", 69, -0.5, 68.5);
 
   //hit locations
-  h_ProdVert            = new TH1F("MCProd_Vert",             "Production Vertex;z (cm)",                           125, -200, 300);
-  h_HitLocations        = new TH2F("Hit_Locations",           "Hit locations;z (cm); r (cm)",                       250, -200, 300,
-                                   80,    0, 160);
-  h_ProdVertvsThetaId   = new TH2F("MCProd_Vert_vs_ThetaID",  "Production Vertex vs #theta_{ID};#theta_{ID};z (cm)", 69, -0.5, 68.5,
-                                   125, -200, 300);
+  h_ProdVert = new TH1F("MCProd_Vert", "Production Vertex;z (cm)", 125, -200, 300);
+  h_HitLocations = new TH2F("Hit_Locations", "Hit locations;z (cm); r (cm)", 250, -200, 300, 80,    0, 160);
+  h_ProdVertvsThetaId = new TH2F("MCProd_Vert_vs_ThetaID", "Production Vertex vs #theta_{ID};#theta_{ID};z (cm)", 69, -0.5, 68.5, 125,
+                                 -200, 300);
 
-  h_Pileup              = new TH1F("Pile_up",                 "Estimated Pile up Noise vs #theta_{ID}; #theta_{ID}; MeV", 69, -0.5,
-                                   68.5);
+  h_Pileup = new TH1F("Pile_up", "Estimated Pile up Noise vs #theta_{ID}; #theta_{ID}; MeV", 69, -0.5, 68.5);
 
   //Neutrons
-  h_NeutronFluxThetaID2  = new TH1F("Neutron_Flux_ThetaID_2",  "Diode Neutron Flux, #theta_{ID}=2;#phi_{ID}; yr^{-1}/cm^{-2}",   64,
+  h_NeutronFluxThetaID2 = new TH1F("Neutron_Flux_ThetaID_2", "Diode Neutron Flux, #theta_{ID}=2;#phi_{ID}; yr^{-1}/cm^{-2}", 64, -0.5,
+                                   63.5);
+  h_NeutronFluxThetaID67 = new TH1F("Neutron_Flux_ThetaID_67", "Diode Neutron Flux, #theta_{ID}=67;#phi_{ID}; yr^{-1}/cm^{-2}", 64,
                                     -0.5, 63.5);
-  h_NeutronFluxThetaID67 = new TH1F("Neutron_Flux_ThetaID_67", "Diode Neutron Flux, #theta_{ID}=67;#phi_{ID}; yr^{-1}/cm^{-2}",  64,
-                                    -0.5, 63.5);
-  h_NeutronFlux          = new TH1F("Neutron_Flux",            "Diode Neutron Flux vs #theta_{ID};#theta_{ID}; yr^{-1}/cm^{-2}", 69,
-                                    -0.5, 68.5);
-  h_NeutronE             = new TH1F("Neutron_Energy",          "Neutron Energy; Energy (MeV)",                           200,    0,
-                                    0.5);
-  h_NeutronEThetaID0     = new TH1F("Neutron_Energy_ThetaID0", "Neutron Energy, First Crystal; Energy (MeV)",             50,    0,
-                                    0.5);
+  h_NeutronFlux = new TH1F("Neutron_Flux", "Diode Neutron Flux vs #theta_{ID};#theta_{ID}; yr^{-1}/cm^{-2}", 69, -0.5, 68.5);
+  h_NeutronE = new TH1F("Neutron_Energy", "Neutron Energy; Energy (MeV)", 200, 0, 0.5);
+  h_NeutronEThetaID0 = new TH1F("Neutron_Energy_ThetaID0", "Neutron Energy, First Crystal; Energy (MeV)", 50, 0, 0.5);
 
-  h_PhotonE              = new TH1F("Photon_Energy",           "Energy of photons creating hits in ECL; Energy (MeV)",   200, 0, 10);
+  h_PhotonE = new TH1F("Photon_Energy", "Energy of photons creating hits in ECL; Energy (MeV)",   200, 0, 10);
 
   //showers
   TString stime = s.str();
-  h_Shower        = new TH1F("Shower_E_Dist",          "Shower Energy distribution " + stime + " #mu s;GeV;# of showers", 100, 0,
-                             0.5);
+  h_Shower = new TH1F("Shower_E_Dist", "Shower Energy distribution " + stime + " #mu s;GeV;# of showers", 100, 0, 0.5);
   h_ShowerVsTheta = new TH2F("Shower_E_Dist_vs_theta", "Shower Energy distribution " + stime + " #mu s;GeV;#theta (deg)", 100, 0, 0.5,
                              180, 0, 180);
 
@@ -176,6 +167,7 @@ void ECLBackgroundModule::defineHisto()
 
   //Doses
   hEMDose = new TH1F("hEMDose",  "Crystal Radiation Dose; Cell ID ; Gy/yr", 8736, 0, 8736);
+  hEnergyPerCrystal = new TH1F("hEnergyPerCrystal", "Energy per crystal; Cell ID; GeV", 8736, 0, 8736);
 
   //Diodes
   hDiodeFlux  = new TH1F("hDiodeFlux",  "Diode Neutron Flux ; Cell ID ; 1MeV-equiv / cm^{2} yr", 8736, 0, 8736);
@@ -186,8 +178,7 @@ void ECLBackgroundModule::defineHisto()
 
   //ARICH plots
   if (m_doARICH) {
-    hARICHDoseBB = new TH1F("hARICHDoseBB", "Radiation dose in ARICH boards (cBB); Ring-ID; Gy/yr",                                   7,
-                            -0.5, 6.5);
+    hARICHDoseBB = new TH1F("hARICHDoseBB", "Radiation dose in ARICH boards (cBB); Ring-ID; Gy/yr", 7, -0.5, 6.5);
     hHAPDFlux    = new TH1F("hARICHnFlux",  "1-MeV equivalent neutron flux in ARICH diodes (BB) ; Ring-ID ; 1-MeV-equiv / cm^{2} yr", 7,
                             -0.5, 6.5);
   }
@@ -201,6 +192,13 @@ void ECLBackgroundModule::defineHisto()
   hDiodeFluxECB     = new TH2F();
   hDiodeFluxBAR     = new TH2F();
   hDiodeFluxWideTID = new TH1F();
+
+  hEnergyPerCrystalECF     = new TH2F();
+  hEnergyPerCrystalECB     = new TH2F();
+  hEnergyPerCrystalBAR     = new TH2F();
+  hEnergyPerCrystalWideTID = new TH1F();
+
+
 
 }
 
@@ -286,6 +284,7 @@ void ECLBackgroundModule::event()
     h_CrystalRadDoseTheta->Fill(theta, dose / NperRing);
     h_CrystalRadDose->Fill(m_thetaID,  dose / NperRing);
     hEMDose->Fill(m_cellID, dose);
+    hEnergyPerCrystal->Fill(m_cellID, edep);
 
     //2nd thetaID ring
     if (m_thetaID == 2) {
@@ -442,6 +441,13 @@ void ECLBackgroundModule::endRun()
     int phiID   = Crystal[m_CryInt[i]]->GetPhiID();
     B2RESULT("Dose in Crystal " << m_CryInt[i] << ": " << dose << " ThetaID=" << thetaID << ", PhiID=" << phiID);
   }
+
+
+  hEnergyPerCrystalECF = BuildPosHisto(hEnergyPerCrystal, "forward");
+  hEnergyPerCrystalECB = BuildPosHisto(hEnergyPerCrystal, "backward");
+  hEnergyPerCrystalBAR = BuildPosHisto(hEnergyPerCrystal, "barrel");
+  hEnergyPerCrystalWideTID = BuildThetaIDWideHisto(hEnergyPerCrystal);
+
 
   hEMDoseECF = BuildPosHisto(hEMDose, "forward");
   hEMDoseECB = BuildPosHisto(hEMDose, "backward");

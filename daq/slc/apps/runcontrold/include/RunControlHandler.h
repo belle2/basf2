@@ -31,8 +31,8 @@
   class CLASS : public NSMVHandlerInt, HandlerRC {      \
   public:                 \
     CLASS(RunControlCallback& callback,          \
-          const std::string& name, RCNode& node)       \
-      : NSMVHandlerInt(name, true, true),          \
+          const std::string& name, RCNode& node)      \
+      : NSMVHandlerInt(name, true, true),       \
         HandlerRC(callback, node) {}         \
     virtual ~CLASS() throw() {}            \
     virtual bool handleGetInt(int& val);         \
@@ -57,6 +57,18 @@ namespace Belle2 {
   RCHANDLER_TEXT_GET(NSMVHandlerRCState);
   RCHANDLER_TEXT(NSMVHandlerRCRequest);
   RCHANDLER_INT(NSMVHandlerRCUsed);
+
+  class NSMVHandlerRCExpNumber : public NSMVHandlerInt {
+  public:
+    NSMVHandlerRCExpNumber(RunControlCallback& callback,
+                           const std::string& name, int val)
+      : NSMVHandlerInt(name, true, true, val),
+        m_callback(callback) {}
+    virtual ~NSMVHandlerRCExpNumber() throw() {}
+    virtual bool handleSetInt(int val);
+  protected:
+    RunControlCallback& m_callback;
+  };
 
 }
 

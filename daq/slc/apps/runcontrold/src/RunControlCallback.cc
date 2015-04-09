@@ -30,8 +30,10 @@ void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
   DBInterface& db(*getDB());
   try {
     db.connect();
-    m_runno.setExpNumber(RunNumberTable(db).getExpNumber());
-    m_runno.setRunNumber(RunNumberTable(db).getRunNumber(m_runno.getExpNumber()));
+    RunNumberTable rntable(db);
+    rntable.create();
+    m_runno.setExpNumber(rntable.getExpNumber());
+    m_runno.setRunNumber(rntable.getRunNumber(m_runno.getExpNumber()));
     m_runno.setStart(false);
   } catch (const DBHandlerException& e) {
   }
@@ -146,6 +148,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
       if (getDB()) {
         DBInterface& db(*getDB());
         if (!db.isConnected()) db.connect();
+        if (expno == 0) expno = m_runno.getExpNumber();
         m_runno = RunNumberTable(db).add(m_runno.getConfig(), expno, runno, 0);
         expno = m_runno.getExpNumber();
         runno = m_runno.getRunNumber();
@@ -363,7 +366,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
   }
   m_node_v = node_v;
   add(new NSMVHandlerInt("nnodes", true, false, (int)m_node_v.size()));
-  add(new NSMVHandlerInt("expno", true, true, m_runno.getExpNumber()));
+  add(new NSMVHandlerRCExpNumber(*this, "expno", m_runno.getExpNumber()));
   add(new NSMVHandlerInt("runno", true, false, m_runno.getRunNumber()));
   add(new NSMVHandlerInt("subno", true, false, 0));
   add(new NSMVHandlerInt("tstart", true, false, (int)m_runno.getRecordTime()));
@@ -441,3 +444,16 @@ void RunControlCallback::Distributer::operator()(RCNode& node) throw()
   }
 }
 
+void RunControlCallback::setExpNumber(int expno) throw()
+{
+  try {
+    m_runno.setExpNumber(expno);
+    int runno = RunNumberTable(*getDB()).getRunNumber(expno);
+    std::string msg = StringUtil::form("Set exp no = %d (run no =%d)", expno, runno);
+    LogFile::info(msg);
+    set("runno", runno);
+    reply(NSMMessage(DAQLogMessage(getNode().getName(), LogFile::INFO, msg), true));
+  } catch (const DBHandlerException& e) {
+    LogFile::error(e.what());
+  }
+}

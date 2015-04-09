@@ -19,6 +19,7 @@ namespace Belle2 {
     RunNumber add(const RunNumber& info);
     int getRunNumber(int expno);
     int getExpNumber(const std::string& config = "");
+    void create();
 
   public:
     RunNumberList get(int expno, bool started, int runno_min = 0, int runno_max = -1);

@@ -66,6 +66,7 @@ namespace Belle2 {
   public:
     void setState(NSMNode& node, const RCState& state) throw();
     void setConfig(RCNode& node, const std::string& config) throw();
+    void setExpNumber(int expno) throw();
 
   private:
     RCCallback* m_callback;

@@ -103,3 +103,12 @@ bool NSMVHandlerRCUsed::handleSetInt(int val)
   LogFile::info("set %s.used to %d", m_rcnode.getName().c_str(), val);
   return true;
 }
+
+bool NSMVHandlerRCExpNumber::handleSetInt(int val)
+{
+  if (val > 0) {
+    m_callback.setExpNumber(val);
+    return NSMVHandlerInt::handleSetInt(val);
+  }
+  return false;
+}

@@ -39,17 +39,22 @@ void NSM2SocketBridge::run() throw()
     LogFile::open("nsm2socket/" + StringUtil::tolower(node.getName()));
     m_callback = new NSM2SocketCallback(node);
     m_callback->setBridge(this);
+    PThread(new NSMNodeDaemon(m_callback, host, port));
     ConfigFile config("slowcontrol");
+    /*
     host = config.get("nsm.host");
     port = config.getInt("nsm.port");
     std::string host2 = config.get("nsm.global.host");
     int port2 = config.getInt("nsm.global.port");
     if (host2.size() > 0 && port2 > 0) {
+      NSM2SocketCallback* callback = new NSM2SocketCallback(node);
+      callback->setBridge(this);
       PThread(new NSMNodeDaemon(m_callback, host, port,
-                                m_callback, host2, port2));
+                                callback, host2, port2));
     } else {
       PThread(new NSMNodeDaemon(m_callback, host, port));
     }
+    */
     m_db = new PostgreSQLInterface(config.get("database.host"),
                                    config.get("database.dbname"),
                                    config.get("database.user"),

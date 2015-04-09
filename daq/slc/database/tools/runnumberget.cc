@@ -9,14 +9,11 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 3) {
-    LogFile::debug("usage: %s <rcnode> <configname> [<expno>]", argv[0]);
+  if (argc < 1 || (argc > 1 && std::string(argv[1]) == "-h")) {
+    printf("usage: %s [<expno>]\n", argv[0]);
     return 1;
   }
-  /*
-  const std::string rcnode = argv[1];
-  const std::string configname = argv[2];
-  int expno = (argc > 3) ? atoi(argv[3]) : 1;
+  int expno = (argc > 1) ? atoi(argv[1]) : 0;
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),
@@ -24,10 +21,13 @@ int main(int argc, char** argv)
                          config.get("database.password"),
                          config.getInt("database.port"));
   db.connect();
-  RunNumber rn(rcnode + "@" + configname, expno, 0, 0);
-  rn = RunNumberTable(db).add(rn);
-  LogFile::debug("runnumber : %03d.%05d.%03d",
-                 rn.getExpNumber(), rn.getRunNumber(), rn.getSubNumber());
-  */
+  const RunNumberList list(RunNumberTable(db).get(expno));
+  for (RunNumberList::const_iterator it = list.begin();
+       it != list.end(); it++) {
+    const RunNumber& rn(*it);
+    printf("%s.%03d.%05d.%03d\n",
+           rn.getConfig().c_str(), rn.getExpNumber(),
+           rn.getRunNumber(), rn.getSubNumber());
+  }
   return 0;
 }

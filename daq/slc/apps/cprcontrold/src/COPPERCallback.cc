@@ -84,6 +84,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
         add(new NSMVHandlerFEEStream(*this, vname + ".stream", i,
                                      o_fee.hasText("stream") ? o_fee.getText("stream") : ""));
         add(new NSMVHandlerFEEBoot(*this, vname + ".boot", i));
+        add(new NSMVHandlerFEELoad(*this, vname + ".load", i));
         vname = StringUtil::form("hslb[%d]", i);
         add(new NSMVHandlerHSLBLinkFee(*this, vname + ".link", i));
         add(new NSMVHandlerHSLBTrgOnFee(*this, vname + ".trigon", i));

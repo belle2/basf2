@@ -48,8 +48,6 @@
 #include <framework/dataobjects/Helix.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <boost/scoped_ptr.hpp>
-
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
 #include <genfit/RKTrackRep.h>
@@ -513,8 +511,8 @@ void GenFitterModule::event()
         continue;
       }
 
-      // Select the fitter.  scoped_ptr ensures that it's destructed at the right point.
-      boost::scoped_ptr<genfit::AbsKalmanFitter> fitter(0);
+      // Select the fitter.  unique_ptr ensures that it's destructed at the right point.
+      std::unique_ptr<genfit::AbsKalmanFitter> fitter(nullptr);
       if (m_filterId == "Kalman") {
         fitter.reset(new genfit::KalmanFitterRefTrack());
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);

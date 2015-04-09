@@ -102,7 +102,7 @@ def generateContinuum(
     decayTable,
     inclusiveT=2,
     path=analysis_main,
-    ):
+):
     """
     Generated e+e- -> gamma* -> qq-bar where light quarks hadronize
     and decay in user specified way (via specified decay table).
@@ -168,40 +168,12 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=analysis_main):
     path.add_module(mcparticleprinter)
 
 
-def loadMCParticles(path=analysis_main):
-    """
-    THIS FUNCTION IS NO LONGER NEEDED. IT IS OBSOLETE AND IT DOES NOTHING.
-    """
-
-    B2WARNING('''
-* ************************************************* *
-* loadMCParticles function is no longer needed.     *
-* IT IS OBSOLETE AND IT DOES NOTHING.               *
-* Delete loadMCParticles() from your python script. *
-* ************************************************* *
-''')
-
-
-def loadReconstructedParticles(path=analysis_main):
-    """
-    THIS FUNCTION IS NO LONGER NEEDED. IT IS OBSOLETE AND IT DOES NOTHING.
-    """
-
-    B2WARNING('''
-* ************************************************************ *
-* loadReconstructedParticles function is no longer needed.     *
-* IT IS OBSOLETE AND IT DOES NOTHING.                          *
-* Delete loadReconstructedParticles() from your python script. *
-* ************************************************************ *
-''')
-
-
 def copyList(
     outputListName,
     inputListName,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
     Copy all Particle indices from input ParticleList to the output ParticleList.
 
@@ -219,7 +191,7 @@ def copyLists(
     inputListNames,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
     Copy all Particle indices from all input ParticleLists to the single output ParticleList.
 
@@ -243,7 +215,7 @@ def cutAndCopyLists(
     cut,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
     Copy Particle indices that pass selection criteria from all
     input ParticleLists to the single output ParticleList.
@@ -270,9 +242,9 @@ def cutAndCopyList(
     cut,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
-    Copy Particle indices that pass selection criteria from 
+    Copy Particle indices that pass selection criteria from
     the input ParticleList to the output ParticleList.
 
     @param ouputListName copied ParticleList
@@ -288,7 +260,7 @@ def cutAndCopyList(
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main):
     """
-    Creates Particles of the desired types from the corresponding MDST dataobjects, 
+    Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
@@ -297,10 +269,10 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     pions = ('pi+:std', 'piid>0.1')
     fillParticleLists([kaons, pions])
 
-    The type of the particles to be loaded is specified via the decayString module parameter. 
-    The type of the MDST dataobject that is used as an input is determined from the type of 
+    The type of the particles to be loaded is specified via the decayString module parameter.
+    The type of the MDST dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
-    
+
     o) charged final state particles (input MDST type = Tracks)
        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
@@ -309,7 +281,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
        - K_S0, Lambda0 (input MDST type = V0)
        - K_L0          (input MDST type = KLMCluster)
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList 
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
@@ -327,15 +299,15 @@ def fillParticleList(
     cut,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
-    Creates Particles of the desired type from the corresponding MDST dataobjects, 
-    loads them to the StoreArray<Particle> and fills the ParticleList. 
+    Creates Particles of the desired type from the corresponding MDST dataobjects,
+    loads them to the StoreArray<Particle> and fills the ParticleList.
 
-    The type of the particles to be loaded is specified via the decayString module parameter. 
-    The type of the MDST dataobject that is used as an input is determined from the type of 
+    The type of the particles to be loaded is specified via the decayString module parameter.
+    The type of the MDST dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
-    
+
     o) charged final state particles (input MDST type = Tracks)
        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
@@ -344,7 +316,7 @@ def fillParticleList(
        - K_S0, Lambda0 (input MDST type = V0)
        - K_L0          (input MDST type = KLMCluster)
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList 
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
@@ -363,13 +335,13 @@ def fillParticleListFromMC(
     addDaughters=False,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    
+
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
@@ -391,7 +363,7 @@ def fillParticleListsFromMC(
     addDaughters=False,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -401,7 +373,7 @@ def fillParticleListsFromMC(
     kaons = ('K+:gen', '')
     pions = ('pi+:gen', 'piid>0.1')
     fillParticleListsFromMC([kaons, pions])
-    
+
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
@@ -418,36 +390,14 @@ def fillParticleListsFromMC(
     path.add_module(pload)
 
 
-def selectParticle(
-    decayString,
-    cut,
-    writeOut=False,
-    path=analysis_main,
-    ):
-    """
-    THIS FUNCTION IS OBSOLETE. IT WILL BE DELETED.
-
-    USE fillParticleList INSTEAD!
-    """
-
-    B2WARNING('''
-* ******************************************************* *
-* selectParticle is obsolete.                             *
-* Replace it with fillParticleList in your python script. *
-* ******************************************************* *
-''')
-
-    fillParticleList(decayString, cut, writeOut, path)
-
-
 def applyCuts(list_name, cut, path=analysis_main):
     """
-    Removes StoreArray<PArticle> indices of Particles from given ParticleList 
+    Removes StoreArray<PArticle> indices of Particles from given ParticleList
     that do not pass the given selection criteria (given in ParticleSelector style).
 
     @param list_name input ParticleList name
     @param cut  Particles that do not pass these selection criteria are removed from the ParticleList
-    @param path      modules are added to this path 
+    @param path      modules are added to this path
     """
 
     pselect = register_module('ParticleSelector')
@@ -463,21 +413,21 @@ def reconstructDecay(
     dmID=0,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
-    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via 
-    their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All 
+    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
+    their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
     possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
     reconstructed as well (meaning that the charge conjugated mother list is created as well).
-    
-    @param decayString DecayString specifying what kind of the decay should be reconstructed 
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         created (mother) Particles are added to the mother ParticleList if they 
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @oaram dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
-    @param path        modules are added to this path     
+    @param path        modules are added to this path
     """
 
     pmake = register_module('ParticleCombiner')
@@ -494,7 +444,7 @@ def rankByHighest(
     variable,
     numBest=0,
     path=analysis_main,
-    ):
+):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
     in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
@@ -521,7 +471,7 @@ def rankByLowest(
     variable,
     numBest=0,
     path=analysis_main,
-    ):
+):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
     in an extra-info field '${variable}_rank' starting at 1 (best). The list is also sorted from best to worst candidate
@@ -548,13 +498,13 @@ def trainTMVAMethod(
     decayString,
     variables,
     methods=[('FastBDT', 'Plugin',
-             '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-             )],
+              '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+              )],
     target='isSignal',
     prefix='TMVA',
     workingDirectory='.',
     path=analysis_main,
-    ):
+):
     """
     Trains a TMVA Method
     @param decayString   specifies type of Particles and determines the name of the ParticleList
@@ -585,7 +535,7 @@ def applyTMVAMethod(
     prefix='TMVA',
     workingDirectory='.',
     path=analysis_main,
-    ):
+):
     """
     Applies a trained TMVA method to a particle list
     @param decayString   specifies type of Particles and determines the name of the ParticleList
@@ -626,7 +576,7 @@ def fitVertex(
     fit_type='vertex',
     constraint='',
     path=analysis_main,
-    ):
+):
     """
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
@@ -663,7 +613,7 @@ def vertexKFit(
     decay_string='',
     constraint='',
     path=analysis_main,
-    ):
+):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
@@ -682,7 +632,7 @@ def vertexKFit(
         'vertex',
         constraint,
         path,
-        )
+    )
 
 
 def massVertexKFit(
@@ -690,7 +640,7 @@ def massVertexKFit(
     conf_level,
     decay_string='',
     path=analysis_main,
-    ):
+):
     """
     Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
 
@@ -708,7 +658,7 @@ def massVertexKFit(
         'massvertex',
         '',
         path,
-        )
+    )
 
 
 def massKFit(
@@ -716,7 +666,7 @@ def massKFit(
     conf_level,
     decay_string='',
     path=analysis_main,
-    ):
+):
     """
     Perform vertex fit using the kfitter for each Particle in the given ParticleList.
 
@@ -734,7 +684,7 @@ def massKFit(
         'mass',
         '',
         path,
-        )
+    )
 
 
 def vertexRave(
@@ -743,7 +693,7 @@ def vertexRave(
     decay_string='',
     constraint='',
     path=analysis_main,
-    ):
+):
     """
     Perform vertex fit using the RAVE for each Particle in the given ParticleList.
 
@@ -762,7 +712,7 @@ def vertexRave(
         'vertex',
         constraint,
         path,
-        )
+    )
 
 
 def massVertexRave(
@@ -770,7 +720,7 @@ def massVertexRave(
     conf_level,
     decay_string='',
     path=analysis_main,
-    ):
+):
     """
     Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
 
@@ -788,7 +738,7 @@ def massVertexRave(
         'massvertex',
         '',
         path,
-        )
+    )
 
 
 def massRave(
@@ -796,7 +746,7 @@ def massRave(
     conf_level,
     decay_string='',
     path=analysis_main,
-    ):
+):
     """
     Perform mass fit using the RAVE for each Particle in the given ParticleList.
     7x7 error matrix of the mother particle must be defined
@@ -815,7 +765,7 @@ def massRave(
         'mass',
         '',
         path,
-        )
+    )
 
 
 def printDataStore(path=analysis_main):
@@ -836,7 +786,7 @@ def printVariableValues(list_name, var_names, path=analysis_main):
 
     @param list_name input ParticleList name
     @param var_names vector of variable names to be printed
-    @param path         modules are added to this path 
+    @param path         modules are added to this path
     """
 
     prlist = register_module('ParticlePrinter')
@@ -849,9 +799,9 @@ def printVariableValues(list_name, var_names, path=analysis_main):
 
 def printList(list_name, full, path=analysis_main):
     """
-    Prints the size and executes Particle->print() (if full=True) 
+    Prints the size and executes Particle->print() (if full=True)
     method for all Particles in given ParticleList. For debugging purposes.
-    
+
     @param list_name input ParticleList name
     @param full      execute Particle->print() method for all Particles
     @param path      modules are added to this path
@@ -867,7 +817,7 @@ def printList(list_name, full, path=analysis_main):
 def ntupleFile(file_name, path=analysis_main):
     """
     Creates new ROOT file to which the flat ntuples will be saved.
-    
+
     @param file_name file name of the output root file
     @param path      modules are added to this path
     """
@@ -883,7 +833,7 @@ def ntupleTree(
     list_name,
     tools,
     path=analysis_main,
-    ):
+):
     """
     Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
 
@@ -906,7 +856,7 @@ def variablesToNTuple(
     treename='variables',
     filename='ntuple.root',
     path=analysis_main,
-    ):
+):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
     @param decayString   specifies type of Particles and determines the name of the ParticleList
@@ -929,7 +879,7 @@ def findMCDecay(
     decay,
     writeOut=False,
     path=analysis_main,
-    ):
+):
     """
     The MCDecayFinder module is buggy at the moment. Not to be used.
     """
@@ -944,7 +894,7 @@ def findMCDecay(
 
 def summaryOfLists(particleLists, path=analysis_main):
     """
-    Prints out Particle statistics at the end of the job: number of events with at 
+    Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.
 
     @param particleLists list of input ParticleLists
@@ -993,7 +943,7 @@ def TagV(
     confidenceLevel=0.,
     useConstraint='boostcut',
     path=analysis_main,
-    ):
+):
     """
     For each Particle in the given Breco ParticleList:
     perform the fit of tag side using the track list from the RestOfEvent dataobject
@@ -1081,5 +1031,3 @@ def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
     mod = register_module('RemoveParticlesNotInLists')
     mod.param('particleLists', lists_to_keep)
     path.add_module(mod)
-
-

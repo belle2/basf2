@@ -3,10 +3,8 @@
 #include <geometry/GeometryManager.h>
 
 #include "genfit/Exception.h"
+#include "genfit/RKTrackRep.h"
 
-#include <TGeoMedium.h>
-#include <TGeoMaterial.h>
-#include <TGeoManager.h>
 #include <assert.h>
 #include <math.h>
 

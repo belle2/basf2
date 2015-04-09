@@ -9,11 +9,9 @@
 
 #include <memory>
 
-#include "G4VPhysicalVolume.hh"
-#include "G4Navigator.hh"
-
 #include "genfit/AbsMaterialInterface.h"
-#include "genfit/RKTrackRep.h"
+
+class G4VPhysicalVolume;
 
 namespace Belle2 {
 
@@ -60,7 +58,7 @@ namespace Belle2 {
   private:
 
     std::unique_ptr<class G4SafeNavigator> nav_;
-    const G4VPhysicalVolume* currentVolume_;
+    const class G4VPhysicalVolume* currentVolume_;
   };
 
 }

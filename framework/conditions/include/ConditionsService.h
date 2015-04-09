@@ -3,8 +3,11 @@
 
 #include <TList.h>
 #include <TObject.h>
+#include <TXMLEngine.h>
 #include <string>
 #include <map>
+#include <framework/core/Module.h>
+#include <curl/curl.h>
 
 namespace Belle2 {
 
@@ -27,68 +30,78 @@ namespace Belle2 {
     static ConditionsService* GetInstance();
 
 
-    /** Start defining a payload
-     *  @param PayloadTag A name for the particular payload you are storing. A run name/number is a common example.
-     *  @param PayloadTag A name for the type of payload you are storing. 'calibration' and 'configuration' are common types.
-     *  @param SubsystemTag The tag for the subsystem to which your algorithm applies.  These tags are administratively controlled.
-     *  @param AlgorithmName The name of the algorithm that generated the payload.
-     *  @param AlgorithmVersion The version of the algorithm that generated the payload.
-     *  @param InitialRun The earliest run in the interval of validity (IOV) for this payload. IOV can be changed.
-     *  @param FinalRun The last run in the interval of validity (IOV) for this payload.  IOV can be changed.
-     */
-    Int_t StartPayload(std::string PayloadTag,
-                       std::string PayloadType,
-                       std::string SubsystemTag,
-                       std::string AlgorithmName,
-                       std::string AlgorithmVersion,
-                       std::string Experiment,
-                       std::string InitialRun,
-                       std::string FinalRun);
 
-
-    /** Write an object to your payload
-     *  @param PayloadTag A name for the particular payload you are storing. A run name/number is a common example.
-     *  @param SubsystemTag The tag for the subsystem to which your algorithm applies.  These tags are administratively controlled.
-     *  @param AlgorithmName The name of the algorithm that generated the payload.
-     *  @param AlgorithmVersion The version of the algorithm that generated the payload.
-     *  @param InitialRun The earliest run in the interval of validity (IOV) for this payload. IOV can be changed.
-     *  @param FinalRun The last run in the interval of validity (IOV) for this payload.  IOV can be changed.
-     */
-    Int_t WritePayloadObject(TObject* payload,
-                             std::string PayloadTag,
-                             std::string SubsystemTag,
-                             std::string AlgorithmName,
-                             std::string AlgorithmVersion,
-                             std::string InitialRun,
-                             std::string FinalRun);
-
-    /** End the definition of the payload and commit it to the conditions database.
-     *  @param PayloadTag A name for the particular payload you are storing. A run name/number is a common example.
-     *  @param SubsystemTag The tag for the subsystem to which your algorithm applies.  These tags are administratively controlled.
-     *  @param AlgorithmName The name of the algorithm that generated the payload.
-     *  @param AlgorithmVersion The version of the algorithm that generated the payload.
-     *  @param InitialRun The earliest run in the interval of validity (IOV) for this payload. IOV can be changed.
-     *  @param FinalRun The last run in the interval of validity (IOV) for this payload.  IOV can be changed.
-     */
-    Int_t CommitPayload(std::string PayloadTag,
-                        std::string SubsystemTag,
-                        std::string AlgorithmName,
-                        std::string AlgorithmVersion,
-                        std::string InitialRun,
-                        std::string FinalRun);
-
-
-    /** Read back a payload associated with a particular global tag and run for a particular algorithm.
+    /** Read back payloads associated with a particular global tag.
      *  @param GlobalTag A global tag is an approved set of payload tags.
-     *  @param RunNumber The run number that you want your returned payload to be associated with.
-     *  @param AlgorithmName The name of the algorithm that generated the payload.
-     *  @param AlgorithmVersion The version of the algorithm that generated the payload.
      *
-     *  @return A pointer to a TList of keys pointing to all the objects in the payload.
+     *  @return Nothing yet
      */
-    TList* GetPayloadList(std::string GlobalTag, std::string RunNumber,
-                          std::string AlgorithmName, std::string AlgorithmVersion);
+    void GetPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName);
 
+    /** Sets the base name for the REST services.  Example is http://belle2db.hep.pnnl.gov/b2s/rest/v1/.
+     *  @param RESTBaseName The base name for the REST services.  Example is http://belle2db.hep.pnnl.gov/b2s/rest/v1/.
+     *
+     *  @return Nothing yet
+     */
+    void SetRESTbasename(std::string RESTBaseName) {m_RESTbase = RESTBaseName;};
+
+    /** Sets the base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
+     *  @param RESTBaseName The base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
+     *
+     *  @return Nothing yet
+     */
+    void SetFILEbasename(std::string FILEBaseName) {m_FILEbase = FILEBaseName;};
+
+
+    /** Adds a payload URL to the payload map.
+     *  @param PackageModuleName The concatenation of the package.name and module.name.
+     *  @param PayloadURL The payload URL.
+     *
+     *  @return Nothing yet
+     */
+    void AddPayloadURL(std::string PackageModuleName, std::string PayloadURL) {m_run_payloads[PackageModuleName] = PayloadURL;};
+
+    /** Adds a payload checksum to the payload map.
+     *  @param PackageModuleName The concatenation of the package.name and module.name.
+     *  @param Checksum The payload MD5 checksum.
+     *
+     *  @return Nothing yet
+     */
+    void AddChecksum(std::string PackageModuleName, std::string Checksum) {m_run_checksums[PackageModuleName] = Checksum;};
+
+    /** Adds a payload file to the conditions database.
+     *  @param payloadFileName The file name of the payload.
+     *  @param module The module requesting payload storage (used for the 'module' and 'package' payload tags).
+     *
+     *  @return Nothing yet
+     */
+    void WritePayloadFile(std::string payloadFileName,
+                          Module* module) {WritePayloadFile(payloadFileName, module->getPackage(), module->getName());};
+
+    /** Adds a payload file to the conditions database.
+     *  @param payloadFileName The file name of the payload.
+     *  @param packageName A string identifier for the payload type.  Does not necessarily need to be the BASF2 package.
+     *  @param moduleName A string identifier for the payload type.  Does not necessarily need to be the BASF2 module.
+     *
+     *  @return Nothing yet
+     */
+    void WritePayloadFile(std::string payloadFileName,
+                          std::string packageName,
+                          std::string moduleName);
+
+    /** Gets payload URL from run generated map and downloads conditions file if needed.  Note that this function will get the package and module from the module.
+     *
+     *  @return Returns a string with the payload URL.
+     */
+    std::string GetPayloadFileURL(Module* module) {return GetPayloadFileURL(module->getPackage(), module->getName());};
+
+    /** Gets payload URL from run generated map and downloads conditions file if needed.
+     *  @param packageName A string identifier for the payload type.  Does not necessarily need to be the BASF2 package.
+     *  @param moduleName A string identifier for the payload type.  Does not necessarily need to be the BASF2 module.
+     *
+     *  @return Returns a string with the payload URL.
+     */
+    std::string GetPayloadFileURL(std::string packageName, std::string moduleName);
 
 
 
@@ -105,30 +118,39 @@ namespace Belle2 {
     /** Singleton, so control use of destructor */
     ~ConditionsService();
 
-    /** Function to generate consistent pointers to payload file directories */
-    std::string GenerateDirectory(std::string PayloadTag,
-                                  std::string SubsystemTag,
-                                  std::string AlgorithmName,
-                                  std::string AlgorithmVersion,
-                                  std::string InitialRun,
-                                  std::string FinalRun);
 
-    /** Function to generate consistent names for payload files */
-    std::string GenerateFilename(std::string PayloadTag,
-                                 std::string SubsystemTag,
-                                 std::string AlgorithmName,
-                                 std::string AlgorithmVersion,
-                                 std::string InitialRun,
-                                 std::string FinalRun);
+    /** Function to parse payloads */
+    static size_t parse_payloads(void* buffer, size_t size, size_t nmemb, void* userp);
+
+    /** Function to parse generic xml return and display */
+    static size_t parse_return(void* buffer, size_t size, size_t nmemb, void* userp);
+
+    /** Function to facilitate downloading files */
+    static size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream);
+
+    /** Function to display file transfer progress */
+    static int progress_func(void* ptr, double TotalToDownload, double NowDownloaded,
+                             double TotalToUpload, double NowUploaded);
 
     /** The single instance of this class */
     static ConditionsService* m_Instance;
+
+    /** The base name for the REST services */
+    std::string m_RESTbase;
+
+    /** The base name for the conditions files */
+    std::string m_FILEbase;
 
     /** A buffer to temporarily get rid of compiler warnings */
     std::string m_buffer;
 
     /** Map of payloads under construction **/
     std::map<std::string, TList*> m_current_payloads;
+
+    /** Map of payloads in DB for a particular run, <PackageNameModuleName, PayloadURL> **/
+    std::map<std::string, std::string> m_run_payloads;
+    /** Map of checksums from DB for a particular run, <PackageNameModuleName, Checksum> **/
+    std::map<std::string, std::string> m_run_checksums;
 
   };
 }

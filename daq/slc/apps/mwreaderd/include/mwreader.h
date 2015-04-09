@@ -1,9 +1,9 @@
 #ifndef mwreader_h
 #define mwreader_h
 
-#define MWMAXITEM 600
+#define MWMAXITEM 100
 
-const int mwreader_revision = 2;
+const int mwreader_revision = 3;
 
 struct mwreader {
   struct mwdata {

@@ -186,7 +186,8 @@ void TpcDigitizerModule::event()
     MicrotpcSimHit* aHit = TpcSimHits[i];
 
     int PDGid = aHit->gettkPDG();
-    if (m_LookAtRec == 1 && (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212))continue;
+    if (m_LookAtRec == 1)
+      if (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212)continue;
     //if(oldPID!=PDGid && iPID[i]<100){
     //partID[detNb][iPID[i]]=PDGid;
     //oldPID = PDGid;

@@ -2,14 +2,15 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <TSQLServer.h>
-#include <TSQLResult.h>
-#include <TSQLRow.h>
 #include <TFile.h>
 #include <TList.h>
+#include <TXMLEngine.h>
+#include <TMD5.h>
+#include <TSystem.h>
 
 #include <iostream>
 #include <string>
+#include <boost/filesystem.hpp>
 
 using namespace Belle2;
 
@@ -26,7 +27,8 @@ ConditionsService* ConditionsService::GetInstance()
 
 ConditionsService::ConditionsService()
 {
-
+  m_RESTbase = "http://belle2db.hep.pnnl.gov/b2s/rest/v1/";
+  m_FILEbase = "http://belle2db.hep.pnnl.gov/";
 }
 
 ConditionsService::~ConditionsService()
@@ -34,214 +36,366 @@ ConditionsService::~ConditionsService()
 
 }
 
-Int_t ConditionsService::StartPayload(std::string PayloadTag,
-                                      std::string PayloadType,
-                                      std::string SubsystemTag,
-                                      std::string AlgorithmName,
-                                      std::string AlgorithmVersion,
-                                      std::string Experiment,
-                                      std::string InitialRun,
-                                      std::string FinalRun)
+
+void ConditionsService::GetPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName)
 {
 
+  m_run_payloads.clear();
 
-  m_current_payloads[PayloadTag] = new TList;
+  CURL* curl;
+  CURLcode res;
 
-  std::string directory = GenerateDirectory(PayloadTag,
-                                            SubsystemTag,
-                                            AlgorithmName,
-                                            AlgorithmVersion,
-                                            InitialRun,
-                                            FinalRun);
+  curl = curl_easy_init();
 
+  int count = 0;
 
-  std::string filename = GenerateFilename(PayloadTag,
-                                          SubsystemTag,
-                                          AlgorithmName,
-                                          AlgorithmVersion,
-                                          InitialRun,
-                                          FinalRun);
+  if (curl) {
+    std::string REST_payloads = m_RESTbase + "payloads/?gtName=" + GlobalTag + "&expName=" + ExperimentName + "&runName=" + RunName;
+    B2INFO("rest payload call: " << REST_payloads);
+    curl_easy_setopt(curl, CURLOPT_URL, REST_payloads.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, parse_payloads);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&count);
 
-  TFile f(Form("%s%s", directory.c_str(), filename.c_str()),
-          "new");
-  if (f.IsOpen()) {
+    res = curl_easy_perform(curl);
 
-    TSQLServer* sql = TSQLServer::Connect("pgsql://localhost/conditions_dev", "app_cond", "belle2");
-
-    if ((sql == NULL) || (sql->GetErrorCode() != 0)) {
-      B2ERROR("Error connecting to conditions database.");
-    } else {
-      std::string initialRun, finalRun;
-
-      sql->Query(Form("select add_payload_detector_tag('%s','%s')",
-                      PayloadType.c_str(),
-                      PayloadTag.c_str()));
-
-
-      if (InitialRun == "NULL") {
-        initialRun = InitialRun;
-      } else initialRun = "'" + InitialRun + "'";
-      if (FinalRun == "NULL") {
-        finalRun = FinalRun;
-      } else finalRun = "'" + FinalRun + "'";
-
-      sql->Query(Form("select add_payload('%s','%s','%s','%s','%s','%s%s','%s',%s,%s)",
-                      SubsystemTag.c_str(),
-                      PayloadType.c_str(),
-                      PayloadTag.c_str(),
-                      AlgorithmName.c_str(),
-                      AlgorithmVersion.c_str(),
-                      directory.c_str(),
-                      filename.c_str(),
-                      Experiment.c_str(),
-                      initialRun.c_str(),
-                      finalRun.c_str()));
-
-
-      B2INFO("started conditions payload: " << directory << filename);
-      sql->Close();
+    if (res != CURLE_OK) {
+      B2ERROR("curl_easy_perform() failed: " << curl_easy_strerror(res));
     }
-    f.Close();
-    return 0;
-  } else {
-    B2ERROR("<ConditionsService::StartPayload> Error Creating Payload: " << directory << filename);
+
+    curl_easy_cleanup(curl);
   }
-  return -1;
+
+  B2INFO("Conditions service retrieved " << m_run_payloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
+         RunName << " listed under global tag " << GlobalTag);
+
+  return ;
 }
 
-Int_t ConditionsService::CommitPayload(std::string PayloadTag,
-                                       std::string SubsystemTag,
-                                       std::string AlgorithmName,
-                                       std::string AlgorithmVersion,
-                                       std::string InitialRun,
-                                       std::string FinalRun)
+void DisplayNodes(TXMLEngine* xml, XMLNodePointer_t node, Int_t level)
 {
+  // this function display all accessible information about xml node and its childs
 
-  // Check that everything is ok, then commit to the database.
-  if (m_current_payloads.count(PayloadTag)) {
+  printf("%*c node: %s\n", level, ' ', xml->GetNodeName(node));
 
-    //// Next open the file
-    std::string directory = GenerateDirectory(PayloadTag,
-                                              SubsystemTag,
-                                              AlgorithmName,
-                                              AlgorithmVersion,
-                                              InitialRun,
-                                              FinalRun);
+  // display namespace
+  XMLNsPointer_t ns = xml->GetNS(node);
+  if (ns != 0)
+    printf("%*c namespace: %s refer: %s\n", level + 2, ' ', xml->GetNSName(ns), xml->GetNSReference(ns));
 
-
-    std::string filename = GenerateFilename(PayloadTag,
-                                            SubsystemTag,
-                                            AlgorithmName,
-                                            AlgorithmVersion,
-                                            InitialRun,
-                                            FinalRun);
-
-
-    TFile f(Form("%s%s", directory.c_str(), filename.c_str()),
-            "update");
-    if (f.IsOpen()) { /// DB looks ok, file looks ok, write objects.
-      TIter next(m_current_payloads[PayloadTag]);
-      TObject* obj;
-      while ((obj = next())) {
-        obj->Write();
-      }
-      f.Close();
-      m_current_payloads.erase(PayloadTag);
-      return 0;
-    } else {
-      B2ERROR("<ConditionsService::WritePayloadObject> Error Opening Payload: " << directory << filename);
-    }
-
-  } else {
-    B2ERROR("Error commiting payload; payload tag " << PayloadTag << " not started or already committed.");
+  // display attributes
+  XMLAttrPointer_t attr = xml->GetFirstAttr(node);
+  while (attr != 0) {
+    printf("%*c attr: %s value: %s\n", level + 2, ' ', xml->GetAttrName(attr), xml->GetAttrValue(attr));
+    attr = xml->GetNextAttr(attr);
   }
 
-  m_buffer = PayloadTag + SubsystemTag + AlgorithmName + AlgorithmVersion + InitialRun + FinalRun;
+  // display content (if exists)
+  const char* content = xml->GetNodeContent(node);
+  if (content != 0)
+    printf("%*c cont: %s\n", level + 2, ' ', content);
+
+  // display all child nodes
+  XMLNodePointer_t child = xml->GetChild(node);
+  while (child != 0) {
+    DisplayNodes(xml, child, level + 2);
+    child = xml->GetNext(child);
+  }
+}
+
+
+size_t ConditionsService::parse_return(void* buffer, size_t size, size_t nmemb, void* userp)
+{
+
+  std::string temp(static_cast<const char*>(buffer), size * nmemb);
+
+  int count = *((int*)userp);
+  count = 0;
+
+  TXMLEngine* xml = new TXMLEngine;
+
+  XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
+
+  // take access to main node
+  XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
+
+  // display recursively all nodes and subnodes
+  DisplayNodes(xml, mainnode, 1);
+
+  return size * nmemb;
+}
+
+size_t ConditionsService::parse_payloads(void* buffer, size_t size, size_t nmemb, void* userp)
+{
+
+  std::string temp(static_cast<const char*>(buffer), size * nmemb);
+
+  //  B2INFO("Rest return: "<<temp);
+
+  int count = *((int*)userp);
+
+  TXMLEngine* xml = new TXMLEngine;
+
+  XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
+
+  // take access to main node
+  XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
+
+  // display recursively all nodes and subnodes
+  //  DisplayNodes(xml, mainnode, 1);
+
+  // parse the payloads
+  XMLNodePointer_t payload_node = xml->GetChild(mainnode);
+  XMLNodePointer_t child_node = xml->GetChild(payload_node);
+
+  std::string PackageName, ModuleName, PayloadURL, Checksum;
+
+  count = 0;
+
+  while (payload_node) {
+
+    std::string nodeName = xml->GetNodeName(payload_node);
+    //    B2INFO("Parsing payload... "<<nodeName);
+    if (nodeName == "payload") { /// Found a payload, now parse the needed information.
+      count++;
+      while (child_node) { // Search for the module
+        nodeName = xml->GetNodeName(child_node);
+
+        if (nodeName == "payloadUrl") {
+          PayloadURL = xml->GetNodeContent(child_node);
+        }
+        if (nodeName == "checksum") {
+          Checksum = xml->GetNodeContent(child_node);
+        }
+        if (nodeName == "basf2Module") { // module found
+          XMLNodePointer_t module_node = child_node;
+          child_node = xml->GetChild(child_node);
+          while (child_node) { // Search for the package
+            nodeName = xml->GetNodeName(child_node);
+            if (nodeName == "name") {
+              // Get the module name.
+              ModuleName = xml->GetNodeContent(child_node);
+            } else if (nodeName == "basf2Package") {
+              XMLNodePointer_t package_node = child_node;
+              child_node = xml->GetChild(child_node);
+              while (child_node) { // Search for the package name
+                nodeName = xml->GetNodeName(child_node);
+                if (nodeName == "name") {
+                  // Get the module name.
+                  PackageName = xml->GetNodeContent(child_node);
+                }
+                child_node = xml->GetNext(child_node);
+              }
+              child_node = package_node;
+            }
+            child_node = xml->GetNext(child_node);
+          }
+          child_node = module_node;
+        }
+        child_node = xml->GetNext(child_node);
+      }
+
+      if (PackageName.size() == 0 || ModuleName.size() == 0 || PayloadURL.size() == 0) {
+        B2ERROR("ConditionsService::parse_payload Payload not parsed correctly.");
+      } else {
+        std::string payloadKey = PackageName + ModuleName;
+        B2INFO("Found payload for module " << ModuleName << " in package " << PackageName << " at URL " << PayloadURL <<
+               ".  Storing with key: " << payloadKey << " and checksum: " << Checksum);
+        ConditionsService::GetInstance()->AddPayloadURL(payloadKey, PayloadURL);
+        ConditionsService::GetInstance()->AddChecksum(payloadKey, Checksum);
+
+      }
+    }
+    payload_node = xml->GetNext(payload_node);
+  }
+
+  // Release memory before exit
+  xml->FreeDoc(xmldoc);
+  delete xml;
+
+
+  return size * nmemb;
+
+}
+
+
+void ConditionsService::WritePayloadFile(std::string payloadFileName,
+                                         std::string packageName,
+                                         std::string moduleName)
+{
+
+  TMD5* checksum = TMD5::FileChecksum(payloadFileName.c_str());
+
+  if (!checksum) {
+    B2ERROR("Error calculating checksum for file " << payloadFileName << ".  Are you sure it exists?");
+    return;
+  }
+  std::string username = "BASF2 Conditions User";
+
+  std::string description = "Automated add by BASF2, no user description provided.";
+
+  TFile* f = TFile::Open(payloadFileName.c_str());
+  if (!f->IsZombie()) {
+  } else { // File is not a valid ROOT file.  Consider throwing an error.
+    B2WARNING("The conditions payload " << payloadFileName.c_str() << " could not be loaded by ROOT properly.");
+  }
+
+  std::string json_header = "{ \"checksum\": \"";
+  json_header = json_header + checksum->AsString() + "\" , \"isDefault\": false , \"modifiedBy\": \"" + username +
+                "\" , \"description\": \"" + description + "\" }";
+  B2INFO("json header: " << json_header);
+
+  CURL* curl;
+  CURLcode res;
+
+  // build post
+  std::string REST_payloads = m_RESTbase + "package/" + packageName + "/module/" + moduleName + "/payload";
+  B2INFO("rest payload post: " << REST_payloads);
+
+
+  struct curl_httppost* post = NULL;
+  struct curl_httppost* last = NULL;
+  struct curl_slist* headerlist = NULL;
+  //  static const char buf[] = "Expect:";
+
+  curl_global_init(CURL_GLOBAL_ALL);
+
+  curl_formadd(&post, &last,
+               CURLFORM_COPYNAME, "metadata",
+               CURLFORM_COPYCONTENTS, json_header.c_str(),
+               CURLFORM_CONTENTTYPE, "application/json", CURLFORM_END);
+  curl_formadd(&post, &last,
+               CURLFORM_COPYNAME, "contents",
+               CURLFORM_FILECONTENT, payloadFileName.c_str(),
+               CURLFORM_CONTENTTYPE, "application/x-root", CURLFORM_END);
+
+  headerlist = curl_slist_append(headerlist, "Content-Type: multipart/mixed");
+
+  curl = curl_easy_init();
+  if (curl) {
+
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
+    curl_easy_setopt(curl, CURLOPT_URL, REST_payloads.c_str());
+    curl_easy_setopt(curl, CURLOPT_USERNAME, username.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, parse_return);
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, post);
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK) {
+      B2ERROR("curl_easy_perform() failed: " << curl_easy_strerror(res));
+    }
+
+    curl_easy_cleanup(curl);
+  }
+
+}
+
+size_t ConditionsService:: write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
+{
+  size_t written = fwrite(ptr, size, nmemb, stream);
+  return written;
+}
+
+
+std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::string moduleName)
+{
+
+
+  std::string remote_file = m_run_payloads[packageName + moduleName];
+  std::string local_file = m_FILEbase + remote_file; // This will work for local files and CVMFS.
+
+
+
+  if (m_FILEbase.substr(0, 7) == "http://") { // May need to transfer files locally.
+    local_file = "/tmp/" + boost::filesystem::path(remote_file).filename().string();
+    TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
+
+    remote_file = m_FILEbase + remote_file;
+    if (!checksum) { // file isn't there.  Start downloading.
+
+      B2INFO("Did not find file " << local_file << " starting download from " << remote_file);
+
+      CURL* curl;
+      FILE* fp;
+      CURLcode res;
+
+      curl = curl_easy_init();
+      if (curl) {
+        fp = fopen(local_file.c_str(), "wb");
+        curl_easy_setopt(curl, CURLOPT_URL, remote_file.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
+        //  curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_func);
+
+        res = curl_easy_perform(curl);
+
+        curl_easy_cleanup(curl);
+        fclose(fp);
+      }
+      checksum = TMD5::FileChecksum(local_file.c_str()); // check checksum
+    } else if (checksum->AsString() == m_run_checksums[packageName + moduleName]) {
+      B2INFO("Found file: " << local_file << " with correct MD5 checksum: " << checksum->AsString());
+      return local_file;
+    }
+
+
+    TMD5* checksum_new;
+    while (checksum->AsString() != m_run_checksums[packageName + moduleName]) { // then there was a checksum mis-match
+      gSystem->Sleep(1000);
+      checksum_new = TMD5::FileChecksum(local_file.c_str()); // check checksum again
+      if (checksum->AsString() != checksum_new->AsString()) {   // Then we are downloading the file already.
+        B2INFO("File with incorrect checksum found, download appears to be occuring... waiting for file to complete");
+        checksum = checksum_new;
+      } else { // File isn't downloading, but checksums don't match.  Throw an error.
+        B2ERROR("Error with file " << local_file.c_str() << " checksum expected: " << m_run_checksums[packageName + moduleName] <<
+                " found: " << checksum);
+      }
+    }
+  }
+
+  TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
+  if (!checksum) { // file isn't there.  Toss an error.
+    B2ERROR("Did not find file " << local_file << " check inputs.");
+  } else if (checksum->AsString() != m_run_checksums[packageName + moduleName]) { // MD5 checksum doesn't match the database entry.
+    B2ERROR("Conditions file " << local_file << " error! Expected MD5 checksum " << m_run_checksums[packageName + moduleName] <<
+            " and calculated checksum " << checksum->AsString());
+  }
+
+  return local_file;
+}
+
+int ConditionsService::progress_func(void* ptr, double TotalToDownload, double NowDownloaded,
+                                     double TotalToUpload, double NowUploaded)
+{
+  // how wide you want the progress meter to be
+  int totaldotz = 40;
+
+  double fractiondownloaded = NowDownloaded / TotalToDownload;
+  double fractionuploaded   = NowUploaded / TotalToUpload;
+  // part of the progressmeter that's already "full"
+  int dotz = round(fractiondownloaded * totaldotz);
+  printf("%3.0f%% [", fractiondownloaded * 100);
+  if (TotalToUpload > 0) {
+    dotz = round(fractionuploaded * totaldotz);
+    printf("%3.0f%% [", fractionuploaded * 100);
+  }
+
+  // create the "meter"
+  int ii = 0;
+
+  // part  that's full already
+  for (; ii < dotz; ii++) {
+    printf("=");
+  }
+  // remaining part (spaces)
+  for (; ii < totaldotz; ii++) {
+    printf(" ");
+  }
+  // and back to line begin - do not forget the fflush to avoid output buffering problems!
+  printf("]\r");
+  fflush(stdout);
+  // if you don't return 0, the transfer will be aborted - see the documentation
   return 0;
 }
-
-std::string ConditionsService::GenerateFilename(std::string PayloadTag,
-                                                std::string SubsystemTag,
-                                                std::string AlgorithmName,
-                                                std::string AlgorithmVersion,
-                                                std::string InitialRun,
-                                                std::string FinalRun)
-{
-
-  m_buffer = PayloadTag + SubsystemTag + AlgorithmName + AlgorithmVersion + InitialRun + FinalRun;
-
-  std::string filename = SubsystemTag + "_" + AlgorithmName + "_" + AlgorithmVersion + "_" + PayloadTag + ".root";
-  return filename;
-
-}
-
-std::string ConditionsService::GenerateDirectory(std::string PayloadTag,
-                                                 std::string SubsystemTag,
-                                                 std::string AlgorithmName,
-                                                 std::string AlgorithmVersion,
-                                                 std::string InitialRun,
-                                                 std::string FinalRun)
-{
-  m_buffer = PayloadTag + SubsystemTag + AlgorithmName + AlgorithmVersion + InitialRun + FinalRun;
-  std::string directory = "/srv/itop_data/conditions/" + SubsystemTag + "/" + AlgorithmName + "/" + AlgorithmVersion + "/";
-  return directory;
-
-}
-
-Int_t ConditionsService::WritePayloadObject(TObject* payload,
-                                            std::string PayloadTag,
-                                            std::string SubsystemTag,
-                                            std::string AlgorithmName,
-                                            std::string AlgorithmVersion,
-                                            std::string InitialRun,
-                                            std::string FinalRun)
-{
-
-  //// First check to see if the payload has been defined in the DB.
-  if (m_current_payloads.count(PayloadTag)) {
-    m_current_payloads[PayloadTag]->Add(payload);
-  } else {
-    B2ERROR("Error adding object to payload; payload tag " << PayloadTag << " not started or already commited.");
-  }
-  m_buffer = PayloadTag + SubsystemTag + AlgorithmName + AlgorithmVersion + InitialRun + FinalRun;
-  return 0; // Check the errors.
-
-}
-
-TList* ConditionsService::GetPayloadList(std::string GlobalTag,
-                                         std::string  RunNumber,
-                                         std::string AlgorithmName,
-                                         std::string AlgorithmVersion)
-{
-
-  m_buffer = GlobalTag + RunNumber + AlgorithmName + AlgorithmVersion;
-
-  B2INFO("Payload retrieval " << m_buffer);
-
-  std::string query(
-    Form("select payload_url from detector_tag, payload, payload_iov, algorithm where payload_iov.payload_id = payload.payload_id and algorithm.name='%s' and initial_run_id<=(select run_id from run where name='%s') and final_run_id>=(select run_id from run where name='%s') and tag_id = detector_tag.detector_tag_id;",
-         (char*)AlgorithmName.c_str(), (char*)RunNumber.c_str(), (char*)RunNumber.c_str()));
-
-  B2INFO("Payload retrieval " << query);
-
-  TSQLServer* sql = TSQLServer::Connect("pgsql://localhost/conditions_dev", "app_cond", "belle2");
-  TSQLResult* res = sql->Query(query.c_str());
-  TSQLRow* row = res->Next();
-
-  B2INFO("payload retrieval -> " << row->GetField(0));
-
-  TFile* f = new TFile(row->GetField(0), "READ");
-  TList* list = NULL;
-  if (!f->IsZombie()) {
-    list = f->GetListOfKeys();
-  } else {
-    B2ERROR("Error retrieving conditions payload.");
-  }
-
-  sql->Close();
-
-  return list;
-
-}
-
-

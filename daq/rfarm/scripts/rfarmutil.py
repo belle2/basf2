@@ -46,6 +46,9 @@ def get_rfgetconf(conffile, item1, item2='NULL', item3='NULL'):
 # Run NSMD
 
 def run_nsmd(nsmdir, port, nsmhost):
+    # Check directory for loggin
+    if not os.path.exists(nsmdir + '/' + nsmhost):
+        os.mkdir(nsmdir + '/' + nsmhost)
     nsmd = str(os.environ.get('BELLE2_EXTERNALS_BIN')) + '/nsmd2 -f -p ' \
         + port + ' -s ' + port + ' -h '
     cmd = 'ssh ' + nsmhost + ' "cd ' + nsmdir + '/' + nsmhost \
@@ -151,6 +154,8 @@ def run_eventserver(conffile):
     evshost = get_rfgetconf(conffile, 'distributor', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     port = get_rfgetconf(conffile, 'system', 'nsmport')
+    if not os.path.exists(basedir + '/distributor'):
+        os.mkdir(basedir + '/distributor')
     cmd = 'ssh ' + evshost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; rf_eventserver ' + get_configpath(conffile) \
         + ' > & distributor/nsmlog.log" '
@@ -166,13 +171,14 @@ def stop_eventserver(conffile):
     unit = get_rfgetconf(conffile, 'system', 'unitname')
     ringbuf = get_rfgetconf(conffile, 'distributor', 'ringbuffer')
     rbufname = unit + ':' + ringbuf
+    shmname = unit + ':distributor'
     p = subprocess.Popen('rfcommand ' + conffile
                          + ' distributor RF_UNCONFIGURE', shell=True)
     p.wait()
     pidfile = basedir + '/distributor/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + evshost + ' "kill ' + pid + '; removerb ' + rbufname \
-            + '"'
+            + "; removeshm " + shmname + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
 
@@ -183,6 +189,8 @@ def run_outputserver(conffile):
     opshost = get_rfgetconf(conffile, 'collector', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     port = get_rfgetconf(conffile, 'system', 'nsmport')
+    if not os.path.exists(basedir + '/collector'):
+        os.mkdir(basedir + '/collector')
     cmd = 'ssh ' + opshost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; rf_outputserver ' + get_configpath(conffile) \
         + ' > & collector/nsmlog.log" '
@@ -200,11 +208,13 @@ def stop_outputserver(conffile):
     rbufout = get_rfgetconf(conffile, 'collector', 'ringbufout')
     rbufinname = unit + ':' + rbufin
     rbufoutname = unit + ':' + rbufout
+    shmname = unit + ':collector'
     p = subprocess.Popen('rfcommand ' + conffile + ' collector RF_UNCONFIGURE', shell=True)
     p.wait()
     pidfile = basedir + '/collector/pid.data'
     for pid in open(pidfile, 'r'):
-        cmd = 'ssh ' + opshost + ' "kill ' + pid + '; removerb ' + rbufinname + '; removerb ' + rbufoutname + '"'
+        cmd = 'ssh ' + opshost + ' "kill ' + pid + '; removerb ' + rbufinname \
+              + '; removerb ' + rbufoutname + '; removeshm ' + shmname + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
 
@@ -226,6 +236,8 @@ def run_eventprocessor(conffile):
         if badlist.find(nodeid) == -1:
             evphost = hostbase + nodeid
             nodename = nodebase + nodeid
+            if not os.path.exists(basedir + '/evp_' + nodename):
+                os.mkdir(basedir + '/evp_' + nodename)
             cmd = 'ssh ' + evphost + ' "cd ' + basedir + '; setenv NSM2_PORT ' \
                 + port + '; rf_eventprocessor ' + get_configpath(conffile) \
                 + ' > & evp_' + nodename + '/nsmlog.log" '
@@ -256,13 +268,15 @@ def stop_eventprocessor(conffile):
         if badlist.find(nodeid) == -1:
             evphost = hostbase + nodeid
             nodename = 'evp_' + nodebase + nodeid
+            shmname = unit + ':' + nodename
             p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename
                                  + ' RF_UNCONFIGURE', shell=True)
             p.wait()
             pidfile = basedir + '/' + nodename + '/pid.data'
             for pid in open(pidfile, 'r'):
                 cmd = 'ssh ' + evphost + ' "kill ' + pid + '; removerb ' \
-                    + rbufinname + '; removerb ' + rbufoutname + '"'
+                    + rbufinname + '; removerb ' + rbufoutname + \
+                    + '; removeshm ' + shmname + '"'
                 print cmd
                 p = subprocess.Popen(cmd, shell=True)
 
@@ -273,6 +287,8 @@ def run_dqmserver(conffile):
     dqmhost = get_rfgetconf(conffile, 'dqmserver', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     port = get_rfgetconf(conffile, 'system', 'nsmport')
+    if not os.path.exists(basedir + '/dqmserver'):
+        os.mkdir(basedir + '/dqmserver')
     cmd = 'ssh ' + dqmhost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; rf_dqmserver ' + get_configpath(conffile) \
         + ' > & dqmserver/nsmlog.log" '
@@ -300,6 +316,8 @@ def run_roisender(conffile):
     roihost = get_rfgetconf(conffile, 'roisender', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     port = get_rfgetconf(conffile, 'system', 'nsmport')
+    if not os.path.exists(basedir + '/roisender'):
+        os.mkdir(basedir + '/roisender')
     cmd = 'ssh ' + roihost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; rf_roisender ' + get_configpath(conffile) \
         + ' > & roisender/nsmlog.log" '
@@ -327,6 +345,8 @@ def run_master(conffile):
     masterhost = get_rfgetconf(conffile, 'master', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     port = get_rfgetconf(conffile, 'system', 'nsmport')
+    if not os.path.exists(basedir + '/master'):
+        os.mkdir(basedir + '/master')
     cmd = 'ssh ' + masterhost + ' "cd ' + basedir + '; setenv NSM2_PORT ' \
         + port + '; rf_master_local ' + get_configpath(conffile) \
         + ' > & master/nsmlog.log" '

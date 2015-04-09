@@ -21,7 +21,6 @@
 
 #include <simulation/dataobjects/BeamBackHit.h>
 
-//#include <ecl/modules/eclBackgroundStudy/def.h>
 
 // if the ARICH package is installed, compile ARICH components
 #ifdef DOARICH
@@ -185,7 +184,7 @@ namespace Belle2 {
     /** Density (silicium) [kg*cm^{-3}] of Si*/
     const double SiRho = 2.33e-3;
     /** Mass [kg] of Diodes */
-    const double DiodeMass = DiodeArea* DiodeThk* SiRho;;
+    const double DiodeMass = DiodeArea * DiodeThk * SiRho;;
 
 
     /** ARICH geometry paramaters */
@@ -216,6 +215,9 @@ namespace Belle2 {
     /** Radiation Dose per cell*/
     TH1F* hEMDose;
 
+    /** Energy per cell */
+    TH1F* hEnergyPerCrystal;
+
     /**Diode Neutron Flux per cell */
     TH1F* hDiodeFlux;
 
@@ -229,6 +231,15 @@ namespace Belle2 {
     TH1F* hARICHDoseBB;
     /** ARICH Yearly neutron flux vs module index. Based on energy of all BeamBackgrounds */
     TH1F* hHAPDFlux;
+
+    /**Energy per crystal Forward Calorimeter*/
+    TH2F* hEnergyPerCrystalECF;
+    /**Energy per crystal Backward Calorimeter*/
+    TH2F* hEnergyPerCrystalECB;
+    /**Energy per crystal Barrel*/
+    TH2F* hEnergyPerCrystalBAR;
+    /**Energy per crystal Wide bins*/
+    TH1F* hEnergyPerCrystalWideTID;
 
 
     /**Radiation Dose Forward Calorimeter*/

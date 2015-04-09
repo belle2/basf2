@@ -246,6 +246,14 @@ namespace Belle2 {
     /* Version history:
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.
        ver 5: CDC Hit Pattern now a single variable (add schema evolution rule).
+       ver 4: added hit pattern
+       ver 3: back to vectors for the elements
+       ver 4: fixed-size arrays for the elements  <------- incompatible with later version 4
+       ver 3: add data fields for hit patterns
+       ver 2: re-arranging of members
+       ver 1:
+       ver 2:                                     <------- incompatible with later version 2
+       ver 1:
     */
   };
 }

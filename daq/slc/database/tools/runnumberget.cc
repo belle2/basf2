@@ -7,6 +7,8 @@
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 
+#include <cstdlib>
+
 using namespace Belle2;
 
 int main(int argc, char** argv)

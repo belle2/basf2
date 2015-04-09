@@ -203,6 +203,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=1):
     # Material effects for all track extrapolations
     material_effects = register_module('SetupGenfitExtrapolation')
     material_effects.param('whichGeometry', 'TGeo')
+    # material_effects.param('whichGeometry', 'Geant4')
     path.add_module(material_effects)
 
     # find MCTracks in CDC, SVD, and PXD

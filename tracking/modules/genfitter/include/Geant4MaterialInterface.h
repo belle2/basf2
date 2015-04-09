@@ -18,39 +18,6 @@
 namespace Belle2 {
 
 
-  class G4SafeNavigator {
-    // Guards against leaving the physical volume.
-  public:
-    G4SafeNavigator() : dX_(0), dY_(0), dZ_(0) {}
-    virtual ~G4SafeNavigator() {}
-
-    void SetWorldVolume(G4VPhysicalVolume* pWorld);
-
-    virtual
-    G4VPhysicalVolume* LocateGlobalPointAndSetup(const G4ThreeVector& point,
-                                                 const G4ThreeVector* direction = 0,
-                                                 const G4bool pRelativeSearch = true,
-                                                 const G4bool ignoreDirection = true);
-
-    virtual G4double ComputeStep(const G4ThreeVector& pGlobalPoint,
-                                 const G4ThreeVector& pDirection,
-                                 const G4double pCurrentProposedStepLength,
-                                 G4double&  pNewSafety);
-
-    G4double CheckNextStep(const G4ThreeVector& pGlobalPoint,
-                           const G4ThreeVector& pDirection,
-                           const G4double pCurrentProposedStepLength,
-                           G4double& pNewSafety);
-
-    void SetGeometricallyLimitedStep() { nav_.SetGeometricallyLimitedStep(); }
-  private:
-    // Half-sizes of the world volume, assumed to be a G4Box;
-    double dX_, dY_, dZ_;
-    G4Navigator nav_;
-  };
-
-
-
   /**
    * @brief AbsMaterialInterface implementation for use with ROOT's TGeoManager.
    */
@@ -59,7 +26,7 @@ namespace Belle2 {
   public:
 
     Geant4MaterialInterface();
-    ~Geant4MaterialInterface() {};
+    ~Geant4MaterialInterface();
 
     /** @brief Initialize the navigator at given position and with given
         direction.  Returns true if the volume changed.
@@ -92,7 +59,7 @@ namespace Belle2 {
 
   private:
 
-    std::unique_ptr<G4SafeNavigator> nav_;
+    std::unique_ptr<class G4SafeNavigator> nav_;
     const G4VPhysicalVolume* currentVolume_;
   };
 

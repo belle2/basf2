@@ -16,6 +16,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4Box.hh"
 #include "G4Material.hh"
+#include "G4TouchableHistory.hh"
 
 static const bool debug = false;
 //static const bool debug = true;
@@ -26,52 +27,66 @@ static const bool debug = false;
 using namespace Belle2;
 
 namespace {
-#ifdef LOOK_IN_TGEO
-
-  /*
-  Reference for elemental mean excitation energies at:
-  http://physics.nist.gov/PhysRefData/XrayMassCoef/tab1.html
-
-  Code ported from GEANT 3
-  */
-
-  const int MeanExcEnergy_NELEMENTS = 93; // 0 = vacuum, 1 = hydrogen, 92 = uranium
-  const double MeanExcEnergy_vals[] = {1.e15, 19.2, 41.8, 40.0, 63.7, 76.0, 78., 82.0, 95.0, 115.0, 137.0, 149.0, 156.0, 166.0, 173.0, 173.0, 180.0, 174.0, 188.0, 190.0, 191.0, 216.0, 233.0, 245.0, 257.0, 272.0, 286.0, 297.0, 311.0, 322.0, 330.0, 334.0, 350.0, 347.0, 348.0, 343.0, 352.0, 363.0, 366.0, 379.0, 393.0, 417.0, 424.0, 428.0, 441.0, 449.0, 470.0, 470.0, 469.0, 488.0, 488.0, 487.0, 485.0, 491.0, 482.0, 488.0, 491.0, 501.0, 523.0, 535.0, 546.0, 560.0, 574.0, 580.0, 591.0, 614.0, 628.0, 650.0, 658.0, 674.0, 684.0, 694.0, 705.0, 718.0, 727.0, 736.0, 746.0, 757.0, 790.0, 790.0, 800.0, 810.0, 823.0, 823.0, 830.0, 825.0, 794.0, 827.0, 826.0, 841.0, 847.0, 878.0, 890.0};
-
-  double
-  MeanExcEnergy_get(int Z)
-  {
-    assert(Z >= 0 && Z < MeanExcEnergy_NELEMENTS);
-    return MeanExcEnergy_vals[Z];
-  }
-
-
-  double
-  MeanExcEnergy_get(TGeoMaterial* mat)
-  {
-    if (mat->IsMixture()) {
-      double logMEE = 0.;
-      double denom  = 0.;
-      TGeoMixture* mix = (TGeoMixture*)mat;
-      for (int i = 0; i < mix->GetNelements(); ++i) {
-        int index = int(floor((mix->GetZmixt())[i]));
-        logMEE += 1. / (mix->GetAmixt())[i] * (mix->GetWmixt())[i] * (mix->GetZmixt())[i] * log(MeanExcEnergy_get(index));
-        denom  += (mix->GetWmixt())[i] * (mix->GetZmixt())[i] * 1. / (mix->GetAmixt())[i];
-      }
-      logMEE /= denom;
-      return exp(logMEE);
-    } else { // not a mixture
-      int index = int(floor(mat->GetZ()));
-      return MeanExcEnergy_get(index);
-    }
-  }
-
-#endif
 
   G4ThreeVector where;
 
 }
 
+namespace Belle2 {
+  class G4SafeNavigator {
+    // Guards against leaving the physical volume.
+    //
+    // Not inheriting from G4Navigator because CheckNextStep is not
+    // virtual.
+  public:
+    G4SafeNavigator() : dX_(0), dY_(0), dZ_(0) {}
+    ~G4SafeNavigator() {}
+
+    void SetWorldVolume(G4VPhysicalVolume* pWorld);
+    G4VPhysicalVolume* LocateGlobalPointAndSetup(const G4ThreeVector& point,
+                                                 const G4ThreeVector* direction = 0,
+                                                 const G4bool pRelativeSearch = true,
+                                                 const G4bool ignoreDirection = true);
+
+    G4double CheckNextStep(const G4ThreeVector& pGlobalPoint,
+                           const G4ThreeVector& pDirection,
+                           const G4double pCurrentProposedStepLength,
+                           G4double& pNewSafety);
+
+    G4VPhysicalVolume* ResetHierarchyAndLocate(const G4ThreeVector& point,
+                                               const G4ThreeVector& direction,
+                                               const G4TouchableHistory& h);
+    G4TouchableHistory* CreateTouchableHistory() const
+    {
+      return nav_.CreateTouchableHistory();
+    }
+  private:
+    void limitToWorld(G4ThreeVector& p, G4ThreeVector& d) const;
+
+    // Half-sizes of the world volume, assumed to be a G4Box;
+    double dX_, dY_, dZ_;
+    G4Navigator nav_;
+  };
+}
+
+void
+G4SafeNavigator::limitToWorld(G4ThreeVector& p, G4ThreeVector& d) const
+{
+  if (fabs(p.x()) >= dX_)
+    p.setX(0);
+  if (fabs(p.y()) >= dY_)
+    p.setY(0);
+  if (fabs(p.z()) >= dZ_)
+    p.setZ(0);
+  where = p;
+
+  if (std::isnan(d.x()) || std::isnan(d.y()) || std::isnan(d.z())) {
+    B2WARNING("nan in direction in G4SafeNavigator::limitToWorld");
+    d.set(1., 0., 0.);
+  } else {
+    d.setMag(1.);
+  }
+}
 
 void G4SafeNavigator::SetWorldVolume(G4VPhysicalVolume* pWorld)
 {
@@ -81,14 +96,6 @@ void G4SafeNavigator::SetWorldVolume(G4VPhysicalVolume* pWorld)
   dY_ = box->GetYHalfLength();
   dZ_ = box->GetZHalfLength();
   nav_.SetWorldVolume(pWorld);
-
-#ifdef LOOK_IN_TGEO
-  if (!gGeoManager) {
-    B2INFO("Building TGeo representation.");
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-#endif
 }
 
 
@@ -98,44 +105,20 @@ G4VPhysicalVolume* G4SafeNavigator::LocateGlobalPointAndSetup(const G4ThreeVecto
     const G4bool ignoreDirection)
 {
   G4ThreeVector p(point);
-  if (fabs(p.x()) >= dX_)
-    p.setX(0);
-  if (fabs(p.y()) >= dY_)
-    p.setY(0);
-  if (fabs(p.z()) >= dZ_)
-    p.setZ(0);
-  where = p;
-
+  assert(direction);
   G4ThreeVector dir(*direction);
-  if (std::isnan(dir.x()) || std::isnan(dir.y()) || std::isnan(dir.z())) {
-    B2WARNING("nan in direction in G4SafeNavigator::LocateGlobalPointAndSetup");
-    dir.set(1., 0., 0.);
-  }
-  dir.setMag(1.);
+  limitToWorld(p, dir);
   return nav_.LocateGlobalPointAndSetup(p, &dir, pRelativeSearch, ignoreDirection);
 }
 
-G4double G4SafeNavigator::ComputeStep(const G4ThreeVector& pGlobalPoint,
-                                      const G4ThreeVector& pDirection,
-                                      const G4double pCurrentProposedStepLength,
-                                      G4double&  pNewSafety)
+G4VPhysicalVolume* G4SafeNavigator::ResetHierarchyAndLocate(const G4ThreeVector& point,
+                                                            const G4ThreeVector& direction,
+                                                            const G4TouchableHistory& h)
 {
-  G4ThreeVector p(pGlobalPoint);
-  if (fabs(p.x()) >= dX_)
-    p.setX(0);
-  if (fabs(p.y()) >= dY_)
-    p.setY(0);
-  if (fabs(p.z()) >= dZ_)
-    p.setZ(0);
-  where = p;
-
-  G4ThreeVector dir(pDirection);
-  if (std::isnan(dir.x()) || std::isnan(dir.y()) || std::isnan(dir.z())) {
-    B2WARNING("nan in direction in G4SafeNavigator::ComputeStep");
-    dir.set(1., 0., 0.);
-  }
-  dir.setMag(1.);
-  return nav_.ComputeStep(p, dir, pCurrentProposedStepLength, pNewSafety);
+  G4ThreeVector p(point);
+  G4ThreeVector dir(direction);
+  limitToWorld(p, dir);
+  return nav_.ResetHierarchyAndLocate(p, dir, h);
 }
 
 G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& pGlobalPoint,
@@ -144,20 +127,8 @@ G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& pGlobalPoint,
                                         G4double& pNewSafety)
 {
   G4ThreeVector p(pGlobalPoint);
-  if (fabs(p.x()) >= dX_)
-    p.setX(0);
-  if (fabs(p.y()) >= dY_)
-    p.setY(0);
-  if (fabs(p.z()) >= dZ_)
-    p.setZ(0);
-  where = p;
-
   G4ThreeVector dir(pDirection);
-  if (std::isnan(dir.x()) || std::isnan(dir.y()) || std::isnan(dir.z())) {
-    B2WARNING("nan in direction in G4SafeNavigator::CheckNextStep");
-    dir.set(1., 0., 0.);
-  }
-  dir.setMag(1.);
+  limitToWorld(p, dir);
   return nav_.CheckNextStep(p, dir, pCurrentProposedStepLength, pNewSafety);
 }
 
@@ -169,6 +140,10 @@ Geant4MaterialInterface::Geant4MaterialInterface()
   nav_->SetWorldVolume(world);
 }
 
+Geant4MaterialInterface::~Geant4MaterialInterface()
+{
+}
+
 
 bool
 Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
@@ -177,13 +152,7 @@ Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
   G4ThreeVector pos(posX * CLHEP::cm, posY * CLHEP::cm, posZ * CLHEP::cm);
   G4ThreeVector dir(dirX, dirY, dirZ);
   const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir, false, false);
-  if (!newVolume)
-    std::cout << "hier " << pos << std::endl;
-#ifdef LOOK_IN_TGEO
-  gGeoManager->IsSameLocation(posX, posY, posZ, kTRUE);
-  // Set the intended direction.
-  gGeoManager->SetCurrentDirection(dirX, dirY, dirZ);
-#endif
+  assert(newVolume);
 
   bool volChanged = newVolume != currentVolume_;
   currentVolume_ = newVolume;
@@ -199,8 +168,6 @@ Geant4MaterialInterface::getMaterialParameters(double& density,
                                                double& radiationLength,
                                                double& mEE)
 {
-  if (!currentVolume_)
-    std::cout << " oder hier " << where << std::endl;
   assert(currentVolume_);
 
   const G4Material* mat = currentVolume_->GetLogicalVolume()->GetMaterial();
@@ -219,29 +186,10 @@ Geant4MaterialInterface::getMaterialParameters(double& density,
   }
 
   density = mat->GetDensity() / CLHEP::g * CLHEP::cm3;
-  // Z is fine
+  // Z has correct units
   A *= CLHEP::mole / CLHEP::g;
   radiationLength = mat->GetRadlen() / CLHEP::cm;
   mEE = mat->GetIonisation()->GetMeanExcitationEnergy() / CLHEP::eV;
-
-
-#ifdef LOOK_IN_TGEO
-  TGeoMaterial* matTG = gGeoManager->GetCurrentVolume()->GetMedium()->GetMaterial();
-
-  double densityTG         = matTG->GetDensity();
-  double ZTG               = matTG->GetZ();
-  double ATG               = matTG->GetA();
-  double radiationLengthTG = matTG->GetRadLen();
-  double mEETG             = MeanExcEnergy_get(matTG);
-
-  std::cout << mat->GetName() << " " << matTG->GetName()
-            << " rho " << density << " " << densityTG
-            << " Z " << Z << " " << ZTG
-            << " A " << A << " " << ATG
-            << " X0 " << radiationLength << " " << radiationLengthTG
-            << " mEE " << mEE << " " << mEETG
-            << std::endl;
-#endif
 }
 
 
@@ -260,6 +208,9 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
                                           double sMax, // signed
                                           bool varField)
 {
+  // This assumes that sMax is small enough to take only a single RK
+  // step.  This restriction comes about because RKPropagate only
+  // takes one step.
   const double delta(1.E-2); // cm, distance limit beneath which straight-line steps are taken.
   const double epsilon(1.E-1); // cm, allowed upper bound on arch deviation from straight line
 
@@ -269,12 +220,12 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   int stepSign(sMax < 0 ? -1 : 1);
 
-  G4ThreeVector pointOrig(stateOrig[0] * CLHEP::cm,
-                          stateOrig[1] * CLHEP::cm,
-                          stateOrig[2] * CLHEP::cm);
-  G4ThreeVector dirOrig(stepSign * stateOrig[3],
-                        stepSign * stateOrig[4],
-                        stepSign * stateOrig[5]);
+  G4ThreeVector pointOld(stateOrig[0] * CLHEP::cm,
+                         stateOrig[1] * CLHEP::cm,
+                         stateOrig[2] * CLHEP::cm);
+  G4ThreeVector dirOld(stepSign * stateOrig[3],
+                       stepSign * stateOrig[4],
+                       stepSign * stateOrig[5]);
 
   double s = 0;  // trajectory length to boundary
 
@@ -283,36 +234,30 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   // Initialize the geometry to the current location (set by caller).
   double safety;
-  double slDist = nav_->ComputeStep(pointOrig, dirOrig, fabs(sMax) * CLHEP::cm, safety);
+  double slDist = nav_->CheckNextStep(pointOld, dirOld, fabs(sMax) * CLHEP::cm, safety);
   if (slDist == kInfinity)
     slDist = fabs(sMax);
   else
     slDist /= CLHEP::cm;
   safety /= CLHEP::cm;
+
+  // No boundary in sight?
+  if (safety > fabs(sMax)) {
+    if (debug)
+      std::cout << "   next boundary is farther away than sMax \n";
+    return stepSign * safety; // sMax
+  }
+
+  // Are we at the boundary?
+  if (slDist < delta) {
+    if (debug)
+      std::cout << "   very close to the boundary -> return @ it " << it
+                << " stepSign*slDist = "
+                << stepSign << "*" << slDist << "\n";
+    return stepSign * slDist;
+  }
   double step = slDist;
 
-#ifdef LOOK_IN_TGEO
-  gGeoManager->IsSameLocation(stateOrig[0], stateOrig[1], stateOrig[2], kTRUE);
-  gGeoManager->SetCurrentDirection(stepSign * stateOrig[3], stepSign * stateOrig[4], stepSign * stateOrig[5]);
-  gGeoManager->FindNextBoundary(fabs(sMax) - s);
-  double safetyTG = gGeoManager->GetSafeDistance();
-  double slDistTG = gGeoManager->GetStep();
-  //double stepTG = slDist;
-
-  if (1 || fabs(slDist - slDistTG) > 1e-3) {
-    if (fabs(slDist - slDistTG) < 1e-3)
-      std::cout << "not";
-    std::cout << " \033[0;01mdifferent\033[00m : "
-              << stateOrig[0] << " " << stateOrig[1] << " " << stateOrig[2] << " "
-              << stepSign* stateOrig[3] << " " << stepSign* stateOrig[4] << " " << stepSign* stateOrig[5] << "\n"
-              << " sMax " << sMax
-              << " slDist " << slDist << " " << slDistTG
-              << " safety " << safety << " " << safetyTG << std::endl
-              << " volume = " << currentVolume_->GetLogicalVolume()->GetName() << " "
-              << gGeoManager->FindNode(stateOrig[0], stateOrig[1], stateOrig[2])->GetName()
-              << std::endl;
-  }
-#endif
   while (1) {
     if (++it > maxIt) {
       genfit::Exception exc("Geant4MaterialInterface::findNextBoundary ==> maximum number of iterations exceeded", __LINE__, __FILE__);
@@ -320,96 +265,105 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
       throw exc;
     }
 
-    // No boundary in sight?
-    if (s + safety > fabs(sMax)) {
-      if (debug)
-        std::cout << "   next boundary is farther away than sMax \n";
-      nav_->SetGeometricallyLimitedStep();
-      return stepSign * (s + safety); // sMax
-    }
-
-    // Are we at the boundary?
-    if (slDist < delta) {
-      if (debug)
-        std::cout << "   very close to the boundary -> return"
-                  << " stepSign*(s + slDist) = "
-                  << stepSign << "*(" << s + slDist << ")\n";
-      nav_->SetGeometricallyLimitedStep();
-      return stepSign * (s + slDist);
-    }
+    if (step < delta)
+      return stepSign * (s + step);
 
     // We have to find whether there's any boundary on our path.
 
     // Follow curved arch, then see if we may have missed a boundary.
     // Always propagate complete way from original start to avoid
-    // inconsistent extrapolations.
+    // inconsistent extrapolations.  This is always a single RK step.
     memcpy(state7, stateOrig, sizeof(state7));
     rep->RKPropagate(state7, NULL, SA, stepSign * (s + step), varField);
 
-    // Straight line distance² between extrapolation finish and
+    G4ThreeVector pos(state7[0] * CLHEP::cm, state7[1] * CLHEP::cm, state7[2] * CLHEP::cm);
+    G4ThreeVector dir(stepSign * state7[3], stepSign * state7[4], stepSign * state7[5]);
+
+    // Straight line distance between extrapolation finish and
     // the end of the previously determined safe segment.
     double dist2 = (pow(state7[0] - oldState7[0], 2)
                     + pow(state7[1] - oldState7[1], 2)
                     + pow(state7[2] - oldState7[2], 2));
-    // Maximal lateral deviation².
-    double maxDeviation2 = 0.25 * (step * step - dist2);
 
-    // Do we need to try again with a shorter step?
-    //
-    // 1. Too much curvature?
-    if (step > safety
-        && maxDeviation2 > epsilon * epsilon) {
-      // Need to take a shorter step to reliably estimate material,
-      // but only if we didn't move by safety.  In order to avoid
-      // issues with roundoff we check 'step > safety' instead of
-      // 'step != safety'.  If we moved by safety, there couldn't have
-      // been a boundary that we missed along the path, but we could
-      // be on the boundary.
+    // If we moved less than safety, the volume cannot possibly have
+    // changed, so we skip further checks.
+    if (dist2 > safety * safety) {
 
-      // Take a shorter step, but never shorter than safety.
-      step = std::max(step / 2, safety);
+      // Do we need to try again with a shorter step?  There are two
+      // possible reasons:
+      //
+      // 1. Too much curvature?
 
-      continue;
-    }
+      // Maximal lateral deviation² of the curved path from the
+      // straight line connecting beginning and end.
+      double maxDeviation2 = 0.25 * (step * step - dist2);
+      if (maxDeviation2 > epsilon * epsilon) {
+        // Need to take a shorter step to reliably estimate material,
+        // but only if we didn't move by safety.
 
-    // 2. Volume changed?
-    //
-    // Where are we after the step?
-    nav_->SetGeometricallyLimitedStep();
-    bool volChanged = initTrack(state7[0], state7[1], state7[2],
-                                stepSign * state7[3], stepSign * state7[4],
-                                stepSign * state7[5]);
-    if (volChanged) {
+        // Take a shorter step, but never shorter than safety.
+        step = safety + 0.5 * (step - safety);
 
-      // Extrapolation may not take the exact step length we asked
-      // for, so it can happen that a requested step < safety takes
-      // us across the boundary.  This is then the best estimate we
-      // can get of the distance to the boundary with the stepper.
-      if (step <= safety)
-        return stepSign * (s + step);
+        continue;
+      }
 
-      // Move back to start.
-      initTrack(oldState7[0], oldState7[1], oldState7[2],
-                stepSign * oldState7[3], stepSign * oldState7[4],
-                stepSign * oldState7[5]);
+      // 2. Volume changed?
+      //
+      // Where are we after the step?
+      std::unique_ptr<G4TouchableHistory> hist(nav_->CreateTouchableHistory());
+      G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir);
 
-      // Volume changed during the extrapolation.  Take a shorter
-      // step, but never shorter than safety.
-      step = std::max(0.5 * step, safety);
+      if (newVolume != currentVolume_) {
 
-      continue;
+        // Volume changed during the extrapolation.
+
+        // Extrapolation may not take the exact step length we asked
+        // for, so it can happen that a requested step < safety takes
+        // us across the boundary.  This is then the best estimate we
+        // can get of the distance to the boundary with the stepper.
+        if (step <= safety)
+          return stepSign * (s + step);
+
+        // Move back to last good point, but looking in the actual
+        // direction of the step.
+        G4ThreeVector dirCloser(pos - pointOld);
+        dirCloser.setMag(1.);
+        nav_->ResetHierarchyAndLocate(pointOld, dirCloser, *hist);
+
+        // Look along the secant of the actual trajectory instead of
+        // the original direction.  There should be a crossing within
+        // distance step.
+        double secantDist = nav_->CheckNextStep(pointOld, dirCloser,
+                                                step * CLHEP::cm, safety) / CLHEP::cm;
+        safety /= CLHEP::cm;
+        if (secantDist >= step) {
+          // Cannot be.  Just take a shorter step, and hope that this
+          // works.
+          slDist = secantDist;
+          step = std::max(0.9 * step, safety);
+        } else {
+          slDist = step = std::max(secantDist, safety);
+        }
+
+        // Are we at the boundary?
+        if (slDist < delta) {
+          if (debug)
+            std::cout << "   very close to the boundary -> return @ it " << it
+                      << " stepSign*(s + slDist) = "
+                      << stepSign << "*(" << s + slDist << ")\n";
+          return stepSign * (s + slDist);
+        }
+
+        continue;
+      }
     }
 
     // We're in the new place, the step was safe, advance.
     s += step;
 
     memcpy(oldState7, state7, sizeof(state7));
-    slDist = nav_->CheckNextStep(G4ThreeVector(state7[0] * CLHEP::cm,
-                                               state7[1] * CLHEP::cm,
-                                               state7[2] * CLHEP::cm),
-                                 G4ThreeVector(stepSign * state7[3],
-                                               stepSign * state7[4],
-                                               stepSign * state7[5]),
+    pointOld = pos;
+    slDist = nav_->CheckNextStep(pos, dir,
                                  (fabs(sMax) - s) * CLHEP::cm, safety);
     if (slDist == kInfinity)
       slDist = fabs(sMax) - s;
@@ -418,28 +372,20 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
     safety /= CLHEP::cm;
     step = slDist;
 
-#ifdef LOOK_IN_TGEO
-    gGeoManager->IsSameLocation(state7[0], state7[1], state7[2], kTRUE);
-    gGeoManager->SetCurrentDirection(stepSign * state7[3], stepSign * state7[4], stepSign * state7[5]);
-    gGeoManager->FindNextBoundary(fabs(sMax) - s);
-    safetyTG = gGeoManager->GetSafeDistance();
-    slDistTG = gGeoManager->GetStep();
-    //double stepTG = slDist;
-
-    if (1 || fabs(slDist - slDistTG) > 1e-3) {
-      if (fabs(slDist - slDistTG) < 1e-3)
-        std::cout << "not";
-      std::cout << " \033[0;35mdifferent\033[00m (following): "
-                << state7[0] << " " << state7[1] << " " << state7[2] << " "
-                << stepSign* state7[3] << " " << stepSign* state7[4] << " " << stepSign* state7[5] << "\n"
-                << " sMax-s " << fabs(sMax) - s
-                << " slDist " << slDist << " " << slDistTG
-                << " safety " << safety << " " << safetyTG << std::endl
-                << " volume = " << currentVolume_->GetLogicalVolume()->GetName() << " "
-                << gGeoManager->FindNode(state7[0], state7[1], state7[2])->GetName()
-                << std::endl;
+    // No boundary in sight?
+    if (s + safety > fabs(sMax)) {
+      if (debug)
+        std::cout << "   next boundary is farther away than sMax \n";
+      return stepSign * (s + safety); // sMax
     }
-#endif
 
+    // Are we at the boundary?
+    if (slDist < delta) {
+      if (debug)
+        std::cout << "   very close to the boundary -> return @ it " << it
+                  << " stepSign*(s + slDist) = "
+                  << stepSign << "*(" << s + slDist << ")\n";
+      return stepSign * (s + slDist);
+    }
   }
 }

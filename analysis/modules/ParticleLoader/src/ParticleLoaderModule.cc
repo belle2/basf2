@@ -32,6 +32,8 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
+#include <utility>
+
 using namespace std;
 
 namespace Belle2 {
@@ -389,6 +391,7 @@ namespace Belle2 {
 
     StoreArray<ECLCluster> ECLClusters;
     StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
 
     for (int i = 0; i < ECLClusters.getEntries(); i++) {
       const ECLCluster* cluster      = ECLClusters[i];
@@ -396,14 +399,46 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+      // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+      // ECLCluster can be matched to multiple MCParticles
+      // order the relations by weights and set Particle -> multiple MCParticle relation
+      // preserve the weight
+      RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
+      // order relations bt weights
+      std::vector<std::pair<int, double>> weightsAndIndices;
+      for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
+        const MCParticle* relMCParticle = mcRelations[iMCParticle];
+        double weight = mcRelations.weight(iMCParticle);
+        if (relMCParticle)
+          weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
+      }
+      // sort descending by weight
+      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
+      const std::pair<int, double>& right) {
+        return left.second > right.second;
+      });
 
+      // create Particle
       Particle particle(cluster);
       if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
         Particle* newPart = particles.appendNew(particle);
 
-        if (mcParticle)
-          newPart->addRelationTo(mcParticle);
+        // set relation
+        for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
+          const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
+          double weight = weightsAndIndices[j].second;
+
+          // TODO: study this further and avoid hardcoded values
+          // set the relation only if the MCParticle's energy contribution
+          // to this cluster ammounts to at least 25%
+          if (relMCParticle)
+            if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
+              newPart->addRelationTo(relMCParticle, weight);
+        }
+
+        // old way (to be removed)
+        //if (mcParticle)
+        //newPart->addRelationTo(mcParticle);
 
         // add particle to list if it passes the selection criteria
         for (auto eclCluster2Plist : m_ECLClusters2Plists) {

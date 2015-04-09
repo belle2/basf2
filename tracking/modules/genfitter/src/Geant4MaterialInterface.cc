@@ -21,16 +21,7 @@
 static const bool debug = false;
 //static const bool debug = true;
 
-// Debug flag, use for comparison if differences in behavior occur.
-//#define LOOK_IN_TGEO
-
 using namespace Belle2;
-
-namespace {
-
-  G4ThreeVector where;
-
-}
 
 namespace Belle2 {
   class G4SafeNavigator {
@@ -78,7 +69,6 @@ G4SafeNavigator::limitToWorld(G4ThreeVector& p, G4ThreeVector& d) const
     p.setY(0);
   if (fabs(p.z()) >= dZ_)
     p.setZ(0);
-  where = p;
 
   if (std::isnan(d.x()) || std::isnan(d.y()) || std::isnan(d.z())) {
     B2WARNING("nan in direction in G4SafeNavigator::limitToWorld");

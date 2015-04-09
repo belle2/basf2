@@ -24,7 +24,8 @@ PedestalModule::PedestalModule() : Module()
 
   addParam("Mode", m_mode, "Calculate Pedestals - 0 ; Apply Pedestals - 1");
 
-  addParam("Conditions", m_conditions, "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
+  addParam("Conditions", m_conditions,
+           "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
   addParam("IOV_initialRun", m_initial_run, "Initial run for the interval of validity for these pedestals", std::string("NULL"));
   addParam("IOV_finalRun", m_final_run, "Final run for the interval of validity for these pedestals", std::string("NULL"));
 
@@ -64,21 +65,22 @@ void PedestalModule::beginRun()
 
       B2INFO("Retrieving pedestal data from service.");
 
-      list = ConditionsService::GetInstance()->GetPayloadList(GetPayloadTag(),
-                                                              m_run,
-                                                              getName(),
-                                                              GetVersion());
+      std::string filename = (ConditionsService::GetInstance()->GetPayloadFileURL(this));
+      m_in_ped_file = TFile::Open(filename.c_str(), "READ");
+
       B2INFO("Retrieving pedestal data from service. done");
     } else if (m_conditions == 0) { // read peds from local file
 
       m_in_ped_file = TFile::Open(m_in_ped_filename.c_str(), "READ");
-      if (!m_in_ped_file) {
-        B2ERROR("Couldn't open input itop pedestal file: " << m_in_ped_filename);
-      }  else {
-        list = m_in_ped_file->GetListOfKeys();
-      }
 
     }
+
+    if (!m_in_ped_file) {
+      B2ERROR("Couldn't open input itop pedestal file: " << m_in_ped_filename);
+    }  else {
+      list = m_in_ped_file->GetListOfKeys();
+    }
+
 
     /// Now load up the pedestals
     TIter next(list);
@@ -169,47 +171,32 @@ void  PedestalModule::terminate()
 
     if ((m_conditions == 1)) { // Use Conditions Service to save pedestals
 
-      m_payload_tag =  m_experiment + '_' + m_run + '_';
-      m_payload_tag += GetAlgName();
-      m_payload_tag += '_';
-      m_payload_tag += GetVersion();
-
-
       B2INFO("writing itop pedestals using Conditions Service - Payload Tag:" << GetPayloadTag()
              << "\tSubsystem Tag: " << getPackage() << "\tAlgorithm Name: " << getName()
              << "\tVersion: " << GetVersion() << "\tRun_i: " << GetInitialRun() << "\tRun_f: " << GetFinalRun());
 
-      ConditionsService::GetInstance()->StartPayload(GetPayloadTag(),
-                                                     GetPayloadType(),
-                                                     getPackage(),
-                                                     getName(),
-                                                     GetVersion(),
-                                                     GetExperiment(),
-                                                     GetInitialRun(),
-                                                     GetFinalRun());
+      std::string tempFile = "temp_pedestals.root";
 
+      m_out_ped_file = TFile::Open(tempFile.c_str(), "recreate");
+
+      std::string title = "Pedestal file generated ending with run " + m_run + " in experiment " + m_experiment;
+      std::cout << "title: " << title << std::endl;
+
+      m_out_ped_file->SetTitle(title.c_str());
+
+      if (m_out_ped_file) {m_out_ped_file->cd();}
 
       std::map<unsigned int, TProfile*>::iterator it_ct = m_sample2ped.begin();
+
       for (; it_ct != m_sample2ped.end(); ++it_ct) {
-
         unsigned int key =  it_ct->first;
-
-        ConditionsService::GetInstance()->WritePayloadObject(m_sample2ped[key],
-                                                             GetPayloadTag(),
-                                                             getPackage(),
-                                                             getName(),
-                                                             GetVersion(),
-                                                             GetInitialRun(),
-                                                             GetFinalRun());
+        m_sample2ped[key]->Write();
       }
 
-      ConditionsService::GetInstance()->CommitPayload(GetPayloadTag(),
-                                                      getPackage(),
-                                                      getName(),
-                                                      GetVersion(),
-                                                      GetInitialRun(),
-                                                      GetFinalRun());
+      m_out_ped_file->Close();
 
+
+      ConditionsService::GetInstance()->WritePayloadFile(tempFile, this);
 
     }
     if (m_writefile == 1) {

@@ -29,7 +29,8 @@ SampleTimeCalibrationModule::SampleTimeCalibrationModule() : Module()
 
   addParam("Mode", m_mode, "Calculate Sample2Sample - 0 ; Apply Sample2Sample - 1");
 
-  addParam("Conditions", m_conditions, "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
+  addParam("Conditions", m_conditions,
+           "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
   addParam("IOV_initialRun", m_initial_run, "Initial run for the interval of validity for this calibration", std::string("NULL"));
   addParam("IOV_finalRun", m_final_run, "Final run for the interval of validity for this calibration", std::string("NULL"));
 
@@ -77,21 +78,19 @@ void SampleTimeCalibrationModule::beginRun()
 
     if (m_conditions == 1) { // read using conditions service
 
-
-      list = ConditionsService::GetInstance()->GetPayloadList(GetPayloadTag(),
-                                                              m_run,
-                                                              getName(),
-                                                              GetVersion());
+      std::string filename = (ConditionsService::GetInstance()->GetPayloadFileURL(this));
+      m_in_file = TFile::Open(filename.c_str(), "READ");
 
     } else if (m_conditions == 0) { // read  from local file
 
       m_in_file = TFile::Open(m_in_filename.c_str(), "READ");
-      if (!m_in_file) {
-        B2ERROR("Couldn't open input file: " << m_in_filename);
-      }  else {
-        list = m_in_file->GetListOfKeys();
-      }
 
+    }
+
+    if (!m_in_file) {
+      B2ERROR("Couldn't open input file: " << m_in_filename);
+    }  else {
+      list = m_in_file->GetListOfKeys();
     }
 
     /// Now load up the calibration
@@ -142,6 +141,7 @@ void SampleTimeCalibrationModule::event()
 
           double corrTime = CalibrateWaveform(evtwave_ptr);
           int TDC = ((int)((double)old_topdigit->getTDC() - corrTime * 40.));
+          B2INFO("s2s .. TDC_i: " << old_topdigit->getTDC() << "\tTDC_c: " << TDC << "\t corrTime: " << corrTime);
           TOPDigit* this_topdigit = new TOPDigit(old_topdigit->getBarID(), old_topdigit->getChannelID(), TDC);
           this_topdigit->setADC(old_topdigit->getADC());
 
@@ -164,9 +164,12 @@ void SampleTimeCalibrationModule::event()
 
 void  SampleTimeCalibrationModule::terminate()
 {
+
+
+
   //If output requested then save calibration
   if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
-
+    std::string tempFile = "temp_pedestals.root"; // if temp filename is needed for conditions post.
     //Save Channel sample adc info.
 
     if ((m_conditions == 1)) { // Use Conditions Service to save calibration
@@ -180,42 +183,25 @@ void  SampleTimeCalibrationModule::terminate()
       B2INFO("writing itop Sample2Sample calibration using Conditions Service - Payload Tag:" << GetPayloadTag()
              << "\tSubsystem Tag: " << getType() << "\tAlgorithm Name: " << getName()
              << "\tVersion: " << GetVersion() << "\tRun_i: " << GetInitialRun() << "\tRun_f: " << GetFinalRun());
-
-      ConditionsService::GetInstance()->StartPayload(GetPayloadTag(),
-                                                     GetPayloadType(),
-                                                     getType(),
-                                                     getName(),
-                                                     GetVersion(),
-                                                     GetExperiment(),
-                                                     GetInitialRun(),
-                                                     GetFinalRun());
-
+      if (m_writefile == 0)
+        m_out_file = TFile::Open(tempFile.c_str(), "recreate");
 
     }
     if (m_writefile == 1) {
 
       B2INFO("writing itop " << getName() << " calibration file manually to " << m_out_filename);
-
       m_out_file = TFile::Open(m_out_filename.c_str(), "recreate");
 
-      if (m_out_file)
-        m_out_file->cd();
-
-
     }
+
+    if (m_out_file)
+      m_out_file->cd();
+
 
     if (m_time_calib_tdc_h) {
       if (m_out_file) {
         m_time_calib_tdc_h->Write();
       }
-      if (m_conditions == 1)
-        ConditionsService::GetInstance()->WritePayloadObject(m_time_calib_tdc_h,
-                                                             GetPayloadTag(),
-                                                             getType(),
-                                                             getName(),
-                                                             GetVersion(),
-                                                             GetInitialRun(),
-                                                             GetFinalRun());
     }
 
     ///////////////////////
@@ -288,14 +274,6 @@ void  SampleTimeCalibrationModule::terminate()
 
     if (m_out_file)
       m_corr_residual_h->Write();
-    if (m_conditions == 1)
-      ConditionsService::GetInstance()->WritePayloadObject(m_time_calib_tdc_h,
-                                                           GetPayloadTag(),
-                                                           getType(),
-                                                           getName(),
-                                                           GetVersion(),
-                                                           GetInitialRun(),
-                                                           GetFinalRun());
 
     //Save Channel sample time info.
     std::map<unsigned int, TProfile*>::iterator it_ct =  m_out_sample2time.begin();
@@ -305,27 +283,10 @@ void  SampleTimeCalibrationModule::terminate()
 
       if (m_out_file)
         m_out_sample2time[key]->Write();
-      if (m_conditions == 1)
-        ConditionsService::GetInstance()->WritePayloadObject(m_out_sample2time[key],
-                                                             GetPayloadTag(),
-                                                             getType(),
-                                                             getName(),
-                                                             GetVersion(),
-                                                             GetInitialRun(),
-                                                             GetFinalRun());
 
     }
     if (m_out_file)
       m_residual_h->Write();
-    if (m_conditions == 1)
-      ConditionsService::GetInstance()->WritePayloadObject(m_residual_h,
-                                                           GetPayloadTag(),
-                                                           getType(),
-                                                           getName(),
-                                                           GetVersion(),
-                                                           GetInitialRun(),
-                                                           GetFinalRun());
-
 
     //TMinuit All channels
     TH1D* rms_h = new TH1D("rms_h", "rms_h", 250, 0.05, 0.15);
@@ -350,14 +311,6 @@ void  SampleTimeCalibrationModule::terminate()
       }
       if (m_out_file)
         channel_time_calib_h->Write();
-      if (m_conditions == 1)
-        ConditionsService::GetInstance()->WritePayloadObject(channel_time_calib_h,
-                                                             GetPayloadTag(),
-                                                             getType(),
-                                                             getName(),
-                                                             GetVersion(),
-                                                             GetInitialRun(),
-                                                             GetFinalRun());
 
 
       //Check
@@ -390,22 +343,9 @@ void  SampleTimeCalibrationModule::terminate()
     }
     if (m_out_file)
       rms_h->Write();
-    if (m_conditions == 1)
-      ConditionsService::GetInstance()->WritePayloadObject(rms_h,
-                                                           GetPayloadTag(),
-                                                           getType(),
-                                                           getName(),
-                                                           GetVersion(),
-                                                           GetInitialRun(),
-                                                           GetFinalRun());
 
-    if (m_conditions == 1)
-      ConditionsService::GetInstance()->CommitPayload(GetPayloadTag(),
-                                                      getPackage(),
-                                                      getName(),
-                                                      GetVersion(),
-                                                      GetInitialRun(),
-                                                      GetFinalRun());
+    if (m_conditions == 1 && m_out_file)
+      ConditionsService::GetInstance()->WritePayloadFile(m_out_file->GetName(), this);
 
   }
 

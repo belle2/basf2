@@ -279,6 +279,16 @@ namespace Belle2 {
     double particleMCErrors(const Particle* particle);
 
     /**
+     * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)
+     */
+    double particleMCMatchWeight(const Particle* particle);
+
+    /**
+     * return the number of relations of this Particle to MCParticle
+     */
+    double particleNumberOfMCMatch(const Particle* particle);
+
+    /**
      * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle
      */
     double particleMCPrimaryParticle(const Particle* particle);

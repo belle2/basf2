@@ -619,6 +619,23 @@ namespace Belle2 {
       return MCMatching::getMCErrors(part);
     }
 
+    double particleNumberOfMCMatch(const Particle* particle)
+    {
+      RelationVector<MCParticle> mcRelations = particle->getRelationsTo<MCParticle>();
+      return double(mcRelations.size());
+    }
+
+    double particleMCMatchWeight(const Particle* particle)
+    {
+      std::pair<MCParticle*, double> relation = particle->getRelatedToWithWeight<MCParticle>();
+
+      if (relation.first) {
+        return relation.second;
+      } else {
+        return 0.0;
+      }
+    }
+
     // Flavour tagging variables
 
     double isMajorityInRestOfEventFromB0(const Particle*)
@@ -1715,6 +1732,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("abs_mcPDG", particleAbsMCMatchPDGCode, "The absolute PDG code of matched MCParticle");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
+    REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
+                      "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
+    REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch, "The number of relations of this Particle to MCParticle.");
 
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
                       "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle.")

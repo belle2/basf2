@@ -78,6 +78,7 @@ void TTDACallback::initialize(const DBObject& obj) throw(RCHandlerException)
 
 void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
+  add(new NSMVHandlerInt("ftsw", true, false, m_ftswid));
   add(new NSMVHandlerTrigft(*this, "trigft"));
   add(new NSMVHandlerTriggerType(*this, "trigger_type",
                                  obj.getText("trigger_type")));
@@ -94,46 +95,76 @@ void TTDACallback::load(const DBObject&) throw(RCHandlerException)
 
 void TTDACallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  int pars[2] = { expno, runno };
-  send(NSMMessage(m_ttdnode, NSMCommand(12, "START"), 2, pars));
+  if (m_ttdnode.getName().size() > 0) {
+    int pars[2] = { expno, runno };
+    send(NSMMessage(m_ttdnode, NSMCommand(12, "START"), 2, pars));
+  } else {
+    std::string cmd = StringUtil::form("regft -%d 160 0x%x", m_ftswid, runno << 8);
+    LogFile::debug(cmd);
+    system(cmd.c_str());
+    trigft();
+  }
 }
 
 void TTDACallback::stop() throw(RCHandlerException)
 {
-  send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
+  if (m_ttdnode.getName().size() > 0) {
+    send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
+  } else {
+    std::string cmd = StringUtil::form("trigft -%d stop", m_ftswid);
+    LogFile::debug(cmd);
+    system(cmd.c_str());
+  }
 }
 
 void TTDACallback::pause() throw(RCHandlerException)
 {
-  send(NSMMessage(m_ttdnode, NSMCommand(14, "PAUSE")));
+  if (m_ttdnode.getName().size() > 0) {
+    send(NSMMessage(m_ttdnode, NSMCommand(14, "PAUSE")));
+  }
 }
 
-void TTDACallback::resume(int subno) throw(RCHandlerException)
+void TTDACallback::resume(int /*subno*/) throw(RCHandlerException)
 {
-  send(NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
+  if (m_ttdnode.getName().size() > 0) {
+    send(NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
+  }
 }
 
 void TTDACallback::recover(const DBObject&) throw(RCHandlerException)
 {
-  send(NSMMessage(m_ttdnode, NSMCommand(16, "RECOVER")));
+  stop();
+  if (m_ttdnode.getName().size() > 0) {
+    send(NSMMessage(m_ttdnode, NSMCommand(16, "RECOVER")));
+  }
 }
 
 void TTDACallback::abort() throw(RCHandlerException)
 {
-  send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
+  stop();
+  if (m_ttdnode.getName().size() > 0) {
+    send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
+  }
 }
 
 void TTDACallback::trigft() throw(RCHandlerException)
 {
   try {
-    LogFile::debug("trigft");
     int pars[3];
     get("trigger_type", m_trigger_type);
     pars[0] = m_trgcommands[m_trigger_type];
     get("dummy_rate", pars[1]);
     get("trigger_limit", pars[2]);
-    send(NSMMessage(m_ttdnode, NSMCommand(11, "LOAD"), 3, pars));
+    if (m_ttdnode.getName().size() > 0) {
+      send(NSMMessage(m_ttdnode, NSMCommand(11, "LOAD"), 3, pars));
+    } else {
+      std::string cmd = StringUtil::form("trigft -%d %s %d %d", m_ftswid,
+                                         m_trigger_type.c_str(), pars[1], pars[2]);
+      LogFile::debug(cmd);
+      system(cmd.c_str());
+    }
   } catch (const std::out_of_range& e) {
+    LogFile::error(e.what());
   }
 }
 

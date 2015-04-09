@@ -2,6 +2,8 @@
 #include <daq/slc/database/RunNumberTable.h>
 
 #include <daq/slc/system/LogFile.h>
+
+#include <daq/slc/base/Date.h>
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 
@@ -25,9 +27,10 @@ int main(int argc, char** argv)
   for (RunNumberList::const_iterator it = list.begin();
        it != list.end(); it++) {
     const RunNumber& rn(*it);
-    printf("%s.%03d.%05d.%03d\n",
-           rn.getConfig().c_str(), rn.getExpNumber(),
-           rn.getRunNumber(), rn.getSubNumber());
+    printf("[%s] %03d.%05d.%03d=%s %s\n",
+           Date(rn.getRecordTime()).toString(),
+           rn.getExpNumber(), rn.getRunNumber(), rn.getSubNumber(),
+           rn.getConfig().c_str(), (rn.isStart() ? "start" : "end"));
   }
   return 0;
 }

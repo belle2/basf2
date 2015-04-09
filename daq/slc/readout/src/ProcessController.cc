@@ -68,6 +68,15 @@ bool ProcessController::start(int expno, int runno)
 
 bool ProcessController::stop()
 {
+  m_info.lock();
+  m_info.setExpNumber(0);
+  m_info.setRunNumber(0);
+  m_info.setSubNumber(0);
+  m_info.setInputCount(0);
+  m_info.setInputNBytes(0);
+  m_info.setOutputCount(0);
+  m_info.setOutputNBytes(0);
+  m_info.unlock();
   return true;
 }
 

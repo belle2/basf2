@@ -24,6 +24,7 @@ namespace Belle2 {
     bool start(int expno, int runno) throw(RCHandlerException);
     bool abort() throw();
     bool term() throw();
+    bool stop() throw(RCHandlerException);
 
   protected:
     virtual void initArguments(const DBObject&) = 0;

@@ -77,7 +77,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerInt(vname + ".reg.size", true, true, -1));
       add(new NSMVHandlerHSLBRegValue(*this, vname + ".par.val", i));
       if (m_fee[i] != NULL && obj.hasObject("fee")) {
-        const DBObject& o_fee((obj("fee", i))("conf"));
+        const DBObject& o_fee((obj("fee", i)));
         vname = StringUtil::form("fee[%d]", i);
         add(new NSMVHandlerText(vname + ".name", true, false, m_fee[i]->getName()));
         vname = StringUtil::form("fee[%d]", i);
@@ -144,7 +144,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
         }
         FEE& fee(*m_fee[i]);
         try {
-          fee.load(hslb, (obj("fee", i))("conf"));
+          fee.load(hslb, (obj("fee", i)));
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
         }
@@ -167,7 +167,7 @@ void COPPERCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void COPPERCallback::stop() throw(RCHandlerException)
 {
-  ronode_status* status = (ronode_status*)m_data.get();
+  ronode_status* status = (ronode_status*)getData().get();
   status->stime = 0;
   m_con.stop();
 }

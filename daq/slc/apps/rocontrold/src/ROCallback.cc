@@ -82,8 +82,7 @@ void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
-    const DBObject& stream0(obj("stream0"));
-    const DBObjectList& senders(stream0.getObjects("sender"));
+    const DBObjectList& stream0(obj.getObjects("stream0"));
     m_eb0.init(this, 0, "eb0", obj);
     add(new NSMVHandlerROPID(m_eb0, "eb0.pid"));
     m_stream1.init(this, 1, "stream1", obj);
@@ -91,15 +90,16 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerROInputPort(m_stream1, "stream1.input.port"));
     add(new NSMVHandlerROOutputPort(m_stream1, "stream1.output.port"));
     m_stream0 = std::vector<Stream0Controller>();
-    for (size_t i = 0; i < senders.size(); i++) {
+    for (size_t i = 0; i < stream0.size(); i++) {
       m_stream0.push_back(Stream0Controller());
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       std::string name = StringUtil::form("stream0_%d", (int)i);
       m_stream0[i].init(this, i + 2, name, obj);
-      add(new NSMVHandlerROPID(m_stream0[i], StringUtil::form("stream0[%d].pid", (int)i)));
-      add(new NSMVHandlerROInputPort(m_stream0[i], StringUtil::form("stream0[%d].input.port", (int)i)));
-      add(new NSMVHandlerROOutputPort(m_stream0[i], StringUtil::form("stream0[%d].output.port", (int)i)));
+      std::string vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
+      add(new NSMVHandlerROPID(m_stream0[i], vname + ".pid"));
+      add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
+      add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
@@ -160,6 +160,11 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void ROCallback::stop() throw(RCHandlerException)
 {
+  m_stream1.stop();
+  for (size_t i = 0; i < m_stream0.size(); i++) {
+    m_stream0[i].stop();
+  }
+  m_eb0.stop();
 }
 
 void ROCallback::recover(const DBObject& obj) throw(RCHandlerException)
@@ -177,7 +182,7 @@ void ROCallback::abort() throw(RCHandlerException)
   m_eb0.abort();
   set("stream1.pid", -1);
   for (size_t i = 0; i < m_stream0.size(); i++) {
-    std::string vname = StringUtil::form("stream0.sender[%d].pid", (int)i);
+    std::string vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
     set(vname, -1);
   }
   set("eb0.pid", -1);

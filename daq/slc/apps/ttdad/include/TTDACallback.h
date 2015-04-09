@@ -29,11 +29,13 @@ namespace Belle2 {
     virtual void monitor() throw(RCHandlerException);
     void trigft() throw(RCHandlerException);
     bool setTriggerType(const std::string& type) throw();
+    void setFTSWID(int id) { m_ftswid = id; }
 
   private:
     RCNode m_ttdnode;
     std::map<std::string, int> m_trgcommands;
     std::string m_trigger_type;
+    int m_ftswid;
 
   private:
     void send(const NSMMessage& msg) throw(RCHandlerException);

@@ -57,6 +57,12 @@ bool ROController::start(int expno, int runno) throw(RCHandlerException)
   return m_con.start(expno, runno);
 }
 
+bool ROController::stop() throw(RCHandlerException)
+{
+  m_con.stop();
+  return true;
+}
+
 bool ROController::abort() throw()
 {
   m_con.abort();

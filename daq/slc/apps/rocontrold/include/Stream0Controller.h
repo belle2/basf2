@@ -18,8 +18,7 @@ namespace Belle2 {
     virtual bool loadArguments(const DBObject& obj);
 
   private:
-    void readDB(const DBObject& obj, int& port,
-                std::string& host, std::string& script);
+    std::string m_host;
 
   };
 

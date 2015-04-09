@@ -23,19 +23,37 @@ int main(int argc, char** argv)
   com.init(NSMNode(argv[1]), hostname, port);
   NSMData data(argv[2], argv[3], -1);
   data.open(com);
-  DBField::Type type;
   if (argc > 4) {
-    const void* p = data.find(argv[4], type);
-    if (type == DBField::INT) {
-      printf("%s : %d\n", argv[4], *(int*)p);
-    } else if (type == DBField::SHORT) {
-      printf("%s : %d\n", argv[4], *(short*)p);
-    } else if (type == DBField::CHAR) {
-      printf("%s : %d\n", argv[4], *(char*)p);
-    } else if (type == DBField::FLOAT) {
-      printf("%s : %f\n", argv[4], *(float*)p);
-    } else if (type == DBField::DOUBLE) {
-      printf("%s : %f\n", argv[4], *(double*)p);
+    DBField::Type type;
+    int length;
+    for (int i = 4; i < argc; i++) {
+      const void* p = data.find(argv[i], type, length);
+      switch (type) {
+        case DBField::LONG:
+          printf("%s : %lld\n", argv[i], *(long long*)p);
+          break;
+        case DBField::INT:
+          printf("%s : %d\n", argv[i], *(int*)p);
+          break;
+        case DBField::SHORT:
+          printf("%s : %d\n", argv[i], *(short*)p);
+          break;
+        case DBField::CHAR:
+          if (length > 0) {
+            printf("%s : %s\n", argv[i], (const char*)p);
+          } else {
+            printf("%s : %d\n", argv[i], *(char*)p);
+          }
+          break;
+        case DBField::FLOAT:
+          printf("%s : %f\n", argv[i], *(float*)p);
+          break;
+        case DBField::DOUBLE:
+          printf("%s : %f\n", argv[i], *(double*)p);
+          break;
+        default:
+          break;
+      }
     }
   } else {
     data.print();

@@ -83,24 +83,39 @@ void FlowMonitorCallback::nsmdataset(NSMCommunicator& com, NSMData& data) throw(
 {
   const NSMMessage& msg(com.getMessage());
   NSMCallback::nsmdataset(com, data);
-  for (size_t i = 0; i < m_hostnames.size(); i++) {
-    if (m_hostnames[i] == msg.getNodeName() &&
-        data.getName() == m_datanames[i]) {
-      ronode_status* ronode = (ronode_status*)data.get();
-      std::string name = StringUtil::tolower(data.getName()).c_str();
-      if (getData().isAvailable()) {
-        LogFile::debug("%s.ctime : %s", data.getName().c_str(),
-                       Date(ronode->ctime).toString());
-        rorc_status* status = (rorc_status*)getData().get();
-        memcpy(&status->ro[i], ronode, sizeof(ronode_status));
+  try {
+    for (size_t i = 0; i < m_hostnames.size(); i++) {
+      if (m_hostnames[i] == msg.getNodeName() &&
+          data.getName() == m_datanames[i]) {
+        ronode_status* ronode = (ronode_status*)data.get();
+        std::string name = StringUtil::tolower(data.getName()).c_str();
+        if (getData().isAvailable()) {
+          rorc_status* status = (rorc_status*)getData().get();
+          memcpy(&status->node[i], ronode, sizeof(ronode_status));
+          if (m_state == RCState::RUNNING_S) {
+            if (ronode->flowrate_out == 0 && ronode->flowrate_in > 0) {
+              LogFile::warning("Data flow is stacked in " + name);
+            }
+            if (ronode->nevent_in - ronode->nevent_out > m_nevents_th) {
+              //LogFile::warning("More than %d events are stacked in %s",
+              //         m_nevents_th, name.c_str());
+              //LogFile::warning("in: %d out: %d", status->nevent_in, status->nevent_out);
+            }
+          }
+        }
       }
     }
+  } catch (const NSMNotConnectedException& e) {
+    LogFile::error(e.what());
   }
 }
 
 void FlowMonitorCallback::timeout(NSMCommunicator& com) throw()
 {
   try {
+    std::string state_s;
+    get(m_runcontrol, "rcstate", state_s);
+    m_state = RCState(state_s);
     for (StringList::iterator it = m_names.begin(); it != m_names.end(); it++) {
       std::string name = *it;
       std::string dataname, format;
@@ -129,6 +144,7 @@ void FlowMonitorCallback::timeout(NSMCommunicator& com) throw()
                                                  format.c_str(), revision)));
         get(node, new NSMVHandlerNSMData("nsmdata.tstamp", *this, com, index), 2);
       } catch (const NSMNotConnectedException& e) {
+        LogFile::error(e.what());
       }
     }
   } catch (const std::exception& e) {

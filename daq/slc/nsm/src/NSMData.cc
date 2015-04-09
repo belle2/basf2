@@ -492,7 +492,7 @@ void NSMData::printPV(const std::string& name_in) const throw()
   }
 }
 
-const void* NSMData::find(const std::string& name_in, DBField::Type& type)
+const void* NSMData::find(const std::string& name_in, DBField::Type& type, int& length)
 const throw()
 {
   size_t pos;
@@ -506,7 +506,7 @@ const throw()
       index = atoi(sstr[1].c_str());
     }
     name_out = name_in.substr(pos + 1);
-    return data_v[index].find(name_out, type);
+    return data_v[index].find(name_out, type, length);
   }
   int index = 0;
   if ((pos = name_out.find("[")) != std::string::npos)  {
@@ -516,6 +516,7 @@ const throw()
   }
   if (!hasValue(name_out)) return NULL;
   const DBField::Property& pro(getProperty(name_out));
+  length = pro.getLength();
   type = pro.getType();
   const void* buf = getValue(name_out);
   switch (type) {

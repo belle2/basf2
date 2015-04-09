@@ -26,6 +26,7 @@ namespace Belle2 {
   public:
     const StringList& getDataNames() const throw() { return m_datanames; }
     const std::string& getDataName(int index) const throw() { return m_datanames[index]; }
+    void setNeventsThreshold(unsigned int n) { m_nevents_th = n; }
 
   private:
     NSMNode m_runcontrol;
@@ -33,6 +34,8 @@ namespace Belle2 {
     StringList m_hostnames;
     StringList m_datanames;
     NSMNodeMap m_nodes;
+    unsigned int m_nevents_th;
+    RCState m_state;
 
   };
 

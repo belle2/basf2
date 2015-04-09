@@ -47,7 +47,6 @@ namespace Belle2 {
     TTRX m_ttrx;
     COPPER m_copper;
     FlowMonitor m_flow;
-    NSMData m_data;
     bool m_dummymode;
     bool m_force_boothslb;
     std::string m_hslb_firm;

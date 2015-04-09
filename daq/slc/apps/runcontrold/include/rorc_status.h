@@ -7,7 +7,7 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int rorc_status_revision = 1;
+  const int rorc_status_revision = 3;
 
   struct rorc_status {
     uint32 nnodes;
@@ -19,15 +19,17 @@ namespace Belle2 {
     uint32 stime;
     uint32 ctime;
     struct ronode_status {
+      uint32 nodeid;
+      uint32 stime;
+      uint32 ctime;
       uint32 state;
-      uint32 configid;
-      uint32 excluded;
       uint32 eflag;
-    } node[20];
-    struct ro_status {
-      uint32 connection_in;
+      uint32 expno;
+      uint32 runno;
+      uint32 subno;
       uint32 nevent_in;
       uint32 nqueue_in;
+      uint32 connection_in;
       uint32 connection_out;
       uint32 nevent_out;
       uint32 nqueue_out;
@@ -40,7 +42,7 @@ namespace Belle2 {
       float flowrate_out;
       float loadavg;
       float reserved_f[5];
-    } ro[20];
+    } node[25];
   };
 
 }

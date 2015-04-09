@@ -14,6 +14,7 @@ int main(int argc, char** argv)
     ConfigFile config("slowcontrol", "flowmonitor");
     FlowMonitorCallback callback(config.get("nsm.nodename"),
                                  config.get("runcontrol"));
+    callback.setNeventsThreshold(config.getInt("nevents"));
     const std::string host = config.get("nsm.host");
     int port = config.getInt("nsm.port");
     NSMNodeDaemon daemon(&callback, host, port);

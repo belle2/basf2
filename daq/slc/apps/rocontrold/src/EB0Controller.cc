@@ -16,7 +16,7 @@ void EB0Controller::readDB(const DBObject& obj, int& port,
   const DBObject& o_eb0(obj("eb0"));
   port = o_eb0.getInt("port");
   executable = o_eb0.getText("executable");
-  const DBObjectList& objs(obj("stream0").getObjects("sender"));
+  const DBObjectList& objs(obj.getObjects("stream0"));
   used = obj("stream0").getBool("used");
   nsenders = (int)objs.size();
 }
@@ -27,8 +27,7 @@ void EB0Controller::initArguments(const DBObject& obj)
   std::string executable;
   bool used = false;
   readDB(obj, port, executable, used, nsenders);
-  m_callback->add(new NSMVHandlerInt("stream0.used", true, true, (int)used));
-  m_callback->add(new NSMVHandlerInt("stream0.nsenders", true, false, nsenders));
+  m_callback->add(new NSMVHandlerInt("nstream0", true, false, nsenders));
   m_callback->add(new NSMVHandlerInt("eb0.port", true, true, port));
   m_callback->add(new NSMVHandlerText("eb0.executable", true, true, executable));
 }
@@ -48,11 +47,11 @@ bool EB0Controller::loadArguments(const DBObject& obj)
   m_con.addArgument("-l");
   m_con.addArgument(port);
   for (int i = 0; i < nsenders; i++) {
-    const DBObject& o_sender(obj("stream0").getObject("sender", i));
-    const int port = o_sender.getInt("port");
-    const std::string host = o_sender.getText("host");
+    const DBObject& o_stream0(obj("stream0", i));
+    const int port = o_stream0.getInt("port");
+    const std::string host = o_stream0.getText("host");
     int used = 0;
-    m_callback->get(m_callback->getRC().getName(), host + ".used", used);
+    m_callback->get(m_callback->getRC(), host + ".used", used);
     if (used) {
       m_con.addArgument("%s:%d", (stream0_used ? "localhost" : host.c_str()), port);
     }

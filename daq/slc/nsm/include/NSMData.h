@@ -70,7 +70,7 @@ namespace Belle2 {
 
     void print(const std::string& name_in = "") const throw();
     void printPV(const std::string& name_in = "") const throw();
-    const void* find(const std::string& name_in, DBField::Type& type) const throw();
+    const void* find(const std::string& name_in, DBField::Type& type, int& length) const throw();
     void search(NameValueList& map, const std::string& name = "") const throw();
 
   public:

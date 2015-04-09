@@ -153,7 +153,8 @@ RunNumberList RunNumberTable::get(int expno, int runno_min, int runno_max)
       const DBRecord& record(*it);
       list.push_back(RunNumber(record.get("config"), record.getInt("expno"),
                                record.getInt("runno"), record.getInt("subno"),
-                               record.getInt("id"), record.getInt("record_time")));
+                               record.getBool("isstart"), record.getInt("id"),
+                               record.getInt("record_time")));
     }
   } catch (const DBHandlerException& e) {
     LogFile::error("DB access error : %s", e.what());

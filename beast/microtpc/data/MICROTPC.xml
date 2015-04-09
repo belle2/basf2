@@ -16,6 +16,7 @@ whitespace, comma or semi-colon -->
 <bar unit="mm">1 2 3 4
 </bar>
 <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
+<LookAtRec>1</LookAtRec>
 <GEMGain1>40</GEMGain1>
 <GEMGain2>50</GEMGain2>
 <GEMGainRMS1>0.2</GEMGainRMS1>
@@ -31,14 +32,22 @@ whitespace, comma or semi-colon -->
 <ChipRowY>0.84</ChipRowY>
 <PixelTimeBinNb>256</PixelTimeBinNb>
 <PixelTimeBin>25</PixelTimeBin>
-<TOTA1>24.4678</TOTA1>
-<TOTB1>-34.7008</TOTB1>
-<TOTC1>264.282</TOTC1>
+<TOTA1>10640.8</TOTA1>
+<TOTB1>-18.4</TOTB1>
+<TOTC1>96007.6</TOTC1>
 <TOTQ1>57.</TOTQ1>
-<TOTA2>24.4678</TOTA2>
-<TOTB2>-34.7008</TOTB2>
-<TOTC2>264.282</TOTC2>
+<TOTA2>29.4</TOTA2>
+<TOTB2>64.7</TOTB2>
+<TOTC2>1082.7</TOTC2>
 <TOTQ2>57.</TOTQ2>
+<!--TOTA1>24.4678</TOTA1-->
+<!--TOTB1>-34.7008</TOTB1-->
+<!--TOTC1>264.282</TOTC1-->
+<!--TOTQ1>57.</TOTQ1-->
+<!--TOTA2>24.4678</TOTA2-->
+<!--TOTB2>-34.7008</TOTB2-->
+<!--TOTC2>264.282</TOTC2-->
+<!--TOTQ2>57.</TOTQ2-->
 <Workfct>35.075</Workfct>
 <Fanofac>0.19</Fanofac>
 <GasAbs>0.05</GasAbs>
@@ -111,22 +120,6 @@ whitespace, comma or semi-colon -->
 <TPCpos_y unit="cm">-39.92000</TPCpos_y>
 <TPCpos_z unit="cm">-40.00000</TPCpos_z>
 </Active>
-<!--
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">12.7</dx_Vessel>
-<dy_Vessel unit="cm">10.16</dy_Vessel>
-<dz_Vessel unit="cm">30.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">90.0</AngleZ>
-<TPCpos_x unit="cm">0</TPCpos_x>
-<TPCpos_y unit="cm">0</TPCpos_y>
-<TPCpos_z unit="cm">0</TPCpos_z>
-</Active>
--->
 </Content>
 </DetectorComponent>
 

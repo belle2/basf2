@@ -59,6 +59,7 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   setDescription("Microtpc digitizer module");
 
   //Default values are set here. New values can be in MICROTPC.xml.
+  addParam("LookAtRec", m_LookAtRec, "Only look at nuclear recoils", 0);
   addParam("GEMGain1", m_GEMGain1, "GEM1 gain", 10.0);
   addParam("GEMGain2", m_GEMGain2, "GEM1 gain", 20.0);
   addParam("GainRMS1", m_GEMGainRMS1, "GEM1 rms", 0.2);
@@ -113,9 +114,10 @@ void TpcDigitizerModule::initialize()
   //get the garfield drift data, gas, and TPC paramters
   getXMLData();
 
+  //converter: electron number to TOT part I
   fctToT_Calib1 = new TF1("fctToT_Calib1", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   fctToT_Calib1->SetParameters(m_TOTA1, m_TOTB1, m_TOTC1, m_TOTQ1);
-
+  //converter: electron number to TOT part II
   fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
 
@@ -145,9 +147,10 @@ void TpcDigitizerModule::event()
   for (int i = 0; i < nTPC; i++)
     for (int j = 0; j < 80; j++)
       for (int k = 0; k < 336; k++)
-        for (int l = 0; l < MAXtSIZE; l++)
+        for (int l = 0; l < MAXtSIZE; l++) {
           dchip[i][j][k][l] = 0;
-
+          partID[i][j][k][l] = 0;
+        }
 
   //Determine T0 for each TPC
   int nentries = TpcSimHits.getEntries();
@@ -175,19 +178,24 @@ void TpcDigitizerModule::event()
   //loop on all entries to store in 3D the ionization for each TPC
   for (int i = 0; i < nentries; i++) {
     MicrotpcSimHit* aHit = TpcSimHits[i];
-    int detNb = aHit->getdetNb();
 
+    int PDGid = aHit->gettkPDG();
+    if (m_LookAtRec == 1 && (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212))continue;
+
+    int detNb = aHit->getdetNb();
     double edep = aHit->getEnergyDep();
     double niel = aHit->getEnergyNiel();
+
     TVector3 position = aHit->gettkPos();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     //double zpos = position.Z() / 100. + (TPCCenter[detNb].Z() + 10) + m_z_DG;
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
 
+    //check if ionization within sensitive volume
     if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
         (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
-        (0. < zpos && zpos <  m_z_DG * 2.) &&
+        (0. < zpos && zpos <  m_z_DG) &&
         (0. < T0[detNb] && T0[detNb] < 1000000.)) {
 
       //ionization energy
@@ -209,29 +217,37 @@ void TpcDigitizerModule::event()
         // start loop on the number of electron-ion-pairs at each interaction point
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
           double x_DG, y_DG, z_DG, t_DG;
+          //drift ionization to GEM 1 plane
           Drift(xpos,
                 ypos,
                 zpos,
                 x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
+          //calculate and scale 1st GEM gain
           double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+          //calculate and scale 2nd GEM gain
           double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
 
           ///////////////////////////////
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
             double x_GEM1, y_GEM1;
+            //1st GEM geometrical effect
             GEMGeo1(x_DG, y_DG, x_GEM1, y_GEM1);
             double x_TG, y_TG, z_TG, t_TG;
+            //drift 1st amplication to 2nd GEM
             Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
 
             ///////////////////////////////
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
               double x_GEM2, y_GEM2;
+              //2nd GEN geometrical effect
               GEMGeo2(x_TG, y_TG, x_GEM2, y_GEM2);
               double x_CG, y_CG, z_CG, t_CG;
+              //drift 2nd amplification to chip
               Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
 
+              //determine col, row, and bc
               int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
               int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
               int pix = col +  m_ChipColumnNb * row;
@@ -245,7 +261,9 @@ void TpcDigitizerModule::event()
                   (0 <= pix && pix < m_ChipColumnNb * m_ChipRowNb)  &&
                   (0 <= bci && bci < MAXtSIZE)) {
                 PixelFired[detNb] = true;
+                //store info into 3D array for each TPCs
                 dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                partID[detNb][col][row][bci] = PDGid;
               }
             }
           }
@@ -270,9 +288,13 @@ void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, doub
 {
   //check if
   if (z1 > 0.) {
+    //transverse diffusion
     x2 = x1 + gRandom->Gaus(0., sqrt(z1) * st);
+    //transverse diffusion
     y2 = y1 + gRandom->Gaus(0., sqrt(z1) * st);
+    //longitidinal diffusion
     z2 = z1 + gRandom->Gaus(0., sqrt(z1) * sl);
+    //time to diffuse
     t2 = z2 / vd;
   } else {
     x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
@@ -309,6 +331,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
   vector <int> ToT; ToT.clear();
   vector <int> bci; bci.clear();
   vector <int> ran; ran.clear();
+  vector <int> pid; pid.clear();
   StoreArray<MicrotpcHit> TpcHits;
 
   //loop on col.
@@ -332,6 +355,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
         int ik = 0;
         int NbOfEl = 0;
         for (int k = k0; k < MAXtSIZE; k++) {
+          //sum up charge with 16 cycles
           if (ik < 16) {
             NbOfEl += dchip[detNb][i][j][k];
           } else {
@@ -352,7 +376,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
 
               //find start time
               t0.push_back(k0);
-
+              pid.push_back(partID[detNb][i][j][k]);
               col.push_back(i);
               row.push_back(j);
               bci.push_back(k0);
@@ -380,7 +404,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
       if ((bci[i] - t0[0]) > (m_PixelTimeBinNb - 1))continue;
 
       //create MicrotpcHit
-      TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb));
+      TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb, pid[i]));
     }
     //end on loop nb of hit
   }
@@ -401,7 +425,7 @@ void TpcDigitizerModule::getXMLData()
                                  activeParams.getLength("TPCpos_z")));
     nTPC++;
   }
-
+  m_LookAtRec = content.getDouble("LookAtRec");
   m_GEMGain1 = content.getDouble("GEMGain1");
   m_GEMGain2 = content.getDouble("GEMGain2");
   m_GEMGainRMS1 = content.getDouble("GEMGainRMS1");

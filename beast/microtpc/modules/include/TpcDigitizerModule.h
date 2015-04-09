@@ -164,7 +164,7 @@ namespace Belle2 {
       /** chip store arrays */
       int dchip[10][80][336][MAXtSIZE];
       /** Particle ID array */
-      int partID[10][80][336][MAXtSIZE];
+      //int partID[10][80][336][MAXtSIZE];
       /** Flag 0/1 only look at nuclear recoils*/
       int m_LookAtRec;
       /** number of detectors. Read from MICROTPC.xml*/

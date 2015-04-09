@@ -149,8 +149,11 @@ void TpcDigitizerModule::event()
       for (int k = 0; k < 336; k++)
         for (int l = 0; l < MAXtSIZE; l++) {
           dchip[i][j][k][l] = 0;
-          partID[i][j][k][l] = 0;
+          //partID[i][j][k][l] = 0;
         }
+  //for (int i = 0; i < nTPC; i++)
+  //for (int j = 0; j < 100; j++)
+  //partID[i][j] = 0
 
   //Determine T0 for each TPC
   int nentries = TpcSimHits.getEntries();
@@ -169,18 +172,26 @@ void TpcDigitizerModule::event()
     double T = posn.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
     if (T < T0[detNb])T0[detNb] = T;
   }
+  //int iPID[nTPC];
   for (int i = 0; i < nTPC; i++) {
+    //iPID[i]=0;
     if (0. < T0[i] && T0[i] < 1000000.) {
       T0[i] = T0[i] / m_v_DG;
     } else T0[i] = -1.;
   }
 
+  //int oldPID=0;
   //loop on all entries to store in 3D the ionization for each TPC
   for (int i = 0; i < nentries; i++) {
     MicrotpcSimHit* aHit = TpcSimHits[i];
 
     int PDGid = aHit->gettkPDG();
     if (m_LookAtRec == 1 && (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212))continue;
+    //if(oldPID!=PDGid && iPID[i]<100){
+    //partID[detNb][iPID[i]]=PDGid;
+    //oldPID = PDGid;
+    //iPID[i]++;
+    //}
 
     int detNb = aHit->getdetNb();
     double edep = aHit->getEnergyDep();
@@ -191,7 +202,7 @@ void TpcDigitizerModule::event()
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     //double zpos = position.Z() / 100. + (TPCCenter[detNb].Z() + 10) + m_z_DG;
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
-
+    //cout <<"xpos " << xpos << " ypos " << ypos << " zpos " << zpos << endl;
     //check if ionization within sensitive volume
     if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
         (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
@@ -208,7 +219,7 @@ void TpcDigitizerModule::event()
       ////////////////////////////////
       // check if enough energy to ionize
       else if ((ionEn * 1e3) >  m_Workfct) {
-
+        //cout << "edep " << ionEn << endl;
         double meanEl = ionEn * 1e3 /  m_Workfct;
         double sigma = sqrt(m_Fanofac * meanEl);
         int NbEle = (int)gRandom->Gaus(meanEl, sigma);
@@ -263,7 +274,7 @@ void TpcDigitizerModule::event()
                 PixelFired[detNb] = true;
                 //store info into 3D array for each TPCs
                 dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
-                partID[detNb][col][row][bci] = PDGid;
+                //partID[detNb][col][row][bci] = PDGid;
               }
             }
           }
@@ -331,7 +342,9 @@ bool TpcDigitizerModule::Pixelization(int detNb)
   vector <int> ToT; ToT.clear();
   vector <int> bci; bci.clear();
   vector <int> ran; ran.clear();
-  vector <int> pid; pid.clear();
+  //vector <int> pid; pid.clear();
+  //int pid[100];
+  //for(int i=0;i<20;i++)pid[i]=partID[detNb][i]
   StoreArray<MicrotpcHit> TpcHits;
 
   //loop on col.
@@ -376,7 +389,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
 
               //find start time
               t0.push_back(k0);
-              pid.push_back(partID[detNb][i][j][k]);
+              //pid.push_back(partID[detNb][i][j][k]);
               col.push_back(i);
               row.push_back(j);
               bci.push_back(k0);
@@ -404,7 +417,8 @@ bool TpcDigitizerModule::Pixelization(int detNb)
       if ((bci[i] - t0[0]) > (m_PixelTimeBinNb - 1))continue;
 
       //create MicrotpcHit
-      TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb, pid[i]));
+      //TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb, pid[i]));
+      TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb));
     }
     //end on loop nb of hit
   }

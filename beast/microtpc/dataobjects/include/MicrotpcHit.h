@@ -33,14 +33,21 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    MicrotpcHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0), m_pdg(0) {}
+    //MicrotpcHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0), m_pdg(0) {}
+    MicrotpcHit(): m_column(0), m_row(0), m_BCID(0), m_TOT(0), m_detNb(0) {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
+    /*
     MicrotpcHit(int column, int row, int BCID, int TOT, int detNb, int pdg):
       m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb), m_pdg(pdg)
+    {
+    }
+    */
+    MicrotpcHit(int column, int row, int BCID, int TOT, int detNb):
+      m_column(column), m_row(row), m_BCID(BCID), m_TOT(TOT), m_detNb(detNb)
     {
     }
 
@@ -55,7 +62,7 @@ namespace Belle2 {
     /** Return the TPC number */
     int getdetNb()  const { return m_detNb; }
     /** Return the PDG of particles */
-    int getPDG()  const { return m_pdg; }
+    //int getPDG()  const { return m_pdg; }
 
   private:
 
@@ -70,7 +77,7 @@ namespace Belle2 {
     /** Detector Number */
     int m_detNb;
     /** Particle PDG */
-    int m_pdg;
+    //int m_pdg;
 
     ClassDef(MicrotpcHit, 1)
   };

@@ -37,16 +37,7 @@ using namespace std;
      new_bins[i] = TMath::Power(10, from + i * width);
 
    }
-//    delete new_bins;
-// // //    axis->Set(bins, new_bins);
-// // //    delete new_bins;
-// // //    Axis_t new_bins[bins + 1];
-// // //    
-// // //    for (int i = 0; i <= bins; i++) {
-// // // 	 new_bins[i] = TMath::Power(10, from + i * width);
-// // // 	 
-// // //    }
-// // //    axis->Set(bins, &new_bins);
+   axis->Set(bins, new_bins);
 } 
 
 /** test if branch exist in given ttree */

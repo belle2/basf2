@@ -40,14 +40,22 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
   addParam("whichGeometry", m_geometry,
            "Which geometry should be used, either 'TGeo' or 'Geant4'", std::string("TGeo"));
 
-  // Energy loss configuration.
-  addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
-  addParam("noiseBetheBloch", m_noiseBetheBloch, "activate the material effect: NoiseBetheBloch", true);
-  addParam("noiseCoulomb", m_noiseCoulomb, "activate the material effect: NoiseCoulomb", true);
-  addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
-  addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
-  addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
-  addParam("MSCModel", m_mscModel, "Multiple scattering model", std::string("Highland"));
+  // Energy loss, multiple scattering configuration.
+  addParam("energyLossBetheBloch", m_energyLossBetheBloch,
+           "activate the material effect: EnergyLossBetheBloch", true);
+  addParam("noiseBetheBloch", m_noiseBetheBloch,
+           "activate the material effect: NoiseBetheBloch", true);
+  addParam("noiseCoulomb", m_noiseCoulomb,
+           "activate the material effect: NoiseCoulomb", true);
+  addParam("energyLossBrems", m_energyLossBrems,
+           "activate the material effect: EnergyLossBrems", true);
+  addParam("noiseBrems", m_noiseBrems,
+           "activate the material effect: NoiseBrems", true);
+  addParam("noEffects", m_noEffects,
+           "switch off all material effects in Genfit. This overwrites all "
+           "individual material effects switches", false);
+  addParam("MSCModel", m_mscModel,
+           "Multiple scattering model", std::string("Highland"));
 }
 
 SetupGenfitExtrapolationModule::~SetupGenfitExtrapolationModule()

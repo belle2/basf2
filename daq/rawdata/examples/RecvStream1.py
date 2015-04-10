@@ -27,14 +27,14 @@ converter = register_module('Convert2RawDet')
 output = register_module('PrintData')
 
 # Receiver
-receiver.param('NodeID', 3)  # ROPC node ID (only used for NSM)
+receiver.param('NodeID', 3)  # ROPC node ID (only used for Run control)
 receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', ['localhost', 'cpr007'])
 receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
 receiver.param('MaxEventNum', -1)
-receiver.param('NodeName', argvs[3])  # node name for NSM
+receiver.param('NodeName', argvs[3])  # node name for Run control
 use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
 
@@ -60,8 +60,8 @@ main = create_path()
 main.add_module(receiver)
 # main.add_module(monitor)
 # main.add_module(converter)
-main.add_module(dump)
-# main.add_module(sender)
+# main.add_module(dump)
+main.add_module(sender)
 # main.add_module(output)
 # main.add_module(perf)
 

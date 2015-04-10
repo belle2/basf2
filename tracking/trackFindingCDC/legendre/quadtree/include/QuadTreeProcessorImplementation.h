@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
 
-      using QuadTreeProcessorTemplate::QuadTreeProcessorTemplate;
+      HitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges) : QuadTreeProcessorTemplate(lastLevel, ranges) { }
 
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node

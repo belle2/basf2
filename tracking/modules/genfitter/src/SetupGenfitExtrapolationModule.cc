@@ -38,7 +38,7 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
 
   //input
   addParam("whichGeometry", m_geometry,
-           "Which geometry should be used, either 'TGeo' or 'Geant4'", std::string("TGeo"));
+           "Which geometry should be used, either 'TGeo' or 'Geant4'", std::string("Geant4"));
 
   // Energy loss, multiple scattering configuration.
   addParam("energyLossBetheBloch", m_energyLossBetheBloch,

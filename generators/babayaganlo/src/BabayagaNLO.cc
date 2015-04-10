@@ -108,6 +108,8 @@ BabayagaNLO::BabayagaNLO()
     m_xpar[i] = 0.0;
   }
 
+  m_sDif = 0.;
+
   setDefaultSettings();
 }
 
@@ -200,7 +202,8 @@ void BabayagaNLO::term()
 
   B2INFO(">>> xsec (weighted)   = (" << bresults_.rescross << " +/- " << bresults_.rescrosserr << ") nb")
   for (int i = 0; i < bresults_.resnphmax; i++) {
-    B2INFO(">>> " << i << " photon(s), xsec (weighted) = (" << bresults_.rescrossphot[i] << " +/- " << bresults_.rescrossphoterr[i] << ") nb")
+    B2INFO(">>> " << i << " photon(s), xsec (weighted) = (" << bresults_.rescrossphot[i] << " +/- " << bresults_.rescrossphoterr[i] <<
+           ") nb")
   }
 
   B2INFO(">>> xsec (unweighted) = (" << bhitnmiss_.hnmcross << " +/- " << bhitnmiss_.hnmcrosserr << ") nb")
@@ -214,7 +217,8 @@ void BabayagaNLO::term()
   B2INFO(">>> points with w <0:            = " << bbias_.nneg)
   B2INFO(">>> bias over fmax               = (" << bbias_.sezover << " +/- " << bbias_.errsezover << ") nb")
   B2INFO(">>> negative bias                = (" << -bbias_.sezneg << " +/- " << bbias_.errsezneg << ") nb")
-  B2INFO(">>> xsec incl. biases            = (" << bhitnmiss_.hnmcross + bbias_.sezover - bbias_.sezneg << " +/- " << bhitnmiss_.hnmcrosserr + bbias_.errsezover + bbias_.errsezneg << ") nb")
+  B2INFO(">>> xsec incl. biases            = (" << bhitnmiss_.hnmcross + bbias_.sezover - bbias_.sezneg << " +/- " <<
+         bhitnmiss_.hnmcrosserr + bbias_.errsezover + bbias_.errsezneg << ") nb")
   B2INFO(">>> bias (w>fmax)/hit            = (" << bbias_.biashit * 100. << ") %")
   B2INFO(">>> bias (w>fmax)/(hit+missed)   = (" << bbias_.biashitpmiss * 100. << ") %")
   B2INFO(">>> bias (w<0)/hit               = (" << bbias_.biasneghit * 100. << ") %")

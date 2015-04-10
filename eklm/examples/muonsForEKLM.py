@@ -50,8 +50,7 @@ paramloader = register_module('Gearbox')
 # Geometry builder
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
-
-geobuilder.param('Components', ['EKLM'])
+geobuilder.param('components', ['EKLM'])
 
 # Full Geant4 simulation
 g4sim = register_module('FullSim')
@@ -65,10 +64,10 @@ mcprint = register_module('PrintMCParticles')
 
 # ------------  EKLM-related modules
 
-# EKLM digi
+# EKLM digitizer
 eklmdigi = register_module('EKLMDigitizer')
 eklmdigi.log_level = LogLevel.INFO
-# EKLM reco
+# EKLM reconstructor
 eklmreco = register_module('EKLMReconstructor')
 eklmreco.log_level = LogLevel.INFO
 

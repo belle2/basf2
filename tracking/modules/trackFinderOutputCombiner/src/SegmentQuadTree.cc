@@ -6,12 +6,18 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <genfit/TrackCand.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 REG_MODULE(SegmentQuadTree);
+
+void SegmentQuadTreeModule::addHitToTrack(CDCTrack& track, const CDCRecoHit2D& hit, const CDCTrajectory3D& trajectory3D)
+{
+  const CDCRLWireHit* ptrRLWireHit = &(hit.getRLWireHit());
+  Vector3D recoPos3D(hit.getRecoPos2D(), 0.0);
+  FloatType perpS = trajectory3D.calcPerpS(recoPos3D);
+  track.push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
+}
 
 SegmentQuadTreeModule::SegmentQuadTreeModule() : TrackFinderCDCFromSegmentsModule()
 {
@@ -24,22 +30,13 @@ void SegmentQuadTreeModule::generate(std::vector<CDCRecoSegment2D>& segments, st
   quadTreeSearch(segments, tracks);
 }
 
-void addHitToTrack(CDCTrack& track, const CDCRecoHit2D& hit, const CDCTrajectory3D& trajectory3D)
-{
-  const CDCRLWireHit* ptrRLWireHit = &(hit.getRLWireHit());
-  Vector3D recoPos3D(hit.getRecoPos2D(), 0.0);
-  FloatType perpS = trajectory3D.calcPerpS(recoPos3D);
-  track.push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
-}
-
 void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& tracks)
 {
-  StoreWrappedObjPtr< std::vector<CDCRecoFacet> > storedFacets("CDCRecoFacetVector");
-  std::vector<CDCRecoFacet>& recoFacets = *storedFacets;
+  typedef std::vector<CDCRecoSegment2D*> RecoVector;
+  std::vector<RecoVector> foundTracks;
 
   Processor::ChildRanges ranges(Processor::rangeX(0, m_nbinsTheta),
                                 Processor::rangeY(m_rMin, m_rMax));
-  Processor qtProcessor(m_param_level, ranges);
 
   Processor::ReturnList hits_set;
 
@@ -47,79 +44,44 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
     if (reco.getStereoType() == AXIAL) {
       hits_set.push_back(&reco);
     }
-    if (reco.getAutomatonCell().hasTakenFlag()) {
-      B2INFO("Yes")
-    } else {
-      B2INFO("No")
-    }
   }
-
-  qtProcessor.provideItemsSet(hits_set);
-
-  // this lambda function will forward the found candidates to the CandidateCreate for further processing
-  // hits belonging to found candidates will be marked as used and ignored for further
-  // filling iterations
 
   Processor::CandidateProcessorLambda lmdCandidateProcessing = [&](const Processor::ReturnList & items,
   Processor::QuadTree * node) -> void {
     B2DEBUG(90, "Found track with " << items.size() << " on level " << static_cast<unsigned int>(node->getLevel()))
+    foundTracks.push_back(items);
+  };
+
+  Processor qtProcessor(m_param_level, ranges, Vector2D(0, 0));
+  qtProcessor.provideItemsSet(hits_set);
+  qtProcessor.fillGivenTree(lmdCandidateProcessing, m_param_minimumItems);
+
+  B2DEBUG(90, "Found " << foundTracks.size() << " tracks")
+
+  for (const RecoVector& track : foundTracks) {
     tracks.emplace_back();
     CDCTrack& foundTrack = tracks.back();
-
     CDCObservations2D observations;
     CDCTrajectory2D trajectory;
 
-    for (Processor::ItemType::TypeData* item : items)
-    {
+    for (Processor::ItemType::TypeData* item : track) {
       observations.append(*item);
     }
 
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
     fitter.update(trajectory, observations);
     //trajectory.setLocalOrigin(items.front()->getStartRecoPos2D());
-    trajectory.setLocalOrigin(items.front()->getFrontRecoPos2D());
+    trajectory.setLocalOrigin(track.front()->getFrontRecoPos2D());
 
     CDCTrajectory3D trajectory3D(trajectory, CDCTrajectorySZ::basicAssumption());
 
     foundTrack.setStartTrajectory3D(trajectory3D);
 
-    for (Processor::ItemType::TypeData* recoSegment : items)
-    {
-      /*addHitToTrack(foundTrack, recoSegment->getStartRecoHit2D(), trajectory3D);
-      addHitToTrack(foundTrack, recoSegment->getMiddleRecoHit2D(), trajectory3D);
-      addHitToTrack(foundTrack, recoSegment->getEndRecoHit2D(), trajectory3D);*/
+    for (Processor::ItemType::TypeData* recoSegment : track) {
       for (const CDCRecoHit2D& recoHit : recoSegment->items()) {
         addHitToTrack(foundTrack, recoHit, trajectory3D);
       }
     }
-  };
-
-  qtProcessor.fillGivenTree(lmdCandidateProcessing, m_param_minimumItems);
-
-  B2DEBUG(90, "Found " << tracks.size() << " tracks")
-}
-
-void SegmentQuadTreeModule::printQuadTree(Processor::QuadTree* node)
-{
-  Processor::QuadTree::Children* children = node->getChildren();
-
-  unsigned int nItems = node->getNItems();
-  unsigned int usedItems = 0;
-
-  for (Processor::ItemType* item : node->getItemsVector()) {
-    if (item->isUsed()) {
-      usedItems++;
-    }
-  }
-
-  B2DEBUG(110, static_cast<unsigned int>(node->getLevel()) << " (" << node->getXMin() << ", " << node->getXMax() << ") - (" <<
-          node->getYMin() << ", " << node->getYMax() << "): " << usedItems << "/" << nItems);
-
-  if (children != nullptr) {
-    printQuadTree(children->get(0, 0));
-    printQuadTree(children->get(0, 1));
-    printQuadTree(children->get(1, 0));
-    printQuadTree(children->get(1, 1));
   }
 
 }

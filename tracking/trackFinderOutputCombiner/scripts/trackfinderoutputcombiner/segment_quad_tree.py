@@ -37,9 +37,12 @@ class Filler(basf2.Module):
 
 class SegmentQuadTreePlotter(basf2.Module):
 
+    """ Small helper to draw the sinograms of the segments """
+
     plot_conformal = True
 
     def event(self):
+        """ Do the drawing """
         plt.clf()
 
         segments = Belle2.PyStoreObj("CDCRecoSegment2DVector")
@@ -146,6 +149,7 @@ class SegmentQuadTreeRun(MCTrackFinderRun, AddValidationMethod):
     plotter_module.plot_conformal = False
 
     def create_path(self):
+        """ Make SegmentFinding and QuadTreeFinding and plotting/display/validation"""
         main_path = super(SegmentQuadTreeRun, self).create_path()
 
         segment_finder = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
@@ -164,8 +168,8 @@ class SegmentQuadTreeRun(MCTrackFinderRun, AddValidationMethod):
             "Level": 6,
             "MinimumItems": 3,
         })
-        # segment_quad_tree.set_log_level(basf2.LogLevel.DEBUG)
-        segment_quad_tree.set_debug_level(110)
+        segment_quad_tree.set_log_level(basf2.LogLevel.DEBUG)
+        segment_quad_tree.set_debug_level(90)
         main_path.add_module(segment_quad_tree)
 
         hit_quad_tree = basf2.register_module("CDCLegendreTracking")

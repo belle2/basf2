@@ -22,28 +22,40 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
     class CDCTrack;
+    class CDCRecoHit2D;
+    class CDCTrajectory2D;
   }
 
   class SegmentQuadTreeModule : public TrackFinderCDCFromSegmentsModule {
 
-    typedef TrackFindingCDC::QuadTreeProcessorSegments Processor;
+    typedef TrackFindingCDC::QuadTreeProcessorSegments Processor; /**< The used quad tree processor */
 
   public:
 
+    /**
+     * Constructor.
+     */
     SegmentQuadTreeModule();
 
+    /**
+     * Used the QuadTree to generate tracks from segments.
+     */
     void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks);
 
   private:
     const double m_rMin = -0.15; /**< Minimum in r direction*/
     const double m_rMax = 0.15; /**< Maximum in r direction*/
-    const int m_nbinsTheta = 8192;
+    const int m_nbinsTheta =
+      8192; /**< Maximum in theta-direction (theta is actually an unsigned int here - we use the LookUp to get the correct angles) */
 
-    unsigned int m_param_level;
-    unsigned int m_param_minimumItems;
+    unsigned int m_param_level; /**< Maximum Level for QuadTreeSearch. */
+    unsigned int m_param_minimumItems; /**< Minimum number of hits in one QuadTreeCell. */
 
+    /** Do the quad tree search */
     void quadTreeSearch(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, std::vector<TrackFindingCDC::CDCTrack>& tracks);
 
-    void printQuadTree(Processor::QuadTree* node);
+    /** Helper function to add a hit to a track */
+    void addHitToTrack(TrackFindingCDC::CDCTrack& track, const TrackFindingCDC::CDCRecoHit2D& hit,
+                       const TrackFindingCDC::CDCTrajectory3D& trajectory3D);
   };
 }

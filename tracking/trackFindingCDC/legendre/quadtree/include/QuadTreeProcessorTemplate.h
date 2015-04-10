@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       typedef QuadTreeItem<typeData> ItemType; /**< The QuadTree will only see items of this type */
-      typedef std::vector<typeData*> ReturnList;
+      typedef std::vector<typeData*> ReturnList; /**< The type of the list of result items returned to the lambda function */
       typedef QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
       typedef std::function< void(const ReturnList&, QuadTree*) >
       CandidateProcessorLambda;   /**< This lambda function can be used for postprocessing */
@@ -103,6 +103,9 @@ namespace Belle2 {
         fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
       }
 
+      /**
+       * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
+       */
       virtual void provideItemsSet(std::vector<typeData*>& itemsVector) final {
         std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
         for (typeData* item : itemsVector)
@@ -142,6 +145,9 @@ namespace Belle2 {
         m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
       }
 
+      /**
+       * Before making a new search we have to clean up the items that are already used from the items list.
+       */
       virtual void cleanUpItems(std::vector<ItemType*>& items) const final
       {
         items.erase(std::remove_if(items.begin(), items.end(),
@@ -151,6 +157,10 @@ namespace Belle2 {
         items.end());
       };
 
+      /**
+       * When a node is accepted as a result, we extract a vector with the items (back transformed to typeData*)
+       * and pass it together with the result node to the given lambda function.
+       */
       virtual void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const final
       {
         ReturnList resultItems;
@@ -165,6 +175,10 @@ namespace Belle2 {
         lambda(resultItems, node);
       }
 
+      /**
+       * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
+       * process further and go one level deeper.
+       */
       virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
                                  bool checkThreshold) const final
       {
@@ -227,6 +241,10 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * This function is called by fillGivenTree and fills the items into the corresponding children.
+       * For this the user-defined method insertItemInNode is called.
+       */
       virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items) const final
       {
         const size_t neededSize = 2 * items.size();
@@ -247,6 +265,10 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Creates the sub node of a given node. This function is called by fillGivenTree.
+       * To calculate the ranges of the children nodes the user-defined function createChiildWithParent is used.
+       */
       virtual void initializeChildren(QuadTree* node, QuadTreeChildren* m_children) const final
       {
         for (unsigned int i = 0; i < binCountX; ++i) {
@@ -269,7 +291,7 @@ namespace Belle2 {
       };
 
       unsigned int m_lastLevel; /**< The last level to be filled */
-      QuadTree* m_quadTree;
+      QuadTree* m_quadTree; /**< The quad tree we work with */
     };
   }
 }

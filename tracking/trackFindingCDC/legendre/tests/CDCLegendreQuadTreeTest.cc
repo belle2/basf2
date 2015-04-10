@@ -42,8 +42,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   }
 
   HitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidates](const HitQuadTreeProcessor::ReturnList & hits,
-  HitQuadTreeProcessor::QuadTree * node) {
-    //std::for_each(hits.begin(), hits.end(), [](TrackHit* th) {th->setUsedFlag();});
+  HitQuadTreeProcessor::QuadTree*) {
     candidates.push_back(hits);
   };
 

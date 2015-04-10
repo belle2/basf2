@@ -70,7 +70,7 @@ namespace Belle2 {
       }
 
       /**
-       * Return
+       * Return the new ranges. We do not use the standard ranges for the lower levels.
        */
       ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
       {
@@ -106,19 +106,21 @@ namespace Belle2 {
       }
     };
 
-    template <class type>
-    class QuadTreeProcessorReco : public QuadTreeProcessorTemplate<int, float, type, 2, 2> {
+    /** A QuadTreeProcessor for RecoSegments */
+    class QuadTreeProcessorSegments : public QuadTreeProcessorTemplate<int, float, CDCRecoSegment2D, 2, 2> {
 
     public:
-      using typename QuadTreeProcessorTemplate<int, float, type, 2, 2>::QuadTree;  /**< The used QuadTree */
-      using typename QuadTreeProcessorTemplate<int, float, type, 2, 2>::rangeX;   /**< This pair describes the range in X for a node */
-      using typename QuadTreeProcessorTemplate<int, float, type, 2, 2>::rangeY;   /**< This pair describes the range in Y for a node */
-      using typename
-      QuadTreeProcessorTemplate<int, float, type, 2, 2>::ChildRanges; /**< This pair of ranges describes the range of a node */
+      /**
+       * the conformalTransformationPostion is the point which we use as an origin for the conformal transformation.
+       */
+      QuadTreeProcessorSegments(unsigned char lastLevel, const ChildRanges& ranges, const Vector2D& conformalTransformationPosition) :
+        QuadTreeProcessorTemplate(lastLevel, ranges), m_origin(conformalTransformationPosition) {}
 
-      using QuadTreeProcessorTemplate<int, float, type, 2, 2>::QuadTreeProcessorTemplate;
-
-      bool insertItemInNode(QuadTree* node, type* recoItem, unsigned int /*t_index*/, unsigned int /*r_index*/) const override
+      /**
+       * Insert only if the sinogram of the front or the back part of the segment goes through the node.
+       * Also we can intersect the sinograms of the front and the back and get an intersection point, which should lay in the node also.
+       */
+      bool insertItemInNode(QuadTree* node, CDCRecoSegment2D* recoItem, unsigned int /*t_index*/, unsigned int /*r_index*/) const override
       {
         float dist[2][2];
 
@@ -134,8 +136,8 @@ namespace Belle2 {
         float thetaMin = thetaIndexMin * bin_width;
         float thetaMax = thetaIndexMax * bin_width;
 
-        Vector2D conformalTransformFront = recoItem->front().getRecoPos2D().conformalTransformed();
-        Vector2D conformalTransformBack = recoItem->back().getRecoPos2D().conformalTransformed();
+        Vector2D conformalTransformFront = recoItem->front().getRecoPos2D().subtract(m_origin).conformalTransformed();
+        Vector2D conformalTransformBack = recoItem->back().getRecoPos2D().subtract(m_origin).conformalTransformed();
 
         double thetaIntersection = std::atan2((conformalTransformBack - conformalTransformFront).x(),
                                               (conformalTransformFront - conformalTransformBack).y());
@@ -178,6 +180,9 @@ namespace Belle2 {
         return true;
       }
 
+      /**
+       * We us the standard ranges here.
+       */
       ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
       {
         int thetaMin = node->getXBin(i);
@@ -186,9 +191,10 @@ namespace Belle2 {
         float rMax = node->getYBin(j + 1);
         return ChildRanges(rangeX(thetaMin, thetaMax), rangeY(rMin, rMax));
       }
-    };
 
-    typedef QuadTreeProcessorReco<CDCRecoSegment2D> QuadTreeProcessorSegments;
+    private:
+      Vector2D m_origin; /**< The origin of the conformal transformation */
+    };
 
   }
 }

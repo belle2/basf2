@@ -25,14 +25,14 @@ dump = register_module('RootOutput')
 output = register_module('PrintData')
 
 # Receiver
-receiver.param('NodeID', 3)  # ROPC node ID (only used for NSM)
+receiver.param('NodeID', 3)  # ROPC node ID (only used for Run control)
 receiver.param('NumConn', 1)
 receiver.param('HostNameFrom', [argvs[1], 'aiueohost'])
 receiver.param('PortFrom', [33000, 33000])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
 receiver.param('MaxEventNum', -1)
-receiver.param('NodeName', argvs[4])  # node name for NSM
+receiver.param('NodeName', argvs[4])  # node name for Run control
 use_shm_flag = int(argvs[2])
 receiver.param('UseShmFlag', use_shm_flag)
 

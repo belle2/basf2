@@ -27,9 +27,9 @@ EKLMSim2Hit::EKLMSim2Hit()
 }
 
 EKLMSim2Hit::EKLMSim2Hit(const EKLMSimHit* simHit)
-  : EKLMHitBase((EKLMHitBase)*simHit),
-    EKLMHitCoord((EKLMHitCoord)*simHit),
-    EKLMHitMomentum((EKLMHitMomentum)*simHit)
+  : EKLMHitBase((EKLMHitBase) * simHit),
+    EKLMHitCoord((EKLMHitCoord) * simHit),
+    EKLMHitMomentum((EKLMHitMomentum) * simHit)
 {
   setVolumeID(simHit->getVolumeID());
   setPlane(simHit->getPlane());

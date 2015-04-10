@@ -253,7 +253,8 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
   //for (const EKLMHit2d * eklmHit : cluster) {
   //k0l->addRelationTo(eklmHit);
   //}
-  for (std::vector<EKLMHit2d*>::iterator clusterPtr_it = cluster.begin(); clusterPtr_it != cluster.end(); ++clusterPtr_it) { //clusterPtr_it iterates over std::vector<EKLMHit2d*>
+  for (std::vector<EKLMHit2d*>::iterator clusterPtr_it = cluster.begin(); clusterPtr_it != cluster.end();
+       ++clusterPtr_it) { //clusterPtr_it iterates over std::vector<EKLMHit2d*>
     EKLMHit2d tmp = **clusterPtr_it;
     for (int  hits2d_it = 0; hits2d_it != hits2d.getEntries(); hits2d_it++) // hits2d_it iterates over StoreArray<EKLMHit2d>
       if (tmp == *(hits2d[hits2d_it])) {

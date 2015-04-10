@@ -66,4 +66,3 @@ main.add_module(output)
 
 # Process 100 events
 process(main)
-

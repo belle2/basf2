@@ -24,17 +24,33 @@ void SegmentQuadTreeModule::generate(std::vector<CDCRecoSegment2D>& segments, st
   quadTreeSearch(segments, tracks);
 }
 
+void addHitToTrack(CDCTrack& track, const CDCRecoHit2D& hit, const CDCTrajectory3D& trajectory3D)
+{
+  const CDCRLWireHit* ptrRLWireHit = &(hit.getRLWireHit());
+  Vector3D recoPos3D(hit.getRecoPos2D(), 0.0);
+  FloatType perpS = trajectory3D.calcPerpS(recoPos3D);
+  track.push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
+}
+
 void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& tracks)
 {
-  QuadTreeProcessorSegments::ChildRanges ranges(QuadTreeProcessorSegments::rangeX(0, m_nbinsTheta),
-                                                QuadTreeProcessorSegments::rangeY(m_rMin, m_rMax));
-  QuadTreeProcessorSegments qtProcessor(m_param_level, ranges);
+  StoreWrappedObjPtr< std::vector<CDCRecoFacet> > storedFacets("CDCRecoFacetVector");
+  std::vector<CDCRecoFacet>& recoFacets = *storedFacets;
 
-  std::vector<CDCRecoSegment2D*> hits_set;
+  Processor::ChildRanges ranges(Processor::rangeX(0, m_nbinsTheta),
+                                Processor::rangeY(m_rMin, m_rMax));
+  Processor qtProcessor(m_param_level, ranges);
 
-  for (CDCRecoSegment2D& recoSegment : recoSegments) {
-    if (recoSegment.getStereoType() == AXIAL) {
-      hits_set.push_back(&recoSegment);
+  Processor::ReturnList hits_set;
+
+  for (Processor::ItemType::TypeData& reco : recoSegments) {
+    if (reco.getStereoType() == AXIAL) {
+      hits_set.push_back(&reco);
+    }
+    if (reco.getAutomatonCell().hasTakenFlag()) {
+      B2INFO("Yes")
+    } else {
+      B2INFO("No")
     }
   }
 
@@ -44,36 +60,36 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
 
-  QuadTreeProcessorSegments::CandidateProcessorLambda lmdCandidateProcessing = [&](SegmentQuadTree * qt) -> void {
-    B2DEBUG(90, "Found track with " << qt->getNItems() << " on level " << static_cast<unsigned int>(qt->getLevel()))
+  Processor::CandidateProcessorLambda lmdCandidateProcessing = [&](const Processor::ReturnList & items,
+  Processor::QuadTree * node) -> void {
+    B2DEBUG(90, "Found track with " << items.size() << " on level " << static_cast<unsigned int>(node->getLevel()))
     tracks.emplace_back();
     CDCTrack& foundTrack = tracks.back();
 
     CDCObservations2D observations;
     CDCTrajectory2D trajectory;
 
-    for (QuadTreeItem<CDCRecoSegment2D>*& quadTreeItem : qt->getItemsVector())
+    for (Processor::ItemType::TypeData* item : items)
     {
-      quadTreeItem->setUsedFlag();
-      CDCRecoSegment2D* recoSegment = quadTreeItem->getPointer();
-      observations.append(*recoSegment);
+      observations.append(*item);
     }
 
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
     fitter.update(trajectory, observations);
+    //trajectory.setLocalOrigin(items.front()->getStartRecoPos2D());
+    trajectory.setLocalOrigin(items.front()->getFrontRecoPos2D());
 
     CDCTrajectory3D trajectory3D(trajectory, CDCTrajectorySZ::basicAssumption());
 
     foundTrack.setStartTrajectory3D(trajectory3D);
 
-    for (QuadTreeItem<CDCRecoSegment2D>*& quadTreeItem : qt->getItemsVector())
+    for (Processor::ItemType::TypeData* recoSegment : items)
     {
-      CDCRecoSegment2D* recoSegment = quadTreeItem->getPointer();
-      for (const CDCRecoHit2D& recoHit2D : recoSegment->items()) {
-        const CDCRLWireHit* ptrRLWireHit = &(recoHit2D.getRLWireHit());
-        Vector3D recoPos3D(recoHit2D.getRecoPos2D(), 0.0);
-        FloatType perpS = trajectory3D.calcPerpS(recoPos3D);
-        foundTrack.push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
+      /*addHitToTrack(foundTrack, recoSegment->getStartRecoHit2D(), trajectory3D);
+      addHitToTrack(foundTrack, recoSegment->getMiddleRecoHit2D(), trajectory3D);
+      addHitToTrack(foundTrack, recoSegment->getEndRecoHit2D(), trajectory3D);*/
+      for (const CDCRecoHit2D& recoHit : recoSegment->items()) {
+        addHitToTrack(foundTrack, recoHit, trajectory3D);
       }
     }
   };
@@ -83,14 +99,14 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
   B2DEBUG(90, "Found " << tracks.size() << " tracks")
 }
 
-void SegmentQuadTreeModule::printQuadTree(SegmentQuadTree* node)
+void SegmentQuadTreeModule::printQuadTree(Processor::QuadTree* node)
 {
-  SegmentQuadTree::Children* children = node->getChildren();
+  Processor::QuadTree::Children* children = node->getChildren();
 
   unsigned int nItems = node->getNItems();
   unsigned int usedItems = 0;
 
-  for (QuadTreeItem<CDCRecoSegment2D>* item : node->getItemsVector()) {
+  for (Processor::ItemType* item : node->getItemsVector()) {
     if (item->isUsed()) {
       usedItems++;
     }

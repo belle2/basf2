@@ -6,6 +6,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class TrackHit;
+    class CDCRecoSegment2D;
 
     /**
      * This class serves as a wrapper around all things that should go into a QuadTree.
@@ -15,6 +16,9 @@ namespace Belle2 {
     template<class typeData>
     class QuadTreeItem {
     public:
+
+      typedef typeData TypeData;
+
       QuadTreeItem(typeData* data) : m_usedFlag(false), m_pointer(data) {};
 
       /**
@@ -81,6 +85,13 @@ namespace Belle2 {
 
     template<>
     void QuadTreeItem<TrackHit>::setUsedFlag(bool usedFlag);
+
+    /** As special case: the CDCRecoSegment2D has a used flag itself */
+    template<>
+    bool QuadTreeItem<CDCRecoSegment2D>::isUsed() const;
+
+    template<>
+    void QuadTreeItem<CDCRecoSegment2D>::setUsedFlag(bool usedFlag);
 
   }
 

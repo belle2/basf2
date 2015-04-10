@@ -3,11 +3,10 @@ import ROOT
 from ROOT import Belle2
 
 from ROOT import gSystem
-from trackfinderoutputcombiner.validation import MCTrackFinderRun
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
-from trackfinderoutputcombiner.validation import MCTrackFinderRun
+from trackfinderoutputcombiner.validation import MCTrackFinderRun, AddValidationMethod
 from tracking.validation.harvesting import HarvestingModule
 from tracking.validation import refiners
 import logging
@@ -30,6 +29,12 @@ import subprocess
 from trackfindingcdc.cdcdisplay.svgdrawing.attributemaps import SegmentMCTrackIdColorMap
 
 
+class Filler(basf2.Module):
+
+    def event(self):
+        Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+
+
 class SegmentQuadTreePlotter(basf2.Module):
 
     plot_conformal = True
@@ -38,8 +43,6 @@ class SegmentQuadTreePlotter(basf2.Module):
         plt.clf()
 
         segments = Belle2.PyStoreObj("CDCRecoSegment2DVector")
-
-        Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
         map = SegmentMCTrackIdColorMap()
 
@@ -121,13 +124,23 @@ class SegmentQuadTreePlotter(basf2.Module):
         raw_input('Hit enter for next event')
 
 
-class SegmentQuadTreeRun(MCTrackFinderRun):
+class SegmentQuadTreeRun(MCTrackFinderRun, AddValidationMethod):
 
     display_module_segments = CDCSVGDisplayModule(interactive=True)
     display_module_segments.draw_gftrackcand_trajectories = False
     display_module_segments.draw_gftrackcands = True
+    display_module_segments.draw_clusters = False
     display_module_segments.track_cands_store_array_name = "TrackCands"
-    display_module_segments.draw_segments_mctrackid = False
+
+    display_module_tracks = CDCSVGDisplayModule(interactive=True)
+    display_module_tracks.draw_gftrackcand_trajectories = True
+    display_module_tracks.draw_gftrackcands = True
+    display_module_tracks.track_cands_store_array_name = "LegendreTrackCands"
+
+    display_module_mc = CDCSVGDisplayModule(interactive=True)
+    display_module_mc.draw_gftrackcand_trajectories = True
+    display_module_mc.draw_gftrackcands = True
+    display_module_mc.track_cands_store_array_name = "MCTrackCands"
 
     plotter_module = SegmentQuadTreePlotter()
     plotter_module.plot_conformal = False
@@ -136,19 +149,36 @@ class SegmentQuadTreeRun(MCTrackFinderRun):
         main_path = super(SegmentQuadTreeRun, self).create_path()
 
         segment_finder = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+        segment_finder.param({
+            "WriteSuperClusters": False,
+            "WriteClusters": False,
+            "WriteFacets": True,
+            "SegmentOrientation": "none",
+        })
         main_path.add_module(segment_finder)
+
+        main_path.add_module(Filler())
 
         segment_quad_tree = basf2.register_module("SegmentQuadTree")
         segment_quad_tree.param({
-            "Level": 10,
-            "MinimumItems": 10,
+            "Level": 6,
+            "MinimumItems": 3,
         })
-        segment_quad_tree.set_log_level(basf2.LogLevel.DEBUG)
-        segment_quad_tree.set_debug_level(90)
+        # segment_quad_tree.set_log_level(basf2.LogLevel.DEBUG)
+        segment_quad_tree.set_debug_level(110)
         main_path.add_module(segment_quad_tree)
 
+        hit_quad_tree = basf2.register_module("CDCLegendreTracking")
+        hit_quad_tree.param("GFTrackCandidatesColName", "LegendreTrackCands")
+        main_path.add_module(hit_quad_tree)
+
+        # self.create_validation(main_path, "TrackCands", "SegmentQuadTree.root")
+        # self.create_validation(main_path, "LegendreTrackCands", "HitQuadTree.root")
+
         # main_path.add_module(self.plotter_module)
-        # main_path.add_module(self.display_module_segments)
+        main_path.add_module(self.display_module_segments)
+        # main_path.add_module(self.display_module_tracks)
+        # main_path.add_module(self.display_module_mc)
 
         return main_path
 

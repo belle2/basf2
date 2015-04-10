@@ -27,9 +27,10 @@ namespace Belle2 {
 
     public:
       typedef QuadTreeItem<typeData> ItemType; /**< The QuadTree will only see items of this type */
+      typedef std::vector<typeData*> ReturnList;
       typedef QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
-      typedef typename QuadTree::CandidateProcessorLambda
-      CandidateProcessorLambda; /**< This lambda function can be used for postprocessing */
+      typedef std::function< void(const ReturnList&, QuadTree*) >
+      CandidateProcessorLambda;   /**< This lambda function can be used for postprocessing */
       typedef typename QuadTree::Children QuadTreeChildren; /**< A typedef for the QuadTree Children */
 
       typedef std::pair<typeX, typeX> rangeX;   /**< This pair describes the range in X for a node */
@@ -54,6 +55,7 @@ namespace Belle2 {
       virtual ~QuadTreeProcessorTemplate()
       {
         clear();
+        delete m_quadTree;
       }
 
     protected:
@@ -87,7 +89,7 @@ namespace Belle2 {
       virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                                  unsigned int nHitsThreshold, typeY rThreshold) const final
       {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, rThreshold, true);
+        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, rThreshold, true);
       }
 
       /**
@@ -98,7 +100,7 @@ namespace Belle2 {
       virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                                  unsigned int nHitsThreshold) const final
       {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
+        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
       }
 
       virtual void provideItemsSet(std::vector<typeData*>& itemsVector) final {
@@ -137,7 +139,7 @@ namespace Belle2 {
       virtual void createQuadTree(const ChildRanges& ranges) final {
         const rangeX& x = ranges.first;
         const rangeY& y = ranges.second;
-        m_quadTree.reset(new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr));
+        m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
       }
 
       virtual void cleanUpItems(std::vector<ItemType*>& items) const final
@@ -148,6 +150,20 @@ namespace Belle2 {
         }),
         items.end());
       };
+
+      virtual void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const final
+      {
+        ReturnList resultItems;
+        const std::vector<ItemType*> quadTreeItems = node->getItemsVector();
+        resultItems.reserve(quadTreeItems.size());
+
+        for (ItemType* quadTreeItem : quadTreeItems) {
+          quadTreeItem->setUsedFlag();
+          resultItems.push_back(quadTreeItem->getPointer());
+        }
+
+        lambda(resultItems, node);
+      }
 
       virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
                                  bool checkThreshold) const final
@@ -167,7 +183,7 @@ namespace Belle2 {
         else if ((fabs(node->getYMean()) < 0.07) && (fabs(node->getYMean()) > 0.04))
           level_diff = 1;
         if (node->getLevel() >= (m_lastLevel - level_diff)) {
-          lmdProcessor(node);
+          callResultFunction(node, lmdProcessor);
           return;
         }
         // **** ???? *****
@@ -224,7 +240,6 @@ namespace Belle2 {
           for (int t_index = 0; t_index < binCountX; ++t_index) {
             for (int r_index = 0; r_index < binCountY; ++r_index) {
               if (insertItemInNode(node->getChildren()->get(t_index, r_index), item->getPointer(), t_index, r_index)) {
-                B2DEBUG(110, "Inserting new item in node (" << t_index << ", " << r_index << ")")
                 node->getChildren()->get(t_index, r_index)->insertItem(item);
               }
             }
@@ -239,9 +254,6 @@ namespace Belle2 {
             const ChildRanges& childRanges = createChildWithParent(node, i, j);
             const rangeX& rangeX = childRanges.first;
             const rangeY& rangeY = childRanges.second;
-
-            B2DEBUG(110, "Creating new child on level " << static_cast<unsigned int>(node->getLevel()) << " with ranges ("
-                    << rangeX.first << ", " << rangeX.second << ") - (" << rangeY.first << ", " << rangeY.second << ")")
             m_children->set(i, j, new QuadTree(rangeX.first, rangeX.second, rangeY.first, rangeY.second, node->getLevel() + 1, node));
           }
         }
@@ -257,7 +269,7 @@ namespace Belle2 {
       };
 
       unsigned int m_lastLevel; /**< The last level to be filled */
-      std::unique_ptr<QuadTree> m_quadTree;
+      QuadTree* m_quadTree;
     };
   }
 }

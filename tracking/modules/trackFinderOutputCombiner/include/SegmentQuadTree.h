@@ -26,7 +26,7 @@ namespace Belle2 {
 
   class SegmentQuadTreeModule : public TrackFinderCDCFromSegmentsModule {
 
-    typedef TrackFindingCDC::QuadTreeProcessorSegments::QuadTree SegmentQuadTree;
+    typedef TrackFindingCDC::QuadTreeProcessorSegments Processor;
 
   public:
 
@@ -44,6 +44,6 @@ namespace Belle2 {
 
     void quadTreeSearch(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, std::vector<TrackFindingCDC::CDCTrack>& tracks);
 
-    void printQuadTree(SegmentQuadTree* node);
+    void printQuadTree(Processor::QuadTree* node);
   };
 }

@@ -194,6 +194,15 @@ class CDCSVGDisplayModule(Module):
         # Draw the trajectories stored in the output Genfit tracks
         self.draw_gftrackcand_trajectories = True and False
 
+        # Name of the CDC Hits store array
+        self.cdc_hits_store_array_name = "CDCHits"
+
+        # Name of the genfit track cand store array
+        self.track_cands_store_array_name = "TrackCands"
+
+        # Name of the CDC Wire Hit Clusters
+        self.cdc_wire_hit_cluster_store_obj_name = "CDCWireHitClusterVector"
+
     @property
     def drawoptions(self):
         """
@@ -324,7 +333,7 @@ class CDCSVGDisplayModule(Module):
         if self.draw_hits:
             styleDict = {'stroke': attributemaps.ZeroDriftLengthColorMap(),
                          'stroke-width': attributemaps.ZeroDriftLengthStrokeWidthMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw the CDCHits colored by the taken flag from the CDCWireHit.
         if self.draw_takenflag:
@@ -334,27 +343,27 @@ class CDCSVGDisplayModule(Module):
         # Draw mcparticle id
         if self.draw_mcparticle_id:
             styleDict = {'stroke': attributemaps.MCParticleColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw the in track segment id
         if self.draw_mcsegments:
             styleDict = {'stroke': attributemaps.MCSegmentIdColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw monte carlo pdg codes
         if self.draw_mcparticle_pdgcodes:
             styleDict = {'stroke': attributemaps.MCPDGCodeColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw monte carlo pdg codes
         if self.draw_mcparticle_primary:
             styleDict = {'stroke': attributemaps.MCPrimaryColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw SimHits
         if self.draw_simhits:
             print 'Drawing simulated hits'
-            hit_storearray = Belle2.PyStoreArray('CDCHits')
+            hit_storearray = Belle2.PyStoreArray(self.cdc_hits_store_array_name)
             if hit_storearray:
                 simHits_related_to_hits = [hit.getRelated('CDCSimHits')
                                            for hit in hit_storearray]
@@ -365,17 +374,17 @@ class CDCSVGDisplayModule(Module):
         # Draw RL MC info
         if self.draw_simhit_posflag:
             styleDict = {'stroke': attributemaps.PosFlagColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw local RL info
         if self.draw_rlinfo:
             styleDict = {'stroke': attributemaps.RLColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw tof info
         if self.draw_simhit_tof:
             styleDict = {'stroke': attributemaps.TOFColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw pdg code of simhits
         if self.draw_simhit_pdgcode:
@@ -389,12 +398,12 @@ class CDCSVGDisplayModule(Module):
                 return color
 
             styleDict = {'stroke': color_map}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw background tag of related simhits
         if self.draw_simhit_bkgtag:
             styleDict = {'stroke': attributemaps.BackgroundTagColorMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # Draw background tag != bg_none of related simhits
         if self.draw_simhit_isbkg:
@@ -406,11 +415,11 @@ class CDCSVGDisplayModule(Module):
                 return color
 
             styleDict = {'stroke': color_map}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         if self.draw_connect_tof:
             print 'Drawing simulated hits connected by tof'
-            cdchits_storearray = Belle2.PyStoreArray('CDCHits')
+            cdchits_storearray = Belle2.PyStoreArray(self.cdc_hits_store_array_name)
             if not cdchits_storearray:
                 print 'Store array not present'
             if cdchits_storearray:
@@ -437,8 +446,8 @@ class CDCSVGDisplayModule(Module):
 
                         styleDict = {'stroke-width': '0.2', "stroke": "black"}
 
-                        fromHit = fromSimHit.getRelated("CDCHits")
-                        toHit = toSimHit.getRelated("CDCHits")
+                        fromHit = fromSimHit.getRelated(self.cdc_hits_store_array_name)
+                        toHit = toSimHit.getRelated(self.cdc_hits_store_array_name)
 
                         fromWireHit = Belle2.TrackFindingCDC.CDCWireHit(fromHit)
                         toWireHit = Belle2.TrackFindingCDC.CDCWireHit(toHit)
@@ -458,7 +467,7 @@ class CDCSVGDisplayModule(Module):
         # Draw the reassignment information of hits
         if self.draw_reassigned:
             styleDict = {'stroke': attributemaps.ReassignedSecondaryMap()}
-            plotter.draw_storearray('CDCHits', **styleDict)
+            plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
         # CDCWireHitClusters
         # Draw superclusters
@@ -469,7 +478,7 @@ class CDCSVGDisplayModule(Module):
         # Draw clusters
         if self.draw_clusters:
             styleDict = {'stroke': attributemaps.listColors}
-            plotter.draw_storevector('CDCWireHitClusterVector', **styleDict)
+            plotter.draw_storevector(self.cdc_wire_hit_cluster_store_obj_name, **styleDict)
 
         # ######### CDCRecoSegments2D ##########
         # Draw Segments
@@ -619,7 +628,7 @@ class CDCSVGDisplayModule(Module):
         # Draw the genfit track candidates
         if self.draw_gftrackcands:
             styleDict = {'stroke': attributemaps.listColors}
-            plotter.draw_storearray('TrackCands', **styleDict)
+            plotter.draw_storearray(self.track_cands_store_array_name, **styleDict)
 
         # Draw interaction point
         if self.draw_interaction_point:
@@ -667,7 +676,7 @@ class CDCSVGDisplayModule(Module):
         # Draw the trajectories of the genfit track candidates
         if self.draw_gftrackcand_trajectories:
             print 'Drawing trajectories of the exported Genfit tracks'
-            gftrackcand_storearray = Belle2.PyStoreArray('TrackCands')
+            gftrackcand_storearray = Belle2.PyStoreArray(self.track_cands_store_array_name)
             if gftrackcand_storearray:
                 print '#Genfit tracks', gftrackcand_storearray.getEntries()
 

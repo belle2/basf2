@@ -179,6 +179,15 @@ GenFitterModule::GenFitterModule() :
 
   // keep GFExceptions quiet or not
   genfit::Exception::quiet(m_suppressGFExceptionOutput);
+
+  // Initial values for counters.
+  m_failedFitCounter = 0;
+  m_successfulFitCounter = 0;
+  m_failedGFTrackCandFitCounter = 0;
+  m_successfulGFTrackCandFitCounter = 0;
+
+  // Silence cppcheck, set in initialize()
+  m_usePdgCodeFromTrackCand = false;
 }
 
 GenFitterModule::~GenFitterModule()
@@ -187,13 +196,6 @@ GenFitterModule::~GenFitterModule()
 
 void GenFitterModule::initialize()
 {
-
-  m_failedFitCounter = 0;
-  m_successfulFitCounter = 0;
-
-  m_failedGFTrackCandFitCounter = 0;
-  m_successfulGFTrackCandFitCounter = 0;
-
   StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   trackCandidates.isRequired();

@@ -19,6 +19,7 @@
 /* External headers. */
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+#include "CLHEP/Units/PhysicalConstants.h"
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polyhedra.hh>
@@ -35,8 +36,6 @@
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>
-
-#include "CLHEP/Units/PhysicalConstants.h"
 
 using namespace Belle2;
 

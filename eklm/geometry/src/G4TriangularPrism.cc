@@ -12,10 +12,12 @@
 #include <cmath>
 #include <new>
 
+/* External headers. */
+#include "CLHEP/Units/PhysicalConstants.h"
+
 /* Belle2 headers. */
 #include <eklm/geometry/G4TriangularPrism.h>
 
-#include "CLHEP/Units/PhysicalConstants.h"
 
 using namespace Belle2;
 

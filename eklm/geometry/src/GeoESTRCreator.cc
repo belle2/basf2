@@ -13,13 +13,12 @@
 
 /* External headers. */
 #include <boost/format.hpp>
+#include "CLHEP/Units/PhysicalConstants.h"
 #include <globals.hh>
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <framework/gearbox/GearDir.h>
-
-#include "CLHEP/Units/PhysicalConstants.h"
 
 using namespace Belle2;
 

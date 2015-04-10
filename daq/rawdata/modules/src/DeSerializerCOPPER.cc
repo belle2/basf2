@@ -583,12 +583,11 @@ void DeSerializerCOPPERModule::event()
   if (n_basf2evt % 100 == 0) {
     RateMonitor(m_prev_ftsweve32);
   }
+  n_basf2evt++;
   if (g_status.isAvailable()) {
     g_status.setInputNBytes(m_totbytes);
-    g_status.setInputCount(m_prev_ftsweve32);
+    g_status.setInputCount(m_prev_ftsweve32 + 1);
   }
-
-  n_basf2evt++;
   return;
 }
 

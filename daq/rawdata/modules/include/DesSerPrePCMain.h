@@ -82,7 +82,13 @@ namespace Belle2 {
     //! Compression Level
     int m_compressionLevel;
 
-    //! Use Network shared memory -> 1; Without Nshm -> 0
+    //! Node(PC or COPPER) ID
+    int m_nodeid;
+
+    //! Node name
+    std::string m_nodename;
+
+    //! Use shared memory -> 1; Without shm -> 0
     int m_shmflag;
 
     // Event Meta Data

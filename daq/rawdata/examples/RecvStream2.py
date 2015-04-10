@@ -26,14 +26,10 @@ processor = register_module('DesSerPrePCMain')
 processor.param('HostNameFrom', argvs[1])
 processor.param('PortTo', int(argvs[3]))
 
-# processor.param('NodeID', 3)  # ROPC node ID (only used for NSM)
-# processor.param('NumConn', 1)
-# processor.param('EventDataBufferWords', 4801)
-# processor.param('MaxTime', -1.)
-# processor.param('MaxEventNum', -1)
-# processor.param('NodeName', argvs[4])  # node name for NSM
-# use_shm_flag = int(argvs[2])
-# processor.param('UseShmFlag', use_shm_flag)
+processor.param('NodeID', 3)  # ROPC node ID (only used for Run control)
+processor.param('NodeName', argvs[4])  # node name for Run control
+use_shm_flag = int(argvs[2])
+processor.param('UseShmFlag', use_shm_flag)
 
 # Create main path
 main = create_path()

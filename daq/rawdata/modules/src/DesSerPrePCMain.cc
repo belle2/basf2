@@ -33,6 +33,8 @@ DesSerPrePCMainModule::DesSerPrePCMainModule() : Module()
   addParam("PortTo", m_port_send, "port number", 34001);
   addParam("HostNameTo", m_host_send, "hostname from", string("localhost"));
 
+  addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);
+  addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   m_compressionLevel = 0;
@@ -59,7 +61,8 @@ void DesSerPrePCMainModule::initialize()
 void DesSerPrePCMainModule::event()
 {
   DesSerPrePC des_ser_prepc(m_host_recv, m_port_recv,
-                            m_host_send, m_port_send, m_shmflag);
+                            m_host_send, m_port_send, m_shmflag,
+                            m_nodename, m_nodeid);
   des_ser_prepc.DataAcquisition();
 
 

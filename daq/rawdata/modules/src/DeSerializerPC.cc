@@ -690,11 +690,11 @@ void DeSerializerPCModule::event()
   if (n_basf2evt % 20000 == 0 || n_basf2evt < 10) {
     RateMonitor(eve_copper_0);
   }
+  n_basf2evt++;
   if (g_status.isAvailable()) {
     g_status.setInputNBytes(m_totbytes);
     g_status.setInputCount(n_basf2evt);
   }
 
-  n_basf2evt++;
   return;
 }

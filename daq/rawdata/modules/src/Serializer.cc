@@ -73,6 +73,12 @@ void SerializerModule::initialize()
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
 
+  RunInfoBuffer& status(DeSerializerModule::getStatus());
+  if (status.isAvailable()) {
+    status.setOutputNBytes(0);
+    status.setOutputCount(0);
+  }
+
   Accept();
 
   initializeNode();
@@ -697,7 +703,6 @@ void SerializerModule::event()
   if (status.isAvailable()) {
     status.setOutputNBytes(m_totbytes);
     status.addOutputCount(raw_dblkarray.getEntries());
-    //status.setOutputCount(n_basf2evt);
   }
 
 }

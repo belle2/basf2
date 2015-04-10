@@ -24,6 +24,7 @@
 #include <daq/rawdata/modules/DeSerializer.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataflow/EvtSocket.h>
+#include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
@@ -60,7 +61,8 @@ namespace Belle2 {
   public:
 
     //! Constructor / Destructor
-    DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag);
+    DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
+                const std::string& nodename, int nodeid);
     //    DesSerPrePC();
     virtual ~DesSerPrePC();
 
@@ -158,6 +160,9 @@ namespace Belle2 {
 
     //! Node name
     std::string m_nodename;
+
+    //! Run info buffer
+    RunInfoBuffer m_status;
 
     //! run no.
     int m_run_no;

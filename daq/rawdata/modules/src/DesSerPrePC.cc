@@ -30,7 +30,8 @@ using namespace Belle2;
 //                 Implementation
 //----------------------------------------------------------------
 
-DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag)
+DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
+                         const std::string& nodename, int nodeid)
 {
   m_num_connections = 1;
 
@@ -45,6 +46,8 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   m_hostname_local = host_send;
 
   m_shmflag = shmflag;
+  m_nodename = nodename;
+  m_nodeid = nodeid;
 
   B2INFO("DeSerializerPrePC: Constructor done.");
 }
@@ -66,7 +69,8 @@ int* DesSerPrePC::getPreAllocBuf()
   } else {
     char err_buf[500];
     sprintf(err_buf,
-            "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
+            "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or "
+            "memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
             m_num_usedbuf, NUM_PREALLOC_BUF);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -129,8 +133,8 @@ void DesSerPrePC::initialize()
     if (m_nodename.size() == 0 || m_nodeid < 0) {
       m_shmflag = 0;
     } else {
-//       g_status.open(m_nodename, m_nodeid);
-//       g_status.reportReady();
+      m_status.open(m_nodename, m_nodeid);
+      m_status.reportReady();
     }
   }
 
@@ -227,15 +231,15 @@ int DesSerPrePC::Connect()
 #ifdef DEBUG
     printf("[DEBUG] TCP_NODELAY %d\n", val);
 #endif
-//     if (g_status.isAvailable()) {
-//       sockaddr_in sa;
-//       memset(&sa, 0, sizeof(sockaddr_in));
-//       socklen_t sa_len = sizeof(sa);
-//       if (getsockname(m_socket_recv[i], (struct sockaddr*)&sa, (socklen_t*)&sa_len) == 0) {
-//         g_status.setInputPort(ntohs(sa.sin_port));
-//         g_status.setInputAddress(sa.sin_addr.s_addr);
-//       }
-//     }
+    if (m_status.isAvailable()) {
+      sockaddr_in sa;
+      memset(&sa, 0, sizeof(sockaddr_in));
+      socklen_t sa_len = sizeof(sa);
+      if (getsockname(m_socket_recv[i], (struct sockaddr*)&sa, (socklen_t*)&sa_len) == 0) {
+        m_status.setInputPort(ntohs(sa.sin_port));
+        m_status.setInputAddress(sa.sin_addr.s_addr);
+      }
+    }
 
   }
   printf("[DEBUG] Initialization finished\n");
@@ -609,10 +613,10 @@ void DesSerPrePC::DataAcquisition()
     // Connect to eb0: This should be here because we want Serializer first to accept connection from eb1tx
     //
     Connect();
-//     if (g_status.isAvailable()) {
-//       B2INFO("DeSerializerPrePC: Waiting for Start...\n");
-//       g_status.reportRunning();
-//     }
+    if (m_status.isAvailable()) {
+      B2INFO("DeSerializerPrePC: Waiting for Start...\n");
+      m_status.reportRunning();
+    }
     m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
@@ -773,16 +777,6 @@ void DesSerPrePC::DataAcquisition()
 #endif
     }
 
-
-
-
-
-
-//   if (g_status.isAvailable()) {
-//     g_status.setInputNBytes(m_totbytes);
-//     g_status.setInputCount(n_basf2evt);
-//   }
-
 #ifdef NONSTOP
     if (g_run_stop == 1) {
       waitRestart();
@@ -791,6 +785,11 @@ void DesSerPrePC::DataAcquisition()
 
 
     n_basf2evt++;
+    if (m_status.isAvailable()) {
+      m_status.setInputNBytes(m_totbytes);
+      m_status.setInputCount(n_basf2evt);
+    }
+
   }
 
   return;
@@ -913,11 +912,9 @@ void DesSerPrePC::event2()
     //     m_prev_nevt = n_basf2evt;
   }
   n_basf2evt++;
-  RunInfoBuffer& status(DeSerializerModule::getStatus());
-  if (status.isAvailable()) {
-    status.setOutputNBytes(m_totbytes);
-    status.addOutputCount(raw_dblkarray.getEntries());
-    //status.setOutputCount(n_basf2evt);
+  if (m_status.isAvailable()) {
+    m_status.setOutputNBytes(m_totbytes);
+    m_status.addOutputCount(raw_dblkarray.getEntries());
   }
 
 }
@@ -946,6 +943,7 @@ void DesSerPrePC::initialize2()
   m_buffer = new int[ BUF_SIZE_WORD ];
 #endif
 
+  /*
   if (m_shmflag != 0) {
     char temp_char1[100] = "/cpr_config";
     char temp_char2[100] = "/cpr_status";
@@ -955,6 +953,7 @@ void DesSerPrePC::initialize2()
     m_cfg_sta = shmGet(m_shmfd_sta, 4);
     m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
   }
+  */
 
   // Create Message Handler
 
@@ -1278,14 +1277,11 @@ void DesSerPrePC::Accept()
   //   int flag = 1;
   //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
   m_socket_send = fd_accept;
-  //  RunInfoBuffer& status(DesSerPrePC::getStatus());
-//   if (status.isAvailable()) {
-//     //status.setOutputPort(ntohs(sock_accept.sin_port));
-//     //status.setOutputAddress(sock_accept.sin_addr.s_addr);
-//     status.setOutputPort(ntohs(sock_listen.sin_port));
-//     status.setOutputAddress(sock_listen.sin_addr.s_addr);
-//     printf("%d %x\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr);
-//   }
+  if (m_status.isAvailable()) {
+    m_status.setOutputPort(ntohs(sock_listen.sin_port));
+    m_status.setOutputAddress(sock_listen.sin_addr.s_addr);
+    printf("%d %x\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr);
+  }
 
   return;
 

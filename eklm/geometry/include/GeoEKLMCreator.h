@@ -620,9 +620,6 @@ namespace Belle2 {
       /** Number of sections is one plane. */
       int nSection;
 
-      /** True if geometry data is loaded. */
-      bool haveGeoDat;
-
       /** True if geometry is constructed. */
       bool haveGeo;
 

@@ -49,9 +49,9 @@ geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 void EKLM::GeoEKLMCreator::constructor(bool geo)
 {
   SectorSupportSize.CornerAngle = -1;
-  haveGeoDat = false;
   haveGeo = false;
   m_geoDat = NULL;
+  readXMLData();
   if (geo) {
     try {
       m_geoDat = new EKLM::GeometryData;
@@ -78,17 +78,16 @@ EKLM::GeoEKLMCreator::~GeoEKLMCreator()
   int i, j;
   if (m_geoDat != NULL)
     delete m_geoDat;
-  if (haveGeoDat) {
-    for (i = 0; i < nPlane; i++) {
-      free(BoardPosition[i]);
-      free(SectionSupportPosition[i]);
-    }
-    free(StripPosition);
-    free(StripBoardPosition);
-    free(ESTRPar.z);
-    free(ESTRPar.rmin);
-    free(ESTRPar.rmax);
+  /* Free geometry data. */
+  for (i = 0; i < nPlane; i++) {
+    free(BoardPosition[i]);
+    free(SectionSupportPosition[i]);
   }
+  free(StripPosition);
+  free(StripBoardPosition);
+  free(ESTRPar.z);
+  free(ESTRPar.rmin);
+  free(ESTRPar.rmax);
   if (haveGeo) {
     for (i = 0; i < nPlane; i++) {
       for (j = 0; j < nBoard; j++)
@@ -357,15 +356,12 @@ void EKLM::GeoEKLMCreator::readXMLData()
                                                  getLength("DeltaLLeft") * CLHEP::cm;
     }
   }
-  haveGeoDat = true;
 }
 
 /****************************** TRANSFORMATIONS ******************************/
 
 void EKLM::GeoEKLMCreator::getEndcapTransform(HepGeom::Transform3D* t, int n)
 {
-  if (!haveGeoDat)
-    readXMLData();
   if (n == 0)
     *t = HepGeom::Translate3D(EndcapPosition.X, EndcapPosition.Y,
                               -EndcapPosition.Z + 94.0 * CLHEP::cm);
@@ -377,8 +373,6 @@ void EKLM::GeoEKLMCreator::getEndcapTransform(HepGeom::Transform3D* t, int n)
 
 void EKLM::GeoEKLMCreator::getLayerTransform(HepGeom::Transform3D* t, int n)
 {
-  if (!haveGeoDat)
-    readXMLData();
   *t = HepGeom::Translate3D(0.0, 0.0, EndcapPosition.length / 2.0 -
                             (n + 1) * Layer_shiftZ +
                             0.5 * LayerPosition.length);
@@ -386,8 +380,6 @@ void EKLM::GeoEKLMCreator::getLayerTransform(HepGeom::Transform3D* t, int n)
 
 void EKLM::GeoEKLMCreator::getSectorTransform(HepGeom::Transform3D* t, int n)
 {
-  if (!haveGeoDat)
-    readXMLData();
   switch (n) {
     case 0:
       *t = HepGeom::Translate3D(0., 0., 0.);
@@ -407,8 +399,6 @@ void EKLM::GeoEKLMCreator::getSectorTransform(HepGeom::Transform3D* t, int n)
 
 void EKLM::GeoEKLMCreator::getPlaneTransform(HepGeom::Transform3D* t, int n)
 {
-  if (!haveGeoDat)
-    readXMLData();
   if (n == 0)
     *t = HepGeom::Translate3D(PlanePosition.X, PlanePosition.Y,
                               PlanePosition.Z);
@@ -421,16 +411,12 @@ void EKLM::GeoEKLMCreator::getPlaneTransform(HepGeom::Transform3D* t, int n)
 
 void EKLM::GeoEKLMCreator::getStripTransform(HepGeom::Transform3D* t, int n)
 {
-  if (!haveGeoDat)
-    readXMLData();
   *t = HepGeom::Translate3D(StripPosition[n].X, StripPosition[n].Y, 0.0);
 }
 
 void EKLM::GeoEKLMCreator::getSheetTransform(HepGeom::Transform3D* t, int n)
 {
   double y;
-  if (!haveGeoDat)
-    readXMLData();
   y = StripPosition[n].Y;
   if (n % 15 == 0)
     y = y + 0.5 * PlasticSheetDeltaL;
@@ -1928,7 +1914,6 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
 {
   (void)content;
   (void)type;
-  readXMLData();
   try {
     m_sensitive[0] =
       new EKLMSensitiveDetector("EKLMSensitiveStrip",

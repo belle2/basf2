@@ -37,7 +37,8 @@ namespace Belle2 {
     /** Exception is thrown if the LHE file could not be opened. */
     BELLE2_DEFINE_EXCEPTION(LHECouldNotOpenFileError, "Could not open file %1% !");
     /** Exception is thrown if the given indices of the daughters are not valid. */
-    BELLE2_DEFINE_EXCEPTION(LHEInvalidDaughterIndicesError, "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
+    BELLE2_DEFINE_EXCEPTION(LHEInvalidDaughterIndicesError,
+                            "Line %1%: Invalid daughter indices d1=%2%, d2=%3%, N=%4% (0<=d1<=d2<=N required)");
     /** Exception is thrown if the header specifying the event header could not be parsed. */
     BELLE2_DEFINE_EXCEPTION(LHEHeaderNotValidError, "Line %1%: Event header not understood: %2%");
     /** Exception is thrown if a field in the LHE file could not be converted to a number. */
@@ -111,7 +112,8 @@ namespace Belle2 {
      * @return The number of particles for the current event.
      * @params: References to the eventID and the eventWeight which can both be read from the file.
      */
-    int readEventHeader(int& eventID, double& eventWeight) throw(LHEHeaderNotValidError);
+//     int readEventHeader(int& eventID, double& eventWeight) throw(LHEHeaderNotValidError);
+    int readEventHeader(double& eventWeight) throw(LHEHeaderNotValidError);
 
     /**
      * Reads the information for a single particle from the LHE file.

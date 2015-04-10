@@ -38,8 +38,9 @@ void LHEReader::open(const string& filename) throw(LHECouldNotOpenFileError)
 
 int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(LHEInvalidDaughterIndicesError, LHEEmptyEventError)
 {
-  int eventID = -1;
-  int nparticles = readEventHeader(eventID, eventWeight);
+//   int eventID = -1;
+//   int nparticles = readEventHeader(eventID, eventWeight);
+  int nparticles = readEventHeader(eventWeight);
   if (nparticles <= 0) {
     throw (LHEEmptyEventError() << m_lineNr << nparticles);
   }
@@ -79,16 +80,18 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(LHEIn
     if (m_nVirtual < m_nInitial) B2WARNING("IsVirtual particle requested but is overwritten by Initial");
 
   }
-  return eventID;
+//   return eventID;
+  return -1;
 }
 
 
 bool LHEReader::skipEvents(int n)
 {
-  int eventID;
+//   int eventID;
   double weight;
   for (int i = 0; i < n; i++) {
-    int nparticles = readEventHeader(eventID, weight);
+//     int nparticles = readEventHeader(eventID, weight);
+    int nparticles = readEventHeader(weight);
     if (nparticles < 0) return false;
     for (int j = 0; j < nparticles; j++) getLine();
   }
@@ -118,8 +121,10 @@ std::string LHEReader::getLine()
 }
 
 
-int LHEReader::readEventHeader(int& eventID, double& eventWeight) throw(LHEHeaderNotValidError)
+// int LHEReader::readEventHeader(int& eventID, double& eventWeight) throw(LHEHeaderNotValidError)
+int LHEReader::readEventHeader(double& eventWeight) throw(LHEHeaderNotValidError)
 {
+
   // Search for next <event>
   std::string line2;
   do {

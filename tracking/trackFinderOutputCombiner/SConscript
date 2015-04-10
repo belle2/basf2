@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework_pybasf2',
+    'simulation_dataobjects',
+    'tracking_trackFinderCDC'
+    ]
+Return('env')
+

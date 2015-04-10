@@ -23,7 +23,7 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(BackgroundHitFinder);
 
-BackgroundHitFinderModule::BackgroundHitFinderModule() : TrackFinderCDCBaseModule(), m_expert("data/tracking",
+BackgroundHitFinderModule::BackgroundHitFinderModule() : TrackFinderCDCBaseModule(), tmvaVariables(), m_expert("data/tracking",
       "BackgroundHitFinder")
 {
   setDescription("");

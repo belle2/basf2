@@ -20,6 +20,9 @@ ClassImp(Belle2::EKLMHit2d);
 
 EKLMHit2d::EKLMHit2d()
 {
+  m_digit[0] = NULL;
+  m_digit[1] = NULL;
+  m_ChiSq = -1;
 }
 
 
@@ -30,6 +33,7 @@ EKLMHit2d::EKLMHit2d(EKLMDigit* s1, EKLMDigit* s2)
   setEndcap(s1->getEndcap());
   setLayer(s1->getLayer());
   setSector(s1->getSector());
+  m_ChiSq = -1;
 }
 
 EKLMHit2d::~EKLMHit2d()

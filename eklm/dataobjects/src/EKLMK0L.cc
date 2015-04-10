@@ -17,6 +17,9 @@ ClassImp(EKLMK0L);
 
 EKLMK0L::EKLMK0L()
 {
+  m_time = -1;
+  m_layers = -1;
+  m_innermostLayer = -1;
 }
 
 EKLMK0L::~EKLMK0L()

@@ -22,8 +22,9 @@ ClassImp(Belle2::EKLMSim2Hit)
 
 EKLMSim2Hit::EKLMSim2Hit()
 {
-  setMomentum(CLHEP::HepLorentzVector(0, 0, 0, 0));
-  m_volid = 0;
+  m_volid = -1;
+  m_Plane = -1;
+  m_Strip = -1;
 }
 
 EKLMSim2Hit::EKLMSim2Hit(const EKLMSimHit* simHit)

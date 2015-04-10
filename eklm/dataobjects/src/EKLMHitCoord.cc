@@ -18,6 +18,9 @@ ClassImp(EKLMHitCoord);
 
 EKLMHitCoord::EKLMHitCoord()
 {
+  m_localX = -1;
+  m_localY = -1;
+  m_localZ = -1;
 }
 
 EKLMHitCoord::~EKLMHitCoord()

@@ -17,6 +17,10 @@ ClassImp(EKLMHitMomentum);
 
 EKLMHitMomentum::EKLMHitMomentum()
 {
+  m_e = -1;
+  m_pX = -1;
+  m_pY = -1;
+  m_pZ = -1;
 }
 
 EKLMHitMomentum::~EKLMHitMomentum()

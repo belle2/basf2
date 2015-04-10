@@ -19,15 +19,27 @@ ClassImp(Belle2::EKLMDigit);
 
 EKLMDigit::EKLMDigit()
 {
+  m_Plane = -1;
+  m_Strip = -1;
+  m_good = false;
+  m_NPE = -1;
+  m_generatedNPE = -1;
+  m_fitStatus = -1;
+  m_volid = -1;
+  m_sMCTime = -1;
 }
 
 EKLMDigit::EKLMDigit(const EKLMSim2Hit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
     m_Strip(hit->getStrip()),
-    m_NPE(-1),
     m_volid(hit->getVolumeID())
 {
+  m_good = false;
+  m_NPE = -1;
+  m_generatedNPE = -1;
+  m_fitStatus = -1;
+  m_sMCTime = -1;
 }
 
 float EKLMDigit::getNPE() const

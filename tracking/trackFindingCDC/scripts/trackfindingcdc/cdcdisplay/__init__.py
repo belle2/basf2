@@ -203,6 +203,9 @@ class CDCSVGDisplayModule(Module):
         # Name of the CDC Wire Hit Clusters
         self.cdc_wire_hit_cluster_store_obj_name = "CDCWireHitClusterVector"
 
+        # Name of the CDC Reco Segment Vector
+        self.cdc_reco_segment_vector_store_obj_name = 'CDCRecoSegment2DVector'
+
     @property
     def drawoptions(self):
         """
@@ -485,40 +488,40 @@ class CDCSVGDisplayModule(Module):
 
         if self.draw_segments_id:
             styleDict = {'stroke': attributemaps.listColors}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_mctrackid:
             styleDict = {'stroke': attributemaps.SegmentMCTrackIdColorMap()}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_fbinfo:
             styleDict = {'stroke': attributemaps.SegmentFBInfoColorMap()}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_firstInTrackId:
             styleDict = \
                 {'stroke': attributemaps.SegmentFirstInTrackIdColorMap()}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_lastInTrackId:
             styleDict = \
                 {'stroke': attributemaps.SegmentLastInTrackIdColorMap()}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_firstNPassedSuperLayers:
             styleDict = \
                 {'stroke': attributemaps.SegmentFirstNPassedSuperLayersColorMap()}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segments_lastNPassedSuperLayers:
             styleDict = \
                 {'stroke': attributemaps.SegmentLastNPassedSuperLayersColorMap()}
-            plotter.draw_storevector('CDCRecoSegment2DVector', **styleDict)
+            plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
 
         # Mimic axial to axial pair selection
         if self.draw_mcaxialaxialpairs:
             print 'Draw axial to axial segment pairs'
-            segment_storevector = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+            segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
             if segment_storevector:
                 segments = segment_storevector.obj().unwrap()
                 print '#Segment', segments.size()
@@ -550,7 +553,7 @@ class CDCSVGDisplayModule(Module):
 
         if self.draw_mcsegmenttriples:
             print 'Draw axial to axial segment pairs'
-            segment_storevector = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+            segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
             if segment_storevector:
                 segments = segment_storevector.obj().unwrap()
                 print '#Segment', segments.size()
@@ -664,7 +667,7 @@ class CDCSVGDisplayModule(Module):
         if self.draw_segment_trajectories:
             print 'Drawing the fits to the selected RecoHit2DSegments'
 
-            segment_storevector = Belle2.PyStoreObj('CDCRecoSegment2DVector')
+            segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
             if segment_storevector:
                 segments = segment_storevector.obj().unwrap()
                 print '#2D Trajectories', segments.size(), 'from segments'

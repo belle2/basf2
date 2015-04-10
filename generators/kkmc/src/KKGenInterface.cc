@@ -39,7 +39,8 @@ KKGenInterface::KKGenInterface()
   myevtpdl = new EvtPDL();
 }
 
-int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName)
+int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName,
+                          const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName)
 {
   B2INFO("Begin initialisation of KKGen Interface.");
 
@@ -275,8 +276,19 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   } else if (hepevt_.isthep[index - 1] == 1) {
     gParticle->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
   }
+
+  // set photon flags (for now: set ISR and FSR (CEEX is undefined by definition, unsure about IFI))
+  // PHOTOS could be called by TAUOLA, not sure what to do about that
+  if (hepevt_.idhep[index - 1] == 22) {
+    if (hepevt_.jmohep[index - 1][0] == 1) {
+      gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsISRPhoton);
+      gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
+    }
+  }
+
   return;
 }
+
 bool KKGenInterface::getPythiaCharge(int kf, double& c)
 {
   // Get charge of asked particle from PYTHIA /PYDAT2/ common block

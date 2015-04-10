@@ -5446,6 +5446,7 @@ void TFRedesignModule::InitializeInConstructor()
   m_rootFilePtr = NULL;
   m_treeTrackWisePtr = NULL;
   m_treeEventWisePtr = NULL;
+  m_treeHitWisePtr = NULL;
   m_rootTimeConsumption = -1;
   m_rootPvalues = -1;
   m_rootChi2 = -1;

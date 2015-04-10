@@ -61,6 +61,7 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
       m_clustersAssigned( {false, false}),
+                        m_vxdID(0),
                         m_qualityIndicator(0.5),
     m_isAssigned(false) {}
 
@@ -125,6 +126,31 @@ namespace Belle2 {
       return !(*this == b);
     }
 
+
+    /** Comparison if SpacePoints share Clusters.
+    *
+    * no real operator but comparable.
+    * If given SP shares at least one cluster with this one, this function returns true.
+    * WARNING: Since original pointers are not stored and a relation to them can not be guaranteed, normalized local coordintes will be compared.
+    * That should work for slanted parts too, since normalized coordinates are invariant for such comparisons.
+    * */
+    inline bool shareClusters(const SpacePoint& b) const
+    {
+      return (
+               this->getVxdID() == b.getVxdID() and
+               (this->getNormalizedLocalU() == b.getNormalizedLocalU() or
+                this->getNormalizedLocalV() == b.getNormalizedLocalV())
+             );
+    }
+
+    /** Comparison if SpacePoints share Clusters.
+     *
+     * same as inline bool shareClusters (const SpacePoint& b) const
+     * */
+    inline bool shareClusters(const SpacePoint* b) const
+    {
+      return shareClusters(*b);
+    }
 
 // getter:
 

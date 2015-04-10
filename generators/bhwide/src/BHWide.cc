@@ -67,6 +67,9 @@ BHWide::BHWide()
     m_xpar[i] = 0.0;
   }
 
+  m_crossSection = 0.;
+  m_crossSectionError = 0.;
+
   setDefaultSettings();
 }
 
@@ -156,7 +159,8 @@ void BHWide::applySettings()
   // Integer parameters
   //--------------------
   int keyZof;
-  if (m_zContribution) keyZof = 0; else keyZof = 1;
+  if (m_zContribution) keyZof = 0;
+  else keyZof = 1;
   m_npar[0] = (1000 * keyZof) + (100 * m_channel) + (10 * m_weighted) + m_randomGenerator;
   m_npar[1] = (1000 * m_weakCorrections) + (100 * m_ewCorrectionLib) + (10 * m_hardBremsModel) + m_photonVacPol;
 

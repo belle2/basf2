@@ -158,7 +158,7 @@ def peel_fit_result(fit_result, key="{part_name}"):
     return fit_crops
 
 
-@format_crop_keys
+# @format_crop_keys
 def get_helix_from_mc_particle(mc_particle, key="{part_name}"):
     position = mc_particle.getVertex()
     momentum = mc_particle.getMomentum()
@@ -169,7 +169,7 @@ def get_helix_from_mc_particle(mc_particle, key="{part_name}"):
     return seed_helix
 
 
-@format_crop_keys
+# @format_crop_keys
 def get_seed_track_fit_result(track_cand, key="{part_name}"):
     position = track_cand.getPosSeed()
     momentum = track_cand.getMomSeed()

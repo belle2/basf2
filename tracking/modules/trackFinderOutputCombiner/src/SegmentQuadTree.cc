@@ -13,8 +13,7 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(SegmentQuadTree);
 
-SegmentQuadTreeModule::SegmentQuadTreeModule() : TrackFinderCDCFromSegmentsModule(), m_quadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0,
-      nullptr)
+SegmentQuadTreeModule::SegmentQuadTreeModule() : TrackFinderCDCFromSegmentsModule()
 {
   addParam("Level", m_param_level, "Maximum Level for QuadTreeSearch.", static_cast<unsigned int>(10));
   addParam("MinimumItems", m_param_minimumItems, "Minimum number of hits in one QuadTreeCell.", static_cast<unsigned int>(10));
@@ -23,13 +22,13 @@ SegmentQuadTreeModule::SegmentQuadTreeModule() : TrackFinderCDCFromSegmentsModul
 void SegmentQuadTreeModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks)
 {
   quadTreeSearch(segments, tracks);
-
-  printDebugInformation();
 }
 
 void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& tracks)
 {
-  QuadTreeProcessorSegments qtProcessor(m_param_level);
+  QuadTreeProcessorSegments::ChildRanges ranges(QuadTreeProcessorSegments::rangeX(0, m_nbinsTheta),
+                                                QuadTreeProcessorSegments::rangeY(m_rMin, m_rMax));
+  QuadTreeProcessorSegments qtProcessor(m_param_level, ranges);
 
   std::vector<CDCRecoSegment2D*> hits_set;
 
@@ -39,13 +38,13 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
     }
   }
 
-  qtProcessor.provideItemsSet(m_quadTree, hits_set);
+  qtProcessor.provideItemsSet(hits_set);
 
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
 
-  SegmentQuadTree::CandidateProcessorLambda lmdCandidateProcessing = [&](SegmentQuadTree * qt) -> void {
+  QuadTreeProcessorSegments::CandidateProcessorLambda lmdCandidateProcessing = [&](SegmentQuadTree * qt) -> void {
     B2DEBUG(90, "Found track with " << qt->getNItems() << " on level " << static_cast<unsigned int>(qt->getLevel()))
     tracks.emplace_back();
     CDCTrack& foundTrack = tracks.back();
@@ -79,9 +78,9 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
     }
   };
 
-  qtProcessor.fillGivenTree(m_quadTree, lmdCandidateProcessing, m_param_minimumItems);
+  qtProcessor.fillGivenTree(lmdCandidateProcessing, m_param_minimumItems);
 
-  qtProcessor.clear(m_quadTree);
+  B2DEBUG(90, "Found " << tracks.size() << " tracks")
 }
 
 void SegmentQuadTreeModule::printQuadTree(SegmentQuadTree* node)
@@ -107,9 +106,4 @@ void SegmentQuadTreeModule::printQuadTree(SegmentQuadTree* node)
     printQuadTree(children->get(1, 1));
   }
 
-}
-
-void SegmentQuadTreeModule::printDebugInformation()
-{
-  printQuadTree(&m_quadTree);
 }

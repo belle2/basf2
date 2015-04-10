@@ -219,6 +219,8 @@ namespace Belle2 {
       template<class processor>
       void cleanUpItems(processor const& proc)
       {
+        B2ASSERT("Deleting items on a the top level will lead to memory leaks! If you want to safely delete all items, use the methods provided by the processor.",
+                 m_level != 0)
         proc.cleanUpItems(m_items);
       } ;
 
@@ -259,7 +261,7 @@ namespace Belle2 {
       inline typeY getYBin(int bin) const { return static_cast<typeY>(m_yBins[bin]); };
 
       /** Return pointer to the parent of the node */
-      inline QuadTreeTemplate<typeX, typeY, typeData>* getParent() const {return m_parent;};
+      inline ThisType* getParent() const {return m_parent;};
 
       /** Clear hits which the node holds */
       void clearNode() {m_items.clear(); };
@@ -291,7 +293,7 @@ namespace Belle2 {
       }
 
       /** apply a lambda expression to all children of this tree node */
-      void applyToChildren(std::function<void(QuadTreeTemplate<typeX, typeY, typeData>*)> lmd)
+      void applyToChildren(std::function<void(ThisType*)> lmd)
       {
         if (!m_children)
           return;
@@ -315,8 +317,6 @@ namespace Belle2 {
 
     // a special instance
     typedef TrackFindingCDC::QuadTreeTemplate<int, float, TrackHit> QuadTreeLegendre;    // another special instance
-    template <class typeData> class QuadTreeItem;
-    typedef TrackFindingCDC::QuadTreeTemplate<int, float, QuadTreeItem<TrackHit>> QuadTreeLegendreTemp;
 
   }
 }

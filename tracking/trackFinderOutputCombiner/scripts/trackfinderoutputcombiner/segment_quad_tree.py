@@ -127,7 +127,7 @@ class SegmentQuadTreeRun(MCTrackFinderRun):
     display_module_segments.draw_gftrackcand_trajectories = False
     display_module_segments.draw_gftrackcands = True
     display_module_segments.track_cands_store_array_name = "TrackCands"
-    display_module_segments.draw_segments_mctrackid = True
+    display_module_segments.draw_segments_mctrackid = False
 
     plotter_module = SegmentQuadTreePlotter()
     plotter_module.plot_conformal = False
@@ -136,19 +136,18 @@ class SegmentQuadTreeRun(MCTrackFinderRun):
         main_path = super(SegmentQuadTreeRun, self).create_path()
 
         segment_finder = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
-        segment_finder.param("SegmentOrientation", "none")
         main_path.add_module(segment_finder)
 
         segment_quad_tree = basf2.register_module("SegmentQuadTree")
         segment_quad_tree.param({
             "Level": 10,
-            "MinimumItems": 8,
+            "MinimumItems": 10,
         })
         segment_quad_tree.set_log_level(basf2.LogLevel.DEBUG)
         segment_quad_tree.set_debug_level(90)
         main_path.add_module(segment_quad_tree)
 
-        main_path.add_module(self.plotter_module)
+        # main_path.add_module(self.plotter_module)
         # main_path.add_module(self.display_module_segments)
 
         return main_path

@@ -25,7 +25,7 @@ namespace Belle2 {
 
     public:
 
-      HitQuadTreeProcessor(unsigned int lastLevel) : QuadTreeProcessorTemplate(lastLevel) { }
+      using QuadTreeProcessorTemplate::QuadTreeProcessorTemplate;
 
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
@@ -109,7 +109,7 @@ namespace Belle2 {
 
     public:
 
-      QuadTreeProcessorSegments(unsigned int lastLevel) : QuadTreeProcessorTemplate(lastLevel) { }
+      using QuadTreeProcessorTemplate::QuadTreeProcessorTemplate;
 
       bool insertItemInNode(QuadTree* node, CDCRecoSegment2D* segment, unsigned int /*t_index*/, unsigned int /*r_index*/) const override
       {
@@ -118,16 +118,28 @@ namespace Belle2 {
 
         TrigonometricalLookupTable& lookupTable = TrigonometricalLookupTable::Instance();
 
-        int thetaMin = node->getXMin();
-        int thetaMax = node->getXMax();
+        //float bin_width = TMath::Pi() / lookupTable.getNBinsTheta();
+
+        int thetaIndexMin = node->getXMin();
+        int thetaIndexMax = node->getXMax();
         float rMin = node->getYMin();
         float rMax = node->getYMax();
 
-        Vector2D trigonometryMin(lookupTable.cosTheta(thetaMin), lookupTable.sinTheta(thetaMin));
-        Vector2D trigonometryMax(lookupTable.cosTheta(thetaMax), lookupTable.sinTheta(thetaMax));
+        //float thetaMin = thetaIndexMin * bin_width;
+        //float thetaMax = thetaIndexMax * bin_width;
 
         Vector2D conformalTransformFront = segment->front().getRecoPos2D().conformalTransformed();
         Vector2D conformalTransformBack = segment->back().getRecoPos2D().conformalTransformed();
+
+        //double thetaIntersection = std::atan2((conformalTransformBack - conformalTransformFront).x(), (conformalTransformFront - conformalTransformBack).y());
+
+        /*if(thetaIntersection < thetaMin or thetaIntersection > thetaMax) {
+          return false;
+        }*/
+
+        Vector2D trigonometryMin(lookupTable.cosTheta(thetaIndexMin), lookupTable.sinTheta(thetaIndexMin));
+        Vector2D trigonometryMax(lookupTable.cosTheta(thetaIndexMax), lookupTable.sinTheta(thetaIndexMax));
+
 
         float rHitFrontMin = conformalTransformFront.dot(trigonometryMin);
         float rHitFrontMax = conformalTransformFront.dot(trigonometryMax);

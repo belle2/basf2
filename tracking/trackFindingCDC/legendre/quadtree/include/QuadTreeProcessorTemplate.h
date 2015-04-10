@@ -43,12 +43,18 @@ namespace Belle2 {
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.
        * @param lastLevel describing the last search level for the quad tree creation.
        */
-      QuadTreeProcessorTemplate(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
+      QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges) : m_lastLevel(lastLevel)
+      {
+        createQuadTree(ranges);
+      }
 
       /**
-       * Destructor is empty.
+       * Destructor deletes the quad tree.
        */
-      virtual ~QuadTreeProcessorTemplate() {}
+      virtual ~QuadTreeProcessorTemplate()
+      {
+        clear();
+      }
 
     protected:
       /**
@@ -74,47 +80,33 @@ namespace Belle2 {
     public:
       /**
        * Start filling the already created tree.
-       * @param tree the tree to fill
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        * @param rThreshold the threshold in the y variable
        */
-      virtual void fillGivenTree(QuadTree& tree, CandidateProcessorLambda& lmdProcessor,
+      virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                                  unsigned int nHitsThreshold, typeY rThreshold) const final
       {
-        fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, rThreshold, true);
       }
 
       /**
        * Start filling the already created tree.
-       * @param tree the tree to fill
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        */
-      virtual void fillGivenTree(QuadTree& tree, CandidateProcessorLambda& lmdProcessor,
+      virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                                  unsigned int nHitsThreshold) const final
       {
-        fillGivenTree(&tree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
       }
 
-      virtual void provideItemsSet(QuadTree& tree, std::vector<typeData*>& itemsVector)
-      {
-        std::vector<ItemType*>& quadtreeItemsVector = tree.getItemsVector();
-        for (typeData* item : itemsVector) {
+      virtual void provideItemsSet(std::vector<typeData*>& itemsVector) final {
+        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
+        for (typeData* item : itemsVector)
+        {
           quadtreeItemsVector.push_back(new ItemType(item));
         }
-      }
-
-      /**
-       * Delete all the QuadTreeItems in the tree and clear the tree.
-       */
-      virtual void clear(QuadTree& tree)
-      {
-        const std::vector<ItemType*>& quadtreeItemsVector = tree.getItemsVector();
-        for (ItemType* item : quadtreeItemsVector) {
-          delete item;
-        }
-        tree.clearTree();
       }
 
     protected:
@@ -127,10 +119,33 @@ namespace Belle2 {
       }
 
     private:
+      /**
+       * Delete all the QuadTreeItems in the tree and clear the tree.
+       */
+      virtual void clear()
+      {
+        const std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
+        for (ItemType* item : quadtreeItemsVector) {
+          delete item;
+        }
+        m_quadTree->clearTree();
+      }
+
+      /**
+       * Create a quad tree with the given parameters ranges.
+       */
+      virtual void createQuadTree(const ChildRanges& ranges) final {
+        const rangeX& x = ranges.first;
+        const rangeY& y = ranges.second;
+        m_quadTree.reset(new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr));
+      }
+
       virtual void cleanUpItems(std::vector<ItemType*>& items) const final
       {
         items.erase(std::remove_if(items.begin(), items.end(),
-        [&](ItemType * hit) {return hit->isUsed();}),
+        [&](ItemType * hit) {
+          return hit->isUsed();
+        }),
         items.end());
       };
 
@@ -241,8 +256,8 @@ namespace Belle2 {
         [&](ItemType * item) {return not item->isUsed();});
       };
 
-    private:
       unsigned int m_lastLevel; /**< The last level to be filled */
+      std::unique_ptr<QuadTree> m_quadTree;
     };
   }
 }

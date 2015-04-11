@@ -96,10 +96,19 @@ KKGenInputModule::KKGenInputModule() : Module()
 
   //Parameter definition
   addParam("KKdefaultFile", m_KKdefaultFileName, "default KKMC setting filename", default_KKdefaultFileName);
-  addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu-pairs generation setting", default_tauinputFileName);
+  addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu/q-pairs generation setting", default_tauinputFileName);
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
   addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", default_KKMCOutputFileName);
+
+  //Initialize member variables
+  m_ELER           = 0.0;
+  m_EHER           = 0.0;
+  m_LER_Espread    = 0.0;
+  m_HER_Espread    = 0.0;
+  m_crossing_angle = 0.0;
+  m_angle          = 0.0;
+
 }
 
 

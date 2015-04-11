@@ -55,6 +55,18 @@ EvtGenInputModule::EvtGenInputModule() : Module()
   addParam("maxTries", m_maxTries, "Number of tries to generate a parent "
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
+
+  //initialize member variables
+  m_ELER           = 0.0;
+  m_EHER           = 0.0;
+  m_LER_Espread    = 0.0;
+  m_HER_Espread    = 0.0;
+  m_angleLerToB    = 0.0;
+  m_angleHerToB    = 0.0;
+  m_crossing_angle = 0.0;
+  m_angle          = 0.0;
+
+
 }
 
 

@@ -22,6 +22,7 @@ namespace Belle2 {
     /** Implements loading of XML data from a SQL database. */
     class Reader_DB {
     public:
+      /** Initialize the reader. */
       Reader_DB();
 
       /** Load the latest revision of a file from the database.
@@ -61,6 +62,7 @@ namespace Belle2 {
       Tree* work_tree_;
 
       typedef std::map<int64_t, ::xmlNodePtr> id_to_node_map_t;
+      /** Map from database id to node in memory. */
       id_to_node_map_t id_to_node_map_;
 
       /** Retrieve a document from the database. */

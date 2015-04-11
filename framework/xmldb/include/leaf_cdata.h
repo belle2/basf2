@@ -44,6 +44,7 @@ namespace Belle2 {
       bool load();
 
     protected:
+      /** Magic constant to represent invalid CDATA ids. */
       static const int32_t cdata_id_invalid = -1;
 
       int32_t cdata_id_; /**< Id of the cdata in the database. */

@@ -11,6 +11,7 @@ namespace Belle2 {
     /** A leaf node containing an text value. */
     class LeafString : public Leaf {
     public:
+      /** Construct the leaf from the associated XML node and tree. */
       explicit LeafString(::xmlNodePtr _xmlnode, const Tree* _owner);
 
       /** Returns the data type, String.

@@ -8,6 +8,8 @@ namespace Belle2 {
     /** A leaf node containing a floating point datum. */
     class LeafDouble : public Leaf {
     public:
+      /** Construct the leaf from the associated XML node, tree, and parsed
+       *  numeric value. */
       LeafDouble(::xmlNodePtr _xmlnode, const Tree* _owner,
                  ConfigDouble _value);
 

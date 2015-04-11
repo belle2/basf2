@@ -44,6 +44,7 @@ namespace Belle2 {
       Node* const node_;
     }; // class Value
 
+    /** Assign a new value to the variable. */
     template<> ConfigDouble Value<ConfigDouble>::operator=(const ConfigDouble& _newValue)
     throw (std::logic_error)
     {
@@ -53,6 +54,7 @@ namespace Belle2 {
       return _newValue;
     } // Value<ConfigDouble>::operator=
 
+    /** Get the variable's current value. */
     template<> ConfigDouble Value<ConfigDouble>::operator()() throw (std::logic_error)
     {
       if (!node_->isLeaf() || static_cast<Leaf*>(node_)->type() != Leaf::DataType::Double)
@@ -62,6 +64,7 @@ namespace Belle2 {
 
     // TOCO: const & ??
 
+    /** Assign a new value to the variable. */
     template<> ConfigInt Value<ConfigInt>::operator=(const ConfigInt& _newValue)
     throw (std::logic_error)
     {
@@ -71,6 +74,7 @@ namespace Belle2 {
       return _newValue;
     } // Value<ConfigInt>::operator=
 
+    /** Get the variable's current value. */
     template<> ConfigInt Value<ConfigInt>::operator()() throw (std::logic_error)
     {
       if (!node_->isLeaf() || static_cast<Leaf*>(node_)->type() != Leaf::DataType::Int)
@@ -78,6 +82,7 @@ namespace Belle2 {
       return static_cast<LeafInt*>(node_)->value();
     } // Value<ConfigInt>::operator()
 
+    /** Assign a new value to the variable. */
     template<> std::string Value<std::string>::operator=(const std::string& _newValue)
     throw (std::logic_error)
     {
@@ -87,6 +92,7 @@ namespace Belle2 {
       return _newValue;
     } // Value<ConfigInt>::operator=
 
+    /** Get the variable's current value. */
     template<> std::string Value<std::string>::operator()() throw (std::logic_error)
     {
       if (!node_->isLeaf() || static_cast<Leaf*>(node_)->type() != Leaf::DataType::String)

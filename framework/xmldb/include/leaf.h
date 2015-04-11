@@ -16,6 +16,7 @@ namespace Belle2 {
         Int, String, Double, Cdata
       };
 
+      /** Construct the leaf from the associated XML node and tree. */
       explicit Leaf(::xmlNodePtr _xmlnode, const Tree* _owner);
 
       /** Get the data type stored in the node. */

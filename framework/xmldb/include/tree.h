@@ -20,24 +20,24 @@ namespace Belle2 {
 
       /** Metadata of a file stored in the database. */
       struct File {
-        int32_t id;
-        std::string name;
+        int32_t id; /**< Database id. */
+        std::string name; /**< File name. */
       };
 
       /** Metadata of a branch stored in the database. */
       struct Branch {
-        int64_t id;
-        std::string name;
-        File file;
+        int64_t id; /**< Database id. */
+        std::string name; /**< Branch name. */
+        File file; /**< File this branch belongs to. */
       };
 
       /** Metadata of a commit to the database. */
       struct Commit {
-        std::string comment;
-        timeval creation_date;
-        int64_t id;
-        int64_t predecessor;
-        Branch branch;
+        std::string comment; /**< Free-form commit message. */
+        timeval creation_date; /**< Time the entry was saved. */
+        int64_t id; /**< Database id. */
+        int64_t predecessor; /**< Id of the commit's predecessor. */
+        Branch branch; /**< Branch the commit belongs to. */
       };
 
       /** A List of commits. */

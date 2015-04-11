@@ -9,6 +9,8 @@ namespace Belle2 {
     /** A leaf node containing an integer datum. */
     class LeafInt : public Leaf {
     public:
+      /** Construct the leaf from the associated XML node, tree, and parsed
+       *  numeric value. */
       LeafInt(::xmlNodePtr _xmlnode, const Tree* _owner, ConfigInt _value);
 
       /** Returns the data type, Int.

@@ -20,7 +20,9 @@ namespace Belle2 {
     /** Annotations for a libxml2 node. */
     class Node {
     public:
+      /** Construct the node from the associated XML node and tree. */
       explicit Node(::xmlNodePtr _xmlnode, const Tree* _owner);
+      /** Release resources held by the node. */
       virtual ~Node();
 
       /** @return A text representation of the attributes of the XML node. */

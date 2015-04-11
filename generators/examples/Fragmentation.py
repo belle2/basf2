@@ -19,9 +19,12 @@ eventinfosetter.param('evtNumList', [10])  # we want to process 100 events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
 
-# add root input module
-rootinput = register_module('RootInput')
-rootinput.param('inputFileName', './madgraph_born_uu.root')
+# use KKMC generated uubar pair as input
+kkgeninput = register_module('KKGenInput')
+kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/uubar_nohadronization.input.dat'))
+kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
+kkgeninput.param('taudecaytableFile', '')
+kkgeninput.param('kkmcoutputfilename', 'testoutput.txt')
 
 # get the gearbox
 gearbox = register_module('Gearbox')
@@ -47,7 +50,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
-main.add_module(rootinput)
+main.add_module(kkgeninput)
 main.add_module(fragmentation)
 main.add_module(rootoutput)
 main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)

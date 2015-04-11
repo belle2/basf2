@@ -38,20 +38,27 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
   setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with Babayaga.NLO.");
 
   //Parameter definition
-  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner, default) or hmnt (Teubner)", std::string("hadr5"));
+  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner, default) or hmnt (Teubner)",
+           std::string("hadr5"));
   addParam("Model", m_model, "Model: exp (default) or ps", std::string("exp"));
   addParam("FinalState", m_finalState, "Final state: ee (default), mm (not recommended) or gg", std::string("ee"));
-  addParam("MinEnergyFrac", m_eMinFrac, "Fractional minimum energy for leptons (ee mode) or photons (gg mode) in the final state [fraction of ECMS]", -1.0);
+  addParam("MinEnergyFrac", m_eMinFrac,
+           "Fractional minimum energy for leptons (ee mode) or photons (gg mode) in the final state [fraction of ECMS]", -1.0);
   addParam("MinEnergy", m_eMin, "Minimum energy for leptons (ee mode) or photons (gg mode) in the final state [GeV]", 0.150);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator [fraction of ECMS/2]", 5.e-4);
-  addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]", 180.0);
+  addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]",
+           180.0);
   addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV] (default: take from xml)", 0.0);
   addParam("FMax", m_fMax, "Maximum of differential cross section weight (fmax)", 50000.);
   addParam("SearchMax", m_nSearchMax, "Number of events used to search for maximum of differential cross section", 500000);
   addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 1);
-  addParam("ScatteringAngleRange", m_ScatteringAngleRange, "Min [0] and Max [1] value for the scattering angle [deg].", make_vector(15.0, 165.0));
+  addParam("ScatteringAngleRange", m_ScatteringAngleRange, "Min [0] and Max [1] value for the scattering angle [deg].",
+           make_vector(15.0, 165.0));
   addParam("ExtraFile", m_fileNameExtraInfo, "ROOT file that contains additional information.", std::string(""));
 
+  //initialize member variables
+  m_fileExtraInfo = 0;
+  m_th1dSDif = 0;
 }
 
 
@@ -96,7 +103,8 @@ void BabayagaNLOInputModule::initialize()
 
       double pzP = sqrt(positronBeamEnergy * positronBeamEnergy - 0.000510998918 * 0.000510998918);
       double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
-      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
+      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP,
+                                 electronBeamEnergy + positronBeamEnergy);
       m_generator.setBoost(boostVector.BoostVector());
 
       //get CMS energy

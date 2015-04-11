@@ -58,6 +58,14 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string("../modules/fragmentation/data/ccbar.dec"));
+
+  //initialize member variables
+  PythiaEvent = 0;
+  evtgen      = 0;
+  nAdded      = 0;
+  nQuarks     = 0;
+  nVpho       = 0;
+
 }
 
 

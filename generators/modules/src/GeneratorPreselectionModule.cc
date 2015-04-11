@@ -45,6 +45,12 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   addParam("MinPhotonEnergy", m_MinPhotonEnergy, "minimum photon energy [GeV]", -1.);
   addParam("MinPhotonTheta", m_MinPhotonTheta, "minimum polar angle of photon [deg]", 15.);
   addParam("MaxPhotonTheta", m_MaxPhotonTheta, "maximum polar angle of photon [deg]", 165.);
+
+  //initialize all member variables
+  m_onlyPrimaries = false;
+  m_maxLevel = -1;
+  m_nCharged = 0;
+  m_nPhoton = 0;
 }
 
 GeneratorPreselectionModule::~GeneratorPreselectionModule()
@@ -136,14 +142,15 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
   }
 
   if (abs(mc.getCharge()) > 0.) {
-    B2DEBUG(250, "pt = " << p.Pt() << " p=" << mom << " theta=" << theta << " thetamin=" << m_MinChargedTheta << " thetamax=" << m_MaxChargedTheta);
+    B2DEBUG(250, "pt = " << p.Pt() << " p=" << mom << " theta=" << theta << " thetamin=" << m_MinChargedTheta << " thetamax=" <<
+            m_MaxChargedTheta);
     if (mom >= m_MinChargedP && p.Pt() >= m_MinChargedPt && theta >= m_MinChargedTheta && theta <= m_MaxChargedTheta) {
       m_nCharged++;
     }
   }
 
   const vector<MCParticle*> daughters = mc.getDaughters();
-  for (MCParticle * daughter : daughters) {
+  for (MCParticle* daughter : daughters) {
     checkParticle(*daughter, level);
   }
   m_seen[mc.getIndex()] = true;

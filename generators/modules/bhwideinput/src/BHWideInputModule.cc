@@ -39,14 +39,23 @@ BHWideInputModule::BHWideInputModule() : Module()
 
   //Parameter definition
   addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 1);
-  addParam("ScatteringAngleRangePositron", m_ScatteringAngleRangePositron, "Min [0] and Max [1] value for the scattering angle [deg] of the positron.", make_vector(15.0, 165.0));
-  addParam("ScatteringAngleRangeElectron", m_ScatteringAngleRangeElectron, "Min [0] and Max [1] value for the scattering angle [deg] of the electron.", make_vector(15.0, 165.0));
+  addParam("ScatteringAngleRangePositron", m_ScatteringAngleRangePositron,
+           "Min [0] and Max [1] value for the scattering angle [deg] of the positron.", make_vector(15.0, 165.0));
+  addParam("ScatteringAngleRangeElectron", m_ScatteringAngleRangeElectron,
+           "Min [0] and Max [1] value for the scattering angle [deg] of the electron.", make_vector(15.0, 165.0));
 
-  addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]", 180.0);
+  addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]",
+           180.0);
   addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV] (default: take from xml)", 0.0);
   addParam("MinEnergy", m_eMin, "Minimum energy for electrons in the final state [GeV] (default: 0.2 GeV)", 0.2);
-  addParam("VacuumPolarization", m_vacPolString, "Vacuum polarization: off (off), Burkhardt89 (bhlumi), Eidelman/Jegerlehner95 (eidelman) or Burkhardt/Pietrzyk95 (burkhardt)", std::string("burkhardt"));
+  addParam("VacuumPolarization", m_vacPolString,
+           "Vacuum polarization: off (off), Burkhardt89 (bhlumi), Eidelman/Jegerlehner95 (eidelman) or Burkhardt/Pietrzyk95 (burkhardt)",
+           std::string("burkhardt"));
   addParam("WtMax", m_wtMax, "Maximum of weight (wtmax, default: 3.0), if <0: internal maximum search", 3.);
+
+  //initialize member variables
+  m_vacPol = BHWide::PhotonVacPolarization::PP_BURKHARDT;
+
 }
 
 
@@ -83,7 +92,8 @@ void BHWideInputModule::initialize()
 
       double pzP = sqrt(positronBeamEnergy * positronBeamEnergy - 0.000510998918 * 0.000510998918);
       double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
-      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
+      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP,
+                                 electronBeamEnergy + positronBeamEnergy);
       m_generator.setBoost(boostVector.BoostVector());
 
       //get CMS energy
@@ -158,5 +168,6 @@ void BHWideInputModule::terminate()
 {
   m_generator.term();
 
-  B2INFO(">>> Total cross section: " << m_generator.getCrossSection() * 0.001 << " nb +- " << m_generator.getCrossSection() * m_generator.getCrossSectionError() * 0.001 << " nb")
+  B2INFO(">>> Total cross section: " << m_generator.getCrossSection() * 0.001 << " nb +- " << m_generator.getCrossSection() *
+         m_generator.getCrossSectionError() * 0.001 << " nb")
 }

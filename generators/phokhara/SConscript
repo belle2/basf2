@@ -1,0 +1,8 @@
+import os
+
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['libeemmgisr', 'libeemmgisrfsr', 'libeemmg5', 'libqcdloop1', 'libpjfry', 'gfortran']
+
+Return('env')

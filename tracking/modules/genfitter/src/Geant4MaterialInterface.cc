@@ -140,7 +140,11 @@ Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
   G4ThreeVector pos(posX * CLHEP::cm, posY * CLHEP::cm, posZ * CLHEP::cm);
   G4ThreeVector dir(dirX, dirY, dirZ);
   const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir, false, false);
-  assert(newVolume);
+  if (!newVolume) {
+    genfit::Exception exc("Geant4MaterialInterface: newVolume == 0", __LINE__, __FILE__);
+    exc.setFatal();
+    throw exc;
+  }
 
   bool volChanged = newVolume != currentVolume_;
   currentVolume_ = newVolume;

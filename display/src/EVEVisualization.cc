@@ -1232,8 +1232,9 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
   const float phi = cluster->getPhi();
   float dPhi = cluster->getErrorPhi();
   float dTheta = cluster->getErrorTheta();
-  if (dPhi == 1.0 and dTheta == 1.0 and cluster->getErrorEnergy() == 1.0) {
-    B2WARNING("Found ECL cluster with unit matrix instead of proper errors. Using 0.05 as error in phi/theta");
+  if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getErrorEnergy() == 1.0) {
+    B2WARNING("Found ECL cluster with broken errors (unit matrix or too large). Using 0.05 as error in phi/theta. The 3x3 error matrix previously was:");
+    cluster->getError3x3().Print();
     dPhi = dTheta = 0.05;
   }
 

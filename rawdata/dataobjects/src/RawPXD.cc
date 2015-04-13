@@ -42,7 +42,7 @@ RawPXD::RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <uns
   // Now create header from payload , this can be done with less loops, but speed is not the issue here
   int nr_frames = header.size();
   int payload_size = 0; // in 32 bit words
-  for (auto & it : header) {
+  for (auto& it : header) {
     payload_size += (it + 3) / 4; // in 32 bit word, rounded up
   }
 
@@ -57,12 +57,12 @@ RawPXD::RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <uns
   m_buffer[offset++] = 0xCAFEBABE;
   m_buffer[offset++] = endian_swap(nr_frames);
   // and now append the frame length table
-  for (auto & it : payload) {
+  for (auto& it : payload) {
     m_buffer[offset++] = endian_swap(it.size()); // in chars, rounded up to 32 bit boundary
   }
   // and now append the actual paylaod data
   unsigned char* data = (unsigned char*) &m_buffer[offset];
-  for (auto & it : payload) {
+  for (auto& it : payload) {
     memcpy(data, it.data(), it.size());
     data += (it.size() + 3) & 0xFFFFFFFC; // in chars, rounded up to 32 bit boundary
   }

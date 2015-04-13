@@ -101,7 +101,9 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
   if (!CheckCOPPERMagic(n)) {
     char err_buf[500];
     PrintData(m_buffer, m_nwords);
-    sprintf(err_buf, "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    sprintf(err_buf,
+            "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf;
     throw (err_str);
@@ -225,7 +227,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   *cur_evenum_rawcprhdr = GetEveNo(n);
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
-    sprintf(err_buf, "CORRUPTED DATA: Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
             *cur_evenum_rawcprhdr, evenum_feehdr,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -286,7 +289,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   // Check checksum calculated by COPPER driver
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
-    sprintf(err_buf, "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
             n,
             GetBlockNwords(n),
             *cur_evenum_rawcprhdr,
@@ -303,7 +307,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
-    sprintf(err_buf, "CORRUPTED DATA: PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -530,7 +535,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   // Fill Exp/Run value
   //
-  int* finesse_buf = &(m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
+  int* finesse_buf = &
+                     (m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
   m_buffer[ tmp_header.POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
 
 
@@ -661,7 +667,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
     ) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
+      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",
+              cur_ftsw_eve32, prev_eve32,
               prev_runsubrun_no, *cur_runsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] [ERROR] %s\n", err_buf);
@@ -895,7 +902,8 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
       if (finesse_nwords - SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
           - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER < 0) {
         char err_buf[500];
-        sprintf(err_buf, "[ERROR] Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
+        sprintf(err_buf,
+                "[ERROR] Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
                 finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -1059,7 +1067,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     fflush(stdout);
 
     char err_buf[500];
-    sprintf(err_buf, "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+    sprintf(err_buf,
+            "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
             (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -1132,7 +1141,8 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
 
   packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
   if (nwords[ 2 ] > 0) {
-    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER +
+                                                       SIZE_B2LHSLB_TRAILER;
   }
   poswords_to += tmp_header.GetHdrNwords();
 
@@ -1172,7 +1182,8 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     packed_buf[ poswords_to + POS_TT_CTIME_TYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;
     packed_buf[ poswords_to + POS_TT_TAG ] = rawcpr_info.eve_num;
     packed_buf[ poswords_to + POS_TT_UTIME ] = rawcpr_info.tt_utime;
-    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << 22) | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
+    packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << 22) | (rawcpr_info.run_subrun_num &
+                                              0x003FFFFF);   // exp. and run #
     packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
     poswords_to += SIZE_B2LFEE_HEADER;
 

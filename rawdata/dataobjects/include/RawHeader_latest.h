@@ -115,6 +115,9 @@ namespace Belle2 {
     //! Get Detected Error bitflag
     unsigned int GetErrorBitFlag();
 
+    //! Add Detected Error bitflag
+    void AddErrorBitFlag(unsigned int error_bit_flag);
+
     int GetOffset1stFINESSE();  //! get contents of header
 
     int GetOffset2ndFINESSE();  //! get contents of header
@@ -428,6 +431,13 @@ namespace Belle2 {
   {
     CheckGetBuffer();
     return (unsigned int)(m_buffer[ POS_TRUNC_MASK_DATATYPE ]);
+  }
+
+  inline void RawHeader_latest::AddErrorBitFlag(unsigned int error_bit_flag)
+  {
+    CheckGetBuffer();
+    m_buffer[ POS_TRUNC_MASK_DATATYPE ] |= (int)error_bit_flag;
+    return;
   }
 
   inline int RawHeader_latest::GetOffset1stFINESSE()

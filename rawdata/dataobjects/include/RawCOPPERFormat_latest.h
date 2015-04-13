@@ -89,6 +89,10 @@ namespace Belle2 {
     //! Get Detected Error bitflag
     unsigned int GetErrorBitFlag(int n);
 
+    //! Add Detected Error bitflag
+    void AddErrorBitFlag(int n, unsigned int error_bit_flag);
+
+
     unsigned int GetNodeID(int n);     //! get node-ID from data
 
     //
@@ -222,6 +226,13 @@ namespace Belle2 {
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetErrorBitFlag();
+  }
+
+  inline void RawCOPPERFormat_latest::AddErrorBitFlag(int n, unsigned int error_bit_flag)
+  {
+    tmp_header.SetBuffer(GetBuffer(n));
+    tmp_header.AddErrorBitFlag(error_bit_flag);
+    return;
   }
 
   inline int RawCOPPERFormat_latest::Get1stDetectorNwords(int n)

@@ -65,7 +65,8 @@ void RawHeader_latest::CheckHeader(int* buf)
   // # of words
   if (buf[ POS_NWORDS ] > 2.5e7 ||
       buf[ POS_NWORDS ] < RAWHEADER_NWORDS) {
-    printf("data size error %d words. Exiting... : %s %s %d\n", buf[ POS_NWORDS ], __FILE__, __PRETTY_FUNCTION__, __LINE__); fflush(stdout);
+    printf("data size error %d words. Exiting... : %s %s %d\n", buf[ POS_NWORDS ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    fflush(stdout);
     exit(1);
   }
 

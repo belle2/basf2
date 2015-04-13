@@ -46,7 +46,8 @@ int RawDataBlock::GetBufferPos(int n)
   int pos_nwords = 0;
   for (int i = 1; i <= n ; i++) {
     if (m_buffer[ pos_nwords ] <= 0) {
-      printf("[DEBUG] CORRUPTED DATA: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...", m_buffer[ pos_nwords ]);
+      printf("[DEBUG] CORRUPTED DATA: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...",
+             m_buffer[ pos_nwords ]);
       sleep(1234567);
       exit(1);
     } else {

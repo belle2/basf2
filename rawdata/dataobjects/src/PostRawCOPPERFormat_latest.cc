@@ -182,7 +182,8 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
-    sprintf(err_buf, "CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -283,10 +284,12 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   //
   // Compare CRC16 with B2LCRC16
   //
-  buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;
+  buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n,
+                                                             finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;
 
   if (GetEveNo(n) % 10000 == 0) {
-    printf("#### PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,  *buf, temp_crc16);
+    printf("#### PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,
+           *buf, temp_crc16);
   }
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     //  if ( false ) {
@@ -302,7 +305,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     printf("\n");
     fflush(stdout);
     char err_buf[500];
-    sprintf(err_buf, "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+    sprintf(err_buf,
+            "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
             (unsigned short)(*buf & 0xFFFF), temp_crc16, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf;     throw (err_str);
   }
@@ -372,7 +376,8 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
 
   packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
   if (nwords[ 2 ] > 0) {
-    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER +
+                                                       SIZE_B2LHSLB_TRAILER;
   }
   poswords_to += tmp_header.GetHdrNwords();
 

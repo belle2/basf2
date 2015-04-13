@@ -148,6 +148,9 @@ namespace Belle2 {
     //! Get Detected Error bitflag
     unsigned int GetErrorBitFlag(int n);
 
+    //! Get Detected Error bitflag
+    void AddErrorBitFlag(int n, unsigned int error_bit_flag);
+
     unsigned int GetNodeID(int n);     //! get node-ID from data
 
     //
@@ -390,6 +393,12 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->GetErrorBitFlag(n);
+  }
+
+  inline void RawCOPPER::AddErrorBitFlag(int n, unsigned int error_bit_flag)
+  {
+    CheckVersionSetBuffer();
+    return m_access->AddErrorBitFlag(n, error_bit_flag);
   }
 
 

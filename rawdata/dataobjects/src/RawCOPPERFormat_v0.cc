@@ -247,7 +247,8 @@ void RawCOPPERFormat_v0::CheckData(int n,
   *cur_evenum_rawcprhdr = GetEveNo(n);
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
-    sprintf(err_buf, "CORRUPTED DATA: Event # in RawCOPPERFormat_v0 header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: Event # in RawCOPPERFormat_v0 header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
             *cur_evenum_rawcprhdr, evenum_feehdr,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -308,7 +309,8 @@ void RawCOPPERFormat_v0::CheckData(int n,
   // Check checksum calculated by COPPER driver
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
-    sprintf(err_buf, "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
             n,
             GetBlockNwords(n),
             *cur_evenum_rawcprhdr,
@@ -326,7 +328,8 @@ void RawCOPPERFormat_v0::CheckData(int n,
   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
-    sprintf(err_buf, "CORRUPTED DATA: RawCOPPERFormat_v0 checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+    sprintf(err_buf,
+            "CORRUPTED DATA: RawCOPPERFormat_v0 checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -540,7 +543,8 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
   //
   // Fill Exp/Run value
   //
-  int* finesse_buf = &(m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
+  int* finesse_buf = &
+                     (m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
   m_buffer[ tmp_header.POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
 
 
@@ -679,7 +683,8 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
 
 #ifndef NO_DATA_CHECK
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",  cur_ftsw_eve32, prev_eve32,
+      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",
+              cur_ftsw_eve32, prev_eve32,
               prev_runsubrun_no, *cur_runsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] [ERROR] %s\n", err_buf);

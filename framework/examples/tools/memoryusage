@@ -6,7 +6,7 @@ Utility to measure the memory consumption of a process hierarchy on Linux.
 
 This is optimized for basf2, taking into account page sharing for parallel
 processing mode and obtaining the process role from the output of basf2 if the
-debug level of the framework is set to INFO.
+log level of the framework is set to INFO.
 
 This program has three modes: in "record" mode memory consumption is recorded
 for all children of the specified progam while it is executed. After execution
@@ -18,10 +18,10 @@ matplotlib plotting library and in mode "both" the memory profile will be
 recorded and plotted in one go.
 
 Profiles can be generated for different types of memory consumption: virtual
-size which is (according to "man top") "The total amount of virtual memory used
+size which is (according to "man top") the "total amount of virtual memory used
 by the task. It includes all code, data and shared libraries plus pages that
 have been swapped out and pages that have been mapped but not used."
-Resident memory memory is the "The non-swapped physical memory a task has
+Resident memory memory is the "non-swapped physical memory a task has
 used." but does not take into account sharing between differnet processes.
 Proportional memory is like Resident memory but takes sharing of pages between
 processes into account. Swap is the amount of memory swapped out.
@@ -160,10 +160,10 @@ if do_plotting:
 # types of memory to plot, can be a list of labels and fields from
 # /proc/<PID>/smaps
 available_types = {
-    "v": ("virtual size", "Size:"),
-    "r": ("resident memory", "Rss:"),
-    "p": ("proportional memory", "Pss:"),
-    "s": ("swap", "Swap:"),
+    "v": ("Virtual size", "Size:"),
+    "r": ("Resident memory", "Rss:"),
+    "p": ("Proportional memory", "Pss:"),
+    "s": ("Swap", "Swap:"),
 }
 memory_types = []
 for memtype in options.types:
@@ -470,7 +470,7 @@ if do_plotting:
 
     #plot total memory if we saw more than one process
     if len(process_memory) > 1:
-        plot_memory(total_memory, "total", "k")
+        plot_memory(total_memory, "Total", "k")
 
     # and plot all processes
     for i, (pid, val) in enumerate(sorted(process_memory.items())):
@@ -484,8 +484,8 @@ if do_plotting:
             a.plot(system_memory[:, 0], system_memory[:, 1] / 1000,
                    label="system", c="k", alpha=0.5)
         # and add title and labels
-        a.set_xlabel("time / s")
-        a.set_ylabel("memory / MB")
+        a.set_xlabel("Time / s")
+        a.set_ylabel("Memory / MB")
         a.set_title(title[0])
         a.set_ylim(ymin=0)
         a.grid()

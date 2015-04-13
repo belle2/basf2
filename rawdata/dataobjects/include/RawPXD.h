@@ -27,7 +27,7 @@ namespace Belle2 {
     RawPXD();
 
     //! Constructor using existing pointer to raw data buffer
-    RawPXD(int* , int);
+    RawPXD(int*, int);
     //! Constructor using existing data which needs to be copied to a new raw data buffer
     RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <unsigned char>>& payload);
 

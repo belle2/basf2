@@ -183,6 +183,9 @@ namespace Belle2 {
 
     virtual int GetTruncMask(int n) = 0;    //! get contents of header
 
+    //! Get Detected Error bitflag
+    virtual unsigned int GetErrorBitFlag(int n) = 0;
+
     virtual unsigned int GetNodeID(int n) = 0;     //! get node-ID from data
 
     //

@@ -145,6 +145,9 @@ namespace Belle2 {
 
     int GetTruncMask(int n);    //! get contents of header
 
+    //! Get Detected Error bitflag
+    unsigned int GetErrorBitFlag(int n);
+
     unsigned int GetNodeID(int n);     //! get node-ID from data
 
     //
@@ -381,6 +384,12 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->GetTruncMask(n);
+  }
+
+  inline unsigned int RawCOPPER::GetErrorBitFlag(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetErrorBitFlag(n);
   }
 
 

@@ -102,6 +102,9 @@ namespace Belle2 {
 
     int GetTruncMask(int n);    //! get contents of header
 
+    //! Get Detected Error bitflag
+    unsigned int GetErrorBitFlag(int n);
+
     unsigned int GetNodeID(int n);     //! get node-ID from data
 
     //
@@ -387,6 +390,11 @@ namespace Belle2 {
     return tmp_header.GetTruncMask();
   }
 
+  inline unsigned int RawCOPPERFormat_v0::GetErrorBitFlag(int n)
+  {
+    tmp_header.SetBuffer(GetBuffer(n));
+    return tmp_header.GetErrorBitFlag();
+  }
 
   inline unsigned int RawCOPPERFormat_v0::GetCOPPERCounter(int n)
   {

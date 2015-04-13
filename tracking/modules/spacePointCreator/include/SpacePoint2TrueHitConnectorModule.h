@@ -148,6 +148,8 @@ namespace Belle2 {
 
     bool m_PARAMrequirePrimary; /**< require the TrueHit to be related to a primary particle in order for the relation to get registered! */
 
+    bool m_PARAMrequireProximity; /**< require the TrueHit to be close to the SpacePoint. What close means can be controlled by other module parameters */
+
     double m_PARAMmaxGlobalDiff; /**< maximum difference of global position coordinates for each direction between TrueHit and SpacePoint */
 
 //     double m_PARAMmaxLocalDiff; /**< maximum difference of local position coordinates for each direction between TrueHit and SpacePoint */
@@ -186,7 +188,6 @@ namespace Belle2 {
     TFile* m_rootFilePtr; /**< pointer to root file */
 
     TTree* m_treePtr; /**< pointer to tree in root file */
-
 
     // ================================================= COUNTERS =================================================================
     std::vector<unsigned int> m_SpacePointsCtr; /**< Number of SpacePoints presented to the module */
@@ -316,9 +317,11 @@ namespace Belle2 {
      * @param trueHitMap map with the information to the (possibly) related TrueHits
      * @param index (StoreArray) index of the TrueHit to which the relation actually got registered (if < 0 it is assumed that all possible relations were registered)
      * @param detType the detector type
+     * NOTE: if a relation is not registered because the combination TrueHit - SpacePoint is considered not compatible (can happen if 'requirePrimary' or 'requireProximity' is set to true this method does not now about this! This can lead to unexpected values for the relation status in the output file!)
+     * If there is time in the future this can be fixed such that the information on why the relation was declined is preserved until the output
      */
     template<typename MapType>
-    void positionAnalysis(Belle2::SpacePoint* spacePoint, MapType trueHitMap, int index, e_detTypes detType);
+    void positionAnalysis(Belle2::SpacePoint* spacePoint, const MapType& trueHitMap, const int& index, e_detTypes detType);
 
     /** increase the appropriate counter to the exception */
     void increaseExceptionCounter(std::runtime_error& exception);

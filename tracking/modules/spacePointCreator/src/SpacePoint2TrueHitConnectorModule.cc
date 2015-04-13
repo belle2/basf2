@@ -53,6 +53,10 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   addParam("requirePrimary", m_PARAMrequirePrimary,
            "Set to true if only relations to TrueHits that are related to a primary particle should get registered.", false);
 
+  addParam("requireProximity", m_PARAMrequireProximity,
+           "Require that the TrueHit is close to the SpacePoint (in local coordinates). The meaning of 'close' can be defined with the parameters 'maxPosSigma' and 'maxGlobalPosDiff'.",
+           true);
+
   std::vector<std::string> defaultInList; // default list for input StoreArrays
   defaultInList.push_back(std::string(""));
   addParam("TrueHitNames", m_PARAMtrueHitNames,
@@ -80,7 +84,7 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
            "Define a minimal weight a relation between a Cluster and a TrueHit has to have for the TrueHit to be considered as possible candidate.",
            0.);
 
-  // initialize all couters
+  // initialize all counters
   initializeCounters();
   m_rootFilePtr = NULL;
   m_treePtr = NULL;
@@ -502,8 +506,8 @@ void SpacePoint2TrueHitConnectorModule::registerTrueHitRelation(Belle2::SpacePoi
 // ====================================================== POSITION ANALYSIS =======================================================
 // TODO: debug output
 template<typename MapType>
-void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spacePoint, MapType trueHitMap, int index,
-                                                         e_detTypes detType)
+void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spacePoint, const MapType& trueHitMap,
+                                                         const int& index, e_detTypes detType)
 {
   B2DEBUG(250, "Doing position analysis for SpacePoint "  << spacePoint->getArrayIndex() << " from Array " <<
           spacePoint->getArrayName())
@@ -535,8 +539,8 @@ void SpacePoint2TrueHitConnectorModule::positionAnalysis(Belle2::SpacePoint* spa
   }
   if (nRelations != 1 && onlySingleWeights) relationStatus.addStatus(c_ghostHit);
 
-  unsigned short int overAllStatus =
-    relationStatus.getStatus(); // get the status that has been set until now as from now on it can differ for every relation
+  // get the status that has been set until now as from now on it can differ for every relation
+  unsigned short int overAllStatus = relationStatus.getStatus();
 
   for (int key : uniqueKeys) {
     relationStatus.setStatus(overAllStatus); // reset status
@@ -689,6 +693,11 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
     return false;
   }
 
+  // CAUTION: if further tests are added, make sure that they do not get 'over-ruled' by this one (i.e. put before this if)
+  if (!m_PARAMrequireProximity) {
+    B2DEBUG(999, "Not checking positions because 'requireProximity' is set to false")
+    return true;
+  }
   const VxdID spacePointVxdId = spacePoint->getVxdID();
   const VxdID trueHitVxdId = trueHit->getSensorID();
 
@@ -822,7 +831,8 @@ void SpacePoint2TrueHitConnectorModule::closeRootFile()
 {
   if (m_treePtr != NULL && m_rootFilePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
-    m_treePtr->Write();
+//     m_treePtr->Write(); // using TTree::Write() instead, which calls this any way
+    m_rootFilePtr->Write();
     m_rootFilePtr->Close();
   }
 }
@@ -863,7 +873,6 @@ std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalError(Belle
     B2ERROR("Detector type not known in SpacePoint2TrueHitConnector::getLocalError() !")
   }
 
-//   cout << errors.first << " " << errors.second << endl;
   return errors;
 }
 // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)

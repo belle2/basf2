@@ -24,6 +24,14 @@ ReaderSAD::ReaderSAD(): m_file(NULL), m_tree(NULL), m_transMatrix(NULL),
   m_SADToRealFactor(5.76e6), m_readoutTime(20.0), m_realPartNum(0),
   m_realPartEntry(0), m_readEntry(0)
 {
+  m_lostX = 0.0;
+  m_lostY = 0.0;
+  m_lostS = 0.0;
+  m_lostPx = 0.0;
+  m_lostPy = 0.0;
+  m_lostRate = 0.0;
+  m_lostE = 0.0;
+
 }
 
 
@@ -84,7 +92,8 @@ double ReaderSAD::getSADParticle(MCParticleGraph& graph)
     //Load the SAD particle
     m_tree->GetEntry(m_readEntry);
     convertParamsToSADUnits();
-    B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" << " and rate = " << m_lostRate << " Hz")
+    B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
+            " and rate = " << m_lostRate << " Hz")
 
     printf("Read particle %d / %d with s= %f [m]\n", m_readEntry + 1 , (int)m_tree->GetEntries(), m_lostS / 100.);
 
@@ -136,7 +145,8 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
       m_tree->GetEntry(m_readEntry);
       convertParamsToSADUnits();
 
-      B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" << " and rate = " << m_lostRate << " Hz")
+      B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
+              " and rate = " << m_lostRate << " Hz")
     } while ((fabs(m_lostS) > m_sRange) && (m_readEntry < m_tree->GetEntries()));
 
     m_realPartNum = calculateRealParticleNumber(m_lostRate);
@@ -145,7 +155,8 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
   //Create a new real particle from the SAD particle
   if ((fabs(m_lostS) <= m_sRange) && (m_realPartNum > 0)) {
     addParticleToMCParticles(graph);
-    B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry + 1 << "/" << m_tree->GetEntries())
+    B2DEBUG(10, "* Created real particle " << m_realPartEntry + 1 << "/" << m_realPartNum << " for SAD particle " << m_readEntry + 1 <<
+            "/" << m_tree->GetEntries())
   }
 
   m_realPartEntry++;

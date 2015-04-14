@@ -182,9 +182,11 @@ void NSM2SocketBridge::nsmdataget(int revision,
   const NSMNode& node(m_callback->getNode());
   try {
     NSMData& data(m_callback->getData(name, format, revision));
+    /*
     if (data.isAvailable()) {
       send(NSMMessage(node, NSMCommand::DATASET), data);
     }
+    */
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());
     std::string message =

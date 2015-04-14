@@ -6,7 +6,6 @@
 package b2daq.apps.runcontrol;
 
 import b2daq.nsm.NSMCommunicator;
-import b2daq.nsm.NSMConfig;
 import b2daq.nsm.NSMVar;
 import java.io.IOException;
 import java.net.URL;

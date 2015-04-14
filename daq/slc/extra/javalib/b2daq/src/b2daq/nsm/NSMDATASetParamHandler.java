@@ -18,9 +18,13 @@ import static b2daq.database.FieldInfo.SHORT;
  */
 public abstract class NSMDATASetParamHandler extends NSMRequestHandler {
 
-    protected String m_name = "";
-    protected String m_pname = "";
-    protected int m_type = FieldInfo.NONE;
+    private String m_name = "";
+    private  String m_pname = "";
+    private  int m_type = FieldInfo.NONE;
+
+    String getDataName() { return m_name; }
+    String getParName() { return m_name; }
+    int getType() { return m_type; }
 
     public NSMDATASetParamHandler(boolean once, String name, String pname, int type) {
         super(once);

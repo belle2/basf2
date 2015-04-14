@@ -11,7 +11,7 @@ import java.io.IOException;
  *
  * @author tkonno
  */
-public abstract class NSMDATASetHandler extends NSMRequestHandler {
+public class NSMDATASetHandler extends NSMRequestHandler {
 
     protected String m_name = "";
     protected String m_format = "";
@@ -46,10 +46,11 @@ public abstract class NSMDATASetHandler extends NSMRequestHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return true;
     }
 
-    abstract public boolean handleDataSet(NSMData data);
+    public boolean handleDataSet(NSMData data) {
+        return true;
+    }
 
 }

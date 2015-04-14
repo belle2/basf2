@@ -286,6 +286,7 @@ public class RCStateViewPane extends GridPane {
             String node1 = item1.getText();
             String config = m_rcconfig.get(node1.toLowerCase());
             String table = m_table.get(node1.toLowerCase());
+            System.out.println(node1 +" " + config + " " + table);
             NSMDBSetHandler handler = new NSMDBSetHandler(table, node1, config, true) {
                 @Override
                 public boolean handleDBSet(ConfigObject obj) {

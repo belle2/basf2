@@ -149,18 +149,6 @@ namespace Belle2 {
     int getlAT() const {return (int) lowAmpThresh;}
     int getsT()  const {return (int) skipThresh;}
 
-    /*
-        void getka(int x ){ x=(int) ka;}
-        void getkb(int x ){ x=(int) kb;}
-        void getkc(int x ){ x=(int) kc;}
-        void gety0s(int x ){ x=(int) y0Startr;}
-        void getcT(int x){ x=(int) chiThresh;}
-        void getk1(int x){ x=(int) k1Chi;}
-        void getk2(int x){ x=(int) k2Chi;}
-        void gethT(int x){ x=(int) hitThresh;}
-        void gethlAT(int x){ x=(int) lowAmpThresh;}
-        void getsT(int x){ x=(int) skipThresh;}
-    */
     ClassDef(ECLWFAlgoParams, 1)
   };
 
@@ -248,13 +236,13 @@ namespace Belle2 {
   public:
     ECLLookupTable() : m_content(8736, 0) {}
 
-    int operator[](int key) const
-    { return m_content[ key ]; }
-    int& operator[](int key)
-    { return m_content[ key ]; }
+    unsigned int operator[](unsigned int key) const
+    { return m_content[ key - 1 ]; }
+    unsigned int& operator[](unsigned int key)
+    { return m_content[ key - 1 ]; }
 
   private:
-    std::vector<int> m_content; /** index to index lookup table */
+    std::vector<unsigned int> m_content; /** index to index lookup table */
     ClassDef(ECLLookupTable, 1);
   };
 

@@ -13,7 +13,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -87,44 +87,21 @@ void ECLDigitizerModule::beginRun()
 {
 }
 
+int** ECLDigitizerModule::allocateMatrix(unsigned int nrows, unsigned int ncols) const
+{
+  int** pointer = new int* [nrows];
+  assert(pointer != nullptr);
+  int* data = new int[ncols * nrows];
+  assert(data != nullptr);
+  pointer[0] = data;
+  for (unsigned int i = 1; i < nrows; ++i)
+    pointer[i] = pointer[i - 1] + ncols;
+  return pointer;
+}
 
 void ECLDigitizerModule::event()
 {
-
-  //Get the waveform, covariance matrix and fit algoritm parameters from the Event Store
-
-  StoreArray<ECLWaveformData> eclWaveformData("ECLWaveformData", DataStore::c_Persistent);;
-  StoreObjPtr< ECLLookupTable > eclWaveformDataTable("ECLWaveformDataTable", DataStore::c_Persistent);
-  StoreArray<ECLWFAlgoParams> eclWFAlgoParams("ECLWFAlgoParams", DataStore::c_Persistent);;
   StoreObjPtr< ECLLookupTable> eclWFAlgoParamsTable("ECLWFAlgoParamsTable", DataStore::c_Persistent);
-  StoreArray<ECLNoiseData> eclNoiseData("ECLNoiseData", DataStore::c_Persistent);
-  StoreObjPtr< ECLLookupTable > eclNoiseDataTable("ECLNoiseDataTable", DataStore::c_Persistent);
-
-  // the following is just a test to show how to get
-  // the correct ECLWaveformData object associated
-  // to a crystal cellId
-  // we loop over all the cellId and verify that a
-  // all the required objects exist in memory
-  // Moreover it shows how to get configuration data needed
-  // by the Digitizer for a given crystal.
-
-  static bool firstEvent = true;
-  if (firstEvent) {
-    firstEvent = false;
-    for (int aCellId = 0; aCellId < 8736; ++aCellId) {
-//      B2INFO("Checking ECL crystal id == " << aCellId<<" array " <<(*eclWaveformDataTable)[ aCellId ]);
-      const ECLWaveformData* eclWFData = eclWaveformData[(*eclWaveformDataTable)[ aCellId ] ];
-//      B2INFO("ECLWaveformData address: " << eclWFData);
-      const ECLWFAlgoParams* eclWFAlgo = eclWFAlgoParams[(*eclWFAlgoParamsTable)[ aCellId ] ];
-//      B2INFO("ECLAlgoParams address: " << eclWFAlgo);
-      const ECLNoiseData* eclNoise = eclNoiseData[(*eclNoiseDataTable)[ aCellId ] ];
-//      B2INFO("ECLNoise address: " << eclNoise);
-      // B2INFO("eclWaveform[12]: " << eclWaveformData[12]);
-
-    }
-  }
-  // end of the test
-
 
   //Input Array
   StoreArray<ECLHit>  eclArray;
@@ -132,7 +109,6 @@ void ECLDigitizerModule::event()
     B2DEBUG(100, "ECLHit in empty in event " << m_nEvent);
   }
 
-  //cout<<"Total Hits in Digi "<<eclArray->GetEntriesFast()<<endl;
   int energyFit[8736] = {0}; //fit output : Amplitude
   int tFit[8736] = {0};    //fit output : T_ave
   int qualityFit[8736] = {0};    //fit output : T_ave
@@ -142,15 +118,9 @@ void ECLDigitizerModule::event()
   float AdcNoise[31];
   float genNoise[31];
 
-
-
   double dt = .02; //delta t for interpolation
   int n = 1250;//provide a shape array for interpolation
-  //   double DeltaT =  gRandom->Uniform(0, 24);
   double DeltaT =  gRandom->Uniform(0, 144);
-  //         double DeltaT =  0.0; // test by KM 20140620
-
-
 
   for (int ii = 0; ii <  eclArray.getEntries(); ii++) {
 
@@ -160,18 +130,14 @@ void ECLDigitizerModule::event()
     double hitTimeAve       =  aECLHit->getTimeAve() / Unit::us;
     double sampleTime ;
 
-
     if (hitTimeAve > 8.5) { continue;}
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
 
     for (int T_clock = 0; T_clock < 31; T_clock++) {
-      //      double timeInt =  DeltaT * 12. / 508.; //us
       double timeInt =  DeltaT * 2. / 508.; //us
-
       sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
                    ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
       DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
-
       HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
     }//for T_clock 31 clock
 
@@ -222,8 +188,6 @@ void ECLDigitizerModule::event()
         FitA[T_clock] = (int)(HitEnergy[iECLCell][T_clock] * 20000 + 3000 + AdcNoise[T_clock] * 20) ;
       }
 
-
-
       m_n16 = 16;
       m_lar = 0;
       m_ltr = 0;
@@ -232,43 +196,36 @@ void ECLDigitizerModule::event()
       m_ttrig = int(DeltaT) ;
       if (m_ttrig < 0)m_ttrig = 0;
       if (m_ttrig > 143)m_ttrig = 143;
-      int map_i;
-      map_i = map[iECLCell];
 
-
-      shapeFitter(&(m_idn[map_i][0]), &(m_f[map_i][0][0]), &(m_f1[map_i][0][0]), &(m_fg41[map_i][0][0]), &(m_fg43[map_i][0][0]),
-                  &(m_fg31[map_i][0][0]), &(m_fg32[map_i][0][0]), &(m_fg33[map_i][0][0]), &(FitA[0]), &m_ttrig,  &m_n16,  &m_lar, &m_ltr, &m_lq);
+      unsigned int idIdx = (*eclWFAlgoParamsTable)[ iECLCell + 1 ]; //lookup table uses cellID definition [1,8736]
+      unsigned int funcIdx = m_funcTable[iECLCell + 1 ];
+      shapeFitter(&(m_idn[idIdx][0]), &(m_f[funcIdx][0][0]), &(m_f1[funcIdx][0][0]), &(m_fg41[funcIdx][0][0]), &(m_fg43[funcIdx][0][0]),
+                  &(m_fg31[funcIdx][0][0]), &(m_fg32[funcIdx][0][0]), &(m_fg33[funcIdx][0][0]), &(FitA[0]), &m_ttrig,  &m_n16,  &m_lar, &m_ltr,
+                  &m_lq);
 
       energyFit[iECLCell] = m_lar; //fit output : Amplitude 18-bits
       tFit[iECLCell] = m_ltr;    //fit output : T_ave 12 bits
       qualityFit[iECLCell] = m_lq;    //fit output : quality 2 bits
 
+      if (energyFit[iECLCell] > 0) {
+        StoreArray<ECLDsp> eclDspArray;
+        if (!eclDspArray) eclDspArray.create();
+        eclDspArray.appendNew();
+        m_hitNum = eclDspArray.getEntries() - 1;
+        eclDspArray[m_hitNum]->setCellId(iECLCell + 1);
+        eclDspArray[m_hitNum]->setDspA(FitA);
 
-//      if (energyFit[iECLCell] > 0) {
-
-      StoreArray<ECLDsp> eclDspArray;
-      if (!eclDspArray) eclDspArray.create();
-      eclDspArray.appendNew();
-      m_hitNum = eclDspArray.getEntries() - 1;
-      eclDspArray[m_hitNum]->setCellId(iECLCell + 1);
-      eclDspArray[m_hitNum]->setDspA(FitA);
-
-      StoreArray<ECLDigit> eclDigiArray;
-      if (!eclDigiArray) eclDigiArray.create();
-      eclDigiArray.appendNew();
-      m_hitNum1 = eclDigiArray.getEntries() - 1;
-      eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
-      eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
-      eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
-      eclDigiArray[m_hitNum1]->setQuality(qualityFit[iECLCell]);
-//      }
-
-
+        StoreArray<ECLDigit> eclDigiArray;
+        if (!eclDigiArray) eclDigiArray.create();
+        eclDigiArray.appendNew();
+        m_hitNum1 = eclDigiArray.getEntries() - 1;
+        eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
+        eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
+        eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
+        eclDigiArray[m_hitNum1]->setQuality(qualityFit[iECLCell]);
+      }
 
     }//if Energy > 0.1 MeV
-
-
-
   } //store  each crystal hit
 
   StoreArray<ECLTrig> eclTrigArray;
@@ -276,9 +233,8 @@ void ECLDigitizerModule::event()
   eclTrigArray.appendNew();
   m_hitNum2 = eclTrigArray.getEntries() - 1;
   //  eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
-
   eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT  / 508.); //t0 (us)= (1520 - m_ltr)*24.*
-  //cout<<"Event "<< m_nEvent<<" Total output entries of Digi Array "<<++m_hitNum1<<endl;
+
   m_nEvent++;
 }
 
@@ -358,8 +314,6 @@ double ECLDigitizerModule::ShaperDSP_F(double Ti, float* ss)
 
 }
 
-
-
 double ECLDigitizerModule::ShaperDSP(double Ti)
 {
   double svp = 0;
@@ -385,7 +339,6 @@ double ECLDigitizerModule::ShaperDSP(double Ti)
   return svp;
 
 }
-
 
 double  ECLDigitizerModule::Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1)
 {
@@ -498,38 +451,12 @@ double  ECLDigitizerModule::Sv123(double t, double t01, double tb1, double t02, 
 
 }
 
-
 void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y,
                                      int* ttrig2, int* n16,  int* lar, int* ltr, int* lq)
 {
 
 
 
-  /*
-   cout<<"Fit Array: \n";
-   for(int testi=0;testi<1;testi++) {
-    for(int testj=0;testj<31;testj++){
-    cout<<*(y+testi *16+testj)<<" ";
-   }cout<<endl;}cout<<endl<<endl;;
-
-   cout<<"fg41: " <<endl;
-   for(int testi=0;testi<24;testi++) {
-    for(int testj=0;testj<16;testj++){
-    cout<<*(fg41+testi *16+testj)<<" ";
-   }cout<<endl;}cout<<endl<<endl;;
-
-   cout<<"fg43: " <<endl;
-   for(int testi=0;testi<24;testi++) {
-    for(int testj=0;testj<16;testj++){
-    cout<<*(fg43+testi *16+testj)<<" ";
-   }cout<<endl;}cout<<endl<<endl;;
-
-   cout<<"id: " <<endl;
-   for(int testi=0;testi<16;testi++) {
-    for(int testj=0;testj<16;testj++){
-    cout<<*(id+testi *16+testj)<<" ";
-   }cout<<endl;}cout<<endl<<endl;
-    */
   static long long int k_np[16] = {
     65536,
     32768,
@@ -548,10 +475,11 @@ void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, 
     4369,
     4096
   };
-//  long long int b32=4294967295;
+
+
   int A0  = (int) * (id + 0) - 128;
   int Askip  = (int) * (id + 1) - 128;
-  //int Askip  = -127-128;
+
   int ttrig;
   int Ahard  = (int) * (id + 2);
   int k_a = (int) * ((unsigned char*)id + 26);
@@ -560,8 +488,6 @@ void ECLDigitizerModule::shapeFitter(short int* id, int* f, int* f1, int* fg41, 
   int k_16 = (int) * ((unsigned char*)id + 29);
   int k1_chi = (int) * ((unsigned char*)id + 24);
   int k2_chi = (int) * ((unsigned char*)id + 25);
-  //  int kz_s =  (int)*((unsigned char*)id+34);
-
 
   int chi_thres = (int) * (id + 15);
 
@@ -796,8 +722,6 @@ ou:
   return ;
 }
 
-
-
 void ECLDigitizerModule::readDSPDB()
 {
 
@@ -869,6 +793,7 @@ void ECLDigitizerModule::readDSPDB()
   for (Long64_t ev = 0; ev < nentries; ev++) {
     tree2->GetEntry(ev);
     eclWFAlgoParams.appendNew(*algo);
+    m_idn.push_back(new short int [16]);
     for (Int_t i = 0; i < ncellId2; ++i)
       (*eclWFAlgoParamsTable) [cellId2[i]] = ev;
   }
@@ -890,57 +815,46 @@ void ECLDigitizerModule::readDSPDB()
 
   rootfile.Close();
 
+  typedef vector< pair<unsigned int, unsigned int> > PairIdx;
+  PairIdx pairIdx;
 
+  for (int icell = 1; icell <= 8736; icell++) {
+    unsigned int wfIdx = (*eclWaveformDataTable) [ icell ];
+    unsigned int algoIdx = (*eclWFAlgoParamsTable) [ icell ];
+    pair<unsigned int, unsigned int> wfAlgoIdx = make_pair(wfIdx, algoIdx) ;
+    bool found(false);
+    for (unsigned int ielem = 0; ielem < pairIdx.size(); ++ielem) {
+      if (wfAlgoIdx == pairIdx[ielem]) {
+        m_funcTable[ icell ] = ielem;
+        found = true;
+        break;
+      }
+    }
 
+    if (!found) {
+      m_funcTable[ icell ] = pairIdx.size();
+      m_f.push_back(allocateMatrix(192, 16));
+      m_f1.push_back(allocateMatrix(192, 16));
+      m_fg31.push_back(allocateMatrix(192, 16));
+      m_fg32.push_back(allocateMatrix(192, 16));
+      m_fg33.push_back(allocateMatrix(192, 16));
+      m_fg41.push_back(allocateMatrix(24, 16));
+      m_fg43.push_back(allocateMatrix(24, 16));
+      pairIdx.push_back(wfAlgoIdx);
+    }
 
-  /*
-  double t=0;
-  double dt=.02;
-  int n=1250;
-  cout<<"  double par_shape[] = {";
-  for(int i=0;i<1250;i++)
-  {
-  if(i!=0&&i%10==0 )cout<<endl;
-  cout<<ShaperDSP(t)<<",";
-  t=t+dt;
   }
-  cout<<"};"<<endl;
-  */
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-  //StoreArray<ECLWaveformData> eclWaveformData("ECLWaveformData", DataStore::c_Persistent);;
-  //StoreArray<ECLWFAlgoParams> eclWFAlgoParams("ECLWFAlgoParams", DataStore::c_Persistent);;
 
   float MP[10];
 
   const ECLWaveformData* eclWFData = eclWaveformData[0];
   eclWFData->getWaveformParArray(MP);
 
-
-  /*
-  int map_i;
-  foat MF[16][16];
-  for(map_i=0;map_i<252;map_i++){
-     const ECLWaveformData* eclWFData = eclWaveformData[map_i ];
-  //  const ECLWFAlgoParams* eclWFAlgo = eclWFAlgoParams[map_i];
-
-  eclWFData->getMatrix(MF);
-
-
-  }
-    */
-
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
-
-
-
   // varible for one channel
 
   float ss1[16][16];
 
-  int ChN;
+  unsigned int ChN;
 
   double  g1g1[192], gg[192], gg1[192], dgg[192];
   double  sg1[16][192], sg[16][192], sg2[16][192], gg2[192], g1g2[192], g2g2[192];
@@ -979,13 +893,20 @@ void ECLDigitizerModule::readDSPDB()
 
   int j1, endc, j, i;
   double ndt;
-  double adt, dt0, t0, ddt, tc1, tin;
+  double adt, dt0, t0, ddt, tc1;
+
+  // set but not used
+  //double tin;
+
   double t, tmd, tpd, ssssj, ssssj1, ssssi, ssssi1;
   double svp, svm;
 
 
   int ibb, iaa, idd, icc;
-  int ia, ib, ic, i16;
+  int ia, ib, ic;
+
+  // set but not used!
+  // int i16;
 
 
   int ipardsp13;
@@ -1007,127 +928,16 @@ void ECLDigitizerModule::readDSPDB()
   int tr0;
   int tr1;
 
-
-
-
-
   // = {tr0 , tr1 , Bhard , 17952 , 19529 , 69 , 0 , 0 , 257 , -1 , 0 , 0 , 256*c1_chi+c2_chi , c_a+256*c_b , c_c+256*c_16 ,chi_thres };
 
 
-  /*
-  del=0.;
-  ts0=0.5;
-  dt=0.5;
-
-
-  ndt=96.;
-  adt=1./ndt;
-  endc=2*ndt;
-
-
-  dt0=adt*dt;
-  t0=-dt0*ndt;
-
-
-
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%55
-
-  del=0.;
-  ts0=0.5;
-  dt=0.5;
-
-
-  ndt=96.;
-  adt=1./ndt;
-  endc=2*ndt;
-
-
-  dt0=adt*dt;
-  t0=-dt0*ndt;
-
-  for(j1=0;j1<endc;j1++){
-    t0=t0+dt0;
-    t=t0-dt-del;
-
-    tin=t+dt;
-
-  //t=0.;
-              for(j=0;j<16;j++){
-        t=t+dt;
-
-                            if(t>0){
-
-  //         f[ChN][j1][j]=ShaperDSP(t/0.881944444);
-
-          f[j1][j]=ShaperDSP(t/0.881944444);
-
-          //printf("j=%d j1=%d t=%.5e f=%.5e \n",j,j1,t,f[j1][j]);
-   ddt=0.005*dt;
-   tc1=t-ts0;
-   tpd=t+ddt;
-   tmd=t-ddt;
-
-
-                                             if(tc1>ddt){
-  svp=ShaperDSP(tpd/0.881944444);
-  svm=ShaperDSP(tmd/0.881944444);
-  //   f1[ChN][j1][j]=(svp-svm)/2./ddt;
-
-   f1[j1][j]=(svp-svm)/2./ddt;
-
-                                                       }
-                            else{
-
-
-                //f1[ChN][j1][j]=ShaperDSP(tpd/0.881944444)/(ddt+tc1);
-  f1[j1][j]=ShaperDSP(tpd/0.881944444)/(ddt+tc1);
-
-
-                                                     }// else tc1>ddt
-
-
-               //                       if(fabs(f1[ChN][j1][j])>100.||(j==2&&j1==156)){
-
-                        if(fabs(f1[j1][j])>100.||(j==2&&j1==156)){
-
-                                                                     }
-              } //if t>0
-                                   else{
-             //   f[ChN][j1][j]=0.;
-             //   f1[ChN][j1][j]=0.;
-
-   f[j1][j]=0.;
-   f1[j1][j]=0.;
-
-                                        }
-
-                            } //for j
-
-
-
-
-
-
-  }
-  */
-
-
-  ///%%%%%%%%%%%%%%%%%%%%%%55
-
-
-  for (ChN = 0; ChN < maxmap; ChN++) {
-
-    if (ChN % 25 == 0) {printf("!!CnN=%d\n", ChN);}
-
-    const ECLWaveformData* eclWFData = eclWaveformData[ChN];
-
+  for (unsigned int ichannel = 0; ichannel < pairIdx.size(); ichannel++) {
+    if (ichannel % 1000 == 0) {printf("!!CnN=%d\n", ichannel);}
+    ChN = pairIdx[ichannel].first;
+    const ECLWaveformData* eclWFData = eclWaveformData[ ChN ];
     eclWFData->getMatrix(ss1);
-
-
+    ChN = pairIdx[ichannel].second;
     const ECLWFAlgoParams* eclWFAlgo = eclWFAlgoParams[ChN];
-
-
     // shape function parameters
 
     c_a = eclWFAlgo->getka();
@@ -1146,7 +956,6 @@ void ECLDigitizerModule::readDSPDB()
     tr1 = Bskip + 128;
 
     // = {tr0 , tr1 , Bhard , 17952 , 19529 , 69 , 0 , 0 , 257 , -1 , 0 , 0 , 256*c1_chi+c2_chi , c_a+256*c_b , c_c+256*c_16 ,chi_thres };
-
 
     m_idn[ ChN][ 0] = (short int)tr0;
     m_idn[ ChN][ 1] = (short int)tr1;
@@ -1190,7 +999,8 @@ void ECLDigitizerModule::readDSPDB()
       t0 = t0 + dt0;
       t = t0 - dt - del;
 
-      tin = t + dt;
+      // set but not used!
+      //tin = t + dt;
 
       for (j = 0; j < 16; j++) {
         t = t + dt;
@@ -1350,39 +1160,41 @@ void ECLDigitizerModule::readDSPDB()
     ia = myPow(2, iaa);
     ib = myPow(2, ibb);
     ic = myPow(2, icc);
-    i16 = myPow(2, 15);
+
+    // set but not used!
+    // i16 = myPow(2, 15);
 
 
-
+    ChN = ichannel;
 
     for (i = 0; i < 16; i++) {
       if (i == 0) {idd = n16;}
       else {idd = 1;}
       for (k = 0; k < 192; k++) {
 
+        //  cout << "Reading channel " << ChN << " " << k << " " << i << endl;
+        (m_f[ChN])[k][i] = (int)(f[k][i] * ia / idd + ia + 0.5) - ia;
 
-        m_f[ChN][k][i] = (int)(f[k][i] * ia / idd + ia + 0.5) - ia;
-
-        m_f1[ChN][k][i] = (int)(4 * f1[k][i] * ia / idd / 3 + ia + 0.5) - ia;
-
-
-
-
-        m_fg31[ChN][k][i] = (int)(fg31[k][i] * ia / idd + ia + 0.5) - ia;
-
-        m_fg32[ChN][k][i] = (int)(3 * fg32[k][i] * ib / idd / 4 + ib + 0.5) - ib;
+        (m_f1[ChN])[k][i] = (int)(4 * f1[k][i] * ia / idd / 3 + ia + 0.5) - ia;
 
 
 
-        m_fg33[ChN][k][i] = (int)(fg33[k][i] * ic / idd + ic + 0.5) - ic;
+
+        (m_fg31[ChN])[k][i] = (int)(fg31[k][i] * ia / idd + ia + 0.5) - ia;
+
+        (m_fg32[ChN])[k][i] = (int)(3 * fg32[k][i] * ib / idd / 4 + ib + 0.5) - ib;
+
+
+
+        (m_fg33[ChN])[k][i] = (int)(fg33[k][i] * ic / idd + ic + 0.5) - ic;
 
 
         if (k <= 23) {
 
-          m_fg41[ChN][k][i] = (int)(fg41[k][i] * ia / idd + ia + 0.5) - ia;
+          (m_fg41[ChN])[k][i] = (int)(fg41[k][i] * ia / idd + ia + 0.5) - ia;
 
 
-          m_fg43[ChN][k][i] = (int)(fg43[k][i] * ic / idd + ic + 0.5) - ic;
+          (m_fg43[ChN])[k][i] = (int)(fg43[k][i] * ic / idd + ic + 0.5) - ic;
 
 
 
@@ -1396,7 +1208,6 @@ void ECLDigitizerModule::readDSPDB()
 
 
   }
-
 
 
 
@@ -1533,169 +1344,14 @@ void ECLDigitizerModule::readDSPDB()
                        };
 
 
-  /*
-    StoreArray<ECLWFAlgoParams> eclWFAlgoParams("ECLWFAlgoParams", DataStore::c_Persistent);;
-    StoreObjPtr< ECLLookupTable> eclWFAlgoParamsTable("ECLWFAlgoParamsTable", DataStore::c_Persistent);
 
-        const ECLWFAlgoParams* eclWFAlgo = eclWFAlgoParams[0];
-
-    short int c_a;
-    short int c_b;
-    short int c_c;
-    short int c_16;
-    short int c1_chi;
-    short int c2_chi;
-    short int chi_thres;
-    short int Bhard;
-    short int Bskip;
-    short int B0;
-
-  */
-  /*
-     int c_a;
-     int c_b;
-     int c_c;
-     int c_16;
-     int c1_chi;
-     int c2_chi;
-     int chi_thres;
-     int Bhard;
-     int Bskip;
-     int B0;
-
-
-    c_a=eclWFAlgo->getka();
-    c_b=eclWFAlgo->getkb();
-    c_c=eclWFAlgo->getkc();
-    c_16=eclWFAlgo->gety0s();
-    c1_chi=eclWFAlgo->getk1();
-    c2_chi=eclWFAlgo->getk2();
-    chi_thres=eclWFAlgo->getcT();
-    Bhard=eclWFAlgo->gethT();
-    B0=eclWFAlgo->getlAT();
-    Bskip=eclWFAlgo->getsT();
-
-    /*
-    eclWFAlgo->getka(c_a);
-    eclWFAlgo->getkb(c_b);
-    eclWFAlgo->getkc(c_c);
-    eclWFAlgo->getky0s(c_16);
-    eclWFAlgo->getk1(c1_chi);
-    eclWFAlgo->getk2(c2_chi);
-    eclWFAlgo->getcT(chi_thres);
-    eclWFAlgo->gethT(Bhard);
-    eclWFAlgo->getlAT(B0);
-    eclWFAlgo->getsT(Bskip);
-     */
-  /*
-  c_a=14;
-  c_b=14;
-  c_c=17;
-  c_16=0;
-  c1_chi=14;
-  c2_chi=10;
-  chi_thres=3000;
-  Bhard=0;
-  B0=100;
-  Bskip=-20;
-  */
-  /*
-    c_16=c_16-16;
-    short int tr0;
-    short int tr1;
-
-    tr0=B0+128;
-    tr1=Bskip+128;
-
-    short int par_idn[16] = {tr0 , tr1 , Bhard , 17952 , 19529 , 69 , 0 , 0 , 257 , -1 , 0 , 0 , 256*c1_chi+c2_chi , c_a+256*c_b , c_c+256*c_16 ,chi_thres };
-
-  for(i=0;i<16;i++){printf("%d ",par_idn[i]);}
-  printf("\n");
-    short int par_id[16][16] = {
-
-  {17221 , 17484 , 20563 , 17952 , 19529 , 69 , 0 , 0 , 257 , -1 , 0 , 0 , 0 , c_a+256*c_b , c_c+256*c_16 ,chi_thres },
-      {256*c1_chi+c2_chi , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {tr0, tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 , tr0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 , tr1 ,tr1 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-      {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 }
-    };
-  */
-  /*  short int par_id[16][16] = {
-
-  {17221 , 17484 , 20563 , 17952 , 19529 , 69 , 0 , 0 , 257 , -1 , 0 , 0 , 0 , 3598 , 17 ,3000 },
-    {2574 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 , 228 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 , 108 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-    {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 }
-  };
-
-  */
   float NoiseM[31][31];
-
-//StoreArray<ECLNoiseData> eclNoiseData("ECLNoiseData", DataStore::c_Persistent);
-//StoreObjPtr< ECLLookupTable > eclNoiseDataTable("ECLNoiseDataTable", DataStore::c_Persistent);
   const ECLNoiseData* eclNoise = eclNoiseData[0];
 
   eclNoise->getMatrix(NoiseM);
 
-  double par_vmat[31][31] = {
-    { 3.7421890e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 2.3000690e-01, 2.9909840e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -1.3080280e-03, 2.9275420e-01, 2.3547880e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -1.1187620e-01, 7.9271060e-02, 2.5876040e-01, 2.3182400e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -8.9043590e-02, -7.3288660e-02, 7.3667100e-02, 2.6195730e-01, 2.3093170e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -3.1746960e-02, -8.5953160e-02, -7.4380120e-02, 8.0350670e-02, 2.6405940e-01, 2.2696520e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 2.5790630e-03, -4.2404220e-02, -9.1190030e-02, -7.3073500e-02, 8.2190800e-02, 2.5937040e-01, 2.2902850e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 1.1706650e-02, -6.0437690e-03, -4.6543940e-02, -9.2237390e-02, -6.7980100e-02, 7.9883190e-02, 2.5576430e-01, 2.3048010e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 5.2791750e-03, 7.3584680e-03, -9.1680320e-03, -4.0477280e-02, -8.5167550e-02, -6.8960090e-02, 7.9615790e-02, 2.6272700e-01, 2.2659670e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -2.7234810e-03, 7.6854350e-03, 7.3870300e-03, -1.5748630e-03, -3.7431840e-02, -8.6361930e-02, -7.1186920e-02, 8.4427120e-02, 2.5761590e-01, 2.2628580e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -4.8001330e-03, 3.7249190e-04, 5.7445500e-03, 6.2892080e-03, 1.2794980e-04, -4.4020030e-02, -9.4132710e-02, -6.5592440e-02, 7.9605540e-02, 2.5897260e-01, 2.2759290e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -1.9747340e-04, -1.0856600e-03, -2.9537980e-03, 1.2521320e-03, 9.2468480e-03, -7.9964520e-03, -5.0048620e-02, -8.6173260e-02, -6.9401890e-02, 8.5095670e-02, 2.5553720e-01, 2.2827970e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 2.2961840e-03, 5.1713580e-03, -9.9831220e-03, -4.8582790e-03, 5.6818920e-03, 2.5234470e-03, -1.1992620e-02, -4.3354460e-02, -8.8238830e-02, -6.3690040e-02, 7.4933660e-02, 2.6035110e-01, 2.2954150e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 1.9911500e-03, 5.6928930e-03, -6.5999590e-03, -5.1220450e-03, 1.3726110e-03, 2.6638390e-03, 6.0810940e-03, -5.5482670e-03, -4.4492380e-02, -8.4784940e-02, -7.4847700e-02, 8.0023210e-02, 2.5971760e-01, 2.2579760e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -2.8168460e-03, -1.5596470e-03, -3.5920740e-04, -1.5568680e-03, -3.0999980e-03, 4.0532330e-03, 5.9865620e-03, 7.5426870e-03, -5.0801370e-03, -4.4410850e-02, -8.9069310e-02, -7.1986760e-02, 8.3717220e-02, 2.5525320e-01, 2.3127400e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -6.2721110e-03, -7.3843720e-03, 4.4293180e-03, -3.1976570e-04, -9.5977030e-03, 4.7985730e-03, 1.3091160e-03, 6.2075590e-03, 1.0678170e-02, -3.9102230e-03, -3.8850100e-02, -9.0111270e-02, -7.2134940e-02, 8.1626010e-02, 2.6625160e-01, 2.3085280e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -8.6380870e-03, -8.7524700e-03, 2.2211860e-03, -2.0377460e-03, -1.1674680e-02, 9.5736500e-04, -4.6511550e-03, 1.1878210e-03, 8.2732240e-03, 1.1068450e-02, -2.4557110e-03, -3.9989100e-02, -9.6560530e-02, -6.7282040e-02, 8.6545660e-02, 2.6266760e-01, 2.2867910e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -5.0006910e-03, -5.3271550e-03, 2.8122650e-03, -3.3844180e-03, -1.2066290e-02, -5.0215660e-03, -5.9443560e-03, -7.7641110e-03, 6.8881110e-04, 1.1126780e-02, 3.5682230e-03, -1.5581290e-03, -4.9215720e-02, -8.7495330e-02, -6.9457910e-02, 8.3078790e-02, 2.5626930e-01, 2.2815010e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -2.8006430e-03, -1.8326510e-03, 4.2013250e-03, -7.3136040e-03, -7.2753960e-03, -1.2072630e-02, -4.9111860e-03, -1.2910630e-02, -7.4327140e-03, 1.7809370e-03, 3.5908200e-03, 9.9266630e-03, -6.1830250e-03, -4.3952940e-02, -9.4068760e-02, -6.9196380e-02, 7.4456340e-02, 2.6240600e-01, 2.2787320e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -5.3262280e-03, 1.0013970e-03, 2.7988670e-03, -7.0614570e-03, -1.2011950e-03, -1.0057020e-02, -2.0390070e-03, -9.7144740e-03, -1.1931430e-02, -4.3344790e-03, -1.0781390e-04, 4.9748730e-03, 7.6804310e-03, -7.0118680e-03, -4.9857660e-02, -9.0621760e-02, -7.3404560e-02, 8.7933660e-02, 2.6087080e-01, 2.2861880e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -8.0181630e-03, -4.9711830e-04, -4.1150970e-03, -7.1515530e-04, 3.4825090e-03, -5.7702340e-03, -2.7436930e-04, -3.0197620e-03, -7.0143680e-03, 1.9427750e-04, -4.9010800e-03, 8.0104930e-04, 5.2002340e-03, 7.9739980e-03, -5.1064490e-03, -4.4475750e-02, -8.8433030e-02, -6.6086290e-02, 7.9523210e-02, 2.6124720e-01, 2.2560000e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -8.3994180e-03, 1.7126790e-03, -7.4873680e-03, 1.2178530e-03, 1.7478160e-03, -4.8931630e-03, -2.6458510e-03, 2.1648390e-03, -1.1115890e-03, 2.2563300e-03, -4.1913370e-03, -1.8302860e-03, 1.9013060e-03, 1.0287630e-02, 9.4747190e-03, -3.1773300e-03, -4.4333930e-02, -8.9549180e-02, -7.0587700e-02, 8.2035590e-02, 2.5992680e-01, 2.2710300e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -5.3834890e-03, 2.2494540e-04, -6.6540030e-03, 9.9553950e-04, -3.4951750e-03, -6.3159040e-03, -2.7434850e-03, 3.1578660e-03, 1.1148350e-03, -3.6016090e-03, -3.0389420e-03, -2.4136690e-03, -4.2965950e-04, 4.0942390e-03, 9.4291110e-03, 1.3586890e-02, -6.0214740e-03, -4.9719230e-02, -9.1375190e-02, -7.3945560e-02, 8.5397150e-02, 2.6079940e-01, 2.2696250e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 2.5065560e-03, -3.8069260e-03, -6.7662800e-04, -2.3149350e-03, -4.6083060e-03, -7.5430530e-03, 1.6668370e-04, -6.3735420e-03, -3.1789190e-03, -7.7085180e-03, -5.2746390e-03, 1.7362840e-03, -9.6647280e-04, -2.9666610e-03, 1.4076840e-03, 1.2331600e-02, 5.9475350e-03, -1.1358520e-02, -4.4444720e-02, -9.5015340e-02, -6.8087640e-02, 8.5311790e-02, 2.5924030e-01, 2.2694380e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 3.6664960e-03, -5.9755790e-03, 1.1686970e-03, -3.2539950e-03, -5.1949060e-03, -7.4019820e-04, 2.9363740e-03, -1.0248240e-02, -2.6863790e-03, -5.4554580e-03, -6.1217710e-03, -2.0915870e-03, -4.4379890e-03, -4.6429420e-03, -6.0521850e-03, 6.9500020e-03, 2.0054410e-03, 1.0426860e-02, -3.7424950e-03, -4.6205980e-02, -9.1165860e-02, -6.6677650e-02, 8.0329110e-02, 2.5543810e-01, 2.3034990e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { 9.3078260e-05, -3.3525630e-03, 7.1849010e-04, -8.6913580e-03, -5.3926540e-03, -1.7520550e-03, 4.3132800e-03, -7.0162730e-03, -5.4201340e-03, 6.8684810e-05, -5.7997490e-03, -1.6304960e-03, -3.7536150e-03, -3.3821230e-03, -8.6243110e-03, -8.5879090e-04, -5.9199840e-03, 1.1289290e-02, 1.2017320e-02, -7.8448640e-03, -4.8806090e-02, -8.8978310e-02, -7.1498770e-02, 8.1850020e-02, 2.5965610e-01, 2.2584000e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -3.9975890e-03, -1.9684830e-03, -2.9398390e-03, -1.0742950e-02, -5.7260550e-04, -6.4837480e-03, -4.1097970e-04, -4.0319450e-03, -8.4026530e-03, -2.5424590e-04, -3.9595570e-04, -1.2657450e-03, -2.3319600e-03, -1.7530350e-03, -5.0691880e-03, -7.0347300e-03, -6.0129350e-03, 4.8913850e-03, 5.5869180e-03, 6.8177870e-03, -5.5931780e-03, -4.4098010e-02, -8.8670600e-02, -6.4754300e-02, 7.7477840e-02, 2.5689540e-01, 2.2915040e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -4.4068680e-03, -6.3513130e-03, -3.2901120e-03, -8.6245530e-03, 5.1832430e-04, -6.5335830e-03, -4.8460790e-03, -6.2148260e-03, -2.5604090e-03, -5.7988390e-03, 5.4880520e-04, -3.5538550e-03, -2.1809030e-03, -1.1549950e-03, -5.6306170e-03, -7.8568590e-03, -6.0848720e-04, -1.8847850e-03, -6.0237990e-03, 1.1852250e-02, 1.3302270e-02, -7.1505840e-03, -4.1669270e-02, -8.8059120e-02, -7.1328220e-02, 8.0681230e-02, 2.6154300e-01, 2.2745840e-01, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00},
-    { -1.5461320e-04, -1.1682510e-02, -7.9529830e-03, -1.3080170e-05, -1.2187170e-03, -7.0621350e-03, -6.8091830e-03, -3.7288430e-03, 4.7856920e-03, -8.9847700e-03, -4.5388100e-03, -4.1014860e-03, -3.6393970e-03, -5.8545800e-03, -5.6582780e-03, -5.2623870e-03, 5.0993990e-03, -6.7282240e-03, -1.0117930e-02, 6.4603410e-03, 3.5110150e-03, 3.1667650e-03, -5.7096600e-03, -4.7129750e-02, -9.0150530e-02, -6.9686500e-02, 8.3052490e-02, 2.5950580e-01, 2.2833470e-01, 0.0000000e+00, 0.0000000e+00},
-    { 1.0202740e-03, -9.5381150e-03, -8.9831140e-03, 1.3487770e-03, -7.1046240e-03, -1.1002140e-02, 3.8150150e-04, -4.7184470e-03, 4.4583300e-03, -7.8033130e-03, -8.4168570e-03, -3.4055110e-03, -3.3224790e-03, -7.6967760e-03, -8.7475620e-03, -1.2469270e-03, 1.8047480e-03, -7.2658010e-03, -8.3518510e-03, 3.5113370e-04, -1.0644220e-02, 2.0328100e-03, 3.6619910e-03, -9.2137200e-03, -4.5310810e-02, -8.9684530e-02, -7.0173430e-02, 8.2865370e-02, 2.6143560e-01, 2.2800430e-01, 0.0000000e+00},
-    { 5.3032550e-04, -3.7301180e-03, -1.1787730e-02, -1.3807920e-03, -5.6132690e-03, -1.1913140e-02, 9.5198650e-04, -1.1367470e-02, 2.2965180e-03, -5.7564360e-03, -9.0643900e-03, -5.9737380e-03, -3.9860480e-03, -5.9836610e-03, -1.1576390e-02, -2.3590400e-03, -4.7896110e-03, -1.5279510e-03, -7.4392120e-03, -1.8085080e-03, -1.3247650e-02, -5.4693190e-04, 5.4005680e-04, 4.9617630e-03, -7.2788800e-03, -4.5880410e-02, -9.1447090e-02, -6.8188230e-02, 8.2035530e-02, 2.5516690e-01, 2.2805310e-01}
-  };
 
-  printf("diff %lf %f %lf %f %lf %f %lf %f \n  ", par_vmat[0][0], NoiseM[0][0], par_vmat[1][0], NoiseM[1][0], par_vmat[12][1],
-         NoiseM[12][1], par_vmat[10][3], NoiseM[10][3]);
+  //Should ShaperDSP() be used instead of par_shape[] ?
 //double t=0;
 //double dt=.02;
 //int n=1250;
@@ -1707,19 +1363,6 @@ void ECLDigitizerModule::readDSPDB()
 
   }
 
-
-
-  /*
-    for (int k = 0; k < maxmap ; k++) {
-
-    for (int i = 0; i < 16 ; i++) {
-  //    m_idn[k][i]=par_idn[k][i];
-      if(i==14){printf("ChN=%d %d %d  \n",k,m_idn[k][i],m_idn[k][i]/256);}
-      if(i==3){printf("!!ChN=%d %d %d  \n",k,m_idn[k][i],m_idn[k][i]/256);}
-
-     }
-    }
-  */
   for (int i = 0; i < 31 ; i++) {
     for (int j = 0; j < 31 ; j++) {
       m_vmat[i][j] = NoiseM[i][j];

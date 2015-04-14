@@ -132,6 +132,24 @@ namespace Belle2 {
     //! Name of the EKLM 2D hits collection
     std::string m_EKLMHitsColName;
 
+    //! Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
+    int m_trackingVerbosity;
+
+    //! A list of Geant4 UI commands that should be applied before the extrapolation starts
+    std::vector<std::string> m_uiCommands;
+
+    //! If set to true the Geant4 visualization support is enabled
+    bool m_enableVisualization;
+
+    //! magnetic field stepper to use
+    std::string m_magneticFieldName;
+
+    //! minimal distance for magnetic field lookup. If distance is smaller, return cached value
+    double m_magneticCacheDistance;
+
+    //! maximum miss-distance between the trajectory curve and its linear chord(s) approximation
+    double m_deltaChordInMagneticField;
+
   private:
 
     //! Register the list of geant4 physical volumes whose entry/exit
@@ -170,15 +188,6 @@ namespace Belle2 {
 
     //! Pointer to the ExtManager singleton
     Simulation::ExtManager* m_ExtMgr;
-
-    //! Pointer to the simulation's G4RunManager (if any)
-    G4RunManager* m_RunMgr;
-
-    //! Pointer to the simulation's TrackingAction (if any)
-    G4UserTrackingAction* m_TrackingAction;
-
-    //! Pointer to the simulation's SteppingAction (if any)
-    G4UserSteppingAction* m_SteppingAction;
 
     //! PDG code for the particle-ID hypotheses
     std::vector<int> m_PDGCode;

@@ -23,10 +23,8 @@
 #include <genfit/TrackPoint.h>
 #include <genfit/AbsFitterInfo.h>
 #include <genfit/Exception.h>
-#include <simulation/kernel/DetectorConstruction.h>
-#include <simulation/kernel/MagneticField.h>
+#include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/ExtManager.h>
-#include <simulation/kernel/ExtPhysicsList.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
@@ -48,18 +46,13 @@
 
 #include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
-#include <G4UImanager.hh>
-#include <G4RunManager.hh>
+#include <G4VPhysicalVolume.hh>
 #include <G4ParticleTable.hh>
-#include <G4RegionStore.hh>
 #include <G4ErrorPropagatorData.hh>
-#include <G4ErrorPropagator.hh>
 #include <G4ErrorTrajErr.hh>
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
-#include <G4TransportationManager.hh>
-#include <G4VPhysicalVolume.hh>
-#include <G4FieldManager.hh>
+#include <G4UImanager.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -69,9 +62,6 @@ REG_MODULE(Ext)
 ExtModule::ExtModule() :
   Module(),
   m_ExtMgr(NULL), // initialized later
-  m_RunMgr(NULL), // initialized later
-  m_TrackingAction(NULL), // initialized later
-  m_SteppingAction(NULL), // initialized later
   m_Enter(NULL), // initialized later
   m_Exit(NULL), // initialized later
   m_TOF(0.0), // initialized later
@@ -88,6 +78,22 @@ ExtModule::ExtModule() :
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
   addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
+  // Additional parameters copied from FullSimModule
+  addParam("TrackingVerbosity", m_trackingVerbosity,
+           "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.",
+           0);
+  addParam("EnableVisualization", m_enableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
+  addParam("magneticField", m_magneticFieldName,
+           "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
+           string("default"));
+  addParam("magneticCacheDistance", m_magneticCacheDistance,
+           "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
+           0.0);
+  addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
+           "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
+  vector<string> defaultCommands;
+  addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied at the start of the job.",
+           defaultCommands);
 }
 
 ExtModule::~ExtModule()
@@ -105,52 +111,14 @@ void ExtModule::initialize()
   // exit points stored during the extrapolation.
   registerVolumes();
 
-  // Define the geant4e extrapolation Manager.
+  // Initialize the (singleton) extrapolation manager.  It will check
+  // whether it will run with or without FullSimModule and with or without
+  // Muid (or any other geant4e-based extrapolation module).
   m_ExtMgr = Simulation::ExtManager::GetManager();
-
-  // See if ext will coexist with geant4 simulation and/or muid extrapolation.
-  // Only geant4 simulation will have created a G4RunManager singleton; geant4e
-  // uses only the G4RunManagerKernel singleton (for ext and/or muid).
-  m_RunMgr = G4RunManager::GetRunManager();
-  if (m_RunMgr == NULL) {
-    B2INFO("Ext will run without simulation")
-    m_TrackingAction = NULL;
-    m_SteppingAction = NULL;
-    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("Ext will call InitGeant4e")
-      // Create the magnetic field for the geant4e extrapolation
-      Simulation::MagneticField* magneticField = new Simulation::MagneticField();
-      G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-      fieldManager->SetDetectorField(magneticField);
-      fieldManager->CreateChordFinder(magneticField);
-      // Tell geant4e about the detector and bare-bones physics list
-      m_ExtMgr->SetUserInitialization(new DetectorConstruction());
-      G4Region* region = (*(G4RegionStore::GetInstance()))[0];
-      region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-      m_ExtMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
-      m_ExtMgr->InitGeant4e();
-    } else {
-      B2INFO("Ext will not call InitGeant4e since it has already been initialized")
-    }
-  } else {
-    B2INFO("Ext will coexist with simulation")
-    m_TrackingAction = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
-    m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
-    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("Ext will call InitGeant4e")
-      if (m_ExtMgr->PrintG4State() == G4String("G4State_Idle")) {
-        // ... if G4RunManager::RunInitialization() will be called via fullsim/beginRun()
-        m_ExtMgr->InitGeant4e();
-        G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
-      } else {
-        // ... if G4RunManager::RunInitialization() has been called via fullsim/initialize()
-        G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
-        m_ExtMgr->InitGeant4e();
-      }
-    } else {
-      B2INFO("Ext will not call InitGeant4e since it has already been initialized")
-    }
-  }
+  m_ExtMgr->Initialize("Ext", m_magneticFieldName, m_magneticCacheDistance,
+                       m_deltaChordInMagneticField,
+                       m_enableVisualization, m_trackingVerbosity,
+                       m_uiCommands);
 
   // Redefine ext's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
@@ -174,12 +142,12 @@ void ExtModule::initialize()
   // Hypotheses for extrapolation
   const Const::ParticleSet set = Const::chargedStableSet;
   if (m_PDGCode.empty()) {
-    for (const Const::ChargedStable & pdgIter : set) {
+    for (const Const::ChargedStable& pdgIter : set) {
       m_ChargedStable.push_back(pdgIter);
     }
   } else { // user defined
     std::vector<Const::ChargedStable> stack;
-    for (const Const::ChargedStable & pdgIter : set) {
+    for (const Const::ChargedStable& pdgIter : set) {
       stack.push_back(pdgIter);
     }
     for (unsigned i = 0; i < m_PDGCode.size(); ++i) {
@@ -218,14 +186,8 @@ void ExtModule::event()
 {
 
   // Put geant4 in proper state (in case this module is in a separate process)
-  if (m_ExtMgr->PrintG4State() == "G4State_Idle") {
+  if (G4StateManager::GetStateManager()->GetCurrentState() == G4State_Idle) {
     G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
-  }
-
-  // Disable simulation-specific actions temporarily while we extrapolate
-  if (m_RunMgr) {
-    m_RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
-    m_RunMgr->SetUserAction((G4UserSteppingAction*)NULL);
   }
 
   // Loop over the reconstructed tracks.
@@ -274,7 +236,7 @@ void ExtModule::event()
       G4ErrorFreeTrajState* state = new G4ErrorFreeTrajState(g4eName, position, momentum, covG4e);
       m_ExtMgr->InitTrackPropagation();
       while (true) {
-        const G4int    errCode    = m_ExtMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
+        const G4int errCode = m_ExtMgr->PropagateOneStep(state);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
         const G4int    preStatus  = step->GetPreStepPoint()->GetStepStatus();
@@ -299,6 +261,7 @@ void ExtModule::event()
           createHit(state, EXT_STOP, tracks[t], pdgCode);
           break;
         }
+        // Detect escapes from the imaginary target cylinder.
         if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
           createHit(state, EXT_ESCAPE, tracks[t], pdgCode);
           break;
@@ -315,11 +278,6 @@ void ExtModule::event()
 
   } // track loop
 
-  if (m_RunMgr) {
-    m_RunMgr->SetUserAction(m_TrackingAction);
-    m_RunMgr->SetUserAction(m_SteppingAction);
-  }
-
 }
 
 void ExtModule::endRun()
@@ -329,14 +287,10 @@ void ExtModule::endRun()
 void ExtModule::terminate()
 {
 
-  if (m_RunMgr) {
-    m_RunMgr->SetUserAction(m_TrackingAction);
-    m_RunMgr->SetUserAction(m_SteppingAction);
-  }
   delete m_Target;
   delete m_Enter;
   delete m_Exit;
-
+  m_ExtMgr->RunTermination();
 }
 
 // Register the list of volumes for which entry/exit point is to be saved during extrapolation
@@ -400,7 +354,7 @@ void ExtModule::registerVolumes()
 
 }
 
-// Convert the physical volume name to integer(-like) identifiers
+// Convert the physical volume to integer(-like) identifiers
 void ExtModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& detID, int& copyID)
 {
 
@@ -476,7 +430,8 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     TVector3 firstDirection(firstMomentum.Unit());
 
     double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) * (CLHEP::m / CLHEP::cm);
+    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
+                    (CLHEP::m / CLHEP::cm);
     double centerPhi = firstMomentum.Phi() - CLHEP::halfpi;
     double centerX = firstPosition.X() + radius * cos(centerPhi);
     double centerY = firstPosition.Y() + radius * sin(centerPhi);

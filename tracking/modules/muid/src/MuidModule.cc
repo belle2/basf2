@@ -28,10 +28,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <simulation/kernel/DetectorConstruction.h>
-#include <simulation/kernel/MagneticField.h>
 #include <simulation/kernel/ExtManager.h>
-#include <simulation/kernel/ExtPhysicsList.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
 
@@ -55,19 +52,16 @@
 #include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4VPhysicalVolume.hh>
-#include <G4VTouchable.hh>
-#include <G4TouchableHandle.hh>
-#include <G4UImanager.hh>
-#include <G4RunManager.hh>
+// not needed #include <G4RunManager.hh>
 #include <G4ParticleTable.hh>
 #include <G4RegionStore.hh>
 #include <G4ErrorPropagatorData.hh>
-#include <G4ErrorPropagator.hh>
 #include <G4ErrorTrajErr.hh>
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
-#include <G4TransportationManager.hh>
-#include <G4FieldManager.hh>
+// not needed #include <G4TransportationManager.hh>
+// not needed #include <G4FieldManager.hh>
+#include <G4UImanager.hh>
 
 using namespace std;
 using namespace CLHEP;
@@ -82,9 +76,6 @@ REG_MODULE(Muid)
 MuidModule::MuidModule() :
   Module(),
   m_ExtMgr(NULL),
-  m_RunMgr(NULL),
-  m_TrackingAction(NULL),
-  m_SteppingAction(NULL),
   m_BKLMVolumes(NULL),
   m_EKLMVolumes(NULL),
   m_TOF(0.0),
@@ -144,15 +135,33 @@ MuidModule::MuidModule() :
   addParam("BKLMHitsColName", m_BKLMHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
   addParam("EKLMHitsColName", m_EKLMHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
-  addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation", string(""));
+  addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation",
+           string(""));
   addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
   addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
   addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference.", double(7.5));
-  addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle, "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
+  addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle,
+           "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
   addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
+  // Additional parameters copied from FullSimModule
+  addParam("TrackingVerbosity", m_trackingVerbosity,
+           "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.",
+           0);
+  addParam("EnableVisualization", m_enableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
+  addParam("magneticField", m_magneticFieldName,
+           "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
+           string("default"));
+  addParam("magneticCacheDistance", m_magneticCacheDistance,
+           "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
+           0.0);
+  addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
+           "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
+  vector<string> defaultCommands;
+  addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied at the start of the job.",
+           defaultCommands);
 }
 
 MuidModule::~MuidModule()
@@ -172,52 +181,14 @@ void MuidModule::initialize()
   // Define the list of BKLM/EKLM sensitive volumes in the geant4 geometry
   registerVolumes();
 
-  // Define the geant4e extrapolation Manager.
+  // Initialize the (singleton) extrapolation manager.  It will check
+  // whether it will run with or without FullSimModule and with or without
+  // Ext (or any other geant4e-based extrapolation module).
   m_ExtMgr = Simulation::ExtManager::GetManager();
-
-  // See if muid will coexist with geant4 simulation and/or ext extrapolation.
-  // Only geant4 simulation will have created a G4RunManager singleton; geant4e
-  // uses only the G4RunManagerKernel singleton (for ext and/or muid).
-  m_RunMgr = G4RunManager::GetRunManager();
-  if (m_RunMgr == NULL) {
-    B2INFO("Muid will run without simulation")
-    m_TrackingAction = NULL;
-    m_SteppingAction = NULL;
-    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("Muid will call InitGeant4e")
-      // Create the magnetic field for the geant4e extrapolation
-      Simulation::MagneticField* magneticField = new Simulation::MagneticField();
-      G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-      fieldManager->SetDetectorField(magneticField);
-      fieldManager->CreateChordFinder(magneticField);
-      // Tell geant4e about the detector and bare-bones physics list
-      m_ExtMgr->SetUserInitialization(new DetectorConstruction());
-      G4Region* region = (*(G4RegionStore::GetInstance()))[0];
-      region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
-      m_ExtMgr->SetUserInitialization(new Simulation::ExtPhysicsList);
-      m_ExtMgr->InitGeant4e();
-    } else {
-      B2INFO("Muid will not call InitGeant4e since it has already been initialized")
-    }
-  } else {
-    B2INFO("Muid will coexist with simulation")
-    m_TrackingAction = const_cast<G4UserTrackingAction*>(m_RunMgr->GetUserTrackingAction());
-    m_SteppingAction = const_cast<G4UserSteppingAction*>(m_RunMgr->GetUserSteppingAction());
-    if (m_ExtMgr->PrintExtState() == G4String("G4ErrorState_PreInit")) {
-      B2INFO("Muid will call InitGeant4e")
-      if (m_ExtMgr->PrintG4State() == G4String("G4State_Idle")) {
-        // ... if G4RunManager::RunInitialization() will be called via fullsim/beginRun()
-        m_ExtMgr->InitGeant4e();
-        G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
-      } else {
-        // ... if G4RunManager::RunInitialization() has been called via fullsim/initialize()
-        G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
-        m_ExtMgr->InitGeant4e();
-      }
-    } else {
-      B2INFO("Muid will not call InitGeant4e since it has already been initialized")
-    }
-  }
+  m_ExtMgr->Initialize("Muid", m_magneticFieldName, m_magneticCacheDistance,
+                       m_deltaChordInMagneticField,
+                       m_enableVisualization, m_trackingVerbosity,
+                       m_uiCommands);
 
   // Redefine muid's step length, magnetic field step limitation (fraction of local curvature radius),
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
@@ -301,7 +272,7 @@ void MuidModule::initialize()
   } else { // user defined
     const Const::ParticleSet set = Const::chargedStableSet;
     std::vector<Const::ChargedStable> stack;
-    for (const Const::ChargedStable & pdgIter : set) {
+    for (const Const::ChargedStable& pdgIter : set) {
       stack.push_back(pdgIter);
     }
     for (unsigned i = 0; i < m_PDGCode.size(); ++i) {
@@ -359,14 +330,8 @@ void MuidModule::event()
 {
 
   // Put geant4 in proper state (in case this module is in a separate process)
-  if (m_ExtMgr->PrintG4State() == "G4State_Idle") {
+  if (G4StateManager::GetStateManager()->GetCurrentState() == G4State_Idle) {
     G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
-  }
-
-  // Disable simulation-specific actions temporarily while we extrapolate
-  if (m_RunMgr) {
-    m_RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
-    m_RunMgr->SetUserAction((G4UserSteppingAction*)NULL);
   }
 
   // Loop over the reconstructed tracks.
@@ -420,7 +385,7 @@ void MuidModule::event()
       m_ExtMgr->InitTrackPropagation();
       while (true) {
 
-        const G4int    errCode    = m_ExtMgr->PropagateOneStep(state, G4ErrorMode_PropForwards);
+        const G4int    errCode    = m_ExtMgr->PropagateOneStep(state);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
         // Ignore the zero-length step by PropagateOneStep() at each boundary
@@ -431,11 +396,9 @@ void MuidModule::event()
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
         }
-
         // Detect radial escapes from the EKLM.  (Longitudinal escapes from
         // EKLM and BKLM are detected elsewhere.)
         if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) m_Escaped = true;
-
         // Stop extrapolating as soon as the track escapes KLM or curls inward too much
         // or the momentum is too low
         if (m_Escaped) break;
@@ -467,11 +430,6 @@ void MuidModule::event()
 
   } // track loop
 
-  if (m_RunMgr) {
-    m_RunMgr->SetUserAction(m_TrackingAction);
-    m_RunMgr->SetUserAction(m_SteppingAction);
-  }
-
 }
 
 void MuidModule::endRun()
@@ -481,13 +439,10 @@ void MuidModule::endRun()
 void MuidModule::terminate()
 {
 
-  if (m_RunMgr) {
-    m_RunMgr->SetUserAction(m_TrackingAction);
-    m_RunMgr->SetUserAction(m_SteppingAction);
-  }
   delete m_Target;
   delete m_BKLMVolumes;
   delete m_EKLMVolumes;
+  m_ExtMgr->RunTermination();
 
   delete m_MuonPlusPar;
   delete m_MuonMinusPar;
@@ -731,7 +686,8 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (point.chi2 >= 0.0) {
     StoreArray<MuidHit> muidHits(m_MuidHitsColName);
-    MuidHit* muidHit = muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position, point.positionAtHitPlane, m_TOF, point.time, point.chi2);
+    MuidHit* muidHit = muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position,
+                                          point.positionAtHitPlane, m_TOF, point.time, point.chi2);
     track->addRelationTo(muidHit);
     G4Point3D newPos(point.position.X()*cm, point.position.Y()*cm, point.position.Z()*cm);
     state->SetPosition(newPos);

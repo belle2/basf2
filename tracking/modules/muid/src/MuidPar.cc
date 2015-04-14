@@ -53,7 +53,8 @@ namespace Belle2 {
     if (exists) {
       content.append(line);
     } else {
-      B2FATAL("MuidPar::fillPDFs(): Required XML content /Detector/Tracking/MuidParameters not found for expt #" << expNo << " or earlier")
+      B2FATAL("MuidPar::fillPDFs(): Required XML content /Detector/Tracking/MuidParameters not found for expt #" << expNo <<
+              " or earlier")
     }
 
     m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size

@@ -103,7 +103,7 @@ EnergyLossForExtrapolator:: ~EnergyLossForExtrapolator()
   m_InvRangeDeuteron->clearAndDestroy(); delete m_InvRangeDeuteron;
   m_MscatElectron->clearAndDestroy(); delete m_MscatElectron;
   delete m_ProductionCuts;
-  for (const G4MaterialCutsCouple * couple : m_Couples) delete couple;
+  for (const G4MaterialCutsCouple* couple : m_Couples) delete couple;
   m_Couples.clear();
 }
 

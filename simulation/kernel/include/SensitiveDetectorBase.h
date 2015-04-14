@@ -55,12 +55,14 @@ namespace Belle2 {
        * the TrackID should be used as index of the MCParticle
        * @param name Name of the relation to register
        */
-      static void registerMCParticleRelation(const std::string& name, RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight);
+      static void registerMCParticleRelation(const std::string& name,
+                                             RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight);
 
       /** Overload to make it easer to register MCParticle relations
        * @param relation RelationArray to register
        */
-      static void registerMCParticleRelation(const RelationArray& relation, RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight) { registerMCParticleRelation(relation.getName(), ignoreAction); }
+      static void registerMCParticleRelation(const RelationArray& relation,
+                                             RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight) { registerMCParticleRelation(relation.getName(), ignoreAction); }
 
     protected:
       /** Process a Geant4 step in any of the sensitive volumes attached to this sensitive detector.

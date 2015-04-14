@@ -10,207 +10,243 @@
  **************************************************************************/
 
 #include <simulation/kernel/ExtManager.h>
-#include <G4EventManager.hh>
-#include <G4ErrorRunManagerHelper.hh>
+#include <simulation/kernel/RunManager.h>
+#include <simulation/kernel/MagneticField.h>
+#include <simulation/kernel/DetectorConstruction.h>
+#include <simulation/kernel/ExtPhysicsList.h>
+// not needed #include <G4ErrorRunManagerHelper.hh>
+
+#include <vector>
+#include <string>
+
+#include <G4UImanager.hh>
 #include <G4ErrorPropagator.hh>
+#include <G4ErrorRunManagerHelper.hh>
+#include <G4RunManager.hh>
+#include <G4EventManager.hh>
+#include <G4RegionStore.hh>
+#include <G4ProductionCutsTable.hh>
+#include <G4ErrorPropagatorData.hh>
+#include <G4ErrorPropagator.hh>
+#include <G4ErrorTrajErr.hh>
+#include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
+#include <G4TransportationManager.hh>
+#include <G4FieldManager.hh>
+#include <G4CachedMagneticField.hh>
+#include <G4Mag_UsualEqRhs.hh>
+#include <G4NystromRK4.hh>
+#include <G4HelixExplicitEuler.hh>
+#include <G4HelixSimpleRunge.hh>
+#include <G4ChordFinder.hh>
+#include <G4HadronicProcessStore.hh>
+#include <G4LossTableManager.hh>
+#include <G4VisExecutive.hh>
 
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-ExtManager* ExtManager::m_manager = NULL;
+ExtManager* ExtManager::m_Manager = NULL;
 
 ExtManager* ExtManager::GetManager()
 {
-  if (m_manager == NULL) {
-    m_manager = new ExtManager;
-  }
-  return m_manager;
+  if (m_Manager == NULL) m_Manager = new ExtManager;
+  return m_Manager;
 }
 
-ExtManager::ExtManager()
+ExtManager::ExtManager() :
+  m_Propagator(NULL),
+  m_G4RunMgr(NULL),
+  m_TrackingAction(NULL),
+  m_SteppingAction(NULL),
+  m_MagneticField(NULL),
+  m_UncachedField(NULL),
+  m_MagFldEquation(NULL),
+  m_Stepper(NULL),
+  m_ChordFinder(NULL),
+  m_VisManager(NULL)
 {
-  m_propagator = NULL;
-  StartHelper();
+  // This flag will be PreInit if FullSimModule is not present
+  m_G4State = G4StateManager::GetStateManager()->GetCurrentState();
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
-  if (false) InitFieldForBackwards();
 }
 
 ExtManager::~ExtManager()
 {
-  if (m_propagator) delete m_propagator;
-  if (m_helper) delete m_helper;
-  if (m_manager) delete m_manager;
-}
-
-void ExtManager::StartHelper()
-{
-  m_helper = G4ErrorRunManagerHelper::GetRunManagerKernel();
-  if (m_helper == NULL) {
-    m_helper = new G4ErrorRunManagerHelper();
-  }
-  B2DEBUG(200, "Simulation::ExtManager::StartHelper() done")
-
-}
-
-void ExtManager::InitGeant4e()
-{
-  B2INFO("Simulation::ExtManager::InitGeant4e(): At entry, Geant4e state "
-         << PrintExtState() << " Geant4 state " << PrintG4State())
-  G4ApplicationState currentState = G4StateManager::GetStateManager()->GetCurrentState();
-  if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState_PreInit) {
-    if ((currentState == G4State_PreInit) || (currentState == G4State_Idle)) {
-      m_helper->InitializeGeometry();
-      m_helper->InitializePhysics();
-    }
-    B2DEBUG(200, "Simulation::ExtManager::InitGeant4e(): Geant4 state before RunInitialization() "
-            << G4StateManager::GetStateManager()->GetCurrentState())
-    m_helper->RunInitialization();
-    B2DEBUG(200, "Simulation::ExtManager::InitGeant4e(): Geant4 state after RunInitialization() "
-            << G4StateManager::GetStateManager()->GetCurrentState())
-    if (!m_propagator) m_propagator = new G4ErrorPropagator();    // currently the only propagator possible
-    InitTrackPropagation();
-  } else {
-    B2DEBUG(200, "Simulation::ExtManager::InitGeant4e(): Illegal Geant4e state  " << PrintExtState())
-  }
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
-  B2INFO("Simulation::ExtManager::InitGeant4e(): At exit, Geant4e state "
-         << PrintExtState() << " Geant4 state " << PrintG4State())
+  if (m_Propagator) { delete m_Propagator; m_Propagator = NULL; }
+  // not needed if (m_helper) delete m_helper;
+  if (m_Manager) { delete m_Manager; m_Manager = NULL; }
 }
 
 void ExtManager::InitTrackPropagation()
 {
-  m_propagator->SetStepN(0);
+  if (m_G4RunMgr) {
+    m_G4RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
+    m_G4RunMgr->SetUserAction((G4UserSteppingAction*)NULL);
+  }
+  if (m_Propagator == NULL) m_Propagator = new G4ErrorPropagator();
+  m_Propagator->SetStepN(0);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Propagating);
-}
-
-G4bool ExtManager::InitFieldForBackwards()
-{
-  B2FATAL("Simulation::ExtManager::InitFieldForBackwards() should never be called")
-  return false;
-}
-
-G4int ExtManager::Propagate(G4ErrorTrajState* currentTS, const G4ErrorTarget* target, G4ErrorMode mode)
-{
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetMode(mode);
-  if (!m_propagator) m_propagator = new G4ErrorPropagator();    // currently the only propagator possible
-  SetSteppingManagerVerboseLevel();
-  InitTrackPropagation();
-  G4int ierr = m_propagator->Propagate(currentTS, target, mode);
-  EventTermination();
-  return ierr;
 }
 
 G4int ExtManager::PropagateOneStep(G4ErrorTrajState* currentTS, G4ErrorMode mode)
 {
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetMode(mode);
-  if (!m_propagator) m_propagator = new G4ErrorPropagator();    // currently the only propagator possible
-  SetSteppingManagerVerboseLevel();
-  return m_propagator->PropagateOneStep(currentTS);
-}
-
-void ExtManager::SetUserInitialization(G4VUserDetectorConstruction* userInit)
-{
-  m_helper->SetUserInitialization(userInit);
-}
-
-void ExtManager::SetUserInitialization(G4VPhysicalVolume* userInit)
-{
-  m_helper->SetUserInitialization(userInit);
-}
-
-void ExtManager::SetUserInitialization(G4VUserPhysicsList* userInit)
-{
-  m_helper->SetUserInitialization(userInit);
-}
-
-void ExtManager::SetUserAction(G4UserTrackingAction* userAction)
-{
-  G4EventManager::GetEventManager()->SetUserAction(userAction);
-}
-
-void ExtManager::SetUserAction(G4UserSteppingAction* userAction)
-{
-  G4EventManager::GetEventManager()->SetUserAction(userAction);
-}
-
-void ExtManager::SetSteppingManagerVerboseLevel()
-{
-  G4TrackingManager* trkmgr = G4EventManager::GetEventManager()->GetTrackingManager();
-  trkmgr->GetSteppingManager()->SetVerboseLevel(trkmgr->GetVerboseLevel());
+  return m_Propagator->PropagateOneStep(currentTS);
 }
 
 void ExtManager::EventTermination()
 {
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
+  if (m_G4RunMgr) {
+    m_G4RunMgr->SetUserAction(m_TrackingAction);
+    m_G4RunMgr->SetUserAction(m_SteppingAction);
+  }
 }
 
 void ExtManager::RunTermination()
 {
+  if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState_PreInit) return;
+
+  if (m_G4RunMgr) {
+    m_G4RunMgr->SetUserAction(m_TrackingAction);
+    m_G4RunMgr->SetUserAction(m_SteppingAction);
+  } else {
+    // Copied from FullSimModule
+    //We used one Geant4 run for all Belle2 runs so end the geant4 run here
+    Simulation::RunManager& myRunMgr = Simulation::RunManager::Instance();
+    myRunMgr.endRun();
+    //And clean up the run manager
+    if (m_VisManager) delete m_VisManager;
+    myRunMgr.destroy();
+    // Delete the objects associated with transport in magnetic field
+    if (m_ChordFinder) delete m_ChordFinder;
+    if (m_Stepper) delete m_Stepper;
+    if (m_MagFldEquation) delete m_MagFldEquation;
+    if (m_UncachedField) delete m_UncachedField;
+    if (m_MagneticField) delete m_MagneticField;
+  }
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
-  m_helper->RunTermination();
 }
 
-G4String ExtManager::PrintExtState()
+void ExtManager::Initialize(const char caller[], const std::string& magneticFieldName,
+                            double magneticCacheDistance,
+                            double deltaChordInMagneticField,
+                            bool enableVisualization,
+                            int trackingVerbosity,
+                            const std::vector<std::string>& uiCommands)
 {
-  return PrintExtState(G4ErrorPropagatorData::GetErrorPropagatorData()->GetState());
-}
 
-G4String ExtManager::PrintExtState(G4ErrorState state)
-{
-  G4String nam = "";
-  switch (state) {
-    case G4ErrorState_PreInit:
-      nam = "G4ErrorState_PreInit";
-      break;
-    case G4ErrorState_Init:
-      nam = "G4ErrorState_Init";
-      break;
-    case G4ErrorState_Propagating:
-      nam = "G4ErrorState_Propagating";
-      break;
-    case G4ErrorState_TargetCloserThanBoundary:
-      nam = "G4ErrorState_TargetCloserThanBoundary";
-      break;
-    case G4ErrorState_StoppedAtTarget:
-      nam = "G4ErrorState_StoppedAtTarget";
-      break;
+  int status = (m_G4State == G4State_PreInit) ? 0 : 2;
+
+  if (G4ErrorPropagatorData::GetErrorPropagatorData()->GetState() == G4ErrorState_Init) {
+    status += 1;
+    if (status == 1) {
+      B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim; the extrapolator has already been initialized")
+    } else {
+      B2INFO("ExtManager::Initialize(): " << caller << " will run with FullSim; the extrapolator has already been initialized")
+    }
+    return;
   }
-  return nam;
-}
 
-G4String ExtManager::PrintG4State()
-{
-  return PrintG4State(G4StateManager::GetStateManager()->GetCurrentState());
-}
+  if (status == 2) {
+    m_G4RunMgr = G4RunManager::GetRunManager();
+    m_TrackingAction = const_cast<G4UserTrackingAction*>(m_G4RunMgr->GetUserTrackingAction());
+    m_SteppingAction = const_cast<G4UserSteppingAction*>(m_G4RunMgr->GetUserSteppingAction());
+  } else { // status == 0
 
-G4String ExtManager::PrintG4State(G4ApplicationState state)
-{
-  G4String nam = "";
-  switch (state) {
-    case G4State_PreInit:
-      nam = "G4State_PreInit";
-      break;
-    case G4State_Init:
-      nam = "G4State_Init";
-      break;
-    case G4State_Idle:
-      nam = "G4State_Idle";
-      break;
-    case G4State_GeomClosed:
-      nam = "G4State_GeomClosed";
-      break;
-    case G4State_EventProc:
-      nam = "G4State_EventProc";
-      break;
-    case G4State_Quit:
-      nam = "G4State_Quit";
-      break;
-    case G4State_Abort:
-      nam = "G4State_Abort";
-      break;
+    Simulation::RunManager& myRunMgr = Simulation::RunManager::Instance();
+
+    // This is duplicated from FullSimModule::initialize() to use the Geant4/Geant4e
+    // machinery for extrapolation only (no simulation)
+
+    // Create the magnetic field for the geant4e extrapolation
+    if (magneticFieldName != "none") {
+      m_MagneticField = new Simulation::MagneticField();
+      if (magneticCacheDistance > 0.0) {
+        m_UncachedField = m_MagneticField;
+        m_MagneticField = new G4CachedMagneticField(m_UncachedField, magneticCacheDistance);
+      }
+      G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+      fieldManager->SetDetectorField(m_MagneticField);
+      if (magneticFieldName != "default") {
+
+        //We only use Magnetic field so let's try the specialized steppers
+        m_MagFldEquation = new G4Mag_UsualEqRhs(m_MagneticField);
+        if (magneticFieldName == "nystrom") {
+          m_Stepper = new G4NystromRK4(m_MagFldEquation);
+        } else if (magneticFieldName == "expliciteuler") {
+          m_Stepper = new G4HelixExplicitEuler(m_MagFldEquation);
+        } else if (magneticFieldName == "simplerunge") {
+          m_Stepper = new G4HelixSimpleRunge(m_MagFldEquation);
+        } else {
+          B2FATAL("Unknown magnetic field option: " << magneticFieldName);
+        }
+
+        //Set a minimum stepsize (stepMinimum): The chordfinder should not attempt to limit
+        //the stepsize to something less than 10µm (which is the default value of Geant4).
+        m_ChordFinder = new G4ChordFinder(m_MagneticField, 1e-2 * CLHEP::mm, m_Stepper);
+        fieldManager->SetChordFinder(m_ChordFinder);
+      } else {
+        fieldManager->CreateChordFinder(m_MagneticField);
+      }
+
+      //Change DeltaCord (the max. miss-distance between the trajectory curve and its linear chord(s) approximation, if asked.
+      G4ChordFinder* chordFinder = fieldManager->GetChordFinder();
+      B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
+      chordFinder->SetDeltaChord(deltaChordInMagneticField * CLHEP::mm);
+      B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
+
+      //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
+    }
+
+    //Set the verbosity level of Geant4 according to the logging settings of the module
+    int g4VerboseLevel = 0;
+    switch (LogSystem::Instance().getCurrentLogLevel()) {
+      case LogConfig::c_Debug : g4VerboseLevel = 2;
+        break;
+      case LogConfig::c_Info  : g4VerboseLevel = 1;
+        break;
+      default: g4VerboseLevel = 0;
+    }
+    G4EventManager::GetEventManager()->SetVerboseLevel(g4VerboseLevel);
+    G4RunManager::GetRunManager()->SetVerboseLevel(g4VerboseLevel);
+    G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(
+      trackingVerbosity); //turned out to be more useful as a parameter.
+    G4LossTableManager::Instance()->SetVerbose(g4VerboseLevel);
+
+    if (enableVisualization) {
+      m_VisManager = new G4VisExecutive;
+      m_VisManager->Initialize();
+    }
+
+    //Apply the Geant4 UI commands
+    if (uiCommands.size() > 0) {
+      G4UImanager* uiManager = G4UImanager::GetUIpointer();
+      for (std::vector<std::string>::const_iterator iter = uiCommands.begin(); iter != uiCommands.end(); ++iter) {
+        uiManager->ApplyCommand(*iter);
+      }
+    }
+
+    // Construct the detector and bare-bones physics list
+    myRunMgr.SetUserInitialization(new DetectorConstruction());
+    G4Region* region = (*(G4RegionStore::GetInstance()))[0];
+    region->SetProductionCuts(G4ProductionCutsTable::GetProductionCutsTable()->GetDefaultProductionCuts());
+    myRunMgr.SetUserInitialization(new Simulation::ExtPhysicsList());
+    myRunMgr.Initialize();
+    B2INFO("ExtManager::Initialize(): Perform Geant4 final initialization: Geometry optimization, ExtPhysicsList calculations...");
+    myRunMgr.beginRun(0);
+    B2INFO("ExtManager::Initialize(): done, Geant4 ready (for extrapolation only)");
+    G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
   }
-  return nam;
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
+  if (status == 0) {
+    B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim and has initialized the extrapolator")
+  } else {
+    B2INFO("ExtManager::Initialize(): " << caller << " will run with FullSim and has initialized the extrapolator")
+  }
+  return;
 }
+

@@ -167,12 +167,13 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
 
     //Add the vertex to the event
     event->AddPrimaryVertex(vertex);
-    B2DEBUG(10, "Created the vertex (" << mcProdVtx.X() << "," << mcProdVtx.Y() << "," << mcProdVtx.Z() << ") with the primary particle " << mcParticle.getPDG());
+    B2DEBUG(10, "Created the vertex (" << mcProdVtx.X() << "," << mcProdVtx.Y() << "," << mcProdVtx.Z() <<
+            ") with the primary particle " << mcParticle.getPDG());
   }
 
   //Add all children
   int currMotherIndex = m_mcParticleGraph.size();
-  for (MCParticle * daughter : mcParticle.getDaughters()) {
+  for (MCParticle* daughter : mcParticle.getDaughters()) {
     addParticle(*daughter, event, g4Mother, currMotherIndex, useTime);
   }
 }

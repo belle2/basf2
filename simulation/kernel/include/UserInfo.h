@@ -95,7 +95,8 @@ namespace Belle2 {
        * @param obj Reference to the carrier.
        * @return The data attached to the carrier.
        */
-      template<class Carrier> static Payload getInfo(Carrier& obj) {
+      template<class Carrier> static Payload getInfo(Carrier& obj)
+      {
         UserInfo<Info, Payload>* userinfo = dynamic_cast<UserInfo<Info, Payload>*>(obj.GetUserInformation());
         if (!userinfo) throw(CouldNotFindUserInfo());
         return userinfo->getData();

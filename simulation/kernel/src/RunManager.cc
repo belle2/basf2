@@ -90,7 +90,7 @@ void RunManager::destroy()
 {
   if (m_instance == nullptr) return;
 
-  for (G4AssemblyVolume * assemblyVolume : m_AssemblyVolumes) delete assemblyVolume;
+  for (G4AssemblyVolume* assemblyVolume : m_AssemblyVolumes) delete assemblyVolume;
   m_AssemblyVolumes.clear();
 
   if (ProcHandler::parallelProcessingUsed() and !ProcHandler::isOutputProcess()) {

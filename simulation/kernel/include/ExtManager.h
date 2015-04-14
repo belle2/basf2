@@ -16,14 +16,16 @@
 #define EXTMANAGER_H
 
 #include <globals.hh>
+#include <G4ApplicationState.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorPropagator.hh>
-#include <G4ApplicationState.hh>
+// not needed #include <G4ApplicationState.hh>
 
-class G4ErrorRunManagerHelper;
+// not needed class G4ErrorRunManagerHelper;
 class G4ErrorTarget;
 class G4ErrorTrajState;
 
+class G4RunManager;
 class G4VUserDetectorConstruction;
 class G4VPhysicalVolume;
 class G4VUserPhysicsList;
@@ -32,7 +34,11 @@ class G4UserEventAction;
 class G4UserStackingAction;
 class G4UserTrackingAction;
 class G4UserSteppingAction;
+class G4MagneticField;
+class G4MagIntegratorStepper;
+class G4ChordFinder;
 class G4Mag_UsualEqRhs;
+class G4VisManager;
 class G4Track;
 
 namespace Belle2 {
@@ -58,82 +64,63 @@ namespace Belle2 {
       void RunTermination();
 
       //! Initialize Geant4 and Geant4e
-      void InitGeant4e();
+      void Initialize(const char [], const std::string&, double, double, bool, int, const std::vector<std::string>&);
 
       //! Initialize for propagation of a track and set state to G4ErrorState_Propagating
       void InitTrackPropagation();
 
-      //! Create G4ErrorMag_UsualEqRhs for backward propagation of a track
-      G4bool InitFieldForBackwards();
-
-      //! Propagate a track to completion
-      G4int Propagate(G4ErrorTrajState* currentTS, const G4ErrorTarget* target,
-                      G4ErrorMode mode = G4ErrorMode_PropForwards);
-
       //! Propagate a track by one step
-      G4int PropagateOneStep(G4ErrorTrajState* currentTS,
-                             G4ErrorMode mode = G4ErrorMode_PropForwards);
-
-      //! Invoke G4ErrorRunManagerHelper to construct detector and set world volume
-      void SetUserInitialization(G4VUserDetectorConstruction*);
-
-      //! Invoke G4ErrorRunManagerHelper to set world volume
-      void SetUserInitialization(G4VPhysicalVolume*);
-
-      //! Invoke G4ErrorRunManagerHelper to initialize ext-specific physics
-      void SetUserInitialization(G4VUserPhysicsList*);
-
-      //! Tell G4EventManager about our tracking action
-      void SetUserAction(G4UserTrackingAction*);
-
-      //! Tell G4EventManager about our stepping action
-      void SetUserAction(G4UserSteppingAction*);
-
-      //! Print the extrapolator's state
-      G4String PrintExtState();
-
-      //! Print the extrapolator's state
-      G4String PrintExtState(G4ErrorState);
-
-      //! Print the geant4 state
-      G4String PrintG4State();
-
-      //! Print the geant4 state
-      G4String PrintG4State(G4ApplicationState);
-
-      //! Get the helper
-      inline G4ErrorRunManagerHelper* GetHelper() const;
-
-      //! Set the verbosity level for the extrapolator's stepping manager
-      void SetSteppingManagerVerboseLevel();
+      G4int PropagateOneStep(G4ErrorTrajState* currentTS, G4ErrorMode mode = G4ErrorMode_PropForwards);
 
       //! Get the propagator
-      inline G4ErrorPropagator* GetPropagator() const;
+      inline G4ErrorPropagator* GetPropagator() const { return m_Propagator; }
 
     private:
 
       //! constructor is hidden: user calls ExtManager::GetManager() instead
       ExtManager();
 
-      //! Create a RunManager helper
-      void StartHelper();
-
     private:
 
       //! Stores pointer to the singleton class
-      static ExtManager* m_manager;
+      static ExtManager* m_Manager;
 
-      //! Stores pointer to the RunManager helper
-      G4ErrorRunManagerHelper* m_helper;
+      //! Initial state of the G4RunManager (=PreInitif FullSimModule not present)
+      G4ApplicationState m_G4State;
 
       //! Stores pointer to the propagator
-      G4ErrorPropagator* m_propagator;
+      G4ErrorPropagator* m_Propagator;
+
+      //! Pointer to the simulation's G4RunManager (if any)
+      G4RunManager* m_G4RunMgr;
+
+      //! Pointer to the simulation's TrackingAction (if any)
+      G4UserTrackingAction* m_TrackingAction;
+
+      //! Pointer to the simulation's SteppingAction (if any)
+      G4UserSteppingAction* m_SteppingAction;
+
+      //! Pointer to the (un)cached magnetic field
+      G4MagneticField* m_MagneticField;
+
+      //! Pointer to the uncached magnetic field (might be superseded by its cached version)
+      G4MagneticField* m_UncachedField;
+
+      //! Pointer to the equation of motion in the magnetic field (if not the default)
+      G4Mag_UsualEqRhs* m_MagFldEquation;
+
+      //! Pointer to the equation-of-motion stepper (if not the default)
+      G4MagIntegratorStepper* m_Stepper;
+
+      //! Pointer to the equation-of-motion chord finder (if not the default)
+      G4ChordFinder* m_ChordFinder;
+
+      //! Pointer to the visualization manager (if used)
+      G4VisManager* m_VisManager;
 
     };
 
-    inline G4ErrorRunManagerHelper* ExtManager::GetHelper() const { return m_helper; }
-
-    inline G4ErrorPropagator* ExtManager::GetPropagator() const { return m_propagator; }
+    // not needed inline G4ErrorRunManagerHelper* ExtManager::GetHelper() const { return m_helper; }
 
   } // end of namespace Simulation
 

@@ -11,6 +11,7 @@
 #ifndef DETECTORCONSTRUCTION_H
 #define DETECTORCONSTRUCTION_H
 
+#include <framework/logging/Logger.h>
 #include <geometry/GeometryManager.h>
 #include "G4VUserDetectorConstruction.hh"
 
@@ -25,7 +26,8 @@ namespace Belle2 {
   class DetectorConstruction: public G4VUserDetectorConstruction {
   public:
     /** Return pointer to top volume */
-    G4VPhysicalVolume* Construct() {
+    G4VPhysicalVolume* Construct()
+    {
       G4VPhysicalVolume* topVolume = geometry::GeometryManager::getInstance().getTopVolume();
       if (!topVolume) B2FATAL("No Geometry defined, please create the geometry"
                                 " before doing simulation, normally by using the Geometry module.");

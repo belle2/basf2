@@ -18,7 +18,8 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(const string& mcCollectionName, MCParticleGraph& mcParticleGraph) : G4VUserPrimaryGeneratorAction()
+PrimaryGeneratorAction::PrimaryGeneratorAction(const string& mcCollectionName,
+                                               MCParticleGraph& mcParticleGraph) : G4VUserPrimaryGeneratorAction()
 {
   m_mcParticleGenerator = new MCParticleGenerator(mcCollectionName, mcParticleGraph);
   if (false) {

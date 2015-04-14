@@ -54,7 +54,8 @@ namespace Belle2 {
 
     };
 
-    inline G4double ExtStepLengthLimitProcess::PostStepGetPhysicalInteractionLength(const G4Track&, G4double, G4ForceCondition* condition)
+    inline G4double ExtStepLengthLimitProcess::PostStepGetPhysicalInteractionLength(const G4Track&, G4double,
+        G4ForceCondition* condition)
     {
       *condition = Forced; // PostStepDoIt() must be called after each step
       return m_stepLimit;

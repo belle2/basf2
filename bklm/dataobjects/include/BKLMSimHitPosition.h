@@ -34,7 +34,7 @@ namespace Belle2 {
     virtual ~BKLMSimHitPosition() {}
 
     //! Copy constructor
-    BKLMSimHitPosition(const BKLMSimHitPosition& p) : RelationsObject(p) { m_Position = p.m_Position; }
+    BKLMSimHitPosition(const BKLMSimHitPosition& p) : RelationsObject(p), m_Position(p.m_Position) {}
 
     //! Get the BKLMSimHit's global position
     //! @return Cartesian global position (cm)

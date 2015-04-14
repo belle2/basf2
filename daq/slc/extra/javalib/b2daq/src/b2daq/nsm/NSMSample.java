@@ -62,8 +62,11 @@ public class NSMSample {
             }
         });
 
+        // send NSM var with integer
+        NSMCommunicator.get().requestVSet(nsmnode, new NSMVar("eb0.port", 5101));
+
         // send NSM message to a NSM node of "ROPC01"
         // request contains a command to perform refresh of configuration parameters
-        //NSMCommunicator.get().request(new NSMMessage(nsmnode, RCCommand.CONFIGURE));
+        NSMCommunicator.get().request(new NSMMessage(nsmnode, RCCommand.CONFIGURE));
     }
 }

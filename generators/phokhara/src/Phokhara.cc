@@ -138,29 +138,29 @@ void Phokhara::setDefaultSettings()
 //   m_MinInvMassHadrons = 0.2;
 //   m_MaxInvMassHadrons = 0.5;
 //   m_MinEnergyGamma = 4.0;
-//
-//   m_cmsEnergy = 10.580 * Unit::GeV;
-//   m_applyBoost = true;
-//   m_finalState = -1;
-//   m_nMaxTrials = -1;
-//   m_nSearchMax = -1;
-//   m_epsilon = 1.e-4;
-//   m_LO = -1;
-//   m_NLO = -1;
-//   m_QED = -1;
-//   m_NLOIFI = -1;
-//   m_alpha = -1;
-//   m_pionff = -1;
-//   m_pionstructure = -1;
-//   m_kaonff = -1;
-//   m_narres = -1;
-//   m_protonff = -1;
-//   m_ScatteringAngleRangePhoton = make_pair(0.0, 180.0); //in [deg]
-//   m_ScatteringAngleRangeFinalStates = make_pair(0.0, 180.0); //in [deg]
-//   m_MinInvMassHadronsGamma = -1;
-//   m_MinInvMassHadrons = 0.;
-//   m_MaxInvMassHadrons = 0.;
-//   m_MinEnergyGamma = 0.;
+
+  m_cmsEnergy = 10.577 * Unit::GeV;
+  m_applyBoost = true;
+  m_finalState = -1;
+  m_nMaxTrials = -1;
+  m_nSearchMax = -1;
+  m_epsilon = 1.e-4;
+  m_LO = -1;
+  m_NLO = -1;
+  m_QED = -1;
+  m_NLOIFI = -1;
+  m_alpha = -1;
+  m_pionff = -1;
+  m_pionstructure = -1;
+  m_kaonff = -1;
+  m_narres = -1;
+  m_protonff = -1;
+  m_ScatteringAngleRangePhoton = make_pair(0.0, 180.0); //in [deg]
+  m_ScatteringAngleRangeFinalStates = make_pair(0.0, 180.0); //in [deg]
+  m_MinInvMassHadronsGamma = -1;
+  m_MinInvMassHadrons = 0.;
+  m_MaxInvMassHadrons = 0.;
+  m_MinEnergyGamma = 0.;
 
 }
 

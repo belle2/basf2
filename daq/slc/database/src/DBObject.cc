@@ -434,9 +434,13 @@ void DBObject::printSQL(const std::string& table, std::ostream& out,
                                     name_out.c_str(), objs[0].getPath().c_str()) << std::endl;
           } else {
             for (int i = 0; i < length; i++) {
+              std::string oname = objs[i].getName();
+              if (oname.size() == 0) oname = objs[0].getName();
+              std::string opath = objs[i].getPath();
+              if (opath.size() == 0) opath = objs[0].getPath();
               out << StringUtil::form("insert into %s (name, path, value_o) values ('%s[%d]', '.%s[%d].', '%s');",
-                                      table.c_str(), objs[0].getName().c_str(),
-                                      i, name_out.c_str(), i, objs[0].getPath().c_str()) << std::endl;
+                                      table.c_str(), oname.c_str(),
+                                      i, name_out.c_str(), i, opath.c_str()) << std::endl;
             }
           }
         } else {

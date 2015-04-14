@@ -124,7 +124,7 @@ bool CDCPedestalHandler::handleGetInt(int& val)
 {
   try {
     int i = m_index / 2;
-    val = m_hslb.readfee32(0x0020 + i * 2);
+    val = m_hslb.readfee32(0x0020 + i);
     if (m_index % 2 == 0) {
       val = val & (0xFFFF >> 6);
     } else {

@@ -5,10 +5,10 @@
  */
 package b2daq.apps.pscontrol;
 
-import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMNode;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class PSCrateSettingPanelController {
 
     public void setNode(NSMNode node) {
         m_hvnode = node;
-        NSMCommunicator.get().add(new CrateNChannelHandler(m_hvnode.getName(), "crate[" + m_crateid + "].nchannels"));
+        NSMRequestHandlerUI.get().add(new CrateNChannelHandler(m_hvnode.getName(), "crate[" + m_crateid + "].nchannels"));
     }
 
     public void allOn(boolean allon) {

@@ -20,7 +20,7 @@ public abstract class NSMRequestHandler {
         m_once = once;
     }
     
-    boolean isOnce() {
+    public boolean isOnce() {
         return m_once;
     }
     

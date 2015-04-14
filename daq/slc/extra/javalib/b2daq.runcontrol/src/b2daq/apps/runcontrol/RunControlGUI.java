@@ -8,6 +8,7 @@ package b2daq.apps.runcontrol;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMConfig;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.ui.LoginDialog;
 import java.io.IOException;
 import javafx.application.Application;
@@ -28,6 +29,7 @@ public class RunControlGUI extends Application {
                 "localhost", 9090, "ecl01", "b2slow2.kek.jp", 9122, "rcgui");
         RunControlMainPane root = new RunControlMainPane(conf.getNsmNode());
         NSMCommunicator.get().reconnect(conf.getHostname(), conf.getPort(), conf.getGuiNode(), conf.getNsmHost(), conf.getNsmPort());
+        NSMCommunicator.get().add(NSMRequestHandlerUI.get());
         Scene scene = new Scene(root, 650, 450);
         scene.getStylesheets().add(LogMessage.getCSSPath());
         stage.setOnCloseRequest((WindowEvent t) -> {

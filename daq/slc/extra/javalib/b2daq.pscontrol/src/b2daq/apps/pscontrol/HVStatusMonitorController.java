@@ -12,12 +12,12 @@ import b2daq.dqm.core.Histo2D;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.hvcontrol.core.HVState;
 import b2daq.nsm.NSMCommand;
-import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMData;
 import b2daq.nsm.NSMMessage;
 import b2daq.nsm.NSMNode;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import java.io.IOException;
 import java.util.HashMap;
 import javafx.fxml.FXML;
@@ -95,7 +95,7 @@ public class HVStatusMonitorController {
 
     void setNode(NSMNode node) {
         m_node = node;
-        NSMCommunicator.get().add(new NSMVSetHandler(true, m_node.getName(), "ncrates", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_node.getName(), "ncrates", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 int ncrates = var.getInt();

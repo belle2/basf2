@@ -11,6 +11,7 @@ import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMNode;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -61,7 +62,7 @@ public class PSChannelSettingPanelController {
     public void setNode(NSMNode node) {
         m_hvnode = node;
         String vname = "crate[" + m_crateid + "].channel[" + m_index + "].";
-        NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), vname + "channel", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), vname + "channel", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_channel = var.getInt();
@@ -70,7 +71,7 @@ public class PSChannelSettingPanelController {
                 return true;
             }
         });
-        NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), vname + "slot", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), vname + "slot", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_slot = var.getInt();
@@ -83,56 +84,56 @@ public class PSChannelSettingPanelController {
 
     private void addValues() {
         if (m_slot > 0 && m_channel > 0) {
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("rampup"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("rampup"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     field_rampup.setText("" + var.getFloat());
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("rampdown"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("rampdown"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     field_rampdown.setText("" + var.getFloat());
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("vdemand"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("vdemand"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     field_vdemand.setText("" + var.getFloat());
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("vlimit"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("vlimit"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     field_vlimit.setText("" + var.getFloat());
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("climit"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("climit"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     field_climit.setText("" + var.getFloat());
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("vmon"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("vmon"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     label_vmon.setText("" + var.getFloat() + " [V]");
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("cmon"), NSMVar.FLOAT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("cmon"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     label_cmon.setText("" + var.getFloat() + " [uA]");
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("switch"), NSMVar.TEXT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("switch"), NSMVar.TEXT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     if (var.getText().equals("OFF")) {
@@ -143,7 +144,7 @@ public class PSChannelSettingPanelController {
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("state"), NSMVar.TEXT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("state"), NSMVar.TEXT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     slabel_state.update(new HVState(var.getText()));

@@ -23,7 +23,7 @@ public abstract class NSMDATASetParamHandler extends NSMRequestHandler {
     private  int m_type = FieldInfo.NONE;
 
     String getDataName() { return m_name; }
-    String getParName() { return m_name; }
+    String getParName() { return m_pname; }
     int getType() { return m_type; }
 
     public NSMDATASetParamHandler(boolean once, String name, String pname, int type) {

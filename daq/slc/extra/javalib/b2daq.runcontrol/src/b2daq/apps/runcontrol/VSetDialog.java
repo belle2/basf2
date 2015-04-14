@@ -9,6 +9,7 @@ import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMVListSetHandler;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import java.io.IOException;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
@@ -120,7 +121,7 @@ public class VSetDialog extends VBox {
         });
         combo.setOnAction((event) -> {
             NSMVListSetHandler.VarEntry en = (NSMVListSetHandler.VarEntry) combo.getSelectionModel().getSelectedItem();
-            NSMCommunicator.get().add(new NSMVSetHandler(true, m_nodename, en.name, NSMVar.NONE) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_nodename, en.name, NSMVar.NONE) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     if (var.getType() == NSMVar.INT) {
@@ -138,7 +139,7 @@ public class VSetDialog extends VBox {
 
     public static void showDialog(Scene pscene, String title,
             String message, String nodename) {
-        NSMCommunicator.get().add(new NSMVListSetHandler(true, nodename) {
+        NSMRequestHandlerUI.get().add(new NSMVListSetHandler(true, nodename) {
             @Override
             public boolean handleVListSet(ArrayList<NSMVListSetHandler.VarEntry> vars) {
                 VSetDialog dialog = new VSetDialog(nodename);

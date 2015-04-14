@@ -5,10 +5,10 @@
  */
 package b2daq.apps.pscontrol;
 
-import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMNode;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class PSSettingMainPanelController {
     
     public void setNode(NSMNode node) throws IOException {
         m_hvnode = node;
-        NSMCommunicator.get().add(new NSMVSetHandler(true, m_hvnode.getName(), "ncrates", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_hvnode.getName(), "ncrates", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 System.out.println(m_node+" " + var.getName());
@@ -88,7 +88,7 @@ public class PSSettingMainPanelController {
                 }
                 int i = 1;
                 for (Tab tab : tabpane.getTabs()) {
-                    NSMCommunicator.get().add(new CrateNameHandler(m_node, "crate[" + i + "].name", tab, crate.get(i-1)));
+                    NSMRequestHandlerUI.get().add(new CrateNameHandler(m_node, "crate[" + i + "].name", tab, crate.get(i-1)));
                     i++;
                 }
                 return true;

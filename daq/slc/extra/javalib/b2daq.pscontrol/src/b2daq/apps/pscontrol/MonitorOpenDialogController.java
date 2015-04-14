@@ -9,9 +9,9 @@ import b2daq.dqm.core.TimedGraph1D;
 import b2daq.dqm.ui.CanvasPanel;
 import b2daq.hvcontrol.core.HVState;
 import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -77,7 +77,7 @@ public class MonitorOpenDialogController implements Initializable {
                 canvas.getCanvas().setFillColor(Color.LIGHTGRAY);
                 canvas.getCanvas().getPad().setY(0.07);
                 canvas.getCanvas().getAxisX().setNdivisions(10);
-                NSMCommunicator.get().add(new NSMVSetHandler(false, m_pmain.getNode().getName(), vname, NSMVar.FLOAT) {
+                NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_pmain.getNode().getName(), vname, NSMVar.FLOAT) {
                     @Override
                     public boolean handleVSet(NSMVar var) {
                         gr.get(var.getName()).addPoint(var.getFloat());

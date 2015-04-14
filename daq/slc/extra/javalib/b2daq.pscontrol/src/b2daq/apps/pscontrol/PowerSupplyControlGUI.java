@@ -9,6 +9,7 @@ import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMConfig;
 import b2daq.nsm.NSMNode;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.ui.LoginDialog;
 import java.net.URL;
 import java.util.logging.Level;
@@ -41,6 +42,7 @@ public class PowerSupplyControlGUI extends Application {
             PSSettingMainPanelController con = (PSSettingMainPanelController) loader.getController();
             con.setNode(new NSMNode(conf.getNsmNode()));
             NSMCommunicator.get().reconnect(conf.getHostname(), conf.getPort(), conf.getGuiNode(), conf.getNsmHost(), conf.getNsmPort());
+            NSMCommunicator.get().add(NSMRequestHandlerUI.get());
             Scene scene = new Scene(root, 1100, 450);
             scene.getStylesheets().add(LogMessage.getCSSPath());
             stage.setOnCloseRequest((WindowEvent t) -> {

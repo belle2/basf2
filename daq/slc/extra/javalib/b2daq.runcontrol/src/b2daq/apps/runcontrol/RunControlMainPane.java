@@ -13,6 +13,7 @@ import b2daq.nsm.NSMLogHandler;
 import b2daq.nsm.NSMMessage;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.runcontrol.core.RCState;
 import b2daq.runcontrol.ui.RCStateLabel;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class RunControlMainPane extends VBox {
         Menu setting_menu = new Menu("_Setting");
         MenuItem run_item = new MenuItem("_Run");
         run_item.setOnAction((ActionEvent t) -> {
-            NSMCommunicator.get().add(new NSMVSetHandler(true, m_nodename, "expno", NSMVar.INT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_nodename, "expno", NSMVar.INT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     m_expno = var.getInt();
@@ -76,7 +77,7 @@ public class RunControlMainPane extends VBox {
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(true, m_nodename, "operators", NSMVar.TEXT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_nodename, "operators", NSMVar.TEXT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     m_operators = var.getText();
@@ -85,7 +86,7 @@ public class RunControlMainPane extends VBox {
                     return true;
                 }
             });
-            NSMCommunicator.get().add(new NSMVSetHandler(true, m_nodename, "comment", NSMVar.TEXT) {
+            NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_nodename, "comment", NSMVar.TEXT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {
                     m_comment = var.getText();
@@ -109,7 +110,7 @@ public class RunControlMainPane extends VBox {
         m_rclabel = new RCStateLabel();
         m_rclabel.setMinSize(100, 35);
         hbox.getChildren().add(m_rclabel);
-        NSMCommunicator.get().add(new NSMVSetHandler(false, nodename, "rcstate", NSMVar.TEXT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, nodename, "rcstate", NSMVar.TEXT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_rclabel.update(new RCState(var.getText()));
@@ -122,7 +123,7 @@ public class RunControlMainPane extends VBox {
         m_label_config = new Label("");
         HBox.setMargin(m_label_config, new Insets(5, 5, 5, 5));
         hbox.getChildren().add(m_label_config);
-        NSMCommunicator.get().add(new NSMVSetHandler(false, nodename, "rcconfig", NSMVar.TEXT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, nodename, "rcconfig", NSMVar.TEXT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 String[] s = var.getText().split("@");
@@ -136,7 +137,7 @@ public class RunControlMainPane extends VBox {
         m_label_runnos = new Label("");
         HBox.setMargin(m_label_runnos, new Insets(5, 5, 5, 5));
         hbox.getChildren().add(m_label_runnos);
-        NSMCommunicator.get().add(new NSMVSetHandler(false, nodename, "expno", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, nodename, "expno", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_expno = var.getInt();
@@ -144,7 +145,7 @@ public class RunControlMainPane extends VBox {
                 return true;
             }
         });
-        NSMCommunicator.get().add(new NSMVSetHandler(false, nodename, "runno", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, nodename, "runno", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_runno = var.getInt();
@@ -152,7 +153,7 @@ public class RunControlMainPane extends VBox {
                 return true;
             }
         });
-        NSMCommunicator.get().add(new NSMVSetHandler(false, nodename, "subno", NSMVar.INT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, nodename, "subno", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_subno = var.getInt();
@@ -175,7 +176,7 @@ public class RunControlMainPane extends VBox {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("LogViewPane.fxml"));
         TitledPane logview = loader.load();
         final LogViewPaneController logger = loader.getController();
-        NSMCommunicator.get().add(new NSMLogHandler() {
+        NSMRequestHandlerUI.get().add(new NSMLogHandler() {
             @Override
             public boolean handleLog(LogMessage msg) {
                 logger.add(msg);
@@ -188,7 +189,7 @@ public class RunControlMainPane extends VBox {
                 return true;
             }
         });
-        NSMCommunicator.get().add(new NSMVSetHandler(true, nodename, "log.dbtable", NSMVar.TEXT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, nodename, "log.dbtable", NSMVar.TEXT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 try {

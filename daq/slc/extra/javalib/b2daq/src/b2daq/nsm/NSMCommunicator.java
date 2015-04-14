@@ -15,7 +15,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 
 /**
  *
@@ -108,11 +107,9 @@ public class NSMCommunicator extends Thread {
                             handlers.add(m_handler.get(i));
                         }
                         for (NSMRequestHandler handler : handlers) {
-                            Platform.runLater(() -> {
-                                if (handler.handle(cmd, msg) && handler.isOnce()) {
-                                    m_handler.remove(handler);
-                                }
-                            });
+                            if (handler.handle(cmd, msg) && handler.isOnce()) {
+                                m_handler.remove(handler);
+                            }
                         }
                     }
                 }
@@ -130,6 +127,12 @@ public class NSMCommunicator extends Thread {
     }
 
     public void request(NSMMessage msg) throws IOException {
+        while (m_socket == null || !m_socket.isConnected()) {
+            try {
+                Thread.sleep(10000);
+            } catch (Exception ex2) {
+            }
+        }
         m_writer.writeObject(msg);
     }
 

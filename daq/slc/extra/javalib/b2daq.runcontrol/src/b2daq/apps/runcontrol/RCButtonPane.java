@@ -11,6 +11,7 @@ import b2daq.nsm.NSMMessage;
 import b2daq.nsm.NSMNode;
 import b2daq.nsm.NSMVSetHandler;
 import b2daq.nsm.NSMVar;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.runcontrol.core.RCCommand;
 import b2daq.runcontrol.core.RCState;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class RCButtonPane extends VBox {
 
     public void setNode(String nodename) {
         m_node = new NSMNode(nodename);
-        NSMCommunicator.get().add(new NSMVSetHandler(false, m_node.getName(), "rcstate", NSMVar.TEXT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_node.getName(), "rcstate", NSMVar.TEXT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 RCState state = new RCState(var.getText());
@@ -130,15 +131,15 @@ public class RCButtonPane extends VBox {
     }
 
     public final void handleConfigure() {
-        NSMCommunicator.get().add(new NSMVSetHandler(true, m_node.getName(), "dbtable", NSMVar.TEXT) {
+        NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_node.getName(), "dbtable", NSMVar.TEXT) {
             @Override
             public boolean handleVSet(NSMVar var) {
                 m_table = var.getText();
-                NSMCommunicator.get().add(new NSMVSetHandler(true, m_node, "rcconfig", NSMVar.TEXT) {
+                NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_node, "rcconfig", NSMVar.TEXT) {
                     @Override
                     public boolean handleVSet(NSMVar var) {
                         m_config = var.getText();
-                        NSMCommunicator.get().add(new NSMDBListSetHandler(true, m_table, m_node, "RC:") {
+                        NSMRequestHandlerUI.get().add(new NSMDBListSetHandler(true, m_table, m_node, "RC:") {
                             @Override
                             public boolean handleDBListSet(String[] list) {
                                 String conf = RunConfigDialog.showDialog(getScene(), "RC Config for " + m_node, "RC Config for " + m_node, m_config, list);

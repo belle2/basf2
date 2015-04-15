@@ -87,12 +87,6 @@ namespace Belle2 {
        */
       void unpack_event(RawPXD& px);
 
-      /** Swap endianes inside all shorts of this frame besides CRC.
-       * @param data pointer to frame
-       * @param len length of frame
-       */
-      void endian_swap_frame(unsigned short* data, int len);
-
       /** Unpack one frame (within an event).
        * @param data pointer to frame
        * @param len length of frame
@@ -111,7 +105,8 @@ namespace Belle2 {
        * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
-      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport,
+                      unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
 
       /** Unpack DHP RAW data within one DHH frame (pedestals, etc)
        * @param data pointer to dhp data
@@ -132,7 +127,8 @@ namespace Belle2 {
        * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
-      void unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+      void unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID,
+                      unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 

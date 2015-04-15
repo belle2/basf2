@@ -44,13 +44,16 @@ SADInputModule::SADInputModule() : Module()
   //Parameter definition
   addParam("AccRing",        m_accRing,      "The accelerator ring: 0 = LER, 1 = HER");
   addParam("ReadoutTime",    m_readoutTime,  "The readout time of the detector [ns]", 20 * Unit::us);
-  addParam("ReadMode",       m_readMode,     "The read mode: 0 = one SAD particle per event, 1 = one real particle per event, 2 = all SAD particles per event", 0);
+  addParam("ReadMode",       m_readMode,
+           "The read mode: 0 = one SAD particle per event, 1 = one real particle per event, 2 = all SAD particles per event", 0);
   addParam("Filename",       m_filename,     "The filename of the SAD input file.");
   addParam("Range",          m_range,        "All particles within the range around the IP are loaded [cm].", 300.0 * Unit::cm);
   addParam("PxResolution",   m_pxRes,        "The resolution for the x momentum component of the SAD real particle.", 0.01);
   addParam("PyResolution",   m_pyRes,        "The resolution for the y momentum component of the SAD real particle.", 0.01);
-  addParam("RotateParticles", m_rotateParticles, "Rotate the SAD particles around the nominal beam axis [deg] (just for unphysical tests !!!).", 0.0);
+  addParam("RotateParticles", m_rotateParticles,
+           "Rotate the SAD particles around the nominal beam axis [deg] (just for unphysical tests !!!).", 0.0);
 
+  m_PipePartMatrix = NULL;
 }
 
 

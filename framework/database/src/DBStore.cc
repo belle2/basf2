@@ -21,30 +21,11 @@
 using namespace std;
 using namespace Belle2;
 
-namespace {
-
-
-  /** Called by exit handlers to free all memory.
-   *
-   * This is important since ROOT exit handlers may remove some of our objects.
-   * Without this function, we will free the memory when the DBStore instance
-   * is destroyed, which happens too late.
-   */
-  void cleanDBStore()
-  {
-    delete &DBStore::Instance();
-  }
-}
-
-bool DBStore::s_DoCleanup = false;
-
 DBStore::~DBStore()
 {
-  if (s_DoCleanup) {
-    //release all memory in db store
-    for (auto& mapEntry : m_dbEntries) {
-      delete mapEntry.second.object;
-    }
+  //release all memory in db store
+  for (auto& mapEntry : m_dbEntries) {
+    delete mapEntry.second.object;
   }
   m_dbEntries.clear();
 }

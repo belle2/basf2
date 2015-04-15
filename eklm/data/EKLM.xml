@@ -4,9 +4,8 @@
   <Version>0</Version>
   <Creator library="eklm">EKLMCreator</Creator>
   <Content>
+    <SolenoidZ desc="Solenoid center Z coordinate" unit="cm">47.0</SolenoidZ>
     <ESTR>
-	<Rotation desc="Rotation of the structure with respect to the Detector" unit="rad">0.0</Rotation>
-	<OffsetZ desc="The offset of the Structure in z with respect to the IP" unit="cm">47.0</OffsetZ>
 
 	<EndcapKLM>
 		<Nsides desc="number of sides of Barrel KLM Vessel">8</Nsides>
@@ -58,7 +57,7 @@
       <Length desc="Length"         unit="mm">1321.0</Length>
       <PositionX  desc="X position" unit="mm">0</PositionX>
       <PositionY  desc="Y position" unit="mm">0</PositionY>
-      <PositionZ  desc="Z position" unit="mm">2770.0</PositionZ>
+      <PositionZ  desc="Z position" unit="mm">2960.5</PositionZ>
       <nLayer desc="Number of layers in one endcap">14</nLayer>
       <Layer>
 	<InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>

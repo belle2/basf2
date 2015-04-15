@@ -239,10 +239,10 @@ void EKLM::GeoEKLMCreator::readXMLData()
   m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
   if (m_mode < 0 || m_mode > 2)
     B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
+  m_solenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   GearDir EndCap(gd);
   EndCap.append("/Endcap");
   readPositionData(&EndcapPosition, &EndCap);
-  EndcapPosition.Z = EndcapPosition.Z + EndcapPosition.length / 2.0;
   nLayer = EndCap.getInt("nLayer");
   GearDir Layer(EndCap);
   Layer.append("/Layer");
@@ -364,10 +364,10 @@ void EKLM::GeoEKLMCreator::getEndcapTransform(HepGeom::Transform3D* t, int n)
 {
   if (n == 0)
     *t = HepGeom::Translate3D(EndcapPosition.X, EndcapPosition.Y,
-                              -EndcapPosition.Z + 94.0 * CLHEP::cm);
+                              -EndcapPosition.Z + m_solenoidZ);
   else
     *t = HepGeom::Translate3D(EndcapPosition.X, EndcapPosition.Y,
-                              EndcapPosition.Z) *
+                              EndcapPosition.Z + m_solenoidZ) *
          HepGeom::RotateY3D(180.*CLHEP::deg);
 }
 

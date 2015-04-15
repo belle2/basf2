@@ -623,6 +623,9 @@ namespace Belle2 {
       /** True if geometry is constructed. */
       bool haveGeo;
 
+      /** Solenoid center Z coordinate. */
+      double m_solenoidZ;
+
       /** ESTR Geometry data. */
       struct ESTRGeometryParams ESTRPar;
 

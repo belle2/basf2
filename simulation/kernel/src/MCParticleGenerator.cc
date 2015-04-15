@@ -167,8 +167,11 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
 
     //Add the vertex to the event
     event->AddPrimaryVertex(vertex);
-    B2DEBUG(10, "Created the vertex (" << mcProdVtx.X() << "," << mcProdVtx.Y() << "," << mcProdVtx.Z() <<
-            ") with the primary particle " << mcParticle.getPDG());
+    B2DEBUG(10, "Created the vertex ("
+            << mcProdVtx.X() / Unit::cm << " cm,"
+            << mcProdVtx.Y() / Unit::cm << " cm,"
+            << mcProdVtx.Z() / Unit::cm << " cm) with the primary particle "
+            << mcParticle.getPDG());
   }
 
   //Add all children

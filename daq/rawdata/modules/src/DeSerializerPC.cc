@@ -598,6 +598,7 @@ void DeSerializerPCModule::event()
   //
   // Main loop
   //
+  int* buf_rc = NULL;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
     eve_copper_0 = 0;
     //
@@ -613,6 +614,7 @@ void DeSerializerPCModule::event()
     PreRawCOPPERFormat_latest pre_rawcopper_latest;
     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
+    buf_rc = temp_rawdatablk.GetWholeBuffer();
 #ifdef REDUCED_RAWCOPPER
     //
     // Copy reduced buffer
@@ -634,13 +636,14 @@ void DeSerializerPCModule::event()
     raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                            delete_flag_to, temp_rawdatablk.GetNumEvents(),
                            temp_rawdatablk.GetNumNodes());
+    buf_rc = temp_rawdatablk.GetWholeBuffer();
 
 #ifndef USE_DESERIALIZER_PREPC
 #ifdef REDUCED_RAWCOPPER
     PostRawCOPPERFormat_latest post_rawcopper_latest;
     post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
                                     0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-
+    buf_rc = temp_rawdatablk.GetWholeBuffer();
     for (int i_finesse_num = 0; i_finesse_num < 4; i_finesse_num ++) {
       int block_num = 0;
       if (post_rawcopper_latest.GetFINESSENwords(block_num, i_finesse_num) > 0) {
@@ -650,7 +653,9 @@ void DeSerializerPCModule::event()
 #endif
 #endif
   }
-
+  if (buf_rc != NULL) {
+    g_status.copyEventHeader(buf_rc);
+  }
 
   //
   // Update EventMetaData

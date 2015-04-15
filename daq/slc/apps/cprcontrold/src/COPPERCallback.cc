@@ -36,8 +36,7 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  allocData(getNode().getName() + "_STATUS", "ronode_status",
-            ronode_status_revision);
+  allocData(getNode().getName(), "ronode_status", ronode_status_revision);
   m_con.init("cprbasf2_" + getNode().getName(), 1);
   m_ttrx.open();
   m_copper.open();

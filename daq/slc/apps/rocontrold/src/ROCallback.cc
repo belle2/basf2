@@ -6,6 +6,7 @@
 
 #include "daq/slc/readout/ronode_info.h"
 #include "daq/slc/readout/ronode_status.h"
+#include "daq/slc/readout/ro_summary.h"
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
@@ -74,8 +75,7 @@ ROCallback::ROCallback(const NSMNode& runcontrol)
 
 void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  allocData(getNode().getName() + "_STATUS", "ronode_status",
-            ronode_status_revision);
+  allocData(getNode().getName(), "ro_summary", ro_summary_revision);
   configure(obj);
 }
 
@@ -190,17 +190,21 @@ void ROCallback::abort() throw(RCHandlerException)
 
 void ROCallback::monitor() throw(RCHandlerException)
 {
-  if (getNode().getState() != RCState::RUNNING_S) {
-    for (size_t i = 0; i < m_stream0.size(); i++) {
-      m_stream0[i].check();
-    }
-  }
   NSMData& data(getData());
   if (data.isAvailable()) {
-    ronode_status* nsm = (ronode_status*)data.get();
-    if (m_stream1.getFlow().isAvailable()) {
-      ronode_status& status(m_stream1.getFlow().monitor());
-      memcpy(nsm, &status, sizeof(ronode_status));
+    ro_summary* nsm = (ro_summary*)data.get();
+    if (getNode().getState() == RCState::RUNNING_S) {
+      if (m_stream1.getFlow().isAvailable()) {
+        ronode_status& status(m_stream1.getFlow().monitor());
+        memcpy(nsm, &status, sizeof(ronode_status));
+      }
+      for (size_t i = 0; i < m_stream0.size(); i++) {
+        m_stream0[i].check();
+        ronode_status& status(m_stream0[i].getFlow().monitor());
+        memcpy(&(nsm->header[i + 1]), &(status.header), sizeof(event_header));
+      }
+    } else {
+      memset(nsm, 0, sizeof(ro_summary));
     }
     double loads[3];
     if (getloadavg(loads, 3) > 0) {

@@ -39,6 +39,7 @@ ronode_status& FlowMonitor::monitor()
     unsigned int ctime = Time().getSecond();
     ronode_info info;
     memcpy(&info, m_info->get(), sizeof(ronode_info));
+    memcpy(&(m_status.header), &(info.header), sizeof(event_header));
     double length = ctime - m_status.ctime;
     m_status.eflag = info.eflag;
     m_status.state = info.state;

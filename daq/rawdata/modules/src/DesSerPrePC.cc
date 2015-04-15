@@ -651,6 +651,7 @@ void DesSerPrePC::DataAcquisition()
       int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
                                  &delete_flag_to);
       m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
+      m_status.copyEventHeader(buf_to);
 #else
       delete_flag_to = delete_flag_from;
 #endif

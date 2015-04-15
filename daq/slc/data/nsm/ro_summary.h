@@ -1,5 +1,5 @@
-#ifndef _Belle2_ronode_status_h
-#define _Belle2_ronode_status_h
+#ifndef _Belle2_ro_summary_h
+#define _Belle2_ro_summary_h
 
 extern "C" {
 #include <nsm2/nsm2.h>
@@ -7,9 +7,9 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int ronode_status_revision = 1;
+  const int ro_summary_revision = 1;
 
-  struct ronode_status {
+  struct ro_summary {
     uint32 nodeid;
     uint32 state;
     uint32 eflag;
@@ -42,7 +42,7 @@ namespace Belle2 {
       uint32 utime;
       uint32 nodeid;
       uint32 crc_err;
-    } header[1];
+    } header[25];
   };
 
 }

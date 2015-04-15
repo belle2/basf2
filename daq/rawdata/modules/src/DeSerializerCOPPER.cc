@@ -500,6 +500,7 @@ void DeSerializerCOPPERModule::event()
     int* temp_buf;
     try {
       temp_buf = readOneEventFromCOPPERFIFO(j, &delete_flag, &m_size_word);
+      g_status.copyEventHeader(temp_buf);
     } catch (string err_str) {
 #ifdef NONSTOP
       if (err_str == "EAGAIN") {

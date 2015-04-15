@@ -7,24 +7,24 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int ronode_status_revision = 4;
+  const int ronode_status_revision = 1;
 
   struct ronode_status {
     uint32 nodeid;
-    uint32 stime;
-    uint32 ctime;
     uint32 state;
     uint32 eflag;
     uint32 expno;
     uint32 runno;
     uint32 subno;
+    uint32 reserved_i[2];
+    uint32 stime;
+    uint32 ctime;
     uint32 nevent_in;
     uint32 nqueue_in;
     uint32 connection_in;
     uint32 connection_out;
     uint32 nevent_out;
     uint32 nqueue_out;
-    int32 reserved_i[2];
     float evtrate_in;
     float evtsize_in;
     float flowrate_in;
@@ -33,6 +33,16 @@ namespace Belle2 {
     float flowrate_out;
     float loadavg;
     float reserved_f[5];
+    struct event_header {
+      uint32 nword;
+      uint32 format;
+      uint32 exp_run;
+      uint32 evtno;
+      uint32 ctime_trgtype;
+      uint32 utime;
+      uint32 nodeid;
+      uint32 crc_err;
+    } header;
   };
 
 }

@@ -24,14 +24,14 @@ namespace Belle2 {
     unsigned int runno;
     unsigned int subno;
     unsigned int reserved[2];
-    float reserved_f[4];
-    event_header header;
+    float reserved_f[5];
     struct io_info {
       int port;
       unsigned int addr;
       unsigned long long nbyte;
       unsigned int count;
     } io[2];
+    event_header header;
   };
 
 }

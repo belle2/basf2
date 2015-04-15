@@ -89,6 +89,7 @@ namespace Belle2 {
     void addOutputCount(unsigned int count) { m_info->io[1].count += count; }
     void addOutputNBytes(unsigned long long nbyte) { m_info->io[1].nbyte += nbyte; }
     event_header& getEventHeader() { return m_info->header; }
+    void copyEventHeader(int* buf);
 
     bool waitRunning(int timeout);
     bool waitReady(int timeout);

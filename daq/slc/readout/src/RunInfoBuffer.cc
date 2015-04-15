@@ -44,6 +44,7 @@ bool RunInfoBuffer::init()
   m_mutex.init();
   m_cond.init();
   memset(m_info, 0, sizeof(ronode_info));
+  LogFile::debug("Initialized %s", m_path.c_str());
   return true;
 }
 

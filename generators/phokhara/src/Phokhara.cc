@@ -162,6 +162,15 @@ void Phokhara::setDefaultSettings()
   m_MaxInvMassHadrons = 0.;
   m_MinEnergyGamma = 0.;
 
+  m_pi = 0.;
+  m_conversionFactor = 0.;
+  m_alphaQED0 = 0.;
+  m_massElectron = 0.;
+  m_massMuon = 0.;
+  m_massW = 0.;
+  m_massZ = 0.;
+  m_widthZ = 0.;
+
 }
 
 void Phokhara::init(const std::string& paramFile)

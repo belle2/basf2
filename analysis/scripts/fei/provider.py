@@ -477,7 +477,7 @@ def VariablesToNTuple(resource, particleList, signalProbability, target, extraVa
         output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
         variables = [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'cosThetaBetweenParticleAndTrueB']
-        if extraVars is not None:
+        if extraVars is not None and len(extraVars) > 0 and extraVars[0] is not None:
             variables += extraVars
         output.param('variables', variables)
         output.param('fileName', filename)

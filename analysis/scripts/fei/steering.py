@@ -58,7 +58,7 @@ class Particle(object):
     """
 
     # Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
-    MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target')
+    MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, model')
     # Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
     PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity, userCut')
     # Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C

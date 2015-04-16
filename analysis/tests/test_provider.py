@@ -571,7 +571,8 @@ class TestGenerateTrainingData(unittest.TestCase):
         self.mvaConfig = Particle.MVAConfiguration(name='FastBDT', type='Plugin',
                                                    config='TMVAConfigString',
                                                    variables=['p', 'pt'],
-                                                   target='isSignal')
+                                                   target='isSignal',
+                                                   model=None)
 
     def test_GenerateTrainingData(self):
         # Returns None if TrainingData does not exists
@@ -690,7 +691,8 @@ class TestSignalProbability(unittest.TestCase):
         self.mvaConfig = Particle.MVAConfiguration(name='FastBDT', type='Plugin',
                                                    config='TMVAConfigString',
                                                    variables=['p', 'pt'],
-                                                   target='isSignal')
+                                                   target='isSignal',
+                                                   model=None)
 
     def test_SignalProbabilityAlreadyTrained(self):
         with temporary_file('trainingData.config'):

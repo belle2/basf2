@@ -861,24 +861,25 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
     if (TCFire[iii] == 0) { continue; }
 
     _BwCluster[_BWDICN][0] = TCFire[iii];
-    _BwCluster[_BWDICN][1] = TCFire[iii - 1]; // top
 
     _BwCluster[_BWDICN][2] = 0;// right top
     _BwCluster[_BWDICN][3] = 0; //right
     _BwCluster[_BWDICN][4] = 0; //right bottom
     _BwCluster[_BWDICN][5] = TCFire[iii + 1]; //bottom
-    _BwCluster[_BWDICN][6] = TCFire[iii + 33]; //bottom left
     _BwCluster[_BWDICN][7] = TCFire[iii + 32]; // left
     _BwCluster[_BWDICN][8] = TCFire[iii + 31]; //top left
     if (iii == 0) {
       _BwCluster[_BWDICN][1] = TCFire[31]; // top
       _BwCluster[_BWDICN][8] = TCFire[63]; //top left
+    } else {
+      _BwCluster[_BWDICN][1] = TCFire[iii - 1]; // top
     }
     if (iii == 31) {
       _BwCluster[_BWDICN][5] = TCFire[0]; //bottom
       _BwCluster[_BWDICN][6] = TCFire[31]; //bottom left
+    } else {
+      _BwCluster[_BWDICN][6] = TCFire[iii + 33]; //bottom left
     }
-
     if (!(_BwCluster[_BWDICN][1] != 0 || _BwCluster[_BWDICN][7] != 0)) {
       if (!(_BwCluster[_BWDICN][5] != 0 && _BwCluster[_BWDICN][6] != 0)) {
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
@@ -921,10 +922,9 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
     _BwCluster[_BWDICN][0] = TCFire[iii];
     _BwCluster[_BWDICN][1] = TCFire[iii - 1]; // top
 
-    _BwCluster[_BWDICN][2] = TCFire[iii - 33]; // right top
+
     _BwCluster[_BWDICN][3] = TCFire[iii - 32]; //right
     _BwCluster[_BWDICN][4] = TCFire[iii - 31]; //right bottom
-    _BwCluster[_BWDICN][5] = TCFire[iii + 1]; //bottom
     _BwCluster[_BWDICN][6] = 0; //bottom left
     _BwCluster[_BWDICN][7] = 0; // left
     _BwCluster[_BWDICN][8] = 0; //top left
@@ -932,13 +932,16 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
       _BwCluster[_BWDICN][1] = TCFire[63]; // top
       _BwCluster[_BWDICN][2] = TCFire[31];// right top
 
+    } else {
+      _BwCluster[_BWDICN][2] = TCFire[iii - 33]; // right top
     }
     if (iii == 63) {
       _BwCluster[_BWDICN][5] = TCFire[32]; //bottom
       _BwCluster[_BWDICN][4] = TCFire[0]; //right bottom
 
+    } else {
+      _BwCluster[_BWDICN][5] = TCFire[iii + 1]; //bottom
     }
-
 
 
 

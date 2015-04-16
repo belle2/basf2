@@ -72,18 +72,21 @@ namespace Belle2 {
       c_singleClustersSPs = 1024, /**< bit 10: The SpacePointTrackCand contains single Cluster SpacePoints */
       c_isActive =  2048, /**< bit 11: SPTC is active (i.e. if false, some module rejected it for further use */
       c_isReserved = 4096, /**< bit 12: SPTC is reserved (i.e. should not be altered and should be treated with high priority) */
+      c_initialState = 0 + c_isActive, /**< this is the initialState which will always be set in the beginning and applied after reset */
     };
 
     /**
      * empty constructor sets pdg code to zero, such that it is possible to determine whether a particle hyptohesis has been asigned
      * to the track candidate or not
      * Also MCTrackID is initialized to -1,
+    * Each SpacePointTrackCand is created in c_isActive-state and has to be deactivated manually if need be
      */
     SpacePointTrackCand();
 
     /**
      * constructor from a vector<SpacePoint*> and some additional information:
      * pdg code and charge estimate as well as the MCTrackID of the track candidate
+    * Each SpacePointTrackCand is created in c_isActive-state and has to be deactivated manually if need be
      */
     SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
                         int mcTrackID = -1);
@@ -101,10 +104,12 @@ namespace Belle2 {
 
     /**
      * Compares two track candidates and determines if they share hits.
+    *
+    * optional parameter determines if TCs shall be compared at SpacePoint-level (standard, true) or at Cluster level (= false)
      * If at least one Hit is shared, return value is true -> tracks are overlapping.
      * Return value is false if no hits are shared.
      * */
-    bool checkOverlap(const SpacePointTrackCand& rhs);
+    bool checkOverlap(const SpacePointTrackCand& rhs, bool compareSPs = true);
 
     /**
      * get hits (space points) of track candidate
@@ -303,8 +308,11 @@ namespace Belle2 {
     /** remove a referee status */
     void removeRefereeStatus(unsigned short int bitmask) { m_refereeStatus &= (~bitmask); }
 
-    /** clear the referee status */
+    /** clear the referee status. WARNING this does not set the value to standard, it completely clears all the states stored! */
     void clearRefereeStatus() { m_refereeStatus = 0; }
+
+    /** resets the referee status to the initial value */
+    void resetRefereeStatus() { m_refereeStatus = c_initialState; }
 
     /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
     void removeSpacePoint(int indexInTrackCand);

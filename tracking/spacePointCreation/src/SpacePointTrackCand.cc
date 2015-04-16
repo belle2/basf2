@@ -35,7 +35,7 @@ SpacePointTrackCand::SpacePointTrackCand() :
   m_q(0),
   m_flightDirection(true),
   m_iTrackStub(-1),
-  m_refereeStatus(0),
+  m_refereeStatus(c_isActive),
   m_qualityIndex(0.5)
 {
 
@@ -47,7 +47,7 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
   m_cov6D(6),
   m_flightDirection(true),
   m_iTrackStub(-1),
-  m_refereeStatus(0),
+  m_refereeStatus(c_isActive),
   m_qualityIndex(0.5)
 {
   m_pdg = pdgCode;
@@ -73,7 +73,7 @@ SpacePointTrackCand::~SpacePointTrackCand()
 }
 
 
-bool SpacePointTrackCand::checkOverlap(const SpacePointTrackCand& rhs)
+bool SpacePointTrackCand::checkOverlap(const SpacePointTrackCand& rhs, bool compareSPs)
 {
   const auto& lhsHits = this->getHits();
   const auto& rhsHits = rhs.getHits();
@@ -84,12 +84,23 @@ bool SpacePointTrackCand::checkOverlap(const SpacePointTrackCand& rhs)
     return false;
   }
 
+  if (compareSPs) {
+    for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
+      auto pos = std::find(rhsHits.begin(), rhsHits.end(), lhsHits[iSP]);
+      if (pos != rhsHits.end()) {
+        B2DEBUG(80, "SpacePointTrackCands are overlaping at hit number: " << iSP << "");
+        return true;
+      }
+    }
+    return false;
+  }
 
-  for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
-    auto pos = std::find(rhsHits.begin(), rhsHits.end(), lhsHits[iSP]);
-    if (pos != rhsHits.end()) {
-      B2DEBUG(80, "SpacePointTrackCands are overlaping at hit number: " << iSP << "");
-      return true;
+  for (const SpacePoint* lSP : lhsHits) {
+    for (const SpacePoint* rSP : rhsHits) {
+      if (lSP->shareClusters(rSP)) {
+        B2DEBUG(80, "SpacePointTrackCands share clusters!");
+        return true;
+      }
     }
   }
   return false;

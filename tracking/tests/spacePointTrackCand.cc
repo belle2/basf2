@@ -26,7 +26,8 @@ namespace Belle2 {
   class SpacePointTrackCandTest : public ::testing::Test {
   public:
     /** this is a small helper function to create a sensorInfo to be used */
-    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, double width = 1., double length = 1., double width2 = -1.) {
+    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, double width = 1., double length = 1., double width2 = -1.)
+    {
       // (SensorType type, VxdID id, double width, double length, double thickness, int uCells, int vCells, double width2=-1, double splitLength=-1, int vCells2=0)
       VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, width, length, 0.3, 2, 4, width2);
 
@@ -237,16 +238,23 @@ namespace Belle2 {
 
     // test throwing of exceptions
     unsigned int nHits = fullTrackCand.getNHits();
-    ASSERT_THROW(fullTrackCand.getHitsInRange(0, nHits + 1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(0, nHits + 1),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
     ASSERT_NO_THROW(fullTrackCand.getHitsInRange(nHits - 2, nHits));
-    ASSERT_THROW(fullTrackCand.getHitsInRange(-1, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(-1, 3),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
     ASSERT_THROW(fullTrackCand.getHitsInRange(0, 10), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
-    ASSERT_THROW(fullTrackCand.getHitsInRange(10, 0), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
+    ASSERT_THROW(fullTrackCand.getHitsInRange(10, 0),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
     ASSERT_THROW(fullTrackCand.getHitsInRange(2, -1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
-    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(-1, 2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
-    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(0, nHits + 1), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
-    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(12, 3), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
-    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(2, -2), SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(-1, 2),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to negative starting index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(0, nHits + 1),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high final index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(12, 3),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too high starting index
+    ASSERT_THROW(fullTrackCand.getSortingParametersInRange(2, -2),
+                 SpacePointTrackCand::SPTCIndexOutOfBounds); // throw due to too low final index
     ASSERT_NO_THROW(fullTrackCand.getSortingParametersInRange(0, nHits));
   }
 
@@ -255,10 +263,14 @@ namespace Belle2 {
    */
   TEST_F(SpacePointTrackCandTest, testRefereeStatus)
   {
-    SpacePointTrackCand trackCand; // default constructor -> should initialize the referee status to 0 (i.e. no status should be set)
+    SpacePointTrackCand trackCand; // default constructor -> should initialize the referee status to c_initialState
+
+    // currently c_isActive is the initialState:
+    EXPECT_EQ(trackCand.getRefereeStatus(), SpacePointTrackCand::c_isActive);
+    EXPECT_EQ(SpacePointTrackCand::c_initialState, SpacePointTrackCand::c_isActive);
 
     unsigned short int initialStatus = trackCand.getRefereeStatus();
-    EXPECT_EQ(initialStatus, 0);
+    EXPECT_EQ(initialStatus, SpacePointTrackCand::c_initialState);
 
     // design an arbitrary status and set it, then test if the returned status is the set status
     unsigned short int newStatus = 0;
@@ -267,10 +279,16 @@ namespace Belle2 {
     trackCand.setRefereeStatus(newStatus);
     EXPECT_EQ(trackCand.getRefereeStatus(), newStatus);
 
-    // clear the status and test if its the initial status again (0)
+    // clear the status and test if its 0
     trackCand.clearRefereeStatus();
-    EXPECT_EQ(trackCand.getRefereeStatus(), initialStatus);
+    EXPECT_EQ(trackCand.getRefereeStatus(), 0);
 
+    // reset the status and test if it's the initial state
+    trackCand.resetRefereeStatus();
+    EXPECT_EQ(trackCand.getRefereeStatus(), SpacePointTrackCand::c_initialState);
+
+
+    trackCand.clearRefereeStatus(); // enforce empty refereeStatus
     // add several statusses one by one and test if the overall status is as expected (once with 'overall status' and once with status one by one)
     trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedClean);
     EXPECT_TRUE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedClean));
@@ -279,7 +297,8 @@ namespace Belle2 {
     EXPECT_FALSE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_hitsLowDistance));
 
     trackCand.addRefereeStatus(SpacePointTrackCand::c_checkedByReferee);
-    unsigned short int expectedStatus = SpacePointTrackCand::c_checkedClean + SpacePointTrackCand::c_hitsOnSameSensor + SpacePointTrackCand::c_checkedByReferee;
+    unsigned short int expectedStatus = SpacePointTrackCand::c_checkedClean + SpacePointTrackCand::c_hitsOnSameSensor +
+                                        SpacePointTrackCand::c_checkedByReferee;
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
 
@@ -287,6 +306,7 @@ namespace Belle2 {
     trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean);
     expectedStatus -= SpacePointTrackCand::c_checkedClean;
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
+    EXPECT_FALSE(trackCand.hasRefereeStatus(SpacePointTrackCand::c_checkedClean));
     trackCand.removeRefereeStatus(SpacePointTrackCand::c_checkedClean); // remove again and check if nothing changes
     EXPECT_EQ(trackCand.getRefereeStatus(), expectedStatus);
 
@@ -311,7 +331,7 @@ namespace Belle2 {
     trackCand.clearRefereeStatus();
     // test that at least n bits are present for storing stuff in the m_refereeStatus (update this test if you add a new flag to the RefereeStatusBit)
     // WARNING: hardcoded -> make sure to keep this thing up to date!
-    int n = 8;
+    int n = 13;
     int maxUsedStatus = pow(2, n);
     trackCand.addRefereeStatus(maxUsedStatus);
     EXPECT_TRUE(trackCand.hasRefereeStatus(maxUsedStatus));
@@ -336,6 +356,7 @@ namespace Belle2 {
     trackCand.addRefereeStatus(wrongStatus);
     EXPECT_TRUE(trackCand.hasRefereeStatus(8));
   }
+
   /**
    * Test the removeSpacePoint method
    */

@@ -14,7 +14,6 @@ EXTINCDIR=$(EXTDIR)/include
 EXTLIBDIR=$(EXTDIR)/lib/$(BELLE2_EXTERNALS_SUBDIR)
 EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
 
-#all: $(OBJS)
 all: $(LIB)
 	@ mkdir -p $(EXTINCDIR)/ttrx/
 	@ install -m 644 -p *.h $(EXTINCDIR)/ttrx/

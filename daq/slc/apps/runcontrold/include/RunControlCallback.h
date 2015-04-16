@@ -23,7 +23,7 @@ namespace Belle2 {
     typedef std::vector<NSMData> NSMDataList;
 
   public:
-    RunControlCallback(int port);
+    RunControlCallback();
     virtual ~RunControlCallback() throw() {}
 
   public:
@@ -40,17 +40,17 @@ namespace Belle2 {
     virtual void resume(int subno) throw(RCHandlerException);
     virtual void pause() throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
-    virtual void timeout(NSMCommunicator& com) throw();
+    virtual void monitor() throw(RCHandlerException);
 
   public:
     void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }
     void setPriorityToGlobal(LogFile::Priority pri) { m_priority_global = pri; }
     void setExcludedNodes(const StringList& excluded) { m_excluded_v = excluded; }
+    void setLocalRunControls(const StringList& rc);
     void setLogTable(const std::string table) { m_logtable = table; }
     void setCallback(RCCallback* callback) { m_callback = callback; }
 
   private:
-    void update() throw();
     void distribute(NSMMessage msg) throw();
     void distribute_r(NSMMessage msg) throw();
     void postRun() throw();
@@ -67,6 +67,7 @@ namespace Belle2 {
     void setState(NSMNode& node, const RCState& state) throw();
     void setConfig(RCNode& node, const std::string& config) throw();
     void setExpNumber(int expno) throw();
+    bool setRCUsed(int expno) throw();
 
   private:
     RCCallback* m_callback;
@@ -78,6 +79,7 @@ namespace Belle2 {
     LogFile::Priority m_priority_db;
     LogFile::Priority m_priority_global;
     StringList m_excluded_v;
+    RCNodeList m_lrc_v;
     int m_port;
 
   private:

@@ -18,7 +18,7 @@ EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
 all: $(OBJS) $(LIB)
 	@ mkdir -p $(EXTINCDIR)/modbus/
 	@ install -m 644 -p *.h $(EXTINCDIR)/modbus/
-	@ install -m 644 -p $(LIB) $(EXTLIBDIR)/
+	@ install -m 755 -p $(LIB) $(EXTLIBDIR)/
 
 clean:
 	@ echo "<< clearing directry >>"

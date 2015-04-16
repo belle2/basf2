@@ -72,13 +72,13 @@ bool NSMVHandlerRCRequest::handleSetText(const std::string& val)
   return true;
 }
 
-bool NSMVHandlerRCUsed::handleGetInt(int& val)
+bool NSMVHandlerRCNodeUsed::handleGetInt(int& val)
 {
   val = m_rcnode.isUsed();
   return true;
 }
 
-bool NSMVHandlerRCUsed::handleSetInt(int val)
+bool NSMVHandlerRCNodeUsed::handleSetInt(int val)
 {
   m_rcnode.setUsed(val > 0);
   if (val == 0) {
@@ -102,6 +102,11 @@ bool NSMVHandlerRCUsed::handleSetInt(int val)
   }
   LogFile::info("set %s.used to %d", m_rcnode.getName().c_str(), val);
   return true;
+}
+
+bool NSMVHandlerRCUsed::handleSetInt(int val)
+{
+  return m_callback.setRCUsed(val);
 }
 
 bool NSMVHandlerRCExpNumber::handleSetInt(int val)

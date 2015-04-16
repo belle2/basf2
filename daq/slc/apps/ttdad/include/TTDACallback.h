@@ -27,6 +27,8 @@ namespace Belle2 {
     virtual void recover(const DBObject&) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
     virtual void monitor() throw(RCHandlerException);
+    virtual void ok(const char* nodename, const char* data) throw();
+    virtual void error(const char* nodename, const char* data) throw();
     void trigft() throw(RCHandlerException);
     bool setTriggerType(const std::string& type) throw();
     void setFTSWID(int id) { m_ftswid = id; }

@@ -56,7 +56,7 @@ namespace Belle2 {
   RCHANDLER_TEXT(NSMVHandlerRCConfig);
   RCHANDLER_TEXT_GET(NSMVHandlerRCState);
   RCHANDLER_TEXT(NSMVHandlerRCRequest);
-  RCHANDLER_INT(NSMVHandlerRCUsed);
+  RCHANDLER_INT(NSMVHandlerRCNodeUsed);
 
   class NSMVHandlerRCExpNumber : public NSMVHandlerInt {
   public:
@@ -67,6 +67,18 @@ namespace Belle2 {
     virtual ~NSMVHandlerRCExpNumber() throw() {}
     virtual bool handleSetInt(int val);
   protected:
+    RunControlCallback& m_callback;
+  };
+
+  class NSMVHandlerRCUsed : public NSMVHandlerInt {
+  public:
+    NSMVHandlerRCUsed(RunControlCallback& callback,
+                      const std::string& name, bool used)
+      : NSMVHandlerInt(name, true, true, (int)used),
+        m_callback(callback) {}
+    virtual ~NSMVHandlerRCUsed() throw() {}
+    virtual bool handleSetInt(int val);
+  private:
     RunControlCallback& m_callback;
   };
 

@@ -198,7 +198,7 @@ public class RCStateViewPane extends GridPane {
                 });
             }
             if (state.equals(RCState.NOTREADY_S) || state.equals(RCState.READY_S)
-                    || state.equals(RCState.OFF_S)) {
+                    || state.equals(RCState.UNKNOWN) || state.equals(RCState.OFF_S)) {
                 menu.getItems().add(exclude);
                 if (m_label.getText().equals("OFF")) {
                     exclude.setText("INCLUDE");

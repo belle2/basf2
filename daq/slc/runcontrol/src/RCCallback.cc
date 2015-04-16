@@ -83,7 +83,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   const RCCommand cmd = msg.getRequestName();
   RCState state(getNode().getState());
   if (cmd == NSMCommand::VSET &&
-      (state != RCState::NOTREADY_S && state != RCState::READY_S)) {
+      (state != RCState::OFF_S &&
+       state != RCState::NOTREADY_S && state != RCState::READY_S)) {
     return false;
   }
   if (NSMCallback::perform(com)) return true;
@@ -144,7 +145,6 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
     RCState state = cmd.nextState();
     if (state != Enum::UNKNOWN && m_auto) {
       setState(state);
-      reply(NSMMessage(NSMCommand::OK, state.getLabel()));
     }
   } catch (const RCHandlerFatalException& e) {
     LogFile::fatal(e.what());
@@ -185,6 +185,7 @@ void RCCallback::setState(const RCState& state) throw()
       LogFile::error(e.what());
     }
   }
+  reply(NSMMessage(NSMCommand::OK, state.getLabel()));
 }
 
 void RCCallback::dbload(NSMCommunicator& com)

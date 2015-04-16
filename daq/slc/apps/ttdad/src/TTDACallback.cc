@@ -47,8 +47,12 @@ namespace Belle2 {
 using namespace Belle2;
 
 TTDACallback::TTDACallback(const RCNode& ttd)
-  : RCCallback(5), m_ttdnode(ttd)
+  : RCCallback(1), m_ttdnode(ttd)
 {
+  if (m_ttdnode.getName().size() > 0) {
+    setAutoReply(false);
+    m_ttdnode.setState(Enum::UNKNOWN);
+  }
   m_trgcommands.insert(std::map<std::string, int>::value_type("none", 0));
   m_trgcommands.insert(std::map<std::string, int>::value_type("aux", 1));
   m_trgcommands.insert(std::map<std::string, int>::value_type("i", 2));
@@ -81,10 +85,31 @@ void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerTrigft(*this, "trigft"));
   add(new NSMVHandlerTriggerType(*this, "trigger_type",
                                  obj.getText("trigger_type")));
+  try {
+    trigft();
+  } catch (const RCHandlerException& e) {
+    LogFile::warning(e.what());
+  }
 }
 
 void TTDACallback::monitor() throw(RCHandlerException)
 {
+  if (m_ttdnode.getName().size() > 0) {
+    RCState cstate(m_ttdnode.getState());
+    try {
+      NSMCommunicator::connected(m_ttdnode.getName());
+      if (cstate == Enum::UNKNOWN) {
+        NSMCommunicator::send(NSMMessage(m_ttdnode, NSMCommand(17, "STATECHECK")));
+      }
+    } catch (const NSMNotConnectedException&) {
+      if (cstate != Enum::UNKNOWN) {
+        m_ttdnode.setState(Enum::UNKNOWN);
+        setState(RCState::NOTREADY_S);
+      }
+    } catch (const NSMHandlerException& e) {
+      LogFile::error(e.what());
+    }
+  }
 }
 
 void TTDACallback::load(const DBObject&) throw(RCHandlerException)
@@ -132,7 +157,6 @@ void TTDACallback::resume(int /*subno*/) throw(RCHandlerException)
 
 void TTDACallback::recover(const DBObject&) throw(RCHandlerException)
 {
-  stop();
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(16, "RECOVER")));
   }
@@ -140,7 +164,6 @@ void TTDACallback::recover(const DBObject&) throw(RCHandlerException)
 
 void TTDACallback::abort() throw(RCHandlerException)
 {
-  stop();
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
   }
@@ -170,9 +193,45 @@ void TTDACallback::trigft() throw(RCHandlerException)
 void TTDACallback::send(const NSMMessage& msg) throw(RCHandlerException)
 {
   try {
-    if (NSMCommunicator::send(msg)) return;
-  } catch (const NSMHandlerException& e) {}
+    if (NSMCommunicator::send(msg)) {
+      return;
+    }
+  } catch (const NSMHandlerException& e) {
+  } catch (const TimeoutException& e) {
+
+  }
   throw (RCHandlerException("Failed to send %s to %s",
                             msg.getRequestName(), msg.getNodeName()));
 }
 
+void TTDACallback::ok(const char* nodename, const char* data) throw()
+{
+  if (m_ttdnode.getName().size() > 0 &&
+      m_ttdnode.getName() == nodename) {
+    LogFile::debug("OK from %s (state = %s)", nodename, data);
+    try {
+      RCState state(data);
+      m_ttdnode.setState(state);
+      if (state == RCState::RUNNING_S) {
+        setState(state);
+      } else {
+        state = RCState(getNode().getState());
+        state = state.next();
+        if (state != RCState::UNKNOWN) {
+          setState(state);
+        }
+      }
+    } catch (const std::out_of_range& e) {}
+  }
+}
+
+void TTDACallback::error(const char* nodename, const char* data) throw()
+{
+  if (m_ttdnode.getName().size() > 0 &&
+      m_ttdnode.getName() == nodename) {
+    LogFile::debug("ERROR from %s : %s", nodename, data);
+    try {
+      setState(RCState::NOTREADY_S);
+    } catch (const std::out_of_range& e) {}
+  }
+}

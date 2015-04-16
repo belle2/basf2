@@ -18,15 +18,15 @@
 
 using namespace Belle2;
 
-RunControlCallback::RunControlCallback(int port)
+RunControlCallback::RunControlCallback()
 {
-  m_port = port;
   setAutoReply(false);
   m_showall = false;
 }
 
 void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
+  add(new NSMVHandlerRCUsed(*this, "used", true));
   DBInterface& db(*getDB());
   try {
     db.connect();
@@ -42,12 +42,19 @@ void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
     throw (RCHandlerException("Failed to initialize (config=%s)", obj.getName().c_str()));
   }
   distribute_r(NSMMessage(RCCommand::ABORT));
+  for (size_t i = 0; i < m_lrc_v.size(); i++) {
+    try {
+      set(m_lrc_v[i], "used", 0);
+    } catch (const IOException& e) {
+      LogFile::debug(e.what());
+    }
+  }
 }
 
 void RunControlCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   if (addAll(obj)) {
-    distribute(NSMMessage(RCCommand::CONFIGURE, m_port));
+    distribute(NSMMessage(RCCommand::CONFIGURE));
   } else {
     throw (RCHandlerException("Failed to configure (config=%s)", obj.getName().c_str()));
   }
@@ -88,7 +95,7 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
       }
     }
   } catch (const std::out_of_range& e) {}
-  update();
+  monitor();
 }
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
@@ -102,7 +109,7 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  update();
+  monitor();
 }
 
 void RunControlCallback::fatal(const char* nodename, const char* data) throw()
@@ -115,7 +122,7 @@ void RunControlCallback::fatal(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  update();
+  monitor();
 }
 
 void RunControlCallback::log(const char* nodename, const DAQLogMessage& lmsg,
@@ -204,12 +211,7 @@ void RunControlCallback::abort() throw(RCHandlerException)
   distribute_r(NSMMessage(RCCommand::ABORT));
 }
 
-void RunControlCallback::timeout(NSMCommunicator&) throw()
-{
-  update();
-}
-
-void RunControlCallback::update() throw()
+void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
   RCState state_new = state.next();
@@ -384,13 +386,13 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
-    add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
+    add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
     add(new NSMVHandlerText(vname + ".dbtable", true, false, table));
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
-    add(new NSMVHandlerRCUsed(*this, vname + ".used", node));
+    add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
   }
   add(new NSMVHandlerText("log.dbtable",  true, false, m_logtable));
   return true;
@@ -455,5 +457,44 @@ void RunControlCallback::setExpNumber(int expno) throw()
     reply(NSMMessage(DAQLogMessage(getNode().getName(), LogFile::INFO, msg), true));
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
+  }
+}
+
+bool RunControlCallback::setRCUsed(int val) throw()
+{
+  int used = (int)getNode().isUsed();
+  if (val != used) {
+    getNode().setUsed(val > 0);
+    if (val == 0) {
+      LogFile::info("Masked");
+      abort();
+      RCCallback::setState(RCState::OFF_S);
+      for (size_t i = 0; i < m_lrc_v.size(); i++) {
+        try {
+          set(m_lrc_v[i], "used", 1);
+        } catch (const IOException& e) {
+          LogFile::debug(e.what());
+        }
+      }
+    } else {
+      LogFile::info("UnMasked");
+      RCCallback::setState(RCState::NOTREADY_S);
+      for (size_t i = 0; i < m_lrc_v.size(); i++) {
+        try {
+          set(m_lrc_v[i], "used", 0);
+        } catch (const IOException& e) {
+          LogFile::debug(e.what());
+        }
+      }
+    }
+  }
+  return true;
+}
+
+void RunControlCallback::setLocalRunControls(const StringList& rc)
+{
+  for (size_t i = 0; i < rc.size(); i++) {
+    LogFile::debug("Local RC: " + rc[i]);
+    m_lrc_v.push_back(RCNode(rc[i]));
   }
 }

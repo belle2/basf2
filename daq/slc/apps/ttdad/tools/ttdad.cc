@@ -1,4 +1,5 @@
 #include "daq/slc/apps/ttdad/TTDACallback.h"
+#include "daq/slc/apps/ttdad/TTDMasterCallback.h"
 
 #include <daq/slc/runcontrol/RCNodeDaemon.h>
 
@@ -13,7 +14,8 @@ int main(int argc, char** argv)
     RCNode ttd(config.get("ttd"));
     TTDACallback callback(ttd);
     callback.setFTSWID(config.getInt("ftsw"));
-    RCNodeDaemon(config, &callback).run();
+    TTDMasterCallback callback2(&callback);
+    RCNodeDaemon(config, &callback, &callback2).run();
   }
   return 0;
 }

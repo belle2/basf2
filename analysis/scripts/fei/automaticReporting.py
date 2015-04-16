@@ -6,8 +6,8 @@ import ROOT
 import pdg
 
 import math
-import actorFramework
-import preCutDetermination
+from fei import dagFramework
+from fei import preCutDetermination
 import os
 import re
 import sys
@@ -65,7 +65,7 @@ def getConfigurationString(particles):
     """
     Prettify config output
     """
-    input = '\n\n'.join([str(p) for p in particles])
+    input = '\n\n'.join([convertParticleObjectToString(p) for p in particles])
     output = ''
     count = 0
     first_sep = 0
@@ -109,6 +109,69 @@ def formatTime(seconds):
     if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
         string += '$<1\mu$s'
     return string
+
+
+def convertParticleObjectToString(particle):
+    """ Convert particle object in a readable string which contains all configuration informations """
+    output = '{identifier}\n'.format(identifier=particle.identifier)
+
+    def compareMVAConfig(x, y):
+        return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target
+
+    def compareCutConfig(x, y):
+        if x is None and y is None:
+            return True
+        return x == y
+
+    if particle.isFSP:
+        if particle.postCutConfig is None:
+            output += '    PostCutConfiguration: None\n'
+        else:
+            output += '    PostCutConfiguration: value={p.value}\n'.format(p=particle.postCutConfig)
+        output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
+            m=particle.mvaConfig)
+        output += '    Variables: ' + ', '.join(particle.mvaConfig.variables) + '\n'
+    else:
+        samePreCutConfig = all(compareCutConfig(channel.preCutConfig, particle.preCutConfig) for channel in particle.channels)
+        sameMVAConfig = all(compareMVAConfig(channel.mvaConfig, particle.mvaConfig) for channel in particle.channels)
+        commonVariables = reduce(
+            lambda x, y: set(x).intersection(y), [
+                channel.mvaConfig.variables for channel in particle.channels])
+        if sameMVAConfig:
+            output += '    All channels use the same MVA configuration\n'
+            output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, config={m.config}\n'.format(
+                m=particle.mvaConfig)
+        output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
+
+        if samePreCutConfig:
+            output += '    All channels use the same PreCut configuration\n'
+            output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
+                p=particle.preCutConfig)
+            output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
+            output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=particle.preCutConfig)
+
+        if particle.postCutConfig is None:
+            output += '    PostCutConfiguration: None\n'
+        else:
+            output += '    PostCutConfiguration: value={p.value}\n'.format(p=particle.postCutConfig)
+
+        for channel in particle.channels:
+            output += '    {name} (decayModeID: {id})\n'.format(name=channel.name, id=channel.decayModeID)
+            if not samePreCutConfig:
+                if particle.postCutConfig is None:
+                    output += '    PreCutConfiguration: None\n'
+                else:
+                    output += ('    PreCutConfiguration: '
+                               'variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
+                                   p=channel.preCutConfig))
+                    output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=channel.preCutConfig)
+                    output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=channel.preCutConfig)
+            if not sameMVAConfig:
+                output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
+                    m=channel.mvaConfig)
+            output += '        Individual Variables: ' + \
+                ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
+    return output
 
 
 def purity(nSig, nBg):
@@ -281,7 +344,7 @@ def createSummaryTexFile(
             placeholders['NEvents']) *
         100)
 
-    hash = actorFramework.create_hash([placeholders])
+    hash = dagFramework.create_hash([placeholders])
     placeholders['texFile'] = 'FEIsummary.tex'
     if not os.path.isfile(placeholders['texFile']):
         createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/SummaryTemplate.tex', placeholders)
@@ -339,7 +402,7 @@ def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaCon
     placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
     placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
 
-    hash = actorFramework.create_hash([placeholders])
+    hash = dagFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash(
         '{name}_combined_{hash}_diag.png'.format(
             name=placeholders['particleName'],
@@ -416,7 +479,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
             placeholders['particleNBackgroundAfterUserCut'] += int(channelPlaceholder['channelNBackgroundAfterUserCut'])
         placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
 
-    hash = actorFramework.create_hash([placeholders])
+    hash = dagFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash(
         '{name}_combined_{hash}_diag.png'.format(
             name=placeholders['particleName'],
@@ -440,7 +503,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     @param preCut used preCuts for this channel
     """
     if preCutHistogram is None:
-        hash = actorFramework.create_hash([placeholders])
+        hash = dagFramework.create_hash([placeholders])
         placeholders['preCutTexFile'] = removeJPsiSlash(
             '{name}_preCut_{hash}.tex'.format(
                 name=placeholders['particleName'],
@@ -503,7 +566,7 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
         placeholders['preCutEfficiency'] = '{:.5f}'.format(preCutConfig.efficiency)
         placeholders['preCutPurity'] = '{:.5f}'.format(preCutConfig.purity)
 
-        hash = actorFramework.create_hash([placeholders])
+        hash = dagFramework.create_hash([placeholders])
 
         ROOT.gROOT.SetBatch(True)
 
@@ -610,7 +673,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
     """
 
     if signalProbability is None:
-        hash = actorFramework.create_hash([placeholders])
+        hash = dagFramework.create_hash([placeholders])
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/fei/templates/MissingMVATemplate.tex'
         placeholders['isIgnored'] = True
@@ -713,7 +776,7 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         placeholders['mvaNBackgroundAfterPostCut'] = placeholders['mvaPostCutBackgroundEfficiency'] * placeholders['mvaNBackground']
 
         # Create plots and texfile if hash changed
-        hash = actorFramework.create_hash([placeholders])
+        hash = dagFramework.create_hash([placeholders])
 
         placeholders['mvaOvertrainingPlot'] = removeJPsiSlash(
             '{name}_mva_{hash}_overtraining.png'.format(

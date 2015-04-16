@@ -90,17 +90,17 @@ namespace Belle2 {
 
   }
 
-  TNtuple* m_tuple;
-  TH1F* hapd[6];
-  TH1F* mwpc_tdc[4][5];
-  TH1F* mwpc_diff[4][2];
-  TH1F* mwpc_sum[4][2];
-  TH1F* mwpc_sum_cut[4][2];
-  TH1F* mwpc_residuals[4][2];
-  TH2F* mwpc_xy[4];
-  TH2F* mwpc_residualsz[4][2];
-  TGraph* m_hapdmap;
-  TGraph* m_el2pos;
+  TNtuple* m_tuple; /**< ntuple containing hapd hits */
+  TH1F* hapd[6];    /**< histogram of hits for each hapd */
+  TH1F* mwpc_tdc[4][5]; /**< tdc information from mwpcs */
+  TH1F* mwpc_diff[4][2]; /**< tdc difference from mwpcs */
+  TH1F* mwpc_sum[4][2];  /**< tdc sum from mwpcs */
+  TH1F* mwpc_sum_cut[4][2]; /**< tdc sum from mwpcs, with sum cut applied */
+  TH1F* mwpc_residuals[4][2]; /**< residuals from mwpcs */
+  TH2F* mwpc_xy[4];           /**< calculated x-y track positions */
+  TH2F* mwpc_residualsz[4][2]; /**< z-residuals from mwpcs */
+  //TGraph* m_hapdmap;
+  //TGraph* m_el2pos;
 
   void arichBtestModule::initialize()
   {
@@ -139,8 +139,8 @@ namespace Belle2 {
       sprintf(name, "mwpc%d_", i);
       mwpc_xy[i] = new TH2F(strcat(name, "xy"), name, 120, -30, 30, 120, -30, 30);
     }
-    m_hapdmap = new TGraph("arich/modules/arichBtest/geometry/hapd.map");
-    m_el2pos = new TGraph("arich/modules/arichBtest/geometry/hapdchmap_v0.dat");
+    //m_hapdmap = new TGraph("arich/modules/arichBtest/geometry/hapd.map");
+    //m_el2pos = new TGraph("arich/modules/arichBtest/geometry/hapdchmap_v0.dat");
 
     /*
      arich::ARICHGeometryPar* _arichgp = arich::ARICHGeometryPar::Instance();

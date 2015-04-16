@@ -42,7 +42,7 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    ARICHReconstruction(int, int);
+    ARICHReconstruction(int = 0, int = 0);
 
     //! Destructor
     ~ARICHReconstruction() {};
@@ -85,7 +85,7 @@ namespace Belle2 {
       \param hitpos vector of hit position
       \param mirrorID id of mirror from which the photon was reflected
      */
-    TVector3 HitVirtualPosition(const TVector3 hitpos, int mirrorID);
+    TVector3 HitVirtualPosition(const TVector3& hitpos, int mirrorID);
 
     //! Calculates the intersection of the Cherenkov photon emitted from point "r" in "dirf" direction with the detector plane.
     /*!

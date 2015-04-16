@@ -194,7 +194,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   tree->SetBranchAddress("phnw", &phnw);
   tree->SetBranchAddress("trlen", &trlen);
   tree->SetBranchAddress("en", &en);
-  //tree->SetBranchAddress("source",&source);
+  tree->SetBranchAddress("source", &source);
 
   int nevents = tree->GetEntries();
 

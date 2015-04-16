@@ -149,12 +149,14 @@ namespace Belle2 {
     //! check the activity of the channel
     bool isActive(int module, int channel);
 
+    //! returns merger board ID from cooperID and finesse
     int getMergerFromCooper(int cooperID, int finesse);
+    //! returns front-end board ID from merger ID and slot
     int getBoardFromMerger(int mergerID, int slot);
+    //! returns number of front-end boards connected to the merger
     int getNBoardsOnMerger(int mergerID);
 
-    //! Return a set of copper ID's
-
+    //! Returns a set of copper ID's
     const std::unordered_set<unsigned int>& getCopperIDs() const
     {
       return m_copperIDs;
@@ -220,6 +222,7 @@ namespace Belle2 {
     //! Gets mirrors positions directly from xml file (in case of simple "beamtest" geometry).
     void mirrorPositionSimple(const GearDir& content);
 
+    //! reads front-end board to merger to cooper mapping from an xml file
     void frontEndMapping(const GearDir& content);
 
     static ARICHGeometryPar* p_B4ARICHGeometryParDB; /*!< Pointer that saves the instance of this class. */
@@ -240,11 +243,11 @@ namespace Belle2 {
     std::vector<TVector3> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
     std::vector<TVector3> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
 
-    std::map<std::pair<unsigned, int>, unsigned> m_copper2merger;
-    std::map<int, std::vector<unsigned>> m_merger2feb;
-    std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
-    std::unordered_set<unsigned int> m_mergerIDs; /**< Merger ID's */
-    std::unordered_set<unsigned int> m_boardIDs; /**< FEB ID's */
+    std::map<std::pair<unsigned, int>, unsigned> m_copper2merger; /*! mapping of merger boards to cooper boards */
+    std::map<int, std::vector<unsigned>> m_merger2feb; /*! mapping of front-end boards to mergers */
+    std::unordered_set<unsigned int> m_copperIDs; /*!< COPPER ID's */
+    std::unordered_set<unsigned int> m_mergerIDs; /*!< Merger ID's */
+    std::unordered_set<unsigned int> m_boardIDs; /*!< FEB ID's */
 
   };
 

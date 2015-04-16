@@ -69,10 +69,10 @@ namespace Belle2 {
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      */
-    void unpackSuppressedData(const int* buffer, int bufferSize);
-    void unpackUnsuppressedData(const int* buffer, int bufferSize);
-    unsigned m_bitMask;
-    int m_debug;
+    void unpackSuppressedData(const int* buffer, int bufferSize); /**< unpacks suppressed data (only hit channels writen)*/
+    void unpackUnsuppressedData(const int* buffer, int bufferSize); /**< unpacks unsuppressed data (all channels writen)*/
+    unsigned m_bitMask; /**< bitmask for hit detection (4bits/hit) */
+    int m_debug; /**< debug */
     ARICHGeometryPar* m_arichgp;  /**< geometry parameters */
 
   };

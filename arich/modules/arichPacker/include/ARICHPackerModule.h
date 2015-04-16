@@ -65,9 +65,9 @@ namespace Belle2 {
   private:
 
     ARICHGeometryPar* m_arichgp;  /**< geometry parameters */
-    int m_nonSuppressed;
-    unsigned m_bitMask;
-    int m_debug;
+    int m_nonSuppressed;   /**< type of data (1 nonsuppressed, 0 suppressed) */
+    unsigned m_bitMask;    /**< bitmask for hit detection (4bit/hit) */
+    int m_debug; /**< debug */
   };
 
 } // Belle2 namespace

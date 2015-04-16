@@ -38,6 +38,8 @@ namespace Belle2 {
 
   ARICHReconstruction::ARICHReconstruction(int storeHist, int beamtest):
     m_arichGeoParameters(ARICHGeometryPar::Instance()),
+    m_hitstuple(0),
+    m_tracktuple(0),
     m_storeHist(storeHist),
     m_beamtest(beamtest),
     m_bkgLevel(0),
@@ -173,7 +175,7 @@ namespace Belle2 {
     return r;
   }
 
-  TVector3 ARICHReconstruction::HitVirtualPosition(const TVector3 hitpos, int mirrorID)
+  TVector3 ARICHReconstruction::HitVirtualPosition(const TVector3& hitpos, int mirrorID)
   {
 
     if (mirrorID == -1) return hitpos;
@@ -541,7 +543,6 @@ namespace Belle2 {
           logL[iHyp] += expected + log(1 - exp(-expected));
         }
 
-        //*******************************************
 
       }// for (unsigned  int iPhoton=0; iPhoton< nPhotonHits; iPhoton++)
 

@@ -4,7 +4,7 @@
 
 int main()
 {
-  int fd = modbus_connect("localhost", 8080);
+  int fd = modbus_connect("modbus", 502);
   modbus_adu_t adu;
   adu.hdr.trans_id = 0x01;
   adu.hdr.unit_id = 0x02;

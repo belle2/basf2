@@ -15,7 +15,6 @@ namespace Belle2 {
     virtual ~NSMVHandlerTrigft() throw() {}
     bool handleSetInt(int val)
     {
-      LogFile::debug("trigft");
       try {
         if (val > 0)
           m_callback.trigft();
@@ -156,7 +155,7 @@ void TTDACallback::trigft() throw(RCHandlerException)
     get("dummy_rate", pars[1]);
     get("trigger_limit", pars[2]);
     if (m_ttdnode.getName().size() > 0) {
-      send(NSMMessage(m_ttdnode, NSMCommand(11, "LOAD"), 3, pars));
+      send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 3, pars));
     } else {
       std::string cmd = StringUtil::form("trigft -%d %s %d %d", m_ftswid,
                                          m_trigger_type.c_str(), pars[1], pars[2]);

@@ -9,8 +9,15 @@
 
 using namespace Belle2;
 
-const std::string ConfigFile::getFilePath(const std::string& filename)
+const std::string ConfigFile::getFilePath(const std::string& filename_in)
 {
+  std::string filename = filename_in;
+  if (filename == "slowcontrol") {
+    char* slcfile = getenv("BELLE2_SLC_FILE");
+    if (slcfile != NULL) {
+      filename = slcfile;
+    }
+  }
   std::string file_path;
   if (filename.size() > std::string(".conf").size() + 1 &&
       StringUtil::find(filename, ".conf")) {

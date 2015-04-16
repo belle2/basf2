@@ -60,13 +60,11 @@ p = Particle('D0', mvaConfig_D, preCutConfiguration_nonFSP)
 p.addChannel(['K-', 'pi+'])
 particles.append(p)
 
-analysis_path = create_path()
-analysis_path.add_module('PrintCollections')
-feistate = fullEventInterpretation(None, analysis_path, particles)
+feistate = fullEventInterpretation(None, particles)
 
 # show constructed path
+feistate.path.add_module('PrintCollections')
 print feistate.path
-
 process(feistate.path)
 
 print statistics

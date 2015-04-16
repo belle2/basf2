@@ -158,7 +158,7 @@ def fullEventInterpretation(selection_path, particles):
 
     # Set environment variables
     dag.env['ROE'] = selection_path is not None
-    dag.env['prone'] = args.prone
+    dag.env['prune'] = args.prune
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
     dag.env['rerun_cached_providers'] = args.rerunCachedProviders
@@ -247,7 +247,7 @@ def fullEventInterpretation(selection_path, particles):
     # Determine Intermediate Cuts using the config objects provided by the user
     for particle in particles:
         # Determine PostCut
-        dag.add('PostCut_' + particle.identifier, PostCutDetermination,
+        dag.add('PostCut_' + particle.identifier, provider.PostCutDetermination,
                 'Identifier_' + particle.identifier,
                 ['SignalProbability_' + particle.identifier] if particle.isFSP
                 else ['SignalProbability_' + channel.name for channel in particle.channels],
@@ -257,10 +257,10 @@ def fullEventInterpretation(selection_path, particles):
         if not particle.isFSP:
             for channel in particle.channels:
                 additionalDependencies = []
-                if 'SignalProbability' in channel.preCutConfig.variable:
+                if 'SignalProbability' in particle.preCutConfig.variable:
                     additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
 
-                dag.add('PreCutHistogram_' + channel.name, CreatePreCutHistogram,
+                dag.add('PreCutHistogram_' + channel.name, provider.CreatePreCutHistogram,
                         particleName='Name_' + particle.identifier,
                         channelName='Name_' + channel.name,
                         mvaConfigTarget='MVAConfigTarget_' + channel.name,
@@ -268,11 +268,11 @@ def fullEventInterpretation(selection_path, particles):
                         daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
                         additionalDependencies=additionalDependencies)
 
-                dag.add('PreCut_' + channel.name, PreCutDeterminationPerChannel,
+                dag.add('PreCut_' + channel.name, provider.PreCutDeterminationPerChannel,
                         channelName='Name_' + channel.name,
                         preCut='PreCut_' + particle.identifier)
 
-                dag.add('PreCut_' + particle.identifier, PreCutDetermination,
+                dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
                         channelNames=['Name_' + channel.name for channel in particle.channels],
                         preCutConfigs='PreCutConfig_' + particle.identifier,
                         preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
@@ -281,39 +281,39 @@ def fullEventInterpretation(selection_path, particles):
     for particle in particles:
         if particle.isFSP:
             # Create Distribution of Signal and Background
-            dag.add('Distribution_' + particle.identifier, FSPDistribution,
+            dag.add('Distribution_' + particle.identifier, provider.FSPDistribution,
                     'gearbox',
                     inputList='MatchedParticleList_' + particle.identifier,
                     mvaConfigTarget='MVAConfigTarget_' + particle.identifier)
             # Calculate inverse sampling rate, thereby limit the maximum amount of statistic
-            dag.add('InverseSamplingRate_' + particle.identifier, CalculateInverseSamplingRate,
+            dag.add('InverseSamplingRate_' + particle.identifier, provider.CalculateInverseSamplingRate,
                     distribution='Distribution_' + particle.identifier)
             # Calculate a reasonable number of bins for the TMVA MVA-PDFs
-            dag.add('Nbins_' + particle.identifier, CalculateNumberOfBins,
+            dag.add('Nbins_' + particle.identifier, provider.CalculateNumberOfBins,
                     distribution='Distribution_' + particle.identifier)
             # Generate training data from MC-matched ParticleList
-            dag.add('TrainingData_' + particle.identifier, GenerateTrainingData,
+            dag.add('TrainingData_' + particle.identifier, provider.GenerateTrainingData,
                     mvaConfig='MVAConfig_' + particle.identifier,
                     particleList='MatchedParticleList_' + particle.identifier,
-                    inverseSamplingRate='InverseSamplingRate_' + particle.identifier,
+                    inverseSamplingRates='InverseSamplingRate_' + particle.identifier,
                     Nbins='Nbins_' + particle.identifier,
                     additionalDependencies='None')
             # Train and apply MVC on raw ParticleList
-            dag.add('SignalProbability_' + particle.identifier, SignalProbability,
+            dag.add('SignalProbability_' + particle.identifier, provider.SignalProbability,
                     mvaConfig='MVAConfig_' + particle.identifier,
                     particleList='RawParticleList_' + particle.identifier,
-                    inverseSamplingRate='InverseSamplingRate_' + particle.identifier,
-                    Nbins='Nbins_' + channel.name,
+                    inverseSamplingRates='InverseSamplingRate_' + particle.identifier,
+                    Nbins='Nbins_' + particle.identifier,
                     trainingData='TrainingData_' + particle.identifier)
         else:
             for channel in particle.channels:
                 # Calculate inverse sampling rate, thereby limit the maximum amount of statistic,
                 # uses nSignal and nBackground as determined by the PreCut algorithm
-                dag.add('InverseSamplingRate_' + channel.name, CalculateInverseSamplingRate,
+                dag.add('InverseSamplingRate_' + channel.name, provider.CalculateInverseSamplingRate,
                         distribution='PreCut_' + channel.name)
                 # Calculate a reasonable number of bins for the TMVA MVA-PDFs
                 # uses nSignal and nBackground as determined by the PreCut algorithm
-                dag.add('Nbins_' + channel.name, CalculateNumberOfBins,
+                dag.add('Nbins_' + channel.name, provider.CalculateNumberOfBins,
                         distribution='PreCut_' + channel.name)
 
                 # Add additional dependencies like VertexFit and SignalProbabilities if used in the MVC
@@ -325,17 +325,17 @@ def fullEventInterpretation(selection_path, particles):
                     additionalDependencies += ['VertexFit_' + channel.name]
 
                 # Generate training data from MC-matched ParticleList
-                dag.add('TrainingData_' + channel.name, GenerateTrainingData,
+                dag.add('TrainingData_' + channel.name, provider.GenerateTrainingData,
                         mvaConfig='MVAConfig_' + channel.name,
                         particleList='MatchedParticleList_' + channel.name,
-                        inverseSamplingRate='InverseSamplingRate_' + channel.name,
+                        inverseSamplingRates='InverseSamplingRate_' + channel.name,
                         Nbins='Nbins_' + channel.name,
                         additionalDependencies=additionalDependencies)
                 # Train and apply MVC on raw ParticleList
-                dag.add('SignalProbability_' + channel.name, SignalProbability,
+                dag.add('SignalProbability_' + channel.name, provider.SignalProbability,
                         mvaConfig='MVAConfig_' + channel.name,
                         particleList='RawParticleList_' + channel.name,
-                        inverseSamplingRate='InverseSamplingRate_' + channel.name,
+                        inverseSamplingRates='InverseSamplingRate_' + channel.name,
                         Nbins='Nbins_' + channel.name,
                         trainingData='TrainingData_' + channel.name)
 
@@ -354,37 +354,37 @@ def fullEventInterpretation(selection_path, particles):
                       pdg.conjugate(particle.name) + ':' + particle.label not in o.daughters for o in particles)]
 
     # Write out additional information, histograms, ...
-    dag.add('mcCounts', CountMCParticles,
+    dag.add('mcCounts', provider.CountMCParticles,
             'gearbox',
             names=['Name_' + particle.identifier for particle in particles])
 
-    dag.add('ModuleStatisticsFile', SaveModuleStatistics,
+    dag.add('ModuleStatisticsFile', provider.SaveModuleStatistics,
             ['SignalProbability_' + finalParticle.identifier for finalParticle in finalParticles])
 
     for particle in particles:
         # Tag unique signal candidates, to avoid double-counting
         # e.g. B->D* pi and B->D pi pi can contain the same correctly reconstructed candidate
-        extraVars = 'None'
+        extraVars = ['None']
         if particle in finalParticles:
-            play.addActor('TagUniqueSignal_' + particle.identifier, TagUniqueSignal,
-                          'gearbox',
-                          particleList='ParticleList_' + particle.identifier,
-                          signalProbability='SignalProbability_' + particle.identifier,
-                          target='MVAConfigTarget_' + particle.identifier)
-            extraVars = 'TagUniqueSignal_' + particle.identifier
+            dag.add('TagUniqueSignal_' + particle.identifier, provider.TagUniqueSignal,
+                    'gearbox',
+                    particleList='ParticleList_' + particle.identifier,
+                    signalProbability='SignalProbability_' + particle.identifier,
+                    target='MVAConfigTarget_' + particle.identifier)
+            extraVars = ['TagUniqueSignal_' + particle.identifier]
 
-        play.addActor('VariablesToNTuple_' + particle.identifier, VariablesToNTuple,
-                      'gearbox',
-                      particleList='ParticleList_' + particle.identifier,
-                      signalProbability='SignalProbability_' + particle.identifier,
-                      extraVars=extraVars,
-                      target='MVAConfigTarget_' + particle.identifier)
+        dag.add('VariablesToNTuple_' + particle.identifier, provider.VariablesToNTuple,
+                'gearbox',
+                particleList='ParticleList_' + particle.identifier,
+                signalProbability='SignalProbability_' + particle.identifier,
+                extraVars=extraVars,
+                target='MVAConfigTarget_' + particle.identifier)
 
     # Create the automatic reporting summary pdf
     if args.summary:
         for particle in particles:
             for channel in particle.channels:
-                dag.add('Placeholder_' + channel.name, WriteAnalysisFileForChannel,
+                dag.add('Placeholder_' + channel.name, provider.WriteAnalysisFileForChannel,
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
                         channelName='Name_' + channel.name,
@@ -397,7 +397,7 @@ def fullEventInterpretation(selection_path, particles):
                         postCut='PostCut_' + particle.identifier)
 
             if particle.isFSP:
-                dag.add('Placeholders_' + particle.identifier, WriteAnalysisFileForFSParticle,
+                dag.add('Placeholders_' + particle.identifier, provider.WriteAnalysisFileForFSParticle,
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
                         mvaConfig='MVAConfig_' + particle.identifier,
@@ -407,7 +407,7 @@ def fullEventInterpretation(selection_path, particles):
                         distribution='Distribution_' + particle.identifier,
                         nTuple='VariablesToNTuple_' + particle.identifier)
             else:
-                dag.add('Placeholders_' + particle.identifier, WriteAnalysisFileForCombinedParticle,
+                dag.add('Placeholders_' + particle.identifier, provider.WriteAnalysisFileForCombinedParticle,
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
                         channelPlaceholders=['Placeholders_' + channel.name for channel in particle.channels],
@@ -420,14 +420,14 @@ def fullEventInterpretation(selection_path, particles):
         inputLists += ['RawParticleList_' + channel.name for p in particles for channel in p.channels]
         channelPlaceholders = ['Placeholders_' + p.identifier for p in particles if p.isFSP]
         channelPlaceholders += ['Placeholders_' + channel.name for p in particles for channel in p.channels]
-        dag.add('CPUTimeSummary', WriteCPUTimeSummary,
+        dag.add('CPUTimeSummary', provider.WriteCPUTimeSummary,
                 channelNames=channelNames,
                 inputLists=inputLists,
                 channelPlaceholders=channelPlaceholders,
                 mcCounts='mcCounts',
                 moduleStatisticsFile='ModuleStatisticsFile')
 
-        dag.add('FEISummary.pdf', WriteAnalysisFileSummary,
+        dag.add('FEISummary.pdf', provider.WriteAnalysisFileSummary,
                 finalStateParticlePlaceholders=['Placeholders_' + p.identifier for p in particles if p.isFSP],
                 combinedParticlePlaceholders=['Placeholders_' + p.identifier for p in particles if not p.isFSP],
                 finalParticleNTuples=['VariablesToNTuple_' + finalParticle.identifier for finalParticle in finalParticles],
@@ -435,7 +435,7 @@ def fullEventInterpretation(selection_path, particles):
                 cpuTimeSummaryPlaceholders='CPUTimeSummary',
                 mcCounts='mcCounts',
                 particles=['Object_' + particle.identifier for particle in particles])
-        dag.addNeeded('FEIsummary.pdf')
+        dag.addNeeded('FEISummary.pdf')
 
     # Finally we add the final particles (normally B+ B0) as needed to the dag
     for finalParticle in finalParticles:
@@ -444,7 +444,7 @@ def fullEventInterpretation(selection_path, particles):
 
     fei_path = create_path()
 
-    is_first_run = args.cache is None or not os.path.isfile(args.cacheFile)
+    is_first_run = args.cache is None or not os.path.isfile(args.cache)
     if args.cache is not None:
         dag.load_cached_resources(args.cache)
     finished_training = dag.run(fei_path)
@@ -469,7 +469,7 @@ def fullEventInterpretation(selection_path, particles):
                 path.add_module('RootInput')
             path.add_path(fei_path)
 
-    if args.preload and not is_first_run:
+    if args.cache is not None and not is_first_run:
         # when preloader is used, make sure we also reload the statistics
         for module in path.modules():
             if module.type() == 'RootInput':

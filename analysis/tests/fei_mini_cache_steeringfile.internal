@@ -39,9 +39,10 @@ particles.append(Particle('pi+', mvaConfig_chargedFSP))
 particles.append(Particle('K+', mvaConfig_chargedFSP))
 
 
-analysis_path = create_path()
-analysis_path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
-feistate = fullEventInterpretation(None, analysis_path, particles)
+feistate = fullEventInterpretation(None, particles)
+
+feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
+
 
 # show constructed path
 print feistate.path

@@ -18,16 +18,16 @@ os.chdir(tempdir)
 
 cmd = "basf2 " + steeringFile + " -i " + inputFile + " -- -summary"
 
-#fsp variablestontuple
+# fsp variablestontuple
 assert 0 == os.system(cmd)
-#fsp TMVATeacher
+# fsp TMVATeacher
 assert 0 == os.system(cmd)
-#fsp training and D hists
+# fsp training and D hists
 assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 4
 assert len(glob.glob('CutHistograms_D0*.root')) == 1
-#D channels ignored.
+# D channels ignored.
 assert 0 == os.system(cmd)
 assert len(glob.glob('D0*.root')) == 0
 
-shutil.rmtree(tempdir)
+# shutil.rmtree(tempdir)

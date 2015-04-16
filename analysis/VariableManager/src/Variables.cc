@@ -1551,6 +1551,11 @@ namespace Belle2 {
 
 
     // Event ------------------------------------------------
+    double eventType(const Particle*)
+    {
+      StoreArray<MCParticle> mcparticles;
+      return (mcparticles.getEntries()) > 0 ? 0 : 1;
+    }
 
     double nTracks(const Particle*)
     {
@@ -1792,6 +1797,7 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Event");
+    REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent",  isContinuumEvent,  "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("nTracks",  nTracks,  "[Eventbased] number of tracks in the event");
     REGISTER_VARIABLE("nECLClusters", nECLClusters, "[Eventbased] number of ECL in the event");

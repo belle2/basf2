@@ -202,18 +202,18 @@ class DAG(object):
         """
         self.resources[identifier].needed = True
 
-    def load_cached_resources(cacheFile):
+    def load_cached_resources(self, cacheFile):
         if os.path.isfile(cacheFile):
             with open(cacheFile, 'r') as f:
                 cache = cPickle.load(f)
                 for resource in cache:
                     self.resources[resource.identifier] = resource
 
-    def save_cached_resources(cacheFile):
+    def save_cached_resources(self, cacheFile):
         if os.path.isfile(cacheFile):
             shutil.copyfile(cacheFile, cacheFile + '.bkp')
         with open(cacheFile, 'w') as f:
-            cPickle.dump([resource for resource in self.resources if resource.cache], f)
+            cPickle.dump([resource for resource in self.resources.values() if resource.cache], f)
 
     def showProgress(self, total, done, ready):
         """ Print progress """
@@ -273,9 +273,10 @@ class DAG(object):
             for x in needed:
                 x.needed = True
                 requirements += x.requires
-            needed = [x for x in resources if x.identifier in requirements]
+            needed = [x for x in resources if x.identifier in requirements and not x.needed]
         # But finally needed are only resources which are in the chain!
         needed = [x for x in chain if x.needed and x.path is not None and x.path.modules() > 0]
+        print "Done"
 
         # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
         # Otherwise they slow down all following modules! Therefore we try to move these modules to the end of the needed list.
@@ -296,7 +297,7 @@ class DAG(object):
 
         if self.env.get('verbose', False):
             self.createDotGraphic(needed)
-            self.printMissingDependencies(actors, results.keys())
+            self.printMissingDependencies([r for r in resources if r not in chain], results.keys())
 
         return nDone == nResources
 
@@ -387,7 +388,7 @@ class DAG(object):
             for r in set(resource.requires):
                 if any(r.startswith(exclude) for exclude in excludeList):
                     continue
-                dotfile.write('"' + r + '" -> "' + provided + '";\n')
+                dotfile.write('"' + r + '" -> "' + resource.identifier + '";\n')
 
         dotfile.write("}\n")
         dotfile.close()

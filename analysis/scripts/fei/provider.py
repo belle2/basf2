@@ -283,7 +283,7 @@ def FSPDistribution(resource, inputList, mvaConfigTarget):
     Counts the number of MC Particles for every pdg code in all events
         @param resource object
         @param inputList particle list name
-        @param mvaConfig configuration for the multivariate analysis
+        @param mvaConfigTarget configuration for the multivariate analysis
     """
     resource.cache = True
     filename = removeJPsiSlash('{i}_{h}.root'.format(i=inputList, h=resource.hash))
@@ -428,7 +428,7 @@ def SignalProbability(resource, particleList, mvaConfig, inverseSamplingRates, N
         expert.param('inverseSamplingRates', inverseSamplingRates)
         expert.param('listNames', [particleList])
         resource.path.add_module(expert)
-        return resource.hash
+        return configFilename
 
     resource.halt = True
     return

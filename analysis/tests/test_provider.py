@@ -694,11 +694,11 @@ class TestSignalProbability(unittest.TestCase):
 
     def test_SignalProbabilityAlreadyTrained(self):
         with temporary_file('trainingData.config'):
-            # Returns hash if training was sucessfull
+            # Returns config filename if training was sucessfull
             self.assertEqual(
                 SignalProbability(
                     self.resource, 'D0:1', self.mvaConfig, {
-                        0: 3}, 'Nbins=100:', 'trainingData.root'), '42')
+                        0: 3}, 'Nbins=100:', 'trainingData.root'), 'trainingData.config')
             # Enables caching
             result = MockResource(cache=True)
             # Adds TMVAExpert for given ParticleList
@@ -733,8 +733,9 @@ class TestSignalProbability(unittest.TestCase):
     def test_SignalProbabilityTrainingSuccessfull(self):
         # I call upon the mighty god of Python!
         exec compile(InjectMockSubprocessSuccess().visit(ast.parse(inspect.getsource(SignalProbability))), '<string>', 'exec')
-        # Returns hash if training was did not create correct file
-        self.assertEqual(SignalProbability(self.resource, 'D0:1', self.mvaConfig, {0: 3}, 'Nbins=100:', 'trainingData.root'), '42')
+        # Returns config filename if training was did not create correct file
+        self.assertEqual(SignalProbability(self.resource, 'D0:1', self.mvaConfig, {0: 3},
+                                           'Nbins=100:', 'trainingData.root'), 'trainingData.config')
         # Enables caching
         result = MockResource(cache=True, usesMultiThreading=True)
         # Adds TMVAExpert for given ParticleList

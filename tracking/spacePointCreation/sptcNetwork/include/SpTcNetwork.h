@@ -52,6 +52,11 @@ namespace Belle2 {
       m_network(TCNetworkContainer<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard >()),
       m_compareSPs(false) {}
 
+    /** specific constructor allowing to set comparison mode */
+    SpTcNetwork(bool compareSPs) :
+      m_network(TCNetworkContainer<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard >()),
+      m_compareSPs(compareSPs) {}
+
     /** virtual destructor to prevent undefined behavior for inherited classes */
     virtual ~SpTcNetwork() {}
 
@@ -73,6 +78,11 @@ namespace Belle2 {
     /** return how many TCs are currently alive */
     unsigned int getNTCsAlive() const  { return m_network.getNTCsAlive(); }
 
+    /** returns in which way the TCs will be compared.
+    *
+    * if true, overlaps are checked via SpacePoints. If false, overlaps are checked via clusters
+    */
+    bool getCompareTCsMode() const { return m_compareSPs; }
 
 /// setter
 
@@ -82,6 +92,9 @@ namespace Belle2 {
     {
       m_network.add(SPTCAvatar<TCCompetitorGuard >(newTC, m_network.getObserver(), m_network.size(), m_compareSPs));
     }
+
+    /** add new TC as node and update all links in network */
+    void add(SpacePointTrackCand* newTC) { add(*newTC); }
 
     /** deactivates a TC and updates the competing links to it */
     void killTC(unsigned int iD) { m_network.killTC(iD); }

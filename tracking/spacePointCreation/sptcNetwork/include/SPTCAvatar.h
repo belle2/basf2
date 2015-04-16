@@ -126,7 +126,7 @@ namespace Belle2 {
      * */
     void setAliveState(bool newState)
     {
-      B2INFO("SPTCAvatar:setAliveState: newState = " << newState)
+      B2DEBUG(50, "SPTCAvatar:setAliveState: newState = " << newState)
       if (newState == false) {
         m_observer.notifyRemove(m_iD);
       }

@@ -69,7 +69,7 @@ namespace Belle2 {
       for (const TCCompetitor& aCompetitor : m_links) {
         aCompetitor.hasCompetitors() and nCompetitors++;
       }
-      B2INFO("TCNetworkContainer::getNCompetitors: " << nCompetitors)
+      B2DEBUG(50, "TCNetworkContainer::getNCompetitors: " << nCompetitors)
       return nCompetitors;
     }
 
@@ -81,7 +81,7 @@ namespace Belle2 {
       for (const TCType& aTC : m_nodes) {
         aTC.isAlive() and nAlive++;
       }
-      B2INFO("TCNetworkContainer::getNTCsAlive: " << nAlive)
+      B2DEBUG(50, "TCNetworkContainer::getNTCsAlive: " << nAlive)
       return nAlive;
     }
 
@@ -98,9 +98,9 @@ namespace Belle2 {
         if (aTC.areCompetitors(newTC)) {
           newCompetitorsFound.push_back(aTC.getID());
           m_links[aTC.getID()].addCompetitor(newTC.getID());
-          B2INFO("current TC " << aTC.getID() << " got new competitor " << newTC.getID())
+          B2DEBUG(50, "current TC " << aTC.getID() << " got new competitor " << newTC.getID())
         } else {
-          B2INFO("current TC " << aTC.getID() << " is not competing with " << newTC.getID())
+          B2DEBUG(50, "current TC " << aTC.getID() << " is not competing with " << newTC.getID())
         }
       }
       m_nodes.push_back(newTC);
@@ -130,7 +130,7 @@ namespace Belle2 {
     void killTC(unsigned int iD)
     {
       if (iD >= size()) {
-        B2WARNING("given iD " << iD << " is not in network with size: " << size())
+        B2WARNING("TCNetworkContainer:killTC: given iD " << iD << " is not in network with size: " << size() << ", killing aborted...")
         return;
       }
       m_nodes[iD].setAliveState(false);

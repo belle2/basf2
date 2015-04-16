@@ -38,7 +38,7 @@ namespace Belle2 {
     /** constructor */
     TCCompetitorGuard(std::vector<TCCompetitor>& observedVector) : m_links(observedVector)
     {
-      B2INFO("TCCompetitorGuard:constructor: nEntries in observedVector " << observedVector.size());
+      B2DEBUG(150, "TCCompetitorGuard:constructor: nEntries in observedVector " << observedVector.size());
     }
 
     /** notify function called by class which wants to be observed. For each competitor of given iD, the iD will be removed as competitor for them. */
@@ -48,14 +48,15 @@ namespace Belle2 {
         B2WARNING("TCCompetitorGuard:notifyRemove: TC not officially registered in network yet! Skipping notifyRemove...")
         return;
       }
-      B2INFO("TCCompetitorGuard:notifyRemove: id " << iD << " got " << m_links[iD].getNCompetitors() <<
-             " competitors which will now be informed")
+      B2DEBUG(50, "TCCompetitorGuard:notifyRemove: id " << iD << " got " << m_links[iD].getNCompetitors() <<
+              " competitors which will now be informed")
 
       for (unsigned int aCompetitor : m_links[iD].getCompetitors()) {
         unsigned int nCompetitorsB4 = m_links[aCompetitor].getNCompetitors();
         m_links[aCompetitor].removeCompetitor(iD);
-        B2INFO(" competitor " << aCompetitor << " has removed " << iD << ". nCompetitorsB4: " << nCompetitorsB4 << ", now: " << m_links.at(
-                 aCompetitor).getNCompetitors())
+        B2DEBUG(75, " competitor " << aCompetitor << " has removed " << iD << ". nCompetitorsB4: " << nCompetitorsB4 << ", now: " <<
+                m_links.at(
+                  aCompetitor).getNCompetitors())
         m_links[iD].removeCompetitor(aCompetitor);
       }
     }

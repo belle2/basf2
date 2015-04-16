@@ -38,6 +38,8 @@ def PDGConjugate(resource, particleList):
         @param particleList ParticleList
     """
     resource.cache = True
+    if particleList is None:
+        return
     name, label = particleList.split(':')
     return pdg.conjugate(name) + ':' + label
 
@@ -111,17 +113,18 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, deca
     return particleList
 
 
-def CopyParticleLists(resource, particleName, particleLists, postCut):
+def CopyParticleLists(resource, particleName, particleLists, postCut, signalProbabilities):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param resource object
         @param particleName valid pdg particle name
         @param particleLists list of ParticleLists name defning which ParticleLists are copied to the new list
         @param postCut dictionary containing 'cutstring'
+        @param signalProbabilities signal probability of the particle lists
         @return name of new ParticleList
     """
     resource.cache = True
-    particleLists = filter(None, particleLists)
+    particleLists = [p for p, s in zip(particleLists, signalProbabilities) if p is not None and s is not None]
     if particleLists == []:
         return
 

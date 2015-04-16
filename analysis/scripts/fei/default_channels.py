@@ -1,4 +1,4 @@
-from fei import Particle
+from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
 
 def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True):
@@ -20,18 +20,18 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         'model': None
     }
 
-    postCut = Particle.PostCutConfiguration(
+    postCut = PostCutConfiguration(
         value=0.1
     )
 
-    postCutSoft = Particle.PostCutConfiguration(
+    postCutSoft = PostCutConfiguration(
         value=0.01
     )
 
     particles = []
 
 # ################## Charged FSP ###############################
-    mva_chargedFSP = Particle.MVAConfiguration(
+    mva_chargedFSP = MVAConfiguration(
         variables=['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
                    'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
                    'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
@@ -49,7 +49,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
 # ################# GAMMA ############################
 
-    mva_gamma = Particle.MVAConfiguration(
+    mva_gamma = MVAConfiguration(
         variables=['clusterReg', 'goodGamma', 'goodGammaUnCal',
                    'clusterNHits', 'clusterTrackMatch', 'clusterE9E25',
                    'p_CMS', 'pt_CMS', 'E', 'pz_CMS'],
@@ -60,13 +60,13 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))
 
 # ################# PI0 ###############################
-    mva_pi0 = Particle.MVAConfiguration(
+    mva_pi0 = MVAConfiguration(
         variables=['M', 'daughter({},extraInfo(SignalProbability))', 'daughterAngle(0,1)', 'Q'],
         target='isSignal',
         **mvaDefaults
     )
 
-    pre_pi0 = Particle.PreCutConfiguration(
+    pre_pi0 = PreCutConfiguration(
         variable='M',
         binning=(500, 0.08, 0.18),
         efficiency=0.95,
@@ -78,7 +78,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         Particle('pi0', mva_pi0, pre_pi0, postCut).addChannel(['gamma', 'gamma']))
 
 # ################## KS0 ###############################
-    mva_KS0 = Particle.MVAConfiguration(
+    mva_KS0 = MVAConfiguration(
         variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb',
                    'M', 'E', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))',
                    'cosAngleBetweenMomentumAndVertexVector',
@@ -87,13 +87,13 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    mva_KS0_pi0pi0 = Particle.MVAConfiguration(
+    mva_KS0_pi0pi0 = MVAConfiguration(
         variables=['M', 'E', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))'],
         target='isSignal',
         **mvaDefaults
     )
 
-    pre_KS0 = Particle.PreCutConfiguration(
+    pre_KS0 = PreCutConfiguration(
         variable='M',
         binning=(500, 0.3, 0.7),
         efficiency=0.95,
@@ -107,7 +107,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     particles.append(p)
 
 # ####################### D0 #########################
-    mva_D0 = Particle.MVAConfiguration(
+    mva_D0 = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -118,7 +118,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_D0 = Particle.PreCutConfiguration(
+    pre_D0 = PreCutConfiguration(
         variable='M',
         binning=(500, 1.5, 2.0),
         efficiency=0.95,
@@ -146,7 +146,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
 # ####################### D+ #########################
 
-    mva_DPlus = Particle.MVAConfiguration(
+    mva_DPlus = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -157,7 +157,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_DPlus = Particle.PreCutConfiguration(
+    pre_DPlus = PreCutConfiguration(
         variable='M',
         binning=(500, 1.5, 2.0),
         efficiency=0.95,
@@ -182,7 +182,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
 # ####################### D*+ #########################
 
-    mva_DStarPlus = Particle.MVAConfiguration(
+    mva_DStarPlus = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -193,7 +193,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_DStarPlus = Particle.PreCutConfiguration(
+    pre_DStarPlus = PreCutConfiguration(
         variable='Q',
         binning=(500, 0, 1),
         efficiency=0.95,
@@ -208,7 +208,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     particles.append(p)
 
 # ####################### D*0 #########################
-    mva_DStar0 = Particle.MVAConfiguration(
+    mva_DStar0 = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -219,7 +219,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_DStar0 = Particle.PreCutConfiguration(
+    pre_DStar0 = PreCutConfiguration(
         variable='Q',
         binning=(500, 0, 1),
         efficiency=0.95,
@@ -234,7 +234,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
 # ####################### D_s+ #########################
 
-    mva_DS = Particle.MVAConfiguration(
+    mva_DS = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -245,7 +245,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_DS = Particle.PreCutConfiguration(
+    pre_DS = PreCutConfiguration(
         variable='M',
         binning=(500, 1.6, 2.2),
         efficiency=0.95,
@@ -268,7 +268,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
 # ####################### DStar_s+ #########################
 
-    mva_DStarS = Particle.MVAConfiguration(
+    mva_DStarS = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -279,7 +279,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_DStarS = Particle.PreCutConfiguration(
+    pre_DStarS = PreCutConfiguration(
         variable='Q',
         binning=(500, 0, 1),
         efficiency=0.95,
@@ -294,7 +294,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
 # ####################### J/psi #########################
 
-    mva_J = Particle.MVAConfiguration(
+    mva_J = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -305,7 +305,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_J = Particle.PreCutConfiguration(
+    pre_J = PreCutConfiguration(
         variable='M',
         binning=(500, 2.5, 3.5),
         efficiency=0.95,
@@ -319,7 +319,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     particles.append(p)
 
 # ################## B+ ##############################
-    mva_BPlus = Particle.MVAConfiguration(
+    mva_BPlus = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -331,7 +331,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_BPlus = Particle.PreCutConfiguration(
+    pre_BPlus = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
@@ -372,7 +372,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     if chargedB:
         particles.append(p)
 
-    mva_BPlusSemileptonic = Particle.MVAConfiguration(
+    mva_BPlusSemileptonic = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -384,7 +384,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_BPlusSemileptonic = Particle.PreCutConfiguration(
+    pre_BPlusSemileptonic = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
@@ -406,7 +406,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         particles.append(p)
 
 # #################################  B0 #################################
-    mva_B0 = Particle.MVAConfiguration(
+    mva_B0 = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -418,7 +418,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_B0 = Particle.PreCutConfiguration(
+    pre_B0 = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
@@ -456,7 +456,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     if neutralB:
         particles.append(p)
 
-    mva_B0Semileptonic = Particle.MVAConfiguration(
+    mva_B0Semileptonic = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
                    'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
                    'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
@@ -468,7 +468,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         **mvaDefaults
     )
 
-    pre_B0Semileptonic = Particle.PreCutConfiguration(
+    pre_B0Semileptonic = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,

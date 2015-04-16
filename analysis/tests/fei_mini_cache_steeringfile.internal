@@ -26,7 +26,7 @@ chargedTrackVars = [
     'pt',
     'chiProb']
 
-mvaConfig_chargedFSP = Particle.MVAConfiguration(
+mvaConfig_chargedFSP = MVAConfiguration(
     #name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
     name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=chargedTrackVars,
@@ -42,7 +42,10 @@ particles.append(Particle('K+', mvaConfig_chargedFSP))
 
 feistate = fullEventInterpretation(None, particles)
 
-feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
+if feistate.is_trained:
+    feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
+else:
+    feistate.path.add_module('RootOutput')
 
 
 # show constructed path

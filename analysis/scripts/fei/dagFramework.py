@@ -133,12 +133,14 @@ class Resource(object):
         hash = create_hash([arguments[r] for r in self.requires])
         if self.value is not None and self.hash == hash and not self.halt and not self.env.get('rerunCachedProviders', False):
             if self.env.get('verbose', False):
-                B2INFO(self.identifier + " provided from cached value")
+                basf2.B2INFO(self.identifier + " provided from cached value")
             return self.value
         # Reset hash
         self.hash = hash
         # Reset halt flag
         self.halt = False
+        # Reset load from cache
+        self.loaded_from_cache = False
 
         if callable(self.provider):
             parameters = {}
@@ -154,13 +156,13 @@ class Resource(object):
             self.value = self.provider(self, **parameters)
             if self.env.get('verbose', False):
                 if self.halt:
-                    B2INFO(self.identifier + " not provided from function, yet.")
+                    basf2.B2INFO(self.identifier + " not provided from function, yet.")
                 else:
-                    B2INFO(self.identifier + " provided from function")
+                    basf2.B2INFO(self.identifier + " provided from function")
         else:
             self.value = self.provider
             if self.env.get('verbose', False):
-                B2INFO(self.identifier + " provided from value")
+                basf2.B2INFO(self.identifier + " provided from value")
 
         return self.value
 
@@ -207,6 +209,7 @@ class DAG(object):
             with open(cacheFile, 'r') as f:
                 cache = cPickle.load(f)
                 for resource in cache:
+                    resource.env = self.env
                     self.resources[resource.identifier] = resource
 
     def save_cached_resources(self, cacheFile):

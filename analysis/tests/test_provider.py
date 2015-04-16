@@ -13,7 +13,7 @@ import contextlib
 import IPython
 import inspect
 import ast
-from fei import Particle
+from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, DecayChannel
 
 # @cond
 
@@ -189,7 +189,8 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleLists(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'], self.postCut), 'D0:42')
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'],
+                                           self.postCut, ['S1', 'S2', 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleListManipulator for given decay
@@ -199,7 +200,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsWithoutPostCut(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'], None), 'D0:42')
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'], None, ['S1', 'S2', 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleListManipulator for given decay
@@ -209,7 +210,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsSomeNone(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', None, 'D0:3'], self.postCut), 'D0:42')
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', None, 'D0:3'], self.postCut, ['S1', 'S2', 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleListManipulator for given decay
@@ -219,7 +220,25 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsAllNone(self):
         # Returns None if all ParticleLists are None
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', [None, None, None], self.postCut), None)
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', [None, None, None], self.postCut, ['S1', 'S2', 'S3']), None)
+        # Enables caching
+        result = MockResource(cache=True)
+        self.assertEqual(self.resource, result)
+
+    def test_CopyParticleListsSomeSignalProbabilitiesNone(self):
+        # Returns name of ParticleList
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'],
+                                           self.postCut, ['S1', None, 'S3']), 'D0:42')
+        # Enables caching
+        result = MockResource(cache=True)
+        # Adds ParticleListManipulator for given decay
+        result.path.add_module('ParticleListManipulator', outputListName='D0:42', inputListNames=['D0:1', 'D0:3'],
+                               writeOut=True, cut=self.postCut['cutstring'])
+        self.assertEqual(self.resource, result)
+
+    def test_CopyParticleListsAllSignalProbabilitiesNone(self):
+        # Returns None if all ParticleLists are None
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'], self.postCut, [None, None, None]), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -288,7 +307,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.preCutConfig = Particle.PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'M > 0.2')
+        self.preCutConfig = PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'M > 0.2')
 
     def test_CreatePreCutHistogram(self):
         # Returns None if Histogram does not exists
@@ -305,7 +324,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
 
     def test_CreatePreCutHistogramCustomBinning(self):
         # Set Custom binning
-        self.preCutConfig = Particle.PreCutConfiguration('M', list(range(10)), 0.7, 0.01, 'M > 0.2')
+        self.preCutConfig = PreCutConfiguration('M', list(range(10)), 0.7, 0.01, 'M > 0.2')
         # Returns None if Histogram does not exists
         self.assertEqual(CreatePreCutHistogram(self.resource, 'D+', 'UniqueChannelName', 'isSignal',
                                                self.preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo']), None)
@@ -367,7 +386,7 @@ class TestPreCutDeterminationPerChannel(unittest.TestCase):
 
 def MockCalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     B2INFO('Called MockCalculatePreCuts')
-    assert preCutConfig == Particle.PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'p > 0.2')
+    assert preCutConfig == PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'p > 0.2')
     assert channelNames == ('D0:1 ==> K+ pi-', 'D0:2 ==> K+ pi- pi0', 'D0:3 ==> K+ pi+ pi- pi-')
     assert preCutHistograms == ('Dummy1', 'Dummy2', 'Dummy3')
     return {'D0:1 ==> K+ pi-': {'cutstring': '0.1 < M < 0.2', 'isIgnored': False},
@@ -388,7 +407,7 @@ class TestPreCutDetermination(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.preCutConfig = Particle.PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'p > 0.2')
+        self.preCutConfig = PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'p > 0.2')
         self.channelNames = ['D0:1 ==> K+ pi-', 'D0:2 ==> K+ pi- pi0', 'D0:3 ==> K+ pi+ pi- pi-', 'D0:4 ==> K+ K-']
         self.preCutHistograms = ['Dummy1', 'Dummy2', 'Dummy3', None]
 
@@ -417,7 +436,7 @@ class TestPostCutDetermination(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.postCutConfig = Particle.PostCutConfiguration(0.123)
+        self.postCutConfig = PostCutConfiguration(0.123)
 
     def test_PostCutDetermination(self):
         # Returns PostCut dictionary with cutstring and range
@@ -568,11 +587,11 @@ class TestGenerateTrainingData(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.mvaConfig = Particle.MVAConfiguration(name='FastBDT', type='Plugin',
-                                                   config='TMVAConfigString',
-                                                   variables=['p', 'pt'],
-                                                   target='isSignal',
-                                                   model=None)
+        self.mvaConfig = MVAConfiguration(name='FastBDT', type='Plugin',
+                                          config='TMVAConfigString',
+                                          variables=['p', 'pt'],
+                                          target='isSignal',
+                                          model=None)
 
     def test_GenerateTrainingData(self):
         # Returns None if TrainingData does not exists
@@ -688,11 +707,11 @@ class TestSignalProbability(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.mvaConfig = Particle.MVAConfiguration(name='FastBDT', type='Plugin',
-                                                   config='TMVAConfigString',
-                                                   variables=['p', 'pt'],
-                                                   target='isSignal',
-                                                   model=None)
+        self.mvaConfig = MVAConfiguration(name='FastBDT', type='Plugin',
+                                          config='TMVAConfigString',
+                                          variables=['p', 'pt'],
+                                          target='isSignal',
+                                          model=None)
 
     def test_SignalProbabilityAlreadyTrained(self):
         with temporary_file('trainingData.config'):

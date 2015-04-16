@@ -18,13 +18,15 @@ os.chdir(tempdir)
 
 shutil.copy(inputFile, "inputdata.root")
 
-cmd = "basf2 " + steeringFile + " -i inputdata.root -o inputdata.root -- -cache cache.pkl -summary"
+cmd = "basf2 " + steeringFile + " -i inputdata.root -o inputdata.root -- -cache cache.pkl -summary -verbose"
 
 # fsp variablestontuple
 assert 0 == os.system(cmd)
 assert len(glob.glob('cache.pkl')) == 1
 assert len(glob.glob('mcParticlesCount.root')) == 1
 # fsp TMVATeacher
+assert 0 == os.system(cmd)
+# fsp training, final variablestontuple
 assert 0 == os.system(cmd)
 # fsp training, final variablestontuple
 assert 0 == os.system(cmd)

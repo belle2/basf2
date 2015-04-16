@@ -132,7 +132,6 @@ def convertParticleObjectToString(particle):
             m=particle.mvaConfig)
         output += '    Variables: ' + ', '.join(particle.mvaConfig.variables) + '\n'
     else:
-        samePreCutConfig = all(compareCutConfig(channel.preCutConfig, particle.preCutConfig) for channel in particle.channels)
         sameMVAConfig = all(compareMVAConfig(channel.mvaConfig, particle.mvaConfig) for channel in particle.channels)
         commonVariables = reduce(
             lambda x, y: set(x).intersection(y), [
@@ -143,12 +142,10 @@ def convertParticleObjectToString(particle):
                 m=particle.mvaConfig)
         output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
 
-        if samePreCutConfig:
-            output += '    All channels use the same PreCut configuration\n'
-            output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
-                p=particle.preCutConfig)
-            output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
-            output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=particle.preCutConfig)
+        output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
+            p=particle.preCutConfig)
+        output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
+        output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=particle.preCutConfig)
 
         if particle.postCutConfig is None:
             output += '    PostCutConfiguration: None\n'
@@ -157,15 +154,6 @@ def convertParticleObjectToString(particle):
 
         for channel in particle.channels:
             output += '    {name} (decayModeID: {id})\n'.format(name=channel.name, id=channel.decayModeID)
-            if not samePreCutConfig:
-                if particle.postCutConfig is None:
-                    output += '    PreCutConfiguration: None\n'
-                else:
-                    output += ('    PreCutConfiguration: '
-                               'variable={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
-                                   p=channel.preCutConfig))
-                    output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=channel.preCutConfig)
-                    output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=channel.preCutConfig)
             if not sameMVAConfig:
                 output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
                     m=channel.mvaConfig)
@@ -254,7 +242,7 @@ def createSummaryTexFile(
     placeholders['finalStateParticleInputs'] = ""
     placeholders['finalStateParticleEPTable'] = ""
     for particlePlaceholder in finalStateParticlePlaceholders:
-        placeholders['finalStateParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
+        placeholders['finalStateParticleInputs'] += '\input{"' + particlePlaceholder['texFile'] + '"}\n'
         placeholders['finalStateParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
         placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(
             efficiency(
@@ -276,7 +264,7 @@ def createSummaryTexFile(
     placeholders['combinedParticleInputs'] = ""
     placeholders['combinedParticleEPTable'] = ""
     for particlePlaceholder in combinedParticlePlaceholders:
-        placeholders['combinedParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
+        placeholders['combinedParticleInputs'] += '\input{"' + particlePlaceholder['texFile'] + '"}\n'
         placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
         placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
             efficiency(
@@ -324,10 +312,10 @@ def createSummaryTexFile(
     finalParticleNames = set()
     for particlePlaceholder in finalParticlePlaceholders:
         finalParticleNames.add(particlePlaceholder['particleName'])
-        placeholders['finalParticleInputs'] += '\input{' + particlePlaceholder['texFile'] + '}\n'
+        placeholders['finalParticleInputs'] += '\input{"' + particlePlaceholder['texFile'] + '"}\n'
 
     placeholders['finalParticleNames'] = ', '.join(finalParticleNames)
-    placeholders['cpuTimeSummary'] = '\input{' + cpuTimeSummaryPlaceholders['texFile'] + '}\n'
+    placeholders['cpuTimeSummary'] = '\input{"' + cpuTimeSummaryPlaceholders['texFile'] + '"}\n'
 
     placeholders['NUniqueSignal'] = 0
     placeholders['NBackground'] = 0
@@ -477,7 +465,7 @@ def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcC
             placeholders['particleNBackgroundAfterPreCut'] += int(channelPlaceholder['channelNBackgroundAfterPreCut'])
             placeholders['particleNSignalAfterUserCut'] += int(channelPlaceholder['channelNSignalAfterUserCut'])
             placeholders['particleNBackgroundAfterUserCut'] += int(channelPlaceholder['channelNBackgroundAfterUserCut'])
-        placeholders['channelInputs'] += '\input{' + channelPlaceholder['texFile'] + '}\n'
+        placeholders['channelInputs'] += '\input{"' + channelPlaceholder['texFile'] + '"}\n'
 
     hash = dagFramework.create_hash([placeholders])
     placeholders['particleDiagPlot'] = removeJPsiSlash(
@@ -1368,8 +1356,18 @@ def createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts
     for row in statTable:
         cpuPerModuleType = row[2]
         bargraph = '\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(cpuPerModuleType[key] for key in moduleTypes)
-        timePerCandidate = formatTime(row[1] * 1.0 / row[4]) + ' (' + formatTime(row[1] * 1.0 / row[3]) + ')'
-        timePercent = row[1] / sum_time_seconds * 100
+        if row[4] == 0:
+            timePerCandidate = ' --- '
+        else:
+            timePerCandidate = formatTime(row[1] * 1.0 / row[4])
+        if row[3] == 0:
+            timePerCandidate += ' ( --- )'
+        else:
+            timePerCandidate += ' (' + formatTime(row[1] * 1.0 / row[3]) + ')'
+        if sum_time_seconds == 0:
+            timePercent = 0
+        else:
+            timePercent = row[1] / sum_time_seconds * 100
         placeholders['cpuTimeStatistics'] += rowString.format(name=row[0],
                                                               bargraph=bargraph,
                                                               time=formatTime(row[1]),

@@ -50,21 +50,23 @@ def getCommandLineOptions():
     return args
 
 
+# Define classes at top level to make them pickable
+# Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
+MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, model')
+# Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity, userCut')
+# Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
+PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
+# Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
+DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, decayModeID')
+
+
 class Particle(object):
     """
     The Particle class is the only class the end-user gets into contact with.
     The user creates an instance of this class for every particle he wants to reconstruct with the FEI algorithm,
     and provides MVAConfiguration, PreCutConfiguration and PostCutConfiguration. These can be overwritten per channel.
     """
-
-    # Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
-    MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, model')
-    # Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity, userCut')
-    # Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
-    PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
-    # Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
-    DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, decayModeID')
 
     def __init__(self, identifier, mvaConfig, preCutConfig=None, postCutConfig=None):
         """
@@ -129,10 +131,10 @@ class Particle(object):
                 mvaVars += [v.format(*c) for c in itertools.combinations(range(0, len(daughters)), v.count('{}'))]
         mvaConfig = mvaConfig._replace(variables=mvaVars)
         # Add new channel
-        self.channels.append(Particle.DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
-                                                   daughters=daughters,
-                                                   mvaConfig=mvaConfig,
-                                                   decayModeID=len(self.channels)))
+        self.channels.append(DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
+                                          daughters=daughters,
+                                          mvaConfig=mvaConfig,
+                                          decayModeID=len(self.channels)))
         return self
 
 
@@ -161,10 +163,7 @@ def fullEventInterpretation(selection_path, particles):
     dag.env['prune'] = args.prune
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
-    dag.env['rerun_cached_providers'] = args.rerunCachedProviders
-
-    # Add None property
-    dag.add('None', None)
+    dag.env['rerunCachedProviders'] = args.rerunCachedProviders
 
     # Add basic properties defined by the user of all Particles as Resources into the graph
     for particle in particles:
@@ -210,7 +209,9 @@ def fullEventInterpretation(selection_path, particles):
                 particleName='Name_' + particle.identifier,
                 particleLists=['RawParticleList_' + particle.identifier] if particle.isFSP
                 else ['RawParticleList_' + channel.name for channel in particle.channels],
-                postCut='PostCut_' + particle.identifier)
+                postCut='PostCut_' + particle.identifier,
+                signalProbabilities=['SignalProbability_' + particle.identifier] if particle.isFSP
+                else ['SignalProbability_' + channel.name for channel in particle.channels])
 
         # Copy particle list into a list with a human readable name
         dag.add('HumanReadableParticleList_' + particle.identifier, provider.CopyIntoHumanReadableParticleList,
@@ -274,7 +275,7 @@ def fullEventInterpretation(selection_path, particles):
 
                 dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
                         channelNames=['Name_' + channel.name for channel in particle.channels],
-                        preCutConfigs='PreCutConfig_' + particle.identifier,
+                        preCutConfig='PreCutConfig_' + particle.identifier,
                         preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
 
     # Trains multivariate classifiers (MVC) methods and provides signal probabilities
@@ -384,11 +385,11 @@ def fullEventInterpretation(selection_path, particles):
     if args.summary:
         for particle in particles:
             for channel in particle.channels:
-                dag.add('Placeholder_' + channel.name, provider.WriteAnalysisFileForChannel,
+                dag.add('Placeholders_' + channel.name, provider.WriteAnalysisFileForChannel,
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
                         channelName='Name_' + channel.name,
-                        preCutConfig='PreCutConfig_' + channel.name,
+                        preCutConfig='PreCutConfig_' + particle.identifier,
                         preCut='PreCut_' + channel.name,
                         preCutHistogram='PreCutHistogram_' + channel.name,
                         mvaConfig='MVAConfig_' + channel.name,
@@ -460,7 +461,6 @@ def fullEventInterpretation(selection_path, particles):
             path.add_path(selection_path)
         path.add_path(fei_path)
     else:
-        fei_path.add_module('RootOutput')
         if is_first_run and selection_path is not None:
             path.add_path(selection_path)
             path.for_each('RestOfEvent', 'RestOfEvents', fei_path)

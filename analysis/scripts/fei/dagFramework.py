@@ -84,16 +84,17 @@ class Resource(object):
 
         self.automatic_requirements = []
         if callable(self.provider):
-            try:
-                argspec = inspect.getargspec(func)
-                for arg in argspec.args[1:]:
-                    if arg not in self.keyword_requirements:
-                        automatic_requirements.append(arg)
-            except Exception as e:
-                pass
+            #    try:
+            argspec = inspect.getargspec(self.provider)
+            for arg in argspec.args[1:]:
+                if arg not in self.keyword_requirements:
+                    self.automatic_requirements.append(arg)
+        # except Exception as e:
+        #    pass
 
         self.requires = []
-        for v in list(self.positional_requirements) + list(self.keyword_requirements.values()) + list(self.automatic_requirements):
+        for v in list(self.positional_requirements) + sorted(list(self.keyword_requirements.values()) +
+                                                             list(self.automatic_requirements)):
             if isinstance(v, str):
                 self.requires.append(v)
             else:
@@ -113,11 +114,15 @@ class Resource(object):
         self.loaded_from_cache = False
 
     def __getstate__(self):
-        return (self.value, basf2.serialize_path(self.path), self.condition, self.halt, self.needed, self.cache)
+        return (self.value, basf2.serialize_path(self.path) if self.path is not None else None, self.condition, self.env,
+                self.halt, self.needed, self.cache, self.identifier, self.provider, self.positional_requirements,
+                self.keyword_requirements, self.automatic_requirements, self.requires, self.hash)
 
     def __setstate__(self, state):
-        self.value, serialized_path, self.condition, self.halt, self.needed, self.cache = state
-        self.path = basf2.deserialize_path(serialized_path)
+        (self.value, serialized_path, self.condition, self.env, self.halt, self.needed, self.cache,
+            self.identifier, self.provider, self.positional_requirements, self.keyword_requirements,
+            self.automatic_requirements, self.requires, self.hash) = state
+        self.path = basf2.deserialize_path(serialized_path) if serialized_path is not None else None
         self.loaded_from_cache = True
 
     def __call__(self, arguments):
@@ -126,11 +131,14 @@ class Resource(object):
             @arguments dictionary of arguments which were required (addtional entries are ignored)
         """
         hash = create_hash([arguments[r] for r in self.requires])
-        if self.value is not None and self.hash == hash and not self.halt and not self.env['rerunCachedProviders']:
-            if self.env['verbose']:
+        if self.value is not None and self.hash == hash and not self.halt and not self.env.get('rerunCachedProviders', False):
+            if self.env.get('verbose', False):
                 B2INFO(self.identifier + " provided from cached value")
             return self.value
+        # Reset hash
         self.hash = hash
+        # Reset halt flag
+        self.halt = False
 
         if callable(self.provider):
             parameters = {}
@@ -144,14 +152,14 @@ class Resource(object):
 
             self.path = basf2.create_path()
             self.value = self.provider(self, **parameters)
-            if self.env['verbose']:
+            if self.env.get('verbose', False):
                 if self.halt:
                     B2INFO(self.identifier + " not provided from function, yet.")
                 else:
                     B2INFO(self.identifier + " provided from function")
         else:
             self.value = self.provider
-            if self.env['verbose']:
+            if self.env.get('verbose', False):
                 B2INFO(self.identifier + " provided from value")
 
         return self.value
@@ -219,7 +227,7 @@ class DAG(object):
         @param path basf2 path
         """
 
-        nThreads = self.env['nThreads']
+        nThreads = self.env.get('nThreads', 1)
         if nThreads > 1:
             p = multiprocessing.pool.ThreadPool(processes=nThreads)
 
@@ -232,7 +240,9 @@ class DAG(object):
         nResources = len(resources)
         nDone = 0
         while True:
-            ready = [x for x in resources if x.identifier not in results and all(r in results for r in x.requires)]
+            ready = [x for x in resources if x.identifier not in results and
+                     x.identifier not in [y.identifier for y in chain] and
+                     all(r in results for r in x.requires)]
             nReady = len(ready)
             if nReady == 0:
                 break
@@ -256,6 +266,7 @@ class DAG(object):
                     results[resource.identifier] = resource.value
             chain += ready
 
+        # Consider all resources to find needed resources
         needed = [x for x in resources if x.needed]
         while len(needed) > 0:
             requirements = []
@@ -263,7 +274,8 @@ class DAG(object):
                 x.needed = True
                 requirements += x.requires
             needed = [x for x in resources if x.identifier in requirements]
-        needed = [x for x in resources if x.needed and x.path is not None and x.path.modules() > 0]
+        # But finally needed are only resources which are in the chain!
+        needed = [x for x in chain if x.needed and x.path is not None and x.path.modules() > 0]
 
         # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
         # Otherwise they slow down all following modules! Therefore we try to move these modules to the end of the needed list.
@@ -282,7 +294,7 @@ class DAG(object):
                 else:
                     path.add_path(resource.path)
 
-        if self.env['verbose']:
+        if self.env.get('verbose', False):
             self.createDotGraphic(needed)
             self.printMissingDependencies(actors, results.keys())
 

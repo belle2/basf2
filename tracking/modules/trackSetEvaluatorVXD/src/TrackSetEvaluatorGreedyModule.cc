@@ -81,7 +81,7 @@ void TrackSetEvaluatorGreedyModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("TrackSetEvaluatorGreedyModule-endRun: want to have some summary here...") // TODO
+  B2INFO("TrackSetEvaluatorGreedyModule-endRun: want to have some summary here... invEvents: " << invEvents) // TODO
 }
 
 

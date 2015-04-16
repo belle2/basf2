@@ -103,13 +103,13 @@ void DisplayNodes(TXMLEngine* xml, XMLNodePointer_t node, Int_t level)
 }
 
 
-size_t ConditionsService::parse_return(void* buffer, size_t size, size_t nmemb, void* userp)
+size_t ConditionsService::parse_return(void* buffer, size_t size, size_t nmemb, void* /*userp*/)
 {
 
   std::string temp(static_cast<const char*>(buffer), size * nmemb);
 
-  int count = *((int*)userp);
-  count = 0;
+  //int count = *((int*)userp);
+  //count = 0;
 
   TXMLEngine* xml = new TXMLEngine;
 
@@ -330,6 +330,9 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
         //  curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_func);
 
         res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+          B2ERROR("curl_easy_perform() failed: " << curl_easy_strerror(res));
+        }
 
         curl_easy_cleanup(curl);
         fclose(fp);
@@ -366,7 +369,7 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
   return local_file;
 }
 
-int ConditionsService::progress_func(void* ptr, double TotalToDownload, double NowDownloaded,
+int ConditionsService::progress_func(void* /*ptr*/, double TotalToDownload, double NowDownloaded,
                                      double TotalToUpload, double NowUploaded)
 {
   // how wide you want the progress meter to be

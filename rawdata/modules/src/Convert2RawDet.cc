@@ -74,7 +74,6 @@ void Convert2RawDetModule::beginRun()
 void Convert2RawDetModule::event()
 {
   //  B2INFO("Event " << m_nevt);
-  printf("Event %d\n", m_nevt);
 
   StoreArray<RawDataBlock> raw_datablkarray;
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
@@ -124,7 +123,6 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       int nwords = raw_dblk->GetBlockNwords(blkid);
       int* temp_buf = new int[ nwords ];
       memcpy(temp_buf, raw_dblk->GetBuffer(blkid), nwords * sizeof(int));
-      temp_buf[ 6 ] |=  0x02000000;
 
 
       // Set buffer to RawCOPPER class to access detector ID

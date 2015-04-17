@@ -327,26 +327,13 @@ void ExtModule::registerVolumes()
       m_Enter->push_back(*iVol);
       m_Exit->push_back(*iVol);
     }
-    // ECL
-    if (name == "physicalECL") {
+    // ECL envelope
+    if (name == "eclPhysical") {
       m_Enter->push_back(*iVol);
       m_Exit->push_back(*iVol);
     }
-    // ECL crystal (=sensitive) has an automatically generated PV name
-    // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-    // YYY is logicalEcl**Crystal, where **=Br, Fw, or Bw.
-    // XXX is 1..144 for Br, 1..16 for Fw, and 1..16 for Bw
-    // ZZZ is n_pv_m where n is 1..46 for Br, 1..72 for Fw, and 73..132 for Bw
-    // CopyNo() encodes XXX and n.
-    if (name.find("_logicalEclBrCrystal_") != string::npos) {
-      m_Enter->push_back(*iVol);
-      m_Exit->push_back(*iVol);
-    }
-    if (name.find("_logicalEclFwCrystal_") != string::npos) {
-      m_Enter->push_back(*iVol);
-      m_Exit->push_back(*iVol);
-    }
-    if (name.find("_logicalEclBwCrystal_") != string::npos) {
+    // ECL crystal
+    if (name.find("CrystalPhysical_") != string::npos) {
       m_Enter->push_back(*iVol);
       m_Exit->push_back(*iVol);
     }
@@ -388,20 +375,13 @@ void ExtModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& de
     copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
   }
   // ECL
-  if (name == "physicalECL") {
+  if (name == "eclPhysical") {
     detID = Const::EDetector::ECL;
   }
-  // ECL crystal (=sensitive) has an automatically generated PV name
-  // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-  // YYY is logicalEcl**Crystal, where **=Br, Fw, or Bw.
-  // XXX is 1..144 for Br, 1..16 for Fw, and 1..16 for Bw
-  // ZZZ is n_pv_m where n is 1..46 for Br, 1..72 for Fw, and 73..132 for Bw
-  // ECL cellID is derived from XXX and n (using code from Poyuan).
-  if ((name.find("_logicalEclBrCrystal_") != string::npos) ||
-      (name.find("_logicalEclBwCrystal_") != string::npos) ||
-      (name.find("_logicalEclFwCrystal_") != string::npos)) {
+  // ECL crystal (=sensitive) is named "ecl{Barrel,Forward,Backward}CrystalPhysical_*"
+  if (name.find("CrystalPhysical_") != string::npos) {
     detID = Const::EDetector::ECL;
-    copyID = ECL::ECLGeometryPar::Instance()->ECLVolNameToCellID(name);
+    copyID = ECL::ECLGeometryPar::Instance()->ECLVolumeToCellID(touch());
   }
 
 }
@@ -430,8 +410,8 @@ void ExtModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     TVector3 firstDirection(firstMomentum.Unit());
 
     double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
-                    (CLHEP::m / CLHEP::cm);
+    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) /
+                    (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) * (CLHEP::m / CLHEP::cm);
     double centerPhi = firstMomentum.Phi() - CLHEP::halfpi;
     double centerX = firstPosition.X() + radius * cos(centerPhi);
     double centerY = firstPosition.Y() + radius * sin(centerPhi);

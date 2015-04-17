@@ -243,8 +243,8 @@ namespace Belle2 {
     std::vector<TVector3> m_mirrornorm;       /*!< vector holding normal vectors of mirror plates */
     std::vector<TVector3> m_mirrorpoint;      /*!< vector holding one point of each mirror plate */
 
-    std::map<std::pair<unsigned, int>, unsigned> m_copper2merger; /*! mapping of merger boards to cooper boards */
-    std::map<int, std::vector<unsigned>> m_merger2feb; /*! mapping of front-end boards to mergers */
+    std::map<std::pair<unsigned, int>, unsigned> m_copper2merger; /*!< mapping of merger boards to cooper boards */
+    std::map<int, std::vector<unsigned>> m_merger2feb; /*!< mapping of front-end boards to mergers */
     std::unordered_set<unsigned int> m_copperIDs; /*!< COPPER ID's */
     std::unordered_set<unsigned int> m_mergerIDs; /*!< Merger ID's */
     std::unordered_set<unsigned int> m_boardIDs; /*!< FEB ID's */

@@ -150,7 +150,7 @@ namespace Belle2 {
       }
 
       /**
-       * @brief Set the state of the module
+       * @brief Set the state of the module.
        *
        * @return void
        */
@@ -160,7 +160,7 @@ namespace Belle2 {
       }
 
       /**
-       * @brief Convert state from string to enum
+       * @brief Convert state from string to enum.
        *
        * @param state ...
        * @return Belle2::calibration::CalibrationModule::ECalibrationModuleState
@@ -233,21 +233,21 @@ namespace Belle2 {
        */
       int m_numberOfIterations;
       /**
-       * Calibration parameter: name of calibration file
+       * Calibration parameter: name of calibration file.
        */
       std::string m_calibrationFileName;
       /**
-       * True if Calibration Module is already initialized
+       * True if Calibration Module is already initialized.
        */
       //bool m_calibrationModuleInitialized;
 
       /**
-       * True if Calibration Manager is already initialized
+       * True if Calibration Manager is already initialized.
        */
       //bool m_calibrationManagerInitialized;
       /**
        * @brief Dependencies of the module to be set on initialization
-       * from module parameter "Dependencies"
+       * from module parameter "Dependencies".
        */
       std::vector< ModuleDependency > m_dependencies;
 

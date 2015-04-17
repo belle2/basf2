@@ -45,7 +45,7 @@ CalibrationModule::CalibrationModule() : Module(),
 
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  // This describtion has to overriden by implementing module
+  // This description has to overridden by implementing module
   setDescription("A standard calibration module");
 
   // Default parameters of the base module
@@ -56,7 +56,7 @@ CalibrationModule::CalibrationModule() : Module(),
   addParam("numberOfIterations", m_numberOfIterations,
            "Maximal number of iterations", int(1));
   addParam("calibrationFileName", m_calibrationFileName,
-           "Name of the calibration output file. If empty, no file will be created. If '*' (default), it will be sed to module_name.root",
+           "Name of the calibration output file. If empty, no file will be created. If '*' (default), it will be set to module_name.root",
            string("*"));
 
   m_dependencies.clear();
@@ -91,7 +91,7 @@ void CalibrationModule::initialize()
       std::string module("");
       std::string state("");
 
-      // We allow to ommit ":state" - in such case we assume ":done"
+      // We allow to omit ":state" - in such case we assume ":done"
       if (moduleAndState.size() == 1) {
         module = moduleAndState[0];
         state = "done";

@@ -30,11 +30,11 @@ from stdLooseFSParticles import stdLoosePi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistBKG = \
-    ['/group/belle2/MC/signal/B2Kstargamma/mcprod1405/BGx1/mc35_B2Kstargamma_BGx1_s00/B2Kstargamma_e0001r001*_s00_BGx1.mdst.root'
-     ]
+filelistBKG = [
+    '/hsm/belle2/bdata/MC/signal/B2Kstargamma/mcprod1405/BGx1/mc35_B2Kstargamma_BGx1_s00/B2Kstargamma_e0001r001*_s00_BGx1.mdst.root'
+    ]
 filelistSIG = \
-    ['/group/belle2/MC/signal/B2Rhogamma/mcprod1405/BGx1/mc35_B2Rhogamma_BGx1_s00/B2Rhogamma_e0001r001*_s00_BGx1.mdst.root'
+    ['/hsm/belle2/bdata/MC/signal/B2Rhogamma/mcprod1405/BGx1/mc35_B2Rhogamma_BGx1_s00/B2Rhogamma_e0001r001*_s00_BGx1.mdst.root'
      ]
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma MC

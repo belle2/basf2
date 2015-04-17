@@ -29,7 +29,7 @@ from stdFSParticles import stdPi0
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
-    ['/group/belle2/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
+    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
      ]
 
 inputMdstList(filelistSIG)

@@ -39,7 +39,7 @@ from stdLooseFSParticles import stdLooseMu
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
-    ['/group/belle2/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
+    ['/hsm/belle2/bdata/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
      ]
 
 inputMdstList(filelistSIG)

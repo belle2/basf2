@@ -51,7 +51,7 @@ namespace Belle2 {
     double m_startEnergy;   /**< particle energy at the entrance in volume */
     double m_energyDeposit; /**< energy deposited in volume */
     double m_trackLength;   /**< length of the track in the volume */
-
+    int m_eclrepscale;      /**< replica (=sector) scale in ECL */
   }; // SensitiveDetector class
 } // end of namespace Belle2
 

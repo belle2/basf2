@@ -29,7 +29,8 @@ namespace Belle2 {
       /**
        * Constructor
        */
-      BeamBGTypes() {
+      BeamBGTypes()
+      {
         m_tags["Coulomb_LER"] = SimHitBase::bg_Coulomb_LER;
         m_tags["Coulomb_HER"] = SimHitBase::bg_Coulomb_HER;
         m_tags["RBB_LER"] = SimHitBase::bg_RBB_LER;
@@ -52,7 +53,8 @@ namespace Belle2 {
        * @param bgType BG type name
        * @return BG tag value
        */
-      SimHitBase::BG_TAG getTag(const std::string& bgType) {
+      SimHitBase::BG_TAG getTag(const std::string& bgType)
+      {
         return m_tags[bgType];
       }
 
@@ -61,7 +63,8 @@ namespace Belle2 {
        * @param bgTag BG tag value
        * @return BG type name or empty string
        */
-      std::string getType(SimHitBase::BG_TAG bgTag) const {
+      std::string getType(SimHitBase::BG_TAG bgTag) const
+      {
         if (bgTag == 0) return "";
         for (auto tag : m_tags) {
           if (bgTag == tag.second) return tag.first;
@@ -74,7 +77,8 @@ namespace Belle2 {
        * @param bgTag BG tag value
        * @return BG type name or empty string
        */
-      std::string getType(unsigned int bgTag) const {
+      std::string getType(unsigned int bgTag) const
+      {
         if (bgTag == 0) return "";
         for (auto tag : m_tags) {
           if (bgTag == tag.second) return tag.first;
@@ -86,7 +90,8 @@ namespace Belle2 {
        * Return all defined BG types as a string
        * @return BG type names separated by comma
        */
-      std::string getBGTypes() const {
+      std::string getBGTypes() const
+      {
         std::string types;
         for (auto tag : m_tags) {
           if (tag.first != "other" && tag.second != 0) types += tag.first + ", ";

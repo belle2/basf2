@@ -31,7 +31,8 @@ namespace Belle2 {
 
 
   BkgSensitiveDetector::BkgSensitiveDetector(const char* subDett, int iden):
-    Simulation::SensitiveDetectorBase("BKG", Const::invalidDetector), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.), m_startTime(0), m_startEnergy(0), m_energyDeposit(0), m_trackLength(0.)
+    Simulation::SensitiveDetectorBase("BKG", Const::invalidDetector), m_trackID(0), m_startPos(0., 0., 0.), m_startMom(0., 0., 0.),
+    m_startTime(0), m_startEnergy(0), m_energyDeposit(0), m_trackLength(0.)
   {
     // registration of store arrays and relations
 
@@ -46,17 +47,25 @@ namespace Belle2 {
     RelationArray  relation(mcParticles, beamBackHits);
     registerMCParticleRelation(relation);
 
+    m_eclrepscale = 0;
     std::string subDet = subDett;
-    if (subDet == "IR")    m_subDet = 0;
-    else if (subDet == "PXD")   m_subDet = 1;
-    else if (subDet == "SVD")   m_subDet = 2;
-    else if (subDet == "CDC")   m_subDet = 3;
-    else if (subDet == "ARICH")   m_subDet = 4;
-    else if (subDet == "TOP") m_subDet = 5;
-    else if (subDet == "ECL")   m_subDet = 6;
-    else if (subDet == "EKLM")  m_subDet = 7;
-    else if (subDet == "BKLM")  m_subDet = 8;
-    else                        m_subDet = 99;
+    if (subDet == "IR") m_subDet = 0;
+    else if (subDet ==   "PXD") m_subDet = 1;
+    else if (subDet ==   "SVD") m_subDet = 2;
+    else if (subDet ==   "CDC") m_subDet = 3;
+    else if (subDet == "ARICH") m_subDet = 4;
+    else if (subDet ==   "TOP") m_subDet = 5;
+    else if (subDet ==   "ECL") m_subDet = 6;
+    else if (subDet ==  "EKLM") m_subDet = 7;
+    else if (subDet ==  "BKLM") m_subDet = 8;
+    else m_subDet = 99;
+
+    if (m_subDet == 6) {
+      const int nc[] = {3, 4, 6, 9, 2, 9, 6, 4}; // the number of crystals in a sector per ring
+      const int indx[] = {96, 288, 864, 1151, 7776, 8064, 8544, 8736}; // regions with the same number of crystals in a ring
+      std::vector<int> indxv(indx, indx + sizeof(indx) / sizeof(int));
+      m_eclrepscale = nc[upper_bound(indxv.begin(), indxv.end(), iden) - indxv.begin()];
+    }
 
     m_identifier = iden;
 
@@ -105,7 +114,14 @@ namespace Belle2 {
       }
       StoreArray<BeamBackHit> beamBackHits;
       int nentr = beamBackHits.getEntries();
-      beamBackHits.appendNew(m_subDet, m_identifier, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy, m_energyDeposit, m_trackLength, neutWeight);
+      int id = m_identifier;
+      if (m_subDet == 6) { // ECL
+        int sector = preStep.GetTouchable()->GetCopyNumber(1);
+        if ((sector == 0) && (m_eclrepscale == 2) && ((id & 1) != 0)) id += 144; // barrel odd-numbered diodes in sector 0 -> sector 144
+        id += sector * m_eclrepscale;
+      }
+      beamBackHits.appendNew(m_subDet, id, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy,
+                             m_energyDeposit, m_trackLength, neutWeight);
 
 
       // create relation to MCParticle

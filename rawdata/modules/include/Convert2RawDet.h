@@ -53,16 +53,16 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-  private:
-
+  protected:
     //! function to register data buffer in DataStore as RawDetector
-    void convertDataObject(RawDataBlock* raw_dblk);
+    virtual void convertDataObject(RawDataBlock* raw_dblk);
+
+    //! No. of sent events
+    int m_nevt;
 
     // Data members
   private:
 
-    //! No. of sent events
-    int m_nevt;
 
   };
 

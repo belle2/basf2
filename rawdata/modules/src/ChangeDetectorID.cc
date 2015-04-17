@@ -1,11 +1,11 @@
 //+
-// File : Convert2RawDet.cc
-// Description : Module to convert from RawCOPPER or RawDataBlock to RawDetector objects
+// File : ChangeDetectorID.cc
+// Description : MModify Detector ID in RawCOPPER's header
 //
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 24 - Oct - 2014
 //-
-#include <rawdata/modules/Convert2RawDet.h>
+#include <rawdata/modules/ChangeDetectorID.h>
 #include <TSystem.h>
 #include <stdlib.h>
 
@@ -19,82 +19,88 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(Convert2RawDet)
+REG_MODULE(ChangeDetectorID)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-Convert2RawDetModule::Convert2RawDetModule() : Module()
+ChangeDetectorIDModule::ChangeDetectorIDModule() : Convert2RawDetModule()
 {
-  //Set module properties
-  setDescription("convert from RawCOPPER or RawDataBlock to RawDetector objects");
-  setPropertyFlags(c_Input);
-  m_nevt = 0;
+  m_new_detector_id = 0;
+  setDescription("Modify Detector ID");
+  ///  maximum # of events to produce( -1 : inifinite)
+  addParam("NewDetectorID", m_new_detector_id, "new Detector ID");
+
 }
 
 
-Convert2RawDetModule::~Convert2RawDetModule()
+ChangeDetectorIDModule::~ChangeDetectorIDModule()
 {
 }
 
-void Convert2RawDetModule::initialize()
+
+void ChangeDetectorIDModule::event()
 {
-  gSystem->Load("libdataobjects");
-
-  // Initialize EvtMetaData
-
-  // Initialize Array of RawCOPPER
-  StoreArray<RawDataBlock>::registerPersistent();
-  StoreArray<RawCOPPER>::registerPersistent();
-  StoreArray<RawSVD>::registerPersistent();
-  StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawARICH>::registerPersistent();
-  StoreArray<RawECL>::registerPersistent();
-  StoreArray<RawKLM>::registerPersistent();
-  StoreArray<RawTRG>::registerPersistent();
-  StoreArray<RawFTSW>::registerPersistent();
-
-
-  // Read the first event in RingBuffer and restore in DataStore.
-  // This is necessary to create object tables before TTree initialization
-  // if used together with SimpleOutput.
-  //  ---- Prefetch the first event
-  //  registerRawCOPPERs();
-}
-
-
-void Convert2RawDetModule::beginRun()
-{
-  B2INFO("beginRun called.");
-}
-
-
-void Convert2RawDetModule::event()
-{
-  //  B2INFO("Event " << m_nevt);
 
   StoreArray<RawDataBlock> raw_datablkarray;
   for (int i = 0; i < raw_datablkarray.getEntries(); i++) {
-
     convertDataObject(raw_datablkarray[ i ]);
   }
   raw_datablkarray.clear();
 
-
   StoreArray<RawCOPPER> raw_cprarray;
   for (int i = 0; i < raw_cprarray.getEntries(); i++) {
-    //    (raw_cprarray[ i ]->GetBuffer(0))[ 6 ] |= 0x02000000;
     convertDataObject((RawDataBlock*)(raw_cprarray[ i ]));
   }
   raw_cprarray.clear();
 
+  StoreArray<RawSVD> raw_svdarray;
+  for (int i = 0; i < raw_svdarray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_svdarray[ i ]));
+  }
+  raw_svdarray.clear();
+
+  StoreArray<RawCDC> raw_cdcarray;
+  for (int i = 0; i < raw_cdcarray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_cdcarray[ i ]));
+  }
+  raw_cdcarray.clear();
+
+  StoreArray<RawTOP> raw_toparray;
+  for (int i = 0; i < raw_toparray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_toparray[ i ]));
+  }
+  raw_toparray.clear();
+
+  StoreArray<RawARICH> raw_aricharray;
+  for (int i = 0; i < raw_aricharray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_aricharray[ i ]));
+  }
+  raw_aricharray.clear();
+
+  StoreArray<RawECL> raw_eclarray;
+  for (int i = 0; i < raw_eclarray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_eclarray[ i ]));
+  }
+  raw_eclarray.clear();
+
+  StoreArray<RawKLM> raw_klmarray;
+  for (int i = 0; i < raw_klmarray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_klmarray[ i ]));
+  }
+  raw_klmarray.clear();
+
+  StoreArray<RawTRG> raw_trgarray;
+  for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+    convertDataObject((RawDataBlock*)(raw_trgarray[ i ]));
+  }
+  raw_trgarray.clear();
+
   m_nevt++;
+
 }
-
-
-void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
+void ChangeDetectorIDModule::convertDataObject(RawDataBlock* raw_dblk)
 {
   //
   // Convert RawDataBlock to Raw***
@@ -107,7 +113,6 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
   }
 
   int num_nodes = raw_dblk->GetNumNodes();
-
 
   //     {
   //     int nwords = raw_dblk->TotalBufNwords();
@@ -136,13 +141,18 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
       int delete_flag;
       delete_flag = 0; // this buffer will not be deleted in RawCOPPER destructor.
       tempcpr.SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
-      int subsys_id = tempcpr.GetNodeID(0);
-
-
+      unsigned int subsys_id = tempcpr.GetNodeID(0);
 
       delete_flag = 1; // this buffer will be deleted in Raw*** destructor.
 
-
+      //
+      // Set a new Detector ID
+      //
+      subsys_id = (m_new_detector_id & DETECTOR_MASK) | (subsys_id & COPPERID_MASK);
+      PostRawCOPPERFormat_latest post_cpr;
+      post_cpr.tmp_header.SetBuffer(tempcpr.GetBuffer(0));
+      post_cpr.tmp_header.SetNodeID(subsys_id);
+      subsys_id = tempcpr.GetNodeID(0);
 
       if ((subsys_id & DETECTOR_MASK) == SVD_ID) {
         StoreArray<RawSVD> ary;
@@ -184,18 +194,3 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
 
   return;
 }
-
-
-void Convert2RawDetModule::endRun()
-{
-  //fill Run data
-
-  B2INFO("Convert2RawDet: endRun done.");
-}
-
-
-void Convert2RawDetModule::terminate()
-{
-  B2INFO("Convert2RawDet: terminate called");
-}
-

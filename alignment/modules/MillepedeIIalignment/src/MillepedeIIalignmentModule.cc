@@ -33,7 +33,8 @@ MillepedeIIalignmentModule::MillepedeIIalignmentModule() :
   Module()
 {
   addParam("steeringFileName", m_steeringFileName, "Name of the steering file to run Millepede II alignment", string("steer.txt"));
-  addParam("resultXmlFileName", m_resultXmlFileName, "Name of the xml with results of Millepede II alignment", string("displacements.txt"));
+  addParam("resultXmlFileName", m_resultXmlFileName, "Name of the xml with results of Millepede II alignment",
+           string("displacements.txt"));
 
 }
 

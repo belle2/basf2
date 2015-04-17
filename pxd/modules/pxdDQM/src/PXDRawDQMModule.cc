@@ -52,9 +52,11 @@ void PXDRawDQMModule::defineHisto()
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
   for (auto i = 0; i < 64; i++) {
+    auto num1 = (((i >> 5) & 0x1) + 1);
+    auto num2 = ((i >> 1) & 0xF);
+    auto num3 = ((i & 0x1) + 1);
     //cppcheck-suppress zerodiv
-    std::string s = boost::str(boost::format("Sensor %d:%d:%d (DHH ID $%02X)") % (((i >> 5) & 0x1) + 1) % ((i >> 1) & 0xF) % ((
-                                 i & 0x1) + 1) % i);
+    std::string s = boost::str(boost::format("Sensor %d:%d:%d (DHH ID $%02X)") % num1 % num2 % num3 % i);
 
     hrawPxdHitMap[i]  = new TH2F(("hrawPxdHitMap" + s).c_str(), ("Pxd Raw Hit Map, " + s + ";column;row").c_str(), 256, 0, 256, 786, 0,
                                  786);

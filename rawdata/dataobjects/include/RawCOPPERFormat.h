@@ -25,6 +25,7 @@
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 #define DETECTOR_MASK 0xFF000000 // tentative
+#define COPPERID_MASK 0x00FFFFFF // tentative
 #define SVD_ID  0x01000000 // tentative
 #define CDC_ID  0x02000000 // tentative
 #define TOP_ID 0x03000000 // tentative

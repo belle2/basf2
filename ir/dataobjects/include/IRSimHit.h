@@ -41,7 +41,8 @@ namespace Belle2 {
       int PDGcode,
       float depEnergy,
       std::string Volname
-    ) {
+    )
+    {
       m_posIn = posIn;
       m_momIn = momIn;
       m_posOut = posOut;

@@ -212,12 +212,16 @@ namespace Belle2 {
 
 
         if (subtract != "" && intersect != "") {
-          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo, polycone.transform.inverse()*elements[subtract].transform);
-          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo, polycone.transform.inverse()*elements[intersect].transform);
+          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
+                                                 polycone.transform.inverse()*elements[subtract].transform);
+          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo,
+                                                 polycone.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "")
-          geo_polycone = new G4SubtractionSolid(geo_polycone_name, geo_polyconexx, elements[subtract].geo, polycone.transform.inverse()*elements[subtract].transform);
+          geo_polycone = new G4SubtractionSolid(geo_polycone_name, geo_polyconexx, elements[subtract].geo,
+                                                polycone.transform.inverse()*elements[subtract].transform);
         else if (intersect != "")
-          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconexx, elements[intersect].geo, polycone.transform.inverse()*elements[intersect].transform);
+          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconexx, elements[intersect].geo,
+                                                 polycone.transform.inverse()*elements[intersect].transform);
 
         polycone.geo = geo_polycone;
 
@@ -316,12 +320,16 @@ namespace Belle2 {
           geo_torus = new G4Torus(geo_torus_name, torus_r, torus_R, torus_RT, torus_SPHI, torus_DPHI);
 
         if (subtract != "" && intersect != "") {
-          geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo, torus.transform.inverse()*elements[subtract].transform);
-          geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusx, elements[intersect].geo, torus.transform.inverse()*elements[intersect].transform);
+          geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
+                                              torus.transform.inverse()*elements[subtract].transform);
+          geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusx, elements[intersect].geo,
+                                              torus.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "")
-          geo_torus  = new G4SubtractionSolid(geo_torus_name, geo_torusxx, elements[subtract].geo, torus.transform.inverse()*elements[subtract].transform);
+          geo_torus  = new G4SubtractionSolid(geo_torus_name, geo_torusxx, elements[subtract].geo,
+                                              torus.transform.inverse()*elements[subtract].transform);
         else if (intersect != "")
-          geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusxx, elements[intersect].geo, torus.transform.inverse()*elements[intersect].transform);
+          geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusxx, elements[intersect].geo,
+                                              torus.transform.inverse()*elements[intersect].transform);
 
         torus.geo = geo_torus;
 
@@ -456,7 +464,8 @@ namespace Belle2 {
 
       //define geometry
       G4Box* geo_polyShieldRx = new G4Box("geo_polyShieldRx_name", PolyShieldR_X, PolyShieldR_Y, PolyShieldR_Z);
-      G4Tubs* geo_polyShieldR_Hole = new G4Tubs("geo_polyShieldRxx_name", 0 * CLHEP::mm, PolyShieldR_r, PolyShieldR_Z, 0. * CLHEP::deg, 360.*CLHEP::deg);
+      G4Tubs* geo_polyShieldR_Hole = new G4Tubs("geo_polyShieldRxx_name", 0 * CLHEP::mm, PolyShieldR_r, PolyShieldR_Z, 0. * CLHEP::deg,
+                                                360.*CLHEP::deg);
       G4SubtractionSolid* geo_polyShieldR
         = new G4SubtractionSolid("geo_polyShieldR_name", geo_polyShieldRx, geo_polyShieldR_Hole, transform_polyShieldR_Hole);
 
@@ -489,7 +498,8 @@ namespace Belle2 {
 
       //define geometry
       G4Box* geo_polyShieldLxx = new G4Box("geo_polyShieldLxx_name", PolyShieldL_X, PolyShieldL_Y, PolyShieldL_Z);
-      G4Tubs* geo_polyShieldL_Hole = new G4Tubs("geo_polyShieldLxxx_name", 0 * CLHEP::mm, PolyShieldL_r, PolyShieldL_Z, 0. * CLHEP::deg, 360.*CLHEP::deg);
+      G4Tubs* geo_polyShieldL_Hole = new G4Tubs("geo_polyShieldLxxx_name", 0 * CLHEP::mm, PolyShieldL_r, PolyShieldL_Z, 0. * CLHEP::deg,
+                                                360.*CLHEP::deg);
       G4SubtractionSolid* geo_polyShieldLx
         = new G4SubtractionSolid("geo_polyShieldLx_name", geo_polyShieldLxx, geo_polyShieldL_Hole, transform_polyShieldL_Hole);
       G4SubtractionSolid* geo_polyShieldL
@@ -530,7 +540,8 @@ namespace Belle2 {
       //define geometry
       G4Box* geo_ConcreteShieldRx = new G4Box("geo_ConcreteShieldRx_name", ConcreteShieldR_X, ConcreteShieldR_Y, ConcreteShieldR_Z);
       G4Box* geo_ConcreteShieldR_Hole = new G4Box("geo_ConcreteShieldRxx_name", ConcreteShieldR_x, ConcreteShieldR_y, ConcreteShieldR_Z);
-      G4SubtractionSolid* geo_ConcreteShieldR = new G4SubtractionSolid("geo_ConcreteShieldR_name", geo_ConcreteShieldRx, geo_ConcreteShieldR_Hole, transform_ConcreteShieldR_Hole);
+      G4SubtractionSolid* geo_ConcreteShieldR = new G4SubtractionSolid("geo_ConcreteShieldR_name", geo_ConcreteShieldRx,
+          geo_ConcreteShieldR_Hole, transform_ConcreteShieldR_Hole);
 
       string strMat_ConcreteShieldR = cConcreteShieldR.getString("Material");
       G4Material* mat_ConcreteShieldR = Materials::get(strMat_ConcreteShieldR);
@@ -563,7 +574,8 @@ namespace Belle2 {
       //define geometry
       G4Box* geo_ConcreteShieldLx = new G4Box("geo_ConcreteShieldLx_name", ConcreteShieldL_X, ConcreteShieldL_Y, ConcreteShieldL_Z);
       G4Box* geo_ConcreteShieldL_Hole = new G4Box("geo_ConcreteShieldLxx_name", ConcreteShieldL_x, ConcreteShieldL_y, ConcreteShieldL_Z);
-      G4SubtractionSolid* geo_ConcreteShieldL = new G4SubtractionSolid("geo_ConcreteShieldL_name", geo_ConcreteShieldLx, geo_ConcreteShieldL_Hole, transform_ConcreteShieldL_Hole);
+      G4SubtractionSolid* geo_ConcreteShieldL = new G4SubtractionSolid("geo_ConcreteShieldL_name", geo_ConcreteShieldLx,
+          geo_ConcreteShieldL_Hole, transform_ConcreteShieldL_Hole);
 
       string strMat_ConcreteShieldL = cConcreteShieldL.getString("Material");
       G4Material* mat_ConcreteShieldL = Materials::get(strMat_ConcreteShieldL);

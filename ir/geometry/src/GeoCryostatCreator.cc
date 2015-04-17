@@ -375,13 +375,15 @@ namespace Belle2 {
       B1spc2.geo = new G4IntersectionSolid("geo_B1spc2_name", geo_B1spc2xx, elements["TubeR2"].geo, B1spc2.transform.inverse());
       B1spc2.logi = NULL;
 
-      G4IntersectionSolid* geo_B1spc1x = new G4IntersectionSolid("geo_B1spc1x_name", geo_B1spc1xx, elements["TubeR"].geo, B1spc1.transform.inverse());
+      G4IntersectionSolid* geo_B1spc1x = new G4IntersectionSolid("geo_B1spc1x_name", geo_B1spc1xx, elements["TubeR"].geo,
+                                                                 B1spc1.transform.inverse());
       B1spc1.geo = new G4UnionSolid("geo_B1spc1_name", geo_B1spc1x, B1spc2.geo);
 
       A1spc2.geo = new G4IntersectionSolid("geo_A1spc2_name", geo_A1spc2xx, elements["TubeR2"].geo, A1spc2.transform.inverse());
       A1spc2.logi = NULL;
 
-      G4IntersectionSolid* geo_A1spc1xy = new G4IntersectionSolid("geo_A1spc1xy_name", geo_A1spc1xx, elements["TubeR"].geo, A1spc1.transform.inverse());
+      G4IntersectionSolid* geo_A1spc1xy = new G4IntersectionSolid("geo_A1spc1xy_name", geo_A1spc1xx, elements["TubeR"].geo,
+                                                                  A1spc1.transform.inverse());
       G4UnionSolid* geo_A1spc1x = new G4UnionSolid("geo_A1spc1x_name", geo_A1spc1xy, A1spc2.geo);
       A1spc1.geo = new G4SubtractionSolid("geo_A1spc1_name", geo_A1spc1x, B1spc1.geo, A1spc1.transform.inverse()*B1spc1.transform);
 
@@ -443,8 +445,10 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_C1wal1xxx = new G4Polycone("geo_C1wal1xxx_name", 0, 2 * M_PI, C1wal1_N, C1wal1_Z, C1wal1_r, C1wal1_R);
-      G4IntersectionSolid* geo_C1wal1xx = new G4IntersectionSolid("geo_C1wal1xx_name", geo_C1wal1xxx, elements["TubeR"].geo, elements["TubeR"].transform);
-      G4SubtractionSolid* geo_C1wal1x = new G4SubtractionSolid("geo_C1wal1x_name", geo_C1wal1xx, elements["A1spc1"].geo, elements["A1spc1"].transform);
+      G4IntersectionSolid* geo_C1wal1xx = new G4IntersectionSolid("geo_C1wal1xx_name", geo_C1wal1xxx, elements["TubeR"].geo,
+                                                                  elements["TubeR"].transform);
+      G4SubtractionSolid* geo_C1wal1x = new G4SubtractionSolid("geo_C1wal1x_name", geo_C1wal1xx, elements["A1spc1"].geo,
+                                                               elements["A1spc1"].transform);
       C1wal1.geo = new G4SubtractionSolid("geo_C1wal1_name", geo_C1wal1x, elements["B1spc1"].geo, elements["B1spc1"].transform);
 
       string strMat_C1wal1 = cC1wal1.getString("Material");
@@ -516,7 +520,8 @@ namespace Belle2 {
       G4Polycone* geo_E1spc1xx = new G4Polycone("geo_E1spc1xx_name", 0, 2 * M_PI, E1spc1_N, E1spc1_Z, E1spc1_r, E1spc1_R);
 
       // final cut
-      G4IntersectionSolid* geo_D1spc1x = new G4IntersectionSolid("geo_D1spc1x_name", geo_D1spc1xx, elements["TubeL"].geo, D1spc1.transform.inverse());
+      G4IntersectionSolid* geo_D1spc1x = new G4IntersectionSolid("geo_D1spc1x_name", geo_D1spc1xx, elements["TubeL"].geo,
+                                                                 D1spc1.transform.inverse());
       E1spc1.geo = new G4IntersectionSolid("geo_E1spc1_name", geo_E1spc1xx, elements["TubeL"].geo, E1spc1.transform.inverse());
       D1spc1.geo = new G4SubtractionSolid("geo_D1spc1_name", geo_D1spc1x, E1spc1.geo, D1spc1.transform.inverse()*E1spc1.transform);
 
@@ -577,8 +582,10 @@ namespace Belle2 {
 
       //define geometry
       G4Polycone* geo_F1wal1xxx = new G4Polycone("geo_F1wal1xxx_name", 0, 2 * M_PI, F1wal1_N, F1wal1_Z, F1wal1_r, F1wal1_R);
-      G4IntersectionSolid* geo_F1wal1xx = new G4IntersectionSolid("geo_F1wal1xx_name", geo_F1wal1xxx, elements["TubeL"].geo, elements["TubeL"].transform);
-      G4SubtractionSolid* geo_F1wal1x = new G4SubtractionSolid("geo_F1wal1x_name", geo_F1wal1xx, elements["D1spc1"].geo, elements["D1spc1"].transform);
+      G4IntersectionSolid* geo_F1wal1xx = new G4IntersectionSolid("geo_F1wal1xx_name", geo_F1wal1xxx, elements["TubeL"].geo,
+                                                                  elements["TubeL"].transform);
+      G4SubtractionSolid* geo_F1wal1x = new G4SubtractionSolid("geo_F1wal1x_name", geo_F1wal1xx, elements["D1spc1"].geo,
+                                                               elements["D1spc1"].transform);
       F1wal1.geo = new G4SubtractionSolid("geo_F1wal1_name", geo_F1wal1x, elements["E1spc1"].geo, elements["E1spc1"].transform);
 
       string strMat_F1wal1 = cF1wal1.getString("Material");
@@ -638,14 +645,18 @@ namespace Belle2 {
 
         if (subtract != "" && intersect != "") {
           geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Z, r, R);
-          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo, elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
-          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo, elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
+          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
+                                                 elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
+          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo,
+                                                 elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "") {
           geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Z, r, R);
-          geo_polycone = new G4SubtractionSolid(geo_polycone_name, geo_polyconexx, elements[subtract].geo, elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
+          geo_polycone = new G4SubtractionSolid(geo_polycone_name, geo_polyconexx, elements[subtract].geo,
+                                                elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract].transform);
         } else if (intersect != "") {
           geo_polyconexx = new G4Polycone(geo_polyconexx_name, 0.0, 2 * M_PI, N, Z, r, R);
-          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconexx, elements[intersect].geo, elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
+          geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconexx, elements[intersect].geo,
+                                                 elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect].transform);
         } else
           geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, Z, r, R);
 

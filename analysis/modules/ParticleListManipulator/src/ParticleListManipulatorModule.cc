@@ -87,9 +87,10 @@ namespace Belle2 {
     m_isSelfConjugatedParticle = (m_outputListName == m_outputAntiListName);
 
     // Input lists
-    for (const std::string & listName : m_inputListNames) {
+    for (const std::string& listName : m_inputListNames) {
       if (listName == m_outputListName) {
-        B2ERROR("ParticleListManipulatorModule: cannot copy Particles from " << listName << " to itself! Use applyCuts() (ParticleSelector module) instead.");
+        B2ERROR("ParticleListManipulatorModule: cannot copy Particles from " << listName <<
+                " to itself! Use applyCuts() (ParticleSelector module) instead.");
       } else if (!m_decaydescriptor.init(listName)) {
         B2ERROR("Invalid input ParticleList name: " << listName);
       } else {
@@ -114,6 +115,9 @@ namespace Belle2 {
 
   void ParticleListManipulatorModule::event()
   {
+    // clear the list
+    m_particlesInTheList.clear();
+
     const StoreArray<Particle> particles;
     StoreObjPtr<ParticleList> plist(m_outputListName);
     bool existingList = plist.isValid();
@@ -130,14 +134,27 @@ namespace Belle2 {
 
         antiPlist->bindAntiParticleList(*(plist));
       }
+    } else {
+      // output list already contains Particles
+      // fill m_particlesInTheList with unique
+      // identifiers of particles already in
+      for (unsigned i = 0; i < plist->getListSize(); i++) {
+        const Particle* particle = plist->getParticle(i);
+
+        std::vector<int> idSeq;
+        fillUniqueIdentifier(particle, idSeq);
+        m_particlesInTheList.push_back(idSeq);
+      }
     }
+
     // copy all particles from input lists that pass selection criteria into plist
     for (unsigned i = 0; i < m_inputListNames.size(); i++) {
       const StoreObjPtr<ParticleList> inPList(m_inputListNames[i]);
 
       std::vector<int> fsParticles     = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               false);
       const std::vector<int>& scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);
-      const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               true);
+      const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,
+                                                                 true);
 
       fsParticles.insert(fsParticles.end(), scParticles.begin(), scParticles.end());
       fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
@@ -145,8 +162,14 @@ namespace Belle2 {
       for (unsigned i = 0; i < fsParticles.size(); i++) {
         const Particle* part = particles[fsParticles[i]];
 
-        if (m_cut.check(part))
+        std::vector<int> idSeq;
+        fillUniqueIdentifier(part, idSeq);
+        bool uniqueSeq = isUnique(idSeq);
+
+        if (uniqueSeq && m_cut.check(part)) {
           plist->addParticle(part);
+          m_particlesInTheList.push_back(idSeq);
+        }
       }
     }
   }
@@ -160,6 +183,44 @@ namespace Belle2 {
   {
   }
 
+  void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence)
+  {
+    idSequence.push_back(p->getPDGCode());
 
+    if (p->getNDaughters() == 0) {
+      idSequence.push_back(p->getMdstArrayIndex());
+    } else {
+      idSequence.push_back(p->getNDaughters());
+      // this is not FSP (go one level down)
+      for (unsigned i = 0; i < p->getNDaughters(); i++)
+        fillUniqueIdentifier(p->getDaughter(i), idSequence);
+    }
+  }
+
+  bool ParticleListManipulatorModule::isUnique(const std::vector<int>& idSeqOUT)
+  {
+    for (unsigned i = 0; i < m_particlesInTheList.size(); i++) {
+      std::vector<int> idSeqIN = m_particlesInTheList[i];
+
+      bool sameSeq = isIdenticalSequence(idSeqIN, idSeqOUT);
+      if (sameSeq)
+        return false;
+    }
+
+    return true;
+  }
+
+  bool ParticleListManipulatorModule::isIdenticalSequence(const std::vector<int>& idSeqIN, const std::vector<int>& idSeqOUT)
+  {
+    if (idSeqIN.size() != idSeqOUT.size())
+      return false;
+
+    for (unsigned i = 0; i < idSeqIN.size(); i++) {
+      if (idSeqIN[i] != idSeqOUT[i])
+        return false;
+    }
+
+    return true;
+  }
 } // end Belle2 namespace
 

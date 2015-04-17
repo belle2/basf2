@@ -14,6 +14,9 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/dataobjects/UncertainHelix.h>
 
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
+
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
@@ -21,8 +24,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class HitPatternCDC;
-  class HitPatternVXD;
 
   /** Values of the result of a track fit with a given particle hypothesis.
    *  The values are stored as perigee parameters with a corresponding covariance matrix.

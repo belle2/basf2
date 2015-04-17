@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/UncertainHelix.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
 
 
 using namespace Belle2;

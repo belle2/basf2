@@ -30,6 +30,7 @@ class RemoveEmptyROEModule(Module):
     For the later plotting we have to set a dummy combiner output on the B0_sig.
     Combiner-network output is set to 0.5, respectively 1 for qr-value (meaning no flavour information).
     """
+
     def event(self):
         self.return_value(0)
         roe = Belle2.PyStoreObj('RestOfEvent')
@@ -46,11 +47,10 @@ main = create_path()
 
 main.add_module('RootInput')
 main.add_module('Gearbox')
-loadReconstructedParticles(path=main)
 
 # Signal side B_sig
-selectParticle('mu+', 'muid >= 0.1', path=main)
-selectParticle('pi+', 'piid >= 0.1', path=main)
+fillParticleList('mu+', 'muid >= 0.1', path=main)
+fillParticleList('pi+', 'piid >= 0.1', path=main)
 
 reconstructDecay('J/psi -> mu+ mu-', '3.0<=M<=3.2', 1, path=main)
 reconstructDecay('K_S0 -> pi+ pi-', '0.25<=M<=0.75', 1, path=main)
@@ -64,18 +64,19 @@ applyCuts('B0', 'isSignal > 0.5', path=main)
 buildRestOfEvent('B0', path=main)
 buildContinuumSuppression('B0', path=main)
 
+#
 # Make a cut for RoE without tracks/clusters on tagside
 # Problem is that roe_path does not anymore work on this B0 list. Instead with a lot of Roe's ---
-#cutAndCopyList('B0', 'B0:UnCut',  '0.0<=CutOnB0<=1.0', path=main)
-#print 'Now on cutted List for B0'
-#buildRestOfEvent('B0', path=main)
-#applyCuts('B0:UnCut', 'CutOnB0 > -0.5', path=main)
+# cutAndCopyList('B0', 'B0:UnCut',  '0.0<=CutOnB0<=1.0', path=main)
+# print 'Now on cutted List for B0'
+# buildRestOfEvent('B0', path=main)
+# applyCuts('B0:UnCut', 'CutOnB0 > -0.5', path=main)
 
 
 roe_path = create_path()
 emptypath = create_path()
 
-#make instance
+# make instance
 ROEEmptyTrigger = RemoveEmptyROEModule()
 
 # If trigger returns 1 jump into empty path skipping further modules in roe_path
@@ -168,11 +169,17 @@ variables['Lambda'] = [
 # For Neurobayes Method see below!
 
 # Please choose method:
-#methods = [('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
-# methods = [('FastBDT', 'Plugin', '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
-# methods = [("Fisher", "Fisher", "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10")]
-# methods = [("BDTGradient", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2")]
-# methods = [("PDEFoamBoost", "PDEFoam", "!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T")]
+# methods = [('FastBDT', 'Plugin',
+# 'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
+# methods = [('FastBDT', 'Plugin',
+# '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
+# methods = [("Fisher", "Fisher",
+# "H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10")]
+# methods = [("BDTGradient", "BDT",
+# "!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2")]
+# methods = [("PDEFoamBoost", "PDEFoam",
+# "!H:!V:CreateMVAPdfs:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T"
+# +":DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T")]
 
 
 B2INFO('*** FLAVOR TAGGING ***')
@@ -200,26 +207,33 @@ for (symbol, category) in trackLevelParticles:
     targetVariable = 'IsFromB(' + category + ')'
 
 # Neurobayes method
-    methods = [('NeuroBayes', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables[category]]) + '=34'), ]
+    methods = [
+        ('NeuroBayes',
+         'Plugin',
+         '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:' +
+         'TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' +
+         '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables[category]]) +
+         '=34'),
+        ]
 
     # Select particles in ROE for different categories of flavour tagging.
     if symbol != 'Lambda0':
-        selectParticle(particleList, 'isInRestOfEvent > 0.5', path=roe_path)
+        fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=roe_path)
 
     # Check if there is K short in this event
     if symbol == 'K+':
         applyCuts('K+:ROE', '0.1<Kid', path=roe_path)  # Precut done to prevent from overtraining, might be redundant
-        selectParticle('pi+:inKaonRoe', 'isInRestOfEvent > 0.5', path=roe_path)
+        fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5', path=roe_path)
         reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
                          '0.40<=M<=0.60', 1, path=roe_path)
         fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=roe_path)
         # modify confidence level?!
 
     if symbol == 'Lambda0':
-        selectParticle('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5',
-                       path=roe_path)
-        selectParticle('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
-                       path=roe_path)
+        fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+                         path=roe_path)
+        fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+                         path=roe_path)
         reconstructDecay('Lambda0:ROE -> pi-:inLambdaRoe p+:inLambdaRoe',
                          '1.00<=M<=1.23', 1, path=roe_path)
         reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe',
@@ -230,7 +244,7 @@ for (symbol, category) in trackLevelParticles:
         # printList('Lambda0:ROE', full=True, path=roe_path)
 
     if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL):
-        #print isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL)
+        # print isTMVAMethodAvailable(workingDirectory + '/' + methodPrefix_TL)
         # print workingDirectory + '/' + methodPrefix_TL
         B2INFO('Train TMVAMethod on track level ' + category)
         trainTMVAMethod(
@@ -266,7 +280,8 @@ if eventLevelReady:
         # Using MetaVariable
         targetVariable = 'IsRightClass(' + category + ')'
         # VariablesToNtuple to investigate the list before best candidate selection
-        # variablesToNTuple(particleList, ["charge", "extraInfo(IsFromB(" + category + "))", "qr_Combined"], filename= workingDirectory + "without_best_candidate_selection_" + category + ".root", path=roe_path)
+        # variablesToNTuple(particleList, ["charge", "extraInfo(IsFromB(" + category + "))", "qr_Combined"],
+        # filename= workingDirectory + "without_best_candidate_selection_" + category + ".root", path=roe_path)
         # Selecting particle with highest r
         applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' + 'IsFromB(' + category + ')) > 0.5', path=roe_path)
 
@@ -327,7 +342,13 @@ if combinerLevelReady:
 #                       'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')]
 
 # Neurobayes method
-    method_Combiner = [('NeuroBayes', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' + '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables]) + '=34')]
+    method_Combiner = [
+        ('NeuroBayes',
+         'Plugin',
+         '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=122:ShapeTreat=DIAG:' +
+         'TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' +
+         '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables]) +
+         '=34')]
 
     if not isTMVAMethodAvailable(workingDirectory + '/' + 'B0Tagger_ROECUT'):
         B2INFO('Train TMVAMethod on combiner level')
@@ -375,7 +396,7 @@ if combinerLevelReady:
             B0bar_prob = 1 - info.obj().getExtraInfo('qr_Combined')
             qr_Combined = 2 * (info.obj().getExtraInfo('qr_Combined') - 0.5)
             qr_MC = 2 * (mc_variables.variables.evaluate('qr_Combined',
-                         someParticle) - 0.5)
+                                                         someParticle) - 0.5)
             B0 = roe.obj().getRelated('Particles')
             B0.addExtraInfo('B0_prob', B0_prob)
             B0.addExtraInfo('B0bar_prob', B0bar_prob)

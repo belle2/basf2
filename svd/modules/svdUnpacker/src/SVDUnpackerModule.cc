@@ -237,8 +237,9 @@ void SVDUnpackerModule::printB2Debug(uint32_t* data32, uint32_t* data32_min, uin
   os << endl;
 
   while (ptr < max + 1) {
-
-    sprintf(message, "%s%.8x ", message, *ptr);
+    char prev_message[256] = "";
+    strcpy(prev_message, message);
+    sprintf(message, "%s%.8x ", prev_message, *ptr);
     if (counter++ % 10 == 9) {
       os << message << endl;
       //sprintf(message,"");

@@ -11,19 +11,22 @@
 #ifndef GEOECLCREATOR_H
 #define GEOECLCREATOR_H
 
+#include <vector>
+
 #include <geometry/CreatorBase.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <ecl/simulation/SensitiveDetector.h>
-
 class G4LogicalVolume;
-class G4VPhysicalVolume;
 
 namespace Belle2 {
 
+  class BkgSensitiveDetector;
+
   namespace ECL {
+
+    class SensitiveDetector;
 
     //!  The GeoECLCreator class.
     /*!
@@ -44,27 +47,29 @@ namespace Belle2 {
         \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-//      virtual void create(const GearDir& content, G4LogicalVolume& topVolume);
 
+      /** Make the ECL barrel and then place elements inside it */
+      void makeBarrel(const GearDir&, G4LogicalVolume*);
+      /** Place elements inside the forward endcap */
+      void makeForwardEndcap(const GearDir&, G4LogicalVolume*);
+      /** Place elements inside the backward endcap */
+      void makeBackwardEndcap(const GearDir&, G4LogicalVolume*);
       /** make geometry of endcap container */
-      void makeEndcap(const bool aForward);
-      /** make geometry ot support structure */
-      void makeSupport();
+      void makeEndcapSupport(const bool aForward, G4LogicalVolume*);
     protected:
       /** isBeamBkgStudy for neutron flux  */
       int isBeamBkgStudy;
 
     private:
-      /** data members */
-      G4LogicalVolume* logical_ecl;/**< the ecl Logical Volume */
-      G4VPhysicalVolume* physical_ecl;/**< the ecl Physical Volume*/
-      G4VPhysicalVolume* physical_ECLBarrelCylinder; /**< the ecl BarrelCylinder Physical Volume*/
+
       /** Sensitive detector */
       SensitiveDetector* m_sensitive;
+      /** Vector of background-Sensitive detectors */
+      std::vector<BkgSensitiveDetector*> m_bkgsensitive;
 
     };
 
   } // end of ecl namespace
 } // end of Belle2 namespace
 
-#endif /* GEOECLBELLEII_H */
+#endif /* GEOECLCREATOR_H */

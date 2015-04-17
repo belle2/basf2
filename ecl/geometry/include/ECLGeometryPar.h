@@ -39,6 +39,7 @@ typedef double     EclRad        ;
 /** tyep define EclDeg */
 typedef double     EclDeg        ;
 
+class G4VTouchable; // LEP: new way
 
 namespace Belle2 {
   namespace ECL {
@@ -88,8 +89,10 @@ namespace Belle2 {
       int GetThetaID() {return mPar_thetaID;};
       /** Get Phi Id */
       int GetPhiID() {return mPar_phiID;};
-      /** Get Cell Id */
+      /** Get Cell Id (LEP: old way) */
       int ECLVolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
+      /** Get Cell Id (LEP: new way)*/
+      int ECLVolumeToCellID(const G4VTouchable*);//Mapping from G4VTouchable copyNumbers to Crystal CellID
 
     private:
       /** The Theta angle of  crystal derection for Barrel crystals */
@@ -216,22 +219,26 @@ namespace Belle2 {
 
       /// Constructors and destructor
       /** Constructor of TEclEnergyHit */
-      TEclEnergyHit() : fId(0), fEnergy(0), fCellId(0) {
+      TEclEnergyHit() : fId(0), fEnergy(0), fCellId(0)
+      {
       }
       /** Constructor of TEclEnergyHit */
       TEclEnergyHit(const TEclEnergyHit& ahit)
-        : fId(ahit.Id()), fEnergy(ahit.Energy()), fCellId(ahit.CellId()) {
+        : fId(ahit.Id()), fEnergy(ahit.Energy()), fCellId(ahit.CellId())
+      {
       }
       /** Constructor of TEclEnergyHit */
       TEclEnergyHit(
         const Identifier hid, const EclGeV energy, const Identifier cid)
-        : fId(hid), fEnergy(energy), fCellId(cid) {
+        : fId(hid), fEnergy(energy), fCellId(cid)
+      {
       }
       ///
       virtual ~TEclEnergyHit() { }
 
       /// assignment operator(s)
-      TEclEnergyHit& operator=(const TEclEnergyHit& hit) {
+      TEclEnergyHit& operator=(const TEclEnergyHit& hit)
+      {
         if (this != &hit) {
           fId = hit.fId;
           fEnergy = hit.fEnergy;
@@ -242,30 +249,36 @@ namespace Belle2 {
 
       // member functions
       /** get Id */
-      Identifier Id(void) const {
+      Identifier Id(void) const
+      {
         return fId;
       }
       /** set Id */
-      Identifier Id(Identifier id) {
+      Identifier Id(Identifier id)
+      {
         return fId = id;
       }
       /** get Cell Id */
-      Identifier CellId(void) const {
+      Identifier CellId(void) const
+      {
         return fCellId;
       }
       /** set Cell Id */
-      Identifier CellId(int cId) {
+      Identifier CellId(int cId)
+      {
         return fCellId = cId;
       }
 
 
 
       /** get Energy  */
-      EclGeV Energy(void) const {
+      EclGeV Energy(void) const
+      {
         return fEnergy;
       }
       /** set Energy  */
-      EclGeV Energy(EclGeV energy) {
+      EclGeV Energy(EclGeV energy)
+      {
         return fEnergy = energy;
       }
 
@@ -274,17 +287,20 @@ namespace Belle2 {
       // static member functions
 
       /** comparison operators */
-      bool operator<(const TEclEnergyHit& rhs) const {
+      bool operator<(const TEclEnergyHit& rhs) const
+      {
         return
           fId < rhs.Id();
       }
       /** comparison operators */
-      bool operator>(const TEclEnergyHit& rhs) const {
+      bool operator>(const TEclEnergyHit& rhs) const
+      {
         return
           fId > rhs.Id();
       }
       /** comparison operators */
-      bool operator==(const TEclEnergyHit& rhs) const {
+      bool operator==(const TEclEnergyHit& rhs) const
+      {
         return
           (fId == rhs.Id())
           && (fEnergy == rhs.Energy())
@@ -292,7 +308,8 @@ namespace Belle2 {
           ;
       }
       /** comparison operators */
-      bool operator!=(const TEclEnergyHit& rhs) const {
+      bool operator!=(const TEclEnergyHit& rhs) const
+      {
         return
           (fId != rhs.Id())
           || (fEnergy != rhs.Energy())
@@ -304,7 +321,8 @@ namespace Belle2 {
       struct less_Energy {
         /** operator */
         bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
-        const {
+        const
+        {
           return
             lhs.Energy() < rhs.Energy();
         }
@@ -313,7 +331,8 @@ namespace Belle2 {
       struct less_CellId {
         /** operator */
         bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
-        const {
+        const
+        {
           return
             lhs.CellId() < rhs.CellId();
         }
@@ -322,7 +341,8 @@ namespace Belle2 {
       struct greater_Energy {
         /** operator */
         bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
-        const {
+        const
+        {
           return
             lhs.Energy() > rhs.Energy();
         }
@@ -331,7 +351,8 @@ namespace Belle2 {
       struct greater_CellId {
         /** operator */
         bool operator()(const TEclEnergyHit& lhs, const TEclEnergyHit& rhs)
-        const {
+        const
+        {
           return
             lhs.CellId() > rhs.CellId();
         }

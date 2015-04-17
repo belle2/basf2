@@ -11,6 +11,10 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+
+#include <G4VPhysicalVolume.hh>
+#include <G4VTouchable.hh>
+
 #include <cmath>
 #include <boost/format.hpp>
 #include <ecl/geometry/ECLGeometryPar.h>
@@ -133,7 +137,8 @@ TVector3 ECLGeometryPar::GetCrystalVec(int cid)
 
   if (mPar_cellID < 7776 && mPar_cellID > 1151) {
     int iSector = mPar_phiID / 2;
-    double phi_ang = double(iSector) * 360. / 72.  + m_BLPhipos[mPar_thetaIndex] + double(mPar_phiIndex % 2) * (5. - 2.494688) + m_BLPhiCrystal[mPar_thetaIndex];
+    double phi_ang = double(iSector) * 360. / 72.  + m_BLPhipos[mPar_thetaIndex] + double(mPar_phiIndex % 2) *
+                     (5. - 2.494688) + m_BLPhiCrystal[mPar_thetaIndex];
     double theta_ang = m_BLThetaCrystal[mPar_thetaIndex];
     TVector3 Pos_tmp(
       sin(theta_ang * PI / 180) * cos(phi_ang * PI / 180),
@@ -314,11 +319,13 @@ void ECLGeometryPar::Mapping(int cid)
 }
 
 
+// LEP: old way
 int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
 {
   char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
   int cellID = 0;
-  sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
+  sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s",
+         temp1, temp2, temp3, temp4, temp5, temp6, temp7);
 
   int GSector = atoi(temp4) - 1;
   int iCry = atoi(temp6) - 1;
@@ -386,6 +393,91 @@ int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
     } else if (iCry < 60) {
       cellID = (GSector) * 4 + (iCry - 56) + 16 * 56 + 7776;
     }
+  }
+  return cellID;
+}
+
+// LEP: new way
+int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
+{
+
+  int depth = touch->GetHistoryDepth();
+  if ((depth != 5) && (depth != 6)) {
+    B2WARNING("ECL simulation cellId; History depth = " << depth << " is out of range: should be 5 or 6.");
+    return -1;
+  }
+
+  int iCry = touch->GetCopyNumber(0);
+  int GSector = touch->GetCopyNumber(2);
+  int cellID = 0;
+
+  if (touch->GetVolume()->GetName().compare(0, 21, "eclFwdCrystalPhysical") == 0) {
+
+    if (iCry < 3) {
+      cellID = GSector * 3 + iCry - 0;
+    } else if (iCry < 6) {
+      cellID = GSector * 3 + (iCry - 3) + 16 * 3;
+    } else if (iCry < 10) {
+      cellID = GSector * 4 + (iCry - 6) + 16 * 6;
+    } else if (iCry < 14) {
+      cellID = GSector * 4 + (iCry - 10) + 16 * 10;
+    } else if (iCry < 18) {
+      cellID = GSector * 4 + (iCry - 14) + 16 * 14;
+    } else if (iCry < 24) {
+      cellID = GSector * 6 + (iCry - 18) + 16 * 18;
+    } else if (iCry < 30) {
+      cellID = GSector * 6 + (iCry - 24) + 16 * 24;
+    } else if (iCry < 36) {
+      cellID = GSector * 6 + (iCry - 30) + 16 * 30;
+    } else if (iCry < 42) {
+      cellID = GSector * 6 + (iCry - 36) + 16 * 36;
+    } else if (iCry < 48) {
+      cellID = GSector * 6 + (iCry - 42) + 16 * 42;
+    } else if (iCry < 54) {
+      cellID = GSector * 6 + (iCry - 48) + 16 * 48;
+    } else if (iCry < 63) {
+      cellID = GSector * 9 + (iCry - 54) + 16 * 54;
+    } else if (iCry < 72) {
+      cellID = GSector * 9 + (iCry - 63) + 16 * 63;
+
+    }
+
+  } else if (touch->GetVolume()->GetName().compare(0, 24, "eclBarrelCrystalPhysical") == 0) {
+
+    GSector = GSector * 2 - touch->GetCopyNumber(1) - 2; // 1..144
+    if (GSector == -1) GSector = 143;
+    cellID = 1152 + (iCry) * 144 + GSector;
+
+  } else if (touch->GetVolume()->GetName().compare(0, 21, "eclBwdCrystalPhysical") == 0) {
+
+    iCry = iCry - 72;
+    if (iCry < 9) {
+      cellID = (GSector) * 9 + iCry - 0 + 7776;
+    } else if (iCry < 18) {
+      cellID = (GSector) * 9 + (iCry - 9) + 16 * 9 + 7776;
+    } else if (iCry < 24) {
+      cellID = (GSector) * 6 + (iCry - 18) + 16 * 18 + 7776;
+    } else if (iCry < 30) {
+      cellID = (GSector) * 6 + (iCry - 24) + 16 * 24 + 7776;
+    } else if (iCry < 36) {
+      cellID = (GSector) * 6 + (iCry - 30) + 16 * 30 + 7776;
+    } else if (iCry < 42) {
+      cellID = (GSector) * 6 + (iCry - 36) + 16 * 36 + 7776;
+    } else if (iCry < 48) {
+      cellID = (GSector) * 6 + (iCry - 42) + 16 * 42 + 7776;
+    } else if (iCry < 52) {
+      cellID = (GSector) * 4 + (iCry - 48) + 16 * 48 + 7776;
+    } else if (iCry < 56) {
+      cellID = (GSector) * 4 + (iCry - 52) + 16 * 52 + 7776;
+    } else if (iCry < 60) {
+      cellID = (GSector) * 4 + (iCry - 56) + 16 * 56 + 7776;
+    }
+
+  } else {
+
+    B2WARNING("ECL simulation cellId; Bad volume name = " << touch->GetVolume()->GetName());
+    return -1;
+
   }
   return cellID;
 }
@@ -1019,7 +1111,8 @@ namespace Belle2 {
     char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
     int cellID = 0;
 
-    sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s", temp1, temp2, temp3, temp4, temp5, temp6, temp7);
+    sscanf(VolumeName.c_str(), "%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%100[^'_']_%5s", temp1, temp2, temp3, temp4,
+           temp5, temp6, temp7);
 
     int GSector = (atoi(temp4) - 1) ;
     int iCry = atoi(temp6) - 1;

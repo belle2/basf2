@@ -146,7 +146,9 @@ namespace Belle2 {
 
       m_startPos =  preStep.GetPosition();
       m_endPos = postStep.GetPosition();
-      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm, (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm, (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
+      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm,
+                        (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm,
+                        (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
       m_WightedPos += position * (aStep->GetTotalEnergyDeposit());
 
       //Save Hit if track leaves volume or is killed
@@ -159,10 +161,11 @@ namespace Belle2 {
 
         if (v.GetName().find("Crystal") != string::npos) {
           ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-          m_cellID = eclp->ECLVolNameToCellID(v.GetName());
+          m_cellID = eclp->ECLVolumeToCellID(preStep.GetTouchable());
 
           double dTotalEnergy = 1 / m_energyDeposit; //avoid the error  no match for 'operator/'
-          if (m_energyDeposit > 0.) saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit , m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
+          if (m_energyDeposit > 0.) saveSimHit(m_cellID, m_trackID, pdgCode, m_WightedTime / m_energyDeposit,
+                                                 m_energyDeposit, m_momentum, m_WightedPos * dTotalEnergy);
         }
 
         //Reset TrackID

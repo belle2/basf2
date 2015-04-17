@@ -10,9 +10,9 @@ env['LIBS'] = [
 	'framework_pybasf2',
 	'simulation_dataobjects',
 	'_trackFinderCDC_',
-    'framework_pybasf2',
-    'simulation_dataobjects',
-    'tracking_trackFinderCDC',
+	'framework_pybasf2',
+	'simulation_dataobjects',
+	'tracking_trackFinderCDC',
     ]
 Return('env')
 

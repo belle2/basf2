@@ -83,6 +83,9 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
     // add it to the self-conjugated list of this (and anti-particle list if exists)
 
     // check if the particle is already in this list
+    // TODO: this check can be removed in future, since all
+    // modules that append particles to lists performe such
+    // tests by themselves
     if (std::find(m_scList.begin(), m_scList.end(), iparticle) == m_scList.end()) {
       m_scList.push_back(iparticle);
     } else {
@@ -100,6 +103,9 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
     if (antiParticle)
       getAntiParticleList().addParticle(iparticle, pdg, type, false);
     else {
+      // TODO: this check can be removed in future, since all
+      // modules that append particles to lists performe such
+      // tests by themselves
       if (std::find(m_fsList.begin(), m_fsList.end(), iparticle) == m_fsList.end()) {
         m_fsList.push_back(iparticle);
       } else {
@@ -230,7 +236,8 @@ ParticleList& ParticleList::getAntiParticleList() const
   if (antiList) {
     return *antiList;
   } else {
-    B2FATAL("Anti-particle list " << m_antiListName << " for " << m_thisListName << " not found, even though one was set via bindAntiParticleList(). Maybe you only saved one list into a .root file?");
+    B2FATAL("Anti-particle list " << m_antiListName << " for " << m_thisListName <<
+            " not found, even though one was set via bindAntiParticleList(). Maybe you only saved one list into a .root file?");
   }
 }
 

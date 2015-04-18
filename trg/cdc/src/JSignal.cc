@@ -1123,7 +1123,7 @@ namespace Belle2{
     if(t_rhs.m_argumentSignals.size()==0) t_rhs.initArgumentSignals();
     combineArguments(t_lhs, t_rhs, t_result);
     // Int Operation.
-    bool t_bool;
+    bool t_bool = false;
     if (operate=="=") {
       t_bool =  (t_lhs.m_int == t_rhs.m_int ? 1 : 0);
     } else if (operate=="/=") {

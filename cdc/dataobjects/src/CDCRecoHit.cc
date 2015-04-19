@@ -164,18 +164,20 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 
   double trackTime = s_useTrackTime ? state.getTime() : 0;
 
-  // The meaning of left / right is derived from CDCGEometryPar::getNewLeftRightRaw().
-  double mR = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
-                                                   true, //right
-                                                   z, alpha, theta);
+  // The meaning of the left / right flag (called
+  // 'ambiguityDiscriminator' in TDCCounTranslatorBase) is inferred
+  // from CDCGeometryPar::getNewLeftRightRaw().
   double mL = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
-                                                   false, //left
+                                                   true, //left
                                                    z, alpha, theta);
-  double VR = s_tdcCountTranslator->getDriftLengthResolution(mR, m_wireID,
-                                                             true, //right
+  double mR = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
+                                                   false, //right
+                                                   z, alpha, theta);
+  double VL = s_tdcCountTranslator->getDriftLengthResolution(mR, m_wireID,
+                                                             true, //left
                                                              z, alpha, theta);
-  double VL = s_tdcCountTranslator->getDriftLengthResolution(mL, m_wireID,
-                                                             false, //left
+  double VR = s_tdcCountTranslator->getDriftLengthResolution(mL, m_wireID,
+                                                             false, //right
                                                              z, alpha, theta);
 
   // static to avoid constructing these over and over.

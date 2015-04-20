@@ -33,7 +33,7 @@ from ROOT import Belle2
 # Bsig+ -> mu+ nu_mu
 #
 # generateY4S function is defined in analysis/scripts/modularAnalysis.py
-generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/B2A101-Y4SEventGeneration.dec'))
+generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.

@@ -123,6 +123,8 @@ namespace Belle2 {
     /** Constructor.
      */
     explicit EVEVisualization();
+
+    EVEVisualization(const EVEVisualization&) = delete;
     /** Destructor. */
     ~EVEVisualization();
 

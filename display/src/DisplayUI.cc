@@ -40,6 +40,8 @@
 #include <TROOT.h>
 #include <TSystem.h>
 
+#include <cassert>
+
 
 using namespace Belle2;
 
@@ -100,6 +102,7 @@ void DisplayUI::prev()
 
 void DisplayUI::setTitle(const std::string& fileName)
 {
+  assert(gEve);
   std::string title("Belle II Event Display");
   if (!fileName.empty())
     title += " - " + fileName;

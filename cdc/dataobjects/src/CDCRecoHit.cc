@@ -122,7 +122,7 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
   }
 
   // construct orthogonal (unit) vector
-  const TVector3& U = dirInPoca.Cross(wireDirection);
+  const TVector3& U = wireDirection.Cross(dirInPoca);
 
   genfit::SharedPlanePtr pl = genfit::SharedPlanePtr(new genfit::DetPlane(pocaOnWire, U, wireDirection));
   //pl->Print();
@@ -168,16 +168,16 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
   // 'ambiguityDiscriminator' in TDCCounTranslatorBase) is inferred
   // from CDCGeometryPar::getNewLeftRightRaw().
   double mL = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
-                                                   true, //left
+                                                   false, //left
                                                    z, alpha, theta);
   double mR = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
-                                                   false, //right
+                                                   true, //right
                                                    z, alpha, theta);
-  double VL = s_tdcCountTranslator->getDriftLengthResolution(mR, m_wireID,
-                                                             true, //left
+  double VL = s_tdcCountTranslator->getDriftLengthResolution(mL, m_wireID,
+                                                             false, //left
                                                              z, alpha, theta);
-  double VR = s_tdcCountTranslator->getDriftLengthResolution(mL, m_wireID,
-                                                             false, //right
+  double VR = s_tdcCountTranslator->getDriftLengthResolution(mR, m_wireID,
+                                                             true, //right
                                                              z, alpha, theta);
 
   // static to avoid constructing these over and over.

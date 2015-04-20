@@ -90,7 +90,10 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main):
     evtnumbers.param('expList', [1])
     evtgeninput = register_module('EvtGenInput')
     if decayTable is not None:
-        evtgeninput.param('userDECFile', decayTable)
+        if os.path.exists(decayTable):
+            evtgeninput.param('userDECFile', decayTable)
+        else:
+            B2ERROR('The specifed decay table file does not exist:' + decayTable)
     evtgeninput.param('boost2LAB', True)
     path.add_module(evtnumbers)
     path.add_module(evtgeninput)

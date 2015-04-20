@@ -128,7 +128,10 @@ def generateContinuum(
     evtnumbers.param('runList', [1])
     evtnumbers.param('expList', [1])
     evtgeninput = register_module('EvtGenInput')
-    evtgeninput.param('userDECFile', decayTable)
+    if os.path.exists(decayTable):
+        evtgeninput.param('userDECFile', decayTable)
+    else:
+        B2ERROR('The specifed decay table file does not exist:' + decayTable)
     evtgeninput.param('ParentParticle', 'vpho')
     evtgeninput.param('InclusiveParticle', inclusiveP)
     evtgeninput.param('InclusiveType', inclusiveT)

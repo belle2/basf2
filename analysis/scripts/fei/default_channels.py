@@ -68,6 +68,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_pi0 = PreCutConfiguration(
         variable='M',
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
         binning=(500, 0.08, 0.18),
         efficiency=0.95,
         purity=0.0001,
@@ -95,7 +96,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_KS0 = PreCutConfiguration(
         variable='M',
-        binning=(500, 0.3, 0.7),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 0.4, 0.6),
         efficiency=0.95,
         purity=0.0001,
         userCut=''
@@ -120,7 +122,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_D0 = PreCutConfiguration(
         variable='M',
-        binning=(500, 1.5, 2.0),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 1.70, 1.95),
         efficiency=0.95,
         purity=0.001,
         userCut=''
@@ -159,7 +162,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_DPlus = PreCutConfiguration(
         variable='M',
-        binning=(500, 1.5, 2.0),
+        binning=(500, 1.7, 1.95),
         efficiency=0.95,
         purity=0.001,
         userCut=''
@@ -195,7 +198,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_DStarPlus = PreCutConfiguration(
         variable='Q',
-        binning=(500, 0, 1),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 0, 0.3),
         efficiency=0.95,
         purity=0.001,
         userCut=''
@@ -221,7 +225,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_DStar0 = PreCutConfiguration(
         variable='Q',
-        binning=(500, 0, 1),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 0, 0.3),
         efficiency=0.95,
         purity=0.001,
         userCut=''
@@ -247,7 +252,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_DS = PreCutConfiguration(
         variable='M',
-        binning=(500, 1.6, 2.2),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 1.68, 2.1),
         efficiency=0.95,
         purity=0.001,
         userCut=''
@@ -281,7 +287,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_DStarS = PreCutConfiguration(
         variable='Q',
-        binning=(500, 0, 1),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 0, 0.3),
         efficiency=0.95,
         purity=0.001,
         userCut=''
@@ -307,7 +314,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     pre_J = PreCutConfiguration(
         variable='M',
-        binning=(500, 2.5, 3.5),
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(500, 2.8, 3.5),
         efficiency=0.95,
         purity=0.001,
         userCut=''

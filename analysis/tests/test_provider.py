@@ -394,15 +394,6 @@ def MockCalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
             'D0:3 ==> K+ pi+ pi- pi-': {'cutstring': '', 'isIgnored': True}}
 
 
-# If you're afraid of black magic, ignore the following lines
-class InjectMockCalculatePreCuts(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'preCutDetermination':
-            return ast.copy_location(ast.Name(id='MockCalculatePreCuts', ctx=node.ctx), node)
-        return node
-
-
 class TestPreCutDetermination(unittest.TestCase):
 
     def setUp(self):
@@ -412,8 +403,8 @@ class TestPreCutDetermination(unittest.TestCase):
         self.preCutHistograms = ['Dummy1', 'Dummy2', 'Dummy3', None]
 
     def test_PreCutDetermination(self):
-        # I call upon the mighty god of Python!
-        exec compile(InjectMockCalculatePreCuts().visit(ast.parse(inspect.getsource(PreCutDetermination))), '<string>', 'exec')
+        from fei import preCutDetermination
+        preCutDetermination.CalculatePreCuts = MockCalculatePreCuts
         # Returns value (preCut) stored in given dictionary (preCuts for all channels) under key (channelName)
         self.assertDictEqual(PreCutDetermination(self.resource, self.channelNames, self.preCutConfig, self.preCutHistograms),
                              {'D0:1 ==> K+ pi-': {'cutstring': '0.1 < M < 0.2 and [p > 0.2]', 'isIgnored': False},
@@ -970,15 +961,6 @@ def MockAutomaticReporting(*args):
     return result_list.pop()
 
 
-# If you're afraid of black magic, ignore the following lines
-class InjectMockAutomaticReporting(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'automaticReporting':
-            return ast.copy_location(ast.Name(id='MockAutomaticReporting', ctx=node.ctx), node)
-        return node
-
-
 class TestWriteAnalysisFileForChannel(unittest.TestCase):
 
     def setUp(self):
@@ -991,12 +973,11 @@ class TestWriteAnalysisFileForChannel(unittest.TestCase):
     def test_WriteAnalysisFileForChannel(self):
         global args_list
         global result_list
-        exec compile(
-            InjectMockAutomaticReporting().visit(
-                ast.parse(
-                    inspect.getsource(WriteAnalysisFileForChannel))),
-            '<string>',
-            'exec')
+        from fei import automaticReporting
+        automaticReporting.createPreCutTexFile = MockAutomaticReporting
+        automaticReporting.createMVATexFile = MockAutomaticReporting
+        automaticReporting.createTexFile = MockAutomaticReporting
+
         placeholders = {'particleName': 'D0', 'particleLabel': 'generic', 'channelName': 'D0 -> K+ pi-',
                         'isIgnored': False, 'mvaConfigObject': 'mvaConfig',
                         'texFile': 'D0_D0 -> K+ pi-_42.tex'}
@@ -1028,12 +1009,10 @@ class TestWriteAnalysisFileForFSParticle(unittest.TestCase):
     def test_WriteAnalysisFileForFSParticle(self):
         global args_list
         global result_list
-        exec compile(
-            InjectMockAutomaticReporting().visit(
-                ast.parse(
-                    inspect.getsource(WriteAnalysisFileForFSParticle))),
-            '<string>',
-            'exec')
+        from fei import automaticReporting
+        automaticReporting.createMVATexFile = MockAutomaticReporting
+        automaticReporting.createFSParticleTexFile = MockAutomaticReporting
+
         placeholders = {'particleName': 'D0', 'particleLabel': 'generic', 'isIgnored': False}
         args_list.append([placeholders, 'nTuple', 'mccounts', 'distribution', 'mvaConfig'])
         args_list.append([placeholders, 'mvaConfig', 'signalProbability', 'postCutConfig', 'postCut'])
@@ -1061,12 +1040,9 @@ class TestWriteAnalysisFileForCombinedParticle(unittest.TestCase):
     def test_WriteAnalysisFileForCombinedParticle(self):
         global args_list
         global result_list
-        exec compile(
-            InjectMockAutomaticReporting().visit(
-                ast.parse(
-                    inspect.getsource(WriteAnalysisFileForCombinedParticle))),
-            '<string>',
-            'exec')
+        from fei import automaticReporting
+        automaticReporting.createCombinedParticleTexFile = MockAutomaticReporting
+
         channelPlaceholders = [{'mvaConfigObject': 'mvaConfig'}]
         placeholders = {'channels': channelPlaceholders, 'particleName': 'D0', 'particleLabel': 'generic', 'isIgnored': False}
         args_list.append([placeholders, channelPlaceholders, 'nTuple', 'mccounts', 'mvaConfig'])
@@ -1092,7 +1068,10 @@ class TestWriteCPUTimeSummary(unittest.TestCase):
     def test_WriteCPUTimeSummary(self):
         global args_list
         global result_list
-        exec compile(InjectMockAutomaticReporting().visit(ast.parse(inspect.getsource(WriteCPUTimeSummary))), '<string>', 'exec')
+        from fei import automaticReporting
+        automaticReporting.getModuleStatsFromFile = MockAutomaticReporting
+        automaticReporting.createCPUTimeTexFile = MockAutomaticReporting
+
         placeholders = 'Placeholders'
         args_list.append(['ChannelNames', 'InputLists', 'channelPlaceholders', 'mccounts', 'moduleStatisticsFile', 'stats'])
         args_list.append(['moduleStatisticsFile'])

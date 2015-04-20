@@ -191,12 +191,21 @@ void EKLM::GeoEKLMCreator::createMaterials()
  */
 static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
 {
-  epos->innerR = gd->getLength("InnerR") * CLHEP::cm;
-  epos->outerR = gd->getLength("OuterR") * CLHEP::cm;
-  epos->length = gd->getLength("Length") * CLHEP::cm;
   epos->X = gd->getLength("PositionX") * CLHEP::cm;
   epos->Y = gd->getLength("PositionY") * CLHEP::cm;
   epos->Z = gd->getLength("PositionZ") * CLHEP::cm;
+}
+
+/**
+ * Read size data.
+ * @param epos Position data.
+ * @param gd   XML data directory.
+ */
+static void readSizeData(struct EKLM::ElementPosition* epos, GearDir* gd)
+{
+  epos->innerR = gd->getLength("InnerR") * CLHEP::cm;
+  epos->outerR = gd->getLength("OuterR") * CLHEP::cm;
+  epos->length = gd->getLength("Length") * CLHEP::cm;
 }
 
 /**
@@ -243,14 +252,15 @@ void EKLM::GeoEKLMCreator::readXMLData()
   GearDir EndCap(gd);
   EndCap.append("/Endcap");
   readPositionData(&EndcapPosition, &EndCap);
+  readSizeData(&EndcapPosition, &EndCap);
   nLayer = EndCap.getInt("nLayer");
   GearDir Layer(EndCap);
   Layer.append("/Layer");
-  readPositionData(&LayerPosition, &Layer);
+  readSizeData(&LayerPosition, &Layer);
   Layer_shiftZ = Layer.getLength("ShiftZ") * CLHEP::cm;
   GearDir Sector(Layer);
   Sector.append("/Sector");
-  readPositionData(&SectorPosition, &Sector);
+  readSizeData(&SectorPosition, &Sector);
   nPlane = Sector.getInt("nPlane");
   nBoard = Sector.getInt("nBoard");
   GearDir Boards(Sector);
@@ -291,10 +301,12 @@ void EKLM::GeoEKLMCreator::readXMLData()
   GearDir SectorSupport(Sector);
   SectorSupport.append("/SectorSupport");
   readPositionData(&SectorSupportPosition, &SectorSupport);
+  readSizeData(&SectorSupportPosition, &SectorSupport);
   readSectorSupportData(&SectorSupportSize, &SectorSupport);
   GearDir Plane(Sector);
   Plane.append("/Plane");
   readPositionData(&PlanePosition, &Plane);
+  readSizeData(&PlanePosition, &Plane);
   nSection = Plane.getInt("nSection");
   PlasticSheetWidth = Plane.getLength("PlasticSheetWidth") * CLHEP::cm;
   PlasticSheetDeltaL = Plane.getLength("PlasticSheetDeltaL") * CLHEP::cm;

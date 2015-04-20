@@ -1,7 +1,6 @@
 #ifndef EVEVISUALIZATION_H
 #define EVEVISUALIZATION_H
 
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -32,12 +31,9 @@
 #include <genfit/GFRaveVertex.h>
 
 #include <TEveStraightLineSet.h>
-#include <TEveTrackPropagator.h>
 #include <TVector3.h>
 #include <TString.h>
 #include <TEveTrack.h>
-#include <TEveManager.h>
-#include <TEveCalo.h>
 
 #include <string>
 #include <vector>
@@ -45,13 +41,16 @@
 
 class TEveBox;
 class TEveCaloDataVec;
+class TEveCalo3D;
 class TEveElementList;
 class TEvePointSet;
 class TEveTrackList;
+class TEveTrackPropagator;
 
 namespace Belle2 {
   class DisplayData;
   class VisualRepMap;
+  class EveVisBField;
 
   /** Produces visualisation for MCParticles, simhits, genfit::Tracks, geometry and other things.
    *
@@ -84,29 +83,6 @@ namespace Belle2 {
       TEveElementList* group; /**< Contains elements of this group. Set to nullptr after event. */
       bool visible; /**< Stores wether this group was visible in last event. */
     };
-
-
-    /** Provide magnetic field values for TEveTrackPropagator. */
-    class EveVisBField : public TEveMagField {
-    public:
-      EveVisBField(): TEveMagField() { }
-      virtual ~EveVisBField() { }
-
-      /** return field strength at given coordinates, using Eve conventions. */
-      virtual TEveVector GetField(Float_t x, Float_t y, Float_t z) const override
-      {
-        TEveVector v;
-
-        v.Set(BFieldMap::Instance().getBField(TVector3(x, y, z)));
-        v.fZ *= -1; //Eve has inverted B field convention
-        v.fZ -= 1e-6; //field must not be zero!
-
-        return v;
-      }
-      /** maximal field strength (is this correct?) */
-      virtual Float_t GetMaxFieldMag() const override { return 1.5; }
-    };
-
 
     /** Color for reco hits. */
     const static int c_recoHitColor = kOrange;
@@ -350,7 +326,7 @@ namespace Belle2 {
     TEveCaloDataVec* m_eclData;
 
     /** The global magnetic field. */
-    EveVisBField m_bfield;
+    EveVisBField* m_bfield;
 
     /** List of shown recohits (PXDCluster, SVDCluster, CDCHit). */
     std::set<const TObject*> m_shownRecohits;

@@ -22,6 +22,7 @@
 #include <display/dataobjects/DisplayData.h>
 #include <display/VisualRepMap.h>
 #include <display/EveGeometry.h>
+#include <display/EveVisBField.h>
 
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
@@ -88,6 +89,7 @@ using namespace Belle2;
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_eclData(0),
+  m_bfield(new EveVisBField()),
   m_unassignedRecoHits(0),
   m_visualRepMap(new VisualRepMap())
 {
@@ -98,7 +100,7 @@ EVEVisualization::EVEVisualization():
   //create new containers
   m_trackpropagator = new TEveTrackPropagator();
   m_trackpropagator->IncDenyDestroy();
-  m_trackpropagator->SetMagFieldObj(&m_bfield, false);
+  m_trackpropagator->SetMagFieldObj(m_bfield, false);
   m_trackpropagator->SetFitDaughters(false); //most secondaries are no longer immediate daughters since we might discard those!
 
   m_trackpropagator->SetMaxR(EveGeometry::getMaxR()); //don't draw tracks outside detector
@@ -113,7 +115,7 @@ EVEVisualization::EVEVisualization():
 
   m_gftrackpropagator = new TEveTrackPropagator();
   m_gftrackpropagator->IncDenyDestroy();
-  m_gftrackpropagator->SetMagFieldObj(&m_bfield, false);
+  m_gftrackpropagator->SetMagFieldObj(m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.5); //stop after track markers
 
   m_calo3d = new TEveCalo3D(NULL, "ECLClusters");
@@ -150,6 +152,7 @@ EVEVisualization::~EVEVisualization()
   delete m_trackpropagator;
   delete m_gftrackpropagator;
   delete m_calo3d;
+  delete m_bfield;
 }
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)

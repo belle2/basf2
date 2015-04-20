@@ -3,9 +3,10 @@
 
 from basf2 import *
 from modularAnalysis import *
-
+from stdLooseFSParticles import stdVeryLoosePi
 
 # Prepare all standard final state particles
+
 
 def stdFSParticles(path=analysis_main):
 
@@ -84,7 +85,7 @@ def stdHighEPhoton(path=analysis_main):
 
 def stdKs(path=analysis_main):
 
-    stdPi()
+    stdVeryLoosePi()
     reconstructDecay('K_S0:all -> pi-:all pi+:all', '0.4 < M < 0.6', 1, True,
                      path)
     vertexKFit('K_S0:all', 0.0)

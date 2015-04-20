@@ -57,39 +57,6 @@ namespace Belle2 {
      *
      * @var ESTRGeometryParams::rmaxsub
      * The outer radius of the tube.
-     *
-     * @var ESTRGeometryParams::thick_eiron
-     * The thickness of the mother vessel of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::thick_eiron_meas
-     * Measured thickness of the mother vessel of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::thick_eslot
-     * The thickness of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::thick_eslot_meas
-     * Measured thickness of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::thick_emod
-     * The thickness of the Endcap KLM module.
-     *
-     * @var ESTRGeometryParams::rmin_emod
-     * The minimum radius of the Endcap KLM module.
-     *
-     * @var ESTRGeometryParams::rmax_emod
-     * The maximum radius of the Endcap KLM module.
-     *
-     * @var ESTRGeometryParams::rmin_eslot
-     * The minimum radius of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::rmax_eslot
-     * The maximum radius of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::rshift_eslot
-     * The shift value in the radial direction of the Endcap KLM module slot.
-     *
-     * @var ESTRGeometryParams::rmax_glass
-     * The maximum radius of the glass used in KLM module (not used now).
      */
     struct ESTRGeometryParams {
       double phi;
@@ -102,17 +69,6 @@ namespace Belle2 {
       double zsub;
       double rminsub;
       double rmaxsub;
-      double thick_eiron;
-      double thick_eiron_meas;
-      double thick_eslot;
-      double thick_eslot_meas;
-      double thick_emod;
-      double rmin_emod;
-      double rmax_emod;
-      double rmin_eslot;
-      double rmax_eslot;
-      double rshift_eslot;
-      double rmax_glass;
     };
 
     /**

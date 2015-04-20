@@ -28,20 +28,6 @@
 		<InnerRadius unit="cm">110.5</InnerRadius>
 		<OuterRadius unit="cm">128.0</OuterRadius>
 	</EndcapKLMsub>
-
-	<EndcapKLMSlot>
-		<THICK_EIRON unit="cm">4.7</THICK_EIRON>
-		<THICK_EIRON_MEAS unit="cm">4.7</THICK_EIRON_MEAS>
-		<THICK_ESLOT unit="cm">4.4</THICK_ESLOT>
-		<THICK_ESLOT_MEAS unit="cm">4.4</THICK_ESLOT_MEAS>
-		<THICK_EMOD unit="cm">4.0</THICK_EMOD>
-		<RMIN_EMOD unit="cm">130.0</RMIN_EMOD>
-		<RMAX_EMOD unit="cm">332.0</RMAX_EMOD>
-		<RMIN_ESLOT unit="cm">130.0</RMIN_ESLOT>
-		<RMAX_ESLOT unit="cm">334.0</RMAX_ESLOT>
-		<RSHIFT_ESLOT unit="cm">5.0</RSHIFT_ESLOT>
-		<RMAX_GLASS unit="cm">320.0</RMAX_GLASS>
-	</EndcapKLMSlot>
     </ESTR>
     <xi:include href="DigitizationParams.xml"/>
     <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>

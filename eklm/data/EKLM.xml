@@ -43,6 +43,10 @@
       <PositionY  desc="Y position" unit="mm">0</PositionY>
       <PositionZ  desc="Z position" unit="mm">2960.5</PositionZ>
       <nLayer desc="Number of layers in one endcap">14</nLayer>
+      <nLayerForward desc="Number of detector layers in the forward endcap">14
+      </nLayerForward>
+      <nLayerBackward desc="Number of detector layers in the backward endcap">12
+      </nLayerBackward>
       <Layer>
 	<InnerR desc="Inner radius"   unit="mm">1305.0</InnerR>
 	<OuterR desc="Outer radius"   unit="mm">3320.0</OuterR>

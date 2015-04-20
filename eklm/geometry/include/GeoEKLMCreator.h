@@ -603,7 +603,13 @@ namespace Belle2 {
       GeometryData* m_geoDat;
 
       /** Number of layers. */
-      int nLayer;
+      int m_nLayer;
+
+      /** Number of detector layers in the forward endcap. */
+      int m_nLayerForward;
+
+      /** Number of detector layers in the backward endcap. */
+      int m_nLayerBackward;
 
       /** Number of planes in one sector. */
       int nPlane;

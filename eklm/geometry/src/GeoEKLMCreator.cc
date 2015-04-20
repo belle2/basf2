@@ -253,7 +253,23 @@ void EKLM::GeoEKLMCreator::readXMLData()
   EndCap.append("/Endcap");
   readPositionData(&EndcapPosition, &EndCap);
   readSizeData(&EndcapPosition, &EndCap);
-  nLayer = EndCap.getInt("nLayer");
+  m_nLayer = EndCap.getInt("nLayer");
+  if (m_nLayer <= 0 || m_nLayer > 14)
+    B2FATAL("Number of layers must be from 1 to 14");
+  m_nLayerForward = EndCap.getInt("nLayerForward");
+  if (m_nLayerForward < 0)
+    B2FATAL("Number of detector layers in the forward endcap "
+            "must be nonnegative.");
+  if (m_nLayerForward > m_nLayer)
+    B2FATAL("Number of detector layers in the forward endcap "
+            "must be less than or equal to the number of layers.");
+  m_nLayerBackward = EndCap.getInt("nLayerBackward");
+  if (m_nLayerBackward < 0)
+    B2FATAL("Number of detector layers in the backward endcap "
+            "must be nonnegative.");
+  if (m_nLayerBackward > m_nLayer)
+    B2FATAL("Number of detector layers in the backward endcap "
+            "must be less than or equal to the number of layers.");
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readSizeData(&LayerPosition, &Layer);
@@ -1267,7 +1283,7 @@ void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (curvol.layer = 1; curvol.layer <= nLayer; curvol.layer++)
+  for (curvol.layer = 1; curvol.layer <= m_nLayer; curvol.layer++)
     createLayer(logicEndcap);
 }
 
@@ -1316,12 +1332,18 @@ void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
   createSectorSupport(logicSector);
   for (i = 1; i <= 2; i++)
     createSectorCover(i, logicSector);
-  for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
-    createPlane(logicSector);
-  if (m_mode == EKLM_DETECTOR_BACKGROUND)
+  if ((curvol.endcap == 1 && curvol.layer <= m_nLayerBackward) ||
+      (curvol.endcap == 2 && curvol.layer <= m_nLayerForward)) {
+    /* Detector layer. */
     for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
-      for (curvol.board = 1; curvol.board <= nBoard; curvol.board++)
-        createSectionReadoutBoard(logicSector);
+      createPlane(logicSector);
+    if (m_mode == EKLM_DETECTOR_BACKGROUND)
+      for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
+        for (curvol.board = 1; curvol.board <= nBoard; curvol.board++)
+          createSectionReadoutBoard(logicSector);
+  } else {
+    /* Shield layer. */
+  }
 }
 
 void EKLM::GeoEKLMCreator::calcBoardTransform()

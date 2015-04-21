@@ -145,8 +145,8 @@ void MicrotpcStudyModule::event()
     int PDGid = aHit->gettkPDG();
     if (fabs(PDGid) == 11 || PDGid == 22) xRec[detNb] = true;
     if (PDGid == 2212) pRec[detNb] = true;
-    if (PDGid == 100002004) HeRec[detNb] = true;
-    if (PDGid == 100006012) ORec[detNb] = true;
+    if (PDGid == 1000020040) HeRec[detNb] = true;
+    if (PDGid == 1000060120) ORec[detNb] = true;
     if (PDGid == 1000080160) CRec[detNb] = true;
   }
 

@@ -90,6 +90,9 @@ bool NSMVHandlerHVSwitch::handleSetText(const std::string& val)
 {
   HV_HANDLE_PRE;
   m_callback.setSwitch(m_crate, m_slot, m_channel, (val == "ON"));
+  std::string state = HVMessage::getStateText((HVMessage::State)m_callback.getState(m_crate, m_slot, m_channel));
+  std::string vname = StringUtil::replace(getName(), "switch", "state");
+  m_callback.set(vname, state);
   HV_HANDLE_POST;
 }
 

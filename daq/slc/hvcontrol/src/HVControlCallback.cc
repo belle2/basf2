@@ -136,7 +136,8 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
       const HVChannel& channel(*ichannel);
       int slot = channel.getSlot();
       int ch = channel.getChannel();
-      int state = getState(crateid, slot, ch);
+      std::string state = HVMessage::getStateText((HVMessage::State)getState(crateid, slot, ch));
+      LogFile::debug("state[%d][%d][%d] = %s", crateid, slot, ch, state.c_str());
       float vmon = getVoltageMonitor(crateid, slot, ch);
       float cmon = getCurrentMonitor(crateid, slot, ch);
       std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);

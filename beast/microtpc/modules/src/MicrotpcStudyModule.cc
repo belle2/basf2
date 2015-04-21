@@ -55,9 +55,6 @@ MicrotpcStudyModule::MicrotpcStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Microtpcs (BEAST)");
 
-  // Parameter definitions
-  //addParam("sampleTime", m_sampletime, "Length of sample, in us", 10000);
-
 }
 
 MicrotpcStudyModule::~MicrotpcStudyModule()
@@ -98,20 +95,7 @@ void MicrotpcStudyModule::defineHisto()
     h_tvp_O[i]  = new TH2F(TString::Format("h_tvp_O_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_O[i]  = new TH2F(TString::Format("h_wtvp_O_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
   }
-  /*
-  h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 8, -0.5, 7.5);
-  h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 8, -0.5, 7.5);
 
-  h_Edep1H3H =       new TH1F("Edep1H3H"     , "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
-  h_Edep1H3H_detNB = new TH1F("Edep1H3H_tube", "Energy deposited by Proton and Tritium in each tube;Tube Num; MeV", 8, -0.5, 7.5);
-  h_Edep1H =         new TH1F("Edep1H"       , "Energy deposited by Protons;MeV", 100, 0, 0.7);
-  h_Edep3H =         new TH1F("Edep3H"       , "Energy deposited by Tritiums;MeV", 100, 0, 0.4);
-  h_TotEdep =        new TH1F("TotEdep"      , "Total energy deposited;MeV", 100, 0, 1.5);
-  h_DetN_Edep =      new TH1F("DetN_Edep"    , "Energy deposited vs detector number;Tube Num;MeV", 8, -0.5, 7.5);
-
-  h_PulseHeights_NotNeutron = new TH1F("PulseHeights_NotNeutron", "Pulse height of waveforms from non-neutron events", 100, 0, 1);
-  h_PulseHeights_Neutron =    new TH1F("PulseHeights_Neutron"   , "Pulse height of waveforms from neutron events", 100, 0, 1);
-  */
 }
 
 

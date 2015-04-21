@@ -127,11 +127,6 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcRecoTrack> Tracks;
 
   //Initialize recoil and hit type counters
-  bool xRec[8];
-  bool pRec[8];
-  bool HeRec[8];
-  bool ORec[8];
-  bool CRec[8];
   for (int i = 0; i < 8; i++) {
     xRec[i] = false;
     pRec[i] = false;

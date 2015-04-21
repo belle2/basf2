@@ -115,7 +115,16 @@ namespace Belle2 {
       TH2F* h_wtvp_C[8];
       /** Phi v. theta, weighted per TPC for X-ray */
       TH2F* h_wtvp_x[8];
-
+      /** X-ray boolean per TPC */
+      Bool_t xRec[8];
+      /** p boolean per TPC */
+      Bool_t pRec[8];
+      /** He boolean per TPC */
+      Bool_t HeRec[8];
+      /** O boolean per TPC */
+      Bool_t ORec[8];
+      /** C boolean per TPC */
+      Bool_t CRec[8];
 
       /** Number of proton recoils */
       //int npRecoils = 0;

@@ -44,7 +44,8 @@ namespace Belle2 {
        * @param methods vector of Method
        * @param useExistingData if correct TFile and TTree exists already exists, use the stored samples for training
        */
-      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight, std::vector<Method> methods, bool useExistingData = false);
+      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight, std::vector<Method> methods,
+              bool useExistingData = false);
 
       /**
        * Destructor
@@ -75,6 +76,13 @@ namespace Belle2 {
       void addClassSample(const Particle* particle, int classid);
 
       /**
+       * Set a variable `branchName` for all samples that are already in the tree. If a branch with this name exists, it will be replaced. Otherwise, it will be added.
+       * @param branchName Name of the variable the
+       * @param values Float values that should be assigned to the samples. Have to be ordered like the samples that reside in the tree. If the Teacher was invoked with `useExistingData`, remember that there are entries in the tree before the ones that are added with `addSample` or `addClassSample`.
+       */
+      void setVariable(const std::string branchName, const std::vector<float>& values);
+
+      /**
        * Writes tree to a file
        */
       void writeTree();
@@ -85,16 +93,19 @@ namespace Belle2 {
        * @param prepareOption options which are passed to the TMVA::Factory::PrepareTrainingAndTestTree, in most cases default options should be fine.
        * @param maxEventsPerClass maximum number of events given to TMVA per class. TMVA internally uses a vector instead of a tree and therefore looses out-of-core ability.
        */
-      void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification", std::string prepareOption = "SplitMode=random:!V", unsigned long int maxEventsPerClass = 0);
+      void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification",
+                 std::string prepareOption = "SplitMode=random:!V", unsigned long int maxEventsPerClass = 0);
 
     private:
       /**
        * Train a class against the rest and return ptree with the configuration of the resulting trainig.
        */
-      boost::property_tree::ptree trainClass(std::string factoryOption, std::string prepareOption, std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass);
+      boost::property_tree::ptree trainClass(std::string factoryOption, std::string prepareOption,
+                                             std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass);
 
     private:
-      std::string m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */
+      std::string
+      m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */
       std::string m_workingDirectory; /**< workingDirectory where the config file and weight file directory is stored */
       std::vector<Method> m_methods; /**< Name, Type and Config of methods */
 

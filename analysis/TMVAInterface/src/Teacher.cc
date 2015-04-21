@@ -32,11 +32,12 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight, std::vector<Method> methods, bool useExistingData) : m_prefix(prefix),
+    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight,
+                     std::vector<Method> methods, bool useExistingData) : m_prefix(prefix),
       m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree("", DataStore::c_Persistent)
     {
 
-      // Change the workling directory to the user defined working directory
+      // Change the working directory to the user defined working directory
       std::string oldDirectory = gSystem->WorkingDirectory();
       gSystem->ChangeDirectory(m_workingDirectory.c_str());
 
@@ -126,13 +127,13 @@ namespace Belle2 {
     void Teacher::addSample(const Particle* particle)
     {
       // The target variable is converted to an integer
-      m_target = int(m_target_var->function(particle) + 0.5);
+      m_target = static_cast<int>(m_target_var->function(particle) + 0.5);
       addClassSample(particle, m_target);
     }
 
     void Teacher::addClassSample(const Particle* particle, int classid)
     {
-      // Change the workling directory to the user defined working directory
+      // Change the working directory to the user defined working directory
       std::string oldDirectory = gSystem->WorkingDirectory();
       gSystem->ChangeDirectory(m_workingDirectory.c_str());
 
@@ -150,7 +151,8 @@ namespace Belle2 {
       for (unsigned int i = 0; i < spectators.size(); ++i) {
         m_input[i + variables.size()] = spectators[i]->function(particle);
         if (!std::isfinite(m_input[i + variables.size()])) {
-          B2ERROR("Output of spectator " << variables[i]->name << " is " << m_input[i + variables.size()] << ", please fix it. Candidate will be skipped.");
+          B2ERROR("Output of spectator " << variables[i]->name << " is " << m_input[i + variables.size()] <<
+                  ", please fix it. Candidate will be skipped.");
           return;
         }
       }
@@ -158,7 +160,7 @@ namespace Belle2 {
       // The target variable is converted to an integer
       m_target = classid;
 
-      //Calculate weight of this candidate/event
+      // Calculate weight of this candidate/event
       m_weight = m_weight_var->function(particle);
 
       m_tree->get().Fill();
@@ -166,10 +168,64 @@ namespace Belle2 {
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
+    void Teacher::setVariable(const std::string branchName, const std::vector<float>& values)
+    {
+      std::cout << "Teacher: Set values of branch " << branchName << std::endl;
+      if (m_tree->get().GetEntries() >= 0) {
+        if (ULong64_t(m_tree->get().GetEntries()) != values.size()) {
+          B2FATAL("setVariable(" << branchName << ", ...): Not the right number of values provided. The tree contains " <<
+                  m_tree->get().GetEntries() << " entries, the provided vector contains " << values.size() << ".");
+        }
+      } else {
+        B2FATAL("setVariable(" << branchName << ", ...): Tree inside Teacher has negative number of entries.");
+      }
+
+      // The tree will be cloned into the same file.
+      // TODO: Is this necessary?
+      m_file->cd();
+
+      // Enable all existing branches except `branchName`, suppressing the
+      // error message in case the branch does not yet exist.
+      UInt_t suppressErrorMessage;
+      m_tree->get().SetBranchStatus("*", 1);
+      m_tree->get().SetBranchStatus(branchName.c_str(), 0);//, &suppressErrorMessage);
+
+      // Clone the tree and set a new name.
+      //   If the name is not set to something different than the
+      //   original tree, file->Delete() can not distinguish between
+      //   them.
+      // TODO: decide if the option 'fast' can/should be chosen.
+      TTree* newTree = m_tree->get().CloneTree();
+      std::string oldTreeName = m_tree->get().GetName();
+      std::string newTreeName = oldTreeName + std::string("_new");
+      newTree->SetName(newTreeName.c_str());
+
+      // Add new branch and fill it. It is already checked that `values` has enough entries.
+      float value;
+      TBranch* newBranch = newTree->Branch(branchName.c_str(), &value);
+      for (auto& v : values) {
+        value = v;
+        newBranch->Fill();
+      }
+
+      // Use the new tree, delete the old one from the file, assign same name to new tree.
+      // Remember: now the file is twice as big, as ROOT doesn't rewrite it.
+      // TODO: decide if we want to write a new file, to get rid of the overhead. Can we
+      // clone the tree directly into a new file?
+      m_tree->assign(newTree);
+      std::string namecycle = oldTreeName + std::string(";*");
+      m_file->Delete(namecycle.c_str());
+      m_tree->get().SetName(oldTreeName.c_str());
+
+      // Write using RootMergeable.
+      // TODO: why does this line break the tree? without it, everything works.
+      //m_tree->write(m_file);
+    }
+
     void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned long int maxEventsPerClass)
     {
 
-      // Change the workling directory to the user defined working directory
+      // Change the working directory to the user defined working directory
       std::string oldDirectory = gSystem->WorkingDirectory();
       gSystem->ChangeDirectory(m_workingDirectory.c_str());
 
@@ -192,7 +248,7 @@ namespace Belle2 {
       // Calculate the total number of events
       std::vector<int> classesWhichReachedMaximum;
       unsigned long int total = 0;
-      for (auto & x : cluster_count) {
+      for (auto& x : cluster_count) {
         if (maxEventsPerClass != 0 and x.second > maxEventsPerClass) {
           classesWhichReachedMaximum.push_back(x.first);
         }
@@ -201,7 +257,7 @@ namespace Belle2 {
 
       // Add to the output config xml file the different clusters and their fractions
       boost::property_tree::ptree pt;
-      for (auto & x : cluster_count) {
+      for (auto& x : cluster_count) {
         boost::property_tree::ptree node;
         node.put("ID", x.first);
         node.put("Count", x.second);
@@ -213,10 +269,10 @@ namespace Belle2 {
 
       // Remove constant variables from all methods,
       // this is a common problem using TMVA. TMVA checks if a variable is constant
-      // and exits the programm if this is the case!
+      // and exits the programme if this is the case!
       // We need to prevent this, therefore we remove all constant variables here.
       std::vector<std::string> cleaned_variables;
-      for (auto & x : m_methods[0].getVariables()) {
+      for (auto& x : m_methods[0].getVariables()) {
         std::string varname = Variable::makeROOTCompatible(x->name);
         if (m_tree->get().GetMinimum(varname.c_str()) < m_tree->get().GetMaximum(varname.c_str())) {
           cleaned_variables.push_back(x->name);
@@ -226,38 +282,39 @@ namespace Belle2 {
       }
 
       std::vector<std::string> spectator_names;
-      for (auto & x : m_methods[0].getSpectators()) {
+      for (auto& x : m_methods[0].getSpectators()) {
         spectator_names.push_back(x->name);
       }
 
-      for (auto & method : m_methods) {
+      for (auto& method : m_methods) {
         method = Method(method.getName(), method.getTypeAsString(), method.getConfig(), cleaned_variables, spectator_names);
       }
 
-      for (auto & x : m_methods[0].getVariables()) {
+      for (auto& x : m_methods[0].getVariables()) {
         boost::property_tree::ptree node;
         node.put("Name", x->name);
         pt.add_child("Setup.Variables.Variable", node);
       }
 
-      for (auto & x : m_methods[0].getSpectators()) {
+      for (auto& x : m_methods[0].getSpectators()) {
         boost::property_tree::ptree node;
         node.put("Name", x->name);
         pt.add_child("Setup.Spectators.Spectator", node);
       }
 
       if (cluster_count.size() <= 1) {
-        B2FATAL("Found less than two clusters in sample, no training necessary!");
+        B2ERROR("Found less than two clusters in sample, no training necessary!")
+        return;
       } else if (cluster_count.size() ==  2) {
         int maxId = cluster_count.begin()->first;
-        for (const auto & pair : cluster_count) {
+        for (const auto& pair : cluster_count) {
           if (pair.first > maxId)
             maxId = pair.first;
         }
         auto node = trainClass(factoryOption, prepareOption, cluster_count, maxEventsPerClass, maxId);
         pt.add_child("Setup.Trainings.Training", node);
       } else {
-        for (const auto & pair : cluster_count) {
+        for (const auto& pair : cluster_count) {
           auto node = trainClass(factoryOption, prepareOption, cluster_count, maxEventsPerClass, pair.first);
           pt.add_child("Setup.Trainings.Training", node);
         }
@@ -270,10 +327,12 @@ namespace Belle2 {
 #endif
 
       boost::property_tree::xml_parser::write_xml(m_prefix + ".config", pt, std::locale(), settings);
+
       gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
-    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption, std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass)
+    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption,
+                                                    std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass)
     {
 
       std::stringstream signal;
@@ -289,11 +348,11 @@ namespace Belle2 {
       TMVA::Factory factory(jobName, &classFile, factoryOption);
 
       // Add variables to the factory
-      for (auto & var : m_methods[0].getVariables()) {
+      for (auto& var : m_methods[0].getVariables()) {
         factory.AddVariable(Variable::makeROOTCompatible(var->name));
       }
 
-      for (auto & var : m_methods[0].getSpectators()) {
+      for (auto& var : m_methods[0].getSpectators()) {
         factory.AddSpectator(Variable::makeROOTCompatible(var->name));
       }
 
@@ -305,7 +364,7 @@ namespace Belle2 {
       auto backgroundCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " != " + signal.str()).c_str());
       unsigned long int backgroundEvents = 0;
       if (maxEventsPerClass == 0) {
-        for (const auto & pair : cluster_count) {
+        for (const auto& pair : cluster_count) {
           if (pair.first != signalClass)
             backgroundEvents += pair.second;
         }
@@ -314,11 +373,11 @@ namespace Belle2 {
       }
 
       // Copy Events from original tree to new signal and background tree.
-      // Unfortunatly this is necessary because TMVA internally uses vectors to store the data,
+      // Unfortunately this is necessary because TMVA internally uses vectors to store the data,
       // therefore TMVA looses its out-of-core capability.
       // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
       // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
-      // if one has many backgruond events.
+      // if one has many background events.
       if ((unsigned long int)m_tree->get().GetEntries(signalCut) > maxEventsPerClass)
         factory.AddSignalTree(m_tree->get().CopyTree(signalCut)->CopyTree("", "", signalEvents));
       else
@@ -330,13 +389,14 @@ namespace Belle2 {
       factory.PrepareTrainingAndTestTree("", prepareOption);
 
       // Append the trained methods to the config xml file
-      for (auto & method : m_methods) {
+      for (auto& method : m_methods) {
         boost::property_tree::ptree method_node;
         method_node.put("SignalID", signalClass);
         method_node.put("MethodName", method.getName());
         method_node.put("MethodType", method.getTypeAsString());
         method_node.put("Samplefile", m_prefix + ".root");
-        method_node.put("Weightfile", std::string("weights/") + jobName + std::string("_") + method.getName() + std::string(".weights.xml"));
+        method_node.put("Weightfile", std::string("weights/") + jobName + std::string("_") + method.getName() +
+                        std::string(".weights.xml"));
         factory.BookMethod(method.getType(), method.getName(), method.getConfig());
         node.add_child("Methods.Method", method_node);
       }

@@ -205,8 +205,13 @@ namespace Belle2 {
   {
     if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
-      Int_t numberOfEvents = m_discriminating_values->numEntries();
-      Int_t numberOfEntries = m_numberOfClasses * numberOfEvents;
+      UInt_t numberOfEvents;
+      if (m_discriminating_values->numEntries() < 0) {
+        B2FATAL("TMVASPlotTeacher: Number of events is less than zero (" << m_discriminating_values->numEntries() << ")");
+      } else {
+        numberOfEvents = static_cast<UInt_t>(m_discriminating_values->numEntries());
+      }
+      UInt_t numberOfEntries = m_numberOfClasses * numberOfEvents;
       std::cout << "SPlot: number of events: " << numberOfEvents << ", number of entries: " << numberOfEntries << std::endl;
 
       // Create a new workspace to manage the project.
@@ -270,8 +275,8 @@ namespace Belle2 {
         RooRealVar* discriminating_variable = m_wspace->var(m_discriminatingVariables[0].c_str());
         std::cout << "SPlot: Generating plot for discriminating variable " << m_discriminatingVariables[0].c_str() << "." << std::endl;
 
-        // TODO: why is it not in batch mode now, when it was two days ago!?
-        // Maybe since the classical teacher is in my steering file?
+        // Set ROOT batch mode to true, so it does not show the GUI
+        // while the fit is plotted.
         bool batchMode = gROOT->IsBatch();
         bool batchModeChanged = false;
         if (batchMode == kFALSE) {
@@ -297,6 +302,7 @@ namespace Belle2 {
         img->FromPad(canvas);
         img->WriteImage(pngFileName.c_str());
 
+        // Reset ROOT batch mode to the previous value.
         if (batchModeChanged) {
           gROOT->SetBatch(batchMode);
           std::cout << "TMVASPlotTeacher: Setting ROOT batch mode back to kFALSE" << std::endl;
@@ -307,6 +313,7 @@ namespace Belle2 {
 
       std::cout << "SPlot: number of entries: " << m_discriminating_values->numEntries() << std::endl;
 
+      // This is used in the RooStat::SPlot tutorial.
       //std::cout << "SPlot: silence RooMsgService" << std::endl;
       //bool silentModeBefore = RooMsgService::instance().silentMode();
       //RooMsgService::instance().setSilentMode(true);
@@ -315,6 +322,7 @@ namespace Belle2 {
         std::cout << "SPlot: call SPlot" << std::endl;
         RooStats::SPlot* sData = new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *m_discriminating_values, m_model, *m_yields);
 
+        // This is used in the RooStat::SPlot tutorial.
         //std::cout << "SPlot: reset verbose status of RooMsgService" << std::endl;
         //RooMsgService::instance().setSilentMode(silentModeBefore);
 
@@ -328,7 +336,7 @@ namespace Belle2 {
         }
         std::cout << "." << std::endl;
 
-        if (sWeightedVars.getSize() != m_numberOfClasses) {
+        if (sWeightedVars.getSize() != static_cast<int>(m_numberOfClasses)) {
           B2FATAL("TMVASPlotTeacher: The SPlot algorithm did not succeed, the number of classes for which sWeights were calculated doesn't match with the number of classes.");
         }
 
@@ -336,7 +344,6 @@ namespace Belle2 {
         // For each event, a weight needs to be retrieved for each class
         for (UInt_t i = 0; i < numberOfEvents; i++) {
           for (UInt_t j = 0; j < m_numberOfClasses; j++) {
-            // TODO: Fill a tree with discriminating values and weights, for the user to play with
             // Get the name of the j-th coefficient from the model
             weights[2 * i + j] = sData->GetSWeight(i, m_yields->at(j)->GetName());
           }

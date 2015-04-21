@@ -30,7 +30,7 @@ V0::V0(const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairPositi
   m_trackFitResultIndexNegative(trackPairNegative.second->getArrayIndex())
 {}
 
-Const::ParticleType V0::getV0Hypothesis()
+Const::ParticleType V0::getV0Hypothesis() const
 {
   StoreArray<TrackFitResult> trackFitResults;
   const auto posParticleType = trackFitResults[m_trackFitResultIndexPositive]->getParticleType();

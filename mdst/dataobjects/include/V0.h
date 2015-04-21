@@ -32,34 +32,34 @@ namespace Belle2 {
        const std::pair<Belle2::Track*, Belle2::TrackFitResult*>& trackPairNegative);
 
     /** Get pair of  yhe Tracks, that are part of the V0 particle.*/
-    std::pair<Track*, Track*> getTracks()
+    std::pair<Track*, Track*> getTracks() const
     {
       StoreArray<Track> tracks;
       return std::make_pair(tracks[m_trackIndexPositive], tracks[m_trackIndexNegative]);
     }
 
     /** Get indices of the Tracks, that are part of the V0 particle. */
-    std::pair<short, short> getTrackIndices()
+    std::pair<short, short> getTrackIndices() const
     {
       return std::make_pair(m_trackIndexPositive, m_trackIndexNegative);
     }
 
     /** Get pair of the TrackFitResults, that are part of the V0 particle.*/
-    std::pair<TrackFitResult*, TrackFitResult*> getTrackFitResults()
+    std::pair<TrackFitResult*, TrackFitResult*> getTrackFitResults() const
     {
       StoreArray<TrackFitResult> trackFitResults;
       return std::make_pair(trackFitResults[m_trackFitResultIndexPositive], trackFitResults[m_trackFitResultIndexNegative]);
     }
 
     /** Get indices of the TrackFitResults, that are part of the V0 particle. */
-    std::pair<short, short> getTrackFitResultIndices()
+    std::pair<short, short> getTrackFitResultIndices() const
     {
       return std::make_pair(m_trackFitResultIndexPositive, m_trackFitResultIndexNegative);
     }
 
     /** Get the hypothesis under which the V0 particle was created.
      * This does not use an MC information, but just checks the particle type in the corresponding TrackFitResults.*/
-    Const::ParticleType getV0Hypothesis();
+    Const::ParticleType getV0Hypothesis() const;
 
   private:
     /** Indicates which positively charged track was used for this V0. */

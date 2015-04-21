@@ -39,7 +39,7 @@ set_random_seed(123456)
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22],
-    'nTracks': 1,
+    'nTracks': 0,
     'momentumGeneration': 'fixed',
     'momentumParams': [1],
     'thetaGeneration': 'uniform',

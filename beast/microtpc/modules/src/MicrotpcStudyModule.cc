@@ -64,7 +64,7 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcStudyModule::defineHisto()
 {
-  for (int i = 0 ; i < 3 ; i++) {
+  for (int i = 0 ; i < 8 ; i++) {
     h_evtrl[i] = new TH2F(TString::Format("h_evtrl_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0., 6.);
     //h_evtrl_x[i] = new TH2F(TString::Format("h_evtrl_x_%d",i),"Deposited energy [keV] v. track length [cm]",2000,0.,2000,200,0.,6.);
     h_evtrl_Hex[i] = new TH2F(TString::Format("h_evtrl_Hex_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200,

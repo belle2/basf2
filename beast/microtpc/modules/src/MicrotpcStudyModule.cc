@@ -66,6 +66,8 @@ void MicrotpcStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 8 ; i++) {
     h_evtrl[i] = new TH2F(TString::Format("h_evtrl_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0., 6.);
+    h_evtrl_p[i] = new TH2F(TString::Format("h_evtrl_p_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0.,
+                            6.);
     //h_evtrl_x[i] = new TH2F(TString::Format("h_evtrl_x_%d",i),"Deposited energy [keV] v. track length [cm]",2000,0.,2000,200,0.,6.);
     h_evtrl_Hex[i] = new TH2F(TString::Format("h_evtrl_Hex_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200,
                               0., 6.);
@@ -143,6 +145,7 @@ void MicrotpcStudyModule::event()
     MicrotpcSimHit* aHit = SimHits[i];
     int detNb = aHit->getdetNb();
     int PDGid = aHit->gettkPDG();
+    cout << "detNb " << detNb << " pdg " << PDGid << endl;
     if (fabs(PDGid) == 11 || PDGid == 22) xRec[detNb] = true;
     if (PDGid == 2212) pRec[detNb] = true;
     if (PDGid == 1000020040) HeRec[detNb] = true;

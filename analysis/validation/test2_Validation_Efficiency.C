@@ -135,7 +135,6 @@ bool check_for_duplicate( std::vector<TLorentzVector> all_evt_tracks, TLorentzVe
 void test2_Validation_Efficiency_Track_Truth(TString filename, TList* list) {
     TChain* tree = new TChain("chain");
     tree->Add(Form("%s/truthpituple",filename.Data()));
-    tree->Add(Form("%s/truthpituplem",filename.Data()));
 
     float pi_P4[4];
     int iCand;

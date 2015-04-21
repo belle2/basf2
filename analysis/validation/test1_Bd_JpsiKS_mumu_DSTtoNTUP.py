@@ -52,13 +52,13 @@ ntupleTree('Bd_JpsiKS_tuple', 'B0', tools)
 # dump all event summary information
 eventtools = [
     'EventMetaData',
-    'B-',
+    'B0',
     'RecoStats',
-    'B-',
+    'B0',
     'DetectorStatsRec',
-    'B-',
+    'B0',
     'DetectorStatsSim',
-    'B-']
+    'B0']
 
 ntupleTree('eventtuple', '', eventtools)
 

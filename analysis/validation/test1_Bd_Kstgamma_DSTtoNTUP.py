@@ -45,7 +45,7 @@ tools = [
     'B0 -> [K*0 -> ^K+ ^pi-] ^gamma',
     'PID',
     'B0 -> [K*0 -> ^K+ ^pi-] gamma',
-    ]
+]
 
 ntupleTree('Bd_Kstgamma_tuple', 'B0', tools)
 
@@ -53,14 +53,14 @@ ntupleTree('Bd_Kstgamma_tuple', 'B0', tools)
 # dump all event summary information
 eventtools = [
     'EventMetaData',
-    'B-',
+    'B0',
     'RecoStats',
-    'B-',
+    'B0',
     'DetectorStatsRec',
-    'B-',
+    'B0',
     'DetectorStatsSim',
-    'B-',
-    ]
+    'B0',
+]
 
 ntupleTree('eventtuple', '', eventtools)
 
@@ -71,4 +71,3 @@ process(analysis_main)
 
 # ----> Print call statistics
 print statistics
-

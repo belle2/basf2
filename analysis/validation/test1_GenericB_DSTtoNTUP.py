@@ -17,25 +17,18 @@ from stdFSParticles import *
 from stdLooseFSParticles import *
 from stdLightMesons import *
 
-# filelistMix = \
-#    ['/group/belle2/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s00/mixed_e0001r000*_s00_BGx1.mdst.root'
-#     ]
-# filelistChg = \
-#    ['/group/belle2/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s00/charged_e0001r000*_s00_BGx1.mdst.root'
-#     ]
-# filelist = filelistMix + filelistChg
-# inputMdstList(filelist)
-
 inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
 stdFSParticles()
 stdLooseFSParticles()
 stdLightMesons()
+stdVeryLoosePi()
 
 # ----> NtupleMaker module
 ntupleFile('../GenericB.ntup.root')
+
 ##########
 # Save the tracks to ntuple
-recotools = [
+recoToolsPi = [
     'EventMetaData',
     '^pi+',
     'Kinematics',
@@ -50,13 +43,11 @@ recotools = [
     '^pi+',
     'PID',
     '^pi+',
-    ]
-ntupleTree('pituple', 'pi+:all', recotools)
+]
+ntupleTree('pituple', 'pi+:all', recoToolsPi)
 # Save the truth tracks to ntuple
-# findMCDecay doesn't yet save complex conjugate mode, this is why I have 2 lists
-findMCDecay('truthPi+', 'pi+')
-findMCDecay('truthPi-', 'pi-')
-truthtools = [
+fillParticleListFromMC('pi+:gen', '')
+truthToolsPi = [
     'EventMetaData',
     '^pi+',
     'Kinematics',
@@ -69,12 +60,12 @@ truthtools = [
     '^pi+',
     'MCHierarchy',
     '^pi+',
-    ]
-ntupleTree('truthpituple', 'truthPi+', truthtools)
-ntupleTree('truthpituplem', 'truthPi-', truthtools)
+]
+ntupleTree('truthpituple', 'pi+:gen', truthToolsPi)
 
+###########
 # Save the photons to ntuple
-recotoolsGamma = [
+recoToolsGamma = [
     'EventMetaData',
     '^gamma',
     'Kinematics',
@@ -87,10 +78,11 @@ recotoolsGamma = [
     '^gamma',
     'Cluster',
     '^gamma',
-    ]
-ntupleTree('gammatuple', 'gamma:all', recotoolsGamma)
-findMCDecay('truthGamma', 'gamma')
-truthtoolsGamma = [
+]
+ntupleTree('gammatuple', 'gamma:all', recoToolsGamma)
+# Save the truth photons to ntuple
+fillParticleListFromMC('gamma:gen', '')
+truthToolsGamma = [
     'EventMetaData',
     '^gamma',
     'Kinematics',
@@ -103,13 +95,13 @@ truthtoolsGamma = [
     '^gamma',
     'MCHierarchy',
     '^gamma',
-    ]
-ntupleTree('truthgammatuple', 'truthGamma', truthtoolsGamma)
+]
+ntupleTree('truthgammatuple', 'gamma:gen', truthToolsGamma)
 
 ###########
 # check the pi0 list for resolution etc.
 matchMCTruth('pi0:all')
-pi0tools = [
+recoToolsPi0 = [
     'EventMetaData',
     '^pi0',
     'MCTruth',
@@ -124,10 +116,13 @@ pi0tools = [
     'pi0 -> ^gamma ^gamma',
     'MCHierarchy',
     'pi0 -> ^gamma ^gamma',
-    ]
-ntupleTree('pi0tuple', 'pi0:all', pi0tools)
-findMCDecay('truthpi0', 'pi0 => gamma gamma')
-pi0truthtools = [
+]
+ntupleTree('pi0tuple', 'pi0:all', recoToolsPi0)
+# Save the truth pi0s to ntuple
+reconstructDecay('pi0:gen -> gamma:gen gamma:gen', '0.1 < M < 0.15')
+matchMCTruth('pi0:gen')
+applyCuts('pi0:gen', 'isSignal > 0.5')
+truthToolsPi0 = [
     'EventMetaData',
     '^pi0',
     'Kinematics',
@@ -136,12 +131,13 @@ pi0truthtools = [
     '^pi0',
     'MCReconstructible',
     'pi0 -> ^gamma ^gamma',
-    ]
-ntupleTree('truthpi0tuple', 'truthpi0', pi0truthtools)
+]
+ntupleTree('truthpi0tuple', 'pi0:gen', truthToolsPi0)
 
+##########
 # Check the KS0 candidates
 matchMCTruth('K_S0:loose')
-kstools = [
+recoToolsKs = [
     'EventMetaData',
     '^K_S0',
     'MCTruth',
@@ -154,15 +150,8 @@ kstools = [
     'K_S0 -> ^pi- ^pi+',
     'MCVertex',
     'K_S0 -> ^pi- ^pi+',
-    ]
-ntupleTree('kstuple', 'K_S0:loose', kstools)
-
-##########
-# StdPhi must be added
-# check the Phi candidates
-# matchMCTruth('StdPhi')
-# phitools = [    'EventMetaData',    '^phi',    'MCTruth',    '^phi -> ^K- ^K+',    'Kinematics',    '^phi -> ^K- ^K+',    ]
-# ntupleTree('phituple', 'StdPhi', phitools)
+]
+ntupleTree('kstuple', 'K_S0:loose', recoToolsKs)
 
 ##########
 # dump all event summary information
@@ -175,11 +164,8 @@ eventtools = [
     '^B-',
     'DetectorStatsSim',
     '^B-',
-    ]
+]
 ntupleTree('eventtuple', '', eventtools)
-
-# summaryOfLists(['StdPhi', 'K_S0:loose'])
-summaryOfLists(['K_S0:loose'])
 
 # ----> start processing of modules
 process(analysis_main)

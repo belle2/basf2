@@ -82,21 +82,21 @@ void MicrotpcStudyModule::defineHisto()
                                   2000, 200, 0., 6.);
 
     h_tvp[i]  = new TH2F(TString::Format("h_tvp_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
-    h_wtvp[i]  = new TH2F(TString::Format("h_tvp_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
+    h_wtvp[i]  = new TH2F(TString::Format("h_wtvp_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_p[i]  = new TH2F(TString::Format("h_tvp_p_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
-    h_wtvp_p[i]  = new TH2F(TString::Format("h_tvp_p_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
+    h_wtvp_p[i]  = new TH2F(TString::Format("h_wtvp_p_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_He[i]  = new TH2F(TString::Format("h_tvp_He_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
-    h_wtvp_He[i]  = new TH2F(TString::Format("h_tvp_He_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
+    h_wtvp_He[i]  = new TH2F(TString::Format("h_wtvp_He_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_Hex[i]  = new TH2F(TString::Format("h_tvp_Hex_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
-    h_wtvp_Hex[i]  = new TH2F(TString::Format("h_tvp_Hex_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180.,
+    h_wtvp_Hex[i]  = new TH2F(TString::Format("h_wtvp_Hex_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180.,
                               180.);
     h_tvp_He_pure[i]  = new TH2F(TString::Format("h_tvp_He_pure_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_He_pure[i]  = new TH2F(TString::Format("h_tvp_He_pure_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360,
                                   -180., 180.);
     h_tvp_C[i]  = new TH2F(TString::Format("h_tvp_C_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
-    h_wtvp_C[i]  = new TH2F(TString::Format("h_tvp_C_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
+    h_wtvp_C[i]  = new TH2F(TString::Format("h_wtvp_C_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_O[i]  = new TH2F(TString::Format("h_tvp_O_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
-    h_wtvp_O[i]  = new TH2F(TString::Format("h_tvp_O_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
+    h_wtvp_O[i]  = new TH2F(TString::Format("h_wtvp_O_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
   }
   /*
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 8, -0.5, 7.5);

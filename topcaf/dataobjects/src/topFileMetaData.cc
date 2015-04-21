@@ -1,4 +1,5 @@
 #include <topcaf/dataobjects/topFileMetaData.h>
+#include <framework/conditions/ConditionsService.h>
 #include <framework/logging/Logger.h>
 #include <TString.h>
 
@@ -39,5 +40,6 @@ void topFileMetaData::set(std::string dir, std::string filename)
   m_run = run;
   m_runtype = runtype;
 
-  B2INFO("top file meta data " << m_dir << m_filename << "; experiment: " << m_experiment << "\trun: " << m_run << "\trun type: " << runtype);
+  B2INFO("top file meta data " << m_dir << m_filename << "; experiment: " << m_experiment << "\trun: " << m_run << "\trun type: " <<
+         runtype);
 }

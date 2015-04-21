@@ -65,9 +65,11 @@ namespace Belle2 {
 
     /**
      * select how to resolve the left/right ambiguity:
-     * -1: negative (left) side on vector (track direction) x (wire direction)
+     * -1: negative (left) side on vector (wire direction) x (track direction)
      * 0: mirrors enter with same weight, DAF will decide.
-     * 1: positive (right) side on vector (track direction) x (wire direction)
+     * 1: positive (right) side on vector (wire direction) x (track direction)
+     * where the wire direction is pointing towards +z except for small
+     * corrections such as stereo angle, sagging
      */
     virtual void setLeftRightResolution(int lr) { m_leftRight = lr; }
 

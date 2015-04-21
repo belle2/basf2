@@ -188,7 +188,7 @@ namespace Belle2 {
       // error message in case the branch does not yet exist.
       UInt_t suppressErrorMessage;
       m_tree->get().SetBranchStatus("*", 1);
-      m_tree->get().SetBranchStatus(branchName.c_str(), 0);//, &suppressErrorMessage);
+      m_tree->get().SetBranchStatus(branchName.c_str(), 0, &suppressErrorMessage);
 
       // Clone the tree and set a new name.
       //   If the name is not set to something different than the

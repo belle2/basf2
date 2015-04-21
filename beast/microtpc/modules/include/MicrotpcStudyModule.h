@@ -79,6 +79,8 @@ namespace Belle2 {
       TH2F* h_evtrl_O[8];
       /** Track length v. energy deposited per TPC for C */
       TH2F* h_evtrl_C[8];
+      /** Track length v. energy deposited per TPC for X-ray */
+      TH2F* h_evtrl_x[8];
 
       /** Phi v. theta per TPC */
       TH2F* h_tvp[8];
@@ -94,6 +96,8 @@ namespace Belle2 {
       TH2F* h_tvp_O[8];
       /** Phi v. theta per TPC for C */
       TH2F* h_tvp_C[8];
+      /** Phi v. theta per TPC for X-ray */
+      TH2F* h_tvp_x[8];
 
       /** Phi v. theta, weighted per TPC */
       TH2F* h_wtvp[8];
@@ -109,6 +113,8 @@ namespace Belle2 {
       TH2F* h_wtvp_O[8];
       /** Phi v. theta, weighted per TPC for C */
       TH2F* h_wtvp_C[8];
+      /** Phi v. theta, weighted per TPC for X-ray */
+      TH2F* h_wtvp_x[8];
 
 
       /** Number of proton recoils */

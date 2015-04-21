@@ -144,6 +144,10 @@ namespace Belle2 {
     //! Get timeval
     void GetTTTimeVal(int n, struct timeval* tv);
 
+    /// Format version number
+    enum {
+      DATA_FORMAT_VERSION = 1
+    };
 
     //! header ( not recorded )
     RawHeader_v1 tmp_header;

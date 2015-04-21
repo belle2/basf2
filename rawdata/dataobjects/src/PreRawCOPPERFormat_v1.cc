@@ -471,7 +471,8 @@ unsigned int PreRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id
   //
   memset(m_buffer, 0, sizeof(int) * tmp_header.RAWHEADER_NWORDS);
   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] = tmp_header.RAWHEADER_NWORDS & tmp_header.HDR_NWORDS_MASK;
-  m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (tmp_header.DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT);
+  m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) &
+                                                  tmp_header.FORMAT_VERSION__MASK;
   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (0x80 << tmp_header.FORMAT_VERSION_SHIFT);   // PreFormat
   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= tmp_header.MAGIC_WORD;
 
@@ -1112,8 +1113,10 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
   tmp_header.SetBuffer(packed_buf);
 
   packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
-  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f8000 | ((POST_RAWCOPPER_FORMAT_VER1 << 8) & 0x0000ff00)
+  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f8000
+                                                   | ((DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) & tmp_header.FORMAT_VERSION__MASK)
                                                    | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
+
   packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
                                             | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #

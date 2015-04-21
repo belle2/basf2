@@ -49,9 +49,6 @@ namespace Belle2 {
     //! check if m_buffer exists
     void CheckGetBuffer();
 
-    //! initialize header
-    void Initialize();
-
     //! set contents of header
     void SetNwords(int nwords);
 
@@ -149,7 +146,6 @@ namespace Belle2 {
       Experimental(10bit) #, Run#(14bit), restat# bit mask(8bit)
     */
     enum {
-      DATA_FORMAT_VERSION = 1,
       MAGIC_WORD = 0x7F7F0000,
       MAGIC_MASK = 0xFFFF0000,
       MAGIC_SHIFT = 16,
@@ -244,24 +240,6 @@ namespace Belle2 {
 
   }
 
-
-
-//
-// Set info.
-//
-  inline void RawHeader_latest::Initialize()
-  {
-    CheckSetBuffer();
-    memset(m_buffer, 0, sizeof(int)*RAWHEADER_NWORDS);
-    m_buffer[ POS_VERSION_HDRNWORDS ] |= RAWHEADER_NWORDS & HDR_NWORDS_MASK;
-    m_buffer[ POS_VERSION_HDRNWORDS ] |= (DATA_FORMAT_VERSION << FORMAT_VERSION_SHIFT);
-    m_buffer[ POS_VERSION_HDRNWORDS ] |= MAGIC_WORD;
-  }
-
-  /*   inline void RawHeader_latest::SetMagicWordEntireHeader() */
-  /*   { */
-  /*     m_buffer[ POS_TERM_HEADER ] = MAGIC_WORD_TERM_HEADER; */
-  /*   } */
 
   inline void RawHeader_latest::SetNwords(int nwords)
   {

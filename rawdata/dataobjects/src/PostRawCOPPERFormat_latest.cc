@@ -285,7 +285,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   // Compare CRC16 with B2LCRC16
   //
   buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n,
-                                                             finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_CRC16) + SIZE_B2LHSLB_TRAILER) ;
+                                                             finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_ERRCNT_CRC16) + SIZE_B2LHSLB_TRAILER) ;
 
   if (GetEveNo(n) % 10000 == 0) {
     printf("#### PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,
@@ -350,8 +350,10 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   tmp_header.SetBuffer(packed_buf);
 
   packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
-  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] = 0x7f7f0000 | ((POST_RAWCOPPER_FORMAT_VER1 << 8) & 0x0000ff00)
-                                                   | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
+  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] =
+    0x7f7f0000
+    | ((DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) & tmp_header.FORMAT_VERSION__MASK)
+    | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
   packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
                                             | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
   packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
@@ -403,7 +405,8 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
 
     // Fill b2link FEE trailer
     unsigned int crc16 = 0;
-    packed_buf[ poswords_to + POS_B2LFEE_CRC16 ] = ((0xffff & rawcpr_info.eve_num) << 16) | (crc16 & 0xffff);
+    packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =  crc16 &
+                                                           0xffff; // Error count is stored in this buffer for ver.2 format but it is set to zero here.
     poswords_to += SIZE_B2LFEE_TRAILER;
 
     // Fill b2link HSLB trailer

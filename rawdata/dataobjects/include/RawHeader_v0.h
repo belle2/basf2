@@ -145,7 +145,6 @@ namespace Belle2 {
       Experimental(10bit) #, Run#(14bit), restat# bit mask(8bit)
     */
     enum {
-      DATA_FORMAT_VERSION = 0,
       FORMAT_VERSION__MASK = 0x0000FF00,
       FORMAT_VERSION_SHIFT = 8
     };

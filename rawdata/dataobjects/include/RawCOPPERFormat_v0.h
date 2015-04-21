@@ -220,6 +220,10 @@ namespace Belle2 {
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info);
 
+    enum {
+      DATA_FORMAT_VERSION = 0
+    };
+
     //
     // size of "COPPER front header" and "COPPER trailer"
     //

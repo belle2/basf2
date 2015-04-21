@@ -188,7 +188,7 @@ namespace Belle2 {
 
     // Data Format : B2Link FEE Trailer
     enum {
-      POS_B2LFEE_CRC16 = 0,
+      POS_B2LFEE_ERRCNT_CRC16 = 0,
       SIZE_B2LFEE_TRAILER = 1
     };
 

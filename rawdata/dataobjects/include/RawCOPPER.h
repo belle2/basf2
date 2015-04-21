@@ -19,6 +19,8 @@
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/RawCOPPERFormat_v0.h>
+#include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
+#include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <framework/datastore/DataStore.h>
 #include <rawdata/RawCOPPERPackerInfo.h>
@@ -37,7 +39,7 @@ using namespace std;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //
 // The latest DAQformat version number
-#define LATEST_POSTREDUCTION_FORMAT_VER 1
+#define LATEST_POSTREDUCTION_FORMAT_VER 2 // Since Apr. 21, 2015
 //
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

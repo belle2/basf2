@@ -47,15 +47,23 @@ void RawCOPPER::SetVersion()
   switch (m_version) {
     case LATEST_POSTREDUCTION_FORMAT_VER :
       m_access = new PostRawCOPPERFormat_latest;
-      //      printf("########################## PostRawCOPPERFormat_latest\n");
+      //            printf("Calling PostRawCOPPERFormat_latest\n");
       break;
     case (0x80 + LATEST_POSTREDUCTION_FORMAT_VER) :
       m_access = new PreRawCOPPERFormat_latest;
-      //      printf("########################## PreRawCOPPERFormat_latest\n");
+      //            printf("Calling PreRawCOPPERFormat_latest\n");
+      break;
+    case 0x1 :
+      m_access = new PostRawCOPPERFormat_v1;
+      //      printf("Calling RawCOPPERFormat_v1\n");
+      break;
+    case (0x80 + 0x1) :
+      m_access = new PreRawCOPPERFormat_v1;
+      //            printf("Calling PreRawCOPPERFormat_latest\n");
       break;
     case 0 :
       m_access = new RawCOPPERFormat_v0;
-      //      printf("########################## RawCOPPERFormat_v0\n");
+      //      printf("Calling RawCOPPERFormat_v0\n");
       break;
     default : {
       char err_buf[500];
@@ -80,12 +88,18 @@ void RawCOPPER::SetVersion(string class_name)
     delete m_access;
   }
 
-  if (class_name == "RawCOPPERFormat_latest") {
+  if (class_name == "PostRawCOPPERFormat_latest") {
     m_access = new PostRawCOPPERFormat_latest;
     m_version = (0 << 7) | LATEST_POSTREDUCTION_FORMAT_VER;
   } else if (class_name == "PreRawCOPPERFormat_latest") {
     m_access = new PreRawCOPPERFormat_latest;
     m_version = (1 << 7) | LATEST_POSTREDUCTION_FORMAT_VER;
+  } else if (class_name == "PostRawCOPPERFormat_v1") {
+    m_access = new PostRawCOPPERFormat_v1;
+    m_version = (0 << 7) | 1;
+  } else if (class_name == "PreRawCOPPERFormat_v1") {
+    m_access = new PreRawCOPPERFormat_v1;
+    m_version = (1 << 7) | 1;
   } else if (class_name == "RawCOPPERFormat_v0") {
     m_access = new RawCOPPERFormat_v0;
     m_version = (0 << 7) | 0;

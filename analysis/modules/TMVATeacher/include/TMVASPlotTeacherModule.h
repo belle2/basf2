@@ -12,18 +12,13 @@
 #include <framework/core/Module.h>
 #include <analysis/TMVAInterface/Teacher.h>
 
-#include <RooDataSet.h>
-#include <RooAbsPdf.h>
-#include <RooAddPdf.h>
-#include <RooArgList.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/RooDataSetMergeable.h>
+
 #include <RooWorkspace.h>
 
 #include <TFile.h>
-
-/*#include <memory>
-#include <vector>
-#include <map>
-#include <shared_ptr>*/
+#include <memory>
 
 namespace Belle2 {
 
@@ -67,15 +62,13 @@ namespace Belle2 {
 
   private:
 
+    std::shared_ptr<RooWorkspace> getWorkspace();
 
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::vector<std::string> m_variables; /**< input variables for the TMVA method */
     std::vector<std::string> m_spectators; /**< input spectators for the TMVA method */
     std::vector<std::string>
     m_discriminatingVariables; /**< variables that will be used as discriminating variables in the sPlot algorithm */
-    RooAbsPdf* m_model;
-    RooArgList* m_yields;
-    TFile* m_modelFile;
     std::string m_modelFileName;
     std::string m_modelObjectName;
     std::vector<std::string> m_modelPlotComponentNames;
@@ -93,15 +86,13 @@ namespace Belle2 {
     bool m_doNotTrain; /**< Do not train the method, just create the sample file. Useful for external training with externTeacher */
     bool m_doNotSPlot; /**< Do not calculate sPlot weights. Useful for debugging purposes. Does not affect the decision if the training is performed. */
     unsigned int m_maxEventsPerClass; /**< Maximum nuber of events per class passed to TMVA */
+    unsigned int m_numberOfClasses;
 
     std::shared_ptr<TMVAInterface::Teacher> m_teacher; /**< Used TMVA method */
     std::map<std::string, const Variable::Manager::Var*> m_discriminating_vars; /**< Variable Pointer to target variable */
-    RooDataSet* m_discriminating_values; // pointer to the data set stored inside the RooWorkspace
+    StoreObjPtr<RooDataSetMergeable> m_discriminating_values; /**< Holds the values of the discriminating variables */
 
-    unsigned int m_numberOfClasses;
-
-    std::shared_ptr<RooWorkspace> m_wspace; /** TODO: Datastore ROOTMergeable */
-    bool isVariableInModel(const std::string variable);
+    bool isVariableInModel(const std::string variable, std::shared_ptr<RooWorkspace> wspace);
 
   };
 

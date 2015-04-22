@@ -46,7 +46,7 @@ namespace Belle2 {
 
   REG_MODULE(TMVASPlotTeacher)
 
-  TMVASPlotTeacherModule::TMVASPlotTeacherModule() : Module()
+  TMVASPlotTeacherModule::TMVASPlotTeacherModule() : Module(), m_discriminating_values("", DataStore::c_Persistent)
   {
     setDescription("Trains TMVA method with given particle lists as training samples. "
                    "The target variable has to be an integer valued variable which defines the clusters in the sample. "
@@ -54,8 +54,7 @@ namespace Belle2 {
                    "The clusters are trained against each other. "
                    "See also https://belle2.cc.kek.jp/~twiki/bin/view/Software/TMVA for detailed instructions.");
 
-    // at the moment not certified!
-    //setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
+    setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
     std::vector<std::string> empty;
     addParam("listNames", m_listNames,
@@ -85,8 +84,7 @@ namespace Belle2 {
     addParam("doNotSPlot", m_doNotSPlot,
              "Do not run SPlot to calculate weights. Useful for debugging, for example in combination with doNotTrain to see how the data looks.",
              false);
-    addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.",
-             static_cast<unsigned int>(0));
+    addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", 0u);
     addParam("discriminatingVariables", m_discriminatingVariables,
              "The discriminating variables used by sPlot to determine the weights.");
     addParam("modelFileName", m_modelFileName,
@@ -96,7 +94,8 @@ namespace Belle2 {
     addParam("modelPlotComponentNames", m_modelPlotComponentNames,
              "Name of RooAbsPdf objects that are part of the model and should be plotted additionally.", empty);
     addParam("modelYieldsObjectNames", m_modelYieldsObjectNames,
-             "Name of the RooRealVar objects that represent the yields of the event classes in the Root file with path modelFileName. There have to be as much yields as classes -- the number of yields is interpreted as the number of classes. In the case of two classes, the yield for the signal class has to be the second, because the largest classid is signal in TMVA.");
+             "Name of the RooRealVar objects that represent the yields of the event classes in the Root file with path modelFileName. There have to be as much yields as classes"
+             "-- the number of yields is interpreted as the number of classes. In the case of two classes, the yield for the signal class has to be the second, because the largest classid is signal in TMVA.");
     addParam("setYieldRanges", m_setYieldRanges,
              "If True, the maximum value of the yield variables given with m_modelYieldsObjectNames will be set to the number of events. The minimum value will not be touched.",
              true);
@@ -125,32 +124,20 @@ namespace Belle2 {
     m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, "isSignal", "constant(1)", methods,
                                                          m_useExistingData);
 
-    // Get the model from the user
-    m_modelFile = new TFile(m_modelFileName.c_str());
-    // Check if it's derived from RooAbsPdf
-    m_model = dynamic_cast<RooAbsPdf*>(m_modelFile->Get(m_modelObjectName.c_str()));
-    if (!m_model) {
-      B2FATAL("TMVASPlotTeacher: The object " << m_modelObjectName << " is either not present in the file " << m_modelFileName <<
-              " or not derived from RooAbsPdf.");
-    }
-    m_modelFile->Close();
-    delete m_modelFile;
-
     // Create a temporary workspace to manage the model and its variables
-    m_wspace = std::make_shared<RooWorkspace>("SPlotWorkspace");
-    m_wspace->import(*m_model);
+    auto workspace = getWorkspace();
 
     // Check that the yields are all RooRealVars
     // and are present in the model.
     // m_yields will be built in terminate()
     for (auto& yield : m_modelYieldsObjectNames) {
       // Check that yields are used in the model
-      if (!this->isVariableInModel(yield)) {
+      if (!this->isVariableInModel(yield, workspace)) {
         B2FATAL("TMVASPlotTeacher: Yield " << yield <<
                 " is not at all used in the model. Thus, SPlot won't work. Please fix the model or remove the variable from the list of yield variables.");
       }
       // Check that the yields are RooRealVars
-      if (!dynamic_cast<RooRealVar*>(m_wspace->var(yield.c_str()))) {
+      if (!dynamic_cast<RooRealVar*>(workspace->var(yield.c_str()))) {
         B2FATAL("TMVASPlotTeacher: Yield " << yield << " in the model is not of type RooRealVar.");
       }
     }
@@ -161,7 +148,7 @@ namespace Belle2 {
     Variable::Manager& manager = Variable::Manager::Instance();
     RooArgSet vars;
     for (auto& variable : m_discriminatingVariables) {
-      if (!this->isVariableInModel(variable)) {
+      if (!this->isVariableInModel(variable, workspace)) {
         B2FATAL("TMVASPlotTeacher: Discriminating variable " << variable <<
                 " is not at all used in the model. Thus, SPlot won't work. Please fix the model or remove the variable from the list of discriminating variables.");
       }
@@ -171,22 +158,37 @@ namespace Belle2 {
       // As the copy constructor needs a name, give it the same name.
       // The reason for extracting the variable from the model is, that this way,
       // the range and binning is just as the user set it.
-      RooRealVar* variableInModel = new RooRealVar(*m_wspace->var(variable.c_str()), variable.c_str());
+      RooRealVar* variableInModel = new RooRealVar(*workspace->var(variable.c_str()), variable.c_str());
       vars.add(*variableInModel);
     }
+
     // Construct the header of the data set.
-    m_discriminating_values = new RooDataSet("discriminating_values", "discriminating_values", vars);
+    m_discriminating_values.registerInDataStore(m_methodPrefix + "discriminating_values",
+                                                DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+    m_discriminating_values.construct("discriminating_values", "discriminating_values", vars);
 
-    // RooWorkspace can't be used in parallel, thus, use it only temporarily here
-    m_wspace.reset();
-
-    // TODO: does m_model, m_yields need to be deleted before going into the parallel phase?
-    //       Then we need to load it again from the file in terminate()!
   }
 
-  bool TMVASPlotTeacherModule::isVariableInModel(const std::string variable)
+  std::shared_ptr<RooWorkspace> TMVASPlotTeacherModule::getWorkspace()
   {
-    RooArgSet variables = m_wspace->allVars();
+
+    auto workspace = std::make_shared<RooWorkspace>("SPlotWorkspace");
+    // Get the model from the user
+    TFile modelFile(m_modelFileName.c_str());
+    // Check if it's derived from RooAbsPdf
+    RooAbsPdf* model = dynamic_cast<RooAbsPdf*>(modelFile.Get(m_modelObjectName.c_str()));
+    if (!model) {
+      B2FATAL("TMVASPlotTeacher: The object " << m_modelObjectName << " is either not present in the file " << m_modelFileName <<
+              " or not derived from RooAbsPdf.");
+    }
+    workspace->import(*model);
+    return workspace;
+
+  }
+
+  bool TMVASPlotTeacherModule::isVariableInModel(const std::string variable, std::shared_ptr<RooWorkspace> wspace)
+  {
+    RooArgSet variables = wspace->allVars();
     TIterator* iter = variables.createIterator();
     RooAbsArg* arg;
     bool found = false;
@@ -206,44 +208,29 @@ namespace Belle2 {
     if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
       UInt_t numberOfEvents;
-      if (m_discriminating_values->numEntries() < 0) {
-        B2FATAL("TMVASPlotTeacher: Number of events is less than zero (" << m_discriminating_values->numEntries() << ")");
+      if (m_discriminating_values->get().numEntries() < 0) {
+        B2FATAL("TMVASPlotTeacher: Number of events is less than zero (" << m_discriminating_values->get().numEntries() << ")");
       } else {
-        numberOfEvents = static_cast<UInt_t>(m_discriminating_values->numEntries());
+        numberOfEvents = static_cast<UInt_t>(m_discriminating_values->get().numEntries());
       }
       UInt_t numberOfEntries = m_numberOfClasses * numberOfEvents;
       std::cout << "SPlot: number of events: " << numberOfEvents << ", number of entries: " << numberOfEntries << std::endl;
 
       // Create a new workspace to manage the project.
-      m_wspace = std::make_shared<RooWorkspace>("SPlotWorkspace");
+      auto workspace = getWorkspace();
+
       // The RooWorkspace will copy this RooDataSet. We grab a pointer to it immediately, to manipulate it more easily later
-      m_wspace->import(*m_discriminating_values);
-      m_wspace->import(*m_model);
+      workspace->import(m_discriminating_values->get());
 
-      // TODO: weak_ptr?
-      // TODO: is it ok to delete m_model and then use m_model again with the next line?
-      delete m_model;
-      m_model = static_cast<RooAddPdf*>(m_wspace->pdf(m_modelObjectName.c_str()));
-      delete m_discriminating_values;
-      m_discriminating_values = static_cast<RooDataSet*>(m_wspace->data("discriminating_values"));
-
-      for (auto& variable : m_discriminating_vars) {
-        std::cout << variable.first << ": ";
-        std::cout << "(values) ";
-        for (Int_t i = 0; i < 20; i++) {
-          const RooArgSet* current = m_discriminating_values->get(i);
-          const Double_t value = current->getRealValue(variable.first.c_str(), -1, kTRUE);
-          std::cout << value << " ";
-        }
-        std::cout << std::endl;
-      }
+      RooAddPdf* model = static_cast<RooAddPdf*>(workspace->pdf(m_modelObjectName.c_str()));
+      RooDataSet* discriminating_values = static_cast<RooDataSet*>(workspace->data("discriminating_values"));
 
       // set yield maximum values
       if (m_setYieldRanges) {
         for (auto& yield : m_modelYieldsObjectNames) {
           std::cout << "TMVASPlotTeacher: Set maximum of yield variable " << yield << " to " << numberOfEvents << " (number of events)." <<
                     std::endl;
-          m_wspace->var(yield.c_str())->setMax(numberOfEvents);
+          workspace->var(yield.c_str())->setMax(numberOfEvents);
         }
       }
 
@@ -252,27 +239,27 @@ namespace Belle2 {
         double initialValue = m_modelYieldsInitialFractions[i] * numberOfEvents;
         std::cout << "TMVASPlotTeacher: Set initial value of yield variable " << m_modelYieldsObjectNames[i] << " to " <<
                   m_modelYieldsInitialFractions[i] << "*" << numberOfEvents << " = " << initialValue << "." << std::endl;
-        m_wspace->var(m_modelYieldsObjectNames[i].c_str())->setVal(initialValue);
+        workspace->var(m_modelYieldsObjectNames[i].c_str())->setVal(initialValue);
       }
 
       // Build a RooArgList of the yields.
       // Build it here so the maximum and the initial value are already set.
       // It was already checked in initialize(), that they are all RooRealVars
       // and are present in the model.
-      m_yields = new RooArgList("yields");
+      auto yields = new RooArgList("yields");
       for (auto& yield : m_modelYieldsObjectNames) {
-        RooRealVar* variableInModel = static_cast<RooRealVar*>(m_wspace->var(yield.c_str()));
-        m_yields->add(*variableInModel);
+        RooRealVar* variableInModel = static_cast<RooRealVar*>(workspace->var(yield.c_str()));
+        yields->add(*variableInModel);
       }
 
       // fit the model to the data.
       std::cout << "SPlot: Fit data to model" << std::endl;
-      m_model->Print("t");
-      m_model->fitTo(*m_discriminating_values, RooFit::Extended());
+      model->Print("t");
+      model->fitTo(*discriminating_values, RooFit::Extended());
 
       // Plot the fit if there is only one dimension
       if (m_discriminatingVariables.size() == 1) {
-        RooRealVar* discriminating_variable = m_wspace->var(m_discriminatingVariables[0].c_str());
+        RooRealVar* discriminating_variable = workspace->var(m_discriminatingVariables[0].c_str());
         std::cout << "SPlot: Generating plot for discriminating variable " << m_discriminatingVariables[0].c_str() << "." << std::endl;
 
         // Set ROOT batch mode to true, so it does not show the GUI
@@ -288,12 +275,12 @@ namespace Belle2 {
         RooPlot* xframe = discriminating_variable->frame(RooFit::Title("Fit of provided model"));
         auto canvas = new TCanvas("splot_fit", "splot_fit");
 
-        m_discriminating_values->plotOn(xframe);
-        m_model->plotOn(xframe);
+        discriminating_values->plotOn(xframe);
+        model->plotOn(xframe);
         // Plot components of the model
         for (auto& component : m_modelPlotComponentNames) {
           std::cout << "TMVASPlotTeacher: Plotting model component " << component << " in addition to the model." << std::endl;
-          m_model->plotOn(xframe, RooFit::Components(*(m_wspace->pdf(component.c_str()))), RooFit::LineStyle(kDashed)) ;
+          model->plotOn(xframe, RooFit::Components(*(workspace->pdf(component.c_str()))), RooFit::LineStyle(kDashed)) ;
         }
         xframe->Draw();
 
@@ -311,16 +298,14 @@ namespace Belle2 {
         std::cout << "SPlot: Skip generating plot, because there is more than one discriminating variable." << std::endl;
       } // End of plot
 
-      std::cout << "SPlot: number of entries: " << m_discriminating_values->numEntries() << std::endl;
+      std::cout << "SPlot: number of entries: " << discriminating_values->numEntries() << std::endl;
 
-      // This is used in the RooStat::SPlot tutorial.
-      //std::cout << "SPlot: silence RooMsgService" << std::endl;
       //bool silentModeBefore = RooMsgService::instance().silentMode();
       //RooMsgService::instance().setSilentMode(true);
 
       if (not m_doNotSPlot) {
         std::cout << "SPlot: call SPlot" << std::endl;
-        RooStats::SPlot* sData = new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *m_discriminating_values, m_model, *m_yields);
+        RooStats::SPlot* sData = new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *discriminating_values, model, *yields);
 
         // This is used in the RooStat::SPlot tutorial.
         //std::cout << "SPlot: reset verbose status of RooMsgService" << std::endl;
@@ -345,7 +330,7 @@ namespace Belle2 {
         for (UInt_t i = 0; i < numberOfEvents; i++) {
           for (UInt_t j = 0; j < m_numberOfClasses; j++) {
             // Get the name of the j-th coefficient from the model
-            weights[2 * i + j] = sData->GetSWeight(i, m_yields->at(j)->GetName());
+            weights[2 * i + j] = sData->GetSWeight(i, yields->at(j)->GetName());
           }
         }
 
@@ -383,7 +368,7 @@ namespace Belle2 {
           //RooRealVar v = RooRealVar(variable.c_str(), variable.c_str(), m_discriminating_vars[variable]->function(particle));
           //row.add(v);
         }
-        m_discriminating_values->add(row);
+        m_discriminating_values->get().add(row);
 
         // TODO: unsigned int?
         for (unsigned int i = 0; i < m_numberOfClasses; i++) {
@@ -401,7 +386,7 @@ namespace Belle2 {
         //RooRealVar v = RooRealVar(variable.c_str(), variable.c_str(), m_discriminating_vars[variable]->function(nullptr));
         //row.add(v);
       }
-      m_discriminating_values->add(row);
+      m_discriminating_values->get().add(row);
 
       // TODO: unsigned int?
       for (unsigned int i = 0; i < m_numberOfClasses; i++) {

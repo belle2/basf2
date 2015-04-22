@@ -56,11 +56,13 @@ namespace Belle2 {
     virtual ~FragmentationModule();
 
     virtual void event();
+    virtual void initialize();
+    virtual void terminate();
 
   protected:
 
-    Pythia8::Pythia pythia;  //  Declare generator
-    Pythia8::Event& PythiaEvent = pythia.event;  //  Pythia event
+    Pythia8::Pythia* pythia;  //  Declare generator
+    Pythia8::Event* PythiaEvent;
 
     EvtGenDecays* evtgen;
 
@@ -74,7 +76,6 @@ namespace Belle2 {
 
     MCParticleGraph mcParticleGraph;        /**< An instance of the MCParticle graph. */
 
-    void initialize();
 
     int nAdded;  /**< number of added particles. */
     int addParticleToPYTHIA(MCParticle& mcParticle);   /**< picks particles and adds them to a pythia event. */

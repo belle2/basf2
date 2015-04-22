@@ -21,6 +21,8 @@
 #include <G4Step.hh>
 
 #include <iostream>
+#define _USE_MATH_DEFINES
+#include <cmath>
 using namespace std;
 
 
@@ -37,9 +39,9 @@ namespace Belle2 {
       current_trackVertex_z = 0.;
       current_pdgID = 0;
       current_sensorID = 0;
-      current_posIN_u = 0.; // mm  z_global for each sensor (-1 -> + 1 mm)
-      current_posIN_v = 0.;  // -5 -> +5 mm
-      current_posIN_w = 0.;   // w (epi layer + foam width + etc.)
+      current_posIN_u = 0.;
+      current_posIN_v = 0.;
+      current_posIN_w = 0.;
       current_posIN_x = 0.;
       current_posIN_y = 0.;
       current_posIN_z = 0.;
@@ -49,13 +51,13 @@ namespace Belle2 {
       current_posOUT_x = 0.;
       current_posOUT_y = 0.;
       current_posOUT_z = 0.;
-      current_momentum_x = 0.;  // GeV
+      current_momentum_x = 0.;
       current_momentum_y = 0.;
       current_momentum_z = 0.;
-      current_energyDep = 0.;  // GeV
+      current_energyDep = 0.;
       current_nielDep = 0.;
-      current_thetaAngle = 0.;   // local sensor frame - degree
-      current_phiAngle = 0.;
+      current_thetaAngle = 0.;   // local sensor frame
+      current_phiAngle = 0.;     // local sensor frame
       current_globalTime = 0.;
 
       //Make sure all collections are registered
@@ -111,10 +113,10 @@ namespace Belle2 {
         current_energyDep = 0.;
         current_nielDep = 0.;
 
-        current_posIN_x = preStepPointPosition.x();  //mm
+        current_posIN_x = preStepPointPosition.x();
         current_posIN_y = preStepPointPosition.y();
         current_posIN_z = preStepPointPosition.z();
-        current_momentum_x = trackMomentum.x();  // MeV
+        current_momentum_x = trackMomentum.x();
         current_momentum_y = trackMomentum.y();
         current_momentum_z = trackMomentum.z();
 
@@ -122,21 +124,44 @@ namespace Belle2 {
         G4TouchableHandle theTouchable = preStepPoint.GetTouchableHandle();
         G4ThreeVector worldDirection = preStepPoint.GetMomentumDirection();
         G4ThreeVector localDirection = theTouchable->GetHistory()->GetTopTransform().TransformAxis(worldDirection);
-        current_thetaAngle = localDirection.theta();
-        current_phiAngle = localDirection.phi();
+
+        if (localDirection.z() < 0.) {
+          current_thetaAngle = M_PI - acos(-1. * localDirection.z());
+        } else {
+          current_thetaAngle = acos(localDirection.z());
+        }
+
+
+        if (localDirection.x() < 0. && localDirection.y() > 0.) {
+          current_phiAngle = atan(-1. * localDirection.x() / localDirection.y());
+        } else if (localDirection.x() < 0. && localDirection.y() < 0.) {
+          current_phiAngle = M_PI - atan(localDirection.x() / localDirection.y());
+        } else if (localDirection.x() > 0. && localDirection.y() < 0.) {
+          current_phiAngle = M_PI + atan(-1. * localDirection.x() / localDirection.y());
+        } else if (localDirection.x() > 0. && localDirection.y() > 0.) {
+          current_phiAngle = 2. * M_PI - atan(localDirection.x() / localDirection.y());
+        } else if (localDirection.x() < 0. && localDirection.y() == 0.) {
+          current_phiAngle = M_PI / 2.;
+        } else if (localDirection.x() > 0. && localDirection.y() == 0.) {
+          current_phiAngle = 3.* M_PI / 2.;
+        } else if (localDirection.x() == 0. && localDirection.y() > 0.) {
+          current_phiAngle = 0.;
+        } else if (localDirection.x() == 0. && localDirection.y() < 0.) {
+          current_phiAngle = M_PI;
+        }
 
         G4ThreeVector localINPosition = theTouchable->GetHistory()->GetTopTransform().TransformPoint(preStepPointPosition);
-        current_posIN_v = localINPosition.x();
         current_posIN_u = localINPosition.y();
+        current_posIN_v = - localINPosition.x();
         current_posIN_w = localINPosition.z();
 
-        current_globalTime = step->GetPreStepPoint()->GetGlobalTime(); // not sure this is relevant for PLUME?
+        current_globalTime = step->GetPreStepPoint()->GetGlobalTime();
 
       }  // end if new track
 
       // Update information at each step
-      current_energyDep += step->GetTotalEnergyDeposit();  // MeV
-      current_nielDep += step->GetNonIonizingEnergyDeposit();   //not sure it works?
+      current_energyDep += step->GetTotalEnergyDeposit();
+      current_nielDep += step->GetNonIonizingEnergyDeposit();
 
       // If track leaves volume or is killed, store final step info and save simHit
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) { // if last step
@@ -148,8 +173,8 @@ namespace Belle2 {
         current_posOUT_z = postStepPointPosition.z();
         G4ThreeVector localOUTPosition = preStepPoint.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(
                                            postStepPointPosition);
-        current_posOUT_v = localOUTPosition.x(); // mm
         current_posOUT_u = localOUTPosition.y();
+        current_posOUT_v = - localOUTPosition.x();
         current_posOUT_w = localOUTPosition.z();
 
         //Get the datastore arrays
@@ -164,26 +189,26 @@ namespace Belle2 {
                                current_pdgID,
                                current_sensorID,
                                current_trackID,
-                               current_trackVertex_x,
-                               current_trackVertex_y,
-                               current_trackVertex_z,
-                               current_energyDep,
-                               current_nielDep,
-                               current_posIN_x,
-                               current_posIN_y,
-                               current_posIN_z,
-                               current_posIN_u,
-                               current_posIN_v,
-                               current_posIN_w,
-                               current_posOUT_u,
-                               current_posOUT_v,
-                               current_posOUT_w,
+                               current_trackVertex_x / CLHEP::mm,
+                               current_trackVertex_y / CLHEP::mm,
+                               current_trackVertex_z / CLHEP::mm,
+                               current_energyDep / CLHEP::MeV,
+                               current_nielDep / CLHEP::MeV,
+                               current_posIN_x / CLHEP::mm,
+                               current_posIN_y / CLHEP::mm,
+                               current_posIN_z / CLHEP::mm,
+                               current_posIN_u / CLHEP::mm,
+                               current_posIN_v / CLHEP::mm,
+                               current_posIN_w / CLHEP::mm,
+                               current_posOUT_u / CLHEP::mm,
+                               current_posOUT_v / CLHEP::mm,
+                               current_posOUT_w / CLHEP::mm,
                                current_momentum_x / CLHEP::GeV,
                                current_momentum_y / CLHEP::GeV,
                                current_momentum_z / CLHEP::GeV,
                                current_thetaAngle / CLHEP::degree,
                                current_phiAngle / CLHEP::degree,
-                               current_globalTime
+                               current_globalTime / CLHEP::nanosecond
                              );
 
           //Add Relation between SimHit and MCParticle with a weight of 1. Since

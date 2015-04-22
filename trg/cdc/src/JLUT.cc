@@ -110,7 +110,7 @@ namespace Belle2{
         else reformatCoeFile << t_line.substr(0,t_line.size()-1) << endl;
       }
       // Process reformatted file.
-      vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
+      // vector<string> keywords = {"memory_initialization_radix", "memory_initialization_vector"};
       int t_radix;
       vector<string> t_rawData;
       while(getline(reformatCoeFile,t_line)){

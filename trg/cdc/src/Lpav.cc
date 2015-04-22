@@ -406,14 +406,13 @@ double TRGCDCLpav::calculate_lpar3(void) {
 double TRGCDCLpav::fit(double x, double y, double w) {
   if (m_nc<=3) return -1;
   m_chisq = -1;
-  double q;
   if (m_nc<4) {
     calculate_average3(x,y,w);
     double q = calculate_lpar3();
     if (q>0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
   } else {
     calculate_average(x,y,w);
-    q = calculate_lpar();
+    double q = calculate_lpar();
     if (q>0) m_chisq = q * m_wsum_temp * m_rscale * m_rscale;
   }
   return m_chisq;

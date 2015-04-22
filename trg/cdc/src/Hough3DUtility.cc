@@ -722,7 +722,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   double stAxPhi[4];
   int stAxWire[4];
   int stAxWire_int[4];
-  double acos_real, myphiz;
+  double myphiz;
   int stCandHitMap[4][10];
 
   // Initalize stCand
@@ -744,7 +744,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     // Prevents crash
     if(m_rr[iLayer]/(2*rho) > 1 ) rho = m_rr[iLayer]/2;
     // This is done in real space
-    acos_real = acos(m_rr[iLayer]/(2*rho));
+    double acos_real = acos(m_rr[iLayer]/(2*rho));
 
     // For integer space
     Fitter3DUtility::findExtreme(m_findArcCosMax, m_findArcCosMin, acos_real);

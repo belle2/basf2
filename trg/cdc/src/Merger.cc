@@ -435,7 +435,7 @@ TCMerger::packerInner(const TRGState & input) {
   }
   else{
   }
-  p+=4;
+//p+=4;
 
   // ...clock counter ...
   // no process for cc at this moment
@@ -523,7 +523,7 @@ TCMerger::packerOuter(const TRGState & input ) {
 	PTS_out_hit[i] = hitptn1[0] || hitptn1[16] || hitptn1[17];
 	}
 	else if (i == 15){
-	PTS_in_hit[i] = hitptn0[14] || hitptn0[14] || hitptn0[30] || hitptn0[31] || hitptn0[47] ;
+	PTS_in_hit[i] = hitptn0[14] || hitptn0[30] || hitptn0[31] || hitptn0[47] ;
         PTS_out_hit[i] = hitptn1[14] || hitptn1[15] || hitptn1[30] || hitptn1[31];
 	}
 	else

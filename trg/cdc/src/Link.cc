@@ -753,7 +753,7 @@ TRGCDCLink::remove(vector<TRGCDCLink *> & list,
 		   const vector<TRGCDCLink *> & links) {
     const unsigned n = list.size();
     const unsigned m = links.size();
-    vector<TRGCDCLink *> toBeRemoved;
+    // vector<TRGCDCLink *> toBeRemoved;
 
     for (unsigned i = 0; i < n; i++) {
 	for (unsigned j = 0; j < m; j++) {

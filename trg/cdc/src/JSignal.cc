@@ -668,8 +668,6 @@ namespace Belle2{
     }
     // For integer case.
     for(unsigned iCondition=0; iCondition<data.size(); iCondition++){
-      TRGCDCJSignal const * from;
-      TRGCDCJSignal const * to;
       TRGCDCJSignal const * assign;
       assign = &(data[iCondition][0]);
       // For default case.
@@ -678,8 +676,8 @@ namespace Belle2{
         target.assignTo(*assign,target.m_finishClock,t_string);
       // For non-default cases.
       } else {
-        from = &(data[iCondition][1]);
-        to = &(data[iCondition][2]);
+	TRGCDCJSignal const * from = &(data[iCondition][1]);
+	TRGCDCJSignal const * to = &(data[iCondition][2]);
         if(t_reference.m_int >= from->m_int && t_reference.m_int <= to->m_int) {
           string t_string="";
           target.assignTo(*assign,target.m_finishClock,t_string);
@@ -689,8 +687,6 @@ namespace Belle2{
     }
     // For actual case.
     for(unsigned iCondition=0; iCondition<data.size(); iCondition++){
-      TRGCDCJSignal const * from;
-      TRGCDCJSignal const * to;
       TRGCDCJSignal const * assign;
       assign = &(data[iCondition][0]);
       // For default case.
@@ -698,8 +694,8 @@ namespace Belle2{
         target.m_actual = (*assign).m_actual;
       // For non-default case.
       } else {
-        from = &(data[iCondition][1]);
-        to = &(data[iCondition][2]);
+	TRGCDCJSignal const * from = &(data[iCondition][1]);
+	TRGCDCJSignal const * to = &(data[iCondition][2]);
         assign = &(data[iCondition][0]);
         if(t_reference.m_actual >= from->m_actual && t_reference.m_actual <= to->m_actual) {
           target.m_actual = (*assign).m_actual;

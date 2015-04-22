@@ -76,9 +76,6 @@ TRGCDCLpar::~TRGCDCLpar()
 //
 void TRGCDCLpar::circle(double x1, double y1, double x2, double y2,
 		  double x3, double y3) {
-  double a;
-  double b;
-  double c;
   double delta = (x1-x2)*(y1-y3) - (y1-y2)*(x1-x3);
   if(delta==0) {
     //
@@ -116,10 +113,10 @@ void TRGCDCLpar::circle(double x1, double y1, double x2, double y2,
     double r1sq = x1 * x1 + y1 * y1;
     double r2sq = x2 * x2 + y2 * y2;
     double r3sq = x3 * x3 + y3 * y3;
-    a = 0.5 * (  (y1-y3)*(r1sq-r2sq) - (y1-y2)*(r1sq-r3sq)) / delta;
-    b = 0.5 * (- (x1-x3)*(r1sq-r2sq) + (x1-x2)*(r1sq-r3sq)) / delta;
+    double a = 0.5 * (  (y1-y3)*(r1sq-r2sq) - (y1-y2)*(r1sq-r3sq)) / delta;
+    double b = 0.5 * (- (x1-x3)*(r1sq-r2sq) + (x1-x2)*(r1sq-r3sq)) / delta;
     double csq = (x1-a)*(x1-a) + (y1-b)*(y1-b);
-    c = sqrt(csq);
+    double c = sqrt(csq);
 //cnv    double csq2 = (x2-a)*(x2-a) + (y2-b)*(y2-b);
 //cnv    double csq3 = (x3-a)*(x3-a) + (y3-b)*(y3-b);
     m_kappa = 1 / (2 * c);
@@ -283,7 +280,7 @@ int intersect(const TRGCDCLpar&lp1, const TRGCDCLpar&lp2, CLHEP::HepVector&v1, C
 //cnv          double r = sqrt(rad2[0]);
           TRGCDCLpar::Cpar cp1(lp1);
           TRGCDCLpar::Cpar cp2(lp2);
-	  for(int j=0;j<2;j++) {
+// for(int j=0;j<2;j++) {
 //jb	    double s1,s2;
 //jb	    if(j==0) {
 //jb	      s1 = lp1.s(v1(1),v1(2));
@@ -294,11 +291,11 @@ int intersect(const TRGCDCLpar&lp1, const TRGCDCLpar&lp2, CLHEP::HepVector&v1, C
 //jb	    }
 //cnv	    double phi1 = cp1.fi() + 2 * cp1.cu() * s1;
 //cnv	    double phi2 = cp2.fi() + 2 * cp2.cu() * s2;
-	    double f = (1 + 2 * cp1.cu() * cp1.da()) *
-	      (1 + 2 * cp2.cu() * cp2.da()) * cos(cp1.fi()-cp2.fi());
-	    f -= 2 * (lp1.gamma() * lp2.kappa() + lp2.gamma() * lp1.kappa());
+//   double f = (1 + 2 * cp1.cu() * cp1.da()) *
+//     (1 + 2 * cp2.cu() * cp2.da()) * cos(cp1.fi()-cp2.fi());
+//   f -= 2 * (lp1.gamma() * lp2.kappa() + lp2.gamma() * lp1.kappa());
 //cnv	    double cosphi12 = f;
-	  }
+// }
 	  return 2;
         }
       }

@@ -66,7 +66,6 @@ double FpgaUtility::arbToDouble(std::string in, int inRadix){
 }
 // Change octal to string.
 string FpgaUtility::doubleToArb(double in, int outRadix, int numberOfDigits){
-  int rem;
   string result;
   int sign=1;
   if(in<0) {
@@ -74,7 +73,7 @@ string FpgaUtility::doubleToArb(double in, int outRadix, int numberOfDigits){
     in *= -1;
   }
   while(1) {
-    rem = fmod(in,outRadix);
+    int rem = fmod(in,outRadix);
     result.insert(result.begin(), char((rem>=0 && rem <=9) ? rem+48 : rem+55));
     in = (in/outRadix)-(rem/outRadix);
     if(in<outRadix) {

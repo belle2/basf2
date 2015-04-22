@@ -73,7 +73,7 @@ void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double
     C+=cos(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
     D+=rr[i]*cos(phi2[i])/(fiterror[i]*fiterror[i]);
     E+=rr[i]*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-    G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
+    //G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
   }
   hcx=D*B-E*C;    //helix center x
   hcx/=2*(A*B-C*C);
@@ -119,7 +119,7 @@ void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, doubl
     C+=cos(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
     D+=rr[i]*cos(phi2[i])/(fiterror[i]*fiterror[i]);
     E+=rr[i]*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-    G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
+    //G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
   }
   hcx=D*B-E*C;    //helix center x
   hcx/=2*(A*B-C*C);

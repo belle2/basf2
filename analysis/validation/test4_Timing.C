@@ -1,7 +1,8 @@
 /*
 <header>
-<output>Timing.root</output>
-<contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
+  <input>GenericB_GENSIMRECtoDST.dst.root</input>
+  <output>Timing.root</output>
+  <contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
 </header>
 */
 #include <TTimeStamp.h>
@@ -14,7 +15,7 @@
 
 
 //how often do we want to execute stuff? (result of first execution ignored to warm caches)
-const int nRuns = 4; //make this >= 3
+const int nRuns = 1; //make this >= 3
 
 /** Helper function to get stdout of 'cmd'. */
 TString exec(const char* cmd) {
@@ -38,9 +39,9 @@ TString exec(const char* cmd) {
 void test4_Timing()
 {
     const char* files[] = {
-        "test1_DSTtoMDST.py",
-        "test2_MDSTtoUDST.py",
-        "test3_UDSTtoNTUP.py"
+        "analysis/validation/test1_DSTtoMDST.py",
+        "analysis/validation/test2_MDSTtoUDST.py",
+        "analysis/validation/test3_UDSTtoNTUP.py"
     };
     TFile* output = TFile::Open("Timing.root", "recreate");
     output->cd();
@@ -48,7 +49,7 @@ void test4_Timing()
     const TString tmpdir = exec("mktemp -d").Strip(TString::kTrailing, '\n');
 
     const int nFiles = sizeof(files)/sizeof(const char*);
-    for (int iFile = 0; iFile < nFiles; iFile++) {
+    for (int iFile = 0; iFile < 1; iFile++) {
         TString path(files[iFile]);
         int lastslash = path.Last('/');
         TNtuple* bench = new TNtuple(path.Remove(0, lastslash+1), "", "time_avg_ms:time_stdev_ms");
@@ -57,7 +58,8 @@ void test4_Timing()
         for (int iRun = 0; iRun < nRuns; iRun++) {
             //(in /tmp/ to avoid producing .root files in current directory)
             //no idea how it actually finds the steering files after the cd...
-            const TString cmd = TString::Format("basf2 %s", files[iFile]);
+
+            const TString cmd = TString::Format("basf2 ../../../%s", files[iFile]);
 
             TTimeStamp start;
             //do stuff

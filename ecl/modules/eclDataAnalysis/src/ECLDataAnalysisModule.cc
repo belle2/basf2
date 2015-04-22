@@ -92,7 +92,12 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclShowerUncEnergy(0),
     m_eclClusterMultip(0),
     m_eclClusterIdx(0),
-    m_eclClusterToMc(0),
+    m_eclClusterToMc1(0),
+    m_eclClusterToMcWeight1(0),
+    m_eclClusterToMc2(0),
+    m_eclClusterToMcWeight2(0),
+    m_eclClusterToBkgWeight(0),
+    m_eclClusterSimHitSum(0),
     m_eclClusterToShower(0),
     m_eclClusterToTrack(0),
     m_eclClusterEnergy(0),
@@ -305,6 +310,9 @@ void ECLDataAnalysisModule::initialize()
   StoreArray<ECLGamma>::required();
   StoreArray<ECLPi0>::required();
   StoreArray<MCParticle>::required();
+
+  //StoreArray<ECLCluster>::requireRelationTo<MCParticle>;
+
   if (m_doTracking == true) StoreArray<TrackFitResult>::required();
   //  StoreArray<ECLDsp>::required();
 
@@ -500,7 +508,12 @@ void ECLDataAnalysisModule::initialize()
 
   m_tree->Branch("eclClusterMultip",     &m_eclClusterMultip,     "eclClusterMultip/I");
   m_tree->Branch("eclClusterIdx",     "std::vector<int>",       &m_eclClusterIdx);
-  m_tree->Branch("eclClusterToMc",      "std::vector<int>",       &m_eclClusterToMc);
+  m_tree->Branch("eclClusterToMc1",      "std::vector<int>",       &m_eclClusterToMc1);
+  m_tree->Branch("eclClusterToMcWeight1",      "std::vector<double>",       &m_eclClusterToMcWeight1);
+  m_tree->Branch("eclClusterToMc2",      "std::vector<int>",       &m_eclClusterToMc2);
+  m_tree->Branch("eclClusterToMcWeight2",      "std::vector<double>",       &m_eclClusterToMcWeight2);
+  m_tree->Branch("eclClusterToBkgWeight",      "std::vector<double>",       &m_eclClusterToBkgWeight);
+  m_tree->Branch("eclClusterSimHitSum",      "std::vector<double>",       &m_eclClusterSimHitSum);
   m_tree->Branch("eclClusterToShower",      "std::vector<int>",       &m_eclClusterToShower);
   m_tree->Branch("eclClusterToTrack",      "std::vector<int>",       &m_eclClusterToTrack);
   m_tree->Branch("eclClusterEnergy",     "std::vector<double>",    &m_eclClusterEnergy);
@@ -630,7 +643,9 @@ void ECLDataAnalysisModule::event()
 
   m_eclClusterEnergy->clear();  m_eclClusterEnergyError->clear();  m_eclClusterTheta->clear();  m_eclClusterThetaError->clear();
   m_eclClusterPhi->clear();  m_eclClusterPhiError->clear();  m_eclClusterR->clear();
-  m_eclClusterIdx->clear();  m_eclClusterToMc->clear(); m_eclClusterToShower->clear(); m_eclClusterToTrack->clear();
+  m_eclClusterIdx->clear();  m_eclClusterToMc1->clear(); m_eclClusterToMcWeight1->clear(); m_eclClusterToMc2->clear();
+  m_eclClusterToMcWeight2->clear(); m_eclClusterToMc2->clear(); m_eclClusterToBkgWeight->clear(); m_eclClusterSimHitSum->clear();
+  m_eclClusterToShower->clear(); m_eclClusterToTrack->clear();
   m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear();
   m_eclClusterNofCrystals->clear();  m_eclClusterCrystalHealth->clear();  m_eclClusterMergedPi0->clear();
@@ -667,7 +682,7 @@ void ECLDataAnalysisModule::event()
   StoreArray<ECLGamma> gammas;
   StoreArray<ECLPi0> pi0s;
   StoreArray<MCParticle> mcParticles;
-
+  RelationArray ECLClusterToMC(clusters, mcParticles);
   /*
   m_eclTriggerMultip=trgs.getEntries();
   for (int itrgs = 0; itrgs < trgs.getEntries() ; itrgs++){
@@ -809,11 +824,54 @@ void ECLDataAnalysisModule::event()
     m_eclClusterDeltaL->push_back(aECLClusters->getdeltaL());
     m_eclClusterBeta->push_back(aECLClusters->getbeta());
 
+    double sumHit = 0;
+    double maxE = 0;
+    int idx1 = -1;
+    int idx2 = -1;
     if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
-      const MCParticle* mc_cluster = aECLClusters->getRelated<MCParticle>();
-      m_eclClusterToMc->push_back(mc_cluster->getArrayIndex());
-    } else
-      m_eclClusterToMc->push_back(-1);
+      //int rel=0;
+      //std::cout << "Entries: " << (int)ECLClusterToMC.getEntries() << std::endl;
+      //std::cout << "Entries: " << (int)aECLClusters->getRelationsFrom<ECLCluster> << std::endl;
+      //for (auto MCpart : aECLClusters->getRelationsTo<MCParticle>()) {
+      //m_eclClusterToMc->push_back(MCpart.getArrayIndex());
+      for (int rel = 0; rel < (int)ECLClusterToMC.getEntries(); rel++) {
+        if (ECLClusterToMC[rel].getFromIndex() == iclusters) {
+          //m_eclClusterToMc->push_back(ECLClusterToMC[rel].getToIndex());
+          //m_eclClusterToMcWeight->push_back(ECLClusterToMC[rel].getWeight());
+          if (ECLClusterToMC[rel].getWeight() > maxE) {
+            idx2 = idx1;
+            idx1 = rel;
+          }
+          sumHit = sumHit + (double)ECLClusterToMC[rel].getWeight();
+          //std::cout << "Cluster: " << iclusters  << " MCCandidate: " << ECLClusterToMC[rel].getToIndex() << ", Weight: " << ECLClusterToMC[rel].getWeight() << "     " << rel << " Sum: " << sumHit << std::endl;
+          //rel++;
+        }
+      }
+      m_eclClusterToMc1->push_back(ECLClusterToMC[idx1].getToIndex());
+      m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx1].getWeight());
+      if (idx2 > -1) {
+        m_eclClusterToMc2->push_back(ECLClusterToMC[idx2].getToIndex());
+        m_eclClusterToMcWeight2->push_back(ECLClusterToMC[idx2].getWeight());
+      } else {
+        m_eclClusterToMc2->push_back(-1);
+        m_eclClusterToMcWeight2->push_back(-1);
+      }
+      m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
+      m_eclClusterSimHitSum->push_back(sumHit);
+    } else {
+      m_eclClusterToMc1->push_back(-1);
+      m_eclClusterToMcWeight1->push_back(-1);
+      m_eclClusterToMc2->push_back(-1);
+      m_eclClusterToMcWeight2->push_back(-1);
+      m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
+      m_eclClusterSimHitSum->push_back(-1);
+    }
+
+    //if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
+    //  const MCParticle* mc_cluster = aECLClusters->getRelated<MCParticle>();
+    //  m_eclClusterToMc->push_back(mc_cluster->getArrayIndex());
+    //} else
+    //  m_eclClusterToMc->push_back(-1);
 
     if (aECLClusters->getRelated<ECLShower>() != (nullptr)) {
       const ECLShower* shower_cluster = aECLClusters->getRelated<ECLShower>();

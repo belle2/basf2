@@ -123,7 +123,12 @@ namespace Belle2 {
 
     int m_eclClusterMultip;
     std::vector<int>* m_eclClusterIdx;
-    std::vector<int>* m_eclClusterToMc;
+    std::vector<int>* m_eclClusterToMc1;
+    std::vector<double>* m_eclClusterToMcWeight1;
+    std::vector<int>* m_eclClusterToMc2;
+    std::vector<double>* m_eclClusterToMcWeight2;
+    std::vector<double>* m_eclClusterToBkgWeight;
+    std::vector<double>* m_eclClusterSimHitSum;
     std::vector<int>* m_eclClusterToShower;
     std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy;

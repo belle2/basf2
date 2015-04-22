@@ -10,6 +10,11 @@
 """
 
 import sys
+
+rootFileName = '../DSTtoMDST'
+logFileName = rootFileName + '.log'
+sys.stdout = open(logFileName, 'w')
+
 import os
 from basf2 import *
 from reconstruction import *

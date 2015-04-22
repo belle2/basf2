@@ -348,7 +348,6 @@ def CalculateNumberOfBins(resource, distribution):
 def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates, Nbins, additionalDependencies):
     """
     Generates the training data for the training of an MVC
-    TODO Implement training with sPlot on real data
         @param resource object
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
@@ -376,26 +375,140 @@ def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates
         teacher.param('inverseSamplingRates', inverseSamplingRates)
         teacher.param('doNotTrain', True)
         resource.path.add_module(teacher)
-
         resource.condition = ('EventType', '==0')
         resource.halt = True
         return
     return rootFilename
 
 
-def SignalProbability(resource, particleList, mvaConfig, inverseSamplingRates, Nbins, trainingData):
+def GenerateSPlotModel(resource, name, mvaConfig, distribution):
     """
-    Calculates the SignalProbability of a ParticleList. If the files required from TMVAExpert aren't available they're created.
+    Generates the SPlot model for the training of an MVC
+        @param resource object
+        @param name of the particle or channel
+        @param mvaConfig configuration for the multivariate analysis
+        @param distribution information about number of background an signal events
+        @return dict sPlotTeacher parameters in a dictionary
+    """
+    if mvaConfig.model != 'M':
+        raise RuntimeError('SPlot is only supported for M model')
+
+    resource.cache = True
+
+    if distribution is None:
+        return
+
+    from ROOT import (RooRealVar, RooGaussian, RooChebychev, RooAddPdf, RooArgList, RooFit, RooAbsReal, kFALSE, kTRUE)
+
+    # Parameters for TMVASPlotTeacher
+    # TODO allow user to specify modelFileName using the model parameter
+    # TODO Set Initial Fit values using Monte Carlo!
+    modelFileName = removeJPsiSlash('model_{name}_{hash}.root'.format(name=name, hash=resource.hash))
+    modelObjectName = 'model'
+    modelYieldsObjectNames = ['bkgfrac', 'sigfrac']
+    total = float(distribution['nBackground'] + distribution['nSignal'])
+    modelYieldsInitialFractions = [distribution['nBackground']/total, distribution['nSignal']/total]
+    modelPlotComponentNames = ['sig', 'bkg']
+    low = max(distribution['range'][0], distribution['signalPeak'] - 3 * distribution['signalWidth'])
+    high = min(distribution['signalPeak'] + 3 * distribution['signalWidth'], distribution['range'][1])
+    var = distribution['variable']
+
+    if not os.path.isfile(modelFileName):
+        # observable
+        M = RooRealVar(var, var, low, high)
+        M.setBins(250)
+
+        # Setup component PDFs
+        m = RooRealVar("m", "Mass", distribution['signalPeak'])
+        sigma = RooRealVar("sigma", "Width of Gaussian", distribution['signalWidth'])
+        sig = RooGaussian("sig", "Model", M, m, sigma)
+        m.setConstant(kTRUE)
+        sigma.setConstant(kFALSE)
+
+        a0 = RooRealVar("a0", "a0", -0.69)
+        a1 = RooRealVar("a1", "a1", 0.1)
+        a0.setConstant(kFALSE)
+        a1.setConstant(kFALSE)
+        bkg = RooChebychev("bkg", "Background", M, RooArgList(a0, a1))
+
+        # Add signal and background
+        # initial value and maximal value will be set inside TMVASPlotTeacher
+        bkgfrac = RooRealVar("bkgfrac", "fraction of background", 42, 0., 42)
+        sigfrac = RooRealVar("sigfrac", "fraction of background", 42, 0., 42)
+
+        bkgfrac.setConstant(kFALSE)
+        sigfrac.setConstant(kFALSE)
+
+        model = RooAddPdf(modelObjectName, "bkg+sig", RooArgList(bkg, sig), RooArgList(bkgfrac, sigfrac))
+
+        # Write model to file and close the file, so TMVASPlotTeacher can open it
+        # It's important to use ROOT.TFile here, otherwise the test will fail
+        modelFile = ROOT.TFile(modelFileName, "RECREATE")
+        model.Write(modelObjectName)
+        modelFile.ls()
+        modelFile.Close()
+
+    model = [{'cut': '{} < {} < {}'.format(low, var, high)},
+             {'modelFileName': modelFileName,
+              'modelObjectName': modelObjectName,
+              'modelPlotComponentNames': modelPlotComponentNames,
+              'modelYieldsObjectNames': modelYieldsObjectNames,
+              'modelYieldsInitialFractions': modelYieldsInitialFractions,
+              'discriminatingVariables': [var]}]
+    return model
+
+
+def GenerateTrainingDataUsingSPlot(resource, particleList, mvaConfig, sPlotParameters, Nbins, additionalDependencies):
+    """
+    Generates the training data for the training of an MVC
         @param resource object
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
-        @param inverseSamplingRates dictionary of inverseSampling Rates for signal (1) and background (0)
+        @param sPlotParameters dictionary containing the sPlot parameters, like the model filename
+        @param Nbins number of bins
+        @return string ROOT filename
+    """
+    resource.cache = True
+    if particleList is None or (additionalDependencies is not None and any([d is None for d in additionalDependencies])):
+        return
+
+    rootFilename = removeJPsiSlash('{particleList}_{hash}.root'.format(particleList=particleList, hash=resource.hash))
+
+    if not os.path.isfile(rootFilename):
+        modularAnalysis.cutAndCopyList(particleList + '_tmp', particleList, sPlotParameters[0]['cut'],
+                                       path=resource.path, writeOut=False)
+        teacher = register_module('TMVASPlotTeacher')
+        teacher.set_name('TMVASPlotTeacher_' + particleList)
+        teacher.param('prefix', removeJPsiSlash(particleList + '_' + resource.hash))
+        teacher.param('methods', [(mvaConfig.name, mvaConfig.type, Nbins + mvaConfig.config)])  # Add number of bins for pdfs
+        teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
+        teacher.param('prepareOption', 'SplitMode=random:!V')
+        teacher.param('variables', mvaConfig.variables)
+        teacher.param('createMVAPDFs', True)
+        teacher.param('listNames', [particleList + '_tmp'])
+        teacher.param('doNotTrain', True)
+        for parameter, value in sPlotParameters[1].iteritems():
+            teacher.param(parameter, value)
+        resource.path.add_module(teacher)
+
+        B2WARNING("SPlot is still using MC-data! Otherwise we couldn't test it, due to the lack of real data!")
+        resource.condition = ('EventType', '==0')  # TODO Replace 0 with 1
+        resource.halt = True
+        return
+    return rootFilename
+
+
+def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
+    """
+    Train multivariate classifier using the trainingData
+        @param resource object
+        @param mvaConfig configuration for the multivariate analysis
         @param Nbins number of bins
         @param trainingData name of ROOT-File which contains training data
         @return string config filename
     """
     resource.cache = True
-    if trainingData is None or particleList is None:
+    if trainingData is None:
         return
     configFilename = trainingData[:-5] + '.config'
 
@@ -420,21 +533,37 @@ def SignalProbability(resource, particleList, mvaConfig, inverseSamplingRates, N
         with resource.EnableMultiThreading():
             subprocess.call(command, shell=True)
 
-    if os.path.isfile(configFilename):
-        expert = register_module('TMVAExpert')
-        expert.set_name('TMVAExpert_' + particleList)
-        expert.param('prefix', trainingData[:-5])
-        expert.param('method', mvaConfig.name)
-        expert.param('signalFraction', -2)  # Use signalFraction from training
-        expert.param('expertOutputName', 'SignalProbability')
-        expert.param('signalClass', 1)
-        expert.param('inverseSamplingRates', inverseSamplingRates)
-        expert.param('listNames', [particleList])
-        resource.path.add_module(expert)
-        return configFilename
+    if not os.path.isfile(configFilename):
+        raise RuntimeError("Training of MVC failed")
 
-    resource.halt = True
-    return
+    return configFilename
+
+
+def SignalProbability(resource, particleList, mvaConfig, inverseSamplingRates, Nbins, configFilename):
+    """
+    Calculates the SignalProbability of a ParticleList using the previously trained MVC
+        @param resource object
+        @param particleList the particleList which is used for training and classification
+        @param mvaConfig configuration for the multivariate analysis
+        @param inverseSamplingRates dictionary of inverseSampling Rates for signal (1) and background (0)
+        @param Nbins number of bins
+        @param configFilename name of file which contains the weights of thhe previously trained MVC
+        @return string config filename
+    """
+    resource.cache = True
+    if configFilename is None or particleList is None:
+        return
+    expert = register_module('TMVAExpert')
+    expert.set_name('TMVAExpert_' + particleList)
+    expert.param('prefix', configFilename[:-7])
+    expert.param('method', mvaConfig.name)
+    expert.param('signalFraction', -2)  # Use signalFraction from training
+    expert.param('expertOutputName', 'SignalProbability')
+    expert.param('signalClass', 1)
+    expert.param('inverseSamplingRates', inverseSamplingRates)
+    expert.param('listNames', [particleList])
+    resource.path.add_module(expert)
+    return resource.hash
 
 
 def TagUniqueSignal(resource, particleList, signalProbability, target):
@@ -555,7 +684,8 @@ def WriteAnalysisFileForChannel(
         preCut,
         preCutHistogram,
         mvaConfig,
-        signalProbability,
+        tmvaTraining,
+        splotTraining,
         postCutConfig,
         postCut):
     """
@@ -568,7 +698,7 @@ def WriteAnalysisFileForChannel(
         @param preCut used preCuts for this channel
         @param preCutHistogram preCutHistogram (filename, histogram postfix)
         @param mvaConfig configuration for mva
-        @param signalProbability config filename for TMVA training
+        @param tmvaTraining config filename for TMVA training
         @param postCutConfig configuration for postCut
         @param postCut
         @return dictionary containing latex placeholders of this channel
@@ -581,8 +711,14 @@ def WriteAnalysisFileForChannel(
     placeholders['mvaConfigObject'] = mvaConfig
     placeholders['texFile'] = removeJPsiSlash('{name}_{channel}_{hash}.tex'.format(
         name=particleName, channel=channelName, hash=resource.hash))
+    placeholders['mvaSPlotTexFile'] = 'empty.tex'
+    placeholders['mvaTexFile'] = 'empty.tex'
+
     placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
-    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
+    if splotTraining is not None:
+        placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, splotTraining, postCutConfig, postCut)
+        placeholders['mvaSPlotTexFile'] = placeholders['mvaTexFile']
+    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postCut)
     automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/ChannelTemplate.tex', placeholders)
 
     resource.needed = False
@@ -595,7 +731,7 @@ def WriteAnalysisFileForFSParticle(
         particleName,
         particleLabel,
         mvaConfig,
-        signalProbability,
+        tmvaTraining,
         postCutConfig,
         postCut,
         distribution,
@@ -607,7 +743,7 @@ def WriteAnalysisFileForFSParticle(
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param mvaConfig configuration for mva
-        @param signalProbability config filename for TMVA training
+        @param tmvaTraining config filename for TMVA training
         @param postCutConfig configuration for postCut
         @param postCut
         @param mcCounts
@@ -619,7 +755,7 @@ def WriteAnalysisFileForFSParticle(
     placeholders['particleLabel'] = particleLabel
     placeholders['isIgnored'] = False
 
-    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut)
+    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postCut)
     placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaConfig)
 
     resource.needed = False
@@ -697,6 +833,7 @@ def WriteAnalysisFileSummary(
         particles)
 
     subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/nordbert.pdf')), shell=True)
+    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/empty.tex')), shell=True)
     for i in range(0, 2):
         ret = subprocess.call(['pdflatex', '-halt-on-error', '-interaction=nonstopmode', placeholders['texFile']])
         if ret == 0:

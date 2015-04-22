@@ -649,18 +649,18 @@ def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
     canvas.SaveAs(plotName)
 
 
-def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, postCut):
+def createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postCut):
     """
     Creates tex file for the MVA of a channel. Adds necessary items to the placeholder dictionary
     and returns the modified dictionary.
     @param placeholders dictionary with values for every placeholder in the latex-template
     @param mvaConfig MVAConfiguration object containing the config for the mva
-    @param signalProbability config file of the TMVATeacher module
+    @param tmvaTraining config file of the TMVATeacher module
     @param postCut used postCut
     @param postCutConfig configuration of the postCut
     """
 
-    if signalProbability is None:
+    if tmvaTraining is None:
         hash = dagFramework.create_hash([placeholders])
         placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
         placeholders['mvaTemplateFile'] = 'analysis/scripts/fei/templates/MissingMVATemplate.tex'
@@ -678,9 +678,9 @@ def createMVATexFile(placeholders, mvaConfig, signalProbability, postCutConfig, 
         ROOT.gROOT.SetBatch(True)
 
         # Set mva placeholders
-        placeholders['mvaROOTFilename'] = signalProbability[:-7] + '.root'  # Strip .config of filename
-        placeholders['mvaTMVAFilename'] = signalProbability[:-7] + '_1.root'  # Strip .config of filename
-        placeholders['mvaLogFilename'] = signalProbability[:-7] + '.log'  # Strip .config of filename
+        placeholders['mvaROOTFilename'] = tmvaTraining[:-7] + '.root'  # Strip .config of filename
+        placeholders['mvaTMVAFilename'] = tmvaTraining[:-7] + '_1.root'  # Strip .config of filename
+        placeholders['mvaLogFilename'] = tmvaTraining[:-7] + '.log'  # Strip .config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
         placeholders['mvaConfig'] = addHyphenations(mvaConfig.config)

@@ -289,7 +289,7 @@ class DAG(object):
         # Therefore we add the filled path objects of the needed actors to the main basf2 path given as
         # an argument to this function
         for resource in needed:
-            if not resource.loaded_from_cache:
+            if not resource.loaded_from_cache and resource.path is not None and len(resource.path.modules()) > 0:
                 if resource.condition is not None:
                     cond_module = basf2.register_module('VariableToReturnValue')
                     cond_module.param('variable', resource.condition[0])

@@ -49,7 +49,10 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
             result[channel] = {'range': range, 'isIgnored': False,
                                'cutstring': str(range[0]) + " <= " + preCutConfig.variable + " <= " + str(range[1]),
                                'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
-                               'nSignal': GetNumberOfEventsInRange(signal[channel], range)}
+                               'nSignal': GetNumberOfEventsInRange(signal[channel], range),
+                               'signalPeak': signal[channel].GetMean(),
+                               'signalWidth': signal[channel].GetRMS(),
+                               'variable': preCutConfig.variable}
 
         for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
             redo_cuts = True

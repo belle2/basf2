@@ -300,12 +300,16 @@ def fullEventInterpretation(selection_path, particles):
                     Nbins='Nbins_' + particle.identifier,
                     additionalDependencies='None')
             # Train and apply MVC on raw ParticleList
+            dag.add('TrainedMVC_' + particle.identifier, provider.TrainMultivariateClassifier,
+                    mvaConfig='MVAConfig_' + particle.identifier,
+                    Nbins='Nbins_' + particle.identifier,
+                    trainingData='TrainingData_' + particle.identifier)
             dag.add('SignalProbability_' + particle.identifier, provider.SignalProbability,
                     mvaConfig='MVAConfig_' + particle.identifier,
                     particleList='RawParticleList_' + particle.identifier,
                     inverseSamplingRates='InverseSamplingRate_' + particle.identifier,
                     Nbins='Nbins_' + particle.identifier,
-                    trainingData='TrainingData_' + particle.identifier)
+                    configFilename='TrainedMVC_' + particle.identifier)
         else:
             for channel in particle.channels:
                 # Calculate inverse sampling rate, thereby limit the maximum amount of statistic,
@@ -332,13 +336,42 @@ def fullEventInterpretation(selection_path, particles):
                         inverseSamplingRates='InverseSamplingRate_' + channel.name,
                         Nbins='Nbins_' + channel.name,
                         additionalDependencies=additionalDependencies)
+
                 # Train and apply MVC on raw ParticleList
+                dag.add('TrainedMVC_' + channel.name, provider.TrainMultivariateClassifier,
+                        mvaConfig='MVAConfig_' + channel.name,
+                        Nbins='Nbins_' + channel.name,
+                        trainingData='TrainingData_' + channel.name)
                 dag.add('SignalProbability_' + channel.name, provider.SignalProbability,
                         mvaConfig='MVAConfig_' + channel.name,
                         particleList='RawParticleList_' + channel.name,
                         inverseSamplingRates='InverseSamplingRate_' + channel.name,
                         Nbins='Nbins_' + channel.name,
-                        trainingData='TrainingData_' + channel.name)
+                        configFilename='TrainedMVC_' + channel.name)
+
+                # Train additional sPlot training to test sPlot
+                # TODO add command line argument splot, which switches completly to splot if available
+                if particle.mvaConfig.model is not None:
+                    # Generate training data from raw ParticleList using Splot
+                    dag.add('SPlotModel_' + channel.name, provider.GenerateSPlotModel,
+                            mvaConfig='MVAConfig_' + channel.name,
+                            name='Name_' + channel.name,
+                            distribution='PreCut_' + channel.name)
+                    dag.add('SPlotTrainingData_' + channel.name, provider.GenerateTrainingDataUsingSPlot,
+                            mvaConfig='MVAConfig_' + channel.name,
+                            particleList='RawParticleList_' + channel.name,
+                            sPlotParameters='SPlotModel_' + channel.name,
+                            Nbins='Nbins_' + channel.name,
+                            additionalDependencies=additionalDependencies)
+                    dag.add('SPlotTrainedMVC_' + channel.name, provider.TrainMultivariateClassifier,
+                            mvaConfig='MVAConfig_' + channel.name,
+                            Nbins='Nbins_' + channel.name,
+                            trainingData='SPlotTrainingData_' + channel.name)
+                    dag.addNeeded('SPlotTrainedMVC_' + channel.name)
+                else:
+                    dag.add('SPlotModel_' + channel.name, None)
+                    dag.add('SPlotTrainingData_' + channel.name, None)
+                    dag.add('SPlotTrainedMVC_' + channel.name, None)
 
             # Create common SignalProbability Resource for this particle, thereby its easy to state the dependency
             # on the SignalProbability of a daughter particle in the line above!
@@ -393,7 +426,8 @@ def fullEventInterpretation(selection_path, particles):
                         preCut='PreCut_' + channel.name,
                         preCutHistogram='PreCutHistogram_' + channel.name,
                         mvaConfig='MVAConfig_' + channel.name,
-                        signalProbability='SignalProbability_' + channel.name,
+                        tmvaTraining='TrainedMVC_' + channel.name,
+                        splotTraining='SPlotTrainedMVC_' + channel.name,
                         postCutConfig='PostCutConfig_' + particle.identifier,
                         postCut='PostCut_' + particle.identifier)
 
@@ -402,7 +436,7 @@ def fullEventInterpretation(selection_path, particles):
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
                         mvaConfig='MVAConfig_' + particle.identifier,
-                        signalProbability='SignalProbability_' + particle.identifier,
+                        tmvaTraining='TrainedMVC_' + particle.identifier,
                         postCutConfig='PostCutConfig_' + particle.identifier,
                         postCut='PostCut_' + particle.identifier,
                         distribution='Distribution_' + particle.identifier,

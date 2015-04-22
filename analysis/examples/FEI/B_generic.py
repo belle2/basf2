@@ -6,16 +6,13 @@ from fei import *
 from basf2 import *
 from modularAnalysis import *
 
-
-analysis_path = create_path()
-analysis_path.add_module('RootOutput')
-
 particles = get_default_channnels()
-feistate = fullEventInterpretation(None, analysis_path, particles)
+feistate = fullEventInterpretation(None, particles)
+feistate.path.add_module('RootOutput')
 
 # show constructed path
 print feistate.path
 
-process(feistate.path)
+# process(feistate.path)
 B2WARNING('event() statistics:')
 print statistics

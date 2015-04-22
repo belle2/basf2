@@ -865,6 +865,9 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   int pos_nwords_to = 0;
   int copy_nwords = 0;
 
+  unsigned int removed_xor_chksum = 0;
+  int cnt = 0;
+
   // copyt to ReducedRawCOPPER
   //  ReducedRawCOPPER m_reduced_rawcpr;
   //Header copy
@@ -872,8 +875,18 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   buf_from = GetBuffer(n);
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
+
+  //calcurate XOR checksum diff.( depends on data-format )
+  removed_xor_chksum ^= buf_from[ tmp_header.POS_VERSION_HDRNWORDS ];
+
   // Unset the PreFormat bit ( 15th bit )
   buf_to[ tmp_header.POS_VERSION_HDRNWORDS ] &= 0xFFFF7FFF;
+
+  //calcurate XOR checksum diff.( depends on data-format )
+  removed_xor_chksum ^=  buf_to[ tmp_header.POS_VERSION_HDRNWORDS ];
+  for (int i = 0; i < SIZE_COPPER_HEADER; i++) {
+    removed_xor_chksum ^=  buf_from[ tmp_header.RAWHEADER_NWORDS + i ];
+  }
 
   //Check Header
   //  m_reduced_rawcpr.tmp_header.CheckHeader(buf_to + pos_nwords_to - copy_nwords);
@@ -899,7 +912,9 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
         + SIZE_B2LHSLB_HEADER
         + POS_B2L_CTIME; //the last word of B2LFEE
 
-      // check finesse buffer size : ( When dumhslb was used, this type of error occured and RecvStream0.py died by Segmentation Fault. ) 2014.12.01.
+
+      // check finesse buffer size : ( When dumhslb was used, this type of error
+      // occured and RecvStream0.py died by Segmentation Fault. ) 2014.12.01.
       if (finesse_nwords - SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
           - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER < 0) {
         char err_buf[500];
@@ -909,6 +924,11 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
         string err_str = err_buf;     throw (err_str);
+      }
+
+      //calcurate XOR checksum diff.( depends on data-format )
+      for (int k = 1; k <= 4 ; k++) {
+        removed_xor_chksum ^=  finesse_buf[ k ];
       }
 
       copy_nwords =
@@ -925,6 +945,11 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
       //copy B2LHSLB trailer(packet CRC error count)
       buf_to[ pos_nwords_to ] |= (finesse_buf[ finesse_nwords - (SIZE_B2LHSLB_TRAILER - POS_MAGIC_B2LHSLB) ] << 16) & 0xFFFF0000;
 
+      //calcurate XOR checksum diff. ( depends on data-format )
+      for (int k = 0; k <= 2 ; k++) {
+        removed_xor_chksum ^=  finesse_buf[ finesse_nwords - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER + k ];
+      }
+      removed_xor_chksum ^=  buf_to[ pos_nwords_to ];
 
       pos_nwords_to++;
 
@@ -941,6 +966,11 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   copy_nwords = tmp_trailer.GetTrlNwords();
   copyData(buf_to, &pos_nwords_to, buf_from, copy_nwords, nwords_buf_to);
 
+  //calcurate XOR checksum diff.( depends on data-format )
+  unsigned int old_rawcopper_chksum = buf_from[ tmp_trailer.POS_CHKSUM ];
+  for (int i = 0; i < SIZE_COPPER_TRAILER; i++) {
+    removed_xor_chksum ^= (unsigned int) * (buf_from - SIZE_COPPER_TRAILER + i);
+  }
 
 
   // length check
@@ -949,6 +979,14 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
     fflush(stdout);
     exit(1);
   }
+
+
+  // Recalculate XOR checksum in a RawCOPPER trailer
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_NWORDS);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_1ST_FINESSE);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_2ND_FINESSE);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_3RD_FINESSE);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE);
 
   //
   // Apply changes followed by data size reduction
@@ -959,10 +997,29 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_3RD_FINESSE) = pos_nwords_finesse[ 2 ];
   *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE) = pos_nwords_finesse[ 3 ];
 
+  // Recalculate XOR checksum in a RawCOPPER trailer
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_NWORDS);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_1ST_FINESSE);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_2ND_FINESSE);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_3RD_FINESSE);
+  removed_xor_chksum ^= *(buf_to + m_reduced_rawcpr.tmp_header.POS_OFFSET_4TH_FINESSE);
 
   // Recalculate XOR checksum in a RawCOPPER trailer
-  *(buf_to + pos_nwords_to - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM) =
-    CalcXORChecksum(buf_to, pos_nwords_to - tmp_trailer.GetTrlNwords());
+  unsigned int new_rawcopper_chksum = CalcXORChecksum(buf_to, pos_nwords_to - tmp_trailer.GetTrlNwords());
+
+  if ((old_rawcopper_chksum ^ removed_xor_chksum) != new_rawcopper_chksum) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "[FATAL]a RawCOPPER XOR checksum is inconsistent between before/after data reduction.(%.8x != %.8x ^ %.8x = %.8x ) Exiting...\n %s %s %d\n",
+            new_rawcopper_chksum,  old_rawcopper_chksum, removed_xor_chksum, old_rawcopper_chksum ^ removed_xor_chksum,
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    string err_str = err_buf;     throw (err_str);
+  }
+
+  *(buf_to + pos_nwords_to - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM) = new_rawcopper_chksum;
+
+
 
   //
   // data block # check

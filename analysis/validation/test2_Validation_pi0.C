@@ -56,30 +56,36 @@ void test2_Validation_pi0() {
 
     /* Take the pi0tuple prepared by the NtupleMaker */
     TChain * recoTree = new TChain("pi0tuple");
-    recoTree->AddFile("../GenericB.ntup.root");
+    recoTree->AddFile("GenericB.ntup.root");
 
     //Plots for online/web validation
     TFile* output = new TFile("test2_Validation_pi0_output.root","recreate");
 
     //Plots used in offline validation
     /* Invariant mass after Egamma>0.05 GeV criterion */
-    TH1F * h_pi0_m_cut = new TH1F("pi0_m_cut",";Mass with photon cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
+    TH1F * h_pi0_m_cut = new TH1F("pi0_m_cut",";Mass with photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
     /* Mass constrained fit value,as stored in Particle */
     TH1F * h_pi0_m_fit = new TH1F("pi0_m_fit",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Description","pi0 Mass constrained fit mass,with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
     h_pi0_m_fit->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
     /* Invariant mass determined from the two photon daughters */
-    TH1F * h_pi0_m    = new TH1F("pi0_m",";Mass without cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
+    TH1F * h_pi0_m    = new TH1F("pi0_m",";Mass without photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
     h_pi0_m->GetListOfFunctions()->Add(new TNamed("Description","pi0 Mass,with background. A Generic BBbar sample is used. Test may be replaced with analysis mode validation with pi0."));
     h_pi0_m->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
+    
+    TH1F * h_pi0_m_truth    = new TH1F("pi0_m",";Mass without cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
+    h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Description","pi0 mass from photons,with mcErrors==0. A Generic BBbar sample is used."));
+    h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Check","Check if mean is correct. Currently photon energy is wrong and gives wrong mean."));
 
     /* Access the Photons and pi0 M*/
     float pi0_gamma0_P4[4];
     float pi0_gamma1_P4[4];
     float pi0_M;
+    int pi0_mcErrors;
     recoTree->SetBranchAddress("pi0_gamma0_P4",&pi0_gamma0_P4);
     recoTree->SetBranchAddress("pi0_gamma1_P4",&pi0_gamma1_P4);
     recoTree->SetBranchAddress("pi0_M",&pi0_M);
+    recoTree->SetBranchAddress("pi0_mcErrors",&pi0_mcErrors);
 
     for(Int_t iloop=0; iloop<recoTree->GetEntries(); iloop++) {
         recoTree->GetEntry(iloop);
@@ -90,11 +96,18 @@ void test2_Validation_pi0() {
         h_pi0_m_fit->Fill(pi0_M);
         h_pi0_m->Fill(pi0_raw_M);
         if(lv_pi0_gamma0.E()>0.05&&lv_pi0_gamma1.E()>0.05)h_pi0_m_cut->Fill(pi0_raw_M);
+        if( pi0_mcErrors<1 )h_pi0_m_truth->Fill(pi0_raw_M);
     }
 
     TCanvas *canvas = new TCanvas ("canvas","canvasReco",1000,800);
     canvas->Print("test2_Validation_pi0_plots.pdf[");
 
+    // Mass constrained fit mass
+    h_pi0_m_truth->SetLineColor(kGreen);
+    h_pi0_m_truth->SetMinimum(0.);
+    h_pi0_m_truth->Draw();
+    canvas->Print("test2_Validation_pi0_plots.pdf");
+    
     // Mass constrained fit mass
     h_pi0_m_fit->SetLineColor(kRed);
     h_pi0_m_fit->SetMinimum(0.);
@@ -114,8 +127,8 @@ void test2_Validation_pi0() {
     RooDataHist h_pi0_nocut("h_pi0_nocut","h_pi0_nocut",*mass,h_pi0_m);
 
     //pi0 signal PDF is a Crystal Ball (Gaussian also listed in case we want to switch)
-    RooRealVar mean("mean","mean",0.14,0.13,0.16);
-    RooRealVar sig1("#sigma","sig",0.6,0.002,1.);
+    RooRealVar mean("mean","mean",0.14,0.11,0.16);
+    RooRealVar sig1("#sigma","sig",0.05,0.002,1.);
     RooGaussian gau1("gau1","gau1",*mass,mean,sig1);
 
     RooRealVar alphacb("alphacb","alpha",1.4,0.1,1.8);
@@ -185,10 +198,10 @@ void test2_Validation_pi0() {
     tvalidation->SetAlias("Description","Fit to the pi0 mass in background conditions. Note this test may be replaced due to overlap with ECL specific tests.");
     tvalidation->SetAlias("Check","Consistent numerical fit results.");
 
-    canvas->Print("test2_Validation_pi0_plots.pdf");
     canvas->Print("test2_Validation_pi0_plots.pdf]");
 
     output->Write();
     output->Close();
 }
+
 

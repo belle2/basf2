@@ -105,17 +105,15 @@ recoToolsPi0 = [
     'EventMetaData',
     '^pi0',
     'MCTruth',
-    'pi0 -> ^gamma ^gamma',
+    '^pi0 -> ^gamma ^gamma',
     'MCKinematics',
-    'pi0 -> ^gamma ^gamma',
+    '^pi0 -> ^gamma ^gamma',
     'Kinematics',
     '^pi0 -> ^gamma ^gamma',
     'InvMass',
     '^pi0',
-    'MCReconstructible',
-    'pi0 -> ^gamma ^gamma',
     'MCHierarchy',
-    'pi0 -> ^gamma ^gamma',
+    '^pi0 -> ^gamma ^gamma',
 ]
 ntupleTree('pi0tuple', 'pi0:all', recoToolsPi0)
 # Save the truth pi0s to ntuple
@@ -129,8 +127,6 @@ truthToolsPi0 = [
     '^pi0 -> ^gamma ^gamma',
     'InvMass',
     '^pi0',
-    'MCReconstructible',
-    'pi0 -> ^gamma ^gamma',
 ]
 ntupleTree('truthpi0tuple', 'pi0:gen', truthToolsPi0)
 

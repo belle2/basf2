@@ -509,29 +509,23 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
 #endif
         delete temp_rawtlu;
       } else {
-
-
-
         //
         // RawCOPPER
         //
         int block_id = 0;
-
         RawCOPPER* temp_rawcopper = new RawCOPPER;
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
+        "do not use the following for actual DAQ"
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
 #endif
 
-
-
 #ifndef NO_DATA_CHECK
         try {
-
           temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
                                     m_prev_copper_ctr, &cur_copper_ctr,
                                     m_prev_runsubrun_no, &m_runsubrun_no);
@@ -555,10 +549,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         }
         cpr_num++;
         delete temp_rawcopper;
-
-
       }
-
     }
 
 #ifndef NO_DATA_CHECK
@@ -601,12 +592,11 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
 void DesSerPrePC::DataAcquisition()
 {
   // For data check
-
-  printf("Check1 \n");
-  fflush(stdout);
   unsigned int eve_copper_0 = 0;
+  B2INFO("initializing...");
   initialize();
   initialize2();
+  B2INFO("Done.");
 
   if (m_start_flag == 0) {
     //
@@ -621,8 +611,6 @@ void DesSerPrePC::DataAcquisition()
     n_basf2evt = 0;
   }
 
-  printf("Check2 \n");
-  fflush(stdout);
   while (1) {
     clearNumUsedBuf();
     //
@@ -630,7 +618,6 @@ void DesSerPrePC::DataAcquisition()
     //
     RawDataBlock raw_datablk[ NUM_EVT_PER_BASF2LOOP_PC ];
     for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
-
       //
       // Receive data from COPPER
       //
@@ -648,8 +635,7 @@ void DesSerPrePC::DataAcquisition()
       //
       // Copy reduced buffer
       //
-      int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
-                                 &delete_flag_to);
+      int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk), &delete_flag_to);
       m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
       m_status.copyEventHeader(buf_to);
 #else
@@ -709,30 +695,11 @@ void DesSerPrePC::DataAcquisition()
 
     }
 
-#ifdef TIME_MONITOR
-
-#endif
 
     //  StoreArray<RawCOPPER> rawcprarray;
     //  StoreArray<RawDataBlock> raw_dblkarray;
 
     for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
-      //    int* buf;
-      //    int m_size_byte = 0;
-      //    printf( "[DEBUG] sent %d bytes\n", m_size_byte);
-#ifndef DUMMY_DATA
-      //  StoreObjPtr<RawCOPPER> rawcopper;
-      //    buf = rawcprarray[ j ]->GetWholeBuffer();
-      //    m_size_byte = rawcprarray[ j ]->TotalBufNwords() * sizeof(int);
-#else
-      m_size_byte = 1000;
-      m_buffer[0] = (m_size_byte + 3) / 4;
-      buf = m_buffer;
-#endif
-
-#ifdef TIME_MONITOR
-
-#endif
 
       //
       // Send data
@@ -783,8 +750,6 @@ void DesSerPrePC::DataAcquisition()
       waitRestart();
     }
 #endif
-
-
     n_basf2evt++;
     if (m_status.isAvailable()) {
       m_status.setInputNBytes(m_totbytes);
@@ -818,39 +783,13 @@ void DesSerPrePC::event2()
     return; // Nothing to do here
   }
 #endif
-
   if (m_start_flag == 0) {
     m_start_time = getTimeSec();
     n_basf2evt = 0;
-
   }
 
-#ifdef TIME_MONITOR
-
-#endif
-
-  //  StoreArray<RawCOPPER> rawcprarray;
   StoreArray<RawDataBlock> raw_dblkarray;
-
-
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
-    //    int* buf;
-    //    int m_size_byte = 0;
-    //    printf( "[DEBUG] sent %d bytes\n", m_size_byte);
-#ifndef DUMMY_DATA
-    //  StoreObjPtr<RawCOPPER> rawcopper;
-    //    buf = rawcprarray[ j ]->GetWholeBuffer();
-    //    m_size_byte = rawcprarray[ j ]->TotalBufNwords() * sizeof(int);
-#else
-    m_size_byte = 1000;
-    m_buffer[0] = (m_size_byte + 3) / 4;
-    buf = m_buffer;
-#endif
-
-#ifdef TIME_MONITOR
-
-#endif
-
     //
     // Send data
     //
@@ -877,11 +816,6 @@ void DesSerPrePC::event2()
     }
   }
 
-#ifdef TIME_MONITOR
-
-#endif
-
-
 #ifdef NONSTOP
   if (g_run_stop == 1) {
     waitRestart();
@@ -893,7 +827,6 @@ void DesSerPrePC::event2()
   // Print current status
   //
   if (n_basf2evt % 1000 == 0) {
-
     //     double cur_time = getTimeSec();
     //     double total_time = cur_time - m_start_time;
     //     double interval = cur_time - m_prev_time;

@@ -123,6 +123,7 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          raw_copper->GetEveNo(i), raw_copper->GetNodeID(i),
          raw_copper->GetBlockNwords(i) * sizeof(int));
 
+  printBuffer(raw_copper->GetWholeBuffer(), raw_copper->TotalBufNwords());
   //
   // Print data from each FINESSE
   //

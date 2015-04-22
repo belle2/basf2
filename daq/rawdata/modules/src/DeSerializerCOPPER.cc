@@ -485,17 +485,15 @@ void DeSerializerCOPPERModule::event()
     n_basf2evt = 0;
   }
 
-  //  rawcprarray.create();
+
   raw_dblkarray.create();
   RawDataBlock* temp_rawdblk;
-  //  RawCOPPER* temp_rawcopper;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;
     int delete_flag = 0;
     if (m_start_flag == 0) {
       B2INFO("DeSerializerCOPPER: Reading the 1st event from COPPER FIFO...");
     }
-
 
     int* temp_buf;
     try {

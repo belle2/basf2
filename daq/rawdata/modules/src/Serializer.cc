@@ -12,8 +12,6 @@
 using namespace std;
 using namespace Belle2;
 
-//#define DUMMY_DATA
-#define TIME_MONITOR
 #define NONSTOP_DEBUG
 //#define DEBUG
 
@@ -108,7 +106,6 @@ void SerializerModule::beginRun()
 void SerializerModule::endRun()
 {
   //fill Run data
-
   B2INFO("endRun done.");
 }
 
@@ -620,23 +617,6 @@ void SerializerModule::event()
 
 
   for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
-    //    int* buf;
-    //    int m_size_byte = 0;
-    //    printf( "[DEBUG] sent %d bytes\n", m_size_byte);
-#ifndef DUMMY_DATA
-    //  StoreObjPtr<RawCOPPER> rawcopper;
-    //    buf = rawcprarray[ j ]->GetWholeBuffer();
-    //    m_size_byte = rawcprarray[ j ]->TotalBufNwords() * sizeof(int);
-#else
-    m_size_byte = 1000;
-    m_buffer[0] = (m_size_byte + 3) / 4;
-    buf = m_buffer;
-#endif
-
-#ifdef TIME_MONITOR
-    recordTime(n_basf2evt, time_array1);
-#endif
-
     //
     // Send data
     //
@@ -646,7 +626,6 @@ void SerializerModule::event()
 
     try {
       m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
-      //      printf("Ser len %d numeve %d node %d\n", raw_dblkarray[ j ]->TotalBufNwords(), raw_dblkarray[ j ]->GetNumEvents(), raw_dblkarray[ j ]->GetNumNodes() );
     } catch (string err_str) {
 #ifdef NONSTOP
       if (err_str == "EAGAIN") {
@@ -663,11 +642,6 @@ void SerializerModule::event()
     }
   }
 
-#ifdef TIME_MONITOR
-  recordTime(n_basf2evt, time_array2);
-#endif
-
-
 #ifdef NONSTOP
   if (g_run_stop == 1) {
     waitRestart();
@@ -679,7 +653,6 @@ void SerializerModule::event()
   // Print current status
   //
   if (n_basf2evt % 1000 == 0) {
-
     //     double cur_time = getTimeSec();
     //     double total_time = cur_time - m_start_time;
     //     double interval = cur_time - m_prev_time;

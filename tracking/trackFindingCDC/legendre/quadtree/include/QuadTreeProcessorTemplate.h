@@ -210,8 +210,8 @@ namespace Belle2 {
           node->setFilled();
         }
 
-        int m_nbins_theta = node->getXNbins();
-        int m_nbins_r = node->getYNbins();
+        constexpr int m_nbins_theta = binCountX;
+        constexpr int m_nbins_r = binCountY;
 
         bool binUsed[m_nbins_theta][m_nbins_r];
         for (int ii = 0; ii < m_nbins_theta; ii++)

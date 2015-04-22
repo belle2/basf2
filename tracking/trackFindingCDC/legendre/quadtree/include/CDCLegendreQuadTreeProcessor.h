@@ -82,8 +82,6 @@ namespace Belle2 {
       void fillChildren(QuadTreeLegendre* m_node, std::vector<TrackHit*>& m_hits) const
       {
 
-        int sizeX = 2;
-        int sizeY = 2;
         double dist_1[3][3];
         double dist_2[3][3];
         const size_t neededSize = 2 * m_hits.size();
@@ -97,8 +95,8 @@ namespace Belle2 {
           if (hit->getHitUsage() != TrackHit::not_used)
             continue;
 
-          for (int t_index = 0; t_index < sizeX; ++t_index) {
-            for (int r_index = 0; r_index < sizeY; ++r_index) {
+          for (int t_index = 0; t_index < m_sizeX; ++t_index) {
+            for (int r_index = 0; r_index < m_sizeY; ++r_index) {
 
               float r_temp_min = hit->getConformalX()
                                  * TrigonometricalLookupTable::Instance().cosTheta(m_node->getChildren()->get(t_index, r_index)->getXMin())
@@ -152,8 +150,6 @@ namespace Belle2 {
                                            std::vector<TrackHit*>& m_hits, std::pair<double, double>& ref_point) const
       {
 
-        int sizeX = 2;
-        int sizeY = 2;
         double dist_1[3][3];
         double dist_2[3][3];
         const size_t neededSize = 2 * m_hits.size();
@@ -170,8 +166,8 @@ namespace Belle2 {
           std::tuple<double, double, double> confCoords = hit->performConformalTransformWithRespectToPoint(ref_point.first, ref_point.second);
 
 
-          for (int t_index = 0; t_index < sizeX; ++t_index) {
-            for (int r_index = 0; r_index < sizeY; ++r_index) {
+          for (int t_index = 0; t_index < m_sizeX; ++t_index) {
+            for (int r_index = 0; r_index < m_sizeY; ++r_index) {
 
               float r_temp_min = std::get<0>(confCoords) * cos(m_node->getXMin())
                                  + std::get<1>(confCoords) * sin(m_node->getXMin());
@@ -309,8 +305,8 @@ namespace Belle2 {
           node->setFilled();
         }
 
-        int m_nbins_theta = node->getXNbins();
-        int m_nbins_r = node->getYNbins();
+        constexpr int m_nbins_theta = m_sizeX;
+        constexpr int m_nbins_r = m_sizeY;
 
         bool binUsed[m_nbins_theta][m_nbins_r];
         for (int ii = 0; ii < m_nbins_theta; ii++)
@@ -341,6 +337,11 @@ namespace Belle2 {
       }
 
       unsigned char m_lastLevel;
+
+      // size of the x and y component of the quad tree children
+      // obviously this will be fixed to 2 for a quad tree.
+      constexpr static int m_sizeX = 2;
+      constexpr static int m_sizeY = 2;
     };
 
   }

@@ -866,7 +866,6 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   int copy_nwords = 0;
 
   unsigned int removed_xor_chksum = 0;
-  int cnt = 0;
 
   // copyt to ReducedRawCOPPER
   //  ReducedRawCOPPER m_reduced_rawcpr;

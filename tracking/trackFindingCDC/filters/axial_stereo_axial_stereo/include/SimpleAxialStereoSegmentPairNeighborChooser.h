@@ -7,41 +7,25 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef SIMPLEAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
-#define SIMPLEAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
+#pragma once
 
 #include "BaseAxialStereoSegmentPairNeighborChooser.h"
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    ///Class filtering the neighborhood of segment triples based on simple criterions.
-    class SimpleAxialStereoSegmentPairNeighborChooser : public BaseAxialStereoSegmentPairNeighborChooser {
+    /// Class filtering the neighborhood of axial stereo segment pairs based on simple criteria.
+    class SimpleAxialStereoSegmentPairNeighborChooser :
+      public Filter<Relation<CDCAxialStereoSegmentPair>> {
 
     public:
-      virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair&,
-                                            const CDCAxialStereoSegmentPair& neighborPair) override final {
-
-        // Just let all found neighors pass since we have the same start -> end segment
-        // and let the cellular automaton figure auto which is longest
-
-        // can of course be adjusted by comparing the z components between
-        // pair and neighbor pair
-
-        // neighbor weight is a penalty for the overlap of the segments since we would
-        // count it to times
-        // could also be a better measure of fit quality
-
-        return  -neighborPair.getStartSegment()->size();
-
-      }
-
-    private:
+      /// TODO implement something sensable here.
+      virtual
+      NeighborWeight operator()(const CDCAxialStereoSegmentPair& fromPair,
+                                const CDCAxialStereoSegmentPair& toPair) IF_NOT_CINT(override final);
 
     }; // end class
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif // SIMPLEAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H

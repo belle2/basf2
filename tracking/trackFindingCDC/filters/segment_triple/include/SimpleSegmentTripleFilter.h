@@ -12,6 +12,7 @@
 #include "BaseSegmentTripleFilter.h"
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,13 +22,13 @@ namespace Belle2 {
 
     public:
       /// Clears all remember information from the last event
-      virtual void clear() override;
+      virtual void clear() IF_NOT_CINT(override final);
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() override;
+      virtual void initialize() IF_NOT_CINT(override final);
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() override;
+      virtual void terminate() IF_NOT_CINT(override final);
 
       /** Checks if a triple of axial, stereo and axial segments is a good combination to be stored.
        *  Checks the proper alignement and the quality of connection between all three segments.

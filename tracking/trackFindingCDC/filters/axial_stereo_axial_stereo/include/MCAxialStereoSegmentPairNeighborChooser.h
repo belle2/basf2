@@ -7,37 +7,71 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef MCAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
-#define MCAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
-
-#include <tracking/trackFindingCDC/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+#pragma once
 
 #include "BaseAxialStereoSegmentPairNeighborChooser.h"
+#include <tracking/trackFindingCDC/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
-    class MCAxialStereoSegmentPairNeighborChooser : public BaseAxialStereoSegmentPairNeighborChooser {
+    class MCAxialStereoSegmentPairNeighborChooser :
+      public Filter<Relation<CDCAxialStereoSegmentPair>> {
+
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCAxialStereoSegmentPair>> Super;
 
     public:
-      /** Constructor. */
-      MCAxialStereoSegmentPairNeighborChooser(bool allowReverse = true) : m_mcAxialStereoSegmentPairFilter(allowReverse)
-      {;}
+      /** Constructor setting to default reversal symmetry. */
+      MCAxialStereoSegmentPairNeighborChooser(bool allowReverse = true);
+
+    public:
+      /// May be used to clear information from former events. Currently unused.
+      virtual void clear() IF_NOT_CINT(override final);
+
+      /// Forwards the modules initialize to the filter
+      virtual void initialize() IF_NOT_CINT(override final);
+
+      /// Forwards the modules initialize to the filter
+      virtual void terminate() IF_NOT_CINT(override final);
+
+      /** Set the parameter with key to value.
+       *
+       *  Parameters are:
+       *  symmetric -  Accept the relation facet if the reverse relation facet is correct
+       *               preserving the progagation reversal symmetry on this level of detail.
+       *               Allowed values "true", "false". Default is "true".
+       */
+      virtual
+      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+
+      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
+       */
+      virtual
+      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
+
+      /// Indicates that the filter requires Monte Carlo information.
+      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
+
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
-                                            const CDCAxialStereoSegmentPair& neighborAxialStereoSegmentPair) override final
+      virtual NeighborWeight operator()(const CDCAxialStereoSegmentPair& fromAxialStereoSegmentPair,
+                                        const CDCAxialStereoSegmentPair& toAxialStereoSegmentPair) IF_NOT_CINT(override final);
+
+    public:
+      /// Setter for the allow reverse parameter
+      void setAllowReverse(bool allowReverse)
       {
+        m_mcAxialStereoSegmentPairFilter.setAllowReverse(allowReverse);
+      }
 
-        CellWeight mcPairWeight = m_mcAxialStereoSegmentPairFilter(axialStereoSegmentPair);
-        CellWeight mcNeighborPairWeight = m_mcAxialStereoSegmentPairFilter(neighborAxialStereoSegmentPair);
-
-        bool mcDecision = (not isNotACell(mcPairWeight)) and (not isNotACell(mcNeighborPairWeight));
-
-        return mcDecision ? -neighborAxialStereoSegmentPair.getStartSegment()->size() : NOT_A_NEIGHBOR;
-
+      /// Getter for the allow reverse parameter
+      bool getAllowReverse() const
+      {
+        return m_mcAxialStereoSegmentPairFilter.getAllowReverse();
       }
 
     private:
@@ -48,5 +82,3 @@ namespace Belle2 {
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif // MCAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H

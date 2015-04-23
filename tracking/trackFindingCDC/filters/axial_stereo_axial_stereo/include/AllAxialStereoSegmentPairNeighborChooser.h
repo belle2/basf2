@@ -7,25 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef ALLAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
-#define ALLAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H
+#pragma once
 
 #include "BaseAxialStereoSegmentPairNeighborChooser.h"
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Neighbor chooser that lets all possible combinations pass.
-    class AllAxialStereoSegmentPairNeighborChooser : public BaseAxialStereoSegmentPairNeighborChooser {
+    class AllAxialStereoSegmentPairNeighborChooser :
+      public Filter<Relation<CDCAxialStereoSegmentPair>>  {
 
     public:
-      virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair&,
-                                            const CDCAxialStereoSegmentPair& neighborPair) override final {
-        return  -neighborPair.getStartSegment()->size();
-      }
+      /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
+      virtual
+      NeighborWeight operator()(const CDCAxialStereoSegmentPair& fromPair,
+                                const CDCAxialStereoSegmentPair& toPair) IF_NOT_CINT(override final);
+
     }; // end class
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif // ALLAXIALSTEREOSEGMENTPAIRNEIGHBORCHOOSER_H

@@ -11,11 +11,9 @@
 #include <b2bii/modules/B2BIIConvertMdst/B2BIIConvertMdstModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
 // Belle II utilities
-#include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 
 // Belle II dataobjects
@@ -32,6 +30,8 @@
 
 
 using namespace Belle2;
+
+const Const::ChargedStable B2BIIConvertMdstModule::c_belleHyp_to_chargedStable[c_nHyp] = { Const::electron, Const::muon, Const::pion, Const::kaon, Const::proton };
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -339,20 +339,8 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
   Belle::Mdst_trk& trk = belleTrack.trk();
 
-  for (int mhyp = 0 ; mhyp < 5; ++mhyp) {
-    std::shared_ptr<Const::ParticleType> pType;
-
-    if (mhyp == 0) {
-      pType = std::make_shared<Const::ParticleType>(Const::electron);
-    } else if (mhyp == 1) {
-      pType = std::make_shared<Const::ParticleType>(Const::muon);
-    } else if (mhyp == 2) {
-      pType = std::make_shared<Const::ParticleType>(Const::pion);
-    } else if (mhyp == 3) {
-      pType = std::make_shared<Const::ParticleType>(Const::kaon);
-    } else {
-      pType = std::make_shared<Const::ParticleType>(Const::proton);
-    }
+  for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
+    const Const::ChargedStable& pType = c_belleHyp_to_chargedStable[mhyp];
 
     Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
 
@@ -432,9 +420,9 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
 
     //TODO what are hitPatternCDCInitializer and hitPatternVXDInitializer?
-    auto trackFit = trackFitResults.appendNew(helixParam, helixError, *pType, pValue, -1, -1);
+    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, -1, -1);
 
-    track->setTrackFitResultIndex(*pType, trackFit->getArrayIndex());
+    track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
 
     // test conversion (pion hypothesis only)
     if (mhyp == 2)

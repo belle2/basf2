@@ -30,6 +30,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
+
 #include <string>
 #include <map>
 
@@ -147,6 +150,11 @@ namespace Belle2 {
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
      */
     void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName);
+
+    /** Number of track hypotheses (see c_belleHyp_to_chargedStable). */
+    const static int c_nHyp = 5;
+    /** maps Belle hypotheses to Const::ChargedStable (from http://belle.kek.jp/secured/wiki/doku.php?id=software:atc_pid). */
+    const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
 
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;

@@ -378,7 +378,7 @@ class TestDAG(unittest.TestCase):
         self.assertTrue(self.s.run(path))
         # Check if condition is correctly implemented
         self.assertEqual(len(path.modules()), 1)
-        self.assertEqual(path.modules()[0].name(), 'VariableToReturnValue')
+        self.assertEqual(path.modules()[0].type(), 'VariableToReturnValue')
         self.assertEqual(path.modules()[0].available_params()[0].name, 'variable')
         self.assertEqual(path.modules()[0].available_params()[0].values, 'EventType')
         self.assertTrue(path.modules()[0].has_condition())

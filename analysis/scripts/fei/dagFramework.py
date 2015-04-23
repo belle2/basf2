@@ -294,6 +294,7 @@ class DAG(object):
                     cond_module = basf2.register_module('VariableToReturnValue')
                     cond_module.param('variable', resource.condition[0])
                     cond_module.if_value(resource.condition[1], resource.path, basf2.AfterConditionPath.CONTINUE)
+                    cond_module.set_name('VariableToReturnValue(' + resource.condition[0] + ')')
                     path.add_module(cond_module)
                 else:
                     path.add_path(resource.path)

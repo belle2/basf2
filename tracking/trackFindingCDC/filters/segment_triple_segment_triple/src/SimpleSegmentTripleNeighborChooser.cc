@@ -14,4 +14,19 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-//only here to trigger a compilation of the source file
+NeighborWeight
+SimpleSegmentTripleNeighborChooser::operator()(const CDCSegmentTriple&,
+                                               const CDCSegmentTriple& neighborTriple)
+{
+  // Just let all found neighors pass since we have the same start -> end segment
+  // and let the cellular automaton figure auto which is longest
+
+  // can of course be adjusted by comparing the z components between
+  // triple and neighbor triples
+
+  // neighbor weight is a penalty for the overlap of the segments since we would
+  // count it to times
+  // could also be a better measure of fit quality
+  return  -neighborTriple.getStart()->size();
+}
+

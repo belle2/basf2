@@ -7,27 +7,29 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
 #ifndef MCSEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define MCSEGMENTTRIPLENEIGHBORCHOOSER_H_
 
+#include "BaseSegmentTripleNeighborChooser.h"
 #include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
-#include "BaseSegmentTripleNeighborChooser.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     ///Class filtering the neighborhood of segment triples with monte carlo information
-    class MCSegmentTripleNeighborChooser: public BaseSegmentTripleNeighborChooser {
+    class MCSegmentTripleNeighborChooser: public Filter<Relation<CDCSegmentTriple>> {
+
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCSegmentTriple>> Super;
 
     public:
       /** Constructor. */
       MCSegmentTripleNeighborChooser(bool allowReverse = true);
-
-      /** Destructor.*/
-      virtual ~MCSegmentTripleNeighborChooser() {;}
 
       /// Clears stored information for a former event
       virtual void clear() IF_NOT_CINT(override final);
@@ -38,18 +40,40 @@ namespace Belle2 {
       /// Forwards the terminate method from the module
       virtual void terminate() IF_NOT_CINT(override final);
 
-      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight isGoodNeighbor(const CDCSegmentTriple& triple,
-                                            const CDCSegmentTriple& neighborTriple) override final
+      /** Set the parameter with key to value.
+       *
+       *  Parameters are:
+       *  symmetric -  Accept the relation of segment triples also if the reverse relation is correct
+       *               preserving the progagation reversal symmetry on this level of detail.
+       *               Allowed values "true", "false". Default is "true".
+       */
+      virtual
+      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+
+      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
+       */
+      virtual
+      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
+
+      /// Indicates that the filter requires Monte Carlo information.
+      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
+
+
+      /** Main filter method returning the weight of the neighborhood relation.
+       *  Return NOT_A_NEIGHBOR if relation shall be rejected.*/
+      virtual NeighborWeight operator()(const CDCSegmentTriple& triple,
+                                        const CDCSegmentTriple& neighborTriple) IF_NOT_CINT(override final);
+
+      /// Setter for the allow reverse parameter
+      void setAllowReverse(bool allowReverse)
       {
+        m_mcSegmentTripleFilter.setAllowReverse(allowReverse);
+      }
 
-        CellState mcTripleWeight = m_mcSegmentTripleFilter(triple);
-        CellState mcNeighborTripleWeight = m_mcSegmentTripleFilter(neighborTriple);
-
-        bool mcDecision = (not isNotACell(mcTripleWeight)) and (not isNotACell(mcNeighborTripleWeight));
-
-        return mcDecision ? - neighborTriple.getStart()->size() : NOT_A_NEIGHBOR;
-
+      /// Getter for the allow reverse parameter
+      bool getAllowReverse() const
+      {
+        return m_mcSegmentTripleFilter.getAllowReverse();
       }
 
     private:

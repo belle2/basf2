@@ -7,41 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
 #ifndef ALLSEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define ALLSEGMENTTRIPLENEIGHBORCHOOSER_H_
 
 #include "BaseSegmentTripleNeighborChooser.h"
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class excepting all segment triples.
-    class AllSegmentTripleNeighborChooser : public BaseSegmentTripleNeighborChooser {
+    class AllSegmentTripleNeighborChooser : public Filter<Relation<CDCSegmentTriple>> {
 
-    public:
-      /// Default constructor
-      AllSegmentTripleNeighborChooser() {;}
-
-      /// Empty destructor
-      virtual ~AllSegmentTripleNeighborChooser() {;}
-
-      /// Clears stored information for a former event
-      virtual void clear() override final {;}
-
-      /// Forwards the initialize method from the module
-      virtual void initialize() override final {;}
-
-      /// Forwards the terminate method from the module
-      virtual void terminate() override final {;}
-
-      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight isGoodNeighbor(const CDCSegmentTriple&,
-                                            const CDCSegmentTriple& neighborTriple) override final {
-        // Just let all found neighors pass for the base implementation
-        // with the default weight
-        return  -neighborTriple.getStart()->size();
-      }
+      /** Main filter method returning the weight of the neighborhood relation.
+       *  Always return the overlap penatlty accepting all relations.*/
+      virtual NeighborWeight operator()(const CDCSegmentTriple& from,
+                                        const CDCSegmentTriple& to) override final;
 
     }; // end class
 

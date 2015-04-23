@@ -1063,7 +1063,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
             new_rawcopper_chksum,  old_rawcopper_chksum, removed_xor_chksum, old_rawcopper_chksum ^ removed_xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    //    string err_str = err_buf;     throw (err_str);
+    string err_str = err_buf;     throw (err_str);
   }
 
   *(buf_to + pos_nwords_to - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM) = new_rawcopper_chksum;
@@ -1160,7 +1160,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
         - ((SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) + SIZE_B2LHSLB_TRAILER) ;
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
-    printf("PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
+    PrintData(GetBuffer(n), *(GetBuffer(n) + tmp_header.POS_NWORDS));
+    printf("[FATAL] PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
            *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
@@ -1171,7 +1172,6 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     }
     printf("\n");
     fflush(stdout);
-
     char err_buf[500];
     sprintf(err_buf,
             "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",

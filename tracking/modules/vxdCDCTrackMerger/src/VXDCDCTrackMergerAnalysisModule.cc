@@ -31,6 +31,7 @@ VXDCDCTrackMergerAnalysisModule::VXDCDCTrackMergerAnalysisModule() :
   m_trk_mrg_eff(0),
   m_match_vec(0),
   m_true_match_vec(0),
+  m_true_match_mc(0),
   m_right_match_vec(0),
   m_loop_match_vec(0),
   m_chi2_vec(0),
@@ -221,6 +222,7 @@ void VXDCDCTrackMergerAnalysisModule::event()
   double merge_radius = m_merge_radius;
 
   unsigned int matched_track = 0;
+  unsigned int recovered_track = 0;
   unsigned int truth_matched = 0;
   unsigned int truth_flag = 0;
   unsigned int vxd_match = 1000;
@@ -245,6 +247,7 @@ void VXDCDCTrackMergerAnalysisModule::event()
       continue;
     }
     matched_track = 0;
+    recovered_track = 0;
     truth_matched = 0;
     vxd_match = 1000; //index for matched track candidate
     vxd_truth = 2000; //index for true matched candidate
@@ -290,6 +293,12 @@ void VXDCDCTrackMergerAnalysisModule::event()
         if ((chi_2 < CHI2_MAX) && (chi_2 > 0)) {
           matched_track = 1;
           CHI2_MAX = chi_2;
+          vxd_match = jtrack;
+          vxd_xmin = vxd_sop.getPos();
+          vxd_pmin = vxd_sop.getMom();
+        } else if ((matched_track == 0) && (chi_2 > 0) && (TMath::Sqrt((pos - vxdpos) * (pos - vxdpos)) < merge_radius)) {
+          recovered_track = 1;
+          //CHI2_MAX = chi_2;
           vxd_match = jtrack;
           vxd_xmin = vxd_sop.getPos();
           vxd_pmin = vxd_sop.getMom();
@@ -358,7 +367,7 @@ void VXDCDCTrackMergerAnalysisModule::event()
     }//end loop on VXD tracks
 
     //Store Indexes
-    if (matched_track == 1) {
+    if ((matched_track == 1) || (recovered_track == 1)) {
       n_trk_pair++;
       m_match_vec->push_back(1);
       //std::cout << "Merged candidate id: " << cdc_mcp_index << std::endl; //Temp for display purposes
@@ -367,7 +376,7 @@ void VXDCDCTrackMergerAnalysisModule::event()
       else
         m_right_match_vec->push_back(0);
     }
-    if ((matched_track == 0) && (truth_matched == 1)) {
+    if (((matched_track == 0) || (recovered_track == 1)) && (truth_matched == 1)) {
       m_match_vec->push_back(0);
       m_right_match_vec->push_back(0);
       //std::cout << "Unmerged candidate id: " << cdc_mcp_index << std::endl; //Temp for display purposes
@@ -375,11 +384,11 @@ void VXDCDCTrackMergerAnalysisModule::event()
       const genfit::TrackCand* UnMergedTrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>((GFTracks[itrack]), m_TrackCandColName);
       UnMergedCands.appendNew(*UnMergedTrkCandPtr);
     }
-    if ((matched_track == 1) && (truth_matched == 0)) {
+    if (((matched_track == 1) || (recovered_track == 1)) && (truth_matched == 0)) {
       m_true_match_vec->push_back(0);
     }
 
-    if ((matched_track == 1) || (truth_matched == 1)) { //Save info for merged tracks or a true-matcheds
+    if ((matched_track == 1) || (recovered_track == 1) || (truth_matched == 1)) { //Save info for merged tracks or a true-matcheds
       //Chi2
       m_chi2_vec->push_back(CHI2_MAX);
       //Residuals

@@ -795,7 +795,7 @@ void ECLDataAnalysisModule::event()
   }
 
   m_eclClusterMultip = clusters.getEntries();
-  for (int iclusters = 0; iclusters < clusters.getEntries() ; iclusters++) {
+  for (unsigned int iclusters = 0; iclusters < clusters.getEntries() ; iclusters++) {
     ECLCluster* aECLClusters = clusters[iclusters];
 
     m_eclClusterIdx->push_back(iclusters);

@@ -25,6 +25,7 @@
     <xtFileName desc="file which contains x-t relation">xt_v2.dat</xtFileName>
     <sigmaFileName desc="file which contains space resol.">sigma_v0.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
+    <t0FileName desc="file which contains t0">t0.dat</t0FileName>
 
     <!-- For misalignment -->
     <Misalignment desc="true: load misaligned sense wire positions; false: not.">true</Misalignment>
@@ -39,6 +40,7 @@
     <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v2.dat</xt4ReconFileName>
     <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v0.dat</sigma4ReconFileName>
     <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
+    <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
 
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
     <Helium>Helium</Helium>

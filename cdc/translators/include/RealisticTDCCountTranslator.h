@@ -95,10 +95,10 @@ namespace Belle2 {
        */
       CDCGeometryPar& m_cdcp;
 
-      /**
-       * Hit timing offset value.
-       */
-      unsigned short m_tdcOffset;
+      //      /**
+      //       * Hit timing offset value.
+      //       */
+      //      unsigned short m_tdcOffset;
 
       /**
        * TDC bin width (1nsec).

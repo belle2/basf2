@@ -31,7 +31,8 @@ using namespace CDC;
 // register module
 REG_MODULE(CDCDigitizer)
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
-  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
+//  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
+  m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0), m_tdcBinHwidth(0.5),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
@@ -114,7 +115,7 @@ void CDCDigitizerModule::initialize()
 
   m_cdcp = &(CDCGeometryPar::Instance());
   CDCGeometryPar& cdcp = *m_cdcp;
-  m_tdcOffset    = cdcp.getTdcOffset();
+  //  m_tdcOffset    = cdcp.getTdcOffset();
   m_tdcBinWidth  = cdcp.getTdcBinWidth();
   m_tdcBinWidthInv = 1. / m_tdcBinWidth;
   m_tdcBinHwidth = m_tdcBinWidth / 2.;
@@ -133,7 +134,7 @@ void CDCDigitizerModule::initialize()
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer initialize" << endl;
-  cout << "m_tdcOffset= " <<  m_tdcOffset << endl;
+  //  cout << "m_tdcOffset= " <<  m_tdcOffset << endl;
   cout << "m_tdcBinWidth= " <<  m_tdcBinWidth << endl;
   cout << "m_tdcBinHwidth= " <<  m_tdcBinHwidth << endl;
   cout << "m_tdcResol= " <<  m_tdcResol << endl;
@@ -318,9 +319,12 @@ void CDCDigitizerModule::event()
     }
 
 //N.B. The real TDC module rounds down the measured time (information from KEK electronics division via N.Taniguchi).
-    unsigned short tdcCount = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
+//    unsigned short tdcCount = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
+    unsigned short tdcCount = static_cast<unsigned short>((m_cdcp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
+                                                          m_tdcBinWidthInv);
     cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
 
+    //    std::cout <<"t0= " << m_cdcp->getT0(iterSignalMap->first) << std::endl;
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
     float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;
     std::cout <<"driftT bf digitization, TDC in common stop, digitized driftT = " << iterSignalMap->second.m_driftTime <<" "<< tdcInCommonStop <<" "<< driftTimeFromTDC << std::endl;

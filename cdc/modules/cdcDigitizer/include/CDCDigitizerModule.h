@@ -114,7 +114,7 @@ namespace Belle2 {
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
-    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
+    //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
 
     CDC::CDCGeometryPar* m_cdcp;  /**< Pointer to CDCGeometryPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */

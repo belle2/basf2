@@ -87,12 +87,20 @@ namespace Belle2 {
       void readSigma(const GearDir, int mode = 0);
 
       /**
-       * Read the propagatio of speed on the sense wire.
+       * Read the propagation speed along the sense wire.
        * @param GearDir Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
 
       void readPropSpeed(const GearDir, int mode = 0);
+
+      /**
+       * Read t0 parameter.
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+
+      void readT0(const GearDir, int mode = 0);
 
       //! Generate an xml file used in gearbox
       /*!
@@ -325,6 +333,18 @@ namespace Belle2 {
           \return Coefficient for the sense wire sag.
       */
       double getWireSagCoef(EWirePosition set, int layerId, int cellId) const;
+
+      //! Returns t0 parameter of the specified sense wire
+      /*!
+      \param layerId The layer id. of the wire
+      \param cellId  The wire id. of the wire
+      \return t0.
+      */
+      float getT0(const WireID& wireID) const
+      {
+        //  std::cout << wireID.getICLayer() <<" "<< wireID.getIWire() << std::endl;
+        return m_t0[wireID.getICLayer()][wireID.getIWire()];
+      }
 
       //! Calculates and saves shifts in super-layers (to be used in searching hits in neighboring cells)
       /*!
@@ -720,6 +740,7 @@ namespace Belle2 {
       double m_XT[MAX_N_SLAYERS][2][19][7][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       double m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
       double m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
+      float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire. */
 
       unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/
       double m_tdcBinWidth;        /*!< TDC bin width (1 nsec/bin). */

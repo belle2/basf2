@@ -271,6 +271,9 @@ void CDCGeometryPar::read()
 
     //Read propagation speed
     readPropSpeed(gbxParams);
+
+    //Read t0
+    readT0(gbxParams);
   }
 
   //Replace xt etc. with those for reconstriction
@@ -281,6 +284,7 @@ void CDCGeometryPar::read()
     readXT(gbxParams, 1);
     readSigma(gbxParams, 1);
     readPropSpeed(gbxParams, 1);
+    readT0(gbxParams, 1);
   }
 
   //calculate and save shifts in super-layers
@@ -628,6 +632,52 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 
   ifs.close();
 }
+
+
+// Read t0 params.
+void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
+{
+  std::string fileName0 = gbxParams.getString("t0FileName");
+  if (mode == 1) {
+    fileName0 = gbxParams.getString("t04ReconFileName");
+  }
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
+  }
+
+  int iL(0), iC(0);
+  float t0(0);
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL >> iC >> t0;
+
+    if (ifs.eof()) break;
+
+    ++nRead;
+
+    m_t0[iL][iC] = t0;
+
+    if (m_debug) {
+      std::cout << iL << " " << iC << " " << t0 << std::endl;
+    }
+  }
+
+  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readT0: #lines read-in (=" << nRead <<
+                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+
+  ifs.close();
+}
+
 
 void CDCGeometryPar::Print() const
 {}

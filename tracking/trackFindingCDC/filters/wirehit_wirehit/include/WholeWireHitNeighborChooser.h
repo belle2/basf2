@@ -7,9 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef WHOLEWIREHITNEIGHBORCHOOSER_H
-#define WHOLEWIREHITNEIGHBORCHOOSER_H
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/algorithms/Relation.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -26,7 +27,7 @@ namespace Belle2 {
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
     /** Class providing the neighborhood filter interface to the NeighborhoodBuilder for the construction of wire neighborhoods.*/
     template<bool withSecondaryNeighborhood = false>
-    class WholeWireHitNeighborChooser {
+    class WholeWireHitNeighborChooser : public Filter<Relation<CDCWireHit>> {
 
     public:
       /// Empty constructor
@@ -35,9 +36,6 @@ namespace Belle2 {
         m_wireNeighbors.reserve(withSecondaryNeighborhood ? 18 : 6);
         m_wireHitNeighbors.reserve(withSecondaryNeighborhood ? 32 : 12);
       }
-
-      /// Clear for interface compliance. Does nothing here.
-      void clear() {}
 
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
       template<class CDCWireHitIterator>
@@ -132,15 +130,24 @@ namespace Belle2 {
 
       }
 
-      /// Returns whether the wire hit is a good neighbor.
-      /** Returns if the wire hit given in the range of possible neighbors is also a good neighbor.
-       *  In the case of wire hits every neighbor is a good neighbor */
-      inline NeighborWeight isGoodNeighbor(
-        const CDCWireHit* wirehit __attribute__((unused)),
-        const CDCWireHit* neighborWirehit __attribute__((unused))
-      ) const
+      /** Legacy method */
+      inline NeighborWeight isGoodNeighbor(const CDCWireHit* fromWireHit,
+                                           const CDCWireHit* toWireHit)
       {
-        return 0; // All possible neighbors are good ones but the relation does not contribute any specific gain in points
+        assert(fromWireHit);
+        assert(toWireHit);
+        return 0;
+      }
+
+      /** Main filter method overriding the filter interface method.
+       *  Checks the validity of the pointers in the relation and unpacks the relation to
+       *  the method implementing the rejection.*/
+      inline CellWeight operator()(const Relation<CDCWireHit>& relation) override final
+      {
+        const CDCWireHit* ptrFrom = relation.first;
+        const CDCWireHit* ptrTo = relation.second;
+        if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
+        return 0;
       }
 
     private:
@@ -154,5 +161,3 @@ namespace Belle2 {
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //WHOLEWIREHITNEIGHBORCHOOSER_H

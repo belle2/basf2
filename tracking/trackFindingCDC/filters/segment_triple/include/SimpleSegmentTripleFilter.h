@@ -7,56 +7,48 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef SIMPLESEGMENTTRIPLEFILTER_H_
-#define SIMPLESEGMENTTRIPLEFILTER_H_
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
-#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
-#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#pragma once
 
 #include "BaseSegmentTripleFilter.h"
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment triples based on simple criterions
-    class SimpleSegmentTripleFilter : public BaseSegmentTripleFilter {
-
-    public:
-
-      /** Constructor. */
-      SimpleSegmentTripleFilter();
-
-      /** Destructor.*/
-      virtual ~SimpleSegmentTripleFilter();
+    class SimpleSegmentTripleFilter : public Filter<CDCSegmentTriple> {
 
     public:
       /// Clears all remember information from the last event
-      virtual void clear() override final;
+      virtual void clear() override;
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() override final;
+      virtual void initialize() override;
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() override final;
+      virtual void terminate() override;
 
-      /// Checks if a triple of axial, stereo and axial segments is a good combination to be stored as an automaton cell
-      /** Checks the proper alignement and the quality of connection between all three segments.
-       *  Returns NOT_A_CELL if the connection shall not be made or a finit value be used as the cell weight of the cell to constructed. */
-      virtual CellWeight isGoodSegmentTriple(const CDCSegmentTriple& triple) override final;
+      /** Checks if a triple of axial, stereo and axial segments is a good combination to be stored.
+       *  Checks the proper alignement and the quality of connection between all three segments.
+       *  Returns NOT_A_CELL if the connection shall not be made or
+       *  a finit value be used as the cell weight of the cell to constructed.
+       */
+      virtual CellWeight operator()(const CDCSegmentTriple& triple) override final;
 
     private:
-      /// Returns the sz trajectory of the reconstructed stereo segment of the segment triple. Does a fit if necessary.
+      /** Returns the sz trajectory of the reconstructed stereo segment of the segment triple.
+       *  Does a fit if necessary.
+       */
       const CDCTrajectorySZ& getFittedTrajectorySZ(const CDCSegmentTriple& segmentTriple) const;
 
-      /// Returns the sz fitter instance that is used by this filter
+      /// Returns the sz fitter instance that is used by this filter.
       const CDCSZFitter& getSZFitter() const
       { return m_szFitter; }
 
     private:
-      CDCSZFitter m_szFitter; ///< Memory of the SZ fitter fitting sz lines to the stereo segments
+      /// Memory of the SZ fitter fitting sz lines to the stereo segments
+      CDCSZFitter m_szFitter;
 
       /// Subsidiary filter to use the fitter from it.
       SimpleAxialAxialSegmentPairFilter m_simpleAxialAxialSegmentPairFilter;
@@ -66,5 +58,3 @@ namespace Belle2 {
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //SIMPLESEGMENTTRIPLEFILTER_H_

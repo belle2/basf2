@@ -14,24 +14,15 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight AllSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
+CellWeight AllSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
   const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
   const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
 
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-  if (ptrMiddleSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as middle segment");
-    return NOT_A_CELL;
-  }
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
+  assert(ptrStartSegment);
+  assert(ptrMiddleSegment);
+  assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;

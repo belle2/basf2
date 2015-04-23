@@ -12,25 +12,9 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-
-SimpleSegmentTripleFilter::SimpleSegmentTripleFilter() : m_szFitter()
-{
-}
-
-
-
-SimpleSegmentTripleFilter::~SimpleSegmentTripleFilter()
-{
-}
-
-
 
 void SimpleSegmentTripleFilter::clear()
 {
@@ -53,30 +37,20 @@ void SimpleSegmentTripleFilter::terminate()
 
 
 
-CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
+CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
   const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
   const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
 
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-  if (ptrMiddleSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as middle segment");
-    return NOT_A_CELL;
-  }
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
+  assert(ptrStartSegment);
+  assert(ptrMiddleSegment);
+  assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
-
 
   //check if the middle segment lies within the acceptable bounds in angular deviation
   {
@@ -178,11 +152,7 @@ CellWeight SimpleSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple
   const CDCTrajectorySZ& trajectorySZ = getFittedTrajectorySZ(segmentTriple);
 
   FloatType squaredDistance = reconstructedMiddle.getSquaredZDist(trajectorySZ);
-
-  {
-    B2DEBUG(100, "  ZDistance of the middleSegment = " << squaredDistance);
-
-  }
+  B2DEBUG(100, "  ZDistance of the middleSegment = " << squaredDistance);
 
   CellWeight result = startSegment.size() + middleSegment.size() + endSegment.size();
 
@@ -218,6 +188,3 @@ const CDCTrajectorySZ& SimpleSegmentTripleFilter::getFittedTrajectorySZ(const CD
   return trajectorySZ;
 
 }
-
-
-

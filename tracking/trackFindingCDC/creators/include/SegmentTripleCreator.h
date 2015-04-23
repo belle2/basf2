@@ -251,7 +251,7 @@ namespace Belle2 {
                 }
 
                 // Ask the filter to assess this triple
-                CellWeight cellWeight = segmentTripleFilter.isGoodSegmentTriple(segmentTriple);
+                CellWeight cellWeight = segmentTripleFilter(segmentTriple);
 
                 if (not isNotACell(cellWeight)) {
                   segmentTriple.getAutomatonCell().setCellWeight(cellWeight);

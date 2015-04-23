@@ -7,43 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef BASESEGMENTTRIPLEFILTER_H_
-#define BASESEGMENTTRIPLEFILTER_H_
-
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
-#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter for the constuction of segment triples based on simple criterions
-    class BaseSegmentTripleFilter {
-
-    public:
-      /** Constructor. */
-      BaseSegmentTripleFilter() {;}
-
-      /** Destructor.*/
-      virtual ~BaseSegmentTripleFilter() {;}
-
-    public:
-      /// Clears all remember information from the last event
-      virtual void clear() {;}
-
-      /// Forwards the modules initialize to the filter
-      virtual void initialize() {;}
-
-      /// Forwards the modules initialize to the filter
-      virtual void terminate() {;}
-
-      /// Base implementation return NOT_A_NEIGHBOT for all segment triples.
-      virtual CellWeight isGoodSegmentTriple(const CDCSegmentTriple&) { return NOT_A_NEIGHBOR; }
-
-    }; // end class BaseSegmentTripleFilter
+    /// Base filter for the constuction of segment triples.
+    typedef Filter<CDCSegmentTriple>  BaseSegmentTripleFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //BASESEGMENTTRIPLEFILTER_H_

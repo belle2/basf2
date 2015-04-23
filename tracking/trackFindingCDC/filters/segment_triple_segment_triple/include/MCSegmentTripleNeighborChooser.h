@@ -40,10 +40,11 @@ namespace Belle2 {
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight isGoodNeighbor(const CDCSegmentTriple& triple,
-                                            const CDCSegmentTriple& neighborTriple) override final {
+                                            const CDCSegmentTriple& neighborTriple) override final
+      {
 
-        CellState mcTripleWeight = m_mcSegmentTripleFilter.isGoodSegmentTriple(triple);
-        CellState mcNeighborTripleWeight = m_mcSegmentTripleFilter.isGoodSegmentTriple(neighborTriple);
+        CellState mcTripleWeight = m_mcSegmentTripleFilter(triple);
+        CellState mcNeighborTripleWeight = m_mcSegmentTripleFilter(neighborTriple);
 
         bool mcDecision = (not isNotACell(mcTripleWeight)) and (not isNotACell(mcNeighborTripleWeight));
 

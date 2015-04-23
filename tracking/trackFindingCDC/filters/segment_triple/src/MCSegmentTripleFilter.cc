@@ -23,17 +23,10 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
-  m_allowReverse(allowReverse),
+  m_param_allowReverse(allowReverse),
   m_mcAxialAxialSegmentPairFilter(allowReverse)
 {
 }
-
-
-
-MCSegmentTripleFilter::~MCSegmentTripleFilter()
-{
-}
-
 
 
 void MCSegmentTripleFilter::clear()
@@ -56,8 +49,40 @@ void MCSegmentTripleFilter::terminate()
 }
 
 
+void MCSegmentTripleFilter::setParameter(const std::string& key, const std::string& value)
+{
+  if (key == "symmetric") {
+    if (value == "true") {
+      m_param_allowReverse = true;
+      B2INFO("Filter received parameter '" << key << "' " << value);
+    } else if (value == "false") {
+      m_param_allowReverse = false;
+      B2INFO("Filter received parameter '" << key << "' " << value);
+    } else {
+      Super::setParameter(key, value);
+    }
+  } else {
+    Super::setParameter(key, value);
+  }
+}
 
-CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& segmentTriple)
+std::map<std::string, std::string> MCSegmentTripleFilter::getParameterDescription()
+{
+  std::map<std::string, std::string> des = Super::getParameterDescription();
+  des["symmetric"] =  "Accept the segment triple if the reverse segment triple is correct "
+                      "preserving the progagation reversal symmetry on this level of detail."
+                      "Allowed values 'true', 'false'. Default is 'true'.";
+  return des;
+}
+
+bool MCSegmentTripleFilter::needsTruthInformation()
+{
+  return true;
+}
+
+
+
+CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -99,7 +124,7 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
 
 
   if ((startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
-      (m_allowReverse and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
+      (m_param_allowReverse and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
 
     // Do fits
     setTrajectoryOf(segmentTriple);
@@ -137,5 +162,3 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
   segmentTriple.setTrajectorySZ(trajectory3D.getTrajectorySZ());
 
 }
-
-

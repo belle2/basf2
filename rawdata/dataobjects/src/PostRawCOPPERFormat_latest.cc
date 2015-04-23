@@ -273,10 +273,14 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     string err_str = err_buf;
     throw (err_str);
   }
-  unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, &(m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ]), 1);
-  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EVE_NO ]), 1);
-  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_TTUTIME ]), 1);
-  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(m_buffer[ tmp_header.POS_EXP_RUN_NO ]), 1);
+
+  int* copper_buf = GetBuffer(n);
+
+
+  unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, &(copper_buf[ tmp_header.POS_TTCTIME_TRGTYPE ]), 1);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(copper_buf[ tmp_header.POS_EVE_NO ]), 1);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(copper_buf[ tmp_header.POS_TTUTIME ]), 1);
+  temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(copper_buf[ tmp_header.POS_EXP_RUN_NO ]), 1);
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
   int pos_nwords = finesse_nwords - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, buf, pos_nwords);
@@ -292,17 +296,25 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
            *buf, temp_crc16);
   }
 
+  //  if ( false ) {
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
-    PrintData(m_buffer, m_nwords);
-    //  if ( false ) {
-    if (m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & (0x1 << tmp_header.B2LINK_PACKET_CRC_ERROR)) {
-      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error eve %8d : %x %x %d\n", GetEveNo(n), *buf , temp_crc16,
-             GetFINESSENwords(n, finesse_num));
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
+    int copper_nwords = copper_buf[ tmp_header.POS_NWORDS ];
+    PrintData(copper_buf, copper_nwords);
+    if (copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & (0x1 << tmp_header.B2LINK_PACKET_CRC_ERROR)) {
+      // Do not stop data
+      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error eve %8d : %x %x %d\n",
+             GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+      // Modify XOR checksum due to adding a bit flag
+      copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
+      |= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
+      copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
+      copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
+      |= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
+
     } else {
-      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error eve %8d : %x %x %d\n", GetEveNo(n), *buf , temp_crc16,
-             GetFINESSENwords(n, finesse_num));
-      printf("\n");
+      // Stop taking data
+      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error eve %8d : %x %x %d\n",
+             GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
       int* temp_buf = GetFINESSEBuffer(n, finesse_num);
       printf("%.8x ", 0);
       for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {

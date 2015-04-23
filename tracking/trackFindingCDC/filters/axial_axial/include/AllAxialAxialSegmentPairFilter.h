@@ -7,44 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef ALLAXIALAXIALSEGMENTPAIRFILTER_H_
-#define ALLAXIALAXIALSEGMENTPAIRFILTER_H_
+#pragma once
 
 #include "BaseAxialAxialSegmentPairFilter.h"
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialAxialSegmentPair.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter accepting all axial to axial segment pairs.
-    class AllAxialAxialSegmentPairFilter  : public BaseAxialAxialSegmentPairFilter {
-
-    public:
-
-      /// Constructor
-      AllAxialAxialSegmentPairFilter() {;}
-
-      /// Empty destructor
-      virtual ~AllAxialAxialSegmentPairFilter() {;}
-
-    public:
-      /// Clears all remember information from the last event
-      virtual void clear() override final {;}
-
-      /// Forwards the modules initialize to the filter
-      virtual void initialize() override final {;}
-
-      /// Forwards the modules initialize to the filter
-      virtual void terminate() override final {;}
+    class AllAxialAxialSegmentPairFilter  : public Filter<CDCAxialAxialSegmentPair> {
 
       /// Checks if a pair of axial segments is a good combination
-      virtual CellWeight isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair&) override final;
+      virtual CellWeight operator()(const CDCAxialAxialSegmentPair&) override final;
 
     }; // end class AllAxialAxialSegmentPairFilter
 
-
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //ALLAXIALAXIALSEGMENTPAIRFILTER_H_

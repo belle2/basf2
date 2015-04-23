@@ -82,7 +82,7 @@ CellWeight MCSegmentTripleFilter::isGoodSegmentTriple(const CDCSegmentTriple& se
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
-  CellWeight pairWeight =  m_mcAxialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(segmentTriple);
+  CellWeight pairWeight =  m_mcAxialAxialSegmentPairFilter(segmentTriple);
   if (isNotACell(pairWeight)) return NOT_A_CELL;
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();

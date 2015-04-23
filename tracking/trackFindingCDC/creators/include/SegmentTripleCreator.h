@@ -35,13 +35,14 @@ namespace Belle2 {
       inline void create(AxialAxialSegmentPairFilter& axialAxialSegmentPairFilter,
                          SegmentTripleFilter& segmentTripleFilter,
                          const std::vector<CDCRecoSegment2D>& segments,
-                         std::set<CDCSegmentTriple>& segmentTriples) const {
+                         std::set<CDCSegmentTriple>& segmentTriples) const
+      {
 
         AxialSegmentsBySuperLayer axialSegmentsBySL;
         StereoSegmentsBySuperLayer stereoSegmentsBySL;
 
         /// Divide segments by superlayer
-        for (const CDCRecoSegment2D & segment : segments) {
+        for (const CDCRecoSegment2D& segment : segments) {
 
           ILayerType iSuperLayer =  segment.getISuperLayer();
           StereoType stereoType = segment.getStereoType();
@@ -89,7 +90,8 @@ namespace Belle2 {
                          SegmentTripleFilter& segmentTripleFilter,
                          const AxialSegmentsBySuperLayer& axialSegmentsBySL,
                          const StereoSegmentsBySuperLayer& stereoSegmentsBySL,
-                         std::set<CDCSegmentTriple>& segmentTriples) const {
+                         std::set<CDCSegmentTriple>& segmentTriples) const
+      {
 
         //clear the remembered fits
         axialAxialSegmentPairFilter.clear();
@@ -203,12 +205,13 @@ namespace Belle2 {
                                                const std::vector<const CDCAxialRecoSegment2D* >& startSegments,
                                                const std::vector<const CDCStereoRecoSegment2D* >& middleSegments,
                                                const std::vector<const CDCAxialRecoSegment2D* >& endSegments,
-                                               std::set< CDCSegmentTriple >& segmentTriples) const {
+                                               std::set< CDCSegmentTriple >& segmentTriples) const
+      {
 
         CDCSegmentTriple segmentTriple;
 
-        for (const CDCAxialRecoSegment2D * startSegment : startSegments) {
-          for (const CDCAxialRecoSegment2D * endSegment : endSegments) {
+        for (const CDCAxialRecoSegment2D* startSegment : startSegments) {
+          for (const CDCAxialRecoSegment2D* endSegment : endSegments) {
 
             if (startSegment == endSegment) continue; //Just for safety
 
@@ -232,12 +235,12 @@ namespace Belle2 {
               continue;
             }
 
-            CellWeight pairWeight = axialAxialSegmentPairFilter.isGoodAxialAxialSegmentPair(axialAxialSegmentPair);
+            CellWeight pairWeight = axialAxialSegmentPairFilter(axialAxialSegmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
 
             if (pairIsGood) {
 
-              for (const CDCAxialRecoSegment2D * middleSegment : middleSegments) {
+              for (const CDCAxialRecoSegment2D* middleSegment : middleSegments) {
 
                 segmentTriple.setMiddle(middleSegment);
                 segmentTriple.getTrajectorySZ().clear();

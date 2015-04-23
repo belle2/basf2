@@ -21,29 +21,20 @@ SimpleAxialAxialSegmentPairFilter::SimpleAxialAxialSegmentPairFilter() : m_riema
   m_riemannFitter.useOnlyOrientation();
 }
 
-CellWeight SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight SimpleAxialAxialSegmentPairFilter::operator()(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
-
   const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
 
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
+  assert(ptrStartSegment);
+  assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  //do fits
+  // Do fits
   const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
   const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
-
 
   // Check if segments are coaligned
   bool endSegmentIsCoaligned = startFit.getTotalPerpS(endSegment) >= 0.0;
@@ -52,7 +43,6 @@ CellWeight SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const 
   if (not endSegmentIsCoaligned or not startSegmentIsCoaligned) {
     return NOT_A_CELL;
   }
-
 
   // Check if there is a positive gap between start and end segment
   FloatType startFitGap = startFit.getPerpSGap(startSegment, endSegment);
@@ -110,7 +100,8 @@ const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(
 
 
 
-const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const
+const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(const CDCAxialAxialSegmentPair&
+    axialAxialSegmentPair) const
 {
   CDCTrajectory2D& trajectory2D = axialAxialSegmentPair.getTrajectory2D();
   if (not trajectory2D.isFitted()) {
@@ -118,6 +109,3 @@ const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(
   }
   return trajectory2D;
 }
-
-
-

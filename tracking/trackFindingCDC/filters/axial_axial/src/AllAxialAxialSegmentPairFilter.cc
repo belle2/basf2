@@ -16,23 +16,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
-CellWeight AllAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight AllAxialAxialSegmentPairFilter::operator()(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
 {
-
   const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
 
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("SimpleAxialAxialSegmentPairFilter::isGoodAxialAxialSegmentPair invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
+  assert(ptrStartSegment);
+  assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;

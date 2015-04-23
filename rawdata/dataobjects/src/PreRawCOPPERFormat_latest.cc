@@ -565,25 +565,46 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   //  m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
 
+//   printf("%.8x %.8x %.8x %.8x : %.8x\n",
+//   copper_buf[ POS_CH_A_DATA_LENGTH ], copper_buf[ POS_CH_B_DATA_LENGTH ],
+//   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
+
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
+
     if ((m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      printf("[ERROR] B2link packet CRC error slot A eve %8d %.8x : %s %s %d\n", cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords);
     }
   }
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      printf("[ERROR] B2link packet CRC error slot B eve %8d %.8x : %s %s %d\n",  cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords);
     }
   }
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      printf("[ERROR] B2link packet CRC error slot C eve %8d %.8x : %s %s %d\n",  cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords);
     }
   }
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      printf("[ERROR] B2link packet CRC error slot D eve %8d %.8x : %s %s %d\n",  cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords);
     }
   }
 
@@ -1034,6 +1055,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
   // Recalculate XOR checksum in a RawCOPPER trailer
   unsigned int new_rawcopper_chksum = CalcXORChecksum(buf_to, pos_nwords_to - tmp_trailer.GetTrlNwords());
 
+
   if ((old_rawcopper_chksum ^ removed_xor_chksum) != new_rawcopper_chksum) {
     char err_buf[500];
     sprintf(err_buf,
@@ -1041,7 +1063,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
             new_rawcopper_chksum,  old_rawcopper_chksum, removed_xor_chksum, old_rawcopper_chksum ^ removed_xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;     throw (err_str);
+    //    string err_str = err_buf;     throw (err_str);
   }
 
   *(buf_to + pos_nwords_to - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM) = new_rawcopper_chksum;
@@ -1136,8 +1158,6 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   //
   buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n, finesse_num)
         - ((SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) + SIZE_B2LHSLB_TRAILER) ;
-
-  //  printf("PreRawCOPPER  : Eve %.8x B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), *buf, temp_crc16 );
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     printf("PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",

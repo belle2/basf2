@@ -291,24 +291,32 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     printf("#### PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,
            *buf, temp_crc16);
   }
+
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
-    //  if ( false ) {
     PrintData(m_buffer, m_nwords);
-    printf("POST CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
-    printf("\n");
-    int* temp_buf = GetFINESSEBuffer(n, finesse_num);
-    printf("%.8x ", 0);
-    for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
-      printf("%.8x ", temp_buf[ k ]);
-      if ((k + 1) % 10 == 0) printf("\n%.8x : ", k);
+    //  if ( false ) {
+    if (m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & (0x1 << tmp_header.B2LINK_PACKET_CRC_ERROR)) {
+      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error eve %8d : %x %x %d\n", GetEveNo(n), *buf , temp_crc16,
+             GetFINESSENwords(n, finesse_num));
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
+    } else {
+      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error eve %8d : %x %x %d\n", GetEveNo(n), *buf , temp_crc16,
+             GetFINESSENwords(n, finesse_num));
+      printf("\n");
+      int* temp_buf = GetFINESSEBuffer(n, finesse_num);
+      printf("%.8x ", 0);
+      for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
+        printf("%.8x ", temp_buf[ k ]);
+        if ((k + 1) % 10 == 0) printf("\n%.8x : ", k);
+      }
+      printf("\n");
+      fflush(stdout);
+      char err_buf[500];
+      sprintf(err_buf,
+              "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+              (unsigned short)(*buf & 0xFFFF), temp_crc16, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      string err_str = err_buf;     throw (err_str);
     }
-    printf("\n");
-    fflush(stdout);
-    char err_buf[500];
-    sprintf(err_buf,
-            "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
-            (unsigned short)(*buf & 0xFFFF), temp_crc16, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf;     throw (err_str);
   }
 
   return 1;

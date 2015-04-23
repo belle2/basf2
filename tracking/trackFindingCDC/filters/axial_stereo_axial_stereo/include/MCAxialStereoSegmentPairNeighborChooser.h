@@ -41,7 +41,7 @@ namespace Belle2 {
       /** Set the parameter with key to value.
        *
        *  Parameters are:
-       *  symmetric -  Accept the relation facet if the reverse relation facet is correct
+       *  symmetric -  Accept the relation of segment pairs also if the reverse relation is correct
        *               preserving the progagation reversal symmetry on this level of detail.
        *               Allowed values "true", "false". Default is "true".
        */

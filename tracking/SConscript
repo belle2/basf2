@@ -4,10 +4,11 @@
 Import('env')
 
 env['LIBS'] = [
-    'tracking_dataobjects', 
+    'tracking_dataobjects',
+    'tracking_trackFindingCDC',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
-    'vxd', 'vxd_dataobjects', 
+    'vxd', 'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'testbeam_vxd_dataobjects',
     'simulation_dataobjects',

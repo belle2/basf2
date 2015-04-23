@@ -15,6 +15,5 @@
 #pragma link C++ class Belle2::RootMergeable<TH1D>+;
 #pragma link C++ class Belle2::RootMergeable<TH2F>+;
 #pragma link C++ class Belle2::RootMergeable<TH2D>+;
-#pragma link C++ class Belle2::RooDataSetMergeable+;
 
 #endif

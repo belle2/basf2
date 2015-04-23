@@ -13,7 +13,7 @@
 #include <analysis/TMVAInterface/Teacher.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/pcore/RooDataSetMergeable.h>
+#include <analysis/modules/TMVATeacher/RooDataSetMergeable.h>
 
 #include <RooWorkspace.h>
 

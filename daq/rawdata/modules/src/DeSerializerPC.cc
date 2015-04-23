@@ -394,10 +394,13 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* d
 
 
 
-void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
+void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* exp_copper_0, unsigned int* run_copper_0,
+                                     unsigned int* subrun_copper_0, unsigned int* eve_copper_0, int* error_bit_flag)
 {
+
   int data_size_copper_0 = -1;
   int data_size_copper_1 = -1;
+
 
   //
   // Data check
@@ -498,8 +501,6 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
 #endif
 
-
-
 #ifndef NO_DATA_CHECK
         try {
 
@@ -518,16 +519,22 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ev
 
         if (cpr_num == 0) {
           data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
-          *eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
+          //          *eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
+          *eve_copper_0 = temp_rawcopper->GetEveNo(0);
+          *exp_copper_0 = temp_rawcopper->GetExpNo(0);
+          *run_copper_0 = temp_rawcopper->GetRunNo(0);
+          *subrun_copper_0 = temp_rawcopper->GetSubRunNo(0);
         } else if (cpr_num == 1) {
           data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
         }
         cpr_num++;
+
+        // Check Error bit flag
+        if (temp_rawcopper->GetErrorBitFlag(0))(*error_bit_flag)++;
+
+
         delete temp_rawcopper;
-
-
       }
-
     }
 
 #ifndef NO_DATA_CHECK
@@ -572,7 +579,13 @@ void DeSerializerPCModule::event()
 {
   // For data check
 
+  unsigned int exp_copper_0 = 0;
+  unsigned int run_copper_0 = 0;
+  unsigned int subrun_copper_0 = 0;
   unsigned int eve_copper_0 = 0;
+  int error_bit_flag = 0;
+
+
 
   clearNumUsedBuf();
 
@@ -608,7 +621,7 @@ void DeSerializerPCModule::event()
     RawDataBlock temp_rawdatablk;
     setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
     //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
-    checkData(&temp_rawdatablk, &eve_copper_0);
+    checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
 
 #ifndef USE_DESERIALIZER_PREPC
     PreRawCOPPERFormat_latest pre_rawcopper_latest;
@@ -661,9 +674,15 @@ void DeSerializerPCModule::event()
   // Update EventMetaData
   //
   m_eventMetaDataPtr.create();
-  m_eventMetaDataPtr->setExperiment(1);
-  m_eventMetaDataPtr->setRun(1);
-  m_eventMetaDataPtr->setEvent(n_basf2evt);
+  m_eventMetaDataPtr->setExperiment(exp_copper_0);
+  m_eventMetaDataPtr->setRun(run_copper_0);
+  if (error_bit_flag == 0) {
+    m_eventMetaDataPtr->setSubrun(subrun_copper_0);
+  } else {
+    printf("[ERROR] error bit was detected. count = %d\n", error_bit_flag);
+    m_eventMetaDataPtr->setSubrun(0xFFFFFFFF);
+  }
+  m_eventMetaDataPtr->setEvent(eve_copper_0);
 
 
 

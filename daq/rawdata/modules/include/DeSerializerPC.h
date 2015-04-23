@@ -73,7 +73,11 @@ namespace Belle2 {
     virtual void setRecvdBuffer(RawDataBlock* raw_datablk, int* delete_flag);
 
     //! check data contents
-    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
+    //    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
+    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* exp_copper_0,
+                           unsigned int* run_copper_0, unsigned int* subrun_copper_0,
+                           unsigned int* eve_copper_0, int* error_bit_flag);
+
 
     //! # of connections
     int m_num_connections;

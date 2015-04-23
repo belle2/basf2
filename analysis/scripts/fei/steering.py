@@ -36,12 +36,13 @@ def getCommandLineOptions():
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
-    parser.add_argument('-summary', '--summmary', dest='summary', action='store_true', help='Create FEI report as PDF file')
+    parser.add_argument('-summary', '--summary', dest='summary', action='store_true', help='Create FEI report as PDF file')
     parser.add_argument('-nThreads', '--nThreads', dest='nThreads', type=int, default=1, help='Number of threads')
     parser.add_argument('-cache', '--cache', dest='cache', type=str, default=None,
-                        help='Use cache between multiple executions. Data from previous runs has to be provided as input!')
+                        help='Use the given file to cache results between multiple executions.'
+                             'Data from previous runs has to be provided as input!')
     parser.add_argument('-prune', '--prune', dest='prune', action='store_true',
-                        help='Prone ParticleStoreArray and ParticleLists')
+                        help='Prune ParticleStoreArray and ParticleLists')
     parser.add_argument('-boost', '--boost', dest='boost', action='store_true',
                         help='Boost last stage of MVCs with higher statistics')
     parser.add_argument('-rerunCached', '--rerunCached', dest='rerunCachedProviders', action='store_true',

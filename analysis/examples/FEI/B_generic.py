@@ -13,6 +13,7 @@ feistate.path.add_module('RootOutput')
 # show constructed path
 print feistate.path
 
-# process(feistate.path)
+process(feistate.path)
+
 B2WARNING('event() statistics:')
 print statistics

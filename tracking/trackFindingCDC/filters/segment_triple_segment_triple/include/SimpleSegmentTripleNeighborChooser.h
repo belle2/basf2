@@ -21,6 +21,14 @@ namespace Belle2 {
     /// Class filtering the neighborhood of segment triples based on simple criterions.
     class SimpleSegmentTripleNeighborChooser : public Filter<Relation<CDCSegmentTriple>> {
 
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCSegmentTriple>> Super;
+
+    public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
     public:
       /// Implementation currently accepts all combinations
       virtual NeighborWeight operator()(const CDCSegmentTriple&,

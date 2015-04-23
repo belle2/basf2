@@ -24,6 +24,10 @@ namespace Belle2 {
       typedef Filter<Relation<CDCRecoFacet>> Super;
 
     public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
+    public:
       /// Constructor using default direction of flight deviation cut off.
       SimpleFacetNeighborChooser() : m_param_deviationCosCut(cos(PI / 180.0 * 180.0))
       {;}

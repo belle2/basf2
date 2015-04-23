@@ -25,6 +25,10 @@ namespace Belle2 {
       typedef Filter<Relation<CDCAxialStereoSegmentPair>> Super;
 
     public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
+    public:
       /** Constructor setting to default reversal symmetry. */
       MCAxialStereoSegmentPairNeighborChooser(bool allowReverse = true);
 

@@ -19,6 +19,14 @@ namespace Belle2 {
     class SimpleAxialStereoSegmentPairNeighborChooser :
       public Filter<Relation<CDCAxialStereoSegmentPair>> {
 
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCAxialStereoSegmentPair>> Super;
+
+    public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
     public:
       /// TODO implement something sensable here.
       virtual

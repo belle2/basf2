@@ -21,6 +21,14 @@ namespace Belle2 {
     /// Class excepting all segment triples.
     class AllSegmentTripleNeighborChooser : public Filter<Relation<CDCSegmentTriple>> {
 
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCSegmentTriple>> Super;
+
+    public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
       /** Main filter method returning the weight of the neighborhood relation.
        *  Always return the overlap penatlty accepting all relations.*/
       virtual NeighborWeight operator()(const CDCSegmentTriple& from,

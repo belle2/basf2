@@ -22,6 +22,10 @@ namespace Belle2 {
       typedef Filter<Relation<CDCRecoFacet>> Super;
 
     public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
+    public:
       /** Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */

@@ -28,6 +28,10 @@ namespace Belle2 {
       typedef Filter<Relation<CDCSegmentTriple>> Super;
 
     public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
+    public:
       /** Constructor. */
       MCSegmentTripleNeighborChooser(bool allowReverse = true);
 

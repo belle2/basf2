@@ -16,7 +16,14 @@ namespace Belle2 {
     ///Class filtering the neighborhood of facets with monte carlo information
     class AllFacetNeighborChooser : public Filter<Relation<CDCRecoFacet>> {
 
+    private:
+      /// Type of the super class
+      typedef Filter<Relation<CDCRecoFacet>> Super;
+
     public:
+      /// Importing all overloads from the super class
+      using Super::operator();
+
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return -2 for all valid combinations to accepting all facets,
        *  but compensating for overlap.

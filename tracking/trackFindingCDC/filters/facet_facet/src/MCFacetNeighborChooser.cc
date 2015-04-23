@@ -13,6 +13,26 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void MCFacetNeighborChooser::clear()
+{
+  m_mcFacetFilter.clear();
+}
+
+
+
+void MCFacetNeighborChooser::initialize()
+{
+  m_mcFacetFilter.initialize();
+}
+
+
+
+void MCFacetNeighborChooser::terminate()
+{
+  m_mcFacetFilter.terminate();
+}
+
+
 
 void MCFacetNeighborChooser::setParameter(const std::string& key, const std::string& value)
 {

@@ -28,6 +28,17 @@ namespace Belle2 {
       MCFacetNeighborChooser(bool allowReverse = true) : m_mcFacetFilter(allowReverse) {;}
 
     public:
+      /// May be used to clear information from former events. Currently unused.
+      virtual void clear() IF_NOT_CINT(override final);
+
+      /// Forwards the modules initialize to the filter
+      virtual void initialize() IF_NOT_CINT(override final);
+
+      /// Forwards the modules initialize to the filter
+      virtual void terminate() IF_NOT_CINT(override final);
+
+
+    public:
       /** Set the parameter with key to value.
        *
        *  Parameters are:
@@ -52,6 +63,19 @@ namespace Belle2 {
        */
       virtual NeighborWeight operator()(const CDCRecoFacet& fromFacet,
                                         const CDCRecoFacet& toFacet) override final;
+
+    public:
+      /// Setter for the allow reverse parameter
+      void setAllowReverse(bool allowReverse)
+      {
+        m_mcFacetFilter.setAllowReverse(allowReverse);
+      }
+
+      /// Getter for the allow reverse parameter
+      bool getAllowReverse() const
+      {
+        return m_mcFacetFilter.getAllowReverse();
+      }
 
     private:
       /// Monte Carlo cell filter to reject neighborhoods have false cells

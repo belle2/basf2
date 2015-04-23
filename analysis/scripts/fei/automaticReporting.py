@@ -609,6 +609,7 @@ def getKey(rootFile, regexp):
 
 
 def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
+    ROOT.gROOT.SetBatch(True)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetHistMinimumZero(True)
     rootfile = ROOT.TFile(rootFilename)
@@ -880,6 +881,7 @@ def makeDiagPlotPerChannel(tmvaFilename, plotName, methodName):
 
 
 def makeDiagPlot(signalHist, bgHist, plotName):
+    ROOT.gROOT.SetBatch(True)
     nbins = 100
     import array
 
@@ -925,6 +927,7 @@ def makeCosBDLPlot(fileName, outputFileName, targetVar):
     Using the TNTuple in 'fileName', save CosThetaBDL plot in 'outputFileName'.
     Shows effect of different cuts on SignalProbability, plus signal distribution.
     """
+    ROOT.gROOT.SetBatch(True)
     ntupleFile = ROOT.TFile(fileName)
     ntupleName = 'variables'
 
@@ -977,6 +980,7 @@ def makeMbcPlot(fileName, outputFileName, targetVar):
     Using the TNTuple in 'fileName', save M_bc plot in 'outputFileName'.
     Shows effect of different cuts on SignalProbability, plus signal distribution.
     """
+    ROOT.gROOT.SetBatch(True)
     ntupleFile = ROOT.TFile(fileName)
     ntupleName = 'variables'
 
@@ -1019,6 +1023,7 @@ def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal, targetVar):
 
     @param nTrueSignal number of true signal particles in the sample.
     """
+    ROOT.gROOT.SetBatch(True)
     ntupleFile = ROOT.TFile(fileName)
     ntupleName = 'variables'
 

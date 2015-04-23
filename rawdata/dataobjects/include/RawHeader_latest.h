@@ -184,6 +184,8 @@ namespace Belle2 {
       POS_OFFSET_3RD_FINESSE = 10,
       POS_OFFSET_4TH_FINESSE = 11,
     };
+
+
     /* Data Format : Node info */
     /*     enum { */
     /*       NUM_MAX_NODES = 4   /\* (NUM_MAX_NODES + 1) slots are available in m_buffer. */
@@ -196,11 +198,19 @@ namespace Belle2 {
     /*       MAGIC_WORD_TERM_HEADER = 0x7fff0005 */
     /*     }; */
 
+
+
     /* To extract ctime */
     enum {
       TTCTIME_MASK = 0x7FFFFFF0,
       TTCTIME_SHIFT = 4,
       TRGTYPE_MASK = 0xF
+    };
+
+    /* Error bit in POS_TRUNC_MASK_DATATYPE */
+    enum {
+      B2LINK_PACKET_CRC_ERROR = 0,
+      B2LINK_EVENT_CRC_ERROR = 1
     };
 
   private:

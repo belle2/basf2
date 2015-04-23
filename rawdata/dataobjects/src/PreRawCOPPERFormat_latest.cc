@@ -557,7 +557,35 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   // Set node ID, trunc_mask, data_type
   //
   m_buffer[ tmp_header.POS_NODE_ID ] = m_node_id;
-  m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
+
+
+
+  //
+  // Check error counts of b2link-packet CRC
+  //
+  //  m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
+
+  m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
+  if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
+    if ((m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+    }
+  }
+  if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
+    if ((m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+    }
+  }
+  if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
+    if ((m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+    }
+  }
+  if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
+    if ((m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+    }
+  }
 
 
   //////////////////////////////////////////////////

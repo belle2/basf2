@@ -6,7 +6,6 @@ from fei import *
 from basf2 import *
 from modularAnalysis import *
 
-
 selection_path = create_path()
 selection_path.add_module('RootInput')
 fillParticleList('mu+', 'muid > 0.6 and nTracks <= 12', writeOut=True, path=selection_path)
@@ -16,12 +15,14 @@ reconstructDecay('B+:sig -> tau+', '', writeOut=True, path=selection_path)
 matchMCTruth('B+:sig', path=selection_path)
 buildRestOfEvent('B+:sig', path=selection_path)
 
-analysis_path = create_path()
-analysis_path.add_module('RootOutput')
-
 # neutral B channels disabled, since we only intend to use B+/B- for our decay
 particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0', neutralB=False)
-feistate = fullEventInterpretation(selection_path, analysis_path, particles)
+feistate = fullEventInterpretation(selection_path, particles)
+
+if feistate.is_trained:
+    feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
+else:
+    feistate.path.add_module('RootOutput')
 
 # show constructed path
 print feistate.path

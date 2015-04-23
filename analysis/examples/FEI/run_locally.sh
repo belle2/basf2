@@ -15,5 +15,5 @@ while [ ! -f FEIsummary.pdf ]; do
   then
     INPUTFILE="tmpdata.root"
   fi
-  basf2 $BELLE2_LOCAL_DIR/analysis/examples/FEI/B_generic.py -p8 -i "$INPUTFILE" -o tmpdata.root -- -cache cache.pkl --preload -summary # -nproc 8
+  basf2 $BELLE2_LOCAL_DIR/analysis/examples/FEI/B_generic.py -p8 -i "$INPUTFILE" -o tmpdata.root -- --cache cache.pkl --summary # -nThreads 8
 done

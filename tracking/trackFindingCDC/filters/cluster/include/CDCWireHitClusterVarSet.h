@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include "EmptyVarSet.h"
-#include "VarSet.h"
-#include "VarNames.h"
+#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/varsets/CDCWireHitClusterBkgTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBkgTruthVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

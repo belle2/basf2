@@ -22,31 +22,20 @@ SimpleAxialStereoSegmentPairFilter::SimpleAxialStereoSegmentPairFilter() : m_rie
   m_riemannFitter.useOnlyOrientation();
 }
 
-
-
-CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+CellWeight SimpleAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
 {
-
   const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
 
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
+  assert(ptrStartSegment);
+  assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  //do fits
+  // Do fits
   const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
   const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
-
 
   // Check if segments are coaligned
   bool endSegmentIsCoaligned = startFit.getTotalPerpS(endSegment) >= 0.0;
@@ -67,7 +56,10 @@ CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(cons
   FloatType startFitFrontOffset = startFit.getPerpSFrontOffset(startSegment, endSegment);
   FloatType endFitBackOffset = endFit.getPerpSBackOffset(startSegment, endSegment);
 
-  if (startFitFrontOffset < 0 or startFitFrontOffset > 50 or endFitBackOffset < 0 or endFitBackOffset > 50) {
+  if (startFitFrontOffset < 0 or
+      startFitFrontOffset > 50 or
+      endFitBackOffset < 0 or
+      endFitBackOffset > 50) {
     return NOT_A_CELL;
   }
 
@@ -99,7 +91,6 @@ CellWeight SimpleAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(cons
 }
 
 
-
 const CDCTrajectory2D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
 {
 
@@ -112,9 +103,8 @@ const CDCTrajectory2D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory2D
 }
 
 
-
-/// Returns the three dimensional trajectory of the axial stereo segment pair. Also fits it if necessary.
-const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) const
+const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D(const CDCAxialStereoSegmentPair&
+    axialStereoSegmentPair) const
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
@@ -130,4 +120,3 @@ const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D
   return axialStereoSegmentPair.getTrajectory3D();
 
 }
-

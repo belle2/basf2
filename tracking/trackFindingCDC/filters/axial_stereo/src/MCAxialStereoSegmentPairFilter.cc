@@ -20,20 +20,46 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+
+void MCAxialStereoSegmentPairFilter::setParameter(const std::string& key, const std::string& value)
+{
+  if (key == "symmetric") {
+    if (value == "true") {
+      m_param_allowReverse = true;
+      B2INFO("Filter received parameter '" << key << "' " << value);
+    } else if (value == "false") {
+      m_param_allowReverse = false;
+      B2INFO("Filter received parameter '" << key << "' " << value);
+    } else {
+      Super::setParameter(key, value);
+    }
+  } else {
+    Super::setParameter(key, value);
+  }
+}
+
+std::map<std::string, std::string> MCAxialStereoSegmentPairFilter::getParameterDescription()
+{
+  std::map<std::string, std::string> des = Super::getParameterDescription();
+  des["symmetric"] =  "Accept the axial stereo segment pair if the reverse axial stereo segment pair is correct "
+                      "preserving the progagation reversal symmetry on this level of detail."
+                      "Allowed values 'true', 'false'. Default is 'true'.";
+  return des;
+}
+
+bool MCAxialStereoSegmentPairFilter::needsTruthInformation()
+{
+  return true;
+}
+
+
+CellWeight MCAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
 
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair invoked with nullptr as start segment");
-    return NOT_A_CELL;
-  }
-
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair invoked with nullptr as end segment");
-    return NOT_A_CELL;
-  }
+  assert(ptrStartSegment);
+  assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
@@ -44,7 +70,7 @@ CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CD
   ForwardBackwardInfo pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
   if (pairFBInfo == INVALID_INFO) return NOT_A_CELL;
 
-  if (pairFBInfo == FORWARD or (m_allowReverse and pairFBInfo == BACKWARD)) {
+  if (pairFBInfo == FORWARD or (m_param_allowReverse and pairFBInfo == BACKWARD)) {
     // Final check for the distance between the segment
     Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
     if (startNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
@@ -54,7 +80,7 @@ CellWeight MCAxialStereoSegmentPairFilter::isGoodAxialStereoSegmentPair(const CD
 
     if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 1) return NOT_A_CELL;
 
-    //do fits
+    // Do fits
     CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
     axialStereoSegmentPair.setTrajectory3D(mcTrajectory3D);
 

@@ -28,10 +28,11 @@ namespace Belle2 {
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
-                                            const CDCAxialStereoSegmentPair& neighborAxialStereoSegmentPair) override final {
+                                            const CDCAxialStereoSegmentPair& neighborAxialStereoSegmentPair) override final
+      {
 
-        CellWeight mcPairWeight = m_mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair);
-        CellWeight mcNeighborPairWeight = m_mcAxialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(neighborAxialStereoSegmentPair);
+        CellWeight mcPairWeight = m_mcAxialStereoSegmentPairFilter(axialStereoSegmentPair);
+        CellWeight mcNeighborPairWeight = m_mcAxialStereoSegmentPairFilter(neighborAxialStereoSegmentPair);
 
         bool mcDecision = (not isNotACell(mcPairWeight)) and (not isNotACell(mcNeighborPairWeight));
 

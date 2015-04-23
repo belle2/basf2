@@ -42,12 +42,13 @@ namespace Belle2 {
       /// Empty destructor.
       ~AxialStereoSegmentPairCreator() {;}
 
-      bool checkSegmentsSortedBySuperLayer(const std::vector<CDCRecoSegment2D>& segments) const {
+      bool checkSegmentsSortedBySuperLayer(const std::vector<CDCRecoSegment2D>& segments) const
+      {
         if (segments.empty()) return true;
 
         ISuperLayerType lastISuperLayer = INNER_ISUPERLAYER;
 
-        for (const CDCRecoSegment2D & segment : segments) {
+        for (const CDCRecoSegment2D& segment : segments) {
           if (lastISuperLayer > segment.getISuperLayer()) {
             B2ERROR("not " << lastISuperLayer << " > " <<  segment.getISuperLayer());
             return false;
@@ -63,12 +64,13 @@ namespace Belle2 {
       template<class AxialStereoSegmentPairFilter>
       inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
                          const std::vector<CDCRecoSegment2D>& segments,
-                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
+                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const
+      {
 
 
         SegmentRangesBySuperLayer segmentRangesBySuperLayer;
 
-        for (const CDCRecoSegment2D & segment : segments) {
+        for (const CDCRecoSegment2D& segment : segments) {
           const CDCRecoSegment2D* ptrSegment = &segment;
           ISuperLayerType iSuperLayer = segment.getISuperLayer();
           segmentRangesBySuperLayer[iSuperLayer].push_back(ptrSegment);
@@ -86,7 +88,8 @@ namespace Belle2 {
       template<class AxialStereoSegmentPairFilter>
       inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
                          const SegmentRangesBySuperLayer& segmentRangesBySuperLayer,
-                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
+                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const
+      {
 
         //clear the remembered fits
         axialStereoSegmentPairFilter.clear();
@@ -123,12 +126,13 @@ namespace Belle2 {
       inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
                          const CDCRecoSegmentRange& startSegments,
                          const CDCRecoSegmentRange& endSegments,
-                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const {
+                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const
+      {
 
         CDCAxialStereoSegmentPair axialStereoSegmentPair;
 
-        for (const CDCRecoSegment2D * ptrStartSegment : startSegments) {
-          for (const CDCRecoSegment2D * ptrEndSegment : endSegments) {
+        for (const CDCRecoSegment2D* ptrStartSegment : startSegments) {
+          for (const CDCRecoSegment2D* ptrEndSegment : endSegments) {
 
             if (ptrStartSegment == ptrEndSegment) continue; //Just for safety
             axialStereoSegmentPair.setSegments(ptrStartSegment, ptrEndSegment);
@@ -144,7 +148,7 @@ namespace Belle2 {
               continue;
             }
 
-            CellWeight pairWeight = axialStereoSegmentPairFilter.isGoodAxialStereoSegmentPair(axialStereoSegmentPair);
+            CellWeight pairWeight = axialStereoSegmentPairFilter(axialStereoSegmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
             if (pairIsGood) {
               axialStereoSegmentPair.getAutomatonCell().setCellWeight(pairWeight);

@@ -23,10 +23,6 @@ namespace Belle2 {
       typedef Filter<CDCRecoFacet> Super;
 
     public:
-      /// Marking  destructor virtual
-      virtual ~MCFacetFilter() {;}
-
-    public:
       /** Constructor also setting the switch ,
        *  if the reversed version of a facet (in comparision to MC truth) shall be accepted.
        */

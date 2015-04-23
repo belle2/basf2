@@ -31,10 +31,6 @@ namespace Belle2 {
       FitlessFacetFilter(bool hardCut = true);
 
     public:
-      /// Marking  destructor virtual
-      virtual ~FitlessFacetFilter() {;}
-
-    public:
       /** Main filter method returning the weight of the facet.
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */

@@ -31,7 +31,7 @@ namespace Belle2 {
       FilterBase() {;}
 
       /// Making destructor virtual
-      ~FilterBase() {;}
+      virtual ~FilterBase() {;}
 
       /// Clears information from former events
       virtual void clear() {;}

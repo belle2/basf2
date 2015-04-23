@@ -34,10 +34,6 @@ namespace Belle2 {
       SimpleFacetFilter(FloatType deviationCosCut);
 
     public:
-      /// Marking  destructor virtual
-      virtual ~SimpleFacetFilter() {;}
-
-    public:
       /** Set the parameter with key to value.
        *
        *  Parameters are:

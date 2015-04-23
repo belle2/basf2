@@ -19,10 +19,6 @@ namespace Belle2 {
     class AllFacetFilter : public Filter<CDCRecoFacet> {
 
     public:
-      /// Marking  destructor virtual
-      virtual ~AllFacetFilter() {;}
-
-    public:
       /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
       virtual CellWeight operator()(const CDCRecoFacet&) override final
       {

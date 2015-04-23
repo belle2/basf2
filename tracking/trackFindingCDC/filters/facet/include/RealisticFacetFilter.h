@@ -30,10 +30,6 @@ namespace Belle2 {
       RealisticFacetFilter(FloatType phiPullCut);
 
     public:
-      /// Marking  destructor virtual
-      virtual ~RealisticFacetFilter() {;}
-
-    public:
       /** Set the parameter with key to value.
        *
        *  Parameters are:

@@ -10,6 +10,7 @@
 #ifndef WEIGHTEDNEIGHBORHOOD_H
 #define WEIGHTEDNEIGHBORHOOD_H
 
+#include <tracking/trackFindingCDC/algorithms/Relation.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include "NeighborWeight.h"
@@ -370,17 +371,19 @@ namespace Belle2 {
       {
         //forget everything from former creations
         chooser.clear();
+        Relation<Item> neighborRelation;
         for (const auto& item : itemRange) {
+          neighborRelation.first = item;
           for (const auto& possibleNeighbor : chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
+            neighborRelation.second = possibleNeighbor;
 
-            NeighborWeight weight = chooser.isGoodNeighbor(item, possibleNeighbor);
+            NeighborWeight weight = chooser(neighborRelation);
 
             if (not isNotANeighbor(weight)) {
               // The neighborhood takes references and keeps them
-
               // Make a push_back here and sort the whole vector afterwards
               m_neighbors.push_back(WeightedRelation(WeightedItemPtr(item, weight), possibleNeighbor));
-              //insert(item, possibleNeighbor, weight);
+
             }
 
           } //end for possibleNeighbor

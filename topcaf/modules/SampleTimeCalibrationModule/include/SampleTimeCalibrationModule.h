@@ -76,7 +76,7 @@ namespace Belle2 {
     std::vector< std::pair<double, double> > v_oddevents, v_evenevents;
 
     int m_channel_samples;  // Can we get this from the data somehow?
-
+    double m_time2tdc;
   };
 
   typedef std::vector<TOPDigit*> TOPDigits;

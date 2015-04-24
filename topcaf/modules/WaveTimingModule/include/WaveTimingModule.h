@@ -15,6 +15,7 @@ namespace Belle2 {
 
     //
     void initialize();
+    void beginRun();
     void event();
     void terminate();
 

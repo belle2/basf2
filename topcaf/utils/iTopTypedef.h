@@ -13,10 +13,13 @@
 typedef std::string TopElectronicConstructionName;
 typedef unsigned int TopPixelNumber;
 typedef unsigned int TopElectronicModuleNumber;
+typedef double TopParameterValue;
+typedef std::string TopParameterUnit;
 
 // Pairs
 typedef std::pair<TopElectronicConstructionName, TopElectronicModuleNumber> TopElectronicModule;
 typedef std::pair<TopElectronicConstructionName, TopPixelNumber> TopPixel;
+typedef std::pair<TopParameterValue, TopParameterUnit> TopParameter;
 
 // Maps
 typedef std::map<TopPixel, unsigned int> TopPixelRefMap;
@@ -31,11 +34,11 @@ typedef std::map<unsigned int, TopElectronicModule> TopElectronicRetMap;
 
 
 #ifdef __CINT__
-/*
+
 #pragma link C++ class TopElectronicModule+;
 #pragma link C++ class TopPixel+;
 
-#pragma link C++ class std::pair<std::string, unsigned int>;
+//#pragma link C++ class std::pair<std::string, unsigned int>;
 
 #pragma link C++ class TopUnsignedMap+;
 #pragma link C++ class std::pair<unsigned int, unsigned int>+;
@@ -55,7 +58,8 @@ typedef std::map<unsigned int, TopElectronicModule> TopElectronicRetMap;
 #pragma link C++ class TopElectronicRetMap+;
 #pragma link C++ class std::pair<unsigned int, TopElectronicRetMap>+;
 
-*/
+#pragma link C++ class TopParameter+;
+
 #endif
 
 

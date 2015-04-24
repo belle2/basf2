@@ -19,15 +19,16 @@ namespace Belle2 {
 
   public:
 
-    /** Get a pointer to the TopConfigurations instance */
-    static TopConfigurations* GetInstance();
+    TopConfigurations();
 
+    ~TopConfigurations();
 
     /** Read back a payload associated with a particular global tag and run for a particular algorithm.
      *  The TFile that contains the configurations information must be associated with the private variable m_fileName.
      *
      */
-    void ReadTopConfigurations();
+    void ReadTopConfigurations(std::string filename);
+
 
     /** Channel Numbering, pixel number to pixel row */
     unsigned int pixel_to_pixelRow(TopPixel pixel) {return m_PixeltoRow[pixel];}
@@ -63,18 +64,9 @@ namespace Belle2 {
     /** Channel Numbering, hardware ID to pixel number */
     unsigned int hardwareID_to_pixelNumber(unsigned int hardwareID) { return m_HardwareIDtoPixel[hardwareID].second; }
 
+    double getTDCUnit_ns() {return m_TDCUnit_ns.first;}
+
   private:
-    /** Singleton, so control use of constructors */
-    TopConfigurations();
-
-    /** Singleton, so control use of constructors */
-    TopConfigurations(TopConfigurations const&);
-
-    /** Singleton, so control use of copy operator */
-    void operator=(TopConfigurations const&);
-
-    /** Singleton, so control use of destructor */
-    ~TopConfigurations();
 
 
     /** The maps for the TOP Numbering Scheme v1.0  https://belle2.cc.kek.jp/~twiki/bin/view/Archive/Belle2note0026 **/
@@ -92,11 +84,7 @@ namespace Belle2 {
     TopElectronicRefMap  m_ElectronicModuletoScrod;
     std::vector<TopElectronicConstructionName> m_TopModuleElectronicConstructions;
 
-    /** The single instance of this class */
-    static TopConfigurations* m_Instance;
-
-    /** The path and filename of the TFile containing the configurations information */
-    std::string m_fileName;
+    TopParameter m_TDCUnit_ns;
 
     /** A buffer to temporarily get rid of compiler warnings */
     std::string m_buffer;

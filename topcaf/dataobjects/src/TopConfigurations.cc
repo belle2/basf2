@@ -16,19 +16,6 @@ using namespace Belle2;
 
 ClassImp(TopConfigurations)
 
-TopConfigurations* TopConfigurations::m_Instance = NULL;
-
-TopConfigurations* TopConfigurations::GetInstance()
-{
-  if (!m_Instance) {
-    m_Instance = new TopConfigurations;
-    m_Instance->ReadTopConfigurations();
-  }
-
-  return m_Instance;
-};
-
-
 TopConfigurations::TopConfigurations()
 {
 
@@ -39,10 +26,11 @@ TopConfigurations::~TopConfigurations()
 
 }
 
-void TopConfigurations::ReadTopConfigurations()
+void TopConfigurations::ReadTopConfigurations(std::string filename)
 {
 
-  TFile* fTopConfigurationsFile = new TFile("$BELLE2_LOCAL_DIR/topcaf/data/TopConfigurations.root", "read");
+  TFile* fTopConfigurationsFile = TFile::Open(filename.c_str(), "read");
+
 
 
 
@@ -59,10 +47,7 @@ void TopConfigurations::ReadTopConfigurations()
   TopPixelRefElectronicRetMap* PixeltoElectronicModuleP;
   TopElectronicRefMap*  ElectronicModuletoScrodP;
   std::vector<TopElectronicConstructionName>* TopModuleElectronicConstructionsP;
-
-
-
-
+  TopParameter* TDCUnit_ns;
 
 
   fTopConfigurationsFile->GetObject("PixeltoRow",               PixeltoRowP);
@@ -78,11 +63,13 @@ void TopConfigurations::ReadTopConfigurations()
   fTopConfigurationsFile->GetObject("ScrodtoElectronicModuleP", ScrodtoElectronicModuleP);
   fTopConfigurationsFile->GetObject("ElectronicModuletoScrodP", ElectronicModuletoScrodP);
   fTopConfigurationsFile->GetObject("TopModuleElectronicConstructionsP", TopModuleElectronicConstructionsP);
+  fTopConfigurationsFile->GetObject("TDCUnit_ns", TDCUnit_ns);
 
   m_PixeltoRow =               *PixeltoRowP;
   m_PixeltoColumn =              *PixeltoColumnP;
   m_PixeltoPMT =               *PixeltoPMTP;
-  m_HardwareIDtoPixel =             *HardwareIDtoPixelP;
+
+
 
 
 
@@ -94,6 +81,10 @@ void TopConfigurations::ReadTopConfigurations()
   m_PixeltoAsicColumn =              *PixeltoAsicColumnP;
   m_PixeltoAsicChannel =             *PixeltoAsicChannelP;
 
+  m_HardwareIDtoPixel =             *HardwareIDtoPixelP;
+  m_TDCUnit_ns = *TDCUnit_ns;
+
+  B2INFO("TDCUnit_ns: " << m_TDCUnit_ns.first);
 
   /*
     m_ScrodtoElectronicModule=          *ScrodtoElectronicModuleP;

@@ -1,6 +1,7 @@
 #include <topcaf/modules/SampleTimeCalibrationModule/SampleTimeCalibrationModule.h>
 #include <topcaf/dataobjects/topFileMetaData.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
+#include <topcaf/dataobjects/TopConfigurations.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/conditions/ConditionsService.h>
@@ -72,6 +73,13 @@ void SampleTimeCalibrationModule::beginRun()
     m_run = metadata_ptr->getRun();
   }
 
+  StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
+  if (topconfig_ptr) {
+    m_time2tdc = 1. / (topconfig_ptr->getTDCUnit_ns());
+  } else {
+    m_time2tdc = 1000.;
+    B2WARNING("Defaulting time/TDC to " << m_time2tdc / 1000. << " ps in SampleTimeCalibration Module.");
+  }
 
   if (m_mode == 1) { // read mode
     TList* list;
@@ -140,7 +148,7 @@ void SampleTimeCalibrationModule::event()
           TOPDigit* old_topdigit = topdigit_ptr[c];
 
           double corrTime = CalibrateWaveform(evtwave_ptr);
-          int TDC = ((int)((double)old_topdigit->getTDC() - corrTime * 40.));
+          int TDC = ((int)((double)old_topdigit->getTDC() - corrTime * m_time2tdc));
           B2INFO("s2s .. TDC_i: " << old_topdigit->getTDC() << "\tTDC_c: " << TDC << "\t corrTime: " << corrTime);
           TOPDigit* this_topdigit = new TOPDigit(old_topdigit->getBarID(), old_topdigit->getChannelID(), TDC);
           this_topdigit->setADC(old_topdigit->getADC());

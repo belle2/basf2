@@ -1,0 +1,139 @@
+/* This root macro will create a TFile that contains the data for the topcaf/dataobjects/TopConfigurations dataobject. */
+/* Formulae are taken from https://belle2.cc.kek.jp/~twiki/bin/view/Archive/Belle2note0026 version 1. */
+/* Note that this only seems to work if compiled in ROOT interactive mode. 
+i.e.
+root [0] .x CreateTopConfigurations.C+
+*/
+
+#include <iostream>
+#include <map>
+#include <string>
+
+#include "TFile.h"
+#include "iTopUtils.h"   // Basic functions for number mapping are here.
+#include "iTopTypedef.h" // Type definitions.
+
+
+void CreateTopConfigurations(void){
+
+  const unsigned int NumberOfTopModules = 1;
+  const unsigned int NumberOfPixels = 512;
+
+  std::string outputFile = "../data/TopConfigurations.root";
+
+  vector<TopElectronicConstructionName> TopModuleElectronicConstructions;
+
+  // specific to CRT November 2014, see https://belle2.cc.kek.jp/~twiki/bin/view/Detector/TOP/CRTSetup2014#CRT_PMT_and_board_stack_configur
+  TopElectronicConstructionName CRTHybridConstruction("CRTHybridConstruction1");
+  TopModuleElectronicConstructions.push_back(CRTHybridConstruction);
+
+  TopElectronicConstructionName June2013LepsConstruction("June2013LEPSConstruction1");
+  TopModuleElectronicConstructions.push_back(June2013LepsConstruction);
+
+  TopElectronicRefMap ElectronicModuletoScrod;
+  TopElectronicRetMap ScrodtoElectronicModule;
+  TopUnsignedMap   ScrodtoElectronicModuleNumber;
+  for(vector<TopElectronicConstructionName>::const_iterator i = TopModuleElectronicConstructions.begin();
+      i!=TopModuleElectronicConstructions.end();
+      ++i){
+
+    TopElectronicConstructionName name = *i;
+
+    if( (*i) == CRTHybridConstruction ){
+      ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 67;
+      ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 65;
+      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 66;
+      ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 59;
+    }
+
+    if( (*i) == June2013LepsConstruction ){
+      ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 36;
+      ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 35;
+      ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 32;
+      ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 37;
+    }
+    
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,0)]] = 0;
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,1)]] = 1;
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,2)]] = 2;
+    ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,3)]] = 3;
+
+    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,0)]] = TopElectronicModule(*i,0);
+    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,1)]] = TopElectronicModule(*i,1);
+    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,2)]] = TopElectronicModule(*i,2);
+    ScrodtoElectronicModule[ElectronicModuletoScrod[TopElectronicModule(*i,3)]] = TopElectronicModule(*i,3);
+    
+  }
+
+
+  TopPixelRefMap PixeltoRow;
+  TopPixelRefMap PixeltoColumn;
+  TopPixelRefMap PixeltoPMT;
+  TopPixelRefMap PixeltoPMTChannel;
+  TopPixelRefMap PixeltoScrod;
+  TopPixelRefMap PixeltoAsicRow;
+  TopPixelRefMap PixeltoAsicColumn;
+  TopPixelRefMap PixeltoAsicChannel;
+
+  TopPixelRetMap HardwareIDtoPixel;
+
+  TopPixelRefElectronicRetMap PixeltoElectronicModule;
+
+  /* Map the pixel to various items. */
+  for(vector<std::string>::const_iterator i = TopModuleElectronicConstructions.begin();
+      i!=TopModuleElectronicConstructions.end();
+      ++i){
+    for( TopPixelNumber c=1 ; c <= NumberOfPixels ; c++ ){
+      TopPixel myPixel(TopElectronicModule(*i,c));
+
+      PixeltoRow[myPixel] = pixelNumber_to_pixelRow(c);
+      PixeltoColumn[myPixel] = pixelNumber_to_pixelColumn(c);
+      PixeltoPMT[myPixel] = pixelNumber_to_PMTNumber(c);
+      PixeltoPMTChannel[myPixel] = pixelNumber_to_channelNumber(c);
+      PixeltoElectronicModule[myPixel] = TopElectronicModule(*i,pixel_to_electronicsModuleNumber(c));
+      PixeltoAsicRow[myPixel] = pixel_to_asicRow(c);
+      PixeltoAsicColumn[myPixel] = pixel_to_asicColumn(c);
+      PixeltoAsicChannel[myPixel] = pixel_to_asicChannel(c);      
+      PixeltoScrod[myPixel] = ElectronicModuletoScrod[PixeltoElectronicModule[myPixel]];
+      
+      unsigned int HardwareID = PixeltoScrod[myPixel] * 1E8
+	+ PixeltoAsicRow[myPixel] * 1E6
+	+ PixeltoAsicColumn[myPixel] * 1E4
+	+ PixeltoAsicChannel[myPixel] * 1E2;
+      
+
+
+      HardwareIDtoPixel[HardwareID] = myPixel;
+      
+    } 
+  }
+
+  TopParameter TDCUnit_ns(.001,"ns"); // lets use picoseconds for now.
+
+
+  TFile f(outputFile.c_str(), "recreate");
+  f.WriteObject(&HardwareIDtoPixel,"HardwareIDtoPixel");
+  f.WriteObject(&ScrodtoElectronicModule,"ScrodtoElectronicModule");
+  f.WriteObject(&ScrodtoElectronicModuleNumber,"ScrodtoElectronicModuleNumber");
+  f.WriteObject(&ElectronicModuletoScrod,"ElectronicModuletoScrod");
+  f.WriteObject(&PixeltoRow,"PixeltoRow");
+  f.WriteObject(&PixeltoColumn,"PixeltoColumn");
+  f.WriteObject(&PixeltoPMT,"PixeltoPMT");
+  f.WriteObject(&PixeltoPMTChannel,"PixeltoPMTChannel");
+  f.WriteObject(&PixeltoAsicRow,"PixeltoAsicRow");
+  f.WriteObject(&PixeltoAsicColumn,"PixeltoAsicColumn");
+  f.WriteObject(&PixeltoAsicChannel,"PixeltoAsicChannel");
+  f.WriteObject(&PixeltoScrod,"PixeltoScrod");
+  f.WriteObject(&PixeltoElectronicModule,"PixeltoElectronicModule");
+  f.WriteObject(&TopModuleElectronicConstructions,"TopModuleElectronicConstructions");
+  f.WriteObject(&TDCUnit_ns,"TDCUnit_ns");
+  
+
+  f.Close();
+
+  unsigned int testID = 3500000100;
+  std::cout<<"hardware id["<<testID<<"]: "<<HardwareIDtoPixel[testID].second<<std::endl;
+
+
+}
+

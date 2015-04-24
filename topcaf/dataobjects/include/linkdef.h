@@ -35,5 +35,6 @@
 #pragma link C++ class TopElectronicRetMap+;
 #pragma link C++ class std::pair<unsigned int, TopElectronicRetMap>+;
 
+#pragma link C++ class TopParameter+;
 
 #endif

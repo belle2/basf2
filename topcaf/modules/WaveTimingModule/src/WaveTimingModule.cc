@@ -37,6 +37,16 @@ void WaveTimingModule::initialize()
   m_tmp_h = new TH1D("wave_h", "wave_h", channel_samples, 0, channel_samples);
 }
 
+void WaveTimingModule::beginRun()
+{
+
+  StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
+  if (topconfig_ptr) {
+    m_time2tdc = 1. / (topconfig_ptr->getTDCUnit_ns());
+  }
+}
+
+
 void WaveTimingModule::event()
 {
 
@@ -121,7 +131,8 @@ void WaveTimingModule::event()
       //Create TOPDigit
       int barID = -9;
 
-      int channelID = TopConfigurations::GetInstance()->hardwareID_to_pixelNumber(channel_id);
+      StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
+      int channelID = topconfig_ptr->hardwareID_to_pixelNumber(channel_id);
       double time = (ftsw - coarse_t + at40_t* sample_dt);
       int TDC = (int)(time * m_time2tdc);
       B2INFO("ChannelID: " << channelID << "\tHardwareID: " << channel_id << "\t TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t <<

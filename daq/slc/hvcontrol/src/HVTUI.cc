@@ -401,10 +401,10 @@ void HVTUI::Listener::run()
         m_tui->setNumber(8, index, pars[4]);
       } break;
       case HVMessage::VOLTAGE_MON: {
-        m_tui->setNumber(10, index, pars[4], "%.1f");
+        m_tui->setNumber(10, index, pars[4], "%.3f");
       } break;
       case HVMessage::CURRENT_MON: {
-        m_tui->setNumber(11, index, pars[4], "%.1f");
+        m_tui->setNumber(11, index, pars[4], "%.3f");
       } break;
       default: break;
     }

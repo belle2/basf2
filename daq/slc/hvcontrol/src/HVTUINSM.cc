@@ -39,7 +39,7 @@ void HVTUINSM::initNSM(const std::string& cfilename,
   LogFile::open("hvcui/" + cuiname, LogFile::ERROR);
   StringList confignames = StringUtil::split(cfile.get("hv.confignames"), ',');
   const std::string configname = (StringUtil::find(confignames[0], "@")) ?
-                                 confignames[0] : nodename + "@" + confignames[0];
+                                 confignames[0] : StringUtil::toupper(nodename) + "@" + confignames[0];
   const std::string tablename = cfile.get("hv.tablename");
   DBObject obj = DBObjectLoader::load(db, tablename, configname);
   LogFile::notice("Loaded %s from %s", configname.c_str(),

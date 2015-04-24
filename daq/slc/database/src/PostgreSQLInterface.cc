@@ -24,14 +24,18 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
 void PostgreSQLInterface::connect() throw(DBHandlerException)
 {
 #ifndef NOT_USE_PSQL
+  if (isConnected()) return;
+  m_mutex.lock();
   m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s",
                                            m_host.c_str(), m_database.c_str(),
                                            m_user.c_str(), m_password.c_str()).c_str());
   if (PQstatus(m_sq_conn) == CONNECTION_BAD) {
+    m_mutex.unlock();
     close();
     throw (DBHandlerException("Failed to connect to the database : (%s)",
                               PQerrorMessage(m_sq_conn)));
   }
+  m_mutex.unlock();
 #else
   throw (DBHandlerException("PGLIB is not available"));
 #endif
@@ -40,8 +44,10 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
 bool PostgreSQLInterface::isConnected() throw()
 {
 #ifndef NOT_USE_PSQL
-  return m_sq_conn != NULL &&
-         PQstatus(m_sq_conn) == CONNECTION_OK;
+  m_mutex.lock();
+  bool connected = m_sq_conn != NULL && PQstatus(m_sq_conn) == CONNECTION_OK;
+  m_mutex.unlock();
+  return connected;
 #else
   return false;
 #endif
@@ -52,12 +58,15 @@ throw(DBHandlerException)
 {
   clear();
 #ifndef NOT_USE_PSQL
+  m_mutex.lock();
   m_sq_result = PQexec(m_sq_conn, command);
   ExecStatusType status = PQresultStatus(m_sq_result);
   if (status == PGRES_FATAL_ERROR) {
+    m_mutex.unlock();
     throw (DBHandlerException("Failed to execute command : %s (%s)",
                               command, PQerrorMessage(m_sq_conn)));
   }
+  m_mutex.unlock();
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif
@@ -66,7 +75,9 @@ throw(DBHandlerException)
 DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 {
 #ifndef NOT_USE_PSQL
+  m_mutex.lock();
   if (PQresultStatus(m_sq_result) != PGRES_TUPLES_OK) {
+    m_mutex.unlock();
     throw (DBHandlerException("DB records are not ready for reading"));
   }
   const size_t nrecords = PQntuples(m_sq_result);
@@ -89,6 +100,7 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
     }
     m_record_v.push_back(record);
   }
+  m_mutex.unlock();
   return m_record_v;
 #else
   throw (DBHandlerException("libpg is not available"));
@@ -98,10 +110,12 @@ DBRecordList PostgreSQLInterface::loadRecords() throw(DBHandlerException)
 void PostgreSQLInterface::clear() throw()
 {
 #ifndef NOT_USE_PSQL
+  m_mutex.lock();
   if (m_sq_result != NULL) {
     PQclear(m_sq_result);
+    m_sq_result = NULL;
   }
-  m_sq_result = NULL;
+  m_mutex.unlock();
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif
@@ -111,10 +125,12 @@ void PostgreSQLInterface::close() throw(DBHandlerException)
 {
   clear();
 #ifndef NOT_USE_PSQL
+  m_mutex.lock();
   if (m_sq_conn != NULL) {
     PQfinish(m_sq_conn);
     m_sq_conn = NULL;
   }
+  m_mutex.unlock();
 #else
   throw (DBHandlerException("libpg is not available"));
 #endif

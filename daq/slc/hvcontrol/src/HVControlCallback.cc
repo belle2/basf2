@@ -122,6 +122,7 @@ void HVControlCallback::dbload(const std::string& data) throw(IOException)
 
 void HVControlCallback::timeout(NSMCommunicator&) throw()
 {
+  update();
   HVConfigList::const_iterator iconfig = getConfigs().begin();
   if (iconfig == getConfigs().end()) return;
   const HVConfig& config(*iconfig);
@@ -137,16 +138,15 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
       int slot = channel.getSlot();
       int ch = channel.getChannel();
       std::string state = HVMessage::getStateText((HVMessage::State)getState(crateid, slot, ch));
-      LogFile::debug("state[%d][%d][%d] = %s", crateid, slot, ch, state.c_str());
       float vmon = getVoltageMonitor(crateid, slot, ch);
       float cmon = getCurrentMonitor(crateid, slot, ch);
+      //LogFile::debug("vmon[%d][%d][%d] = %f", crateid, slot, ch, vmon);
       std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
       set(vname + "state", state);
       set(vname + "vmon", vmon);
       set(vname + "cmon", cmon);
     }
   }
-  update();
 }
 
 void HVControlCallback::monitor() throw()

@@ -2,6 +2,7 @@
 #define _Belle2_PostgreSQLInterface_hh
 
 #include "daq/slc/database/DBInterface.h"
+#include "daq/slc/system/Mutex.h"
 
 typedef struct pg_conn PGconn;
 typedef struct pg_result PGresult;
@@ -32,6 +33,7 @@ namespace Belle2 {
   private:
     PGconn* m_sq_conn;
     PGresult* m_sq_result;
+    Mutex m_mutex;
 
   };
 

@@ -28,9 +28,15 @@ void ArichHVControlCallback::initialize(const HVConfig& hvconf) throw()
     const DBObjectList& c_channel_v(c_crate.getObjects("channel"));
     for (size_t j = 0; j < c_channel_v.size(); j++) {
       const DBObject& c_channel(c_channel_v[j]);
+      float voffset = c_channel.getFloat("voffset");
+      float vslope = c_channel.getFloat("vslope");
+      float coffset = c_channel.getFloat("coffset");
+      float cslope = c_channel.getFloat("cslope");
+      if (vslope <= 0) vslope = 1;
+      if (cslope <= 0) cslope = 1;
       int slot = c_channel.getInt("slot");
       int channel = c_channel.getInt("channel");
-      acomm.addUnit(ArichHVUnit(ArichHVCalib(0, 1, 0, 1),
+      acomm.addUnit(ArichHVUnit(ArichHVCalib(voffset, vslope, coffset, cslope),
                                 HVChannel(crateid, slot, channel)));
     }
     m_acomm.push_back(acomm);
@@ -41,7 +47,7 @@ void ArichHVControlCallback::initialize(const HVConfig& hvconf) throw()
   }
 }
 
-void ArichHVControlCallback::timeout() throw()
+void ArichHVControlCallback::update() throw()
 {
   for (size_t i = 0; i < m_acomm.size(); i++) {
     m_acomm[i].requestValueAll(0, 0);

@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     virtual void initialize(const HVConfig& hvconf) throw();
-    virtual void timeout() throw();
+    virtual void update() throw();
 
   public:
     virtual void setSwitch(int crate, int slot, int channel, bool switchon) throw(IOException);

@@ -263,7 +263,10 @@ void ArichHVCommunicator::requestCurrentMonitor(int unit, int ch) throw(IOExcept
 void ArichHVCommunicator::send(ArichHVMessage& msg)
 throw(IOException)
 {
-  if (!m_available) return;
+  if (!m_available) {
+    LogFile::error("HV crate is Not available");
+    return;
+  }
   m_mutex.lock();
   try {
     std::string str = msg.toString(m_usech);

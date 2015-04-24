@@ -76,8 +76,9 @@ DBObject DBObjectLoader::load(ConfigFile& config)
 
 DBObject DBObjectLoader::load(DBInterface& db,
                               const std::string& tablename,
-                              const std::string& configname, bool isfull)
+                              const std::string& config_in, bool isfull)
 {
+  std::string configname = config_in;
   const std::string rootnode = "." + configname;
   if (!db.isConnected()) {
     db.connect();
@@ -89,7 +90,14 @@ DBObject DBObjectLoader::load(DBInterface& db,
              tablename.c_str(), rootnode.c_str());
   DBRecordList record_v(db.loadRecords());
   DBObject obj;
-  if (record_v.size() == 0) return obj;
+  if (record_v.size() == 0) {
+    StringList list = DBObjectLoader::getDBlist(db, tablename, configname);
+    if (list.size() > 0) {
+      configname = list[0];
+      return DBObjectLoader::load(db, tablename, configname, true);
+    }
+    return obj;
+  }
   obj.setName(configname);
   for (size_t i = 0; i < record_v.size(); i++) {
     DBRecord& record(record_v[i]);

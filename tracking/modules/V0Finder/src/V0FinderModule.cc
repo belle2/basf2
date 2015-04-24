@@ -34,11 +34,21 @@ REG_MODULE(V0Finder);
 
 V0FinderModule::V0FinderModule() : Module()
 {
-  setDescription("This is a simple V0 finder which matches all positive tracks "
-                 "with all negative tracks.  The two main cuts are "
-                 "'vertexChi2Cut' (which rejects really bad vertex fits) and "
-                 "'distRfromIP' (which rejects vertices that happen too close "
-                 "to the IP in the perpendicular direction).");
+  setDescription("This is a simple V0 finder which matches all positive "
+                 "tracks with all negative tracks, fitting a vertex for each "
+                 "pair.  Depending on the outcome of each fit, a corresponding "
+                 "Belle2::V0 is stored or not.\n\n"
+
+                 "Inside the beam pipe (cut determined by the option "
+                 "'beamPipeRadius') a loose chi2 cut is applied "
+                 "('vertexChi2CutInside') and, since all tracks coming from a "
+                 "single B decay will actually fit into a vertex, an additional "
+                 "mass cut restricting to Kshorts is applied "
+                 "('massWindowKshortInside').\n\n"
+
+                 "Outside the beam pipe only a chi^2 cut is applied "
+                 "('vertexChi2CutOutside').");
+
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input tracks

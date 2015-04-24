@@ -77,8 +77,9 @@ namespace Belle2 {
     void removeCompetitor(unsigned int iD)
     {
       if (isCompetitor(iD)) {
-        std::remove(m_competitors.begin(), m_competitors.end(), iD);
-        m_competitors.resize(getNCompetitors() - 1);
+        auto newEndOfVector = std::remove(m_competitors.begin(), m_competitors.end(), iD);
+//         m_competitors.resize(getNCompetitors() - 1);
+        m_competitors.resize(std::distance(m_competitors.begin(), newEndOfVector));
       } else {
         B2WARNING("TCCompetitorContainer::addCompetitor: given iD " << iD << " was not found among " << getNCompetitors() <<
                   " competitors! ID can not be removed!")

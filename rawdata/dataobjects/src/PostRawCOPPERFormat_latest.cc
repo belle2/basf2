@@ -291,7 +291,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   buf = GetFINESSEBuffer(n, finesse_num) +  GetFINESSENwords(n,
                                                              finesse_num) - ((SIZE_B2LFEE_TRAILER - POS_B2LFEE_ERRCNT_CRC16) + SIZE_B2LHSLB_TRAILER) ;
 
-  if (GetEveNo(n) % 10000 == 0) {
+  if (GetEveNo(n) % 100000 == 0) {
     printf("#### PostRawCOPPER : Eve %.8x block %d finesse %d B2LCRC16 %.8x calculated CRC16 %.8x\n", GetEveNo(n), n, finesse_num,
            *buf, temp_crc16);
   }
@@ -306,10 +306,10 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
              GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
       // Modify XOR checksum due to adding a bit flag
       copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
-      |= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
+      ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
       copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
       copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
-      |= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
+      ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
 
     } else {
       // Stop taking data

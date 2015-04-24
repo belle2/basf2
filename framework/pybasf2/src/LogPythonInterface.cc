@@ -113,9 +113,18 @@ dict LogPythonInterface::getLogStatistics()
   return returnDict;
 }
 
+#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#endif
 /** Create overloads since default arguments are lost in C++ */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogFile_overloads, addLogFile, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0, 1)
+#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#else
+#pragma GCC diagnostic pop
+#endif
 
 /** Expose python api */
 void LogPythonInterface::exposePythonAPI()

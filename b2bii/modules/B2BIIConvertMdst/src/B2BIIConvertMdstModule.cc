@@ -10,7 +10,6 @@
 
 #include <b2bii/modules/B2BIIConvertMdst/B2BIIConvertMdstModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
 
 // Belle II utilities
@@ -45,7 +44,7 @@ REG_MODULE(B2BIIConvertMdst)
 B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module()
 {
   //Set module properties
-  setDescription("Converts Belle mdst objects (Panther tables and records) to Belle II msdt objects.");
+  setDescription("Converts Belle mDST objects (Panther tables and records) to Belle II mDST objects.");
 
   m_realData = false;
 
@@ -79,6 +78,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreArray<TrackFitResult> trackFitResults;
   trackFitResults.registerInDataStore();
 
+  m_pidLikelihoods.registerInDataStore();
+
   // needs to be registered, even if running over data, since this information is available only at the begin_run function
   // TODO: Change to module parameter and check if consistent?
   StoreArray<MCParticle> mcParticles;
@@ -86,6 +87,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   //list here all Relations between Belle2 objects
   tracks.registerRelationTo(mcParticles);
+  tracks.registerRelationTo(m_pidLikelihoods);
   eclClusters.registerRelationTo(mcParticles);
   eclClusters.registerRelationTo(tracks);
 
@@ -149,6 +151,8 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
 
     // convert MDST_Charged -> Track
     convertMdstChargedObject(belleTrack, track);
+
+    convertPIDData(belleTrack, track);
 
     if (m_realData)
       continue;
@@ -332,6 +336,51 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 //-----------------------------------------------------------------------------
 // CONVERT OBJECTS
 //-----------------------------------------------------------------------------
+
+void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track)
+{
+  PIDLikelihood* pid = m_pidLikelihoods.appendNew();
+  track->addRelationTo(pid);
+
+  //convert data handled by atc_pid: dE/dx (-> CDC), TOF (-> TOP), ACC ( -> ARICH)
+  //this should result in the same likelihoods used when creating atc_pid(3, 1, 5, ..., ...)
+  //and calling prob(const Mdst_charged & chg).
+
+  //accq0 = 3, as implemented in acc_prob3()
+  //TODO acc_pid() values can be used as likelihood, but needs PDFs plus some constants...
+
+  //tofq0 = 1, as implemented in tof_prob1()
+  //uses p1 / (p1 + p2) to create probability, so this should map directly to likelihoods
+  const Belle::Mdst_tof& tof = belleTrack.tof();
+  if (tof and tof.quality() == 0) {
+    for (int i = 0; i < c_nHyp; i++) {
+      double logl = log(tof.pid(i));
+      pid->setLogLikelihood(Const::TOP, c_belleHyp_to_chargedStable[i], logl);
+    }
+    //copy proton likelihood to deuterons
+    pid->setLogLikelihood(Const::TOP, Const::deuteron, pid->getLogL(Const::proton, Const::TOP));
+  }
+
+  // cdcq0 = 5, as implemented in cdc_prob0() (which is used for all values of cdcq0!)
+  //uses p1 / (p1 + p2) to create probability, so this should map directly to likelihoods
+  const Belle::Mdst_trk& trk = belleTrack.trk();
+  if (trk.dEdx() > 0) {
+    for (int i = 0; i < c_nHyp; i++) {
+      double logl = log(trk.pid(i));
+      pid->setLogLikelihood(Const::CDC, c_belleHyp_to_chargedStable[i], logl);
+    }
+    //copy proton likelihood to deuterons
+    pid->setLogLikelihood(Const::CDC, Const::deuteron, pid->getLogL(Const::proton, Const::CDC));
+  }
+
+
+  //eid
+  //TODO
+
+  //muid
+  //TODO
+}
+
 
 void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track)
 {

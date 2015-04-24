@@ -124,6 +124,9 @@ namespace Belle2 {
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
 
+    /** Get PID information for belleTrack and add it to PIDLikelihood (with relation from track). */
+    void convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track);
+
     //
     // RELATIONS
     //
@@ -161,6 +164,9 @@ namespace Belle2 {
 
     //! map of Gen_hepevt Panther IDs and corresponing MCParticle StoreArray indices
     std::map<int, int> genHepevtToMCParticle;
+
+    /** output PIDLikelihood array. */
+    StoreArray<PIDLikelihood> m_pidLikelihoods;
 
   };
 

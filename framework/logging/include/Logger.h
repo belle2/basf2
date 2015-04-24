@@ -30,7 +30,7 @@
 #ifdef _PACKAGE_
 #define PACKAGENAME() _PACKAGE_
 #else
-#define PACKAGENAME() "NoPackage"
+#define PACKAGENAME() nullptr
 #endif
 
 /**

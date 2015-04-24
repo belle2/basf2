@@ -32,12 +32,12 @@ namespace Belle2 {
      *
      * @param logLevel The log level of the message (e.g. debug, info, warning, error, fatal).
      * @param message The message string which should be send.
-     * @param package The package name where the message was sent from.
+     * @param package The package name where the message was sent from (can be NULL)
      * @param function The function name where the message was sent from.
      * @param file The file name where the message was sent from.
      * @param line The line number in the source code where the message was sent from.
      */
-    LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const std::string& package,
+    LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
                const std::string& function, const std::string& file, unsigned int line);
 
     /**

@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 
 
-LogMethod::LogMethod(const string& package, const string& function, const string& file, unsigned int line)
+LogMethod::LogMethod(const char* package, const string& function, const string& file, unsigned int line)
 {
   m_package = package;
   m_function = function;

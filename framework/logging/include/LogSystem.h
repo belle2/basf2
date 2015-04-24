@@ -80,7 +80,7 @@ namespace Belle2 {
      *                        Set to NULL to use the global log configuration.
      * @param moduleName Name of the module.
      */
-    void setModuleLogConfig(LogConfig* moduleLogConfig = 0, const std::string& moduleName = "-global-") {m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
+    void setModuleLogConfig(LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
 
     /**
      * Add the per package log configuration.
@@ -89,7 +89,7 @@ namespace Belle2 {
      * @param package The name of the package whose log configuration should be added.
      * @param logConfig The log configuration which should be assigned to the given package.
      */
-    void addPackageLogConfig(const std::string& package, const LogConfig& logConfig) {m_packageLogConfigs[package] = logConfig; };
+    void addPackageLogConfig(const std::string& package, const LogConfig& logConfig) { m_packageLogConfigs[package] = logConfig; };
 
     /**
      * Get the log configuration for the package with the given name.
@@ -98,15 +98,16 @@ namespace Belle2 {
      * @param package The name of the package whose log configuration should be returned
      * @return The log configuration of the given package
      */
-    LogConfig& getPackageLogConfig(const std::string& package) {return m_packageLogConfigs[package]; };
+    LogConfig& getPackageLogConfig(const std::string& package) { return m_packageLogConfigs[package]; };
 
     /**
      * Returns true if the given log level is allowed by the log system (i.e. >= the system level).
      *
      * @param level The log level which should be compared with the log level of the log system
      * @param debugLevel The level for debug messages. Only used for the debug level.
+     * @param package Current package (e.g. framework). NULL for package-independent config.
      */
-    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, const std::string& package = "") const;
+    bool isLevelEnabled(LogConfig::ELogLevel level, int debugLevel = 0, const char* package = nullptr) const;
 
     /**
      * Sends a log message using the log connection object.
@@ -138,21 +139,21 @@ namespace Belle2 {
      * The idea is that a module can call functions in a different package,
      * and the log configuration for that package will be used.
      */
-    const LogConfig& getCurrentLogConfig(const std::string& package = "") const;
+    const LogConfig& getCurrentLogConfig(const char* package = nullptr) const;
 
     /**
      * Returns the current log level used by the logging system.
      *
      * \sa getCurrentLogConfig()
      */
-    inline LogConfig::ELogLevel getCurrentLogLevel(const std::string& package = "") const { return getCurrentLogConfig(package).getLogLevel(); }
+    inline LogConfig::ELogLevel getCurrentLogLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getLogLevel(); }
 
     /**
      * Returns the current debug level used by the logging system.
      *
      * \sa getCurrentLogConfig()
      */
-    inline int getCurrentDebugLevel(const std::string& package = "") const { return getCurrentLogConfig(package).getLogLevel(); }
+    inline int getCurrentDebugLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getLogLevel(); }
 
     /**
      * Print error/warning summary at end of execution.

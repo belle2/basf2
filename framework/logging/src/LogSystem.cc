@@ -46,7 +46,7 @@ void LogSystem::resetLogConnections()
 }
 
 
-bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const std::string& package) const
+bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const char* package) const
 {
   const LogConfig& config = getCurrentLogConfig(package);
   LogConfig::ELogLevel logLevelLimit = config.getLogLevel();
@@ -108,10 +108,10 @@ int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 }
 
 
-const LogConfig& LogSystem::getCurrentLogConfig(const std::string& package) const
+const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 {
   //package specific config?
-  if (!package.empty()) {
+  if (package && !m_packageLogConfigs.empty()) {
     map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(package);
     if (packageLogConfig != m_packageLogConfigs.end()) {
       const LogConfig& logConfig = packageLogConfig->second;

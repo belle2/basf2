@@ -10,6 +10,8 @@
 
 #include "tracking/modules/trackSetEvaluatorVXD/TrackSetEvaluatorGreedyModule.h"
 
+#include <tracking/spacePointCreation/sptcNetwork/TrackSetEvaluatorGreedy.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -26,6 +28,7 @@ TrackSetEvaluatorGreedyModule::TrackSetEvaluatorGreedyModule() : Module()
 
   addParam("writeToRoot", m_PARAMwriteToRoot, " if true, analysis data is written into a root file - standard is false", bool(false));
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it", string(""));
+  addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of tcNetwork to loaded as a StoreObjPtr", string(""));
 
   if (m_PARAMwriteToRoot == false) { setPropertyFlags(c_ParallelProcessingCertified); }
 }
@@ -34,44 +37,24 @@ TrackSetEvaluatorGreedyModule::TrackSetEvaluatorGreedyModule() : Module()
 
 void TrackSetEvaluatorGreedyModule::event()
 {
-//   m_eventCounter++;
-//
-//   checkMinMaxQI();
-//
-//   unsigned int nTCsTotal = m_spacePointTrackCands.getEntries();
-//   m_nTCsTotal += nTCsTotal;
-//
-//   if (nTCsTotal < 2) {
-//  m_nTCsCompatible += nTCsTotal;
-//  m_nFinalTCs += nTCsTotal;
-//  return;
-//   }
-//
-//   vector<SpacePointTrackCand*> overlappingTCs = findOverlappingTCs(); // TODO: outsource
-//
-//   unsigned int nTCsOverlapping = overlappingTCs.size();
-//
-//   if (nTCsOverlapping == 0) {
-//  m_nTCsCompatible += nTCsTotal;
-//  m_nFinalTCs += nTCsTotal;
-//  return;
-//   }
-//
-//   if (nTCsOverlapping == 1) {
-//  B2ERROR("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": only one SpacePointTrackCand was overlapping (should not be possible!)")
-//   }
-//
-//   if (nTCsOverlapping == 2) {
-//
-//  B2DEBUG(10, "TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": 2 overlapping Track Candidates found, tcDuel choses the last TC standing on its own")
-//  tcDuell(overlappingTCs);
-//
-//  m_nTCsOverlapping += 2;
-//  m_nFinalTCs += nTCsTotal;
-//  return;
-//   }
+  m_eventCounter++;
+  m_nTCsTotal += m_spacePointTrackCands.getEntries();
+  checkMinMaxQI();
+  m_nTCsOverlapping += m_tcNetwork->getNCompetitors();
+
+  B2INFO("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": got " << m_spacePointTrackCands.getEntries() <<
+         " TC of which " << m_tcNetwork->getNCompetitors() << " are overlapping")
+
+  m_tcNetwork->replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
+                                        (m_tcNetwork->getNodes(), m_tcNetwork->getObserver()));
+
+  unsigned int nTCsAlive = m_tcNetwork->cleanOverlaps();
+
+  m_nFinalTCs += nTCsAlive;
+  m_nRejectedTCs += m_spacePointTrackCands.getEntries() - nTCsAlive;
 
 
+  // TODO inform SpacePointTrackCands about the decissions made here!
 }
 
 
@@ -81,7 +64,16 @@ void TrackSetEvaluatorGreedyModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("TrackSetEvaluatorGreedyModule-endRun: want to have some summary here... invEvents: " << invEvents) // TODO
+  B2INFO("TrackSetEvaluatorGreedyModule-endRun: " <<
+         " nTCs per event: " << float(m_nTCsTotal)*invEvents <<
+         ", nTCs overlapping per event: " << float(m_nTCsOverlapping)*invEvents <<
+         " nFinalTCs per event: " << float(m_nFinalTCs)*invEvents <<
+         ", nTCsRejected per event: " << float(m_nRejectedTCs)*invEvents <<
+         "\n nTCs total: " << m_nTCsTotal <<
+         ", nTCs overlapping total: " << m_nTCsOverlapping <<
+         " nFinalTCs total: " << m_nFinalTCs <<
+         ", nTCsRejected total: " << m_nRejectedTCs <<
+         " highest/lowest QI found: " << m_maxQI << "/" << m_minQI)
 }
 
 
@@ -108,115 +100,5 @@ void TrackSetEvaluatorGreedyModule::checkMinMaxQI()
     if (tempQI < m_minQI) {
       m_minQI = tempQI;
     }
-  }
-}
-
-
-/** ***** greedy ***** **/
-/// search for nonOverlapping trackCandidates using Greedy algorithm (start with TC of highest QI, remove all TCs incompatible with current TC, if there are still TCs there, repeat step until no incompatible TCs are there any more)
-// template <typename TCCollectionType, typename TCType>
-// void TrackSetEvaluatorGreedyModule::greedy(typename TCCollectionType<TCType*>& tcVector)
-// {
-//   list< pair< double, TCType*> > overlappingTCs;
-//
-//   int countTCsAliveAtStart = 0, countSurvivors = 0, countKills = 0;
-//   double totalSurvivingQI = 0, totalQI = 0;
-//   for (VXDTFTrackCandidate* tc : tcVector) {  // store tcs in list of current overlapping TCs
-//  ++countTCsAliveAtStart;
-//  if (tc->getCondition() == false) continue;
-//
-//  double qi = tc->getTrackQuality();
-//  totalQI += qi;
-//
-//  if (int(tc->getBookingRivals().size()) == 0) { // tc is clean and therefore automatically accepted
-//    totalSurvivingQI += qi;
-//    countSurvivors++;
-//    continue;
-//  }
-//
-//  overlappingTCs.push_back({qi, tc});
-//   }
-//
-//   overlappingTCs.sort();
-//   overlappingTCs.reverse();
-//
-//   greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
-//
-//   B2DEBUG(3, "VXDTFModule::greedy: total number of TCs: " << tcVector.size() << " with totalQi " << totalQI <<
-//   ", TCs alive at begin of greedy algoritm: " << countTCsAliveAtStart << ", TCs survived: " << countSurvivors << ", TCs killed: " <<
-//   countKills)
-// }
-
-
-/** ***** greedyRecursive ***** **/
-/// used by VXDTFModule::greedy, recursive function which takes tc with highest QI and kills all its rivals. After that, TC gets removed and process is repeated with shrinking list of TCs until no TCs alive has got rivals alive
-// template <typename TCCollectionType, typename TCType>
-// void TrackSetEvaluatorGreedyModule::greedyRecursive(TCCollectionType< std::pair<double, TCType*> >& overlappingTCs,
-// void TrackSetEvaluatorGreedyModule::greedyRecursive(std::list< std::pair<double, VXDTFTrackCandidate*> >& overlappingTCs,
-//                  double& totalSurvivingQI,
-//                  int& countSurvivors,
-//                  int& countKills)
-// {
-//   if (overlappingTCs.empty() == true) return;
-//
-//   list< pair<double, VXDTFTrackCandidate*> >::iterator tcEntry = overlappingTCs.begin();
-//
-//   while (tcEntry->second->getCondition() == false) {
-//  tcEntry = overlappingTCs.erase(tcEntry);
-//  if (tcEntry == overlappingTCs.end() or overlappingTCs.empty() == true) return;
-//   }
-//
-//   double qi = tcEntry->first;
-//
-//   for (VXDTFTrackCandidate* rival : tcEntry->second->getBookingRivals()) {
-//  if (rival->getCondition() == false) continue;
-//
-//  countKills++;
-//
-//  if (qi >= rival->getTrackQuality()) {
-//    rival->setCondition(false);
-//
-//    // Update Collector TC - hopfield
-//    if (m_PARAMdisplayCollector > 0) {
-//    m_collector.updateTC(rival->getCollectorID(), CollectorTFInfo::m_nameHopfield, CollectorTFInfo::m_idHopfield, vector<int>(), {FilterID::greedy});
-//    }
-//
-//  } else {
-//    tcEntry->second->setCondition(false);
-//
-//    // Update Collector TC - hopfield
-//    if (m_PARAMdisplayCollector > 0) {
-//    m_collector.updateTC(tcEntry->second->getCollectorID(),  CollectorTFInfo::m_nameHopfield, CollectorTFInfo::m_idHopfield,
-//               vector<int>(), {FilterID::greedy});
-//    }
-//
-//
-//    break;
-//  }
-//   }
-//
-//   if (tcEntry->second->getCondition() == true) {
-//  countSurvivors++;
-//  totalSurvivingQI += qi;
-//   }
-//
-//   if (overlappingTCs.empty() != true) { overlappingTCs.pop_front(); }
-//
-//
-//   greedyRecursive(overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
-//
-//   return;
-// }
-
-
-/** ***** tcDuel ***** **/
-/// for that easy situation we dont need the neuronal network or other algorithms for finding the best subset...
-template <typename TCCollectionType>
-void TrackSetEvaluatorGreedyModule::tcDuel(TCCollectionType& tcVector)
-{
-  if (tcVector.at(0)->getQualityIndex() > tcVector.at(1)->getQualityIndex()) {
-    tcVector.at(1)->setInactive();
-  } else {
-    tcVector.at(0)->setInactive();
   }
 }

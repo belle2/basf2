@@ -12,10 +12,12 @@
 #pragma once
 
 #include <tracking/spacePointCreation/sptcNetwork/TCCompetitor.h>
+#include <tracking/spacePointCreation/sptcNetwork/TrackSetEvaluatorBase.h>
 
 #include <framework/logging/Logger.h>
 
 #include <vector>
+#include <utility>
 
 
 namespace Belle2 {
@@ -27,7 +29,6 @@ namespace Belle2 {
   template <class TCType, class ObserverType>
   class TCNetworkContainer {
   protected:
-
     /** ************************* DATA MEMBERS ************************* */
 
     /** stores Nodes of the network - the TCs */
@@ -39,27 +40,39 @@ namespace Belle2 {
     /** keeps the links updated, if something changes with the nodes */
     ObserverType m_obsi;
 
+    /** is working with the network and can remove all overlaps by killing the correct nodes */
+    TrackSetEvaluatorBase<TCType, ObserverType>* m_trackSetEvaluator;
+
   public:
-
-
     /** ************************* CONSTRUCTORS ************************* */
 
     /** standard constructor, prepares observer for observing links */
-    TCNetworkContainer() : m_obsi(m_links) {}
+    TCNetworkContainer() :
+      m_obsi(m_links),
+      m_trackSetEvaluator(new TrackSetEvaluatorBase<TCType, ObserverType>(m_nodes, m_obsi)) {}
 
-    /** ************************* OPERATORS ************************* */
+
+    /** destructor cleaning up the evaluator */
+    ~TCNetworkContainer() { delete m_trackSetEvaluator; }
 
     /** ************************* MEMBER FUNCTIONS ************************* */
 
-
 /// getter
 
-
-    /** return number of nodes in network */
+    /** return number of nodes in network.
+    *
+    * does not consider whether nodes are alive or not.
+    */
     unsigned int size() const { return m_nodes.size(); }
+
 
     /** return link to the observer which observes the links */
     ObserverType& getObserver() { return m_obsi; }
+
+
+    /** returns a reference to the nodes in the network */
+    std::vector<TCType>& getNodes() { return m_nodes; }
+
 
     /** returns how many TCs are currently overlapping */
     unsigned int getNCompetitors() const
@@ -72,6 +85,7 @@ namespace Belle2 {
       B2DEBUG(50, "TCNetworkContainer::getNCompetitors: " << nCompetitors)
       return nCompetitors;
     }
+
 
     /** return how many TCs are currently alive */
     unsigned int getNTCsAlive() const
@@ -87,6 +101,13 @@ namespace Belle2 {
 
 
 /// setter
+
+    /** allows to replace the former trackSetEvaluator, please only pass stuff created with new! */
+    void replaceTrackSetEvaluator(TrackSetEvaluatorBase<TCType, ObserverType>* newEvaluator)
+    {
+      delete m_trackSetEvaluator;
+      m_trackSetEvaluator = newEvaluator;
+    }
 
 
     /** add new TC as node and update all links in network */
@@ -112,7 +133,6 @@ namespace Belle2 {
         newTCCompetitor.addCompetitor(competitorID);
       }
 
-
       // just some final sanity checks (DEBUG):
       for (unsigned int tcID = 0; tcID < size(); tcID++) {
         if (m_nodes[tcID].getID() != tcID) {
@@ -126,19 +146,23 @@ namespace Belle2 {
       }
     }
 
+
     /** deactivates a TC and updates the competing links to it */
     void killTC(unsigned int iD)
     {
-      if (iD >= size()) {
-        B2WARNING("TCNetworkContainer:killTC: given iD " << iD << " is not in network with size: " << size() << ", killing aborted...")
+      if (iD < size()) {
+        m_nodes[iD].setAliveState(false);
         return;
       }
-      m_nodes[iD].setAliveState(false);
+      B2WARNING("TCNetworkContainer:killTC: given iD " << iD << " is not in network with size: " << size() << ", killing aborted...")
     }
+
 
     /** looping through the notify-function to the observer */
     void notifyRemove(unsigned int iD) { m_obsi.notifyRemove(iD); }
 
 
+    /** start trackSetEvaluator to clean the overlaps, returns number of final tcs */
+    unsigned int cleanOverlaps() { return m_trackSetEvaluator->cleanOverlaps(); }
   };
 } // end namespace Belle2

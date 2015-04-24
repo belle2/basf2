@@ -32,7 +32,6 @@
 #include "vxdtfRedesign/observersDynamic.cc"
 #include "vxdtfRedesign/oldVSNewSegFinderFilters.cc"
 #include "vxdtfRedesign/twoHitFilters.cc"
-#include "vxdtfRedesign/tCNetworkContainer.cc"
 
 
 /// for testing:

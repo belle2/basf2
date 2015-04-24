@@ -35,20 +35,12 @@ SPTCNetworkProducerModule::SPTCNetworkProducerModule() : Module()
 
 
 
-void SPTCNetworkProducerModule::initialize()
-{
-  InitializeCounters();
-  m_spacePointTrackCands.isRequired(m_PARAMtcArrayName);
-  m_tcNetwork.registerInDataStore(m_PARAMtcNetworkName, DataStore::c_DontWriteOut);
-}
-
-
-
 void SPTCNetworkProducerModule::event()
 {
   m_eventCounter++;
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
+  // prepare the tcNetwork
   m_tcNetwork.construct(m_PARAMcheckSPsInsteadOfClusters);
 
   B2DEBUG(10, "SPTCNetworkProducer:event " << m_eventCounter
@@ -57,6 +49,7 @@ void SPTCNetworkProducerModule::event()
           << " SPTCs!\n"
           << ", mode to compare TCs is set to " << m_tcNetwork->getCompareTCsMode())
 
+  // fill the tcNetwork
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     m_tcNetwork->add(aTC);
   }

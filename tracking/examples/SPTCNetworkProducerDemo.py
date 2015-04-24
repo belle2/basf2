@@ -7,21 +7,19 @@ from sys import argv
 from basf2 import *
 from time import time
 
-numEvents = 100
+numEvents = 10
 initialValue = 1
 
-usePXD = True
-useEvtGen = True
-usePGun = False
+usePGun = True
 
 # flags for the pGun
-numTracks = 4
+numTracks = 2
 # transverseMomentum:
 momentumMin = 0.130  # GeV/c
 momentumMax = 0.260  # %
 # theta: starting angle of particle direction in r-z-plane
-thetaMin = 75.0  # degrees
-thetaMax = 105.  # degrees
+thetaMin = 20.0  # degrees
+thetaMax = 145.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
 phiMin = 0.  # degrees
 phiMax = 360.  # degrees
@@ -30,8 +28,10 @@ phiMax = 360.  # degrees
 checkTH = False
 
 # flags for SPTCNetworkProducer
+# debugLevel = LogLevel.DEBUG
+debugLevel = LogLevel.INFO
 dLevel = 1
-checkSPs = True
+checkSPs = False
 
 if len(argv) > 1:
     numEvents = int(argv[1])
@@ -140,11 +140,16 @@ trackCandConverter.param(param_trackCandConverter)
 
 
 tcNetworkProducer = register_module('SPTCNetworkProducer')
-tcNetworkProducer.logging.log_level = LogLevel.DEBUG
+tcNetworkProducer.logging.log_level = debugLevel
 tcNetworkProducer.logging.debug_level = dLevel
 tcNetworkProducer.param('tcArrayName', 'SPTracks')
 tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
 tcNetworkProducer.param('checkSPsInsteadOfClusters', checkSPs)
+
+greedy = register_module('TrackSetEvaluatorGreedy')
+greedy.logging.log_level = debugLevel
+greedy.param('tcArrayName', 'SPTracks')
+greedy.param('tcNetworkName', 'tcNetwork')
 
 
 log_to_file('sptcNetworkDemoOutput.txt', append=False)
@@ -169,6 +174,7 @@ main.add_module(spCreatorPXD)
 main.add_module(spCreatorSVD)
 main.add_module(trackCandConverter)
 main.add_module(tcNetworkProducer)
+main.add_module(greedy)
 
 # Process events
 process(main)

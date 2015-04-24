@@ -11,7 +11,9 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/spacePointCreation/sptcNetwork/SpTcNetwork.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
@@ -39,6 +41,7 @@ namespace Belle2 {
     virtual void initialize()
     {
       m_spacePointTrackCands.isRequired(m_PARAMtcArrayName);
+      m_tcNetwork.isRequired(m_PARAMtcNetworkName);
     }
 
 
@@ -81,9 +84,15 @@ namespace Belle2 {
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
     std::string m_PARAMtcArrayName;
 
+    /** sets the name of the StoreObjPtr used for storing a TC network. */
+    std::string m_PARAMtcNetworkName;
+
     // member variables
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
+
+    /** access to tcNetwork, which will be produced by this module */
+    StoreObjPtr<SpTcNetwork> m_tcNetwork;
 
     /** knows current event number */
     unsigned int m_eventCounter;

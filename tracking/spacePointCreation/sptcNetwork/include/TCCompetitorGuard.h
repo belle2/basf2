@@ -27,19 +27,18 @@ namespace Belle2 {
    */
   class TCCompetitorGuard {
   protected:
-
     /** ************************* DATA MEMBERS ************************* */
 
     /** stores the links of the network - the competitors */
     std::vector<TCCompetitor>& m_links;
 
   public:
-
     /** constructor */
     TCCompetitorGuard(std::vector<TCCompetitor>& observedVector) : m_links(observedVector)
     {
-      B2DEBUG(150, "TCCompetitorGuard:constructor: nEntries in observedVector " << observedVector.size());
+//       B2DEBUG(150, "TCCompetitorGuard:constructor: nEntries in observedVector " << observedVector.size());
     }
+
 
     /** notify function called by class which wants to be observed. For each competitor of given iD, the iD will be removed as competitor for them. */
     void notifyRemove(unsigned int iD)
@@ -61,6 +60,15 @@ namespace Belle2 {
       }
     }
 
+
+    /** says whether given TCCompetitor has competitors stored */
+    bool hasCompetitors(unsigned int iD)
+    {
+      return iD < m_links.size() and m_links[iD].hasCompetitors();
+    }
+
+    /** getCompetitors - returns non-modifyable reference to entries of the container */
+    const std::vector<unsigned int>& getCompetitors(unsigned int iD) const { return  m_links[iD].getCompetitors(); }
   };
 
 } // end namespace Belle2

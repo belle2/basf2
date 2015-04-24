@@ -5,7 +5,7 @@ Import('env')
 #import os
 
 ## Mark this folder as a sub library
-#env['SUBLIB'] = True
+env['SUBLIB'] = True
 ##env.Dictionary()['SUBLIB'] = True
 
 

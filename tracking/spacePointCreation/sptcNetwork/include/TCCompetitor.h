@@ -26,7 +26,6 @@ namespace Belle2 {
    */
   class TCCompetitor {
   protected:
-
     /** ************************* DATA MEMBERS ************************* */
 
     /** stores indices for given competitors */
@@ -36,14 +35,10 @@ namespace Belle2 {
     /** returns iterator-position of given iD. is m_competitors.end() if entry not found. */
     std::vector<unsigned int>::const_iterator find(unsigned int iD) const { return std::find(m_competitors.begin(), m_competitors.end(), iD); }
 
+
     /** short cut which tells you, if given iterator is end of m_competitors */
     bool isEnd(std::vector<unsigned int>::const_iterator pos) const { return pos == m_competitors.end(); }
   public:
-
-    /** ************************* CONSTRUCTORS ************************* */
-
-    /** ************************* OPERATORS ************************* */
-
     /** ************************* MEMBER FUNCTIONS ************************* */
 
 
@@ -52,15 +47,17 @@ namespace Belle2 {
     /** says whether TCCompetitorContainer has competitors stored */
     bool hasCompetitors() const { return !m_competitors.empty(); }
 
+
     /** returns non-modifyable reference to entries of the container */
     const std::vector<unsigned int>& getCompetitors() const { return m_competitors; }
+
 
     /** returns current number of competitors */
     unsigned int getNCompetitors() const { return m_competitors.size(); }
 
+
     /** for given id it will be checked whether it is one of the competitors or not */
     bool isCompetitor(unsigned int iD) const { return !isEnd(find(iD)); }
-
 
 /// setter
 
@@ -75,6 +72,7 @@ namespace Belle2 {
       }
     }
 
+
     /** removes given id if it was a competitor. If iD was not found among the competitors, a warning will be given */
     void removeCompetitor(unsigned int iD)
     {
@@ -86,7 +84,6 @@ namespace Belle2 {
                   " competitors! ID can not be removed!")
       }
     }
-
 
   };
 } // end namespace Belle2

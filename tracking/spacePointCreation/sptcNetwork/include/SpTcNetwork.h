@@ -16,15 +16,7 @@
 //
 // // framework
 #include <framework/datastore/RelationsObject.h>
-// #include <framework/datastore/StoreObjPtr.h>
-// #include <framework/core/FrameworkExceptions.h>
-// #include <framework/logging/Logger.h>
-//
-// // stl:
-// #include <vector>
-// #include <string>
-// #include <utility> // std::pair
-// #include <math.h>
+
 
 namespace Belle2 {
   /** The SpTcNetwork class.
@@ -44,7 +36,6 @@ namespace Belle2 {
 
     ClassDef(SpTcNetwork, 1) // last member changed:  m_network
   public:
-
     /** ************************* CONSTRUCTORS ************************* */
 
     /** standard constructor for Root IO */
@@ -52,31 +43,39 @@ namespace Belle2 {
       m_network(TCNetworkContainer<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard >()),
       m_compareSPs(false) {}
 
+
     /** specific constructor allowing to set comparison mode */
     SpTcNetwork(bool compareSPs) :
       m_network(TCNetworkContainer<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard >()),
       m_compareSPs(compareSPs) {}
+
 
     /** virtual destructor to prevent undefined behavior for inherited classes */
     virtual ~SpTcNetwork() {}
 
     /** ************************* MEMBER FUNCTIONS ************************* */
 
-
 /// getter
-
 
     /** return number of nodes in network */
     unsigned int size() const { return m_network.size(); }
 
+
     /** return link to the observer which observes the links */
     TCCompetitorGuard& getObserver() { return m_network.getObserver(); }
+
+
+    /** returns a reference to the nodes in the network */
+    std::vector<SPTCAvatar<TCCompetitorGuard> >& getNodes() { return m_network.getNodes(); }
+
 
     /** returns how many TCs are currently overlapping */
     unsigned int getNCompetitors() const { return m_network.getNCompetitors(); }
 
+
     /** return how many TCs are currently alive */
     unsigned int getNTCsAlive() const  { return m_network.getNTCsAlive(); }
+
 
     /** returns in which way the TCs will be compared.
     *
@@ -84,8 +83,11 @@ namespace Belle2 {
     */
     bool getCompareTCsMode() const { return m_compareSPs; }
 
-/// setter
 
+    /** returns a vector of pointers to all TCs which are alive and overlapping */
+//  std::vector<SPTCAvatar<TCCompetitorGuard>*> provideOverlappingTCs() { return m_network.provideOverlappingTCs(); }
+
+/// setter
 
     /** add new TC as node and update all links in network */
     void add(SpacePointTrackCand& newTC)
@@ -93,10 +95,24 @@ namespace Belle2 {
       m_network.add(SPTCAvatar<TCCompetitorGuard >(newTC, m_network.getObserver(), m_network.size(), m_compareSPs));
     }
 
+
     /** add new TC as node and update all links in network */
     void add(SpacePointTrackCand* newTC) { add(*newTC); }
 
+
     /** deactivates a TC and updates the competing links to it */
     void killTC(unsigned int iD) { m_network.killTC(iD); }
+
+
+    /** allows to replace the former trackSetEvaluator, please only pass stuff created with new! */
+    void replaceTrackSetEvaluator(
+      Belle2::TrackSetEvaluatorBase<Belle2::SPTCAvatar<Belle2::TCCompetitorGuard>, Belle2::TCCompetitorGuard>* newEvaluator)
+    {
+      m_network.replaceTrackSetEvaluator(newEvaluator);
+    }
+
+
+    /** start trackSetEvaluator to clean the overlaps, returns number of final tcs */
+    unsigned int cleanOverlaps() { return m_network.cleanOverlaps(); }
   };
 }

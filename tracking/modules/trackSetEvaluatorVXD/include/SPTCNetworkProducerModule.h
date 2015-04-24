@@ -40,7 +40,12 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize();
+    virtual void initialize()
+    {
+      InitializeCounters();
+      m_spacePointTrackCands.isRequired(m_PARAMtcArrayName);
+      m_tcNetwork.registerInDataStore(m_PARAMtcNetworkName, DataStore::c_DontWriteOut);
+    }
 
 
     /**

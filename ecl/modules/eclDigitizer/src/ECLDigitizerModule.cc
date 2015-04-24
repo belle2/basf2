@@ -73,8 +73,8 @@ ECLDigitizerModule::~ECLDigitizerModule()
 
 void ECLDigitizerModule::initialize()
 {
-
-  m_nEvent  = 0 ;
+  if (m_background)
+    m_nEvent  = 0 ;
   readDSPDB();
 
   StoreArray<ECLDsp>::registerPersistent();
@@ -726,12 +726,15 @@ void ECLDigitizerModule::readDSPDB()
 {
 
   string dataFileName;
-  if (m_background)
+  if (m_background) {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
-  else
+    B2INFO("ECLDigitizer: Reading configuration data with background from: " << dataFileName);
+  } else {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
-
+    B2INFO("ECLDigitizer: Reading configuration data without background from: " << dataFileName);
+  }
   assert(! dataFileName.empty());
+
 
   StoreArray<ECLWaveformData> eclWaveformData("ECLWaveformData", DataStore::c_Persistent);
   eclWaveformData.registerInDataStore();

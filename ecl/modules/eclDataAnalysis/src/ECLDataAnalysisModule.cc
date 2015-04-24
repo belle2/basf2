@@ -16,6 +16,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -27,6 +28,8 @@
 #include <ecl/dataobjects/ECLPi0.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLPidLikelihood.h>
+
 //#include <ecl/dataobjects/ECLTrig.h>
 #include <list>
 #include <iostream>
@@ -173,7 +176,9 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_trkPz(0),
     m_trkX(0),
     m_trkY(0),
-    m_trkZ(0)
+    m_trkZ(0),
+    m_eclpidtrkIdx(0), m_eclpidEnergy(0), m_eclpidEop(0), m_eclpidE9E25(0), m_eclpidNCrystals(0), m_eclpidNClusters(0),
+    m_eclLogLikeEl(0), m_eclLogLikeMu(0), m_eclLogLikePi(0)
 {
   //Set module properties
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
@@ -185,6 +190,8 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
            string("eclDataAnalysis"));
   addParam("doTracking", m_doTracking,
            "set true if you want to save the informations from TrackFitResults'rootFileName'", bool(true));
+
+
   /*
 
   m_eclHitMultip=0;
@@ -311,10 +318,11 @@ void ECLDataAnalysisModule::initialize()
   StoreArray<ECLPi0>::required();
   StoreArray<MCParticle>::required();
 
-  //StoreArray<ECLCluster>::requireRelationTo<MCParticle>;
-
-  if (m_doTracking == true) StoreArray<TrackFitResult>::required();
-  //  StoreArray<ECLDsp>::required();
+  if (m_doTracking == true) {
+    StoreArray<Track>::required();
+    StoreArray<TrackFitResult>::required();
+    StoreArray<ECLPidLikelihood>::required();
+  }
 
   if (m_writeToRoot == true) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -443,7 +451,7 @@ void ECLDataAnalysisModule::initialize()
   m_mcProdVtxY = new std::vector<double>();
   m_mcProdVtxZ = new std::vector<double>();
   m_mcSecondaryPhysProc = new std::vector<int>();
-
+  */
   m_trkMultip = 0;
   m_trkIdx = new std::vector<int>();
   m_trkPdg = new std::vector<int>();
@@ -454,7 +462,16 @@ void ECLDataAnalysisModule::initialize()
   m_trkX = new std::vector<double>();
   m_trkY = new std::vector<double>();
   m_trkZ = new std::vector<double>();
-  */
+
+  m_eclpidtrkIdx = new std::vector<int>();
+  m_eclpidEnergy = new std::vector<double>();
+  m_eclpidEop = new std::vector<double>();
+  m_eclpidE9E25 = new std::vector<double>();
+  m_eclpidNCrystals = new std::vector<int>();
+  m_eclpidNClusters = new std::vector<int>();
+  m_eclLogLikeEl = new std::vector<double>();
+  m_eclLogLikeMu = new std::vector<double>();
+  m_eclLogLikePi = new std::vector<double>();
 
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
@@ -595,6 +612,16 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("trkPosx",       "std::vector<double>", &m_trkX);
     m_tree->Branch("trkPosy",       "std::vector<double>", &m_trkY);
     m_tree->Branch("trkPosz",      "std::vector<double>",  &m_trkZ);
+
+    m_tree->Branch("eclpidtrkIdx",     "std::vector<int>",  &m_eclpidtrkIdx);
+    m_tree->Branch("eclpidEnergy",     "std::vector<double>",  &m_eclpidEnergy);
+    m_tree->Branch("eclpidEop",        "std::vector<double>",  &m_eclpidEop);
+    m_tree->Branch("eclpidE9E25",      "std::vector<double>",  &m_eclpidE9E25);
+    m_tree->Branch("eclpidNCrystals",  "std::vector<int>",  &m_eclpidNCrystals);
+    m_tree->Branch("eclpidNClusters",  "std::vector<int>",  &m_eclpidNClusters);
+    m_tree->Branch("eclLogLikeEl",      "std::vector<double>",  &m_eclLogLikeEl);
+    m_tree->Branch("eclLogLikeMu",      "std::vector<double>",  &m_eclLogLikeMu);
+    m_tree->Branch("eclLogLikePi",      "std::vector<double>",  &m_eclLogLikePi);
   }
 
   B2INFO("[ECLDataAnalysis Module]: Initialization of ECLDataAnalysis Module completed.");
@@ -661,6 +688,10 @@ void ECLDataAnalysisModule::event()
   m_trkIdx->clear();
   m_trkPdg->clear();  m_trkCharge->clear();   m_trkPx->clear();  m_trkPy->clear();  m_trkPz->clear();
   m_trkX->clear();  m_trkY->clear();  m_trkZ->clear();
+
+  m_eclpidtrkIdx->clear(); m_eclpidEnergy->clear();   m_eclpidEop->clear();   m_eclpidE9E25->clear();   m_eclpidNCrystals->clear();
+  m_eclpidNClusters->clear();
+  m_eclLogLikeEl->clear();   m_eclLogLikeMu->clear();   m_eclLogLikePi->clear();
 
   StoreObjPtr<EventMetaData> eventmetadata;
   if (eventmetadata) {
@@ -795,7 +826,7 @@ void ECLDataAnalysisModule::event()
   }
 
   m_eclClusterMultip = clusters.getEntries();
-  for (unsigned int iclusters = 0; iclusters < clusters.getEntries() ; iclusters++) {
+  for (unsigned int iclusters = 0; iclusters < (unsigned int)clusters.getEntries() ; iclusters++) {
     ECLCluster* aECLClusters = clusters[iclusters];
 
     m_eclClusterIdx->push_back(iclusters);
@@ -945,7 +976,7 @@ void ECLDataAnalysisModule::event()
 
   if (m_doTracking == true) {
     StoreArray<TrackFitResult> trks;
-
+    /*
     m_trkMultip = trks.getEntries();
     for (int itrks = 0; itrks < trks.getEntries(); itrks++) {
       TrackFitResult* atrk = trks[itrks];
@@ -961,7 +992,51 @@ void ECLDataAnalysisModule::event()
       m_trkX->push_back(atrk->getPosition().X());
       m_trkY->push_back(atrk->getPosition().Y());
       m_trkZ->push_back(atrk->getPosition().Z());
+    }
+    */
 
+    StoreArray<Track> tracks;
+    m_trkMultip = 0;
+    for (const Track& itrk : tracks) {
+      const TrackFitResult* atrk = itrk.getTrackFitResult(Const::pion);
+      assert(atrk != nullptr);
+
+      m_trkIdx->push_back(m_trkMultip);
+      m_trkPdg->push_back(atrk->getParticleType().getPDGCode());
+      m_trkCharge->push_back(atrk->getChargeSign());
+
+      m_trkPx->push_back(atrk->getMomentum().X());
+      m_trkPy->push_back(atrk->getMomentum().Y());
+      m_trkPz->push_back(atrk->getMomentum().Z());
+
+      m_trkX->push_back(atrk->getPosition().X());
+      m_trkY->push_back(atrk->getPosition().Y());
+      m_trkZ->push_back(atrk->getPosition().Z());
+
+      const ECLPidLikelihood* eclpid = itrk.getRelatedTo<ECLPidLikelihood>() ;
+
+      if (eclpid != nullptr) {
+        m_eclpidtrkIdx -> push_back(m_trkMultip);
+        m_eclpidEnergy -> push_back(eclpid-> energy());
+        m_eclpidEop    -> push_back(eclpid-> eop());
+        m_eclpidE9E25  -> push_back(eclpid-> e9e25());
+        m_eclpidNCrystals -> push_back(eclpid-> nCrystals());
+        m_eclpidNClusters -> push_back(eclpid-> nClusters());
+        m_eclLogLikeEl -> push_back(eclpid-> getLogLikelihood(Const::electron));
+        m_eclLogLikeMu -> push_back(eclpid-> getLogLikelihood(Const::muon));
+        m_eclLogLikePi -> push_back(eclpid-> getLogLikelihood(Const::pion));
+      } else {
+        m_eclpidtrkIdx -> push_back(-1);
+        m_eclpidEnergy -> push_back(0);
+        m_eclpidEop    -> push_back(0);
+        m_eclpidE9E25  -> push_back(0);
+        m_eclpidNCrystals -> push_back(0);
+        m_eclpidNClusters -> push_back(0);
+        m_eclLogLikeEl -> push_back(0);
+        m_eclLogLikeMu -> push_back(0);
+        m_eclLogLikePi -> push_back(0);
+      }
+      m_trkMultip++;
     }
   }
 

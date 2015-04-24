@@ -210,8 +210,16 @@ namespace Belle2 {
     std::vector<double>* m_trkY;
     std::vector<double>* m_trkZ;
 
+    std::vector<int>* m_eclpidtrkIdx;
+    std::vector<double>* m_eclpidEnergy;
+    std::vector<double>* m_eclpidEop;
+    std::vector<double>* m_eclpidE9E25;
+    std::vector<int>* m_eclpidNCrystals;
+    std::vector<int>* m_eclpidNClusters;
+    std::vector<double>* m_eclLogLikeEl;
+    std::vector<double>* m_eclLogLikeMu;
+    std::vector<double>* m_eclLogLikePi;
   };
-
 }
 
 #endif

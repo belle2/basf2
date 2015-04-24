@@ -38,7 +38,6 @@ ECLElectronIdModule::ECLElectronIdModule() : Module()
   setDescription("E/p based Electron ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
   setPropertyFlags(c_ParallelProcessingCertified);
   for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) m_pdf[i] = 0;
-  //add module parameters here [see one of the following tutorials]
 }
 
 
@@ -82,28 +81,44 @@ void ECLElectronIdModule::event()
     const Track* track = Tracks[t];
     auto relShowers = track->getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
-    double energy = 0;
-    for (auto sh : relShowers) energy += sh.GetEnergy();
-
+    double energy(0);
+    int nCrystals(0);
+    int nClusters(relShowers.size());
+    for (auto sh : relShowers) {
+      energy += sh.GetEnergy();
+      nCrystals += int(sh.getNHits());
+    }
     float likelihoods [ Const::ChargedStable::c_SetSize ] ;
+    double p, eop, costheta;
     for (Const::ChargedStable hypo = Const::chargedStableSet.begin();
          hypo != Const::chargedStableSet.end() ; ++hypo) {
 
       const TrackFitResult* fitRes = track -> getTrackFitResult(hypo);
       if (fitRes == 0) fitRes = track -> getTrackFitResult(Const::pion);
+      p = fitRes  -> getMomentum() . Mag();
+      eop = energy / p;
+      costheta = fitRes  -> getMomentum() . CosTheta();
 
       if (fitRes != 0) {
         ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
         if (currentpdf == 0) currentpdf = m_pdf[ Const::pion.getIndex() ]; // use pion pdf when specialized pdf is not assigned.
-        double p = fitRes  -> getMomentum() . Mag();
-        double eop = energy / p;
-        double costheta = fitRes  -> getMomentum() . CosTheta();
         likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p, costheta));
       } else likelihoods[hypo.getIndex()] = -700;
 
     } // end loop on hypo
 
-    track-> addRelationTo(ecllogL.appendNew(ECLPidLikelihood(likelihoods)));
+    //    track-> addRelationTo(ecllogL.appendNew(ECLPidLikelihood(likelihoods)));
+    track-> addRelationTo(ecllogL.appendNew(likelihoods, energy, eop, 0, nCrystals, nClusters));
+
+    /*
+    RelationVector<ECLPidLikelihood> rel = track->getRelationsTo<ECLPidLikelihood>();
+    int pos = rel.size();
+    const ECLPidLikelihood* data = rel[pos-1];
+    cout << "Relation n. " << pos
+    << " added. Track = " << track << " eclpidlikelihood = " << data
+    << endl;
+    */
+
   } // end loop on Tracks
 }
 

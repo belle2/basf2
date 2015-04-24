@@ -1109,7 +1109,6 @@ TRGCDC::updateByData(int inputMode) {
     // For Fuji hall matching data
     //int cdcDelay = 79;
     //int nCDCWindows = 47+1;
-    int nCdcBitsInWindow = 1536;
 
     // For TRG parameters
     unsigned nTRGWindows = 48;
@@ -1123,6 +1122,7 @@ TRGCDC::updateByData(int inputMode) {
     // Get data using Belle2Link
     if(inputMode == 1) {
 
+      int nCdcBitsInWindow = 1536;
         //[FIXME] Getting data from ROOT file is fixed to 2 CDC FE, 1 TRG board.
         // Data should be in CDCFE0, CDCFE1, TRG sequence.
 
@@ -1209,13 +1209,12 @@ TRGCDC::updateByData(int inputMode) {
         // Shift all binary data by 8 bits to the right for two CDC FE data
         for(unsigned iBoard=0; iBoard<2; iBoard++){
             unsigned t_buf=0;
-            unsigned t_value;
             // 1 is due to missing data
             vector<unsigned> t_feData(widthCDCFEData+1);
             for(unsigned iWord=0; iWord<rawBinaryData[iBoard].size(); iWord++){
-                t_value = t_buf + (rawBinaryData[iBoard][iWord] >> 8);
-                t_buf = rawBinaryData[iBoard][iWord] << 24;
-                t_feData[iWord] = t_value;
+	      unsigned t_value = t_buf + (rawBinaryData[iBoard][iWord] >> 8);
+	      t_buf = rawBinaryData[iBoard][iWord] << 24;
+	      t_feData[iWord] = t_value;
             }
             inBinaryData.push_back(t_feData);
         }
@@ -1668,15 +1667,14 @@ TRGCDC::localId(unsigned id) const {
          << endl;
     unsigned iLayer = 0;
     unsigned nW = 0;
-    unsigned nWLast = 0;
     bool nextLayer = true;
     while (nextLayer) {
-        nWLast = nW;
-        nW += layer(iLayer++)->nCells();
-        if (id < (nW - 1))
-            return id - nWLast;
-        if (nW >= nWires())
-            nextLayer = false;
+      unsigned nWLast = nW;
+      nW += layer(iLayer++)->nCells();
+      if (id < (nW - 1))
+	return id - nWLast;
+      if (nW >= nWires())
+	nextLayer = false;
     }
     cout << "TRGCDC::localId !!! no such a wire (id=" << id << endl;
     return TRGCDC_UNDEFINED;
@@ -2296,7 +2294,7 @@ TRGCDC::fastSimulation(void) {
 
         //...Get MC contribution list...
         if (! _perfect2DFinder) {
-            vector<TCTrack *> dummyList;
+	  // vector<TCTrack *> dummyList;
             _pFinder->doit(trackList);
         }
         const vector<int> & trackListMC = _pFinder->trackListMC();
@@ -2537,8 +2535,8 @@ TRGCDC::configure(void) {
     //...Read configuration data...
     char b[800];
     unsigned lines = 0;
-    string cdcVersion = "";
-    string configVersion = "";
+    // string cdcVersion = "";
+    // string configVersion = "";
 
 
     /*
@@ -2628,12 +2626,12 @@ TRGCDC::configure(void) {
                 skip = true;
                 break;
             } else if (car == "CDC") {
-                if (l.find("CDC Wire Config Version") != string::npos)
-                    cdcVersion = l;
-                else if (l.find("CDC TRG Config Version") != string::npos)
-                    configVersion = l;
-                skip = true;
-                break;
+	      // if (l.find("CDC Wire Config Version") != string::npos)
+	      // cdcVersion = l;
+	      // else if (l.find("CDC TRG Config Version") != string::npos)
+	      // configVersion = l;
+	      skip = true;
+	      break;
             }
 
             if (i == 0) {

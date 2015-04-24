@@ -176,7 +176,7 @@ TCSegment::simulate(bool clockSimulation, bool logicLUTFlag) {
     //...Get wire informtion for speed-up...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
-    vector<TRGSignal> signals;
+    // vector<TRGSignal> signals;
     for (unsigned i = 0; i < n; i++) {
 
 	//...Copy signal from a wire...
@@ -348,8 +348,8 @@ TCSegment::simulateWithoutClock(bool logicLUTFlag) {
 
 float
 TCSegment::fastestTime(void)const{
-  float tmpFastTime = 9999;
   if((this->LUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
+    float tmpFastTime = 9999;
     for(unsigned i=0;i<_wires.size();i++){
       if(_wires[i]->hit()){
         float dt= _wires[i]->hit()->drift()*10*1000/40;

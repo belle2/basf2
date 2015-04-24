@@ -198,8 +198,6 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
     const string ni= name()+"InputSignalBundle";
 //    _tisb = new TRGSignalBundle(ni, dClock);
 
-    TRGSignalVector * trackerOut;
-    TRGSignalVector * evtOut;
     //TRGSignalVector *inputM= new TRGSignalVector(*( (*(*this)[0]->output())[0]));
     vector <TRGSignalVector*> inputM;
     vector <TRGSignalVector*> findOUTTrack;
@@ -322,7 +320,7 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
         if(nomatch) changeTimeListT.push_back(tmpCTimeListT[i]);
       }
 
-      trackerOut = packerOuterTracker(findOUTTrack, changeTimeListT, 6);
+      TRGSignalVector * trackerOut = packerOuterTracker(findOUTTrack, changeTimeListT, 6);
       (*trackerOut).insert((*trackerOut).end(),(*clockCounter).begin(),(*clockCounter).end());
       trackerOut->name("TSF TrackerOut");
 
@@ -347,7 +345,8 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
         }
         if(nomatch) changeTimeListE.push_back(tmpCTimeListE[i]);
       }
-      evtOut = packerOuterEvt(findOUTEvt, changeTimeListE, 6);
+
+      TRGSignalVector * evtOut = packerOuterEvt(findOUTEvt, changeTimeListE, 6);
       (*evtOut).insert((*evtOut).end(),(*clockCounter).begin(),(*clockCounter).end());
 
       const string noE = name()+"OutputSignalBundleEvt";
@@ -375,16 +374,10 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
 
 //variables for EvtTime & Low pT
   vector<bool> fTimeVect;
-  bool fTimeBool[10];
-  bool eOUT= true;
 //  int tmpFTime = 0 ;
 
 //variables for Tracker & N.N
-  int hitPosition=0;
-  int tmpPTime = 0 ;
-  int tmpCTime = 0 ;
   vector <bool> tmpOutBool;
-  int tmpOutInt;
 
   TRGSignalVector* resultT = new TRGSignalVector(na, eachInput->clock(),22);
   TRGSignalVector* resultE = new TRGSignalVector(na, eachInput->clock(),10);
@@ -408,10 +401,16 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
 
   int * LUTValue = new int[changeTime.size()];
   if(changeTime.size()){
+    int hitPosition=0;
+    bool fTimeBool[10];
+    int tmpPTime = 0 ;
+    int tmpCTime = 0 ;
+    int tmpOutInt;
     fTime->state(changeTime[0]).copy2bool(fTimeBool);
     fTimeBool[9]=true;
     fTimeVect.insert(fTimeVect.begin(),fTimeBool,fTimeBool+10);
     //tmpFTime = mkint(fTime->state(changeTime[0]));
+    bool eOUT= true;
     for(unsigned i=0;i<changeTime.size();i++){
       LUTValue[i] = tsi->LUT()->getValue(mkint(Hitmap->state(changeTime[i])));
 

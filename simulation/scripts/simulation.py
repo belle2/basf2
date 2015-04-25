@@ -103,6 +103,8 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
     # ECL digitization
     if components is None or 'ECL' in components:
         ecl_digitizer = register_module('ECLDigitizer')
+        if bkgfiles is not None:
+            ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # BKLM digitization

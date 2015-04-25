@@ -257,6 +257,13 @@ void DisplayUI::clearEvent()
 
 void DisplayUI::selectionHandler(TEveElement* eveObj)
 {
+  //if true, we'll recursively follow relations and possibly highlight the entire event
+  const bool allowRecursiveCall = false;
+  static bool recursiveCall = false;
+  if (!allowRecursiveCall && recursiveCall)
+    return;
+
+  recursiveCall = true;
   const TObject* representedObject = m_visualRepMap->getDataStoreObject(eveObj);
   if (representedObject) {
     //representedObject->Dump();
@@ -272,6 +279,7 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
     }
   }
 
+  recursiveCall = false;
 }
 void DisplayUI::handleEvent(Event_t* event)
 {

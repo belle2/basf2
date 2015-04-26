@@ -10,10 +10,8 @@
 
 #pragma once
 
-#include <tracking/spacePointCreation/sptcNetwork/SpTcNetwork.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/core/Module.h>
 #include <string>
@@ -22,12 +20,11 @@
 
 namespace Belle2 {
 
-  /** The Greedy algoritm Track-set-evaluator.
+  /** The quality estimator module for SpacePointTrackCandidates using random values.
    *
-   * This module expects a container of SpacePointTrackCandidates and builds a network of SpacePointTrackCands.
-   * That network keeps track of their connections (overlaps) during evaluation phase of other modules (e.g. TrackSetEvaluatorGreedyModule).
+   * This module is to be used for comparison and testing purposes.
    */
-  class SPTCNetworkProducerModule : public Module {
+  class QualityEstimatorVXDRandomModule : public Module {
 
   public:
 
@@ -35,7 +32,7 @@ namespace Belle2 {
     /**
      * Constructor of the module.
      */
-    SPTCNetworkProducerModule();
+    QualityEstimatorVXDRandomModule();
 
 
     /** Initializes the Module.
@@ -44,7 +41,6 @@ namespace Belle2 {
     {
       InitializeCounters();
       m_spacePointTrackCands.isRequired(m_PARAMtcArrayName);
-      m_tcNetwork.registerInDataStore(m_PARAMtcNetworkName, DataStore::c_DontWriteOut);
     }
 
 
@@ -78,14 +74,6 @@ namespace Belle2 {
     std::string m_PARAMtcArrayName;
 
 
-    /** sets the name of the StoreObjPtr used for storing a TC network. */
-    std::string m_PARAMtcNetworkName;
-
-
-    /** if true, overlaps are checked via SpacePoints. If false, overlaps are checked via clusters */
-    bool m_PARAMcheckSPsInsteadOfClusters;
-
-
     // member variables
 
 
@@ -97,23 +85,9 @@ namespace Belle2 {
     unsigned int m_nTCsTotal;
 
 
-    /** total number of TCs == nodes found in SpTcNetwork-container */
-    unsigned int m_nNodesNetwork;
-
-
-    /** total number of competitors == links found in SpTcNetwork-container */
-    unsigned int m_nLinksNetwork;
-
-
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 
-
-    /** access to tcNetwork, which will be produced by this module */
-    StoreObjPtr<SpTcNetwork> m_tcNetwork;
-
-
   private:
-
   };
 }

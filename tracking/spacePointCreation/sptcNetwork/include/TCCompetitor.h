@@ -16,6 +16,7 @@
 #include <vector>
 #include <algorithm>    // std::find
 #include <functional> // std::remove
+#include <string>     // std::string, std::to_string
 
 
 namespace Belle2 {
@@ -32,6 +33,11 @@ namespace Belle2 {
     std::vector<unsigned int> m_competitors;
 
 
+    /** stores own index number for identification */
+    unsigned int m_identifier;
+
+    /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
+
     /** returns iterator-position of given iD. is m_competitors.end() if entry not found. */
     std::vector<unsigned int>::const_iterator find(unsigned int iD) const { return std::find(m_competitors.begin(), m_competitors.end(), iD); }
 
@@ -39,6 +45,10 @@ namespace Belle2 {
     /** short cut which tells you, if given iterator is end of m_competitors */
     bool isEnd(std::vector<unsigned int>::const_iterator pos) const { return pos == m_competitors.end(); }
   public:
+
+    /** constructor expecting to become its own iD during construction */
+    TCCompetitor(unsigned int iD) : m_identifier(iD) {}
+
     /** ************************* MEMBER FUNCTIONS ************************* */
 
 
@@ -65,7 +75,8 @@ namespace Belle2 {
     void addCompetitor(unsigned int iD)
     {
       if (isCompetitor(iD)) {
-        B2WARNING("TCCompetitorContainer::addCompetitor: given iD " << iD << " was already found among " << getNCompetitors() <<
+        B2WARNING("TCCompetitor(iD: " << m_identifier << ")::addCompetitor: given iD " << iD << " was already found among " <<
+                  getNCompetitors() <<
                   " competitors! ID will not be added again")
       } else {
         m_competitors.push_back(iD);
@@ -76,13 +87,18 @@ namespace Belle2 {
     /** removes given id if it was a competitor. If iD was not found among the competitors, a warning will be given */
     void removeCompetitor(unsigned int iD)
     {
+      using namespace std;
       if (isCompetitor(iD)) {
         auto newEndOfVector = std::remove(m_competitors.begin(), m_competitors.end(), iD);
 //         m_competitors.resize(getNCompetitors() - 1);
         m_competitors.resize(std::distance(m_competitors.begin(), newEndOfVector));
       } else {
-        B2WARNING("TCCompetitorContainer::addCompetitor: given iD " << iD << " was not found among " << getNCompetitors() <<
-                  " competitors! ID can not be removed!")
+        // storing lambda as function, compiler does not accept direct usage in B2WARNING (do not know why)
+        auto miniPrinter = [](vector<unsigned>& vec) -> string { string out; for (auto iD : vec) { out += " " + to_string(iD); } return out; };
+        B2WARNING("TCCompetitor(iD: " << m_identifier << ")::removeCompetitor: given iD " << iD
+                  << " was not found among " << getNCompetitors()
+                  << " competitors (with iDs:" << miniPrinter(m_competitors)
+                  << ")! ID can not be removed!")
       }
     }
 

@@ -125,7 +125,7 @@ namespace Belle2 {
         }
       }
       m_nodes.push_back(newTC);
-      m_links.push_back(TCCompetitor());
+      m_links.push_back(TCCompetitor(newTC.getID()));
 
       // add each overlapping TC to new TC as competitor
       TCCompetitor& newTCCompetitor = m_links.at(newTC.getID());

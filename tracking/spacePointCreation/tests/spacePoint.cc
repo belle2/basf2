@@ -10,13 +10,13 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/SensorPlane.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 

@@ -139,6 +139,9 @@ param_trackCandConverter = {
 trackCandConverter.param(param_trackCandConverter)
 
 
+qualiEstimatorRandom = register_module('QualityEstimatorVXDRandom')
+qualiEstimatorRandom.param('tcArrayName', 'SPTracks')
+
 tcNetworkProducer = register_module('SPTCNetworkProducer')
 tcNetworkProducer.logging.log_level = debugLevel
 tcNetworkProducer.logging.debug_level = dLevel
@@ -173,6 +176,7 @@ main.add_module(vxdtf)
 main.add_module(spCreatorPXD)
 main.add_module(spCreatorSVD)
 main.add_module(trackCandConverter)
+main.add_module(qualiEstimatorRandom)
 main.add_module(tcNetworkProducer)
 main.add_module(greedy)
 

@@ -34,6 +34,15 @@ namespace Belle2 {
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
 
+    /** DEBUG: mini helper function for printing. */
+    std::string miniPrinter(std::vector<TCType*> vec)
+    {
+      std::string out;
+      for (auto tc : vec) { out += "tc (alive:" + std::to_string(tc->isAlive()) + ") " + std::to_string(tc->getID()) + " got QI: " + std::to_string(tc->getTrackQuality()) + "\n" ; }
+      return out;
+    }
+
+
     /** main Greedy function, returns number of TCs died.
      *
      * Algorithm:
@@ -47,25 +56,22 @@ namespace Belle2 {
     {
       unsigned int countTCsAliveAtStart = overlappingTCs.size(), countSurvivors = 0, countKills = 0;
       double totalQI = 0, totalSurvivingQI = 0;
+      using namespace std;
 
-      B2INFO("doGreedy:b4Sorting:")
-      for (TCType* aTC : overlappingTCs) {
-        B2INFO("tc " << aTC->getID() << " got QI: " << aTC->getTrackQuality())
-        totalQI += aTC->getTrackQuality();
-      }
+      B2INFO("doGreedy:b4Sorting:\n" << miniPrinter(overlappingTCs))
+
+      // sort that TC with highest QI comes first
       std::sort(overlappingTCs.begin(), overlappingTCs.end(), [](const TCType * a, const TCType * b) -> bool { return *a > *b; });
 
-      B2INFO("doGreedy:afterSorting:")
-      for (TCType* aTC : overlappingTCs) {
-        B2INFO("tc " << aTC->getID() << " got QI: " << aTC->getTrackQuality())
-      }
+      B2INFO("doGreedy:afterSorting:\n" << miniPrinter(overlappingTCs))
 
       // start recursive greedy algorithm...
       greedyRecursive(0, overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
 
       B2INFO("doGreedy: at begin of greedy algoritm: total number of TCs alive: " << countTCsAliveAtStart << " with totalQi: " << totalQI
              <<
-             ", TCs survived: " << countSurvivors << ", TCs killed: " << countKills << ", survivingQI: " << totalSurvivingQI)
+             ", TCs survived: " << countSurvivors << ", TCs killed: " << countKills << ", survivingQI: " << totalSurvivingQI << "\n Result:\n" <<
+             miniPrinter(overlappingTCs))
       return countKills;
     }
 
@@ -80,6 +86,7 @@ namespace Belle2 {
                          unsigned int& countSurvivors,
                          unsigned int& countKills)
     {
+      B2INFO("doGreedyRecursive-start: current index: " << currentIndex << ", fullList:\n" << miniPrinter(overlappingTCs))
       // if end of container is reached: end greedy recursive for good.
       if ((currentIndex < overlappingTCs.size()) == false) return;
 
@@ -88,15 +95,19 @@ namespace Belle2 {
         currentIndex++;
         if (currentIndex == overlappingTCs.size()) { return; }
       }
+      B2INFO("doGreedyRecursive-after dead entries bypass: current index: " << currentIndex << ", fullList:\n" << miniPrinter(
+               overlappingTCs))
 
       countSurvivors++;
       totalSurvivingQI += overlappingTCs[currentIndex]->getTrackQuality();
 
       // kill all remaining competitors of current TC (all should have a smaller QI than this one...)
-      for (unsigned int competitorID : BaseClass::m_manager.getCompetitors(currentIndex)) {
+      for (unsigned int competitorID : BaseClass::m_manager.getCompetitors(overlappingTCs[currentIndex]->getID())) {
         BaseClass::m_trackSet[competitorID].setAliveState(false);
         countKills++;
       }
+      B2INFO("doGreedyRecursive-after killing competitors: current index: " << currentIndex << ", fullList:\n" << miniPrinter(
+               overlappingTCs))
 
       currentIndex++;
 

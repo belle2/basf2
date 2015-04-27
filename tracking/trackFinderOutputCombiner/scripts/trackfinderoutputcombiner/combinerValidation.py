@@ -23,7 +23,11 @@ from trackfindingcdc.cdcLegendreTrackingValidation import ReassignHits
 
 import logging
 
-import root_pandas
+try:
+    import root_pandas
+except ImportError:
+    print "do a pip install git+https://github.com/ibab/root_pandas"
+
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb
@@ -189,19 +193,18 @@ class CombinerTrackFinderRun(LegendreTrackFinderRun):
         local_track_finder.param({
             "GFTrackCandsStoreArrayName": self.local_track_cands_store_array_name,
             "UseOnlyCDCHitsRelatedFrom": self.not_assigned_cdc_hits_store_array_name,
-            "SegmentsStoreObjName": "RecoSegments",
             "CreateGFTrackCands": True,
             "FitSegments": True,
         })
 
         segment_quality_check = basf2.register_module("SegmentQualityCheck")
-        segment_quality_check.param("RecoSegments", "RecoSegments")
+        segment_quality_check.param("RecoSegments", 'CDCRecoSegment2DVector')
 
         not_assigned_hits_combiner = basf2.register_module("NotAssignedHitsCombiner")
         not_assigned_hits_combiner.param({"TracksFromLegendreFinder": self.legendre_track_cands_store_array_name,
                                           "ResultTrackCands": "ResultTrackCands",
                                           "BadTrackCands": "BadTrackCands",
-                                          "RecoSegments": "RecoSegments",
+                                          "RecoSegments": 'CDCRecoSegment2DVector',
                                           "MinimalChi2": 0.8,
                                           "MinimalThetaDifference": 0.3,
                                           "MinimalZDifference": 10,

@@ -15,7 +15,10 @@ import sys
 
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
-import root_pandas
+try:
+    import root_pandas
+except ImportError:
+    print "do a pip install git+https://github.com/ibab/root_pandas"
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb
@@ -96,6 +99,13 @@ class SegmentFakeRatesModule(HarvestingModule):
 
 class SegmentFakeRates(CombinerTrackFinderRun, AddValidationMethod):
 
+    display_module = CDCSVGDisplayModule(output_folder="tmp/", interactive=True)
+    display_module.draw_segments_mctrackid = True
+    display_module.draw_hits = True
+    display_module.draw_gftrackcands = True
+    display_module.draw_gftrackcand_trajectories = True
+    display_module.track_cands_store_array_name = "MCTrackCands"
+
     def create_path(self):
 
         # Turn of combining
@@ -104,13 +114,16 @@ class SegmentFakeRates(CombinerTrackFinderRun, AddValidationMethod):
 
         main_path = super(SegmentFakeRates, self).create_path()
 
-        main_path.add_module(self.create_matcher_module(self.legendre_track_cands_store_array_name))
-        main_path.add_module(self.create_matcher_module(self.local_track_cands_store_array_name))
+        # main_path.add_module(self.create_matcher_module(self.legendre_track_cands_store_array_name))
+        # main_path.add_module(self.create_matcher_module(self.local_track_cands_store_array_name))
 
-        main_path.add_module(SegmentFakeRatesModule(local_track_cands_store_array_name=self.local_track_cands_store_array_name,
-                                                    mc_track_cands_store_array_name=self.mc_track_cands_store_array_name,
-                                                    legendre_track_cand_store_array_name=self.legendre_track_cands_store_array_name,
-                                                    output_file_name="segment_fake_rates.root"))
+        # main_path.add_module(SegmentFakeRatesModule(local_track_cands_store_array_name=self.local_track_cands_store_array_name,
+        #                                            mc_track_cands_store_array_name=self.mc_track_cands_store_array_name,
+        #                                            legendre_track_cand_store_array_name=self.legendre_track_cands_store_array_name,
+        #                                            output_file_name="segment_fake_rates.root"))
+
+        main_path.add_module(self.display_module)
+
         return main_path
 
 

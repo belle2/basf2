@@ -11,7 +11,10 @@ from trackfinderoutputcombiner.combination_checker import CombinationChecker
 from tracking.validation.harvesting import HarvestingModule
 from tracking.validation import refiners
 
-import root_pandas
+try:
+    import root_pandas
+except ImportError:
+    print "do a pip install git+https://github.com/ibab/root_pandas"
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb

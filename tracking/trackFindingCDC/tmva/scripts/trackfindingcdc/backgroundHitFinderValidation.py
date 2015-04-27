@@ -30,7 +30,10 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 import logging
 
-import root_pandas
+try:
+    import root_pandas
+except ImportError:
+    print "do a pip install git+https://github.com/ibab/root_pandas"
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb

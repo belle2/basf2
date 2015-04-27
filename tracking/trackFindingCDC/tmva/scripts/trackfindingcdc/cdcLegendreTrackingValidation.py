@@ -19,7 +19,10 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from ROOT import Belle2
 from collections import deque
 import numpy as np
-from root_pandas import read_root
+try:
+    import root_pandas
+except ImportError:
+    print "do a pip install git+https://github.com/ibab/root_pandas"
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb
@@ -139,7 +142,9 @@ def plot_many_times():
     for tmva_cut in np.arange(0, 1.0, 0.1):
         output_file_name = "cut_values/validation_%.2f.root" % tmva_cut
 
-        efficiency = read_root(output_file_name, tree_key="ExpertMCSideTrackingValidationModule_overview_figures_of_merit")
+        efficiency = root_pandas.read_root(
+            output_file_name,
+            tree_key="ExpertMCSideTrackingValidationModule_overview_figures_of_merit")
         finding_efficiency = efficiency.finding_efficiency[0]
         hit_efficiency = efficiency.hit_efficiency[0]
         rates = root_pandas.read_root(output_file_name, tree_key="ExpertPRSideTrackingValidationModule_overview_figures_of_merit")

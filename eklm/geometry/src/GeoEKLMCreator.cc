@@ -48,7 +48,6 @@ geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 
 void EKLM::GeoEKLMCreator::constructor(bool geo)
 {
-  SectorSupportSize.CornerAngle = -1;
   haveGeo = false;
   m_geoDat = NULL;
   readXMLData();
@@ -209,33 +208,74 @@ static void readSizeData(struct EKLM::ElementPosition* epos, GearDir* gd)
 }
 
 /**
- * Read sector support size data.
- * @param sss Sector support size data.
+ * Read sector support geometry data.
+ * @param ssg Sector support size data.
  * @param gd  XML data directory.
  */
-static void readSectorSupportData(struct EKLM::SectorSupportSize* sss,
+static void readSectorSupportData(struct EKLM::SectorSupportGeometry* ssg,
                                   GearDir* gd)
 {
-  sss->Thickness = gd->getLength("Thickness") * CLHEP::cm;
-  sss->DeltaLY = gd->getLength("DeltaLY") * CLHEP::cm;
-  sss->CornerX = gd->getLength("CornerX") * CLHEP::cm;
-  sss->TopCornerHeight = gd->getLength("TopCornerHeight") * CLHEP::cm;
-  sss->Corner1LX = gd->getLength("Corner1LX") * CLHEP::cm;
-  sss->Corner1Width = gd->getLength("Corner1Width") * CLHEP::cm;
-  sss->Corner1Thickness = gd->getLength("Corner1Thickness") * CLHEP::cm;
-  sss->Corner1Z = gd->getLength("Corner1Z") * CLHEP::cm;
-  sss->Corner2LX = gd->getLength("Corner2LX") * CLHEP::cm;
-  sss->Corner2LY = gd->getLength("Corner2LY") * CLHEP::cm;
-  sss->Corner2Thickness = gd->getLength("Corner2Thickness") * CLHEP::cm;
-  sss->Corner2Z = gd->getLength("Corner2Z") * CLHEP::cm;
-  sss->Corner3LX = gd->getLength("Corner3LX") * CLHEP::cm;
-  sss->Corner3LY = gd->getLength("Corner3LY") * CLHEP::cm;
-  sss->Corner3Thickness = gd->getLength("Corner3Thickness") * CLHEP::cm;
-  sss->Corner3Z = gd->getLength("Corner3Z") * CLHEP::cm;
-  sss->Corner4LX = gd->getLength("Corner4LX") * CLHEP::cm;
-  sss->Corner4LY = gd->getLength("Corner4LY") * CLHEP::cm;
-  sss->Corner4Thickness = gd->getLength("Corner4Thickness") * CLHEP::cm;
-  sss->Corner4Z = gd->getLength("Corner4Z") * CLHEP::cm;
+  ssg->Thickness = gd->getLength("Thickness") * CLHEP::cm;
+  ssg->DeltaLY = gd->getLength("DeltaLY") * CLHEP::cm;
+  ssg->CornerX = gd->getLength("CornerX") * CLHEP::cm;
+  ssg->Corner1LX = gd->getLength("Corner1LX") * CLHEP::cm;
+  ssg->Corner1Width = gd->getLength("Corner1Width") * CLHEP::cm;
+  ssg->Corner1Thickness = gd->getLength("Corner1Thickness") * CLHEP::cm;
+  ssg->Corner1Z = gd->getLength("Corner1Z") * CLHEP::cm;
+  ssg->Corner2LX = gd->getLength("Corner2LX") * CLHEP::cm;
+  ssg->Corner2LY = gd->getLength("Corner2LY") * CLHEP::cm;
+  ssg->Corner2Thickness = gd->getLength("Corner2Thickness") * CLHEP::cm;
+  ssg->Corner2Z = gd->getLength("Corner2Z") * CLHEP::cm;
+  ssg->Corner3LX = gd->getLength("Corner3LX") * CLHEP::cm;
+  ssg->Corner3LY = gd->getLength("Corner3LY") * CLHEP::cm;
+  ssg->Corner3Thickness = gd->getLength("Corner3Thickness") * CLHEP::cm;
+  ssg->Corner3Z = gd->getLength("Corner3Z") * CLHEP::cm;
+  ssg->Corner4LX = gd->getLength("Corner4LX") * CLHEP::cm;
+  ssg->Corner4LY = gd->getLength("Corner4LY") * CLHEP::cm;
+  ssg->Corner4Thickness = gd->getLength("Corner4Thickness") * CLHEP::cm;
+  ssg->Corner4Z = gd->getLength("Corner4Z") * CLHEP::cm;
+}
+
+/**
+ * Calculate sector support geometry data.
+ * @param ssg Sector support geometry data.
+ */
+void EKLM::GeoEKLMCreator::calculateSectorSupportData()
+{
+  /* Corner 1. */
+  m_SectorSupportData.Corner1A.X = SectorSupportPosition.X;
+  m_SectorSupportData.Corner1A.Y = SectorSupportPosition.outerR -
+                                   m_SectorSupportData.DeltaLY;
+  m_SectorSupportData.Corner1B.X = SectorSupportPosition.X +
+                                   m_SectorSupportData.CornerX;
+  m_SectorSupportData.Corner1B.Y = sqrt(SectorSupportPosition.outerR *
+                                        SectorSupportPosition.outerR -
+                                        m_SectorSupportData.Corner1B.X *
+                                        m_SectorSupportData.Corner1B.X);
+  m_SectorSupportData.CornerAngle = atan2(m_SectorSupportData.Corner1B.Y -
+                                          m_SectorSupportData.Corner1A.Y,
+                                          m_SectorSupportData.Corner1B.X -
+                                          m_SectorSupportData.Corner1A.X) *
+                                    CLHEP::rad;
+  m_SectorSupportData.Corner1AInner.X = SectorSupportPosition.X +
+                                        m_SectorSupportData.Thickness;
+  m_SectorSupportData.Corner1AInner.Y =
+    m_SectorSupportData.Corner1A.Y -
+    m_SectorSupportData.Thickness *
+    (1.0 / cos(m_SectorSupportData.CornerAngle) -
+     tan(m_SectorSupportData.CornerAngle));
+  /* Corner 3. */
+  m_SectorSupportData.Corner3.X = sqrt(SectorSupportPosition.innerR *
+                                       SectorSupportPosition.innerR -
+                                       SectorSupportPosition.Y *
+                                       SectorSupportPosition.Y);
+  m_SectorSupportData.Corner3.Y = SectorSupportPosition.Y;
+  /* Corner 4. */
+  m_SectorSupportData.Corner4.X = SectorSupportPosition.X;
+  m_SectorSupportData.Corner4.Y = sqrt(SectorSupportPosition.innerR *
+                                       SectorSupportPosition.innerR -
+                                       SectorSupportPosition.X *
+                                       SectorSupportPosition.X);
 }
 
 void EKLM::GeoEKLMCreator::readXMLData()
@@ -318,7 +358,8 @@ void EKLM::GeoEKLMCreator::readXMLData()
   SectorSupport.append("/SectorSupport");
   readPositionData(&SectorSupportPosition, &SectorSupport);
   readSizeData(&SectorSupportPosition, &SectorSupport);
-  readSectorSupportData(&SectorSupportSize, &SectorSupport);
+  readSectorSupportData(&m_SectorSupportData, &SectorSupport);
+  calculateSectorSupportData();
   GearDir Plane(Sector);
   Plane.append("/Plane");
   readPositionData(&PlanePosition, &Plane);
@@ -453,23 +494,6 @@ void EKLM::GeoEKLMCreator::getSheetTransform(HepGeom::Transform3D* t, int n)
   *t = HepGeom::Translate3D(StripPosition[n].X, y, 0.0);
 }
 
-double EKLM::GeoEKLMCreator::getSectorSupportCornerAngle()
-{
-  double x1;
-  double y1;
-  double x2;
-  double y2;
-  if (SectorSupportSize.CornerAngle < 0) {
-    x1 = SectorSupportPosition.X;
-    y1 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
-    x2 = SectorSupportSize.CornerX + SectorSupportPosition.X;
-    y2 = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
-              x2 * x2);
-    SectorSupportSize.CornerAngle = atan2(y2 - y1, x2 - x1) * CLHEP::rad;
-  }
-  return SectorSupportSize.CornerAngle;
-}
-
 /*************************** CREATION OF SOLIDS ******************************/
 
 void EKLM::GeoEKLMCreator::createEndcapSolid()
@@ -499,7 +523,6 @@ void EKLM::GeoEKLMCreator::createEndcapSolid()
 void EKLM::GeoEKLMCreator::createSectorCoverSolid()
 {
   double lz;
-  double ang;
   G4Transform3D t1;
   G4Transform3D t2;
   G4Tubs* solidCoverTube = NULL;
@@ -529,17 +552,21 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  ang = getSectorSupportCornerAngle();
   t1 = G4Translate3D(0.5 * PlanePosition.outerR + SectorSupportPosition.X,
                      0.5 * PlanePosition.outerR + SectorSupportPosition.Y,
                      0.);
   t2 = G4Translate3D(SectorSupportPosition.X +
-                     0.5 * SectorSupportPosition.outerR * cos(ang) -
-                     0.5 * SectorSupportPosition.outerR * sin(ang),
-                     SectorSupportPosition.outerR - SectorSupportSize.DeltaLY +
-                     0.5 * SectorSupportPosition.outerR * cos(ang) +
-                     0.5 * SectorSupportPosition.outerR * sin(ang),
-                     0.) * G4RotateZ3D(ang);
+                     0.5 * SectorSupportPosition.outerR *
+                     cos(m_SectorSupportData.CornerAngle) -
+                     0.5 * SectorSupportPosition.outerR *
+                     sin(m_SectorSupportData.CornerAngle),
+                     SectorSupportPosition.outerR -
+                     m_SectorSupportData.DeltaLY +
+                     0.5 * SectorSupportPosition.outerR *
+                     cos(m_SectorSupportData.CornerAngle) +
+                     0.5 * SectorSupportPosition.outerR *
+                     sin(m_SectorSupportData.CornerAngle),
+                     0.) * G4RotateZ3D(m_SectorSupportData.CornerAngle);
   try {
     is = new G4IntersectionSolid("Cover_Intersection",
                                  solidCoverTube, solidCoverBox, t1);
@@ -555,19 +582,17 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
 
 G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(G4Transform3D& t)
 {
-  double x1;
-  double x2;
+  double x;
   G4Box* res = NULL;
-  x1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
-            SectorSupportPosition.Y * SectorSupportPosition.Y);
-  x2 = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
-            SectorSupportPosition.Y * SectorSupportPosition.Y);
-  t =  G4Translate3D(0.5 * (x1 + x2), SectorSupportPosition.Y +
-                     0.5 * SectorSupportSize.Thickness, 0.);
+  x = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
+           SectorSupportPosition.Y * SectorSupportPosition.Y);
+  t = G4Translate3D(0.5 * (x + m_SectorSupportData.Corner3.X),
+                    SectorSupportPosition.Y +
+                    0.5 * m_SectorSupportData.Thickness, 0.);
   try {
     res = new G4Box("SectorSupport_BoxX",
-                    0.5 * (x2 - x1),
-                    0.5 * SectorSupportSize.Thickness,
+                    0.5 * (x - m_SectorSupportData.Corner3.X),
+                    0.5 * m_SectorSupportData.Thickness,
                     0.5 * SectorSupportPosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -577,18 +602,17 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(G4Transform3D& t)
 
 G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxY(G4Transform3D& t)
 {
-  double y1;
-  double y2;
   G4Box* res = NULL;
-  y1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
-            SectorSupportPosition.X * SectorSupportPosition.X);
-  y2 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
-  t = G4Translate3D(SectorSupportPosition.X + 0.5 * SectorSupportSize.Thickness,
-                    0.5 * (y1 + y2), 0.) * G4RotateZ3D(90. * CLHEP::deg);
+  t = G4Translate3D(SectorSupportPosition.X +
+                    0.5 * m_SectorSupportData.Thickness,
+                    0.5 * (m_SectorSupportData.Corner4.Y +
+                           m_SectorSupportData.Corner1A.Y), 0.) *
+      G4RotateZ3D(90. * CLHEP::deg);
   try {
     res = new G4Box("SectorSupport_BoxY",
-                    0.5 * (y2 - y1),
-                    0.5 * SectorSupportSize.Thickness,
+                    0.5 * (m_SectorSupportData.Corner1A.Y -
+                           m_SectorSupportData.Corner4.Y),
+                    0.5 * m_SectorSupportData.Thickness,
                     0.5 * SectorSupportPosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -598,25 +622,23 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxY(G4Transform3D& t)
 
 G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxTop(G4Transform3D& t)
 {
-  double x1;
-  double y1;
-  double x2;
-  double y2;
-  double ang;
+  double dx;
+  double dy;
   G4Box* res = NULL;
-  x1 = SectorSupportPosition.X;
-  y1 = SectorSupportPosition.outerR - SectorSupportSize.DeltaLY;
-  x2 = SectorSupportSize.CornerX + SectorSupportPosition.X;
-  y2 = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
-            x2 * x2);
-  ang = getSectorSupportCornerAngle();
-  t = G4Translate3D(0.5 * (x1 + x2 + SectorSupportSize.Thickness * sin(ang)),
-                    0.5 * (y1 + y2 - SectorSupportSize.Thickness * cos(ang)),
-                    0.) * G4RotateZ3D(ang);
+  t = G4Translate3D(0.5 * (m_SectorSupportData.Corner1A.X +
+                           m_SectorSupportData.Corner1B.X +
+                           m_SectorSupportData.Thickness *
+                           sin(m_SectorSupportData.CornerAngle)),
+                    0.5 * (m_SectorSupportData.Corner1A.Y +
+                           m_SectorSupportData.Corner1B.Y -
+                           m_SectorSupportData.Thickness *
+                           cos(m_SectorSupportData.CornerAngle)),
+                    0.) * G4RotateZ3D(m_SectorSupportData.CornerAngle);
+  dx = m_SectorSupportData.Corner1B.X - m_SectorSupportData.Corner1A.X;
+  dy = m_SectorSupportData.Corner1B.Y - m_SectorSupportData.Corner1B.Y;
   try {
-    res = new G4Box("SectorSupport_BoxTop",
-                    0.5 * sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)),
-                    0.5 * SectorSupportSize.Thickness,
+    res = new G4Box("SectorSupport_BoxTop", 0.5 * sqrt(dx * dx + dy * dy),
+                    0.5 * m_SectorSupportData.Thickness,
                     0.5 * SectorSupportPosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -626,24 +648,18 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxTop(G4Transform3D& t)
 
 G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportInnerTube()
 {
-  double x1;
-  double y1;
   double ang1;
   double ang2;
   G4Tubs* res = NULL;
-  x1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
-            SectorSupportPosition.Y * SectorSupportPosition.Y);
-  y1 = sqrt(SectorSupportPosition.innerR * SectorSupportPosition.innerR -
-            SectorSupportPosition.X * SectorSupportPosition.X);
-  ang1 = atan2(SectorSupportPosition.Y, x1);
-  ang2 = atan2(y1, SectorSupportPosition.X);
+  ang1 = atan2(m_SectorSupportData.Corner3.Y, m_SectorSupportData.Corner3.X);
+  ang2 = atan2(m_SectorSupportData.Corner4.Y, m_SectorSupportData.Corner4.X);
   try {
     res = new G4Tubs("SectorSupport_InnerTube",
                      SectorSupportPosition.innerR,
                      SectorSupportPosition.innerR +
-                     SectorSupportSize.Thickness,
+                     m_SectorSupportData.Thickness,
                      0.5 * SectorSupportPosition.length,
-                     std::min(ang1, ang2) * CLHEP::rad, fabs(ang1 - ang2) * CLHEP::rad);
+                     ang1 * CLHEP::rad, (ang2 - ang1) * CLHEP::rad);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -652,29 +668,20 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportInnerTube()
 
 G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportOuterTube()
 {
-  double x1;
-  double y1;
-  double x2;
-  double y2;
+  double x;
   double ang1;
   double ang2;
   double r;
   G4Tubs* res = NULL;
-  r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
-  x1 = sqrt(r * r - SectorSupportPosition.Y * SectorSupportPosition.Y);
-  y1 = SectorSupportPosition.Y;
-  x2 = SectorSupportSize.CornerX + SectorSupportPosition.X;
-  y2 = sqrt(SectorSupportPosition.outerR * SectorSupportPosition.outerR -
-            x2 * x2);
-  ang1 = atan2(y1, x1);
-  ang2 = atan2(y2, x2);
+  r = SectorSupportPosition.outerR - m_SectorSupportData.Thickness;
+  x = sqrt(r * r - SectorSupportPosition.Y * SectorSupportPosition.Y);
+  ang1 = atan2(SectorSupportPosition.Y, x);
+  ang2 = atan2(m_SectorSupportData.Corner1B.Y, m_SectorSupportData.Corner1B.X);
   try {
-    res = new G4Tubs("SectorSupport_OuterTube",
-                     SectorSupportPosition.outerR -
-                     SectorSupportSize.Thickness,
+    res = new G4Tubs("SectorSupport_OuterTube", r,
                      SectorSupportPosition.outerR,
                      0.5 * SectorSupportPosition.length,
-                     std::min(ang1, ang2) * CLHEP::rad, fabs(ang1 - ang2) * CLHEP::rad);
+                     ang1 * CLHEP::rad, (ang2 - ang1) * CLHEP::rad);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -691,13 +698,13 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
   G4IntersectionSolid* is1 = NULL;
   G4Transform3D t1;
   G4Transform3D t2;
-  lx = SectorSupportSize.CornerX + SectorSupportSize.Corner1LX -
-       SectorSupportSize.Thickness;
+  lx = m_SectorSupportData.CornerX + m_SectorSupportData.Corner1LX -
+       m_SectorSupportData.Thickness;
   try {
     solidCorner1Tube = new G4Tubs("SectorSupport_Corner1_Tube", 0.,
                                   SectorSupportPosition.outerR -
-                                  SectorSupportSize.Thickness,
-                                  0.5 * SectorSupportSize.Corner1Thickness,
+                                  m_SectorSupportData.Thickness,
+                                  0.5 * m_SectorSupportData.Corner1Thickness,
                                   0., 90. * CLHEP::deg);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -705,33 +712,30 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
   try {
     solidCorner1Box1 = new G4Box("SectorSupport_Corner1_Box1", 0.5 * lx,
                                  0.5 * SectorSupportPosition.outerR,
-                                 0.5 * SectorSupportSize.Corner1Thickness);
+                                 0.5 * m_SectorSupportData.Corner1Thickness);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   try {
     solidCorner1Box2 =
       new G4Box("SectorSupport_Corner1_Box2",
-                0.5 * (lx / cos(getSectorSupportCornerAngle()) +
-                       SectorSupportSize.Corner1Width *
-                       sin(getSectorSupportCornerAngle())),
-                0.5 * SectorSupportSize.Corner1Width,
-                0.5 * SectorSupportSize.Corner1Thickness);
+                0.5 * (lx / cos(m_SectorSupportData.CornerAngle) +
+                       m_SectorSupportData.Corner1Width *
+                       tan(m_SectorSupportData.CornerAngle)),
+                0.5 * m_SectorSupportData.Corner1Width,
+                0.5 * m_SectorSupportData.Corner1Thickness);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  x = SectorSupportPosition.X + 0.5 * (SectorSupportSize.CornerX +
-                                       SectorSupportSize.Corner1LX +
-                                       SectorSupportSize.Thickness);
+  x = SectorSupportPosition.X + 0.5 * (m_SectorSupportData.CornerX +
+                                       m_SectorSupportData.Corner1LX +
+                                       m_SectorSupportData.Thickness);
   t1 = G4Translate3D(x, 0.5 * SectorSupportPosition.outerR, 0.);
-  t2 = G4Translate3D(x, SectorSupportPosition.outerR -
-                     SectorSupportSize.DeltaLY -
-                     (SectorSupportSize.Thickness +
-                      0.5 * SectorSupportSize.Corner1Width) /
-                     cos(getSectorSupportCornerAngle()) +
-                     (SectorSupportSize.Thickness + 0.5 * lx) *
-                     tan(getSectorSupportCornerAngle()), 0.) *
-       G4RotateZ3D(getSectorSupportCornerAngle());
+  t2 = G4Translate3D(x, m_SectorSupportData.Corner1AInner.Y -
+                     0.5 * m_SectorSupportData.Corner1Width /
+                     cos(m_SectorSupportData.CornerAngle) +
+                     0.5 * lx * tan(m_SectorSupportData.CornerAngle), 0.) *
+       G4RotateZ3D(m_SectorSupportData.CornerAngle);
   try {
     is1 = new G4IntersectionSolid("SectorSupport_Corner1_Intersection1",
                                   solidCorner1Tube, solidCorner1Box1, t1);
@@ -751,16 +755,16 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2Solid()
   double r;
   G4TriangularPrism* solidCorner2Prism = NULL;
   G4Transform3D t1;
-  r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
-  solids.sectorsup.c2y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+  r = SectorSupportPosition.outerR - m_SectorSupportData.Thickness;
+  solids.sectorsup.c2y = SectorSupportPosition.Y + m_SectorSupportData.Thickness;
   solids.sectorsup.c2x = sqrt(r * r - solids.sectorsup.c2y * solids.sectorsup.c2y);
   try {
     solidCorner2Prism = new G4TriangularPrism("SectorSupport_Corner2_Prism",
-                                              SectorSupportSize.Corner2LY,
+                                              m_SectorSupportData.Corner2LY,
                                               90. * CLHEP::deg,
-                                              SectorSupportSize.Corner2LX,
+                                              m_SectorSupportData.Corner2LX,
                                               180. * CLHEP::deg,
-                                              0.5 * SectorSupportSize.
+                                              0.5 * m_SectorSupportData.
                                               Corner2Thickness);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -782,17 +786,17 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3Solid()
   double y;
   G4TriangularPrism* solidCorner3Prism = NULL;
   G4Transform3D t1;
-  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner3LY;
+  r = SectorSupportPosition.innerR + m_SectorSupportData.Thickness;
+  y = SectorSupportPosition.Y + m_SectorSupportData.Thickness +
+      m_SectorSupportData.Corner3LY;
   solids.sectorsup.c3x = sqrt(r * r - y * y);
-  solids.sectorsup.c3y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+  solids.sectorsup.c3y = SectorSupportPosition.Y + m_SectorSupportData.Thickness;
   try {
     solidCorner3Prism = new G4TriangularPrism("SectorSupport_Corner3_Prism",
-                                              SectorSupportSize.Corner3LX, 0.,
-                                              SectorSupportSize.Corner3LY,
+                                              m_SectorSupportData.Corner3LX, 0.,
+                                              m_SectorSupportData.Corner3LY,
                                               90. * CLHEP::deg,
-                                              0.5 * SectorSupportSize.
+                                              0.5 * m_SectorSupportData.
                                               Corner3Thickness);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -814,17 +818,17 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4Solid()
   double x;
   G4TriangularPrism* solidCorner4Prism = NULL;
   G4Transform3D t1;
-  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner4LX;
+  r = SectorSupportPosition.innerR + m_SectorSupportData.Thickness;
+  x = SectorSupportPosition.X + m_SectorSupportData.Thickness +
+      m_SectorSupportData.Corner4LX;
   solids.sectorsup.c4y = sqrt(r * r - x * x);
-  solids.sectorsup.c4x = SectorSupportPosition.X + SectorSupportSize.Thickness;
+  solids.sectorsup.c4x = SectorSupportPosition.X + m_SectorSupportData.Thickness;
   try {
     solidCorner4Prism = new G4TriangularPrism("SectorSupport_Corner4_Prism",
-                                              SectorSupportSize.Corner4LX, 0.,
-                                              SectorSupportSize.Corner4LY,
+                                              m_SectorSupportData.Corner4LX, 0.,
+                                              m_SectorSupportData.Corner4LY,
                                               90. * CLHEP::deg,
-                                              0.5 * SectorSupportSize.
+                                              0.5 * m_SectorSupportData.
                                               Corner4Thickness);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -957,13 +961,9 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
 
 void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
 {
-  double r;
-  double x;
-  double y;
   double box_x;
   double box_y;
   double box_lx;
-  double ang;
   HepGeom::Transform3D t;
   HepGeom::Transform3D t1;
   HepGeom::Transform3D t2;
@@ -991,8 +991,8 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
     B2FATAL(MemErr);
   }
   snprintf(name, 128, "Plane_%d_Box_1", n + 1);
-  box_x = SectorSupportPosition.X + SectorSupportSize.Thickness;
-  box_y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+  box_x = SectorSupportPosition.X + m_SectorSupportData.Thickness;
+  box_y = SectorSupportPosition.Y + m_SectorSupportData.Thickness;
   box_lx =  PlanePosition.outerR;
   try {
     b1 = new G4Box(name, 0.5 * box_lx, 0.5 * box_lx,
@@ -1002,24 +1002,24 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   }
   snprintf(name, 128, "Plane_%d_Triangular_Prism_1", n + 1);
   try {
-    pr1 = new G4TriangularPrism(name, SectorSupportSize.Corner2LY, 90. * CLHEP::deg,
-                                SectorSupportSize.Corner2LX,
+    pr1 = new G4TriangularPrism(name, m_SectorSupportData.Corner2LY, 90. * CLHEP::deg,
+                                m_SectorSupportData.Corner2LX,
                                 180. * CLHEP::deg, PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   snprintf(name, 128, "Plane_%d_Triangular_Prism_2", n + 1);
   try {
-    pr2 = new G4TriangularPrism(name, SectorSupportSize.Corner3LX, 0.,
-                                SectorSupportSize.Corner3LY,
+    pr2 = new G4TriangularPrism(name, m_SectorSupportData.Corner3LX, 0.,
+                                m_SectorSupportData.Corner3LY,
                                 90. * CLHEP::deg, PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   snprintf(name, 128, "Plane_%d_Triangular_Prism_3", n + 1);
   try {
-    pr3 = new G4TriangularPrism(name, SectorSupportSize.Corner4LX, 0.,
-                                SectorSupportSize.Corner4LY,
+    pr3 = new G4TriangularPrism(name, m_SectorSupportData.Corner4LX, 0.,
+                                m_SectorSupportData.Corner4LY,
                                 90. * CLHEP::deg, PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1033,35 +1033,17 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   /* Calculate transformations for boolean solids. */
   t1 = HepGeom::Translate3D(0.5 * PlanePosition.outerR + box_x,
                             0.5 * PlanePosition.outerR + box_y, 0.);
-  /* Corner 1 */
-  ang = getSectorSupportCornerAngle();
-  x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
-  y = SectorSupportPosition.outerR -
-      SectorSupportSize.DeltaLY -
-      SectorSupportSize.TopCornerHeight;
-  t2 = HepGeom::Translate3D(x + 0.5 * box_lx * cos(ang) -
-                            0.5 * box_lx * sin(ang),
-                            y + 0.5 * box_lx * cos(ang) +
-                            0.5 * box_lx * sin(ang),
-                            0.) * HepGeom::RotateZ3D(ang);
-  /* Corner 2 */
-  r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-  x = sqrt(r * r - y * y);
-  t3 = HepGeom::Translate3D(x, y, 0.);
-  /* Corner 3 */
-  r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner3LY;
-  x = sqrt(r * r - y * y);
-  y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
-  t4 = HepGeom::Translate3D(x, y, 0.);
-  /* Corner 4 */
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness +
-      SectorSupportSize.Corner4LX;
-  y = sqrt(r * r - x * x);
-  x = SectorSupportPosition.X + SectorSupportSize.Thickness;
-  t5 = HepGeom::Translate3D(x, y, 0.);
+  t2 = HepGeom::Translate3D(
+         m_SectorSupportData.Corner1AInner.X +
+         0.5 * box_lx * cos(m_SectorSupportData.CornerAngle) -
+         0.5 * box_lx * sin(m_SectorSupportData.CornerAngle),
+         m_SectorSupportData.Corner1AInner.Y +
+         0.5 * box_lx * cos(m_SectorSupportData.CornerAngle) +
+         0.5 * box_lx * sin(m_SectorSupportData.CornerAngle),
+         0.) * HepGeom::RotateZ3D(m_SectorSupportData.CornerAngle);
+  t3 = HepGeom::Translate3D(solids.sectorsup.c2x, solids.sectorsup.c2y, 0.);
+  t4 = HepGeom::Translate3D(solids.sectorsup.c3x, solids.sectorsup.c3y, 0.);
+  t5 = HepGeom::Translate3D(solids.sectorsup.c4x, solids.sectorsup.c4y, 0.);
   /* For rotated plane. */
   if (n == 1) {
     t = HepGeom::Rotate3D(180. * CLHEP::deg,
@@ -1461,7 +1443,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1(G4LogicalVolume* mlv)
   }
   geometry::setVisibility(*logicCorner1, true);
   geometry::setColor(*logicCorner1, "#ff0000ff");
-  t = G4Translate3D(0., 0., SectorSupportSize.Corner1Z);
+  t = G4Translate3D(0., 0., m_SectorSupportData.Corner1Z);
   try {
     new G4PVPlacement(t, logicCorner1, Corner1_Name, mlv, false, 1, false);
   } catch (std::bad_alloc& ba) {
@@ -1484,7 +1466,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2(G4LogicalVolume* mlv)
   geometry::setVisibility(*logicCorner2, true);
   geometry::setColor(*logicCorner2, "#ff0000ff");
   t = G4Translate3D(solids.sectorsup.c2x, solids.sectorsup.c2y,
-                    SectorSupportSize.Corner2Z);
+                    m_SectorSupportData.Corner2Z);
   try {
     new G4PVPlacement(t, logicCorner2, Corner2_Name, mlv, false, 1, false);
   } catch (std::bad_alloc& ba) {
@@ -1507,7 +1489,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3(G4LogicalVolume* mlv)
   geometry::setVisibility(*logicCorner3, true);
   geometry::setColor(*logicCorner3, "#ff0000ff");
   t = G4Translate3D(solids.sectorsup.c3x, solids.sectorsup.c3y,
-                    SectorSupportSize.Corner3Z);
+                    m_SectorSupportData.Corner3Z);
   try {
     new G4PVPlacement(t, logicCorner3, Corner3_Name, mlv, false, 1, false);
   } catch (std::bad_alloc& ba) {
@@ -1530,7 +1512,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4(G4LogicalVolume* mlv)
   geometry::setVisibility(*logicCorner4, true);
   geometry::setColor(*logicCorner4, "#ff0000ff");
   t = G4Translate3D(solids.sectorsup.c4x, solids.sectorsup.c4y,
-                    SectorSupportSize.Corner4Z);
+                    m_SectorSupportData.Corner4Z);
   try {
     new G4PVPlacement(t, logicCorner4, Corner4_Name, mlv, false, 1, false);
   } catch (std::bad_alloc& ba) {

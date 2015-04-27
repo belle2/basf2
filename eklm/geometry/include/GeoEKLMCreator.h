@@ -48,42 +48,158 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Position information for the elements of detector.
+     * @struct Point2D
+     * 2D point.
+     *
+     * @var Point2D::x
+     * X coordinate.
+     *
+     * @var Point2D::y
+     * Y coordinate.
      */
-    struct ElementPosition {
-      double innerR;   /**< Inner radius. */
-      double outerR;   /**< Outer radius. */
-      double length;   /**< Length. */
-      double X;        /**< X coordinate. */
-      double Y;        /**< Y coordinate. */
-      double Z;        /**< Z coordinate. */
+    struct Point2D {
+      double X;
+      double Y;
     };
 
     /**
-     * Sector support size data.
+     * @struct ElementPosition
+     * Position information for the elements of detector.
+     *
+     * @var ElementPosition::innerR
+     * Inner radius.
+     *
+     * @var ElementPosition::outerR
+     * Outer radius.
+     *
+     * @var ElementPosition::length
+     * Length.
+     *
+     * @var ElementPosition::X
+     * X coordinate.
+     *
+     * @var ElementPosition::Y
+     * Y coordinate.
+     *
+     * @var ElementPosition::Z
+     * Z coordinate.
+     *
      */
-    struct SectorSupportSize {
-      double Thickness;        /**< Yhickness. */
-      double DeltaLY;          /**< outerR - Y of upper edge of BoxY. */
-      double CornerX;          /**< Coordinate X of corner 1. */
-      double TopCornerHeight;  /**< Corner 1 height (subtraction from plane). */
-      double Corner1LX;        /**< Corner 1 X length. */
-      double Corner1Width;     /**< Corner 1 width. */
-      double Corner1Thickness; /**< Corner 1 thickness. */
-      double Corner1Z;         /**< Corner 1 Z coordinate. */
-      double Corner2LX;        /**< Corner 2 X length. */
-      double Corner2LY;        /**< Corner 2 Y length. */
-      double Corner2Thickness; /**< Corner 2 thickness. */
-      double Corner2Z;         /**< Corner 2 Z coordinate. */
-      double Corner3LX;        /**< Corner 3 X length. */
-      double Corner3LY;        /**< Corner 3 Y length. */
-      double Corner3Thickness; /**< Corner 3 thickness. */
-      double Corner3Z;         /**< Corner 3 Z coordinate. */
-      double Corner4LX;        /**< Corner 4 X length. */
-      double Corner4LY;        /**< Corner 4 Y length. */
-      double Corner4Thickness; /**< Corner 4 thickness. */
-      double Corner4Z;         /**< Corner 4 Z coordinate. */
-      double CornerAngle;      /**< Corner 1 angle. */
+    struct ElementPosition {
+      double innerR;
+      double outerR;
+      double length;
+      double X;
+      double Y;
+      double Z;
+    };
+
+    /**
+     * @struct SectorSupportGeometry
+     * Sector support geometry data.
+     *
+     * @var SectorSupportGeometry::Thickness
+     * Thickness.
+     *
+     * @var SectorSupportGeometry::DeltaLY
+     * outerR - Y of upper edge of BoxY.
+     *
+     * @var SectorSupportGeometry::CornerX
+     * Coordinate X of corner 1.
+     *
+     * @var SectorSupportGeometry::Corner1LX
+     * Corner 1 X length.
+     *
+     * @var SectorSupportGeometry::Corner1Width
+     * Corner 1 width.
+     *
+     * @var SectorSupportGeometry::Corner1Thickness
+     * Corner 1 thickness.
+     *
+     * @var SectorSupportGeometry::Corner1Z
+     * Corner 1 Z coordinate.
+     *
+     * @var SectorSupportGeometry::Corner2LX
+     * Corner 2 X length.
+     *
+     * @var SectorSupportGeometry::Corner2LY
+     * Corner 2 Y length.
+     *
+     * @var SectorSupportGeometry::Corner2Thickness
+     * Corner 2 thickness.
+     *
+     * @var SectorSupportGeometry::Corner2Z
+     * Corner 2 Z coordinate.
+     *
+     * @var SectorSupportGeometry::Corner3LX
+     * Corner 3 X length.
+     *
+     * @var SectorSupportGeometry::Corner3LY
+     * Corner 3 Y length.
+     *
+     * @var SectorSupportGeometry::Corner3Thickness
+     * Corner 3 thickness.
+     *
+     * @var SectorSupportGeometry::Corner3Z
+     * Corner 3 Z coordinate.
+     *
+     * @var SectorSupportGeometry::Corner4LX
+     * Corner 4 X length.
+     *
+     * @var SectorSupportGeometry::Corner4LY
+     * Corner 4 Y length.
+     *
+     * @var SectorSupportGeometry::Corner4Thickness
+     * Corner 4 thickness.
+     *
+     * @var SectorSupportGeometry::Corner4Z
+     * Corner 4 Z coordinate.
+     *
+     * @var SectorSupportGeometry::CornerAngle
+     * Corner 1 angle.
+     *
+     * @var SectorSupportGeometry::Corner1A
+     * Corner 1A coordinates.
+     *
+     * @var SectorSupportGeometry::Corner1AInner
+     * Corner 1A coordinates (inner side).
+     *
+     * @var SectorSupportGeometry::Corner1B
+     * Corner 1B coordinates.
+     *
+     * @var SectorSupportGeometry::Corner3
+     * Corner 3 coordinates.
+     *
+     * @var SectorSupportGeometry::Corner4
+     * Corner 4 coordinates.
+     *
+     */
+    struct SectorSupportGeometry {
+      double Thickness;
+      double DeltaLY;
+      double CornerX;
+      double Corner1LX;
+      double Corner1Width;
+      double Corner1Thickness;
+      double Corner1Z;
+      double Corner2LX;
+      double Corner2LY;
+      double Corner2Thickness;
+      double Corner2Z;
+      double Corner3LX;
+      double Corner3LY;
+      double Corner3Thickness;
+      double Corner3Z;
+      double Corner4LX;
+      double Corner4LY;
+      double Corner4Thickness;
+      double Corner4Z;
+      double CornerAngle;
+      Point2D Corner1A;
+      Point2D Corner1AInner;
+      Point2D Corner1B;
+      Point2D Corner3;
+      Point2D Corner4;
     };
 
     /**
@@ -323,6 +439,11 @@ namespace Belle2 {
        * Creation of materials.
        */
       void createMaterials();
+
+      /**
+       * Calculate sector support geometry data.
+       */
+      void calculateSectorSupportData();
 
       /**
        * Read parameters from XML database.
@@ -651,7 +772,7 @@ namespace Belle2 {
       struct ElementPosition SectorSupportPosition;
 
       /** Sector support size data. */
-      struct SectorSupportSize SectorSupportSize;
+      struct SectorSupportGeometry m_SectorSupportData;
 
       /** Readout board size data. */
       struct BoardSize BoardSize;

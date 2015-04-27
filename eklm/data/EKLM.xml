@@ -71,7 +71,6 @@
             </DeltaLY>
             <CornerX desc="X coordinate of cutted corner" unit="mm">300.0
             </CornerX>
-            <TopCornerHeight unit="mm">30.0</TopCornerHeight>
             <Corner1LX unit="mm">70.0</Corner1LX>
             <Corner1Width unit="mm">150.0</Corner1Width>
             <Corner1Thickness unit="mm">5.0</Corner1Thickness>

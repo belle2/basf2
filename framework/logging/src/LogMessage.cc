@@ -37,12 +37,12 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
 bool LogMessage::operator==(const LogMessage& message) const
 {
   return (m_logLevel == message.m_logLevel) &&
+         (m_line == message.m_line) &&
          (m_message == message.m_message) &&
          (m_module == message.m_module) &&
          (m_package == message.m_package) &&
          (m_function == message.m_function) &&
-         (m_file == message.m_file) &&
-         (m_line == message.m_line);
+         (m_file == message.m_file);
 }
 
 

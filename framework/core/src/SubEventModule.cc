@@ -31,7 +31,7 @@ SubEventModule::SubEventModule():
   m_path()
 {
   //since we might be created via 'new'...
-  setDescription("Internal module, please use the for_each() function in Path instead.");
+  setDescription("Internal module to handle Path.for_each(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
 
   addParam("loopOver", m_loopOverName, "Name of array to iterate over.", std::string(""));
   addParam("objectName", m_objectName, "Name of the object holding the current iteration's item.", std::string(""));

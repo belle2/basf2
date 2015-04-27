@@ -27,6 +27,11 @@
 #include <limits>
 #include <queue>
 
+#ifdef HAVE_KID_ACC
+#include "belle_legacy/kid/kid_acc.h"
+#include "CLHEP/Vector/ThreeVector.h"
+#endif
+
 
 using namespace Belle2;
 
@@ -337,6 +342,27 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 // CONVERT OBJECTS
 //-----------------------------------------------------------------------------
 
+#ifdef HAVE_KID_ACC
+double B2BIIConvertMdstModule::acc_pid(const Belle::Mdst_charged& chg, int idp)
+{
+  static Belle::kid_acc acc_pdf(0);
+  //static kid_acc acc_pdf(1);
+
+  const double pmass[5] = { 0.00051099907, 0.105658389, 0.13956995, 0.493677, 0.93827231 };
+
+  CLHEP::Hep3Vector mom(chg.px(), chg.py(), chg.pz());
+  double cos_theta = mom.cosTheta();
+  double pval      = mom.mag();
+
+  double npe    = chg.acc().photo_electron();
+  double beta   = pval / sqrt(pval * pval + pmass[idp] * pmass[idp]);
+  double pdfval = acc_pdf.npe2pdf(cos_theta, beta, npe);
+
+  return pdfval;
+}
+#endif
+
+
 void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track)
 {
   PIDLikelihood* pid = m_pidLikelihoods.appendNew();
@@ -346,8 +372,18 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   //this should result in the same likelihoods used when creating atc_pid(3, 1, 5, ..., ...)
   //and calling prob(const Mdst_charged & chg).
 
+#ifdef HAVE_KID_ACC
   //accq0 = 3, as implemented in acc_prob3()
-  //TODO acc_pid() values can be used as likelihood, but needs PDFs plus some constants...
+  const auto& acc = belleTrack.acc();
+  if (acc and acc.quality()) {
+    for (int i = 0; i < c_nHyp; i++) {
+      float logl = log(acc_pid(belleTrack, i));
+      pid->setLogLikelihood(Const::ARICH, c_belleHyp_to_chargedStable[i], logl);
+    }
+    //copy proton likelihood to deuterons
+    pid->setLogLikelihood(Const::ARICH, Const::deuteron, pid->getLogL(Const::proton, Const::ARICH));
+  }
+#endif
 
   //tofq0 = 1, as implemented in tof_prob1()
   //uses p1 / (p1 + p2) to create probability, so this should map directly to likelihoods

@@ -36,6 +36,9 @@
 #include <string>
 #include <map>
 
+//uncomment this to enable ACC conversion (needs newer belle-legacy version)
+//#define HAVE_KID_ACC
+
 namespace Belle2 {
 
   /**
@@ -126,6 +129,11 @@ namespace Belle2 {
 
     /** Get PID information for belleTrack and add it to PIDLikelihood (with relation from track). */
     void convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track);
+
+#ifdef HAVE_KID_ACC
+    /** Returns ACC likelihood for given hypothesis idp. Copied from atc_pid::acc_pid(). */
+    static double acc_pid(const Belle::Mdst_charged& chg, int idp);
+#endif
 
     //
     // RELATIONS

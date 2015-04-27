@@ -9,8 +9,8 @@ EventHeaderPacket::EventHeaderPacket(): Packet() {}
 EventHeaderPacket::EventHeaderPacket(const unsigned int* temp_buffer,
                                      int nwords): Packet(temp_buffer, nwords)
 {
-  m_type = m_packet_payload[0]
-           m_freeze_date = m_packet_payload[2];
+  m_type = m_packet_payload[0];
+  m_freeze_date = m_packet_payload[2];
   m_evt_num = m_packet_payload[3];
   m_trigger = m_packet_payload[4];
   m_flag = m_packet_payload[5];

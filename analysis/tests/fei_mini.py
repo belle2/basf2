@@ -30,4 +30,4 @@ assert len(glob.glob('CutHistograms_D0*.root')) == 1
 assert 0 == os.system(cmd)
 assert len(glob.glob('D0*.root')) == 0
 
-# shutil.rmtree(tempdir)
+shutil.rmtree(tempdir)

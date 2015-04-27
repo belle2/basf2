@@ -14,6 +14,8 @@ import logging
 import sys
 
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
+from trackfindingcdc.cdcdisplay.svgdrawing.attributemaps import CDCSegmentColorMap
+CDCSegmentColorMap.bkgSegmentColor = "black"
 
 try:
     import root_pandas
@@ -97,20 +99,40 @@ class SegmentFakeRatesModule(HarvestingModule):
     save_tree = refiners.save_tree(folder_name="tree")
 
 
+class Filler(basf2.Module):
+
+    def event(self):
+        Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+
+
 class SegmentFakeRates(CombinerTrackFinderRun, AddValidationMethod):
 
-    display_module = CDCSVGDisplayModule(output_folder="tmp/", interactive=True)
-    display_module.draw_segments_mctrackid = True
+    display_module = CDCSVGDisplayModule(output_folder="tmp/mc/", interactive=False)
+    display_module.draw_segments_mctrackid = False
     display_module.draw_hits = True
     display_module.draw_gftrackcands = True
     display_module.draw_gftrackcand_trajectories = True
     display_module.track_cands_store_array_name = "MCTrackCands"
+
+    display_module2 = CDCSVGDisplayModule(output_folder="tmp/segments/", interactive=False)
+    display_module2.draw_hits = True
+    display_module2.draw_gftrackcands = True
+    display_module2.draw_gftrackcand_trajectories = True
+    display_module2.track_cands_store_array_name = "LocalTrackCands"
+
+    display_module_segments = CDCSVGDisplayModule(output_folder="tmp/segments/", interactive=False)
+    display_module_segments.draw_hits = True
+    display_module_segments.draw_gftrackcand_trajectories = True
+    display_module_segments.draw_gftrackcands = True
+    display_module_segments.track_cands_store_array_name = "LegendreTrackCands"
+    display_module_segments.draw_segments_mctrackid = True
 
     def create_path(self):
 
         # Turn of combining
         self.do_combining = False
         self.use_segment_quality_check = False
+        self.stereo_assignment = False
 
         main_path = super(SegmentFakeRates, self).create_path()
 
@@ -122,7 +144,22 @@ class SegmentFakeRates(CombinerTrackFinderRun, AddValidationMethod):
         #                                            legendre_track_cand_store_array_name=self.legendre_track_cands_store_array_name,
         #                                            output_file_name="segment_fake_rates.root"))
 
-        main_path.add_module(self.display_module)
+        # main_path.add_module(self.display_module)
+        # main_path.add_module(self.display_module2)
+
+        main_path.add_module(Filler())
+        main_path.add_module(self.display_module_segments)
+        cdc_drawing_module = basf2.register_module("CDCNiceDrawing")
+        cdc_drawing_module.param({
+            'StoreDirectory': "CDCNiceDrawing",
+            'DrawAlsoDifference': False,
+            'DrawMCSignal': False,
+            'TrackCandColName': "MCTrackCands",
+            'MCTrackCandColName': "MCTrackCands",
+            'HitColName': "CDCHits"
+        })
+
+        main_path.add_module(cdc_drawing_module)
 
         return main_path
 
@@ -179,4 +216,4 @@ def plot():
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
     main()
-    plot()
+    # plot()

@@ -169,25 +169,24 @@ class WeightCreator():
         self.output_file_name = "weights.root"
         self.input_file_name = None
 
-    def train(self):
+    def train(self, tree_name, factory_name, cut_signal, excluded_columns):
         input_file = ROOT.TFile(self.input_file_name, "READ")
         output_file = ROOT.TFile(self.output_file_name, "RECREATE")
-        input_tree = input_file.Get("tree/ClusterFilterValidationModule_tree")
+        input_tree = input_file.Get(tree_name)
 
-        factory = ROOT.TMVA.Factory("BackgroundHitFinder", output_file, "!V:!Silent:Transformations=I")
+        factory = ROOT.TMVA.Factory(factory_name, output_file, "!V:!Silent:Transformations=I")
         factory.AddSignalTree(input_tree)
         factory.AddBackgroundTree(input_tree)
 
         column_names = [leave.GetName() for leave in input_tree.GetListOfLeaves()]
 
         for column in column_names:
-            if column not in ["n_background", "background_fraction"]:
+            if column not in excluded_columns:
                 factory.AddVariable(column)
 
-        cutSignal = "background_fraction<=0.8"
-        cutBackground = "background_fraction>0.8"
+        cut_background = "!(" + str(cut_signal) + ")"
 
-        factory.PrepareTrainingAndTestTree(ROOT.TCut(cutSignal), ROOT.TCut(cutBackground), "SplitMode=Random")
+        factory.PrepareTrainingAndTestTree(ROOT.TCut(cut_signal), ROOT.TCut(cut_background), "SplitMode=Random")
         factory.BookMethod(
             ROOT.TMVA.Types.kPlugins,
             "FastBDT",
@@ -211,7 +210,10 @@ def create_events():
 def create_weights():
     weight_creator = WeightCreator()
     weight_creator.input_file_name = ClusterFilterValidationRun.output_file_name
-    weight_creator.train()
+    weight_creator.train(tree_name="tree/ClusterFilterValidationModule_tree",
+                         factory_name="BackgroundHitFinder",
+                         cut_signal="background_fraction<=0.8",
+                         excluded_columns=["n_background", "background_fraction"])
 
 
 def plot():

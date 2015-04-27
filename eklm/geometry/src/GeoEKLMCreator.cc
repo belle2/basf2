@@ -1525,6 +1525,10 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   G4SubtractionSolid** ss[2];
   G4SubtractionSolid* prev_solid = NULL;
   G4SubtractionSolid* res = NULL;
+  /* If there are no boards, it is not necessary to subtract their solids. */
+  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+    return plane;
+  /* Subtraction. */
   try {
     solidBoardBox = new G4Box("PlateBox", 0.5 * BoardSize.length,
                               0.5 * BoardSize.height,

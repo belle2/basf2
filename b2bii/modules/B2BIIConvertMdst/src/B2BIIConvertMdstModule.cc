@@ -375,7 +375,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
 #ifdef HAVE_KID_ACC
   //accq0 = 3, as implemented in acc_prob3()
   const auto& acc = belleTrack.acc();
-  if (acc and acc.quality()) {
+  if (acc and acc.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++) {
       float logl = log(acc_pid(belleTrack, i));
       pid->setLogLikelihood(Const::ARICH, c_belleHyp_to_chargedStable[i], logl);

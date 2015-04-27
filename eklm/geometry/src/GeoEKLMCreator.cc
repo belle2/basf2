@@ -961,8 +961,10 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   double x;
   double y;
   double box_x;
+  double box_y;
   double box_lx;
   double ang;
+  HepGeom::Transform3D t;
   HepGeom::Transform3D t1;
   HepGeom::Transform3D t2;
   HepGeom::Transform3D t3;
@@ -989,9 +991,9 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
     B2FATAL(MemErr);
   }
   snprintf(name, 128, "Plane_%d_Box_1", n + 1);
-  box_x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X) +
-          SectorSupportSize.Thickness;
-  box_lx =  PlanePosition.outerR - box_x;
+  box_x = SectorSupportPosition.X + SectorSupportSize.Thickness;
+  box_y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
+  box_lx =  PlanePosition.outerR;
   try {
     b1 = new G4Box(name, 0.5 * box_lx, 0.5 * box_lx,
                    0.5 * PlanePosition.length);
@@ -1029,53 +1031,47 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
     B2FATAL(MemErr);
   }
   /* Calculate transformations for boolean solids. */
-  t1 = HepGeom::Translate3D(0.5 * (PlanePosition.outerR + box_x),
-                            0.5 * (PlanePosition.outerR + box_x), 0.);
-  if (n == 1)
-    t1 = HepGeom::Rotate3D(180. * CLHEP::deg,
-                           HepGeom::Vector3D<double>(1., 1., 0.)) * t1;
+  t1 = HepGeom::Translate3D(0.5 * PlanePosition.outerR + box_x,
+                            0.5 * PlanePosition.outerR + box_y, 0.);
+  /* Corner 1 */
   ang = getSectorSupportCornerAngle();
   x = std::max(SectorSupportPosition.Y, SectorSupportPosition.X);
   y = SectorSupportPosition.outerR -
       SectorSupportSize.DeltaLY -
       SectorSupportSize.TopCornerHeight;
-  if (n == 0) {
-    t2 = HepGeom::Translate3D(x + 0.5 * box_lx * cos(ang) -
-                              0.5 * box_lx * sin(ang),
-                              y + 0.5 * box_lx * cos(ang) +
-                              0.5 * box_lx * sin(ang),
-                              0.) * HepGeom::RotateZ3D(ang);
-  } else {
-    t2 = HepGeom::Translate3D(y + 0.5 * box_lx * cos(ang) +
-                              0.5 * box_lx * sin(ang),
-                              x + 0.5 * box_lx * cos(ang) -
-                              0.5 * box_lx * sin(ang),
-                              0.) * HepGeom::RotateZ3D(-ang);
-  }
+  t2 = HepGeom::Translate3D(x + 0.5 * box_lx * cos(ang) -
+                            0.5 * box_lx * sin(ang),
+                            y + 0.5 * box_lx * cos(ang) +
+                            0.5 * box_lx * sin(ang),
+                            0.) * HepGeom::RotateZ3D(ang);
+  /* Corner 2 */
   r = SectorSupportPosition.outerR - SectorSupportSize.Thickness;
   y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
   x = sqrt(r * r - y * y);
   t3 = HepGeom::Translate3D(x, y, 0.);
-  if (n == 1)
-    t3 = HepGeom::Rotate3D(180. * CLHEP::deg,
-                           HepGeom::Vector3D<double>(1., 1., 0.)) * t3;
+  /* Corner 3 */
   r = SectorSupportPosition.innerR + SectorSupportSize.Thickness;
   y = SectorSupportPosition.Y + SectorSupportSize.Thickness +
       SectorSupportSize.Corner3LY;
   x = sqrt(r * r - y * y);
   y = SectorSupportPosition.Y + SectorSupportSize.Thickness;
   t4 = HepGeom::Translate3D(x, y, 0.);
-  if (n == 1)
-    t4 = HepGeom::Rotate3D(180. * CLHEP::deg,
-                           HepGeom::Vector3D<double>(1., 1., 0.)) * t4;
+  /* Corner 4 */
   x = SectorSupportPosition.X + SectorSupportSize.Thickness +
       SectorSupportSize.Corner4LX;
   y = sqrt(r * r - x * x);
   x = SectorSupportPosition.X + SectorSupportSize.Thickness;
   t5 = HepGeom::Translate3D(x, y, 0.);
-  if (n == 1)
-    t5 = HepGeom::Rotate3D(180. * CLHEP::deg,
-                           HepGeom::Vector3D<double>(1., 1., 0.)) * t5;
+  /* For rotated plane. */
+  if (n == 1) {
+    t = HepGeom::Rotate3D(180. * CLHEP::deg,
+                          HepGeom::Vector3D<double>(1., 1., 0.));
+    t1 = t * t1;
+    t2 = t * t2;
+    t3 = t * t3;
+    t4 = t * t4;
+    t5 = t * t5;
+  }
   /* Boolean solids. */
   snprintf(name, 128, "Plane_%d_Intersection", n + 1);
   try {

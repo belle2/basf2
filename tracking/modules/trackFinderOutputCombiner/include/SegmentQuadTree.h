@@ -37,6 +37,9 @@ namespace Belle2 {
      */
     SegmentQuadTreeModule();
 
+    /** Also initialize the debug output */
+    void initialize();
+
     /**
      * Used the QuadTree to generate tracks from segments.
      */

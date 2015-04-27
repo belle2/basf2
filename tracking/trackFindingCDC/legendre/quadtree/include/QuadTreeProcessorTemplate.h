@@ -79,6 +79,15 @@ namespace Belle2 {
        */
       virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int iX, unsigned int iY) const = 0;
 
+      /**
+       * Override that function if you want to receive debug output whenever the children of a node are filled the first time
+       * Maybe you want to make some nice plots or statistics.
+       */
+      virtual void afterFillDebugHook(QuadTreeChildren*)
+      {
+
+      }
+
     public:
       /**
        * Start filling the already created tree.
@@ -87,8 +96,7 @@ namespace Belle2 {
        * @param rThreshold the threshold in the y variable
        */
       virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                                 unsigned int nHitsThreshold, typeY rThreshold) const final
-      {
+                                 unsigned int nHitsThreshold, typeY rThreshold) final {
         fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, rThreshold, true);
       }
 
@@ -98,8 +106,7 @@ namespace Belle2 {
        * @param nHitsThreshold the threshold on the number of items
        */
       virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                                 unsigned int nHitsThreshold) const final
-      {
+                                 unsigned int nHitsThreshold) final {
         fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
       }
 
@@ -164,7 +171,7 @@ namespace Belle2 {
       virtual void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const final
       {
         ReturnList resultItems;
-        const std::vector<ItemType*> quadTreeItems = node->getItemsVector();
+        const std::vector<ItemType*>& quadTreeItems = node->getItemsVector();
         resultItems.reserve(quadTreeItems.size());
 
         for (ItemType* quadTreeItem : quadTreeItems) {
@@ -180,32 +187,28 @@ namespace Belle2 {
        * process further and go one level deeper.
        */
       virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
-                                 bool checkThreshold) const final
-      {
+                                 bool checkThreshold) final {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
-                (node->getLevel()));
+        (node->getLevel()));
         if (node->getItemsVector().size() < nItemsThreshold)
           return;
-        if (checkThreshold) {
+        if (checkThreshold)
+        {
           if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
             return;
         }
 
-        // **** ???? *****
-        unsigned char level_diff = 0;
-        if (fabs(node->getYMean()) > 0.07) level_diff = 2;
-        else if ((fabs(node->getYMean()) < 0.07) && (fabs(node->getYMean()) > 0.04))
-          level_diff = 1;
-        if (node->getLevel() >= (m_lastLevel - level_diff)) {
+        if (node->getLevel() >= m_lastLevel)
+        {
           callResultFunction(node, lmdProcessor);
           return;
         }
-        // **** ???? *****
 
         if (node->getChildren() == nullptr)
           node->initializeChildren(*this);
 
-        if (!node->checkFilled()) {
+        if (!node->checkFilled())
+        {
           fillChildren(node, node->getItemsVector());
           node->setFilled();
         }
@@ -214,30 +217,37 @@ namespace Belle2 {
         constexpr int m_nbins_r = binCountY;
 
         bool binUsed[m_nbins_theta][m_nbins_r];
-        for (int ii = 0; ii < m_nbins_theta; ii++)
-          for (int jj = 0; jj < m_nbins_r; jj++)
-            binUsed[ii][jj] = false;
+        for (int iX = 0; iX < m_nbins_theta; iX++)
+          for (int iY = 0; iY < m_nbins_r; iY++)
+            binUsed[iX][iY] = false;
 
         //Processing, which bins are further investigated
-        for (int bin_loop = 0; bin_loop < m_nbins_theta * m_nbins_r; bin_loop++) {
-          int t_index = 0;
-          int r_index = 0;
-          float max_value_temp = 0;
-          for (int t_index_temp = 0; t_index_temp < m_nbins_theta; ++t_index_temp) {
-            for (int r_index_temp = 0; r_index_temp < m_nbins_r; ++r_index_temp) {
-              if ((max_value_temp < node->getChildren()->get(t_index_temp, r_index_temp)->getNItems())
-                  && (!binUsed[t_index_temp][r_index_temp])) {
-                max_value_temp = node->getChildren()->get(t_index_temp, r_index_temp)->getNItems();
-                t_index = t_index_temp;
-                r_index = r_index_temp;
+        for (int bin_loop = 0; bin_loop < binCountX* binCountY; bin_loop++)
+        {
+
+          // Search for the bin with the highest bin content.
+          int xIndexMax = 0;
+          int yIndexMax = 0;
+          size_t maxValue = 0;
+          for (int xIndexLoop = 0; xIndexLoop < binCountX; ++xIndexLoop) {
+            for (int yIndexLoop = 0; yIndexLoop < binCountY; ++yIndexLoop) {
+              if ((maxValue < node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems())
+              && (!binUsed[xIndexLoop][yIndexLoop])) {
+                maxValue = node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems();
+                xIndexMax = xIndexLoop;
+                yIndexMax = yIndexLoop;
               }
             }
           }
 
-          binUsed[t_index][r_index] = true;
+          // Go down one level for the bin with the maximum number of items in it
+          binUsed[xIndexMax][yIndexMax] = true;
+          this->fillGivenTree(node->getChildren()->get(xIndexMax, yIndexMax), lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
 
-          node->getChildren()->get(t_index, r_index)->cleanUpItems(*this);
-          this->fillGivenTree(node->getChildren()->get(t_index, r_index), lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
+          // After we have processed the children we need to get rid of the already used hits in all the children, because this can change the number of items drastically
+          node->getChildren()->apply([&](QuadTree * childNode) {
+            childNode->cleanUpItems(*this);
+          });
         }
       }
 
@@ -245,13 +255,13 @@ namespace Belle2 {
        * This function is called by fillGivenTree and fills the items into the corresponding children.
        * For this the user-defined method insertItemInNode is called.
        */
-      virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items) const final
-      {
+      virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items) final {
         const size_t neededSize = 2 * items.size();
         node->getChildren()->apply([neededSize](QuadTree * qt) {qt->reserveHitsVector(neededSize);});
 
         //Voting within the four bins
-        for (ItemType* item : items) {
+        for (ItemType* item : items)
+        {
           if (item->isUsed())
             continue;
 
@@ -263,6 +273,8 @@ namespace Belle2 {
             }
           }
         }
+
+        afterFillDebugHook(node->getChildren());
       }
 
       /**

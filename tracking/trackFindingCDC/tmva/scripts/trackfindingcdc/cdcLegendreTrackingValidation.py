@@ -11,6 +11,7 @@
 
 import basf2
 
+from tracking.validation.run import TrackingValidationRun
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.validation.module import SeparatedTrackingValidationModule
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
@@ -109,7 +110,7 @@ class CDCLegendre(StandardEventGenerationRun):
             main_path.add_module(background_hit_finder_module)
 
         main_path.add_module(cdctracking)
-        main_path.add_module(cdc_stereo_combiner)
+        # main_path.add_module(cdc_stereo_combiner)
         if self.tmva_cut > 0:
             main_path.add_module(
                 ReassignHits(
@@ -141,7 +142,7 @@ def plot_many_times():
         efficiency = read_root(output_file_name, tree_key="ExpertMCSideTrackingValidationModule_overview_figures_of_merit")
         finding_efficiency = efficiency.finding_efficiency[0]
         hit_efficiency = efficiency.hit_efficiency[0]
-        rates = read_root(output_file_name, tree_key="ExpertPRSideTrackingValidationModule_overview_figures_of_merit")
+        rates = root_pandas.read_root(output_file_name, tree_key="ExpertPRSideTrackingValidationModule_overview_figures_of_merit")
         fake_rate = rates.fake_rate[0]
         clone_rate = rates.clone_rate[0]
 

@@ -109,12 +109,36 @@ namespace Belle2 {
     /** A QuadTreeProcessor for RecoSegments */
     class QuadTreeProcessorSegments : public QuadTreeProcessorTemplate<int, float, CDCRecoSegment2D, 2, 2> {
 
+    private:
+      std::map<std::pair<int, float>, std::vector<ItemType*>> m_debugOutputMap;
+
     public:
       /**
-       * the conformalTransformationPostion is the point which we use as an origin for the conformal transformation.
+       * The conformalTransformationPostion is the point which we use as an origin for the conformal transformation.
        */
       QuadTreeProcessorSegments(unsigned char lastLevel, const ChildRanges& ranges, const Vector2D& conformalTransformationPosition) :
         QuadTreeProcessorTemplate(lastLevel, ranges), m_origin(conformalTransformationPosition) {}
+
+      /**
+       * We do override the afterFillDebugHook to get some nice debug output
+       * @todo implement a way to save this on the datastore
+       */
+      void afterFillDebugHook(QuadTreeChildren* children) override
+      {
+        children->apply(
+        [&](QuadTree * childNode) {
+          if (childNode->getLevel() == getLastLevel()) {
+            B2INFO("Filled " << childNode->getNItems() << " on last level " << static_cast<unsigned int>(childNode->getLevel()))
+            m_debugOutputMap.emplace(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector());
+          }
+        }
+        );
+      }
+
+      const std::map<std::pair<int, float>, std::vector<ItemType*>>& printDebugInformation()
+      {
+        return m_debugOutputMap;
+      }
 
       /**
        * Insert only if the sinogram of the front or the back part of the segment goes through the node.
@@ -142,7 +166,7 @@ namespace Belle2 {
         double thetaIntersection = std::atan2((conformalTransformBack - conformalTransformFront).x(),
                                               (conformalTransformFront - conformalTransformBack).y());
 
-        if (thetaIntersection < 0) {
+        while (thetaIntersection < 0) {
           thetaIntersection += TMath::Pi();
         }
 

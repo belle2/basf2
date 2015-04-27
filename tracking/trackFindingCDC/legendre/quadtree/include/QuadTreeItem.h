@@ -31,6 +31,9 @@ namespace Belle2 {
        */
       QuadTreeItem& operator=(QuadTreeItem const& copy) = delete;
 
+      /**
+       * Destructor
+       */
       virtual ~QuadTreeItem() {}
 
       /**

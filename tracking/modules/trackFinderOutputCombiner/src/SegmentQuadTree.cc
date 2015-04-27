@@ -6,6 +6,9 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
+#include <TFile.h>
+#include <TH2F.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -25,6 +28,14 @@ SegmentQuadTreeModule::SegmentQuadTreeModule() : TrackFinderCDCFromSegmentsModul
   addParam("MinimumItems", m_param_minimumItems, "Minimum number of hits in one QuadTreeCell.", static_cast<unsigned int>(10));
 }
 
+void SegmentQuadTreeModule::initialize()
+{
+  TrackFinderCDCFromSegmentsModule::initialize();
+
+  StoreWrappedObjPtr< std::vector<std::vector<CDCRecoSegment2D>> >::registerTransient("DebugOutputSegments");
+  StoreWrappedObjPtr< std::vector<std::pair<int, float>> >::registerTransient("DebugOutputNodes");
+}
+
 void SegmentQuadTreeModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks)
 {
   quadTreeSearch(segments, tracks);
@@ -32,8 +43,7 @@ void SegmentQuadTreeModule::generate(std::vector<CDCRecoSegment2D>& segments, st
 
 void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& tracks)
 {
-  typedef std::vector<CDCRecoSegment2D*> RecoVector;
-  std::vector<RecoVector> foundTracks;
+  std::vector<Processor::ReturnList> foundTracks;
 
   Processor::ChildRanges ranges(Processor::rangeX(0, m_nbinsTheta),
                                 Processor::rangeY(m_rMin, m_rMax));
@@ -58,7 +68,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
 
   B2DEBUG(90, "Found " << foundTracks.size() << " tracks")
 
-  for (const RecoVector& track : foundTracks) {
+  for (const Processor::ReturnList& track : foundTracks) {
     tracks.emplace_back();
     CDCTrack& foundTrack = tracks.back();
     CDCObservations2D observations;
@@ -84,4 +94,32 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
     }
   }
 
+  // Debug output
+  const auto& debugMap = qtProcessor.printDebugInformation();
+
+  TFile file("output.root", "RECREATE");
+  TH2F histUnused("histUnused", "QuadTreeContent - unused Items", std::pow(2, m_param_level), 0, m_nbinsTheta, std::pow(2,
+                  m_param_level), m_rMin, m_rMax);
+  TH2F histUsed("histUsed", "QuadTreeContent - used Items", std::pow(2, m_param_level), 0, m_nbinsTheta, std::pow(2, m_param_level),
+                m_rMin, m_rMax);
+
+  for (const auto& debug : debugMap) {
+    const auto& positionInformation = debug.first;
+    const auto& quadItemsVector = debug.second;
+
+    unsigned int usedItems = 0;
+
+    for (const auto& quadItem : quadItemsVector) {
+      if (quadItem->isUsed()) {
+        usedItems++;
+      }
+    }
+
+    histUnused.Fill(positionInformation.first, positionInformation.second, quadItemsVector.size() - usedItems);
+    histUsed.Fill(positionInformation.first, positionInformation.second, usedItems);
+  }
+
+  histUnused.Write();
+  histUsed.Write();
+  file.Clone();
 }

@@ -53,6 +53,7 @@ namespace Belle2 {
 
     unsigned int m_param_level; /**< Maximum Level for QuadTreeSearch. */
     unsigned int m_param_minimumItems; /**< Minimum number of hits in one QuadTreeCell. */
+    bool m_param_debugOutput; /**< Create debug output or not. */
 
     /** Do the quad tree search */
     void quadTreeSearch(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments, std::vector<TrackFindingCDC::CDCTrack>& tracks);

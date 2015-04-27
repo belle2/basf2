@@ -109,15 +109,13 @@ namespace Belle2 {
     /** A QuadTreeProcessor for RecoSegments */
     class QuadTreeProcessorSegments : public QuadTreeProcessorTemplate<int, float, CDCRecoSegment2D, 2, 2> {
 
-    private:
-      std::map<std::pair<int, float>, std::vector<ItemType*>> m_debugOutputMap;
-
     public:
       /**
        * The conformalTransformationPostion is the point which we use as an origin for the conformal transformation.
        */
-      QuadTreeProcessorSegments(unsigned char lastLevel, const ChildRanges& ranges, const Vector2D& conformalTransformationPosition) :
-        QuadTreeProcessorTemplate(lastLevel, ranges), m_origin(conformalTransformationPosition) {}
+      QuadTreeProcessorSegments(unsigned char lastLevel, const ChildRanges& ranges, const Vector2D& conformalTransformationPosition,
+                                bool debugOutput = false) :
+        QuadTreeProcessorTemplate(lastLevel, ranges), m_origin(conformalTransformationPosition), m_debugOutput(debugOutput) {}
 
       /**
        * We do override the afterFillDebugHook to get some nice debug output
@@ -125,14 +123,16 @@ namespace Belle2 {
        */
       void afterFillDebugHook(QuadTreeChildren* children) override
       {
-        children->apply(
-        [&](QuadTree * childNode) {
-          if (childNode->getLevel() == getLastLevel()) {
-            B2INFO("Filled " << childNode->getNItems() << " on last level " << static_cast<unsigned int>(childNode->getLevel()))
-            m_debugOutputMap.emplace(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector());
+        if (m_debugOutput) {
+          children->apply(
+          [&](QuadTree * childNode) {
+            if (childNode->getLevel() == getLastLevel()) {
+              B2INFO("Filled " << childNode->getNItems() << " on last level " << static_cast<unsigned int>(childNode->getLevel()))
+              m_debugOutputMap.emplace(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector());
+            }
           }
+          );
         }
-        );
       }
 
       const std::map<std::pair<int, float>, std::vector<ItemType*>>& printDebugInformation()
@@ -217,7 +217,9 @@ namespace Belle2 {
       }
 
     private:
+      std::map<std::pair<int, float>, std::vector<ItemType*>> m_debugOutputMap;
       Vector2D m_origin; /**< The origin of the conformal transformation */
+      bool m_debugOutput; /**< A flag to control the creation of the debug output */
     };
 
   }

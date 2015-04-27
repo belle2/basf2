@@ -25,12 +25,12 @@ class SegmentQuadTreePlotter(basf2.Module):
 
     file_name_of_quad_tree_content = "output.root"
 
-    draw_quad_tree_content = True or False
-    draw_segment_intersection = True or False
-    draw_segment = True or False
-    draw_segment_averaged = True or False
-    draw_mc_information = True or False
-    draw_mc_hits = True or False
+    draw_quad_tree_content = True and False
+    draw_segment_intersection = True and False
+    draw_segment = True and False
+    draw_segment_averaged = True and False
+    draw_mc_information = True and False
+    draw_mc_hits = True and False
 
     def plotQuadTreeContent(self, input_file):
         hist = input_file.Get("histUsed")

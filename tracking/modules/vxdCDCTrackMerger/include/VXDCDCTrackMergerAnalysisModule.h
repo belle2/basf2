@@ -55,17 +55,17 @@ namespace Belle2 {
     double m_total_matched_pairs;
     //root tree variables
     //int nEv;
-    int m_nevent;
+    //int m_nevent;
     int m_npair;
     int m_ntruepair;
     int m_ncdc_trk;
     int m_nvxd_trk;
-    double m_trk_mrg_eff;
+    //double m_trk_mrg_eff;
     std::vector<int>* m_match_vec;
     std::vector<int>* m_true_match_vec;
     std::vector<int>* m_true_match_mc;
     std::vector<int>* m_right_match_vec;
-    std::vector<int>* m_loop_match_vec;
+    //std::vector<int>* m_loop_match_vec;
     std::vector<float>* m_chi2_vec;
     std::vector<float>* m_dist_vec;
     std::vector<float>* m_dx_vec;

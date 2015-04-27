@@ -3,6 +3,7 @@
 
 from basf2 import *
 from fei import *
+import glob
 
 chargedTrackVars = [
     'eid',
@@ -51,6 +52,7 @@ else:
 # show constructed path
 print feistate.path
 
-process(feistate.path)
+if len(glob.glob('FEIsummary.tex')) == 0:
+    process(feistate.path)
 
 print statistics

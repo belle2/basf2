@@ -53,7 +53,7 @@ void ECLCluster()
   hE9oE25_500->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   tree->Draw("eclClusterE9oE25>>hE9oE25_500");
 
-  TH1F* hphi_500 = new TH1F("hphi_500", "Reconstructed #phi Angle", 100,-3.155,3.155);
+  TH1F* hphi_500 = new TH1F("hphi_500", "Reconstructed #phi Angle", 50,-3.155,3.155);
   hphi_500->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed #phi angle of the cluster for 500 MeV/c single photons"));
   hphi_500->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape, flat distribution"));
   hphi_500->GetXaxis()->SetTitle("#phi (rad)");

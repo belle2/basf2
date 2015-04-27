@@ -899,6 +899,62 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
   }
 }
 
+G4SubtractionSolid* EKLM::GeoEKLMCreator::
+subtractBoardSolids(G4SubtractionSolid* plane, int n)
+{
+  int i;
+  int j;
+  G4Transform3D t;
+  G4Box* solidBoardBox = NULL;
+  G4SubtractionSolid** ss[2];
+  G4SubtractionSolid* prev_solid = NULL;
+  G4SubtractionSolid* res = NULL;
+  /* If there are no boards, it is not necessary to subtract their solids. */
+  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+    return plane;
+  /* Subtraction. */
+  try {
+    solidBoardBox = new G4Box("PlateBox", 0.5 * BoardSize.length,
+                              0.5 * BoardSize.height,
+                              0.5 * (PlanePosition.length + PlanePosition.Z));
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  for (i = 0; i < 2; i++) {
+    ss[i] = (G4SubtractionSolid**)malloc(sizeof(G4SubtractionSolid*) * nBoard);
+    if (ss[i] == NULL)
+      B2FATAL(MemErr);
+    for (j = 0; j < nBoard; j++) {
+      t = *BoardTransform[i][j];
+      if (n == 1)
+        t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
+      if (i == 0) {
+        if (j == 0)
+          prev_solid = plane;
+        else
+          prev_solid = ss[0][j - 1];
+      } else {
+        if (j == 0)
+          prev_solid = ss[0][nBoard - 1];
+        else
+          prev_solid = ss[1][j - 1];
+      }
+      try {
+        ss[i][j] = new G4SubtractionSolid("BoardSubtraction_" +
+                                          boost::lexical_cast<std::string>(i) + "_" +
+                                          boost::lexical_cast<std::string>(j),
+                                          prev_solid, solidBoardBox, t);
+      } catch (std::bad_alloc& ba) {
+        B2FATAL(MemErr);
+      }
+    }
+  }
+  res = ss[1][nBoard - 1];
+  for (i = 0; i < 2; i++)
+    free(ss[i]);
+  return res;
+}
+
 void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
 {
   double r;
@@ -1513,62 +1569,6 @@ void EKLM::GeoEKLMCreator::createSectorSupport(G4LogicalVolume* mlv)
   createSectorSupportCorner3(mlv);
   createSectorSupportCorner4(mlv);
   printVolumeMass(logicSectorSupport);
-}
-
-G4SubtractionSolid* EKLM::GeoEKLMCreator::
-subtractBoardSolids(G4SubtractionSolid* plane, int n)
-{
-  int i;
-  int j;
-  G4Transform3D t;
-  G4Box* solidBoardBox = NULL;
-  G4SubtractionSolid** ss[2];
-  G4SubtractionSolid* prev_solid = NULL;
-  G4SubtractionSolid* res = NULL;
-  /* If there are no boards, it is not necessary to subtract their solids. */
-  if (m_mode != EKLM_DETECTOR_BACKGROUND)
-    return plane;
-  /* Subtraction. */
-  try {
-    solidBoardBox = new G4Box("PlateBox", 0.5 * BoardSize.length,
-                              0.5 * BoardSize.height,
-                              0.5 * (PlanePosition.length + PlanePosition.Z));
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  for (i = 0; i < 2; i++) {
-    ss[i] = (G4SubtractionSolid**)malloc(sizeof(G4SubtractionSolid*) * nBoard);
-    if (ss[i] == NULL)
-      B2FATAL(MemErr);
-    for (j = 0; j < nBoard; j++) {
-      t = *BoardTransform[i][j];
-      if (n == 1)
-        t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
-      if (i == 0) {
-        if (j == 0)
-          prev_solid = plane;
-        else
-          prev_solid = ss[0][j - 1];
-      } else {
-        if (j == 0)
-          prev_solid = ss[0][nBoard - 1];
-        else
-          prev_solid = ss[1][j - 1];
-      }
-      try {
-        ss[i][j] = new G4SubtractionSolid("BoardSubtraction_" +
-                                          boost::lexical_cast<std::string>(i) + "_" +
-                                          boost::lexical_cast<std::string>(j),
-                                          prev_solid, solidBoardBox, t);
-      } catch (std::bad_alloc& ba) {
-        B2FATAL(MemErr);
-      }
-    }
-  }
-  res = ss[1][nBoard - 1];
-  for (i = 0; i < 2; i++)
-    free(ss[i]);
-  return res;
 }
 
 void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)

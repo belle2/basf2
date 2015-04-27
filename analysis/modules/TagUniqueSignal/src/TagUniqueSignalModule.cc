@@ -28,7 +28,9 @@ TagUniqueSignalModule::TagUniqueSignalModule() : Module(), m_targetVar(nullptr)
   // Add parameters
   addParam("particleList", m_particleList, "Input ParticleList name");
   addParam("target", m_targetVariable, "Variable which defines signal and background.", std::string("isSignal"));
-  addParam("extraInfoName", m_extraInfoName, "Extra-info field added to all particles in the input list. 1 for unique signal, 0 for background or duplicates.", string("uniqueSignal"));
+  addParam("extraInfoName", m_extraInfoName,
+           "Extra-info field added to all particles in the input list. 1 for unique signal, 0 for background or duplicates.",
+           string("uniqueSignal"));
 }
 
 TagUniqueSignalModule::~TagUniqueSignalModule()
@@ -64,8 +66,6 @@ void TagUniqueSignalModule::event()
       const bool was_inserted = foundMCParticles.insert(mcp).second;
       if (was_inserted)
         extraInfoValue = 1.0;
-      else
-        B2WARNING("dup");
     }
     part->addExtraInfo(m_extraInfoName, extraInfoValue);
   }

@@ -10,8 +10,9 @@
 
 void EKLMK0L()
 {
-  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
-  gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));  
+  TList *l;
+  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";
+  gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
   TFile* fin = new TFile("../EKLMK0LOutput.root");
   TTree* tree = (TTree*) fin->Get("tree");
   TFile* fout = new TFile("EKLMK0L.root", "recreate");
@@ -105,34 +106,34 @@ void EKLMK0L()
     ptres->Fill(p.Theta() - pmc.Theta());
     ppres->Fill(p.Phi() - pmc.Phi());
   }
-  xres->GetListOfFunctions()->Add(new TNamed("Description",
-    "X resolution")); 
-  xres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias, resolution ~ 10 cm.")); 
-  yres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Y resolution")); 
-  yres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias, resolution ~ 10 cm.")); 
-  zres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Z resolution")); 
-  zres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias, resolution ~ 10 cm.")); 
-  tres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Time resolution")); 
-  tres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias. See bug #997.")); 
-  pres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Momentum resolution")); 
-  pres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias. See bug #997.")); 
-  ptres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Momentum theta resolution")); 
-  ptres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias, resolution ~ 0.03")); 
-  ppres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Momentum phi resolution")); 
-  ppres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias, resolution ~ 0.05")); 
+  l = xres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "X resolution"));
+  l->Add(new TNamed("Check", "No bias, resolution ~ 10 cm."));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l = yres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Y resolution"));
+  l->Add(new TNamed("Check", "No bias, resolution ~ 10 cm."));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l = zres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Z resolution"));
+  l->Add(new TNamed("Check", "No bias, resolution ~ 10 cm."));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l = tres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Time resolution"));
+  l->Add(new TNamed("Check", "No bias. See bug #997."));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l = pres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Momentum resolution"));
+  l->Add(new TNamed("Check", "No bias. See bug #997."));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l = ptres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Momentum theta resolution"));
+  l->Add(new TNamed("Check", "No bias, resolution ~ 0.03"));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
+  l = ppres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Momentum phi resolution"));
+  l->Add(new TNamed("Check", "No bias, resolution ~ 0.05"));
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
   xres->Write();
   yres->Write();
   zres->Write();

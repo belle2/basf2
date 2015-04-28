@@ -12,6 +12,7 @@
 
 void EKLMMuon()
 {
+  TList *l;
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));  
   TFile* fin = new TFile("../EKLMMuonOutput.root");
@@ -32,10 +33,10 @@ void EKLMMuon()
   h2dtres->SetXTitle("ns");
   h2dtres->SetYTitle("Events");
   tree->Draw("EKLMHit2ds.m_Time-EKLMHit2ds.m_MCTime>>muon_h2dtres");
-  h2dtres->GetListOfFunctions()->Add(new TNamed("Description",
-    "Time resolution")); 
-  h2dtres->GetListOfFunctions()->Add(new TNamed("Check",
-    "No bias. See bug #997.")); 
+  l = h2dtres->GetListOfFunctions();
+  l->Add(new TNamed("Description", "Time resolution")); 
+  l->Add(new TNamed("Check", "No bias. See bug #997.")); 
+  l->Add(new TNamed("Contact", "Kirill Chilikin"));
   h2dtres->Write();
   delete h2dtres;
   delete fin;

@@ -320,7 +320,7 @@ void ECLGeometryPar::Mapping(int cid)
 
 
 // LEP: old way
-int ECLGeometryPar::ECLVolNameToCellID(const G4String VolumeName)
+int ECLGeometryPar::ECLVolNameToCellID(const G4String& VolumeName)
 {
   char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
   int cellID = 0;
@@ -407,9 +407,13 @@ int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
     return -1;
   }
 
-  int iCry = touch->GetCopyNumber(0);
+  // iCry range is 0..71 for Fwd, 72..131 for Bwd, 0..45 for Barrel
+  int iCry = touch->GetCopyNumber(0) - 1;
+  // GSector range is 0..15 for Fwd, 0..15 for Bwd, 0..71 for Barrel
   int GSector = touch->GetCopyNumber(2);
-  int cellID = 0;
+
+  // Return an illegal value by default
+  int cellID = -1;
 
   if (touch->GetVolume()->GetName().compare(0, 21, "eclFwdCrystalPhysical") == 0) {
 
@@ -444,7 +448,8 @@ int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
 
   } else if (touch->GetVolume()->GetName().compare(0, 24, "eclBarrelCrystalPhysical") == 0) {
 
-    GSector = GSector * 2 - touch->GetCopyNumber(1) - 2; // 1..144
+    // Barrel GSector range is -1..142 --> 0..143 (by relabelling the -1 value)
+    GSector = GSector * 2 - touch->GetCopyNumber(1);
     if (GSector == -1) GSector = 143;
     cellID = 1152 + (iCry) * 144 + GSector;
 
@@ -476,7 +481,6 @@ int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
   } else {
 
     B2WARNING("ECL simulation cellId; Bad volume name = " << touch->GetVolume()->GetName());
-    return -1;
 
   }
   return cellID;
@@ -1106,7 +1110,7 @@ EclNbr::getNbr(const Identifier aCellId)
 }
 
 namespace Belle2 {
-  int ECLG4VolNameToCellID(const G4String VolumeName)
+  int ECLG4VolNameToCellID(const G4String& VolumeName)
   {
     char temp1[100], temp2[100], temp3[100], temp4[100], temp5[100], temp6[100], temp7[100];
     int cellID = 0;

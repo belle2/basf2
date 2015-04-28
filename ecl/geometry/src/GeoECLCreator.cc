@@ -136,8 +136,8 @@ namespace Belle2 {
     const double k_barSupForwFarIR(k_barConInnerR +
                                    (k_barSupForwFarZ - k_barConForwZIn)*
                                    k_barForwTan);
-    const double k_barCryBackZIn(k_barConBackZIn + k_barFinThick / k_barBackSin);
-    const double k_barCryForwZIn(k_barConForwZIn - k_barFinThick / k_barForwSin);
+    // unused const double k_barCryBackZIn(k_barConBackZIn + k_barFinThick / k_barBackSin);
+    // unused const double k_barCryForwZIn(k_barConForwZIn - k_barFinThick / k_barForwSin);
     const double k_barConBackR5(k_barCryInnerR + k_barFinThick / k_barBackCos);
     const double k_barConForwR5(k_barCryInnerR + k_barFinThick / k_barForwCos);
     const double k_barConTFC(k_barFinThick + k_barConEndConThick);
@@ -450,11 +450,11 @@ namespace Belle2 {
                                                          supportContainer_Z, supportContainer_I, supportContainer_O);
       G4LogicalVolume* supportContainerLogical = new G4LogicalVolume(supportContainerSolid, medAir, "eclBarrelSupportContainerLogical");
       new G4PVPlacement(0, noMove, supportContainerLogical, "eclBarrelSupportContainerPhysical", barrelLogical, false, 0, overlaps);
-      G4Polycone* supportSectorSolid = new G4Polycone("eclBarrelSupportSectorSolid", 0, dPhi, 2,
+      G4Polycone* supportSectorSolid = new G4Polycone("eclBarrelSupportSectorSolid", -0.5 * dPhi, dPhi, 2,
                                                       supportContainer_Z, supportContainer_I, supportContainer_O);
       G4LogicalVolume* supportSectorLogical = new G4LogicalVolume(supportSectorSolid, medAir, "eclBarrelSupportSectorLogical");
       new G4PVReplica("eclBarrelSupportSectorPhysical", supportSectorLogical, supportContainerLogical,
-                      kPhi, nSectors, dPhi, outerSectorOffset);
+                      kPhi, nSectors, dPhi, 0.5 * dPhi + outerSectorOffset);
 
       // "Radial" boundaries of the ECL barrel's crystal-bearing sectors are not quite radial,
       // by design, so we cannot use G4PVReplicas of a G4Polycone for each sector.
@@ -798,9 +798,9 @@ namespace Belle2 {
       double iSectorsRot = - 0.5 * dPhi + outerSectorOffset;
       // LEP: to place 1 and 2 properly in the G4Replica sector, omit iSectorsRot here
       // LEP: ... but retain iSectorsRot for 4 and 5 for the G4PVParameterised sector
-      G4Transform3D rot11 = G4RotateZ3D(0.0); // iSectorsRot);
-      G4Transform3D rot12 = G4RotateZ3D(-ribdp1 + dPhi); // + iSectorsRot);
-      G4Transform3D rot2 = G4RotateZ3D(-ribdp2 / 2.0 + dPhi / 2); // + iSectorsRot);
+      G4Transform3D rot11 = G4RotateZ3D(-0.5 * dPhi);
+      G4Transform3D rot12 = G4RotateZ3D(-ribdp1 + dPhi - 0.5 * dPhi);
+      G4Transform3D rot2 = G4RotateZ3D(-ribdp2 / 2.0 + dPhi / 2 - 0.5 * dPhi);
 
       G4Transform3D rot41 = G4RotateZ3D(-ribdp4 + ribdp1 + iSectorsRot);
       G4Transform3D rot42 = G4RotateZ3D(-ribdp1 + dPhi + iSectorsRot);
@@ -963,11 +963,11 @@ namespace Belle2 {
           "eclForwardSupportContainerLogical", 0, 0, 0);
       new G4PVPlacement(0, noMove, supportContainerLogical, "eclForwardSupportContainerPhysical", eclLogical, false, 0, overlaps);
 
-      G4Polycone* supportSectorSolid = new G4Polycone("eclForwardSupportSectorSolid", 0.0, 2.0 * dPhi, 8,
+      G4Polycone* supportSectorSolid = new G4Polycone("eclForwardSupportSectorSolid", -dPhi, 2.0 * dPhi, 8,
                                                       supportContainer_Z, supportContainer_I, supportContainer_O);
       G4LogicalVolume* supportSectorLogical = new G4LogicalVolume(supportSectorSolid, medAir, "eclForwardSupportSectorLogical", 0, 0, 0);
       new G4PVReplica("eclForwardSupportSectorPhysical", supportSectorLogical, supportContainerLogical,
-                      kPhi, k_forwNPhiSegs / 2, 2.0 * dPhi, -dPhi);
+                      kPhi, k_forwNPhiSegs / 2, 2.0 * dPhi, 0.0);
 
       G4Polycone* crystalContainerSolid = new G4Polycone("eclForwardCrystalContainerSolid", 0.0, TWOPI, 6,
                                                          crystalContainer_Z, crystalContainer_I, crystalContainer_O);
@@ -975,15 +975,15 @@ namespace Belle2 {
           "eclForwardCrystalContainerLogical", 0, 0, 0);
       new G4PVPlacement(0, noMove, crystalContainerLogical, "eclForwardCrystalContainerPhysical", eclLogical, false, 0, overlaps);
 
-      G4Polycone* crystalSectorSolid = new G4Polycone("eclForwardCrystalSectorSolid", 0.0, dPhi, 6,
+      G4Polycone* crystalSectorSolid = new G4Polycone("eclForwardCrystalSectorSolid", -0.5 * dPhi, dPhi, 6,
                                                       crystalContainer_Z, crystalContainer_I, crystalContainer_O);
       G4LogicalVolume* crystalSectorLogical = new G4LogicalVolume(crystalSectorSolid, medAir, "eclForwardCrystalSectorLogical", 0, 0, 0);
       new G4PVReplica("eclForwardCrystalSectorPhysical", crystalSectorLogical, crystalContainerLogical,
-                      kPhi, k_forwNPhiSegs, dPhi, -0.5 * dPhi);
+                      kPhi, k_forwNPhiSegs, dPhi, 0.0);
 
       // Forward endcap support
 
-      const double ECSoffset = dPhi;
+      const double ECSoffset = 0.0;
 
       EclCM ECSw_1 = 13.0 * CLHEP::cm;
       EclCM ECSh_1 = 17.0 * CLHEP::cm;
@@ -1079,7 +1079,6 @@ namespace Belle2 {
 
       // forward endcap crystals and container
 
-      double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
       int k_forwMPerRing[] = { 3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9 };
 
       int iRing = 0;
@@ -1090,21 +1089,21 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1") * CLHEP::cm;
-        h2 = counter.getLength("K_h2") * CLHEP::cm;
-        bl1 = counter.getLength("K_bl1") * CLHEP::cm;
-        bl2 = counter.getLength("K_bl2") * CLHEP::cm;
-        tl1 = counter.getLength("K_tl1") * CLHEP::cm;
-        tl2 = counter.getLength("K_tl2") * CLHEP::cm;
-        alpha1 = counter.getAngle("K_alpha1");
-        alpha2 = counter.getAngle("K_alpha2");
-        Rphi1 = counter.getAngle("K_Rphi1");
-        Rtheta = counter.getAngle("K_Rtheta");
-        Rphi2 = counter.getAngle("K_Rphi2");
-        Pr = counter.getLength("K_Pr") * CLHEP::cm;
-        Ptheta = counter.getAngle("K_Ptheta");
-        Pphi = counter.getAngle("K_Pphi");
-        halflength = 15.0 * CLHEP::cm;
+        double h1 = counter.getLength("K_h1") * CLHEP::cm;
+        double h2 = counter.getLength("K_h2") * CLHEP::cm;
+        double bl1 = counter.getLength("K_bl1") * CLHEP::cm;
+        double bl2 = counter.getLength("K_bl2") * CLHEP::cm;
+        double tl1 = counter.getLength("K_tl1") * CLHEP::cm;
+        double tl2 = counter.getLength("K_tl2") * CLHEP::cm;
+        double alpha1 = counter.getAngle("K_alpha1");
+        double alpha2 = counter.getAngle("K_alpha2");
+        double Rphi1 = counter.getAngle("K_Rphi1");
+        double Rtheta = counter.getAngle("K_Rtheta");
+        double Rphi2 = counter.getAngle("K_Rphi2");
+        double Pr = counter.getLength("K_Pr") * CLHEP::cm;
+        double Ptheta = counter.getAngle("K_Ptheta");
+        double Pphi = counter.getAngle("K_Pphi");
+        double halflength = 15.0 * CLHEP::cm;
 
         G4Material* material = medAlTeflon;
         double foilthk = foilthickness;
@@ -1133,7 +1132,7 @@ namespace Belle2 {
         G4Transform3D position = G4Translate3D(Pr * sin(Ptheta) * cos(Pphi),
                                                Pr * sin(Ptheta) * sin(Pphi),
                                                Pr * cos(Ptheta));  // Move over to the left...
-        G4Transform3D Tr = position * m3 * m2 * m1;
+        G4Transform3D Tr = G4RotateZ3D(-0.5 * dPhi) * position * m3 * m2 * m1;
 
         if (iCry == 5) { // Pentagon!!
 
@@ -1320,11 +1319,11 @@ namespace Belle2 {
           "eclBackwardSupportContainerLogical", 0, 0, 0);
       new G4PVPlacement(0, noMove, supportContainerLogical, "eclBackwardSupportContainerPhysical", eclLogical, false, 0, overlaps);
 
-      G4Polycone* supportSectorSolid = new G4Polycone("eclBackwardSupportSectorSolid", 0.0, 2.0 * dPhi, 2,
+      G4Polycone* supportSectorSolid = new G4Polycone("eclBackwardSupportSectorSolid", -dPhi, 2.0 * dPhi, 2,
                                                       supportContainer_Z, supportContainer_I, supportContainer_O);
       G4LogicalVolume* supportSectorLogical = new G4LogicalVolume(supportSectorSolid, medAir, "eclBackwardSupportSectorLogical", 0, 0, 0);
       new G4PVReplica("eclBackwardSupportSectorPhysical", supportSectorLogical, supportContainerLogical,
-                      kPhi, k_backNPhiSegs / 2, 2.0 * dPhi, -dPhi);
+                      kPhi, k_backNPhiSegs / 2, 2.0 * dPhi, 0.0);
 
       G4Polycone* crystalContainerSolid = new G4Polycone("eclBackwardCrystalContainerSolid", 0.0, TWOPI, 12,
                                                          crystalContainer_Z, crystalContainer_I, crystalContainer_O);
@@ -1332,15 +1331,15 @@ namespace Belle2 {
           "eclBackwardCrystalContainerLogical", 0, 0, 0);
       new G4PVPlacement(0, noMove, crystalContainerLogical, "eclBackwardCrystalContainerPhysical", eclLogical, false, 0, overlaps);
 
-      G4Polycone* crystalSectorSolid = new G4Polycone("eclBackwardCrystalSectorSolid", 0.0, dPhi, 12,
+      G4Polycone* crystalSectorSolid = new G4Polycone("eclBackwardCrystalSectorSolid", -0.5 * dPhi, dPhi, 12,
                                                       crystalContainer_Z, crystalContainer_I, crystalContainer_O);
       G4LogicalVolume* crystalSectorLogical = new G4LogicalVolume(crystalSectorSolid, medAir, "eclBackwardCrystalSectorLogical", 0, 0, 0);
       new G4PVReplica("eclBackwardCrystalSectorPhysical", crystalSectorLogical, crystalContainerLogical,
-                      kPhi, k_backNPhiSegs, dPhi, -0.5 * dPhi);
+                      kPhi, k_backNPhiSegs, dPhi, 0.0);
 
       // backward endcap support
 
-      const double ECSoffset = dPhi;
+      const double ECSoffset = 0.0;
 
       // In fact they're not polycone, but for simplicity...
 
@@ -1406,7 +1405,6 @@ namespace Belle2 {
 
       // backward endcap crystals and container
 
-      double h1, h2, bl1, bl2, tl1, tl2, alpha1, alpha2, Rphi1, Rphi2, Rtheta, Pr, Ptheta, Pphi, halflength;
       int k_backMPerRing[] = { 9, 9, 6, 6, 6, 6, 6, 4, 4, 4 };
 
       int iRing = 0;
@@ -1417,21 +1415,21 @@ namespace Belle2 {
         GearDir counter(content);
         counter.append((format("/EndCapCrystals/EndCapCrystal[%1%]/") % (iCry)).str());
 
-        h1 = counter.getLength("K_h1") * CLHEP::cm;
-        h2 = counter.getLength("K_h2") * CLHEP::cm;
-        bl1 = counter.getLength("K_bl1") * CLHEP::cm;
-        bl2 = counter.getLength("K_bl2") * CLHEP::cm;
-        tl1 = counter.getLength("K_tl1") * CLHEP::cm;
-        tl2 = counter.getLength("K_tl2") * CLHEP::cm;
-        alpha1 = counter.getAngle("K_alpha1");
-        alpha2 = counter.getAngle("K_alpha2");
-        Rphi1 = counter.getAngle("K_Rphi1");
-        Rtheta = counter.getAngle("K_Rtheta");
-        Rphi2 = counter.getAngle("K_Rphi2");
-        Pr = counter.getLength("K_Pr") * CLHEP::cm;
-        Ptheta = counter.getAngle("K_Ptheta");
-        Pphi = counter.getAngle("K_Pphi");
-        halflength = 15.0 * CLHEP::cm;
+        double h1 = counter.getLength("K_h1") * CLHEP::cm;
+        double h2 = counter.getLength("K_h2") * CLHEP::cm;
+        double bl1 = counter.getLength("K_bl1") * CLHEP::cm;
+        double bl2 = counter.getLength("K_bl2") * CLHEP::cm;
+        double tl1 = counter.getLength("K_tl1") * CLHEP::cm;
+        double tl2 = counter.getLength("K_tl2") * CLHEP::cm;
+        double alpha1 = counter.getAngle("K_alpha1");
+        double alpha2 = counter.getAngle("K_alpha2");
+        double Rphi1 = counter.getAngle("K_Rphi1");
+        double Rtheta = counter.getAngle("K_Rtheta");
+        double Rphi2 = counter.getAngle("K_Rphi2");
+        double Pr = counter.getLength("K_Pr") * CLHEP::cm;
+        double Ptheta = counter.getAngle("K_Ptheta");
+        double Pphi = counter.getAngle("K_Pphi");
+        double halflength = 15.0 * CLHEP::cm;
 
         G4Material* material = medAlTeflon;
         double foilthk = foilthickness;
@@ -1457,7 +1455,7 @@ namespace Belle2 {
         G4Transform3D position = G4Translate3D(Pr * sin(Ptheta) * cos(Pphi),
                                                Pr * sin(Ptheta) * sin(Pphi),
                                                Pr * cos(Ptheta));  // Move over to the left...
-        G4Transform3D Tr = position * m3 * m2 * m1;
+        G4Transform3D Tr = G4RotateZ3D(-0.5 * dPhi) * position * m3 * m2 * m1;
 
         /////////////////  add backward foil ///////////////////////////////////////
 
@@ -1649,21 +1647,22 @@ namespace Belle2 {
                            G4Transform3D(G4TranslateY3D(rf_h)))
                           *rfTr0);
 
-      new G4PVPlacement(phFinTr1, phiFinLogical, (format("ecl%1%PhiFinPhysical") % direction).str(),
+      G4RotateZ3D rot(-0.5 * deltaPhi);
+      new G4PVPlacement(rot * phFinTr1, phiFinLogical, (format("ecl%1%PhiFinPhysical") % direction).str(),
                         crystalSectorLogical, false, 0, overlaps);
-      new G4PVPlacement(phFinTr2, phiFinLogical, (format("ecl%1%PhiFinPhysical") % direction).str(),
+      new G4PVPlacement(rot * phFinTr2, phiFinLogical, (format("ecl%1%PhiFinPhysical") % direction).str(),
                         crystalSectorLogical, false, 1, overlaps);
-      new G4PVPlacement(rf2Tr1, rib2Logical, (format("ecl%1%EndcapRib2Physical") % direction).str(),
+      new G4PVPlacement(rot * rf2Tr1, rib2Logical, (format("ecl%1%EndcapRib2Physical") % direction).str(),
                         crystalSectorLogical, false, 0, overlaps);
-      new G4PVPlacement(rf2Tr2, rib2Logical, (format("ecl%1%EndcapRib2Physical") % direction).str(),
+      new G4PVPlacement(rot * rf2Tr2, rib2Logical, (format("ecl%1%EndcapRib2Physical") % direction).str(),
                         crystalSectorLogical, false, 1, overlaps);
 
       if (!aForward) {
-        new G4PVPlacement(rfTr1, ribLogical, (format("ecl%1%EndcapRibPhysical") % direction).str(),
+        new G4PVPlacement(rot * rfTr1, ribLogical, (format("ecl%1%EndcapRibPhysical") % direction).str(),
                           crystalSectorLogical, false, 0, overlaps);
       } else {
         G4Transform3D rfTr2(G4RotateZ3D(deltaPhi) * G4TranslateY3D(-rf_h) * rfTr1);
-        new G4PVPlacement(rfTr2, ribLogical, (format("ecl%1%EndcapRibPhysical") % direction).str(),
+        new G4PVPlacement(rot * rfTr2, ribLogical, (format("ecl%1%EndcapRibPhysical") % direction).str(),
                           crystalSectorLogical, false, 0, overlaps);
       }
 

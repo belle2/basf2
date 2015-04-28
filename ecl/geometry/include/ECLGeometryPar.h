@@ -90,7 +90,7 @@ namespace Belle2 {
       /** Get Phi Id */
       int GetPhiID() {return mPar_phiID;};
       /** Get Cell Id (LEP: old way) */
-      int ECLVolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
+      int ECLVolNameToCellID(const G4String& VolumeName);//Mapping from VolumeName to Crystal CellID
       /** Get Cell Id (LEP: new way)*/
       int ECLVolumeToCellID(const G4VTouchable*);//Mapping from G4VTouchable copyNumbers to Crystal CellID
 
@@ -391,7 +391,7 @@ namespace Belle2 {
 
 namespace Belle2 {
   /**  function of G4  VolumeName to Crystal CellID */
-  int ECLG4VolNameToCellID(const G4String VolumeName);//Mapping from VolumeName to Crystal CellID
+  int ECLG4VolNameToCellID(const G4String& VolumeName);//Mapping from VolumeName to Crystal CellID
 } // end of namespace Belle2
 
 #endif

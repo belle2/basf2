@@ -17,5 +17,6 @@ Enddecay
 Decay B0sig
 1.000 K_S0 K_S0 K_S0               PHSP;
 Enddecay
+CDecay anti-B0sig
 #
 End

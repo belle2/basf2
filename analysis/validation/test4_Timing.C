@@ -1,6 +1,6 @@
 /*
 <header>
-  <input>GenericB_GENSIMRECtoDST.dst.root</input>
+  <input>GenericB_GENSIMRECtoDST.dst.root,DSTtoMDST.mdst.root,MDSTtoUDST.udst.root,UDSTtoNTUP.ntup.root</input>
   <output>Timing.root</output>
   <contact>Luis Pesantex, pesantez@uni-bonn.de</contact>
 </header>
@@ -43,7 +43,7 @@ void test4_Timing()
         "analysis/validation/test2_MDSTtoUDST.py",
         "analysis/validation/test3_UDSTtoNTUP.py"
     };
-    TFile* output = TFile::Open("Timing.root", "recreate");
+    TFile* output = TFile::Open("../Timing.root", "recreate");
     output->cd();
 
     const TString tmpdir = exec("mktemp -d").Strip(TString::kTrailing, '\n');

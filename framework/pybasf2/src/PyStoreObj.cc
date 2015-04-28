@@ -66,17 +66,7 @@ bool PyStoreObj::registerInDataStore(std::string className, int storeFlags)
 
 vector<string> PyStoreObj::list(int durability)
 {
-  vector<string> list;
-  const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
-  for (const auto& entrypair : map) {
-    if (!entrypair.second.isArray) {
-      const TObject* obj = entrypair.second.object;
-      if (obj and dynamic_cast<const RelationContainer*>(obj))
-        continue; //ignore relations in list
-      list.push_back(entrypair.first);
-    }
-  }
-  return list;
+  return DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(durability));
 }
 
 void PyStoreObj::printList(int durability)

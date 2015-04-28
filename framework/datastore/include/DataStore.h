@@ -486,8 +486,14 @@ namespace Belle2 {
      */
     std::vector<std::string> getListOfRelatedArrays(const StoreAccessorBase& array) const;
 
-    /** Returns a list of names of arrays which are of type arrayClass. */
+    /** Returns a list of names of arrays which are of type (or inherit from) arrayClass. */
     std::vector<std::string> getListOfArrays(const TClass* arrayClass, EDurability durability) const;
+
+    /** Returns a list of names of StoreObjPtr-objects whose class is (or inherits from) objClass.
+     *
+     * (this does NOT include the internal RelationContainer objects.)
+     */
+    std::vector<std::string> getListOfObjects(const TClass* objClass, EDurability durability) const;
 
 
     //------------------------------ For internal use --------------------------------------------------

@@ -585,6 +585,23 @@ std::vector<std::string> DataStore::getListOfArrays(const TClass* arrayClass, ED
   return arrays;
 }
 
+std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDurability durability) const
+{
+  vector<string> list;
+  const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
+  for (const auto& entrypair : map) {
+    if (!entrypair.second.isArray) {
+      const TObject* obj = entrypair.second.object;
+      if (obj and dynamic_cast<const RelationContainer*>(obj))
+        continue; //ignore relations in list
+
+      if (obj->IsA()->InheritsFrom(objClass))
+        list.push_back(entrypair.first);
+    }
+  }
+  return list;
+}
+
 void DataStore::invalidateData(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);

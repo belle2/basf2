@@ -321,6 +321,9 @@ namespace Belle2 {
      */
     struct LogicalVolumes {
       G4LogicalVolume** stripvol;    /**< Strip volumes. */
+      G4LogicalVolume** strip;       /**< Strips. */
+      G4LogicalVolume** groove;      /**< Strip grooves. */
+      G4LogicalVolume** scint;       /**< Scintillator. */
       G4LogicalVolume** psheet;      /**< Plastic sheet. */
     };
 
@@ -444,6 +447,11 @@ namespace Belle2 {
        * Calculate sector support geometry data.
        */
       void calculateSectorSupportData();
+
+      /**
+       * Read strip parameters from XML database.
+       */
+      void readXMLDataStrips();
 
       /**
        * Read parameters from XML database.
@@ -643,7 +651,7 @@ namespace Belle2 {
       void createSectionSupport(int iSectionSupport, G4LogicalVolume* mlv);
 
       /**
-       * Create plastic list element
+       * Create plastic list element.
        * @param[in] iSheetPlane Number of list plane.
        * @param[in] iSheet      Number of list.
        * @param[in] mlv         Mother logical volume.
@@ -652,28 +660,23 @@ namespace Belle2 {
                                      G4LogicalVolume* mlv);
 
       /**
-       * Create strip volume (strip + SiPM).
+       * Create strip logical volumes.
+       * @param[in] iStrip Number of strip in the length-based array.
+       * @param[in] mlv    Mother logical volume.
+       */
+      void createStripLogicalVolumes(int iStrip, G4LogicalVolume* mlv);
+
+      /**
+       * Create strip volume.
        * @param[in] mlv    Mother logical volume.
        */
       void createStripVolume(G4LogicalVolume* mlv);
 
       /**
-       * Create strip.
-       * @param[in] mlv Mother logical volume.
+       * Create strip physical volumes.
+       * @param[in] iStrip Number of strip in the length-based array.
        */
-      void createStrip(G4LogicalVolume* mlv);
-
-      /**
-       * Create strip groove.
-       * @param[in] mlv Mother logical volume.
-       */
-      void createStripGroove(G4LogicalVolume* mlv);
-
-      /**
-       * Create strip sensitive volume.
-       * @param[in] mlv Mother logical volume.
-       */
-      void createStripSensitive(G4LogicalVolume* mlv);
+      void createStripPhysicalVolumes(int iStrip);
 
       /**
        * Create silicon cube in the place of SiPM for radiation study.
@@ -739,10 +742,13 @@ namespace Belle2 {
       int nBoard;
 
       /** Number of strip readout boards on one section readout board. */
-      int nStripBoard;
+      int m_nStripBoard;
 
       /** Number of strips in one plane. */
-      int nStrip;
+      int m_nStrip;
+
+      /** Number of strips with different lengths in one plane. */
+      int m_nStripDifferent;
 
       /** Number of sections is one plane. */
       int nSection;
@@ -812,6 +818,12 @@ namespace Belle2 {
 
       /** Position data for strips. */
       struct ElementPosition* StripPosition;
+
+      /** Number of strip in length-based array. */
+      int* m_StripAllToLen;
+
+      /** Number of strip in position-based array. */
+      int* m_StripLenToAll;
 
       /** Strip size data. */
       struct StripSize StripSize;

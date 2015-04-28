@@ -25,9 +25,11 @@
 #include <cassert>
 
 #include <TDecompChol.h>
+#include <TMatrixDSymEigen.h>
 #include <TMatrixTSymCramerInv.h>
 #include <TMath.h>
 
+#include "AbsHMatrix.h"
 #include "Exception.h"
 
 // Use Cramer inversion for small matrices?
@@ -315,7 +317,7 @@ void tools::QR(TMatrixD& A)
 //   ||Ax - b|| = min
 // is equivalent to
 //   ||QRx - b|| = ||Rx - Q'b|| = min
-// where Q' denotes the transposed.
+// where Q' denotes the transposed (i.e. inverse).
 void tools::QR(TMatrixD& A, TVectorD& b)
 {
   int nCols = A.GetNcols();
@@ -435,4 +437,143 @@ void tools::safeAverage(const TMatrixDSym& C1, const TMatrixDSym& C2,
   result.ResizeTo(inv.GetNcols(), inv.GetNcols());
   result = TMatrixDSym(TMatrixDSym::kAtA, inv);
 }
+
+
+void
+tools::noiseMatrixSqrt(const TMatrixDSym& noise,
+		       TMatrixD& noiseSqrt)
+{
+  // This is the slowest part of the whole Sqrt Kalman.  Using an LDLt
+  // transform is probably the easiest way of remedying this.
+  TMatrixDSymEigen eig(noise);
+  noiseSqrt.ResizeTo(noise);
+  noiseSqrt = eig.GetEigenVectors();
+  double* pNoiseSqrt = noiseSqrt.GetMatrixArray();
+  const TVectorD& evs(eig.GetEigenValues());
+  const double* pEvs = evs.GetMatrixArray();
+  // GetEigenVectors is such that noise = noiseSqrt * evs * noiseSqrt'
+  // We're evaluating the first product with the eigenvalues replaced
+  // by their square roots, so we're multiplying with a diagonal
+  // matrix from the right.
+  int iCol = 0;
+  for (; iCol < noiseSqrt.GetNrows(); ++iCol) {
+    double ev = pEvs[iCol] > 0 ? sqrt(pEvs[iCol]) : 0;
+    // if (ev == 0)
+    //  break;
+    for (int j = 0; j < noiseSqrt.GetNrows(); ++j) {
+      pNoiseSqrt[j*noiseSqrt.GetNcols() + iCol] *= ev;
+    }
+  }
+  if (iCol < noiseSqrt.GetNcols()) {
+    // Hit zero eigenvalue, resize matrix
+    noiseSqrt.ResizeTo(noiseSqrt.GetNrows(), iCol);
+  }
+
+  // noiseSqrt * noiseSqrt' = noise
+}
+
+// Transports the state.
+void
+tools::kalmanPrediction(const TVectorD& x,
+			const TVectorD& delta, const TMatrixD& F,
+			TVectorD& xNew)
+{
+  xNew = x;
+  xNew *= F;
+  xNew += delta;
+}
+
+// Transports the square root of the covariance matrix using a
+// square-root formalism
+//
+// With covariance square root S, transport matrix F and noise matrix
+// square root Q.
+void
+tools::kalmanPredictionCovSqrt(const TMatrixD& S,
+			       const TMatrixD& F, const TMatrixD& Q,
+			       TMatrixD& Snew)
+{
+  Snew.ResizeTo(S.GetNrows() + Q.GetNcols(),
+		S.GetNcols());
+
+  // This overwrites all elements, no precautions necessary
+  Snew.SetSub(0, 0, TMatrixD(S, TMatrixD::kMultTranspose, F));
+  if (Q.GetNcols() != 0)
+    Snew.SetSub(S.GetNrows(), 0, TMatrixD(TMatrixD::kTransposed, Q));
+
+  tools::QR(Snew);
+
+  // The result is in the upper right corner of the matrix.
+  Snew.ResizeTo(S.GetNrows(), S.GetNrows());
+}
+
+
+// Kalman measurement update (no transport)
+// x, S : state prediction, covariance square root
+// res, R, H : residual, measurement covariance square root, H matrix of the measurement
+// gives the update (new state = x + update) and the updated covariance square root.
+// S and Snew are allowed to refer to the same object.
+void
+tools::kalmanUpdateSqrt(const TMatrixD& S,
+			const TVectorD& res, const TMatrixD& R,
+			const AbsHMatrix* H,
+			TVectorD& update, TMatrixD& SNew)
+{
+  TMatrixD pre(S.GetNrows() + R.GetNrows(),
+	       S.GetNcols() + R.GetNcols());
+  pre.SetSub(0,            0,         R); /* Zeros in upper right block */
+  pre.SetSub(R.GetNrows(), 0, H->MHt(S)); pre.SetSub(R.GetNrows(), R.GetNcols(), S);
+
+  tools::QR(pre);
+  const TMatrixD& r = pre;
+
+  const TMatrixD& a(r.GetSub(0, R.GetNrows()-1,
+			     0, R.GetNcols()-1));
+  TMatrixD K(TMatrixD::kTransposed, r.GetSub(0, R.GetNrows()-1, R.GetNcols(), pre.GetNcols()-1));
+  SNew = r.GetSub(R.GetNrows(), pre.GetNrows()-1, R.GetNcols(), pre.GetNcols()-1);
+
+  update.ResizeTo(res);
+  update = res;
+  tools::transposedForwardSubstitution(a, update);
+  update *= K;
+}
+
+
+// Kalman transport + measurement update
+// x, S : state prediction, covariance square root (pre-prediction)
+// transport matrix F and noise matrix square root Q
+// res, R, H : residual, measurement covariance square root, H matrix of the measurement
+void
+tools::kalmanPredictionUpdateSqrt(const TVectorD& x, const TMatrixD& S,
+				  const TMatrixD& F, const TMatrixD& Q,
+				  const TVectorD& res, const TMatrixD& R,
+				  const AbsHMatrix* H,
+				  TVectorD& xNew, TMatrixD& SNew)
+{
+  TMatrixD pre(S.GetNrows() + Q.GetNrows() + R.GetNrows(),
+	       S.GetNcols() + R.GetNcols());
+  TMatrixD SFt(S, TMatrixD::kMultTranspose, F);
+  pre.SetSub(                        0,  0,          R);   /*           upper right block is zero               */
+  pre.SetSub(             R.GetNrows(),  0,H->MHt(SFt));   pre.SetSub(R.GetNrows(),             R.GetNcols(),SFt);
+  if (Q.GetNcols() > 0) { // needed to suppress warnings when inserting an empty Q
+    TMatrixD Qt(TMatrixD::kTransposed, Q);
+    pre.SetSub(S.GetNrows()+R.GetNrows(),0,H->MHt(Qt));    pre.SetSub(S.GetNrows()+R.GetNrows(),R.GetNcols(), Qt);
+  }
+
+  tools::QR(pre);
+  const TMatrixD& r = pre;
+
+  TMatrixD a(r.GetSub(0, R.GetNrows()-1, 0, R.GetNcols()-1));
+  TMatrixD K(TMatrixD::kTransposed, r.GetSub(0, R.GetNrows()-1, R.GetNcols(), pre.GetNcols()-1));
+  SNew = r.GetSub(R.GetNrows(), R.GetNrows() + S.GetNrows() - 1,
+		  R.GetNcols(), pre.GetNcols() - 1);
+
+  xNew.ResizeTo(res);
+  xNew = res;
+  tools::transposedForwardSubstitution(a, xNew);
+  xNew *= K;
+  xNew += x;
+}
+
+
 } /* End of namespace genfit */

@@ -808,7 +808,7 @@ def WriteAnalysisFileSummary(
     finalParticlePlaceholders = []
     for (ntuple, target) in zip(finalParticleNTuples, finalParticleTargets):
         if ntuple is not None:
-            type = 'CosBDL' if 'semileptonic' in ntuple else 'Mbc'
+            type = 'CosBDL' if 'AcceptMissingNeutrino' in target else 'Mbc'
             plot = automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts, target)
             rocPlot = automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts, target)
             finalParticlePlaceholders.append(plot)

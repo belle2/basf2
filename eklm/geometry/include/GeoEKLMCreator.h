@@ -51,10 +51,10 @@ namespace Belle2 {
      * @struct Point2D
      * 2D point.
      *
-     * @var Point2D::x
+     * @var Point2D::X
      * X coordinate.
      *
-     * @var Point2D::y
+     * @var Point2D::Y
      * Y coordinate.
      */
     struct Point2D {

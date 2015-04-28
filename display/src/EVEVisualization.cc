@@ -669,7 +669,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
 
   addToGroup("Fitted Tracks", eveTrack);
-  addObject(track, eveTrack);
+  if (track)
+    addObject(track, eveTrack);
   addObject(belle2Track, eveTrack);
 }
 

@@ -15,6 +15,11 @@
          whitespace, comma or semi-colon -->
     <bar unit="cm">1 2
     </bar>
+    <ScintCell>16</ScintCell>
+    <TimeStep>0.8</TimeStep>
+    <MinTime>0.0</MinTime>
+    <MaxTime>750.0</MaxTime>
+    <ConvFac>1.0</ConvFac>
 
     <Active>
       <Material>CLAW-Material</Material>

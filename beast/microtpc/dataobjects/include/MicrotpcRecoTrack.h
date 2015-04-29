@@ -36,7 +36,7 @@ namespace Belle2 {
      */
     MicrotpcRecoTrack(int detNb, float chi2, float theta, float phi, float esum, int totsum, float trl, int time_range,
                       const float parFit[5], const float parFit_err[5], const float cov[5][5], const float impact_x[4], const float impact_y[4],
-                      const int side[5][4]): m_detNb(detNb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum), m_trl(trl),
+                      const int side[4][4]): m_detNb(detNb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum), m_trl(trl),
       m_time_range(time_range)
     {
       std::copy(parFit, parFit + 5, m_parFit);
@@ -44,7 +44,7 @@ namespace Belle2 {
       std::copy(&cov[0][0], &cov[0][0] + 5 * 5, &m_cov[0][0]);
       std::copy(impact_x, impact_x + 4, m_impact_x);
       std::copy(impact_y, impact_y + 4, m_impact_y);
-      std::copy(&side[0][0], &side[0][0] + 5 * 4, &m_side[0][0]);
+      std::copy(&side[0][0], &side[0][0] + 4 * 4, &m_side[0][0]);
     }
     /** Return detector number */
     int getdetNb() const { return m_detNb; }
@@ -106,7 +106,7 @@ namespace Belle2 {
     /** Impact parameter y */
     float m_impact_y[4];
     /** Which side was/were hit */
-    int m_side[5][4];
+    int m_side[4][4];
 
     ClassDef(MicrotpcRecoTrack, 1)
   };

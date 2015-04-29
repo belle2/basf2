@@ -168,7 +168,16 @@ void TrackFitterModule::event()
 
       Track = new TGraph2DErrors();
 
-      for (int j = 0; j < 5; j++)for (int k = 0; k < 4; k++)m_side[j][k] = 0;
+      for (int j = 0; j < 4; j++)for (int k = 0; k < 4; k++)m_side[j][k] = 0;
+      /*
+      for (int k = 0; k < 4; k++)  {
+      m_side1[k] = 0;
+      m_side2[k] = 0;
+      m_side3[k] = 0;
+      m_side4[k] = 0;
+      m_side5[k] = 0;
+      }
+      */
 
       int xnpts[4];
       int ynpts[4];
@@ -239,13 +248,35 @@ void TrackFitterModule::event()
           //Track->SetPointError(i_tpc[i],0,0,e[i_tpc[i]]);
           Track->SetPointError(i_tpc[i], 0, 0, 1.);
 
-          for (int k = 0; k < 5; k++) {
+          for (int k = 0; k < 4; k++) {
             if (0 <= col && col <= k)m_side[k][0] = k + 1;
             if (80 - k <= col && col <= 80)m_side[k][1] = k + 1;
             if (0 <= row && row <= 5 * k)m_side[k][2] = k + 1;
             if (336 - 5 * k <= row && row <= 336)m_side[k][3] = k + 1;
           }
 
+          /*
+          if(col == 1)m_side1[0]=1;
+          if(1 <= col && col <= 2)m_side2[0]=1;
+          if(1 <= col && col <= 3)m_side3[0]=1;
+          if(1 <= col && col <= 4)m_side4[0]=1;
+          if(1 <= col && col <= 5)m_side5[0]=1;
+          if(col == 80)m_side1[0]=1;
+          if(79 <= col && col <= 80)m_side2[1]=1;
+          if(78 <= col && col <= 80)m_side3[1]=1;
+          if(77 <= col && col <= 80)m_side4[1]=1;
+          if(76 <= col && col <= 80)m_side5[1]=1;
+          if(1 <= row && row <= 5)m_side1[2]=1;
+          if(1 <= row && row <= 10)m_side2[2]=1;
+          if(1 <= row && row <= 15)m_side3[2]=1;
+          if(1 <= row && row <= 25)m_side4[2]=1;
+          if(1 <= row && row <= 30)m_side5[2]=1;
+          if(332 <= row && row <= 336)m_side1[3]=1;
+          if(327 <= row && row <= 336)m_side2[3]=1;
+          if(324 <= row && row <= 336)m_side3[3]=1;
+          if(319 <= row && row <= 336)m_side4[3]=1;
+          if(314 <= row && row <= 336)m_side5[3]=1;
+          */
           if (col == 0) {
             m_impact_y[0] += y[i_tpc[i]];
             ynpts[0]++;

@@ -96,6 +96,47 @@ namespace Belle2 {
     double particlePhi_CMS(const Particle* part);
 
     /**
+     * return momentum magnitude in rest frame
+     */
+    double particleP_RF(const Particle* part);
+
+    /**
+     * return energy in rest frame
+     */
+    double particleE_RF(const Particle* part);
+
+    /**
+     * return momentum component x in rest frame
+     */
+    double particlePx_RF(const Particle* part);
+
+    /**
+     * return momentum component y in rest frame
+     */
+    double particlePy_RF(const Particle* part);
+
+    /**
+     * return momentum component z in rest frame
+     */
+    double particlePz_RF(const Particle* part);
+
+    /**
+     * return transverse momentum in rest frame
+     */
+    double particlePt_RF(const Particle* part);
+
+    /**
+     * return momentum cosine of polar angle in rest frame
+     */
+    double particleCosTheta_RF(const Particle* part);
+
+    /**
+     * return momentum azimuthal angle in rest frame
+     */
+    double particlePhi_RF(const Particle* part);
+
+
+    /**
      * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);

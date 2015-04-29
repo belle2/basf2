@@ -16,6 +16,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/PRestFrameLabTransform.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -32,6 +33,24 @@
 
 namespace Belle2 {
   namespace Variable {
+
+    Manager::FunctionPtr useRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          static PRestFrameLabTransform T;
+          T.setRestFrame(particle->get4Vector().BoostVector());
+          double result = var->function(particle);
+          T.resetRestFrame();
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useRestFrameAsCMS")
+        return nullptr;
+      }
+    }
 
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
@@ -810,6 +829,7 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MetaFunctions");
+    REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle in PRestFrameLab Transform.");
     REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion,
                       "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");

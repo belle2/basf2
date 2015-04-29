@@ -547,9 +547,10 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               hit_box->SetMainTransparency(0);
               eveTrack->AddElement(hit_box);
             } else {
+              //pixel hit
               // calculate eigenvalues to draw error-ellipse ----------------------------
               TMatrixDEigen eigen_values(hit_cov);
-              TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
+              TEveGeoShape* cov_shape = new TEveGeoShape("PXDRecoHit");
               cov_shape->IncDenyDestroy();
               TMatrixT<double> ev = eigen_values.GetEigenValues();
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
@@ -585,7 +586,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
             // get eigenvalues of covariance to know how to draw the ellipsoid ------------
             TMatrixDEigen eigen_values(m->getRawHitCov());
-            TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
+            TEveGeoShape* cov_shape = new TEveGeoShape("SpacePoint Hit");
             cov_shape->IncDenyDestroy();
             cov_shape->SetShape(new TGeoSphere(0., 1.));
             TMatrixT<double> ev = eigen_values.GetEigenValues();
@@ -624,7 +625,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
           // draw wire hits -----------------------------------------------------------------
           if (wire_hit) {
-            TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
+            TEveGeoShape* cov_shape = new TEveGeoShape("CDCRecoHit");
             cov_shape->IncDenyDestroy();
             double pseudo_res_0 = errorScale_ * std::sqrt(hit_cov(0, 0));
             double pseudo_res_1 = plane_size;

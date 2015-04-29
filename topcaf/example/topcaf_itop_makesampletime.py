@@ -5,20 +5,23 @@ from basf2 import *
 import sys
 import argparse
 
-parser = \
-    argparse.ArgumentParser(description='Calculate the sample to sample time calibration (for <=IRS3C). Typically, an electronic pulser run that includes data for all channels is used as the input to create this calibration.'
-                            , usage='%(prog)s [options]')
+parser = argparse.ArgumentParser(
+    description='Calculate the sample to sample time calibration (for <=IRS3C).' +
+                ' Typically, an electronic pulser run that includes data for all' +
+                ' channels is used as the input to create this calibration.',
+    usage='%(prog)s [options]')
 
 parser.add_argument('--ped', metavar='PedestalFile (path/filename)',
                     required=True,
                     help='The pedestal file and path to be used for the analysis.   This parameter is REQUIRED'
                     )
 
-parser.add_argument('--inputRun',
-                    metavar='InputRun (i.e. file name = InputRun.dat)',
-                    required=True,
-                    help='the root name for the input data files.  myInputRun.dat would have a root name of myInputRun.  This parameter is REQUIRED.'
-                    )
+parser.add_argument(
+    '--inputRun',
+    metavar='InputRun (i.e. file name = InputRun.dat)',
+    required=True,
+    help='the root name for the input data files.  myInputRun.dat would have a root ' +
+         'name of myInputRun.  This parameter is REQUIRED.')
 
 parser.add_argument('--inputDir', metavar='InputDirectory (path)',
                     required=True,
@@ -34,11 +37,11 @@ parser.add_argument('--Conditions', action='store_true',
                     )
 
 parser.add_argument('--IOVi', metavar='Run_initial', default='NULL',
-                    help='The initial run in the conditions service interval of validity.'
+                    help='The initial run ID in the conditions service interval of validity.'
                     )
 
 parser.add_argument('--IOVf', metavar='Run_final', default='NULL',
-                    help='The final run in the conditions service interval of validity.'
+                    help='The final run ID in the conditions service interval of validity.'
                     )
 
 args = parser.parse_args()
@@ -74,7 +77,7 @@ itopeventconverter.param('InputFileName', args.inputRun + '.dat')
 itopeventconverter.param('InputDirectory', args.inputDir)
 
 camacconverter = register_module('Camac')
-camacDict = {  #             'CrateID'            : 13369927,  # leps june 2013 itop test beam
+camacDict = {  # 'CrateID'            : 13369927,  # leps june 2013 itop test beam
                #             'FTSWslot'           : 7,  # leps june 2013 itop test beam
                #             'FTSWword'           : 3  # leps june 2013 itop test beam
                # 2014 itop crt
@@ -84,7 +87,7 @@ camacDict = {  #             'CrateID'            : 13369927,  # leps june 2013 
     'CrateID': 0x00cc0200,
     'FTSWslot': 6,
     'FTSWword': 5,
-    }
+}
 camacconverter.param(camacDict)
 
 pedmodule = register_module('Pedestal')
@@ -93,7 +96,7 @@ pedestalDict = {
     'WriteFile': 0,
     'Conditions': 0,
     'InputFileName': args.ped,
-    }
+}
 pedmodule.param(pedestalDict)
 
 mergemodule = register_module('WaveMerging')
@@ -109,9 +112,9 @@ sampletimeDict = {
     'Mode': 0,
     'WriteFile': 1,
     'Conditions': Conditions,
-    'IOV_initialRun': args.IOVi,
-    'IOV_finalRun': args.IOVf,
-    }
+    'IOV_initialRunID': args.IOVi,
+    'IOV_finalRunID': args.IOVf,
+}
 sampletimemodule.param(sampletimeDict)
 
 main = create_path()
@@ -126,4 +129,3 @@ main.add_module(sampletimemodule)
 # main.add_module(output) # this is for debugging using values of individual events.
 
 process(main)
-

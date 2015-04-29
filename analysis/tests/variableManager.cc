@@ -17,7 +17,7 @@ namespace {
   double dummyVarWithParameters(const Particle*, const std::vector<double>& parameters)
   {
     double result = 0;
-    for (auto & x : parameters)
+    for (auto& x : parameters)
       result += x;
     return result;
   }
@@ -51,8 +51,19 @@ namespace {
     const Manager::Var* funcDoesNotExists = Manager::Instance().getVariable("funcDoesNotExist(p)");
     EXPECT_TRUE(funcDoesNotExists == nullptr);
 
-    const Manager::Var* nestedDoesNotExist = Manager::Instance().getVariable("daughterSumOf(daughter(1, ExtraInfoWrongName(signalProbability)))");
-    EXPECT_TRUE(nestedDoesNotExist != nullptr);
+    const Manager::Var* nestedDoesNotExist =
+      Manager::Instance().getVariable("daughterSumOf(daughter(1, ExtraInfoWrongName(signalProbability)))");
+    EXPECT_TRUE(nestedDoesNotExist != nullptr); // TODO This should actually return nullptr, but this is not easy to implement.
+
+    // Test alias
+    const Manager::Var* aliasDoesNotExists = Manager::Instance().getVariable("myAlias");
+    EXPECT_TRUE(aliasDoesNotExists == nullptr);
+    Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))");
+    const Manager::Var* aliasDoesExists = Manager::Instance().getVariable("myAlias");
+    EXPECT_TRUE(aliasDoesExists != nullptr);
+
+    EXPECT_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
+    EXPECT_B2ERROR(Manager::Instance().addAlias("M", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
 
     //re-registration not allowed
     EXPECT_B2FATAL(Manager::Instance().registerVariable("p", (Manager::FunctionPtr)&dummyVar, "description"));
@@ -74,7 +85,8 @@ namespace {
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 42.0);
 
 
-    Manager::Instance().registerVariable("testingthedummyvarwithparameters(n)", (Manager::ParameterFunctionPtr)&dummyVarWithParameters, "blah");
+    Manager::Instance().registerVariable("testingthedummyvarwithparameters(n)", (Manager::ParameterFunctionPtr)&dummyVarWithParameters,
+                                         "blah");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters(3)");
     EXPECT_TRUE(dummy != nullptr);
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 3.0);

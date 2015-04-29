@@ -25,8 +25,12 @@ Variable::Manager& Variable::Manager::Instance()
   return v;
 }
 
-const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& name)
+const Variable::Manager::Var* Variable::Manager::getVariable(std::string name)
 {
+  auto aliasIter = m_alias.find(name);
+  if (aliasIter != m_alias.end()) {
+    name = aliasIter->second;
+  }
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
     if (createVariable(name)) {
@@ -39,12 +43,33 @@ const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& 
   return mapIter->second.get();
 }
 
+bool Variable::Manager::addAlias(const std::string& alias, const std::string& variable)
+{
+
+  assertValidName(alias);
+
+  if (m_alias.find(alias) != m_alias.end()) {
+    B2WARNING("Another alias with the name'" << alias << "' is already set! I overwrite it!")
+    m_alias[alias] = variable;
+    return true;
+  }
+
+  if (m_variables.find(alias) != m_variables.end()) {
+    B2ERROR("Variable with the name '" << alias << "' exists already, cannot add it as an alias!")
+    return false;
+  }
+
+  m_alias.insert(std::make_pair(alias, variable));
+  return true;
+}
+
 void Variable::Manager::assertValidName(const std::string& name)
 {
   const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");
 
   if (!boost::regex_match(name, allowedNameRegex)) {
-    B2FATAL("Variable '" << name << "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
+    B2FATAL("Variable '" << name <<
+            "' contains forbidden characters! Only alphanumeric characters plus underscores (_) are allowed for variable names.");
   }
 }
 
@@ -74,7 +99,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     std::string functionName = results[1];
     boost::algorithm::trim(functionName);
     std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(results[2], ',', '(', ')');
-    for (auto & str : functionArguments) {
+    for (auto& str : functionArguments) {
       boost::algorithm::trim(str);
     }
 
@@ -83,7 +108,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     if (parameterIter != m_parameter_variables.end()) {
 
       std::vector<double> arguments;
-      for (auto & arg : functionArguments) {
+      for (auto& arg : functionArguments) {
         double number = 0;
         try {
           number = boost::lexical_cast<double>(arg);
@@ -132,7 +157,8 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   }
 }
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::ParameterFunctionPtr f, const std::string& description)
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::ParameterFunctionPtr f,
+                                         const std::string& description)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -151,7 +177,8 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   }
 }
 
-void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::MetaFunctionPtr f, const std::string& description)
+void Variable::Manager::registerVariable(const std::string& name, Variable::Manager::MetaFunctionPtr f,
+                                         const std::string& description)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -174,7 +201,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
 std::vector<std::string> Variable::Manager::getNames() const
 {
   std::vector<std::string> names;
-  for (const VarBase * var : m_variablesInRegistrationOrder) {
+  for (const VarBase* var : m_variablesInRegistrationOrder) {
     names.push_back(var->name);
   }
   return names;

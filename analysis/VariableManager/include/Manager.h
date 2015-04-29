@@ -138,7 +138,12 @@ namespace Belle2 {
        *
        * Returns NULL if name not found.
        */
-      const Var* getVariable(const std::string& name);
+      const Var* getVariable(std::string name);
+
+      /** Add alias
+       * Return tru if the alias was successfully added
+       */
+      bool addAlias(const std::string& alias, const std::string& variable);
 
       /** Return list of all variables (in order registered). */
       std::vector<const Belle2::Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
@@ -189,6 +194,8 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
 #else
       /** List of registered variables. */
+      std::map<std::string, std::string> m_alias;
+      /** List of registered variables. */
       std::map<std::string, std::shared_ptr<Var>> m_variables;
       /** List of registered variables. */
       std::map<std::string, std::shared_ptr<ParameterVar>> m_parameter_variables;
@@ -204,15 +211,18 @@ namespace Belle2 {
     class Proxy {
     public:
       /** constructor. */
-      Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description) {
+      Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description)
+      {
         Manager::Instance().registerVariable(name, f, description);
       }
       /** constructor. */
-      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description) {
+      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description)
+      {
         Manager::Instance().registerVariable(name, f, description);
       }
       /** constructor. */
-      Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description) {
+      Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description)
+      {
         Manager::Instance().registerVariable(name, f, description);
       }
     };
@@ -221,7 +231,8 @@ namespace Belle2 {
     class GroupProxy {
     public:
       /** constructor. */
-      GroupProxy(const std::string& groupName) {
+      GroupProxy(const std::string& groupName)
+      {
         Manager::Instance().setVariableGroup(groupName);
       }
     };

@@ -63,6 +63,8 @@ void test2_Validation_RecoStats() {
         {"nECLTrigs",           0,  5},
         {"nEKLMHit2ds",         0,  100},
         {"nEKLMK0Ls",           0,  10},
+ //       {"nEKLMStepHits",       0,  10},
+ //       {"nGFTrackCands",       0,  25},
         {"nGFTracks",           0,  25},
         {"nPIDLikelihoods",     0,  25},
         {"nPXDClusters",        0,  100},
@@ -74,6 +76,8 @@ void test2_Validation_RecoStats() {
     VarInfo DetectorStatsSim[] = {
         {"nARICHDigits",    0,  200},
         {"nARICHSimHits",   0,  250},
+//        {"nBKLMDigits",     0,  250},
+//        {"nBKLMSimHits",    0,  250},
         {"nCDCSimHits",     0,  11000},
         {"nECLDigits",      0,  1500},
         {"nECLSimHits",     0,  20000},

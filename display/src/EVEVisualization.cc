@@ -190,7 +190,6 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   bool drawForward_ = false;
   bool drawBackward_ = false;
   eFitterType fitterId_ = RefKalman;
-  double errorScale_ = 1.0;
   unsigned int repId_ = 0;
   eMultipleMeasurementHandling mmHandling_ = unweightedClosestToPrediction;
   double dPVal_ = 1.E-3;
@@ -554,8 +553,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               cov_shape->IncDenyDestroy();
               TMatrixT<double> ev = eigen_values.GetEigenValues();
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
-              double pseudo_res_0 = errorScale_ * std::sqrt(ev(0, 0));
-              double pseudo_res_1 = errorScale_ * std::sqrt(ev(1, 1));
+              double pseudo_res_0 = m_errorScale * std::sqrt(ev(0, 0));
+              double pseudo_res_1 = m_errorScale * std::sqrt(ev(1, 1));
               // finished calcluating, got the values -----------------------------------
 
               // calculate the semiaxis of the error ellipse ----------------------------
@@ -603,9 +602,9 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                                  (eVec3.Theta() * 180) / TMath::Pi(), (eVec3.Phi() * 180) / TMath::Pi()); // the rotation is already clear
 
             // set the scaled eigenvalues -------------------------------------------------
-            double pseudo_res_0 = errorScale_ * std::sqrt(ev(0, 0));
-            double pseudo_res_1 = errorScale_ * std::sqrt(ev(1, 1));
-            double pseudo_res_2 = errorScale_ * std::sqrt(ev(2, 2));
+            double pseudo_res_0 = m_errorScale * std::sqrt(ev(0, 0));
+            double pseudo_res_1 = m_errorScale * std::sqrt(ev(1, 1));
+            double pseudo_res_2 = m_errorScale * std::sqrt(ev(2, 2));
             // finished scaling -----------------------------------------------------------
 
             // rotate and translate -------------------------------------------------------
@@ -625,11 +624,12 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
           // draw wire hits -----------------------------------------------------------------
           if (wire_hit) {
+            const double cdcErrorScale = 1.0;
             TEveGeoShape* cov_shape = new TEveGeoShape("CDCRecoHit");
             cov_shape->IncDenyDestroy();
-            double pseudo_res_0 = errorScale_ * std::sqrt(hit_cov(0, 0));
+            double pseudo_res_0 = cdcErrorScale * std::sqrt(hit_cov(0, 0));
             double pseudo_res_1 = plane_size;
-            if (wirepoint_hit) pseudo_res_1 = errorScale_ * std::sqrt(hit_cov(1, 1));
+            if (wirepoint_hit) pseudo_res_1 = cdcErrorScale * std::sqrt(hit_cov(1, 1));
 
             cov_shape->SetShape(new TGeoTube(std::max(0., (double)(hit_u - pseudo_res_0)), hit_u + pseudo_res_0, pseudo_res_1));
             TVector3 norm = u.Cross(v);

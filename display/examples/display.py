@@ -20,7 +20,7 @@ from basf2 import *
 main = create_path()
 
 rootinput = register_module('RootInput')
-#no input file set, use -i
+# no input file set, use -i
 
 # create geometry
 gearbox = register_module('Gearbox')
@@ -41,8 +41,6 @@ display = register_module('Display')
 # H draw track hits
 # M draw track markers - intersections of track with detector planes
 # P draw detector planes
-# S scale manually - spacepoint hits are drawn as spheres and scaled with
-#   errors
 #
 # Note that you can always turn off an individual detector component or track
 # interactively by removing its checkmark in the 'Eve' tab.

@@ -228,18 +228,17 @@ namespace Belle2 {
      *      option.\n\n
      * 'H': Draw hits. This causes the hits to be visualized. Normally, the size of the hit
      *      representation is connected to the covariance matrix of the hit, scaled by the value
-     *      set in setErrScale which is normally 1. See also option 'S'. Normally used in
-     *      connection with 'D'.\n\n
+     *      set in setErrScale which is normally 1. Normally used in connection with 'D'.\n\n
      * 'M': Draw track markers. Draw the intersection points between the track and the virtual
      *      (and/or real) detector planes.
      * 'P': Draw detector planes. Draws the virtual (and/or real) detector planes.\n\n
-     * 'S': Scale manually. This leads to the spacepoint hits (and only them up to now!) being drawn
-     *      as spheres with radius 0.5 scaled with the error scale factor. Can be used if the scaling
-     *      with errors leads to problems.\n\n
      */
     void setOptions(const std::string& opts);
 
-    /** @brief Set the scaling factor for the visualization of the errors.*/
+    /** @brief Set the scaling factor for the visualization of track hit errors.
+     *
+     * (only affects PXD and SpacePoint hits, which are somewhat small
+     */
     void setErrScale(double errScale = 1.);
 
     /** If true, hits created by secondary particles (e.g. delta electrons) will be assigned to the original primary particle. */

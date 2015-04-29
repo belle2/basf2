@@ -43,21 +43,7 @@ namespace Belle2 {
     void event(); //< Show genfit::Tracks & hits in event viewer until next event is requested.
     void terminate(); //< terminate gEve to avoid problems with root's cleanup
   private:
-    /** List of drawing options, a combination of:
-     *
-     * - A autoscale errors - use when hits are too small to be seen (because of tiny errors)
-     * - D draw detectors - draw simple detector representation (with different size) for each hit
-     * - H draw track hits
-     * - M draw track markers - intersections of track with detector planes (use with T)
-     * - P draw detector planes
-     * - S scale manually - spacepoint hits are drawn as spheres and scaled with errors
-     * - T draw track (straight line between detector planes)
-     *
-     * Note that you can always turn off an individual detector component or track
-     * interactively by removing its checkmark in the 'Eve' tab.
-     *
-     * @sa EVEVisualization::setOptions()
-     */
+    /** List of drawing options, see EVEVisualization::setOptions() */
     std::string m_options;
 
     /** Show Monte Carlo information (MCParticles, SimHits). */

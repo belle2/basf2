@@ -99,6 +99,12 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclClusterToMcWeight1(0),
     m_eclClusterToMc2(0),
     m_eclClusterToMcWeight2(0),
+    m_eclClusterToMc3(0),
+    m_eclClusterToMcWeight3(0),
+    m_eclClusterToMc4(0),
+    m_eclClusterToMcWeight4(0),
+    m_eclClusterToMc5(0),
+    m_eclClusterToMcWeight5(0),
     m_eclClusterToBkgWeight(0),
     m_eclClusterSimHitSum(0),
     m_eclClusterToShower(0),
@@ -529,6 +535,12 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterToMcWeight1",      "std::vector<double>",       &m_eclClusterToMcWeight1);
   m_tree->Branch("eclClusterToMc2",      "std::vector<int>",       &m_eclClusterToMc2);
   m_tree->Branch("eclClusterToMcWeight2",      "std::vector<double>",       &m_eclClusterToMcWeight2);
+  m_tree->Branch("eclClusterToMc3",      "std::vector<int>",       &m_eclClusterToMc3);
+  m_tree->Branch("eclClusterToMcWeight3",      "std::vector<double>",       &m_eclClusterToMcWeight3);
+  m_tree->Branch("eclClusterToMc4",      "std::vector<int>",       &m_eclClusterToMc4);
+  m_tree->Branch("eclClusterToMcWeight4",      "std::vector<double>",       &m_eclClusterToMcWeight4);
+  m_tree->Branch("eclClusterToMc5",      "std::vector<int>",       &m_eclClusterToMc5);
+  m_tree->Branch("eclClusterToMcWeight5",      "std::vector<double>",       &m_eclClusterToMcWeight5);
   m_tree->Branch("eclClusterToBkgWeight",      "std::vector<double>",       &m_eclClusterToBkgWeight);
   m_tree->Branch("eclClusterSimHitSum",      "std::vector<double>",       &m_eclClusterSimHitSum);
   m_tree->Branch("eclClusterToShower",      "std::vector<int>",       &m_eclClusterToShower);
@@ -671,7 +683,10 @@ void ECLDataAnalysisModule::event()
   m_eclClusterEnergy->clear();  m_eclClusterEnergyError->clear();  m_eclClusterTheta->clear();  m_eclClusterThetaError->clear();
   m_eclClusterPhi->clear();  m_eclClusterPhiError->clear();  m_eclClusterR->clear();
   m_eclClusterIdx->clear();  m_eclClusterToMc1->clear(); m_eclClusterToMcWeight1->clear(); m_eclClusterToMc2->clear();
-  m_eclClusterToMcWeight2->clear(); m_eclClusterToMc2->clear(); m_eclClusterToBkgWeight->clear(); m_eclClusterSimHitSum->clear();
+  m_eclClusterToMcWeight2->clear(); m_eclClusterToMc3->clear();
+  m_eclClusterToMcWeight3->clear(); m_eclClusterToMc4->clear();
+  m_eclClusterToMcWeight4->clear(); m_eclClusterToMc5->clear();
+  m_eclClusterToMcWeight5->clear(); m_eclClusterToBkgWeight->clear(); m_eclClusterSimHitSum->clear();
   m_eclClusterToShower->clear(); m_eclClusterToTrack->clear();
   m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear();
@@ -856,44 +871,89 @@ void ECLDataAnalysisModule::event()
     m_eclClusterBeta->push_back(aECLClusters->getbeta());
 
     double sumHit = 0;
-    double maxE = 0;
-    int idx1 = -1;
-    int idx2 = -1;
+    int idx[10];
+    for (int i = 0; i < 10; i++)
+      idx[i] = -1;
+
     if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
       //int rel=0;
       //std::cout << "Entries: " << (int)ECLClusterToMC.getEntries() << std::endl;
       //std::cout << "Entries: " << (int)aECLClusters->getRelationsFrom<ECLCluster> << std::endl;
       //for (auto MCpart : aECLClusters->getRelationsTo<MCParticle>()) {
       //m_eclClusterToMc->push_back(MCpart.getArrayIndex());
+      int ii = 0;
       for (int rel = 0; rel < (int)ECLClusterToMC.getEntries(); rel++) {
         if (ECLClusterToMC[rel].getFromIndex() == iclusters) {
           //m_eclClusterToMc->push_back(ECLClusterToMC[rel].getToIndex());
           //m_eclClusterToMcWeight->push_back(ECLClusterToMC[rel].getWeight());
-          if (ECLClusterToMC[rel].getWeight() > maxE) {
-            idx2 = idx1;
-            idx1 = rel;
+          if ((ECLClusterToMC[rel].getWeight() > 0) && (rel < 10)) {
+            idx[ii] = rel;
+            ii++;
           }
           sumHit = sumHit + (double)ECLClusterToMC[rel].getWeight();
-          //std::cout << "Cluster: " << iclusters  << " MCCandidate: " << ECLClusterToMC[rel].getToIndex() << ", Weight: " << ECLClusterToMC[rel].getWeight() << "     " << rel << " Sum: " << sumHit << std::endl;
-          //rel++;
         }
       }
-      m_eclClusterToMc1->push_back(ECLClusterToMC[idx1].getToIndex());
-      m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx1].getWeight());
-      if (idx2 > -1) {
-        m_eclClusterToMc2->push_back(ECLClusterToMC[idx2].getToIndex());
-        m_eclClusterToMcWeight2->push_back(ECLClusterToMC[idx2].getWeight());
-      } else {
-        m_eclClusterToMc2->push_back(-1);
-        m_eclClusterToMcWeight2->push_back(-1);
+      int max = 0;
+      if ((int)ECLClusterToMC.getEntries() > 9)
+        max = 9;
+      else
+        max = (int)ECLClusterToMC.getEntries();
+
+      int y = 0;
+      while (y < max) {
+        for (int i = 0; i < max; i++) {
+          //cout << "Idx1: " << idx[i] << " Idx2: " << idx[i+1] << endl;
+          if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
+            if (ECLClusterToMC[idx[i]].getWeight() < ECLClusterToMC[idx[i + 1]].getWeight()) {
+              int temp = idx[i];
+              idx[i] = idx[i + 1];
+              idx[i + 1] = temp;
+            }
+          }
+        }
+        y++;
       }
       m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
       m_eclClusterSimHitSum->push_back(sumHit);
+      m_eclClusterToMc1->push_back(idx[0]);
+      //cout << idx[0] << endl;
+      if (idx[0] > -1)
+        m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx[0]].getWeight());
+      else
+        m_eclClusterToMcWeight1->push_back(-1);
+      m_eclClusterToMc2->push_back(idx[1]);
+      //cout << idx[1] << endl;
+      if (idx[1] > -1)
+        m_eclClusterToMcWeight2->push_back(ECLClusterToMC[idx[1]].getWeight());
+      else
+        m_eclClusterToMcWeight2->push_back(-1);
+      //cout << idx[2] << endl;
+      m_eclClusterToMc3->push_back(idx[2]);
+      if (idx[2] > -1)
+        m_eclClusterToMcWeight3->push_back(ECLClusterToMC[idx[2]].getWeight());
+      else
+        m_eclClusterToMcWeight3->push_back(-1);
+      m_eclClusterToMc4->push_back(idx[3]);
+      if (idx[3] > -1)
+        m_eclClusterToMcWeight4->push_back(ECLClusterToMC[idx[3]].getWeight());
+      else
+        m_eclClusterToMcWeight4->push_back(-1);
+      m_eclClusterToMc5->push_back(idx[4]);
+      if (idx[4] > -1)
+        m_eclClusterToMcWeight5->push_back(ECLClusterToMC[idx[4]].getWeight());
+      else
+        m_eclClusterToMcWeight5->push_back(-1);
     } else {
       m_eclClusterToMc1->push_back(-1);
       m_eclClusterToMcWeight1->push_back(-1);
       m_eclClusterToMc2->push_back(-1);
       m_eclClusterToMcWeight2->push_back(-1);
+      m_eclClusterToMc3->push_back(-1);
+      m_eclClusterToMcWeight3->push_back(-1);
+      m_eclClusterToMc4->push_back(-1);
+      m_eclClusterToMcWeight4->push_back(-1);
+      m_eclClusterToMc5->push_back(-1);
+      m_eclClusterToMcWeight5->push_back(-1);
       m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
       m_eclClusterSimHitSum->push_back(-1);
     }

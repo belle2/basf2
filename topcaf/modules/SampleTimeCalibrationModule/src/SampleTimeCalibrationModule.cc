@@ -32,8 +32,9 @@ SampleTimeCalibrationModule::SampleTimeCalibrationModule() : Module()
 
   addParam("Conditions", m_conditions,
            "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
-  addParam("IOV_initialRun", m_initial_run, "Initial run for the interval of validity for this calibration", std::string("NULL"));
-  addParam("IOV_finalRun", m_final_run, "Final run for the interval of validity for this calibration", std::string("NULL"));
+  addParam("IOV_initialRunID", m_initial_run, "Initial run ID for the interval of validity for this calibration",
+           std::string("NULL"));
+  addParam("IOV_finalRunID", m_final_run, "Final run ID for the interval of validity for this calibration", std::string("NULL"));
 
   addParam("InputFileName", m_in_filename, "Input filename used if Mode==1 and Conditions==0", std::string());
   addParam("WriteFile", m_writefile, "Do not write file - 0 ; Write to local root file - 1 ", 0);

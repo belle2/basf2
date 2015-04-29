@@ -31,14 +31,10 @@ variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH',
 # Define one or multiple methods.
 # Every definition consists of 3 string. First the name of the method, secondly the type and thirdly a TMVA config string
 methods = [
-    ('Fisher', 'Fisher',
-     '!H:!V:Fisher:VarTransform=None:CreateMVAPdfs:PDFInterpolMVAPdf=Spline2:NbinsMVAPdf=50:NsmoothMVAPdf=10'),
     ('BDTGradient', 'BDT',
-     '!H:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2'),
-    ('PDEFoamBoost', 'PDEFoam',
-     '!H:!V:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T'),
+     '!H:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:GradBaggingFraction=0.5:nCuts=256:MaxDepth=3'),
     ('FastBDT', 'Plugin',
-     '!H:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
+     '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
 ]
 
 # Add TMVA Teacher to path
@@ -48,7 +44,7 @@ teacher.param('methods', methods)
 teacher.param('variables', variables)
 teacher.param('spectators', ['nTracks', 'nClusters'])
 teacher.param('target', 'isSignal')
-teacher.param('weight', 'constant(100.1)')
+teacher.param('weight', 'constant(1.0)')
 teacher.param('prepareOption', '!V:SplitMode=random:NormMode=None')
 teacher.param('listNames', 'e-')
 main.add_module(teacher)

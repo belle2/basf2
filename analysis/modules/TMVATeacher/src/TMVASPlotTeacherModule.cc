@@ -73,7 +73,7 @@ namespace Belle2 {
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory",
              std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
     addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree",
-             std::string("SplitMode=random:!V"));
+             std::string("!V:SplitMode=alternate:MixMode=Block:NormMode=None"));
     addParam("createMVAPDFs", m_createMVAPDFs,
              "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.",
              true);

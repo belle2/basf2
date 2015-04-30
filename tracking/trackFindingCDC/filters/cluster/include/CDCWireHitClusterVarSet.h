@@ -28,18 +28,25 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const clusterNames[11] = {
-      "avg_n_neignbors", // TODO: correct name and ordering once we can retrain the analysis.
-      "distance_to_superlayer_center",
+    static char const* const clusterNames[14] = {
       "is_stereo",
-      "mean_drift_length",
-      "mean_inner_distance",
-      "size",
       "superlayer_id",
+      "size",
+
+      "total_number_of_neighbors",
+      "mean_number_of_neighbors",
+
       "total_drift_length",
-      "total_inner_distance",
-      "total_n_neighbors",
+      "mean_drift_length",
       "variance_drift_length",
+
+      "total_inner_distance",
+      "mean_inner_distance",
+      "distance_to_superlayer_center",
+
+      "total_adc_count",
+      "mean_adc_count",
+      "variance_adc_count"
     };
 
     /** Class that specifies the names of the variables
@@ -49,7 +56,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 11;
+      static const size_t nNames = 14;
 
       /// Names of the variables to be generated.
       // IF_NOT_CINT(constexpr)

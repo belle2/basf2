@@ -47,49 +47,69 @@ bool CDCWireHitClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
   double totalDriftLength = 0;
   double totalDriftLengthSquared = 0;
   double driftVariance = 0;
+  double totalADCCount = 0;
+  double totalADCCountSquared = 0;
+  double adcCountVariance;
+
   for (const CDCWireHit* wireHit : cluster) {
     assert(wireHit);
     // Clusterizer writes the number of neighbors into the cell weight
     int nNeighbors = wireHit->getAutomatonCell().getCellWeight();
     totalNNeighbors += nNeighbors;
 
-    // hit position informnamedion
+    // hit position information
     totalInnerDistance += wireHit->getRefPos2D().norm();
 
-    // Drift circle informnamedion
+    // Drift circle information
     double driftLength = wireHit->getRefDriftLength();
     totalDriftLength += driftLength;
     totalDriftLengthSquared += driftLength * driftLength;
+
+    // ADC information
+    double adc = static_cast<double>(wireHit->getHit()->getADCCount());
+    totalADCCount += adc;
+    totalADCCountSquared += adc * adc;
   }
 
   if (size > 1) {
-    double varianceSquared = (totalDriftLengthSquared - totalDriftLength * totalDriftLength / size)  / (size - 1.0) ;
+    double driftLengthVarianceSquared = (totalDriftLengthSquared - totalDriftLength * totalDriftLength / size)  / (size - 1.0) ;
+    double adcVarianceSquared = (totalADCCountSquared - totalADCCount * totalADCCount / size)  / (size - 1.0) ;
 
-    if (varianceSquared > 0) {
-      driftVariance = std::sqrt(varianceSquared);
-
+    if (driftLengthVarianceSquared > 0) {
+      driftVariance = std::sqrt(driftLengthVarianceSquared);
     } else {
       driftVariance = 0;
+    }
 
+    if (adcVarianceSquared > 0) {
+      adcCountVariance = std::sqrt(adcVarianceSquared);
+    } else {
+      adcCountVariance = 0;
     }
 
   } else {
     driftVariance = -1;
+    adcCountVariance = -1;
   }
 
   var<named("is_stereo")>() = cluster.getStereoType() != AXIAL;
   var<named("size")>() = size;
 
-  var<named("total_n_neighbors")>() = totalNNeighbors;
+  var<named("total_number_of_neighbors")>() = totalNNeighbors;
   var<named("total_drift_length")>() = totalDriftLength;
+  var<named("total_adc_count")>() = totalADCCount;
   var<named("total_inner_distance")>() = totalInnerDistance;
+
   var<named("variance_drift_length")>() = driftVariance;
+  var<named("variance_adc_count")>() = adcCountVariance;
 
   var<named("distance_to_superlayer_center")>() = m_superLayerCenters[superlayerID] - totalInnerDistance / size;
   var<named("superlayer_id")>() = superlayerID;
+
   var<named("mean_drift_length")>() = totalDriftLength / size;
+  var<named("mean_adc_count")>() = totalADCCount / size;
   var<named("mean_inner_distance")>() = totalInnerDistance / size;
-  var<named("avg_n_neignbors")>() = 1.0 * totalNNeighbors / size;
+  var<named("mean_number_of_neighbors")>() = 1.0 * totalNNeighbors / size;
   return true;
 }
 

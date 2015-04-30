@@ -77,9 +77,9 @@ class FastBDTClassifier(object):
         # Remove the variables that have Monte Carlo truth information unless explicitly selected
         variable_names = [name for name
                           in variable_names
-                          if "truth" in not name or name in select]
+                          if "truth" not in name or name in select]
 
-        if "weight" in variable_names and "weight" in not select:
+        if "weight" in variable_names and "weight" not in select:
             variable_names.remove("weight")
 
         for variable_name in variable_names:

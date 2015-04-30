@@ -7,7 +7,7 @@
 
 const char* col_status(const char* ip_addr)
 {
-  static char server_reply[1024];
+  static char server_reply[10240];
   int sock;
   struct sockaddr_in server;
   char message[100];
@@ -28,7 +28,7 @@ const char* col_status(const char* ip_addr)
   //Connect to remote server
   if (connect(sock , (struct sockaddr *)&server, sizeof(server)) < 0) {
     printf("Fault: connection error\n");
-    return 1;
+    return NULL;
   }
 
   message[0] = 'S';

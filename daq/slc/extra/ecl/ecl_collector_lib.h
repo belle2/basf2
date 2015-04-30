@@ -22,6 +22,10 @@ int sh_reg_io(const char* ip_addr, const char* opt,
               int sh_num, int mem_addr, int reg_wdata,
               int* sh_reg_data, char* msg);
 
+int col_reg_io(const char* ip_addr, const char* opt,
+               int mem_addr, int reg_wdata,
+               int* reg_data, char* msg);
+
 #ifdef __cplusplus
 }
 #endif

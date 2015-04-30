@@ -15,6 +15,7 @@ int main(int argc, char** argv)
     LogFile::debug("usage: %s <tablename> [<prefix>]", argv[0]);
     return 1;
   }
+
   const std::string tablename = argv[1];
   const std::string prefix = (argc > 2) ? argv[2] : "";
   ConfigFile config("slowcontrol");

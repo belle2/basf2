@@ -22,6 +22,7 @@ namespace Belle2 {
     bool init(int shm_num, int mem_addr) throw(IOException);
     int read(int sh_num, int mem_addr) throw(IOException);
     int write(int sh_num, int mem_addr, int reg_wdata) throw(IOException);
+    int col_write(int mem_addr, int reg_wdata) throw(IOException);
 
   public:
     int getId() const throw() { return m_id; }

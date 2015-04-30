@@ -45,7 +45,7 @@ int sh_boot(const char* ip_addr, int sh_num, unsigned int mem_addr)
   }
 
   // wait for Init DONE message
-  do{
+  do {
     if( (recv_len=recv(sock , server_reply , 1000 , 0)) < 0) {
       printf("Fault: recv failed\n");
       close(sock);

@@ -25,17 +25,11 @@ rctemplated:
 
 copyinc:
 	@ mkdir -p bin
+	@ mkdir -p lib
 	@ for dir in $(SUBPACKAGES); \
 	  do mkdir -p $(INCDIR)/$$dir; install -m 644 -p $$dir/include/* $(INCDIR)/$$dir; done
-	@ mkdir -p lib
 	@ mkdir -p include/nsm2
-	@ make -C ./extra/nsm2
-	@ install -m 644 -p ./extra/nsm2/corelib/*.h include/nsm2
-	@ install -m 644 -p ./extra/nsm2/b2lib/*.h include/nsm2
-	@ install -m 644 -p ./extra/nsm2/corelib/*.so $(LIBDIR)
-	@ install -m 644 -p ./extra/nsm2/b2lib/*.so $(LIBDIR)
-	@ install -m 755 -p ./extra/nsm2/daemon/nsmd2 $(BINDIR)
-	@ install -m 755 -p ./extra/nsm2/daemon/nsminfo2 $(BINDIR)
+	@ make nsmlib
 	@ mkdir -p include/mgt
 	@ make -C extra/mgt BELLE2_EXTERNALS_DIR=$(PWD)
 	@ mkdir -p include/ttrx
@@ -55,5 +49,30 @@ clean:
 	@ make -C ./extra clean
 	@ make -C ./extra/nsm2/example clean
 	@ rm -rf *~ \#*~ .*~ */*~ */*/*~
+
+nsmlib: lib/libnsm2_b2lib.so lib/libnsm2_corelib.so nsmlib_daemon 
+
+nsmlib_b2lib: lib/libnsm2_b2lib.so
+
+lib/libnsm2_b2lib.so: extra/nsm2/b2lib/*.h extra/nsm2/b2lib/*.c
+	@ make -C extra/nsm2/b2lib
+	@ install -m 644 -p ./extra/nsm2/b2lib/*.h include/nsm2
+	@ install -m 644 -p ./extra/nsm2/b2lib/*.so $(LIBDIR)
+
+nsmlib_corelib: lib/libnsm2_corelib.so
+
+lib/libnsm2_corelib.so: extra/nsm2/corelib/*.c 
+	@ make -C extra/nsm2/corelib
+	@ install -m 644 -p ./extra/nsm2/corelib/*.h include/nsm2
+	@ install -m 644 -p ./extra/nsm2/corelib/*.so $(LIBDIR)
+
+nsmlib_daemon: $(BINDIR)/nsmd2 $(BINDIR)/nsminfo2
+
+$(BINDIR)/nsmd2: extra/nsm2/daemon/nsmd2.cc 
+	@ make -C extra/nsm2/daemon
+	@ install -m 755 -p ./extra/nsm2/daemon/nsmd2 $(BINDIR)
+
+$(BINDIR)/nsminfo2: extra/nsm2/daemon/nsminfo2.cc 
+	@ install -m 755 -p ./extra/nsm2/daemon/nsminfo2 $(BINDIR)
 
 

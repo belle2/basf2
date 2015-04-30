@@ -181,8 +181,9 @@ void NSM2SocketBridge::nsmdataget(int revision,
 {
   const NSMNode& node(m_callback->getNode());
   try {
-    NSMData& data(m_callback->getData(name, format, revision));
+    m_callback->getData(name, format, revision);
     /*
+    NSMData& data(m_callback->getData(name, format, revision));
     if (data.isAvailable()) {
       send(NSMMessage(node, NSMCommand::DATASET), data);
     }

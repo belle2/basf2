@@ -76,3 +76,9 @@ package: daemon/nsm2.h
 	@echo
 	tar cf - daemon/nsm2.h $(FILES)  | gzip -9 \
 	> tgz/nsm2-$(shell sed -n '/NSM_PACKAGE_VERSION/s/.*ION *\([0-9]*\) .*/\1/p' daemon/nsm2.h).tgz
+
+install: ${BELLE2_EXTERNALS_DIR}/src/nsm2/daemon/Makefile
+
+${BELLE2_EXTERNALS_DIR}/src/nsm2/daemon/Makefile: daemon/Makefile
+	@sh ${BELLE2_LOCAL_DIR}/daq/slc/extra/nsm2/export.sh
+

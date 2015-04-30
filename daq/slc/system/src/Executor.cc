@@ -39,7 +39,7 @@ void Executor::addArg(const std::string& arg)
   m_arg_v.push_back(arg);
 }
 
-bool Executor::execute()
+bool Executor::execute(bool isdaemon)
 {
   char* argv[30];
   argv[0] = (char*)m_path.c_str();
@@ -50,6 +50,7 @@ bool Executor::execute()
   }
   std::cerr << std::endl;
   argv[m_arg_v.size() + 1] = NULL;
+  if (isdaemon) daemon(0, 0);
   if (execvp(m_path.c_str(), argv) == -1) {
     LogFile::error("Faield to start %s", argv[0]);
     return false;

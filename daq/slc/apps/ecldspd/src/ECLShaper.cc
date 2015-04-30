@@ -60,3 +60,15 @@ int ECLShaper::write(int sh_num, int mem_addr, int reg_wdata) throw(IOException)
   return true;
 }
 
+int ECLShaper::col_write(int mem_addr, int reg_wdata) throw(IOException)
+{
+  int err;
+  char msg[255];
+  memset(msg, 0, 255);
+  if ((err = col_reg_io(m_host.c_str(), "w", mem_addr,
+                        reg_wdata, m_reg_data, msg)) > 0) {
+    throw (IOException(err, "Failed to write to Shaper : %s", msg));
+  }
+  return true;
+}
+

@@ -21,12 +21,14 @@ int sh_reg_io(const char* ip_addr, const char* opt,
 
   if((rc = ecl_udp_init_ip(ip_addr))!=0) {
     sprintf(msg, "Can not init network (%d,%d)\n", rc, errno);
+    ecl_udp_close();
     return 2;
   }
   sh_mask = (sh_num == 15)? 0xFFF :1 << sh_num;
 
   if((rc = ecl_udp_read_reg(_ECL_COLLECTOR_REG_DL_LOCKED, &reg_data)) != 0) {
     sprintf(msg, "ecl_udp_read_reg() fault (%d,%d)\n", rc, errno);
+    ecl_udp_close();
     return 3;
   }
 
@@ -35,6 +37,7 @@ int sh_reg_io(const char* ip_addr, const char* opt,
   
   if((rc = ecl_udp_read_reg(_ECL_COLLECTOR_REG_DL_READ_PEND, &reg_data)) != 0) {
     sprintf(msg, "ecl_udp_read_reg() fault (%d,%d)\n", rc, errno);
+    ecl_udp_close();
     return 4;
   }
 
@@ -45,26 +48,30 @@ int sh_reg_io(const char* ip_addr, const char* opt,
       if((sh_mask_i&1)!=0) {
 	if( (rc = ecl_udp_read_reg(_ECL_COLLECTOR_REG_DL_NEXT_PCT_BASE + sh_num_i, &reg_data)) != 0) {
 	  sprintf(msg, "ecl_udp_read_reg() fault (%d,%d)\n", rc, errno);
+	  ecl_udp_close();
 	  return 5;
 	}
 	if((rc = ecl_udp_write_reg(_ECL_COLLECTOR_REG_DL_REF_PCT_BASE + sh_num_i, reg_data)) != 0) {
 	  sprintf(msg, "ecl_udp_write_reg() fault (%d,%d)\n", rc, errno);
+	  ecl_udp_close();
 	  return 6;
 	}
       }
     }
     if((rc = ecl_udp_read_reg(_ECL_COLLECTOR_REG_DL_READ_PEND, &reg_data)) != 0) {
       sprintf(msg, "ecl_udp_read_reg() fault (%d,%d)\n", rc, errno);
+      ecl_udp_close();
       return 7;
     }
     if((sh_mask & reg_data) != 0) {
       sprintf(msg, "ERROR: deser buffer still is not empty and flushing doesn't help: DL_READ_PEND=%04X, shaper mask=%04X\n", 
 	      reg_data, sh_mask);
+      ecl_udp_close();
       return 8;
     }
   }
 
-  if(strcmp(opt, "r") == 0) {
+  if(strcmp(opt, "r") == 0 && sh_reg_data != NULL) {
     sh_read_reg(sh_num, reg_num, sh_reg_data, &read_ok_mask);
     for(sh_num_i = 0, sh_mask_i = sh_mask, read_ok_mask_i = read_ok_mask; 
 	sh_num_i < 12; sh_num_i++, sh_mask_i >>= 1, read_ok_mask_i >>= 1 ) {
@@ -84,6 +91,7 @@ int sh_reg_io(const char* ip_addr, const char* opt,
       }
     }
   }
+  ecl_udp_close();
   return 0;
 }
 

@@ -357,7 +357,7 @@ struct dhhc_onsen_roi_frame {
     B2INFO("DHHC HLT/ROI Frame");
   };
 
-  unsigned int check_inner_crc(unsigned int length) const
+  unsigned int check_inner_crc(unsigned int /*length*/) const
   {
     /// Parts of the data are now in the ONSEN Trigger frame, therefore the inner CRC cannot be checked that easily!
     // TODO can be re-implemented if needed
@@ -863,11 +863,13 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 };
 
-void PXDUnpackerModule::unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo,
-                                   unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
+// PQ: Commented out argument names to prevent compiler warnings about unused arguments
+void PXDUnpackerModule::unpack_fce(void* /*data*/, unsigned int /*frame_len*/, unsigned int /*dhh_first_readout_frame_id_lo*/,
+                                   unsigned int /*dhh_ID*/, unsigned /*dhh_DHPport*/, unsigned /*dhh_reformat*/, unsigned short /*toffset*/, VxdID /*vxd_id*/)
 {
-  unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  ubig16_t* dhp_fce = (ubig16_t*)data;
+  // PQ: Commented out to prevent compiler warning about a variable not used.
+  //unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
+  //ubig16_t* dhp_fce = (ubig16_t*)data;
 
   /// Actually, the format is not fixed yet, thus any depacking is guessing right now :-/
   /// It seems, there is nod DHP Frame header here

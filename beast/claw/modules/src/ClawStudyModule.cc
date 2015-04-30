@@ -64,7 +64,7 @@ ClawStudyModule::~ClawStudyModule()
 void ClawStudyModule::defineHisto()
 {
   h_time = new TH2F("h_time", "Detector # vs. time", 16, 0., 16., 750, 0., 750.);
-  h_timeWeighted = new TH2F("h_timeWeigthed", "Detector # vs. time weighted by the energy deposited", 16, 0., 16., 750, 0., 600.);
+  h_timeWeighted = new TH2F("h_timeWeigthed", "Detector # vs. time weighted by the energy deposited", 16, 0., 16., 750, 0., 750.);
   h_edep = new TH2F("h_edep", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
   h_edepThres = new TH2F("h_edepThres", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
 

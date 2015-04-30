@@ -18,7 +18,8 @@
     <ScintCell>16</ScintCell>
     <TimeStep>0.8</TimeStep>
     <MinTime>0.0</MinTime>
-    <MaxTime>750.0</MaxTime>
+    <MaxTime>600.0</MaxTime>
+    <Ethres>0.0</Ethres>
     <ConvFac>1.0</ConvFac>
 
     <Active>

@@ -52,9 +52,11 @@ void ConditionsService::GetPayloads(std::string GlobalTag, std::string Experimen
   if (curl) {
     std::string REST_payloads = m_RESTbase + "payloads/?gtName=" + GlobalTag + "&expName=" + ExperimentName + "&runName=" + RunName;
     B2INFO("rest payload call: " << REST_payloads);
+    m_buffer.clear();
     curl_easy_setopt(curl, CURLOPT_URL, REST_payloads.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, parse_payloads);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, capture_return);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&count);
+    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // For debug.
 
     res = curl_easy_perform(curl);
 
@@ -64,6 +66,7 @@ void ConditionsService::GetPayloads(std::string GlobalTag, std::string Experimen
 
     curl_easy_cleanup(curl);
   }
+  parse_payloads(m_buffer);
 
   B2INFO("Conditions service retrieved " << m_run_payloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
          RunName << " listed under global tag " << GlobalTag);
@@ -103,17 +106,17 @@ void DisplayNodes(TXMLEngine* xml, XMLNodePointer_t node, Int_t level)
 }
 
 
-size_t ConditionsService::parse_return(void* buffer, size_t size, size_t nmemb, void* /*userp*/)
+void ConditionsService::parse_return(std::string temp)
 {
 
-  std::string temp(static_cast<const char*>(buffer), size * nmemb);
-
-  //int count = *((int*)userp);
-  //count = 0;
 
   TXMLEngine* xml = new TXMLEngine;
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
+  if (xmldoc == 0) {
+    B2FATAL("corrupt return from REST call: " << temp.c_str());
+  }
+
 
   // take access to main node
   XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
@@ -121,42 +124,52 @@ size_t ConditionsService::parse_return(void* buffer, size_t size, size_t nmemb, 
   // display recursively all nodes and subnodes
   DisplayNodes(xml, mainnode, 1);
 
-  return size * nmemb;
 }
 
-size_t ConditionsService::parse_payloads(void* buffer, size_t size, size_t nmemb, void* userp)
+size_t ConditionsService::capture_return(void* buffer, size_t size, size_t nmemb, void* userp)
 {
 
   std::string temp(static_cast<const char*>(buffer), size * nmemb);
-
-  //  B2INFO("Rest return: "<<temp);
-
   int count = *((int*)userp);
+  count = 1;
+  ConditionsService::GetInstance()->AddReturn(temp);
+  return size * nmemb * count;
+
+}
+
+
+void ConditionsService::parse_payloads(std::string temp)
+{
 
   TXMLEngine* xml = new TXMLEngine;
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
+  if (xmldoc == 0) {
+    B2FATAL("corrupt return from REST call: " << temp.c_str());
+  }
 
   // take access to main node
   XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
 
   // display recursively all nodes and subnodes
-  //  DisplayNodes(xml, mainnode, 1);
+  //DisplayNodes(xml, mainnode, 1);
 
   // parse the payloads
   XMLNodePointer_t payload_node = xml->GetChild(mainnode);
-  XMLNodePointer_t child_node = xml->GetChild(payload_node);
+  XMLNodePointer_t child_node;
 
   std::string PackageName, ModuleName, PayloadURL, Checksum;
 
-  count = 0;
+  XMLAttrPointer_t attr;
+  std::string nodeName;
 
   while (payload_node) {
 
-    std::string nodeName = xml->GetNodeName(payload_node);
-    //    B2INFO("Parsing payload... "<<nodeName);
+    nodeName = xml->GetNodeName(payload_node);
+    attr = xml->GetFirstAttr(payload_node);
+    B2INFO("Parsing payload... " << nodeName << " with id " << xml->GetAttrValue(attr));
     if (nodeName == "payload") { /// Found a payload, now parse the needed information.
-      count++;
+      child_node = xml->GetChild(payload_node);
       while (child_node) { // Search for the module
         nodeName = xml->GetNodeName(child_node);
 
@@ -198,11 +211,13 @@ size_t ConditionsService::parse_payloads(void* buffer, size_t size, size_t nmemb
         B2ERROR("ConditionsService::parse_payload Payload not parsed correctly.");
       } else {
         std::string payloadKey = PackageName + ModuleName;
+        if (ConditionsService::GetInstance()->PayloadExists(payloadKey)) {
+          B2FATAL("Found duplicate payload key " << payloadKey << " while parsing conditions payloads. ");
+        }
         B2INFO("Found payload for module " << ModuleName << " in package " << PackageName << " at URL " << PayloadURL <<
                ".  Storing with key: " << payloadKey << " and checksum: " << Checksum);
         ConditionsService::GetInstance()->AddPayloadURL(payloadKey, PayloadURL);
         ConditionsService::GetInstance()->AddChecksum(payloadKey, Checksum);
-
       }
     }
     payload_node = xml->GetNext(payload_node);
@@ -212,8 +227,6 @@ size_t ConditionsService::parse_payloads(void* buffer, size_t size, size_t nmemb
   xml->FreeDoc(xmldoc);
   delete xml;
 
-
-  return size * nmemb;
 
 }
 
@@ -227,6 +240,10 @@ void ConditionsService::WritePayloadFile(std::string payloadFileName,
 
   if (!checksum) {
     B2ERROR("Error calculating checksum for file " << payloadFileName << ".  Are you sure it exists?");
+    return;
+  }
+  if (checksum->AsString() == std::string("d41d8cd98f00b204e9800998ecf8427e")) {
+    B2ERROR("Found empty file md5sum for " << payloadFileName << ", cowardly refusing to add file to conditions DB.");
     return;
   }
   std::string username = "BASF2 Conditions User";
@@ -273,12 +290,13 @@ void ConditionsService::WritePayloadFile(std::string payloadFileName,
   curl = curl_easy_init();
   if (curl) {
 
+    m_buffer.clear();
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
     curl_easy_setopt(curl, CURLOPT_URL, REST_payloads.c_str());
     curl_easy_setopt(curl, CURLOPT_USERNAME, username.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, parse_return);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, capture_return);
     curl_easy_setopt(curl, CURLOPT_HTTPPOST, post);
 
     res = curl_easy_perform(curl);
@@ -287,6 +305,7 @@ void ConditionsService::WritePayloadFile(std::string payloadFileName,
     }
 
     curl_easy_cleanup(curl);
+    parse_return(m_buffer);
   }
 
 }
@@ -301,14 +320,16 @@ size_t ConditionsService:: write_data(void* ptr, size_t size, size_t nmemb, FILE
 std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::string moduleName)
 {
 
-
+  if (!PayloadExists(packageName + moduleName)) {
+    B2FATAL("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
+  }
   std::string remote_file = m_run_payloads[packageName + moduleName];
   std::string local_file = m_FILEbase + remote_file; // This will work for local files and CVMFS.
 
 
 
   if (m_FILEbase.substr(0, 7) == "http://") { // May need to transfer files locally.
-    local_file = "/tmp/" + boost::filesystem::path(remote_file).filename().string();
+    local_file = m_FILElocal + boost::filesystem::path(remote_file).filename().string();
     TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
 
     remote_file = m_FILEbase + remote_file;
@@ -324,18 +345,21 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
       if (curl) {
         fp = fopen(local_file.c_str(), "wb");
         curl_easy_setopt(curl, CURLOPT_URL, remote_file.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
+        curl_easy_setopt(curl, CURLOPT_AUTOREFERER, true);
         //  curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_func);
 
         res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-          B2ERROR("curl_easy_perform() failed: " << curl_easy_strerror(res));
-        }
 
         curl_easy_cleanup(curl);
+
         fclose(fp);
+
+        if (res != CURLE_OK) {
+          B2ERROR("libcurl error code " << res << " trying to download file.")
+        }
       }
       checksum = TMD5::FileChecksum(local_file.c_str()); // check checksum
     } else if (checksum->AsString() == m_run_checksums[packageName + moduleName]) {
@@ -348,28 +372,34 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
     while (checksum->AsString() != m_run_checksums[packageName + moduleName]) { // then there was a checksum mis-match
       gSystem->Sleep(1000);
       checksum_new = TMD5::FileChecksum(local_file.c_str()); // check checksum again
-      if (checksum->AsString() != checksum_new->AsString()) {   // Then we are downloading the file already.
-        B2INFO("File with incorrect checksum found, download appears to be occuring... waiting for file to complete");
+      if (std::string(checksum->AsString()) != std::string(checksum_new->AsString())) {   // Then we are downloading the file already.
+        B2INFO("File with incorrect checksum found, download appears to be occuring... waiting for file to complete ");
+        B2INFO("checksum: " << checksum->AsString() << "\tchecksum_new: " << checksum_new->AsString());
         checksum = checksum_new;
       } else { // File isn't downloading, but checksums don't match.  Throw an error.
-        B2ERROR("Error with file " << local_file.c_str() << " checksum expected: " << m_run_checksums[packageName + moduleName] <<
-                " found: " << checksum);
+        B2FATAL("Error with file " << local_file.c_str() << " checksum expected: " << m_run_checksums[packageName + moduleName] <<
+                " found: " << checksum->AsString());
+        return NULL;
       }
+
     }
   }
 
   TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
   if (!checksum) { // file isn't there.  Toss an error.
     B2ERROR("Did not find file " << local_file << " check inputs.");
-  } else if (checksum->AsString() != m_run_checksums[packageName + moduleName]) { // MD5 checksum doesn't match the database entry.
-    B2ERROR("Conditions file " << local_file << " error! Expected MD5 checksum " << m_run_checksums[packageName + moduleName] <<
+  } else if (std::string(checksum->AsString()) != m_run_checksums[packageName +
+             moduleName]) { // MD5 checksum doesn't match the database entry.
+    B2FATAL("Conditions file " << local_file << " error! Expected MD5 checksum " << m_run_checksums[packageName + moduleName] <<
             " and calculated checksum " << checksum->AsString());
+    return NULL;
   }
 
   return local_file;
 }
 
-int ConditionsService::progress_func(void* /*ptr*/, double TotalToDownload, double NowDownloaded,
+/*
+int ConditionsService::progress_func(void* ptr, double TotalToDownload, double NowDownloaded,
                                      double TotalToUpload, double NowUploaded)
 {
   // how wide you want the progress meter to be
@@ -402,3 +432,4 @@ int ConditionsService::progress_func(void* /*ptr*/, double TotalToDownload, doub
   // if you don't return 0, the transfer will be aborted - see the documentation
   return 0;
 }
+*/

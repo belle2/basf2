@@ -46,6 +46,7 @@ namespace Belle2 {
 
       /**  */
       virtual void endRun();
+
       /**  */
       virtual void terminate();
 
@@ -56,6 +57,7 @@ namespace Belle2 {
       virtual void getXMLData();
 
     private:
+      /** Event number */
       int Event = 0;
       /** number of pixels */
       int m_nofPixels;

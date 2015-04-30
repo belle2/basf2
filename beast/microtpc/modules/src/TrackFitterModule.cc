@@ -340,12 +340,10 @@ void TrackFitterModule::event()
         min->ExecuteCommand("SET NOWARNINGS", arglist, 0);
 
         XYZVector temp_vector3(0, 0, 0);
-        float init_theta = 0.;
-        float init_phi = 0.;
         float pStart[5] = {0, 0, 0, 0, 0};
         temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]], z[iz[fpxhits - 1]] - z[iz[0]]);
-        init_theta = temp_vector3.Theta();
-        init_phi   = temp_vector3.Phi();
+        float init_theta = temp_vector3.Theta();
+        float init_phi = temp_vector3.Phi();
         pStart[0] = x[ix[0]];
         pStart[1] = y[iy[0]];
         pStart[2] = z[iz[0]];

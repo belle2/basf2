@@ -41,15 +41,18 @@ namespace Belle2 {
       Sample():
         m_arrayIndex(0), m_cellID(0), m_iTime(0), m_charge(0) {}
       /** Less-than operator */
-      bool operator<(const Sample& b)  const {
+      bool operator<(const Sample& b)  const
+      {
         return (m_cellID < b.getCellID()) || (m_cellID == b.getCellID() && m_iTime < b.getSampleIndex());
       }
       /** Greater-than operator */
-      bool operator>(const Sample& b)  const {
+      bool operator>(const Sample& b)  const
+      {
         return (m_cellID > b.getCellID()) || (m_cellID == b.getCellID() && m_iTime > b.getSampleIndex());
       }
       /** Equality operator */
-      bool operator==(const Sample& b) const {
+      bool operator==(const Sample& b) const
+      {
         return m_cellID == b.getCellID() && m_iTime == b.getSampleIndex();
       }
       /** Shorthand to get the sample time */

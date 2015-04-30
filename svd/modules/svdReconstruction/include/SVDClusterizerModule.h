@@ -69,6 +69,13 @@ namespace Belle2 {
       /** Write a cluster to the collection. */
       void writeClusters(VxdID sensorID, int side);
 
+      /** Write a cluster to DataStore.
+       * Use time fit to get cluster time and amplitudes.
+       * This version is only experimental and temporary,
+       * the whole module will be re-done to get rid of 2D clustering.
+       */
+      void writeClustersWithTimeFit(VxdID sensorID, int side);
+
       // Data members
       //1. Collections
       /** Name of the collection to use for the SVDDigits */
@@ -128,6 +135,8 @@ namespace Belle2 {
       const unsigned int c_minSamples;
       /** Time tolerance for clustering: max. mean square distance between maxima in a cluster.*/
       double m_timeTolerance;
+      /** Use time ftter? */
+      bool m_useFitter;
 
       // 5. Timing
       // The decay times are shaping times plus typical diffusion time."
@@ -148,6 +157,12 @@ namespace Belle2 {
        * (m_triggerTime, m_triggerTime+m_acceptance) will be accepted.
        */
       double m_acceptance;
+      /** Rejection level for the fitter - reject clusters with p < pReject of being within acceptance window */
+      double m_rejectionLevel;
+      /** Likelihood threshold based on rejection level:
+       * A cluster will be rejected if neg.loglikelihood(window) - neg.loglikelihood(fitted_time) > threshold)
+       */
+      double m_rejectionThreshold;
 
       /** Pointer to the geometry info of the currently active Sensor */
       SensorInfo* m_geometry;

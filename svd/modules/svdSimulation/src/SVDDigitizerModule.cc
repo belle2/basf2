@@ -93,7 +93,7 @@ SVDDigitizerModule::SVDDigitizerModule() :
   addParam("UseIntegrationWindow", m_applyWindow, "Use integration window?",
            bool(true));
   addParam("StartSampling", m_startSampling,
-           "Start of the sampling window, in ns", double(0.0));
+           "Start of the sampling window, in ns", double(-31.44));
   addParam("nAPV25Samples", m_nAPV25Samples, "number of APV25 samples",
            6);
   addParam("RandomPhaseSampling", m_randomPhaseSampling,

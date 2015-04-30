@@ -178,7 +178,8 @@ void SVDRecoHit2D::setDetectorPlane()
 
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+                                                  state.getRep(), this->constructHMatrix(state.getRep())));
 }
 
 genfit::AbsMeasurement* SVDRecoHit2D::clone() const

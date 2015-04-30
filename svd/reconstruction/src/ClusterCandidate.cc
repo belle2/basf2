@@ -90,7 +90,7 @@ namespace Belle2 {
       if (cls.m_seed.getCharge() > m_seed.getCharge()) {
         m_seed = cls.m_seed;
       }
-      for (const Sample & sample : cls.m_samples) {
+      for (const Sample& sample : cls.m_samples) {
         unsigned int strip = sample.getCellID();
         unsigned int index = sample.getSampleIndex();
         unsigned int max_index = cls.m_maxima[strip];

@@ -24,9 +24,21 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
+#include <svd/reconstruction/WaveFitter.h>
+
+#include <boost/math/distributions/chi_squared.hpp>
+
+#include <algorithm>
+#include <numeric>
+#include <functional>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
+
+using boost::math::chi_squared;
+using boost::math::quantile;
+using boost::math::complement;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -40,8 +52,9 @@ REG_MODULE(SVDClusterizer)
 SVDClusterizerModule::SVDClusterizerModule() : Module(),
   m_minADC(-96000), m_maxADC(386000), m_bitsADC(10), m_unitADC(375), m_cutSeed(5.0),
   m_cutAdjacent(3.0), m_cutCluster(5.0), m_sizeHeadTail(3), c_minSamples(1),
-  m_timeTolerance(30), m_shapingTimeElectrons(55), m_shapingTimeHoles(60),
-  m_samplingTime(31.44), m_refTime(-31.44), m_assumeSorted(true)
+  m_timeTolerance(30), m_useFitter(false), m_shapingTimeElectrons(55),
+  m_shapingTimeHoles(60), m_samplingTime(31.44), m_refTime(-31.44),
+  m_rejectionLevel(0.05), m_rejectionThreshold(0.0), m_assumeSorted(true)
 {
   //Set module properties
   setDescription("Clusterize SVDDigits and reconstruct hits");
@@ -84,6 +97,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
            "Cluster size at which to switch to Analog head tail algorithm", m_sizeHeadTail);
   addParam("TimeTolerance", m_timeTolerance,
            "Maximum allowable RMS of signal times in a cluster", m_timeTolerance);
+  addParam("UseTimeFitter", m_useFitter,
+           "Use time fitter to calculate strip charges and cluster time", m_useFitter);
 
   //5. Timing: all times are expected in ns.
   addParam("ShapingTimeElectrons", m_shapingTimeElectrons,
@@ -102,6 +117,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
            "Time of the trigger", double(0.0));
   addParam("acceptanceWindowSize", m_acceptance,
            "Size of the acceptance window following the trigger", double(100));
+  addParam("RejectionLevel", m_rejectionLevel,
+           "Reject clusters with p < RejectionLevel of being in acceptance window", m_rejectionLevel);
 
   /** Cluster charge calculation. */
   addParam("calClsChargeCal", m_calClsCharge,
@@ -156,6 +173,13 @@ void SVDClusterizerModule::initialize()
     B2WARNING("The tanLorentz parameters are obsolete and have no effect!")
     // Report:
     B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
+
+  // Calculate likelihood threshold for time rejection if time fitter is used
+  if (m_useFitter) {
+    // distribution
+    chi_squared chi(1);
+    m_rejectionThreshold = 0.5 * quantile(complement(chi, m_rejectionLevel));
+  }
 
   B2INFO(" 1. COLLECTIONS:");
   B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
@@ -310,7 +334,10 @@ void SVDClusterizerModule::event()
 
       //Other side or new sensor: write clusters
       if ((uSide != thisSide) || (sensorID != thisSensorID)) {
-        writeClusters(sensorID, uSide ? 0 : 1);
+        if (!m_useFitter)
+          writeClusters(sensorID, uSide ? 0 : 1);
+        else
+          writeClustersWithTimeFit(sensorID, uSide ? 0 : 1);
         // Reset the guards
         uSide = thisSide;
         sensorID = thisSensorID;
@@ -343,7 +370,10 @@ void SVDClusterizerModule::event()
       //Find the correct cluster and add sample to cluster
       findCluster(sample);
     }
-    writeClusters(sensorID, uSide ? 0 : 1);
+    if (!m_useFitter)
+      writeClusters(sensorID, uSide ? 0 : 1);
+    else
+      writeClustersWithTimeFit(sensorID, uSide ? 0 : 1);
   }
 
   B2DEBUG(1, "Number of clusters: " << storeClusters.getEntries());
@@ -478,7 +508,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
       restrictedCharge += charge;
     }
     clusterTime /= restrictedCharge;
-    double clusterTiimeStd = 0.0;
+    double clusterTimeStd = 0.0;
     if (clusterSize > 1) {
       for (unsigned int strip = stripLow; strip <= stripHigh; ++strip) {
         double charge = stripCharges.find(strip)->second; // safe
@@ -492,10 +522,10 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
         }
         //double diff = stripMaxima.find(strip)->second - clusterTime;
         double diff = time - clusterTime;
-        clusterTiimeStd += charge * diff * diff;
+        clusterTimeStd += charge * diff * diff;
       }
     }
-    clusterTiimeStd = sqrt(clusterTiimeStd / restrictedCharge);
+    clusterTimeStd = sqrt(clusterTimeStd / restrictedCharge);
     // Only now we scale the time properly
     double shapingTime = isU ? m_shapingTimeHoles : m_shapingTimeElectrons;
     clusterTime = m_refTime + m_samplingTime * clusterTime - shapingTime;
@@ -539,7 +569,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     //Store Cluster into Datastore ...
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
-                              sensorID, side == 0, clusterPosition, clusterPositionError, clusterTime, clusterTiimeStd,
+                              sensorID, side == 0, clusterPosition, clusterPositionError, clusterTime, clusterTimeStd,
                               clusterSeed.getCharge(), clusterCharge, clusterSize
                             ));
 
@@ -556,3 +586,190 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
   m_clusters.clear();
   m_cache.clear();
 }
+
+
+/************************************************************************
+ * Experimental version using time fitter
+ ***********************************************************************/
+void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
+{
+  if (m_clusters.empty()) return;
+
+  //Get all datastore elements
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<SVDDigit>   storeDigits(m_storeDigitsName);
+  const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterDigitName);
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
+
+  RelationIndex<SVDDigit, MCParticle> relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
+  RelationIndex<SVDDigit, SVDTrueHit> relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
+
+  //Get Geometry information
+  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+  bool isU = (side == 0);
+  // Just to be sure
+  m_noiseMap.setSensorID(sensorID, isU);
+  double pitch = isU ? info.getUPitch() : info.getVPitch();
+
+  for (ClusterCandidate& cls : m_clusters) {
+    if (cls.size() == 0) continue;
+    int clusterSize = cls.size();
+    // Create the fitter
+    double shaping_time = (side = 0) ? m_shapingTimeElectrons : m_shapingTimeHoles;
+    DefaultWave wave(shaping_time);
+    std::array<double, 6> times;
+    for (int i = 0; i < 6; ++i) times[i] = (i - 1) * m_samplingTime;
+    WaveFitter fitter(
+      [&wave](double t) -> double {return wave.getValue(t);},
+      times
+    );
+    // Get data from the cluster into the fitter
+    std::vector<int> stripNumbers;
+    auto stripCharges = cls.getStripCharges();
+    // we only want strip numbers here
+    for (auto stripCharge : stripCharges)
+      stripNumbers.push_back(stripCharge.first);
+    double currentNoise = 0;
+    int currentStrip = -1;
+    int nAddedStrips = 0;
+    int nAddedSamples = 0;
+    std::array<double, 6> stripData;
+    for (auto sample : cls.samples()) {
+      short index = sample.getSampleIndex();
+      unsigned int strip = sample.getCellID();
+      if (strip != currentStrip) {
+        // we are on a new strip -save what we've got
+        fitter.addData(stripData, currentNoise);
+        stripData.fill(0);
+        nAddedStrips++;
+        nAddedSamples = 0;
+        currentNoise = m_noiseMap.getNoise(sample);
+        currentStrip = strip;
+      }
+      stripData[index] = sample.getCharge();
+      nAddedSamples++;
+    }
+    if (nAddedStrips == 0) continue;
+    //Get time and amplitudes
+    auto amplitudes = fitter.getFittedAmplitudes();
+    double clusterCharge = std::accumulate(amplitudes.begin(), amplitudes.end(), 0.0);
+    auto itSeedStrip = std::max_element(amplitudes.begin(), amplitudes.end());
+    int iSeedStrip = std::distance(amplitudes.begin(), itSeedStrip);
+    int seedStrip = stripNumbers[iSeedStrip];
+    double seedCharge = amplitudes[iSeedStrip];
+    //Check for noise cuts
+    if (!(m_noiseMap(clusterCharge, m_cutCluster) && m_noiseMap(seedCharge, m_cutSeed))) continue;
+
+    // FIXME: This is only provisional. Below, there are no noise-weighted formulas.
+    double elNoise = m_noiseMap.getNoise(seedStrip);
+
+    unsigned int maxStrip = stripNumbers.back();
+    double maxStripCharge = amplitudes.back();
+    unsigned int minStrip = stripNumbers.front();
+    double minStripCharge = amplitudes.front();
+    double totalCharge = 0.0;
+    double clusterPosition = 0.0;
+    double clusterPositionError = 0.0;
+    if (clusterSize < m_sizeHeadTail) { // COG, size = 1 or 2
+      for (int iStrip = 0; iStrip < clusterSize; ++iStrip) {
+        double stripPos = isU ? info.getUCellPosition(stripNumbers[iStrip]) : info.getVCellPosition(stripNumbers[iStrip]);
+        clusterPosition += stripPos * stripCharges[iStrip];
+      }
+      clusterPosition /= clusterCharge;
+      // Compute position error
+      // FIXME: We now have different errors than elNoise on strip charges.
+      if (clusterSize == 1) {
+        // Add a strip charge equal to the zero-suppression threshold to compute the error
+        double phantomCharge = m_cutAdjacent * elNoise;
+        clusterPositionError = pitch * phantomCharge / (clusterCharge + phantomCharge);
+      } else {
+        double a = (clusterSize == 2) ? 1.414 : (clusterSize - 1);
+        double sn = clusterCharge / elNoise;
+        clusterPositionError = a * pitch / sn;
+      }
+    } else { // Head-tail
+      double centreCharge = (totalCharge - minStripCharge - maxStripCharge) / (clusterSize - 2);
+      minStripCharge = (minStripCharge < centreCharge) ? minStripCharge : centreCharge;
+      maxStripCharge = (maxStripCharge < centreCharge) ? maxStripCharge : centreCharge;
+      double minPos = isU ? info.getUCellPosition(minStrip) : info.getVCellPosition(minStrip);
+      double maxPos = isU ? info.getUCellPosition(maxStrip) : info.getVCellPosition(maxStrip);
+      clusterPosition = 0.5 * (minPos + maxPos + (maxStripCharge - minStripCharge) / centreCharge * pitch);
+      double sn = centreCharge / m_cutAdjacent / elNoise;
+      // Rough estimates of Landau noise
+      double landauHead = minStripCharge / centreCharge;
+      double landauTail = maxStripCharge / centreCharge;
+      clusterPositionError = 0.5 * pitch * sqrt(2.0 / sn / sn +
+                                                0.5 * landauHead * landauHead +
+                                                0.5 * landauTail * landauTail);
+    }
+
+    // Time
+    double clusterTime = fitter.getFittedTime();
+    double clusterTimeStd = fitter.getFittedTimeError();
+    // discard if not within acceptance
+    if (m_applyWindow) {
+      if ((clusterTime < m_triggerTime) && (fitter.negLogLikelihood(m_triggerTime) - fitter.getFitLikelihood() > m_rejectionThreshold))
+        continue;
+      else if ((clusterTime > m_triggerTime + m_acceptance)
+               && (fitter.negLogLikelihood(m_triggerTime + m_acceptance) - fitter.getFitLikelihood() > m_rejectionThreshold))
+        continue;
+    }
+
+    //Lorentz shift correction
+    clusterPosition -= info.getLorentzShift(isU, clusterPosition);
+    map<int, float> mc_relations;
+    map<int, float> truehit_relations;
+    vector<pair<int, float> > digit_weights;
+    digit_weights.reserve(cls.size());
+
+    for (const SVD::Sample& sample : cls.samples()) {
+
+      //Fill map with MCParticle relations
+      if (relDigitMCParticle) {
+        typedef const RelationIndex<SVDDigit, MCParticle>::Element relMC_type;
+        for (relMC_type& mcRel : relDigitMCParticle.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
+          //negative weights are from ignored particles, we don't like them and
+          //thus ignore them :D
+          if (mcRel.weight < 0) continue;
+          mc_relations[mcRel.indexTo] += mcRel.weight;
+        };
+      };
+      //Fill map with SVDTrueHit relations
+      if (relDigitTrueHit) {
+        typedef const RelationIndex<SVDDigit, SVDTrueHit>::Element relTrueHit_type;
+        for (relTrueHit_type& trueRel : relDigitTrueHit.getElementsFrom(storeDigits[sample.getArrayIndex()])) {
+          //negative weights are from ignored particles, we don't like them and
+          //thus ignore them :D
+          if (trueRel.weight < 0) continue;
+          truehit_relations[trueRel.indexTo] += trueRel.weight;
+        };
+      };
+      //Add digit to the Cluster->Digit relation list
+      digit_weights.push_back(make_pair(sample.getArrayIndex(), sample.getCharge()));
+    }
+
+    //Store Cluster into Datastore ...
+    int clsIndex = storeClusters.getEntries();
+    storeClusters.appendNew(SVDCluster(
+                              sensorID, side == 0, clusterPosition, clusterPositionError,
+                              clusterTime, clusterTimeStd, seedCharge, clusterCharge, clusterSize
+                            ));
+
+    //Create Relations to this Digit
+    if (!mc_relations.empty()) {
+      relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
+    }
+    if (!truehit_relations.empty()) {
+      relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
+    }
+    relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
+  }
+
+  m_clusters.clear();
+  m_cache.clear();
+}
+

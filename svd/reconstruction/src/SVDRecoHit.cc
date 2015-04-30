@@ -83,7 +83,8 @@ SVDRecoHit::SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit*):
   if (isWedgeU) {
     // For u coordinate in a wedge sensor, the position line is not u = const.
     // We have to rotate the coordinate system to achieve this.
-    m_rotationPhi = atan2((geometry.getBackwardWidth() - geometry.getForwardWidth()) / geometry.getWidth(0) * hit->getPosition(), geometry.getLength());
+    m_rotationPhi = atan2((geometry.getBackwardWidth() - geometry.getForwardWidth()) / geometry.getWidth(0) * hit->getPosition(),
+                          geometry.getLength());
   }
   // Set the error covariance matrix (this does not scale with position)
   rawHitCov_(0, 0) = hit->getPositionSigma() * hit->getPositionSigma();
@@ -122,7 +123,8 @@ genfit::AbsMeasurement* SVDRecoHit::clone() const
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   if (!m_isU || m_rotationPhi == 0.0) {
-    return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+    return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+                                                    state.getRep(), this->constructHMatrix(state.getRep())));
   }
 
   // Wedged sensor: the measured coordinate in U depends on V and the
@@ -137,7 +139,8 @@ std::vector<genfit::MeasurementOnPlane*> SVDRecoHit::constructMeasurementsOnPlan
 
   TMatrixDSym cov(scale * scale * rawHitCov_);
 
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(coords, cov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(coords, cov, state.getPlane(), state.getRep(),
+                                                  this->constructHMatrix(state.getRep())));
 }
 
 TMatrixD SVDRecoHit::derivatives(const genfit::StateOnPlane* sop)

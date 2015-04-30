@@ -40,7 +40,8 @@ namespace Belle2 {
        * @param digit Pointer to the digit to be added.
        * @param index DataStore index of the digit.
        */
-      void add(SVDDigit* digit, int index) {
+      void add(SVDDigit* digit, int index)
+      {
         if (m_charge < digit->getCharge()) {
           m_charge = digit->getCharge();
           m_time = digit->getTime();

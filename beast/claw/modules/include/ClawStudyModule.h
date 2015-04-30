@@ -73,6 +73,8 @@ namespace Belle2 {
       TH2F* h_edep;
       /** Energy deposited above threshold per time bin */
       TH2F* h_edepThres;
+      /** Energy deposited vs z */
+      TH1F* h_zvedep[2];
 
     };
 

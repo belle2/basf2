@@ -68,6 +68,9 @@ void ClawStudyModule::defineHisto()
   h_edep = new TH2F("h_edep", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
   h_edepThres = new TH2F("h_edepThres", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
 
+  for (int i = 0; i < 2; i++) {
+    h_zvedep[i] = new TH1F(TString::Format("h_zvedep_%d", i) , "edep [MeV] vs. z [cm]", 200, -10., 10.);
+  }
 }
 
 
@@ -91,6 +94,21 @@ void ClawStudyModule::event()
 
   StoreArray<ClawSimHit>  SimHits;
   StoreArray<ClawHit> Hits;
+
+  //number of entries in SimHits
+  int nSimHits = SimHits.getEntries();
+
+  for (int i = 0; i < nSimHits; i++) {
+    ClawSimHit* aHit = SimHits[i];
+    int detNb = aHit->getdetNb();
+    double adep = aHit->getEnergyNiel();
+    TVector3 position = aHit->gettkPos();
+
+    if (0 <= detNb && detNb <= 7)
+      h_zvedep[0]->Fill(position.Z() / 100., adep);
+    else if (8 <= detNb && detNb <= 15)
+      h_zvedep[1]->Fill(position.Z() / 100., adep);
+  }
 
   //number of entries in Hit
   int nHits = Hits.getEntries();

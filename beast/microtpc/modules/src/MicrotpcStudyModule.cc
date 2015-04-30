@@ -162,12 +162,12 @@ void MicrotpcStudyModule::event()
     float trl = aTrack->gettrl();
     float esum = aTrack->getesum();
     //int time_range = aTrack->gettime_range();
-    int side[5][4];
+    int side[4][4];
     side[0][4] = {aTrack->getside()[0]};
     side[1][4] = {aTrack->getside()[1]};
     side[2][4] = {aTrack->getside()[2]};
     side[3][4] = {aTrack->getside()[3]};
-    side[4][4] = {aTrack->getside()[4]};
+    //side[4][4] = {aTrack->getside()[4]};
 
     h_evtrl[detNb]->Fill(esum, trl);
     h_tvp[detNb]->Fill(theta, phi);

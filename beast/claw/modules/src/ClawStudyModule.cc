@@ -64,15 +64,21 @@ ClawStudyModule::~ClawStudyModule()
 void ClawStudyModule::defineHisto()
 {
   h_time = new TH2F("h_time", "Detector # vs. time", 16, 0., 16., 750, 0., 750.);
+  h_time->Sumw2();
   h_timeWeighted = new TH2F("h_timeWeigthed", "Detector # vs. time weighted by the energy deposited", 16, 0., 16., 750, 0., 750.);
+  h_timeWeighted->Sumw2();
   h_timeThres = new TH2F("h_timeThres", "Detector # vs. time", 16, 0., 16., 750, 0., 750.);
+  h_timeThres->Sumw2();
   h_timeWeightedThres = new TH2F("h_timeWeigthedThres", "Detector # vs. time weighted by the energy deposited", 16, 0., 16., 750, 0.,
                                  750.);
+  h_timeWeightedThres->Sumw2();
   h_edep = new TH2F("h_edep", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
+  h_edep->Sumw2();
   h_edepThres = new TH2F("h_edepThres", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
-
+  h_edepThres->Sumw2();
   for (int i = 0; i < 2; i++) {
     h_zvedep[i] = new TH1F(TString::Format("h_zvedep_%d", i) , "edep [MeV] vs. z [cm]", 200, -10., 10.);
+    h_zvedep[i]->Sumw2();
   }
 }
 

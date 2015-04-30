@@ -34,11 +34,23 @@ namespace Belle2 {
      * @struct DigitizationParams.
      * @brief Digitization parameters.
      *
+     * @var DigitizationParams::ADCRange
+     * ADC range: 2**(resolution in bits).
+     *
      * @var DigitizationParams::ADCSamplingTime
      * ADC conversion time, ns.
      *
      * @var DigitizationParams::nDigitizations
      * Number of digitizations (points) in one sample.
+     *
+     * @var DigitizationParams::ADCPedestal
+     * ADC pedestal.
+     *
+     * @var DigitizationParams::ADCPEAmplitude
+     * ADC photoelectron amplitude.
+     *
+     * @var DigitizationParams::ADCSaturation
+     * ADC readout corresponding to saturation.
      *
      * @var DigitizationParams::nPEperMeV
      * Number of photoelectrons / 1 MeV.
@@ -77,8 +89,12 @@ namespace Belle2 {
      * Debug mode (generates additional output files with histograms).
      */
     struct DigitizationParams {
+      double ADCRange;
       double ADCSamplingTime;
       int nDigitizations;
+      double ADCPedestal;
+      double ADCPEAmplitude;
+      double ADCSaturation;
       double nPEperMeV;
       double minCosTheta;
       double mirrorReflectiveIndex;

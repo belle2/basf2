@@ -28,8 +28,12 @@ void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
 {
   GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"
               "Content/DigitizationParams");
+  digPar->ADCRange = dig.getDouble("ADCRange");
   digPar->ADCSamplingTime = dig.getDouble("ADCSamplingTime");
   digPar->nDigitizations = dig.getDouble("nDigitizations");
+  digPar->ADCPedestal = dig.getDouble("ADCPedestal");
+  digPar->ADCPEAmplitude = dig.getDouble("ADCPEAmplitude");
+  digPar->ADCSaturation = dig.getDouble("ADCSaturation");
   digPar->nPEperMeV = dig.getDouble("nPEperMeV");
   digPar->minCosTheta = cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI);
   digPar->mirrorReflectiveIndex = dig.getDouble("MirrorReflectiveIndex");

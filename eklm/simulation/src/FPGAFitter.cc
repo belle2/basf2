@@ -89,7 +89,7 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, float* fit,
                                                struct FPGAFitParams* par)
 {
-  const int thr = 100;
+  const int thr = 110;
   int i;
   int sum;
   int firstSig;
@@ -116,7 +116,7 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, float* fit,
   mpar[1] = 2;
   mpar[2] = 2. / (lastSig - firstSig + 1);
   mpar[3] = sum / (lastSig - firstSig + 1);
-  mpar[4] = 0.;
+  mpar[4] = par->bgAmplitude;
   /**
    * TODO: Minuit is used here.
    *       It must be replaced by actual FPGA algorithm.
@@ -136,6 +136,9 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, float* fit,
   args[0] = 1000;
   if (par->bgAmplitude == 0.0)
     mn->mnfixp(4, ierflg);
+  mn->mncomd("FIX 1 2 3", ierflg);
+  mn->mnexcm("MIGRAD", args, 1, ierflg);
+  mn->mncomd("REL 1 2 3", ierflg);
   mn->mnexcm("MIGRAD", args, 1, ierflg);
   double err, xup, xlow;
   int iuint;

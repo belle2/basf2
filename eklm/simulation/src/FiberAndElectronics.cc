@@ -113,14 +113,15 @@ void EKLM::FiberAndElectronics::processEntry()
   simulateADC();
 
   /* Fit. */
-  m_FPGAParams.bgAmplitude = (double)m_digPar->enableConstBkg;
+  m_FPGAParams.bgAmplitude = m_digPar->ADCPedestal;
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   /**
    * TODO: Change units.
-   * FPGA fitter now uses units: time = ADC conversion time,
-   *                             amplitude = amplitude * 0.5 * ADCRange.
+   * FPGA fitter now uses units:
+   * time = ADC conversion time,
+   * amplitude = amplitude * 0.5 * m_digPar->ADCRange.
    */
 
   //* --------------------------     this is a very simple procedure to find a start time instead of the fit
@@ -138,8 +139,6 @@ void EKLM::FiberAndElectronics::processEntry()
   m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /
                                  m_digPar->ADCSamplingTime;
-  m_FPGAParams.amplitude = m_FPGAParams.amplitude * 2 / ADCRange;
-  m_FPGAParams.bgAmplitude = m_FPGAParams.bgAmplitude * 2 / ADCRange;
   if (m_digPar->debug)
     if (m_npe >= 10)
       debugOutput();
@@ -207,8 +206,13 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
 void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
-  for (i = 0; i < m_digPar->nDigitizations; i++)
-    m_ADCAmplitude[i] = (int)(0.5 * ADCRange * m_amplitude[i]);
+  double amp;
+  for (i = 0; i < m_digPar->nDigitizations; i++) {
+    amp = m_digPar->ADCPedestal + m_digPar->ADCPEAmplitude * m_amplitude[i];
+    if (amp > m_digPar->ADCSaturation)
+      amp = m_digPar->ADCSaturation;
+    m_ADCAmplitude[i] = amp;
+  }
 }
 
 struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults()
@@ -226,7 +230,7 @@ double EKLM::FiberAndElectronics::getNPE()
   double intg;
   intg = m_FPGAParams.amplitude * (0.5 * m_FPGAParams.peakTime +
                                    1.0 / m_FPGAParams.attenuationFreq);
-  return intg * m_digPar->PEAttenuationFreq;
+  return intg * m_digPar->PEAttenuationFreq / m_digPar->ADCPEAmplitude;
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()

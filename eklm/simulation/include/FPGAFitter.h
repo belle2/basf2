@@ -21,9 +21,6 @@ namespace Belle2 {
 
   namespace EKLM {
 
-    /** 2 ** (ADC resolution in bits) */
-    const int ADCRange = 4096;          /* TODO: replace by real value! */
-
     /**
      * FPGA fit status.
      */

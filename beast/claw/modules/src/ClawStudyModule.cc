@@ -107,6 +107,7 @@ void ClawStudyModule::event()
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
 
+  //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     ClawSimHit* aHit = SimHits[i];
     int detNb = aHit->getdetNb();
@@ -122,7 +123,7 @@ void ClawStudyModule::event()
   //number of entries in Hit
   int nHits = Hits.getEntries();
 
-  //loop over all SimHit entries
+  //loop over all Hit entries
   for (int i = 0; i < nHits; i++) {
     ClawHit* aHit = Hits[i];
     int detNb = aHit->getdetNb();

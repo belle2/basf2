@@ -11,12 +11,11 @@ import matplotlib.patches as patches
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import numpy as np
-from datetime import datetime
 import subprocess
+from datetime import datetime
 
 import seaborn as sb
 
-import IPython
 
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 
@@ -29,8 +28,12 @@ class SegmentQuadTreePlotter(basf2.Module):
     draw_segment_intersection = True and False
     draw_segment = True and False
     draw_segment_averaged = True and False
+    draw_segment_fitted = True and False
     draw_mc_information = True and False
     draw_mc_hits = True and False
+
+    theta_shifted = False
+    maximum_theta = np.pi
 
     def plotQuadTreeContent(self, input_file):
         hist = input_file.Get("histUsed")
@@ -51,10 +54,10 @@ class SegmentQuadTreePlotter(basf2.Module):
         for iX in xrange(1, xAxis.GetNbins() + 1):
             for iY in xrange(1, yAxis.GetNbins() + 1):
                 length_list += [hist.GetBinContent(iX, iY) + histUnused.GetBinContent(iX, iY)]
-                width_list += [xAxis.GetBinWidth(iX) / 8192 * np.pi]
+                width_list += [xAxis.GetBinWidth(iX) / 8192 * self.maximum_theta]
                 height_list += [yAxis.GetBinWidth(iY)]
                 y_list += [yAxis.GetBinLowEdge(iY)]
-                x_list += [xAxis.GetBinLowEdge(iX) / 8192 * np.pi]
+                x_list += [xAxis.GetBinLowEdge(iX) / 8192 * self.maximum_theta]
 
         cm = plt.get_cmap('Blues')
         cNorm = colors.Normalize(vmin=0, vmax=max(length_list))
@@ -70,8 +73,12 @@ class SegmentQuadTreePlotter(basf2.Module):
 
         theta_cut = np.arctan2((positionBack - positionFront).x(), (positionFront - positionBack).y())
 
-        while theta_cut < 0:
-            theta_cut += np.pi
+        if self.theta_shifted:
+            while theta_cut < - self.maximum_theta / 2:
+                theta_cut += self.maximum_theta
+        else:
+            while theta_cut < 0:
+                theta_cut += self.maximum_theta
 
         r_cut = positionFront.x() * np.cos(theta_cut) + positionFront.y() * np.sin(theta_cut)
 
@@ -80,15 +87,42 @@ class SegmentQuadTreePlotter(basf2.Module):
     def calculatePositionInQuadTreePicture(self, position):
         position = position.conformalTransformed()
 
-        theta = np.linspace(0, np.pi, 100)
+        theta = np.linspace(-self.maximum_theta / 2, self.maximum_theta / 2, 100)
         r = position.x() * np.cos(theta) + position.y() * np.sin(theta)
 
+        return theta, r
+
+    def forAllAxialSegments(self, f):
+        items = Belle2.PyStoreObj("CDCRecoSegment2DVector")
+        wrapped_vector = items.obj()
+        vector = wrapped_vector.get()
+
+        for quad_tree_item in vector:
+            if quad_tree_item.getStereoType() == 0:
+                f(quad_tree_item)
+
+    def convertToQuadTreePicture(self, phi, mag, charge):
+        theta = phi + np.pi / 2
+        r = 1 / mag * 1.5 * 0.00299792458 * charge
+        if self.theta_shifted:
+            if theta > self.maximum_theta / 2 or theta < -self.maximum_theta / 2:
+                theta = theta % self.maximum_theta - self.maximum_theta / 2
+            else:
+                r *= -1
+        else:
+            if theta > self.maximum_theta or theta < 0:
+                theta = theta % self.maximum_theta
+            else:
+                r *= -1
         return theta, r
 
     def event(self):
         plt.clf()
 
-        plt.xlim(0, np.pi)
+        if self.theta_shifted:
+            plt.xlim(-self.maximum_theta / 2, self.maximum_theta / 2)
+        else:
+            plt.xlim(0, self.maximum_theta)
         plt.ylim(-0.05, 0.05)
         plt.xticks([])
         plt.yticks([])
@@ -99,40 +133,46 @@ class SegmentQuadTreePlotter(basf2.Module):
 
         if self.draw_segment_intersection:
             map = attributemaps.SegmentMCTrackIdColorMap()
-            items = Belle2.PyStoreObj("CDCRecoSegment2DVector")
-            wrapped_vector = items.obj()
-            vector = wrapped_vector.get()
 
-            for quad_tree_item in vector:
-                if quad_tree_item.getStereoType() == 0:
-                    theta, r = self.calculateIntersectionInQuadTreePicture(quad_tree_item.front(), quad_tree_item.back())
-                    plt.plot(theta, r, color=map(0, quad_tree_item), marker="o")
+            def f(segment):
+                theta, r = self.calculateIntersectionInQuadTreePicture(segment.front(), segment.back())
+                plt.plot(theta, r, color=map(0, segment), marker="o")
+
+            self.forAllAxialSegments(f)
 
         if self.draw_segment:
             map = attributemaps.SegmentMCTrackIdColorMap()
-            items = Belle2.PyStoreObj("CDCRecoSegment2DVector")
-            wrapped_vector = items.obj()
-            vector = wrapped_vector.get()
 
-            for quad_tree_item in vector:
-                if quad_tree_item.getStereoType() == 0:
-                    theta, r = self.calculatePositionInQuadTreePicture(quad_tree_item.front().getRecoPos2D())
-                    plt.plot(theta, r, color=map(0, quad_tree_item), marker="", ls="-")
+            def f(segment):
+                theta, r = self.calculatePositionInQuadTreePicture(segment.front().getRecoPos2D())
+                plt.plot(theta, r, color=map(0, segment), marker="", ls="-")
+
+            self.forAllAxialSegments(f)
 
         if self.draw_segment_averaged:
             map = attributemaps.SegmentMCTrackIdColorMap()
-            items = Belle2.PyStoreObj("CDCRecoSegment2DVector")
-            wrapped_vector = items.obj()
-            vector = wrapped_vector.get()
 
-            for quad_tree_item in vector:
-                if quad_tree_item.getStereoType() == 0:
-                    middle_index = int(np.round(quad_tree_item.size() / 2.0))
-                    middle_point = quad_tree_item.items()[middle_index]
-                    theta_front, r_front = self.calculateIntersectionInQuadTreePicture(quad_tree_item.front(), middle_point)
-                    theta_back, r_back = self.calculateIntersectionInQuadTreePicture(middle_point, quad_tree_item.back())
+            def f(segment):
+                middle_index = int(np.round(segment.size() / 2.0))
+                middle_point = segment.items()[middle_index]
+                theta_front, r_front = self.calculateIntersectionInQuadTreePicture(segment.front(), middle_point)
+                theta_back, r_back = self.calculateIntersectionInQuadTreePicture(middle_point, segment.back())
 
-                    plt.plot([theta_front, theta_back], [r_front, r_back], color=map(0, quad_tree_item), marker="o", ls="-")
+                plt.plot([theta_front, theta_back], [r_front, r_back], color=map(0, segment), marker="o", ls="-")
+
+            self.forAllAxialSegments(f)
+
+        if self.draw_segment_fitted:
+            map = attributemaps.SegmentMCTrackIdColorMap()
+            fitter = Belle2.TrackFindingCDC.CDCRiemannFitter.getOriginCircleFitter()
+
+            def f(segment):
+                trajectory = fitter.fit(segment)
+                momentum = trajectory.getUnitMom2D(Belle2.TrackFindingCDC.Vector2D(0, 0)).scale(trajectory.getAbsMom2D())
+                theta, r = self.convertToQuadTreePicture(momentum.phi(), momentum.norm(), trajectory.getChargeSign())
+                plt.plot(theta, r, color=map(0, segment), marker="o")
+
+            self.forAllAxialSegments(f)
 
         if self.draw_mc_hits:
             wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
@@ -159,14 +199,7 @@ class SegmentQuadTreePlotter(basf2.Module):
                 momentum = track.getMomSeed()
 
                 # HARDCODED!!! Temporary solution
-                theta = (momentum.Phi() + np.pi / 2)
-                r = 1 / momentum.Mag() * 1.5 * 0.00299792458 * track.getChargeSeed()
-
-                if theta > np.pi or theta < 0:
-                    theta = theta % np.pi
-                else:
-                    r *= -1
-
+                theta, r = self.convertToQuadTreePicture(momentum.Phi(), momentum.Mag(), track.getChargeSeed())
                 mcTrackID = track.getMcTrackId()
 
                 plt.plot(theta, r, marker="o", color="black", ms=10)

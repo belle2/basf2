@@ -46,11 +46,18 @@ namespace Belle2 {
     void SetRESTbasename(std::string RESTBaseName) {m_RESTbase = RESTBaseName;};
 
     /** Sets the base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
-     *  @param RESTBaseName The base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
+     *  @param FILEBaseName The base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
      *
      *  @return Nothing yet
      */
     void SetFILEbasename(std::string FILEBaseName) {m_FILEbase = FILEBaseName;};
+
+    /** Sets the local directory name for copies of the conditions files.  Example is /tmp/.
+     *  @param FILEBaseLocal The base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
+     *
+     *  @return Nothing yet
+     */
+    void SetFILEbaselocal(std::string FILEBaseLocal) {m_FILElocal = FILEBaseLocal;};
 
 
     /** Adds a payload URL to the payload map.
@@ -60,6 +67,12 @@ namespace Belle2 {
      *  @return Nothing yet
      */
     void AddPayloadURL(std::string PackageModuleName, std::string PayloadURL) {m_run_payloads[PackageModuleName] = PayloadURL;};
+    /** Check to see if a payload key is already registered in the payload map.
+     *  @param PackageModuleName The concatenation of the package.name and module.name.
+     *
+     *  @return true if payload exists, false if not.
+     */
+    bool PayloadExists(std::string PackageModuleName) {return (m_run_payloads.find(PackageModuleName) != m_run_payloads.end());}
 
     /** Adds a payload checksum to the payload map.
      *  @param PackageModuleName The concatenation of the package.name and module.name.
@@ -77,6 +90,13 @@ namespace Belle2 {
      */
     void WritePayloadFile(std::string payloadFileName,
                           Module* module) {WritePayloadFile(payloadFileName, module->getPackage(), module->getName());};
+
+    /** Adds a string to the buffer (for REST returns.)
+     *  @param buffer The string to be added to the buffer.
+     *
+     *  @return Nothing yet
+     */
+    void AddReturn(std::string buffer) {m_buffer = m_buffer + buffer;};
 
     /** Adds a payload file to the conditions database.
      *  @param payloadFileName The file name of the payload.
@@ -105,6 +125,7 @@ namespace Belle2 {
 
 
 
+
   private:
     /** Singleton, so control use of constructors */
     ConditionsService();
@@ -119,11 +140,14 @@ namespace Belle2 {
     ~ConditionsService();
 
 
+    /** Function to capture rest returns. **/
+    static size_t capture_return(void* buffer, size_t size, size_t nmemb, void* userp);
+
     /** Function to parse payloads */
-    static size_t parse_payloads(void* buffer, size_t size, size_t nmemb, void* userp);
+    void parse_payloads(std::string temp);
 
     /** Function to parse generic xml return and display */
-    static size_t parse_return(void* buffer, size_t size, size_t nmemb, void* userp);
+    void parse_return(std::string temp);
 
     /** Function to facilitate downloading files */
     static size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream);
@@ -138,8 +162,11 @@ namespace Belle2 {
     /** The base name for the REST services */
     std::string m_RESTbase;
 
-    /** The base name for the conditions files */
+    /** The base name for the remote conditions files */
     std::string m_FILEbase;
+
+    /** The base name for the local conditions files to be stored temporarily */
+    std::string m_FILElocal;
 
     /** A buffer to temporarily get rid of compiler warnings */
     std::string m_buffer;

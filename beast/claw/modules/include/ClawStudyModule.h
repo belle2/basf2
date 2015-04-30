@@ -69,6 +69,10 @@ namespace Belle2 {
       TH2F* h_time;
       /** Time distribution weighted per the energy deposited */
       TH2F* h_timeWeighted;
+      /** Time distribution with energy threshold applied */
+      TH2F* h_timeThres;
+      /** Time distribution weighted per the energy deposited with energy threshold applied */
+      TH2F* h_timeWeightedThres;
       /** Energy deposited per time bin */
       TH2F* h_edep;
       /** Energy deposited above threshold per time bin */

@@ -47,6 +47,6 @@ bool CDCWireHitClusterBkgTruthVarSet::extract(const CDCWireHitCluster* ptrCluste
   var<named("n_background_hits_truth")>() = nBackgroundHits;
   var<named("background_fraction_truth")>() = 1.0 * nBackgroundHits / cluster.size();
   var<named("weight")>() = cluster.size();
-  var<named("truth")>() = (1.0 * nBackgroundHits / cluster.size() > 0.8) ? 1 : 0;
+  var<named("truth")>() = (1.0 * nBackgroundHits / cluster.size() > 0.8) ? 0 : 1;
   return true;
 }

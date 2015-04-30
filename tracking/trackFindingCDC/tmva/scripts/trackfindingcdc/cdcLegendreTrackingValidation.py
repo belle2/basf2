@@ -68,8 +68,14 @@ class CDCLegendre(StandardEventGenerationRun):
         # based on the properties in the base class.
         main_path = super(CDCLegendre, self).create_path()
 
-        background_hit_finder_module = basf2.register_module("BackgroundHitFinder")
-        background_hit_finder_module.param("TMVACut", float(self.tmva_cut))
+        background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+        background_hit_finder_module.param({
+            "ClusterFilter": "tmva",
+            "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
+            "RemainingCDCHitsStoreArrayName": "GoodCDCHits",
+            "FacetFilter": "none",
+            "FacetNeighborChooser": "none",
+        })
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
         cdctracking.set_log_level(basf2.LogLevel.WARNING)

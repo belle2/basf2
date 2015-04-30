@@ -67,8 +67,14 @@ class BackgroundHitFinderValidationRun(StandardEventGenerationRun):
         # based on the properties in the base class.
         main_path = super(BackgroundHitFinderValidationRun, self).create_path()
 
-        background_hit_finder_module = basf2.register_module("BackgroundHitFinder")
-        background_hit_finder_module.param("TMVACut", float(self.tmva_cut))
+        background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+        background_hit_finder_module.param({
+            "ClusterFilter": "tmva",
+            "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
+            "RemainingCDCHitsStoreArrayName": "GoodCDCHits",
+            "FacetFilter": "none",
+            "FacetNeighborChooser": "none",
+        })
 
         main_path.add_module(background_hit_finder_module)
         main_path.add_module(BackgroundHitFinderValidationModule("CDCHits", output_file_name=self.tuples_file_name + "_old.root"))

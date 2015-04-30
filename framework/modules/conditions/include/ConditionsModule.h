@@ -25,8 +25,11 @@ namespace Belle2 {
      */
     void beginRun();
 
+
+
     /** The Terminator. */
     void terminate();
+
 
   private:
 
@@ -36,7 +39,13 @@ namespace Belle2 {
     std::string m_run_name;
     std::string m_rest_basename;
     std::string m_file_basename;
+    std::string m_file_local;
 
+    //Parameters for manual payload addition
+    std::string m_filename;
+    std::string m_package;
+    std::string m_module;
+    std::string m_comment;
 
   };
 }

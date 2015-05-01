@@ -57,7 +57,8 @@ DBObject DBObjectLoader::load(ConfigFile& config)
         type = DBField::BOOL;
       } else if (StringUtil::tolower(value) == "false") {
         type = DBField::BOOL;
-      } else if (StringUtil::isdigit(value)) {
+      } else if ((value.size() >= 2 && value.at(0) == '0' && value.at(1) == 'x') ||
+                 StringUtil::isdigit(value)) {
         type = DBField::INT;
       } else if (StringUtil::split(value, '.').size() < 3 &&
                  StringUtil::isdigit(StringUtil::replace(value, ".", "")) &&

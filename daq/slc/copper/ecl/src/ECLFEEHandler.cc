@@ -10,7 +10,7 @@ using namespace Belle2;
 bool ECLFEEHandler::feeget(int& val)
 {
   try {
-    val = m_hslb.readfee32(m_adr);
+    val = m_hslb.readfee8(m_adr);
     LogFile::info("ECL FEE read 0x%x >> %d", m_adr, val);
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -21,7 +21,7 @@ bool ECLFEEHandler::feeget(int& val)
 bool ECLFEEHandler::feeset(int val)
 {
   try {
-    m_hslb.writefee32(m_adr, val);
+    m_hslb.writefee8(m_adr, val);
     LogFile::info("ECL FEE write 0x%x << %d", m_adr, val);
   } catch (const IOException& e) {
     LogFile::error(e.what());

@@ -12,6 +12,7 @@ namespace Belle2 {
     virtual ~ECLFEE() throw() {}
 
   public:
+    virtual void init(RCCallback& callback, HSLB& hslb);
     virtual void boot(HSLB& hslb, const DBObject& obj);
     virtual void load(HSLB& hslb, const DBObject& obj);
 

@@ -1,4 +1,5 @@
 #include "daq/slc/copper/ecl/ECLFEE.h"
+#include "daq/slc/copper/ecl/ECLFEEHandler.h"
 
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
@@ -14,6 +15,24 @@ using namespace Belle2;
 
 ECLFEE::ECLFEE()
 {
+}
+
+void ECLFEE::init(RCCallback& callback, HSLB& hslb)
+{
+  std::string vname = StringUtil::form("ecl[%d]", hslb.get_finid());
+  callback.add(new ECLShaperMaskLowHandler(vname + ".shaper.mask.low", callback, hslb, *this, 0x20));
+  callback.add(new ECLShaperMaskHighHandler(vname + ".shaper.mask.high", callback, hslb, *this, 0x21));
+  callback.add(new ECLTTTrgRareFactorHandler(vname + ".ttd.trg.rare.factor", callback, hslb, *this, 0x38));
+  callback.add(new ECLTTTrgTypeHandler(vname + ".ttd.trg.type", callback, hslb, *this, 0x39));
+  callback.add(new ECLCalibAmpl0LowHandler(vname + ".calib.ampl0.low", callback, hslb, *this, 0x40));
+  callback.add(new ECLCalibAmpl0HighHandler(vname + ".calib.ampl0.high", callback, hslb, *this, 0x41));
+  callback.add(new ECLCalibAmplStepLowHandler(vname + ".calib.ampl.step.low", callback, hslb, *this, 0x42));
+  callback.add(new ECLCalibAmplStepHighHandler(vname + ".calib.ampl.step.high", callback, hslb, *this, 0x43));
+  callback.add(new ECLCalibDelay0LowHandler(vname + ".calib.delay0.low", callback, hslb, *this, 0x44));
+  callback.add(new ECLCalibDelay0HighHandler(vname + ".calib.delay0.high", callback, hslb, *this, 0x45));
+  callback.add(new ECLCalibDelaytepLowHandler(vname + ".calib.delay.step.low", callback, hslb, *this, 0x46));
+  callback.add(new ECLCalibDelayStepHighHandler(vname + ".calib.delay.step.high", callback, hslb, *this, 0x47));
+  callback.add(new ECLCalibEventPerStepHandler(vname + ".calib.event.per.step", callback, hslb, *this, 0x48));
 }
 
 void ECLFEE::boot(HSLB& hslb,  const DBObject&)

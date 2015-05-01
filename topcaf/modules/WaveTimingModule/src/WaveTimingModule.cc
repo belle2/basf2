@@ -130,9 +130,14 @@ void WaveTimingModule::event()
 
       //Create TOPDigit
       int barID = -9;
+      int channelID = -9;
 
       StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
-      int channelID = topconfig_ptr->hardwareID_to_pixelNumber(channel_id);
+      if (topconfig_ptr) {
+        channelID = topconfig_ptr->hardwareID_to_pixelNumber(channel_id);
+      } else {
+        B2WARNING("ITOP channel mapping not found, TOPDigit channel IDs will be incorrect.");
+      }
       double time = (ftsw - coarse_t + at40_t* sample_dt);
       int TDC = (int)(time * m_time2tdc);
       B2INFO("ChannelID: " << channelID << "\tHardwareID: " << channel_id << "\t TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t <<

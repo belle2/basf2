@@ -2,13 +2,16 @@
 #define _Belle2_ECLShaperControllerHandler_h
 
 namespace Belle2 {
+
   class NSMVHandlerColStatus : public NSMVHandlerText {
+
   public:
     NSMVHandlerColStatus(ECLShaperControllerCallback& callback,
                          const std::string& name, int sh_num)
-      : NSMVHandlerText(name, true, false), m_callback(callback),
-        m_sh_num(sh_num) {}
+      : NSMVHandlerText(name, true, false),
+        m_callback(callback), m_sh_num(sh_num) {}
     virtual ~NSMVHandlerColStatus() throw() {}
+
   public:
     bool handleGetText(std::string& val)
     {
@@ -20,10 +23,12 @@ namespace Belle2 {
       }
       return false;
     }
+
   private:
     ECLShaperControllerCallback& m_callback;
     int m_sh_num;
   };
+
 }
 
 #endif

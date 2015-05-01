@@ -56,7 +56,7 @@ int sh_boot(const char* ip_addr, int sh_num, unsigned int mem_addr)
   printf(server_reply);
   close(sock);
   if (strcmp(server_reply, "DONE") != 0) {
-    printf("Failed to boot Shaper %d %s\n", sh_num, ip_addr);
+    printf("Failed to boot Shaper %d %s : %s\n", sh_num, ip_addr, server_reply);
     return 3;
   }
   return 0;

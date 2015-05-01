@@ -13,23 +13,22 @@ import shutil
 import sys
 import time
 
-
-# Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE', None) is None:
-    sys.exit('Error: No basf2 release set up!')
-
 # Load ROOT
 import ROOT
-
 
 # The pretty printer. Print prettier :)
 import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
-################################################################################
-###                         Function definitions                             ###
-################################################################################
+# Only execute the program if a basf2 release is set up!
+if os.environ.get('BELLE2_RELEASE', None) is None:
+    sys.exit('Error: No basf2 release set up!')
+
+
+###############################################################################
+#                           Function definitions                              #
+###############################################################################
 
 def available_revisions():
     """
@@ -214,7 +213,10 @@ def get_reference_files():
                 full_path = root + '/' + current_file
                 # If the file is a *.root file in a validation subfolder,
                 # we shall collect it as a reference file
-                if fnmatch.fnmatch(full_path, '*/validation/*.root'):
+                # NB: This will only find ROOT files that lie directly in
+                # the /[pkg]/validation folder, not in any subdirs of it!
+                if (os.path.splitext(full_path)[1] == 'root' and
+                        os.path.dirname(full_path).endswith('validation')):
                     results[location].append(os.path.abspath(full_path))
 
     # Now we need to get a rid of all the duplicates: Since local > central,
@@ -225,7 +227,7 @@ def get_reference_files():
         local_path = local_file.replace(basepaths['local'], '')
         # Now loop over all central reference files
         for central_file in results['central']:
-            # Remove the location, i.e. reduce the path to /[package]/[filename]
+            # Remove the location, i.e. reduce path to /[package]/[filename]
             central_path = central_file.replace(basepaths['central'], '')
             # If package and filename are the same, we remove the central
             # file from our results list
@@ -293,8 +295,8 @@ def generate_new_plots(list_of_revisions):
     # Write meta-data, i.e. creation date and revisions contained in the file
     created = str(datetime.datetime.utcfromtimestamp(int(time.time())))
     json_revs = ','.join(['"' + _ + '"' for _ in list_of_revisions])
-    html_output.write('<!-- {{ "lastModified": "Plots created:<br>{0} (UTC)", '
-                      '"revisions":[{1}] }} -->\n\n'.format(created, json_revs))
+    html_output.write('<!-- {{"lastModified": "Plots created:<br>{0} (UTC)", '
+                      '"revisions":[{1}]}} -->\n\n'.format(created, json_revs))
 
     for package in sorted(list_of_packages):
         html_output.write('<div id="' + package + '">\n')
@@ -358,7 +360,8 @@ def create_RootObjects_from_list(list_of_root_files, is_reference):
         # Create the RootObjects from this file and store them, as well as the
         file_objects, \
             file_keys, \
-            file_package = create_RootObjects_from_file(root_file, is_reference)
+            file_package = create_RootObjects_from_file(root_file,
+                                                        is_reference)
 
         # Append results to the global results
         list_objects += file_objects
@@ -569,7 +572,9 @@ def create_revision_list_html():
 
     for item in available_revisions():
         ind = index_from_revision(item)
-        color = ROOT.gROOT.GetColor(get_style(ind, len(available_revisions())).GetLineColor()).AsHexString()
+        color = ROOT.gROOT.GetColor(get_style(ind,
+                                    len(available_revisions()))
+                                    .GetLineColor()).AsHexString()
         date_of_revision = datetime.datetime.utcfromtimestamp(int(
             date_from_revision(item)))
         revisions.write('<label title="Data created: {0} (UTC)">'
@@ -591,9 +596,9 @@ def create_packages_list_html(list_of_packages):
                        .format(pkg))
 
 
-################################################################################
-###                            Class Definition                              ###
-################################################################################
+###############################################################################
+#                              Class Definition                               #
+###############################################################################
 
 class RootObject:
     """
@@ -630,8 +635,8 @@ class RootObject:
         @param check: A short description of how the data in the plot should
                 look like, i.e. for example the target location of a peak etc.
         @param contact: A name or preferably an e-mail address of the person
-                who is responsible for this plot and may be contacted in case of
-                problems
+                who is responsible for this plot and may be contacted in case
+                of problems
         @param is_reference: A boolean value telling if an object is a
                 reference object or a normal plot/n-tuple object from a
                 revision. Possible Values: True for reference objects,
@@ -642,7 +647,7 @@ class RootObject:
         # All of the following could be simplified, if one modified the
         # find_root_object() method to search through vars(Root-Object)
 
-        ## A dict with all information about the Root-object
+        # A dict with all information about the Root-object
         # Have all information as a dictionary so that we can search and
         # filter the objects by properties
         self.data = {'revision': revision,
@@ -660,39 +665,39 @@ class RootObject:
         # For convenient access, define the following variables, which are
         # only references to the values from the dict
 
-        ## The revision to which the object belongs to
+        # The revision to which the object belongs to
         self.revision = self.data['revision']
 
-        ## The package to which the object belongs to
+        # The package to which the object belongs to
         self.package = self.data['package']
 
-        ## The root file to which the object belongs to
+        # The root file to which the object belongs to
         self.rootfile = self.data['rootfile']
 
-        ## The key (more precisely: the name of they) which the object has
+        # The key (more precisely: the name of they) which the object has
         # within the root file
         self.key = self.data['key']
 
-        ## The root object itself
+        # The root object itself
         self.object = self.data['object']
 
-        ## The type, i.e. whether its a histogram or an n-tuple
+        # The type, i.e. whether its a histogram or an n-tuple
         self.type = self.data['type']
 
-        ## The description, what the histogram/n-tuple contains
+        # The description, what the histogram/n-tuple contains
         self.description = self.data['description']
 
-        ## A brief description how the histogram or the values should look
+        # A brief description how the histogram or the values should look
         # like (e.g. characteristic peaks etc.)
         self.check = self.data['check']
 
-        ## A contact person for this histogram/n-tuple
+        # A contact person for this histogram/n-tuple
         self.contact = self.data['contact']
 
-        ## The date of the object (identical with the date of its rootfile)
+        # The date of the object (identical with the date of its rootfile)
         self.date = self.data['date']
 
-        ## Boolean value if it is an object from a reference file or not
+        # Boolean value if it is an object from a reference file or not
         self.is_reference = self.data['is_reference']
 
     def dump(self):
@@ -717,18 +722,18 @@ class Plotuple:
         @param list_of_revisions: The list of revisions (Duh!)
         """
 
-        ## The list of Root objects in this Plotuple-object
+        # The list of Root objects in this Plotuple-object
         self.list_of_root_objects = list_of_root_objects
 
-        ## The list of revisions
+        # The list of revisions
         self.list_of_revisions = list_of_revisions
 
-        ## A list of all problems that occured with this Plotuple,
+        # A list of all problems that occured with this Plotuple,
         # e.g. missing reference object, missing meta-information...
         self.warnings = []
 
         # Find the reference element. If we can't find one, set it to 'None'
-        ## The reference-object for this Plotuple object
+        # The reference-object for this Plotuple object
         self.reference = None
         for root_object in self.list_of_root_objects:
             if root_object.is_reference:
@@ -740,7 +745,7 @@ class Plotuple:
         if self.reference is None:
             self.warnings = ['No reference object']
 
-        ## All elements of the Plotuple that are not the reference-object
+        # All elements of the Plotuple that are not the reference-object
         # Get the elements, i.e. all RootObjects except for the
         # reference object. May be either histograms or n-tuples.
         self.elements = sorted([_ for _ in list_of_root_objects if _ is not
@@ -748,44 +753,44 @@ class Plotuple:
                                key=lambda _: _.date,
                                reverse=True)
 
-        ## The newest element, i.e. the element belonging the revision
+        # The newest element, i.e. the element belonging the revision
         # whose data were created most recently.
         # Should always be self.element[0]
         self.newest = self.elements[0]
 
         # All available meta-information about the plotuple object:
 
-        ## The key (more precisely: the name of the key) that all elements of
+        # The key (more precisely: the name of the key) that all elements of
         # this Plotuple object share
         self.key = self.newest.key
 
-        ## The type of the elements in this Plotuple object
+        # The type of the elements in this Plotuple object
         self.type = self.newest.type
 
-        ## The description of the histogram/n-tuple which this Plotuple object
+        # The description of the histogram/n-tuple which this Plotuple object
         # will yield
         self.description = self.newest.description
 
-        ## The 'Check for ...'-guideline for the histogram/n-tuple which this
+        # The 'Check for ...'-guideline for the histogram/n-tuple which this
         # Plotuple object will yield
         self.check = self.newest.check
 
-        ## A contact person for the histogram/n-tuple which this Plotuple object
+        # A contact person for the histogram/n-tuple which this Plotuple object
         # will yield
         self.contact = self.newest.contact
 
-        ## The package to which the elements in this Plotuple object belong
+        # The package to which the elements in this Plotuple object belong
         self.package = self.newest.package
 
-        ## The result of the Chi^2-Test. By default, there is no such result.
+        # The result of the Chi^2-Test. By default, there is no such result.
         # If the Chi^2-Test has been performed, this variable holds between
         # which objects it has been performed.
         self.chi2test_result = 'n/a'
 
-        ## The p-value that the Chi^2-Test returned.
+        # The p-value that the Chi^2-Test returned.
         self.pvalue = 'n/a'
 
-        ## The file, in which the histogram or the HMTL-table (for n-tuples)
+        # The file, in which the histogram or the HMTL-table (for n-tuples)
         # are stored (without the file extension!)
         self.file = None
 
@@ -839,8 +844,8 @@ class Plotuple:
         elif pvalue < 1:
             canvas.SetFillColor(ROOT.kOrange)
 
-        self.chi2test_result = ('Performed Chi^2-Test between reference and {0}'
-                                .format(self.newest.revision))
+        self.chi2test_result = ('Performed Chi^2-Test between reference \
+                                and {0}'.format(self.newest.revision))
         self.pvalue = pvalue
 
     def draw_ref(self, canvas):
@@ -934,8 +939,8 @@ class Plotuple:
                 title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
-                + self.package)
+        path = ('./plots/{0}/{1}'.format('_'.
+                join(sorted(self.list_of_revisions)), self.package))
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -949,8 +954,8 @@ class Plotuple:
         """!
         Plots all histogram-objects in this Plotuple together in one histogram,
         which is then given the name of the key.
-        @param mode: Determines whether it is a one- or two-dimensional histogram.
-            Accepted values are '1D' and '2D'
+        @param mode: Determines whether it is a one- or two-dimensional
+            histogram. Accepted values are '1D' and '2D'
         @return: None
         """
 
@@ -974,8 +979,8 @@ class Plotuple:
         # If we have a 1D histogram
         if mode == '1D':
 
-            # A variable which holds whether we have drawn on the canvas already
-            # or not
+            # A variable which holds whether we have drawn on the canvas
+            # already or not
             drawn = False
 
             # If there is a reference object, plot it first
@@ -1053,8 +1058,8 @@ class Plotuple:
                     title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
-                + self.package)
+        path = ('./plots/{0}/{1}'.format('_'.
+                join(sorted(self.list_of_revisions)), self.package))
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -1073,9 +1078,9 @@ class Plotuple:
         # The string which will contain our lines of code
         html = ['<table>']
 
-        # The column names are stored in a separate variable so we can be sure a
-        # column only contains values that belong there (no 'shifting' of rows
-        # if a column does not exist in a revision etc.)
+        # The column names are stored in a separate variable so we can be sure
+        # a column only contains values that belong there (no 'shifting' of
+        # rows if a column does not exist in a revision etc.)
         columns = []
 
         # Actually read in the column names and write them into the table
@@ -1090,8 +1095,8 @@ class Plotuple:
         html.append(line)
 
         # Now fill the table with values
-        # First check if there is a reference object, and in case there is none,
-        # create a row which states that no reference object is available
+        # First check if there is a reference object, and in case there is
+        # none, create a row which states that no reference object is available
         if self.reference is None and 'reference' in self.list_of_revisions:
             line = '<tr><td>reference</td>'
             for _ in columns:
@@ -1119,8 +1124,8 @@ class Plotuple:
         html.append('</table>')
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
-                + self.package)
+        path = ('./plots/{0}/'.
+                format('_'.join(sorted(self.list_of_revisions)), self.package))
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -1154,8 +1159,8 @@ class Plotuple:
                     html.append(line + '\n')
             html.append('\n')
         else:
-            html.append('<a href="./plots/{0}.pdf"><img src="./plots/{0}.png"></a>\n'
-                        .format(self.file))
+            html.append('<a href="./plots/{0}.pdf"> \
+                        <img src="./plots/{0}.png"></a>\n'.format(self.file))
 
         html.append('</div>\n')
 
@@ -1181,14 +1186,15 @@ class Plotuple:
         return html
 
 
-################################################################################
-###                     Main function starts here!                           ###
-################################################################################
+###############################################################################
+#                       Main function starts here!                            #
+###############################################################################
 
 
 def create_plots(revisions=None, force=False):
     """!
-    This function generates the plots and html pgae for the requested revisions.
+    This function generates the plots and html pgae for the requested
+    revisions.
     By default all available revisions are taken. New plots will ony be
     created if they don't exist already for the given set of revisions,
     unless the force option is used.
@@ -1207,8 +1213,9 @@ def create_plots(revisions=None, force=False):
         for revision in revisions:
             # If it is a valid (i.e. available) revision, append it to the list
             # of revisions that we will include in our plots
-            # 'reference' needs to be treated separately, because it is always a
-            # viable option, but will never be listed in 'available_revisions()'
+            # 'reference' needs to be treated separately, because it is always
+            # a viable option, but will never be listed in
+            # 'available_revisions()'
             if revision in available_revisions() or revision == 'reference':
                 list_of_revisions.append(revision)
 
@@ -1220,8 +1227,8 @@ def create_plots(revisions=None, force=False):
 
     # Now we check whether the plots for the selected revisions have been
     # generated before or not. In the path we use the alphabetical order of the
-    # revisions, not the chronological one (easier to work with on the web server
-    # side)
+    # revisions, not the chronological one (easier to work with on the web
+    # server side)
     expected_path = './plots/{0}/content.html'.format(
         '_'.join(sorted(list_of_revisions)))
 

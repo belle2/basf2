@@ -245,11 +245,11 @@ void MicrotpcStudyModule::event()
         double trl0 = BeginPoint * direction.Unit();
         double trl1 = EndPoint * direction.Unit();
         trlArray[detNb].push_back(fabs(trl0 - trl1));
+        pid_old[detNb] = PDGid;
+        thetaArray[detNb].push_back(theta);
+        phiArray[detNb].push_back(phi);
+        pidArray[detNb].push_back(PDGid);
       }
-      pid_old[detNb] = PDGid;
-      thetaArray[detNb].push_back(theta);
-      phiArray[detNb].push_back(phi);
-      pidArray[detNb].push_back(PDGid);
       esum[detNb] = 0;
     } else {
       esum[detNb] += ioni;
@@ -263,36 +263,36 @@ void MicrotpcStudyModule::event()
       double phi = phiArray[i][j];
       double theta = phiArray[i][j];
       int PDGid = pidArray[i][j];
-      double esum = esumArray[i][j];
+      double ioni = esumArray[i][j];
       double trl = trlArray[i][j];
       if (PDGid == 1000080160) {
         h_ttvp_O[i]->Fill(theta, phi);
-        h_tevtrl_O[i]->Fill(esum, trl);
+        h_tevtrl_O[i]->Fill(ioni, trl);
       }
       if (PDGid == 1000060120) {
         h_ttvp_C[i]->Fill(theta, phi);
-        h_tevtrl_C[i]->Fill(esum, trl);
+        h_tevtrl_C[i]->Fill(ioni, trl);
       }
       if (PDGid == 1000020040) {
         h_ttvp_He[i]->Fill(theta, phi);
-        h_tevtrl_He[i]->Fill(esum, trl);
+        h_tevtrl_He[i]->Fill(ioni, trl);
       }
       if (PDGid == 2212) {
         h_ttvp_p[i]->Fill(theta, phi);
-        h_tevtrl_p[i]->Fill(esum, trl);
+        h_tevtrl_p[i]->Fill(ioni, trl);
       }
       if (fabs(PDGid) == 11 || PDGid == 22) {
         h_ttvp_x[i]->Fill(theta, phi);
-        h_tevtrl_x[i]->Fill(esum, trl);
+        h_tevtrl_x[i]->Fill(ioni, trl);
       }
       h_ttvp[i]->Fill(theta, phi);
-      h_tevtrl[i]->Fill(esum, trl);
+      h_tevtrl[i]->Fill(ioni, trl);
 
       if (EdgeCut[i]) {
         if (PDGid == 1000020040) {
           h_ttvp_He_pure[i]->Fill(theta, phi);
-          h_twtvp_He_pure[i]->Fill(theta, phi, esum);
-          h_tevtrl_He_pure[i]->Fill(esum, trl);
+          h_twtvp_He_pure[i]->Fill(theta, phi, ioni);
+          h_tevtrl_He_pure[i]->Fill(ioni, trl);
         }
       }
     }

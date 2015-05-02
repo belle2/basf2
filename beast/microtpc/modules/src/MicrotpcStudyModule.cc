@@ -17,6 +17,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 #include <cmath>
 #include <boost/foreach.hpp>
 
@@ -33,6 +35,7 @@
 #include <TH2.h>
 #include <TH3.h>
 #include <TFile.h>
+#include <TMath.h>
 
 int eventNum = 0;
 
@@ -55,6 +58,12 @@ MicrotpcStudyModule::MicrotpcStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Microtpcs (BEAST)");
 
+  //Default values are set here. New values can be in MICROTPC.xml.
+  addParam("ChipRowNb", m_ChipRowNb, "Chip number of row", 226);
+  addParam("ChipColumnNb", m_ChipColumnNb, "Chip number of column", 80);
+  addParam("ChipColumnX", m_ChipColumnX, "Chip x dimension in cm / 2", 1.0);
+  addParam("ChipRowY", m_ChipRowY, "Chip y dimension in cm / 2", 0.86);
+  addParam("z_DG", m_z_DG, "Drift gap distance [cm]", 12.0);
 }
 
 MicrotpcStudyModule::~MicrotpcStudyModule()
@@ -65,6 +74,8 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 void MicrotpcStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 8 ; i++) {
+    h_z[i] = new TH2F(TString::Format("h_z_%d", i), "Charged density vs z vs r", 100, 0, 20, 100, -5., 5.);
+
     h_evtrl[i] = new TH2F(TString::Format("h_evtrl_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0., 6.);
     h_evtrl_p[i] = new TH2F(TString::Format("h_evtrl_p_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0.,
                             6.);
@@ -81,23 +92,60 @@ void MicrotpcStudyModule::defineHisto()
     h_evtrl_He_pure[i] = new TH2F(TString::Format("h_evtrl_He_pure_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0.,
                                   2000, 200, 0., 6.);
 
+
+    h_tevtrl[i] = new TH2F(TString::Format("h_tevtrl_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0.,
+                           6.);
+    h_tevtrl_p[i] = new TH2F(TString::Format("h_tevtrl_p_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200,
+                             0.,
+                             6.);
+    h_tevtrl_x[i] = new TH2F(TString::Format("h_tevtrl_x_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200,
+                             0.,
+                             6.);
+    h_tevtrl_Hex[i] = new TH2F(TString::Format("h_tevtrl_Hex_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000,
+                               200,
+                               0., 6.);
+    h_tevtrl_He[i] = new TH2F(TString::Format("h_tevtrl_He_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000,
+                              200,
+                              0., 6.);
+    h_tevtrl_C[i] = new TH2F(TString::Format("h_tevtrl_C_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200,
+                             0.,
+                             6.);
+    h_tevtrl_O[i] = new TH2F(TString::Format("h_tevtrl_O_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200,
+                             0.,
+                             6.);
+    h_tevtrl_He_pure[i] = new TH2F(TString::Format("h_tevtrl_He_pure_%d", i), "t: Deposited energy [keV] v. track length [cm]", 2000,
+                                   0.,
+                                   2000, 200, 0., 6.);
+
     h_tvp[i]  = new TH2F(TString::Format("h_tvp_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp[i]  = new TH2F(TString::Format("h_ttvp_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp[i]  = new TH2F(TString::Format("h_wtvp_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_x[i]  = new TH2F(TString::Format("h_tvp_x_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_x[i]  = new TH2F(TString::Format("h_ttvp_x_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_x[i]  = new TH2F(TString::Format("h_wtvp_x_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_p[i]  = new TH2F(TString::Format("h_tvp_p_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_p[i]  = new TH2F(TString::Format("h_ttvp_p_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_p[i]  = new TH2F(TString::Format("h_wtvp_p_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_He[i]  = new TH2F(TString::Format("h_tvp_He_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_He[i]  = new TH2F(TString::Format("h_ttvp_He_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_He[i]  = new TH2F(TString::Format("h_wtvp_He_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_Hex[i]  = new TH2F(TString::Format("h_tvp_Hex_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_Hex[i]  = new TH2F(TString::Format("h_ttvp_Hex_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_Hex[i]  = new TH2F(TString::Format("h_wtvp_Hex_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180.,
                               180.);
     h_tvp_He_pure[i]  = new TH2F(TString::Format("h_tvp_He_pure_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_He_pure[i]  = new TH2F(TString::Format("h_ttvp_He_pure_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180.,
+                                  180.);
     h_wtvp_He_pure[i]  = new TH2F(TString::Format("h_wtvp_He_pure_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360,
                                   -180., 180.);
+    h_twtvp_He_pure[i]  = new TH2F(TString::Format("h_twtvp_He_pure_%d", i), "t: Phi [deg] v. theta [deg] - weighted", 180, 0., 180,
+                                   360,
+                                   -180., 180.);
     h_tvp_C[i]  = new TH2F(TString::Format("h_tvp_C_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_C[i]  = new TH2F(TString::Format("h_ttvp_C_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_C[i]  = new TH2F(TString::Format("h_wtvp_C_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
     h_tvp_O[i]  = new TH2F(TString::Format("h_tvp_O_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_ttvp_O[i]  = new TH2F(TString::Format("h_ttvp_O_%d", i), "t: Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_wtvp_O[i]  = new TH2F(TString::Format("h_wtvp_O_%d", i), "Phi [deg] v. theta [deg] - weighted", 180, 0., 180, 360, -180., 180.);
   }
 
@@ -107,6 +155,9 @@ void MicrotpcStudyModule::defineHisto()
 void MicrotpcStudyModule::initialize()
 {
   B2INFO("MicrotpcStudyModule: Initialize");
+
+  //read microtpc xml file
+  getXMLData();
 
   REG_HISTOGRAM
 
@@ -126,6 +177,8 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcHit> Hits;
   StoreArray<MicrotpcRecoTrack> Tracks;
 
+  Bool_t EdgeCut[8];
+  double esum[8];
   //Initialize recoil and hit type counters
   for (int i = 0; i < 8; i++) {
     xRec[i] = false;
@@ -133,11 +186,23 @@ void MicrotpcStudyModule::event()
     HeRec[i] = false;
     ORec[i] = false;
     CRec[i] = false;
+    //ARec[i] = false;
+    pid_old[i] = 0;
+    EdgeCut[i] = true;
+    esum[i] = 0;
   }
 
   //number of entries in SimHit
   int nSimHits = SimHits.getEntries();
 
+  auto phiArray = new vector<double>[8](); //phi
+  auto thetaArray = new vector<double>[8](); //theta
+  auto pidArray = new vector<int>[8](); //PID
+  //auto edgeArray = new vector<int>[8](); // Edge cut
+  auto esumArray = new vector<double>[8](); // eum
+  auto trlArray = new vector<double>[8](); // eum
+
+  TVector3 EndPoint;
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     MicrotpcSimHit* aHit = SimHits[i];
@@ -148,8 +213,90 @@ void MicrotpcStudyModule::event()
     if (PDGid == 1000020040) HeRec[detNb] = true;
     if (PDGid == 2212) pRec[detNb] = true;
     if (fabs(PDGid) == 11 || PDGid == 22) xRec[detNb] = true;
+
+    double edep = aHit->getEnergyDep();
+    double niel = aHit->getEnergyNiel();
+    double ioni = edep - niel;
+    TVector3 position = aHit->gettkPos();
+    double xpos = position.X() / 100. - TPCCenter[detNb].X();
+    double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
+    double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
+    double r = sqrt(xpos * xpos + ypos * ypos);
+    h_z[detNb]->Fill(zpos, r, ioni);
+
+    TVector3 direction = aHit->gettkMomDir();
+    double theta = direction.Theta() * TMath::RadToDeg();
+    double phi = direction.Phi() * TMath::RadToDeg();
+
+    if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
+        (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
+        (0. < zpos && zpos <  m_z_DG)) {
+      //edgeArray].push_back(1);
+    } else {
+      //edgeArray[i].push_back(0);
+      EdgeCut[i] = false;
+    }
+
+    if (pid_old[detNb] != PDGid) {
+      if (esum[detNb] > 0) {
+        esumArray[detNb].push_back(esum[detNb]);
+        TVector3 BeginPoint;
+        BeginPoint.SetXYZ(xpos, ypos, zpos);
+        double trl0 = BeginPoint * direction.Unit();
+        double trl1 = EndPoint * direction.Unit();
+        trlArray[detNb].push_back(fabs(trl0 - trl1));
+      }
+      pid_old[detNb] = PDGid;
+      thetaArray[detNb].push_back(theta);
+      phiArray[detNb].push_back(phi);
+      pidArray[detNb].push_back(PDGid);
+      esum[detNb] = 0;
+    } else {
+      esum[detNb] += ioni;
+      EndPoint.SetXYZ(xpos, ypos, zpos);
+
+    }
   }
 
+  for (int i = 0; i < 8;  i++) {
+    for (int j = 0; j < (int)phiArray[i].size(); j++) {
+      double phi = phiArray[i][j];
+      double theta = phiArray[i][j];
+      int PDGid = pidArray[i][j];
+      double esum = esumArray[i][j];
+      double trl = trlArray[i][j];
+      if (PDGid == 1000080160) {
+        h_ttvp_O[i]->Fill(theta, phi);
+        h_tevtrl_O[i]->Fill(esum, trl);
+      }
+      if (PDGid == 1000060120) {
+        h_ttvp_C[i]->Fill(theta, phi);
+        h_tevtrl_C[i]->Fill(esum, trl);
+      }
+      if (PDGid == 1000020040) {
+        h_ttvp_He[i]->Fill(theta, phi);
+        h_tevtrl_He[i]->Fill(esum, trl);
+      }
+      if (PDGid == 2212) {
+        h_ttvp_p[i]->Fill(theta, phi);
+        h_tevtrl_p[i]->Fill(esum, trl);
+      }
+      if (fabs(PDGid) == 11 || PDGid == 22) {
+        h_ttvp_x[i]->Fill(theta, phi);
+        h_tevtrl_x[i]->Fill(esum, trl);
+      }
+      h_ttvp[i]->Fill(theta, phi);
+      h_tevtrl[i]->Fill(esum, trl);
+
+      if (EdgeCut[i]) {
+        if (PDGid == 1000020040) {
+          h_ttvp_He_pure[i]->Fill(theta, phi);
+          h_twtvp_He_pure[i]->Fill(theta, phi, esum);
+          h_tevtrl_He_pure[i]->Fill(esum, trl);
+        }
+      }
+    }
+  }
   //number of Tracks
   int nTracks = Tracks.getEntries();
 
@@ -212,11 +359,37 @@ void MicrotpcStudyModule::event()
 
   eventNum++;
 
+  //delete
+  delete [] phiArray;
+  delete [] thetaArray;
+  delete [] pidArray;
+  //delete [] edgeArray;
+  delete [] esumArray;
+  delete [] trlArray;
+}
+//read tube centers, impulse response, and garfield drift data filename from MICROTPC.xml
+void MicrotpcStudyModule::getXMLData()
+{
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
 
+  //get the location of the tubes
+  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
+    TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
+                                 activeParams.getLength("TPCpos_z")));
+    nTPC++;
+  }
+
+  m_ChipColumnNb = content.getInt("ChipColumnNb");
+  m_ChipRowNb = content.getInt("ChipRowNb");
+  m_ChipColumnX = content.getDouble("ChipColumnX");
+  m_ChipRowY = content.getDouble("ChipRowY");
+  m_z_DG = content.getDouble("z_DG");
+
+  B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
+  B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");
 
 }
-
 void MicrotpcStudyModule::endRun()
 {
 

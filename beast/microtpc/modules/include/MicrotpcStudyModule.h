@@ -65,6 +65,28 @@ namespace Belle2 {
 
     private:
 
+      /** reads data from MICROTPC.xml: tube location, drift data filename, sigma of impulse response function */
+      virtual void getXMLData();
+
+      /** Chip column number */
+      int m_ChipColumnNb;
+      /** Chip row number */
+      int m_ChipRowNb;
+      /** Chip column x dimension */
+      double m_ChipColumnX;
+      /** Chip row y dimension */
+      double m_ChipRowY;
+      /** z drift gap */
+      double m_z_DG;
+      /** number of detectors. Read from MICROTPC.xml*/
+      int nTPC = 0;
+      /** TPC coordinate */
+      std::vector<TVector3> TPCCenter;
+      /** Event counter */
+      int Event = 0;
+
+      /** Charged density vs z vs r */
+      TH2F* h_z[8];
       /** Track length v. energy deposited per TPC */
       TH2F* h_evtrl[8];
       /** Track length v. energy deposited per TPC for He */
@@ -82,6 +104,23 @@ namespace Belle2 {
       /** Track length v. energy deposited per TPC for X-ray */
       TH2F* h_evtrl_x[8];
 
+      /** Track length v. energy deposited per TPC */
+      TH2F* h_tevtrl[8];
+      /** Track length v. energy deposited per TPC for He */
+      TH2F* h_tevtrl_He[8];
+      /** Track length v. energy deposited per TPC for He and x */
+      TH2F* h_tevtrl_Hex[8];
+      /** Track length v. energy deposited per TPC for He w/ edge cuts */
+      TH2F* h_tevtrl_He_pure[8];
+      /** Track length v. energy deposited per TPC for p */
+      TH2F* h_tevtrl_p[8];
+      /** Track length v. energy deposited per TPC for O */
+      TH2F* h_tevtrl_O[8];
+      /** Track length v. energy deposited per TPC for C */
+      TH2F* h_tevtrl_C[8];
+      /** Track length v. energy deposited per TPC for X-ray */
+      TH2F* h_tevtrl_x[8];
+
       /** Phi v. theta per TPC */
       TH2F* h_tvp[8];
       /** Phi v. theta per TPC for He */
@@ -98,6 +137,26 @@ namespace Belle2 {
       TH2F* h_tvp_C[8];
       /** Phi v. theta per TPC for X-ray */
       TH2F* h_tvp_x[8];
+
+      /** Phi v. theta per TPC */
+      TH2F* h_ttvp[8];
+      /** Phi v. theta per TPC for He */
+      TH2F* h_ttvp_He[8];
+      /** Phi v. theta per TPC for He and x */
+      TH2F* h_ttvp_Hex[8];
+      /** Phi v. theta per TPC for He w/ edge cuts */
+      TH2F* h_ttvp_He_pure[8];
+      /** Phi v. theta per TPC for p */
+      TH2F* h_ttvp_p[8];
+      /** Phi v. theta per TPC for O */
+      TH2F* h_ttvp_O[8];
+      /** Phi v. theta per TPC for C */
+      TH2F* h_ttvp_C[8];
+      /** Phi v. theta per TPC for X-ray */
+      TH2F* h_ttvp_x[8];
+
+      /** Phi v. theta per TPC for He w/ edge cuts weighted */
+      TH2F* h_twtvp_He_pure[8];
 
       /** Phi v. theta, weighted per TPC */
       TH2F* h_wtvp[8];
@@ -125,6 +184,10 @@ namespace Belle2 {
       Bool_t ORec[8];
       /** C boolean per TPC */
       Bool_t CRec[8];
+      /** A boolean per TPC */
+      //Bool_t ARec[8];
+      /** First hit of ... */
+      int pid_old[8];
 
       /** Number of proton recoils */
       //int npRecoils = 0;

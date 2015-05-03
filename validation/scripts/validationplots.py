@@ -601,12 +601,28 @@ def create_packages_list_html(list_of_packages):
 ###############################################################################
 
 class RootObject:
-    """
+    """!
     Wraps a ROOT object (either a histogram or an n-tuple) together with the
     available meta-information about it.
     Storing the information in a dictionary is necessary to make the objects
     searchable, i.e. implement a function that can return for example all
     objects from a certain revision.
+
+    @var data: A dict with all information about the Root-object
+    @var revision: The revision to which the object belongs to
+    @var package: The package to which the object belongs to
+    @var rootfile: The root file to which the object belongs to
+    @var key: The key (more precisely: the name of the key) which the object
+        has within the root file
+    @var object: The root object itself
+    @var type: The type, i.e. whether its a histogram or an n-tuple
+    @var description: The description, what the histogram/n-tuple contains
+    @var check: A brief description how the histogram or the values should
+        look like
+    @var contact: A contact person for this histogram/n-tuple
+    @var date: The date of the object (identical with the date of its rootfile)
+    @var is_reference: Boolean value if it is an object from a reference file
+        or not
     """
 
     def __init__(self, revision, package, rootfile, key, root_object,
@@ -710,8 +726,30 @@ class RootObject:
 
 
 class Plotuple:
-    """
+    """!
     A Plotuple is either a Plot or an N-Tuple
+
+    @var list_of_root_objects: A list of Root-objects which belong
+        together (i.e. should be drawn into one histogram or one table)
+    @var list_of_revisions: The list of revisions
+    @var warnings: A list of warnings that occured while creating the
+        plots/tables for this Plotuple object
+    @var reference: The reference RootObject for this Plotuple
+    @var elements: The elements (RootObject of different revisions) for this
+        Plotuple
+    @var newest: The newest element in elements
+    @var key: The key of the object within the corresponding ROOT file
+    @var type: The type of the elements (TH1, TH2, TNtuple)
+    @var description: The description of this Plotuple object
+    @var check: Hint how the Plotuple object should look like
+    @var contact: The contact person for this Plotuple object
+    @var package: The package to which this Plotuple object belongs to
+    @var chi2test_result: The result of the Chi^2-Test. By default, there is no
+        such result. If the Chi^2-Test has been performed, this variable holds
+        the information between which objects it has been performed.
+    @var pvalue: The p-value that the Chi^2-Test returned
+    @var file: The file, in which the histogram or the HMTL-table (for
+        n-tuples) are stored (without the file extension!)
     """
 
     def __init__(self, list_of_root_objects, list_of_revisions):

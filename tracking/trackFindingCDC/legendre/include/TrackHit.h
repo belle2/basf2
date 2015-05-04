@@ -47,6 +47,7 @@ namespace Belle2 {
       /** Constructor to create a TrackHit from a CDCHit object.
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
        * (e.g. the position of the hit wire in normal space and in the conformal plane).
+       * The parameter iHit is unused!
        */
       TrackHit(const CDCHit* hit, int iHit);
 
@@ -58,10 +59,6 @@ namespace Belle2 {
       {
         initializeFromWireHit(wireHit);
       }
-
-      // TODO
-      TrackHit(int hitId, int wireID, double driftLength, double sigmaDriftLength,
-               unsigned short charge, int superlayerId, int layerId, TVector3 wirePosition);
 
       /** Return the index in the store array of the original CDCHit*/
       inline int getStoreIndex() const { return m_underlayingWireHit->getStoreIHit(); }
@@ -107,6 +104,8 @@ namespace Belle2 {
 
       /** Get pointer to original CDCHit */
       const CDCHit* getOriginalCDCHit() const { return m_underlayingWireHit->getHit(); }
+
+      const CDCWireHit* getUnderlayingCDCWireHit() const { return m_underlayingWireHit; }
 
       /** Get Z reference */
       double getZReference() const { return m_zReference; }

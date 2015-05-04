@@ -29,8 +29,6 @@ using namespace TrackFindingCDC;
 
 TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
-  //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::ELogLevel::c_Debug);
-
   HitQuadTreeProcessor::ChildRanges ranges(HitQuadTreeProcessor::rangeX(0, std::pow(2, 13)),
                                            HitQuadTreeProcessor::rangeY(-1.5, 1.5));
   std::vector<HitQuadTreeProcessor::ReturnList> candidates;

@@ -8,7 +8,8 @@ env['LIBS'] = [
     'framework_pybasf2',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',
-    'genfit2'
+    'genfit2',
+    'cdc_dataobjects'
     ]
 
 Return('env')

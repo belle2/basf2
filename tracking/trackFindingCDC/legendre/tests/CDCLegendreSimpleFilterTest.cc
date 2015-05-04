@@ -30,24 +30,24 @@ TEST_F(CDCLegendreTestFixture, legendre_SimpleFilterAssignmentProbabilityTest)
   TrackCandidate* otherTrackCandidate = getTrackCandidate(1);
 
   // Test the assignment probability
-  for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+  for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
     EXPECT_GT(SimpleFilter::getAssigmentProbability(trackHit, trackCandidate), 0.5);
   }
 
-  for (TrackHit * trackHit : otherTrackCandidate->getTrackHits()) {
+  for (TrackHit* trackHit : otherTrackCandidate->getTrackHits()) {
     EXPECT_GT(SimpleFilter::getAssigmentProbability(trackHit, otherTrackCandidate), 0.5);
   }
 
 
   unsigned int numberOfNearHits = 0;
-  for (TrackHit * trackHit : otherTrackCandidate->getTrackHits()) {
+  for (TrackHit* trackHit : otherTrackCandidate->getTrackHits()) {
     if (SimpleFilter::getAssigmentProbability(trackHit, trackCandidate) > 0.5)
       numberOfNearHits++;
   }
   EXPECT_LT(numberOfNearHits, otherTrackCandidate->getNHits() / 10);
 
   numberOfNearHits = 0;
-  for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+  for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
     if (SimpleFilter::getAssigmentProbability(trackHit, otherTrackCandidate) > 0.5)
       numberOfNearHits++;
   }
@@ -76,7 +76,7 @@ TEST_F(CDCLegendreTestFixture, legendre_SimpleFilterDeleteAllMarkedHitsTest)
 {
   TrackCandidate* trackCandidate = getTrackCandidate(0);
 
-  for (TrackHit * trackHit : trackCandidate->getTrackHits()) {
+  for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
     trackHit->setHitUsage(TrackHit::bad);
   }
 
@@ -94,7 +94,7 @@ TEST_F(CDCLegendreTestFixture, legendre_SimpleFilterDeleteWrongHitsOfTrackTest)
   unsigned int numberOfHitsBefore = trackCandidate->getNHits();
 
   std::vector<TrackHit*>& trackHitList = trackCandidate->getTrackHits();
-  for (TrackHit * trackHit : someHits) {
+  for (TrackHit* trackHit : someHits) {
     trackHitList.push_back(trackHit);
   }
 
@@ -116,13 +116,13 @@ TEST_F(CDCLegendreTestFixture, legendre_SimpleFilterReassignHitsFromOtherTracksT
   unsigned int numberOfHitsBeforeOther = otherTrackCandidate->getNHits();
 
   std::vector<TrackHit*>& trackHitList = trackCandidate->getTrackHits();
-  for (TrackHit * trackHit : someHitsFromOther) {
+  for (TrackHit* trackHit : someHitsFromOther) {
     trackHitList.push_back(trackHit);
   }
   EXPECT_EQ(trackCandidate->getNHits(), numberOfHitsBefore + someHitsFromOther.size());
 
   std::vector<TrackHit*>& otherTrackHitList = otherTrackCandidate->getTrackHits();
-  for (TrackHit * trackHit : someHits) {
+  for (TrackHit* trackHit : someHits) {
     otherTrackHitList.push_back(trackHit);
   }
   EXPECT_EQ(otherTrackCandidate->getNHits(), numberOfHitsBeforeOther + someHits.size());
@@ -134,5 +134,5 @@ TEST_F(CDCLegendreTestFixture, legendre_SimpleFilterReassignHitsFromOtherTracksT
   SimpleFilter::reassignHitsFromOtherTracks(trackList);
 
   EXPECT_EQ(trackCandidate->getNHits(), numberOfHitsBefore + someHits.size());
-  EXPECT_EQ(otherTrackCandidate->getNHits(), numberOfHitsBeforeOther +  + someHitsFromOther.size());
+  EXPECT_EQ(otherTrackCandidate->getNHits(), numberOfHitsBeforeOther +  someHitsFromOther.size());
 }

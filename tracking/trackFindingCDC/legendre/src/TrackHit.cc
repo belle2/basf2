@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-TrackHit::TrackHit(const CDCHit* hit, int ID)
+TrackHit::TrackHit(const CDCHit* hit, int)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   initializeFromWireHit(wireHitTopology.getWireHit(hit));
@@ -38,16 +38,6 @@ void TrackHit::initializeFromWireHit(const CDCWireHit* wireHit)
   m_hitUsage = TrackHit::not_used;
   checkHitDriftLength();
 }
-
-TrackHit::TrackHit(int hitId, int wireID, double driftLength, double sigmaDriftLength,
-                   unsigned short charge, int superlayerId, int layerId, TVector3 wirePosition)
-{
-  m_zReference = 0;
-  m_hitUsage = TrackHit::not_used;
-  m_wirePosition = wirePosition;
-  performConformalTransformation();
-}
-
 
 bool TrackHit::checkHitDriftLength()
 {

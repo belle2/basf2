@@ -5,8 +5,12 @@ import BaseHTTPServer
 import logging as log
 import os
 import sys
+import time
 import subprocess
 import mimetypes
+from urlparse import parse_qs
+from cgi import parse_header, parse_multipart
+from save import create_image_matrix, merge_multiple_plots
 
 try:
     import simplejson as json
@@ -61,6 +65,17 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         print
 
+    def parse_POST(self):
+        ctype, pdict = parse_header(self.headers['content-type'])
+        if ctype == 'multipart/form-data':
+            postvars = parse_multipart(self.rfile, pdict)
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers['content-length'])
+            postvars = parse_qs(self.rfile.read(length), keep_blank_values=1)
+        else:
+            postvars = {}
+        return postvars
+
     def do_POST(self):
         """!
         How to deal with a POST-request
@@ -71,38 +86,82 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         log.debug("POST: Path %s" % path)
 
-        if not contentType.startswith('application/json'):
+        if contentType.startswith('application/json'):
+            contentLength = int(self.headers['Content-length'])
+            content = self.rfile.read(contentLength)
+            log.debug("POST: Content-length %d" % contentLength)
+            log.debug("POST: Content: %s" % content)
+            data = json.loads(content)
+
+            if 'input' not in data:
+                log.debug("POST: Missing input parameter: %s" % content)
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Missing input parameter"}))
+                return
+
+            (respCode, respContent, respContType) = self.do_GET_JSON(data['input'])
+
+            self.send_response(respCode)
+            self.send_header('Content-type', respContType)
+            self.send_header('Content-length', len(respContent))
+            self.end_headers()
+
+            self.wfile.write(respContent)
+
+            return
+
+        elif (contentType.startswith('multipart/form-data') or
+              contentType.startswith('application/x-www-form-urlencoded')) and "matrix_save" in self.path:
+            postvars = self.parse_POST()
+            images = []
+            pakidz = set()
+            for element in postvars['matrix']:
+                pakidz.add(element.split("__")[0])
+                images.append(element.split("__")[1])
+            if len(pakidz) > 1 or len(postvars['size']) > 1 or len(postvars['package']) > 1:
+                sys.exit("Error: Two or more packages selected in /save_matrix")
+            if "pdf" in postvars["type"]:
+                try:
+                    if merge_multiple_plots("".join(postvars['package']), images):
+                        log.debug("POST: Requested plots successfully merged and the pdf saved.")
+                        self.send_response(301)
+                        self.send_header('Location', './plots/merged_plots.pdf')
+                        self.end_headers()
+                    else:
+                        log.debug("POST: Something went wrong, pdf could not be saved.")
+                        sys.exit()
+                except ImportError:
+                    log.debug("ImportError - the module 'PyPDF2' is missing. \
+                              Please install it by running commands 'source activate' and 'pip install PyPDF2'")
+                    self.send_response(301)
+                    self.send_header('Location', './import_error_pdf.html')
+                    self.end_headers()
+            else:
+                try:
+                    if create_image_matrix(images, "".join(postvars['package']), int(max(postvars['size']))):
+                        log.debug("POST: Requested plot matrix successfully created and saved.")
+                        self.send_response(301)
+                        self.send_header('Location', './plots/matrix.png')
+                        self.end_headers()
+                    else:
+                        log.debug("POST: Plot matrix could not be created.")
+                        self.wfile.write("Error: Requested plot matrix could not be created.")
+                except ImportError:
+                    log.debug("ImportError - the module 'pillow' is missing. \
+                              Please install it by running commands 'source activate' and 'pip install pillow'")
+                    self.send_response(301)
+                    self.send_header('Location', './import_error.html')
+                    self.end_headers()
+            return
+
+        else:
             self.send_response(404)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({"error": "ContentType not supported"}))
             return
-
-        contentLength = int(self.headers['Content-length'])
-        content = self.rfile.read(contentLength)
-
-        log.debug("POST: Content-length %d" % contentLength)
-        log.debug("POST: Content: %s" % content)
-
-        data = json.loads(content)
-        if 'input' not in data:
-            log.debug("POST: Missing input parameter: %s" % content)
-            self.send_response(404)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": "Missing input parameter"}))
-            return
-
-        (respCode, respContent, respContType) = self.do_GET_JSON(data['input'])
-
-        self.send_response(respCode)
-        self.send_header('Content-type', respContType)
-        self.send_header('Content-length', len(respContent))
-        self.end_headers()
-
-        self.wfile.write(respContent)
-
-        return
 
     def do_GET_FILE(self):
         """!
@@ -188,11 +247,11 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 ###############################################################################
-### Webserver starts here
+#   Webserver starts here
 ###############################################################################
 
 
-def run(ip='', port=8000):
+def run(ip='localhost', port=8000):
     """!
     Runs a BaseHTTPServer on the given address
     """

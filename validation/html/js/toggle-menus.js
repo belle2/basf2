@@ -28,10 +28,31 @@ $(document).ready(function(){
             $("#"+$(this).attr("value")).toggle();
 	});
     });
-});
 
-$(document).ready(function(){
     $('input[type="checkbox"][name="options"]').click(function(){
-        $(".wrap_boxes").toggle();
+        $(".descriptions").toggle();
     });
+
+    $('input[type="checkbox"][name="overview"]').click(function(){
+		if($(this).prop("checked")){
+			$(".object_wrap").hide();
+			$(".plot_matrix").show();
+			$(".noplots").show();
+			$(".hidebutton").show();
+		} else {
+			$(".object_wrap").show();
+			$(".noplots").hide();
+			$(".hidebutton").hide();
+		}
+    });
+    $('input[type="checkbox"][name="showlists"]').click(function(){
+		if(!$(this).prop("checked")){
+			$(".hideme").hide();
+			$(".hidetext").text("(show)");
+		} else {
+			$(".hideme").show();
+			$(".hidetext").text("(hide)");
+		}
+	});
+
 });

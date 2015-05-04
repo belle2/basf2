@@ -14,10 +14,11 @@
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/jquery.range.css">
+		<script src="js/jquery.range.js"></script>
 		
     </head>
     <body>
-      
       <!-- This is the layer that is shown while new plots are created -->
       <div id="outer">
 	<div id="table-container">
@@ -37,7 +38,7 @@
 				<div id='revisions' class='submenu' style='display: block; position: relative;'></div>
 				
 				<div class='packages menuhead'><img src="images/cubes.png" alt="Packages">&nbsp; Packages</div>
-				<div id='packages' class='submenu'></div>
+				<div id='packages' class='packages_submenu'></div>
 				
 				<div class='filters menuhead'><img src="images/filter.png" alt="Filters">&nbsp; Filters</div>
 				<div id='filters' class='submenu'>
@@ -49,6 +50,8 @@
 				<div class='options menuhead'><img src="images/options.png" alt="Options">&nbsp; Options</div>
                                 <div id='options' class='submenu'>
                                   <input type="checkbox" name="options" class="displaydescriptions" checked>&nbsp; Display descriptions <br>
+                                  <input type="checkbox" name="overview" class="package_overview" value="overview" checked>&nbsp; Package overview <br>
+                                  <input type="checkbox" name="showlists" class="show_plot_lists" value="lists" >&nbsp; Show plot lists <br>
                                 </div>
 
 				<div class='menuhead readlogs'><img src="images/file-text.png" alt="Read Logs">&nbsp; Read Logs</div>

@@ -3,6 +3,7 @@
 
 # Normal imports
 import argparse
+import glob
 import datetime
 import fnmatch
 import math
@@ -13,22 +14,40 @@ import shutil
 import sys
 import time
 
+
+# Only execute the program if a basf2 release is set up!
+if os.environ.get('BELLE2_RELEASE', None) is None:
+    sys.exit('Error: No basf2 release set up!')
+
 # Load ROOT
 import ROOT
+
 
 # The pretty printer. Print prettier :)
 import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
-# Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE', None) is None:
-    sys.exit('Error: No basf2 release set up!')
+################################################################################
+#                           Function definitions                               #
+################################################################################
 
 
-###############################################################################
-#                           Function definitions                              #
-###############################################################################
+def largest_name(name):
+    nameArr = []
+    for plts in os.listdir(name):
+        plts = plts.strip()
+        if plts.endswith(".png"):
+            nameArr.append(len(plts[:-4]))
+    return max(nameArr)
+
+
+def no_pval_less_than(pValDict, number):
+    for element in pValDict:
+        if pValDict[element] <= number:
+            return 0
+    return 1
+
 
 def available_revisions():
     """
@@ -213,10 +232,7 @@ def get_reference_files():
                 full_path = root + '/' + current_file
                 # If the file is a *.root file in a validation subfolder,
                 # we shall collect it as a reference file
-                # NB: This will only find ROOT files that lie directly in
-                # the /[pkg]/validation folder, not in any subdirs of it!
-                if (os.path.splitext(full_path)[1] == 'root' and
-                        os.path.dirname(full_path).endswith('validation')):
+                if fnmatch.fnmatch(full_path, '*/validation/*.root'):
                     results[location].append(os.path.abspath(full_path))
 
     # Now we need to get a rid of all the duplicates: Since local > central,
@@ -227,7 +243,7 @@ def get_reference_files():
         local_path = local_file.replace(basepaths['local'], '')
         # Now loop over all central reference files
         for central_file in results['central']:
-            # Remove the location, i.e. reduce path to /[package]/[filename]
+            # Remove the location, i.e. reduce the path to /[package]/[filename]
             central_path = central_file.replace(basepaths['central'], '')
             # If package and filename are the same, we remove the central
             # file from our results list
@@ -291,20 +307,27 @@ def generate_new_plots(list_of_revisions):
 
     # Open the output file
     html_output = open('./content.html', 'w+')
+    temp_output = ""
 
     # Write meta-data, i.e. creation date and revisions contained in the file
     created = str(datetime.datetime.utcfromtimestamp(int(time.time())))
     json_revs = ','.join(['"' + _ + '"' for _ in list_of_revisions])
-    html_output.write('<!-- {{"lastModified": "Plots created:<br>{0} (UTC)", '
-                      '"revisions":[{1}]}} -->\n\n'.format(created, json_revs))
-
+    html_output.write('<!-- {{ "lastModified": "Plots created:<br>{0} (UTC)", '
+                      '"revisions":[{1}] }} -->\n\n'.format(created, json_revs))
+    # MYCONTENT
+    # for every package
     for package in sorted(list_of_packages):
+
         html_output.write('<div id="' + package + '">\n')
         html_output.write('<h1>' + package + '</h1>\n')
 
         root_files_in_pkg = find_root_object(list_of_root_objects,
                                              package=package)
 
+        # emptying temporary dictionaries
+        desc = {}
+        p_value = {}
+        temp_output = ""
         for key in sorted(list_of_keys):
             root_objects = find_root_object(root_files_in_pkg, key=key)
 
@@ -313,12 +336,165 @@ def generate_new_plots(list_of_revisions):
                 continue
 
             plotuple = Plotuple(root_objects, list_of_revisions)
+            desc[plotuple.key] = plotuple.description
+            p_value[plotuple.key] = plotuple.pvalue
 
-            html_output.write('\n\n')
+            # html_output.write('\n\n')
+            temp_output += "\n\n"
             for line in plotuple.html():
-                html_output.write(line + '\n')
-            html_output.write('\n\n')
+                # html_output.write(line + '\n')
+                temp_output += line + '\n'
+            # html_output.write('\n\n')
+            temp_output += '\n\n'
 
+        # define where we have the plots
+        folder = './plots/{0}/'.format('_'.join(sorted(
+            list_of_revisions))) + package
+
+        ident = []
+        i = 1
+        # if there is a folder and this folder contains plots
+        if os.path.isdir(folder) and len(glob.glob(folder + "/*.png")) >= 1:
+
+            if no_pval_less_than(p_value, 0.01) and no_pval_less_than(p_value, 1):
+                html_output.write(
+                    "<div class=\"fltr p_value_leq_0_01 hlaska\" style=\"display:none\">"
+                    "<strong>No plots with p-value less than 0.01</strong></div>\n"
+                )
+                html_output.write(
+                    "<div class=\"fltr p_value_leq_1 hlaska\" style=\"display:none\">"
+                    "<strong>No plots with p-value less than 1</strong></div>\n"
+                )
+            elif no_pval_less_than(p_value, 0.01):
+                html_output.write(
+                    "<div class=\"fltr p_value_leq_0_01 hlaska\" style=\"display:none\">"
+                    "<strong>No plots with p-value less than 0.01</strong></div>\n"
+                )
+            elif no_pval_less_than(p_value, 1):
+                html_output.write(
+                    "<div class=\"fltr p_value_leq_1 hlaska\" style=\"display:none\">"
+                    "<strong>No plots with p-value less than 1</strong></div>\n"
+                )
+
+            html_output.write('<div class="object_wrap plot_matrix">\n\n<div class="object">\n')
+            # the slider
+            html_output.write(
+                '\n<table width="100%" style="border:none">\n<tr>\n'
+                '<td width="50%" align="left">\nChange image size: \n</td>\n'
+                '<td widht="50%" align="right">\n<input widht=\"25%\" '
+                'type=\"range\" id=\"{0}\" class=\"plot-size\" min=\"10\" max=\"50\" value=\"25\">&nbsp;'
+                '<span id="slidernumber_{0}">25</span>'
+                '%&nbsp;&nbsp;&nbsp;\n</td>\n</tr>\n</table>\n<p></p>\n'.format(package)
+            )
+
+            # creation of the actual plot matrix
+            for plts in sorted(os.listdir(folder)):
+                plts = plts.strip()
+                if plts.endswith(".png"):
+                    img = './plots/./{0}/'.format('_'.join(sorted(
+                        list_of_revisions)) + "/" + package) + plts
+                    # get the plot key from the file path
+                    plts = plts[:-4].strip()
+                    # if there is no description, say it
+                    if not desc[plts]:
+                        desc[plts] = "n/a"
+                    # setting up our filters
+                    classes = ["imidzes_"+package, "fltr"]
+                    if p_value[plts] <= 1:
+                        classes.append('p_value_leq_1')
+                    if p_value[plts] <= 0.01:
+                        classes.append('p_value_leq_0_01')
+
+                    # the code for the actual plots
+                    html_output.write('<span id="{2}" class="imidz-{6} imidz"><a href="#{0}"> \
+                        <img width="25%" src="{1}" class="matrix-img {5}" align="left" alt="{3}" title="{3}, {4}"> \
+                        </a></span>\n'.format((package + "_" + plts.replace(".", "_")).strip(),
+                                              img, (package + "__" + plts.replace(".", "_")).strip(), plts,
+                                              desc[plts], " ".join(classes), package))
+                    # save which plots we are using, this string will be then pasted into id="" html tag
+                    ident.append(package + "__" + plts)
+
+            # lots of spaghetti-looking code that creates the hide/show button,
+            # the information at the beginning and the select all/none button.
+            html_output.write("</div>\n\n<div class='wrap_boxes'>\n\n\
+                <div style=\"cursor:pointer; font-size: 70%; text-align:right; width:100%\" \
+                class=\"hide hidetext\" id=\"h{0}\">(hide)</div>\
+                <span class='wrap_h{0} hideme'><h2>Plots in this package</h2> \
+                \nUncheck the checkbox next to the plot name to hide the \
+                plot from the plot matrix and click on the plot name or on the \
+                plot miniature on the plot matrix to show a bigger plot with \
+                full description.<br>\n<br>\nSelect <span class=\"selectall\" \
+                id=\"{0}\" style=\"cursor:pointer; color: #348017; \
+                text-decoration:underline;\">all</span>/<span class=\"selectnone\" \
+                id=\"{0}\" style=\"cursor:pointer; color:#990012; text-decoration:underline;\">none</span><br> \
+                <form method=\"post\" name=\"{1}\" action=\"./matrix_save\"><input \
+                type=\"hidden\" name=\"package\" value=\"{1}\"><table style='width:100%; \
+                border:none'>\n<input type=\"hidden\" name=\"size\" class=\"slidernumber_{0}\" \
+                value=\"25\">\n<tr>".format(package, ('_'.join(sorted(list_of_revisions)) + "/" + package)))
+            # this is here for aesthetics. If we have the largest name of a plot with a length up to
+            # 5 letters, we can fit 5 of these names into one line of text
+            # so we create 5xN table
+            if largest_name(folder) <= 5:
+                k = 5
+            # if the largest name is up to 15 letters long, we can fit only 3 of these names into one line of text
+            elif largest_name(folder) <= 15:
+                k = 3
+            # if 25, we can fit only two of these names
+            elif largest_name(folder) <= 25:
+                k = 2
+            # and if it is longer, we can fit only one. I don't suppose somebody will
+            # be in need of so long name that we would have to wrap it
+            else:
+                k = 1
+            # and now we create the table
+            for el in sorted(ident):
+                # split the package from the plot key
+                plts = el.split("__")[1]
+                # prepare the ends of lines
+                if (i % k) == 0:
+                    end = "\n</tr>\n<tr>"
+                else:
+                    end = ""
+                i += 1
+                # also we can't forget our classes,
+                # we don't want a name without a plot to be shown
+                classes = ["fltr", "matrix-img"]
+                if p_value[plts] <= 1:
+                    classes.append('p_value_leq_1')
+                if p_value[plts] <= 0.01:
+                    classes.append('p_value_leq_0_01')
+                # the code for the actual name table
+                html_output.write("  <td stytle='width:{5}%' class='{4}'>\
+                    <input type='checkbox' name='matrix' class='matrix-toggle \
+                    matrix-{6}' value='{0}' checked><a href='#{1}' \
+                    class=\"imidz\" name=\"{0}\">{2}</a>\n</td>{3}\
+                    \n".format(el.strip(), ("_".join(el.split("__"))).replace(".", "_"),
+                               plts, end, " ".join(classes), 100/k, package))
+
+            html_output.write("</tr>\n</table>\n")
+            # the save button
+            html_output.write(
+                "\n<div width=\"100%\" align=\"right\"title='Option PNG: "
+                "Saves the matrix exactly as you see in bigger resolution "
+                "as .png image.\nOption PDF: Creates an .pdf file out "
+                "of selected plots shown in the matrix. Will not be "
+                "formated, each plot is a new page of the .pdf file, "
+                "plots will be placed in order one after another.'>\n"
+                "<select name='type'><option value='png'>Save the matrix "
+                "as PNG image</option><option value='pdf'>Merge plots "
+                "into a single PDF file</option></select>&nbsp;"
+                "<input type='submit' value='Save'>\n</div>\n</form>\n"
+                "</span>\n</div>\n\n</div>\n\n"
+            )
+        # if we don't have the folder for this package, say we don't have anything to display
+        elif not os.path.isdir(folder):
+            html_output.write("\n<strong>Nothing to display</strong>\n<br>\n")
+        # and if we don't have any plots, then in overview mode(hence the <span>),
+        # where we show only plots, write that we don't have any plots in this package
+        elif os.path.isdir(folder) and not len(glob.glob(folder + "/*.png")):
+            html_output.write("\n<span class='noplots'><strong>This package does not contain any plots.</strong></span>")
+        # in the end, write everything else
+        html_output.write(temp_output)
         html_output.write('</div>\n\n')
 
     html_output.close()
@@ -360,8 +536,7 @@ def create_RootObjects_from_list(list_of_root_files, is_reference):
         # Create the RootObjects from this file and store them, as well as the
         file_objects, \
             file_keys, \
-            file_package = create_RootObjects_from_file(root_file,
-                                                        is_reference)
+            file_package = create_RootObjects_from_file(root_file, is_reference)
 
         # Append results to the global results
         list_objects += file_objects
@@ -444,7 +619,7 @@ def create_RootObjects_from_file(root_file, is_reference):
             # after the ROOT file is closed
             root_object.SetDirectory(0)
 
-            # Read out meta information: Description, Check and Contact
+            # Read out meta information: DescriptionDescription, Check and Contact
             # Initialize as None objects
             description = None
             check = None
@@ -534,7 +709,7 @@ def get_style(index, overallItemCount):
     # Define the linestyles for the plot
     linestyles = {'dashed': 2,    # Dashed: - - - - -
                   'solid': 1,    # Solid: ----------
-                  'dashdot': 10}    # Dash-dot: -⋅-⋅-⋅-
+                  'dashdot': 10}    # Dash-dot: -?-?-?-
     ls_index = {0: 'dashed', 1: 'solid', 2: 'dashdot'}
 
     # Define the linewidth for the plots
@@ -572,9 +747,7 @@ def create_revision_list_html():
 
     for item in available_revisions():
         ind = index_from_revision(item)
-        color = ROOT.gROOT.GetColor(get_style(ind,
-                                    len(available_revisions()))
-                                    .GetLineColor()).AsHexString()
+        color = ROOT.gROOT.GetColor(get_style(ind, len(available_revisions())).GetLineColor()).AsHexString()
         date_of_revision = datetime.datetime.utcfromtimestamp(int(
             date_from_revision(item)))
         revisions.write('<label title="Data created: {0} (UTC)">'
@@ -592,13 +765,13 @@ def create_packages_list_html(list_of_packages):
     with open('./packages.html', 'w+') as pkgs:
         for pkg in sorted(list_of_packages):
             pkgs.write('<label><input type="checkbox" name="packages" value="{'
-                       '0}" checked>&nbsp;<a href="#{0}">{0} »</a><br></label>'
+                       '0}" checked>&nbsp;<a href="#{0}">{0} ?</a><br></label>'
                        .format(pkg))
 
 
-###############################################################################
-#                              Class Definition                               #
-###############################################################################
+################################################################################
+#                              Class Definition                                #
+################################################################################
 
 class RootObject:
     """!
@@ -651,8 +824,8 @@ class RootObject:
         @param check: A short description of how the data in the plot should
                 look like, i.e. for example the target location of a peak etc.
         @param contact: A name or preferably an e-mail address of the person
-                who is responsible for this plot and may be contacted in case
-                of problems
+                who is responsible for this plot and may be contacted in case of
+                problems
         @param is_reference: A boolean value telling if an object is a
                 reference object or a normal plot/n-tuple object from a
                 revision. Possible Values: True for reference objects,
@@ -882,8 +1055,8 @@ class Plotuple:
         elif pvalue < 1:
             canvas.SetFillColor(ROOT.kOrange)
 
-        self.chi2test_result = ('Performed Chi^2-Test between reference \
-                                and {0}'.format(self.newest.revision))
+        self.chi2test_result = ('Performed Chi^2-Test between reference and {0}'
+                                .format(self.newest.revision))
         self.pvalue = pvalue
 
     def draw_ref(self, canvas):
@@ -977,8 +1150,8 @@ class Plotuple:
                 title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/{1}'.format('_'.
-                join(sorted(self.list_of_revisions)), self.package))
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
+                + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -992,8 +1165,8 @@ class Plotuple:
         """!
         Plots all histogram-objects in this Plotuple together in one histogram,
         which is then given the name of the key.
-        @param mode: Determines whether it is a one- or two-dimensional
-            histogram. Accepted values are '1D' and '2D'
+        @param mode: Determines whether it is a one- or two-dimensional histogram.
+            Accepted values are '1D' and '2D'
         @return: None
         """
 
@@ -1017,8 +1190,8 @@ class Plotuple:
         # If we have a 1D histogram
         if mode == '1D':
 
-            # A variable which holds whether we have drawn on the canvas
-            # already or not
+            # A variable which holds whether we have drawn on the canvas already
+            # or not
             drawn = False
 
             # If there is a reference object, plot it first
@@ -1096,8 +1269,8 @@ class Plotuple:
                     title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/{1}'.format('_'.
-                join(sorted(self.list_of_revisions)), self.package))
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
+                + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -1116,9 +1289,9 @@ class Plotuple:
         # The string which will contain our lines of code
         html = ['<table>']
 
-        # The column names are stored in a separate variable so we can be sure
-        # a column only contains values that belong there (no 'shifting' of
-        # rows if a column does not exist in a revision etc.)
+        # The column names are stored in a separate variable so we can be sure a
+        # column only contains values that belong there (no 'shifting' of rows
+        # if a column does not exist in a revision etc.)
         columns = []
 
         # Actually read in the column names and write them into the table
@@ -1133,8 +1306,8 @@ class Plotuple:
         html.append(line)
 
         # Now fill the table with values
-        # First check if there is a reference object, and in case there is
-        # none, create a row which states that no reference object is available
+        # First check if there is a reference object, and in case there is none,
+        # create a row which states that no reference object is available
         if self.reference is None and 'reference' in self.list_of_revisions:
             line = '<tr><td>reference</td>'
             for _ in columns:
@@ -1162,8 +1335,8 @@ class Plotuple:
         html.append('</table>')
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.
-                format('_'.join(sorted(self.list_of_revisions)), self.package))
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
+                + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -1179,13 +1352,13 @@ class Plotuple:
         """
         html = []
 
-        classes = ['object_wrap']
+        classes = ['object_wrap', (self.package + "__" + self.file.split("/")[-1].replace(".", "_")).strip(), 'fltr']
         if self.pvalue <= 1:
             classes.append('p_value_leq_1')
         if self.pvalue <= 0.01:
             classes.append('p_value_leq_0_01')
-
-        html.append('<div class="{0}">\n'.format(' '.join(classes)))
+        prmn = (self.package + "_" + self.file.split("/")[-1].replace(".", "_")).strip()
+        html.append('<div class="{0}" id="{1}">\n'.format(' '.join(classes), prmn))
 
         html.append('<div class="object">\n')
 
@@ -1197,13 +1370,19 @@ class Plotuple:
                     html.append(line + '\n')
             html.append('\n')
         else:
-            html.append('<a href="./plots/{0}.pdf"> \
-                        <img src="./plots/{0}.png"></a>\n'.format(self.file))
+            html.append('<a href="./plots/{0}.pdf"><img src="./plots/{0}.png"></a>\n'
+                        .format(self.file))
 
         html.append('</div>\n')
 
-        html.append('<div class="wrap_boxes">\n')
-        html.append('<h2>' + self.key + '</h2>\n')
+        html.append('<div class="wrap_boxes descriptions">\n')
+        if len(self.key) > 45:
+            h2 = "-<br>".join([self.key[i:i+45] for i in range(0, len(self.key), 45)])
+        else:
+            h2 = self.key
+        html.append('<div class="hidebutton" width="100%" align="right" \
+            style="font-size: 70%;">(<a href="#' + self.package + '" \
+            style="color:black; text-decoration:none;">hide this plot</a>)</div>\n<h2>' + h2 + '</h2>\n')
 
         if self.warnings:
             html.append('<p style="color: red;"><strong>Warnings:</strong> '
@@ -1224,15 +1403,14 @@ class Plotuple:
         return html
 
 
-###############################################################################
-#                       Main function starts here!                            #
-###############################################################################
+################################################################################
+#                       Main function starts here!                             #
+################################################################################
 
 
 def create_plots(revisions=None, force=False):
     """!
-    This function generates the plots and html pgae for the requested
-    revisions.
+    This function generates the plots and html pgae for the requested revisions.
     By default all available revisions are taken. New plots will ony be
     created if they don't exist already for the given set of revisions,
     unless the force option is used.
@@ -1251,9 +1429,8 @@ def create_plots(revisions=None, force=False):
         for revision in revisions:
             # If it is a valid (i.e. available) revision, append it to the list
             # of revisions that we will include in our plots
-            # 'reference' needs to be treated separately, because it is always
-            # a viable option, but will never be listed in
-            # 'available_revisions()'
+            # 'reference' needs to be treated separately, because it is always a
+            # viable option, but will never be listed in 'available_revisions()'
             if revision in available_revisions() or revision == 'reference':
                 list_of_revisions.append(revision)
 
@@ -1265,8 +1442,8 @@ def create_plots(revisions=None, force=False):
 
     # Now we check whether the plots for the selected revisions have been
     # generated before or not. In the path we use the alphabetical order of the
-    # revisions, not the chronological one (easier to work with on the web
-    # server side)
+    # revisions, not the chronological one (easier to work with on the web server
+    # side)
     expected_path = './plots/{0}/content.html'.format(
         '_'.join(sorted(list_of_revisions)))
 

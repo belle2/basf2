@@ -5,15 +5,18 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 16 - Feb - 2015
 //
-// Contributors: Anze Zupanc
+// Contributors: Anze Zupanc, Matic Lubej
 //-
 
 #include <b2bii/modules/B2BIIConvertMdst/B2BIIConvertMdstModule.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
@@ -23,6 +26,7 @@
 
 // ROOT
 #include <TVector3.h>
+#include <TLorentzVector.h>
 
 #include <limits>
 #include <queue>
@@ -83,6 +87,17 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreArray<TrackFitResult> trackFitResults;
   trackFitResults.registerInDataStore();
 
+  StoreArray<Particle> particles;
+  particles.registerInDataStore();
+
+  StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+  extraInfoMap.registerInDataStore();
+
+  StoreObjPtr<ParticleList> gammaParticleList(gammaListName);
+  gammaParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> pi0ParticleList(pi0ListName);
+  pi0ParticleList.registerInDataStore();
+
   m_pidLikelihoods.registerInDataStore();
 
   // needs to be registered, even if running over data, since this information is available only at the begin_run function
@@ -95,6 +110,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   tracks.registerRelationTo(m_pidLikelihoods);
   eclClusters.registerRelationTo(mcParticles);
   eclClusters.registerRelationTo(tracks);
+  particles.registerRelationTo(mcParticles);
 
   B2DEBUG(99, "[B2BIIConvertMdstModule::initializeDataStore] initialization of DataStore ended");
 }
@@ -128,6 +144,12 @@ void B2BIIConvertMdstModule::event()
 
   // 4. Set ECLCluster -> Track relations
   setECLClustersToTracksRelations();
+
+  // 5. Convert Gamma information
+  convertMdstGammaTable();
+
+  // 6. Convert Pi0 information
+  convertMdstPi0Table();
 }
 
 //-----------------------------------------------------------------------------
@@ -206,7 +228,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
   int nParticles = 0;
 
   // Start with the root (mother-of-all) particle (1st particle in gen_hepevt table)
-  m_particleGraph.addParticle(); nParticles++;
+  m_particleGraph.addParticle();
+  nParticles++;
   Belle::Gen_hepevt rootParticle = genMgr(Belle::Panther_ID(1));
   genHepevtToMCParticle[1] = position;
 
@@ -262,7 +285,8 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 
     //putting the daughter in the graph:
     position = m_particleGraph.size();
-    m_particleGraph.addParticle(); nParticles++;
+    m_particleGraph.addParticle();
+    nParticles++;
     genHepevtToMCParticle[currDaughter.get_ID()] = position;
 
     MCParticleGraph::GraphParticle* graphDaughter = &m_particleGraph[position];
@@ -292,49 +316,151 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 
 void B2BIIConvertMdstModule::convertMdstECLTable()
 {
-  // at this point MCParticles StoreArray should already exist
+  // At this point MCParticles StoreArray should already exist
   StoreArray<MCParticle> mcParticles;
 
-  // create ECLCluster StoreArray
+  // Create ECLCluster StoreArray
   StoreArray<ECLCluster> eclClusters;
   eclClusters.create();
 
   // Relations
   RelationArray eclClustersToMCParticles(eclClusters, mcParticles);
 
-  // Loop over all Belle ECL clusters
+  // Clear the mdstEcl <-> ECLCluster map
+  mdstEclToECLCluster.clear();
+
+  // Loop over all Belle Mdst_ecl
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
   Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
   for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); eclIterator++) {
 
+    // Pull Mdst_ecl from manager
     Belle::Mdst_ecl mdstEcl = *eclIterator;
-    Belle::Mdst_ecl_aux mdstEclAux(ecl_aux_manager(Belle::Panther_ID(mdstEcl.get_ID())));
+    Belle::Mdst_ecl_aux mdstEclAux(ecl_aux_manager(mdstEcl.get_ID()));
 
+    // Create Belle II ECLCluster
     auto B2EclCluster = eclClusters.appendNew();
 
-    // convert Belle::MDST_ECL -> ECLCluster
+    // Convert Mdst_ecl -> ECLCluster and create map of indices
     convertMdstECLObject(mdstEcl, mdstEclAux, B2EclCluster);
+    mdstEclToECLCluster[mdstEcl.get_ID()] = B2EclCluster->getArrayIndex();
 
     if (m_realData)
       continue;
 
-    // create ECLCluster -> MCParticle relation
-    // step 1: MDST_ECL -> Gen_hepevt
-    const Belle::Gen_hepevt hep(get_hepevt(mdstEcl, 0));
+    // Create ECLCluster -> MCParticle relation
+    // Step 1: MDST_ECL -> Gen_hepevt
+    const Belle::Gen_hepevt hep(gen_level(get_hepevt(mdstEcl)));
     if (hep && hep.idhep() != 911) {
-      // step 2: Gen_hepevt -> MCParticle
+      // Step 2: Gen_hepevt -> MCParticle
       if (genHepevtToMCParticle.count(hep.get_ID()) > 0) {
-        int matchedMCParticle = genHepevtToMCParticle[hep.get_ID()];
-        // step 3: set the relation
-        eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticle);
-
-        testMCRelation(hep, mcParticles[matchedMCParticle], "ECLCluster");
+        int matchedMCParticleID = genHepevtToMCParticle[hep.get_ID()];
+        // Step 3: set the relation
+        eclClustersToMCParticles.add(B2EclCluster->getArrayIndex(), matchedMCParticleID);
+        testMCRelation(hep, mcParticles[matchedMCParticleID], "ECLCluster");
       } else {
-        B2DEBUG(79, "Can not find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
+        B2DEBUG(79, "Cannot find MCParticle corresponding to this gen_hepevt (Panther ID = " << hep.get_ID() << ")");
         B2DEBUG(79, "Gen_hepevt: Panther ID = " << hep.get_ID() << "; idhep = " << hep.idhep() << "; isthep = " << hep.isthep());
       }
     }
+  }
+}
+
+void B2BIIConvertMdstModule::convertMdstGammaTable()
+{
+  // At this point ECLClusters and MCParticles StoreArray should already exist
+  StoreArray<ECLCluster> eclClusters;
+  StoreArray<MCParticle> mcParticles;
+
+  // Create Particles StoreArray
+  StoreArray<Particle> particles;
+  particles.create();
+
+  // Relations
+  RelationArray particlesToMCParticles(particles, mcParticles);
+
+  // Clear the mdstGamma <-> Particle map
+  mdstGammaToParticle.clear();
+
+  // Create and initialize particle list
+  StoreObjPtr<ParticleList> plist(gammaListName);
+  plist.create();
+  plist->initialize(gammaPDGCode, gammaListName);
+
+  // Loop over all Belle Mdst_gamma
+  Belle::Mdst_gamma_Manager& gamma_manager = Belle::Mdst_gamma_Manager::get_manager();
+
+  for (Belle::Mdst_gamma_Manager::iterator gammaIterator = gamma_manager.begin(); gammaIterator != gamma_manager.end();
+       gammaIterator++) {
+
+    // Pull Mdst_gamma from manager and Mdst_ecl from pointer to Mdst_ecl
+    Belle::Mdst_gamma mdstGamma = *gammaIterator;
+    Belle::Mdst_ecl mdstEcl = mdstGamma.ecl();
+    if (!mdstEcl)
+      continue;
+
+    // Get ECLCluster from map
+    ECLCluster* B2EclCluster = eclClusters[mdstEclToECLCluster[mdstEcl.get_ID()]];
+    if (!B2EclCluster)
+      continue;
+
+    // Create Particle from ECLCluster, add to StoreArray, create gamma map entry
+    Particle* B2Gamma = particles.appendNew(Particle(B2EclCluster));
+    mdstGammaToParticle[mdstGamma.get_ID()] = B2Gamma->getArrayIndex();
+
+    // Add particle to particle list
+    plist->addParticle(B2Gamma);
+
+    if (m_realData)
+      continue;
+
+    // Relation to MCParticle
+    MCParticle* matchedMCParticle = B2EclCluster->getRelated<MCParticle>();
+    if (matchedMCParticle)
+      B2Gamma->addRelationTo(matchedMCParticle);
+  }
+}
+
+void B2BIIConvertMdstModule::convertMdstPi0Table()
+{
+  // At this point ECLClusters and Particles StoreArray should already exist
+  StoreArray<ECLCluster> eclClusters;
+  StoreArray<Particle> particles;
+
+  // Create and initialize particle list
+  StoreObjPtr<ParticleList> plist(pi0ListName);
+  plist.create();
+  plist->initialize(pi0PDGCode, pi0ListName);
+
+  // Loop over all Mdst_pi0
+  Belle::Mdst_pi0_Manager& pi0_manager = Belle::Mdst_pi0_Manager::get_manager();
+  for (Belle::Mdst_pi0_Manager::iterator pi0Iterator = pi0_manager.begin(); pi0Iterator != pi0_manager.end(); pi0Iterator++) {
+
+    // Pull Mdst_pi0 from manager and Mdst_gammas from pointers to Mdst_gammas
+    Belle::Mdst_pi0 mdstPi0 = *pi0Iterator;
+    Belle::Mdst_gamma mdstGamma1 = mdstPi0.gamma(0);
+    Belle::Mdst_gamma mdstGamma2 = mdstPi0.gamma(1);
+    if (!mdstGamma1 || !mdstGamma2)
+      continue;
+
+    TLorentzVector p4(mdstPi0.px(), mdstPi0.py(), mdstPi0.pz(), mdstPi0.energy());
+
+    // Create Particle from TLorentzVector and PDG code, add to StoreArray
+    Particle* B2Pi0 = particles.appendNew(Particle(p4, pi0PDGCode));
+
+    // Get Belle II photons from map
+    Particle* B2Gamma1 = particles[mdstGammaToParticle[mdstGamma1.get_ID()]];
+    Particle* B2Gamma2 = particles[mdstGammaToParticle[mdstGamma2.get_ID()]];
+    if (!B2Gamma1 || !B2Gamma2)
+      continue;
+
+    // Append photons as pi0 daughters
+    B2Pi0->appendDaughter(B2Gamma1);
+    B2Pi0->appendDaughter(B2Gamma2);
+
+    // Add particle to particle list
+    plist->addParticle(B2Pi0);
   }
 }
 
@@ -642,31 +768,56 @@ int B2BIIConvertMdstModule::recoverMoreThan24bitIDHEP(int id)
   if (high_bits == 0 || high_bits == mask) return id;
 
   switch (id) {
-    case   7114363: return      91000443; // X(3940)
-    case   6114363: return      90000443; // Y(3940)
-    case   6114241: return      90000321; // K_0*(800)+
-    case   6114231: return      90000311; // K_0*(800)0
-    case  -6865004: return       9912212; // p_diff+
-    case  -6865104: return       9912112; // n_diffr
-    case  -6866773: return       9910443; // psi_diff
-    case  -6866883: return       9910333; // phi_diff
-    case  -6866993: return       9910223; // omega_diff
-    case  -6867005: return       9910211; // pi_diff+
-    case  -6867103: return       9910113; // rho_diff0
-    case  -7746995: return       9030221; // f_0(1500)
-    case  -7756773: return       9020443; // psi(4415)
-    case  -7756995: return       9020221; // eta(1405)
-    case  -7766773: return       9010443; // psi(4160)
-    case  -7776663: return       9000553; // Upsilon(5S)
-    case  -7776773: return       9000443; // psi(4040)
-    case  -7776783: return       9000433; // D_sj(2700)+
-    case  -7776995: return       9000221; // f_0(600)
-    case  -6114241: return     -90000321; // K_0*(800)-
-    case  -6114231: return     -90000311; // anti-K_0*(800)0
-    case   6865004: return      -9912212; // anti-p_diff-
-    case   6865104: return      -9912112; // anti-n_diffr
-    case   6867005: return      -9910211; // pi_diff-
-    case   7776783: return      -9000433; // D_sj(2700)-
+    case   7114363:
+      return      91000443; // X(3940)
+    case   6114363:
+      return      90000443; // Y(3940)
+    case   6114241:
+      return      90000321; // K_0*(800)+
+    case   6114231:
+      return      90000311; // K_0*(800)0
+    case  -6865004:
+      return       9912212; // p_diff+
+    case  -6865104:
+      return       9912112; // n_diffr
+    case  -6866773:
+      return       9910443; // psi_diff
+    case  -6866883:
+      return       9910333; // phi_diff
+    case  -6866993:
+      return       9910223; // omega_diff
+    case  -6867005:
+      return       9910211; // pi_diff+
+    case  -6867103:
+      return       9910113; // rho_diff0
+    case  -7746995:
+      return       9030221; // f_0(1500)
+    case  -7756773:
+      return       9020443; // psi(4415)
+    case  -7756995:
+      return       9020221; // eta(1405)
+    case  -7766773:
+      return       9010443; // psi(4160)
+    case  -7776663:
+      return       9000553; // Upsilon(5S)
+    case  -7776773:
+      return       9000443; // psi(4040)
+    case  -7776783:
+      return       9000433; // D_sj(2700)+
+    case  -7776995:
+      return       9000221; // f_0(600)
+    case  -6114241:
+      return     -90000321; // K_0*(800)-
+    case  -6114231:
+      return     -90000311; // anti-K_0*(800)0
+    case   6865004:
+      return      -9912212; // anti-p_diff-
+    case   6865104:
+      return      -9912112; // anti-n_diffr
+    case   6867005:
+      return      -9910211; // pi_diff-
+    case   7776783:
+      return      -9000433; // D_sj(2700)-
     default:
       return id;
   }

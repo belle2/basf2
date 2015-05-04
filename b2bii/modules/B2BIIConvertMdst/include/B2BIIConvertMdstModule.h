@@ -25,6 +25,8 @@
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
@@ -106,6 +108,16 @@ namespace Belle2 {
      */
     void convertMdstChargedTable();
 
+    /**
+     * Reads all entries of Mdst_Gamma Panther table, creates a particle list 'gamma:mdst' and adds them to StoreArray<Particles>.
+     */
+    void convertMdstGammaTable();
+
+    /**
+     * Reads all entries of Mdst_Pi0 Panther table, creates a particle list 'pi0:mdst' and adds them to StoreArray<Particles>.
+     */
+    void convertMdstPi0Table();
+
     //-----------------------------------------------------------------------------
     // CONVERT OBJECTS
     //-----------------------------------------------------------------------------
@@ -135,9 +147,10 @@ namespace Belle2 {
     static double acc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
 
-    //
+    //-----------------------------------------------------------------------------
     // RELATIONS
-    //
+    //-----------------------------------------------------------------------------
+
     /**
      * Sets ECLCluster -> Track relations
      */
@@ -172,6 +185,16 @@ namespace Belle2 {
 
     //! map of Gen_hepevt Panther IDs and corresponing MCParticle StoreArray indices
     std::map<int, int> genHepevtToMCParticle;
+    //! map of Mdst_ecl Panther IDs and corresponing ECLCluster StoreArray indices
+    std::map<int, int> mdstEclToECLCluster;
+    //! map of gamma Panther IDs and corresponing Particle StoreArray indices
+    std::map<int, int> mdstGammaToParticle;
+
+    //! Mdst_gamma and Mdst_pi0 related
+    std::string gammaListName = "gamma:mdst";
+    int gammaPDGCode = Const::photon.getPDGCode();
+    std::string pi0ListName = "pi0:mdst";
+    int pi0PDGCode = Const::pi0.getPDGCode();
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;

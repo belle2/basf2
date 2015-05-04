@@ -127,8 +127,7 @@ namespace Belle2 {
           children->apply(
           [&](QuadTree * childNode) {
             if (childNode->getLevel() == getLastLevel()) {
-              B2INFO("Filled " << childNode->getNItems() << " on last level " << static_cast<unsigned int>(childNode->getLevel()))
-//              m_debugOutputMap.emplace(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector());
+              m_debugOutputMap.insert(std::make_pair(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector()));
             }
           }
           );

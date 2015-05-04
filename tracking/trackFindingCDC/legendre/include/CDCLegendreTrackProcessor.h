@@ -93,12 +93,6 @@ namespace Belle2 {
       }
 
       /**
-       * Compile the hitList from the StoreArray with CDCHits.
-       * @param cdcHits
-       */
-      void initializeHitList(const StoreArray<CDCHit>& cdcHits);
-
-      /**
        * Compile the hitList from the wire it topology.
        */
       void initializeHitListFromWireHitTopology();

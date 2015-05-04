@@ -12,105 +12,40 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
 #include <TMath.h>
-#include <cmath>
 
-#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/CDCHit.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-TrackHit::TrackHit(const CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIWire())
+TrackHit::TrackHit(const CDCHit* hit, int ID)
 {
-//  m_zReference = CDCLegendreWireCenter::Instance().getCenter(hit->getILayer());
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+  initializeFromWireHit(wireHitTopology.getWireHit(hit));
+}
+
+void TrackHit::initializeFromWireHit(const CDCWireHit* wireHit)
+{
+  m_underlayingWireHit = wireHit;
   m_zReference = 0;
-
-  m_cdcHit = hit;
-
-  CDC::RealisticTDCCountTranslator sDriftTimeTranslator;
-  m_driftLength = sDriftTimeTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
-  //FIXME: Provide correct parameters, as soon as driftTimeTranslator supports them
-  m_sigmaDriftLength = sDriftTimeTranslator.getDriftLengthResolution(-999., WireID(hit->getID()), false, -999., -999.);
-
-  m_charge = hit->getADCCount();
-
-  m_superlayerId = hit->getISuperLayer();
-
-  // for the pattern recognition it is nice to have a unique layerId, maybe one can change it later to avoid confusion
-  if (hit->getISuperLayer() == 0)
-    m_layerId = hit->getILayer();
-  else
-    m_layerId = hit->getILayer() + hit->getISuperLayer() * 6 + 2;
-
-  //set if the hit is axial or stereo
-  if (m_superlayerId % 2 == 0)
-    m_isAxial = true;
-  else
-    m_isAxial = false;
 
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
   performConformalTransformation();
-  m_wirePositionOrig = m_wirePosition;
-
   m_hitUsage = TrackHit::not_used;
-
   checkHitDriftLength();
-
-  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
-
-  //forward end of the wire
-  m_wireForwardPosition.SetXYZ(cdcg.wireForwardPosition(m_layerId, m_wireId).x(), cdcg.wireForwardPosition(m_layerId, m_wireId).y(),
-                               cdcg.wireForwardPosition(m_layerId, m_wireId).z());
-
-  //backward end of the wire
-  m_wireBackwardPosition.SetXYZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).x(), cdcg.wireBackwardPosition(m_layerId,
-                                m_wireId).y(), cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
-
 }
 
 TrackHit::TrackHit(int hitId, int wireID, double driftLength, double sigmaDriftLength,
                    unsigned short charge, int superlayerId, int layerId, TVector3 wirePosition)
 {
-  m_cdcHitIndex = hitId;
-  m_hitUsage = TrackHit::not_used;
-  m_wireId = wireID;
-  m_cdcHit = nullptr;
   m_zReference = 0;
-  m_isAxial = true;
-  m_driftLength = driftLength;
-  m_sigmaDriftLength = sigmaDriftLength;
-  m_charge = charge;
-  m_superlayerId = superlayerId;
-  m_layerId = layerId;
-  m_wirePosition = m_wirePositionOrig = wirePosition;
+  m_hitUsage = TrackHit::not_used;
+  m_wirePosition = wirePosition;
   performConformalTransformation();
-}
-
-TrackHit::TrackHit(const TrackHit& rhs)
-{
-  m_cdcHitIndex = rhs.m_cdcHitIndex;
-  m_driftLength = rhs.getDriftLength();
-  m_charge = rhs.m_charge;
-  m_wireId = rhs.getWireId();
-  m_superlayerId = rhs.getSuperlayerId();
-  m_layerId = rhs.getLayerId();
-  m_isAxial = rhs.m_isAxial;
-  m_wirePositionOrig = rhs.m_wirePositionOrig;
-  m_hitUsage = rhs.getHitUsage();
-
-  m_cdcHit = rhs.m_cdcHit;
-
-  //set hit coordinates in normal space and conformal plane
-  setWirePosition();
-  performConformalTransformation();
-}
-
-TrackHit::~TrackHit()
-{
 }
 
 
@@ -119,14 +54,14 @@ bool TrackHit::checkHitDriftLength()
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
-  TVector3 wireBegin = cdcg.wireForwardPosition(m_layerId, m_wireId);
+  TVector3 wireBegin = cdcg.wireForwardPosition(getLayerId(), getWireId());
 
   TVector3 wireBeginNeighbor;
 
-  if (m_wireId != 0) {
-    wireBeginNeighbor = cdcg.wireForwardPosition(m_layerId, m_wireId - 1);
+  if (getWireId() != 0) {
+    wireBeginNeighbor = cdcg.wireForwardPosition(getLayerId(), getWireId() - 1);
   } else {
-    wireBeginNeighbor = cdcg.wireForwardPosition(m_layerId, m_wireId + 1);
+    wireBeginNeighbor = cdcg.wireForwardPosition(getLayerId(), getWireId() + 1);
   }
 
 //  double delta = sqrt((wireBegin.x() - wireBeginNeighbor.x()) * (wireBegin.x() - wireBeginNeighbor.x()) +
@@ -135,11 +70,11 @@ bool TrackHit::checkHitDriftLength()
 
   double coef = 1.;
 
-  if (m_isAxial) coef = 0.8;
+  if (getIsAxial()) coef = 0.8;
   else coef = 0.9;
 
 
-  if (m_driftLength > delta * coef) {
+  if (getDriftLength() > delta * coef) {
     m_hitUsage = TrackHit::background;
 //    B2INFO("Bad hit!");
     return false;
@@ -158,89 +93,65 @@ void TrackHit::setZReference(double zReference)
 
 void TrackHit::setWirePosition()
 {
-  //Get the position of the hit wire from CDCGeometryParameters
-  CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
+  Vector2D referenceWirePosition = m_underlayingWireHit->getRefPos2D();
 
-  TVector3 wireBegin = cdcg.wireForwardPosition(m_layerId, m_wireId);
-  TVector3 wireEnd   = cdcg.wireBackwardPosition(m_layerId, m_wireId);
-
-  double fraction = (m_zReference - wireBegin.z()) / (wireEnd.z() - wireBegin.z());
-
-  m_wirePosition.SetZ(m_zReference);
-  m_wirePosition.SetX(wireBegin.x() + fraction * (wireEnd.x() - wireBegin.x()));
-  m_wirePosition.SetY(wireBegin.y() + fraction * (wireEnd.y() - wireBegin.y()));
-
+  m_wirePosition.setZ(m_zReference);
+  m_wirePosition.setXY(referenceWirePosition);
   performConformalTransformation();
-
 }
 
 void TrackHit::performConformalTransformation()
 {
-  double x = m_wirePosition.x();
-  double y = m_wirePosition.y();
+  const Vector2D& twoDimensionalPosition = m_wirePosition.xy();
+  double dominator = twoDimensionalPosition.normSquared() - getDriftLength() * getDriftLength();
 
   //transformation of the coordinates from normal to conformal plane
   //this is not the actual wire position but the transformed center of the drift circle
-  m_conformalX = 2 * x / (x * x + y * y - m_driftLength * m_driftLength);
-  m_conformalY = 2 * y / (x * x + y * y - m_driftLength * m_driftLength);
+  m_conformalPosition = 2 * twoDimensionalPosition.divided(dominator);
 
   //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
-  m_conformalDriftLength = 2 * m_driftLength / (x * x + y * y - m_driftLength * m_driftLength);
-
+  m_conformalDriftLength = 2 * getDriftLength() / (dominator);
 }
 
 
 std::tuple<double, double, double> TrackHit::performConformalTransformWithRespectToPoint(double x0, double y0)
 {
-  double x = m_wirePosition.x() - x0;
-  double y = m_wirePosition.y() - y0;
+  Vector2D twoDimensionalPosition = m_wirePosition.xy() - Vector2D(x0, y0);
+  double dominator = twoDimensionalPosition.normSquared() - getDriftLength() * getDriftLength();
 
-  //transformation of the coordinates from normal to conformal plane
-  //this is not the actual wire position but the transformed center of the drift circle
-  double conformalX = 2 * x / (x * x + y * y - m_driftLength * m_driftLength);
-  double conformalY = 2 * y / (x * x + y * y - m_driftLength * m_driftLength);
+  Vector2D conformalPosition = 2 * twoDimensionalPosition.divided(dominator);
+  double conformalDriftLength = 2 * getDriftLength() / (dominator);
 
-  //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
-  double conformalDriftLength = 2 * m_driftLength / (x * x + y * y - m_driftLength * m_driftLength);
-
-  return std::make_tuple(conformalX, conformalY, conformalDriftLength);
+  return std::make_tuple(conformalPosition.x(), conformalPosition.y(), conformalDriftLength);
 }
 
 double TrackHit::getPhi() const
 {
   //the phi angle of the hit depends on the definition, so I try to use the wireId instead
   //however maybe this function might also be still useful...
-  double phi = atan(m_wirePosition.y() / m_wirePosition.x());
+  double phi = atan(getWirePosition().y() / getWirePosition().x());
 
-  //distribute the phi values from 0 to 2pi
-  if (m_wirePosition.x() >= 0 && m_wirePosition.y() >= 0) {
-    phi = atan(m_wirePosition.y() / m_wirePosition.x());
+  if (getWirePosition().x() < 0) {
+    phi += TMath::Pi();
   }
 
-  if (m_wirePosition.x() < 0) {
-    phi = TMath::Pi() + atan(m_wirePosition.y() / m_wirePosition.x());
-  }
-
-  if (m_wirePosition.x() >= 0 && m_wirePosition.y() < 0) {
-    phi = 2 * TMath::Pi() + atan(m_wirePosition.y() / m_wirePosition.x());
+  if (getWirePosition().x() >= 0 && getWirePosition().y() < 0) {
+    phi += 2 * TMath::Pi();
   }
 
   return phi;
-
 }
 
 int TrackHit::getCurvatureSignWrt(double xc, double yc) const
 {
-  double PI = 3.1415926535897932384626433832795;
   double phi_diff = atan2(yc, xc) - getPhi();
 
-  while (phi_diff > 2 * PI)
-    phi_diff -= 2 * PI;
+  while (phi_diff > 2 * TMath::Pi())
+    phi_diff -= 2 * TMath::Pi();
   while (phi_diff < 0)
-    phi_diff += 2 * PI;
+    phi_diff += 2 * TMath::Pi();
 
-
-  if (phi_diff > PI)
+  if (phi_diff > TMath::Pi())
     return TrackCandidate::charge_positive;
   else
     return TrackCandidate::charge_negative;
@@ -248,7 +159,7 @@ int TrackHit::getCurvatureSignWrt(double xc, double yc) const
 
 bool TrackHit::approach(const TrackCandidate& track)
 {
-  if (m_isAxial)
+  if (getIsAxial())
     return false;
 
   //Get the necessary position of the hit wire from CDCGeometryParameters
@@ -259,14 +170,14 @@ bool TrackHit::approach(const TrackCandidate& track)
   TVector3 wireVector;  //direction of the wire
 
   //forward end of the wire
-  forwardWirePoint.SetX(cdcg.wireForwardPosition(m_layerId, m_wireId).x());
-  forwardWirePoint.SetY(cdcg.wireForwardPosition(m_layerId, m_wireId).y());
-  forwardWirePoint.SetZ(cdcg.wireForwardPosition(m_layerId, m_wireId).z());
+  forwardWirePoint.SetX(cdcg.wireForwardPosition(getLayerId(), getWireId()).x());
+  forwardWirePoint.SetY(cdcg.wireForwardPosition(getLayerId(), getWireId()).y());
+  forwardWirePoint.SetZ(cdcg.wireForwardPosition(getLayerId(), getWireId()).z());
 
   //backward end of the wire
-  backwardWirePoint.SetX(cdcg.wireBackwardPosition(m_layerId, m_wireId).x());
-  backwardWirePoint.SetY(cdcg.wireBackwardPosition(m_layerId, m_wireId).y());
-  backwardWirePoint.SetZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
+  backwardWirePoint.SetX(cdcg.wireBackwardPosition(getLayerId(), getWireId()).x());
+  backwardWirePoint.SetY(cdcg.wireBackwardPosition(getLayerId(), getWireId()).y());
+  backwardWirePoint.SetZ(cdcg.wireBackwardPosition(getLayerId(), getWireId()).z());
 
   //direction of the wire
   wireVector = forwardWirePoint - backwardWirePoint;
@@ -285,8 +196,8 @@ bool TrackHit::approach(const TrackCandidate& track)
     //loop over the parameter vector ( = loop over the length of the wire)
 
     //calculation of the shortest distance between the hit point and the track in the conformal plane
-    m_wirePosition.SetX(backwardWirePoint.x() + parameter[i] * wireVector.x());
-    m_wirePosition.SetY(backwardWirePoint.y() + parameter[i] * wireVector.y());
+    m_wirePosition.setX(backwardWirePoint.x() + parameter[i] * wireVector.x());
+    m_wirePosition.setY(backwardWirePoint.y() + parameter[i] * wireVector.y());
 
     double distance = track.DistanceTo(
                         *this); //distance between the hit und the intersection point ( = shortest distance from hit to "track line")
@@ -303,7 +214,7 @@ bool TrackHit::approach(const TrackCandidate& track)
   double y = backwardWirePoint.y() + parameter[bestIndex] * wireVector.y();
   double z = backwardWirePoint.z() + parameter[bestIndex] * wireVector.z();
 
-  m_wirePosition.SetXYZ(x, y, z);
+  m_wirePosition.set(x, y, z);
   performConformalTransformation();
 
   return true;
@@ -311,7 +222,7 @@ bool TrackHit::approach(const TrackCandidate& track)
 
 bool TrackHit::approach2(const TrackCandidate& track)
 {
-  if (m_isAxial)
+  if (getIsAxial())
     return false;
 
   //Get the necessary position of the hit wire from CDCGeometryParameters
@@ -322,14 +233,14 @@ bool TrackHit::approach2(const TrackCandidate& track)
   TVector3 wireVector;  //direction of the wire
 
   //forward end of the wire
-  forwardWirePoint.SetX(cdcg.wireForwardPosition(m_layerId, m_wireId).x());
-  forwardWirePoint.SetY(cdcg.wireForwardPosition(m_layerId, m_wireId).y());
-  forwardWirePoint.SetZ(cdcg.wireForwardPosition(m_layerId, m_wireId).z());
+  forwardWirePoint.SetX(cdcg.wireForwardPosition(getLayerId(), getWireId()).x());
+  forwardWirePoint.SetY(cdcg.wireForwardPosition(getLayerId(), getWireId()).y());
+  forwardWirePoint.SetZ(cdcg.wireForwardPosition(getLayerId(), getWireId()).z());
 
   //backward end of the wire
-  backwardWirePoint.SetX(cdcg.wireBackwardPosition(m_layerId, m_wireId).x());
-  backwardWirePoint.SetY(cdcg.wireBackwardPosition(m_layerId, m_wireId).y());
-  backwardWirePoint.SetZ(cdcg.wireBackwardPosition(m_layerId, m_wireId).z());
+  backwardWirePoint.SetX(cdcg.wireBackwardPosition(getLayerId(), getWireId()).x());
+  backwardWirePoint.SetY(cdcg.wireBackwardPosition(getLayerId(), getWireId()).y());
+  backwardWirePoint.SetZ(cdcg.wireBackwardPosition(getLayerId(), getWireId()).z());
 
   //direction of the wire
   wireVector = forwardWirePoint - backwardWirePoint;
@@ -344,10 +255,10 @@ bool TrackHit::approach2(const TrackCandidate& track)
   double ty = track.getYc();
 
   double r_t = sqrt(tx * tx + ty * ty);
-  double r_h = m_driftLength;
+  double r_h = getDriftLength();
 
-  double d = sqrt((m_wirePositionOrig.X() - tx) * (m_wirePositionOrig.X() - tx) + (m_wirePositionOrig.Y() - ty) *
-                  (m_wirePositionOrig.Y() - ty));
+  double d = sqrt((getOriginalWirePosition().X() - tx) * (getOriginalWirePosition().X() - tx) + (getOriginalWirePosition().Y() - ty) *
+                  (getOriginalWirePosition().Y() - ty));
   double radii;
 
   if (d > max(r_t, r_h))
@@ -381,7 +292,7 @@ bool TrackHit::approach2(const TrackCandidate& track)
   double y = backwardWirePoint.y() + l * wireVector.y();
   double z = backwardWirePoint.z() + l * wireVector.z();
 
-  m_wirePosition.SetXYZ(x, y, z);
+  m_wirePosition.set(x, y, z);
   performConformalTransformation();
 
   return true;

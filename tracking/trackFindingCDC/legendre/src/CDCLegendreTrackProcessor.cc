@@ -251,26 +251,6 @@ void TrackProcessor::fitAllTracks()
   }
 }
 
-
-void TrackProcessor::initializeHitList(const StoreArray<CDCHit>& cdcHits)
-{
-  B2DEBUG(90, "Number of digitized hits: " << cdcHits.getEntries());
-  if (cdcHits.getEntries() == 0) {
-    B2WARNING("cdcHitsCollection is empty!");
-  }
-  m_axialHitList.reserve(2048);
-  for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
-    TrackHit* trackHit = new TrackHit(cdcHits[iHit], iHit);
-    if (trackHit->checkHitDriftLength() && trackHit->getIsAxial()) {
-      m_axialHitList.push_back(trackHit);
-    } else {
-      delete trackHit;
-    }
-  }
-  B2DEBUG(90,
-          "Number of hits to be used by track finder: " << m_axialHitList.size());
-}
-
 void TrackProcessor::initializeHitListFromWireHitTopology()
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -283,8 +263,7 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
   }
   m_axialHitList.reserve(2048);
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
-    const CDCHit* cdcHit = cdcWireHit.getHit();
-    TrackHit* trackHit = new TrackHit(cdcHit, cdcWireHit.getStoreIHit());
+    TrackHit* trackHit = new TrackHit(cdcWireHit);
     if (trackHit->checkHitDriftLength() && trackHit->getIsAxial()) {
       m_axialHitList.push_back(trackHit);
     } else {

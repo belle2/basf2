@@ -14,14 +14,14 @@
 
 using namespace Belle2;
 
-ConditionsService* ConditionsService::m_Instance = NULL;
+ConditionsService* ConditionsService::m_instance = NULL;
 
-ConditionsService* ConditionsService::GetInstance()
+ConditionsService* ConditionsService::getInstance()
 {
 
-  if (!m_Instance) m_Instance = new ConditionsService;
+  if (!m_instance) m_instance = new ConditionsService;
 
-  return m_Instance;
+  return m_instance;
 };
 
 
@@ -37,10 +37,10 @@ ConditionsService::~ConditionsService()
 }
 
 
-void ConditionsService::GetPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName)
+void ConditionsService::getPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName)
 {
 
-  m_run_payloads.clear();
+  m_runPayloads.clear();
 
   CURL* curl;
   CURLcode res;
@@ -68,7 +68,7 @@ void ConditionsService::GetPayloads(std::string GlobalTag, std::string Experimen
   }
   parse_payloads(m_buffer);
 
-  B2INFO("Conditions service retrieved " << m_run_payloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
+  B2INFO("Conditions service retrieved " << m_runPayloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
          RunName << " listed under global tag " << GlobalTag);
 
   return ;
@@ -132,7 +132,7 @@ size_t ConditionsService::capture_return(void* buffer, size_t size, size_t nmemb
   std::string temp(static_cast<const char*>(buffer), size * nmemb);
   int count = *((int*)userp);
   count = 1;
-  ConditionsService::GetInstance()->AddReturn(temp);
+  ConditionsService::getInstance()->addReturn(temp);
   return size * nmemb * count;
 
 }
@@ -211,13 +211,13 @@ void ConditionsService::parse_payloads(std::string temp)
         B2ERROR("ConditionsService::parse_payload Payload not parsed correctly.");
       } else {
         std::string payloadKey = PackageName + ModuleName;
-        if (ConditionsService::GetInstance()->PayloadExists(payloadKey)) {
+        if (ConditionsService::getInstance()->payloadExists(payloadKey)) {
           B2FATAL("Found duplicate payload key " << payloadKey << " while parsing conditions payloads. ");
         }
         B2INFO("Found payload for module " << ModuleName << " in package " << PackageName << " at URL " << PayloadURL <<
                ".  Storing with key: " << payloadKey << " and checksum: " << Checksum);
-        ConditionsService::GetInstance()->AddPayloadURL(payloadKey, PayloadURL);
-        ConditionsService::GetInstance()->AddChecksum(payloadKey, Checksum);
+        ConditionsService::getInstance()->addPayloadURL(payloadKey, PayloadURL);
+        ConditionsService::getInstance()->addChecksum(payloadKey, Checksum);
       }
     }
     payload_node = xml->GetNext(payload_node);
@@ -231,7 +231,7 @@ void ConditionsService::parse_payloads(std::string temp)
 }
 
 
-void ConditionsService::WritePayloadFile(std::string payloadFileName,
+void ConditionsService::writePayloadFile(std::string payloadFileName,
                                          std::string packageName,
                                          std::string moduleName)
 {
@@ -317,13 +317,13 @@ size_t ConditionsService:: write_data(void* ptr, size_t size, size_t nmemb, FILE
 }
 
 
-std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::string moduleName)
+std::string ConditionsService::getPayloadFileURL(std::string packageName, std::string moduleName)
 {
 
-  if (!PayloadExists(packageName + moduleName)) {
+  if (!payloadExists(packageName + moduleName)) {
     B2FATAL("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
   }
-  std::string remote_file = m_run_payloads[packageName + moduleName];
+  std::string remote_file = m_runPayloads[packageName + moduleName];
   std::string local_file = m_FILEbase + remote_file; // This will work for local files and CVMFS.
 
 
@@ -362,14 +362,14 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
         }
       }
       checksum = TMD5::FileChecksum(local_file.c_str()); // check checksum
-    } else if (checksum->AsString() == m_run_checksums[packageName + moduleName]) {
+    } else if (checksum->AsString() == m_runChecksums[packageName + moduleName]) {
       B2INFO("Found file: " << local_file << " with correct MD5 checksum: " << checksum->AsString());
       return local_file;
     }
 
 
     TMD5* checksum_new;
-    while (checksum->AsString() != m_run_checksums[packageName + moduleName]) { // then there was a checksum mis-match
+    while (checksum->AsString() != m_runChecksums[packageName + moduleName]) { // then there was a checksum mis-match
       gSystem->Sleep(1000);
       checksum_new = TMD5::FileChecksum(local_file.c_str()); // check checksum again
       if (std::string(checksum->AsString()) != std::string(checksum_new->AsString())) {   // Then we are downloading the file already.
@@ -377,7 +377,7 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
         B2INFO("checksum: " << checksum->AsString() << "\tchecksum_new: " << checksum_new->AsString());
         checksum = checksum_new;
       } else { // File isn't downloading, but checksums don't match.  Throw an error.
-        B2FATAL("Error with file " << local_file.c_str() << " checksum expected: " << m_run_checksums[packageName + moduleName] <<
+        B2FATAL("Error with file " << local_file.c_str() << " checksum expected: " << m_runChecksums[packageName + moduleName] <<
                 " found: " << checksum->AsString());
         return NULL;
       }
@@ -388,9 +388,9 @@ std::string ConditionsService::GetPayloadFileURL(std::string packageName, std::s
   TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
   if (!checksum) { // file isn't there.  Toss an error.
     B2ERROR("Did not find file " << local_file << " check inputs.");
-  } else if (std::string(checksum->AsString()) != m_run_checksums[packageName +
+  } else if (std::string(checksum->AsString()) != m_runChecksums[packageName +
              moduleName]) { // MD5 checksum doesn't match the database entry.
-    B2FATAL("Conditions file " << local_file << " error! Expected MD5 checksum " << m_run_checksums[packageName + moduleName] <<
+    B2FATAL("Conditions file " << local_file << " error! Expected MD5 checksum " << m_runChecksums[packageName + moduleName] <<
             " and calculated checksum " << checksum->AsString());
     return NULL;
   }

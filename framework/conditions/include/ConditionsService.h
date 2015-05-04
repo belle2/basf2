@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jeter Hall,                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef ConditionsService_H
 #define ConditionsService_H
 
@@ -27,7 +37,7 @@ namespace Belle2 {
   public:
 
     /** Get a pointer to the ConditionsService instance */
-    static ConditionsService* GetInstance();
+    static ConditionsService* getInstance();
 
 
 
@@ -36,28 +46,28 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void GetPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName);
+    void getPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName);
 
     /** Sets the base name for the REST services.  Example is http://belle2db.hep.pnnl.gov/b2s/rest/v1/.
      *  @param RESTBaseName The base name for the REST services.  Example is http://belle2db.hep.pnnl.gov/b2s/rest/v1/.
      *
      *  @return Nothing yet
      */
-    void SetRESTbasename(std::string RESTBaseName) {m_RESTbase = RESTBaseName;};
+    void setRESTbasename(std::string RESTBaseName) {m_RESTbase = RESTBaseName;};
 
     /** Sets the base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
      *  @param FILEBaseName The base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
      *
      *  @return Nothing yet
      */
-    void SetFILEbasename(std::string FILEBaseName) {m_FILEbase = FILEBaseName;};
+    void setFILEbasename(std::string FILEBaseName) {m_FILEbase = FILEBaseName;};
 
     /** Sets the local directory name for copies of the conditions files.  Example is /tmp/.
      *  @param FILEBaseLocal The base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
      *
      *  @return Nothing yet
      */
-    void SetFILEbaselocal(std::string FILEBaseLocal) {m_FILElocal = FILEBaseLocal;};
+    void setFILEbaselocal(std::string FILEBaseLocal) {m_FILElocal = FILEBaseLocal;};
 
 
     /** Adds a payload URL to the payload map.
@@ -66,13 +76,14 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void AddPayloadURL(std::string PackageModuleName, std::string PayloadURL) {m_run_payloads[PackageModuleName] = PayloadURL;};
+    void addPayloadURL(std::string PackageModuleName, std::string PayloadURL) {m_runPayloads[PackageModuleName] = PayloadURL;};
+
     /** Check to see if a payload key is already registered in the payload map.
      *  @param PackageModuleName The concatenation of the package.name and module.name.
      *
      *  @return true if payload exists, false if not.
      */
-    bool PayloadExists(std::string PackageModuleName) {return (m_run_payloads.find(PackageModuleName) != m_run_payloads.end());}
+    bool payloadExists(std::string PackageModuleName) {return (m_runPayloads.find(PackageModuleName) != m_runPayloads.end());}
 
     /** Adds a payload checksum to the payload map.
      *  @param PackageModuleName The concatenation of the package.name and module.name.
@@ -80,7 +91,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void AddChecksum(std::string PackageModuleName, std::string Checksum) {m_run_checksums[PackageModuleName] = Checksum;};
+    void addChecksum(std::string PackageModuleName, std::string Checksum) {m_runChecksums[PackageModuleName] = Checksum;};
 
     /** Adds a payload file to the conditions database.
      *  @param payloadFileName The file name of the payload.
@@ -88,15 +99,15 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void WritePayloadFile(std::string payloadFileName,
-                          Module* module) {WritePayloadFile(payloadFileName, module->getPackage(), module->getName());};
+    void writePayloadFile(std::string payloadFileName,
+                          Module* module) {writePayloadFile(payloadFileName, module->getPackage(), module->getName());};
 
     /** Adds a string to the buffer (for REST returns.)
      *  @param buffer The string to be added to the buffer.
      *
      *  @return Nothing yet
      */
-    void AddReturn(std::string buffer) {m_buffer = m_buffer + buffer;};
+    void addReturn(std::string buffer) {m_buffer = m_buffer + buffer;};
 
     /** Adds a payload file to the conditions database.
      *  @param payloadFileName The file name of the payload.
@@ -105,7 +116,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void WritePayloadFile(std::string payloadFileName,
+    void writePayloadFile(std::string payloadFileName,
                           std::string packageName,
                           std::string moduleName);
 
@@ -113,7 +124,7 @@ namespace Belle2 {
      *
      *  @return Returns a string with the payload URL.
      */
-    std::string GetPayloadFileURL(Module* module) {return GetPayloadFileURL(module->getPackage(), module->getName());};
+    std::string getPayloadFileURL(Module* module) {return getPayloadFileURL(module->getPackage(), module->getName());};
 
     /** Gets payload URL from run generated map and downloads conditions file if needed.
      *  @param packageName A string identifier for the payload type.  Does not necessarily need to be the BASF2 package.
@@ -121,7 +132,7 @@ namespace Belle2 {
      *
      *  @return Returns a string with the payload URL.
      */
-    std::string GetPayloadFileURL(std::string packageName, std::string moduleName);
+    std::string getPayloadFileURL(std::string packageName, std::string moduleName);
 
 
 
@@ -157,7 +168,7 @@ namespace Belle2 {
                              double TotalToUpload, double NowUploaded);
 
     /** The single instance of this class */
-    static ConditionsService* m_Instance;
+    static ConditionsService* m_instance;
 
     /** The base name for the REST services */
     std::string m_RESTbase;
@@ -172,12 +183,13 @@ namespace Belle2 {
     std::string m_buffer;
 
     /** Map of payloads under construction **/
-    std::map<std::string, TList*> m_current_payloads;
+    std::map<std::string, TList*> m_currentPayloads;
 
     /** Map of payloads in DB for a particular run, <PackageNameModuleName, PayloadURL> **/
-    std::map<std::string, std::string> m_run_payloads;
+    std::map<std::string, std::string> m_runPayloads;
+
     /** Map of checksums from DB for a particular run, <PackageNameModuleName, Checksum> **/
-    std::map<std::string, std::string> m_run_checksums;
+    std::map<std::string, std::string> m_runChecksums;
 
   };
 }

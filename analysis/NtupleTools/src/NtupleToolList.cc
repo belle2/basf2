@@ -42,6 +42,8 @@
 #include <analysis/NtupleTools/NtupleVVAnglesTool.h>
 #include <analysis/NtupleTools/NtupleHelicityTool.h>
 #include <analysis/NtupleTools/NtupleSLTool.h>
+#include <analysis/NtupleTools/NtupleErrMatrixTool.h>
+
 
 using namespace Belle2;
 using namespace std;
@@ -120,6 +122,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "VVAngles") return new NtupleVVAnglesTool(tree, d);
   else if (strToolName == "Helicity") return new NtupleHelicityTool(tree, d);
   else if (strToolName == "SL") return new NtupleSLTool(tree, d);
+  else if (strToolName == "ErrMatrix") return new NtupleErrMatrixTool(tree, d);
 
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;

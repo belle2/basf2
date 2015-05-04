@@ -125,8 +125,14 @@ namespace Belle2 {
 
       /** Finds the point of closest approach to a given track candidate adjusts the wire position accordingly.
        * @return Status of the approach. False if no nearest point could be found.
+       * UNUSED IN THE MOMENT. DO NOT DELETE.
        * */
       bool approach(const TrackCandidate&);
+
+      /** Finds the point of closest approach to a given track candidate adjusts the wire position accordingly.
+       * @return Status of the approach. False if no nearest point could be found.
+       * UNUSED IN THE MOMENT. DO NOT DELETE.
+       * */
       bool approach2(const TrackCandidate&);
 
       /** Returns the position of the center(!!!) of the wire. */

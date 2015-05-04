@@ -29,6 +29,8 @@ using namespace TrackFindingCDC;
 
 TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
+  //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::ELogLevel::c_Debug);
+
   HitQuadTreeProcessor::ChildRanges ranges(HitQuadTreeProcessor::rangeX(0, std::pow(2, 13)),
                                            HitQuadTreeProcessor::rangeY(-1.5, 1.5));
   std::vector<HitQuadTreeProcessor::ReturnList> candidates;
@@ -38,7 +40,8 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   std::vector<TrackHit*> hitVector;
 
   for (TrackHit* trackHit : hits_set) {
-    hitVector.push_back(trackHit);
+    if (trackHit->getSuperlayerId() % 2 == 0)
+      hitVector.push_back(trackHit);
   }
 
   HitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidates](const HitQuadTreeProcessor::ReturnList & hits,
@@ -51,7 +54,7 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   qtProcessor.provideItemsSet(hitVector);
 
   // actual filling of the hits into the quad tree structure
-  qtProcessor.fillGivenTree(lmdProcessor, 55);
+  qtProcessor.fillGivenTree(lmdProcessor, 30);
   auto later = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());
@@ -60,8 +63,8 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
   B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidates.size() << " candidates");
 
   // Check for the parameters of the track candidates
-  // The actual hit numbers are more than 50, but this is somewhat a lower bound
-  EXPECT_GE(candidates[0].size(), 50);
-  EXPECT_GE(candidates[1].size(), 50);
+  // The actual hit numbers are more than 30, but this is somewhat a lower bound
+  EXPECT_GE(candidates[0].size(), 30);
+  EXPECT_GE(candidates[1].size(), 30);
 }
 

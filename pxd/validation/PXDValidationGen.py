@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+<header>
+  <contact>Peter Kodys, peter.kodys@mff.cuni.cz</contact>
+  <description>
+    PVD validation of diffusion, cluster size, digit signal to noise,
+    error distribution, eta distribution, statistics of particles
+    going thrue detector, energy true and reco deposition and lost momentum,
+    seed, Lorentz angle, constants.
+  </description>
+</header>
+"""
 
 ##############################################################################
 #
@@ -15,6 +26,8 @@
 #  History:
 #  06 Nov 2013    ver. 0.1   First example
 #  29 Nov 2013    ver. 0.2   Cleanup, P.Kvasnicka
+#  01 May 2015    ver. 0.2   small format changes recover functionality
+#                            adding of header, P.Kodys
 #
 ##############################################################################
 
@@ -89,7 +102,7 @@ particlegun.param({  # Generate 5 tracks (on average)
 print_params(particlegun)
 
 # Select subdetectors to be built
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 pxddigi.param('statisticsFilename', 'PXDValidationDiags3.root')
 pxddigi.param('ElectronicEffects', True)

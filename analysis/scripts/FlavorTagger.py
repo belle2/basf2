@@ -41,19 +41,24 @@ class FlavorTaggerInfoFiller(Module):
             return
 
         for (particleList, category) in EventLevelParticleLists:
-
             # Load the Particle list in Python after the cuts
-            plist = Belle2.PyStoreObj(particleList)
-            if category == 'FSC' or category == 'KaonPion':
+            if category == 'KaonPion':
                 continue
+            elif category == 'FSC':
+                continue
+            elif category == 'IntermediateElectron':
+                continue
+            elif category == 'IntermediateMuon':
+                continue
+            plist = Belle2.PyStoreObj(particleList)
 
             if plist.obj().getListSize() == 0:  # From the likelihood it is possible to have Kaon category with no actual kaons
-                FlavorTaggerInfo.setIsB(0)
                 FlavorTaggerInfo.setTrack(None)
                 FlavorTaggerInfo.setCategories(category)
                 FlavorTaggerInfo.setCatProb(0)
                 FlavorTaggerInfo.setTargProb(0)
                 FlavorTaggerInfo.setParticle(None)
+                FlavorTaggerInfo.setP(0.0)
 
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
@@ -62,32 +67,20 @@ class FlavorTaggerInfoFiller(Module):
                 if category == 'MaximumP*':  # MaximumP only gives the momentum of the Highest Momentum Particle
                     targetProb = mc_variables.variables.evaluate('p_CMS',
                                                                  particle)
-                    categoryProb = 0
+                    categoryProb = 0.0
                 else:
                     targetProb = particle.getExtraInfo('IsRightTrack(' + category
                                                        + ')')  # Prob of being the right target
                     categoryProb = particle.getExtraInfo('IsRightCategory('
                                                          + category + ')')  # Prob of belonging to a cat
 
-    # Find Mother of MCTruth - if B (511) give True -- temporally use
-                isIt = False
-                if category != 'Lambda':
-                    MCparticle = particle.getRelated('MCParticles')
-                    MCMother = MCparticle.getMother()
-                    if not MCMother:
-                        B2ERROR(category)
-                        break
-                    if MCMother.getPDG() == 511 or MCMother.getPDG() == -511:
-                        isIt = True
-
     # Save information in the FlavorTagInfo DataObject
-                FlavorTaggerInfo.setIsB(isIt)
                 FlavorTaggerInfo.setTrack(track)
                 FlavorTaggerInfo.setTargProb(targetProb)
                 FlavorTaggerInfo.setParticle(particle)
                 FlavorTaggerInfo.setCategories(category)
                 FlavorTaggerInfo.setCatProb(categoryProb)
-
+                FlavorTaggerInfo.setP(particle.getP())
                 break  # Temporary break that avoids saving more than 1 Lambda per event.
 
 
@@ -622,7 +615,6 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
 
 
 def FlavorTagger(
-    recoParticle,
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     categories=[
@@ -675,10 +667,8 @@ def FlavorTagger(
     if mode == 'Expert':
         # Initialation of FlavorTagInfo dataObject needs to be done in the main path
         FlavorTagInfoBuilder = register_module('FlavorTagInfoBuilder')
-        FlavorTagInfoBuilder.param('particleList', recoParticle)
         path.add_module(FlavorTagInfoBuilder)
-        # Add FlavorTag Info filler to roe_path
-        roe_path.add_module(FlavorTaggerInfoFiller())
+        roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
 
     roe_path.add_module(RemoveExtraInfoModule())  # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
 

@@ -18,9 +18,7 @@
 namespace Belle2 {
 
   /**
-   * Creates for each Particle in given ParticleList an FlavorTagInfo dataobject and makes BASF2 relation between them.
-   * It relates the correspondant RestOfEvent to the FlavorTagInfo as well, since it's needed in that way when using the
-   * FlavorTagger.py script
+   * Creates for each Particle and RestOfEvent object in the DataStore a FlavorTagInfo dataobject and makes BASF2 relation between them.
    * NOTE: this module DOES NOT fill the FlavorTagInfo dataobject, but only initializes it so can be filled during the run
    * of FlavorTagger.py
    */
@@ -42,7 +40,6 @@ namespace Belle2 {
 
   private:
 
-    std::string m_particleList;  /**< Name of the ParticleList */
   };
 }
 

@@ -38,19 +38,14 @@ FlavorTagInfoBuilderModule::FlavorTagInfoBuilderModule() : Module()
   // Set module properties
   setDescription("Initializes the FlavorTagInfo DataObject that will be used during the Flavor Tagging. Filling is done in the FlavorTagger.py script");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  // Parameter definitions
-  addParam("particleList", m_particleList, "Name of the ParticleList");
-
 }
 
 void FlavorTagInfoBuilderModule::initialize()
 {
   // input: Particles and RestOfEvent
-  StoreObjPtr<ParticleList>::required(m_particleList);
-  StoreArray<Particle> particles;
   StoreArray<RestOfEvent> roeArray;
-  particles.isRequired();
+  StoreArray<Particle> particles;
+  roeArray.isRequired();
 
   // output: FlavorTagInfo
   StoreArray<FlavorTagInfo> flavTagArray;
@@ -61,17 +56,16 @@ void FlavorTagInfoBuilderModule::initialize()
 
 void FlavorTagInfoBuilderModule::event()
 {
-  // input Particle
-  StoreObjPtr<ParticleList> plist(m_particleList);
+  // input
+  StoreArray<RestOfEvent> roeArray;
 
   // output
-  StoreArray<RestOfEvent> roeArray;
   StoreArray<FlavorTagInfo> flavTagArray;
 
 
-  for (unsigned i = 0; i < plist->getListSize(); i++) {
-    const Particle* particle = plist->getParticle(i);
+  for (int i = 0; i < roeArray.getEntries(); i++) {
     const RestOfEvent* roe = roeArray[i];
+    const Particle* particle = roe->getRelated<Particle>();
 
     // create FlavorTagInfo object
     FlavorTagInfo* flavTag = flavTagArray.appendNew();

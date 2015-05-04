@@ -97,6 +97,10 @@ void V0FinderModule::initialize()
   StoreArray<V0> V0s(m_V0ColName);
   V0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
+  StoreArray<genfit::GFRaveVertex> SAvertices;
+  SAvertices.registerInDataStore(DataStore::c_WriteOut);
+  SAvertices.registerRelationTo(StoreArray<genfit::Track>());
+
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
 
@@ -365,6 +369,13 @@ void V0FinderModule::event()
       B2DEBUG(100, "Creating new V0.");
       V0s.appendNew(std::make_pair(tracksPlus[iTrPlus].first, tfrPlusVtx),
                     std::make_pair(tracksMinus[iTrMinus].first, tfrMinusVtx));
+
+      // Store a copy of the RAVE vertex into the Datastore.  This
+      // makes the vertex visible in the event display.
+      StoreArray<genfit::GFRaveVertex> SAvertices;
+      genfit::GFRaveVertex* raveVertexInArray = SAvertices.appendNew(vert);
+      DataStore::Instance().addRelationFromTo(raveVertexInArray, gfTrackPlus);
+      DataStore::Instance().addRelationFromTo(raveVertexInArray, gfTrackMinus);
     }
   }
 }

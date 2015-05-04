@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <genfit/TrackCand.h>
 #include <framework/gearbox/Const.h>
@@ -107,6 +109,56 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 bool TrackProcessor::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
 {
   return true;
+}
+
+void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+{
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  tracks.clear();
+  tracks.reserve(m_trackList.size());
+  int createdTrackCandidatesCounter = 0;
+
+  for (TrackCandidate* trackCand : m_trackList) {
+    if (trackCand->getTrackHits().size() < 5) continue;
+    tracks.emplace_back();
+    CDCTrack& newTrackCandidate = tracks.back();
+
+    TVector3 position = trackCand->getReferencePoint();
+    TVector3 momentum = trackCand->getMomentumEstimation(true);
+
+    //Pattern recognition can determine only the charge, so here some dummy pdg value is set (with the correct charge), the pdg hypothesis can be then overwritten in the GenFitterModule
+    int pdg = trackCand->getChargeSign() * (211);
+
+    //set the start parameters
+    CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()), Vector2D(momentum.x(), momentum.y()),
+                                 trackCand->getChargeSign());
+    CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
+    newTrackCandidate.setStartTrajectory3D(trajectory3D);
+
+    B2DEBUG(100, "Create genfit::TrackCandidate " << createdTrackCandidatesCounter << "  with pdg " << pdg);
+    B2DEBUG(100,
+            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")");
+    B2DEBUG(100,
+            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");
+
+    //find indices of the Hits
+    std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
+
+    sortHits(trackHitVector, trackCand->getChargeSign());
+
+    unsigned int sortingParameter = 0;
+    for (TrackHit* trackHit : trackHitVector) {
+      // TODO: Can we determine the plane?
+      const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(trackHit->getOriginalCDCHit(), 0);
+      rlWireHit->getWireHit().getAutomatonCell().setTakenFlag();
+
+      const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);
+      newTrackCandidate.push_back(std::move(cdcRecoHit3D));
+      sortingParameter++;
+    }
+    ++createdTrackCandidatesCounter;
+  }
 }
 
 void TrackProcessor::createGFTrackCandidates(const string& m_gfTrackCandsColName)
@@ -209,6 +261,30 @@ void TrackProcessor::initializeHitList(const StoreArray<CDCHit>& cdcHits)
   m_axialHitList.reserve(2048);
   for (int iHit = 0; iHit < cdcHits.getEntries(); iHit++) {
     TrackHit* trackHit = new TrackHit(cdcHits[iHit], iHit);
+    if (trackHit->checkHitDriftLength() && trackHit->getIsAxial()) {
+      m_axialHitList.push_back(trackHit);
+    } else {
+      delete trackHit;
+    }
+  }
+  B2DEBUG(90,
+          "Number of hits to be used by track finder: " << m_axialHitList.size());
+}
+
+void TrackProcessor::initializeHitListFromWireHitTopology()
+{
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  const SortableVector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
+
+  B2DEBUG(90, "Number of digitized hits: " << cdcWireHits.size());
+  if (cdcWireHits.size() == 0) {
+    B2WARNING("cdcHitsCollection is empty!");
+  }
+  m_axialHitList.reserve(2048);
+  for (const CDCWireHit& cdcWireHit : cdcWireHits) {
+    const CDCHit* cdcHit = cdcWireHit.getHit();
+    TrackHit* trackHit = new TrackHit(cdcHit, cdcWireHit.getStoreIHit());
     if (trackHit->checkHitDriftLength() && trackHit->getIsAxial()) {
       m_axialHitList.push_back(trackHit);
     } else {

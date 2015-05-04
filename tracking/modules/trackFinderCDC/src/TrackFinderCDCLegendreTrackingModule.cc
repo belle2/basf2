@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bastian Kronenbitter, Thomas Hauth                       *
+ * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
+ *               Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,20 +26,12 @@ using namespace TrackFindingCDC;
 REG_MODULE(CDCLegendreTracking)
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
-  Module(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
+  TrackFinderCDCBaseModule(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
   m_cdcLegendreTrackProcessor(),
-  m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr), m_treeFinder(0), eventNumber(0)
+  m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr)
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
-
-  addParam("CDCHitsColName", m_param_cdcHitsColumnName,
-           "Input CDCHits collection (should be created by CDCDigi module)",
-           string("CDCHits"));
-
-  addParam("GFTrackCandidatesColName", m_param_trackCandidatesColumnName,
-           "Output GFTrackCandidates collection",
-           string("TrackCands"));
 
   addParam("Threshold", m_param_threshold, "Threshold for peak finder", static_cast<unsigned int>(10));
 
@@ -83,8 +76,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 
 void CDCLegendreTrackingModule::initialize()
 {
-  //StoreArray for genfit::TrackCandidates
-  StoreArray<genfit::TrackCand>::registerPersistent(m_param_trackCandidatesColumnName);
+  TrackFinderCDCBaseModule::initialize();
 
   // initialize track drawer
   m_cdcLegendreTrackDrawer = new TrackDrawer(m_drawCandInfo, m_drawCandidates, m_batchMode);
@@ -97,24 +89,21 @@ void CDCLegendreTrackingModule::initialize()
   m_cdcLegendreTrackProcessor.setTrackDrawer(m_cdcLegendreTrackDrawer);
 }
 
-void CDCLegendreTrackingModule::event()
+void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   startNewEvent();
   findTracks();
-  outputObjects();
+  outputObjects(tracks);
   clearVectors();
 }
 
 void CDCLegendreTrackingModule::startNewEvent()
 {
   B2INFO("**********   CDCTrackingModule  ************");
-
-  eventNumber++;
   m_cdcLegendreTrackDrawer->event();
 
   B2DEBUG(100, "Initializing hits");
-  StoreArray<CDCHit> cdcHits(m_param_cdcHitsColumnName);
-  m_cdcLegendreTrackProcessor.initializeHitList(cdcHits);
+  m_cdcLegendreTrackProcessor.initializeHitListFromWireHitTopology();
 }
 
 void CDCLegendreTrackingModule::findTracks()
@@ -133,7 +122,7 @@ void CDCLegendreTrackingModule::findTracks()
   }
 }
 
-void CDCLegendreTrackingModule::outputObjects()
+void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   for (TrackCandidate* cand : m_cdcLegendreTrackProcessor.getTrackList()) {
     B2DEBUG(100, "R value: " << cand->getR() << "; theta: " << cand->getTheta() << "; radius: " << cand->getRadius() << "; phi: "
@@ -141,7 +130,7 @@ void CDCLegendreTrackingModule::outputObjects()
             "Hitsize: " << cand->getNHits());
   }
   //create GenFit Track candidates
-  m_cdcLegendreTrackProcessor.createGFTrackCandidates(m_param_trackCandidatesColumnName);
+  m_cdcLegendreTrackProcessor.createCDCTrackCandidates(tracks);
   m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
@@ -172,7 +161,6 @@ void CDCLegendreTrackingModule::processNodes(std::vector<QuadTreeLegendre*>& lis
 void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, double rThreshold, bool increaseThreshold)
 {
   B2DEBUG(100, "Performing tree track finding");
-  m_treeFinder++;
 
   unsigned int limit = limitInitial;
 
@@ -374,11 +362,6 @@ void CDCLegendreTrackingModule::postprocessTracks()
   if (m_appendHitsInTheEnd) {
     m_cdcLegendreTrackProcessor.appendHitsOfAllTracks();
   }
-}
-
-void CDCLegendreTrackingModule::endRun()
-{
-  B2INFO("Tree finder had " << m_treeFinder << " calls");
 }
 
 void CDCLegendreTrackingModule::terminate()

@@ -45,7 +45,7 @@ namespace Belle2 {
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
        * (e.g. the position of the hit wire in normal space and in the conformal plane).
        */
-      TrackHit(CDCHit* hit, int iHit);
+      TrackHit(const CDCHit* hit, int iHit);
 
       TrackHit(int hitId, int wireID, double driftLength, double sigmaDriftLength,
                unsigned short charge, int superlayerId, int layerId, TVector3 wirePosition);
@@ -145,7 +145,7 @@ namespace Belle2 {
       void setHitUsage(int hitUsage) {m_hitUsage = hitUsage;};
 
       /** Get pointer to original CDCHit */
-      CDCHit* getOriginalCDCHit() const {return m_cdcHit;};
+      const CDCHit* getOriginalCDCHit() const {return m_cdcHit;};
 
       /** Get Z reference */
       double getZReference() const {return m_zReference;};
@@ -153,7 +153,7 @@ namespace Belle2 {
 
     private:
 
-      CDCHit* m_cdcHit;                  /**< Pointer to original CDCHit */
+      const CDCHit* m_cdcHit;                  /**< Pointer to original CDCHit */
 
       int m_cdcHitIndex;                 /**< ID of the original CDCHit in the store array*/
       int m_layerId;                     /**< ID of the layer of the hit (0-55)*/

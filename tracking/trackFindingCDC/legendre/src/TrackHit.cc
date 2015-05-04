@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-TrackHit::TrackHit(CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIWire())
+TrackHit::TrackHit(const CDCHit* hit, int ID) : m_cdcHitIndex(ID), m_wireId(hit->getIWire())
 {
 //  m_zReference = CDCLegendreWireCenter::Instance().getCenter(hit->getILayer());
   m_zReference = 0;

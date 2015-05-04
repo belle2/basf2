@@ -30,6 +30,7 @@ namespace Belle2 {
 
     class TrackDrawer;
     class TrackHit;
+    class CDCTrack;
 
     class TrackProcessor {
     public:
@@ -67,6 +68,9 @@ namespace Belle2 {
       /** Creates GeantFit Track Candidates from the stored CDCLegendreTrackCandidates */
       void createGFTrackCandidates(const string& m_gfTrackCandsColName);
 
+      /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
+      void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
+
       /** Sort hits for fitting.
        * This method sorts hits to bring them in a correct order, which is needed for the fitting
        */
@@ -93,6 +97,11 @@ namespace Belle2 {
        * @param cdcHits
        */
       void initializeHitList(const StoreArray<CDCHit>& cdcHits);
+
+      /**
+       * Compile the hitList from the wire it topology.
+       */
+      void initializeHitListFromWireHitTopology();
 
       /**
        * After each event the created hits and trackCandidates should be deleted.

@@ -186,11 +186,11 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 
   m(0) = mR;
   cov(0, 0) = VR;
-  auto mopL = new genfit::MeasurementOnPlane(m, cov, state.getPlane(), state.getRep(),
+  auto mopR = new genfit::MeasurementOnPlane(m, cov, state.getPlane(), state.getRep(),
                                              constructHMatrix(state.getRep()));
   m(0) = -mL; // Convert from unsigned drift length to signed coordinate.
   cov(0, 0) = VL;
-  auto mopR = new genfit::MeasurementOnPlane(m, cov, state.getPlane(), state.getRep(),
+  auto mopL = new genfit::MeasurementOnPlane(m, cov, state.getPlane(), state.getRep(),
                                              constructHMatrix(state.getRep()));
 
   // set left/right weights

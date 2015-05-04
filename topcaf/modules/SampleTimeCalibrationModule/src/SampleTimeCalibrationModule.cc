@@ -87,7 +87,7 @@ void SampleTimeCalibrationModule::beginRun()
 
     if (m_conditions == 1) { // read using conditions service
 
-      std::string filename = (ConditionsService::GetInstance()->GetPayloadFileURL(this));
+      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
       m_in_file = TFile::Open(filename.c_str(), "READ");
 
     } else if (m_conditions == 0) { // read  from local file
@@ -354,7 +354,7 @@ void  SampleTimeCalibrationModule::terminate()
       rms_h->Write();
 
     if (m_conditions == 1 && m_out_file)
-      ConditionsService::GetInstance()->WritePayloadFile(m_out_file->GetName(), this);
+      ConditionsService::getInstance()->writePayloadFile(m_out_file->GetName(), this);
 
   }
 

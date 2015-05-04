@@ -35,7 +35,7 @@ void TopConfigurationModule::beginRun()
 {
   StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
   topconfig_ptr.create(true);
-  std::string filename = (ConditionsService::GetInstance()->GetPayloadFileURL(this));
+  std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
   topconfig_ptr->ReadTopConfigurations(filename);
 }
 

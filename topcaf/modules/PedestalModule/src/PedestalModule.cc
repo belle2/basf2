@@ -65,7 +65,7 @@ void PedestalModule::beginRun()
 
       B2INFO("Retrieving pedestal data from service.");
 
-      std::string filename = (ConditionsService::GetInstance()->GetPayloadFileURL(this));
+      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
       m_in_ped_file = TFile::Open(filename.c_str(), "READ");
 
       B2INFO("Retrieving pedestal data from service. done");
@@ -196,7 +196,7 @@ void  PedestalModule::terminate()
       m_out_ped_file->Close();
 
 
-      ConditionsService::GetInstance()->WritePayloadFile(tempFile, this);
+      ConditionsService::getInstance()->writePayloadFile(tempFile, this);
 
     }
     if (m_writefile == 1) {

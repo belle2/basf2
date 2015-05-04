@@ -34,7 +34,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
-#include <../genfit2/code2/extern/boost/concept_check.hpp>
+#include <boost/concept_check.hpp>
 
 #include <tuple>
 #include <utility>

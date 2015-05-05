@@ -49,10 +49,10 @@ args = parser.parse_args()
 
 
 conditions = register_module('Conditions')
-conditionsDict = {'RESTBaseName': 'http://belle2db.hep.pnnl.gov/b2s/rest/v1/',
-                  'FileName': args.payload,
-                  'Package': args.package,
-                  'Module': args.module}
+conditionsDict = {'restBaseName': 'http://belle2db.hep.pnnl.gov/b2s/rest/v1/',
+                  'fileName': args.payload,
+                  'package': args.package,
+                  'module': args.module}
 
 conditions.param(conditionsDict)
 

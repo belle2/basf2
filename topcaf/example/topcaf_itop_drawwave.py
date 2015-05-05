@@ -53,10 +53,10 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfoprinter = register_module('EventInfoPrinter')
 
 run_info = args.inputRun.split('-')
-conditionsDict = {'ExperimentName': run_info[0] + '-' + run_info[2][0:7],
-                  'RunName': run_info[2][7:14],
-                  'GlobalTag': 'leps2013_InitialTest_GlobalTag',
-                  'FileBaseName': 'http://belle2db.hep.pnnl.gov/'}
+conditionsDict = {'experimentName': run_info[0] + '-' + run_info[2][0:7],
+                  'runName': run_info[2][7:14],
+                  'globalTag': 'leps2013_InitialTest_GlobalTag',
+                  'fileBaseName': 'http://belle2db.hep.pnnl.gov/'}
 conditions = register_module('Conditions')
 conditions.param(conditionsDict)
 

@@ -11,22 +11,22 @@ REG_MODULE(Conditions)
 ConditionsModule::ConditionsModule(): Module()
 {
   setDescription("This module is used test conditions API");
-  addParam("GlobalTag", m_globalTag, "Global Database Conditions Tag", std::string("leps2013_InitialTest_GlobalTag"));
-  addParam("ExperimentName", m_experimentName, "Experiment name", std::string("topcrt-e000002"));
-  addParam("RunName", m_runName, "Run name", std::string("r000545"));
-  addParam("RESTBaseName", m_restBasename, "Base name for REST services", std::string("http://belle2db.hep.pnnl.gov/b2s/rest/v1/"));
-  addParam("FileBaseName", m_fileBasename, "Base name for conditions files", std::string("http://belle2db.hep.pnnl.gov/"));
-  addParam("FileBaseLocal", m_fileLocal, "Directory name for local conditions files copies", std::string("/tmp/"));
-  addParam("FileBaseLocal", m_file_local, "Directory name for local conditions files copies", std::string("/tmp/"));
+  addParam("globalTag", m_globalTag, "Global Database Conditions Tag", std::string("leps2013_InitialTest_GlobalTag"));
+  addParam("experimentName", m_experimentName, "Experiment name", std::string("topcrt-e000002"));
+  addParam("runName", m_runName, "Run name", std::string("r000545"));
+  addParam("restBaseName", m_restBasename, "Base name for REST services", std::string("http://belle2db.hep.pnnl.gov/b2s/rest/v1/"));
+  addParam("fileBaseName", m_fileBasename, "Base name for conditions files", std::string("http://belle2db.hep.pnnl.gov/"));
+  addParam("fileBaseLocal", m_fileLocal, "Directory name for local conditions files copies", std::string("/tmp/"));
+  addParam("fileBaseLocal", m_file_local, "Directory name for local conditions files copies", std::string("/tmp/"));
 
   /// Parameters for custom payload additions.  See framework/conditions/scripts/add_payload.py example.
-  addParam("FileName", m_filename,
-           "Filename for manual payload addition.  This payload will be added to conditions on intialization.", std::string());
-  addParam("Package", m_package, "Package for manual payload addition.  This payload will be added to conditions on intialization.",
+  addParam("fileName", m_filename,
+           "filename for manual payload addition.  This payload will be added to conditions on intialization.", std::string());
+  addParam("package", m_package, "Package for manual payload addition.  This payload will be added to conditions on intialization.",
            std::string());
-  addParam("Module", m_module, "Module for manual payload addition.  This payload will be added to conditions on intialization.",
+  addParam("module", m_module, "Module for manual payload addition.  This payload will be added to conditions on intialization.",
            std::string());
-  addParam("Comment", m_comment, "Comment for manual payload addition.  This payload will be added to conditions on intialization.",
+  addParam("comment", m_comment, "Comment for manual payload addition.  This payload will be added to conditions on intialization.",
            std::string());
 
 }

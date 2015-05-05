@@ -32,7 +32,7 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
 ###############################################################################
-###                            Class Definition                             ###
+#                              Class Definition                               #
 ###############################################################################
 
 class Validation:
@@ -270,6 +270,33 @@ class Validation:
         # Thats it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.list_of_scripts
 
+    def set_runtime_data(self):
+
+        """!
+        This method sets runtime property of each script.
+        """
+        # Set up temporary dict
+        run_times = {}
+
+        # Open the data
+        runtimes = open("./runtimes.dat", "r")
+
+        # Get our data
+        for line in runtimes:
+            run_times[line.split("=")[0].strip()] = line.split("=")[1].strip()
+
+        # And try to set a property for each script
+        for script in self.list_of_scripts:
+            try:
+                script.runtime = float(run_times[script.name])
+            # If we don't have runtime data, then set it to an average of all runtimes
+            except KeyError:
+                suma = 0.0
+                for dict_key in run_times:
+                    suma += float(run_times[dict_key])
+                script.runtime = suma/len(run_times)
+        runtimes.close()
+
     def run_validation(self):
         """!
         This method runs the actual validation, i.e. it loops over all
@@ -289,6 +316,21 @@ class Validation:
         else:
             control = local_control
 
+        # If we do have runtime data, then read them
+        if os.path.exists("./runtimes.dat") and os.stat("./runtimes.dat").st_size:
+            self.set_runtime_data()
+            if os.path.exists("./runtimes-old.dat"):
+                # If there is an old data backup, delete it, we backup only one run
+                os.remove("./runtimes-old.dat")
+            if not self.mode == "cluster":
+                # Backup the old data file
+                shutil.copyfile("./runtimes.dat", "./runtimes-old.dat")
+
+        # Open runtimes log and start logging, but log only if we are
+        # running in the local mode
+        if not self.mode == "cluster":
+            runtimes = open('./runtimes.dat', 'w+')
+
         if not self.quiet:
             # This variable is needed for the progress bar function
             progress_bar_lines = 0
@@ -297,6 +339,10 @@ class Validation:
         # The list of scripts that have to be processed
         remaining_scripts = [script for script in self.list_of_scripts
                              if script.status == 'waiting']
+
+        # Sort the list of scripts that have to be processed by runtime,
+        # execute slow scripts first
+        remaining_scripts.sort(key=lambda x: x.runtime, reverse=True)
 
         # While there are scripts that have not yet been executed...
         while remaining_scripts:
@@ -316,6 +362,11 @@ class Validation:
 
                         # Write to log that the script finished
                         self.log.debug('Finished: ' + script_object.path)
+
+                        # If we are running locally, log a runtime
+                        script_object.runtime = time.time() - script_object.start_time
+                        if not self.mode == "cluster":
+                            runtimes.write(script_object.name + "=" + str(script_object.runtime) + "\n")
 
                         # Check for the return code and set variables
                         # accordingly
@@ -378,6 +429,8 @@ class Validation:
                         script_object.control.execute(script_object,
                                                       self.basf2_options,
                                                       self.dry, self.tag)
+                        # Log the script execution start time
+                        script_object.start_time = time.time()
 
                         # Some printout in quiet mode
                         if self.quiet:
@@ -393,6 +446,9 @@ class Validation:
             remaining_scripts = [script for script in remaining_scripts if
                                  script.status in ['waiting', 'running']]
 
+            # Sort them again, Justin Case
+            remaining_scripts.sort(key=lambda x: x.runtime, reverse=True)
+
             # Wait for one second before starting again
             time.sleep(1)
 
@@ -400,6 +456,9 @@ class Validation:
             if not self.quiet:
                 progress_bar_lines = draw_progress_bar(progress_bar_lines)
 
+        # And close the runtime data file
+        if not self.mode == "cluster":
+            runtimes.close()
         print
 
     def create_plots(self):
@@ -450,6 +509,10 @@ class Script:
 
         # The (absolute) path of the steering file
         self.path = path
+
+        # The runtime of the script
+        self.runtime = None
+        self.start_time = None
 
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
@@ -607,7 +670,7 @@ class Script:
 
 
 ###############################################################################
-###                         Function definitions                            ###
+#                           Function definitions                              #
 ###############################################################################
 
 def find_creator(outputfile, package):
@@ -831,7 +894,7 @@ def draw_progress_bar(delete_lines, barlength=50):
     return len(running) + 2
 
 ###############################################################################
-###                     Actual program starts here!                         ###
+#                       Actual program starts here!                           #
 ###############################################################################
 
 # If there is no release of basf2 set up, we can stop the execution right here!

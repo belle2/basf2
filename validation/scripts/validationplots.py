@@ -381,7 +381,7 @@ def generate_new_plots(list_of_revisions):
             html_output.write(
                 '\n<table width="100%" style="border:none">\n<tr>\n'
                 '<td width="50%" align="left">\nChange image size: \n</td>\n'
-                '<td widht="50%" align="right">\n<input widht=\"25%\" '
+                '<td width="50%" align="right">\n<input width=\"25%\" '
                 'type=\"range\" id=\"{0}\" class=\"plot-size\" min=\"10\" max=\"50\" value=\"25\">&nbsp;'
                 '<span id="slidernumber_{0}">25</span>'
                 '%&nbsp;&nbsp;&nbsp;\n</td>\n</tr>\n</table>\n<p></p>\n'.format(package)

@@ -130,6 +130,7 @@ textarea {
 {
     border:1px solid #bdc3c7;
     width:100%;
+    overflow-y: scroll;
 }
 
 #loglist

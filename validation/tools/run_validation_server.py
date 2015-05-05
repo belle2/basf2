@@ -66,6 +66,10 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         print
 
     def parse_POST(self):
+        """!
+        A method that parses header sent to the server and returns POST method html form data.
+        """
+
         ctype, pdict = parse_header(self.headers['content-type'])
         if ctype == 'multipart/form-data':
             postvars = parse_multipart(self.rfile, pdict)

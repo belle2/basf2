@@ -266,7 +266,7 @@ void DedxPIDModule::event()
 
     //calculate dE/dx values using associated genfit::Track
     const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
-    std::unique_ptr<genfit::TrackCand> gftrackcand(gftrack->constructTrackCand());
+    genfit::TrackCand gftrackcand = *fitResult->getRelatedFrom<genfit::TrackCand>();
     genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
 
     //get momentum (at origin) from fit result
@@ -295,8 +295,8 @@ void DedxPIDModule::event()
     //sort hits in the order they were created
     //this is required if I want to use the helix path length
     //genfit::TrackCand gftrackcand = gftrack->getCand();
-    gftrackcand->sortHits();
-    const int num_hits = gftrackcand->getNHits();
+    gftrackcand.sortHits();
+    const int num_hits = gftrackcand.getNHits();
     if (num_hits == 0) {
       B2WARNING("Track has no associated hits, skipping");
       continue;
@@ -317,7 +317,7 @@ void DedxPIDModule::event()
       bool track_extrapolation_failed = false;
 
       //Loop over all CDC hits from this track
-      const std::vector<int>& cdc_hit_ids = gftrackcand->getHitIDs(Const::CDC);
+      const std::vector<int>& cdc_hit_ids = gftrackcand.getHitIDs(Const::CDC);
       const int num_cdc_hits = cdc_hit_ids.size();
       for (int iCDC = 0; iCDC < num_cdc_hits; iCDC++) {
         const int cdc_idx = cdc_hit_ids[iCDC];
@@ -466,12 +466,12 @@ void DedxPIDModule::event()
     }
 
     if (m_usePXD) {
-      const std::vector<int>& pxdClusterIDs = gftrackcand->getHitIDs(Const::PXD);
+      const std::vector<int>& pxdClusterIDs = gftrackcand.getHitIDs(Const::PXD);
       saveSiHits(dedxTrack.get(), helix_at_origin, pxdClusters, pxdClusterIDs);
     }
 
     if (m_useSVD) {
-      const std::vector<int>& svdClusterIDs = gftrackcand->getHitIDs(Const::SVD);
+      const std::vector<int>& svdClusterIDs = gftrackcand.getHitIDs(Const::SVD);
       saveSiHits(dedxTrack.get(), helix_at_origin, svdClusters, svdClusterIDs);
     }
 

@@ -112,21 +112,15 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(mdstPID)
 
 
-def add_tracking_reconstruction(path, components=None, pruneTracks=1):
+def add_track_finding(path, components=None):
     """
-    This function adds the standard reconstruction modules for tracking
-    to a path.
+    Adds the realistic track finding to the path.
     """
-
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
     use_vxd = components is None or 'SVD' in components
     use_cdc = components is None or 'CDC' in components
-
-    # Material effects for all track extrapolations
-    material_effects = register_module('SetupGenfitExtrapolation')
-    path.add_module(material_effects)
 
     # CDC track finder: trasan
     if use_cdc:
@@ -168,39 +162,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=1):
         track_merger.param('VXDTrackCandidatesColName', vxd_trackcands)
         path.add_module(track_merger)
 
-    # track fitting
-    trackfitter = register_module('GenFitter')
-    path.add_module(trackfitter)
 
-    # V0 finding
-    v0finder = register_module('V0Finder')
-    path.add_module(v0finder)
-
-    # dE/dx PID
-    dEdxPID = register_module('DedxPID')
-    dEdxPID.param('useSVD', use_vxd)
-    dEdxPID.param('useCDC', use_cdc)
-    path.add_module(dEdxPID)
-
-    # prune genfit tracks
-    if pruneTracks:
-        path.add_module(PruneGenfitTracks())
-
-
-def add_mc_tracking_reconstruction(path, components=None, pruneTracks=1):
-    """
-    This function adds the standard reconstruction modules for MC tracking
-    to a path.
-    """
-
+def add_mc_track_finding(path, components=None):
     # tracking
     if components and not ('PXD' in components or 'SVD' in components or 'CDC'
                            in components):
         return
-
-    # Material effects for all track extrapolations
-    material_effects = register_module('SetupGenfitExtrapolation')
-    path.add_module(material_effects)
 
     # find MCTracks in CDC, SVD, and PXD
     mc_trackfinder = register_module('TrackFinderMCTruth')
@@ -220,6 +187,29 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=1):
         mc_trackfinder.param('UseCDCHits', 0)
     path.add_module(mc_trackfinder)
 
+
+def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrackFinding=False):
+    """
+    This function adds the standard reconstruction modules for tracking
+    to a path.  If mcTrackFinding is set it uses MC truth based track finding,
+    realistic track finding otherwise.
+    """
+
+    if components and not ('SVD' in components or 'CDC' in components):
+        return
+
+    use_vxd = components is None or 'SVD' in components
+    use_cdc = components is None or 'CDC' in components
+
+    # Material effects for all track extrapolations
+    material_effects = register_module('SetupGenfitExtrapolation')
+    path.add_module(material_effects)
+
+    if mcTrackFinding:
+        add_mc_track_finding(path, components)
+    else:
+        add_track_finding(path, components)
+
     # track fitting
     trackfitter = register_module('GenFitter')
     path.add_module(trackfitter)
@@ -230,15 +220,21 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=1):
 
     # dE/dx PID
     dEdxPID = register_module('DedxPID')
-    if components is not None and 'SVD' not in components:
-        dEdxPID.param('useSVD', False)
-    if components is not None and 'CDC' not in components:
-        dEdxPID.param('useCDC', False)
+    dEdxPID.param('useSVD', use_vxd)
+    dEdxPID.param('useCDC', use_cdc)
     path.add_module(dEdxPID)
 
     # prune genfit tracks
     if pruneTracks:
         path.add_module(PruneGenfitTracks())
+
+
+def add_mc_tracking_reconstruction(path, components=None, pruneTracks=True):
+    """
+    This function adds the standard reconstruction modules for MC tracking
+    to a path.
+    """
+    add_tracking_reconstruction(path, components, pruneTracks, True)
 
 
 def add_reconstruction(path, components=None, pruneTracks=1):
@@ -260,7 +256,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=1):
     """
 
     # tracking
-    add_mc_tracking_reconstruction(path, components, pruneTracks)
+    add_tracking_reconstruction(path, components, pruneTracks, True)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path, components)

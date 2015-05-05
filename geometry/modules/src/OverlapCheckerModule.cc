@@ -38,6 +38,7 @@ void OverlapCheckerModule::initialize()
     B2ERROR("No geometry found. => Add the Geometry module to the path before the OverlapChecker module.");
     return;
   }
+  m_seen.clear();
   checkVolume(volume, "");
 
   //Print the list of found overlaps
@@ -59,6 +60,9 @@ bool OverlapCheckerModule::checkVolume(G4VPhysicalVolume* volume, const std::str
   G4LogicalVolume* logicalVolume = volume->GetLogicalVolume();
   for (int iDaughter = 0; iDaughter < logicalVolume->GetNoDaughters(); iDaughter++) {
     G4VPhysicalVolume* daughter = logicalVolume->GetDaughter(iDaughter);
+    // check if we already checked this particular volume, if so skip it
+    auto it = m_seen.insert(daughter);
+    if (!it.second) continue;
     result = checkVolume(daughter, volumePath) || result;
   }
   return result;

@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class G4VPhysicalVolume;
 
@@ -60,6 +61,7 @@ namespace Belle2 {
     int    m_points;     /**< number of test points */
     double m_tolerance;  /**< tolerance of overlap check */
     std::vector<std::string> m_overlaps;  /**< list of overlapping volumes */
+    std::set<G4VPhysicalVolume*> m_seen; /**< set of logical volumes we already checked */
   };
 } //Belle2 namespace
 #endif

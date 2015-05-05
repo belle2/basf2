@@ -47,8 +47,8 @@ namespace Belle2 {
         return;
       }
 
-      B2INFO("TrackSetEvaluator::tcDuel: first competitor got QI: " << overlappingTCs.front()->getTrackQuality() <<
-             ", and second one got: " << overlappingTCs.back()->getTrackQuality())
+      B2DEBUG(25, "TrackSetEvaluator::tcDuel: first competitor got QI: " << overlappingTCs.front()->getTrackQuality() <<
+              ", and second one got: " << overlappingTCs.back()->getTrackQuality())
       if (overlappingTCs.front()->getTrackQuality() > overlappingTCs.back()->getTrackQuality()) {
         overlappingTCs.back()->setAliveState(false);
       } else {
@@ -68,8 +68,9 @@ namespace Belle2 {
           overlappingTCs.push_back(&m_trackSet[index]);
         }
       }
-      B2INFO("TrackSetEvaluatorBase::getOverlappingTCs: in a trackset of size " << m_trackSet.size() << ", " << overlappingTCs.size() <<
-             " overlapping TCs were found ")
+      B2DEBUG(50, "TrackSetEvaluatorBase::getOverlappingTCs: in a trackset of size " << m_trackSet.size() << ", " << overlappingTCs.size()
+              <<
+              " overlapping TCs were found ")
 
       return overlappingTCs;
     }

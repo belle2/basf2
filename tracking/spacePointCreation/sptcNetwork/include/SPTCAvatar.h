@@ -130,7 +130,8 @@ namespace Belle2 {
     {
 //       B2DEBUG(50, "SPTCAvatar:setAliveState: newState = " << newState)
       if (newState == false) {
-        m_observer.notifyRemove(m_iD);
+        // notify all competitors to remove this TC - additionally clears this TCs' competitors
+        m_observer.notifyRemove(getID());
       }
       m_aliveState = newState;
     }

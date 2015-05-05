@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <utility>
+#include <functional>
 
 
 namespace Belle2 {
@@ -124,6 +125,7 @@ namespace Belle2 {
           B2DEBUG(50, "current TC " << aTC.getID() << " is not competing with " << newTC.getID())
         }
       }
+//       B2INFO("TCNEtworkContainer:add: newTC.getID: " << newTC.getID() << ", size(old) for m_nodes/m_links: " << m_nodes.size() << "/" << m_links.size())
       m_nodes.push_back(newTC);
       m_links.push_back(TCCompetitor(newTC.getID()));
 
@@ -132,6 +134,10 @@ namespace Belle2 {
       for (unsigned int competitorID : newCompetitorsFound) {
         newTCCompetitor.addCompetitor(competitorID);
       }
+//       auto vecPrint = [] (const std::vector<unsigned int>& vec) -> std::string { std::string out; for (auto iD : vec) { out += "competitor: " + std::to_string(iD) + "\n" ; } return out; };
+//    B2INFO("TCNEtworkContainer:add: newTC.getID: " << newTC.getID()
+//        << ", got competitor with ID: " << newTCCompetitor.getID()
+//        << " and its own competitors: \n" << vecPrint(newTCCompetitor.getCompetitors()))
 
       // just some final sanity checks (DEBUG):
       for (unsigned int tcID = 0; tcID < size(); tcID++) {
@@ -141,11 +147,26 @@ namespace Belle2 {
         }
       }
       if (m_nodes.size() != m_links.size()) {
-        B2ERROR("TCNEtworkContainer:add: m_nodes.size() " << m_nodes.size() << " and m_links.size() " << m_links.size() <<
+        B2ERROR("TCNEtworkContainer:add: m_nodes.size() " << size() << " and m_links.size() " << m_links.size() <<
                 " differ - this is strictly forbidden!")
       }
     }
 
+
+    /** print the network */
+    void print() const
+    {
+      auto vecPrint = [](const std::vector<unsigned int>& vec) -> std::string { std::string out; for (auto iD : vec) { out += " " + std::to_string(iD) + "," ; } return out; };
+
+      std::string out = "TCNetwork::print: The network got " + std::to_string(m_nodes.size()) + " nodes:\n";
+      for (auto& aNode : m_nodes) {
+        out += "node " + std::to_string(aNode.getID())
+               + "(alive: " + std::to_string(aNode.isAlive())
+               + ", QI: " + std::to_string(aNode.getTrackQuality())
+               + ") got competitors: " + vecPrint(m_obsi.getCompetitors(aNode.getID())) + "\n";
+      }
+      B2INFO(out << "\n")
+    }
 
     /** deactivates a TC and updates the competing links to it */
     void killTC(unsigned int iD)

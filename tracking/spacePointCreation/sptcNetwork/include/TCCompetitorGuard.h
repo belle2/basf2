@@ -40,24 +40,51 @@ namespace Belle2 {
     }
 
 
-    /** notify function called by class which wants to be observed. For each competitor of given iD, the iD will be removed as competitor for them. */
+    /** notify function called by class which wants to be observed.
+    *
+    * For each competitor of given iD, the iD will be removed as competitor for them.
+    * Additionally given ID gets rid of competitors as well.
+    */
     void notifyRemove(unsigned int iD)
     {
       if (iD >= m_links.size()) {
         B2WARNING("TCCompetitorGuard:notifyRemove: TC not officially registered in network yet! Skipping notifyRemove...")
         return;
       }
-      B2DEBUG(50, "TCCompetitorGuard:notifyRemove: id " << iD << " got " << m_links[iD].getNCompetitors() <<
-              " competitors which will now be informed")
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
+        B2DEBUG(50, "TCCompetitorGuard:notifyRemove: id " << iD << " got " << m_links[iD].getNCompetitors() <<
+                " competitors which will now be informed")
+//    auto vecPrint = [] (const std::vector<unsigned int>& vec) -> std::string { std::string out; for (auto iD : vec) { out += "competitors: " + std::to_string(iD) + "\n" ; } return out; };
+        B2DEBUG(50, print(m_links[iD].getCompetitors()) << "\n")
+      }
 
+      // clean now the competitors of given iD
       for (unsigned int aCompetitor : m_links[iD].getCompetitors()) {
         unsigned int nCompetitorsB4 = m_links[aCompetitor].getNCompetitors();
+//    B2INFO("TCCompetitorGuard:notifyRemove: inform now competitor: " << aCompetitor << " to be killed!")
         m_links[aCompetitor].removeCompetitor(iD);
-        B2DEBUG(75, " competitor " << aCompetitor << " has removed " << iD << ". nCompetitorsB4: " << nCompetitorsB4 << ", now: " <<
-                m_links.at(
-                  aCompetitor).getNCompetitors())
-        m_links[iD].removeCompetitor(aCompetitor);
+        B2DEBUG(50, "TCCompetitorGuard:notifyRemove: current competitor " << aCompetitor << " has removed " << iD << ". nCompetitorsB4: " <<
+                nCompetitorsB4 << ", now: " <<
+                m_links.at(aCompetitor).getNCompetitors())
       }
+      // clean now the node of the given iD, has to be done in separate step to prevent undefined behavior
+      m_links[iD].clearAllCompetitors(); // WARNING maybe still needed!
+
+//       for (unsigned int aCompetitor : m_links[iD].getCompetitors()) {
+//    B2INFO("TCCompetitorGuard:notifyRemove: in node " << iD << " killing now competitor: " << aCompetitor)
+//    m_links[iD].removeCompetitor(aCompetitor);
+//    }
+    }
+
+
+    /** removes all competing competitors of given iD. */
+    void clearAllCompetitors(unsigned int iD)
+    {
+      if (iD >= m_links.size()) {
+        B2WARNING("TCCompetitorGuard:clearAllCompetitors: given ID is not part of the network! Skipping clearAllCompetitors...")
+        return;
+      }
+      m_links[iD].clearAllCompetitors();
     }
 
 
@@ -67,8 +94,20 @@ namespace Belle2 {
       return iD < m_links.size() and m_links[iD].hasCompetitors();
     }
 
+
     /** getCompetitors - returns non-modifyable reference to entries of the container */
     const std::vector<unsigned int>& getCompetitors(unsigned int iD) const { return  m_links[iD].getCompetitors(); }
+
+
+    /** print the competitors */
+    std::string print(const std::vector<unsigned int>& vec) const
+    {
+      std::string out;
+      for (auto iD : vec) {
+        out += "competitors: " + std::to_string(iD) + "\n" ;
+      }
+      return out;
+    }
   };
 
 } // end namespace Belle2

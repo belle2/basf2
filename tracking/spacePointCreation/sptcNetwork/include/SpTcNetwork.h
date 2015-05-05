@@ -84,6 +84,9 @@ namespace Belle2 {
     bool getCompareTCsMode() const { return m_compareSPs; }
 
 
+    /** print network in a human readable way: */
+    void print() const { m_network.print(); }
+
     /** returns a vector of pointers to all TCs which are alive and overlapping */
 //  std::vector<SPTCAvatar<TCCompetitorGuard>*> provideOverlappingTCs() { return m_network.provideOverlappingTCs(); }
 

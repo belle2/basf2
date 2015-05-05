@@ -50,6 +50,9 @@ void TrackSetEvaluatorGreedyModule::event()
 
   unsigned int nTCsAlive = m_tcNetwork->cleanOverlaps();
 
+  B2INFO("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": after cleanOverlaps: network now looks like this:")
+  m_tcNetwork->print();
+
   m_nFinalTCs += nTCsAlive;
   m_nRejectedTCs += m_spacePointTrackCands.getEntries() - nTCsAlive;
 

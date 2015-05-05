@@ -37,6 +37,7 @@ QualityEstimatorVXDRandomModule::QualityEstimatorVXDRandomModule() : Module()
 void QualityEstimatorVXDRandomModule::event()
 {
   m_eventCounter++;
+  B2INFO("\n" << "QualityEstimatorVXDRandomModule:event: event " << m_eventCounter << "\n")
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
 

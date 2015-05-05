@@ -69,6 +69,11 @@ namespace Belle2 {
     /** for given id it will be checked whether it is one of the competitors or not */
     bool isCompetitor(unsigned int iD) const { return !isEnd(find(iD)); }
 
+
+    /** returns iD of this competitor */
+    unsigned int getID() const { return m_identifier; }
+
+
 /// setter
 
     /** adds given id if it was no competitor yet. If id was already competitor, a warning will be given */
@@ -78,6 +83,11 @@ namespace Belle2 {
         B2WARNING("TCCompetitor(iD: " << m_identifier << ")::addCompetitor: given iD " << iD << " was already found among " <<
                   getNCompetitors() <<
                   " competitors! ID will not be added again")
+      } else if (iD == m_identifier) {
+        B2ERROR("TCCompetitor(iD: " << m_identifier << ")::addCompetitor: given iD " << iD <<
+                " is identical with itself. This iD is not allowed to be added to the  " <<
+                getNCompetitors() <<
+                " competitors! Attempt to allow competing with itself aborted!")
       } else {
         m_competitors.push_back(iD);
       }
@@ -90,7 +100,9 @@ namespace Belle2 {
       using namespace std;
       if (isCompetitor(iD)) {
         auto newEndOfVector = std::remove(m_competitors.begin(), m_competitors.end(), iD);
-//         m_competitors.resize(getNCompetitors() - 1);
+        unsigned int newSize = std::distance(m_competitors.begin(), newEndOfVector);
+        B2DEBUG(50, "TCCompetitor::removeCompetitor: own iD " << getID() << " removes competing id: " << iD << " with nOldCompetitors: " <<
+                getNCompetitors() << ", nNewCompetitors: " << newSize)
         m_competitors.resize(std::distance(m_competitors.begin(), newEndOfVector));
       } else {
         // storing lambda as function, compiler does not accept direct usage in B2WARNING (do not know why)
@@ -102,5 +114,16 @@ namespace Belle2 {
       }
     }
 
+
+    /** removes all competing competitors from this one. */
+    void clearAllCompetitors()
+    {
+      unsigned int oldSize = m_competitors.size();
+      auto miniPrinter = [](std::vector<unsigned>& vec) -> std::string { std::string out; for (auto iD : vec) { out += " " + std::to_string(iD); } return out; };
+      std::string out = miniPrinter(m_competitors);
+      m_competitors.clear();
+      B2DEBUG(50, "TCCompetitor::clearAllCompetitors: competitor " << getID() << " had " << oldSize << " competitors and " <<
+              m_competitors.size() << " competitors now.\nOld ones were: " << out)
+    }
   };
 } // end namespace Belle2

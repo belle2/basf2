@@ -87,16 +87,16 @@ namespace Belle2 {
   }
 
   /**
-   * get the key value pairs stored in the map, sorted after the following scheme (descending order)
+   * get the (key, value, number of values) tuples stored in the map, sorted after the following scheme (descending order)
    * 1) the number of associated values to one key
    * 2) the sum of the associated values to that key
    * NOTE: for a non-multimap this returns the content of the map ordered by valued
    * CAUTION: if one of the values to a key is NaN this key will be the first (of the ones with the same number of associated values)
-   * @returns a vector of tuples where get<0> is the key, get<1> is the sum of the values to the key and get<2> is the number of weights to the key
+   * @returns a vector of tuples where get<0> is the key, get<1> is the sum of the values to the key and get<2> is the number of values to the key
    */
   template <typename MapType>
   std::vector<std::tuple<typename MapType::key_type, typename MapType::mapped_type, unsigned int> >
-  getSortedKeyValuePairs(const MapType& aMap)
+  getSortedKeyValueTuples(const MapType& aMap)
   {
     typedef typename MapType::key_type keyT;
     typedef typename MapType::mapped_type mapT;

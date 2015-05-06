@@ -266,7 +266,7 @@ namespace Belle2 {
   }
 
   /** test if the 'getSortedKeyValuePairs' method actually works as advertised */
-  TEST_F(MapHelperFunctionsTest, testGetSortedKeyValuePairs)
+  TEST_F(MapHelperFunctionsTest, testGetSortedKeyValueTuples)
   {
     // multimap without nans first
     std::vector<int> possibleKeys = { 0, 1, 2, 3, 4, 5 };
@@ -283,7 +283,7 @@ namespace Belle2 {
       summedValues.push_back(std::accumulate(possibleValues.begin(), possibleValues.end(), 0.0));
     }
 
-    std::vector<std::tuple<int, double, unsigned int> > keyValPairs = getSortedKeyValuePairs(_nanMultiMap);
+    std::vector<std::tuple<int, double, unsigned int> > keyValPairs = getSortedKeyValueTuples(_nanMultiMap);
 
     EXPECT_EQ(keyValPairs.size(), 6);
     // hardcoded checking here (only sampling here! not checking the whole thing!)
@@ -292,7 +292,7 @@ namespace Belle2 {
     EXPECT_EQ(get<2>(keyValPairs[0]), 4);
 
     // all the other checks with multimap without NaNs
-    keyValPairs = getSortedKeyValuePairs(_multimap);
+    keyValPairs = getSortedKeyValueTuples(_multimap);
     EXPECT_EQ(keyValPairs.size(), 6);
 
     EXPECT_EQ(get<0>(keyValPairs[0]), 0);
@@ -303,7 +303,7 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(get<1>(keyValPairs[2]), summedValues[3]);
     EXPECT_EQ(get<2>(keyValPairs[2]), 3);
 
-    keyValPairs = getSortedKeyValuePairs(_map);
+    keyValPairs = getSortedKeyValueTuples(_map);
     EXPECT_EQ(get<0>(keyValPairs[0]), 3); // sin(x/2) has its maximum at x = n*pi, 3 is the value that comes closest to this
     EXPECT_DOUBLE_EQ(get<1>(keyValPairs[0]), sinHalf.operator()(3));
 

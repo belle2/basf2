@@ -279,8 +279,6 @@ void DedxCellPIDModule::event()
       B2WARNING("No related track for this fit...");
       continue;
     }
-    int nhits = gftrack->getNumPointsWithMeasurement();
-    dedxCell->m_nHits = nhits;
 
     // use the cardinal track representation (by default, the first element)
     genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
@@ -316,6 +314,8 @@ void DedxCellPIDModule::event()
 
     // loop over all CDC hits from this track
     if (m_useCDC) {
+      double layerdE = 0.0; // total charge in current layer
+      double layerdx = 0.0; // total path length in current layer
 
       // get the momentum valid in the CDC
       WireID wireID0(0);
@@ -336,10 +336,22 @@ void DedxCellPIDModule::event()
         int cdcIDx = cdcHitIDs[iCDC];
 
         // get the global wire ID (between 0 and 14336) and the layer info
+        const int wire = cdcHits[cdcIDx]->getIWire();
         WireID wireID(cdcHits[cdcIDx]->getID());
         int layer = cdcHits[cdcIDx]->getILayer();
         int superlayer = cdcHits[cdcIDx]->getISuperLayer();
         int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
+
+        const bool lastHit = (iCDC + 1 >= cdcHitIDs.size());
+        bool last_hit_in_current_layer = lastHit;
+        if (!lastHit) {
+          //peek at next hit
+          const int nextcdcIDx = cdcHitIDs[iCDC + 1];
+          const int nextLayer = cdcHits[nextcdcIDx]->getILayer();
+          const int nextSuperlayer = cdcHits[nextcdcIDx]->getISuperLayer();
+          const int nextLayerFull = (nextSuperlayer == 0) ? nextLayer : (8 + (nextSuperlayer - 1) * 6 + nextLayer);
+          last_hit_in_current_layer = (nextLayerFull != currentLayer);
+        }
 
         // find the position of the endpoints of the sense wire
         const TVector3& wirePosF = cdcgeo.wireForwardPosition(wireID);
@@ -388,35 +400,42 @@ void DedxCellPIDModule::event()
           RealisticTDCCountTranslator realistictdc;
           double driftDRealistic = realistictdc.getDriftLength(driftT, wireID);
           double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID);
-          // if instead we want to use measured angles, etc:
-          //          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
-          //          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, poca.z(), pocaMom.Phi(), pocaMom.Theta());
 
           // now calculate the path length for this hit
           double celldx = c.dx(doca, entAng);
           if (!c.isValid()) continue;
 
+          layerdE += adcCount;
+          layerdx += celldx;
+
           double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
-          // drop hits with path lengths less than 20% of the cell height
-          if (celldx / cellHeight < 0.2) {
-            continue;
-          }
-
-          // save the information for this hit
-          dedxCell->addDedx(currentLayer, cellDedx);
-          if (!m_pdfFile.empty() and m_useIndividualHits) {
-            saveLogLikelihood(dedxCell->m_cdcLogl, dedxCell->m_p, cellDedx, m_pdfs[c_CDC]);
-          }
-
           if (m_enableDebugOutput)
-            dedxCell->addHit(Dedx::c_CDC, currentLayer, (short)wireID, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight,
+            dedxCell->addHit(wire, currentLayer, (short)wireID, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight,
                              cellHalfWidth, driftT, driftDRealistic, driftDRealisticRes);
-
         } catch (genfit::Exception) {
           B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": genfit::Track extrapolation failed (in CDC)");
           continue;
         }
 
+        if (last_hit_in_current_layer) {
+          double totalDistance = layerdx / sin(trackMom.Theta());
+          double cellDedx = layerdE / totalDistance;
+          // drop hits with path lengths less than 20% of the cell height
+          //    if (layerdx / cellHeight < 0.2) {
+          //      continue;
+          //    }
+
+          if (cellDedx > 0) {
+            // save the information for this hit
+            dedxCell->addDedx(currentLayer, totalDistance, cellDedx);
+            if (!m_pdfFile.empty() and m_useIndividualHits) {
+              saveLogLikelihood(dedxCell->m_cdcLogl, dedxCell->m_p, cellDedx, m_pdfs[c_CDC]);
+            }
+          }
+
+          layerdE = 0;
+          layerdx = 0;
+        }
       } // end of loop over CDC hits for this track
 
 
@@ -426,10 +445,13 @@ void DedxCellPIDModule::event()
                        &(dedxCell->m_dedx_avg_truncated_err[c_CDC]),
                        dedxCell->dedx);
         const int numDedx = dedxCell->dedx.size();
+        dedxCell->m_nHits = numDedx;
         const int lowEdgeTrunc = int(numDedx * m_removeLowest);
         const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest));
         dedxCell->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
       }
+
+      B2INFO("DedxCells: " << dedxCell->dedx.size() << "\t" << cdcHitIDs.size());
     }
 
     if (m_usePXD) {
@@ -610,7 +632,7 @@ template <class HitClass> void DedxCellPIDModule::saveSiHits(DedxCell* track, co
       //store data
       silicon_dedx.push_back(dedx);
       track->m_dedx_avg[current_detector] += dedx;
-      track->addDedx(layer, dedx);
+      track->addDedx(layer, total_distance, dedx);
       if (!m_pdfFile.empty() and m_useIndividualHits) {
         saveLogLikelihood(track->m_svdLogl, track->m_p, dedx, m_pdfs[current_detector]);
       }

@@ -607,7 +607,7 @@ std::pair<TrueHitType*, double>
 SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits,
                                                    Belle2::SpacePoint* spacePoint, e_detTypes detType)
 {
-  vector<tuple<int, double, unsigned int> > keyValuePairs = getSortedKeyValuePairs(aMap);
+  vector<tuple<int, double, unsigned int> > keyValuePairs = getSortedKeyValueTuples(aMap);
 
   std::pair<TrueHitType*, double> THwithWeight(NULL, 0.0); // default return value
 //   std::vector<std::pair<int, unsigned int> > indNweights = getNValuesPerKey(aMap);

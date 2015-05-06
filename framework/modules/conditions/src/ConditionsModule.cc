@@ -17,7 +17,6 @@ ConditionsModule::ConditionsModule(): Module()
   addParam("restBaseName", m_restBasename, "Base name for REST services", std::string("http://belle2db.hep.pnnl.gov/b2s/rest/v1/"));
   addParam("fileBaseName", m_fileBasename, "Base name for conditions files", std::string("http://belle2db.hep.pnnl.gov/"));
   addParam("fileBaseLocal", m_fileLocal, "Directory name for local conditions files copies", std::string("/tmp/"));
-  addParam("fileBaseLocal", m_file_local, "Directory name for local conditions files copies", std::string("/tmp/"));
 
   /// Parameters for custom payload additions.  See framework/conditions/scripts/add_payload.py example.
   addParam("fileName", m_filename,

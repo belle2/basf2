@@ -190,10 +190,10 @@ namespace Belle2 {
     double m_p_cdc; /**< momentum at the inner layer of the CDC */
     double m_cosTheta; /**< cos(theta) for the track */
     short m_charge; /**< particle charge from tracking (+1 or -1) */
-    short m_nHits; /**< number of hits on this track */
-    short m_nHitsUsed; /**< number of hits on this track used in truncated mean */
 
     double m_length; /**< total distance travelled by the track */
+    short m_nHits; /**< number of hits on this track */
+    short m_nHitsUsed; /**< number of hits on this track used in truncated mean */
 
     double m_pdg; /**< MC PID */
     double m_mother_pdg; /**< MC PID of mother particle */

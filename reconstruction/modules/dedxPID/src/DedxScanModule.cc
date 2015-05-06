@@ -8,15 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/DedxCellPID/DedxScanModule.h>
-#include <reconstruction/modules/DedxCellPID/LineHelper.h>
+#include <reconstruction/modules/dedxPID/DedxScanModule.h>
+#include <reconstruction/modules/dedxPID/LineHelper.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <reconstruction/dataobjects/DedxCell.h>
+#include <reconstruction/dataobjects/DedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -72,7 +72,7 @@ void DedxScanModule::initialize()
 {
 
   // register outputs
-  StoreArray<DedxCell>::registerPersistent();
+  StoreArray<DedxTrack>::registerPersistent();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -87,7 +87,7 @@ void DedxScanModule::event()
 {
 
   // outputs
-  StoreArray<DedxCell> dedxArray;
+  StoreArray<DedxTrack> dedxArray;
 
   // get the geometry of the cdc
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -100,7 +100,7 @@ void DedxScanModule::event()
 
   srand(time(NULL));
 
-  boost::shared_ptr<DedxCell> dedxCell = boost::make_shared<DedxCell>();
+  boost::shared_ptr<DedxTrack> dedxTrack = boost::make_shared<DedxTrack>();
 
   for (int i = 0; i < 56; ++i) {
     int nWires = cdcgeo.nWiresInLayer(i);
@@ -137,10 +137,10 @@ void DedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxCell->addHit(Dedx::c_CDC, i, 0, doca, entAng, 0, celldx, 0.0, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0);
+        dedxTrack->addHit(Dedx::c_CDC, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0);
       }
     }
-    dedxArray.appendNew(*dedxCell);
+    dedxArray.appendNew(*dedxTrack);
   }
 }
 

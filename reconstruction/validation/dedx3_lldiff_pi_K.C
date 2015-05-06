@@ -46,9 +46,9 @@ void plot(const TString &input_filename)
   for (int det = 0; det < 2; det++) {
     TString selection;
     if (det == 0) //SVD
-      selection = TString::Format("(DedxTracks.m_svdLogl[][2] - DedxTracks.m_svdLogl[][3]):m_p_true");
+      selection = TString::Format("(DedxTracks.m_svdLogl[][2] - DedxTracks.m_svdLogl[][3]):DedxTracks.m_p_true");
     else //CDC
-      selection = TString::Format("(DedxTracks.m_cdcLogl[][2] - DedxTracks.m_cdcLogl[][3]):m_p_true");
+      selection = TString::Format("(DedxTracks.m_cdcLogl[][2] - DedxTracks.m_cdcLogl[][3]):DedxTracks.m_p_true");
 
     for (int part = 2; part < 4; part++) {
       //now create histograms with log-likelihood difference

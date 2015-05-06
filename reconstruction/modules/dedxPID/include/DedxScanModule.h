@@ -27,9 +27,9 @@ using namespace std;
 
 namespace Belle2 {
 
-  class DedxCell;
+  class DedxTrack;
 
-  /** This class performs the same function as DedxCellModule, but does so
+  /** This class performs the same function as DedxPIDModule, but does so
    * without using real objects from BASF2. Instead, it scans values of
    * DOCA and entrance angle for a cell in each layer of the CDC.
    */

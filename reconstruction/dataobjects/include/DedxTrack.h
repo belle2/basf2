@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Pulvermacher
+ * Contributors: Jake Bennett
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,22 +24,23 @@ namespace Belle2 {
   /** Debug output for DedxPID module.
    *
    * Contains information of individual hits belonging to a track
-   * as well as calculated dE/dx values.
    */
   class DedxTrack : public RelationsObject {
     friend class DedxPIDModule;
+    friend class DedxScanModule;
+    friend class DedxCorrectionModule;
+
   public:
-    // default constructor
-    DedxTrack():
+
+    /** Default constructor */
+    DedxTrack() :
       RelationsObject(),
-      m_event_id(0), m_track_id(0), m_pdg(0), m_slow_pion(false),
-      m_p_vec(TVector3()), m_p(0), m_p_true(0),
-      m_charge(0),
-      m_chi2(0),
-      m_mother_pdg(0),
-      m_last_layer(-1),
-      m_length(0.0)
+      m_cdc(0), m_vxd(0), m_eventID(0), m_trackID(0),
+      m_p(0), m_p_cdc(0), m_cosTheta(0), m_charge(0),
+      m_length(0.0), m_nHits(0), m_nHitsUsed(0),
+      m_pdg(0), m_mother_pdg(0), m_p_true(0)
     {
+      //for all particles
       //for all detectors
       for (int i = 0; i < Dedx::c_num_detectors; i++)
         m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
@@ -51,32 +52,36 @@ namespace Belle2 {
       }
     }
 
-    /** add a single hit to the object */
-    void addHit(const TVector3& pos, int layer, int sensorid, float phi, float energydep, float translenergydep, bool extrapFailed,
-                float drift_length = 0.0)
+    /** Add a single hit to the object */
+    void addHit(int sid, int layer, double doca, double enta, int adcCount, double dE, double dx, double dEdx,
+                double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes)
     {
-      wx.push_back(pos.X());
-      wy.push_back(pos.Y());
-      wz.push_back(pos.Z());
-      flayer.push_back(layer);
-      sensorUID.push_back(sensorid);
-      phiWireTrack.push_back(phi);
-      edep.push_back(energydep);
-      tedep.push_back(translenergydep);
-      extrapolationFailed.push_back(extrapFailed);
-      driftLength.push_back(drift_length);
-      if ((layer < 0 and layer < m_last_layer) or (layer >= 0 and layer > m_last_layer))
-        m_last_layer = layer;
+      if (sid < 15000) m_cdc++;
+      else m_vxd++;
+      m_sensorID.push_back(sid);
+      m_layer.push_back(layer);
+      m_doca.push_back(doca);
+      m_enta.push_back(enta);
+      m_adcCount.push_back(adcCount);
+      m_dE.push_back(dE);
+      m_dx.push_back(dx);
+      m_dEdx.push_back(dEdx);
+      m_cellHeight.push_back(cellHeight);
+      m_cellHalfWidth.push_back(cellHalfWidth);
+      m_driftT.push_back(driftT);
+      m_driftD.push_back(driftD);
+      m_driftDRes.push_back(driftDRes);
     }
 
-    /** add a dE/dx value (one per layer for non-curling tracks) */
-    void addDedx(int layer, float distance, float dedx_value)
+    /** add a dE/dx value */
+    void addDedx(int layer, float distance, float dedxValue)
     {
-      dedx_flayer.push_back(layer);
+      dedxLayer.push_back(layer);
       dist.push_back(distance);
-      dedx.push_back(dedx_value);
+      dedx.push_back(dedxValue);
       m_length += distance;
     }
+
 
     /** Get average dE/dx for given detector. */
     float getDedx(Const::EDetector detector) const
@@ -96,46 +101,126 @@ namespace Belle2 {
       return m_dedx_avg_truncated[iDet];
     }
 
+    /** Return the event ID */
+    double eventID() const { return m_eventID; }
+    /** Return the track ID */
+    double trackID() const { return m_trackID; }
+
+    /** Return the momentum in the CDC */
+    double getMomentum() const { return m_p_cdc; }
+    /** Return the number of hits on the track */
+    double getNHits() const { return m_nHits; }
+    /** Return the number of hits used in truncated mean */
+    double getNHitsUsed() const { return m_nHitsUsed; }
+
+
+    /** Return the (global) layer number */
+    int getLayer(int i) const { return m_layer[i]; }
+
+    /** Return the sensor ID for this hit: wire number for CDC (0-14336) */
+    int getSensorID(int i) const { return m_sensorID[i]; }
+    /** Return the adcCount for this hit */
+    int getADCCount(int i) const { return m_adcCount[i]; }
+    /** Return the charge from this hit */
+    double getDE(int i) const { return m_dE[i]; }
+    /** Return the path length through the cell */
+    double getDx(int i) const { return m_dx[i]; }
+    /** Return the dE/dx value for this hit */
+    double getDedx(int i) const { return m_dEdx[i]; }
+    /** Return the distance of closest approach for this hit */
+    double getDoca(int i) const { return m_doca[i]; }
+    /** Return the entrance angle for this hit */
+    double getEnta(int i) const { return m_enta[i]; }
+
+    /** Return the height of the Cell */
+    double getCellHeight(int i) const { return m_cellHeight[i]; }
+    /** Return the half-width of the Cell */
+    double getCellHalfWidth(int i) const { return m_cellHalfWidth[i]; }
+
+    /** Return the drift time for a hit */
+    int getDriftT(int i) const { return m_driftT[i]; }
+    /** Return the drift distance for a hit */
+    double getDriftD(int i) const { return m_driftD[i]; }
+    /** Return the drift distance resolution for a hit */
+    double getDriftDRes(int i) const { return m_driftDRes[i]; }
+
+    /** Return the mean value of dE/dx for CDC */
+    double getMean() const { return m_dedx_avg[2]; }
+    /** Return the truncated mean value of dE/dx for CDC */
+    double getTruncatedMean() const { return m_dedx_avg_truncated[2]; }
+    /** Return the error on the truncated mean value of dE/dx for CDC */
+    double getError() const { return m_dedx_avg_truncated_err[2]; }
+
+    /** Return the number of good CDC hits on this Track */
+    int size() const { return m_cdc + m_vxd; }
+    /** Return cos(theta) for this Track */
+    double getCosTheta() const { return m_cosTheta; }
+
+    /** Return the vector of dE/dx values for this object */
+    std::vector< double > getDedxList() const { return m_dEdx; }
+
+    /** Set the mean value of dE/dx */
+    void setMean(int sid, double mean) { m_dedx_avg[sid] = mean; }
+    /** Set the truncated mean value of dE/dx */
+    void setTruncatedMean(int sid, double mean) { m_dedx_avg_truncated[sid] = mean; }
+    /** Set the error on the truncated mean value of dE/dx */
+    void setError(int sid, double err) { m_dedx_avg_truncated_err[sid] = err; }
+
+    /** Set the dE/dx value for this hit */
+    void setDedx(int i, double dedx) { m_dEdx[i] = dedx; }
+
   private:
-    int m_event_id; /**< event this track was found in */
-    int m_track_id; /**< equal to Track id. */
-    int m_pdg; /**< PDG code (MC truth) */
-    int m_pdg_hyp; /**< PDG code (fit hypothesis, >0) */
-    bool m_slow_pion; /**< does this particle belong to a slow pion (MC truth) */
-    TVector3 m_p_vec; /**< momentum */
-    float m_p; /**< total momentum at point of closest approach to origin */
-    float m_p_true; /**< true momentum */
+
+    int m_cdc;    /**< the number of hits in the CDC */
+    int m_vxd;    /**< the number of hits in the VXD */
+
+    int m_eventID; /**< event in which this Track was found */
+    int m_trackID; /**< ID number of the Track */
+
+    // hit level information
+    std::vector<int> m_layer;   /**< layer number */
+    std::vector<int> m_sensorID; /**< unique sensor ID (wire ID in CDC) */
+    std::vector<int> m_adcCount;   /**< adcCount per hit */
+    std::vector<double> m_dE;   /**< charge per hit */
+    std::vector<double> m_dx;   /**< path length in cell */
+    std::vector<double> m_dEdx; /**< charge per path length */
+    std::vector<double> m_doca; /**< distance of closest approach */
+    std::vector<double> m_enta; /**< entrance angle */
+
+    std::vector<double> m_cellHeight;    /**< height of the cdc cell */
+    std::vector<double> m_cellHalfWidth; /**< half-width of the cdc cell */
+
+    std::vector<int> m_driftT; /**< drift time for each hit */
+    std::vector<double> m_driftD; /**< drift distance for each hit */
+    std::vector<double> m_driftDRes; /**< drift distance resolution for each hit */
+
+    // one entry per layer (just don't mix with the hit arrays)
+    std::vector<double> dedx; /**< extracted dE/dx (arb. units, detector dependent) */
+    std::vector<double> dist; /**< distance flown through active medium in current segment */
+    std::vector<double> dedxLayer; /**< layer id corresponding to dedx */
+
+    // track level information
+    double m_p; /**< momentum at the IP */
+    double m_p_cdc; /**< momentum at the inner layer of the CDC */
+    double m_cosTheta; /**< cos(theta) for the track */
     short m_charge; /**< particle charge from tracking (+1 or -1) */
-    float m_chi2; /**< chi^2 from track fitting */
-    int m_mother_pdg; /**< PDG code of mother particle */
-    int m_last_layer; /**< layer id of outermost hit */
+
     double m_length; /**< total distance travelled by the track */
+    short m_nHits; /**< number of hits on this track */
+    short m_nHitsUsed; /**< number of hits on this track used in truncated mean */
 
-    //arrays with one entry per hit
-    std::vector<float> edep; /**< uncorrected energy deposition (or charge for CDC hits) */
-    std::vector<float> tedep; /**< translated energy deposition (or charge for CDC hits) */
-    std::vector<int> flayer; /**< full layer id, -1..-2 for PXD -2..-6 for SVD */
-    std::vector<float> phiWireTrack; /**< for PXD/SVD: angle between sensor normal and track; for CDC angle of track in x/y plane */
-    std::vector<float> wx; /**< hit position */
-    std::vector<float> wy; /**< hit position */
-    std::vector<float> wz; /**< hit position */
-    std::vector<int> sensorUID; /**< unique sensor ID (wire ID in CDC) */
-    std::vector<float> driftLength; /**< drift length in CDC (0 for other hits) */
-    std::vector<bool> extrapolationFailed; /**< true for hits where the extrapolation failed. */
+    double m_pdg; /**< MC PID */
+    double m_mother_pdg; /**< MC PID of mother particle */
+    double m_p_true; /**< MC true momentum */
 
-    //arrays with one entry per layer (or so. just don't mix them with the hit arrays)
-    std::vector<float> dedx; /**< extracted specific energy loss (arbitrary units, different between detectors) */
-    std::vector<float> dist; /**< distance flown through active medium in current segment */
-    std::vector<int> dedx_flayer; /**< layer id corresponding to dedx & dist */
+    double m_dedx_avg[Dedx::c_num_detectors];               /**< dE/dx averaged */
+    double m_dedx_avg_truncated[Dedx::c_num_detectors];     /**< dE/dx averaged, truncated mean */
+    double m_dedx_avg_truncated_err[Dedx::c_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
 
-    float m_dedx_avg[Dedx::c_num_detectors]; /**< dEdX averaged for one subdetector */
-    float m_dedx_avg_truncated[Dedx::c_num_detectors]; /**< dEdX averaged for one subdetector, truncated mean */
-    float m_dedx_avg_truncated_err[Dedx::c_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
+    float m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
+    float m_svdLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    float m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< CDC log likelihood for each particle, not including momentum prior */
-    float m_svdLogl[Const::ChargedStable::c_SetSize]; /**< SVD log likelihood for each particle, not including momentum prior */
-
-    ClassDef(DedxTrack, 7); /**< Debug output for DedxPID module. */
+    ClassDef(DedxTrack, 8); /**< Debug output for DedxPID module. */
   };
 }
 #endif

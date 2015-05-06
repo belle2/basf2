@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <reconstruction/modules/DedxCorrection/DedxCorrectionModule.h>
-#include <reconstruction/dataobjects/DedxCell.h>
+#include <reconstruction/dataobjects/DedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -54,12 +54,12 @@ void DedxCorrectionModule::initialize()
 {
 
   // required inputs
-  StoreArray<DedxCell>::required();
+  StoreArray<DedxTrack>::required();
   StoreArray<Track>::required();
   StoreArray<TrackFitResult>::required();
 
   // register outputs
-  StoreArray<DedxCell>::registerPersistent();
+  StoreArray<DedxTrack>::registerPersistent();
 
 }
 
@@ -67,11 +67,11 @@ void DedxCorrectionModule::event()
 {
 
   // inputs
-  StoreArray<DedxCell> dedxCells;
+  StoreArray<DedxTrack> dedxTracks;
   StoreArray<Track> tracks;
 
   // outputs
-  StoreArray<DedxCell> dedxArray;
+  StoreArray<DedxTrack> dedxArray;
 
   // **************************************************
   //
@@ -81,8 +81,8 @@ void DedxCorrectionModule::event()
 
   for (int iTrack = 0; iTrack < tracks.getEntries(); ++iTrack) {
     Track* track = tracks[iTrack];
-    DedxCell* dedxCell = track->getRelatedTo<DedxCell>();
-    if (!dedxCell || dedxCell->size() != 0) {
+    DedxTrack* dedxTrack = track->getRelatedTo<DedxTrack>();
+    if (!dedxTrack || dedxTrack->size() != 0) {
       B2WARNING("No good hits on this track...");
       continue;
     }
@@ -101,16 +101,19 @@ void DedxCorrectionModule::event()
     //
     // **************************************************
 
-    int nhits = dedxCell->size();
+    int nhits = dedxTrack->size();
     for (int i = 0; i < nhits; ++i) {
-      double newdedx = StandardCorrection(m_runNo, dedxCell->getWireID(i), dedxCell->getCosTheta(), dedxCell->getDedx(i));
-      dedxCell->setDedx(i, newdedx);
+      // only look at CDC hits
+      if (dedxTrack->getSensorID(i) > 15000) continue;
+
+      double newdedx = StandardCorrection(m_runNo, dedxTrack->getSensorID(i), dedxTrack->getCosTheta(), dedxTrack->getDedx(i));
+      dedxTrack->setDedx(i, newdedx);
     } // end loop over hits
 
-    calculateMeans(&(dedxCell->m_dedx_avg[c_CDC]),
-                   &(dedxCell->m_dedx_avg_truncated[c_CDC]),
-                   &(dedxCell->m_dedx_avg_truncated_err[c_CDC]),
-                   dedxCell->dedx);
+    calculateMeans(&(dedxTrack->m_dedx_avg[c_CDC]),
+                   &(dedxTrack->m_dedx_avg_truncated[c_CDC]),
+                   &(dedxTrack->m_dedx_avg_truncated_err[c_CDC]),
+                   dedxTrack->dedx);
   } // end loop over tracks
 }
 

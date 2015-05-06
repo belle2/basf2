@@ -74,7 +74,6 @@ buildContinuumSuppression('B0:jspiks')
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 # FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
 FlavorTagger(
-    recoParticle='B0:jspiks',
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     categories=['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumP*', 'KaonPion'])

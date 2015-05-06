@@ -130,7 +130,7 @@ textarea {
 {
     border:1px solid #bdc3c7;
     width:100%;
-    overflow-y: scroll;
+    overflow-x: scroll;
 }
 
 #loglist
@@ -351,7 +351,6 @@ textarea {
     margin-bottom:10px;
     order:2;
     width:696px;
-    overflow-x: auto;
 }
 
 .object img

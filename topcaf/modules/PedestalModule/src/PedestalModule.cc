@@ -22,16 +22,18 @@ PedestalModule::PedestalModule() : Module()
 {
   setDescription("This module is used to create itop pedestal file, see the parameters for various options");
 
-  addParam("Mode", m_mode, "Calculate Pedestals - 0 ; Apply Pedestals - 1");
+  addParam("mode", m_mode, "Calculate Pedestals - 0 ; Apply Pedestals - 1");
 
-  addParam("Conditions", m_conditions,
-           "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
-  addParam("IOV_initialRunID", m_initial_run, "Initial run ID for the interval of validity for these pedestals", std::string("NULL"));
-  addParam("IOV_finalRunID", m_final_run, "Final run ID for the interval of validity for these pedestals", std::string("NULL"));
+  addParam("conditions", m_conditions,
+           "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if mode==0) ", 0);
+  addParam("iovInitialRunID", m_initial_run, "Initial run ID for the interval of validity for these pedestals", std::string("NULL"));
+  addParam("iovFinalRunID", m_final_run, "Final run ID for the interval of validity for these pedestals", std::string("NULL"));
 
-  addParam("InputFileName", m_in_ped_filename, "Input filename used if Mode==1 and PedConditions==0", std::string());
-  addParam("WriteFile", m_writefile, "Do not write file - 0 ; Write Peds to local root file - 1 ", 0);
-  addParam("OutputFileName", m_out_ped_filename, "Output filename written if Mode==0 and WriteFile==1", std::string());
+  addParam("inputFileName", m_in_ped_filename, "Input filename used if mode==1 and conditions==0", std::string());
+  addParam("writeFile", m_writefile, "Do not write file - 0 ; Write Peds to local root file - 1 ", 0);
+  addParam("outputFileName", m_out_ped_filename,
+           "output filename written if mode==0 and writeFile==1, also used for conditions temporary output.",
+           std::string("/tmp/temp_pedestal.root"));
 
 
   m_out_ped_file = NULL;
@@ -43,7 +45,14 @@ PedestalModule::~PedestalModule() {}
 
 void PedestalModule::initialize()
 {
-
+  if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
+    m_out_ped_file = TFile::Open(m_out_ped_filename.c_str(), "recreate");
+    if (!m_out_ped_file) {
+      B2FATAL("Could not write output pedestal file.  Aborting.");
+    } else {
+      m_out_ped_file->Close();
+    }
+  }
 }
 
 void PedestalModule::beginRun()
@@ -175,8 +184,8 @@ void  PedestalModule::terminate()
              << "\tSubsystem Tag: " << getPackage() << "\tAlgorithm Name: " << getName()
              << "\tVersion: " << GetVersion() << "\tRun_i: " << GetInitialRun() << "\tRun_f: " << GetFinalRun());
 
-      std::string tempFile = "temp_pedestals.root";
-
+      std::string tempFile = m_out_ped_filename;
+      // test
       m_out_ped_file = TFile::Open(tempFile.c_str(), "recreate");
 
       std::string title = "Pedestal file generated ending with run " + m_run + " in experiment " + m_experiment;

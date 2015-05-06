@@ -64,17 +64,17 @@ eventinfoprinter = register_module('EventInfoPrinter')
 # register topcaf modules
 
 itopeventconverter = register_module('iTopRawConverter')
-itopeventconverter.param('InputFileName', args.inputRun + '.dat')
-itopeventconverter.param('InputDirectory', args.inputDir)
+itopeventconverter.param('inputFileName', args.inputRun + '.dat')
+itopeventconverter.param('inputDirectory', args.inputDir)
 
 pedmodule = register_module('Pedestal')
 pedestalDict = {
-    'OutputFileName': OutputFile,
-    'Mode': 0,
-    'WriteFile': WriteFile,
-    'Conditions': Conditions,
-    'IOV_initialRunID': args.IOVi,
-    'IOV_finalRunID': args.IOVf,
+    'outputFileName': OutputFile,
+    'mode': 0,
+    'writeFile': WriteFile,
+    'conditions': Conditions,
+    'iovInitialRunID': args.IOVi,
+    'iovFinalRunID': args.IOVf,
 }
 pedmodule.param(pedestalDict)
 

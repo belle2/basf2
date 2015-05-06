@@ -22,11 +22,11 @@ CamacModule::CamacModule() : Module(), m_c3377nhit(0)
 
   setDescription("This module is used to read auxliary CAMAC data for itop test beams.  Almost always needed for older versions of the electronics to get the FTSW timing.");
 
-  addParam("InputFilename", m_in_filename, "The input .cmc file to be parsed.");
-  addParam("CrateID", m_crateID, "The crate containing the FTSW TDC.");
-  addParam("FTSW_TDC_Timing", m_ftswTDCtiming, "The timing of the FTSW TDC counts in nanoseconds.", 0.045056);
-  addParam("FTSWslot", m_ftswSlot, "The slot number of the TDC containing the FTSW signal.");
-  addParam("FTSWword", m_ftswWord, "The word number of the FTSW time.");
+  addParam("inputFilename", m_in_filename, "The input .cmc file to be parsed.");
+  addParam("crateID", m_crateID, "The crate containing the FTSW TDC.");
+  addParam("ftsw_TDC_Timing", m_ftswTDCtiming, "The timing of the FTSW TDC counts in nanoseconds.", 0.045056);
+  addParam("ftswSlot", m_ftswSlot, "The slot number of the TDC containing the FTSW signal.");
+  addParam("ftswWord", m_ftswWord, "The word number of the FTSW time.");
 
 }
 

@@ -13,7 +13,8 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('--ped', metavar='PedestalFile (path/filename)',
                     required=True,
-                    help='The pedestal file and path to be used for the analysis.   This parameter is REQUIRED'
+                    help='The pedestal file and path to be used for the analysis.' +
+                         ' If PedestalFile == Conditions, then DB used. This parameter is REQUIRED.'
                     )
 
 parser.add_argument(
@@ -70,11 +71,19 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 output = register_module('RootOutput')
 
-# register topcaf modules
+run_info = args.inputRun.split('-')
+conditionsDict = {'experimentName': run_info[0] + '-' + run_info[2][0:7],
+                  'runName': run_info[2][7:14],
+                  'globalTag': 'leps2013_InitialTest_GlobalTag',
+                  'fileBaseName': 'http://belle2db.hep.pnnl.gov/'}
+conditions = register_module('Conditions')
+conditions.param(conditionsDict)
 
+# register topcaf modules
+itopconfig = register_module('TopConfiguration')
 itopeventconverter = register_module('iTopRawConverter')
-itopeventconverter.param('InputFileName', args.inputRun + '.dat')
-itopeventconverter.param('InputDirectory', args.inputDir)
+itopeventconverter.param('inputFileName', args.inputRun + '.dat')
+itopeventconverter.param('inputDirectory', args.inputDir)
 
 camacconverter = register_module('Camac')
 camacDict = {  # 'CrateID'            : 13369927,  # leps june 2013 itop test beam
@@ -83,43 +92,52 @@ camacDict = {  # 'CrateID'            : 13369927,  # leps june 2013 itop test be
                # 2014 itop crt
                # 2014 itop crt
                # 2014 itop crt
-    'InputFilename': args.inputDir + args.inputRun + '.cmc',
-    'CrateID': 0x00cc0200,
-    'FTSWslot': 6,
-    'FTSWword': 5,
+    'inputFilename': args.inputDir + args.inputRun + '.cmc',
+    'crateID': 0x00cc0200,
+    'ftswSlot': 6,
+    'ftswWord': 5,
 }
 camacconverter.param(camacDict)
 
 pedmodule = register_module('Pedestal')
-pedestalDict = {
-    'Mode': 1,
-    'WriteFile': 0,
-    'Conditions': 0,
-    'InputFileName': args.ped,
-}
+if args.ped == 'Conditions':
+    pedestalDict = {
+        'mode': 1,
+        'writeFile': 0,
+        'conditions': 1,
+    }
+else:
+    pedestalDict = {
+        'mode': 1,
+        'writeFile': 0,
+        'conditions': 0,
+        'inputFileName': args.ped,
+    }
 pedmodule.param(pedestalDict)
 
 mergemodule = register_module('WaveMerging')
 
 timemodule = register_module('WaveTiming')
-timeDict = {'Time2TDC': 40.0}
+timeDict = {'time2TDC': 40.0}
 timemodule.param(timeDict)
 
 sampletimemodule = register_module('SampleTimeCalibration')
 
 sampletimeDict = {
-    'OutputFileName': OutputFile,
-    'Mode': 0,
-    'WriteFile': 1,
-    'Conditions': Conditions,
-    'IOV_initialRunID': args.IOVi,
-    'IOV_finalRunID': args.IOVf,
+    'outputFileName': OutputFile,
+    'mode': 0,
+    'writeFile': 1,
+    'conditions': Conditions,
+    'iovInitialRunID': args.IOVi,
+    'iovFinalRunID': args.IOVf,
 }
 sampletimemodule.param(sampletimeDict)
 
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
+main.add_module(conditions)
+main.add_module(itopconfig)
 main.add_module(itopeventconverter)
 main.add_module(camacconverter)
 main.add_module(pedmodule)

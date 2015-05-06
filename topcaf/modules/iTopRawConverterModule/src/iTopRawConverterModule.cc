@@ -10,8 +10,8 @@ REG_MODULE(iTopRawConverter)
 iTopRawConverterModule::iTopRawConverterModule() : Module()
 {
   setDescription("This module is used to upack the raw data from the testbeam and crt data");
-  addParam("InputFileName", m_input_filename, "Raw input filename");
-  addParam("InputDirectory", m_input_directory, "Raw input file directory");
+  addParam("inputFileName", m_input_filename, "Raw input filename");
+  addParam("inputDirectory", m_input_directory, "Raw input file directory");
 
   m_WfPacket = NULL;
   m_EvtPacket = NULL;

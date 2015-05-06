@@ -68,28 +68,28 @@ output.param(outputDict)
 # register topcaf modules
 itopconfig = register_module('TopConfiguration')
 itopeventconverter = register_module('iTopRawConverter')
-evtconvDict = {'InputDirectory': args.inputDir,
-               'InputFileName': args.inputRun + '.dat'}
+evtconvDict = {'inputDirectory': args.inputDir,
+               'inputFileName': args.inputRun + '.dat'}
 itopeventconverter.param(evtconvDict)
 
 pedmodule = register_module('Pedestal')
-pedmodule.param('Mode', 1)
+pedmodule.param('mode', 1)
 if args.ped:
-    pedmodule.param('InputFileName', args.ped)
-    pedmodule.param('Conditions', 0)
+    pedmodule.param('inputFileName', args.ped)
+    pedmodule.param('conditions', 0)
 else:
-    pedmodule.param('Conditions', 1)
+    pedmodule.param('conditions', 1)
 
 camacconverter = register_module('Camac')
-camacDict = {'InputFilename': args.inputDir + args.inputRun + ".cmc",
+camacDict = {'inputFilename': args.inputDir + args.inputRun + ".cmc",
 
-             'CrateID': 13369927,  # leps june 2013 itop test beam
-             'FTSWslot': 7,  # leps june 2013 itop test beam
-             'FTSWword': 3  # leps june 2013 itop test beam
+             'crateID': 13369927,  # leps june 2013 itop test beam
+             'ftswSlot': 7,  # leps june 2013 itop test beam
+             'ftswWord': 3  # leps june 2013 itop test beam
 
-             #             'CrateID'            : 0x00cc0200,  # 2014 itop crt
-             #             'FTSWslot'           : 6,  # 2014 itop crt
-             #             'FTSWword'           : 5  # 2014 itop crt
+             #             'crateID'            : 0x00cc0200,  # 2014 itop crt
+             #             'ftswSlot'           : 6,  # 2014 itop crt
+             #             'ftswWord'           : 5  # 2014 itop crt
 
              }
 camacconverter.param(camacDict)
@@ -97,20 +97,20 @@ camacconverter.param(camacDict)
 mergemodule = register_module('WaveMerging')
 
 timemodule = register_module('WaveTiming')
-timeDict = {'Time2TDC': 40.0}
+timeDict = {'time2TDC': 40.0}
 timemodule.param(timeDict)
 
 if args.s2s:
     sampletimemodule = register_module('SampleTimeCalibration')
     if args.s2s == 'Conditions':
-        sampletimeDict = {'Mode': 1,
-                          'WriteFile': 0,
-                          'Conditions': 1}
+        sampletimeDict = {'mode': 1,
+                          'writeFile': 0,
+                          'conditions': 1}
     else:
-        sampletimeDict = {'InputFileName': args.s2s,
-                          'Mode': 1,
-                          'WriteFile': 0,
-                          'Conditions': 0}
+        sampletimeDict = {'inputFileName': args.s2s,
+                          'mode': 1,
+                          'writeFile': 0,
+                          'conditions': 0}
 
     sampletimemodule.param(sampletimeDict)
 

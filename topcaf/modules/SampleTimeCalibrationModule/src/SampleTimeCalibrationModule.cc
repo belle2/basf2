@@ -28,19 +28,21 @@ SampleTimeCalibrationModule::SampleTimeCalibrationModule() : Module()
 {
   setDescription("This module is used to create itop sample 2 sample calibration file, see the parameters for various options.  Apply these calibrations before merging the wave packets with the WaveMergingModule.  Note that this module is untested after porting from the stand alone topcaf code.");
 
-  addParam("Mode", m_mode, "Calculate Sample2Sample - 0 ; Apply Sample2Sample - 1");
+  addParam("mode", m_mode, "Calculate Sample2Sample - 0 ; Apply Sample2Sample - 1");
 
-  addParam("Conditions", m_conditions,
-           "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if Mode==0) ", 0);
-  addParam("IOV_initialRunID", m_initial_run, "Initial run ID for the interval of validity for this calibration",
+  addParam("conditions", m_conditions,
+           "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if mode==0) ", 0);
+  addParam("iovInitialRunID", m_initial_run, "Initial run ID for the interval of validity for this calibration",
            std::string("NULL"));
-  addParam("IOV_finalRunID", m_final_run, "Final run ID for the interval of validity for this calibration", std::string("NULL"));
+  addParam("iovFinalRunID", m_final_run, "Final run ID for the interval of validity for this calibration", std::string("NULL"));
 
-  addParam("InputFileName", m_in_filename, "Input filename used if Mode==1 and Conditions==0", std::string());
-  addParam("WriteFile", m_writefile, "Do not write file - 0 ; Write to local root file - 1 ", 0);
-  addParam("OutputFileName", m_out_filename, "Output filename written if Mode==0 and WriteFile==1", std::string());
+  addParam("inputFileName", m_in_filename, "Input filename used if mode==1 and conditions==0", std::string());
+  addParam("writeFile", m_writefile, "Do not write file - 0 ; Write to local root file - 1 ", 0);
+  addParam("outputFileName", m_out_filename,
+           "Output filename written if mode==0 and writeFile==1, also used for temporary conditions output.",
+           std::string("/tmp/temp_makesampletime.root"));
 
-  addParam("NumberOfSamples", m_channel_samples, "Number of samples to consider (4096 for IRS3C)", 4096);
+  addParam("numberOfSamples", m_channel_samples, "Number of samples to consider (4096 for IRS3C)", 4096);
 
 
   m_out_file = NULL;
@@ -53,6 +55,15 @@ SampleTimeCalibrationModule::~SampleTimeCalibrationModule() {}
 
 void SampleTimeCalibrationModule::initialize()
 {
+  if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
+    m_out_file = TFile::Open(m_out_filename.c_str(), "recreate");
+    if (!m_out_file) {
+      B2FATAL("Could not write output pedestal file.  Aborting.");
+    } else {
+      m_out_file->Close();
+    }
+  }
+
   m_dt_h = new TH1D("m_dt_h", "m_dt_h", m_channel_samples, 0, -1);
   m_waveform_h = new TH1D("m_waveform_h", "m_waveform_h", m_channel_samples, 0, m_channel_samples);
 
@@ -61,6 +72,7 @@ void SampleTimeCalibrationModule::initialize()
     m_residual_h = new TH1D("m_residual_h", "m_residual_h", m_channel_samples, 0, 0);
     m_corr_residual_h = new TH1D("m_corr_residual_h", "m_corr_residual_h", m_channel_samples, 0, 0);
   }
+
 }
 
 void SampleTimeCalibrationModule::beginRun()
@@ -178,7 +190,6 @@ void  SampleTimeCalibrationModule::terminate()
 
   //If output requested then save calibration
   if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
-    std::string tempFile = "temp_pedestals.root"; // if temp filename is needed for conditions post.
     //Save Channel sample adc info.
 
     if ((m_conditions == 1)) { // Use Conditions Service to save calibration
@@ -193,7 +204,7 @@ void  SampleTimeCalibrationModule::terminate()
              << "\tSubsystem Tag: " << getType() << "\tAlgorithm Name: " << getName()
              << "\tVersion: " << GetVersion() << "\tRun_i: " << GetInitialRun() << "\tRun_f: " << GetFinalRun());
       if (m_writefile == 0)
-        m_out_file = TFile::Open(tempFile.c_str(), "recreate");
+        m_out_file = TFile::Open(m_out_filename.c_str(), "recreate");
 
     }
     if (m_writefile == 1) {

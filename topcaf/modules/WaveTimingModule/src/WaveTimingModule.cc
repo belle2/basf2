@@ -17,7 +17,7 @@ const int channel_samples = 4096;
 WaveTimingModule::WaveTimingModule() : Module()
 {
   setDescription("This module calculates the timing of itop raw waveform event data");
-  addParam("Time2TDC", m_time2tdc, "Conversion factor to match iTOPDigit time scale [time unit/ns]", 40.0);
+  addParam("time2TDC", m_time2tdc, "Conversion factor to match iTOPDigit time scale [time unit/ns]", 40.0);
 
 
 }

@@ -37,7 +37,7 @@ namespace Belle2 {
       RelationsObject(),
       m_size(0), m_vxd(0), m_eventID(0), m_trackID(0),
       m_p(0), m_p_cdc(0), m_cosTheta(0), m_charge(0),
-      m_nHits(0), m_nHitsUsed(0),
+      m_length(0.0), m_nHits(0), m_nHitsUsed(0),
       m_pdg(0), m_mother_pdg(0), m_p_true(0)
     {
       //for all particles
@@ -56,7 +56,7 @@ namespace Belle2 {
     void addHit(int sid, int layer, int wireID, double doca, double enta, int adcCount, double dE, double dx, double dEdx,
                 double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes)
     {
-      if (sid == Dedx::c_CDC) m_size++;
+      if (sid < 10000) m_size++;
       else m_vxd++;
       m_sensorID.push_back(sid);
       m_layer.push_back(layer);
@@ -75,10 +75,12 @@ namespace Belle2 {
     }
 
     /** add a dE/dx value */
-    void addDedx(int layer, float dedxValue)
+    void addDedx(int layer, float distance, float dedxValue)
     {
       dedxLayer.push_back(layer);
+      dist.push_back(distance);
       dedx.push_back(dedxValue);
+      m_length += distance;
     }
 
     /** Return the event ID */
@@ -180,6 +182,7 @@ namespace Belle2 {
 
     // one entry per layer (just don't mix with the hit arrays)
     std::vector<double> dedx; /**< extracted dE/dx (arb. units, detector dependent) */
+    std::vector<double> dist; /**< distance flown through active medium in current segment */
     std::vector<double> dedxLayer; /**< layer id corresponding to dedx */
 
     // track level information
@@ -189,6 +192,8 @@ namespace Belle2 {
     short m_charge; /**< particle charge from tracking (+1 or -1) */
     short m_nHits; /**< number of hits on this track */
     short m_nHitsUsed; /**< number of hits on this track used in truncated mean */
+
+    double m_length; /**< total distance travelled by the track */
 
     double m_pdg; /**< MC PID */
     double m_mother_pdg; /**< MC PID of mother particle */

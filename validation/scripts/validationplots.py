@@ -698,11 +698,11 @@ def get_style(index, overallItemCount):
     """
 
     # Define the colors for the plot
-    colors = [ROOT.kGreen + 1,
+    colors = [ROOT.kPink,
               ROOT.kOrange,
               ROOT.kPink + 7,
               ROOT.kOrange - 8,
-              ROOT.kPink,
+              ROOT.kGreen + 1,
               ROOT.kCyan + 4,
               ROOT.kBlue + 1,
               ROOT.kRed + 2]

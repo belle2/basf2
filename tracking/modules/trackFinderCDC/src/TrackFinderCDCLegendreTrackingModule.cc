@@ -35,7 +35,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 
   addParam("Threshold", m_param_threshold, "Threshold for peak finder", static_cast<unsigned int>(10));
 
-  addParam("StepScale", m_stepScale, "Scale size for Stepped Hough", 0.75);
+  addParam("StepScale", m_param_stepScale, "Scale size for Stepped Hough", 0.75);
 
   addParam("MaxLevel", m_maxLevel,
            "Maximal level of recursive calling of FastHough algorithm", 12);
@@ -322,7 +322,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
       processNodes(listOfCandidates, lmdCandidateProcessingFinal, limit);
     } else {
 
-      limit = limit * m_stepScale;
+      limit = limit * m_param_stepScale;
 
       if (increaseThreshold) {
         rThreshold *= 2.;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <framework/core/Module.h>
 #include <fstream>
 
 #include <boost/tuple/tuple.hpp>
@@ -11,73 +10,57 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
+#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
     class TrackHit;
   }
 
-//  class TrackCandidateWithStereoHit;
-
-  class CDCLegendreHistogrammingModule: public Module {
+  class CDCLegendreHistogrammingModule: public TrackFinderCDCBaseModule {
 
   public:
-
 
     /** Constructor.
      *  Create and allocate memory for variables here. Add the module parameters in this method.
      */
-    CDCLegendreHistogrammingModule();
+    CDCLegendreHistogrammingModule() : TrackFinderCDCBaseModule() { }
 
-    /** Destructor.
-     * Use the destructor to release the memory you allocated in the constructor.
-     */
-    virtual ~CDCLegendreHistogrammingModule();
-
-    /** Initialize the Module.
-     * This method is called only once before the actual event processing starts.
-     * Use this method to initialize variables, open files etc.
-     */
-    virtual void initialize();
-
-    /** Called when entering a new run;
-     * Called at the beginning of each run, the method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
-    virtual void beginRun() {};
+  private:
+    std::list<TrackFindingCDC::TrackCandidateWithStereoHits*>
+    m_trackList; /**< List of track candidates. Mainly used for memory management! Later we want to use the builtin list in the trackProcessor.*/
+    TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /** This object is used for memory handling*/
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.
      */
-    virtual void event();
+    void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
-    /** This method is called if the current run ends.
-     * Use this method to store information, which should be aggregated over one run.
+    /**
+     * Release all the used pointers.
      */
-    virtual void endRun() {};
-
-    /** This method is called at the end of the event processing.
-     *  Use this method for cleaning up, closing files, etc.
-     */
-    virtual void terminate() {};
-
-
-  protected:
-
-
-  private:
-
-    std::vector<TrackFindingCDC::TrackHit*>
-    m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
-    std::vector<TrackFindingCDC::TrackHit*>
-    m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
-    std::list<TrackFindingCDC::TrackCandidateWithStereoHits*>
-    m_trackList; /**< List of track candidates. Mainly used for memory management! */
-
-    std::string m_param_cdcHitsColumnName;
-    std::string m_param_trackCandidatesColumnName;
-
     void clear_pointer_vectors();
 
+    /**
+     * Fill the used lists.
+     */
+    void startNewEvent();
+
+    /**
+     * Do the real stereo hit finding.
+     */
+    void makeHistogramming();
+
+    /**
+     * Go through all tracks and import them to our own track list.
+     */
+    void importTrackList(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
+
+    /**
+     * Update the input cdctracks and output them to the store array.
+     */
+    void outputObjects();
   };
 
 }

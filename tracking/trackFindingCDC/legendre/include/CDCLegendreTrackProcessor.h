@@ -36,10 +36,11 @@ namespace Belle2 {
     public:
 
       /**
+       * Please note that the implemented methods do only use the axial hits!
        * We use the fitter and the drawer as a pointer to have the possibility to use different classes.
        */
       TrackProcessor() :
-        m_axialHitList(), m_trackList(), m_cdcLegendreTrackDrawer(nullptr) { }
+        m_axialHitList(), m_stereoHitList(), m_trackList(), m_cdcLegendreTrackDrawer(nullptr) { }
 
       /**
        * Do not copy this class
@@ -93,6 +94,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get the list with currently stored stereo hits.
+       */
+      std::vector<TrackHit*>& getStereoHitsList()
+      {
+        return m_stereoHitList;
+      }
+
+      /**
        * Compile the hitList from the wire it topology.
        */
       void initializeHitListFromWireHitTopology();
@@ -107,6 +116,11 @@ namespace Belle2 {
         }
         m_axialHitList.clear();
 
+        for (TrackHit* hit : m_stereoHitList) {
+          delete hit;
+        }
+        m_stereoHitList.clear();
+
         for (TrackCandidate* track : m_trackList) {
           delete track;
         }
@@ -114,12 +128,12 @@ namespace Belle2 {
       }
 
       /**
-       * Postprocessing: Delete hits that do not "match" to the tracks.
+       * Postprocessing: Delete axial hits that do not "match" to the tracks.
        */
       void deleteHitsOfAllBadTracks();
 
       /**
-       * Postprocessing: Delete hits that do not "match" to the given track.
+       * Postprocessing: Delete axial hits that do not "match" to the given track.
        */
       void deleteBadHitsOfOneTrack(TrackCandidate* trackCandidate);
 
@@ -134,7 +148,7 @@ namespace Belle2 {
       void mergeAllTracks();
 
       /**
-       * Postprocessing: Try to reassign hits between all tracks.
+       * Postprocessing: Try to reassign axial hits between all tracks.
        */
       void appendHitsOfAllTracks();
 
@@ -168,13 +182,14 @@ namespace Belle2 {
 
       /**
        * For the use in the QuadTree use this hit set.
-       * @return the hit set to use in the QuadTree-Finding.
+       * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
       std::set<TrackHit*> createHitSet();
 
 
     private:
       std::vector<TrackHit*> m_axialHitList; /**< Vector which hold axial hits */
+      std::vector<TrackHit*> m_stereoHitList; /**< Vector which hold stereo hits */
       std::list<TrackCandidate*> m_trackList; /**< List of track candidates. */
       TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which performs in-module drawing */
       TrackFitter m_cdcLegendreTrackFitter; /**< Used for fitting the tracks */

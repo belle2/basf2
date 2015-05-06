@@ -264,14 +264,17 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
   m_axialHitList.reserve(2048);
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     TrackHit* trackHit = new TrackHit(cdcWireHit);
-    if (trackHit->checkHitDriftLength() && trackHit->getIsAxial()) {
-      m_axialHitList.push_back(trackHit);
+    if (trackHit->checkHitDriftLength()) {
+      if (trackHit->getIsAxial())
+        m_axialHitList.push_back(trackHit);
+      else
+        m_stereoHitList.push_back(trackHit);
     } else {
       delete trackHit;
     }
   }
   B2DEBUG(90,
-          "Number of hits to be used by track finder: " << m_axialHitList.size());
+          "Number of hits to be used by track finder: " << m_stereoHitList.size() << " stereo " << m_axialHitList.size() << " axial.");
 }
 
 void TrackProcessor::deleteHitsOfAllBadTracks()

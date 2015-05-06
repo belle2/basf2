@@ -64,7 +64,7 @@ namespace Belle2 {
     TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
     unsigned int m_param_threshold;         /**< Threshold for votes in the legendre plane, parameter of the module*/
-    double m_stepScale;           /**< Scale of steps for SteppedHough*/
+    double m_param_stepScale;           /**< Scale of steps for SteppedHough*/
     int m_maxLevel;               /**< Maximum Level of FastHough Algorithm*/
     bool m_reconstructCurler;     /**< Stores, curlers shall be reconstructed*/
     bool m_drawCandidates;        /**< Draw each candidate in interactive mode*/

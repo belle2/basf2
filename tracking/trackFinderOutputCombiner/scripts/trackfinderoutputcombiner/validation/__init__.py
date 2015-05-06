@@ -114,14 +114,17 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
         if self.tmva_cut > 0:
-            cdctracking.param('CDCHitsColName', good_cdc_hits_store_array_name)
-        cdctracking.param('GFTrackCandidatesColName', temp_track_cands_store_array_name)
+            cdctracking.param('UseOnlyCDCHitsRelatedFrom', good_cdc_hits_store_array_name)
+        cdctracking.param('GFTrackCandsStoreArrayName', temp_track_cands_store_array_name)
+        if self.stereo_assignment:
+            cdctracking.param('WriteGFTrackCands', False)
         cdctracking.set_log_level(basf2.LogLevel.WARNING)
 
         cdc_stereo_combiner = basf2.register_module('CDCLegendreHistogramming')
         if self.tmva_cut > 0:
-            cdc_stereo_combiner.param('CDCHitsColName', good_cdc_hits_store_array_name)
-        cdc_stereo_combiner.param('GFTrackCandidatesColName', temp_track_cands_store_array_name)
+            cdc_stereo_combiner.param('UseOnlyCDCHitsRelatedFrom', good_cdc_hits_store_array_name)
+        cdc_stereo_combiner.param({'GFTrackCandsStoreArrayName': temp_track_cands_store_array_name,
+                                   "TracksStoreObjNameIsInput": True})
         cdc_stereo_combiner.set_log_level(basf2.LogLevel.WARNING)
 
         not_assigned_hits_searcher_module = basf2.register_module("NotAssignedHitsSearcher")
@@ -129,9 +132,6 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
                                                  "SplittedTracks": self.legendre_track_cands_store_array_name,
                                                  "NotAssignedCDCHits": self.not_assigned_cdc_hits_store_array_name,
                                                  })
-
-        if self.tmva_cut > 0:
-            not_assigned_hits_searcher_module.param("CDCHits", good_cdc_hits_store_array_name)
 
         if self.splitting:
             not_assigned_hits_searcher_module.param("MinimumDistanceToSplit", 0.2)
@@ -146,12 +146,6 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
         if self.stereo_assignment:
             main_path.add_module(cdc_stereo_combiner)
         main_path.add_module(not_assigned_hits_searcher_module)
-
-        if self.tmva_cut > 0:
-            main_path.add_module(ReassignHits(
-                old_cdc_hits_store_array_name=good_cdc_hits_store_array_name,
-                new_cdc_hits_store_array_name="CDCHits",
-                track_cands_store_array_name=self.legendre_track_cands_store_array_name))
 
         return main_path
 

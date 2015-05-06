@@ -351,6 +351,7 @@ textarea {
     margin-bottom:10px;
     order:2;
     width:696px;
+    overflow-x: auto;
 }
 
 .object img

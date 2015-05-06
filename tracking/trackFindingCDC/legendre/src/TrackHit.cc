@@ -83,11 +83,18 @@ void TrackHit::setZReference(double zReference)
 
 void TrackHit::setWirePosition()
 {
-  Vector2D referenceWirePosition = m_underlayingWireHit->getRefPos2D();
-
-  m_wirePosition.setZ(m_zReference);
-  m_wirePosition.setXY(referenceWirePosition);
+  m_wirePosition = calculateFractionedPosition(getZReference());
   performConformalTransformation();
+}
+
+TVector3 TrackHit::calculateFractionedPosition(double zReferenz) const
+{
+  const TVector3& wireForwardPosition = getForwardWirePosition();
+  const TVector3& wireBackwardPosition = getBackwardWirePosition();
+
+  double fraction = (zReferenz - wireForwardPosition.z()) / (wireBackwardPosition.z() - wireForwardPosition.z());
+
+  return wireForwardPosition + fraction * (wireBackwardPosition - wireForwardPosition);
 }
 
 void TrackHit::performConformalTransformation()

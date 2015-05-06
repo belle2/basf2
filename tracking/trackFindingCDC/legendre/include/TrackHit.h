@@ -141,9 +141,11 @@ namespace Belle2 {
       /** Returns the original wire position (before the finding of the z-position, so z = 0) */
       inline TVector3 getOriginalWirePosition() const
       {
-        Vector2D referenceWirePosition = m_underlayingWireHit->getRefPos2D();
-        return TVector3(referenceWirePosition.x(), referenceWirePosition.y(), 0);
+        return calculateFractionedPosition(0);
       }
+
+      /** Us the forward and backward position of the wire to calculate the position with the given z referenz.  */
+      TVector3 calculateFractionedPosition(double zReferenz) const;
 
       /** Check hit drift time; if it greater than distances between wires mark hit as bad*/
       bool checkHitDriftLength();

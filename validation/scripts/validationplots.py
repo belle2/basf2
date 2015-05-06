@@ -698,12 +698,12 @@ def get_style(index, overallItemCount):
     """
 
     # Define the colors for the plot
-    colors = [ROOT.kPink,
+    colors = [ROOT.kRed,
               ROOT.kOrange,
-              ROOT.kPink + 7,
+              ROOT.kPink + 9,
               ROOT.kOrange - 8,
               ROOT.kGreen + 1,
-              ROOT.kCyan + 4,
+              ROOT.kCyan + 2,
               ROOT.kBlue + 1,
               ROOT.kRed + 2]
 
@@ -732,9 +732,6 @@ def get_style(index, overallItemCount):
     # dashed linestyle
     else:
         linestyle = linestyles[ls_index[index % len(ls_index)]]
-    for colour in colors:
-        print ROOT.gROOT.GetColor(ROOT.TAttLine(colour, linestyle, linewidth).GetLineColor()).AsHexString()
-    time.sleep(10)
 
     return ROOT.TAttLine(color, linestyle, linewidth)
 

@@ -132,6 +132,9 @@ namespace Belle2 {
       if (newState == false) {
         // notify all competitors to remove this TC - additionally clears this TCs' competitors
         m_observer.notifyRemove(getID());
+        m_originalTC.removeRefereeStatus(SpacePointTrackCand::c_isActive);
+      } else {
+        m_originalTC.addRefereeStatus(SpacePointTrackCand::c_isActive);
       }
       m_aliveState = newState;
     }

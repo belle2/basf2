@@ -7,7 +7,7 @@ from sys import argv
 from basf2 import *
 from time import time
 
-numEvents = 10
+numEvents = 8
 initialValue = 1
 
 usePGun = True
@@ -140,6 +140,7 @@ trackCandConverter.param(param_trackCandConverter)
 
 
 qualiEstimatorRandom = register_module('QualityEstimatorVXDRandom')
+qualiEstimatorRandom.logging.log_level = debugLevel
 qualiEstimatorRandom.param('tcArrayName', 'SPTracks')
 
 tcNetworkProducer = register_module('SPTCNetworkProducer')

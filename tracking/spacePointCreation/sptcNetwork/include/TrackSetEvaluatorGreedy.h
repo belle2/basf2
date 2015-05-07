@@ -31,7 +31,9 @@ namespace Belle2 {
   template<class TCType, class CompetitorManagingType>
   class TrackSetEvaluatorGreedy : public TrackSetEvaluatorBase<TCType, CompetitorManagingType> {
   protected:
+    /** simple typedef to increase readability. BaseClass simply means the base class of this one */
     typedef TrackSetEvaluatorBase<TCType, CompetitorManagingType> BaseClass;
+
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
 
@@ -75,7 +77,7 @@ namespace Belle2 {
               ", TCs killed: " << countKills <<
               ", survivingQI: " << totalSurvivingQI <<
               "\n Result:\n" << miniPrinter(overlappingTCs))
-      return countKills;
+      return BaseClass::getNTCs() - countKills;
     }
 
 
@@ -149,25 +151,19 @@ namespace Belle2 {
     /** main function. returns number of final TCs */
     virtual unsigned int cleanOverlaps()
     {
-      unsigned int countedTCsDied = 0;
+      unsigned int nTCsDied = 0, nTCsAlive = 0;
       std::vector<TCType*> overlaps = BaseClass::getOverlappingTCs();
 
-      // deal with simple cases:
-      if (overlaps.size() < 3) {
-        if (overlaps.size() == 2) {
-          BaseClass::tcDuel(overlaps);
-          return BaseClass::getNTCs() - 1;
-        } else if (overlaps.size() == 0) {
-          return BaseClass::getNTCs();
-        }
-        B2ERROR("TrackSetEvaluatorGreedy::cleanOverlaps: nOverlapping TCs is " << overlaps.size() <<
-                " which is illegal. Stopping cleaning overlaps!")
-        return BaseClass::getNTCs();
-      }
+      // deal with simple cases first (contains many safety checks, which can therefore be ommitted by the actual algorithms):
+      bool wasSimpleCase = BaseClass::dealWithSimpleCases(overlaps);
+
+      if (wasSimpleCase) { return BaseClass::getNTCs() - overlaps.size() + 1; }
 
       // executing actual algorithm:
-      countedTCsDied = BaseClass::getNTCs() - doGreedy(overlaps);
-      return countedTCsDied;
+      nTCsAlive = doGreedy(overlaps);
+      nTCsDied = BaseClass::getNTCs() - nTCsAlive;
+      B2DEBUG(25, "TrackSetEvaluatorGreedy::cleanOverlaps: nTCs alive/dead at end: " << nTCsAlive << "/" << nTCsDied)
+      return nTCsAlive;
     }
 
   };

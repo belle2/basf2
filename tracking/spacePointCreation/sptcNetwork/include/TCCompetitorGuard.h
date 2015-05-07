@@ -99,6 +99,16 @@ namespace Belle2 {
     const std::vector<unsigned int>& getCompetitors(unsigned int iD) const { return  m_links[iD].getCompetitors(); }
 
 
+    /** for given pair of iDs it will be checked if they are competitors or not (this function relies on the fact that the competitor-info is stored in both competitors) */
+    bool areCompetitors(unsigned int a, unsigned int b) const
+    {
+      if (m_links[a].getNCompetitors() > m_links[b].getNCompetitors()) {
+        return m_links[b].isCompetitor(a);
+      }
+      return m_links[a].isCompetitor(b);
+    }
+
+
     /** print the competitors */
     std::string print(const std::vector<unsigned int>& vec) const
     {

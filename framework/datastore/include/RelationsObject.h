@@ -130,7 +130,7 @@ namespace Belle2 {
                                         object->m_cacheArrayIndex, weight);
     }
 
-    /** Add a relation from this object to another object.
+    /** Add a relation from this object to another object (no caching, can be quite slow).
      *
      *  @param object  The object to which the relation should point.
      *  @param weight  The weight of the relation.
@@ -143,7 +143,7 @@ namespace Belle2 {
     }
 
     //====================================================================================================
-    //These return an a vector of relations:
+    //These return a vector of relations:
 
     /** Get the relations that point from this object to another store array.
      *
@@ -324,7 +324,7 @@ namespace Belle2 {
 #endif
   protected:
 
-    /** Returns the pointer to the store array holding this object (protected since these arrays are easy to misuse). */
+    /** Returns the pointer to the raw DataStore array holding this object (protected since these arrays are easy to misuse). */
     TClonesArray* getArrayPointer() const
     {
       DataStore::Instance().findStoreEntry(this, m_cacheDataStoreEntry, m_cacheArrayIndex);
@@ -347,7 +347,7 @@ namespace Belle2 {
     ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
   };
 
-  template <class BASE> RelationsInterface<BASE>& RelationsInterface<BASE>::operator = (const RelationsInterface<BASE>&
+  template <class BASE> RelationsInterface<BASE>& RelationsInterface<BASE>::operator=(const RelationsInterface<BASE>&
       relationsInterface)
   {
     if (this != &relationsInterface) {

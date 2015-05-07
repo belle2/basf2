@@ -231,6 +231,19 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
                        if os.path.isdir('./results/' + __)]
             newest = sorted(folders, key=os.path.getctime)[-1]
 
+            failist = []
+            failed_list_logfile = newest + "/__general__/list_of_failed_scripts.log"
+            if os.path.exists(failed_list_logfile):
+                failed_list = open(failed_list_logfile, "r")
+                for line in failed_list:
+                    failist.append(line.strip() + ".log")
+            skiplist = []
+            skipped_list_logfile = newest + "/__general__/list_of_skipped_scripts.log"
+            if os.path.exists(skipped_list_logfile):
+                skipped_list = open(skipped_list_logfile, "r")
+                for line in skipped_list:
+                    skiplist.append(line.strip() + ".log")
+            print skiplist
             loglist = {}
             for dir in os.listdir(newest):
                 if os.path.isdir(newest + '/' + dir):
@@ -240,8 +253,12 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
                                 loglist[dir].append(file)
                             else:
                                 loglist[dir] = [file]
-            print json.dumps([newest, loglist])
-            return (200, json.dumps([newest, loglist]), 'application/json')
+            try:
+                loglist["__general__"].append("Execution failed on <strong>" + str(len(failist)) + "</strong> scripts")
+                loglist["__general__"].append("Execution skipped on <strong>" + str(len(skiplist)) + "</strong> scripts<br>")
+            except KeyError:
+                pass
+            return (200, json.dumps([newest, loglist, failist, skiplist]), 'application/json')
 
         # Used to generate new plots
         if '/ajax/makeplots' in self.path:

@@ -270,6 +270,50 @@ class Validation:
         # Thats it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.list_of_scripts
 
+    def log_failed(self):
+
+        """!
+        This method logs all scripts with property failed into a single file
+        to be read in run_validation_server.py
+        """
+        # Folder, where we have the log
+        flder = "./results/{0}/__general__/".format(self.tag)
+
+        # Open the log for writing
+        list_failed = open(flder + "list_of_failed_scripts.log", "w+")
+
+        # Select only failed scripts
+        list_of_failed_scripts = [script for script in self.list_of_scripts if
+                                  script.status == "failed"]
+
+        # log the name of all failed scripts
+        for script in list_of_failed_scripts:
+            list_failed.write(script.path.split("/")[-1] + "\n")
+        # close the log
+        list_failed.close()
+
+    def log_skipped(self):
+
+        """!
+        This method logs all scripts with property skipped into a single file
+        to be read in run_validation_server.py
+        """
+        # Folder, where we have the log
+        flder = "./results/{0}/__general__/".format(self.tag)
+
+        # Open the log for writing
+        list_skipped = open(flder + "list_of_skipped_scripts.log", "w+")
+
+        # Select only failed scripts
+        list_of_skipped_scripts = [script for script in self.list_of_scripts if
+                                   script.status == "skipped"]
+
+        # log the name of all failed scripts
+        for script in list_of_skipped_scripts:
+            list_skipped.write(script.path.split("/")[-1] + "\n")
+        # close the log
+        list_skipped.close()
+
     def set_runtime_data(self):
 
         """!
@@ -377,6 +421,7 @@ class Validation:
                             self.log.warning('exit_status was {0} for {1}'
                                              .format(result[1],
                                                      script_object.path))
+
                             # Skip all dependent scripts
                             self.skip_script(script_object)
 
@@ -455,6 +500,10 @@ class Validation:
             # If we are not running in quiet mode, draw the progress bar
             if not self.quiet:
                 progress_bar_lines = draw_progress_bar(progress_bar_lines)
+
+        # Log failed and skipped scripts
+        self.log_failed()
+        self.log_skipped()
 
         # And close the runtime data file
         if not self.mode == "cluster":

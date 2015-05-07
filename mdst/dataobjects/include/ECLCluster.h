@@ -305,7 +305,7 @@ namespace Belle2 {
     //.................
     // For filling error matrix on Px,Py and Pz
 
-    /*! Return TMatrixFsym 4x4  error matrix
+    /*! Return TMatrixFsym 4x4  error matrix (order should be: px,py,pz,E)
     */
 
     TMatrixFSym getError4x4() const

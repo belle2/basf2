@@ -17,12 +17,21 @@ def build_map(target, source, env):
     map_file = open(str(target[0]), 'w')
 
     # loop over source files and extract registered modules
+    nModules = 0
     for source_file in source:
+        # ignore libs
+        if str(source_file).endswith(env.subst('$SHLIBSUFFIX')):
+            continue
+
         contents = source_file.get_text_contents()
         for entry in reg_re.findall(contents):
             map_file.write(entry + '\n')
+            nModules += 1
 
     map_file.close()
+
+    if nModules == 0:
+        return "Module map file empty. Did you forget REG_MODULE(...) in your module source file?"
 
     return None
 
@@ -38,5 +47,3 @@ def generate(env):
 
 def exists(env):
     return True
-
-

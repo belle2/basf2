@@ -11,7 +11,7 @@ def define_aliases(
     target,
     dir_name,
     extension=None,
-    ):
+):
 
     parent_dir = dir_name
     while len(parent_dir) > 0:
@@ -65,7 +65,7 @@ def process_dir(
     dir_name,
     is_module_dir,
     release_dir,
-    ):
+):
 
     # determine library name
     if dir_name == '.':
@@ -97,11 +97,11 @@ def process_dir(
     # get list of test files
     test_files = [os.path.join(parent_env['BUILDDIR'], str(node)) for node in
                   get_files(os.path.join(dir_name, 'tests', '*.cc'),
-                  release_dir)]
+                            release_dir)]
 
     # get list of script files
     script_files = get_python_files_recursive(os.path.join(dir_name, 'scripts'
-            ))
+                                                           ))
 
     # get list of executable script files
     executable_files = []
@@ -111,9 +111,9 @@ def process_dir(
         executable_file = str(tools_file)
         if not os.path.exists(executable_file):
             executable_file = os.path.join(os.environ['BELLE2_RELEASE_DIR'],
-                    executable_file)
+                                           executable_file)
         if os.stat(executable_file).st_mode & executable_mode \
-            == executable_mode:
+                == executable_mode:
             executable_files.append(tools_file)
 
     # get list of data files
@@ -155,7 +155,7 @@ def process_dir(
             env = result
 
             # don't continue with the default build process if the SConscript file requests this
-            if env.Dictionary().get('CONTINUE', True) == False:
+            if not env.Dictionary().get('CONTINUE', True):
                 return
 
     # install header files in the include directory
@@ -170,7 +170,7 @@ def process_dir(
         script_dir = os.path.dirname(script_file_path)
 
         destination_reldir = os.path.relpath(script_dir,
-                os.path.join(dir_name, 'scripts'))
+                                             os.path.join(dir_name, 'scripts'))
 
         if not destination_reldir:
             continue
@@ -186,7 +186,7 @@ def process_dir(
 
     # install data files in the data directory
     data = env.Install(os.path.join(env['DATADIR'], dir_name), env['DATA_FILES'
-                       ])
+                                                                   ])
     define_aliases(env, data, dir_name, 'data')
 
     # remember tests defined in this directory
@@ -197,7 +197,7 @@ def process_dir(
     for entry in entries:
         if entry.find('.') == -1 \
             and not os.path.isfile(real_path(os.path.join(dir_name, entry),
-                                   release_dir)) and not entry in [
+                                             release_dir)) and entry not in [
             'include',
             'src',
             'tools',
@@ -207,7 +207,7 @@ def process_dir(
             'doc',
             'examples',
             'modules',
-            ]:
+        ]:
             if dir_name == '.' and entry in [
                 'build',
                 'include',
@@ -215,15 +215,15 @@ def process_dir(
                 'bin',
                 'modules',
                 'data',
-                ]:
+            ]:
                 continue
             process_dir(env, os.path.join(dir_name, entry), is_module_dir
                         and dir_name != '.', release_dir)
 
     # determine whether we are in a special directory
     is_package_dir = dir_name == env['PACKAGE']
-    is_sublib_dir = env.Dictionary().get('SUBLIB', False) == True
-    is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False) == True
+    is_sublib_dir = env.Dictionary().get('SUBLIB', False)
+    is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False)
     is_dataobjects_dir = os.path.basename(dir_name) == 'dataobjects' \
         and env['PACKAGE'] != 'framework'
     if dir_name == './dataobjects':
@@ -233,7 +233,7 @@ def process_dir(
 
     # check whether we have to create a new library
     if is_package_dir or is_sublib_dir or is_python_module_dir \
-        or is_module_dir or is_dataobjects_dir:
+            or is_module_dir or is_dataobjects_dir:
 
         # generate dictionaries
         dict_files = []
@@ -241,10 +241,10 @@ def process_dir(
             dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] \
                 + 'Dict.cc'
             dict_file = env.RootDict(os.path.join(env['BUILDDIR'],
-                                     dict_filename), linkdef_file)
+                                                  dict_filename), linkdef_file)
             # add current directory to include path for dictionary compilation
             dict_files.append(env.SharedObject(dict_file, CPPPATH=['.']
-                              + env['CPPPATH']))
+                                               + env['CPPPATH']))
 
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0:
@@ -265,9 +265,12 @@ def process_dir(
                                     [env['SRC_FILES'], dict_files])
             lib_files = [lib]
             if is_module_dir:
-                reg_map = env.RegMap(os.path.join(lib_dir_name,
-                                     env.subst('$SHLIBPREFIX') + lib_name
-                                     + '.map'), env['SRC_FILES'])
+                map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.map')
+                # Adding lib_files is important to ensure we load local module
+                # libraries if they are newer than those in central directory
+                map_sources = env['SRC_FILES'] + lib_files
+
+                reg_map = env.RegMap(map_file, map_sources)
                 lib_files.append(reg_map)
 
             # define build target aliases
@@ -280,8 +283,8 @@ def process_dir(
             # install python module libraries with a file name that is recognized by python
             if is_python_module_dir:
                 pymod = env.InstallAs(os.path.join(env['LIBDIR'],
-                                      os.path.basename(dir_name) + 'module'
-                                      + env.subst('$SHLIBSUFFIX')), lib)
+                                                   os.path.basename(dir_name) + 'module'
+                                                   + env.subst('$SHLIBSUFFIX')), lib)
                 define_aliases(env, pymod, dir_name, 'lib')
     else:
 
@@ -297,7 +300,7 @@ def process_dir(
 
     # process modules directory last so that it is known whether the main library exists
     if os.path.isdir(real_path(os.path.join(dir_name, 'modules'),
-                     release_dir)):
+                               release_dir)):
         process_dir(env, os.path.join(dir_name, 'modules'), True, release_dir)
 
     # setup environment for building executables, include SConscript if it exists
@@ -318,13 +321,13 @@ def process_dir(
         bin_env['LIBS'] = []
         if bin_filename in bin_env['TOOLS_LIBS']:
             bin_env['LIBS'] = Flatten([env.subst(str(lib)).split() for lib in
-                                      Flatten(bin_env['TOOLS_LIBS'
-                                      ][bin_filename])])
+                                       Flatten(bin_env['TOOLS_LIBS'
+                                                       ][bin_filename])])
         if bin_filename in bin_env['TOOLS_LIBPATH']:
             bin_env['LIBPATH'] = bin_env['TOOLS_LIBPATH'][bin_filename]
         tool = bin_env.Program(os.path.join(bin_env['BINDIR'], bin_filename),
                                os.path.join(bin_env['BUILDDIR'],
-                               str(bin_file)))
+                                            str(bin_file)))
         env.Alias(os.path.join(dir_name, 'tools', bin_filename), tool)
         env.Alias(os.path.join(dir_name, 'tools'), tool)
         env.Alias(os.path.join(dir_name, bin_filename), tool)
@@ -337,7 +340,7 @@ def process_dir(
     if len(local_test_files) > 0:
         local_test_env = env.Clone()
         sconscript_name = real_path(os.path.join(dir_name, 'tests',
-                                    'SConscript'), release_dir)
+                                                 'SConscript'), release_dir)
         if os.path.isfile(sconscript_name):
             result = SConscript(sconscript_name, exports='env')
             if isinstance(result, Environment):
@@ -354,7 +357,7 @@ def process_dir(
         test_env = env.Clone()
         test_env['LIBS'] = env['TEST_LIBS']
         test = test_env.Program(os.path.join(test_env['BINDIR'],
-                                test_filename), env['TEST_FILES'])
+                                             test_filename), env['TEST_FILES'])
         env.Alias(os.path.join(dir_name, 'tests', test_filename), test)
         env.Alias(os.path.join(dir_name, 'tests'), test)
         env.Alias(os.path.join(dir_name, test_filename), test)
@@ -371,5 +374,3 @@ def generate(env):
 
 def exists(env):
     return True
-
-

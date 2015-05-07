@@ -212,7 +212,7 @@ if analysis:
     for entry in os.listdir(os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)):
         if entry.endswith('_dataobjects' + global_env.subst('$SHLIBSUFFIX')):
             release_libs.append(entry[len(global_env.subst('$SHLIBPREFIX')): -len(global_env.subst('$SHLIBSUFFIX'))])
-    
+
 lib = global_env.SharedLibrary(os.path.join(global_env['LIBDIR'], 'dataobjects'), empty_file,
                                LIBS = global_env['DATAOBJECT_LIBS'] + ['framework'] + release_libs,
                                LINKFLAGS = '-Wl,--no-as-needed')

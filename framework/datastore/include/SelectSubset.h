@@ -23,7 +23,7 @@
 
 
 namespace Belle2 {
-  /** Type-independent implementation details. */
+  /** Type-independent implementation details of SelectSubset. */
   class SelectSubsetBase {
   public:
     /** Get list of arrays we inherit relations from. */
@@ -71,7 +71,7 @@ namespace Belle2 {
    *  in another StoreArray called, as an example,'oddParticles'.
    *
    *  <h2> Instantiation</h2>
-   *  First you need to instantiate a SelectSubset object in your module:
+   *  First you need to add a SelectSubset to your module as a member variable:
    *  \code
       SelectSubset< Particle > m_selector;
       \endcode
@@ -90,11 +90,13 @@ namespace Belle2 {
    * register it into the datastore with name "oddParticles" same durability and
    * same persistent attributes of the original one.
    *
+   * Inheritance of relations can also be configured here, see "Relations" section below.
+   *
    * <h2> Selection </h2>
    *
    * To create the subset you have to specify the selection criterium.
    * You can do that in two possible ways.
-   * <h3> C++ function </h3>
+   * <h3>via C++ function </h3>
    * You can define your C++ function and then use it. E.g:
    *  \code
       bool
@@ -108,7 +110,7 @@ namespace Belle2 {
      m_selector.select( MySelectionFunction );
      \endcode
    *
-   * <h3> C++ lambda function </h3>
+   * <h3>via C++ lambda function </h3>
    * You can specify a lambda expression as parameter of the select method. E.g.:
    * in the event method of your code:
    * \code
@@ -136,7 +138,7 @@ namespace Belle2 {
    * in relation To the StoreArray<MCParticle>. You can use the relation from
    * the set to the subset and then from the set to the MCParticles. This can
    * be quite tedious, so you can ask SelectSubset to produce the natural
-   * restrictions of the relations  from and to the original set.
+   * restrictions of the relations from and to the original set.
 
    * <h2>Automatic inheritance</h2>
    * If you want your subset to have the same relations as for the original set,

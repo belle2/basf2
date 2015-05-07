@@ -31,7 +31,7 @@ namespace Belle2 {
    *  lifetime of one event.
    *
    *
-   *  <h1>Accessing elements of an existing array</h1>
+   *  <h2>Accessing elements of an existing array</h2>
    *  Stored objects can be accessed directly using their array index and
    *  operator[]. For example, the following code snippet loops over all
    *  entries in an array of CDCSimHits:
@@ -50,7 +50,7 @@ namespace Belle2 {
    *  (See class documentation for usage examples.)
    *
    *
-   *  <h1>Adding elements</h1>
+   *  <h2>Adding elements</h2>
    *  Elements can be added to the array in a few ways. The easiest is to use
    *  something like:
    *
@@ -65,19 +65,40 @@ namespace Belle2 {
    *  that takes the arguments (int, float), you can use appendNew(int, float) instead.
    *
    *
-   *  <h1>Registration of arrays</h1>
+   *  <h2>Registration of arrays</h2>
    *  Note that you have to register an array in the initialize method of a
    *  module first (using registerInDataStore()) before you can use it.
    *  This procedure is the same  as for objects handled by StoreObjPtr.
    *
    *
-   *  <h1>Internals</h1>
+   *  <h2>Using StoreArray as a module member variable</h2>
+   *  To avoid some overhead involved in re-creating the StoreArray e.g. in
+   *  each event() function call, you can also make StoreArray a member variable
+   *  of your class. If it is of non-event durability, you'll need to add the appropriate
+   *  constructor call to the initializer list, e.g. (here with default name):
+   *
+      \code
+      MyModule::MyModule():
+        m_fooHits("", DataStore::c_Persistent)
+      {}
+      \endcode
+   *
+   *  In initialize(), you should also use registerInDataStore() or isOptional()/isRequired()
+   *  to specify wether it is an input or output.
+   *  For <b>non-default names</b> (which you might not know in the constructor, e.g. in the
+   *  case of module parameters), set the 'name' argument of any of these three functions to
+   *  permanently bind the StoreArray to the array with the given name.
+
+   *
+   *
+   *  <h2>Internals</h2>
    *  Internally, the arrays are stored as TClonesArrays, see
    *  http://root.cern.ch/root/html/TClonesArray.html for technical details.
    *
    *  @sa Objects in different arrays can be linked using relations, see RelationsInterface, RelationsObject
    *  @sa See StoreObjPtr for a way store single objects
    *  @sa Data can also be accessed from Python modules using PyStoreArray
+   *  @sa While objects cannot be removed directly from StoreArray, SelectSubset can be used to filter it.
    *
    *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreArray">The basf2 developers</a>
    */

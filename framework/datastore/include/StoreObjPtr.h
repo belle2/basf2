@@ -16,12 +16,12 @@
 
 namespace Belle2 {
 
-  /** Type safe access to single objects in the data store.
+  /** Type-safe access to single objects in the data store.
    *
    *  This class provides access to single (i.e. non-array) objects
    *  in the data store, identified by their name and durability.
    *
-   *  <h1>Accessing existing objects</h1>
+   *  <h2>Accessing existing objects</h2>
    *  This example creates a new StoreObjPtr for the EventMetaData object,
    *  using the default name (EventMetaData) and default durability (event).
    *  If no object 'EventMetaData' is found in the data store, the store
@@ -36,7 +36,7 @@ namespace Belle2 {
       }
       \endcode
    *
-   *  <h1>Storing objects</h1>
+   *  <h2>Storing objects</h2>
    *  First, objects have to be registered in the data store during the
    *  initialization phase, meaning in the initialize method of a module:
    *  \code
@@ -68,9 +68,27 @@ namespace Belle2 {
       \endcode
    *  Note that the datastore takes ownership of the object!
    *
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
+   *  <h2>Using StoreOjbPtr as a module member variable</h2>
+   *  To avoid some overhead involved in re-creating the StoreObjPtr e.g. in
+   *  each event() function call, you can also make StoreObjPtr a member variable
+   *  of your class. If it is of non-event durability, you'll need to add the appropriate
+   *  constructor call to the initializer list, e.g. (here with default name):
+   *
+      \code
+      MyModule::MyModule():
+        m_fooPtr("", DataStore::c_Persistent)
+      {}
+      \endcode
+   *
+   *  In initialize(), you should also use registerInDataStore() or isOptional()/isRequired()
+   *  to specify wether it is an input or output.
+   *  For <b>non-default names</b> (which you might not know in the constructor, e.g. in the
+   *  case of module parameters), set the 'name' argument of any of these three functions to
+   *  permanently bind the StoreObjPtr to the array with the given name.
+   *
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
    *  @sa Data can also be created/accessed from Python modules using PyStoreObj
+   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    */
   template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:

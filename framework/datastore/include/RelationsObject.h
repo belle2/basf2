@@ -97,8 +97,9 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
     /** Constructor, forwards all arguments to BASE constructor. */
-    template<class ...Args> RelationsInterface(Args&& ... params) : BASE(std::forward<Args>(params)...), m_cacheDataStoreEntry(NULL),
-      m_cacheArrayIndex(-1) { }
+    template<class ...Args> RelationsInterface(Args&& ... params):
+      BASE(std::forward<Args>(params)...),
+      m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) { }
 #endif
 
     /** Copy constructor.
@@ -106,15 +107,21 @@ namespace Belle2 {
      *  Cached values are cleared.
      *  @param relationsInterface  The object that should be copied.
      */
-    RelationsInterface(const RelationsInterface& relationsInterface): BASE(relationsInterface), m_cacheDataStoreEntry(NULL),
-      m_cacheArrayIndex(-1) {}
+    RelationsInterface(const RelationsInterface& relationsInterface):
+      BASE(relationsInterface),
+      m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) { }
 
     /** Assignment operator.
      *
-     *  Cached values are cleared.
+     *  cached values of 'this' are not touched, since position does not change.
      *  @param relationsInterface  The object that should be assigned.
      */
-    RelationsInterface& operator=(const RelationsInterface& relationsInterface);
+    RelationsInterface& operator=(const RelationsInterface& relationsInterface)
+    {
+      if (this != &relationsInterface)
+        this->BASE::operator=(relationsInterface);
+      return *this;
+    }
 
 
     /** Add a relation from this object to another object (with caching).
@@ -124,10 +131,9 @@ namespace Belle2 {
      */
     void addRelationTo(const RelationsInterface<BASE>* object, double weight = 1.0) const
     {
-      if (!object)
-        return;
-      DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, object->m_cacheDataStoreEntry,
-                                        object->m_cacheArrayIndex, weight);
+      if (object)
+        DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex,
+                                          object, object->m_cacheDataStoreEntry, object->m_cacheArrayIndex, weight);
     }
 
     /** Add a relation from this object to another object (no caching, can be quite slow).
@@ -346,17 +352,6 @@ namespace Belle2 {
     //version 0 to disable streaming
     ClassDef(RelationsInterface, 0); /**< defines interface for accessing relations of objects in StoreArray. */
   };
-
-  template <class BASE> RelationsInterface<BASE>& RelationsInterface<BASE>::operator=(const RelationsInterface<BASE>&
-      relationsInterface)
-  {
-    if (this != &relationsInterface) {
-      this->BASE::operator=(relationsInterface);
-      m_cacheDataStoreEntry = NULL;
-      m_cacheArrayIndex = -1;
-    }
-    return *this;
-  }
 
   /** Provides interface for getting/adding relations to objects in StoreArrays. See RelationsInterface for details. */
   typedef RelationsInterface<TObject> RelationsObject;

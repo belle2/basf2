@@ -1,16 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-<header>
-  <contact>Peter Kodys, peter.kodys@mff.cuni.cz</contact>
-  <description>
-    PVD validation of diffusion, cluster size, digit signal to noise,
-    error distribution, eta distribution, statistics of particles
-    going thrue detector, energy true and reco deposition and lost momentum,
-    seed, Lorentz angle, constants.
-  </description>
-</header>
-"""
 
 ##############################################################################
 #
@@ -26,11 +15,16 @@
 #  History:
 #  06 Nov 2013    ver. 0.1   First example
 #  29 Nov 2013    ver. 0.2   Cleanup, P.Kvasnicka
-#  01 May 2015    ver. 0.2   small format changes recover functionality
-#                            adding of header, P.Kodys
 #
 ##############################################################################
-
+"""
+<header>
+<output>PXDValidationTTreeOutput.root</output>
+<output>PXDValidationTTreeSimHitOutput.root</output>
+<output>PXDValidationTTreeDigitOutput.root</output>
+<contact>Peter Kodys, peter.kodys@mff.cuni.cz</contact>
+</header>
+"""
 from basf2 import *
 from PXDValidationTTree import PXDValidationTTree
 from PXDValidationTTreeSimHit import PXDValidationTTreeSimHit

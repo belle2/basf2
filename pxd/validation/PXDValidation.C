@@ -52,6 +52,15 @@
 // 13: ClusterSizeV 1D (Cluster size in v projection) [from Clasterizer]
 // 14: Statistics file plots: on
 // -----------------------------------------------------
+/*
+<header>
+<input>PXDValidationTTreeOutput.root</input>
+<input>PXDValidationTTreeSimHitOutput.root</input>
+<input>PXDValidationTTreeDigitOutput.root</input>
+<output>PXDValidation.root</output>
+<contact>Peter Kodys, peter.kodys@mff.cuni.cz</contact>
+</header>
+*/
 #include "TMath.h"
 #include "TFile.h"
 #include "TTree.h"

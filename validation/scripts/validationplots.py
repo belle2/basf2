@@ -504,6 +504,12 @@ def generate_new_plots(list_of_revisions):
     # The path where we need it
     src = './content.html'
 
+    # Create destination directory if it does not yet exist
+    dest_dir = './plots/{0}/'.format('_'.join(sorted(
+        list_of_revisions)))
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
     # The path where the content.html should be
     dst = './plots/{0}/content.html'.format('_'.join(sorted(
         list_of_revisions)))
@@ -1315,7 +1321,16 @@ class Plotuple:
                 line += '<td>n/a</td>'
             line += '</tr>'
             html.append(line)
+        # If there is a reference object, print the reference values as the
+        # first row of the table
+        else:
+            line = '<tr><td>reference</td>'
+            for key in self.reference.object.keys():
+                line += '<td>{0:.4f}</td>'.format(self.reference.object[key])
+            line += '</tr>'
+            html.append(line)
 
+        # Now print the values for all other revisions
         for ntuple in self.elements:
             # Get the index of the object (to retrieve the color)
             ind = index_from_revision(ntuple.revision)

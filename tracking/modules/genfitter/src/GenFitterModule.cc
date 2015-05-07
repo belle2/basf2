@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2015 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler          *
+ *               & Tobias Schlüter                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -123,6 +124,9 @@ GenFitterModule::GenFitterModule() :
   addParam("StoreFailedTracks", m_storeFailed,
            "Set true if the tracks where the fit failed should also be stored in the output",
            bool(false));
+  addParam("BuildBelle2Tracks", m_buildBelle2Tracks,
+           "Backward compatibility option to build Belle2::Tracks.  Will be removed soon.",
+           bool(true));
   addParam("UseClusters", m_useClusters,
            "If set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used",
            true);
@@ -201,13 +205,8 @@ void GenFitterModule::initialize()
   trackCandidates.isRequired();
   mcParticles.isOptional();
 
-  StoreArray<Track> tracks;
   StoreArray<genfit::Track> gftracks(m_gfTracksColName);
-  StoreArray<TrackFitResult> trackfitresults;
-
   gftracks.registerInDataStore();
-  tracks.registerInDataStore();
-  trackfitresults.registerInDataStore();
 
   if (!m_tracksColName.empty() and m_tracksColName != "Tracks") {
     B2ERROR("Setting a collection name with TracksColName is not implemented.");
@@ -215,14 +214,27 @@ void GenFitterModule::initialize()
   }
 
   gftracks.registerRelationTo(mcParticles);
-  tracks.registerRelationTo(mcParticles);
-  gftracks.registerRelationTo(trackfitresults);
-  trackCandidates.registerRelationTo(trackfitresults);
   trackCandidates.registerRelationTo(gftracks);
 
+  if (m_buildBelle2Tracks) {
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackfitresults;
+
+    tracks.registerInDataStore();
+    trackfitresults.registerInDataStore();
+
+    tracks.registerRelationTo(mcParticles);
+    trackCandidates.registerRelationTo(trackfitresults);
+    gftracks.registerRelationTo(trackfitresults);
+
+    B2WARNING("Please update your option file to use the TrackBuilderModule to build "
+              "Belle2::Tracks and set the BuildBelle2Tracks option of the "
+              "GenFitterModule to false as this will become the default and the "
+              "functionality will be removed soon.");
+  }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
+    B2ERROR("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
 
     if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
       geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
@@ -329,20 +341,10 @@ void GenFitterModule::event()
   }
 
 
-  //StoreArrays to store the fit results
-  StoreArray < Track > tracks;
-  tracks.create();
-  StoreArray <TrackFitResult> trackFitResults;
-  trackFitResults.create();
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
   gfTracks.create();
 
-  //Relations for Tracks
-  RelationArray tracksToMcParticles(tracks, mcParticles);
-  RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
   RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
-
-  RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults);
 
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);
@@ -350,6 +352,19 @@ void GenFitterModule::event()
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
   int trackFitResultCounter = 0;
+
+  //Relations for Tracks
+  //StoreArrays to store the fit results
+  StoreArray < Track > tracks;
+  StoreArray <TrackFitResult> trackFitResults;
+  RelationArray tracksToMcParticles(tracks, mcParticles);
+  RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
+  RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults);
+
+  if (m_buildBelle2Tracks) {
+    tracks.create();
+    trackFitResults.create();
+  }
 
   for (int iCand = 0; iCand < trackCandidates.getEntries(); ++iCand) { //loop over all track candidates
     B2DEBUG(99, "#############  Fit track candidate Nr. : " << iCand << "  ################");
@@ -614,13 +629,18 @@ void GenFitterModule::event()
           //Create output tracks
           gfTrack.prune(m_pruneFlags.c_str());
           gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
-          tracks.appendNew(); //Track is created empty, parameters are set later on
+          gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
 
           //Create relation
           if (aTrackCandPointer->getMcTrackId() >= 0) {
             gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
           }
 
+          if (!m_buildBelle2Tracks)
+            continue;
+
+          // Only build Belle 2 Tracks if explicitly requested.
+          tracks.appendNew(); //Track is created empty, parameters are set later on
           // To calculate the correct starting helix parameters, one
           // has to extrapolate the track to its 'start' (here: take
           // point of closest approach to the origin)
@@ -657,7 +677,6 @@ void GenFitterModule::event()
 
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
-            gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
             trackFitResultCounter++;
 
             //store position errors

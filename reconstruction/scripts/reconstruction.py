@@ -212,7 +212,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
 
     # track fitting
     trackfitter = register_module('GenFitter')
+    trackfitter.param('BuildBelle2Tracks', False)
     path.add_module(trackfitter)
+
+    # create Belle2 Tracks from the genfit Tracks
+    trackbuilder = register_module('TrackBuilder')
+    path.add_module(trackbuilder)
 
     # V0 finding
     v0finder = register_module('V0Finder')

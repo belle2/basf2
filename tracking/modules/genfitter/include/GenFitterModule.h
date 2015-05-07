@@ -3,12 +3,10 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler           *
+ * Contributors: Martin Heck & Oksana Brovchenko & Moritz Nadler          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- ********************
-
-******************************************************/
+ **************************************************************************/
 #pragma once
 
 #include <framework/core/Module.h>
@@ -105,6 +103,8 @@ namespace Belle2 {
     std::string m_pruneFlags;
 
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
+    bool m_buildBelle2Tracks;                        /**< Whether Belle2::Tracks should be built (should be done by TrackBuilder module).  */
+
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the track fit. */
     bool m_realisticCDCGeoTranslator;                /**< Whether to use the realistic geometry translators.  */
     bool m_enableWireSag;                            /**< Wire sag in CDCGeometryTranslator.  */

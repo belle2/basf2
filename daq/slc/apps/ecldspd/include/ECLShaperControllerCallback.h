@@ -1,16 +1,7 @@
 #ifndef _Belle2_ECLShaperControllerCallback_h
 #define _Belle2_ECLShaperControllerCallback_h
 
-#include "daq/slc/apps/ecldspd/ECLShaperController.h"
-#include "daq/slc/apps/ecldspd/ECLShaperConfig.h"
-
-#include "daq/slc/readout/ProcessController.h"
-
 #include "daq/slc/runcontrol/RCCallback.h"
-
-#include <daq/slc/nsm/NSMData.h>
-
-#include <daq/slc/system/PThread.h>
 
 namespace Belle2 {
 

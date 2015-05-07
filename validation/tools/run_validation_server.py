@@ -226,39 +226,92 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         # Used to get a list of all log files
         if '/ajax/listlogs' in self.path:
+
+            # In this list we will store the HTML code that will be returned
+            # to the requesting JavaScript application
+            html = []
+
             # Get a list of all folders in results and sort by mod. date
             folders = ['./results/' + __ for __ in os.listdir('./results')
                        if os.path.isdir('./results/' + __)]
+
+            # The folder containing the data from the most recent validation run
             newest = sorted(folders, key=os.path.getctime)[-1]
 
-            failist = []
-            failed_list_logfile = newest + "/__general__/list_of_failed_scripts.log"
-            if os.path.exists(failed_list_logfile):
-                failed_list = open(failed_list_logfile, "r")
-                for line in failed_list:
-                    failist.append(line.strip() + ".log")
-            skiplist = []
-            skipped_list_logfile = newest + "/__general__/list_of_skipped_scripts.log"
-            if os.path.exists(skipped_list_logfile):
-                skipped_list = open(skipped_list_logfile, "r")
-                for line in skipped_list:
-                    skiplist.append(line.strip() + ".log")
-            print skiplist
-            loglist = {}
-            for dir in os.listdir(newest):
-                if os.path.isdir(newest + '/' + dir):
-                    for file in os.listdir(newest + '/' + dir):
-                        if file.endswith('.log'):
-                            if dir in loglist.keys():
-                                loglist[dir].append(file)
-                            else:
-                                loglist[dir] = [file]
-            try:
-                loglist["__general__"].append("Execution failed on <strong>" + str(len(failist)) + "</strong> scripts")
-                loglist["__general__"].append("Execution skipped on <strong>" + str(len(skiplist)) + "</strong> scripts<br>")
-            except KeyError:
-                pass
-            return (200, json.dumps([newest, loglist, failist, skiplist]), 'application/json')
+            # Read in the failed scripts
+            failedscripts_path = newest + "/__general__/list_of_failed_scripts.log"
+            if os.path.exists(failedscripts_path):
+                # If a list of failed scripts exists, read it in
+                with open(failedscripts_path, 'r') as f:
+                    failed_scripts = f.readlines()
+            else:
+                # Otherwise use an empty list
+                failed_scripts = []
+
+            # Read in the skipped scripts
+            skippedscripts_path = newest + "/__general__/list_of_skipped_scripts.log"
+            if os.path.exists(failedscripts_path):
+                # If a list of skipped scripts exists, read it in
+                with open(skippedscripts_path, 'r') as f:
+                    skipped_scripts = f.readlines()
+            else:
+                # Otherwise use an empty list
+                skipped_scripts = []
+
+            # Add some general information to the HTML
+            html.append('<strong>General information:</strong><br>')
+            html.append('Execution failed for <strong>{0}</strong> scripts!<br>'
+                        .format(len(failed_scripts)))
+            html.append('Execution skipped <strong>{0}</strong> scripts!<br>'
+                        .format(len(skipped_scripts)))
+            html.append('<br>')
+
+            # A dict of all logfiles.
+            # Structure: {'package':[list, of, logfiles, for, pkg]}
+            logfiles = {}
+            for _ in os.listdir(newest):
+                if os.path.isdir(newest + '/' + _):
+                    logfiles[_] = []
+            for pkg in logfiles:
+                logfiles[pkg] = [newest + '/' + pkg + '/' + _ for _ in os.listdir(newest + '/' + pkg) if _.endswith('.log')]
+
+            # Parse the dict into HTML
+            for pkg in sorted(logfiles.keys()):
+                html.append('<strong>{0}</strong><br>'.format(pkg))
+                for logfile in sorted(logfiles[pkg]):
+
+                    # Make the variable names more intuitively understandable
+                    filename = os.path.basename(logfile)
+                    filepath = logfile
+
+                    # Add the entry to the html list
+                    html.append('<span class="loglink" name="{0}">{1}</span></br>'.format(filepath, filename))
+                html.append('<br>')
+
+            return (200, json.dumps('\n'.join(html)), 'application/json')
+
+        # Get the number of scripts that had issues
+        if '/ajax/scriptcount' in self.path:
+
+            # Get a list of all folders in results and sort by mod. date
+            folders = ['./results/' + __ for __ in os.listdir('./results')
+                       if os.path.isdir('./results/' + __)]
+
+            # The folder containing the data from the most recent validation run
+            newest = sorted(folders, key=os.path.getctime)[-1]
+
+            # Get the number of failed/skipped scripts
+            number_of_failed_scripts = sum(1 for line in open(newest + '/__general__/list_of_failed_scripts.log'))
+            number_of_skipped_scripts = sum(1 for line in open(newest + '/__general__/list_of_skipped_scripts.log'))
+
+            # Turn that into the result we want to deliver to the website
+            if number_of_failed_scripts + number_of_skipped_scripts == 0:
+                result = ''
+            else:
+                result = '{0}+{1}'.format(number_of_failed_scripts, number_of_skipped_scripts)
+
+            # Answer the AJAX request
+            return (200, json.dumps(result), 'application/json')
 
         # Used to generate new plots
         if '/ajax/makeplots' in self.path:
@@ -301,7 +354,7 @@ if __name__ == '__main__':
                     datefmt='%H:%M:%S')
 
     # Define the server address
-    ip = 'localhost'
+    ip = '129.13.133.6'
     port = 8000
 
     # Start the server!

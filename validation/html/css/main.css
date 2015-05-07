@@ -283,6 +283,22 @@ textarea {
     background:#e5e5e5;
 }
 
+#scriptcount
+{
+    background: FireBrick;
+    border: 0 !important;
+    width: 32px;
+    font-size: 10px;
+    height: 16px;
+    line-height: 16px;
+    padding: 2px;
+    color: white;
+    float: right;
+    border-radius: 5px !important;
+    text-align: center;
+    display: none;
+}
+
 #serverwarning
 {
     box-sizing:border-box;

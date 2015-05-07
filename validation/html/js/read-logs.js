@@ -5,7 +5,7 @@ $(document).ready(function() {
         $(this).parent().parent().hide();
     });  
 
-    // Send an AJAX request to retrieve the list of log filess
+    // Send an AJAX request to retrieve the list of log files
     $('.readlogs').click(function(){
 	$.ajax({ 
 	    cache: false,

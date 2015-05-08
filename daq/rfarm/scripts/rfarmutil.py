@@ -161,6 +161,7 @@ def run_eventserver(conffile):
         + ' > & distributor/nsmlog.log" '
     print cmd
     p = subprocess.Popen(cmd, shell=True)
+    time.sleep(1)
 
 
 # Stop eventserver
@@ -181,6 +182,7 @@ def stop_eventserver(conffile):
             + "; removeshm " + shmname + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
+        p.wait()
 
 
 # Run outputserver
@@ -196,6 +198,7 @@ def run_outputserver(conffile):
         + ' > & collector/nsmlog.log" '
     print cmd
     p = subprocess.Popen(cmd, shell=True)
+    time.sleep(1)
 
 
 # Stop outputserver
@@ -214,9 +217,11 @@ def stop_outputserver(conffile):
     pidfile = basedir + '/collector/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + opshost + ' "kill ' + pid + '; removerb ' + rbufinname \
-              + '; removerb ' + rbufoutname + '; removeshm ' + shmname + '"'
+              + '; removerb ' + rbufoutname + '; removeshm ' + shmname \
+              + '; clear_basf2_ipc"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
+        p.wait()
 
 
 # Start event procesor
@@ -243,6 +248,7 @@ def run_eventprocessor(conffile):
                 + ' > & evp_' + nodename + '/nsmlog.log" '
             print cmd
             p = subprocess.Popen(cmd, shell=True)
+            time.sleep(1)
 
 
 # Stop event procesor
@@ -269,16 +275,20 @@ def stop_eventprocessor(conffile):
             evphost = hostbase + nodeid
             nodename = 'evp_' + nodebase + nodeid
             shmname = unit + ':' + nodename
+            print shmname
             p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename
                                  + ' RF_UNCONFIGURE', shell=True)
             p.wait()
             pidfile = basedir + '/' + nodename + '/pid.data'
             for pid in open(pidfile, 'r'):
                 cmd = 'ssh ' + evphost + ' "kill ' + pid + '; removerb ' \
-                    + rbufinname + '; removerb ' + rbufoutname + \
-                    + '; removeshm ' + shmname + '"'
+                    + rbufinname + '; removerb ' + rbufoutname \
+                    + '; removeshm ' + shmname + '; clear_basf2_ipc"'
+#                    + '; removeshm ' +  '"'
+#                    + '; removeshm ' + shmname + '"'
                 print cmd
                 p = subprocess.Popen(cmd, shell=True)
+                p.wait()
 
 
 # Run dqmserver
@@ -294,6 +304,7 @@ def run_dqmserver(conffile):
         + ' > & dqmserver/nsmlog.log" '
     print cmd
     p = subprocess.Popen(cmd, shell=True)
+    time.sleep(1)
 
 
 # Stop dqmserver
@@ -308,6 +319,7 @@ def stop_dqmserver(conffile):
         cmd = 'ssh ' + dqmhost + ' "kill ' + pid + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
+        p.wait()
 
 
 # Run roisender
@@ -323,6 +335,7 @@ def run_roisender(conffile):
         + ' > & roisender/nsmlog.log" '
     print cmd
     p = subprocess.Popen(cmd, shell=True)
+    time.sleep(1)
 
 
 # Stop roisender
@@ -337,6 +350,7 @@ def stop_roisender(conffile):
         cmd = 'ssh ' + roihost + ' "kill ' + pid + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
+        p.wait()
 
 
 # Run local master
@@ -352,6 +366,7 @@ def run_master(conffile):
         + ' > & master/nsmlog.log" '
     print cmd
     p = subprocess.Popen(cmd, shell=True)
+    time.sleep(1)
 
 
 # Stop local master
@@ -366,6 +381,7 @@ def stop_master(conffile):
         cmd = 'ssh ' + masterhost + ' "kill ' + pid + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
+        p.wait()
 
 
 def start_rfarm_components(conffile):
@@ -396,5 +412,6 @@ def start_rfarm_local(conffile):
 # Stop RFARM local operation
 
 def stop_rfarm_local(conffile):
+    #    stop_eventprocessor(conffile)
     stop_rfarm_components(conffile)
     stop_master(conffile)

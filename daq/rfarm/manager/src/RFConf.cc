@@ -121,6 +121,7 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
     if (strcmp(cur->key, keybuf) == 0) return cur->val;
     nitem++;
   }
+  printf("RFConf: Key %s not found\n", keybuf);
   printf("nitem = %d, keybuf = %s\n", nitem, keybuf);
   return NULL;
 }

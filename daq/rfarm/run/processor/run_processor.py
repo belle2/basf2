@@ -10,8 +10,8 @@ global proc
 
 # Signal Handler
 def cleanup(num, frame):
-    os.kill(proc.pid, signal.SIGINT)
-    os.kill(proc.pid, signal.SIGINT)
+    os.kill(proc.pid, signal.SIGKILL)
+#    os.kill(proc.pid, signal.SIGINT)
     exit()
 
 # main
@@ -27,7 +27,8 @@ argc = len(argvs)
 inputrb = argvs[1]
 outputrb = argvs[2]
 histport = argvs[3]
-ncore = argvs[4]
+# ncore = argvs[4]
+ncore = "16"
 
 script = "processor.py"
 

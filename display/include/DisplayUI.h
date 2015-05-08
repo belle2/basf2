@@ -23,7 +23,6 @@ namespace Belle2 {
   template <class T> class ModuleParam;
   class SplitGLView;
   class DisplayData;
-  class VisualRepMap;
 
   /** Control TEve browser user interface.
    *
@@ -139,13 +138,6 @@ namespace Belle2 {
     /** toggle cumulative mode. */
     void toggleCumulative() { m_cumulative = !m_cumulative; }
 
-    /** Set the TObject <-> TEveElement map (to be filled by EVEVisualization). */
-    void setVisualRepMap(const VisualRepMap* visualRepMap) { m_visualRepMap = visualRepMap; }
-
-    /** Select the representation of the given object. */
-    void select(const TObject* object);
-
-
   public: // slots, don't call these manually
     /** Handle special actions when objects are selected. */
     void selectionHandler(TEveElement* eveObj);
@@ -222,9 +214,6 @@ namespace Belle2 {
 
     /** Polling/auto-advance timer. */
     TTimer* m_timer;
-
-    /** Map TObject <-> TEveElement */
-    const VisualRepMap* m_visualRepMap;
 
     /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
     std::vector<std::string> m_hideObjects;

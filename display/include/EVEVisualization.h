@@ -247,9 +247,6 @@ namespace Belle2 {
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
     void setHideSecondaries(bool on) { m_hideSecondaries = on; }
 
-    /** Get TObject <-> TEveElement mapping. */
-    const VisualRepMap* getVisualRepMap() const { return m_visualRepMap; }
-
 
   private:
     /** Object for the energy bar visualisation. */
@@ -333,9 +330,6 @@ namespace Belle2 {
 
     /** Unassigned recohits. */
     TEveStraightLineSet* m_unassignedRecoHits;
-
-    /** Map TObject <-> TEveElement, shared with UI */
-    VisualRepMap* m_visualRepMap;
 
     /** don't show MCParticles with momentum below this cutoff. */
     static constexpr double c_minPCut = 0.00;

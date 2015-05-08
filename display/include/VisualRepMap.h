@@ -1,8 +1,5 @@
 #pragma once
 
-#include <boost/bimap/bimap.hpp>
-#include <boost/bimap/unordered_set_of.hpp>
-
 class TEveElement;
 class TObject;
 
@@ -13,14 +10,24 @@ namespace Belle2 {
    * and vice versa.
    */
   class VisualRepMap {
-
-    /** defines a bidirectional mapping between TObjects in DataStore and their visual representation. */
-    typedef boost::bimaps::bimap <
-    boost::bimaps::unordered_set_of<const TObject*>,
-          boost::bimaps::unordered_set_of<TEveElement*>
-          > DataStoreEveElementMap;
-
   public:
+    static VisualRepMap* getInstance();
+
+    /** Select the representation of the given object. */
+    void select(const TObject* object) const;
+
+    /** Select related objects. */
+    void selectRelated(TEveElement* eveObj) const;
+
+    /** Clear existing selection in Eve Browser. */
+    void clearSelection() const;
+
+    /** are we currently in a select() call?
+     *
+     * Call this in your selection handler and abort if true.
+     * (otherwise we end up recursively calling ourselves).
+     */
+    bool isCurrentlySelecting() const { return m_currentlySelecting; }
 
     /** Get object represented by given visual representation.
      *
@@ -28,12 +35,11 @@ namespace Belle2 {
      */
     const TObject* getDataStoreObject(TEveElement* elem) const;
 
-
     /** Get visual representation of given object. */
     TEveElement* getEveElement(const TObject* obj) const;
 
-    /** Remove all contents in map. */
-    void clear() { m_dataStoreEveElementMap.clear(); }
+    /** Remove all contents in map. (call this after each event) */
+    void clear();
 
     /** Generic function to keep track of which objects have which visual representation.
      *
@@ -42,12 +48,19 @@ namespace Belle2 {
      *
      * Does not take ownership of given objects, just stores mapping between pointers.
      */
-    void add(const TObject* dataStoreObject, TEveElement* visualRepresentation) {
-      m_dataStoreEveElementMap.insert(DataStoreEveElementMap::value_type(dataStoreObject, visualRepresentation));
-    }
+    void add(const TObject* dataStoreObject, TEveElement* visualRepresentation);
   private:
+    VisualRepMap();
+    /** no copy ctor */
+    VisualRepMap(const VisualRepMap&) = delete;
+    ~VisualRepMap();
+
+    class DataStoreEveElementMap;
+
+    mutable bool m_currentlySelecting; /**< are we currently in a select() call? */
+
     /** Map DataStore contents in current event with their visual representation. */
-    DataStoreEveElementMap m_dataStoreEveElementMap;
+    DataStoreEveElementMap* m_dataStoreEveElementMap;
 
   };
 }

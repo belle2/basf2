@@ -1,5 +1,6 @@
 #include <display/SplitGLView.h>
 #include <display/EveGeometry.h>
+#include <display/InfoWidget.h>
 #include <framework/logging/Logger.h>
 
 #include "TEveScene.h"
@@ -22,31 +23,38 @@ using namespace Belle2;
 ClassImp(SplitGLView)
 
 SplitGLView::SplitGLView() :
-  m_activeViewer(-1)
+  m_activeViewer(-1),
+  m_infoWidget(nullptr)
 {
+  const char* projectionName[3] = { "3D", "Rho/Z", "R/Phi" };
+  TGLViewer::ECameraType cameraType[3] = { TGLViewer::kCameraPerspXOZ, TGLViewer::kCameraOrthoXOY, TGLViewer::kCameraOrthoXOY };
+
   TEveWindowSlot* slot = TEveWindow::CreateWindowMainFrame();
   TEveWindowPack* pack = slot->MakePack();
   pack->SetVertical();
   pack->SetShowTitleBar(kFALSE);
 
-  const char* projectionName[3] = { "3D", "Rho/Z", "R/Phi" };
-  TGLViewer::ECameraType cameraType[3] = { TGLViewer::kCameraPerspXOZ, TGLViewer::kCameraOrthoXOY, TGLViewer::kCameraOrthoXOY };
+  TEveWindowSlot* viewerslots[3];
+  auto pack1 = pack->NewSlot()->MakePack();
+  pack1->SetHorizontal();
+  pack1->SetShowTitleBar(kFALSE);
+  viewerslots[0] = pack1->NewSlotWithWeight(0.7);
+  TEveWindowSlot* infoslot = pack1->NewSlotWithWeight(0.3);
+
+  auto pack2 = pack->NewSlot()->MakePack();
+  pack2->SetHorizontal();
+  pack2->SetShowTitleBar(kFALSE);
+  viewerslots[1] = pack2->NewSlot();
+  viewerslots[2] = pack2->NewSlot();
+
 
   //0: 3d, 1: rhoz, 2: rphi
   for (int iFrame = 0; iFrame < 3; iFrame++) {
-    if (iFrame == 1) {
-      //split bottom region again
-      slot = pack->NewSlot();
-      pack = slot->MakePack();
-      pack->SetHorizontal();
-      pack->SetShowTitleBar(kFALSE);
-    }
-    slot = pack->NewSlot();
-
     TEveViewer* viewer = new TEveViewer(TString::Format("%s viewer", projectionName[iFrame]));
     m_glViewer[iFrame] = viewer->SpawnGLEmbeddedViewer();
-    slot->ReplaceWindow(viewer);
-    slot = 0; //invalid after ReplaceWindow()
+    viewerslots[iFrame]->ReplaceWindow(viewer);
+    viewerslots[iFrame] = nullptr; // invalid after ReplaceWindow()
+
     viewer->SetShowTitleBar(kFALSE); //might want to show these?
     m_window[iFrame] = viewer;
 
@@ -82,6 +90,14 @@ SplitGLView::SplitGLView() :
       gEve->AddToListTree(projectionMgr, kTRUE);
     }
   }
+
+  m_infoWidget = new InfoWidget(gClient->GetRoot());
+
+  TEveWindowFrame* eveFrame = new TEveWindowFrame(m_infoWidget, "DataStore Info");
+  infoslot->ReplaceWindow(eveFrame);
+  eveFrame->SetShowTitleBar(kFALSE);
+  infoslot = nullptr; // invalid after ReplaceWindow()
+
 
   // create the "camera" popup menu
   m_cameraMenu = new TGPopupMenu(gClient->GetDefaultRoot());
@@ -131,6 +147,7 @@ SplitGLView::~SplitGLView()
     delete m_glViewer[i];
   }
   delete m_cameraMenu;
+  delete m_infoWidget;
 }
 
 void SplitGLView::handleMenu(Int_t id)

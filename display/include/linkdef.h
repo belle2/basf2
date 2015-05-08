@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::DisplayUI+;
 #pragma link C++ class Belle2::SplitGLView+;
 #pragma link C++ class Belle2::BrowsableWrapper+;
+#pragma link C++ class Belle2::InfoWidget+;
 
 #endif

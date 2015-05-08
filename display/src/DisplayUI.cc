@@ -6,12 +6,11 @@
 #include <display/VisualRepMap.h>
 #include <display/BrowsableWrapper.h>
 #include <display/SplitGLView.h>
+#include <display/InfoWidget.h>
 
 #include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationVector.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/AsyncWrapper.h>
@@ -50,6 +49,7 @@ ClassImp(DisplayUI)
 DisplayUI::DisplayUI(bool automatic):
   m_currentEntry(0),
   m_guiInitialized(false),
+  m_reshowCurrentEvent(false),
   m_automatic(automatic),
   m_cumulative(false),
   m_prevButton(0),
@@ -259,29 +259,14 @@ void DisplayUI::clearEvent()
 
 void DisplayUI::selectionHandler(TEveElement* eveObj)
 {
-  //if true, we'll recursively follow relations and possibly highlight the entire event
-  const bool allowRecursiveCall = false;
-  static bool recursiveCall = false;
-  if (!allowRecursiveCall && recursiveCall)
+  if (VisualRepMap::getInstance()->isCurrentlySelecting())
     return;
 
-  recursiveCall = true;
-  const TObject* representedObject = m_visualRepMap->getDataStoreObject(eveObj);
-  if (representedObject) {
-    //representedObject->Dump();
+  const TObject* representedObject = VisualRepMap::getInstance()->getDataStoreObject(eveObj);
+  if (representedObject)
+    m_viewPane->getInfoWidget()->show(representedObject);
 
-    const RelationVector<TObject>& relatedObjects = DataStore::Instance().getRelationsWithObj<TObject>(representedObject, "ALL");
-    for (const TObject& relObj : relatedObjects) {
-      //relObj.Print();
-      TEveElement* relObjRep = m_visualRepMap->getEveElement(&relObj);
-      if (relObjRep and !gEve->GetSelection()->HasChild(relObjRep)) {
-        //select this object in addition to existing selection
-        gEve->GetSelection()->UserPickedElement(relObjRep, true);
-      }
-    }
-  }
-
-  recursiveCall = false;
+  VisualRepMap::getInstance()->selectRelated(eveObj);
 }
 void DisplayUI::handleEvent(Event_t* event)
 {
@@ -300,7 +285,6 @@ void DisplayUI::handleEvent(Event_t* event)
 
 bool DisplayUI::startDisplay()
 {
-  m_reshowCurrentEvent = false;
   if (!m_guiInitialized) {
     makeGui();
     if (AsyncWrapper::isAsync()) {
@@ -328,6 +312,10 @@ bool DisplayUI::startDisplay()
 
   updateUI(); //update button state
 
+  //update info if this is another event
+  if (!m_reshowCurrentEvent)
+    m_viewPane->getInfoWidget()->newEvent();
+
   m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
   m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
 
@@ -343,6 +331,7 @@ bool DisplayUI::startDisplay()
     }
   }
 
+  m_reshowCurrentEvent = false;
   if (!m_automatic) {
     gEve->Redraw3D(false); //do not reset camera when redrawing
 
@@ -382,6 +371,7 @@ void DisplayUI::makeGui()
     glv->GetGLWidget()->Connect("ProcessedEvent(Event_t*)", "Belle2::DisplayUI", this, "handleEvent(Event_t*)");
   }
 
+  //----------Event Control
   browser->StartEmbedding(TRootBrowser::kLeft);
 
   TGMainFrame* frmMain = new TGMainFrame(gClient->GetRoot(), 240, 600);
@@ -590,12 +580,11 @@ void DisplayUI::makeGui()
   }
   frmMain->AddFrame(exit_frame, new TGLayoutHints(kLHintsExpandX | kLHintsBottom, 0, 0, 0, 0));
 
+  //magic to prevent the frame being empty.
   frmMain->MapSubwindows();
   frmMain->Resize();
   frmMain->MapWindow();
-  browser->StopEmbedding();
-
-  browser->SetTabTitle("Event Control", 0);
+  browser->StopEmbedding("Event Control");
 }
 
 void DisplayUI::handleParameterChange(int id)
@@ -841,7 +830,7 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     StoreArray<TObject> array(pair.first);
     const TObject* obj = array[pair.second];
     if (obj) {
-      select(array[pair.second]);
+      VisualRepMap::getInstance()->select(array[pair.second]);
     } else {
       B2WARNING("Cannot select object " << pair.first << "[" << pair.second << "], not found. Is the array available?");
     }
@@ -861,13 +850,4 @@ void DisplayUI::showUserData(const DisplayData& displayData)
     m->SetName("Add canvas to active window");
     fileBrowser->Add(m);
     */
-}
-
-void DisplayUI::select(const TObject* object)
-{
-  TEveElement* elem = m_visualRepMap->getEveElement(object);
-  if (elem and !gEve->GetSelection()->HasChild(elem)) {
-    //select this object in addition to existing selection
-    gEve->GetSelection()->UserPickedElement(elem, true);
-  }
 }

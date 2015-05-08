@@ -12,6 +12,7 @@ class TGStatusBar;
 class TGLPhysicalShape;
 
 namespace Belle2 {
+  class InfoWidget;
 
   /** Responsible for arranging the GL viewers and providing related functionality.
    *
@@ -46,6 +47,8 @@ namespace Belle2 {
     TEveProjectionManager* getRhoZMgr() const { return m_rhozManager; }
     /** return TGLEmbeddedViewer that is active right now. */
     TGLEmbeddedViewer* getActiveGLViewer();
+    /** text-based info viewer. */
+    InfoWidget* getInfoWidget() const { return m_infoWidget; }
 
     /** Which menu command was selected? */
     enum EMyCommands {
@@ -66,6 +69,9 @@ namespace Belle2 {
 
     TGPopupMenu*           m_cameraMenu;    /**< 'Camera' popup menu */
     TGStatusBar*           m_statusBar;     /**< status bar */
+
+    /** text-based info viewer. */
+    InfoWidget* m_infoWidget;
 
     /** Generate root dictionaries. */
     ClassDef(SplitGLView, 0)

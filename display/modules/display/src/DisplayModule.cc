@@ -123,9 +123,6 @@ void DisplayModule::initialize()
   EveGeometry::addGeometry(m_fullGeometry);
 
   m_display->hideObjects(m_hideObjects);
-
-  //allow UI to get additional info on the represented objects
-  m_display->setVisualRepMap(m_visualizer->getVisualRepMap());
 }
 
 

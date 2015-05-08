@@ -90,8 +90,7 @@ EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_eclData(0),
   m_bfield(new EveVisBField()),
-  m_unassignedRecoHits(0),
-  m_visualRepMap(new VisualRepMap())
+  m_unassignedRecoHits(0)
 {
   setErrScale();
 
@@ -139,9 +138,6 @@ void EVEVisualization::setErrScale(double errScale) { m_errorScale = errScale; }
 
 EVEVisualization::~EVEVisualization()
 {
-  //my objects
-  delete m_visualRepMap;
-
   if (!gEve)
     return; //objects are probably already freed by Eve
 
@@ -1138,7 +1134,7 @@ void EVEVisualization::clearEvent()
   if (!gEve)
     return;
 
-  m_visualRepMap->clear();
+  VisualRepMap::getInstance()->clear();
   for (auto& groupPair : m_groups) {
     //store visibility, invalidate pointers
     if (groupPair.second.group)
@@ -1419,7 +1415,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
 }
 void EVEVisualization::addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation)
 {
-  m_visualRepMap->add(dataStoreObject, visualRepresentation);
+  VisualRepMap::getInstance()->add(dataStoreObject, visualRepresentation);
 }
 
 void EVEVisualization::addToGroup(const std::string& name, TEveElement* elem)

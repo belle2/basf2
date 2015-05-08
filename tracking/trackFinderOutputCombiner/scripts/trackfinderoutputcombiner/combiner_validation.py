@@ -196,6 +196,8 @@ class TestingModule(basf2.Module):
         for recoHit in segment.items():
             track.addHit(Belle2.Const.CDC, recoHit.getWireHit().getStoreIHit())
 
+        # segment.clear()
+
 
 class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
@@ -204,37 +206,17 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
+
+        self.stereo_assignment = True
+
         main_path = super(CombinerValidationRun, self).create_path()
+
+        main_path.add_module(basf2.register_module("RootOutput"))
 
         if self.splitting:
             suffix = ""
         else:
             suffix = "_no_splitting"
-
-# ===============================================================================
-#         self.create_validation(
-#             main_path,
-#             track_candidates_store_array_name="ResultTrackCands",
-#             output_file_name="evaluation/result_%.2f%s.root" % (self.tmva_cut, suffix))
-#         self.create_validation(
-#             main_path,
-#             track_candidates_store_array_name="NaiveResultTrackCands",
-#             output_file_name="evaluation/naive_%.2f%s.root" % (self.tmva_cut, suffix))
-#         self.create_validation(
-#             main_path,
-#             track_candidates_store_array_name=self.legendre_track_cands_store_array_name,
-#             output_file_name="evaluation/legendre_%.2f%s.root" % (self.tmva_cut, suffix))
-#
-#         self.create_validation(
-#             main_path,
-#             track_candidates_store_array_name=self.trasan_track_cands_store_array_name,
-#             output_file_name="evaluation/trasan_%.2f%s.root" % (self.tmva_cut, suffix))
-#
-#         self.create_validation(
-#             main_path,
-#             track_candidates_store_array_name="BestResultTrackCands",
-#             output_file_name="evaluation/mc_%.2f%s.root" % (self.tmva_cut, suffix))
-# ===============================================================================
 
         local_track_finder = basf2.register_module('SegmentFinderCDCFacetAutomaton')
         local_track_finder.param({
@@ -244,16 +226,23 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
         main_path.add_module(local_track_finder)
 
-        main_path.add_module(TestingModule())
-
-        display_module = CDCSVGDisplayModule()
-        display_module.track_cands_store_array_name = self.legendre_track_cands_store_array_name
-        display_module.draw_gftrackcands = True
-        # main_path.add_module(display_module)
-
         display_module = CDCSVGDisplayModule()
         display_module.draw_segments_id = True
-        # main_path.add_module(display_module)
+        main_path.add_module(display_module)
+
+        # main_path.add_module(TestingModule())
+
+        combiner_module = basf2.register_module("SegmentTrackCombiner")
+        combiner_module.param("GFTrackCandsStoreArrayName", "ResultTrackCands")
+        combiner_module.set_debug_level(110)
+        combiner_module.set_log_level(basf2.LogLevel.DEBUG)
+        main_path.add_module(combiner_module)
+
+        display_module = CDCSVGDisplayModule()
+        display_module.track_cands_store_array_name = "ResultTrackCands"
+        display_module.draw_gftrackcands = True
+        display_module.draw_gftrackcand_trajectories = True
+        main_path.add_module(display_module)
 
         return main_path
 

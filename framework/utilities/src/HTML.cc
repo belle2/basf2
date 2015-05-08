@@ -1,11 +1,11 @@
 #include <framework/utilities/HTML.h>
-#include <framework/logging/Logger.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
 
 #include <TMatrixFBase.h>
 #include <TMatrixD.h>
+#include <TVector3.h>
 
 #include <iomanip>
 #include <sstream>
@@ -62,6 +62,15 @@ std::string HTML::getString(const TMatrixDBase& matrix, int precision, bool colo
   stream << "</table>";
   stream << "<br>";
 
+  return stream.str();
+}
+
+std::string HTML::getString(const TVector3& vec, int precision)
+{
+  std::stringstream stream;
+  stream.precision(precision);
+
+  stream << std::fixed << "(" << vec.x() << ", " <<  vec.y() << ", " <<  vec.z() << ")";
   return stream.str();
 }
 

@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/utilities/HTML.h>
 
 #include <TDatabasePDG.h>
 
@@ -123,7 +124,7 @@ std::string MCParticle::getInfoHTML() const
   out << "<b>pT</b>=" << getMomentum().Pt();
   out << ", <b>pZ</b>=" << m_momentum_z;
   out << "<br>";
-  out << "<b>V</b>=(" << m_productionVertex_x << ", " << m_productionVertex_y << ", " << m_productionVertex_z << ")";
+  out << "<b>V</b>=" << HTML::getString(getProductionVertex());
 
   const MCParticle* mom = getMother();
   if (mom) {

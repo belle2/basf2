@@ -628,13 +628,11 @@ std::string Particle::getInfoHTML() const
   stream << " <b>mass</b>=" << m_mass;
   stream << "<br>";
 
-  stream << " <b>momentum</b>=(";
-  stream << m_px << ", " << m_py << ", " << m_pz << ")";
+  stream << " <b>momentum</b>=" << HTML::getString(getMomentum());
   stream << " <b>p</b>=" << getP();
   stream << "<br>";
 
-  stream << " <b>position</b>=(";
-  stream << m_x << ", " << m_y << ", " << m_z << ")";
+  stream << " <b>position</b>=" << HTML::getString(getVertex());
   stream << "<br>";
 
   stream << " <b>p-value of fit</b> (if done): ";

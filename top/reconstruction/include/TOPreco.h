@@ -70,7 +70,8 @@ namespace Belle2 {
        * Set maximum for photon times (allows to set it lower than TDC range)
        * @param Tmax maximum time [ns], Tmax = 0: set to default TDC range
        */
-      void setTmax(double Tmax) {
+      void setTmax(double Tmax)
+      {
         float tmax = (float) Tmax;
         set_tmax_(&tmax);
       }
@@ -79,7 +80,8 @@ namespace Belle2 {
        * Set PDF option
        * @param opt option - see definition of PDFoption
        */
-      void setPDFoption(PDFoption opt) {
+      void setPDFoption(PDFoption opt)
+      {
         int iopt = opt;
         set_pdf_opt_(&iopt);
       }
@@ -91,17 +93,18 @@ namespace Belle2 {
 
       /**
        * Add data
-       * @param QbarID bar ID
+       * @param barID bar ID
        * @param chID channel ID
        * @param TDC digitized time
        * @param t0 offset in [ns] to be added
        */
-      int addData(int QbarID, int chID, int TDC, double t0 = 0.0);
+      int addData(int barID, int chID, int TDC, double t0 = 0.0);
 
       /**
        * Return size of data list
        */
-      int getDataSize() {
+      int getDataSize()
+      {
         return data_getnum_();
       }
 
@@ -115,10 +118,12 @@ namespace Belle2 {
        * @param Py track momentum component y
        * @param Pz track momentum component z
        * @param Q track charge
-       * @param HYP true hypothesis
+       * @param HYP true hypothesis (optional)
+       * @param barID bar ID (optional)
        */
       void reconstruct(double X, double Y, double Z, double Tlen,
-                       double Px, double Py, double Pz, int Q, int HYP = 0);
+                       double Px, double Py, double Pz, int Q,
+                       int HYP = 0, int barID = 0);
 
       /**
        * Run reconstruction
@@ -174,7 +179,8 @@ namespace Belle2 {
        * @param sigma additional time smearing sigma
        * @return log likelihood
        */
-      double getLogL(double timeShift, double timeWindow, double sigma = 0.0) {
+      double getLogL(double timeShift, double timeWindow, double sigma = 0.0)
+      {
         float t0 = (float) timeShift;
         float twin = (float) timeWindow;
         float sigt = (float) sigma;
@@ -189,10 +195,10 @@ namespace Belle2 {
        * @param Len track length inside bar
        * @param Tlen track length from IP
        * @param Mom track momentum
-       * @param QbarID bar ID if hit, else -1
+       * @param barID bar ID if hit, else -1
        */
       void getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
-                       double& Tlen, double& Mom, int& QbarID);
+                       double& Tlen, double& Mom, int& barID);
 
       /**
        * Print log likelihoods to std output

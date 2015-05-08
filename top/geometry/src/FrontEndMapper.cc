@@ -40,7 +40,7 @@ namespace Belle2 {
 
       // read parameters from DB
       int numBars = 0; // counter of mapped bars
-      for (const GearDir & topModule : frontEndMapping.getNodes("TOPModule")) {
+      for (const GearDir& topModule : frontEndMapping.getNodes("TOPModule")) {
 
         int barID = topModule.getInt("@barID");
         if (barID <= 0 or barID > c_numModules) {
@@ -49,7 +49,7 @@ namespace Belle2 {
         }
 
         bool barMapped = false; // to count mapped bars
-        for (const GearDir & electronicsModule : topModule.getNodes("ElectronicsModule")) {
+        for (const GearDir& electronicsModule : topModule.getNodes("ElectronicsModule")) {
 
           int col = electronicsModule.getInt("@col");
           if (col < 0 or col >= c_numColumns) {
@@ -101,7 +101,7 @@ namespace Belle2 {
 
       // set conversion objects
 
-      for (const auto & feemap : m_mapping) {
+      for (const auto& feemap : m_mapping) {
         m_fromBarToScrod[feemap.barID - 1][feemap.column] = &feemap;
         m_fromScrodToBar[feemap.scrodID] = &feemap;
         m_fromCopperInputToBar[feemap.copperID * 4 + feemap.finesseID] = &feemap;

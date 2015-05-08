@@ -36,7 +36,8 @@ namespace Belle2 {
       /**
        * Clear the structure: set elements to zero
        */
-      void clear() {
+      void clear()
+      {
         e = mu = pi = K = p = d = 0;
       }
     };
@@ -65,7 +66,8 @@ namespace Belle2 {
       /**
        * Clear the structure: set elements to zero
        */
-      void clear() {
+      void clear()
+      {
         barID = PDG = 0;
         x = y = z = p = theta = phi = time = 0;
       }
@@ -115,7 +117,8 @@ namespace Belle2 {
       /**
        * Clear the structure: set elements to zero
        */
-      void clear() {
+      void clear()
+      {
         evt = 0;
         run = 0;
 

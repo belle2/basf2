@@ -94,7 +94,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     digits.clear();
 
-    for (auto & raw : rawData) {
+    for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
         int bufferSize = raw.GetDetectorNwords(0, finesse);

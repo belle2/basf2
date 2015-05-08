@@ -119,7 +119,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
     StoreArray<Track> tracks;
 
-    for (const auto & track : tracks) {
+    for (const auto& track : tracks) {
       const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
       if (!trackFit) continue;
       const TOPLikelihood* top = track.getRelated<TOPLikelihood>();

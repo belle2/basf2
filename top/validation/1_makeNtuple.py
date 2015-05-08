@@ -25,7 +25,7 @@ main = create_path()
 # Input
 roinput = register_module('RootInput')
 roinput.param('inputFileNames', ['../EvtGenSimRec_B2Kpi.root',
-              '../EvtGenSimRec.root'])
+                                 '../EvtGenSimRec.root'])
 main.add_module(roinput)
 
 # Gearbox: access to database (xml files)
@@ -51,4 +51,3 @@ process(main)
 
 # Print call statistics
 print statistics
-

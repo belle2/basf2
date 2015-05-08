@@ -51,7 +51,8 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
-                   const std::vector<unsigned short>& data) {
+                   const std::vector<unsigned short>& data)
+    {
       m_barID = barID;
       m_channelID = channelID;
       m_hardChannelID = hardChannelID;
@@ -179,7 +180,8 @@ namespace Belle2 {
      * Returns waveform
      * @return vector of ADC values
      */
-    const std::vector<unsigned short>& getWaveform() const {
+    const std::vector<unsigned short>& getWaveform() const
+    {
       return m_data;
     }
 

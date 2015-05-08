@@ -35,9 +35,10 @@
       ENDIF
 
       DO ITRA=1,N_RTRA
-         I_RTRA=ITRA
          CALL TRESHOLD_TEST(RTRA_P(ITRA),NHYP,RTRA_MASS,OK)
          IF(.NOT.OK) CYCLE
+         I_RTRA=ITRA
+         MODUL=RTRA_MOD(ITRA)
          PMOM=RTRA_P(ITRA)
          CALL SET_HELIX(RTRA_R0(1,ITRA),RTRA_DIR(1,ITRA),RTRA_P(ITRA),
      &        RTRA_CHARGE(ITRA),HLX)
@@ -79,44 +80,62 @@
       DO I=1,10
          HLX(I)=HLX0(I)
       ENDDO
+
+      IF(MODUL.LT.0) THEN
+
 !     move starting point to TOP_R1
-      RR=R0(1)**2+R0(2)**2
-      IF(RR.NE.TOP_R1**2) THEN
-         CALL XSEC_CYL(HLX,TOP_R1,T1,T2,OK)
-         IF(.NOT.OK) RETURN
-         IF(RR.LT.TOP_R1**2) THEN
-            T0=T1
-         ELSE
-            T0=T2-HLX(10)
+         RR=R0(1)**2+R0(2)**2
+         IF(RR.NE.TOP_R1**2) THEN
+            CALL XSEC_CYL(HLX,TOP_R1,T1,T2,OK)
+            IF(.NOT.OK) RETURN
+            IF(RR.LT.TOP_R1**2) THEN
+               T0=T1
+            ELSE
+               T0=T2-HLX(10)
+            ENDIF
+            CALL MOVE_PIVOT(HLX,T0)
          ENDIF
-         CALL MOVE_PIVOT(HLX,T0)
-      ENDIF
 
 !     find, which TOP module is intersected 
-      TMI=1.E10
-      DO I=0,NUM_MOD-1
-         CALL HLX_TO_LOCAL(HLX,I,HLX_LOC)
+         TMI=1.E10
+         DO I=0,NUM_MOD-1
+            CALL HLX_TO_LOCAL(HLX,I,HLX_LOC)
+            Y=0.
+            CALL XSEC_PLANE_Y(HLX_LOC,Y,T1,T2,OK)
+            IF(.NOT.OK) CYCLE
+            TMI=MIN(TMI,T1)
+            CALL GET_HLX_RDIR(HLX_LOC,T1,T_R0,T_DIR)
+            OK=ABS(T_R0(1)).LT.QBAR_A(I)/2.
+            IF(.NOT.OK) CYCLE
+            OK=ABS(T_R0(3)).LT.QBAR_C(I)/2.
+            IF(.NOT.OK) CYCLE
+            OK=INSIDE_QBAR(T_R0(1),T_R0(2),T_R0(3),I)
+            IF(.NOT.OK) CYCLE
+            MODUL=I
+            EXIT
+         ENDDO
+
+         IF(.NOT.OK) THEN
+            IF(TMI.LT.(1.E10)) THEN
+               CALL GET_HLX_RDIR(HLX,TMI,R,DIR)
+               IF(R(3).GT.TOP_Z1.AND.R(3).LT.TOP_Z2) FLAG=-1
+            ENDIF
+            RETURN
+         ENDIF
+      ELSE
+         T0=-10.0/C0
+         CALL MOVE_PIVOT(HLX,T0) ! ensure that both bar surfaces are infront of track
+         CALL HLX_TO_LOCAL(HLX,MODUL,HLX_LOC)
          Y=0.
          CALL XSEC_PLANE_Y(HLX_LOC,Y,T1,T2,OK)
-         IF(.NOT.OK) CYCLE
-         TMI=MIN(TMI,T1)
+         IF(.NOT.OK) RETURN
          CALL GET_HLX_RDIR(HLX_LOC,T1,T_R0,T_DIR)
-         OK=ABS(T_R0(1)).LT.QBAR_A(I)/2.
-         IF(.NOT.OK) CYCLE
-         OK=ABS(T_R0(3)).LT.QBAR_C(I)/2.
-         IF(.NOT.OK) CYCLE
-         OK=INSIDE_QBAR(T_R0(1),T_R0(2),T_R0(3),I)
-         IF(.NOT.OK) CYCLE
-         MODUL=I
-         EXIT
-      ENDDO
-
-      IF(.NOT.OK) THEN
-         IF(TMI.LT.(1.E10)) THEN
-            CALL GET_HLX_RDIR(HLX,TMI,R,DIR)
-            IF(R(3).GT.TOP_Z1.AND.R(3).LT.TOP_Z2) FLAG=-1
-         ENDIF
-         RETURN
+         OK=ABS(T_R0(1)).LT.QBAR_A(MODUL)/2.
+         IF(.NOT.OK) RETURN
+         OK=ABS(T_R0(3)).LT.QBAR_C(MODUL)/2.
+         IF(.NOT.OK) RETURN
+         OK=INSIDE_QBAR(T_R0(1),T_R0(2),T_R0(3),MODUL)
+         IF(.NOT.OK) RETURN
       ENDIF
 
 !     module is found

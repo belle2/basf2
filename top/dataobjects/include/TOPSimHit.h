@@ -37,7 +37,8 @@ namespace Belle2 {
       m_x(0.0),
       m_y(0.0),
       m_globalTime(0.0),
-      m_energy(0.0) {
+      m_energy(0.0)
+    {
     }
 
     /**
@@ -56,7 +57,8 @@ namespace Belle2 {
       double yLocal,
       double globalTime,
       double energy_eV
-    ): SimHitBase() {
+    ): SimHitBase()
+    {
       m_barID = barID;
       m_pmtID = pmtID;
       m_x = (float) xLocal;

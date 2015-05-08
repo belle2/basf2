@@ -36,7 +36,8 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      IRSConstants(): m_valid(false), m_run(0), m_runFrom(0), m_runTo(0) {
+      IRSConstants(): m_valid(false), m_run(0), m_runFrom(0), m_runTo(0)
+      {
         for (unsigned k = 0; k < c_NumBars; k++) {
           for (unsigned i = 0; i < c_NumChannels; i++) m_bar[k].push_back(0);
         }
@@ -45,10 +46,11 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      ~IRSConstants() {
+      ~IRSConstants()
+      {
         for (unsigned k = 0; k < c_NumBars; k++) {
           auto& bar = m_bar[k];
-          for (auto & channel : bar) {
+          for (auto& channel : bar) {
             if (channel) delete channel;
           }
         }
@@ -121,7 +123,8 @@ namespace Belle2 {
        * @param channel hardware channel number
        * @return pointer to the object or NULL
        */
-      const ASICChannelConstants* getConstants(int barID, unsigned channel) const {
+      const ASICChannelConstants* getConstants(int barID, unsigned channel) const
+      {
         if (barID < 1 or barID > c_NumBars) return 0;
         barID--;
         auto& bar = m_bar[barID];

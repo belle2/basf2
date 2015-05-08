@@ -31,7 +31,7 @@
       REAL S_T, R, OMEGA, VZ, FI0, XC, YC
 
       S_T=SQRT(DIR(1)**2+DIR(2)**2)
-      IF(B_FIELD.NE.0) THEN
+      IF(ABS(B_FIELD).GT.S_T*P/C0) THEN ! R < 100 m
          R=10000./C0*S_T*P/ABS(B_FIELD)
          OMEGA=C0**2/10000.*CHARGE*B_FIELD/P
          VZ=C0*DIR(3)

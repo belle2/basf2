@@ -33,7 +33,8 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      ASICGains(): m_asicWindow(0), m_unit(c_Unit), m_gainError(0) {
+      ASICGains(): m_asicWindow(0), m_unit(c_Unit), m_gainError(0)
+      {
         for (unsigned i = 0; i < c_WindowSize; i++) m_gains[i] = c_Unit;
       }
 
@@ -42,7 +43,8 @@ namespace Belle2 {
        * @param asicWindow ASIC window ID
        */
       ASICGains(unsigned short asicWindow):
-        m_asicWindow(asicWindow), m_unit(c_Unit), m_gainError(0) {
+        m_asicWindow(asicWindow), m_unit(c_Unit), m_gainError(0)
+      {
         for (unsigned i = 0; i < c_WindowSize; i++) m_gains[i] = c_Unit;
       }
 
@@ -71,7 +73,8 @@ namespace Belle2 {
        * @param i sample number
        * @return relative gain
        */
-      float getGain(unsigned i) const {
+      float getGain(unsigned i) const
+      {
         if (i < c_WindowSize) {
           return float(m_gains[i]) / float(m_unit);
         }
@@ -82,7 +85,8 @@ namespace Belle2 {
        * Return gain uncertainly
        * @return gain uncertainty
        */
-      float getGainError() const {
+      float getGainError() const
+      {
         return float(m_gainError) / float(m_unit);
       }
 

@@ -43,7 +43,8 @@ namespace Belle2 {
      * @param numTracks number of tracks in acceptance of TOP
      * @param usedTracks number of tracks used in bunch reconstruction
      */
-    void setReconstructed(int bunchNo, double time, int numTracks, int usedTracks) {
+    void setReconstructed(int bunchNo, double time, int numTracks, int usedTracks)
+    {
       m_recBunchNo = bunchNo;
       m_recTime = time;
       m_numTracks = numTracks;
@@ -55,7 +56,8 @@ namespace Belle2 {
      * Append log likelihood
      * @param logL log likelihood
      */
-    void addLogL(double logL) {
+    void addLogL(double logL)
+    {
       m_logL.push_back(logL);
     }
 
@@ -64,7 +66,8 @@ namespace Belle2 {
      * @param bunchNo relative bunch number
      * @param time relative bunch time
      */
-    void setSimulated(int bunchNo, double time) {
+    void setSimulated(int bunchNo, double time)
+    {
       m_simBunchNo = bunchNo;
       m_simTime = time;
       m_simValid = true;

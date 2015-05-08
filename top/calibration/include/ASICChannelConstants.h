@@ -33,7 +33,8 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      ASICChannelConstants(): m_barID(0), m_channel(0), m_timeInterval(0) {
+      ASICChannelConstants(): m_barID(0), m_channel(0), m_timeInterval(0)
+      {
         for (unsigned i = 0; i < c_TimeAxisSize; i++)
           m_timeAxis[i] = 0;
       }
@@ -45,7 +46,8 @@ namespace Belle2 {
        * @param numWindows number of active windows per ASIC
        */
       ASICChannelConstants(int barID, unsigned channel, int numWindows):
-        m_barID(barID), m_channel(channel) {
+        m_barID(barID), m_channel(channel)
+      {
         for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
         float timeBin = 1 / 2.77; //TODO get correct value
         setTimeAxis(timeBin);
@@ -55,11 +57,12 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      ~ASICChannelConstants() {
-        for (auto & window : m_pedestals) {
+      ~ASICChannelConstants()
+      {
+        for (auto& window : m_pedestals) {
           if (window) delete window;
         }
-        for (auto & window : m_gains) {
+        for (auto& window : m_gains) {
           if (window) delete window;
         }
       }
@@ -69,7 +72,8 @@ namespace Belle2 {
        * @param pedestals ASIC window pedestals
        * @return true on success
        */
-      bool setPedestals(const ASICPedestals& pedestals) {
+      bool setPedestals(const ASICPedestals& pedestals)
+      {
         unsigned i = pedestals.getAsicWindow();
         if (i < m_pedestals.size()) {
           if (m_pedestals[i]) {
@@ -87,7 +91,8 @@ namespace Belle2 {
        * @param gains ASIC window gains
        * @return true on success
        */
-      bool setGains(const ASICGains& gains) {
+      bool setGains(const ASICGains& gains)
+      {
         if (m_gains.empty()) {
           for (unsigned i = 0; i < m_pedestals.size(); i++) m_gains.push_back(NULL);
         }
@@ -113,7 +118,8 @@ namespace Belle2 {
        * Set equidistant time axis
        * @param timeBin time bin
        */
-      void setTimeAxis(float timeBin) {
+      void setTimeAxis(float timeBin)
+      {
         float t = 0;
         for (unsigned i = 0; i < c_TimeAxisSize; i++) {
           m_timeAxis[i] = t;
@@ -144,7 +150,8 @@ namespace Belle2 {
        * @param offset offset to be added
        * @return time axis
        */
-      std::vector<float> getTimeAxis(float offset = 0) const {
+      std::vector<float> getTimeAxis(float offset = 0) const
+      {
         std::vector<float> timeAxis;
         for (unsigned i = 0; i < c_TimeAxisSize; i++) {
           timeAxis.push_back(m_timeAxis[i] + offset);
@@ -156,7 +163,8 @@ namespace Belle2 {
        * Return number of ASIC windows
        * @return number of windows
        */
-      unsigned getNumofWindows() const {
+      unsigned getNumofWindows() const
+      {
         return m_pedestals.size();
       }
 
@@ -165,7 +173,8 @@ namespace Belle2 {
        * @param i ASIC window number
        * @return pointer to pedestals or NULL
        */
-      const ASICPedestals* getPedestals(unsigned i) const {
+      const ASICPedestals* getPedestals(unsigned i) const
+      {
         if (i < m_pedestals.size()) return m_pedestals[i];
         return NULL;
       }
@@ -175,7 +184,8 @@ namespace Belle2 {
        * @param i ASIC window number
        * @return pointer to gains or NULL
        */
-      const ASICGains* getGains(unsigned i) const {
+      const ASICGains* getGains(unsigned i) const
+      {
         if (i < m_gains.size()) return m_gains[i];
         return NULL;
       }
@@ -184,9 +194,10 @@ namespace Belle2 {
        * Return number of good ASIC windows (e.g. those with defined pedestals)
        * @return number of good windows
        */
-      unsigned getNumofGoodWindows() const {
+      unsigned getNumofGoodWindows() const
+      {
         unsigned n = 0;
-        for (auto & window : m_pedestals) if (window) n++;
+        for (auto& window : m_pedestals) if (window) n++;
         return n;
       }
 

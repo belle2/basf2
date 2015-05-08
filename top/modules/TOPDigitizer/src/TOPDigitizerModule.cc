@@ -201,7 +201,7 @@ namespace Belle2 {
 
     // set hardware channel ID
 
-    for (auto & digit : topDigits) {
+    for (auto& digit : topDigits) {
       unsigned chan = m_topgp->getHardwareChannelID(digit.getChannelID());
       digit.setHardwareChannelID(chan);
     }

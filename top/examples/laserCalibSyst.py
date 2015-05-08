@@ -21,7 +21,7 @@ def fiber(
     angle,
     barID=1,
     path=main,
-    ):
+):
 
     source1 = register_module('OpticalGun')
     source1.param('alpha', 60.0)
@@ -69,7 +69,7 @@ for barId in range(16):
         33.7,
         39.3,
         44.1,
-        ]:
+    ]:
         angle = 17
         x = -45. / 2. + pos
         fiber(x, angle, barId + 1, main)

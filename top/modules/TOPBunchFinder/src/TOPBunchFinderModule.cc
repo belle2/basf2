@@ -148,7 +148,7 @@ namespace Belle2 {
     // add photon hits to reconstruction object
 
     StoreArray<TOPDigit> topDigits;
-    for (const auto & digit : topDigits) {
+    for (const auto& digit : topDigits) {
       if (digit.getHitQuality() == TOPDigit::c_Good)
         reco.addData(digit.getBarID(), digit.getChannelID(), digit.getTDC());
     }
@@ -168,7 +168,7 @@ namespace Belle2 {
     // loop over reconstructed tracks and make sum of log likelihoods for diff. bunches
 
     StoreArray<Track> tracks;
-    for (const auto & track : tracks) {
+    for (const auto& track : tracks) {
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 

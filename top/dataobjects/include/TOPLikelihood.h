@@ -29,7 +29,8 @@ namespace Belle2 {
     /**
      * default constructor
      */
-    TOPLikelihood(): m_flag(0), m_numPhot(0), m_estBkg(0) {
+    TOPLikelihood(): m_flag(0), m_numPhot(0), m_estBkg(0)
+    {
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_logL[i] = 0;
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_estPhot[i] = 0;
     }
@@ -46,7 +47,8 @@ namespace Belle2 {
                   int numPhot,
                   const double* logL,
                   const double* estPhot,
-                  double estBkg) {
+                  double estBkg)
+    {
       m_flag = flag;
       m_numPhot = numPhot;
       m_estBkg = estBkg;
@@ -73,7 +75,8 @@ namespace Belle2 {
      * @param part charged stable particle
      * @return log likelihood
      */
-    float getLogL(const Const::ChargedStable& part) const {
+    float getLogL(const Const::ChargedStable& part) const
+    {
       return m_logL[part.getIndex()];
     }
 
@@ -82,7 +85,8 @@ namespace Belle2 {
      * @param part charged stable particle
      * @return estimated number of photons (signal + background)
      */
-    float getEstPhot(const Const::ChargedStable& part) const {
+    float getEstPhot(const Const::ChargedStable& part) const
+    {
       return m_estPhot[part.getIndex()];
     }
 

@@ -89,7 +89,7 @@ namespace Belle2 {
 
     StoreArray<TOPRawWaveform> waveforms;
 
-    for (auto & waveform : waveforms) {
+    for (auto& waveform : waveforms) {
       if (waveform.getBarID() != m_barID) continue;
       unsigned channel = waveform.getHardwareChannelID();
       unsigned window = waveform.getStorageWindow();
@@ -106,7 +106,7 @@ namespace Belle2 {
           m_profile[channel][window] = prof;
         }
         int i = 0;
-        for (const auto & adc : waveform.getWaveform()) {
+        for (const auto& adc : waveform.getWaveform()) {
           prof->Fill(i, adc);
           i++;
         }

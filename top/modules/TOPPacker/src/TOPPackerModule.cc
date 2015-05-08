@@ -96,7 +96,7 @@ namespace Belle2 {
 
     vector<const TOPDigit*>* sortedDigits = new vector<const TOPDigit*>[mapSize];
 
-    for (const auto & digit : digits) {
+    for (const auto& digit : digits) {
       int barID = digit.getBarID();
       int col = digit.getHardwareChannelID() / 128;
       const auto* feemap = mapper.getMap(barID, col);
@@ -117,7 +117,7 @@ namespace Belle2 {
     int bufferDim = 1 + sortedDigitsMaxsize; // 1 header word + 1 data word per digit
     int buffer[4][bufferDim];
 
-    for (const auto & copperID : mapper.getCopperIDs()) {
+    for (const auto& copperID : mapper.getCopperIDs()) {
       int bufferSize[4] = {0, 0, 0, 0};
       for (int finesse = 0; finesse < 4; finesse++) {
         auto* buf = buffer[finesse];
@@ -129,7 +129,7 @@ namespace Belle2 {
         unsigned version = 0;
         buf[i] = scrodID + (version << 16) + (dataFormat << 24);
         i++; // one header word
-        for (const auto & digit : sortedDigits[feemap->index]) {
+        for (const auto& digit : sortedDigits[feemap->index]) {
           unsigned tdc = digit->getTDC() & 0xFFFF;
           unsigned chan = digit->getHardwareChannelID() % 128;
           unsigned flags = (unsigned) digit->getHitQuality();

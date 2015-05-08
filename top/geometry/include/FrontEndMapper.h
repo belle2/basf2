@@ -53,7 +53,8 @@ namespace Belle2 {
              unsigned short scrod,
              unsigned copper,
              int finesse,
-             int i) {
+             int i)
+      {
         barID = bar;
         column = col;
         scrodID = scrod;
@@ -94,7 +95,8 @@ namespace Belle2 {
        * @param col column
        * @return pointer to map element or NULL
        */
-      const FEEMap* getMap(int barID, int col) const {
+      const FEEMap* getMap(int barID, int col) const
+      {
         barID--;
         if (barID >= 0 and barID < c_numModules and col >= 0 and col < c_numColumns)
           return m_fromBarToScrod[barID][col];
@@ -106,7 +108,8 @@ namespace Belle2 {
        * @param scrodID SCROD ID
        * @return pointer to map element or NULL
        */
-      const FEEMap* getMap(unsigned short scrodID) const {
+      const FEEMap* getMap(unsigned short scrodID) const
+      {
         std::map<unsigned short, const FEEMap*>::const_iterator it =
           m_fromScrodToBar.find(scrodID);
         if (it == m_fromScrodToBar.end()) return 0;
@@ -119,7 +122,8 @@ namespace Belle2 {
        * @param finesse Finesse slot number
        * @return pointer to map element or NULL
        */
-      const FEEMap* getMapFromCopper(unsigned copperID, int finesse) const {
+      const FEEMap* getMapFromCopper(unsigned copperID, int finesse) const
+      {
         std::map<unsigned int, const FEEMap*>::const_iterator it =
           m_fromCopperInputToBar.find(copperID * 4 + finesse);
         if (it == m_fromCopperInputToBar.end()) return 0;
@@ -136,7 +140,8 @@ namespace Belle2 {
        * Return a set of copper ID's
        * @return copper ID's
        */
-      const std::unordered_set<unsigned int>& getCopperIDs() const {
+      const std::unordered_set<unsigned int>& getCopperIDs() const
+      {
         return m_copperIDs;
       }
 

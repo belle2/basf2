@@ -24,15 +24,15 @@ from reconstruction import add_reconstruction
 class TOPDisplay(Module):
 
     '''
-    Simple event display for TOP. 
+    Simple event display for TOP.
     It displays single event timing distributions of modules using TOPDigits.
     Distributions of modules with the track impact are shown in red color.
     '''
 
-    ## 1D histograms
+    # 1D histograms
     hist = [TH1F('h' + str(i), 'bar#' + str(i), 128, 0.0, 4096.0) for i in
             range(16)]
-    ## canvas
+    # canvas
     c1 = TCanvas('c1', 'TOP event display', 1000, 800)
 
     def initialize(self):
@@ -42,8 +42,8 @@ class TOPDisplay(Module):
         self.c1.Show()
 
     def event(self):
-        ''' 
-        Event processor: reset and fill the histograms, display them, 
+        '''
+        Event processor: reset and fill the histograms, display them,
         wait for user respond.
         '''
 
@@ -87,7 +87,7 @@ class TOPDisplay(Module):
 
 
 # Check if the display is set (needed for canvas)
-if not os.environ.has_key('DISPLAY'):
+if 'DISPLAY' not in os.environ:
     print 'DISPLAY variable is not set'
     print '- to set it in bash: export DISPLAY=:0'
     print '- to set it in csh:  setenv DISPLAY :0'
@@ -111,7 +111,7 @@ main.add_module(evtgeninput)
 
 # Detector simulation
 bg = None
-if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 

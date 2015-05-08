@@ -50,12 +50,12 @@ def wait():
 class WFDisplay(Module):
 
     '''
-    Simple event display of raw waveforms. 
+    Simple event display of raw waveforms.
     '''
 
-    ## 1D histograms
+    # 1D histograms
     hist = [TH1F('h' + str(i), 'wf', 64, 0.0, 64.0) for i in range(16)]
-    ## canvas
+    # canvas
     c1 = TCanvas('c1', 'WF event display', 800, 800)
 
     def initialize(self):
@@ -69,7 +69,7 @@ class WFDisplay(Module):
         k,
         event,
         run,
-        ):
+    ):
         ''' Draw histograms and wait for user respond '''
 
         self.c1.Clear()
@@ -87,8 +87,8 @@ class WFDisplay(Module):
         return stat
 
     def event(self):
-        ''' 
-        Event processor: fill the histograms, display them, 
+        '''
+        Event processor: fill the histograms, display them,
         wait for user respond.
         '''
 
@@ -147,7 +147,7 @@ col1 = bar1 + "ElectronicsModule[@col = '1']/SCRODid"
 col2 = bar1 + "ElectronicsModule[@col = '2']/SCRODid"
 col3 = bar1 + "ElectronicsModule[@col = '3']/SCRODid"
 gearbox.param('override', [(col0, '59', ''), (col1, '66', ''), (col2, '65', ''
-              ), (col3, '67', '')])
+                                                                ), (col3, '67', '')])
 main.add_module(gearbox)
 
 geometry = register_module('Geometry')

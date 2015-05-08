@@ -98,7 +98,8 @@ namespace Belle2 {
        * @param data pointer to finesse buffer (pointer must be valid)
        * @param size buffer size
        */
-      DataArray(const int* data, int size) {
+      DataArray(const int* data, int size)
+      {
         m_data = data;
         m_size = size;
         m_i = 0;
@@ -108,7 +109,8 @@ namespace Belle2 {
        * Returns consecutive data word
        * @return data word
        */
-      int getWord() {
+      int getWord()
+      {
         m_i++;
         if (m_i < m_size) {
           return m_data[m_i];

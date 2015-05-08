@@ -64,7 +64,7 @@
       END
 
 
-      SUBROUTINE RTRA_PUT(X0,Y0,Z0,T0,PX,PY,PZ,Q,HYP,REF,MCREF)
+      SUBROUTINE RTRA_PUT(X0,Y0,Z0,T0,PX,PY,PZ,Q,HYP,REF,MDN)
 
       IMPLICIT NONE
       REAL X0, Y0, Z0           ! track: point [cm] 
@@ -73,7 +73,7 @@
       INTEGER Q                 ! track: charge (+/-1)
       INTEGER HYP               ! hypothesis to measure pulls
       INTEGER REF               ! reference
-      INTEGER MCREF             ! reference used in MTRA_PUT (if >0), dummy now!
+      INTEGER MDN               ! module number
 #include "TOP_RTRA.fi"
       INTEGER K, I
       REAL P
@@ -98,9 +98,10 @@
          RTRA_PLKH(I,K)=0.
          RTRA_SFOT(I,K)=0.
       ENDDO
+      RTRA_BFOT(K)=0
       RTRA_NFOT(K)=0
       RTRA_FLAG(K)=0
-      RTRA_MOD(K)=-1
+      RTRA_MOD(K)=MDN
       DO I=1,3
          RTRA_TR(I,K)=0.
          RTRA_TDIR(I,K)=0.
@@ -108,15 +109,6 @@
       RTRA_TLEN(K)=0.
       RTRA_TOFC0(K)=0.
       RTRA_MTRA(K)=0
-c      IF(MCREF.GT.0) THEN
-c         DO I=1,N_MTRA
-c            IF(MCREF.EQ.MTRA_REF(I)) THEN
-c               MTRA_RTRA(I)=K
-c               RTRA_MTRA(K)=I
-c               EXIT
-c            ENDIF
-c         ENDDO
-c      ENDIF
       RTRA_REF(K)=REF
       RTRA_HYP(K)=HYP
       N_RTRA=K

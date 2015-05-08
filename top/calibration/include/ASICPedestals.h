@@ -32,7 +32,8 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      ASICPedestals(): m_asicWindow(0), m_offset(0) {
+      ASICPedestals(): m_asicWindow(0), m_offset(0)
+      {
         for (unsigned i = 0; i < c_WindowSize; i++) m_pedestals[i] = 0;
       }
 
@@ -40,7 +41,8 @@ namespace Belle2 {
        * Constructor with ASIC window
        * @param asicWindow ASIC window ID
        */
-      ASICPedestals(unsigned short asicWindow): m_asicWindow(asicWindow), m_offset(0) {
+      ASICPedestals(unsigned short asicWindow): m_asicWindow(asicWindow), m_offset(0)
+      {
         for (unsigned i = 0; i < c_WindowSize; i++) m_pedestals[i] = 0;
       }
 
@@ -68,7 +70,8 @@ namespace Belle2 {
        * @param i sample number
        * @return pedestal value
        */
-      float getPedestal(unsigned i) const {
+      float getPedestal(unsigned i) const
+      {
         if (i < c_WindowSize) {
           return (m_pedestals[i] & 0x00FF) + m_offset;
         }
@@ -80,7 +83,8 @@ namespace Belle2 {
        * @param i sample number
        * @return pedestal uncertainty
        */
-      float getPedestalError(unsigned i) const {
+      float getPedestalError(unsigned i) const
+      {
         if (i < c_WindowSize) {
           return (m_pedestals[i] >> 8) / sqrt(12.0);
         }

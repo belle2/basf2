@@ -39,7 +39,7 @@ geometry.param('components', [
     'SVD',
     'CDC',
     'TOP',
-    ])
+])
 main.add_module(geometry)
 
 # Particle gun: generate multiple tracks
@@ -79,6 +79,10 @@ main.add_module(svd_clusterizer)
 # CDC digitization
 cdcDigitizer = register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
+
+# Material effects for all track extrapolations
+material_effects = register_module('SetupGenfitExtrapolation')
+main.add_module(material_effects)
 
 # MC track finder (for simplicity)
 mctrackfinder = register_module('TrackFinderMCTruth')

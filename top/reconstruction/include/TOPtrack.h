@@ -132,7 +132,8 @@ namespace Belle2 {
        * @param particle charged stable particle
        * @return time-of-flight
        */
-      double getTOF(const Const::ChargedStable& particle) const {
+      double getTOF(const Const::ChargedStable& particle) const
+      {
         return getTOF(particle.getMass());
       }
 
@@ -148,7 +149,8 @@ namespace Belle2 {
        * @param tof time-of-flight
        * @param particle charged stable particle
        */
-      void setTrackLength(double tof, const Const::ChargedStable& particle) {
+      void setTrackLength(double tof, const Const::ChargedStable& particle)
+      {
         setTrackLength(tof, particle.getMass());
       }
 

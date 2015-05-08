@@ -69,7 +69,9 @@ namespace Belle2 {
     addParam("numPhotons", m_numPhotons,
              "average number of photons per pulse, if positive, otherwise exactly one",
              0.0);
-    addParam("barID", m_barID, "TOP bar ID: if valid, source position and rotation angles assumed to be given in a local bar frame, otherwise Belle II frame assumed", 0);
+    addParam("barID", m_barID,
+             "TOP bar ID: if valid, source position and rotation angles assumed to be given in a local bar frame, otherwise Belle II frame assumed",
+             0);
     addParam("slitDX", m_slitDX, "slit size in x [cm], if positive, otherwise full open",
              0.0);
     addParam("slitDY", m_slitDY, "slit size in y [cm], if positive, otherwise full open",

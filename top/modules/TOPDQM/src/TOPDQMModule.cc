@@ -135,7 +135,7 @@ namespace Belle2 {
 
     StoreArray<TOPDigit> digits;
 
-    for (TOPDigit & digit : digits) {
+    for (TOPDigit& digit : digits) {
       m_barHits->Fill(digit.getBarID());
       int i = digit.getBarID() - 1;
       if (i < 0 || i >= m_topgp->getNbars()) {

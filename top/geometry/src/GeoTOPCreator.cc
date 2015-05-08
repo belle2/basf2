@@ -270,7 +270,8 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(-length / 2.0 - Gwidth1 - WLength - dGlue,
                                     Qthickness / 2.0));
 
-      G4ExtrudedSolid* wedge = new  G4ExtrudedSolid("wedge", polygon, Wwidth / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
+      G4ExtrudedSolid* wedge = new  G4ExtrudedSolid("wedge", polygon, Wwidth / 2.0, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0),
+                                                    1.0);
 
       G4LogicalVolume* qwedge = new G4LogicalVolume(wedge, quartzMaterial, "qwedge");
 
@@ -322,7 +323,8 @@ namespace Belle2 {
       //! get the PMT stack and position it
       G4LogicalVolume* stack = buildPMTstack(content);
 
-      G4double dz = Bposition - WLength - Gwidth1 - m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) / 2.0;
+      G4double dz = Bposition - WLength - Gwidth1 - m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() +
+                    m_topgp->getBotthickness()) / 2.0;
       G4double dx = (-Wextdown) / 2.0;
 
       G4RotationMatrix* rotsta = new G4RotationMatrix(M_PI / 2.0, -M_PI / 2.0, -M_PI / 2.0);
@@ -415,7 +417,8 @@ namespace Belle2 {
       polygon.push_back(G4TwoVector(ZBackward,
                                     downside - LowerGap - PlateThickness));
 
-      G4ExtrudedSolid* supportShape = new  G4ExtrudedSolid("support", polygon, side + SideGap + PlateThickness, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
+      G4ExtrudedSolid* supportShape = new  G4ExtrudedSolid("support", polygon, side + SideGap + PlateThickness, G4TwoVector(0.0, 0.0),
+                                                           1.0, G4TwoVector(0.0, 0.0), 1.0);
 
       //! Build inside air
       std::vector<G4TwoVector> polygon2;
@@ -447,7 +450,8 @@ namespace Belle2 {
       cout<<endl;
       */
 
-      G4ExtrudedSolid* airShape = new  G4ExtrudedSolid("air", polygon2, side + SideGap, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0), 1.0);
+      G4ExtrudedSolid* airShape = new  G4ExtrudedSolid("air", polygon2, side + SideGap, G4TwoVector(0.0, 0.0), 1.0, G4TwoVector(0.0, 0.0),
+                                                       1.0);
 
       /*! Read support and fill materials */
 
@@ -493,8 +497,10 @@ namespace Belle2 {
       setColor(*pcb2, "rgb(0.0,1.0,0.0,1.0)");
 
 
-      G4ThreeVector transPCB(Z1 - WLength - 2 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) - m_topgp->getBotthickness() / 2.0, -Wextdown / 2.0, 0.);
-      G4ThreeVector transPCB2(Z1 - WLength - 3 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() + m_topgp->getBotthickness()) - m_topgp->getBotthickness() - y / 2.0, -Wextdown / 2.0, 0.);
+      G4ThreeVector transPCB(Z1 - WLength - 2 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() +
+                             m_topgp->getBotthickness()) - m_topgp->getBotthickness() / 2.0, -Wextdown / 2.0, 0.);
+      G4ThreeVector transPCB2(Z1 - WLength - 3 * m_topgp->getdGlue() - (m_topgp->getWinthickness() + m_topgp->getMsizez() +
+                              m_topgp->getBotthickness()) - m_topgp->getBotthickness() - y / 2.0, -Wextdown / 2.0, 0.);
 
       new G4PVPlacement(0, transPCB, pcb1, "TOP.electronics", air, false, 0);
       new G4PVPlacement(0, transPCB2, pcb2, "TOP.electronics", air, false, 0);

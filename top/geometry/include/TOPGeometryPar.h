@@ -180,7 +180,8 @@ namespace Belle2 {
        * @param ID Q-bar ID
        * @return pointer to Q-bar or NULL
        */
-      const TOPQbar* getQbar(int ID) const {
+      const TOPQbar* getQbar(int ID) const
+      {
         if (ID < 1 || ID > (int) m_bars.size()) return NULL;
         return &m_bars[ID - 1];
       }
@@ -330,7 +331,8 @@ namespace Belle2 {
        * @param time [ns]
        * @return TDC TDC count
        */
-      int getTDCcount(double time) const {
+      int getTDCcount(double time) const
+      {
         time += m_TDCoffset;
         if (time < 0) return TDCoverflow();
         if (time > TDCoverflow() * m_TDCwidth) return TDCoverflow();
@@ -475,7 +477,8 @@ namespace Belle2 {
        * @return software channel ID
        */
       int getChannelID(int electronicsModule, int asicRow,
-                       int asicColumn, int asicChannel) const {
+                       int asicColumn, int asicChannel) const
+      {
         return 4 - (asicChannel % 8) / 2 + (asicChannel % 2) * 64 + asicColumn * 4
                + electronicsModule * 16 + asicRow * 128;
       }
@@ -485,7 +488,8 @@ namespace Belle2 {
        * @param channel hardware channel ID
        * @return software channel ID
        */
-      int getChannelID(unsigned int channel) const {
+      int getChannelID(unsigned int channel) const
+      {
         unsigned asicChannel = channel % 8; channel /= 8;
         unsigned asicRow = channel % 4; channel /= 4;
         unsigned asicCol = channel % 4; channel /= 4;
@@ -498,7 +502,8 @@ namespace Belle2 {
        * @param pixel software channel ID
        * @return electronic module number
        */
-      int getElectronicsModuleNumber(int pixel) const {
+      int getElectronicsModuleNumber(int pixel) const
+      {
         return ((pixel - 1) % 64) / 16;
       }
 
@@ -507,7 +512,8 @@ namespace Belle2 {
        * @param pixel software channel ID
        * @return ASIC row
        */
-      int getAsicRow(int pixel) const {
+      int getAsicRow(int pixel) const
+      {
         return (pixel - 1) / 128;
       }
 
@@ -516,7 +522,8 @@ namespace Belle2 {
        * @param pixel software channel ID
        * @return ASIC column
        */
-      int getAsicColumn(int pixel) const {
+      int getAsicColumn(int pixel) const
+      {
         return ((pixel - 1) % 16) / 4;
       }
 
@@ -525,7 +532,8 @@ namespace Belle2 {
        * @param pixel software channel ID
        * @return ASIC channel
        */
-      int getAsicChannel(int pixel) const {
+      int getAsicChannel(int pixel) const
+      {
         return 2 * ((3 - (pixel - 1) % 4)) + ((pixel - 1) % 128) / 64;
       }
 
@@ -534,7 +542,8 @@ namespace Belle2 {
        * @param pixel software channel ID
        * @return hardware channel ID
        */
-      unsigned getHardwareChannelID(int pixel) const {
+      unsigned getHardwareChannelID(int pixel) const
+      {
         unsigned asicChannel = getAsicChannel(pixel);
         unsigned asicRow = getAsicRow(pixel);
         unsigned asicCol = getAsicColumn(pixel);
@@ -548,7 +557,8 @@ namespace Belle2 {
        * @param column electronics module number (a column within TOP module)
        * @return hardware channel ID
        */
-      unsigned getHardwareChannelID(unsigned ColRowChannel, unsigned column) const {
+      unsigned getHardwareChannelID(unsigned ColRowChannel, unsigned column) const
+      {
         return ColRowChannel + column * 128;
       }
 
@@ -574,7 +584,8 @@ namespace Belle2 {
       /** Get forward possition
        * @return forward possition of the bar (segmen 1+2+3 + glues)
        */
-      double getZ2() const {
+      double getZ2() const
+      {
         return (m_Bposition + m_Length1 + m_Gwidth2 + m_Length2 + m_Gwidth3 + m_Length3)
                / m_unit;
       }

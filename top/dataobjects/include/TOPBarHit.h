@@ -39,7 +39,8 @@ namespace Belle2 {
       m_py(0.0),
       m_pz(0.0),
       m_time(0.0),
-      m_length(0.) {
+      m_length(0.)
+    {
     }
 
     /*!  Full constructor
@@ -59,7 +60,8 @@ namespace Belle2 {
       TVector3 momentum,
       double time,
       double length
-    ) {
+    )
+    {
       m_barID = barID;
       m_pdg = PDG;
       m_x0 = (float) origin.x();

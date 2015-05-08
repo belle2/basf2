@@ -43,7 +43,8 @@ namespace Belle2 {
       m_pzd(0.0),
       m_td(0.0),
       m_length(0.0),
-      m_energy(0.0) {
+      m_energy(0.0)
+    {
     }
 
     /*!  Full constructor.
@@ -67,7 +68,8 @@ namespace Belle2 {
       double detectionTime,
       double length,
       double energy_eV
-    ) {
+    )
+    {
       m_barID = barID;
       m_xe = (float) emissionPoint.x();
       m_ye = (float) emissionPoint.y();

@@ -75,7 +75,7 @@ namespace Belle2 {
       // delete old calibration constants
       for (unsigned k = 0; k < c_NumBars; k++) {
         auto& bar = m_bar[k];
-        for (auto & channel : bar) {
+        for (auto& channel : bar) {
           if (channel) delete channel;
         }
       }
@@ -116,7 +116,7 @@ namespace Belle2 {
 
       for (unsigned k = 0; k < c_NumBars; k++) {
         auto& bar = m_bar[k];
-        for (auto & channel : bar) {
+        for (auto& channel : bar) {
           if (!channel) continue;
           if (channel->getNumofGoodWindows() == 0) continue;
           channelConstants = channel;

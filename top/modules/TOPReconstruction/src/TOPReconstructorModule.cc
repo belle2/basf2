@@ -137,7 +137,7 @@ namespace Belle2 {
 
     // Initialize masses
 
-    for (const auto & part : Const::chargedStableSet) {
+    for (const auto& part : Const::chargedStableSet) {
       m_masses[part.getIndex()] = part.getMass();
       m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
     }

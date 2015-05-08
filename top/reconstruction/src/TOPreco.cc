@@ -56,19 +56,20 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int QbarID, int chID, int TDC, double t0)
+    int TOPreco::addData(int barID, int chID, int TDC, double t0)
     {
       int status;
-      QbarID--; // 0-based ID used in fortran
+      barID--; // 0-based ID used in fortran
       chID--;   // 0-based ID used in fortran
       float T0 = (float) t0;
-      data_put_(&QbarID, &chID, &TDC, &T0, &status);
+      data_put_(&barID, &chID, &TDC, &T0, &status);
       return status;
     }
 
 
     void TOPreco::reconstruct(double X, double Y, double Z, double Tlen,
-                              double Px, double Py, double Pz, int Q, int HYP)
+                              double Px, double Py, double Pz, int Q,
+                              int HYP, int barID)
     {
       m_hypID = HYP;
       float x = (float) X;
@@ -78,18 +79,20 @@ namespace Belle2 {
       float px = (float) Px;
       float py = (float) Py;
       float pz = (float) Pz;
-      int REF = 0; int MCREF = 0;
+      int REF = 0;
+      barID--; // 0-based ID used in fortran
       rtra_clear_();
-      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_hypID, &REF, &MCREF);
+      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_hypID, &REF, &barID);
       top_reco_();
     }
 
     void TOPreco::reconstruct(TOPtrack& trk)
     {
-      //      m_hypID = trk.getHypID();
       m_hypID = abs(trk.getPDGcode());
+      int barID = trk.getBarID();
       reconstruct(trk.getX(), trk.getY(), trk.getZ(), trk.getTrackLength(),
-                  trk.getPx(), trk.getPy(), trk.getPz(), trk.getCharge(), m_hypID);
+                  trk.getPx(), trk.getPy(), trk.getPz(), trk.getCharge(),
+                  m_hypID, barID);
     }
 
     int TOPreco::getFlag()
@@ -137,11 +140,12 @@ namespace Belle2 {
     }
 
     void TOPreco::getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
-                              double& Tlen, double& Mom, int& QbarID)
+                              double& Tlen, double& Mom, int& barID)
     {
       int K = 1;
       float r[3], dir[3], len, tof, p;
-      rtra_gethit_(&K, &LocGlob, r, dir, &len, &tof, &p, &QbarID);
+      rtra_gethit_(&K, &LocGlob, r, dir, &len, &tof, &p, &barID);
+      barID++;
       for (int i = 0; i < 3; i++) {
         R[i] = r[i];
         Dir[i] = dir[i];
@@ -182,12 +186,12 @@ namespace Belle2 {
     void TOPreco::dumpTrackHit(int LocGlob)
     {
       double r[3], dir[3], len, Tlen, p;
-      int QbarID;
-      getTrackHit(LocGlob, r, dir, len, Tlen, p, QbarID);
+      int barID;
+      getTrackHit(LocGlob, r, dir, len, Tlen, p, barID);
 
       using namespace std;
       cout << showpoint << fixed << right;
-      cout << "TOPreco::dumpTrackHit: QbarID=" << QbarID;
+      cout << "TOPreco::dumpTrackHit: barID=" << barID;
       cout << "  Len=" << setprecision(2) << len;
       cout << "cm  Tlen=" << setprecision(1) << Tlen;
       cout << "cm  p=" << setprecision(2) << p << "GeV/c" << endl;

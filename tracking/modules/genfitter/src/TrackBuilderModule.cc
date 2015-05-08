@@ -20,9 +20,8 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/dataobjects/Helix.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
@@ -32,9 +31,7 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace CDC;
 
 REG_MODULE(TrackBuilder)
 
@@ -49,18 +46,18 @@ TrackBuilderModule::TrackBuilderModule() :
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
            "Name of collection holding the genfit::TrackCandidates (should be "
            "created by the pattern recognition or MCTrackFinderModule).",
-           string(""));
+           std::string(""));
   addParam("GFTracksColName", m_gfTracksColName,
            "Name of collection holding the final genfit::Tracks (created by GenFitterModule)",
-           string(""));
+           std::string(""));
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)",
-           string(""));
+           std::string(""));
 
   addParam("beamSpot", m_beamSpot,
            "Point on line parallel z to which the fitted track will be "
            "extrapolated in order to put together the TrackFitResults.",
-           vector<double> {0.0, 0.0, 0.0});
+           std::vector<double> {0.0, 0.0, 0.0});
 }
 
 TrackBuilderModule::~TrackBuilderModule()

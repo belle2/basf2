@@ -24,35 +24,119 @@ namespace Belle2 {
   (momentum, energy) to a flat ntuple. */
   class NtupleErrMatrixTool : public NtupleFlatTool {
   private:
-    /** Error matrix elements */
+
+    /** 7x7 MomentumVertex Error matrix element: E */
+
     float* m_err00;
+
+    /** 7x7 MomentumVertex Error matrix element: (Px, E) */
+
     float* m_err10;
+
+    /** 7x7 MomentumVertex Error matrix element: Px */
+
     float* m_err11;
+
+    /** 7x7 MomentumVertex Error matrix element: (Py, E) */
+
     float* m_err20;
+
+    /** 7x7 MomentumVertex Error matrix element: (Py, Px) */
+
     float* m_err21;
+
+    /** 7x7 MomentumVertex Error matrix element: Py */
+
     float* m_err22;
+
+    /** 7x7 MomentumVertex Error matrix element: (Pz, E) */
+
     float* m_err30;
+
+    /** 7x7 MomentumVertex Error matrix element: (Pz, Px) */
+
     float* m_err31;
+
+    /** 7x7 MomentumVertex Error matrix element: (Pz, Py) */
+
     float* m_err32;
+
+    /** 7x7 MomentumVertex Error matrix element: Pz */
+
     float* m_err33;
+
+    /** 7x7 MomentumVertex Error matrix element: (X, E) */
+
     float* m_err40;
+
+    /** 7x7 MomentumVertex Error matrix element: (X, Px) */
+
     float* m_err41;
+
+    /** 7x7 MomentumVertex Error matrix element: (X, Py) */
+
     float* m_err42;
+
+    /** 7x7 MomentumVertex Error matrix element: (X, Pz) */
+
     float* m_err43;
+
+    /** 7x7 MomentumVertex Error matrix element: X */
+
     float* m_err44;
+
+    /** 7x7 MomentumVertex Error matrix element: (Y, E) */
+
     float* m_err50;
+
+    /** 7x7 MomentumVertex Error matrix element: (Y, Px) */
+
     float* m_err51;
+
+    /** 7x7 MomentumVertex Error matrix element: (Y, Py) */
+
     float* m_err52;
+
+    /** 7x7 MomentumVertex Error matrix element: (Y, Pz) */
+
     float* m_err53;
+
+    /** 7x7 MomentumVertex Error matrix element: (Y, X) */
+
     float* m_err54;
+
+    /** 7x7 MomentumVertex Error matrix element: Y */
+
     float* m_err55;
+
+    /** 7x7 MomentumVertex Error matrix element: (Z, E) */
+
     float* m_err60;
+
+    /** 7x7 MomentumVertex Error matrix element: (Z, Px) */
+
     float* m_err61;
+
+    /** 7x7 MomentumVertex Error matrix element: (Z, Py) */
+
     float* m_err62;
+
+    /** 7x7 MomentumVertex Error matrix element: (Z, Px) */
+
     float* m_err63;
+
+    /** 7x7 MomentumVertex Error matrix element: (Z, X) */
+
     float* m_err64;
+
+    /** 7x7 MomentumVertex Error matrix element: (Z, Y) */
+
     float* m_err65;
+
+    /** 7x7 MomentumVertex Error matrix element: Z */
+
     float* m_err66;
+
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

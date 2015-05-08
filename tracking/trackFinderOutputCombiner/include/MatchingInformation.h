@@ -104,8 +104,14 @@ namespace Belle2 {
         m_maxPerpS = m_perpSList.back();
       }
 
+      void setGoodSegmentTrain(const std::vector<SegmentInformation*>& goodFittingSegmentTrain)
+      {
+        m_goodFittingSegmentTrain = * goodFittingSegmentTrain;
+      }
+
     private:
       std::vector<double> m_perpSList;
+      std::vector<SegmentInformation*>* m_goodFittingSegmentTrain;
       double m_minPerpS;
       double m_maxPerpS;
     };

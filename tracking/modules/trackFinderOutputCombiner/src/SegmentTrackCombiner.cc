@@ -10,7 +10,7 @@ REG_MODULE(SegmentTrackCombiner);
 
 void SegmentTrackCombinerModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks)
 {
-  /*m_lookUp.fillWith(tracks, segments);
+  m_lookUp.fillWith(tracks, segments);
   m_lookUp.combine();
 
   // Delete all used segments
@@ -18,5 +18,5 @@ void SegmentTrackCombinerModule::generate(std::vector<CDCRecoSegment2D>& segment
     return segment.size() == 0 or segment.getAutomatonCell().hasTakenFlag();
   }), segments.end());
 
-  B2WARNING("After all there are " << segments.size() << " Segments left in this event.")*/
+  B2WARNING("After all there are " << segments.size() << " Segments left in this event.")
 }

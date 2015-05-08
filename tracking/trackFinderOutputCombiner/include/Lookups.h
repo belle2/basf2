@@ -92,7 +92,15 @@ namespace Belle2 {
 
       /**
        * Do the heavy combining works:
-       * TODO: DESCRIBE!
+       * - Go through all superlayers
+       * - In each superlayer: Go through all segments in this superlayer and match them to the tracks.
+       *   If a match is made is calculated using the method segmentMatchesToTrack.
+       *   After that we have a segment <-> track network.
+       * - Go through all tracks and try to concatenate the segments in this superlayer to a larger segment train that fits together.
+       *   For deciding if a list of segments could be a train we use the method couldBeASegmentTrain.
+       * - If there is more than one segment (or train of segments) in this superlayer, that match to this track, we use a fit to decide
+       *   which train of segments should be kept.
+       * - If there is (now) only one possible train/segment left, we mark this as the goodSegmentTrain for this track.
        */
       void combine();
 
@@ -100,15 +108,18 @@ namespace Belle2 {
       const float m_param_percentageForPerpSMeasurements = 0.05;
       const float m_param_minimalFitProbability = 0.5;
 
-      void createTracksForOutput(std::vector<TrackFindingCDC::CDCTrack>& tracks);
+      bool segmentMatchesToTrack(const SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
+      bool couldBeASegmentTrain(const TrainOfSegments& list, const TrackInformation* trackInformation);
+
+      const TrainOfSegments& findBestFittingSegmentTrain(const std::list<TrainOfSegments>& trainsOfSegments,
+                                                         TrackInformation* trackInformation);
       void combineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments);
       void matchTracksToSegment(SegmentInformation* segmentInformation);
-      bool segmentMatchesToTrack(const SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
-      bool doesFitTogether(const TrainOfSegments& list, const TrackInformation* trackInformation);
       void makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
-      void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
       double testFitSegmentToTrack(const SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
-      void createTrainsOfSegments(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
+      void createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
+      void createTracksForOutput(std::vector<TrackFindingCDC::CDCTrack>& tracks);
+      void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
 
     private:
       TrackLookUp m_trackLookUp;

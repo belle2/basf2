@@ -283,8 +283,8 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
 }
 void DisplayUI::handleEvent(Event_t* event)
 {
-  //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode);
-  if (event->fType != kGKeyPress) {
+  if (event->fType == kGKeyPress) {
+    //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode);
     switch (event->fCode) {
       case 117: //Page Down
         next();

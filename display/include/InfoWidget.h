@@ -22,10 +22,9 @@ namespace Belle2 {
     /** reset for new event. */
     void newEvent();
 
-    /** Navigate to given URI of the form "entryName/arrayIndex".
+    /** Navigate to given URI
      *
-     * "/" will show DataStore overview, "entryName/" shows the given array or object.
-     *
+     * @param uri what to show, see InfoWidget::URI
      * @param clearSelection when showing an object, this determines  wether to clear
      *        an existing selection
      */
@@ -35,7 +34,7 @@ namespace Belle2 {
      *
      * Special in that it doesn't clear the current selection.
      */
-    void show(const TObject* obj) { show(getURI(obj).Data(), false); }
+    void show(const TObject* obj);
 
     /** navigate to previous page, clearing current page from history. */
     void back();
@@ -47,13 +46,16 @@ namespace Belle2 {
     /** a parsed URI. */
     struct URI {
       URI(): object(0), entryName(""), arrayIndex(-1) { }
+      /** Construct URI by parsing given string. */
+      explicit URI(const TString& uri);
+
+      /** get URI string to given object. */
+      static TString getURI(const TObject* obj);
 
       const TObject* object; /**< object referenced (or NULL). */
       TString entryName; /**< name of DataStore entry. */
       int arrayIndex; /**< index in array, only valid if arrayName and object are filled. */
     };
-    /** Construct URI by parsing given string. */
-    URI parseURI(const TString& uri);
 
     /** create DataStore overview. */
     TString createMainPage() const;
@@ -73,9 +75,6 @@ namespace Belle2 {
 
     /** Where is this object in the datastore? */
     static TString getIdentifier(const TObject* obj);
-
-    /** get URI to this object. */
-    static TString getURI(const TObject* obj);
 
     /** return entry name & index for arrays, with index = -1 for objects. */
     static std::pair<std::string, int> getDataStorePosition(const TObject* obj);

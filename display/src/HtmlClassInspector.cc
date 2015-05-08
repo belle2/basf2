@@ -1,5 +1,7 @@
 #include <display/HtmlClassInspector.h>
 
+#include <framework/utilities/HTML.h>
+
 #include <TDataType.h>
 #include <TDataMember.h>
 #include <TClass.h>
@@ -9,9 +11,43 @@
 
 using namespace Belle2;
 
+TString HtmlClassInspector::getMemberData(const TObject* obj)
+{
+  HtmlClassInspector dm;
+  const_cast<TObject*>(obj)->ShowMembers(dm);
+  return dm.getTable();
+}
+
+TString HtmlClassInspector::getClassInfo(const TClass* cl)
+{
+  if (!cl)
+    return "";
+  TString info;
+  info += "<b>";
+  info += HTML::htmlToPlainText(cl->GetName());
+  info += "</b> (";
+
+  TString title(HTML::htmlToPlainText(stripTitle(cl->GetTitle()).Data()));
+  return info + title + ")<br> <br>";
+}
+
+TString HtmlClassInspector::stripTitle(TString title)
+{
+  title = title.Strip(TString::kBoth, '/');
+  title = title.Strip(TString::kBoth, '*');
+  title = title.Strip(TString::kLeading, '!');
+  title = title.Strip(TString::kLeading, '<');
+  title = title.Strip(TString::kBoth, ' ');
+  return title;
+}
+
 TString HtmlClassInspector::getTable() const
 {
-  return "<table width=100\% cellpadding=2 bgcolor=eeeeee><tbody>" + m_info + "</tbody></table>";
+  TString tmp;
+  tmp += "<table width=100\% cellpadding=2 bgcolor=eeeeee>";
+  tmp += m_info;
+  tmp += "</table>";
+  return tmp;
 }
 void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mname, const void* add)
 {
@@ -172,14 +208,15 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
   }
 
 
-  TString memberValue(line);
   m_info += "<tr>";
-  if (TString(pname) == "")
-    m_info += "<td>" + memberName + "</td>";
-  else //indent nested members
-    m_info += "<td>&nbsp;&nbsp;" + memberName + "</td>";
+  TString indent;
+  if (TString(pname) != "") //indent nested members
+    indent = "&nbsp;&nbsp;&nbsp;";
+  m_info += "<td><b>" + indent + HTML::htmlToPlainText(memberName.Data()) + "</b><br>";
+  m_info += indent + "<small>" + HTML::htmlToPlainText(stripTitle(memberTitle).Data()) + "</small>";
+  m_info += "</td>";
+
+  TString memberValue(HTML::htmlToPlainText(line));
   m_info += "<td align=right>" + memberValue + "</td>";
-  //takes up too much space. alt text on image _might_ work, there's code for it at least.
-  //m_info += "<td>" + memberTitle + "</td>";
   m_info += "</tr>";
 }

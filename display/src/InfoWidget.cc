@@ -8,6 +8,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/HTML.h>
 
 #include <utility>
 
@@ -51,6 +52,11 @@ void InfoWidget::back()
   show(lastURI);
 }
 
+void InfoWidget::show(const TObject* obj)
+{
+  show(URI::getURI(obj).Data(), false);
+}
+
 void InfoWidget::show(const char* uri, bool clearSelection)
 {
   B2DEBUG(100, "Navigating to: " << uri);
@@ -63,7 +69,7 @@ void InfoWidget::show(const char* uri, bool clearSelection)
   m_visited.insert(uri);
   m_history.push_back(uri);
 
-  URI parsedURI = parseURI(uri);
+  URI parsedURI = URI(uri);
   TString info;
   if (parsedURI.object) {
     info = createObjectPage(parsedURI);
@@ -88,7 +94,7 @@ void InfoWidget::show(const char* uri, bool clearSelection)
 TString InfoWidget::createMainPage() const
 {
   TString info = getHeader();
-  //info += "<p>The following is a list of all stored data for the current event. Click on any object/array to show additional information.</p>";
+  info += "<p>Arrays/Objects of <tt>c_Event</tt> durability:</p>";
   info += "<h2>Arrays</h2>";
   for (std::string name : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::c_Event)) {
     const StoreArray<TObject> array(name);
@@ -114,6 +120,9 @@ TString InfoWidget::createArrayPage(const URI& uri) const
 {
   const StoreArray<TObject> array(uri.entryName.Data());
   TString info = getHeader(uri);
+  if (array.getEntries() != 0) {
+    info += HtmlClassInspector::getClassInfo(array[0]->IsA());
+  }
 
   for (int i = 0; i < array.getEntries(); i++) {
     TString name = getName(array[i]);
@@ -253,7 +262,7 @@ TString InfoWidget::getIdentifier(const TObject* obj)
   return pos.first;
 }
 
-TString InfoWidget::getURI(const TObject* obj)
+TString InfoWidget::URI::getURI(const TObject* obj)
 {
   auto pos = getDataStorePosition(obj);
   if (pos.first.empty()) {
@@ -277,7 +286,7 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
       TString name = getName(relObj);
       if (name != "")
         name = " - " + name;
-      info += pref + "<a href='" + getURI(relObj) + "'>" + getIdentifier(relObj) + name + "</a>";
+      info += pref + "<a href='" + URI::getURI(relObj) + "'>" + getIdentifier(relObj) + name + "</a>";
       if (weight != 1.0)
         info += TString::Format(" (weight: %.3g)", weight);
       info += "<br>";
@@ -295,7 +304,7 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
       TString name = getName(relObj);
       if (name != "")
         name = " - " + name;
-      info += pref + "<a href='" + getURI(relObj) + "'>" + getIdentifier(relObj) + name + "</a>";
+      info += pref + "<a href='" + URI::getURI(relObj) + "'>" + getIdentifier(relObj) + name + "</a>";
       if (weight != 1.0)
         info += TString::Format(" (weight: %.3g)", weight);
       info += "<br>";
@@ -308,43 +317,38 @@ TString InfoWidget::getContents(const TObject* obj)
 {
   TString info;
 
-  info += "<h4>Member Data</h4>";
-
-  HtmlClassInspector dm;
-  ((TObject*)obj)->ShowMembers(dm);
-
-  info += dm.getTable();
+  info += "<h4>Object Details</h4>";
+  info += HtmlClassInspector::getClassInfo(obj->IsA());
+  info += HtmlClassInspector::getMemberData(obj);
 
   return info;
 }
 
-InfoWidget::URI InfoWidget::parseURI(const TString& uri)
+InfoWidget::URI::URI(const TString& uri):
+  object(0), entryName(""), arrayIndex(-1)
 {
-  URI u;
-
   if (uri != "/") {
     Ssiz_t delim = uri.Last('/');
     Ssiz_t idxFieldLength = uri.Length() - delim - 1;
     //ok, set.entryName
-    u.entryName = uri(0, delim);
+    entryName = uri(0, delim);
     if (delim >= uri.Length()) {
       B2WARNING("delim: " << delim << " " << idxFieldLength);
       B2FATAL("URI has invalid format: " << uri);
     }
     if (idxFieldLength > 0) {
       //array index found
-      u.arrayIndex = TString(uri(delim + 1, idxFieldLength)).Atoi();
-      const StoreArray<TObject> arr(u.entryName.Data());
-      u.object = arr[u.arrayIndex];
+      arrayIndex = TString(uri(delim + 1, idxFieldLength)).Atoi();
+      const StoreArray<TObject> arr(entryName.Data());
+      object = arr[arrayIndex];
     }
     const auto& entries = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
-    const auto& it = entries.find(u.entryName.Data());
+    const auto& it = entries.find(entryName.Data());
     if (it == entries.end()) {
-      B2ERROR("Given entry '" << u.entryName << "' not found in DataStore, invalid URI?");
+      B2ERROR("Given entry '" << entryName << "' not found in DataStore, invalid URI?");
     } else if (!it->second.isArray) {
       //also set object for StoreObjPtr
-      u.object = it->second.object;
+      object = it->second.object;
     }
   }
-  return u;
 }

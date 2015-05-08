@@ -16,9 +16,11 @@
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
+#include <TLorentzVector.h>
 
 #include <stdint.h>
 #include <vector>
+#include <cmath>
 
 namespace Belle2 {
   class HitPatternCDC;
@@ -93,6 +95,20 @@ namespace Belle2 {
      */
     TVector3 getMomentum(const float bField = 1.5) const
     { return getHelix().getMomentum(bField); }
+
+    /** Getter for the 4Momentum at the closest approach of the track in the r/phi projection.
+     * P = (px, py, pz, E) where E is calculated via the momentum and the particle hypothesis of the TrackFitResult.
+     * @param bField  Magnetic field at the perigee.
+     *
+     */
+    TLorentzVector get4Momentum(const float bField = 1.5) const
+    { return TLorentzVector(getMomentum(bField), getEnergy(bField)); }
+
+    /** Getter for the Energy at the closest approach of the track in the r/phi projection.
+     * E is calculated via the momentum and the particle hypothesis of the TrackFitResult.
+     */
+    double getEnergy(const float bField = 1.5) const
+    { return std::sqrt(getMomentum(bField).Mag2() + getParticleType().getMass() * getParticleType().getMass()); }
 
     /** Getter for the absolute value of the transverse momentum at the perigee.
      *

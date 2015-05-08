@@ -17,14 +17,11 @@ if len(argvs) != 4:
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.ERROR)
-# set_log_level(LogLevel.INFO)
 
 # Modules
 receiver = register_module('DeSerializerPC')
-dump = register_module('RootOutput')
-# perf = register_module('DAQPerf')
+dump = register_module('SeqRootOutput')
 converter = register_module('Convert2RawDet')
-output = register_module('PrintData')
 
 # Receiver
 receiver.param('NodeID', 3)  # ROPC node ID (only used for Run control)
@@ -38,32 +35,22 @@ receiver.param('NodeName', argvs[3])  # node name for Run control
 use_shm_flag = int(argvs[1])
 receiver.param('UseShmFlag', use_shm_flag)
 
-# Monitor module
-monitor = register_module('MonitorDataCOPPER')
-
 # Dump
-dump.param('outputFileName', 'root_output.root')
+dump.param('outputFileName', 'root_output.sroot')
 
 # Sender
 sender = register_module('Serializer')
 sender.param('DestPort', 36000)
 sender.param('LocalHostName', 'localhost')
 
-# Perf
-# perf.param('Cycle', 100000)
-# perf.param('MonitorSize', True)
-
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
-# main.add_module(monitor)
-# main.add_module(converter)
-# main.add_module(dump)
-main.add_module(sender)
-# main.add_module(output)
-# main.add_module(perf)
+main.add_module(converter)
+main.add_module(dump)
+# main.add_module(sender)
 
 # Process all events
 process(main)

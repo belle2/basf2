@@ -23,7 +23,7 @@
 #include <array>
 #include <tuple>
 
-#include <unordered_map> // needef for typedef of defaultMap
+#include <unordered_map> // needed for typedef of defaultMap
 
 #include <numeric> // std::accumulate
 
@@ -38,16 +38,16 @@ namespace Belle2 {
    *
    * As there is no direct relation between SpacePoints and TrueHits, the relations between SpacePoints and Clusters and the relations between Clusters and TrueHits are used to relate SpacePoints and TrueHits. In a first step all (unique) TrueHits that are related to all Clusters of a SpacePoint are collected (including the weight of the relation). It is then possible that there is more than one TrueHit after this.
    * + If 'storeSeperate' is set to true a new StoreArray of SpacePoints is created for every input StoreArray of SpacePoints with the same name and the 'outputSuffix' appended to it. This can be useful to have a StoreArray of SpacePoints where only 'checked' SpacePoints are (e.g. without ghost hits) that can then be used to feed the GFTC2SPTCConverter for example. If it is set to false, the relations will get registered in the existing StoreArray.
-   * + If 'registerAll' is set to true, the module simply registers a relation to all of these TrueHits. The weight of this new built relation is the sum of the weights of the relations between the Cluster(s) and the according TrueHit. In this way the decision which TrueHit to use is left to the user. NOTE: The information how many Clusters of a SpacePoint were related to a TrueHit and the weights of the single relations between Clusters and TrueHits is 'lost' (can be retrieved again if actually needed).
+   * + If 'registerAll' is set to true, the module simply registers a relation to all of these TrueHits. The weight of this new built relation is the number of the Clusters (of the SpacePoint) that are related to this TrueHit (max. 2). In this way the decision which TrueHit to use is left to the user. NOTE: The exact weight of the relations between Clusters and TrueHits is not stored, however the relations are registered in an order that the TrueHit with the heighest sum of weights is the first entry in the RelationVector (i.e. it should be th the one that is returned by SpacePoint::getRelatedTo<TrueHit>()).
    * + If 'registerAll' is set to false, the module tries to find a relation to only one TrueHit:
-   *  1) If there is only one TrueHit -> register relation to SpacePoint with weight being the sum of the weights of the relations between Cluster(s) of SpacePoint and TrueHit <BR>
-   *  2) If there is more than one TrueHit but only one TrueHit has a relation to both Clusters of a SpacePoint -> register relation to this TrueHit (again the weight of the relation is the sum of the weights of the relation between the Clusters and the TrueHit) <BR>
-   *  3) If there is more than one TrueHit with a relation to both Clusters of a SpacePoint -> register relation to the TrueHit with the largest sum of weights (of relation between Clusters and TrueHits)<BR>
-   *  4) If the SpacePoint has only one Cluster (e.g. PXD) and there is more than one TrueHit -> register relation to the TrueHit with the largest weight (of relation between Cluster and TrueHit)<BR>
+   *  1) If there is only one TrueHit -> check if all Clusters of the SpacePoint are related to this TrueHit -> if true -> register relation with weight being the number of Clusters of the SpacePoint (i.e. the number of Clusters of the SpacePoint that are related to this TrueHit) <BR>
+   *  2) If there is more than one TrueHit but only one TrueHit has a relation to both Clusters of a SpacePoint -> register relation to this TrueHit (again the weight of the relation is the number of the Clusters of the SpacePoint that are related to this TrueHit) <BR>
+   *  3) If there is more than one TrueHit with a relation to all Clusters of a SpacePoint -> register relation to the TrueHit with the largest sum of weights (of relation between Clusters and TrueHits). Again the weight of the newly registered relation is the number of Clusters related to the TrueHit<BR>
+   *  4) If the SpacePoint has only one Cluster (e.g. PXD) and there is more than one TrueHit -> register relation to the TrueHit with the largest weight (of relation between Cluster and TrueHit). The weight of the newly registered relation is 1 in this case (as there is only one Cluster of such a SpacePoint related to the TrueHit)<BR>
    *
    * NOTE: It is not guaranteed that every SpacePoint gets related to a TrueHit if 'registerAll' is set to false! E.g. 'ghost hits' should be sorted out.
    * NOTE: Choosing the TrueHit with the biggest weight (or sum of weights) if there is more than one possible TrueHit does not guarantee that the 'right' TrueHit is chosen! It is possible that in such cases no relation will get registered in the future if this proves to be a source of errors!
-   *
+   * NOTE: in a previous version the weight of the registered relations was the sum of the weights. Now it is the number of the Clusters (of a SpacePoint) that are related to a TrueHit. The Information on the absolute values of the weights is lost, however the relative values are preserved and if there are more than one related TrueHits to a SpacePoint (only possible if 'registerAll' is set to true) the entries of the RelationVector of TrueHits is ordered from highest to lowest sum of weights.
    * NOTE: This module should be used to connect SpacePoints and TrueHits if MC information is needed afterwards (e.g. in the SPTCRefereeModule for SpacePointTrackCands) to avoid having to look up the relations to obtain these informations seperately in every Module. Furthermore some modules are no longer able to determine the related TrueHits themselves (e.g. GFTC2SPTCConverter)
    */
   class SpacePoint2TrueHitConnectorModule : public Module {

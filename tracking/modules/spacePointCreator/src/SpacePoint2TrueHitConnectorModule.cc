@@ -424,14 +424,11 @@ void SpacePoint2TrueHitConnectorModule::registerAllRelations(Belle2::SpacePoint*
     else reRegisterClusterRelations<SVDCluster>(spacePoint, newSP, m_SVDClusters.getName());
   }
 
-  // register the Relations to the TrueHits
-  std::vector<int> uniqueTHinds = getUniqueKeys(trueHitMap); // get the unique indices of all related TrueHits and loop over them
-  for (int aInd : uniqueTHinds) {
-    std::vector<double> weights = getValuesToKey(trueHitMap, aInd);
-    // sum all weights to the index -> sum of weights is used as weight for the relation between TrueHit and SpacePoint
-    double sumOfWeights = std::accumulate(weights.begin(), weights.end(), 0.0);
-    if (detType == c_PXD) registerTrueHitRelation<PXDTrueHit>(newSP, aInd, sumOfWeights, m_PXDTrueHits);
-    else registerTrueHitRelation<SVDTrueHit>(newSP, aInd, sumOfWeights, m_SVDTrueHits);
+  // register the Relations to the TrueHits in the correct order (i.e. in the order getSortedKeyValueTuples returns)
+  std::vector<std::tuple<int, double, unsigned> > keyValueTuples = getSortedKeyValueTuples(trueHitMap);
+  for (auto tup : keyValueTuples) {
+    if (detType == c_PXD) registerTrueHitRelation<PXDTrueHit>(newSP, get<0>(tup), get<2>(tup), m_PXDTrueHits);
+    else if (detType == c_SVD) registerTrueHitRelation<SVDTrueHit>(newSP, get<0>(tup), get<2>(tup), m_SVDTrueHits);
   }
 }
 
@@ -464,7 +461,7 @@ void SpacePoint2TrueHitConnectorModule::reRegisterClusterRelations(Belle2::Space
 {
   B2DEBUG(100, "Registering the Relations to Clusters of SpacePoint " << origSpacePoint->getArrayIndex() << " in Array " <<
           origSpacePoint->getArrayName() << " for SpacePoint " << newSpacePoint->getArrayIndex() << " in Array " <<
-          newSpacePoint->getArrayIndex())
+          newSpacePoint->getArrayName())
 
   vector<pair<ClusterType*, double> > clustersAndWeights = getRelatedClusters<ClusterType>(origSpacePoint, clusterName);
   for (auto aCluster : clustersAndWeights) {
@@ -663,7 +660,7 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
     B2DEBUG(499, "Now checking tuple: " << get<0>(tuple) << ", " << get<1>(tuple) << ", " << get<2>(tuple))
     if (nClusters == get<2>(tuple)) {
       TrueHitType* trueHit = trueHits[get<0>(tuple)];
-      if (compatibleCombination(spacePoint, trueHit)) return make_pair(trueHit, get<1>(tuple));
+      if (compatibleCombination(spacePoint, trueHit)) return make_pair(trueHit, get<2>(tuple));
     } else {
       B2DEBUG(499, "The number of related Clusters ( = " << nClusters << ") and the number of associated weights ( = " << get<2>
               (tuple) << ") do not match! This indicates a ghost hit")

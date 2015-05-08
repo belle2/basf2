@@ -79,6 +79,8 @@ void CDCLegendreHistogrammingModule::outputObjects()
       }
       sortingParameter++;
     }
+
+    oldCDCTrack->sort();
   }
   //clear pointers
   clear_pointer_vectors();

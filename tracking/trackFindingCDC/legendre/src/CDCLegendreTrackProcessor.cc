@@ -124,6 +124,11 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     tracks.emplace_back();
     CDCTrack& newTrackCandidate = tracks.back();
 
+    //find indices of the Hits
+    std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
+
+    sortHits(trackHitVector, trackCand->getChargeSign());
+
     TVector3 position = trackCand->getReferencePoint();
     TVector3 momentum = trackCand->getMomentumEstimation(true);
 
@@ -133,6 +138,7 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     //set the start parameters
     CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()), Vector2D(momentum.x(), momentum.y()),
                                  trackCand->getChargeSign());
+    trajectory2D.setLocalOrigin(trackHitVector.front()->getOriginalWirePosition().XYvector());
     CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
     newTrackCandidate.setStartTrajectory3D(trajectory3D);
 
@@ -142,10 +148,6 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     B2DEBUG(100,
             "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");
 
-    //find indices of the Hits
-    std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
-
-    sortHits(trackHitVector, trackCand->getChargeSign());
 
     unsigned int sortingParameter = 0;
     for (TrackHit* trackHit : trackHitVector) {

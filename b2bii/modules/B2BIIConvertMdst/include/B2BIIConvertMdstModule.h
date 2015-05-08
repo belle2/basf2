@@ -5,7 +5,7 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 16 - Feb - 2015
 //
-// Contirbutors: Anze Zupanc, Matic Lubej
+// Contirbutors: Anze Zupanc, Matic Lubej,
 //-
 
 #ifndef B2BII_CONVERT_MDST_H
@@ -189,12 +189,6 @@ namespace Belle2 {
     std::map<int, int> mdstEclToECLCluster;
     //! map of gamma Panther IDs and corresponing Particle StoreArray indices
     std::map<int, int> mdstGammaToParticle;
-
-    //! Mdst_gamma and Mdst_pi0 related
-    std::string gammaListName = "gamma:mdst";
-    int gammaPDGCode = Const::photon.getPDGCode();
-    std::string pi0ListName = "pi0:mdst";
-    int pi0PDGCode = Const::pi0.getPDGCode();
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;

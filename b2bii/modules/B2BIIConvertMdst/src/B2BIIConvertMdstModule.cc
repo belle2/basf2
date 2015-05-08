@@ -5,7 +5,7 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 16 - Feb - 2015
 //
-// Contributors: Anze Zupanc, Matic Lubej
+// Contributors: Anze Zupanc, Matic Lubej,
 //-
 
 #include <b2bii/modules/B2BIIConvertMdst/B2BIIConvertMdstModule.h>
@@ -93,9 +93,9 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  StoreObjPtr<ParticleList> gammaParticleList(gammaListName);
+  StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
-  StoreObjPtr<ParticleList> pi0ParticleList(pi0ListName);
+  StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
   pi0ParticleList.registerInDataStore();
 
   m_pidLikelihoods.registerInDataStore();
@@ -384,9 +384,9 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
   mdstGammaToParticle.clear();
 
   // Create and initialize particle list
-  StoreObjPtr<ParticleList> plist(gammaListName);
+  StoreObjPtr<ParticleList> plist("gamma:mdst");
   plist.create();
-  plist->initialize(gammaPDGCode, gammaListName);
+  plist->initialize(22, "gamma:mdst");
 
   // Loop over all Belle Mdst_gamma
   Belle::Mdst_gamma_Manager& gamma_manager = Belle::Mdst_gamma_Manager::get_manager();
@@ -429,9 +429,9 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
   StoreArray<Particle> particles;
 
   // Create and initialize particle list
-  StoreObjPtr<ParticleList> plist(pi0ListName);
+  StoreObjPtr<ParticleList> plist("pi0:mdst");
   plist.create();
-  plist->initialize(pi0PDGCode, pi0ListName);
+  plist->initialize(111, "pi0:mdst");
 
   // Loop over all Mdst_pi0
   Belle::Mdst_pi0_Manager& pi0_manager = Belle::Mdst_pi0_Manager::get_manager();
@@ -447,7 +447,7 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     TLorentzVector p4(mdstPi0.px(), mdstPi0.py(), mdstPi0.pz(), mdstPi0.energy());
 
     // Create Particle from TLorentzVector and PDG code, add to StoreArray
-    Particle* B2Pi0 = particles.appendNew(Particle(p4, pi0PDGCode));
+    Particle* B2Pi0 = particles.appendNew(Particle(p4, 111));
 
     // Get Belle II photons from map
     Particle* B2Gamma1 = particles[mdstGammaToParticle[mdstGamma1.get_ID()]];

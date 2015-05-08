@@ -47,13 +47,18 @@ ECLClusterInfoModule::ECLClusterInfoModule() : Module()
   addParam("outputFileName", m_fileName, "The name of the output .root file", string("ECLClusterInfo.root"));
   addParam("treeName", m_treeName, "The name of the tree in the output .root file", string("ecl_mdst"));
 
+  m_file = nullptr;
+  m_tree = nullptr;
 }
 
 void ECLClusterInfoModule::terminate()
 {
   // Write and close file
-  m_file->Write();
-  m_file->Close();
+  B2INFO("Writing NTuple " << m_treeName);
+  m_tree->Write();
+
+  B2INFO("Closing file " << m_fileName);
+  delete m_file;
 }
 
 void ECLClusterInfoModule::initialize()
@@ -62,13 +67,51 @@ void ECLClusterInfoModule::initialize()
   StoreArray<ECLCluster> eclClusters;
 
   // Define output file name, tree name and branches
-  m_file = new TFile(m_fileName.c_str(), "RECREATE", "");
+  m_file = new TFile(m_fileName.c_str(), "RECREATE");
+  if (!m_file->IsOpen()) {
+    B2WARNING("Could not create file " << m_fileName);
+    return;
+  }
+
+  m_file->cd();
+
+  // Check if TTree with that name already exists
+  if (m_file->Get(m_treeName.c_str())) {
+    B2WARNING("Tree with this name already exists: " << m_fileName);
+    return;
+  }
+
   m_tree = new TTree(m_treeName.c_str(), "");
+
+  m_E = 0;
+  m_Theta = 0;
+  m_Phi = 0;
+  m_R = 0;
+  m_Edep = 0;
+  m_E9oE25 = 0;
+  m_HE = 0;
+  m_NC = 0;
+  m_Err00 = 0;
+  m_Err10 = 0;
+  m_Err11 = 0;
+  m_Err20 = 0;
+  m_Err21 = 0;
+  m_Err22 = 0;
+  m_Truth_Px = 0;
+  m_Truth_Py = 0;
+  m_Truth_Pz = 0;
+  m_Truth_E = 0;
+  m_PDG = 0;
 
   m_tree->Branch("Cluster_E",        &m_E,        "Cluster_E/F");
   m_tree->Branch("Cluster_Theta",    &m_Theta,    "Cluster_Theta/F");
   m_tree->Branch("Cluster_Phi",      &m_Phi,      "Cluster_Phi/F");
   m_tree->Branch("Cluster_R",        &m_R,        "Cluster_R/F");
+
+  m_tree->Branch("Cluster_EnedepSum",        &m_Edep,        "Cluster_EnedepSum/F");
+  m_tree->Branch("Cluster_E9oE25",        &m_E9oE25,        "Cluster_E9oE25/F");
+  m_tree->Branch("Cluster_HighestE",        &m_HE,        "Cluster_HighestE/F");
+  m_tree->Branch("Cluster_NofCrystals",        &m_NC,        "Cluster_NofCrystals/I");
 
   m_tree->Branch("Cluster_Err00",    &m_Err00,    "Cluster_Err00/F");
   m_tree->Branch("Cluster_Err10",    &m_Err10,    "Cluster_Err10/F");
@@ -94,11 +137,18 @@ void ECLClusterInfoModule::event()
   for (int iECL = 0; iECL < eclClusters.getEntries(); iECL++) {
     const ECLCluster* ecl = eclClusters[iECL];
 
-    // Set Variables
+    // Get ecl values
     m_E = ecl->getEnergy();
     m_Theta = ecl->getTheta();
     m_Phi = ecl->getPhi();
     m_R = ecl->getR();
+
+    // Get auxiliary values
+    m_Edep = ecl->getEnedepSum();
+    m_E9oE25 = ecl->getE9oE25();
+    m_HE = ecl->getHighestE();
+    m_NC = ecl->getNofCrystals();
+
     TMatrixFSym Err = ecl->getError3x3();
 
     m_Err00 = Err[0][0];

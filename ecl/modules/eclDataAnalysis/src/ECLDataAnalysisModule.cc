@@ -1059,7 +1059,7 @@ void ECLDataAnalysisModule::event()
     m_trkMultip = 0;
     for (const Track& itrk : tracks) {
       const TrackFitResult* atrk = itrk.getTrackFitResult(Const::pion);
-      assert(atrk != nullptr);
+      if (atrk == nullptr) continue;
 
       m_trkIdx->push_back(m_trkMultip);
       m_trkPdg->push_back(atrk->getParticleType().getPDGCode());

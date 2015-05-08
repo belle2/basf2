@@ -38,10 +38,11 @@ namespace Belle2 {
 #define BELLE2_DEFINE_EXCEPTION(ClassName, Message) \
   class ClassName : public std::runtime_error { \
   public: \
-    ClassName(): std::runtime_error(Message), m_format(Message) { } \
+    ClassName(): std::runtime_error(""), m_format(Message) { } \
     ~ClassName() throw() {} \
-    virtual const char * what() const throw() { \
-      return m_format.str().c_str();\
+    virtual const char * what() const throw() override { \
+      m_finalStr = m_format.str();\
+      return m_finalStr.c_str();\
     }\
     template <class T> ClassName& operator<<(const T& param) {\
       m_format % param;\
@@ -49,6 +50,7 @@ namespace Belle2 {
     }\
   private:\
     boost::format m_format;\
+    mutable std::string m_finalStr;\
   };
 }
 

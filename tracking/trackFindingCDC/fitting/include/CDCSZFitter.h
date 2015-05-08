@@ -57,6 +57,14 @@ namespace Belle2 {
         update(trajectory, observationsSZ);
       }
 
+      /// Fits a linear sz trajectory to the s and z coordinates given in the observations.
+      CDCTrajectorySZ fit(CDCObservations2D& observationsSZ) const
+      {
+        CDCTrajectorySZ trajectorySZ;
+        update(trajectorySZ, observationsSZ);
+        return trajectorySZ;
+      }
+
 
 
     private:

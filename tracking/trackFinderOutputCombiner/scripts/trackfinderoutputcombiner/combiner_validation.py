@@ -228,18 +228,18 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
         display_module = CDCSVGDisplayModule()
         display_module.draw_segments_id = True
-        main_path.add_module(display_module)
+        # main_path.add_module(display_module)
 
         # main_path.add_module(TestingModule())
 
         combiner_module = basf2.register_module("SegmentTrackCombiner")
         combiner_module.param("GFTrackCandsStoreArrayName", "ResultTrackCands")
-        combiner_module.set_debug_level(110)
-        combiner_module.set_log_level(basf2.LogLevel.DEBUG)
+        combiner_module.set_debug_level(100)
+        # combiner_module.set_log_level(basf2.LogLevel.DEBUG)
         main_path.add_module(combiner_module)
 
         display_module = CDCSVGDisplayModule()
-        display_module.track_cands_store_array_name = "ResultTrackCands"
+        display_module.track_cands_store_array_name = "RestTrackCands"
         display_module.draw_gftrackcands = True
         display_module.draw_gftrackcand_trajectories = True
         main_path.add_module(display_module)

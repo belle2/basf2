@@ -32,7 +32,10 @@ namespace Belle2 {
     public:
       TrackInformation(genfit::TrackCand* trackCand) :
         m_trackCand(trackCand), m_trajectory(), m_perpSList(), m_minPerpS(0), m_maxPerpS(0),
-        m_matchingSegments() { }
+        m_matchingSegments()
+      {
+        m_matchingSegments.reserve(5);
+      }
 
       double getMaxPerpS() const
       {
@@ -98,7 +101,10 @@ namespace Belle2 {
     class SegmentInformation {
     public:
       SegmentInformation(TrackFindingCDC::CDCRecoSegment2D* segment) :
-        m_segment(segment), m_matchingTracks() { }
+        m_segment(segment), m_matchingTracks(), m_usedInTrack(false)
+      {
+        m_matchingTracks.reserve(5);
+      }
 
       TrackFindingCDC::CDCRecoSegment2D* getSegment() const
       {
@@ -115,9 +121,20 @@ namespace Belle2 {
         m_matchingTracks.clear();
       }
 
+      bool isUsedInTrack() const
+      {
+        return m_usedInTrack;
+      }
+
+      void setUsedInTrack(bool usedInTrack = true)
+      {
+        m_usedInTrack = usedInTrack;
+      }
+
     private:
       TrackFindingCDC::CDCRecoSegment2D* m_segment;
       std::vector<TrackInformation*> m_matchingTracks;
+      bool m_usedInTrack;
     };
 
 
@@ -141,13 +158,28 @@ namespace Belle2 {
 
   private:
     std::string m_param_legendreTrackCandsStoreArrayName;
-
     const float m_param_percentageForPerpSMeasurements = 0.05;
+    const float m_param_minimalFitProbability = 0.5;
+
+    // Object pools
+    typedef std::vector<SegmentInformation> SegmentsList;
+    std::vector<SegmentsList> m_segmentLookUp;
+    std::vector<TrackInformation> m_trackLookUp;
+
+    StoreArray<genfit::TrackCand> m_legendreTrackCands;
+    StoreArray<CDCHit> m_cdcHits;
 
     bool segmentMatchesToTrack(const SegmentInformation& segmentInformation, const TrackInformation& trackInformation);
     void makeAllCombinations(std::list<ListOfSegmentPointer>& trainsOfSegments, const ListOfSegmentPointer& matchedSegments,
                              const TrackInformation& trackInformation);
     bool doesFitTogether(const ListOfSegmentPointer& list, const TrackInformation& trackInformation);
     void combineSegmentTrainAndTrack(const ListOfSegmentPointer& trainOfSegments);
+    void calculateSegmentLookUp(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments);
+    void calculateTrackLookup();
+    void createTracksForOutput(std::vector<TrackFindingCDC::CDCTrack>& tracks);
+    void matchTracksToSegments(unsigned int superLayerCounter, SegmentInformation& segmentInformation);
+    void createTrainsOfSegments(std::list<ListOfSegmentPointer>& trainsOfSegments, TrackInformation& trackInformation);
+    void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
+    double testFitSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* trackInformation);
   };
 }

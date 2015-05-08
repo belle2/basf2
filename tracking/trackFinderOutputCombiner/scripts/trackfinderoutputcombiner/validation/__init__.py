@@ -102,15 +102,20 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
         return argument_parser
 
     def create_path(self):
+        # BackgroundHitFinder, Legendre, LegendreStereo, NotAssignedHitsSearcher
         main_path = super(LegendreTrackFinderRun, self).create_path()
 
         good_cdc_hits_store_array_name = "GoodCDCHits"
         temp_track_cands_store_array_name = "TempTrackCands"
 
-        background_hit_finder_module = basf2.register_module("BackgroundHitFinder")
-        background_hit_finder_module.param("TMVACut", float(self.tmva_cut))
-        if self.tmva_cut > 0:
-            background_hit_finder_module.param("GoodCDCHitsStoreObjName", good_cdc_hits_store_array_name)
+        background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+        background_hit_finder_module.param({
+            "ClusterFilter": "tmva",
+            "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
+            "RemainingCDCHitsStoreArrayName": good_cdc_hits_store_array_name,
+            "FacetFilter": "none",
+            "FacetNeighborChooser": "none",
+        })
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
         if self.tmva_cut > 0:
@@ -151,6 +156,7 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
 
 
 class CombinerTrackFinderRun(LegendreTrackFinderRun):
+    # depricated
 
     local_track_cands_store_array_name = "LocalTrackCands"
     use_segment_quality_check = True

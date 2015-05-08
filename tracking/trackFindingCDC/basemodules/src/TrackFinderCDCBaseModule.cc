@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

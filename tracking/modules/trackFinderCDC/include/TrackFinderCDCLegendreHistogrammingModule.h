@@ -1,16 +1,11 @@
 #pragma once
 
-#include <fstream>
-
-#include <boost/tuple/tuple.hpp>
-#include <vector>
-
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreTrackWithStereohits.h>
-#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
+
+#include <vector>
 
 namespace Belle2 {
 

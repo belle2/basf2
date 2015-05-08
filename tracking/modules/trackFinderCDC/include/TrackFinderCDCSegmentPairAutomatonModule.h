@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCFromSegmentsModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 
 #include <vector>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /// Forward declaration of the module implementing the track generation by cellular automaton on segment pairs using specific filter instances.
     template < class AxialStereoSegmentPairFilter = BaseAxialStereoSegmentPairFilter,
-             class AxialStereoSegmentPairNeighborChooser = BaseAxialStereoSegmentPairNeighborChooser >
+               class AxialStereoSegmentPairNeighborChooser = BaseAxialStereoSegmentPairNeighborChooser >
     class TrackFinderCDCSegmentPairAutomatonImplModule;
   }
 
@@ -55,7 +55,8 @@ namespace Belle2 {
         m_ptrAxialStereoSegmentPairFilter(new AxialStereoSegmentPairFilter()),
         m_ptrAxialStereoSegmentPairNeighborChooser(new AxialStereoSegmentPairNeighborChooser()),
         m_param_writeSegmentPairs(false),
-        m_param_segmentPairsStoreObjName("CDCAxialStereoSegmentPairVector") {
+        m_param_segmentPairsStoreObjName("CDCAxialStereoSegmentPairVector")
+      {
 
         setDescription("Generates tracks from segments using a cellular automaton build from segment pairs.");
 
@@ -72,7 +73,8 @@ namespace Belle2 {
       }
 
       /// Destructor deleting the filters.
-      ~TrackFinderCDCSegmentPairAutomatonImplModule() {
+      ~TrackFinderCDCSegmentPairAutomatonImplModule()
+      {
         if (m_ptrAxialStereoSegmentPairFilter) delete m_ptrAxialStereoSegmentPairFilter;
         m_ptrAxialStereoSegmentPairFilter = nullptr;
 
@@ -81,7 +83,8 @@ namespace Belle2 {
       }
 
       ///  Initialize the Module before event processing
-      virtual void initialize() override {
+      virtual void initialize() override
+      {
         TrackFinderCDCFromSegmentsModule::initialize();
 
         if (m_param_writeSegmentPairs) {
@@ -102,7 +105,8 @@ namespace Belle2 {
       virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments,
                             std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override final;
 
-      virtual void terminate() override {
+      virtual void terminate() override
+      {
         if (m_ptrAxialStereoSegmentPairFilter) {
           m_ptrAxialStereoSegmentPairFilter->terminate();
         }
@@ -116,23 +120,27 @@ namespace Belle2 {
 
     public:
       /// Getter for the current segment pair filter. The module keeps ownership of the pointer.
-      AxialStereoSegmentPairFilter* getAxialStereoSegmentPairFilter() {
+      AxialStereoSegmentPairFilter* getAxialStereoSegmentPairFilter()
+      {
         return m_ptrAxialStereoSegmentPairFilter;
       }
 
       /// Setter for the segment pair filter used in the segment pair creation. The module takes ownership of the pointer.
-      void setAxialStereoSegmentPairFilter(AxialStereoSegmentPairFilter* ptrAxialStereoSegmentPairFilter) {
+      void setAxialStereoSegmentPairFilter(AxialStereoSegmentPairFilter* ptrAxialStereoSegmentPairFilter)
+      {
         if (m_ptrAxialStereoSegmentPairFilter) delete m_ptrAxialStereoSegmentPairFilter;
         m_ptrAxialStereoSegmentPairFilter = ptrAxialStereoSegmentPairFilter;
       }
 
       /// Getter for the current segment pair neighbor chooser. The module keeps ownership of the pointer.
-      AxialStereoSegmentPairNeighborChooser* getAxialStereoSegmentPairNeighborChooser() {
+      AxialStereoSegmentPairNeighborChooser* getAxialStereoSegmentPairNeighborChooser()
+      {
         return m_ptrAxialStereoSegmentPairNeighborChooser;
       }
 
       /// Setter for the segment neighbor chooser. The module takes ownership of the pointer.
-      void setAxialStereoSegmentPairNeighborChooser(AxialStereoSegmentPairNeighborChooser* ptrAxialStereoSegmentPairNeighborChooser) {
+      void setAxialStereoSegmentPairNeighborChooser(AxialStereoSegmentPairNeighborChooser* ptrAxialStereoSegmentPairNeighborChooser)
+      {
         if (m_ptrAxialStereoSegmentPairNeighborChooser) delete m_ptrAxialStereoSegmentPairNeighborChooser;
         m_ptrAxialStereoSegmentPairNeighborChooser = ptrAxialStereoSegmentPairNeighborChooser;
       }
@@ -180,7 +188,7 @@ namespace Belle2 {
 
 
     template < class AxialStereoSegmentPairFilter,
-             class AxialStereoSegmentPairNeighborChooser >
+               class AxialStereoSegmentPairNeighborChooser >
     void TrackFinderCDCSegmentPairAutomatonImplModule <
     AxialStereoSegmentPairFilter,
     AxialStereoSegmentPairNeighborChooser
@@ -204,7 +212,7 @@ namespace Belle2 {
 
       if (m_param_writeSegmentPairs) {
         std::vector<CDCAxialStereoSegmentPair>& segmentPairs = *ptrSegmentPairs;
-        for (const CDCAxialStereoSegmentPair & segmentPair : m_axialStereoSegmentPairs) {
+        for (const CDCAxialStereoSegmentPair& segmentPair : m_axialStereoSegmentPairs) {
           segmentPairs.push_back(segmentPair);
         }
       }

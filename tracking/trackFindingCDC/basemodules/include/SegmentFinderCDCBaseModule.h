@@ -11,7 +11,7 @@
 #define SEGMENTFINDERCDCBASEMODULE_H_
 
 // Base track finder module
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 

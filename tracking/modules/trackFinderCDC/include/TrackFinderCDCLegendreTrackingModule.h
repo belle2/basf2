@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 

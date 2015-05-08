@@ -1,7 +1,11 @@
+#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
+
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCLegendreHistogrammingModule.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
 using namespace std;
 using namespace Belle2;

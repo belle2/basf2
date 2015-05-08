@@ -11,7 +11,7 @@
 #ifndef SEGMENTFINDERCDCMCTRUTHMODULE_H_
 #define SEGMENTFINDERCDCMCTRUTHMODULE_H_
 
-#include <tracking/modules/trackFinderCDC/SegmentFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
 
 #include <framework/core/Module.h>
 

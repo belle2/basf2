@@ -10,12 +10,11 @@
 
 #pragma once
 
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
+
 #include <string>
 #include <vector>
-
-#include <framework/core/Module.h>
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCFromSegmentsModule.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 
 namespace Belle2 {
 

@@ -26,7 +26,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/modules/trackFinderCDC/SegmentFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
 
 #include <vector>
 #include <iterator>

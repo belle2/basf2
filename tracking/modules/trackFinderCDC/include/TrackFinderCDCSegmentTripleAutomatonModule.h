@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCFromSegmentsModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 
 #include <vector>
 
@@ -33,8 +33,8 @@ namespace Belle2 {
 
     /// Forward declaration of the module implementing the track generation by cellular automaton on segment triples using specific filter instances.
     template < class AxialAxialSegmentPairFilter = BaseAxialAxialSegmentPairFilter,
-             class SegmentTripleFilter = BaseSegmentTripleFilter,
-             class SegmentTripleNeighborChooser = BaseSegmentTripleNeighborChooser >
+               class SegmentTripleFilter = BaseSegmentTripleFilter,
+               class SegmentTripleNeighborChooser = BaseSegmentTripleNeighborChooser >
     class TrackFinderCDCSegmentTripleAutomatonImplModule;
   }
 
@@ -58,7 +58,8 @@ namespace Belle2 {
         m_ptrSegmentTripleFilter(new SegmentTripleFilter()),
         m_ptrSegmentTripleNeighborChooser(new SegmentTripleNeighborChooser()),
         m_param_writeSegmentTriples(false),
-        m_param_segmentTriplesStoreObjName("CDCSegmentTripleVector") {
+        m_param_segmentTriplesStoreObjName("CDCSegmentTripleVector")
+      {
 
         setDescription("Generates tracks from segments using a cellular automaton build from segment triples.");
 
@@ -75,7 +76,8 @@ namespace Belle2 {
       }
 
       /// Destructor deleting the filters.
-      ~TrackFinderCDCSegmentTripleAutomatonImplModule() {
+      ~TrackFinderCDCSegmentTripleAutomatonImplModule()
+      {
         if (m_ptrAxialAxialSegmentPairFilter) delete m_ptrAxialAxialSegmentPairFilter;
         m_ptrAxialAxialSegmentPairFilter = nullptr;
 
@@ -87,7 +89,8 @@ namespace Belle2 {
       }
 
       ///  Initialize the Module before event processing
-      virtual void initialize() override {
+      virtual void initialize() override
+      {
         TrackFinderCDCFromSegmentsModule::initialize();
 
         if (m_param_writeSegmentTriples) {
@@ -112,7 +115,8 @@ namespace Belle2 {
       virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments,
                             std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override final;
 
-      virtual void terminate() override {
+      virtual void terminate() override
+      {
         if (m_ptrAxialAxialSegmentPairFilter) {
           m_ptrAxialAxialSegmentPairFilter->terminate();
         }
@@ -130,34 +134,40 @@ namespace Belle2 {
 
     public:
       /// Getter for the current axial axial segment filter. The module keeps ownership of the pointer.
-      AxialAxialSegmentPairFilter* getAxialAxialSegmentPairFilter() {
+      AxialAxialSegmentPairFilter* getAxialAxialSegmentPairFilter()
+      {
         return m_ptrAxialAxialSegmentPairFilter;
       }
 
       /// Setter for the segment triple filter. The module takes ownership of the pointer.
-      void getAxialAxialSegmentPairFilter(AxialAxialSegmentPairFilter* ptrAxialAxialSegmentPairFilter) {
+      void getAxialAxialSegmentPairFilter(AxialAxialSegmentPairFilter* ptrAxialAxialSegmentPairFilter)
+      {
         if (m_ptrAxialAxialSegmentPairFilter) delete m_ptrAxialAxialSegmentPairFilter;
         m_ptrAxialAxialSegmentPairFilter = ptrAxialAxialSegmentPairFilter;
       }
 
       /// Getter for the current segment triple filter. The module keeps ownership of the pointer.
-      SegmentTripleFilter* getSegmentTripleFilter() {
+      SegmentTripleFilter* getSegmentTripleFilter()
+      {
         return m_ptrSegmentTripleFilter;
       }
 
       /// Setter for the segment triple filter. The module takes ownership of the pointer.
-      void setSegmentTripleFilter(SegmentTripleFilter* ptrSegmentTripleFilter) {
+      void setSegmentTripleFilter(SegmentTripleFilter* ptrSegmentTripleFilter)
+      {
         if (m_ptrSegmentTripleFilter) delete m_ptrSegmentTripleFilter;
         m_ptrSegmentTripleFilter = ptrSegmentTripleFilter;
       }
 
       /// Getter for the current segment triple neighbor chooser. The module keeps ownership of the pointer.
-      SegmentTripleNeighborChooser* getSegmentTripleNeighborChooser() {
+      SegmentTripleNeighborChooser* getSegmentTripleNeighborChooser()
+      {
         return m_ptrSegmentTripleNeighborChooser;
       }
 
       /// Setter for the current segment triple neighbor chooser. The module keeps ownership of the pointer.
-      void setSegmentTripleNeighborChooser(SegmentTripleNeighborChooser* ptrSegmentTripleNeighborChooser) {
+      void setSegmentTripleNeighborChooser(SegmentTripleNeighborChooser* ptrSegmentTripleNeighborChooser)
+      {
         if (m_ptrSegmentTripleNeighborChooser) delete m_ptrSegmentTripleNeighborChooser;
         m_ptrSegmentTripleNeighborChooser = ptrSegmentTripleNeighborChooser;
       }
@@ -206,8 +216,8 @@ namespace Belle2 {
 
 
     template < class AxialAxialSegmentPairFilter,
-             class SegmentTripleFilter,
-             class SegmentTripleNeighborChooser >
+               class SegmentTripleFilter,
+               class SegmentTripleNeighborChooser >
     void TrackFinderCDCSegmentTripleAutomatonImplModule <
     AxialAxialSegmentPairFilter,
     SegmentTripleFilter,
@@ -242,7 +252,7 @@ namespace Belle2 {
 
       if (m_param_writeSegmentTriples) {
         std::vector<CDCSegmentTriple>& segmentTriples = *ptrSegmentTriples;
-        for (const CDCSegmentTriple & segmentTriple : m_segmentTriples) {
+        for (const CDCSegmentTriple& segmentTriple : m_segmentTriples) {
           segmentTriples.push_back(segmentTriple);
         }
       }

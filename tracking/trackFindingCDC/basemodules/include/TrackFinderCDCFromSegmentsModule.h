@@ -13,7 +13,7 @@
 
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 #include <vector>
 #include <map>

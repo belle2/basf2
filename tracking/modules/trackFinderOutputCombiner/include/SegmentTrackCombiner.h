@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCFromSegmentsModule.h>
-#include <vector>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 #include <tracking/trackFinderOutputCombining/Lookups.h>
+#include <vector>
 
 namespace Belle2 {
 

@@ -3,6 +3,7 @@
 #include "daq/slc/base/StringUtil.h"
 
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -14,7 +15,7 @@ const std::string ConfigFile::getFilePath(const std::string& filename_in)
   std::string filename = filename_in;
   if (filename == "slowcontrol") {
     char* slcfile = getenv("BELLE2_SLC_FILE");
-    if (slcfile != NULL) {
+    if (slcfile != NULL && strlen(slcfile) > 0) {
       filename = slcfile;
     }
   }

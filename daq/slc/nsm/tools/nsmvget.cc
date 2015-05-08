@@ -2,6 +2,8 @@
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
+#include <daq/slc/nsm/nsm_read_argv.h>
+
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Daemon.h>
 
@@ -28,9 +30,9 @@ namespace Belle2 {
     virtual void init(NSMCommunicator&) throw()
     {
       try {
-        NSMNode node(m_argv[2]);
+        NSMNode node(m_argv[1]);
         NSMCommunicator::connected(node.getName());
-        for (int i = 3; i < m_argc; i++) {
+        for (int i = 2; i < m_argc; i++) {
           NSMVar var(m_argv[i]);
           get(node, var);
           switch (var.getType()) {
@@ -48,7 +50,7 @@ namespace Belle2 {
           }
         }
       } catch (const NSMNotConnectedException& e) {
-        printf("node %s is not online\n", m_argv[2]);
+        printf("node %s is not online\n", m_argv[1]);
       } catch (const NSMHandlerException& e) {
         printf("NSM error %s\n", e.what());
       } catch (const IOException& e) {
@@ -64,19 +66,27 @@ namespace Belle2 {
 
 }
 
+int help(const char** argv)
+{
+  printf("usage  : %s <nodename> <varname> [-n myname] [-c conf] [-g]\n", argv[0]);
+  printf("options: -c : set conf file \"conf\" (default:slowcontrol)\n");
+  printf("options: -n : set nsm user name (default:env of USER)\n");
+  printf("options: -g : use nsm.global (default:nsm)\n");
+  return 0;
+}
+
 using namespace Belle2;
 
-int main(int argc, char** argv)
+int main(int argc, const char** argv)
 {
-  if (argc < 3) {
-    LogFile::debug("Usage : %s <myname> <nodename> <varname>", argv[0]);
-    return 1;
-  }
   ConfigFile config("slowcontrol");
-  const std::string hostname = config.get("nsm.host");
-  const int port = config.getInt("nsm.port");
-  NSMVGETCallback* callback = new NSMVGETCallback(NSMNode(argv[1]), argc, argv);
-  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
+  std::string name, username;
+  char** argv_in = new char* [argc];
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  int port = config.getInt(name + ".port");
+  std::string host = config.get(name + ".host");
+  NSMVGETCallback* callback = new NSMVGETCallback(NSMNode(username), argc_in, argv_in);
+  NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, host, port);
   daemon->run();
   return 0;
 }

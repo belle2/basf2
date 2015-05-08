@@ -1,6 +1,7 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/nsm/nsm_read_argv.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Daemon.h>
@@ -25,6 +26,16 @@ void setNode(int ir, const std::string& node);
 void setState(int ir, std::string state);
 void setConfig(int ir, const std::string& config);
 void init_cui(int nnodes);
+
+int help(const char** argv)
+{
+  printf("usage : %s <nodename> "
+         "[-n myname] [-c conf] [-g]\n", argv[0]);
+  printf("options: -c : set conf file \"conf\" (default:slowcontrol)\n");
+  printf("options: -n : set nsm user name (default:env of USER)\n");
+  printf("options: -g : use nsm.global (default:nsm)\n");
+  return 0;
+}
 
 namespace Belle2 {
 
@@ -118,19 +129,18 @@ namespace Belle2 {
 
 }
 
-int main(int argc, char** argv)
-{
-  using namespace Belle2;
+using namespace Belle2;
 
-  if (argc < 2) {
-    LogFile::debug("Usage : %s <myname> <nodename>", argv[0]);
-    return 1;
-  }
+int main(int argc, const char** argv)
+{
   LogFile::open(StringUtil::form("%s/%s", argv[0], argv[1]), LogFile::ERROR);
   ConfigFile config("slowcontrol");
-  const std::string hostname = config.get("nsm.host");
-  const int port = config.getInt("nsm.port");
-  RCViewCallback* callback = new RCViewCallback(NSMNode(argv[1]), argc, argv);
+  std::string name, username;
+  char** argv_in = new char* [argc];
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  const std::string hostname = config.get(name + ".host");
+  const int port = config.getInt(name + ".port");
+  RCViewCallback* callback = new RCViewCallback(NSMNode(username), argc_in, argv_in);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();
   return 0;

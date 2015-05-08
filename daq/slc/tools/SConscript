@@ -2,10 +2,10 @@ Import('env')
 
 env['TOOLS_LIBS']['shmclean'] = ['rt']
 env['TOOLS_LIBS']['nsmcui']  = ['nsm2_b2lib', 'nsm2_corelib']
-env['TOOLS_LIBS']['getconfig']  = ['daq']
-env['TOOLS_LIBS']['rfconfcreate']  = ['daq', 'framework', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['rfconfget']  = ['daq', 'framework', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['rcconfigget']  = ['daq', 'framework', '$PGSQL_LIBS']
-env['TOOLS_LIBS']['bootnsmd2']  = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['confget']  = ['daq']
+env['TOOLS_LIBS']['rfconfcreate']  = ['daq', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['rfconfget']  = ['daq', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['bootnsmd2']  = ['daq']
+env['TOOLS_LIBS']['checknsm2']  = ['daq']
 
 Return('env')

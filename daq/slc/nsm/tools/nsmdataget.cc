@@ -1,6 +1,7 @@
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 #include <daq/slc/nsm/NSMData.h>
 #include <daq/slc/nsm/NSMCommunicator.h>
+#include <daq/slc/nsm/nsm_read_argv.h>
 
 #include <daq/slc/system/LogFile.h>
 
@@ -8,25 +9,34 @@
 
 #include <cstdlib>
 
+int help(const char** argv)
+{
+  printf("usage : %s <dataname> <format> [<varname>...] "
+         "[-n myname] [-c conf] [-g]\n", argv[0]);
+  printf("options: -c : set conf file \"conf\" (default:slowcontrol)\n");
+  printf("options: -n : set nsm user name (default:env of USER)\n");
+  printf("options: -g : use nsm.global (default:nsm)\n");
+  return 0;
+}
+
 using namespace Belle2;
 
-int main(int argc, char** argv)
+int main(int argc, const char** argv)
 {
-  if (argc < 4) {
-    LogFile::debug("Usage : %s <mynode> <dataname> <format> [<parname>]", argv[0]);
-    return 1;
-  }
-  NSMCommunicator com;
   ConfigFile config("slowcontrol");
-  const std::string hostname = config.get("nsm.host");
-  const int port = config.getInt("nsm.port");
-  com.init(NSMNode(argv[1]), hostname, port);
-  NSMData data(argv[2], argv[3], -1);
+  std::string name, username;
+  char** argv_in = new char* [argc];
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  const std::string hostname = config.get(name + ".host");
+  const int port = config.getInt(name + ".port");
+  NSMCommunicator com;
+  com.init(NSMNode(username), hostname, port);
+  NSMData data(argv_in[1], argv_in[2], -1);
   data.open(com);
-  if (argc > 4) {
+  if (argc_in > 3) {
     DBField::Type type;
     int length;
-    for (int i = 4; i < argc; i++) {
+    for (int i = 3; i < argc; i++) {
       const void* p = data.find(argv[i], type, length);
       switch (type) {
         case DBField::LONG:

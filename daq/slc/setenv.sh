@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export BELLE2_LOCAL_DIR=$HOME/
+export BELLE2_LOCAL_DIR=$HOME/belle2/release
 export BELLE2_DAQ_SLC=$PWD
 export BELLE2_EXTERNALS_DIR=$PWD
 export PATH=$BELLE2_DAQ_SLC/bin:$PATH

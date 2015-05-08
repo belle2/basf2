@@ -1,6 +1,7 @@
 #include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
+#include <daq/slc/nsm/nsm_read_argv.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Daemon.h>
@@ -58,18 +59,27 @@ namespace Belle2 {
 
 }
 
+int help(const char** argv)
+{
+  printf("usage : %s <nodename> <varname> <type=int/float/text> <value> "
+         "[-n myname] [-c conf] [-g]\n", argv[0]);
+  printf("options: -c : set conf file \"conf\" (default:slowcontrol)\n");
+  printf("options: -n : set nsm user name (default:env of USER)\n");
+  printf("options: -g : use nsm.global (default:nsm)\n");
+  return 0;
+}
+
 using namespace Belle2;
 
-int main(int argc, char** argv)
+int main(int argc, const char** argv)
 {
-  if (argc < 6) {
-    LogFile::debug("Usage : %s <myname> <nodename> <varname> <type=int/float/text> <value>", argv[0]);
-    return 1;
-  }
   ConfigFile config("slowcontrol");
-  const std::string hostname = config.get("nsm.host");
-  const int port = config.getInt("nsm.port");
-  NSMVSETCallback* callback = new NSMVSETCallback(NSMNode(argv[1]), argc, argv);
+  std::string name, username;
+  char** argv_in = new char* [argc];
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  const std::string hostname = config.get(name + ".host");
+  const int port = config.getInt(name + ".port");
+  NSMVSETCallback* callback = new NSMVSETCallback(NSMNode(username), argc_in, argv_in);
   NSMNodeDaemon* daemon = new NSMNodeDaemon(callback, hostname, port);
   daemon->run();
   return 0;

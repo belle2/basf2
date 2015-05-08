@@ -2,7 +2,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
-#include <framework/dataobjects/RelationContainer.h>
 #include <framework/logging/Logger.h>
 
 #include <TObject.h>

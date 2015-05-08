@@ -33,12 +33,10 @@ using namespace std;
  */
 double histogram_integral(const TH1F* h, double xmin, double xmax)
 {
-  double sign = 1;
   if (xmin > xmax) {
     double z = xmin;
     xmin = xmax;
     xmax = z;
-    sign = -1;
   }
   TAxis* axis = h->GetXaxis();
   int bmin = axis->FindBin(xmin);

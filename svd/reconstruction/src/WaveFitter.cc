@@ -186,7 +186,7 @@ double WaveFitter::integral12(double lower, double upper, std::function<double(d
   double span = 0.5 * (upper - lower);
   double center = 0.5 * (upper + lower);
   double result = 0;
-  for (int iknot = 0; iknot < half_order; ++iknot) {
+  for (unsigned int iknot = 0; iknot < half_order; ++iknot) {
     result += weights[iknot] * f(center + span * knots[iknot]);
     result += weights[iknot] * f(center - span * knots[iknot]);
   }
@@ -224,7 +224,7 @@ double WaveFitter::integral20(double lower, double upper, std::function<double(d
   double span = 0.5 * (upper - lower);
   double center = 0.5 * (upper + lower);
   double result = 0;
-  for (int iknot = 0; iknot < half_order; ++iknot) {
+  for (unsigned int iknot = 0; iknot < half_order; ++iknot) {
     result += weights[iknot] * f(center + span * knots[iknot]);
     result += weights[iknot] * f(center - span * knots[iknot]);
   }

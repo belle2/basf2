@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     g_levels[i]->SetLineColor(kBlack);
     g_levels[i]->SetLineStyle(3);
   }
-  for (int iamp = 0; iamp < sn_values.size(); ++iamp) {
+  for (unsigned int iamp = 0; iamp < sn_values.size(); ++iamp) {
     double amplitude = sn_values[iamp];
     TString amp_string(Form("(true_amp==%f)", amplitude));
     TGraph* g = new TGraph(nPoints);

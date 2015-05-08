@@ -641,7 +641,7 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
     for (auto sample : cls.samples()) {
       short index = sample.getSampleIndex();
       unsigned int strip = sample.getCellID();
-      if (strip != currentStrip) {
+      if (static_cast<int>(strip) != currentStrip) {
         // we are on a new strip -save what we've got
         fitter.addData(stripData, currentNoise);
         stripData.fill(0);

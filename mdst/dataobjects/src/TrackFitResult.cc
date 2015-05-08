@@ -12,6 +12,9 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
+#include <framework/utilities/HTML.h>
+
+#include <sstream>
 
 using namespace Belle2;
 
@@ -95,4 +98,11 @@ HitPatternCDC TrackFitResult::getHitPatternCDC() const
 HitPatternVXD TrackFitResult::getHitPatternVXD() const
 {
   return HitPatternVXD(m_hitPatternVXDInitializer);
+}
+std::string TrackFitResult::getInfoHTML() const
+{
+  std::stringstream out;
+  out << "<b>PDG</b>: " << m_pdg << "<br>";
+  out << "<b>Covariance Matrix</b>: " << HTML::getString(getCovariance5()) << "<br>";
+  return out.str();
 }

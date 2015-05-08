@@ -208,6 +208,8 @@ namespace Belle2 {
     /** Getter for the hit pattern in the VXD; @sa HitPatternVXD */
     HitPatternVXD getHitPatternVXD() const;
 
+    virtual std::string getInfoHTML() const;
+
     ///--------------------------------------------------------------------------------------------------------------------------
   private:
 

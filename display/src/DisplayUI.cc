@@ -262,12 +262,16 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
   if (VisualRepMap::getInstance()->isCurrentlySelecting())
     return;
 
+  //B2INFO("in selection handler: " << eveObj->GetElementName());
+
   const TObject* representedObject = VisualRepMap::getInstance()->getDataStoreObject(eveObj);
   if (representedObject)
     m_viewPane->getInfoWidget()->show(representedObject);
 
+  VisualRepMap::getInstance()->selectOnly(eveObj);
   VisualRepMap::getInstance()->selectRelated(eveObj);
 }
+
 void DisplayUI::handleEvent(Event_t* event)
 {
   if (event->fType == kGKeyPress) {
@@ -308,6 +312,7 @@ bool DisplayUI::startDisplay()
 
     //We want to do special things when objects are selected
     gEve->GetSelection()->Connect("SelectionAdded(TEveElement*)", "Belle2::DisplayUI", this, "selectionHandler(TEveElement*)");
+    gEve->GetSelection()->Connect("SelectionRepeated(TEveElement*)", "Belle2::DisplayUI", this, "selectionHandler(TEveElement*)");
   }
 
   updateUI(); //update button state

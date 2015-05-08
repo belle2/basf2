@@ -1255,8 +1255,9 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
     std::swap(etaLow, etaHigh);
   }
 
-  m_eclData->AddTower(etaLow, etaHigh, phi - dPhi, phi + dPhi);
+  int id = m_eclData->AddTower(etaLow, etaHigh, phi - dPhi, phi + dPhi);
   m_eclData->FillSlice(0, cluster->getEnergy());
+  VisualRepMap::getInstance()->addCluster(cluster, m_eclData, id);
 }
 
 void EVEVisualization::addROI(const ROIid* roi, const TString& name)

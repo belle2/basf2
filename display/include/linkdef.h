@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::SplitGLView+;
 #pragma link C++ class Belle2::BrowsableWrapper+;
 #pragma link C++ class Belle2::InfoWidget+;
+#pragma link C++ class Belle2::EveTower+;
 
 #endif

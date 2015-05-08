@@ -1,9 +1,13 @@
 #pragma once
 
+#include <vector>
+
 class TEveElement;
+class TEveCaloData;
 class TObject;
 
 namespace Belle2 {
+  class EveTower;
   /** defines a bidirectional mapping between TObjects in DataStore and their visual representation.
    *
    * This is used to allow retrieving the original objects for a given TEveElement (to show additional info),
@@ -15,6 +19,9 @@ namespace Belle2 {
 
     /** Select the representation of the given object. */
     void select(const TObject* object) const;
+
+    /** Deselect all other objects. */
+    void selectOnly(TEveElement* eveObj) const;
 
     /** Select related objects. */
     void selectRelated(TEveElement* eveObj) const;
@@ -49,6 +56,9 @@ namespace Belle2 {
      * Does not take ownership of given objects, just stores mapping between pointers.
      */
     void add(const TObject* dataStoreObject, TEveElement* visualRepresentation);
+
+    /** Selection inside TEveCalo* is complicated, use this to keep track of ECL clusters. */
+    void addCluster(const TObject* dataStoreObject, TEveCaloData* caloData, int towerID);
   private:
     VisualRepMap();
     /** no copy ctor */
@@ -61,6 +71,9 @@ namespace Belle2 {
 
     /** Map DataStore contents in current event with their visual representation. */
     DataStoreEveElementMap* m_dataStoreEveElementMap;
+
+    /** individual ECL towers (getting them out of TEve is hard). */
+    std::vector<EveTower*> m_eclTowers;
 
   };
 }

@@ -1,10 +1,12 @@
 #include <display/VisualRepMap.h>
 
+#include <display/EveTower.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TEveSelection.h>
+#include <TEveCaloData.h>
 #include <TEveManager.h>
 
 #include <boost/bimap/bimap.hpp>
@@ -33,10 +35,32 @@ VisualRepMap::VisualRepMap() : m_currentlySelecting(false), m_dataStoreEveElemen
 
 VisualRepMap::~VisualRepMap() { delete m_dataStoreEveElementMap; }
 
-void VisualRepMap::clear() { m_dataStoreEveElementMap->clear(); }
+void VisualRepMap::clear()
+{
+  m_dataStoreEveElementMap->clear();
+
+  for (EveTower* t : m_eclTowers)
+    delete t;
+  m_eclTowers.clear();
+}
+
 
 const TObject* VisualRepMap::getDataStoreObject(TEveElement* elem) const
 {
+  //special handling for TEveCaloData
+  if (TEveCaloData* caloData = dynamic_cast<TEveCaloData*>(elem)) {
+    const auto& selectedCells = caloData->GetCellsSelected();
+    if (selectedCells.empty())
+      return nullptr;
+    int id = selectedCells[0].fTower;
+    for (EveTower* eveTower : m_eclTowers) {
+      if (eveTower->getID() == id) {
+        elem = eveTower;
+        break;
+      }
+    }
+  }
+
   const auto& it = m_dataStoreEveElementMap->right.find(elem);
   if (it != m_dataStoreEveElementMap->right.end())
     return it->second;
@@ -63,6 +87,17 @@ void VisualRepMap::select(const TObject* object) const
     gEve->GetSelection()->UserPickedElement(elem, true);
   }
   m_currentlySelecting = false;
+}
+
+void VisualRepMap::selectOnly(TEveElement* eveObj) const
+{
+  //copy current selection
+  const std::list<TEveElement*> sel(gEve->GetSelection()->BeginChildren(), gEve->GetSelection()->EndChildren());
+  for (TEveElement* el : sel) {
+    if (el == eveObj or el->IsA() == EveTower::Class())
+      continue;
+    gEve->GetSelection()->UserUnPickedElement(el);
+  }
 }
 
 void VisualRepMap::selectRelated(TEveElement* eveObj) const
@@ -95,4 +130,13 @@ void VisualRepMap::add(const TObject* dataStoreObject, TEveElement* visualRepres
   if (!ret.second) {
     B2ERROR("Failed to insert object represented by " << visualRepresentation->GetElementName() << "! Duplicate?");
   }
+}
+
+void VisualRepMap::addCluster(const TObject* dataStoreObject, TEveCaloData* caloData, int towerID)
+{
+  EveTower* tower = new EveTower(caloData, towerID);
+  tower->IncDenyDestroy(); //otherwise the selection wants to own this.
+  m_eclTowers.push_back(tower);
+
+  add(dataStoreObject, tower);
 }

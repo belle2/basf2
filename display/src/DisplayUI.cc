@@ -138,6 +138,8 @@ void DisplayUI::updateUI()
                                           eventMetaData->getRun(), eventMetaData->getExperiment()));
   }
   m_eventLabel->Resize();
+
+  gVirtualX->SetCursor(gEve->GetBrowser()->GetId(), gVirtualX->CreateCursor(kPointer));
 }
 
 void DisplayUI::goToEvent(Long_t id)
@@ -161,8 +163,9 @@ void DisplayUI::goToEvent(Long_t id)
   } else {
     m_currentEntry++;
   }
-  m_eventLabel->SetTextColor(gROOT->GetColor(kRed + 1));
-  m_eventLabel->SetText(" \nLoading...\n ");
+  gVirtualX->SetCursor(gEve->GetBrowser()->GetId(), gVirtualX->CreateCursor(kWatch));
+
+
   if (m_timer)
     m_timer->Stop(); //apparently timer only deactivates after processing event, so do it manually
   //process remaining events to ensure redraw (only needed if called from Timeout())
@@ -178,8 +181,7 @@ void DisplayUI::goToEvent(Long_t event, Long_t run, Long_t experiment)
   const long numEntries = InputController::numEntries();
   if (numEntries > 0 && InputController::canControlInput()) {
     B2DEBUG(100, "Switching to event " << event << " in run " << run << ", experiment " << experiment);
-    m_eventLabel->SetTextColor(gROOT->GetColor(kRed + 1));
-    m_eventLabel->SetText(" \nLoading...\n ");
+    gVirtualX->SetCursor(gEve->GetBrowser()->GetId(), gVirtualX->CreateCursor(kWatch));
     InputController::setNextEntry(experiment, run, event);
   }
   B2DEBUG(100, "exiting event loop now.");

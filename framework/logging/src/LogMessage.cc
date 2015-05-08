@@ -50,8 +50,11 @@ std::ostream& LogMessage::print(std::ostream& out) const
 {
   if (!m_logInfo || (m_logInfo & LogConfig::c_Timestamp)) {
     static const double startClock = Utils::getClock();
-    out.precision(3);
+    const auto flags = out.flags();
+    const int oldprecision = out.precision(3);
     out << std::fixed << (Utils::getClock() - startClock) / Unit::s << ": ";
+    out.precision(oldprecision);
+    out.flags(flags);
   }
   if (!m_logInfo || (m_logInfo & LogConfig::c_Level)) {
     out << "[" << LogConfig::logLevelToString(m_logLevel) << "] ";

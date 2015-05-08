@@ -1,5 +1,11 @@
 Import('env')
 
-env['LIBS'] = []
+env['LIBS'] = ['cdc_dataobjects',
+               'framework',
+               'genfit2',
+               'tracking_trackFindingCDC',
+               'mdst_dataobjects',
+               'framework_pybasf2',
+               'simulation_dataobjects',
+               'tracking']
 Return('env')
-

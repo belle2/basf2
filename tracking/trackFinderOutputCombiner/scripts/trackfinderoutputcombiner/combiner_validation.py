@@ -211,38 +211,53 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
         main_path = super(CombinerValidationRun, self).create_path()
 
-        main_path.add_module(basf2.register_module("RootOutput"))
-
-        if self.splitting:
-            suffix = ""
-        else:
-            suffix = "_no_splitting"
+        display_module = CDCSVGDisplayModule()
+        display_module.draw_tracks = True
+        display_module.draw_track_trajectories = True
+        # main_path.add_module(display_module)
 
         local_track_finder = basf2.register_module('SegmentFinderCDCFacetAutomaton')
         local_track_finder.param({
-            "UseOnlyCDCHitsRelatedFrom": self.not_assigned_cdc_hits_store_array_name,
             "GFTrackCandsStoreArrayName": self.local_track_cands_store_array_name,
+            "TracksStoreObjName": "TempCDCTracks",
+            "WriteClusters": True,
+            "WriteGFTrackCands": False,
+            'SkipHitsPreparation': True,
         })
-
         main_path.add_module(local_track_finder)
 
         display_module = CDCSVGDisplayModule()
         display_module.draw_segments_id = True
         # main_path.add_module(display_module)
 
-        # main_path.add_module(TestingModule())
-
         combiner_module = basf2.register_module("SegmentTrackCombiner")
-        combiner_module.param("GFTrackCandsStoreArrayName", "ResultTrackCands")
-        combiner_module.set_debug_level(100)
+        combiner_module.param({'WriteGFTrackCands': False,
+                               'SkipHitsPreparation': True,
+                               'TracksStoreObjNameIsInput': True})
+        combiner_module.set_debug_level(200)
         # combiner_module.set_log_level(basf2.LogLevel.DEBUG)
         main_path.add_module(combiner_module)
 
+        second_local_track_finder = basf2.register_module('TrackFinderCDCSegmentTripleAutomaton')
+        second_local_track_finder.param({'WriteGFTrackCands': True,
+                                         'SkipHitsPreparation': True,
+                                         'GFTrackCandsStoreArrayName': "ResultTrackCands",
+                                         'TracksStoreObjNameIsInput': True})
+        main_path.add_module(second_local_track_finder)
+
         display_module = CDCSVGDisplayModule()
-        display_module.track_cands_store_array_name = "RestTrackCands"
-        display_module.draw_gftrackcands = True
+        display_module.draw_track_trajectories = True
+        display_module.draw_tracks = True
+        # main_path.add_module(display_module)
+
+        display_module = CDCSVGDisplayModule()
         display_module.draw_gftrackcand_trajectories = True
-        main_path.add_module(display_module)
+        display_module.draw_gftrackcands = True
+        display_module.track_cands_store_array_name = "MCTrackCands"
+        # main_path.add_module(display_module)
+
+        self.create_validation(main_path, track_candidates_store_array_name="TrackCands", output_file_name="Legendre.root")
+        self.create_validation(main_path, track_candidates_store_array_name="ResultTrackCands", output_file_name="Combiner.root")
 
         return main_path
 

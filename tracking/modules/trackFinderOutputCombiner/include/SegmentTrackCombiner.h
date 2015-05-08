@@ -27,7 +27,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    SegmentTrackCombinerModule(): TrackFinderCDCFromSegmentsModule(), m_lookUp() { }
+    SegmentTrackCombinerModule(): TrackFinderCDCFromSegmentsModule(), m_combiner() { }
 
     /**
      * Used the QuadTree to generate tracks from segments.
@@ -35,6 +35,6 @@ namespace Belle2 {
     void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
 
   private:
-    TrackFinderOutputCombining::SegmentTrackCombiner m_lookUp;
+    TrackFinderOutputCombining::SegmentTrackCombiner m_combiner;
   };
 }

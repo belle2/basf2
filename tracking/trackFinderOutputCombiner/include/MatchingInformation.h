@@ -68,7 +68,7 @@ namespace Belle2 {
     public:
       TrackInformation(TrackFindingCDC::CDCTrack* trackCand) :
         MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation>(trackCand),
-        m_perpSList(), m_minPerpS(0), m_maxPerpS(0)
+        m_perpSList(), m_goodFittingSegmentTrain(), m_minPerpS(0), m_maxPerpS(0)
       {
       }
 
@@ -106,12 +106,22 @@ namespace Belle2 {
 
       void setGoodSegmentTrain(const std::vector<SegmentInformation*>& goodFittingSegmentTrain)
       {
-        m_goodFittingSegmentTrain = * goodFittingSegmentTrain;
+        m_goodFittingSegmentTrain = goodFittingSegmentTrain;
+      }
+
+      const std::vector<SegmentInformation*>& getGoodSegmentTrain() const
+      {
+        return m_goodFittingSegmentTrain;
+      }
+
+      void clearGoodSegmentTrain()
+      {
+        m_goodFittingSegmentTrain.clear();
       }
 
     private:
       std::vector<double> m_perpSList;
-      std::vector<SegmentInformation*>* m_goodFittingSegmentTrain;
+      std::vector<SegmentInformation*> m_goodFittingSegmentTrain;
       double m_minPerpS;
       double m_maxPerpS;
     };

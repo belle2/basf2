@@ -53,7 +53,7 @@ namespace Belle2 {
     class SegmentLookUp : public LookUpBase<TrackFindingCDC::CDCRecoSegment2D, std::vector<SegmentInformation*>> {
     public:
       void fillWith(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments) override;
-      ~SegmentLookUp()
+      void clear()
       {
         for (std::vector<SegmentInformation*>& segmentList : m_lookup) {
           for (SegmentInformation* segmentInformation : segmentList) {
@@ -66,7 +66,7 @@ namespace Belle2 {
     class TrackLookUp : public LookUpBase<TrackFindingCDC::CDCTrack, TrackInformation*> {
     public:
       void fillWith(std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
-      ~TrackLookUp()
+      void clear()
       {
         for (TrackInformation* trackInformation : m_lookup) {
           delete trackInformation;
@@ -101,8 +101,20 @@ namespace Belle2 {
        * - If there is more than one segment (or train of segments) in this superlayer, that match to this track, we use a fit to decide
        *   which train of segments should be kept.
        * - If there is (now) only one possible train/segment left, we mark this as the goodSegmentTrain for this track.
+       * - We now still have the problem that there could be two ore more tracks matched to the same segment (or segment in a train)
+       *   So we go through all the segments in the good-markes trains and check if they have more than one match. We try to find the best matching candidate.
+       * - Now we really have a one-on-one relation between tracks and segments. We can put them all together.
        */
       void combine();
+
+      /**
+       * Clear all the pointer vectors.
+       */
+      void clear()
+      {
+        m_trackLookUp.clear();
+        m_segmentLookUp.clear();
+      }
 
     private:
       const float m_param_percentageForPerpSMeasurements = 0.05;
@@ -111,12 +123,13 @@ namespace Belle2 {
       bool segmentMatchesToTrack(const SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
       bool couldBeASegmentTrain(const TrainOfSegments& list, const TrackInformation* trackInformation);
 
-      const TrainOfSegments& findBestFittingSegmentTrain(const std::list<TrainOfSegments>& trainsOfSegments,
+      const TrainOfSegments& findBestFittingSegmentTrain(std::list<TrainOfSegments>& trainsOfSegments,
                                                          TrackInformation* trackInformation);
-      void combineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments);
+      void tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments);
       void matchTracksToSegment(SegmentInformation* segmentInformation);
       void makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
-      double testFitSegmentToTrack(const SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
+      double testFitSegmentToTrack(SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
+      double testFitSegmentTrainToTrack(const TrainOfSegments& train, const TrackInformation* trackInformation);
       void createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
       void createTracksForOutput(std::vector<TrackFindingCDC::CDCTrack>& tracks);
       void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);

@@ -1,4 +1,5 @@
 from ROOT import gSystem
+from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
@@ -61,14 +62,8 @@ class MCTrackFinderRun(StandardEventGenerationRun):
 
 
 class LegendreTrackFinderRun(MCTrackFinderRun):
-    # output (splitted) track cands
-    legendre_track_cands_store_array_name = "LegendreTrackCands"
-    # output not assigned cdc hits
-    not_assigned_cdc_hits_store_array_name = "NotAssignedCDCHits"
     # input tmva cut
     tmva_cut = 0.1
-    # input flag if to split
-    splitting = True
     # input flag if to use stereo assignment
     stereo_assignment = True
 
@@ -83,66 +78,29 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
             help='Cut for the TMVA in the module.'
         )
 
-        argument_parser.add_argument(
-            '--splitting',
-            dest='splitting',
-            action="store_true",
-            help='Split the tracks before searching for not assigned hits.'
-        )
-
-        argument_parser.add_argument(
-            '--no-splitting',
-            dest='splitting',
-            action="store_false",
-            help='Split the tracks before searching for not assigned hits.'
-        )
-
-        argument_parser.set_defaults(splitting=self.splitting)
-
         return argument_parser
 
     def create_path(self):
         # BackgroundHitFinder, Legendre, LegendreStereo, NotAssignedHitsSearcher
         main_path = super(LegendreTrackFinderRun, self).create_path()
 
-        good_cdc_hits_store_array_name = "GoodCDCHits"
-        temp_track_cands_store_array_name = "TempTrackCands"
-
         background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
         background_hit_finder_module.param({
             "ClusterFilter": "tmva",
             "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
-            "RemainingCDCHitsStoreArrayName": good_cdc_hits_store_array_name,
+            "SegmentsStoreObjName": "TempCDCRecoSegment2DVector",
             "FacetFilter": "none",
             "FacetNeighborChooser": "none",
         })
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
-        if self.tmva_cut > 0:
-            cdctracking.param('UseOnlyCDCHitsRelatedFrom', good_cdc_hits_store_array_name)
-        cdctracking.param('GFTrackCandsStoreArrayName', temp_track_cands_store_array_name)
-        if self.stereo_assignment:
-            cdctracking.param('WriteGFTrackCands', False)
-        cdctracking.set_log_level(basf2.LogLevel.WARNING)
+        cdctracking.param({'WriteGFTrackCands': False,
+                           'SkipHitsPreparation': True})
 
         cdc_stereo_combiner = basf2.register_module('CDCLegendreHistogramming')
-        if self.tmva_cut > 0:
-            cdc_stereo_combiner.param('UseOnlyCDCHitsRelatedFrom', good_cdc_hits_store_array_name)
-        cdc_stereo_combiner.param({'GFTrackCandsStoreArrayName': temp_track_cands_store_array_name,
-                                   "TracksStoreObjNameIsInput": True})
-        cdc_stereo_combiner.set_log_level(basf2.LogLevel.WARNING)
-
-        not_assigned_hits_searcher_module = basf2.register_module("NotAssignedHitsSearcher")
-        not_assigned_hits_searcher_module.param({"TracksFromFinder": temp_track_cands_store_array_name,
-                                                 "SplittedTracks": self.legendre_track_cands_store_array_name,
-                                                 "NotAssignedCDCHits": self.not_assigned_cdc_hits_store_array_name,
-                                                 })
-
-        if self.splitting:
-            not_assigned_hits_searcher_module.param("MinimumDistanceToSplit", 0.2)
-            not_assigned_hits_searcher_module.param("MinimalHits", 17)
-        else:
-            not_assigned_hits_searcher_module.param("MinimumDistanceToSplit", 1.1)
+        cdc_stereo_combiner.param({'WriteGFTrackCands': True,
+                                   'SkipHitsPreparation': True,
+                                   'TracksStoreObjNameIsInput': True})
 
         if self.tmva_cut > 0:
             main_path.add_module(background_hit_finder_module)
@@ -150,93 +108,11 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
         main_path.add_module(cdctracking)
         if self.stereo_assignment:
             main_path.add_module(cdc_stereo_combiner)
-        main_path.add_module(not_assigned_hits_searcher_module)
 
         return main_path
 
 
-class CombinerTrackFinderRun(LegendreTrackFinderRun):
-    # depricated
-
-    local_track_cands_store_array_name = "LocalTrackCands"
-    use_segment_quality_check = True
-    do_combining = True
-
-    def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
-        main_path = super(CombinerTrackFinderRun, self).create_path()
-
-        local_track_finder = basf2.register_module('SegmentFinderCDCFacetAutomaton')
-        local_track_finder.param({
-            "GFTrackCandsStoreArrayName": self.local_track_cands_store_array_name,
-            "UseOnlyCDCHitsRelatedFrom": self.not_assigned_cdc_hits_store_array_name,
-            "CreateGFTrackCands": True,
-            "FitSegments": True,
-        })
-
-        segment_quality_check = basf2.register_module("SegmentQualityCheck")
-        segment_quality_check.param("RecoSegments", 'CDCRecoSegment2DVector')
-
-        not_assigned_hits_combiner = basf2.register_module("NotAssignedHitsCombiner")
-        not_assigned_hits_combiner.param({"TracksFromLegendreFinder": self.legendre_track_cands_store_array_name,
-                                          "ResultTrackCands": "ResultTrackCands",
-                                          "BadTrackCands": "BadTrackCands",
-                                          "RecoSegments": 'CDCRecoSegment2DVector',
-                                          "MinimalChi2": 0.8,
-                                          "MinimalThetaDifference": 0.3,
-                                          "MinimalZDifference": 10,
-                                          "MinimalChi2Stereo": 0.000001})
-
-        track_finder_output_combiner_naive = basf2.register_module("NaiveCombiner")
-        track_finder_output_combiner_naive.param({"TracksFromLegendreFinder": self.legendre_track_cands_store_array_name,
-                                                  "NotAssignedTracksFromLocalFinder": self.local_track_cands_store_array_name,
-                                                  "ResultTrackCands": "NaiveResultTrackCands",
-                                                  "UseMCInformation": False
-                                                  })
-
-        mc_track_matcher_module_local = basf2.register_module('MCTrackMatcher')
-        mc_track_matcher_module_local.param({
-            'UseCDCHits': True,
-            'UseSVDHits': False,
-            'UsePXDHits': False,
-            'RelateClonesToMCParticles': True,
-            'MCGFTrackCandsColName': "MCTrackCands",
-            'PRGFTrackCandsColName': self.legendre_track_cands_store_array_name,
-        })
-
-        mc_track_matcher_module_legendre = basf2.register_module('MCTrackMatcher')
-        mc_track_matcher_module_legendre.param({
-            'UseCDCHits': True,
-            'UseSVDHits': False,
-            'UsePXDHits': False,
-            'RelateClonesToMCParticles': True,
-            'MCGFTrackCandsColName': "MCTrackCands",
-            'PRGFTrackCandsColName': self.local_track_cands_store_array_name,
-        })
-
-        track_finder_output_combiner_mc = basf2.register_module("NaiveCombiner")
-        track_finder_output_combiner_mc.param({"TracksFromLegendreFinder": self.legendre_track_cands_store_array_name,
-                                               "NotAssignedTracksFromLocalFinder": self.local_track_cands_store_array_name,
-                                               "ResultTrackCands": "BestResultTrackCands",
-                                               "UseMCInformation": True
-                                               })
-
-        main_path.add_module(local_track_finder)
-        if self.use_segment_quality_check:
-            main_path.add_module(segment_quality_check)
-
-        if self.do_combining:
-            main_path.add_module(not_assigned_hits_combiner)
-            main_path.add_module(track_finder_output_combiner_naive)
-            main_path.add_module(mc_track_matcher_module_legendre)
-            main_path.add_module(mc_track_matcher_module_local)
-            main_path.add_module(track_finder_output_combiner_mc)
-
-        return main_path
-
-
-class TrasanTrackFinderRun(CombinerTrackFinderRun):
+class TrasanTrackFinderRun(LegendreTrackFinderRun):
     trasan_track_cands_store_array_name = "TrasanTrackCands"
 
     def create_path(self):

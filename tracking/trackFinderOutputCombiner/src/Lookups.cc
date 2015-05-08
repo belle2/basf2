@@ -68,6 +68,7 @@ void SegmentTrackCombiner::combine()
       std::list<TrainOfSegments> trainsOfSegments;
 
       // TODO: Be careful with curlers here!!!!
+      B2DEBUG(100, "Track matches to " << trackInformation->getMatches().size() << " segments before train creation.")
       createTrainsOfMatchedSegments(trainsOfSegments, trackInformation);
 
       if (trainsOfSegments.size() == 1) {
@@ -87,7 +88,12 @@ void SegmentTrackCombiner::combine()
 
     // Go through the tracks and see if we can combine the remaining segment-track combinations
     for (TrackInformation* trackInformation : m_trackLookUp) {
-      combineSegmentTrainAndMatchedTracks();
+      B2DEBUG(100, "Looking for possible combinations..")
+      const TrainOfSegments& goodTrain = trackInformation->getGoodSegmentTrain();
+      if (goodTrain.size() > 0)
+        tryToCombineSegmentTrainAndMatchedTracks(goodTrain);
+
+      trackInformation->clearGoodSegmentTrain();
     }
 
     // Count the number of segments we have still left
@@ -120,13 +126,15 @@ bool SegmentTrackCombiner::segmentMatchesToTrack(const SegmentInformation* segme
   const CDCTrajectory2D& trajectory = trackInformation->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
 
   if (segmentInformation->getSegment()->getStereoType() != AXIAL) {
-    if (fabs(trajectory.getDist2D(front.getRecoPos2D())) > 10)  {
-      B2DEBUG(120, "Hits too far away.")
+    if (fabs(trajectory.getDist2D(front.getWireHit().getRefPos2D())) > 10
+        or fabs(trajectory.getDist2D(back.getWireHit().getRefPos2D())) > 10)  {
+      B2DEBUG(120, "Hits too far away: " << trajectory.getDist2D(front.getRecoPos2D()))
       return false;
     }
   } else {
-    if (fabs(trajectory.getDist2D(front.getRecoPos2D())) > 5)  {
-      B2DEBUG(120, "Hits too far away.")
+    if (fabs(trajectory.getDist2D(front.getWireHit().getRefPos2D())) > 2
+        or fabs(trajectory.getDist2D(back.getWireHit().getRefPos2D())) > 2)  {
+      B2DEBUG(120, "Hits too far away: " << trajectory.getDist2D(front.getRecoPos2D()))
       return false;
     }
   }
@@ -144,27 +152,19 @@ bool SegmentTrackCombiner::segmentMatchesToTrack(const SegmentInformation* segme
     }
   }
 
-  // Calculate perpS
-  double perpS_min = trajectory.calcPerpS(frontRecoPos3D.xy());
-  double perpS_max = trajectory.calcPerpS(backRecoPos3D.xy());
-
-  if (perpS_min > perpS_max) {
-    std::swap(perpS_min, perpS_max);
-  }
 
   unsigned int hitsInSameRegion = 0;
-  for (double perpS : trackInformation->getPerpSList()) {
-    if (perpS < (1 + m_param_percentageForPerpSMeasurements) * perpS_max
-        and perpS > (1 - m_param_percentageForPerpSMeasurements) * perpS_min) {
+  for (const CDCRecoHit3D& recoHit : trackInformation->getTrackCand()->items()) {
+    if (recoHit.getISuperLayer() == segmentInformation->getSegment()->getISuperLayer()) {
       hitsInSameRegion++;
     }
   }
 
-  if (hitsInSameRegion > 3) {
+  if (hitsInSameRegion > 5) {
     B2DEBUG(110, "Too many hits in the same region: " << hitsInSameRegion)
     return false;
   } else {
-    B2DEBUG(110, "Hits in the region " << perpS_min << " - " << perpS_max << ": " << hitsInSameRegion << " while hits in segment: " <<
+    B2DEBUG(110, "Hits in the region: " << hitsInSameRegion << " while hits in segment: " <<
             segmentInformation->getSegment()->size())
   }
 
@@ -190,19 +190,27 @@ bool SegmentTrackCombiner::couldBeASegmentTrain(const TrainOfSegments& trainOfSe
 }
 
 const SegmentTrackCombiner::TrainOfSegments& SegmentTrackCombiner::findBestFittingSegmentTrain(
-  const std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation)
+  std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation)
 {
   // We can easily delete all matches here as we have them in the list anyway
   trackInformation->clearMatches();
+
+  TrainOfSegments* bestFittingTrain = nullptr;
+  double bestProbability = -1;
   for (TrainOfSegments& trainOfSegments : trainsOfSegments) {
     for (SegmentInformation* segmentInformation : trainOfSegments) {
-      std::vector<TrackInformation>& matchedTracks = segmentInformation->getMatches();
+      std::vector<TrackInformation*>& matchedTracks = segmentInformation->getMatches();
       matchedTracks.erase(std::remove(matchedTracks.begin(), matchedTracks.end(), trackInformation), matchedTracks.end());
+    }
+
+    double currentProbability = testFitSegmentTrainToTrack(trainOfSegments, trackInformation);
+    if (currentProbability > bestProbability) {
+      bestFittingTrain = &trainOfSegments;
+      bestProbability = currentProbability;
     }
   }
 
-  // TODO
-  TrainOfSegments& bestFittingSegmentTrain = trainsOfSegments.front();
+  TrainOfSegments& bestFittingSegmentTrain = *bestFittingTrain;
 
   // We have to readd the matches we want to keep
   for (SegmentInformation* segmentInformation : bestFittingSegmentTrain) {
@@ -243,8 +251,6 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
 
   segmentInformation->setUsedInTrack();
   for (const CDCRecoHit2D& recoHit : segmentInformation->getSegment()->items()) {
-    // TODO
-
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
     matchingTrack->getTrackCand()->push_back(recoHit3D);
     matchingTrack->getPerpSList().push_back(
@@ -253,19 +259,18 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
   matchingTrack->calcPerpS();
 }
 
-double SegmentTrackCombiner::testFitSegmentToTrack(const SegmentInformation* segmentInformation,
-                                                   const TrackInformation* trackInformation)
+double SegmentTrackCombiner::testFitSegmentTrainToTrack(const TrainOfSegments& train, const TrackInformation* trackInformation)
 {
+  if (train.size() == 0) return -1;
+
+
   const CDCTrajectory2D& trajectory2D = trackInformation->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
 
   CDCObservations2D observations;
 
-  double perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
-  double perpSBack = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
-
   CDCTrack* trackCand = trackInformation->getTrackCand();
 
-  bool isAxialSegment = segmentInformation->getSegment()->getStereoType() != AXIAL;
+  bool isAxialSegment = train.front()->getSegment()->getStereoType() != AXIAL;
 
   for (const CDCRecoHit3D& recoHit : trackCand->items()) {
     if (isAxialSegment) {
@@ -277,16 +282,17 @@ double SegmentTrackCombiner::testFitSegmentToTrack(const SegmentInformation* seg
     }
   }
 
-  for (const CDCRecoHit2D& recoHit : segmentInformation->getSegment()->items()) {
-    if (isAxialSegment) {
-      observations.append(recoHit.getRecoPos2D());
-    } else {
-      // TODO: Actually we need the rl-information here!
-      CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
-      double s = recoHit3D.getPerpS();
-      double z = recoHit3D.getRecoZ();
-      observations.append(s, z);
+  for (SegmentInformation* segmentInformation : train) {
+    for (const CDCRecoHit2D& recoHit : segmentInformation->getSegment()->items()) {
+      if (isAxialSegment) {
+        observations.append(recoHit.getRecoPos2D());
+      } else {
+        CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
+        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
+        double s = recoHit3D.getPerpS();
+        double z = recoHit3D.getRecoZ();
+        observations.append(s, z);
+      }
     }
   }
 
@@ -301,12 +307,20 @@ double SegmentTrackCombiner::testFitSegmentToTrack(const SegmentInformation* seg
   }
 }
 
-void SegmentTrackCombiner::combineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments)
+double SegmentTrackCombiner::testFitSegmentToTrack(SegmentInformation* segmentInformation,
+                                                   const TrackInformation* trackInformation)
 {
-  B2DEBUG(100, "Trying to combine...")
+  TrainOfSegments temporaryTrain {segmentInformation};
+  return testFitSegmentTrainToTrack(temporaryTrain, trackInformation);
+}
+
+void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments)
+{
+  B2DEBUG(100, "Trying to combine " << trainOfSegments.size() << " segment(s) with their track(s)...")
   for (SegmentInformation* segmentInformation : trainOfSegments) {
 
     std::vector<TrackInformation*>& matchingTracks = segmentInformation->getMatches();
+    B2DEBUG(100, "Segment has " << matchingTracks.size() << " partners.")
 
     if (matchingTracks.size() == 0) {
       B2DEBUG(100, "Match was deleted.")
@@ -314,6 +328,9 @@ void SegmentTrackCombiner::combineSegmentTrainAndMatchedTracks(const TrainOfSegm
     }
 
     // Try to fiddle out which is the best one!
+    double bestFitProb = 0;
+    TrackInformation* bestMatch = nullptr;
+
     std::vector<TrackInformation*> matchesAboveTrack;
     matchesAboveTrack.reserve(matchingTracks.size() / 2);
 
@@ -333,10 +350,11 @@ void SegmentTrackCombiner::combineSegmentTrainAndMatchedTracks(const TrainOfSegm
       }
     }), matchingTracks.end());
 
-    if (matchingTracks.size() > 1) {
+    if (matchingTracks.size() == 1) {
+      bestMatch = matchingTracks[0];
+      B2DEBUG(100, "Combining segment with track: " << bestMatch->getTrackCand())
+    } else if (matchingTracks.size() > 1) {
       B2DEBUG(100, matchingTracks.size() << " are too many possible partners! We choose the best one:")
-      double bestFitProb = 0;
-      TrackInformation* bestMatch = nullptr;
 
       for (TrackInformation* trackInformation : matchingTracks) {
         double fitProbability = testFitSegmentToTrack(segmentInformation, trackInformation);
@@ -349,7 +367,9 @@ void SegmentTrackCombiner::combineSegmentTrainAndMatchedTracks(const TrainOfSegm
 
       if (bestMatch != nullptr and bestFitProb > m_param_minimalFitProbability) {
         B2DEBUG(100, "Combining segment with track after fit test: " << bestMatch->getTrackCand() << " with: " << bestFitProb)
-        addSegmentToTrack(segmentInformation, bestMatch);
+      } else {
+        B2DEBUG(100, "Found no segment with a good fit value in the track.")
+        bestMatch = nullptr;
       }
     } else if (matchingTracks.size() == 0) {
       B2WARNING("None of the matches were in the track. Aborting. There are " << matchesAboveTrack.size() << " matches above the track.")
@@ -369,13 +389,14 @@ void SegmentTrackCombiner::combineSegmentTrainAndMatchedTracks(const TrainOfSegm
 
       if (bestMatch != nullptr and bestFitProb > m_param_minimalFitProbability) {
         B2DEBUG(100, "Combining segment with track above/below after fit test: " << bestMatch->getTrackCand() << " with: " << bestFitProb)
-        addSegmentToTrack(segmentInformation, bestMatch);
+      } else {
+        B2DEBUG(100, "Found no segment with a good fit value above/below the track.")
+        bestMatch = nullptr;
       }
-    } else {
-      B2DEBUG(100, "Combining segment with track: " << matchingTracks[0]->getTrackCand())
-      addSegmentToTrack(segmentInformation, matchingTracks[0]);
     }
 
+    if (bestMatch != nullptr)
+      addSegmentToTrack(segmentInformation, bestMatch);
     matchingTracks.clear();
   }
 }

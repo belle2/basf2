@@ -73,7 +73,7 @@ int main(int argc, const char** argv)
   ConfigFile config("slowcontrol");
   std::string name, username;
   char** argv_in = new char* [argc];
-  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 2);
   const std::string hostname = config.get(name + ".host");
   const int port = config.getInt(name + ".port");
   NSMVLISTGETCallback* callback = new NSMVLISTGETCallback(NSMNode(username), argc_in, argv_in);

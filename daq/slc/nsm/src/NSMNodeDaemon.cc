@@ -18,15 +18,20 @@ using namespace Belle2;
 void NSMNodeDaemon::add(NSMCallback* callback,
                         const std::string& host, int port)
 {
-  if (callback != NULL && host.size() > 0 && port > 0) {
-    NSMCommunicator* com = new NSMCommunicator();
-    NSMNode& node(callback->getNode());
-    com->init(node, host, port);
-    com->setCallback(callback);
-    callback->init(*com);
-    callback->alloc_open(*com);
-    if (m_timeout == 0) m_timeout = callback->getTimeout();
-    m_callback.push_back(callback);
+  try {
+    if (callback != NULL && host.size() > 0 && port > 0) {
+      NSMCommunicator* com = new NSMCommunicator();
+      NSMNode& node(callback->getNode());
+      com->init(node, host, port);
+      com->setCallback(callback);
+      callback->init(*com);
+      callback->alloc_open(*com);
+      if (m_timeout == 0) m_timeout = callback->getTimeout();
+      m_callback.push_back(callback);
+    }
+  } catch (const std::exception& e) {
+    LogFile::fatal(e.what());
+    exit(1);
   }
 }
 

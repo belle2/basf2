@@ -1,4 +1,4 @@
-#include <tracking/modules/mcV0Matcher/MCV0MatcherModule.h>
+#include <tracking/modules/mcMatcher/MCV0MatcherModule.h>
 
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>

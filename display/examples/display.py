@@ -54,11 +54,11 @@ display.param('assignHitsToPrimaries', False)
 # show all primary MCParticles?
 display.param('showAllPrimaries', True)
 
-# show all charged MCParticles? (SLOW)
-# display.param('showCharged', True)
+# show all charged MCParticles?
+display.param('showCharged', True)
 
-# show all neutral MCParticles? (SLOW)
-# display.param('showNeutrals', True)
+# show all neutral MCParticles?
+display.param('showNeutrals', True)
 
 # show tracks, vertices, eclgammas?
 display.param('showTrackLevelObjects', True)

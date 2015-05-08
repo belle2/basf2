@@ -39,10 +39,10 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            false);
   addParam("showCharged", m_showCharged,
            "If true, all charged MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.",
-           false);
+           true);
   addParam("showNeutrals", m_showNeutrals,
            "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.",
-           false);
+           true);
   addParam("showTrackLevelObjects", m_showTrackLevelObjects,
            "If true, fitted Tracks (+genfit::Track), GFRave Vertices and ECLCluster objects will be shown in the display.", true);
   addParam("showTrackCandidates", m_showTrackCandidates,

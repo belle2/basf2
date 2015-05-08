@@ -92,7 +92,7 @@ void PXDPackerModule::initialize()
   /// read in the mapping for ONSEN->DHHC->DHH->DHP
   /// until now ONSEN->DHHC is not needed yet (might be based on event numbers per event)
   /// DHH->DHP is only defined by port number/active mask ... not implemented yet.
-  for (auto & it : m_dhh_to_dhhc) {
+  for (auto& it : m_dhh_to_dhhc) {
     bool flag;
     int dhhc_id;
     B2INFO("PXD Packer --> DHHC/DHH");
@@ -101,7 +101,7 @@ void PXDPackerModule::initialize()
       /// means [ 1 2 3 4 5 -1 ] DHHC 1 has DHH 2,3,4,5 on port 0-3 and nothing on port 4
       B2WARNING("PXD Packer --> DHHC/DHH maps 1 dhhc to 5 dhh (1+5 values), but I found " << it.size());
     }
-    for (auto & it2 : it) {
+    for (auto& it2 : it) {
       if (flag) {
         int v;
         v = it2;
@@ -129,10 +129,10 @@ void PXDPackerModule::initialize()
 //     B2INFO("PXD Packer --> DHH " << it.first << " connects to DHHC " << it.second);
 //   }
 
-  for (auto & it : m_dhhc_mapto_dhh) {
+  for (auto& it : m_dhhc_mapto_dhh) {
     int port = 0;
     B2INFO("PXD Packer --> DHHC " << it.first);
-    for (auto & it2 : it.second) {
+    for (auto& it2 : it.second) {
       B2INFO("PXD Packer --> .. connects to DHH " << it2 << " port " << port);
       port++;
     }
@@ -176,7 +176,8 @@ void PXDPackerModule::event()
         sensor = currentVxdId.getSensorNumber();/// 1 ... 2
         segment = currentVxdId.getSegmentNumber();// Frame nr?
         dhh_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
-        B2INFO("Layer: " << layer << " Ladder " << ladder << " Sensor " << sensor << " Segment(Frame) " << segment << " =>DHHID: " << dhh_id);
+        B2INFO("Layer: " << layer << " Ladder " << ladder << " Sensor " << sensor << " Segment(Frame) " << segment << " =>DHHID: " <<
+               dhh_id);
       }
 
       startOfVxdID[currentVxdId] = std::distance(storeDigits.begin(), it);
@@ -208,11 +209,11 @@ void PXDPackerModule::pack_event(void)
 
   // loop for each DHHC in system
   // get active DHHCs from a database?
-  for (auto & it : m_dhhc_mapto_dhh) {
+  for (auto& it : m_dhhc_mapto_dhh) {
     int port = 1, port_inx = 0;
     int act_port = 0;
 
-    for (auto & it2 : it.second) {
+    for (auto& it2 : it.second) {
       if (it2 >= 0) act_port += port;
       port += port;
       dhh_ids[port_inx] = it2;
@@ -292,7 +293,8 @@ void PXDPackerModule::pack_dhhc(int dhhc_id, int dhh_active, int* dhh_ids)
   /// DHHC Start
 
   start_frame();
-  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START << 27) | ((dhhc_id & 0xF) << 21) | ((dhh_active & 0x1F) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHHC_START << 27) | ((dhhc_id & 0xF) << 21) | ((dhh_active & 0x1F) << 16) |
+               (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16);
   append_int16(0x00000000); // TT 11-0 | Type --- fill with something usefull TODO
   append_int16(0x00000000); // TT 27-12
@@ -334,7 +336,8 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 
   /// DHH Start
   start_frame();
-  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHH_START << 27) | ((dhh_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHH_START << 27) | ((dhh_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) |
+               (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16); // Trigger Nr Hi
   append_int16(0x00000000);  // DHH Timer Lo
   append_int16(0x00000000);  // DHH Time Hi
@@ -349,10 +352,10 @@ void PXDPackerModule::pack_dhh(int dhh_id, int dhp_active)
 // we fake the framenr and startframenr until we find some better solution
 
   if (dhp_active != 0) { /// is there any hardware switched on?
-    const unsigned int ladder_min_row = 0; /// get them from database
-    const unsigned int ladder_max_row = 767;
-    const unsigned int ladder_min_col = 0;
-    const unsigned int ladder_max_col = 250;
+    unsigned int ladder_min_row = 0; /// get them from database
+    unsigned int ladder_max_row = 767;
+    unsigned int ladder_min_col = 0;
+    unsigned int ladder_max_col = 250;
 
     /// clear pixelmap
     bzero(halfladder_pixmap, sizeof(halfladder_pixmap));
@@ -421,7 +424,8 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhh_id, bool adcpedestal)
   B2INFO("PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHH id: " << dhh_id << " Mode " << adcpedestal);
   start_frame();
   /// DHP data Frame
-  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
+               (m_trigger_nr & 0xFFFF));
   append_int32((DHP_FRAME_HEADER_DATA_TYPE_RAW << 29) | ((dhh_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (0 & 0xFFFF));
 
   int c1, c2;
@@ -471,7 +475,8 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
 
   start_frame();
   /// DHP data Frame
-  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD << 27) | ((dhh_id & 0x3F) << 20) | ((dhh_reformat & 0x1) << 19) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+  append_int32((DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD << 27) | ((dhh_id & 0x3F) << 20) | ((dhh_reformat & 0x1) << 19) | ((
+                 chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   append_int32((DHP_FRAME_HEADER_DATA_TYPE_ZSD << 29) | ((dhh_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) | (frame_id & 0xFFFF));
   for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
     bool rowstart;
@@ -504,7 +509,8 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhh_id, int dhh_reformat)
     B2INFO("Found no data for halfladder! DHHID: " << dhh_id << " Chip: " << chip_id);
     start_frame();
     /// Ghost Frame ... start frame overwrites frame info set above
-    append_int32((DHHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
+    append_int32((DHHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhh_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
+                 (m_trigger_nr & 0xFFFF));
   } else {
     //B2INFO("Found data for halfladder DHHID: " << dhh_id << " Chip: " << chip_id);
   }

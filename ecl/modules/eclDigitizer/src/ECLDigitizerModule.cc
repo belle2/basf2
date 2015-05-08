@@ -99,6 +99,16 @@ int** ECLDigitizerModule::allocateMatrix(unsigned int nrows, unsigned int ncols)
   return pointer;
 }
 
+void ECLDigitizerModule::deallocate(std::vector<int**> matrices) const
+{
+  for (int** element : matrices) deallocate(element);
+}
+void ECLDigitizerModule::deallocate(int** pointer) const
+{
+  delete[] pointer[0];
+  delete[] pointer;
+}
+
 void ECLDigitizerModule::event()
 {
   StoreObjPtr< ECLLookupTable> eclWFAlgoParamsTable("ECLWFAlgoParamsTable", DataStore::c_Persistent);
@@ -244,6 +254,13 @@ void ECLDigitizerModule::endRun()
 
 void ECLDigitizerModule::terminate()
 {
+  deallocate(m_f);
+  deallocate(m_f1);
+  deallocate(m_fg31);
+  deallocate(m_fg32);
+  deallocate(m_fg33);
+  deallocate(m_fg41);
+  deallocate(m_fg43);
 }
 
 int ECLDigitizerModule::myPow(int x, int p)
@@ -789,6 +806,7 @@ void ECLDigitizerModule::readDSPDB()
     for (Int_t i = 0; i < ncellId; ++i)
       (*eclWaveformDataTable) [cellId[i]] = ev;
   }
+  delete info;
 
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   tree2->SetBranchAddress("Algopars", &algo);
@@ -800,6 +818,7 @@ void ECLDigitizerModule::readDSPDB()
     for (Int_t i = 0; i < ncellId2; ++i)
       (*eclWFAlgoParamsTable) [cellId2[i]] = ev;
   }
+  delete algo;
 
   ECLNoiseData* noise = new ECLNoiseData;
   tree3->SetBranchAddress("NoiseM", &noise);
@@ -815,6 +834,7 @@ void ECLDigitizerModule::readDSPDB()
         (*eclNoiseDataTable)[cellId3[i]] = ev;
     }
   }
+  delete noise;
 
   rootfile.Close();
 

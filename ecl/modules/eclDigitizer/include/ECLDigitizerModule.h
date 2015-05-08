@@ -109,6 +109,10 @@ namespace Belle2 {
       /** Matrix allocation helper function */
       int** allocateMatrix(unsigned int , unsigned int) const;
 
+      /** deallocation functions */
+      void deallocate(std::vector<int**> matrices) const;
+      void deallocate(int** pointer) const;
+
       /** Event number */
       int    m_nEvent;
       /** index of eclDsp */

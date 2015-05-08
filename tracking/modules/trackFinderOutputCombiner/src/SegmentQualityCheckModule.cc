@@ -2,9 +2,8 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFinderOutputCombiner/FittingMatrix.h>
-
 #include <genfit/TrackCand.h>
+#include "../../../trackFinderOutputCombining/include/FittingMatrix.h"
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -195,17 +195,17 @@ namespace Belle2 {
   private:
 
     Eigen::MatrixXf
-    m_fittingMatrix;  /*< The matrix with the chi2. One column corresponds to one track candiate and one row to a reco segement. */
-    Eigen::MatrixXf m_zMatrix;        /*< The matrix with the theta values */
-    Eigen::MatrixXf m_zDistMatrix;    /*< The matrix with the z distances */
+    m_fittingMatrix;  /**< The matrix with the chi2. One column corresponds to one track candiate and one row to a reco segement. */
+    Eigen::MatrixXf m_zMatrix;        /**< The matrix with the theta values */
+    Eigen::MatrixXf m_zDistMatrix;    /**< The matrix with the z distances */
 
-    std::vector<bool> m_segmentIsUsed;            /*< An array with status flasg if the segment is used or not */
+    std::vector<bool> m_segmentIsUsed;            /**< An array with status flasg if the segment is used or not */
 
-    double m_param_maximum_theta;
-    double m_param_maximum_distance_z;
-    double m_param_minimal_theta_difference;
-    double m_param_minimal_z_difference;
-    double m_param_minimal_chi2;
-    double m_param_minimal_chi2_stereo;
+    double m_param_maximum_theta; /** Parameter */
+    double m_param_maximum_distance_z; /** Parameter */
+    double m_param_minimal_theta_difference; /** Parameter */
+    double m_param_minimal_z_difference; /** Parameter */
+    double m_param_minimal_chi2; /** Parameter */
+    double m_param_minimal_chi2_stereo; /** Parameter */
   };
 }

@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFinderOutputCombiner/MatchingInformation.h>
-
+#include <tracking/trackFinderOutputCombining/MatchingInformation.h>
 #include <vector>
 
 namespace Belle2 {
@@ -23,36 +22,49 @@ namespace Belle2 {
 
   namespace TrackFinderOutputCombining {
 
+    /** Abstract base class for a list of objects which could be filled (more or less a vector) */
     template <class ItemType, class ListType>
     class LookUpBase {
     public:
+      /** Should be overloaded. Fill the vector with the given elements */
       virtual void fillWith(std::vector<ItemType>& items) = 0;
       virtual ~LookUpBase() { }
 
+      /** STL: begin */
       typename std::vector<ListType>::const_iterator begin() const
       {
         return m_lookup.begin();
       }
+
+      /** STL: begin */
       typename std::vector<ListType>::iterator begin()
       {
         return m_lookup.begin();
       }
+
+      /** STL: end */
       typename std::vector<ListType>::const_iterator end() const
       {
         return m_lookup.end();
       }
+
+      /** STL: end */
       typename std::vector<ListType>::iterator end()
       {
         return m_lookup.end();
       }
 
     protected:
-      std::vector<ListType> m_lookup;
+      std::vector<ListType> m_lookup; /**< The internal store for the elements list */
     };
 
+    /** We use this class for storing our segment lists - one for each superlayer */
     class SegmentLookUp : public LookUpBase<TrackFindingCDC::CDCRecoSegment2D, std::vector<SegmentInformation*>> {
     public:
+      /** Create the lists. Do not forget to call clear before the next event. */
       void fillWith(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments) override;
+
+      /** Clear all pointer vectors */
       void clear()
       {
         for (std::vector<SegmentInformation*>& segmentList : m_lookup) {
@@ -65,7 +77,10 @@ namespace Belle2 {
 
     class TrackLookUp : public LookUpBase<TrackFindingCDC::CDCTrack, TrackInformation*> {
     public:
+      /** Create the lists. Do not forget to call clear before the next event. */
       void fillWith(std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
+
+      /** Clear all pointer vectors */
       void clear()
       {
         for (TrackInformation* trackInformation : m_lookup) {
@@ -74,9 +89,12 @@ namespace Belle2 {
       }
     };
 
+    /** Class which does the segment - track combining */
     class SegmentTrackCombiner {
     public:
 
+      /** We use this to describe more than one segment that could belong together in one single superlayer.
+       * Actually the segment finder should not preduce such things... */
       typedef std::vector<SegmentInformation*> TrainOfSegments;
 
       /**
@@ -117,26 +135,43 @@ namespace Belle2 {
       }
 
     private:
-      const float m_param_percentageForPerpSMeasurements = 0.05;
-      const float m_param_minimalFitProbability = 0.5;
+      const float m_param_percentageForPerpSMeasurements = 0.05; /**< We use this amount of overlap when defining a segment train */
+      const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */
 
+      /** Decide whether a segment is matchable with a track (look at the hit pattern) */
       bool segmentMatchesToTrack(const SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
+
+      /** Decide if a list of segments could be a segment train (of the do not overlap each other) */
       bool couldBeASegmentTrain(const TrainOfSegments& list, const TrackInformation* trackInformation);
 
+      /** Find the best fitting train of segments to a given track from the list */
       const TrainOfSegments& findBestFittingSegmentTrain(std::list<TrainOfSegments>& trainsOfSegments,
                                                          TrackInformation* trackInformation);
+
+      /** Go through all segments a combine them to their best matches */
       void tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments);
+
+      /** Do the Segment <-> Track matching */
       void matchTracksToSegment(SegmentInformation* segmentInformation);
+
+      /** Make all possible subsets of a given list */
       void makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
+
+      /** Do a fit and calculate the chi2 */
       double testFitSegmentToTrack(SegmentInformation* segmentInformation, const TrackInformation* trackInformation);
+
+      /** Do a fit and calculate the chi2 */
       double testFitSegmentTrainToTrack(const TrainOfSegments& train, const TrackInformation* trackInformation);
+
+      /** Create all possible trains with a given segments list */
       void createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation);
-      void createTracksForOutput(std::vector<TrackFindingCDC::CDCTrack>& tracks);
+
+      /** Combine a segment and a track */
       void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
 
     private:
-      TrackLookUp m_trackLookUp;
-      SegmentLookUp m_segmentLookUp;
+      TrackLookUp m_trackLookUp; /**< The used track list */
+      SegmentLookUp m_segmentLookUp; /**< The used segment list */
     };
   }
 }

@@ -1,5 +1,4 @@
-#include <tracking/trackFinderOutputCombiner/Lookups.h>
-
+#include <tracking/trackFinderOutputCombining/Lookups.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>

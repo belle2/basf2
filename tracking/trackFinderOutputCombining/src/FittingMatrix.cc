@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFinderOutputCombiner/FittingMatrix.h>
-
-//datastore types
+#include <tracking/trackFinderOutputCombining/FittingMatrix.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/gearbox/Const.h>

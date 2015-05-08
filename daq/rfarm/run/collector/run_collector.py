@@ -14,6 +14,9 @@ global procmrb2rb
 
 global ncol
 
+global inrblist
+global outrblist
+
 # Signal Handler
 
 
@@ -21,7 +24,9 @@ def cleanup(num, frame):
     os.kill(procrb2mrb.pid, signal.SIGINT)
     os.kill(procmrb2rb.pid, signal.SIGINT)
     for i in range(0, ncol):
-        os.kill(procbasf2[i].pid, signal.SIGINT)
+        os.kill(procbasf2[i].pid, signal.SIGKILL)
+        subprocess.call(["removerb", inrblist[i]])
+        subprocess.call(["removerb", outrblist[i]])
     exit()
 
 # main

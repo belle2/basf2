@@ -202,13 +202,11 @@ void ExtModule::event()
   G4ThreeVector momentum;
   G4ErrorTrajErr covG4e(5, 0);
 
-  for (int t = 0; t < tracks.getEntries(); ++t) {
+  for (auto& b2track : tracks) {
 
-    for (unsigned int hypothesis = 0; hypothesis < m_ChargedStable.size(); ++hypothesis) {
+    for (const auto& chargedStable : m_ChargedStable) {
 
-      Const::ChargedStable chargedStable = m_ChargedStable[hypothesis];
-
-      const TrackFitResult* trackFit = tracks[t]->getTrackFitResult(chargedStable);
+      const TrackFitResult* trackFit = b2track.getTrackFitResult(chargedStable);
       if (!trackFit) {
         B2ERROR("No valid TrackFitResult for PDGcode " <<
                 chargedStable.getPDGCode() << ": extrapolation not possible")
@@ -243,27 +241,27 @@ void ExtModule::event()
         const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // First step on this track?
         if (preStatus == fUndefined) {
-          createHit(state, EXT_FIRST, tracks[t], pdgCode);
+          createHit(state, EXT_FIRST, &b2track, pdgCode);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            createHit(state, EXT_ENTER, tracks[t], pdgCode);
+            createHit(state, EXT_ENTER, &b2track, pdgCode);
           }
           m_TOF += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
-            createHit(state, EXT_EXIT, tracks[t], pdgCode);
+            createHit(state, EXT_EXIT, &b2track, pdgCode);
           }
         }
         // Post-step momentum too low?
         if (errCode || (track->GetMomentum().mag() < minP)) {
-          createHit(state, EXT_STOP, tracks[t], pdgCode);
+          createHit(state, EXT_STOP, &b2track, pdgCode);
           break;
         }
         // Detect escapes from the imaginary target cylinder.
         if (m_Target->GetDistanceFromPoint(track->GetPosition()) < 0.0) {
-          createHit(state, EXT_ESCAPE, tracks[t], pdgCode);
+          createHit(state, EXT_ESCAPE, &b2track, pdgCode);
           break;
         }
         // Stop extrapolating as soon as the track curls inward too much

@@ -263,6 +263,7 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
   }
   m_axialHitList.reserve(2048);
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
+    if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
     TrackHit* trackHit = new TrackHit(cdcWireHit);
     if (trackHit->checkHitDriftLength()) {
       if (trackHit->getIsAxial())

@@ -86,6 +86,11 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule(ETrackOrientation trackOrient
            "A copy for each CDCHit is created into the new StoreArray and a relation to the main CDCHits"
            " is constructed. The default value '' means no StoreArray and no copies are created.",
            std::string(""));
+
+  addParam("SkipHitsPreparation",
+           m_param_skipHitsPreparation,
+           "Flag to skip wire hits generation, because other modules have done so before.",
+           false);
 }
 
 TrackFinderCDCBaseModule::~TrackFinderCDCBaseModule()
@@ -152,23 +157,25 @@ size_t TrackFinderCDCBaseModule::prepareHits()
   size_t nHits = wireHitTopology.event();
   size_t useNHits = nHits;
 
-  if (m_param_useOnlyCDCHitsRelatedFromStoreArrayName != std::string("")) {
-    B2DEBUG(100, "  Use only CDCHits related from " << m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
-    useNHits = wireHitTopology.useOnlyRelatedFrom(m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
-  } else {
-    useNHits = wireHitTopology.useAll();
-  }
+  if (not m_param_skipHitsPreparation) {
+    if (m_param_useOnlyCDCHitsRelatedFromStoreArrayName != std::string("")) {
+      B2DEBUG(100, "  Use only CDCHits related from " << m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
+      useNHits = wireHitTopology.useOnlyRelatedFrom(m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
+    } else {
+      useNHits = wireHitTopology.useAll();
+    }
 
-  if (m_param_dontUseCDCHitsRelatedFromStoreArrayName != std::string("")) {
-    B2DEBUG(100, "  Don't use CDCHits related from " << m_param_dontUseCDCHitsRelatedFromStoreArrayName);
-    useNHits -= wireHitTopology.dontUseRelatedFrom(m_param_dontUseCDCHitsRelatedFromStoreArrayName);
-  }
+    if (m_param_dontUseCDCHitsRelatedFromStoreArrayName != std::string("")) {
+      B2DEBUG(100, "  Don't use CDCHits related from " << m_param_dontUseCDCHitsRelatedFromStoreArrayName);
+      useNHits -= wireHitTopology.dontUseRelatedFrom(m_param_dontUseCDCHitsRelatedFromStoreArrayName);
+    }
 
-  B2DEBUG(100, "  Created number of CDCWireHits == " << nHits);
-  B2DEBUG(100, "  Number of usable CDCWireHits == " << useNHits);
+    B2DEBUG(100, "  Created number of CDCWireHits == " << nHits);
+    B2DEBUG(100, "  Number of usable CDCWireHits == " << useNHits);
 
-  if (nHits == 0) {
-    B2WARNING("Event with no hits");
+    if (nHits == 0) {
+      B2WARNING("Event with no hits");
+    }
   }
 
   return nHits;

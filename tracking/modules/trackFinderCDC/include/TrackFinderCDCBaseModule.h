@@ -123,6 +123,9 @@ namespace Belle2 {
     /// Encoded desired track orientation. Valid orientations are "c_None" (as generated), "c_Symmetric", "c_Outwards", "c_downwards.
     ETrackOrientation m_trackOrientation;
 
+    /// Parameter: Flag to skip wire hits generation, because other modules have done so before
+    bool m_param_skipHitsPreparation;
+
   }; // end class
 
 

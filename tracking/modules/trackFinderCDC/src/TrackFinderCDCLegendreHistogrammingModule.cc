@@ -59,23 +59,24 @@ void CDCLegendreHistogrammingModule::outputObjects()
     TVector3 momentum = trackCand->getMomentumEstimation(true);
     CDCTrajectory3D newTrajectory3D(position, momentum,
                                     trackCand->getChargeSign());
+
+    newTrajectory3D.setLocalOrigin(Vector3D(oldCDCTrack->front().getRecoPos3D().xy(), 0));
+
     CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()),
                                  Vector2D(momentum.x(), momentum.y()), trackCand->getChargeSign());
     oldCDCTrack->setStartTrajectory3D(newTrajectory3D);
     std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
     unsigned int sortingParameter = 0;
     for (TrackHit* trackHit : trackHitVector) {
-      //add only stereohits
-      if (trackHit->getIsAxial())
-        continue;
-
       // TODO: Can we determine the plane?
       const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(
                                         trackHit->getOriginalCDCHit(), 0);
       rlWireHit->getWireHit().getAutomatonCell().setTakenFlag();
-      const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit,
-                                         trajectory2D);
-      oldCDCTrack->push_back(std::move(cdcRecoHit3D));
+      if (not trackHit->getIsAxial()) {
+        const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit,
+                                           trajectory2D);
+        oldCDCTrack->push_back(std::move(cdcRecoHit3D));
+      }
       sortingParameter++;
     }
   }

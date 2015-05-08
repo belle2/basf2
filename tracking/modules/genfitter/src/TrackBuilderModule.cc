@@ -221,11 +221,15 @@ void TrackBuilderModule::event()
       // Create a StoreArray entry from a copy.
       Track* tr = tracks.appendNew(newTrack);
 
-      const MCParticle* mcPart = 0;
+      // Do MC association.
       if (mcParticles.getEntries() > 0) {
-        mcPart = gfTracksToMCPart.getFirstElementFrom(gfTrack)->to;
-        if (mcPart)
-          tr->addRelationTo(mcPart);
+        auto relationToMCPart = gfTracksToMCPart.getFirstElementFrom(gfTrack);
+        // relationToMCPart can be a nullptr (as of 2015-05-08 this
+        // happens in framework/tests/streamer_test.py), so we have to
+        // guard against this.  Otherwise we check if the relation
+        // points to an MC particle and if so, we build the relation.
+        if (relationToMCPart && relationToMCPart->to)
+          tr->addRelationTo(relationToMCPart->to);
       }
     }
   }

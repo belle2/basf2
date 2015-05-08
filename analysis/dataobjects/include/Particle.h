@@ -190,7 +190,8 @@ namespace Belle2 {
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */
-    void set4Vector(const TLorentzVector& p4) {
+    void set4Vector(const TLorentzVector& p4)
+    {
       m_px = p4.Px();
       m_py = p4.Py();
       m_pz = p4.Pz();
@@ -201,7 +202,8 @@ namespace Belle2 {
      * Sets position (decay vertex)
      * @param vertex position
      */
-    void setVertex(const TVector3& vertex) {
+    void setVertex(const TVector3& vertex)
+    {
       m_x = vertex.X();
       m_y = vertex.Y();
       m_z = vertex.Z();
@@ -217,7 +219,8 @@ namespace Belle2 {
      * Sets chi^2 probability of fit
      * @param pValue p-value of fit
      */
-    void setPValue(float pValue) {
+    void setPValue(float pValue)
+    {
       m_pValue = pValue;
     }
 
@@ -231,7 +234,8 @@ namespace Belle2 {
     void updateMomentum(const TLorentzVector& p4,
                         const TVector3& vertex,
                         const TMatrixFSym& errMatrix,
-                        float pValue) {
+                        float pValue)
+    {
       set4Vector(p4);
       setVertex(vertex);
       setMomentumVertexErrorMatrix(errMatrix);
@@ -248,7 +252,8 @@ namespace Belle2 {
      * Appends index of daughter to daughters index array
      * @param particleIndex daughter particle store array index
      */
-    void appendDaughter(int particleIndex) {
+    void appendDaughter(int particleIndex)
+    {
       m_particleType = c_Composite;
 
       m_daughterIndices.push_back(particleIndex);
@@ -266,7 +271,8 @@ namespace Belle2 {
      * Returns PDG code
      * @return PDG code
      */
-    int getPDGCode(void) const {
+    int getPDGCode(void) const
+    {
       return m_pdgCode;
     }
 
@@ -280,7 +286,8 @@ namespace Belle2 {
      * Returns flavor type of the decay (for FS particles: flavor type of particle)
      * @return flavor type (0=unflavored, 1=flavored)
      */
-    EFlavorType getFlavorType() const {
+    EFlavorType getFlavorType() const
+    {
       return m_flavorType;
     }
 
@@ -288,7 +295,8 @@ namespace Belle2 {
      * Returns particle type as defined with enum EParticleType
      * @return particle type
      */
-    EParticleType getParticleType() const {
+    EParticleType getParticleType() const
+    {
       return m_particleType;
     }
 
@@ -296,7 +304,8 @@ namespace Belle2 {
      * Returns 0-based index of MDST store array object (0 for composite particles)
      * @return index of MDST store array object
      */
-    unsigned getMdstArrayIndex(void) const {
+    unsigned getMdstArrayIndex(void) const
+    {
       return m_mdstIndex;
     }
 
@@ -304,7 +313,8 @@ namespace Belle2 {
      * Returns invariant mass (= nominal for FS particles)
      * @return invariant mass
      */
-    float getMass() const {
+    float getMass() const
+    {
       return m_mass;
     }
 
@@ -325,7 +335,8 @@ namespace Belle2 {
      * Returns total energy
      * @return total energy
      */
-    float getEnergy() const {
+    float getEnergy() const
+    {
       return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz + m_mass * m_mass);
     }
 
@@ -333,7 +344,8 @@ namespace Belle2 {
      * Returns Lorentz vector
      * @return Lorentz vector
      */
-    TLorentzVector get4Vector() const {
+    TLorentzVector get4Vector() const
+    {
       TLorentzVector vec;
       vec.SetXYZM(m_px, m_py, m_pz, m_mass);
       return vec;
@@ -343,7 +355,8 @@ namespace Belle2 {
      * Returns momentum vector
      * @return momentum vector
      */
-    TVector3 getMomentum() const {
+    TVector3 getMomentum() const
+    {
       return TVector3(m_px, m_py, m_pz);
     };
 
@@ -351,7 +364,8 @@ namespace Belle2 {
      * Returns momentum magnitude
      * @return momentum magnitude
      */
-    float getMomentumMagnitude() const {
+    float getMomentumMagnitude() const
+    {
       return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
@@ -359,7 +373,8 @@ namespace Belle2 {
      * Returns momentum magnitude (same as getMomentumMagnitude but with shorter name)
      * @return momentum magnitude
      */
-    float getP() const {
+    float getP() const
+    {
       return sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
@@ -367,7 +382,8 @@ namespace Belle2 {
      * Returns x component of momentum
      * @return x component of momentum
      */
-    float getPx() const {
+    float getPx() const
+    {
       return m_px;
     }
 
@@ -375,7 +391,8 @@ namespace Belle2 {
      * Returns y component of momentum
      * @return y component of momentum
      */
-    float getPy() const {
+    float getPy() const
+    {
       return m_py;
     }
 
@@ -383,7 +400,8 @@ namespace Belle2 {
      * Returns z component of momentum
      * @return z component of momentum
      */
-    float getPz() const {
+    float getPz() const
+    {
       return m_pz;
     }
 
@@ -391,7 +409,8 @@ namespace Belle2 {
      * Returns vertex position (POCA for charged, IP for neutral FS particles)
      * @return vertex position
      */
-    TVector3 getVertex() const {
+    TVector3 getVertex() const
+    {
       return TVector3(m_x, m_y, m_z);
     };
 
@@ -399,7 +418,8 @@ namespace Belle2 {
      * Returns x component of vertex position
      * @return x component of vertex position
      */
-    float getX() const {
+    float getX() const
+    {
       return m_x;
     }
 
@@ -407,7 +427,8 @@ namespace Belle2 {
      * Returns y component of vertex position
      * @return y component of vertex position
      */
-    float getY() const {
+    float getY() const
+    {
       return m_y;
     }
 
@@ -415,7 +436,8 @@ namespace Belle2 {
      * Returns z component of vertex position
      * @return z component of vertex position
      */
-    float getZ() const {
+    float getZ() const
+    {
       return m_z;
     }
 
@@ -423,7 +445,8 @@ namespace Belle2 {
      * Returns chi^2 probability of fit if done or -1
      * @return p-value of fit (-1 means no fit done)
      */
-    float getPValue() const {
+    float getPValue() const
+    {
       return m_pValue;
     }
 
@@ -449,7 +472,8 @@ namespace Belle2 {
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */
-    int getMdstSource() const {
+    int getMdstSource() const
+    {
       return m_mdstIndex + (m_particleType << 24);
     }
 
@@ -457,7 +481,8 @@ namespace Belle2 {
      * Returns number of daughter particles
      * @return number of daughter particles
      */
-    unsigned getNDaughters(void) const {
+    unsigned getNDaughters(void) const
+    {
       return m_daughterIndices.size();
     }
 
@@ -465,7 +490,8 @@ namespace Belle2 {
      * Retruns a vector of store array indices of daughter particles
      * @return vector of store array indices of daughter particle
      */
-    const std::vector<int>& getDaughterIndices() const {
+    const std::vector<int>& getDaughterIndices() const
+    {
       return m_daughterIndices;
     }
 
@@ -533,6 +559,12 @@ namespace Belle2 {
      */
     const MCParticle* getMCParticle() const;
 
+    /** Return name of this particle. */
+    virtual std::string getName() const;
+
+    /** Return a short summary of this object's contents in HTML format. */
+    virtual std::string getInfoHTML() const;
+
     /**
      * Prints the contents of a Particle object to standard output.
      */
@@ -553,12 +585,14 @@ namespace Belle2 {
     bool hasExtraInfo(const std::string& name) const;
 
     /** Return the id of the associated ParticleExtraInfoMap or -1 if no map is set. */
-    int getExtraInfoMap() const {
+    int getExtraInfoMap() const
+    {
       return !m_extraInfo.empty() ? m_extraInfo[0] : -1;
     }
 
     /** Return the size of the extra info array */
-    unsigned int getExtraInfoSize() const {
+    unsigned int getExtraInfoSize() const
+    {
       return m_extraInfo.size();
     }
 
@@ -575,7 +609,8 @@ namespace Belle2 {
     void addExtraInfo(const std::string& name, float value);
 
     /** Returns the pointer to the store array which holds the daughter particles */
-    TClonesArray* getArrayPointer() const {
+    TClonesArray* getArrayPointer() const
+    {
       if (!m_arrayPointer)
         m_arrayPointer = RelationsObject::getArrayPointer();
       return m_arrayPointer;

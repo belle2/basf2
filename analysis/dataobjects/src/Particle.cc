@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/HTML.h>
 
 
 #include <TClonesArray.h>
@@ -581,69 +582,69 @@ void Particle::setFlavorType()
   if (q1 == 0 && q2 == q3) m_flavorType = c_Unflavored; // unflavored meson
 }
 
+std::string Particle::getName() const
+{
+  return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->GetName();
+}
 
 void Particle::print() const
 {
-  std::cout << "Particle: collection=";
-  std::cout << getArrayName();
-  std::cout << " PDGCode=" << m_pdgCode;
-  std::cout << " Charge=" << getCharge();
-  std::cout << " PDGMass=" << getPDGMass();
-  std::cout << " flavorType=" << m_flavorType;
-  std::cout << " particleType=" << m_particleType;
-  std::cout << std::endl;
+  std::cout << getInfo();
+}
 
-  std::cout << " mdstIndex=" << m_mdstIndex;
-  std::cout << " arrayIndex=" << getArrayIndex();
-  std::cout << " daughterIndices: ";
+std::string Particle::getInfoHTML() const
+{
+  std::stringstream stream;
+  stream << std::setprecision(4);
+  stream << "<b>collection</b>=" << getArrayName();
+  stream << "<br>";
+  stream << " <b>PDGCode</b>=" << m_pdgCode;
+  stream << " <b>Charge</b>=" << getCharge();
+  stream << " <b>PDGMass</b>=" << getPDGMass();
+  stream << "<br>";
+  stream << " <b>flavorType</b>=" << m_flavorType;
+  stream << " <b>particleType</b>=" << m_particleType;
+  stream << "<br>";
+
+  stream << " <b>mdstIndex</b>=" << m_mdstIndex;
+  stream << " <b>arrayIndex</b>=" << getArrayIndex();
+  stream << " <b>daughterIndices</b>: ";
   for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
-    std::cout << m_daughterIndices[i] << ", ";
+    stream << m_daughterIndices[i] << ", ";
   }
-  if (m_daughterIndices.empty()) std::cout << " (none)";
-  std::cout << std::endl;
+  if (m_daughterIndices.empty()) stream << " (none)";
+  stream << "<br>";
 
   if (!m_daughterIndices.empty()) {
-    std::cout << " daughter PDGCodes: ";
+    stream << " <b>daughter PDGCodes</b>: ";
     for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
       const Particle* p = getDaughter(i);
-      if (p) {std::cout << p->getPDGCode() << ", ";}
-      else {std::cout << "?, ";}
+      if (p) {stream << p->getPDGCode() << ", ";}
+      else {stream << "?, ";}
     }
-    std::cout << std::endl;
+    stream << "<br>";
   }
 
-  std::cout << " mass=" << m_mass;
-  std::cout << std::endl;
+  stream << " <b>mass</b>=" << m_mass;
+  stream << "<br>";
 
-  std::cout << " momentum=(";
-  std::cout << m_px << "," << m_py << "," << m_pz << ")";
-  std::cout << " p=" << getP();
-  std::cout << std::endl;
+  stream << " <b>momentum</b>=(";
+  stream << m_px << ", " << m_py << ", " << m_pz << ")";
+  stream << " <b>p</b>=" << getP();
+  stream << "<br>";
 
-  std::cout << " position=(";
-  std::cout << m_x << "," << m_y << "," << m_z << ")";
-  std::cout << std::endl;
+  stream << " <b>position</b>=(";
+  stream << m_x << ", " << m_y << ", " << m_z << ")";
+  stream << "<br>";
 
-  std::cout << " p-value of fit (if done): ";
-  std::cout << m_pValue;
-  std::cout << std::endl;
+  stream << " <b>p-value of fit</b> (if done): ";
+  stream << m_pValue;
+  stream << "<br>";
 
-  std::cout << " error matrix:";
-  std::cout << std::endl;
+  stream << " <b>error matrix</b> (px, py, pz, E, x, y ,z):<br>";
+  stream << HTML::getString(getMomentumVertexErrorMatrix());
 
-  TMatrixFSym errMatrix = getMomentumVertexErrorMatrix();
-  int prec = std::cout.precision();
-  std::cout << std::setprecision(4);
-  for (int i = 0; i < errMatrix.GetNrows(); i++) {
-    for (int k = 0; k < errMatrix.GetNcols(); k++) {
-      std::cout << std::setw(11) << errMatrix(i, k);
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-  std::cout << std::setprecision(prec);
-
-  std::cout << " extra info=( ";
+  stream << " <b>extra info</b>=( ";
   if (!m_extraInfo.empty()) {
     StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
     if (!extraInfoMap) {
@@ -653,13 +654,14 @@ void Particle::print() const
     const unsigned int nVars = m_extraInfo.size();
     for (const auto& pair : map) {
       if (pair.second < nVars) {
-        std::cout << pair.first << "=" << m_extraInfo[pair.second] << " ";
+        stream << pair.first << "=" << m_extraInfo[pair.second] << " ";
       }
     }
 
   }
-  std::cout << ") " << std::endl;
+  stream << ") " << "<br>";
 
+  return stream.str();
 }
 
 bool Particle::hasExtraInfo(const std::string& name) const

@@ -107,5 +107,31 @@ void MCParticle::fixParticleList() const
     mc.m_index = i + 1;
   }
 }
+std::string MCParticle::getName() const
+{
+  return TDatabasePDG::Instance()->GetParticle(m_pdg)->GetName();
+}
+std::string MCParticle::getInfoHTML() const
+{
+  std::stringstream out;
+
+  out << "<b>Charge</b>=" << (int)getCharge();
+  out << ", <b>PDG</b>=" << getPDG();
+  out << " (" << getName() << ")";
+  out << "<br>";
+
+  out << "<b>pT</b>=" << getMomentum().Pt();
+  out << ", <b>pZ</b>=" << m_momentum_z;
+  out << "<br>";
+  out << "<b>V</b>=(" << m_productionVertex_x << ", " << m_productionVertex_y << ", " << m_productionVertex_z << ")";
+
+  const MCParticle* mom = getMother();
+  if (mom) {
+    out << "<br>";
+    out << "<b>Mother</b>: " << mom->getArrayName() << "[" << mom->getArrayIndex() << "] (" << mom->getName() << ")";
+  }
+  return out.str();
+}
+
 
 ClassImp(MCParticle)

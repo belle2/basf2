@@ -22,6 +22,11 @@
 class TClonesArray;
 
 namespace Belle2 {
+  /** hide some implementation details. */
+  namespace _RelationsInterfaceImpl {
+    /** See RelationsObject::getInfo() */
+    std::string htmlToPlainText(const std::string& html);
+  };
 
   /** Defines interface for accessing relations of objects in StoreArray.
    *
@@ -148,7 +153,7 @@ namespace Belle2 {
       DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, toEntry, toIndex, weight);
     }
 
-    //====================================================================================================
+    //===========================================================================
     //These return a vector of relations:
 
     /** Get the relations that point from this object to another store array.
@@ -195,7 +200,7 @@ namespace Belle2 {
                                m_cacheArrayIndex, T::Class(), name));
     }
 
-    //====================================================================================================
+    //===========================================================================
     //These return only the first related object
 
     /** Get the object to which this object has a relation.
@@ -241,7 +246,7 @@ namespace Belle2 {
     }
 
 
-    //====================================================================================================
+    //===========================================================================
     //These return an object/weight pair
 
     /** Get first related object & weight of relation pointing to an array.
@@ -288,6 +293,43 @@ namespace Belle2 {
                                                                   T::Class(), name);
       return std::make_pair(static_cast<T*>(entry.object), entry.weight);
     }
+
+
+    //===========================================================================
+    // Information about this object (not strictly relation-related)
+
+    /** Return a short name that describes this object, e.g. pi+ for an MCParticle. */
+    virtual std::string getName() const { return ""; }
+
+    /** Return a short summary of this object's contents in HTML format.
+     *
+     * Reimplement this in your own class to provide useful output for display
+     * or debugging purposes. For example, you might do something like:
+     *
+      \code
+      std::stringstream out;
+      out << "<b>PDG</b>: " << m_pdg << "<br>";
+      out << "<b>Covariance Matrix</b>: " << HTML::getString(getCovariance5()) << "<br>";
+      return out.str();
+      \endcode
+     *
+     * @sa Particle::getInfoHTML() for a more complex example.
+     * @sa HTML for some utility functions.
+     * @sa Use getInfo() to get a raw text version of this output.
+     */
+    virtual std::string getInfoHTML() const { return ""; }
+
+    /** Return a short summary of this object's contents in raw text format.
+     *
+     * Returns the contents of getInfoHTML() while translating line-breaks etc.
+     * @note: You don't need to implement this function (it's not virtual),
+     *        getInfoHTML() is enough.
+     */
+    std::string getInfo() const
+    {
+      return _RelationsInterfaceImpl::htmlToPlainText(getInfoHTML());
+    }
+
 
     /** Get name of array this object is stored in, or "" if not found. */
     std::string getArrayName() const

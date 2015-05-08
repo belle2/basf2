@@ -490,6 +490,11 @@ namespace Belle2 {
      */
     void setInitial() {  addStatus(c_Initial); }
 
+    /** Return name of this particle. */
+    virtual std::string getName() const;
+
+    /** Return a short summary of this object's contents in HTML format. */
+    virtual std::string getInfoHTML() const;
 
   protected:
 

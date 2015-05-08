@@ -10,6 +10,13 @@
 
 #include <framework/datastore/RelationsObject.h>
 
+#include <framework/utilities/HTML.h>
+
 using namespace Belle2;
 
 templateClassImp(RelationsInterface)
+
+std::string _RelationsInterfaceImpl::htmlToPlainText(const std::string& html)
+{
+  return HTML::htmlToPlainText(html);
+}

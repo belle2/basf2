@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
+import argparse
 import BaseHTTPServer
 import logging as log
 import os
@@ -18,6 +19,27 @@ except ImportError:
     import json
 
 from validationplots import create_plots
+
+
+def parse_cmd_line_arguments():
+        """!
+        Sets up a parser for command line arguments, parses them and returns the
+        arguments.
+        @return: An object containing the parsed command line arguments.
+        Arguments are accessed like they are attributes of the object,
+        i.e. [name_of_object].[desired_argument]
+        """
+
+        # Set up the command line parser
+        parser = argparse.ArgumentParser()
+
+        # Define the accepted command line flags and read them in
+        parser.add_argument("-ip", "--ip", help="The IP address on which the"
+                            "server starts. Default is 'localhost'.",
+                            type=str, default='localhost')
+
+        # Return the parsed arguments!
+        return parser.parse_args()
 
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -341,6 +363,9 @@ if __name__ == '__main__':
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
+    # Parse command line arguments
+    cmd_arguments = parse_cmd_line_arguments()
+
     # Make sure the output of validate_basf2.py is there
     if not os.path.isdir('html/results'):
         sys.exit('Error: No html/results dir found! Run validate_bash2.py first.')
@@ -354,7 +379,7 @@ if __name__ == '__main__':
                     datefmt='%H:%M:%S')
 
     # Define the server address
-    ip = 'localhost'
+    ip = cmd_arguments.ip
     port = 8000
 
     # Start the server!

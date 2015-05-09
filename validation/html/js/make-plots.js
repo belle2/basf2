@@ -4,7 +4,7 @@ $(document).ready(function() {
     $("#revisions").load("revisions.html", function(){
 	
 	// If we click the regenerate-button:
-	$("#regenerate").click(function() {
+	$("#regenerate").on("click", function() {
 	    
 	    // Get an array with the values of all checked checkboxes
 	    var checkedValues = $('[name=revisions]:checked').map(function() {
@@ -12,7 +12,7 @@ $(document).ready(function() {
 	    }).get();
 	    
 	    // Show the layer div that indicates that new plots are being created
-	    $("#outer").show()
+	    $("#outer").show();
 	    
 	    // Now make an AJAX-Request with these values
 	    $.ajax({ 
@@ -73,7 +73,7 @@ $(document).ready(function() {
 
 	    // Always hide the layer
 	    }).always(function() {		
-		$("#outer").hide()
+		$("#outer").hide();
 	    });
 	    
 	});    

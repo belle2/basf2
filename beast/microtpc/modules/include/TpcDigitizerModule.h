@@ -71,11 +71,18 @@ namespace Belle2 {
       /** Drift ionization */
       virtual void Drift(double, double, double, double&, double&, double&, double&, double, double, double);
 
+      /** Drift 2 ionization */
+      virtual void Drift2(double, double, double, double&, double&, double&, double&, double, double, double, double, double, double,
+                          double, double, double);
+
       /** GEMazition of GEM1 */
       virtual void GEMGeo1(double, double, double&, double&);
 
       /** GEMazition of GEM2 */
       virtual void GEMGeo2(double, double, double&, double&);
+
+      /** Pseudo-gaus calculated from a uniformly random numbers between -1 and 1 */
+      virtual double pseudo_gaus(double, double, double, double);
 
       /** Define random variable */
       //TRandom3* fRandom;
@@ -181,6 +188,8 @@ namespace Belle2 {
       std::vector<int> totArray;
       /** bci vector */
       std::vector<int> bciArray;
+      /** Random Array */
+      double RNDnb[10000];
     };
 
   }

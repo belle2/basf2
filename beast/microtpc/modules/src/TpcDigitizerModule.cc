@@ -100,6 +100,7 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   addParam("Fanofac", m_Fanofac, "Fano factor", 0.19);
   addParam("GasAbs", m_GasAbs, "Gas absorption", 0.05);
 
+  for (int i = 0; i < 10000; i++) RNDnb[i] = gRandom->Uniform(-1., 1.);
 }
 
 TpcDigitizerModule::~TpcDigitizerModule()
@@ -168,7 +169,6 @@ void TpcDigitizerModule::event()
     MicrotpcSimHit* aHit = TpcSimHits[i];
     int detNb = aHit->getdetNb();
     TVector3 posn = aHit->gettkPos() ;
-    //double T = posn.Z() / 100. + (TPCCenter[detNb].Z() + 10.) + m_z_DG;
     double T = posn.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
     if (T < T0[detNb])T0[detNb] = T;
   }
@@ -182,6 +182,7 @@ void TpcDigitizerModule::event()
 
   //int oldPID=0;
   //loop on all entries to store in 3D the ionization for each TPC
+  int i_rnd = 0;
   for (int i = 0; i < nentries; i++) {
     MicrotpcSimHit* aHit = TpcSimHits[i];
 
@@ -201,9 +202,8 @@ void TpcDigitizerModule::event()
     TVector3 position = aHit->gettkPos();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
-    //double zpos = position.Z() / 100. + (TPCCenter[detNb].Z() + 10) + m_z_DG;
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
-    //cout <<"xpos " << xpos << " ypos " << ypos << " zpos " << zpos << endl;
+
     //check if ionization within sensitive volume
     if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
         (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
@@ -220,24 +220,43 @@ void TpcDigitizerModule::event()
       ////////////////////////////////
       // check if enough energy to ionize
       else if ((ionEn * 1e3) >  m_Workfct) {
-        //cout << "edep " << ionEn << endl;
+
         double meanEl = ionEn * 1e3 /  m_Workfct;
         double sigma = sqrt(m_Fanofac * meanEl);
-        int NbEle = (int)gRandom->Gaus(meanEl, sigma);
+        //int NbEle = (int)gRandom->Gaus(meanEl, sigma);
+        if (i_rnd > 10000 - 2)i_rnd = 0;
+        int NbEle = (int)pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], meanEl, sigma);
+        i_rnd = i_rnd + 2;
         double  NbEle_real = 0;
         NbEle_real  = NbEle - NbEle * m_GasAbs * zpos;
         // start loop on the number of electron-ion-pairs at each interaction point
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
           double x_DG, y_DG, z_DG, t_DG;
           //drift ionization to GEM 1 plane
+          /*
           Drift(xpos,
                 ypos,
                 zpos,
-                x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
+                x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);*/
+          if (i_rnd > 10000 - 6)i_rnd = 0;
+          Drift2(xpos,
+                 ypos,
+                 zpos,
+                 x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG,
+                 RNDnb[i_rnd], RNDnb[i_rnd + 1],
+                 RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
+                 RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
+          i_rnd = i_rnd + 6;
           //calculate and scale 1st GEM gain
-          double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+          //double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+          if (i_rnd > 10000 - 2)i_rnd = 0;
+          double GEM_gain1 = pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+          i_rnd = i_rnd + 2;
           //calculate and scale 2nd GEM gain
-          double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
+          //double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
+          if (i_rnd > 10000 - 2)i_rnd = 0;
+          double GEM_gain2 = pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
+          i_rnd = i_rnd + 2;
 
           ///////////////////////////////
           // start loop on amplification
@@ -247,8 +266,13 @@ void TpcDigitizerModule::event()
             GEMGeo1(x_DG, y_DG, x_GEM1, y_GEM1);
             double x_TG, y_TG, z_TG, t_TG;
             //drift 1st amplication to 2nd GEM
-            Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
-
+            //Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
+            if (i_rnd > 10000 - 6)i_rnd = 0;
+            Drift2(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG,
+                   RNDnb[i_rnd], RNDnb[i_rnd + 1],
+                   RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
+                   RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
+            i_rnd = i_rnd + 6;
             ///////////////////////////////
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
@@ -257,8 +281,13 @@ void TpcDigitizerModule::event()
               GEMGeo2(x_TG, y_TG, x_GEM2, y_GEM2);
               double x_CG, y_CG, z_CG, t_CG;
               //drift 2nd amplification to chip
-              Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
-
+              //Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
+              if (i_rnd > 10000 - 6)i_rnd = 0;
+              Drift2(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG,
+                     RNDnb[i_rnd], RNDnb[i_rnd + 1],
+                     RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
+                     RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
+              i_rnd = i_rnd + 6;
               //determine col, row, and bc
               int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
               int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
@@ -277,6 +306,7 @@ void TpcDigitizerModule::event()
                 dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
                 //partID[detNb][col][row][bci] = PDGid;
               }
+              i_rnd++;
             }
           }
         }
@@ -306,6 +336,24 @@ void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, doub
     y2 = y1 + gRandom->Gaus(0., sqrt(z1) * st);
     //longitidinal diffusion
     z2 = z1 + gRandom->Gaus(0., sqrt(z1) * sl);
+    //time to diffuse
+    t2 = z2 / vd;
+  } else {
+    x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
+  }
+}
+//Make the ionization drifting from (x,y,z) to GEM1 top plane
+void TpcDigitizerModule::Drift2(double x1, double y1, double z1, double& x2, double& y2, double& z2, double& t2, double st,
+                                double sl, double vd, double rnd1, double rnd2, double rnd3, double rnd4, double rnd5, double rnd6)
+{
+  //check if
+  if (z1 > 0.) {
+    //transverse diffusion
+    x2 = x1 + pseudo_gaus(rnd1, rnd2, 0.0, sqrt(z1) * st);
+    //transverse diffusion
+    y2 = y1 + pseudo_gaus(rnd3, rnd4, 0.0, sqrt(z1) * st);
+    //longitidinal diffusion
+    z2 = z1 + pseudo_gaus(rnd5, rnd6, 0.0, sqrt(z1) * sl);
     //time to diffuse
     t2 = z2 / vd;
   } else {
@@ -431,7 +479,8 @@ bool TpcDigitizerModule::Pixelization(int detNb)
 //read tube centers, impulse response, and garfield drift data filename from MICROTPC.xml
 void TpcDigitizerModule::getXMLData()
 {
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
+  //const GearDir& content;
+  GearDir content;// = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
 
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
@@ -483,6 +532,23 @@ void TpcDigitizerModule::getXMLData()
   B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
   B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");
 
+}
+double TpcDigitizerModule::pseudo_gaus(double rnd1, double rnd2, double mean, double sigma)
+{
+  static double n2 = 0.0;
+  static int n2_cached = 0;
+  if (!n2_cached) {
+    double r = rnd1 * rnd1 + rnd2 * rnd2;
+    double d = sqrt(-2.0 * log(r) / r);
+    double n1 = rnd1 * d;
+    n2 = rnd2 * d;
+    double result = n1 * sigma + mean;
+    n2_cached = 1;
+    return result;
+  } else {
+    n2_cached = 0;
+    return n2 * sigma + mean;
+  }
 }
 
 void TpcDigitizerModule::endRun()

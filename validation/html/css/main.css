@@ -283,6 +283,7 @@ textarea {
     background:#e5e5e5;
 }
 
+
 #scriptcount
 {
     background: FireBrick;
@@ -298,6 +299,7 @@ textarea {
     text-align: center;
     display: none;
 }
+
 
 #serverwarning
 {
@@ -379,17 +381,46 @@ textarea {
 .object_wrap
 {
     border-bottom:1px solid gray;
+    border-bottom:1px solid gray!important;
+    display: none;
+    width: 100%;
+    -webkit-flex-wrap: wrap;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    margin-bottom:25px;
+    padding-bottom:15px;
+}
+.show
+{
+    display: -webkit-box!important;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box!important;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox!important;      /* TWEENER - IE 10 */
+    display: -webkit-flex!important;     /* NEW - Chrome */
+    display: flex!important;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}
+
+td.show
+{
+	display: table-cell!important;
+}
+
+.plot_matrix {
     display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
     display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
     display: -ms-flexbox;      /* TWEENER - IE 10 */
     display: -webkit-flex;     /* NEW - Chrome */
     display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    border-bottom:1px solid gray;
     -webkit-flex-wrap: wrap;
     flex-wrap:wrap;
     justify-content:space-between;
     margin-bottom:25px;
     padding-bottom:15px;
     width:100%;
+}
+
+.noplots, .hidebutton {
+	display: block;
 }
 
 .sep
@@ -497,6 +528,9 @@ tr:nth-child(even) td
 /*
  * Hide from both screenreaders and browsers: h5bp.com/u
  */
+.p_value_leq_0_01.hlaska, .p_value_leq_1.hlaska, .hideme {
+    display: none;
+}
 
 .hidden {
     display: none !important;

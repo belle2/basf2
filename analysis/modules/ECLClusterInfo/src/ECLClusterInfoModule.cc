@@ -43,12 +43,32 @@ ECLClusterInfoModule::ECLClusterInfoModule() : Module()
   // Set module properties
   setDescription("Creates an output root file which contains info from ECL clusters. Used for b2bii conversion validation.");
 
-  //Parameter definition
+  // Parameter definition
   addParam("outputFileName", m_fileName, "The name of the output .root file", string("ECLClusterInfo.root"));
   addParam("treeName", m_treeName, "The name of the tree in the output .root file", string("ecl_mdst"));
 
+  // Initializing the rest of private memebers
   m_file = nullptr;
   m_tree = nullptr;
+  m_E = 0;
+  m_Theta = 0;
+  m_Phi = 0;
+  m_R = 0;
+  m_Edep = 0;
+  m_E9oE25 = 0;
+  m_HE = 0;
+  m_NC = 0;
+  m_Err00 = 0;
+  m_Err10 = 0;
+  m_Err11 = 0;
+  m_Err20 = 0;
+  m_Err21 = 0;
+  m_Err22 = 0;
+  m_Truth_Px = 0;
+  m_Truth_Py = 0;
+  m_Truth_Pz = 0;
+  m_Truth_E = 0;
+  m_PDG = 0;
 }
 
 void ECLClusterInfoModule::terminate()
@@ -82,26 +102,6 @@ void ECLClusterInfoModule::initialize()
   }
 
   m_tree = new TTree(m_treeName.c_str(), "");
-
-  m_E = 0;
-  m_Theta = 0;
-  m_Phi = 0;
-  m_R = 0;
-  m_Edep = 0;
-  m_E9oE25 = 0;
-  m_HE = 0;
-  m_NC = 0;
-  m_Err00 = 0;
-  m_Err10 = 0;
-  m_Err11 = 0;
-  m_Err20 = 0;
-  m_Err21 = 0;
-  m_Err22 = 0;
-  m_Truth_Px = 0;
-  m_Truth_Py = 0;
-  m_Truth_Pz = 0;
-  m_Truth_E = 0;
-  m_PDG = 0;
 
   m_tree->Branch("Cluster_E",        &m_E,        "Cluster_E/F");
   m_tree->Branch("Cluster_Theta",    &m_Theta,    "Cluster_Theta/F");

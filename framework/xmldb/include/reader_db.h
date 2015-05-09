@@ -61,6 +61,7 @@ namespace Belle2 {
       /** The tree we are building. */
       Tree* work_tree_;
 
+      /** Map from database id to node in memory. */
       typedef std::map<int64_t, ::xmlNodePtr> id_to_node_map_t;
       /** Map from database id to node in memory. */
       id_to_node_map_t id_to_node_map_;

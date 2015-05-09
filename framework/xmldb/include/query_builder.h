@@ -78,7 +78,7 @@ namespace Belle2 {
 
       /** Prepare a union to easily support more data types later. */
       typedef union {
-        int64_t int_value;
+        int64_t int_value; /**< integer type parameter. */
       } Parameter;
 
       /** Collects the paramFormats[] parameter for the PQexecParams call. */

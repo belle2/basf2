@@ -28,6 +28,7 @@ namespace Belle2 {
   /** Predicate checking that all five components of the Helix are close by a maximal error of absError.*/
   namespace TestHelpers {
 
+    /** Overload method for ASSERT_ALL_NEAR / EXPECT_ALL_NEAR. */
     template<>
     bool allNear<Belle2::Helix>(const Belle2::Helix& expected,
                                 const Belle2::Helix& actual,

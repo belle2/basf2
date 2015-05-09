@@ -83,6 +83,7 @@ namespace Belle2 {
       /** Libxml2 handle for the config namespace definition. */
       ::xmlNsPtr configNs_;
 
+      /** node pointer -> metadata. */
       typedef std::map< ::xmlNodePtr, Node* > node_data_map_t;
       /** Maps from the libxml node pointer to our additional metadata
        * for the node. */

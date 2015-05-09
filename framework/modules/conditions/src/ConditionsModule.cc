@@ -10,7 +10,7 @@ REG_MODULE(Conditions)
 
 ConditionsModule::ConditionsModule(): Module()
 {
-  setDescription("This module is used test conditions API");
+  setDescription("This module is used test conditions API (experimental, should not be used)");
   addParam("globalTag", m_globalTag, "Global Database Conditions Tag", std::string("leps2013_InitialTest_GlobalTag"));
   addParam("experimentName", m_experimentName, "Experiment name", std::string("topcrt-e000002"));
   addParam("runName", m_runName, "Run name", std::string("r000545"));

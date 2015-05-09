@@ -3,9 +3,7 @@ $(document).ready(function(){
     $('.reportbug').click( function(){
 	window.open('https://belle2.cc.kek.jp/redmine/projects/support/issues/new');
     });
-});
 
-$(document).ready(function() {
 
     $('.revisions').click(function() {
             $('#revisions').slideToggle("fast");
@@ -19,10 +17,7 @@ $(document).ready(function() {
     $('.options').click(function() {
             $('#options').slideToggle("fast");
     });
-});
 
-
-$(document).ready(function(){
     $('#packages').load('packages.html', function() {
 	$('input[type="checkbox"][name="packages"]').click(function(){
             $("#"+$(this).attr("value")).toggle();
@@ -32,26 +27,20 @@ $(document).ready(function(){
     $('input[type="checkbox"][name="options"]').click(function(){
         $(".descriptions").toggle();
     });
-
     $('input[type="checkbox"][name="overview"]').click(function(){
 		if($(this).prop("checked")){
-			$(".object_wrap").hide();
-			$(".plot_matrix").show();
-			$(".noplots").show();
-			$(".hidebutton").show();
+			$(".nomatrix").each(function(){$(this).removeClass("show");});
 		} else {
-			$(".object_wrap").show();
-			$(".noplots").hide();
-			$(".hidebutton").hide();
+			$(".nomatrix").each(function(){$(this).addClass("show");});
 		}
     });
     $('input[type="checkbox"][name="showlists"]').click(function(){
 		if(!$(this).prop("checked")){
-			$(".hideme").hide();
-			$(".hidetext").text("(show)");
+			$(".hideme").each(function(){$(this).hide();});
+			$(".hidetext").each(function(){$(this).text("(show)");});
 		} else {
-			$(".hideme").show();
-			$(".hidetext").text("(hide)");
+			$(".hideme").each(function(){$(this).show();});
+			$(".hidetext").each(function(){$(this).text("(hide)");});
 		}
 	});
 

@@ -6,48 +6,41 @@ $(document).ready(function(){
 	}).get();
 	if(!jQuery.isEmptyObject(checkedValues)){
 		$('.fltr').each(function() {
-			$(this).hide();
+			$(this).hide().removeClass("show");
 		});
-		if(jQuery.inArray("p_value_leq_1", checkedValues)){
-			$('.p_value_leq_0_01.hlaska').each(function() {
-				$(this).show();
+		if(jQuery.inArray("p_value_leq_0_01", checkedValues)>=0){
+			$('.p_value_leq_0_01').each(function() {
+				$(this).addClass("show");
 	    	});	
-			if($('input[type="checkbox"][name="overview"]').prop("checked")) {
-				$('.p_value_leq_0_01.matrix-img').each(function() {
-					$(this).show();
-	    		});	
-			} else {
-				$('.p_value_leq_0_01').each(function() {
-					$(this).show();
-	    		});	
-	    	}    
+	    	if($('input[type="checkbox"][name="overview"]').prop("checked")) {
+				$('.nomatrix').each(function() {
+					$(this).removeClass("show");
+	    		});
+	    	}   
 		}
-		else if(jQuery.inArray("p_value_leq_0_01", checkedValues)) {
-			$('.p_value_leq_1.hlaska').each(function() {
-				$(this).show();
-			});
-			if($('input[type="checkbox"][name="overview"]').prop("checked")) {
-	    		$('.p_value_leq_1.matrix-img').each(function() {
-					$(this).show();
-	    		});
-	    	} else {
-				$('.p_value_leq_1').each(function() {
-					$(this).show();
-	    		});
-	    	}
+		else if(jQuery.inArray("p_value_leq_1", checkedValues)>=0) {
+	        $('.p_value_leq_1').each(function() {
+				$(this).addClass("show");
+	    	});
+	        if($('input[type="checkbox"][name="overview"]').prop("checked")) {
+				$('.nomatrix').each(function() {
+					$(this).removeClass("show");
+	    		}); 
+	    	} 
+	    	
 	    		
-		} else { $('.fltr').each(function(){$(this).hide()}); }
+		} else { $('.fltr').each(function(){$(this).addClass("show")}); }
 	} else { 
 		if($('input[type="checkbox"][name="overview"]').prop("checked")) {
-			$('.fltr.matrix-img').each(function(){$(this).show()});
+			$('.fltr.matrix-img').each(function(){$(this).addClass("show")});
 		} else {
-			$('.fltr').each(function(){$(this).show()}); 
+			$('.fltr').each(function(){$(this).addClass("show")}); 
 		}
 			$('.p_value_leq_1.hlaska').each(function() {
-				$(this).hide();
+				$(this).removeClass("show");
 			});
 			$('.p_value_leq_0_01.hlaska').each(function() {
-				$(this).hide();
+				$(this).removeClass("show");
 			});
 	}
     });

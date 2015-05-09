@@ -36,10 +36,10 @@ $(document).ready(function(){
     });
     $('input[type="checkbox"][name="showlists"]').click(function(){
 		if(!$(this).prop("checked")){
-			$(".hideme").each(function(){$(this).hide();});
+			$(".hideme").each(function(){$(this).css("display", "none");});
 			$(".hidetext").each(function(){$(this).text("(show)");});
 		} else {
-			$(".hideme").each(function(){$(this).show();});
+			$(".hideme").each(function(){$(this).css("display", "block");});
 			$(".hidetext").each(function(){$(this).text("(hide)");});
 		}
 	});

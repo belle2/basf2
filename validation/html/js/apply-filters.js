@@ -6,7 +6,7 @@ $(document).ready(function(){
 	}).get();
 	if(!jQuery.isEmptyObject(checkedValues)){
 		$('.fltr').each(function() {
-			$(this).hide().removeClass("show");
+			$(this).css("display", "none").removeClass("show");
 		});
 		if(jQuery.inArray("p_value_leq_0_01", checkedValues)>=0){
 			$('.p_value_leq_0_01').each(function() {

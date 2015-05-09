@@ -152,11 +152,9 @@ TString InfoWidget::getHeader(const URI& uri) const
   }
 
   TString info;
-  info += "<table border=0 width=100\% bgcolor=d2ede4><tr>";
-  //TODO: maybe make it small once stupid font issues are gone?
+  info += "<table border=0 width=100% bgcolor=d2ede4><tr>";
   //breadcrumbs
   info += "<td>";
-  //info += "<td><small>";
   info += "<a href='/'>DataStore</a> / ";
   if (uri.arrayIndex != -1) {
     info += "<a href='" + uri.entryName + "/'>" + uri.entryName + "</a> / ";
@@ -164,7 +162,6 @@ TString InfoWidget::getHeader(const URI& uri) const
   } else {
     info += "<b>" + uri.entryName + "</b>";
   }
-  //info += "</small></td>";
   info += "</td>";
 
   //back button

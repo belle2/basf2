@@ -14,6 +14,9 @@ class InspectorModule(Module):
 
     """Inspect DataStore contents"""
 
+    # @doc InfoWidget pointer
+    info = None
+
     def initialize(self):
         """reimplementation of Module::initialize()."""
         from ROOT import gClient

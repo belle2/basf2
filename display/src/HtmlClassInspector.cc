@@ -44,7 +44,7 @@ TString HtmlClassInspector::stripTitle(TString title)
 TString HtmlClassInspector::getTable() const
 {
   TString tmp;
-  tmp += "<table width=100\% cellpadding=2 bgcolor=eeeeee>";
+  tmp += "<table width=100% cellpadding=2 bgcolor=eeeeee>";
   tmp += m_info;
   tmp += "</table>";
   return tmp;

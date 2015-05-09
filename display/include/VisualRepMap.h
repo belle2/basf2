@@ -15,6 +15,7 @@ namespace Belle2 {
    */
   class VisualRepMap {
   public:
+    /** get instance pointer. */
     static VisualRepMap* getInstance();
 
     /** Select the representation of the given object. */

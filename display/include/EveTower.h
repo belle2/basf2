@@ -5,9 +5,10 @@
 class TEveCaloData;
 
 namespace Belle2 {
-  /** individual ECL tower (getting them out of TEve is hard). */
+  /** handles selection of individual ECLClusters (getting them out of TEve is hard). */
   class EveTower : public TEveElement, public TObject {
   public:
+    /** Construct from given ECLCluster representation. (id = AddTower() return value) */
     EveTower(TEveCaloData* calodata, int towerID): TEveElement(), TObject(), m_caloData(calodata), m_id(towerID) { }
 
     /** returns tower ID. */
@@ -20,7 +21,7 @@ namespace Belle2 {
     TEveCaloData* m_caloData; /**< Calo data object containing the tower. */
     int m_id; /**< id of tower. */
 
-    ClassDef(EveTower, 0); /**< individual ECL tower (getting them out of TEve is hard). */
+    ClassDef(EveTower, 0); /**< handles selection of individual ECLClusters (getting them out of TEve is hard). */
 
   };
 }

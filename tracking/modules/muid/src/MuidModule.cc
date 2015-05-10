@@ -247,10 +247,14 @@ void MuidModule::initialize()
     m_BarrelModuleMiddleRadius[layer - 1] = bklm::GeometryPar::instance()->getActiveMiddleRadius(layer); // in G4e units (cm)
   }
   double dz(eklmContent.getLength("Endcap/Layer/ShiftZ")); // in G4e units (cm)
-  double z0(eklmContent.getLength("Endcap/PositionZ") - m_OffsetZ + dz
-            - 0.5 * eklmContent.getLength("Endcap/Layer/Length")
-            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/Strips/Thickness")
-            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/PlasticSheetWidth")); // in G4e units (cm)
+//  double z0(eklmContent.getLength("Endcap/PositionZ") - m_OffsetZ + dz
+//            - 0.5 * eklmContent.getLength("Endcap/Layer/Length")
+//            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/Strips/Thickness")
+//            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/PlasticSheetWidth")); // in G4e units (cm)
+  double z0(eklmContent.getLength("Endcap/PositionZ")
+            - 0.5 * eklmContent.getLength("Endcap/Length")
+            + dz - 0.5 * eklmContent.getLength("Endcap/Layer/Length"));
+
   int nEndcapLayers = eklmContent.getInt("Endcap/nLayer");
   m_OutermostActiveEndcapLayer = nEndcapLayers - 1; // zero-based counting
   for (int layer = 1; layer <= nEndcapLayers; ++layer) {

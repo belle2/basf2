@@ -232,7 +232,10 @@ def get_reference_files():
                 full_path = root + '/' + current_file
                 # If the file is a *.root file in a validation subfolder,
                 # we shall collect it as a reference file
-                if fnmatch.fnmatch(full_path, '*/validation/*.root'):
+                # NB: This will only find ROOT files that lie directly in
+                # the /[pkg]/validation folder, not in any subdirs of it!
+                if (os.path.splitext(full_path)[1] == 'root' and
+                        os.path.dirname(full_path).endswith('validation')):
                     results[location].append(os.path.abspath(full_path))
 
     # Now we need to get a rid of all the duplicates: Since local > central,

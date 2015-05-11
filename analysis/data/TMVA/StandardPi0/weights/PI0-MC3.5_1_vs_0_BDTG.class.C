@@ -68,7 +68,7 @@ NNodesMax: "0" [deprecated: Use MaxDepth instead to limit the tree size]
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
 NVar 8
-p_CMS                         p_CMS                         p_CMS                         p_CMS                                                           'F'    [0.000638258643448,30.4221420288]
+useCMSFramep                         useCMSFramep                         useCMSFramep                         useCMSFramep                                                           'F'    [0.000638258643448,30.4221420288]
 cosTheta                      cosTheta                      cosTheta                      cosTheta                                                        'F'    [-0.999998927116,0.99999576807]
 ErrM                          ErrM                          ErrM                          ErrM                                                            'F'    [0.00470399530604,159.342559814]
 decayAngle                    decayAngle                    decayAngle                    decayAngle                                                      'F'    [-0.999971807003,0.999974906445]
@@ -201,7 +201,7 @@ class ReadBDTG : public IClassifierReader {
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "p_CMS", "cosTheta", "ErrM", "decayAngle", "daughter0E", "daughter1E", "daughter0clusterE9E25", "daughter1clusterE9E25" };
+      const char* inputVars[] = { "useCMSFramep", "cosTheta", "ErrM", "decayAngle", "daughter0E", "daughter1E", "daughter0clusterE9E25", "daughter1clusterE9E25" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {

@@ -65,7 +65,7 @@ class FlavorTaggerInfoFiller(Module):
                 track = particle.getTrack()  # Track of the particle
 
                 if category == 'MaximumP*':  # MaximumP only gives the momentum of the Highest Momentum Particle
-                    targetProb = mc_variables.variables.evaluate('p_CMS',
+                    targetProb = mc_variables.variables.evaluate('useCMSFrame(p)',
                                                                  particle)
                     categoryProb = 0.0
                 else:
@@ -319,8 +319,8 @@ def WhichCategories(categories=[
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
 variables['Electron'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'p',
     'pt',
     'eid',
@@ -336,8 +336,8 @@ variables['Electron'] = [
 ]
 variables['IntermediateElectron'] = variables['Electron']
 variables['Muon'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'p',
     'pt',
     'muid',
@@ -352,8 +352,8 @@ variables['Muon'] = [
 ]
 variables['IntermediateMuon'] = variables['Muon']
 variables['KinLepton'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'p',
     'pt',
     'muid',
@@ -372,8 +372,8 @@ variables['KinLepton'] = [
     'chiProb',
 ]
 variables['Kaon'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'cosTheta',
     'pt',
     'Kid',
@@ -386,8 +386,8 @@ variables['Kaon'] = [
     'chiProb',
 ]
 variables['SlowPion'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'cosTheta',
     'p',
     'pt',
@@ -410,7 +410,7 @@ variables['Lambda'] = [
     'lambdaZError',
     'MomentumOfSecondDaughter',
     'MomentumOfSecondDaughter_CMS',
-    'p_CMS',
+    'useCMSFrame(p)',
     'p',
     'chiProb',
     'distance',
@@ -421,8 +421,8 @@ variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, IsRightTrack(Kaon))',
                          'cosKaonPion', 'KaonPionHaveOpositeCharges', 'Kid']
 
 variables['MaximumP*'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'p',
     'pt',
     'cosTPTO',
@@ -430,7 +430,7 @@ variables['MaximumP*'] = [
 ]
 
 variables['FSC'] = [
-    'p_CMS',
+    'useCMSFrame(p)',
     'cosTPTO',
     'Kid',
     'FSCVariables(p_CMS_Fast)',

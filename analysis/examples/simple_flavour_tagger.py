@@ -87,8 +87,8 @@ ROEEmptyTrigger.if_true(emptypath)
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
 variables['Electron'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'p',
     'pt',
     'eid',
@@ -102,8 +102,8 @@ variables['Electron'] = [
     'eid_ECL', ]
 variables['IntermediateElectron'] = variables['Electron']
 variables['Muon'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'p',
     'pt',
     'muid',
@@ -116,8 +116,8 @@ variables['Muon'] = [
     'muid_ARICH', ]
 variables['IntermediateMuon'] = variables['Muon']
 variables['Kaon'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'cosTheta',
     'pt',
     'Kid',
@@ -129,8 +129,8 @@ variables['Kaon'] = [
     'ptTracksRoe',
     'distance', ]
 variables['SlowPion'] = [
-    'p_CMS',
-    'pt_CMS',
+    'useCMSFrame(p)',
+    'useCMSFrame(pt)',
     'cosTheta',
     'p',
     'pt',
@@ -150,9 +150,9 @@ variables['Lambda'] = [
     'M',
     'cosAngleBetweenMomentumAndVertexVector',
     'lambdaZError',
-    'MomentumOfSecondDaughter',
-    'MomentumOfSecondDaughter_CMS',
-    'p_CMS',
+    'MomentumOfSecondDaughter',  # ARGHH Why won't you use daughter(1, p)?
+    'MomentumOfSecondDaughter_CMS',  # ARGHH Why won't you use useCMSFrame(daughter(1, p))?
+    'useCMSFrame(p)',
     'p',
     'chiProb',
     'distance', ]
@@ -214,7 +214,7 @@ for (symbol, category) in trackLevelParticles:
          'TrainingMethod=BFGS:NBIndiPreproFlagByVarname=' +
          '=34,'.join([Belle2.Variable.makeROOTCompatible(s) for s in variables[category]]) +
          '=34'),
-        ]
+    ]
 
     # Select particles in ROE for different categories of flavour tagging.
     if symbol != 'Lambda0':

@@ -26,7 +26,7 @@ variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH',
              'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
              'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
              'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-             'p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb']
+             'p', 'pt', 'useCMSFrame(p)', 'useCMSFrame(pt)', 'chiProb']
 
 # Define one or multiple methods.
 # Every definition consists of 3 string. First the name of the method, secondly the type and thirdly a TMVA config string

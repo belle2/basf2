@@ -50,7 +50,7 @@ variables = ['daughter(0, Kid)', 'daughter(1, piid)',
              'daughter(0, dr)', 'daughter(0, dz)',
              'daughter(1, dr)', 'daughter(1, dz)',
              'daughter(0, chiProb)', 'daughter(1, chiProb)',
-             'p_CMS', 'pt_CMS', 'pz_CMS',
+             'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(pz)',
              'dr', 'dz', 'chiProb', 'significanceOfDistance',
              'VertexZDist']
 

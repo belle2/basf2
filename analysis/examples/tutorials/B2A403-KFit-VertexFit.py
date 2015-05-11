@@ -63,7 +63,7 @@ vertexKFit('D0:kpi', 0.0)
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 # and D* CMS momentum > 2.5 GeV
-reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 <= Q < 0.02 and 2.5 < p_CMS < 5.5')
+reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5')
 
 # perform D*+ vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)

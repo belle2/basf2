@@ -25,7 +25,7 @@ variables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH',
              'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
              'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
              'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-             'p', 'pt', 'p_CMS', 'pt_CMS', 'chiProb']
+             'p', 'pt', 'useCMSFrame(p)', 'useCMSFrame(pt)', 'chiProb']
 
 # Define one or multiple methods.
 # Every definition consists of 3 string. First the name of the method, secondly the type and thirdly a TMVA config string
@@ -35,7 +35,8 @@ methods = [
     ('BDTGradient', 'BDT',
      '!H:!V:NTrees=100:BoostType=Grad:Shrinkage=0.10:GradBaggingFraction=0.5:nCuts=200:MaxDepth=2'),
     ('PDEFoamBoost', 'PDEFoam',
-     '!H:!V:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T'),
+     '!H:!V:Boost_Num=10:Boost_Transform=linear:SigBgSeparate=F:MaxDepth=4:UseYesNoCell=T:DTLogic=MisClassificationError:'
+     'FillFoamWithOrigWeights=F:TailCut=0:nActiveCells=500:nBin=20:Nmin=400:Kernel=None:Compress=T'),
     ('FastBDT', 'Plugin',
      '!H:!V:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
 ]

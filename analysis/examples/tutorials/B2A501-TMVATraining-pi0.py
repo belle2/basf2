@@ -74,7 +74,7 @@ matchMCTruth('pi0')
 # define the input variables
 # all PSelectorFunctions/VariableManager
 variables = [
-    'p_CMS',
+    'useCMSFrame(p)',
     'cosTheta',
     'ErrM',
     'decayAngle(0)',

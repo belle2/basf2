@@ -55,7 +55,7 @@
     <Option name="NNodesMax" modified="No">0</Option>
   </Options>
   <Variables NVar="8">
-    <Variable VarIndex="0" Expression="p_CMS" Label="p_CMS" Title="p_CMS" Unit="" Internal="p_CMS" Type="F" Min="6.38258643e-04" Max="3.04221420e+01"/>
+    <Variable VarIndex="0" Expression="useCMSFramep" Label="useCMSFramep" Title="useCMSFramep" Unit="" Internal="useCMSFramep" Type="F" Min="6.38258643e-04" Max="3.04221420e+01"/>
     <Variable VarIndex="1" Expression="cosTheta" Label="cosTheta" Title="cosTheta" Unit="" Internal="cosTheta" Type="F" Min="-9.99998927e-01" Max="9.99995768e-01"/>
     <Variable VarIndex="2" Expression="ErrM" Label="ErrM" Title="ErrM" Unit="" Internal="ErrM" Type="F" Min="4.70399531e-03" Max="1.59342560e+02"/>
     <Variable VarIndex="3" Expression="decayAngle0" Label="decayAngle0" Title="decayAngle0" Unit="" Internal="decayAngle0" Type="F" Min="-9.99971807e-01" Max="9.99974906e-01"/>

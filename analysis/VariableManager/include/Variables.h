@@ -177,11 +177,6 @@ namespace Belle2 {
     double particleCharge(const Particle* part);
 
     /**
-     * return cosine of angle between thrust axis of given particle and thrust axis of ROE
-     */
-    double cosTPTO(const Particle* part);
-
-    /**
      * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle
      */
     double particleMCInitialParticle(const Particle* particle);
@@ -222,11 +217,6 @@ namespace Belle2 {
     double genMotherPDG(const Particle* particle);
 
     /**
-     * return absolute PDG code of matched MCParticle
-     */
-    double particleAbsMCMatchPDGCode(const Particle* particle);
-
-    /**
      * return PDG code of matched MCParticle
      */
     double particleMCMatchPDGCode(const Particle* particle);
@@ -255,104 +245,6 @@ namespace Belle2 {
      * return 1 if Particle was in RestOfEventObject, 0 otherwise
      */
     double isInRestOfEvent(const Particle* particle);
-
-    /**
-     * return 1 if (dummy)
-     */
-    double isMajorityInRestOfEventFromB0(const Particle*);
-
-    /**
-     * return 1 if (dummy)
-     */
-    double isMajorityInRestOfEventFromB0bar(const Particle*);
-
-    /**
-     * return 1 if (dummy)
-     */
-    double isRestOfEventOfB0(const Particle*);
-
-    /**
-     * return 1 if (dummy)
-     */
-    double isRestOfEventOfB0bar(const Particle*);
-
-    /**
-     * -1 (1) if current RestOfEvent is related to a B0bar (B0) and -2 if empty - used for cuts
-     */
-    double isRestOfEventEmpty(const Particle* part);
-
-    /**
-     * -1 (1) if current RestOfEvent is related to a B0bar (B0)
-     */
-
-    double isRestOfEventB0Flavor(const Particle*);
-    /**
-     * 0 (1) if current RestOfEvent is related to a B0bar (B0)
-     */
-    double isRestOfEventB0Flavor_Norm(const Particle*);
-
-    /**
-     * returns missing Momentum on the tag side (flavor tagging specific variable).
-     *
-     * requires that StoreObjPtr<RestOfEvent> roe("RestOfEvent") exists.
-     */
-    double p_miss(const Particle*);
-
-    /**
-     * Returns the number of K_S0 in the remaining Kaon ROE (flavor tagging specific variable).
-     *
-     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROEKaon") exists.
-     */
-    double NumberOfKShortinRemainingROEKaon(const Particle*);
-
-    /**
-     * Returns the number of K_S0 in the remaining Lambda ROE (flavor tagging specific variable).
-     *
-     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda") exists.
-     */
-    double NumberOfKShortinRemainingROELambda(const Particle*);
-
-    /**
-     * 1.0 if pdg-code for Lambda0, -1.0 if Anti-Lambda0, 0.0 else
-     *
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-    double lambdaFlavor(const Particle* particle);
-
-    /**
-     * 0.0 if pdg-code for MCParticle is Lambda0, 0.0 if MCAnti-Lambda0, 1.0 else
-     *
-     */
-    double isLambda(const Particle* particle);
-
-
-
-    /**
-     * Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.
-     *
-     * This is a simplistic hack. But I see no other way to get the information.
-     */
-    double lambdaZError(const Particle* particle);
-
-    /**
-     * Returns the Momentum of second daughter if existing, else 0.
-     */
-    double MomentumOfSecondDaughter(const Particle* part);
-
-    /**
-     * Returns the Momentum of second daughter if existing in CMS, else 0.
-     */
-    double MomentumOfSecondDaughter_CMS(const Particle* part);
-
-    /**
-     * Returns q*(highest PID_Likelihood for Kaons), else 0.
-     */
-    double chargeTimesKaonLiklihood(const Particle*);
-
-    /**
-     * Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.
-     */
-    double transverseMomentumOfChargeTracksInRoe(const Particle* part);
 
     /**
      * return number of remaining tracks as given by the related RestOfEvent object
@@ -423,16 +315,6 @@ namespace Belle2 {
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaB(const Particle* particle);
-
-    /**
-     * Flavour of Btag from trained Method
-     */
-    double particleClassifiedFlavor(const Particle* particle);
-
-    /**
-     * Flavour of Btag from MC
-     */
-    double particleMCFlavor(const Particle* particle);
 
     /**
      * return magnitude of 3-momentum recoiling against given Particle

@@ -204,41 +204,6 @@ namespace Belle2 {
       return constant[0];
     }
 
-    // Flavor Information in Transition --------------------------------------------------
-    double hasCharmedDaughter(const Particle* particle, const std::vector<double>& transition)
-    {
-      int Status = 0;
-
-      if (abs(transition[0]) != 1)
-        B2ERROR("The parameter variable hasCharmedDaughter() only accepts 1 or -1 as an argument.");
-
-      if (!particle)
-        Status = -999;
-
-      int nDaughters = int(particle->getNDaughters());
-      if (nDaughters < 1)
-        Status = -999;
-
-      int motherPDGSign = (particle->getPDGCode()) / (abs(particle->getPDGCode()));
-      const std::vector<Particle*> daughters = particle->getDaughters();
-
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
-        int daughterPDGSign = daughterPDG / (abs(daughterPDG));
-
-        if (transition[0] == 1) {
-          if (((abs(daughterPDG) / 100) % 10 == 4 || (abs(daughterPDG) / 1000) % 10 == 4)
-              && motherPDGSign == daughterPDGSign) // charmed meson or baryon and b->anti-c transition
-            Status = 1;
-        } else if (transition[0] == -1) {
-          if (((abs(daughterPDG) / 100) % 10 == 4 || (abs(daughterPDG) / 1000) % 10 == 4)
-              && motherPDGSign == -daughterPDGSign) // charmed meson or baryon and b->c transition
-            Status = 1;
-        }
-      }
-      return Status;
-    }
-
     VARIABLE_GROUP("ParameterFunctions");
     REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent ,
                       "Returns number of MC Particles (including anti particles) with the given pdg in the event.");
@@ -258,7 +223,5 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
 
-    REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
-                      "Returns information regarding the charm quark presence in the decay.");
   }
 }

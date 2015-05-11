@@ -57,26 +57,26 @@ namespace Belle2 {
 
   private:
 
-    /**number of charged*/
-    int m_nCharged; //counted per event
-    int m_nChargedMin; //user selected
-    int m_nChargedMax;
-
-    /**number of photons*/
-    double m_nPhoton; //counted per event
-    int m_nPhotonMin; //user selected
-    int m_nPhotonMax;
-
-    /**selection criteria for photons*/
-    double m_MinPhotonEnergy;
-    double m_MinPhotonTheta;
-    double m_MaxPhotonTheta;
+    /**charged*/
+    int m_nCharged; /**< number of charged particles (counted per event). */
+    int m_nChargedMin; /**< minimum number of charged particles. */
+    int m_nChargedMax; /**< minimum number of charged particles. */
 
     /**selection criteria for charged*/
-    double m_MinChargedP;
-    double m_MinChargedPt;
-    double m_MinChargedTheta;
-    double m_MaxChargedTheta;
+    double m_MinChargedP; /**< minimum p for each charged particle. */
+    double m_MinChargedPt; /**< minimum pT for each charged particle. */
+    double m_MinChargedTheta; /**< minimum theta for each charged particle. */
+    double m_MaxChargedTheta; /**< maximum theta for each charged particle. */
+
+    /**number of photons*/
+    double m_nPhoton; /**< number of photons (counted per event). */
+    int m_nPhotonMin; /**< minimum number of photons. */
+    int m_nPhotonMax; /**< minimum number of photons. */
+
+    /**selection criteria for photons*/
+    double m_MinPhotonEnergy; /**< minimum energy for each photon. */
+    double m_MinPhotonTheta; /**< minimum theta for each photon. */
+    double m_MaxPhotonTheta; /**< maximum theta for each photon. */
 
   };
 }

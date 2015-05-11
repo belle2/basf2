@@ -19,7 +19,8 @@ using namespace Belle2::MCMatching;
 namespace {
   TEST(MCMatchingTest, TestsDisabled)
   {
-    EXPECT_TRUE(false) << "MC matching test disabled on intel compiler (version < 14 sp1 update2), please see https://software.intel.com/en-us/forums/topic/475378";
+    EXPECT_TRUE(false) <<
+                       "MC matching test disabled on intel compiler (version < 14 sp1 update2), please see https://software.intel.com/en-us/forums/topic/475378";
   }
 }
 #else
@@ -56,32 +57,35 @@ namespace {
     };
     /** create MCParticles for decay of particle with 'pdg' to given daughter PDG codes. */
     Decay(int pdg, std::vector<Decay> daughters = std::vector<Decay>()):
-      m_pdg(pdg), m_daughterDecays(daughters), m_mcparticle(nullptr), m_particle(nullptr) {
+      m_pdg(pdg), m_daughterDecays(daughters), m_mcparticle(nullptr), m_particle(nullptr)
+    {
       m_graphParticle = &gParticleGraph.addParticle();
       m_graphParticle->setPDG(m_pdg);
       m_graphParticle->setStatus(MCParticle::c_PrimaryParticle);
-      for (Decay & d : daughters) {
+      for (Decay& d : daughters) {
         gParticleGraph.addDecay(*m_graphParticle, *d.m_graphParticle);
       }
     }
     /** add all MCParticles created so far to data store. Must be called manually if you want to check MCParticles before calling reconstruct(). */
-    void finalize() {
+    void finalize()
+    {
       gParticleGraph.generateList();
       gParticleGraph.clear(); //don't add them again in the next call..
 
       StoreArray<MCParticle> mcparticles;
       m_mcparticle = mcparticles[m_graphParticle->getIndex() - 1];
 
-      for (Decay & d : m_daughterDecays)
+      for (Decay& d : m_daughterDecays)
         d.finalize();
     }
 
     /** get first Particle with matching PDG code. */
-    Particle* getParticle(int pdg) const {
+    Particle* getParticle(int pdg) const
+    {
       if (m_pdg == pdg and m_particle)
         return m_particle;
 
-      for (auto & d : m_daughterDecays) {
+      for (auto& d : m_daughterDecays) {
         Particle* res = d.getParticle(pdg);
         if (res)
           return res;
@@ -89,11 +93,12 @@ namespace {
       return nullptr;
     }
     /** get first MCParticle with matching PDG code. */
-    MCParticle* getMCParticle(int pdg) const {
+    MCParticle* getMCParticle(int pdg) const
+    {
       if (m_pdg == pdg and m_mcparticle)
         return m_mcparticle;
 
-      for (auto & d : m_daughterDecays) {
+      for (auto& d : m_daughterDecays) {
         MCParticle* res = d.getMCParticle(pdg);
         if (res)
           return res;
@@ -101,11 +106,12 @@ namespace {
       return nullptr;
     }
     /** get first Decay with matching PDG code. */
-    Decay* getDecay(int pdg) {
+    Decay* getDecay(int pdg)
+    {
       if (m_pdg == pdg)
         return this;
 
-      for (auto & d : m_daughterDecays) {
+      for (auto& d : m_daughterDecays) {
         Decay* res = d.getDecay(pdg);
         if (res)
           return res;
@@ -117,7 +123,8 @@ namespace {
 
     /** Helper for constructing Particles. */
     struct ReconstructedDecay {
-      ReconstructedDecay(int pdg, std::vector<ReconstructedDecay> daughters = std::vector<ReconstructedDecay>(), EBehavior behavior = c_Default):
+      ReconstructedDecay(int pdg, std::vector<ReconstructedDecay> daughters = std::vector<ReconstructedDecay>(),
+                         EBehavior behavior = c_Default):
         m_pdg(pdg), m_daughterDecays(daughters), m_behavior(behavior), m_optMcPart(nullptr), m_optDecay(nullptr) { }
       ReconstructedDecay(int pdg, std::vector<ReconstructedDecay> daughters, EBehavior behavior, MCParticle* optMcPart):
         m_pdg(pdg), m_daughterDecays(daughters), m_behavior(behavior), m_optMcPart(optMcPart), m_optDecay(nullptr) { }
@@ -136,7 +143,8 @@ namespace {
      *
      * TODO: adding additional Particles (i.e. more than MCParticles) doesn't work yet
      */
-    void reconstruct(ReconstructedDecay decay) {
+    void reconstruct(ReconstructedDecay decay)
+    {
       if (!m_mcparticle) {
         finalize();
       }
@@ -174,7 +182,7 @@ namespace {
           ReconstructedDecay rd = decay.m_daughterDecays[i];
           //we must make sure that m_graphParticle always corresponds to the same thing in the reconstructed thing.
           if (rd.m_behavior == c_ReconstructFrom) {
-            ASSERT_TRUE(rd.m_optDecay != nullptr);
+            ASSERT_NE(rd.m_optDecay, nullptr);
             Decay* mcDecay = rd.m_optDecay;
             rd.m_optDecay = nullptr;
             rd.m_behavior = Decay::c_Default;
@@ -201,7 +209,8 @@ namespace {
           std::sort(decaybarlist.begin(), decaybarlist.end());
           bool isUnflavored = (decaylist == decaybarlist);
 
-          m_particle = particles.appendNew(TLorentzVector(), decay.m_pdg, isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored), daughterIndices);
+          m_particle = particles.appendNew(TLorentzVector(), decay.m_pdg, isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored),
+                                           daughterIndices);
         }
       }
     }
@@ -210,13 +219,15 @@ namespace {
 
     int m_pdg; /**< PDG code of this MCParticle. */
     vector<Decay> m_daughterDecays; /**< decay products. */
-    MCParticleGraph::GraphParticle* m_graphParticle; /**< GraphParticle (derived from MCParticle) corresponding to pdg. Linked to the specified daughters. */
+    MCParticleGraph::GraphParticle*
+    m_graphParticle; /**< GraphParticle (derived from MCParticle) corresponding to pdg. Linked to the specified daughters. */
     MCParticle* m_mcparticle; /**< corresponding MCParticle. if finalize() hasn't been called, = nullptr. */
     Particle* m_particle; /**< corresponding Particle. if reconstruct() hasn't been called, = nullptr. */
 
   private:
     /** implementation of getString(), without descriptive prefix. */
-    string getStringInternal(int depth = 0) const {
+    string getStringInternal(int depth = 0) const
+    {
       stringstream s;
       string spaces;
       for (int i = 0; i < depth; i++)
@@ -250,7 +261,7 @@ namespace {
 
       if (!m_daughterDecays.empty()) {
         s << " [";
-        for (const Decay & d : m_daughterDecays) {
+        for (const Decay& d : m_daughterDecays) {
           s << "\n" << d.getStringInternal(depth + 1);
         }
 
@@ -265,7 +276,8 @@ namespace {
   class MCMatchingTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
       StoreArray<Particle> particles;
       StoreArray<MCParticle> mcparticles;
@@ -275,7 +287,8 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
   };
@@ -334,11 +347,11 @@ namespace {
     EXPECT_EQ(mcparticles[5]->getPDG(), 22);
     EXPECT_EQ(particles.getEntries(), 6);
 
-    EXPECT_TRUE(d.m_particle != nullptr);
+    ASSERT_NE(d.m_particle, nullptr);
     const auto& fspParticles = d.m_particle->getFinalStateDaughters();
     EXPECT_EQ(fspParticles.size(), 4u);
     //all final state particles should have relations...
-    for (const Particle * p : fspParticles) {
+    for (const Particle* p : fspParticles) {
       EXPECT_EQ(p->getRelated<MCParticle>()->getDaughters().size(), 0u);
     }
     //composite particles don't have them
@@ -616,7 +629,8 @@ namespace {
       Decay* pi0decay = d.getDecay(111);
       ASSERT_TRUE(setMCTruth(pi0)) << pi0decay->getString();
       EXPECT_EQ(521, pi0->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance | c_MissFSR, getMCErrors(pi0)) << pi0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance | c_MissFSR,
+                getMCErrors(pi0)) << pi0decay->getString();
 
       //flags migrate upstream
       Particle* p = d.getParticle(421);
@@ -626,7 +640,8 @@ namespace {
 
       //even with addedWrongParticle (inherited from daughter), missFSR should be detected.
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance | c_MissFSR, getMCErrors(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance | c_MissFSR,
+                getMCErrors(d.m_particle)) << d.getString();
     }
   }
 

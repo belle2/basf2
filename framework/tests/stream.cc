@@ -34,7 +34,7 @@ namespace {
   /** common content checks for RelationContainer. */
   void checkObject(const RelationContainer* rel)
   {
-    EXPECT_TRUE(rel != NULL);
+    ASSERT_NE(rel, nullptr);
     EXPECT_TRUE(rel->getFromName() == "a");
     EXPECT_TRUE(rel->getToName() == "b");
     EXPECT_EQ(rel->getEntries(), 100);
@@ -67,8 +67,7 @@ namespace {
     //restore
     TObject* obj = Stream::deserializeXML(vStr);
     TVector3* v2 = dynamic_cast<TVector3*>(obj);
-    EXPECT_TRUE(v2 != NULL);
-
+    ASSERT_NE(v2, nullptr);
     EXPECT_TRUE(*v2 == v);
 
     //something more complex
@@ -100,7 +99,7 @@ namespace {
     //restore
     TObject* obj = Stream::deserializeEncodedRawData(vStr);
     TVector3* v2 = dynamic_cast<TVector3*>(obj);
-    EXPECT_TRUE(v2 != NULL);
+    ASSERT_NE(v2, nullptr);
     EXPECT_TRUE(*v2 == v);
 
     //something more complex

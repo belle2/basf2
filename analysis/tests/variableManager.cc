@@ -73,14 +73,14 @@ namespace {
 
     Manager::Instance().registerVariable("testingthedummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
     const Manager::Var* dummy = Manager::Instance().getVariable("testingthedummyvar");
-    EXPECT_TRUE(dummy != nullptr);
+    ASSERT_NE(dummy, nullptr);
     EXPECT_TRUE(dummy->description == "blah");
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 42.0);
 
     //also test the macro (with other name)
     REGISTER_VARIABLE("testingthedummyvar2", dummyVar, "something else");
     dummy = Manager::Instance().getVariable("testingthedummyvar2");
-    EXPECT_TRUE(dummy != nullptr);
+    ASSERT_NE(dummy, nullptr);
     EXPECT_TRUE(dummy->description == "something else");
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 42.0);
 
@@ -88,7 +88,7 @@ namespace {
     Manager::Instance().registerVariable("testingthedummyvarwithparameters(n)", (Manager::ParameterFunctionPtr)&dummyVarWithParameters,
                                          "blah");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters(3)");
-    EXPECT_TRUE(dummy != nullptr);
+    ASSERT_NE(dummy, nullptr);
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 3.0);
     EXPECT_DOUBLE_EQ(Manager::Instance().getVariable("testingthedummyvarwithparameters(3)")->function(nullptr), 3.0);
     EXPECT_DOUBLE_EQ(Manager::Instance().getVariable("testingthedummyvarwithparameters(3,5)")->function(nullptr), 8.0);
@@ -97,7 +97,7 @@ namespace {
     //also test the macro (with other name)
     REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters2(4,5)");
-    EXPECT_TRUE(dummy != nullptr);
+    ASSERT_NE(dummy, nullptr);
     EXPECT_DOUBLE_EQ(dummy->function(nullptr), 9.0);
 
     //test list

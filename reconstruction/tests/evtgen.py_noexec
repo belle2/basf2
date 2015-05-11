@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from basf2 import *
+from simulation import add_simulation
+
+set_random_seed(12345)
+
+main = create_path()
+
+# specify number of events to be generated
+eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [10])
+eventinfosetter.param('runList', [1])
+eventinfosetter.param('expList', [1])
+main.add_module(eventinfosetter)
+
+# generate BBbar events
+evtgeninput = register_module('EvtGenInput')
+main.add_module(evtgeninput)
+
+# GearBox
+gearbox = register_module('Gearbox')
+main.add_module(gearbox)
+
+add_simulation(main)
+
+# Root Output
+output = register_module('RootOutput')
+output.param('outputFileName', 'evtgen_bbar.root')
+main.add_module(output)
+
+# Progress
+progress = register_module('Progress')
+main.add_module(progress)
+
+# Run analysis
+process(main)

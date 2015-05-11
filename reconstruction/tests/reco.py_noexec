@@ -1,0 +1,34 @@
+
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+
+from basf2 import *
+#from simulation import add_simulation
+from reconstruction import add_reconstruction
+main = create_path()
+
+# Input Module
+input = register_module('RootInput')
+input.param('inputFileName', 'evtgen_bbar.root')
+main.add_module(input)
+
+# GearBox
+gearbox = register_module('Gearbox')
+main.add_module(gearbox)
+
+# to test: add reconstruction should add all neccessary modules (like geometry) itself
+add_reconstruction(main)
+
+# output
+output = register_module('RootOutput')
+output.param('outputFileName', 'rec_bbar.root')
+main.add_module(output)
+
+# progress
+progress = register_module('Progress')
+main.add_module(progress)
+
+process(main)

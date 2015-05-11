@@ -55,8 +55,7 @@ namespace Belle2 {
 
   protected:
 
-    double getBeamEnergyCM(double e1, double e2, double angle);
-
+    double getBeamEnergyCM(double e1, double e2, double angle); /**< Get the CM energy from LER, HER and the crossing angle. */
 
     /** Module parameters */
     std::string m_model; /**< model: exp or ps. */
@@ -70,16 +69,15 @@ namespace Belle2 {
     int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     double m_fMax; /**< Maximum differential cross section weight. */
     int m_nSearchMax; /**< Events used to search maximum of differential cross section. */
-    std::vector<double> m_ScatteringAngleRange; /**< Min [0] and Max [1] value for the scattering angle [deg] of the electron/positron. */
+    std::vector<double>
+    m_ScatteringAngleRange; /**< Min [0] and Max [1] value for the scattering angle [deg] of the electron/positron. */
     std::string m_fileNameExtraInfo; /**< Extra ROOT file that contains the weight distribution to check overweight bias. */
 
     /** Variables */
     BabayagaNLO m_generator;   /**< The BabayagaNLO generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
-
-    /** Variables */
-    TFile* m_fileExtraInfo;
-    TH1D* m_th1dSDif;
+    TFile* m_fileExtraInfo;  /**< Output file. */
+    TH1D* m_th1dSDif;   /**< Histograms with the event weights. */
 
     template <typename T>
     std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */

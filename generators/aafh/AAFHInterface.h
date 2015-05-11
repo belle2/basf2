@@ -40,6 +40,7 @@ namespace Belle2 {
       c_ElectonElectron = 5,
     };
 
+    /** Rejection mode */
     enum ERejection {
       /** Apply rejection only once for the final event */
       c_Once = 1,
@@ -61,7 +62,8 @@ namespace Belle2 {
     /** Set the minimum invariant mass for the generated event */
     void setMinimumMass(double minMass) { m_minMass = minMass; }
     /** Set the particle type for modes c_MuonParticle and c_ElectronParticle */
-    void setParticle(const std::string& particle) {
+    void setParticle(const std::string& particle)
+    {
       m_particle = particle;
     }
 

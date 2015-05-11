@@ -55,7 +55,7 @@ namespace Belle2 {
 
   protected:
 
-    double getBeamEnergyCM(double e1, double e2, double angle);
+    double getBeamEnergyCM(double e1, double e2, double angle); /**< get beam energy in CM from LER, HER and crossing angle */
 
     /** Module parameters */
     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */

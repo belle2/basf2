@@ -19,7 +19,6 @@
 #include <complex>
 #include <cmath>
 #include <tuple>
-#include <boost/concept_check.hpp>
 
 using namespace std;
 

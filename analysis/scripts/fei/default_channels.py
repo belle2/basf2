@@ -36,7 +36,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
                    'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
                    'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
                    'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-                   'p_CMS', 'pt_CMS', 'E', 'pz_CMS',
+                   'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)',
                    'dr', 'dz', 'chiProb'],
         target='isSignal',
         **mvaDefaults
@@ -52,7 +52,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_gamma = MVAConfiguration(
         variables=['clusterReg', 'goodGamma', 'goodGammaUnCal',
                    'clusterNHits', 'clusterTrackMatch', 'clusterE9E25',
-                   'p_CMS', 'pt_CMS', 'E', 'pz_CMS'],
+                   'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)'],
         target='isSignal',
         **mvaDefaults
     )
@@ -81,7 +81,8 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 # ################## KS0 ###############################
     mva_KS0 = MVAConfiguration(
         variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb',
-                   'M', 'E', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))',
+                   'M', 'useCMSFrame(E)', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))',
+                   'useRestFrame(daughter({}, p))',
                    'cosAngleBetweenMomentumAndVertexVector',
                    'daughter({}, dz)', 'daughter({}, dr)', 'Q'],
         target='isSignal',
@@ -89,7 +90,7 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     )
 
     mva_KS0_pi0pi0 = MVAConfiguration(
-        variables=['M', 'E', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))'],
+        variables=['M', 'useCMSFrame(E)', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))'],
         target='isSignal',
         **mvaDefaults
     )
@@ -111,8 +112,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 # ####################### D0 #########################
     mva_D0 = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -151,8 +153,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_DPlus = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -187,8 +190,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_DStarPlus = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -214,8 +218,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 # ####################### D*0 #########################
     mva_DStar0 = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -241,8 +246,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_DS = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -276,8 +282,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_DStarS = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -303,8 +310,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_J = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q'],
@@ -329,8 +337,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 # ################## B+ ##############################
     mva_BPlus = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q',
@@ -382,8 +391,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_BPlusSemileptonic = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q',
@@ -416,8 +426,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 # #################################  B0 #################################
     mva_B0 = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q',
@@ -466,8 +477,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
 
     mva_B0Semileptonic = MVAConfiguration(
         variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
-                   'chiProb', 'daughter({}, dz)', 'daughter({}, dr)', 'daughter({}, chiProb)',
-                   'daughter({}, p_CMS)', 'daughter({}, pt_CMS)',  'daughter({}, pz_CMS)',
+                   'chiProb', 'daughter({}, chiProb)',
+                   'useRestFrame(daughter({}, p))',
+                   'useRestFrame(daughter({}, distance))',
                    'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                    'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
                    'daughterInvariantMass({},{},{},{},{})', 'Q',

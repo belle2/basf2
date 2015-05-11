@@ -65,6 +65,9 @@ FragmentationModule::FragmentationModule() : Module()
   nQuarks     = 0;
   nVpho       = 0;
 
+  pythia = nullptr;
+  PythiaEvent = nullptr;
+
 }
 
 

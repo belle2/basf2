@@ -51,12 +51,14 @@ namespace Belle2 {
 
   protected:
 
-    double getBeamEnergyCM(double e1, double e2, double angle);
+    double getBeamEnergyCM(double e1, double e2, double angle); /**< Get CM beam energy from LER, HER and crossing angle. */
 
     /** Module parameters */
     int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
-    std::vector<double> m_ScatteringAngleRangePositron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the positron. */
-    std::vector<double> m_ScatteringAngleRangeElectron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the electron. */
+    std::vector<double>
+    m_ScatteringAngleRangePositron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the positron. */
+    std::vector<double>
+    m_ScatteringAngleRangeElectron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the electron. */
 
     std::string m_vacPolString; /**< Vacuum polarization as string*/
     BHWide::PhotonVacPolarization m_vacPol; /**< Vacuum polarization */

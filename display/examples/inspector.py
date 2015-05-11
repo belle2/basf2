@@ -14,7 +14,7 @@ class InspectorModule(Module):
 
     """Inspect DataStore contents"""
 
-    # @doc InfoWidget pointer
+    #: InfoWidget pointer
     info = None
 
     def initialize(self):

@@ -95,7 +95,7 @@ namespace Belle2 {
       /** If true, the number of tracks per event will fluctuate according to
        * Poisson distribution */
       bool varyNumberOfTracks = true;
-      /* generates particle momentum according to the specified
+      /** generates particle momentum according to the specified
        * distribution and assigns this momentum to all particles generated
        * for one event */
       bool fixedMomentumPerEvent = false;

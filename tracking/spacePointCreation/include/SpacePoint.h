@@ -245,13 +245,13 @@ namespace Belle2 {
     /** returns the number of Clusters assigned to this SpacePoint (0,1, or 2) */
     unsigned short getNClustersAssigned() const
     {
-      if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
+      if (m_sensorType == VXD::SensorInfoBase::SensorType::SVD) {
         unsigned short nClusters = 0;
-        nClusters += getIfClustersAssigned().first;
-        nClusters += getIfClustersAssigned().second;
+        nClusters += m_clustersAssigned.first;
+        nClusters += m_clustersAssigned.second;
         return nClusters;
       }
-      if (m_clustersAssigned.first == m_clustersAssigned.second and m_clustersAssigned.first == true) return 1;
+      if (m_clustersAssigned.first && m_clustersAssigned.second) return 1;
       return 0;
     }
 

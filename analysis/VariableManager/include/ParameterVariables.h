@@ -50,7 +50,7 @@ namespace Belle2 {
     double massDifferenceSignificance(const Particle* particle, const std::vector<double>& daughter_index);
 
     /**
-     * return cosine of the angle between the i-th and j-th daughters, in lab frame
+     * return cosine of the angle between the i-th and j-th daughters
      */
     double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters);
 

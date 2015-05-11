@@ -16,7 +16,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/PRestFrameLabTransform.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -39,15 +39,45 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          static PRestFrameLabTransform T;
-          T.setRestFrame(particle->get4Vector().BoostVector());
+          UseReferenceFrame<RestFrame> frame(particle);
           double result = var->function(particle);
-          T.resetRestFrame();
           return result;
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useRestFrameAsCMS")
+        B2WARNING("Wrong number of arguments for meta function useRestFrame")
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr useCMSFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          UseReferenceFrame<CMSFrame> frame;
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useCMSFrame")
+        return nullptr;
+      }
+    }
+
+    Manager::FunctionPtr useLabFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          UseReferenceFrame<LabFrame> frame;
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useLabFrame")
         return nullptr;
       }
     }
@@ -829,7 +859,9 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MetaFunctions");
-    REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle in PRestFrameLab Transform.");
+    REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle as current reference frame.");
+    REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame, "Use the CMS frame as current reference frame.");
+    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, "Use the lab frame as current reference frame.");
     REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion,
                       "Returns 1 if given variable is inside a given region. Otherwise 0.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");

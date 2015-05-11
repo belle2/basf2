@@ -11,7 +11,7 @@
 // Own include
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/PRestFrameLabTransform.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
@@ -55,170 +55,60 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    // momentum (lab) -------------------------------------------
+    // momentum -------------------------------------------
 
     double particleP(const Particle* part)
     {
-      return part->getP();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).P();
     }
 
     double particleE(const Particle* part)
     {
-      return part->getEnergy();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).E();
     }
 
     double particlePx(const Particle* part)
     {
-      return part->getPx();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).Px();
     }
 
     double particlePy(const Particle* part)
     {
-      return part->getPy();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).Py();
     }
 
     double particlePz(const Particle* part)
     {
-      return part->getPz();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).Pz();
     }
 
     double particlePt(const Particle* part)
     {
-      float px = part->getPx();
-      float py = part->getPy();
-      return sqrt(px * px + py * py);
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).Pt();
     }
 
     double particleCosTheta(const Particle* part)
     {
-      return part->get4Vector().CosTheta();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).CosTheta();
     }
 
     double particlePhi(const Particle* part)
     {
-      return part->get4Vector().Phi();
-    }
-
-    // momentum (CMS) -----------------------------------------------
-
-    double particleP_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-
-      return vec.P();
-    }
-
-    double particleE_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.E();
-    }
-
-    double particlePx_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.Px();
-    }
-
-    double particlePy_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.Py();
-    }
-
-    double particlePz_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.Pz();
-    }
-
-    double particlePt_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.Pt();
-    }
-
-    double particleCosTheta_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.CosTheta();
-    }
-
-    double particlePhi_CMS(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
-      return vec.Phi();
-    }
-
-    // momentum (RF) -----------------------------------------------
-
-    double particleP_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.P();
-    }
-
-    double particleE_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.E();
-    }
-
-    double particlePx_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.Px();
-    }
-
-    double particlePy_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.Py();
-    }
-
-    double particlePz_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.Pz();
-    }
-
-    double particlePt_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.Pt();
-    }
-
-    double particleCosTheta_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.CosTheta();
-    }
-
-    double particlePhi_RF(const Particle* part)
-    {
-      PRestFrameLabTransform T;
-      TLorentzVector vec = T.rotateLabToRestFrame() * part->get4Vector();
-      return vec.Phi();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).Phi();
     }
 
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
-      return std::cos(part->getVertex().Angle(part->getMomentum()));
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return std::cos(frame.getVertex(part).Angle(frame.getMomentum(part).Vect()));
     }
 
     double cosThetaBetweenParticleAndTrueB(const Particle* part)
@@ -273,28 +163,36 @@ namespace Belle2 {
       return abs(z0_daughters[1] - z0_daughters[0]);
     }
 
-
-
     // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
     {
-      return part->getX() - 0; // TODO replace with IP position
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).X();
     }
 
     double particleDY(const Particle* part)
     {
-      return part->getY() - 0; // TODO replace with IP position
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Y();
     }
 
     double particleDZ(const Particle* part)
     {
-      return part->getZ() - 0; // TODO replace with IP position
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Z();
+    }
+
+    double particleDRho(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Perp();
     }
 
     double particleDistance(const Particle* part)
     {
-      return part->getVertex().Mag();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Mag();
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -305,18 +203,12 @@ namespace Belle2 {
       // where:
       // r &= \sqrt{\vec{x}*\vec{x}}
       // and V_{ij} is the covariance matrix
-      const auto& vertex = part->getVertex();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      const auto& vertex = frame.getVertex(part);
       auto denominator = vertex * (part->getVertexErrorMatrix() * vertex);
       if (denominator <= 0)
         return -1;
       return vertex.Mag2() / sqrt(denominator);
-    }
-
-    double particleDRho(const Particle* part)
-    {
-      float x = part->getX() - 0; // TODO replace with IP position
-      float y = part->getY() - 0; // TODO replace with IP position
-      return sqrt(x * x + y * y);
     }
 
     // mass ------------------------------------------------------------
@@ -1745,24 +1637,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
-
-    REGISTER_VARIABLE("p_CMS", particleP_CMS, "CMS momentum magnitude");
-    REGISTER_VARIABLE("E_CMS", particleE_CMS, "CMS energy");
-    REGISTER_VARIABLE("px_CMS", particlePx_CMS, "CMS momentum component x");
-    REGISTER_VARIABLE("py_CMS", particlePy_CMS, "CMS momentum component y");
-    REGISTER_VARIABLE("pz_CMS", particlePz_CMS, "CMS momentum component z");
-    REGISTER_VARIABLE("pt_CMS", particlePt_CMS, "CMS transverse momentum");
-    REGISTER_VARIABLE("cosTheta_CMS", particleCosTheta_CMS, "CMS momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi_CMS", particlePhi_CMS, "CMS momentum azimuthal angle in degrees");
-
-    REGISTER_VARIABLE("p_RF", particleP_RF, "momentum magnitude in current rest frame");
-    REGISTER_VARIABLE("E_RF", particleE_RF, "energy in current rest frame in current rest frame");
-    REGISTER_VARIABLE("px_RF", particlePx_RF, "momentum component x in current rest frame");
-    REGISTER_VARIABLE("py_RF", particlePy_RF, "momentum component y in current rest frame");
-    REGISTER_VARIABLE("pz_RF", particlePz_RF, "momentum component z in current rest frame");
-    REGISTER_VARIABLE("pt_RF", particlePt_RF, "transverse momentum in current rest frame");
-    REGISTER_VARIABLE("cosTheta_RF", particleCosTheta_RF, "momentum cosine of polar angle in current rest frame");
-    REGISTER_VARIABLE("phi_RF", particlePhi_RF, "momentum azimuthal angle in degrees in current rest frame");
 
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB", cosThetaBetweenParticleAndTrueB,
                       "cosine of angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");

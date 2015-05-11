@@ -272,7 +272,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             # Read in the skipped scripts
             skippedscripts_path = newest + "/__general__/list_of_skipped_scripts.log"
-            if os.path.exists(failedscripts_path):
+            if os.path.exists(skippedscripts_path):
                 # If a list of skipped scripts exists, read it in
                 with open(skippedscripts_path, 'r') as f:
                     skipped_scripts = f.readlines()

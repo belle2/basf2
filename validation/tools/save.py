@@ -4,6 +4,7 @@ import math
 import os
 import glob
 import sys
+import time
 
 
 def create_image_matrix(imidzes, package, size):
@@ -26,12 +27,10 @@ def create_image_matrix(imidzes, package, size):
 
     # this is extremely useful for debugging, but not as useful as
     # it could be for running the script, so it is commented out
-    """
     if imidzes == "everything":
         imidzes = []
         for image in imgs:
             imidzes.append(image.split("/")[-1][:-4])
-    """
 
     # error handling
     if not imgs:
@@ -67,6 +66,7 @@ def create_image_matrix(imidzes, package, size):
 
     # get the size of images, we need min of width and min and max of height
     element_size_y = set(im_ys)
+    element_size_x = set(im_xs)
     min_x = min(im_xs)
     max_y = max(element_size_y)
     min_y = min(element_size_y)
@@ -126,6 +126,9 @@ def create_image_matrix(imidzes, package, size):
         # We want them sorted according to y-coordinate(in rows)
         vacant_spaces = sorted(vacant_spaces, key=lambda x: x[1])
 
+        # create a dictionary of removed elementary boxes
+        removed = {}
+
         # Now let's loop over all boxes and put images into them.
         for i, vacant_space in enumerate(vacant_spaces):
             # We have more boxes than images, so everything is in try-except
@@ -138,25 +141,39 @@ def create_image_matrix(imidzes, package, size):
                        vacant_space[1] + border[1] + images[i].size[1])
                 # If the image height is bigger than one elementary box,
                 # loop over all vacant boxes and delete boxes that are
-                # occupied by this image
+                # occupied by this image and save the height of all removed
+                # elementary boxes to dictionary "removed"
+                removed[box[3]] = []
                 if box[3] > vacant_space[3]:
                     for space in vacant_spaces:
                         if (box[3] >= space[3] and
                                 vacant_space[0] == space[0] and
                                 vacant_space[1] < space[1]):
+                            removed[box[3]].append(space[3])
                             vacant_spaces.remove(space)
+                if not removed[box[3]]:
+                    removed[box[3]].append(vacant_space[3])
             except IndexError:
                 continue
         # And now loop over all images and paste them, also we need the
         # true height of an image, so we can crop it so we don't leave any
         # empty space at the end of the image. The true height is in w variable
         height = []
+        box = []
         for i, vacant_space in enumerate(vacant_spaces):
             try:
-                box = (vacant_space[0] + border[0],
+                box = [vacant_space[0] + border[0],
                        vacant_space[1] + border[1],
                        vacant_space[0] + border[0] + min_x,
-                       vacant_space[1] + border[1] + images[i].size[1])
+                       vacant_space[1] + border[1] + images[i].size[1]]
+                if box[3] > vacant_space[3]:
+                    box[3] = max(removed[box[3]])
+                resize = (box[2] - box[0], box[3] - box[1])
+
+                # if we have a different size of an image than the box size
+                # we want to paste it in, resize it
+                if images[i].size != resize:
+                    images[i] = images[i].resize(resize)
                 img.paste(images[i], box)
                 height.append(box[3])
             except IndexError:
@@ -191,9 +208,12 @@ def create_image_matrix(imidzes, package, size):
             # and right corner of the image
             v = x+int(es[0])
             w = y+int(es[1])
+            # If we have different widths, resize images
+            if len(element_size_x) > 1:
+                element = element.resize((v - x, w - y))
 
-        # finally, paste the image onto our canvas
-        img.paste(element, (x, y, v, w))
+            # finally, paste the image onto our canvas
+            img.paste(element, (x, y, v, w))
 
     # Crop the created image to fit pasted images
     crop_coords = (0, 0, element_size[0], w)
@@ -210,7 +230,7 @@ def create_image_matrix(imidzes, package, size):
     # return true as a sign of successfull image creation
     return 1
 # trial debug line
-# create_image_matrix("everything", "current_reference/test", 20)
+# create_image_matrix("everything", "current_reference/test1", 10)
 
 
 def merge_multiple_plots(package, pdfs):

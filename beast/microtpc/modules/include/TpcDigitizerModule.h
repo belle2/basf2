@@ -189,7 +189,8 @@ namespace Belle2 {
       /** bci vector */
       std::vector<int> bciArray;
       /** Random Array */
-      double RNDnb[10000];
+      double RNDnb[MAXtSIZE];
+
     };
 
   }

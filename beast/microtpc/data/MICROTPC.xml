@@ -16,13 +16,13 @@ whitespace, comma or semi-colon -->
 <bar unit="mm">1 2 3 4
 </bar>
 <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
-<LookAtRec>1</LookAtRec>
+<LookAtRec>0</LookAtRec>
 <GEMGain1>40</GEMGain1>
 <GEMGain2>50</GEMGain2>
 <GEMGainRMS1>0.2</GEMGainRMS1>
 <GEMGainRMS2>0.2</GEMGainRMS2>
-<ScaleGain1>10</ScaleGain1>
-<ScaleGain2>10</ScaleGain2>
+<ScaleGain1>10.0</ScaleGain1>
+<ScaleGain2>10.0</ScaleGain2>
 <GEMpitch>0.014</GEMpitch>
 <PixelThreshold>3000</PixelThreshold>
 <PixelThresholdRMS>150</PixelThresholdRMS>

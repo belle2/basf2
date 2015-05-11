@@ -100,7 +100,6 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   addParam("Fanofac", m_Fanofac, "Fano factor", 0.19);
   addParam("GasAbs", m_GasAbs, "Gas absorption", 0.05);
 
-  for (int i = 0; i < 10000; i++) RNDnb[i] = gRandom->Uniform(-1., 1.);
 }
 
 TpcDigitizerModule::~TpcDigitizerModule()
@@ -122,6 +121,17 @@ void TpcDigitizerModule::initialize()
   fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
 
+  //for (int i = 0; i < MAXtSIZE; i++) RNDnb[i] = gRandom->Uniform(-1., 1.);
+
+  for (int i = 0; i < nTPC; i++) {
+    for (int j = 0; j < 80; j++) {
+      for (int k = 0; k < 336; k++) {
+        for (int l = 0; l < MAXtSIZE; l++) {
+          dchip[i][j][k][l] = 0;
+        }
+      }
+    }
+  }
 }
 
 void TpcDigitizerModule::beginRun()
@@ -140,22 +150,6 @@ void TpcDigitizerModule::event()
     return;
   }
 
-  //auto columnArray = new vector<int>[nTPC](); //column
-  //auto rowArray = new vector<int>[nTPC](); //row
-  //auto bcidArray = new vector<int>[nTPC](); //BCID
-  //auto totArray = new vector<int>[nTPC](); //TOT
-  /** Initialize 3D array */
-  for (int i = 0; i < nTPC; i++)
-    for (int j = 0; j < 80; j++)
-      for (int k = 0; k < 336; k++)
-        for (int l = 0; l < MAXtSIZE; l++) {
-          dchip[i][j][k][l] = 0;
-          //partID[i][j][k][l] = 0;
-        }
-  //for (int i = 0; i < nTPC; i++)
-  //for (int j = 0; j < 100; j++)
-  //partID[i][j] = 0
-
   //Determine T0 for each TPC
   int nentries = TpcSimHits.getEntries();
 
@@ -172,15 +166,14 @@ void TpcDigitizerModule::event()
     double T = posn.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
     if (T < T0[detNb])T0[detNb] = T;
   }
-  //int iPID[nTPC];
+
   for (int i = 0; i < nTPC; i++) {
-    //iPID[i]=0;
     if (0. < T0[i] && T0[i] < 1000000.) {
       T0[i] = T0[i] / m_v_DG;
     } else T0[i] = -1.;
   }
 
-  //int oldPID=0;
+
   //loop on all entries to store in 3D the ionization for each TPC
   int i_rnd = 0;
   for (int i = 0; i < nentries; i++) {
@@ -215,49 +208,57 @@ void TpcDigitizerModule::event()
       double ionEn = (edep - niel) * 1e3;
       // check if enough energy to ionize if not break
       // keV -> eV
-      if ((ionEn * 1e3) <  m_Workfct) break;
 
+      if ((ionEn * 1e3) <  m_Workfct) break;
       ////////////////////////////////
       // check if enough energy to ionize
       else if ((ionEn * 1e3) >  m_Workfct) {
 
         double meanEl = ionEn * 1e3 /  m_Workfct;
         double sigma = sqrt(m_Fanofac * meanEl);
-        //int NbEle = (int)gRandom->Gaus(meanEl, sigma);
-        if (i_rnd > 10000 - 2)i_rnd = 0;
+        int NbEle = (int)gRandom->Gaus(meanEl, sigma);
+        /*
+        if (i_rnd > MAXtSIZE - 2)i_rnd = 0;
         int NbEle = (int)pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], meanEl, sigma);
         i_rnd = i_rnd + 2;
+        */
         double  NbEle_real = 0;
         NbEle_real  = NbEle - NbEle * m_GasAbs * zpos;
         // start loop on the number of electron-ion-pairs at each interaction point
+
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
           double x_DG, y_DG, z_DG, t_DG;
           //drift ionization to GEM 1 plane
-          /*
+
           Drift(xpos,
                 ypos,
                 zpos,
-                x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);*/
-          if (i_rnd > 10000 - 6)i_rnd = 0;
-          Drift2(xpos,
-                 ypos,
-                 zpos,
-                 x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG,
-                 RNDnb[i_rnd], RNDnb[i_rnd + 1],
-                 RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
-                 RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
-          i_rnd = i_rnd + 6;
+                x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
+          /*
+          if (i_rnd > MAXtSIZE - 6)i_rnd = 0;
+                Drift2(xpos,
+                       ypos,
+                       zpos,
+                       x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG,
+                       RNDnb[i_rnd], RNDnb[i_rnd + 1],
+                       RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
+                       RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
+                i_rnd = i_rnd + 6;
+          */
           //calculate and scale 1st GEM gain
-          //double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
-          if (i_rnd > 10000 - 2)i_rnd = 0;
+          double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+          /*
+          if (i_rnd > MAXtSIZE - 2)i_rnd = 0;
           double GEM_gain1 = pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
           i_rnd = i_rnd + 2;
+          */
           //calculate and scale 2nd GEM gain
-          //double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
-          if (i_rnd > 10000 - 2)i_rnd = 0;
+          double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
+          /*
+          if (i_rnd > MAXtSIZE - 2)i_rnd = 0;
           double GEM_gain2 = pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
           i_rnd = i_rnd + 2;
-
+          */
           ///////////////////////////////
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
@@ -266,13 +267,15 @@ void TpcDigitizerModule::event()
             GEMGeo1(x_DG, y_DG, x_GEM1, y_GEM1);
             double x_TG, y_TG, z_TG, t_TG;
             //drift 1st amplication to 2nd GEM
-            //Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
-            if (i_rnd > 10000 - 6)i_rnd = 0;
+            Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
+            /*
+            if (i_rnd > MAXtSIZE - 6)i_rnd = 0;
             Drift2(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG,
                    RNDnb[i_rnd], RNDnb[i_rnd + 1],
                    RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
                    RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
             i_rnd = i_rnd + 6;
+            */
             ///////////////////////////////
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
@@ -281,13 +284,15 @@ void TpcDigitizerModule::event()
               GEMGeo2(x_TG, y_TG, x_GEM2, y_GEM2);
               double x_CG, y_CG, z_CG, t_CG;
               //drift 2nd amplification to chip
-              //Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
-              if (i_rnd > 10000 - 6)i_rnd = 0;
+              Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
+              /*
+              if (i_rnd > MAXtSIZE - 6)i_rnd = 0;
               Drift2(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG,
                      RNDnb[i_rnd], RNDnb[i_rnd + 1],
                      RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
                      RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
               i_rnd = i_rnd + 6;
+              */
               //determine col, row, and bc
               int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
               int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
@@ -318,8 +323,16 @@ void TpcDigitizerModule::event()
   for (int i = 0; i < nTPC; i++) {
     if (0. < T0[i] && T0[i] < 1000000. && PixelFired[i]) {
       Pixelization(i);
+      for (int j = 0; j < 80; j++) {
+        for (int k = 0; k < 336; k++) {
+          for (int l = 0; l < MAXtSIZE; l++) {
+            dchip[i][j][k][l] = 0;
+          }
+        }
+      }
     }
   }
+
 
   Event++;
 
@@ -480,7 +493,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
 void TpcDigitizerModule::getXMLData()
 {
   //const GearDir& content;
-  GearDir content;// = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/");
 
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {

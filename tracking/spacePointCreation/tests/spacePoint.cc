@@ -44,10 +44,11 @@ namespace Belle2 {
 
   public:
     /** this is a small helper function to create a sensorInfo to be used */
-    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, float width = 1., float length = 1., float width2 = -1.)
+    VXD::SensorInfoBase createSensorInfo(VxdID aVxdID, float width = 1., float length = 1., float width2 = -1.,
+                                         VXD::SensorInfoBase::SensorType sensorType = VXD::SensorInfoBase::PXD)
     {
       // (SensorType type, VxdID id, float width, float length, float thickness, int uCells, int vCells, float width2=-1, double splitLength=-1, int vCells2=0)
-      VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, width, length, 0.3, 2, 4, width2);
+      VXD::SensorInfoBase sensorInfoBase(sensorType, aVxdID, width, length, 0.3, 2, 4, width2);
 
       TGeoRotation r1;
       r1.SetAngles(45, 20, 30);      // rotation defined by Euler angles
@@ -506,6 +507,45 @@ namespace Belle2 {
    *  If no sensorInfo is passed, the member gets its own pointer to it.
    */
   //     static pair<float, float> convertToLocalCoordinatesNormalized(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+
+  /** Test if the number of assigned Clusters is obtained correctly
+   * NOTE: using the same constructors as in previous tests!
+   */
+  TEST_F(SpacePointTest, testGetNClustersAssigned)
+  {
+    // create a PXD SpacePoint and check if there is one Cluster assigned to it
+    VxdID aVxdID = VxdID(1, 1, 1);
+    VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
+    PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
+
+    EXPECT_EQ(testPoint.getNClustersAssigned(), 1);
+
+    // create different SVD SpacePoints and check if the number of assigned Clusters is correct
+    aVxdID = VxdID(3, 1, 2);
+    sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2, -1, VXD::SensorInfoBase::SVD);
+
+    // create new SVDClusters and fill it with Info getting a Hit which is not at the origin
+    // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize)
+    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+
+    vector<const SVDCluster*> clusters2d = { &clusterU1, &clusterV1 };
+    SpacePoint testPoint2D = SpacePoint(clusters2d, &sensorInfoBase);
+    EXPECT_EQ(testPoint2D.getNClustersAssigned(), 2);
+
+    vector<const SVDCluster*> clustersU = { &clusterU1 };
+    SpacePoint testPoint1DU = SpacePoint(clustersU, &sensorInfoBase);
+    EXPECT_EQ(testPoint1DU.getNClustersAssigned(), 1);
+
+    vector<const SVDCluster*> clustersV = { &clusterV1 };
+    SpacePoint testPoint1DV = SpacePoint(clustersV, &sensorInfoBase);
+    EXPECT_EQ(testPoint1DV.getNClustersAssigned(), 1);
+
+    // create empty SpacePoint (via default constructor and check if it has 0 assigned Clusters)
+    SpacePoint emptyPoint = SpacePoint();
+    EXPECT_EQ(emptyPoint.getNClustersAssigned(), 0);
+  }
 
 
   /** test conversion to genfit-compatible output and relations WARNING NOT WORKING ATTENTION! reason: Mockup for testing relations of StoreArrays could not be created (not solved yet)*/

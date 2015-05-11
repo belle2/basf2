@@ -96,6 +96,9 @@ namespace Belle2 {
      */
     void setFinalState(std::string finalState) { m_finalState = finalState; }
 
+    /**
+     * Initializes the generator.
+     */
     void init();
 
     /** Generates one single event.
@@ -131,7 +134,8 @@ namespace Belle2 {
     double m_cmsEnergy;             /**< CMS Energy = 2*Ebeam [GeV]. */
 
     std::pair<double, double> m_ScatteringAngleRange; /**< Min and Max value for the scattering angle [deg] of the electron/positron. */
-    std::pair<double, double> m_ScatteringAngleRangePhoton; /**< Min and Max value for the scattering angle [deg] of the photons in gg mode. */
+    std::pair<double, double>
+    m_ScatteringAngleRangePhoton; /**< Min and Max value for the scattering angle [deg] of the photons in gg mode. */
     double m_epsilon; /**< Soft/hard photon separator in units of CMS/2. */
     double m_eMin; /**<  [GeV]. */
     double m_maxAcollinearity; /**< Maximum acollinearity of the electron-positron pair. */

@@ -21,7 +21,7 @@
 #include <TVector3.h>
 
 /** size of hit */
-const Int_t MAXSIZE         = 10000;
+const Int_t MAXSIZE         = 30000;
 /** size of pixel hit */
 const Int_t MAXtSIZE        = 1000;
 

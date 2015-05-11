@@ -211,7 +211,7 @@ trackMerger_param = {  # (in cm) use cdc inner wall
     'CDCGFTracksColName': 'CDCTracks',
     'TrackCandColName': 'TracksCand',
     'relMatchedTracks': 'MatchedTracksIdx',
-    'chi2_max': 100,
+    'chi2_max': 100000000,
 }
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
 

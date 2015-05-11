@@ -10,6 +10,7 @@ env['LIBS'] = [
     'svd_dataobjects',
     #'tracking_trackFindingCDC', # actually not needed, but if not added, it doesn't compile...
     'tracking',
+    'mdst_dataobjects',
     #'tracking_dataobjects',
     #'tracking_spacePointCreation_sptcNetwork',
     'vxd', 'vxd_dataobjects', 

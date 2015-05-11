@@ -145,6 +145,13 @@ void TrackBuilderModule::event()
     for (unsigned int iRep = 0; iRep < gfTrack->getNumReps(); ++iRep) {
       const genfit::AbsTrackRep* trackRep = gfTrack->getTrackRep(iRep);
       int iPDG = trackRep->getPDG();
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(iPDG)))) {
+        B2DEBUG(100,
+                "Track fitted with hypothesis that is not a ChargedStable (PDG code = "
+                << iPDG << ")");
+        continue;
+      }
+
       Const::ChargedStable chargedStable(abs(iPDG));
 
       bool fitSuccess = gfTrack->hasFitStatus(trackRep);
@@ -218,6 +225,7 @@ void TrackBuilderModule::event()
       // Create a StoreArray entry from a copy.
       Track* tr = tracks.appendNew(newTrack);
 
+      B2DEBUG(50, "Built Belle2::Track");
       // Do MC association.
       if (mcParticles.getEntries() > 0) {
         auto relationToMCPart = gfTracksToMCPart.getFirstElementFrom(gfTrack);
@@ -225,8 +233,10 @@ void TrackBuilderModule::event()
         // happens in framework/tests/streamer_test.py), so we have to
         // guard against this.  Otherwise we check if the relation
         // points to an MC particle and if so, we build the relation.
-        if (relationToMCPart && relationToMCPart->to)
+        if (relationToMCPart && relationToMCPart->to) {
           tr->addRelationTo(relationToMCPart->to);
+          B2DEBUG(100, "Associated new Belle2::Track with Belle2::MCParticle");
+        }
       }
     }
   }

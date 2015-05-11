@@ -105,6 +105,13 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the SAD file.
      */
     void addAllSADParticles(MCParticleGraph& graph);
+
+    /**
+     * Transformation matrix.
+     *
+     * @param accRing The accelerator ring from which the particles originate.
+     * @param s s value.
+     */
     TGeoHMatrix SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s);
 
 

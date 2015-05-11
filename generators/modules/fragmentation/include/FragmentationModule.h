@@ -34,7 +34,7 @@ namespace Belle2 {
 
     // in PYTHIA, there is one pure virtual method in RndmEngine,
     // to generate one random number flat in the range between 0 and 1:
-    double flat();
+    double flat(); /**< flat random generator. */
 
   private:
 
@@ -61,10 +61,9 @@ namespace Belle2 {
 
   protected:
 
-    Pythia8::Pythia* pythia;  //  Declare generator
-    Pythia8::Event* PythiaEvent;
-
-    EvtGenDecays* evtgen;
+    Pythia8::Pythia* pythia; /**< PYTHIA generator. */
+    Pythia8::Event* PythiaEvent; /**< PYTHIA event. */
+    EvtGenDecays* evtgen; /**< EvtGen decay engine inside PYTHIA8 */
 
     /** Module parameters */
     std::string m_parameterfile; /**< PYTHIA input parameter file. */
@@ -74,13 +73,13 @@ namespace Belle2 {
     std::string m_DecFile;  /**< EvtGen decay file */
     std::string m_UserDecFile;  /**< User EvtGen decay file */
 
-    MCParticleGraph mcParticleGraph;        /**< An instance of the MCParticle graph. */
+    MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */
 
 
     int nAdded;  /**< number of added particles. */
     int addParticleToPYTHIA(MCParticle& mcParticle);   /**< picks particles and adds them to a pythia event. */
-    int nQuarks;
-    int nVpho;
+    int nQuarks; /**< number of quarks. */
+    int nVpho; /**< number of virtual exchange particles. */
 
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */

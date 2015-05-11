@@ -206,7 +206,11 @@ namespace Belle2 {
     double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV] */
     double m_MinEnergyGamma; /**< minimum gamma energy [GeV] */
 
-    void applySettings();/** Apply the settings to the internal Fortran generator. */
+
+    /**
+    * Apply the settings to the internal Fortran generator.
+    */
+    void applySettings();
 
     /** Store a single generated particle into the MonteCarlo graph.
      * @param mcGraph Reference to the MonteCarlo graph into which the particle should be stored.

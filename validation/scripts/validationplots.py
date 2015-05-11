@@ -438,7 +438,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
             if p_value[plts] <= 0.01:
                 classes.append('p_value_leq_0_01')
             # the code for the actual name table
-            pre = ("_".join(el.split("__"))).replace(".", "_"),
+            pre = "_".join(el.split("__")).replace(".", "_")
             html.append("  <td stytle='width:{5}%' class='{4}'>"
                         "<input type='checkbox' name='matrix' "
                         "class='matrix-toggle matrix-{6}' "

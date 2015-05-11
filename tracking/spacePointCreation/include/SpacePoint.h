@@ -242,6 +242,19 @@ namespace Belle2 {
     std::pair<bool, bool> getIfClustersAssigned() const {return m_clustersAssigned; }
 
 
+    /** returns the number of Clusters assigned to this SpacePoint (0,1, or 2) */
+    unsigned short getNClustersAssigned() const
+    {
+      if (getType() == VXD::SensorInfoBase::SensorType::SVD) {
+        unsigned short nClusters = 0;
+        nClusters += getIfClustersAssigned().first;
+        nClusters += getIfClustersAssigned().second;
+        return nClusters;
+      }
+      if (m_clustersAssigned.first == m_clustersAssigned.second and m_clustersAssigned.first == true) return 1;
+      return 0;
+    }
+
 
     /** returns the current estimation for the quality of that spacePoint.
      *

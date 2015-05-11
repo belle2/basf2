@@ -201,6 +201,13 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     use_vxd = components is None or 'SVD' in components
     use_cdc = components is None or 'CDC' in components
 
+    # check for detector geometry, necessary for track extrapolation in genfit
+    if 'Geometry' not in path:
+        geometry = register_module('Geometry')
+        if components:
+            geometry.param('components', components)
+        path.add_module(geometry)
+
     # Material effects for all track extrapolations
     material_effects = register_module('SetupGenfitExtrapolation')
     path.add_module(material_effects)

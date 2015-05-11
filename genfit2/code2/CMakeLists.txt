@@ -1,5 +1,8 @@
-# #require a certain version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+if(POLICY CMP0042)
+   # policies not known to CMake 2.8 ...
+   cmake_policy(SET CMP0042 NEW) # Mac OS -rpath behavior
+endif(POLICY CMP0042)
 
 # declare the project name
 PROJECT(genfit2)
@@ -89,12 +92,7 @@ IF (Boost_FOUND)
 	    PATTERN ".svn" EXCLUDE 
 	 )
 ELSE()
-    MESSAGE( " Boost was not found on your system, using the one shipped with GENFIT.")
-    INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/extern/ )
-    INSTALL( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/extern/ ${GF_INC_DIRS}  
-    	DESTINATION ${INCLUDE_OUTPUT_DIRECTORY}
-    	PATTERN ".svn" EXCLUDE 
-    )
+    MESSAGE(SEND_ERROR " Boost was not found on your system, required for GENFIT.")
 ENDIF()
 
 

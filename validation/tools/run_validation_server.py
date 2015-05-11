@@ -68,7 +68,6 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         # Usually 'Content-type' is empty, except for AJAX-requests
         if 'Content-type' in self.headers:
-            print self.headers['Content-type']
             contentType = self.headers['Content-type']
         else:
             contentType = 'text/html'
@@ -334,7 +333,6 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
                                                              pkg)
                                  if _.endswith('.log')]
 
-            print failed_scripts
             # Parse the dict into HTML
             for pkg in sorted(logfiles.keys()):
                 html.append('<strong>{0}</strong><br>'.format(pkg))
@@ -376,7 +374,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             # Get the number of failed/skipped scripts
             failpth = newest + '/__general__/list_of_failed_scripts.log'
-            shippth = newest + '/__general__/list_of_skipped_scripts.log'
+            skippth = newest + '/__general__/list_of_skipped_scripts.log'
             number_of_failed_scripts = sum(1 for line in open(failpth))
             number_of_skipped_scripts = sum(1 for line in open(skippth))
 

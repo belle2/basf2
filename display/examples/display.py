@@ -25,9 +25,6 @@ rootinput = register_module('RootInput')
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
-# Since Geometry is only required for track extrapolation in inner detectors,
-# we'll exclude ECL (saves about 10s in startup time)
-geometry.param('excludedComponents', ['ECL'])
 
 main.add_module(rootinput)
 main.add_module(gearbox)

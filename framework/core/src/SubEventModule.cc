@@ -12,6 +12,7 @@
 
 #include <framework/core/Environment.h>
 #include <framework/core/ProcessStatistics.h>
+#include <framework/pcore/ProcHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -28,7 +29,8 @@ SubEventModule::SubEventModule():
   EventProcessor(),
   m_objectName(""),
   m_loopOver(),
-  m_path()
+  m_path(),
+  m_processID(-1)
 {
   //since we might be created via 'new'...
   setDescription("Internal module to handle Path.for_each(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
@@ -59,7 +61,9 @@ void SubEventModule::initSubEvent(const std::string& objectName, const std::stri
     }
   }
   if (allCertified)
-    setPropertyFlags(c_ParallelProcessingCertified);
+    setPropertyFlags(c_TerminateInAllProcesses | c_ParallelProcessingCertified);
+  else
+    setPropertyFlags(c_TerminateInAllProcesses);
 }
 
 void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntryMap& dest)
@@ -110,7 +114,17 @@ void SubEventModule::terminate()
   DataStore::StoreEntryMap& persistentMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
   DataStore::StoreEntryMap persistentMapCopy = persistentMap;
 
-  processTerminate(m_moduleList);
+  if (!ProcHandler::parallelProcessingUsed() or m_processID == ProcHandler::EvtProcID()) {
+    processTerminate(m_moduleList);
+  } else {
+    //we're in another process than we actually belong to, only call terminate where approriate
+    ModulePtrList tmpModuleList;
+    for (const ModulePtr& m : m_moduleList) {
+      if (m->hasProperties(c_TerminateInAllProcesses))
+        tmpModuleList.push_back(m);
+    }
+    processTerminate(tmpModuleList);
+  }
 
   restoreContents(persistentMapCopy, persistentMap);
 
@@ -121,6 +135,8 @@ void SubEventModule::terminate()
 
 void SubEventModule::beginRun()
 {
+  m_processID = ProcHandler::EvtProcID();
+
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   processStatistics->suspendGlobal();
   processBeginRun();

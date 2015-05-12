@@ -38,6 +38,7 @@ namespace Belle2 {
     std::string m_loopOverName; /**< name for m_loopOver. */
     StoreArray<TObject> m_loopOver; /**< array looped over. */
     boost::shared_ptr<Path> m_path; /**< Path to execute. */
+    int m_processID; /**< when using multi-processing contains the ID of the process where event() is called (in that process only). -1 otherwise. */
 
   };
 }

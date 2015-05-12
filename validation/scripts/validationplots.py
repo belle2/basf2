@@ -439,7 +439,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                 classes.append('p_value_leq_0_01')
             # the code for the actual name table
             pre = "_".join(el.split("__")).replace(".", "_")
-            html.append("  <td stytle='width:{5}%' class='{4}'>"
+            html.append("<td style='width:{5}%' class='{4}'>"
                         "<input type='checkbox' name='matrix' "
                         "class='matrix-toggle matrix-{6}' "
                         "value='{0}' checked><a href='#{1}' "
@@ -451,7 +451,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
         html.append("</tr>\n</table>\n")
         # the save button
         html.append("\n<div width=\"100%\" align=\"right\" "
-                    "itle='Option PNG: "
+                    "title='Option PNG: "
                     "Saves the matrix exactly as you see in bigger "
                     "resolution as .png image.\nOption PDF: Creates an "
                     ".pdf file out of selected plots shown in the "

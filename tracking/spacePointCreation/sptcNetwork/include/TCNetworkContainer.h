@@ -101,6 +101,10 @@ namespace Belle2 {
     }
 
 
+    /** allows read-access to the evaluator (to use the simple getters for debugging) */
+    const TrackSetEvaluatorBase<TCType, ObserverType>* accessEvaluator() const { return m_trackSetEvaluator; }
+
+
 /// setter
 
     /** allows to replace the former trackSetEvaluator, please only pass stuff created with new! */
@@ -184,6 +188,6 @@ namespace Belle2 {
 
 
     /** start trackSetEvaluator to clean the overlaps, returns number of final tcs */
-    unsigned int cleanOverlaps() { return m_trackSetEvaluator->cleanOverlaps(); }
+    bool cleanOverlaps() { return m_trackSetEvaluator->cleanOverlaps(); }
   };
 } // end namespace Belle2

@@ -37,16 +37,7 @@ namespace Belle2 {
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
 
-    /** DEBUG: mini helper function for printing. */
-    std::string miniPrinter(std::vector<TCType*> vec)
-    {
-      std::string out;
-      for (auto tc : vec) { out += "tc (alive:" + std::to_string(tc->isAlive()) + ") " + std::to_string(tc->getID()) + " got QI: " + std::to_string(tc->getTrackQuality()) + "\n" ; }
-      return out;
-    }
-
-
-    /** main Greedy function, returns number of TCs died.
+    /** main Greedy function, returns true if it was successful.
      *
      * Algorithm:
      * search for nonOverlapping trackCandidates using Greedy algorithm:
@@ -55,55 +46,47 @@ namespace Belle2 {
      * - if there are still TCs there
      * - repeat step until no incompatible TCs are there any more
      */
-    unsigned int doGreedy(std::vector<TCType*>& overlappingTCs)
+    bool doGreedy(std::vector<TCType*>& overlappingTCs)
     {
-      unsigned int countTCsAliveAtStart = overlappingTCs.size(), countSurvivors = 0, countKills = 0;
-      double totalQI = 0, totalSurvivingQI = 0;
       using namespace std;
-
-      B2DEBUG(25, "doGreedy:b4Sorting:\n" << miniPrinter(overlappingTCs))
+      B2DEBUG(25, "doGreedy:b4Sorting:\n" << BaseClass::miniPrinter(overlappingTCs))
 
       // sort that TC with highest QI comes first
       std::sort(overlappingTCs.begin(), overlappingTCs.end(), [](const TCType * a, const TCType * b) -> bool { return *a > *b; });
 
-      B2DEBUG(25, "doGreedy:afterSorting:\n" << miniPrinter(overlappingTCs))
+      B2DEBUG(25, "doGreedy:afterSorting:\n" << BaseClass::miniPrinter(overlappingTCs))
 
       // start recursive greedy algorithm...
-      greedyRecursive(0, overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
+      bool wasSuccsessfull = greedyRecursive(0, overlappingTCs);
 
-      B2DEBUG(50, "doGreedy: at end of greedy algoritm: total number of TCs alive: " << countTCsAliveAtStart <<
-              " with totalQi: " << totalQI <<
-              ", TCs survived: " << countSurvivors <<
-              ", TCs killed: " << countKills <<
-              ", survivingQI: " << totalSurvivingQI <<
-              "\n Result:\n" << miniPrinter(overlappingTCs))
-      return BaseClass::getNTCs() - countKills;
+      if (wasSuccsessfull) {
+        B2DEBUG(50, "doGreedy: at end of greedy algoritm: total number of TCs alive: " << BaseClass::checkAtEnd() <<
+                "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs))
+        return true;
+      }
+      B2WARNING("doGreedyRecursive aborted!" << BaseClass::checkAtEnd() << "\n Overview:\n" << BaseClass::miniPrinter(overlappingTCs))
+      return false;
     }
 
 
-    /** recursive function which takes tc with highest QI and kills all its rivals.
+    /** recursive function which takes tc with highest QI and kills all its rivals. returns true, if it was successful
      *
      * After that, TC gets removed and process is repeated with shrinking list of TCs until no TCs alive has got rivals alive
+    * TODO: currently no abort-conditions implemented! -> returns always true!
      */
-    void greedyRecursive(unsigned int currentIndex,
-                         std::vector<TCType*>& overlappingTCs,
-                         double& totalSurvivingQI,
-                         unsigned int& countSurvivors,
-                         unsigned int& countKills)
+    inline bool greedyRecursive(unsigned int currentIndex,
+                                std::vector<TCType*>& overlappingTCs)
     {
-      B2DEBUG(50, "doGreedyRecursive-start: current index: " << currentIndex << ", fullList:\n" << miniPrinter(overlappingTCs))
+      B2DEBUG(50, "doGreedyRecursive-start: current index: " << currentIndex << ", fullList:\n" << BaseClass::miniPrinter(overlappingTCs))
       // if end of container is reached: end greedy recursive for good.
-      if ((currentIndex < overlappingTCs.size()) == false) return;
+      if ((currentIndex < overlappingTCs.size()) == false) return true;
 
       // bypass all dead entries, skip if end of container is reached:
       while (overlappingTCs.size() > currentIndex and (overlappingTCs[currentIndex]->isAlive() == false)) {
         B2DEBUG(50, "doGreedyRecursive-while-loop: current index: " << currentIndex << " is dead, skipping...")
         currentIndex++;
-        if (currentIndex == overlappingTCs.size()) { return; }
+        if (currentIndex == overlappingTCs.size()) { return true; }
       }
-
-      countSurvivors++;
-      totalSurvivingQI += overlappingTCs[currentIndex]->getTrackQuality();
 
       auto vecPrint = [](const std::vector<unsigned int>& vec) -> std::string { std::string out = "competitor:"; for (auto iD : vec) { out += " " + std::to_string(iD) + "," ; } return out; };
       B2DEBUG(50, "\ndoGreedyRecursive before killing stuff: these are the competitors of index (overlap/total) " << currentIndex
@@ -124,18 +107,15 @@ namespace Belle2 {
 
         // warning currentIndex is running in overlap-system, but competitorID is in total system!
         BaseClass::m_trackSet[competitorID].setAliveState(false);
-        countKills++;
       }
 
       B2DEBUG(50, "doGreedyRecursive-after killing competitors: current index: " << currentIndex
               << " has now " <<  BaseClass::m_manager.getCompetitors(overlappingTCs[currentIndex]->getID()).size() << " competitors (should be 0)"
-              << ", fullList:\n" << miniPrinter(overlappingTCs))
+              << ", fullList:\n" << BaseClass::miniPrinter(overlappingTCs))
 
       currentIndex++;
 
-      greedyRecursive(currentIndex, overlappingTCs, totalSurvivingQI, countSurvivors, countKills);
-
-      return;
+      return greedyRecursive(currentIndex, overlappingTCs);
     }
 
 
@@ -148,24 +128,33 @@ namespace Belle2 {
     virtual ~TrackSetEvaluatorGreedy() {}
 
 
-    /** main function. returns number of final TCs */
-    virtual unsigned int cleanOverlaps()
+    /** main function. returns true, if clean overlaps was successfull and returns false if not.
+    *
+    * after executing cleanOverlaps, the counters are updated.
+    * These counters can give you a clue why there was a problem.
+    */
+    virtual bool cleanOverlaps()
     {
-      unsigned int nTCsDied = 0, nTCsAlive = 0;
+      std::string result = BaseClass::checkAtStart();
+      B2DEBUG(25, "TrackSetEvaluatorGreedy::cleanOverlaps: " << result)
+
       std::vector<TCType*> overlaps = BaseClass::getOverlappingTCs();
+      unsigned int nOverlaps = overlaps.size();
+
+      if (nOverlaps == 0) return true;  // nothing to be done, no checks needed
 
       // deal with simple cases first (contains many safety checks, which can therefore be ommitted by the actual algorithms):
       bool wasSimpleCase = BaseClass::dealWithSimpleCases(overlaps);
 
-      if (wasSimpleCase) { return BaseClass::getNTCs() - overlaps.size() + 1; }
+      if (wasSimpleCase) {
+        return BaseClass::doSanityChecks(true, overlaps.size(), "was easy case");
+      }
 
       // executing actual algorithm:
-      nTCsAlive = doGreedy(overlaps);
-      nTCsDied = BaseClass::getNTCs() - nTCsAlive;
-      B2DEBUG(25, "TrackSetEvaluatorGreedy::cleanOverlaps: nTCs alive/dead at end: " << nTCsAlive << "/" << nTCsDied)
-      return nTCsAlive;
-    }
+      bool wasSuccsessfull = doGreedy(overlaps);
 
+      return BaseClass::doSanityChecks(wasSuccsessfull, nOverlaps, "Greedy algorithm");
+    }
   };
 
 } // end namespace Belle2

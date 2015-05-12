@@ -87,9 +87,6 @@ namespace Belle2 {
     /** print network in a human readable way: */
     void print() const { m_network.print(); }
 
-    /** returns a vector of pointers to all TCs which are alive and overlapping */
-//  std::vector<SPTCAvatar<TCCompetitorGuard>*> provideOverlappingTCs() { return m_network.provideOverlappingTCs(); }
-
 /// setter
 
     /** add new TC as node and update all links in network */
@@ -116,6 +113,14 @@ namespace Belle2 {
 
 
     /** start trackSetEvaluator to clean the overlaps, returns number of final tcs */
-    unsigned int cleanOverlaps() { return m_network.cleanOverlaps(); }
+    bool cleanOverlaps() { return m_network.cleanOverlaps(); }
+
+
+    /** allows read-access to the evaluator (to use the simple getters for debugging) */
+    const Belle2::TrackSetEvaluatorBase<Belle2::SPTCAvatar<Belle2::TCCompetitorGuard>, Belle2::TCCompetitorGuard>* accessEvaluator()
+    const
+    {
+      return m_network.accessEvaluator();
+    }
   };
 }

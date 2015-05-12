@@ -89,7 +89,7 @@ namespace Belle2 {
 
 
     /** says whether given TCCompetitor has competitors stored */
-    bool hasCompetitors(unsigned int iD)
+    bool hasCompetitors(unsigned int iD) const
     {
       return iD < m_links.size() and m_links[iD].hasCompetitors();
     }
@@ -106,6 +106,16 @@ namespace Belle2 {
         return m_links[b].isCompetitor(a);
       }
       return m_links[a].isCompetitor(b);
+    }
+
+
+    /** returns current number of competing entries still alive at time of function call */
+    unsigned int countCompetitors() const
+    {
+      unsigned int nCompetitors = 0;
+      // by design nCompetitors for dead links is 0, therefore no alive-state has to be checked:
+      for (const auto& link : m_links) { if (link.hasCompetitors()) nCompetitors++; }
+      return nCompetitors;
     }
 
 

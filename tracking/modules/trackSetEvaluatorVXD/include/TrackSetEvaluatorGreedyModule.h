@@ -112,12 +112,20 @@ namespace Belle2 {
     /** number of TCs rejected for final sets of non-overlapping TCs so far */
     unsigned int m_nRejectedTCs;
 
+    /** sums up all QI-values of given TCs at start */
+    double m_totalQI;
+
+    /** sums up all QI-values of given TCs surviving the evaluation */
+    double m_totalSurvivingQI;
+
     /** lowest quality indicator value found among TCs */
     double m_minQI;
 
     /** highests quality indicator value found among TCs */
     double m_maxQI;
 
+    /** counts number of times when Greedy was not able to clean overlaps */
+    unsigned int m_nGreedyFails;
   private:
 
   };

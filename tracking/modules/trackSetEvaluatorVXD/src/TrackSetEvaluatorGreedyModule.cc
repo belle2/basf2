@@ -48,13 +48,21 @@ void TrackSetEvaluatorGreedyModule::event()
   m_tcNetwork->replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (m_tcNetwork->getNodes(), m_tcNetwork->getObserver()));
 
-  unsigned int nTCsAlive = m_tcNetwork->cleanOverlaps();
+  bool wasSuccessful = m_tcNetwork->cleanOverlaps();
+  if (!wasSuccessful) {
+    B2ERROR("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter <<
+            ": greedy did not succeed! tracks were not successfully cleaned of overlaps!")
+    m_nGreedyFails++;
+    return;
+  }
+  m_totalQI += m_tcNetwork->accessEvaluator()->getTotalQI();
+  m_totalSurvivingQI += m_tcNetwork->accessEvaluator()->getTotalSurvivingQI();
 
   B2INFO("TrackSetEvaluatorGreedyModule - in event " << m_eventCounter << ": after cleanOverlaps: network now looks like this:")
   m_tcNetwork->print();
 
-  m_nFinalTCs += nTCsAlive;
-  m_nRejectedTCs += m_spacePointTrackCands.getEntries() - nTCsAlive;
+  m_nFinalTCs += m_tcNetwork->accessEvaluator()->getNSurvivors();
+  m_nRejectedTCs += m_spacePointTrackCands.getEntries() - m_tcNetwork->accessEvaluator()->getNSurvivors();
 
 
   // TODO inform SpacePointTrackCands about the decissions made here!
@@ -76,7 +84,10 @@ void TrackSetEvaluatorGreedyModule::endRun()
          ", nTCs overlapping total: " << m_nTCsOverlapping <<
          " nFinalTCs total: " << m_nFinalTCs <<
          ", nTCsRejected total: " << m_nRejectedTCs <<
-         " highest/lowest QI found: " << m_maxQI << "/" << m_minQI)
+         ", sum of QI total: " << m_totalQI <<
+         ", sum of QI after cleanOverlaps: " << m_totalSurvivingQI <<
+         ", highest/lowest QI found: " << m_maxQI << "/" << m_minQI <<
+         ", number of times Greedy did not succeed: " << m_nGreedyFails)
 }
 
 
@@ -88,8 +99,11 @@ void TrackSetEvaluatorGreedyModule::InitializeCounters()
   m_nTCsOverlapping = 0;
   m_nFinalTCs = 0;
   m_nRejectedTCs = 0;
+  m_totalQI = 0;
+  m_totalSurvivingQI = 0;
   m_minQI = std::numeric_limits<double>::max();
   m_maxQI = std::numeric_limits<double>::min();
+  m_nGreedyFails = 0;
 }
 
 

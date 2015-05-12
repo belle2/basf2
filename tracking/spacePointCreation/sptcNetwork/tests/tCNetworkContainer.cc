@@ -107,14 +107,14 @@ namespace TCNetworkContainerTests {
 
       vector<const SpacePoint*> sps4TC1 = { allSpacePoints.at(0), allSpacePoints.at(1)};
       SpacePointTrackCand* aSPTC1 = spacePointTrackCandData.appendNew((sps4TC1)); // shares hits with no one
-      aSPTC1->setQualityIndex(0.9);
+      aSPTC1->setQualityIndex(0.92);
 
       vector<const SpacePoint*> sps4TC2 = { allSpacePoints.at(2), allSpacePoints.at(3)};
-      SpacePointTrackCand* aSPTC2 = spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3
+      SpacePointTrackCand* aSPTC2 = spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3, tc4, tc5
       aSPTC2->setQualityIndex(0.9);
 
       vector<const SpacePoint*> sps4TC3 = { allSpacePoints.at(3), allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC3 = spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2
+      SpacePointTrackCand* aSPTC3 = spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2, tc5
       aSPTC3->setQualityIndex(0.8);
 
       vector<const SpacePoint*> sps4TC4 = { allSpacePoints.at(4)};
@@ -165,6 +165,14 @@ namespace TCNetworkContainerTests {
       B2INFO("MicroObserver:areCompetitors: given iDs a/b: " << a << "/" << b)
       return false;
     }
+
+    /** here a dummy only */
+    unsigned countCompetitors()
+    {
+      B2INFO("MicroObserver:countCompetitors: does nothing...")
+      return 0;
+    }
+
   };
 
 
@@ -277,11 +285,13 @@ namespace TCNetworkContainerTests {
     newNetwork.replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (newNetwork.getNodes(), newNetwork.getObserver()));
     // since only 2 tcs are overlapping, tcDuel is used
-    unsigned int finalTCs = newNetwork.cleanOverlaps();
+    EXPECT_TRUE(newNetwork.cleanOverlaps());
     EXPECT_EQ(3, newNetwork.size());
     EXPECT_EQ(0, newNetwork.getNCompetitors());
+    EXPECT_EQ(2, newNetwork.accessEvaluator()->getNCompetitorsAtStart());
+    EXPECT_EQ(newNetwork.accessEvaluator()->getNFinalCompetitors(), newNetwork.getNCompetitors());
     EXPECT_EQ(2, newNetwork.getNTCsAlive());
-    EXPECT_EQ(newNetwork.getNTCsAlive(), finalTCs);
+    EXPECT_EQ(newNetwork.getNTCsAlive(), newNetwork.accessEvaluator()->getNSurvivors());
   }
 
 
@@ -310,11 +320,14 @@ namespace TCNetworkContainerTests {
     // since basic trackSetEvaluator does no evaluation, we have to replace the standard setting with a working one:
     newNetwork.replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (newNetwork.getNodes(), newNetwork.getObserver()));
-    unsigned int finalTCs = newNetwork.cleanOverlaps(); // executes the evaluator set above
+    // since all competitors are forming one overlapping bunch, only one will survive:
+    EXPECT_TRUE(newNetwork.cleanOverlaps());
     EXPECT_EQ(4, newNetwork.size());
     EXPECT_EQ(0, newNetwork.getNCompetitors());
+    EXPECT_EQ(3, newNetwork.accessEvaluator()->getNCompetitorsAtStart());
+    EXPECT_EQ(newNetwork.accessEvaluator()->getNFinalCompetitors(), newNetwork.getNCompetitors());
     EXPECT_EQ(2, newNetwork.getNTCsAlive());
-    EXPECT_EQ(newNetwork.getNTCsAlive(), finalTCs);
+    EXPECT_EQ(newNetwork.getNTCsAlive(), newNetwork.accessEvaluator()->getNSurvivors());
 
     //  newNetwork.print();
   }
@@ -345,11 +358,13 @@ namespace TCNetworkContainerTests {
     // since basic trackSetEvaluator does no evaluation, we have to replace the standard setting with a working one:
     newNetwork.replaceTrackSetEvaluator(new TrackSetEvaluatorGreedy<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
                                         (newNetwork.getNodes(), newNetwork.getObserver()));
-    unsigned int finalTCs = newNetwork.cleanOverlaps();
+    EXPECT_TRUE(newNetwork.cleanOverlaps()); // executes Greedy algorithm
     EXPECT_EQ(4, newNetwork.size());
     EXPECT_EQ(0, newNetwork.getNCompetitors());
+    EXPECT_EQ(3, newNetwork.accessEvaluator()->getNCompetitorsAtStart());
+    EXPECT_EQ(newNetwork.accessEvaluator()->getNFinalCompetitors(), newNetwork.getNCompetitors());
     EXPECT_EQ(3, newNetwork.getNTCsAlive());
-    EXPECT_EQ(newNetwork.getNTCsAlive(), finalTCs);
+    EXPECT_EQ(newNetwork.getNTCsAlive(), newNetwork.accessEvaluator()->getNSurvivors());
 
 //  newNetwork.print();
   }
@@ -359,31 +374,36 @@ namespace TCNetworkContainerTests {
   TEST_F(TCNetworkContainerTest, TestTrackSetEvaluatorHopfieldNN)
   {
 //     EXPECT_EQ(true, false); // not fulfilled yet, therefore test fails!
-//
-//     /// create and fill network with SpacePointTrackCands, will have 3 overlaps ( but 2 are compatible)
-//     TCNetworkContainer<SPTCAvatar<TCCompetitorGuard >, TCCompetitorGuard > newNetwork;
-//     EXPECT_EQ(0, newNetwork.size());
-//     EXPECT_EQ(0, newNetwork.getNCompetitors());
-//     EXPECT_EQ(0, newNetwork.getNTCsAlive());
-//     newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[0], newNetwork.getObserver(),
-//                                                   newNetwork.size()));    // node 0: shares hits with no one
-//     newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[1], newNetwork.getObserver(),
-//                                                   newNetwork.size()));   // node 1: shares a hit with node 3
-//     newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[3], newNetwork.getObserver(),
-//                                                   newNetwork.size()));   // node 2: shares a hit with node 3
-//     newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[2], newNetwork.getObserver(),
-//                                                   newNetwork.size()));   // node 3: shares a hit with node 1 and node 2
-//     EXPECT_EQ(4, newNetwork.size());
-//     EXPECT_EQ(3, newNetwork.getNCompetitors());
-//     EXPECT_EQ(4, newNetwork.getNTCsAlive());
-//
-//     newNetwork.print();
-//
-//     // since basic trackSetEvaluator does no evaluation, we have to replace the standard setting with a working one:
-//     newNetwork.replaceTrackSetEvaluator(new TrackSetEvaluatorHopfieldNN<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
-//                                         (newNetwork.getNodes(), newNetwork.getObserver()));
-//     unsigned int finalTCs = newNetwork.cleanOverlaps();
-//     EXPECT_EQ(newNetwork.getNTCsAlive(), finalTCs);
+
+    /// create and fill network with SpacePointTrackCands, will have 3 overlaps ( but 2 are compatible)
+    TCNetworkContainer<SPTCAvatar<TCCompetitorGuard >, TCCompetitorGuard > newNetwork;
+    EXPECT_EQ(0, newNetwork.size());
+    EXPECT_EQ(0, newNetwork.getNCompetitors());
+    EXPECT_EQ(0, newNetwork.getNTCsAlive());
+    newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[0], newNetwork.getObserver(),
+                                                  newNetwork.size()));    // node 0: shares hits with no one
+    newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[1], newNetwork.getObserver(),
+                                                  newNetwork.size()));   // node 1: shares a hit with node 3
+    newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[3], newNetwork.getObserver(),
+                                                  newNetwork.size()));   // node 2: shares a hit with node 3
+    newNetwork.add(SPTCAvatar<TCCompetitorGuard >(*spacePointTrackCandData[2], newNetwork.getObserver(),
+                                                  newNetwork.size()));   // node 3: shares a hit with node 1 and node 2
+    EXPECT_EQ(4, newNetwork.size());
+    EXPECT_EQ(3, newNetwork.getNCompetitors());
+    EXPECT_EQ(4, newNetwork.getNTCsAlive());
+
+    newNetwork.print();
+
+    // since basic trackSetEvaluator does no evaluation, we have to replace the standard setting with a working one:
+    newNetwork.replaceTrackSetEvaluator(new TrackSetEvaluatorHopfieldNN<SPTCAvatar<TCCompetitorGuard>, TCCompetitorGuard>
+                                        (newNetwork.getNodes(), newNetwork.getObserver()));
+    EXPECT_TRUE(newNetwork.cleanOverlaps()); // executes Hopfield neural network algorithm
+    EXPECT_EQ(4, newNetwork.size());
+    EXPECT_EQ(3, newNetwork.accessEvaluator()->getNCompetitorsAtStart());
+    EXPECT_EQ(newNetwork.accessEvaluator()->getNFinalCompetitors(), newNetwork.getNCompetitors());
+    EXPECT_EQ(0, newNetwork.getNCompetitors());
+    EXPECT_EQ(3, newNetwork.getNTCsAlive());
+    EXPECT_EQ(newNetwork.getNTCsAlive(), newNetwork.accessEvaluator()->getNSurvivors());
   }
 
 

@@ -7,7 +7,7 @@ from sys import argv
 from basf2 import *
 from time import time
 
-numEvents = 8
+numEvents = 25
 initialValue = 1
 
 usePGun = True
@@ -29,8 +29,10 @@ checkTH = False
 
 # flags for SPTCNetworkProducer
 # debugLevel = LogLevel.DEBUG
-debugLevel = LogLevel.INFO
-dLevel = 1
+debugLevel1 = LogLevel.INFO
+debugLevel2 = LogLevel.INFO
+dLevel1 = 1
+dLevel2 = 101
 checkSPs = False
 
 if len(argv) > 1:
@@ -140,20 +142,22 @@ trackCandConverter.param(param_trackCandConverter)
 
 
 qualiEstimatorRandom = register_module('QualityEstimatorVXDRandom')
-qualiEstimatorRandom.logging.log_level = debugLevel
+qualiEstimatorRandom.logging.log_level = LogLevel.INFO
 qualiEstimatorRandom.param('tcArrayName', 'SPTracks')
 
 tcNetworkProducer = register_module('SPTCNetworkProducer')
-tcNetworkProducer.logging.log_level = debugLevel
-tcNetworkProducer.logging.debug_level = dLevel
+tcNetworkProducer.logging.log_level = debugLevel1
+tcNetworkProducer.logging.debug_level = dLevel1
 tcNetworkProducer.param('tcArrayName', 'SPTracks')
 tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
 tcNetworkProducer.param('checkSPsInsteadOfClusters', checkSPs)
 
-greedy = register_module('TrackSetEvaluatorGreedy')
-greedy.logging.log_level = debugLevel
-greedy.param('tcArrayName', 'SPTracks')
-greedy.param('tcNetworkName', 'tcNetwork')
+# trackSetEval = register_module('TrackSetEvaluatorGreedy')
+trackSetEval = register_module('TrackSetEvaluatorHopfieldNN')
+trackSetEval.logging.log_level = debugLevel2
+tcNetworkProducer.logging.debug_level = dLevel2
+trackSetEval.param('tcArrayName', 'SPTracks')
+trackSetEval.param('tcNetworkName', 'tcNetwork')
 
 
 log_to_file('sptcNetworkDemoOutput.txt', append=False)
@@ -179,7 +183,7 @@ main.add_module(spCreatorSVD)
 main.add_module(trackCandConverter)
 main.add_module(qualiEstimatorRandom)
 main.add_module(tcNetworkProducer)
-main.add_module(greedy)
+main.add_module(trackSetEval)
 
 # Process events
 process(main)

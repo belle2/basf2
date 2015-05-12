@@ -100,8 +100,8 @@ namespace Belle2 {
     /** total number of TCs evaluated so far */
     unsigned int m_nTCsTotal;
 
-    /** number possible TC-combinations occured so far */
-    unsigned int m_nTCsCompatible;
+    /** number of clean TCs in total spTC-network before cleaning it */
+    unsigned int m_nTCsCleanAtStart;
 
     /** number of overlapping TCs so far */
     unsigned int m_nTCsOverlapping;
@@ -118,6 +118,17 @@ namespace Belle2 {
     /** highests quality indicator value found among TCs */
     double m_maxQI;
 
+    /** sums up all QI-values of given TCs at start */
+    double m_totalQI;
+
+    /** sums up all QI-values of given TCs surviving the evaluation */
+    double m_totalSurvivingQI;
+
+    /** counts number of times when Hopfield was not able to clean overlaps */
+    unsigned int m_nHopfieldFails;
+
+    /** counts number of times when neither Hopfield nor Greedy were not able to clean overlaps */
+    unsigned int m_completeFails;
   private:
 
   };

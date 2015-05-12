@@ -213,6 +213,7 @@ namespace Belle2 {
 
       int nIterations = 0;
       std::array<double, 100> cValues; // protocolling all values of c
+      cValues.fill(0);
 
       while (c > cmax) {
 
@@ -229,7 +230,6 @@ namespace Belle2 {
           xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
 
           B2DEBUG(100, "tc, random number " << i << " -  old neuron value: " << xMatrix(0, i))
-//      B2INFO("tc, random number " << i << " -  old neuron value: " << xMatrix(0, i))
         }
 
         T = 0.5 * (T + Tmin);
@@ -238,7 +238,6 @@ namespace Belle2 {
         tempMatrix.Abs();
         c = tempMatrix.Max();
         B2DEBUG(10, " c value is " << c << " at iteration " << nIterations)
-//    B2INFO(" c value is " << c << " at iteration " << nIterations)
         cValues.at(nIterations) = c;
 
         xMatrixOld = xMatrix;
@@ -256,16 +255,12 @@ namespace Belle2 {
       }
 
       B2DEBUG(3, "Hopfield network - found subset of TCs within " << nIterations << " iterations... with c=" << c);
-// B2INFO("Hopfield network - found subset of TCs within " << nIterations << " iterations... with c=" << c);
 
       // update neuronValues:
       for (unsigned int i = 0; i < nTCs; i++) {
         B2DEBUG(50, "tc " << i <<
                 " - got final neuron value: " << xMatrix(0, i) <<
                 " and quality indicator " << tcs[i].qi)
-//    B2INFO("tc " << i <<
-//        " - got final neuron value: " << xMatrix(0,i) <<
-//        " and quality indicator " << tcs[i].qi)
         tcs[i].neuronValue = xMatrix(0, i);
       }
 

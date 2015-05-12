@@ -474,7 +474,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     # don't have any plots in this package
     elif os.path.isdir(folder) and not len(glob.glob(folder + "/*.png")):
         html.append("\n<span class='noplots'><strong"
-                    ">This package does not contain any plots."
+                    ">This section does not contain any plots."
                     "</strong></span>")
     print "Plot matrix successfully created."
     return html
@@ -543,37 +543,83 @@ def generate_new_plots(list_of_revisions):
     # for every package
     for package in sorted(list_of_packages):
 
+        # Some information to be printed out while the plots are created
+        print 'Now creating plots for package: {0}'.format(package)
+
         html_output.write('<div id="' + package + '">\n')
         html_output.write('<h1>' + package + '</h1>\n')
 
-        root_files_in_pkg = find_root_object(list_of_root_objects,
-                                             package=package)
+        # A list of all objects (including reference objects) that
+        # belong to the current package
+        objects_in_pkg = find_root_object(list_of_root_objects,
+                                          package=package)
 
-        # Create the list of plotuples
-        list_of_plotuples = []
-        for key in sorted(list_of_keys):
-            root_objects = find_root_object(root_files_in_pkg, key=key)
+        # Find all ROOT files that were created in the scope of this
+        # package (also including reference files)
+        files_in_pkg = []
+        for plot_object in objects_in_pkg:
+            # For every object in the package, get the corresponding
+            # file name and append it to the list if its not in there
+            rootfile_name = os.path.basename(plot_object.rootfile)
+            if rootfile_name not in files_in_pkg:
+                files_in_pkg.append(rootfile_name)
+        files_in_pkg.sort()
 
-            # If the list is empty, we can continue right ahead
-            if not root_objects:
-                continue
+        # Now we loop over all files that belong to the package to
+        # group the plots correctly
+        for rootfile in files_in_pkg:
 
-            plotuple = Plotuple(root_objects, list_of_revisions)
-            list_of_plotuples.append(plotuple)
+            # Some more information to be printed out while plots are
+            # being created
+            print '\nNow creating plots for file: {0}'.format(rootfile)
 
-        # Generate the plot matrix
-        for line in plot_matrix(list_of_plotuples, package, list_of_revisions):
-            html_output.write(line + "\n")
+            # Write to the HTML the name of the current file
+            html_output.write('<h2 name="#{0}">{0}</h2><br>\n'
+                              .format(rootfile))
 
-        # write the code for each plot
-        for plotuple in list_of_plotuples:
-            html_output.write("\n\n")
-            for line in plotuple.html():
-                html_output.write(line + '\n')
-            html_output.write('\n\n')
+            # Get the list of all objects that belong to the current
+            # package and the current file. First the regular objects:
+            objects_in_pkg_and_file = find_root_object(objects_in_pkg,
+                                                       rootfile=".*"+rootfile+".*")
+            # And then the reference objects
+            objects_in_pkg_and_file += find_root_object(reference_objects,
+                                                        rootfile=".*"+rootfile+".*")
 
-        html_output.write('</div>\n\n')
+            # A list in which we keep all the plotuples for this file
+            list_of_plotuples = []
 
+            # Now loop over ALL keys (within a file, objects will be
+            # sorted by key)
+            for key in sorted(list_of_keys):
+
+                # Find all objects for the Plotuple that is defined by the
+                # package, the file and the key
+                root_objects = find_root_object(objects_in_pkg_and_file,
+                                                key=key)
+
+                # If this list is empty, we can continue right away
+                if not root_objects:
+                    continue
+
+                # Otherwise we can generate Plotuple object
+                plotuple = Plotuple(root_objects, list_of_revisions)
+                list_of_plotuples.append(plotuple)
+
+                # Write the HTML for the Plotuple to the file stream
+                html_output.write('\n\n')
+                html_output.write('\n'.join(plotuple.html()))
+
+            # Now generate the matrix view with all plots for this ROOT file
+            plot_matrix_html = plot_matrix(list_of_plotuples, package, list_of_revisions)
+            html_output.write('\n'.join(plot_matrix_html))
+
+        # Make the command line output more readable
+        print 2*'\n'
+
+        # Close the div for the package
+        html_output.write('</div>\n<br>\n<br>\n\n')
+
+    # Close the file stream for the HTML file
     html_output.close()
 
     # Now copy that file to the folder with the plots
@@ -1005,6 +1051,7 @@ class Plotuple:
     @var check: Hint how the Plotuple object should look like
     @var contact: The contact person for this Plotuple object
     @var package: The package to which this Plotuple object belongs to
+    @var rootfile: The rootfile to which the Plotuple object belongs to
     @var chi2test_result: The result of the Chi^2-Test. By default, there is no
         such result. If the Chi^2-Test has been performed, this variable holds
         the information between which objects it has been performed.
@@ -1054,8 +1101,12 @@ class Plotuple:
 
         # The newest element, i.e. the element belonging the revision
         # whose data were created most recently.
-        # Should always be self.element[0]
-        self.newest = self.elements[0]
+        # Should always be self.element[0], except if there is only a
+        # reference object
+        if self.elements:
+            self.newest = self.elements[0]
+        else:
+            self.newest = self.reference
 
         # All available meta-information about the plotuple object:
 
@@ -1080,6 +1131,9 @@ class Plotuple:
 
         # The package to which the elements in this Plotuple object belong
         self.package = self.newest.package
+
+        # The root file to which the elements in this Plotuple object belong
+        self.rootfile = self.newest.rootfile
 
         # The result of the Chi^2-Test. By default, there is no such result.
         # If the Chi^2-Test has been performed, this variable holds between
@@ -1499,11 +1553,17 @@ class Plotuple:
                     '(<a href="#' + self.package + '" '
                     'style="color:black; '
                     'text-decoration:none;">hide this plot</a>)'
-                    '</div>\n<h2>' + h2 + '</h2>\n')
+                    '</div>\n<h3>' + h2 + '</h3>\n')
 
         if self.warnings:
             html.append('<p style="color: red;"><strong>Warnings:</strong> '
                         '{0}</p>'.format(', '.join(self.warnings)))
+
+        # Write out which package and root file the plots belongs to
+        # (May be helpful for orientation)
+        html.append('<p><strong>Package:</strong> {0}</p>\n'
+                    '<p><strong>ROOT file:</strong> {1}</p>'
+                    .format(self.package, os.path.basename(self.rootfile)))
 
         if self.type != 'TNtuple':
             html.append('<p><strong>P-Value:</strong> {0}</p>\n'

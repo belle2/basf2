@@ -28,6 +28,8 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
   const std::vector<SegmentInformation*> segmentTrain = testPair->first;
   const CDCTrack* track = testPair->second;
 
+  const CDCTrajectory2D& trajectory = track->getStartTrajectory3D().getTrajectory2D();
+
   bool is_stereo = segmentTrain.front()->getSegment()->getStereoType() != AXIAL;
 
   double maximumPerpSOverlap = 0;
@@ -39,7 +41,15 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
   const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
 
   for (const SegmentInformation* segmentInformation : segmentTrain) {
-    double perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
+    double perpSFront = 0;
+    if (is_stereo) {
+      CDCRLWireHit rlWireHit(segmentInformation->getSegment()->front().getWireHit(),
+                             segmentInformation->getSegment()->front().getRLInfo());
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
+      perpSFront = recoHit3D.getPerpS();
+    } else {
+      perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
+    }
     if (alreadySet) {
       double currentOverlap = lastPerpS - perpSFront;
       sumPerpSOverlap += currentOverlap;
@@ -48,11 +58,15 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
       }
     }
     alreadySet = true;
-    lastPerpS = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
+    if (is_stereo) {
+      CDCRLWireHit rlWireHit(segmentInformation->getSegment()->back().getWireHit(), segmentInformation->getSegment()->back().getRLInfo());
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
+      lastPerpS = recoHit3D.getPerpS();
+    } else {
+      lastPerpS = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
+    }
   }
 
-  // TODO
-  var<named("fit_prob")>() = 0;
   var<named("is_stereo")>() = is_stereo;
   var<named("size")>() = segmentTrain.size();
   var<named("maximum_perpS_overlap")>() = maximumPerpSOverlap;

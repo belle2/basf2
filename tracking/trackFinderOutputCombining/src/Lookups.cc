@@ -166,7 +166,9 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
         return trajectory2D.calcPerpS(first->getSegment()->front().getRecoPos2D()) >
                trajectory2D.calcPerpS(second->getSegment()->front().getRecoPos2D());
       });
-      if (not isNotACell(segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand()))))
+      segmentTrainFilter.clear();
+      // Problem: The recording filter return NOT_A_CELL everytime!
+      if (segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand())) != 0)
         innerSet.push_back(x);
     }
     trainsOfSegments.insert(trainsOfSegments.end(), innerSet.begin(), innerSet.end());

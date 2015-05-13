@@ -32,7 +32,6 @@ namespace Belle2 {
     static char const* const segmentTrainNames[5] = {
       "is_stereo",
       "maximum_perpS_overlap",
-      "fit_prob",
       "size",
       "perpS_overlap_mean"
     };
@@ -45,7 +44,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 5;
+      static const size_t nNames = 4;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

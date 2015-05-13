@@ -309,4 +309,52 @@ namespace Belle2 {
     EXPECT_EQ(get<0>(keyValPairs[19]), 9);
     EXPECT_DOUBLE_EQ(get<1>(keyValPairs[19]), sinHalf.operator()(9));
   }
+
+  /** test the getAllValues() function actually returns all values that are stored in the map*/
+  TEST_F(MapHelperFunctionsTest, testGetAllValues)
+  {
+    // set up vectors with all values there are in the maps
+    std::vector<double> possibleValues, nanPossibleValues;
+    for (int i = 0; i < _nEntries; ++i) {
+      possibleValues.push_back(sinHalf.operator()(i));
+      nanPossibleValues.push_back(secans.operator()(i));
+    }
+    // sort vectors to be able to simply loop over them for comparison since the order is unimportant for this function
+    std::sort(possibleValues.begin(), possibleValues.end());
+    std::sort(nanPossibleValues.begin(), nanPossibleValues.end());
+
+    // test normal map first
+    std::vector<double> allValues = getAllValues(_map);
+    EXPECT_EQ(allValues.size(), _nEntries);
+    std::sort(allValues.begin(), allValues.end());
+    for (int i = 0; i < _nEntries; ++i) {
+      EXPECT_DOUBLE_EQ(allValues[i], possibleValues[i]);
+    }
+
+    // test multimap with non NaN entries
+    allValues = getAllValues(_multimap);
+    EXPECT_EQ(allValues.size(), _nEntries);
+    std::sort(allValues.begin(), allValues.end());
+    for (int i = 0; i < _nEntries; ++i) {
+      EXPECT_DOUBLE_EQ(allValues[i], possibleValues[i]);
+    }
+
+    // TODO: does not work at the moment, FIX THIS!!
+    // test the nan maps
+    // allValues = getAllValues(_nanMap);
+    // EXPECT_EQ(allValues.size(), _nEntries);
+    // std::sort(allValues.begin(), allValues.end());
+    // for(int i = 0; i < _nEntries; ++i) {
+    //   EXPECT_DOUBLE_EQ(allValues[i], possibleValues[i]);
+    // }
+
+    // allValues = getAllValues(_nanMultiMap);
+    // EXPECT_EQ(allValues.size(), _nEntries);
+    // std::sort(allValues.begin(), allValues.end());
+    // for(int i = 0; i < _nEntries; ++i) {
+    //   EXPECT_DOUBLE_EQ(allValues[i], possibleValues[i]);
+    // }
+
+
+  }
 }

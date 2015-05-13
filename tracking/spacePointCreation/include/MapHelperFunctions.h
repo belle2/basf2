@@ -123,6 +123,28 @@ namespace Belle2 {
   }
 
   /**
+   * get all values in the map (i.e. dump out all values that are stored in the map). The connection to the keys is lost!
+   * TODO: write test for this!!!!
+   */
+  template<typename MapType>
+  std::vector<typename MapType::mapped_type> getAllValues(const MapType& aMap)
+  {
+    typedef typename MapType::key_type keyT;
+    std::vector<keyT> allKeys = getUniqueKeys(aMap);
+
+    typedef typename MapType::mapped_type valueT;
+    std::vector<valueT> allValues;
+    for (const keyT& key : allKeys) {
+      std::vector<valueT> keyValues = getValuesToKey(aMap, key);
+      for (const valueT& value : keyValues) {
+        allValues.push_back(value);
+      }
+    }
+
+    return allValues;
+  }
+
+  /**
    * get the contents of the map as string. NOTE: should compile without warning for any map (e.g. map, multimap, unordered_map,...) with key and values of a type that have a defined stream insertion operator (only tested for multimap and unordered_multimap!)
    */
   template <typename MapType>

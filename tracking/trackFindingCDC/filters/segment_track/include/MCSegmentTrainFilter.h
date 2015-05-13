@@ -10,32 +10,37 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrainVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrainTruthVarSet.h>
 
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the construction of good segment trains
-    class SimpleSegmentTrainFilter : public FilterOnVarSet<SegmentTrainVarSet> {
+    /// Filter for the construction of good segment - track pairs
+    class MCSegmentTrainFilter : public FilterOnVarSet<SegmentTrainTruthVarSet> {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<SegmentTrainVarSet> Super;
+      typedef FilterOnVarSet<SegmentTrainTruthVarSet> Super;
 
     public:
       /// Constructor
-      SimpleSegmentTrainFilter() : Super() { }
+      MCSegmentTrainFilter() : Super() { }
 
-    public:
-      virtual CellWeight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>&
-                                    testPair) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair) IF_NOT_CINT(
+        override final)
+      {
+        Super::operator()(testPair);
+        const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
 
-    private:
-
+        if (varSet.at("truth") == 1.0)
+          return 1.0;
+        else
+          return 0.0;
+      }
     };
   }
 }

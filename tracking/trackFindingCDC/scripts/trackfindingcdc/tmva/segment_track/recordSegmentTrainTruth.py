@@ -14,7 +14,7 @@ def get_logger():
 
 
 class SegmentTrackTruthRecordingRun(LegendreTrackFinderRun):
-    n_events = 50
+    n_events = 1
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
     segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     segment_finder_module.param({
@@ -25,8 +25,9 @@ class SegmentTrackTruthRecordingRun(LegendreTrackFinderRun):
     })
     combiner_module = basf2.register_module("SegmentTrackCombinerDev")
     combiner_module.param({'SegmentTrackChooser': 'tmva',
-                           'SegmentTrackChooserParameters': {"cut": "0.05"},
+                           'SegmentTrackChooserParameters': {"cut": "0.3"},
                            'SegmentTrainFilter': 'recording',
+                           'SegmentTrackFilter': 'none',
                            'WriteGFTrackCands': False,
                            'SkipHitsPreparation': True,
                            'TracksStoreObjNameIsInput': True})

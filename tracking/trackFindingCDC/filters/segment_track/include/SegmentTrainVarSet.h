@@ -21,11 +21,9 @@
 
 
 namespace Belle2 {
-  namespace TrackFinderOutputCombining {
-    class SegmentInformation;
-  }
   namespace TrackFindingCDC {
     class CDCTrack;
+    class SegmentInformation;
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
@@ -33,18 +31,19 @@ namespace Belle2 {
       "is_stereo",
       "maximum_perpS_overlap",
       "size",
-      "perpS_overlap_mean"
+      "perpS_overlap_mean",
+      "calculation_failed"
     };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
      */
     class SegmentTrainVarNames : public
-      VarNames<std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>> {
+      VarNames<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 4;
+      static const size_t nNames = 5;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
@@ -62,8 +61,10 @@ namespace Belle2 {
       /// Construct the peeler and take an optional prefix.
       SegmentTrainVarSet(const std::string& prefix = "") : VarSet<SegmentTrainVarNames>(prefix) { }
 
+      const float m_param_percentageForPerpSMeasurements = 0.05; /**< We use this amount of overlap when defining a segment train */
+
       /// Generate and assign the variables from the pair
-      virtual bool extract(const std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>* testPair)
+      virtual bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
       IF_NOT_CINT(override final);
     };
   }

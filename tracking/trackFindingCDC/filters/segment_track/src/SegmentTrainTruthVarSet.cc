@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segment_track/SegmentTrainTruthVarSet.h>
 
-#include <tracking/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
@@ -19,10 +19,9 @@
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace TrackFinderOutputCombining;
 
 bool SegmentTrainTruthVarSet::extract(const
-                                      std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>* testPair)
+                                      std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
 {
   bool extracted = extractNested(testPair);
   if (not extracted or not testPair) return false;

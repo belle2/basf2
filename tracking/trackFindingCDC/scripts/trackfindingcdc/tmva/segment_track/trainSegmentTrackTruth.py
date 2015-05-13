@@ -15,7 +15,7 @@ import logging
 def main():
     classifer = FastBDTClassifier(
         "SegmentTrackTruth",
-        "SegmentTrackTruthTruthWeight.root"
+        "SegmentTrackTruthTruthWeight.root",
     )
 
     input_file_name = "SegmentTrackChooser.root"

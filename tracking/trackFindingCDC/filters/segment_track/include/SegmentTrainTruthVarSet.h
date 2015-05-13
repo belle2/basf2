@@ -24,7 +24,7 @@ namespace Belle2 {
      *  that should be generated from a wire hits cluster.
      */
     class SegmentTrainTruthVarNames : public
-      VarNames<std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>> {
+      VarNames<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>> {
 
     public:
       /// Number of variables to be generated.
@@ -50,7 +50,7 @@ namespace Belle2 {
       SegmentTrainTruthVarSet(const std::string& prefix = "") : VarSet<SegmentTrainTruthVarNames>(prefix) { }
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>* testPair)
+      virtual bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
       IF_NOT_CINT(override final);
 
     };

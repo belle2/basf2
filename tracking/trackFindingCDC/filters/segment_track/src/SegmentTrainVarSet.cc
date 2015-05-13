@@ -13,14 +13,13 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
-#include <tracking/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace TrackFinderOutputCombining;
 
 bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
 {
@@ -32,7 +31,10 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
 
   bool is_stereo = segmentTrain.front()->getSegment()->getStereoType() != AXIAL;
 
-  double maximumPerpSOverlap = 0;
+  var<named("is_stereo")>() = is_stereo;
+  var<named("size")>() = segmentTrain.size();
+
+  double maximumPerpSOverlap = -999;
   double sumPerpSOverlap = 0;
 
   double lastPerpS;
@@ -50,8 +52,14 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
     } else {
       perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
     }
+    if (std::isnan(perpSFront)) {
+      var<named("maximum_perpS_overlap")>() = 0;
+      var<named("perpS_overlap_mean")>() = 0;
+      var<named("calculation_failed")>() = true;
+      return true;
+    }
     if (alreadySet) {
-      double currentOverlap = lastPerpS - perpSFront;
+      double currentOverlap = (1 - m_param_percentageForPerpSMeasurements) * lastPerpS - perpSFront;
       sumPerpSOverlap += currentOverlap;
       if (currentOverlap > maximumPerpSOverlap) {
         maximumPerpSOverlap = currentOverlap;
@@ -65,10 +73,16 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
     } else {
       lastPerpS = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
     }
+
+    if (std::isnan(lastPerpS)) {
+      var<named("maximum_perpS_overlap")>() = 0;
+      var<named("perpS_overlap_mean")>() = 0;
+      var<named("calculation_failed")>() = true;
+      return true;
+    }
   }
 
-  var<named("is_stereo")>() = is_stereo;
-  var<named("size")>() = segmentTrain.size();
+  var<named("calculation_failed")>() = false;
   var<named("maximum_perpS_overlap")>() = maximumPerpSOverlap;
   if (segmentTrain.size() > 1)
     var<named("perpS_overlap_mean")>() = sumPerpSOverlap / (segmentTrain.size() - 1);

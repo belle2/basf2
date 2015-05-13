@@ -13,15 +13,29 @@
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace TrackFinderOutputCombining;
 
 CellWeight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
 {
-  CellWeight extracted = Super::operator()(testPair);
+  Super::operator()(testPair);
 
-  const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
+  const std::vector<SegmentInformation*>& trainOfSegments = testPair.first;
+  const CDCTrack* track = testPair.second;
+  const CDCTrajectory2D& trajectory = track->getStartTrajectory3D().getTrajectory2D();
 
-  // TODO
+  const SegmentTrainVarSet& varSet = Super::getVarSet();
+
+  double lastPerpS;
+  bool alreadySet = false;
+
+  for (const SegmentInformation* segmentInformation : trainOfSegments) {
+    double perpSFront = trajectory.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
+    if (alreadySet and perpSFront < (1 - varSet.m_param_percentageForPerpSMeasurements) * lastPerpS) {
+      // Means: no
+      return 0.0;
+    }
+    alreadySet = true;
+    lastPerpS = trajectory.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
+  }
 
   // Means: yes
   return 1.0;

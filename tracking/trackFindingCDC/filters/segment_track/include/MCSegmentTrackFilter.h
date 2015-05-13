@@ -9,13 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrainFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    typedef Filter<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>> BaseSegmentTrainFilter;
+    /// Filter for the construction of good segment - track pairs
+    typedef MCSegmentTrainFilter MCSegmentTrackFilter;
   }
 }

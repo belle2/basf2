@@ -109,8 +109,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
     } else {
       const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-      var<named("fit_full")>() = -1; // fitter.fit(observationsFull).getProb();
-      var<named("fit_neigh")>() = -1; //fitter.fit(observationsNeigh).getProb();
+      var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
+      var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
     }
   }
 
@@ -118,8 +118,22 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
   var<named("segment_size")>() = segment->size();
   var<named("track_size")>() = track->size();
-  var<named("maxmimum_hit_distance_front")>() = maxmimumHitDistanceFront;
-  var<named("maxmimum_hit_distance_back")>() = maxmimumHitDistanceBack;
+  var<named("calculation_failed")>() = false;
+
+  if (std::isnan(maxmimumHitDistanceFront)) {
+    var<named("maxmimum_hit_distance_front")>() = 999;
+    var<named("calculation_failed")>() = true;
+  } else {
+    var<named("maxmimum_hit_distance_front")>() = maxmimumHitDistanceFront;
+  }
+
+  if (std::isnan(maxmimumHitDistanceBack)) {
+    var<named("maxmimum_hit_distance_back")>() = 999;
+    var<named("calculation_failed")>() = true;
+  } else {
+    var<named("maxmimum_hit_distance_back")>() = maxmimumHitDistanceBack;
+  }
+
   var<named("out_of_CDC")>() = outOfCDC;
   var<named("hits_in_same_region")>() = hitsInSameRegion;
 

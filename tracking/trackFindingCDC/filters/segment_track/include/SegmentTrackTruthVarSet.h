@@ -11,8 +11,16 @@
 
 #include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackVarSet.h>
 
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+    class CDCTrack;
+
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
     static char const* const segmentTrackTruthNames[5] = {

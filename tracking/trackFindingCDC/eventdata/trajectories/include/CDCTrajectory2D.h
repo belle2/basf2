@@ -24,6 +24,8 @@
 
 #include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
 
+#include <TMath.h>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -408,7 +410,11 @@ namespace Belle2 {
       void setNDF(const size_t& ndf)
       { return m_localPerigeeCircle.setNDF(ndf); }
 
-
+      /// Getter for the probability for a good fit
+      FloatType getProb() const
+      {
+        return TMath::Prob(getChi2(), getNDF());
+      }
 
       /// Setter for the generalized circle that describes the trajectory.
       void setLocalCircle(const UncertainPerigeeCircle& localPerigeeCircle)

@@ -19,6 +19,8 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 
+#include <TMath.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -147,6 +149,12 @@ namespace Belle2 {
       void setNDF(const size_t& ndf)
       { return m_szLine.setNDF(ndf); }
 
+      /// Getter for the probability for a good fit
+      FloatType getProb() const
+      {
+        return TMath::Prob(getChi2(), getNDF());
+      }
+
 
 
       /// Getter for the line in sz space
@@ -169,7 +177,8 @@ namespace Belle2 {
       /// Setter for the normal parameters of the line.
       void setN(const FloatType& n0,
                 const FloatType& n1,
-                const FloatType& n2) {
+                const FloatType& n2)
+      {
         m_szLine.setN(n0, n1, n2);
         if (not getSZLine().alignedWithFirst()) m_szLine.reverse();
       }

@@ -49,7 +49,9 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
   }
 }
 
-void SegmentTrackCombiner::combine()
+void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
+                                   BaseSegmentTrainFilter& segmentTrainFilter,
+                                   BaseSegmentTrackFilter& segmentTrackFilter)
 {
   B2DEBUG(100, "Starting combining work.");
 
@@ -58,7 +60,7 @@ void SegmentTrackCombiner::combine()
 
     // Search for all matching tracks for a given segment
     for (SegmentInformation* segmentInformation : segmentsList) {
-      matchTracksToSegment(segmentInformation);
+      matchTracksToSegment(segmentInformation, segmentTrackChooser);
     }
 
     // Go through all tracks and delete the cases were we have more than one train/segment
@@ -68,7 +70,7 @@ void SegmentTrackCombiner::combine()
 
       // TODO: Be careful with curlers here!!!!
       B2DEBUG(100, "Track matches to " << trackInformation->getMatches().size() << " segments before train creation.")
-      createTrainsOfMatchedSegments(trainsOfSegments, trackInformation);
+      createTrainsOfMatchedSegments(trainsOfSegments, trackInformation, segmentTrainFilter);
 
       if (trainsOfSegments.size() == 1) {
         // If there is only one matching segment/train, mark this as matched
@@ -78,7 +80,7 @@ void SegmentTrackCombiner::combine()
         // There are no good reasons why we should have more than one train/segment that matches. We have to find the best one.
         B2WARNING("Number of possible trains/segments still left: " << trainsOfSegments.size() <<
                   ". As these are too much we will only us the best one and delete the rest.");
-        trackInformation->setGoodSegmentTrain(findBestFittingSegmentTrain(trainsOfSegments, trackInformation));
+        trackInformation->setGoodSegmentTrain(findBestFittingSegmentTrain(trainsOfSegments, trackInformation, segmentTrackFilter));
       }
 
       // Reset the matching segments lists
@@ -115,67 +117,12 @@ void SegmentTrackCombiner::combine()
   }
 }
 
-bool SegmentTrackCombiner::segmentMatchesToTrack(const SegmentInformation* segmentInformation,
-                                                 const TrackInformation* trackInformation)
-{
-  const CDCRecoHit2D& front = segmentInformation->getSegment()->front();
-  const CDCRecoHit2D& back = segmentInformation->getSegment()->back();
-
-  // Calculate distance
-  const CDCTrajectory2D& trajectory = trackInformation->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
-
-  if (segmentInformation->getSegment()->getStereoType() != AXIAL) {
-    if (fabs(trajectory.getDist2D(front.getWireHit().getRefPos2D())) > 10
-        or fabs(trajectory.getDist2D(back.getWireHit().getRefPos2D())) > 10)  {
-      B2DEBUG(120, "Hits too far away: " << trajectory.getDist2D(front.getRecoPos2D()))
-      return false;
-    }
-  } else {
-    if (fabs(trajectory.getDist2D(front.getWireHit().getRefPos2D())) > 2
-        or fabs(trajectory.getDist2D(back.getWireHit().getRefPos2D())) > 2)  {
-      B2DEBUG(120, "Hits too far away: " << trajectory.getDist2D(front.getRecoPos2D()))
-      return false;
-    }
-  }
-
-  Vector3D frontRecoPos3D = front.reconstruct3D(trajectory);
-  Vector3D backRecoPos3D = back.reconstruct3D(trajectory);
-
-  if (segmentInformation->getSegment()->getStereoType() != AXIAL) {
-    double forwardZ = front.getWire().getSkewLine().forwardZ();
-    double backwardZ = front.getWire().getSkewLine().backwardZ();
-
-    if (frontRecoPos3D.z() > forwardZ or frontRecoPos3D.z() < backwardZ) {
-      B2DEBUG(120, "Segment out of CDC after reconstruction.")
-      return false;
-    }
-  }
-
-
-  unsigned int hitsInSameRegion = 0;
-  for (const CDCRecoHit3D& recoHit : trackInformation->getTrackCand()->items()) {
-    if (recoHit.getISuperLayer() == segmentInformation->getSegment()->getISuperLayer()) {
-      hitsInSameRegion++;
-    }
-  }
-
-  if (hitsInSameRegion > 5) {
-    B2DEBUG(110, "Too many hits in the same region: " << hitsInSameRegion)
-    return false;
-  } else {
-    B2DEBUG(110, "Hits in the region: " << hitsInSameRegion << " while hits in segment: " <<
-            segmentInformation->getSegment()->size())
-  }
-
-  return true;
-}
-
-bool SegmentTrackCombiner::couldBeASegmentTrain(const TrainOfSegments& trainOfSegments, const TrackInformation* trackInformation)
+bool SegmentTrackCombiner::couldBeASegmentTrain(const TrainOfSegments& trainOfSegments, const CDCTrack* track)
 {
   double lastPerpS;
   bool alreadySet = false;
 
-  const CDCTrajectory2D& trajectory2D = trackInformation->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
+  const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
 
   for (SegmentInformation* segmentInformation : trainOfSegments) {
     double perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
@@ -189,7 +136,7 @@ bool SegmentTrackCombiner::couldBeASegmentTrain(const TrainOfSegments& trainOfSe
 }
 
 const SegmentTrackCombiner::TrainOfSegments& SegmentTrackCombiner::findBestFittingSegmentTrain(
-  std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation)
+  std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation, BaseSegmentTrackFilter& segmentTrackFilter)
 {
   // We can easily delete all matches here as we have them in the list anyway
   trackInformation->clearMatches();
@@ -218,9 +165,9 @@ const SegmentTrackCombiner::TrainOfSegments& SegmentTrackCombiner::findBestFitti
   return bestFittingSegmentTrain;
 }
 
-
 void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments,
-                                               const TrackInformation* trackInformation)
+                                               const TrackInformation* trackInformation,
+                                               BaseSegmentTrainFilter& segmentTrainFilter)
 {
   const std::vector<SegmentInformation*>& matchedSegments = trackInformation->getMatches();
 
@@ -237,7 +184,7 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
         return trajectory2D.calcPerpS(first->getSegment()->front().getRecoPos2D()) >
                trajectory2D.calcPerpS(second->getSegment()->front().getRecoPos2D());
       });
-      if (couldBeASegmentTrain(x, trackInformation))
+      if (not isNotACell(segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand()))))
         innerSet.push_back(x);
     }
     trainsOfSegments.insert(trainsOfSegments.end(), innerSet.begin(), innerSet.end());
@@ -400,26 +347,29 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
   }
 }
 
-void SegmentTrackCombiner::matchTracksToSegment(SegmentInformation* segmentInformation)
+void SegmentTrackCombiner::matchTracksToSegment(SegmentInformation* segmentInformation,
+                                                BaseSegmentTrackChooser& segmentTrackChooser)
 {
   for (TrackInformation* trackInformation : m_trackLookUp) {
-    if (segmentMatchesToTrack(segmentInformation, trackInformation)) {
+    segmentTrackChooser.clear();
+    if (isNotACell(segmentTrackChooser(std::make_pair(segmentInformation->getSegment(), trackInformation->getTrackCand())))) {
+      B2DEBUG(110, "Found not matchable in " << segmentInformation->getSegment()->getISuperLayer())
+    } else {
       B2DEBUG(110, "Found matchable in " << segmentInformation->getSegment()->getISuperLayer())
       trackInformation->addMatch(segmentInformation);
       segmentInformation->addMatch(trackInformation);
-    } else {
-      B2DEBUG(110, "Found not matchable in " << segmentInformation->getSegment()->getISuperLayer())
     }
   }
 }
 
 void SegmentTrackCombiner::createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments,
-                                                         const TrackInformation* trackInformation)
+                                                         const TrackInformation* trackInformation,
+                                                         BaseSegmentTrainFilter& segmentTrainFilter)
 {
   const std::vector<SegmentInformation*>& matchedSegments = trackInformation->getMatches();
   if (matchedSegments.size() == 1) {
     trainsOfSegments.push_back(matchedSegments);
   } else if (matchedSegments.size() > 1) {
-    makeAllCombinations(trainsOfSegments, trackInformation);
+    makeAllCombinations(trainsOfSegments, trackInformation, segmentTrainFilter);
   }
 }

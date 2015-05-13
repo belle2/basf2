@@ -10,6 +10,7 @@
 
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDRandomModule.h>
 #include <framework/logging/Logger.h>
+#include <genfit/TrackCand.h>
 
 #include <TRandom.h>
 
@@ -30,6 +31,10 @@ QualityEstimatorVXDRandomModule::QualityEstimatorVXDRandomModule() : Module()
 
 
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it", string(""));
+
+  addParam("useTimeSeedAsQI", m_PARAMuseTimeSeedAsQI,
+           "JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators (TFRedesignModule fills the TimeSeed with its determined QI) ",
+           false);
 }
 
 
@@ -42,6 +47,15 @@ void QualityEstimatorVXDRandomModule::event()
 
 
   // assign a random QI for each given SpacePointTrackCand
+  if (m_PARAMuseTimeSeedAsQI) {
+    for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
+      double qi = aTC.getRelatedTo<genfit::TrackCand>("ALL")->getTimeSeed();
+      B2INFO("in event " << m_eventCounter << ", for aTC " << aTC.getArrayIndex() << ": retrieved QI using getTimeSeed is " << qi);
+      aTC.setQualityIndex(qi);
+    }
+    return;
+  }
+
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     aTC.setQualityIndex(gRandom->Uniform(1.0));
   }

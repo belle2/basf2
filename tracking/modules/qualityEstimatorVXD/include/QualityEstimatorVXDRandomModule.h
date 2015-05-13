@@ -74,6 +74,9 @@ namespace Belle2 {
     std::string m_PARAMtcArrayName;
 
 
+    bool m_PARAMuseTimeSeedAsQI; /** JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators */
+
+
     // member variables
 
 

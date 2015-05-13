@@ -106,6 +106,7 @@ param_vxdtf = {'sectorSetup': secSetup,
                'GFTrackCandidatesColName': 'caTracks',
                'tuneCutoffs': tuneValue,
                'filterOverlappingTCs': 'none',  # shall provide overlapping TCs
+               'useTimeSeedAsQI': True  # hack for storing QIs in TimeSeed-Variable for genfit::TrackCand
                }
 
 vxdtf.param(param_vxdtf)
@@ -144,6 +145,7 @@ trackCandConverter.param(param_trackCandConverter)
 qualiEstimatorRandom = register_module('QualityEstimatorVXDRandom')
 qualiEstimatorRandom.logging.log_level = LogLevel.INFO
 qualiEstimatorRandom.param('tcArrayName', 'SPTracks')
+qualiEstimatorRandom.param('useTimeSeedAsQI', True)  # hack for storing QIs in TimeSeed-Variable for genfit::TrackCand
 
 tcNetworkProducer = register_module('SPTCNetworkProducer')
 tcNetworkProducer.logging.log_level = debugLevel1

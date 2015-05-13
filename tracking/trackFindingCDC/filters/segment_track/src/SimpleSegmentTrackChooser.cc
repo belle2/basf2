@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 
 CellWeight SimpleSegmentTrackChooser::operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair)
 {
-  CellWeight extracted = Super::operator()(testPair);
+  Super::operator()(testPair);
 
   const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
   bool is_stereo = varSet.at("is_stereo") == 1.0 ? true : false;

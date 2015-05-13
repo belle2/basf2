@@ -32,7 +32,7 @@ namespace Belle2 {
       //static char const* const names[nNames] = {};
 
       IF_NOT_CINT(constexpr)
-      static char const* getName(int iName)
+      static char const* getName(int __attribute__((unused)) iName)
       {
         return "";
       }

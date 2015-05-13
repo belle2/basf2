@@ -27,8 +27,12 @@ TrackCandidateWithStereoHits::TrackCandidateWithStereoHits(CDCTrack* oldCDCTrack
       trackHits.push_back(new TrackHit(recoHit.getWireHit()));
   }
 
-  double r = 1.5 * 0.00299792458 / oldCDCTrack->getStartTrajectory3D().getTrajectory2D().getAbsMom2D();
-  double theta = oldCDCTrack->getStartFitMom3D().phi() - oldCDCTrack->getStartChargeSign() * TMath::Pi() / 2.;
+  // There are some problems with the theta angle here: it has to be set on the IP??
+  CDCTrajectory3D oldTrajectory = oldCDCTrack->getStartTrajectory3D();
+  oldTrajectory.setLocalOrigin(Vector3D(0, 0, 0));
+
+  double r = 1.5 * 0.00299792458 / oldTrajectory.getTrajectory2D().getAbsMom2D();
+  double theta = oldTrajectory.getUnitMom3DAtSupport().phi() - oldCDCTrack->getStartChargeSign() * TMath::Pi() / 2.;
   if (theta < 0.) theta += TMath::Pi() * 2.;
 
   int charge = oldCDCTrack->getStartChargeSign();

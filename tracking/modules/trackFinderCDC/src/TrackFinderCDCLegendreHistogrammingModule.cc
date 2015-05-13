@@ -64,7 +64,10 @@ void CDCLegendreHistogrammingModule::outputObjects()
     CDCTrajectory3D newTrajectory3D(position, momentum,
                                     trackCand->getChargeSign());
 
-    newTrajectory3D.setLocalOrigin(Vector3D(oldCDCTrack->front().getRecoPos3D().xy(), 0));
+    Vector3D startingPosition = oldCDCTrack->front().getRecoPos3D();
+    double sStartingPosition = newTrajectory3D.calcPerpS(startingPosition);
+    double zStartingPosition = newTrajectory3D.getTrajectorySZ().mapSToZ(sStartingPosition);
+    newTrajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
 
     CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()),
                                  Vector2D(momentum.x(), momentum.y()), trackCand->getChargeSign());

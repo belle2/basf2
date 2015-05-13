@@ -132,22 +132,18 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     TVector3 position = trackCand->getReferencePoint();
     TVector3 momentum = trackCand->getMomentumEstimation(true);
 
-    //Pattern recognition can determine only the charge, so here some dummy pdg value is set (with the correct charge), the pdg hypothesis can be then overwritten in the GenFitterModule
-    int pdg = trackCand->getChargeSign() * (211);
-
     //set the start parameters
     CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()), Vector2D(momentum.x(), momentum.y()),
                                  trackCand->getChargeSign());
-    trajectory2D.setLocalOrigin(trackHitVector.front()->getOriginalWirePosition().XYvector());
+
     CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
+
+    Vector3D startingPosition = trackHitVector.front()->getOriginalWirePosition();
+    double sStartingPosition = trajectory3D.calcPerpS(startingPosition);
+    double zStartingPosition = trajectory3D.getTrajectorySZ().mapSToZ(sStartingPosition);
+
+    //trajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
     newTrackCandidate.setStartTrajectory3D(trajectory3D);
-
-    B2DEBUG(100, "Create genfit::TrackCandidate " << createdTrackCandidatesCounter << "  with pdg " << pdg);
-    B2DEBUG(100,
-            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")");
-    B2DEBUG(100,
-            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");
-
 
     unsigned int sortingParameter = 0;
     for (TrackHit* trackHit : trackHitVector) {

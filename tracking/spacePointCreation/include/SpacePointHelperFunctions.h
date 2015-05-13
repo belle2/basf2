@@ -105,6 +105,7 @@ namespace Belle2 {
    * second parameter is the container which collects all combinations found.
    *
    * for each u cluster, a v cluster is combined to a possible combination.
+   * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
                                        std::vector< std::vector<const SVDCluster*> >& foundCombinations)
@@ -123,6 +124,7 @@ namespace Belle2 {
    * first parameter is a storeArray containing SVDClusters.
    * second parameter is a storeArra containing SpacePoints (will be filled in the function).
    * third parameter tels the spacePoint where to get the name of the storeArray containing the related clusters
+   * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints)
@@ -149,7 +151,7 @@ namespace Belle2 {
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
       for (auto* cluster : clusterCombi) {
-        newSP->addRelationTo(cluster);
+        newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
       }
     }
   }

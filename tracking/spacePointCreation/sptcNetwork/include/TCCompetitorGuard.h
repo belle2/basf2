@@ -68,7 +68,7 @@ namespace Belle2 {
                 m_links.at(aCompetitor).getNCompetitors())
       }
       // clean now the node of the given iD, has to be done in separate step to prevent undefined behavior
-      m_links[iD].clearAllCompetitors(); // WARNING maybe still needed!
+      m_links[iD].clearAllCompetitors();
 
 //       for (unsigned int aCompetitor : m_links[iD].getCompetitors()) {
 //    B2INFO("TCCompetitorGuard:notifyRemove: in node " << iD << " killing now competitor: " << aCompetitor)

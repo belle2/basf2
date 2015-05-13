@@ -40,6 +40,11 @@ namespace Belle2 {
   /** The SpacePoint class.
    *
    *  This class stores a global space point with its position error and some extra infos
+   *
+   * For SVD only:
+   *  if relations to its attached Clusters are set, these have got the following meaning:
+   *  relationweights code the type of the cluster. +1 for u and -1 for v clusters.
+   * For other detector types the default value is used
    */
   class SpacePoint: public RelationsObject {
   public:

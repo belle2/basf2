@@ -373,7 +373,6 @@ namespace TCNetworkContainerTests {
   /** test SPTCAvatar to be used with a realistic observer and realistic SPTCs. TestTrackSetEvaluatorHopfieldNN used for clean up - TODO */
   TEST_F(TCNetworkContainerTest, TestTrackSetEvaluatorHopfieldNN)
   {
-//     EXPECT_EQ(true, false); // not fulfilled yet, therefore test fails!
 
     /// create and fill network with SpacePointTrackCands, will have 3 overlaps ( but 2 are compatible)
     TCNetworkContainer<SPTCAvatar<TCCompetitorGuard >, TCCompetitorGuard > newNetwork;

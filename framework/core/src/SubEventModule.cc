@@ -189,7 +189,11 @@ void SubEventModule::event()
     restoreContents(eventMapCopy, eventMap);
   }
 
-  objectEntry.object = nullptr;
+  // object is not allowed to be nullptr, otherwise multi processing crashes
+  // on the other hand, it is not allowed to be a reference to another object in the corresponding
+  // StoreArray, otherwise it will crash (double free), again.
+  // Therefore we create a new deletable TObject :-)
+  objectEntry.object = new TObject;
   objectEntry.ptr = nullptr;
 
   Environment::Instance().setNoStats(noStats);

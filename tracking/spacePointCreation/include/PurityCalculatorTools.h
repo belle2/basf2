@@ -28,6 +28,12 @@ namespace Belle2 {
 
   /**
    * get the related MCParticles and the number of Clusters they are related to for a SpacePoint
+   * + If there is a TrueHit with no relation to a MCParticle, the Cluster is consiedered to be related to MCId -1 (CAUTION: cannot
+   * be accesed in StoreArray!)
+   *
+   * CAUTION: The method cannot check if there is a TrueHit to a Cluster, hence it is possible that it returns an empty vector or a
+   * vector that is filled with MCParticleIds that are only related to one Cluster of the SpacePoint!
+   * This issue has to be adressed during the creation of the Relations between SpacePoints and TrueHits! -> TODO!!!
    */
   template<typename TrueHitType>
   std::vector<std::pair<int, short> > getMCParticles(const Belle2::SpacePoint* spacePoint)
@@ -100,4 +106,21 @@ namespace Belle2 {
 
     return purities;
   }
+
+  /**
+   * function that takes any container holding SpacePoints that provide a getHits() function.
+   * @return vector of pairs where .first is an McId and .second is the purity of this McId
+   *
+   * The purities are calculated via (# Clusters associated with MCId) / (# Clusters in all SpacePoints of container)
+   * Clusters that cannot be associated with a MCParticle are put into MCId -1
+   *
+   * Overload function taking references for use in C++11 for loops
+   */
+  template<typename SPContainer>
+  std::vector<std::pair<int, double> > calculatePurity(const SPContainer& container)
+  {
+    return calculatePurity(&container);
+  }
+
 }
+

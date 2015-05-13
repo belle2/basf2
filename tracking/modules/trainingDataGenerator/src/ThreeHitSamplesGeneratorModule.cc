@@ -39,12 +39,17 @@ void ThreeHitSamplesGeneratorModule::event()
 {
   StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMcontainerName);
 
+  // usage with const pointer. NOTE: the const is important, without it gets called with a reference which doesnot work
   for (int iTC = 0; iTC < spacePointTCs.getEntries(); ++iTC) {
     B2DEBUG(150, "Calculating purities for SP container " << iTC << ", name: " << spacePointTCs.getName());
-    vector<pair<int, double> > purities = calculatePurity(spacePointTCs[iTC]);
+    const SpacePointTrackCand* container = spacePointTCs[iTC];
+    vector<pair<int, double> > purities = calculatePurity(container);
   }
 
-
+  // usage with reference
+  for (const SpacePointTrackCand& container : spacePointTCs) {
+    vector<pair<int, double> > purities = calculatePurity(container);
+  }
 
 }
 

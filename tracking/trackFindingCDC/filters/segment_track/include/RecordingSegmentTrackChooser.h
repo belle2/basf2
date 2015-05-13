@@ -16,7 +16,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Records the encountered CDCWireHitClusters.
     class RecordingSegmentTrackChooser: public RecordingFilter<SegmentTrackTruthVarSet> {
 
     public:

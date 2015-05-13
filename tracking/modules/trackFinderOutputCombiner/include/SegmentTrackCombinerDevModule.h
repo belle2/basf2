@@ -47,6 +47,11 @@ namespace Belle2 {
     */
     std::string m_param_segmentTrainFilter;
 
+    /** Parameter: Segment Train Filter  parameters forwarded to the chooser
+     *  Meaning of the Key - Value pairs depend on the filter
+     */
+    std::map<std::string, std::string> m_param_segmentTrainFilterParameters;
+
     /** Parameter: Filter to be used to do an uniqe segment train <-> track matching
     Valid values are:
     + "simple"

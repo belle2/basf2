@@ -9,13 +9,33 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrainVarSet.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFinderOutputCombining/MatchingInformation.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    typedef Filter<std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>> BaseSegmentTrainFilter;
+    /// Filter for the construction of good segment - track pairs
+    class SimpleSegmentTrainFilter : public FilterOnVarSet<SegmentTrainVarSet> {
+
+    private:
+      /// Type of the super class
+      typedef FilterOnVarSet<SegmentTrainVarSet> Super;
+
+    public:
+      /// Constructor
+      SimpleSegmentTrainFilter() : Super() { }
+
+    public:
+      virtual CellWeight operator()(const std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>&
+                                    testPair) IF_NOT_CINT(override final);
+
+    private:
+
+    };
   }
 }

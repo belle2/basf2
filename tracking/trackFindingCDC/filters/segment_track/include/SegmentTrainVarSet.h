@@ -9,24 +9,39 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackVarSet.h>
+#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
+#include <vector>
+#include <string>
+#include <assert.h>
+
 
 namespace Belle2 {
+  namespace TrackFinderOutputCombining {
+    class SegmentInformation;
+  }
   namespace TrackFindingCDC {
+    class CDCTrack;
+
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const segmentTrackTruthNames[5] = {
-      "belongs_to_same_track_truth",
-      "segment_is_fake_truth",
-      "segment_purity_truth",
-      "track_purity_truth",
-      "truth"
+    static char const* const segmentTrainNames[5] = {
+      "is_stereo",
+      "maximum_perpS_overlap",
+      "fit_prob",
+      "size",
+      "perpS_overlap_mean"
     };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
      */
-    class SegmentTrackTruthVarNames : public VarNames<std::pair<const CDCRecoSegment2D*, const CDCTrack*>> {
+    class SegmentTrainVarNames : public
+      VarNames<std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>> {
 
     public:
       /// Number of variables to be generated.
@@ -35,25 +50,22 @@ namespace Belle2 {
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return segmentTrackTruthNames[iName];
+        return segmentTrainNames[iName];
       }
-
-      /// Marking that the basic cluster variables should be included.
-      typedef SegmentTrackVarSet NestedVarSet;
     };
 
-    /** Class that computes floating point variables from a wire hit clusters.
+    /** Class that computes floating point variables from a pair of track and segment.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class SegmentTrackTruthVarSet : public VarSet<SegmentTrackTruthVarNames> {
+    class SegmentTrainVarSet : public VarSet<SegmentTrainVarNames> {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      SegmentTrackTruthVarSet(const std::string& prefix = "") : VarSet<SegmentTrackTruthVarNames>(prefix) { }
+      SegmentTrainVarSet(const std::string& prefix = "") : VarSet<SegmentTrainVarNames>(prefix) { }
 
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) IF_NOT_CINT(override final);
-
+      /// Generate and assign the variables from the pair
+      virtual bool extract(const std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>* testPair)
+      IF_NOT_CINT(override final);
     };
   }
 }

@@ -7,15 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrainFilter.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    typedef Filter<std::pair<std::vector<TrackFinderOutputCombining::SegmentInformation*>, const CDCTrack*>> BaseSegmentTrainFilter;
-  }
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+using namespace TrackFinderOutputCombining;
+
+CellWeight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
+{
+  CellWeight extracted = Super::operator()(testPair);
+
+  const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
+
+  // TODO
+
+  // Means: yes
+  return 1.0;
 }

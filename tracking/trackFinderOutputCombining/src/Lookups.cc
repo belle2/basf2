@@ -117,24 +117,6 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
   }
 }
 
-bool SegmentTrackCombiner::couldBeASegmentTrain(const TrainOfSegments& trainOfSegments, const CDCTrack* track)
-{
-  double lastPerpS;
-  bool alreadySet = false;
-
-  const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
-
-  for (SegmentInformation* segmentInformation : trainOfSegments) {
-    double perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
-    if (alreadySet and perpSFront < (1 - m_param_percentageForPerpSMeasurements) * lastPerpS) {
-      return false;
-    }
-    alreadySet = true;
-    lastPerpS = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
-  }
-  return true;
-}
-
 const SegmentTrackCombiner::TrainOfSegments& SegmentTrackCombiner::findBestFittingSegmentTrain(
   std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation, BaseSegmentTrackFilter& segmentTrackFilter)
 {

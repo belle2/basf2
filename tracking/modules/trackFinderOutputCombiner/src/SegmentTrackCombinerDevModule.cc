@@ -11,6 +11,8 @@
 #include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerDevModule.h>
 #include <tracking/trackFindingCDC/filters/segment_track/RecordingSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/TMVASegmentTrackChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_track/RecordingSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/TMVASegmentTrainFilter.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -39,6 +41,11 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   addParam("SegmentTrainFilter",
            m_param_segmentTrainFilter, "", string("simple"));
 
+  addParam("SegmentTrainFilterParameters",
+           m_param_segmentTrainFilterParameters,
+           "Key - Value pairs depending on the filter",
+           map<string, string>());
+
   addParam("SegmentTrackFilter",
            m_param_segmentTrackFilter, "", string("simple"));
 }
@@ -66,22 +73,25 @@ void SegmentTrackCombinerDevModule::initialize()
   std::unique_ptr<BaseSegmentTrainFilter> ptrSegmentTrainFilter(new BaseSegmentTrainFilter());;
 
   if (m_param_segmentTrainFilter == string("simple")) {
-    // TODO
-    // ptrSegmentTrainFilter.reset(new SimpleSegmentTrainFilter());
+    ptrSegmentTrainFilter.reset(new SimpleSegmentTrainFilter());
+  } else if (m_param_segmentTrainFilter == string("recording")) {
+    ptrSegmentTrainFilter.reset(new RecordingSegmentTrainFilter());
+  } else if (m_param_segmentTrainFilter == string("tmva")) {
+    ptrSegmentTrainFilter.reset(new TMVASegmentTrainFilter());
   } else {
     B2ERROR("Unrecognised SegmentTrainFilter option " << m_param_segmentTrainFilter);
   }
 
   // Takes ownership
   setSegmentTrainFilter(std::move(ptrSegmentTrainFilter));
+  getSegmentTrainFilter()->setParameters(m_param_segmentTrainFilterParameters);
 
   std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilter(new BaseSegmentTrackFilter());
   if (m_param_segmentTrackFilter == string("simple")) {
     // TODO
     // ptrSegmentTrackFilter.reset(new SimpleSegmentTrackFilter());
   } else {
-    B2ERROR("Unrecognised SegmentTrackFilter option " << m_param_segmentTrackFilter <<
-            ". Allowed values are \"none\", \"all\", \"mc\", and \"simple\".");
+    B2ERROR("Unrecognised SegmentTrackFilter option " << m_param_segmentTrackFilter);
   }
 
   // Takes ownership

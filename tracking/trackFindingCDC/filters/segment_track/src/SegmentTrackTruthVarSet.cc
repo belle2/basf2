@@ -27,7 +27,6 @@ bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCRecoSegment2D*, c
 
   const CDCRecoSegment2D* segment = testPair->first;
   const CDCTrack* track = testPair->second;
-  double track_purity;
 
   var<named("belongs_to_same_track_truth")>() = 0.0;
 

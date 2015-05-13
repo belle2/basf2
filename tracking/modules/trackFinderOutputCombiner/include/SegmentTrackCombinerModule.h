@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrainFilter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -37,7 +38,7 @@ namespace Belle2 {
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
   typedef TrackFinderOutputCombining::SegmentTrackCombinerImplModule <
   TrackFindingCDC::SimpleSegmentTrackChooser,
-                  TrackFindingCDC::BaseSegmentTrainFilter,
+                  TrackFindingCDC::SimpleSegmentTrainFilter,
                   TrackFindingCDC::BaseSegmentTrackFilter
                   > SegmentTrackCombinerModule;
 

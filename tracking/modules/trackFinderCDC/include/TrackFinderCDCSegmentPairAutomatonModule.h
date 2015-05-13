@@ -232,7 +232,6 @@ namespace Belle2 {
 
       //reduce to plain tracks
       B2DEBUG(100, "Reducing the AxialStereoPairTracks to CDCTracks");
-      tracks.clear();
       m_trackCreator.create(m_axialStereoSegmentPairPaths, tracks);
       B2DEBUG(100, "  Created " << tracks.size()  << " CDCTracks");
 

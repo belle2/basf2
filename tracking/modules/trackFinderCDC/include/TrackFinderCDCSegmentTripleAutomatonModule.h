@@ -264,7 +264,6 @@ namespace Belle2 {
 
       // Reduce to plain tracks
       B2DEBUG(100, "Reducing the SegmentTripleTracks to CDCTracks");
-      tracks.clear();
       m_trackCreator.create(m_segmentTriplePaths, tracks);
       B2DEBUG(100, "  Created " << tracks.size()  << " CDCTracks");
     }

@@ -56,31 +56,52 @@ namespace Belle2 {
      */
     virtual ~CDCRawHitWaveForm();
 
+
+    /**
+     * Setter for trigger number.
+     */
     inline void setTriggerNumber(int trgNumber)
     {
       m_triggerNumber = trgNumber;
     }
 
+
+    /**
+     * Getter for trigger number.
+     */
     inline int getTriggerNumber(void) const
     {
       return m_triggerNumber;
     }
 
+    /**
+     * Setter for Node ID.
+     */
     inline void setNode(unsigned short node)
     {
       m_node = node;
     }
 
+
+    /**
+     * Getter for Node ID.
+     */
     inline unsigned short getNode(void) const
     {
       return m_node;
     }
 
+    /**
+     * Setter for Finess ID.
+     */
     inline void setFiness(unsigned short finess)
     {
       m_finess = finess;
     }
 
+    /**
+     * Getter for Finess ID.
+     */
     inline unsigned short getFiness(void) const
     {
       return m_finess;
@@ -88,17 +109,46 @@ namespace Belle2 {
 
 
   private:
-    unsigned short m_status; /// Status of data.
-    int m_triggerNumber;              /// Event number.
-    unsigned short m_node;    /// Copper node ID.
-    unsigned short m_finess;  /// Finess Slot ID.
-    unsigned short m_board;   /// FEE boad ID.
-    unsigned short m_channel; /// Channel in a FEE (0-47).
-    unsigned short m_triggerTime; /// Trigger Timing.
-    unsigned short m_sample; /// index of FADC sampling.
-
-    unsigned short m_adc; /// FADC count.
-    unsigned short m_tdc; /// TDC count (not subtracted by trigger time).
+    /**
+     * Status of data block.
+     */
+    unsigned short m_status;
+    /**
+     * Trigger number.
+     */
+    int m_triggerNumber;
+    /**
+     * Copper node ID.
+     */
+    unsigned short m_node;
+    /**
+     * Finess Slot ID.
+     */
+    unsigned short m_finess;
+    /**
+     * FEE boad ID.
+     */
+    unsigned short m_board;
+    /**
+     * Channel in a FEE (0-47).
+     */
+    unsigned short m_channel;
+    /**
+     * Trigger Timing.
+     */
+    unsigned short m_triggerTime;
+    /**
+     * Index of FADC sampling.
+     */
+    unsigned short m_sample;
+    /**
+     * FADC count.
+     */
+    unsigned short m_adc;
+    /**
+     * TDC count (not subtracted by trigger time).
+     */
+    unsigned short m_tdc;
 
     /// To derive from TObject
     ClassDef(CDCRawHitWaveForm, 1);

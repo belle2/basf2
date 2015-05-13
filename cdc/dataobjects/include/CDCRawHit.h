@@ -119,16 +119,42 @@ namespace Belle2 {
     // To derive from TObject.
 
   private:
-    unsigned short m_status;  /// Status.
-    int m_triggerNumber;      /// Trigger number.
-    unsigned short m_node;    /// Copper node ID.
-    unsigned short m_finess;  /// Finess Slot ID.
-    unsigned short m_board;   /// FEE boad ID.
-    unsigned short m_channel; /// Channel in a FEE (0-47).
-    unsigned short m_triggerTime; /// Trigger Timing.
-
-    unsigned short m_adc; /// FADC count.
-    unsigned short m_tdc; /// TDC count (not subtracted by trigger time).
+    /**
+     * Status of data block.
+     */
+    unsigned short m_status;
+    /**
+     * Trigger number.
+     */
+    int m_triggerNumber;
+    /**
+     * Copper node ID.
+     */
+    unsigned short m_node;
+    /**
+     * Finess Slot ID.
+     */
+    unsigned short m_finess;
+    /**
+     * FEE boad ID.
+     */
+    unsigned short m_board;
+    /**
+     * Channel in a FEE (0-47).
+     */
+    unsigned short m_channel;
+    /**
+     * Trigger Timing.
+     */
+    unsigned short m_triggerTime;
+    /**
+     * FADC count.
+     */
+    unsigned short m_adc;
+    /**
+     * TDC count (not subtracted by trigger time).
+     */
+    unsigned short m_tdc;
 
     ClassDef(CDCRawHit, 1);
   };

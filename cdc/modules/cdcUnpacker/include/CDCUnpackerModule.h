@@ -158,7 +158,7 @@ namespace Belle2 {
 
       int m_event; /// Event number.
       int m_fadcThreshold;  /// FADC threshold.
-      int m_overflow; /// TDC overflow.
+      //      int m_overflow; /// TDC overflow.
       int m_tdcOffset; /// TDC offset (nsec).
 
 
@@ -194,15 +194,15 @@ namespace Belle2 {
        */
       int m_triggerNumber;
 
-      /**
-       * Number of good blocks.
-       */
-      int n_nGoodBlocks;
+      ///**
+      //       * Number of good blocks.
+      //       */
+      //            int m_nGoodBlocks;
 
-      /**
-       * Number of error blocks.
-       */
-      int m_nErrorBlocks;
+      //      /**
+      //       * Number of error blocks.
+      //       */
+      //      int m_nErrorBlocks;
 
       /**
        * Enable/Disable to store CDCRawHit.

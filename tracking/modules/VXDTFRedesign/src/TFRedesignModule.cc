@@ -588,6 +588,11 @@ TFRedesignModule::TFRedesignModule() : Module()
            "Collector operating flag: 0 = no collector, 1 = collect for analysis, 2 = collect for display",
            int(0));
 
+  addParam("useTimeSeedAsQI", m_PARAMuseTimeSeedAsQI,
+           "JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators (TFRedesignModule fills the TimeSeed with its determined QI) ",
+           false);
+
+
   if (m_PARAMwriteToRoot == true and Environment::Instance().getNumberProcesses() > 0) {
     B2WARNING("VXDTF::initialize: writeToRoot enabled and basf2 is running in multi-threaded mode - this can cause nondeterministic behavior if VXDTF was not manually set to vxdtf.set_property_flags(0) in the steering file!")
   }
@@ -4051,6 +4056,9 @@ genfit::TrackCand TFRedesignModule::generateGFTrackCand(VXDTFTrackCandidate* cur
       }
     }
   }
+
+  /// for debugging purposes only: use setTimeSeed for storing qualityIndicator (WARNING this is just a workaround, actually not a valid behavior!)
+  if (m_PARAMuseTimeSeedAsQI) { newGFTrackCand.setTimeSeed(currentTC->getTrackQuality()); }
 
   return newGFTrackCand;
 }

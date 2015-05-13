@@ -749,6 +749,8 @@ namespace Belle2 {
     std::vector<ClusterInfo> m_clustersOfEvent; /**< stores the clusterInfos of the current event */
 
     /// module_parameters:
+    bool m_PARAMuseTimeSeedAsQI; /** JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators */
+
     bool m_PARAMDebugMode; /**< some code will only be executed if this mode is enabled */
     std::vector<std::string>
     m_PARAMsectorSetup; /**< lets you chose the sectorSetup (compatibility of sensors, individual cutoffs,...) accepts 'std', 'low', 'high' and 'personal', please note that the chosen setup has to exist as a xml-file in ../tracking/data/friendList_XXX.xml. If you can not create your own xml files using e.g. the filterCalculatorModule, use params for  'tuneCutoffXXX' or 'setupWeigh' instead. multipass supported by setting setups in a row */

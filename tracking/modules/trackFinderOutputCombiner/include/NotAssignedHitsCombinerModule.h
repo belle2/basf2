@@ -16,7 +16,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <Eigen/Dense>
-#include <tracking/trackFinderOutputCombining/FittingMatrix.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/FittingMatrix.h>
 
 // Forward declarations
 namespace genfit {

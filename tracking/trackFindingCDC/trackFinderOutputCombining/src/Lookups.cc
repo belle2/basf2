@@ -1,4 +1,4 @@
-#include <tracking/trackFinderOutputCombining/Lookups.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
@@ -11,7 +11,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace TrackFinderOutputCombining;
 
 void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
 {
@@ -80,7 +79,9 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
         // There are no good reasons why we should have more than one train/segment that matches. We have to find the best one.
         B2WARNING("Number of possible trains/segments still left: " << trainsOfSegments.size() <<
                   ". As these are too much we will only us the best one and delete the rest.");
-        trackInformation->setGoodSegmentTrain(findBestFittingSegmentTrain(trainsOfSegments, trackInformation, segmentTrackFilter));
+        const TrainOfSegments* bestFittingTrain = findBestFittingSegmentTrain(trainsOfSegments, trackInformation, segmentTrackFilter);
+        if (bestFittingTrain != nullptr)
+          trackInformation->setGoodSegmentTrain(*bestFittingTrain);
       }
 
       // Reset the matching segments lists
@@ -92,7 +93,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
       B2DEBUG(100, "Looking for possible combinations..")
       const TrainOfSegments& goodTrain = trackInformation->getGoodSegmentTrain();
       if (goodTrain.size() > 0)
-        tryToCombineSegmentTrainAndMatchedTracks(goodTrain);
+        tryToCombineSegmentTrainAndMatchedTracks(goodTrain, segmentTrackFilter);
 
       trackInformation->clearGoodSegmentTrain();
     }
@@ -117,7 +118,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
   }
 }
 
-const SegmentTrackCombiner::TrainOfSegments& SegmentTrackCombiner::findBestFittingSegmentTrain(
+const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFittingSegmentTrain(
   std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation, BaseSegmentTrackFilter& segmentTrackFilter)
 {
   // We can easily delete all matches here as we have them in the list anyway
@@ -131,20 +132,23 @@ const SegmentTrackCombiner::TrainOfSegments& SegmentTrackCombiner::findBestFitti
       matchedTracks.erase(std::remove(matchedTracks.begin(), matchedTracks.end(), trackInformation), matchedTracks.end());
     }
 
-    double currentProbability = testFitSegmentTrainToTrack(trainOfSegments, trackInformation);
-    if (currentProbability > bestProbability) {
+    CellWeight currentProbability = segmentTrackFilter(std::make_pair(trainOfSegments, trackInformation->getTrackCand()));
+    if (not isNotACell(currentProbability) and currentProbability > bestProbability) {
       bestFittingTrain = &trainOfSegments;
       bestProbability = currentProbability;
     }
   }
 
-  TrainOfSegments& bestFittingSegmentTrain = *bestFittingTrain;
+  if (bestFittingTrain != nullptr) {
+    // We have to readd the matches we want to keep
+    for (SegmentInformation* segmentInformation : *bestFittingTrain) {
+      segmentInformation->addMatch(trackInformation);
+    }
 
-  // We have to readd the matches we want to keep
-  for (SegmentInformation* segmentInformation : bestFittingSegmentTrain) {
-    segmentInformation->addMatch(trackInformation);
+    return bestFittingTrain;
+  } else {
+    return nullptr;
   }
-  return bestFittingSegmentTrain;
 }
 
 void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments,
@@ -167,7 +171,7 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
                trajectory2D.calcPerpS(second->getSegment()->front().getRecoPos2D());
       });
       segmentTrainFilter.clear();
-      // Problem: The recording filter return NOT_A_CELL everytime!
+      // Problem: The recording filter return NOT_A_CELL every time!
       if (segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand())) != 0)
         innerSet.push_back(x);
     }
@@ -189,62 +193,8 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
   matchingTrack->calcPerpS();
 }
 
-double SegmentTrackCombiner::testFitSegmentTrainToTrack(const TrainOfSegments& train, const TrackInformation* trackInformation)
-{
-  if (train.size() == 0) return -1;
-
-
-  const CDCTrajectory2D& trajectory2D = trackInformation->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
-
-  CDCObservations2D observations;
-
-  CDCTrack* trackCand = trackInformation->getTrackCand();
-
-  bool isAxialSegment = train.front()->getSegment()->getStereoType() != AXIAL;
-
-  for (const CDCRecoHit3D& recoHit : trackCand->items()) {
-    if (isAxialSegment) {
-      observations.append(recoHit.getWireHit().getRefPos2D());
-    } else {
-      double s = recoHit.getPerpS();
-      double z = recoHit.getRecoZ();
-      observations.append(s, z);
-    }
-  }
-
-  for (SegmentInformation* segmentInformation : train) {
-    for (const CDCRecoHit2D& recoHit : segmentInformation->getSegment()->items()) {
-      if (isAxialSegment) {
-        observations.append(recoHit.getRecoPos2D());
-      } else {
-        CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
-        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
-        double s = recoHit3D.getPerpS();
-        double z = recoHit3D.getRecoZ();
-        observations.append(s, z);
-      }
-    }
-  }
-
-  if (isAxialSegment) {
-    const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-    CDCTrajectory2D fittedTrajectory = fitter.fit(observations);
-    return TMath::Prob(fittedTrajectory.getChi2(), fittedTrajectory.getNDF());
-  } else {
-    const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-    CDCTrajectorySZ fittedTrajectory = fitter.fit(observations);
-    return TMath::Prob(fittedTrajectory.getChi2(), fittedTrajectory.getNDF());
-  }
-}
-
-double SegmentTrackCombiner::testFitSegmentToTrack(SegmentInformation* segmentInformation,
-                                                   const TrackInformation* trackInformation)
-{
-  TrainOfSegments temporaryTrain {segmentInformation};
-  return testFitSegmentTrainToTrack(temporaryTrain, trackInformation);
-}
-
-void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments)
+void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments,
+    TrackFindingCDC::BaseSegmentTrackFilter& segmentTrackFilter)
 {
   B2DEBUG(100, "Trying to combine " << trainOfSegments.size() << " segment(s) with their track(s)...")
   for (SegmentInformation* segmentInformation : trainOfSegments) {
@@ -287,9 +237,10 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       B2DEBUG(100, matchingTracks.size() << " are too many possible partners! We choose the best one:")
 
       for (TrackInformation* trackInformation : matchingTracks) {
-        double fitProbability = testFitSegmentToTrack(segmentInformation, trackInformation);
+        std::vector<SegmentInformation*> temporaryTrain = {segmentInformation};
+        CellWeight fitProbability = segmentTrackFilter(std::make_pair(temporaryTrain, trackInformation->getTrackCand()));
 
-        if (fitProbability > bestFitProb) {
+        if (not isNotACell(fitProbability) and fitProbability > bestFitProb) {
           bestFitProb = fitProbability;
           bestMatch = trackInformation;
         }
@@ -309,9 +260,10 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       TrackInformation* bestMatch = nullptr;
 
       for (TrackInformation* trackInformation : matchesAboveTrack) {
-        double fitProbability = testFitSegmentToTrack(segmentInformation, trackInformation);
+        std::vector<SegmentInformation*> temporaryTrain = {segmentInformation};
+        CellWeight fitProbability = segmentTrackFilter(std::make_pair(temporaryTrain, trackInformation->getTrackCand()));
 
-        if (fitProbability > bestFitProb) {
+        if (not isNotACell(fitProbability) and fitProbability > bestFitProb) {
           bestFitProb = fitProbability;
           bestMatch = trackInformation;
         }

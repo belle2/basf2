@@ -5,6 +5,5 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace TrackFinderOutputCombining;
 
 REG_MODULE(SegmentTrackCombiner);

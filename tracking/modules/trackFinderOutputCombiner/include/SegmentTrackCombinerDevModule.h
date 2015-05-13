@@ -15,7 +15,7 @@ namespace Belle2 {
 
   /// Module for the combination of tracks and segments. Development edition.
   class SegmentTrackCombinerDevModule:
-    public Belle2::TrackFinderOutputCombining::SegmentTrackCombinerImplModule<> {
+    public Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule<> {
 
   public:
     /// Constructor of the module. Setting up parameters and description.

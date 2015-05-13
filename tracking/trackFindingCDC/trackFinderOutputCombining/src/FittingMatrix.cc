@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFinderOutputCombining/FittingMatrix.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/FittingMatrix.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/gearbox/Const.h>

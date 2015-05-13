@@ -11,12 +11,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
-#include <tracking/trackFinderOutputCombining/Lookups.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrainFilter.h>
+
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -24,9 +27,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
     class CDCTrack;
-  }
-
-  namespace TrackFinderOutputCombining {
 
     /// Forward declaration of the module implementing the segment track combiner based on various filters
     template < class SegmentTrackChooser = TrackFindingCDC::BaseSegmentTrackChooser,
@@ -36,13 +36,13 @@ namespace Belle2 {
   }
 
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
-  typedef TrackFinderOutputCombining::SegmentTrackCombinerImplModule <
+  typedef TrackFindingCDC::SegmentTrackCombinerImplModule <
   TrackFindingCDC::SimpleSegmentTrackChooser,
                   TrackFindingCDC::SimpleSegmentTrainFilter,
-                  TrackFindingCDC::BaseSegmentTrackFilter
+                  TrackFindingCDC::SimpleSegmentTrackFilter
                   > SegmentTrackCombinerModule;
 
-  namespace TrackFinderOutputCombining {
+  namespace TrackFindingCDC {
     template < class SegmentTrackChooser,
                class SegmentTrainFilter,
                class SegmentTrackFilter>
@@ -139,7 +139,7 @@ namespace Belle2 {
 
     private:
       /// Object that handles the combination
-      TrackFinderOutputCombining::SegmentTrackCombiner m_combiner;
+      SegmentTrackCombiner m_combiner;
 
       /// Reference to the chooser to be used for matching segments and tracks
       std::unique_ptr<SegmentTrackChooser> m_ptrSegmentTrackChooser;
@@ -165,14 +165,27 @@ namespace Belle2 {
         return segment.getAutomatonCell().hasTakenFlag();
       }), segments.end());
 
-      B2WARNING("After all there are " << segments.size() << " Segments left in this event.")
+      B2ERROR("After all there are " << segments.size() << " Segments left in this event.")
 
-      // Reset the taken flag for the hits of all the unused segments
+      /*// Reset the taken flag for the hits of all the unused segments
       for (const TrackFindingCDC::CDCRecoSegment2D& segment : segments) {
         for (const TrackFindingCDC::CDCRecoHit2D& recoHit : segment) {
-          recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
+          tracks.emplace_back();
+          TrackFindingCDC::CDCTrack & newCDCTrack = tracks.back();
+
+          const TrackFindingCDC::CDCRiemannFitter& fitter = TrackFindingCDC::CDCRiemannFitter::getFitter();
+          TrackFindingCDC::CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
+          fitter.update(trajectory2D, segment);
+
+          TrackFindingCDC::CDCTrajectory3D trajectory3D(trajectory2D, TrackFindingCDC::CDCTrajectorySZ::basicAssumption());
+          newCDCTrack.setStartTrajectory3D(trajectory3D);
+
+          for(const TrackFindingCDC::CDCRecoHit2D & recoHit2D : segment) {
+            TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(recoHit2D->getRLWireHit(), trajectory2D);
+            newCDCTrack.push_back(recoHit3D);
+          }
         }
-      }
+      }*/
 
       m_combiner.clear();
     }

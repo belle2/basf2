@@ -9,10 +9,16 @@
  **************************************************************************/
 
 #include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerDevModule.h>
+
 #include <tracking/trackFindingCDC/filters/segment_track/RecordingSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/TMVASegmentTrackChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrackChooser.h>
+
 #include <tracking/trackFindingCDC/filters/segment_track/RecordingSegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_track/TMVASegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrainFilter.h>
+
+#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrackFilter.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -55,8 +61,12 @@ void SegmentTrackCombinerDevModule::initialize()
   // Set the filters before they get initialized in the base module.
   std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooser(new BaseSegmentTrackChooser());
 
-  if (m_param_segmentTrackChooser == string("simple")) {
+  if (m_param_segmentTrackChooser == string("none")) {
+    ptrSegmentTrackChooser.reset(new BaseSegmentTrackChooser());
+  } else if (m_param_segmentTrackChooser == string("simple")) {
     ptrSegmentTrackChooser.reset(new SimpleSegmentTrackChooser());
+  } else if (m_param_segmentTrackChooser == string("mc")) {
+    ptrSegmentTrackChooser.reset(new MCSegmentTrackChooser());
   } else if (m_param_segmentTrackChooser == string("recording")) {
     ptrSegmentTrackChooser.reset(new RecordingSegmentTrackChooser());
   } else if (m_param_segmentTrackChooser == string("tmva")) {
@@ -72,8 +82,12 @@ void SegmentTrackCombinerDevModule::initialize()
   // Set the filters before they get initialized in the base module.
   std::unique_ptr<BaseSegmentTrainFilter> ptrSegmentTrainFilter(new BaseSegmentTrainFilter());;
 
-  if (m_param_segmentTrainFilter == string("simple")) {
+  if (m_param_segmentTrainFilter == string("none")) {
+    ptrSegmentTrainFilter.reset(new BaseSegmentTrainFilter());
+  } else if (m_param_segmentTrainFilter == string("simple")) {
     ptrSegmentTrainFilter.reset(new SimpleSegmentTrainFilter());
+  } else if (m_param_segmentTrainFilter == string("mc")) {
+    ptrSegmentTrainFilter.reset(new MCSegmentTrainFilter());
   } else if (m_param_segmentTrainFilter == string("recording")) {
     ptrSegmentTrainFilter.reset(new RecordingSegmentTrainFilter());
   } else if (m_param_segmentTrainFilter == string("tmva")) {
@@ -87,9 +101,12 @@ void SegmentTrackCombinerDevModule::initialize()
   getSegmentTrainFilter()->setParameters(m_param_segmentTrainFilterParameters);
 
   std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilter(new BaseSegmentTrackFilter());
-  if (m_param_segmentTrackFilter == string("simple")) {
-    // TODO
-    // ptrSegmentTrackFilter.reset(new SimpleSegmentTrackFilter());
+  if (m_param_segmentTrackFilter == string("none")) {
+    ptrSegmentTrackFilter.reset(new BaseSegmentTrackFilter());
+  } else if (m_param_segmentTrackFilter == string("simple")) {
+    ptrSegmentTrackFilter.reset(new SimpleSegmentTrackFilter());
+  } else if (m_param_segmentTrackFilter == string("mc")) {
+    ptrSegmentTrackFilter.reset(new MCSegmentTrackFilter());
   } else {
     B2ERROR("Unrecognised SegmentTrackFilter option " << m_param_segmentTrackFilter);
   }

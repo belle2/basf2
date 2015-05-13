@@ -18,9 +18,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
     class CDCTrack;
-  }
-
-  namespace TrackFinderOutputCombining {
     class SegmentInformation;
     class TrackInformation;
 

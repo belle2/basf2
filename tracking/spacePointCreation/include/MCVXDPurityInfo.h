@@ -67,6 +67,14 @@ namespace Belle2 {
       m_nTotalClusters( { {nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal} }),
     m_nFoundClusters({ {nPXDClusters, nSVDUClusters, nSVDVClusters} }) {}
 
+    /**
+     * constructor
+     * @param iD: particle Id
+     * @param nClustersTotal: the total number of Clusters in the container as array ([0] is PXDClusters, [1]/[2] are SVD U-/V- Clusters)
+     * @param nMCClusters: the number of Clusters in the container connectoed to iD as array
+     */
+    MCVXDPurityInfo(int iD, std::array<unsigned int, 3> nClustersTotal, std::array<unsigned int, 3> nMCClusters) :
+      m_iD(iD), m_nTotalClusters(nClustersTotal), m_nFoundClusters(nMCClusters) { }
 
     /** operator for sorting.
       *

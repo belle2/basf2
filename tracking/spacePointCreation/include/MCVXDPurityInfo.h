@@ -161,5 +161,16 @@ namespace Belle2 {
 
     /** getter - returns number of v-type SVDClustes found to this iD */
     unsigned int getNSVDVClusters() const { return m_nFoundClusters[2]; }
+
+    /** dump the contents to a string (for easier debugging) */
+    std::string dumpToString() const
+    {
+      std::stringstream s;
+      s << "iD: " << m_iD << "\n";
+      for (size_t i = 0; i < m_nTotalClusters.size(); ++i) {
+        s << "totalClusters[" << i << "]: " << m_nTotalClusters[i] << ", foundClusters[" << i << "]: " << m_nFoundClusters[i] << "\n";
+      }
+      return s.str();
+    }
   };
 }

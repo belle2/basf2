@@ -39,8 +39,6 @@ namespace Belle2 {
     /** empty constructor */
     MCVXDPurityInfo() :
       m_iD(-1),
-      //         m_nTotalClusters( std::array<unsigned int, 3> (nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal) ),
-      //         m_nFoundClusters( std::array<unsigned int, 3> (nPXDClusters, nSVDUClusters, nSVDVClusters) ) {}
       m_nTotalClusters( { {0, 0, 0} }),
     m_nFoundClusters({ {0, 0, 0} }) {}
 
@@ -62,8 +60,6 @@ namespace Belle2 {
                     unsigned int nSVDUClusters,
                     unsigned int nSVDVClusters) :
       m_iD(iD),
-//        m_nTotalClusters( std::array<unsigned int, 3> (nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal) ),
-//        m_nFoundClusters( std::array<unsigned int, 3> (nPXDClusters, nSVDUClusters, nSVDVClusters) ) {}
       m_nTotalClusters( { {nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal} }),
     m_nFoundClusters({ {nPXDClusters, nSVDUClusters, nSVDVClusters} }) {}
 
@@ -135,8 +131,12 @@ namespace Belle2 {
     }
 
 
-    /** getter - returns the ID of the particle */
-    unsigned int getParticleID() const { return m_iD; }
+    /** getter - returns the ID of the particle, if value is -1 no particle has been able to be found for it */
+    int getParticleID() const { return m_iD; }
+
+
+    /** returns total number of clusters the trackCandidate had */
+    unsigned int getNClustersTotal() const { return std::accumulate(m_nTotalClusters.begin(), m_nTotalClusters.end(), 0); }
 
 
     /** getter - returns total number of PXDClusters in the TrackCandidate */
@@ -149,6 +149,10 @@ namespace Belle2 {
 
     /** getter - returns total number of v-type SVDClustes in the TrackCandidate */
     unsigned int getNSVDVClustersTotal() const { return m_nTotalClusters[2]; }
+
+
+    /** returns number of clusters the trackCandidate had assigned to h_iD */
+    unsigned int getNClustersFound() const { return std::accumulate(m_nFoundClusters.begin(), m_nFoundClusters.end(), 0); }
 
 
     /** getter - returns number of PXDClusters found to this iD */

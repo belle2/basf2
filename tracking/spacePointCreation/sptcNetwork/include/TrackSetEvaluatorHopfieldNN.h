@@ -22,6 +22,7 @@
 
 #include <TRandom.h>
 
+#include <array>
 #include <vector>
 #include <limits>
 #include <list>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#######################################################                                                                                     #
+# ######################################################
 # This tutorial demonstrates how to perform detector simulation
 # and reconstruction (track finding+track fitting+ecl reconstruction+...)
 # on a previously generated events with beam background mixing.
@@ -13,10 +13,10 @@
 # The processed events are saved to the output ROOT file that
 # now contain in addition to the generated particles
 # (MCParticle objects stored in the StoreArray<MCParticle>) also
-# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).                                                                              #
+# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).
 # Contributors: A. Zupanc (June 2014)
 #
-######################################################
+# #####################################################
 
 from basf2 import *
 from modularAnalysis import inputMdst
@@ -29,21 +29,15 @@ from reconstruction import add_mdst_output
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. Please run B2A101-Y4SEventGeneration.py tutorial script first.'
-             )
+    sys.exit(
+        'Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist.'
+        'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 
 bkgdir = '/sw/belle2/bkg/'
-bkgFiles = [
-    bkgdir + 'Coulomb_HER_100us.root',
-    bkgdir + 'Coulomb_LER_100us.root',
-    bkgdir + 'RBB_HER_100us.root',
-    bkgdir + 'RBB_LER_100us.root',
-    bkgdir + 'Touschek_HER_100us.root',
-    bkgdir + 'Touschek_LER_100us.root',
-    ]
+bkgFiles = [bkgdir + '*.root']
 
 # simulation
 add_simulation(analysis_main, None, bkgFiles)

@@ -47,20 +47,23 @@
 
 class EvtParticle;
 
+//! Register Decay model EvtYmSToYnSpipiCLEOboost
 class EvtYmSToYnSpipiCLEOboost: public  EvtDecayAmp  {
   //EvtDecayProb  {
 
 public:
-
+  /* Constructor. */
   EvtYmSToYnSpipiCLEOboost() {}
+
+  /* Destructor. */
   virtual ~EvtYmSToYnSpipiCLEOboost();
 
-  std::string getName();
-  EvtDecayBase* clone();
+  std::string getName(); /**< Get function Name  */
+  EvtDecayBase* clone();  /**< Clone the decay  */
 
-  void decay(EvtParticle* p);
-  void init();
-  void initProbMax();
+  void decay(EvtParticle* p); /**< Member of particle in EvtGen */
+  void init();  /**< Initialize standard stream objects  */
+  void initProbMax();  /**< Initialize standard stream objects for probability function  */
 
 };
 

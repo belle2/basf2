@@ -48,6 +48,9 @@ namespace Belle2 {
     /** Method is called for each event. */
     virtual void event();
 
+    /** Method is called at the end of the event processing. */
+    virtual void terminate();
+
   protected:
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */

@@ -83,11 +83,19 @@ namespace Belle2 {
      */
     ~KKGenInterface() {}
 
-    int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
+    int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName,
+              const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
 
-    void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER, double Espread_HER); /**< Setup for beam inforamtion to KKMC */
+    void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER,
+                       double Espread_HER); /**< Setup for beam inforamtion to KKMC */
 
     int simulateEvent(MCParticleGraph& graph); /**< MC simulation function */
+
+    /**
+    * Terminates the generator.
+    */
+    void term();
+
 
   private:
     int addParticles2Graph(MCParticleGraph& graph);  /**< Function to add particle decays */

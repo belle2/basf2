@@ -317,3 +317,9 @@ int KKGenInterface::getPythiaSpinType(int kf)
   return ret;
 }
 
+void KKGenInterface::term()
+{
+  double xsec = 0.;
+  double xsecerr = 0.;
+  kk_term_(&xsec, &xsecerr);
+}

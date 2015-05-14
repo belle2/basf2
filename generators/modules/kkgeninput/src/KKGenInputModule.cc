@@ -217,3 +217,7 @@ void KKGenInputModule::event()
   B2INFO("Simulated event " << eventMetaDataPtr->getEvent() << " with " << nPart << " particles.");
 }
 
+void KKGenInputModule::terminate()
+{
+  m_Ikkgen.term();
+}

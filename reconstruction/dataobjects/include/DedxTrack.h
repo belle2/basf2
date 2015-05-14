@@ -151,8 +151,10 @@ namespace Belle2 {
     /** Return the error on the truncated mean value of dE/dx for CDC */
     double getError() const { return m_dedx_avg_truncated_err[2]; }
 
-    /** Return the number of good CDC hits on this Track */
+    /** Return the number of good hits on this Track */
     int size() const { return m_cdc + m_vxd; }
+    /** Return the number of good CDC hits on this Track */
+    int CDCsize() const { return m_cdc; }
     /** Return cos(theta) for this Track */
     double getCosTheta() const { return m_cosTheta; }
 

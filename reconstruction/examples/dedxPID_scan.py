@@ -43,8 +43,8 @@ dedx = register_module('DedxScan')
 main.add_module(dedx)
 
 output = register_module('RootOutput')
-output.param('outputFileName', 'dedxCellPID_scan.root')
-# output.param('branchNames','DedxCells')
+output.param('outputFileName', 'dedxPID_scan.root')
+# output.param('branchNames','DedxTracks')
 main.add_module(output)
 process(main)
 print statistics

@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
       for (int detector = 0; detector < Dedx::c_num_detectors; detector++) {
         std::cout << "i " << i << ", d" << detector << "\n";
-        const char* flayer_var = "DedxTracks.dedx_flayer";
+        const char* flayer_var = "DedxTracks.dedxLayer";
         TString flayer_selection;
         double dedx_cutoff = 0;
         switch (Dedx::Detector(detector)) {
@@ -119,9 +119,15 @@ int main(int argc, char* argv[])
                                    num_p_bins, pbins,
                                    num_dedx_bins, 0, dedx_cutoff);
         hists[detector]->Sumw2(); //save weights (important for fitting)
-        tree->Project(histname.Data(),
-                      TString::Format("%s:DedxTracks.m_p", varname),
-                      TString::Format("%s < %g && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+        if (use_truncated_mean)
+          tree->Project(histname.Data(),
+                        TString::Format("%s[][%i]:DedxTracks.m_p_cdc", varname, detector),
+                        TString::Format("%s < %g && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+        else
+          tree->Project(histname.Data(),
+                        TString::Format("%s:DedxTracks.m_p_cdc", varname),
+                        TString::Format("%s < %g && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+
         //TString::Format("%s < %g && abs(log(DedxTracks.m_chi2)) < 5 && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
 
       } //detector type

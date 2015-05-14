@@ -102,6 +102,9 @@ namespace Belle2 {
     addParam("modelYieldsInitialFractions", m_modelYieldsInitialFractions,
              "If set, the initial value of yield i will be set to initialFraction[i]*numberOfEvents. If there are fewer initial fractions than yields, the values of the other yields will not be touched",
              std::vector<double>());
+
+    // all other members
+    m_numberOfClasses = 0;
   }
 
   TMVASPlotTeacherModule::~TMVASPlotTeacherModule()

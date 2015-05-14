@@ -34,20 +34,81 @@
 namespace Belle2 {
 
   /**
-   * Module that tries to register a relation between SpacePoints and TrueHits, hence making some MC Information easily accesible for other modules working with SpacePoints (e.g. CurlingTrackCandSplitter or GFTC2SPTCConverter).
+   * helper struct that holds information that is needed for the registration of the relation between SpacePoint and TrueHit
+   */
+  struct TrueHitInfo {
+
+    int m_Id; /**< TrueHit ID (StoreArray Index) */
+    double m_wU; /**< weight of relation between U-Cluster and TrueHit */
+    double m_wV; /**< weight of relation between V-Cluster and TrueHit */
+    bool m_U; /**< if true, U-Cluster is used by SpacePoint */
+    bool m_V; /**< if true, V-Cluster is used by SpacePoint */
+
+    /** default ctor, initializing Id to -1, weights to 0, and bools to false */
+    TrueHitInfo() : m_Id(-1), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
+
+    /** ctor using Id-only */
+    TrueHitInfo(int Id) : m_Id(Id), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
+
+    // /** ctor with full information */
+    // TrueHitInfo(int Id, double wU, double wV, bool U, bool V) :
+    //   m_Id(Id), m_wU(wU), m_wV(wV), m_U(U), m_V(V) { }
+
+    // /** ctor for single Cluster SpacePoints (SVD) or PXD SpacePoints. The information which Cluster is set can be
+    //  * retrieved from the SpacePoint directlly for SVD in this case!
+    //  */
+    // TrueHitInfo(int Id, double weight) : m_Id(Id), m_wU(weight), m_wV(0.), m_U(true), m_V(false) { }
+
+    /**
+     * comparison operator ensuring strict weak ordering
+     * sorts by the number of Clusters first, and then by the sum of the weights to this Cluster
+     * CAUTION: actually sorts in descending order!!! (so is rather an operator> than the other way round!)
+     */
+    bool operator<(const TrueHitInfo& b) const
+    {
+      return (std::tuple<int, double>(b.m_U + b.m_V, b.m_wU + b.m_wV) < std::tuple<int, double>(m_U + m_V, m_wU + m_wV));
+    }
+
+    /** get the number of Clusters that point to this TrueHit */
+    short getNClusters() const { return m_U + m_V; }
+
+    /** set the weight for the U-Cluster */
+    void setUWeight(double weight) { m_wU = weight; m_U = true; }
+
+    /** set the weight for the V-Cluster */
+    void setVWeight(double weight) { m_wV = weight; m_V = true; }
+
+    double getWeightSum() const { return m_wU + m_wV; }
+  }; // end of struct TrueHitInfo
+
+  /** extraction operator of TrueHitInfo */
+  std::ostream& operator<<(std::ostream& os, const TrueHitInfo& thInfo)
+  {
+    os << "Id " << thInfo.m_Id << ": wU = " << thInfo.m_wU << ", setU = " << thInfo.m_U << ". wV = " <<
+       thInfo.m_wV << ", setV = " << thInfo.m_V;
+    return os;
+  }
+
+  /**
+   * Module that tries to register a relation between SpacePoints and TrueHits, hence making some MC Information easily accesible
+   * for other modules working with SpacePoints (e.g. SPTCReferee or GFTC2SPTCConverter).
    *
    * As there is no direct relation between SpacePoints and TrueHits, the relations between SpacePoints and Clusters and the relations between Clusters and TrueHits are used to relate SpacePoints and TrueHits. In a first step all (unique) TrueHits that are related to all Clusters of a SpacePoint are collected (including the weight of the relation). It is then possible that there is more than one TrueHit after this.
    * + If 'storeSeperate' is set to true a new StoreArray of SpacePoints is created for every input StoreArray of SpacePoints with the same name and the 'outputSuffix' appended to it. This can be useful to have a StoreArray of SpacePoints where only 'checked' SpacePoints are (e.g. without ghost hits) that can then be used to feed the GFTC2SPTCConverter for example. If it is set to false, the relations will get registered in the existing StoreArray.
-   * + If 'registerAll' is set to true, the module simply registers a relation to all of these TrueHits. The weight of this new built relation is the number of the Clusters (of the SpacePoint) that are related to this TrueHit (max. 2). In this way the decision which TrueHit to use is left to the user. NOTE: The exact weight of the relations between Clusters and TrueHits is not stored, however the relations are registered in an order that the TrueHit with the heighest sum of weights is the first entry in the RelationVector (i.e. it should be th the one that is returned by SpacePoint::getRelatedTo<TrueHit>()).
+   * + If 'registerAll' is set to true, the module simply registers a relation to all of these TrueHits. The weight of this new
+   * built relation encodes the information which Clusters of the SpacePoint where related to this TrueHit.
+   * ++ for PXD it is always 1, since these SpacePoints have only one underlying Cluster
+   * ++ for SVD it is 2 if it is a double Cluster SpacePoint and both Clusters have a relation to the TrueHit. It is 11 if only the U-Cluster has a relation to the TrueHit and it is 21 if only the V-Cluster has a relation to the TrueHit. This is also valid for single Cluster SpacePoints
+   * In this way the decision which TrueHit to use is left to the user. NOTE: The exact weight of the relations between Clusters and TrueHits is not stored, however the relations are registered in an order that the TrueHit with the heighest sum of weights is the first entry in the RelationVector (i.e. it should be th the one that is returned by SpacePoint::getRelatedTo<TrueHit>()).
    * + If 'registerAll' is set to false, the module tries to find a relation to only one TrueHit:
-   *  1) If there is only one TrueHit -> check if all Clusters of the SpacePoint are related to this TrueHit -> if true -> register relation with weight being the number of Clusters of the SpacePoint (i.e. the number of Clusters of the SpacePoint that are related to this TrueHit) <BR>
-   *  2) If there is more than one TrueHit but only one TrueHit has a relation to both Clusters of a SpacePoint -> register relation to this TrueHit (again the weight of the relation is the number of the Clusters of the SpacePoint that are related to this TrueHit) <BR>
-   *  3) If there is more than one TrueHit with a relation to all Clusters of a SpacePoint -> register relation to the TrueHit with the largest sum of weights (of relation between Clusters and TrueHits). Again the weight of the newly registered relation is the number of Clusters related to the TrueHit<BR>
-   *  4) If the SpacePoint has only one Cluster (e.g. PXD) and there is more than one TrueHit -> register relation to the TrueHit with the largest weight (of relation between Cluster and TrueHit). The weight of the newly registered relation is 1 in this case (as there is only one Cluster of such a SpacePoint related to the TrueHit)<BR>
+   *  1) If there is only one TrueHit -> check if all Clusters of the SpacePoint are related to this TrueHit -> if true -> register relation with weight holding the same information as explained above. <BR>
+   *  2) If there is more than one TrueHit but only one TrueHit has a relation to both Clusters of a SpacePoint -> register relation to this TrueHit (again the weight of the relation codes the information which clusters of the SpacePoint are related to the TrueHit) <BR>
+   *  3) If there is more than one TrueHit with a relation to all Clusters of a SpacePoint -> register relation to the TrueHit with the largest sum of weights (of relation between Clusters and TrueHits). Again the weight of the newly registered relation codes the above stated information<BR>
+   *  4) If the SpacePoint has only one Cluster (e.g. PXD) and there is more than one TrueHit -> register relation to the TrueHit with the largest weight (of relation between Cluster and TrueHit). The weight of the newly registered relation is 1,11 or 21 (depending on what Cluster is underlying the SpacePoint) in this case (as there is only one Cluster of such a SpacePoint related to the TrueHit)<BR>
    *
    * NOTE: It is not guaranteed that every SpacePoint gets related to a TrueHit if 'registerAll' is set to false! E.g. 'ghost hits' should be sorted out.
    * NOTE: Choosing the TrueHit with the biggest weight (or sum of weights) if there is more than one possible TrueHit does not guarantee that the 'right' TrueHit is chosen! It is possible that in such cases no relation will get registered in the future if this proves to be a source of errors!
-   * NOTE: in a previous version the weight of the registered relations was the sum of the weights. Now it is the number of the Clusters (of a SpacePoint) that are related to a TrueHit. The Information on the absolute values of the weights is lost, however the relative values are preserved and if there are more than one related TrueHits to a SpacePoint (only possible if 'registerAll' is set to true) the entries of the RelationVector of TrueHits is ordered from highest to lowest sum of weights.
+   * NOTE: in a previous version the weight of the registered relations was the sum of the weights. Now it encodes information on the relation between the SpacePoint and the Clusters as well. The Information on the absolute values of the weights (between Cluster and TrueHit)is lost, however the relative values are preserved and if there are more than one related TrueHits to a SpacePoint (only possible if 'registerAll' is set to true) the entries of the RelationVector of TrueHits are ordered from highest to lowest sum of weights.
    * NOTE: This module should be used to connect SpacePoints and TrueHits if MC information is needed afterwards (e.g. in the SPTCRefereeModule for SpacePointTrackCands) to avoid having to look up the relations to obtain these informations seperately in every Module. Furthermore some modules are no longer able to determine the related TrueHits themselves (e.g. GFTC2SPTCConverter)
    */
   class SpacePoint2TrueHitConnectorModule : public Module {
@@ -62,8 +123,8 @@ namespace Belle2 {
 
     virtual void terminate(); /**< terminate: print some summary information */
 
-    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster,
-                            "Found no related TrueHit for a Cluster!"); /**< Exception for when no related TrueHit can be found for a Cluster */
+    /** Exception for when no related TrueHit can be found for any Cluster of a SpacePoint */
+    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster, "Found no related TrueHit for any Cluster of the SpacePoint!");
 
     BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint,
                             "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
@@ -104,7 +165,7 @@ namespace Belle2 {
 
   protected:
 
-    typedef std::unordered_multimap<int, double> baseMapT; /**< typedef to have the same type of map throughout the module */
+    typedef std::unordered_map<int, TrueHitInfo> baseMapT; /**< typedef for shorter notation throughout the module */
 
     /**
      * enum to distinguish the detectortypes
@@ -123,7 +184,8 @@ namespace Belle2 {
       c_primaryParticle = 16, //< bit 4: Particle related to TrueHit is primary
       c_bgParticle = 32, //< bit 5: particle related to TrueHit is background
       c_nonUniqueRelation = 64, //< bit 6: more than one TrueHit related to SpacePoint
-      c_registeredRelation = 128, //<bit 7: this relation got registered
+      c_registeredRelation = 128, //< bit 7: this relation got registered
+      c_noiseCluster = 256, //< bit 8: one of the Clusters has no relation to a TrueHit (i.e. is noise) -> only for twoCluster SPs!
     }; // end e_relationStatus
 
     // ================================================== PARAMETERS ==============================================================
@@ -133,16 +195,18 @@ namespace Belle2 {
 
     std::vector<std::string> m_PARAMspacePointNames; /**< names of containers of SpacePoints */
 
-    std::vector<std::string>
-    m_PARAMdetectorTypes; /**< detector type names as strings to determine which name belongs to which detector type */
+    /** detector type names as strings to determine which name belongs to which detector type */
+    std::vector<std::string> m_PARAMdetectorTypes;
 
     std::vector<std::string> m_PARAMclusterNames; /**< names of containers of Clusters */
 
     std::vector<std::string> m_PARAMrootFileName; /**< name and update status of root file */
 
-    bool m_PARAMstoreSeparate; /**< switch for storing the SpacePoints that can be related to a TrueHit into separate StoreArrays, where only such SpacePoints are stored */
+    /** switch for storing the SpacePoints that can be related to a TrueHit into separate StoreArrays, where only such SpacePoints are stored */
+    bool m_PARAMstoreSeparate;
 
-    bool m_PARAMregisterAll; /**< switch for registereing all relations for all TrueHits for all SpacePoints (there can be more than 1 related TrueHit to each SpacePoint). The module can be used to get all TrueHits for a SpacePoint and then the user can decide what to do with it. */
+    /** switch for registereing all relations for all TrueHits for all SpacePoints (there can be more than 1 related TrueHit to each SpacePoint). The module can be used to get all TrueHits for a SpacePoint and then the user can decide what to do with it. */
+    bool m_PARAMregisterAll;
 
     bool m_PARAMpositionAnalysis; /**< switch for doing the analysis of positions of SpacePoints and TrueHits */
 
@@ -159,9 +223,8 @@ namespace Belle2 {
     double m_PARAMminWeight; /**< define a minimal weight a relation between Cluster and TrueHit. Below this limit the relation will not be registered */
 
     // ================================================= INTERMALLY USED MEMBERS ==================================================
-
-    unsigned int
-    m_nContainers; /**< number of passed containers -> storing the size of an input vector for not having to obtain it every time */
+    /** number of passed containers -> storing the size of an input vector for not having to obtain it every time */
+    unsigned int m_nContainers;
 
     std::vector<e_detTypes> m_detectorTypes; /**< storing the detector types for each container in vector, needed in initialize */
 
@@ -173,8 +236,8 @@ namespace Belle2 {
 
     Belle2::StoreArray<Belle2::SVDCluster> m_SVDClusters; /**< PXDClusters StoreArray used throughout the module */
 
-    std::vector<std::pair<Belle2::StoreArray<Belle2::SpacePoint>, e_detTypes> >
-    m_inputSpacePoints; /**< StoreArray of all input SpacePoints */
+    /** StoreArray of all input SpacePoints */
+    std::vector<std::pair<Belle2::StoreArray<Belle2::SpacePoint>, e_detTypes> > m_inputSpacePoints;
 
     std::vector<Belle2::StoreArray<Belle2::SpacePoint> > m_outputSpacePoints; /**< StoreArray of all output SpacePoints */
 
@@ -192,8 +255,8 @@ namespace Belle2 {
     // ================================================= COUNTERS =================================================================
     std::vector<unsigned int> m_SpacePointsCtr; /**< Number of SpacePoints presented to the module */
 
-    std::vector<std::array<unsigned int, 5> >
-    m_nRelTrueHitsCtr; /**< counting different numbers of related TrueHits (to a SpacePoint) with one variable */
+    /** counting different numbers of related TrueHits (to a SpacePoint) with one variable */
+    std::vector<std::array<unsigned int, 5> > m_nRelTrueHitsCtr;
 
     /** Number of SpacePoints without relation to a Cluster (i.e. counts how many times the NoClusterTrueHit exception gets thrown) */
     std::vector<unsigned int> m_noClusterCtr;
@@ -241,10 +304,10 @@ namespace Belle2 {
 
     /**
      * get the TrueHit from information that is stored in the map (conditions are checked in the following order):
-     * + if there is only one TrueHit in the map, return a pointer to it and as weight the sum of the weights of the relations between the Clusters and the TrueHits
-     * + if there is only one TrueHit in the map with two weights associated (and all other TrueHits have only one weight or there is no other TrueHit), return a pointer to it and the weight is again the sum of the weights in the map
-     * + if there are more than one TrueHits with two weights associated, return the one with the biggest sum of weights
-     * + if there are only TrueHits with one weight associated, return the one with the biggest weight ONLY if the SpacePoint is related to only one Cluster (e.g. PXD)
+     * + if there is only one TrueHit in the map, return a pointer to it and as weight the information which Clusters of the SpacePoint are related to this TrueHit (1 -> PXD, 2 -> both Clusters, 11 -> only U-, 21 -> only V-Cluster)
+     * + if there is only one TrueHit in the map with two weights associated (and all other TrueHits have only one weight or there is no other TrueHit), return a pointer to it and the weight is 2
+     * + if there are more than one TrueHits with two weights associated, return the one with the biggest sum of weights (.second = 2)
+     * + if there are only TrueHits with one weight associated, return the one with the biggest weight ONLY if the SpacePoint is related to only one Cluster (e.g. PXD). .second is either 1 (PXD), 11 or 21 (U-/V-cluster SP)
      * NOTE: as this method is rather specific, it is not very much templated!
      * NOTE: the possible return of a NULL pointer has to be handled!
      */
@@ -259,8 +322,8 @@ namespace Belle2 {
     template <typename TrueHitType>
     bool compatibleCombination(Belle2::SpacePoint* spacePoint, TrueHitType* trueHit);
 
-    /** get all the related TrueHits to the SpacePoint, including their weights in a map (multimap!) where the StoreArray indices of the TrueHits are the keys and the weights are the associated values
-     * MapType has to have key value pairs of <int, float> !!
+    /** get all the related TrueHits to the SpacePoint, including their weights in a map (multimap!) where the StoreArray indices of the TrueHits are the keys and the values are TrueHitInfos to these indices
+     * MapType has to have key value pairs of pair<int,TrueHitInfo>
      * throws: + NoTrueHitToCluster
      *         + NoSpacePointToCluster
      * @param clusterName: Name of the StoreArray of Clusters to be searched (defaults to "ALL")
@@ -349,7 +412,15 @@ namespace Belle2 {
      * @retuns .first is U position error, .second is V position error
      */
     std::pair<double, double> getLocalError(Belle2::SpacePoint* spacePoint);
-    // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for testing at the moment (i.e. do not commit)
+
+    /**
+     * calculate the Relation weight to be used (for SVD only, although method works with PXD as well!)
+     * + if a TrueHit is related to both Clusters -> relation weight = 2
+     * + if a TrueHit is only related to the U-Cluster -> relation weight = 11 (this is what happens with if a PXD is passed!)
+     * + if a TrueHit is only related to the V-Cluster -> relation weight = 21
+     */
+    double calculateRelationWeight(const TrueHitInfo& trueHitInfo, Belle2::SpacePoint* spacePoint);
+
   }; // end module
 
   /** helper class for setting up a bitfield that can be used to store several flags in one variable

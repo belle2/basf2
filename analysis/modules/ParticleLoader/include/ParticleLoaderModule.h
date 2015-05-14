@@ -136,7 +136,8 @@ namespace Belle2 {
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
 
-    std::vector<std::tuple<std::string, Variable::Cut::Parameter>> m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
+    std::vector<std::tuple<std::string, Variable::Cut::Parameter>>
+                                                                m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
 
 
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */
@@ -148,6 +149,39 @@ namespace Belle2 {
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
 
+    // static members
+    // (this is part of a temporary solution)
+    static int m_eventNo; /**< event number */
+    static int m_instance;
+    static std::vector<int> m_trackIndices; /**<Store array indices of all kaons, pions, electrons, muons, protons */
+    static std::vector<int> m_gammaIndices; /**<Store array indices of all gamma */
+    static std::vector<int> m_kshortIndices; /**<Store array indices of K0S gamma */
+    static std::vector<int> m_klongIndices; /**<Store array indices of K0L gamma */
+
+    /**
+     * Loads all MDST objects as Particles
+     */
+    void loadFromReconstruction();
+
+    /**
+     * Fill charged particle lists
+     */
+    void fillChargedParticleLists();
+
+    /**
+     * Fill gamma particle lists
+     */
+    void fillGammaParticleLists();
+
+    /**
+     * Fill K0short particle lists
+     */
+    void fillKshortParticleLists();
+
+    /**
+     * Fill K0long particle lists
+     */
+    void fillKlongParticleLists();
   };
 
 } // Belle2 namespace

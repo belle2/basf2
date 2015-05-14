@@ -81,7 +81,8 @@ namespace Belle2 {
    */
   class MapHelperFunctionsTest : public ::testing::Test {
   protected:
-    virtual void SetUp() /**< set up the maps for the tests */
+    /** set up the maps for the tests */
+    virtual void SetUp()
     {
       _nEntries = 20;
       _map = createMap(_nEntries, sinHalf);

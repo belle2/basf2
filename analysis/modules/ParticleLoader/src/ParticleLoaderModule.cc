@@ -41,7 +41,6 @@ using namespace std;
 namespace Belle2 {
 
   int ParticleLoaderModule::m_eventNo = -1;
-  int ParticleLoaderModule::m_instance = 0;
   vector<int> ParticleLoaderModule::m_trackIndices;
   vector<int> ParticleLoaderModule::m_gammaIndices;
   vector<int> ParticleLoaderModule::m_kshortIndices;
@@ -108,13 +107,11 @@ namespace Belle2 {
       Variable::Cut* cut = get<c_CutPointer>(mcParticle2Plist);
       delete cut;
     }
-    B2INFO("Terminate module instance #" << --m_instance);
   }
 
   void ParticleLoaderModule::initialize()
   {
     B2INFO("ParticleLoader's Summary of Actions:");
-    B2INFO("Initialize module instance #" << ++m_instance);
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     StoreArray<PIDLikelihood> pidlikelihoods;
@@ -234,7 +231,6 @@ namespace Belle2 {
     }
     if (currentEvent != m_eventNo) {
       m_eventNo = currentEvent;
-      B2INFO("Load particles in a new event! Event = " << m_eventNo);
       /*
       B2INFO("Size track = " << m_trackIndices.size());
       B2INFO("Size gamma = " << m_gammaIndices.size());
@@ -279,7 +275,6 @@ namespace Belle2 {
     StoreArray<MCParticle> mcParticles;
 
     // clear existing vectors of indices
-    B2INFO("clearing indicies in event " << m_eventNo);
     m_trackIndices.clear();
     m_gammaIndices.clear();
     m_kshortIndices.clear();

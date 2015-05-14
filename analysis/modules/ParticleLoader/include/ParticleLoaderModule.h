@@ -152,7 +152,6 @@ namespace Belle2 {
     // static members
     // (this is part of a temporary solution)
     static int m_eventNo; /**< event number */
-    static int m_instance;
     static std::vector<int> m_trackIndices; /**<Store array indices of all kaons, pions, electrons, muons, protons */
     static std::vector<int> m_gammaIndices; /**<Store array indices of all gamma */
     static std::vector<int> m_kshortIndices; /**<Store array indices of K0S gamma */

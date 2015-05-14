@@ -10,6 +10,7 @@
 #include <tracking/modules/trainingDataGenerator/ThreeHitSamplesGeneratorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/spacePointCreation/PurityCalculatorTools.h>
+#include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <vector>
@@ -43,13 +44,21 @@ void ThreeHitSamplesGeneratorModule::event()
   for (int iTC = 0; iTC < spacePointTCs.getEntries(); ++iTC) {
     B2DEBUG(150, "Calculating purities for SP container " << iTC << ", name: " << spacePointTCs.getName());
     const SpacePointTrackCand* container = spacePointTCs[iTC];
-    vector<pair<int, double> > purities = calculatePurity(container);
+    // vector<pair<int, double> > purities = calculatePurity(container);
+    vector<MCVXDPurityInfo> purInfos = createPurityInfos(container);
+
+    for (auto& info : purInfos) {
+      B2DEBUG(499, "PurityInfo: " << info.dumpToString());
+      B2DEBUG(499, "purities: PXD: " << info.getPurityPXD().second << ", SVD U: " << info.getPuritySVDU().second <<
+              ", SVD V: " << info.getPuritySVDV().second << ", overall: " << info.getPurity().second);
+    }
   }
 
-  // usage with reference
-  for (const SpacePointTrackCand& container : spacePointTCs) {
-    vector<pair<int, double> > purities = calculatePurity(container);
-  }
+  // // usage with reference
+  // for (const SpacePointTrackCand& container : spacePointTCs) {
+  //   // vector<pair<int, double> > purities = calculatePurity(container);
+  //   vector<MCVXDPurityInfo> purInfos = createPurityInfos(container);
+  // }
 
 }
 

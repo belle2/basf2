@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <vector>
-#include <utility> // for pair
-#include <unordered_map>
+#include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 
 #include <framework/datastore/RelationVector.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -24,33 +22,34 @@
 
 #include <tracking/spacePointCreation/MapHelperFunctions.h>
 
+#include <vector>
+#include <utility> // for pair
+#include <unordered_map>
+#include <cmath> // for nearbyint
+
 namespace Belle2 {
 
   /**
-   * get the related MCParticles and the number of Clusters they are related to for a SpacePoint
-   * + If there is a TrueHit with no relation to a MCParticle, the Cluster is consiedered to be related to MCId -1 (CAUTION: cannot
-   * be accesed in StoreArray!)
-   *
-   * CAUTION: The method cannot check if there is a TrueHit to a Cluster, hence it is possible that it returns an empty vector or a
-   * vector that is filled with MCParticleIds that are only related to one Cluster of the SpacePoint!
-   * This issue has to be adressed during the creation of the Relations between SpacePoints and TrueHits! -> TODO!!!
+   * get the related MCParticles to the TrueHit.
+   * @returns vector of pairs, where .first is the MCParticleId, which is -1 if there was no MCParticle related to a TrueHit.
+   * .second is the relation weight between SpacePoint and TrueHit (encodes additional information that is needed afterwards)
    */
   template<typename TrueHitType>
-  std::vector<std::pair<int, short> > getMCParticles(const Belle2::SpacePoint* spacePoint)
+  std::vector<std::pair<int, double> > getMCParticles(const Belle2::SpacePoint* spacePoint)
   {
-    // CAUTION: getting all TrueHits here! if needed restrict this!
+    // CAUTION: getting all TrueHits here
     Belle2::RelationVector<TrueHitType> trueHits = spacePoint->getRelationsTo<TrueHitType>("ALL");
-    std::vector<std::pair<int, short> > mcParticles;
+    std::vector<std::pair<int, double> > mcParticles;
 
     for (size_t iTH = 0; iTH < trueHits.size(); ++iTH) {
-      B2DEBUG(999, "Trying to get MCParticles from TrueHit " << trueHits[iTH]->getArrayIndex() <<
+      B2DEBUG(4999, "Trying to get MCParticles from TrueHit " << trueHits[iTH]->getArrayIndex() <<
               " from Array " << trueHits[iTH]->getArrayName());
       Belle2::MCParticle* mcPart = trueHits[iTH]->template getRelatedFrom<Belle2::MCParticle>("ALL");
 
       int mcPartId = -1; // default value for MCPartId (not found)
       if (mcPart != NULL) {
         mcPartId = mcPart->getArrayIndex();
-        B2DEBUG(999, "TrueHit " << iTH << " MCPartId " << mcPartId);
+        B2DEBUG(4999, "TrueHit is related to MCParticle " << mcPartId);
       } else {
         B2WARNING("Found no MCParticle related to TrueHit " << trueHits[iTH]->getArrayIndex() <<
                   " from Array " << trueHits[iTH]->getArrayName());
@@ -58,69 +57,115 @@ namespace Belle2 {
       mcParticles.push_back(std::make_pair(mcPartId, trueHits.weight(iTH)));
     }
 
+    // sort & unique to filter out double MCIds (if the relations are set correct, this only happens if more than one TrueHits point to the same MCParticle)
+    std::sort(mcParticles.begin(), mcParticles.end());
+    auto newEnd = std::unique(mcParticles.begin(), mcParticles.end(),
+    [](const std::pair<int, double>& a, const std::pair<int, double>& b) { return a.first == b.first; }
+                             );
+    if (newEnd != mcParticles.end()) B2ERROR("More than one TrueHits (related to one SpacePoint) are related to the same MCParticle!");
+    mcParticles.resize(std::distance(mcParticles.begin(), newEnd));
+
     return mcParticles;
   }
 
   /**
-   * function that takes any container holding SpacePoints that provide a getHits() function.
-   * @return vector of pairs where .first is an McId and .second is the purity of this McId
-   *
-   * The purities are calculated via (# Clusters associated with MCId) / (# Clusters in all SpacePoints of container)
-   * Clusters that cannot be associated with a MCParticle are put into MCId -1
+   * increase the appropriate Cluster counter by asking the SpacePoint which type he has and which Clusters are assigned
    */
-  template<typename SPContainer>
-  std::vector<std::pair<int, double> > calculatePurity(const SPContainer* container)
+  void increaseClusterCounters(const Belle2::SpacePoint* spacePoint, std::array<unsigned, 3>& clusterCtr)
   {
-    std::vector<std::pair<int, double> > purities;
-    const std::vector<const Belle2::SpacePoint*>& spacePoints = container->getHits();
-
-    // store the MCParticle Ids and the number of related Clusters to that id into a map (use mapHelperFunctions from there on)
-    std::unordered_map<int, unsigned> mcPartMap;
-    unsigned nClusters = 0;
-
-    for (const Belle2::SpacePoint* spacePoint : spacePoints) {
-      B2DEBUG(999, "Getting MCParticles from SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
-              spacePoint->getArrayName());
-      std::vector<std::pair<int, short> > mcParticles;
-
-      if (spacePoint->getType() == VXD::SensorInfoBase::PXD) mcParticles = getMCParticles<PXDTrueHit>(spacePoint);
-      else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) mcParticles = getMCParticles<SVDTrueHit>(spacePoint);
-      nClusters += spacePoint->getNClustersAssigned(); // TODO: this function needs to be defined first!
-
-      for (const std::pair<int, double>& anID : mcParticles) {
-        B2DEBUG(999, "MCParticle " << anID.first << " has " << anID.second << " Clusters in this SpacePoint");
-        mcPartMap[anID.first] += anID.second;
+    if (spacePoint->getType() == Belle2::VXD::SensorInfoBase::PXD) {
+      clusterCtr[0]++;
+      B2DEBUG(4999, "SpacePoint contains PXDCluster");
+    } else {
+      std::pair<bool, bool> setClusters = spacePoint->getIfClustersAssigned();
+      if (setClusters.first) {
+        clusterCtr[1]++;
+        B2DEBUG(4999, "SpacePoint contains U SVDCluster");
       }
-      B2DEBUG(999, "Container contains " << nClusters << " Clusters up to now");
+      if (setClusters.second) {
+        clusterCtr[2]++;
+        B2DEBUG(4999, "SpacePoint contains V SVDCluster");
+      }
     }
-
-    B2DEBUG(999, "MCParticle Ids (keys) and Clusters related to it (values) for this container: " + printMap(mcPartMap));
-
-    std::vector<int> mcIds = getUniqueKeys(mcPartMap);
-    for (int id : mcIds) {
-      double purity = mcPartMap[id] / double(nClusters);
-      B2DEBUG(999, "MCParticle " << id << " has purity " << purity << " in container " << container->getArrayIndex() <<
-              " from Array " << container->getArrayName());
-      purities.push_back(std::make_pair(id, purity));
-    }
-
-    return purities;
   }
 
   /**
-   * function that takes any container holding SpacePoints that provide a getHits() function.
-   * @return vector of pairs where .first is an McId and .second is the purity of this McId
-   *
-   * The purities are calculated via (# Clusters associated with MCId) / (# Clusters in all SpacePoints of container)
-   * Clusters that cannot be associated with a MCParticle are put into MCId -1
-   *
-   * Overload function taking references for use in C++11 for loops
+   * convert the relation weight (SpacePoint <-> TrueHit) to a type that can be used to access arrays
    */
-  template<typename SPContainer>
-  std::vector<std::pair<int, double> > calculatePurity(const SPContainer& container)
+  std::vector<size_t> getAccessorsFromWeight(double weight)
   {
-    return calculatePurity(&container);
+    if (weight < 1.5 && weight > 0) return {0}; // weight 1 -> PXD
+    if (weight < 2.5) return { 1, 2 }; // weight 2 -> both Clusters with relation to MCParticle
+    if (weight < 20) return {1}; // weight 11 -> only U-Cluster related to MCParticle
+    if (weight > 20 && weight < 30) return {2}; // weight 21 -> only V-Cluster related to MCParticle
+
+    return std::vector<size_t>(); // empty vector else
   }
 
-}
+  /**
+   * create a vector of MCVXDPurityInfos objects for any given container holding SpacePoints and providing a getHits() method
+   * each MCParticle that is in the container gets its own object
+   * NOTE: negative MCParticleIds are possible und used as follows:
+   * + -1 -> there was a TrueHit (i.e. Cluster) related to a SpacePoint in the container that did not have relation to a MCParticle
+   * + -2 -> there was a SpacePoint with a Cluster that was not related to a TrueHit (noise Cluster)
+   * @returns sorted vector of MCVXDPurityInfo (sorted by overall purity)
+   */
+  template<typename SPContainer>
+  std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer* container)
+  {
+    std::array<unsigned, 3> totalClusters = { {0, 0, 0 } };
+    // WARNING: relying on the fact here that all array entries will be initialized to 0
+    std::unordered_map<int, std::array<unsigned, 3> > mcClusters;
+
+    unsigned nClusters = 0;
+
+    // collect all information
+    for (const Belle2::SpacePoint* spacePoint : container->getHits()) {
+      B2DEBUG(4999, "Now processing SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
+      increaseClusterCounters(spacePoint, totalClusters);
+
+      nClusters += spacePoint->getNClustersAssigned();
+
+      std::vector<std::pair<int, double> > mcParticles;
+      if (spacePoint->getType() == VXD::SensorInfoBase::PXD) mcParticles = getMCParticles<PXDTrueHit>(spacePoint);
+      else if (spacePoint->getType() == VXD::SensorInfoBase::SVD) mcParticles = getMCParticles<SVDTrueHit>(spacePoint);
+      else B2ERROR("Unknown DetectorType in createPurityInfos! Skipping this SpacePoint");
+
+      for (const std::pair<int, double>& particle : mcParticles) {
+        std::vector<size_t> accessors = getAccessorsFromWeight(particle.second);
+        for (size_t acc : accessors) {
+          mcClusters[particle.first][acc]++;
+        }
+      }
+    }
+
+    B2DEBUG(4999, "container contained " << container->getNHits() << " SpacePoint with " << nClusters << " Clusters");
+    // TODO: handle noise Clusters
+
+    // create MCVXDPurityInfos and add them to the return vector
+    std::vector<Belle2::MCVXDPurityInfo> purityInfos;
+    for (int mcId : getUniqueKeys(mcClusters)) {
+      purityInfos.push_back(MCVXDPurityInfo(mcId, totalClusters, mcClusters[mcId]));
+    }
+
+    std::sort(purityInfos.begin(), purityInfos.end());
+    return purityInfos;
+  }
+
+  /**
+   * * create a vector of MCVXDPurityInfos objects for any given container holding SpacePoints and providing a getHits() method
+   * each MCParticle that is in the container gets its own object
+   * NOTE: negative MCParticleIds are possible und used as follows:
+   * + -1 -> there was a TrueHit (i.e. Cluster) related to a SpacePoint in the container that did not have relation to a MCParticle
+   * + -2 -> there was a SpacePoint with a Cluster that was not related to a TrueHit (noise Cluster)
+   * @returns sorted vector of MCVXDPurityInfo (sorted by overall purity)
+   *
+   * wrapper taking a const reference instead of a const pointer for use in e.g. C++11 for loops
+   */
+  template<typename SPContainer>
+  std::vector<Belle2::MCVXDPurityInfo> createPurityInfos(const SPContainer& container)
+  {
+    return createPurityInfos(&container);
+  }
+} // end namespace
 

@@ -34,4 +34,5 @@ void RelationContainer::Clear(Option_t*)
   m_fromName.clear();
   m_toName.clear();
   m_modified = true;
+  m_fromDurability = m_toDurability = -1;
 }

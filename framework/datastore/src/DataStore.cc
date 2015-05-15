@@ -431,18 +431,18 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   }
   StoreEntry* entry = &(it->second);
 
-  // auto create relations if needed
-  if (!entry->ptr) {
+  // auto create relations if needed (both if null pointer, or uninitialised object read from TTree)
+  if (!entry->ptr)
     entry->recreate();
-    RelationContainer* relations = static_cast<RelationContainer*>(entry->ptr);
-    relations->setFromName(fromEntry->name);
-    relations->setFromDurability(c_Event);
-    relations->setToName(toEntry->name);
-    relations->setToDurability(c_Event);
+  RelationContainer* relContainer = static_cast<RelationContainer*>(entry->ptr);
+  if (relContainer->isDefaultConstructed()) {
+    relContainer->setFromName(fromEntry->name);
+    relContainer->setFromDurability(c_Event);
+    relContainer->setToName(toEntry->name);
+    relContainer->setToDurability(c_Event);
   }
 
   // add relation
-  RelationContainer* relContainer = static_cast<RelationContainer*>(entry->ptr);
   TClonesArray& relations = relContainer->elements();
   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
 

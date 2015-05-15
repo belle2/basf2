@@ -39,6 +39,31 @@ CONTACT = "ucddn@student.kit.edu"
 class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
     local_track_cands_store_array_name = "LocalTrackCands"
+    create_mc_tracks = True
+
+    def add_mc_combination(self, main_path):
+        mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
+        mc_track_matcher_module.param({'UseCDCHits': True,
+                                       'UseSVDHits': False,
+                                       'UsePXDHits': False,
+                                       'RelateClonesToMCParticles': True,
+                                       'MCGFTrackCandsColName': "MCTrackCands",
+                                       'PRGFTrackCandsColName': "TrackCands"})
+        main_path.add_module(mc_track_matcher_module)
+        mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
+        mc_track_matcher_module.param({'UseCDCHits': True,
+                                       'UseSVDHits': False,
+                                       'UsePXDHits': False,
+                                       'RelateClonesToMCParticles': True,
+                                       'MCGFTrackCandsColName': "MCTrackCands",
+                                       'PRGFTrackCandsColName': self.local_track_cands_store_array_name})
+        main_path.add_module(mc_track_matcher_module)
+        naive_combiner_module = basf2.register_module("NaiveCombiner")
+        naive_combiner_module.param({"TracksFromLegendreFinder": "TrackCands",
+                                     "NotAssignedTracksFromLocalFinder": self.local_track_cands_store_array_name,
+                                     "UseMCInformation": False,
+                                     "ResultTrackCands": "NaiveCombinerTrackCands"})
+        main_path.add_module(naive_combiner_module)
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
@@ -80,11 +105,7 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
         combiner_module.set_debug_level(200)
         main_path.add_module(combiner_module)
 
-        naive_combiner_module = basf2.register_module("NaiveCombiner")
-        naive_combiner_module.param({"TracksFromLegendreFinder": "TrackCands",
-                                     "NotAssignedTracksFromLocalFinder": self.local_track_cands_store_array_name,
-                                     "ResultTrackCands": "NaiveCombinerTrackCands"})
-        main_path.add_module(naive_combiner_module)
+        self.add_mc_combination(main_path)
 
         rest_track_finder = basf2.register_module("TrackFinderCDCSegmentPairAutomatonDev")
         rest_track_finder.param({'SkipHitsPreparation': True,
@@ -118,7 +139,6 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
 def main():
     run = CombinerValidationRun()
-    run.n_events = 1
     run.configure_and_execute_from_commandline()
 
 if __name__ == "__main__":

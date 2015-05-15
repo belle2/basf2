@@ -36,22 +36,14 @@ namespace Belle2 {
 
     /**
      * Constructor with two strips.
-     * @param[in] s1 Strip from plane 1.
-     * @param[in] s2 Strip from plane 2.
+     * @param[in] s1 One of EKLMDigits.
      */
-    EKLMHit2d(EKLMDigit* s1, EKLMDigit* s2);
+    EKLMHit2d(EKLMDigit* s1);
 
     /**
      * Destructor.
      */
     ~EKLMHit2d();
-
-    /**
-     * Get EKLMDigit.
-     * @param[in[ plane plane number.
-     * @return Pointer to the hit.
-     */
-    EKLMDigit* getDigit(int plane) const;
 
     /**
      * Get strip number (from EKLMDigit).
@@ -73,14 +65,11 @@ namespace Belle2 {
 
   private:
 
-    /** EKLMdigts used to create this hit. */
-    EKLMDigit* m_digit[2];  //! {ROOT streamer directive}
-
     /** Chi^2 of the hit. */
     float m_ChiSq;
 
     /** Needed to make Belle2::EKLMHit2d storable. */
-    ClassDef(Belle2::EKLMHit2d, 2);
+    ClassDef(Belle2::EKLMHit2d, 3);
 
   };
 

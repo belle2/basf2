@@ -100,8 +100,11 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
     for (it = itStart; it != itEnd; it++) {
       if (it->stat != c_Unknown)
         continue;
+      RelationVector<EKLMDigit> digits = it->hit->getRelationsTo<EKLMDigit>();
+      if (digits.size() != 2)
+        B2FATAL("Wrong number of related EKLMDigits.");
       for (j = 0; j < 2; j++) {
-        clust[j][0] = it->hit->getStrip(j + 1);
+        clust[j][0] = digits[j]->getStrip();
         clust[j][1] = clust[j][0];
       }
       hit2d = NULL;
@@ -112,8 +115,12 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
             continue;
           if (it->stat != c_Unknown)
             continue;
+          RelationVector<EKLMDigit> digits2 =
+            it2->hit->getRelationsTo<EKLMDigit>();
+          if (digits2.size() != 2)
+            B2FATAL("Wrong number of related EKLMDigits.");
           for (j = 0; j < 2; j++)
-            s[j] = it2->hit->getStrip(j + 1);
+            s[j] = digits2[j]->getStrip();
           if (s[0] > clust[0][1] + 1 || s[0] < clust[0][0] - 1 ||
               s[1] > clust[1][1] + 1 || s[1] < clust[1][0] - 1)
             continue;

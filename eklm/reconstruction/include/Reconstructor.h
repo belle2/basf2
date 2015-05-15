@@ -63,8 +63,11 @@ namespace Belle2 {
 
     private:
 
-      /** Storage. */
-      StoreArray<EKLMHit2d>m_hit2dArray;
+      /** StoreArray for EKLMDigit. */
+      StoreArray<EKLMDigit> m_DigitArray;
+
+      /** StoreArray for EKLMHit2d. */
+      StoreArray<EKLMHit2d> m_hit2dArray;
 
       /** Vector of StripHits. */
       std::vector <EKLMDigit*> m_StripHitVector;

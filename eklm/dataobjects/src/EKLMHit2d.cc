@@ -20,16 +20,12 @@ ClassImp(Belle2::EKLMHit2d);
 
 EKLMHit2d::EKLMHit2d()
 {
-  m_digit[0] = NULL;
-  m_digit[1] = NULL;
   m_ChiSq = -1;
 }
 
 
-EKLMHit2d::EKLMHit2d(EKLMDigit* s1, EKLMDigit* s2)
+EKLMHit2d::EKLMHit2d(EKLMDigit* s1)
 {
-  m_digit[0] = s1;
-  m_digit[1] = s2;
   setEndcap(s1->getEndcap());
   setLayer(s1->getLayer());
   setSector(s1->getSector());
@@ -38,16 +34,6 @@ EKLMHit2d::EKLMHit2d(EKLMDigit* s1, EKLMDigit* s2)
 
 EKLMHit2d::~EKLMHit2d()
 {
-}
-
-EKLMDigit* EKLMHit2d::getDigit(int plane) const
-{
-  return m_digit[plane - 1];
-}
-
-int EKLMHit2d::getStrip(int plane)
-{
-  return m_digit[plane - 1]->getStrip();
 }
 
 float EKLMHit2d::getChiSq() const

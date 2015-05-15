@@ -29,10 +29,9 @@ bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)
 
 void EKLM::Reconstructor::readStripHits()
 {
-  StoreArray<EKLMDigit> stripHitsArray;
-  for (int i = 0; i < stripHitsArray.getEntries(); i++)
-    if (stripHitsArray[i]->isGood())
-      m_StripHitVector.push_back(stripHitsArray[i]);
+  for (int i = 0; i < m_DigitArray.getEntries(); i++)
+    if (m_DigitArray[i]->isGood())
+      m_StripHitVector.push_back(m_DigitArray[i]);
 }
 
 void EKLM::Reconstructor::createSectorHits()
@@ -89,13 +88,15 @@ void EKLM::Reconstructor::create2dHits()
         t = (t1 + t2) / 2;
         if (fastHit(crossPoint, t))
           continue;
-        EKLMHit2d* hit2d = m_hit2dArray.appendNew(hit1, hit2);
+        EKLMHit2d* hit2d = m_hit2dArray.appendNew(hit1);
         hit2d->setEDep(hit1->getEDep() + hit2->getEDep());
         hit2d->setGlobalPosition(crossPoint);
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
                         m_digPar.timeResolution / m_digPar.timeResolution);
         hit2d->setTime(t);
         hit2d->setMCTime((hit1->getMCTime() + hit2->getMCTime()) / 2);
+        hit2d->addRelationTo(hit1);
+        hit2d->addRelationTo(hit2);
       }
     }
     delete *it;

@@ -31,7 +31,11 @@ EKLMReconstructorModule::~EKLMReconstructorModule()
 
 void EKLMReconstructorModule::initialize()
 {
-  StoreArray<EKLMHit2d>::registerPersistent();
+  StoreArray<EKLMHit2d> hit2ds;
+  StoreArray<EKLMDigit> digits;
+  hit2ds.registerInDataStore();
+  digits.isRequired();
+  hit2ds.registerRelationTo(digits);
   if (m_geoDat.read() != 0)
     B2FATAL("Cannot read geometry data file.");
   EKLM::transformsToGlobal(&m_geoDat.transf);

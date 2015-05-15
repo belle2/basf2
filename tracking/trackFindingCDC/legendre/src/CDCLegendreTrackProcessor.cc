@@ -142,7 +142,7 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     double sStartingPosition = trajectory3D.calcPerpS(startingPosition);
     double zStartingPosition = trajectory3D.getTrajectorySZ().mapSToZ(sStartingPosition);
 
-    //trajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
+    trajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
     newTrackCandidate.setStartTrajectory3D(trajectory3D);
 
     unsigned int sortingParameter = 0;

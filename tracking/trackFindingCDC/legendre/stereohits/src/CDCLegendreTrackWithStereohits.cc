@@ -40,7 +40,7 @@ TrackCandidateWithStereoHits::TrackCandidateWithStereoHits(CDCTrack* oldCDCTrack
   setCharge(charge);
   setTheta(theta);
   setR(r);
-  setReferencePoint(oldCDCTrack->getStartFitPos3D().x(), oldCDCTrack->getStartFitPos3D().y());
+  setReferencePoint(0, 0);
 
   B2DEBUG(100, "R value: " << getR() << "; theta: " << getTheta() << "; radius: " <<
           getRadius() << "; phi: " << getPhi() << "; charge: " << getChargeSign() << "; Xc = "

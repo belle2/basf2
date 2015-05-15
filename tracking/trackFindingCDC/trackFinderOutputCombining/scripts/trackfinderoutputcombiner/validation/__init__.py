@@ -45,6 +45,7 @@ class AddValidationMethod:
 class MCTrackFinderRun(StandardEventGenerationRun):
     # output track cands
     mc_track_cands_store_array_name = "MCTrackCands"
+    create_mc_tracks = True
 
     def create_path(self):
         main_path = super(MCTrackFinderRun, self).create_path()
@@ -56,7 +57,8 @@ class MCTrackFinderRun(StandardEventGenerationRun):
             'GFTrackCandidatesColName': self.mc_track_cands_store_array_name,
         })
 
-        main_path.add_module(track_finder_mc_truth_module)
+        if self.create_mc_tracks:
+            main_path.add_module(track_finder_mc_truth_module)
 
         return main_path
 

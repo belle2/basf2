@@ -36,10 +36,10 @@ namespace Belle2 {
         Super::operator()(testPair);
         const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
 
-        if (varSet.at("truth") == 1.0)
-          return 1.0;
-        else
+        if (varSet.at("truth") == 0.0)
           return 0.0;
+        else
+          return 1.0;
       }
     };
   }

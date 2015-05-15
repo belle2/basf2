@@ -1,0 +1,8 @@
+Import('env')
+
+env['SUBLIB'] = True
+
+env['LIBS'] = ['framework', 'geometry', 'simulation', '$ROOT_LIBS',
+               'simulation_dataobjects', 'beast_fangs_dataobjects', 'beast_claws']
+
+Return('env')

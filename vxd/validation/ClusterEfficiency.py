@@ -27,11 +27,22 @@ theta_params = [90, 0.1]
 
 
 class ClusterEfficiency(Module):
+    """
+    Plot Efficiency to find a U and V cluster for each given truehit.
+    """
     def initialize(self):
+        """
+        Create ROOT TProfiles for all layers and momenta.
+        """
+
         # let's create a root file to store all profiles
+        #: Output file to store all plots
         self.rfile = ROOT.TFile("ClusterEfficiency.root", "RECREATE")
         self.rfile.cd()
+        #: flat list of all profiles for easy access
         self.profiles = []
+        #: layer/momentum hierachy of all profiles
+        self.eff = {}
 
         def profile(name, title, text):
             """small helper function to create a phi profile and set the names
@@ -54,7 +65,6 @@ class ClusterEfficiency(Module):
             + "of the generated particle, not the truehit position."
 
         # create all profiles
-        self.eff = {}
         for layer in range(1, 7):
             self.eff[layer] = {}
             for p in momenta:
@@ -64,6 +74,9 @@ class ClusterEfficiency(Module):
                 self.eff[layer][p] = profile(name, title, text)
 
     def terminate(self):
+        """
+        Format all profiles and write the ROOT file.
+        """
         # determine min value in all profiles to set all profiles to a common
         # range. We always want to show at least the range from 0.9
         minVal = 0.9
@@ -82,6 +95,10 @@ class ClusterEfficiency(Module):
         self.rfile.Close()
 
     def fill_truehits(self, phi, p, truehits):
+        """
+        Loop over all truehits for a track with the given angle phi and momentum
+        p and update the efficiency profiles.
+        """
         # iterate over all truehits and look for the clusters
         for i, truehit in enumerate(truehits):
             # we ignore all truehits which have an negative weight
@@ -119,6 +136,9 @@ class ClusterEfficiency(Module):
             self.eff[layer][p].Fill(phi, has_cluster[True] & has_cluster[False])
 
     def event(self):
+        """
+        Update the efficienies by iterating over all primary particles
+        """
         mcparticles = Belle2.PyStoreArray("MCParticles")
         for mcp in mcparticles:
             # we only look at primary particles

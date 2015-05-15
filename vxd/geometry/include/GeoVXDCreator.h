@@ -84,7 +84,8 @@ namespace Belle2 {
        * @param sensorID SensorID for the sensor
        * @param sensor   Information about the sensor to create the Sensitive Detector for
        */
-      virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const GeoVXDSensor& sensor, const GeoVXDSensorPlacement& placement) = 0;
+      virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const GeoVXDSensor& sensor,
+                                                             const GeoVXDSensorPlacement& placement) = 0;
 
       /**
        * Read parameters for given layer and store in m_ladder
@@ -103,7 +104,8 @@ namespace Belle2 {
        * @param daugther Daughter component
        * @return Transformation matrix to place the daughter relative to the origin to the mother
        */
-      G4Transform3D getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter, const GeoVXDPlacement& placement, bool originCenter);
+      G4Transform3D getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter, const GeoVXDPlacement& placement,
+                                bool originCenter);
 
       /**
        * Get Alignment for given component from the database
@@ -184,6 +186,7 @@ namespace Belle2 {
       GeoVXDLadder m_ladder;
       /** List to all created sensitive detector instances */
       std::vector<Simulation::SensitiveDetectorBase*> m_sensitive;
+      /** Diamond radiation sensor "sub creator" */
       GeoVXDRadiationSensors m_radiationsensors;
       /** tolerance for Geant4 steps to be merged to a single step */
       float m_distanceTolerance {(float)(5 * Unit::um)};

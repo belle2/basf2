@@ -16,15 +16,16 @@
 #include <stdlib.h>
 
 
-/** Maximal size of streamed objects. */
-const static int c_maxObjectSizeBytes = 50000000; //50MB
+namespace {
+  /** Warn if a streamed object is larger than this. */
+  const static int c_maxObjectSizeBytes = 50000000; //50MB
+}
 
 using namespace std;
 using namespace Belle2;
 
 MsgHandler::MsgHandler(int complevel)
 {
-  //  printf("MsgHandler : constructor called.....\n");
   if (complevel != 0) {
     B2FATAL("Compression support disabled because of https://sft.its.cern.ch/jira/browse/ROOT-4550 . You can enable it manually by removing this check in MsgHandler, but be aware of huge memory leaks.");
   }
@@ -37,7 +38,6 @@ MsgHandler::MsgHandler(int complevel)
 
 MsgHandler::~MsgHandler()
 {
-  //  printf("MsgHandler : destructor called.....\n");
 }
 
 void MsgHandler::clear()
@@ -67,16 +67,13 @@ bool MsgHandler::add(const TObject* obj, const string& name)
   }
   //  printf ( "MsgHandler : size of %s = %d (pid=%d)\n", name.c_str(), len, (int)getpid() );
 
-  // Store streamed objects in array
-  if (len < c_maxObjectSizeBytes) {
-    m_buf.push_back(msg);
-    m_name.push_back(name);
-    return true;
-  } else {
-    B2FATAL("MsgHandler : " << name <<
-            " : size too large (" << len  << " bytes), dropped.");
-    return false;
+  if (len > c_maxObjectSizeBytes) {
+    B2WARNING("MsgHandler: Object " << name << " is very large (" << len  << " bytes), parallel processing may be slow.");
   }
+  // Store streamed objects in array
+  m_buf.push_back(msg);
+  m_name.push_back(name);
+  return true;
 }
 
 EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
@@ -168,7 +165,7 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     //    char* tmpmsg = new char[objlen];
     //    TMessage* tmsg = new InMessage ( tmpmsg, objlen );
     //    TObject* obj = (TObject*)tmsg->ReadObjectAny(NULL);
-    TObject* obj = (TObject*)tmsg->ReadObjectAny(tmsg->GetClass());
+    TObject* obj = static_cast<TObject*>(tmsg->ReadObjectAny(tmsg->GetClass()));
     objlist.push_back(obj);
 
     /*

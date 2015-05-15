@@ -10,28 +10,12 @@ import basf2
 import ROOT
 from ROOT import Belle2
 
-from trackfinderoutputcombiner.validation import TrasanTrackFinderRun, AddValidationMethod, LegendreTrackFinderRun
-
+from trackfinderoutputcombiner.validation import AddValidationMethod, LegendreTrackFinderRun
+from tracking.validation.extract_information_from_tracking_validation_output import (initialize_results,
+                                                                                     extract_information_from_file)
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 import logging
-from functools import reduce
-
-try:
-    import root_pandas
-except ImportError:
-    print "do a pip install git+https://github.com/ibab/root_pandas"
-
-import pandas
-import matplotlib.pyplot as plt
-import seaborn as sb
-
-from itertools import chain, combinations
-import operator
-
-
-def get_logger():
-    return logging.getLogger(__name__)
 
 CONTACT = "ucddn@student.kit.edu"
 
@@ -40,6 +24,8 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
     local_track_cands_store_array_name = "LocalTrackCands"
     create_mc_tracks = True
+    segment_track_chooser_cut = 0.1
+    stereo_assignment = True
 
     def add_mc_combination(self, main_path):
         mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
@@ -69,8 +55,6 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
 
-        self.stereo_assignment = True
-
         main_path = super(CombinerValidationRun, self).create_path()
 
         display_module = CDCSVGDisplayModule()
@@ -89,18 +73,19 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
         })
         main_path.add_module(local_track_finder)
 
-        display_module = CDCSVGDisplayModule()
-        display_module.draw_segments_id = True
-        # main_path.add_module(display_module)
-
         combiner_module = basf2.register_module("SegmentTrackCombinerDev")
         combiner_module.param({'SegmentTrackChooser': 'tmva',
-                               'SegmentTrackChooserParameters': {"cut": "0.3"},
+                               'SegmentTrackChooserParameters': {"cut": str(self.segment_track_chooser_cut)},
                                'SegmentTrainFilter': 'simple',
-                               'SegmentTrackFilter': 'simple',
+                               'SegmentTrackFilter': 'mc',
                                'WriteGFTrackCands': False,
                                'SkipHitsPreparation': True,
                                'TracksStoreObjNameIsInput': True})
+        if self.segment_track_chooser_cut >= 1.0:
+            combiner_module.param({"SegmentTrackChooser": "mc", "SegmentTrackChooserParameters": {}})
+        if self.segment_track_chooser_cut <= 0.0:
+            combiner_module.param({"SegmentTrackChooser": "simple", "SegmentTrackChooserParameters": {}})
+
         # combiner_module.set_log_level(basf2.LogLevel.DEBUG)
         combiner_module.set_debug_level(200)
         main_path.add_module(combiner_module)
@@ -116,30 +101,38 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
                                  "GFTrackCandsStoreArrayName": "ResultTrackCands"})
         main_path.add_module(rest_track_finder)
 
-        display_module = CDCSVGDisplayModule()
-        display_module.draw_track_trajectories = True
-        display_module.draw_tracks = True
-        # main_path.add_module(display_module)
-
-        display_module = CDCSVGDisplayModule()
-        display_module.draw_gftrackcand_trajectories = True
-        display_module.draw_gftrackcands = True
-        display_module.track_cands_store_array_name = "ResultTrackCands"
-        # main_path.add_module(display_module)
-
-        self.create_validation(main_path, track_candidates_store_array_name="ResultTrackCands", output_file_name="Combiner.root")
-        self.create_validation(main_path, track_candidates_store_array_name="TrackCands", output_file_name="Legendre.root")
+        self.create_validation(
+            main_path,
+            track_candidates_store_array_name="ResultTrackCands",
+            output_file_name="evaluation/Combiner%.1f.root" %
+            self.segment_track_chooser_cut)
+        self.create_validation(
+            main_path,
+            track_candidates_store_array_name="TrackCands",
+            output_file_name="evaluation/Legendre.root")
         self.create_validation(
             main_path,
             track_candidates_store_array_name="NaiveCombinerTrackCands",
-            output_file_name="Naive.root")
+            output_file_name="evaluation/Naive.root")
 
         return main_path
 
 
 def main():
-    run = CombinerValidationRun()
-    run.configure_and_execute_from_commandline()
+
+    result = initialize_results()
+    result.update({"tmva_cut": []})
+
+    for tmva_cut in np.arange(0.0, 1.1, 0.1):
+        run = CombinerValidationRun()
+        run.segment_track_chooser_cut = tmva_cut
+        run.configure_and_execute_from_commandline()
+
+        result = extract_information_from_file("evaluation/Combiner%.1f.root" % tmva_cut, result)
+        result["tmva_cut"].append(tmva_cut)
+
+    for key in result:
+        print key + "\t" + "\t".join([str(value) for value in result[key]])
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')

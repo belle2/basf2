@@ -86,7 +86,7 @@ namespace Belle2 {
         //Positioned PIN diodes
         double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
         double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
-        double phi = activeParams.getAngle("Phi");
+        double phi = activeParams.getAngle("Phi") + 180. * CLHEP::deg;
         double thetaZ = activeParams.getAngle("ThetaZ");
 
         //create beamabort volumes

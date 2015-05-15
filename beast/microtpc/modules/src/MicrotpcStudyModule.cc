@@ -194,14 +194,14 @@ void MicrotpcStudyModule::event()
 
   //number of entries in SimHit
   int nSimHits = SimHits.getEntries();
-
+  /*
   auto phiArray = new vector<double>[8](); //phi
   auto thetaArray = new vector<double>[8](); //theta
   auto pidArray = new vector<int>[8](); //PID
   //auto edgeArray = new vector<int>[8](); // Edge cut
   auto esumArray = new vector<double>[8](); // eum
   auto trlArray = new vector<double>[8](); // eum
-
+  */
   TVector3 EndPoint;
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
@@ -213,7 +213,7 @@ void MicrotpcStudyModule::event()
     if (PDGid == 1000020040) HeRec[detNb] = true;
     if (PDGid == 2212) pRec[detNb] = true;
     if (fabs(PDGid) == 11 || PDGid == 22) xRec[detNb] = true;
-
+    /*
     double edep = aHit->getEnergyDep();
     double niel = aHit->getEnergyNiel();
     double ioni = edep - niel;
@@ -256,9 +256,9 @@ void MicrotpcStudyModule::event()
       EndPoint.SetXYZ(xpos, ypos, zpos);
 
     }
-  }
+    }
 
-  for (int i = 0; i < 8;  i++) {
+    for (int i = 0; i < 8;  i++) {
     for (int j = 0; j < (int)phiArray[i].size(); j++) {
       double phi = phiArray[i][j];
       double theta = phiArray[i][j];
@@ -296,6 +296,8 @@ void MicrotpcStudyModule::event()
         }
       }
     }
+    }
+    */
   }
   //number of Tracks
   int nTracks = Tracks.getEntries();
@@ -358,7 +360,7 @@ void MicrotpcStudyModule::event()
   }
 
   eventNum++;
-
+  /*
   //delete
   delete [] phiArray;
   delete [] thetaArray;
@@ -366,6 +368,7 @@ void MicrotpcStudyModule::event()
   //delete [] edgeArray;
   delete [] esumArray;
   delete [] trlArray;
+  */
 }
 //read tube centers, impulse response, and garfield drift data filename from MICROTPC.xml
 void MicrotpcStudyModule::getXMLData()

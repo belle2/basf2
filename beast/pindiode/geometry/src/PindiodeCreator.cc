@@ -114,7 +114,7 @@ namespace Belle2 {
         //Positioned PIN diodes
         double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
         double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
-        double phi = activeParams.getAngle("Phi");
+        double phi = activeParams.getAngle("Phi") + 180. * CLHEP::deg;
         double thetaZ = activeParams.getAngle("ThetaZ");
 
         //inch to cm
@@ -129,8 +129,8 @@ namespace Belle2 {
         G4double ir_hole = 0.;
         G4double or_hole = 5. / 2.*CLHEP::mm;
         G4double h_hole = 0.382 / 2. * InchtoCm;
-        G4double sA_hole = 0.*deg;
-        G4double spA_hole = 360.*deg;
+        G4double sA_hole = 0.*CLHEP::deg;
+        G4double spA_hole = 360.*CLHEP::deg;
         G4VSolid* s_hole = new G4Tubs("s_hole", ir_hole, or_hole, h_hole, sA_hole, spA_hole);
         s_base = new G4SubtractionSolid("s_base_hole1", s_base, s_hole, 0, G4ThreeVector((0.5 - 0.315)*InchtoCm,
                                         (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));

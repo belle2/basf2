@@ -91,6 +91,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
   }
 
   static bool already_executed = false;
+  static int errors_from_previous_run = 0;
   if (already_executed) {
     B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems");
     if (startPath->buildModulePathList(true) != startPath->buildModulePathList(false)) {
@@ -101,11 +102,12 @@ void Framework::process(PathPtr startPath, long maxEvent)
     startPath = boost::static_pointer_cast<Path>(startPath->clone());
   }
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
-  if (numLogError != 0) {
+  if (numLogError != errors_from_previous_run) {
     B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
   }
 
   try {
+    LogSystem::Instance().resetMessageCounter();
     DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
 
@@ -118,6 +120,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
       pEventProcessor processor;
       processor.process(startPath, maxEvent);
     }
+    errors_from_previous_run += LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers

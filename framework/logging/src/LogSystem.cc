@@ -99,6 +99,7 @@ void LogSystem::resetMessageCounter()
   for (int i = 0; i < LogConfig::c_Default; ++i) {
     m_messageCounter[i] = 0;
   }
+  m_errorLog.clear();
 }
 
 
@@ -195,7 +196,7 @@ void LogSystem::printErrorSummary()
     if (count == 0) //this is the first time we see this message
       uniqueLog.push_back(msg);
   }
-  m_errorLog.clear();
+  m_errorLog.clear(); // only do this once (e.g. not again when used through python)
 
   for (const LogMessage& msg : uniqueLog) {
     sendMessage(msg);
@@ -210,7 +211,6 @@ void LogSystem::printErrorSummary()
     B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
   }
 
-  m_printErrorSummary = false; // only do this once (e.g. not again when used through python)
   m_logConfig = oldConfig;
 }
 

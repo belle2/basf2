@@ -118,7 +118,7 @@ namespace Belle2 {
      */
     bool sendMessage(LogMessage message);
 
-    /** Resets the message counter by setting all message counts to 0. */
+    /** Resets the message counter and error log by setting all message counts to 0. */
     void resetMessageCounter();
 
     /**

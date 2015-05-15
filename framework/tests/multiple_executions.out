@@ -17,8 +17,8 @@
 [INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
-[INFO] In module ReturnFalse1Condition
-[INFO] In module final
+[ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
+[ERROR] In module final  { module: final }
 [INFO] Setting return value to False
 [INFO] Processed:   1 runs,      1 events
 [INFO] ------------------------------------------------------------------------
@@ -41,12 +41,20 @@
 [INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
-[INFO] In module ReturnFalse1Condition
-[INFO] In module final
+[ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
+[ERROR] In module final  { module: final }
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 2
 [INFO] ========================================================================
 [INFO] terminating SelectOddEvents
+[INFO] ================================================================================
+[INFO] Error summary: 4 errors and 0 warnings occurred.
+[ERROR] In module ReturnFalse1Condition
+[INFO]  (last message occurred 2 times in total)
+[ERROR] In module final
+[INFO]  (last message occurred 2 times in total)
+[INFO] ================================================================================
+
 [INFO] second process() call follows...
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] Begin of new run
@@ -66,8 +74,8 @@
 [INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
-[INFO] In module ReturnFalse1Condition
-[INFO] In module final
+[ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
+[ERROR] In module final  { module: final }
 [INFO] Setting return value to False
 [INFO] Processed:   1 runs,      1 events
 [INFO] ------------------------------------------------------------------------
@@ -90,15 +98,18 @@
 [INFO] ProcessStatistics    ProcessStatistics
 [INFO] 
 [INFO] ============================================================================
-[INFO] In module ReturnFalse1Condition
-[INFO] In module final
+[ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
+[ERROR] In module final  { module: final }
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 2
 [INFO] ========================================================================
 [INFO] terminating SelectOddEvents
 [INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Error summary: 4 errors and 0 warnings occurred.
+[ERROR] In module ReturnFalse1Condition
+[INFO]  (last message occurred 2 times in total)
+[ERROR] In module final
+[INFO]  (last message occurred 2 times in total)
 [INFO] ================================================================================
 
 [[[]] -> EventInfoSetter -> [SelectOddEvents(? <1[Progress -> [[]]] ) -> EventInfoPrinter] -> PrintCollections -> ReturnFalse(? <1[ReturnFalse1Condition] ) -> final]

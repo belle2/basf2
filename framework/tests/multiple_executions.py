@@ -49,7 +49,8 @@ class PrintName(Module):
 
     def event(self):
         """reimplementation of Module::event()."""
-        B2INFO("In module " + self.name())
+        # error level to check that this doesn't prevent execution
+        B2ERROR("In module " + self.name())
 
 
 # register necessary modules

@@ -261,6 +261,8 @@ void ECLDigitizerModule::terminate()
   deallocate(m_fg33);
   deallocate(m_fg41);
   deallocate(m_fg43);
+
+  for (auto i : m_idn) delete[] i;
 }
 
 int ECLDigitizerModule::myPow(int x, int p)
@@ -955,7 +957,7 @@ void ECLDigitizerModule::readDSPDB()
 
 
   for (unsigned int ichannel = 0; ichannel < pairIdx.size(); ichannel++) {
-    if (ichannel % 1000 == 0) {printf("!!CnN=%d\n", ichannel);}
+    // if (ichannel % 1000 == 0) {printf("!!CnN=%d\n", ichannel);}
     ChN = pairIdx[ichannel].first;
     const ECLWaveformData* eclWFData = eclWaveformData[ ChN ];
     eclWFData->getMatrix(ss1);

@@ -105,7 +105,7 @@ namespace Belle2 {
     unsigned int m_psnmBits[10]; /**< psnm bits. Prescaled ftdl bits */
     unsigned int m_timTypeBits; /**< timing source bits */
 
-    ClassDef(TRGSummary, 1); /**< ClassDef */
+    ClassDef(TRGSummary, 1); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
 
   };
 

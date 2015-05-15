@@ -186,33 +186,19 @@ namespace Belle2 {
 
   private:
 
-    /** Event number.
-     */
-    unsigned long m_event;
+    unsigned long m_event; /**< Event number.  */
 
-    /** Run number.
-     */
-    unsigned long m_run;
+    unsigned long m_run; /**< Run number.  */
 
-    /** Sub-run number.
-     */
-    unsigned long m_subrun;
+    unsigned long m_subrun; /**< Sub-run number.  */
 
-    /** Experiment number.
-     */
-    unsigned long m_experiment;
+    unsigned long m_experiment; /**< Experiment number.  */
 
-    /** Time in ns since epoch (1970-01-01).
-     */
-    unsigned long long int m_time;
+    unsigned long long int m_time; /**< Time in ns since epoch (1970-01-01).  */
 
-    /** Index of parent file.
-     */
-    int m_parent_index;
+    int m_parent_index; /**< Index of parent file.  */
 
-    /** Generated weight.
-     */
-    double m_generated_weight;
+    double m_generated_weight; /**< Generated weight.  */
 
     ClassDef(EventMetaData, 2); /**< Store event number, run number, and experiment number. */
   }; //class

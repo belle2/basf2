@@ -75,6 +75,6 @@ namespace Belle2 {
 
     /** Second version; doesn't store the name of the TrackFitResults, as default will be taken.
      */
-    ClassDef(Track, 3);
+    ClassDef(Track, 3); // Class that bundles various TrackFitResults.
   };
 }

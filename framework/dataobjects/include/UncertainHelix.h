@@ -129,8 +129,7 @@ namespace Belle2 {
     /** Chi2 Probability of the fit. */
     Double32_t m_pValue;
 
-    /** Streamer version. */
-    ClassDef(UncertainHelix, 1);
+    ClassDef(UncertainHelix, 1); /**< represents an ideal helix in perigee parameterization including covariance matrix */
   };
 }
 

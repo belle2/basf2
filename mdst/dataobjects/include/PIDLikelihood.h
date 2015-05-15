@@ -66,7 +66,8 @@ namespace Belle2 {
      */
     float getDeltaLogL(const Const::ChargedStable& p1,
                        const Const::ChargedStable& p2,
-                       Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const {
+                       Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const
+    {
       return getLogL(p1, set) - getLogL(p2, set);
     }
 
@@ -80,7 +81,8 @@ namespace Belle2 {
      */
     double getProbability(const Const::ChargedStable& p1,
                           const Const::ChargedStable& p2,
-                          Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const {
+                          Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const
+    {
       return getProbability(p1, p2, 1.0, set);
     }
 
@@ -141,7 +143,7 @@ namespace Belle2 {
                      Const::PIDDetectorSet detSet) const;
 
 
-    ClassDef(PIDLikelihood, 3); /**< class definition */
+    ClassDef(PIDLikelihood, 3); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
 
   };
 

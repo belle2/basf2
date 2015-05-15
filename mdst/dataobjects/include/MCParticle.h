@@ -542,8 +542,7 @@ namespace Belle2 {
 
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
-    /** Class definition required for the creation of the ROOT dictionary. */
-    ClassDef(MCParticle, 5);
+    ClassDef(MCParticle, 5); /**< A Class to store the Monte Carlo particle information. */
   };
 
 

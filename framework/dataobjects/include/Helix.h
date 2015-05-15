@@ -403,8 +403,7 @@ namespace Belle2 {
     /** Memory for the slope of the track in the z coordinate over the two dimensional arc length (dz/ds)*/
     Double32_t m_tanLambda;
 
-    /** Streamer version 1. */
-    ClassDef(Helix, 2);
+    ClassDef(Helix, 2); /**< This class represents an ideal helix in perigee parameterization. */
   };
 }
 

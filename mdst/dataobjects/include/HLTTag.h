@@ -101,8 +101,7 @@ namespace Belle2 {
     ///  * Usage dependent on each algorithm
     int m_HLTAlgoInfo[MAXALGO];
 
-    /// To derive from TObject
-    ClassDef(HLTTag, 1);
+    ClassDef(HLTTag, 1); /**< Contains the information of Highlevel trigger. */
   };
 }
 

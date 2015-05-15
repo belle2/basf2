@@ -35,9 +35,9 @@ void TestWithGearbox::TearDownTestCase()
   gearbox.close();
 }
 
-TempDirCreator::TempDirCreator()
+TempDirCreator::TempDirCreator():
+  m_oldpwd(current_path().string())
 {
-  m_oldpwd = current_path().string();
   path tmpdir = temp_directory_path() / unique_path();
   create_directories(tmpdir);
   current_path(tmpdir);

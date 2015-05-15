@@ -30,13 +30,15 @@ int main(int argc, char** argv)
     else if (strcmp(argv[1], "--help") == 0) {
       printf("Usage : clear_basf2_ipc {all|named|unnamed} \n");
       printf("all: all IPCs, named: named IPCs only, unnamed: basf2 internal IPCs only(default)\n");
+
+      printf("\n Cleans up inter-process communication (IPC) resources left behind if basf2 crashes.");
+      printf("Resources currently in use are not touched.\n");
     }
   }
-  //  printf ( "mode = %d\n", mode );
 
   DIR* dir;
-  struct dirent* ent;
   if ((dir = opendir("/tmp")) != NULL) {
+    struct dirent* ent;
     while ((ent = readdir(dir)) != NULL) {
       if (strncmp(ent->d_name, "SHM", 3) == 0) {
         //  printf ("%s\n", ent->d_name);

@@ -77,8 +77,8 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
         trackInformation->setGoodSegmentTrain(trainsOfSegments.front());
       } else if (trainsOfSegments.size() > 1) {
         // There are no good reasons why we should have more than one train/segment that matches. We have to find the best one.
-        B2WARNING("Number of possible trains/segments still left: " << trainsOfSegments.size() <<
-                  ". As these are too much we will only us the best one and delete the rest.");
+        B2DEBUG(100, "Number of possible trains/segments still left: " << trainsOfSegments.size() <<
+                ". As these are too much we will only us the best one and delete the rest.");
         const TrainOfSegments* bestFittingTrain = findBestFittingSegmentTrain(trainsOfSegments, trackInformation, segmentTrackFilter);
         if (bestFittingTrain != nullptr)
           trackInformation->setGoodSegmentTrain(*bestFittingTrain);
@@ -112,7 +112,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
     });
 
     if (notUsedSegments > 0) {
-      B2WARNING("Still " << notUsedSegments << " not used in this superlayer.")
+      B2DEBUG(100, "Still " << notUsedSegments << " not used in this superlayer.")
     }
 
   }
@@ -127,15 +127,17 @@ const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFitti
   TrainOfSegments* bestFittingTrain = nullptr;
   double bestProbability = -1;
   for (TrainOfSegments& trainOfSegments : trainsOfSegments) {
-    for (SegmentInformation* segmentInformation : trainOfSegments) {
-      std::vector<TrackInformation*>& matchedTracks = segmentInformation->getMatches();
-      matchedTracks.erase(std::remove(matchedTracks.begin(), matchedTracks.end(), trackInformation), matchedTracks.end());
-    }
+    if (trainOfSegments.size() > 0) {
+      for (SegmentInformation* segmentInformation : trainOfSegments) {
+        std::vector<TrackInformation*>& matchedTracks = segmentInformation->getMatches();
+        matchedTracks.erase(std::remove(matchedTracks.begin(), matchedTracks.end(), trackInformation), matchedTracks.end());
+      }
 
-    CellWeight currentProbability = segmentTrackFilter(std::make_pair(trainOfSegments, trackInformation->getTrackCand()));
-    if (not isNotACell(currentProbability) and currentProbability > bestProbability) {
-      bestFittingTrain = &trainOfSegments;
-      bestProbability = currentProbability;
+      CellWeight currentProbability = segmentTrackFilter(std::make_pair(trainOfSegments, trackInformation->getTrackCand()));
+      if (not isNotACell(currentProbability) and currentProbability > bestProbability) {
+        bestFittingTrain = &trainOfSegments;
+        bestProbability = currentProbability;
+      }
     }
   }
 
@@ -148,6 +150,34 @@ const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFitti
     return bestFittingTrain;
   } else {
     return nullptr;
+  }
+}
+
+void SegmentTrackCombiner::clearSmallerCombinations(std::list<TrainOfSegments>& trainsOfSegments)
+{
+  // Sort by size descending (biggest at the front)
+  trainsOfSegments.sort([](const TrainOfSegments & first, const TrainOfSegments & second) {
+    return first.size() > second.size();
+  });
+
+  // Can not used a c++-11 range based for loop here, as I edit the container!
+  for (auto testTrain = trainsOfSegments.begin(); testTrain != trainsOfSegments.end(); ++testTrain) {
+    trainsOfSegments.erase(std::remove_if(trainsOfSegments.begin(),
+    trainsOfSegments.end(), [&testTrain](const TrainOfSegments & train) -> bool {
+      if (train.size() >= testTrain->size())
+        return false;
+
+      bool oneIsNotFound = false;
+      for (const SegmentInformation* segmentInformation : train)
+      {
+        if (std::find(testTrain->begin(), testTrain->end(), segmentInformation) == train.end()) {
+          oneIsNotFound = true;
+          break;
+        }
+      }
+
+      return not oneIsNotFound;
+    }), trainsOfSegments.end());
   }
 }
 
@@ -172,11 +202,23 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
       });
       segmentTrainFilter.clear();
       // Problem: The recording filter return NOT_A_CELL every time!
-      if (segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand())) != 0)
+      CellWeight resultFilter = segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand()));
+      if (resultFilter != 0)
         innerSet.push_back(x);
     }
     trainsOfSegments.insert(trainsOfSegments.end(), innerSet.begin(), innerSet.end());
+    if (trainsOfSegments.size() > 1000) {
+      B2ERROR("Too much trains: " << trainsOfSegments.size() << "!")
+      trainsOfSegments.clear();
+      return;
+    }
   }
+
+  // Delete the first one: it is empty by definition
+  trainsOfSegments.pop_front();
+
+  // Delete all trains which are also found as a bigger one
+  clearSmallerCombinations(trainsOfSegments);
 }
 
 void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTrack)
@@ -253,7 +295,8 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
         bestMatch = nullptr;
       }
     } else if (matchingTracks.size() == 0) {
-      B2WARNING("None of the matches were in the track. Aborting. There are " << matchesAboveTrack.size() << " matches above the track.")
+      B2DEBUG(100, "None of the matches were in the track. Aborting. There are " << matchesAboveTrack.size() <<
+              " matches above the track.")
 
       // Try to fit them to the track
       double bestFitProb = 0;
@@ -305,7 +348,9 @@ void SegmentTrackCombiner::createTrainsOfMatchedSegments(std::list<TrainOfSegmen
   const std::vector<SegmentInformation*>& matchedSegments = trackInformation->getMatches();
   if (matchedSegments.size() == 1) {
     trainsOfSegments.push_back(matchedSegments);
-  } else if (matchedSegments.size() > 1) {
+  } else if (matchedSegments.size() > 1 and matchedSegments.size() <= 5) {
     makeAllCombinations(trainsOfSegments, trackInformation, segmentTrainFilter);
+  } else if (matchedSegments.size() > 5) {
+    B2ERROR("Number of matched segments exceeds 5 with: " << matchedSegments.size())
   }
 }

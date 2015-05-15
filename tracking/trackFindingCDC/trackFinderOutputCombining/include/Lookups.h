@@ -158,6 +158,9 @@ namespace Belle2 {
       void createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation,
                                          BaseSegmentTrainFilter& segmentTrainFilter);
 
+      /** Delete all trains which are found as a bigger one also */
+      void clearSmallerCombinations(std::list<TrainOfSegments>& trainsOfSegments);
+
       /** Combine a segment and a track */
       void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
 

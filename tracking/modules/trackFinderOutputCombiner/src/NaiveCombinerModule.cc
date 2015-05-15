@@ -125,7 +125,6 @@ void NaiveCombinerModule::event()
     for (const genfit::TrackCand& legendreTrackCand : goodTrackCands) {
       const genfit::TrackCand* matchedMCTrackCand = trackMatchLookUpForLegendre.getMatchedMCTrackCand(legendreTrackCand);
       if (matchedMCTrackCand != nullptr) {
-        B2INFO(mcTrackCandToIdMap[matchedMCTrackCand])
         legendreTrackList[mcTrackCandToIdMap[matchedMCTrackCand]].push_back(legendreTrackCand);
       }
     }
@@ -134,7 +133,6 @@ void NaiveCombinerModule::event()
       const genfit::TrackCand* matchedMCTrackCand = trackMatchLookUpForLocal.getMatchedMCTrackCand(localTrackCand);
 
       if (matchedMCTrackCand != nullptr) {
-        B2INFO(mcTrackCandToIdMap[matchedMCTrackCand])
         localTrackList[mcTrackCandToIdMap[matchedMCTrackCand]].push_back(localTrackCand);
       }
     }

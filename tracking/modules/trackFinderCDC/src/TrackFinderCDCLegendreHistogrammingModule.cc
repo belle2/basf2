@@ -26,7 +26,7 @@ void CDCLegendreHistogrammingModule::makeHistogramming()
   //create object which will add stereohits to tracks
   StereohitsProcesser stereohitsProcesser;
   for (TrackCandidate* cand : m_trackList) {
-    B2INFO("Processing new track; assigning stereohits.");
+    B2DEBUG(100, "Processing new track; assigning stereohits.");
 
     //assign stereohits to the track
     stereohitsProcesser.makeHistogramming(cand, m_cdcLegendreTrackProcessor.getStereoHitsList());

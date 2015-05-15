@@ -165,7 +165,7 @@ namespace Belle2 {
         return segment.getAutomatonCell().hasTakenFlag();
       }), segments.end());
 
-      B2ERROR("After all there are " << segments.size() << " Segments left in this event.")
+      B2DEBUG(100, "After all there are " << segments.size() << " Segments left in this event.")
 
       /*// Reset the taken flag for the hits of all the unused segments
       for (const TrackFindingCDC::CDCRecoSegment2D& segment : segments) {

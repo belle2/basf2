@@ -488,6 +488,16 @@ double B2BIIConvertMdstModule::acc_pid(const Belle::Mdst_charged& chg, int idp)
 }
 #endif
 
+void B2BIIConvertMdstModule::setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp])
+{
+  for (int i = 0; i < c_nHyp; i++) {
+    float logl = log(likelihoods[i]);
+    pid->setLogLikelihood(det, c_belleHyp_to_chargedStable[i], logl);
+  }
+  //copy proton likelihood to deuterons
+  pid->setLogLikelihood(det, Const::deuteron, pid->getLogL(Const::proton, det));
+}
+
 
 void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track)
 {
@@ -498,16 +508,14 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   //this should result in the same likelihoods used when creating atc_pid(3, 1, 5, ..., ...)
   //and calling prob(const Mdst_charged & chg).
 
+  double likelihoods[c_nHyp];
 #ifdef HAVE_KID_ACC
   //accq0 = 3, as implemented in acc_prob3()
   const auto& acc = belleTrack.acc();
   if (acc and acc.quality() == 0) {
-    for (int i = 0; i < c_nHyp; i++) {
-      float logl = log(acc_pid(belleTrack, i));
-      pid->setLogLikelihood(Const::ARICH, c_belleHyp_to_chargedStable[i], logl);
-    }
-    //copy proton likelihood to deuterons
-    pid->setLogLikelihood(Const::ARICH, Const::deuteron, pid->getLogL(Const::proton, Const::ARICH));
+    for (int i = 0; i < c_nHyp; i++)
+      likelihoods[i] = acc_pid(belleTrack, i);
+    setLikelihoods(pid, Const::ARICH, likelihoods);
   }
 #endif
 
@@ -515,24 +523,18 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   //uses p1 / (p1 + p2) to create probability, so this should map directly to likelihoods
   const Belle::Mdst_tof& tof = belleTrack.tof();
   if (tof and tof.quality() == 0) {
-    for (int i = 0; i < c_nHyp; i++) {
-      double logl = log(tof.pid(i));
-      pid->setLogLikelihood(Const::TOP, c_belleHyp_to_chargedStable[i], logl);
-    }
-    //copy proton likelihood to deuterons
-    pid->setLogLikelihood(Const::TOP, Const::deuteron, pid->getLogL(Const::proton, Const::TOP));
+    for (int i = 0; i < c_nHyp; i++)
+      likelihoods[i] = tof.pid(i);
+    setLikelihoods(pid, Const::TOP, likelihoods);
   }
 
   // cdcq0 = 5, as implemented in cdc_prob0() (which is used for all values of cdcq0!)
   //uses p1 / (p1 + p2) to create probability, so this should map directly to likelihoods
   const Belle::Mdst_trk& trk = belleTrack.trk();
   if (trk.dEdx() > 0) {
-    for (int i = 0; i < c_nHyp; i++) {
-      double logl = log(trk.pid(i));
-      pid->setLogLikelihood(Const::CDC, c_belleHyp_to_chargedStable[i], logl);
-    }
-    //copy proton likelihood to deuterons
-    pid->setLogLikelihood(Const::CDC, Const::deuteron, pid->getLogL(Const::proton, Const::CDC));
+    for (int i = 0; i < c_nHyp; i++)
+      likelihoods[i] = trk.pid(i);
+    setLikelihoods(pid, Const::CDC, likelihoods);
   }
 
 

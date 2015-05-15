@@ -142,6 +142,14 @@ namespace Belle2 {
     /** Get PID information for belleTrack and add it to PIDLikelihood (with relation from track). */
     void convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track);
 
+    /** Number of Belle track hypotheses (see c_belleHyp_to_chargedStable). */
+    const static int c_nHyp = 5;
+    /** maps Belle hypotheses to Const::ChargedStable (from http://belle.kek.jp/secured/wiki/doku.php?id=software:atc_pid). */
+    const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
+
+    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothethis order) for given detector to pid. */
+    void setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp]);
+
 #ifdef HAVE_KID_ACC
     /** Returns ACC likelihood for given hypothesis idp. Copied from atc_pid::acc_pid(). */
     static double acc_pid(const Belle::Mdst_charged& chg, int idp);
@@ -174,11 +182,6 @@ namespace Belle2 {
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
      */
     void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName);
-
-    /** Number of track hypotheses (see c_belleHyp_to_chargedStable). */
-    const static int c_nHyp = 5;
-    /** maps Belle hypotheses to Const::ChargedStable (from http://belle.kek.jp/secured/wiki/doku.php?id=software:atc_pid). */
-    const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
 
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;

@@ -29,6 +29,7 @@
 #include <TLorentzVector.h>
 
 #include <limits>
+#include <algorithm>
 #include <queue>
 
 #ifdef HAVE_KID_ACC
@@ -490,6 +491,10 @@ double B2BIIConvertMdstModule::acc_pid(const Belle::Mdst_charged& chg, int idp)
 
 void B2BIIConvertMdstModule::setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp])
 {
+  const double max_l = *std::max_element(likelihoods, likelihoods + c_nHyp);
+  if (max_l <= 0.0)
+    return; //likelihoods broken, ignore
+
   for (int i = 0; i < c_nHyp; i++) {
     float logl = log(likelihoods[i]);
     pid->setLogLikelihood(det, c_belleHyp_to_chargedStable[i], logl);

@@ -123,6 +123,9 @@ namespace Belle2 {
     //! Name of the muidHit collection of the extrapolation hits
     std::string m_MuidHitsColName;
 
+    //! Name of the extHit collection of the extrapolation hits
+    std::string m_ExtHitsColName;
+
     //! Name of the KLMCluster collection
     std::string m_KLMClustersColName;
 
@@ -156,11 +159,17 @@ namespace Belle2 {
     //! points will be saved during extrapolation
     void registerVolumes();
 
+    //! Get the physical volume information for a geant4 physical volume
+    void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
+
     //! Get the starting phase-space point and covariance for one reconstructed track and PDG hypothesis
     void getStartPoint(const genfit::Track*, int, G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
     bool createHit(G4ErrorFreeTrajState*, Track*, int);
+
+    //! Add a KLM sensitive-volume entry/exit extHit for the track
+    void createEntryExitHit(const G4ErrorFreeTrajState*, ExtHitStatus, Track*, int);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(const TVector3&, Point&);
@@ -200,6 +209,9 @@ namespace Belle2 {
 
     //! Pointers to EKLM geant4 sensitive (physical) volumes
     std::vector<G4VPhysicalVolume*>* m_EKLMVolumes;
+
+    //! Pointers to geant4 physical volumes whose entry/exit points will be saved
+    std::vector<G4VPhysicalVolume*>* m_EnterExit;
 
     //! Time of flight (ns) along the track from the interaction point
     double m_TOF;

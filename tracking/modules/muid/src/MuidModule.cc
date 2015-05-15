@@ -12,6 +12,7 @@
 #include <tracking/modules/muid/MuidPar.h>
 #include <tracking/dataobjects/Muid.h>
 #include <tracking/dataobjects/MuidHit.h>
+#include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -26,11 +27,13 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <bklm/dataobjects/BKLMStatus.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
+#include <eklm/geometry/EKLMObjectNumbers.h>
 
 #include <cmath>
 #include <vector>
@@ -70,6 +73,7 @@ using namespace Belle2;
 #define TWOPI 6.283185482025146484375
 #define M_PI_8 0.3926990926265716552734
 #define DEPTH_RPC 9
+#define DEPTH_SCINT 10
 
 REG_MODULE(Muid)
 
@@ -138,6 +142,7 @@ MuidModule::MuidModule() :
   addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation",
            string(""));
   addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
+  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the extHits from the extrapolation", string(""));
   addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
@@ -299,12 +304,15 @@ void MuidModule::initialize()
   StoreArray<Track> tracks(m_TracksColName);
   StoreArray<Muid> muids(m_MuidsColName);
   StoreArray<MuidHit> muidHits(m_MuidHitsColName);
+  StoreArray<ExtHit> extHits(m_ExtHitsColName);
   StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
   muids.registerInDataStore();
   muidHits.registerInDataStore();
+  extHits.registerInDataStore();
   klmClusters.registerInDataStore();
   tracks.registerRelationTo(muids);
   tracks.registerRelationTo(muidHits);
+  tracks.registerRelationTo(extHits);
   tracks.registerRelationTo(klmClusters);
 
   return;
@@ -392,9 +400,17 @@ void MuidModule::event()
         const G4int    errCode    = m_ExtMgr->PropagateOneStep(state);
         G4Track*       track      = state->GetG4Track();
         const G4Step*  step       = track->GetStep();
+        const G4int    preStatus  = step->GetPreStepPoint()->GetStepStatus();
+        const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
+          if (preStatus == fGeomBoundary) {      // first step in this volume?
+            createEntryExitHit(state, EXT_ENTER, tracks[t], pdgCode);
+          }
           m_TOF += step->GetDeltaTime();
+          if (postStatus == fGeomBoundary) {
+            createEntryExitHit(state, EXT_EXIT, tracks[t], pdgCode);
+          }
           if (createHit(state, tracks[t], pdgCode)) {
             // Force geant4e to update its G4Track from the Kalman-updated state
             m_ExtMgr->GetPropagator()->SetStepN(0);
@@ -446,6 +462,7 @@ void MuidModule::terminate()
   delete m_Target;
   delete m_BKLMVolumes;
   delete m_EKLMVolumes;
+  delete m_EnterExit;
   m_ExtMgr->RunTermination();
 
   delete m_MuonPlusPar;
@@ -474,22 +491,25 @@ void MuidModule::registerVolumes()
 
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
   m_EKLMVolumes = new vector<G4VPhysicalVolume*>;
+  m_EnterExit = new vector<G4VPhysicalVolume*>;
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
     // see belle2/run/volname3.txt:
     // Barrel KLM: BKLM.Layer**GasPhysical for RPCs or BKLM.Layer**ChimneyGasPhysical for RPCs
     //             BKLM.ScintType*Physical for scintillator strips
-    if (name.substr(0, 5) == "BKLM.") {
+    if (name.compare(0, 5, "BKLM.") == 0) {
       if ((name.find("ScintType") != string::npos) ||
           (name.find("GasPhysical") != string::npos)) {
         m_BKLMVolumes->push_back(*iVol);
+        m_EnterExit->push_back(*iVol);
       }
     }
     // Endcap KLM:
     // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
-    if (name.substr(0, 27) == "Sensitive_Strip_StripVolume") {
+    if (name.compare(0, 27, "Sensitive_Strip_StripVolume") == 0) {
       m_EKLMVolumes->push_back(*iVol);
+      m_EnterExit->push_back(*iVol);
     }
   }
 
@@ -596,6 +616,91 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
   m_LastEndcapHitLayer = -1;    // no matching hit in endcap layer yet
 
   return;
+
+}
+
+// Convert the physical volume to integer(-like) identifiers
+void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& detID, int& copyID)
+{
+
+  // default values
+  detID = Const::EDetector::invalidDetector;
+  copyID = 0;
+
+  G4String name = touch->GetVolume(0)->GetName();
+
+  // BKLM.Layer**GasPhysical or BKLM.Layer**ChimneyGasPhysical for barrel KLM RPCs
+  // BKLM.ScintType*Physical for barrel KLM scintillator strips
+  if (name.compare(0, 5, "BKLM.") == 0) {
+    if ((name.find("ScintType") != string::npos) ||
+        (name.find("GasPhysical") != string::npos)) {
+      detID = Const::EDetector::KLM;
+      int baseDepth = touch->GetHistoryDepth() - DEPTH_RPC;
+      if ((baseDepth < 0) || (baseDepth > DEPTH_SCINT - DEPTH_RPC)) {
+        B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 10=scint)")
+      } else {
+        int plane = touch->GetCopyNumber(baseDepth);
+        int layer = touch->GetCopyNumber(baseDepth + 4);
+        int sector = touch->GetCopyNumber(baseDepth + 6);
+        bool isForward = (touch->GetCopyNumber(baseDepth + 7) == BKLM_FORWARD);
+        copyID = (isForward ? BKLM_END_MASK : 0)
+                 | ((sector - 1) << BKLM_SECTOR_BIT)
+                 | ((layer - 1) << BKLM_LAYER_BIT)
+                 | BKLM_MC_MASK;
+        if (baseDepth == 0) {
+          copyID |= BKLM_INRPC_MASK;
+        } else {
+          int scint = touch->GetCopyNumber(0);
+          copyID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
+          if (plane == BKLM_INNER) {
+            copyID |= BKLM_PLANE_MASK;
+          }
+        }
+      }
+    }
+  }
+
+  // Endcap KLM scintillators:
+  // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
+  if (name.compare(0, 27, "Sensitive_Strip_StripVolume") == 0) {
+    detID = Const::EDetector::KLM;
+    copyID = EKLM::stripNumber(touch->GetVolume(6)->GetCopyNo(),
+                               touch->GetVolume(5)->GetCopyNo(),
+                               touch->GetVolume(4)->GetCopyNo(),
+                               touch->GetVolume(3)->GetCopyNo(),
+                               touch->GetVolume(2)->GetCopyNo());
+  }
+
+}
+
+// write another volume-entry or volume-exit extHit on track in KLM
+// (adapted from ExtModule)
+void MuidModule::createEntryExitHit(const G4ErrorFreeTrajState* state, ExtHitStatus status, Track* track, int pdgCode)
+{
+
+  StoreArray<ExtHit> extHits(m_ExtHitsColName);
+
+  G4StepPoint* stepPoint = state->GetG4Track()->GetStep()->GetPreStepPoint();
+  G4TouchableHandle preTouch = stepPoint->GetTouchableHandle();
+  G4VPhysicalVolume* preVol = preTouch->GetVolume();
+
+  // Perhaps no hit will be stored?
+  if (find(m_EnterExit->begin(), m_EnterExit->end(), preVol) == m_EnterExit->end()) { return; }
+  if (status == EXT_EXIT) {
+    stepPoint = state->GetG4Track()->GetStep()->GetPostStepPoint();
+  }
+
+  TVector3 pos(stepPoint->GetPosition().x() / CLHEP::cm,
+               stepPoint->GetPosition().y() / CLHEP::cm,
+               stepPoint->GetPosition().z() / CLHEP::cm);
+  TVector3 mom(stepPoint->GetMomentum().x() / CLHEP::GeV,
+               stepPoint->GetMomentum().y() / CLHEP::GeV,
+               stepPoint->GetMomentum().z() / CLHEP::GeV);
+  Const::EDetector detID(Const::EDetector::invalidDetector);
+  int copyID(0);
+  getVolumeID(preTouch, detID, copyID);
+  ExtHit* extHit = extHits.appendNew(pdgCode, detID, copyID, status, m_TOF, pos, mom, fromG4eToPhasespace(state));
+  track->addRelationTo(extHit);
 
 }
 

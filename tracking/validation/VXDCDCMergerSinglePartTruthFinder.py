@@ -172,6 +172,8 @@ cand_merger.param(cand_merger_param)
 #    }
 # si_fitting.param(si_fitting_param)
 
+setupgen = register_module('SetupGenfitExtrapolation')
+
 # -2) fitting the tracks
 fitting = register_module('GenFitter')
 fitting_param = {  # ---    'FilterId': 1,
@@ -182,6 +184,7 @@ fitting_param = {  # ---    'FilterId': 1,
     'GFTracksColName': 'GFTracks',
     'NMaxIterations': 10,
     'ProbCut': 0.001,
+    'BuildBelle2Tracks': 0
 }
 fitting.logging.log_level = LogLevel.WARNING
 fitting.param(fitting_param)
@@ -320,6 +323,7 @@ main.add_module(mctf)
 main.add_module(matcher1)
 main.add_module(matcher2)
 main.add_module(cand_merger)
+main.add_module(setupgen)
 # main.add_module(si_fitting)
 main.add_module(fitting)
 main.add_module(track_splitter)

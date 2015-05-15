@@ -321,8 +321,8 @@ bool DisplayUI::startDisplay()
   if (!m_reshowCurrentEvent)
     m_viewPane->getInfoWidget()->newEvent();
 
-  m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
-  m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements((TEveElement*)gEve->GetEventScene()));
+  m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements(gEve->GetEventScene()));
+  m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements(gEve->GetEventScene()));
 
   for (std::string name : m_hideObjects) {
     TGListTreeItem* eventItem = gEve->GetListTree()->FindItemByPathname("Event");

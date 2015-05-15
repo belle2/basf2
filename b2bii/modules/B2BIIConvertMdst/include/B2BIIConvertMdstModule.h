@@ -148,7 +148,7 @@ namespace Belle2 {
     const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
 
     /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothethis order) for given detector to pid. */
-    void setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp]);
+    void setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp], bool discard_allzero = false);
 
 #ifdef HAVE_KID_ACC
     /** Returns ACC likelihood for given hypothesis idp. Copied from atc_pid::acc_pid(). */

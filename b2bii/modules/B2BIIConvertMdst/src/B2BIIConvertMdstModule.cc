@@ -489,11 +489,15 @@ double B2BIIConvertMdstModule::acc_pid(const Belle::Mdst_charged& chg, int idp)
 }
 #endif
 
-void B2BIIConvertMdstModule::setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp])
+void B2BIIConvertMdstModule::setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp],
+                                            bool discard_allzero)
 {
-  const double max_l = *std::max_element(likelihoods, likelihoods + c_nHyp);
-  if (max_l <= 0.0)
-    return; //likelihoods broken, ignore
+  if (discard_allzero) {
+    const double max_l = *std::max_element(likelihoods, likelihoods + c_nHyp);
+    if (max_l <= 0.0) {
+      return; //likelihoods broken, ignore
+    }
+  }
 
   for (int i = 0; i < c_nHyp; i++) {
     float logl = log(likelihoods[i]);
@@ -520,7 +524,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   if (acc and acc.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
       likelihoods[i] = acc_pid(belleTrack, i);
-    setLikelihoods(pid, Const::ARICH, likelihoods);
+    setLikelihoods(pid, Const::ARICH, likelihoods, true);
   }
 #endif
 
@@ -530,7 +534,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   if (tof and tof.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
       likelihoods[i] = tof.pid(i);
-    setLikelihoods(pid, Const::TOP, likelihoods);
+    setLikelihoods(pid, Const::TOP, likelihoods, true);
   }
 
   // cdcq0 = 5, as implemented in cdc_prob0() (which is used for all values of cdcq0!)
@@ -539,7 +543,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   if (trk.dEdx() > 0) {
     for (int i = 0; i < c_nHyp; i++)
       likelihoods[i] = trk.pid(i);
-    setLikelihoods(pid, Const::CDC, likelihoods);
+    setLikelihoods(pid, Const::CDC, likelihoods, true);
   }
 
 
@@ -547,7 +551,41 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   //TODO
 
   //muid
-  //TODO
+  //Note that though it says "_likelihood()" on the label, those are
+  //actually likelihood ratios of the type L(hyp) / (L(mu) + L(pi) + L(K)),
+  //which are set in the FixMdst module.
+  int muid_trackid = belleTrack.muid_ID();
+  if (muid_trackid) {
+    //Using approach 2. from http://belle.kek.jp/secured/muid/usage_muid.html since
+    //it's much simpler than what Muid_mdst does.
+    Belle::Mdst_klm_mu_ex_Manager& ex_mgr = Belle::Mdst_klm_mu_ex_Manager::get_manager();
+    Belle::Mdst_klm_mu_ex& ex = ex_mgr(Belle::Panther_ID(muid_trackid));
+
+    //filter out tracks with insufficient #hits (equal to cut on Muid_mdst::Chi_2())
+    if (ex.Chi_2() > 0) {
+      likelihoods[0] = 0; //no electrons
+      likelihoods[1] = ex.Muon_likelihood();
+      likelihoods[2] = ex.Pion_likelihood();
+      likelihoods[3] = ex.Kaon_likelihood();
+      likelihoods[4] = 0; //no protons
+      //TODO are Miss_likelihood()/Junk_likelihood() useful?
+      //TODO: what does Junk_likelihood == 1 mean for a track? (happens quite often)
+
+      setLikelihoods(pid, Const::KLM, likelihoods);
+
+      /*
+      const double tolerance = 1e-7;
+      if (fabs(pid->getProbability(Const::muon, nullptr, Const::KLM) - ex.Muon_likelihood()) > tolerance ||
+          fabs(pid->getProbability(Const::pion, nullptr, Const::KLM) - ex.Pion_likelihood()) > tolerance ||
+          fabs(pid->getProbability(Const::kaon, nullptr, Const::KLM) - ex.Kaon_likelihood()) > tolerance) {
+        B2ERROR("muons: " <<  pid->getProbability(Const::muon, nullptr, Const::KLM) << " " << ex.Muon_likelihood())
+        B2ERROR("pion: " <<  pid->getProbability(Const::pion, nullptr, Const::KLM) << " " << ex.Pion_likelihood())
+        B2ERROR("kaon: " <<  pid->getProbability(Const::kaon, nullptr, Const::KLM) << " " << ex.Kaon_likelihood())
+        B2WARNING("miss/junk: " << ex.Miss_likelihood() << " " << ex.Junk_likelihood());
+      }
+      */
+    }
+  }
 }
 
 

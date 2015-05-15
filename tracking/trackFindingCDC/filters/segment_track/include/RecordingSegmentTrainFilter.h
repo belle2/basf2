@@ -21,7 +21,9 @@ namespace Belle2 {
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
       RecordingSegmentTrainFilter() :
         RecordingFilter<SegmentTrainTruthVarSet>("SegmentTrainFilter.root")
-      {;}
+      {
+        setParameter("returned_cell_weight", "1.0");
+      }
 
     };
   }

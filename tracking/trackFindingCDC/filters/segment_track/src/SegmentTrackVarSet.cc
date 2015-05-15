@@ -119,7 +119,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("segment_size")>() = segment->size();
   var<named("track_size")>() = track->size();
 
-  var<named("pt_of_track")>() = trajectory.getAbsMom2D();
+  var<named("pt_of_track")>() = std::isnan(trajectory.getAbsMom2D()) ? 0.0 : trajectory.getAbsMom2D();
   var<named("track_is_curler")>() = trajectory.getExit().hasNAN();
 
   var<named("superlayer_already_full")>() = not trajectory.getOuterExit().hasNAN() and hitsInSameRegion > 5;

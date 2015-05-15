@@ -31,7 +31,7 @@ CellWeight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<Segm
     double perpSFront = trajectory.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
     if (alreadySet and perpSFront < (1 - varSet.m_param_percentageForPerpSMeasurements) * lastPerpS) {
       // Means: no
-      return 0.0;
+      return NOT_A_CELL;
     }
     alreadySet = true;
     lastPerpS = trajectory.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());

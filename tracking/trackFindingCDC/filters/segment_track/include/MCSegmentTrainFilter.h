@@ -36,8 +36,8 @@ namespace Belle2 {
         Super::operator()(testPair);
         const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
 
-        if (varSet.at("truth") == 0.0)
-          return 0.0;
+        if (varSet.at("truth") == 1.0)
+          return NOT_A_CELL;
         else
           return 1.0;
       }

@@ -201,9 +201,7 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
                trajectory2D.calcPerpS(second->getSegment()->front().getRecoPos2D());
       });
       segmentTrainFilter.clear();
-      // Problem: The recording filter return NOT_A_CELL every time!
-      CellWeight resultFilter = segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand()));
-      if (resultFilter != 0)
+      if (segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand())) != NOT_A_CELL)
         innerSet.push_back(x);
     }
     trainsOfSegments.insert(trainsOfSegments.end(), innerSet.begin(), innerSet.end());
@@ -351,6 +349,6 @@ void SegmentTrackCombiner::createTrainsOfMatchedSegments(std::list<TrainOfSegmen
   } else if (matchedSegments.size() > 1 and matchedSegments.size() <= 5) {
     makeAllCombinations(trainsOfSegments, trackInformation, segmentTrainFilter);
   } else if (matchedSegments.size() > 5) {
-    B2ERROR("Number of matched segments exceeds 5 with: " << matchedSegments.size())
+    B2WARNING("Number of matched segments exceeds 5 with: " << matchedSegments.size())
   }
 }

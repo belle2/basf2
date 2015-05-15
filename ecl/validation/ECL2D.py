@@ -79,13 +79,18 @@ bkgFiles = [
 # bg = []
 # if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
 #    bg += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+bg = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+else:
+    print 'Warning: variable BELLE2_BACKGROUND_DIR is not set'
 
 # Create paths
 main = create_path()
 main.add_module(eventinfosetter)
 # main.add_module(eventinfoprinter)
 # main.add_module(pGun)
-add_simulation(main, bkgfiles=bkgFiles)
+add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 main.add_module(eclanalysis)
 # main.add_module(simpleoutput)

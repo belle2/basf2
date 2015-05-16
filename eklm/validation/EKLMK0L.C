@@ -46,7 +46,7 @@ void EKLMK0L()
   int n = tree->GetEntries();
   TClonesArray *k0lArray;
   TClonesArray *mcParticleArray;
-  tree->SetBranchAddress("EKLMK0Ls", &k0lArray);
+  tree->SetBranchAddress("KLMClusters", &k0lArray);
   tree->SetBranchAddress("MCParticles", &mcParticleArray);
   for (int i = 0; i < n; i++) {
     tree->GetEntry(i);
@@ -79,12 +79,12 @@ void EKLMK0L()
     if (!((z > -315.1 && z < -183.0) || (z > 277.0 && z < 409.1)))
       continue;
     int nkl = k0lArray->GetEntries();
-    Belle2::EKLMK0L *k0l;
+    Belle2::KLMCluster *k0l;
     int jmax = -1;
     int mindist = 10000.;
     for (int j = 0; j < nkl; j++) {
-      k0l = (Belle2::EKLMK0L*)k0lArray->AddrAt(j);
-      vk = k0l->getPosition();
+      k0l = (Belle2::KLMCluster*)k0lArray->AddrAt(j);
+      vk = k0l->getClusterPosition();
       double d = (v - vk).Mag();
       if (d < mindist) {
         jmax = j;
@@ -93,9 +93,9 @@ void EKLMK0L()
     }
     if (jmax < 0)
       continue;
-    k0l = (Belle2::EKLMK0L*)k0lArray->AddrAt(jmax);
-    vk = k0l->getPosition() - v;
-    TVector3 p = k0l->getMomentumRoot().Vect();
+    k0l = (Belle2::KLMCluster*)k0lArray->AddrAt(jmax);
+    vk = k0l->getClusterPosition() - v;
+    TVector3 p = k0l->getMomentum().Vect();
     TVector3 pmc = mcp->getMomentum();
     xres->Fill(vk.x());
     yres->Fill(vk.y());

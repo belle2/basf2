@@ -60,16 +60,6 @@ namespace Belle2 {
      */
     void terminate();
 
-    /*
-    bool hasAssociatedTrack(genfit::Track &gfTrack);
-    */
-    /**
-     * Copy information from K0Lhits array to mdst K0L
-     */
-    void fillMdstDataobjects();
-
-
-
   };
 
 }

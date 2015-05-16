@@ -16,13 +16,9 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/dataobjects/EKLMK0L.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/modules/EKLMK0LReconstructor/EKLMK0LReconstructorModule.h>
-
-
 #include <mdst/dataobjects/KLMCluster.h>
 
 using namespace Belle2;
@@ -43,8 +39,9 @@ enum HitStatus {
  * Hit information.
  */
 struct HitData {
-  EKLMHit2d* hit;       /**< Hit. */
-  enum HitStatus stat;  /**< Hit status. */
+  EKLMHit2d* hit;                     /**< Hit. */
+  enum HitStatus stat;                /**< Hit status. */
+  std::vector<EKLMHit2d*> mergedHits; /**< Vector of merged hits. */
 };
 
 /**
@@ -63,7 +60,7 @@ static bool layerLessThan(struct HitData hit1, struct HitData hit2)
  * @param[in.out] hits2d New 2d hits.
  */
 static void merge2dClusters(std::vector<struct HitData>& hits,
-                            std::vector<EKLMHit2d*>& hits2d)
+                            std::vector<struct HitData>& newHits)
 {
   std::vector<struct HitData>::iterator it, it2, itStart, itEnd;
   int layerRange[15];
@@ -73,10 +70,11 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
   int s[2];
   int clust[2][2];
   double e, de;
-  EKLMHit2d* hit2d;
+  struct HitData dat;
   /* Nothing to do. */
   if (hits.size() <= 1)
     return;
+  dat.stat = c_Unknown;
   /* Fill layer ranges. */
   currLayer = 1;
   layerRange[0] = 0;
@@ -107,7 +105,8 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
         clust[j][0] = digits[j]->getStrip();
         clust[j][1] = clust[j][0];
       }
-      hit2d = NULL;
+      dat.hit = NULL;
+      dat.mergedHits.clear();
       do {
         add = false;
         for (it2 = itStart; it2 != itEnd; it2++) {
@@ -136,18 +135,22 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
           add = true;
           it2->stat = c_Merged;
           it->stat = c_Merged;
-          if (hit2d == NULL) {
-            hit2d = new EKLMHit2d(*(it->hit));
-            hits2d.push_back(hit2d);
+          if (dat.hit == NULL) {
+            dat.hit = new EKLMHit2d(*(it->hit));
+            dat.mergedHits.push_back(it->hit);
           }
-          e = hit2d->getEDep();
+          dat.mergedHits.push_back(it2->hit);
+          e = dat.hit->getEDep();
           de = it2->hit->getEDep();
-          hit2d->setEDep(e + de);
-          hit2d->setTime(std::min(hit2d->getTime(), it2->hit->getTime()));
-          hit2d->setGlobalPosition((hit2d->getGlobalPosition() * e +
-                                    it2->hit->getGlobalPosition() * de) / (e + de));
+          dat.hit->setEDep(e + de);
+          dat.hit->setTime(std::min(dat.hit->getTime(), it2->hit->getTime()));
+          dat.hit->setGlobalPosition((dat.hit->getGlobalPosition() * e +
+                                      it2->hit->getGlobalPosition() * de) /
+                                     (e + de));
         }
       } while (add);
+      if (dat.hit != NULL)
+        newHits.push_back(dat);
     }
   }
   /* Erase merged hits. */
@@ -165,63 +168,63 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
  * @param[in]     hit     This hit.
  * @param[in,out] hits    All hits (including this).
  */
-static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
+static void findAssociatedHits(struct HitData* hit,
                                std::vector<struct HitData>& hits)
 {
-  int i;
+  int i, n;
   int layerHits[14], nLayers;
   float e, de;
-  std::vector<EKLMHit2d*> cluster;
-  std::vector<EKLMHit2d*>::iterator itClust;
-  std::vector<struct HitData>::iterator it;
+  std::vector<struct HitData*> cluster;
+  std::vector<struct HitData*>::iterator itClust;
+  std::vector<EKLMHit2d*>::iterator itHit;
   HepGeom::Point3D<double> hitPos;
   CLHEP::Hep3Vector p;
   float mt, t, m;
   double v;
-  EKLMK0L* k0l;
   /* Initially fill the cluster with the hit in question. */
-  cluster.push_back(hit->hit);
+  cluster.push_back(hit);
   hitPos = hit->hit->getGlobalPosition();
   /* Collect other hits. */
-  for (it = hits.begin(); it != hits.end(); it++) {
-    if (it == hit)
+  n = hits.size();
+  for (i = 0; i < n; i++) {
+    if (&hits[i] == hit)
       continue;
-    if (it->stat != c_Unknown)
+    if (hits[i].stat != c_Unknown)
       continue;
-    if (it->hit->getGlobalPosition().angle(hitPos) < 0.1) {
-      it->stat = c_Cluster;
-      cluster.push_back(it->hit);
+    if (hits[i].hit->getGlobalPosition().angle(hitPos) < 0.1) {
+      hits[i].stat = c_Cluster;
+      cluster.push_back(&hits[i]);
     }
   }
   /* Get minimal time. */
-  mt = (*cluster.begin())->getTime();
-  for (itClust = cluster.begin() + 1; itClust != cluster.end(); itClust++) {
-    t = (*itClust)->getTime();
+  mt = (*cluster.begin())->hit->getTime();
+  for (itClust = cluster.begin() + 1; itClust != cluster.end(); ++itClust) {
+    t = (*itClust)->hit->getTime();
     if (t < mt) {
       mt = t;
     }
   }
-  /* Get number of layers  and number of the innermost layer with hits */
+  /* Get number of layers and number of the innermost layer with hits */
   for (i = 0; i < 14; i++)
     layerHits[i] = 0;
-  for (itClust = cluster.begin(); itClust != cluster.end(); itClust++)
-    layerHits[(*itClust)->getLayer() - 1]++;
+  for (itClust = cluster.begin(); itClust != cluster.end(); ++itClust)
+    layerHits[(*itClust)->hit->getLayer() - 1]++;
   nLayers = 0;
-  int   nInnermostLayer = 0;
+  int nInnermostLayer = 0;
   for (i = 13; i >= 0; i--)
     if (layerHits[i] > 0) {
       nInnermostLayer = i;
       nLayers++;
     }
-  /* Get hit position as weighed average of cluster hit positions. */
+  /* Get hit position as weighted average of cluster hit positions. */
   e = 0;
   hitPos = HepGeom::Point3D<double>(0., 0., 0.);
-  for (itClust = cluster.begin(); itClust != cluster.end(); itClust++) {
-    if ((*itClust)->getLayer() != hit->hit->getLayer())
+  for (itClust = cluster.begin(); itClust != cluster.end(); ++itClust) {
+    if ((*itClust)->hit->getLayer() != hit->hit->getLayer())
       continue;
-    de = (*itClust)->getEDep();
+    de = (*itClust)->hit->getEDep();
     e = e + de;
-    hitPos = hitPos + de * (*itClust)->getGlobalPosition();
+    hitPos = hitPos + de * (*itClust)->hit->getGlobalPosition();
   }
   hitPos = hitPos / e;
   /* Calculate momentum. */
@@ -241,78 +244,26 @@ static void findAssociatedHits(std::vector<struct HitData>::iterator hit,
     return;
   }
   hit->stat = c_Cluster;
-
-  /* Fill EKLMK0L. */
-  StoreArray<EKLMK0L> k0lArray;
-  k0l = k0lArray.appendNew();
-  k0l->setGlobalPosition(hitPos);
-  k0l->setTime(mt);
-  k0l->setLayers(nLayers);
-  CLHEP::HepLorentzVector momentum4 = CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m));
-  k0l->setMomentum(momentum4);
-  k0l->setInnermostLayer(nInnermostLayer);
-
+  /* Fill KLMClusters. */
+  StoreArray<KLMCluster> klmClusters;
+  CLHEP::HepLorentzVector momentum4 =
+    CLHEP::HepLorentzVector(p, sqrt(p.mag2() + m * m));
+  KLMCluster* klmCluster = klmClusters.appendNew(
+                             hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers, nInnermostLayer,
+                             momentum4.x(), momentum4.y(), momentum4.z()
+                           );
   /* Fill cluster-hit relation array */
   StoreArray<EKLMHit2d> hits2d;
-  RelationArray EKLMClustersToHits2d(k0lArray, hits2d);
-
-  /*  reversion of rev #9900 */
-  //for (const EKLMHit2d * eklmHit : cluster) {
-  //k0l->addRelationTo(eklmHit);
-  //}
-  for (std::vector<EKLMHit2d*>::iterator clusterPtr_it = cluster.begin(); clusterPtr_it != cluster.end();
-       ++clusterPtr_it) { //clusterPtr_it iterates over std::vector<EKLMHit2d*>
-    EKLMHit2d tmp = **clusterPtr_it;
-    for (int  hits2d_it = 0; hits2d_it != hits2d.getEntries(); hits2d_it++) // hits2d_it iterates over StoreArray<EKLMHit2d>
-      if (tmp == *(hits2d[hits2d_it])) {
-        EKLMClustersToHits2d.add(k0lArray.getEntries() - 1, hits2d_it);
-        break;
-      }
-    /**  end of reversion */
+  for (itClust = cluster.begin(); itClust != cluster.end(); ++itClust) {
+    if ((*itClust)->mergedHits.size() == 0) {
+      klmCluster->addRelationTo((*itClust)->hit);
+    } else {
+      for (itHit = (*itClust)->mergedHits.begin();
+           itHit != (*itClust)->mergedHits.end(); ++itHit)
+        klmCluster->addRelationTo(*itHit);
+    }
   }
 }
-
-
-
-
-
-void EKLMK0LReconstructorModule::fillMdstDataobjects()
-{
-
-
-  /* Fill MDST dataobject */
-  StoreArray<EKLMK0L> k0lArray;
-  StoreArray<KLMCluster> klmClusterMDST;
-
-  for (int i = 0; i < k0lArray.getEntries(); i++) {
-    HepGeom::Point3D<double> pos = k0lArray[i]->getGlobalPosition();
-    CLHEP::HepLorentzVector momentum = k0lArray[i]->getMomentum();
-    klmClusterMDST.appendNew(
-      pos.x(), pos.y(), pos.z(),
-      k0lArray[i]->getTime(),
-      k0lArray[i]->getLayers(),
-      k0lArray[i]->getInnermostLayer(),
-      momentum.x(), momentum.y(), momentum.z()
-    );
-  }
-
-}
-/*
-  bool EKLMK0LReconstructorModule::hasAssociatedTrack(genfit::Track &gfTrack)
-  {
-
-  genfit::AbsTrackRep* gfTrackRep = gfTrack->getCardinalRep();
-  const genfit::TrackPoint* firstPoint = gfTrack->getPointWithMeasurementAndFitterInfo(0, gfTrackRep);
-  const genfit::AbsFitterInfo* firstFitterInfo = firstPoint->getFitterInfo(gfTrackRep);
-  const genfit::MeasuredStateOnPlane& firstState = firstFitterInfo->getFittedState(true);
-  TVector3 firstPosition, firstMomentum;
-  TMatrixDSym firstCov(6);
-  gfTrackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
-  int charge = gfTrackRep->getCharge(firstState);
-  TVector3 firstDirection(firstMomentum.Unit());
-
-}
-*/
 
 EKLMK0LReconstructorModule::EKLMK0LReconstructorModule() : Module()
 {
@@ -326,12 +277,11 @@ EKLMK0LReconstructorModule::~EKLMK0LReconstructorModule()
 
 void EKLMK0LReconstructorModule::initialize()
 {
-  StoreArray<EKLMK0L> k0ls;
   StoreArray<KLMCluster> clusters;
   StoreArray<EKLMHit2d> hit2ds;
-  k0ls.registerInDataStore();
   clusters.registerInDataStore();
-  k0ls.registerRelationTo(hit2ds);
+  hit2ds.isRequired();
+  clusters.registerRelationTo(hit2ds);
 }
 
 void EKLMK0LReconstructorModule::beginRun()
@@ -340,16 +290,16 @@ void EKLMK0LReconstructorModule::beginRun()
 
 void EKLMK0LReconstructorModule::event()
 {
-  int i;
-  int n;
+  int i, j, n;
   StoreArray<EKLMHit2d> hits2d;
   struct HitData dat;
-  std::vector<EKLMHit2d*> new2dHits;
-  std::vector<EKLMHit2d*>::iterator itClust;
+  std::vector<struct HitData> newHits;
+  std::vector<struct HitData>::iterator itClust;
   /* Hits in endcap, index is (number of endcap - 1). */
   std::vector<struct HitData> endcap[2];
   std::vector<struct HitData>::iterator it;
   dat.stat = c_Unknown;
+  dat.mergedHits.clear();
   /* Sort hits by endcap. */
   n = hits2d.getEntries();
   for (i = 0; i < n; i++) {
@@ -360,28 +310,23 @@ void EKLMK0LReconstructorModule::event()
     /* Sort hits by layer. */
     sort(endcap[i].begin(), endcap[i].end(), layerLessThan);
     /* Merge 2d clusters. */
-    merge2dClusters(endcap[i], new2dHits);
-    for (itClust = new2dHits.begin(); itClust != new2dHits.end(); itClust++) {
-      dat.hit = *itClust;
-      endcap[i].push_back(dat);
-    }
+    merge2dClusters(endcap[i], newHits);
+    for (itClust = newHits.begin(); itClust != newHits.end(); itClust++)
+      endcap[i].push_back(*itClust);
     /* Sort by layer again. */
     sort(endcap[i].begin(), endcap[i].end(), layerLessThan);
     /* Search for clusters. */
-    for (it = endcap[i].begin(); it != endcap[i].end(); it++) {
-      if ((*it).stat != c_Unknown)
+    n = endcap[i].size();
+    for (j = 0; j < n; j++) {
+      if (endcap[i][j].stat != c_Unknown)
         continue;
-      findAssociatedHits(it, endcap[i]);
+      findAssociatedHits(&(endcap[i][j]), endcap[i]);
     }
-
     /* Free memory. */
-    for (itClust = new2dHits.begin(); itClust != new2dHits.end(); itClust++)
-      delete *itClust;
-    new2dHits.clear();
+    for (itClust = newHits.begin(); itClust != newHits.end(); itClust++)
+      delete itClust->hit;
+    newHits.clear();
   }
-  /* create MDST objects */
-  fillMdstDataobjects();
-
 }
 
 void EKLMK0LReconstructorModule::endRun()

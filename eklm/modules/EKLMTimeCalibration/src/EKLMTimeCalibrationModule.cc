@@ -63,7 +63,7 @@ void EKLMTimeCalibrationModule::event()
   StoreArray<EKLMHit2d> hit2ds;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, itLower, itUpper;
-  ExtHit* extHit, *entryHit, *exitHit;
+  ExtHit* extHit, *entryHit = NULL, *exitHit = NULL;
   n = tracks.getEntries();
   for (i = 0; i < n; i++) {
     RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();

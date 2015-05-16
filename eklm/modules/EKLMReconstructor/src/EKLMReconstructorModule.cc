@@ -48,8 +48,6 @@ void EKLMReconstructorModule::beginRun()
 void EKLMReconstructorModule::event()
 {
   EKLM::Reconstructor recon(&m_geoDat);
-  recon.readStripHits();
-  recon.createSectorHits();
   recon.create2dHits();
 }
 

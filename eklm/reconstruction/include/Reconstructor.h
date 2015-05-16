@@ -20,7 +20,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/dataobjects/EKLMSectorHit.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/Digitizer.h>
 #include <framework/datastore/StoreArray.h>
@@ -47,33 +46,11 @@ namespace Belle2 {
       ~Reconstructor() {};
 
       /**
-       * Read StripHits from the datastore.
-       */
-      void readStripHits();
-
-      /**
-       * Create Sector hits and fill it with StripHits.
-       */
-      void createSectorHits();
-
-      /**
-       * Create 2d hits in each SectorHit.
+       * Create 2d hits.
        */
       void create2dHits();
 
     private:
-
-      /** StoreArray for EKLMDigit. */
-      StoreArray<EKLMDigit> m_DigitArray;
-
-      /** StoreArray for EKLMHit2d. */
-      StoreArray<EKLMHit2d> m_hit2dArray;
-
-      /** Vector of StripHits. */
-      std::vector <EKLMDigit*> m_StripHitVector;
-
-      /** Vector of SectorHits. */
-      std::vector <EKLMSectorHit*> m_SectorHitVector;
 
       /**
        * Check whether hit has too small time.

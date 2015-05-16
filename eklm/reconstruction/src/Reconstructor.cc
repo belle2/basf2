@@ -9,12 +9,38 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 
 using namespace Belle2;
+
+static bool comparePlane(EKLMDigit* d1, EKLMDigit* d2)
+{
+  int s1, s2;
+  s1 = EKLM::planeNumber(d1->getEndcap(), d1->getLayer(), d1->getSector(),
+                         d1->getPlane());
+  s2 = EKLM::planeNumber(d2->getEndcap(), d2->getLayer(), d2->getSector(),
+                         d2->getPlane());
+  return s1 < s2;
+}
+
+static bool samePlane(EKLMDigit* d1, EKLMDigit* d2)
+{
+  return ((d1->getEndcap() == d2->getEndcap()) &&
+          (d1->getLayer() == d2->getLayer()) &&
+          (d1->getSector() == d2->getSector()) &&
+          (d1->getPlane() == d2->getPlane()));
+}
+
+static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
+{
+  return ((d1->getEndcap() == d2->getEndcap()) &&
+          (d1->getLayer() == d2->getLayer()) &&
+          (d1->getSector() == d2->getSector()));
+}
 
 EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
 {
@@ -27,79 +53,64 @@ bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)
   return time < pos.mag() / Const::speedOfLight - 2.0 * m_digPar.timeResolution;
 }
 
-void EKLM::Reconstructor::readStripHits()
-{
-  for (int i = 0; i < m_DigitArray.getEntries(); i++)
-    if (m_DigitArray[i]->isGood())
-      m_StripHitVector.push_back(m_DigitArray[i]);
-}
-
-void EKLM::Reconstructor::createSectorHits()
-{
-  for (std::vector<EKLMDigit*>::iterator stripIter =
-         m_StripHitVector.begin(); stripIter != m_StripHitVector.end();
-       ++stripIter) {
-    bool sectorNotFound = true;
-    for (std::vector<EKLMSectorHit*>::iterator sectorIter =
-           m_SectorHitVector.begin(); sectorIter != m_SectorHitVector.end();
-         sectorIter++) {
-      // since every hit could be added only once
-      if ((*sectorIter)->addHit(*stripIter) == 0) {
-        sectorNotFound = false;
-        break;
-      }
-    }
-    if (sectorNotFound) {
-      EKLMSectorHit* newSectorHit =
-        new EKLMSectorHit((*stripIter)->getEndcap(),
-                          (*stripIter)->getLayer(),
-                          (*stripIter)->getSector());
-
-      newSectorHit->addHit(*stripIter);
-      m_SectorHitVector.push_back(newSectorHit);
-    }
-  }
-
-}
-
 void EKLM::Reconstructor::create2dHits()
 {
-  std::vector<EKLMSectorHit*>::iterator it;
-  int n1, n2;
-  int i1, i2;
-  double d1, d2;
-  double t, t1, t2;
-  double sd;
-  EKLMDigit* hit1, *hit2;
-  for (it = m_SectorHitVector.begin(); it != m_SectorHitVector.end(); it++) {
-    n1 = (*it)->getHitNumber(1);
-    n2 = (*it)->getHitNumber(2);
-    for (i1 = 0; i1 < n1; i1++) {
-      hit1 = (*it)->getHit(1, i1);
-      for (i2 = 0; i2 < n2; i2++) {
-        hit2 = (*it)->getHit(2, i2);
+  int i, n;
+  double d1, d2, t, t1, t2, sd;
+  StoreArray<EKLMDigit> digits;
+  StoreArray<EKLMHit2d> hit2ds;
+  std::vector<EKLMDigit*> digitVector;
+  std::vector<EKLMDigit*>::iterator it, it2, it3, it4, it5;
+  n = digits.getEntries();
+  for (i = 0; i < n; i++)
+    if (digits[i]->isGood())
+      digitVector.push_back(digits[i]);
+  /* Sort by plane. Note that numbers of planes from one sector differ by 1. */
+  sort(digitVector.begin(), digitVector.end(), comparePlane);
+  it = digitVector.begin();
+  while (it != digitVector.end()) {
+    it2 = it;
+    while (1) {
+      ++it2;
+      if (it2 == digitVector.end())
+        break;
+      if (!samePlane(*it, *it2))
+        break;
+    }
+    it3 = it2;
+    --it3;
+    while (1) {
+      ++it3;
+      if (it3 == digitVector.end())
+        break;
+      if (!sameSector(*it, *it3))
+        break;
+    }
+    /* Now it .. it2 - first plane hits, it2 .. it3 - second plane hits. */
+    for (it4 = it; it4 != it2; ++it4) {
+      for (it5 = it2; it5 != it3; ++it5) {
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        if (!m_geoDat->intersection(hit1, hit2, &crossPoint, &d1, &d2, &sd))
+        if (!m_geoDat->intersection(*it4, *it5, &crossPoint, &d1, &d2, &sd))
           continue;
-        t1 = hit1->getTime() - d1 / m_digPar.fiberLightSpeed +
+        t1 = (*it4)->getTime() - d1 / m_digPar.fiberLightSpeed +
              0.5 * sd / Const::speedOfLight;
-        t2 = hit2->getTime() - d2 / m_digPar.fiberLightSpeed -
+        t2 = (*it5)->getTime() - d2 / m_digPar.fiberLightSpeed -
              0.5 * sd / Const::speedOfLight;
         t = (t1 + t2) / 2;
         if (fastHit(crossPoint, t))
           continue;
-        EKLMHit2d* hit2d = m_hit2dArray.appendNew(hit1);
-        hit2d->setEDep(hit1->getEDep() + hit2->getEDep());
+        EKLMHit2d* hit2d = hit2ds.appendNew(*it4);
+        hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
         hit2d->setGlobalPosition(crossPoint);
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
                         m_digPar.timeResolution / m_digPar.timeResolution);
         hit2d->setTime(t);
-        hit2d->setMCTime((hit1->getMCTime() + hit2->getMCTime()) / 2);
-        hit2d->addRelationTo(hit1);
-        hit2d->addRelationTo(hit2);
+        hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
+        hit2d->addRelationTo(*it4);
+        hit2d->addRelationTo(*it5);
       }
     }
-    delete *it;
+    it = it3;
   }
 }
 

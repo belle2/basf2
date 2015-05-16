@@ -15,6 +15,32 @@
 
 using namespace Belle2;
 
+static const char MemErr[] = "Memory allocation error.";
+
+static bool compareLength(double a, double b)
+{
+  return a < b;
+}
+
+EKLM::GeometryData::GeometryData()
+{
+  m_nStrip = -1;
+  m_nStripDifferent = -1;
+  m_StripLen = NULL;
+  m_StripLenToAll = NULL;
+  m_StripAllToLen = NULL;
+}
+
+EKLM::GeometryData::~GeometryData()
+{
+  if (m_StripLen != NULL)
+    free(m_StripLen);
+  if (m_StripLenToAll != NULL)
+    free(m_StripLenToAll);
+  if (m_StripAllToLen != NULL)
+    free(m_StripAllToLen);
+}
+
 int EKLM::GeometryData::save(const char* file)
 {
   int res;
@@ -35,11 +61,16 @@ int EKLM::GeometryData::save(const char* file)
 
 int EKLM::GeometryData::read(const char* file)
 {
-  int i;
-  int n;
-  int res;
+  const char err[] = "Strip sorting algorithm error.";
+  int i, res;
   char str[32];
   FILE* f;
+  double l;
+  std::vector<double> strips;
+  std::vector<double>::iterator it;
+  std::map<double, int> mapLengthStrip;
+  std::map<double, int> mapLengthStrip2;
+  std::map<double, int>::iterator itm;
   f = fopen(file, "r");
   if (f == NULL)
     return -1;
@@ -50,21 +81,78 @@ int EKLM::GeometryData::read(const char* file)
   /* Fill strip data. */
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
              "Layer/Sector/Plane/Strips");
-  n = gd.getNumberNodes("Strip");
-  if (n != 75)
-    B2FATAL("Unexpected number of strips in EKLM geometry XML data!");
-  for (i = 0; i < 75; i++) {
+  m_nStrip = gd.getNumberNodes("Strip");
+  m_StripLen = (double*)malloc(m_nStrip * sizeof(double));
+  if (m_StripLen == NULL)
+    B2FATAL(MemErr);
+  for (i = 0; i < m_nStrip; i++) {
     GearDir gds(gd);
     snprintf(str, 32, "/Strip[%d]", i + 1);
     gds.append(str);
-    m_stripLen[i] = gds.getLength("Length");
+    m_StripLen[i] = gds.getLength("Length");
+    strips.push_back(m_StripLen[i]);
+    mapLengthStrip.insert(std::pair<double, int>(m_StripLen[i], i));
+  }
+  sort(strips.begin(), strips.end(), compareLength);
+  l = strips[0];
+  m_nStripDifferent = 1;
+  for (it = strips.begin(); it != strips.end(); ++it) {
+    if ((*it) != l) {
+      l = (*it);
+      m_nStripDifferent++;
+    }
+  }
+  m_StripLenToAll = (int*)malloc(m_nStripDifferent * sizeof(int));
+  if (m_StripLenToAll == NULL)
+    B2FATAL(MemErr);
+  i = 0;
+  l = strips[0];
+  itm = mapLengthStrip.find(l);
+  if (itm == mapLengthStrip.end())
+    B2FATAL(err);
+  m_StripLenToAll[i] = itm->second;
+  mapLengthStrip2.insert(std::pair<double, int>(l, i));
+  for (it = strips.begin(); it != strips.end(); ++it) {
+    if ((*it) != l) {
+      l = (*it);
+      i++;
+      itm = mapLengthStrip.find(l);
+      if (itm == mapLengthStrip.end())
+        B2FATAL(err);
+      m_StripLenToAll[i] = itm->second;
+      mapLengthStrip2.insert(std::pair<double, int>(l, i));
+    }
+  }
+  m_StripAllToLen = (int*)malloc(m_nStrip * sizeof(int));
+  if (m_StripAllToLen == NULL)
+    B2FATAL(MemErr);
+  for (i = 0; i < m_nStrip; i++) {
+    itm = mapLengthStrip2.find(m_StripLen[i]);
+    if (itm == mapLengthStrip2.end())
+      B2FATAL(err);
+    m_StripAllToLen[i] = itm->second;
   }
   return 0;
 }
 
 double EKLM::GeometryData::getStripLength(int strip)
 {
-  return m_stripLen[strip - 1];
+  return m_StripLen[strip - 1];
+}
+
+int EKLM::GeometryData::getStripLengthIndex(int positionIndex)
+{
+  return m_StripAllToLen[positionIndex];
+}
+
+int EKLM::GeometryData::getStripPositionIndex(int lengthIndex)
+{
+  return m_StripLenToAll[lengthIndex];
+}
+
+int EKLM::GeometryData::getNStripsDifferentLength()
+{
+  return m_nStripDifferent;
 }
 
 bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,

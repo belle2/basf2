@@ -747,9 +747,6 @@ namespace Belle2 {
       /** Number of strips in one plane. */
       int m_nStrip;
 
-      /** Number of strips with different lengths in one plane. */
-      int m_nStripDifferent;
-
       /** Number of sections is one plane. */
       int nSection;
 
@@ -818,12 +815,6 @@ namespace Belle2 {
 
       /** Position data for strips. */
       struct ElementPosition* StripPosition;
-
-      /** Number of strip in length-based array. */
-      int* m_StripAllToLen;
-
-      /** Number of strip in position-based array. */
-      int* m_StripLenToAll;
 
       /** Strip size data. */
       struct StripSize StripSize;

@@ -106,7 +106,7 @@ EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 
 void EKLM::GeoEKLMCreator::mallocVolumes()
 {
-  int i;
+  int i, nDiff;
   solids.plane = (G4VSolid**)malloc(nPlane * sizeof(G4VSolid*));
   if (solids.plane == NULL)
     B2FATAL(MemErr);
@@ -117,33 +117,30 @@ void EKLM::GeoEKLMCreator::mallocVolumes()
                   malloc(nSection * sizeof(G4LogicalVolume*));
   if (logvol.psheet == NULL)
     B2FATAL(MemErr);
-  solids.stripvol = (G4VSolid**)malloc(m_nStripDifferent * sizeof(G4Box*));
+  nDiff = m_geoDat->getNStripsDifferentLength();
+  solids.stripvol = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
   if (solids.stripvol == NULL)
     B2FATAL(MemErr);
-  logvol.stripvol =
-    (G4LogicalVolume**)malloc(m_nStripDifferent * sizeof(G4LogicalVolume*));
+  logvol.stripvol = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (logvol.stripvol == NULL)
     B2FATAL(MemErr);
-  solids.strip = (G4VSolid**)malloc(m_nStripDifferent * sizeof(G4Box*));
+  solids.strip = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
   if (solids.strip == NULL)
     B2FATAL(MemErr);
-  logvol.strip =
-    (G4LogicalVolume**)malloc(m_nStripDifferent * sizeof(G4LogicalVolume*));
+  logvol.strip = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (logvol.strip == NULL)
     B2FATAL(MemErr);
-  solids.groove = (G4VSolid**)malloc(m_nStripDifferent * sizeof(G4Box*));
+  solids.groove = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
   if (solids.groove == NULL)
     B2FATAL(MemErr);
-  logvol.groove =
-    (G4LogicalVolume**)malloc(m_nStripDifferent * sizeof(G4LogicalVolume*));
+  logvol.groove = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (logvol.groove == NULL)
     B2FATAL(MemErr);
   solids.scint = (struct EKLM::ScintillatorSolids*)
                  malloc(m_nStrip * sizeof(struct EKLM::ScintillatorSolids));
   if (solids.scint == NULL)
     B2FATAL(MemErr);
-  logvol.scint =
-    (G4LogicalVolume**)malloc(m_nStripDifferent * sizeof(G4LogicalVolume*));
+  logvol.scint = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (logvol.scint == NULL)
     B2FATAL(MemErr);
   solids.sectionsup = (struct EKLM::SectionSupportSolids**)
@@ -291,22 +288,9 @@ void EKLM::GeoEKLMCreator::calculateSectorSupportData()
                                        SectorSupportPosition.X);
 }
 
-static bool compareLength(struct EKLM::ElementPosition* a,
-                          struct EKLM::ElementPosition* b)
-{
-  return a->length < b->length;
-}
-
 void EKLM::GeoEKLMCreator::readXMLDataStrips()
 {
-  const char err[] = "Strip sorting algorithm error.";
   int i;
-  double l;
-  std::vector<struct EKLM::ElementPosition*> strips;
-  std::vector<struct EKLM::ElementPosition*>::iterator it;
-  std::map<double, int> mapLengthStrip;
-  std::map<double, int> mapLengthStrip2;
-  std::map<double, int>::iterator itm;
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
                  "Layer/Sector/Plane/Strips");
   m_nStrip = Strips.getNumberNodes("Strip");
@@ -329,47 +313,6 @@ void EKLM::GeoEKLMCreator::readXMLDataStrips()
     StripPosition[i].X = StripContent.getLength("PositionX") * CLHEP::cm;
     StripPosition[i].Y = StripContent.getLength("PositionY") * CLHEP::cm;
     StripPosition[i].Z = StripContent.getLength("PositionZ") * CLHEP::cm;
-    strips.push_back(&StripPosition[i]);
-    mapLengthStrip.insert(std::pair<double, int>(StripPosition[i].length, i));
-  }
-  sort(strips.begin(), strips.end(), compareLength);
-  l = strips[0]->length;
-  m_nStripDifferent = 1;
-  for (it = strips.begin(); it != strips.end(); ++it) {
-    if ((*it)->length != l) {
-      l = (*it)->length;
-      m_nStripDifferent++;
-    }
-  }
-  m_StripLenToAll = (int*)malloc(m_nStripDifferent * sizeof(int));
-  if (m_StripLenToAll == NULL)
-    B2FATAL(MemErr);
-  i = 0;
-  l = strips[0]->length;
-  itm = mapLengthStrip.find(l);
-  if (itm == mapLengthStrip.end())
-    B2FATAL(err);
-  m_StripLenToAll[i] = itm->second;
-  mapLengthStrip2.insert(std::pair<double, int>(l, i));
-  for (it = strips.begin(); it != strips.end(); ++it) {
-    if ((*it)->length != l) {
-      l = (*it)->length;
-      i++;
-      itm = mapLengthStrip.find(l);
-      if (itm == mapLengthStrip.end())
-        B2FATAL(err);
-      m_StripLenToAll[i] = itm->second;
-      mapLengthStrip2.insert(std::pair<double, int>(l, i));
-    }
-  }
-  m_StripAllToLen = (int*)malloc(m_nStrip * sizeof(int));
-  if (m_StripAllToLen == NULL)
-    B2FATAL(MemErr);
-  for (i = 0; i < m_nStrip; i++) {
-    itm = mapLengthStrip2.find(StripPosition[i].length);
-    if (itm == mapLengthStrip2.end())
-      B2FATAL(err);
-    m_StripAllToLen[i] = itm->second;
   }
 }
 
@@ -1241,7 +1184,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
 
 void EKLM::GeoEKLMCreator::createSolids()
 {
-  int i, n;
+  int i, iPos, n;
   char name[128];
   HepGeom::Transform3D t;
   /* Endcap. */
@@ -1278,13 +1221,14 @@ void EKLM::GeoEKLMCreator::createSolids()
   for (i = 0; i < nPlane; i++)
     createPlaneSolid(i);
   /* Strips. */
-  for (i = 0; i < m_nStripDifferent; i++) {
-    n = m_StripLenToAll[i];
+  n = m_geoDat->getNStripsDifferentLength();
+  for (i = 0; i < n; i++) {
+    iPos = m_geoDat->getStripPositionIndex(i);
     /* Strip volumes. */
     snprintf(name, 128, "StripVolume_%d", i + 1);
     try {
       solids.stripvol[i] =
-        new G4Box(name, 0.5 * (StripPosition[n].length + StripSize.rss_size),
+        new G4Box(name, 0.5 * (StripPosition[iPos].length + StripSize.rss_size),
                   0.5 * StripSize.width, 0.5 * StripSize.thickness);
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
@@ -1292,7 +1236,7 @@ void EKLM::GeoEKLMCreator::createSolids()
     /* Strips. */
     snprintf(name, 128, "Strip_%d", i + 1);
     try {
-      solids.strip[i] = new G4Box(name, 0.5 * StripPosition[n].length,
+      solids.strip[i] = new G4Box(name, 0.5 * StripPosition[iPos].length,
                                   0.5 * StripSize.width,
                                   0.5 * StripSize.thickness);
     } catch (std::bad_alloc& ba) {
@@ -1301,7 +1245,7 @@ void EKLM::GeoEKLMCreator::createSolids()
     /* Strip grooves. */
     snprintf(name, 128, "Groove_%d", i + 1);
     try {
-      solids.groove[i] = new G4Box(name, 0.5 * StripPosition[n].length,
+      solids.groove[i] = new G4Box(name, 0.5 * StripPosition[iPos].length,
                                    0.5 * StripSize.groove_width,
                                    0.5 * StripSize.groove_depth);
     } catch (std::bad_alloc& ba) {
@@ -1312,7 +1256,7 @@ void EKLM::GeoEKLMCreator::createSolids()
     try {
       solids.scint[i].box =
         new G4Box(name,
-                  0.5 * StripPosition[n].length -
+                  0.5 * StripPosition[iPos].length -
                   StripSize.no_scintillation_thickness,
                   0.5 * StripSize.width -
                   StripSize.no_scintillation_thickness,
@@ -1651,7 +1595,7 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
       createPlasticSheetElement(i, j, logicPlane);
   if (curvol.endcap == 1 && curvol.layer == 1 && curvol.sector == 1 &&
       curvol.plane == 1)
-    for (i = 0; i < m_nStripDifferent; i++) {
+    for (i = 0; i < m_geoDat->getNStripsDifferentLength(); i++) {
       createStripLogicalVolumes(i, logicPlane);
       createStripPhysicalVolumes(i);
     }
@@ -1959,7 +1903,7 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
   int n;
   G4Transform3D t;
   G4LogicalVolume* lv;
-  n = m_StripAllToLen[curvol.strip - 1];
+  n = m_geoDat->getStripLengthIndex(curvol.strip - 1);
   t = m_geoDat->transf.strip[curvol.endcap - 1][curvol.layer - 1][curvol.sector - 1][curvol.plane - 1][curvol.strip - 1] *
       G4Translate3D(0.5 * StripSize.rss_size, 0.0, 0.0);
   lv = logvol.stripvol[n];

@@ -170,6 +170,7 @@ namespace Belle2 {
       double m_GasAbs;
       /** chip store arrays */
       int dchip[10][80][336][MAXtSIZE];
+      //int dchip[80][336][MAXtSIZE];
       /** Particle ID array */
       //int partID[10][80][336][MAXtSIZE];
       /** Flag 0/1 only look at nuclear recoils*/
@@ -181,15 +182,15 @@ namespace Belle2 {
       /** Event counter */
       int Event = 0;
       /** col vector */
-      std::vector<int> colArray;
+      //std::vector<int> colArray;
       /** row vector */
-      std::vector<int> rowArray;
+      //std::vector<int> rowArray;
       /** tot vector */
-      std::vector<int> totArray;
+      //std::vector<int> totArray;
       /** bci vector */
-      std::vector<int> bciArray;
+      //std::vector<int> bciArray;
       /** Random Array */
-      double RNDnb[MAXtSIZE];
+      //double RNDnb[MAXtSIZE];
 
     };
 

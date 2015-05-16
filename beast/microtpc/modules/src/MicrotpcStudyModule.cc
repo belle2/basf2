@@ -74,7 +74,13 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 void MicrotpcStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 8 ; i++) {
-    h_z[i] = new TH2F(TString::Format("h_z_%d", i), "Charged density vs z vs r", 100, 0, 20, 100, -5., 5.);
+    h_z[i] = new TH1F(TString::Format("h_z_%d", i), "Charged density per cm^2", 2000, 0.0, 20.0);
+
+    h_zr[i] = new TH2F(TString::Format("h_zr_%d", i), "Charged density vs z vs r", 100, 0, 20, 100, 0., 5.);
+
+    h_zx[i] = new TH2F(TString::Format("h_zx_%d", i), "Charged density vs x vs r", 100, 0, 20, 100, -5., 5.);
+
+    h_zy[i] = new TH2F(TString::Format("h_zy_%d", i), "Charged density vs y vs r", 100, 0, 20, 100, -5., 5.);
 
     h_evtrl[i] = new TH2F(TString::Format("h_evtrl_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0., 6.);
     h_evtrl_p[i] = new TH2F(TString::Format("h_evtrl_p_%d", i), "Deposited energy [keV] v. track length [cm]", 2000, 0., 2000, 200, 0.,
@@ -194,14 +200,14 @@ void MicrotpcStudyModule::event()
 
   //number of entries in SimHit
   int nSimHits = SimHits.getEntries();
-  /*
+
   auto phiArray = new vector<double>[8](); //phi
   auto thetaArray = new vector<double>[8](); //theta
   auto pidArray = new vector<int>[8](); //PID
   //auto edgeArray = new vector<int>[8](); // Edge cut
-  auto esumArray = new vector<double>[8](); // eum
-  auto trlArray = new vector<double>[8](); // eum
-  */
+  auto esumArray = new vector<double>[8](); // esum
+  auto trlArray = new vector<double>[8](); // trl
+
   TVector3 EndPoint;
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
@@ -213,17 +219,19 @@ void MicrotpcStudyModule::event()
     if (PDGid == 1000020040) HeRec[detNb] = true;
     if (PDGid == 2212) pRec[detNb] = true;
     if (fabs(PDGid) == 11 || PDGid == 22) xRec[detNb] = true;
-    /*
+
     double edep = aHit->getEnergyDep();
     double niel = aHit->getEnergyNiel();
-    double ioni = edep - niel;
+    double ioni = (edep - niel) * 1e3; //MeV -> keV
     TVector3 position = aHit->gettkPos();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
     double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
     double r = sqrt(xpos * xpos + ypos * ypos);
-    h_z[detNb]->Fill(zpos, r, ioni);
-
+    h_z[detNb]->Fill(zpos, ioni);
+    h_zr[detNb]->Fill(zpos, r, ioni);
+    h_zx[detNb]->Fill(zpos, xpos, ioni);
+    h_zy[detNb]->Fill(zpos, ypos, ioni);
     TVector3 direction = aHit->gettkMomDir();
     double theta = direction.Theta() * TMath::RadToDeg();
     double phi = direction.Phi() * TMath::RadToDeg();
@@ -234,7 +242,7 @@ void MicrotpcStudyModule::event()
       //edgeArray].push_back(1);
     } else {
       //edgeArray[i].push_back(0);
-      EdgeCut[i] = false;
+      EdgeCut[detNb] = false;
     }
 
     if (pid_old[detNb] != PDGid) {
@@ -245,23 +253,62 @@ void MicrotpcStudyModule::event()
         double trl0 = BeginPoint * direction.Unit();
         double trl1 = EndPoint * direction.Unit();
         trlArray[detNb].push_back(fabs(trl0 - trl1));
-        pid_old[detNb] = PDGid;
+        /*
+        double trl = fabs(trl0 - trl1);
+        double ioniz = esum[detNb];
+        if (PDGid == 1000080160) {
+          h_ttvp_O[detNb]->Fill(theta, phi);
+          h_tevtrl_O[detNb]->Fill(ioniz, trl);
+        }
+        if (PDGid == 1000060120) {
+          h_ttvp_C[detNb]->Fill(theta, phi);
+          h_tevtrl_C[detNb]->Fill(ioniz, trl);
+        }
+        if (PDGid == 1000020040) {
+          h_ttvp_He[detNb]->Fill(theta, phi);
+          h_tevtrl_He[detNb]->Fill(ioniz, trl);
+        }
+        if (PDGid == 2212) {
+          h_ttvp_p[detNb]->Fill(theta, phi);
+          h_tevtrl_p[detNb]->Fill(ioniz, trl);
+        }
+        if (fabs(PDGid) == 11 || PDGid == 22) {
+          h_ttvp_x[detNb]->Fill(theta, phi);
+          h_tevtrl_x[detNb]->Fill(ioniz, trl);
+        }
+        h_ttvp[detNb]->Fill(theta, phi);
+        h_tevtrl[detNb]->Fill(ioniz, trl);
+
+        if (EdgeCut[detNb]) {
+        if (PDGid == 1000020040) {
+        h_ttvp_He_pure[detNb]->Fill(theta, phi);
+            h_twtvp_He_pure[detNb]->Fill(theta, phi, ioniz);
+            h_tevtrl_He_pure[detNb]->Fill(ioni, trl);
+          }
+        }
+        */
+
         thetaArray[detNb].push_back(theta);
         phiArray[detNb].push_back(phi);
         pidArray[detNb].push_back(PDGid);
+
       }
+      pid_old[detNb] = PDGid;
       esum[detNb] = 0;
+
     } else {
       esum[detNb] += ioni;
       EndPoint.SetXYZ(xpos, ypos, zpos);
-
-    }
     }
 
-    for (int i = 0; i < 8;  i++) {
+  }
+
+  for (int i = 0; i < 8;  i++) {
+
     for (int j = 0; j < (int)phiArray[i].size(); j++) {
+      //if (EdgeCut[i]) {
       double phi = phiArray[i][j];
-      double theta = phiArray[i][j];
+      double theta = thetaArray[i][j];
       int PDGid = pidArray[i][j];
       double ioni = esumArray[i][j];
       double trl = trlArray[i][j];
@@ -295,10 +342,11 @@ void MicrotpcStudyModule::event()
           h_tevtrl_He_pure[i]->Fill(ioni, trl);
         }
       }
+      //}
     }
-    }
-    */
   }
+
+
   //number of Tracks
   int nTracks = Tracks.getEntries();
 
@@ -360,7 +408,7 @@ void MicrotpcStudyModule::event()
   }
 
   eventNum++;
-  /*
+
   //delete
   delete [] phiArray;
   delete [] thetaArray;
@@ -368,7 +416,7 @@ void MicrotpcStudyModule::event()
   //delete [] edgeArray;
   delete [] esumArray;
   delete [] trlArray;
-  */
+
 }
 //read tube centers, impulse response, and garfield drift data filename from MICROTPC.xml
 void MicrotpcStudyModule::getXMLData()

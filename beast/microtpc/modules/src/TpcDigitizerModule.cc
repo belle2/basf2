@@ -128,6 +128,7 @@ void TpcDigitizerModule::initialize()
       for (int k = 0; k < 336; k++) {
         for (int l = 0; l < MAXtSIZE; l++) {
           dchip[i][j][k][l] = 0;
+          //dchip[j][k][l] = 0;
         }
       }
     }
@@ -310,6 +311,7 @@ void TpcDigitizerModule::event()
                 //store info into 3D array for each TPCs
                 dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
                 //partID[detNb][col][row][bci] = PDGid;
+                // ( detNb + 1 ) * (bci + 1 ) * ( col * m_ChipRowNb + row)
               }
               i_rnd++;
             }
@@ -332,7 +334,6 @@ void TpcDigitizerModule::event()
       }
     }
   }
-
 
   Event++;
 
@@ -419,6 +420,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
       //determined t0 ie first time above pixel threshold
       for (int k = 0; k < MAXtSIZE; k++) {
         if (dchip[detNb][i][j][k] > thresEl) {
+          //if (dchip[i][j][k] > thresEl) {
           k0 = k;
           break;
         }
@@ -433,6 +435,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
           //sum up charge with 16 cycles
           if (ik < 16) {
             NbOfEl += dchip[detNb][i][j][k];
+            //NbOfEl += dchip[i][j][k];
           } else {
             //calculate ToT
             int tot = -1;

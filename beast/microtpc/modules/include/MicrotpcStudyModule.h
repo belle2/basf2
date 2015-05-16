@@ -85,8 +85,14 @@ namespace Belle2 {
       /** Event counter */
       int Event = 0;
 
+      /** Charged density vs z vs section */
+      TH1F* h_z[8];
       /** Charged density vs z vs r */
-      TH2F* h_z[8];
+      TH2F* h_zr[8];
+      /** Charged density vs x vs r */
+      TH2F* h_zx[8];
+      /** Charged density vs y vs r */
+      TH2F* h_zy[8];
       /** Track length v. energy deposited per TPC */
       TH2F* h_evtrl[8];
       /** Track length v. energy deposited per TPC for He */

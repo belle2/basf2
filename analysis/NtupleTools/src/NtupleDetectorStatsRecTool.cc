@@ -22,8 +22,8 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/dataobjects/EKLMK0L.h>
 
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -48,7 +48,7 @@ void NtupleDetectorStatsRecTool::setupTree()
   m_iECLShowers = -1;
   m_iECLTrigs = -1;
   m_iEKLMHit2ds = -1;
-  m_iEKLMK0Ls = -1;
+  m_iKLMClusters = -1;
   m_iGFTracks = -1;
   m_iPIDLikelihoods = -1;
   m_iPXDClusters = -1;
@@ -66,7 +66,7 @@ void NtupleDetectorStatsRecTool::setupTree()
   m_tree->Branch("nECLShowers",   &m_iECLShowers,   "nECLShowers/I");
   m_tree->Branch("nECLTrigs",     &m_iECLTrigs,     "nECLTrigs/I");
   m_tree->Branch("nEKLMHit2ds",   &m_iEKLMHit2ds,   "nEKLMHit2ds/I");
-  m_tree->Branch("nEKLMK0Ls",     &m_iEKLMK0Ls,     "nEKLMK0Ls/I");
+  m_tree->Branch("nKLMClusters",  &m_iKLMClusters,  "nKLMClusters/I");
   m_tree->Branch("nGFTracks",     &m_iGFTracks,     "nGFTracks/I");
   m_tree->Branch("nPIDLikelihoods",   &m_iPIDLikelihoods,   "nPIDLikelihoods/I");
   m_tree->Branch("nPXDClusters",  &m_iPXDClusters,  "nPXDClusters/I");
@@ -109,8 +109,8 @@ void NtupleDetectorStatsRecTool::eval(const  Particle*)
   StoreArray<EKLMHit2d>    mEKLMHit2ds;
   m_iEKLMHit2ds = (int) mEKLMHit2ds.getEntries();
 
-  StoreArray<EKLMK0L>    mEKLMK0Ls;
-  m_iEKLMK0Ls = (int) mEKLMK0Ls.getEntries();
+  StoreArray<KLMCluster>    mKLMClusters;
+  m_iKLMClusters = (int) mKLMClusters.getEntries();
 
   StoreArray<genfit::Track>    mGFTracks("");
   m_iGFTracks = (int) mGFTracks.getEntries();

@@ -16,8 +16,10 @@
 
 /* External headers. */
 #include <TFile.h>
+#include <TTree.h>
 
 /* Belle2 headers. */
+#include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -28,6 +30,14 @@ namespace Belle2 {
    * Module for generation of transformation and alignment data.
    */
   class EKLMTimeCalibrationModule : public Module {
+
+    /**
+     * Event (hit): time, distance from hit to SiPM.
+     */
+    struct event {
+      float time;   /**< Time. */
+      float dist;   /**< Distance. */
+    };
 
   public:
 
@@ -73,6 +83,18 @@ namespace Belle2 {
 
     /** Output file */
     TFile* m_outputFile;
+
+    /** Geometry data. */
+    EKLM::GeometryData m_geoDat;
+
+    /** Number of strips with different lengths. */
+    int m_nStripDifferent;
+
+    /** Trees. */
+    TTree** m_Tree;
+
+    /** Event (for tree branches). */
+    struct event m_ev;
 
   };
 

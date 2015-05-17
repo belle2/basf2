@@ -29,6 +29,8 @@ EKLM::GeometryData::GeometryData()
   m_StripLen = NULL;
   m_StripLenToAll = NULL;
   m_StripAllToLen = NULL;
+  m_MinZForward = 0;
+  m_MaxZBackward = 0;
 }
 
 EKLM::GeometryData::~GeometryData()
@@ -65,12 +67,13 @@ int EKLM::GeometryData::read(const char* file)
   int i, res;
   char str[32];
   FILE* f;
-  double l;
+  double l, solenoidZ, endcapZ, endcapLength;
   std::vector<double> strips;
   std::vector<double>::iterator it;
   std::map<double, int> mapLengthStrip;
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
+  /* Read transformations. */
   f = fopen(file, "r");
   if (f == NULL)
     return -1;
@@ -78,15 +81,23 @@ int EKLM::GeometryData::read(const char* file)
   if (res != 0)
     return res;
   fclose(f);
+  /* Read position data. */
+  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
+  solenoidZ = gd.getLength("SolenoidZ");
+  gd.append("/Endcap");
+  endcapZ = gd.getLength("PositionZ");
+  endcapLength = gd.getLength("Length");
+  m_MinZForward = solenoidZ + endcapZ - 0.5 * endcapLength;
+  m_MaxZBackward = solenoidZ - endcapZ + 0.5 * endcapLength;
   /* Fill strip data. */
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
-             "Layer/Sector/Plane/Strips");
-  m_nStrip = gd.getNumberNodes("Strip");
+  GearDir gd2("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
+              "Layer/Sector/Plane/Strips");
+  m_nStrip = gd2.getNumberNodes("Strip");
   m_StripLen = (double*)malloc(m_nStrip * sizeof(double));
   if (m_StripLen == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < m_nStrip; i++) {
-    GearDir gds(gd);
+    GearDir gds(gd2);
     snprintf(str, 32, "/Strip[%d]", i + 1);
     gds.append(str);
     m_StripLen[i] = gds.getLength("Length");
@@ -218,5 +229,10 @@ bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   if (s2_cg.mag2() < s1_cg.mag2())
     *sd = - *sd;
   return true;
+}
+
+bool EKLM::GeometryData::hitInEKLM(double z)
+{
+  return (z > m_MinZForward) || (z < m_MaxZBackward);
 }
 

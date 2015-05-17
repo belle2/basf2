@@ -99,6 +99,12 @@ namespace Belle2 {
                         HepGeom::Point3D<double>* cross,
                         double* d1, double* d2, double* sd);
 
+      /**
+       * Check if z coordinate may be in EKLM.
+       * Warning: this is not a complete check!
+       */
+      bool hitInEKLM(double z);
+
       /** Transformations. */
       struct TransformData transf;
 
@@ -118,6 +124,12 @@ namespace Belle2 {
 
       /** Number of strip in position-based array. */
       int* m_StripLenToAll;
+
+      /* Minimal z coordinate of the forward endcap. */
+      double m_MinZForward;
+
+      /* Maximal z coordinate of the backward endcap. */
+      double m_MaxZBackward;
 
     };
 

@@ -171,20 +171,25 @@ namespace Belle2{
     }
     //if(m_name!="") cout<<"Signal name: "<<m_name<<" Clock: "<<t_rhs.m_finishClock<<endl;
 
-    //// If Signal is not from blank constructor.
-    if((*this).m_bitsize != -1) {
-      // Check if rhs and lhs bitsize is the same.
-      if((*this).m_bitsize != t_rhs.m_bitsize) {
-        cout<<"[Warning] TRGCDCJSignal::operator<=() => rhs and lhs do not have same bitsize."<<endl;
-      }
-      // Check if rhs and lhs is same type.
-      if((*this).m_type != t_rhs.m_type) {
-        cout<<"[Warning] TRGCDCJSignal::operator<=() => rhs and lhs do not have same type."<<endl;
-      }
-      // Check if rhs and lhs clock is the same.
-      if(m_finishClock != t_rhs.m_finishClock) {
-        cout<<"[Warning] TRGCDCJSignal::operator<=() => rhs and lhs do not have same clock."<<endl;
-        cout<<m_name<<" lhs clock: "<<m_finishClock<<" rhs clock: "<<t_rhs.m_finishClock<<endl;
+    //// If Signal is not from blank constructor, or has a name.
+    if((*this).m_bitsize != -1 || (*this).m_name != "") 
+    //if((*this).m_bitsize != -1)
+    {
+
+      if((*this).m_bitsize == 1) {
+        // Check if rhs and lhs bitsize is the same.
+        if((*this).m_bitsize != t_rhs.m_bitsize) {
+          cout<<"[Warning] TRGCDCJSignal::operator<=() => rhs and lhs do not have same bitsize."<<endl;
+        }
+        // Check if rhs and lhs is same type.
+        if((*this).m_type != t_rhs.m_type) {
+          cout<<"[Warning] TRGCDCJSignal::operator<=() => rhs and lhs do not have same type."<<endl;
+        }
+        // Check if rhs and lhs clock is the same.
+        if(m_finishClock != t_rhs.m_finishClock) {
+          cout<<"[Warning] TRGCDCJSignal::operator<=() => rhs and lhs do not have same clock."<<endl;
+          cout<<m_name<<" lhs clock: "<<m_finishClock<<" rhs clock: "<<t_rhs.m_finishClock<<endl;
+        }
       }
 
       //int t_type;
@@ -1838,7 +1843,9 @@ namespace Belle2{
       if(target.m_name == "") cout<<"[Error] TRGCDCJSignal::assignVhdlCode() => target.m_name is \"\" "<<endl;
       map<string, vector<int> > & t_signals = target.m_commonData->m_signals;
       if(t_signals.find(target.m_name) == t_signals.end()) {
-        t_signals[target.m_name] = {target.m_type, target.m_bitsize};
+        //t_signals[target.m_name] = {target.m_type, target.m_bitsize};
+        // From and target should be same.
+        t_signals[target.m_name] = {from.m_type, from.m_bitsize};
       }
     }
 
@@ -2067,6 +2074,9 @@ namespace Belle2{
       double const & t_min = get<3>(inValues[iSignals]);
       double const & t_max = get<4>(inValues[iSignals]);
       int const & t_clock = get<5>(inValues[iSignals]);
+      // Put input to signal.
+      // Input to finish clock is 0. 
+      // Signals that will be used will have finish clock 1 due to below line.
       outMap[t_name] <= Belle2::TRGCDCJSignal(t_bitWidth, t_value, t_min, t_max, t_clock, inCommonData);
     }
   }

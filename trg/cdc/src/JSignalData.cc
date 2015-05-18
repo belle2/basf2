@@ -81,6 +81,15 @@ namespace Belle2{
     return m_vhdlOutProcess;
   }
 
+  std::string TRGCDCJSignalData::getVhdlDefine() const {
+    return m_vhdlDefine;
+  }
+
+  std::map<std::string, std::vector<int> > const & TRGCDCJSignalData::getSignals() const{
+    return m_signals;
+  }
+
+
   void TRGCDCJSignalData::printToFile(){
     // Write to file.
     ofstream outFile;

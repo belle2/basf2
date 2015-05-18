@@ -58,15 +58,17 @@ void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double
   //}
 
   double Trg_PI=3.141592653589793; 
-  double A,B,C,D,E,G,hcx,hcy;
+  double A,B,C,D,E,hcx,hcy;
   double fiterror[5];
+  //double G;
   //Calculate fit error
   for(unsigned i=0;i<5;i++){
     fiterror[i]=sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi2[4]-phi2[2])+rr[2]*rr[2])/(sin(phi2[4]-phi2[2])*sin(phi2[4]-phi2[2]))-rr[i]*rr[i])*phierror[i];
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-  A=0,B=0,C=0,D=0,E=0,G=0,hcx=0,hcy=0;
+  A=0,B=0,C=0,D=0,E=0,hcx=0,hcy=0;
+  //G=0;
   for(unsigned i=0;i<5;i++){
     A+=cos(phi2[i])*cos(phi2[i])/(fiterror[i]*fiterror[i]);
     B+=sin(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
@@ -103,7 +105,8 @@ void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double
 void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS){
 
   double Trg_PI=3.141592653589793; 
-  double A,B,C,D,E,G,hcx,hcy;
+  double A,B,C,D,E,hcx,hcy;
+  //double G;
   double fiterror[5];
   //Calculate fit error
   for(int i=0;i<nTS;i++){
@@ -112,7 +115,8 @@ void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, doubl
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
-  A=0,B=0,C=0,D=0,E=0,G=0,hcx=0,hcy=0;
+  A=0,B=0,C=0,D=0,E=0,hcx=0,hcy=0;
+  //G=0;
   for(int i=0;i<nTS;i++){
     A+=cos(phi2[i])*cos(phi2[i])/(fiterror[i]*fiterror[i]);
     B+=sin(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);

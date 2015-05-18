@@ -449,6 +449,9 @@ namespace Belle2{
     // Set m_shiftOffsetInput.
     // [TODO] Change to constructor?
     m_shiftOffsetInput.setName("lut_"+out.getName()+"_in");
+    // To remove warning of no m_commonData.
+    m_shiftOffsetInput.setCommonData(t_offsetInput.getCommonData());
+    
     // Shift input (If needed)
     string t_shiftOffsetInputCode="";
     if(m_inputShiftBits>0) m_shiftOffsetInput.assignTo(Belle2::TRGCDCJSignal::toSlv(t_offsetInput.shift(m_inputShiftBits,0)), t_offsetInput.calFinishClock(), t_shiftOffsetInputCode);

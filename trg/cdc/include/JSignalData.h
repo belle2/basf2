@@ -41,8 +41,10 @@ class TRGCDCJSignalData {
   std::string getVhdlOutputFile() const;
   bool getPrintVhdl() const;
   bool getPrintedToFile() const;
+  std::map<std::string, std::vector<int> > const & getSignals() const;
   std::string getVhdlInProcess() const;
   std::string getVhdlOutProcess() const;
+  std::string getVhdlDefine() const;
 
   // Utilities
   void printToFile();

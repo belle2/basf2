@@ -361,7 +361,10 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
-        if(hits[j]==0) {cout<<"[0] POINTER IS ZERO"<<endl; continue;}
+        if(hits[j]==0) {
+          if(TRGDebug::level()) cout<<"[0] POINTER IS ZERO"<<endl; 
+          continue;
+        }
         st0TSs[j] = (double)hits[j]->cell().localId()/m_nWires[0]*4*m_Trg_PI;
         //driftSt0TSs[j] = hits[j]->segment().phiPosition();
         driftSt0TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
@@ -377,7 +380,10 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
-        if(hits[j]==0) {cout<<"[1] POINTER IS ZERO"<<endl; continue;}
+        if(hits[j]==0) {
+          if(TRGDebug::level()) cout<<"[1] POINTER IS ZERO"<<endl; 
+          continue;
+        }
         st1TSs[j] = (double)hits[j]->cell().localId()/m_nWires[1]*4*m_Trg_PI;
         //driftSt1TSs[j] = hits[j]->segment().phiPosition();
         driftSt1TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
@@ -392,7 +398,10 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
-        if(hits[j]==0) {cout<<"[2] POINTER IS ZERO"<<endl; continue;}
+        if(hits[j]==0) {
+          if(TRGDebug::level()) cout<<"[2] POINTER IS ZERO"<<endl; 
+          continue;
+        }
         st2TSs[j] = (double)hits[j]->cell().localId()/m_nWires[2]*4*m_Trg_PI;
         //driftSt2TSs[j] = hits[j]->segment().phiPosition();
         driftSt2TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
@@ -407,7 +416,10 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
     stTSs.push_back(vector<double>());
     p_stTSs.push_back(vector<const TCSHit *>());
     for(unsigned j=0; j< hits.size(); j++) {
-        if(hits[j]==0) {cout<<"[3] POINTER IS ZERO"<<endl; continue;}
+        if(hits[j]==0) {
+          if(TRGDebug::level()) cout<<"[3] POINTER IS ZERO"<<endl; 
+          continue;
+        }
         st3TSs[j] = (double)hits[j]->cell().localId()/m_nWires[3]*4*m_Trg_PI;
         //driftSt3TSs[j] = hits[j]->segment().phiPosition();
         driftSt3TSs[j] = TRGCDCFitter3D::calPhi(hits[j],_cdc.getEventTime());
@@ -450,10 +462,22 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
 
 
         // Check if there is a TS in each super layer.
-        if(stTSs[0].size()==0) {cout<<"[0] No TS"<<endl; continue;}
-        if(stTSs[1].size()==0) {cout<<"[1] No TS"<<endl; continue;}
-        if(stTSs[2].size()==0) {cout<<"[2] No TS"<<endl; continue;}
-        if(stTSs[3].size()==0) {cout<<"[3] No TS"<<endl; continue;}
+        if(stTSs[0].size()==0) {
+          if(TRGDebug::level()) cout<<"[0] No TS"<<endl; 
+          continue;
+        }
+        if(stTSs[1].size()==0) {
+          if(TRGDebug::level()) cout<<"[1] No TS"<<endl; 
+          continue;
+        }
+        if(stTSs[2].size()==0) {
+          if(TRGDebug::level()) cout<<"[2] No TS"<<endl; 
+          continue;
+        }
+        if(stTSs[3].size()==0) {
+          if(TRGDebug::level()) cout<<"[3] No TS"<<endl; 
+          continue;
+        }
 
         // Set input for Hough 3D finder
         // Get 2D track parameters.
@@ -474,10 +498,12 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
             //...Presently nSegments should be 1...
             if (nSegments != 1) {
                 if (nSegments==0){
-                    cout << " !!! NO TS assigned" << endl;
+                    if(TRGDebug::level()) cout << " !!! NO TS assigned" << endl;
                     break;
                 }
-                else{cout<< "!!!! multiple TS assigned"<< endl;}
+                else{
+                  if(TRGDebug::level()) cout<< "!!!! multiple TS assigned"<< endl;
+                }
             }
             const TCSegment * s = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
             axPhi[iLayer]=(double) s->localId()/m_axNWires[iLayer]*4*m_Trg_PI;

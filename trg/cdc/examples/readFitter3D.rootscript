@@ -1,3 +1,4 @@
+#include <map>
 #include <algorithm>
 
 using namespace RooFit;
@@ -270,7 +271,7 @@ void readFitter3D(){
     RooDataHist dHresZ0("dHresZ0","Resolution z0",RooArgList(fitSpace::ResZ0), hResz0);
     fitSpace::modelResZ0.fitTo(dHresZ0);
     // ResPt
-    RooRealVar resPt("ResPt", "Pt-McZ0", -250, 250, "MeV");
+    RooRealVar resPt("ResPt", "Pt-McPt", -250, 250, "MeV");
     fitSpace.import(resPt);
     fitSpace.factory("Gaussian::innerResPt(ResPt,ResPtInnerMean[0,-250,250],ResPtInnerSigma[10,0,250])");
     fitSpace.factory("Gaussian::outerResPt(ResPt,ResPtOuterMean[0,-250,250],ResPtOuterSigma[100,0,250])");

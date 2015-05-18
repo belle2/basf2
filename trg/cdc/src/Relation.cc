@@ -76,6 +76,8 @@ const MCParticle &
 TRGCDCRelation::mcParticle(unsigned a) const {
     const unsigned id = contributor(a);
     StoreArray<MCParticle> mcParticles;
+    const unsigned nMcParticles = mcParticles.getEntries();
+    if(nMcParticles==0) cout<<"[Error] TRGCDCRelation::mcParticle() => There are no mc particles in MCParticle store array."<<endl;
     return * mcParticles[id];
 }
 

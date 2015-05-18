@@ -73,9 +73,10 @@ namespace Belle2 {
 
   void TRGCDCFitter3D::initialize(){
     // [TODO] move to TRGCDC steering file
-    m_mBool["fFloatInt"] = 0;
     m_mBool["fMc"] = 1;
     m_mBool["fVerbose"] = 0;
+    m_mBool["fIsPrintError"] = 0;
+    m_mBool["fIsIntegerEffect"] = 1;
 
     // Init values
     m_mConstD["Trg_PI"] = 3.141592653589793;
@@ -138,7 +139,6 @@ namespace Belle2 {
       cout<<"fLRLUT:       "<<m_mBool["fLRLUT"]<<endl;
       cout<<"fEvtTime:     "<<m_mBool["fEvtTime"]<<endl;
       cout<<"fzierror:     "<<m_mBool["fzierror"]<<endl;
-      cout<<"fFloatInt:    "<<m_mBool["fFloatInt"]<<endl;
       cout<<"fMc:          "<<m_mBool["fMc"]<<endl;
       cout<<"fVerbose:     "<<m_mBool["fVerbose"]<<endl;
       cout<<"fmcLR:        "<<m_mBool["fmcLR"]<<endl;
@@ -161,15 +161,10 @@ namespace Belle2 {
 
     TRGDebug::enterStage("Fitter 3D");
 
-
     // Set values for saving data.
     if(m_mBool["fRootFile"]) m_mDouble["iSave"] = 0;
     if(m_mBool["fRootFile"]) {
       HandleRoot::initializeEvent(m_mTClonesArray);
-    }
-    if(m_commonData==0){
-      m_commonData = new Belle2::TRGCDCJSignalData();
-      m_commonData->setVhdlOutputFile("./VHDL/vhdlOutput");
     }
 
     // Get common values for event.
@@ -202,12 +197,12 @@ namespace Belle2 {
             trackFull = 0;
             //cout<<"Fitter3D::doit() => Not enough TS."<<endl;
           } else {
-            cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
+            if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
           }
         } else {
           if (priorityHitTS == 0) {
             trackFull = 0;
-            cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
+            if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
           }
         }
       } // End superlayer loop
@@ -365,7 +360,6 @@ namespace Belle2 {
 
     TRGDebug::enterStage("Fitter 3D");
 
-
     // Set values for saving data.
     if(m_mBool["fRootFile"]) m_mDouble["iSave"] = 0;
     if(m_mBool["fRootFile"]) {
@@ -373,13 +367,11 @@ namespace Belle2 {
     }
     if(m_commonData==0){
       m_commonData = new Belle2::TRGCDCJSignalData();
-      m_commonData->setVhdlOutputFile("./VHDL/vhdlOutput");
     }
 
     // Get common values for event.
     if(m_mBool["fEvtTime"]==0) m_mDouble["eventTime"]=0;
     else m_mDouble["eventTime"] = m_cdc.getEventTime();
-
 
     // Fitter3D
     // Loop over all tracks
@@ -406,12 +398,12 @@ namespace Belle2 {
             trackFull = 0;
             //cout<<"Fitter3D::doit() => Not enough TS."<<endl;
           } else {
-            cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
+            if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => multiple TS are assigned."<<endl;
           }
         } else {
           if (priorityHitTS == 0) {
             trackFull = 0;
-            cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
+            if (m_mBool["fIsPrintError"]) cout<<"Fitter3D::doit() => There are no priority hit TS"<<endl;
           }
         }
       } // End superlayer loop
@@ -596,19 +588,18 @@ namespace Belle2 {
 
             // Save values to root file.
             {
-              bool isIntegerEffectOn = 1;
               vector<pair<string, int> > chooseValues = {
-                make_pair("zz_0", isIntegerEffectOn),
-                make_pair("zz_1", isIntegerEffectOn),
-                make_pair("zz_2", isIntegerEffectOn),
-                make_pair("zz_3", isIntegerEffectOn),
-                make_pair("arcS_0", isIntegerEffectOn),
-                make_pair("arcS_1", isIntegerEffectOn),
-                make_pair("arcS_2", isIntegerEffectOn),
-                make_pair("arcS_3", isIntegerEffectOn),
-                make_pair("z0", isIntegerEffectOn),
-                make_pair("cot", isIntegerEffectOn),
-                make_pair("zChi2", isIntegerEffectOn)
+                make_pair("zz_0", m_mBool["fIsIntegerEffect"]),
+                make_pair("zz_1", m_mBool["fIsIntegerEffect"]),
+                make_pair("zz_2", m_mBool["fIsIntegerEffect"]),
+                make_pair("zz_3", m_mBool["fIsIntegerEffect"]),
+                make_pair("arcS_0", m_mBool["fIsIntegerEffect"]),
+                make_pair("arcS_1", m_mBool["fIsIntegerEffect"]),
+                make_pair("arcS_2", m_mBool["fIsIntegerEffect"]),
+                make_pair("arcS_3", m_mBool["fIsIntegerEffect"]),
+                make_pair("z0", m_mBool["fIsIntegerEffect"]),
+                make_pair("cot", m_mBool["fIsIntegerEffect"]),
+                make_pair("zChi2", m_mBool["fIsIntegerEffect"])
               };
               // outValues => [name, value, bitwidth, min, max, clock]
               vector<tuple<string, double, int, double, double, int> > outValues;
@@ -616,16 +607,42 @@ namespace Belle2 {
               HandleRoot::convertSignalValuesToMaps(outValues, m_mDouble, m_mVector);
               // Save values to m_mDouble and m_mVector.
             }
-
-            //// Saves to file only one time.
-            //saveVhdlAndCoe();
-            //// Saves values to memory. Wrote to file at terminate().
-            //saveAllSignals();
-            //saveIoSignals();
           }
         }
 
-      } //Reject low pt.
+        m_mBool["fVHDLFile"] = 0;
+        if(m_mBool["fVHDLFile"]) {
+          // Check if there is a name.
+          if((*m_mSignalStorage.begin()).second.getName() != ""){
+            // Saves to file only one time.
+            saveVhdlAndCoe();
+            // Saves values to memory. Wrote to file at terminate().
+            saveAllSignals();
+            saveIoSignals();
+          }
+        }
+
+        // Set track in trackListOut.
+        // Set Helix parameters 
+        TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
+        CLHEP::HepVector a(5); 
+        a = aTrack.helix().a(); 
+        aTrack.setFitted(1); 
+        a[3] = m_mDouble["z0"];  
+        a[4] = m_mDouble["cot"]; 
+        helix.a(a); 
+        aTrack.setHelix(helix); 
+        // Fill track list 
+        trackListOut.push_back(&aTrack); 
+
+      } else { //Reject low pt.
+        TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
+        CLHEP::HepVector helixParameters(5);
+        helixParameters = aTrack.helix().a();
+        aTrack.setFitted(0);
+        aTrack.setHelix(helix);
+        trackListOut.push_back(&aTrack);
+      }
 
       ///////////////
       // Save values
@@ -850,7 +867,9 @@ namespace Belle2 {
       HandleRoot::writeRoot(m_fileFitter3D);
       HandleRoot::terminateRoot(m_mTVectorD, m_mTClonesArray);
       delete m_fileFitter3D;
+    }
 
+    if(m_mBool["fVHDLFile"]) {
       //if(m_mSavedIoSignals.size()!=0) FpgaUtility::multipleWriteCoe(10, m_mSavedIoSignals, "./VHDL/LutData/Io/");
       //if(m_mSavedSignals.size()!=0) FpgaUtility::writeSignals("./VHDL/signals",m_mSavedSignals);
       if(m_mSavedIoSignals.size()!=0) FpgaUtility::multipleWriteCoe(10, m_mSavedIoSignals, "./");

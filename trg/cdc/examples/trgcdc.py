@@ -4,9 +4,11 @@
 # 2013/11/05 : Updated for release-00-03-00
 # 2014/02/12 : Updated for build-2014-01-19 //JB
 # 2015/01/28 : Updated for build-2015-01-03 //JB
-# 2015/02/02 : Added KKGen, Background, RootInput/RootOutput
+# 2015/02/02 : Added KKGen, Background, RootInput/RootOutput //JB
+# 2015/05/18 : Fixed background file issue. //JB
 
 from basf2 import *
+import glob
 
 #...suppress messages and warnings during processing...
 set_log_level(LogLevel.ERROR)
@@ -58,8 +60,8 @@ particlegun.param('pdgCodes', [13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
 #particlegun.param('momentumGeneration', 'uniform')
-particlegun.param('momentumParams', [0.2,0.4])
-#particlegun.param('momentumParams', [0.3, 0.3])
+#particlegun.param('momentumParams', [0.2,0.4])
+particlegun.param('momentumParams', [0.9, 0.9])
 #particlegun.param('thetaGeneration', 'uniform')
 #particlegun.param('thetaParams', [35, 127])
 particlegun.param('thetaParams', [90, 90])
@@ -97,15 +99,15 @@ g4sim.param('UICommands',['/control/execute ' + os.path.join(os.environ.get('BEL
 #...BeamBkgMixer...
 # Mix background (From beamBkgMixer.py)
 dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
-bkg_files = [
-    dir + 'Coulomb_HER_100us.root',
-    dir + 'Coulomb_LER_100us.root',
-    dir + 'RBB_HER_100us.root',
-    dir + 'RBB_LER_100us.root',
-    dir + 'Touschek_HER_100us.root',
-    dir + 'Touschek_LER_100us.root',
-]
-#bkg_file = glob.glob(dir + '/*.root')
+#bkg_files = [
+#    dir + 'Coulomb_HER_100us.root',
+#    dir + 'Coulomb_LER_100us.root',
+#    dir + 'RBB_HER_100us.root',
+#    dir + 'RBB_LER_100us.root',
+#    dir + 'Touschek_HER_100us.root',
+#    dir + 'Touschek_LER_100us.root',
+#]
+bkg_files = glob.glob(dir + '/*.root')
 bkgScaleFactor = 1
 bkgmixer.param('backgroundFiles', bkg_files)
 bkgmixer.param('components', simulatedComponents)
@@ -177,7 +179,7 @@ fullMain.add_module(particlegun)
 #fullMain.add_module(kkgeninput)
 fullMain.add_module(mcparticleprinter)
 fullMain.add_module(g4sim)
-#fullMain.add_module(bkgmixer)
+fullMain.add_module(bkgmixer)
 fullMain.add_module(cdcdigitizer)
 fullMain.add_module(cdctrg)
 

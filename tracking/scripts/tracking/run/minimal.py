@@ -167,17 +167,21 @@ class MinimalRun(object):
         self.execute()
 
     @classmethod
-    def get_basf2_module(cls, module_or_module_name):
+    def get_basf2_module(cls, module_or_module_name, **kwargs):
         if isinstance(module_or_module_name, list):
+            if kwargs is not None:
+                raise ValueError("kwargs keyword is not supported for module lists.")
             modules = module_or_module_name
             modules = [cls.get_basf2_module(m) for m in modules]
             return metamodules.PathModule(modules=modules)
         elif isinstance(module_or_module_name, str):
             module_name = module_or_module_name
             module = basf2.register_module(module_name)
+            module.param(kwargs)
             return module
         elif isinstance(module_or_module_name, basf2.Module):
             module = module_or_module_name
+            module.param(kwargs)
             return module
         else:
             message_template = \

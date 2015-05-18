@@ -235,6 +235,12 @@ namespace Belle2 {
       /// Getter for the z coordinate at the backward joint points of the wires
       FloatType  getBackwardZ() const { return getSkewLine().backwardZ(); }
 
+      /** Indicator if the given position near the wire is already outside the CDC.
+       *  If one component of the vector is NaN false is returned.
+       */
+      bool isOutsideCDC(const Vector3D& recoPos3D) const
+      { return recoPos3D.z() > getForwardZ() or recoPos3D.z() < getBackwardZ(); }
+
       /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference
       const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }
 

@@ -87,9 +87,9 @@ namespace Belle2 {
       virtual std::map<std::string, std::string> getParameterDescription()
       {
         std::map<std::string, std::string> des = Super::getParameterDescription();
-        des["cut"] =  "The cut value of the mva output below which the object is rejected.";
-        des["root_file_name"] = "Name of the ROOT file to be written.";
-        des["tree_name"] = "Name of the Tree to be written.";
+        des["cut"] =  "The cut value of the mva output below which the object is rejected";
+        des["root_file_name"] = "Name of the ROOT file to be written";
+        des["tree_name"] = "Name of the Tree to be written";
         des["returned_cell_weight"] = "CellWeight this filter should return when called. Defaults to NOT_A_CELL";
         return des;
       }

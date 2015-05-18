@@ -73,9 +73,9 @@ namespace Belle2 {
       virtual std::map<std::string, std::string> getParameterDescription()
       {
         std::map<std::string, std::string> des = Super::getParameterDescription();
-        des["cut"] =  "The cut value of the mva output below which the object is rejected.";
-        des["folder_weight"] = "The name of the folder to look for weight files from trainings.";
-        des["training_name"] = "The name of the training that should be used for the prediction.";
+        des["cut"] =  "The cut value of the mva output below which the object is rejected";
+        des["folder_weight"] = "The name of the folder to look for weight files from trainings";
+        des["training_name"] = "The name of the training that should be used for the prediction";
         return des;
       }
     public:

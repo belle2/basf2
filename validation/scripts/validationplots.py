@@ -167,6 +167,26 @@ def serve_existing_plots(list_of_revisions):
                  'content.html file could not be found!')
 
 
+def files_in_pkg(pkg, list_of_revisions):
+    """
+    For a given package, and a list of revisions, returns a list of all plot
+    and reference files in this package. Gives only the file names!
+    """
+
+    # Get a list of all files (plot and reference)
+    all_files = get_plot_files(list_of_revisions) + get_reference_files()
+
+    # Remove all files that do not belong to the given package
+    # Also, only remember the name of the file, not the full path
+    in_pkg = []
+    for rootfile in all_files:
+        head, tail = os.path.split(rootfile)
+        if head.endswith(pkg):
+            in_pkg.append(tail)
+
+    return sorted(in_pkg)
+
+
 def get_plot_files(list_of_revisions):
     """
     Returns a list of all plot files as absolute paths. For this purpose,
@@ -526,11 +546,10 @@ def generate_new_plots(list_of_revisions):
     # Now create the HTML files that contain the lists of all available
     # revisions and the available packages
     create_revision_list_html()
-    create_packages_list_html(list_of_packages)
+    create_packages_list_html(list_of_packages, list_of_revisions)
 
     # Open the output file
     html_output = open('./content.html', 'w+')
-    temp_output = ""
 
     # Write meta-data, i.e. creation date and revisions contained in the file
     created = str(datetime.datetime.utcfromtimestamp(int(time.time())))
@@ -569,6 +588,8 @@ def generate_new_plots(list_of_revisions):
         # group the plots correctly
         for rootfile in files_in_pkg:
 
+            fileName, fileExt = os.path.splitext(rootfile)
+
             # Some more information to be printed out while plots are
             # being created
             print '\nNow creating plots for file: {0}'.format(rootfile)
@@ -577,8 +598,8 @@ def generate_new_plots(list_of_revisions):
             html_output.write('<section class="persistent-area">')
 
             # Write to the HTML the name of the current file
-            html_output.write('<h2 name="#{0}" class="persistent-header">{0}</h2><br>\n'
-                              .format(rootfile))
+            html_output.write('<h2 id="{0}_{1}" class="persistent-header">{1}</h2><br>\n'
+                              .format(package, fileName))
 
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
@@ -911,15 +932,51 @@ def create_revision_list_html():
     revisions.close()
 
 
-def create_packages_list_html(list_of_packages):
+def create_packages_list_html(list_of_packages, list_of_revisions):
 
     # Create a file with all available packages
     with open('./packages.html', 'w+') as pkgs:
         for pkg in sorted(list_of_packages):
-            pkgs.write('<label><input type="checkbox" name="packages" value="{'
-                       '0}" checked>&nbsp;<a href="#{0}">'
-                       '{0} &raquo;</a><br></label>'
+
+            # Write the checkbox to the HTML
+            pkgs.write('<label>'
+                       '<input type="checkbox" name="packages" '
+                       'value="{0}" checked>&nbsp;'
+                       '<a href="#{0}" class="pkg_container_head" '
+                       'name="{0}">{0} &raquo;</a><br>'
+                       '</label>\n'
                        .format(pkg))
+
+            # Get a list of all ROOT result files in this package
+            in_pkg = files_in_pkg(pkg, list_of_revisions)
+
+            # Print them into a container
+            pkgs.write('<div class="pkg_container pkg_{0}" '
+                       'style="margin-left:18px; font-size:10px;'
+                       'display:none;">'.format(pkg))
+
+            for rootfile in in_pkg:
+
+                # Get the file name and shorten it if necessary
+                filename, extension = os.path.splitext(rootfile)
+                if len(filename) > 19:
+                    shortname = filename[:16] + '...'
+                else:
+                    shortname = filename
+
+                # Write to HTML
+                pkgs.write('<a href="#{0}_{1}">{2}</a><br>\n'
+                           .format(pkg, filename, shortname))
+
+            pkgs.write('</div>')
+
+        # Add JavaScript that shows/hides the boxes with the files
+        pkgs.write('<script type="text/javascript"> \n'
+                   '$(".pkg_container_head").click( function() { \n'
+                   '$(".pkg_container").each( function(){$(this).hide();});\n'
+                   '$(".pkg_"+$(this).attr("name")).show(); \n'
+                   '}); \n'
+                   '</script> \n')
 
 
 ##############################################################################

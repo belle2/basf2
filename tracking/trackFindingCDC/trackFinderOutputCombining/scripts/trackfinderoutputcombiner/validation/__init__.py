@@ -99,8 +99,12 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
             legendre_path.add_module(background_hit_finder_module)
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
-        cdctracking.param({'WriteGFTrackCands': False,
-                           'SkipHitsPreparation': True})
+        cdctracking.param('SkipHitsPreparation', True)
+
+        if self.stereo_assignment:
+            cdctracking.param('WriteGFTrackCands', False)
+        else:
+            cdctracking.param('WriteGFTrackCands', True)
 
         cdc_stereo_combiner = basf2.register_module('CDCLegendreHistogramming')
         cdc_stereo_combiner.param({'WriteGFTrackCands': True,

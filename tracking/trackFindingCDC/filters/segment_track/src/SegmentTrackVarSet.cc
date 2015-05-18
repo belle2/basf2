@@ -26,19 +26,27 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   const CDCRecoSegment2D* segment = testPair->first;
   const CDCTrack* track = testPair->second;
 
+  double maxmimumTrajectoryDistanceFront = 0;
+  double maxmimumTrajectoryDistanceBack = 0;
   double maxmimumHitDistanceFront = 0;
   double maxmimumHitDistanceBack = 0;
   double outOfCDC = 0; // 0 means no, 1 means yes
   double hitsInSameRegion = 0;
 
+
   const CDCRecoHit2D& front = segment->front();
   const CDCRecoHit2D& back = segment->back();
 
-  // Calculate distance
+  // Calculate distances
   const CDCTrajectory2D& trajectory = track->getStartTrajectory3D().getTrajectory2D();
+  CDCTrajectory2D& trajectorySegment = segment->getTrajectory2D();
 
-  maxmimumHitDistanceFront = trajectory.getDist2D(front.getWireHit().getRefPos2D());
-  maxmimumHitDistanceBack = trajectory.getDist2D(back.getWireHit().getRefPos2D());
+  maxmimumTrajectoryDistanceFront = trajectory.getDist2D(front.getWireHit().getRefPos2D());
+  maxmimumTrajectoryDistanceBack = trajectory.getDist2D(back.getWireHit().getRefPos2D());
+
+
+  const CDCRiemannFitter& circleFitter = CDCRiemannFitter::getFitter();
+  circleFitter.update(trajectorySegment, *segment);
 
   // Calculate if it is out of the CDC
   Vector3D frontRecoPos3D = front.reconstruct3D(trajectory);
@@ -58,6 +66,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   for (const CDCRecoHit3D& recoHit : track->items()) {
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
+    } else if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) == 1) {
+      double distanceFront = (front.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).norm();
+      if (distanceFront > maxmimumHitDistanceFront) {
+        maxmimumHitDistanceFront = distanceFront;
+      }
+      double distanceBack = (back.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).norm();
+      if (distanceBack > maxmimumHitDistanceBack) {
+        maxmimumHitDistanceBack = distanceBack;
+      }
     }
   }
 
@@ -99,21 +116,20 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     }
   }
 
-  if (observationsFull.size() == observationsNeigh.size()) {
-    var<named("fit_full")>() = var<named("fit_neigh")>() = -1;
+  // Do the fit
+  if (segment->getStereoType() == AXIAL) {
+    const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+    var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
+    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
   } else {
-    // Do the fit
-    if (segment->getStereoType() == AXIAL) {
-      const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-      var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
-      var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
-    } else {
-      const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-      var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
-      var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
-    }
+    const CDCSZFitter& fitter = CDCSZFitter::getFitter();
+    var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
+    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
   }
 
+  if (observationsFull.size() == observationsNeigh.size()) {
+    var<named("fit_neigh")>() = -1;
+  }
 
   var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
   var<named("segment_size")>() = segment->size();
@@ -124,17 +140,20 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   var<named("superlayer_already_full")>() = not trajectory.getOuterExit().hasNAN() and hitsInSameRegion > 5;
 
-  if (std::isnan(maxmimumHitDistanceFront)) {
-    var<named("maxmimum_hit_distance_front")>() = 999;
+  if (std::isnan(maxmimumTrajectoryDistanceFront)) {
+    var<named("maxmimum_trajectory_distance_front")>() = 999;
   } else {
-    var<named("maxmimum_hit_distance_front")>() = maxmimumHitDistanceFront;
+    var<named("maxmimum_trajectory_distance_front")>() = maxmimumTrajectoryDistanceFront;
   }
 
-  if (std::isnan(maxmimumHitDistanceBack)) {
-    var<named("maxmimum_hit_distance_back")>() = 999;
+  if (std::isnan(maxmimumTrajectoryDistanceBack)) {
+    var<named("maxmimum_trajectory_distance_back")>() = 999;
   } else {
-    var<named("maxmimum_hit_distance_back")>() = maxmimumHitDistanceBack;
+    var<named("maxmimum_trajectory_distance_back")>() = maxmimumTrajectoryDistanceBack;
   }
+
+  var<named("maxmimum_hit_distance_front")>() = maxmimumHitDistanceFront;
+  var<named("maxmimum_hit_distance_back")>() = maxmimumHitDistanceBack;
 
   var<named("out_of_CDC")>() = outOfCDC;
   var<named("hits_in_same_region")>() = hitsInSameRegion;

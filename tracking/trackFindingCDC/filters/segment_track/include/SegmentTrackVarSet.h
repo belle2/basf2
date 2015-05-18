@@ -33,6 +33,8 @@ namespace Belle2 {
       "is_stereo",
       "segment_size",
       "track_size",
+      "maxmimum_trajectory_distance_front",
+      "maxmimum_trajectory_distance_back",
       "maxmimum_hit_distance_front",
       "maxmimum_hit_distance_back",
       "out_of_CDC",
@@ -51,7 +53,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 12;
+      static const size_t nNames = 14;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

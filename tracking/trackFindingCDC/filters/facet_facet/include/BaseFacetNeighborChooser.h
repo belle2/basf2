@@ -68,7 +68,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual CellWeight operator()(const Relation<CDCRecoFacet>& relation) override final
+      virtual CellWeight operator()(const Relation<CDCRecoFacet>& relation) override
       {
         const CDCRecoFacet* ptrFrom = relation.first;
         const CDCRecoFacet* ptrTo = relation.second;

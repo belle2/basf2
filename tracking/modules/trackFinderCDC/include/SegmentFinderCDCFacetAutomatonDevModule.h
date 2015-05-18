@@ -65,6 +65,7 @@ namespace Belle2 {
     + "all" (all possible neighbors are valid)
     + "mc" (monte carlo truth)
     + "simple" (mc free with simple criteria)
+    + "recording" (records the encountered instances of facets relations including truth information)",
     */
     std::string m_param_facetNeighborChooser;
 

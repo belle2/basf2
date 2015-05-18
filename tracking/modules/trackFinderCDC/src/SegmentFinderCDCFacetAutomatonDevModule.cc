@@ -54,9 +54,9 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"mc_symmetric\" (monte carlo truth and their mirror image), "
            "\"fitless\" (only checking the feasability of right left passage information), "
            "\"fitless_hard\" (also exclude the boarder line feasable combinations), "
-           "\"simple\" (mc free with simple criteria)."
-           "\"realistic\" (mc free with more realistic criteria)."
-           "\"recording\" (record the encountered instances of facets including truth information)",
+           "\"simple\" (mc free with simple criteria), "
+           "\"realistic\" (mc free with more realistic criteria), "
+           "\"recording\" (record the encountered instances of facets including truth information).",
            string("realistic"));
 
   addParam("FacetFilterParameters",
@@ -72,7 +72,9 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"all\" (all possible neighbors are valid), "
            "\"mc\" (monte carlo truth), "
            "\"mc_symmetric\" (monte carlo truth and the reversed version are excepted), "
-           "\"simple\" (mc free with simple criteria).",
+           "\"simple\" (mc free with simple criteria), "
+           "\"recording\" (records the encountered instances of facets relations including truth "
+           "information)",
            string("simple"));
 
   addParam("FacetNeighborChooserParameters",
@@ -146,6 +148,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
     ptrFacetNeighborChooser.reset(new MCFacetNeighborChooser());
   } else if (m_param_facetNeighborChooser == string("simple")) {
     ptrFacetNeighborChooser.reset(new SimpleFacetNeighborChooser());
+  } else if (m_param_facetNeighborChooser == string("recording")) {
+    ptrFacetNeighborChooser.reset(new RecordingFacetNeighborChooser());
   } else {
     B2ERROR("Unrecognised FacetNeighborChooser option " << m_param_facetNeighborChooser <<
             ". Allowed values are \"none\", \"all\", \"mc\", and \"simple\".");

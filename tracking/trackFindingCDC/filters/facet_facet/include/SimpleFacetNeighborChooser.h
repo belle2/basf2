@@ -29,7 +29,7 @@ namespace Belle2 {
 
     public:
       /// Constructor using default direction of flight deviation cut off.
-      SimpleFacetNeighborChooser() : m_param_deviationCosCut(cos(PI / 180.0 * 180.0))
+      SimpleFacetNeighborChooser() : m_param_deviationCosCut(cos(0.4))
       {;}
 
       /// Constructor using given direction of flight deviation cut off.

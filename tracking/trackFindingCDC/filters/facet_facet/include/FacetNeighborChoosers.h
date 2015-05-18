@@ -12,3 +12,4 @@
 #include "AllFacetNeighborChooser.h"
 #include "MCFacetNeighborChooser.h"
 #include "SimpleFacetNeighborChooser.h"
+#include "RecordingFacetNeighborChooser.h"

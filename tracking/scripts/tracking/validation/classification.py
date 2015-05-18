@@ -34,6 +34,7 @@ class ClassificationAnalysis(object):
         lower_bound=None,
         upper_bound=None,
         outlier_z_score=None,
+        allow_discrete=None,
         unit=None
     ):
         """Performs a comparision of an estimated quantity to their truths by generating standardized validation plots."""
@@ -50,6 +51,7 @@ class ClassificationAnalysis(object):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.outlier_z_score = outlier_z_score
+        self.allow_discrete = allow_discrete
         self.unit = unit
 
     def analyse(
@@ -146,7 +148,8 @@ class ClassificationAnalysis(object):
             stackby=truths,
             lower_bound=self.lower_bound,
             upper_bound=self.upper_bound,
-            outlier_z_score=self.outlier_z_score
+            outlier_z_score=self.outlier_z_score,
+            allow_discrete=self.allow_discrete,
         )
         signal_bkg_histogram.xlabel = axis_label
 
@@ -161,7 +164,8 @@ class ClassificationAnalysis(object):
             truths,
             lower_bound=self.lower_bound,
             upper_bound=self.upper_bound,
-            outlier_z_score=self.outlier_z_score
+            outlier_z_score=self.outlier_z_score,
+            allow_discrete=self.allow_discrete,
         )
 
         purity_profile.xlabel = axis_label
@@ -202,6 +206,7 @@ class ClassificationAnalysis(object):
                 lower_bound=self.lower_bound,
                 upper_bound=self.upper_bound,
                 outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
             )
 
             efficiency_by_cut_profile.xlabel = "cut " + axis_label
@@ -219,6 +224,7 @@ class ClassificationAnalysis(object):
                 lower_bound=self.lower_bound,
                 upper_bound=self.upper_bound,
                 outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
             )
 
             bkg_rejection_by_cut_profile.xlabel = "cut " + axis_label

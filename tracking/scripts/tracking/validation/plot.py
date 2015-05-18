@@ -481,7 +481,12 @@ class ValidationPlot(object):
 
             stackby = np.array(stackby, copy=False)
 
-            histograms = self.fill_into_grouped(histogram, xs, ys, weights=weights, groupby=stackby)
+            histograms = self.fill_into_grouped(histogram,
+                                                xs,
+                                                ys,
+                                                weights=weights,
+                                                groupbys=stackby,
+                                                groupby_label="stack")
 
             if cumulation_direction is not None:
                 histograms = [self.cumulate(histogram, cumulation_direction=cumulation_direction) for histogram in histograms]
@@ -508,23 +513,30 @@ class ValidationPlot(object):
 
         self.attach_attributes()
 
-    def fill_into_grouped(self, histogram_template, xs, ys=None, weights=None, groupby=None):
+    def fill_into_grouped(self,
+                          histogram_template,
+                          xs,
+                          ys=None,
+                          weights=None,
+                          groupbys=None,
+                          groupby_label="group"):
         histograms = []
-        unique_groupby = np.unique(groupby)
+        unique_groupbys = np.unique(groupbys)
         name = histogram_template.GetName()
 
-        for i_value, value in enumerate(unique_groupby):
+        for i_value, value in enumerate(unique_groupbys):
             if np.isnan(value):
-                indices_for_value = np.isnan(groupby)
+                indices_for_value = np.isnan(groupbys)
             else:
-                indices_for_value = groupby == value
+                indices_for_value = groupbys == value
 
             # Make a copy of the empty histogram
             histogram_for_value = histogram_template.Clone(name + '_' + str(value))
             i_root_color = i_value + 1
 
             histogram_for_value.SetLineColor(i_root_color)
-
+            if groupby_label:
+                self.add_stats_entry(groupby_label, value, histogram_for_value)
             self.fill_into(histogram_for_value, xs, weights=weights, filter=indices_for_value)
             histograms.append(histogram_for_value)
 

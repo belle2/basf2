@@ -152,29 +152,33 @@ namespace Belle2 {
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
       void draw(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D,
-                const AttributeMap& attributeMap = AttributeMap()) {
+                const AttributeMap& attributeMap = AttributeMap())
+      {
         draw(recoHit3D.getRecoHit2D(), attributeMap);
       }
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
-      void draw(const Belle2::TrackFindingCDC::CDCRecoTangent& recoTangent,
+      void draw(const Belle2::TrackFindingCDC::CDCTangent& tangent,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCTrajectory from the start point until it first exits the CDC.
       void draw(const CDCTrajectory2D& trajectory2D, AttributeMap attributeMap = AttributeMap());
 
       /// Draws all CDCWireHits of the cluster
-      void draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap()) {
+      void draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap())
+      {
         drawRange(wireHitCluster, attributeMap);
       }
 
       /// Draws all CDCRecoHits2D of the segment
-      void draw(const CDCRecoSegment2D& recoSegment2D, const AttributeMap& attributeMap = AttributeMap()) {
+      void draw(const CDCRecoSegment2D& recoSegment2D, const AttributeMap& attributeMap = AttributeMap())
+      {
         drawRange(recoSegment2D, attributeMap);
       }
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCRecoSegment3D& recoSegment3D, const AttributeMap& attributeMap = AttributeMap()) {
+      void draw(const CDCRecoSegment3D& recoSegment3D, const AttributeMap& attributeMap = AttributeMap())
+      {
         drawRange(recoSegment3D, attributeMap);
       }
 
@@ -188,7 +192,8 @@ namespace Belle2 {
       void draw(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap()) {
+      void draw(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap())
+      {
         drawRange(track, attributeMap);
       }
 
@@ -197,13 +202,15 @@ namespace Belle2 {
 
       /// Allow the drawing of pointers checking if the pointer is nonzero.
       template<class T>
-      void draw(const T* ptr, const AttributeMap& attributeMap = AttributeMap()) {
+      void draw(const T* ptr, const AttributeMap& attributeMap = AttributeMap())
+      {
         if (ptr) draw(*ptr, attributeMap);
       }
 
       /// Draw store array
       template<class T>
-      void draw(const StoreArray<T>& storeArray, const AttributeMap& attributeMap = AttributeMap()) {
+      void draw(const StoreArray<T>& storeArray, const AttributeMap& attributeMap = AttributeMap())
+      {
         if (storeArray) {
           drawRange(storeArray, attributeMap);
         }
@@ -211,11 +218,12 @@ namespace Belle2 {
 
       /// Draws a range iterable collection of drawable elements
       template<class Range>
-      void drawRange(const Range& range, const AttributeMap& attributeMap = AttributeMap()) {
+      void drawRange(const Range& range, const AttributeMap& attributeMap = AttributeMap())
+      {
         if (not m_ptrPrimitivePlotter) return;
         PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
         primitivePlotter.startGroup(attributeMap);
-        for (const auto & element : range) {
+        for (const auto& element : range) {
           draw(element);
         }
         primitivePlotter.endGroup();

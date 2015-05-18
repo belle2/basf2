@@ -16,7 +16,7 @@
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/algorithms/SortableVector.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 namespace Belle2 {
@@ -38,7 +38,7 @@ namespace Belle2 {
       void createFacets(FacetFilter& facetFilter,
                         const CDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
-                        SortableVector<CDCRecoFacet>& facets) const
+                        SortableVector<CDCFacet>& facets) const
       {
         createFacetsGeneric(facetFilter, wirehits, neighborhood, facets);
         facets.sort();
@@ -117,12 +117,12 @@ namespace Belle2 {
           for (const CDCRLWireHit& middleRLWireHit : middleRLWireHits) {
             for (const CDCRLWireHit& endRLWireHit : endRLWireHits) {
 
-              CDCRecoFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
+              CDCFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
               // do not set the lines yet. The filter shall do that if it wants to.
               // He should set them if he accepts the facet.
 
               //Obtain a constant interface to pass to the filter method following
-              const CDCRecoFacet& constFacet = facet;
+              const CDCFacet& constFacet = facet;
 
               CellState cellWeight = facetFilter(constFacet);
 

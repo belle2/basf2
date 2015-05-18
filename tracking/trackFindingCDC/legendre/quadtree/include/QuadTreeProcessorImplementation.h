@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

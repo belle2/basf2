@@ -464,8 +464,8 @@ class CDCSVGDisplayModule(Module):
                         fromRecoHit2D = Belle2.TrackFindingCDC.CDCRecoHit2D(fromRLWireHit, fromDisplacement.xy())
                         toRecoHit2D = Belle2.TrackFindingCDC.CDCRecoHit2D(toRLWireHit, toDisplacement.xy())
 
-                        recoTangent = Belle2.TrackFindingCDC.CDCRecoTangent(fromRecoHit2D, toRecoHit2D)
-                        plotter.draw(recoTangent, **styleDict)
+                        tangent = Belle2.TrackFindingCDC.CDCTangent(fromRecoHit2D, toRecoHit2D)
+                        plotter.draw(tangent, **styleDict)
 
         # Draw the reassignment information of hits
         if self.draw_reassigned:
@@ -611,7 +611,7 @@ class CDCSVGDisplayModule(Module):
         # Draw Tangent segments
         if self.draw_tangentsegments:
             styleDict = {'stroke-width': '0.2'}
-            plotter.draw_storearray('CDCRecoTangentSegments', **styleDict)
+            plotter.draw_storearray('CDCTangentSegments', **styleDict)
 
         # Draw axial stereo segment pairs
         if self.draw_axialstereosegmentpairs:

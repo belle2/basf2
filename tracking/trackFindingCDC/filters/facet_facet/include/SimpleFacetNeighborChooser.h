@@ -17,11 +17,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of facets based on simple criterions.
-    class SimpleFacetNeighborChooser : public Filter<Relation<CDCRecoFacet>> {
+    class SimpleFacetNeighborChooser : public Filter<Relation<CDCFacet>> {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCRecoFacet>> Super;
+      typedef Filter<Relation<CDCFacet>> Super;
 
     public:
       /// Importing all overloads from the super class
@@ -55,8 +55,8 @@ namespace Belle2 {
 
     public:
       /** Main filter method returning the weight of the neighborhood relation.*/
-      virtual NeighborWeight operator()(const CDCRecoFacet& fromFacet,
-                                        const CDCRecoFacet& toFacet) override final;
+      virtual NeighborWeight operator()(const CDCFacet& fromFacet,
+                                        const CDCFacet& toFacet) override final;
 
     private:
       /// Memory for the used direction of flight deviation.

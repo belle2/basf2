@@ -15,11 +15,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     ///Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetNeighborChooser : public Filter<Relation<CDCRecoFacet>> {
+    class MCFacetNeighborChooser : public Filter<Relation<CDCFacet>> {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCRecoFacet>> Super;
+      typedef Filter<Relation<CDCFacet>> Super;
 
     public:
       /// Importing all overloads from the super class
@@ -65,8 +65,8 @@ namespace Belle2 {
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return NOT_A_NEIGHBOR if relation shall be rejected.
        */
-      virtual NeighborWeight operator()(const CDCRecoFacet& fromFacet,
-                                        const CDCRecoFacet& toFacet) override final;
+      virtual NeighborWeight operator()(const CDCFacet& fromFacet,
+                                        const CDCFacet& toFacet) override final;
 
     public:
       /// Setter for the allow reverse parameter

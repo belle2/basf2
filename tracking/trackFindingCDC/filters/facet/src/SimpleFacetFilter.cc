@@ -57,7 +57,7 @@ std::map<std::string, std::string> SimpleFacetFilter::getParameterDescription()
   return des;
 }
 
-CellWeight SimpleFacetFilter::operator()(const CDCRecoFacet& facet)
+CellWeight SimpleFacetFilter::operator()(const CDCFacet& facet)
 {
   CellWeight fitlessWeight = m_fitlessFacetFilter(facet);
   if (isNotACell(fitlessWeight)) return NOT_A_CELL;

@@ -47,9 +47,9 @@ std::map<std::string, std::string> FitlessFacetFilter::getParameterDescription()
 }
 
 
-CellState FitlessFacetFilter::operator()(const CDCRecoFacet& facet)
+CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
 {
-  CDCRecoFacet::Shape shape = facet.getShape();
+  CDCFacet::Shape shape = facet.getShape();
 
   const RightLeftInfo& startRLInfo = facet.getStartRLInfo();
   const RightLeftInfo& middleRLInfo = facet.getMiddleRLInfo();

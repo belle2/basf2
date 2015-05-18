@@ -10,17 +10,17 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of good facets based on monte carlo information
-    class MCFacetFilter : public Filter<CDCRecoFacet> {
+    class MCFacetFilter : public Filter<CDCFacet> {
     private:
       /// Type of the super class
-      typedef Filter<CDCRecoFacet> Super;
+      typedef Filter<CDCFacet> Super;
 
     public:
       /** Constructor also setting the switch ,
@@ -32,7 +32,7 @@ namespace Belle2 {
       /** Main filter method returning the weight of the facet.
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */
-      virtual CellWeight operator()(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCFacet& facet) IF_NOT_CINT(override final);
 
       /** Set the parameter with key to value.
        *

@@ -7,33 +7,33 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCRECOTANGENTSEGMENT_H
-#define CDCRECOTANGENTSEGMENT_H
+#ifndef CDCTANGENTSEGMENT_H
+#define CDCTANGENTSEGMENT_H
 
-#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoTangentVector.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCTangentVector.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A segment consisting of adjacent reconstructed tangents.
-    class  CDCRecoTangentSegment : public CDCRecoTangentVector {
+    /// A segment consisting of adjacent tangents.
+    class  CDCTangentSegment : public CDCTangentVector {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCRecoTangentSegment() {;}
+      CDCTangentSegment() {;}
 
       /// Empty deconstructor
-      ~CDCRecoTangentSegment() {;}
+      ~CDCTangentSegment() {;}
 
       /// Takes all distinct tangents from the facets in the path - Note! there is no particular order of the tangents in the segment.
-      static CDCRecoTangentSegment condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoFacet* >& recoFacetPath);
+      static CDCTangentSegment condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
 
 
     private:
-      /// ROOT Macro to make CDCRecoTangentSegment a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoTangentSegment, 1);
+      /// ROOT Macro to make CDCTangentSegment a ROOT class.
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTangentSegment, 1);
 
 
     };
@@ -42,7 +42,7 @@ namespace Belle2 {
 }
 
 
-#endif // CDCRECOTANGENTSEGMENT
+#endif // CDCTANGENTSEGMENT
 
 
 

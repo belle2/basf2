@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
@@ -20,11 +20,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the constuction of good facets based on simple criterions.
-    class SimpleFacetFilter : public Filter<CDCRecoFacet> {
+    class SimpleFacetFilter : public Filter<CDCFacet> {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCRecoFacet> Super;
+      typedef Filter<CDCFacet> Super;
 
     public:
       /// Constructor using default direction of flight deviation cut off.
@@ -54,7 +54,7 @@ namespace Belle2 {
       /** Main filter method returning the weight of the facet.
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */
-      virtual CellWeight operator()(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCFacet& facet) IF_NOT_CINT(override final);
 
     private:
       /// Basic filter to implement a fitless preselection.

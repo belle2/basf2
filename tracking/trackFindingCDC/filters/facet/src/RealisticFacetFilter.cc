@@ -57,7 +57,7 @@ std::map<std::string, std::string> RealisticFacetFilter::getParameterDescription
 }
 
 
-CellWeight RealisticFacetFilter::operator()(const CDCRecoFacet& facet)
+CellWeight RealisticFacetFilter::operator()(const CDCFacet& facet)
 {
   CellWeight fitlessWeight = m_fitlessFacetFilter(facet);
   if (isNotACell(fitlessWeight)) return NOT_A_CELL;

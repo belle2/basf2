@@ -39,8 +39,8 @@ Vector2D
 // CDCGenHitVector<CDCWireHit>,
 // CDCWireHitVector,
 // CDCRecoHit2DVector,
-// CDCRecoTangentVector,
-// CDCRecoFacetVector,
+// CDCTangentVector,
+// CDCFacetVector,
 // CDCRecoHit3DVector
 > RootifiedTypes;
 
@@ -79,7 +79,8 @@ TYPED_TEST(TrackFindingCDCTestRootification, rootification_UsableAsStoreObject)
   // Fetch the object from the DataStore and use it
   ASSERT_NE(-1, PyRun_SimpleString("pyStoreObj = Belle2.PyStoreObj(objectName)"));
   //ASSERT_NE(-1,PyRun_SimpleString("print 'pyStoreObj is',pyStoreObj"));
-  ASSERT_NE(-1, PyRun_SimpleString("if not pyStoreObj: raise ValueError('PyStoreObj does not point to a valid object on the DataStore')"));
+  ASSERT_NE(-1,
+            PyRun_SimpleString("if not pyStoreObj: raise ValueError('PyStoreObj does not point to a valid object on the DataStore')"));
   ASSERT_NE(-1, PyRun_SimpleString("print 'pyStoreObj.obj() is', pyStoreObj.obj()"));
 
   //Note: if an error is raised in Python the return value is -1

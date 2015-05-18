@@ -83,7 +83,7 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
     cos_cut_value = 0.980
 
     def __init__(self, output_file_name):
-        super(FacetCreationValidationModule, self).__init__(foreach="CDCRecoFacetVector",
+        super(FacetCreationValidationModule, self).__init__(foreach="CDCFacetVector",
                                                             output_file_name=output_file_name)
         self.mc_facet_filter = None
 

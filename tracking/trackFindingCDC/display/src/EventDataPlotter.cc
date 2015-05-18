@@ -370,16 +370,16 @@ void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, const AttributeMap& a
 
 
 /// --------------------- Draw CDCRecoHit2D ------------------------
-void EventDataPlotter::draw(const CDCRecoTangent& recoTangent, const AttributeMap& attributeMap)
+void EventDataPlotter::draw(const CDCTangent& tangent, const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  const Vector2D fromPos = recoTangent.getFromRecoPos2D();
+  const Vector2D fromPos = tangent.getFromRecoPos2D();
   const float fromX =  fromPos.x();
   const float fromY =  fromPos.y();
 
-  const Vector2D toPos = recoTangent.getToRecoPos2D();
+  const Vector2D toPos = tangent.getToRecoPos2D();
   const float toX =  toPos.x();
   const float toY =  toPos.y();
 

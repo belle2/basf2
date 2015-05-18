@@ -1,19 +1,30 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#ifndef CDCFACETSEGMENT_H
+#define CDCFACETSEGMENT_H
 
-#include "../include/CDCRecoTangentVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCFacetVector.h>
 
-using namespace std;
-using namespace Belle2;
-using namespace TrackFindingCDC;
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    // for now a typedef is enough
+    // may get additional methods if necessary
+    /// A segment consisting of adjacent tangents
+    typedef CDCFacetVector CDCFacetSegment;
+
+  }
+}
 
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoTangentVector)
+#endif // CDCFACETSEGMENT
+
+
 

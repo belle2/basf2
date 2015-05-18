@@ -7,33 +7,33 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCRECOTANGENTVECTOR_H
-#define CDCRECOTANGENTVECTOR_H
+#ifndef CDCTANGENTVECTOR_H
+#define CDCTANGENTVECTOR_H
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoTangent.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A vector of wire hits. Template instance of CDCGenHitVector<CDCRecoTangent>
+    /// A vector of wire hits. Template instance of CDCGenHitVector<CDCTangent>
     /** See CDCGenHitVector for all methods and details */
-    class CDCRecoTangentVector : public CDCGenHitVector<Belle2::TrackFindingCDC::CDCRecoTangent> {
+    class CDCTangentVector : public CDCGenHitVector<Belle2::TrackFindingCDC::CDCTangent> {
 
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCRecoTangentVector() {;}
+      CDCTangentVector() {;}
 
       /// Empty deconstructor
-      ~CDCRecoTangentVector() {;}
+      ~CDCTangentVector() {;}
 
     private:
-      /// ROOT Macro to make CDCRecoTangentVector a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoTangentVector, 1);
+      /// ROOT Macro to make CDCTangentVector a ROOT class.
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTangentVector, 1);
 
-    }; //class CDCRecoTangentVector
+    }; //class CDCTangentVector
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCRECOTANGENTVECTOR_H
+#endif // CDCTANGENTVECTOR_H

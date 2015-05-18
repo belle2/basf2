@@ -7,26 +7,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRecoFacetFitlessVarSet.h"
+#include "../include/CDCFacetFitlessVarSet.h"
 #include <assert.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoFacetFitlessVarSet::CDCRecoFacetFitlessVarSet(const std::string& prefix) :
-  VarSet<CDCRecoFacetFitlessVarNames>(prefix)
+CDCFacetFitlessVarSet::CDCFacetFitlessVarSet(const std::string& prefix) :
+  VarSet<CDCFacetFitlessVarNames>(prefix)
 {
 }
 
-bool CDCRecoFacetFitlessVarSet::extract(const CDCRecoFacet* ptrFacet)
+bool CDCFacetFitlessVarSet::extract(const CDCFacet* ptrFacet)
 {
   extractNested(ptrFacet);
   if (not ptrFacet) return false;
-  const CDCRecoFacet& facet = *ptrFacet;
+  const CDCFacet& facet = *ptrFacet;
 
   /// Fitless variables
-  CDCRecoFacet::Shape shape = facet.getShape();
+  CDCFacet::Shape shape = facet.getShape();
   ISuperLayerType superlayerID = facet.getISuperLayer();
 
   const RightLeftInfo& startRLInfo = facet.getStartRLInfo();

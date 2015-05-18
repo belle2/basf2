@@ -8,36 +8,36 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCRecoTangentSegment.h"
+#include "../include/CDCTangentSegment.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoTangentSegment)
+TRACKFINDINGCDC_SwitchableClassImp(CDCTangentSegment)
 
 
 
-CDCRecoTangentSegment CDCRecoTangentSegment::condense(const std::vector<const CDCRecoFacet* >& recoFacetPath)
+CDCTangentSegment CDCTangentSegment::condense(const std::vector<const CDCFacet* >& facetPath)
 {
-  CDCRecoTangentSegment recoTangentSegment;
+  CDCTangentSegment tangentSegment;
 
-  recoTangentSegment.reserve(recoFacetPath.size() * 3);
+  tangentSegment.reserve(facetPath.size() * 3);
 
-  for (const CDCRecoFacet * ptrFacet : recoFacetPath) {
+  for (const CDCFacet* ptrFacet : facetPath) {
     if (not ptrFacet) continue;
 
-    const CDCRecoFacet& facet = *ptrFacet;
+    const CDCFacet& facet = *ptrFacet;
 
     //the alignement of the tangents does not play a major role here
-    recoTangentSegment.push_back(facet.getStartToMiddle());
-    recoTangentSegment.push_back(facet.getStartToEnd());
-    recoTangentSegment.push_back(facet.getMiddleToEnd());
+    tangentSegment.push_back(facet.getStartToMiddle());
+    tangentSegment.push_back(facet.getStartToEnd());
+    tangentSegment.push_back(facet.getMiddleToEnd());
 
   }
-  recoTangentSegment.ensureUnique();
+  tangentSegment.ensureUnique();
 
-  return recoTangentSegment;
+  return tangentSegment;
 
 }
 

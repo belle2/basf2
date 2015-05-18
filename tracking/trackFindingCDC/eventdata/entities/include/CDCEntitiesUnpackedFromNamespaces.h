@@ -21,8 +21,8 @@ typedef Belle2::TrackFindingCDC::CDCGenHit CDCGenHit;
 typedef Belle2::TrackFindingCDC::CDCWireHit CDCWireHit;
 typedef Belle2::TrackFindingCDC::CDCRLWireHit CDCRLWireHit;
 typedef Belle2::TrackFindingCDC::CDCRecoHit2D CDCRecoHit2D;
-typedef Belle2::TrackFindingCDC::CDCRecoTangent CDCRecoTangent;
-typedef Belle2::TrackFindingCDC::CDCRecoFacet CDCRecoFacet;
+typedef Belle2::TrackFindingCDC::CDCTangent CDCTangent;
+typedef Belle2::TrackFindingCDC::CDCFacet CDCFacet;
 typedef Belle2::TrackFindingCDC::CDCRecoHit3D CDCRecoHit3D;
 
 #endif // __CINT__

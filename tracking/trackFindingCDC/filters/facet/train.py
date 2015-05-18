@@ -15,11 +15,11 @@ import logging
 
 def main():
     classifer = FastBDTClassifier(
-        "CDCRecoFacet",
-        "CDCRecoFacetWeight.root"
+        "CDCFacet",
+        "CDCFacetWeight.root"
     )
 
-    input_file_name = "CDCRecoFacetTruthRecords.root"
+    input_file_name = "CDCFacetTruthRecords.root"
     input_file = ROOT.TFile(input_file_name, "READ")
     input_tree_name = "records"
     input_tree = input_file.Get(input_tree_name)

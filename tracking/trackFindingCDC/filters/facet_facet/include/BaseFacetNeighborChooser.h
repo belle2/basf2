@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
 
 #include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
@@ -28,30 +28,30 @@ namespace Belle2 {
      *  Besides that it accepts all facets.
      */
     template<>
-    class Filter<Relation<CDCRecoFacet>>  :
-                                        public FilterBase<Relation<CDCRecoFacet>> {
+    class Filter<Relation<CDCFacet>>  :
+                                    public FilterBase<Relation<CDCFacet>> {
 
     public:
       /** Returns a two iterator range covering the range of possible neighboring
        *  facets of the given facet out of the sorted range given by the two other argumets.*/
-      template<class CDCRecoFacetIterator>
-      boost::iterator_range<CDCRecoFacetIterator>
-      getPossibleNeighbors(const CDCRecoFacet& recoFacet,
-                           const CDCRecoFacetIterator& itBegin,
-                           const CDCRecoFacetIterator& itEnd) const
+      template<class CDCFacetIterator>
+      boost::iterator_range<CDCFacetIterator>
+      getPossibleNeighbors(const CDCFacet& facet,
+                           const CDCFacetIterator& itBegin,
+                           const CDCFacetIterator& itEnd) const
       {
 
-        const CDCRLWireHitPair& rearRLWireHitPair = recoFacet.getRearRLWireHitPair();
+        const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();
 
-        std::pair<CDCRecoFacetIterator, CDCRecoFacetIterator> rangePossibleNeighbors =
+        std::pair<CDCFacetIterator, CDCFacetIterator> rangePossibleNeighbors =
           std::equal_range(itBegin, itEnd, rearRLWireHitPair);
-        return boost::iterator_range<CDCRecoFacetIterator>(rangePossibleNeighbors.first,
-                                                           rangePossibleNeighbors.second);
+        return boost::iterator_range<CDCFacetIterator>(rangePossibleNeighbors.first,
+                                                       rangePossibleNeighbors.second);
       }
 
       /** Legacy method */
-      NeighborWeight isGoodNeighbor(const CDCRecoFacet& from ,
-                                    const CDCRecoFacet& to)
+      NeighborWeight isGoodNeighbor(const CDCFacet& from ,
+                                    const CDCFacet& to)
       {
         return operator()(from, to);
       }
@@ -59,8 +59,8 @@ namespace Belle2 {
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NOT_A_NEIGHBOR to reject all facet neighbors.
        */
-      virtual NeighborWeight operator()(const CDCRecoFacet& /* from */,
-                                        const CDCRecoFacet& /* to */)
+      virtual NeighborWeight operator()(const CDCFacet& /* from */,
+                                        const CDCFacet& /* to */)
       {
         return NOT_A_NEIGHBOR;
       }
@@ -68,10 +68,10 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual CellWeight operator()(const Relation<CDCRecoFacet>& relation) override
+      virtual CellWeight operator()(const Relation<CDCFacet>& relation) override
       {
-        const CDCRecoFacet* ptrFrom = relation.first;
-        const CDCRecoFacet* ptrTo = relation.second;
+        const CDCFacet* ptrFrom = relation.first;
+        const CDCFacet* ptrTo = relation.second;
         if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
         return operator()(*ptrFrom, *ptrTo);
       }
@@ -80,7 +80,7 @@ namespace Belle2 {
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of facets.
-    typedef Filter<Relation<CDCRecoFacet>> BaseFacetNeighborChooser;
+    typedef Filter<Relation<CDCFacet>> BaseFacetNeighborChooser;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

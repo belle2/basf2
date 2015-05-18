@@ -7,28 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRecoFacetRelationTruthVarSet.h"
+#include "../include/CDCFacetRelationTruthVarSet.h"
 #include <assert.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoFacetRelationTruthVarSet::CDCRecoFacetRelationTruthVarSet(const std::string& prefix) :
-  VarSet<CDCRecoFacetRelationTruthVarNames>(prefix)
+CDCFacetRelationTruthVarSet::CDCFacetRelationTruthVarSet(const std::string& prefix) :
+  VarSet<CDCFacetRelationTruthVarNames>(prefix)
 {
 }
 
-bool CDCRecoFacetRelationTruthVarSet::extract(const Relation<CDCRecoFacet>* ptrFacetRelation)
+bool CDCFacetRelationTruthVarSet::extract(const Relation<CDCFacet>* ptrFacetRelation)
 {
   bool extracted = extractNested(ptrFacetRelation);
   if (not extracted or not ptrFacetRelation) return false;
 
-  const CDCRecoFacet* ptrFromFacet = ptrFacetRelation->first;
-  const CDCRecoFacet* ptrToFacet = ptrFacetRelation->second;
+  const CDCFacet* ptrFromFacet = ptrFacetRelation->first;
+  const CDCFacet* ptrToFacet = ptrFacetRelation->second;
 
-  const CDCRecoFacet& fromFacet = *ptrFromFacet;
-  const CDCRecoFacet& toFacet = *ptrToFacet;
+  const CDCFacet& fromFacet = *ptrFromFacet;
+  const CDCFacet& toFacet = *ptrToFacet;
 
   // Despite of that two facets are neighbors if both are true facets
   // That also implies the correct tof alignment of the hits not common to both facets
@@ -40,12 +40,12 @@ bool CDCRecoFacetRelationTruthVarSet::extract(const Relation<CDCRecoFacet>* ptrF
   return true;
 }
 
-void CDCRecoFacetRelationTruthVarSet::initialize()
+void CDCFacetRelationTruthVarSet::initialize()
 {
   m_mcFacetFilter.initialize();
 }
 
-void CDCRecoFacetRelationTruthVarSet::terminate()
+void CDCFacetRelationTruthVarSet::terminate()
 {
   m_mcFacetFilter.terminate();
 }

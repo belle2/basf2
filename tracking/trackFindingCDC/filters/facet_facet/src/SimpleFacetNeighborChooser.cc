@@ -35,8 +35,8 @@ std::map<std::string, std::string> SimpleFacetNeighborChooser::getParameterDescr
 
 
 
-NeighborWeight SimpleFacetNeighborChooser::operator()(const CDCRecoFacet& fromFacet,
-                                                      const CDCRecoFacet& toFacet)
+NeighborWeight SimpleFacetNeighborChooser::operator()(const CDCFacet& fromFacet,
+                                                      const CDCFacet& toFacet)
 {
 
   if (fromFacet.getStartWire() == toFacet.getEndWire()) return NOT_A_NEIGHBOR;

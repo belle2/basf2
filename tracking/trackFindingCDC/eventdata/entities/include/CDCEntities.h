@@ -17,8 +17,8 @@
 #include "CDCRLWireHit.h"
 
 #include "CDCRecoHit2D.h"
-#include "CDCRecoTangent.h"
-#include "CDCRecoFacet.h"
+#include "CDCTangent.h"
+#include "CDCFacet.h"
 
 #include "CDCRecoHit3D.h"
 

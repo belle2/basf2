@@ -67,7 +67,7 @@ namespace Belle2 {
         m_param_writeFacets(false),
         m_param_facetsStoreObjName("CDCFacetVector"),
         m_param_writeTangentSegments(false),
-        m_param_tangentSegmentsStoreObjName("CDCRecoTangentSegmentVector")
+        m_param_tangentSegmentsStoreObjName("CDCTangentSegmentVector")
       {
 
         setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
@@ -100,7 +100,7 @@ namespace Belle2 {
         addParam("FacetsStoreObjName",
                  m_param_facetsStoreObjName,
                  "Name of the output StoreObjPtr of the facets generated within this module.",
-                 std::string("CDCRecoFacetVector"));
+                 std::string("CDCFacetVector"));
 
         addParam("WriteTangentSegments",
                  m_param_writeTangentSegments,
@@ -110,7 +110,7 @@ namespace Belle2 {
         addParam("TangentSegmentsStoreObjName",
                  m_param_tangentSegmentsStoreObjName,
                  "Name of the output StoreObjPtr of the tangent segments generated within this module.",
-                 std::string("CDCRecoTangentSegmentVector"));
+                 std::string("CDCTangentSegmentVector"));
       }
 
       /// Initialize the Module before event processing
@@ -127,11 +127,11 @@ namespace Belle2 {
         }
 
         if (m_param_writeFacets) {
-          StoreWrappedObjPtr< std::vector<CDCRecoFacet> >::registerTransient(m_param_facetsStoreObjName);
+          StoreWrappedObjPtr< std::vector<CDCFacet> >::registerTransient(m_param_facetsStoreObjName);
         }
 
         if (m_param_writeTangentSegments) {
-          StoreWrappedObjPtr< std::vector<CDCRecoTangentSegment> >::registerTransient(m_param_tangentSegmentsStoreObjName);
+          StoreWrappedObjPtr< std::vector<CDCTangentSegment> >::registerTransient(m_param_tangentSegmentsStoreObjName);
         }
 
         if (m_ptrClusterFilter) {
@@ -245,16 +245,16 @@ namespace Belle2 {
     private:
       //object pools
       /// Memory for the constructed facets.
-      CDCRecoFacetCollection m_facets;
+      CDCFacetCollection m_facets;
 
       /// Neighborhood type for facets.
-      typedef WeightedNeighborhood<const CDCRecoFacet> CDCRecoFacetNeighborhood;
+      typedef WeightedNeighborhood<const CDCFacet> CDCFacetNeighborhood;
 
       /// Memory for the facet neighborhood.
-      CDCRecoFacetNeighborhood m_facetsNeighborhood;
+      CDCFacetNeighborhood m_facetsNeighborhood;
 
       /// Memory for the facet paths generated from the graph.
-      std::vector< std::vector<const CDCRecoFacet*> > m_facetPaths;
+      std::vector< std::vector<const CDCFacet*> > m_facetPaths;
 
       /** Memory for the hit superclusters in the current superlayer
        *  Superclusters generated from the secondary neighborhood
@@ -283,7 +283,7 @@ namespace Belle2 {
 
       //cellular automaton
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<CDCRecoFacet> m_cellularPathFinder;
+      MultipassCellularPathFinder<CDCFacet> m_cellularPathFinder;
 
     }; // end class SegmentFinderCDCFacetAutomatonImplModule
 
@@ -314,20 +314,20 @@ namespace Belle2 {
       }
 
       /// Attain facet vector on the DataStore if needed.
-      std::vector<CDCRecoFacet>* ptrFacets = nullptr;
+      std::vector<CDCFacet>* ptrFacets = nullptr;
       if (m_param_writeFacets) {
-        StoreWrappedObjPtr< std::vector<CDCRecoFacet> > storedFacets(m_param_facetsStoreObjName);
+        StoreWrappedObjPtr< std::vector<CDCFacet> > storedFacets(m_param_facetsStoreObjName);
         storedFacets.create();
-        std::vector<CDCRecoFacet>& facets = *storedFacets;
+        std::vector<CDCFacet>& facets = *storedFacets;
         ptrFacets = &facets;
       }
 
       /// Attain tangent vector on the DataStore if needed.
-      std::vector<CDCRecoTangentSegment>* ptrTangentSegments = nullptr;
+      std::vector<CDCTangentSegment>* ptrTangentSegments = nullptr;
       if (m_param_writeTangentSegments) {
-        StoreWrappedObjPtr< std::vector<CDCRecoTangentSegment> > storedTangentSegments(m_param_tangentSegmentsStoreObjName);
+        StoreWrappedObjPtr< std::vector<CDCTangentSegment> > storedTangentSegments(m_param_tangentSegmentsStoreObjName);
         storedTangentSegments.create();
-        std::vector<CDCRecoTangentSegment>& tangentSegments = *storedTangentSegments;
+        std::vector<CDCTangentSegment>& tangentSegments = *storedTangentSegments;
         ptrTangentSegments = &tangentSegments;
       }
 
@@ -397,21 +397,21 @@ namespace Belle2 {
             B2DEBUG(100, "Wire hit neighborhood size: " << m_wirehitNeighborhood.size());
 
             // Create the facets
-            B2DEBUG(100, "Creating the CDCRecoFacets");
+            B2DEBUG(100, "Creating the CDCFacets");
             m_facets.clear();
             m_facetCreator.createFacets(*m_ptrFacetFilter, cluster, m_wirehitNeighborhood, m_facets);
-            B2DEBUG(100, "  Created " << m_facets.size()  << " CDCRecoFacets");
+            B2DEBUG(100, "  Created " << m_facets.size()  << " CDCFacets");
 
             // Copy facets to the DataStore
             if (m_param_writeFacets and ptrFacets) {
-              std::vector<CDCRecoFacet>& facets = *ptrFacets;
-              for (const CDCRecoFacet& facet : m_facets) {
+              std::vector<CDCFacet>& facets = *ptrFacets;
+              for (const CDCFacet& facet : m_facets) {
                 facets.push_back(facet);
               }
             }
 
             // Create the facet neighborhood
-            B2DEBUG(100, "Creating the CDCRecoFacet neighborhood");
+            B2DEBUG(100, "Creating the CDCFacet neighborhood");
             m_facetsNeighborhood.clear();
             m_facetsNeighborhood.createUsing(*m_ptrFacetNeighborChooser, m_facets);
             B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
@@ -425,16 +425,16 @@ namespace Belle2 {
             m_cellularPathFinder.apply(m_facets, m_facetsNeighborhood, m_facetPaths);
 
             segments.reserve(segments.size() + m_facetPaths.size());
-            for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
+            for (const std::vector<const CDCFacet*>& facetPath : m_facetPaths) {
               segments.push_back(CDCRecoSegment2D::condense(facetPath));
               segments.back().setISuperCluster(iSuperCluster);
             }
 
             // Copy tangent segments to the DataStore
             if (m_param_writeTangentSegments and ptrTangentSegments) {
-              std::vector<CDCRecoTangentSegment>& tangentSegments = *ptrTangentSegments;
-              for (const std::vector<const CDCRecoFacet*>& facetPath : m_facetPaths) {
-                tangentSegments.push_back(CDCRecoTangentSegment::condense(facetPath));
+              std::vector<CDCTangentSegment>& tangentSegments = *ptrTangentSegments;
+              for (const std::vector<const CDCFacet*>& facetPath : m_facetPaths) {
+                tangentSegments.push_back(CDCTangentSegment::condense(facetPath));
               }
             }
 

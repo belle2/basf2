@@ -7,28 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRecoFacetRelationVarSet.h"
+#include "../include/CDCFacetRelationVarSet.h"
 #include <assert.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoFacetRelationVarSet::CDCRecoFacetRelationVarSet(const std::string& prefix) :
-  VarSet<CDCRecoFacetRelationVarNames>(prefix)
+CDCFacetRelationVarSet::CDCFacetRelationVarSet(const std::string& prefix) :
+  VarSet<CDCFacetRelationVarNames>(prefix)
 {
 }
 
-bool CDCRecoFacetRelationVarSet::extract(const Relation<CDCRecoFacet>* ptrFacetRelation)
+bool CDCFacetRelationVarSet::extract(const Relation<CDCFacet>* ptrFacetRelation)
 {
   bool extracted = extractNested(ptrFacetRelation);
   if (not extracted or not ptrFacetRelation) return false;
 
-  const CDCRecoFacet* ptrFromFacet = ptrFacetRelation->first;
-  const CDCRecoFacet* ptrToFacet = ptrFacetRelation->second;
+  const CDCFacet* ptrFromFacet = ptrFacetRelation->first;
+  const CDCFacet* ptrToFacet = ptrFacetRelation->second;
 
-  const CDCRecoFacet& fromFacet = *ptrFromFacet;
-  const CDCRecoFacet& toFacet = *ptrToFacet;
+  const CDCFacet& fromFacet = *ptrFromFacet;
+  const CDCFacet& toFacet = *ptrToFacet;
 
 
   const ParameterLine2D& fromStartToMiddle = fromFacet.getStartToMiddleLine();

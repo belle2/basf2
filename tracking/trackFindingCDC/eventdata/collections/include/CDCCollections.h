@@ -22,11 +22,11 @@
 //#include "CDCRecoHit3DSet.h"
 #include "CDCRecoHit3DVector.h"
 
-//#include "CDCRecoTangentSet.h"
-#include "CDCRecoTangentVector.h"
+//#include "CDCTangentSet.h"
+#include "CDCTangentVector.h"
 
-//#include "CDCRecoFacetSet.h"
-#include "CDCRecoFacetVector.h"
+//#include "CDCFacetSet.h"
+#include "CDCFacetVector.h"
 
 #endif //CDCCOLLECTIONS_H
 

@@ -10,17 +10,17 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of good facets based on simple criterions.
-    class AllFacetFilter : public Filter<CDCRecoFacet> {
+    class AllFacetFilter : public Filter<CDCFacet> {
 
     public:
       /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      virtual CellWeight operator()(const CDCRecoFacet&) override final
+      virtual CellWeight operator()(const CDCFacet&) override final
       {
         return 3.0;
       }

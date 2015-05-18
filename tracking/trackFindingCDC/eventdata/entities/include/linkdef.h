@@ -18,10 +18,10 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRecoHit2D-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHitPair-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoTangent-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCTangent-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHitTriple-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCRecoFacet-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCFacet-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRecoHit3D-;
 
@@ -31,8 +31,8 @@
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRLWireHit>-;
 #pragma link C++ class std::vector<const Belle2::TrackFindingCDC::CDCRLWireHit*>-;
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoHit2D>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoTangent>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoFacet>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCTangent>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCFacet>-;
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D>-;
 
 #endif

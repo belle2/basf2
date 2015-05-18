@@ -17,8 +17,8 @@
 #include "CDCWireHitSegment.h"
 #include "CDCRLWireHitSegment.h"
 
-#include "CDCRecoTangentSegment.h"
-#include "CDCRecoFacetSegment.h"
+#include "CDCTangentSegment.h"
+#include "CDCFacetSegment.h"
 
 #include "genfit/TrackCand.h"
 
@@ -37,16 +37,16 @@ namespace Belle2 {
 
 
       /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent segment
-      static CDCRecoSegment2D condense(const CDCRecoTangentSegment& recoTangentSegment);
+      static CDCRecoSegment2D condense(const CDCTangentSegment& tangentSegment);
 
       /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent path
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoTangent* >& recoTangentPath);
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCTangent* >& tangentPath);
 
       /// Averages the reconstructed positions from hits that overlap in adjacent facets in the given facet segment.
-      static CDCRecoSegment2D condense(const CDCRecoFacetSegment& recoFacetSegment);
+      static CDCRecoSegment2D condense(const CDCFacetSegment& facetSegment);
 
       /// Averages the reconstructed positions from hits that overlap in adjacent facet in the given facet path.
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoFacet* >& recoFacetPath);
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
 
 
       /// Reconstruct from wire hits with attached right left passage hypotheses by constructing tangents between adjacent hits pairs and averaging the reconstucted position.

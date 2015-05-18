@@ -11,18 +11,18 @@
 
 #include <tracking/trackFindingCDC/filters/facet_facet/BaseFacetNeighborChooser.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_facet/CDCRecoFacetRelationTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet_facet/CDCFacetRelationTruthVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitFacets.
-    class RecordingFacetNeighborChooser: public RecordingFilter<CDCRecoFacetRelationTruthVarSet> {
+    class RecordingFacetNeighborChooser: public RecordingFilter<CDCFacetRelationTruthVarSet> {
 
     public:
       /// Constructor initialising the RecordingNeighborChooser with standard root file name for this neighborChooser.
       RecordingFacetNeighborChooser() :
-        RecordingFilter<CDCRecoFacetRelationTruthVarSet>("CDCRecoFacetRelationTruthRecords.root")
+        RecordingFilter<CDCFacetRelationTruthVarSet>("CDCFacetRelationTruthRecords.root")
       {;}
 
     };

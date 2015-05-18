@@ -66,8 +66,8 @@ bool MCFacetNeighborChooser::needsTruthInformation()
 }
 
 
-NeighborWeight MCFacetNeighborChooser::operator()(const CDCRecoFacet& fromFacet,
-                                                  const CDCRecoFacet& toFacet)
+NeighborWeight MCFacetNeighborChooser::operator()(const CDCFacet& fromFacet,
+                                                  const CDCFacet& toFacet)
 {
   // the last wire of the neighbor should not be the same as the start wire of the facet
   if (fromFacet.getStartWire() == toFacet.getEndWire()) {

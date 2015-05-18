@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
@@ -20,11 +20,11 @@ namespace Belle2 {
      *  of the right left passage hypotheses combination.
      *  If the given combination cannot be made by a track reject it.
      */
-    class FitlessFacetFilter : public Filter<CDCRecoFacet> {
+    class FitlessFacetFilter : public Filter<CDCFacet> {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCRecoFacet> Super;
+      typedef Filter<CDCFacet> Super;
 
     public:
       /// Constructor taking a flag if boarderline feasable cases should be excluded.
@@ -34,7 +34,7 @@ namespace Belle2 {
       /** Main filter method returning the weight of the facet.
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */
-      virtual CellWeight operator()(const CDCRecoFacet& facet) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCFacet& facet) IF_NOT_CINT(override final);
 
     public:
       /** Set the parameter with key to value.

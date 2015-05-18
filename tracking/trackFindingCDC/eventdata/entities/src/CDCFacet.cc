@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCRecoFacet.h"
+#include "../include/CDCFacet.h"
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
@@ -16,21 +16,21 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoFacet)
+TRACKFINDINGCDC_SwitchableClassImp(CDCFacet)
 
-CDCRecoFacet::CDCRecoFacet() :
+CDCFacet::CDCFacet() :
   CDCRLWireHitTriple(nullptr, nullptr, nullptr),
   m_startToMiddle(),
   m_startToEnd(),
   m_middleToEnd(),
   m_automatonCell()
 {
-  B2ERROR("CDCRecoFacet initialized with nullptr for all oriented wire hit");
+  B2ERROR("CDCFacet initialized with nullptr for all oriented wire hit");
 }
 
 
 
-CDCRecoFacet::CDCRecoFacet(
+CDCFacet::CDCFacet(
   const CDCRLWireHit* startRLWireHit,
   const CDCRLWireHit* middleRLWireHit,
   const CDCRLWireHit* endRLWireHit
@@ -41,15 +41,15 @@ CDCRecoFacet::CDCRecoFacet(
   m_middleToEnd(),
   m_automatonCell()
 {
-  if (startRLWireHit == nullptr) B2ERROR("CDCRecoFacet initialized with nullptr as first oriented wire hit");
-  if (middleRLWireHit == nullptr) B2ERROR("CDCRecoFacet initialized with nullptr as second oriented wire hit");
-  if (endRLWireHit == nullptr) B2ERROR("CDCRecoFacet initialized with nullptr as third oriented wire hit");
+  if (startRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as first oriented wire hit");
+  if (middleRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as second oriented wire hit");
+  if (endRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as third oriented wire hit");
   adjustLines();
 }
 
 
 
-CDCRecoFacet::CDCRecoFacet(
+CDCFacet::CDCFacet(
   const CDCRLWireHit* startRLWireHit,
   const CDCRLWireHit* middleRLWireHit,
   const CDCRLWireHit* endRLWireHit,
@@ -63,43 +63,43 @@ CDCRecoFacet::CDCRecoFacet(
   m_middleToEnd(middleToEnd),
   m_automatonCell()
 {
-  if (startRLWireHit == nullptr) B2ERROR("CDCRecoFacet initialized with nullptr as first oriented wire hit");
-  if (middleRLWireHit == nullptr) B2ERROR("CDCRecoFacet initialized with nullptr as second oriented wire hit");
-  if (endRLWireHit == nullptr) B2ERROR("CDCRecoFacet initialized with nullptr as third oriented wire hit");
+  if (startRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as first oriented wire hit");
+  if (middleRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as second oriented wire hit");
+  if (endRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as third oriented wire hit");
 }
 
 
 
-CDCRecoFacet CDCRecoFacet::reversed() const
+CDCFacet CDCFacet::reversed() const
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-  return CDCRecoFacet(wireHitTopology.getReverseOf(getEndRLWireHit()),
-                      wireHitTopology.getReverseOf(getMiddleRLWireHit()),
-                      wireHitTopology.getReverseOf(getStartRLWireHit()));
+  return CDCFacet(wireHitTopology.getReverseOf(getEndRLWireHit()),
+                  wireHitTopology.getReverseOf(getMiddleRLWireHit()),
+                  wireHitTopology.getReverseOf(getStartRLWireHit()));
 
 }
 
 
 
-void CDCRecoFacet::adjustLines() const
+void CDCFacet::adjustLines() const
 {
 
-  m_startToMiddle = CDCRecoTangent::constructTouchingLine(
+  m_startToMiddle = CDCTangent::constructTouchingLine(
                       getStartWireHit().getRefPos2D(),
                       getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
                       getMiddleWireHit().getRefPos2D(),
                       getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength()
                     );
 
-  m_startToEnd = CDCRecoTangent::constructTouchingLine(
+  m_startToEnd = CDCTangent::constructTouchingLine(
                    getStartWireHit().getRefPos2D(),
                    getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
                    getEndWireHit().getRefPos2D(),
                    getEndRLInfo() * getEndWireHit().getRefDriftLength()
                  );
 
-  m_middleToEnd = CDCRecoTangent::constructTouchingLine(
+  m_middleToEnd = CDCTangent::constructTouchingLine(
                     getMiddleWireHit().getRefPos2D(),
                     getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
                     getEndWireHit().getRefPos2D(),
@@ -108,7 +108,7 @@ void CDCRecoFacet::adjustLines() const
 
 }
 
-FloatType CDCRecoFacet::getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
+FloatType CDCFacet::getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
 {
 
   FloatType distance = trajectory2D.getDist2D(getStartRecoPos2D());

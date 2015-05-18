@@ -14,19 +14,19 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-class CDCRecoFacetRelationTruthRecordingRun(StandardEventGenerationRun):
+class CDCFacetRelationTruthRecordingRun(StandardEventGenerationRun):
     n_events = 50
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
     segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
     segment_finder_module.param({
         "FacetNeighborChooser": "recording",
-        "FacetNeighborChooserParameters": {"root_file_name": "CDCRecoFacetRelationTruthRecords.root"},
+        "FacetNeighborChooserParameters": {"root_file_name": "CDCFacetRelationTruthRecords.root"},
     })
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(CDCRecoFacetRelationTruthRecordingRun, self).create_path()
+        main_path = super(CDCFacetRelationTruthRecordingRun, self).create_path()
 
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
         main_path.add_module(segment_finder_module)
@@ -34,7 +34,7 @@ class CDCRecoFacetRelationTruthRecordingRun(StandardEventGenerationRun):
 
 
 def main():
-    run = CDCRecoFacetRelationTruthRecordingRun()
+    run = CDCFacetRelationTruthRecordingRun()
     run.configure_and_execute_from_commandline()
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCRecoTangent.h"
+#include "../include/CDCTangent.h"
 
 #include <cmath>
 
@@ -19,15 +19,15 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoTangent)
+TRACKFINDINGCDC_SwitchableClassImp(CDCTangent)
 
 
 
-CDCRecoTangent::CDCRecoTangent(): CDCRLWireHitPair(), m_line() {;}
+CDCTangent::CDCTangent(): CDCRLWireHitPair(), m_line() {;}
 
 
 
-CDCRecoTangent::CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair):
+CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair), m_line()
 {
   adjustLine();
@@ -35,7 +35,7 @@ CDCRecoTangent::CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair):
 
 
 
-CDCRecoTangent::CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit):
+CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line()
 {
   adjustLine();
@@ -43,19 +43,19 @@ CDCRecoTangent::CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWir
 
 
 
-CDCRecoTangent::CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line):
+CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line):
   CDCRLWireHitPair(rlWireHitPair), m_line(line)
 {;}
 
 
 
-CDCRecoTangent::CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line):
+CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line(line)
 {;}
 
 
 
-CDCRecoTangent::CDCRecoTangent(
+CDCTangent::CDCTangent(
   const CDCRecoHit2D& fromRecoHit,
   const CDCRecoHit2D& toRecoHit
 ):
@@ -66,11 +66,11 @@ CDCRecoTangent::CDCRecoTangent(
 
 
 
-CDCRecoTangent::~CDCRecoTangent() {;}
+CDCTangent::~CDCTangent() {;}
 
 
 
-void CDCRecoTangent::adjustLine()
+void CDCTangent::adjustLine()
 {
 
   m_line  = constructTouchingLine(
@@ -82,7 +82,7 @@ void CDCRecoTangent::adjustLine()
 
 }
 
-void CDCRecoTangent::adjustRLInfo()
+void CDCTangent::adjustRLInfo()
 {
 
   RightLeftInfo newFromRLInfo = getLine().isRightOrLeft(getFromWireHit()->getRefPos2D());
@@ -93,7 +93,7 @@ void CDCRecoTangent::adjustRLInfo()
 
 }
 
-void CDCRecoTangent::reverse()
+void CDCTangent::reverse()
 {
 
   CDCRLWireHitPair::reverse();
@@ -105,14 +105,14 @@ void CDCRecoTangent::reverse()
   m_line.passiveMoveAtBy(-1);
 }
 
-CDCRecoTangent CDCRecoTangent::reversed() const
+CDCTangent CDCTangent::reversed() const
 {
-  return CDCRecoTangent(CDCRLWireHitPair::reversed(),
-                        ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
+  return CDCTangent(CDCRLWireHitPair::reversed(),
+                    ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
 }
 
 /** This returns sum of the squared distances of the two touch points to the circle */
-FloatType CDCRecoTangent::getSquaredDist2D(const  CDCTrajectory2D& trajectory2D) const
+FloatType CDCTangent::getSquaredDist2D(const  CDCTrajectory2D& trajectory2D) const
 {
   FloatType fromDistance =  trajectory2D.getDist2D(getFromRecoPos2D());
   FloatType toDistance   =  trajectory2D.getDist2D(getToRecoPos2D());
@@ -121,7 +121,7 @@ FloatType CDCRecoTangent::getSquaredDist2D(const  CDCTrajectory2D& trajectory2D)
 
 
 
-ParameterLine2D CDCRecoTangent::constructTouchingLine(
+ParameterLine2D CDCTangent::constructTouchingLine(
   const Vector2D& fromCenter,
   const FloatType& fromSignedRadius,
   const Vector2D& toCenter,

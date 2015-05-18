@@ -9,48 +9,63 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCRecoFacetFitVarSet.h"
-#include "MCFacetFilter.h"
+#include <tracking/trackFindingCDC/filters/facet_facet/CDCFacetRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackFindingCDC/algorithms/Relation.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
+#include <vector>
+#include <string>
+#include <assert.h>
+
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Forward declaration of the CDCFacet.
+    class CDCFacet;
+
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const facetTruthNames[] = {
+    static char const* const facetRelationTruthNames[] = {
       "truth"
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a facet.
+     *  that should be generated from a facet relation
      */
-    class CDCRecoFacetTruthVarNames : public VarNames<CDCRecoFacet> {
+    class CDCFacetRelationTruthVarNames : public VarNames<Relation<CDCFacet>> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetTruthNames);
+      static const size_t nNames = size(facetRelationTruthNames);
 
       /// Getter for the name a the given index
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return facetTruthNames[iName];
+        return facetRelationTruthNames[iName];
       }
 
       /// Marking that the basic facet variables should be included.
-      typedef CDCRecoFacetFitVarSet NestedVarSet;
+      typedef CDCFacetRelationVarSet NestedVarSet;
     };
 
-    /** Class that computes floating point variables from facet.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /** Class that computes floating point variables from a facet relation.
+     *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class  CDCRecoFacetTruthVarSet : public VarSet<CDCRecoFacetTruthVarNames> {
+    class CDCFacetRelationTruthVarSet : public VarSet<CDCFacetRelationTruthVarNames> {
 
     public:
-      /// Construct the varset and take an optional prefix.
-      CDCRecoFacetTruthVarSet(const std::string& prefix = "");
+      /// Construct the varset and take an optional prefix to be prepended to all variable names.
+      CDCFacetRelationTruthVarSet(const std::string& prefix = "");
 
-      /// Generate and assign the variables from the facet
-      virtual bool extract(const CDCRecoFacet* facet) IF_NOT_CINT(override final);
+      /// Generate and assign the variables from the facet relation
+      virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) IF_NOT_CINT(override final);
 
       /// Initialize the varset before event processing
       virtual void initialize() IF_NOT_CINT(override final);

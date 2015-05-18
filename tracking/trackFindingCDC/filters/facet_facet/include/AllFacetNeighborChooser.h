@@ -14,11 +14,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     ///Class filtering the neighborhood of facets with monte carlo information
-    class AllFacetNeighborChooser : public Filter<Relation<CDCRecoFacet>> {
+    class AllFacetNeighborChooser : public Filter<Relation<CDCFacet>> {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCRecoFacet>> Super;
+      typedef Filter<Relation<CDCFacet>> Super;
 
     public:
       /// Importing all overloads from the super class
@@ -28,8 +28,8 @@ namespace Belle2 {
        *  Return -2 for all valid combinations to accepting all facets,
        *  but compensating for overlap.
        */
-      virtual NeighborWeight operator()(const CDCRecoFacet& fromFacet,
-                                        const CDCRecoFacet& toFacet) override final
+      virtual NeighborWeight operator()(const CDCFacet& fromFacet,
+                                        const CDCFacet& toFacet) override final
       {
         // The last wire of the neighbor should not be the same as the start wire of the facet
         // The  default weight must be -2 because the overlap of the facets is two points

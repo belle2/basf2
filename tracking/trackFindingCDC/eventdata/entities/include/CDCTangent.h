@@ -26,7 +26,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representating a linear track piece between two oriented wire hits \n
-    /** A reconstructed tangent is an approximation of the possible trajectory between two oriented wire hits. \n
+    /** A tangent is an approximation of the possible trajectory between two oriented wire hits. \n
      *  The approximation is obtained by constructing a tangent between two drift circles of the wire hits  \n
      *  ( in the reference xy projection ) \n
      *  Generally maximal four tangents are possible. So to uniquely define a tangent we have \n
@@ -38,7 +38,7 @@ namespace Belle2 {
      *  are located at(0) for the first and at(1) for the second. \n
      *  The tangent has therefor a sense of what is forward and can be reversed if necessary \n
      *  Generally tangents are only a good approximation between neighboring wire hits.*/
-    class CDCRecoTangent : public CDCRLWireHitPair {
+    class CDCTangent : public CDCRLWireHitPair {
     public:
 
       /// Constructs a line touching two circles in one point each.
@@ -58,31 +58,32 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCRecoTangent();
+      CDCTangent();
 
       /// Construct a tangent from a pair of oriented wire hits
-      CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair);
+      CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Construct a tangent from two oriented wire hits.
-      CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit);
+      CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit);
 
       /// Construct a tangent from a pair of oriented wire hits taking the given tangential line instead of a computed one.
-      CDCRecoTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line);
+      CDCTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line);
 
       /// Construct a tangent from two oriented wire hits taking the given tangential line instead of a computed one.
-      CDCRecoTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line);
+      CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line);
 
       /// Construct a tangent from two reconstructed hits
-      CDCRecoTangent(const CDCRecoHit2D& fromRecoHit, const CDCRecoHit2D& toRecoHit);
+      CDCTangent(const CDCRecoHit2D& fromRecoHit, const CDCRecoHit2D& toRecoHit);
 
       /// Empty deconstructor
-      ~CDCRecoTangent();
+      ~CDCTangent();
 
 
 
       /// Print tangent for debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCRecoTangent& tangent) {
-        output << "RecoTangent" << std::endl;
+      friend std::ostream& operator<<(std::ostream& output, const CDCTangent& tangent)
+      {
+        output << "Tangent" << std::endl;
         output << "From : " << tangent.getFromWireHit()->getWire() << " " <<  tangent.getFromRecoDisp2D() << std::endl;
         output << "To : " << tangent.getToWireHit()->getWire() << " " <<  tangent.getToRecoDisp2D()  << std::endl;
         return output;
@@ -93,12 +94,12 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCRecoTangent* operator->() const { return this; }
+      const CDCTangent* operator->() const { return this; }
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to objects is a class of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication. */
-      operator const Belle2::TrackFindingCDC::CDCRecoTangent* () const { return this; }
+      operator const Belle2::TrackFindingCDC::CDCTangent* () const { return this; }
 
 
       /// Getter for the touching point of the tangent to the first drift circle
@@ -122,7 +123,7 @@ namespace Belle2 {
       { return getLine().tangential(); }
 
       /// Returns the cosine of the angle between the two flight directions of the tangents.
-      double getCosFlightDifference(const CDCRecoTangent& tangent) const
+      double getCosFlightDifference(const CDCTangent& tangent) const
       { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
 
       /// Gets the center of the tangent half way from one touch point to the other
@@ -179,7 +180,7 @@ namespace Belle2 {
       void reverse();
 
       /// Same as reverse but returns a copy.
-      CDCRecoTangent reversed() const;
+      CDCTangent reversed() const;
 
     public:
       /// Get for the line representation of the line
@@ -190,8 +191,8 @@ namespace Belle2 {
     private:
       ParameterLine2D m_line;///< Memory for the line between the two touching points. The first touch point at(0), second at(1).
 
-      /// ROOT Macro to make CDCRecoTangent a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoTangent, 1);
+      /// ROOT Macro to make CDCTangent a ROOT class.
+      TRACKFINDINGCDC_SwitchableClassDef(CDCTangent, 1);
 
     }; //class
 

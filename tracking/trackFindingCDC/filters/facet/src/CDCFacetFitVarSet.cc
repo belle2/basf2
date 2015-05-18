@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRecoFacetFitVarSet.h"
+#include "../include/CDCFacetFitVarSet.h"
 #include <assert.h>
 
 namespace {
@@ -22,16 +22,16 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoFacetFitVarSet::CDCRecoFacetFitVarSet(const std::string& prefix) :
-  VarSet<CDCRecoFacetFitVarNames>(prefix)
+CDCFacetFitVarSet::CDCFacetFitVarSet(const std::string& prefix) :
+  VarSet<CDCFacetFitVarNames>(prefix)
 {
 }
 
-bool CDCRecoFacetFitVarSet::extract(const CDCRecoFacet* ptrFacet)
+bool CDCFacetFitVarSet::extract(const CDCFacet* ptrFacet)
 {
   bool extracted = extractNested(ptrFacet);
   if (not extracted or not ptrFacet) return false;
-  const CDCRecoFacet& facet = *ptrFacet;
+  const CDCFacet& facet = *ptrFacet;
 
   // Make the feasibility cut on the right left passage information first
   const CellWeight fitlessWeight = m_fitlessFacetFilter(facet);

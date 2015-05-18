@@ -54,7 +54,7 @@ bool MCFacetFilter::needsTruthInformation()
   return true;
 }
 
-CellWeight MCFacetFilter::operator()(const CDCRecoFacet& facet)
+CellWeight MCFacetFilter::operator()(const CDCFacet& facet)
 {
   const int inTrackHitDistanceTolerance = 3;
   bool isCorrectFacet = operator()(facet,
@@ -189,9 +189,9 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   CDCRecoHit2D middleMCHit = CDCRecoHit2D::fromSimHit(&middleWireHit, *middleSimHit);
   CDCRecoHit2D endMCHit = CDCRecoHit2D::fromSimHit(&endWireHit, *endSimHit);
 
-  CDCRecoTangent startToMiddleMCTangent(startMCHit, middleMCHit);
-  CDCRecoTangent startToEndMCTangent(startMCHit, endMCHit);
-  CDCRecoTangent middleToEndMCTangent(middleMCHit, endMCHit);
+  CDCTangent startToMiddleMCTangent(startMCHit, middleMCHit);
+  CDCTangent startToEndMCTangent(startMCHit, endMCHit);
+  CDCTangent middleToEndMCTangent(middleMCHit, endMCHit);
 
   //the right left passage info from mc often is not correct, because the simhits offer poor momentum information (therefor limites flight direction information)
   startToMiddleMCTangent.adjustRLInfo();

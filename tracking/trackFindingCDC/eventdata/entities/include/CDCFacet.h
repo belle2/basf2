@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef CDCRECOFACET_H
-#define CDCRECOFACET_H
+#ifndef CDCFACET_H
+#define CDCFACET_H
 
 #include <utility>
 
@@ -19,28 +19,28 @@
 #include "CDCRLWireHitTriple.h"
 
 #include "CDCRecoHit2D.h"
-#include "CDCRecoTangent.h"
+#include "CDCTangent.h"
 
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing a triple of neighboring wire hits
-    class CDCRecoFacet : public CDCRLWireHitTriple {
+    class CDCFacet : public CDCRLWireHitTriple {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCRecoFacet();
+      CDCFacet();
 
       /// Constructor taking three oriented wire hits
-      CDCRecoFacet(
+      CDCFacet(
         const CDCRLWireHit* startRLWireHit,
         const CDCRLWireHit* middleRLWireHit,
         const CDCRLWireHit* endRLWireHit
       );
 
       /// Constructor taking three oriented wire hits and the tangent lines
-      CDCRecoFacet(
+      CDCFacet(
         const CDCRLWireHit* startRLWireHit,
         const CDCRLWireHit* middleRLWireHit,
         const CDCRLWireHit* endRLWireHit,
@@ -50,11 +50,11 @@ namespace Belle2 {
       );
 
       /// Empty destructor
-      ~CDCRecoFacet() {;}
+      ~CDCFacet() {;}
 
     public:
       /// Constructs the reverse tiple from this one - this ignores the tangent lines
-      CDCRecoFacet reversed() const;
+      CDCFacet reversed() const;
 
     public:
 
@@ -63,14 +63,14 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCRecoFacet* operator->() const
+      const CDCFacet* operator->() const
       { return this; }
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCRecoFacet* () const
+      operator const Belle2::TrackFindingCDC::CDCFacet* () const
       { return this; }
 
 
@@ -126,16 +126,16 @@ namespace Belle2 {
 
 
       /// Getter for the tangential line including the hits from the first to the second hit
-      CDCRecoTangent getStartToMiddle() const
-      { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToMiddleLine()); }
+      CDCTangent getStartToMiddle() const
+      { return CDCTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToMiddleLine()); }
 
       /// Getter for the tangential line including the hits from the first to the third hit
-      CDCRecoTangent getStartToEnd() const
-      { return CDCRecoTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToEndLine()); }
+      CDCTangent getStartToEnd() const
+      { return CDCTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToEndLine()); }
 
       /// Getter for the tangential line including the hits from the second to the third hit
-      CDCRecoTangent getMiddleToEnd() const
-      { return CDCRecoTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
+      CDCTangent getMiddleToEnd() const
+      { return CDCTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
 
 
       /// Returns the start reconstucted position projected to the trajectory
@@ -194,11 +194,11 @@ namespace Belle2 {
 
 
 
-      /// ROOT Macro to make CDCRecoFacet a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoFacet, 1);
+      /// ROOT Macro to make CDCFacet a ROOT class.
+      TRACKFINDINGCDC_SwitchableClassDef(CDCFacet, 1);
 
     }; //class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCRECOFACET_H
+#endif // CDCFACET_H

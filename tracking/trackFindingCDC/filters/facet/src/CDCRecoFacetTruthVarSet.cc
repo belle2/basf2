@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRecoFacetTruthVarSet.h"
+#include "../include/CDCFacetTruthVarSet.h"
 
 
 #include <assert.h>
@@ -16,28 +16,28 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoFacetTruthVarSet::CDCRecoFacetTruthVarSet(const std::string& prefix) :
-  VarSet<CDCRecoFacetTruthVarNames>(prefix)
+CDCFacetTruthVarSet::CDCFacetTruthVarSet(const std::string& prefix) :
+  VarSet<CDCFacetTruthVarNames>(prefix)
 {
 }
 
-bool CDCRecoFacetTruthVarSet::extract(const CDCRecoFacet* ptrFacet)
+bool CDCFacetTruthVarSet::extract(const CDCFacet* ptrFacet)
 {
   bool extracted = extractNested(ptrFacet);
   if (not extracted or not ptrFacet) return false;
-  const CDCRecoFacet& facet = *ptrFacet;
+  const CDCFacet& facet = *ptrFacet;
 
   const CellWeight mcWeight = m_mcFacetFilter(facet);
   var<named("truth")>() =  not isNotACell(mcWeight);
   return true;
 }
 
-void CDCRecoFacetTruthVarSet::initialize()
+void CDCFacetTruthVarSet::initialize()
 {
   m_mcFacetFilter.initialize();
 }
 
-void CDCRecoFacetTruthVarSet::terminate()
+void CDCFacetTruthVarSet::terminate()
 {
   m_mcFacetFilter.terminate();
 }

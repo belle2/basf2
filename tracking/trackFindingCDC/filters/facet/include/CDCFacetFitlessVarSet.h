@@ -8,16 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/filters/facet/CDCRecoFacetFitlessVarSet.h>
-
-#include <tracking/trackFindingCDC/varsets/PairVarSet.h>
+#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/algorithms/Relation.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
@@ -28,47 +25,55 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCRecoFacet.
-    class CDCRecoFacet;
+    /// Forward declaration of the CDCFacet.
+    class CDCFacet;
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const facetRelationNames[] = {
-      "from_middle_phi",
-      "to_middle_phi"
+    static char const* const facetFitlessNames[] = {
+      "superlayer_id",
+      "shape",
+      "abs_shape",
+      "start_rlinfo",
+      "start_drift_length",
+      "start_drift_length_sigma",
+      "middle_rlinfo",
+      "middle_drift_length",
+      "middle_drift_length_sigma",
+      "end_rlinfo",
+      "end_drift_length",
+      "end_drift_length_sigma",
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a facet relation
+     *  that should be generated from a facet
      */
-    class CDCRecoFacetRelationVarNames : public VarNames<Relation<CDCRecoFacet>> {
+    class CDCFacetFitlessVarNames : public VarNames<CDCFacet> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationNames);
+      static const size_t nNames = size(facetFitlessNames);
 
       /// Getter for the name a the given index
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return facetRelationNames[iName];
+        return facetFitlessNames[iName];
       }
-
-      /// Marking that the basic facet variables should be included.
-      typedef PairVarSet<CDCRecoFacetFitlessVarSet> NestedVarSet;
     };
 
-    /** Class that computes floating point variables from a facet relation.
+    /** Class that computes floating point variables from a facet.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class CDCRecoFacetRelationVarSet : public VarSet<CDCRecoFacetRelationVarNames> {
+    class CDCFacetFitlessVarSet : public VarSet<CDCFacetFitlessVarNames> {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCRecoFacetRelationVarSet(const std::string& prefix = "");
+      CDCFacetFitlessVarSet(const std::string& prefix = "");
 
-      /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<CDCRecoFacet>* ptrFacetRelation) IF_NOT_CINT(override final);
+      /// Generate and assign the variables from the cluster
+      virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);
+
     };
   }
 }

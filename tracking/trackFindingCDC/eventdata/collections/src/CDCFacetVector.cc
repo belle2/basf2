@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCRecoFacetVector.h"
+#include "../include/CDCFacetVector.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoFacetVector)
+TRACKFINDINGCDC_SwitchableClassImp(CDCFacetVector)
 

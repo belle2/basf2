@@ -16,8 +16,8 @@
 #include "CDCWireHit.h"
 #include "CDCRLWireHit.h"
 #include "CDCRecoHit2D.h"
-#include "CDCRecoTangent.h"
-#include "CDCRecoFacet.h"
+#include "CDCTangent.h"
+#include "CDCFacet.h"
 
 #include "CDCRecoHit3D.h"
 
@@ -54,18 +54,18 @@ namespace Belle2 {
     /* bool operator<(const CDCWireHit& wireHit, const HitEntity& hitEntity) { return wireHit < hitEntity.getWireHit(); } */
     /**@}*/
 
-    /// Defines reconstructed tangents and facet as coaligned on the start to middle tangent
-    /*bool operator<(const CDCRecoFacet& recoFacet, const CDCRecoTangent& recoTangent) {
-      return recoFacet.getStartRLWireHit() < recoTangent.getFromRLWireHit() or
-    ( recoFacet.getStartRLWireHit() == recoTangent.getFromRLWireHit() and
-    recoFacet.getMiddleRLWireHit() < recoTangent.getToRLWireHit() );
+    /// Defines tangents and facet as coaligned on the start to middle tangent
+    /*bool operator<(const CDCFacet& facet, const CDCTangent& tangent) {
+      return facet.getStartRLWireHit() < tangent.getFromRLWireHit() or
+    ( facet.getStartRLWireHit() == tangent.getFromRLWireHit() and
+    facet.getMiddleRLWireHit() < tangent.getToRLWireHit() );
     }
 
-    /// Defines reconstructed tangents and facet as coaligned on the start to middle tangent
-    bool operator<(const CDCWireHit& recoTangent, const CDCRecoFacet& recoFacet){
-      return recoTangent.getFromRLWireHit() < recoFacet.getStartRLWireHit() or
-    ( recoTangent.getFromRLWireHit() == recoFacet.getStartRLWireHit() and
-    recoTangent.getToRLWireHit() < recoFacet.getMiddleRLWireHit() );
+    /// Defines tangents and facet as coaligned on the start to middle tangent
+    bool operator<(const CDCWireHit& tangent, const CDCFacet& facet){
+      return tangent.getFromRLWireHit() < facet.getStartRLWireHit() or
+    ( tangent.getFromRLWireHit() == facet.getStartRLWireHit() and
+    tangent.getToRLWireHit() < facet.getMiddleRLWireHit() );
     }
     */
 

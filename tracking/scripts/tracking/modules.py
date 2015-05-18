@@ -86,29 +86,38 @@ class CDCFullFinder(metamodules.PathModule):
     """Full finder sequence for the CDC with a step of Legendre tracking first and cellular automaton tracking second."""
 
     def __init__(self):
-        path = basf2.create_path()
+        background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+        background_hit_finder_module.param({"ClusterFilter": "tmva",
+                                            "ClusterFilterParameters": {"cut": "0.1"},
+                                            "SegmentsStoreObjName": "TempCDCRecoSegment2DVector",
+                                            "FacetFilter": "none",
+                                            "FacetNeighborChooser": "none"})
 
-        legendre_track_finder_module = basf2.register_module("CDCLegendreTracking")
-        legendre_track_finder_module.param("GFTrackCandidatesColName", "LegendreTrackCands")
+        printer = basf2.register_module("PrintCollections")
 
-        stereo_histogramming_finder = basf2.register_module("CDCLegendreHistogramming")
-        stereo_histogramming_finder.param("GFTrackCandidatesColName", "LegendreTrackCands")
+        legendre_track_finder_module = basf2.register_module('CDCLegendreTracking')
+        legendre_track_finder_module.param({'SkipHitsPreparation': True,
+                                            'WriteGFTrackCands': False})
 
-        not_assigned_hits_searcher_module = basf2.register_module("NotAssignedHitsSearcher")
-        not_assigned_hits_searcher_module.param({"TracksFromFinder": "LegendreTrackCands",
-                                                 "NotAssignedCDCHits": "NotAssignedCDCHits"})
+        cdc_stereo_combiner = basf2.register_module('CDCLegendreHistogramming')
+        cdc_stereo_combiner.param({'WriteGFTrackCands': True,
+                                   'SkipHitsPreparation': True,
+                                   'TracksStoreObjNameIsInput': True,
+                                   "GFTrackCandsStoreArrayName": "LegendreTrackCands"})
 
         local_track_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
-        local_track_finder_module.param({"UseOnlyCDCHitsRelatedFrom": "NotAssignedCDCHits",
-                                         "GFTrackCandsStoreArrayName": "LocalTrackCands"})
+        local_track_finder_module.param({"SkipHitsPreparation": True,
+                                         "CreateGFTrackCands": False})
 
         not_assigned_hits_combiner_module = basf2.register_module("NotAssignedHitsCombiner")
         not_assigned_hits_combiner_module.param({"TracksFromLegendreFinder": "LegendreTrackCands",
-                                                 "NotAssignedTracksFromLocalFinder": "LocalTrackCands",
-                                                 "ResultTrackCands": "TrackCands"})
+                                                 "ResultTrackCands": "TrackCands",
+                                                 "RecoSegments": "CDCRecoSegment2DVector",
+                                                 "BadTrackCands": "BadTrackCands"})
 
-        modules = [legendre_track_finder_module,
-                   not_assigned_hits_searcher_module,
+        modules = [background_hit_finder_module,
+                   legendre_track_finder_module,
+                   cdc_stereo_combiner,
                    local_track_finder_module,
                    not_assigned_hits_combiner_module]
 

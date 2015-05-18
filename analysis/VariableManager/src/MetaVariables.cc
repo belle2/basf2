@@ -18,6 +18,7 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -199,44 +200,42 @@ namespace Belle2 {
 
     Manager::FunctionPtr veto(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2) {
+      if (arguments.size() == 2 or arguments.size() == 3) {
 
-        std::string roeListName = "Test";
-        std::string cutString = "Test";
-        try {
-          roeListName = boost::lexical_cast<std::string>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of veto meta function must be string!");
-          return nullptr;
-        }
-        try {
-          cutString = boost::lexical_cast<std::string>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of veto meta function must be string!");
-          return nullptr;
+        std::string roeListName = arguments[0];
+        std::string cutString = arguments[1];
+        int pdgCode = 11;
+        if (arguments.size() == 2) {
+          B2INFO("Use pdgCode 11 as default in meta variable veto, other arguments: " << roeListName << ", " << cutString)
+        } else {
+          try {
+            pdgCode = boost::lexical_cast<int>(arguments[2]);
+          } catch (boost::bad_lexical_cast&) {
+            B2WARNING("Third argument of veto meta function must be integer!");
+            return nullptr;
+          }
         }
 
-        auto func = [roeListName, cutString](const Particle * particle) -> double {
+        Variable::Cut cut = Cut(cutString);
+
+        auto func = [roeListName, cut, pdgCode](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          else {
-            StoreObjPtr<ParticleList> roeList(roeListName);
-            TLorentzVector vec = particle->get4Vector();
+          StoreObjPtr<ParticleList> roeList(roeListName);
+          TLorentzVector vec = particle->get4Vector();
 
-            for (unsigned int i = 0; i < roeList->getListSize(); i++)
-            {
-              Particle* roeParticle = roeList->getParticle(i);
-              if (roeParticle->getMdstArrayIndex() != particle->getMdstArrayIndex()) {
-                TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
-                Particle tempParticle = Particle(tempCombination, 11);
-                Variable::Cut cut = Cut(cutString);
-                if (cut.check(&tempParticle)) {
-                  return 1;
-                }
+          for (unsigned int i = 0; i < roeList->getListSize(); i++)
+          {
+            const Particle* roeParticle = roeList->getParticle(i);
+            if (particle->overlapsWith(roeParticle)) {
+              TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
+              Particle tempParticle = Particle(tempCombination, pdgCode);
+              if (cut.check(&tempParticle)) {
+                return 1;
               }
             }
-            return 0;
           }
+          return 0;
         };
         return func;
       } else {
@@ -354,6 +353,8 @@ namespace Belle2 {
                       "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
                       "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
+    REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
+                      "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut.");
 
   }
 }

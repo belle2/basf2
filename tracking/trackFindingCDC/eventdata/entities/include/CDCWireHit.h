@@ -7,15 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCWIREHIT_H
 #define CDCWIREHIT_H
 
-#include <TVector2.h>
-
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
@@ -32,13 +29,16 @@ namespace Belle2 {
 
     const FloatType SIMPLE_DRIFT_LENGTH_VARIANCE  = 0.000169;
 
-    /// Class representing a hit wire in the central drift chamber
-    /** This class combines the measurement informations from a CDCHit with the geometry informations. \n
+    /** Class representing a hit wire in the central drift chamber
+     *  This class combines the measurement informations from a CDCHit
+     *  with the geometry informations.
      *  It forms the basis of all other higher level tracking objects.
-     *  It contains an AutomataCell since we want to use it with the Clusterizer which makes use of the cell state. \n
-     *  Additionally contains references to both the CDCWire instance from the CDCTopology and the CDCHit from the StoreArray of the event. \n
+     *  It contains an AutomataCell since we want to use it
+     *  with the Clusterizer which makes use of the cell state.
+     *  Additionally contains references to both the CDCWire instance from the CDCTopology and
+     *  the CDCHit from the StoreArray of the event.
      */
-    class CDCWireHit : public SwitchableRootificationBase {
+    class CDCWireHit {
 
     public:
       static CDC::TDCCountTranslatorBase& getTDCCountTranslator();
@@ -50,7 +50,8 @@ namespace Belle2 {
 
     private:
       /// Constructor for interal use
-      /** Construct for a dummy CDCWireHit. The wire hit is still assoziated with a wire but has no hit attached to it.
+      /** Construct for a dummy CDCWireHit. The wire hit is still assoziated with a wire
+      but has no hit attached to it.
           The getHit() will yield nullptr. The getStoreIHit() yields -1 for this case. */
       CDCWireHit(const CDCWire* ptrWire);
 
@@ -68,9 +69,6 @@ namespace Belle2 {
 
       /// Constructor to taking a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID, const FloatType& driftLength);
-
-      /// Empty deconstructor
-      ~CDCWireHit();
 
     public:
       /// Make the wire hit automatically castable to its underlying cdcHit
@@ -184,7 +182,9 @@ namespace Belle2 {
       const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
 
-      /// Cast operator to the reference of the automaton cell - making AutomatonCell a constant pseudo base class of CDCWireHit
+      /** Cast operator to the reference of the automaton cell.
+       *  Making AutomatonCell a constant pseudo base class of CDCWireHit
+       */
       operator const Belle2::TrackFindingCDC::AutomatonCell& () const
       { return m_automatonCell; }
 
@@ -192,9 +192,9 @@ namespace Belle2 {
       /** @name Mimic pointer
         */
       /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
-       *  if one should use the dot '.' or operator '->' for method look up. \n
-       *  So this function defines the -> operator for the object. \n
+      /** In situations where the type is not known to be a pointer or a reference
+       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
+       *  So this function defines the -> operator for the object.
        *  No matter you have a pointer or an object access is given with '->'*/
       /**@{*/
       const CDCWireHit* operator->() const
@@ -202,15 +202,18 @@ namespace Belle2 {
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
-       *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after
+       *  the trailing const to constrain the cast to lvalues.*/
       operator const Belle2::TrackFindingCDC::CDCWireHit* () const
       { return this; }
       /**@}*/
 
 
       /** @name Methods common to all tracking entities
-       *  All entities ( track parts contained in a single superlayer ) share this interface to help the definition of collections of them. */
+       *  All entities ( track parts contained in a single superlayer ) share this interface to help
+       *  the definition of collections of them. */
       /**@{*/
       /// Checks of the wire hit is base on the wire given
       bool hasWire(const CDCWire& wire) const
@@ -267,11 +270,9 @@ namespace Belle2 {
       { return wirehit == nullptr ? output << "nullptr" : output << *wirehit; }
 
     private:
-      /// Memory for the CDCWire reference
-      const CDCWire* m_wire;
-
-      /// Memory for the CDCWire reference
-      const CDCHit* m_hit;
+      /** Memory for the automaton cell. Marked as mutable since its content should be changeable
+       *  even if the wire and drift length information are required to be constant. */
+      AutomatonCell m_automatonCell;
 
       /// Memory for the drift length at the wire reference point
       FloatType m_refDriftLength;
@@ -279,13 +280,13 @@ namespace Belle2 {
       /// Memory for the variance of the drift length at the wire reference point
       FloatType m_refDriftLengthVariance;
 
-      /// Memory for the automaton cell. Marked it as mutable since its content should be changeable when if the wire and drift length information are required to be constant.
-      AutomatonCell m_automatonCell;
+      /// Memory for the CDCWire reference
+      const CDCWire* m_wire;
 
-      /// ROOT Macro to make CDCWireHit a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCWireHit, 1);
+      /// Memory for the CDCWire reference
+      const CDCHit* m_hit;
 
-    }; //class
+    }; //class CDCWireHit
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

@@ -7,32 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+#pragma once
 #ifndef CDCRLWIREHITPAIR_H
 #define CDCRLWIREHITPAIR_H
 
 #include "CDCRLWireHit.h"
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A pair of oriented wire hits
-    class CDCRLWireHitPair : public SwitchableRootificationBase {
+    class CDCRLWireHitPair {
 
     public:
-
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitPair();
 
-      /// Copy constructor applying checks
+      /// Copy constructor
       CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Constructor taking two oriented wire hits
-      CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit);
-
-      /// Empty deconstructor
-      ~CDCRLWireHitPair();
+      CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit,
+                       const CDCRLWireHit* toRLWireHit);
 
 
 
@@ -46,21 +42,35 @@ namespace Belle2 {
 
       /// Equality comparision based the two oriented wire hits.
       bool operator==(const CDCRLWireHitPair& other) const
-      { return getFromRLWireHit() == other.getFromRLWireHit() and getToRLWireHit() == other.getToRLWireHit(); }
+      {
+        return getFromRLWireHit() == other.getFromRLWireHit() and
+               getToRLWireHit() == other.getToRLWireHit();
+      }
 
-      /// Total ordering relation based on the from oriented wire hit first and the to oriented wire hit second
-      bool operator<(const CDCRLWireHitPair& other) const {
+      /** Total ordering relation based on
+       *  the from oriented wire hit first and
+       *  the to oriented wire hit second.
+       */
+      bool operator<(const CDCRLWireHitPair& other) const
+      {
         return getFromRLWireHit() < other.getFromRLWireHit() or
-               (getFromRLWireHit() == other.getFromRLWireHit() and getToRLWireHit() < other.getToRLWireHit());
+               (getFromRLWireHit() == other.getFromRLWireHit() and
+                getToRLWireHit() < other.getToRLWireHit());
       }
 
 
 
       /// Defines wire hits and oriented wire hit pair as coaligned on the first wire hit
-      friend bool operator<(const  CDCRLWireHitPair& rlWireHitPair, const CDCWireHit& wireHit) { return rlWireHitPair.getFromWireHit() < wireHit; }
+      friend bool operator<(const  CDCRLWireHitPair& rlWireHitPair, const CDCWireHit& wireHit)
+      {
+        return rlWireHitPair.getFromWireHit() < wireHit;
+      }
 
       /// Defines wire hits and oriented wire hit pair as coaligned on the first wire hit
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHitPair& rlWireHitPair) { return  wireHit <  rlWireHitPair.getFromWireHit(); }
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHitPair& rlWireHitPair)
+      {
+        return  wireHit <  rlWireHitPair.getFromWireHit();
+      }
 
 
 
@@ -94,7 +104,8 @@ namespace Belle2 {
 
 
       /// Getter for the common superlayer id of the pair
-      ILayerType getISuperLayer() const {
+      ILayerType getISuperLayer() const
+      {
         ILayerType result = getFromRLWireHit().getISuperLayer();
         return result == getToRLWireHit().getISuperLayer() ? result : INVALID_ISUPERLAYER;
       }
@@ -163,15 +174,14 @@ namespace Belle2 {
       void setToRLInfo(const RightLeftInfo& toRLInfo);
 
     protected:
-      const CDCRLWireHit* m_fromRLWireHit; ///< Memory for the reference to the first oriented wire hit
-      const CDCRLWireHit* m_toRLWireHit;   ///< Memory for the reference to the second oriented wire hit
+      /// Memory for the reference to the first oriented wire hit
+      const CDCRLWireHit* m_fromRLWireHit;
 
-      /// ROOT Macro to make CDCRLWireHitPair a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHitPair, 1);
+      /// Memory for the reference to the second oriented wire hit
+      const CDCRLWireHit* m_toRLWireHit;
 
     }; //end class CDCRLWireHitPair
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
 #endif //CDCRLWIREHITPAIR_H
-

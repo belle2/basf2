@@ -10,19 +10,19 @@
 #ifndef CDCRLWIREHIT_H
 #define CDCRLWIREHIT_H
 
-
-#include <cdc/dataobjects/CDCSimHit.h>
-
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-
 #include "CDCWireHit.h"
 
 namespace Belle2 {
+
+  /// Forward declaration
+  class CDCSimHit;
+
   namespace TrackFindingCDC {
 
-    /// Class representing an oriented hit wire including a hypotheses whether the causing track passes left or right
-    class CDCRLWireHit : public SwitchableRootificationBase {
+    /** Class representing an oriented hit wire including a hypotheses
+     *  whether the causing track passes left or right
+     */
+    class CDCRLWireHit {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -34,15 +34,13 @@ namespace Belle2 {
        *  @param rlInfo the right left passage information the _wire_ relativ to the track */
       CDCRLWireHit(const CDCWireHit* wireHit, RightLeftInfo rlInfo = 0);
 
-      /// Empty deconstructor
-      ~CDCRLWireHit();
-
       /// Constructs an oriented wire hit from a sim hit and the assoziated wirehit.
       /** This translates the sim hit to an oriented wire hit mainly to be able to compare the \n
        *  reconstructed values from the algorithm with the Monte Carlo information. \n
        *  It merely evalutates, if the true trajectory passes right or left of the wire. */
       static CDCRLWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
 
+    public:
       /// Returns the oriented wire hit with the opposite right left information.
       const CDCRLWireHit* reversed() const;
 
@@ -56,7 +54,9 @@ namespace Belle2 {
         return getWireHit() == other.getWireHit() and getRLInfo() == other.getRLInfo();
       }
 
-      /// Total ordering relation based on wire hit and left right passage information in this order of importance.
+      /** Total ordering relation based on
+       *  wire hit and left right passage information in this order of importance.
+       */
       bool operator<(const CDCRLWireHit& other) const
       {
         return getWireHit() <  other.getWireHit() or (
@@ -65,16 +65,24 @@ namespace Belle2 {
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire) { return rlWireHit.getWire() < wire; }
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire)
+      { return rlWireHit.getWire() < wire; }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
-      friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit) { return wire < rlWireHit.getWire(); }
+      friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
+      { return wire < rlWireHit.getWire(); }
 
-      /// Defines wire hits and oriented wire hits to be coaligned on the wire hit on which they are based.
-      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWireHit& wireHit) { return rlWireHit.getWireHit() < wireHit; }
+      /** Defines wire hits and oriented wire hits to be coaligned on the wire hit
+       *  on which they are based.
+       */
+      friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWireHit& wireHit)
+      { return rlWireHit.getWireHit() < wireHit; }
 
-      /// Defines wire hits and oriented wire hits to be coaligned on the wire hit on which they are based.
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit) { return wireHit < rlWireHit.getWireHit(); }
+      /** Defines wire hits and oriented wire hits to be coaligned on the wire hit
+       * on which they are based.
+       */
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
+      { return wireHit < rlWireHit.getWireHit(); }
 
 
 
@@ -114,19 +122,23 @@ namespace Belle2 {
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getWireHit().getRecoPos2D(trajectory2D);}
 
-      /// Reconstruct the three dimensional position (especially of stereo hits)
-      /// by terminating the z coordinate assuming the drift circle touches the two dimensional trajectory in the xy projection.
+      /** Reconstruct the three dimensional position (especially of stereo hits)
+       *  by terminating the z coordinate assuming the drift circle touches
+       *  the two dimensional trajectory in the xy projection.
+       */
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
 
       /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
-       *  if one should use the dot '.' or operator '->' for method look up. \n
+      /** In situations where the type is not known to be a pointer or a reference
+       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
        *  So this function defines the -> operator for the object. \n
-       *  No matter you have a pointer or an object access is given with '->'*/
+       *  No matter you have a pointer or an object access is given with '->'
+       */
       const CDCRLWireHit* operator->() const { return this; }
 
       /** @name Methods common to all tracking entities
-       *  All entities ( track parts contained in a single superlayer ) share this interface to help definition of collections of them.
+       *  All entities ( track parts contained in a single superlayer ) share this interface to help
+       *  definition of collections of them.
        */
       /**@{*/
       /// Checks if the oriented hit is assoziated with the give wire
@@ -165,11 +177,14 @@ namespace Belle2 {
       Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getRecoPos2D(trajectory2D); }
 
-      /// Calculates the squared distance of the oriented hit to a circle as see from the transvers plane.
+      /** Calculates the squared distance of the oriented hit to a circle
+       *  as see from the transvers plane.
+       */
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
       {
-        FloatType correctedDistance = trajectory2D.getDist2D(getRefPos2D()) - getRLInfo() * getRefDriftLength();
-        return correctedDistance * correctedDistance;
+        FloatType wireDistance = trajectory2D.getDist2D(getRefPos2D());
+        FloatType correctedDistance = wireDistance - getRLInfo() * getRefDriftLength();
+        return  correctedDistance *  correctedDistance;
       }
 
       /// Output operator. Help debugging.
@@ -181,12 +196,11 @@ namespace Belle2 {
       }
 
     private:
+      /// Memory for the reference to the assiziated wire hit
+      const CDCWireHit* m_wirehit;
 
-      const CDCWireHit* m_wirehit;  ///< Memory for the reference to the assiziated wire hit
-      RightLeftInfo m_rlInfo; ///< Memory for the right left passage information of the oriented wire hit.
-
-      /// ROOT Macro to make CDCRLWireHit a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHit, 1);
+      /// Memory for the right left passage information of the oriented wire hit.
+      RightLeftInfo m_rlInfo;
 
     }; //class CDCRLWireHit
 

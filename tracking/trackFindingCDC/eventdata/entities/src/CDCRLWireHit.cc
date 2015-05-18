@@ -11,14 +11,11 @@
 #include "../include/CDCRLWireHit.h"
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-TRACKFINDINGCDC_SwitchableClassImp(CDCRLWireHit)
-
-
 
 
 
@@ -26,9 +23,6 @@ CDCRLWireHit::CDCRLWireHit() :
   m_wirehit(nullptr),
   m_rlInfo(LEFT)
 {;}
-
-
-
 
 
 CDCRLWireHit::CDCRLWireHit(
@@ -40,15 +34,6 @@ CDCRLWireHit::CDCRLWireHit(
 {
   if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
 }
-
-
-
-
-
-CDCRLWireHit::~CDCRLWireHit()
-{
-}
-
 
 
 
@@ -80,7 +65,8 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(
 
 const CDCRLWireHit* CDCRLWireHit::reversed() const
 {
-  return CDCWireHitTopology::getInstance().getReverseOf(*this);
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+  return wireHitTopology.getReverseOf(*this);
 }
 
 

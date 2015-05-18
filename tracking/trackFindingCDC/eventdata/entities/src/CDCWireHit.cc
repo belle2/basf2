@@ -22,9 +22,6 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCWireHit)
-
-
 TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
 {
   return CDCWireHitTopology::getInstance().getTDCCountTranslator();
@@ -97,12 +94,3 @@ CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
   m_refDriftLengthVariance(getTDCCountTranslator().getDriftLengthResolution(driftLength, wireID, false, NAN, NAN)),
   m_automatonCell(1)
 {;}
-
-
-CDCWireHit::~CDCWireHit() {;}
-
-
-
-
-
-

@@ -67,6 +67,10 @@ void TagUniqueSignalModule::event()
       if (was_inserted)
         extraInfoValue = 1.0;
     }
-    part->addExtraInfo(m_extraInfoName, extraInfoValue);
+    if (part->hasExtraInfo(m_extraInfoName)) {
+      B2WARNING("Extra Info with given name is already set! I won't set it again!")
+    } else {
+      part->addExtraInfo(m_extraInfoName, extraInfoValue);
+    }
   }
 }

@@ -42,13 +42,20 @@ namespace Belle2 {
       virtual ~PairVarSet() {;}
 
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const  std::pair<const BaseObject*, const BaseObject*>* obj)
+      virtual bool extract(const std::pair<const BaseObject*, const BaseObject*>* obj)
       {
         assert(obj);
         bool first_extracted = m_firstVarSet.extract(obj->first);
         bool second_extracted = m_secondVarSet.extract(obj->second);
         return first_extracted and second_extracted;
       }
+
+      /// Method for extraction from an object instead of a pointer.
+      bool extract(const std::pair<const BaseObject*, const BaseObject*>& obj)
+      {
+        return extract(&obj);
+      }
+
 
       /** Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.

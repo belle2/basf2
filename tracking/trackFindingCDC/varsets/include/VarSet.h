@@ -61,6 +61,12 @@ namespace Belle2 {
         return extractNested(obj);
       }
 
+      /// Method for extraction from an object instead of a pointer.
+      bool extract(const Object& obj)
+      {
+        return extract(&obj);
+      }
+
       /** Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
        */

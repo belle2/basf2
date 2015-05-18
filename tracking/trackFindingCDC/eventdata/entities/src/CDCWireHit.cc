@@ -30,28 +30,24 @@ TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
 
 
 
-CDCWireHit::CDCWireHit():
-  m_wire(&(CDCWire::getLowest())),
-  m_hit(nullptr),
-  m_refDriftLength(0.0),
-  m_refDriftLengthVariance(0.0),
-  m_automatonCell(1)
+CDCWireHit::CDCWireHit() :
+  CDCWireHit(&(CDCWire::getLowest()))
 {;}
 
 CDCWireHit::CDCWireHit(const CDCWire* wire):
-  m_wire(wire),
-  m_hit(nullptr),
+  m_automatonCell(1),
   m_refDriftLength(0.0),
   m_refDriftLengthVariance(0.0),
-  m_automatonCell(1)
+  m_wire(wire),
+  m_hit(nullptr)
 {;}
 
 CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslator):
-  m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
-  m_hit(ptrHit),
+  m_automatonCell(1),
   m_refDriftLength(0.0),
   m_refDriftLengthVariance(0.0),
-  m_automatonCell(1)
+  m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
+  m_hit(ptrHit)
 {
   if (not ptrHit) {
     B2ERROR("CDCWireHit constructor invoked with nullptr CDCHit");
@@ -88,9 +84,9 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslat
 }
 
 CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
-  m_wire(CDCWire::getInstance(wireID)),
-  m_hit(nullptr),
+  m_automatonCell(1),
   m_refDriftLength(driftLength),
   m_refDriftLengthVariance(getTDCCountTranslator().getDriftLengthResolution(driftLength, wireID, false, NAN, NAN)),
-  m_automatonCell(1)
+  m_wire(CDCWire::getInstance(wireID)),
+  m_hit(nullptr)
 {;}

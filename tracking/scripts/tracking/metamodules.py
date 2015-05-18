@@ -45,6 +45,9 @@ class WrapperModule(basf2.Module):
         #: The wrapped module
         self.module = module
 
+        # Forward the name of this module to the C++ world
+        self.set_name(self.name)
+
     @property
     def wrapper_name(self):
         return self.__class__.__name__
@@ -54,12 +57,13 @@ class WrapperModule(basf2.Module):
         """Forwards the parameters"""
         return self.module.param
 
+    @property
     def name(self):
         """Compose a name that indicates the wrapped module."""
         return "{wrapper_name}({module_name})".format(module_name=self.module.name(),
                                                       wrapper_name=self.wrapper_name)
 
-    def getName(self):
+    def get_name(self):
         """Forwards the name()."""
         return self.name()
 

@@ -11,6 +11,8 @@
 
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonModule.h>
 
+#include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
+
 namespace Belle2 {
 
   /// Module for the cellular automaton tracking for the CDC on regular events
@@ -28,18 +30,11 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    /** Parameter: Cluster filter to be used during the construction of clusters.
-    Valid values are:
-    + "all" (all hits are valid),
-    + "tmva"
-    + "recording"
+    /**
+       Factory for the cluster filter, knowing all the available filters and there respective parameters
     */
-    std::string m_param_clusterFilter;
+    Belle2::TrackFindingCDC::ClusterFilterFactory m_clusterFilterFactory;
 
-    /** Parameter: Cluster filter parameters forwarded to the cluster filter
-     *  Meaning of the Key - Value pairs depend on the cluster filter
-     */
-    std::map<std::string, std::string> m_param_clusterFilterParameters;
 
     /** Parameter: Facet filter to be used during the construction of facets.
     Valid values are:

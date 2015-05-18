@@ -94,6 +94,18 @@ namespace Belle2 {
     const T& getParamValue(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
                                                                 ModuleParamList::ModuleParameterTypeError);
 
+    /**
+       Same as in base Module class but public
+    */
+    template<typename T>
+    void addParam(const std::string& name,
+                  T& paramVariable,
+                  const std::string& description,
+                  const T& defaultValue)
+    {
+      Module::addParam(name, paramVariable, description, defaultValue);
+    }
+
   protected:
 
     /// Parameter: Full name of a StoreArray that has a Relation to the CDCHits StoreArray. Only CDCHits that have a relation will be used in this track finder.

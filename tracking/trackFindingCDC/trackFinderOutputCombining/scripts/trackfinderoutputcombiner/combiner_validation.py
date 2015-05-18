@@ -32,7 +32,7 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
     segment_track_chooser_filter = "tmva"
     segment_train_filter = "simple"
     segment_track_filter = "simple"
-    stereo_assignment = True
+    stereo_assignment = False
 
     def add_mc_combination(self, main_path):
         mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
@@ -79,7 +79,7 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
         main_path.add_module(local_track_finder)
 
         combiner_module = basf2.register_module("SegmentTrackCombinerDev")
-        combiner_module.param({'SegmentTrackChooser': str(self.segment_track_chooser_filter),
+        combiner_module.param({'SegmentTrackChooser': self.segment_track_chooser_filter,
                                'SegmentTrainFilter': self.segment_train_filter,
                                'SegmentTrackFilter': self.segment_track_filter,
                                'WriteGFTrackCands': True,
@@ -130,53 +130,80 @@ def print_data():
     print result
 
 
-def main():
+def main(pool_number):
 
-    for tmva_cut in np.arange(0.0, 1.0, 0.1):
+    if pool_number == 1:
+        for tmva_cut in np.arange(0.0, 1.0, 0.1):
+            run = CombinerValidationRun()
+            run.segment_track_chooser_cut = tmva_cut
+            run.segment_track_chooser_filter = "tmva"
+            run.segment_train_filter = "simple"
+            run.segment_track_filter = "simple"
+            run.configure_and_execute_from_commandline()
+    elif pool_number == 2:
+        for tmva_cut in np.arange(0.0, 1.0, 0.1):
+            run = CombinerValidationRun()
+            run.segment_track_chooser_cut = tmva_cut
+            run.segment_track_chooser_filter = "tmva"
+            run.segment_train_filter = "mc"
+            run.segment_track_filter = "simple"
+            run.configure_and_execute_from_commandline()
+    elif pool_number == 3:
+        for tmva_cut in np.arange(0.0, 1.0, 0.1):
+            run = CombinerValidationRun()
+            run.segment_track_chooser_cut = tmva_cut
+            run.segment_track_chooser_filter = "tmva"
+            run.segment_train_filter = "simple"
+            run.segment_track_filter = "mc"
+            run.configure_and_execute_from_commandline()
+    elif pool_number == 4:
+        for tmva_cut in np.arange(0.0, 1.0, 0.1):
+            run = CombinerValidationRun()
+            run.segment_track_chooser_cut = tmva_cut
+            run.segment_track_chooser_filter = "tmva"
+            run.segment_train_filter = "mc"
+            run.segment_track_filter = "mc"
+            run.configure_and_execute_from_commandline()
+    elif pool_number == 5:
         run = CombinerValidationRun()
-        run.segment_track_chooser_cut = tmva_cut
-        run.segment_track_chooser_filter = "tmva"
+        run.segment_track_chooser_filter = "mc"
+        run.segment_train_filter = "mc"
+        run.segment_track_filter = "mc"
+        run.configure_and_execute_from_commandline()
+
+        run = CombinerValidationRun()
+        run.segment_track_chooser_filter = "simple"
         run.segment_train_filter = "simple"
         run.segment_track_filter = "simple"
         run.configure_and_execute_from_commandline()
 
-    for tmva_cut in np.arange(0.0, 1.0, 0.1):
         run = CombinerValidationRun()
-        run.segment_track_chooser_cut = tmva_cut
-        run.segment_track_chooser_filter = "tmva"
+        run.segment_track_chooser_filter = "simple"
         run.segment_train_filter = "mc"
-        run.segment_track_filter = "simple"
+        run.segment_track_filter = "mc"
         run.configure_and_execute_from_commandline()
 
-    for tmva_cut in np.arange(0.0, 1.0, 0.1):
         run = CombinerValidationRun()
-        run.segment_track_chooser_cut = tmva_cut
-        run.segment_track_chooser_filter = "tmva"
+        run.segment_track_chooser_filter = "mc"
         run.segment_train_filter = "simple"
         run.segment_track_filter = "mc"
         run.configure_and_execute_from_commandline()
 
-    for tmva_cut in np.arange(0.0, 1.0, 0.1):
         run = CombinerValidationRun()
-        run.segment_track_chooser_cut = tmva_cut
-        run.segment_track_chooser_filter = "tmva"
+        run.segment_track_chooser_filter = "mc"
         run.segment_train_filter = "mc"
-        run.segment_track_filter = "mc"
+        run.segment_track_filter = "simple"
         run.configure_and_execute_from_commandline()
 
-    run = CombinerValidationRun()
-    run.segment_track_chooser_filter = "mc"
-    run.segment_train_filter = "mc"
-    run.segment_track_filter = "mc"
-    run.configure_and_execute_from_commandline()
-
-    run = CombinerValidationRun()
-    run.segment_track_chooser_filter = "simple"
-    run.segment_train_filter = "simple"
-    run.segment_track_filter = "simple"
-    run.configure_and_execute_from_commandline()
+        run = CombinerValidationRun()
+        run.segment_track_chooser_filter = "mc"
+        run.segment_train_filter = "simple"
+        run.segment_track_filter = "simple"
+        run.configure_and_execute_from_commandline()
 
 if __name__ == "__main__":
+    from multiprocessing import Pool
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
-    main()
+    p = Pool(5)
+    p.map(main, [1, 2, 3, 4, 5])
     print_data()

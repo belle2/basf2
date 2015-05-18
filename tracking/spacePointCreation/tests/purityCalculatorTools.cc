@@ -120,6 +120,8 @@ namespace PurityCalcTests {
      */
     virtual void SetUp()
     {
+      DataStore::Instance().setInitializeActive(true);
+
       // register everything necessary in the datastore
       m_pxdTrueHits.registerInDataStore("PXDTHs");
       m_svdTrueHits.registerInDataStore("SVDTHs");

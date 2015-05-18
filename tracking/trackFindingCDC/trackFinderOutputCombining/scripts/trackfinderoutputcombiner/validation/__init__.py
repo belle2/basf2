@@ -10,7 +10,7 @@ import basf2
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.validation.module import SeparatedTrackingValidationModule
-from tracking.metamodules import IfPathWithStoreArrayName
+from tracking.metamodules import IfStoreArrayPresentModule
 
 
 from trackfindingcdc.cdcLegendreTrackingValidation import ReassignHits
@@ -55,8 +55,9 @@ class MCTrackFinderRun(StandardEventGenerationRun):
                                                        WhichParticles=[],
                                                        GFTrackCandidatesColName=self.mc_track_cands_store_array_name)
 
-        mc_track_finder_module_if_module = IfPathWithStoreArrayName(modules=[mc_track_finder_module],
-                                                                    store_array_name=self.mc_track_cands_store_array_name)
+        mc_track_finder_module_if_module = IfStoreArrayPresentModule(mc_track_finder_module,
+                                                                     storearray_name=self.mc_track_cands_store_array_name)
+
         mc_track_finder_module_if_module.set_log_level(basf2.LogLevel.DEBUG)
         main_path.add_module(mc_track_finder_module_if_module)
 

@@ -20,13 +20,13 @@ namespace Belle2 {
        Factory that can creates apropriate cluster filter instance from parameters.
 
        It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering file.
+       Can collaborate with a Module and expose these parameters to the user in steering files.
     */
     class ClusterFilterFactory : public FilterFactory<BaseClusterFilter> {
 
     public:
       /** Fill the default filter name and parameter values*/
-      ClusterFilterFactory();
+      ClusterFilterFactory(const std::string& defaultFilterName = "all");
 
       using FilterFactory<BaseClusterFilter>::create;
 

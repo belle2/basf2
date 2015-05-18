@@ -7,47 +7,47 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/MCAxialStereoSegmentPairNeighborChooser.h"
+#include "../include/MCSegmentPairNeighborChooser.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MCAxialStereoSegmentPairNeighborChooser::MCAxialStereoSegmentPairNeighborChooser(bool allowReverse) :
-  m_mcAxialStereoSegmentPairFilter(allowReverse)
+MCSegmentPairNeighborChooser::MCSegmentPairNeighborChooser(bool allowReverse) :
+  m_mcSegmentPairFilter(allowReverse)
 {
 }
 
 
-void MCAxialStereoSegmentPairNeighborChooser::clear()
+void MCSegmentPairNeighborChooser::clear()
 {
-  m_mcAxialStereoSegmentPairFilter.clear();
+  m_mcSegmentPairFilter.clear();
 }
 
 
 
-void MCAxialStereoSegmentPairNeighborChooser::initialize()
+void MCSegmentPairNeighborChooser::initialize()
 {
-  m_mcAxialStereoSegmentPairFilter.initialize();
+  m_mcSegmentPairFilter.initialize();
 }
 
 
 
-void MCAxialStereoSegmentPairNeighborChooser::terminate()
+void MCSegmentPairNeighborChooser::terminate()
 {
-  m_mcAxialStereoSegmentPairFilter.terminate();
+  m_mcSegmentPairFilter.terminate();
 }
 
 
 
-void MCAxialStereoSegmentPairNeighborChooser::setParameter(const std::string& key, const std::string& value)
+void MCSegmentPairNeighborChooser::setParameter(const std::string& key, const std::string& value)
 {
   if (key == "symmetric") {
     if (value == "true") {
-      m_mcAxialStereoSegmentPairFilter.setAllowReverse(true);
+      m_mcSegmentPairFilter.setAllowReverse(true);
       B2INFO("Filter received parameter '" << key << "' " << value);
     } else if (value == "false") {
-      m_mcAxialStereoSegmentPairFilter.setAllowReverse(false);
+      m_mcSegmentPairFilter.setAllowReverse(false);
       B2INFO("Filter received parameter '" << key << "' " << value);
     } else {
       Super::setParameter(key, value);
@@ -57,7 +57,7 @@ void MCAxialStereoSegmentPairNeighborChooser::setParameter(const std::string& ke
   }
 }
 
-std::map<std::string, std::string> MCAxialStereoSegmentPairNeighborChooser::getParameterDescription()
+std::map<std::string, std::string> MCSegmentPairNeighborChooser::getParameterDescription()
 {
   std::map<std::string, std::string> des = Super::getParameterDescription();
   des["symmetric"] =  "Accept the facet relation if the reverse axial stereo segment pair relation is correct "
@@ -66,18 +66,18 @@ std::map<std::string, std::string> MCAxialStereoSegmentPairNeighborChooser::getP
   return des;
 }
 
-bool MCAxialStereoSegmentPairNeighborChooser::needsTruthInformation()
+bool MCSegmentPairNeighborChooser::needsTruthInformation()
 {
   return true;
 }
 
 NeighborWeight
-MCAxialStereoSegmentPairNeighborChooser::operator()(const CDCAxialStereoSegmentPair& fromAxialStereoSegmentPair,
-                                                    const CDCAxialStereoSegmentPair& toAxialStereoSegmentPair)
+MCSegmentPairNeighborChooser::operator()(const CDCSegmentPair& fromSegmentPair,
+                                         const CDCSegmentPair& toSegmentPair)
 {
-  CellWeight mcFromPairWeight = m_mcAxialStereoSegmentPairFilter(fromAxialStereoSegmentPair);
-  CellWeight mcToPairWeight = m_mcAxialStereoSegmentPairFilter(toAxialStereoSegmentPair);
+  CellWeight mcFromPairWeight = m_mcSegmentPairFilter(fromSegmentPair);
+  CellWeight mcToPairWeight = m_mcSegmentPairFilter(toSegmentPair);
 
   bool mcDecision = (not isNotACell(mcFromPairWeight)) and (not isNotACell(mcToPairWeight));
-  return mcDecision ? -toAxialStereoSegmentPair.getStartSegment()->size() : NOT_A_NEIGHBOR;
+  return mcDecision ? -toSegmentPair.getStartSegment()->size() : NOT_A_NEIGHBOR;
 }

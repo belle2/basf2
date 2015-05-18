@@ -7,15 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/AllSegmentPairNeighborChooser.h"
 
-using namespace std;
-using namespace Belle2;
-using namespace TrackFindingCDC;
-
-
-NeighborWeight AllSegmentPairNeighborChooser::operator()(const CDCSegmentPair&,
-                                                         const CDCSegmentPair& toPair)
-{
-  return  -toPair.getStartSegment()->size();
-}
+#include "BaseSegmentPairNeighborChooser.h"
+#include "AllSegmentPairNeighborChooser.h"
+#include "MCSegmentPairNeighborChooser.h"
+#include "SimpleSegmentPairNeighborChooser.h"

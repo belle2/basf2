@@ -66,11 +66,11 @@ class SegmentFitterModule(Module):
 class AxialStereoPairFitterModule(Module):
 
     @staticmethod
-    def default_fit_method(axialStereoSegmentPair):
+    def default_fit_method(segmentPair):
         """Default method to fit the generated segment pairs."""
 
         CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
-        CDCAxialStereoFusion.reconstructFuseTrajectories(axialStereoSegmentPair,
+        CDCAxialStereoFusion.reconstructFuseTrajectories(segmentPair,
                                                          True)
 
     def __init__(self, fit_method=None):
@@ -95,7 +95,7 @@ class AxialStereoPairFitterModule(Module):
 
         fit_method = self.fit_method
 
-        stored_axial_stereo_segment_pairs = Belle2.PyStoreObj("CDCAxialStereoSegmentPairVector")
+        stored_axial_stereo_segment_pairs = Belle2.PyStoreObj("CDCSegmentPairVector")
         wrapped_axial_stereo_segment_pairs = stored_axial_stereo_segment_pairs.obj()
         axial_stereo_segment_pairs = wrapped_axial_stereo_segment_pairs.get()
 

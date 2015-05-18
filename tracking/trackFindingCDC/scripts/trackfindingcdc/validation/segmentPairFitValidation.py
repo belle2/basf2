@@ -145,7 +145,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
     def __init__(self, output_file_name):
         super(SegmentPairFitValidationModule, self).__init__(
             output_file_name=output_file_name,
-            foreach="CDCAxialStereoSegmentPairVector"
+            foreach="CDCSegmentPairVector"
         )
         self.mc_segment_lookup = None
 

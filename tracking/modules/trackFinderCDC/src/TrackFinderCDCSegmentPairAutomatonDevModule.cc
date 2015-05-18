@@ -10,8 +10,8 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonDevModule.h>
 
-#include <tracking/trackFindingCDC/filters/axial_stereo/AxialStereoSegmentPairFilters.h>
-#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/AxialStereoSegmentPairNeighborChoosers.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/SegmentPairFilters.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/SegmentPairNeighborChoosers.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -65,54 +65,54 @@ TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonD
 void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseAxialStereoSegmentPairFilter>
-  ptrAxialStereoSegmentPairFilter(new BaseAxialStereoSegmentPairFilter());
+  std::unique_ptr<BaseSegmentPairFilter>
+  ptrSegmentPairFilter(new BaseSegmentPairFilter());
 
   if (m_param_segmentPairFilter == string("all")) {
-    ptrAxialStereoSegmentPairFilter.reset(new AllAxialStereoSegmentPairFilter());
+    ptrSegmentPairFilter.reset(new AllSegmentPairFilter());
   } else if (m_param_segmentPairFilter == string("mc")) {
-    ptrAxialStereoSegmentPairFilter.reset(new MCAxialStereoSegmentPairFilter(false));
+    ptrSegmentPairFilter.reset(new MCSegmentPairFilter(false));
   } else if (m_param_segmentPairFilter == string("mc_symmetric")) {
-    ptrAxialStereoSegmentPairFilter.reset(new MCAxialStereoSegmentPairFilter(true));
+    ptrSegmentPairFilter.reset(new MCSegmentPairFilter(true));
   } else if (m_param_segmentPairFilter == string("simple")) {
-    ptrAxialStereoSegmentPairFilter.reset(new SimpleAxialStereoSegmentPairFilter());
+    ptrSegmentPairFilter.reset(new SimpleSegmentPairFilter());
   } else if (m_param_segmentPairFilter == string("recording")) {
-    ptrAxialStereoSegmentPairFilter.reset(new RecordingAxialStereoSegmentPairFilter());
+    ptrSegmentPairFilter.reset(new RecordingSegmentPairFilter());
   } else {
-    B2ERROR("Unrecognised AxialStereoSegmentPairFilter option " <<
+    B2ERROR("Unrecognised SegmentPairFilter option " <<
             m_param_segmentPairFilter <<
             ". Allowed values are \"all\", \"mc\", \"mc_symmetric\", \"simple\" and \"recording\".");
   }
 
-  setAxialStereoSegmentPairFilter(std::move(ptrAxialStereoSegmentPairFilter));
-  getAxialStereoSegmentPairFilter()->setParameters(m_param_segmentPairFilterParameters);
+  setSegmentPairFilter(std::move(ptrSegmentPairFilter));
+  getSegmentPairFilter()->setParameters(m_param_segmentPairFilterParameters);
 
-  std::unique_ptr<BaseAxialStereoSegmentPairNeighborChooser>
-  ptrAxialStereoSegmentPairNeighborChooser(new BaseAxialStereoSegmentPairNeighborChooser());
+  std::unique_ptr<BaseSegmentPairNeighborChooser>
+  ptrSegmentPairNeighborChooser(new BaseSegmentPairNeighborChooser());
 
   if (m_param_segmentPairNeighborChooser == string("none")) {
-    ptrAxialStereoSegmentPairNeighborChooser.reset(new BaseAxialStereoSegmentPairNeighborChooser());
+    ptrSegmentPairNeighborChooser.reset(new BaseSegmentPairNeighborChooser());
   } else if (m_param_segmentPairNeighborChooser == string("all")) {
-    ptrAxialStereoSegmentPairNeighborChooser.reset(new AllAxialStereoSegmentPairNeighborChooser());
+    ptrSegmentPairNeighborChooser.reset(new AllSegmentPairNeighborChooser());
   } else if (m_param_segmentPairNeighborChooser == string("mc")) {
-    ptrAxialStereoSegmentPairNeighborChooser.reset(new MCAxialStereoSegmentPairNeighborChooser(false));
+    ptrSegmentPairNeighborChooser.reset(new MCSegmentPairNeighborChooser(false));
   } else if (m_param_segmentPairNeighborChooser == string("mc_symmetric")) {
-    ptrAxialStereoSegmentPairNeighborChooser.reset(new MCAxialStereoSegmentPairNeighborChooser(true));
+    ptrSegmentPairNeighborChooser.reset(new MCSegmentPairNeighborChooser(true));
   } else if (m_param_segmentPairNeighborChooser == string("simple")) {
-    ptrAxialStereoSegmentPairNeighborChooser.reset(new SimpleAxialStereoSegmentPairNeighborChooser());
+    ptrSegmentPairNeighborChooser.reset(new SimpleSegmentPairNeighborChooser());
   } else {
-    B2ERROR("Unrecognised AxialStereoSegmentPairNeighborChooser option " <<
+    B2ERROR("Unrecognised SegmentPairNeighborChooser option " <<
             m_param_segmentPairNeighborChooser <<
             ". Allowed values are \"none\", \"all\", \"mc\", \"mc_symmetric\" and \"simple\".");
   }
 
-  setAxialStereoSegmentPairNeighborChooser(std::move(ptrAxialStereoSegmentPairNeighborChooser));
-  getAxialStereoSegmentPairNeighborChooser()->setParameters(m_param_segmentPairNeighborChooserParameters);
+  setSegmentPairNeighborChooser(std::move(ptrSegmentPairNeighborChooser));
+  getSegmentPairNeighborChooser()->setParameters(m_param_segmentPairNeighborChooserParameters);
 
   TrackFinderCDCSegmentPairAutomatonImplModule<>::initialize();
 
-  if (getAxialStereoSegmentPairFilter()->needsTruthInformation() or
-      getAxialStereoSegmentPairNeighborChooser()->needsTruthInformation()) {
+  if (getSegmentPairFilter()->needsTruthInformation() or
+      getSegmentPairNeighborChooser()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -121,8 +121,8 @@ void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
 
 void TrackFinderCDCSegmentPairAutomatonDevModule::event()
 {
-  if (getAxialStereoSegmentPairFilter()->needsTruthInformation() or
-      getAxialStereoSegmentPairNeighborChooser()->needsTruthInformation()) {
+  if (getSegmentPairFilter()->needsTruthInformation() or
+      getSegmentPairNeighborChooser()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 

@@ -1,14 +1,22 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include "BaseAxialStereoSegmentPairNeighborChooser.h"
-#include "AllAxialStereoSegmentPairNeighborChooser.h"
-#include "MCAxialStereoSegmentPairNeighborChooser.h"
-#include "SimpleAxialStereoSegmentPairNeighborChooser.h"
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /// Base class for all axial to stereo segment pairs filters
+    typedef Filter<CDCSegmentPair> BaseSegmentPairFilter;
+
+  } //end namespace TrackFindingCDC
+} //end namespace Belle2

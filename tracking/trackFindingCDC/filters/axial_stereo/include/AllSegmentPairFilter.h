@@ -9,22 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseAxialStereoSegmentPairFilter.h"
+#include "BaseSegmentPairFilter.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the constuction of axial to stereo segment pairs based on simple criteria.
-    class AllAxialStereoSegmentPairFilter : public Filter<CDCAxialStereoSegmentPair> {
+    class AllSegmentPairFilter : public Filter<CDCSegmentPair> {
 
     public:
       /** Checks if a pair of segments is a good combination.
        *  All implementation always accepts the total number of hits.
        */
       virtual
-      CellWeight operator()(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) override final
+      CellWeight operator()(const CDCSegmentPair& segmentPair) override final
       {
-        const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-        const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+        const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+        const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
         assert(ptrStartSegment);
         assert(ptrEndSegment);
@@ -34,6 +34,6 @@ namespace Belle2 {
         return startSegment.size() + endSegment.size();
       }
 
-    }; // end class AllAxialStereoSegmentPairFilter
+    }; // end class AllSegmentPairFilter
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

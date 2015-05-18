@@ -41,7 +41,7 @@ namespace Belle2 {
       }
 
       /// Updates the trajectory of the axial stereo segment pair inplace
-      void update(const CDCAxialStereoSegmentPair& axialStereoSegmentPair) const;
+      void update(const CDCSegmentPair& segmentPair) const;
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
       void update(CDCTrajectorySZ& trajectorySZ,

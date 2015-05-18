@@ -86,7 +86,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
     """Module to collect information about the generated segments and compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
-        super(SegmentPairCreationValidationModule, self).__init__(foreach="CDCAxialStereoSegmentPairVector",
+        super(SegmentPairCreationValidationModule, self).__init__(foreach="CDCSegmentPairVector",
                                                                   output_file_name=output_file_name)
         self.mc_segment_lookup = None
         self.mc_segment_pair_filter = None
@@ -95,7 +95,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
     def initialize(self):
         super(SegmentPairCreationValidationModule, self).initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
-        self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCAxialStereoSegmentPairFilter()
+        self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCSegmentPairFilter()
         self.axial_stereo_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
     def prepare(self):
@@ -118,7 +118,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_target(self, axial_stereo_segment_pair):
-        mc_weight = self.mc_segment_pair_filter.isGoodAxialStereoSegmentPair(axial_stereo_segment_pair)
+        mc_weight = self.mc_segment_pair_filter.isGoodSegmentPair(axial_stereo_segment_pair)
         mc_decision = np.isfinite(mc_weight)  # Filters for nan
 
         return dict(

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include "TMatrixD.h"
 #include "TVectorD.h"
@@ -73,13 +73,13 @@ namespace Belle2 {
       static CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
                                               const CDCRecoSegment2D& endSegment);
 
-      static void fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair);
+      static void fuseTrajectories(const CDCSegmentPair& segmentPair);
 
       static CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
                                                          const CDCRecoSegment2D& endSegment,
                                                          bool priorityOnSZ = true);
 
-      static void reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+      static void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair,
                                               bool priorityOnSZ = true);
 
     }; // end class

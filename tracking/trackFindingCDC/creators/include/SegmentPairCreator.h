@@ -14,7 +14,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 
 
@@ -25,7 +25,7 @@ namespace Belle2 {
 
 
     /// Class providing construction combinatorics for the segment triples.
-    class AxialStereoSegmentPairCreator {
+    class SegmentPairCreator {
 
     private:
       /// Iterator range type usable with range based for of input segments.
@@ -37,10 +37,10 @@ namespace Belle2 {
 
     public:
       /// Empty constructor.
-      AxialStereoSegmentPairCreator() {;}
+      SegmentPairCreator() {;}
 
       /// Empty destructor.
-      ~AxialStereoSegmentPairCreator() {;}
+      ~SegmentPairCreator() {;}
 
       bool checkSegmentsSortedBySuperLayer(const std::vector<CDCRecoSegment2D>& segments) const
       {
@@ -61,10 +61,10 @@ namespace Belle2 {
 
 
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
-      template<class AxialStereoSegmentPairFilter>
-      inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
+      template<class SegmentPairFilter>
+      inline void create(SegmentPairFilter& segmentPairFilter,
                          const std::vector<CDCRecoSegment2D>& segments,
-                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const
+                         std::vector<CDCSegmentPair>& segmentPairs) const
       {
 
 
@@ -76,23 +76,23 @@ namespace Belle2 {
           segmentRangesBySuperLayer[iSuperLayer].push_back(ptrSegment);
         }
 
-        create(axialStereoSegmentPairFilter, segmentRangesBySuperLayer, axialStereoSegmentPairs);
+        create(segmentPairFilter, segmentRangesBySuperLayer, segmentPairs);
 
-        std::sort(std::begin(axialStereoSegmentPairs), std::end(axialStereoSegmentPairs));
+        std::sort(std::begin(segmentPairs), std::end(segmentPairs));
 
       }
 
 
     private:
       /// Creates the axial stereo segment pairs from the segments, which have been grouped by their superlayer id.
-      template<class AxialStereoSegmentPairFilter>
-      inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
+      template<class SegmentPairFilter>
+      inline void create(SegmentPairFilter& segmentPairFilter,
                          const SegmentRangesBySuperLayer& segmentRangesBySuperLayer,
-                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const
+                         std::vector<CDCSegmentPair>& segmentPairs) const
       {
 
         //clear the remembered fits
-        axialStereoSegmentPairFilter.clear();
+        segmentPairFilter.clear();
 
         //Make pairs of closeby superlayers
         for (ISuperLayerType iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {
@@ -104,7 +104,7 @@ namespace Belle2 {
             ILayerType iSuperLayerIn = iSuperLayer - 1;
             if (isValidISuperLayer(iSuperLayerIn)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerIn];
-              create(axialStereoSegmentPairFilter, startSegments, endSegments, axialStereoSegmentPairs);
+              create(segmentPairFilter, startSegments, endSegments, segmentPairs);
             }
           }
 
@@ -113,7 +113,7 @@ namespace Belle2 {
             ILayerType iSuperLayerOut = iSuperLayer + 1;
             if (isValidISuperLayer(iSuperLayerOut)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerOut];
-              create(axialStereoSegmentPairFilter, startSegments, endSegments, axialStereoSegmentPairs);
+              create(segmentPairFilter, startSegments, endSegments, segmentPairs);
             }
           }
 
@@ -122,37 +122,37 @@ namespace Belle2 {
 
 
       /// Creates segment tiples from a combination of start segment, middle segments and end segments.
-      template<class AxialStereoSegmentPairFilter>
-      inline void create(AxialStereoSegmentPairFilter& axialStereoSegmentPairFilter,
+      template<class SegmentPairFilter>
+      inline void create(SegmentPairFilter& segmentPairFilter,
                          const CDCRecoSegmentRange& startSegments,
                          const CDCRecoSegmentRange& endSegments,
-                         std::vector<CDCAxialStereoSegmentPair>& axialStereoSegmentPairs) const
+                         std::vector<CDCSegmentPair>& segmentPairs) const
       {
 
-        CDCAxialStereoSegmentPair axialStereoSegmentPair;
+        CDCSegmentPair segmentPair;
 
         for (const CDCRecoSegment2D* ptrStartSegment : startSegments) {
           for (const CDCRecoSegment2D* ptrEndSegment : endSegments) {
 
             if (ptrStartSegment == ptrEndSegment) continue; //Just for safety
-            axialStereoSegmentPair.setSegments(ptrStartSegment, ptrEndSegment);
-            axialStereoSegmentPair.clearTrajectory3D();
+            segmentPair.setSegments(ptrStartSegment, ptrEndSegment);
+            segmentPair.clearTrajectory3D();
 
-            if (axialStereoSegmentPair.getTrajectory3D().isFitted()) {
-              B2ERROR("CDCAxialStereoSegmentPair still fitted after clearing.")
+            if (segmentPair.getTrajectory3D().isFitted()) {
+              B2ERROR("CDCSegmentPair still fitted after clearing.")
               continue;
             }
 
-            if (not axialStereoSegmentPair.checkSegments()) {
-              B2ERROR("CDCAxialAxialSegmentPair containing nullptr encountered in AxialStereoSegmentPairCreator");
+            if (not segmentPair.checkSegments()) {
+              B2ERROR("CDCAxialAxialSegmentPair containing nullptr encountered in SegmentPairCreator");
               continue;
             }
 
-            CellWeight pairWeight = axialStereoSegmentPairFilter(axialStereoSegmentPair);
+            CellWeight pairWeight = segmentPairFilter(segmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
             if (pairIsGood) {
-              axialStereoSegmentPair.getAutomatonCell().setCellWeight(pairWeight);
-              axialStereoSegmentPairs.push_back(axialStereoSegmentPair);
+              segmentPair.getAutomatonCell().setCellWeight(pairWeight);
+              segmentPairs.push_back(segmentPair);
             }
 
           }

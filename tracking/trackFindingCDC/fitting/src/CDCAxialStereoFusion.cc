@@ -41,7 +41,7 @@ namespace {
     const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
     const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
 
-    for (const RecoHit & recoHit : segment) {
+    for (const RecoHit& recoHit : segment) {
       const Vector2D& recoPos2D = recoHit.getRecoPos2D();
       const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
       //const Vector2D tangential = localCircle.tangential(localRecoPos2D);
@@ -422,10 +422,10 @@ CDCTrajectory3D CDCAxialStereoFusion::fuseTrajectories(const CDCRecoSegment2D& s
 
 
 
-void CDCAxialStereoFusion::fuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+void CDCAxialStereoFusion::fuseTrajectories(const CDCSegmentPair& segmentPair)
 {
-  const CDCRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
   if (not ptrStartSegment) {
     B2WARNING("Start segment unset.");
@@ -441,7 +441,7 @@ void CDCAxialStereoFusion::fuseTrajectories(const CDCAxialStereoSegmentPair& axi
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
   CDCTrajectory3D trajectory3D = fuseTrajectories(startSegment, endSegment);
-  axialStereoSegmentPair.setTrajectory3D(trajectory3D);
+  segmentPair.setTrajectory3D(trajectory3D);
 
 
 
@@ -501,7 +501,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     // To reconstructed point in the three dimensional stereo segment all lie exactly on the circle they are reconstructed onto.
     // This part draws them away from the circle onto the sz trajectory instead leaving all the residuals visible in the xy projection.
     // Hence the two dimensional fit, which is used for the fusion afterwards can react to residuals and render the covariances of the stereo segment broader.
-    for (CDCRecoHit3D & recoHit3D : stereoSegment3D) {
+    for (CDCRecoHit3D& recoHit3D : stereoSegment3D) {
       const CDCWire& wire = recoHit3D.getWire();
 
       const FloatType& oldZ = recoHit3D.getRecoZ();
@@ -543,11 +543,11 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
 }
 
 
-void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegmentPair& segmentPair,
                                                        bool priorityOnSZ)
 {
-  const CDCRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
   if (not ptrStartSegment) {
     B2WARNING("Start segment unset.");
@@ -563,5 +563,5 @@ void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCAxialStereoSegme
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
   CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(startSegment, endSegment, priorityOnSZ);
-  axialStereoSegmentPair.setTrajectory3D(trajectory3D);
+  segmentPair.setTrajectory3D(trajectory3D);
 }

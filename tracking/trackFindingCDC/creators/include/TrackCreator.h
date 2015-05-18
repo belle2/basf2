@@ -14,7 +14,7 @@
 #include <vector>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -39,7 +39,7 @@ namespace Belle2 {
       typedef std::vector<const CDCSegmentTriple*> CDCSegmentTripleTrack;
 
       /// Type of a path of axial stereo segment pairs.
-      typedef std::vector<const CDCAxialStereoSegmentPair*> CDCAxialStereoSegmentPairTrack;
+      typedef std::vector<const CDCSegmentPair*> CDCSegmentPairTrack;
 
 
 
@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
       /// Creates many CDCTracks from a path of axial stereo segment pairs by averaging the common parts and shifting the transverse travel distance of each part to match the end of the former triple.
-      void create(const std::vector<CDCAxialStereoSegmentPairTrack>& axialStereoSegmentPairTracks,
+      void create(const std::vector<CDCSegmentPairTrack>& segmentPairTracks,
                   std::vector<CDCTrack>& tracks) const;
 
 
@@ -61,7 +61,7 @@ namespace Belle2 {
 
 
       /// Copies the hit content of the axial stereo segment pair track to the CDCTrack.
-      void create(const CDCAxialStereoSegmentPairTrack& axialStereoSegmentPairTrack,
+      void create(const CDCSegmentPairTrack& segmentPairTrack,
                   CDCTrack& track) const;
 
 
@@ -85,12 +85,12 @@ namespace Belle2 {
 
 
       ///Reconstruct the start segment of a pair and append it to the track
-      void appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
+      void appendStartRecoHits3D(const CDCSegmentPair& pair,
                                  FloatType perpSOffset,
                                  CDCTrack& recohits3D) const;
 
       ///Reconstruct the last segment of a pair and append it to the track
-      void appendEndRecoHits3D(const CDCAxialStereoSegmentPair& pair,
+      void appendEndRecoHits3D(const CDCSegmentPair& pair,
                                FloatType perpSOffset,
                                CDCTrack& recohits3D) const;
 
@@ -116,8 +116,8 @@ namespace Belle2 {
 
       /// Average overlapping segments of two pairs and append it to the track
       /** @return the travel distance offset for the following segment pairs. */
-      FloatType appendAverageStartEnd(const CDCAxialStereoSegmentPair& pair,
-                                      const CDCAxialStereoSegmentPair& followingPair,
+      FloatType appendAverageStartEnd(const CDCSegmentPair& pair,
+                                      const CDCSegmentPair& followingPair,
                                       FloatType perpSOffset,
                                       CDCTrack& recohits3D) const;
 

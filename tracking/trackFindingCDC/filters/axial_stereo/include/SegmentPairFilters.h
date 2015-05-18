@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "BaseAxialStereoSegmentPairFilter.h"
-#include "AllAxialStereoSegmentPairFilter.h"
-#include "MCAxialStereoSegmentPairFilter.h"
-#include "SimpleAxialStereoSegmentPairFilter.h"
-#include "RecordingAxialStereoSegmentPairFilter.h"
+#include "BaseSegmentPairFilter.h"
+#include "AllSegmentPairFilter.h"
+#include "MCSegmentPairFilter.h"
+#include "SimpleSegmentPairFilter.h"
+#include "RecordingSegmentPairFilter.h"
 

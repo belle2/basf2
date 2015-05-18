@@ -22,46 +22,46 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing a pair of one reconstructed axial segement and one stereo segment in adjacent superlayer.
-    class CDCAxialStereoSegmentPair : public SwitchableRootificationBase {
+    class CDCSegmentPair : public SwitchableRootificationBase {
     public:
 
       /// Default constructor - for ROOT compatability.
-      CDCAxialStereoSegmentPair();
+      CDCSegmentPair();
 
       /// Constructor from two segments
-      CDCAxialStereoSegmentPair(const CDCRecoSegment2D* startSegment,
-                                const CDCRecoSegment2D* endSegment);
+      CDCSegmentPair(const CDCRecoSegment2D* startSegment,
+                     const CDCRecoSegment2D* endSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCAxialStereoSegmentPair(const CDCRecoSegment2D* startSegment,
-                                const CDCRecoSegment2D* endSegment,
-                                const CDCTrajectory3D& trajectory3D);
+      CDCSegmentPair(const CDCRecoSegment2D* startSegment,
+                     const CDCRecoSegment2D* endSegment,
+                     const CDCTrajectory3D& trajectory3D);
 
       /// Empty destructor
-      ~CDCAxialStereoSegmentPair();
+      ~CDCSegmentPair();
 
       /// Equality comparision based on the pointers to the stored segments.
-      bool operator==(CDCAxialStereoSegmentPair const& rhs) const
+      bool operator==(CDCSegmentPair const& rhs) const
       { return getStartSegment() == rhs.getStartSegment() and getEndSegment() == rhs.getEndSegment(); }
 
 
 
       /// Total ordering sheme comparing the segment pointers.
-      bool operator<(CDCAxialStereoSegmentPair const& rhs) const
+      bool operator<(CDCSegmentPair const& rhs) const
       {
         return (getStartSegment() < rhs.getStartSegment()  or
                 (getStartSegment() == rhs.getStartSegment() and getEndSegment() < rhs.getEndSegment()));
       }
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the start segment
-      friend bool operator<(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+      friend bool operator<(const CDCSegmentPair& segmentPair,
                             const CDCRecoSegment2D* segment)
-      { return axialStereoSegmentPair.getStartSegment() < segment; }
+      { return segmentPair.getStartSegment() < segment; }
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the start segment
       friend bool operator<(const CDCRecoSegment2D* segment,
-                            const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
-      { return segment < axialStereoSegmentPair.getStartSegment(); }
+                            const CDCSegmentPair& segmentPair)
+      { return segment < segmentPair.getStartSegment(); }
 
 
 
@@ -71,7 +71,7 @@ namespace Belle2 {
        *  that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const
        *  to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCAxialStereoSegmentPair* () const
+      operator const Belle2::TrackFindingCDC::CDCSegmentPair* () const
       { return this; }
 
 
@@ -146,8 +146,8 @@ namespace Belle2 {
       {
         m_startSegment = startSegment;
         m_endSegment = endSegment;
-        if (not checkSegmentsNonNullptr()) B2WARNING("CDCAxialStereoSegmentPair: one segment set to nullptr");
-        if (not checkSegmentsStereoTypes()) B2WARNING("CDCAxialStereoSegmentPair: segments set with same stereo type");
+        if (not checkSegmentsNonNullptr()) B2WARNING("CDCSegmentPair: one segment set to nullptr");
+        if (not checkSegmentsStereoTypes()) B2WARNING("CDCSegmentPair: segments set with same stereo type");
       }
 
       /** Determines the angle between the last reconstructed position of the start segment and
@@ -249,10 +249,10 @@ namespace Belle2 {
 
       mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
 
-      /** ROOT Macro to make CDCAxialStereoSegmentPair a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialStereoSegmentPair, 1);
+      /** ROOT Macro to make CDCSegmentPair a ROOT class.*/
+      TRACKFINDINGCDC_SwitchableClassDef(CDCSegmentPair, 1);
 
-    }; //end class CDCAxialStereoSegmentPair
+    }; //end class CDCSegmentPair
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

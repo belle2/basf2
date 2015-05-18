@@ -511,14 +511,14 @@ void EventDataPlotter::draw(const CDCAxialAxialSegmentPair& axialAxialSegmentPai
 
 }
 
-void EventDataPlotter::draw(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
+void EventDataPlotter::draw(const CDCSegmentPair& segmentPair,
                             const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  const CDCRecoSegment2D* ptrFromSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrToSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrToSegment = segmentPair.getEndSegment();
 
   if (not ptrFromSegment or not ptrToSegment) return;
 

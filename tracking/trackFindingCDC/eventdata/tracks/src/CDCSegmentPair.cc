@@ -8,54 +8,54 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCAxialStereoSegmentPair.h"
+#include "../include/CDCSegmentPair.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCAxialStereoSegmentPair)
+TRACKFINDINGCDC_SwitchableClassImp(CDCSegmentPair)
 
 
 
-CDCAxialStereoSegmentPair::CDCAxialStereoSegmentPair() : m_startSegment(nullptr),  m_endSegment(nullptr)
+CDCSegmentPair::CDCSegmentPair() : m_startSegment(nullptr),  m_endSegment(nullptr)
 {
 
 }
 
 
 
-CDCAxialStereoSegmentPair::CDCAxialStereoSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                                                     const CDCAxialRecoSegment2D* endSegment):
+CDCSegmentPair::CDCSegmentPair(const CDCAxialRecoSegment2D* startSegment,
+                               const CDCAxialRecoSegment2D* endSegment):
   m_startSegment(startSegment),
   m_endSegment(endSegment)
 {
-  if (not startSegment) B2ERROR("CDCAxialStereoSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCAxialStereoSegmentPair initialized with nullptr as end segment");
+  if (not startSegment) B2ERROR("CDCSegmentPair initialized with nullptr as start segment");
+  if (not endSegment) B2ERROR("CDCSegmentPair initialized with nullptr as end segment");
 }
 
 
 
-CDCAxialStereoSegmentPair::CDCAxialStereoSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                                                     const CDCAxialRecoSegment2D* endSegment,
-                                                     const CDCTrajectory3D& trajectory3D) :
+CDCSegmentPair::CDCSegmentPair(const CDCAxialRecoSegment2D* startSegment,
+                               const CDCAxialRecoSegment2D* endSegment,
+                               const CDCTrajectory3D& trajectory3D) :
   m_startSegment(startSegment),
   m_endSegment(endSegment),
   m_trajectory3D(trajectory3D)
 {
-  if (not startSegment) B2ERROR("CDCAxialStereoSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCAxialStereoSegmentPair initialized with nullptr as end segment");
+  if (not startSegment) B2ERROR("CDCSegmentPair initialized with nullptr as start segment");
+  if (not endSegment) B2ERROR("CDCSegmentPair initialized with nullptr as end segment");
 }
 
 
 
-CDCAxialStereoSegmentPair::~CDCAxialStereoSegmentPair()
+CDCSegmentPair::~CDCSegmentPair()
 {
 }
 
 
 
-FloatType CDCAxialStereoSegmentPair::computeDeltaPhiAtSuperLayerBound() const
+FloatType CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
@@ -88,7 +88,7 @@ FloatType CDCAxialStereoSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 
 
 
-FloatType CDCAxialStereoSegmentPair::computeStartIsBeforeEndFitless() const
+FloatType CDCSegmentPair::computeStartIsBeforeEndFitless() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
@@ -126,7 +126,7 @@ FloatType CDCAxialStereoSegmentPair::computeStartIsBeforeEndFitless() const
 
 
 
-FloatType CDCAxialStereoSegmentPair::computeEndIsAfterStartFitless() const
+FloatType CDCSegmentPair::computeEndIsAfterStartFitless() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
@@ -163,7 +163,7 @@ FloatType CDCAxialStereoSegmentPair::computeEndIsAfterStartFitless() const
 }
 
 
-FloatType CDCAxialStereoSegmentPair::computeIsCoalignedFitless() const
+FloatType CDCSegmentPair::computeIsCoalignedFitless() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();

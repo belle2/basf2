@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCAxialStereoSegmentPairVarSet.h"
+#include "../include/CDCSegmentPairVarSet.h"
 #include <assert.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
@@ -19,17 +19,17 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCAxialStereoSegmentPairVarSet::CDCAxialStereoSegmentPairVarSet(const std::string& prefix) :
-  VarSet<CDCAxialStereoSegmentPairVarNames>(prefix)
+CDCSegmentPairVarSet::CDCSegmentPairVarSet(const std::string& prefix) :
+  VarSet<CDCSegmentPairVarNames>(prefix)
 {
 }
 
-bool CDCAxialStereoSegmentPairVarSet::extract(const CDCAxialStereoSegmentPair* ptrSegmentPair)
+bool CDCSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   bool extracted = extractNested(ptrSegmentPair);
   if (not extracted or not ptrSegmentPair) return false;
 
-  const CDCAxialStereoSegmentPair segmentPair = *ptrSegmentPair;
+  const CDCSegmentPair segmentPair = *ptrSegmentPair;
 
   const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();

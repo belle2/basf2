@@ -9,19 +9,19 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseAxialStereoSegmentPairNeighborChooser.h"
+#include "BaseSegmentPairNeighborChooser.h"
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Neighbor chooser that lets all possible combinations pass.
-    class AllAxialStereoSegmentPairNeighborChooser :
-      public Filter<Relation<CDCAxialStereoSegmentPair>>  {
+    class AllSegmentPairNeighborChooser :
+      public Filter<Relation<CDCSegmentPair>>  {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCAxialStereoSegmentPair>> Super;
+      typedef Filter<Relation<CDCSegmentPair>> Super;
 
     public:
       /// Importing all overloads from the super class
@@ -30,8 +30,8 @@ namespace Belle2 {
     public:
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
       virtual
-      NeighborWeight operator()(const CDCAxialStereoSegmentPair& fromPair,
-                                const CDCAxialStereoSegmentPair& toPair) IF_NOT_CINT(override final);
+      NeighborWeight operator()(const CDCSegmentPair& fromPair,
+                                const CDCSegmentPair& toPair) IF_NOT_CINT(override final);
 
     }; // end class
   } //end namespace TrackFindingCDC

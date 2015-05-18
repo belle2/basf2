@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/MCAxialStereoSegmentPairFilter.h"
+#include "../include/MCSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
 
@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-void MCAxialStereoSegmentPairFilter::setParameter(const std::string& key, const std::string& value)
+void MCSegmentPairFilter::setParameter(const std::string& key, const std::string& value)
 {
   if (key == "symmetric") {
     if (value == "true") {
@@ -38,7 +38,7 @@ void MCAxialStereoSegmentPairFilter::setParameter(const std::string& key, const 
   }
 }
 
-std::map<std::string, std::string> MCAxialStereoSegmentPairFilter::getParameterDescription()
+std::map<std::string, std::string> MCSegmentPairFilter::getParameterDescription()
 {
   std::map<std::string, std::string> des = Super::getParameterDescription();
   des["symmetric"] =  "Accept the axial stereo segment pair if the reverse axial stereo segment pair is correct "
@@ -47,16 +47,16 @@ std::map<std::string, std::string> MCAxialStereoSegmentPairFilter::getParameterD
   return des;
 }
 
-bool MCAxialStereoSegmentPairFilter::needsTruthInformation()
+bool MCSegmentPairFilter::needsTruthInformation()
 {
   return true;
 }
 
 
-CellWeight MCAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+CellWeight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
@@ -82,7 +82,7 @@ CellWeight MCAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSegmen
 
     // Do fits
     CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
-    axialStereoSegmentPair.setTrajectory3D(mcTrajectory3D);
+    segmentPair.setTrajectory3D(mcTrajectory3D);
 
     return startSegment.size() + endSegment.size();
   }

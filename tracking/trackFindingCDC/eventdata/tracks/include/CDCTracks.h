@@ -11,7 +11,7 @@
 #define CDCTRACKS_H
 
 #include "CDCAxialAxialSegmentPair.h"
-#include "CDCAxialStereoSegmentPair.h"
+#include "CDCSegmentPair.h"
 #include "CDCSegmentTriple.h"
 #include "CDCTrack.h"
 

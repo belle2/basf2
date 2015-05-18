@@ -7,36 +7,36 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCAxialStereoSegmentPairTruthVarSet.h"
+#include "../include/CDCSegmentPairTruthVarSet.h"
 #include <assert.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCAxialStereoSegmentPairTruthVarSet::CDCAxialStereoSegmentPairTruthVarSet(const std::string& prefix) :
-  VarSet<CDCAxialStereoSegmentPairTruthVarNames>(prefix)
+CDCSegmentPairTruthVarSet::CDCSegmentPairTruthVarSet(const std::string& prefix) :
+  VarSet<CDCSegmentPairTruthVarNames>(prefix)
 {
 }
 
-bool CDCAxialStereoSegmentPairTruthVarSet::extract(const CDCAxialStereoSegmentPair* ptrSegmentPair)
+bool CDCSegmentPairTruthVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   bool extracted = extractNested(ptrSegmentPair);
   if (not extracted or not ptrSegmentPair) return false;
 
-  const CDCAxialStereoSegmentPair& segmentPair = *ptrSegmentPair;
+  const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
-  const CellWeight mcWeight = m_mcAxialStereoSegmentPairFilter(segmentPair);
+  const CellWeight mcWeight = m_mcSegmentPairFilter(segmentPair);
   var<named("truth")>() =  not isNotACell(mcWeight);
   return true;
 }
 
-void CDCAxialStereoSegmentPairTruthVarSet::initialize()
+void CDCSegmentPairTruthVarSet::initialize()
 {
-  m_mcAxialStereoSegmentPairFilter.initialize();
+  m_mcSegmentPairFilter.initialize();
 }
 
-void CDCAxialStereoSegmentPairTruthVarSet::terminate()
+void CDCSegmentPairTruthVarSet::terminate()
 {
-  m_mcAxialStereoSegmentPairFilter.terminate();
+  m_mcSegmentPairFilter.terminate();
 }

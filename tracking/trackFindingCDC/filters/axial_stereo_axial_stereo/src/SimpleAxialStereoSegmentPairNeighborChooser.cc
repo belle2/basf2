@@ -7,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/SimpleAxialStereoSegmentPairNeighborChooser.h"
+#include "../include/SimpleSegmentPairNeighborChooser.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-NeighborWeight SimpleAxialStereoSegmentPairNeighborChooser::operator()(const CDCAxialStereoSegmentPair&,
-    const CDCAxialStereoSegmentPair& toPair)
+NeighborWeight SimpleSegmentPairNeighborChooser::operator()(const CDCSegmentPair&,
+                                                            const CDCSegmentPair& toPair)
 {
 
   // Just let all found neighors pass since we have the same start -> end segment

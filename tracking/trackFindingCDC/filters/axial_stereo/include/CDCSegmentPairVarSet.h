@@ -11,7 +11,7 @@
 #ifndef CDCAXIALSTEREOSEGMENTPAIRVARSET_H
 #define CDCAXIALSTEREOSEGMENTPAIRVARSET_H
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DVarSet.h>
 
@@ -26,7 +26,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Forward declaration
-    class CDCAxialStereoSegmentPair;
+    class CDCSegmentPair;
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a segment
      */
-    class CDCAxialStereoSegmentPairVarNames : public VarNames<CDCAxialStereoSegmentPair> {
+    class CDCSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
     public:
       /// Number of variables to be generated.
@@ -108,7 +108,7 @@ namespace Belle2 {
       /// Unpack the object for for the nested variable set
       static
       const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment2D*>
-      getNested(const CDCAxialStereoSegmentPair* segmentPair)
+      getNested(const CDCSegmentPair* segmentPair)
       {
         return std::make_pair(segmentPair->getStartSegment(), segmentPair->getEndSegment());
       }
@@ -117,14 +117,14 @@ namespace Belle2 {
     /** Class that computes floating point variables from a facet relation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class CDCAxialStereoSegmentPairVarSet : public VarSet<CDCAxialStereoSegmentPairVarNames> {
+    class CDCSegmentPairVarSet : public VarSet<CDCSegmentPairVarNames> {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCAxialStereoSegmentPairVarSet(const std::string& prefix = "");
+      CDCSegmentPairVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the segment pair
-      virtual bool extract(const CDCAxialStereoSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
 
 
     private:

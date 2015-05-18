@@ -9,20 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseAxialStereoSegmentPairNeighborChooser.h"
-#include <tracking/trackFindingCDC/filters/axial_stereo/MCAxialStereoSegmentPairFilter.h>
+#include "BaseSegmentPairNeighborChooser.h"
+#include <tracking/trackFindingCDC/filters/axial_stereo/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
-    class MCAxialStereoSegmentPairNeighborChooser :
-      public Filter<Relation<CDCAxialStereoSegmentPair>> {
+    class MCSegmentPairNeighborChooser :
+      public Filter<Relation<CDCSegmentPair>> {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCAxialStereoSegmentPair>> Super;
+      typedef Filter<Relation<CDCSegmentPair>> Super;
 
     public:
       /// Importing all overloads from the super class
@@ -30,7 +30,7 @@ namespace Belle2 {
 
     public:
       /** Constructor setting to default reversal symmetry. */
-      MCAxialStereoSegmentPairNeighborChooser(bool allowReverse = true);
+      MCSegmentPairNeighborChooser(bool allowReverse = true);
 
     public:
       /// May be used to clear information from former events. Currently unused.
@@ -62,25 +62,25 @@ namespace Belle2 {
 
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight operator()(const CDCAxialStereoSegmentPair& fromAxialStereoSegmentPair,
-                                        const CDCAxialStereoSegmentPair& toAxialStereoSegmentPair) IF_NOT_CINT(override final);
+      virtual NeighborWeight operator()(const CDCSegmentPair& fromSegmentPair,
+                                        const CDCSegmentPair& toSegmentPair) IF_NOT_CINT(override final);
 
     public:
       /// Setter for the allow reverse parameter
       void setAllowReverse(bool allowReverse)
       {
-        m_mcAxialStereoSegmentPairFilter.setAllowReverse(allowReverse);
+        m_mcSegmentPairFilter.setAllowReverse(allowReverse);
       }
 
       /// Getter for the allow reverse parameter
       bool getAllowReverse() const
       {
-        return m_mcAxialStereoSegmentPairFilter.getAllowReverse();
+        return m_mcSegmentPairFilter.getAllowReverse();
       }
 
     private:
       /// Instance of the Monte Carlo axial stereo segment filter for rejection of false cells.
-      MCAxialStereoSegmentPairFilter m_mcAxialStereoSegmentPairFilter;
+      MCSegmentPairFilter m_mcSegmentPairFilter;
 
     }; // end class
 

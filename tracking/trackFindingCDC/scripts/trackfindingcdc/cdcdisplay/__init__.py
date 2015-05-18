@@ -549,7 +549,7 @@ class CDCSVGDisplayModule(Module):
 
         if self.draw_axialstereopairs:
             styleDict = {"stroke": "black"}
-            plotter.draw_storearray('CDCAxialStereoSegmentPairs', **styleDict)
+            plotter.draw_storearray('CDCSegmentPairs', **styleDict)
 
         if self.draw_mcsegmenttriples:
             print 'Draw axial to axial segment pairs'
@@ -616,7 +616,7 @@ class CDCSVGDisplayModule(Module):
         # Draw axial stereo segment pairs
         if self.draw_axialstereosegmentpairs:
             styleDict = {'stroke': attributemaps.listColors}
-            plotter.draw_storearray('CDCAxialStereoSegmentPairs', **styleDict)
+            plotter.draw_storearray('CDCSegmentPairs', **styleDict)
 
         # Draw segment triples
         if self.draw_segmenttriples:

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialStereoSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 #include <tracking/trackFindingCDC/algorithms/Relation.h>
@@ -24,31 +24,31 @@ namespace Belle2 {
     ///Base class for filtering the neighborhood of axial stereo segment pairs
 
     template<>
-    class Filter<Relation<CDCAxialStereoSegmentPair>>  :
-                                                     public FilterBase<Relation<CDCAxialStereoSegmentPair>> {
+    class Filter<Relation<CDCSegmentPair>>  :
+                                          public FilterBase<Relation<CDCSegmentPair>> {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
-      template<class CDCAxialStereoSegmentPairIterator>
-      boost::iterator_range<CDCAxialStereoSegmentPairIterator>
-      getPossibleNeighbors(const CDCAxialStereoSegmentPair& axialStereoSegmentPair,
-                           const CDCAxialStereoSegmentPairIterator& itBegin,
-                           const CDCAxialStereoSegmentPairIterator& itEnd) const
+      template<class CDCSegmentPairIterator>
+      boost::iterator_range<CDCSegmentPairIterator>
+      getPossibleNeighbors(const CDCSegmentPair& segmentPair,
+                           const CDCSegmentPairIterator& itBegin,
+                           const CDCSegmentPairIterator& itEnd) const
       {
 
-        const CDCRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
-        if (not ptrEndSegment) boost::iterator_range<CDCAxialStereoSegmentPairIterator>(itEnd, itEnd);
+        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+        if (not ptrEndSegment) boost::iterator_range<CDCSegmentPairIterator>(itEnd, itEnd);
 
-        std::pair<CDCAxialStereoSegmentPairIterator, CDCAxialStereoSegmentPairIterator> itPairPossibleNeighbors = std::equal_range(itBegin,
+        std::pair<CDCSegmentPairIterator, CDCSegmentPairIterator> itPairPossibleNeighbors = std::equal_range(itBegin,
             itEnd, ptrEndSegment);
-        return boost::iterator_range<CDCAxialStereoSegmentPairIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+        return boost::iterator_range<CDCSegmentPairIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NOT_A_NEIGHBOR to reject all axial stereo segment pair neighbors.
        */
-      virtual NeighborWeight operator()(const CDCAxialStereoSegmentPair& /* from */,
-                                        const CDCAxialStereoSegmentPair& /* to */)
+      virtual NeighborWeight operator()(const CDCSegmentPair& /* from */,
+                                        const CDCSegmentPair& /* to */)
       {
         return NOT_A_NEIGHBOR;
       }
@@ -56,24 +56,24 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual CellWeight operator()(const Relation<CDCAxialStereoSegmentPair>& relation) override final
+      virtual CellWeight operator()(const Relation<CDCSegmentPair>& relation) override final
       {
-        const CDCAxialStereoSegmentPair* ptrFrom = relation.first;
-        const CDCAxialStereoSegmentPair* ptrTo = relation.second;
+        const CDCSegmentPair* ptrFrom = relation.first;
+        const CDCSegmentPair* ptrTo = relation.second;
         if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
         return operator()(*ptrFrom, *ptrTo);
       }
 
       /// Legacy method
-      virtual NeighborWeight isGoodNeighbor(const CDCAxialStereoSegmentPair& from,
-                                            const CDCAxialStereoSegmentPair& to)
+      virtual NeighborWeight isGoodNeighbor(const CDCSegmentPair& from,
+                                            const CDCSegmentPair& to)
       {
         return operator()(from, to);
       }
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of axial stereo segment pairs.
-    typedef Filter<Relation<CDCAxialStereoSegmentPair>>  BaseAxialStereoSegmentPairNeighborChooser;
+    typedef Filter<Relation<CDCSegmentPair>>  BaseSegmentPairNeighborChooser;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

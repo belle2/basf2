@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCAxialStereoSegmentPairVarSet.h"
-#include "MCAxialStereoSegmentPairFilter.h"
+#include "CDCSegmentPairVarSet.h"
+#include "MCSegmentPairFilter.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -23,7 +23,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a segment pair.
      */
-    class CDCAxialStereoSegmentPairTruthVarNames : public VarNames<CDCAxialStereoSegmentPair> {
+    class CDCSegmentPairTruthVarNames : public VarNames<CDCSegmentPair> {
 
     public:
       /// Number of variables to be generated.
@@ -37,20 +37,20 @@ namespace Belle2 {
       }
 
       /// Marking that the basic segmentPair variables should be included.
-      typedef CDCAxialStereoSegmentPairVarSet NestedVarSet;
+      typedef CDCSegmentPairVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from segment pair.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class  CDCAxialStereoSegmentPairTruthVarSet : public VarSet<CDCAxialStereoSegmentPairTruthVarNames> {
+    class  CDCSegmentPairTruthVarSet : public VarSet<CDCSegmentPairTruthVarNames> {
 
     public:
       /// Construct the varset and take an optional prefix.
-      CDCAxialStereoSegmentPairTruthVarSet(const std::string& prefix = "");
+      CDCSegmentPairTruthVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the segmentPair
-      virtual bool extract(const CDCAxialStereoSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
 
       /// Initialize the varset before event processing
       virtual void initialize() IF_NOT_CINT(override final);
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     public:
       /// SegmentPair filter that gives if the segment pair is a true segmentPair.
-      MCAxialStereoSegmentPairFilter m_mcAxialStereoSegmentPairFilter;
+      MCSegmentPairFilter m_mcSegmentPairFilter;
 
     };
   }

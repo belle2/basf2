@@ -15,11 +15,11 @@ import logging
 
 def main():
     classifer = FastBDTClassifier(
-        "CDCAxialStereoSegmentPair",
-        "CDCAxialStereoSegmentPairWeights.root"
+        "CDCSegmentPair",
+        "CDCSegmentPairWeights.root"
     )
 
-    input_file_name = "CDCAxialStereoSegmentPairTruthRecords.root"
+    input_file_name = "CDCSegmentPairTruthRecords.root"
     input_file = ROOT.TFile(input_file_name, "READ")
     input_tree_name = "records"
     input_tree = input_file.Get(input_tree_name)

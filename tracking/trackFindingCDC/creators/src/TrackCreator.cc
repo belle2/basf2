@@ -25,7 +25,7 @@ void TrackCreator::create(const std::vector<CDCSegmentTripleTrack>& segmentTripl
                           std::vector<CDCTrack>& tracks) const
 {
 
-  for (const CDCSegmentTripleTrack & segmentTripleTrack : segmentTripleTracks) {
+  for (const CDCSegmentTripleTrack& segmentTripleTrack : segmentTripleTracks) {
 
     tracks.push_back(CDCTrack());
     CDCTrack& track = tracks.back();
@@ -38,15 +38,15 @@ void TrackCreator::create(const std::vector<CDCSegmentTripleTrack>& segmentTripl
 
 
 
-void TrackCreator::create(const std::vector<CDCAxialStereoSegmentPairTrack>& axialStereoSegmentPairTracks,
+void TrackCreator::create(const std::vector<CDCSegmentPairTrack>& segmentPairTracks,
                           std::vector<CDCTrack>& tracks) const
 {
 
-  for (const CDCAxialStereoSegmentPairTrack & axialStereoSegmentPairTrack : axialStereoSegmentPairTracks) {
+  for (const CDCSegmentPairTrack& segmentPairTrack : segmentPairTracks) {
 
     tracks.push_back(CDCTrack());
     CDCTrack& track = tracks.back();
-    create(axialStereoSegmentPairTrack, track);
+    create(segmentPairTrack, track);
 
   }
 
@@ -110,18 +110,18 @@ void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
 
 
 
-void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegmentPairTrack,
+void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
                           CDCTrack& track) const
 {
 
   //B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
-  if (not  axialStereoSegmentPairTrack.empty()) {
+  if (not  segmentPairTrack.empty()) {
 
-    CDCAxialStereoSegmentPairTrack::const_iterator itSegmentPair = axialStereoSegmentPairTrack.begin();
-    const CDCAxialStereoSegmentPair* ptrFirstSegmentPair = *itSegmentPair++;
+    CDCSegmentPairTrack::const_iterator itSegmentPair = segmentPairTrack.begin();
+    const CDCSegmentPair* ptrFirstSegmentPair = *itSegmentPair++;
 
-    if (not ptrFirstSegmentPair) B2ERROR("Nullptr encounter in CDCAxialStereoSegmentPairTrack");
-    const CDCAxialStereoSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
+    if (not ptrFirstSegmentPair) B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+    const CDCSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
 
     // Keep the fit of the first segment pair to set it as the fit at the start of the track
     CDCTrajectory3D startTrajectory3D = firstSegmentPair.getTrajectory3D();
@@ -129,14 +129,14 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
     FloatType perpSOffset = 0.0;
     appendStartRecoHits3D(firstSegmentPair, perpSOffset, track);
 
-    while (itSegmentPair != axialStereoSegmentPairTrack.end()) {
+    while (itSegmentPair != segmentPairTrack.end()) {
 
-      const CDCAxialStereoSegmentPair* ptrSecondSegmentPair = *itSegmentPair++;
-      if (not ptrSecondSegmentPair) B2ERROR("Nullptr encounter in CDCAxialStereoSegmentPairTrack");
+      const CDCSegmentPair* ptrSecondSegmentPair = *itSegmentPair++;
+      if (not ptrSecondSegmentPair) B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
 
 
-      const CDCAxialStereoSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
-      const CDCAxialStereoSegmentPair& secondSegmentPair = *ptrSecondSegmentPair;
+      const CDCSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
+      const CDCSegmentPair& secondSegmentPair = *ptrSecondSegmentPair;
 
       perpSOffset = appendAverageStartEnd(firstSegmentPair,
                                           secondSegmentPair,
@@ -147,7 +147,7 @@ void TrackCreator::create(const CDCAxialStereoSegmentPairTrack& axialStereoSegme
 
     }
 
-    const CDCAxialStereoSegmentPair& lastSegmentPair = *ptrFirstSegmentPair;
+    const CDCSegmentPair& lastSegmentPair = *ptrFirstSegmentPair;
     appendEndRecoHits3D(lastSegmentPair, perpSOffset, track);
 
     // Keep the fit of the last segment pair to set it as the fit at the end of the track
@@ -216,7 +216,7 @@ void TrackCreator::appendEndRecoHits3D(const CDCSegmentTriple& triple,
 
 
 
-void TrackCreator::appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
+void TrackCreator::appendStartRecoHits3D(const CDCSegmentPair& pair,
                                          FloatType perpSOffset,
                                          CDCTrack& recohits3D) const
 {
@@ -233,7 +233,7 @@ void TrackCreator::appendStartRecoHits3D(const CDCAxialStereoSegmentPair& pair,
 }
 
 
-void TrackCreator::appendEndRecoHits3D(const CDCAxialStereoSegmentPair& pair,
+void TrackCreator::appendEndRecoHits3D(const CDCSegmentPair& pair,
                                        FloatType perpSOffset,
                                        CDCTrack& recohits3D) const
 {
@@ -318,8 +318,8 @@ FloatType TrackCreator::appendAverageStartEnd(const CDCSegmentTriple& triple,
 
 
 
-FloatType TrackCreator::appendAverageStartEnd(const CDCAxialStereoSegmentPair& pair,
-                                              const CDCAxialStereoSegmentPair& followingPair,
+FloatType TrackCreator::appendAverageStartEnd(const CDCSegmentPair& pair,
+                                              const CDCSegmentPair& followingPair,
                                               FloatType perpSOffset,
                                               CDCTrack& recoHits3D) const
 {
@@ -379,7 +379,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
 
   FloatType followingPerpSOffSet = firstPerpS + perpSOffset - followingFirstPerpS;
 
-  for (const CDCRecoHit2D & recoHit2D : segment) {
+  for (const CDCRecoHit2D& recoHit2D : segment) {
 
     CDCRecoHit3D recoHit3D =
       CDCRecoHit3D::reconstruct(recoHit2D,

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleAxialStereoSegmentPairFilter.h"
+#include "../include/SimpleSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
@@ -17,15 +17,15 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SimpleAxialStereoSegmentPairFilter::SimpleAxialStereoSegmentPairFilter() : m_riemannFitter()
+SimpleSegmentPairFilter::SimpleSegmentPairFilter() : m_riemannFitter()
 {
   m_riemannFitter.useOnlyOrientation();
 }
 
-CellWeight SimpleAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSegmentPair& axialStereoSegmentPair)
+CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
@@ -82,7 +82,7 @@ CellWeight SimpleAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSe
   FloatType endFit_dist2DToBack_startSegment = endFit.getDist2DToBack(startSegment);
 
   if (startFit_dist2DToFront_endSegment < 10 and  endFit_dist2DToBack_startSegment < 10) {
-    getFittedTrajectory3D(axialStereoSegmentPair);
+    getFittedTrajectory3D(segmentPair);
     return startSegment.size() + endSegment.size();
   } else {
     return NOT_A_CELL;
@@ -91,7 +91,7 @@ CellWeight SimpleAxialStereoSegmentPairFilter::operator()(const CDCAxialStereoSe
 }
 
 
-const CDCTrajectory2D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
+const CDCTrajectory2D& SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
 {
 
   CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
@@ -103,11 +103,11 @@ const CDCTrajectory2D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory2D
 }
 
 
-const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D(const CDCAxialStereoSegmentPair&
-    axialStereoSegmentPair) const
+const CDCTrajectory3D& SimpleSegmentPairFilter::getFittedTrajectory3D(const CDCSegmentPair&
+    segmentPair) const
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialStereoSegmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialStereoSegmentPair.getEndSegment();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
@@ -116,7 +116,7 @@ const CDCTrajectory3D& SimpleAxialStereoSegmentPairFilter::getFittedTrajectory3D
   getFittedTrajectory2D(startSegment);
   getFittedTrajectory2D(endSegment);
 
-  CDCAxialStereoFusion::reconstructFuseTrajectories(axialStereoSegmentPair);
-  return axialStereoSegmentPair.getTrajectory3D();
+  CDCAxialStereoFusion::reconstructFuseTrajectories(segmentPair);
+  return segmentPair.getTrajectory3D();
 
 }

@@ -9,20 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/axial_stereo/BaseAxialStereoSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/axial_stereo/CDCAxialStereoSegmentPairTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/axial_stereo/CDCSegmentPairTruthVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Records the encountered CDCWireHitAxialStereoSegmentPairs.
-    class RecordingAxialStereoSegmentPairFilter: public RecordingFilter<CDCAxialStereoSegmentPairTruthVarSet> {
+    /// Records the encountered CDCWireHitSegmentPairs.
+    class RecordingSegmentPairFilter: public RecordingFilter<CDCSegmentPairTruthVarSet> {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      RecordingAxialStereoSegmentPairFilter() :
-        RecordingFilter<CDCAxialStereoSegmentPairTruthVarSet>("CDCRecoAxialStereoSegmentPairTruthRecords.root")
+      RecordingSegmentPairFilter() :
+        RecordingFilter<CDCSegmentPairTruthVarSet>("CDCRecoSegmentPairTruthRecords.root")
       {;}
 
     };

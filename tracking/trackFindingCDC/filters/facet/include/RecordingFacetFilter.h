@@ -7,13 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include "BaseFacetFilter.h"
-#include "AllFacetFilter.h"
-#include "MCFacetFilter.h"
-#include "FitlessFacetFilter.h"
-#include "SimpleFacetFilter.h"
-#include "RealisticFacetFilter.h"
+#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/CDCRecoFacetTruthVarSet.h>
 
-#include "RecordingFacetFilter.h"
+namespace Belle2 {
+  namespace TrackFindingCDC {
 
+    /// Records the encountered CDCWireHitFacets.
+    class RecordingFacetFilter: public RecordingFilter<CDCRecoFacetTruthVarSet> {
+
+    public:
+      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
+      RecordingFacetFilter() :
+        RecordingFilter<CDCRecoFacetTruthVarSet>("CDCRecoFacetTruthRecords.root")
+      {;}
+
+    };
+  }
+}

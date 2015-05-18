@@ -48,6 +48,8 @@ namespace Belle2 {
     + "mc" (monte carlo truth)
     + "fitless" (only checking the feasability of right left passage information)
     + "simple" (mc free with simple criteria)
+    + "realistic" (mc free with more realistic criteria)
+    + "recording" (records the encountered instances of facets including truth information)",
     */
     std::string m_param_facetFilter;
 
@@ -63,7 +65,6 @@ namespace Belle2 {
     + "all" (all possible neighbors are valid)
     + "mc" (monte carlo truth)
     + "simple" (mc free with simple criteria)
-    + "realistic" (mc free with more realistic criteria)
     */
     std::string m_param_facetNeighborChooser;
 

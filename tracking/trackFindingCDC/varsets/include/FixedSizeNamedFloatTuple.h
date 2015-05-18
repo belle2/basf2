@@ -72,6 +72,15 @@ namespace Belle2 {
               strequal(getName(iName), name) ? iName : index<nNames>(getName, name, iName + 1));
     }
 
+    // *INDENT-OFF*
+    /** Const expression that gives the length of an array.
+     *  @param         A C-array
+     *  @return        The length of the array
+     */
+    template<class T, size_t N>
+    constexpr
+    size_t size(T (&)[N]) { return N; }
+    // *INDENT-ON*
 
     /** Generic class that contains a fixed number of named float values.
      *  This object template provides the memory and the names of the float values.

@@ -55,7 +55,8 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
            "\"fitless\" (only checking the feasability of right left passage information), "
            "\"fitless_hard\" (also exclude the boarder line feasable combinations), "
            "\"simple\" (mc free with simple criteria)."
-           "\"realistic\" (mc free with more realistic criteria).",
+           "\"realistic\" (mc free with more realistic criteria)."
+           "\"recording\" (record the encountered instances of facets including truth information)",
            string("realistic"));
 
   addParam("FacetFilterParameters",
@@ -119,6 +120,8 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
     ptrFacetFilter.reset(new SimpleFacetFilter());
   } else if (m_param_facetFilter == string("realistic")) {
     ptrFacetFilter.reset(new RealisticFacetFilter());
+  } else if (m_param_facetFilter == string("recording")) {
+    ptrFacetFilter.reset(new RecordingFacetFilter());
   } else {
     B2ERROR("Unrecognised FacetFilter option " << m_param_facetFilter <<
             ". Allowed values are " <<
@@ -151,7 +154,6 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   // Takes ownership
   setFacetNeighborChooser(std::move(ptrFacetNeighborChooser));
   getFacetNeighborChooser()->setParameters(m_param_facetNeighborChooserParameters);
-
   SegmentFinderCDCFacetAutomatonImplModule<>::initialize();
 
   if (getClusterFilter()->needsTruthInformation() or

@@ -568,9 +568,10 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
       likelihoods[2] = ex.Pion_likelihood();
       likelihoods[3] = ex.Kaon_likelihood();
       likelihoods[4] = 0; //no protons
-      //TODO are Miss_likelihood()/Junk_likelihood() useful?
-      //TODO: what does Junk_likelihood == 1 mean for a track? (happens quite often)
+      //Miss_likelihood should only be != 0 for tracks that do not pass the Chi_2 cut.
 
+      //note: discard_allzero = false since all likelihoods = 0 usually means that Junk_likelihood is 1
+      //      PIDLikelihood::getProbability(hyp) will correctly return 0 then.
       setLikelihoods(pid, Const::KLM, likelihoods);
 
       /*

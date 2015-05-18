@@ -36,8 +36,8 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    segment_finder_module = "SegmentFinderCDCMCTruth"
-    # segment_finder_module = "SegmentFinderCDCFacetAutomaton"
+    # segment_finder_module = "SegmentFinderCDCMCTruth"
+    segment_finder_module = "SegmentFinderCDCFacetAutomaton"
     fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()
     fit_positions = "rl"
     output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
@@ -58,7 +58,9 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
         )
 
         karimaki_fitter = Belle2.TrackFindingCDC.CDCKarimakiFitter()
+        karimaki_fitter.useOnlyOrientation()
         riemann_fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()
+        riemann_fitter.useOnlyOrientation()
         argument_parser.add_argument(
             "-k",
             "--karimaki",
@@ -100,7 +102,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
                 # Make a filtering step stripping potential Monte Carlo information
                 # in the reconstructed positions
                 rlWireHitSegment = segment.getRLWireHitSegment()
-                CDCRecoSegment2D = Belle2.CDCLocalTracking.CDCRecoSegment2D
+                CDCRecoSegment2D = Belle2.TrackFindingCDC.CDCRecoSegment2D
                 recoSegment = CDCRecoSegment2D.reconstructUsingFacets(rlWireHitSegment)
                 return fitter.fit(recoSegment)
 

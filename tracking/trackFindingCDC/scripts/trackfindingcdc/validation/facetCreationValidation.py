@@ -48,7 +48,7 @@ class FacetCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGe
     segment_finder_module.param({
         "WriteFacets": True,
         "FacetFilter": "fitless_hard",
-        "FacetNeighborChooser": "none",
+        "FacetRelationFilter": "none",
     })
 
     py_profile = True

@@ -21,7 +21,7 @@ class CDCFacetTruthRecordingRun(StandardEventGenerationRun):
     segment_finder_module.param({
         "FacetFilter": "recording",
         "FacetFilterParameters": {"root_file_name": "CDCFacetTruthRecords.root"},
-        "FacetNeighborChooser": "none"
+        "FacetRelationFilter": "none"
     })
 
     def create_path(self):

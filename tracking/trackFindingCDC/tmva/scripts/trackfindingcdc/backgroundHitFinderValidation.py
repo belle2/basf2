@@ -73,7 +73,7 @@ class BackgroundHitFinderValidationRun(StandardEventGenerationRun):
             "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
             "RemainingCDCHitsStoreArrayName": "GoodCDCHits",
             "FacetFilter": "none",
-            "FacetNeighborChooser": "none",
+            "FacetRelationFilter": "none",
         })
 
         main_path.add_module(background_hit_finder_module)

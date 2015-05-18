@@ -19,8 +19,8 @@ class CDCFacetRelationTruthRecordingRun(StandardEventGenerationRun):
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
     segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
     segment_finder_module.param({
-        "FacetNeighborChooser": "recording",
-        "FacetNeighborChooserParameters": {"root_file_name": "CDCFacetRelationTruthRecords.root"},
+        "FacetRelationFilter": "recording",
+        "FacetRelationFilterParameters": {"root_file_name": "CDCFacetRelationTruthRecords.root"},
     })
 
     def create_path(self):

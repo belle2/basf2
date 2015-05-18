@@ -18,7 +18,7 @@ class CDCDebugDisplayRun(CDCDisplayRun):
         "WriteClusters": True,
         "RemainingCDCHitsStoreArrayName": "GoodCDCHits",
         "FacetFilter": "none",
-        "FacetNeighborChooser": "none",
+        "FacetRelationFilter": "none",
         # "CreateGFTrackCands" : True,
         # "FitSegments" : True,
         # "SegmentOrientation": "none",

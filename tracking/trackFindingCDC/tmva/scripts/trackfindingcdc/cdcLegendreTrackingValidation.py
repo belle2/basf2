@@ -74,7 +74,7 @@ class CDCLegendre(StandardEventGenerationRun):
             "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
             "RemainingCDCHitsStoreArrayName": "GoodCDCHits",
             "FacetFilter": "none",
-            "FacetNeighborChooser": "none",
+            "FacetRelationFilter": "none",
         })
 
         cdctracking = basf2.register_module('CDCLegendreTracking')

@@ -42,7 +42,7 @@ class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGe
     segment_finder_module.param({
         "WriteClusters": True,
         "FacetFilter": "none",
-        "FacetNeighborChooser": "none",
+        "FacetRelationFilter": "none",
     })
 
     py_profile = True

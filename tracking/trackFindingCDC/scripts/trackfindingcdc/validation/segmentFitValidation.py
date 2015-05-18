@@ -46,7 +46,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
     segment_finder_module.param({
         "FacetFilter": "realistic",
-        "FacetNeighborChooser": "simple",
+        "FacetRelationFilter": "simple",
         "SegmentOrientation": "outwards",  # as is from mc filters
     })
 
@@ -55,8 +55,8 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     # segment_finder_module.param({
     #         "FacetFilter" : "mc",
     #         "FacetFilterParameters" : { "symmetric" : "false" },
-    #         "FacetNeighborChooser" : "mc",
-    #         "FacetNeighborChooserParameters" : { "symmetric" : "false" },
+    #         "FacetRelationFilter" : "mc",
+    #         "FacetRelationFilterParameters" : { "symmetric" : "false" },
     #         })
 
     fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()

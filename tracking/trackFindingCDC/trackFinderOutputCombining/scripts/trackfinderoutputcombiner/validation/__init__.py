@@ -93,7 +93,7 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
                                                              ClusterFilterParameters={"cut": str(self.tmva_cut)},
                                                              SegmentsStoreObjName="TempCDCRecoSegment2DVector",
                                                              FacetFilter="none",
-                                                             FacetNeighborChooser="none")
+                                                             FacetRelationFilter="none")
 
         if self.tmva_cut > 0:
             legendre_path.add_module(background_hit_finder_module)

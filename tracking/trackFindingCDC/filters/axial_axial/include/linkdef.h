@@ -9,7 +9,7 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#pragma link C++ class Belle2::TrackFindingCDC::MCAxialAxialSegmentPairFilter-;
+#pragma link C++ class Belle2::TrackFindingCDC::MCAxialSegmentPairFilter-;
 
 #endif
 

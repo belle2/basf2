@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleAxialAxialSegmentPairFilter.h"
+#include "../include/SimpleAxialSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
 
@@ -16,15 +16,15 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SimpleAxialAxialSegmentPairFilter::SimpleAxialAxialSegmentPairFilter() : m_riemannFitter()
+SimpleAxialSegmentPairFilter::SimpleAxialSegmentPairFilter() : m_riemannFitter()
 {
   m_riemannFitter.useOnlyOrientation();
 }
 
-CellWeight SimpleAxialAxialSegmentPairFilter::operator()(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
@@ -87,7 +87,7 @@ CellWeight SimpleAxialAxialSegmentPairFilter::operator()(const CDCAxialAxialSegm
 
 
 
-const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
+const CDCTrajectory2D& SimpleAxialSegmentPairFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
 {
 
   CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
@@ -100,12 +100,12 @@ const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(
 
 
 
-const CDCTrajectory2D& SimpleAxialAxialSegmentPairFilter::getFittedTrajectory2D(const CDCAxialAxialSegmentPair&
-    axialAxialSegmentPair) const
+const CDCTrajectory2D& SimpleAxialSegmentPairFilter::getFittedTrajectory2D(const CDCAxialSegmentPair&
+    axialSegmentPair) const
 {
-  CDCTrajectory2D& trajectory2D = axialAxialSegmentPair.getTrajectory2D();
+  CDCTrajectory2D& trajectory2D = axialSegmentPair.getTrajectory2D();
   if (not trajectory2D.isFitted()) {
-    getRiemannFitter().update(trajectory2D, axialAxialSegmentPair);
+    getRiemannFitter().update(trajectory2D, axialSegmentPair);
   }
   return trajectory2D;
 }

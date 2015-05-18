@@ -18,21 +18,21 @@ using namespace TrackFindingCDC;
 
 void SimpleSegmentTripleFilter::clear()
 {
-  m_simpleAxialAxialSegmentPairFilter.clear();
+  m_simpleAxialSegmentPairFilter.clear();
 }
 
 
 
 void SimpleSegmentTripleFilter::initialize()
 {
-  m_simpleAxialAxialSegmentPairFilter.initialize();
+  m_simpleAxialSegmentPairFilter.initialize();
 }
 
 
 
 void SimpleSegmentTripleFilter::terminate()
 {
-  m_simpleAxialAxialSegmentPairFilter.terminate();
+  m_simpleAxialSegmentPairFilter.terminate();
 }
 
 
@@ -55,8 +55,8 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
   //check if the middle segment lies within the acceptable bounds in angular deviation
   {
     //get the remembered fits
-    const CDCTrajectory2D& startFit = m_simpleAxialAxialSegmentPairFilter.getFittedTrajectory2D(startSegment);
-    const CDCTrajectory2D& endFit = m_simpleAxialAxialSegmentPairFilter.getFittedTrajectory2D(endSegment);
+    const CDCTrajectory2D& startFit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(startSegment);
+    const CDCTrajectory2D& endFit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(endSegment);
 
     //use only the first and last hit for this check
     const CDCRecoHit2D& firstHit = middleSegment.front();
@@ -131,7 +131,7 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
   // make more complex judgement on fitness
 
   // Get the combined fit of start and end axial segment
-  const CDCTrajectory2D& fit = m_simpleAxialAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
+  const CDCTrajectory2D& fit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
 
   // Check if the middle segment is actually coaligned with the trajectory
   if (not middleSegment.isForwardTrajectory(fit)) return NOT_A_CELL;
@@ -158,7 +158,7 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
 
   if (not isNotACell(result)) {
 
-    m_simpleAxialAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
+    m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
     getFittedTrajectorySZ(segmentTriple);
 
   }
@@ -176,7 +176,7 @@ const CDCTrajectorySZ& SimpleSegmentTripleFilter::getFittedTrajectorySZ(const CD
 
   if (not trajectorySZ.isFitted()) {
 
-    const CDCTrajectory2D& trajectory2D = m_simpleAxialAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
+    const CDCTrajectory2D& trajectory2D = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
 
     const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
     const CDCStereoRecoSegment2D middleSegment = *ptrMiddleSegment;

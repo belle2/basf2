@@ -11,7 +11,7 @@
 
 #include "BaseSegmentTripleFilter.h"
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
-#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
@@ -52,7 +52,7 @@ namespace Belle2 {
       CDCSZFitter m_szFitter;
 
       /// Subsidiary filter to use the fitter from it.
-      SimpleAxialAxialSegmentPairFilter m_simpleAxialAxialSegmentPairFilter;
+      SimpleAxialSegmentPairFilter m_simpleAxialSegmentPairFilter;
 
     }; // end class SimpleSegmentTripleFilter
 

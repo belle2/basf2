@@ -474,14 +474,14 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
 
 }
 
-void EventDataPlotter::draw(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,
+void EventDataPlotter::draw(const CDCAxialSegmentPair& axialSegmentPair,
                             const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  const CDCRecoSegment2D* ptrFromSegment = axialAxialSegmentPair.getStart();
-  const CDCRecoSegment2D* ptrToSegment = axialAxialSegmentPair.getEnd();
+  const CDCRecoSegment2D* ptrFromSegment = axialSegmentPair.getStart();
+  const CDCRecoSegment2D* ptrToSegment = axialSegmentPair.getEnd();
 
   if (not ptrFromSegment or not ptrToSegment) return;
 

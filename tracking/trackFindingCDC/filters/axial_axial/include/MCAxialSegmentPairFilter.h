@@ -9,22 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseAxialAxialSegmentPairFilter.h"
+#include "BaseAxialSegmentPairFilter.h"
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class MCAxialAxialSegmentPairFilter : public Filter<CDCAxialAxialSegmentPair> {
+    class MCAxialSegmentPairFilter : public Filter<CDCAxialSegmentPair> {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCAxialAxialSegmentPair> Super;
+      typedef Filter<CDCAxialSegmentPair> Super;
 
     public:
       /// Constructor
-      MCAxialAxialSegmentPairFilter(bool allowReverse = true);
+      MCAxialSegmentPairFilter(bool allowReverse = true);
 
       /** Set the parameter with key to value.
        *
@@ -46,7 +46,7 @@ namespace Belle2 {
       virtual bool needsTruthInformation() IF_NOT_CINT(override final);
 
       /// Checks if a pair of axial segments is a good combination
-      virtual CellWeight operator()(const Belle2::TrackFindingCDC::CDCAxialAxialSegmentPair& axialAxialSegmentPair) IF_NOT_CINT(
+      virtual CellWeight operator()(const Belle2::TrackFindingCDC::CDCAxialSegmentPair& axialSegmentPair) IF_NOT_CINT(
         override final);
 
     public:
@@ -62,7 +62,7 @@ namespace Belle2 {
       /// Switch to indicate if the reversed version of the segment pair shall also be accepted (default is true).
       bool m_param_allowReverse;
 
-    }; // end class MCAxialAxialSegmentPairFilter
+    }; // end class MCAxialSegmentPairFilter
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

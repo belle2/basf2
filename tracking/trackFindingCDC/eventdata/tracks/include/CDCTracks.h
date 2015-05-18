@@ -10,7 +10,7 @@
 #ifndef CDCTRACKS_H
 #define CDCTRACKS_H
 
-#include "CDCAxialAxialSegmentPair.h"
+#include "CDCAxialSegmentPair.h"
 #include "CDCSegmentPair.h"
 #include "CDCSegmentTriple.h"
 #include "CDCTrack.h"

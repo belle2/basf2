@@ -19,14 +19,14 @@ TRACKFINDINGCDC_SwitchableClassImp(CDCSegmentTriple)
 
 
 CDCSegmentTriple::CDCSegmentTriple() :
-  CDCAxialAxialSegmentPair(),
+  CDCAxialSegmentPair(),
   m_middleSegment(nullptr)
 {;}
 
 
 
 CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment) :
-  CDCAxialAxialSegmentPair(startSegment, endSegment),
+  CDCAxialSegmentPair(startSegment, endSegment),
   m_middleSegment(nullptr)
 {;}
 
@@ -37,7 +37,7 @@ CDCSegmentTriple::CDCSegmentTriple(
   const CDCStereoRecoSegment2D* middleSegment,
   const CDCAxialRecoSegment2D* endSegment
 ) :
-  CDCAxialAxialSegmentPair(startSegment, endSegment),
+  CDCAxialSegmentPair(startSegment, endSegment),
   m_middleSegment(middleSegment)
 {
   if (not startSegment) B2ERROR("CDCSegmentTriple initialized with nullptr as start segment");
@@ -54,7 +54,7 @@ CDCSegmentTriple::CDCSegmentTriple(
   const CDCTrajectory2D& trajectory2D,
   const CDCTrajectorySZ& trajectorySZ
 ) :
-  CDCAxialAxialSegmentPair(startSegment, endSegment, trajectory2D),
+  CDCAxialSegmentPair(startSegment, endSegment, trajectory2D),
   m_middleSegment(middleSegment),
   m_trajectorySZ(trajectorySZ)
 {

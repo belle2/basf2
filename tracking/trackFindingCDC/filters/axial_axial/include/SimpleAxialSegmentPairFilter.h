@@ -9,28 +9,28 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseAxialAxialSegmentPairFilter.h"
+#include "BaseAxialSegmentPairFilter.h"
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleAxialAxialSegmentPairFilter : public Filter<CDCAxialAxialSegmentPair> {
+    class SimpleAxialSegmentPairFilter : public Filter<CDCAxialSegmentPair> {
 
     public:
       /// Constructor
-      SimpleAxialAxialSegmentPairFilter();
+      SimpleAxialSegmentPairFilter();
 
       /// Checks if a pair of axial segments is a good combination
-      virtual CellWeight operator()(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) override final;
+      virtual CellWeight operator()(const CDCAxialSegmentPair& axialSegmentPair) override final;
 
     public:
       /// Returns the trajectory of the axial segment. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
 
       /// Returns the trajectory of the axial to axial segment pair. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialAxialSegmentPair& axialAxialSegmentPair) const;
+      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialSegmentPair& axialSegmentPair) const;
 
       /// Returns the xy fitter instance that is used by this filter
       const CDCRiemannFitter& getRiemannFitter() const
@@ -39,7 +39,7 @@ namespace Belle2 {
     private:
       CDCRiemannFitter m_riemannFitter; ///< Memory of the Riemann fitter for the circle fits.
 
-    }; // end class SimpleAxialAxialSegmentPairFilter
+    }; // end class SimpleAxialSegmentPairFilter
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

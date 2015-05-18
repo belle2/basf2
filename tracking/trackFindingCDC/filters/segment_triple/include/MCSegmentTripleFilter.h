@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/axial_axial/MCAxialAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_axial/MCAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include "BaseSegmentTripleFilter.h"
@@ -69,7 +69,7 @@ namespace Belle2 {
       void setAllowReverse(bool allowReverse)
       {
         m_param_allowReverse = allowReverse;
-        m_mcAxialAxialSegmentPairFilter.setAllowReverse(allowReverse);
+        m_mcAxialSegmentPairFilter.setAllowReverse(allowReverse);
       }
 
       /// Getter for the allow reverse parameter
@@ -83,7 +83,7 @@ namespace Belle2 {
       bool m_param_allowReverse;
 
       /// Instance of the cell filter to reject neighborhoods of false cells.
-      MCAxialAxialSegmentPairFilter m_mcAxialAxialSegmentPairFilter;
+      MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
 
 
     }; // end class MCSegmentTripleFilter

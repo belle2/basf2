@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/BaseAxialAxialSegmentPairFilter.h"
+#include "../include/BaseAxialSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
 

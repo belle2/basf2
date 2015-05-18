@@ -7,20 +7,25 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
 
-#include "BaseAxialAxialSegmentPairFilter.h"
+#include "../include/AllAxialSegmentPairFilter.h"
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
+#include <framework/logging/Logger.h>
 
-    /// Filter accepting all axial to axial segment pairs.
-    class AllAxialAxialSegmentPairFilter  : public Filter<CDCAxialAxialSegmentPair> {
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-      /// Checks if a pair of axial segments is a good combination
-      virtual CellWeight operator()(const CDCAxialAxialSegmentPair&) override final;
+CellWeight AllAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
+{
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
 
-    }; // end class AllAxialAxialSegmentPairFilter
+  assert(ptrStartSegment);
+  assert(ptrEndSegment);
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+
+  return startSegment.size() + endSegment.size();
+}

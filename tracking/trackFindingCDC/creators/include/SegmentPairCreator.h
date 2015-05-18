@@ -144,7 +144,7 @@ namespace Belle2 {
             }
 
             if (not segmentPair.checkSegments()) {
-              B2ERROR("CDCAxialAxialSegmentPair containing nullptr encountered in SegmentPairCreator");
+              B2ERROR("CDCAxialSegmentPair containing nullptr encountered in SegmentPairCreator");
               continue;
             }
 

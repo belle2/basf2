@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/MCAxialAxialSegmentPairFilter.h"
+#include "../include/MCAxialSegmentPairFilter.h"
 
 #include <framework/logging/Logger.h>
 
@@ -20,13 +20,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MCAxialAxialSegmentPairFilter::MCAxialAxialSegmentPairFilter(bool allowReverse) :
+MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse) :
   m_param_allowReverse(allowReverse)
 {
 }
 
 
-void MCAxialAxialSegmentPairFilter::setParameter(const std::string& key, const std::string& value)
+void MCAxialSegmentPairFilter::setParameter(const std::string& key, const std::string& value)
 {
   if (key == "symmetric") {
     if (value == "true") {
@@ -43,7 +43,7 @@ void MCAxialAxialSegmentPairFilter::setParameter(const std::string& key, const s
   }
 }
 
-std::map<std::string, std::string> MCAxialAxialSegmentPairFilter::getParameterDescription()
+std::map<std::string, std::string> MCAxialSegmentPairFilter::getParameterDescription()
 {
   std::map<std::string, std::string> des = Super::getParameterDescription();
   des["symmetric"] =  "Accept the axial axial segment pair if the reverse axial axial segment pair is correct "
@@ -52,15 +52,15 @@ std::map<std::string, std::string> MCAxialAxialSegmentPairFilter::getParameterDe
   return des;
 }
 
-bool MCAxialAxialSegmentPairFilter::needsTruthInformation()
+bool MCAxialSegmentPairFilter::needsTruthInformation()
 {
   return true;
 }
 
-CellWeight MCAxialAxialSegmentPairFilter::operator()(const CDCAxialAxialSegmentPair& axialAxialSegmentPair)
+CellWeight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialAxialSegmentPair.getStart();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialAxialSegmentPair.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);

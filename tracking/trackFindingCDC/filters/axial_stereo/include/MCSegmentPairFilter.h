@@ -47,7 +47,7 @@ namespace Belle2 {
       virtual bool needsTruthInformation() IF_NOT_CINT(override final);
 
       /// Checks if a axial stereo segment pair is a good combination.
-      virtual CellWeight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& axialAxialSegmentPair) IF_NOT_CINT(
+      virtual CellWeight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& axialSegmentPair) IF_NOT_CINT(
         override final);
 
     public:

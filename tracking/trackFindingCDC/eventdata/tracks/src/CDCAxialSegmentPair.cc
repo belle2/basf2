@@ -8,33 +8,33 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCAxialAxialSegmentPair.h"
+#include "../include/CDCAxialSegmentPair.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCAxialAxialSegmentPair)
+TRACKFINDINGCDC_SwitchableClassImp(CDCAxialSegmentPair)
 
 
 
-CDCAxialAxialSegmentPair::CDCAxialAxialSegmentPair() : m_startSegment(nullptr),  m_endSegment(nullptr)
+CDCAxialSegmentPair::CDCAxialSegmentPair() : m_startSegment(nullptr),  m_endSegment(nullptr)
 {
 
 }
 
 
 
-CDCAxialAxialSegmentPair::CDCAxialAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment) :
+CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment) :
   m_startSegment(startSegment), m_endSegment(endSegment)
 {
-  if (not startSegment) B2ERROR("CDCAxialAxialSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCAxialAxialSegmentPair initialized with nullptr as end segment");
+  if (not startSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as start segment");
+  if (not endSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as end segment");
 }
 
 
 
-CDCAxialAxialSegmentPair::CDCAxialAxialSegmentPair(
+CDCAxialSegmentPair::CDCAxialSegmentPair(
   const CDCAxialRecoSegment2D* startSegment,
   const CDCAxialRecoSegment2D* endSegment,
   const CDCTrajectory2D& trajectory2D
@@ -44,14 +44,14 @@ CDCAxialAxialSegmentPair::CDCAxialAxialSegmentPair(
   m_trajectory2D(trajectory2D)
 {
 
-  if (not startSegment) B2ERROR("CDCAxialAxialSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCAxialAxialSegmentPair initialized with nullptr as end segment");
+  if (not startSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as start segment");
+  if (not endSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as end segment");
 
 }
 
 
 
-CDCAxialAxialSegmentPair::~CDCAxialAxialSegmentPair() {;}
+CDCAxialSegmentPair::~CDCAxialSegmentPair() {;}
 
 
 

@@ -529,15 +529,15 @@ class CDCSVGDisplayModule(Module):
                                   if segment.getStereoType() == 0]
 
                 mc_axial_axial_segment_filter = \
-                    Belle2.TrackFindingCDC.MCAxialAxialSegmentPairFilter()
+                    Belle2.TrackFindingCDC.MCAxialSegmentPairFilter()
                 axial_axial_segment_pairs = \
-                    (Belle2.TrackFindingCDC.CDCAxialAxialSegmentPair(startSegment, endSegment)
+                    (Belle2.TrackFindingCDC.CDCAxialSegmentPair(startSegment, endSegment)
                      for startSegment in axial_segments
                      for endSegment in axial_segments)
 
                 def is_good_pair(pair):
                     weight = \
-                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(pair)
+                        mc_axial_axial_segment_filter.isGoodAxialSegmentPair(pair)
                     return weight == weight  # not nan
 
                 good_axial_axial_segment_pairs = [pair for pair in
@@ -565,7 +565,7 @@ class CDCSVGDisplayModule(Module):
 
                 # Misuse this a bit but still does what we want
                 mc_axial_axial_segment_filter = \
-                    Belle2.TrackFindingCDC.MCAxialAxialSegmentPairFilter()
+                    Belle2.TrackFindingCDC.MCAxialSegmentPairFilter()
                 mc_segment_lookup = \
                     Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
 
@@ -581,7 +581,7 @@ class CDCSVGDisplayModule(Module):
                     end = triple.getEnd()
 
                     pairWeight = \
-                        mc_axial_axial_segment_filter.isGoodAxialAxialSegmentPair(triple)
+                        mc_axial_axial_segment_filter.isGoodAxialSegmentPair(triple)
 
                     if not pairWeight == pairWeight:
                         return False

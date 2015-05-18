@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 
 
 
@@ -25,7 +25,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing a triple of reconstructed segements in adjacent superlayer
-    class CDCSegmentTriple : public CDCAxialAxialSegmentPair {
+    class CDCSegmentTriple : public CDCAxialSegmentPair {
     public:
 
       /// Default constructor for ROOT compatability
@@ -56,13 +56,13 @@ namespace Belle2 {
       /// Equality comparision based on the pointers to the stored segments
       bool operator==(CDCSegmentTriple const& rhs) const
       {
-        return CDCAxialAxialSegmentPair::operator==(rhs) and getMiddle() == rhs.getMiddle();
+        return CDCAxialSegmentPair::operator==(rhs) and getMiddle() == rhs.getMiddle();
       }
 
       /// Total ordering sheme based on the two axial segments first and the stereo segments second
       bool operator<(CDCSegmentTriple const& rhs) const
       {
-        return  CDCAxialAxialSegmentPair::operator<(rhs) or (CDCAxialAxialSegmentPair::operator==(rhs) and getMiddle() < rhs.getMiddle());
+        return  CDCAxialSegmentPair::operator<(rhs) or (CDCAxialSegmentPair::operator==(rhs) and getMiddle() < rhs.getMiddle());
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
@@ -84,7 +84,7 @@ namespace Belle2 {
 
       /// Checks the references to the contained three segment for nullptrs
       bool checkSegments() const
-      { return CDCAxialAxialSegmentPair::checkSegments() and not(m_middleSegment == nullptr); }
+      { return CDCAxialSegmentPair::checkSegments() and not(m_middleSegment == nullptr); }
 
       /// Getter for the superlayer id of the middle segment
       ILayerType getMiddleISuperLayer() const
@@ -112,20 +112,20 @@ namespace Belle2 {
 
       /// Clears all stored trajectories to an invalid state
       void clearTrajectories() const
-      { clearTrajectorySZ(); CDCAxialAxialSegmentPair::clearTrajectory2D(); }
+      { clearTrajectorySZ(); CDCAxialSegmentPair::clearTrajectory2D(); }
 
       /// Sets the taken flag of the segment triple's automaton cell. Also forward the taken to the contained segments and the contained wire hits.
       void setAndForwardTakenFlag() const
       {
         getAutomatonCell().setTakenFlag();
-        CDCAxialAxialSegmentPair::setAndForwardTakenFlag();
+        CDCAxialSegmentPair::setAndForwardTakenFlag();
         getMiddle()->setAndForwardTakenFlag();
       }
 
       /// If one of the contained segments is marked as taken this segment triple is set be taken as well.
       void receiveTaken() const
       {
-        CDCAxialAxialSegmentPair::receiveTakenFlag();
+        CDCAxialSegmentPair::receiveTakenFlag();
         getMiddle()->receiveTakenFlag();
 
         if (getStart()->getAutomatonCell().hasTakenFlag() or

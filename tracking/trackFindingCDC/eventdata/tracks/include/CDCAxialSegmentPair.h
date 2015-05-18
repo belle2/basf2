@@ -21,49 +21,49 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing a pair of reconstructed axial segements in adjacent superlayer
-    class CDCAxialAxialSegmentPair : public SwitchableRootificationBase {
+    class CDCAxialSegmentPair : public SwitchableRootificationBase {
     public:
 
       /// Default constructor - for ROOT compatability
-      CDCAxialAxialSegmentPair();
+      CDCAxialSegmentPair();
 
       /// Constructor from two segments
-      CDCAxialAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment);
+      CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCAxialAxialSegmentPair(
+      CDCAxialSegmentPair(
         const CDCAxialRecoSegment2D* startSegment,
         const CDCAxialRecoSegment2D* endSegment,
         const CDCTrajectory2D& trajectory2D
       );
 
       /// Empty destructor
-      ~CDCAxialAxialSegmentPair();
+      ~CDCAxialSegmentPair();
 
       /// Equality comparision based on the pointers to the stored segments.
-      bool operator==(CDCAxialAxialSegmentPair const& rhs) const
+      bool operator==(CDCAxialSegmentPair const& rhs) const
       { return getStart() == rhs.getStart() and getEnd() == rhs.getEnd(); }
 
       /// Total ordering sheme comparing the segment pointers.
-      bool operator<(CDCAxialAxialSegmentPair const& rhs) const
+      bool operator<(CDCAxialSegmentPair const& rhs) const
       {
         return (getStart() < rhs.getStart()  or
                 (getStart() == rhs.getStart() and getEnd() < rhs.getEnd()));
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(CDCAxialAxialSegmentPair const& segmentTriple , const CDCAxialRecoSegment2D* axialSegment)
+      friend bool operator<(CDCAxialSegmentPair const& segmentTriple , const CDCAxialRecoSegment2D* axialSegment)
       { return segmentTriple.getStart() < axialSegment; }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCAxialAxialSegmentPair const& segmentTriple)
+      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCAxialSegmentPair const& segmentTriple)
       { return axialSegment < segmentTriple.getStart(); }
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCAxialAxialSegmentPair* () const
+      operator const Belle2::TrackFindingCDC::CDCAxialSegmentPair* () const
       { return this; }
 
 
@@ -160,10 +160,10 @@ namespace Belle2 {
       mutable CDCTrajectory2D m_trajectory2D; ///< Reference to the common trajectory
       mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
 
-      /** ROOT Macro to make CDCAxialAxialSegmentPair a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialAxialSegmentPair, 1);
+      /** ROOT Macro to make CDCAxialSegmentPair a ROOT class.*/
+      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialSegmentPair, 1);
 
-    }; //end class CDCAxialAxialSegmentPair
+    }; //end class CDCAxialSegmentPair
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

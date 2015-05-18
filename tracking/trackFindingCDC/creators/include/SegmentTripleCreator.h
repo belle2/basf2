@@ -31,8 +31,8 @@ namespace Belle2 {
       ~SegmentTripleCreator() {;}
 
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
-      template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter>
-      inline void create(AxialAxialSegmentPairFilter& axialAxialSegmentPairFilter,
+      template<class AxialSegmentPairFilter, class SegmentTripleFilter>
+      inline void create(AxialSegmentPairFilter& axialSegmentPairFilter,
                          SegmentTripleFilter& segmentTripleFilter,
                          const std::vector<CDCRecoSegment2D>& segments,
                          std::set<CDCSegmentTriple>& segmentTriples) const
@@ -70,7 +70,7 @@ namespace Belle2 {
           }
         }
 
-        create(axialAxialSegmentPairFilter,
+        create(axialSegmentPairFilter,
                segmentTripleFilter,
                axialSegmentsBySL,
                stereoSegmentsBySL,
@@ -85,8 +85,8 @@ namespace Belle2 {
       typedef std::vector<const CDCStereoRecoSegment2D*> StereoSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
 
       /// Creates the segment triples from the segments, which have been grouped by their superlayer id.
-      template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter>
-      inline void create(AxialAxialSegmentPairFilter& axialAxialSegmentPairFilter,
+      template<class AxialSegmentPairFilter, class SegmentTripleFilter>
+      inline void create(AxialSegmentPairFilter& axialSegmentPairFilter,
                          SegmentTripleFilter& segmentTripleFilter,
                          const AxialSegmentsBySuperLayer& axialSegmentsBySL,
                          const StereoSegmentsBySuperLayer& stereoSegmentsBySL,
@@ -94,7 +94,7 @@ namespace Belle2 {
       {
 
         //clear the remembered fits
-        axialAxialSegmentPairFilter.clear();
+        axialSegmentPairFilter.clear();
         segmentTripleFilter.clear();
 
         //Make pairs of closeby axial superlayers
@@ -118,7 +118,7 @@ namespace Belle2 {
                 axialSegmentsBySL[iAxialSuperLayerIn];
 
 
-              createForAxialSuperLayerPair(axialAxialSegmentPairFilter,
+              createForAxialSuperLayerPair(axialSegmentPairFilter,
                                            segmentTripleFilter,
                                            startSegments,
                                            middleSegments,
@@ -136,7 +136,7 @@ namespace Belle2 {
               const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerOut];
               const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayerOut];
 
-              createForAxialSuperLayerPair(axialAxialSegmentPairFilter,
+              createForAxialSuperLayerPair(axialSegmentPairFilter,
                                            segmentTripleFilter,
                                            startSegments,
                                            middleSegments,
@@ -152,7 +152,7 @@ namespace Belle2 {
             const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iAxialSuperLayer];
             const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
 
-            createForAxialSuperLayerPair(axialAxialSegmentPairFilter,
+            createForAxialSuperLayerPair(axialSegmentPairFilter,
                                          segmentTripleFilter,
                                          startSegments,
                                          middleSegments,
@@ -199,8 +199,8 @@ namespace Belle2 {
 
 
       /// Creates segment tiples from a combination of start segment, middle segments and end segments.
-      template<class AxialAxialSegmentPairFilter, class SegmentTripleFilter>
-      inline void createForAxialSuperLayerPair(AxialAxialSegmentPairFilter& axialAxialSegmentPairFilter,
+      template<class AxialSegmentPairFilter, class SegmentTripleFilter>
+      inline void createForAxialSuperLayerPair(AxialSegmentPairFilter& axialSegmentPairFilter,
                                                SegmentTripleFilter& segmentTripleFilter,
                                                const std::vector<const CDCAxialRecoSegment2D* >& startSegments,
                                                const std::vector<const CDCStereoRecoSegment2D* >& middleSegments,
@@ -221,21 +221,21 @@ namespace Belle2 {
             segmentTriple.clearTrajectories();
 
             if (segmentTriple.getTrajectory2D().isFitted()) {
-              B2ERROR("Two dimensional trajectory of CDCAxialAxialSegmentPair still fitted after clearing.")
+              B2ERROR("Two dimensional trajectory of CDCAxialSegmentPair still fitted after clearing.")
               continue;
             }
             if (segmentTriple.getTrajectorySZ().isFitted()) {
-              B2ERROR("SZ trajectory of CDCAxialAxialSegmentPair still fitted after clearing.")
+              B2ERROR("SZ trajectory of CDCAxialSegmentPair still fitted after clearing.")
               continue;
             }
 
-            const CDCAxialAxialSegmentPair& axialAxialSegmentPair = segmentTriple;
-            if (not axialAxialSegmentPair.checkSegments()) {
-              B2ERROR("CDCAxialAxialSegmentPair containing nullptr encountered in SegmentTripleCreator");
+            const CDCAxialSegmentPair& axialSegmentPair = segmentTriple;
+            if (not axialSegmentPair.checkSegments()) {
+              B2ERROR("CDCAxialSegmentPair containing nullptr encountered in SegmentTripleCreator");
               continue;
             }
 
-            CellWeight pairWeight = axialAxialSegmentPairFilter(axialAxialSegmentPair);
+            CellWeight pairWeight = axialSegmentPairFilter(axialSegmentPair);
             bool pairIsGood = not isNotACell(pairWeight);
 
             if (pairIsGood) {

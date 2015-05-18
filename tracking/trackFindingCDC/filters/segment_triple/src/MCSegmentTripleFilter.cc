@@ -24,28 +24,28 @@ using namespace TrackFindingCDC;
 
 MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
   m_param_allowReverse(allowReverse),
-  m_mcAxialAxialSegmentPairFilter(allowReverse)
+  m_mcAxialSegmentPairFilter(allowReverse)
 {
 }
 
 
 void MCSegmentTripleFilter::clear()
 {
-  m_mcAxialAxialSegmentPairFilter.clear();
+  m_mcAxialSegmentPairFilter.clear();
 }
 
 
 
 void MCSegmentTripleFilter::initialize()
 {
-  m_mcAxialAxialSegmentPairFilter.initialize();
+  m_mcAxialSegmentPairFilter.initialize();
 }
 
 
 
 void MCSegmentTripleFilter::terminate()
 {
-  m_mcAxialAxialSegmentPairFilter.terminate();
+  m_mcAxialSegmentPairFilter.terminate();
 }
 
 
@@ -107,7 +107,7 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
-  CellWeight pairWeight =  m_mcAxialAxialSegmentPairFilter(segmentTriple);
+  CellWeight pairWeight =  m_mcAxialSegmentPairFilter(segmentTriple);
   if (isNotACell(pairWeight)) return NOT_A_CELL;
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();

@@ -245,17 +245,17 @@ namespace Belle2 {
 
 
       /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
-      size_t append(const CDCAxialAxialSegmentPair& axialAxialSegmentPair,
+      size_t append(const CDCAxialSegmentPair& axialSegmentPair,
                     bool usePosition = false)
       {
         size_t result = 0;
-        const CDCRecoSegment2D* ptrStartSegment2D = axialAxialSegmentPair.getStart();
+        const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStart();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
           result += append(startSegment2D, usePosition);
         }
 
-        const CDCRecoSegment2D* ptrEndSegment2D = axialAxialSegmentPair.getEnd();
+        const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEnd();
         if (ptrEndSegment2D) {
           const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
           result += append(endSegment2D, usePosition);

@@ -183,7 +183,7 @@ namespace Belle2 {
       }
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
-      void draw(const CDCAxialAxialSegmentPair& axialAxialSegmentPair, const AttributeMap& attributeMap = AttributeMap());
+      void draw(const CDCAxialSegmentPair& axialSegmentPair, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
       void draw(const CDCSegmentPair& segmentPair, const AttributeMap& attributeMap = AttributeMap());

@@ -573,8 +573,11 @@ def generate_new_plots(list_of_revisions):
             # being created
             print '\nNow creating plots for file: {0}'.format(rootfile)
 
+            # Start the section for the fixed/floating headers
+            html_output.write('<section class="persistent-area">')
+
             # Write to the HTML the name of the current file
-            html_output.write('<h2 name="#{0}">{0}</h2><br>\n'
+            html_output.write('<h2 name="#{0}" class="persistent-header">{0}</h2><br>\n'
                               .format(rootfile))
 
             # Get the list of all objects that belong to the current
@@ -613,11 +616,27 @@ def generate_new_plots(list_of_revisions):
             plot_matrix_html = plot_matrix(list_of_plotuples, package, list_of_revisions)
             html_output.write('\n'.join(plot_matrix_html))
 
+            # Close the section for the header
+            html_output.write('</section>')
+
         # Make the command line output more readable
         print 2*'\n'
 
         # Close the div for the package
         html_output.write('</div>\n<br>\n<br>\n\n')
+
+    # Add JavaScript for the fixed headers
+    # Admittedly, this is an ugly workaround...
+    html_output.write('<script type="text/javascript">\n'
+                      'var clonedHeaderRow;\n'
+                      '$(".persistent-area").each(function() {\n'
+                      'clonedHeaderRow = $(".persistent-header", this);\n'
+                      'clonedHeaderRow\n'
+                      '.before(clonedHeaderRow.clone())\n'
+                      '.css("width", clonedHeaderRow.width())\n'
+                      '.addClass("floatingHeader");\n'
+                      '});\n'
+                      '</script>\n')
 
     # Close the file stream for the HTML file
     html_output.close()

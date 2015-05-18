@@ -345,6 +345,18 @@ textarea {
     float:right;
 }
 
+.floatingHeader
+{
+    position: fixed;
+    margin-left: -20px;
+    top: 0;
+    width: 100%;
+    visibility: hidden;
+    background: rgba(42, 42, 42, 0.95);
+    color: white;
+    padding: 10px 20px 10px 20px;
+}
+
 .lastmodified
 {
     font-size:12px;

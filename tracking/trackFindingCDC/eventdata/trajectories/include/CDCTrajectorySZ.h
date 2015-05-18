@@ -10,15 +10,14 @@
 #ifndef CDCTRAJECTORYSZ_H
 #define CDCTRAJECTORYSZ_H
 
-#include <TVector3.h>
-
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
+
+#include <TVector3.h>
 #include <TMath.h>
 
 namespace Belle2 {
@@ -132,6 +131,10 @@ namespace Belle2 {
       { return getSZLine().intercept(); }
 
 
+
+      ///  Getter for p-value
+      FloatType getPValue() const
+      { return TMath::Prob(getChi2(), getNDF()); }
 
       /// Getter for the chi square value of the line fit
       FloatType getChi2() const

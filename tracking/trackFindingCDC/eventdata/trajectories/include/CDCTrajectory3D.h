@@ -11,6 +11,7 @@
 #define CDCTRAJECTORY3D_H
 
 #include <cmath>
+#include <TMath.h>
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -234,6 +235,10 @@ namespace Belle2 {
       /// Getter for the cirlce in local coordinates
       UncertainPerigeeCircle getLocalCircle() const
       { return getLocalHelix().uncertainCircleXY(); }
+
+      ///  Getter for p-value
+      FloatType getPValue() const
+      { return TMath::Prob(getChi2(), getNDF()); }
 
       /// Getter for the chi2 value of the fit
       FloatType getChi2() const

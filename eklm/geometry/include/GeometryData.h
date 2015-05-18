@@ -125,10 +125,10 @@ namespace Belle2 {
       /** Number of strip in position-based array. */
       int* m_StripLenToAll;
 
-      /* Minimal z coordinate of the forward endcap. */
+      /** Minimal z coordinate of the forward endcap. */
       double m_MinZForward;
 
-      /* Maximal z coordinate of the backward endcap. */
+      /** Maximal z coordinate of the backward endcap. */
       double m_MaxZBackward;
 
     };

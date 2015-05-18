@@ -9,6 +9,8 @@ from tracking.modules import (
     CDCFullFinder
 )
 
+from tracking.metamodules import IfMCParticlesPresentModule
+
 import tracking.utilities as utilities
 
 import logging
@@ -111,35 +113,37 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             tracking_coverage = self.determine_tracking_coverage(self.finder_module)
 
             if self.finder_module == 'StandardReco':
-                trackFinderModule = StandardTrackingReconstructionModule(components=self.components)
-                main_path.add_module(trackFinderModule)
+                track_finder_module = StandardTrackingReconstructionModule(components=self.components)
+                main_path.add_module(track_finder_module)
 
             elif self.finder_module == "CDCFullFinder":
-                trackFinderModule = CDCFullFinder()
-                main_path.add_module(trackFinderModule)
+                track_finder_module = CDCFullFinder()
+                main_path.add_module(track_finder_module)
 
             else:
-                trackFinderModule = self.get_basf2_module(self.finder_module)
-                main_path.add_module(trackFinderModule)
+                track_finder_module = self.get_basf2_module(self.finder_module)
+                main_path.add_module(track_finder_module)
 
             # Reference Monte Carlo tracks
-            trackFinderMCTruthModule = basf2.register_module('TrackFinderMCTruth')
-            trackFinderMCTruthModule.param({'WhichParticles': ['primary'],
-                                            'EnergyCut': 0.1,
-                                            'GFTrackCandidatesColName': 'MCTrackCands'})
-            trackFinderMCTruthModule.param(tracking_coverage)
-            main_path.add_module(trackFinderMCTruthModule)
+            track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruth')
+            track_finder_mc_truth_module.param({
+                'WhichParticles': ['primary'],
+                'EnergyCut': 0.1,
+                'GFTrackCandidatesColName': 'MCTrackCands'
+            })
+            track_finder_mc_truth_module.param(tracking_coverage)
+            main_path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
 
             # Track matcher
-            mcTrackMatcherModule = basf2.register_module('MCTrackMatcher')
-            mcTrackMatcherModule.param({
+            mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
+            mc_track_matcher_module.param({
                 'MCGFTrackCandsColName': 'MCTrackCands',
                 'MinimalPurity': 0.66,
                 'RelateClonesToMCParticles': True,
                 'PRGFTrackCandsColName': self.trackCandidatesColumnName,
             })
-            mcTrackMatcherModule.param(tracking_coverage)
-            main_path.add_module(mcTrackMatcherModule)
+            mc_track_matcher_module.param(tracking_coverage)
+            main_path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ
@@ -148,14 +152,14 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 not isinstance(self.finder_module, StandardTrackingReconstructionModule)):
 
             # Prepare Genfit extrapolation
-            setupGenfitExtrapolationModule = basf2.register_module('SetupGenfitExtrapolation')
-            setupGenfitExtrapolationModule.param({'whichGeometry': self.fit_geometry})
-            main_path.add_module(setupGenfitExtrapolationModule)
+            setup_genfit_extrapolation_module = basf2.register_module('SetupGenfitExtrapolation')
+            setup_genfit_extrapolation_module.param({'whichGeometry': self.fit_geometry})
+            main_path.add_module(setup_genfit_extrapolation_module)
 
             # Fit tracks
-            genFitterModule = basf2.register_module('GenFitter')
-            genFitterModule.param({'PDGCodes': [13]})
-            main_path.add_module(genFitterModule)
+            gen_fitter_module = basf2.register_module('GenFitter')
+            gen_fitter_module.param({'PDGCodes': [13]})
+            main_path.add_module(gen_fitter_module)
 
         return main_path
 

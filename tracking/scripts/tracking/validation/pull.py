@@ -191,7 +191,7 @@ class PullAnalysis(object):
             sigmas_hist.hist(sigmas,
                              lower_bound=0,
                              outlier_z_score=outlier_z_score)
-            sigmas_hist.xlabel = compose_axis_label("#sigma(" + quantity_name + ')', self.unit)
+            sigmas_hist.xlabel = compose_axis_label("#sigma (" + quantity_name + ')', self.unit)
             sigmas_hist.title = formatter.format(plot_title, subplot_title='Estimated variance distribution')
 
             self.plots['sigmas'] = sigmas_hist

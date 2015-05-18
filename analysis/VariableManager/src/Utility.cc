@@ -60,13 +60,10 @@ std::vector<std::string> Belle2::Variable::splitOnDelimiterAndConserveParenthesi
   return result;
 }
 
-Belle2::Variable::Cut::Cut(Parameter str) : left(nullptr), right(nullptr), operation(EMPTY), number(0), isNumeric(false),
-  var(nullptr) { init(str); }
+Belle2::Variable::Cut::Cut(Parameter str) : operation(EMPTY), number(0), isNumeric(false), var(nullptr) { init(str); }
 
 void Belle2::Variable::Cut::init(Parameter str)
 {
-
-  clean();
 
   if (str.empty()) {
     operation = EMPTY;
@@ -92,19 +89,6 @@ void Belle2::Variable::Cut::init(Parameter str)
       }
     }
   }
-}
-
-void Belle2::Variable::Cut::clean()
-{
-  delete left;
-  delete right;
-  left = nullptr;
-  right = nullptr;
-}
-
-Belle2::Variable::Cut::~Cut()
-{
-  clean();
 }
 
 std::string Belle2::Variable::Cut::preprocess(std::string str)
@@ -135,15 +119,15 @@ bool Belle2::Variable::Cut::processLogicConditions(std::string str)
 
   if ((pos =  str.find(" or ", begin)) != std::string::npos && str.substr(begin, pos - begin).find("[") == std::string::npos) {
     operation = OR;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 4));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 4));
     return true;
   }
 
   if ((pos =  str.find(" and ", begin)) != std::string::npos && str.substr(begin, pos - begin).find("[") == std::string::npos) {
     operation = AND;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 5));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 5));
     return true;
   }
 
@@ -157,38 +141,38 @@ bool Belle2::Variable::Cut::processBinaryNumericConditions(std::string str)
   unsigned long int pos = 0;
   if ((pos =  str.find("<=")) != std::string::npos) {
     operation = LE;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 2));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 2));
     return true;
   }
   if ((pos =  str.find("<")) != std::string::npos) {
     operation = LT;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 1));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 1));
     return true;
   }
   if ((pos =  str.find(">=")) != std::string::npos) {
     operation = GE;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 2));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 2));
     return true;
   }
   if ((pos =  str.find(">")) != std::string::npos) {
     operation = GT;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 1));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 1));
     return true;
   }
   if ((pos =  str.find("==")) != std::string::npos) {
     operation = EQ;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 2));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 2));
     return true;
   }
   if ((pos =  str.find("!=")) != std::string::npos) {
     operation = NE;
-    left = new Cut(str.substr(0, pos));
-    right = new Cut(str.substr(pos + 2));
+    left = std::make_shared<Cut>(str.substr(0, pos));
+    right = std::make_shared<Cut>(str.substr(pos + 2));
     return true;
   }
 
@@ -205,10 +189,10 @@ bool Belle2::Variable::Cut::processTernaryNumericConditions(std::string str)
         ((pos2 =  str.find("<", pos1 + 2)) != std::string::npos or (pos2 =  str.find(">", pos1 + 2)) != std::string::npos
          or (pos2 =  str.find("!", pos1 + 2)) != std::string::npos or (pos2 =  str.find("=", pos1 + 2)) != std::string::npos)) {
       operation = AND;
-      left = new Cut(str.substr(0, pos2));
+      left = std::make_shared<Cut>(str.substr(0, pos2));
       if (str[pos1 + 1] == '=')
         pos1++;
-      right = new Cut(str.substr(pos1 + 1));
+      right = std::make_shared<Cut>(str.substr(pos1 + 1));
       return true;
     }
   }

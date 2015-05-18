@@ -3,6 +3,7 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <string>
+#include <memory>
 
 namespace Belle2 {
 
@@ -83,11 +84,6 @@ namespace Belle2 {
       Cut(Parameter str = "");
 
       /**
-       * Desstructor
-       */
-      ~Cut();
-
-      /**
        * Initialises Cut object with the given cuts
        * @param str Cut is initaliszed with the specified cuts.
        */
@@ -105,10 +101,6 @@ namespace Belle2 {
       void print() const;
 
     private:
-      /**
-       * Clean the cut object. Delete all former cuts
-       */
-      void clean();
 
       /**
        * Preprocess cut string. Trim string and delete global parenthesis
@@ -151,12 +143,16 @@ namespace Belle2 {
         NE,
       };
 
-      Cut* left; /**< Left-side cut */
-      Cut* right; /**< Right-side cut */
       Operation operation; /**< Operation which connects left and right cut */
       float number; /**< literal number contained in the cut */
       bool isNumeric; /**< if there was a literal number in this cut */
       const Variable::Manager::Var* var; /**< set if there was a valid variable in this cut */
+#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
+#else
+      std::shared_ptr<Cut> left; /**< Left-side cut */
+      std::shared_ptr<Cut> right; /**< Right-side cut */
+#endif
+      //NOTE: do not put any data members between the endif and end of class! this would change the class layout in memory
     };
   }
 }

@@ -97,12 +97,12 @@ namespace Belle2 {
        * Check if the current cuts are passed by the given particle
        * @param p pointer to the particle object
        */
-      bool check(const Particle* p);
+      bool check(const Particle* p) const;
 
       /**
        * Print cut tree
        */
-      void print();
+      void print() const;
 
     private:
       /**
@@ -133,7 +133,7 @@ namespace Belle2 {
       /**
        * Returns stored number or Variable value for the given particle
        */
-      float get(const Particle* p);
+      float get(const Particle* p) const;
 
       /**
        * Enum with the allowed operations of the Cut Tree

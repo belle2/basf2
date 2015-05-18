@@ -37,7 +37,8 @@ unsigned long int Belle2::Variable::findMatchedParenthesis(std::string str, char
   return end - 1;
 }
 
-std::vector<std::string> Belle2::Variable::splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close)
+std::vector<std::string> Belle2::Variable::splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open,
+    char close)
 {
 
   std::vector<std::string> result;
@@ -59,7 +60,8 @@ std::vector<std::string> Belle2::Variable::splitOnDelimiterAndConserveParenthesi
   return result;
 }
 
-Belle2::Variable::Cut::Cut(Parameter str) : left(nullptr), right(nullptr), operation(EMPTY), number(0), isNumeric(false), var(nullptr) { init(str); }
+Belle2::Variable::Cut::Cut(Parameter str) : left(nullptr), right(nullptr), operation(EMPTY), number(0), isNumeric(false),
+  var(nullptr) { init(str); }
 
 void Belle2::Variable::Cut::init(Parameter str)
 {
@@ -198,7 +200,7 @@ bool Belle2::Variable::Cut::processTernaryNumericConditions(std::string str)
 
   unsigned long int pos1 = 0;
   unsigned long int pos2 = 0;
-  for (auto & c : {"<", ">", "!", "="}) {
+  for (auto& c : {"<", ">", "!", "="}) {
     if (((pos1 =  str.find(c)) != std::string::npos) and
         ((pos2 =  str.find("<", pos1 + 2)) != std::string::npos or (pos2 =  str.find(">", pos1 + 2)) != std::string::npos
          or (pos2 =  str.find("!", pos1 + 2)) != std::string::npos or (pos2 =  str.find("=", pos1 + 2)) != std::string::npos)) {
@@ -214,7 +216,7 @@ bool Belle2::Variable::Cut::processTernaryNumericConditions(std::string str)
   return false;
 }
 
-bool Belle2::Variable::Cut::check(const Particle* p)
+bool Belle2::Variable::Cut::check(const Particle* p) const
 {
   switch (operation) {
     case EMPTY:
@@ -242,7 +244,7 @@ bool Belle2::Variable::Cut::check(const Particle* p)
   return false;
 }
 
-float Belle2::Variable::Cut::get(const Particle* p)
+float Belle2::Variable::Cut::get(const Particle* p) const
 {
 
   if (isNumeric) {
@@ -255,7 +257,7 @@ float Belle2::Variable::Cut::get(const Particle* p)
 
 }
 
-void Belle2::Variable::Cut::print()
+void Belle2::Variable::Cut::print() const
 {
 
   switch (operation) {

@@ -216,7 +216,7 @@ namespace Belle2 {
           }
         }
 
-        Variable::Cut cut = Cut(cutString);
+        Variable::Cut cut(cutString);
 
         auto func = [roeListName, cut, pdgCode](const Particle * particle) -> double {
           if (particle == nullptr)

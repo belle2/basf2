@@ -119,12 +119,12 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   // Do the fit
   if (segment->getStereoType() == AXIAL) {
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-    var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
-    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
+    var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
+    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getPValue();
   } else {
     const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-    var<named("fit_full")>() = fitter.fit(observationsFull).getProb();
-    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getProb();
+    var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
+    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getPValue();
   }
 
   if (observationsFull.size() == observationsNeigh.size()) {

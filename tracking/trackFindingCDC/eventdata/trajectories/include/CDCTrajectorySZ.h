@@ -152,13 +152,6 @@ namespace Belle2 {
       void setNDF(const size_t& ndf)
       { return m_szLine.setNDF(ndf); }
 
-      /// Getter for the probability for a good fit
-      FloatType getProb() const
-      {
-        return TMath::Prob(getChi2(), getNDF());
-      }
-
-
 
       /// Getter for the line in sz space
       const UncertainSZLine& getSZLine() const

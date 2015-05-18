@@ -8,7 +8,6 @@ from modularAnalysis import *
 
 particles = get_default_channnels()
 feistate = fullEventInterpretation(None, particles)
-feistate.path.add_module('RootOutput')
 
 # show constructed path
 print feistate.path

@@ -496,6 +496,7 @@ def fullEventInterpretation(selection_path, particles):
             path.add_path(selection_path)
         path.add_path(fei_path)
     else:
+        fei_path.add_module("RootOutput")
         if is_first_run and selection_path is not None:
             path.add_path(selection_path)
             path.for_each('RestOfEvent', 'RestOfEvents', fei_path)

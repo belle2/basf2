@@ -20,9 +20,8 @@ particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent 
 feistate = fullEventInterpretation(selection_path, particles)
 
 if feistate.is_trained:
+    # Add your analysis path
     feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
-else:
-    feistate.path.add_module('RootOutput')
 
 # show constructed path
 print feistate.path

@@ -3,6 +3,7 @@
 
 from basf2 import *
 from fei import *
+from modularAnalysis import *
 import glob
 
 chargedTrackVars = [
@@ -40,8 +41,12 @@ particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP))
 particles.append(Particle('K+', mvaConfig_chargedFSP))
 
+selection_path = create_path()
+selection_path.add_module("RootInput")
+fillParticleLists([('mu+', 'muid > 0.3')], True, selection_path)
+buildRestOfEvent('mu+', path=selection_path)
 
-feistate = fullEventInterpretation(None, particles)
+feistate = fullEventInterpretation(selection_path, particles)
 
 if feistate.is_trained:
     feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)

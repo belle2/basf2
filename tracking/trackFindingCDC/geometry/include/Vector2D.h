@@ -186,6 +186,7 @@ namespace Belle2 {
 
       /// Divides all coordinates by a common denominator in place
       inline Vector2D& divide(const FloatType& denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
+
       /// Same as divide()
       inline Vector2D& operator/=(const FloatType& denominator) { return divide(denominator); }
 
@@ -195,7 +196,8 @@ namespace Belle2 {
       inline Vector2D operator/(const FloatType& denominator) const { return divided(denominator); }
 
       /// Adds a vector to this in place
-      inline Vector2D& add(const Vector2D& rhs)     { m_x += rhs.x();  m_y += rhs.y(); return *this; }
+      inline Vector2D& add(const Vector2D& rhs) { m_x += rhs.x();  m_y += rhs.y(); return *this; }
+
       /// Same as add()
       inline Vector2D& operator+=(const Vector2D& rhs) { return add(rhs); }
 

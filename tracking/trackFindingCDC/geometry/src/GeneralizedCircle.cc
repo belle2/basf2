@@ -31,8 +31,10 @@ GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) {
 
 
 
-GeneralizedCircle::GeneralizedCircle(const FloatType& n0, const FloatType& n1,
-                                     const FloatType& n2, const FloatType& n3) :
+GeneralizedCircle::GeneralizedCircle(const FloatType& n0,
+                                     const FloatType& n1,
+                                     const FloatType& n2,
+                                     const FloatType& n3) :
   m_n3(n3), m_n12(n1, n2), m_n0(n0)
 {
   normalize();
@@ -155,11 +157,11 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   } else {
     const FloatType& a = n3();
     const FloatType& b = nParallel;
-    const FloatType c = n0() + nOrthogonal * closestOrthogonal + n3() * closestOrthogonal * closestOrthogonal;
+    const FloatType c = n0() + (nOrthogonal + n3() * closestOrthogonal) * closestOrthogonal;
 
     const pair<FloatType, FloatType> closestParallel12 = solveQuadraticABC(a, b, c);
 
-    //take the solution with smaller distance to point
+    // take the solution with smaller distance to point
     const FloatType pointParallel = point.unnormalizedParallelComp(coordinateSystem);
 
     const FloatType criterion1 = closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
@@ -186,7 +188,9 @@ Vector2D GeneralizedCircle::apogee() const
 }
 
 
-Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const
+Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
+                                                const Vector2D& end1,
+                                                const Vector2D& end2) const
 {
 
   FloatType lengthOnCurve1 = arcLengthBetween(start, end1);
@@ -237,11 +241,16 @@ pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const FloatType& R)
   const FloatType sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
   //orthogonal component
-  const FloatType sameCylindricalROrthogonal = sqrt(R * R - sameCylindricalRParallel * sameCylindricalRParallel);
+  const FloatType sameCylindricalROrthogonal = sqrt(square(R) - square(sameCylindricalRParallel));
 
   /// Two versions in this case
-  Vector2D sameCylindricalR1 = Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
-  Vector2D sameCylindricalR2 = Vector2D::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
+  Vector2D sameCylindricalR1 = Vector2D::compose(nUnit,
+                                                 sameCylindricalRParallel,
+                                                 sameCylindricalROrthogonal);
+
+  Vector2D sameCylindricalR2 = Vector2D::compose(nUnit,
+                                                 sameCylindricalRParallel,
+                                                 -sameCylindricalROrthogonal);
 
   pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
   return result;
@@ -253,31 +262,32 @@ Vector2D GeneralizedCircle::sameCylindricalR(const Vector2D& point) const
 {
   const FloatType R = point.norm();
 
-  //extraploted to r
-  //solve
-  // reducedCircleParameters(0) + reducedCircleParameters(1)*x + reducedCircleParameters(2)*y + reducedCircleParameters(3)*r*r == 0
+  // extraploted to r
+  // solve
+  //  n0 + n1*x + n2*y + n3*r*r == 0
   // and r = R
-  //search for x and y
+  // search for x and y
 
-  //solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
+  // solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
   const Vector2D nUnit = n12().unit();
 
   // parallel component
   const FloatType sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
-  //orthogonal component
+  // orthogonal component
   const FloatType pointOrthogonal = point.unnormalizedOrthogonalComp(nUnit);
 
-  //orthoganal component of the solution takes to sign of the orthogonal component of the point
-  const FloatType sameCylindricalROrthogonal = sign(pointOrthogonal) * sqrt(R * R - sameCylindricalRParallel *
-                                               sameCylindricalRParallel);
+  // orthoganal component of the solution takes to sign of the orthogonal component of the point
+  const FloatType sameCylindricalROrthogonal =
+    copysign(sqrt(square(R) - square(sameCylindricalRParallel)), pointOrthogonal);
 
-  //combine parallel and orthogonal components
+  // combine parallel and orthogonal components
   return Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
 
 }
 
-Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint, const FloatType& cylindricalR) const
+Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint,
+                                                      const FloatType& cylindricalR) const
 {
 
   pair<Vector2D, Vector2D> candidatePoints = sameCylindricalR(cylindricalR);
@@ -287,7 +297,8 @@ Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint
 
 
 
-FloatType GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to) const
+FloatType GeneralizedCircle::arcLengthBetween(const Vector2D& from,
+                                              const Vector2D& to) const
 {
   ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
   if (lengthSign == INVALID_INFO) return NAN;
@@ -396,7 +407,8 @@ FloatType GeneralizedCircle::distance(const FloatType& fastDistance) const
 
 
 
-std::pair<Vector2D, Vector2D> GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
+std::pair<Vector2D, Vector2D>
+GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
 {
 
   const FloatType& m0 = generalizedCircle.n0();

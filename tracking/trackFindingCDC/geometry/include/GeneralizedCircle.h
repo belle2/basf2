@@ -7,39 +7,42 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef GENERALIZEDCIRCLEIMPL_H
-#define GENERALIZEDCIRCLEIMPL_H
+#ifndef GENERALIZEDCIRCLE_H
+#define GENERALIZEDCIRCLE_H
 
-#include <cmath>
-
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-
-#include "Vector2D.h"
-#include "Line2D.h"
-#include "Circle2D.h"
 #include "BoundSkewLine.h"
+#include "Circle2D.h"
+#include "Line2D.h"
+#include "Vector2D.h"
+#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <cmath>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    ///A generalized circle
-    /** Makes a smooth generalization from a two dimensional normal line ( like Line2D ) to a circle \n
-     *  The parameterisation is best suited for low curvature circle. The representation takes four \n
-     *  parameters. They correspond to the normal circle parameters like \n
-     *  n0 = (m_x*m_x + m_y*m_y - r*r)/2r \n
-     *  n1 = -m_x/r \n
-     *  n2 = -m_y/r \n
-     *  n3 = 1/2r \n
-     *  where the normalization condtion is n1*n1 + n2*n2 - 4 * n0 * n3 = 1. \n
-     *  The overall sign is fixed in the following way: If the last parameter is positiv the circle \n
-     *  is assummed to be orientated counterclockwise else the circle is assummed to be orientated clockwise.\n
-     *  The parameters n1 and n2 are indeed a vector in two dimensions and we keep them stored as Vector2D. \n
-     *  Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
-     */
+    /**
+    A generalized circle.
 
-    class GeneralizedCircle : public TrackFindingCDC::SwitchableRootificationBase {
+    Makes a smooth generalization from a two dimensional normal line
+    ( like Line2D ) to a circle.
+
+    The parameterisation is best suited for low curvature circle. The representation takes four
+    parameters. They correspond to the normal circle parameters like \n
+    n0 = (m_x*m_x + m_y*m_y - r*r)/2r \n
+    n1 = -m_x/r \n
+    n2 = -m_y/r \n
+    n3 = 1/2r \n
+    where the normalization condtion is n1*n1 + n2*n2 - 4 * n0 * n3 = 1.
+    The overall sign is fixed in the following way:
+    If the last parameter is positiv the circle is assummed to be orientated counterclockwise
+    else the circle is assummed to be orientated clockwise.
+    The parameters n1 and n2 are indeed a vector in two dimensions and
+    we keep them stored as Vector2D.
+    Additionally we can represent a line with same parameters by setting n3 = 0. Compare Line2D.
+    */
+
+    class GeneralizedCircle {
 
     public:
 
@@ -63,49 +66,80 @@ namespace Belle2 {
       /// Constructor from a two dimensional circle
       GeneralizedCircle(const Circle2D& circle);
 
-      /// Constructor from center, radius and a optional orientation
-      /** The center and radius alone do not carry any orientation. However the generalized circle does.
-       *  This constructor makes an orientated representation from them. If not given the orientation defaults to
-       *  mathematical positiv counterclockwise. */
+      /**
+      Constructor from center, radius and a optional orientation.
+      The center and radius alone do not carry any orientation.
+      However the generalized circle does.
+      This constructor makes an orientated representation from them.
+      If not given the orientation defaults to
+      mathematical positiv counterclockwise.
+      */
       static GeneralizedCircle fromCenterAndRadius(const Vector2D& center,
                                                    const FloatType& absRadius,
                                                    const CCWInfo& orientation = CCW);
 
-      /// Constructor of a generalized circle from perigee parameters. Tangential at perigee given as two dimensional vector.
+      /**
+      Constructor of a generalized circle from perigee parameters.
+      Tangential at perigee given as two dimensional vector.
+      */
       static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
                                                      const Vector2D& tangential,
                                                      const FloatType& impact);
 
-      /// Constructor of a generalized circle from perigee parameters. Tangential at perigee given as azimuth angle.
+      /**
+      Constructor of a generalized circle from perigee parameters.
+      Tangential at perigee given as azimuth angle.
+      */
       static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
                                                      const FloatType& tangentialPhi,
                                                      const FloatType& impact);
 
-      /// Destructor.
-      ~GeneralizedCircle() {;}
-
     protected:
-      ///Setter for first circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      /**
+      Setter for first circle parameter.
+      Makes _no_ normalization after setting.
+      Use is discouraged.
+      */
       inline void setN0(const FloatType& n0)
       { m_n0 = n0; }
 
-      ///Setter for second circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      /**
+      Setter for second circle parameter.
+      Makes _no_ normalization after setting.
+      Use is discouraged.
+      */
       inline void setN1(const FloatType& n1)
       { m_n12.setX(n1); }
 
-      ///Setter for third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      /**
+      Setter for third circle parameter.
+      Makes _no_ normalization after setting.
+      Use is discouraged.
+      */
       inline void setN2(const FloatType& n2)
       { m_n12.setY(n2); }
 
-      ///Setter for second and third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      /**
+      Setter for second and third circle parameter.
+      Makes _no_ normalization after setting.
+      Use is discouraged.
+      */
       inline void setN12(const FloatType& n1, const FloatType& n2)
       { m_n12.setXY(n1, n2); }
 
-      ///Setter for second and third circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      /**
+      Setter for second and third circle parameter.
+      Makes _no_ normalization after setting.
+      Use is discouraged.
+      */
       inline void setN12(const Vector2D& n12)
       { m_n12.setXY(n12); }
 
-      ///Setter for fourth circle parameter. Makes _no_ normalization after setting. Use is discouraged.
+      /**
+      Setter for fourth circle parameter.
+      Makes _no_ normalization after setting.
+      Use is discouraged.
+      */
       inline void setN3(const FloatType& n3)
       { m_n3 = n3; }
 
@@ -127,14 +161,25 @@ namespace Belle2 {
                                        const FloatType& impact)
       { setPerigeeParameters(curvature, Vector2D::Phi(tangentialPhi), impact); }
 
-      /// Setter for all four circle parameters. Makes a normalization after setting.
-      /// The normal representation of a line leave out the last parameter
-      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2, const FloatType& n3 = 0.0)
+      /**
+      Setter for all four circle parameters.
+      Makes a normalization after setting.
+      The normal representation of a line leave out the last parameter.
+      */
+      void setN(const FloatType& n0,
+                const FloatType& n1,
+                const FloatType& n2,
+                const FloatType& n3 = 0.0)
       { setN0(n0); setN12(n1, n2); setN3(n3); normalize(); }
 
-      /// Setter for all four circle parameters. Makes a normalization after setting.
-      /// The normal representation of a line leave out the last parameter
-      void setN(const FloatType& n0, const Vector2D& n12, const FloatType& n3 = 0.0)
+      /**
+      Setter for all four circle parameters.
+      Makes a normalization after setting.
+      The normal representation of a line leave out the last parameter.
+      */
+      void setN(const FloatType& n0,
+                const Vector2D& n12,
+                const FloatType& n3 = 0.0)
       { setN0(n0); setN12(n12); setN3(n3); normalize(); }
 
       /// Setter for all four circle parameters from another circle
@@ -153,23 +198,31 @@ namespace Belle2 {
       inline void reverse()
       { scaleN(-1); }
 
-      /// Transforms the generalized circle to conformal space inplace
-      /** Applies the conformal map in the self-inverse form  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
-       *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
+      /**
+      Transforms the generalized circle to conformal space inplace
+      Applies the conformal map in the self-inverse form
+      X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
+      It works most easily by the exchange of the circle parameters n0 <-> n3
+      */
       inline void conformalTransform()
       { std::swap(m_n0, m_n3); }
 
-      /// Moves the coordinate system by the given vector. Updates the circle parameters inplace.
+      /**
+      Moves the coordinate system by the given vector.
+      Updates the circle parameters inplace.
+      */
       void passiveMoveBy(const Vector2D& by)
       { setN(fastDistance(by), gradient(by), n3()); }
 
 
     protected:
-      ///Normalizes the circle parameters.
-      /** The normalization is only made if the circle parameters have a valid positiv
-       *  norm. If the normalization of the cirlce is negativ or zero all circle
-       *  parameters are not changed.
-       */
+      /**
+      Normalizes the circle parameters.
+
+      The normalization is only made if the circle parameters have a valid positiv
+      norm. If the normalization of the cirlce is negativ or zero all circle
+      parameters are not changed.
+      */
       inline void normalize()
       {
         FloatType normalization_squared = normalizationSquared();
@@ -177,29 +230,29 @@ namespace Belle2 {
       }
 
     private:
-      ///Scales the circle parameters by a common factor.
+      /// Scales the circle parameters by a common factor.
       inline void scaleN(const FloatType& factor)
       { m_n0 *= factor; m_n12 *= factor; m_n3 *= factor; }
 
 
     public:
-      ///Getter for the first circle parameter
+      /// Getter for the first circle parameter
       inline const FloatType& n0() const
       { return m_n0; }
 
-      ///Getter for the second circle parameter
+      /// Getter for the second circle parameter
       inline const FloatType& n1() const
       { return m_n12.x(); }
 
-      ///Getter for the third circle parameter
+      /// Getter for the third circle parameter
       inline const FloatType& n2() const
       { return m_n12.y(); }
 
-      ///Getter for the second and third circle parameter which natuarally from a vector
+      /// Getter for the second and third circle parameter which natuarally from a vector
       inline const Vector2D& n12() const
       { return m_n12; }
 
-      ///Getter for the fourth circle parameter
+      /// Getter for the fourth circle parameter
       inline const FloatType& n3() const
       { return m_n3; }
 
@@ -212,7 +265,10 @@ namespace Belle2 {
       inline bool isValid() const
       { return normalizationSquared() > 0; }
 
-      /// Calculates the generalized circle specific squared norm. Correctly normalized this should give one.
+      /**
+      Calculates the generalized circle specific squared norm.
+      Correctly normalized this should give one.
+       */
       inline FloatType normalizationSquared() const
       { return n12().normSquared() - 4 * n0() * n3(); }
 
@@ -223,66 +279,76 @@ namespace Belle2 {
       { return GeneralizedCircle(-n0(), -n12(), -n3()); }
 
     public:
-      /// Returns a copy of the circle in conformal space
-      /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) and returns the result as a new GeneralizedCircle
-       *  It works most easily by the exchange of the circle parameters n0 <-> n3 */
+      /**
+      Returns a copy of the circle in conformal space.
+      Applies the conformal map in the self-inverse from
+      X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) and
+      returns the result as a new GeneralizedCircle.
+      It works most easily by the exchange of the circle parameters n0 <-> n3
+      */
       inline GeneralizedCircle conformalTransformed() const
       { return GeneralizedCircle(n3(), n12(), n0()); }
 
     public:
-      /// Gradient of the distance field
       /**
-       * Gives the gradient of the approximated distance field for the given point.
-       * @param point Point in the plane to calculate the gradient
-       * @return Gradient of the distance field
+      Gradient of the distance field
+      Gives the gradient of the approximated distance field for the given point.
+      @param point Point in the plane to calculate the gradient
+      @return Gradient of the distance field
        */
       inline Vector2D gradient(const Vector2D& point) const
       { return point * (2.0 * n3()) + n12(); }
 
-      /// Normal vector to the circle near the given position
       /**
-       * Gives the unit normal vector to the circle line.
-       * It points to the outside of the circle for counterclockwise orientation,
-       * and inwards for the clockwise orientation.
-       * It is essentially the gradient normalized to unit length
-       * @param point Point in the plane to calculate the tangential
-       * @return Unit normal vector to the circle line
+      Normal vector to the circle near the given position.
+      Gives the unit normal vector to the circle line.
+      It points to the outside of the circle for counterclockwise orientation,
+      and inwards for the clockwise orientation.
+      It is essentially the gradient normalized to unit length
+      @param point Point in the plane to calculate the tangential
+      @return Unit normal vector to the circle line
        */
       inline Vector2D normal(const Vector2D& point) const
       { return gradient(point).unit(); }
 
-      /// Tangential vector to the circle near the given position
       /**
-       * Gives the unit tangential vector to the circle line.
-       * It always points in the direction of positiv advance
-       * at the point of closest approach from the given point.
-       * @param point Point in the plane to calculate the tangential
-       * @return Unit tangential vector to the circle line
+      Tangential vector to the circle near the given position.
+      Gives the unit tangential vector to the circle line.
+      It always points in the direction of positiv advance
+      at the point of closest approach from the given point.
+      @param point Point in the plane to calculate the tangential
+      @return Unit tangential vector to the circle line
        */
       inline Vector2D tangential(const Vector2D& point) const
       { return normal(point).orthogonal(); }
 
-      ///Closest approach on the circle to the point
       /**
-       * Calculates the closest point on the circle relative to the given point.
-       * @param point Point in the plane to calculate the closest approach to
-       * @return Point of closest approach on the circle.
+      Closest approach on the circle to the point.
+      Calculates the closest point on the circle relative to the given point.
+      @param point Point in the plane to calculate the closest approach to
+      @return Point of closest approach on the circle.
        */
       Vector2D closest(const Vector2D& point) const;
 
-      /// Calculates the closest approach to the two dimensional origin
+      /**
+      Calculates the closest approach to the two dimensional origin.
+      */
       Vector2D perigee() const;
 
-      /// Calculates the point on the circle that is furthest away from the origin.
-      /** This results in Vector2D(NAN, NAN) in the straight line case.*/
+      /**
+      Calculates the point on the circle that is furthest away from the origin.
+      This results in Vector2D(NAN, NAN) in the straight line case.
+      */
       Vector2D apogee() const;
 
-      /// Calculates if the to vector is closer to the from vector following the along orientation of the circle or against.
-      /** Returns:
-       *  * FORWARD in case the to vector is closer following the along the orientation
-       *  * BACKWARD in case the to vector is closer against the orientation.
-       *  * UNKNOWN_INFO if neither can be determined.
-       */
+      /**
+      Calculates if the to vector is closer to the from vector
+      following the along orientation of the circle or against.
+      Returns:
+      * FORWARD in case the to vector is closer following the along the orientation
+      * BACKWARD in case the to vector is closer against the orientation.
+      * UNKNOWN_INFO if neither can be determined.
+      */
       ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
       {
         Vector2D difference = to - from;
@@ -290,50 +356,62 @@ namespace Belle2 {
         return tangentialAtFrom.isForwardOrBackwardOf(difference);
       }
 
-      /// Returns the end point which is first reached if one follows the forward direction of the circle starting from the start point
       /**
-       * Evaluates which of the given end points end1 and end2 is closer to start
-       * This espicially treats the discontinuity on the far side of the circle correctly.
-       * If the generalized circle is truely a line none of the points might lie in the forward direction and Vector2D(NAN,NAN) is returned
-       * @param start Point to start the traversal
-       * @param end1 One possible end point
-       * @param end2 Other possible end point
-       * @return end1 or end2 depending, which lies closer to start in the forward direction or Vector2D(NAN,NAN) if neither end1 nor end2 are reachable in the forward direction (line case only)
+      Returns the end point which is first reached
+      if one follows the forward direction of the circle starting from the start point.
+      Evaluates which of the given end points end1 and end2 is closer to start
+      This espicially treats the discontinuity on the far side of the circle correctly.
+      If the generalized circle is truely a line none of the points might lie
+         in the forward direction and Vector2D(NAN,NAN) is returned.
+         @param start Point to start the traversal
+         @param end1 One possible end point
+         @param end2 Other possible end point
+         @return end1 or end2 depending, which lies closer to start in the forward direction or
+                 Vector2D(NAN,NAN) if neither end1 nor end2 are reachable in the forward direction
+                 (line case only)
        */
-      Vector2D chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
+      Vector2D chooseNextForwardOf(const Vector2D& start,
+                                   const Vector2D& end1,
+                                   const Vector2D& end2) const;
 
       /// Calculates the two points with the given cylindrical radius on the generalised circle
-      std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D> sameCylindricalR(
-        const FloatType& cylindricalR) const;
+      std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D>
+      sameCylindricalR(const FloatType& cylindricalR) const;
 
-      ///Approach with the same cylindrical radius on the circle to the point
       /**
-       * Calculates the point on the circle with the same cylindrical radius as the given point.
-       * This is particularly useful to extraplotate within  a certain layer.
-       * In case on intersection with this cylindrical radius exists the function return Vector2D(NAN,NAN)
-       * @param point Point in the plane to calculate the same cylindrical radius point on the circle
-       * @return Close point with same cylindrical radius on the circle
+      Approach with the same cylindrical radius on the circle to the point.
+      Calculates the point on the circle with the same cylindrical radius as the given point.
+      This is particularly useful to extraplotate within  a certain layer.
+      In case on intersection with this cylindrical radius does not exist return
+      Vector2D(NAN,NAN).
+      @param point   Point to which to extrapolate.
+      @return Close  Point with same cylindrical radius on the circle
        */
       Vector2D sameCylindricalR(const Vector2D& point) const;
 
-      ///Approach on the circle with the given cylindrical radius that lies in the forward direction of a start point
       /**
-       * Calculates the point on the circle with cylindrical radius cylindricalR,
-       * which is closest following the circle in the direction of positive forward orientation
-       * This is particularly useful to extraplotate into a certain layer.
-       * In case on intersection with this cylindrical radius exists the function return Vector2D(NAN,NAN)
-       * @param startPoint Start point from which to follow in the circle in the forward direction
-       * @param cylindricalR Cylindrical radius of interest
-       * @return Close point in forward direction with same cylindrical radius on the circle.
-       */
-      Vector2D sameCylindricalRForwardOf(const Vector2D& startPoint, const FloatType& cylindricalR) const;
+         Approach on the circle with the given cylindrical radius
+         that lies in the forward direction of a start point.
 
-      /// Approximate distance
+         Calculates the point on the circle with cylindrical radius cylindricalR,
+         which is closest following the circle in the direction of positive forward orientation
+         This is particularly useful to extraplotate into a certain layer.
+         In case no intersection with this cylindrical radius exists
+      the function returns Vector2D(NAN,NAN)
+         @param startPoint Start point from which to follow in the circle in the forward direction
+         @param cylindricalR Cylindrical radius of interest
+         @return Close point in forward direction with same cylindrical radius on the circle.
+       */
+      Vector2D sameCylindricalRForwardOf(const Vector2D& startPoint,
+                                         const FloatType& cylindricalR) const;
+
       /**
-       * Gives a fast signed approximation of the distance to the circle.
-       * The absolute value of the fast distance is accurate up to first
-       * order of distance/circle radius, hence best used with big circles and small distances.
-       * The sign of the fast distance indicates if the point is to the right or to the left of the circle.
+         Approximate distance.
+         Gives a fast signed approximation of the distance to the circle.
+         The absolute value of the fast distance is accurate up to first
+         order of distance/circle radius, hence best used with big circles and small distances.
+         The sign of the fast distance indicates if the point is to the right or to the left of the
+         circle.
        */
       inline FloatType fastDistance(const Vector2D& point) const
       { return n0() + point.dot(n12()) + point.normSquared() * n3(); }
@@ -342,13 +420,23 @@ namespace Belle2 {
       inline FloatType fastImpact() const
       { return n0(); }
 
-      /// Gives the proper distance of the point to the circle line retaining the sign of the fast distance.
+      /**
+      Gives the proper distance of the point to the circle line
+          retaining the sign of the fast distance.
+       */
       FloatType distance(const Vector2D& point) const;
 
-      /// Helper function to translate the fast linearized distance measure of the generalized circle to the proper distance from the circle retaining the sign of the distance.
+      /**
+      Helper function to translate the fast linearized distance measure
+          of the generalized circle to the proper distance from the circle
+          retaining the sign of the distance.
+       */
       FloatType distance(const FloatType& fastDistance) const;
 
-      /// Helper function to translate the proper distance to the linearized distance measure of the generalized circle retaining the sign of the distance.
+      /**
+      Helper function to translate the proper distance to the linearized distance measure of
+      the generalized circle retaining the sign of the distance.
+       */
       FloatType fastDistance(const FloatType& distance) const
       { return (distance * n3() + 1.0) * distance; }
 
@@ -376,7 +464,10 @@ namespace Belle2 {
       inline FloatType absDistance(const Vector2D& point) const
       { return fabs(distance(point)); }
 
-      /// Indicates if the point is on the right or left side of the circle. This is also refered to as alpha.
+      /**
+      Indicates if the point is on the right or left side of the circle.
+      This is also refered to as alpha.
+      */
       RightLeftInfo isRightOrLeft(const Vector2D& point) const
       { return sign(fastDistance(point)); }
 
@@ -404,9 +495,16 @@ namespace Belle2 {
       inline FloatType absRadius() const
       { return fabs(radius()); }
 
-      /// Gives  the signed curvature of the generalized circle
+      /// Gives the signed curvature of the generalized circle
       inline FloatType curvature() const
       { return 2 * n3(); }
+
+      /**
+      Gives the omega parameter as used by the framework helix.
+      It is the signed curvature of the generalized circle with the opposite sign.
+      */
+      inline FloatType omega() const
+      { return -curvature(); }
 
       /// Gives the center of the circle. If it was a line both components will be infinity
       inline Vector2D center() const
@@ -416,54 +514,61 @@ namespace Belle2 {
       inline FloatType perimeter() const
       { return 2 * PI * radius(); }
 
-      /// Gives the orientation of the circle
       /**
-       * The circle can be either orientated counterclockwise or clockwise.
-       * @return CCW for counterclockwise travel, CW for clockwise.
+      Gives the orientation of the circle.
+         The circle can be either orientated counterclockwise or clockwise.
+         @return CCW for counterclockwise travel, CW for clockwise.
        */
       inline CCWInfo orientation() const
       {  return sign(n3()); }
 
-      /// Calculates the angle between two points of closest approach on the circle
       /**
-       * The angle is signed positiv for a counterclockwise rotation.
-       * The points are essentially first taken to their closest approach
-       * before we take the opening angle as seen from the circle center.
-       * The angle will zero if the generalized circle was line.
+      Calculates the angle between two points of closest approach on the circle.
+         The angle is signed positiv for a counterclockwise rotation.
+         The points are essentially first taken to their closest approach
+         before we take the opening angle as seen from the circle center.
+         The angle will zero if the generalized circle was line.
        */
       inline FloatType openingAngleBetween(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
 
 
-      /// Calculates the arc length between two points of closest approach on the circle.
       /**
-       * The arc length is signed positiv for travel in orientation direction.
-       * In the circle case the arc length is between -PI*radius and PI*radius,
-       * hence the discontinuity is on the far side of the circle relative to the given from point.
-       * The points are essentially first taken to their closest approach
-       * before we take the length on the curve.
-       * For the line case the length is the distance component parallel to the line.
+      Calculates the arc length between two points of closest approach on the circle.
+         The arc length is signed positiv for travel in orientation direction.
+         In the circle case the arc length is between -PI*radius and PI*radius,
+         hence the discontinuity is on the far side of the circle relative to the given from point.
+         The points are essentially first taken to their closest approach
+         before we take the length on the curve.
+         For the line case the length is the distance component parallel to the line.
        */
       FloatType arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
 
       /// Calculates the arc length between the perigee and the given point.
       FloatType arcLengthTo(const Vector2D& point) const;
 
-      /// Helper function the calculate the factor between the length of a secant line and the length on the arc.
       /**
-       *  Smooth function expressing the relation between arc length and direct length
-       *  only using the curvature of the circle as additional information.
-       *  It enables better handling of the line limit compared to the former implementaiton
-       *  which used the opening angle of the arc.
+      Helper function the calculate the factor between the length of a secant line and
+      the length on the arc.
+      Smooth function expressing the relation between arc length and direct length
+      only using the curvature of the circle as additional information.
+      It enables better handling of the line limit compared to the former implementaiton
+      which used the opening angle of the arc.
        */
       FloatType arcLengthFactor(const FloatType& directDistance) const;
 
-      /// Calculates the two points common to both circles.
-      /** If the two points coincide both returned points are the same. If there is no common point both returned points will be  made of NAN.*/
+      /**
+      Calculates the two points common to both circles.
+      If the two points coincide both returned points are the same.
+      If there is no common point both returned points will be made of NAN.
+      */
       std::pair<Vector2D, Vector2D> intersections(const GeneralizedCircle& generalizedCircle) const;
 
 
-      /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
+      /**
+      Calculates the point, which lies at the give perpendicular travel distance
+      (counted from the perigee)
+      */
       Vector2D atArcLength(const FloatType& arcLength) const;
 
 
@@ -483,15 +588,18 @@ namespace Belle2 {
 
     private:
       // Order of this parameters make them easier to initialize
-      FloatType m_n3; ///< Memory for the fourth parameter
-      Vector2D m_n12; ///< Memory for the second and third parameter
-      FloatType m_n0; ///< Memory for the first parameter
 
-      /// ROOT Macro to make GeneralizedCircle a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(GeneralizedCircle, 1);
+      /// Memory for the fourth parameter
+      FloatType m_n3;
+
+      /// Memory for the second and third parameter
+      Vector2D m_n12;
+
+      /// Memory for the first parameter
+      FloatType m_n0;
 
     }; //class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // GENERALIZEDCIRCLE
+#endif // GENERALIZEDCIRCLE_H

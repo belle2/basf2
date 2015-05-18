@@ -10,6 +10,7 @@
 
 
 #include <analysis/VariableManager/MetaVariables.h>
+#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -195,6 +196,54 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function daughter");
       }
     }
+
+    Manager::FunctionPtr veto(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+
+        std::string roeListName = "Test";
+        std::string cutString = "Test";
+        try {
+          roeListName = boost::lexical_cast<std::string>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of veto meta function must be string!");
+          return nullptr;
+        }
+        try {
+          cutString = boost::lexical_cast<std::string>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of veto meta function must be string!");
+          return nullptr;
+        }
+
+        auto func = [roeListName, cutString](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          else {
+            StoreObjPtr<ParticleList> roeList(roeListName);
+            TLorentzVector vec = particle->get4Vector();
+
+            for (unsigned int i = 0; i < roeList->getListSize(); i++)
+            {
+              Particle* roeParticle = roeList->getParticle(i);
+              if (roeParticle->getMdstArrayIndex() != particle->getMdstArrayIndex()) {
+                TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
+                Particle tempParticle = Particle(tempCombination, 11);
+                Variable::Cut cut = Cut(cutString);
+                if (cut.check(&tempParticle)) {
+                  return 1;
+                }
+              }
+            }
+            return 0;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function veto");
+      }
+    }
+
 
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments)
     {

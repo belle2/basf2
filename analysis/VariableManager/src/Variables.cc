@@ -670,12 +670,12 @@ namespace Belle2 {
         if ((p_Photon->getEnergy() >= 0.1) && (p_Photon->getMdstArrayIndex() != sig_Photon->getMdstArrayIndex())) {
           double tempCombination = (p_Photon->get4Vector() + vec).M();
           if (abs(tempCombination - pion0Mass) <= deltaE) {
-            return 1.;
-          };
-        };
-      };
+            return 1;
+          }
+        }
+      }
 
-      return 0.;
+      return 0;
     }
 
     // TDCPV related ---------------------------------------------------------

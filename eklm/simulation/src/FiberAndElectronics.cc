@@ -99,19 +99,16 @@ void EKLM::FiberAndElectronics::processEntry()
       m_npe = m_npe + gnpe;
     }
   }
-
-  // sum up histograms
+  /* Sum up histograms. */
   for (i = 0; i < m_digPar->nDigitizations; i++) {
     m_amplitude[i] = m_amplitudeDirect[i];
     if (m_digPar->mirrorReflectiveIndex > 0)
       m_amplitude[i] = m_amplitude[i] + m_amplitudeReflected[i];
   }
-
   /* SiPM noise and ADC. */
   if (m_digPar->meanSiPMNoise > 0)
     addRandomSiPMNoise();
   simulateADC();
-
   /* Fit. */
   m_FPGAParams.bgAmplitude = m_digPar->ADCPedestal;
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
@@ -123,19 +120,7 @@ void EKLM::FiberAndElectronics::processEntry()
    * time = ADC conversion time,
    * amplitude = amplitude * 0.5 * m_digPar->ADCRange.
    */
-
-  //* --------------------------     this is a very simple procedure to find a start time instead of the fit
-  // to be removed or modified...
-
-  int my_thr = 100;
-  m_FPGAParams.startTime = 0;
-  for (int i = 0 ; i < m_digPar->nDigitizations; i++)
-    if (m_ADCAmplitude[i] > my_thr) {
-      m_FPGAParams.startTime = i * m_digPar->ADCSamplingTime;
-      break;
-    }
-  //  std::cout << "-------------------------------- " << m_FPGAParams.startTime << std::endl;
-  //  m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
+  m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_digPar->ADCSamplingTime;
   m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /
                                  m_digPar->ADCSamplingTime;
@@ -188,7 +173,7 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
     hitTime = hitDist / digPar->fiberLightSpeed + deExcitationTime +
               timeShift;
     for (j = 0; j < digPar->nDigitizations; j++) {
-      digTime = j * digPar->ADCSamplingTime;
+      digTime = j * digPar->ADCSamplingTime + 0.5;
       if (digTime > hitTime + dt)
         sig = (exp(-digPar->PEAttenuationFreq * (digTime - hitTime - dt)) -
                exp(-digPar->PEAttenuationFreq * (digTime - hitTime + dt))

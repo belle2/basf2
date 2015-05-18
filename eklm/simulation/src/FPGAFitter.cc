@@ -78,7 +78,7 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   double sig;
   fval = 0.0;
   for (i = 0; i < n; i++) {
-    sig = SignalShapeFitFunction(i, par);
+    sig = SignalShapeFitFunction((double)i + 0.5, par);
     if (famp[i] < 0.5)
       fval = fval + 2.0 * sig;
     else

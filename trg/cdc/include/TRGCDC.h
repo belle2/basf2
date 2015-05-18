@@ -93,6 +93,12 @@ class TRGCDC {
     /// configuration before calling this function.
     static TRGCDC * getTRGCDC(void);
 
+    /// return trackList
+    std::vector<TRGCDCTrack *> getTrackList(void);
+
+    /// return trackList3D
+    std::vector<TRGCDCTrack *> getTrackList3D(void);
+
   private:
 
     /// Constructor
@@ -253,6 +259,12 @@ class TRGCDC {
     /// returns a pointer to a track segment layer. 0 will be returned
     /// if 'id' is invalid.
     const TRGCDCLayer * segmentLayer(unsigned id) const;
+
+    /// trackList for fast simulation
+    std::vector<TRGCDCTrack *> trackList;
+
+    /// trackList3D for fast simulation
+    std::vector<TRGCDCTrack *> trackList3D;
 
   public:// Event by event hit information.
 

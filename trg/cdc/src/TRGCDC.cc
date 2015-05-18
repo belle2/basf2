@@ -164,6 +164,20 @@ TRGCDC::getTRGCDC(void) {
     return _cdc;
 }
 
+vector<TCTrack *>
+TRGCDC::getTrackList(void) {
+
+    return trackList;
+
+}
+
+vector<TCTrack *>
+TRGCDC::getTrackList3D(void) {
+
+    return trackList3D;
+
+}
+
 TRGCDC::TRGCDC(const string & configFile,
                unsigned simulationMode,
                unsigned fastSimulationMode,
@@ -905,6 +919,9 @@ TRGCDC::fastClear(void) {
 
 void
 TRGCDC::update(bool) {
+
+    trackList.clear();
+    trackList3D.clear();
 
     //cout << "               -------------A TRGCDC is updated-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC update");
@@ -2038,7 +2055,7 @@ TRGCDC::fastSimulation(void) {
     //...2D tracker : Hough finder...
     //cout<<"################start##########"<<endl; //JB: Please use TRGDebug
 	  if (TRGDebug::level()) cout << TRGDebug::tab() <<"################start##########"<<endl;
-    vector<TCTrack *> trackList;
+    //vector<TCTrack *> trackList;
     if (_perfect2DFinder)
         _pFinder->doit(trackList);
     else
@@ -2101,7 +2118,7 @@ TRGCDC::fastSimulation(void) {
     _eventTime.back()->getT0();
 
     //...3D tracker...
-    vector<TCTrack*> trackList3D;
+    //vector<TCTrack*> trackList3D;
     //_fitter3D->doit(trackList, trackList3D);
     _fitter3D->doitComplex(trackList, trackList3D);
 

@@ -17,6 +17,8 @@ import pstats
 
 import logging
 
+from ROOT import Belle2
+
 
 def get_logger():
     return logging.getLogger(__name__)
@@ -235,3 +237,38 @@ class PathModule(basf2.Module):
         """
 
         self.return_value(True)
+
+
+class IfPathWithStoreArrayName(PathModule):
+
+    """ Special Path which conditionally executes a given module only of the given store array name is not already present in the
+    store array
+
+    Attributes
+    ----------
+    modules or path: list of basf2.Module or path
+        The modules/path executed if a StoreArray with the given name is not already present
+    store_array_name:
+        The given name for the store array
+
+    """
+
+    def __init__(self, store_array_name, path=None, modules=None):
+        """ Initialization method sending the parameters to the base class IfModule """
+
+        self.is_not_store_array = None
+        self.store_array_name = store_array_name
+
+        super(IfPathWithStoreArrayName, self).__init__(path=path, modules=modules)
+
+    def search_for_store_array_name_condition(self):
+        if self.is_not_store_array is None:
+            store_array_list = Belle2.PyStoreArray.list()
+            self.is_not_store_array = self.store_array_name not in store_array_list
+
+        print self.is_not_store_array
+        return self.is_not_store_array
+
+    def event(self):
+        """ Only execute the event if the condition is true """
+        self.return_value(self.search_for_store_array_name_condition())

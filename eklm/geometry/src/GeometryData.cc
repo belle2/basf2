@@ -11,6 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -181,17 +182,17 @@ bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   if (hit1->getPlane() == hit2->getPlane())
     return false;
   /* Coordinates of strip 1 ends. */
-  double l1 = getStripLength(hit1->getStrip()) * 10.0; /* mm */
+  double l1 = getStripLength(hit1->getStrip()) / Unit::mm * CLHEP::mm;
   HepGeom::Point3D<double> s1_1(-0.5 * l1, 0.0, 0.0);
   HepGeom::Point3D<double> s1_2(0.5 * l1, 0.0, 0.0);
-  HepGeom::Transform3D* tr1 = getStripTransform(&transf, hit1);
+  HepGeom::Transform3D* tr1 = getStripLocalToGlobal(&transf, hit1);
   HepGeom::Point3D<double> s1_1g = (*tr1) * s1_1;
   HepGeom::Point3D<double> s1_2g = (*tr1) * s1_2;
   /* Coordinates of strip 2 ends. */
-  double l2 = getStripLength(hit2->getStrip()) * 10.0; /* mm */
+  double l2 = getStripLength(hit2->getStrip()) / Unit::mm * CLHEP::mm;
   HepGeom::Point3D<double> s2_1(-0.5 * l2, 0.0, 0.0);
   HepGeom::Point3D<double> s2_2(0.5 * l2, 0.0, 0.0);
-  HepGeom::Transform3D* tr2 = getStripTransform(&transf, hit2);
+  HepGeom::Transform3D* tr2 = getStripLocalToGlobal(&transf, hit2);
   HepGeom::Point3D<double> s2_1g = (*tr2) * s2_1;
   HepGeom::Point3D<double> s2_2g = (*tr2) * s2_2;
   /**

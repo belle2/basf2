@@ -165,6 +165,8 @@ void EKLM::transformsToGlobal(struct EKLM::TransformData* dat)
           for (i5 = 0; i5 < 75; i5++) {
             dat->strip[i1][i2][i3][i4][i5] = dat->plane[i1][i2][i3][i4] *
                                              dat->strip[i1][i2][i3][i4][i5];
+            dat->stripInverse[i1][i2][i3][i4][i5] =
+              dat->strip[i1][i2][i3][i4][i5].inverse();
           }
         }
       }
@@ -172,10 +174,19 @@ void EKLM::transformsToGlobal(struct EKLM::TransformData* dat)
   }
 }
 
-HepGeom::Transform3D* EKLM::getStripTransform(struct EKLM::TransformData* dat,
-                                              EKLMDigit* hit)
+HepGeom::Transform3D* EKLM::getStripLocalToGlobal(
+  struct EKLM::TransformData* dat, EKLMDigit* hit)
 {
   return &(dat->strip[hit->getEndcap() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
+
+
+HepGeom::Transform3D* EKLM::getStripGlobalToLocal(
+  struct EKLM::TransformData* dat, EKLMDigit* hit)
+{
+  return &(dat->stripInverse[hit->getEndcap() - 1][hit->getLayer() - 1]
+           [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
+}
+
 

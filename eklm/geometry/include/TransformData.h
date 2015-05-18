@@ -54,6 +54,7 @@ namespace Belle2 {
       HepGeom::Transform3D sector[2][14][4];
       HepGeom::Transform3D plane[2][14][4][2];
       HepGeom::Transform3D strip[2][14][4][2][75];
+      HepGeom::Transform3D stripInverse[2][14][4][2][75];
     };
 
     /**
@@ -88,15 +89,26 @@ namespace Belle2 {
     void transformsToGlobal(struct TransformData* dat);
 
     /**
-     * Get strip transformation by hit.
+     * Get strip local to global transformation by hit.
      * @param[in] dat Transformation data.
      * @param[in] hit Hit.
      * @return Transformation.
      * @details
-     * Output units are mm.
+     * The transformation uses GEANT/CLHEP units (mm)!.
      */
-    HepGeom::Transform3D* getStripTransform(struct TransformData* dat,
-                                            EKLMDigit* hit);
+    HepGeom::Transform3D* getStripLocalToGlobal(struct TransformData* dat,
+                                                EKLMDigit* hit);
+
+    /**
+     * Get strip global to local transformation by hit.
+     * @param[in] dat Transformation data.
+     * @param[in] hit Hit.
+     * @return Transformation.
+     * @details
+     * The transformation uses GEANT/CLHEP units (mm)!
+     */
+    HepGeom::Transform3D* getStripGlobalToLocal(struct TransformData* dat,
+                                                EKLMDigit* hit);
 
   }
 

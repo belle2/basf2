@@ -18,6 +18,7 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Unit.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
@@ -33,6 +34,8 @@ EKLMTimeCalibrationModule::EKLMTimeCalibrationModule() : Module()
            std::string("eklm_time_calibration.root"));
   m_outputFile = NULL;
   m_nStripDifferent = -1;
+  m_Tree = NULL;
+  m_ev = {0, 0};
 }
 
 EKLMTimeCalibrationModule::~EKLMTimeCalibrationModule()
@@ -81,13 +84,15 @@ void EKLMTimeCalibrationModule::beginRun()
 void EKLMTimeCalibrationModule::event()
 {
   int i, j, k, n, n2, vol;
-  double hitTime, dist[2], sd;
+  double l, hitTime;
+  TVector3 hitPosition;
+  HepGeom::Point3D<double> hitGlobal, hitLocal;
   StoreArray<Track> tracks;
   StoreArray<EKLMHit2d> hit2ds;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, itLower, itUpper;
   ExtHit* extHit, *entryHit[2], *exitHit[2];
-  HepGeom::Point3D<double> crossPoint(0, 0, 0);
+  HepGeom::Transform3D* tr;
   n = tracks.getEntries();
   for (i = 0; i < n; i++) {
     RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
@@ -139,13 +144,18 @@ void EKLMTimeCalibrationModule::event()
     if (entryHit[0] == NULL || exitHit[0] == NULL ||
         entryHit[1] == NULL || exitHit[1] == NULL)
       continue;
-    /* The strips are already known to intersect - not necessary to check. */
-    m_geoDat.intersection(digits[0], digits[1], &crossPoint,
-                          &dist[0], &dist[1], &sd);
     for (j = 0; j < 2; j++) {
       hitTime = 0.5 * (entryHit[j]->getTOF() + exitHit[j]->getTOF());
+      hitPosition = 0.5 * (entryHit[j]->getPosition() +
+                           exitHit[j]->getPosition());
+      l = m_geoDat.getStripLength(digits[j]->getStrip());
+      hitGlobal.setX(hitPosition.X() / Unit::mm * CLHEP::mm);
+      hitGlobal.setY(hitPosition.Y() / Unit::mm * CLHEP::mm);
+      hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);
+      tr = getStripGlobalToLocal(&m_geoDat.transf, digits[j]);
+      hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
-      m_ev.dist = dist[j];
+      m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
       k = m_geoDat.getStripLengthIndex(digits[j]->getStrip() - 1);
       m_Tree[k]->Fill();
     }

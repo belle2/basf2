@@ -43,7 +43,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
         "SegmentPairFilter": "mc",
-        "SegmentPairNeighborChooser": "none",
+        "SegmentPairRelationFilter": "none",
     })
     fit_method_name = "fuse-xy"
     # Specification for BrowseTFileOnTerminateRunMixin
@@ -97,23 +97,23 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
         elif fit_method_name == 'fuse-simple':
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
-            def simple_axial_stereo_fusion_fit(pair):
+            def simple_segment_pair_fusion_fit(pair):
                 return CDCAxialStereoFusion.reconstructTrajectories(pair)
-            return simple_axial_stereo_fusion_fit
+            return simple_segment_pair_fusion_fit
 
         elif fit_method_name == 'fuse-xy':
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
-            def xy_axial_stereo_fusion_fit(pair):
+            def xy_segment_pair_fusion_fit(pair):
                 return CDCAxialStereoFusion.reconstructFuseTrajectories(pair, False)
-            return xy_axial_stereo_fusion_fit
+            return xy_segment_pair_fusion_fit
 
         elif fit_method_name == 'fuse-sz':
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
-            def sz_axial_stereo_fusion_fit(pair):
+            def sz_segment_pair_fusion_fit(pair):
                 return CDCAxialStereoFusion.reconstructFuseTrajectories(pair, True)
-            return sz_axial_stereo_fusion_fit
+            return sz_segment_pair_fusion_fit
 
         else:
             raise ValueError("Unexpected fit_positions %s" % fit_method_name)
@@ -156,21 +156,21 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
-    def pick(self, axial_stereo_segment_pair):
+    def pick(self, segment_pair_relation):
         mc_segment_lookup = self.mc_segment_lookup
-        start_segment = axial_stereo_segment_pair.getStartSegment()
-        end_segment = axial_stereo_segment_pair.getEndSegment()
+        start_segment = segment_pair_relation.getStartSegment()
+        end_segment = segment_pair_relation.getEndSegment()
         mc_particle = mc_segment_lookup.getMCParticle(start_segment)
         return (mc_particle and
                 is_primary(mc_particle) and
                 start_segment.size() > 3 and
                 end_segment.size() > 3)
 
-    def peel(self, axial_stereo_segment_pair):
+    def peel(self, segment_pair_relation):
         mc_segment_lookup = self.mc_segment_lookup
 
-        start_segment = axial_stereo_segment_pair.getStartSegment()
-        end_segment = axial_stereo_segment_pair.getEndSegment()
+        start_segment = segment_pair_relation.getStartSegment()
+        end_segment = segment_pair_relation.getEndSegment()
 
         mc_particle = mc_segment_lookup.getMCParticle(start_segment)
 
@@ -182,7 +182,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
             tan_lambda_truth=fit3d_truth.getTanLambda(),
         )
 
-        segment_pair_crops = cdc_peelers.peel_axial_stereo_segment_pair(axial_stereo_segment_pair)
+        segment_pair_crops = cdc_peelers.peel_segment_pair_relation(segment_pair_relation)
         segment_pair_crops.update(truth_crops)
         return segment_pair_crops
 

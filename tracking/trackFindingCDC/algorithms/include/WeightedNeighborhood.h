@@ -334,50 +334,50 @@ namespace Belle2 {
        *  Since we already sorted out the arrangement of entities during their creation, we have to define \n
        *  the region where to look for neighbors. We keep the general logic for look up the same \n
        *  but vary the definition of what a neighborhood is supposed to be we factor the later out into \n
-       *  a strategy object called the NeighborChooser with the following interface methods : \n
+       *  a strategy object called the RelationFilter with the following interface methods : \n
        *  * getPossibleNeighbors(item, itBegin, itEnd) returns a range iterable object of items which are possible neighbors \n
        *
        *  * isGoodNeighbor(item, neighborItem) checks every neighboring object and returns a weight to indicate the quality of the neighbor.\n
        *    It returns NOT_A_NEIGHBOR (NaN) in case the neighbor is invalid and shall not be saved.\n
        */
       /**@{*/
-      /// Clears the neighborhood and creates relations between elements in the given range using an instance of the NeighborChooser given as first template argument.
-      template<class NeighborChooser, class ItemRange>
+      /// Clears the neighborhood and creates relations between elements in the given range using an instance of the RelationFilter given as first template argument.
+      template<class RelationFilter, class ItemRange>
       void createUsing(const ItemRange& itemRange)
       {
         clear();
-        appendUsing<NeighborChooser>(itemRange);
+        appendUsing<RelationFilter>(itemRange);
       }
 
-      /// Clears the neighborhood and creates relations between elements in the given range using the NeighborChooser given as first function argument.
-      template<class NeighborChooser, class ItemRange>
-      void createUsing(NeighborChooser& chooser, const ItemRange& itemRange)
+      /// Clears the neighborhood and creates relations between elements in the given range using the RelationFilter given as first function argument.
+      template<class RelationFilter, class ItemRange>
+      void createUsing(RelationFilter& relationFilter, const ItemRange& itemRange)
       {
         clear();
-        appendUsing(chooser, itemRange);
+        appendUsing(relationFilter, itemRange);
       }
 
-      /// Appends relations between elements in the given range using an instance of the NeighborChooser given as first template argument to the existing neighborhood.
-      template<class NeighborChooser, class ItemRange>
+      /// Appends relations between elements in the given range using an instance of the RelationFilter given as first template argument to the existing neighborhood.
+      template<class RelationFilter, class ItemRange>
       void appendUsing(const ItemRange& itemRange)
       {
-        NeighborChooser chooser;
-        appendUsing(chooser, itemRange);
+        RelationFilter relationFilter;
+        appendUsing(relationFilter, itemRange);
       }
 
-      /// Appends relations between elements in the given range using the NeighborChooser given as first function argument to the existing neighborhood.
-      template<class NeighborChooser, class ItemRange>
-      void appendUsing(NeighborChooser& chooser, const ItemRange& itemRange)
+      /// Appends relations between elements in the given range using the RelationFilter given as first function argument to the existing neighborhood.
+      template<class RelationFilter, class ItemRange>
+      void appendUsing(RelationFilter& relationFilter, const ItemRange& itemRange)
       {
         //forget everything from former creations
-        chooser.clear();
+        relationFilter.clear();
         Relation<Item> neighborRelation;
         for (const auto& item : itemRange) {
           neighborRelation.first = item;
-          for (const auto& possibleNeighbor : chooser.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
+          for (const auto& possibleNeighbor : relationFilter.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
             neighborRelation.second = possibleNeighbor;
 
-            NeighborWeight weight = chooser(neighborRelation);
+            NeighborWeight weight = relationFilter(neighborRelation);
 
             if (not isNotANeighbor(weight)) {
               // The neighborhood takes references and keeps them

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilters.h>
-#include <tracking/trackFindingCDC/filters/facet_facet/FacetNeighborChoosers.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilters.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -25,13 +25,13 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
   SegmentFinderCDCFacetAutomatonImplModule<>(c_Symmetric),
   m_clusterFilterFactory("all"),
   m_facetFilterFactory("realistic"),
-  m_facetNeighborChooserFilterFactory("simple")
+  m_facetRelationFilterFilterFactory("simple")
 {
   setDescription("Versatile module with adjustable filters for segment generation.");
 
   m_clusterFilterFactory.exposeParameters(this);
   m_facetFilterFactory.exposeParameters(this);
-  m_facetNeighborChooserFilterFactory.exposeParameters(this);
+  m_facetRelationFilterFilterFactory.exposeParameters(this);
 }
 
 void SegmentFinderCDCFacetAutomatonDevModule::initialize()
@@ -43,15 +43,15 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   std::unique_ptr<BaseFacetFilter> ptrFacetFilter = m_facetFilterFactory.create();
   setFacetFilter(std::move(ptrFacetFilter));
 
-  std::unique_ptr<BaseFacetNeighborChooser>
-  ptrFacetNeighborChooser = m_facetNeighborChooserFilterFactory.create();
-  setFacetNeighborChooser(std::move(ptrFacetNeighborChooser));
+  std::unique_ptr<BaseFacetRelationFilter>
+  ptrFacetRelationFilter = m_facetRelationFilterFilterFactory.create();
+  setFacetRelationFilter(std::move(ptrFacetRelationFilter));
 
   SegmentFinderCDCFacetAutomatonImplModule<>::initialize();
 
   if (getClusterFilter()->needsTruthInformation() or
       getFacetFilter()->needsTruthInformation() or
-      getFacetNeighborChooser()->needsTruthInformation()) {
+      getFacetRelationFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -61,7 +61,7 @@ void SegmentFinderCDCFacetAutomatonDevModule::event()
 {
   if (getClusterFilter()->needsTruthInformation() or
       getFacetFilter()->needsTruthInformation() or
-      getFacetNeighborChooser()->needsTruthInformation()) {
+      getFacetRelationFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 

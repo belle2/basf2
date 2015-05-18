@@ -9,24 +9,27 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/axial_segment_pair/MCAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
-#include "BaseSegmentTripleFilter.h"
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
+#include "BaseFacetRelationFilter.h"
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the constuction of segment triples based on monte carlo information
-    class MCSegmentTripleFilter  : public Filter<CDCSegmentTriple> {
+    ///Class filtering the neighborhood of facets with monte carlo information
+    class MCFacetRelationFilter : public Filter<Relation<CDCFacet>> {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCSegmentTriple> Super;
+      typedef Filter<Relation<CDCFacet>> Super;
 
     public:
-      /// Constructor initializing the symmetry flag.
-      MCSegmentTripleFilter(bool allowReverse = true);
+      /// Importing all overloads from the super class
+      using Super::operator();
+
+    public:
+      /** Constructor also setting the switch if the reversed version of a facet
+       *  (in comparision to MC truth) shall be accepted.
+       */
+      MCFacetRelationFilter(bool allowReverse = true) : m_mcFacetFilter(allowReverse) {;}
 
     public:
       /// May be used to clear information from former events. Currently unused.
@@ -38,12 +41,13 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       virtual void terminate() IF_NOT_CINT(override final);
 
+
+    public:
       /** Set the parameter with key to value.
        *
        *  Parameters are:
-       *  symmetric -  Accept the axial segment triple if the reverse segment triple
-       *               is correct preserving the progagation reversal symmetry
-       *               on this level of detail.
+       *  symmetric -  Accept the relation facet if the reverse relation facet is correct
+       *               preserving the progagation reversal symmetry on this level of detail.
        *               Allowed values "true", "false". Default is "true".
        */
       virtual
@@ -57,35 +61,30 @@ namespace Belle2 {
       /// Indicates that the filter requires Monte Carlo information.
       virtual bool needsTruthInformation() IF_NOT_CINT(override final);
 
-      /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      virtual CellWeight operator()(const CDCSegmentTriple& triple) IF_NOT_CINT(override final);
-
-    private:
-      /// Sets the trajectories of the segment triple from Monte Carlo information. IS executed for good segment triples.
-      void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
+    public:
+      /** Main filter method returning the weight of the neighborhood relation.
+       *  Return NOT_A_NEIGHBOR if relation shall be rejected.
+       */
+      virtual NeighborWeight operator()(const CDCFacet& fromFacet,
+                                        const CDCFacet& toFacet) override final;
 
     public:
       /// Setter for the allow reverse parameter
       void setAllowReverse(bool allowReverse)
       {
-        m_param_allowReverse = allowReverse;
-        m_mcAxialSegmentPairFilter.setAllowReverse(allowReverse);
+        m_mcFacetFilter.setAllowReverse(allowReverse);
       }
 
       /// Getter for the allow reverse parameter
       bool getAllowReverse() const
       {
-        return m_param_allowReverse;
+        return m_mcFacetFilter.getAllowReverse();
       }
 
     private:
-      /// Switch to indicate if the reversed version of the segment triple shall also be accepted (default is true).
-      bool m_param_allowReverse;
+      /// Monte Carlo cell filter to reject neighborhoods have false cells
+      MCFacetFilter m_mcFacetFilter;
 
-      /// Instance of the cell filter to reject neighborhoods of false cells.
-      MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
-
-
-    }; // end class MCSegmentTripleFilter
+    }; // end class
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

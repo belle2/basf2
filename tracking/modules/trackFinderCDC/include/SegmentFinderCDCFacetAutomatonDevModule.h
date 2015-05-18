@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/facet_facet/FacetNeighborChooserFactory.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilterFactory.h>
 
 namespace Belle2 {
 
@@ -48,7 +48,7 @@ namespace Belle2 {
        Factory for the facet relation filter, knowing all the available filters and
        their respective parameters
     */
-    Belle2::TrackFindingCDC::FacetNeighborChooserFactory m_facetNeighborChooserFilterFactory;
+    Belle2::TrackFindingCDC::FacetRelationFilterFactory m_facetRelationFilterFilterFactory;
 
 
   }; // end class

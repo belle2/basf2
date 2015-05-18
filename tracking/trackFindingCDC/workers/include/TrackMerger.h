@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-#include <tracking/trackFindingCDC/filters/wirehit_wirehit/WireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/wirehit_relation/WireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
@@ -47,14 +47,16 @@ namespace Belle2 {
       void terminate() {}
 
       /// Generates the segments from the event topology.
-      inline void merge(std::vector<CDCTrack>& tracks) {
+      inline void merge(std::vector<CDCTrack>& tracks)
+      {
 
         copyToDataStoreForDebug();
       }
 
     private:
       /// Helper function to copy intermediate objects to the data store for analysis from python.
-      void copyToDataStoreForDebug() const {
+      void copyToDataStoreForDebug() const
+      {
 
 
         // IO for monitoring in python

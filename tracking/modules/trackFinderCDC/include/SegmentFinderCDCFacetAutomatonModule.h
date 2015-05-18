@@ -14,11 +14,11 @@
 #include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
-#include <tracking/trackFindingCDC/filters/wirehit_wirehit/WholeWireHitNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/wirehit_relation/WholeWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_facet/SimpleFacetNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/SimpleFacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -38,7 +38,7 @@ namespace Belle2 {
     /// Forward declaration of the module implementing the segment generation by cellular automaton on facets using specific filter instances.
     template<class ClusterFilter = BaseClusterFilter,
              class FacetFilter = BaseFacetFilter,
-             class FacetNeighborChooser = BaseFacetNeighborChooser>
+             class FacetRelationFilter = BaseFacetRelationFilter>
     class SegmentFinderCDCFacetAutomatonImplModule;
   }
 
@@ -46,11 +46,11 @@ namespace Belle2 {
   typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <
   TrackFindingCDC::AllClusterFilter,
                   TrackFindingCDC::RealisticFacetFilter,
-                  TrackFindingCDC::SimpleFacetNeighborChooser >
+                  TrackFindingCDC::SimpleFacetRelationFilter >
                   SegmentFinderCDCFacetAutomatonModule;
 
   namespace TrackFindingCDC {
-    template<class ClusterFilter, class FacetFilter, class FacetNeighborChooser>
+    template<class ClusterFilter, class FacetFilter, class FacetRelationFilter>
     class SegmentFinderCDCFacetAutomatonImplModule : public SegmentFinderCDCBaseModule {
 
     public:
@@ -59,7 +59,7 @@ namespace Belle2 {
         SegmentFinderCDCBaseModule(segmentOrientation),
         m_ptrClusterFilter(new ClusterFilter()),
         m_ptrFacetFilter(new FacetFilter()),
-        m_ptrFacetNeighborChooser(new FacetNeighborChooser()),
+        m_ptrFacetRelationFilter(new FacetRelationFilter()),
         m_param_writeSuperClusters(false),
         m_param_superClustersStoreObjName("CDCWireHitSuperClusterVector"),
         m_param_writeClusters(false),
@@ -142,8 +142,8 @@ namespace Belle2 {
           m_ptrFacetFilter->initialize();
         }
 
-        if (m_ptrFacetNeighborChooser) {
-          m_ptrFacetNeighborChooser->initialize();
+        if (m_ptrFacetRelationFilter) {
+          m_ptrFacetRelationFilter->initialize();
         }
 
       }
@@ -163,8 +163,8 @@ namespace Belle2 {
           m_ptrFacetFilter->terminate();
         }
 
-        if (m_ptrFacetNeighborChooser) {
-          m_ptrFacetNeighborChooser->terminate();
+        if (m_ptrFacetRelationFilter) {
+          m_ptrFacetRelationFilter->terminate();
         }
 
         SegmentFinderCDCBaseModule::terminate();
@@ -196,15 +196,15 @@ namespace Belle2 {
       }
 
       /// Getter for the current facet filter. The module keeps ownership of the pointer.
-      FacetNeighborChooser* getFacetNeighborChooser()
+      FacetRelationFilter* getFacetRelationFilter()
       {
-        return m_ptrFacetNeighborChooser.get();
+        return m_ptrFacetRelationFilter.get();
       }
 
-      /// Setter for the facet neighbor chooser used to connect facets in a network. The module takes ownership of the pointer.
-      void setFacetNeighborChooser(std::unique_ptr<FacetNeighborChooser> ptrFacetNeighborChooser)
+      /// Setter for the facet relation filter used to connect facets in a network. The module takes ownership of the pointer.
+      void setFacetRelationFilter(std::unique_ptr<FacetRelationFilter> ptrFacetRelationFilter)
       {
-        m_ptrFacetNeighborChooser = std::move(ptrFacetNeighborChooser);
+        m_ptrFacetRelationFilter = std::move(ptrFacetRelationFilter);
       }
 
     private:
@@ -214,8 +214,8 @@ namespace Belle2 {
       /// Reference to the filter to be used for the facet generation.
       std::unique_ptr<FacetFilter> m_ptrFacetFilter;
 
-      /// Reference to the chooser to be used to construct the facet network.
-      std::unique_ptr<FacetNeighborChooser> m_ptrFacetNeighborChooser;
+      /// Reference to the relation filter to be used to construct the facet network.
+      std::unique_ptr<FacetRelationFilter> m_ptrFacetRelationFilter;
 
     private:
       /// Parameter: Switch if superclusters shall be written to the DataStore
@@ -288,11 +288,11 @@ namespace Belle2 {
     }; // end class SegmentFinderCDCFacetAutomatonImplModule
 
 
-    template<class ClusterFilter, class FacetFilter, class FacetNeighborChooser>
+    template<class ClusterFilter, class FacetFilter, class FacetRelationFilter>
     void SegmentFinderCDCFacetAutomatonImplModule <
     ClusterFilter,
     FacetFilter,
-    FacetNeighborChooser
+    FacetRelationFilter
     >::generateSegments(std::vector<CDCRecoSegment2D>& segments)
     {
       /// Attain super cluster vector on the DataStore if needed.
@@ -346,7 +346,7 @@ namespace Belle2 {
         m_secondaryWirehitNeighborhood.clear();
 
         const bool withSecondaryNeighborhood = true;
-        m_secondaryWirehitNeighborhood.appendUsing<WholeWireHitNeighborChooser<withSecondaryNeighborhood>>(wireHitsInSuperlayer);
+        m_secondaryWirehitNeighborhood.appendUsing<WholeWireHitRelationFilter<withSecondaryNeighborhood>>(wireHitsInSuperlayer);
         assert(m_secondaryWirehitNeighborhood.isSymmetric());
 
         B2DEBUG(100, "  seconaryWirehitNeighborhood.size() = " << m_secondaryWirehitNeighborhood.size());
@@ -367,7 +367,7 @@ namespace Belle2 {
           m_wirehitNeighborhood.clear();
 
           const bool primaryNeighborhoodOnly = false;
-          m_wirehitNeighborhood.appendUsing<WholeWireHitNeighborChooser<primaryNeighborhoodOnly>>(superCluster);
+          m_wirehitNeighborhood.appendUsing<WholeWireHitRelationFilter<primaryNeighborhoodOnly>>(superCluster);
           assert(m_wirehitNeighborhood.isSymmetric());
           B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
 
@@ -413,7 +413,7 @@ namespace Belle2 {
             // Create the facet neighborhood
             B2DEBUG(100, "Creating the CDCFacet neighborhood");
             m_facetsNeighborhood.clear();
-            m_facetsNeighborhood.createUsing(*m_ptrFacetNeighborChooser, m_facets);
+            m_facetsNeighborhood.createUsing(*m_ptrFacetRelationFilter, m_facets);
             B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
             if (m_facetsNeighborhood.size() == 0) {

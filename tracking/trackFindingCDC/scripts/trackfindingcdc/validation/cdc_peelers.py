@@ -68,9 +68,9 @@ def peel_trajectory3d(trajectory3d, key="{part_name}"):
 
 
 @peelers.format_crop_keys
-def peel_axial_stereo_segment_pair(axial_stereo_segment_pair, key="{part_name}"):
-    start_segment = axial_stereo_segment_pair.getStartSegment()
-    end_segment = axial_stereo_segment_pair.getEndSegment()
+def peel_segment_pair_relation(segment_pair_relation, key="{part_name}"):
+    start_segment = segment_pair_relation.getStartSegment()
+    end_segment = segment_pair_relation.getEndSegment()
 
     start_segment_crops = peel_segment2d(start_segment, key="start_{part_name}")
     end_segment_crops = peel_segment2d(end_segment, key="end_{part_name}")
@@ -80,7 +80,7 @@ def peel_axial_stereo_segment_pair(axial_stereo_segment_pair, key="{part_name}")
 
     superlayer_id_pair = 10.0 * sorted_superlayer_ids[1] + sorted_superlayer_ids[0]
 
-    trajectory3d = axial_stereo_segment_pair.getTrajectory3D()
+    trajectory3d = segment_pair_relation.getTrajectory3D()
     trajectory3d_crops = peel_trajectory3d(trajectory3d, key="{part_name}")
 
     crops = dict(

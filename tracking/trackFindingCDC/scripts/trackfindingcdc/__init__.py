@@ -95,9 +95,9 @@ class AxialStereoPairFitterModule(Module):
 
         fit_method = self.fit_method
 
-        stored_axial_stereo_segment_pairs = Belle2.PyStoreObj("CDCSegmentPairVector")
-        wrapped_axial_stereo_segment_pairs = stored_axial_stereo_segment_pairs.obj()
-        axial_stereo_segment_pairs = wrapped_axial_stereo_segment_pairs.get()
+        stored_segment_pair_relations = Belle2.PyStoreObj("CDCSegmentPairVector")
+        wrapped_segment_pair_relations = stored_segment_pair_relations.obj()
+        segment_pair_relations = wrapped_segment_pair_relations.get()
 
-        for axial_stereo_segment_pair in axial_stereo_segment_pairs:
-            fit_method(axial_stereo_segment_pair)
+        for segment_pair_relation in segment_pair_relations:
+            fit_method(segment_pair_relation)

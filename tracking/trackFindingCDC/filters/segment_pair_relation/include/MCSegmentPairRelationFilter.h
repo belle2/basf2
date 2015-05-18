@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -9,24 +9,28 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/axial_segment_pair/MCAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
-#include "BaseSegmentTripleFilter.h"
+#include "BaseSegmentPairRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the constuction of segment triples based on monte carlo information
-    class MCSegmentTripleFilter  : public Filter<CDCSegmentTriple> {
+
+    ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
+    class MCSegmentPairRelationFilter :
+      public Filter<Relation<CDCSegmentPair>> {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCSegmentTriple> Super;
+      typedef Filter<Relation<CDCSegmentPair>> Super;
 
     public:
-      /// Constructor initializing the symmetry flag.
-      MCSegmentTripleFilter(bool allowReverse = true);
+      /// Importing all overloads from the super class
+      using Super::operator();
+
+    public:
+      /** Constructor setting to default reversal symmetry. */
+      MCSegmentPairRelationFilter(bool allowReverse = true);
 
     public:
       /// May be used to clear information from former events. Currently unused.
@@ -41,9 +45,8 @@ namespace Belle2 {
       /** Set the parameter with key to value.
        *
        *  Parameters are:
-       *  symmetric -  Accept the axial segment triple if the reverse segment triple
-       *               is correct preserving the progagation reversal symmetry
-       *               on this level of detail.
+       *  symmetric -  Accept the relation of segment pairs also if the reverse relation is correct
+       *               preserving the progagation reversal symmetry on this level of detail.
        *               Allowed values "true", "false". Default is "true".
        */
       virtual
@@ -57,35 +60,29 @@ namespace Belle2 {
       /// Indicates that the filter requires Monte Carlo information.
       virtual bool needsTruthInformation() IF_NOT_CINT(override final);
 
-      /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      virtual CellWeight operator()(const CDCSegmentTriple& triple) IF_NOT_CINT(override final);
 
-    private:
-      /// Sets the trajectories of the segment triple from Monte Carlo information. IS executed for good segment triples.
-      void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
+      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
+      virtual NeighborWeight operator()(const CDCSegmentPair& fromSegmentPair,
+                                        const CDCSegmentPair& toSegmentPair) IF_NOT_CINT(override final);
 
     public:
       /// Setter for the allow reverse parameter
       void setAllowReverse(bool allowReverse)
       {
-        m_param_allowReverse = allowReverse;
-        m_mcAxialSegmentPairFilter.setAllowReverse(allowReverse);
+        m_mcSegmentPairFilter.setAllowReverse(allowReverse);
       }
 
       /// Getter for the allow reverse parameter
       bool getAllowReverse() const
       {
-        return m_param_allowReverse;
+        return m_mcSegmentPairFilter.getAllowReverse();
       }
 
     private:
-      /// Switch to indicate if the reversed version of the segment triple shall also be accepted (default is true).
-      bool m_param_allowReverse;
+      /// Instance of the Monte Carlo axial stereo segment filter for rejection of false cells.
+      MCSegmentPairFilter m_mcSegmentPairFilter;
 
-      /// Instance of the cell filter to reject neighborhoods of false cells.
-      MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
+    }; // end class
 
-
-    }; // end class MCSegmentTripleFilter
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

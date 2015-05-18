@@ -48,7 +48,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
         "SegmentPairFilter": "all",
-        "SegmentPairNeighborChooser": "none",
+        "SegmentPairRelationFilter": "none",
     })
 
     py_profile = True
@@ -90,35 +90,35 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
                                                                   output_file_name=output_file_name)
         self.mc_segment_lookup = None
         self.mc_segment_pair_filter = None
-        self.axial_stereo_fusion = None
+        self.segment_pair_fusion = None
 
     def initialize(self):
         super(SegmentPairCreationValidationModule, self).initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
         self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCSegmentPairFilter()
-        self.axial_stereo_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
+        self.segment_pair_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
-    def pick(self, axial_stereo_segment_pair):
+    def pick(self, segment_pair_relation):
         mc_segment_lookup = self.mc_segment_lookup
-        start_segment = axial_stereo_segment_pair.getStartSegment()
-        end_segment = axial_stereo_segment_pair.getEndSegment()
+        start_segment = segment_pair_relation.getStartSegment()
+        end_segment = segment_pair_relation.getEndSegment()
         mc_particle = mc_segment_lookup.getMCParticle(start_segment)
         return (mc_particle and
                 is_primary(mc_particle) and
                 start_segment.size() > 3 and
                 end_segment.size() > 3)
 
-    def peel(self, axial_stereo_segment_pair):
-        crops = self.peel_target(axial_stereo_segment_pair)
-        crops.update(self.peel_mc(axial_stereo_segment_pair))
-        crops.update(self.peel_fit(axial_stereo_segment_pair))
+    def peel(self, segment_pair_relation):
+        crops = self.peel_target(segment_pair_relation)
+        crops.update(self.peel_mc(segment_pair_relation))
+        crops.update(self.peel_fit(segment_pair_relation))
         return crops
 
-    def peel_target(self, axial_stereo_segment_pair):
-        mc_weight = self.mc_segment_pair_filter.isGoodSegmentPair(axial_stereo_segment_pair)
+    def peel_target(self, segment_pair_relation):
+        mc_weight = self.mc_segment_pair_filter.isGoodSegmentPair(segment_pair_relation)
         mc_decision = np.isfinite(mc_weight)  # Filters for nan
 
         return dict(
@@ -126,10 +126,10 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
             mc_decision=mc_decision,
         )
 
-    def peel_mc(self, axial_stereo_segment_pair):
+    def peel_mc(self, segment_pair_relation):
         mc_segment_lookup = self.mc_segment_lookup
 
-        end_segment = axial_stereo_segment_pair.getEndSegment()
+        end_segment = segment_pair_relation.getEndSegment()
 
         # Take the fit best at the middle of the segment pair
         mc_particle = mc_segment_lookup.getMCParticle(end_segment)
@@ -140,14 +140,14 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
             tan_lambda_truth=fit3d_truth.getTanLambda(),
         )
 
-    def peel_fit(self, axial_stereo_segment_pair):
-        fitless_crops = self.peel_fitless(axial_stereo_segment_pair)
+    def peel_fit(self, segment_pair_relation):
+        fitless_crops = self.peel_fitless(segment_pair_relation)
 
         select_fitless = fitless_crops["select_fitless"]
         if select_fitless:
             # Now fit
-            self.fit(axial_stereo_segment_pair)
-            fit3d = axial_stereo_segment_pair.getTrajectory3D()
+            self.fit(segment_pair_relation)
+            fit3d = segment_pair_relation.getTrajectory3D()
 
             i_curv = 0
             i_tan_lambda = 3
@@ -199,12 +199,12 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
 
         return crops
 
-    def peel_fitless(self, axial_stereo_segment_pair):
+    def peel_fitless(self, segment_pair_relation):
         # Try to make some judgements without executing the common fit.
         mc_segment_lookup = self.mc_segment_lookup
 
-        start_segment = axial_stereo_segment_pair.getStartSegment()
-        end_segment = axial_stereo_segment_pair.getEndSegment()
+        start_segment = segment_pair_relation.getStartSegment()
+        end_segment = segment_pair_relation.getEndSegment()
 
         start_fit2d = start_segment.getTrajectory2D()
         end_fit2d = end_segment.getTrajectory2D()
@@ -227,18 +227,18 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
             start_curvature_estimate=start_fit2d.getCurvature(),
             end_curvature_estimate=end_fit2d.getCurvature(),
 
-            delta_phi=axial_stereo_segment_pair.computeDeltaPhiAtSuperLayerBound(),
-            is_coaligned=axial_stereo_segment_pair.computeIsCoaligned(),
+            delta_phi=segment_pair_relation.computeDeltaPhiAtSuperLayerBound(),
+            is_coaligned=segment_pair_relation.computeIsCoaligned(),
 
-            start_is_before_end=axial_stereo_segment_pair.computeStartIsBeforeEnd(),
-            end_is_after_start=axial_stereo_segment_pair.computeEndIsAfterStart(),
+            start_is_before_end=segment_pair_relation.computeStartIsBeforeEnd(),
+            end_is_after_start=segment_pair_relation.computeEndIsAfterStart(),
         )
 
         fitless_crops["select_fitless"] = self.select_fitless(fitless_crops)
         return fitless_crops
 
-    def fit(self, axial_stereo_segment_pair):
-        self.axial_stereo_fusion.reconstructFuseTrajectories(axial_stereo_segment_pair, True)
+    def fit(self, segment_pair_relation):
+        self.segment_pair_fusion.reconstructFuseTrajectories(segment_pair_relation, True)
 
     delta_phi_cut_value = 1.0
     is_after_cut_value = 1.0

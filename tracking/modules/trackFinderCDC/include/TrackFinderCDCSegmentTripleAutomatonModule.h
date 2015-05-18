@@ -16,9 +16,9 @@
 #include <tracking/trackFindingCDC/creators/SegmentTripleCreator.h>
 #include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
 
-#include <tracking/trackFindingCDC/filters/axial_axial/SimpleAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/axial_segment_pair/SimpleAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_triple_segment_triple/SimpleSegmentTripleNeighborChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_triple_relation/SimpleSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
@@ -34,7 +34,7 @@ namespace Belle2 {
     /// Forward declaration of the module implementing the track generation by cellular automaton on segment triples using specific filter instances.
     template < class AxialSegmentPairFilter = BaseAxialSegmentPairFilter,
                class SegmentTripleFilter = BaseSegmentTripleFilter,
-               class SegmentTripleNeighborChooser = BaseSegmentTripleNeighborChooser >
+               class SegmentTripleRelationFilter = BaseSegmentTripleRelationFilter >
     class TrackFinderCDCSegmentTripleAutomatonImplModule;
   }
 
@@ -42,11 +42,11 @@ namespace Belle2 {
   typedef TrackFindingCDC::TrackFinderCDCSegmentTripleAutomatonImplModule <
   TrackFindingCDC::SimpleAxialSegmentPairFilter,
                   TrackFindingCDC::SimpleSegmentTripleFilter,
-                  TrackFindingCDC::SimpleSegmentTripleNeighborChooser
+                  TrackFindingCDC::SimpleSegmentTripleRelationFilter
                   > TrackFinderCDCSegmentTripleAutomatonModule;
 
   namespace TrackFindingCDC {
-    template<class AxialSegmentPairFilter, class SegmentTripleFilter, class SegmentTripleNeighborChooser>
+    template<class AxialSegmentPairFilter, class SegmentTripleFilter, class SegmentTripleRelationFilter>
     class TrackFinderCDCSegmentTripleAutomatonImplModule : public TrackFinderCDCFromSegmentsModule {
 
     public:
@@ -56,7 +56,7 @@ namespace Belle2 {
         TrackFinderCDCFromSegmentsModule(trackOrientation),
         m_ptrAxialSegmentPairFilter(new AxialSegmentPairFilter()),
         m_ptrSegmentTripleFilter(new SegmentTripleFilter()),
-        m_ptrSegmentTripleNeighborChooser(new SegmentTripleNeighborChooser()),
+        m_ptrSegmentTripleRelationFilter(new SegmentTripleRelationFilter()),
         m_param_writeSegmentTriples(false),
         m_param_segmentTriplesStoreObjName("CDCSegmentTripleVector")
       {
@@ -84,8 +84,8 @@ namespace Belle2 {
         if (m_ptrSegmentTripleFilter) delete m_ptrSegmentTripleFilter;
         m_ptrSegmentTripleFilter = nullptr;
 
-        if (m_ptrSegmentTripleNeighborChooser) delete m_ptrSegmentTripleNeighborChooser;
-        m_ptrSegmentTripleNeighborChooser = nullptr;
+        if (m_ptrSegmentTripleRelationFilter) delete m_ptrSegmentTripleRelationFilter;
+        m_ptrSegmentTripleRelationFilter = nullptr;
       }
 
       ///  Initialize the Module before event processing
@@ -105,8 +105,8 @@ namespace Belle2 {
           m_ptrSegmentTripleFilter->initialize();
         }
 
-        if (m_ptrSegmentTripleNeighborChooser) {
-          m_ptrSegmentTripleNeighborChooser->initialize();
+        if (m_ptrSegmentTripleRelationFilter) {
+          m_ptrSegmentTripleRelationFilter->initialize();
         }
 
       }
@@ -125,8 +125,8 @@ namespace Belle2 {
           m_ptrSegmentTripleFilter->terminate();
         }
 
-        if (m_ptrSegmentTripleNeighborChooser) {
-          m_ptrSegmentTripleNeighborChooser->terminate();
+        if (m_ptrSegmentTripleRelationFilter) {
+          m_ptrSegmentTripleRelationFilter->terminate();
         }
 
         TrackFinderCDCFromSegmentsModule::terminate();
@@ -159,17 +159,17 @@ namespace Belle2 {
         m_ptrSegmentTripleFilter = ptrSegmentTripleFilter;
       }
 
-      /// Getter for the current segment triple neighbor chooser. The module keeps ownership of the pointer.
-      SegmentTripleNeighborChooser* getSegmentTripleNeighborChooser()
+      /// Getter for the current segment triple relation filter. The module keeps ownership of the pointer.
+      SegmentTripleRelationFilter* getSegmentTripleRelationFilter()
       {
-        return m_ptrSegmentTripleNeighborChooser;
+        return m_ptrSegmentTripleRelationFilter;
       }
 
-      /// Setter for the current segment triple neighbor chooser. The module keeps ownership of the pointer.
-      void setSegmentTripleNeighborChooser(SegmentTripleNeighborChooser* ptrSegmentTripleNeighborChooser)
+      /// Setter for the current segment triple relation filter. The module keeps ownership of the pointer.
+      void setSegmentTripleRelationFilter(SegmentTripleRelationFilter* ptrSegmentTripleRelationFilter)
       {
-        if (m_ptrSegmentTripleNeighborChooser) delete m_ptrSegmentTripleNeighborChooser;
-        m_ptrSegmentTripleNeighborChooser = ptrSegmentTripleNeighborChooser;
+        if (m_ptrSegmentTripleRelationFilter) delete m_ptrSegmentTripleRelationFilter;
+        m_ptrSegmentTripleRelationFilter = ptrSegmentTripleRelationFilter;
       }
 
     private:
@@ -179,8 +179,8 @@ namespace Belle2 {
       /// Reference to the filter to be used for the segment triple generation.
       SegmentTripleFilter* m_ptrSegmentTripleFilter;
 
-      /// Reference to the chooser to be used to construct the segment triple network.
-      SegmentTripleNeighborChooser* m_ptrSegmentTripleNeighborChooser;
+      /// Reference to the relation filter to be used to construct the segment triple network.
+      SegmentTripleRelationFilter* m_ptrSegmentTripleRelationFilter;
 
     private:
       /// Parameter: Switch if segment triples shall be written to the DataStore
@@ -217,11 +217,11 @@ namespace Belle2 {
 
     template < class AxialSegmentPairFilter,
                class SegmentTripleFilter,
-               class SegmentTripleNeighborChooser >
+               class SegmentTripleRelationFilter >
     void TrackFinderCDCSegmentTripleAutomatonImplModule <
     AxialSegmentPairFilter,
     SegmentTripleFilter,
-    SegmentTripleNeighborChooser
+    SegmentTripleRelationFilter
     >::generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments,
                 std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
     {
@@ -247,7 +247,7 @@ namespace Belle2 {
       // Create the segment triple neighorhood
       B2DEBUG(100, "Creating the CDCSegmentTriple neighborhood");
       m_segmentTripleNeighborhood.clear();
-      m_segmentTripleNeighborhood.createUsing(*m_ptrSegmentTripleNeighborChooser, m_segmentTriples);
+      m_segmentTripleNeighborhood.createUsing(*m_ptrSegmentTripleRelationFilter, m_segmentTriples);
       B2DEBUG(100, "  Created " << m_segmentTripleNeighborhood.size()  << " SegmentTripleNeighborhoods");
 
       if (m_param_writeSegmentTriples) {

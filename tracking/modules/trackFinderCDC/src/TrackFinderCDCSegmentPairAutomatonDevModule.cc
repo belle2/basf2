@@ -10,8 +10,8 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonDevModule.h>
 
-#include <tracking/trackFindingCDC/filters/axial_stereo/SegmentPairFilters.h>
-#include <tracking/trackFindingCDC/filters/axial_stereo_axial_stereo/SegmentPairNeighborChoosers.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilters.h>
+#include <tracking/trackFindingCDC/filters/segment_pair_relation/SegmentPairRelationFilters.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -24,7 +24,7 @@ REG_MODULE(TrackFinderCDCSegmentPairAutomatonDev);
 TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonDevModule() :
   TrackFinderCDCSegmentPairAutomatonImplModule<>(c_None),
   m_param_segmentPairFilter("simple"),
-  m_param_segmentPairNeighborChooser("simple")
+  m_param_segmentPairRelationFilter("simple")
 {
   setDescription("Versatile module with adjustable filters for track generation.");
 
@@ -45,20 +45,20 @@ TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonD
            "Key - Value pairs depending on the segment pair filter",
            map<string, string>());
 
-  addParam("SegmentPairNeighborChooser",
-           m_param_segmentPairNeighborChooser,
-           "Segment pair neighbor chooser to be used during the construction of the graph. "
+  addParam("SegmentPairRelationFilter",
+           m_param_segmentPairRelationFilter,
+           "Segment pair relation filter to be used during the construction of the graph. "
            "Valid values are: "
            "\"none\" (no neighbor is correct, stops segment generation), "
            "\"all\" (all possible neighbors are valid), "
            "\"mc\" (monte carlo truth), "
            "\"mc_symmetric\" (monte carlo truth and the reversed version are excepted), "
            "\"simple\" (mc free with simple criteria).",
-           string(m_param_segmentPairNeighborChooser));
+           string(m_param_segmentPairRelationFilter));
 
-  addParam("SegmentPairNeighborChooserParameters",
-           m_param_segmentPairNeighborChooserParameters,
-           "Key - Value pairs depending on the segment pair neighbor chooser",
+  addParam("SegmentPairRelationFilterParameters",
+           m_param_segmentPairRelationFilterParameters,
+           "Key - Value pairs depending on the segment pair relation filter",
            map<string, string>());
 }
 
@@ -87,32 +87,32 @@ void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
   setSegmentPairFilter(std::move(ptrSegmentPairFilter));
   getSegmentPairFilter()->setParameters(m_param_segmentPairFilterParameters);
 
-  std::unique_ptr<BaseSegmentPairNeighborChooser>
-  ptrSegmentPairNeighborChooser(new BaseSegmentPairNeighborChooser());
+  std::unique_ptr<BaseSegmentPairRelationFilter>
+  ptrSegmentPairRelationFilter(new BaseSegmentPairRelationFilter());
 
-  if (m_param_segmentPairNeighborChooser == string("none")) {
-    ptrSegmentPairNeighborChooser.reset(new BaseSegmentPairNeighborChooser());
-  } else if (m_param_segmentPairNeighborChooser == string("all")) {
-    ptrSegmentPairNeighborChooser.reset(new AllSegmentPairNeighborChooser());
-  } else if (m_param_segmentPairNeighborChooser == string("mc")) {
-    ptrSegmentPairNeighborChooser.reset(new MCSegmentPairNeighborChooser(false));
-  } else if (m_param_segmentPairNeighborChooser == string("mc_symmetric")) {
-    ptrSegmentPairNeighborChooser.reset(new MCSegmentPairNeighborChooser(true));
-  } else if (m_param_segmentPairNeighborChooser == string("simple")) {
-    ptrSegmentPairNeighborChooser.reset(new SimpleSegmentPairNeighborChooser());
+  if (m_param_segmentPairRelationFilter == string("none")) {
+    ptrSegmentPairRelationFilter.reset(new BaseSegmentPairRelationFilter());
+  } else if (m_param_segmentPairRelationFilter == string("all")) {
+    ptrSegmentPairRelationFilter.reset(new AllSegmentPairRelationFilter());
+  } else if (m_param_segmentPairRelationFilter == string("mc")) {
+    ptrSegmentPairRelationFilter.reset(new MCSegmentPairRelationFilter(false));
+  } else if (m_param_segmentPairRelationFilter == string("mc_symmetric")) {
+    ptrSegmentPairRelationFilter.reset(new MCSegmentPairRelationFilter(true));
+  } else if (m_param_segmentPairRelationFilter == string("simple")) {
+    ptrSegmentPairRelationFilter.reset(new SimpleSegmentPairRelationFilter());
   } else {
-    B2ERROR("Unrecognised SegmentPairNeighborChooser option " <<
-            m_param_segmentPairNeighborChooser <<
+    B2ERROR("Unrecognised SegmentPairRelationFilter option " <<
+            m_param_segmentPairRelationFilter <<
             ". Allowed values are \"none\", \"all\", \"mc\", \"mc_symmetric\" and \"simple\".");
   }
 
-  setSegmentPairNeighborChooser(std::move(ptrSegmentPairNeighborChooser));
-  getSegmentPairNeighborChooser()->setParameters(m_param_segmentPairNeighborChooserParameters);
+  setSegmentPairRelationFilter(std::move(ptrSegmentPairRelationFilter));
+  getSegmentPairRelationFilter()->setParameters(m_param_segmentPairRelationFilterParameters);
 
   TrackFinderCDCSegmentPairAutomatonImplModule<>::initialize();
 
   if (getSegmentPairFilter()->needsTruthInformation() or
-      getSegmentPairNeighborChooser()->needsTruthInformation()) {
+      getSegmentPairRelationFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -122,7 +122,7 @@ void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
 void TrackFinderCDCSegmentPairAutomatonDevModule::event()
 {
   if (getSegmentPairFilter()->needsTruthInformation() or
-      getSegmentPairNeighborChooser()->needsTruthInformation()) {
+      getSegmentPairRelationFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 

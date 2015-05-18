@@ -17,13 +17,18 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    typedef Weight NeighborWeight;  ///< Type for the cell weight in the cellular automata
+    /// Type for the cell weight in the cellular automata
+    typedef Weight NeighborWeight;
 
-    /**Indicates that a connection in a neighborhood shall not be made. Used by neighorhood_choosers.*/
+    /**
+    Indicates that a connection in a neighborhood shall not be made.
+    Used by relation filters.
+    */
     extern const NeighborWeight NOT_A_NEIGHBOR;
-    // Implementation note: Uses external linkage because ROOT cint can not handle the inclusion of numeric_limits<> constructs.
+    // Implementation note: Uses external linkage,
+    // because ROOT cint can not handle the inclusion of numeric_limits<> constructs.
 
-    ///Returns if the weight indicates that a certain connection in a neighborhood shall not be made.
+    /// Weight indicates that a certain connection in a neighborhood shall not be made.
     inline bool isNotANeighbor(const NeighborWeight& weight)
     { return std::isnan(weight); }
 

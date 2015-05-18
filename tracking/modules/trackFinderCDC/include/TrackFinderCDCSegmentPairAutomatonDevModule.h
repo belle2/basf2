@@ -44,7 +44,7 @@ namespace Belle2 {
      */
     std::map<std::string, std::string> m_param_segmentPairFilterParameters;
 
-    /** Parameter: Segment pair neighbor chooser to be used during the construction of the graph.
+    /** Parameter: Segment pair relation filter to be used during the construction of the graph.
     Valid values are:
 
     + "none" (no neighbor is correct, stops segment generation)
@@ -53,12 +53,12 @@ namespace Belle2 {
     + "mc_symmetric" (monte carlo truth and the reversed version are excepted)
     + "simple" (mc free with simple criteria)
     */
-    std::string m_param_segmentPairNeighborChooser;
+    std::string m_param_segmentPairRelationFilter;
 
-    /** Parameter: Segment Pair neighbor chooser parameters forwarded to the segment pair neighbor chooser
-     *  Meaning of the Key - Value pairs depend on the segment pair neighbor chooser
+    /** Parameter: Segment Pair relation filter parameters forwarded to the segment pair relation filter
+     *  Meaning of the Key - Value pairs depend on the segment pair relation filter
      */
-    std::map<std::string, std::string> m_param_segmentPairNeighborChooserParameters;
+    std::map<std::string, std::string> m_param_segmentPairRelationFilterParameters;
 
   }; // end class
 } // end namespace Belle2

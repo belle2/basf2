@@ -2,7 +2,6 @@ Import('env')
 
 # Use the common libraries of the track finder for the test compilation
 env['LIBS'] = [
-    'tracking',
     'tracking_trackFindingCDC',
     'cdc',
     'cdc_dataobjects',

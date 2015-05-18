@@ -116,7 +116,7 @@ void SegmentFinderCDCBaseModule::event()
       CDCRecoSegment2D& lastSegment = outputSegments.back();
       const CDCRecoHit2D& firstHit = lastSegment.front();
       const CDCRecoHit2D& lastHit = lastSegment.back();
-      if (lastHit.getRecoPos2D().cylindricalR() > firstHit.getRecoPos2D().cylindricalR()) {
+      if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
         lastSegment.reverse();
       }
     }

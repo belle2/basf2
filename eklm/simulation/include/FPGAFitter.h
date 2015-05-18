@@ -34,8 +34,6 @@ namespace Belle2 {
      */
     struct FPGAFitParams {
       double startTime;       /**< Start of signal. */
-      double peakTime;        /**< Peak time (from startTime). */
-      double attenuationFreq; /**< Attenuation frequency. */
       double amplitude;       /**< Amplitude. */
       double bgAmplitude;     /**< Background amplitude. */
     };
@@ -61,19 +59,15 @@ namespace Belle2 {
       /**
        * FPGA fitter.
        * @param[in]  amp     Digital amplitude.
-       * @param[in]  fit     Fit result histogram.
        * @param[out] par     Fit parameters.
        * @return Fit status.
        */
-      enum FPGAFitStatus fit(int* amp, float* fit, struct FPGAFitParams* par);
+      enum FPGAFitStatus fit(int* amp, struct FPGAFitParams* par);
 
     private:
 
       /** Number of points. */
       int m_nPoints;
-
-      /** Signal shape. */
-      float* m_sig;
 
     };
 

@@ -112,9 +112,6 @@ namespace Belle2 {
       /** Digital amplitude. */
       int* m_ADCAmplitude;
 
-      /** Digital fit result. */
-      float* m_ADCFit;
-
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 

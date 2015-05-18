@@ -55,9 +55,6 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_ADCAmplitude = (int*)calloc(m_digPar->nDigitizations, sizeof(int));
   if (m_ADCAmplitude == NULL)
     B2FATAL(MemErr);
-  m_ADCFit = (float*)calloc(m_digPar->nDigitizations, sizeof(float));
-  if (m_ADCFit == NULL)
-    B2FATAL(MemErr);
 }
 
 
@@ -67,7 +64,6 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
   free(m_amplitudeReflected);
   free(m_amplitude);
   free(m_ADCAmplitude);
-  free(m_ADCFit);
 }
 
 void EKLM::FiberAndElectronics::processEntry()
@@ -111,7 +107,7 @@ void EKLM::FiberAndElectronics::processEntry()
   simulateADC();
   /* Fit. */
   m_FPGAParams.bgAmplitude = m_digPar->ADCPedestal;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ADCFit, &m_FPGAParams);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, &m_FPGAParams);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   /**
@@ -121,9 +117,6 @@ void EKLM::FiberAndElectronics::processEntry()
    * amplitude = amplitude * 0.5 * m_digPar->ADCRange.
    */
   m_FPGAParams.startTime = m_FPGAParams.startTime * m_digPar->ADCSamplingTime;
-  m_FPGAParams.peakTime = m_FPGAParams.peakTime * m_digPar->ADCSamplingTime;
-  m_FPGAParams.attenuationFreq = m_FPGAParams.attenuationFreq /
-                                 m_digPar->ADCSamplingTime;
   if (m_digPar->debug)
     if (m_npe >= 10)
       debugOutput();
@@ -213,8 +206,7 @@ enum EKLM::FPGAFitStatus EKLM::FiberAndElectronics::getFitStatus() const
 double EKLM::FiberAndElectronics::getNPE()
 {
   double intg;
-  intg = m_FPGAParams.amplitude * (0.5 * m_FPGAParams.peakTime +
-                                   1.0 / m_FPGAParams.attenuationFreq);
+  intg = m_FPGAParams.amplitude;
   return intg * m_digPar->PEAttenuationFreq / m_digPar->ADCPEAmplitude;
 }
 
@@ -231,7 +223,6 @@ void EKLM::FiberAndElectronics::debugOutput()
   TH1D* histAmplitudeReflected = NULL;
   TH1D* histAmplitude = NULL;
   TH1D* histADCAmplitude = NULL;
-  TH1D* histADCFit = NULL;
   try {
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),
@@ -245,9 +236,6 @@ void EKLM::FiberAndElectronics::debugOutput()
     histADCAmplitude =
       new TH1D("histADCAmplitude", m_stripName.c_str(),
                m_digPar->nDigitizations, 0, m_histRange);
-    histADCFit =
-      new TH1D("histADCFit", m_stripName.c_str(),
-               m_digPar->nDigitizations, 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -256,7 +244,6 @@ void EKLM::FiberAndElectronics::debugOutput()
     histAmplitudeReflected->SetBinContent(i + 1, m_amplitudeReflected[i]);
     histAmplitude->SetBinContent(i + 1, m_amplitude[i]);
     histADCAmplitude->SetBinContent(i + 1, m_ADCAmplitude[i]);
-    histADCFit->SetBinContent(i + 1, m_ADCFit[i]);
   }
   std::string filename = m_stripName +
                          boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
@@ -269,7 +256,6 @@ void EKLM::FiberAndElectronics::debugOutput()
   hfile->Append(histAmplitudeReflected);
   hfile->Append(histAmplitude);
   hfile->Append(histADCAmplitude);
-  hfile->Append(histADCFit);
   hfile->Write();
   hfile->Close();
 }

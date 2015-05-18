@@ -79,27 +79,44 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));
   addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(""));
-  addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy, "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
-  addParam("ThresholdTrials", m_thresholdTrials, "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.", 10);
-  addParam("TrackingVerbosity", m_trackingVerbosity, "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.", 0);
+  addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy,
+           "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
+  addParam("ThresholdTrials", m_thresholdTrials,
+           "Geant4 will try 'ThresholdTrials' times to move a particle which got 'stuck' and has an energy less than 'ThresholdImportantEnergy'.",
+           10);
+  addParam("TrackingVerbosity", m_trackingVerbosity,
+           "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.",
+           0);
   addParam("HadronProcessVerbosity", m_hadronprocessVerbosity, "Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
-  addParam("ProductionCut", m_productionCut, "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.", 0.07);
-  addParam("MaxNumberSteps", m_maxNumberSteps, "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
+  addParam("ProductionCut", m_productionCut,
+           "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
+           0.07);
+  addParam("MaxNumberSteps", m_maxNumberSteps,
+           "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.35);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
-  addParam("StoreAllSecondaries", m_storeSecondaries, "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them", false);
+  addParam("StoreAllSecondaries", m_storeSecondaries,
+           "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them",
+           false);
   addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
-  addParam("magneticField", m_magneticFieldName, "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge", string("default"));
-  addParam("magneticCacheDistance", m_magneticCacheDistance, "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching", 0.0);
-  addParam("deltaChordInMagneticField", m_deltaChordInMagneticField, "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
+  addParam("magneticField", m_magneticFieldName,
+           "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
+           string("default"));
+  addParam("magneticCacheDistance", m_magneticCacheDistance,
+           "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
+           0.0);
+  addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
+           "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
 
   vector<string> defaultCommands;
-  addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.", defaultCommands);
+  addParam("UICommands", m_uiCommands, "A list of Geant4 UI commands that should be applied before the simulation starts.",
+           defaultCommands);
 
-  addParam("trajectoryStore", m_trajectoryStore, "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
+  addParam("trajectoryStore", m_trajectoryStore,
+           "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
   addParam("trajectoryAngularTolerance", m_trajectoryAngularTolerance,
            "If >0 the saved trajectory will be simplified by merging segments "
            "which change direction by less than this value in radian", 1e-2);
@@ -153,10 +170,10 @@ void FullSimModule::initialize()
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)
-  G4ParticleTable::G4PTblDicIterator* theParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
-  theParticleIterator->reset();
-  while ((*theParticleIterator)()) {
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
+  myParticleIterator->reset();
+  while ((*myParticleIterator)()) {
+    G4ParticleDefinition* particle = myParticleIterator->value();
     if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
       physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
     }
@@ -269,7 +286,8 @@ void FullSimModule::initialize()
   }
   G4EventManager::GetEventManager()->SetVerboseLevel(g4VerboseLevel);
   G4RunManager::GetRunManager()->SetVerboseLevel(g4VerboseLevel);
-  G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(m_trackingVerbosity); //turned out to be more useful as a parameter.
+  G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(
+    m_trackingVerbosity); //turned out to be more useful as a parameter.
   //G4HadronicProcessStore::Instance()->SetVerbose(g4VerboseLevel);
   G4HadronicProcessStore::Instance()->SetVerbose(m_hadronprocessVerbosity);
   G4LossTableManager::Instance()->SetVerbose(g4VerboseLevel);

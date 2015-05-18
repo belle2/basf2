@@ -94,7 +94,7 @@ void FullSimTimingModule::event()
     //Ok, we want to plot the regions in the order they were created so we need
     //to map from region to index in the store
     int index {0};
-    for (G4Region * region : * (G4RegionStore::GetInstance())) {
+    for (G4Region* region : * (G4RegionStore::GetInstance())) {
       //We don't care about regions wihtout volumes
       if (region->GetNumberOfRootVolumes() == 0) continue;
       //Increase the index otherwise
@@ -117,7 +117,7 @@ void FullSimTimingModule::event()
   if (m_eventTime > 0) {
     ++m_eventCount;
     m_eventTime = 0;
-    for (auto & it : m_regionCache) {
+    for (auto& it : m_regionCache) {
       int index = m_regionIndices[it.first];
       m_timingProfile->Fill(index, it.second);
       it.second = 0;
@@ -152,7 +152,7 @@ void FullSimTimingModule::terminate()
   m_timingProfile->Scale(1. / Unit::ms);
   //Set the labels of the profile to the region names and check the maximum length
   size_t regionWidth {6};
-  for (auto & it : m_regionIndices) {
+  for (auto& it : m_regionIndices) {
     m_timingProfile->GetXaxis()->SetBinLabel(it.second + 1, it.first->GetName().c_str());
     regionWidth = std::max(regionWidth, it.first->GetName().size());
   }

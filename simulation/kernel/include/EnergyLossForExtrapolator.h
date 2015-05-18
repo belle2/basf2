@@ -255,9 +255,6 @@ namespace Belle2 {
       //! Pointer to the electron's multiple-scattering cross section vs KE table
       G4PhysicsTable*          m_MscatElectron;
 
-      //! Flag to enable/disable spline interpolation of the above tables
-      G4bool m_SplineFlag;
-
       //! Pointer to internally cached material
       const G4Material* m_Material;
 

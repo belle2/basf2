@@ -326,12 +326,11 @@ void EnergyLossForExtrapolator::Initialisation()
 G4PhysicsTable* EnergyLossForExtrapolator::PrepareTable()
 {
   G4PhysicsTable* table = new G4PhysicsTable();
-  m_SplineFlag = G4LossTableManager::Instance()->SplineFlag();
 
   for (G4int i = 0; i < m_NMaterials; i++) {
 
     G4PhysicsVector* v = new G4PhysicsLogVector(m_UserTmin, m_UserTmax, m_Nbins);
-    v->SetSpline(m_SplineFlag);
+    v->SetSpline(true);
     table->push_back(v);
   }
   return table;
@@ -459,7 +458,7 @@ void EnergyLossForExtrapolator::ComputeElectronDEDX(const G4ParticleDefinition* 
               << dedx / ((CLHEP::MeV * (*G4Material::GetMaterialTable())[i]->GetDensity()) / (CLHEP::g / CLHEP::cm2)))
       aVector->PutValue(j, dedx);
     }
-    if (m_SplineFlag) aVector->FillSecondDerivatives();
+    aVector->FillSecondDerivatives();
   }
   delete ioni; delete ioniPC;
   delete brem; delete bremPC;
@@ -510,7 +509,7 @@ void EnergyLossForExtrapolator::ComputeMuonDEDX(const G4ParticleDefinition* part
               << " dedx(Mev/(g/cm2)= "
               << dedx / ((CLHEP::MeV * (*G4Material::GetMaterialTable())[i]->GetDensity()) / (CLHEP::g / CLHEP::cm2)))
     }
-    if (m_SplineFlag) aVector->FillSecondDerivatives();
+    aVector->FillSecondDerivatives();
   }
   delete ioni; delete ioniPC;
   delete pair; delete pairPC;
@@ -551,7 +550,7 @@ void EnergyLossForExtrapolator::ComputeHadronDEDX(const G4ParticleDefinition* pa
               << " dedx(Mev.cm2/g)= "
               << dedx / (((*G4Material::GetMaterialTable())[i]->GetDensity()) / (CLHEP::g / CLHEP::cm2)))
     }
-    if (m_SplineFlag) aVector->FillSecondDerivatives();
+    aVector->FillSecondDerivatives();
   }
   delete ioni; delete ioniPC;
 }
@@ -589,7 +588,7 @@ void EnergyLossForExtrapolator::ComputeTransportXS(const G4ParticleDefinition* p
       B2DEBUG(10, "EnergyLossForExtrapolator::ComputeTransportXS(): j= " << j << "  e(MeV)= " << e / CLHEP::MeV
               << " xs(1/mm)= " << xs * CLHEP::mm)
     }
-    if (m_SplineFlag) aVector->FillSecondDerivatives();
+    aVector->FillSecondDerivatives();
   }
   delete msc; delete mscPC;
 }

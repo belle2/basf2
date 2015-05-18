@@ -655,6 +655,29 @@ namespace Belle2 {
       return result;
     }
 
+    double pionVeto(const Particle* particle)
+    {
+      double pion0Mass = 0.135;           // neutral pion mass from PDG
+      double deltaE = 0.03;               // mass range around pion0Mass that will be accepted
+
+      StoreObjPtr<ParticleList> PhotonList("gamma");
+
+      const Particle* sig_Photon = particle->getDaughter(1)->getDaughter(0);
+      TLorentzVector vec = sig_Photon->get4Vector();
+
+      for (unsigned int i = 0; i < PhotonList->getListSize(); i++) {
+        Particle* p_Photon = PhotonList->getParticle(i);
+        if ((p_Photon->getEnergy() >= 0.1) && (p_Photon->getMdstArrayIndex() != sig_Photon->getMdstArrayIndex())) {
+          double tempCombination = (p_Photon->get4Vector() + vec).M();
+          if (abs(tempCombination - pion0Mass) <= deltaE) {
+            return 1.;
+          };
+        };
+      };
+
+      return 0.;
+    }
+
     // TDCPV related ---------------------------------------------------------
 
     double particleTagVx(const Particle* particle)
@@ -1193,6 +1216,8 @@ namespace Belle2 {
                       "number of remaining KLM clusters as given by the related RestOfEvent object");
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
                       "Returns number of tracks in ROE - number of tracks of given particle");
+
+    REGISTER_VARIABLE("pionVeto", pionVeto, "Returns the Flag 1 if a combination of photons has the invariant mass of a neutral pion");
 
     VARIABLE_GROUP("TDCPV");
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");

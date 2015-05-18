@@ -265,8 +265,15 @@ namespace Belle2 {
      *
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      */
-    double nROEKLMClusters(const Particle* particle);
+    double pionVeto(const Particle* particle);
 
+    /**
+     * returns 1 if the invariant mass of a combination of a photon in RestOfEvent with
+     * the signal photon yields the mass of the a neutral Pion.
+     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
+     */
+
+    double nROEKLMClusters(const Particle* particle);
     /**
      * return X component of the tag vertex
      *

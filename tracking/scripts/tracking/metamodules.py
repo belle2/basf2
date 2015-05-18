@@ -195,9 +195,19 @@ class IfModule(WrapperModule):
             super(IfModule, self).event()
 
 
-class IfStoreArrayPresentModule(IfModule):
+def is_storearray_present(storearray_name,
+                          storearray_durability=0):
+    """Checks if a StoreArray with name and durability is present in the DataStore.
 
-    """Conditional execution of the wrapped module based if a StoreArray is present.
+    Only works during the event processing phase, but not on initialisation,
+    due to limitation of the python interface to the framework
+    """
+    storearray_list = Belle2.PyStoreArray.list(storearray_durability)
+    return storearray_name in storearray_list
+
+
+class IfStoreArrayPresentModule(IfModule):
+    """Conditional execution of the wrapped module if a StoreArray is present.
 
     Attributes:
       storearray_name (str): The name of the StoreArray which presence has to be checked.
@@ -229,15 +239,25 @@ class IfStoreArrayPresentModule(IfModule):
         self.storearray_is_present = None
 
     def condition(self):
-        """Returns the flag if the StoreArray is present"""
-        if self.storearray_is_present is None:
-            storearray = Belle2.PyStoreArray(self.storearray_name, self.storearray_durability)
-            if storearray:
-                self.storearray_is_present = True
-            else:
-                self.storearray_is_present = False
+        """Returns true if the StoreArray is present.
 
+        Checks presence of the StoreArray once and remembers the result for all following events.
+        """
+        if self.storearray_is_present is None:
+            self.storearray_is_present = is_storearray_present(self.storearray_name,
+                                                               self.storearray_durability)
         return self.storearray_is_present
+
+
+class IfStoreArrayNotPresentModule(IfStoreArrayPresentModule):
+    """Conditional execution of the wrapped module based if a StoreArray is not present."""
+
+    def condition(self):
+        """Returns false if the StoreArray is present.
+
+        Checks presence of the StoreArray once and remembers the result for all following events.
+        """
+        return not IfStoreArrayPresentModule.condition(self)
 
 
 class IfMCParticlesPresentModule(IfStoreArrayPresentModule):
@@ -303,38 +323,3 @@ class PathModule(basf2.Module):
         """
 
         self.return_value(True)
-
-
-class IfPathWithStoreArrayName(PathModule):
-
-    """ Special Path which conditionally executes a given module only of the given store array name is not already present in the
-    store array
-
-    Attributes
-    ----------
-    modules or path: list of basf2.Module or path
-        The modules/path executed if a StoreArray with the given name is not already present
-    store_array_name:
-        The given name for the store array
-
-    """
-
-    def __init__(self, store_array_name, path=None, modules=None):
-        """ Initialization method sending the parameters to the base class IfModule """
-
-        self.is_not_store_array = None
-        self.store_array_name = store_array_name
-
-        super(IfPathWithStoreArrayName, self).__init__(path=path, modules=modules)
-
-    def search_for_store_array_name_condition(self):
-        if self.is_not_store_array is None:
-            store_array_list = Belle2.PyStoreArray.list()
-            self.is_not_store_array = self.store_array_name not in store_array_list
-
-        print self.is_not_store_array
-        return self.is_not_store_array
-
-    def event(self):
-        """ Only execute the event if the condition is true """
-        self.return_value(self.search_for_store_array_name_condition())

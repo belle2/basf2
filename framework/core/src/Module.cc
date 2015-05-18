@@ -339,11 +339,11 @@ void Module::exposePythonAPI()
   .def("set_abort_level", &Module::setAbortLevel)
   .def("set_log_info", &Module::setLogInfo)
   //tell python about the default implementations of virtual functions
-  .def("initialize", &PyModule::def_initialize)
-  .def("beginRun", &PyModule::def_beginRun)
-  .def("event", &PyModule::def_event)
-  .def("endRun", &PyModule::def_endRun)
-  .def("terminate", &PyModule::def_terminate)
+  .def("initialize", &Module::def_initialize)
+  .def("beginRun", &Module::def_beginRun)
+  .def("event", &Module::def_event)
+  .def("endRun", &Module::def_endRun)
+  .def("terminate", &Module::def_terminate)
   ;
 
   register_ptr_to_python<ModulePtr>();

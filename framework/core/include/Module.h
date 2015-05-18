@@ -155,6 +155,41 @@ namespace Belle2 {
      */
     virtual void terminate() {};
 
+    //@{
+    /** Wrappers for the event processing methods callable and overrideable from Python. */
+
+    /**
+     * Wrapper method for the virtual function initialize() that has the implementation
+     * to be used in a call from Python.
+     */
+    virtual void def_initialize() { initialize(); }
+
+    /**
+     * Wrapper method for the virtual function beginRun() that has the implementation
+     * to be used in a call from Python.
+     */
+    virtual void def_beginRun() { beginRun(); }
+
+    /**
+     * Wrapper method for the virtual function event() that has the implementation
+     * to be used in a call from Python.
+     */
+    virtual void def_event() { event(); }
+
+    /**
+     * This method can receive that the current run ends as a call from the Python side.
+     *
+     * For regular C++-Modules that forwards the call to the regular endRun() method.
+     */
+    virtual void def_endRun() { endRun(); }
+
+    /**
+     * Wrapper method for the virtual function terminate() that has the implementation
+     * to be used in a call from Python.
+     */
+    virtual void def_terminate() { terminate(); }
+    //@}
+
     /**
      * Returns the name of the module.
      */

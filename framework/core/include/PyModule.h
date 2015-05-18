@@ -12,6 +12,7 @@
 #define PYMODULE_H
 
 #include <boost/python/call_method.hpp>
+#include <boost/python/wrapper.hpp>
 
 #include <framework/core/Module.h>
 
@@ -53,19 +54,62 @@ namespace Belle2 {
     *  note that all methods must be registered in Module::exposePythonAPI()
     */
 
-    void initialize() { boost::python::call_method<void>(m_self, "initialize"); };
-    void beginRun() { boost::python::call_method<void>(m_self, "beginRun"); };
-    void event() { boost::python::call_method<void>(m_self, "event"); };
-    void endRun() { boost::python::call_method<void>(m_self, "endRun"); };
-    void terminate() { boost::python::call_method<void>(m_self, "terminate"); };
+    virtual void initialize() override final
+    {
+      boost::python::call_method<void>(m_self, "initialize");
+    }
+
+    virtual void beginRun() override final
+    {
+      boost::python::call_method<void>(m_self, "beginRun");
+    }
+
+    virtual void event() override final
+    {
+      boost::python::call_method<void>(m_self, "event");
+    }
+
+    virtual void endRun() override final
+    {
+      boost::python::call_method<void>(m_self, "endRun");
+    }
+
+    virtual void terminate() override final
+    {
+      boost::python::call_method<void>(m_self, "terminate");
+    }
 
     //@{
     /** default implementation used when Python module doesn't supply its own */
-    static void def_initialize(Module& m) { m.Module::initialize(); }
-    static void def_beginRun(Module& m) { m.Module::beginRun(); }
-    static void def_event(Module& m) { m.Module::event(); }
-    static void def_endRun(Module& m) { m.Module::endRun(); }
-    static void def_terminate(Module& m) { m.Module::terminate(); }
+    virtual void def_initialize() override final
+    {
+      // Call empty base implementation if initialize() is not overriden from Python.
+      Module::initialize();
+    }
+
+    virtual void def_beginRun() override final
+    {
+      // Call empty base implementation if beginRun() is not overriden from Python.
+      Module::beginRun();
+    }
+
+    virtual void def_event() override final
+    {
+      // Call empty base implementation if event() is not overriden from Python.
+      Module::event();
+    }
+
+    virtual void def_endRun() override final
+    {
+      // Call empty base implementation if endRun() is not overriden from Python.
+      Module::endRun();
+    }
+
+    virtual void def_terminate() override final
+    {
+      // Call empty base implementation if terminate() is not overriden from Python.
+      Module::terminate();
+    }
     //@}
 
   private:

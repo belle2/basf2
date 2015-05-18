@@ -91,7 +91,7 @@ class CDCFullFinder(metamodules.PathModule):
                                             "ClusterFilterParameters": {"cut": "0.1"},
                                             "SegmentsStoreObjName": "TempCDCRecoSegment2DVector",
                                             "FacetFilter": "none",
-                                            "FacetNeighborChooser": "none"})
+                                            "FacetRelationFilter": "none"})
 
         printer = basf2.register_module("PrintCollections")
 

@@ -12,4 +12,5 @@
 #include "AllAxialStereoSegmentPairFilter.h"
 #include "MCAxialStereoSegmentPairFilter.h"
 #include "SimpleAxialStereoSegmentPairFilter.h"
+#include "RecordingAxialStereoSegmentPairFilter.h"
 

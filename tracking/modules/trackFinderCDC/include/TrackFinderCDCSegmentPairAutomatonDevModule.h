@@ -39,6 +39,11 @@ namespace Belle2 {
     */
     std::string m_param_segmentPairFilter;
 
+    /** Parameter: Segment Pair filter parameters forwarded to the segment pair filter
+     *  Meaning of the Key - Value pairs depend on the segment pair filter
+     */
+    std::map<std::string, std::string> m_param_segmentPairFilterParameters;
+
     /** Parameter: Segment pair neighbor chooser to be used during the construction of the graph.
     Valid values are:
 
@@ -50,6 +55,10 @@ namespace Belle2 {
     */
     std::string m_param_segmentPairNeighborChooser;
 
+    /** Parameter: Segment Pair neighbor chooser parameters forwarded to the segment pair neighbor chooser
+     *  Meaning of the Key - Value pairs depend on the segment pair neighbor chooser
+     */
+    std::map<std::string, std::string> m_param_segmentPairNeighborChooserParameters;
 
   }; // end class
 } // end namespace Belle2

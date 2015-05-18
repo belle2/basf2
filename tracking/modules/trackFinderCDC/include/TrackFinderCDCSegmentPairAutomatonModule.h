@@ -27,6 +27,7 @@
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 
 #include <vector>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -72,16 +73,6 @@ namespace Belle2 {
 
       }
 
-      /// Destructor deleting the filters.
-      ~TrackFinderCDCSegmentPairAutomatonImplModule()
-      {
-        if (m_ptrAxialStereoSegmentPairFilter) delete m_ptrAxialStereoSegmentPairFilter;
-        m_ptrAxialStereoSegmentPairFilter = nullptr;
-
-        if (m_ptrAxialStereoSegmentPairNeighborChooser) delete m_ptrAxialStereoSegmentPairNeighborChooser;
-        m_ptrAxialStereoSegmentPairNeighborChooser = nullptr;
-      }
-
       ///  Initialize the Module before event processing
       virtual void initialize() override
       {
@@ -122,35 +113,36 @@ namespace Belle2 {
       /// Getter for the current segment pair filter. The module keeps ownership of the pointer.
       AxialStereoSegmentPairFilter* getAxialStereoSegmentPairFilter()
       {
-        return m_ptrAxialStereoSegmentPairFilter;
+        return m_ptrAxialStereoSegmentPairFilter.get();
       }
 
       /// Setter for the segment pair filter used in the segment pair creation. The module takes ownership of the pointer.
-      void setAxialStereoSegmentPairFilter(AxialStereoSegmentPairFilter* ptrAxialStereoSegmentPairFilter)
+      void setAxialStereoSegmentPairFilter(std::unique_ptr<AxialStereoSegmentPairFilter>
+                                           ptrAxialStereoSegmentPairFilter)
       {
-        if (m_ptrAxialStereoSegmentPairFilter) delete m_ptrAxialStereoSegmentPairFilter;
-        m_ptrAxialStereoSegmentPairFilter = ptrAxialStereoSegmentPairFilter;
+        m_ptrAxialStereoSegmentPairFilter = std::move(ptrAxialStereoSegmentPairFilter);
       }
 
       /// Getter for the current segment pair neighbor chooser. The module keeps ownership of the pointer.
       AxialStereoSegmentPairNeighborChooser* getAxialStereoSegmentPairNeighborChooser()
       {
-        return m_ptrAxialStereoSegmentPairNeighborChooser;
+        return m_ptrAxialStereoSegmentPairNeighborChooser.get();
       }
 
       /// Setter for the segment neighbor chooser. The module takes ownership of the pointer.
-      void setAxialStereoSegmentPairNeighborChooser(AxialStereoSegmentPairNeighborChooser* ptrAxialStereoSegmentPairNeighborChooser)
+      void setAxialStereoSegmentPairNeighborChooser(std::unique_ptr<AxialStereoSegmentPairNeighborChooser>
+                                                    ptrAxialStereoSegmentPairNeighborChooser)
       {
-        if (m_ptrAxialStereoSegmentPairNeighborChooser) delete m_ptrAxialStereoSegmentPairNeighborChooser;
-        m_ptrAxialStereoSegmentPairNeighborChooser = ptrAxialStereoSegmentPairNeighborChooser;
+
+        m_ptrAxialStereoSegmentPairNeighborChooser = std::move(ptrAxialStereoSegmentPairNeighborChooser);
       }
 
     private:
       /// Reference to the filter to be used for the segment pair generation.
-      AxialStereoSegmentPairFilter* m_ptrAxialStereoSegmentPairFilter;
+      std::unique_ptr<AxialStereoSegmentPairFilter> m_ptrAxialStereoSegmentPairFilter;
 
       /// Reference to the chooser to be used to construct the segment pair network.
-      AxialStereoSegmentPairNeighborChooser* m_ptrAxialStereoSegmentPairNeighborChooser;
+      std::unique_ptr<AxialStereoSegmentPairNeighborChooser> m_ptrAxialStereoSegmentPairNeighborChooser;
 
     private:
       /// Parameter: Switch if segment pairs shall be written to the DataStore

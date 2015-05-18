@@ -10,6 +10,7 @@ import basf2
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.validation.module import SeparatedTrackingValidationModule
+from tracking.metamodules import IfPathWithStoreArrayName
 
 
 from trackfindingcdc.cdcLegendreTrackingValidation import ReassignHits
@@ -45,20 +46,19 @@ class AddValidationMethod:
 class MCTrackFinderRun(StandardEventGenerationRun):
     # output track cands
     mc_track_cands_store_array_name = "MCTrackCands"
-    create_mc_tracks = True
 
     def create_path(self):
         main_path = super(MCTrackFinderRun, self).create_path()
 
-        track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruth')
-        track_finder_mc_truth_module.param({
-            'UseCDCHits': True,
-            'WhichParticles': [],
-            'GFTrackCandidatesColName': self.mc_track_cands_store_array_name,
-        })
+        mc_track_finder_module = self.get_basf2_module('TrackFinderMCTruth',
+                                                       UseCDCHits=True,
+                                                       WhichParticles=[],
+                                                       GFTrackCandidatesColName=self.mc_track_cands_store_array_name)
 
-        if self.create_mc_tracks:
-            main_path.add_module(track_finder_mc_truth_module)
+        mc_track_finder_module_if_module = IfPathWithStoreArrayName(modules=[mc_track_finder_module],
+                                                                    store_array_name=self.mc_track_cands_store_array_name)
+        mc_track_finder_module_if_module.set_log_level(basf2.LogLevel.DEBUG)
+        main_path.add_module(mc_track_finder_module_if_module)
 
         return main_path
 
@@ -83,17 +83,20 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
         return argument_parser
 
     def create_path(self):
-        # BackgroundHitFinder, Legendre, LegendreStereo, NotAssignedHitsSearcher
+        # BackgroundHitFinder, Legendre, LegendreStereo
         main_path = super(LegendreTrackFinderRun, self).create_path()
 
-        background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
-        background_hit_finder_module.param({
-            "ClusterFilter": "tmva",
-            "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
-            "SegmentsStoreObjName": "TempCDCRecoSegment2DVector",
-            "FacetFilter": "none",
-            "FacetNeighborChooser": "none",
-        })
+        legendre_path = basf2.create_path()
+
+        background_hit_finder_module = self.get_basf2_module("SegmentFinderCDCFacetAutomatonDev",
+                                                             ClusterFilter="tmva",
+                                                             ClusterFilterParameters={"cut": str(self.tmva_cut)},
+                                                             SegmentsStoreObjName="TempCDCRecoSegment2DVector",
+                                                             FacetFilter="none",
+                                                             FacetNeighborChooser="none")
+
+        if self.tmva_cut > 0:
+            legendre_path.add_module(background_hit_finder_module)
 
         cdctracking = basf2.register_module('CDCLegendreTracking')
         cdctracking.param({'WriteGFTrackCands': False,
@@ -104,12 +107,11 @@ class LegendreTrackFinderRun(MCTrackFinderRun):
                                    'SkipHitsPreparation': True,
                                    'TracksStoreObjNameIsInput': True})
 
-        if self.tmva_cut > 0:
-            main_path.add_module(background_hit_finder_module)
-
-        main_path.add_module(cdctracking)
+        legendre_path.add_module(cdctracking)
         if self.stereo_assignment:
-            main_path.add_module(cdc_stereo_combiner)
+            legendre_path.add_module(cdc_stereo_combiner)
+
+        main_path.add_path(legendre_path)
 
         return main_path
 

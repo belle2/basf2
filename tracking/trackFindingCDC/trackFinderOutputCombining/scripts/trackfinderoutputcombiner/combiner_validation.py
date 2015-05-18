@@ -10,6 +10,8 @@ import basf2
 import ROOT
 from ROOT import Belle2
 
+import glob
+
 from trackfinderoutputcombiner.validation import AddValidationMethod, LegendreTrackFinderRun
 from tracking.validation.extract_information_from_tracking_validation_output import (initialize_results,
                                                                                      extract_information_from_file)
@@ -17,14 +19,19 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 import logging
 
+import pandas as pd
+
+
 CONTACT = "ucddn@student.kit.edu"
 
 
 class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
 
     local_track_cands_store_array_name = "LocalTrackCands"
-    create_mc_tracks = True
     segment_track_chooser_cut = 0.1
+    segment_track_chooser_filter = "tmva"
+    segment_train_filter = "simple"
+    segment_track_filter = "simple"
     stereo_assignment = True
 
     def add_mc_combination(self, main_path):
@@ -62,78 +69,114 @@ class CombinerValidationRun(LegendreTrackFinderRun, AddValidationMethod):
         display_module.draw_track_trajectories = True
         # main_path.add_module(display_module)
 
-        local_track_finder = basf2.register_module('SegmentFinderCDCFacetAutomaton')
-        local_track_finder.param({
-            "GFTrackCandsStoreArrayName": self.local_track_cands_store_array_name,
-            "TracksStoreObjName": "TempCDCTracks",
-            "WriteGFTrackCands": True,
-            "CreateGFTrackCands": True,
-            "FitSegments": True,
-            'SkipHitsPreparation': True,
-        })
+        local_track_finder = self.get_basf2_module('SegmentFinderCDCFacetAutomaton',
+                                                   GFTrackCandsStoreArrayName=self.local_track_cands_store_array_name,
+                                                   TracksStoreObjName="TempCDCTracks",
+                                                   WriteGFTrackCands=True,
+                                                   CreateGFTrackCands=True,
+                                                   FitSegments=True,
+                                                   SkipHitsPreparation=True)
         main_path.add_module(local_track_finder)
 
         combiner_module = basf2.register_module("SegmentTrackCombinerDev")
-        combiner_module.param({'SegmentTrackChooser': 'tmva',
-                               'SegmentTrackChooserParameters': {"cut": str(self.segment_track_chooser_cut)},
-                               'SegmentTrainFilter': 'simple',
-                               'SegmentTrackFilter': 'mc',
-                               'WriteGFTrackCands': False,
+        combiner_module.param({'SegmentTrackChooser': str(self.segment_track_chooser_filter),
+                               'SegmentTrainFilter': self.segment_train_filter,
+                               'SegmentTrackFilter': self.segment_track_filter,
+                               'WriteGFTrackCands': True,
                                'SkipHitsPreparation': True,
+                               "GFTrackCandsStoreArrayName": "ResultTrackCands",
                                'TracksStoreObjNameIsInput': True})
-        if self.segment_track_chooser_cut >= 1.0:
-            combiner_module.param({"SegmentTrackChooser": "mc", "SegmentTrackChooserParameters": {}})
-        if self.segment_track_chooser_cut <= 0.0:
-            combiner_module.param({"SegmentTrackChooser": "simple", "SegmentTrackChooserParameters": {}})
 
-        # combiner_module.set_log_level(basf2.LogLevel.DEBUG)
-        combiner_module.set_debug_level(200)
+        if self.segment_track_chooser_filter == "tmva":
+            combiner_module.param('SegmentTrackChooserParameters', {"cut": str(self.segment_track_chooser_cut)})
+
         main_path.add_module(combiner_module)
 
         self.add_mc_combination(main_path)
 
-        rest_track_finder = basf2.register_module("TrackFinderCDCSegmentPairAutomatonDev")
-        rest_track_finder.param({'SkipHitsPreparation': True,
-                                 "WriteGFTrackCands": True,
-                                 "SegmentPairFilter": "mc",
-                                 "SegmentPairNeighborChooser": "mc",
-                                 "TracksStoreObjNameIsInput": True,
-                                 "GFTrackCandsStoreArrayName": "ResultTrackCands"})
-        main_path.add_module(rest_track_finder)
-
         self.create_validation(
             main_path,
             track_candidates_store_array_name="ResultTrackCands",
-            output_file_name="evaluation/Combiner%.1f.root" %
-            self.segment_track_chooser_cut)
-        self.create_validation(
-            main_path,
-            track_candidates_store_array_name="TrackCands",
-            output_file_name="evaluation/Legendre.root")
-        self.create_validation(
-            main_path,
-            track_candidates_store_array_name="NaiveCombinerTrackCands",
-            output_file_name="evaluation/Naive.root")
+            output_file_name="evaluation/Combiner%.1f_%s_%s_%s.root" % (self.segment_track_chooser_cut,
+                                                                        self.segment_track_chooser_filter,
+                                                                        self.segment_train_filter,
+                                                                        self.segment_track_filter))
+
+        if not os.path.exists("evaluation/Legendre.root"):
+            self.create_validation(
+                main_path,
+                track_candidates_store_array_name="TrackCands",
+                output_file_name="evaluation/Legendre.root")
+        if not os.path.exists("evaluation/Naive.root"):
+            self.create_validation(
+                main_path,
+                track_candidates_store_array_name="NaiveCombinerTrackCands",
+                output_file_name="evaluation/Naive.root")
 
         return main_path
 
 
-def main():
+def print_data():
+
+    root_files = glob.glob("evaluation/*.root")
 
     result = initialize_results()
-    result.update({"tmva_cut": []})
+    result.update({"file_name": []})
 
-    for tmva_cut in np.arange(0.0, 1.1, 0.1):
+    for file_name in root_files:
+        result = extract_information_from_file(file_name, result)
+        result["file_name"].append(file_name)
+
+    print result
+
+
+def main():
+
+    for tmva_cut in np.arange(0.0, 1.0, 0.1):
         run = CombinerValidationRun()
         run.segment_track_chooser_cut = tmva_cut
+        run.segment_track_chooser_filter = "tmva"
+        run.segment_train_filter = "simple"
+        run.segment_track_filter = "simple"
         run.configure_and_execute_from_commandline()
 
-        result = extract_information_from_file("evaluation/Combiner%.1f.root" % tmva_cut, result)
-        result["tmva_cut"].append(tmva_cut)
+    for tmva_cut in np.arange(0.0, 1.0, 0.1):
+        run = CombinerValidationRun()
+        run.segment_track_chooser_cut = tmva_cut
+        run.segment_track_chooser_filter = "tmva"
+        run.segment_train_filter = "mc"
+        run.segment_track_filter = "simple"
+        run.configure_and_execute_from_commandline()
 
-    for key in result:
-        print key + "\t" + "\t".join([str(value) for value in result[key]])
+    for tmva_cut in np.arange(0.0, 1.0, 0.1):
+        run = CombinerValidationRun()
+        run.segment_track_chooser_cut = tmva_cut
+        run.segment_track_chooser_filter = "tmva"
+        run.segment_train_filter = "simple"
+        run.segment_track_filter = "mc"
+        run.configure_and_execute_from_commandline()
+
+    for tmva_cut in np.arange(0.0, 1.0, 0.1):
+        run = CombinerValidationRun()
+        run.segment_track_chooser_cut = tmva_cut
+        run.segment_track_chooser_filter = "tmva"
+        run.segment_train_filter = "mc"
+        run.segment_track_filter = "mc"
+        run.configure_and_execute_from_commandline()
+
+    run = CombinerValidationRun()
+    run.segment_track_chooser_filter = "mc"
+    run.segment_train_filter = "mc"
+    run.segment_track_filter = "mc"
+    run.configure_and_execute_from_commandline()
+
+    run = CombinerValidationRun()
+    run.segment_track_chooser_filter = "simple"
+    run.segment_train_filter = "simple"
+    run.segment_track_filter = "simple"
+    run.configure_and_execute_from_commandline()
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
     main()
+    print_data()

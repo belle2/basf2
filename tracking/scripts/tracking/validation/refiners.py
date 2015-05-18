@@ -529,7 +529,10 @@ class SavePullAnalysisRefiner(Refiner):
         name = formatter.format(name, part_name=self.part_name, **replacement_dict)
         plot_name = name + "_{subplot_name}"
 
-        title_postfix = self.title_postfix or self.default_title_postfix
+        title_postfix = self.title_postfix
+        if title_postfix is None:
+            title_postfix = self.default_title_postfix
+
         title_postfix = formatter.format(title_postfix, part_name=self.part_name, **replacement_dict)
         plot_title = "{subplot_title} of {quantity_name}" + title_postfix
 

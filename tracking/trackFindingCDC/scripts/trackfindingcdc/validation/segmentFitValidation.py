@@ -207,14 +207,16 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         unit="1/cm",
         absolute=False,
         groupby=[None, "stereo_type", "superlayer_id"],
-        outlier_z_score=3.0)
+        outlier_z_score=3.0,
+        title_postfix="")
 
     save_absolute_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=True,
         groupby=[None, "stereo_type", "superlayer_id"],
-        outlier_z_score=3.0)
+        outlier_z_score=3.0,
+        title_postfix="")
 
     save_fit_quality_histograms = refiners.save_histograms(
         outlier_z_score=5.0,
@@ -224,6 +226,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
                 "tan_lambda_truth": "true tan #lambda",
                 },
         groupby=[None, "stereo_type", "superlayer_id"],
+        title="Histogram of {part_name}{stacked_by_indication}{stackby}",
         description="Distribution of {part_name} in the segment fits",
     )
 
@@ -242,6 +245,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         description = ("Investigating the reconstruction quality for different "
                        "tan lambda regions of the CDC. Most notably is the superlayer dependency."
                        "For stereo superlayers the curve is not flat but has distinct slope."),
+        title = "Profile of {y_part_name} by {x_part_name}",
         fit='line',
     )
 

@@ -36,8 +36,29 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
+    n_events = 1000
+    generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
+
+    # All MC segments
     # segment_finder_module = "SegmentFinderCDCMCTruth"
-    segment_finder_module = "SegmentFinderCDCFacetAutomaton"
+
+    # MC Free
+    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    segment_finder_module.param({
+        "FacetFilter": "realistic",
+        "FacetNeighborChooser": "simple",
+        "SegmentOrientation": "outwards",  # as is from mc filters
+    })
+
+    # Proper generation logic of facets, filters use MC information
+    # segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    # segment_finder_module.param({
+    #         "FacetFilter" : "mc",
+    #         "FacetFilterParameters" : { "symmetric" : "false" },
+    #         "FacetNeighborChooser" : "mc",
+    #         "FacetNeighborChooserParameters" : { "symmetric" : "false" },
+    #         })
+
     fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()
     fit_positions = "rl"
     output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin

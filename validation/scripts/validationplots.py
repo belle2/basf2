@@ -951,16 +951,14 @@ def create_packages_list_html(list_of_packages, list_of_revisions):
             in_pkg = files_in_pkg(pkg, list_of_revisions)
 
             # Print them into a container
-            pkgs.write('<div class="pkg_container pkg_{0}" '
-                       'style="margin-left:18px; font-size:10px;'
-                       'display:none;">'.format(pkg))
+            pkgs.write('<div class="pkg_container pkg_{0}">'.format(pkg))
 
             for rootfile in in_pkg:
 
                 # Get the file name and shorten it if necessary
                 filename, extension = os.path.splitext(rootfile)
-                if len(filename) > 19:
-                    shortname = filename[:16] + '...'
+                if len(filename) > 20:
+                    shortname = filename[:17] + '...'
                 else:
                     shortname = filename
 

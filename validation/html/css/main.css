@@ -242,8 +242,17 @@ textarea {
     width:200px!important;
     height: 100%;
     overflow-y: auto;
+}
 
-	
+#navigation a
+{
+    color: black;
+    text-decoration: none;
+}
+
+#navigation a:hover
+{
+    text-decoration: underline;
 }
 
 #outer
@@ -414,6 +423,15 @@ textarea {
 td.show
 {
 	display: table-cell!important;
+}
+
+.pkg_container
+{
+    font-size: 13px;
+    line-height: 24px;
+    display: none;
+    margin-left: 18px;
+    padding: 4px 0 4px 0;
 }
 
 .plot_matrix {

@@ -131,10 +131,11 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
     throw (RCHandlerException("TTRX Link error"));
   }
   try {
+    bool dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
-      if (o_hslb.getBool("used") && m_fee[i] != NULL  &&
-          obj.hasObject("fee")) {
+      if (!dummymode && o_hslb.getBool("used") &&
+          m_fee[i] != NULL  && obj.hasObject("fee")) {
         HSLB& hslb(m_hslb[i]);
         hslb.open(i);
         try {
@@ -213,7 +214,9 @@ void COPPERCallback::monitor() throw(RCHandlerException)
     } catch (const IOException& e) {
       return;
     }
-    if (state != RCState::NOTREADY_S && state.isStable()) {
+    int dummymode = 0;
+    get("dummymode", dummymode);
+    if (!dummymode && state != RCState::NOTREADY_S && state.isStable()) {
       logging(m_copper.isFifoEmpty(), LogFile::NOTICE, "COPPER FIFO empty");
       logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
       logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");

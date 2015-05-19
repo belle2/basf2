@@ -17,6 +17,7 @@
 #include <framework/logging/Logger.h> // for B2INFO, etc...
 #include <vxd/geometry/SensorInfoBase.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationVector.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -98,6 +99,10 @@ namespace PurityCalcTests {
     return SpacePoint(); // empty SP as default but should not happen!
   }
 
+  /**
+   * small helper functor to find a pair in a container of pairs, where .first matches the passed integer
+   * COULDDO: make this templated to take any arguments to the pair, instead of only ints and shorts
+   */
   struct compFirst {
     explicit compFirst(int j) : i(j) { }
     bool operator()(const pair<int, short>& p)
@@ -108,6 +113,18 @@ namespace PurityCalcTests {
     int i;
   };
 
+  /**
+   * small helper functor to get the MCVXDPurityInfo with the passed ParticleId from a container of MCVXDPurityInfos
+   */
+  struct compMCId {
+    explicit compMCId(int j) : i(j) { }
+    bool operator()(const MCVXDPurityInfo& info)
+    {
+      return info.getParticleID() == i;
+    }
+  private:
+    int i;
+  };
   /**
    * class for testing the purity calculator tools (i.e. functions) defined in the spacePointCreation includes
    */
@@ -186,8 +203,8 @@ namespace PurityCalcTests {
       // add a SVD (non-ideal case: twoClusters -> 2 TrueHits -> 2 MCParticles)
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
       m_assignedClusters.push_back(2);
-      spacePoint->addRelationTo(sTH2MC1, 1);
-      spacePoint->addRelationTo(sTH2MC2, 1);
+      spacePoint->addRelationTo(sTH2MC1, 11); // U-Cluster
+      spacePoint->addRelationTo(sTH2MC2, 21); // V-Cluster
 
       // add a SVD (non-ideal case: no related TrueHits)
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
@@ -198,62 +215,30 @@ namespace PurityCalcTests {
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
       m_assignedClusters.push_back(2);
       spacePoint->addRelationTo(sTH2MC1, 2); // both Clusters related to this TrueHit
-      spacePoint->addRelationTo(sTH2MC2, 1); // only one Cluster related to TrueHit
+      spacePoint->addRelationTo(sTH2MC2, 11); // only one Cluster related to TrueHit (U-Cluster in this case)
 
-      // add a SVD (non-ideal case: only one Cluster with relation to ONE TrueHit)
+      // add a SVD (non-ideal case: only one Cluster with relation to ONE TrueHit: V-Cluster related)
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
       m_assignedClusters.push_back(2);
-      spacePoint->addRelationTo(sTH2MC1, 1); // one Cluster with relation to TrueHit with relation to MCParticle
+      spacePoint->addRelationTo(sTH2MC1, 21); // one V-Cluster with relation to TrueHit with relation to MCParticle
+
+      // add a SVD (non-ideal case: only one Cluster with relation to ONE TrueHit: U-Cluster related)
+      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
+      m_assignedClusters.push_back(2);
+      spacePoint->addRelationTo(sTH2MC2, 11); // one U-Cluster with relation to TrueHit with relation to MCParticle
 
       // add a SVD (non-ideal case: only one TrueHit has a relation to a MCParticle)
-      // add a SVD (non-ideal case: no related TrueHits)
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
       m_assignedClusters.push_back(2);
-      spacePoint->addRelationTo(sTH2MC1, 1);
-      spacePoint->addRelationTo(sTH2None, 1);
+      spacePoint->addRelationTo(sTH2MC1, 11); // U-Cluster
+      spacePoint->addRelationTo(sTH2None, 21); // V-Cluster without relation to MCParticle
 
-
-      // add a SVD combo with a normal two Cluster SpacePoint
-
-      // SVDTrueHit* sTrueHit = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId));
-      // mcPart1->addRelationTo(sTrueHit);
-      // spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP
-
-
-      // // add a SVD combo with a 'ghost hit'
-      // sTrueHit = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId));
-      // mcPart1->addRelationTo(sTrueHit);
-      // SVDTrueHit* sTrueHit2 = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId));
-      // mcPart2->addRelationTo(sTrueHit2);
-      // spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0)); // add two cluster SP
-      // spacePoint->addRelationTo(sTrueHit, 1);
-      // spacePoint->addRelationTo(sTrueHit2, 1);
-
-      // // add a SVD combo where one of the TrueHits has no relation to a MCParticle
-      // sTrueHit = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId));
-      // mcPart2->addRelationTo(sTrueHit);
-      // sTrueHit2 = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // make TH without relation to MCPart
-      // spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));
-      // spacePoint->addRelationTo(sTrueHit);
-      // spacePoint->addRelationTo(sTrueHit2);
-
-      // // add a single Cluster SVD SpacePoint to check if those are handled right
-      // // NOTE: this SP is related to a TrueHit that is also connected to another SpacePoint to check if there is no interference
-      // spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 1)); // make one Cluster SP
-      // spacePoint->addRelationTo(sTrueHit);
-
-      // // add a SpacePoint that has only one Cluster connected to a TrueHit
-      // spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, true, 0));
-      // sTrueHit = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId));
-      // spacePoint->addRelationTo(sTrueHit);
-
-      // add a SpacePoint that has a Cluster with two TrueHits
-
-
-
-      B2INFO("Contents of DataStore after SetUp: pxdTrueHits: " << m_pxdTrueHits.getEntries() <<
-             " svdTrueHits: " << m_svdTrueHits.getEntries() << " mcParticles: " << m_mcParticles.getEntries() <<
-             " spacePoints: " << m_spacePoints.getEntries());
+      // add singleCluster SpacePoints for testing the increaseCounterMethod. Do not need any relations!
+      // NOTE: these shall not be included in the testing of the other methods!
+      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, -1)); // add V-Cluster set only
+      m_assignedClusters.push_back(1);
+      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 1)); // add U-Cluster set only
+      m_assignedClusters.push_back(1);
     }
 
     /** tear down environment after test -> clear datastore */
@@ -270,84 +255,288 @@ namespace PurityCalcTests {
 
   /**
    * test that checks if the setup works as expected
+   * TODO!!!
    */
   TEST_F(PurityCalculatorToolsTest, testSetUp)
   {
+    B2INFO("Contents of DataStore after SetUp: pxdTrueHits: " << m_pxdTrueHits.getEntries() <<
+           " svdTrueHits: " << m_svdTrueHits.getEntries() << " mcParticles: " << m_mcParticles.getEntries() <<
+           " spacePoints: " << m_spacePoints.getEntries());
+
     // test if StoreArray has all the entries that should be there
     EXPECT_EQ(m_pxdTrueHits.getEntries(), 3);
     EXPECT_EQ(m_svdTrueHits.getEntries(), 3);
-    EXPECT_EQ(m_spacePoints.getEntries(), 10);
+    EXPECT_EQ(m_spacePoints.getEntries(), 13);
     EXPECT_EQ(m_mcParticles.getEntries(), 2);
 
     // test if the SpacePoints have the expected number of assigned Clusters
     for (int i = 0; i < m_spacePoints.getEntries(); ++i) {
       EXPECT_EQ(m_spacePoints[i]->getNClustersAssigned(), m_assignedClusters[i]);
     }
+
+    // test if the relations are set according to the set-up (mainly testing if the methods for setting up are working properly)
+    // NOTE: only sampling here, not testing all SpacePoints! (but still tried to cover all important relations (i.e. TH -> MCPart))
+    RelationVector<PXDTrueHit> pxdTrueHits = m_spacePoints[0]->getRelationsTo<PXDTrueHit>("ALL");
+    ASSERT_EQ(pxdTrueHits.size(), 1);
+    EXPECT_EQ(pxdTrueHits[0]->getArrayIndex(), 0);
+    EXPECT_EQ(pxdTrueHits.weight(0), 1);
+
+    pxdTrueHits = m_spacePoints[2]->getRelationsTo<PXDTrueHit>("ALL");
+    ASSERT_EQ(pxdTrueHits.size(), 2);
+    EXPECT_EQ(pxdTrueHits[0]->getArrayIndex(), 0);
+    EXPECT_EQ(pxdTrueHits[0]->getRelatedFrom<MCParticle>("ALL")->getArrayIndex(), 0);
+    EXPECT_EQ(pxdTrueHits.weight(0), 1);
+    EXPECT_EQ(pxdTrueHits[1]->getArrayIndex(), 1);
+    EXPECT_EQ(pxdTrueHits[1]->getRelatedFrom<MCParticle>("ALL")->getArrayIndex(), 1);
+    EXPECT_EQ(pxdTrueHits.weight(1), 1);
+
+    RelationVector<SVDTrueHit> svdTrueHits = m_spacePoints[4]->getRelationsTo<SVDTrueHit>("ALL");
+    ASSERT_EQ(svdTrueHits.size(), 1);
+    EXPECT_EQ(svdTrueHits[0]->getArrayIndex(), 0);
+    EXPECT_EQ(svdTrueHits[0]->getRelatedFrom<MCParticle>("ALL")->getArrayIndex(), 0);
+    EXPECT_EQ(svdTrueHits.weight(0), 2);
+
+    svdTrueHits = m_spacePoints[5]->getRelationsTo<SVDTrueHit>("ALL");
+    ASSERT_EQ(svdTrueHits.size(), 2);
+    EXPECT_EQ(svdTrueHits[0]->getArrayIndex(), 0); // MCParticle relation already tested!
+    EXPECT_EQ(svdTrueHits.weight(0), 11);
+    EXPECT_EQ(svdTrueHits[1]->getArrayIndex(), 1);
+    EXPECT_EQ(svdTrueHits.weight(1), 21);
+    EXPECT_EQ(svdTrueHits[1]->getRelatedFrom<MCParticle>("ALL")->getArrayIndex(), 1);
+
+    svdTrueHits = m_spacePoints[6]->getRelationsTo<SVDTrueHit>("ALL");
+    ASSERT_EQ(svdTrueHits.size(), 0);
+
+    svdTrueHits = m_spacePoints[7]->getRelationsTo<SVDTrueHit>("ALL");
+    ASSERT_EQ(svdTrueHits.size(), 2);
+    EXPECT_EQ(svdTrueHits[0]->getArrayIndex(), 0); // MCParticle relation already tested!
+    EXPECT_EQ(svdTrueHits.weight(0), 2);
+    EXPECT_EQ(svdTrueHits.weight(1), 11); // only related to U-Cluster
+    EXPECT_EQ(svdTrueHits[1]->getArrayIndex(), 1); // MCParticle relation already tested!
   }
 
-  /** test if the getMCParticles function returns the expected values. This test can also be seen as a check if
-   * mock up works!
-   * CAUTION: changing the SetUp might break things here as the order is assumed as in SetUp!
+  /**
+   * test if the findWeightInVector acts as advertised by its documentation
    */
-  // TEST_F(PurityCalculatorToolsTest, testGetMCParticles)
-  // {
-  //   // check first SP in StoreArray
-  //   vector<pair<int, short> > mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[0]);
-  //   EXPECT_EQ(0, mcParts[0].first);
-  //   EXPECT_EQ(1, mcParts[0].second);
-  //   EXPECT_EQ(1, mcParts.size());
+  TEST_F(PurityCalculatorToolsTest, testFindWeightInVector)
+  {
+    std::vector<std::pair<int, double> > vec;
+    vec.push_back(std::make_pair(1, 0));
+    vec.push_back(std::make_pair(1, 1.1));
+    vec.push_back(std::make_pair(1, 2));
+    vec.push_back(std::make_pair(1, 11));
+    vec.push_back(std::make_pair(1, 21));
+    vec.push_back(std::make_pair(1, 11));
+    vec.push_back(std::make_pair(1, 2.5));
 
-  //   // check two Cluster SpacePoint in StoreArray
-  //   mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[1]);
-  //   EXPECT_EQ(0, mcParts[0].first);
-  //   EXPECT_EQ(2, mcParts[0].second);
-
-
-  //   // check ghost hit SP in store Array
-  //   mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[2]);
-  //   EXPECT_EQ(2, mcParts.size());
-
-  //   auto findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1));
-  //   EXPECT_FALSE(findIt == mcParts.end());
-  //   findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(0));
-  //   EXPECT_FALSE(findIt == mcParts.end());
-
-  //   EXPECT_EQ(1, mcParts[0].second);
-  //   EXPECT_EQ(1, mcParts[1].second);
-
-  //   // check two Cluster SpacePoint with one TH without relation to MCParticle
-  //   mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[3]);
-  //   EXPECT_EQ(2, mcParts.size());
-  //   findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(-1));
-  //   EXPECT_FALSE(findIt == mcParts.end());
-  //   EXPECT_EQ(findIt->second, 1);
-  //   findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1));
-  //   EXPECT_FALSE(findIt == mcParts.end());
-  //   EXPECT_EQ(findIt->second, 1);
-
-  //   // check single Cluster SP
-  //   mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[4]);
-  //   EXPECT_EQ(mcParts[0].first, 1);
-  //   EXPECT_EQ(mcParts[0].second, 1);
-
-  //   // TODO: check for SpacePoint with no TH relation
-  //   mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[5]);
-  //   EXPECT_EQ(1, mcParts.size());
-  //   findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(-1)); // TrueHit has no connection to a MCParticle
-  //   EXPECT_FALSE(findIt == mcParts.end());
-  //   EXPECT_EQ(1, findIt->second);
-  //   findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(-2)); // Cluster has no relation to TrueHit
-  //   EXPECT_FALSE(findIt == mcParts.end());
-  //   EXPECT_EQ(1, findIt->second);
-
-  // }
+    EXPECT_TRUE(findWeightInVector(vec, 1e-4));
+    EXPECT_TRUE(findWeightInVector(vec, 1.1));
+    EXPECT_FALSE(findWeightInVector(vec, 11.1));
+    EXPECT_FALSE(findWeightInVector(vec, 2.501));
+  }
 
   /**
-   * test the calculatePurity function by comparing the calculated purities with expected values (known from mockup construction)
+   * test the getAccessorsFromWeight method with the values that are encountered
    */
-  TEST_F(PurityCalculatorToolsTest, testCalculatePurity)
+  TEST_F(PurityCalculatorToolsTest, testGetAccessorsFromWeight)
   {
-    // TODO !!
+    // empty returns first
+    std::vector<size_t> accs = getAccessorsFromWeight(0);
+    EXPECT_TRUE(accs.empty());
+    accs = getAccessorsFromWeight(30);
+    EXPECT_TRUE(accs.empty());
+
+    // cases that occur in "real life"
+    accs = getAccessorsFromWeight(1);
+    EXPECT_EQ(accs[0], 0); // -> PXD
+    EXPECT_EQ(accs.size(), 1);
+    accs = getAccessorsFromWeight(2);
+    EXPECT_EQ(accs.size(), 2);
+    EXPECT_EQ(accs[0], 1);
+    EXPECT_EQ(accs[1], 2);
+    accs = getAccessorsFromWeight(11);
+    EXPECT_EQ(accs[0], 1); // -> SVD U Cluster
+    EXPECT_EQ(accs.size(), 1);
+    accs = getAccessorsFromWeight(21);
+    EXPECT_EQ(accs[0], 2);
+    EXPECT_EQ(accs.size(), 1);
+  }
+
+  /**
+   * test if the increasClusterCounters increases the appropriate counters using SpacePoints that have been setup in the test
+   */
+  TEST_F(PurityCalculatorToolsTest, testIncreaseClusterCounters)
+  {
+    // create Array and test its initialization
+    std::array<unsigned, 3> ctrArray = { {0, 0, 0} };
+    for (size_t i = 0; i < 3; ++i) { EXPECT_EQ(ctrArray[i], 0); }
+
+    increaseClusterCounters(m_spacePoints[0], ctrArray); // PXD
+    EXPECT_EQ(ctrArray[0], 1);
+    increaseClusterCounters(m_spacePoints[1], ctrArray); // PXD
+    EXPECT_EQ(ctrArray[0], 2);
+
+    increaseClusterCounters(m_spacePoints[5], ctrArray); // SVD (two Cluster)
+    EXPECT_EQ(ctrArray[1], 1);
+    EXPECT_EQ(ctrArray[2], 1);
+
+    increaseClusterCounters(m_spacePoints[11], ctrArray); // SVD (only V set)
+    EXPECT_EQ(ctrArray[2], 2);
+    EXPECT_EQ(ctrArray[1], 1);
+    increaseClusterCounters(m_spacePoints[12], ctrArray); // SVD (only U set)
+    EXPECT_EQ(ctrArray[1], 2);
+    EXPECT_EQ(ctrArray[2], 2);
+  }
+
+  /**
+   * test the getMCParticles method. Desired outputs:
+   * + MCParticleID if there is a MCParticle to a TrueHit
+   * + -1, if there is no MCParticle (but a TrueHit)
+   * + -2, if there is no TrueHit (but a Cluster in the SpacePoint)
+   * NOTE: partly tests mock-up
+   * NOTE: seperate tests for SVD and PXD for better readability
+   */
+  TEST_F(PurityCalculatorToolsTest, testGetMCParticlesPXD)
+  {
+    std::vector<std::pair<int, double> > mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[0]); // ideal PXD
+    ASSERT_EQ(mcParts.size(), 1);
+    EXPECT_EQ(mcParts[0].first, 0); // related to MCParticle with Id 0
+    EXPECT_DOUBLE_EQ(mcParts[0].second, 1);
+
+    mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[1]); // PXD with no relation to TrueHit
+    ASSERT_EQ(mcParts.size(), 1);
+    EXPECT_EQ(mcParts[0].first, -2); // no TrueHit to Cluster
+    EXPECT_EQ(mcParts[0].second, 1);
+
+    mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[2]); // PXD with two different TrueHits (to two different MCParticle Ids
+    ASSERT_EQ(mcParts.size(), 2);
+    auto findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(0)); // one MCParticle with Id 0
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 1);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1)); // one MCParticle with Id 1
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 1);
+
+    B2INFO("The occuring error message is expected! It is used to discover some corner cases in real usage!")
+    mcParts = getMCParticles<PXDTrueHit>(m_spacePoints[3]); // PXD with two TrueHits pointing to one MCParticle
+    ASSERT_EQ(mcParts.size(), 1);
+    EXPECT_EQ(mcParts[0].first, 1); // related to MCParticle 2
+    EXPECT_DOUBLE_EQ(mcParts[0].second, 1);
+  }
+
+  /**
+   * test the getMCParticles method. Desired outputs:
+   * + MCParticleID if there is a MCParticle to a TrueHit
+   * + -1, if there is no MCParticle (but a TrueHit)
+   * + -2, if there is no TrueHit (but a Cluster in the SpacePoint)
+   * NOTE: partly tests mock-up
+   * NOTE: seperate tests for SVD and PXD for better readability
+   */
+  TEST_F(PurityCalculatorToolsTest, testGetMCParticlesSVD)
+  {
+    std::vector<std::pair<int, double> > mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[4]); // ideal SVD
+    ASSERT_EQ(mcParts.size(), 1);
+    EXPECT_EQ(mcParts[0].first, 0);
+    EXPECT_DOUBLE_EQ(mcParts[0].second, 2);
+
+    mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[5]); // SVD with two THs to two different MCParticles
+    ASSERT_EQ(mcParts.size(), 2);
+    auto findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(0)); // one MCParticle with Id 0
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 11); // U-Cluster to this MCParticle
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1)); // one MCParticle with Id 1
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 21); // V-Cluster to this MCParticle
+
+    mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[6]); // SVD with no TrueHit relations
+    ASSERT_EQ(mcParts.size(), 1);
+    EXPECT_EQ(mcParts[0].first, -2);
+    EXPECT_DOUBLE_EQ(mcParts[0].second, 2);
+
+    mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[7]);
+    ASSERT_EQ(mcParts.size(), 2);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1)); // one MCParticle with Id 1
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 11); // only U-Cluster has connection to this MCParticle
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(0)); // one MCParticle with Id 0
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 2); // both Clusters with relation to this MCParticle
+
+    mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[8]); // only V-Cluster has relation to TrueHit
+    ASSERT_EQ(mcParts.size(), 2);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(-2));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 11);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(0));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 21);
+
+    mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[9]); // only U-Cluster has relation to TrueHit
+    ASSERT_EQ(mcParts.size(), 2);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(-2));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 21);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 11);
+
+    // NOTE: the rest of the occuring set-up cases should be covered by the above tests!
+  }
+
+  /**
+   * test the createPurityInfos function by comparing the created MCVXDpurityinfo objects with the expected ones (kown
+   * from mockup-construction)
+   */
+  TEST_F(PurityCalculatorToolsTest, testCreatePurityInfos)
+  {
+    // first create a SpacePointTrackCand (as container of SpacePoints) containing all the wanted hits
+    std::vector<const SpacePoint*> spacePoints;
+    for (size_t i = 0; i < 11; ++i) { spacePoints.push_back(m_spacePoints[i]); } // do not use the last two SpacePoints from the setup
+    SpacePointTrackCand sptc(spacePoints);
+    EXPECT_EQ(sptc.getNHits(), 11); // check if the creation worked
+
+    B2INFO("There will be WARNING and ERROR messages! Those are expected!")
+    std::vector<MCVXDPurityInfo> purities = createPurityInfos(sptc); // create the purityInfos
+
+    auto findIt = find_if(purities.begin(), purities.end(), compMCId(1)); // get MCParticle with Id 1
+    ASSERT_FALSE(findIt == purities.end());
+    EXPECT_EQ(findIt->getNClustersTotal(), 18);
+    EXPECT_EQ(findIt->getNPXDClustersTotal(), 4); // 4 PXD Clusters were in container
+    EXPECT_EQ(findIt->getNClustersFound(), 5);
+    EXPECT_EQ(findIt->getNPXDClusters(), 2);
+    EXPECT_EQ(findIt->getNSVDUClusters(), 2);
+    EXPECT_EQ(findIt->getNSVDVClusters(), 1);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 7. / 22.);
+
+    findIt = find_if(purities.begin(), purities.end(), compMCId(0)); // get Id 0
+    ASSERT_FALSE(findIt == purities.end());
+    EXPECT_EQ(findIt->getNClustersTotal(), 18);
+    EXPECT_EQ(findIt->getNSVDUClustersTotal(), 7); // 7 SVD U Clusters are in container
+    EXPECT_EQ(findIt->getNClustersFound(), 9);
+    EXPECT_EQ(findIt->getNPXDClusters(), 2);
+    EXPECT_EQ(findIt->getNSVDUClusters(), 4);
+    EXPECT_EQ(findIt->getNSVDVClusters(), 3);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 11. / 22.);
+
+    findIt = find_if(purities.begin(), purities.end(), compMCId(-1));
+    ASSERT_FALSE(findIt == purities.end());
+    EXPECT_EQ(findIt->getNClustersTotal(), 18);
+    EXPECT_EQ(findIt->getNSVDVClustersTotal(), 7); // 7 SVD U Clusters are in container
+    EXPECT_EQ(findIt->getNClustersFound(), 1);
+    EXPECT_EQ(findIt->getNPXDClusters(), 0);
+    EXPECT_EQ(findIt->getNSVDUClusters(), 0);
+    EXPECT_EQ(findIt->getNSVDVClusters(), 1);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 1. / 22.);
+
+    // NOTE: fails because not handled yet!
+    findIt = find_if(purities.begin(), purities.end(), compMCId(-2));
+    ASSERT_FALSE(findIt == purities.end());
+    EXPECT_EQ(findIt->getNClustersTotal(), 18);
+    EXPECT_EQ(findIt->getNClustersFound(), 5);
+    EXPECT_EQ(findIt->getNPXDClusters(), 1);
+    EXPECT_EQ(findIt->getNSVDUClusters(), 2);
+    EXPECT_EQ(findIt->getNSVDVClusters(), 2);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 6. / 22.);
   }
 
 } // namespace

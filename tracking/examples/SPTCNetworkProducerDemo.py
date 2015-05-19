@@ -30,7 +30,7 @@ checkTH = False
 # flags for SPTCNetworkProducer
 # debugLevel = LogLevel.DEBUG
 debugLevel1 = LogLevel.INFO
-debugLevel2 = LogLevel.INFO
+debugLevel2 = LogLevel.DEBUG
 dLevel1 = 1
 dLevel2 = 101
 checkSPs = False
@@ -111,6 +111,18 @@ param_vxdtf = {'sectorSetup': secSetup,
 
 vxdtf.param(param_vxdtf)
 
+refTrackFinder = register_module('TrackFinderMCTruth')
+refTrackFinder.logging.log_level = LogLevel.INFO
+# select which detectors you would like to use
+param_refTrackFinder = {
+    'UseCDCHits': 0,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'MinimalNDF': 6,
+    'WhichParticles': ['primary'],
+    'GFTrackCandidatesColName': 'mcTracks',
+}
+refTrackFinder.param(param_refTrackFinder)
 
 # double clusters
 spCreatorSVD = register_module('SpacePointCreatorSVD')
@@ -126,6 +138,23 @@ spCreatorPXD.logging.log_level = LogLevel.INFO
 spCreatorPXD.param('NameOfInstance', 'pxdOnly')
 spCreatorPXD.param('SpacePoints', 'pxdOnly')
 
+sp2thConnector = register_module('SpacePoint2TrueHitConnector')
+sp2thConnector.logging.log_level = LogLevel.WARNING
+param_sp2thConnector = {
+    'DetectorTypes': ['PXD', 'SVD'],
+    'TrueHitNames': ['', ''],
+    'ClusterNames': ['', ''],
+    'SpacePointNames': ['pxdOnly', 'nosingleSP'],
+    'outputSuffix': '_relTH',
+    'storeSeperate': False,
+    'registerAll': True,
+    'maxGlobalPosDiff': 0.05,
+    'maxPosSigma': 5,
+    'minWeight': 0,
+    'requirePrimary': True,
+    'positionAnalysis': False,
+    }
+sp2thConnector.param(param_sp2thConnector)
 
 # TCConverter, genfit -> SPTC
 trackCandConverter = register_module('GFTC2SPTCConverter')
@@ -142,6 +171,20 @@ param_trackCandConverter = {
 trackCandConverter.param(param_trackCandConverter)
 
 
+trackCandConverterReference = register_module('GFTC2SPTCConverter')
+trackCandConverterReference.logging.log_level = LogLevel.INFO
+param_trackCandConverterReference = {
+    'genfitTCName': 'mcTracks',
+    'SpacePointTCName': 'SPTracksReference',
+    'NoSingleClusterSVDSP': 'nosingleSP',
+    'PXDClusterSP': 'pxdOnly',
+    'checkTrueHits': checkTH,
+    'useSingleClusterSP': False,
+    'checkNoSingleSVDSP': True,
+}
+trackCandConverterReference.param(param_trackCandConverterReference)
+
+
 qualiEstimatorRandom = register_module('QualityEstimatorVXDRandom')
 qualiEstimatorRandom.logging.log_level = LogLevel.INFO
 qualiEstimatorRandom.param('tcArrayName', 'SPTracks')
@@ -156,10 +199,18 @@ tcNetworkProducer.param('checkSPsInsteadOfClusters', checkSPs)
 
 # trackSetEval = register_module('TrackSetEvaluatorGreedy')
 trackSetEval = register_module('TrackSetEvaluatorHopfieldNN')
-trackSetEval.logging.log_level = debugLevel2
-tcNetworkProducer.logging.debug_level = dLevel2
+trackSetEval.logging.log_level = debugLevel1
+trackSetEval.logging.debug_level = dLevel1
 trackSetEval.param('tcArrayName', 'SPTracks')
 trackSetEval.param('tcNetworkName', 'tcNetwork')
+
+
+analizer = register_module('TrackFinderVXDAnalizer')
+analizer.logging.log_level = debugLevel2
+analizer.logging.debug_level = dLevel2
+analizer.param('testTCname', 'SPTracks')
+analizer.param('referenceTCname', 'SPTracksReference')
+analizer.param('writeToRoot', False)
 
 
 log_to_file('sptcNetworkDemoOutput.txt', append=False)
@@ -180,12 +231,17 @@ main.add_module(svdDigitizer)
 main.add_module(svdClusterizer)
 main.add_module(eventCounter)
 main.add_module(vxdtf)
+main.add_module(refTrackFinder)
+
 main.add_module(spCreatorPXD)
 main.add_module(spCreatorSVD)
+main.add_module(sp2thConnector)
 main.add_module(trackCandConverter)
+main.add_module(trackCandConverterReference)
 main.add_module(qualiEstimatorRandom)
 main.add_module(tcNetworkProducer)
 main.add_module(trackSetEval)
+main.add_module(analizer)
 
 # Process events
 process(main)

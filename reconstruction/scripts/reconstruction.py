@@ -139,6 +139,7 @@ def add_track_finding(path, components=None):
             vxd_trackcands = 'VXDGFTrackCands'
         vxd_trackfinder = register_module('VXDTF')
         vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
+        # WARNING: workaround for possible clashes between fitting and VXDTF - stays until the redesign of the VXDTF is finished.
         vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
         if components is not None and 'PXD' not in components:
             vxd_trackfinder.param('sectorSetup',

@@ -47,6 +47,7 @@ void ECL2D()
   BDyz->Add(BDyz4, 1);
   BDyz->Add(BDyz5, 1);
   BDyz->Add(BDyz6, 1);
+  BDyz->Draw("colz");
   BDyz->Write();
 
   TH2F* BDyz7 = new TH2F("BDyz7", "Cluster position FWD", 200, -2, 2, 200, -1.5, 1.5);
@@ -58,6 +59,7 @@ void ECL2D()
   BDyz7->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz7->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
   tree->Draw("(2.402*TMath::Cos(eclClusterPhi)*TMath::Sin(eclClusterTheta)):(2.402*TMath::Sin(eclClusterPhi)*TMath::Sin(eclClusterTheta))>>BDyz7","TMath::Abs(eclClusterTheta)<31.36*(3.1415/180)");
+  BDyz7->Draw("colz");
   BDyz7->Write();
 
   BDyz8->GetXaxis()->SetTitle("x (m)");
@@ -66,6 +68,7 @@ void ECL2D()
   BDyz8->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz8->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
   tree->Draw("(1.669*TMath::Cos(eclClusterPhi)*TMath::Sin(eclClusterTheta)):(1.669*TMath::Sin(eclClusterPhi)*TMath::Sin(eclClusterTheta))>>BDyz8","TMath::Abs(eclClusterTheta)>(180-48.5)*(3.1415/180)");
+  BDyz8->Draw("colz");
   BDyz8->Write();
 
   TH2F* BDyz9 = new TH2F("BDyz9", "Cluster position barrel", 200, -2, 2, 200, -1.5, 1.5);
@@ -75,6 +78,7 @@ void ECL2D()
   BDyz9->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz9->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
   tree->Draw("(1.250*TMath::Cos(eclClusterPhi)):(1.250*TMath::Sin(eclClusterPhi))>>BDyz9","(32.20*(3.1415/180))<eclClusterTheta<(180-51.28)*(3.1415/180)");
+  BDyz9->Draw("colz");
   BDyz9->Write();
   
   output->Close();

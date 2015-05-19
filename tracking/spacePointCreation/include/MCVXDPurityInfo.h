@@ -13,6 +13,7 @@
 #include <array>
 #include <utility> // std::pair
 #include <numeric>      // std::accumulate
+#include <string>
 
 
 namespace Belle2 {
@@ -92,11 +93,14 @@ namespace Belle2 {
     }
 
 
-    /** getter - returns overal purity (.second) for this particleID (.first) */
+    /** getter - returns overal purity (.second) for this particleID (.first).
+    *
+    * since PXD-Clusters are counting as two measurements, they count twice.
+    */
     std::pair<int, float> getPurity() const
     {
-      unsigned int nTotal = std::accumulate(m_nTotalClusters.begin(), m_nTotalClusters.end(), 0);
-      unsigned int nFound = std::accumulate(m_nFoundClusters.begin(), m_nFoundClusters.end(), 0);
+      unsigned int nTotal = std::accumulate(m_nTotalClusters.begin() + 1, m_nTotalClusters.end(), 0) + 2 * m_nTotalClusters[0];
+      unsigned int nFound = std::accumulate(m_nFoundClusters.begin() + 1, m_nFoundClusters.end(), 0) + 2 * m_nFoundClusters[0];
       return {m_iD, (nTotal == 0 ? 0.f : float(nFound) / float(nTotal)) };
     }
 
@@ -151,7 +155,7 @@ namespace Belle2 {
     unsigned int getNSVDVClustersTotal() const { return m_nTotalClusters[2]; }
 
 
-    /** returns number of clusters the trackCandidate had assigned to h_iD */
+    /** returns number of clusters the trackCandidate had assigned to this iD */
     unsigned int getNClustersFound() const { return std::accumulate(m_nFoundClusters.begin(), m_nFoundClusters.end(), 0); }
 
 
@@ -165,6 +169,47 @@ namespace Belle2 {
 
     /** getter - returns number of v-type SVDClustes found to this iD */
     unsigned int getNSVDVClusters() const { return m_nFoundClusters[2]; }
+
+
+    /** getter - returns number of degrees of freedom for all Clusters in TC total */
+    unsigned int getNDFTotal() const { return std::accumulate(m_nTotalClusters.begin() + 1, m_nTotalClusters.end(), 0) + 2 * m_nTotalClusters[0]; }
+
+
+    /** getter - returns number of degrees of freedom for all Clusters in TC found */
+    unsigned int getNDFFound() const { return std::accumulate(m_nFoundClusters.begin() + 1, m_nFoundClusters.end(), 0) + 2 * m_nFoundClusters[0]; }
+
+
+    /** getter - returns number of degrees of freedom for PXD Clusters in TC total */
+    unsigned int getNDFPXDTotal() const { return  2 * m_nTotalClusters[0]; }
+
+
+    /** getter - returns number of degrees of freedom for PXD Clusters in TC found */
+    unsigned int getNDFPXDFound() const { return  2 * m_nFoundClusters[0]; }
+
+
+    /** getter - returns number of degrees of freedom for SVD Clusters in TC total */
+    unsigned int getNDFSVDTotal() const { return std::accumulate(m_nTotalClusters.begin() + 1, m_nTotalClusters.end(), 0); }
+
+
+    /** getter - returns number of degrees of freedom for SVD Clusters in TC found */
+    unsigned int getNDFSVDFound() const { return std::accumulate(m_nFoundClusters.begin() + 1, m_nFoundClusters.end(), 0); }
+
+
+    /** getter - returns number of degrees of freedom for u-type SVDClustes in the TrackCandidate */
+    unsigned int getNDFSVDUTotal() const { return getNSVDUClustersTotal(); }
+
+
+    /** getter - returns number of degrees of freedom for v-type SVDClustes in the TrackCandidate */
+    unsigned int getNDFSVDVTotal() const { return getNSVDVClustersTotal(); }
+
+
+    /** getter - returns number of degrees of freedom for u-type SVDClustes found to this iD */
+    unsigned int getNDFSVDUFound() const { return getNSVDUClusters(); }
+
+
+    /** getter - returns number of degrees of freedom for v-type SVDClustes found to this iD */
+    unsigned int getNDFSVDVFound() const { return getNSVDVClusters(); }
+
 
     /** dump the contents to a string (for easier debugging) */
     std::string dumpToString() const

@@ -10,7 +10,6 @@
 #pragma once
 
 // tracking
-// #include <tracking/spacePointCreation/SpacePointMetaInfo.h>
 #include <tracking/vectorTools/B2Vector3.h>
 // #include <TVector3.h>
 

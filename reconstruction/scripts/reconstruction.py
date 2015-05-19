@@ -139,6 +139,7 @@ def add_track_finding(path, components=None):
             vxd_trackcands = 'VXDGFTrackCands'
         vxd_trackfinder = register_module('VXDTF')
         vxd_trackfinder.param('GFTrackCandidatesColName', vxd_trackcands)
+        vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
         if components is not None and 'PXD' not in components:
             vxd_trackfinder.param('sectorSetup',
                                   ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Jakob Lettenbichler                                      *
@@ -12,6 +12,10 @@
 // tracking:
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
+#include <tracking/trackFindingVXD/analyzingTools/TCType.h>
+
+
+#include <framework/logging/Logger.h>
 
 // stl:
 #include <vector>
@@ -26,18 +30,20 @@ namespace Belle2 {
   public:
 
 
-    /** allows classifying TCs */
-    enum TCType {
-      Unclassified, // a TC which was not classified yet
-      Lost, // reference TCs which were not found by test TF
-      Ghost, // did not reach m_PARAMqiThreshold
-      Clone, // reached threshold but for the same reference TC a better partner was already found
-      Contaminated, // more than m_PARAMqiThreshold in purity
-      Clean, // test TC has 100% purity for the particle type but not all hits of reference TC were found
-      Perfect, // test TC is identical with a reference TC (have exactly the same hits and no extra ones)
-      Reference, // reference TC
-      NTypes // number of tcTypes available
-    };
+//     /** allows classifying TCs */
+//     enum TCType {
+//       Unclassified, // a TC which was not classified yet
+//       Lost, // reference TCs which were not found by test TF
+//       Ghost, // did not reach m_PARAMqiThreshold
+//    SmallStump, // TC too short
+//       Clone, // reached threshold but for the same reference TC a better partner was already found
+//       Contaminated, // more than m_PARAMqiThreshold in purity
+//       Clean, // test TC has 100% purity for the particle type but not all hits of reference TC were found
+//       Perfect, // test TC is identical with a reference TC (have exactly the same hits and no extra ones)
+//    AllTCTypes, // all other test types are smaller than this value
+//       Reference, // reference TC
+//       NTypes // number of tcTypes available
+//     };
 
 
     /** carries the global coordinates of the position of the seed hit (typically the innermost hit) */
@@ -56,11 +62,11 @@ namespace Belle2 {
     MCVXDPurityInfo assignedID;
 
     /** classifies attached TC */
-    AnalizerTCInfo::TCType tcType;
+    TCType::Type tcType;
 
 
     /** constructor, makes sure that pointers are on NULL until set */
-    AnalizerTCInfo() : tC(NULL), assignedTC(NULL), tcType(Unclassified) {}
+    AnalizerTCInfo() : tC(NULL), assignedTC(NULL), tcType(TCType::Unclassified) {}
 
 
     /** static function for correctly creating TrackCandidates */
@@ -72,13 +78,13 @@ namespace Belle2 {
       newTC.momSeed = aTC.getMomSeed();
       newTC.tC = &aTC;
       newTC.assignedID = iD;
-      newTC.tcType = isReference ? Reference : Unclassified;
+      newTC.tcType = isReference ? TCType::Reference : TCType::Unclassified;
       return newTC;
     }
 
 
     /** find unpaired tcs and mark them with given type */
-    static void markUnused(std::vector<AnalizerTCInfo>& tcs, AnalizerTCInfo::TCType newType)
+    static void markUnused(std::vector<AnalizerTCInfo>& tcs, TCType::Type newType)
     {
       for (AnalizerTCInfo& aTC : tcs) {
         if (aTC.assignedTC == NULL) {
@@ -89,20 +95,23 @@ namespace Belle2 {
 
 
     /** for given pair of TCs their compatibility will be checked and the testTC classified, the given threshold will be used to draw the line between Contaminated and Ghost */
-    static AnalizerTCInfo::TCType classifyTC(AnalizerTCInfo& referenceTC, AnalizerTCInfo& testTC, double threshold)
+    static TCType::Type classifyTC(AnalizerTCInfo& referenceTC, AnalizerTCInfo& testTC, double purityThreshold,
+                                   unsigned int ndfThreshold)
     {
       std::pair<int, float> testPurity = testTC.assignedID.getPurity();
       std::pair<int, float> refPurity = referenceTC.assignedID.getPurity();
       // catch ill case
-      if (testPurity.first != refPurity.first) { return Unclassified; }
+      if (testPurity.first != refPurity.first) { return TCType::Unclassified; }
 
-      if (testPurity.second < threshold) { return Ghost; }
+      if (testPurity.second < purityThreshold) { return TCType::Ghost; }
 
-      if (testPurity.second < 1.f) { return Contaminated; }
+      if (testTC.assignedID.getNDFTotal() < ndfThreshold) { return TCType::SmallStump; }
 
-      if (testTC.assignedID.getNClustersTotal() < referenceTC.assignedID.getNClustersTotal()) { return Clean; }
+      if (testPurity.second < 1.f) { return TCType::Contaminated; }
 
-      return Perfect;
+      if (testTC.assignedID.getNClustersTotal() < referenceTC.assignedID.getNClustersTotal()) { return TCType::Clean; }
+
+      return TCType::Perfect;
     }
 
 
@@ -112,7 +121,7 @@ namespace Belle2 {
      */
     void discardTC()
     {
-      assignedTC->tcType = Clone;
+      assignedTC->tcType = TCType::Clone;
       assignedTC = NULL;
     }
 
@@ -141,9 +150,13 @@ namespace Belle2 {
         return;
       }
 
+      // case: was already assigned, but old one was better.
       otherTC->assignedTC = this;
-      otherTC->tcType = Clone;
+      otherTC->tcType = TCType::Clone;
     }
 
+
+    /** a type-identifier function */
+    TCType::Type getType() const { return tcType; }
   };
 }

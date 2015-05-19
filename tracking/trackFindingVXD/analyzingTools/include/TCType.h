@@ -1,0 +1,111 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jakob Lettenbichler                                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+// framework:
+#include <framework/logging/Logger.h>
+
+// stl:
+#include <string>
+// #include <unordered_map>
+#include <map>
+
+
+
+
+namespace Belle2 {
+  /** Small class containing enums and converter from and to strings */
+  class TCType {
+  public:
+
+    /** allows classifying TCs */
+    enum Type {
+      UnknownType, // the type of this TC is not even unclassified but completely unknown, normally a hint for errors
+      Unclassified, // a TC which was not classified yet
+      Lost, // reference TCs which were not found by test TF
+      Ghost, // did not reach m_PARAMqiThreshold
+      SmallStump, // TC too short
+      Clone, // reached threshold but for the same reference TC a better partner was already found
+      Contaminated, // more than m_PARAMqiThreshold in purity
+      Clean, // test TC has 100% purity for the particle type but not all hits of reference TC were found
+      Perfect, // test TC is identical with a reference TC (have exactly the same hits and no extra ones)
+      AllTCTypes, // all other test types are smaller than this value
+      Reference, // reference TC
+      NTypes // number of tcTypes available
+    };
+
+
+    /** for given TCType the corresponding string-name will be returned. For invalid types, UnknownType will be passed */
+    static std::string getTypeName(TCType::Type type)
+    {
+      auto pos = TCType::m_fromTypeToString.find(type);
+      if (pos == TCType::m_fromTypeToString.end()) {
+        B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!")
+        return TCType::m_fromTypeToString[UnknownType];
+      }
+      return pos->second;
+    }
+
+
+    /** for given string name of a TCType the corresponding TCType will be returned. For invalid types, UnknownType will be passed */
+    static TCType::Type getTypeEnum(std::string type)
+    {
+      auto pos = TCType::m_fromStringToType.find(type);
+      if (pos == TCType::m_fromStringToType.end()) {
+        B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!")
+        return TCType::m_fromStringToType[std::string("UnknownType")];
+      }
+      return pos->second;
+    }
+
+
+  protected:
+    /** static map allowing translation from a given type to its name stored as a string */
+    static std::map<Type, std::string> m_fromTypeToString;
+
+    /** static map allowing translation from a given name stored as a string to its type */
+    static std::map<std::string, Type> m_fromStringToType;
+  };
+
+
+  /** setting static dictionary translating type -> string */
+  std::map<TCType::Type, std::string> TCType::m_fromTypeToString = {
+    {TCType::UnknownType, std::string("UnknownType")},
+    {TCType::Unclassified, std::string("Unclassified")},
+    {TCType::Lost, std::string("Lost")},
+    {TCType::Ghost, std::string("Ghost")},
+    {TCType::SmallStump, std::string("SmallStump")},
+    {TCType::Clone, std::string("Clone")},
+    {TCType::Contaminated, std::string("Contaminated")},
+    {TCType::Clean, std::string("Clean")},
+    {TCType::Perfect, std::string("Perfect")},
+    {TCType::AllTCTypes, std::string("AllTCTypes")},
+    {TCType::Reference, std::string("Reference")},
+    {TCType::NTypes, std::string("NTypes")}
+  };
+
+
+  /** setting static dictionary translating string -> type */
+  std::map<std::string, TCType::Type> TCType::m_fromStringToType = {
+    {std::string("UnknownType"), TCType::UnknownType},
+    {std::string("Unclassified"), TCType::Unclassified},
+    {std::string("Lost"), TCType::Lost},
+    {std::string("Ghost"), TCType::Ghost},
+    {std::string("SmallStump"), TCType::SmallStump},
+    {std::string("Clone"), TCType::Clone},
+    {std::string("Contaminated"), TCType::Contaminated},
+    {std::string("Clean"), TCType::Clean},
+    {std::string("Perfect"), TCType::Perfect},
+    {std::string("AllTCTypes"), TCType::AllTCTypes},
+    {std::string("Reference"), TCType::Reference},
+    {std::string("NTypes"), TCType::NTypes}
+  };
+
+}

@@ -87,7 +87,7 @@ namespace Belle2 {
     virtual void init(NSMCommunicator&) throw()
     {
       try {
-        NSMNode node(m_argv[2]);
+        NSMNode node(m_argv[1]);
         NSMCommunicator::connected(node.getName());
         int nnodes = 0;
         get(node, "nnodes", nnodes);
@@ -109,7 +109,7 @@ namespace Belle2 {
         }
       } catch (const NSMNotConnectedException& e) {
         endwin();
-        printf("node %s is not online\n", m_argv[2]);
+        printf("node %s is not online\n", m_argv[1]);
         exit(1);
       } catch (const NSMHandlerException& e) {
         endwin();
@@ -137,7 +137,7 @@ int main(int argc, const char** argv)
   ConfigFile config("slowcontrol");
   std::string name, username;
   char** argv_in = new char* [argc];
-  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 2);
   const std::string hostname = config.get(name + ".host");
   const int port = config.getInt(name + ".port");
   RCViewCallback* callback = new RCViewCallback(NSMNode(username), argc_in, argv_in);

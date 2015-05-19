@@ -78,6 +78,7 @@ namespace Belle2 {
     /** set the weight for the V-Cluster */
     void setVWeight(double weight) { m_wV = weight; m_V = true; }
 
+    /** get sum of relation weights */
     double getWeightSum() const { return m_wU + m_wV; }
   }; // end of struct TrueHitInfo
 

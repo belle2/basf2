@@ -41,6 +41,7 @@ std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDes
     {"none", "no facet is valid, stop at cluster generation."},
     {"realistic", "mc free with more realistic criteria"},
     {"recording", "record the encountered instances of facets"},
+    {"multirecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
   };
 }
@@ -61,6 +62,8 @@ std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& f
     return std::unique_ptr<BaseFacetFilter>(new RealisticFacetFilter());
   } else if (filterName == string("recording")) {
     return std::unique_ptr<BaseFacetFilter>(new RecordingFacetFilter());
+  } else if (filterName == string("multirecording")) {
+    return std::unique_ptr<BaseFacetFilter>(new MultiRecordingFacetFilter());
   } else {
     return std::unique_ptr<BaseFacetFilter>(nullptr);
   }

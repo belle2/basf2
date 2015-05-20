@@ -8,12 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "BaseFacetFilter.h"
-#include "AllFacetFilter.h"
-#include "MCFacetFilter.h"
-#include "FitlessFacetFilter.h"
-#include "SimpleFacetFilter.h"
-#include "RealisticFacetFilter.h"
-
-#include "RecordingFacetFilter.h"
-#include "MultiRecordingFacetFilter.h"
+#include "CDCFacetFitlessVarSet.h"
+#include "CDCFacetFitVarSet.h"
+#include "CDCFacetTruthVarSet.h"

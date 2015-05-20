@@ -10,9 +10,17 @@ StoreEntry::StoreEntry(bool isArray, const TClass* cl, const std::string& name, 
   isArray(isArray),
   dontWriteOut(dontWriteOut),
   objClass(cl),
+  object(nullptr),
   ptr(nullptr),
   name(name)
 {
+  recoverFromNullObject();
+}
+
+void StoreEntry::recoverFromNullObject()
+{
+  if (object)
+    return;
   if (isArray) {
     object = new TClonesArray(objClass);
   } else {
@@ -35,10 +43,9 @@ void StoreEntry::resetForGetEntry()
 
 void StoreEntry::recreate()
 {
-  TClass* objClass = object->IsA();
   resetForGetEntry();
   if (object == nullptr)
-    object = static_cast<TObject*>(objClass->New());
+    recoverFromNullObject();
 
   ptr = object;
 }

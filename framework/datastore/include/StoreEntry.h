@@ -16,6 +16,8 @@ namespace Belle2 {
 
     /** Reset stored object to defaults, or nullptr. Only useful for input modules (before GetEntry()). */
     void resetForGetEntry();
+    /** Recreate object if null. Used to recover from temporary invalid states after reading empty branches. */
+    void recoverFromNullObject();
     /** Reset stored object to defaults, set ptr to new object. More or less equivalent to delete object; object = new X;, but optimized. */
     void recreate();
     /** Return ptr cast to TClonesArray. If this is not an array, return null. */

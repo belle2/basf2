@@ -200,14 +200,10 @@ void RootInputModule::readTree()
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {
-    if (!entry->object)
-      continue;
     entry->resetForGetEntry();
   }
   for (auto storeEntries : m_parentStoreEntries) {
     for (auto entry : storeEntries) {
-      if (!entry->object)
-        continue;
       entry->resetForGetEntry();
     }
   }
@@ -234,9 +230,13 @@ void RootInputModule::readTree()
   }
 
   for (auto entry : m_storeEntries) {
-    if (!entry->object)
+    if (!entry->object) {
       entryNotFound("Event durability tree (global entry: " + std::to_string(m_nextEntry) + ")", entry->name);
-    entry->ptr = entry->object;
+      entry->recoverFromNullObject();
+      entry->ptr = nullptr;
+    } else {
+      entry->ptr = entry->object;
+    }
   }
 
   if (m_parentLevel > 0) readParentTrees();
@@ -464,8 +464,8 @@ void RootInputModule::entryNotFound(std::string entryOrigin, std::string name)
   if (name == "ProcessStatistics" or DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
     B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.");
   } else {
-    B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name <<
-              " that was present in a previous entry.")
+    B2DEBUG(100, entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name <<
+            " that was present in a previous entry.")
   }
 }
 
@@ -474,8 +474,6 @@ void RootInputModule::readPersistentEntry(long fileEntry)
   m_lastPersistentEntry = fileEntry;
 
   for (auto entry : m_persistentStoreEntries) {
-    if (!entry->object)
-      continue;
     bool isMergeable = entry->object->InheritsFrom(Mergeable::Class());
     TObject* copyOfPreviousVersion = nullptr;
     if (isMergeable) {
@@ -501,9 +499,11 @@ void RootInputModule::readPersistentEntry(long fileEntry)
 
         delete entry->ptr;
       }
+      entry->ptr = entry->object;
     } else {
       entryNotFound("Persistent tree", entry->name);
+      entry->recoverFromNullObject();
+      entry->ptr = nullptr;
     }
-    entry->ptr = entry->object;
   }
 }

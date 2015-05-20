@@ -104,10 +104,7 @@ void PrintCollectionsModule::printCollections(DataStore::EDurability durability)
     if (currCol != NULL)
       entries = currCol->GetEntriesFast();
 
-    const TClonesArray* obj = dynamic_cast<TClonesArray*>(iter->second.object);
-    std::string type;
-    if (obj)
-      type = shorten(obj->GetClass()->GetName());
+    std::string type = shorten(iter->second.objClass->GetName());
 
     B2INFO(boost::format("%1%[] %|20t| %2% %|47t| %3%") % type % iter->first % entries);
   }

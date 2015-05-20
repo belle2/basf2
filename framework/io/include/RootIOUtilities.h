@@ -49,14 +49,14 @@ namespace Belle2 {
      *
      *  TObject is not considered to have any.
      */
-    bool hasStreamer(TClass* cl);
+    bool hasStreamer(const TClass* cl);
 
     /** Returns true if and only if 'cl' has a user-defined streamer
      *
      * In that case, TClonesArrays of this type should be written with BypassStreamer(false) and
      * split-level -1 (no splitting).
      */
-    bool hasCustomStreamer(TClass* cl);
+    bool hasCustomStreamer(const TClass* cl);
 
     /** Load dictionaries for classes found in input files. */
     void loadDictionaries();

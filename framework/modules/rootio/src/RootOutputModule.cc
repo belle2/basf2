@@ -119,10 +119,7 @@ void RootOutputModule::initialize()
           continue;
       }
 
-      TClass* entryClass = iter->second.object->IsA();
-      if (iter->second.isArray) {
-        entryClass = static_cast<TClonesArray*>(iter->second.object)->GetClass();
-      }
+      const TClass* entryClass = iter->second.objClass;
 
       if (!hasStreamer(entryClass))
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");

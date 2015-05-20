@@ -125,10 +125,7 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
   }
 
   // Check whether the existing entry has the same type
-  TClass* entryClass = entry.object->IsA();
-  if (entry.isArray) {
-    entryClass = static_cast<TClonesArray*>(entry.object)->GetClass();
-  }
+  const TClass* entryClass = entry.objClass;
   if (!entryClass->InheritsFrom(accessor.getClass())) {
     B2FATAL("Existing " << accessor.readableName() << " of type " << entryClass->GetName() << " doesn't match requested type " <<
             accessor.getClass()->GetName());
@@ -186,15 +183,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
   }
 
   // Add the DataStore entry
-  StoreEntry& entry = m_storeEntryMap[durability][name];
-  entry.isArray = array;
-  entry.dontWriteOut = dontwriteout;
-  if (array) {
-    entry.object = new TClonesArray(objClass);
-  } else {
-    entry.object = static_cast<TObject*>(objClass->New());
-  }
-  entry.name = name;
+  m_storeEntryMap[durability][name] = StoreEntry(array, objClass, name, dontwriteout);
 
   B2DEBUG(100, "Successfully registered " << accessor.readableName());
   return true;
@@ -350,29 +339,30 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   const TClass* objectClass = object->IsA();
   for (auto& mapEntry : m_storeEntryMap[c_Event]) {
     if (mapEntry.second.ptr && mapEntry.second.isArray) {
+      const TClass* arrayClass = mapEntry.second.objClass;
+      if (arrayClass != objectClass)
+        continue;
+
       const TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
-      const TClass* arrayClass = array->GetClass();
-      if (arrayClass == objectClass) {
-        if (object == array->Last()) {
-          //quickly find entry if it's at the end of the array
-          index = array->GetLast();
+      if (object == array->Last()) {
+        //quickly find entry if it's at the end of the array
+        index = array->GetLast();
+      } else {
+        if (arrayClass->InheritsFrom(RelationsObject::Class())) {
+          //update cache for entire array
+          updateRelationsObjectCache(mapEntry.second);
+
+          //if found, m_cacheArrayIndex is now correct, otherwise still -1
+          index = static_cast<const RelationsObject*>(object)->m_cacheArrayIndex;
         } else {
-          if (arrayClass->InheritsFrom(RelationsObject::Class())) {
-            //update cache for entire array
-            updateRelationsObjectCache(mapEntry.second);
-
-            //if found, m_cacheArrayIndex is now correct, otherwise still -1
-            index = static_cast<const RelationsObject*>(object)->m_cacheArrayIndex;
-          } else {
-            //not a RelationsObject, so no caching
-            index = array->IndexOf(object);
-          }
+          //not a RelationsObject, so no caching
+          index = array->IndexOf(object);
         }
+      }
 
-        if (index >= 0) {
-          entry = &mapEntry.second;
-          return true;
-        }
+      if (index >= 0) {
+        entry = &mapEntry.second;
+        return true;
       }
     }
   }
@@ -394,11 +384,8 @@ void DataStore::getArrayNames(std::vector<std::string>& names, const std::string
     }
   } else if (arrayName == "ALL") {
     for (auto& mapEntry : m_storeEntryMap[durability]) {
-      if (mapEntry.second.ptr && mapEntry.second.isArray) {
-        TClonesArray* array = static_cast<TClonesArray*>(mapEntry.second.ptr);
-        if (array->GetClass()->InheritsFrom(arrayClass)) {
-          names.push_back(mapEntry.second.name);
-        }
+      if (mapEntry.second.ptr and mapEntry.second.isArray and mapEntry.second.objClass->InheritsFrom(arrayClass)) {
+        names.push_back(mapEntry.second.name);
       }
     }
   } else {

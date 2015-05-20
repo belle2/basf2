@@ -6,6 +6,20 @@
 
 using namespace Belle2;
 
+StoreEntry::StoreEntry(bool isArray, const TClass* cl, const std::string& name, bool dontWriteOut):
+  isArray(isArray),
+  dontWriteOut(dontWriteOut),
+  objClass(cl),
+  ptr(nullptr),
+  name(name)
+{
+  if (isArray) {
+    object = new TClonesArray(objClass);
+  } else {
+    object = static_cast<TObject*>(objClass->New());
+  }
+}
+
 void StoreEntry::resetForGetEntry()
 {
   if (isArray) {

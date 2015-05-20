@@ -25,7 +25,7 @@ void PyStoreObj::attach()
                                  TObject::Class(), false));
   if (entry) {
     m_storeObjPtr = &(entry->ptr);
-    m_class = entry->object->IsA();
+    m_class = entry->objClass;
   }
 }
 

@@ -111,7 +111,7 @@ namespace Belle2 {
     void attach();
 
     TObject** m_storeObjPtr; /**< Pointer to pointer to object */
-    TClass* m_class; /**< Class of this object. */
+    const TClass* m_class; /**< Class of this object. */
     std::string m_name; /**< Name of data store entry. */
     int m_durability; /**< Durability of data store entry. */
   };

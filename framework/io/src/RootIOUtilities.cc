@@ -105,14 +105,14 @@ void RootIOUtilities::buildIndex(TTree* tree)
   tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
 }
 
-bool RootIOUtilities::hasStreamer(TClass* cl)
+bool RootIOUtilities::hasStreamer(const TClass* cl)
 {
   if (cl == TObject::Class())
     return false;
 
   if (cl->GetClassVersion() <= 0) {
     // version number == 0 means no streamers for this class, check base classes
-    TList* baseClasses = cl->GetListOfBases();
+    TList* baseClasses = const_cast<TClass*>(cl)->GetListOfBases(); //method might update an internal cache, but is const otherwise
     TIter it(baseClasses);
     while (TBaseClass* base = static_cast<TBaseClass*>(it())) {
       if (hasStreamer(base->GetClassPointer()))
@@ -126,7 +126,7 @@ bool RootIOUtilities::hasStreamer(TClass* cl)
 }
 
 
-bool RootIOUtilities::hasCustomStreamer(TClass* cl)
+bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
 {
   //does this class have a custom streamer? (magic from from TTree.cxx)
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)

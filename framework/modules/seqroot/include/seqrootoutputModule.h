@@ -44,6 +44,10 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+
+    ///! Write StreamerInfos to a file
+    void writeStreamerInfos();
+
     //! File name
     std::string m_outputFileName;
 

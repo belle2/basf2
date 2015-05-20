@@ -14,6 +14,10 @@
 #include <cmath>
 #include <fcntl.h>
 
+#include <TClonesArray.h>
+#include <TClass.h>
+#include <TList.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -62,6 +66,9 @@ void SeqRootOutputModule::initialize()
   // DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_streamer->registerStreamObjs(m_saveObjs);
+
+  //Write StreamerInfo at the beginning of a file
+  writeStreamerInfos();
 
   B2INFO("SeqRootOutput: initialized.");
 }
@@ -133,4 +140,49 @@ void SeqRootOutputModule::terminate()
   delete m_file;
 
   B2INFO("terminate called");
+}
+
+
+void SeqRootOutputModule::writeStreamerInfos()
+{
+
+  if (!m_msghandler) {
+    B2FATAL("DataStoreStreamer : m_msghandler is NULL.");
+    return;
+  }
+
+  TList* minilist = 0 ;
+  int durability = DataStore::c_Event;
+
+  //  for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
+  DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
+
+  for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
+    TClass* entryClass = iter->second.object->IsA();
+    if (iter->second.isArray) {
+      entryClass = static_cast<TClonesArray*>(iter->second.object)->GetClass();
+    }
+    TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
+
+    printf("durability %d Class Name %s\n", durability,  entryClass->GetName());
+
+    if (!minilist) minilist  =  new TList();
+    minilist->Add((TObject*)vinfo);
+  }
+
+  if (minilist) {
+    //       TMessage messinfo(kMESS_STREAMERINFO);
+    //       messinfo.WriteObject(minilist);
+    m_msghandler->add(minilist, "StreamerInfo");
+    //      EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
+    EvtMessage* msg = m_msghandler->encode_msg(MSG_STREAMERINFO);
+    (msg->header())->nObjects = 1;       // No. of objects
+    (msg->header())->nArrays = 0;    // No. of arrays
+    int size = m_file->write(msg->buffer());
+    printf("Wrote %d byte?\n", size);
+    //      exit(1);
+    delete minilist;
+  }
+
+  return;
 }

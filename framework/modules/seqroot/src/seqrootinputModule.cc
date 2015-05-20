@@ -70,23 +70,41 @@ void SeqRootInputModule::initialize()
   // Read the first event in SeqRoot file and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
   // if used together with TTree based output (RootOutput module).
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+
   EvtMessage* evtmsg = NULL;
   // Open input file
   m_file = new SeqFile(m_inputFileName.c_str(), "r");
   if (m_file->status() <= 0)
     B2FATAL("SeqRootInput : Error in opening input file : " << m_inputFileName);
-  // Read first event
-  int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
-  if (size > 0) {
-    evtmsg = new EvtMessage(evtbuf);
-    m_streamer->restoreDataStore(evtmsg);
-  } else {
-    B2FATAL("SeqRootInput : Error in reading first event");
+
+  //Read StreamerInfo and the first event
+  int info_cnt = 0;
+  while (true) {
+    char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+    int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (size > 0) {
+      evtmsg = new EvtMessage(evtbuf);
+      m_streamer->restoreDataStore(evtmsg);
+      if (evtmsg->type() == MSG_STREAMERINFO) {
+        // StreamerInfo was read
+        B2INFO("Reading StreamerInfo");
+        if (info_cnt != 0) B2FATAL("SeqRootInput : Reading StreamerInfos twice");
+        info_cnt++;
+      } else {
+        // first event was read
+        delete[] evtbuf;
+        delete evtmsg;
+        break;
+      }
+      delete[] evtbuf;
+      delete evtmsg;
+
+    } else {
+      B2FATAL("SeqRootInput : Error in reading first event");
+    }
   }
 
-  delete evtmsg;
-  delete[] evtbuf;
+
 
   B2INFO("SeqRootInput: initialized.");
 }

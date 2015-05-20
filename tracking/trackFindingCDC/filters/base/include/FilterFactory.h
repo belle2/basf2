@@ -114,6 +114,10 @@ namespace Belle2 {
         filterParametersDescription << "\"" << filterName << "\"" << " :\n";
 
         std::unique_ptr<Filter_> filter = create(filterName);
+        if (not filter) {
+          B2WARNING("Could not create a " << prefix << "Filter for name " << filterName);
+          continue;
+        }
         std::map<std::string, std::string> filterParameters = filter->getParameterDescription();
         if (filterParameters.empty()) {
           filterParametersDescription << "(no parameters)";

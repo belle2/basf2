@@ -39,7 +39,6 @@ SegmentPairRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "all segment pair relations are valid"},
     {"mc", "segment pair relations from monte carlo truth"},
     {"none", "no segment pair relation is valid, stop at segment pair creation"},
-    {"recording", "record the encountered instances of segment pair relations"},
     {"simple", "mc free with simple criteria"},
   };
 }

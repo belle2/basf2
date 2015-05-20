@@ -12,6 +12,7 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'bklm', 'bklm_dataobjects',
     'eklm_dataobjects', 
+    'eklm',
     'mdst_dataobjects',
     ]
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/TrackMatchLookUp.h"
+#include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationEntry.h>

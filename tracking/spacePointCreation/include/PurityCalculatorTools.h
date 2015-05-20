@@ -180,7 +180,10 @@ namespace Belle2 { // make seperate sub-namespace for this?
       purityInfos.push_back(MCVXDPurityInfo(mcId, totalClusters, mcClusters[mcId]));
     }
 
-    std::sort(purityInfos.begin(), purityInfos.end());
+    // sort in descending order before return
+    std::sort(purityInfos.begin(), purityInfos.end(),
+    [](const MCVXDPurityInfo & left, const MCVXDPurityInfo & right) { return left > right; }
+             );
     return purityInfos;
   }
 

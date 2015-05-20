@@ -518,6 +518,13 @@ namespace PurityCalcTests {
     B2INFO("There will be WARNING and ERROR messages! Those are expected!")
     std::vector<MCVXDPurityInfo> purities = createPurityInfos(sptc); // create the purityInfos
 
+    EXPECT_EQ(purities.size(), 4); // 4 different Particle Ids: 0, 1, -1, -2
+
+    // check if the vector is sorted from highest to lowest overall purity
+    for (size_t i = 0; i < purities.size() - 1; ++i) {
+      EXPECT_TRUE(purities[i].getPurity().second >= purities[i + 1].getPurity().second);
+    }
+
     auto findIt = find_if(purities.begin(), purities.end(), compMCId(1)); // get MCParticle with Id 1
     ASSERT_FALSE(findIt == purities.end());
     EXPECT_EQ(findIt->getNClustersTotal(), totCls);
@@ -548,7 +555,6 @@ namespace PurityCalcTests {
     EXPECT_EQ(findIt->getNSVDVClusters(), 1);
     EXPECT_FLOAT_EQ(findIt->getPurity().second, 1. / ndf);
 
-    // NOTE: fails because not handled yet!
     findIt = find_if(purities.begin(), purities.end(), compMCId(-2));
     ASSERT_FALSE(findIt == purities.end());
     EXPECT_EQ(findIt->getNClustersTotal(), totCls);

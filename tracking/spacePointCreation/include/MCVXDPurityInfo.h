@@ -79,7 +79,7 @@ namespace Belle2 {
       * */
     inline bool operator > (const MCVXDPurityInfo& b) const
     {
-      return getPurity() > b.getPurity();
+      return getPurity().second > b.getPurity().second;
     }
 
 
@@ -89,7 +89,7 @@ namespace Belle2 {
      * */
     inline bool operator < (const MCVXDPurityInfo& b) const
     {
-      return getPurity() < b.getPurity();
+      return getPurity().second < b.getPurity().second;
     }
 
 

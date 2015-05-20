@@ -13,6 +13,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
 #include <set>
@@ -53,23 +54,66 @@ namespace Belle2 {
      */
     void setTrack(Belle2::Track* track); // Save the track of the most probable particle
     void setParticle(Particle*);  // Save the pointer of the most probable particle
+
+    void setMCParticle(MCParticle*);  // Save the pointer of the most probable particle
+    void setMCParticleMother(MCParticle*);  // Save the pointer of the most probable particle
+
     void setTracks(std::vector<Belle2::Track*>); // Save a vector of tracks
-    void setCatProb(double); // Save the probability of belonging to a given category
-    void setTargProb(double); // Save the probability of being the right target
-    void setIsB(bool); // Save True if the MCTruth particle comes from the B
+    void setCatProb(float); // Save the probability of belonging to a given category
+    void setTargProb(float); // Save the probability of being the right target
+    void setP(float); // Save the momentum of the track
+    void setIsFromB(int); // Save True if the MCTruth particle comes from the B
+    void setIsFromBGeneral(int);
+    void setROEComesFromB(int);
+    void setGoodTracksPurityFT(float);
+    void setGoodBadTracksRatioFT(float);
+    void setGoodTracksPurityROE(float);
+    void setGoodBadTracksRatioROE(float);
+    void setGoodTracksROE(int);
+    void setBadTracksROE(int);
+    void setGoodTracksFT(int);
+    void setBadTracksFT(int);
+    void setD0(double);
+    void setZ0(double);
+    void setFTandROEGoodTracksRatio(float);
+    void setProdVertexMotherZ(float);
     void setCategories(std::string);
+
 
 
     /**
      * GETTERS
      */
-    const std::vector<Belle2::Track*> getTracks() const; // Get the tracks corresponding to each cat
-    std::vector<double> getCatProb(); // Get the probabilities of every particle to belong to its correspondant category
-    std::vector<double> getTargProb(); // Get the probabilites of every partcile to be the target
+    std::vector<Belle2::Track*> getTracks(); // Get the tracks corresponding to each cat
+    Belle2::Track* getTrack(int);
+    std::vector<float> getCatProb(); // Get the probabilities of every particle to belong to its correspondant category
+    std::vector<float> getTargProb(); // Get the probabilites of every partcile to be the target
+    std::vector<float> getP(); // Get the momentum of the track
     std::vector<Particle*> getParticle(); // Get a list of pointers to the particle of every category
-    std::vector<bool> getIsB(); // Get True if MCTruth particles come from B
-    std::vector<std::string> getCategories();
 
+    std::vector<MCParticle*> getMCParticle(); // Get a list of pointers to the particle of every category
+    std::vector<MCParticle*> getMCParticleMother(); // Get a list of pointers to the particle of every category
+
+    std::vector<float> getD0();
+    std::vector<float> getZ0();
+
+    std::vector<int> getIsFromB(); // Get True if MCTruth particles come from B
+    int getIsFromBGeneral(); // Get True if MCTruth particles come from B
+    int getROEComesFromB(); // Get True if MCTruth particles come from B
+    float getGoodTracksPurityFT();
+    float getGoodBadTracksRatioFT();
+
+    float getGoodTracksPurityROE();
+    float getGoodBadTracksRatioROE();
+    int getBadTracksROE();
+    int getGoodTracksROE();
+    int getBadTracksFT();
+    int getGoodTracksFT();
+    float getFTandROEGoodTracksRatio();
+    std::vector<std::string> getCategories();
+    std::vector<float> getProdVertexMotherZ();
+
+    void relationToParticle(Particle* particle);
 
   private:
 
@@ -77,9 +121,29 @@ namespace Belle2 {
     std::vector<Belle2::Track*> m_tracks; // Most probable particle's track
     std::vector<Particle*> m_particle; // Most probable particle
 
-    std::vector<double> m_categoryProb; // Probabilities for every category
-    std::vector<double> m_targetProb; // Probabilities for every particle
-    std::vector<bool> m_isB; // True if MCTruth particles come from B
+    std::vector<MCParticle*> m_MCparticle; // TEMPORARY
+    std::vector<MCParticle*> m_MCparticle_mother; // TEMPORARY
+
+    std::vector<float> m_D0;
+    std::vector<float> m_Z0;
+
+    std::vector<float> m_categoryProb; // Probabilities for every category
+    std::vector<float> m_targetProb; // Probabilities for every particle
+    std::vector<float> m_P; // Absolute momentum of the track
+    std::vector<int> m_isFromB; // True if MCTruth particles come from B
+    int m_isFromBGeneral; // True if MCTruth particles come from B
+    int m_ROEComesFromB;
+    float m_goodTracksPurityFT;
+    float m_goodBadTracksRatioFT;
+    float m_goodTracksPurityROE;
+    float m_goodBadTracksRatioROE;
+    int m_badTracksROE;
+    int m_goodTracksROE;
+    int m_badTracksFT;
+    int m_goodTracksFT;
+
+    float m_FTandROEGoodTracksRatio;
+    std::vector<float> m_prodVerZ;
     std::vector<std::string> m_categories;
 
 

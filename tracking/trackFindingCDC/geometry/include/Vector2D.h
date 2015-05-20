@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef VECTOR2D_H
 #define VECTOR2D_H
 

@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef CDCENTITIESCOMPARE_H
 #define CDCENTITIESCOMPARE_H
 

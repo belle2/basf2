@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 

@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCTRAJECTORY2D_H
 #define CDCTRAJECTORY2D_H
 

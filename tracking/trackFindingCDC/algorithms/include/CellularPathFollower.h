@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef CELLULARPATHFOLLOWER_H_
 #define CELLULARPATHFOLLOWER_H_
 

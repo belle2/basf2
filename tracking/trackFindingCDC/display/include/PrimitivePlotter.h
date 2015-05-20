@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef PRIMITIVEPLOTTER_H_
 #define PRIMITIVEPLOTTER_H_
 

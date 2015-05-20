@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef SEGMENTFINDERCDCFACETAUTOMATONMODULE_H_
 #define SEGMENTFINDERCDCFACETAUTOMATONMODULE_H_
 

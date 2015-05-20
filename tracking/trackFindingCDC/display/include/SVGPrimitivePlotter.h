@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef SVGPRIMITIVEPLOTTER_H_
 #define SVGPRIMITIVEPLOTTER_H_
 

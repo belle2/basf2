@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef CLUSTERIZER_H_
 #define CLUSTERIZER_H_
 
@@ -62,18 +63,19 @@ namespace Belle2 {
       template<class ItemRange>
       void create(const ItemRange& items,
                   const Neighborhood& neighborhood,
-                  std::vector<Cluster>& clusters) const {
+                  std::vector<Cluster>& clusters) const
+      {
 
         clusters.reserve(30);
 
         //Prepare states
         m_cellStates.clear();
-        for (Item const & item : items) {
+        for (Item const& item : items) {
           setCellState(item, -1);
         }
 
         int iCluster = -1;
-        for (Item const & item : items) {
+        for (Item const& item : items) {
 
           if (getCellState(item) == -1) {
 
@@ -94,14 +96,15 @@ namespace Belle2 {
       template<class PtrItemRange>
       void createFromPointers(const PtrItemRange& ptrItems,
                               const Neighborhood& neighborhood,
-                              std::vector<Cluster>& clusters) const {
+                              std::vector<Cluster>& clusters) const
+      {
 
 
         clusters.reserve(30);
 
         //Prepare states
         m_cellStates.clear();
-        for (Item const * ptrItem : ptrItems) {
+        for (Item const* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
             B2WARNING("Nullptr given as item in Clusterizer");
@@ -112,7 +115,7 @@ namespace Belle2 {
         }
 
         int iCluster = -1;
-        for (const Item * ptrItem : ptrItems) {
+        for (const Item* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
             B2WARNING("Nullptr given as item in Clusterizer");
@@ -138,7 +141,8 @@ namespace Belle2 {
       typename boost::enable_if <
       boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
             void >::type
-      setCellState(const ConvertableToAutomaton& item, const CellState& cellState) const {
+            setCellState(const ConvertableToAutomaton& item, const CellState& cellState) const
+      {
         const AutomatonCell& automatonCell = item;
         automatonCell.setCellState(cellState);
       }
@@ -148,7 +152,8 @@ namespace Belle2 {
       typename boost::enable_if <
       boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
             CellState >::type
-      getCellState(const ConvertableToAutomaton& item) const {
+            getCellState(const ConvertableToAutomaton& item) const
+      {
         const AutomatonCell& automatonCell = item;
         return automatonCell.getCellState();
       }
@@ -174,7 +179,8 @@ namespace Belle2 {
       typename boost::enable_if <
       boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
             void >::type
-      setCellWeight(const ConvertableToAutomaton& item, const CellWeight& cellWeight) const {
+            setCellWeight(const ConvertableToAutomaton& item, const CellWeight& cellWeight) const
+      {
         const AutomatonCell& automatonCell = item;
         automatonCell.setCellWeight(cellWeight);
       }
@@ -193,7 +199,8 @@ namespace Belle2 {
       inline void startCluster(const Neighborhood& neighborhood,
                                Cluster& newCluster,
                                int iCluster,
-                               const Item& seedItem) const {
+                               const Item& seedItem) const
+      {
 
         //Cluster uses pointers as items instead of objects
         const Item* ptrSeedItem = &seedItem;
@@ -219,7 +226,7 @@ namespace Belle2 {
             size_t nNeighbors = 0;
 
             // Consider each neighbor
-            for (const typename Neighborhood::WeightedRelation & relation : neighborhood.equal_range(clusterItem)) {
+            for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(clusterItem)) {
               ++nNeighbors;
 
               const Item* neighborItem = getNeighbor(relation);
@@ -250,9 +257,11 @@ namespace Belle2 {
       } // end  startCluster(...)
 
     private:
-      mutable std::map<const Item*, CellState> m_cellStates; ///< Memory for the cell state, if the Item does not inherit from AutomatonCell.
+      mutable std::map<const Item*, CellState>
+      m_cellStates; ///< Memory for the cell state, if the Item does not inherit from AutomatonCell.
 
-      mutable std::map<const Item*, CellWeight> m_cellWeights; ///< Memory for the cell weight, if the Item does not inherit from AutomatonCell.
+      mutable std::map<const Item*, CellWeight>
+      m_cellWeights; ///< Memory for the cell weight, if the Item does not inherit from AutomatonCell.
 
     }; // end class Clusterizer
 

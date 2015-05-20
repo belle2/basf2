@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCFACETSEGMENT_H
 #define CDCFACETSEGMENT_H
 

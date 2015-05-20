@@ -1,3 +1,4 @@
+#pragma once
 #ifndef V0FINDERMODULE_H
 #define V0FINDERMODULE_H
 

@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef TRACKMERGER_H_
 #define TRACKMERGER_H_
 

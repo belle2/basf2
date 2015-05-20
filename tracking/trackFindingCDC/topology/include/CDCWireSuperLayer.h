@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCWIRESUPERLAYER_H
 #define CDCWIRESUPERLAYER_H
 

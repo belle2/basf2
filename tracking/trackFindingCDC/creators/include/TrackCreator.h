@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef TRACKCREATOR_H_
 #define TRACKCREATOR_H_
 

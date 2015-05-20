@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCWIREHITTOPOLOGY_H
 #define CDCWIREHITTOPOLOGY_H
 
@@ -80,19 +81,22 @@ namespace Belle2 {
       size_t useOnly(const std::vector<int>& iHits);
 
       /// Only use the cdc hits that have a relation from the StoreArray given by full name.
-      size_t dontUseRelatedFrom(const std::string& storeArrayName) {
+      size_t dontUseRelatedFrom(const std::string& storeArrayName)
+      {
         std::vector<int> iHits = getIHitsRelatedFrom(storeArrayName);
         return dontUse(iHits);
       }
 
       /// Only use the cdc hits that have a relation from the StoreArray given by full name.
-      size_t useOnlyRelatedFrom(const std::string& storeArrayName) {
+      size_t useOnlyRelatedFrom(const std::string& storeArrayName)
+      {
         std::vector<int> iHits = getIHitsRelatedFrom(storeArrayName);
         return useOnly(iHits);
       }
 
       /// Use all but the cdc hits that have a relation from the StoreArray given by full name.
-      size_t useAllButRelatedFrom(const std::string& storeArrayName) {
+      size_t useAllButRelatedFrom(const std::string& storeArrayName)
+      {
         std::vector<int> iHits = getIHitsRelatedFrom(storeArrayName);
         return useAllBut(iHits);
       }
@@ -122,10 +126,12 @@ namespace Belle2 {
       const Belle2::TrackFindingCDC::CDCWireHit* getWireHit(const Belle2::CDCHit* ptrHit) const;
 
       /// Getter for the two oriented wire hits that are based on the given wire hit
-      std::pair<const Belle2::TrackFindingCDC::CDCRLWireHit*, const Belle2::TrackFindingCDC::CDCRLWireHit*> getRLWireHitPair(const Belle2::TrackFindingCDC::CDCWireHit& wireHit) const;
+      std::pair<const Belle2::TrackFindingCDC::CDCRLWireHit*, const Belle2::TrackFindingCDC::CDCRLWireHit*> getRLWireHitPair(
+        const Belle2::TrackFindingCDC::CDCWireHit& wireHit) const;
 
       /// Getter for the oriented wire hit that is based on the given wire hit with a specific right left passage hypotheses.
-      const Belle2::TrackFindingCDC::CDCRLWireHit* getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const RightLeftInfo& rlInfo) const;
+      const Belle2::TrackFindingCDC::CDCRLWireHit* getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
+                                                                const RightLeftInfo& rlInfo) const;
 
       /// Getter for the oriented wire hit that is based on the given CDCHit with a specific right left passafe hypotheses.
       const Belle2::TrackFindingCDC::CDCRLWireHit* getRLWireHit(const Belle2::CDCHit* ptrHit, const RightLeftInfo& rlInfo) const;
@@ -160,7 +166,8 @@ namespace Belle2 {
 
       bool m_useSimpleTDCCountTranslator; ///< Switch whether the simple or the realistic tdc count translator shall be used.
 
-      CDC::TDCCountTranslatorBase* m_initialTDCCountTranslator; ///< Reference of the tdc count translator used at the beginning of this event.
+      CDC::TDCCountTranslatorBase*
+      m_initialTDCCountTranslator; ///< Reference of the tdc count translator used at the beginning of this event.
 
     private:
       /// ROOT Macro to make CDCWireTopology a ROOT class

@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef FACETCREATOR_H_
 #define FACETCREATOR_H_
 

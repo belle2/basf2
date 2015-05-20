@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCGENHITVECTOR_H
 #define CDCGENHITVECTOR_H
 
@@ -33,7 +34,8 @@ namespace Belle2 {
       typedef typename SortableVector<T>::const_iterator const_iterator;    ///< Constant iterator type of this container
 
       typedef typename SortableVector<T>::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
-      typedef typename SortableVector<T>::const_reverse_iterator const_reverse_iterator;  ///< Constant reversed iterator type of this container
+      typedef typename SortableVector<T>::const_reverse_iterator
+      const_reverse_iterator;  ///< Constant reversed iterator type of this container
 
 
       typedef typename SortableVector<T>::range range; ///< Iterator type of this container
@@ -50,7 +52,8 @@ namespace Belle2 {
       ~CDCGenHitVector() {;}
 
       ///Implements the standard swap idiom
-      friend void swap(CDCGenHitVector<T>& lhs, CDCGenHitVector<T>& rhs) {
+      friend void swap(CDCGenHitVector<T>& lhs, CDCGenHitVector<T>& rhs)
+      {
         SortableVector<T>& rawLHS = lhs;
         SortableVector<T>& rawRHS = rhs;
         rawLHS.swap(rawRHS);
@@ -88,37 +91,43 @@ namespace Belle2 {
 
     public:
       /// Erases all tracking entities assoziated with specific wire from the vector.
-      void eraseAll(const Belle2::TrackFindingCDC::CDCWire& wire) {
+      void eraseAll(const Belle2::TrackFindingCDC::CDCWire& wire)
+      {
         this->erase(remove_if(this->begin(), this->end(), HasWirePredicate(wire)), this->end());
         //remove erase idiom
       }
       /// Erases all tracking entities assoziated with specific wire hit from the vector.
-      void eraseAll(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) {
+      void eraseAll(const Belle2::TrackFindingCDC::CDCWireHit& wirehit)
+      {
         this->erase(remove_if(this->begin(), this->end(), HasWireHitPredicate(wirehit)), this->end());
         //remove erase idiom
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire.
-      bool hasWire(const Belle2::TrackFindingCDC::CDCWire& wire) const {
+      bool hasWire(const Belle2::TrackFindingCDC::CDCWire& wire) const
+      {
         const_iterator found = std::find_if(this->begin(), this->end(), HasWirePredicate(wire));
         return found != this->end();
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire hit.
-      bool hasWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) const {
+      bool hasWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) const
+      {
         const_iterator found = std::find_if(this->begin(), this->end(), HasWireHitPredicate(wirehit));
         return found != this->end();
       }
 
       /// Copy all entities in this collection assoziated with a specific wire to the given collection.
-      void collectForWire(const Belle2::TrackFindingCDC::CDCWire& wire, CDCGenHitVector<T>& collect) const {
+      void collectForWire(const Belle2::TrackFindingCDC::CDCWire& wire, CDCGenHitVector<T>& collect) const
+      {
         input_iterator inputTo = collect.input();
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
           if ((*itItem)->hasWire(wire)) inputTo = *itItem;
         }
       }
       /// Copy all entities in this collection assoziated with a specific wire hit to the given collection.
-      void collectForWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit, CDCGenHitVector<T>& collect) const {
+      void collectForWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit, CDCGenHitVector<T>& collect) const
+      {
         input_iterator inputTo = collect.input();
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
           if ((*itItem)->hasWireHit(wirehit)) inputTo = *itItem;
@@ -126,7 +135,8 @@ namespace Belle2 {
       }
 
       /// Calculates the average center of mass of all stored tracking entities.
-      Vector2D getCenterOfMass2D() const {
+      Vector2D getCenterOfMass2D() const
+      {
         Vector2D accumulate(0.0, 0.0);
         //B2DEBUG(100,"getCenterOfMass");
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
@@ -149,7 +159,8 @@ namespace Belle2 {
       /** This checks if all tracking entities are located in the same superlayer and \n
        *  returns the superlayer id of the later. Returns INVALID_ISUPERLAYER if the superlayer \n
        *  is not shared among the tracking entities. */
-      ILayerType getISuperLayer() const {
+      ILayerType getISuperLayer() const
+      {
         if (this->empty()) return INVALID_ISUPERLAYER;
         const_iterator itItem = this->begin();
         const T& firstItem =  *itItem;
@@ -161,7 +172,8 @@ namespace Belle2 {
       }
 
       /// Calculates the sum of all squared distances of the stored tracking entities to the circle as see from the transvers plane.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const {
+      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
+      {
 
         FloatType accumulate = 0;
         for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {

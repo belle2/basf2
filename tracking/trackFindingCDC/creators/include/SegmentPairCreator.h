@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef AXIALSTEREOSEGMENTPAIRCREATOR_H
 #define AXIALSTEREOSEGMENTPAIRCREATOR_H
 

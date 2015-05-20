@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef EVENTDATAPLOTTER_H_
 #define EVENTDATAPLOTTER_H_
 

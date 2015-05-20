@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCRECOSEGMENT3D_H
 #define CDCRECOSEGMENT3D_H
 

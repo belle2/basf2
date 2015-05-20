@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef STOREWRAPPEDOBJPTR_H_
 #define STOREWRAPPEDOBJPTR_H_
 
@@ -41,7 +42,8 @@ namespace Belle2 {
        */
       static bool registerTransient(const std::string& name = "",
                                     DataStore::EDurability durability = DataStore::c_Event,
-                                    bool errorIfExisting = false) {
+                                    bool errorIfExisting = false)
+      {
         return StoreObjPtr<StoreWrapper<T> >::registerTransient(name, durability, errorIfExisting);
       }
 
@@ -54,7 +56,8 @@ namespace Belle2 {
        *  @param durability  Specifies lifetime of object in question.
        *  @return            True if the object exists.
        */
-      static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+      static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
+      {
         return StoreObjPtr<StoreWrapper<T> >::required(name, durability);
       }
 
@@ -67,7 +70,8 @@ namespace Belle2 {
        *  @param durability  Specifies lifetime of object in question.
        *  @return            True if the object exists.
        */
-      static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) {
+      static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
+      {
         return StoreObjPtr<StoreWrapper<T> >::optional(name, durability);
       }
 
@@ -89,7 +93,8 @@ namespace Belle2 {
        *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut.
        *  @return            True if the registration succeeded.
        */
-      bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut) {
+      bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut)
+      {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(storeFlags);
       }
 
@@ -100,17 +105,20 @@ namespace Belle2 {
        *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut.
        *  @return            True if the registration succeeded.
        */
-      bool registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut) {
+      bool registerInDataStore(const std::string& name, DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut)
+      {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(name, storeFlags);
       }
 
       /// Dereference to the wrapped object.
-      T& operator*() const {
+      T& operator*() const
+      {
         return StoreObjPtr<StoreWrapper<T> >::operator*().get();
       }
 
       /// Forward pointer access to the wrapped object.
-      T* operator->() const {
+      T* operator->() const
+      {
         return  &(operator*());
       }
 

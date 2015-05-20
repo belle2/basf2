@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef SZCOVARIANCE_H
 #define SZCOVARIANCE_H
 

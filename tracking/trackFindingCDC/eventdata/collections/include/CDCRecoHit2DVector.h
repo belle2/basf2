@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCRECOHIT2DVECTOR_H
 #define CDCRECOHIT2DVECTOR_H
 

@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCMCMAP_H
 #define CDCMCMAP_H
 
@@ -138,7 +139,8 @@ namespace Belle2 {
       { return hit ? m_simHitByHit.by<CDCHit>().at(hit) : nullptr; }
 
       /// Seeks the CDCHit related to the CDCSimHit - nullptr if no CDCHit is related.
-      const Belle2::CDCHit* getHit(const CDCSimHit* simHit) const {
+      const Belle2::CDCHit* getHit(const CDCSimHit* simHit) const
+      {
         auto itFound = m_simHitByHit.by<CDCSimHit>().find(simHit);
         return itFound != m_simHitByHit.by<CDCSimHit>().end() ? itFound->get<CDCHit>() : nullptr;
       }
@@ -158,14 +160,16 @@ namespace Belle2 {
 
 
       /// Seeks the MCParticle related to the CDCHit - nullptr if no MCParticle is related, this is also the case for background hits.
-      const Belle2::MCParticle* getMCParticle(const CDCHit* hit) const {
+      const Belle2::MCParticle* getMCParticle(const CDCHit* hit) const
+      {
         auto itFound = m_mcParticlesByHit.by<CDCHit>().find(hit);
         return itFound != m_mcParticlesByHit.by<CDCHit>().end() ? itFound->get<MCParticle>() : nullptr;
       }
       //{ return hit ? hit->getRelated<MCParticle>() : nullptr; }
 
       /// Seeks the MCParticle related to the CDCSimHit - nullptr if no MCParticle is related, this is also the case for background hits.
-      const Belle2::MCParticle* getMCParticle(const CDCSimHit* simHit) const {
+      const Belle2::MCParticle* getMCParticle(const CDCSimHit* simHit) const
+      {
         auto itFound = m_mcParticlesBySimHit.by<CDCSimHit>().find(simHit);
         return itFound != m_mcParticlesBySimHit.by<CDCSimHit>().end() ? itFound->get<MCParticle>() : nullptr;
       }

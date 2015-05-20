@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef TRACKFINDERCDCAUTOMATONMODULE_H_
 #define TRACKFINDERCDCAUTOMATONMODULE_H_
 

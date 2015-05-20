@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef STOREWRAPPER_H_
 #define STOREWRAPPER_H_
 

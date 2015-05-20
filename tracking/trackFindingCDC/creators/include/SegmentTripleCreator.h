@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef SEGMENTTRIPLECREATOR_H_
 #define SEGMENTTRIPLECREATOR_H_
 

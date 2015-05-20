@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef MCTRACKMATCHER_H_
 #define MCTRACKMATCHER_H_
 

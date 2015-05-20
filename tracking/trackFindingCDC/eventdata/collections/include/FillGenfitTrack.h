@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef FILLGENFITTRACK_H_
 #define FILLGENFITTRACK_H_
 
@@ -33,7 +34,7 @@ namespace Belle2 {
       // the sorting parameter is just used to reinforce the order in the range.
       int sortingParameter = -1;
 
-      for (const auto & genHit : hits) {
+      for (const auto& genHit : hits) {
         ++sortingParameter;
 
         const CDCRLWireHit& rlWireHit = genHit->getRLWireHit();

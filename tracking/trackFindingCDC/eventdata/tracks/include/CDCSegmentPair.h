@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCAXIALSTEREOSEGMENTPAIR_H
 #define CDCAXIALSTEREOSEGMENTPAIR_H
 

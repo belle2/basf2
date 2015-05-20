@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef PARAMETERLINE2D_H
 #define PARAMETERLINE2D_H
 

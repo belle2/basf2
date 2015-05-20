@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCWIREHITCLUSTER_H
 #define CDCWIREHITCLUSTER_H
 

@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef HELIXPARAMETERINDEX_H
 #define HELIXPARAMETERINDEX_H
 

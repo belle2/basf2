@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef CDCMCTRACKSTORE_H
 #define CDCMCTRACKSTORE_H
 
@@ -57,7 +58,8 @@ namespace Belle2 {
       { return  m_mcTracksByMCParticleIdx;}
 
       /// Getter for the stored Monte Carlo segments ordered by their Monte Carlo Id
-      const std::map<ITrackType, std::vector<Belle2::TrackFindingCDC::CDCMCTrackStore::CDCHitVector> >& getMCSegmentsByMCParticleIdx() const
+      const std::map<ITrackType, std::vector<Belle2::TrackFindingCDC::CDCMCTrackStore::CDCHitVector> >& getMCSegmentsByMCParticleIdx()
+      const
       { return  m_mcSegmentsByMCParticleIdx;}
 
     private:

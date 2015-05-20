@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef IFNOTCINT_H_
 #define IFNOTCINT_H_
 

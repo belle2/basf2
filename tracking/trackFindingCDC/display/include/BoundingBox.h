@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #ifndef BOUNDINGBOX_H_
 #define BOUNDINGBOX_H_
 
@@ -41,7 +42,8 @@ namespace Belle2 {
       {;}
 
       /// Expands the bounding box such that it also covers the given bounding box
-      void operator&=(const BoundingBox& other) {
+      void operator&=(const BoundingBox& other)
+      {
 
         m_left = std::isnan(getLeft()) ? other.getLeft() : std::min(getLeft(), other.getLeft());
         m_bottom = std::isnan(getBottom()) ? other.getBottom() : std::min(getBottom(), other.getBottom());
@@ -52,7 +54,8 @@ namespace Belle2 {
       }
 
       /// Expands the rectangle in each direction by the given value delta.
-      void expand(const float& delta) {
+      void expand(const float& delta)
+      {
         m_left -= delta;
         m_bottom -= delta;
         m_right += delta;
@@ -84,7 +87,8 @@ namespace Belle2 {
       { return m_top; }
 
       /// Clears all bounds to NAN.
-      void clear() {
+      void clear()
+      {
         m_left = NAN;
         m_bottom = NAN;
         m_right = NAN;

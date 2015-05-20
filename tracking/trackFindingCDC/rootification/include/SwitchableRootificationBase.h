@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 #ifndef SWITCHABLEROOTIFICATIONBASE_H_
 #define SWITCHABLEROOTIFICATIONBASE_H_
 

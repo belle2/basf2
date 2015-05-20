@@ -63,44 +63,44 @@ namespace Belle2 {
     addParam("methods", m_methods,
              "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, Fisher, Plugin. For type 'Plugin', the plugin matching the Name attribute will be loaded (e.g. NeuroBayes). The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
     addParam("prefix", m_methodPrefix,
-             "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information",
+             "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information. A control plot for the sPlot fit is written to $prefix_pre_splot_fit.png.",
              std::string("TMVA"));
     addParam("workingDirectory", m_workingDirectory,
              "Working directory in which the config file and the weight file directory is created", std::string("."));
     addParam("variables", m_variables, "Input variables used by the TMVA method");
     addParam("spectators", m_spectators,
-             "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input.", empty);
+             "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input. The discriminating variables are automatically added to this list.",
+             empty);
     addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory",
              std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
-    addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree",
-             std::string("!V:SplitMode=alternate:MixMode=Block:NormMode=None"));
+    addParam("prepareOption", m_prepareOption,
+             "Option passed to TMVA::Factory::PrepareTrainingAndTestTree. The default value is chosen to work with sPlot, do not change.",
+             std::string("!V:SplitMode=Alternate:MixMode=Block:NormMode=None"));
     addParam("createMVAPDFs", m_createMVAPDFs,
              "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.",
              true);
-    addParam("useExistingData", m_useExistingData, "Use existing data which is already stored in the $prefix.root file.", false);
     addParam("doNotTrain", m_doNotTrain,
              "Do not train, create only datafile with samples. Useful if you want to train outside of basf2 with the externTeacher tool.",
              false);
-    addParam("doNotSPlot", m_doNotSPlot,
-             "Do not run SPlot to calculate weights. Useful for debugging, for example in combination with doNotTrain to see how the data looks.",
-             false);
     addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", 0u);
     addParam("discriminatingVariables", m_discriminatingVariables,
-             "The discriminating variables used by sPlot to determine the weights.");
+             "The variables that will be used as discriminating variables in the sPlot algorithm to determine the weights.");
     addParam("modelFileName", m_modelFileName,
-             "Path to the Root file containing the model which describes signal and background in the discriminating variable. This file will only be opened readonly.");
-    addParam("modelObjectName", m_modelObjectName, "Name of the RooAbsPdf object in the Root file with path modelFileName.",
+             "Path to the Root file containing the model which describes the distribution of signal and background candidates in the discriminating variable. This file will only be opened readonly.");
+    addParam("modelObjectName", m_modelObjectName,
+             "Name of the RooAbsPdf object which represents the model. This object must be present in the Root file given with the parameter modelFileName.",
              std::string("model"));
     addParam("modelPlotComponentNames", m_modelPlotComponentNames,
-             "Name of RooAbsPdf objects that are part of the model and should be plotted additionally.", empty);
+             "Name of RooAbsPdf objects that are part of the model and should be plotted additionally in the control plot $prefix_pre_splot_fit.png.",
+             empty);
     addParam("modelYieldsObjectNames", m_modelYieldsObjectNames,
-             "Name of the RooRealVar objects that represent the yields of the event classes in the Root file with path modelFileName. There have to be as much yields as classes"
+             "Name of the RooRealVar objects that represent the yields of the event classes in the model. There have to be as many yields as classes"
              "-- the number of yields is interpreted as the number of classes. In the case of two classes, the yield for the signal class has to be the second, because the largest classid is signal in TMVA.");
     addParam("setYieldRanges", m_setYieldRanges,
-             "If True, the maximum value of the yield variables given with m_modelYieldsObjectNames will be set to the number of events. The minimum value will not be touched.",
+             "If True, the upper limit of the yield variables will be set to the number of candidates. The lower limit is not changed.",
              true);
     addParam("modelYieldsInitialFractions", m_modelYieldsInitialFractions,
-             "If set, the initial value of yield i will be set to initialFraction[i]*numberOfEvents. If there are fewer initial fractions than yields, the values of the other yields will not be touched",
+             "If set, the initial value of yield i will be set to initialFraction[i]*numberOfCandidates. If there are fewer initial fractions given than yields, the initial values of the remaining yields are not changed.",
              std::vector<double>());
 
     // all other members
@@ -124,8 +124,7 @@ namespace Belle2 {
         config = std::string("CreateMVAPdfs:") + config;
       methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables, m_spectators));
     }
-    m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, "isSignal", "constant(1)", methods,
-                                                         m_useExistingData);
+    m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, "isSignal", "constant(1)", methods, false);
 
     // Create a temporary workspace to manage the model and its variables
     auto workspace = getWorkspace();
@@ -306,42 +305,37 @@ namespace Belle2 {
       //bool silentModeBefore = RooMsgService::instance().silentMode();
       //RooMsgService::instance().setSilentMode(true);
 
-      if (not m_doNotSPlot) {
-        std::cout << "SPlot: call SPlot" << std::endl;
-        RooStats::SPlot* sData = new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *discriminating_values, model, *yields);
+      std::cout << "SPlot: call SPlot" << std::endl;
+      RooStats::SPlot* sData = new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *discriminating_values, model, *yields);
 
-        // This is used in the RooStat::SPlot tutorial.
-        //std::cout << "SPlot: reset verbose status of RooMsgService" << std::endl;
-        //RooMsgService::instance().setSilentMode(silentModeBefore);
+      // This is used in the RooStat::SPlot tutorial.
+      //std::cout << "SPlot: reset verbose status of RooMsgService" << std::endl;
+      //RooMsgService::instance().setSilentMode(silentModeBefore);
 
-        RooArgList sWeightedVars = sData->GetSWeightVars();
-        std::cout << "For the following " << sWeightedVars.getSize() << " classes sWeights were calculated: ";
-        for (Int_t i = 0; i < sWeightedVars.getSize(); i++) {
-          std::cout << sWeightedVars.at(i)->GetName();
-          if (i != sWeightedVars.getSize() - 1) {
-            std::cout << ", ";
-          }
+      RooArgList sWeightedVars = sData->GetSWeightVars();
+      std::cout << "For the following " << sWeightedVars.getSize() << " classes sWeights were calculated: ";
+      for (Int_t i = 0; i < sWeightedVars.getSize(); i++) {
+        std::cout << sWeightedVars.at(i)->GetName();
+        if (i != sWeightedVars.getSize() - 1) {
+          std::cout << ", ";
         }
-        std::cout << "." << std::endl;
-
-        if (sWeightedVars.getSize() != static_cast<int>(m_numberOfClasses)) {
-          B2FATAL("TMVASPlotTeacher: The SPlot algorithm did not succeed, the number of classes for which sWeights were calculated doesn't match with the number of classes.");
-        }
-
-        std::vector<float> weights(numberOfEntries);
-        // For each event, a weight needs to be retrieved for each class
-        for (UInt_t i = 0; i < numberOfEvents; i++) {
-          for (UInt_t j = 0; j < m_numberOfClasses; j++) {
-            // Get the name of the j-th coefficient from the model
-            weights[2 * i + j] = sData->GetSWeight(i, yields->at(j)->GetName());
-          }
-        }
-
-        m_teacher->setVariable("__weight__", weights);
-
-      } else {
-        std::cout << "TMVASPlotTeacher: SPlot skipped." << std::endl;
       }
+      std::cout << "." << std::endl;
+
+      if (sWeightedVars.getSize() != static_cast<int>(m_numberOfClasses)) {
+        B2FATAL("TMVASPlotTeacher: The SPlot algorithm did not succeed, the number of classes for which sWeights were calculated doesn't match with the number of classes.");
+      }
+
+      std::vector<float> weights(numberOfEntries);
+      // For each event, a weight needs to be retrieved for each class
+      for (UInt_t i = 0; i < numberOfEvents; i++) {
+        for (UInt_t j = 0; j < m_numberOfClasses; j++) {
+          // Get the name of the j-th coefficient from the model
+          weights[2 * i + j] = sData->GetSWeight(i, yields->at(j)->GetName());
+        }
+      }
+
+      m_teacher->setVariable("__weight__", weights);
 
       if (not m_doNotTrain) {
         m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);

@@ -9,7 +9,7 @@
 # and performs simulation with [SVD, PXD, CDC, ARICH] subdetectors.
 # Output root file contains all information nedded for ARICH likelihood
 # reconstruction, which can be later performed using "FullDet_rec.py" script.
-
+#
 ##############################################################################
 
 from basf2 import *
@@ -105,7 +105,8 @@ cdcfitting = register_module('GenFitter')
 # Track extrapolation
 ext = register_module('Ext')
 
-#
+# this creates relations between ExtHits and ARICHAeroHits. It allows to have relevant MC information
+# without storing MCParticles (which are HUGE) into output root file.
 arichRELATE = register_module('ARICHRelate')
 
 # store output information

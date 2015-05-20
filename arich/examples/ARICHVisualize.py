@@ -3,7 +3,8 @@
 
 ##############################################################################
 #
-# This is an example steering file to visulize ARICH subdetector.
+# This is an example steering file to visulize ARICH subdetector geometry +
+# 3 pion tracks hitting the detector.
 # It creates .wrl file which can be opened with apropriate
 # viewer (ex. freewrl).
 #
@@ -30,7 +31,7 @@ particlegun = register_module('ParticleGun')
 simulation = register_module('FullSim')
 
 # EventInfoSetter parameters
-# Set the number of events to be processed (10 event)
+# Set the number of events to be processed (1 event)
 eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 # ============================================================================
 
@@ -41,7 +42,7 @@ set_random_seed(1028307)
 # Setting the list of particle codes (PDG codes) for the generated particles
 particlegun.param('pdgCodes', [-211, 211])
 # Setting the number of tracks to be generated per event:
-particlegun.param('nTracks', 1)
+particlegun.param('nTracks', 3)
 # if you set nTracks to 0, then for each PDG code in pdgCodes list a track
 # will be generated on each event.
 # Setting the parameters for the random generation
@@ -50,7 +51,7 @@ particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [1, 4])
 # Setting the parameters for the random generation
 # of the particle polar angle:
-particlegun.param('thetaGeneration', 'uniformCosinus')
+particlegun.param('thetaGeneration', 'uniformCos')
 particlegun.param('thetaParams', [17, 35])
 # Print the parameters of the particle gun
 print_params(particlegun)
@@ -59,19 +60,14 @@ print_params(particlegun)
 # ============================================================================
 # Geometry parameters
 # Select subdetectors to be built
-geometry.param('Components', ['ARICH'])
+geometry.param('components', ['ARICH'])
+
 # If you comment this out all subdetectors will be built. If you want to
 # include just some of them do for example ['ARICH','TOP','CDC'].
 # ============================================================================
 
 # ============================================================================
-# Simulation parameters
-# To speed up the simulation you can propagate only a selected fraction of
-# photons.
-simulation.param('PhotonFraction', 0.3)
-# !!! NOTE: if you use ARICH digitization module this must be set to 0.3
-# since HAPD q.e. curve is scaled to that value
-# (will be solved in one of next releases)
+
 # Here you can select visualization driver and visualization commands.
 # You can use any visualization supported by geant4:
 # "http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides/
@@ -84,9 +80,9 @@ simulation.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
                                 '/vis/scene/add/trajectories smooth',
                                 '/vis/modeling/trajectories/create/drawByCharge'])
 # =============================================================================
-
 # Do the simulation
 # =============================================================================
+
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)

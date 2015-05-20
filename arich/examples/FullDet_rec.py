@@ -7,7 +7,6 @@
 # It performs calculation of ARICH PID likelihood for each track, and stores
 # information needed for PID efficiency calculation into output root file.
 #
-#
 ##############################################################################
 
 from basf2 import *
@@ -38,7 +37,7 @@ gearbox = register_module('Gearbox')
 
 # Create geometry
 geometry = register_module('Geometry')
-geometry.param('Components', ['ARICH'])  # 'MagneticField',
+geometry.param('components', ['ARICH'])  # 'MagneticField',
 #    'BeamPipe',
 #    'PXD',
 #    'SVD',
@@ -51,7 +50,6 @@ arichDIGI = register_module('ARICHDigitizer')
 arichRECO = register_module('ARICHReconstructor')
 arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.logging.debug_level = 20
-arichRECO.param('inputTrackType', 1)
 
 # my module - reconstruction efficiency analysis
 arichEfficiency = register_module('ARICHAnalysis')

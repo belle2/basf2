@@ -5,7 +5,7 @@
  *      Author: vtrusov
  */
 
-#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h>
 
 using namespace std;
 using namespace Belle2;

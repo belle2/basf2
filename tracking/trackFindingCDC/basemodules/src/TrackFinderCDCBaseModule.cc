@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 //out type
-#include "genfit/TrackCand.h"
+#include <genfit/TrackCand.h>
 
 using namespace std;
 using namespace Belle2;

@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/KarimakisMethod.h>
 
-#include "TMatrixDSym.h"
+#include <TMatrixDSym.h>
 #include <Eigen/Dense>
 
 using namespace std;

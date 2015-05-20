@@ -5,7 +5,7 @@
  *      Author: kronenbitter
  */
 
-#include "tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h"
+#include <tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h>
 
 
 #include <framework/gearbox/Const.h>

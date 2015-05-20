@@ -13,8 +13,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include "TMatrixD.h"
-#include "TVectorD.h"
+#include <TMatrixD.h>
+#include <TVectorD.h>
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 

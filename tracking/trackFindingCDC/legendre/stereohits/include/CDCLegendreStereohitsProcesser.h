@@ -17,13 +17,13 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
-#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h"
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
-#include "TVector3.h"
-#include "TVector2.h"
+#include <TVector3.h>
+#include <TVector2.h>
 
 #include "boost/foreach.hpp"
 
@@ -31,7 +31,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-#include "TMath.h"
+#include <TMath.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

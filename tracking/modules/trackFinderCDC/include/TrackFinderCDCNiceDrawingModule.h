@@ -9,14 +9,14 @@
 
 #include <framework/core/Module.h>
 
-#include "cdc/geometry/CDCGeometryPar.h"
-#include "cdc/translators/SimpleTDCCountTranslator.h"
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/translators/SimpleTDCCountTranslator.h>
 
 #include <fstream>
-#include "genfit/Track.h"
-#include "genfit/TrackCand.h"
+#include <genfit/Track.h>
+#include <genfit/TrackCand.h>
 
-#include "tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h"
+#include <tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h>
 
 class TVector2;
 

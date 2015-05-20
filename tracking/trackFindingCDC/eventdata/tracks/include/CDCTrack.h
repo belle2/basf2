@@ -20,7 +20,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
-#include "genfit/TrackCand.h"
+#include <genfit/TrackCand.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h"
+#include <tracking/trackFindingCDC/legendre/CDCLegendreNiceDrawing.h>
 
 #include <list>
 
@@ -96,7 +96,8 @@ namespace Belle2 {
       /**
        * Draw hits in legendre and conformal space using ROOT
        */
-      void drawHitsROOT(std::vector<TrackHit*>& hits_vector); /**<Method for drawing cdchits in TCanvas (in legendre and conformal spaces)*/
+      void drawHitsROOT(std::vector<TrackHit*>&
+                        hits_vector); /**<Method for drawing cdchits in TCanvas (in legendre and conformal spaces)*/
 
       /**
        * Finalize ROOT drawing

@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h"
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 
-#include "tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h"
+#include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>

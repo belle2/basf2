@@ -30,7 +30,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include "genfit/TrackCand.h"
+#include <genfit/TrackCand.h>
 
 namespace Belle2 {
 

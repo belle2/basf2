@@ -31,7 +31,7 @@ void ProgressBarModule::initialize()
   m_evtNr = 0;
   m_nTotal = InputController::numEntries();
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
-  if (numEventsArgument != 0)
+  if (numEventsArgument != 0 and (m_nTotal == 0 or numEventsArgument < m_nTotal))
     m_nTotal = numEventsArgument;
 
   m_startTime = (long)(Utils::getClock() / 1e9);

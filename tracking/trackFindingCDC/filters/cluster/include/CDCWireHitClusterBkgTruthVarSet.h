@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCWireHitClusterVarSet.h"
+#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

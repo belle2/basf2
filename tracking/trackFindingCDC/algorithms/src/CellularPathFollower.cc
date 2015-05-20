@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include "../include/CellularPathFollower.h"
+#include <tracking/trackFindingCDC/algorithms/CellularPathFollower.h>
 
 //#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>

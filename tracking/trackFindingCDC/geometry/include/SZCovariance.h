@@ -18,7 +18,7 @@
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include "HelixParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
 
 namespace Belle2 {
 
@@ -52,7 +52,8 @@ namespace Belle2 {
 
     private:
       /// Checks the covariance matrix for consistence
-      inline void checkMatrix() const {
+      inline void checkMatrix() const
+      {
         if (matrix().GetNrows() != 2 or
             matrix().GetNcols() != 2 or
             matrix().GetColLwb() != iSZ or
@@ -70,7 +71,8 @@ namespace Belle2 {
 
     public:
       /// Setter for the whole covariance matrix of the sz parameters
-      inline void setMatrix(const TMatrixDSym& covarianceMatrix) {
+      inline void setMatrix(const TMatrixDSym& covarianceMatrix)
+      {
         checkMatrix();
         m_matrix = covarianceMatrix;
       }
@@ -95,7 +97,8 @@ namespace Belle2 {
       void reverse();
 
       /// Returns the sz covariance for the reversed travel direction as a copy.
-      SZCovariance reversed() const {
+      SZCovariance reversed() const
+      {
         SZCovariance result(*this);
         result.reverse();
         return result;
@@ -115,7 +118,8 @@ namespace Belle2 {
 
 
       /// Transforms the covariance by the given jacobian matrix in place.
-      void similarityTransform(const TMatrixD& jacobian) {
+      void similarityTransform(const TMatrixD& jacobian)
+      {
         if (jacobian.GetNrows() != 2 or jacobian.GetNcols() != 2) {
           B2ERROR("Cannot transform SZCovariance with a " <<
                   jacobian.GetNrows() << "x"  <<
@@ -128,7 +132,8 @@ namespace Belle2 {
 
 
       /// Transforms a copy the covariance by the given jacobian matrix.
-      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const {
+      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const
+      {
         TMatrixDSym matrix = m_matrix;
         matrix.Similarity(jacobian);
         return matrix;

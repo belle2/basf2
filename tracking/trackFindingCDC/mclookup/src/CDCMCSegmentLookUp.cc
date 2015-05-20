@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCMCSegmentLookUp.h"
-#include "../include/CDCMCManager.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <TDatabasePDG.h>
 
@@ -105,7 +105,7 @@ const CDCHit* CDCMCSegmentLookUp::getFirstHit(const CDCRecoSegment2D* ptrSegment
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  for (const CDCRecoHit2D & recoHit2D : segment2D) {
+  for (const CDCRecoHit2D& recoHit2D : segment2D) {
     if (mcTrackId == mcHitLookUp.getMCTrackId(recoHit2D)) return recoHit2D;
   }
   return nullptr;
@@ -127,7 +127,7 @@ const CDCHit* CDCMCSegmentLookUp::getLastHit(const CDCRecoSegment2D* ptrSegment2
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  for (const CDCRecoHit2D & recoHit2D : segment2D.reverseRange()) {
+  for (const CDCRecoHit2D& recoHit2D : segment2D.reverseRange()) {
     if (mcTrackId == mcHitLookUp.getMCTrackId(recoHit2D)) return recoHit2D;
   }
   return nullptr;
@@ -153,7 +153,8 @@ ForwardBackwardInfo CDCMCSegmentLookUp::isForwardOrBackwardToMCTrack(const CDCRe
 
 
 
-ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment2D* ptrStartSegment2D, const CDCRecoSegment2D* ptrEndSegment2D) const
+ForwardBackwardInfo CDCMCSegmentLookUp::areAlignedInMCTrack(const CDCRecoSegment2D* ptrStartSegment2D,
+                                                            const CDCRecoSegment2D* ptrEndSegment2D) const
 {
 
   // Check if the segments are sensable on their own

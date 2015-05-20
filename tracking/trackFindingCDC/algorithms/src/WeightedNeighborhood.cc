@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/WeightedNeighborhood.h"
+#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 
 using namespace std;
 using namespace Belle2;

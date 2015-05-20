@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include "../include/SegmentTripleCreator.h"
+#include <tracking/trackFindingCDC/creators/SegmentTripleCreator.h>
 
 //#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>

@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-#include "../include/CDCWireHitTopology.h"
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

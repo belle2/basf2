@@ -18,12 +18,12 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
-#include "PerigeeParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
-#include "Vector2D.h"
-#include "Line2D.h"
-#include "Circle2D.h"
-#include "GeneralizedCircle.h"
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 
 namespace Belle2 {
 

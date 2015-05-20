@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/ISuperLayerType.h"
+#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 

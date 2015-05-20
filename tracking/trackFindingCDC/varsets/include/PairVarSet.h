@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "FixedSizeNamedFloatTuple.h"
+#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

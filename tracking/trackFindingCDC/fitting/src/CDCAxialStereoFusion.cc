@@ -8,10 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCSZFitter.h"
-#include "../include/CDCRiemannFitter.h"
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include "../include/CDCAxialStereoFusion.h"
+#include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include "CDCObservations2D.h"
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

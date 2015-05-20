@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/NamedFloatTuple.h"
+#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 using namespace std;
 using namespace Belle2;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/Vector3D.h"
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;

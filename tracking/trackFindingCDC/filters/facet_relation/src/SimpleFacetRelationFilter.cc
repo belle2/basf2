@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleFacetRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/facet_relation/SimpleFacetRelationFilter.h>
 
 using namespace std;
 using namespace Belle2;

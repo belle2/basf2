@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRiemannFitter.h"
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 using namespace Belle2::TrackFindingCDC;
 

@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/algorithms/Relation.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "NeighborWeight.h"
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
 #include <iostream>
 #include <vector>

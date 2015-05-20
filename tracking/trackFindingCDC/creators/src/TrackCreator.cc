@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include "../include/TrackCreator.h"
+#include <tracking/trackFindingCDC/creators/TrackCreator.h>
 
 #include <boost/foreach.hpp>
 #include <framework/logging/Logger.h>

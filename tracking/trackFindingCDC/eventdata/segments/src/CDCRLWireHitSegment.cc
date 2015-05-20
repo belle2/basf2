@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCRLWireHitSegment.h"
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 

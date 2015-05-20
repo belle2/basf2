@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/ClusterFilterFactory.h"
-#include "../include/ClusterFilters.h"
+#include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/PerigeeCovariance.h"
-#include "../include/PerigeeParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/PerigeeCovariance.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
 using namespace std;
 using namespace Belle2;

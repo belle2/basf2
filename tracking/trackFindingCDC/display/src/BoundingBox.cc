@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/BoundingBox.h"
+#include <tracking/trackFindingCDC/display/BoundingBox.h>
 
 using namespace std;
 using namespace Belle2;

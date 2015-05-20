@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCTrajectory2D.h"
-#include "../include/CDCBField.h"
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>

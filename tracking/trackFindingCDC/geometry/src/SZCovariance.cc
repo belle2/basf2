@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SZCovariance.h"
+#include <tracking/trackFindingCDC/geometry/SZCovariance.h>
 
 
 using namespace std;

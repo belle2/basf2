@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/AllAxialSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/filters/axial_segment_pair/AllAxialSegmentPairFilter.h>
 
 #include <framework/logging/Logger.h>
 

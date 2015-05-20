@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <cmath>
-#include "../include/numerics.h"
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include <boost/math/tools/precision.hpp>
 

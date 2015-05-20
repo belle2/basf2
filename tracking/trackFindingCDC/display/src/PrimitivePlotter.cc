@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/PrimitivePlotter.h"
+#include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 
 using namespace std;
 using namespace Belle2;

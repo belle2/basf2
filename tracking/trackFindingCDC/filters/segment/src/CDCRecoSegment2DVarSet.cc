@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCRecoSegment2DVarSet.h"
+#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DVarSet.h>
 #include <assert.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>

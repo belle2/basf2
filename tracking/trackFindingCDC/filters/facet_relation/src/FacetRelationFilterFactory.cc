@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/FacetRelationFilterFactory.h"
-#include "../include/FacetRelationFilters.h"
+#include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilters.h>
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 

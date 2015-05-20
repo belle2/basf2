@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseVarSet.h"
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
-#include "FixedSizeNamedFloatTuple.h"
+#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

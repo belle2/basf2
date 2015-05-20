@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/UncertainPerigeeCircle.h"
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
 #include <framework/logging/Logger.h>
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCTangentVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCTangentVector.h>
 
 using namespace std;
 using namespace Belle2;

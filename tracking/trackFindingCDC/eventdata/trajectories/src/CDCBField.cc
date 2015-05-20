@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCBField.h"
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 #include "TMath.h"
 #include <cmath>

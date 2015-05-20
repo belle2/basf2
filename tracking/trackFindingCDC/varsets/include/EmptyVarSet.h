@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseVarSet.h"
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

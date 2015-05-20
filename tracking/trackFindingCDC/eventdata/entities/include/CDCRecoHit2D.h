@@ -15,8 +15,8 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "CDCWireHit.h"
-#include "CDCRLWireHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

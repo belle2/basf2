@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCWireHitClusterVarSet.h"
+#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>

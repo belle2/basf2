@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCFitter2D.h"
-#include "ExtendedRiemannsMethod.h"
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
+#include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -10,23 +10,23 @@
 #ifndef CDCCOLLECTIONS_H
 #define CDCCOLLECTIONS_H
 
-#include "CDCGenHitVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
 //#include "CDCWireHitPtrSet.h"
 //#include "CDCWireHitSet.h"
-#include "CDCWireHitVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCWireHitVector.h>
 
 //#include "CDCRecoHit2DSet.h"
-#include "CDCRecoHit2DVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
 
 //#include "CDCRecoHit3DSet.h"
-#include "CDCRecoHit3DVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
 
 //#include "CDCTangentSet.h"
-#include "CDCTangentVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCTangentVector.h>
 
 //#include "CDCFacetSet.h"
-#include "CDCFacetVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCFacetVector.h>
 
 #endif //CDCCOLLECTIONS_H
 

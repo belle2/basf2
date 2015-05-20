@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/ParameterLine2D.h"
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
 using namespace std;
 using namespace Belle2;

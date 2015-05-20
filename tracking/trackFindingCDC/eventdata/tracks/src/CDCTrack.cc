@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCTrack.h"
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
 
@@ -35,7 +35,7 @@ CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
   m_startTrajectory3D.setLocalOrigin(startPos3D);
   m_endTrajectory3D.setLocalOrigin(endPos3D);
 
-  for (const CDCRecoHit2D & recoHit2D : segment) {
+  for (const CDCRecoHit2D& recoHit2D : segment) {
     const CDCRLWireHit* ptrRLWireHit = &(recoHit2D.getRLWireHit());
     Vector3D recoPos3D(recoHit2D.getRecoPos2D(), 0.0);
     FloatType perpS = m_startTrajectory3D.calcPerpS(recoPos3D);
@@ -71,7 +71,7 @@ void CDCTrack::reverse()
   FloatType newLastPerpS = m_startTrajectory3D.calcPerpS(lastRecoHit3D.getRecoPos3D());
 
   // Reverse the left right passage hypotheses and reverse the measured travel distance
-  for (CDCRecoHit3D & recoHit3D : *this) {
+  for (CDCRecoHit3D& recoHit3D : *this) {
     recoHit3D.reverse();
     FloatType perpS = recoHit3D.getPerpS();
     recoHit3D.setPerpS(newLastPerpS + lastPerpS - perpS);

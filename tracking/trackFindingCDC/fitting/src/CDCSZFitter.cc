@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCSZFitter.h"
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 #include <Eigen/Dense>
 

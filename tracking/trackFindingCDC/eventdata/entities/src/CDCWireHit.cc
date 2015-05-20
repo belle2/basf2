@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCWireHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 

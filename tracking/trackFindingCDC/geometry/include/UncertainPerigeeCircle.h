@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "Vector2D.h"
-#include "PerigeeCircle.h"
-#include "PerigeeCovariance.h"
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCovariance.h>
 
 
 namespace Belle2 {

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CellState.h"
+#include <tracking/trackFindingCDC/algorithms/CellState.h>
 
 #include <limits>
 

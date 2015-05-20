@@ -13,8 +13,8 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "CellWeight.h"
-#include "CellState.h"
+#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
+#include <tracking/trackFindingCDC/algorithms/CellState.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

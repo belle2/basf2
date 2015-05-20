@@ -10,10 +10,10 @@
 #ifndef CDCSEGMENTS_H
 #define CDCSEGMENTS_H
 
-#include "CDCWireHitCluster.h"
-#include "CDCWireHitSegment.h"
-#include "CDCRecoSegment2D.h"
-#include "CDCRecoSegment3D.h"
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

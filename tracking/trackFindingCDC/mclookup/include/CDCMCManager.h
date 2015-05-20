@@ -12,12 +12,12 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 
-#include "CDCMCMap.h"
-#include "CDCMCTrackStore.h"
-#include "CDCSimHitLookUp.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
-#include "CDCMCHitLookUp.h"
-#include "CDCMCSegmentLookUp.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

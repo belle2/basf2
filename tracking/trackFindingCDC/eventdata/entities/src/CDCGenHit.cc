@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCGenHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
 
 using namespace std;
 using namespace Belle2;

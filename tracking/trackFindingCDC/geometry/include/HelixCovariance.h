@@ -18,8 +18,8 @@
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include "PerigeeCovariance.h"
-#include "SZCovariance.h"
+#include <tracking/trackFindingCDC/geometry/PerigeeCovariance.h>
+#include <tracking/trackFindingCDC/geometry/SZCovariance.h>
 
 namespace Belle2 {
 
@@ -38,7 +38,8 @@ namespace Belle2 {
       /// Merges the covariance matrix of perigee and sz parameters
       HelixCovariance(const PerigeeCovariance& perigeeCovariance,
                       const SZCovariance& szCovariance) :
-        m_matrix(5) {
+        m_matrix(5)
+      {
         m_matrix.Zero();
         m_matrix.SetSub(perigeeCovariance.matrix().GetRowLwb(), perigeeCovariance.matrix());
         m_matrix.SetSub(szCovariance.matrix().GetRowLwb(), szCovariance.matrix());
@@ -66,7 +67,8 @@ namespace Belle2 {
 
     private:
       /// Checks the covariance matrix for consistence
-      inline void checkMatrix() const {
+      inline void checkMatrix() const
+      {
         if (matrix().GetNrows() != 5 or matrix().GetNcols() != 5) {
           B2ERROR("Helix covariance matrix is a  " <<
                   matrix().GetNrows() << "x" <<
@@ -100,13 +102,15 @@ namespace Belle2 {
 
 
       /// Getter for the perigee subcovariance
-      PerigeeCovariance perigeeCovariance() const {
+      PerigeeCovariance perigeeCovariance() const
+      {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
         return matrix().GetSub(iCurv, iI, iCurv, iI);
       }
 
       /// Getter for the sz subcovariance
-      SZCovariance szCovariance() const {
+      SZCovariance szCovariance() const
+      {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
         return matrix().GetSub(iSZ, iZ0, iSZ, iZ0);
       }
@@ -118,7 +122,8 @@ namespace Belle2 {
 
 
       /// Returns the helix covariance for the reversed travel direction as a copy.
-      HelixCovariance reversed() const {
+      HelixCovariance reversed() const
+      {
         HelixCovariance result(*this);
         result.reverse();
         return result;
@@ -139,7 +144,8 @@ namespace Belle2 {
 
 
       /// Transforms the covariance by the given jacobian matrix in place.
-      void similarityTransform(const TMatrixD& jacobian) {
+      void similarityTransform(const TMatrixD& jacobian)
+      {
         if (jacobian.GetNrows() != 5 or jacobian.GetNcols() != 5) {
           B2ERROR("Cannot transform HelixCovariance with a " <<
                   jacobian.GetNrows() << "x"  <<
@@ -152,7 +158,8 @@ namespace Belle2 {
 
 
       /// Transforms a copy the covariance by the given jacobian matrix.
-      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const {
+      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const
+      {
         TMatrixDSym matrix = m_matrix;
         matrix.Similarity(jacobian);
         return matrix;

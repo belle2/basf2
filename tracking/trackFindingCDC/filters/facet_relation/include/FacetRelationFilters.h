@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "BaseFacetRelationFilter.h"
-#include "AllFacetRelationFilter.h"
-#include "MCFacetRelationFilter.h"
-#include "SimpleFacetRelationFilter.h"
-#include "RecordingFacetRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/AllFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/MCFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/SimpleFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/RecordingFacetRelationFilter.h>

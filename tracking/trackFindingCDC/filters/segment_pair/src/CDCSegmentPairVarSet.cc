@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCSegmentPairVarSet.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairVarSet.h>
 #include <assert.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>

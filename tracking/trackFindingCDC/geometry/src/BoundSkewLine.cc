@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/BoundSkewLine.h"
+#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 
 using namespace std;
 using namespace Belle2;

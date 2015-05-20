@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseSegmentPairRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_pair_relation/BaseSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

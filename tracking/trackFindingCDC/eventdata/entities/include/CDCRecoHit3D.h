@@ -21,9 +21,9 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include "CDCWireHit.h"
-#include "CDCRLWireHit.h"
-#include "CDCRecoHit2D.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -119,7 +119,8 @@ namespace Belle2 {
 
 
       /// Equality comparision based on wire hit, right left passage information and reconstructed position.
-      bool operator==(const CDCRecoHit3D& other) const {
+      bool operator==(const CDCRecoHit3D& other) const
+      {
         return getRLWireHit() == other.getRLWireHit() and
                getRLInfo() == other.getRLInfo() and
                getRecoPos3D() == other.getRecoPos3D();
@@ -128,7 +129,8 @@ namespace Belle2 {
 
 
       /// Total ordering relation based on wire hit, right left passage information and position information in this order of importance.
-      bool operator<(const CDCRecoHit3D& other) const {
+      bool operator<(const CDCRecoHit3D& other) const
+      {
         return getRLWireHit() < other.getRLWireHit() or (
                  getRLWireHit() == other.getRLWireHit() and
                  getRecoPos3D() < other.getRecoPos3D());
@@ -291,7 +293,8 @@ namespace Belle2 {
       /// Calculates the squared distance in z direction.
       /** Calculates the z position on the fitted sz line with the stored travel distance.\n
        *  Returns the squared difference to the reconstructed position of this reconstructed hit.*/
-      FloatType getSquaredZDist(const CDCTrajectorySZ& szTrajectory) const {
+      FloatType getSquaredZDist(const CDCTrajectorySZ& szTrajectory) const
+      {
         FloatType zDistance = szTrajectory.getZDist(getPerpS(), getRecoPos3D().z());
         return zDistance * zDistance;
       }

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <cmath>
-#include "../include/SinEqLine.h"
+#include <tracking/trackFindingCDC/numerics/SinEqLine.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

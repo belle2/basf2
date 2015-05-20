@@ -11,15 +11,15 @@
 #define CDCENTITIES_H
 
 //Convenience header
-#include "CDCGenHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
 
-#include "CDCWireHit.h"
-#include "CDCRLWireHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 
-#include "CDCRecoHit2D.h"
-#include "CDCTangent.h"
-#include "CDCFacet.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
-#include "CDCRecoHit3D.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
 
 #endif //CDCENTITIES_H

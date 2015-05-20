@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCWireTopology.h"
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 

@@ -20,7 +20,7 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include "CDCMCHitLookUp.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

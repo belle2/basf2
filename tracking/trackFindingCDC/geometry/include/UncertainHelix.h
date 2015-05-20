@@ -16,11 +16,11 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "Helix.h"
-#include "HelixCovariance.h"
+#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackFindingCDC/geometry/HelixCovariance.h>
 
-#include "UncertainPerigeeCircle.h"
-#include "UncertainSZLine.h"
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 
 namespace Belle2 {
 
@@ -153,7 +153,8 @@ namespace Belle2 {
       { m_ndf = ndf; }
 
       /// Sets all circle parameters to zero including the covariance matrix
-      inline void setNull() {
+      inline void setNull()
+      {
         Helix::setNull();
         m_helixCovariance.setNull();
         m_chi2 = 0.0;
@@ -162,7 +163,8 @@ namespace Belle2 {
 
     public:
       /// Flips the orientation of the circle in place
-      inline void reverse() {
+      inline void reverse()
+      {
         Helix::reverse();
         m_helixCovariance.reverse();
       }
@@ -173,7 +175,8 @@ namespace Belle2 {
 
     public:
       /// Moves the coordinate system by the vector by and calculates the new perigee and its covariance matrix. Change is inplace.
-      void passiveMoveBy(const Vector3D& by) {
+      void passiveMoveBy(const Vector3D& by)
+      {
         // Move the covariance matrix first to have access to the original parameters
         TMatrixD jacobian = passiveMoveByJacobian(by);
         m_helixCovariance.similarityTransform(jacobian);

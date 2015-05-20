@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "RecordingFilter.h"
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/MultiVarSet.h>
 #include <boost/algorithm/string.hpp>

@@ -10,7 +10,7 @@
 #ifndef HELIXPARAMETERINDEX_H
 #define HELIXPARAMETERINDEX_H
 
-#include "PerigeeParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
 namespace Belle2 {
 

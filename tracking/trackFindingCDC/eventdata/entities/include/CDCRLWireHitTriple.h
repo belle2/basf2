@@ -11,8 +11,8 @@
 #ifndef CDCRLWIREHITTRIPLE_H
 #define CDCRLWIREHITTRIPLE_H
 
-#include "CDCRLWireHit.h"
-#include "CDCRLWireHitPair.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

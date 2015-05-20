@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCMCTrackStore.h"
-#include "../include/CDCMCManager.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
@@ -105,7 +105,7 @@ void CDCMCTrackStore::fillMCTracks()
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCMCMap::MCParticleByCDCHitRelation & relation : mcMap.getMCParticleByHitRelations()) {
+  for (const CDCMCMap::MCParticleByCDCHitRelation& relation : mcMap.getMCParticleByHitRelations()) {
 
     const CDCHit* ptrHit = relation.get<CDCHit>();
     const MCParticle* ptrMCParticle = relation.get<MCParticle>();
@@ -147,12 +147,12 @@ void CDCMCTrackStore::fillMCSegments()
     WeightedNeighborhood<const CDCHit> hitNeighborhood;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-    for (const CDCHit * ptrHit : mcTrack) {
+    for (const CDCHit* ptrHit : mcTrack) {
 
       const CDCHit& hit = *ptrHit;
       WireID wireID(hit.getISuperLayer(), hit.getILayer(), hit.getIWire());
 
-      for (const CDCHit * ptrNeighborHit : mcTrack) {
+      for (const CDCHit* ptrNeighborHit : mcTrack) {
 
         if (ptrHit == ptrNeighborHit) continue;
 
@@ -172,7 +172,7 @@ void CDCMCTrackStore::fillMCSegments()
     // mcSegments are not sorted for their time of flight internally, but they are in the right order
 
     // Lets sort them along for the time of flight.
-    for (CDCHitVector & mcSegment : mcSegments) {
+    for (CDCHitVector& mcSegment : mcSegments) {
       arrangeMCTrack(mcSegment);
     }
   }
@@ -224,7 +224,7 @@ void CDCMCTrackStore::fillInTrackId()
 
     //Fill the in track ids
     Index iHit = -1;
-    for (const CDCHit * ptrHit : mcTrack) {
+    for (const CDCHit* ptrHit : mcTrack) {
       ++iHit;
       m_inTrackIds[ptrHit] = iHit;
     }
@@ -238,9 +238,9 @@ void CDCMCTrackStore::fillInTrackSegmentId()
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
     Index iSegment = -1;
-    for (const CDCHitVector &  mcSegment : mcSegments) {
+    for (const CDCHitVector&   mcSegment : mcSegments) {
       ++iSegment;
-      for (const CDCHit * ptrHit : mcSegment) {
+      for (const CDCHit* ptrHit : mcSegment) {
 
         m_inTrackSegmentIds[ptrHit] = iSegment;
       }
@@ -258,13 +258,13 @@ void CDCMCTrackStore::fillNPassedSuperLayers()
     const CDCHitVector* ptrLastMCSegment = nullptr;
     Index nPassedSuperLayers = 0;
 
-    for (const CDCHitVector & mcSegment : mcSegments) {
+    for (const CDCHitVector& mcSegment : mcSegments) {
 
       if (ptrLastMCSegment and changedSuperLayer(*ptrLastMCSegment, mcSegment)) {
         ++nPassedSuperLayers;
       }
 
-      for (const CDCHit * ptrHit : mcSegment) {
+      for (const CDCHit* ptrHit : mcSegment) {
         m_nPassedSuperLayers[ptrHit] = nPassedSuperLayers;
       }
 

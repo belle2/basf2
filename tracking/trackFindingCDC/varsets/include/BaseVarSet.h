@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
-#include "NamedFloatTuple.h"
+#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <map>
 #include <vector>

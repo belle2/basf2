@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "Vector2D.h"
-#include "Line2D.h"
-#include "SZCovariance.h"
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/SZCovariance.h>
 
 
 namespace Belle2 {
@@ -99,7 +99,8 @@ namespace Belle2 {
 
 
       /// Sets all line parameters to zero including the covariance matrix
-      inline void setNull() {
+      inline void setNull()
+      {
         Line2D::setNull();
         m_szCovariance.setNull();
         m_chi2 = 0.0;
@@ -108,13 +109,15 @@ namespace Belle2 {
 
     public:
       /// Reverses the direction of flight represented by this sz line
-      inline void reverse() {
+      inline void reverse()
+      {
         Line2D::flipFirst();
         m_szCovariance.reverse();
       }
 
       /// Returns a copy of the line corresponding to the reverse direction of travel.
-      inline UncertainSZLine reversed() const {
+      inline UncertainSZLine reversed() const
+      {
         return UncertainSZLine(Line2D::flippedFirst(),
                                szCovariance().reversed(),
                                chi2(),
@@ -123,7 +126,8 @@ namespace Belle2 {
 
     public:
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      TMatrixD passiveMoveByJacobian(const Vector2D& bySZ) const {
+      TMatrixD passiveMoveByJacobian(const Vector2D& bySZ) const
+      {
         TMatrixD result(iSZ, iZ0);
         result.UnitMatrix();
         result(iZ0, iSZ) = bySZ.first();
@@ -133,14 +137,16 @@ namespace Belle2 {
 
 
       /// Moves the coordinate system by the vector by and calculates the new sz line and its covariance matrix. Change is inplace.
-      void passiveMoveBy(const Vector2D& bySZ) {
+      void passiveMoveBy(const Vector2D& bySZ)
+      {
         // Move the covariance matrix first to have access to the original parameters
         TMatrixD jacobian = passiveMoveByJacobian(bySZ);
         m_szCovariance.similarityTransform(jacobian);
         Line2D::passiveMoveBy(bySZ);
       }
 
-      SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const {
+      SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const
+      {
         TMatrixD jacobian = passiveMoveByJacobian(bySZ);
         return szCovariance().similarityTransformed(jacobian);
       }

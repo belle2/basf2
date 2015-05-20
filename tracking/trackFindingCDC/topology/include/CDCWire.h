@@ -16,13 +16,13 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 
-#include "ISuperLayerType.h"
-#include "ILayerType.h"
-#include "IWireType.h"
+#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
+#include <tracking/trackFindingCDC/topology/ILayerType.h>
+#include <tracking/trackFindingCDC/topology/IWireType.h>
 
-#include "WireNeighborType.h"
+#include <tracking/trackFindingCDC/topology/WireNeighborType.h>
 
-#include "StereoType.h"
+#include <tracking/trackFindingCDC/topology/StereoType.h>
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>

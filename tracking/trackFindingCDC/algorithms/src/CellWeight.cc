@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CellWeight.h"
+#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
 
 #include <limits>
 

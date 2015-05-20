@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "FilterBase.h"
+#include <tracking/trackFindingCDC/filters/base/FilterBase.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

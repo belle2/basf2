@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCSegmentPairVarSet.h"
-#include "MCSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

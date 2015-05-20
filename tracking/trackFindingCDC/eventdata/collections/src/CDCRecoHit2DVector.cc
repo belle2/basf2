@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCRecoHit2DVector.h"
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
 
 using namespace std;
 using namespace Belle2;

@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include "CDCWireHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 
 
 namespace Belle2 {
@@ -50,7 +50,8 @@ namespace Belle2 {
       { return getWire() == other.getWire() and getDummyPos2D() == other.getDummyPos2D(); }
 
       /// Total ordering relation based on the wire and the dummy position.
-      bool operator<(const CDCGenHit& other) const {
+      bool operator<(const CDCGenHit& other) const
+      {
         return getWire() < other.getWire() or
                (getWire() == other.getWire() and getDummyPos2D() < other.getDummyPos2D());
       }
@@ -111,7 +112,8 @@ namespace Belle2 {
       { return getRecoPos2D(trajectory2D); }
 
       /// Calculates the squared distance of the wire hit to a circle as see from the transvers plane
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const {
+      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
+      {
         FloatType distance = trajectory2D.getDist2D(getDummyPos2D());
         return distance * distance;
       }

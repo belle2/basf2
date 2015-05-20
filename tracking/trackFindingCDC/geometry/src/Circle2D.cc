@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/Circle2D.h"
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
 
 using namespace std;
 using namespace Belle2;

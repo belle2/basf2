@@ -18,7 +18,7 @@
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
-#include "PerigeeParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
 namespace Belle2 {
 
@@ -52,7 +52,8 @@ namespace Belle2 {
 
     private:
       /// Checks the covariance matrix for consistence
-      inline void checkMatrix() const {
+      inline void checkMatrix() const
+      {
         if (matrix().GetNrows() != 3 or matrix().GetNcols() != 3) {
           B2ERROR("Perigee covariance matrix is a  " <<
                   matrix().GetNrows() << "x" <<
@@ -66,7 +67,8 @@ namespace Belle2 {
 
     public:
       /// Setter for the whole covariance matrix of the perigee parameters.
-      inline void setMatrix(const TMatrixDSym& covarianceMatrix) {
+      inline void setMatrix(const TMatrixDSym& covarianceMatrix)
+      {
         checkMatrix();
         m_matrix = covarianceMatrix;
       }
@@ -92,7 +94,8 @@ namespace Belle2 {
 
 
       /// Returns the perigee covariance for the reversed travel direction as a copy.
-      PerigeeCovariance reversed() const {
+      PerigeeCovariance reversed() const
+      {
         PerigeeCovariance result(*this);
         result.reverse();
         return result;
@@ -112,7 +115,8 @@ namespace Belle2 {
 
 
       /// Transforms the covariance by the given jacobian matrix in place.
-      void similarityTransform(const TMatrixD& jacobian) {
+      void similarityTransform(const TMatrixD& jacobian)
+      {
         if (jacobian.GetNrows() != 3 or jacobian.GetNcols() != 3) {
           B2ERROR("Cannot transform PerigeeCovariance with a " <<
                   jacobian.GetNrows() << "x"  <<
@@ -125,7 +129,8 @@ namespace Belle2 {
 
 
       /// Transforms a copy the covariance by the given jacobian matrix.
-      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const {
+      TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const
+      {
         TMatrixDSym matrix = m_matrix;
         matrix.Similarity(jacobian);
         return matrix;

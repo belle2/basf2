@@ -10,10 +10,10 @@
 #ifndef GENERALIZEDCIRCLE_H
 #define GENERALIZEDCIRCLE_H
 
-#include "BoundSkewLine.h"
-#include "Circle2D.h"
-#include "Line2D.h"
-#include "Vector2D.h"
+#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <cmath>
 

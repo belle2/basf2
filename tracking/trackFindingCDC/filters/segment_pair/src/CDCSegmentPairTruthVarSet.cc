@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCSegmentPairTruthVarSet.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairTruthVarSet.h>
 #include <assert.h>
 
 using namespace std;

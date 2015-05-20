@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
-#include "FitlessFacetFilter.h"
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

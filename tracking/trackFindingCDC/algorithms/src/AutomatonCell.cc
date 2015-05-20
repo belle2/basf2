@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/AutomatonCell.h"
+#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
 
 using namespace std;
 using namespace Belle2;

@@ -10,7 +10,7 @@
 #ifndef CDCWIREUNPACKEDFROMNAMESPACES_H
 #define CDCWIREUNPACKEDFROMNAMESPACES_H
 
-#include "CDCWire.h"
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #ifdef __CINT__
 // Because ROOTCINT does not like namespaces inside template parameters

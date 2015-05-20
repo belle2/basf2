@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/KarimakisMethod.h"
+#include <tracking/trackFindingCDC/fitting/KarimakisMethod.h>
 
 #include "TMatrixDSym.h"
 #include <Eigen/Dense>

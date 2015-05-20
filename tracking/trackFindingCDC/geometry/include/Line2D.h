@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "Vector2D.h"
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 
 namespace Belle2 {
@@ -124,7 +124,8 @@ namespace Belle2 {
 
 
       /// Updates the parameters to obey the normalization condition
-      void normalize() {
+      void normalize()
+      {
         if (not isNull()) {
           scaleN(1.0 / normalization());
         }
@@ -183,7 +184,8 @@ namespace Belle2 {
       { return isRightOrLeft(rhs) == RIGHT; }
 
       /// Calculates the point of closest approach on the line to the point
-      Vector2D closest(const Vector2D& point) const {
+      Vector2D closest(const Vector2D& point) const
+      {
         const FloatType closestParallel = -n0();
         const FloatType closestOrthgonal = point.unnormalizedOrthogonalComp(n12());
         return Vector2D(n12(), closestParallel, closestOrthgonal);

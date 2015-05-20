@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/AllClusterFilter.h"
+#include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/Compare.h"
+#include <tracking/trackFindingCDC/eventdata/entities/Compare.h>
 
 using namespace std;
 using namespace Belle2;

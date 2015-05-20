@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCObservations2D.h"
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 using namespace std;
 using namespace Eigen;

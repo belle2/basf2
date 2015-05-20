@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/FilterFactory.h"
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 using namespace std;
 using namespace Belle2;

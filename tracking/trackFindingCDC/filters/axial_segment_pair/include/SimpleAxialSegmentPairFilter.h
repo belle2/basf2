@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseAxialSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/filters/axial_segment_pair/BaseAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {

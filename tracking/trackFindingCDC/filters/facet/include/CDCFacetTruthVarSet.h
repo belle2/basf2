@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCFacetFitVarSet.h"
-#include "MCFacetFilter.h"
+#include <tracking/trackFindingCDC/filters/facet/CDCFacetFitVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

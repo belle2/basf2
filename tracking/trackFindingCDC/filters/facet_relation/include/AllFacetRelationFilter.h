@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "BaseFacetRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

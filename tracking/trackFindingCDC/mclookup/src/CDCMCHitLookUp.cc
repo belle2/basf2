@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCMCHitLookUp.h"
-#include "../include/CDCMCManager.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 

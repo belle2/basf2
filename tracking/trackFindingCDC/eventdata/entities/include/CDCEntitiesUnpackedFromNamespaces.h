@@ -10,7 +10,7 @@
 #ifndef CDCENTITIESUNPACKEDFROMNAMESPACES_H
 #define CDCENTITIESUNPACKEDFROMNAMESPACES_H
 
-#include "CDCEntities.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
 
 #ifdef __CINT__
 // Because ROOTCINT does not like namespaces inside template parameters

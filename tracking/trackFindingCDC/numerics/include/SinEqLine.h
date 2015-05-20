@@ -10,7 +10,7 @@
 #ifndef SINEQLINE_H_
 #define SINEQLINE_H_
 
-#include "numerics.h"
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -106,12 +106,14 @@ namespace Belle2 {
       { return lower.x() < next.x() and next.x() < upper.x(); }
 
       /// Check if the intervall has shrunk close enough to the solution.
-      static bool isConverged(const Vector2D& lower, const Vector2D& upper) {
+      static bool isConverged(const Vector2D& lower, const Vector2D& upper)
+      {
         return fabs(lower.y()) < 10e-7 or fabs(upper.y()) < 10e-7;
       }
 
       /// Returns the better solution x from the bounds of the intervall.
-      static FloatType getConvergedBound(const Vector2D& lower, const Vector2D& upper) {
+      static FloatType getConvergedBound(const Vector2D& lower, const Vector2D& upper)
+      {
         if (fabs(lower.y()) <= fabs(upper.y())) {
           return lower.x();
 
@@ -130,7 +132,8 @@ namespace Belle2 {
       { return (lower.y() > 0 and upper.y() < 0) or (lower.y() < 0 and upper.y() > 0); }
 
       /// Determines if the function is increasing or decreasing in the intervall.
-      static IncDecInfo getIncDecInfo(const Vector2D& lower, const Vector2D& upper) {
+      static IncDecInfo getIncDecInfo(const Vector2D& lower, const Vector2D& upper)
+      {
         if (lower.y() < upper.y()) return INCREASING;
         else if (lower.y() > upper.y()) return DECREASING;
         else if (lower.y() == upper.y()) return CONSTANT;

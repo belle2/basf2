@@ -10,7 +10,7 @@
 #ifndef CDCRLWIREHIT_H
 #define CDCRLWIREHIT_H
 
-#include "CDCWireHit.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 
 namespace Belle2 {
 

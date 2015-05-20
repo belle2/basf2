@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "FilterOnVarSet.h"
+#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/tmva/Expert.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 

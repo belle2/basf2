@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCMCMap.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
@@ -84,7 +84,7 @@ void CDCMCMap::fillSimHitByHitMap()
   //Pickup an iterator for hinted insertion
   CDCSimHitByCDCHitMap::iterator itInsertHint = m_simHitByHit.end();
 
-  for (const RelationElement & simHitToHitsRelation : simhitToHitsRelations) {
+  for (const RelationElement& simHitToHitsRelation : simhitToHitsRelations) {
 
     RelationElement::index_type iSimHit = simHitToHitsRelation.getFromIndex();
     const CDCSimHit* ptrSimHit = simHits[iSimHit];
@@ -111,7 +111,7 @@ void CDCMCMap::fillSimHitByHitMap()
   }
 
   //Check if every hit has a corresponding simhit
-  for (const CDCHit & hit : hits) {
+  for (const CDCHit& hit : hits) {
     const CDCHit* ptrHit = &hit;
 
     if (m_simHitByHit.by<CDCHit>().count(ptrHit) == 0) {
@@ -138,7 +138,7 @@ void CDCMCMap::fillMCParticleByHitMap()
   //Pickup an iterator for hinted insertion
   MCParticleByCDCHitMap::iterator itInsertHint = m_mcParticlesByHit.end();
 
-  for (const RelationElement & mcParticleToHitsRelation : mcParticleToHitsRelations) {
+  for (const RelationElement& mcParticleToHitsRelation : mcParticleToHitsRelations) {
 
     RelationElement::index_type iMCParticle = mcParticleToHitsRelation.getFromIndex();
     const MCParticle* ptrMCParticle = mcParticles[iMCParticle];
@@ -167,7 +167,7 @@ void CDCMCMap::fillMCParticleByHitMap()
 
   //Check if every hit has a corresponding MCParticle
   //Only exception is, if the hit is background.
-  for (const CDCHit & hit : hits) {
+  for (const CDCHit& hit : hits) {
     const CDCHit* ptrHit = &hit;
 
     if (m_mcParticlesByHit.by<CDCHit>().count(ptrHit) == 0 and not isBackground(ptrHit)) {
@@ -191,7 +191,7 @@ void CDCMCMap::fillMCParticleBySimHitMap()
   //Pickup an iterator for hinted insertion
   MCParticleByCDCSimHitMap::iterator itInsertHint = m_mcParticlesBySimHit.end();
 
-  for (const RelationElement & mcParticleToSimHitsRelation : mcParticleToSimHitsRelations) {
+  for (const RelationElement& mcParticleToSimHitsRelation : mcParticleToSimHitsRelations) {
 
     RelationElement::index_type iMCParticle = mcParticleToSimHitsRelation.getFromIndex();
     const MCParticle* ptrMCParticle = mcParticles[iMCParticle];
@@ -220,7 +220,7 @@ void CDCMCMap::fillMCParticleBySimHitMap()
 
   //Check if every hit has a corresponding MCParticle
   //Only exception is, if the hit is background.
-  for (const CDCSimHit & simHit : simHits) {
+  for (const CDCSimHit& simHit : simHits) {
     const CDCSimHit* ptrSimHit = &simHit;
 
     if (m_mcParticlesBySimHit.by<CDCSimHit>().count(ptrSimHit) == 0 and not isBackground(ptrSimHit)) {
@@ -238,7 +238,7 @@ void CDCMCMap::validateRelations() const
 
   StoreArray<CDCHit> hits;
 
-  for (const CDCHit & hit : hits) {
+  for (const CDCHit& hit : hits) {
     const CDCHit* ptrHit = &hit;
 
 
@@ -260,7 +260,7 @@ void CDCMCMap::validateRelations() const
 void CDCMCMap::validateReassignedSecondaries() const
 {
 
-  for (const CDCHit * ptrHit : m_reassignedSecondaryHits) {
+  for (const CDCHit* ptrHit : m_reassignedSecondaryHits) {
 
     const CDCSimHit* ptrSimHit = getSimHit(ptrHit);
     if (not isReassignedSecondary(ptrSimHit)) {

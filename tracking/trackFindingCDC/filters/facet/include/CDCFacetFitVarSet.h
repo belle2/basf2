@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
-#include "CDCFacetFitlessVarSet.h"
+#include <tracking/trackFindingCDC/filters/facet/CDCFacetFitlessVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>

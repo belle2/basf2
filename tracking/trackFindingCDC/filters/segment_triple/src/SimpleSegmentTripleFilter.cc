@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleSegmentTripleFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
 
 #include <framework/logging/Logger.h>
 

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCKarimakiFitter.h"
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
 using namespace Belle2::TrackFindingCDC;
 

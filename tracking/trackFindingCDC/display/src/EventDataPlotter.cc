@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/EventDataPlotter.h"
+#include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 

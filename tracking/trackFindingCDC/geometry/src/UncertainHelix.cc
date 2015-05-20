@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/UncertainHelix.h"
+#include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
 
 #include <framework/logging/Logger.h>
 

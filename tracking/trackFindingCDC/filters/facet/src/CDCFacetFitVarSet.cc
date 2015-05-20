@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCFacetFitVarSet.h"
+#include <tracking/trackFindingCDC/filters/facet/CDCFacetFitVarSet.h>
 #include <assert.h>
 
 namespace {

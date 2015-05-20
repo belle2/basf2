@@ -12,7 +12,7 @@
 #ifndef MCSEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define MCSEGMENTTRIPLENEIGHBORCHOOSER_H_
 
-#include "BaseSegmentTripleRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_triple_relation/BaseSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>

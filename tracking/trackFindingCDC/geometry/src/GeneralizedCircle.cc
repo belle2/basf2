@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/GeneralizedCircle.h"
+#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 
 #include <framework/logging/Logger.h>
 

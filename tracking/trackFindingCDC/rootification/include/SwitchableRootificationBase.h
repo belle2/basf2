@@ -11,7 +11,7 @@
 #ifndef SWITCHABLEROOTIFICATIONBASE_H_
 #define SWITCHABLEROOTIFICATIONBASE_H_
 
-#include "RootificationBase.h"
+#include <tracking/trackFindingCDC/rootification/RootificationBase.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>

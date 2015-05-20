@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/Helix.h"
-#include "../include/HelixParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
 
 
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
@@ -80,7 +80,8 @@ FloatType Helix::arcLengthAtClosest(const Vector3D& point) const
   Index iSmallestSol = 0;
 
   for (int iSol = 0; iSol < 4; ++iSol) {
-    distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + szSlope() * szSlope() * solutions[iSol] * solutions[iSol] + 2 * szSlope() * curvatureXY() * deltaZ * solutions[iSol];
+    distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + szSlope() * szSlope() * solutions[iSol] *
+                      solutions[iSol] + 2 * szSlope() * curvatureXY() * deltaZ * solutions[iSol];
     // B2INFO("Solution : " << iSol);
     // B2INFO("arcLength * curvature = " << solutions[iSol]);
     // B2INFO("distance = " << distances[iSol]);

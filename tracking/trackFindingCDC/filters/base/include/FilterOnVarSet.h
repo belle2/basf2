@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include "Filter.h"
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 namespace Belle2 {

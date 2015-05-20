@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/TMVAClusterFilter.h"
+#include <tracking/trackFindingCDC/filters/cluster/TMVAClusterFilter.h>
 
 #include <assert.h>
 

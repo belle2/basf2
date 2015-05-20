@@ -14,11 +14,11 @@
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
-#include "CDCWireHitSegment.h"
-#include "CDCRLWireHitSegment.h"
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
-#include "CDCTangentSegment.h"
-#include "CDCFacetSegment.h"
+#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 
 #include "genfit/TrackCand.h"
 

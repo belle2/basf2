@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "Vector2D.h"
-#include "Line2D.h"
-#include "GeneralizedCircle.h"
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -153,7 +153,8 @@ namespace Belle2 {
       { return isRightOrLeft(rhs) == RIGHT; }
 
       /// Gives the position at the closest approach on the line to point
-      Vector2D closest(const Vector2D& point) const {
+      Vector2D closest(const Vector2D& point) const
+      {
         FloatType norm_squared = tangential().normSquared();
         return Vector2D(tangential() , tangential().dot(point)       / norm_squared,
                         tangential().cross(support()) / norm_squared);
@@ -187,7 +188,8 @@ namespace Belle2 {
       /** Calculates the two line parameters of the intersections with the circle as a pair.
       The second of the pair is always the small of the two solutions, which is closer to the support point.
       */
-      std::pair<FloatType, FloatType> intersectionsAt(const GeneralizedCircle& genCircle) const {
+      std::pair<FloatType, FloatType> intersectionsAt(const GeneralizedCircle& genCircle) const
+      {
         FloatType a = genCircle.n3() * tangential().normSquared();
         FloatType b = tangential().dot(genCircle.gradient(support()));
         FloatType c = genCircle.fastDistance(support());
@@ -259,7 +261,8 @@ namespace Belle2 {
       void invert() { m_tangential.swapCoordinates(); m_support.swapCoordinates(); }
 
       /// Gives the line assoziated with the inverse function as a copy.
-      ParameterLine2D inverted() const {
+      ParameterLine2D inverted() const
+      {
         return ParameterLine2D(Vector2D(support().second(), support().first()),
                                Vector2D(tangential().second(), tangential().first()));
       }

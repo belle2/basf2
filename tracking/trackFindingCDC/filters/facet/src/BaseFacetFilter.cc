@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/BaseFacetFilter.h"
+#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
 #include <framework/logging/Logger.h>
 

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/ExtendedRiemannsMethod.h"
+#include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 
 #include "TMatrixDSym.h"
 #include <Eigen/Dense>

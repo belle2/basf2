@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCMCManager.h"
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <framework/datastore/RelationVector.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCTangent.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
 
 #include <cmath>
 

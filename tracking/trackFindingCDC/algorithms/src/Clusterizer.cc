@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/Clusterizer.h"
+#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 
 using namespace std;
 using namespace Belle2;

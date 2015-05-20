@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/SimpleSegmentPairFilter.h>
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>

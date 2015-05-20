@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/MCSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
 
 #include <framework/logging/Logger.h>
 

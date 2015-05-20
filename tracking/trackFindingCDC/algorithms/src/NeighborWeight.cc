@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/NeighborWeight.h"
+#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
 #include <limits>
 

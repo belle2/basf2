@@ -10,7 +10,7 @@
 #ifndef CDCRECOSEGMENT3D_H
 #define CDCRECOSEGMENT3D_H
 
-#include "CDCRecoSegment2D.h"
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
 
@@ -28,9 +28,10 @@ namespace Belle2 {
       ~CDCRecoSegment3D() {;}
 
       /// Reconstructs a two dimensional stereo segment by shifting each hit onto the given two dimensional trajectory.
-      static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D, const CDCTrajectory2D& trajectory2D) {
+      static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D, const CDCTrajectory2D& trajectory2D)
+      {
         CDCRecoSegment3D segment3D;
-        for (const CDCRecoHit2D & recoHit2D : segment2D) {
+        for (const CDCRecoHit2D& recoHit2D : segment2D) {
           CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
           segment3D.push_back(recoHit3D);
         }

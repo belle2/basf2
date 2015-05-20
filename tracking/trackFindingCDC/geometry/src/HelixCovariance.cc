@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/HelixCovariance.h"
-#include "../include/HelixParameterIndex.h"
+#include <tracking/trackFindingCDC/geometry/HelixCovariance.h>
+#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
 
 using namespace std;
 using namespace Belle2;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SVGPrimitivePlotter.h"
+#include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 
 #include <framework/logging/Logger.h>
 
@@ -321,7 +321,8 @@ void SVGPrimitivePlotter::writeOpeningTag(std::ostream& outputStream,
   indent();
 
   if (geometryAttributeMap.count("_showAt") + styleAttributeMap.count("_showAt")) {
-    const std::string showAt = geometryAttributeMap.count("_showAt") ? geometryAttributeMap.at("_showAt") :  styleAttributeMap.at("_showAt");
+    const std::string showAt = geometryAttributeMap.count("_showAt") ? geometryAttributeMap.at("_showAt") :
+                               styleAttributeMap.at("_showAt");
 
     AttributeMap setAttributeMap {
       {"attributeName", "visibility"} ,

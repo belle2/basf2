@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SortableVector.h"
+#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
 
 using namespace std;
 using namespace Belle2;

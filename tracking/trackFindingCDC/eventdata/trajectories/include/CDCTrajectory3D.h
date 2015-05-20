@@ -27,8 +27,8 @@
 
 #include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
 
-#include "CDCTrajectory2D.h"
-#include "CDCTrajectorySZ.h"
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include "genfit/TrackCand.h"
 

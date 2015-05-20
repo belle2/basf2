@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCAxialSegmentPair.h"
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 
 using namespace std;
 using namespace Belle2;

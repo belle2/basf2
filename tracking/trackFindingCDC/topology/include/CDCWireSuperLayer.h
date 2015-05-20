@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include "CDCWireLayer.h"
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

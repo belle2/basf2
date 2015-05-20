@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleFacetFilter.h"
+#include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
 
 #include <cmath>
 #include <framework/logging/Logger.h>

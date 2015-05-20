@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include "../include/FacetCreator.h"
+#include <tracking/trackFindingCDC/creators/FacetCreator.h>
 
 //#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>

@@ -17,10 +17,10 @@
 
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
-#include "CDCRLWireHit.h"
-#include "CDCRLWireHitPair.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
 
-#include "CDCRecoHit2D.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

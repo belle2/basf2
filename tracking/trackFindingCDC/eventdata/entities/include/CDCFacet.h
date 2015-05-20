@@ -16,10 +16,10 @@
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
 
-#include "CDCRLWireHitTriple.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitTriple.h>
 
-#include "CDCRecoHit2D.h"
-#include "CDCTangent.h"
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
 
 
 namespace Belle2 {

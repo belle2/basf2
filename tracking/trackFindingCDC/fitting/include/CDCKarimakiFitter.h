@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include "CDCFitter2D.h"
-#include "KarimakisMethod.h"
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
+#include <tracking/trackFindingCDC/fitting/KarimakisMethod.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

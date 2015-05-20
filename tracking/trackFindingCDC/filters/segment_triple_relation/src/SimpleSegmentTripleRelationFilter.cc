@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/SimpleSegmentTripleRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_triple_relation/SimpleSegmentTripleRelationFilter.h>
 
 using namespace std;
 using namespace Belle2;

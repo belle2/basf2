@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include "../include/CDCFacetRelationTruthVarSet.h"
+#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationTruthVarSet.h>
 #include <assert.h>
 
 using namespace std;

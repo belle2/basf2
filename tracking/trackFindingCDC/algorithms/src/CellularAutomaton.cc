@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include "../include/CellularAutomaton.h"
+#include <tracking/trackFindingCDC/algorithms/CellularAutomaton.h>
 
 #include <framework/logging/Logger.h>
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCSegmentTriple.h"
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 using namespace std;
 using namespace Belle2;

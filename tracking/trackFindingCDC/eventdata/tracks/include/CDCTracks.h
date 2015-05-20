@@ -10,10 +10,10 @@
 #ifndef CDCTRACKS_H
 #define CDCTRACKS_H
 
-#include "CDCAxialSegmentPair.h"
-#include "CDCSegmentPair.h"
-#include "CDCSegmentTriple.h"
-#include "CDCTrack.h"
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #endif //CDCTRACKS_H
 

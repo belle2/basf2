@@ -9,11 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include "MultiVarSet.h"
-#include "EvalVariadic.h"
+#include <tracking/trackFindingCDC/varsets/MultiVarSet.h>
+#include <tracking/trackFindingCDC/varsets/EvalVariadic.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
-#include "NamedFloatTuple.h"
+#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <vector>
 #include <string>

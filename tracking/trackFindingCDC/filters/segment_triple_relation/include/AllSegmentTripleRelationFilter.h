@@ -12,7 +12,7 @@
 #ifndef ALLSEGMENTTRIPLENEIGHBORCHOOSER_H_
 #define ALLSEGMENTTRIPLENEIGHBORCHOOSER_H_
 
-#include "BaseSegmentTripleRelationFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_triple_relation/BaseSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {

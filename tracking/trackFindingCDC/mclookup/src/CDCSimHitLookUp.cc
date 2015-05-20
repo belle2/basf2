@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "../include/CDCSimHitLookUp.h"
-#include "../include/CDCMCManager.h"
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -76,7 +76,7 @@ void CDCSimHitLookUp::fillPrimarySimHits()
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCMCMap::CDCSimHitByCDCHitRelation & relation : mcMap.getSimHitByHitRelations()) {
+  for (const CDCMCMap::CDCSimHitByCDCHitRelation& relation : mcMap.getSimHitByHitRelations()) {
 
     const CDCHit* ptrHit = relation.get<CDCHit>();
     const CDCSimHit* ptrSimHit = relation.get<CDCSimHit>();
@@ -125,7 +125,7 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
     std::vector<const CDCSimHit*> primarySimHitsOnSameOrNeighborWire;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-    for (const CDCMCMap::CDCSimHitByMCParticleRelation & simHitByMCParticleRelation : mcMap.getSimHits(ptrMCParticle)) {
+    for (const CDCMCMap::CDCSimHitByMCParticleRelation& simHitByMCParticleRelation : mcMap.getSimHits(ptrMCParticle)) {
 
       const CDCSimHit* ptrPrimarySimHit = simHitByMCParticleRelation.get<CDCSimHit>();
       if (mcMap.isReassignedSecondary(ptrPrimarySimHit) or not ptrPrimarySimHit) continue;
@@ -233,7 +233,7 @@ void CDCSimHitLookUp::fillRLInfo()
   }
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCMCMap::CDCSimHitByCDCHitRelation & relation : mcMap.getSimHitByHitRelations()) {
+  for (const CDCMCMap::CDCSimHitByCDCHitRelation& relation : mcMap.getSimHitByHitRelations()) {
 
     const CDCHit* ptrHit = relation.get<CDCHit>();
     const CDCSimHit* ptrSimHit = relation.get<CDCSimHit>();

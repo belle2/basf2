@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "BaseSegmentPairFilter.h"
-#include "AllSegmentPairFilter.h"
-#include "MCSegmentPairFilter.h"
-#include "SimpleSegmentPairFilter.h"
-#include "RecordingSegmentPairFilter.h"
+#include <tracking/trackFindingCDC/filters/segment_pair/BaseSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/AllSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/SimpleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/RecordingSegmentPairFilter.h>
 

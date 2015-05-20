@@ -11,12 +11,14 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonModule.h>
 
+#include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segment_pair_relation/SegmentPairRelationFilterFactory.h>
+
 namespace Belle2 {
 
-
-
   /// Module for the cellular automaton tracking for the CDC on regular events
-  class TrackFinderCDCSegmentPairAutomatonDevModule: public Belle2::TrackFindingCDC::TrackFinderCDCSegmentPairAutomatonImplModule<> {
+  class TrackFinderCDCSegmentPairAutomatonDevModule:
+    public Belle2::TrackFindingCDC::TrackFinderCDCSegmentPairAutomatonImplModule<> {
 
   public:
     /// Constructor of the module. Setting up parameters and description.
@@ -29,38 +31,17 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    /** Parameter: Segment pair filter to be used during the construction of segment pairs.
-    Valid values are:
-
-    + "all" (all segment pairs are valid)
-    + "mc" (monte carlo truth)
-    + "mc_symmetric" (monte carlo truth and their mirror image)
-    + "simple" (mc free with simple criteria)
+    /**
+       Factory for the cluster filter, knowing all the available filters and
+       their respective parameters
     */
-    std::string m_param_segmentPairFilter;
+    Belle2::TrackFindingCDC::SegmentPairFilterFactory m_segmentPairFilterFactory;
 
-    /** Parameter: Segment Pair filter parameters forwarded to the segment pair filter
-     *  Meaning of the Key - Value pairs depend on the segment pair filter
-     */
-    std::map<std::string, std::string> m_param_segmentPairFilterParameters;
-
-    /** Parameter: Segment pair relation filter to be used during the construction of the graph.
-    Valid values are:
-
-    + "none" (no neighbor is correct, stops segment generation)
-    + "all" (all possible neighbors are valid)
-    + "mc" (monte carlo truth)
-    + "mc_symmetric" (monte carlo truth and the reversed version are excepted)
-    + "simple" (mc free with simple criteria)
+    /**
+       Factory for the cluster filter, knowing all the available filters and
+       their respective parameters
     */
-    std::string m_param_segmentPairRelationFilter;
-
-    /** Parameter: Segment Pair relation filter parameters forwarded to the segment pair relation filter
-     *  Meaning of the Key - Value pairs depend on the segment pair relation filter
-     */
-    std::map<std::string, std::string> m_param_segmentPairRelationFilterParameters;
+    Belle2::TrackFindingCDC::SegmentPairRelationFilterFactory m_segmentPairRelationFilterFactory;
 
   }; // end class
 } // end namespace Belle2
-
-

@@ -7,7 +7,14 @@ set -e
 
 ################################################################################
 # User settings
+# You'll need to change most of the paths to point to your own directories.
+# Some temporary files must stay on /home for technical reasons (otherwise your jobs
+# will be killed), while larger files will be moved to HSM (/ghi/...). Members of the
+# belle2 group can create their own directories inside /ghi/fs01/belle2/bdata/users.
+
+#split input data into this many jobs
 nJobs="2000"
+#steering file to run
 steeringFile="/home/belle/pulver/basf2/analysis/examples/FEI/B_generic.py"
 
 #collects training output, plots, etc.
@@ -19,9 +26,9 @@ collectionDirectory="/home/belle/pulver/B_generic/collection"
 jobDirectory="/home/belle/pulver/B_generic/jobs"
 
 #use HSM for large amounts of data (.root files from training, ntuples)
-collectionDirectoryReal="/ghi/fs01/belle2/bdata/pulver/B_generic/collection"
+collectionDirectoryReal="/ghi/fs01/belle2/bdata/users/pulver/B_generic/collection"
 #cache intermediate information (probably needs at least as much space as input data, should be on HSM)
-persistentDirectory="/ghi/fs01/belle2/bdata/pulver/B_generic/persistent"
+persistentDirectory="/ghi/fs01/belle2/bdata/users/pulver/B_generic/persistent"
 
 #Data files to use as input:
 #streams 0-39

@@ -48,7 +48,6 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
   addData(nodename, format);
   const DBObject& processor(obj("processor"));
   int maxnodes = processor.getInt("nnodes");
-  add(new NSMVHandlerInt("nnodes", true, false, maxnodes));
   int idbase = processor.getInt("idbase");
   std::string hostbase = processor.getText("nodebase");
   std::string badlist = processor.getText("badlist");
@@ -61,8 +60,13 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
       addData(nodename, format);
     }
   }
-  m_nodes.push_back(NSMNode(nodename));
+  add(new NSMVHandlerInt("nnodes", true, false, m_nodes.size()));
+  //m_nodes.push_back(NSMNode(nodename));
   int i = 0;
+  std::string rcconf = obj.getName();
+  if (StringUtil::find(rcconf, "@")) {
+    rcconf = StringUtil::split(rcconf, '@')[1];
+  }
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); it++) {
     NSMNode& node(*it);
@@ -70,8 +74,9 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
     std::string vname = StringUtil::form("node[%d].name", i++);
     add(new NSMVHandlerText(vname, true, false,
                             StringUtil::tolower(node.getName())));
-    vname = StringUtil::tolower(node.getName()) + ".rcstate";
-    add(new NSMVHandlerText(vname, true, false, s.getLabel()));
+    vname = StringUtil::tolower(node.getName());
+    add(new NSMVHandlerText(vname + ".rcstate", true, false, s.getLabel()));
+    add(new NSMVHandlerText(vname + ".rcconfig", true, false, rcconf));
   }
 }
 
@@ -142,27 +147,14 @@ void RFMasterCallback::error(const char* nodename, const char* data) throw()
 
 void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  for (NSMNodeList::iterator it = m_nodes.begin();
-       it != m_nodes.end(); it++) {
+  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
-    if (NSMCommunicator::send(NSMMessage(node, RFCommand::UNCONFIGURE))) {
+    if (NSMCommunicator::send(NSMMessage(node, RFCommand::CONFIGURE))) {
       setState(node, RCState::LOADING_TS);
-      while (true) {
+      while (node.getName().find("EVP") == std::string::npos &&
+             node.getState() != RCState::READY_S) {
         try {
-          NSMCommunicator& com(wait(node, NSMCommand::UNKNOWN, 30));
-          NSMMessage msg(com.getMessage());
-          NSMCommand cmd(msg.getRequestName());
-          if (cmd == NSMCommand::OK) {
-            ok(msg.getNodeName(), msg.getData());
-            break;
-          } else if (cmd == NSMCommand::ERROR) {
-            error(msg.getNodeName(), msg.getData());
-            throw (RCHandlerException("Failed to configure %s due to error %s",
-                                      node.getName().c_str(), msg.getData()));
-          } else {
-            LogFile::debug("Unexpected reqeust : %s", msg.getRequestName());
-            perform(com);
-          }
+          perform(NSMCommunicator::select(60));
         } catch (const TimeoutException& e) {
           throw (RCHandlerException("Failed to configure due to timeout from %s",
                                     node.getName().c_str()));
@@ -172,6 +164,16 @@ void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
       throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
     }
   }
+  while (true) {
+    bool configured = true;
+    for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+      if (it->getState() != RCState::READY_S) configured = false;
+    }
+    if (configured) return;
+    try {
+      perform(NSMCommunicator::select(30));
+    } catch (const TimeoutException& e) {}
+  }
 }
 
 void RFMasterCallback::abort() throw(RCHandlerException)
@@ -179,18 +181,20 @@ void RFMasterCallback::abort() throw(RCHandlerException)
   for (NSMNodeList::reverse_iterator it = m_nodes.rbegin();
        it != m_nodes.rend(); it++) {
     NSMNode& node(*it);
-    if (NSMCommunicator::send(NSMMessage(node, RFCommand::CONFIGURE))) {
+    if (NSMCommunicator::send(NSMMessage(node, RFCommand::UNCONFIGURE))) {
       setState(node, RCState::ABORTING_RS);
-      while (true) {
-        NSMCommunicator& com(wait(node, NSMCommand::UNKNOWN));
-        NSMMessage msg(com.getMessage());
-        NSMCommand cmd(msg.getRequestName());
-        if (cmd == NSMCommand::OK) {
-          ok(msg.getNodeName(), msg.getData());
-          break;
-        } else {
-          LogFile::debug("Unexpected reqeust : %s", msg.getRequestName());
-          perform(com);
+      if (node.getName().find("EVP") == std::string::npos) {
+        while (true) {
+          bool unconfigured = (node.getState() == RCState::NOTREADY_S);
+          for (NSMNodeList::reverse_iterator it2 = m_nodes.rbegin();
+               it2 != it; it2++) {
+            if (it2->getState() != RCState::NOTREADY_S)
+              unconfigured = false;
+          }
+          if (unconfigured) break;
+          try {
+            perform(NSMCommunicator::select(30));
+          } catch (const TimeoutException& e) {}
         }
       }
     } else {

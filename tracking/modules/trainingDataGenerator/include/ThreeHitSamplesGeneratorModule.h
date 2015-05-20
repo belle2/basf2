@@ -13,6 +13,9 @@
 #include <framework/core/Module.h>
 #include <string>
 
+#include <TFile.h>
+#include <TTree.h>
+
 namespace Belle2 {
 
   /**
@@ -37,5 +40,13 @@ namespace Belle2 {
 
     std::string m_PARAMcontainerName; /**< name of SpacePoint container in StoreArray */
 
+    std::vector<std::string> m_PARAMoutputFileName; /**< name of output file (root file) that holds the training samples */
+
+    TFile* m_rootFilePtr; /**< pointer to the root output file */
+
+    TTree* m_treePtr; /**< pointer to tree in root output file */
+
+    /** initialize the root file (set all branch-adresses and tree-names)*/
+    void initializeRootFile(const std::string& filename, const std::string& writemode);
   };
 }

@@ -6,7 +6,6 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
     'framework',
-    'geometry',
     'simulation', 
     'ecl',
     'tracking_dataobjects',

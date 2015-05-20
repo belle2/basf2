@@ -29,14 +29,16 @@ namespace {
   class ParticleCombinerTest : public ::testing::Test {
   protected:
     /** register Particle array */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>::registerPersistent();
       DataStore::Instance().setInitializeActive(false);
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
   };
@@ -53,7 +55,8 @@ namespace {
       ListIndexGenerator listIndexGenerator;
       listIndexGenerator.init(1);
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle}), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle}),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_FALSE(listIndexGenerator.loadNext());
     }
 
@@ -61,11 +64,14 @@ namespace {
       ListIndexGenerator listIndexGenerator;
       listIndexGenerator.init(2);
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_FALSE(listIndexGenerator.loadNext());
     }
 
@@ -73,19 +79,26 @@ namespace {
       ListIndexGenerator listIndexGenerator;
       listIndexGenerator.init(3);
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle }), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_SelfConjugatedParticle, ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle }),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_TRUE(listIndexGenerator.loadNext());
-      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle, ParticleList::c_SelfConjugatedParticle}), listIndexGenerator.getCurrentIndices());
+      EXPECT_EQ(std::vector<ParticleList::EParticleType>({ ParticleList::c_FlavorSpecificParticle, ParticleList::c_SelfConjugatedParticle, ParticleList::c_SelfConjugatedParticle}),
+                listIndexGenerator.getCurrentIndices());
       EXPECT_FALSE(listIndexGenerator.loadNext());
     }
 
@@ -206,7 +219,8 @@ namespace {
     typedef std::tuple<Particle::EFlavorType, int, std::vector<int>> MockParticle;
 
   public:
-    TestParticleList(std::string decayString) : decayString(decayString) {
+    TestParticleList(std::string decayString) : decayString(decayString)
+    {
 
       DecayDescriptor decaydescriptor;
       decaydescriptor.init(decayString);
@@ -239,25 +253,31 @@ namespace {
       }
     }
 
-    void addParticle(unsigned int mdstSource) {
+    void addParticle(unsigned int mdstSource)
+    {
       StoreObjPtr<ParticleList> list(listName);
       StoreArray<Particle> particles;
-      Particle* part = particles.appendNew(TLorentzVector(), pdgCode, isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
+      Particle* part = particles.appendNew(TLorentzVector(), pdgCode,
+                                           isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
       list->addParticle(part);
     }
 
-    void addAntiParticle(unsigned int mdstSource) {
+    void addAntiParticle(unsigned int mdstSource)
+    {
       StoreObjPtr<ParticleList> list(antiListName);
       StoreArray<Particle> particles;
-      Particle* part = particles.appendNew(TLorentzVector(), -pdgCode, isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
+      Particle* part = particles.appendNew(TLorentzVector(), -pdgCode,
+                                           isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
       list->addParticle(part);
     }
 
-    void addExpectedParticle(Particle::EFlavorType flavourType, int pdg_code, std::vector<int> daughter_indices) {
+    void addExpectedParticle(Particle::EFlavorType flavourType, int pdg_code, std::vector<int> daughter_indices)
+    {
       expected_particles.push_back(std::make_tuple(flavourType, pdg_code, daughter_indices));
     }
 
-    void addAndCheckParticlesFromGenerator() {
+    void addAndCheckParticlesFromGenerator()
+    {
 
       StoreObjPtr<ParticleList> list(listName);
       StoreArray<Particle> particles;
@@ -276,11 +296,11 @@ namespace {
       }
       EXPECT_FALSE(generator.loadNext());
 
-      for (const auto & p : received_particles) {
+      for (const auto& p : received_particles) {
         EXPECT_EQ(std::count(expected_particles.begin(), expected_particles.end(), p), 1);
       }
 
-      for (const auto & p : expected_particles) {
+      for (const auto& p : expected_particles) {
         EXPECT_EQ(std::count(received_particles.begin(), received_particles.end(), p), 1);
         auto it = std::find(received_particles.begin(), received_particles.end(), p);
         if (it != received_particles.end()) {
@@ -291,17 +311,20 @@ namespace {
 
     }
 
-    int operator*(int index) {
+    int operator*(int index)
+    {
       StoreObjPtr<ParticleList> list(listName);
       return list->getList(ParticleList::c_SelfConjugatedParticle)[index];
     }
 
-    int operator+(int index) {
+    int operator+(int index)
+    {
       StoreObjPtr<ParticleList> list(listName);
       return list->getList(ParticleList::c_FlavorSpecificParticle)[index];
     }
 
-    int operator-(int index) {
+    int operator-(int index)
+    {
       StoreObjPtr<ParticleList> list(antiListName);
       return list->getList(ParticleList::c_FlavorSpecificParticle)[index];
     }

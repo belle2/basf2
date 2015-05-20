@@ -49,7 +49,8 @@ namespace {
 
   TEST(TMVAInterfaceTest, BuiltinMethodIsConstructedCorrectly)
   {
-    auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}), std::vector<std::string>({"isSignal"}));
+    auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"}),
+                         std::vector<std::string>({"isSignal"}));
     EXPECT_EQ(method.getName(), "BoostedDecisionTrees");
     EXPECT_EQ(method.getType(), TMVA::Types::kBDT);
     EXPECT_EQ(method.getTypeAsString(), "BDT");
@@ -65,13 +66,16 @@ namespace {
   TEST(TMVAInterfaceTest, BuiltinMethodFailsCorrectly)
   {
     EXPECT_B2ERROR(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "DOES_NOT_EXIST", "eid"})));
-    EXPECT_B2WARNING(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "eid"}), std::vector<std::string>({"DOES_NOT_EXIST", "eid"})));
-    EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"})), ".*");
+    EXPECT_B2WARNING(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "eid"}),
+                            std::vector<std::string>({"DOES_NOT_EXIST", "eid"})));
+    EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NTrees=100", std::vector<std::string>({"p", "pt", "eid"})),
+                 ".*");
   }
 
   TEST(TMVAInterfaceTest, PluginMethodIsConstructedCorrectly)
   {
-    auto method = Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", std::vector<std::string>({"p", "pt", "eid"}), std::vector<std::string>({"isSignal"}));
+    auto method = Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs", std::vector<std::string>({"p", "pt", "eid"}),
+                         std::vector<std::string>({"isSignal"}));
     EXPECT_EQ(method.getName(), "MockPlugin");
     EXPECT_EQ(method.getType(), TMVA::Types::kPlugins);
     EXPECT_EQ(method.getTypeAsString(), "Plugin");

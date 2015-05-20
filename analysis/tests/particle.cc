@@ -15,7 +15,8 @@ namespace {
   class ParticleTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
       StoreArray<Particle>::registerPersistent();
@@ -23,7 +24,8 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown() {
+    virtual void TearDown()
+    {
       DataStore::Instance().reset();
     }
   };

@@ -58,9 +58,8 @@ namespace Belle2 {
       /** Set the parameter with key to values.
        *
        *  Parameters are:
-       *  cut           - The cut value of the mva output below which the object is rejected
-       *  weight_folder - The name of the folder to look for weight files from trainings.
-       *  training_name - The name of the training that should be used for the prediction.
+       *  root_file_name = Name of the ROOT file to be written.
+       *  tree_name -  Name of the Tree to be written.
        *  returned_cell_weight - CellWeight this filter should return when called. Defaults to NOT_A_CELL
        */
       virtual void setParameter(const std::string& key, const std::string& value)
@@ -72,10 +71,7 @@ namespace Belle2 {
           m_treeName = value;
           B2INFO("Filter received parameter 'tree_name' = " << m_treeName);
         } else if (key == "returned_cell_weight") {
-          if (value == "NOT_A_CELL")
-            m_returnedCellWeight = NOT_A_CELL;
-          else
-            m_returnedCellWeight = std::stod(value);
+          m_returnedCellWeight = value == "NOT_A_CELL" ? NOT_A_CELL : std::stod(value);
           B2INFO("Filter received parameter 'returned_cell_weight' = " << m_returnedCellWeight);
         } else {
           Super::setParameter(key, value);

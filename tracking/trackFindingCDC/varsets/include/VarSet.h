@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include "BaseVarSet.h"
+
 #include "FixedSizeNamedFloatTuple.h"
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
@@ -29,15 +31,19 @@ namespace Belle2 {
      *  names - Array of names which contain the nNames names of the float values.
      **/
     template<class ObjectVarNames>
-    class VarSet {
+    class VarSet : public BaseVarSet<typename ObjectVarNames::Object> {
+
+    private:
+      /// Type of the super class
+      typedef BaseVarSet<typename ObjectVarNames::Object> Super;
+
+    public:
+      /// Type from which variables should be extracted
+      typedef typename Super::Object Object;
 
     private:
       /// Number of floating point values represented by this class.
       static const size_t nVars = ObjectVarNames::nNames;
-
-    public:
-      /// Object type from which variables shall be extracted.
-      typedef typename ObjectVarNames::Object Object;
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
@@ -46,31 +52,26 @@ namespace Belle2 {
         m_nestedVarSet(prefix)
       {;}
 
-      /// Virtual destructor
-      virtual ~VarSet() {;}
-
       /// Extract the nested variables next
       bool extractNested(const Object* obj)
       {
         return m_nestedVarSet.extract(ObjectVarNames::getNested(obj));
       }
 
+      using Super::extract;
+
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const Object* obj)
+      virtual
+      bool extract(const Object* obj) override
       {
         return extractNested(obj);
-      }
-
-      /// Method for extraction from an object instead of a pointer.
-      bool extract(const Object& obj)
-      {
-        return extract(&obj);
       }
 
       /** Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
        */
-      virtual void initialize()
+      virtual
+      void initialize() override
       {
         m_nestedVarSet.initialize();
       }
@@ -78,7 +79,8 @@ namespace Belle2 {
       /** Terminate the variable set after event processing.
        *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
-      virtual void terminate()
+      virtual
+      void terminate() override
       {
         m_nestedVarSet.terminate();
       }
@@ -86,7 +88,8 @@ namespace Belle2 {
       /** Getter for the named tuples storing the values of all the (possibly nested) VarSets
        *  Base implementation returns the  named tuple of this variable set.
        */
-      virtual std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables()
+      virtual
+      std::vector<Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() override
       {
         std::vector<NamedFloatTuple*> result = m_nestedVarSet.getAllVariables();
         result.push_back(&m_variables);
@@ -96,27 +99,12 @@ namespace Belle2 {
       /** Const getter for the named tuples storing the values of all the (possibly nested)
        *  variable sets. Base implementation returns the named tuple of this variable set.
        */
-      virtual std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const
+      virtual
+      std::vector<const Belle2::TrackFindingCDC::NamedFloatTuple*> getAllVariables() const override
       {
         std::vector<const NamedFloatTuple*> result = m_nestedVarSet.getAllVariables();
         result.push_back(&m_variables);
         return result;
-      }
-
-      /// Getter for a map of all name including the optional prefix and value pairs
-      std::map<std::string, Float_t> getNamedValuesWithPrefix() const
-      {
-        std::map<std::string, Float_t> namedValues;
-        std::vector<const NamedFloatTuple*> allVariables = getAllVariables();
-        for (const NamedFloatTuple* variables : allVariables) {
-          size_t nVariables = variables->size();
-          for (size_t iVariable = 0; iVariable < nVariables; ++iVariable) {
-            std::string name = variables->getNameWithPrefix(iVariable);
-            Float_t value = variables->get(iVariable);
-            namedValues[name] = value;
-          }
-        }
-        return namedValues;
       }
 
     protected:

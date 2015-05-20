@@ -35,9 +35,6 @@ namespace Belle2 {
       {
         return facetTruthNames[iName];
       }
-
-      /// Marking that the basic facet variables should be included.
-      typedef CDCFacetFitVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from facet.

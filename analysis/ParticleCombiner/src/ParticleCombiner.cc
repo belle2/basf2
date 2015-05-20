@@ -233,10 +233,10 @@ namespace Belle2 {
 
     switch (iParticleType) {
       case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_particles[0]->getArrayPointer());
+                                m_particleArray.getPtr());
       case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_particles[0]->getArrayPointer());
-      case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_particles[0]->getArrayPointer());
+                                m_particleArray.getPtr());
+      case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_particleArray.getPtr());
       default: B2FATAL("Thomas you have a serious bug in the particle combiner");
     }
 

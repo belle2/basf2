@@ -44,51 +44,50 @@ class TRGGRLMatch {
 
     void dump(void);
 
-    double getCenter_x(void) const{return center_x;};
-    double getCenter_y(void) const{return center_y;};
-    double getCenter_z(void) const{return center_z;};
-    double getCenter_r(void) const{return r;};
-    double getCenter_phi(void) const{return phi;};
-    double getCenter_pt(void) const{return pt;};
-    double getCenter_z0(void) const{return z0;};
-    double getCenter_pz(void) const{return pz;};
-    double getCenter_slope(void) const{return slope;};
+    double getCenter_x(void) const{return _center_x;};
+    double getCenter_y(void) const{return _center_y;};
+    double getCenter_z(void) const{return _center_z;};
+    double getCenter_r(void) const{return _r;};
+    double getCenter_phi(void) const{return _phi;};
+    double getCenter_pt(void) const{return _pt;};
+    double getCenter_z0(void) const{return _z0;};
+    double getCenter_pz(void) const{return _pz;};
+    double getCenter_slope(void) const{return _slope;};
 
-    double getCluster_x(void) const{return cluster_x;};
-    double getCluster_y(void) const{return cluster_y;};
-    double getCluster_z(void) const{return cluster_z;};
-    double getCluster_e(void) const{return cluster_e;};
-    double getCluster_R(void) const{return R;};
-    double getCluster_D(void) const{return D;};
-    double getP_rescaled(void) const{return re_scaled_p;};
-    double getP(void) const{return p;};
+    double getCluster_x(void) const{return _cluster_x;};
+    double getCluster_y(void) const{return _cluster_y;};
+    double getCluster_z(void) const{return _cluster_z;};
+    double getCluster_e(void) const{return _cluster_e;};
+    double getCluster_R(void) const{return _R;};
+    double getCluster_D(void) const{return _D;};
+    double getP_rescaled(void) const{return _re_scaled_p;};
+    double getP(void) const{return _p;};
 
-    double getDr(void) const{return dr;};
-    double getDz(void) const{return dz;};
-    double getPoe(void) const{return poe;};
+    double getDr(void) const{return _dr;};
+    double getDz(void) const{return _dz;};
+    double getPoe(void) const{return _poe;};
 
-    int getMatch3D(void) const{return match3D;};
+    int getMatch3D(void) const{return _match3D;};
+
 
 private:
 
-    void calculate(void);
-
-    int match3D;
+    TRGCDCTrack * _track;
+    
+    TRGECLCluster * _cluster; 
+    
+    int _match3D;
 
     /// center of track helix
-    double center_x, center_y, center_z, r, phi, pt, p, pz, z0, slope;
+    double _center_x, _center_y, _center_z, _r, _phi, _pt, _p, _pz, _z0, _slope;
 
     /// cluster information
-    double cluster_x, cluster_y, cluster_z, cluster_e, R, D, re_scaled_p;
+    double _cluster_x, _cluster_y, _cluster_z, _cluster_e, _R, _D, _re_scaled_p;
 
     /// result of matching
-    double dr, dz, ex_x, ex_y, ex_z, poe;
+    double _dr, _dz, _ex_x, _ex_y, _ex_z, _poe;
 
-    TRGCDCTrack * _track;
-
-    TRGECLCluster * _cluster;
-
-
+    void calculate(void);
 };
 
 

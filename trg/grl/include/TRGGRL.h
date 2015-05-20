@@ -28,8 +28,9 @@
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include "trg/ecl/TrgEclCluster.h"
 #include "trg/grl/TRGGRLMatch.h"
-//#include <TFile.h>
-//#include <TTree.h>
+#include <TFile.h>
+#include <TTree.h>
+
 
 namespace HepGeom {
 template <class T> class Point3D;
@@ -167,10 +168,10 @@ class TRGGRL {
     const TRGClock & _clock;
 
     /// root file
-    //TFile * m_file;
+    TFile * m_file;
 
     /// root tree 
-    //TTree * h1;
+    TTree * h1;
 
     double x0, x1, x2, x3, x4, x5, x6, x7, x8, x9;
     std::vector<TRGGRLMatch * > matchList;

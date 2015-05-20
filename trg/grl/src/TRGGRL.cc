@@ -30,10 +30,8 @@
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include "trg/ecl/TrgEclCluster.h"
 #include <math.h>
-//#include <TFile.h>
-//#include <TTree.h>
-
-#define N_TIMING_REGISTERS 4
+#include <TFile.h>
+#include <TTree.h>
 
 # define M_PI           3.14159265358979323846
 
@@ -112,7 +110,7 @@ TRGGRL::TRGGRL(const string & configFile,
 
 void
 TRGGRL::initialize(void) {
-/*
+
     m_file = new TFile("trggrl.root", "RECREATE");
     h1 = new TTree("h1", "h1");
 
@@ -124,7 +122,7 @@ TRGGRL::initialize(void) {
     h1->Branch("pt",&x5,"pt");
     h1->Branch("pz",&x6,"pz");
     h1->Branch("e",&x7,"e");
-*/
+
     configure();
 }
 
@@ -161,9 +159,9 @@ TRGGRL::update(bool) {
 }
 
 TRGGRL::~TRGGRL() {
-	//h1->Write();
-        //m_file->Write();
-        //m_file->Close();
+	h1->Write();
+        m_file->Write();
+        m_file->Close();
     clear();
 }
 
@@ -182,21 +180,40 @@ TRGGRL::simulate(void) {
 //	if (TRGDebug::level() > 2) cout <<"yt_grl "<< n_cluster << " " << n_track << endl;
 
         for (unsigned i = 0; i < n_track; i++) {
-		for (unsigned j = 0; j < n_cluster; j++) {
-			TRGGRLMatch * match = new TRGGRLMatch(trackList[i], ClusterArray[j], 0);
+		vector<TRGGRLMatch *> match_i;
+		if (n_cluster == 0) break;
+		else if (n_cluster == 1) {
+			TRGGRLMatch * match = new TRGGRLMatch(trackList[i], ClusterArray[0], 0);
 			matchList.push_back(match);
-			if(TRGDebug::level() > 1 && match->getDr() > 30) match->dump();
+		}
+		else if (n_cluster > 1){
+			int best_j = 0; double old_dr = 99999;
+			for (unsigned j = 0; j < n_cluster; j++) {
+				TRGGRLMatch * match = new TRGGRLMatch(trackList[i], ClusterArray[j], 0);
+				if (match->getDr() < old_dr) {best_j = j; old_dr = match->getDr();}
+			}
+			TRGGRLMatch * match = new TRGGRLMatch(trackList[i], ClusterArray[best_j], 0);
+			matchList.push_back(match);
 		}
 	}
 
         for (unsigned i = 0; i < n_track3D; i++) {
-                for (unsigned j = 0; j < n_cluster; j++) {
-                        TRGGRLMatch * match = new TRGGRLMatch(trackList3D[i], ClusterArray[j], 1);
+		vector<TRGGRLMatch *> match_i;
+		if (n_cluster == 0) break;
+		else if (n_cluster == 1) {
+			TRGGRLMatch * match = new TRGGRLMatch(trackList3D[i], ClusterArray[0], 1);
+			matchList.push_back(match);
+		}
+		else if (n_cluster > 1){
+			int best_j = 0; double old_dr = 99999;
+			for (unsigned j = 0; j < n_cluster; j++) {
+				TRGGRLMatch * match = new TRGGRLMatch(trackList3D[i], ClusterArray[j], 0);
+				if (match->getDr() < old_dr) {best_j = j; old_dr = match->getDr();}
+			}
+			TRGGRLMatch * match = new TRGGRLMatch(trackList3D[i], ClusterArray[best_j], 0);
 			matchList3D.push_back(match);
-                        if(TRGDebug::level() > 1 && match->getDr() > 30) match->dump();
-                }
-        }
-
+		}
+	}
 
 	//-----Fill tree
 	for (unsigned i = 0; i < matchList.size(); i++) {
@@ -211,7 +228,8 @@ TRGGRL::simulate(void) {
 		x6 = match.getCenter_pz();
 		x7 = match.getCluster_e();
 		if (TRGDebug::level() > 1) printf("%s %f %f %f %f %f %f %f %f \n","dump! ",x0,x1,x2,x3,x4,x5,x6,x7);
-		//h1->Fill();
+		if (TRGDebug::level() > 1 && match.getDr() > 30) match.dump();
+		h1->Fill();
 	}
 
 	for (unsigned i = 0; i < matchList3D.size(); i++) {
@@ -226,7 +244,8 @@ TRGGRL::simulate(void) {
 		x6 = match.getCenter_pz();
 		x7 = match.getCluster_e();
 		if (TRGDebug::level() > 1) printf("%s %f %f %f %f %f %f %f %f \n","dump! ",x0,x1,x2,x3,x4,x5,x6,x7);
-		//h1->Fill();
+		if (TRGDebug::level() > 1 && match.getDr() > 30) match.dump();
+		h1->Fill();
 	}
 
 	//--------------------------------------

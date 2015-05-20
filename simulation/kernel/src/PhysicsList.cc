@@ -66,11 +66,11 @@ void PhysicsList::SetCuts()
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)
   G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
-  //G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
-  theParticleIterator = theParticleTable->GetIterator();
-  theParticleIterator->reset();
-  while ((*theParticleIterator)()) {
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  // theParticleIterator is a Geant4 macro since version 10.
+  G4ParticleTable::G4PTblDicIterator* myParticleIterator = theParticleTable->GetIterator();
+  myParticleIterator->reset();
+  while ((*myParticleIterator)()) {
+    G4ParticleDefinition* particle = myParticleIterator->value();
     if (particle->GetParticleName().substr(0, 4) == "g4e_") {
       SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
     }

@@ -47,6 +47,9 @@ namespace Belle2 {
      *
      * @var TransformData::strip
      * Strip transformations.
+     *
+     * @var TransformData::stripInverse
+     * Inverse strip transformations.
      */
     struct TransformData {
       HepGeom::Transform3D endcap[2];

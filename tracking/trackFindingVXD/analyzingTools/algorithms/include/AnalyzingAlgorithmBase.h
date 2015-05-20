@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /** Base class (functor) for storing an algorithm determining the data one wants to have */
-  template <class DataType, class TCInfoType, class VectorType , typename ... otherTypes>
+  template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmBase {
   protected:
 
@@ -50,7 +50,7 @@ namespace Belle2 {
     void setOrigin(VectorType newOrigin) const { m_origin = newOrigin ; }
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(otherTypes ...)
+    virtual DataType calcData(const TCInfoType&, const TCInfoType&)
     {
       B2ERROR(" AnalyzingAlgorithmBase::calcData: if you can see this, the code tried to return the actual baseClass instead of the inherited ones - this is unintended behavior! The TCs had the types: ")
 
@@ -60,8 +60,8 @@ namespace Belle2 {
 
 
   /** setting the static origin to a standard value */
-  template<class DataType, class TCInfoType, class VectorType, typename ... otherTypes>
-  VectorType AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType, otherTypes ... >::m_origin = VectorType(0, 0, 0);
+  template<class DataType, class TCInfoType, class VectorType>
+  VectorType AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_origin = VectorType(0, 0, 0);
 
 
   /** non-memberfunction Comparison for equality with a std::string */

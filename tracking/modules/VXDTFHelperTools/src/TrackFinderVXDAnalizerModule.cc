@@ -136,12 +136,27 @@ void TrackFinderVXDAnalizerModule::initialize()
             m_PARAMorigin.size() << " reset to standard (0, 0, 0)")
     m_PARAMorigin = {0, 0, 0};
   }
+  if (m_PARAMwriteToRoot == false) { return; }
+
+  if ((m_PARAMrootFileName.size()) != 2) {
+    string output;
+    for (string& entry : m_PARAMrootFileName) {
+      output += "'" + entry + "' ";
+    }
+    B2FATAL("TrackFinderVXDAnalizer::initialize(), rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
+            <<
+            output)
+  }
+
   // deal with algorithms:
   for (auto& parameterSet : m_PARAMparametersToBeTracked) {
     if (parameterSet.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'parametersToBeTracked' was mis-used! Please read the documentation!") }
 
-//  rootParameterTracker.addParameters(parameterSet[0], parameterSet[1]);
+    m_rootParameterTracker.createFile(m_PARAMrootFileName[0] + ".root", m_PARAMrootFileName[1]);
+    // store in internal bla, prepare branch
+    m_rootParameterTracker.addParameters(parameterSet[0], parameterSet[1]);
   }
+
 
   AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>().setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1],
       m_PARAMorigin[2]));
@@ -444,8 +459,6 @@ void TrackFinderVXDAnalizerModule::event()
          ", svdHits " << m_nCaSVDHits << "|" << m_nMcSVDHits << "|" << float(m_nCaSVDHits) / float(m_nMcSVDHits) << " found by the two TFs")
 
 
-
-
   // TODO:
   /**
    * catch refTCs which are out of bounds (e.g. min/max-momentum-cuts):
@@ -473,8 +486,16 @@ void TrackFinderVXDAnalizerModule::event()
 
   if (m_PARAMwriteToRoot == false) { return; }
   /// now deal with all the root-cases:
-
   // TODO:
+
+  m_rootParameterTracker.prepareRoot(testTCVector);
+  m_rootParameterTracker.prepareRoot(referenceTCVector);
+
+  m_rootParameterTracker.fillRoot();
+
+
+
+
   /// for each vector<std::pair<TrackCandidate*, TrackCandidate*> >, fill the according Root-blabla and the accepted/lost TCs
 
 //   m_rootTotalPXresiduals = rootVariables.totalPXresiduals;
@@ -628,6 +649,7 @@ void TrackFinderVXDAnalizerModule::endRun()
 void TrackFinderVXDAnalizerModule::terminate()
 {
 
+  m_rootParameterTracker.terminate();
   if (m_treePtr != NULL) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_treePtr->Write();

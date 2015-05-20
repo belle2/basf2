@@ -22,66 +22,66 @@ namespace Belle2 {
    * */
 
   /** Class for storing an algorithm determining the momentum in X */
-  template <class DataType, class TCInfoType, class VectorType, typename ... otherTypes>
+  template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValuePX : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePX() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePX")) {}
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, otherTypes ...) { return aTC.momSeed.X(); }
+    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.X(); }
   };
 
 
 
   /** Class for storing an algorithm determining the momentum in Y */
-  template <class DataType, class TCInfoType, class VectorType, typename ... otherTypes>
+  template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValuePY : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePY")) {}
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, otherTypes ...) { return aTC.momSeed.Y(); }
+    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Y(); }
   };
 
 
 
   /** Class for storing an algorithm determining the momentum in Z */
-  template <class DataType, class TCInfoType, class VectorType, typename ... otherTypes>
+  template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValuePZ : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePZ() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePZ")) {}
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, otherTypes ...) { return aTC.momSeed.Z(); }
+    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Z(); }
   };
 
 
 
   /** Class for storing an algorithm determining the residual of momentum in pT */
-  template <class DataType, class TCInfoType, class VectorType, typename ... otherTypes>
+  template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValuePT : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePT() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePT")) {}
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, otherTypes ...) { return aTC.momSeed.Perp(); }
+    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Perp(); }
   };
 
 
 
   /** Class for storing an algorithm determining the residual of momentum in |p| */
-  template <class DataType, class TCInfoType, class VectorType, typename ... otherTypes>
+  template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValueP : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValueP() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValueP")) {}
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, otherTypes ...) { return aTC.momSeed.Mag(); }
+    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Mag(); }
   };
 
   // TODO

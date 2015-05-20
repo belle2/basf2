@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/trackFindingVXD/analyzingTools/RootParameterTracker.h>
 
 //stl-stuff
 #include <string>
@@ -39,6 +40,11 @@ namespace Belle2 {
       */
     class TrackFinderVXDAnalizerModule : public Module {
     public:
+
+
+
+
+
 
 //    /** Base class (functor) for storing an algorithm determining the data one wants to have */
 //    template <class DataType>
@@ -234,6 +240,7 @@ namespace Belle2 {
       StoreArray<SpacePointTrackCand> m_acceptedTCs;
       StoreArray<SpacePointTrackCand> m_lostTCs;
 
+      RootParameterTracker m_rootParameterTracker; /**< takes care of collecting data and storing it to root branches */
       std::vector<double> m_PARAMorigin; /**< only allowed size: 3. stores coordinates of the origin used */
       bool m_PARAMFileExportMcTracks; /**< possibly needed later (currently not in use), exports McTracks to File */
       bool m_PARAMFileExportTfTracks; /**< possibly needed later (currently not in use), exports TfTracks to File */

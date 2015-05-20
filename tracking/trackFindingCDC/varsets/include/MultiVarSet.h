@@ -38,7 +38,6 @@ namespace Belle2 {
       /// Type of the contained variable sets
       typedef BaseVarSet<Object> ContainedVarSet;
 
-
     public:
       using Super::extract;
 
@@ -124,6 +123,12 @@ namespace Belle2 {
       void clear()
       {
         m_varSets.clear();
+      }
+
+      /// Return the number of currently contained variable sets
+      size_t size()
+      {
+        return m_varSets.size();
       }
 
     private:

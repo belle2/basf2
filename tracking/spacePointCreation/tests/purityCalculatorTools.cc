@@ -104,27 +104,28 @@ namespace PurityCalcTests {
    * COULDDO: make this templated to take any arguments to the pair, instead of only ints and shorts
    */
   struct compFirst {
-    explicit compFirst(int j) : i(j) { }
-    bool operator()(const pair<int, short>& p)
+    explicit compFirst(int j) : i(j) { } /**< explicit constructor for use as functor with argument */
+    bool operator()(const pair<int, short>& p) /**< comparison operator returning true if .first is j (from ctor) */
     {
       return p.first == i;
     }
   private:
-    int i;
+    int i; /**< only member holding the value that has to be matched by the .first element of a pair */
   };
 
   /**
    * small helper functor to get the MCVXDPurityInfo with the passed ParticleId from a container of MCVXDPurityInfos
    */
   struct compMCId {
-    explicit compMCId(int j) : i(j) { }
-    bool operator()(const MCVXDPurityInfo& info)
+    explicit compMCId(int j) : i(j) { } /**< explicit constructor for use as functor with arguments */
+    bool operator()(const MCVXDPurityInfo& info) /**< operator comparing the particle Id and the passed argument */
     {
       return info.getParticleID() == i;
     }
   private:
-    int i;
+    int i; /**< member holding the value that has to be mateched by the .first element of a pair */
   };
+
   /**
    * class for testing the purity calculator tools (i.e. functions) defined in the spacePointCreation includes
    */
@@ -233,6 +234,12 @@ namespace PurityCalcTests {
       spacePoint->addRelationTo(sTH2MC1, 11); // U-Cluster
       spacePoint->addRelationTo(sTH2None, 21); // V-Cluster without relation to MCParticle
 
+      // add a SVD (non-ideal case: one Cluster has relations to more than one TrueHit, while the other has not)
+      spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0)); // add twoCluster SP
+      m_assignedClusters.push_back(2);
+      spacePoint->addRelationTo(sTH2MC1, 11); // U-Cluster
+      spacePoint->addRelationTo(sTH2MC2, 11); // U-Cluster, no relation for V-Cluster
+
       // add singleCluster SpacePoints for testing the increaseCounterMethod. Do not need any relations!
       // NOTE: these shall not be included in the testing of the other methods!
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, -1)); // add V-Cluster set only
@@ -255,7 +262,6 @@ namespace PurityCalcTests {
 
   /**
    * test that checks if the setup works as expected
-   * TODO!!!
    */
   TEST_F(PurityCalculatorToolsTest, testSetUp)
   {
@@ -266,7 +272,7 @@ namespace PurityCalcTests {
     // test if StoreArray has all the entries that should be there
     EXPECT_EQ(m_pxdTrueHits.getEntries(), 3);
     EXPECT_EQ(m_svdTrueHits.getEntries(), 3);
-    EXPECT_EQ(m_spacePoints.getEntries(), 13);
+    EXPECT_EQ(m_spacePoints.getEntries(), 14);
     EXPECT_EQ(m_mcParticles.getEntries(), 2);
 
     // test if the SpacePoints have the expected number of assigned Clusters
@@ -380,10 +386,10 @@ namespace PurityCalcTests {
     EXPECT_EQ(ctrArray[1], 1);
     EXPECT_EQ(ctrArray[2], 1);
 
-    increaseClusterCounters(m_spacePoints[11], ctrArray); // SVD (only V set)
+    increaseClusterCounters(m_spacePoints[12], ctrArray); // SVD (only V set)
     EXPECT_EQ(ctrArray[2], 2);
     EXPECT_EQ(ctrArray[1], 1);
-    increaseClusterCounters(m_spacePoints[12], ctrArray); // SVD (only U set)
+    increaseClusterCounters(m_spacePoints[13], ctrArray); // SVD (only U set)
     EXPECT_EQ(ctrArray[1], 2);
     EXPECT_EQ(ctrArray[2], 2);
   }
@@ -480,6 +486,18 @@ namespace PurityCalcTests {
     ASSERT_FALSE(findIt == mcParts.end());
     EXPECT_DOUBLE_EQ(findIt->second, 11);
 
+    mcParts = getMCParticles<SVDTrueHit>(m_spacePoints[11]); // U-Cluster has relations to two TrueHits, while V-Cluster has none
+    ASSERT_EQ(mcParts.size(), 3);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(0));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 11);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(1));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 11);
+    findIt = std::find_if(mcParts.begin(), mcParts.end(), compFirst(-2));
+    ASSERT_FALSE(findIt == mcParts.end());
+    EXPECT_DOUBLE_EQ(findIt->second, 21);
+
     // NOTE: the rest of the occuring set-up cases should be covered by the above tests!
   }
 
@@ -491,52 +509,54 @@ namespace PurityCalcTests {
   {
     // first create a SpacePointTrackCand (as container of SpacePoints) containing all the wanted hits
     std::vector<const SpacePoint*> spacePoints;
-    for (size_t i = 0; i < 11; ++i) { spacePoints.push_back(m_spacePoints[i]); } // do not use the last two SpacePoints from the setup
+    for (size_t i = 0; i < 12; ++i) { spacePoints.push_back(m_spacePoints[i]); } // do not use the last two SpacePoints from the setup
     SpacePointTrackCand sptc(spacePoints);
-    EXPECT_EQ(sptc.getNHits(), 11); // check if the creation worked
+    EXPECT_EQ(sptc.getNHits(), 12); // check if the creation worked
+    unsigned totCls = 20;
+    float ndf = 4 * 2 + 8 * 2; // 4 PXD SpacePoints, and 8 two Cluster SVD-SpacePoints
 
     B2INFO("There will be WARNING and ERROR messages! Those are expected!")
     std::vector<MCVXDPurityInfo> purities = createPurityInfos(sptc); // create the purityInfos
 
     auto findIt = find_if(purities.begin(), purities.end(), compMCId(1)); // get MCParticle with Id 1
     ASSERT_FALSE(findIt == purities.end());
-    EXPECT_EQ(findIt->getNClustersTotal(), 18);
+    EXPECT_EQ(findIt->getNClustersTotal(), totCls);
     EXPECT_EQ(findIt->getNPXDClustersTotal(), 4); // 4 PXD Clusters were in container
-    EXPECT_EQ(findIt->getNClustersFound(), 5);
+    EXPECT_EQ(findIt->getNClustersFound(), 6);
     EXPECT_EQ(findIt->getNPXDClusters(), 2);
-    EXPECT_EQ(findIt->getNSVDUClusters(), 2);
+    EXPECT_EQ(findIt->getNSVDUClusters(), 3);
     EXPECT_EQ(findIt->getNSVDVClusters(), 1);
-    EXPECT_FLOAT_EQ(findIt->getPurity().second, 7. / 22.);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 8. / ndf);
 
     findIt = find_if(purities.begin(), purities.end(), compMCId(0)); // get Id 0
     ASSERT_FALSE(findIt == purities.end());
-    EXPECT_EQ(findIt->getNClustersTotal(), 18);
-    EXPECT_EQ(findIt->getNSVDUClustersTotal(), 7); // 7 SVD U Clusters are in container
-    EXPECT_EQ(findIt->getNClustersFound(), 9);
+    EXPECT_EQ(findIt->getNClustersTotal(), totCls);
+    EXPECT_EQ(findIt->getNSVDUClustersTotal(), 8); // 8 SVD U Clusters are in container
+    EXPECT_EQ(findIt->getNClustersFound(), 10);
     EXPECT_EQ(findIt->getNPXDClusters(), 2);
-    EXPECT_EQ(findIt->getNSVDUClusters(), 4);
+    EXPECT_EQ(findIt->getNSVDUClusters(), 5);
     EXPECT_EQ(findIt->getNSVDVClusters(), 3);
-    EXPECT_FLOAT_EQ(findIt->getPurity().second, 11. / 22.);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 12. / ndf);
 
     findIt = find_if(purities.begin(), purities.end(), compMCId(-1));
     ASSERT_FALSE(findIt == purities.end());
-    EXPECT_EQ(findIt->getNClustersTotal(), 18);
-    EXPECT_EQ(findIt->getNSVDVClustersTotal(), 7); // 7 SVD U Clusters are in container
+    EXPECT_EQ(findIt->getNClustersTotal(), totCls);
+    EXPECT_EQ(findIt->getNSVDVClustersTotal(), 8); // 8 SVD U Clusters are in container
     EXPECT_EQ(findIt->getNClustersFound(), 1);
     EXPECT_EQ(findIt->getNPXDClusters(), 0);
     EXPECT_EQ(findIt->getNSVDUClusters(), 0);
     EXPECT_EQ(findIt->getNSVDVClusters(), 1);
-    EXPECT_FLOAT_EQ(findIt->getPurity().second, 1. / 22.);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 1. / ndf);
 
     // NOTE: fails because not handled yet!
     findIt = find_if(purities.begin(), purities.end(), compMCId(-2));
     ASSERT_FALSE(findIt == purities.end());
-    EXPECT_EQ(findIt->getNClustersTotal(), 18);
-    EXPECT_EQ(findIt->getNClustersFound(), 5);
+    EXPECT_EQ(findIt->getNClustersTotal(), totCls);
+    EXPECT_EQ(findIt->getNClustersFound(), 6);
     EXPECT_EQ(findIt->getNPXDClusters(), 1);
     EXPECT_EQ(findIt->getNSVDUClusters(), 2);
-    EXPECT_EQ(findIt->getNSVDVClusters(), 2);
-    EXPECT_FLOAT_EQ(findIt->getPurity().second, 6. / 22.);
+    EXPECT_EQ(findIt->getNSVDVClusters(), 3);
+    EXPECT_FLOAT_EQ(findIt->getPurity().second, 7. / ndf);
   }
 
 } // namespace

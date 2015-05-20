@@ -124,12 +124,7 @@ namespace Belle2 {
 
   void ParticleGenerator::init()
   {
-
-    if (not m_isSelfConjugated) {
-      iParticleType = 0;
-    } else {
-      iParticleType = 1;
-    }
+    iParticleType = 0;
 
     particleIndexGenerator.init(std::vector<unsigned int> {}); // ParticleIndexGenerator will be initialised on first call
     listIndexGenerator.init(numberOfLists); // ListIndexGenerator must be initialised here!
@@ -237,8 +232,10 @@ namespace Belle2 {
     }
 
     switch (iParticleType) {
-      case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices, m_particles[0]->getArrayPointer());
-      case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices, m_particles[0]->getArrayPointer());
+      case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
+                                m_particles[0]->getArrayPointer());
+      case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
+                                m_particles[0]->getArrayPointer());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_particles[0]->getArrayPointer());
       default: B2FATAL("Thomas you have a serious bug in the particle combiner");
     }

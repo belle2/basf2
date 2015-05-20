@@ -63,6 +63,8 @@ Particle::Particle(const TLorentzVector& momentum,
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
+  if (flavorType == c_Unflavored and pdgCode < 0)
+    m_pdgCode = -pdgCode;
   m_mdstIndex = mdstIndex;
   m_particleType = type;
   set4Vector(momentum);
@@ -82,6 +84,8 @@ Particle::Particle(const TLorentzVector& momentum,
 {
   m_pdgCode = pdgCode;
   m_flavorType = flavorType;
+  if (flavorType == c_Unflavored and pdgCode < 0)
+    m_pdgCode = -pdgCode;
   set4Vector(momentum);
   resetErrorMatrix();
 

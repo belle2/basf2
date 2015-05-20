@@ -76,6 +76,7 @@ namespace Belle2 {
     /** operator for sorting.
       *
       * will be compared using overal purity
+      * NOTE: only the purity will be compared (i.e. .second), the iD is not used!
       * */
     inline bool operator > (const MCVXDPurityInfo& b) const
     {
@@ -86,6 +87,7 @@ namespace Belle2 {
     /** operator for sorting.
      *
      * will be compared using overal purity
+     * NOTE: only the purity will be compared (i.e. .second), the iD is not used!
      * */
     inline bool operator < (const MCVXDPurityInfo& b) const
     {

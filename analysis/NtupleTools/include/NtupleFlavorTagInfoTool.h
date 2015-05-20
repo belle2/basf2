@@ -18,6 +18,7 @@
 #include <utility>
 
 namespace Belle2 {
+  /* WORK IN PROGRESS */
 
   /** Writes all the Flavor Tag Information to flat ntuple. All members are arrays,
    whose elements correspond to all the categories used in the TMVA algorithm*/
@@ -35,6 +36,8 @@ namespace Belle2 {
     float* m_Z0;
     float* m_MCvertex;
 
+    /* Information obtained from the MC about the nature of the tracks in the
+     *FlavorTagInfo DataObject */
     float m_isFromBGeneral;
     float m_ROEComesFromB;
     float m_goodTracksPurityFT;

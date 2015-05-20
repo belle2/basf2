@@ -15,6 +15,8 @@
 using namespace Belle2;
 using namespace std;
 
+/* WORK IN PROGRESS */
+
 void NtupleFlavorTagInfoTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
@@ -41,7 +43,6 @@ void NtupleFlavorTagInfoTool::setupTree()
   m_goodTracksFT = 0;
 
   for (unsigned i = 0; i < sizeof(m_targetP); i++) {
-    +
     m_tree->Branch((strNames[0] + "_" + m_categories[i] + "_targetP").c_str(), &m_targetP[i],
                    (strNames[0] + "_" + m_categories[i] + "_targetP/F").c_str());
     m_tree->Branch((strNames[0] + "_" + m_categories[i] + "_categoryP").c_str(), &m_categoryP[i],

@@ -20,6 +20,7 @@
 #include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
+#include <set>
 
 using namespace std;
 using namespace Belle2;
@@ -216,9 +217,18 @@ namespace {
 
   class TestParticleList {
 
-    typedef std::tuple<Particle::EFlavorType, int, std::vector<int>> MockParticle;
+    typedef std::tuple<Particle::EFlavorType, int, std::set<int>> MockParticle;
 
   public:
+    static std::string printable(const MockParticle& m)
+    {
+      std::string s = "MockParticle with PDG " + std::to_string(std::get<1>(m));
+      s += ", type " + std::to_string(std::get<0>(m)) + ", daughter indices: ";
+      for (int idx : std::get<2>(m))
+        s += std::to_string(idx) + " ";
+      return s;
+    }
+
     TestParticleList(std::string decayString) : decayString(decayString)
     {
 
@@ -273,7 +283,8 @@ namespace {
 
     void addExpectedParticle(Particle::EFlavorType flavourType, int pdg_code, std::vector<int> daughter_indices)
     {
-      expected_particles.push_back(std::make_tuple(flavourType, pdg_code, daughter_indices));
+      expected_particles.push_back(std::make_tuple(flavourType, pdg_code, std::set<int>(daughter_indices.begin(),
+                                                   daughter_indices.end())));
     }
 
     void addAndCheckParticlesFromGenerator()
@@ -292,16 +303,18 @@ namespace {
         const Particle& particle = generator.getCurrentParticle();
         Particle* part = particles.appendNew(particle);
         added_particles.push_back(part);
-        received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), part->getDaughterIndices()));
+        auto daughter_indices = part->getDaughterIndices();
+        received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
+                                                     daughter_indices.end())));
       }
       EXPECT_FALSE(generator.loadNext());
 
       for (const auto& p : received_particles) {
-        EXPECT_EQ(std::count(expected_particles.begin(), expected_particles.end(), p), 1);
+        EXPECT_EQ(std::count(expected_particles.begin(), expected_particles.end(), p), 1) << "check failed for " << printable(p);
       }
 
       for (const auto& p : expected_particles) {
-        EXPECT_EQ(std::count(received_particles.begin(), received_particles.end(), p), 1);
+        EXPECT_EQ(std::count(received_particles.begin(), received_particles.end(), p), 1) << "check failed for " << printable(p);
         auto it = std::find(received_particles.begin(), received_particles.end(), p);
         if (it != received_particles.end()) {
           auto index = std::distance(received_particles.begin(), it);

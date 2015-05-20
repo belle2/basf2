@@ -59,32 +59,39 @@ void ThreeHitSamplesGeneratorModule::event()
 {
   StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMcontainerName);
 
-  // usage with const pointer. NOTE: the const is important, without it gets called with a reference which doesnot work
+  // loop over all trackCands in the event
   for (int iTC = 0; iTC < spacePointTCs.getEntries(); ++iTC) {
-    B2DEBUG(150, "Calculating purities for SP container " << iTC << ", name: " << spacePointTCs.getName());
-    const SpacePointTrackCand* container = spacePointTCs[iTC];
-    // vector<pair<int, double> > purities = calculatePurity(container);
-    vector<MCVXDPurityInfo> purInfos = createPurityInfos(container);
+    B2DEBUG(15, "Getting training samples from SP container " << iTC << ", name: " << spacePointTCs.getName());
+    const SpacePointTrackCand* fullSPTC = spacePointTCs[iTC];
 
-    for (auto& info : purInfos) {
-      B2DEBUG(499, "PurityInfo: " << info.dumpToString());
-      B2DEBUG(499, "purities: PXD: " << info.getPurityPXD().second << ", SVD U: " << info.getPuritySVDU().second <<
-              ", SVD V: " << info.getPuritySVDV().second << ", overall: " << info.getPurity().second);
+    vector<SpacePointTrackCand> threeHitCombos = splitTrackCandNHitCombos(fullSPTC, 3);
+
+    for (const SpacePointTrackCand& comb : threeHitCombos) {
+      vector<MCVXDPurityInfo> purInfos = createPurityInfos(comb);
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 499, PACKAGENAME())) {
+        for (auto& info : purInfos) {
+          B2DEBUG(499, "PurityInfo: " << info.dumpToString());
+        }
+      }
+
+      addHitCombination(comb, (purInfos[0].getPurity().second == 1), m_combinations);
     }
   }
 
-  // // usage with reference
-  // for (const SpacePointTrackCand& container : spacePointTCs) {
-  //   // vector<pair<int, double> > purities = calculatePurity(container);
-  //   vector<MCVXDPurityInfo> purInfos = createPurityInfos(container);
-  // }
-
+  m_treePtr->Fill();
 }
 
 // ============================================== TERMINATE ===========================================================
 void ThreeHitSamplesGeneratorModule::terminate()
 {
-  // TODO
+  // TODO: info output
+
+  // root file handling
+  if (m_rootFilePtr != NULL && m_treePtr != NULL) {
+    m_rootFilePtr->cd();
+    m_rootFilePtr->Write();
+    m_rootFilePtr->Close();
+  }
 }
 
 // ============================================= INITIALIZE ROOT FILE ==============================================================
@@ -93,5 +100,79 @@ void ThreeHitSamplesGeneratorModule::initializeRootFile(const std::string& filen
   m_rootFilePtr = new TFile(filename.c_str(), writemode.c_str());
   m_treePtr = new TTree("ThreeHitSamplesTree", "three hit training samples");
 
-  // TODO: linking variables
+  m_treePtr->Branch("hit1X", &m_combinations.Hit1X);
+  m_treePtr->Branch("hit1Y", &m_combinations.Hit1Y);
+  m_treePtr->Branch("hit1Z", &m_combinations.Hit1Z);
+
+  m_treePtr->Branch("hit2X", &m_combinations.Hit2X);
+  m_treePtr->Branch("hit2Y", &m_combinations.Hit2Y);
+  m_treePtr->Branch("hit2Z", &m_combinations.Hit2Z);
+
+  m_treePtr->Branch("hit3X", &m_combinations.Hit3X);
+  m_treePtr->Branch("hit3Y", &m_combinations.Hit3Y);
+  m_treePtr->Branch("hit3Z", &m_combinations.Hit3Z);
+
+  m_treePtr->Branch("signal", &m_combinations.Signal);
+}
+
+// ============================================ SPLIT TRACKCAND N HIT COMBOS =======================================================
+std::vector<Belle2::SpacePointTrackCand>
+ThreeHitSamplesGeneratorModule::splitTrackCandNHitCombos(const Belle2::SpacePointTrackCand* trackCand, unsigned nHits)
+{
+  const std::vector<const SpacePoint*> spacePoints = trackCand->getHits();
+
+  B2DEBUG(25, "Now trying to get " << nHits << " hit combinations from trackCand " << trackCand->getArrayIndex() <<
+          ". It contains " << trackCand->getNHits() << " SpacePoints.");
+
+  std::vector<SpacePointTrackCand> combiContainer;
+
+  if (nHits > trackCand->getNHits()) {
+    B2DEBUG(25, "SpacePointTrackCand contains an insufficient number of hits! " << nHits <<
+            " are needed. Returning an empty vector of combinations!");
+    return combiContainer;
+  }
+
+  auto itNHit = spacePoints.begin() + nHits;
+  auto itBegin = spacePoints.begin();
+  while (itNHit != spacePoints.end() + 1) { // constructor from iterators is [first,last)
+    vector<const SpacePoint*> combination(itBegin, itNHit);
+    if (isValidHitCombination(combination)) {
+      combiContainer.push_back(SpacePointTrackCand(combination));
+    }
+
+    itBegin++; itNHit++;
+  }
+
+  B2DEBUG(25, "Created " << combiContainer.size() << " combinations from trackCand " << trackCand->getArrayIndex());
+  return combiContainer;
+}
+
+// ====================================================== IS VALID HIT COMBINATION =================================================
+bool ThreeHitSamplesGeneratorModule::isValidHitCombination(const std::vector<const Belle2::SpacePoint*>&) // no name, no warning
+{
+  // TODO
+  return true;
+}
+
+// ================================================== ADD HIT COMBINATION ==========================================================
+void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointTrackCand& combination, bool signal,
+                                                       RootCombinations& combinations)
+{
+  // TODO: make sure ordering is kept as it should be
+  // TODO: make this less ugly
+  const std::vector<const SpacePoint*>& spacePoints = combination.getHits();
+
+  combinations.Hit1X.push_back(spacePoints[0]->X());
+  combinations.Hit1Y.push_back(spacePoints[0]->Y());
+  combinations.Hit1Z.push_back(spacePoints[0]->Z());
+
+  combinations.Hit2X.push_back(spacePoints[1]->X());
+  combinations.Hit2Y.push_back(spacePoints[1]->Y());
+  combinations.Hit2Z.push_back(spacePoints[1]->Z());
+
+  combinations.Hit3X.push_back(spacePoints[2]->X());
+  combinations.Hit3Y.push_back(spacePoints[2]->Y());
+  combinations.Hit3Z.push_back(spacePoints[2]->Z());
+
+  combinations.Signal.push_back(signal);
 }

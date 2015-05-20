@@ -4,7 +4,7 @@
 # Uses TMVATeacher module to train a classifier to do electron identification
 # using a combination of available PID variables.
 #
-# Use 'showTMVAResults TMVA.root' to view detailed detailed information about
+# Use 'showTMVAResults TMVA_1.root' to view detailed detailed information about
 # a completed training
 
 import sys
@@ -25,7 +25,6 @@ main = create_path()
 
 main.add_module(register_module('RootInput'))
 main.add_module(register_module('Gearbox'))
-main.add_module(register_module('ParticleLoader'))
 
 if not os.path.isfile("input.root"):
     # Train TMVA Teacher using all electron candidates as input data
@@ -33,7 +32,7 @@ if not os.path.isfile("input.root"):
     fillParticleList('K-', 'Kid > 0.1', path=main)
     fillParticleList('pi+', 'piid > 0.1', path=main)
 
-    # the vertex fit changes the mass a bit, if we cut later, the bins
+    # the vertex fit changes the mass a bit; if we cut later, the bins
     # at the edges will have fewer statistics because of that. Thus,
     # take a bit more, 0.0025 GeV, on each side, and cut it after the fit.
     reconstructDecay('D0:raw -> K- pi+', '1.8275 < M < 1.9025', path=main)
@@ -44,7 +43,7 @@ if not os.path.isfile("input.root"):
     matchMCTruth('D0', path=main)
 
 
-# Define Variables
+# Define variables used in the trainings.
 variables = ['daughter(0, Kid)', 'daughter(1, piid)',
              'decayAngle(0)',
              'daughter(0, dr)', 'daughter(0, dz)',
@@ -54,12 +53,12 @@ variables = ['daughter(0, Kid)', 'daughter(1, piid)',
              'dr', 'dz', 'chiProb', 'significanceOfDistance',
              'VertexZDist']
 
-
+# Define variables used to calculate sWeights.
 discriminatingVariables = ['M']
-# Dictionary which defines the PDF for each variable. Currently the PDF is represented
-# by a list of float values.
+
 # Define one or multiple methods.
-# Every definition consists of 3 string. First the name of the method, secondly the type and thirdly a TMVA config string
+# Every definition consists of 3 strings: first the name of the method;
+# secondly the type; and thirdly a TMVA config string.
 methods = [
     ('BDTStochastic',
      'BDT',
@@ -86,14 +85,14 @@ methods = [
 
 
 #
-# construct PDF
+# Construct PDF for sPlot.
 #
 
-# observable
+# Define observable.
 M = RooRealVar("M", "M", 1.83, 1.9)
 M.setBins(250)
 
-# Setup component PDFs
+# Setup component PDFs.
 mD0 = RooRealVar("mD0", "D0 Mass", 1.865)
 sigmaD0 = RooRealVar("sigmaD0", "Width of Gaussian", 0.025)
 sig = RooGaussian("sig", "D0 Model", M, mD0, sigmaD0)
@@ -106,10 +105,11 @@ a0.setConstant(kFALSE)
 a1.setConstant(kFALSE)
 bkg = RooChebychev("bkg", "Background", M, RooArgList(a0, a1))
 
-# Add signal and background
-# initial value and maximal value will be set inside TMVASPlotTeacher
-bkgfrac = RooRealVar("bkgfrac", "fraction of background", 42, 0., 42)
-sigfrac = RooRealVar("sigfrac", "fraction of background", 42, 0., 42)
+# Add signal and background.
+# Initial value and maximum value will be set inside TMVASPlotTeacher.
+dummy = 42
+bkgfrac = RooRealVar("bkgfrac", "fraction of background", dummy, 0., dummy)
+sigfrac = RooRealVar("sigfrac", "fraction of background", dummy, 0., dummy)
 
 # Parameters for TMVASPlotTeacher
 modelYieldsObjectNames = ['bkgfrac', 'sigfrac']
@@ -121,7 +121,7 @@ sigfrac.setConstant(kFALSE)
 
 model = RooAddPdf(modelObjectName, "bkg+sig", RooArgList(bkg, sig), RooArgList(bkgfrac, sigfrac))
 
-# Write model to file and close the file, so TMVASPlotTeacher can open it
+# Write model to file and close the file, so TMVASPlotTeacher can open it.
 modelFile = TFile(modelFileName, "RECREATE")
 model.Write(modelObjectName)
 modelFile.ls()
@@ -175,5 +175,5 @@ process(main)
 print statistics
 
 B2INFO("")
-B2INFO("Training completed. Run 'showTMVAresults TMVA_1.root' to view detailed"
+B2INFO("Training completed. Run 'showTMVAResults TMVA_1.root' to view detailed"
        " information about the trained methods.")

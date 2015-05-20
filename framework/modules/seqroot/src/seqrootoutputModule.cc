@@ -158,10 +158,7 @@ void SeqRootOutputModule::writeStreamerInfos()
   DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
 
   for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
-    TClass* entryClass = iter->second.object->IsA();
-    if (iter->second.isArray) {
-      entryClass = static_cast<TClonesArray*>(iter->second.object)->GetClass();
-    }
+    const TClass* entryClass = iter->second.objClass;
     TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
 
     printf("durability %d Class Name %s\n", durability,  entryClass->GetName());

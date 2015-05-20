@@ -22,22 +22,22 @@ namespace Belle2 {
   void ParticleIndexGenerator::init(const std::vector<unsigned>& _sizes)
   {
 
-    numberOfLists = _sizes.size();
+    m_numberOfLists = _sizes.size();
     sizes = _sizes;
 
-    iCombination = 0;
+    m_iCombination = 0;
 
-    indices.resize(numberOfLists);
-    for (unsigned int i = 0; i < numberOfLists; ++i) {
+    indices.resize(m_numberOfLists);
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
       indices[i] = 0;
     }
 
-    nCombinations = 1;
-    for (unsigned int i = 0; i < numberOfLists; ++i)
-      nCombinations *= sizes[i];
+    m_nCombinations = 1;
+    for (unsigned int i = 0; i < m_numberOfLists; ++i)
+      m_nCombinations *= sizes[i];
 
-    if (numberOfLists == 0) {
-      nCombinations = 0;
+    if (m_numberOfLists == 0) {
+      m_nCombinations = 0;
     }
 
   }
@@ -45,13 +45,13 @@ namespace Belle2 {
   bool ParticleIndexGenerator::loadNext()
   {
 
-    if (iCombination == nCombinations) {
+    if (m_iCombination == m_nCombinations) {
       return false;
     }
 
-    if (iCombination > 0) {
+    if (m_iCombination > 0) {
 
-      for (unsigned int i = 0; i < numberOfLists; i++) {
+      for (unsigned int i = 0; i < m_numberOfLists; i++) {
         indices[i]++;
         if (indices[i] < sizes[i]) break;
         indices[i] = 0;
@@ -59,7 +59,7 @@ namespace Belle2 {
 
     }
 
-    iCombination++;
+    m_iCombination++;
     return true;
   }
 
@@ -70,35 +70,36 @@ namespace Belle2 {
 
   void ListIndexGenerator::init(unsigned int _numberOfLists)
   {
-    numberOfLists = _numberOfLists;
-    types.resize(numberOfLists);
+    m_numberOfLists = _numberOfLists;
+    m_types.resize(m_numberOfLists);
 
-    iCombination = 0;
-    nCombinations = (1 << numberOfLists) - 1;
+    m_iCombination = 0;
+    m_nCombinations = (1 << m_numberOfLists) - 1;
 
   }
 
   bool ListIndexGenerator::loadNext()
   {
 
-    if (iCombination == nCombinations)
+    if (m_iCombination == m_nCombinations)
       return false;
 
-    for (unsigned int i = 0; i < numberOfLists; ++i) {
-      bool useSelfConjugatedDaughterList = (iCombination & (1 << i));
-      types[i] = useSelfConjugatedDaughterList ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_FlavorSpecificParticle;
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      bool useSelfConjugatedDaughterList = (m_iCombination & (1 << i));
+      m_types[i] = useSelfConjugatedDaughterList ? ParticleList::c_SelfConjugatedParticle : ParticleList::c_FlavorSpecificParticle;
     }
 
-    ++iCombination;
+    ++m_iCombination;
     return true;
   }
 
   const std::vector<ParticleList::EParticleType>& ListIndexGenerator::getCurrentIndices() const
   {
-    return types;
+    return m_types;
   }
 
-  ParticleGenerator::ParticleGenerator(std::string decayString) : iParticleType(0), listIndexGenerator(), particleIndexGenerator()
+  ParticleGenerator::ParticleGenerator(std::string decayString) : m_iParticleType(0), m_listIndexGenerator(),
+    m_particleIndexGenerator()
   {
 
     DecayDescriptor decaydescriptor;
@@ -111,8 +112,8 @@ namespace Belle2 {
     m_pdgCode = mother->getPDGCode();
 
     // Daughters
-    numberOfLists = decaydescriptor.getNDaughters();
-    for (unsigned int i = 0; i < numberOfLists; ++i) {
+    m_numberOfLists = decaydescriptor.getNDaughters();
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
@@ -124,13 +125,13 @@ namespace Belle2 {
 
   void ParticleGenerator::init()
   {
-    iParticleType = 0;
+    m_iParticleType = 0;
 
-    particleIndexGenerator.init(std::vector<unsigned int> {}); // ParticleIndexGenerator will be initialised on first call
-    listIndexGenerator.init(numberOfLists); // ListIndexGenerator must be initialised here!
+    m_particleIndexGenerator.init(std::vector<unsigned int> {}); // ParticleIndexGenerator will be initialised on first call
+    m_listIndexGenerator.init(m_numberOfLists); // ListIndexGenerator must be initialised here!
     m_usedCombinations.clear();
-    m_indices.resize(numberOfLists);
-    m_particles.resize(numberOfLists);
+    m_indices.resize(m_numberOfLists);
+    m_particles.resize(m_numberOfLists);
   }
 
   bool ParticleGenerator::loadNext()
@@ -138,7 +139,7 @@ namespace Belle2 {
 
     bool loadedNext = false;
     while (true) {
-      switch (iParticleType) {
+      switch (m_iParticleType) {
         case 0: loadedNext = loadNextParticle(true); break; //Anti-Particles
         case 1: loadedNext = loadNextParticle(false); break; //Particles
         case 2: loadedNext = loadNextSelfConjugatedParticle(); break;
@@ -146,16 +147,16 @@ namespace Belle2 {
       }
       if (loadedNext)
         return true;
-      ++iParticleType;
+      ++m_iParticleType;
 
-      if (iParticleType == 2) {
-        std::vector<unsigned int> sizes(numberOfLists);
-        for (unsigned int i = 0; i < numberOfLists; ++i) {
+      if (m_iParticleType == 2) {
+        std::vector<unsigned int> sizes(m_numberOfLists);
+        for (unsigned int i = 0; i < m_numberOfLists; ++i) {
           sizes[i] = m_plists[i]->getList(ParticleList::c_SelfConjugatedParticle, false).size();
         }
-        particleIndexGenerator.init(sizes);
+        m_particleIndexGenerator.init(sizes);
       } else {
-        listIndexGenerator.init(numberOfLists);
+        m_listIndexGenerator.init(m_numberOfLists);
       }
 
     }
@@ -163,17 +164,16 @@ namespace Belle2 {
 
   bool ParticleGenerator::loadNextParticle(bool useAntiParticle)
   {
-
     while (true) {
 
       // Load next index combination if available
-      if (particleIndexGenerator.loadNext()) {
+      if (m_particleIndexGenerator.loadNext()) {
 
-        const auto& types = listIndexGenerator.getCurrentIndices();
-        const auto& indices = particleIndexGenerator.getCurrentIndices();
+        const auto& m_types = m_listIndexGenerator.getCurrentIndices();
+        const auto& indices = m_particleIndexGenerator.getCurrentIndices();
 
-        for (unsigned int i = 0; i < numberOfLists; i++) {
-          const auto& list = m_plists[i]->getList(types[i], types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false);
+        for (unsigned int i = 0; i < m_numberOfLists; i++) {
+          const auto& list = m_plists[i]->getList(m_types[i], m_types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false);
           m_indices[i] =  list[ indices[i] ];
           m_particles[i] = m_particleArray[ m_indices[i] ];
         }
@@ -184,13 +184,13 @@ namespace Belle2 {
       }
 
       // Load next list combination if available and reset indexCombiner
-      if (listIndexGenerator.loadNext()) {
-        const auto& types = listIndexGenerator.getCurrentIndices();
-        std::vector<unsigned int> sizes(numberOfLists);
-        for (unsigned int i = 0; i < numberOfLists; ++i) {
-          sizes[i] = m_plists[i]->getList(types[i], types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false).size();
+      if (m_listIndexGenerator.loadNext()) {
+        const auto& m_types = m_listIndexGenerator.getCurrentIndices();
+        std::vector<unsigned int> sizes(m_numberOfLists);
+        for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+          sizes[i] = m_plists[i]->getList(m_types[i], m_types[i] == ParticleList::c_FlavorSpecificParticle ? useAntiParticle : false).size();
         }
-        particleIndexGenerator.init(sizes);
+        m_particleIndexGenerator.init(sizes);
         continue;
       }
       return false;
@@ -203,11 +203,11 @@ namespace Belle2 {
     while (true) {
 
       // Load next index combination if available
-      if (particleIndexGenerator.loadNext()) {
+      if (m_particleIndexGenerator.loadNext()) {
 
-        const auto& indices = particleIndexGenerator.getCurrentIndices();
+        const auto& indices = m_particleIndexGenerator.getCurrentIndices();
 
-        for (unsigned int i = 0; i < numberOfLists; i++) {
+        for (unsigned int i = 0; i < m_numberOfLists; i++) {
           m_indices[i] = m_plists[i]->getList(ParticleList::c_SelfConjugatedParticle, false) [ indices[i] ];
           m_particles[i] = m_particleArray[ m_indices[i] ];
         }
@@ -231,7 +231,7 @@ namespace Belle2 {
       vec += m_particles[i]->get4Vector();
     }
 
-    switch (iParticleType) {
+    switch (m_iParticleType) {
       case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,

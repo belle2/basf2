@@ -26,7 +26,8 @@ namespace std {
   /** Hash function used by unordered_set. */
   template<> struct hash<std::set<int>> {
     /** Actual work done by boost. */
-    std::size_t operator()(const std::set<int>& v) const {
+    std::size_t operator()(const std::set<int>& v) const
+    {
       return boost::hash_value(v);
     }
   };
@@ -61,9 +62,9 @@ namespace Belle2 {
 
   private:
 
-    unsigned int numberOfLists;  /**< Number of lists which are combined */
-    unsigned int iCombination;         /**< The current position of the combination */
-    unsigned int nCombinations;        /**< The total amount of combinations */
+    unsigned int m_numberOfLists;  /**< Number of lists which are combined */
+    unsigned int m_iCombination;         /**< The current position of the combination */
+    unsigned int m_nCombinations;        /**< The total amount of combinations */
     std::vector<unsigned int> indices; /**< The indices of the current loaded combination */
     std::vector<unsigned int> sizes;   /**< The sizes of the particle lists which are combined */
 
@@ -98,10 +99,10 @@ namespace Belle2 {
 
   private:
 
-    unsigned int numberOfLists; /**< Number of lists which are combined */
-    unsigned int iCombination; /**< The current position of the combination */
-    unsigned int nCombinations; /**< The total amount of combinations */
-    std::vector<ParticleList::EParticleType> types; /**< The current types of sublist of the ParticleLists for this combination */
+    unsigned int m_numberOfLists; /**< Number of lists which are combined */
+    unsigned int m_iCombination; /**< The current position of the combination */
+    unsigned int m_nCombinations; /**< The total amount of combinations */
+    std::vector<ParticleList::EParticleType> m_types; /**< The current types of sublist of the ParticleLists for this combination */
 
   };
 
@@ -160,13 +161,15 @@ namespace Belle2 {
 
     int m_pdgCode; /**< PDG Code of the particle which is combined */
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
-    unsigned int iParticleType; /**< The type of particle which is currently generated */
+    unsigned int m_iParticleType; /**< The type of particle which is currently generated */
 
-    unsigned int numberOfLists; /**< Number of lists which are combined */
+    unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */
 
-    ListIndexGenerator listIndexGenerator;   /**< listIndexGenerator makes the combinations of the types of sublists of the ParticleLists */
-    ParticleIndexGenerator particleIndexGenerator; /**< particleIndexGenerator makes the combinations of indices stored in the sublists of the ParticleLists */
+    ListIndexGenerator
+    m_listIndexGenerator;   /**< listIndexGenerator makes the combinations of the types of sublists of the ParticleLists */
+    ParticleIndexGenerator
+    m_particleIndexGenerator; /**< particleIndexGenerator makes the combinations of indices stored in the sublists of the ParticleLists */
 
     const StoreArray<Particle> m_particleArray; /**< Global list of particles. */
     std::vector<Particle*> m_particles; /**< Pointers to the particle objects of the current combination */

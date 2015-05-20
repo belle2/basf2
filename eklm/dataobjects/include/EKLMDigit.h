@@ -27,7 +27,7 @@ namespace Belle2 {
    * hitted strips.
    */
   class EKLMDigit : public RelationsObject, public EKLMHitBase,
-    public EKLMHitCoord, public EKLMHitMCTime {
+    public EKLMHitGlobalCoord, public EKLMHitMCTime {
 
   public:
 
@@ -172,7 +172,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 2);
+    ClassDef(Belle2::EKLMDigit, 3);
 
   };
 

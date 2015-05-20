@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef TRACKFINDERCDCSEGMENTTRIPLEAUTOMATONMODULE_H_
-#define TRACKFINDERCDCSEGMENTTRIPLEAUTOMATONMODULE_H_
 
 #include <tracking/trackFindingCDC/creators/TrackCreator.h>
 
@@ -271,11 +269,4 @@ namespace Belle2 {
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif // TRACKFINDERCDCSEGMENTTRIPLEAUTOMATONMODULE_H_
-
-
-
-
-
 

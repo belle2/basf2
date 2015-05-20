@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef AUTOMATONCELL_H
-#define AUTOMATONCELL_H
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -204,14 +202,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // AUTOMATONCELL
-
-
-
-
-
-
-
-
-
-

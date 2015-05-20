@@ -1,6 +1,4 @@
 #pragma once
-#ifndef V0FINDERMODULE_H
-#define V0FINDERMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -54,4 +52,3 @@ namespace Belle2 {
 
   };
 }
-#endif

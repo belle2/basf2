@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef TRACKMERGER_H_
-#define TRACKMERGER_H_
 
 #include <vector>
 
@@ -74,4 +72,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //FACETSEGMENTWORKER_H_

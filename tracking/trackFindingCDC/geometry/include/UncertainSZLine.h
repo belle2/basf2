@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef UNCERTAINSZLINE_H
-#define UNCERTAINSZLINE_H
 
 #include <cmath>
 
@@ -170,4 +168,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // UNCERTAINSZLINE

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef WEIGHTEDNEIGHBORHOOD_H
-#define WEIGHTEDNEIGHBORHOOD_H
 
 #include <tracking/trackFindingCDC/algorithms/Relation.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -425,4 +423,3 @@ namespace Belle2 {
     }; //class
   } // end namespace WeightedNeighborhood
 } // namespace Belle2
-#endif // WEIGHTEDNEIGHBORHOOD_H_

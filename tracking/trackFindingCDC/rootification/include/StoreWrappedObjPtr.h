@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef STOREWRAPPEDOBJPTR_H_
-#define STOREWRAPPEDOBJPTR_H_
 
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -127,4 +125,3 @@ namespace Belle2 {
 } //end namespace Belle2
 
 
-#endif // STOREWRAPPEDOBJPTR_H_

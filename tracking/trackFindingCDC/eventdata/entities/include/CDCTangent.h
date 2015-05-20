@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRECOHITTANGENT_H
-#define CDCRECOHITTANGENT_H
 
 #include <vector>
 
@@ -199,4 +197,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCRECOHITTANGENT_H

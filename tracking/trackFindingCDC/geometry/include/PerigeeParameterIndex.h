@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef PERIGEEPARAMETERINDEX_H
-#define PERIGEEPARAMETERINDEX_H
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
@@ -33,4 +31,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // PERIGEEPARAMETERINDEX_H

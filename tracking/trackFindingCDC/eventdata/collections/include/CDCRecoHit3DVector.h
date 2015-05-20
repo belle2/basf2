@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRECOHIT3DVECTOR_H
-#define CDCRECOHIT3DVECTOR_H
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -45,4 +43,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 } // namespace Belle2
 
-#endif // CDCRECOHIT3DVECTOR_H

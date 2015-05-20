@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SEGMENTTRIPLECREATOR_H_
-#define SEGMENTTRIPLECREATOR_H_
 
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -273,4 +271,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //SEGMENTTRIPLECREATOR_H_

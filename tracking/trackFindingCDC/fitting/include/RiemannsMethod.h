@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef RIEMANNSMETHOD_H
-#define RIEMANNSMETHOD_H
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -70,4 +68,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // RIEMANNSMETHOD

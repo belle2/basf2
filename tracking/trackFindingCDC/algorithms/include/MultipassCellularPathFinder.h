@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef MULTIPASSCELLULARPATHFINDER_H
-#define MULTIPASSCELLULARPATHFINDER_H
 
 #include <tracking/trackFindingCDC/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingCDC/algorithms/CellularPathFollower.h>
@@ -111,4 +109,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif //MULTIPASSCELLULARPATHFINDER_H

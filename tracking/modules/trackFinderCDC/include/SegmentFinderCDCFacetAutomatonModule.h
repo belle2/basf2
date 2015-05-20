@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SEGMENTFINDERCDCFACETAUTOMATONMODULE_H_
-#define SEGMENTFINDERCDCFACETAUTOMATONMODULE_H_
 
 #include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
@@ -479,4 +477,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif // SEGMENTFINDERCDCFACETAUTOMATONMODULE_H_

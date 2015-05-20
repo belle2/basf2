@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef ISUPERLAYERTYPE_H
-#define ISUPERLAYERTYPE_H
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
@@ -48,4 +46,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 
 } // namespace Belle2
-#endif // ISUPERLAYERTYPE_H

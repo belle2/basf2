@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#ifndef SIMPLESEGMENTTRIPLENEIGHBORCHOOSER_H_
-#define SIMPLESEGMENTTRIPLENEIGHBORCHOOSER_H_
 
 #include <tracking/trackFindingCDC/filters/segment_triple_relation/BaseSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
@@ -39,4 +37,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //SIMPLESEGMENTTRIPLENEIGHBORCHOOSER_H_

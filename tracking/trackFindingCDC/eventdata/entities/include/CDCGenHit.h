@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef CDCGENHIT_H
-#define CDCGENHIT_H
 
 #include <TVector2.h>
 
@@ -147,6 +145,4 @@ namespace Belle2 {
     }; //end class GenHit
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-
-#endif //CDCGENHIT_H
 

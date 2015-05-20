@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef TRACKCREATOR_H_
-#define TRACKCREATOR_H_
 
 #include <vector>
 
@@ -145,4 +143,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //TRACKCREATOR_H_

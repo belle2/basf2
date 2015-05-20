@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef CLUSTERIZER_H_
-#define CLUSTERIZER_H_
 
 #include <boost/foreach.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -268,4 +266,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //CLUSTERIZER_H_

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef TRACKFINDERCDCCOSMICSMODULE_H_
-#define TRACKFINDERCDCCOSMICSMODULE_H_
 
 //#define LOG_NO_B2DEBUG
 
@@ -40,6 +38,4 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-#endif /* TRACKFINDERCDCCOSMICSMODULE_H_ */
 

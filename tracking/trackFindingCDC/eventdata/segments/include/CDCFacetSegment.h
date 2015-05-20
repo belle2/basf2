@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCFACETSEGMENT_H
-#define CDCFACETSEGMENT_H
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCFacetVector.h>
 
@@ -23,9 +21,5 @@ namespace Belle2 {
 
   }
 }
-
-
-#endif // CDCFACETSEGMENT
-
 
 

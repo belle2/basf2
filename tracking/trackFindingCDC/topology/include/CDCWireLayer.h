@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIRELAYER_H
-#define CDCWIRELAYER_H
 
 #include <TVector3.h>
 
@@ -315,4 +313,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCWIRELAYER

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCAXIALSTEREOSEGMENTPAIR_H
-#define CDCAXIALSTEREOSEGMENTPAIR_H
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -257,4 +255,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
-#endif // CDCAXIALSTEREOSEGMENTPAIR_H

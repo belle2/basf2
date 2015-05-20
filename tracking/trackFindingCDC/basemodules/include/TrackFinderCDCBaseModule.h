@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef TRACKFINDERCDCBASEMODULE_H_
-#define TRACKFINDERCDCBASEMODULE_H_
 
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -163,6 +161,4 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif /* TRACKFINDERCDCBASEMODULE_H_ */
 

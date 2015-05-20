@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRECOSEGMENT2D_H_
-#define CDCRECOSEGMENT2D_H_
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -226,4 +224,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
-#endif // CDCRECOSEGMENT2D_H_

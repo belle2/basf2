@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef SINEQLINE_H_
-#define SINEQLINE_H_
 
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -177,4 +175,3 @@ namespace Belle2 {
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
 
-#endif // SINEQLINE_H_

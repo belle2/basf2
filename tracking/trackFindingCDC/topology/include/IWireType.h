@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef IWIRETYPE_H
-#define IWIRETYPE_H
 
 
 
@@ -30,4 +28,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 
 } // namespace Belle2
-#endif // WIRETYPE_H

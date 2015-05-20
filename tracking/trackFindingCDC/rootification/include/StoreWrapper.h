@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef STOREWRAPPER_H_
-#define STOREWRAPPER_H_
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
@@ -76,4 +74,3 @@ namespace Belle2 {
 } //end namespace Belle2
 
 
-#endif // STOREWRAPPER_H_

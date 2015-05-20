@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIRE_H
-#define CDCWIRE_H
 
 #include <vector>
 #include <iostream>
@@ -380,4 +378,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCWIRE_H

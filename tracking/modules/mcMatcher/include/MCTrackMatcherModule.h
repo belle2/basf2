@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef MCTRACKMATCHER_H_
-#define MCTRACKMATCHER_H_
 
 #include <tracking/modules/mcMatcher/MCMatcherTracksModule.h>
 
@@ -21,4 +19,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* MCTRACKMATCHER_H_ */

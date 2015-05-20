@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CIRCLE2D_H
-#define CIRCLE2D_H
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -267,4 +265,3 @@ namespace Belle2 {
     }; //class
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CIRCLE2D

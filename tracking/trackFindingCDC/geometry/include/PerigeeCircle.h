@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef PERIGEECIRCLE_H
-#define PERIGEECIRCLE_H
 
 #include <cmath>
 
@@ -345,4 +343,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // PERIGEECIRCLE_H

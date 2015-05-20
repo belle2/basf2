@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef TRACKFINDERCDCFROMSEGMENTSMODULE_H_
-#define TRACKFINDERCDCFROMSEGMENTSMODULE_H_
 
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
@@ -48,4 +46,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif // TRACKFINDERCDCFROMSEGMENTSMODULE_H_

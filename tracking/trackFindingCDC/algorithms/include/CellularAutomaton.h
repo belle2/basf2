@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef CELLULARAUTOMATON_H
-#define CELLULARAUTOMATON_H
 
 #include <vector>
 #include <boost/foreach.hpp>
@@ -337,4 +335,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif //CELLULARAUTOMATON_H

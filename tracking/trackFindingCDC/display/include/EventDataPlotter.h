@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef EVENTDATAPLOTTER_H_
-#define EVENTDATAPLOTTER_H_
 
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -241,4 +239,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // EVENTDATAPLOTTER_H_

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCCOLLECTIONS_H
-#define CDCCOLLECTIONS_H
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
@@ -28,6 +26,4 @@
 
 //#include "CDCFacetSet.h"
 #include <tracking/trackFindingCDC/eventdata/collections/CDCFacetVector.h>
-
-#endif //CDCCOLLECTIONS_H
 

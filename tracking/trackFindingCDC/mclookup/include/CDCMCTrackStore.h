@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCMCTRACKSTORE_H
-#define CDCMCTRACKSTORE_H
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
@@ -122,4 +120,3 @@ namespace Belle2 {
     }; //class CDCMCTrackStore
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCMCTRACKSTORE

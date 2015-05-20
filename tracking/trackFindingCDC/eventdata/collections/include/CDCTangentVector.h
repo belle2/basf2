@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCTANGENTVECTOR_H
-#define CDCTANGENTVECTOR_H
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
@@ -37,4 +35,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCTANGENTVECTOR_H

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRLWIREHITPAIR_H
-#define CDCRLWIREHITPAIR_H
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 
@@ -184,4 +182,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //CDCRLWIREHITPAIR_H

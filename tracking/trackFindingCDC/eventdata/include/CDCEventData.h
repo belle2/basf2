@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCEVENTDATA_H
-#define CDCEVENTDATA_H
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
@@ -29,6 +27,4 @@ namespace Belle2 {
   }
 }
 
-
-#endif //CDCEVENTDATA_H
 

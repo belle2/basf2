@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCENTITIES_H
-#define CDCENTITIES_H
 
 //Convenience header
 #include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
@@ -23,4 +21,3 @@
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
 
-#endif //CDCENTITIES_H

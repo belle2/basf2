@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef SVGPRIMITIVEPLOTTER_H_
-#define SVGPRIMITIVEPLOTTER_H_
 
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 
@@ -240,4 +238,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // SVGPRIMITIVEPLOTTER_H_

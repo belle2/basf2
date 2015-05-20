@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef GENERALIZEDCIRCLE_H
-#define GENERALIZEDCIRCLE_H
 
 #include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 #include <tracking/trackFindingCDC/geometry/Circle2D.h>
@@ -603,4 +601,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // GENERALIZEDCIRCLE_H

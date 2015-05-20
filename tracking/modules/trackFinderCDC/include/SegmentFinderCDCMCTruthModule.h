@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SEGMENTFINDERCDCMCTRUTHMODULE_H_
-#define SEGMENTFINDERCDCMCTRUTHMODULE_H_
 
 #include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
 
@@ -38,4 +36,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif // SEGMENTFINDERCDCMCTRUTHMODULE_H_

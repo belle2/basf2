@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef HELIXPARAMETERINDEX_H
-#define HELIXPARAMETERINDEX_H
 
 #include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
@@ -35,4 +33,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // HELIXPARAMETERINDEX_H

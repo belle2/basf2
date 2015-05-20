@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCSEGMENTS_H
-#define CDCSEGMENTS_H
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
@@ -26,9 +24,5 @@ namespace Belle2 {
 
   }
 }
-
-
-#endif //CDCSEGMENTS_H
-
 
 

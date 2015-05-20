@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef AXIALSTEREOSEGMENTPAIRCREATOR_H
-#define AXIALSTEREOSEGMENTPAIRCREATOR_H
 
 #include <boost/range/iterator_range.hpp>
 
@@ -165,4 +163,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif // AXIALSTEREOSEGMENTPAIRCREATOR_H

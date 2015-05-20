@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef INFOTYPES_H
-#define INFOTYPES_H
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
@@ -85,4 +83,3 @@ namespace Belle2 {
 
   }
 } // namespace Belle2
-#endif // INFOTYPES_H

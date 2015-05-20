@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef STEREOTYPES_H
-#define STEREOTYPES_H
 
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
 
@@ -36,4 +34,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // STEREOTYPES

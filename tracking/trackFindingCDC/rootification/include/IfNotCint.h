@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef IFNOTCINT_H_
-#define IFNOTCINT_H_
 
 #ifdef __CINT__
 #define IF_NOT_CINT(x)
@@ -18,4 +16,3 @@
 #define IF_NOT_CINT(x) x
 #endif
 
-#endif

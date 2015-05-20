@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef NUMERICS_H
-#define NUMERICS_H
 
 #include <math.h>
 #include <utility>
@@ -115,4 +113,3 @@ namespace Belle2 {
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
 
-#endif // NUMERICS_H

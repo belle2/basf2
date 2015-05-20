@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef PARAMETERLINE2D_H
-#define PARAMETERLINE2D_H
 
 #include <TVector3.h>
 
@@ -281,4 +279,3 @@ namespace Belle2 {
     }; //class
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // PARAMETERLINE2D

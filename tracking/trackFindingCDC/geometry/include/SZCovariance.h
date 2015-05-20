@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef SZCOVARIANCE_H
-#define SZCOVARIANCE_H
 
 #include <cmath>
 #include <iostream>
@@ -153,4 +151,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // SZCOVARIANCE_H

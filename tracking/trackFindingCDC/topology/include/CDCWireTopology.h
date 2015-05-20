@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIRETOPOLOGY_H
-#define CDCWIRETOPOLOGY_H
 
 #include <algorithm>
 #include <set>
@@ -619,4 +617,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCWIRETOPOLOGY

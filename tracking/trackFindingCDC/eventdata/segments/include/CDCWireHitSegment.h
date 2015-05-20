@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIREHITSEGMENT_H_
-#define CDCWIREHITSEGMENT_H_
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
@@ -89,4 +87,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
-#endif // CDCWIREHITSEGMENT_H_

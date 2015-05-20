@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FACETCREATOR_H_
-#define FACETCREATOR_H_
 
 #include <vector>
 #include <set>
@@ -140,4 +138,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //FACETCREATOR_H_

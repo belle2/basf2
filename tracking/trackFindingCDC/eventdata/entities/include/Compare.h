@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef CDCENTITIESCOMPARE_H
-#define CDCENTITIESCOMPARE_H
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
 
@@ -74,4 +72,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //CDCENTITIESCOMPARE_H

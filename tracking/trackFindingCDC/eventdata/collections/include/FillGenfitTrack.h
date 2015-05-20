@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef FILLGENFITTRACK_H_
-#define FILLGENFITTRACK_H_
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
@@ -77,4 +75,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 } // namespace Belle2
 
-#endif // FILLGENFITTRACK_H_

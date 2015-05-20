@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIREUNPACKEDFROMNAMESPACES_H
-#define CDCWIREUNPACKEDFROMNAMESPACES_H
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
@@ -22,4 +20,3 @@ typedef Belle2::TrackFindingCDC::CDCWire CDCWire;
 
 #endif // __CINT__
 
-#endif //CDCWIREUNPACKEDFROMNAMESPACES_H

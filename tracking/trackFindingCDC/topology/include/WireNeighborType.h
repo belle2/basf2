@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef WIRENEIGHBORTYPE_H
-#define WIRENEIGHBORTYPE_H
 
 namespace Belle2 {
 
@@ -43,4 +41,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // WIRENEIGHBORTYPE_H

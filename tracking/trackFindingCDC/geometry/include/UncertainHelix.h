@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef UNCERTAINHELIX_H
-#define UNCERTAINHELIX_H
 
 #include <cmath>
 #include <TMatrixD.h>
@@ -201,4 +199,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // UNCERTAINHELIX

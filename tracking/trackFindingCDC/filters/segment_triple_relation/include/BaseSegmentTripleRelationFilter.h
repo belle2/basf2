@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
-#define BASESEGMENTTRIPLENEIGHBORCHOOSER_H_
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
@@ -81,4 +79,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //BASESEGMENTTRIPLENEIGHBORCHOOSER_H_

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef BASICTYPES_H
-#define BASICTYPES_H
 
 #include <cstddef> //for size_t
 #include <cstdlib> //for abs
@@ -52,4 +50,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 
 } // namespace Belle2
-#endif // BASICTYPES

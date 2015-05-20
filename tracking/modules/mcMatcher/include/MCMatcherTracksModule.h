@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef MCMATCHERTRACKSMODULE_H_
-#define MCMATCHERTRACKSMODULE_H_
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -182,6 +180,4 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-#endif /* MCMATCHERTRACKSMODULE_H_ */
 

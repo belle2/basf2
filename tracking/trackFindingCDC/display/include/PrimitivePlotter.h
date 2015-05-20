@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef PRIMITIVEPLOTTER_H_
-#define PRIMITIVEPLOTTER_H_
 
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
@@ -202,4 +200,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // PRIMITIVEPLOTTER_H_

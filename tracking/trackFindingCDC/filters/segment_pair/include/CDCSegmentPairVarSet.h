@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCAXIALSTEREOSEGMENTPAIRVARSET_H
-#define CDCAXIALSTEREOSEGMENTPAIRVARSET_H
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
@@ -141,4 +139,3 @@ namespace Belle2 {
 }
 
 
-#endif // CDCAXIALSTEREOSEGMENTPAIRVARSET_H

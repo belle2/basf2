@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef VECTOR3D_H
-#define VECTOR3D_H
 
 #include <math.h>
 #include <iostream>
@@ -360,4 +358,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // VECTOR3D_H

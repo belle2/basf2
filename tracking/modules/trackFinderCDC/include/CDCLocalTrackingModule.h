@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef TRACKFINDINGCDCMODULE_H_
-#define TRACKFINDINGCDCMODULE_H_
 
 // Base track finder module
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCAutomatonModule.h>
@@ -28,6 +26,4 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-#endif /*  TRACKFINDINGCDCMODULE_H_ */
 

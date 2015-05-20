@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef EVALVARIADIC_H
-#define EVALVARIADIC_H
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -63,4 +61,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // EVALVARIADIC_H

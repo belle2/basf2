@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCTRAJECTORY2D_H
-#define CDCTRAJECTORY2D_H
 
 #include <cmath>
 #include <TMath.h>
@@ -475,4 +473,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCTRAJECTORY2D_H

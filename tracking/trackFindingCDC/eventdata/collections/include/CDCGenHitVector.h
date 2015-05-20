@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCGENHITVECTOR_H
-#define CDCGENHITVECTOR_H
 
 #include <vector>
 #include <algorithm>
@@ -228,4 +226,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 } // namespace Belle2
 
-#endif // CDCGENHITVECTOR_H

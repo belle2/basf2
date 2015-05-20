@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRECOHIT2D_H
-#define CDCRECOHIT2D_H
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
@@ -274,4 +272,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCRECOHIT2D_H

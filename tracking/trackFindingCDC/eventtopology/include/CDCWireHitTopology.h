@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIREHITTOPOLOGY_H
-#define CDCWIREHITTOPOLOGY_H
 
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -178,4 +176,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCWIREHITTOPOLOGY_H

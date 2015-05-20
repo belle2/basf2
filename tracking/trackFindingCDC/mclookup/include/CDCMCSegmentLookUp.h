@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCMCSEGMENTLOOKUP_H
-#define CDCMCSEGMENTLOOKUP_H
 
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
@@ -204,4 +202,3 @@ namespace Belle2 {
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCMCSEGMENTLOOKUP

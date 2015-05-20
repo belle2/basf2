@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCENTITIESUNPACKEDFROMNAMESPACES_H
-#define CDCENTITIESUNPACKEDFROMNAMESPACES_H
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
 
@@ -28,4 +26,3 @@ typedef Belle2::TrackFindingCDC::CDCRecoHit3D CDCRecoHit3D;
 
 #endif // __CINT__
 
-#endif //CDCENTITIESUNPACKEDFROMNAMESPACES_H

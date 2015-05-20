@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef ILAYERTYPE_H
-#define ILAYERTYPE_H
 
 
 
@@ -30,4 +28,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // ILAYERTYPE_H

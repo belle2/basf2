@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCTRAJECTORYSZ_H
-#define CDCTRAJECTORYSZ_H
 
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -189,4 +187,3 @@ namespace Belle2 {
     }; //class
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCTRAJECTORYSZ_H

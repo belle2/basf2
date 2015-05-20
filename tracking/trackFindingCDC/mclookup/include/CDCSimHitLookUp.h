@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCSIMHITLOOKUP_H
-#define CDCSIMHITLOOKUP_H
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
@@ -113,4 +111,3 @@ namespace Belle2 {
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCSIMHITLOOKUP_H

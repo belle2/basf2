@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef SWITCHABLEROOTIFICATIONBASE_H_
-#define SWITCHABLEROOTIFICATIONBASE_H_
 
 #include <tracking/trackFindingCDC/rootification/RootificationBase.h>
 
@@ -46,4 +44,3 @@ namespace Belle2 {
 } //end namespace Belle2
 
 
-#endif // SWITCHABLEROOTIFICATIONBASE_H_

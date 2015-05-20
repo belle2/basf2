@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRECOSEGMENT2DVARSET_H
-#define CDCRECOSEGMENT2DVARSET_H
 
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
@@ -63,4 +61,3 @@ namespace Belle2 {
   }
 }
 
-#endif // CDCRECOSEGMENT2DVARSET_H

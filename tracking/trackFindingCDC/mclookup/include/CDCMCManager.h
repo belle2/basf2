@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCMCMANAGER_H
-#define CDCMCMANAGER_H
 
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -88,4 +86,3 @@ namespace Belle2 {
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCMCHITLOOKUP

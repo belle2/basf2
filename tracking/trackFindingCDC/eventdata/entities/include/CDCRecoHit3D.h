@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCRECOHIT3D_H
-#define CDCRECOHIT3D_H
 
 #include <cmath>
 
@@ -314,4 +312,3 @@ namespace Belle2 {
 
   } //end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCRECOHIT3D_H

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCMCMAP_H
-#define CDCMCMAP_H
 
 #include <boost/bimap/bimap.hpp>
 #include <boost/bimap/multiset_of.hpp>
@@ -240,4 +238,3 @@ namespace Belle2 {
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2
-#endif // CDCMCHITLOOKUP

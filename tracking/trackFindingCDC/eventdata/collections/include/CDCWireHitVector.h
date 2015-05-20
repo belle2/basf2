@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIREHITVECTOR_H
-#define CDCWIREHITVECTOR_H
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
@@ -39,4 +37,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 } // namespace Belle2
 
-#endif // CDCWIREHITVECTOR_H

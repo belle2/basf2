@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef BOUNDSKEWLINE_H
-#define BOUNDSKEWLINE_H
 
 
 #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
@@ -249,4 +247,3 @@ namespace Belle2 {
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-#endif // BOUNDSKEWLINE_H

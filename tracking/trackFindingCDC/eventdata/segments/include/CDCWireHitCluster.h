@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef CDCWIREHITCLUSTER_H
-#define CDCWIREHITCLUSTER_H
 
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
@@ -38,9 +36,5 @@ namespace Belle2 {
 
   }
 }
-
-
-#endif //CDCWIREHITCLUSTER_H
-
 
 

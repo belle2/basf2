@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef TRACKMATCHLOOKUP_H
-#define TRACKMATCHLOOKUP_H
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -203,4 +201,3 @@ namespace Belle2 {
 
   }; //class
 } // namespace Belle2
-#endif // TRACKMATCHLOOKUP

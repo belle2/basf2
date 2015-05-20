@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef SORTABLEVECTOR_H
-#define SORTABLEVECTOR_H
 
 #include <vector>
 #include <algorithm>
@@ -459,4 +457,3 @@ namespace Belle2 {
   } // namespace TrackFindingCDC
 } // namespace Belle2
 
-#endif // SORTABLEVECTOR_H

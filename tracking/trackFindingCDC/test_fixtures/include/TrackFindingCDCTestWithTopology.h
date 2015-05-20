@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#ifndef TRACKFINDINGCDCTESTWITHTOPOLOGY_H_
-#define TRACKFINDINGCDCTESTWITHTOPOLOGY_H_
 
 #include <gtest/gtest.h>
 
@@ -51,4 +49,3 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 
-#endif //TRACKFINDINGCDCTESTWITHTOPOLOGY_H_

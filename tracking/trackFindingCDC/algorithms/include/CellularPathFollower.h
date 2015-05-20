@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef CELLULARPATHFOLLOWER_H_
-#define CELLULARPATHFOLLOWER_H_
 
 #include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
@@ -218,10 +216,4 @@ namespace Belle2 {
   } //end namespace TrackFindingCDC
 
 } //end namespace Belle2
-
-#endif //CELLULARPATHFOLLOWER_H_
-
-
-
-
 

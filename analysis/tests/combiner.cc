@@ -400,9 +400,8 @@ namespace {
 
   }
 
-  TEST_F(ParticleCombinerTest, MuPlusMuMinus)
+  TEST_F(ParticleCombinerTest, PsiTo2D0_to2MuPlus2MuMinus)
   {
-
     TestParticleList mu("mu+");
     mu.addParticle(1);
     mu.addParticle(2);
@@ -416,7 +415,51 @@ namespace {
     D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 1, mu - 0});
     D0.addAndCheckParticlesFromGenerator();
 
+    TestParticleList Psi("psi(3770) -> D0 anti-D0");
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0 * 0, D0 * 2});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0 * 1, D0 * 3});
+    Psi.addAndCheckParticlesFromGenerator();
 
+  }
+
+  TEST_F(ParticleCombinerTest, PsiToD0D0sig)
+  {
+    TestParticleList mu("mu+");
+    mu.addParticle(1);
+    mu.addParticle(2);
+    mu.addAntiParticle(3);
+    mu.addAntiParticle(4);
+
+    TestParticleList K("K+");
+    K.addParticle(5);
+    K.addAntiParticle(6);
+    TestParticleList pi("pi+");
+    pi.addParticle(7);
+    pi.addAntiParticle(8);
+
+    TestParticleList D0("D0 -> mu+ mu-");
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 0, mu - 0});
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 0, mu - 1});
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 1, mu - 1});
+    D0.addExpectedParticle(Particle::c_Unflavored, 421, {mu + 1, mu - 0});
+    D0.addAndCheckParticlesFromGenerator();
+
+    TestParticleList D0sig("D0:sig -> K+ pi-");
+    D0sig.addExpectedParticle(Particle::c_Flavored, 421, {K + 0, pi - 0});
+    D0sig.addExpectedParticle(Particle::c_Flavored, -421, {K - 0, pi + 0});
+    D0sig.addAndCheckParticlesFromGenerator();
+
+    TestParticleList Psi("psi(3770) -> D0:sig anti-D0");
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig + 0, D0 * 0});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig + 0, D0 * 1});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig + 0, D0 * 2});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig + 0, D0 * 3});
+    //also use anti-D0:sig in combination!
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig - 0, D0 * 0});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig - 0, D0 * 1});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig - 0, D0 * 2});
+    Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0sig - 0, D0 * 3});
+    Psi.addAndCheckParticlesFromGenerator();
   }
 
 }  // namespace

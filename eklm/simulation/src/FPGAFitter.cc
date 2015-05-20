@@ -51,6 +51,7 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp,
   } while (amp[i] <= thr);
   par->startTime = i;
   par->bgAmplitude = sum / i;
+  sum = 0;
   while (i < m_nPoints) {
     sum = sum + amp[i] - par->bgAmplitude;
     ++i;

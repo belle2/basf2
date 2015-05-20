@@ -19,7 +19,7 @@ namespace Belle2 {
    *
    * Note: for parallel processing, the only type that can work is MSG_EVENT. Other messages would need to be sent once to each process, which would result in all kinds of race conditions.
    */
-  enum RECORD_TYPE { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD };
+  enum RECORD_TYPE { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD, MSG_STREAMERINFO };
 
   /** Header structure of streamed object list */
   struct EvtHeader {

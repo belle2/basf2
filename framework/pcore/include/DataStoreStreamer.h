@@ -104,6 +104,9 @@ namespace Belle2 {
 
   private:
 
+    /** restore StreamerInfo from data in a file */
+    int restoreStreamerInfos(TList* obj);
+
     /** bits to store in TObject.
      *
      * Bits 14-23 are available for use in derived classes, and are reused here to transmit additional information. This is really quite ugly and should be replaced with some more sane way of transmitting object-level data.

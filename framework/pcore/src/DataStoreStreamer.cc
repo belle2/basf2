@@ -24,6 +24,10 @@
 #include <algorithm>
 #include <queue>
 
+#include <TStreamerInfo.h>
+#include <TList.h>
+
+
 using namespace std;
 using namespace Belle2;
 
@@ -250,6 +254,13 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
       TObject* obj = objlist.at(i);
       bool array = (dynamic_cast<TClonesArray*>(obj) != 0);
       if (obj != NULL) {
+
+        // Read and Build StreamerInfo
+        if (msg->type() == MSG_STREAMERINFO) {
+          restoreStreamerInfos((TList*)obj);
+          return 0;
+        }
+
         bool isPersistent = obj->TestBit(c_PersistentDurability);
         DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
         const TClass* cl = obj->IsA();
@@ -483,3 +494,42 @@ void DataStoreStreamer::setDecoderStatus(int val)
 }
 
 
+int DataStoreStreamer::restoreStreamerInfos(TList* obj)
+{
+
+  //      TList *list = (TList*)mess->ReadObject(TList::Class());
+  TList* list = (TList*)obj;
+  TIter next(list);
+  TStreamerInfo* info;
+  TObjLink* lnk = list->FirstLink();
+  // First call BuildCheck for regular class
+  while (lnk) {
+    info = (TStreamerInfo*)lnk->GetObject();
+    TObject* element = info->GetElements()->UncheckedAt(0);
+    Bool_t isstl = element && strcmp("This", element->GetName()) == 0;
+    if (!isstl) {
+      info->BuildCheck();
+      //              if (gDebug > 0)
+      printf("importing TStreamerInfo: %s, version = %d",
+             info->GetName(), info->GetClassVersion()); fflush(stdout);
+    }
+    lnk = lnk->Next();
+  }
+
+  // Then call BuildCheck for stl class
+  lnk = list->FirstLink();
+  while (lnk) {
+    info = (TStreamerInfo*)lnk->GetObject();
+    TObject* element = info->GetElements()->UncheckedAt(0);
+    Bool_t isstl = element && strcmp("This", element->GetName()) == 0;
+    if (isstl) {
+      info->BuildCheck();
+      //              if (gDebug > 0)
+      printf("STL importing TStreamerInfo: %s, version = %d",
+             info->GetName(), info->GetClassVersion()); fflush(stdout);
+    }
+    lnk = lnk->Next();
+  }
+
+  return 0;
+}

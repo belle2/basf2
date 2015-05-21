@@ -5,6 +5,9 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
 using namespace std;
@@ -59,22 +62,17 @@ void CDCLegendreHistogrammingModule::outputObjects()
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   for (TrackCandidateWithStereoHits* trackCand : m_trackList) {
     CDCTrack* oldCDCTrack = trackCand->getCDCTrackCand();
-    TVector3 position = trackCand->getReferencePoint();
-    TVector3 momentum = trackCand->getMomentumEstimation(true);
-    CDCTrajectory3D newTrajectory3D(position, momentum,
-                                    trackCand->getChargeSign());
 
-    Vector3D startingPosition = oldCDCTrack->front().getRecoPos3D();
-    double sStartingPosition = newTrajectory3D.calcPerpS(startingPosition);
-    double zStartingPosition = newTrajectory3D.getTrajectorySZ().mapSToZ(sStartingPosition);
-    newTrajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
+    // Get the trajectory2D from the old track (that should not have changed in this module)
+    const CDCTrajectory2D& trajectory2D = oldCDCTrack->getStartTrajectory3D().getTrajectory2D();
 
-    CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()),
-                                 Vector2D(momentum.x(), momentum.y()), trackCand->getChargeSign());
-    oldCDCTrack->setStartTrajectory3D(newTrajectory3D);
-    std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
-    unsigned int sortingParameter = 0;
-    for (TrackHit* trackHit : trackHitVector) {
+
+    // Make a fit to determine the trajectory in sz direction
+    CDCObservations2D szObervations;
+    CDCTrajectorySZ trajectorySZ;
+
+    const std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
+    for (const TrackHit* trackHit : trackHitVector) {
       // TODO: Can we determine the plane?
       const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(
                                         trackHit->getOriginalCDCHit(), 0);
@@ -83,9 +81,21 @@ void CDCLegendreHistogrammingModule::outputObjects()
         const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit,
                                            trajectory2D);
         oldCDCTrack->push_back(std::move(cdcRecoHit3D));
+        szObervations.append(cdcRecoHit3D.getPerpS(), cdcRecoHit3D.getRecoZ());
       }
-      sortingParameter++;
     }
+
+    const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+    szFitter.update(trajectorySZ, szObervations);
+    CDCTrajectory3D newTrajectory3D(trajectory2D, trajectorySZ);
+
+    // Set the starting point to the first hit
+    Vector3D startingPosition = oldCDCTrack->front().getRecoPos3D();
+    double sStartingPosition = newTrajectory3D.calcPerpS(startingPosition);
+    double zStartingPosition = newTrajectory3D.getTrajectorySZ().mapSToZ(sStartingPosition);
+    newTrajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
+    oldCDCTrack->setStartTrajectory3D(newTrajectory3D);
+
 
     oldCDCTrack->sort();
   }

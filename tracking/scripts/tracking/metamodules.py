@@ -208,6 +208,7 @@ def is_storearray_present(storearray_name,
 
 
 class IfStoreArrayPresentModule(IfModule):
+
     """Conditional execution of the wrapped module if a StoreArray is present.
 
     Attributes:
@@ -251,6 +252,7 @@ class IfStoreArrayPresentModule(IfModule):
 
 
 class IfStoreArrayNotPresentModule(IfStoreArrayPresentModule):
+
     """Conditional execution of the wrapped module based if a StoreArray is not present."""
 
     def condition(self):
@@ -312,6 +314,10 @@ class PathModule(basf2.Module):
                 path.add_module(module)
 
         self.if_true(path, basf2.AfterConditionPath.CONTINUE)
+
+        # Pass a telling name to the C++ world
+        self.set_name("{path_module} ({items} modules):".format(path_module=self.__class__.__name__,
+                                                                items=len(modules)))
 
     @classmethod
     def from_modules(cls, *modules):

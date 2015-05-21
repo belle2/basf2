@@ -32,11 +32,11 @@ persistentDirectory="/ghi/fs01/belle2/bdata/users/pulver/B_generic/persistent"
 
 #Data files to use as input:
 #streams 0-39
-#allMcFiles=(/group/belle2/MC/generic/{mixed,charged}/mcprod1405/BGx0/*_s{0{0..9},{10..39}}/*.root)
+#allMcFiles=(/hsm/belle2/bdata/MC/generic/{mixed,charged}/mcprod1405/BGx0/*_s{0{0..9},{10..39}}/*.root)
 #10 independent streams
-allMcFiles=(/group/belle2/MC/generic/{mixed,charged}/mcprod1405/BGx0/*_s{40..49}/*.root)
+allMcFiles=(/hsm/belle2/bdata/MC/generic/{mixed,charged}/mcprod1405/BGx0/*_s{40..49}/*.root)
 #all 50 streams
-#allMcFiles=(/group/belle2/MC/generic/{mixed,charged}/mcprod1405/BGx1/*_s{0{0..9},{10..49}}/*.root)
+#allMcFiles=(/hsm/belle2/bdata/MC/generic/{mixed,charged}/mcprod1405/BGx1/*_s{0{0..9},{10..49}}/*.root)
 ################################################################################
 
 

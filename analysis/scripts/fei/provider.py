@@ -174,9 +174,10 @@ def FitVertex(resource, channelName, particleList):
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
-    pvfit.param('confidenceLevel', -2)  # don't remove Particles with failed fit (pValue = -1)
+    pvfit.param('confidenceLevel', -2)  # don't remove Particles with failed fit (pValue = -1, happens more often than >=0))
     pvfit.param('vertexFitter', 'kfitter')
     pvfit.param('fitType', 'vertex')
+    pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
     resource.path.add_module(pvfit)
 
     return resource.hash

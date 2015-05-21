@@ -401,12 +401,14 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 
   // get entry from which the relation points
   if (!findStoreEntry(fromObject, fromEntry, fromIndex)) {
-    B2FATAL("Couldn't find from-side entry for relation between " << fromObject->ClassName() << " and " << toObject->ClassName());
+    B2FATAL("Couldn't find from-side entry for relation between " << fromObject->ClassName() << " and " << toObject->ClassName() <<
+            ". Please make sure the object is part of a StoreArray before adding a relation.");
   }
 
   // get entry to which the relation points
   if (!findStoreEntry(toObject, toEntry, toIndex)) {
-    B2FATAL("Couldn't find to-side entry for relation between " << fromObject->ClassName() << " and " << toObject->ClassName());
+    B2FATAL("Couldn't find to-side entry for relation between " << fromObject->ClassName() << " and " << toObject->ClassName() <<
+            ". Please make sure the object is part of a StoreArray before adding a relation.");
   }
 
   // get the relations from -> to

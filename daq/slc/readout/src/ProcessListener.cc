@@ -30,8 +30,10 @@ void ProcessListener::run()
   NSMNode& node(callback.getNode());
   if (m_con->getInfo().isAvailable()) {
     unsigned int state = m_con->getInfo().getState();
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
     switch (state) {
       case RunInfoBuffer::RUNNING:
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
         if (node.getState() == RCState::RUNNING_S ||
             node.getState() == RCState::LOADING_TS ||
             node.getState() == RCState::STARTING_TS) {
@@ -40,15 +42,19 @@ void ProcessListener::run()
           callback.replyLog(LogFile::ERROR, emsg);
           m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
         }
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
         break;
       case RunInfoBuffer::READY: {
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
         std::string emsg = StringUtil::form("Foked process %s (pid = %d) was not started", process_name.c_str(), pid);
         LogFile::error(emsg);
         callback.replyLog(LogFile::ERROR, emsg);
         m_con->getInfo().reportError(RunInfoBuffer::PROCESS_DOWN);
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
       } break;
       case RunInfoBuffer::NOTREADY:
       default: {
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
         if (node.getState() == RCState::LOADING_TS) {
           std::string emsg = StringUtil::form("Foked process %s (pid = %d) was not booted", process_name.c_str(), pid);
           LogFile::error(emsg);
@@ -59,8 +65,10 @@ void ProcessListener::run()
           LogFile::debug(emsg);
           callback.replyLog(LogFile::INFO, emsg);
         }
+        LogFile::debug("%s:%d", __FILE__, __LINE__);
       } break;
     }
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
   }
   LogFile::debug("%s:%d", __FILE__, __LINE__);
   process.set_id(-1);

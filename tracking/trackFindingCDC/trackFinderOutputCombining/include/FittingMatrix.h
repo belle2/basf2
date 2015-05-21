@@ -53,7 +53,7 @@ namespace Belle2 {
        */
       void resetSegment(SegmentCounter counterSegment)
       {
-        for (TrackCounter counterTracks = 0; counterTracks < m_fittingMatrix.cols(); counterTracks++) {
+        for (TrackCounter counterTracks = 0; counterTracks < static_cast<unsigned int>(m_fittingMatrix.cols()); counterTracks++) {
           resetEntry(counterSegment, counterTracks);
         }
       }

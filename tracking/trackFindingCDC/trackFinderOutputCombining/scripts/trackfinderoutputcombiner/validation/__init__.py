@@ -85,7 +85,7 @@ def add_legendre_track_finder(path, delete_hit_information=False,
 
 def add_local_track_finder(path, delete_hit_information=False,
                            output_track_cands_store_array_name=None,
-                           output_segments_store_vector_name="CDCRecoSegments2DVector"):
+                           output_segments_store_vector_name="CDCRecoSegment2DVector"):
 
     # Add the local finder to the path.
     # If delete_hit_information is True, all already marked hits get unmarked (not default)
@@ -116,7 +116,7 @@ def add_local_track_finder(path, delete_hit_information=False,
 
 def add_old_combiner(path, output_track_cands_store_array_name=None,
                      track_cands_store_vector_name="CDCTrackVector",
-                     segments_store_vector_name="CDCRecoSegments2DVector"):
+                     segments_store_vector_name="CDCRecoSegment2DVector"):
 
     # Add the old combiner module to the path
     # If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
@@ -143,7 +143,7 @@ def add_old_combiner(path, output_track_cands_store_array_name=None,
 
 def add_new_combiner(path, output_track_cands_store_array_name=None,
                      track_cands_store_vector_name="CDCTrackVector",
-                     segments_store_vector_name="CDCRecoSegments2DVector",
+                     segments_store_vector_name="CDCRecoSegment2DVector",
                      segment_track_chooser_filter="simple",
                      segment_track_chooser_cut=0,
                      segment_train_filter="simple",

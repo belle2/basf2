@@ -1,9 +1,10 @@
 import basf2
 from ROOT import Belle2
 
-from trackfinderoutputcombiner.validation import MCTrackFinderRun, AddValidationMethod, StandardEventGenerationRun
+from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.quadtree.quadTreePlotter import SegmentQuadTreePlotter
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
+from trackfinderoutputcombiner.validation import add_mc_track_finder
 
 import logging
 import sys
@@ -11,11 +12,15 @@ import sys
 
 class Filler(basf2.Module):
 
+    """ Fill the later needed mc information """
+
     def event(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
 
-class SegmentQuadTreeRun(StandardEventGenerationRun, AddValidationMethod):
+class SegmentQuadTreeRun(StandardEventGenerationRun):
+
+    """ Create segments and plot them in a segment quad tree """
 
     display_module_segments = CDCSVGDisplayModule(interactive=True)
     display_module_segments.draw_gftrackcand_trajectories = False
@@ -41,6 +46,8 @@ class SegmentQuadTreeRun(StandardEventGenerationRun, AddValidationMethod):
         """ Make SegmentFinding and QuadTreeFinding and plotting/display/validation"""
         main_path = super(SegmentQuadTreeRun, self).create_path()
 
+        add_mc_track_finder(main_path)
+
         segment_finder = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
         segment_finder.param({
             "WriteFacets": True,
@@ -61,13 +68,6 @@ class SegmentQuadTreeRun(StandardEventGenerationRun, AddValidationMethod):
         segment_quad_tree.set_debug_level(100)
         main_path.add_module(segment_quad_tree)
         main_path.add_module(self.display_module_tracks)
-
-        # self.create_validation(main_path, "TrackCands", "SegmentQuadTree.root")
-        # self.create_validation(main_path, "LegendreTrackCands", "HitQuadTree.root")
-
-        # main_path.add_module(self.plotter_module)
-        # main_path.add_module(self.display_module_tracks)
-        # main_path.add_module(self.display_module_mc)
 
         return main_path
 

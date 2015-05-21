@@ -13,6 +13,7 @@ import logging
 
 
 def main():
+    overview = ClassificationOverview("SegmentTrainTruthOverview.root")
     classifer = FastBDTClassifier(
         "SegmentTrainTruth",
         "SegmentTrainTruthWeight.root"
@@ -23,6 +24,7 @@ def main():
     input_tree_name = "records"
     input_tree = input_file.Get(input_tree_name)
 
+    overview.train(input_tree)
     classifer.train(input_tree)
 
 if __name__ == "__main__":

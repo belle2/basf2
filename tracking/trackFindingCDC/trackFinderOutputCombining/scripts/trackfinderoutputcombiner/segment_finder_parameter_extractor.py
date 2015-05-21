@@ -7,7 +7,6 @@ gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
 from trackfinderoutputcombiner.combinerValidation import MCTrackFinderRun
-from trackfinderoutputcombiner.combination_checker import CombinationChecker
 from tracking.validation.harvesting import HarvestingModule
 from tracking.validation import refiners
 import logging

@@ -13,7 +13,7 @@ from ROOT import Belle2
 import glob
 
 from trackfinderoutputcombiner.validation import add_local_track_finder, add_validation, add_new_combiner,\
-    add_legendre_track_finder
+    add_legendre_track_finder, add_old_combiner, add_mc_track_finder
 from tracking.validation.extract_information_from_tracking_validation_output import (initialize_results,
                                                                                      extract_information_from_file)
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
@@ -36,7 +36,6 @@ class CombinerValidationRun(StandardEventGenerationRun):
     segment_track_chooser_filter = "tmva"
     segment_train_filter = "simple"
     segment_track_filter = "simple"
-    stereo_assignment = True
 
     def add_mc_combination(self, main_path):
         mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
@@ -68,28 +67,53 @@ class CombinerValidationRun(StandardEventGenerationRun):
 
         main_path = super(CombinerValidationRun, self).create_path()
 
+        add_mc_track_finder(main_path)
         add_legendre_track_finder(main_path, output_track_cands_store_array_name=self.legendre_track_cands_store_array_name)
-        add_local_track_finder(main_path)
 
-        if not os.path.exists("evaluation/OldCombiner.root"):
-            add_old_combiner(main_path)
-            add_validation(
-                main_path,
-                track_candidates_store_array_name="OldCombinerTrackCands",
-                output_file_name="evaluation/OldCombiner.root")
+        drawing_module = CDCSVGDisplayModule()
+        drawing_module.draw_tracks = True
+        drawing_module.draw_track_trajectories = True
+        # main_path.add_module(drawing_module)
+
+        add_local_track_finder(main_path, output_track_cands_store_array_name="LocalTrackCands")
+
+        drawing_module = CDCSVGDisplayModule()
+        drawing_module.draw_segments_id = True
+        # main_path.add_module(drawing_module)
+
+        add_old_combiner(main_path, output_track_cands_store_array_name="OldCombinerTrackCands")
+
+        drawing_module = CDCSVGDisplayModule()
+        drawing_module.draw_tracks = True
+        drawing_module.draw_track_trajectories = True
+        # main_path.add_module(drawing_module)
 
         add_new_combiner(main_path, output_track_cands_store_array_name="ResultTrackCands",
                          segment_track_chooser_filter=self.segment_track_chooser_filter,
                          segment_track_chooser_cut=self.segment_track_chooser_cut,
                          segment_train_filter=self.segment_train_filter,
                          segment_track_filter=self.segment_track_filter)
-        self.create_validation(
+
+        drawing_module = CDCSVGDisplayModule()
+        drawing_module.draw_tracks = True
+        drawing_module.draw_track_trajectories = True
+        # main_path.add_module(drawing_module)
+
+        return main_path
+
+        add_validation(
             main_path,
             track_candidates_store_array_name="ResultTrackCands",
             output_file_name="evaluation/Combiner%.1f_%s_%s_%s.root" % (self.segment_track_chooser_cut,
                                                                         self.segment_track_chooser_filter,
                                                                         self.segment_train_filter,
                                                                         self.segment_track_filter))
+
+        if not os.path.exists("evaluation/OldCombiner.root"):
+            add_validation(
+                main_path,
+                track_candidates_store_array_name="OldCombinerTrackCands",
+                output_file_name="evaluation/OldCombiner.root")
 
         if not os.path.exists("evaluation/Legendre.root"):
             add_validation(
@@ -126,7 +150,7 @@ def print_data():
         result = extract_information_from_file(file_name, result)
         result["file_name"].append(file_name)
 
-    print result
+    print pd.DataFrame(result)
 
 
 def main(pool_number):
@@ -212,6 +236,7 @@ def main(pool_number):
 if __name__ == "__main__":
     from multiprocessing import Pool
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
-    p = Pool(8)
-    p.map(main, [1, 2, 3, 4])
+    # p = Pool(8)
+    # p.map(main, [5])
+    main(5)
     print_data()

@@ -289,6 +289,8 @@ InfoWidget::URI::URI(const TString& uri):
       durability = DataStore::c_Event;
     else if (scheme == "persistent")
       durability = DataStore::c_Persistent;
+    else
+      B2FATAL("Invalid URI scheme '" << scheme << "' specified!");
 
     Ssiz_t delim = path.Last('/');
     Ssiz_t idxFieldLength = path.Length() - delim - 1;

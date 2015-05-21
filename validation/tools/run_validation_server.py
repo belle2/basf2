@@ -438,7 +438,7 @@ if __name__ == '__main__':
 
     # Start the server!
     try:
-        log.info("Server: Starting HTTP server on %s:%d" % (ip, port))
+        log.info("Server: Starting HTTP server on {0}:{1}".format(ip, port))
         run(ip=ip, port=port)
         log.info("Server: Terminating")
     # Terminate upon KeyboardInterrupt

@@ -948,7 +948,7 @@ def create_packages_list_html(list_of_packages, list_of_revisions):
                        .format(pkg))
 
             # Get a list of all ROOT result files in this package
-            in_pkg = files_in_pkg(pkg, list_of_revisions)
+            in_pkg = sorted(list(set(files_in_pkg(pkg, list_of_revisions))))
 
             # Print them into a container
             pkgs.write('<div class="pkg_container pkg_{0}">'.format(pkg))

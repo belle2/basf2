@@ -10,22 +10,12 @@
 
 #include <tracking/modules/trackFinderOutputCombiner/NotAssignedHitsCombinerModule.h>
 
-//datastore types
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
-
-#include <framework/gearbox/Const.h>
-
-#include <genfit/TrackCand.h>
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <Eigen/Dense>
-#include <cdc/dataobjects/CDCHit.h>
 
 
 using namespace Belle2;
@@ -33,26 +23,10 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(NotAssignedHitsCombiner);
 
-NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : m_fittingMatrix()
+NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCFromSegmentsModule(), m_fittingMatrix()
 {
   setDescription("Combines the newly found track candidates from the local track finder with the ones found by the legendre track finder to get all tracks.");
 
-  addParam("TracksFromLegendreFinder",
-           m_param_tracksFromLegendreFinder,
-           "TrackCandidates store array name from the legendre track finder with hits from CDCHits.");
-  addParam("CDCHits",
-           m_param_cdcHits,
-           "Name of the store array containing the hits from the legendre track finder.",
-           std::string("CDCHits"));
-  addParam("BadTrackCands",
-           m_param_badTrackCands,
-           "Name of the Store Array for the bad segments for testing.");
-  addParam("RecoSegments",
-           m_param_recoSegments,
-           "Name of the Store Array for the segments from the local track finder.");
-  addParam("ResultTrackCands",
-           m_param_resultTrackCands,
-           "TrackCandidates collection name from the combined results of the two recognition algorithm. The hits come from the parameter CDCHits.");
   addParam("MinimalChi2",
            m_fittingMatrix.getParamMinimalChi2(),
            "Minimal chi2 for a merge.",
@@ -79,72 +53,17 @@ NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : m_fittingMatrix
            10.0);
 }
 
-void NotAssignedHitsCombinerModule::initialize()
-{
-  StoreArray<genfit::TrackCand> legendreTrackCands(m_param_tracksFromLegendreFinder);
 
-  legendreTrackCands.isRequired();
-
-  StoreArray<CDCHit> cdcHits(m_param_cdcHits);
-
-  StoreArray<genfit::TrackCand> resultTrackCands(m_param_resultTrackCands);
-  resultTrackCands.registerInDataStore();
-
-  StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
-  badTrackCands.registerInDataStore();
-
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> recoSegments(m_param_recoSegments);
-  recoSegments.isRequired();
-}
-
-void NotAssignedHitsCombinerModule::createBadTrackCandsForTesting(
-  std::vector<CDCRecoSegment2D>& recoSegments,
-  const StoreArray<genfit::TrackCand>& resultTrackCands)
-{
-  // For the segments ending up here there are basically two possibilities:
-  // (1) they are background -> actually these segments should be deleted before with the SegmentQualityCheckModule. We will not assume this case here!
-  // (2) they form a new track - a track the legendre track finder has not found at all.
-  // (3) the matching routine has not worked properly and they belong to an already found track
-  // The question is not only if some of the segments are background - the question is also whether we should merge them in one ore more tracks
-  // Just for testing: add all the segments + found tracks to the bad track cands
-  StoreArray<genfit::TrackCand> badTrackCands(m_param_badTrackCands);
-  badTrackCands.create();
-  for (const genfit::TrackCand& resultTrackCand : resultTrackCands) {
-    badTrackCands.appendNew(resultTrackCand);
-  }
-  unsigned int numberOfLeftSegments = 0;
-  for (FittingMatrix::SegmentCounter counterOuter = 0;
-       counterOuter < recoSegments.size(); counterOuter++) {
-    if (!m_fittingMatrix.isSegmentUsed(counterOuter)) {
-      genfit::TrackCand* badTrackCand = badTrackCands.appendNew();
-      numberOfLeftSegments++;
-      const CDCRecoSegment2D& recoSegment = recoSegments[counterOuter];
-      m_fittingMatrix.fillHitsInto(recoSegment, badTrackCand);
-    }
-  }
-  B2DEBUG(100, numberOfLeftSegments << " segments left.")
-}
-
-void NotAssignedHitsCombinerModule::event()
+void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& legendreTracks)
 {
   B2DEBUG(100, "########## NotAssignedHitsCombinerModule ############")
 
-  StoreArray<genfit::TrackCand> resultTrackCands(m_param_resultTrackCands);
-  StoreArray<genfit::TrackCand> legendreTrackCands(m_param_tracksFromLegendreFinder);
-  StoreArray<CDCHit> cdcHits(m_param_cdcHits);
+  // TODO: It may not be needed to copy the tracks...
 
-  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_recoSegments);
-  std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
-
-  resultTrackCands.create();
-
-  B2DEBUG(100, "Length of CDCSegments: " << recoSegments.size())
-
-
-  // Add the legendre tracks to the output. They are assumed to be good at this stage.
-  for (const genfit::TrackCand& legendreTrackCand : legendreTrackCands) {
-    resultTrackCands.appendNew(legendreTrackCand);
-  }
+  // Copy the legendre tracks
+  std::vector<CDCTrack> resultTrackCands;
+  resultTrackCands.reserve(legendreTracks.size());
+  std::copy(legendreTracks.begin(), legendreTracks.end(), std::back_inserter(resultTrackCands));
 
   // Go through all the reco segments
   // There are three different cases for a segment:
@@ -154,11 +73,13 @@ void NotAssignedHitsCombinerModule::event()
   // (2b) It can be background
   // As in most of the cases these segments are stereo segments, case (1) is the most common
 
-  m_fittingMatrix.calculateMatrices(recoSegments, resultTrackCands, cdcHits);
+  B2DEBUG(100, "Calculating matrices...")
+  m_fittingMatrix.calculateMatrices(segments, resultTrackCands);
+  B2DEBUG(100, "Done calculating matrices.")
   m_fittingMatrix.print();
 
   // Find all "easy" possibilities:
-  findEasyCandidates(recoSegments, resultTrackCands, legendreTrackCands, cdcHits);
+  findEasyCandidates(segments, legendreTracks, resultTrackCands);
 
 
   // For the segments ending up here there are basically two possibilities:
@@ -166,21 +87,18 @@ void NotAssignedHitsCombinerModule::event()
   // (2) they form a new track - a track the legendre track finder has not found at all.
   // (3) the matching routine has not worked properly and they belong to an already found track
   // The question is not only if some of the segments are background - the question is also whether we should merge them in one ore more tracks
-
-  // Just for testing: add all the segments + found tracks to the bad track cands
-  createBadTrackCandsForTesting(recoSegments, resultTrackCands);
   m_fittingMatrix.print();
 
   // Delete all segments, that are used
   std::vector<CDCRecoSegment2D> notUsedRecoSegments;
-  for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < recoSegments.size(); segmentCounter++) {
+  for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < segments.size(); segmentCounter++) {
     if (not m_fittingMatrix.isSegmentUsed(segmentCounter)) {
-      notUsedRecoSegments.push_back(recoSegments[segmentCounter]);
+      notUsedRecoSegments.push_back(segments[segmentCounter]);
     }
   }
 
   // Recalculate the matrices
-  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, resultTrackCands, cdcHits);
+  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, resultTrackCands);
 
   // Testing purposes:
   // Use all segments with a very low pt.
@@ -193,10 +111,10 @@ void NotAssignedHitsCombinerModule::event()
     StereoType stereoType = recoSegment.getStereoType();
 
     std::vector<FittingMatrix::SegmentStatus> status;
-    status.reserve(resultTrackCands.getEntries());
+    status.reserve(resultTrackCands.size());
 
-    for (const genfit::TrackCand& resultTrackCand : resultTrackCands) {
-      CDCTrajectory3D trajectory(resultTrackCand.getPosSeed(), resultTrackCand.getMomSeed(), resultTrackCand.getChargeSeed());
+    for (const CDCTrack& resultTrackCand : resultTrackCands) {
+      const CDCTrajectory3D& trajectory = resultTrackCand.getStartTrajectory3D();
       const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
 
       // if it is axial, we can check the mean distance to the track in the xy-plane
@@ -213,7 +131,7 @@ void NotAssignedHitsCombinerModule::event()
         }
       }
 
-      FittingMatrix::SegmentStatus segmentStatus = FittingMatrix::calculateSegmentStatus(recoSegment, resultTrackCand, cdcHits);
+      FittingMatrix::SegmentStatus segmentStatus = FittingMatrix::calculateSegmentStatus(recoSegment, resultTrackCand);
       status.push_back(segmentStatus);
     }
 
@@ -224,7 +142,7 @@ void NotAssignedHitsCombinerModule::event()
         FittingMatrix::TrackCounter bestFitPartner = -1;
         double maximumChi2 = -1;
 
-        for (FittingMatrix::TrackCounter trackCounter = 0; trackCounter < resultTrackCands.getEntries(); trackCounter++) {
+        for (FittingMatrix::TrackCounter trackCounter = 0; trackCounter < resultTrackCands.size(); trackCounter++) {
           if (status[trackCounter] == FittingMatrix::SegmentStatus::IN_TRACK
               or status[trackCounter] == FittingMatrix::SegmentStatus::MIX_WITH_TRACK) {
             if (m_fittingMatrix.getChi2(segmentCounter, trackCounter) > maximumChi2) {
@@ -250,22 +168,27 @@ void NotAssignedHitsCombinerModule::event()
   }
 
   m_fittingMatrix.print();
+
+  // Copy the result tracks to the output
+  legendreTracks.clear();
+  legendreTracks.reserve(resultTrackCands.size());
+  std::copy(resultTrackCands.begin(), resultTrackCands.end(), std::back_inserter(legendreTracks));
 }
 
-double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(genfit::TrackCand* trackCand,
-    const StoreArray<CDCHit>& cdcHits)
+double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate)
 {
   const CDCSZFitter& zFitter = CDCSZFitter::getFitter();
 
-  CDCTrajectory3D trajectory(trackCand->getPosSeed(), trackCand->getMomSeed(), trackCand->getChargeSeed());
+  const CDCTrajectory3D& trajectory = trackCandidate.getStartTrajectory3D();
   CDCObservations2D observationsSZ;
 
+  // TODO: Is it the same if adding the already fitted values??
+
   // Add the hits from the segment to the sz fit
-  for (int cdcHitID : trackCand->getHitIDs(Const::CDC)) {
-    CDCHit* cdcHit = cdcHits[cdcHitID];
-    if (cdcHit->getISuperLayer() % 2 != 0) {
+  for (CDCRecoHit3D recoHit : trackCandidate) {
+    if (recoHit.getStereoType() != AXIAL) {
       // we do not know the right-left information
-      CDCWireHit cdcWireHit(cdcHit);
+      CDCWireHit cdcWireHit(recoHit.getWireHit());
       CDCRLWireHit cdcRLWireHit(cdcWireHit);
       const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(cdcRLWireHit, trajectory.getTrajectory2D());
       if (recoHit3D.isInCDC()) {
@@ -287,11 +210,9 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(genfit::Tra
 }
 
 
-void NotAssignedHitsCombinerModule::findEasyCandidates(
-  std::vector<CDCRecoSegment2D>& recoSegments,
-  const StoreArray<genfit::TrackCand>& resultTrackCands,
-  const StoreArray<genfit::TrackCand>& legendreTrackCands,
-  const StoreArray<CDCHit>& cdcHits)
+void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
+                                                       std::vector<TrackFindingCDC::CDCTrack>& resultTrackCands,
+                                                       std::vector<TrackFindingCDC::CDCTrack>& legendreTrackCands)
 {
   // Find all "easy" possibilities:
   for (FittingMatrix::SegmentCounter counterOuter = 0;
@@ -300,7 +221,7 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(
     unsigned int bestFitIndex = 0; // Which track has the highest chi2? For one possible fit partner this is the only possible index
     double highestChi2 = 0; // Which is the highest chi2?
     for (FittingMatrix::TrackCounter counterInner = 0;
-         counterInner < resultTrackCands.getEntries(); counterInner++) {
+         counterInner < resultTrackCands.size(); counterInner++) {
       if (m_fittingMatrix.isGoodEntry(counterOuter, counterInner)) {
         numberOfPossibleFits++;
         if (m_fittingMatrix.getChi2(counterOuter, counterInner) > highestChi2) {
@@ -331,11 +252,10 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(
       // Now we come to the more tricky segments: we have more than one possibility
       // we look for the cases where we have more than one possible fit, but only one fits to the track:
       for (FittingMatrix::TrackCounter counterInner = 0;
-           counterInner < resultTrackCands.getEntries(); counterInner++) {
+           counterInner < resultTrackCands.size(); counterInner++) {
         if (m_fittingMatrix.getChi2(counterOuter, counterInner)
             > m_fittingMatrix.getParamMinimalChi2()) {
-          double theta = calculateThetaOfTrackCandidate(
-                           legendreTrackCands[counterInner], cdcHits);
+          double theta = calculateThetaOfTrackCandidate(legendreTrackCands[counterInner]);
           if (std::abs(m_fittingMatrix.getZ(counterOuter, counterInner) - theta)
               < m_fittingMatrix.getParamMinimalThetaDifference()) {
             m_fittingMatrix.addSegmentToResultTrack(counterOuter, counterInner,

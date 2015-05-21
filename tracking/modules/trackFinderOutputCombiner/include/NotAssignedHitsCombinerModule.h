@@ -9,31 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <string>
-#include <utility>
-#include <vector>
-
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <Eigen/Dense>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/FittingMatrix.h>
-
-// Forward declarations
-namespace genfit {
-  class TrackCand;
-}
-
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
+#include <vector>
 
 
 namespace Belle2 {
 
-  class CDCHit;
-
+// Forward declarations
   namespace TrackFindingCDC {
+    class CDCTrack;
     class CDCRecoSegment2D;
   }
 
-  class NotAssignedHitsCombinerModule : public Module {
+  class NotAssignedHitsCombinerModule : public TrackFinderCDCFromSegmentsModule {
 
   public:
 
@@ -42,55 +31,18 @@ namespace Belle2 {
      */
     NotAssignedHitsCombinerModule();
 
-    /**
-     * Empty destructor.
-     */
-    virtual ~NotAssignedHitsCombinerModule() {};
-
-    virtual void initialize();
-
-    /**
-     * Empty begin run.
-     */
-    virtual void beginRun() {};
-
-    /**
-     * Combine the two track finder outputs.
-     */
-    virtual void event();
-
-    /**
-     * Empty end run.
-     */
-    virtual void endRun() {};
-
-    /**
-     * Empty terminate.
-     */
-    virtual void terminate() {};
-
-  protected:
-
   private:
+    /**
+     * Try to combine the segments and the tracks
+     */
+    void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
 
-    std::string
-    m_param_tracksFromLegendreFinder;                 /**< TrackCandidates store array name from the legendre track finder. */
-    std::string
-    m_param_resultTrackCands;                         /**< TrackCandidates collection name from the combined results of the two recognition algorithm. The CDCHits are assumed to come from m_param_cdcHitsColName1. */
-    std::string m_param_cdcHits;                                  /**< Name of the store array containing the hits. */
-    std::string m_param_badTrackCands;                            /**< Name of the Store Array for the bad segments for testing. */
-    std::string
-    m_param_recoSegments;                             /**< Name of the Store Array for the segments from the local track finder. */
+    TrackFindingCDC::FittingMatrix m_fittingMatrix; /**< The fitting matrix we use to calculate the track - segment combinations */
 
-    FittingMatrix m_fittingMatrix;
-
-    double calculateGoodFitIndex(const genfit::TrackCand& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment,
-                                 const StoreArray<CDCHit>& cdcHits);
-    double calculateThetaOfTrackCandidate(genfit::TrackCand* trackCandidate, const StoreArray<CDCHit>& cdcHits);
+    double calculateGoodFitIndex(const TrackFindingCDC::CDCTrack& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment);
+    double calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate);
     void findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
-                            const StoreArray<genfit::TrackCand>& resultTrackCands, const StoreArray<genfit::TrackCand>& legendreTrackCands,
-                            const StoreArray<CDCHit>& cdcHits);
-    void createBadTrackCandsForTesting(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
-                                       const StoreArray<genfit::TrackCand>& resultTrackCands);
+                            std::vector<TrackFindingCDC::CDCTrack>& resultTrackCands,
+                            std::vector<TrackFindingCDC::CDCTrack>& legendreTrackCands);
   };
 }

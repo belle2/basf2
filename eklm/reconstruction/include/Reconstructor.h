@@ -33,6 +33,14 @@ namespace Belle2 {
      */
     class Reconstructor {
 
+      /**
+       * Time calibration: parameters of time correction function
+       */
+      struct TimeParams {
+        float p0; /**< Coefficient of the polynomial. */
+        float p1; /**< Coefficient of the polynomial. */
+      };
+
     public:
 
       /**
@@ -43,7 +51,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      ~Reconstructor() {};
+      ~Reconstructor();
 
       /**
        * Create 2d hits.
@@ -51,6 +59,13 @@ namespace Belle2 {
       void create2dHits();
 
     private:
+
+      /**
+       * Get 2d hit time corresponding to EKLMDigit.
+       * @param[in] d    EKLMDigit.
+       * @param[in] dist Distance from 2d hit to SiPM.
+       */
+      double getTime(EKLMDigit* d, double dist);
 
       /**
        * Check whether hit has too small time.
@@ -64,6 +79,9 @@ namespace Belle2 {
 
       /** Geometry data. */
       GeometryData* m_geoDat;
+
+      /** Time calibration data. */
+      struct TimeParams* m_TimeParams;
 
     };
 

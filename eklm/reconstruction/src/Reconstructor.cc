@@ -8,12 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <TFile.h>
+#include <TTree.h>
+
 /* Belle2 headers. */
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -44,13 +49,43 @@ static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
 
 EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
 {
+  int i, n;
+  float p0, p1;
+  TFile* f;
+  TTree* t;
   setDefDigitizationParams(&m_digPar);
   m_geoDat = geoDat;
+  n = m_geoDat->getNStripsDifferentLength();
+  m_TimeParams = new struct TimeParams[n];
+  f = new TFile(FileSystem::findFile(
+                  "/data/eklm/TimeCalibration.root").c_str());
+  if (f->IsZombie())
+    B2FATAL("Cannot open time calibration data file.");
+  t = (TTree*)f->Get("t_calibration");
+  t->SetBranchAddress("p0", &p0);
+  t->SetBranchAddress("p1", &p1);
+  for (i = 0; i < n; i++) {
+    t->GetEntry(i);
+    m_TimeParams[i].p0 = p0;
+    m_TimeParams[i].p1 = p1;
+  }
+}
+
+EKLM::Reconstructor::~Reconstructor()
+{
+  delete m_TimeParams;
 }
 
 bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)
 {
   return time < pos.mag() / Const::speedOfLight - 2.0 * m_digPar.timeResolution;
+}
+
+double EKLM::Reconstructor::getTime(EKLMDigit* d, double dist)
+{
+  int n;
+  n = m_geoDat->getStripLengthIndex(d->getStrip() - 1);
+  return d->getTime() - (dist * m_TimeParams[n].p0 + m_TimeParams[n].p1);
 }
 
 void EKLM::Reconstructor::create2dHits()
@@ -92,10 +127,8 @@ void EKLM::Reconstructor::create2dHits()
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
         if (!m_geoDat->intersection(*it4, *it5, &crossPoint, &d1, &d2, &sd))
           continue;
-        t1 = (*it4)->getTime() - d1 / m_digPar.fiberLightSpeed +
-             0.5 * sd / Const::speedOfLight;
-        t2 = (*it5)->getTime() - d2 / m_digPar.fiberLightSpeed -
-             0.5 * sd / Const::speedOfLight;
+        t1 = getTime(*it4, d1) + 0.5 * sd / Const::speedOfLight;
+        t2 = getTime(*it5, d2) - 0.5 * sd / Const::speedOfLight;
         t = (t1 + t2) / 2;
         if (fastHit(crossPoint, t))
           continue;

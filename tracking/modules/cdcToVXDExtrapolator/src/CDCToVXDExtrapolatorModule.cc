@@ -822,9 +822,9 @@ void CDCToVXDExtrapolatorModule::event()
       float mcd0 = -1;
       float mcth = -1;
       bool recoverable = false;
-      int nCdcMcHits;
-      int nSvdMcClusters;
-      int nPxdMcClusters;
+      int nCdcMcHits = 0;
+      int nSvdMcClusters = 0;
+      int nPxdMcClusters = 0;
       if (MCParticles_fromTrack.size() == 1) {
         mcpt = MCParticles_fromTrack[0]->get4Vector().Pt();
         mcth = MCParticles_fromTrack[0]->get4Vector().Theta() * 180 / 3.14159265;

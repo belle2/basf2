@@ -5,7 +5,6 @@
 
 #include <set>
 #include <vector>
-#include <algorithm>
 
 class TObject;
 class TGWindow;
@@ -67,21 +66,6 @@ namespace Belle2 {
 
     /** returns string with title, breadcrumbs, menu. */
     TString getHeader(const URI& uri = URI()) const;
-
-    /** human-readable name (e.g. pi+)
-     *
-     *  use TObject::GetName()? default is ok.
-     */
-    static TString getName(const TObject* obj);
-
-    /** Where is this object in the datastore? */
-    static TString getIdentifier(const TObject* obj);
-
-    /** return entry name & index for arrays, with index = -1 for objects. */
-    static std::pair<std::string, int> getDataStorePosition(const TObject* obj);
-
-    /** Get object info (e.g. via RelationsObject::getInfoHTML()). */
-    static TString getInfo(const TObject* obj);
 
     /** Get object contents (member data). */
     static TString getContents(const TObject* obj);

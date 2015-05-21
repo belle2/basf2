@@ -1,6 +1,7 @@
 #include <display/InfoWidget.h>
 #include <display/HtmlClassInspector.h>
 #include <display/VisualRepMap.h>
+#include <display/ObjectInfo.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -125,11 +126,11 @@ TString InfoWidget::createArrayPage(const URI& uri) const
   }
 
   for (int i = 0; i < array.getEntries(); i++) {
-    TString name = getName(array[i]);
+    TString name = ObjectInfo::getName(array[i]);
     if (name != "")
       name = " - " + name;
     info += TString::Format("<a href='%s/%d'>%s</a><br>", uri.entryName.Data(), i,
-                            (getIdentifier(array[i]) + name).Data());
+                            (ObjectInfo::getIdentifier(array[i]) + name).Data());
   }
   return info;
 }
@@ -137,7 +138,7 @@ TString InfoWidget::createArrayPage(const URI& uri) const
 TString InfoWidget::createObjectPage(const URI& uri) const
 {
   TString info = getHeader(uri);
-  info += getInfo(uri.object);
+  info += ObjectInfo::getInfo(uri.object);
   info += getRelatedInfo(uri.object);
   info += getContents(uri.object);
 
@@ -179,10 +180,10 @@ TString InfoWidget::getHeader(const URI& uri) const
 
   //title
   if (uri.object) {
-    TString name = getName(uri.object);
+    TString name = ObjectInfo::getName(uri.object);
     if (name != "")
       name = " - " + name;
-    info += "<h2>" + getIdentifier(uri.object) + name + "</h2>";
+    info += "<h2>" + ObjectInfo::getIdentifier(uri.object) + name + "</h2>";
   } else {
     info += TString::Format("<h2>%s (%d)</h2>", uri.entryName.Data(), numEntries);
   }
@@ -203,65 +204,9 @@ TString InfoWidget::getHeader(const URI& uri) const
 
   return info;
 }
-
-TString InfoWidget::getName(const TObject* obj)
-{
-  if (!obj)
-    B2FATAL("InfoWidget::getName() got null?");
-  if (const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(obj)) {
-    return relObj->getName();
-  }
-  return "";
-}
-
-TString InfoWidget::getInfo(const TObject* obj)
-{
-  if (!obj)
-    B2FATAL("InfoWidget::getInfo() got null?");
-  if (const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(obj)) {
-    return relObj->getInfoHTML();
-  }
-  return "";
-}
-
-std::pair<std::string, int> InfoWidget::getDataStorePosition(const TObject* obj)
-{
-  std::string name;
-  int index = -1;
-  if (const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(obj)) {
-    name = relObj->getArrayName();
-    index = relObj->getArrayIndex();
-  } else {
-    //somewhat manual way to find location of object (might not inherit from RelationInterface)
-    DataStore::StoreEntry* entry = nullptr;
-    DataStore::Instance().findStoreEntry(obj, entry, index);
-    if (entry)
-      name = entry->name;
-  }
-  if (index == -1) {
-    //this thing might be in a StoreObjPtr...
-    for (const auto pair : DataStore::Instance().getStoreEntryMap(DataStore::c_Event)) {
-      if (pair.second.object == obj) {
-        name = pair.second.name;
-        break;
-      }
-    }
-  }
-
-  return std::make_pair(name, index);
-}
-
-TString InfoWidget::getIdentifier(const TObject* obj)
-{
-  auto pos = getDataStorePosition(obj);
-  if (pos.second != -1)
-    return TString::Format("%s[%d]", pos.first.c_str(), pos.second);
-  return pos.first;
-}
-
 TString InfoWidget::URI::getURI(const TObject* obj)
 {
-  auto pos = getDataStorePosition(obj);
+  auto pos = ObjectInfo::getDataStorePosition(obj);
   if (pos.first.empty()) {
     B2WARNING("No URI found for " << obj->GetName());
     return "/";
@@ -280,10 +225,10 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);
       double weight = relatedObjects.weight(i);
-      TString name = getName(relObj);
+      TString name = ObjectInfo::getName(relObj);
       if (name != "")
         name = " - " + name;
-      info += pref + "<a href='" + URI::getURI(relObj) + "'>" + getIdentifier(relObj) + name + "</a>";
+      info += pref + "<a href='" + URI::getURI(relObj) + "'>" + ObjectInfo::getIdentifier(relObj) + name + "</a>";
       if (weight != 1.0)
         info += TString::Format(" (weight: %.3g)", weight);
       info += "<br>";
@@ -298,10 +243,10 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);
       double weight = relatedObjects.weight(i);
-      TString name = getName(relObj);
+      TString name = ObjectInfo::getName(relObj);
       if (name != "")
         name = " - " + name;
-      info += pref + "<a href='" + URI::getURI(relObj) + "'>" + getIdentifier(relObj) + name + "</a>";
+      info += pref + "<a href='" + URI::getURI(relObj) + "'>" + ObjectInfo::getIdentifier(relObj) + name + "</a>";
       if (weight != 1.0)
         info += TString::Format(" (weight: %.3g)", weight);
       info += "<br>";

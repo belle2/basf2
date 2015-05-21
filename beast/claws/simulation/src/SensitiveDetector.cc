@@ -40,7 +40,11 @@ namespace Belle2 {
       //particles will be attributed to the last saved mother particle
       registerMCParticleRelation(m_relMCSimHit, RelationArray::c_negativeWeight);
 
+#if G4VERSION_NUMBER < 1010
       m_saturationEngine = new G4EmSaturation();
+#else
+      m_saturationEngine = new G4EmSaturation(1); // verbose level
+#endif
     }
 
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)

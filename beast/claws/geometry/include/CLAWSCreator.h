@@ -33,8 +33,20 @@ namespace Belle2 {
        */
       CLAWSCreator(Simulation::SensitiveDetectorBase* sensitive = nullptr);
       virtual ~CLAWSCreator();
-      void createShape(const std::string prefix, const GearDir& params, G4LogicalVolume* parent, double roffset, bool check);
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      /** create a shape (box or cylinder) from XML description and place all
+       * child shapes in it by recursively calling this function for all
+       * children.
+       * @param prefix prefix of the volume names
+       * @param params XML parameters
+       * @param parent Logical Volume where to place the shape
+       * @param roffset radial offset for the placement
+       * @param check if true check for overlaps when placing the volumes
+       */
+      void createShape(const std::string& prefix, const GearDir& params,
+                       G4LogicalVolume* parent, double roffset, bool check);
+
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume,
+                          geometry::GeometryTypes type);
     protected:
       /** pointer to the sensitive detector implementation */
       Simulation::SensitiveDetectorBase* m_sensitive{nullptr};

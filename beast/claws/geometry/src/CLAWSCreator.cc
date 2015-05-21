@@ -45,7 +45,8 @@ namespace Belle2 {
       delete m_stepLength;
     }
 
-    void CLAWSCreator::createShape(const std::string prefix, const GearDir& params, G4LogicalVolume* parent, double roffset, bool check)
+    void CLAWSCreator::createShape(const std::string& prefix, const GearDir& params, G4LogicalVolume* parent, double roffset,
+                                   bool check)
     {
       std::string name = params.getString("@name");
       if (!prefix.empty()) {

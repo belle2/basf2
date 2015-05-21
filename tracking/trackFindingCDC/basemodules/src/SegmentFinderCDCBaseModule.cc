@@ -85,65 +85,68 @@ void SegmentFinderCDCBaseModule::event()
   generatedSegments.reserve(90);
   generateSegments(generatedSegments);
 
-  // Fit the segments if requested
-  if (m_param_fitSegments) {
-    const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-    for (const CDCRecoSegment2D& segment : generatedSegments) {
-      CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
-      fitter.update(trajectory2D, segment);
-    }
-  }
+  if (generatedSegments.size() != 0) {
 
-  // Now aquire the store vector
-  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
-  storedRecoSegments.create();
-  std::vector<CDCRecoSegment2D>& outputSegments = *storedRecoSegments;
-  outputSegments.clear();
-
-  /// Copy segments to output fixing their segmentOrientation
-  if (m_segmentOrientation == c_None) {
-    std::swap(generatedSegments, outputSegments);
-  } else if (m_segmentOrientation == c_Symmetric) {
-    outputSegments.reserve(2 * generatedSegments.size());
-    for (const CDCRecoSegment2D& segment : generatedSegments) {
-      outputSegments.push_back(segment.reversed());
-      outputSegments.push_back(std::move(segment));
-    }
-  } else if (m_segmentOrientation == c_Outwards) {
-    outputSegments.reserve(generatedSegments.size());
-    for (const CDCRecoSegment2D& segment : generatedSegments) {
-      outputSegments.push_back(std::move(segment));
-      CDCRecoSegment2D& lastSegment = outputSegments.back();
-      const CDCRecoHit2D& firstHit = lastSegment.front();
-      const CDCRecoHit2D& lastHit = lastSegment.back();
-      if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
-        lastSegment.reverse();
+    // Fit the segments if requested
+    if (m_param_fitSegments) {
+      const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+      for (const CDCRecoSegment2D& segment : generatedSegments) {
+        CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
+        fitter.update(trajectory2D, segment);
       }
     }
-  } else if (m_segmentOrientation == c_Downwards) {
-    outputSegments.reserve(generatedSegments.size());
-    for (const CDCRecoSegment2D& segment : generatedSegments) {
-      outputSegments.push_back(std::move(segment));
-      CDCRecoSegment2D& lastSegment = outputSegments.back();
-      const CDCRecoHit2D& firstHit = lastSegment.front();
-      const CDCRecoHit2D& lastHit = lastSegment.back();
-      if (lastHit.getRecoPos2D().y() > firstHit.getRecoPos2D().y()) {
-        lastSegment.reverse();
+
+    // Now aquire the store vector
+    StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
+    storedRecoSegments.create();
+    std::vector<CDCRecoSegment2D>& outputSegments = *storedRecoSegments;
+    outputSegments.clear();
+
+    /// Copy segments to output fixing their segmentOrientation
+    if (m_segmentOrientation == c_None) {
+      std::swap(generatedSegments, outputSegments);
+    } else if (m_segmentOrientation == c_Symmetric) {
+      outputSegments.reserve(2 * generatedSegments.size());
+      for (const CDCRecoSegment2D& segment : generatedSegments) {
+        outputSegments.push_back(segment.reversed());
+        outputSegments.push_back(std::move(segment));
       }
+    } else if (m_segmentOrientation == c_Outwards) {
+      outputSegments.reserve(generatedSegments.size());
+      for (const CDCRecoSegment2D& segment : generatedSegments) {
+        outputSegments.push_back(std::move(segment));
+        CDCRecoSegment2D& lastSegment = outputSegments.back();
+        const CDCRecoHit2D& firstHit = lastSegment.front();
+        const CDCRecoHit2D& lastHit = lastSegment.back();
+        if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
+          lastSegment.reverse();
+        }
+      }
+    } else if (m_segmentOrientation == c_Downwards) {
+      outputSegments.reserve(generatedSegments.size());
+      for (const CDCRecoSegment2D& segment : generatedSegments) {
+        outputSegments.push_back(std::move(segment));
+        CDCRecoSegment2D& lastSegment = outputSegments.back();
+        const CDCRecoHit2D& firstHit = lastSegment.front();
+        const CDCRecoHit2D& lastHit = lastSegment.back();
+        if (lastHit.getRecoPos2D().y() > firstHit.getRecoPos2D().y()) {
+          lastSegment.reverse();
+        }
+      }
+    } else {
+      B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" << m_segmentOrientation <<
+                "'. No segments generated.");
     }
-  } else {
-    B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" << m_segmentOrientation <<
-              "'. No segments generated.");
-  }
 
 
-  // Put code to generate gf track cands here if requested.
-  if (m_param_createGFTrackCands) {
-    StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
-    storedGFTrackCands.create();
-    for (const CDCRecoSegment2D& segment : outputSegments) {
-      genfit::TrackCand* ptrTrackCand = storedGFTrackCands.appendNew();
-      segment.fillInto(*ptrTrackCand);
+    // Put code to generate gf track cands here if requested.
+    if (m_param_createGFTrackCands) {
+      StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
+      storedGFTrackCands.create();
+      for (const CDCRecoSegment2D& segment : outputSegments) {
+        genfit::TrackCand* ptrTrackCand = storedGFTrackCands.appendNew();
+        segment.fillInto(*ptrTrackCand);
+      }
     }
   }
 

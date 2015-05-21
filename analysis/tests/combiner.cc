@@ -420,6 +420,11 @@ namespace {
     Psi.addExpectedParticle(Particle::c_Unflavored, 30443, {D0 * 1, D0 * 3});
     Psi.addAndCheckParticlesFromGenerator();
 
+    TestParticleList PsiMixed("psi(3770):mixeed -> D0 D0");
+    PsiMixed.addExpectedParticle(Particle::c_Unflavored, 30443, {D0 * 0, D0 * 2});
+    PsiMixed.addExpectedParticle(Particle::c_Unflavored, 30443, {D0 * 1, D0 * 3});
+    PsiMixed.addAndCheckParticlesFromGenerator();
+
   }
 
   TEST_F(ParticleCombinerTest, PsiToD0D0sig)

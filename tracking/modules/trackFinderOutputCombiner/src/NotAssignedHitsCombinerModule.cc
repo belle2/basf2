@@ -66,13 +66,9 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   // (2b) It can be background
   // As in most of the cases these segments are stereo segments, case (1) is the most common
 
-  B2DEBUG(100, "Calculating matrices...")
-  m_fittingMatrix.calculateMatrices(segments, tracks);
-  B2DEBUG(100, "Done calculating matrices.")
-  m_fittingMatrix.print();
-
   // Find all "easy" possibilities:
   findEasyCandidates(segments, tracks);
+  m_fittingMatrix.print();
 
 
   // For the segments ending up here there are basically two possibilities:
@@ -80,22 +76,98 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   // (2) they form a new track - a track the legendre track finder has not found at all.
   // (3) the matching routine has not worked properly and they belong to an already found track
   // The question is not only if some of the segments are background - the question is also whether we should merge them in one ore more tracks
-  m_fittingMatrix.print();
 
   // Delete all segments, that are used
   std::vector<CDCRecoSegment2D> notUsedRecoSegments;
   for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < segments.size(); segmentCounter++) {
     if (not m_fittingMatrix.isSegmentUsed(segmentCounter)) {
-      notUsedRecoSegments.push_back(segments[segmentCounter]);
+      notUsedRecoSegments.push_back(std::move(segments[segmentCounter]));
     }
   }
 
-  // Recalculate the matrices
-  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, tracks);
+  //findHarderCandidates(notUsedRecoSegments, tracks);
+  m_fittingMatrix.print();
 
-  // Testing purposes:
-  // Use all segments with a very low pt.
-  // TODO
+  // Delete all segments, that are used
+  for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < segments.size(); segmentCounter++) {
+    if (m_fittingMatrix.isSegmentUsed(segmentCounter)) {
+      segments[segmentCounter].getAutomatonCell().setTakenFlag();
+    }
+  }
+  segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCRecoSegment2D & segment) -> bool { return segment.getAutomatonCell().hasTakenFlag(); }),
+                 segments.end());
+}
+
+
+void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<CDCRecoSegment2D>& segments,
+                                                       std::vector<CDCTrack>& tracks)
+{
+  m_fittingMatrix.calculateMatrices(segments, tracks);
+  m_fittingMatrix.print();
+
+  // Make a copy of the tracks
+  std::vector<CDCTrack> copy;
+  std::copy(tracks.begin(), tracks.end(), std::back_inserter(copy));
+
+  // Find all "easy" possibilities:
+  for (FittingMatrix::SegmentCounter counterOuter = 0;
+       counterOuter < segments.size(); counterOuter++) {
+    unsigned int numberOfPossibleFits = 0; // How many tracks can be fitted to this segment in total
+    unsigned int bestFitIndex = 0; // Which track has the highest chi2? For one possible fit partner this is the only possible index
+    double highestChi2 = 0; // Which is the highest chi2?
+    for (FittingMatrix::TrackCounter counterInner = 0;
+         counterInner < tracks.size(); counterInner++) {
+      if (m_fittingMatrix.isGoodEntry(counterOuter, counterInner)) {
+        numberOfPossibleFits++;
+        if (m_fittingMatrix.getChi2(counterOuter, counterInner) > highestChi2) {
+          bestFitIndex = counterInner;
+          highestChi2 = m_fittingMatrix.getChi2(counterOuter, counterInner);
+        }
+      }
+    }
+    // for axial hits we add the segment to the best fit partner
+    // for stereo hits we add it to the track candidate, if we have only one possible fit partner. Then, we add all other segments sharing more or less the same parameters
+    if (segments[counterOuter].getStereoType() == AXIAL) {
+      if (numberOfPossibleFits > 0
+          && highestChi2 > m_fittingMatrix.getParamMinimalChi2()) {
+        m_fittingMatrix.addSegmentToResultTrack(counterOuter, bestFitIndex,
+                                                segments, tracks);
+      }
+    } else if (numberOfPossibleFits == 1) {
+      // Add segments with more or less the same parameters that fit to the track
+      for (FittingMatrix::SegmentCounter counterSegments = 0;
+           counterSegments < segments.size(); counterSegments++) {
+        if (m_fittingMatrix.segmentHasTheSameParameters(counterSegments,
+                                                        counterOuter, bestFitIndex)) {
+          m_fittingMatrix.addSegmentToResultTrack(counterSegments, bestFitIndex,
+                                                  segments, tracks);
+        }
+      }
+    } else if (numberOfPossibleFits > 0) {
+      // Now we come to the more tricky segments: we have more than one possibility
+      // we look for the cases where we have more than one possible fit, but only one fits to the track:
+      for (FittingMatrix::TrackCounter counterInner = 0;
+           counterInner < tracks.size(); counterInner++) {
+        if (m_fittingMatrix.getChi2(counterOuter, counterInner)
+            > m_fittingMatrix.getParamMinimalChi2()) {
+          double theta = calculateThetaOfTrackCandidate(copy[counterInner]);
+          if (std::abs(m_fittingMatrix.getZ(counterOuter, counterInner) - theta)
+              < m_fittingMatrix.getParamMinimalThetaDifference()) {
+            m_fittingMatrix.addSegmentToResultTrack(counterOuter, counterInner,
+                                                    segments, tracks);
+          }
+        }
+      }
+    }
+  }
+}
+
+void NotAssignedHitsCombinerModule::findHarderCandidates(std::vector<CDCRecoSegment2D>& notUsedRecoSegments,
+                                                         std::vector<CDCTrack>& tracks)
+{
+
+  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, tracks);
+  m_fittingMatrix.print();
 
   // Check if the segments would fit into a whole in a track pattern of a result track candidate
   for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < notUsedRecoSegments.size(); segmentCounter++) {
@@ -159,8 +231,6 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
 
     B2INFO("Axial: " << (recoSegment.getStereoType() == AXIAL))
   }
-
-  m_fittingMatrix.print();
 }
 
 double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate)
@@ -194,66 +264,5 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
     // just a dummy value: this means the track is more or less axial only
     B2WARNING("Axial only")
     return 100;
-  }
-}
-
-
-void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
-                                                       std::vector<TrackFindingCDC::CDCTrack>& resultTrackCands)
-{
-  // Make a copy of the tracks
-  std::vector<CDCTrack> copy;
-  std::copy(resultTrackCands.begin(), resultTrackCands.end(), std::back_inserter(copy));
-
-  // Find all "easy" possibilities:
-  for (FittingMatrix::SegmentCounter counterOuter = 0;
-       counterOuter < recoSegments.size(); counterOuter++) {
-    unsigned int numberOfPossibleFits = 0; // How many tracks can be fitted to this segment in total
-    unsigned int bestFitIndex = 0; // Which track has the highest chi2? For one possible fit partner this is the only possible index
-    double highestChi2 = 0; // Which is the highest chi2?
-    for (FittingMatrix::TrackCounter counterInner = 0;
-         counterInner < resultTrackCands.size(); counterInner++) {
-      if (m_fittingMatrix.isGoodEntry(counterOuter, counterInner)) {
-        numberOfPossibleFits++;
-        if (m_fittingMatrix.getChi2(counterOuter, counterInner) > highestChi2) {
-          bestFitIndex = counterInner;
-          highestChi2 = m_fittingMatrix.getChi2(counterOuter, counterInner);
-        }
-      }
-    }
-    // for axial hits we add the segment to the best fit partner
-    // for stereo hits we add it to the track candidate, if we have only one possible fit partner. Then, we add all other segments sharing more or less the same parameters
-    if (recoSegments[counterOuter].getStereoType() == AXIAL) {
-      if (numberOfPossibleFits > 0
-          && highestChi2 > m_fittingMatrix.getParamMinimalChi2()) {
-        m_fittingMatrix.addSegmentToResultTrack(counterOuter, bestFitIndex,
-                                                recoSegments, resultTrackCands);
-      }
-    } else if (numberOfPossibleFits == 1) {
-      // Add segments with more or less the same parameters that fit to the track
-      for (FittingMatrix::SegmentCounter counterSegments = 0;
-           counterSegments < recoSegments.size(); counterSegments++) {
-        if (m_fittingMatrix.segmentHasTheSameParameters(counterSegments,
-                                                        counterOuter, bestFitIndex)) {
-          m_fittingMatrix.addSegmentToResultTrack(counterSegments, bestFitIndex,
-                                                  recoSegments, resultTrackCands);
-        }
-      }
-    } else if (numberOfPossibleFits > 0) {
-      // Now we come to the more tricky segments: we have more than one possibility
-      // we look for the cases where we have more than one possible fit, but only one fits to the track:
-      for (FittingMatrix::TrackCounter counterInner = 0;
-           counterInner < resultTrackCands.size(); counterInner++) {
-        if (m_fittingMatrix.getChi2(counterOuter, counterInner)
-            > m_fittingMatrix.getParamMinimalChi2()) {
-          double theta = calculateThetaOfTrackCandidate(copy[counterInner]);
-          if (std::abs(m_fittingMatrix.getZ(counterOuter, counterInner) - theta)
-              < m_fittingMatrix.getParamMinimalThetaDifference()) {
-            m_fittingMatrix.addSegmentToResultTrack(counterOuter, counterInner,
-                                                    recoSegments, resultTrackCands);
-          }
-        }
-      }
-    }
   }
 }

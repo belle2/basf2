@@ -36,16 +36,16 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   m_nodes = NSMNodeList();
   m_dataname = StringList();
+  const std::string format = obj("system").getText("nsmdata");
+  // 0. Register DqmServer
   if (obj.hasObject("dqmserver")) {
     m_nodes.push_back(NSMNode(obj("dqmserver").getText("nodename")));
   }
-  const std::string format = obj("system").getText("nsmdata");
+  // 1. Register distributor
   std::string nodename = obj("distributor").getText("nodename");
   m_nodes.push_back(NSMNode(nodename));
   addData(nodename, format);
-  nodename = obj("collector").getText("nodename");
-  m_nodes.push_back(NSMNode(nodename));
-  addData(nodename, format);
+  // 2. Register event processors
   const DBObject& processor(obj("processor"));
   int maxnodes = processor.getInt("nnodes");
   int idbase = processor.getInt("idbase");
@@ -60,8 +60,15 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
       addData(nodename, format);
     }
   }
+  // 3. Register Collector
+  nodename = obj("collector").getText("nodename");
+  m_nodes.push_back(NSMNode(nodename));
+  addData(nodename, format);
+  // 4. Register RoiSender
+  nodename = obj("roisender").getText("nodename");
+  m_nodes.push_back(NSMNode(nodename));
+
   add(new NSMVHandlerInt("nnodes", true, false, m_nodes.size()));
-  //m_nodes.push_back(NSMNode(nodename));
   int i = 0;
   std::string rcconf = obj.getName();
   if (StringUtil::find(rcconf, "@")) {
@@ -169,11 +176,15 @@ void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
     for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
       if (it->getState() != RCState::READY_S) configured = false;
     }
-    if (configured) return;
+    if (configured) break;
     try {
       perform(NSMCommunicator::select(30));
     } catch (const TimeoutException& e) {}
   }
+  if (m_callback != NULL) {
+    m_callback->setState(RCState::READY_S);
+  }
+  RCCallback::setState(RCState::READY_S);
 }
 
 void RFMasterCallback::abort() throw(RCHandlerException)
@@ -201,6 +212,10 @@ void RFMasterCallback::abort() throw(RCHandlerException)
       throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
     }
   }
+  if (m_callback != NULL) {
+    m_callback->setState(RCState::NOTREADY_S);
+  }
+  RCCallback::setState(RCState::NOTREADY_S);
 }
 
 void RFMasterCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)

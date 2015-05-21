@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-from trackfinderoutputcombiner.validation import (add_mc_track_finder, add_printer,
-                                                  add_background_hit_finder, add_legendre_track_finder,
-                                                  add_local_track_finder, add_old_combiner, add_new_combiner,
-                                                  add_validation)
 from tracking.run.event_generation import StandardEventGenerationRun
+from tracking import modules
+from trackfinderoutputcombiner.validation import add_mc_track_finder
 
 import logging
 import sys
@@ -15,15 +13,18 @@ import basf2
 class FullRun(StandardEventGenerationRun):
     # Tester module for all cdc tracking in on path (plus combiners)
 
+    n_events = 1
+
     def create_path(self):
         # Creates the path with all the modules in a row
         main_path = super(FullRun, self).create_path()
-        add_mc_track_finder(main_path)
-        add_background_hit_finder(main_path)
-        add_legendre_track_finder(main_path)
-        add_local_track_finder(main_path)
-        add_old_combiner(main_path, output_track_cands_store_array_name="ResultTrackCands")
-        basf2.print_path(main_path, defaults=True)
+
+        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands"))
+
+        main_path.add_module(modules.CDCFitter(input_track_cands_store_array_name="TrackCands"))
+
+        genfitter_visualization = StandardEventGenerationRun.get_basf2_module('Display', showTrackCandidates=True, showMCInfo=False)
+        main_path.add_module(genfitter_visualization)
 
         return main_path
 

@@ -12,6 +12,7 @@ import ROOT
 import logging
 
 import tracking.metamodules as metamodules
+from tracking.run.event_generation import StandardEventGenerationRun
 
 
 def get_logger():
@@ -85,40 +86,247 @@ class CDCFullFinder(metamodules.PathModule):
 
     """Full finder sequence for the CDC with a step of Legendre tracking first and cellular automaton tracking second."""
 
-    def __init__(self):
-        background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
-        background_hit_finder_module.param({"ClusterFilter": "tmva",
-                                            "ClusterFilterParameters": {"cut": "0.1"},
-                                            "SegmentsStoreObjName": "TempCDCRecoSegment2DVector",
-                                            "FacetFilter": "none",
-                                            "FacetRelationFilter": "none"})
+    def __init__(self, output_track_cands_store_array_name="TrackCands"):
 
-        printer = basf2.register_module("PrintCollections")
-
-        legendre_track_finder_module = basf2.register_module('CDCLegendreTracking')
-        legendre_track_finder_module.param({'SkipHitsPreparation': True,
-                                            'WriteGFTrackCands': False})
-
-        cdc_stereo_combiner = basf2.register_module('CDCLegendreHistogramming')
-        cdc_stereo_combiner.param({'WriteGFTrackCands': True,
-                                   'SkipHitsPreparation': True,
-                                   'TracksStoreObjNameIsInput': True,
-                                   "GFTrackCandsStoreArrayName": "LegendreTrackCands"})
-
-        local_track_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
-        local_track_finder_module.param({"SkipHitsPreparation": True,
-                                         "CreateGFTrackCands": False})
-
-        not_assigned_hits_combiner_module = basf2.register_module("NotAssignedHitsCombiner")
-        not_assigned_hits_combiner_module.param({"TracksFromLegendreFinder": "LegendreTrackCands",
-                                                 "ResultTrackCands": "TrackCands",
-                                                 "RecoSegments": "CDCRecoSegment2DVector",
-                                                 "BadTrackCands": "BadTrackCands"})
-
-        modules = [background_hit_finder_module,
-                   legendre_track_finder_module,
-                   cdc_stereo_combiner,
-                   local_track_finder_module,
-                   not_assigned_hits_combiner_module]
+        modules = [CDCBackgroundHitFinder(),
+                   CDCLegendreTrackFinder(),
+                   CDCLocalTrackFinder(),
+                   CDCNotAssignedHitsCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name)]
 
         super(CDCFullFinder, self).__init__(modules=modules)
+
+
+class CDCBackgroundHitFinder(metamodules.WrapperModule):
+
+    """ Adds the background hit finder to the path. The vectors with __Temp get registered but not created.
+    WARNING: Pleasy remember that even a tmva_cut of 0 does remove hits!
+    """
+
+    def __init__(self, tmva_cut=0.1):
+        self.tmva_cut = tmva_cut
+
+        if self.tmva_cut < 0 or self.tmva_cut > 1:
+            print "Given tmva_cut %.1f is not in the valid range [0, 1]. Not adding the module" % self.tmva_cut
+            return
+
+        background_hit_finder_module = StandardEventGenerationRun.get_basf2_module(
+            "SegmentFinderCDCFacetAutomatonDev",
+            ClusterFilter="tmva",
+            ClusterFilterParameters={
+                "cut": str(
+                    self.tmva_cut)},
+            SegmentsStoreObjName="__TempCDCRecoSegment2DVector",
+            CreateGFTrackCands=False,
+            WriteGFTrackCands=False,
+            FacetFilter="none",
+            FacetRelationFilter="none",
+            TracksStoreObjName="__TempCDCTracksVector")
+
+        super(CDCBackgroundHitFinder, self).__init__(background_hit_finder_module)
+
+
+class CDCLegendreTrackFinder(metamodules.PathModule):
+
+    """Add the legendre finder to the path.
+    If assign_stereo_hits is True, also add the Histogramming module (default)
+    If delete_hit_information is True, all already marked hits get unmarked (not default)
+    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
+    With output_track_cands_store_vector_name you can control the output vector of the CDCTracks. Be aware that every content
+    in this vector will be deleted before executing this module!
+    """
+
+    def __init__(self, delete_hit_information=False,
+                 output_track_cands_store_array_name=None,
+                 output_track_cands_store_vector_name="CDCTrackVector",
+                 assign_stereo_hits=True):
+
+        module_list = []
+
+        legendre_tracking_module = StandardEventGenerationRun.get_basf2_module(
+            'CDCLegendreTracking',
+            WriteGFTrackCands=False,
+            TracksStoreObjName=output_track_cands_store_vector_name)
+        if delete_hit_information:
+            legendre_tracking_module.param('SkipHitsPreparation', False)
+        else:
+            legendre_tracking_module.param('SkipHitsPreparation', True)
+
+        last_tracking_module = legendre_tracking_module
+
+        cdc_stereo_combiner = StandardEventGenerationRun.get_basf2_module('CDCLegendreHistogramming',
+                                                                          SkipHitsPreparation=True,
+                                                                          TracksStoreObjNameIsInput=True,
+                                                                          WriteGFTrackCands=False,
+                                                                          TracksStoreObjName=output_track_cands_store_vector_name)
+
+        if assign_stereo_hits:
+            module_list.append(last_tracking_module)
+            last_tracking_module = cdc_stereo_combiner
+
+        if output_track_cands_store_array_name is not None:
+            last_tracking_module.param({'WriteGFTrackCands': True,
+                                        'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        module_list.append(last_tracking_module)
+
+        super(CDCLegendreTrackFinder, self).__init__(modules=module_list)
+
+
+class CDCLocalTrackFinder(metamodules.WrapperModule):
+
+    """ Add the local finder to the path.
+    If delete_hit_information is True, all already marked hits get unmarked (not default)
+    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
+    With output_segments_store_vector_name you can control the output vector of the CDCRecoSegments2D. Be aware that every content
+    in this vector will be deleted before executing this module!
+
+    The vector with _Temp gets registered but not created
+    """
+
+    def __init__(self, delete_hit_information=False,
+                 output_track_cands_store_array_name=None,
+                 output_segments_store_vector_name="CDCRecoSegment2DVector"):
+
+        local_track_finder_module = StandardEventGenerationRun.get_basf2_module(
+            'SegmentFinderCDCFacetAutomaton',
+            SegmentsStoreObjName=output_segments_store_vector_name,
+            WriteGFTrackCands=False,
+            FitSegments=True,
+            TracksStoreObjName="__TempCDCTracksVector")
+
+        if delete_hit_information:
+            local_track_finder_module.param('SkipHitsPreparation', False)
+        else:
+            local_track_finder_module.param('SkipHitsPreparation', True)
+
+        if output_track_cands_store_array_name is not None:
+            local_track_finder_module.param({'WriteGFTrackCands': True,
+                                             'GFTrackCandsStoreArrayName': output_track_cands_store_array_name,
+                                             'CreateGFTrackCands': True})
+
+        super(CDCLocalTrackFinder, self).__init__(local_track_finder_module)
+
+
+class CDCNotAssignedHitsCombiner(metamodules.WrapperModule):
+
+    """Add the old combiner module to the path
+    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
+    With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With segments_store_vector_name you can control the input vector of the CDCRecoSegments2D. Be aware that the content
+    of this vector will be replaced by the output of this module
+    """
+
+    def __init__(self, output_track_cands_store_array_name=None,
+                 track_cands_store_vector_name="CDCTrackVector",
+                 segments_store_vector_name="CDCRecoSegment2DVector",
+                 use_second_stage=False):
+
+        not_assigned_hits_combiner_module = StandardEventGenerationRun.get_basf2_module(
+            "NotAssignedHitsCombiner",
+            SkipHitsPreparation=True,
+            TracksStoreObjNameIsInput=True,
+            WriteGFTrackCands=False,
+            SegmentsStoreObjName=segments_store_vector_name,
+            TracksStoreObjName=track_cands_store_vector_name,
+            UseSecondStage=use_second_stage)
+
+        if output_track_cands_store_array_name is not None:
+            not_assigned_hits_combiner_module.param({'WriteGFTrackCands': True,
+                                                     'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        super(CDCNotAssignedHitsCombiner, self).__init__(not_assigned_hits_combiner_module)
+
+
+class CDCSegmentTrackCombiner(metamodules.WrapperModule):
+
+    """ Add the new combiner module to the path
+    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
+    With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With segments_store_vector_name you can control the input vector of the CDCRecoSegments2D. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With the other parameters you can control the filters of the SegmentTrackCombiner
+    """
+
+    def __init__(self, output_track_cands_store_array_name=None,
+                 track_cands_store_vector_name="CDCTrackVector",
+                 segments_store_vector_name="CDCRecoSegment2DVector",
+                 segment_track_chooser_filter="simple",
+                 segment_track_chooser_cut=0,
+                 segment_train_filter="simple",
+                 segment_track_filter="simple"):
+
+        combiner_module = StandardEventGenerationRun.get_basf2_module("SegmentTrackCombinerDev",
+                                                                      SegmentTrackChooser=segment_track_chooser_filter,
+                                                                      SegmentTrainFilter=segment_train_filter,
+                                                                      SegmentTrackFilter=segment_track_filter,
+                                                                      WriteGFTrackCands=False,
+                                                                      SkipHitsPreparation=True,
+                                                                      TracksStoreObjNameIsInput=True,
+                                                                      SegmentsStoreObjName=segments_store_vector_name,
+                                                                      TracksStoreObjName=track_cands_store_vector_name)
+
+        if segment_track_chooser_filter == "tmva":
+            combiner_module.param('SegmentTrackChooserParameters', {"cut": str(segment_track_chooser_cut)})
+
+        if output_track_cands_store_array_name is not None:
+            combiner_module.param({'WriteGFTrackCands': True,
+                                   'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        super(CDCSegmentTrackCombiner, self).__init__(combiner_module)
+
+
+class CDCValidation(metamodules.PathModule):
+
+    """Add a validation and a mc track matcher to the path
+    With track_candidates_store_array_name you can choose the name of the genfit::TrackCands this validation should be created for
+    With output_file_name you can choose the file name for the results
+
+    TODO: Do only create the mc_track_matching relations if not already present
+    TODO: Create a parameter to only do the validation if the file is not already present (something like force overwrite)
+    """
+
+    def __init__(self, track_candidates_store_array_name, output_file_name):
+        mc_track_matcher_module = StandardEventGenerationRun.get_basf2_module(
+            'MCTrackMatcher',
+            UseCDCHits=True,
+            UseSVDHits=False,
+            UsePXDHits=False,
+            RelateClonesToMCParticles=True,
+            MCGFTrackCandsColName="MCTrackCands",
+            PRGFTrackCandsColName=track_candidates_store_array_name)
+
+        validation_module = SeparatedTrackingValidationModule(
+            name="",
+            contact="",
+            output_file_name=output_file_name,
+            trackCandidatesColumnName=track_candidates_store_array_name,
+            expert_level=2)
+
+        super(CDCValidation, self).__init__(modules=[mc_track_matcher_module, validation_module])
+
+
+class CDCFitter(metamodules.PathModule):
+
+    """ Add the genfit module to te path """
+
+    def __init__(self, fit_geometry="Geant4",
+                 input_track_cands_store_array_name="TrackCands"):
+
+        setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
+                                                                                        whichGeometry=fit_geometry)
+        gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
+                                                                        PDGCodes=[13],
+                                                                        StoreFailedTracks=True,
+                                                                        GFTrackCandidatesColName=input_track_cands_store_array_name,
+                                                                        GFTracksColName="GF2Tracks",
+                                                                        BuildBelle2Tracks=False)
+
+        track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder',
+                                                                    GFTracksColName="GF2Tracks",
+                                                                    GFTrackCandidatesColName=input_track_cands_store_array_name)
+
+        module_list = [setup_genfit_extrapolation_module, gen_fitter_module, track_builder]
+
+        super(CDCFitter, self).__init__(modules=module_list)

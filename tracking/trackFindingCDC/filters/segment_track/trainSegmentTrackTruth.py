@@ -5,7 +5,7 @@ import os
 import sys
 import os.path
 import basf2
-from trackfindingcdc.tmva.train import FastBDTClassifier
+from trackfindingcdc.tmva.train import FastBDTClassifier, ClassificationOverview
 
 import ROOT.TFile
 
@@ -13,9 +13,10 @@ import logging
 
 
 def main():
+    overview = ClassificationOverview("SegmentTrackTruthOverview.root")
     classifer = FastBDTClassifier(
         "SegmentTrackTruth",
-        "SegmentTrackTruthTruthWeight.root",
+        "SegmentTrackTruthWeight.root",
     )
 
     input_file_name = "SegmentTrackChooser.root"
@@ -23,6 +24,7 @@ def main():
     input_tree_name = "records"
     input_tree = input_file.Get(input_tree_name)
 
+    overview.train(input_tree)
     classifer.train(input_tree)
 
 if __name__ == "__main__":

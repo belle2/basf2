@@ -214,5 +214,15 @@ void ROCallback::monitor() throw(RCHandlerException)
     }
     data.flush();
   }
+  if (getNode().getState() == RCState::RUNNING_S ||
+      getNode().getState() == RCState::READY_S ||
+      getNode().getState() == RCState::PAUSED_S) {
+    if (!m_stream1.getControl().isAlive()) {
+      throw (RCHandlerException("Process down : stream1"));
+    }
+    for (size_t i = 0; i < m_stream0.size(); i++) {
+      throw (RCHandlerException("Process down : stream0-%d", (int)i));
+    }
+  }
 }
 

@@ -57,8 +57,6 @@ class MCTrackFinderRun(StandardEventGenerationRun):
 
         mc_track_finder_module_if_module = IfStoreArrayNotPresentModule(mc_track_finder_module,
                                                                         storearray_name=self.mc_track_cands_store_array_name)
-
-        mc_track_finder_module_if_module.set_log_level(basf2.LogLevel.DEBUG)
         main_path.add_module(mc_track_finder_module_if_module)
 
         return main_path

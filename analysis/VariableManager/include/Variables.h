@@ -217,6 +217,16 @@ namespace Belle2 {
     double genMotherPDG(const Particle* particle);
 
     /**
+     * check the array index of a particle's MC mother
+     */
+    double genMotherIndex(const Particle* particle);
+
+    /**
+     * check the array index of a particle's related MCParticle
+     */
+    double genParticleIndex(const Particle* particle);
+
+    /**
      * return PDG code of matched MCParticle
      */
     double particleMCMatchPDGCode(const Particle* particle);

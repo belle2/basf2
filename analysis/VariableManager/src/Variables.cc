@@ -531,6 +531,27 @@ namespace Belle2 {
       return m_pdg;
     }
 
+    double genMotherIndex(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (!mcparticle) return -1.0;
+
+      const MCParticle* mcmother = mcparticle->getMother();
+      if (!mcmother) return -2.0;
+
+      double m_ID = mcmother->getArrayIndex();
+      return m_ID;
+    }
+
+    double genParticleIndex(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (!mcparticle) return -1.0;
+
+      double m_ID = mcparticle->getArrayIndex();
+      return m_ID;
+    }
+
     double isSignalAcceptMissingNeutrino(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1178,6 +1199,8 @@ namespace Belle2 {
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,               "Check the PDG code of a particles MC mother particle");
+    REGISTER_VARIABLE("genMotherID", genMotherIndex,               "Check the array index of a particle's generated mother");
+    REGISTER_VARIABLE("genParticleID", genParticleIndex,               "Check the array index of a particle's related MCParticle");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino", isSignalAcceptMissingNeutrino,
                       "same as isSignal, but also accept missing neutrino");
     REGISTER_VARIABLE("mcPDG",    particleMCMatchPDGCode,

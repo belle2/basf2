@@ -204,6 +204,73 @@ namespace Belle2 {
       return constant[0];
     }
 
+    // Misc --------------------------------------------------
+
+    double hasDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3)
+    {
+
+      if (args3.size() != 3) {
+        B2ERROR("This function accepts three arguments!");
+        return -999.0;
+      }
+
+      if (!particle) {
+        B2ERROR("This particle does not exist!");
+        return -999.0;
+      }
+
+      int nDaughters = int(particle->getNDaughters());
+
+      if (nDaughters < 1) {
+        B2ERROR("This particle has no daughters!");
+        return -999.0;
+      }
+
+      if (args3[0] == 0) {
+        B2ERROR("Looking for particles with PDG = 0!");
+        return -999.0;
+      }
+
+      if (args3[1] < 0) {
+        B2ERROR("Second argument should be >= 0");
+        return -999.0;
+      }
+
+      if (abs(args3[2]) != 1) {
+        B2ERROR("Third argument should be 1 or -1!");
+        return -999.0;
+      }
+
+      int Count = 0;
+
+      const std::vector<Particle*> daughters = particle->getDaughters();
+
+      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+        int daughterPDG = daughters[iDaughter]->getPDGCode();
+
+        if (args3[2] == 1) {
+          if (abs(daughterPDG) == abs(args3[0])) // same PDG codes, sign independent
+            Count++;
+        } else if (args3[2] == -1) {
+          if (daughterPDG == args3[0]) // same PDG codes, sign dependent
+            Count++;
+        }
+      }
+
+      // check conditions
+      if (Count == (int) args3[1])
+        return 1.0;
+      else
+        return 0.0;
+    }
+
+    double hasDaughterWithPDG(const Particle* particle, const std::vector<double>& args2)
+    {
+      const std::vector<double> args3 = {args2[0], 1.0, args2[1]};
+      double result = hasDaughtersWithPDG(particle, args3);
+      return result;
+    }
+
     VARIABLE_GROUP("ParameterFunctions");
     REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent ,
                       "Returns number of MC Particles (including anti particles) with the given pdg in the event.");
@@ -222,6 +289,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("constant(i)", Constant, "Returns constant number");
 
     REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
+
+    REGISTER_VARIABLE("hasDaughtersWithPDG(PDG,N,sign)", hasDaughtersWithPDG,
+                      "Returns information regarding the daughter with a specific PDG code.");
+    REGISTER_VARIABLE("hasDaughterWithPDG(PDG,sign)", hasDaughterWithPDG,
+                      "Returns information regarding the daughter with a specific PDG code.");
+
 
   }
 }

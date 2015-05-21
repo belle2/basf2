@@ -336,7 +336,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
   static float bentZ[7] = {0, 0, 0, 0, 8.94, 17.51, 24.61};
   // and what is the opening angle of the "cone" created by the bent layers
   const float degToRad = 3.14159265 / 180.0;
-  static float openingAngle[7] = {0, 0, 0, 0, 11.9 * degToRad, 16 * degToRad, 21.1 * degToRad};
+  static float openingAngle[7] = {0, 0, 0, 0, 11.9f * degToRad, 16.0f * degToRad, 21.1f * degToRad};
 
   // assumes the track is ordered correctly
   TVector3 posAtLayer, momAtLayer;

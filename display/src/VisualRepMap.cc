@@ -128,7 +128,7 @@ void VisualRepMap::add(const TObject* dataStoreObject, TEveElement* visualRepres
   }
   auto ret = m_dataStoreEveElementMap->insert(DataStoreEveElementMap::value_type(dataStoreObject, visualRepresentation));
   if (!ret.second) {
-    B2ERROR("Failed to insert object represented by " << visualRepresentation->GetElementName() << "! Duplicate?");
+    B2DEBUG(100, "Failed to insert object represented by " << visualRepresentation->GetElementName() << "! Duplicate?");
   }
 }
 

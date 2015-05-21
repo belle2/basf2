@@ -13,6 +13,7 @@
 #include <framework/gearbox/Unit.h>
 #include <G4Track.hh>
 #include <G4Step.hh>
+#include <G4Version.hh>
 
 #include <array>
 

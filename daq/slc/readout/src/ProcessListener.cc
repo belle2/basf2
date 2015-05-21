@@ -23,7 +23,9 @@ void ProcessListener::run()
     LogFile::fatal("Failed to wait processed process %s", process_name.c_str());
     return;
   }
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
   m_con->lock();
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
   RCCallback& callback(*(m_con->getCallback()));
   NSMNode& node(callback.getNode());
   if (m_con->getInfo().isAvailable()) {
@@ -60,6 +62,9 @@ void ProcessListener::run()
       } break;
     }
   }
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
   process.set_id(-1);
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
   m_con->unlock();
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
 }

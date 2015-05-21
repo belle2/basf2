@@ -206,8 +206,12 @@ namespace Belle2 {
 
     // Misc --------------------------------------------------
 
-    double hasDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3)
+    double hasNDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3)
     {
+
+      int p_PDG = args3[0];
+      int p_N = args3[1];
+      int p_Sign = args3[2];
 
       if (args3.size() != 3) {
         B2ERROR("This function accepts three arguments!");
@@ -226,17 +230,17 @@ namespace Belle2 {
         return -999.0;
       }
 
-      if (args3[0] == 0) {
+      if (p_PDG == 0) {
         B2ERROR("Looking for particles with PDG = 0!");
         return -999.0;
       }
 
-      if (args3[1] < 0) {
+      if (p_N < 0) {
         B2ERROR("Second argument should be >= 0");
         return -999.0;
       }
 
-      if (abs(args3[2]) != 1) {
+      if (abs(p_Sign) != 1) {
         B2ERROR("Third argument should be 1 or -1!");
         return -999.0;
       }
@@ -248,17 +252,17 @@ namespace Belle2 {
       for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
         int daughterPDG = daughters[iDaughter]->getPDGCode();
 
-        if (args3[2] == 1) {
-          if (abs(daughterPDG) == abs(args3[0])) // same PDG codes, sign independent
+        if (p_Sign == 1) {
+          if (abs(daughterPDG) == abs(p_PDG)) // same PDG codes, sign independent
             Count++;
-        } else if (args3[2] == -1) {
-          if (daughterPDG == args3[0]) // same PDG codes, sign dependent
+        } else if (p_Sign == -1) {
+          if (daughterPDG == p_PDG) // same PDG codes, sign dependent
             Count++;
         }
       }
 
       // check conditions
-      if (Count == (int) args3[1])
+      if (Count == p_N)
         return 1.0;
       else
         return 0.0;
@@ -266,9 +270,57 @@ namespace Belle2 {
 
     double hasDaughterWithPDG(const Particle* particle, const std::vector<double>& args2)
     {
-      const std::vector<double> args3 = {args2[0], 1.0, args2[1]};
-      double result = hasDaughtersWithPDG(particle, args3);
-      return result;
+      int p_PDG = args2[0];
+      int p_Sign = args2[1];
+
+      if (args2.size() != 2) {
+        B2ERROR("This function accepts two arguments!");
+        return -999.0;
+      }
+
+      if (!particle) {
+        B2ERROR("This particle does not exist!");
+        return -999.0;
+      }
+
+      int nDaughters = int(particle->getNDaughters());
+
+      if (nDaughters < 1) {
+        B2ERROR("This particle has no daughters!");
+        return -999.0;
+      }
+
+      if (p_PDG == 0) {
+        B2ERROR("Looking for particles with PDG = 0!");
+        return -999.0;
+      }
+
+      if (abs(p_Sign) != 1) {
+        B2ERROR("Second argument should be 1 or -1!");
+        return -999.0;
+      }
+
+      int Status = 0;
+
+      const std::vector<Particle*> daughters = particle->getDaughters();
+
+      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+        int daughterPDG = daughters[iDaughter]->getPDGCode();
+
+        if (p_Sign == 1) {
+          if (abs(daughterPDG) == abs(p_PDG)) // same PDG codes, sign independent
+            Status = 1;
+        } else if (p_Sign == -1) {
+          if (daughterPDG == p_PDG) // same PDG codes, sign dependent
+            Status = 1;
+        }
+      }
+
+      // check conditions
+      if (Status == 1)
+        return 1.0;
+      else
+        return 0.0;
     }
 
     VARIABLE_GROUP("ParameterFunctions");
@@ -290,10 +342,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
 
-    REGISTER_VARIABLE("hasDaughtersWithPDG(PDG,N,sign)", hasDaughtersWithPDG,
-                      "Returns information regarding the daughter with a specific PDG code.");
-    REGISTER_VARIABLE("hasDaughterWithPDG(PDG,sign)", hasDaughterWithPDG,
-                      "Returns information regarding the daughter with a specific PDG code.");
+    REGISTER_VARIABLE("hasNDaughtersWithPDG(PDG,N,Sign)", hasNDaughtersWithPDG,
+                      "Returns information regarding a specific number of daughters with a specific PDG code.");
+    REGISTER_VARIABLE("hasDaughterWithPDG(PDG,Sign)", hasDaughterWithPDG,
+                      "Returns information regarding a daughter with a specific PDG code.");
 
 
   }

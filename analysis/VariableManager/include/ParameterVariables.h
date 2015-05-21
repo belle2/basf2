@@ -63,15 +63,15 @@ namespace Belle2 {
      * returns information regarding daughters with a specific PDG code. It accepts the PDG code of interest, the number of particles of interest and an
      * option to take (-1) or not to take (1) the sign of the PDG code into account.
      *
-     * hasDaughtersWithPDG(11,1,1) returns 1 if there ONE daughter with the PDG code 11 or -11 (e- or e+) exists, 0 otherwise
-     * hasDaughtersWithPDG(-11,2,-1) returns 1 if there TWO daughters with the PDG code -11 (e+) exist, 0 otherwise
-     * hasDaughtersWithPDG(11,0,1) returns 1 if there are NONE daughters with the PDG code 11 or -11 (e- or e+), 0 otherwise
+     * hasNDaughtersWithPDG(11,1,1) returns 1 if there ONE daughter with the PDG code 11 or -11 (e- or e+) exists, 0 otherwise
+     * hasNDaughtersWithPDG(-11,2,-1) returns 1 if there TWO daughters with the PDG code -11 (e+) exist, 0 otherwise
+     * hasNDaughtersWithPDG(11,0,1) returns 1 if there are NONE daughters with the PDG code 11 or -11 (e- or e+), 0 otherwise
      *
      */
-    double hasDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3);
+    double hasNDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3);
 
     /**
-     * returns information regarding a daughter with a specific PDG code. Same as hasDaughtersWithPDG(), but for only one daughter.
+     * returns information regarding daughters with a specific PDG code. Same as hasNDaughtersWithPDG(), but for any (greater than 0) number of daughter.
      *
      */
     double hasDaughterWithPDG(const Particle* particle, const std::vector<double>& args2);

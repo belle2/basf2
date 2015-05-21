@@ -254,7 +254,7 @@ def get_reference_files():
                 # we shall collect it as a reference file
                 # NB: This will only find ROOT files that lie directly in
                 # the /[pkg]/validation folder, not in any subdirs of it!
-                if (os.path.splitext(full_path)[1] == 'root' and
+                if (os.path.splitext(full_path)[1] == '.root' and
                         os.path.dirname(full_path).endswith('validation')):
                     results[location].append(os.path.abspath(full_path))
 

@@ -1349,7 +1349,9 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   cov_shape->SetName(ObjectInfo::getIdentifier(hit));
   cov_shape->SetTitle(ObjectInfo::getInfo(hit) + TString::Format("\nWire ID: %d\nADC: %d\nTDC: %d",
                       hit->getID(), hit->getADCCount(), hit->getTDCCount()));
+
   addToGroup("CDCHits", cov_shape);
+  addObject(hit, cov_shape);
 }
 
 void EVEVisualization::showUserData(const DisplayData& displayData)

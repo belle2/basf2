@@ -43,7 +43,12 @@ namespace Belle2 {
     virtual int IsVisited(const char* uri); //please add 'override' here once CINT is gone
 
   private:
-    /** a parsed URI. (scheme:[entryName[/arrayIndex]]) */
+    /** a parsed URI. allowed URI formats are
+     *
+     * durability:[entryName[/arrayIndex]] (durability: event/persistent)
+     * raw:addressOfTObject (for objects not in DataStore)
+     * main: (the mian page)
+     */
     struct URI {
       URI(): object(0), entryName(""), arrayIndex(-1) { }
       /** Construct URI by parsing given string. */

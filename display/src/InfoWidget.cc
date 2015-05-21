@@ -210,8 +210,8 @@ TString InfoWidget::URI::getURI(const TObject* obj)
 {
   auto pos = ObjectInfo::getDataStorePosition(obj);
   if (pos.first.empty()) {
-    B2WARNING("No URI found for " << obj->GetName());
-    return "main:";
+    B2DEBUG(100, "No DataStore entry found for " << obj->GetName() << ", using raw pointer.");
+    return TString::Format("raw:%lu", (long)obj);
   }
   return TString::Format("event:%s/%d", pos.first.c_str(), pos.second);
 }
@@ -274,24 +274,35 @@ InfoWidget::URI::URI(const TString& uri):
   //split uri into schema:path (no double slash: only path after scheme)
   Ssiz_t protStart = uri.First(":");
   Ssiz_t protEnd = protStart + 1;
+  if (protStart >= uri.Length())
+    B2FATAL("URI has invalid format: " << uri);
   scheme = uri(0, protStart);
   TString path = uri(protEnd, uri.Length() - 1);
 
-  if (path.Length() > 0 and path != "/") {
+  if (scheme == "raw") {
+    //interpret path as pointer
+    object = reinterpret_cast<TObject*>(path.Atoll());
+  } else if (path.Length() > 0 and path != "/") {
+    //event/persistent
+    DataStore::EDurability durability;
+    if (scheme == "event")
+      durability = DataStore::c_Event;
+    else if (scheme == "persistent")
+      durability = DataStore::c_Persistent;
+
     Ssiz_t delim = path.Last('/');
     Ssiz_t idxFieldLength = path.Length() - delim - 1;
-    //ok, set.entryName
-    entryName = path(0, delim);
-    if (delim >= path.Length()) {
+    if (delim >= path.Length())
       B2FATAL("URI has invalid format: " << path);
-    }
+    //ok, set entryName
+    entryName = path(0, delim);
     if (idxFieldLength > 0) {
       //array index found
       arrayIndex = TString(path(delim + 1, idxFieldLength)).Atoi();
-      const StoreArray<TObject> arr(entryName.Data());
+      const StoreArray<TObject> arr(entryName.Data(), durability);
       object = arr[arrayIndex];
     }
-    const auto& entries = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
+    const auto& entries = DataStore::Instance().getStoreEntryMap(durability);
     const auto& it = entries.find(entryName.Data());
     if (it == entries.end()) {
       B2ERROR("Given entry '" << entryName << "' not found in DataStore, invalid URI?");

@@ -261,6 +261,13 @@ void COPPERCallback::monitor() throw(RCHandlerException)
   } catch (const std::exception& e) {
 
   }
+  if (getNode().getState() == RCState::RUNNING_S ||
+      getNode().getState() == RCState::READY_S ||
+      getNode().getState() == RCState::PAUSED_S) {
+    if (!m_con.isAlive()) {
+      throw (RCHandlerException("Process down : basf2"));
+    }
+  }
 }
 
 void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)

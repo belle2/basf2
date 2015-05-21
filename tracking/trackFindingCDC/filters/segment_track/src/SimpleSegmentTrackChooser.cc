@@ -20,7 +20,7 @@ CellWeight SimpleSegmentTrackChooser::operator()(const std::pair<const CDCRecoSe
   Super::operator()(testPair);
 
   const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
-  bool is_stereo = varSet.at("is_stereo") == 1.0 ? true : false;
+  bool is_stereo = testPair.first->getStereoType() != AXIAL;
   double hit_distance = varSet.at("maxmimum_hit_distance_front");
 
   if (is_stereo) {

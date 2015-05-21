@@ -4,6 +4,7 @@
 import os
 from trackfinderoutputcombiner.validation import (add_mc_track_finder, add_legendre_track_finder,
                                                   add_local_track_finder, add_new_combiner,
+                                                  add_old_combiner,
                                                   add_background_hit_finder)
 from tracking.run.event_generation import StandardEventGenerationRun
 import logging
@@ -23,6 +24,7 @@ class SegmentTrackTruthRecordingRun(StandardEventGenerationRun):
         add_background_hit_finder(main_path)
         add_legendre_track_finder(main_path)
         add_local_track_finder(main_path)
+        add_old_combiner(main_path)
         add_new_combiner(main_path, segment_track_chooser_filter="recording")
 
         return main_path

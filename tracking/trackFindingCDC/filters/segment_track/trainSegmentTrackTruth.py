@@ -17,6 +17,7 @@ def main():
     classifer = FastBDTClassifier(
         "SegmentTrackTruth",
         "SegmentTrackTruthWeight.root",
+        exclude=["is_stereo", "xy_distance", "phi_distance"]
     )
 
     input_file_name = "SegmentTrackChooser.root"

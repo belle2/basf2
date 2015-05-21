@@ -33,24 +33,52 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   double outOfCDC = 0; // 0 means no, 1 means yes
   double hitsInSameRegion = 0;
 
-
   const CDCRecoHit2D& front = segment->front();
   const CDCRecoHit2D& back = segment->back();
 
   // Calculate distances
-  const CDCTrajectory2D& trajectory = track->getStartTrajectory3D().getTrajectory2D();
-  CDCTrajectory2D& trajectorySegment = segment->getTrajectory2D();
-
-  maxmimumTrajectoryDistanceFront = trajectory.getDist2D(front.getWireHit().getRefPos2D());
-  maxmimumTrajectoryDistanceBack = trajectory.getDist2D(back.getWireHit().getRefPos2D());
+  const CDCTrajectory2D& trajectoryTrack = track->getStartTrajectory3D().getTrajectory2D();
 
 
-  const CDCRiemannFitter& circleFitter = CDCRiemannFitter::getFitter();
-  circleFitter.update(trajectorySegment, *segment);
+  maxmimumTrajectoryDistanceFront = trajectoryTrack.getDist2D(front.getWireHit().getRefPos2D());
+  maxmimumTrajectoryDistanceBack = trajectoryTrack.getDist2D(back.getWireHit().getRefPos2D());
+
+  var<named("z_distance")>() = 0;
+  var<named("theta_distance")>() = 0;
+
+  if (segment->getStereoType() == AXIAL) {
+    CDCTrajectory2D& trajectorySegment = segment->getTrajectory2D();
+    if (not trajectoryTrack.isFitted()) {
+      const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+      fitter.update(trajectorySegment, *segment);
+    }
+  } else {
+    const CDCTrajectorySZ& szTrajectoryTrack = track->getStartTrajectory3D().getTrajectorySZ();
+
+    CDCObservations2D observations;
+    for (const CDCRecoHit2D& recoHit : segment->items()) {
+      CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
+      double s = recoHit3D.getPerpS();
+      double z = recoHit3D.getRecoZ();
+      observations.append(s, z);
+    }
+
+    if (observations.size() > 3) {
+      const CDCSZFitter& fitter = CDCSZFitter::getFitter();
+      const CDCTrajectorySZ& szTrajectorySegments = fitter.fit(observations);
+
+      double startZTrack = szTrajectoryTrack.getStartZ();
+      double startZSegments = szTrajectorySegments.getStartZ();
+
+      var<named("z_distance")>() = startZTrack - startZSegments;
+      var<named("theta_distance")>() = szTrajectoryTrack.getSZSlope() - szTrajectorySegments.getSZSlope();
+    }
+  }
 
   // Calculate if it is out of the CDC
-  Vector3D frontRecoPos3D = front.reconstruct3D(trajectory);
-  Vector3D backRecoPos3D = back.reconstruct3D(trajectory);
+  Vector3D frontRecoPos3D = front.reconstruct3D(trajectoryTrack);
+  Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack);
 
   if (segment->getStereoType() != AXIAL) {
     double forwardZ = front.getWire().getSkewLine().forwardZ();
@@ -108,7 +136,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       observationsNeigh.append(recoHit.getRecoPos2D());
     } else {
       CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
       double s = recoHit3D.getPerpS();
       double z = recoHit3D.getRecoZ();
       observationsFull.append(s, z);
@@ -120,25 +148,29 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   if (segment->getStereoType() == AXIAL) {
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
     var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
-    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getPValue();
   } else {
     const CDCSZFitter& fitter = CDCSZFitter::getFitter();
     var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
-    var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getPValue();
+
+    if (observationsNeigh.size() > 3) {
+      var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getPValue();
+    } else {
+      var<named("fit_neigh")>() = 0;
+    }
   }
 
   if (observationsFull.size() == observationsNeigh.size()) {
     var<named("fit_neigh")>() = -1;
   }
 
-  var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
+  //var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
   var<named("segment_size")>() = segment->size();
   var<named("track_size")>() = track->size();
 
-  var<named("pt_of_track")>() = std::isnan(trajectory.getAbsMom2D()) ? 0.0 : trajectory.getAbsMom2D();
-  var<named("track_is_curler")>() = trajectory.getExit().hasNAN();
+  var<named("pt_of_track")>() = std::isnan(trajectoryTrack.getAbsMom2D()) ? 0.0 : trajectoryTrack.getAbsMom2D();
+  var<named("track_is_curler")>() = trajectoryTrack.getExit().hasNAN();
 
-  var<named("superlayer_already_full")>() = not trajectory.getOuterExit().hasNAN() and hitsInSameRegion > 5;
+  var<named("superlayer_already_full")>() = not trajectoryTrack.getOuterExit().hasNAN() and hitsInSameRegion > 5;
 
   if (std::isnan(maxmimumTrajectoryDistanceFront)) {
     var<named("maxmimum_trajectory_distance_front")>() = 999;

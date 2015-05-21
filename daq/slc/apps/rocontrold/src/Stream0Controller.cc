@@ -21,7 +21,10 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
 {
   const DBObject& cobj(obj("stream0", m_id - 2));
   int used = cobj.getBool("used");
-  if (!used) return false;
+  if (!used) {
+    setUsed(false);
+    return false;
+  }
   int port = cobj.getInt("port");
   m_host = cobj.getText("host");
   std::string script = cobj.getText("script");

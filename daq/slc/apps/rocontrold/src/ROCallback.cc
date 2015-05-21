@@ -221,7 +221,7 @@ void ROCallback::monitor() throw(RCHandlerException)
       throw (RCHandlerException("Process down : stream1"));
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
-      if (!m_stream0[i].getControl().isAlive()) {
+      if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
         throw (RCHandlerException("Process down : stream0-%d", (int)i));
       }
     }

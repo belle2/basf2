@@ -204,62 +204,63 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
 
 void COPPERCallback::monitor() throw(RCHandlerException)
 {
-  if (m_dummymode) return;
-  try {
-    RCState state = getNode().getState();
+  if (!m_dummymode) {
     try {
-      m_ttrx.monitor();
-    } catch (const IOException& e) {
-      return;
-    }
-    try {
-      m_copper.monitor();
-    } catch (const IOException& e) {
-      return;
-    }
-    int dummymode = 0;
-    get("dummymode", dummymode);
-    if (!dummymode && state != RCState::NOTREADY_S && state.isStable()) {
-      logging(m_copper.isFifoEmpty(), LogFile::NOTICE, "COPPER FIFO empty");
-      logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
-      logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");
-      for (int i = 0; i < 4; i++) {
-        if (!m_fee[i]) continue;
-        int used = 0;
-        get(StringUtil::form("hslb[%d].used", i), used);
-        if (used) {
-          HSLB& hslb(m_hslb[i]);
-          hslb.monitor();
-          logging(hslb.isBelle2LinkDown(), LogFile::ERROR,
-                  "HSLB %c Belle2 link down", (char)(i + 'a'));
-          logging(hslb.isCOPPERFifoFull(), LogFile::WARNING,
-                  "HSLB %c COPPER fifo full", (char)(i + 'a'));
-          logging(hslb.isCOPPERLengthFifoFull(), LogFile::WARNING,
-                  "HSLB %c COPPER length fifo full", (char)(i + 'a'));
-          logging(hslb.isFifoFull(), LogFile::WARNING, "HSLB %c fifo full", (char)(i + 'a'));
-          logging(hslb.isCRCError(), LogFile::WARNING, "HSLB %c CRC error", (char)(i + 'a'));
+      RCState state = getNode().getState();
+      try {
+        m_ttrx.monitor();
+      } catch (const IOException& e) {
+        return;
+      }
+      try {
+        m_copper.monitor();
+      } catch (const IOException& e) {
+        return;
+      }
+      int dummymode = 0;
+      get("dummymode", dummymode);
+      if (!dummymode && state != RCState::NOTREADY_S && state.isStable()) {
+        logging(m_copper.isFifoEmpty(), LogFile::NOTICE, "COPPER FIFO empty");
+        logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
+        logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");
+        for (int i = 0; i < 4; i++) {
+          if (!m_fee[i]) continue;
+          int used = 0;
+          get(StringUtil::form("hslb[%d].used", i), used);
+          if (used) {
+            HSLB& hslb(m_hslb[i]);
+            hslb.monitor();
+            logging(hslb.isBelle2LinkDown(), LogFile::ERROR,
+                    "HSLB %c Belle2 link down", (char)(i + 'a'));
+            logging(hslb.isCOPPERFifoFull(), LogFile::WARNING,
+                    "HSLB %c COPPER fifo full", (char)(i + 'a'));
+            logging(hslb.isCOPPERLengthFifoFull(), LogFile::WARNING,
+                    "HSLB %c COPPER length fifo full", (char)(i + 'a'));
+            logging(hslb.isFifoFull(), LogFile::WARNING, "HSLB %c fifo full", (char)(i + 'a'));
+            logging(hslb.isCRCError(), LogFile::WARNING, "HSLB %c CRC error", (char)(i + 'a'));
+          }
         }
+        logging(m_ttrx.isBelle2LinkError(), LogFile::ERROR, "TTRX Belle2 link error");
+        logging(m_ttrx.isLinkUpError(), LogFile::ERROR, "TTRX Link up error");
       }
-      logging(m_ttrx.isBelle2LinkError(), LogFile::ERROR, "TTRX Belle2 link error");
-      logging(m_ttrx.isLinkUpError(), LogFile::ERROR, "TTRX Link up error");
-    }
-    NSMData& data(getData());
-    if (data.isAvailable()) {
-      ronode_status* nsm = (ronode_status*)data.get();
-      if (m_flow.isAvailable()) {
-        ronode_status& status(m_flow.monitor());
-        memcpy(nsm, &status, sizeof(ronode_status));
+      NSMData& data(getData());
+      if (data.isAvailable()) {
+        ronode_status* nsm = (ronode_status*)data.get();
+        if (m_flow.isAvailable()) {
+          ronode_status& status(m_flow.monitor());
+          memcpy(nsm, &status, sizeof(ronode_status));
+        }
+        double loads[3];
+        if (getloadavg(loads, 3) > 0) {
+          nsm->loadavg = (float)loads[0];
+        } else {
+          nsm->loadavg = -1;
+        }
+        data.flush();
       }
-      double loads[3];
-      if (getloadavg(loads, 3) > 0) {
-        nsm->loadavg = (float)loads[0];
-      } else {
-        nsm->loadavg = -1;
-      }
-      data.flush();
-    }
-  } catch (const std::exception& e) {
+    } catch (const std::exception& e) {
 
+    }
   }
   if (getNode().getState() == RCState::RUNNING_S ||
       getNode().getState() == RCState::READY_S ||

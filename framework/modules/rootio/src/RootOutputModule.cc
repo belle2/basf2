@@ -59,7 +59,8 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            "Branch split level: determines up to which depth object members will be saved in separate sub-branches in the tree. For arrays or objects with custom streamers, -1 is used instead to ensure the streamers are used. The default (99) usually gives the highest read performance with RootInput.",
            99);
   addParam("updateFileCatalog", m_updateFileCatalog,
-           "Flag that specifies whether the file metadata catalog (Belle2FileCatalog.xml) is updated.", true);
+           "Flag that specifies whether the file metadata catalog (Belle2FileCatalog.xml) is updated. (You can also set the BELLE2_FILECATALOG environment variable to NONE to get the same effect.)",
+           true);
 
   vector<string> emptyvector;
   addParam(c_SteerBranchNames[0], m_branchNames[0],

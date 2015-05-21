@@ -42,7 +42,6 @@ namespace Belle2 {
     double calculateGoodFitIndex(const TrackFindingCDC::CDCTrack& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment);
     double calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate);
     void findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
-                            std::vector<TrackFindingCDC::CDCTrack>& resultTrackCands,
                             std::vector<TrackFindingCDC::CDCTrack>& legendreTrackCands);
   };
 }

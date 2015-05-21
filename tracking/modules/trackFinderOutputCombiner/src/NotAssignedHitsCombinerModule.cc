@@ -54,16 +54,9 @@ NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCF
 }
 
 
-void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& legendreTracks)
+void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks)
 {
   B2DEBUG(100, "########## NotAssignedHitsCombinerModule ############")
-
-  // TODO: It may not be needed to copy the tracks...
-
-  // Copy the legendre tracks
-  std::vector<CDCTrack> resultTrackCands;
-  resultTrackCands.reserve(legendreTracks.size());
-  std::copy(legendreTracks.begin(), legendreTracks.end(), std::back_inserter(resultTrackCands));
 
   // Go through all the reco segments
   // There are three different cases for a segment:
@@ -74,12 +67,12 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   // As in most of the cases these segments are stereo segments, case (1) is the most common
 
   B2DEBUG(100, "Calculating matrices...")
-  m_fittingMatrix.calculateMatrices(segments, resultTrackCands);
+  m_fittingMatrix.calculateMatrices(segments, tracks);
   B2DEBUG(100, "Done calculating matrices.")
   m_fittingMatrix.print();
 
   // Find all "easy" possibilities:
-  findEasyCandidates(segments, legendreTracks, resultTrackCands);
+  findEasyCandidates(segments, tracks);
 
 
   // For the segments ending up here there are basically two possibilities:
@@ -98,7 +91,7 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   }
 
   // Recalculate the matrices
-  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, resultTrackCands);
+  m_fittingMatrix.calculateMatrices(notUsedRecoSegments, tracks);
 
   // Testing purposes:
   // Use all segments with a very low pt.
@@ -111,9 +104,9 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
     StereoType stereoType = recoSegment.getStereoType();
 
     std::vector<FittingMatrix::SegmentStatus> status;
-    status.reserve(resultTrackCands.size());
+    status.reserve(tracks.size());
 
-    for (const CDCTrack& resultTrackCand : resultTrackCands) {
+    for (const CDCTrack& resultTrackCand : tracks) {
       const CDCTrajectory3D& trajectory = resultTrackCand.getStartTrajectory3D();
       const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
 
@@ -142,7 +135,7 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
         FittingMatrix::TrackCounter bestFitPartner = -1;
         double maximumChi2 = -1;
 
-        for (FittingMatrix::TrackCounter trackCounter = 0; trackCounter < resultTrackCands.size(); trackCounter++) {
+        for (FittingMatrix::TrackCounter trackCounter = 0; trackCounter < tracks.size(); trackCounter++) {
           if (status[trackCounter] == FittingMatrix::SegmentStatus::IN_TRACK
               or status[trackCounter] == FittingMatrix::SegmentStatus::MIX_WITH_TRACK) {
             if (m_fittingMatrix.getChi2(segmentCounter, trackCounter) > maximumChi2) {
@@ -154,7 +147,7 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
 
         if (numberOfInMatches == 1 or status[bestFitPartner] == FittingMatrix::SegmentStatus::IN_TRACK or maximumChi2 > 0) {
           B2DEBUG(100, "Adding " << segmentCounter << " to " << bestFitPartner << " with: " << maximumChi2);
-          m_fittingMatrix.addSegmentToResultTrack(segmentCounter, bestFitPartner, notUsedRecoSegments, resultTrackCands);
+          m_fittingMatrix.addSegmentToResultTrack(segmentCounter, bestFitPartner, notUsedRecoSegments, tracks);
         }
       }
     }
@@ -168,11 +161,6 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   }
 
   m_fittingMatrix.print();
-
-  // Copy the result tracks to the output
-  legendreTracks.clear();
-  legendreTracks.reserve(resultTrackCands.size());
-  std::copy(resultTrackCands.begin(), resultTrackCands.end(), std::back_inserter(legendreTracks));
 }
 
 double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate)
@@ -211,9 +199,12 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
 
 
 void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& recoSegments,
-                                                       std::vector<TrackFindingCDC::CDCTrack>& resultTrackCands,
-                                                       std::vector<TrackFindingCDC::CDCTrack>& legendreTrackCands)
+                                                       std::vector<TrackFindingCDC::CDCTrack>& resultTrackCands)
 {
+  // Make a copy of the tracks
+  std::vector<CDCTrack> copy;
+  std::copy(resultTrackCands.begin(), resultTrackCands.end(), std::back_inserter(copy));
+
   // Find all "easy" possibilities:
   for (FittingMatrix::SegmentCounter counterOuter = 0;
        counterOuter < recoSegments.size(); counterOuter++) {
@@ -255,7 +246,7 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<TrackFindingC
            counterInner < resultTrackCands.size(); counterInner++) {
         if (m_fittingMatrix.getChi2(counterOuter, counterInner)
             > m_fittingMatrix.getParamMinimalChi2()) {
-          double theta = calculateThetaOfTrackCandidate(legendreTrackCands[counterInner]);
+          double theta = calculateThetaOfTrackCandidate(copy[counterInner]);
           if (std::abs(m_fittingMatrix.getZ(counterOuter, counterInner) - theta)
               < m_fittingMatrix.getParamMinimalThetaDifference()) {
             m_fittingMatrix.addSegmentToResultTrack(counterOuter, counterInner,

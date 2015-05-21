@@ -137,6 +137,7 @@ void FittingMatrix::fillHitsInto(const CDCRecoSegment2D& recoSegment, CDCTrack& 
 void FittingMatrix::addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack,
                                             const std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& resultTrackCands)
 {
+  B2DEBUG(100, "Adding Segment #" << counterSegment << " with Track #" << counterTrack);
   const TrackFindingCDC::CDCRecoSegment2D& recoSegment = recoSegments[counterSegment];
   CDCTrack& trackCandidate = resultTrackCands[counterTrack];
   FittingMatrix::fillHitsInto(recoSegment, trackCandidate);

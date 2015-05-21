@@ -23,7 +23,8 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(NotAssignedHitsCombiner);
 
-NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCFromSegmentsModule(), m_fittingMatrix()
+NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCFromSegmentsModule(), m_fittingMatrix(),
+  m_param_useSecondStage(false)
 {
   setDescription("Combines the newly found track candidates from the local track finder with the ones found by the legendre track finder to get all tracks.");
 
@@ -37,11 +38,11 @@ NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCF
            0.00001);
   addParam("MaximumTheta",
            m_fittingMatrix.getParamMaximumTheta(),
-           "",
+           "Maximum Theta a track is allowed to have to be called matchable.",
            0.95 * TMath::PiOver2());
   addParam("MaximumDistanceZ",
            m_fittingMatrix.getParamMaximumDistanceZ(),
-           "",
+           "Maximum Distance in z two fits should have to be called matchable.",
            500.0);
   addParam("MinimalThetaDifference",
            m_fittingMatrix.getParamMinimalThetaDifference(),
@@ -51,6 +52,10 @@ NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCF
            m_fittingMatrix.getParamMinimalZDifference(),
            "",
            10.0);
+  addParam("UseSecondStage",
+           m_param_useSecondStage,
+           "Use the second combining stage",
+           m_param_useSecondStage);
 }
 
 

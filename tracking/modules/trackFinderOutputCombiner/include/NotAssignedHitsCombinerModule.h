@@ -36,13 +36,17 @@ namespace Belle2 {
      * Try to combine the segments and the tracks
      */
     void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
-
-    TrackFindingCDC::FittingMatrix m_fittingMatrix; /**< The fitting matrix we use to calculate the track - segment combinations */
-
     double calculateGoodFitIndex(const TrackFindingCDC::CDCTrack& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment);
     double calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate);
     void findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
                             std::vector<TrackFindingCDC::CDCTrack>& tracks);
     void findHarderCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks);
+
+
+    /// Object Pool
+    TrackFindingCDC::FittingMatrix m_fittingMatrix; /**< The fitting matrix we use to calculate the track - segment combinations */
+
+    /// Parameters
+    bool m_param_useSecondStage; /**< Flag to also append "harder" cases with a higher fake rate */
   };
 }

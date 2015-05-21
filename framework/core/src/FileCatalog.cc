@@ -110,9 +110,15 @@ bool FileCatalog::readCatalog(FileCatalog::FileMap& fileMap)
 
   FileMetaData entry;
 
-  while (!file.eof()) {
-    file >> entry;
-    if (entry.getId() != 0) fileMap.insert(FileMap::value_type(entry.getId(), entry));
+  try {
+    while (!file.eof()) {
+      file >> entry;
+      if (entry.getId() != 0) fileMap.insert(FileMap::value_type(entry.getId(), entry));
+    }
+  } catch (std::exception& e) {
+    B2ERROR("Errors occured while reading " << m_fileName <<
+            ", maybe it is corrupted? Note that your .root files should be unaffected. (Error details: " << e.what() << ")");
+    return false;
   }
 
   return true;

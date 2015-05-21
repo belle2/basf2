@@ -221,7 +221,8 @@ void RootInputModule::readTree()
   // GetTreeNumber() also starts at the last entry before we read the first event from m_tree,
   // so we'll save the last persistent tree loaded and only reload on changes.
   const long treeNum = m_tree->GetTreeNumber();
-  if (m_lastPersistentEntry != treeNum) {
+  const bool fileChanged = (m_lastPersistentEntry != treeNum);
+  if (fileChanged) {
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
     StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
@@ -231,7 +232,7 @@ void RootInputModule::readTree()
 
   for (auto entry : m_storeEntries) {
     if (!entry->object) {
-      entryNotFound("Event durability tree (global entry: " + std::to_string(m_nextEntry) + ")", entry->name);
+      entryNotFound("Event durability tree (global entry: " + std::to_string(m_nextEntry) + ")", entry->name, fileChanged);
       entry->recoverFromNullObject();
       entry->ptr = nullptr;
     } else {
@@ -459,13 +460,13 @@ bool RootInputModule::readParentTrees()
   return true;
 }
 
-void RootInputModule::entryNotFound(std::string entryOrigin, std::string name)
+void RootInputModule::entryNotFound(std::string entryOrigin, std::string name, bool fileChanged)
 {
   if (name == "ProcessStatistics" or DataStore::Instance().getDependencyMap().isUsedAs(name, DependencyMap::c_Input)) {
     B2FATAL(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain required object " << name << ", aborting.");
-  } else {
-    B2DEBUG(100, entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name <<
-            " that was present in a previous entry.")
+  } else if (fileChanged) {
+    B2WARNING(entryOrigin << " in " << m_tree->GetFile()->GetName() << " does not contain object " << name <<
+              " that was present in a previous entry.")
   }
 }
 

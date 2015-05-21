@@ -97,7 +97,7 @@ namespace Belle2 {
     void readPersistentEntry(long fileEntry);
 
     /** Check if we warn the user or abort after an entry was missing after changing files. */
-    void entryNotFound(std::string entryOrigin, std::string name);
+    void entryNotFound(std::string entryOrigin, std::string name, bool fileChanged = true);
 
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */

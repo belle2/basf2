@@ -41,7 +41,7 @@ void InfoWidget::newEvent()
   m_visited.clear();
   m_history.clear();
 
-  show("/");
+  show("main:");
 }
 
 void InfoWidget::back()
@@ -62,7 +62,7 @@ void InfoWidget::show(const char* uri, bool clearSelection)
 {
   B2DEBUG(100, "Navigating to: " << uri);
 
-  if (std::string(uri) == "back") {
+  if (std::string(uri) == "back:") {
     back();
     return;
   }
@@ -94,6 +94,7 @@ void InfoWidget::show(const char* uri, bool clearSelection)
 
 TString InfoWidget::createMainPage() const
 {
+  const TString scheme = "event:";
   TString info = getHeader();
   info += "<p>Arrays/Objects of <tt>c_Event</tt> durability:</p>";
   info += "<h2>Arrays</h2>";
@@ -101,7 +102,7 @@ TString InfoWidget::createMainPage() const
     const StoreArray<TObject> array(name);
     int nEntries = array.getEntries();
     if (nEntries)
-      info += TString::Format("<a href='%s/'>%s (%d)</a><br>", name.c_str(), name.c_str(), nEntries);
+      info += TString::Format("<a href='%s%s/'>%s (%d)</a><br>", scheme.Data(), name.c_str(), name.c_str(), nEntries);
     else
       info += TString::Format("%s (%d)<br>", name.c_str(), nEntries);
   }
@@ -110,7 +111,7 @@ TString InfoWidget::createMainPage() const
   for (std::string name : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::c_Event)) {
     const StoreObjPtr<TObject> obj(name);
     if (obj)
-      info += TString::Format("<a href='%s/'>%s</a><br>", name.c_str(), name.c_str());
+      info += TString::Format("<a href='%s%s/'>%s</a><br>", scheme.Data(), name.c_str(), name.c_str());
     else
       info += TString::Format("%s<br>", name.c_str());
   }
@@ -129,7 +130,8 @@ TString InfoWidget::createArrayPage(const URI& uri) const
     TString name = ObjectInfo::getName(array[i]);
     if (name != "")
       name = " - " + name;
-    info += TString::Format("<a href='%s/%d'>%s</a><br>", uri.entryName.Data(), i,
+    info += TString::Format("<a href='%s:%s/%d'>%s</a><br>",
+                            uri.scheme.Data(), uri.entryName.Data(), i,
                             (ObjectInfo::getIdentifier(array[i]) + name).Data());
   }
   return info;
@@ -156,9 +158,9 @@ TString InfoWidget::getHeader(const URI& uri) const
   info += "<table border=0 width=100% bgcolor=d2ede4><tr>";
   //breadcrumbs
   info += "<td>";
-  info += "<a href='/'>DataStore</a> / ";
+  info += "<a href='main:'>DataStore</a> / ";
   if (uri.arrayIndex != -1) {
-    info += "<a href='" + uri.entryName + "/'>" + uri.entryName + "</a> / ";
+    info += "<a href='" + uri.scheme + ":" + uri.entryName + "/'>" + uri.entryName + "</a> / ";
     info += TString::Format("<b>[%d]</b>", uri.arrayIndex);
   } else {
     info += "<b>" + uri.entryName + "</b>";
@@ -169,7 +171,7 @@ TString InfoWidget::getHeader(const URI& uri) const
   if (m_history.size() <= 1) //current page is part of history, so we need at least two
     info += "<td align=right>Back</td>";
   else
-    info += "<td align=right><a href='back'>Back</a></td>";
+    info += "<td align=right><a href='back:'>Back</a></td>";
 
 
   info += "</tr></table>";
@@ -193,12 +195,12 @@ TString InfoWidget::getHeader(const URI& uri) const
     if (uri.arrayIndex == 0)
       info += "Previous";
     else
-      info += "<a href='" + TString::Format("%s/%d", uri.entryName.Data(), uri.arrayIndex - 1) + "'>Previous</a>";
+      info += "<a href='" + uri.scheme + ":" + TString::Format("%s/%d", uri.entryName.Data(), uri.arrayIndex - 1) + "'>Previous</a>";
     info += " ";
     if (uri.arrayIndex == numEntries - 1)
       info += "Next";
     else
-      info += "<a href='" + TString::Format("%s/%d", uri.entryName.Data(), uri.arrayIndex + 1) + "'>Next</a>";
+      info += "<a href='" + uri.scheme + ":" + TString::Format("%s/%d", uri.entryName.Data(), uri.arrayIndex + 1) + "'>Next</a>";
     info += "<br> <br>";
   }
 
@@ -209,9 +211,9 @@ TString InfoWidget::URI::getURI(const TObject* obj)
   auto pos = ObjectInfo::getDataStorePosition(obj);
   if (pos.first.empty()) {
     B2WARNING("No URI found for " << obj->GetName());
-    return "/";
+    return "main:";
   }
-  return TString::Format("%s/%d", pos.first.c_str(), pos.second);
+  return TString::Format("event:%s/%d", pos.first.c_str(), pos.second);
 }
 
 TString InfoWidget::getRelatedInfo(const TObject* obj)
@@ -267,20 +269,25 @@ TString InfoWidget::getContents(const TObject* obj)
 }
 
 InfoWidget::URI::URI(const TString& uri):
-  object(0), entryName(""), arrayIndex(-1)
+  object(nullptr), scheme(""), entryName(""), arrayIndex(-1)
 {
-  if (uri != "/") {
-    Ssiz_t delim = uri.Last('/');
-    Ssiz_t idxFieldLength = uri.Length() - delim - 1;
+  //split uri into schema:path (no double slash: only path after scheme)
+  Ssiz_t protStart = uri.First(":");
+  Ssiz_t protEnd = protStart + 1;
+  scheme = uri(0, protStart);
+  TString path = uri(protEnd, uri.Length() - 1);
+
+  if (path.Length() > 0 and path != "/") {
+    Ssiz_t delim = path.Last('/');
+    Ssiz_t idxFieldLength = path.Length() - delim - 1;
     //ok, set.entryName
-    entryName = uri(0, delim);
-    if (delim >= uri.Length()) {
-      B2WARNING("delim: " << delim << " " << idxFieldLength);
-      B2FATAL("URI has invalid format: " << uri);
+    entryName = path(0, delim);
+    if (delim >= path.Length()) {
+      B2FATAL("URI has invalid format: " << path);
     }
     if (idxFieldLength > 0) {
       //array index found
-      arrayIndex = TString(uri(delim + 1, idxFieldLength)).Atoi();
+      arrayIndex = TString(path(delim + 1, idxFieldLength)).Atoi();
       const StoreArray<TObject> arr(entryName.Data());
       object = arr[arrayIndex];
     }

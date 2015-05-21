@@ -28,7 +28,7 @@ namespace Belle2 {
      * @param clearSelection when showing an object, this determines  wether to clear
      *        an existing selection
      */
-    void show(const char* uri = "/", bool clearSelection = true);
+    void show(const char* uri = "main:", bool clearSelection = true);
 
     /** Navigate to page belonging to given object.
      *
@@ -43,7 +43,7 @@ namespace Belle2 {
     virtual int IsVisited(const char* uri); //please add 'override' here once CINT is gone
 
   private:
-    /** a parsed URI. */
+    /** a parsed URI. (scheme:[entryName[/arrayIndex]]) */
     struct URI {
       URI(): object(0), entryName(""), arrayIndex(-1) { }
       /** Construct URI by parsing given string. */
@@ -53,6 +53,7 @@ namespace Belle2 {
       static TString getURI(const TObject* obj);
 
       const TObject* object; /**< object referenced (or NULL). */
+      TString scheme; /**< scheme name (part before first colon). */
       TString entryName; /**< name of DataStore entry. */
       int arrayIndex; /**< index in array, only valid if arrayName and object are filled. */
     };

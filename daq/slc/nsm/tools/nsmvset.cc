@@ -28,18 +28,18 @@ namespace Belle2 {
   public:
     virtual void init(NSMCommunicator&) throw()
     {
-      std::string type = m_argv[4];
+      std::string type = m_argv[3];
       try {
         bool result = true;
-        const std::string name = m_argv[3];
-        NSMNode node(m_argv[2]);
+        const std::string name = m_argv[2];
+        NSMNode node(m_argv[1]);
         NSMCommunicator::connected(node.getName());
         if (type == "int") {
-          result = set(node, NSMVar(name, (int)atoi(m_argv[5])));
+          result = set(node, NSMVar(name, (int)atoi(m_argv[4])));
         } else if (type == "float") {
-          result = set(node, NSMVar(name, (float)atof(m_argv[5])));
+          result = set(node, NSMVar(name, (float)atof(m_argv[4])));
         } else if (type == "text") {
-          result = set(node, NSMVar(name, m_argv[5]));
+          result = set(node, NSMVar(name, m_argv[4]));
         }
         printf("%s %s\n", name.c_str(), (result ? "SUCCESS" : "FAILED"));
       } catch (const NSMNotConnectedException& e) {
@@ -76,7 +76,7 @@ int main(int argc, const char** argv)
   ConfigFile config("slowcontrol");
   std::string name, username;
   char** argv_in = new char* [argc];
-  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 3);
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 4);
   const std::string hostname = config.get(name + ".host");
   const int port = config.getInt(name + ".port");
   NSMVSETCallback* callback = new NSMVSETCallback(NSMNode(username), argc_in, argv_in);

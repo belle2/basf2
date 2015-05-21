@@ -47,6 +47,7 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
+    m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
     add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
@@ -124,35 +125,36 @@ void COPPERCallback::term() throw()
 
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  m_ttrx.open();
-  m_ttrx.monitor();
-  if (m_ttrx.isError()) {
-    m_ttrx.close();
-    throw (RCHandlerException("TTRX Link error"));
-  }
-  try {
-    bool dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
-    for (int i = 0; i < 4; i++) {
-      const DBObject& o_hslb(obj("hslb", i));
-      if (!dummymode && o_hslb.getBool("used") &&
-          m_fee[i] != NULL  && obj.hasObject("fee")) {
-        HSLB& hslb(m_hslb[i]);
-        hslb.open(i);
-        try {
-          hslb.load();
-        } catch (const HSLBHandlerException& e) {
-          throw (RCHandlerException("Failed to load: %s", e.what()));
-        }
-        FEE& fee(*m_fee[i]);
-        try {
-          fee.load(hslb, (obj("fee", i)));
-        } catch (const IOException& e) {
-          throw (RCHandlerException(e.what()));
+  m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
+  if (!m_dummymode) {
+    m_ttrx.open();
+    m_ttrx.monitor();
+    if (m_ttrx.isError()) {
+      m_ttrx.close();
+      throw (RCHandlerException("TTRX Link error"));
+    }
+    try {
+      for (int i = 0; i < 4; i++) {
+        const DBObject& o_hslb(obj("hslb", i));
+        if (o_hslb.getBool("used") && m_fee[i] != NULL  && obj.hasObject("fee")) {
+          HSLB& hslb(m_hslb[i]);
+          hslb.open(i);
+          try {
+            hslb.load();
+          } catch (const HSLBHandlerException& e) {
+            throw (RCHandlerException("Failed to load: %s", e.what()));
+          }
+          FEE& fee(*m_fee[i]);
+          try {
+            fee.load(hslb, (obj("fee", i)));
+          } catch (const IOException& e) {
+            throw (RCHandlerException(e.what()));
+          }
         }
       }
+    } catch (const std::out_of_range& e) {
+      throw (RCHandlerException(e.what()));
     }
-  } catch (const std::out_of_range& e) {
-    throw (RCHandlerException(e.what()));
   }
   bootBasf2(obj);
 }
@@ -202,6 +204,7 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
 
 void COPPERCallback::monitor() throw(RCHandlerException)
 {
+  if (m_dummymode) return;
   try {
     RCState state = getNode().getState();
     try {
@@ -289,9 +292,10 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
   }
-  if (!m_con.load(10)) {
-    LogFile::debug("load timeout");
-    throw (RCHandlerException("Failed to start readout : " + script));
+  try {
+    m_con.load(30);
+  } catch (const std::exception& e) {
+    LogFile::warning("load timeout");
   }
   LogFile::debug("load succeded");
 }

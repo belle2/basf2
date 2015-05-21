@@ -133,11 +133,11 @@ using namespace Belle2;
 
 int main(int argc, const char** argv)
 {
-  LogFile::open(StringUtil::form("%s/%s", argv[0], argv[1]), LogFile::ERROR);
   ConfigFile config("slowcontrol");
   std::string name, username;
   char** argv_in = new char* [argc];
-  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 2);
+  int argc_in = nsm_read_argv(argc, argv, help, argv_in, config, name, username, 1);
+  LogFile::open(StringUtil::form("%s/%s", argv[0], argv[1]), LogFile::ERROR);
   const std::string hostname = config.get(name + ".host");
   const int port = config.getInt(name + ".port");
   RCViewCallback* callback = new RCViewCallback(NSMNode(username), argc_in, argv_in);

@@ -20,10 +20,11 @@ void Stream0Controller::initArguments(const DBObject& obj)
 bool Stream0Controller::loadArguments(const DBObject& obj)
 {
   const DBObject& cobj(obj("stream0", m_id - 2));
+  int used = cobj.getBool("used");
+  if (!used) return false;
   int port = cobj.getInt("port");
   m_host = cobj.getText("host");
   std::string script = cobj.getText("script");
-  int used = 0;
   try {
     m_callback->get(m_callback->getRC().getName(), m_host + ".used", used);
   } catch (const RCHandlerException& e) {

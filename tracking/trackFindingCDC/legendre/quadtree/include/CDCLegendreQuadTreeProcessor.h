@@ -92,7 +92,7 @@ namespace Belle2 {
         //Voting within the four bins
         for (TrackHit* hit : m_hits) {
           //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-          if (hit->getHitUsage() != TrackHit::not_used)
+          if (hit->getHitUsage() != TrackHit::c_notUsed)
             continue;
 
           for (int t_index = 0; t_index < m_sizeX; ++t_index) {
@@ -160,7 +160,7 @@ namespace Belle2 {
         //Voting within the four bins
         for (TrackHit* hit : m_hits) {
           //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-          if (hit->getHitUsage() != TrackHit::not_used)
+          if (hit->getHitUsage() != TrackHit::c_notUsed)
             continue;
 
           std::tuple<double, double, double> confCoords = hit->performConformalTransformWithRespectToPoint(ref_point.first, ref_point.second);
@@ -260,14 +260,14 @@ namespace Belle2 {
       {
         hits_vector.clear();
         std::copy_if(hits_set.begin(), hits_set.end(), std::back_inserter(hits_vector),
-        [&](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::not_used);});
+        [&](TrackHit * hit) {return (hit->getHitUsage() == TrackHit::c_notUsed);});
       };
 
       void cleanUpItems(std::vector<TrackHit*>& hits) const
       {
         hits.erase(
           std::remove_if(hits.begin(), hits.end(),
-        [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}),
+        [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::c_notUsed;}),
         hits.end());
       } ;
 

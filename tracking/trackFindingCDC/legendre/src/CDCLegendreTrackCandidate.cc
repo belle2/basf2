@@ -54,7 +54,7 @@ TrackCandidate::TrackCandidate(double theta, double r, int charge,
 
     m_TrackHits.push_back(hit);
 
-    hit->setHitUsage(TrackHit::used_in_track);
+    hit->setHitUsage(TrackHit::c_usedInTrack);
 
     m_hitPattern.setLayer(hit->getLayerId());
   }
@@ -356,7 +356,7 @@ void TrackCandidate::removeHit(TrackHit* hit)
   else
     --m_stereoHits;
 
-  hit->setHitUsage(TrackHit::not_used);
+  hit->setHitUsage(TrackHit::c_notUsed);
 }
 
 int TrackCandidate::getInnermostSLayer(bool forced, int minNHits)
@@ -501,7 +501,7 @@ void TrackCandidate::clearBadHits()
     double y0_hit = hit->getOriginalWirePosition().Y();
     double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength();
     if (dist > hit->getSigmaDriftLength() * 2.) {
-      hit->setHitUsage(TrackHit::bad);
+      hit->setHitUsage(TrackHit::c_bad);
       return true;
     } else {
       return false;

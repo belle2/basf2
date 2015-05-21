@@ -121,11 +121,11 @@ void FastHough::FastHoughNormal(
         //curves are assumed to be straight lines, might be a reasonable assumption locally
         if ((!sameSign(dist_1[t_index][r_index], dist_1[t_index][r_index + 1], dist_1[t_index + 1][r_index],
                        dist_1[t_index + 1][r_index + 1])) &&
-            (hit->getHitUsage() == TrackHit::not_used))
+            (hit->getHitUsage() == TrackHit::c_notUsed))
           voted_hits[t_index][r_index].push_back(hit);
         else if ((!sameSign(dist_2[t_index][r_index], dist_2[t_index][r_index + 1], dist_2[t_index + 1][r_index],
                             dist_2[t_index + 1][r_index + 1])) &&
-                 (hit->getHitUsage() == TrackHit::not_used))
+                 (hit->getHitUsage() == TrackHit::c_notUsed))
           voted_hits[t_index][r_index].push_back(hit);
       }
     }
@@ -414,7 +414,7 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
 
   //Voting within the four bins
   for (TrackHit* hit : hits) {
-    if (hit->getHitUsage() != TrackHit::not_used) continue;
+    if (hit->getHitUsage() != TrackHit::c_notUsed) continue;
     for (int t_index = 0; t_index < 3; ++t_index) {
 
       r_temp = hit->getConformalX() * m_cos_theta[thetaBin[t_index]] +
@@ -503,11 +503,11 @@ void FastHough::MaxFastHough(const std::vector<TrackHit*>& hits, const int level
           return;
 
         voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(),
-        voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}),
+        voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::c_notUsed;}),
         voted_hits[t_index][r_index].end());
 
         for (TrackHit* hit : voted_hits[t_index][r_index]) {
-          hit->setHitUsage(TrackHit::used_in_cand);
+          hit->setHitUsage(TrackHit::c_usedInCand);
         }
 
         candidate_temp.first = voted_hits[t_index][r_index];
@@ -740,7 +740,7 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
   for (TrackHit* hit : hits) {
     hit_counter++;
     //B2DEBUG(100, "PROCCESSING hit " << hit_counter << " of " << nhitsToReserve);
-    if (hit->getHitUsage() != TrackHit::not_used) continue;
+    if (hit->getHitUsage() != TrackHit::c_notUsed) continue;
     for (int t_index = 0; t_index < nbins_theta + 1; ++t_index) {
 
       r_temp = ConformalPosition::InstanceTrusted().getConformalR(hit->getLayerId(), hit->getWireId(), thetaBin[t_index]);
@@ -846,11 +846,11 @@ void FastHough::MaxFastHoughHighPt(const std::vector<TrackHit*>& hits, const int
         }
 
         voted_hits[t_index][r_index].erase(std::remove_if(voted_hits[t_index][r_index].begin(),
-        voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::not_used;}),
+        voted_hits[t_index][r_index].end(), [&](TrackHit * hit) {return hit->getHitUsage() != TrackHit::c_notUsed;}),
         voted_hits[t_index][r_index].end());
 
         for (TrackHit* hit : voted_hits[t_index][r_index]) {
-          hit->setHitUsage(TrackHit::used_in_cand);
+          hit->setHitUsage(TrackHit::c_usedInCand);
         }
 
         candidate_temp.first = voted_hits[t_index][r_index];

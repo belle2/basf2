@@ -40,7 +40,7 @@ void PatternChecker::checkCurler(
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
       [ &center, &charge, &ii](TrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == TrackCandidate::charge_positive)) {
-        hit->setHitUsage(TrackHit::bad);
+        hit->setHitUsage(TrackHit::c_bad);
         return true;
       } else {
         return false;
@@ -55,7 +55,7 @@ void PatternChecker::checkCurler(
       track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
       [ &center, &charge, &ii](TrackHit * hit) {
       if ((hit->getSuperlayerId() == ii) && (hit->getCurvatureSignWrt(center.first, center.second) == TrackCandidate::charge_negative)) {
-        hit->setHitUsage(TrackHit::bad);
+        hit->setHitUsage(TrackHit::c_bad);
         return true;
       } else {
         return false;
@@ -69,7 +69,7 @@ void PatternChecker::checkCurler(
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
     [&center, &charge](TrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != TrackCandidate::charge_positive) {
-        hit->setHitUsage(TrackHit::bad);
+        hit->setHitUsage(TrackHit::c_bad);
         return true;
       } else {
         return false;
@@ -79,7 +79,7 @@ void PatternChecker::checkCurler(
     track->first.erase(std::remove_if(track->first.begin(), track->first.end(),
     [&center, &charge](TrackHit * hit) {
       if (hit->getCurvatureSignWrt(center.first, center.second) != TrackCandidate::charge_negative) {
-        hit->setHitUsage(TrackHit::bad);
+        hit->setHitUsage(TrackHit::c_bad);
         return true;
       } else {
         return false;
@@ -260,7 +260,7 @@ void PatternChecker::clearBadHits(std::pair<std::vector<TrackHit*>, std::pair<do
     double y0_hit = hit->getOriginalWirePosition().Y();
     double dist = fabs(R - sqrt(SQR(x0_track - x0_hit) + SQR(y0_track - y0_hit))) - hit->getDriftLength();
     if (dist > hit->getDriftLength() / 2.) {
-      hit->setHitUsage(TrackHit::bad);
+      hit->setHitUsage(TrackHit::c_bad);
       return true;
     } else {
       return false;

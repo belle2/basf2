@@ -8,16 +8,16 @@ using namespace TrackFindingCDC;
 template<>
 bool QuadTreeItem<TrackHit>::isUsed() const
 {
-  return getPointer()->getHitUsage() == TrackHit::used_in_track;
+  return getPointer()->getHitUsage() == TrackHit::c_usedInTrack;
 }
 
 template<>
 void QuadTreeItem<TrackHit>::setUsedFlag(bool usedFlag)
 {
   if (usedFlag) {
-    getPointer()->setHitUsage(TrackHit::used_in_track);
+    getPointer()->setHitUsage(TrackHit::c_usedInTrack);
   } else {
-    getPointer()->setHitUsage(TrackHit::not_used);
+    getPointer()->setHitUsage(TrackHit::c_notUsed);
   }
 }
 

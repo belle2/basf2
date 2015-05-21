@@ -43,7 +43,7 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
 
   for (TrackCandidate* cand : m_trackList) {
     for (TrackHit* hit : cand->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 
     if (cand->getTrackHits().size() == 0) continue;
@@ -66,7 +66,7 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
 
       if (bestHitProb > prob) {
         bestCandidate->addHit(hit);
-        hit->setHitUsage(TrackHit::bad);
+        hit->setHitUsage(TrackHit::c_bad);
       }
     }
 
@@ -75,7 +75,7 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
 
   for (TrackCandidate* cand : m_trackList) {
     for (TrackHit* hit : cand->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
   }
 }
@@ -84,7 +84,7 @@ void SimpleFilter::deleteAllMarkedHits(TrackCandidate* trackCandidate)
 {
   trackCandidate->getTrackHits().erase(
     std::remove_if(trackCandidate->getTrackHits().begin(), trackCandidate->getTrackHits().end(),
-  [&](TrackHit * hit) { return hit->getHitUsage() == TrackHit::bad; }),
+  [&](TrackHit * hit) { return hit->getHitUsage() == TrackHit::c_bad; }),
   trackCandidate->getTrackHits().end());
 
 }
@@ -94,7 +94,7 @@ void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::
 {
 
   for (TrackHit* hit : axialHitList) {
-    if (hit->getHitUsage() == TrackHit::used_in_track or hit->getHitUsage() == TrackHit::used_in_cand) continue;
+    if (hit->getHitUsage() == TrackHit::c_usedInTrack or hit->getHitUsage() == TrackHit::c_usedInCand) continue;
 
     // Search for best candidate to assign to
     double bestHitProb = 0;
@@ -111,7 +111,7 @@ void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::
 
     if (bestHitProb > minimal_assignment_probability) {
       BestCandidate->addHit(hit);
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 
   }
@@ -124,7 +124,7 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
   if (trackHits.size() == 0) return;
 
   for (TrackHit* hit : trackHits) {
-    hit->setHitUsage(TrackHit::used_in_track);
+    hit->setHitUsage(TrackHit::c_usedInTrack);
   }
 
   int ndf = trackHits.size() - 4;
@@ -135,7 +135,7 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
     double assignment_probability = getAssigmentProbability(*hitIterator, trackCandidate);
 
     if (assignment_probability < minimal_assignment_probability) {
-      (*hitIterator)->setHitUsage(TrackHit::bad);
+      (*hitIterator)->setHitUsage(TrackHit::c_bad);
     }
   }
 

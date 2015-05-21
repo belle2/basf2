@@ -223,7 +223,7 @@ void CDCLegendreDAFStereoAssigningModule::event()
     for (TrackHit* hit : m_StereoHitList) {
 
 
-      if (hit->getHitUsage() == TrackHit::used_in_track) continue;
+      if (hit->getHitUsage() == TrackHit::c_usedInTrack) continue;
 
       std::pair<StereoHit, StereoHit> stereoHitPair;
 

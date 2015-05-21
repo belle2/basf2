@@ -77,7 +77,7 @@ TEST_F(CDCLegendreTestFixture, legendre_SimpleFilterDeleteAllMarkedHitsTest)
   TrackCandidate* trackCandidate = getTrackCandidate(0);
 
   for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
-    trackHit->setHitUsage(TrackHit::bad);
+    trackHit->setHitUsage(TrackHit::c_bad);
   }
 
   SimpleFilter::deleteAllMarkedHits(trackCandidate);

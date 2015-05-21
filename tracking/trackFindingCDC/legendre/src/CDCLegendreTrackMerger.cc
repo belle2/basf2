@@ -46,7 +46,7 @@ void TrackMerger::mergeTracks(TrackCandidate* cand1, TrackCandidate* cand2)
 void TrackMerger::resetHits(TrackCandidate* otherTrackCandidate)
 {
   for (TrackHit* hit : otherTrackCandidate->getTrackHits()) {
-    hit->setHitUsage(TrackHit::used_in_track);
+    hit->setHitUsage(TrackHit::c_usedInTrack);
   }
 }
 
@@ -118,10 +118,10 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(TrackCandid
 
     // Reset hits, because we do not want to throw them away if this is not be best candidate to merge
     for (TrackHit* hit : trackCandidateToBeMerged->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
     for (TrackHit* hit : cand2->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 
     if (probabilityToBeMerged < probabilityTemp) {
@@ -166,7 +166,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(TrackCandidate* cand1, std::lis
 
   for (TrackCandidate* cand : trackList) {
     for (TrackHit* hit : cand->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 
     trackFitter.fitTrackCandidateFast(cand);
@@ -189,12 +189,12 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<TrackHit*>& track
     double dist = fabs(fabs(1 / fabs(track_par.second) - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) *
                                                               (y0_track - y0_hit))) - hit->getDriftLength());
     if (dist > hit->getDriftLength() * factor) {
-      hit->setHitUsage(TrackHit::bad);
+      hit->setHitUsage(TrackHit::c_bad);
     }
   }
   trackHits.erase(std::remove_if(trackHits.begin(), trackHits.end(),
   [&](TrackHit * hit) {
-    return hit->getHitUsage() == TrackHit::bad;
+    return hit->getHitUsage() == TrackHit::c_bad;
   }), trackHits.end());
 }
 
@@ -231,7 +231,7 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
     commonHitListOfTwoTracks.end());
 
   for (TrackHit* hit : commonHitListOfTwoTracks) {
-    hit->setHitUsage(TrackHit::used_in_track);
+    hit->setHitUsage(TrackHit::c_usedInTrack);
   }
 
   // Calculate track parameters
@@ -296,14 +296,14 @@ TrackCandidate* TrackMerger::splitBack2BackTrack(TrackCandidate* trackCandidate)
         double phiOfHit = hit->getWirePosition().Phi();
         if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
           secondTrackHits.push_back(hit);
-          hit->setHitUsage(TrackHit::bad);
+          hit->setHitUsage(TrackHit::c_bad);
         }
       }
 
       SimpleFilter::deleteAllMarkedHits(trackCandidate);
 
       for (TrackHit* hit : secondTrackHits) {
-        hit->setHitUsage(TrackHit::used_in_track);
+        hit->setHitUsage(TrackHit::c_usedInTrack);
       }
 
       return secondTrackCandidate;

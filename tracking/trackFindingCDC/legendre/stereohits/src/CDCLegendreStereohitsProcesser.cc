@@ -141,7 +141,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
   for (TrackHit* hit : stereohitsForCandidate) {
     cand->addHit(hit);
-    hit->setHitUsage(TrackHit::used_in_track);
+    hit->setHitUsage(TrackHit::c_usedInTrack);
   }
 
   return;
@@ -274,7 +274,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
     if (((fabs(dist1) < 1.5) || (fabs(dist2) < 1.5)) && (hit->getZReference() > hit->getBackwardWirePosition().Z()
                                                          && hit->getZReference() < hit->getForwardWirePosition().Z())) {
       cand->addHit(hit);
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
 
       //Compare to original CDCHit
 //      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
@@ -341,7 +341,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
   std::set<TrackHit*> hits_set;
   std::set<TrackHit*>::iterator it = hits_set.begin();
   for (TrackHit* trackHit : stereohits) {
-    if (trackHit->getHitUsage() == TrackHit::used_in_track) continue;
+    if (trackHit->getHitUsage() == TrackHit::c_usedInTrack) continue;
 
 
 
@@ -430,7 +430,7 @@ void StereohitsProcesser::assignStereohitsByAngleWithQuadtree(TrackCandidate* ca
 
     for (TrackHit* hit : nodeWithMostHits->getItemsVector()) {
       cand->addHit(hit);
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 
     nodeWithMostHits = nullptr;
@@ -495,7 +495,7 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
   for (TrackHit* hit : stereohits) {
 
 
-    if (hit->getHitUsage() == TrackHit::used_in_track) continue;
+    if (hit->getHitUsage() == TrackHit::c_usedInTrack) continue;
 
     std::pair<StereoHit, StereoHit> stereoHitPair;
 
@@ -520,7 +520,7 @@ void StereohitsProcesser::assignStereohitsByAngle(TrackCandidate* cand, double t
     if (((fabs(dist1) < 1.5) || (fabs(dist2) < 1.5)) && (hit->getZReference() > hit->getBackwardWirePosition().Z()
                                                          && hit->getZReference() < hit->getForwardWirePosition().Z())) {
       cand->addHit(hit);
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
 
       //Compare to original CDCHit
 //      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());

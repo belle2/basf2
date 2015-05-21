@@ -22,7 +22,6 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    class TrackCandidate;
     class CDCWireHit;
 
     /** CDC Hit Class used for pattern recognition in the Legendre plain. */
@@ -33,16 +32,16 @@ namespace Belle2 {
        * Numeration used for marking hits
        */
       enum HitUsage {
-        not_used = 0,
-        used_in_track = 1,
-        used_in_cand = 2,
-        bad = 3,
-        background = 4
+        c_notUsed = 0,
+        c_usedInTrack = 1,
+        c_usedInCand = 2,
+        c_bad = 3,
+        c_background = 4
       };
 
       /** For root: */
       TrackHit() : m_underlayingWireHit(nullptr), m_wirePosition(), m_conformalPosition(),
-        m_conformalDriftLength(), m_zReference(0), m_hitUsage(HitUsage::not_used) { }
+        m_conformalDriftLength(), m_zReference(0), m_hitUsage(HitUsage::c_notUsed) { }
 
       /** Constructor to create a TrackHit from a CDCHit object.
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
@@ -123,18 +122,6 @@ namespace Belle2 {
       /** Return curvature sign with respect to a certain point in the conformal plain.*/
       int getCurvatureSignWrt(double xc, double yc) const;
 
-      /** Finds the point of closest approach to a given track candidate adjusts the wire position accordingly.
-       * @return Status of the approach. False if no nearest point could be found.
-       * UNUSED IN THE MOMENT. DO NOT DELETE.
-       * */
-      bool approach(const TrackCandidate&);
-
-      /** Finds the point of closest approach to a given track candidate adjusts the wire position accordingly.
-       * @return Status of the approach. False if no nearest point could be found.
-       * UNUSED IN THE MOMENT. DO NOT DELETE.
-       * */
-      bool approach2(const TrackCandidate&);
-
       /** Returns the position of the center(!!!) of the wire. */
       inline TVector3 getWirePosition() const { return m_wirePosition; }
 
@@ -147,7 +134,7 @@ namespace Belle2 {
       /** Us the forward and backward position of the wire to calculate the position with the given z referenz.  */
       TVector3 calculateFractionedPosition(double zReferenz) const;
 
-      /** Check hit drift time; if it greater than distances between wires mark hit as bad*/
+      /** Check hit drift lenght; if it's greater than cell size - set m_hitUsage == TrackHit::c_background*/
       bool checkHitDriftLength();
 
       /** Assigns the Z coordinate of the hit wire and update XY coordinates*/
@@ -163,7 +150,7 @@ namespace Belle2 {
       /** Set all parameters from the given wire hit */
       void initializeFromWireHit(const CDCWireHit* wireHit);
 
-      /** Assigns the coordinates of the hit wire (from CDC Geometry database) and sets the wire vector.*/
+      /** Assigns the coordinates of the hit wire (from CDC Geometry database) and updates wire vector according to assigned Z position.*/
       void setWirePosition();
 
       /** Assigns values for conformal coordinates by transforming the wire coordinates. */

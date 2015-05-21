@@ -86,7 +86,7 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
     m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
     for (TrackHit* hit : trackCandidate->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 
     m_cdcLegendreTrackDrawer->showPicture();
@@ -96,7 +96,7 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 
   else {
     for (TrackHit* hit : trackCandidate->getTrackHits()) {
-      hit->setHitUsage(TrackHit::bad);
+      hit->setHitUsage(TrackHit::c_bad);
     }
 
     //memory management, since we cannot use smart pointers in function interfaces
@@ -211,15 +211,15 @@ std::set<TrackHit*> TrackProcessor::createHitSet()
 {
   for (TrackCandidate* cand : m_trackList) {
     for (TrackHit* hit : cand->getTrackHits()) {
-      hit->setHitUsage(TrackHit::used_in_track);
+      hit->setHitUsage(TrackHit::c_usedInTrack);
     }
   }
   std::sort(m_axialHitList.begin(), m_axialHitList.end());
   std::set<TrackHit*> hits_set;
   std::set<TrackHit*>::iterator it = hits_set.begin();
   for (TrackHit* trackHit : m_axialHitList) {
-    if ((trackHit->getHitUsage() != TrackHit::used_in_track)
-        && (trackHit->getHitUsage() != TrackHit::background))
+    if ((trackHit->getHitUsage() != TrackHit::c_usedInTrack)
+        && (trackHit->getHitUsage() != TrackHit::c_background))
       it = hits_set.insert(it, trackHit);
   }
   B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
@@ -232,7 +232,7 @@ void TrackProcessor::deleteTracksWithASmallNumberOfHits()
   m_trackList.erase(std::remove_if(m_trackList.begin(), m_trackList.end(), [](TrackCandidate * trackCandidate) {
     if (trackCandidate->getNHits() < 3) {
       for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
-        trackHit->setHitUsage(TrackHit::not_used);
+        trackHit->setHitUsage(TrackHit::c_notUsed);
       }
       return true;
     } else {

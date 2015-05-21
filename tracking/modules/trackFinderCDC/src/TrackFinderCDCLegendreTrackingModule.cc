@@ -174,7 +174,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
   if (increaseThreshold) {
     for (TrackHit* hit : m_cdcLegendreTrackProcessor.getAxialHitsList()) {
-      if (hit->getHitUsage() == TrackHit::bad) hit->setHitUsage(TrackHit::not_used);
+      if (hit->getHitUsage() == TrackHit::c_bad) hit->setHitUsage(TrackHit::c_notUsed);
     }
   }
 
@@ -204,7 +204,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     {
       if (TrackCandidate::convertRhoToPt(fabs(qt->getYMean())) > 0.7 && (D > 0.4)) {
         for (TrackHit* hit : qt->getItemsVector()) {
-          hit->setHitUsage(TrackHit::bad);
+          hit->setHitUsage(TrackHit::c_bad);
         }
 
         return;
@@ -262,7 +262,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     unsigned int numberOfUsedHits = 0;
     for (TrackHit* hit : hits_set)
     {
-      if (hit->getHitUsage() == TrackHit::used_in_track)
+      if (hit->getHitUsage() == TrackHit::c_usedInTrack)
         numberOfUsedHits++;
     }
 

@@ -63,7 +63,7 @@ namespace Belle2 {
       void markAllHitsAsUnused()
       {
         for (TrackHit* hit : m_hitSet) {
-          hit->setHitUsage(TrackHit::not_used);
+          hit->setHitUsage(TrackHit::c_notUsed);
         }
       }
 
@@ -92,7 +92,7 @@ namespace Belle2 {
         }
 
         for (TrackHit* trackHit : someHits)  {
-          trackHit->setHitUsage(TrackHit::bad);
+          trackHit->setHitUsage(TrackHit::c_bad);
         }
 
         trackHitList.clear();
@@ -723,7 +723,7 @@ namespace Belle2 {
         EXPECT_FALSE(std::isnan(trackCandidate->getReferencePoint().Z()));
 
         for (TrackHit* trackHit : trackCandidate->getTrackHits()) {
-          trackHit->setHitUsage(TrackHit::used_in_track);
+          trackHit->setHitUsage(TrackHit::c_usedInTrack);
         }
       }
 

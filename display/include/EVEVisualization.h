@@ -1,6 +1,7 @@
 #ifndef EVEVISUALIZATION_H
 #define EVEVISUALIZATION_H
 
+#include <display/ObjectInfo.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -114,7 +115,6 @@ namespace Belle2 {
 
     /** Add a genfit::TrackCand, to evaluate track finding. */
     template<class PXDType, class SVDType> void addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand,
-        const TString& label,
         const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
 
     /** Add VXDTF track candidate. */
@@ -162,13 +162,13 @@ namespace Belle2 {
     MCTrack* addMCParticle(const MCParticle* particle);
 
     /** Add a vertex point and its covariance matrix. */
-    void addVertex(const genfit::GFRaveVertex* vertex, const TString& name);
+    void addVertex(const genfit::GFRaveVertex* vertex);
 
     /** Add a reconstructed cluster in the ECL. */
     void addECLCluster(const ECLCluster* cluster);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */
-    void addROI(const ROIid* roi, const TString& name);
+    void addROI(const ROIid* roi);
 
     /** After adding recohits for tracks/candidates, this function adds the remaining hits in a global collection. */
     template <class T> void addUnassignedRecoHits(const StoreArray<T>& hits)
@@ -336,9 +336,10 @@ namespace Belle2 {
   };
 
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName,
-      const genfit::TrackCand* trackCand, const TString& label,
+      const genfit::TrackCand* trackCand,
       const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
   {
+    const TString label = ObjectInfo::getIdentifier(trackCand);
     // parse the option string ------------------------------------------------------------------------
     bool drawHits = false;
 
@@ -354,7 +355,7 @@ namespace Belle2 {
     TVector3 track_pos = trackCand->getPosSeed();
     TVector3 track_mom = trackCand->getMomSeed();
 
-    TEveStraightLineSet* lines = new TEveStraightLineSet(TString::Format("RecoHits for %s", label.Data()));
+    TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
     lines->SetMainColor(c_trackCandColor);
     lines->SetMarkerColor(c_trackCandColor);
     lines->SetMarkerStyle(6);
@@ -413,11 +414,7 @@ namespace Belle2 {
     track_lines->SetPropagator(m_gftrackpropagator);
     track_lines->SetLineColor(c_trackCandColor);
     track_lines->SetLineWidth(1);
-    track_lines->SetTitle(TString::Format("%s\n"
-                                          "#hits: %u\n"
-                                          "pT=%.3f, pZ=%.3f",
-                                          label.Data(), numhits,
-                                          track_mom.Pt(), track_mom.Pz()));
+    track_lines->SetTitle(ObjectInfo::getTitle(trackCand));
 
     track_lines->SetCharge((int)trackCand->getChargeSeed());
 

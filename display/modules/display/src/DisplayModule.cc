@@ -171,10 +171,10 @@ void DisplayModule::event()
       const int nCands = gftrackcands.getEntries();
       for (int i = 0; i < nCands; i++) {
         if (m_useClusters) {
-          m_visualizer->addTrackCandidate(colName, gftrackcands[i], TString::Format("%s %d", colName.c_str(), i),
+          m_visualizer->addTrackCandidate(colName, gftrackcands[i],
                                           StoreArray<PXDCluster>(), StoreArray<SVDCluster>(), StoreArray<CDCHit>());
         } else {
-          m_visualizer->addTrackCandidate(colName, gftrackcands[i], TString::Format("%s %d", colName.c_str(), i),
+          m_visualizer->addTrackCandidate(colName, gftrackcands[i],
                                           StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
         }
       }
@@ -192,7 +192,7 @@ void DisplayModule::event()
 
     StoreArray<ROIid> ROIs;
     for (int i = 0 ; i < ROIs.getEntries(); i++)
-      m_visualizer->addROI(ROIs[i], TString::Format("ROIs_%d", i));
+      m_visualizer->addROI(ROIs[i]);
 
     //special VXDTF objects
     StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
@@ -226,7 +226,7 @@ void DisplayModule::event()
     StoreArray<genfit::GFRaveVertex> vertices;
     const int nVertices = vertices.getEntries();
     for (int i = 0; i < nVertices; i++) {
-      m_visualizer->addVertex(vertices[i], TString::Format("GFRaveVertex %d", i));
+      m_visualizer->addVertex(vertices[i]);
     }
 
     StoreArray<ECLCluster> clusters;

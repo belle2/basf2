@@ -20,8 +20,11 @@ namespace Belle2 {
     /** Where is this object in the datastore? */
     TString getIdentifier(const TObject* obj);
 
-    /** Get object info (e.g. via RelationsObject::getInfoHTML()). */
+    /** Get object info HTML (e.g. via RelationsObject::getInfoHTML()). */
     TString getInfo(const TObject* obj);
+
+    /** Get plain text for TEve object titles (shown on mouse-over). */
+    TString getTitle(const TObject* obj);
 
     /** return entry name & index for arrays, with index = -1 for objects. */
     std::pair<std::string, int> getDataStorePosition(const TObject* obj);

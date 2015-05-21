@@ -1009,32 +1009,22 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     TString particle_name(mctrack.GetName());
 
     //set track title (for popup)
-    TString momLabel = "";
     const MCParticle* mom = particle->getMother();
     if (mom) {
-      momLabel = TString::Format("\nMother: Idx=%d, PDG=%d)", mom->getIndex(), mom->getPDG());
       m_mcparticleTracks[particle].parentParticle = mom;
       addMCParticle(mom);
     }
 
+    TString title = ObjectInfo::getTitle(particle);
     if (!hasTrajectory) {
       //Hijack the mother label to show that the track position is only
       //extrapolated, not known from simulation
-      momLabel += "\n(track estimated from initial momentum)";
+      title += "\n(track estimated from initial momentum)";
       //Also, show those tracks with dashed lines
       m_mcparticleTracks[particle].track->SetLineStyle(2);
     }
 
-    m_mcparticleTracks[particle].track->SetTitle(TString::Format(
-                                                   "MCParticle Index=%d\n"
-                                                   "Chg=%d, PDG=%d (%s)\n"
-                                                   "pT=%.3f, pZ=%.3f\nV=(%.3f, %.3f, %.3f)"
-                                                   "%s",
-                                                   particle->getIndex(),
-                                                   (int)particle->getCharge(), particle->getPDG(), particle_name.Data(),
-                                                   mctrack.Pt(), mctrack.Pz(), mctrack.Vx(), mctrack.Vy(), mctrack.Vz(),
-                                                   momLabel.Data()));
-
+    m_mcparticleTracks[particle].track->SetTitle(title);
 
     //add some color (avoid black & white)
     switch (abs(pdg)) {
@@ -1061,7 +1051,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
     }
 
     //create point set for hits
-    const TString pointsTitle = TString::Format("SimHits for MCParticle %d (%s)", particle->getIndex(), particle_name.Data());
+    const TString pointsTitle = "SimHits for " + ObjectInfo::getIdentifier(particle) + " - " + particle_name;
     m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
     m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
     m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
@@ -1172,21 +1162,17 @@ void EVEVisualization::clearEvent()
 
 
 
-void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex, const TString& name)
+void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 {
   TVector3 v = vertex->getPos();
-  TEvePointSet* vertexPoint = new TEvePointSet(name);
+  TEvePointSet* vertexPoint = new TEvePointSet(ObjectInfo::getInfo(vertex));
   //sadly, setting a title for a TEveGeoShape doesn't result in a popup...
-  vertexPoint->SetTitle(TString::Format("%s\n"
-                                        "V=(%.3f, %.3f, %.3f)\n"
-                                        "pVal=%e",
-                                        name.Data(), v.x(), v.y(), v.z(),
-                                        TMath::Prob(vertex->getChi2(), vertex->getNdf())));
+  vertexPoint->SetTitle(ObjectInfo::getTitle(vertex));
   vertexPoint->SetMainColor(c_recoHitColor);
   vertexPoint->SetNextPoint(v.x(), v.y(), v.z());
 
   TMatrixDEigen eigen_values(vertex->getCov());
-  TEveGeoShape* det_shape = new TEveGeoShape(name + " Error");
+  TEveGeoShape* det_shape = new TEveGeoShape(ObjectInfo::getInfo(vertex) + " Error");
   det_shape->IncDenyDestroy();
   det_shape->SetShape(new TGeoSphere(0., 1.));   //Initially created as a sphere, then "scaled" into an ellipsoid.
   TMatrixT<double> ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
@@ -1260,7 +1246,7 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
   VisualRepMap::getInstance()->addCluster(cluster, m_eclData, id);
 }
 
-void EVEVisualization::addROI(const ROIid* roi, const TString& name)
+void EVEVisualization::addROI(const ROIid* roi)
 {
 
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
@@ -1284,7 +1270,7 @@ void EVEVisualization::addROI(const ROIid* roi, const TString& name)
 
   TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, 1, 1, 0.01);
 
-  ROIbox->SetName(name);
+  ROIbox->SetName(ObjectInfo::getIdentifier(roi));
   ROIbox->SetMainColor(kSpring - 9);
   ROIbox->SetMainTransparency(50);
 
@@ -1360,9 +1346,9 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
 
   cov_shape->SetMainColor(kOrange - 3);
   cov_shape->SetMainTransparency(50);
-  cov_shape->SetName(TString::Format("CDCHit %d", hit->getArrayIndex()));
-  cov_shape->SetTitle(TString::Format("CDCHit %d\nWire ID: %d\nADC: %d\nTDC: %d", hit->getArrayIndex(), hit->getID(),
-                                      hit->getADCCount(), hit->getTDCCount()));
+  cov_shape->SetName(ObjectInfo::getIdentifier(hit));
+  cov_shape->SetTitle(ObjectInfo::getInfo(hit) + TString::Format("\nWire ID: %d\nADC: %d\nTDC: %d",
+                      hit->getID(), hit->getADCCount(), hit->getTDCCount()));
   addToGroup("CDCHits", cov_shape);
 }
 

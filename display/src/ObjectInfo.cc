@@ -2,8 +2,13 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/utilities/HTML.h>
+
+#include <genfit/TrackCand.h>
+#include <genfit/GFRaveVertex.h>
 
 #include <TString.h>
+#include <TMath.h>
 
 using namespace Belle2;
 
@@ -21,10 +26,28 @@ TString ObjectInfo::getInfo(const TObject* obj)
 {
   if (!obj)
     B2FATAL("ObjectInfo::getInfo() got null?");
-  if (const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(obj)) {
+  if (auto relObj = dynamic_cast<const RelationsObject*>(obj)) {
     return relObj->getInfoHTML();
+  } else if (auto vertex = dynamic_cast<const genfit::GFRaveVertex*>(obj)) {
+    return "<b>V</b>=" + HTML::getString(vertex->getPos()) + "<br>" +
+           TString::Format("pVal=%e", TMath::Prob(vertex->getChi2(), vertex->getNdf()));
+  } else if (auto trackCand = dynamic_cast<const genfit::TrackCand*>(obj)) {
+    TVector3 momentum = trackCand->getMomSeed();
+    return TString::Format("<b>#hits</b>=%u<br><b>pT</b>=%.3f, <b>pZ</b>=%.3f",
+                           trackCand->getNHits(),
+                           momentum.Pt(), momentum.Pz());
   }
   return "";
+}
+
+TString ObjectInfo::getTitle(const TObject* obj)
+{
+  TString out(getIdentifier(obj));
+  const TString& name = getName(obj);
+  if (name.Length() != 0)
+    out += " - " + name;
+
+  return out + "\n" + HTML::htmlToPlainText(getInfo(obj).Data()).c_str();
 }
 
 std::pair<std::string, int> ObjectInfo::getDataStorePosition(const TObject* obj)

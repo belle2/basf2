@@ -31,6 +31,7 @@ namespace Belle2 {
 
     /** Constructor */
     ClosedLowerBoundedSet(MinType min): m_min(min) {};
+    ClosedLowerBoundedSet(): m_min(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
      *

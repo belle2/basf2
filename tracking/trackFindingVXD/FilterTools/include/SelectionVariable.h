@@ -12,6 +12,7 @@
 
 #include <string>
 #include <typeinfo>
+#include <boost/regex.hpp>
 #include <cxxabi.h>
 #include <stdlib.h>
 
@@ -105,7 +106,19 @@ namespace Belle2 {
       realname = abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
       std::string name(realname);
       free(realname);
-      return name ;
+      boost::regex colon("(:)");      // matches ":" because root does not like it
+      // we are going to substitute : with _
+      auto name1 = boost::regex_replace(name, colon, std::string("_"));
+      boost::regex lesser("(<)");     // matches "<" because root does not like it
+      // we are going to substitute : with {
+      auto name2 = boost::regex_replace(name1, lesser, std::string("{"));
+
+      boost::regex greather("(>)");   // matches ">" because root does not like it
+      // we are going to substitute : with }
+      auto name3 = boost::regex_replace(name2, greather, std::string("}"));
+
+      return name3;
+
     }
 
     /** A bogus virtual denstructor */

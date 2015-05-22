@@ -33,6 +33,7 @@ namespace Belle2 {
     /** Constructor */
     Range(InfType inf, SupType sup): m_inf(inf), m_sup(sup) {};
 
+    Range(): m_inf(0.), m_sup(0.) {};
     /** Method used by the filter tools to decide on the fate of the pair.
      *
      * @param x is the result of some SelectionVariable applied to a pair of objects.

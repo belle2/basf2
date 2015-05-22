@@ -73,6 +73,8 @@ namespace Belle2 {
     Filter(const Range& range):
       m_range(range) { };
 
+    Filter() { };
+
     /** Getter of the range */
     Range getRange(void) const { return m_range; }
 
@@ -130,14 +132,14 @@ namespace Belle2 {
      * true
      */
     Filter< Variable, Range, BypassableFilter, Observer>
-    bypass(const bool& bypassVariable)
+    bypass(const bool& bypassVariable = false_c)
     {
       return Filter< Variable, Range, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
     Filter< Variable, Range, ActivableFilter, Observer>
-    __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
-    enable(const bool& enableVariable)
+    //    __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
+    enable(const bool& enableVariable = true_c)
     {
       return Filter< Variable, Range, ActivableFilter, Observer>(m_range, enableVariable);
     }
@@ -152,6 +154,10 @@ namespace Belle2 {
     template< class otherObserver >
     Filter(const Filter< Variable, Range, otherObserver>& filter):
       m_range(filter.getRange()) {};
+
+    static const bool true_c = true ;
+    static const bool false_c = false;
+
 
 
   protected:
@@ -219,8 +225,9 @@ namespace Belle2 {
      * method will return the actual result of the test.
      */
     Filter(const Range& range , const bool& bypass):
-      Filter< Variable, Range, Observer >(range),
-      m_bypass(bypass) { };
+      Filter< Variable, Range, Observer >(range)
+    { m_bypass = &bypass; };
+    Filter()  {};
 
     /** All the real computations are occuring here */
     bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
@@ -228,13 +235,21 @@ namespace Belle2 {
     {
       typename Variable::variableType value = Variable::value(arg1, arg2);
       Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
-      return m_bypass || Filter< Variable, Range, Observer >::m_range.contains(value);
+      return (*m_bypass) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 
   private:
 
-    const bool& m_bypass;
+    const  bool* m_bypass;
   };
+
+  /*  template <
+    class Variable,
+    class Range,
+    class Observer
+    >
+    const bool * Filter < Variable, Range, BypassableFilter, Observer  >::m_bypass = NULL;
+  */
 
 
   /** Basic building block of the Filter tools
@@ -296,24 +311,36 @@ namespace Belle2 {
      * method will return the actual result of the test.
      */
     Filter(const Range& range , const bool& enable):
-      Filter< Variable, Range, Observer >(range),
-      m_enable(enable) { };
+      Filter< Variable, Range, Observer >(range)
+    { m_enable = & enable ;};
+
+
+    Filter() { };
+
 
     /** All the real computations are occuring here */
     bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
                 const typename Filter< Variable, Range, Observer>::argumentType& arg2) const
     {
       typename Variable::variableType value = Variable::value(arg1, arg2);
+      cout << (*m_enable) << " | ";
       Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
-      return (! m_enable) || Filter< Variable, Range, Observer >::m_range.contains(value);
+
+      return (!(*m_enable)) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 
   private:
 
-    const bool& m_enable;
+    const bool* m_enable;
   };
 
-
+  /*template <
+    class Variable,
+    class Range,
+    class Observer
+    >
+  const bool * Filter < Variable, Range, ActivableFilter, Observer  >::m_enable = NULL;
+  */
 
   /***
    * Boolean NOT of a given filters
@@ -349,6 +376,7 @@ namespace Belle2 {
     Filter(const someFilter& filter):
       m_filter(filter) { };
 
+    Filter() {};
   private:
     someFilter  m_filter;
 
@@ -404,6 +432,10 @@ namespace Belle2 {
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
 
+    Filter() { };
+
+
+
   private:
     FilterA  m_filterA;
     FilterB  m_filterB;
@@ -451,6 +483,7 @@ namespace Belle2 {
 
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
+    Filter() {};
 
     void persist(TTree* t, const string& branchName)
     {

@@ -32,6 +32,7 @@ namespace Belle2 {
 
     /** Constructor */
     ClosedRange(MinType min, MaxType max): m_min(min), m_max(max) {};
+    ClosedRange(): m_min(0), m_max(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
      *

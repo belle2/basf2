@@ -28,6 +28,7 @@ namespace Belle2 {
     MaxType m_max;
   public:
     ClosedUpperBoundedSet(MaxType max):  m_max(max) {};
+    ClosedUpperBoundedSet():  m_max(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
      *

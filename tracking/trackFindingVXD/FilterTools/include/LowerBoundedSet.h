@@ -31,6 +31,7 @@ namespace Belle2 {
 
     /** Constructor */
     LowerBoundedSet(InfType inf): m_inf(inf) {};
+    LowerBoundedSet(): m_inf(0) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
      *

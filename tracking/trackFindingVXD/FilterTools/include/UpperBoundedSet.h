@@ -28,7 +28,7 @@ namespace Belle2 {
     SupType m_sup;
   public:
     UpperBoundedSet(SupType sup):  m_sup(sup) {};
-
+    UpperBoundedSet(): m_sup(0) {};
     /** Method used by the filter tools to decide on the fate of the pair.
      *
      * @param x is the result of some SelectionVariable applied to a pair of objects.

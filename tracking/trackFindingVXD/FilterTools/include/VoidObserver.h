@@ -10,10 +10,6 @@
 
 #pragma once
 
-#include <string>
-#include <tuple>
-#include <iostream>
-using namespace std;
 
 namespace Belle2 {
 

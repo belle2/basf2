@@ -220,10 +220,18 @@ void RFMasterCallback::abort() throw(RCHandlerException)
 
 void RFMasterCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
 {
+  if (m_callback != NULL) {
+    m_callback->setState(RCState::RUNNING_S);
+  }
+  RCCallback::setState(RCState::RUNNING_S);
 }
 
 void RFMasterCallback::stop() throw(RCHandlerException)
 {
+  if (m_callback != NULL) {
+    m_callback->setState(RCState::READY_S);
+  }
+  RCCallback::setState(RCState::READY_S);
 }
 
 void RFMasterCallback::pause() throw(RCHandlerException)

@@ -13,6 +13,7 @@ import logging
 
 import tracking.metamodules as metamodules
 from tracking.run.event_generation import StandardEventGenerationRun
+from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 
 def get_logger():
@@ -288,6 +289,8 @@ class CDCValidation(metamodules.PathModule):
     """
 
     def __init__(self, track_candidates_store_array_name, output_file_name):
+        from tracking.validation.module import SeparatedTrackingValidationModule
+
         mc_track_matcher_module = StandardEventGenerationRun.get_basf2_module(
             'MCTrackMatcher',
             UseCDCHits=True,
@@ -313,15 +316,14 @@ class CDCFitter(metamodules.PathModule):
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
                  input_track_cands_store_array_name="TrackCands",
-                 build_belle_tracks=True,
                  output_tracks_store_array_name="GF2Tracks"):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
         gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
                                                                         PDGCodes=[211],
-                                                                        StoreFailedTracks=True,
-                                                                        NMaxIterations=4,
+                                                                        FilterId="DAF",
+                                                                        StoreFailedTracks=False,
                                                                         GFTrackCandidatesColName=input_track_cands_store_array_name,
                                                                         GFTracksColName=output_tracks_store_array_name,
                                                                         BuildBelle2Tracks=False)
@@ -335,8 +337,22 @@ class CDCFitter(metamodules.PathModule):
             module_list.append(setup_genfit_extrapolation_module)
 
         module_list.append(gen_fitter_module)
-
-        if build_belle_tracks:
-            module_list.append(track_builder)
+        module_list.append(track_builder)
 
         super(CDCFitter, self).__init__(modules=module_list)
+
+
+class CDCEventDisplay(metamodules.WrapperModule):
+
+    """ Add the b2display module of the cdc display to the path """
+
+    def __init__(self, full_display=True):
+
+        if full_display:
+            display_module = StandardEventGenerationRun.get_basf2_module("Display", showTrackCandidates=True, showMCInfo=False)
+        else:
+            display_module = CDCSVGDisplayModule()
+            display_module.draw_gftrackcand_trajectories = True
+            display_module.draw_gftrackcands = True
+
+        super(CDCEventDisplay, self).__init__(display_module)

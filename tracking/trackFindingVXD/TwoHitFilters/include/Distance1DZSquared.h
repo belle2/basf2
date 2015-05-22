@@ -11,9 +11,6 @@
 #pragma once
 
 #include "tracking/trackFindingVXD/FilterTools/SelectionVariable.h"
-
-#include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <math.h>
 
 namespace Belle2 {

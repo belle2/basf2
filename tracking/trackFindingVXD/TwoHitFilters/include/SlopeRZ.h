@@ -12,8 +12,6 @@
 
 #include "tracking/trackFindingVXD/FilterTools/SelectionVariable.h"
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <boost/math/special_functions/fpclassify.hpp> // isnan and isinf
 
 #include <math.h>

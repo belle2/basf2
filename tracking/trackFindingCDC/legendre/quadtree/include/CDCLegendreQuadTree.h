@@ -63,6 +63,9 @@ namespace Belle2 {
         }
       };
 
+      /*
+        This method will apply a lambda function to every child of the quad tree
+      */
       void apply(std::function<void(quadChild*)> lmd)
       {
         for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {

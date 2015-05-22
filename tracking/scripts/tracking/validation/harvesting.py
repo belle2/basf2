@@ -30,9 +30,17 @@ def get_logger():
 
 
 class AttributeDict(dict):
-
     """Class that enables access to the dictionaries items by attribute lookup
-    in addition to normal item lookup."""
+    in addition to normal item lookup.
+
+    Example
+    -------
+    >>> style = AttributeDict(color="red", dash=True)
+    >>> print style["color"] # normal access
+    'red'
+    >>> print style.color    # access as attribute lookup
+    'red'
+    """
 
     def __getattr__(self, name):
         """If the name is not an attribute of the object, try to look it up as an item instead."""
@@ -63,7 +71,11 @@ def harvest(foreach="", pick=None, name=None, output_file_name=None):
     function decorator
         A decorator that turns a function into HarvestingModule instance,
         which peel function is replaced by the decorated function.
-        """
+
+    Notes
+    -----
+    An example of the usage pattern can be found at the end of this file
+    """
 
     def harvest_decorator(peel_func):
         name_or_default = name or peel_func.__name__
@@ -148,32 +160,6 @@ class HarvestingModule(basf2.Module):
     * tracking/scripts/tracking/validation/eventwise_side_module.py
     * tracking/trackFindingCDC/scripts/trackfindingcdc/validation/segmentFitValidation.py
     * tracking/trackFindingCDC/scripts/trackfindingcdc/validation/segmentPairFitValidation.py
-
-
-    Parameters
-    ----------
-    foreach : string
-        Name of a StoreArray, which objects should be investigated
-    output_file_name : string
-        Name of the ROOT file to which the results should be written
-    name : string, optional
-        Name of the harvest that is used in the names of ROOT plots and trees.
-        Defaults to the class name.
-    title : string, optional
-        Name of the harvest that is used in the title of ROOT plots and trees. Defaults to the name.
-    contact : string, optional
-        Contact email adress to be used in the validation plots contact. Defaults to None.
-    expert_level : int, optional
-        Expert level that can be used to switch on more plots.
-        Generally the higher the more detailed to analysis.
-        Meaning depends entirely on the subclass implementing a certain policy.
-        Defaults to default_expert_level.
-
-
-    Attributes
-    ----------
-    refiners : list of Refiners.
-        A list of additional refiners of the instance to be invoked on termination of the module.
     """
 
     default_expert_level = 1
@@ -185,19 +171,56 @@ class HarvestingModule(basf2.Module):
                  title=None,
                  contact=None,
                  expert_level=None):
+        """Constructor of the harvesting module.
+
+        Parameters
+        ----------
+        foreach : string
+            Name of a StoreArray, which objects should be investigated
+        output_file_name : string
+            Name of the ROOT file to which the results should be written.
+            Giving an opened ROOT file is also allowed.
+            If None is given write to the current ROOT file.
+        name : string, optional
+            Name of the harvest that is used in the names of ROOT plots and trees.
+            Defaults to the class name.
+        title : string, optional
+            Name of the harvest that is used in the title of ROOT plots and trees.
+            Defaults to the name.
+        contact : string, optional
+            Contact email adress to be used in the validation plots contact. Defaults to None.
+        expert_level : int, optional
+            Expert level that can be used to switch on more plots.
+            Generally the higher the more detailed to analysis.
+            Meaning depends entirely on the subclass implementing a certain policy.
+            Defaults to default_expert_level.
+            """
 
         super(HarvestingModule, self).__init__()
+
+        #: Name of the StoreArray or iterable StoreObjPtr that contains the objects to be harvested
         self.foreach = foreach
 
+        #: Name of the ROOT output file to be generated
         self.output_file_name = output_file_name
+
         if not isinstance(self.output_file_name, (ROOT.TFile, basestring)):
             raise TypeError("output_file_name is allowed to be a string or a ROOT.TFile object")
 
+        #: Name of this harvest
         self.name = name or self.__class__.__name__
+
+        #: Title particle of this harvest
         self.title = title or self.name
+
+        #: Contact email address to be displayed on the validation page
         self.contact = contact
+
+        #: Integer expert level that controlls to detail of plots to be generated
         self.expert_level = self.default_expert_level if expert_level is None else expert_level
 
+        #: A list of additional refiner instances to be executed
+        #: on top of the refiner methods that are members of this class
         self.refiners = []
 
     def run(self,
@@ -205,6 +228,25 @@ class HarvestingModule(basf2.Module):
             components=False,
             show=True,
             pyprofile=False):
+        """Run the module on a basf2 output file and harvest objects from it.
+
+        Parameters
+        ----------
+        input_root_file : str
+            Name of the basf2 output file to be read.
+            The file is read by RootInputModule.
+        components : list(str), optional
+            A list of geometry components that should be loaded for the harvesting to work.
+            Defaults to the default compontent of
+            tracking.run.tracked_event_generation.ReadOrGenerateTrackedEventsRun
+        show : bool, optional
+            Open a TBrowser and show the ROOT file that has been generated on terminate.
+            Defaults to True.
+        pyprofile: bool
+            Use the tracking.metamodules.PyProfilingModule on the harvesting module
+            to investigate bottlenecks in the python code.
+            Defaults to False
+            """
 
         run = tracking.run.tracked_event_generation.ReadOrGenerateTrackedEventsRun()
 
@@ -229,23 +271,22 @@ class HarvestingModule(basf2.Module):
         run.execute()
 
     def initialize(self):
-        if (isinstance(self.output_file_name, basestring) and
-                self.output_file_name.startswith("datastore://")):
+        """Initialisation method of the module.
 
-            # Check if the tfile was registered on the datastore before
-            datastore_output_file_name = self.output_file_name[len("datastore://"):]
-            persistent = 1
-            stored_tfile = Belle2.PyStoreObj(datastore_output_file_name, persistent)
-            if not stored_tfile:
-                msg = "No TFile with name {} created on the DataStore.".format(
-                    datastore_output_file_name
-                )
-                raise KeyError(msg)
-
-        # prepare the barn to receive the harvested crops
+        Prepares the receiver stash of objects to be harvestered.
+        """
         self.stash = self.barn()
 
     def event(self):
+        """Event method of the module
+
+        * Does invoke the prepare method before the iteration starts.
+        * In each event fetch the StoreArray / iterable StoreObjPtr,
+        * Iterate through all instances
+        * Feed each instance to the pick method to deside it the instance is relevant
+        * Forward it to the peel method that should generated a dictionary of values
+        * Store each dictionary of values
+        """
         self.prepare()
         stash = self.stash.send
         pick = self.pick
@@ -261,16 +302,27 @@ class HarvestingModule(basf2.Module):
                     stash(crop)
 
     def terminate(self):
+        """Termination method of the module.
+
+        Finalize the collected crops.
+        Start the refinement.
+        """
+
         self.stash.close()
         del self.stash
         self.refine(self.crops)
 
     @staticmethod
     def create_crop_part_collection():
+        """Create the storing objects for the crop values
+
+        Currently a numpy.array of doubles is used to store all values in memory.
+        """
         return array.array("d")
 
     @coroutine
     def barn(self):
+        """Coroutine that receives the dictionaries of names and values from peel and store them."""
         crop = (yield)
         raw_crops = copy.copy(crop)
         crops = copy.copy(crop)
@@ -310,6 +362,14 @@ class HarvestingModule(basf2.Module):
         self.crops = crops
 
     def gather(self):
+        """Iterator that yield the instances form the StoreArray / iterable StoreObj.
+
+        Yields
+        ------
+        Object instances from the StoreArray, iterable StoreObj or the StoreObj itself
+        in case it is not iterable.
+        """
+
         registered_store_arrays = Belle2.PyStoreArray.list()
         registered_store_objs = Belle2.PyStoreObj.list()
 
@@ -341,31 +401,47 @@ class HarvestingModule(basf2.Module):
             yield None
 
     def prepare(self):
+        """Default implementation of prepare.
+
+        Can be overridden by subclasses.
+        """
         return
 
     def peel(self, crop):
-        return crop
+        """Unpack the the instances and return and dictionary of names to values or
+        a generator of those dictionaries to be saved.
+
+        Returns
+        -------
+        dict(str -> float)
+            Unpacked names and values
+        or
+
+        Yields
+        ------
+        dict(str -> float)
+            Unpacked names and values
+
+        """
+        return {"name", np.nan}
 
     def pick(self, crop):
+        """Indicate whether the instance should be forwarded to the peeling
+
+        Returns
+        -------
+        bool : Indicator if the instance is valueable in the current harverst.
+        """
         return True
 
     def refine(self, crops):
+        """Receive the gathered crops and forward them to the refiners."""
+
         kwds = {}
         if self.output_file_name:
             # Save everything to a ROOT file
             if isinstance(self.output_file_name, ROOT.TFile):
                 output_tdirectory = self.output_file_name
-            elif self.output_file_name.startswith("datastore://"):
-                # Check if the tfile was registered on the datastore before
-                datastore_output_file_name = self.output_file_name[len("datastore://"):]
-                persistent = 1
-                stored_tfile = Belle2.PyStoreObj(datastore_output_file_name, persistent)
-                if not stored_tfile:
-                    msg = "No TFile with name {} created on the DataStore.".format(
-                        datastore_output_file_name
-                    )
-                    raise KeyError(msg)
-                output_tdirectory = stored_tfile.obj()
             else:
                 output_tfile = ROOT.TFile(self.output_file_name, 'recreate')
                 output_tdirectory = output_tfile
@@ -389,12 +465,20 @@ class HarvestingModule(basf2.Module):
         finally:
             # If we opened the TFile ourself, close it again
             if self.output_file_name:
-                if (isinstance(self.output_file_name, basestring) and
-                        not self.output_file_name.startswith("datastore://")):
+                if isinstance(self.output_file_name, basestring):
                     output_tfile.Close()
 
     @staticmethod
     def iter_store_obj(store_obj):
+        """Obtain a iterator from a StoreObj
+
+        Repeatly calls iter(store_obj) or store_obj.__iter__()
+        until the final iterator returns itself
+
+        Returns
+        -------
+        iterator of the StoreObj
+        """
         iterable = store_obj.obj()
         last_iterable = None
         while iterable is not last_iterable:

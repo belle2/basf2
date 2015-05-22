@@ -192,9 +192,12 @@ namespace Belle2 {
       return assign(t, true);
     }
 
+    /** Return list of object names with matching type.  */
+    static std::vector<std::string> getObjectList(DataStore::EDurability durability = DataStore::c_Event)
+    {
+      return DataStore::Instance().getListOfObjects(T::Class(), durability);
+    }
 
-    /** Virtual destructor for inherited classes */
-    virtual ~StoreObjPtr() {}
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
     inline T& operator *()  const {ensureAttached(); return **m_storeObjPtr;}  /**< Imitate pointer functionality. */

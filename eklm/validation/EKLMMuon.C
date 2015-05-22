@@ -26,13 +26,14 @@ void EKLMMuon()
   tree->Draw("EKLMHit2ds.m_Time-EKLMHit2ds.m_MCTime>>muon_h2dtres");
   l = h1dtres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Time resolution")); 
-  l->Add(new TNamed("Check", "No bias. See bug #997.")); 
+  l->Add(new TNamed("Check", "No bias.")); 
   l->Add(new TNamed("Contact", "Kirill Chilikin"));
   l = h2dtres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Time resolution")); 
-  l->Add(new TNamed("Check", "No bias. See bug #997.")); 
+  l->Add(new TNamed("Check", "No bias.")); 
   l->Add(new TNamed("Contact", "Kirill Chilikin"));
-  h1dtres->Write();
+  // This plot needs new creation procedure.
+  // h1dtres->Write();
   h2dtres->Write();
   delete h2dtres;
   delete fin;

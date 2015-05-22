@@ -119,11 +119,11 @@ void EKLMK0L()
   l->Add(new TNamed("Contact", "Kirill Chilikin"));
   l = tres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Time resolution"));
-  l->Add(new TNamed("Check", "No bias. See bug #997."));
+  l->Add(new TNamed("Check", "No bias."));
   l->Add(new TNamed("Contact", "Kirill Chilikin"));
   l = pres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Momentum resolution"));
-  l->Add(new TNamed("Check", "No bias. See bug #997."));
+  l->Add(new TNamed("Check", "No bias."));
   l->Add(new TNamed("Contact", "Kirill Chilikin"));
   l = ptres->GetListOfFunctions();
   l->Add(new TNamed("Description", "Momentum theta resolution"));

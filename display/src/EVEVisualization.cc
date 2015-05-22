@@ -29,6 +29,7 @@
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <genfit/AbsMeasurement.h>
@@ -202,7 +203,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
   TEveRecTrackD recTrack;
   const TVector3& poca = fitResult->getPosition();
-  const TVector3& poca_momentum = fitResult->getMomentum();
+  const TVector3& Bfield = BFieldMap::Instance().getBField(poca);
+  const TVector3& poca_momentum = fitResult->getMomentum(Bfield.z());
 
   recTrack.fV.Set(poca);
   recTrack.fP.Set(poca_momentum);
@@ -216,7 +218,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
 
   if (track) {
-    if (! track->checkConsistency()) {
+    if (!track->checkConsistency()) {
       B2ERROR("track is not consistent");
       return;
     }

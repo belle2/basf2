@@ -18,7 +18,6 @@ using namespace CDC;
 
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCWireLayer)
 
 CDCWireLayer::CDCWireLayer() :
 

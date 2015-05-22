@@ -14,7 +14,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(Vector2D)
 
 // Implement all functions
 

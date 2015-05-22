@@ -17,7 +17,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace CDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCWireTopology)
 
 
 void CDCWireTopology::initialize()

@@ -14,7 +14,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoHit3DVector)
 
 FloatType CDCRecoHit3DVector::getSquaredZDist(const CDCTrajectorySZ& trajectorySZ) const
 {

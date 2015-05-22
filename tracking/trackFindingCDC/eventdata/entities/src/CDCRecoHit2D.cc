@@ -16,7 +16,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCRecoHit2D)
 
 CDCRecoHit2D::CDCRecoHit2D() :
   m_rlWireHit(nullptr),

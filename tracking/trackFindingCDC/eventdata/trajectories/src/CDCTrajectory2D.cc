@@ -21,7 +21,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCTrajectory2D)
 
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,

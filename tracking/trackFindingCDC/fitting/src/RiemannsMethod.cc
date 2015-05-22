@@ -19,7 +19,6 @@ using namespace Eigen;
 
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(RiemannsMethod)
 
 RiemannsMethod::RiemannsMethod() :
   m_lineConstrained(false),

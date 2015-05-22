@@ -21,7 +21,6 @@ using namespace CDC;
 
 using namespace TrackFindingCDC;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCWireSuperLayer)
 
 CDCWireSuperLayer::CDCWireSuperLayer() {;}
 

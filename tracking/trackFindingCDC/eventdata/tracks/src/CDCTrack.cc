@@ -17,7 +17,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace genfit;
 
-TRACKFINDINGCDC_SwitchableClassImp(CDCTrack)
 
 CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),

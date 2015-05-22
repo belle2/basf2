@@ -426,16 +426,22 @@ void GenFitterModule::event()
         const double v = beta * Const::speedOfLight;
 
         // Arc length from IP to posSeed in cm.
+        // Calculate the arc-length.  Helix doesn't provide a way of
+        // obtaining this directly from the difference in z, as it
+        // only provide arc-lengths in the transverse plane, so we do
+        // it like this.
         const Helix h(posSeed, momentumSeed, part->Charge() / 3, 1.5);
+        const double s2D = h.getArcLength2DAtCylindricalR(posSeed.Perp());
+        const double s = s2D * hypot(1, h.getTanLambda());
 
-        // Arc length calculation doesn't work, do it ourselves until I can fix the Helix.
-        const double z0 = h.getZ0();
-        const double cotTh = h.getTanLambda();
-
-        const double s = fabs((posSeed.Z() - z0) * hypot(cotTh, 1.) / cotTh);
-
-        // Time from trigger (= 0 ns) to posSeed assuming constant velocity in ns.
+        // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.
         timeSeed = s / v;
+
+        if (!(timeSeed > -1000)) {
+          // Guard against NaN or just something silly.
+          B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
+          timeSeed = 0;
+        }
       }
 
       B2DEBUG(99, "Fit track with start values: ");

@@ -291,7 +291,7 @@ namespace Belle2 {
      * It is equivalent to the if_value() method, using the expression ">=1".
      * This method is meant to be used together with the setReturnValue(bool value) method.
      *
-     * @param path Shared pointer to the Path which will be executed if the return value is _false_.
+     * @param path Shared pointer to the Path which will be executed if the return value is _true_.
      * @param afterConditionPath  What to do after executing 'path'.
      */
     void if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);

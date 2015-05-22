@@ -1,7 +1,7 @@
 /* Nanae Taniguchi 2015.05.19 */
 
 #ifndef CDCDQM7MODULE_H
-#define CDCDQM7MODULW_H
+#define CDCDQM7MODULE_H
 
 #include <framework/core/HistoModule.h>        // <- Substitution of HistoModule.h
 #include <vector>

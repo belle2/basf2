@@ -251,13 +251,13 @@ TrgEcl::simulate(int m_nEvent)
     for (int iii = 1; iii <= k09[0]; iii++) { vct_bhabha[8]  += _PhiRingSum[k09[iii] - 1]; }
     for (int iii = 1; iii <= k10[0]; iii++) { vct_bhabha[9]  += _PhiRingSum[k10[iii] - 1]; }
     for (int iii = 1; iii <= k11[0]; iii++) { vct_bhabha[10] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k12[0]; iii++) { vct_bhabha[11] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k13[0]; iii++) { vct_bhabha[12] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k14[0]; iii++) { vct_bhabha[13] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k15[0]; iii++) { vct_bhabha[14] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k16[0]; iii++) { vct_bhabha[15] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k17[0]; iii++) { vct_bhabha[16] += _PhiRingSum[k11[iii] - 1]; }
-    for (int iii = 1; iii <= k18[0]; iii++) { vct_bhabha[17] += _PhiRingSum[k11[iii] - 1]; }
+    for (int iii = 1; iii <= k12[0]; iii++) { vct_bhabha[11] += _PhiRingSum[k12[iii] - 1]; }
+    for (int iii = 1; iii <= k13[0]; iii++) { vct_bhabha[12] += _PhiRingSum[k13[iii] - 1]; }
+    for (int iii = 1; iii <= k14[0]; iii++) { vct_bhabha[13] += _PhiRingSum[k14[iii] - 1]; }
+    for (int iii = 1; iii <= k15[0]; iii++) { vct_bhabha[14] += _PhiRingSum[k15[iii] - 1]; }
+    for (int iii = 1; iii <= k16[0]; iii++) { vct_bhabha[15] += _PhiRingSum[k16[iii] - 1]; }
+    for (int iii = 1; iii <= k17[0]; iii++) { vct_bhabha[16] += _PhiRingSum[k17[iii] - 1]; }
+    for (int iii = 1; iii <= k18[0]; iii++) { vct_bhabha[17] += _PhiRingSum[k18[iii] - 1]; }
 
 
 

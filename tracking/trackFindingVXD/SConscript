@@ -1,8 +1,11 @@
 Import('env')
 
 env['LIBS'] = [
-    #'boost_chrono',
+    
     'framework', 
+    'boost_regex'
+
+    #'boost_chrono',
     #'geometry',
     #'pxd', 'pxd_dataobjects',
     #'svd', 'svd_dataobjects',

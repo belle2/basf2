@@ -12,6 +12,7 @@
 #include <tracking/spacePointCreation/PurityCalculatorTools.h>
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
 #include <utility> // pair
@@ -34,6 +35,8 @@ ThreeHitSamplesGeneratorModule::ThreeHitSamplesGeneratorModule() :
   addParam("outputFileName", m_PARAMoutputFileName,
            "Name of the output file (root file) that contains the training samples. Two arguments needed: first is filename (withoug .root file-ending), second is write-mode ('update' or 'recreate')",
            defaultOutput);
+
+  initializeCounters();
 }
 
 // =========================================== INITIALIZE ==============================================================
@@ -67,11 +70,15 @@ void ThreeHitSamplesGeneratorModule::event()
     vector<SpacePointTrackCand> threeHitCombos = splitTrackCandNHitCombos(fullSPTC, 3);
 
     for (const SpacePointTrackCand& comb : threeHitCombos) {
+      B2DEBUG(25, "Getting purity Infos from combination");
       vector<MCVXDPurityInfo> purInfos = createPurityInfos(comb);
+      ++m_combCtr;
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 499, PACKAGENAME())) {
+        stringstream purInfoStr;
         for (auto& info : purInfos) {
-          B2DEBUG(499, "PurityInfo: " << info.dumpToString());
+          purInfoStr << info.dumpToString();
         }
+        B2DEBUG(499, "combination " << m_combCtr <<  ", PurityInfos:\n" << purInfoStr.str(););
       }
 
       addHitCombination(comb, (purInfos[0].getPurity().second == 1), m_combinations);
@@ -81,10 +88,12 @@ void ThreeHitSamplesGeneratorModule::event()
   m_treePtr->Fill();
 }
 
-// ============================================== TERMINATE ===========================================================
+// ============================================== TERMINATE ========================================================================
 void ThreeHitSamplesGeneratorModule::terminate()
 {
-  // TODO: info output
+  B2INFO("ThreeHitSampleGenerator::terminate() : generated " << m_combCtr << " combinations: " << m_noiseSampleCtr <<
+         " noise samples, " << m_signalSampleCtr << " signal samples. " << m_invalidCombiCtr <<
+         " combinations were ruled invalid. " << m_smallContainerCtr << " SPTCs did not have enough hits");
 
   // root file handling
   if (m_rootFilePtr != NULL && m_treePtr != NULL) {
@@ -129,6 +138,7 @@ ThreeHitSamplesGeneratorModule::splitTrackCandNHitCombos(const Belle2::SpacePoin
   if (nHits > trackCand->getNHits()) {
     B2DEBUG(25, "SpacePointTrackCand contains an insufficient number of hits! " << nHits <<
             " are needed. Returning an empty vector of combinations!");
+    m_smallContainerCtr++;
     return combiContainer;
   }
 
@@ -140,7 +150,7 @@ ThreeHitSamplesGeneratorModule::splitTrackCandNHitCombos(const Belle2::SpacePoin
       combiContainer.push_back(SpacePointTrackCand(combination));
     }
 
-    itBegin++; itNHit++;
+    ++itBegin; ++itNHit;
   }
 
   B2DEBUG(25, "Created " << combiContainer.size() << " combinations from trackCand " << trackCand->getArrayIndex());
@@ -148,9 +158,25 @@ ThreeHitSamplesGeneratorModule::splitTrackCandNHitCombos(const Belle2::SpacePoin
 }
 
 // ====================================================== IS VALID HIT COMBINATION =================================================
-bool ThreeHitSamplesGeneratorModule::isValidHitCombination(const std::vector<const Belle2::SpacePoint*>&) // no name, no warning
+bool ThreeHitSamplesGeneratorModule::isValidHitCombination(const std::vector<const Belle2::SpacePoint*>& combination)
 {
-  // TODO
+  B2DEBUG(150, "Checking if the combination is valid");
+  // unsigned short layer = (*combination.begin())->getVxdID().getLayerNumber();
+  // getVxdID of SpacePoint returns unsigned short so we have to convert it to a VxdID first to get a layer number
+  unsigned short prevLayer = VxdID((*combination.begin())->getVxdID()).getLayerNumber();
+  for (auto itSP = combination.begin() + 1; itSP != combination.end(); ++itSP) { // do not use first SpacePoint
+    unsigned short layer = VxdID((*itSP)->getVxdID()).getLayerNumber();
+    if (layer != prevLayer + 1) {
+      B2DEBUG(150, "The hits in the passed combination are not in subsequent order: previous layer = " << prevLayer <<
+              ", this layer = " << layer);
+      ++m_invalidCombiCtr;
+      // B2ERROR("==================================== INVALID =============================================");
+      return false;
+    }
+    prevLayer = layer;
+  }
+
+  B2DEBUG(150, "Combination is valid!")
   return true;
 }
 
@@ -175,4 +201,7 @@ void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointT
   combinations.Hit3Z.push_back(spacePoints[2]->Z());
 
   combinations.Signal.push_back(signal);
+
+  m_noiseSampleCtr += (!signal);
+  m_signalSampleCtr += signal;
 }

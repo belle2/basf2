@@ -23,8 +23,8 @@ namespace Belle2 {
 
   /**
    * Module for generating training samples for supervised training of a MLP
-   * Combines the spatial coordinates of two Combinations (consisting of 2 SpacePoints each)
-   * where both Combinations share one hit. Thus a training sample consists of three SpacePoint
+   * Combines the spatial coordinates of two Segments (consisting of 2 SpacePoints each)
+   * where both Segments share one hit. Thus a training sample consists of three SpacePoint
    * coordinates and a boolean value that flags if this combination of SpacePoints is part
    * of a track or not.
    *
@@ -41,7 +41,9 @@ namespace Belle2 {
 
     virtual void terminate(); /**< terminate */
 
-    /** helper struct to keep the root variables contained in this module*/
+    /** helper struct to keep the root variables contained in this module
+     * TODO: make this cleaner (i.e. less ugly)
+     */
     struct RootCombinations {
       std::vector<double> Hit1X; /**< (global) X-position of first SpacePoint of three hit combination */
       std::vector<double> Hit1Y; /**< (global) Y-position of first SpacePoint of three hit combination */
@@ -75,6 +77,27 @@ namespace Belle2 {
     /** RootCombinations to store information eventwise (avoid writing to root file more than once per event)*/
     RootCombinations m_combinations;
 
+    // ==================================================== COUNTER VARIABLES ======================================================
+
+    unsigned m_combCtr; /**< total number of created hit combinations */
+
+    unsigned m_noiseSampleCtr; /**< total number of noise samples written to root file */
+
+    unsigned m_signalSampleCtr; /**< total number of signal samples written to root file */
+
+    unsigned m_invalidCombiCtr; /**< total number of combinations that were ruled invalid by isValidHitCombination*/
+
+    unsigned m_smallContainerCtr; /**< total number of SPTCs that did not have enough hits (3 in this case)*/
+
+    void initializeCounters() /**< initialize all counters to zero*/
+    {
+      m_combCtr = 0;
+      m_noiseSampleCtr = 0;
+      m_signalSampleCtr = 0;
+      m_invalidCombiCtr = 0;
+      m_smallContainerCtr = 0;
+    }
+
     // ================================================== member functions =========================================================
 
     /** initialize the root file (set all branch-adresses and tree-names)*/
@@ -85,9 +108,8 @@ namespace Belle2 {
      * @param trackCand, the SpacePointTrackCand to be split
      * @param nHits, the number of hits that form a combination
      *
-     * NOTE: at the moment only combinations where the three hits are on three different but subsequent layers are produced!
+     * NOTE: at only combinations that pass isValidHitCombination are produced, see the documentation there on the conditions
      *
-     * TODO: further documentation and decide how to handle trackCands with missing layers
      */
     std::vector<Belle2::SpacePointTrackCand> splitTrackCandNHitCombos(const Belle2::SpacePointTrackCand* trackCand, unsigned nHits);
 
@@ -97,13 +119,17 @@ namespace Belle2 {
      * reaches the stage where this decision is formed
      *
      * This function can be used to sort out combinations with hits on the same layer, etc...
-     * TODO: define what a valid combination is. at the moment this returns true always!
+     * At the moment the function checks if the SpacePoints of the combination are on subsequent layers (i.e. if two SpacePoints are
+     * on the same layer the combination is invalid)
+     *
+     * NOTE: this is only a temporary solution at the moment
+     * TODO: decide which cases should be covered by the approach and adapt this function accordingly
      */
     bool isValidHitCombination(const std::vector<const Belle2::SpacePoint*>& combination);
 
     /**
      * add a complete three hit combination to the m_combinations member
-     * NOTE: in a final stage it has to be made sure that the SpacePoints in the combination are always
+     * NOTE: in a final stage it has to be made sure that the SpacePoints in the combination are always in the right order
      */
     void addHitCombination(const Belle2::SpacePointTrackCand& combination, bool signal, RootCombinations& combinations);
   };

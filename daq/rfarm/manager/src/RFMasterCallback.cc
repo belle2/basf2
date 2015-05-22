@@ -156,19 +156,21 @@ void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
 {
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
-    if (NSMCommunicator::send(NSMMessage(node, RFCommand::CONFIGURE))) {
-      setState(node, RCState::LOADING_TS);
-      while (node.getName().find("EVP") == std::string::npos &&
-             node.getState() != RCState::READY_S) {
-        try {
-          perform(NSMCommunicator::select(60));
-        } catch (const TimeoutException& e) {
-          throw (RCHandlerException("Failed to configure due to timeout from %s",
-                                    node.getName().c_str()));
+    if (node.getState() != RCState::READY_S) {
+      if (NSMCommunicator::send(NSMMessage(node, RFCommand::CONFIGURE))) {
+        setState(node, RCState::LOADING_TS);
+        while (node.getName().find("EVP") == std::string::npos &&
+               node.getState() != RCState::READY_S) {
+          try {
+            perform(NSMCommunicator::select(60));
+          } catch (const TimeoutException& e) {
+            throw (RCHandlerException("Failed to configure due to timeout from %s",
+                                      node.getName().c_str()));
+          }
         }
+      } else {
+        throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
       }
-    } else {
-      throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
     }
   }
   while (true) {

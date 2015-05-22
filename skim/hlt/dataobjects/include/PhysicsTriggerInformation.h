@@ -364,6 +364,8 @@ namespace Belle2 {
     /**the second largest energtic cluster*/
     float m_E2;
 
+
+
     /**the number of KLM clusters*/
     int  m_nKLMClusters;
 

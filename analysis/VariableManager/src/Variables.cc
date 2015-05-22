@@ -405,6 +405,16 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double mcParticleSecondaryPhysicsProcess(const Particle* p)
+    {
+      const MCParticle* mcp = p->getRelated<MCParticle>();
+      if (mcp) {
+        return mcp->getSecondaryPhysicsProcess();
+      } else {
+        return -1;
+      }
+    }
+
     double mcParticleStatus(const Particle* p)
     {
       const MCParticle* mcp = p->getRelated<MCParticle>();
@@ -1271,6 +1281,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
+    REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
+                      "Returns the secondary physics process flag.");
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
                       "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,

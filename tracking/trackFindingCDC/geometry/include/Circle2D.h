@@ -259,8 +259,6 @@ namespace Belle2 {
       FloatType m_radius; ///< Memory for the signed radius
 
     private:
-      /// ROOT Macro to make Circle2D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(Circle2D, 1);
 
     }; //class
   } // namespace TrackFindingCDC

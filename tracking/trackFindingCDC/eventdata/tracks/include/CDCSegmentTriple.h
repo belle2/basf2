@@ -140,8 +140,6 @@ namespace Belle2 {
       const CDCStereoRecoSegment2D* m_middleSegment;  ///< Reference to the stereo segment in the middle of the triple.
       mutable CDCTrajectorySZ m_trajectorySZ; ///< Memory of the linear trajectory in the sz direction assoziated with the triple.
 
-      /** ROOT Macro to make CDCSegmentTriple a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCSegmentTriple, 1);
 
     }; //class
 

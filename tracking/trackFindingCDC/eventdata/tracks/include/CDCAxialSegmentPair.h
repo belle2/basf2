@@ -159,8 +159,6 @@ namespace Belle2 {
       mutable CDCTrajectory2D m_trajectory2D; ///< Reference to the common trajectory
       mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
 
-      /** ROOT Macro to make CDCAxialSegmentPair a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCAxialSegmentPair, 1);
 
     }; //end class CDCAxialSegmentPair
 

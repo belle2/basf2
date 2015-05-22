@@ -31,8 +31,6 @@ namespace Belle2 {
 
 
     private:
-      /// ROOT Macro to make CDCTangentSegment a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCTangentSegment, 1);
 
 
     };

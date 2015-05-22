@@ -192,8 +192,6 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedim of the fit of this helix.
       size_t m_ndf;
 
-      /// ROOT Macro to make UncertainHelix a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(UncertainHelix, 1);
 
     }; //class
 

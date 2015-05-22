@@ -334,8 +334,6 @@ namespace Belle2 {
       Vector2D  m_n12; ///< Memory for the second line parameter
 
     private:
-      /// ROOT Macro to make Line2D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(Line2D, 1);
 
     }; //class
   } // namespace TrackFindingCDC

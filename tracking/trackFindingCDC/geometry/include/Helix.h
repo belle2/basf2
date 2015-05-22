@@ -250,8 +250,6 @@ namespace Belle2 {
       /// Memory of the of the linear relation between perpendicular travel distance and the z position.
       Line2D m_lineSZ;
 
-      /// ROOT Macro to make Helix a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(Helix, 1);
 
     }; //class
 

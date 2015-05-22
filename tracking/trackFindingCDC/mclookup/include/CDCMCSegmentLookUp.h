@@ -196,8 +196,6 @@ namespace Belle2 {
 
 
 
-      /// ROOT Macro to make CDCMCSegmentLookUp a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCMCSegmentLookUp, 1);
 
     }; //class
   } // end namespace TrackFindingCDC

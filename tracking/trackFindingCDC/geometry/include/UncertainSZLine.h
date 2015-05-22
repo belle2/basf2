@@ -161,8 +161,6 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedim of the fit of this line.
       size_t m_ndf;
 
-      /// ROOT Macro to make UncertainSZLine a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(UncertainSZLine, 1);
 
     }; //class
 

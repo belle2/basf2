@@ -293,8 +293,6 @@ namespace Belle2 {
       /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
       UncertainHelix m_localHelix;
 
-      /// ROOT Macro to make CDCTrajectory3D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCTrajectory3D, 1);
 
     }; //class
 

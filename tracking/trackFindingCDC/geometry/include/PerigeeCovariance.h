@@ -141,8 +141,6 @@ namespace Belle2 {
       /// Memory for the 3x3 matrix presentation of the covariance.
       TMatrixDSym m_matrix;
 
-      /// ROOT Macro to make PerigeeCovariance a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(PerigeeCovariance, 1);
 
     }; //class
 

@@ -387,8 +387,6 @@ namespace Belle2 {
       FloatType m_y; ///< Memory for the second coordinate
 
     private:
-      /// ROOT Macro to make Vector2D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(Vector2D, 1);
 
     }; //class
 

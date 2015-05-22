@@ -335,8 +335,6 @@ namespace Belle2 {
       Vector2D m_tangential; ///< Cached unit direction of flight at the perigee
       FloatType m_impact; ///< Memory for the signed impact parameter
 
-      /// ROOT Macro to make PerigeeCircle a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(PerigeeCircle, 1);
 
     }; //class
 

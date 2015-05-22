@@ -168,8 +168,6 @@ namespace Belle2 {
       m_initialTDCCountTranslator; ///< Reference of the tdc count translator used at the beginning of this event.
 
     private:
-      /// ROOT Macro to make CDCWireTopology a ROOT class
-      TRACKFINDINGCDC_SwitchableClassDef(CDCWireHitTopology, 1);
 
     }; //class
 

@@ -86,8 +86,6 @@ namespace Belle2 {
       mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
 
     private:
-      /// ROOT Macro to make CDCRLWireHitSegment a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRLWireHitSegment, 1);
 
     }; //end class CDCRLWireHitSegment
 

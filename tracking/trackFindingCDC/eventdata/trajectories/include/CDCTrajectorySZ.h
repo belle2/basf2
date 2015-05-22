@@ -181,8 +181,6 @@ namespace Belle2 {
     private:
       UncertainSZLine m_szLine; ///< Memory for the line representation
 
-      /// ROOT Macro to make CDCTrajectorySZ a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCTrajectorySZ, 1);
 
     }; //class
   } // namespace TrackFindingCDC

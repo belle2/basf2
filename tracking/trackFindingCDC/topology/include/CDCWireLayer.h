@@ -306,8 +306,6 @@ namespace Belle2 {
       FloatType m_outerCylindricalR; ///< Storage of the outer radius of the wire layer as taken from the CDCGeometryPar instance
       //@}
 
-      /** ROOT Macro to make CDCWireLayer a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCWireLayer, 1);
 
     }; //class
 

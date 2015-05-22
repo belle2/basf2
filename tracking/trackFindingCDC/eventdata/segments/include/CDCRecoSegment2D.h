@@ -215,8 +215,6 @@ namespace Belle2 {
       size_t m_iSuperCluster;
 
     private:
-      /// ROOT Macro to make CDCRecoSegment2D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoSegment2D, 1);
 
 
 

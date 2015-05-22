@@ -449,8 +449,6 @@ namespace Belle2 {
       std::vector<T> m_items; ///< Memory of the wrapped vector containing the items.
 
     private:
-      /// ROOT Macro to make SortableVector a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(SortableVector, 1);
 
     }; //class
 

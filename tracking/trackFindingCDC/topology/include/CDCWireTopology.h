@@ -609,8 +609,6 @@ namespace Belle2 {
 
 
     private:
-      /// ROOT Macro to make CDCWireTopology a ROOT class
-      TRACKFINDINGCDC_SwitchableClassDef(CDCWireTopology, 1);
 
     }; //class
 

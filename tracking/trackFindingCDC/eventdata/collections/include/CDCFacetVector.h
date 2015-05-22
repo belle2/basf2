@@ -28,8 +28,6 @@ namespace Belle2 {
       ~CDCFacetVector() {;}
 
     private:
-      /// ROOT Macro to make CDCFacetVector a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCFacetVector, 1);
 
     }; //class CDCFacetVector
 

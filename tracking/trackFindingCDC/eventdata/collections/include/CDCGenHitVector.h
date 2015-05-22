@@ -218,8 +218,6 @@ namespace Belle2 {
       { return sign(getTotalPerpS(trajectory2D)); }
 
     private:
-      /// ROOT Macro to make CDCGenHitVector a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCGenHitVector, 1);
 
     }; //class
 

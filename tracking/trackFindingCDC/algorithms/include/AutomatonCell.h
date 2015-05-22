@@ -195,8 +195,6 @@ namespace Belle2 {
       mutable CellFlags m_flags; ///< Storage for the cell status flags
       mutable CellState m_state; ///< Storage for the cell state set by the cellular automata
 
-      /** ROOT Macro to make AutomatonCell a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(AutomatonCell, 1);
 
     }; //class
 

@@ -170,8 +170,6 @@ namespace Belle2 {
       /// Memory for the 5x5 matrix presentation of the covariance.
       TMatrixDSym m_matrix;
 
-      /// ROOT Macro to make HelixCovariance a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(HelixCovariance, 1);
 
     }; //class
 

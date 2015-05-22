@@ -28,8 +28,6 @@ namespace Belle2 {
       ~CDCWireHitVector() {;}
 
     private:
-      /// ROOT Macro to make CDCWireHitVector a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCWireHitVector, 1);
 
     }; //class
 

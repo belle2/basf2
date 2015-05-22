@@ -131,8 +131,6 @@ namespace Belle2 {
       /// Memory for the three dimensional trajectory at the end of the track
       CDCTrajectory3D m_endTrajectory3D;
 
-      /// ROOT Macro to make CDCTrack a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCTrack, 1);
 
     }; //class
 

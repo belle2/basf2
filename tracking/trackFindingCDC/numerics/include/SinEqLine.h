@@ -167,8 +167,6 @@ namespace Belle2 {
       /// Memory for the intercept.
       FloatType m_intercept;
 
-      /// ROOT Macro to make SinEqLine a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(SinEqLine, 1);
 
     };
 

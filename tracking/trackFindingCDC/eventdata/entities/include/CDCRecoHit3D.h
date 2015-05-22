@@ -305,8 +305,6 @@ namespace Belle2 {
       Vector3D m_recoPos3D; ///< Memory for the reconstructed hit position
       FloatType m_perpS; ///< Memory for the travel distance as see in the xy projection.
 
-      /// ROOT Macro to make CDCRecoHit3D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoHit3D, 1);
 
     }; //class
 

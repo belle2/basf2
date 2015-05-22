@@ -35,8 +35,6 @@ namespace Belle2 {
       FloatType getSquaredZDist(const CDCTrajectorySZ& trajectorySZ) const;
 
     private:
-      /// ROOT Macro to make CDCRecoHit3DVector a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCRecoHit3DVector, 1);
 
     }; //class CDCRecoHit3DVector
 

@@ -193,8 +193,6 @@ namespace Belle2 {
 
 
 
-      /// ROOT Macro to make CDCFacet a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(CDCFacet, 1);
 
     }; //class
 

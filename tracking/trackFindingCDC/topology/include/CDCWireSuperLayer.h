@@ -311,8 +311,6 @@ namespace Belle2 {
       /// Memory for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
       FloatType m_refTanLambda;
 
-      /** ROOT Macro to make CDCWireSuperLayer a ROOT class.*/
-      TRACKFINDINGCDC_SwitchableClassDef(CDCWireSuperLayer, 1);
 
     }; //class
 

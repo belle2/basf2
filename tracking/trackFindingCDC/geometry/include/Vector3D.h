@@ -351,8 +351,6 @@ namespace Belle2 {
       FloatType m_z;
 
     private:
-      /// ROOT Macro to make Vector3D a ROOT class.
-      TRACKFINDINGCDC_SwitchableClassDef(Vector3D, 1);
 
     }; //class
 

@@ -84,9 +84,6 @@ namespace Belle2 {
       /// Returns the true right left passage information
       RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
 
-      /// ROOT Macro to make CDCMCHitLookUp a ROOT class.
-      //ClassDef(CDCMCHitLookUp, 1);
-
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2

@@ -11,7 +11,6 @@
 
 #include <vector>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>

@@ -17,6 +17,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <framework/datastore/StoreArray.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

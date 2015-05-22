@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <framework/logging/Logger.h>
 
@@ -37,7 +36,7 @@ namespace Belle2 {
      *  However only a range of indices corresponds to realized solutions. For non existent solutions NAN is returned.
      *  Note that for fabs(slope) >= 1 there are no more local maxima. In this case only a single solution exists, which is always returned for any index.
      */
-    class SinEqLine : public SwitchableRootificationBase {
+    class SinEqLine  {
 
     public:
       /// Default constructor initializing slope and intercept to zero.

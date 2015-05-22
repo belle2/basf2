@@ -14,7 +14,6 @@
 
 #include <TVector3.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -30,7 +29,7 @@ namespace Belle2 {
      *  for monitoring purposes but may be empty for maximal performance. \n
      *  Also this vector can be used whereever a TVector3 is expected syntactically.
      */
-    class Vector3D : public TrackFindingCDC::SwitchableRootificationBase {
+    class Vector3D  {
 
     public:
       /// Default constructor for ROOT compatibility.

@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
+#include <framework/datastore/StoreArray.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/algorithms/CellWeight.h>
@@ -25,7 +24,7 @@ namespace Belle2 {
      *  is not worth a full point, but a probability measure which is additiv. The points that can be gained by picking \n
      *  this cell are stored in the cell weight property. Moreover the class defines status flags to be set and/or read by\n
      *  the cellular automaton. */
-    class AutomatonCell : public TrackFindingCDC::SwitchableRootificationBase {
+    class AutomatonCell  {
 
     public:
       typedef unsigned CellFlags; ///< Type for the additional status flags of cells in the cellular automata

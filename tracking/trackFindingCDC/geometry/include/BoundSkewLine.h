@@ -10,7 +10,6 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -34,7 +33,7 @@ namespace Belle2 {
      * @brief A three dimensional limited line
      *
      */
-    class BoundSkewLine : public TrackFindingCDC::SwitchableRootificationBase {
+    class BoundSkewLine  {
 
     public:
 

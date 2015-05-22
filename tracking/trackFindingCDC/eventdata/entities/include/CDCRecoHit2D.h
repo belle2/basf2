@@ -11,7 +11,6 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
@@ -28,7 +27,7 @@ namespace Belle2 {
      *  the hit wire lies to the right or to the left of the particle trajectory causing the hit. The later readily \n
      *  indicates a flight direction from the reconstructed it, if a tangential approch of the trajectory to the \n
      *  drift circle is assumed. */
-    class CDCRecoHit2D : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCRecoHit2D  {
     public:
 
       /// Default constructor for ROOT compatibility.

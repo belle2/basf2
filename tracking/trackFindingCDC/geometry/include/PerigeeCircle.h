@@ -11,7 +11,6 @@
 
 #include <cmath>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <TMatrixD.h>

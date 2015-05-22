@@ -13,7 +13,6 @@
 
 #include <TVectorD.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
@@ -28,7 +27,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
-    class Helix : public TrackFindingCDC::SwitchableRootificationBase {
+    class Helix  {
 
     public:
 

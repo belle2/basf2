@@ -15,7 +15,6 @@
 
 //#include <TVector3.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -41,7 +40,7 @@ namespace Belle2 {
      *  the two dimensional tracking as the arc length.
      */
 
-    class CDCRecoHit3D : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCRecoHit3D  {
     public:
 
       /// Default constructor for ROOT compatibility.

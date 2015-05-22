@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>

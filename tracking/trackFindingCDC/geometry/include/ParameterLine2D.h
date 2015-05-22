@@ -11,7 +11,6 @@
 
 #include <TVector3.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -28,7 +27,7 @@ namespace Belle2 {
      *  this line defines a direction of positiv advance ( the tangential vector ) as well as \n
      *  a right and a left half plane.
      */
-    class ParameterLine2D : public TrackFindingCDC::SwitchableRootificationBase {
+    class ParameterLine2D  {
 
     public:
 

@@ -14,7 +14,6 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
@@ -32,7 +31,7 @@ namespace Belle2 {
         purposes being a drop in replacement for a concrete hit type.
     */
 
-    class CDCGenHit : public SwitchableRootificationBase {
+    class CDCGenHit  {
 
     public:
       /// Default constructor for ROOT compatibility.

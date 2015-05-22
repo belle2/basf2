@@ -12,7 +12,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <framework/logging/Logger.h>
 //Unpacked version for ROOT dictionary generation
@@ -23,7 +22,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /// A generic vector which keeps track if its elements are sorted and speeds up lookups accordingly.
     template<class T>
-    class SortableVector : public SwitchableRootificationBase {
+    class SortableVector  {
 
     private:
       typedef std::vector<T> Container; ///< std::vector to be wrapped

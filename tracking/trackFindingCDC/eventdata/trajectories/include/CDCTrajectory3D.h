@@ -12,7 +12,6 @@
 #include <cmath>
 #include <TMath.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
@@ -36,7 +35,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Particle full three dimensional trajectory.
-    class CDCTrajectory3D : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCTrajectory3D  {
 
     public:
       /// Default constructor for ROOT compatibility.

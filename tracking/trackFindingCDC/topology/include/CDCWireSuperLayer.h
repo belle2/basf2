@@ -10,7 +10,6 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
@@ -33,7 +32,7 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a superlayer object and \n
      * it should be avoided for speed reasons. */
-    class CDCWireSuperLayer : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCWireSuperLayer  {
 
 
     public:

@@ -15,7 +15,6 @@
 #include <TMatrixD.h>
 
 #include <framework/logging/Logger.h>
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
@@ -24,7 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing the covariance matrix of a set of perigee parameters.
-    class PerigeeCovariance : public SwitchableRootificationBase {
+    class PerigeeCovariance  {
 
     public:
       /// Default constructor for ROOT compatibility.

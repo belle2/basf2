@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #endif
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
@@ -25,7 +24,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class serving as a storage of observed drift circles to present to the Riemann fitter
-    class CDCObservations2D : public SwitchableRootificationBase {
+    class CDCObservations2D  {
 
     public:
 #ifndef __CINT__

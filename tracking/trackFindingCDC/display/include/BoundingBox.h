@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-// #include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <algorithm>
 #include <cmath>

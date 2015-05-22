@@ -16,7 +16,6 @@
 
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
@@ -37,7 +36,7 @@ namespace Belle2 {
      *  Also there are methods for getting to the closest and secondary of each wire. \n
      *  The class does provide the memory for all instances of wires, layers and superlayers by itself.
      */
-    class CDCWireTopology : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCWireTopology  {
 
     public:
       /// The underlying container type storing range of wires represented by this class

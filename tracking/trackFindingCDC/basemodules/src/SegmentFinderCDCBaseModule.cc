@@ -17,6 +17,9 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
+#include <framework/datastore/StoreArray.h>
+
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

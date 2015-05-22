@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -27,7 +26,7 @@ namespace Belle2 {
      *  This naturally corresponds to a direction of positiv advance being the tangential \n
      *  to the line (-n2 ,n1) \n
      *  This line is best suited for linear least square fits. */
-    class Line2D : public TrackFindingCDC::SwitchableRootificationBase {
+    class Line2D  {
 
     public:
 

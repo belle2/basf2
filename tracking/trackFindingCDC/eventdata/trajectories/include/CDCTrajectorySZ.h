@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <TVector3.h>
 #include <TMath.h>
@@ -29,7 +28,7 @@ namespace Belle2 {
      *  This class presents this trajectory projection by a line representation in sz space.
      *  The s coordinate is interpreted as the transvers travel distance, hence  \n
      *  the part of the travel distance see in the xy projection. */
-    class CDCTrajectorySZ : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCTrajectorySZ  {
 
     public:
 

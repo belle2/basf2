@@ -11,7 +11,6 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
@@ -40,7 +39,7 @@ namespace Belle2 {
      *  (and their right left passage hypothese in case of
      *  So they can be retieved by their respective (super) layer as a range.
      */
-    class CDCWireHitTopology : public SwitchableRootificationBase {
+    class CDCWireHitTopology  {
 
     public:
       /// A Range of const CDCWireHits - usable with range based for

@@ -13,7 +13,6 @@
 #include <math.h>
 #include <iostream>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
@@ -29,7 +28,7 @@ namespace Belle2 {
      *  for monitoring purposes but may be empty for maximal performance. \n
      *  Also this vector can be used whereever a TVector2 is expected syntactically.
      */
-    class Vector2D : public TrackFindingCDC::SwitchableRootificationBase {
+    class Vector2D  {
 
     public:
 

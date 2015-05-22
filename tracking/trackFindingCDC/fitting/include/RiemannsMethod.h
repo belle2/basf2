@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
@@ -17,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
-    class RiemannsMethod : public TrackFindingCDC::SwitchableRootificationBase {
+    class RiemannsMethod  {
 
     public:
       ///Empty constructor

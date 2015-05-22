@@ -12,7 +12,6 @@
 #include <cmath>
 #include <TMath.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
 
@@ -31,7 +30,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Particle trajectory as it is seen in xy projection
-    class CDCTrajectory2D : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCTrajectory2D  {
 
     public:
 

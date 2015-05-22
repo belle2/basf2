@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -24,7 +23,7 @@ namespace Belle2 {
      *  The convension is that positiv radii correspond to a counterclockwise orientation of the circle,
      *  while negative radii are for the clockwise orientation.
      */
-    class Circle2D : public TrackFindingCDC::SwitchableRootificationBase {
+    class Circle2D  {
 
     public:
 

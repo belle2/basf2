@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
@@ -27,7 +26,7 @@ namespace Belle2 {
     /// Interface class to the Monte Carlo information for segments
     /** This class provides a stable interface for the underlying implementation for look ups
      *  into the Monte Carlo informations for the second stage of the algorithm.*/
-    class CDCMCSegmentLookUp : public SwitchableRootificationBase {
+    class CDCMCSegmentLookUp  {
 
     public:
       /// Structure representing a matched Monte Carlo track id with the corresponding purity

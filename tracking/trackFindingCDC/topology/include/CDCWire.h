@@ -23,7 +23,6 @@
 
 #include <tracking/trackFindingCDC/topology/StereoType.h>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -43,7 +42,7 @@ namespace Belle2 {
      * which you can get with the static getInstance() functions. \n
      * There is rarely a need for constructing a wire object it should be avoided for speed reasons.
      */
-    class CDCWire : public TrackFindingCDC::SwitchableRootificationBase {
+    class CDCWire  {
 
     public:
       /// A wire pointer pair as returned from getNeighborsOutward(), getNeighborsInward()

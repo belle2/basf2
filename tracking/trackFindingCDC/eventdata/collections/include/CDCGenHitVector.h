@@ -12,7 +12,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>

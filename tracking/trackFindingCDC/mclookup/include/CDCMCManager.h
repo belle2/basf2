@@ -23,7 +23,7 @@ namespace Belle2 {
 
     ///Class to organize and present the monte carlo hit information
 
-    class CDCMCManager : public SwitchableRootificationBase {
+    class CDCMCManager  {
 
     public:
       /// Empty constructor

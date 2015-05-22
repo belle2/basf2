@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/rootification/SwitchableRootificationBase.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
 
@@ -21,7 +20,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing a pair of one reconstructed axial segement and one stereo segment in adjacent superlayer.
-    class CDCSegmentPair : public SwitchableRootificationBase {
+    class CDCSegmentPair  {
     public:
 
       /// Default constructor - for ROOT compatability.

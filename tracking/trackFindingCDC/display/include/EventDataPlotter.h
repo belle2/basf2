@@ -18,6 +18,8 @@
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
+#include <framework/datastore/StoreArray.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

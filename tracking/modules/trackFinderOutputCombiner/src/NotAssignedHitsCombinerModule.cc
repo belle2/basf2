@@ -90,8 +90,10 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
     }
   }
 
-  //findHarderCandidates(notUsedRecoSegments, tracks);
-  m_fittingMatrix.print();
+  if (m_param_useSecondStage) {
+    findHarderCandidates(notUsedRecoSegments, tracks);
+    m_fittingMatrix.print();
+  }
 
   // Delete all segments, that are used
   for (FittingMatrix::SegmentCounter segmentCounter = 0; segmentCounter < segments.size(); segmentCounter++) {
@@ -101,6 +103,11 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   }
   segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCRecoSegment2D & segment) -> bool { return segment.getAutomatonCell().hasTakenFlag(); }),
                  segments.end());
+
+  // Prepare the tracks for output
+  for (CDCTrack& track : tracks) {
+    track.sort();
+  }
 }
 
 

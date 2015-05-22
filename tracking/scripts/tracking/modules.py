@@ -311,22 +311,32 @@ class CDCFitter(metamodules.PathModule):
 
     """ Add the genfit module to te path """
 
-    def __init__(self, fit_geometry="Geant4",
-                 input_track_cands_store_array_name="TrackCands"):
+    def __init__(self, setup_geometry=True, fit_geometry="Geant4",
+                 input_track_cands_store_array_name="TrackCands",
+                 build_belle_tracks=True,
+                 output_tracks_store_array_name="GF2Tracks"):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
         gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
-                                                                        PDGCodes=[13],
+                                                                        PDGCodes=[211],
                                                                         StoreFailedTracks=True,
+                                                                        NMaxIterations=4,
                                                                         GFTrackCandidatesColName=input_track_cands_store_array_name,
-                                                                        GFTracksColName="GF2Tracks",
+                                                                        GFTracksColName=output_tracks_store_array_name,
                                                                         BuildBelle2Tracks=False)
 
         track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder',
-                                                                    GFTracksColName="GF2Tracks",
+                                                                    GFTracksColName=output_tracks_store_array_name,
                                                                     GFTrackCandidatesColName=input_track_cands_store_array_name)
 
-        module_list = [setup_genfit_extrapolation_module, gen_fitter_module, track_builder]
+        module_list = []
+        if setup_geometry:
+            module_list.append(setup_genfit_extrapolation_module)
+
+        module_list.append(gen_fitter_module)
+
+        if build_belle_tracks:
+            module_list.append(track_builder)
 
         super(CDCFitter, self).__init__(modules=module_list)

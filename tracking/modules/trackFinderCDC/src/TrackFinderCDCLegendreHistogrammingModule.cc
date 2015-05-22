@@ -69,7 +69,7 @@ void CDCLegendreHistogrammingModule::outputObjects()
 
     // Make a fit to determine the trajectory in sz direction
     CDCObservations2D szObervations;
-    CDCTrajectorySZ trajectorySZ;
+    CDCTrajectorySZ trajectorySZ = CDCTrajectorySZ::basicAssumption();
 
     const std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
     for (const TrackHit* trackHit : trackHitVector) {
@@ -85,8 +85,10 @@ void CDCLegendreHistogrammingModule::outputObjects()
       }
     }
 
-    const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
-    szFitter.update(trajectorySZ, szObervations);
+    if (szObervations.size() > 3) {
+      const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+      szFitter.update(trajectorySZ, szObervations);
+    }
     CDCTrajectory3D newTrajectory3D(trajectory2D, trajectorySZ);
 
     // Set the starting point to the first hit

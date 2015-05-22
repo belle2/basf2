@@ -45,7 +45,7 @@ void NtupleCustomFloatsTool::setupTree()
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     for (int iVar = 0; iVar < nVars; iVar++) {
-      int iPos = iProduct * nDecayProducts + iVar;
+      int iPos = iVar * nDecayProducts + iProduct;
       string varName = Variable::makeROOTCompatible(m_strVarNames[iVar]);
 
       // extraInfoVariableName -> VariableName
@@ -99,7 +99,7 @@ void NtupleCustomFloatsTool::eval(const Particle* particle)
   int nVars = m_strVarNames.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     for (int iVar = 0; iVar < nVars; iVar++) {
-      int iPos = iProduct * nDecayProducts + iVar;
+      int iPos = iVar * nDecayProducts + iProduct;
       m_fVars[iPos] = m_functions[iVar](selparticles[iProduct]);
     }
   }

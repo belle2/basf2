@@ -12,9 +12,9 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 #include <cmath>
 #include <TMath.h>
-#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 using namespace std;
 using namespace Belle2;

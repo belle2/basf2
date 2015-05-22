@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

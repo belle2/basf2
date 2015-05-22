@@ -1,7 +1,7 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendrePatternChecker.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 using namespace std;
 using namespace Belle2;

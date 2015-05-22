@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
+#include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 
 #include <list>
 #include <vector>

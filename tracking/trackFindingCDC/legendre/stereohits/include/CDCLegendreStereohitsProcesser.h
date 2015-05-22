@@ -11,13 +11,14 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohit.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
+#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/HitPatternCDC.h>

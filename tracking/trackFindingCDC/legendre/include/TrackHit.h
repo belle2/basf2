@@ -14,8 +14,8 @@
 #include <tuple>
 #endif
 
-#include <TVector3.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <TVector3.h>
 
 namespace Belle2 {
   class CDCHit;

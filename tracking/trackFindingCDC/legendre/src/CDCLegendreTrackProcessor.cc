@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
-#include <cdc/dataobjects/CDCHit.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <genfit/TrackCand.h>
 #include <framework/gearbox/Const.h>

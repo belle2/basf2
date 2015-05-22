@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 
+#include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>

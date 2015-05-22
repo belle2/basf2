@@ -11,10 +11,10 @@
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 
-#include <TMath.h>
-
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;

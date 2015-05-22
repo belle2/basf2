@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreTrackWithStereohits.h>
-#include <genfit/TrackCand.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
+#include <genfit/TrackCand.h>
 
 using namespace Belle2;
 using namespace std;

@@ -210,14 +210,22 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
     // out quickly.
     //
     // Wire spacing in the radial direction according to TDR is 10 mm
-    // in the innermost superlayer, 18 mm otherwise.  Use these times
-    // a safety margin of 1.5 as upper bound for the drift radii.  The
-    // max distance between the mirror hits is twice the maximal drift
-    // radius.
-    double rMax = m_wireID.getISuperLayer() == 0 ? 1.5 : 2.7;
+    // in the innermost superlayer, 18 mm otherwise.  Use these values
+    // times a safety margin of 1.5 as upper bound for the drift
+    // radii.  The max distance between the mirror hits is twice the
+    // maximal drift radius.
+    double rMax = 1.5 * (m_wireID.getISuperLayer() == 0 ? 1. : 1.8);
     double weight = 0.5 * pow(std::max(0., 1 - (mR + mL) / 2 / rMax), 2);
     mopL->setWeight(weight);
     mopR->setWeight(weight);
+  }
+
+  // Ignore hits with negative drift times.  For these, the
+  // TDCCountTranslator returns a drift length of -999.
+  if (mL == -999 || mR == -999) {
+    B2DEBUG(150, "Ignoring hit with negative drift time.");
+    mopL->setWeight(0);
+    mopR->setWeight(0);
   }
 
   return {mopL, mopR};

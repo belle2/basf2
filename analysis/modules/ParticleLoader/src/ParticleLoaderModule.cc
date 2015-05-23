@@ -29,8 +29,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
@@ -40,7 +38,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  int ParticleLoaderModule::m_eventNo = -1;
+  EventMetaData ParticleLoaderModule::m_event = EventMetaData();
   vector<int> ParticleLoaderModule::m_trackIndices;
   vector<int> ParticleLoaderModule::m_gammaIndices;
   vector<int> ParticleLoaderModule::m_kshortIndices;
@@ -111,6 +109,8 @@ namespace Belle2 {
 
   void ParticleLoaderModule::initialize()
   {
+    m_event.setEndOfData();
+
     B2INFO("ParticleLoader's Summary of Actions:");
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
@@ -222,15 +222,9 @@ namespace Belle2 {
 
     // part of the temporary solution
     // will change in future
-    StoreObjPtr<EventMetaData> eventmetadata;
-    int currentEvent = 0;
-    if (eventmetadata) {
-      currentEvent = eventmetadata->getEvent();
-    } else {
-      B2ERROR("EventMetaData does not exist.");
-    }
-    if (currentEvent != m_eventNo) {
-      m_eventNo = currentEvent;
+    const StoreObjPtr<EventMetaData> eventmetadata;
+    if (*eventmetadata != m_event) {
+      m_event = *eventmetadata;
       /*
       B2INFO("Size track = " << m_trackIndices.size());
       B2INFO("Size gamma = " << m_gammaIndices.size());

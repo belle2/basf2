@@ -15,6 +15,7 @@
 #include <framework/gearbox/Const.h>
 
 #include <analysis/dataobjects/ParticleList.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
@@ -151,7 +152,7 @@ namespace Belle2 {
 
     // static members
     // (this is part of a temporary solution)
-    static int m_eventNo; /**< event number */
+    static EventMetaData m_event; /**< event for which the following are valid */
     static std::vector<int> m_trackIndices; /**<Store array indices of all kaons, pions, electrons, muons, protons */
     static std::vector<int> m_gammaIndices; /**<Store array indices of all gamma */
     static std::vector<int> m_kshortIndices; /**<Store array indices of K0S gamma */

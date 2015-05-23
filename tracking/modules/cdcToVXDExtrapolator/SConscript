@@ -5,7 +5,13 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'cdc_dataobjects',
     'genfit2',
-    'tracking',
+    'geometry',
+    'vxd',
+    'pxd',
+    'svd',
+    'svd_dataobjects',
+    'pxd_dataobjects',
+    'vxd_dataobjects'
     ]
 Return('env')
 

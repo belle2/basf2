@@ -147,6 +147,27 @@
      </Components>
   </Material>
 
+  <Material name="ParylenC">
+     <density unit="g/cm3">1.298</density>
+     <state>Gas</state>
+     <Components>
+        <Element fraction="0.050908">H</Element>
+        <Element fraction="0.693276">C</Element>
+        <Element fraction="0.255816">Cl</Element>
+     </Components>         
+  </Material>
+
+  <Material name="Kapton">
+     <density unit="g/cm3">1.43</density>
+     <state>Gas</state>
+     <Components>
+        <Element fraction="0.0273">H</Element>
+        <Element fraction="0.7213">C</Element>
+        <Element fraction="0.0765">N</Element>
+	<Element fraction="0.1749">O</Element>
+     </Components>
+  </Material>
+
    <Material name="MaterialEnCap">
      <density unit="g/cm3">2.70</density>
      <Components>

@@ -94,7 +94,7 @@ namespace Belle2 {
     std::string m_OutGFTrackCandColName; /**< genfit::TrackCand output collection name */
 
     std::string m_rootOutputFilename; /**< Filename for the ROOT file of module information. If "" then won't output ROOT file. */
-    bool saveInfo;
+    bool m_saveInfo;
     bool m_refitMcHits;
     bool m_useKalman; /**< true - refit with Kalman, false - refit with DAF */
     bool m_searchSensorDimensions; /**< true - look for hits within a sensor width/length, false - search within n sigma of the track extrap. */

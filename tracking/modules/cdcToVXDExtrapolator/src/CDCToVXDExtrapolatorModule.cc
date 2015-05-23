@@ -62,12 +62,16 @@ REG_MODULE(CDCToVXDExtrapolator)
 
 CDCToVXDExtrapolatorModule::CDCToVXDExtrapolatorModule() :
   Module(),
+  m_saveInfo(false),
   nTotalTracks(0),
   nCdcRecoOnlyTracks(0),
   nCdcRecoOnlyTracksWithVxdMcHits(0),
   nTracksWithAddedHits(0),
   nTracksWithAddedPxdHits(0),
   nStoredTracks(0),
+  HitInfo(0),
+  TrackInfo(0),
+  m_outputFile(0),
   cdcHitsFromMC(0),
   svdClustersFromMC(0),
   pxdClustersFromMC(0)
@@ -287,7 +291,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToPXDLayer(genfit::Track* track, int
     auto hit = new PXDRecoHit(cluster);
     track->insertMeasurement(hit, 0);
     B2DEBUG(60, "Inserted cluster.");
-    if (saveInfo) {
+    if (m_saveInfo) {
       if (m_extrapolateToDetector) {
         posAtLayer = sensor2pos[cluster->getSensorID()];
         zSigma = sensor2zSig[cluster->getSensorID()];
@@ -550,7 +554,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       auto uHit = new SVDRecoHit(uCluster);
       track->insertMeasurement(vHit, 0);
       track->insertMeasurement(uHit, 0);
-      if (saveInfo) {
+      if (m_saveInfo) {
         // fill hit info
         stHitInfo.z = posAtLayer.Z() - pos2d.Z();
         stHitInfo.pull_z = fabs(posAtLayer.Z() - pos2d.Z()) / sqrt(zSigma * zSigma + spErr.Z() * spErr.Z());
@@ -707,11 +711,11 @@ void CDCToVXDExtrapolatorModule::initialize()
   }
 
 
-  saveInfo = false;
+  m_saveInfo = false;
   if (m_rootOutputFilename != std::string("")) {
     m_outputFile = new TFile(m_rootOutputFilename.c_str(), "recreate");
 
-    saveInfo = true;
+    m_saveInfo = true;
 
     HitInfo = new TTree("HitInfo", "HitInfo");
     HitInfo->Branch("stHitInfo", &stHitInfo,
@@ -789,7 +793,7 @@ void CDCToVXDExtrapolatorModule::event()
   for (genfit::Track& crnt : gfTracks) {
     B2DEBUG(110, "<----> Processing next track <---->");
 
-    if (saveInfo) {
+    if (m_saveInfo) {
       trkInfo.refit = false;
       trkInfo.cdconly = false;
       trkInfo.StartHitIdx = HitInfo->GetEntries();
@@ -885,7 +889,7 @@ void CDCToVXDExtrapolatorModule::event()
             extrapolatedTrack = 0;
           } else {
             B2DEBUG(70, "<><> Added Extrapolated SVD Hits To Track <><>");
-            if (saveInfo) {
+            if (m_saveInfo) {
               if (recoverable) { // real hits
                 int nDiff = extrapolatedTrack->getNumPointsWithMeasurement() - crnt.getNumPointsWithMeasurement();
                 trkInfo.nRec = nDiff;
@@ -998,7 +1002,7 @@ void CDCToVXDExtrapolatorModule::event()
         B2WARNING("Unknown exception just trying to dump out a default track. Very strange.");
       }
     }
-    if (saveInfo) {
+    if (m_saveInfo) {
       trkInfo.EndHitIdx = HitInfo->GetEntries();
       TrackInfo->Fill();
     }
@@ -1015,7 +1019,7 @@ void CDCToVXDExtrapolatorModule::terminate()
   B2INFO("nTracksWithAddedPxdHits: " << nTracksWithAddedPxdHits);
   B2INFO("nStoredTracks: " << nStoredTracks);
 
-  if (saveInfo) {
+  if (m_saveInfo) {
     m_outputFile->cd();
 
     HitInfo->Write();

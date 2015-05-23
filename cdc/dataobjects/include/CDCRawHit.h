@@ -156,6 +156,7 @@ namespace Belle2 {
      */
     unsigned short m_tdc;
 
+    /// To derive from TObject
     ClassDef(CDCRawHit, 1);
   };
 }

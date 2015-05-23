@@ -79,9 +79,9 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //create vessel volume inner volume will be subtracted by "inactive" gas
-        G4double dx_Vessel = activeParams.getLength("dx_Vessel") / 2.*CLHEP::cm;
-        G4double dy_Vessel = activeParams.getLength("dy_Vessel") / 2.*CLHEP::cm;
-        G4double dz_Vessel = activeParams.getLength("dz_Vessel") / 2.*CLHEP::cm;
+        G4double dx_Vessel = activeParams.getLength("dx_Vessel") * CLHEP::cm / 2.;
+        G4double dy_Vessel = activeParams.getLength("dy_Vessel") * CLHEP::cm / 2.;
+        G4double dz_Vessel = activeParams.getLength("dz_Vessel") * CLHEP::cm / 2.;
         G4VSolid* s_Vessel = new G4Box("s_Vessel_tmp", dx_Vessel, dy_Vessel, dz_Vessel);
 
         G4double inch = 2.54 * CLHEP::cm;
@@ -128,8 +128,10 @@ namespace Belle2 {
         G4double y_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap)* sin(AngleX * CLHEP::deg), (-dz_VesselEndCap - dz_Vessel - 0.00001)* sin(AngleX * CLHEP::deg)};
         G4double z_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap)* cos(AngleX * CLHEP::deg), (-dz_VesselEndCap - dz_Vessel - 0.00001)* cos(AngleX * CLHEP::deg)};
 
-        new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[0], y_VesselEndCap[0], z_VesselEndCap[0]) + TPCpos, l_VesselEndCap, "p_VesselEndCapTop", &topVolume, false, 1);
-        new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[1], y_VesselEndCap[1], z_VesselEndCap[1]) + TPCpos, l_VesselEndCap, "p_VesselEndCapBottom", &topVolume, false, 1);
+        new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[0], y_VesselEndCap[0], z_VesselEndCap[0]) + TPCpos, l_VesselEndCap,
+                          "p_VesselEndCapTop", &topVolume, false, 1);
+        new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[1], y_VesselEndCap[1], z_VesselEndCap[1]) + TPCpos, l_VesselEndCap,
+                          "p_VesselEndCapBottom", &topVolume, false, 1);
 
         G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
         orange->SetForceAuxEdgeVisible(true);
@@ -180,14 +182,14 @@ namespace Belle2 {
         }
 
         G4LogicalVolume* l_Ring = new G4LogicalVolume(s_Ring, geometry::Materials::get("MetalCopper"), "l_Ring");
-
+        G4double offset = 3.*CLHEP::cm;
         G4double x_Ring[40];
         G4double y_Ring[40];
         G4double z_Ring[40];
-        for (G4int i = 0; i < 23; i++) {
+        for (G4int i = 0; i < 10; i++) {
           x_Ring[i] = 0;
           y_Ring[i] = 0;
-          z_Ring[i] = -dz_iGasTPC + 3.*CLHEP::cm + 1.*i * CLHEP::cm + 2.*dz_Ring * i * CLHEP::mm;
+          z_Ring[i] = -dz_iGasTPC + offset + 1.*i * CLHEP::cm + 2.*dz_Ring * i * CLHEP::mm;
           //z_Ring[i] = -dz_iGasTPC + 3.*CLHEP::cm + 1.* i * CLHEP::cm + 2.*dz_Ring * i ;
           cout << "z ring # " << i << " pos. " << z_Ring[i] / CLHEP::cm << endl;
           sprintf(Name, "p_Ring_%d", i);
@@ -201,10 +203,10 @@ namespace Belle2 {
           s_Anode = new G4SubtractionSolid(Name, s_Anode, s_RingHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));
         }
         G4LogicalVolume* l_Anode = new G4LogicalVolume(s_Anode, geometry::Materials::get("MetalCopper"), "l_Anode");
-        x_Ring[23] = 0;
-        y_Ring[23] = 0;
-        z_Ring[23] = -dz_iGasTPC + 3.*CLHEP::cm + 1.*23.*CLHEP::cm  + 2.*dz_Ring * 23.*CLHEP::mm;
-        new G4PVPlacement(0, G4ThreeVector(x_Ring[23], y_Ring[23], z_Ring[23]), l_Anode, "p_Anode", l_iGasTPC, false, 1);
+        x_Ring[10] = 0;
+        y_Ring[10] = 0;
+        z_Ring[10] = -dz_iGasTPC + offset + 1.*10.*CLHEP::cm  + 2.*dz_Ring * 10.*CLHEP::mm;
+        new G4PVPlacement(0, G4ThreeVector(x_Ring[10], y_Ring[10], z_Ring[10]), l_Anode, "p_Anode", l_iGasTPC, false, 1);
 
         //create ring spacer
         G4double iR_RSpacer = oR_Rod;
@@ -218,7 +220,7 @@ namespace Belle2 {
         G4double x_RSpacer[40];
         G4double y_RSpacer[40];
         G4double z_RSpacer[40];
-        for (G4int i = 0; i < 23; i++) {
+        for (G4int i = 0; i < 10; i++) {
           for (G4int k = 0; k < 4; k++) {
             x_RSpacer[i] = x_Rod[k];
             y_RSpacer[i] = y_Rod[k];
@@ -255,7 +257,8 @@ namespace Belle2 {
         G4double h_GEMSupportHoles = dz_GEMSupport;
         G4double sA_GEMSupportHoles = 0.*CLHEP::deg;
         G4double spA_GEMSupportHoles = 360.*CLHEP::deg;
-        G4VSolid* s_GEMSupportHoles = new G4Tubs("s_GEMSupportHoles", iR_GEMSupportHoles, oR_GEMSupportHoles, h_GEMSupportHoles, sA_GEMSupportHoles, spA_GEMSupportHoles);
+        G4VSolid* s_GEMSupportHoles = new G4Tubs("s_GEMSupportHoles", iR_GEMSupportHoles, oR_GEMSupportHoles, h_GEMSupportHoles,
+                                                 sA_GEMSupportHoles, spA_GEMSupportHoles);
         s_GEMSupport = new G4SubtractionSolid("s_GEMSupport2", s_GEMSupport, s_GEM, 0, G4ThreeVector(0, 0, 0));
         for (G4int i = 0; i < 4; i++) {
           sprintf(Name, "s_GEMSupport_%d", i);
@@ -269,9 +272,9 @@ namespace Belle2 {
         }
         //cout <<"gem 1 " << z_GEM[0] << " gem 2 " << z_GEM[1] << " ring 22 " << z_Ring[22] << " anode " << z_Ring[23] << " dz_GEM " << dz_GEM << " dz_Ring " << dz_Ring << endl;
         //create sensitive volume
-        G4double dx_GasTPC = 2.5 * CLHEP::cm;
-        G4double dy_GasTPC = 2.5 * CLHEP::cm;
-        G4double dz_GasTPC = (z_Ring[23] - dz_Ring - z_GEM[1] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
+        G4double dx_GasTPC = 1.8 / 2. * CLHEP::cm;
+        G4double dy_GasTPC = 2.12 / 2. * CLHEP::cm;
+        G4double dz_GasTPC = (z_Ring[10] - dz_Ring - z_GEM[1] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
         //cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);
         G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matGas), "l_GasTPC", 0, m_sensitive);
@@ -295,7 +298,8 @@ namespace Belle2 {
         G4double z_PixelChip = z_GEM[0] - 0.3 * CLHEP::cm;
 
         G4Box* s_PixelChip = new G4Box("s_PixelChip", dx_PixelChip, dy_PixelChip, dz_PixelChip);
-        G4LogicalVolume* l_PixelChip = new G4LogicalVolume(s_PixelChip, geometry::Materials::get("G4_PLASTIC_SC_VINYLTOLUENE"), "l_PixelChip");
+        G4LogicalVolume* l_PixelChip = new G4LogicalVolume(s_PixelChip, geometry::Materials::get("G4_PLASTIC_SC_VINYLTOLUENE"),
+                                                           "l_PixelChip");
         new G4PVPlacement(0, G4ThreeVector(x_PixelChip, y_PixelChip, z_PixelChip), l_PixelChip, "p_PixelChip", l_iGasTPC, false, 1);
 
         //create cu plate
@@ -321,7 +325,8 @@ namespace Belle2 {
         G4double dz_PixelBoard = 2.*CLHEP::mm;
 
         G4VSolid* s_PixelBoard = new G4Box("s_PixelBoard1", dx_PixelBoard, dy_PixelBoard, dz_PixelBoard);
-        G4VSolid* s_PixelBoardHoles = new G4Tubs("s_PixelBoardHoles", iR_RingHoles, oR_RingHoles, dz_PixelBoard, sA_RingHoles, spA_RingHoles);
+        G4VSolid* s_PixelBoardHoles = new G4Tubs("s_PixelBoardHoles", iR_RingHoles, oR_RingHoles, dz_PixelBoard, sA_RingHoles,
+                                                 spA_RingHoles);
         for (G4int i = 0; i < 4; i++) {
           sprintf(Name, "s_PixelBoard_%d", i);
           s_PixelBoard = new G4SubtractionSolid(Name, s_PixelBoard, s_PixelBoardHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));

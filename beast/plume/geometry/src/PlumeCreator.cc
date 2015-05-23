@@ -92,7 +92,7 @@ namespace Belle2 {
         //Create LADDER, LADDER is made of 7 layers
         G4double r = activeParams.getLength("r_plume") * CLHEP::cm;
         G4double z = activeParams.getLength("z_plume") * CLHEP::cm;
-        G4double phi = activeParams.getAngle("Phi") + 180. * CLHEP::deg;
+        G4double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;
         G4double thetaZ = activeParams.getAngle("ThetaZ");
 
         G4double ElecBandY = activeParams.getLength("ElecBandY");

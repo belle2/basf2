@@ -83,7 +83,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   const RCCommand cmd = msg.getRequestName();
   RCState state(getNode().getState());
   if (cmd == NSMCommand::VSET &&
-      (state != RCState::OFF_S &&
+      (state != RCState::OFF_S && state != RCState::UNKNOWN &&
+       state != RCState::RECOVERING_RS && state != RCState::ABORTING_RS &&
        state != RCState::NOTREADY_S && state != RCState::READY_S)) {
     return false;
   }

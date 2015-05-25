@@ -1,5 +1,6 @@
 Import('env')
 
-env['TOOLS_LIBS']['rfarmmonitor'] = ['daq', 'framework', '$ROOT_LIBS', 'nsm2_b2lib' ]
+env['TOOLS_LIBS']['rfarmmonitor'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['testrfclient'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 
 Return('env')

@@ -145,6 +145,10 @@ void SeqRootOutputModule::terminate()
 
 void SeqRootOutputModule::writeStreamerInfos()
 {
+  //
+  // Write StreamerInfo to a file
+  // Copy from RootOutputModule::initialize() and TSocket::SendStreamerInfos()
+  //
 
   if (!m_msghandler) {
     B2FATAL("DataStoreStreamer : m_msghandler is NULL.");
@@ -152,19 +156,16 @@ void SeqRootOutputModule::writeStreamerInfos()
   }
 
   TList* minilist = 0 ;
-  int durability = DataStore::c_Event;
+  for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
+    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
 
-  //  for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
-  DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
-
-  for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
-    const TClass* entryClass = iter->second.objClass;
-    TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
-
-    printf("durability %d Class Name %s\n", durability,  entryClass->GetName());
-
-    if (!minilist) minilist  =  new TList();
-    minilist->Add((TObject*)vinfo);
+    for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
+      const TClass* entryClass = iter->second.objClass;
+      TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
+      B2INFO("Recording StreamerInfo : durability " << durability << " : Class Name " << entryClass->GetName());
+      if (!minilist) minilist  =  new TList();
+      minilist->Add((TObject*)vinfo);
+    }
   }
 
   if (minilist) {
@@ -176,8 +177,7 @@ void SeqRootOutputModule::writeStreamerInfos()
     (msg->header())->nObjects = 1;       // No. of objects
     (msg->header())->nArrays = 0;    // No. of arrays
     int size = m_file->write(msg->buffer());
-    printf("Wrote %d byte?\n", size);
-    //      exit(1);
+    B2INFO("Wrote StreamerInfo to a file : " << size << "bytes");
     delete minilist;
   }
 

@@ -496,6 +496,9 @@ void DataStoreStreamer::setDecoderStatus(int val)
 
 int DataStoreStreamer::restoreStreamerInfos(TList* obj)
 {
+  //
+  // Copy from TSocket::RecvStreamerInfos()
+  //
 
   //      TList *list = (TList*)mess->ReadObject(TList::Class());
   TList* list = (TList*)obj;
@@ -510,8 +513,8 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     if (!isstl) {
       info->BuildCheck();
       //              if (gDebug > 0)
-      printf("importing TStreamerInfo: %s, version = %d",
-             info->GetName(), info->GetClassVersion()); fflush(stdout);
+      B2INFO("importing TStreamerInfo: " << info->GetName() <<
+             " version = " << info->GetClassVersion());
     }
     lnk = lnk->Next();
   }
@@ -525,8 +528,8 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     if (isstl) {
       info->BuildCheck();
       //              if (gDebug > 0)
-      printf("STL importing TStreamerInfo: %s, version = %d",
-             info->GetName(), info->GetClassVersion()); fflush(stdout);
+      B2INFO("STL importing TStreamerInfo: " << info->GetName() <<
+             " version = " << info->GetClassVersion());
     }
     lnk = lnk->Next();
   }

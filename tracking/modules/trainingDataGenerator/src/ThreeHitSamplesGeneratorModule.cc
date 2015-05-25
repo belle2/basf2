@@ -37,6 +37,9 @@ ThreeHitSamplesGeneratorModule::ThreeHitSamplesGeneratorModule() :
            defaultOutput);
 
   initializeCounters();
+
+  // initialize pointers
+  m_rootFilePtr = NULL; m_treePtr = NULL;
 }
 
 // =========================================== INITIALIZE ==============================================================
@@ -60,7 +63,9 @@ void ThreeHitSamplesGeneratorModule::initialize()
 // ============================================== EVENT ===============================================================
 void ThreeHitSamplesGeneratorModule::event()
 {
-  StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMcontainerName);
+  StoreArray<SpacePointTrackCand> spacePointTCs(m_PARAMcontainerName); // make this a member -> not having to create it every event
+
+  m_combinations = RootCombinations(); // reset in every event
 
   // loop over all trackCands in the event
   for (int iTC = 0; iTC < spacePointTCs.getEntries(); ++iTC) {
@@ -72,7 +77,7 @@ void ThreeHitSamplesGeneratorModule::event()
     for (const SpacePointTrackCand& comb : threeHitCombos) {
       B2DEBUG(25, "Getting purity Infos from combination");
       vector<MCVXDPurityInfo> purInfos = createPurityInfos(comb);
-      ++m_combCtr;
+
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 499, PACKAGENAME())) {
         stringstream purInfoStr;
         for (auto& info : purInfos) {
@@ -128,7 +133,7 @@ void ThreeHitSamplesGeneratorModule::initializeRootFile(const std::string& filen
 std::vector<Belle2::SpacePointTrackCand>
 ThreeHitSamplesGeneratorModule::splitTrackCandNHitCombos(const Belle2::SpacePointTrackCand* trackCand, unsigned nHits)
 {
-  const std::vector<const SpacePoint*> spacePoints = trackCand->getHits();
+  const std::vector<const SpacePoint*>& spacePoints = trackCand->getHits();
 
   B2DEBUG(25, "Now trying to get " << nHits << " hit combinations from trackCand " << trackCand->getArrayIndex() <<
           ". It contains " << trackCand->getNHits() << " SpacePoints.");
@@ -202,6 +207,7 @@ void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointT
 
   combinations.Signal.push_back(signal);
 
+  m_combCtr++;
   m_noiseSampleCtr += (!signal);
   m_signalSampleCtr += signal;
 }

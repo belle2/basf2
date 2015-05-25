@@ -67,6 +67,8 @@ namespace Belle2 {
       //Visualization Attributes
       G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
       orange->SetForceAuxEdgeVisible(true);
+      G4VisAttributes* magenta = new G4VisAttributes(G4Colour(1, 0, 1));
+      magenta->SetForceAuxEdgeVisible(true);
 
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
@@ -86,8 +88,25 @@ namespace Belle2 {
         //Positioned PIN diodes
         double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
         double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
-        double phi = activeParams.getAngle("Phi") + 180. * CLHEP::deg;
+        double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;
         double thetaZ = activeParams.getAngle("ThetaZ");
+
+        //create beamabort package
+        G4double dx_opa = 10. / 2.*CLHEP::mm;
+        G4double dy_opa = 20. / 2.*CLHEP::mm;
+        G4double dz_opa =  2. / 2.*CLHEP::mm;
+        G4VSolid* s_pa = new G4Box("s_opa", dx_opa, dy_opa, dz_opa);
+        G4double dx_ipa =  6. / 2.*CLHEP::mm;
+        G4double dy_ipa =  6. / 2.*CLHEP::mm;
+        G4double dz_ipa =  1. / 2.*CLHEP::mm;
+        G4VSolid* s_ipa = new G4Box("s_ipa", dx_ipa, dy_ipa, dz_ipa);
+        s_pa = new G4SubtractionSolid("s_pa", s_pa, s_ipa, 0, G4ThreeVector(0., 6.75 * CLHEP::mm, 0.));
+        G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
+        l_pa->SetVisAttributes(magenta);
+        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+
+        new G4PVPlacement(transform, l_pa, "p_pa", &topVolume, false, 0);
+
 
         //create beamabort volumes
         G4double dx_ba = 4.5 / 2.*CLHEP::mm;
@@ -95,11 +114,12 @@ namespace Belle2 {
         G4double dz_ba = 0.5 / 2.*CLHEP::mm;
         G4Box* s_BEAMABORT = new G4Box("s_BEAMABORT", dx_ba, dy_ba, dz_ba);
         G4LogicalVolume* l_BEAMABORT = new G4LogicalVolume(s_BEAMABORT, geometry::Materials::get("Diamond"), "l_BEAMABORT", 0, m_sensitive);
+        l_BEAMABORT->SetVisAttributes(orange);
 
         //Lets limit the Geant4 stepsize inside the volume
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
         l_BEAMABORT->SetVisAttributes(orange);
-        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) * G4Translate3D(0, 6.75 * CLHEP::mm, 0);
         new G4PVPlacement(transform, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
 
         detID++;

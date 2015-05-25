@@ -18,7 +18,7 @@
 
    <!-- 4-1 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -26,7 +26,7 @@
    </Active>
    <!-- 5-2 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -34,7 +34,7 @@
    </Active>
    <!-- 6-3 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -42,7 +42,7 @@
    </Active>
    <!-- 7-4 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-8.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -54,7 +54,7 @@
 
    <!-- 12-1 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -62,7 +62,7 @@
    </Active>
    <!-- 13-2 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -70,7 +70,7 @@
    </Active>
    <!-- 14-3 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -78,7 +78,7 @@
    </Active>
    <!-- 15-4 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">-4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -87,7 +87,7 @@
 
    <!-- 20-1 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -95,7 +95,7 @@
    </Active>
    <!-- 21-2 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -103,7 +103,7 @@
    </Active>
    <!-- 22-3 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -111,7 +111,7 @@
    </Active>
    <!-- 23-4 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -120,7 +120,7 @@
 
     <!-- 24-1 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -128,7 +128,7 @@
    </Active>
    <!-- 25-2 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -136,7 +136,7 @@
    </Active>
    <!-- 26-3 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -144,7 +144,7 @@
    </Active>
    <!-- 27-4 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">10.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -153,7 +153,7 @@
 
    <!-- 36-1 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -161,7 +161,7 @@
    </Active>
    <!-- 37-2 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -169,7 +169,7 @@
    </Active>
    <!-- 38-3 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -177,7 +177,7 @@
    </Active>
    <!-- 39-4 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">4.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -188,7 +188,7 @@
 
    <!-- 36-1 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -196,7 +196,7 @@
    </Active>
    <!-- 37-2 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -204,7 +204,7 @@
    </Active>
    <!-- 38-3 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>
@@ -212,7 +212,7 @@
    </Active>
    <!-- 39-4 -->
     <Active>
-      <Material>PINDIODE-Material</Material>
+      <Material>BEAMABORT-Material</Material>
       <z_pindiode unit="cm">0.0</z_pindiode>
       <r_pindiode unit="cm">6.8</r_pindiode>
       <ThetaZ unit="deg">0.0</ThetaZ>

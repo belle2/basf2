@@ -114,7 +114,7 @@ namespace Belle2 {
         //Positioned PIN diodes
         double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
         double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
-        double phi = activeParams.getAngle("Phi") + 180. * CLHEP::deg;
+        double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;
         double thetaZ = activeParams.getAngle("ThetaZ");
 
         //inch to cm
@@ -169,7 +169,7 @@ namespace Belle2 {
         G4LogicalVolume* l_cover2 = new G4LogicalVolume(s_cover2, G4Material::GetMaterial("Al6061"), "l_cover2");
         l_cover2->SetVisAttributes(yellow);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D(0., 0., -dz_base - dz_cover2);
+                    G4Translate3D(0., -2.*dy_cover1, - dz_base - dz_cover2);
         new G4PVPlacement(transform, l_cover2, "p_cover2", &topVolume, false, 0);
 
         //Create PIN plastic subtrate
@@ -212,7 +212,7 @@ namespace Belle2 {
         G4LogicalVolume* l_layer1 = new G4LogicalVolume(s_layer1, geometry::Materials::get("G4_Au"), "l_layer1");
         l_layer1->SetVisAttributes(red);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + dy_pin,
+                    G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
                                   (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
         new G4PVPlacement(transform, l_layer1, "p_layer1", &topVolume, false, 0);
 
@@ -221,7 +221,7 @@ namespace Belle2 {
         G4LogicalVolume* l_layer2 = new G4LogicalVolume(s_layer2, geometry::Materials::get("Aluminum"), "l_layer2");
         l_layer2->SetVisAttributes(green);
         transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) *
-                    G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + dy_pin,
+                    G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
                                   (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
         new G4PVPlacement(transform, l_layer2, "p_layer2", &topVolume, false, 0);
 

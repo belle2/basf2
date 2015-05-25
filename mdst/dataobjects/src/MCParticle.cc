@@ -110,7 +110,11 @@ void MCParticle::fixParticleList() const
 }
 std::string MCParticle::getName() const
 {
-  return TDatabasePDG::Instance()->GetParticle(m_pdg)->GetName();
+  const TParticlePDG* p = TDatabasePDG::Instance()->GetParticle(m_pdg);
+  if (p)
+    return p->GetName();
+  else //handle unknown PDG codes
+    return std::to_string(m_pdg);
 }
 std::string MCParticle::getInfoHTML() const
 {

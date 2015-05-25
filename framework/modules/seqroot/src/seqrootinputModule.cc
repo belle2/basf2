@@ -145,6 +145,10 @@ void SeqRootInputModule::event()
   m_size += dsize;
   m_size2 += dsize * dsize;
 
+  if (evtmsg->type() == MSG_STREAMERINFO) {
+    B2FATAL("SeqRootInput : StreamerInfo is found in the middle of *.sroot-* files");
+  }
+
   // Restore objects in DataStore
   m_streamer->restoreDataStore(evtmsg);
 

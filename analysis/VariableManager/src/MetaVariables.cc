@@ -18,7 +18,6 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>

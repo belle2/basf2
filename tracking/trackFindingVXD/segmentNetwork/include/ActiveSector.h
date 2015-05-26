@@ -1,60 +1,53 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Jakob Lettenbichler                                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/dataobjects/FullSecID.h>
 
 // C++-std:
-#include <limits>       // std::numeric_limits
 #include <vector>
 
 namespace Belle2 {
 
-  /** predeclaration, real class can be found in tracking/trackFindingVXD/segmentNetwork/TrackNode.h */
-  class TrackNode;
-
-
   /** The ActiveSector Class.
    *
    * associated with static sector to be able to access filter cutoffs.
-   * It contains a vector of trackNodes associated with it and allows to determine the related ActiveSectors.
+   * It contains a vector of hits associated with it and allows to determine the related inner sectors.
    *
    */
+  template<class StaticSectorType, class HitType>
   class ActiveSector {
+  protected:
+    /** ********************************* members ********************************* **/
+
+    /** Pointer to real sector after design of SectorMap */
+    const StaticSectorType* m_staticSector;
+
+    /** stores indices of all associated Hits */
+    std::vector<HitType*> m_hits;
+
+
   public:
-
-
-
     /** ********************************* constructors ********************************* **/
 
 
-
     /** Default constructor for root compatibility */
-    ActiveSector():
-      m_FullSecID(std::numeric_limits<unsigned int>::max()),
-      m_index(std::numeric_limits<unsigned int>::max()) {}
-
+    ActiveSector(): m_staticSector(NULL) {}
 
     /** Constructor.
-     *      //      * @param activeSectorIndex index number of Activated Sector associated with this one.
-     *      //      * @param FullSecID basetype of Full sector ID of activated sector associated with this one.
+    *      //      * @param staticSector pointer to static sector associated with this one.
      *      //      */
-    ActiveSector(unsigned int  activeSectorIndex, FullSecID::BaseType secID):
-      m_FullSecID(secID),
-      m_index(activeSectorIndex) {}
-
-
+    ActiveSector(StaticSectorType* staticSector):
+      m_staticSector(staticSector) {}
 
     /** ********************************* operator overload ********************************* **/
-
 
 
     /** overloaded '=='-operator for sorting algorithms */
@@ -77,65 +70,28 @@ namespace Belle2 {
       return (getFullSecID() > b.getFullSecID());
     }
 
-
-
     /** ********************************* getter ********************************* **/
 
 
-
-    /** returns all indices of attached TrackNodes */
-    inline const std::vector<TrackNode*>& getTrackNodes() const { return m_nodes; }
-
-
-    /** returns all indices of attached ActiveSectors (e.g. "inner friends") */
-    inline const std::vector<ActiveSector*>& getActiveFriends() const { return m_activatedFriends; }
+    /** returns all indices of attached Hits */
+    inline const std::vector<HitType*>& getHits() const { return m_hits; }
 
 
-    /** returns index number of associated ActiveSector in StoreArray TODO replace by pointer! */
-    inline unsigned int getActiveSectorIndex() const { return m_index; }
+    /** returns all IDs for inner sectors stored in the static SectorMap*/
+    inline const std::vector<FullSecID::BaseType>& getInnerSecIDs() const { return m_staticSector->getInnerSecIDs(); }
+
+
+    /** returns pointer to associated static Sector in StoreArray */
+    inline const StaticSectorType* getAttachedStaticSector() const { return m_staticSector; }
 
 
     /** returns VxdID of sensor carrying current sector */
-    inline FullSecID::BaseType getFullSecID() const { return m_FullSecID; }
-
-
+    inline FullSecID::BaseType getFullSecID() const { return m_staticSector->getFullSecID(); }
 
     /** ********************************* setter ********************************* **/
 
 
-
     /** adds new Segment to vector of inner Cells attached to current hit */
-    inline void addTrackNode(TrackNode* newNode) { m_nodes.push_back(newNode); }
-
-
-    /** adds index number of ActiveSector which is a Friend of this one*/
-    inline void addActiveFriend(ActiveSector* newSector) { m_activatedFriends.push_back(newSector); }
-
-
-    /** deactivate this sector all connected Nodes */
-    void deactivateSector() { /* TODO */ }
-
-  protected:
-
-
-    /** ********************************* members ********************************* **/
-
-
-
-    /** FullSecID of sector containing hit - WARNING redundant information, is this really needed? */
-    FullSecID::BaseType m_FullSecID;
-
-
-    /** index number of associated static sector TODO replace by Pointer to real sector after design of SectorMap */
-    unsigned int m_index;
-
-
-    /** stores indices of all associated TrackNodes */
-    std::vector<TrackNode*> m_nodes;
-
-
-    /** stores all active Friend sectors */
-    std::vector<ActiveSector*> m_activatedFriends;
+    inline void addHit(HitType* newNode) { m_hits.push_back(newNode); }
   };
-
 } //Belle2 namespace

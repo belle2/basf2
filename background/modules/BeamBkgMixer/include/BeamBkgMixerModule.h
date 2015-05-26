@@ -135,7 +135,8 @@ namespace Belle2 {
                BackgroundMetaData::EFileType fileTyp = BackgroundMetaData::c_Usual):
         tag(bkgTag), type(bkgType), realTime(time), scaleFactor(1.0),
         fileType(fileTyp),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0) {
+        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
+      {
         fileNames.push_back(fileName);
       }
     };
@@ -154,15 +155,15 @@ namespace Belle2 {
                     TClonesArray* cloneArray,
                     double timeShift,
                     double minTime,
-                    double maxTime) {
+                    double maxTime)
+    {
       if (!cloneArray) return;
       if (!simHits.isValid()) return;
 
       int numEntries = cloneArray->GetEntriesFast();
       for (int i = 0; i < numEntries; i++) {
         SIMHIT* bkgSimHit = static_cast<SIMHIT*>(cloneArray->AddrAt(i));
-        SIMHIT* simHit = simHits.appendNew();
-        (*simHit) = (*bkgSimHit);
+        SIMHIT* simHit = simHits.appendNew(*bkgSimHit);
         simHit->shiftInTime(timeShift);
         if (simHit->getBackgroundTag() == 0) // should be properly set at bkg simulation
           simHit->setBackgroundTag(SimHitBase::bg_other);
@@ -188,7 +189,8 @@ namespace Belle2 {
      */
     template<class HIT>
     void addBeamBackHits(StoreArray<HIT>& hits, TClonesArray* cloneArray,
-                         double timeShift, double minTime, double maxTime) {
+                         double timeShift, double minTime, double maxTime)
+    {
       //Match SubDet id from BeamBackHits to whether we keep it or not
       bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_EKLM, m_BKLM};
       if (!cloneArray) return;

@@ -218,7 +218,7 @@ namespace Belle2 {
       if (m_bgTypes.getTag(type) == 0)
         B2ERROR("Unknown beam background type found in 'scaleFactors': " << type << "\n"
                 "Possible are: " + m_bgTypes.getBGTypes());
-      for (auto & bkg : m_backgrounds) {
+      for (auto& bkg : m_backgrounds) {
         if (type == bkg.type)
           bkg.scaleFactor =  std::get<1>(scaleFactor);
       }
@@ -226,7 +226,7 @@ namespace Belle2 {
 
     // open files for reading SimHits
 
-    for (auto & bkg : m_backgrounds) {
+    for (auto& bkg : m_backgrounds) {
 
       // define TChain for reading SimHits
       bkg.tree = new TChain("tree");
@@ -313,7 +313,7 @@ namespace Belle2 {
     if (m_BeamBackHits && !beamBackHits.isValid()) beamBackHits.create();
 
 
-    for (auto & bkg : m_backgrounds) {
+    for (auto& bkg : m_backgrounds) {
 
       if (bkg.fileType != BackgroundMetaData::c_Usual) continue;
 
@@ -343,7 +343,7 @@ namespace Belle2 {
     }
 
 
-    for (auto & bkg : m_backgrounds) {
+    for (auto& bkg : m_backgrounds) {
 
       if (bkg.fileType != BackgroundMetaData::c_ECL) continue;
 
@@ -374,7 +374,7 @@ namespace Belle2 {
     }
 
 
-    for (auto & bkg : m_backgrounds) {
+    for (auto& bkg : m_backgrounds) {
 
       if (bkg.fileType != BackgroundMetaData::c_PXD) continue;
 
@@ -414,7 +414,7 @@ namespace Belle2 {
   void BeamBkgMixerModule::terminate()
   {
 
-    for (auto & bkg : m_backgrounds) {
+    for (auto& bkg : m_backgrounds) {
       delete bkg.tree;
     }
 
@@ -440,7 +440,7 @@ namespace Belle2 {
                                         double realTime,
                                         BackgroundMetaData::EFileType fileType)
   {
-    for (auto & bkg : m_backgrounds) {
+    for (auto& bkg : m_backgrounds) {
       if (tag == bkg.tag and fileType == bkg.fileType) {
         bkg.fileNames.push_back(fileName);
         bkg.realTime += realTime;

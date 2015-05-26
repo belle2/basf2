@@ -14,6 +14,12 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
+// FIXME 2015-05-26 In order to allow friend declaration of
+// hit-pattern builders.  Should be removed once the
+// TrackBuilderModule is used always and the code to build tracks is
+// removed from the GenFitterModule.
+#include <tracking/modules/genfitter/GenFitterModule.h>
+
 #include <vector>
 #include <string>
 
@@ -64,8 +70,11 @@ namespace Belle2 {
 
     std::vector<double> m_beamSpot;                  /**< point on line to which tracks will be extrapolated */
 
-    HitPatternCDC getHitPatternCDC(const genfit::Track&); /**< returns HitPatternCDC of the Track */
-    HitPatternVXD getHitPatternVXD(const genfit::Track&); /**< returns the HitPatternVXD of the Track*/
+    // FIXME 2015-05-26 These two functions are to remain static as
+    // long as they are also used by the GenFitterModule.
+    friend void GenFitterModule::event();
+    static HitPatternCDC getHitPatternCDC(const genfit::Track&); /**< returns HitPatternCDC of the Track */
+    static HitPatternVXD getHitPatternVXD(const genfit::Track&); /**< returns the HitPatternVXD of the Track*/
   };
 }
 

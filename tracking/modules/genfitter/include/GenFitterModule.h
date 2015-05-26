@@ -76,9 +76,6 @@ namespace Belle2 {
     std::string m_gfTracksColName;                   /**< genfit::Tracks collection name */
     bool m_suppressGFExceptionOutput;                /**< Switch on/off printing GenFit error message output */
 
-    HitPatternCDC getHitPatternCDC(genfit::Track); /**< returns HitPatternCDC of the Track */
-    HitPatternVXD getHitPatternVXD(genfit::Track); /**< returns the HitPatternVXD of the Track*/
-
     //These are two different counters, the counter for genfit::TrackCands refers to the number of input genfit::TrackCands. The number of total successfull/failed fits may be different, if genfit::TrackCand is fitted several times under different PDG hypothesises.
     int m_failedFitCounter;                          /**< Number of failed fits. */
     int m_successfulFitCounter;                      /**< Number of successfully fitted tracks. */

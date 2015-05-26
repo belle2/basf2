@@ -78,6 +78,11 @@
 #include <TGeoManager.h>
 #include <TDatabasePDG.h>
 
+// FIXME 2015-05-26 Only temporarily, until the Belle2::Track building
+// functionality is removed.  This is needed for the hit pattern
+// functionality.
+#include <tracking/modules/genfitter/TrackBuilderModule.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -626,10 +631,10 @@ void GenFitterModule::event()
 
           candFitted = true;
           //fill hit patterns VXD and CDC
-          HitPatternVXD theHitPatternVXD =  getHitPatternVXD(gfTrack);
+          HitPatternVXD theHitPatternVXD = TrackBuilderModule::getHitPatternVXD(gfTrack);
           uint32_t hitPatternVXDInitializer = (uint32_t)theHitPatternVXD.getInteger();
 
-          HitPatternCDC theHitPatternCDC =  getHitPatternCDC(gfTrack);
+          HitPatternCDC theHitPatternCDC = TrackBuilderModule::getHitPatternCDC(gfTrack);
           long long int hitPatternCDCInitializer = (long long int)theHitPatternCDC.getInteger();
 
           //Create output tracks
@@ -737,142 +742,4 @@ void GenFitterModule::endRun()
 
 void GenFitterModule::terminate()
 {
-}
-
-
-HitPatternVXD GenFitterModule::getHitPatternVXD(genfit::Track track)
-{
-
-  Int_t PXD_Hits[2] = {0, 0};
-  Int_t SVD_uHits[4] = {0, 0, 0, 0};
-  Int_t SVD_vHits[4] = {0, 0, 0, 0};
-
-  HitPatternVXD aHitPatternVXD;
-
-  //hits used in the fit
-  int nHits = track.getNumPointsWithMeasurement();
-  int nNotFittedVXDhits = 0;
-
-  for (int i = 0; i < nHits; i++) {
-    genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
-
-    int nMea = tp->getNumRawMeasurements();
-    for (int mea = 0; mea < nMea; mea++) {
-
-      genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
-
-      double weight = 0;
-      std::vector<double> weights;
-      genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
-      if (kalmanInfo) {
-        weights = kalmanInfo->getWeights();
-        weight = weights.at(mea);
-      } else {
-        ++nNotFittedVXDhits;
-        continue;
-      }
-
-      if (weight == 0)
-        continue;
-
-      PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
-      SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
-      SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
-
-      if (pxdHit) {
-        VxdID sensor = pxdHit->getSensorID();
-        if (sensor.getLayerNumber() > 2)
-          B2WARNING("wrong PXD layer (>2)");
-        PXD_Hits[ sensor.getLayerNumber() - 1 ]++;
-      } else if (svdHit2D) {
-
-        //  B2WARNING("No way to handle 2D SVD hits (fill HitPatternVXD)");
-        VxdID sensor = svdHit2D->getSensorID();
-        if (sensor.getLayerNumber() < 2 ||  sensor.getLayerNumber() > 6)
-          B2WARNING("wrong SVD layer (<2 || >6)");
-        SVD_uHits[ sensor.getLayerNumber() - 3]++;
-        SVD_vHits[ sensor.getLayerNumber() - 3]++;
-
-      } else if (svdHit) {
-        VxdID sensor = svdHit->getSensorID();
-        if (sensor.getLayerNumber() < 2 ||  sensor.getLayerNumber() > 6)
-          B2WARNING("wrong SVD layer (<2 || >6)");
-        if (svdHit->isU())
-          SVD_uHits[ sensor.getLayerNumber() - 3]++;
-        else
-          SVD_vHits[ sensor.getLayerNumber() - 3]++;
-      }
-    }
-  }
-
-  //fill PXD hits
-  for (int l = 0; l < 2; l++)
-    //maximum number of hits checked inside the HitPatternVXD
-    aHitPatternVXD.setPXDLayer(l, PXD_Hits[l], 0); //normal/gated mode not retireved
-
-
-  //fill SVD hits
-  for (int l = 0; l < 4; l++)
-    //maximum number of hits checked inside the HitPatternVXD
-    aHitPatternVXD.setSVDLayer(l, SVD_uHits[l], SVD_vHits[l]);
-
-  if (nNotFittedVXDhits > 0) {
-    B2WARNING(" No KalmanFitterInfo associated to some TrackPoints with VXD hits, not filling the HitPatternVXD");
-    B2DEBUG(100, nNotFittedVXDhits << " had no FitterInfo");
-  }
-  return aHitPatternVXD;
-}
-
-HitPatternCDC GenFitterModule::getHitPatternCDC(genfit::Track track)
-{
-
-  HitPatternCDC aHitPatternCDC(0);
-
-  //hits used in the fit
-  int nHits = track.getNumPointsWithMeasurement();
-  int nCDChits = 0;
-  int nNotFittedCDChits = 0;
-  for (int i = 0; i < nHits; i++) {
-    genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
-
-    int nMea = tp->getNumRawMeasurements();
-    for (int mea = 0; mea < nMea; mea++) {
-
-      genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
-
-      double weight = 0;
-      std::vector<double> weights;
-      genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
-
-      if (kalmanInfo) {
-        weights = kalmanInfo->getWeights();
-        weight = weights.at(mea);
-      } else {
-        ++nNotFittedCDChits;
-        continue;
-      }
-
-      if (weight == 0)
-        continue;
-
-      CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
-
-      if (cdcHit) {
-        WireID wire = cdcHit->getWireID();
-
-        //maximum number of hits checked inside the HitPatternCDC
-        aHitPatternCDC.setLayer(wire.getICLayer());
-        nCDChits++;
-      }
-    }
-
-  }
-  if (nNotFittedCDChits > 0) {
-    B2WARNING(" No KalmanFitterInfo associated to some TrackPoints with CDC hits, not filling the HitPatternCDC");
-    B2DEBUG(100, nNotFittedCDChits << " out of " << nCDChits << " had no FitterInfo");
-  }
-  aHitPatternCDC.setNHits(nCDChits);
-
-  return aHitPatternCDC;
-
 }

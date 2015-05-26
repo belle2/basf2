@@ -14,9 +14,11 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/FlavorTagInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <framework/logging/Logger.h>
 

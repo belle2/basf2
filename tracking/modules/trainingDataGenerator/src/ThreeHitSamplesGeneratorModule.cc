@@ -86,7 +86,9 @@ void ThreeHitSamplesGeneratorModule::event()
         B2DEBUG(499, "combination " << m_combCtr <<  ", PurityInfos:\n" << purInfoStr.str(););
       }
 
-      addHitCombination(comb, (purInfos[0].getPurity().second == 1), m_combinations);
+      // only take a combination as signal if it is from a valid MCParticle and if purity is 1
+      bool isSignal = (purInfos[0].getPurity().first >= 0 && purInfos[0].getPurity().second == 1);
+      addHitCombination(comb, isSignal, m_combinations);
     }
   }
 

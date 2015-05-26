@@ -53,9 +53,9 @@ class WFDisplay(Module):
     Simple event display of raw waveforms.
     '''
 
-    # 1D histograms
+    #: 1D histograms
     hist = [TH1F('h' + str(i), 'wf', 64, 0.0, 64.0) for i in range(16)]
-    # canvas
+    #: canvas
     c1 = TCanvas('c1', 'WF event display', 800, 800)
 
     def initialize(self):

@@ -29,10 +29,10 @@ class TOPDisplay(Module):
     Distributions of modules with the track impact are shown in red color.
     '''
 
-    # 1D histograms
+    #: 1D histograms
     hist = [TH1F('h' + str(i), 'bar#' + str(i), 128, 0.0, 4096.0) for i in
             range(16)]
-    # canvas
+    #: canvas
     c1 = TCanvas('c1', 'TOP event display', 1000, 800)
 
     def initialize(self):

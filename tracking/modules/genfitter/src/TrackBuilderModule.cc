@@ -299,8 +299,12 @@ HitPatternVXD TrackBuilderModule::getHitPatternVXD(const genfit::Track& track)
         PXD_Hits[ sensor.getLayerNumber() - 1 ]++;
       } else if (svdHit2D) {
 
-        B2WARNING("No way to handle 2D SVD hits (fill HitPatternVXD)");
-
+        //  B2WARNING("No way to handle 2D SVD hits (fill HitPatternVXD)");
+        VxdID sensor = svdHit2D->getSensorID();
+        if (sensor.getLayerNumber() < 2 ||  sensor.getLayerNumber() > 6)
+          B2WARNING("wrong SVD layer (<2 || >6)");
+        SVD_uHits[ sensor.getLayerNumber() - 3]++;
+        SVD_vHits[ sensor.getLayerNumber() - 3]++;
       } else if (svdHit) {
         VxdID sensor = svdHit->getSensorID();
         if (sensor.getLayerNumber() < 2 ||  sensor.getLayerNumber() > 6)

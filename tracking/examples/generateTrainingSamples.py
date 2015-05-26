@@ -5,9 +5,10 @@ import os
 from basf2 import *
 from sys import argv
 from simulation import add_simulation
+import glob
 
 # Parameters
-nEvents = 10
+nEvents = 1
 useEvtGen = True  # if false ParticleGun is used
 useRootInput = False  # read pre-simulated events from root-input
 useRootOutputAfterSim = False  # use rootoutput after simulation
@@ -38,8 +39,8 @@ secSetup = [
 tuneValue = 0.06  # expands the set cutoffs in the VXDTF in percent
 
 # background file setup
-bkgdir = '/home/maldi/belle2FW/bkg_9_jun14/'  # obtain bkg-files from somewhere -> these are too old
-bkgfiles = [bkgdir + "*.root"]
+bkgdir = '/home/maldi/belle2FW/bkg/'  # paht to background files
+bkgfiles = glob.glob(bkgdir + "*.root")
 
 # module registration
 # EventInfoSetter
@@ -146,7 +147,7 @@ mcTrackFinder.logging.log_level = LogLevel.INFO
 param_mctrackfinder = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
-    'UsePXDHits': 1,
+    'UsePXDHits': 0,
     'Smearing': 0,
     'UseClusters': True,
     'MinimalNDF': 5,
@@ -196,12 +197,12 @@ if not useRootInput:
     else:
         main.add_module(particlegun)
 
-    main.add_module(gearbox)  # add gearbox and geometry in before add_simulation so that they are in the right order
-    main.add_module(geometry)
-    main.add_module(g4sim)  # add g4sim with custom settings
+    # main.add_module(gearbox)  # add gearbox and geometry in before add_simulation so that they are in the right order
+    # main.add_module(geometry)
+    # main.add_module(g4sim)  # add g4sim with custom settings
     # add the simulation (including clusterizing and digitizing)
     # NOTE: using RSVD only here (not RCDC)
-    add_simulation(main, ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'])  # , bkgfiles)
+    add_simulation(main, ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'], bkgfiles)
 else:
     main.add_module(rootinput)
     main.add_module(eventinfoprinter)

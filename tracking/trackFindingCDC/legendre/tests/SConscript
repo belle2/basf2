@@ -5,7 +5,6 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'simulation_dataobjects',
     'framework',
-    'framework_pybasf2',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',
     'genfit2',

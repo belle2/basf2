@@ -4,7 +4,6 @@ env['LIBS'] = [
     'tracking_trackFindingCDC',
     'cdc_dataobjects',
     'framework',
-    'framework_pybasf2',
     '$ROOT_LIBS',
     '$PYTHON_LIBS',
     ]

@@ -7,15 +7,15 @@ from sys import argv
 from simulation import add_simulation
 
 # Parameters
-nEvents = 1
+nEvents = 10
 useEvtGen = True  # if false ParticleGun is used
 useRootInput = False  # read pre-simulated events from root-input
 useRootOutputAfterSim = False  # use rootoutput after simulation
 useRootBeforeSampleGeneration = False  # use rootoutput just before the invokation of the sample generating module
 
 # In-/Output filenames (dummys for now)
-inFileName = 'SimulatedEvents.root'
-outFileName = 'SimulatedEvents.root'
+inFileName = 'EvtGen_nobg_25k.root'
+outFileName = 'EvtGen_nobg_25k.root'
 
 # ParticleGun parameters
 nTracks = 15  # number of tracks
@@ -36,7 +36,10 @@ secSetup = [
     'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
 
 tuneValue = 0.06  # expands the set cutoffs in the VXDTF in percent
-alwaysTrue = [True] * len(secSetup)
+
+# background file setup
+bkgdir = '/home/maldi/belle2FW/bkg_9_jun14/'  # obtain bkg-files from somewhere -> these are too old
+bkgfiles = [bkgdir + "*.root"]
 
 # module registration
 # EventInfoSetter
@@ -78,6 +81,16 @@ param_particlegun = {
 }
 particlegun.param(param_particlegun)
 
+# gearbox, geometry and fullsim (for non-default settings)
+gearbox = register_module('Gearbox')
+
+geometry = register_module('Geometry')
+geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',
+                              'PXD', 'SVD'])  # 'components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',........
+
+g4sim = register_module('FullSim')
+g4sim.param('StoreAllSecondaries', True)  # need for MCTrackfinder to work correctly
+
 # SpacePoint creation (store in seperate StoreArrays)
 spCreatorSVDdouble = register_module('SpacePointCreatorSVD')
 spCreatorSVDdouble.param('OnlySingleClusterSpacePoints', False)
@@ -105,17 +118,43 @@ vxdtf = register_module('VXDTF')
 vxdtf.logging.log_level = LogLevel.DEBUG
 vxdtf.logging.debug_level = 1
 param_vxdtf = {
+    # NOTE: the activateAlwaysTrueNHit is currently not compiled (in the head relase!) into the code
+    # setting the filters to false individually
     'sectorSetup': secSetup,
     'GFTrackCandidatesColName': 'vxdTracks',
-    # 'activateAlwaysTrue3Hit': [True],
-    # 'activateAlwaysTrue4Hit': [True],
+    'activateAlwaysTrue3Hit': [True],
+    'activateAlwaysTrue4Hit': [True],
     'activateDistance3D': [True],
     'activateDistanceXY': [True],
     'activateDistanceZ': [False],
+    # 'activateAngles3D': [False],
+    # 'activateAngles3DHioC': [False],
+    # 'activateAnglesXYHioC': [False],
+    # 'activateDeltaDistance2IPHioC': [False],
+    # 'activateDeltaPtHioC': [False],
+    # 'activateSlopeRZ': [False],
+    # 'activateZigZagXY': [False],
     'filterOverlappingTCs': 'none',
+    'killEventForHighOccupancyThreshold': 100000,
     'tuneCutoffs': tuneValue,
 }
 vxdtf.param(param_vxdtf)
+
+# MCTrackFinder
+mcTrackFinder = register_module('TrackFinderMCTruth')
+mcTrackFinder.logging.log_level = LogLevel.INFO
+param_mctrackfinder = {
+    'UseCDCHits': 0,
+    'UseSVDHits': 1,
+    'UsePXDHits': 1,
+    'Smearing': 0,
+    'UseClusters': True,
+    'MinimalNDF': 5,
+    'WhichParticles': ['primary'],
+    'GFTrackCandidatesColName': 'mcTracks',
+    'TrueHitMustExist': True,
+}
+mcTrackFinder.param(param_mctrackfinder)
 
 # convert trackcands from VXDTF to SPTCs
 tcconverter = register_module('GFTC2SPTCConverter')
@@ -127,6 +166,7 @@ param_tcconverter = {
     'useSingleClusterSP': False,
     'checkTrueHits': False,
     'skipCluster': False,
+    # 'genfitTCName': 'mcTracks',
     'genfitTCName': 'vxdTracks',
     'SpacePointTCName': 'SPTracks',
 }
@@ -134,16 +174,16 @@ tcconverter.param(param_tcconverter)
 
 # generate training samples
 samplesgenerator = register_module('ThreeHitSamplesGenerator')
-samplesgenerator.logging.log_level = LogLevel.DEBUG
+samplesgenerator.logging.log_level = LogLevel.INFO
 samplesgenerator.logging.debug_level = 1000
 param_samplesgenerator = {
     'containerName': 'SPTracks',
-    'outputFileName': ['threeHitSamples', 'recreate'],
+    'outputFileName': ['threeHitSamplesMConly', 'recreate'],
 }
 samplesgenerator.param(param_samplesgenerator)
 
 set_log_level(LogLevel.WARNING)
-# set_random_seed(1234)
+set_random_seed(1234)
 
 # Path
 main = create_path()
@@ -154,13 +194,19 @@ if not useRootInput:
     if useEvtGen:
         main.add_module(evtgen)
     else:
-        main.add_module(pGun)
+        main.add_module(particlegun)
+
+    main.add_module(gearbox)  # add gearbox and geometry in before add_simulation so that they are in the right order
+    main.add_module(geometry)
+    main.add_module(g4sim)  # add g4sim with custom settings
     # add the simulation (including clusterizing and digitizing)
     # NOTE: using RSVD only here (not RCDC)
-    add_simulation(main, ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'], None, None)
+    add_simulation(main, ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'])  # , bkgfiles)
 else:
     main.add_module(rootinput)
     main.add_module(eventinfoprinter)
+    main.add_module(gearbox)
+    main.add_module(geometry)
 
 if useRootOutputAfterSim:
     main.add_module(rootoutput)
@@ -171,6 +217,7 @@ main.add_module(sp2thConnector)
 
 # NOTE: this step is only needed now!
 main.add_module(vxdtf)
+# main.add_module(mcTrackFinder)
 main.add_module(tcconverter)
 
 if useRootBeforeSampleGeneration and not useRootOutputAfterSim:

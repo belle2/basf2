@@ -610,19 +610,11 @@ void GenFitterModule::event()
 
             //Create output tracks
             gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
-            tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
+            gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
 
             //Create relation
             if (aTrackCandPointer->getMcTrackId() >= 0) {
               gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
-            }
-
-            //Set non-helix parameters
-            tracks[trackCounter]->setTrackFitResultIndex(chargedStable, -999);
-
-            //Create relations
-            if (aTrackCandPointer->getMcTrackId() >= 0) {
-              tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
             }
           }
         } else {            //fit successful

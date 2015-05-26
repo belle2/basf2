@@ -124,9 +124,6 @@ namespace Belle2 {
 
     virtual void terminate(); /**< terminate: print some summary information */
 
-    /** Exception for when no related TrueHit can be found for any Cluster of a SpacePoint */
-    BELLE2_DEFINE_EXCEPTION(NoTrueHitToCluster, "Found no related TrueHit for any Cluster of the SpacePoint!");
-
     BELLE2_DEFINE_EXCEPTION(NoClusterToSpacePoint,
                             "Found no related Cluster for a SpacePoint!"); /**< Exception for when no related Cluster can be found for a SpacePoint */
 
@@ -386,9 +383,6 @@ namespace Belle2 {
      */
     template<typename MapType>
     void positionAnalysis(Belle2::SpacePoint* spacePoint, const MapType& trueHitMap, const int& index, e_detTypes detType);
-
-    /** increase the appropriate counter to the exception */
-    void increaseExceptionCounter(std::runtime_error& exception);
 
     /** get the local position of a SpacePoint */
     std::pair<double, double> getLocalPos(Belle2::SpacePoint* spacePoint);

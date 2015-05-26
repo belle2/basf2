@@ -267,6 +267,7 @@ void SpacePoint2TrueHitConnectorModule::terminate()
       contSumm << " more than 4 related TrueHits to a SpacePoint: " << m_nRelTrueHitsCtr[iCont].at(4) << "\n"; // WARNING: hardcoded
       contSumm << m_rejectedRelsCtr.at(iCont) << " SpacePoints did not get a relation, " << m_ghostHitCtr.at(
                  iCont) << " were probably ghost hits in this container!\n";
+      contSumm << m_noTrueHitCtr[iCont] << " SpacePoints had no relation to a TrueHit at all.\n";
     }
     B2DEBUG(1, contSumm.str())
 
@@ -303,9 +304,9 @@ MapType SpacePoint2TrueHitConnectorModule::processSpacePoint(Belle2::SpacePoint*
     } else {
       trueHitMap = getRelatedTrueHits<MapType, SVDCluster, SVDTrueHit>(spacePoint, m_SVDClusters.getName(), m_SVDTrueHits.getName());
     }
-  } catch (std::runtime_error& anE) { // should catch all Belle2 exceptions in try-block
+  } catch (NoClusterToSpacePoint& anE) {
     B2WARNING("Caught an exception while trying to relate SpacePoints and TrueHits: " << anE.what());
-    increaseExceptionCounter(anE);
+    m_noClusterCtr.at(m_iCont)++;
   } catch (...) { // catch the rest
     B2ERROR("Caught undefined exception while trying to relate SpacePoints and TrueHits")
     throw; // throw further (maybe it is caught somewhere else)
@@ -367,7 +368,7 @@ MapType SpacePoint2TrueHitConnectorModule::getRelatedTrueHits(Belle2::SpacePoint
   }
   // check if there was no Cluster with a related TrueHit -> then throw
   if (noTrueHits == spacePoint->getNClustersAssigned()) {
-    throw NoTrueHitToCluster();
+    m_noTrueHitCtr[m_iCont]++; // increase counter for current container
   }
   return trueHitsMap;
 }
@@ -409,20 +410,6 @@ void SpacePoint2TrueHitConnectorModule::initializeCounters()
 //   m_oneCluster2THCtr = 0;
 //
 
-}
-
-// ================================================ INCREASE EXCEPTION COUNTER ====================================================
-void SpacePoint2TrueHitConnectorModule::increaseExceptionCounter(std::runtime_error& exception)
-{
-  const char* message = exception.what();
-  // NOTE comparing the messages of the exceptions to determine which exception got caught
-  if (strcmp(message, NoClusterToSpacePoint().what()) == 0) {
-    m_noClusterCtr.at(m_iCont)++;
-  } else if (strcmp(message, NoTrueHitToCluster().what()) == 0) {
-    m_noTrueHitCtr.at(m_iCont)++;
-  } else {
-    B2ERROR("Caught an unexpected runtime_error: " << exception.what()) // only the upper to should be caught!
-  }
 }
 
 // ===================================================== REGISTER ALL RELATIONS ===================================================

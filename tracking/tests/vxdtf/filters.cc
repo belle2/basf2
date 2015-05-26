@@ -194,7 +194,7 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, SelectionVariableName)
   {
 
-    EXPECT_EQ("VXDTFfilterTest::SquaredDistance3D" , SquaredDistance3D().name());
+    EXPECT_EQ("VXDTFfilterTest__SquaredDistance3D" , SquaredDistance3D().name());
 
   }
 

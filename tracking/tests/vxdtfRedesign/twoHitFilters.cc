@@ -321,10 +321,10 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, SelectionVariableName)
   {
 
-    EXPECT_EQ("Belle2::Distance3DSquared<Belle2::SpacePoint>" , Distance3DSquared<SpacePoint>().name());
-    EXPECT_EQ("Belle2::Distance2DXYSquared<Belle2::SpacePoint>" , Distance2DXYSquared<SpacePoint>().name());
-    EXPECT_EQ("Belle2::Distance1DZ<Belle2::SpacePoint>" , Distance1DZ<SpacePoint>().name());
-    EXPECT_EQ("Belle2::SlopeRZ<Belle2::SpacePoint>" , SlopeRZ<SpacePoint>().name());
+    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__SpacePoint}" , Distance3DSquared<SpacePoint>().name());
+    EXPECT_EQ("Belle2__Distance2DXYSquared{Belle2__SpacePoint}" , Distance2DXYSquared<SpacePoint>().name());
+    EXPECT_EQ("Belle2__Distance1DZ{Belle2__SpacePoint}" , Distance1DZ<SpacePoint>().name());
+    EXPECT_EQ("Belle2__SlopeRZ{Belle2__SpacePoint}" , SlopeRZ<SpacePoint>().name());
 
   }
 

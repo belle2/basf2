@@ -13,7 +13,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
 #include <set>
@@ -23,18 +22,20 @@ namespace Belle2 {
   // forward declarations
 
   class Track;
+  class MCParticle;
 
   /**
    * This class stores the relevant information from the FlavorTagging. More concretely, it
-   * stores the details of the most suitable particles used in the tagging.
+   * stores the details of the most suitable tracks for the flavour tagging.
    *
    * The way the information is stored is into vectors with the same length. Every position
    * in all vectors correspond to the same particle-category information, so that every category
    * is uniquely correlated to one, e.g, track. Variables stored:
    *
-   * - Track probability of being the right target for every category
+   * - Track's probability of being a Btag daughter for every category
    * - Highest probability track's pointer
    * - Event probability to belong to a given category
+   * - MC information obtained in the TagV module
    *
    * This class is still in an early phase, so lots of more stuff is expected soon enough.
    */
@@ -55,8 +56,8 @@ namespace Belle2 {
     void setTrack(Belle2::Track* track); // Save the track of the most probable particle
     void setParticle(Particle*);  // Save the pointer of the most probable particle
 
-    void setMCParticle(MCParticle*);  // Save the pointer of the most probable particle
-    void setMCParticleMother(MCParticle*);  // Save the pointer of the most probable particle
+    void setMCParticle(Belle2::MCParticle*);  // Save the pointer of the most probable particle
+    void setMCParticleMother(Belle2::MCParticle*);  // Save the pointer of the most probable particle
 
     void setTracks(std::vector<Belle2::Track*>); // Save a vector of tracks
     void setCatProb(float); // Save the probability of belonging to a given category
@@ -91,8 +92,8 @@ namespace Belle2 {
     std::vector<float> getP(); // Get the momentum of the track
     std::vector<Particle*> getParticle(); // Get a list of pointers to the particle of every category
 
-    std::vector<MCParticle*> getMCParticle(); // Get a list of pointers to the particle of every category
-    std::vector<MCParticle*> getMCParticleMother(); // Get a list of pointers to the particle of every category
+    std::vector<Belle2::MCParticle*> getMCParticle(); // Get a list of pointers to the particle of every category
+    std::vector<Belle2::MCParticle*> getMCParticleMother(); // Get a list of pointers to the particle of every category
 
     std::vector<float> getD0();
     std::vector<float> getZ0();
@@ -113,7 +114,6 @@ namespace Belle2 {
     std::vector<std::string> getCategories();
     std::vector<float> getProdVertexMotherZ();
 
-    void relationToParticle(Particle* particle);
 
   private:
 
@@ -121,8 +121,8 @@ namespace Belle2 {
     std::vector<Belle2::Track*> m_tracks; // Most probable particle's track
     std::vector<Particle*> m_particle; // Most probable particle
 
-    std::vector<MCParticle*> m_MCparticle; // TEMPORARY
-    std::vector<MCParticle*> m_MCparticle_mother; // TEMPORARY
+    std::vector<Belle2::MCParticle*> m_MCparticle; // TEMPORARY
+    std::vector<Belle2::MCParticle*> m_MCparticle_mother; // TEMPORARY
 
     std::vector<float> m_D0;
     std::vector<float> m_Z0;

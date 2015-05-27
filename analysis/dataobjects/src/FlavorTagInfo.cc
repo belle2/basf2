@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
 #include <iostream>
@@ -23,12 +24,12 @@ using namespace Belle2;
 
 /************************SETTERS***********************/
 
-void FlavorTagInfo::setTrack(Belle2::Track* track)
+void FlavorTagInfo::setTrack(Track* track)
 {
   m_tracks.push_back(track);
 }
 
-void FlavorTagInfo::setTracks(std::vector<Belle2::Track*> tracks)
+void FlavorTagInfo::setTracks(std::vector<Track*> tracks)
 {
 
   for (unsigned i = 0; i < tracks.size(); i++) {
@@ -198,7 +199,7 @@ std::vector<MCParticle*> FlavorTagInfo::getMCParticleMother()
   return m_MCparticle_mother;
 }
 
-std::vector<Belle2::Track*> FlavorTagInfo::getTracks()
+std::vector<Track*> FlavorTagInfo::getTracks()
 {
   for (unsigned i = 0; i < m_tracks.size(); i++) {
     if (m_tracks[i]) {
@@ -217,7 +218,7 @@ std::vector<float> FlavorTagInfo::getZ0()
   return m_Z0;
 }
 
-Belle2::Track* FlavorTagInfo::getTrack(int track)
+Track* FlavorTagInfo::getTrack(int track)
 {
   return m_tracks[track];
 }
@@ -295,11 +296,3 @@ std::vector<std::string> FlavorTagInfo::getCategories()
 }
 
 
-/**************************/
-void FlavorTagInfo::relationToParticle(Particle* particle)
-{
-  particle->addRelationTo(this);
-
-}
-
-ClassImp(FlavorTagInfo)

@@ -406,7 +406,7 @@ namespace Belle2 {
     }
 
 
-    //setter with mag, theta, phi
+    /** setter with mag, theta, phi */
     inline void SetMagThetaPhi(DataType mag, DataType theta, DataType phi)
     {
       DataType amag = TMath::Abs(mag);
@@ -810,7 +810,7 @@ namespace Belle2 {
 
   /** non-memberfunction Comparison for equality with a TVector3 */
   template < typename DataType>
-  inline Bool_t operator == (const TVector3& a, B2Vector3<DataType> b)
+  inline Bool_t operator == (const TVector3& a, const B2Vector3<DataType>& b)
   {
     return (a.X() == b.X() && a.Y() == b.Y() && a.Z() == b.Z());
   }
@@ -818,7 +818,7 @@ namespace Belle2 {
 
   /** non-memberfunction Comparison for equality with a TVector3 */
   template < typename DataType>
-  inline Bool_t operator != (const TVector3& a, B2Vector3<DataType> b)
+  inline Bool_t operator != (const TVector3& a, const B2Vector3<DataType>& b)
   {
     return (a.X() != b.X() && a.Y() != b.Y() && a.Z() != b.Z());
   }

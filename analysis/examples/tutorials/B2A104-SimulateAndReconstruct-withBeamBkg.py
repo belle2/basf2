@@ -24,6 +24,7 @@ from modularAnalysis import analysis_main
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
+import glob
 
 # check if the required input file exists (from B2A101 example)
 import os.path
@@ -36,8 +37,8 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
 
-bkgdir = '/sw/belle2/bkg/'
-bkgFiles = [bkgdir + '*.root']
+# if you run at KEKCC
+bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
 
 # simulation
 add_simulation(analysis_main, None, bkgFiles)
@@ -50,7 +51,7 @@ add_mdst_output(analysis_main, True,
                 'B2A101-Y4SEventGeneration-gsim-BKGx1.root')
 
 # Show progress of processing
-progress = register_module('Progress')
+progress = register_module('ProgressBar')
 analysis_main.add_module(progress)
 
 # Process the events

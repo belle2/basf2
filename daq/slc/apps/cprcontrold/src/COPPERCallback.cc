@@ -177,7 +177,7 @@ void COPPERCallback::stop() throw(RCHandlerException)
 
 void COPPERCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  abort();
+  //abort();
   load(obj);
 }
 

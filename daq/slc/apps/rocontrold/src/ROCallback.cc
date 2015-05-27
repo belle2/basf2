@@ -169,7 +169,7 @@ void ROCallback::stop() throw(RCHandlerException)
 
 void ROCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  abort();
+  //abort();
   load(obj);
 }
 

@@ -82,14 +82,6 @@ void StoragerCallback::term() throw()
 
 void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  bool is_up_all = true;
-  for (size_t i = 0; i < m_con.size(); i++) {
-    if (!m_con[i].isAlive()) {
-      is_up_all = false;
-      break;
-    }
-  }
-  if (is_up_all) return;
   const DBObject& input(obj("input"));
   const DBObject& output(obj("output"));
   const DBObject& record(obj("record"));
@@ -99,7 +91,8 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   const DBObject& isocket(input("socket"));
   const DBObject& osocket(output("socket"));
   const DBObject& file(record("file"));
-  if (obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
+
+  if (!m_eb2rx.isAlive() && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
     const DBObject& eb2rx(obj("eb2rx"));
     m_eb2rx.clearArguments();
     m_eb2rx.setExecutable(eb2rx.getText("exe"));
@@ -118,44 +111,47 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   }
 
   const std::string nodename = StringUtil::tolower(getNode().getName());
-
-  m_con[0].clearArguments();
-  m_con[0].setExecutable("storagein");
-  m_con[0].addArgument(ibuf.getText("name"));
-  m_con[0].addArgument("%d", ibuf.getInt("size"));
-  m_con[0].addArgument(isocket.getText("host"));
-  m_con[0].addArgument("%d", isocket.getInt("port"));
-  m_con[0].addArgument(nodename + "_storagein");
-  m_con[0].addArgument("2");
-  if (!m_con[0].load(10)) {
-    std::string emsg = "storagein: Failed to connect to eb2rx";
-    LogFile::error(emsg);
-    throw (RCHandlerException(emsg));
+  if (!m_con[0].isAlive()) {
+    m_con[0].clearArguments();
+    m_con[0].setExecutable("storagein");
+    m_con[0].addArgument(ibuf.getText("name"));
+    m_con[0].addArgument("%d", ibuf.getInt("size"));
+    m_con[0].addArgument(isocket.getText("host"));
+    m_con[0].addArgument("%d", isocket.getInt("port"));
+    m_con[0].addArgument(nodename + "_storagein");
+    m_con[0].addArgument("2");
+    if (!m_con[0].load(10)) {
+      std::string emsg = "storagein: Failed to connect to eb2rx";
+      LogFile::error(emsg);
+      throw (RCHandlerException(emsg));
+    }
+    LogFile::debug("Booted storagein");
+    try_wait();
   }
-  LogFile::debug("Booted storagein");
-  try_wait();
 
-  m_con[1].clearArguments();
-  m_con[1].setExecutable("storagerecord");
-  m_con[1].addArgument(rbuf.getText("name"));
-  m_con[1].addArgument("%d", rbuf.getInt("size"));
-  m_con[1].addArgument(record.getText("dir"));
-  m_con[1].addArgument("%d", record.getInt("ndisks"));
-  m_con[1].addArgument(file.getText("diskid"));
-  m_con[1].addArgument(file.getText("dbtmp"));
-  m_con[1].addArgument(obuf.getText("name"));
-  m_con[1].addArgument("%d", obuf.getInt("size"));
-  m_con[1].addArgument(nodename + "_storagerecord");
-  m_con[1].addArgument("3");
-  if (!m_con[1].load(30)) {
-    std::string emsg = "storagerecord: Failed to start";
-    LogFile::error(emsg);
-    throw (RCHandlerException(emsg));
+  if (!m_con[1].isAlive()) {
+    m_con[1].clearArguments();
+    m_con[1].setExecutable("storagerecord");
+    m_con[1].addArgument(rbuf.getText("name"));
+    m_con[1].addArgument("%d", rbuf.getInt("size"));
+    m_con[1].addArgument(record.getText("dir"));
+    m_con[1].addArgument("%d", record.getInt("ndisks"));
+    m_con[1].addArgument(file.getText("diskid"));
+    m_con[1].addArgument(file.getText("dbtmp"));
+    m_con[1].addArgument(obuf.getText("name"));
+    m_con[1].addArgument("%d", obuf.getInt("size"));
+    m_con[1].addArgument(nodename + "_storagerecord");
+    m_con[1].addArgument("3");
+    if (!m_con[1].load(30)) {
+      std::string emsg = "storagerecord: Failed to start";
+      LogFile::error(emsg);
+      throw (RCHandlerException(emsg));
+    }
+    LogFile::debug("Booted storagerecord");
+    try_wait();
   }
-  LogFile::debug("Booted storagerecord");
-  try_wait();
 
-  if (output.getBool("used")) {
+  if (!m_con[2].isAlive() && output.getBool("used")) {
     m_con[2].clearArguments();
     m_con[2].setExecutable("storageout");
     m_con[2].addArgument(obuf.getInt("oname"));
@@ -173,24 +169,26 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   }
 
   for (size_t i = 3; i < m_con.size(); i++) {
-    m_con[i].clearArguments();
-    m_con[i].setExecutable("basf2");
-    m_con[i].addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
-                         record.getText("script").c_str());
-    m_con[i].addArgument(ibuf.getText("name"));
-    m_con[i].addArgument("%d", ibuf.getInt("size"));
-    m_con[i].addArgument(rbuf.getText("name"));
-    m_con[i].addArgument("%d", rbuf.getInt("size"));
-    m_con[i].addArgument("%s_storagebasf2_%d", nodename.c_str(), i - 3);
-    m_con[i].addArgument("%d", i + 2);
-    m_con[i].addArgument("1");
-    if (!m_con[i].load(10)) {
-      std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
-      LogFile::error(emsg);
-      throw (RCHandlerException(emsg));
+    if (!m_con[i].isAlive()) {
+      m_con[i].clearArguments();
+      m_con[i].setExecutable("basf2");
+      m_con[i].addArgument("%s/%s", getenv("BELLE2_LOCAL_DIR"),
+                           record.getText("script").c_str());
+      m_con[i].addArgument(ibuf.getText("name"));
+      m_con[i].addArgument("%d", ibuf.getInt("size"));
+      m_con[i].addArgument(rbuf.getText("name"));
+      m_con[i].addArgument("%d", rbuf.getInt("size"));
+      m_con[i].addArgument("%s_storagebasf2_%d", nodename.c_str(), i - 3);
+      m_con[i].addArgument("%d", i + 2);
+      m_con[i].addArgument("1");
+      if (!m_con[i].load(10)) {
+        std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
+        LogFile::error(emsg);
+        throw (RCHandlerException(emsg));
+      }
+      LogFile::debug("Booted %d-th basf2", i - 3);
+      try_wait();
     }
-    LogFile::debug("Booted %d-th basf2", i - 3);
-    try_wait();
   }
   m_flow = std::vector<FlowMonitor>();
   for (size_t i = 0; i < m_con.size(); i++) {
@@ -226,7 +224,7 @@ void StoragerCallback::stop() throw(RCHandlerException)
 
 void StoragerCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  abort();
+  //abort();
   load(obj);
 }
 

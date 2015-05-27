@@ -8,14 +8,12 @@ def iqr(array_like):
     return np.percentile(array_like, 75) - np.percentile(array_like, 25)
 
 
-normal_iqr_to_std_factor = 2.0 * math.sqrt(2.0) * math.erf(0.5)
-
-
 def trimmed_std(array_like):
     """A trimmed estimate for the standard deviation of a normal distribution
     contaminated by outliers using the interquanitle range times the appropriate factor.
     """
 
+    normal_iqr_to_std_factor = 2.0 * math.sqrt(2.0) * math.erf(0.5)
     return normal_iqr_to_std_factor * iqr(array_like)
 
 
@@ -50,14 +48,17 @@ def truncated_mean(array_like, r=0.23):
 
 
 def cubic_root(x):
+    """Returns the cubic root of a number"""
     return pow(float(x), 1.0 / 3.0)
 
 
 def rice_n_bin(n_data):
+    """Returns the number of bins for a number of data instances according to the rice rule."""
     return np.ceil(2.0 * cubic_root(n_data))
 
 
 def rice_exceptional_values(xs):
+    """Returns a array of exceptionally frequent values according to the rice rule."""
     unique_xs, indices = np.unique(xs, return_inverse=True)
     # Note: The indices are such that unique_xs[indices] == xs
 
@@ -80,16 +81,34 @@ def rice_exceptional_values(xs):
 
 
 def is_binary_series(xs):
+    """Deterimes of the given series only consists of true and false values"""
     is_boolean = all(isinstance(x, bool) for x in xs)
     is_one_or_zero = all(x == 0 or x == 1 or not np.isfinite(x)
                          for x in xs)
 
     return is_boolean or is_one_or_zero
 
+#: Constant defining how many unique values are allowed for a discrete quantity.
 default_max_n_unique_for_discrete = 20
 
 
-def is_discrete_series(xs, max_n_unique=default_max_n_unique_for_discrete):
+def is_discrete_series(xs, max_n_unique=None):
+    """Determine of a data series is only made of a bunch of discrete values
+
+    Currently only test if the number of unique values is lower than
+    the default_max_n_unique_for_discrete.
+
+    Parameters
+    ----------
+    xs : np.array (1d)
+        Data series
+    max_n_unique : int
+        Number of allowed distinct values for the series to be discrete.
+    """
+
+    if max_n_unique is None:
+        max_n_unique = statistics.default_max_n_unique_for_discrete
+
     # FIXME: improve test for discrete variable
     unique_xs = np.unique(xs)
     if len(unique_xs) < max_n_unique:

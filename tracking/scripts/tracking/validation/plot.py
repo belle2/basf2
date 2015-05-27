@@ -17,12 +17,27 @@ import logging
 
 
 def get_logger():
+    """Get for the logging.Logger instance of this module
+
+    Returns
+    -------
+    logging.Logger
+        Logger instance of this module
+    """
     return logging.getLogger(__name__)
 
-
-default_max_n_unique_for_discrete = 20
-
+#: A map from quanity name symbols to their usual units in Belle II standard units.
 units_by_quantity_name = {
+    'x': 'cm',
+    'y': 'cm',
+    'z': 'cm',
+    'E': 'GeV',
+    'px': 'GeV',
+    'p_{x}': 'GeV',
+    'py': 'GeV',
+    'p_{y}': 'GeV',
+    'pz': 'GeV',
+    'p_{z}': 'GeV',
     'pt': 'GeV',
     'p_{t}': 'GeV',
     'd0': 'cm',
@@ -38,11 +53,44 @@ units_by_quantity_name = {
 
 
 def get_unit(quantity_name):
+    """Infers the unit of a quantity from its name.
+
+    Assumes the standard Belle II unit system.
+
+    Currently looks up the quantity string from units_by_quantity_name.
+
+    Parameters
+    ----------
+    quantity_name : str
+        Name of a quantity (E.g. pt, x, ...)
+
+    Returns
+    -------
+    str
+    """
+
     unit = units_by_quantity_name.get(quantity_name, None)
     return unit
 
 
 def compose_axis_label(quantity_name, unit=None):
+    """Formats a quantity name and a unit to a label for a plot axes.
+
+    If the unit is not given to is tried to infer it
+    from the quantity name by the get_unit function.
+
+    Parameters
+    ----------
+    quantity_name : str
+        Name of the quantity to be displayed at the axes
+    unit : str, optional
+        The unit of the quantity. Defaults to get_unit(quantity_name)
+
+    Returns
+    -------
+    str
+    """
+
     if unit is None:
         unit = get_unit(quantity_name)
 
@@ -54,23 +102,65 @@ def compose_axis_label(quantity_name, unit=None):
     return axis_label
 
 
+#: A class for storing a named additional statistic to a histogram
 StatsEntry = ROOT.TParameter(float)
 
 
 class ValidationPlot(object):
 
+    """Class for generating a validation plot for the Belle II validation page.
+
+    Typically it generates plots from values stored in numpy arrays and feeds them into
+    plot ROOT classes for storing them.
+
+    It implements an automatic binning procedure based on the rice rule and
+    robust z score outlier detection.
+
+    It also keeps track of additional statistics typically neglected by ROOT such as a count
+    for the non finit values such as NaN, +Inf, -Inf.
+
+    The special attributes for the Belle II validation page like
+    * title
+    * contract
+    * description
+    * check
+    are exposed as properties of this class.
+    """
+
     def __init__(self, name):
+        """Constructor of the ValidationPlot
+
+        Parameters
+        ----------
+        name : str
+            A unique name to be used as the name of the ROOT object to be generated
+        """
+
+        #: A unique name to be used as the name of the ROOT object to be generated
         self.name = root_save_name(name)
 
+        #: Description of the plot purpose for display on the validation page
         self._description = ''
+
+        #: Detailed check instructions for display on the validation page
         self._check = ''
+
+        #: Contact email address for display on the validation page
         self._contact = ''
 
+        #: X axes label of the validation plot
         self._xlabel = ''
+
+        #: Y axes label of the validation plot
         self._ylabel = ''
+
+        #: Title of the validation plot
         self._title = ''
 
+        #: The main plot object, may contain one or more (in case of stacked pltos) histograms
         self.plot = None
+
+        #: A list of the histograms that make up the plot
         self.histograms = []
 
     def hist(self,
@@ -84,6 +174,7 @@ class ValidationPlot(object):
              include_exceptionals=True,
              allow_discrete=False,
              cumulation_direction=None):
+        """Fill the plot with a one dimensional histogram."""
 
         th1_factory = ROOT.TH1D
 
@@ -115,6 +206,7 @@ class ValidationPlot(object):
                 include_exceptionals=True,
                 allow_discrete=False,
                 cumulation_direction=None):
+        """Fill the plot with a one dimensional profile of one variable over another."""
 
         th1_factory = ROOT.TProfile
 
@@ -138,57 +230,77 @@ class ValidationPlot(object):
     def scatter(self,
                 xs,
                 ys,
-                weights=None,
-                bins=(None, None),
                 lower_bound=(None, None),
                 upper_bound=(None, None),
                 outlier_z_score=(None, None),
                 include_exceptionals=(True, True),
-                allow_discrete=(False, False)):
+                max_n_data=100000):
+        """Fill the plot with a (unbinned) two dimensional scatter plot"""
+
+        x_lower_bound, y_lower_bound = self.unpack_2d_param(lower_bound)
+        x_upper_bound, y_upper_bound = self.unpack_2d_param(upper_bound)
+        x_outlier_z_score, y_outlier_z_score = self.unpack_2d_param(outlier_z_score)
+        x_include_exceptionals, y_include_exceptionals = self.unpack_2d_param(include_exceptionals)
+
+        x_lower_bound, x_upper_bound = self.determine_range(
+            xs,
+            lower_bound=x_lower_bound,
+            upper_bound=x_upper_bound,
+            outlier_z_score=x_outlier_z_score,
+            include_exceptionals=x_include_exceptionals
+        )
+
+        y_lower_bound, y_upper_bound = self.determine_range(
+            ys,
+            lower_bound=y_lower_bound,
+            upper_bound=y_upper_bound,
+            outlier_z_score=y_outlier_z_score,
+            include_exceptionals=y_include_exceptionals
+        )
+
+        plot = ROOT.TGraph()
+
+        plot.SetName(self.name)
+        plot.SetMarkerStyle(2)
+        # Trying to make the plot lines invisible
+        color_index = 0  # white
+        plot.SetLineColor(color_index)
+        plot.SetLineWidth(0)
+
+        # Transport the lower and upper bound as ranges of the axis
+        plot.GetXaxis().SetLimits(x_lower_bound, x_upper_bound)
+        plot.GetYaxis().SetLimits(y_lower_bound, y_upper_bound)
+
+        self.fill_into(plot, xs, ys)
+
+        self.plot = plot
+
+        # TGraph are mostly compatible with the histogram classes for our purposes.
+        self.histograms = [plot, ]
+
+        # Add description, check, contact and titles to the histograms
+        self.attach_attributes()
+
+    def hist2d(self,
+               xs,
+               ys,
+               weights=None,
+               bins=(None, None),
+               lower_bound=(None, None),
+               upper_bound=(None, None),
+               outlier_z_score=(None, None),
+               include_exceptionals=(True, True),
+               allow_discrete=(False, False)):
+        """Fill the plot with a two dimensional histogram"""
 
         name = self.name
 
-        try:
-            if len(bins) == 2:
-                (x_bins, y_bins) = bins
-        except TypeError:
-            x_bins = bins
-            y_bins = bins
-
-        try:
-            if len(lower_bound) == 2:
-                (x_lower_bound, y_lower_bound) = lower_bound
-        except TypeError:
-            x_lower_bound = lower_bound
-            y_lower_bound = lower_bound
-
-        try:
-            if len(upper_bound) == 2:
-                (x_upper_bound, y_upper_bound) = upper_bound
-        except TypeError:
-            x_upper_bound = upper_bound
-            y_upper_bound = upper_bound
-
-        try:
-            if len(outlier_z_score) == 2:
-                (x_outlier_z_score, y_outlier_z_score) = outlier_z_score
-        except TypeError:
-            x_outlier_z_score = outlier_z_score
-            y_outlier_z_score = outlier_z_score
-
-        try:
-            if len(include_exceptionals) == 2:
-                (x_include_exceptionals, y_include_exceptionals) = include_exceptionals
-        except TypeError:
-            x_include_exceptionals = include_exceptionals
-            y_include_exceptionals = include_exceptionals
-
-        try:
-            if len(allow_discrete) == 2:
-                (x_allow_discrete, y_allow_discrete) = allow_discrete
-        except TypeError:
-            x_allow_discrete = allow_discrete
-            y_allow_discrete = allow_discrete
+        x_bins, y_bins = unpack_2d_param(bins)
+        x_lower_bound, y_lower_bound = unpack_2d_param(lower_bound)
+        x_upper_bound, y_upper_bound = unpack_2d_param(upper_bound)
+        x_outlier_z_score, y_outlier_z_score = unpack_2d_param(outlier_z_score)
+        x_include_exceptionals, y_include_exceptionals = unpack_2d_param(include_exceptionals)
+        x_allow_discrete, y_allow_discrete = unpack_2d_param(allow_discrete)
 
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
                                                              bins=x_bins,
@@ -255,18 +367,23 @@ class ValidationPlot(object):
         return self
 
     def fit_gaus(self):
+        """Fit a gaus belle curve to a one dimensional histogram"""
         self.fit('gaus', 'LM')
 
     def fit_line(self):
+        """Fit a general line to a one dimensional histogram"""
         self.fit('x++1', 'M')
 
     def fit_const(self):
+        """Fit a constant function to a one dimensional histogram"""
         self.fit('[0]', 'M')
 
     def fit_diag(self):
+        """Fit a diagonal line through the origin to a one dimensional histogram"""
         self.fit('[0]*x', 'M')
 
     def fit(self, formula, options):
+        """Fit a user defined function to a one dimensional histogram"""
         plot = self.plot
         if plot is None:
             raise RuntimeError('Validation plot must be filled before it can be fitted.')
@@ -297,12 +414,21 @@ class ValidationPlot(object):
         self.set_fit_tf1(histogram, fit_tf1)
 
     def show(self):
+        """Show the plot."""
         if self.plot:
             self.plot.Draw()
         else:
             raise ValueError("Can not show a validation plot that has not been filled.")
 
     def write(self, tdirectory=None):
+        """Write the plot to file
+
+        Parameters
+        ----------
+        tdirectory : ROOT.TDirectory, optional
+            ROOT directory to which the plot should be written.
+            If omitted write to the current directory
+        """
         if not self.plot:
             raise ValueError("Can not write a validation plot that has not been filled.")
         with root_cd(tdirectory):
@@ -315,10 +441,12 @@ class ValidationPlot(object):
 
     @property
     def title(self):
+        """Getter for the plot title"""
         return self._title
 
     @title.setter
     def title(self, title):
+        """Setter for the plot title"""
         self._title = title
         if self.plot:
             self.plot.SetTitle(title)
@@ -327,30 +455,36 @@ class ValidationPlot(object):
 
     @property
     def xlabel(self):
+        """Getter for the axis label at the x axis"""
         return self._xlabel
 
     @xlabel.setter
     def xlabel(self, xlabel):
+        """Setter for the axis label at the x axis"""
         self._xlabel = xlabel
         for histogram in self.histograms:
-            histogram.SetXTitle(xlabel)
+            histogram.GetXaxis().SetTitle(xlabel)
 
     @property
     def ylabel(self):
+        """Getter for the axis label at the y axis"""
         return self._ylabel
 
     @ylabel.setter
     def ylabel(self, ylabel):
+        """Setter for the axis label at the y axis"""
         self._ylabel = ylabel
         for histogram in self.histograms:
-            histogram.SetYTitle(ylabel)
+            histogram.GetYaxis().SetTitle(ylabel)
 
     @property
     def contact(self):
+        """Getter for the contact email address to be displayed on the validation page"""
         return self._contact
 
     @contact.setter
     def contact(self, contact):
+        """Setter for the contact email address to be displayed on the validation page"""
         self._contact = contact
         for histogram in self.histograms:
             found_obj = histogram.FindObject('Contact')
@@ -362,10 +496,12 @@ class ValidationPlot(object):
 
     @property
     def description(self):
+        """Getter for the description to be displayed on the validation page"""
         return self._description
 
     @description.setter
     def description(self, description):
+        """Setter for the description to be displayed on the validation page"""
         self._description = description
         for histogram in self.histograms:
             found_obj = histogram.FindObject('Description')
@@ -377,10 +513,12 @@ class ValidationPlot(object):
 
     @property
     def check(self):
+        """Getter for the check to be displayed on the validation page"""
         return self._check
 
     @check.setter
     def check(self, check):
+        """Setter for the check to be displayed on the validation page"""
         self._check = check
         for histogram in self.histograms:
             found_obj = histogram.FindObject('Check')
@@ -394,25 +532,81 @@ class ValidationPlot(object):
     # ###################### #
 
     @staticmethod
+    def unpack_2d_param(param):
+        """Unpacks a function parameter for the two dimensional plots.
+
+        If it is a pair the first parameter shall apply to the x coordinate
+        the second to the y coordinate. In this case the pair is returned as two values
+
+        If something else is given the it is assumed that this parameter should equally apply
+        to both coordinates. In this case the same values is return twice as a pair.
+
+        Parameters
+        ----------
+        param : pair or single value
+            Function parameter for a two dimensional plot
+
+        Returns
+        -------
+        pair
+            A pair of values being the parameter for the x coordinate and
+            the y coordinate respectively
+        """
+        try:
+            if len(param) == 2:
+                x_param, y_param = param
+        except TypeError:
+            x_param = param
+            y_param = param
+        return x_param, y_param
+
+    @staticmethod
     def is_binary(xs):
+        """Determine if the data consists of boolean values"""
         return statistics.is_binary_series(xs)
 
     @staticmethod
-    def is_discrete(xs, max_n_unique=default_max_n_unique_for_discrete):
+    def is_discrete(xs, max_n_unique=None):
+        """Determine if the data consists of discrete values"""
         return statistics.is_discrete_series(xs, max_n_unique=max_n_unique)
 
     @staticmethod
     def get_exceptional_values(xs):
+        """Find exceptionally frequent values
+
+        Parameters
+        ----------
+        xs : np.array (1d)
+            Data series
+
+        Returns
+        -------
+        np.array (1d)
+            A list of the found exceptional values.
+        """
         return statistics.rice_exceptional_values(xs)
 
     @staticmethod
     def get_robust_mean_and_std(xs):
+        """Does an estimation of mean and standard deviation robust against outliers.
+
+        Parameters
+        ----------
+        xs : np.array (1d)
+            Data series
+
+        Returns
+        -------
+        float, float
+           Pair of mean and standard deviation
+        """
         x_mean = statistics.truncated_mean(xs)
         x_std = statistics.trimmed_std(xs)
         return x_mean, x_std
 
     @staticmethod
     def format_bin_label(value):
+        """Formats a value to be placed at a tick on an axis."""
         if np.isfinite(value) and value == np.round(value):
             return str(int(value))
         else:
@@ -436,7 +630,7 @@ class ValidationPlot(object):
                   include_exceptionals=True,
                   allow_discrete=False,
                   cumulation_direction=None):
-
+        """Combined factory method for creating a one dimensional histogram or a profile plot."""
         name = self.name
 
         # Coerce values to a numpy array. Do not copy if already a numpy array.
@@ -520,6 +714,8 @@ class ValidationPlot(object):
                           weights=None,
                           groupbys=None,
                           groupby_label="group"):
+        """Fill data into similar histograms in groups indicated by a groupby array"""
+
         histograms = []
         unique_groupbys = np.unique(groupbys)
         name = histogram_template.GetName()
@@ -536,16 +732,244 @@ class ValidationPlot(object):
 
             histogram_for_value.SetLineColor(i_root_color)
             if groupby_label:
-                self.add_stats_entry(groupby_label, value, histogram_for_value)
+                self.add_stats_entry(histogram_for_value, groupby_label, value)
             self.fill_into(histogram_for_value, xs, weights=weights, filter=indices_for_value)
             histograms.append(histogram_for_value)
 
         return histograms
 
+    def fill_into(self, plot, xs, ys=None, weights=None, filter=None):
+        """Fill the data into the plot object"""
+        if isinstance(plot, ROOT.TGraph):
+            if ys is None:
+                raise ValueError("ys are required for filling a graph")
+            self.fill_into_tgraph(plot, xs, ys, filter=filter)
+        else:
+            self.fill_into_th1(plot, xs, ys, weights=weights, filter=filter)
+
+    def fill_into_tgraph(self, graph, xs, ys, filter=None):
+        """Fill the data into a TGraph"""
+
+        # Save some ifs by introducing a dummy slicing as a non filter
+        if filter is None:
+            filter = slice(None)
+
+        xs = xs[filter]
+        ys = ys[filter]
+
+        max_n_data = 100000
+        x_n_data = len(xs)
+        y_n_data = len(ys)
+
+        if max_n_data:
+            if x_n_data > max_n_data or y_n_data > max_n_data:
+                get_logger().warning("Number of points in scatter graph %s exceed limit %s" %
+                                     (self.name, max_n_data))
+
+                get_logger().warning("Cropping  %s" % max_n_data)
+
+                xs = xs[0:max_n_data]
+                ys = ys[0:max_n_data]
+
+        x_axis = graph.GetXaxis()
+        y_axis = graph.GetYaxis()
+
+        x_lower_bound = x_axis.GetXmin()
+        x_upper_bound = x_axis.GetXmax()
+
+        y_lower_bound = y_axis.GetXmin()
+        y_upper_bound = y_axis.GetXmax()
+
+        print x_lower_bound, x_upper_bound
+        print y_lower_bound, y_upper_bound
+
+        x_underflow_indices = xs < x_lower_bound
+        x_overflow_indices = xs > x_upper_bound
+
+        y_underflow_indices = ys < x_lower_bound
+        y_overflow_indices = ys > x_upper_bound
+
+        plot_indices = ~(np.isnan(xs) |
+                         x_underflow_indices |
+                         x_overflow_indices |
+                         np.isnan(ys) |
+                         y_underflow_indices |
+                         y_overflow_indices)
+
+        n_plot_data = np.sum(plot_indices)
+        plot_xs = xs[plot_indices]
+        plot_ys = ys[plot_indices]
+
+        graph.Set(n_plot_data)
+        for i, (x, y) in enumerate(zip(plot_xs, plot_ys)):
+            graph.SetPoint(i, x, y)
+
+        self.add_stats_entry(graph, 'Entries', np.sum(np.isfinite(xs)))
+
+        self.add_nan_inf_stats(graph, 'x', xs)
+        self.add_nan_inf_stats(graph, 'y', ys)
+
+        x_n_underflow = np.sum(x_underflow_indices)
+        if x_n_underflow:
+            self.add_stats_entry(graph, 'x underf.', x_n_underflow)
+
+        x_n_overflow = np.sum(x_overflow_indices)
+        if x_n_overflow:
+            self.add_stats_entry(graph, 'x overf.', x_n_overflow)
+
+        y_n_underflow = np.sum(y_underflow_indices)
+        if y_n_underflow:
+            self.add_stats_entry(graph, 'y underf.', y_n_underflow)
+
+        y_n_overflow = np.sum(y_overflow_indices)
+        if y_n_overflow:
+            self.add_stats_entry(graph, 'y overf.', y_n_overflow)
+
+        self.add_stats_entry(graph, 'x mean', graph.GetMean(1))
+        self.add_stats_entry(graph, 'x std', graph.GetRMS(1))
+
+        self.add_stats_entry(graph, 'y mean', graph.GetMean(2))
+        self.add_stats_entry(graph, 'y std', graph.GetRMS(2))
+
+        self.add_stats_entry(graph, 'cov', graph.GetCovariance())
+        self.add_stats_entry(graph, 'corr', graph.GetCorrelationFactor())
+
+    def fill_into_th1(self, histogram, xs, ys=None, weights=None, filter=None):
+        """Fill the histogram blocking non finite values
+
+        Parameters
+        ----------
+        histogram : ROOT.TH1
+            The histogram to be filled
+        xs : numpy.ndarray (1d)
+            Data for the first axes
+        ys : numpy.ndarray (1d), optional
+            Data for the second axes
+        weights : numpy.ndarray (1d), optional
+            Weight of the individual points. Defaults to one for each
+        filter : numpy.ndarray, optional
+            Boolean index array indicating which entries shall be taken.
+        """
+        # Save some ifs by introducing a dummy slicing as a non filter
+        if filter is None:
+            filter = slice(None)
+
+        xs = xs[filter]
+        # Count the nan and inf values in x
+        self.add_nan_inf_stats(histogram, 'x', xs)
+        finite_filter = np.isfinite(xs)
+
+        if ys is not None:
+            ys = ys[filter]
+            # Count the nan and inf values in y
+            self.add_nan_inf_stats(histogram, 'y', ys)
+            finite_filter &= np.isfinite(ys)
+
+        if weights is None:
+            weights = itertools.repeat(1.0)
+        else:
+            weights = weights[filter]
+            self.add_nan_inf_stats(histogram, 'w', weights)
+            finite_filter &= np.isfinite(weights)
+
+        # Now fill the actual histogram
+        Fill = histogram.Fill
+        if ys is None:
+            for (x, weight, passes) in zip(xs, weights, finite_filter):
+                if passes:
+                    Fill(float(x), float(weight))
+        else:
+            for (x, y, weight, passes) in zip(xs, ys, weights, finite_filter):
+                if passes:
+                    Fill(float(x), float(y), float(weight))
+
+        self.set_additional_stats_tf1(histogram)
+
+    @classmethod
+    def add_nan_inf_stats(cls, histogram, name, xs):
+        """ Extracts the counts of non finite floats from a series
+        and adds them as additional statistics to the histogram.
+
+        Parameters
+        ----------
+        histogram : derived from ROOT.TH1 or ROOT.TGraph
+            Something having a GetListOfFunctions method that
+        name : str
+            A label for the data series to be prefixed to the entries.
+        xs : numpy.ndarray (1d)
+            Data from which the non finit floats should be counted.
+        """
+        n_nans = np.isnan(xs).sum()
+        if n_nans > 0:
+            cls.add_stats_entry(histogram, name + ' nan', n_nans)
+
+        n_positive_inf = np.sum(xs == np.inf)
+        if n_positive_inf > 0:
+            cls.add_stats_entry(histogram, name + ' +inf', n_positive_inf)
+
+        n_negative_inf = np.sum(xs == -np.inf)
+        if n_negative_inf > 0:
+            cls.add_stats_entry(histogram, name + ' -inf', n_negative_inf)
+
+    @classmethod
+    def add_stats_entry(cls, histogram, label, value):
+        """Add a new additional statistics to the histogram.
+
+        Parameters
+        ----------
+        histogram : derived from ROOT.TH1 or ROOT.TGraph
+            Something having a GetListOfFunctions method that holds the additional statistics
+        label : str
+            Label of the statistic
+        value : float
+            Value of the statistic
+        """
+        stats_entry = StatsEntry(str(label), float(value))
+        histogram.GetListOfFunctions().Add(stats_entry)
+        cls.set_additional_stats_tf1(histogram)
+
+    @classmethod
+    def get_additional_stats(cls, histogram):
+        """Get the additional statistics from the histogram and return them a dict.
+
+        Parameters
+        ----------
+        histogram : derived from ROOT.TH1 or ROOT.TGraph
+            Something having a GetListOfFunctions method that holds the additional statistics
+
+        Returns
+        -------
+        collection.OrderedDict
+            A map of labels to values for the additional statistics
+        """
+        additional_stats = collections.OrderedDict()
+        for tobject in histogram.GetListOfFunctions():
+            if isinstance(tobject, StatsEntry):
+                stats_entry = tobject
+                label = stats_entry.GetName()
+                value = stats_entry.GetVal()
+                additional_stats[label] = value
+        return additional_stats
+
     @staticmethod
     def cumulate(histogram, cumulation_direction=None):
-        """Cumulates the histogram inplace"""
-        if cumulation_direction is None:
+        """Cumulates the histogram inplace.
+
+        Parameters
+        ----------
+        histogram : ROOT.TH1 or ROOT.TProfile
+            Filled histogram to be cumulated
+        cumulation_direction : int, optional
+            Direction is indicated by the sign.
+            Positive means from left to right, negative means from right to left.
+            If now cumulation direction is given return the histogram as is.
+
+        Returns
+        -------
+        ROOT.TH1
+            Cumulated histogram potentially altered inplace.
+        """
+        if not cumulation_direction:
             return histogram
 
         cumulate_backward = cumulation_direction < 0
@@ -616,76 +1040,6 @@ class ValidationPlot(object):
 
         return histogram
 
-    def fill_into(self, histogram, xs, ys=None, weights=None, filter=None):
-        # Save some ifs by introducing a dummy slicing as a non filter
-        if filter is None:
-            filter = slice(None)
-
-        xs = xs[filter]
-        # Count the nan and inf values in x
-        self.add_nan_inf_stats(histogram, 'x', xs)
-        finite_filter = np.isfinite(xs)
-
-        if ys is not None:
-            ys = ys[filter]
-            # Count the nan and inf values in y
-            self.add_nan_inf_stats(histogram, 'y', ys)
-            finite_filter &= np.isfinite(ys)
-
-        if weights is None:
-            weights = itertools.repeat(1.0)
-        else:
-            weights = weights[filter]
-            self.add_nan_inf_stats(histogram, 'w', weights)
-            finite_filter &= np.isfinite(weights)
-
-        # Now fill the actual histogram
-        Fill = histogram.Fill
-        if ys is None:
-            for (x, weight, passes) in zip(xs, weights, finite_filter):
-                if passes:
-                    Fill(float(x), float(weight))
-        else:
-            for (x, y, weight, passes) in zip(xs, ys, weights, finite_filter):
-                if passes:
-                    Fill(float(x), float(y), float(weight))
-
-        self.set_additional_stats_tf1(histogram)
-
-    def add_nan_inf_stats(self, histogram, name, values):
-        n_nans = np.isnan(values).sum()
-        if n_nans > 0:
-            self.add_stats_entry(name + ' nan', n_nans, histogram)
-
-        n_positive_inf = np.sum(values == np.inf)
-        if n_positive_inf > 0:
-            self.add_stats_entry(name + ' +inf', n_positive_inf, histogram)
-
-        n_negative_inf = np.sum(values == -np.inf)
-        if n_negative_inf > 0:
-            self.add_stats_entry(name + ' -inf', n_negative_inf, histogram)
-
-    def add_stats_entry(self, label, value, histogram=None):
-        if histogram is None:
-            if self.histograms:
-                histogram = self.histograms[-1]
-            else:
-                return
-        stats_entry = StatsEntry(str(label), float(value))
-        histogram.GetListOfFunctions().Add(stats_entry)
-        self.set_additional_stats_tf1(histogram)
-
-    @staticmethod
-    def get_additional_stats(histogram):
-        additional_stats = {}
-        for tobject in histogram.GetListOfFunctions():
-            if isinstance(tobject, StatsEntry):
-                stats_entry = tobject
-                label = stats_entry.GetName()
-                value = stats_entry.GetVal()
-                additional_stats[label] = value
-        return additional_stats
-
     def determine_bin_edges(self,
                             xs,
                             bins=None,
@@ -694,7 +1048,39 @@ class ValidationPlot(object):
                             outlier_z_score=None,
                             include_exceptionals=True,
                             allow_discrete=False):
+        """Deducing bin edges from a data series.
 
+        Parameters
+        ----------
+        xs : numpy.ndarray (1d)
+            Data point for which a binning should be found.
+        bins : list(float) or int or None, optional
+            Preset bin edges or preset number of desired bins.
+            The default, None, means the bound should be extracted from data.
+            The rice rule is used the determine the number of bins.
+            If a list of floats is given return them immediatly.
+        lower_bound : float or None, optional
+            Preset lower bound of the binning range.
+            The default, None, means the bound should be extracted from data.
+        upper_bound : float or None, optional
+            Preset upper bound of the binning range.
+            The default, None, means the bound should be extracted from data.
+        outlier_z_score : float or None, optional
+            Threshold z-score of outlier detection.
+            The default, None, means no outlier detection.
+        include_exceptionals : bool, optional
+            If the outlier detection is active this switch indicates,
+            if values detected as exceptionally frequent shall be included
+            nevertheless into the binning range. Default is True,
+            which means exceptionally frequent values as included
+            even if they are detected as outliers.
+
+        Returns
+        -------
+        np.array (1d), list(str)
+            Pair of bin edges and labels deduced from the series.
+            Second element is None if the series is not detected as discrete.
+        """
         debug = get_logger().debug
         debug('Determine binning for plot named %s', self.name)
 
@@ -809,7 +1195,7 @@ class ValidationPlot(object):
                             outlier_z_score=None,
                             include_exceptionals=True):
         """Calculates the number of bins, the lower bound and the upper bound from a given data series
-        filling in the values that are not given.
+        estimating the values that are not given.
 
         If the outlier_z_score is given the method tries to exclude outliers that exceed a certain z-score.
         The z-score is calculated (x - x_mean) / x_std. The be robust against outliers the necessary
@@ -833,15 +1219,20 @@ class ValidationPlot(object):
             Preset number of desired bins. The default, None, means the bound should be extracted from data.
             The rice rule is used the determine the number of bins.
         lower_bound : float or None, optional
-            Preset lower bound of the binning range. The default, None, means the bound should be extracted from data.
+            Preset lower bound of the binning range.
+            The default, None, means the bound should be extracted from data.
         upper_bound : float or None, optional
-            Preset upper bound of the binning range. The default, None, means the bound should be extracted from data.
+            Preset upper bound of the binning range.
+            The default, None, means the bound should be extracted from data.
         outlier_z_score : float or None, optional
-            Threshold z-score of outlier detection. The default, None, means no outlier detection.
+            Threshold z-score of outlier detection.
+            The default, None, means no outlier detection.
         include_exceptionals : bool, optional
-            If the outlier detection is active this switch indicates, if  values detected as exceptional shall be included
-            nevertheless into the binning range. Default is True, which means excpetional values as included even if they are
-            detected as outliers.
+            If the outlier detection is active this switch indicates,
+            if values detected as exceptionally frequent shall be included
+            nevertheless into the binning range. Default is True,
+            which means exceptionally frequent values as included
+            even if they are detected as outliers.
 
         Returns
         -------
@@ -849,9 +1240,73 @@ class ValidationPlot(object):
             A triple of found number of bins, lower bound and upper bound of the binning range.
         """
 
+        finite_xs_indices = np.isfinite(xs)
+        if np.any(finite_xs_indices):
+            finite_xs = xs[finite_xs_indices]
+        else:
+            finite_xs = xs
+
+        lower_bound, upper_bound = self.determine_range(finite_xs,
+                                                        lower_bound=lower_bound,
+                                                        upper_bound=upper_bound,
+                                                        outlier_z_score=outlier_z_score,
+                                                        include_exceptionals=include_exceptionals)
+
+        if n_bins is None:
+            # Assume number of bins according to the rice rule.
+            # The number of data points should not include outliers.
+            n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
+            rice_n_bins = int(statistics.rice_n_bin(n_data))
+            n_bins = rice_n_bins
+
+        else:
+            n_bins = int(n_bins)
+            # Do not allow negative bin numbers
+            if not n_bins > 0:
+                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
+                raise ValueError(message)
+
+        return n_bins, lower_bound, upper_bound
+
+    def determine_range(self,
+                        xs,
+                        lower_bound=None,
+                        upper_bound=None,
+                        outlier_z_score=None,
+                        include_exceptionals=True):
+        """
+        Parameters
+        ----------
+        xs : numpy.ndarray (1d)
+            Data point for which a binning should be found.
+        lower_bound : float or None, optional
+            Preset lower bound of the binning range.
+            The default, None, means the bound should be extracted from data.
+        upper_bound : float or None, optional
+            Preset upper bound of the binning range.
+            The default, None, means the bound should be extracted from data.
+        outlier_z_score : float or None, optional
+            Threshold z-score of outlier detection.
+            The default, None, means no outlier detection.
+        include_exceptionals : bool, optional
+            If the outlier detection is active this switch indicates,
+            if values detected as exceptionally frequent shall be included
+            nevertheless into the binning range. Default is True,
+            which means exceptionally frequent values as included
+            even if they are detected as outliers.
+
+        Returns
+        -------
+        lower_bound, upper_bound : float, float
+            A pair of found lower bound and upper bound of series.
+        """
         debug = get_logger().debug
 
-        finite_xs = xs[np.isfinite(xs)]
+        finite_xs_indices = np.isfinite(xs)
+        if np.any(finite_xs_indices):
+            finite_xs = xs[finite_xs_indices]
+        else:
+            finite_xs = xs
 
         # Prepare for the estimation of outliers
         if outlier_z_score is not None and (lower_bound is None
@@ -883,7 +1338,7 @@ class ValidationPlot(object):
                 if np.any(indices_above_lower_outlier_bound):
                     lower_bound = np.min(finite_xs[indices_above_lower_outlier_bound])
 
-                    # However we want to include at least the exceptional values in the range if there is any.
+                    # However we want to include at least the exceptional values in the range if there are any.
                     lower_bound = np.nanmin([lower_bound, lower_exceptional_x])
 
                 debug('Lower bound after outlier detection')
@@ -904,73 +1359,88 @@ class ValidationPlot(object):
                 if np.any(indices_below_upper_outlier_bound):
                     upper_bound = np.max(finite_xs[indices_below_upper_outlier_bound])
 
-                    # However we want to include at least the exceptional values in the range if there is any.
+                    # However we want to include at least the exceptional values in the range if there are any.
                     upper_bound = np.nanmax([upper_bound, upper_exceptional_x])
 
                 debug('Upper bound after outlier detection')
                 debug('Upper bound %s', upper_bound)
                 debug('Upper outlier bound %s', upper_outlier_bound)
 
-        if n_bins is None:
-            # Assume number of bins according to the rice rule.
-            # The number of data points should not include outliers.
-            n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
-            rice_n_bins = int(statistics.rice_n_bin(n_data))
-            n_bins = rice_n_bins
+        return lower_bound, upper_bound
 
-        else:
-            n_bins = int(n_bins)
-            # Do not allow negative bin numbers
-            if not n_bins > 0:
-                message = 'Cannot accept n_bins=%s as number of bins, because it is not a number greater than 0.' % bins
-                raise ValueError(message)
+    @classmethod
+    def set_additional_stats_tf1(cls, histogram):
+        """Combining fit TF1 with the additional statistics and attach them to the histogram.
 
-        return n_bins, lower_bound, upper_bound
+        Parameters
+        ----------
+        histogram : ROOT.TH1 or ROOT.TGraph or ROOT.TMultiGraph
+            Something having a GetListOfFunctions method that should hold
+            the combined fit and additional statistics function.
+        """
+        additional_stats_tf1 = cls.create_additional_stats_tf1(histogram)
+        cls.set_tf1(histogram, additional_stats_tf1)
 
-    def set_additional_stats_tf1(self, histogram):
-        additional_stats_tf1 = self.create_additional_stats_tf1(histogram)
-        self.set_tf1(histogram, additional_stats_tf1)
+    @classmethod
+    def set_fit_tf1(cls, histogram, fit_tf1):
+        """Combining fit TF1 with the additional statistics and attach them to the histogram.
 
-    def set_fit_tf1(self, histogram, fit_tf1):
-        additional_stats_tf1 = self.create_additional_stats_tf1(histogram)
-        combined_tf1 = self.combine_fit_and_additional_stats(fit_tf1, additional_stats_tf1)
-        self.set_tf1(histogram, combined_tf1)
+        Parameters
+        ----------
+        histogram : ROOT.TH1 or ROOT.TGraph or ROOT.TMultiGraph
+            Something having a GetListOfFunctions method that should hold
+            the combined fit and additional statistics function.
+        """
+        additional_stats_tf1 = cls.create_additional_stats_tf1(histogram)
+        combined_tf1 = cls.combine_fit_and_additional_stats(fit_tf1, additional_stats_tf1)
+        cls.set_tf1(histogram, combined_tf1)
 
-    def set_tf1(self, histogram, tf1):
+    @classmethod
+    def set_tf1(cls, histogram, tf1):
+        """Set the attached TF1 of the histogram.
+
+        Parameters
+        ----------
+        histogram : ROOT.TH1 or ROOT.TGraph or ROOT.TMultiGraph
+            Something having a GetListOfFunctions method that should hold
+            the combined fit and additional statistics function.
+        """
         # Delete any functions formally added
-        self.delete_tf1(histogram)
+        cls.delete_tf1(histogram)
         if tf1 is not None:
             tf1.SetName("FitAndStats")
             histogram.GetListOfFunctions().Add(tf1)
 
-    def delete_tf1(self, histogram):
+    @classmethod
+    def delete_tf1(cls, histogram):
+        """Delete the attached TF1 from the histogram
+
+        Parameters
+        ----------
+        histogram : ROOT.TH1 or ROOT.TGraph
+            Something having a GetListOfFunctions method that holds the fit function
+        """
         tf1 = histogram.FindObject("FitAndStats")
         if tf1:
             function_list = histogram.GetListOfFunctions()
             function_list.Remove(tf1)
 
-    @staticmethod
-    def copy_tf1_parameters(tf1_source, tf1_target, offset=0):
-        n_parameters = tf1_source.GetNpar()
+    @classmethod
+    def create_additional_stats_tf1(cls, histogram):
+        """Create a TF1 with the additional statistics from the histogram as parameters.
 
-        # Helper variables for pyROOT's mechanism to call functions by reference
-        lower_bound = ROOT.Double()
-        upper_bound = ROOT.Double()
+        Parameters
+        ----------
+        histogram : ROOT.TH1 or ROOT.TGraph
+            Something having a GetListOfFunctions method that holds the additional statistics.
 
-        for i_parameter in range(n_parameters):
-            i_source = i_parameter
-            i_target = i_parameter + offset
+        Returns
+        -------
+        ROOT.TF1
+            Function with the additional statistics as parameters.
+        """
 
-            tf1_target.SetParameter(i_target,
-                                    tf1_source.GetParameter(i_source))
-            tf1_target.SetParError(i_target, tf1_source.GetParError(i_source))
-            tf1_target.SetParName(i_target, tf1_source.GetParName(i_source))
-
-            tf1_source.GetParLimits(i_source, lower_bound, upper_bound)
-            tf1_target.SetParLimits(i_target, lower_bound, upper_bound)
-
-    def create_additional_stats_tf1(self, histogram):
-        additional_stats = self.get_additional_stats(histogram)
+        additional_stats = cls.get_additional_stats(histogram)
         if not additional_stats:
             return None
 
@@ -992,7 +1462,21 @@ class ValidationPlot(object):
 
         return additional_stats_tf1
 
-    def combine_fit_and_additional_stats(self, fit_tf1, additional_stats_tf1):
+    @classmethod
+    def combine_fit_and_additional_stats(cls, fit_tf1, additional_stats_tf1):
+        """Combine the fit function and the function carrying the additional statistics to one function.
+
+        Parameters
+        ----------
+        fit_tf1 : ROOT.TF1
+            The fit function
+        additional_stats_tf1 : ROOT.TF1
+            The function carrying the additional statistics as parameters
+
+        Returns
+        -------
+        ROOT.TF1
+        """
         if additional_stats_tf1 is None:
             return fit_tf1
 
@@ -1015,12 +1499,44 @@ class ValidationPlot(object):
 
         n_stats_parameters = additional_stats_tf1.GetNpar()
         n_fit_parameters = fit_tf1.GetNpar()
-        self.copy_tf1_parameters(additional_stats_tf1, combined_tf1)
-        self.copy_tf1_parameters(fit_tf1, combined_tf1, offset=n_stats_parameters)
+        cls.copy_tf1_parameters(additional_stats_tf1, combined_tf1)
+        cls.copy_tf1_parameters(fit_tf1, combined_tf1, offset=n_stats_parameters)
 
         return combined_tf1
 
+    @classmethod
+    def copy_tf1_parameters(cls, tf1_source, tf1_target, offset=0):
+        """Copy the parameters of one TF1 to  another.
+
+        Parameters
+        ----------
+        tf1_source : ROOT.TF1
+            Take parameters from here
+        tf1_target : ROOT.TF1
+            Copy them to here.
+        offset : int, optional
+            Index of the first target parameter to which to copy.
+        """
+        n_parameters = tf1_source.GetNpar()
+
+        # Helper variables for pyROOT's mechanism to call functions by reference
+        lower_bound = ROOT.Double()
+        upper_bound = ROOT.Double()
+
+        for i_parameter in range(n_parameters):
+            i_source = i_parameter
+            i_target = i_parameter + offset
+
+            tf1_target.SetParameter(i_target,
+                                    tf1_source.GetParameter(i_source))
+            tf1_target.SetParError(i_target, tf1_source.GetParError(i_source))
+            tf1_target.SetParName(i_target, tf1_source.GetParName(i_source))
+
+            tf1_source.GetParLimits(i_source, lower_bound, upper_bound)
+            tf1_target.SetParLimits(i_target, lower_bound, upper_bound)
+
     def attach_attributes(self):
+        """Reassign the special attributes of the plot forwarding them to the ROOT plot."""
         # Forward the attributes to the plot by auto assignment
         self.check = self.check
         self.contact = self.contact
@@ -1032,6 +1548,7 @@ class ValidationPlot(object):
 
     @staticmethod
     def set_tstyle():
+        """Set the style such that the additional stats entries are shown by the TBrowser"""
         belle2_validation_style_name = "belle2_validation_style"
         belle2_validation_tstyle = ROOT.gROOT.GetStyle(belle2_validation_style_name)
         if not belle2_validation_tstyle:
@@ -1049,6 +1566,7 @@ class ValidationPlot(object):
 
 
 def test():
+    """Simple test methode"""
     ValidationPlot.set_tstyle()
 
     # Test a histogram plot with some nan and inf values

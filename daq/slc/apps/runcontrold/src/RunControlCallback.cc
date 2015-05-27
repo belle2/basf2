@@ -103,8 +103,8 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    NSMCommunicator::send(NSMMessage(node, RCCommand::RECOVER));
-    setState(node, RCState::RECOVERING_RS);
+    std::for_each(m_node_v.begin(), m_node_v.end(),
+                  Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
     setState(RCState::RECOVERING_RS);
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
@@ -262,12 +262,12 @@ void RunControlCallback::monitor() throw(RCHandlerException)
 
 void RunControlCallback::distribute(NSMMessage msg) throw()
 {
-  std::for_each(m_node_v.begin(), m_node_v.end(), Distributer(*this, msg));
+  std::for_each(m_node_v.begin(), m_node_v.end(), Distributor(*this, msg));
 }
 
 void RunControlCallback::distribute_r(NSMMessage msg) throw()
 {
-  std::for_each(m_node_v.rbegin(), m_node_v.rend(), Distributer(*this, msg));
+  std::for_each(m_node_v.rbegin(), m_node_v.rend(), Distributor(*this, msg));
 }
 
 void RunControlCallback::postRun() throw()
@@ -398,7 +398,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
   return true;
 }
 
-void RunControlCallback::Distributer::operator()(RCNode& node) throw()
+void RunControlCallback::Distributor::operator()(RCNode& node) throw()
 {
   if (!m_enabled) return;
   m_msg.setNodeName(node);
@@ -433,6 +433,31 @@ void RunControlCallback::Distributer::operator()(RCNode& node) throw()
           m_callback.setState(RCState::NOTREADY_S);
           if (cmd == RCCommand::LOAD && node.isSequential())
             m_enabled = false;
+        }
+      } catch (const NSMHandlerException& e) {
+        LogFile::fatal("Failed to NSM2 request");
+        m_enabled = false;
+      } catch (const IOException& e) {
+        LogFile::error(e.what());
+        m_enabled = false;
+        m_callback.setState(RCState::NOTREADY_S);
+      }
+    }
+  }
+}
+
+void RunControlCallback::Recoveror::operator()(RCNode& node) throw()
+{
+  if (!m_enabled) return;
+  m_msg.setNodeName(node);
+  RCCommand cmd = RCCommand::RECOVER;
+  if (m_msg.getNodeName() == node.getName()) {
+    RCState state(node.getState());
+    if (node.isUsed() && state != RCState::RECOVERING_RS
+        && state != RCState::ABORTING_RS) {
+      try {
+        if (NSMCommunicator::send(m_msg)) {
+          m_callback.setState(node, RCState::RECOVERING_RS);
         }
       } catch (const NSMHandlerException& e) {
         LogFile::fatal("Failed to NSM2 request");

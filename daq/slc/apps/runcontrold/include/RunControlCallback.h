@@ -83,18 +83,31 @@ namespace Belle2 {
     int m_port;
 
   private:
-    class Distributer {
+    class Distributor {
     public:
-      Distributer(RunControlCallback& callback, const NSMMessage& msg)
+      Distributor(RunControlCallback& callback, const NSMMessage& msg)
         : m_callback(callback), m_msg(msg), m_enabled(true) {}
+      virtual ~Distributor() {}
 
     public:
-      void operator()(RCNode& node) throw();
+      virtual void operator()(RCNode& node) throw();
 
-    private:
+    protected:
       RunControlCallback& m_callback;
       NSMMessage m_msg;
       bool m_enabled;
+
+    };
+
+  private:
+    class Recoveror : public Distributor {
+    public:
+      Recoveror(RunControlCallback& callback, const NSMMessage& msg)
+        : Distributor(callback, msg) {}
+      virtual ~Recoveror() {}
+
+    public:
+      virtual void operator()(RCNode& node) throw();
 
     };
 

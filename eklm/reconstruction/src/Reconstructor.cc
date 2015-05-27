@@ -69,6 +69,8 @@ EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
     m_TimeParams[i].p0 = p0;
     m_TimeParams[i].p1 = p1;
   }
+  delete t;
+  delete f;
 }
 
 EKLM::Reconstructor::~Reconstructor()

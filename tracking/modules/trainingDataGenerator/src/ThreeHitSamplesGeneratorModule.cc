@@ -129,6 +129,10 @@ void ThreeHitSamplesGeneratorModule::initializeRootFile(const std::string& filen
   m_treePtr->Branch("hit3Z", &m_combinations.Hit3Z);
 
   m_treePtr->Branch("signal", &m_combinations.Signal);
+
+  m_treePtr->Branch("layer1", &m_combinations.Layer1);
+  m_treePtr->Branch("layer2", &m_combinations.Layer2);
+  m_treePtr->Branch("layer3", &m_combinations.Layer3);
 }
 
 // ============================================ SPLIT TRACKCAND N HIT COMBOS =======================================================
@@ -206,6 +210,10 @@ void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointT
   combinations.Hit3X.push_back(spacePoints[2]->X());
   combinations.Hit3Y.push_back(spacePoints[2]->Y());
   combinations.Hit3Z.push_back(spacePoints[2]->Z());
+
+  combinations.Layer1.push_back(VxdID(spacePoints[0]->getVxdID()).getLayerNumber());
+  combinations.Layer2.push_back(VxdID(spacePoints[1]->getVxdID()).getLayerNumber());
+  combinations.Layer3.push_back(VxdID(spacePoints[2]->getVxdID()).getLayerNumber());
 
   combinations.Signal.push_back(signal);
 

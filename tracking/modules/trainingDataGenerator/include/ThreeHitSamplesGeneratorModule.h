@@ -57,6 +57,10 @@ namespace Belle2 {
       std::vector<double> Hit3Y; /**< (global) Y-position of third SpacePoint of three hit combination */
       std::vector<double> Hit3Z; /**< (global) Z-position of third SpacePoint of three hit combination */
 
+      std::vector<int> Layer1; /**< Layer number of first SpacePounsigned short of the three hit combination */
+      std::vector<int> Layer2; /**< Layer number of second SpacePounsigned short of the three hit combination */
+      std::vector<int> Layer3; /**< Layer number of third SpacePounsigned short of the three hit combination */
+
       std::vector<bool> Signal; /**< flag for specifying if combination is signal or noise */
     };
 

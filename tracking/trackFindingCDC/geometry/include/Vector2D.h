@@ -21,12 +21,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    ///A two dimensional vector
-    /** A two dimensional vector which is equiped with functions for correct handeling \n
-     *  of orientation related issues in addition to the expected vector methods. \n
-     *  It inherits from SwitchableRootificationBase which can be inject the inheritance to TObject \n
-     *  for monitoring purposes but may be empty for maximal performance. \n
-     *  Also this vector can be used whereever a TVector2 is expected syntactically.
+    /**
+     * A two dimensional vector which is equipped with functions for correct handeling \n
+     * of orientation related issues in addition to the expected vector methods. \n
+     * Also this vector can be passed to functions where a TVector2 is expected syntactically.
      */
     class Vector2D  {
 
@@ -41,8 +39,11 @@ namespace Belle2 {
       /// Constructor from two coordinates
       Vector2D(const FloatType& x, const FloatType& y)  : m_x(x), m_y(y) { ; }
 
-      /// Constructs a vector from a unit coordinate system vector and the coordinates in that system. Same as compose()
-      /** See compose() for details */
+      /**
+       * Constructs a vector from a unit coordinate system vector and the coordinates in that system.
+       * Same as compose()
+       * See compose() for details.
+       */
       Vector2D(const Vector2D& coordinateVec,
                const FloatType& parallelCoor,
                const FloatType& orthoCoor) :
@@ -382,12 +383,13 @@ namespace Belle2 {
       inline void set(const Vector2D& both) { m_x = both.x(); m_y = both.y(); }
 
     private:
-      FloatType m_x; ///< Memory for the first coordinate
-      FloatType m_y; ///< Memory for the second coordinate
+      /// Memory for the first coordinate
+      FloatType m_x;
 
-    private:
+      /// Memory for the second coordinate
+      FloatType m_y;
 
-    }; //class
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

@@ -25,9 +25,7 @@ namespace Belle2 {
 
     ///A three dimensional vector
     /** A three dimensional vector which is equiped with the expected vector methods. \n
-     *  It inherits from SwitchableRootificationBase which can be inject the inheritance to TObject \n
-     *  for monitoring purposes but may be empty for maximal performance. \n
-     *  Also this vector can be used whereever a TVector3 is expected syntactically.
+     *  Also this vector can be passed to functions where a TVector3 is expected syntactically.
      */
     class Vector3D  {
 

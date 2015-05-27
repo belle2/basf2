@@ -118,7 +118,7 @@ void FragmentationModule::initialize()
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
     evtgen = new EvtGenDecays(pythia, m_DecFile, m_EvtPdl); //COMMENT OUT FOR PYTHIA8.206+
-    //evtgen = new EvtGenDecays(&pythia, m_DecFile, m_EvtPdl, &genlist, radCorrEngine); //COMMENT IN FOR PYTHIA8.206+
+    //evtgen = new EvtGenDecays(pythia, m_DecFile, m_EvtPdl, &genlist, radCorrEngine); //COMMENT IN FOR PYTHIA8.206+
     evtgen->readDecayFile(m_UserDecFile);
   }
 

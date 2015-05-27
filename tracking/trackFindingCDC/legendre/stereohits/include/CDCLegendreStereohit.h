@@ -30,11 +30,11 @@ namespace Belle2 {
     public:
 
       StereoHit(): m_aplha(-999), m_posX(-999), m_posY(-999), m_InnerOuter(0), m_displacement(-999), m_lWire(-999), m_rWire(-999),
-        m_sign_final(-999), m_Rcand(-999), m_theta(0), m_Z0(-999), m_hit(0) {};
+        m_sign_final(-999), m_Rcand(-999), m_Z0(-999), m_hit(0) {};
 
       StereoHit(double alpha, double posX, double posY, int InnerOuter, TrackHit* hit, double displacement):
         m_aplha(alpha), m_posX(posX), m_posY(posY), m_InnerOuter(InnerOuter), m_displacement(displacement), m_lWire(-999), m_rWire(-999),
-        m_sign_final(-999), m_Rcand(-999), m_theta(0), m_Z0(-999), m_hit(hit) {};
+        m_sign_final(-999), m_Rcand(-999), m_Z0(-999), m_hit(hit) {};
 
 
       /** Set alpha of hit */
@@ -57,8 +57,6 @@ namespace Belle2 {
 
       void setRcand(double Rcand) { m_Rcand = Rcand; };
 
-      void setPolarAngle(double theta) { m_theta = theta; };
-
       void setZ0(double Z0) { m_Z0 = Z0; };
 
       inline double getAlpha() const { return m_aplha; };
@@ -79,8 +77,6 @@ namespace Belle2 {
 
       inline double getRcand() const { return m_Rcand; };
 
-      inline double getPolarAngle() const { return m_theta; };
-
       inline double getZ0() const { return m_Z0; };
 
       double computePolarAngle()
@@ -93,8 +89,7 @@ namespace Belle2 {
         assert(m_aplha != -999);
         assert(m_Rcand != -999);
 
-        m_theta = atan2(m_lWire * m_sign_final * m_displacement - m_Z0 * m_rWire , m_aplha * m_Rcand * m_rWire); // + 3.1415 / 2.;
-        return tan(m_theta);
+        return (m_lWire * m_sign_final * m_displacement - m_Z0 * m_rWire) / (m_aplha * m_Rcand * m_rWire);
       }
 
     private:
@@ -108,7 +103,6 @@ namespace Belle2 {
       double m_rWire;         // polar angle
       double m_sign_final;    // polar angle
       double m_Rcand;         // polar angle
-      double m_theta;         // polar angle
       double m_Z0;            // polar angle
 
       TrackHit* m_hit;        // Holds pointer to TrackHit object;

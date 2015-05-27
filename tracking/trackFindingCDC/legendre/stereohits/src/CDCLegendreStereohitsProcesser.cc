@@ -127,9 +127,7 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
     B2DEBUG(100, "SLayerID: " << sLayer <<  "; delta_phi: " << delta_phi << "; alpha: " <<  stereoHitPair.first.getAlpha() <<
             "; sign_final: " << sign_final
             << "; lWire: " << lWire  << "; rWire: " << rWire << ";   Dist_1: " <<  stereoHitPair.first.getDisplacement() << "; Dist_2: " <<
-            stereoHitPair.second.getDisplacement()
-            << "; theta1: " << stereoHitPair.first.getPolarAngle() * 180. / 3.1415 << "; theta2: " << stereoHitPair.first.getPolarAngle() *
-            180. / 3.1415);
+            stereoHitPair.second.getDisplacement());
 
     hits_to_add.push_back(stereoHitPair);
 
@@ -146,27 +144,27 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
   return;
 
-  int nbins = 60;
+  /*int nbins = 60;
   double thetaMin = 15.;
   double thetaMax = 170.;
-//  double binWidth = m_PI / static_cast<double>(nbins);
+  //  double binWidth = m_PI / static_cast<double>(nbins);
 
-//    TCanvas canv1("canv1", "canv", 0, 0, 1400, 600);
-//    canv1.Divide(2, 3);
+  //    TCanvas canv1("canv1", "canv", 0, 0, 1400, 600);
+  //    canv1.Divide(2, 3);
 
   TH1F hist("hist", "hist", nbins, thetaMin, thetaMax);
-//      hist.GetYaxis()->SetRangeUser(0,20);
-//      hist.SetLineColor(ii);    //1 - black; 3 - green; 5 - yellow; 7 - blue
-//      if(ii==1) hist.DrawClone("E1");
-//      else hist.DrawClone("E1 same");
-//      hist.Clear();
-//    }
+  //      hist.GetYaxis()->SetRangeUser(0,20);
+  //      hist.SetLineColor(ii);    //1 - black; 3 - green; 5 - yellow; 7 - blue
+  //      if(ii==1) hist.DrawClone("E1");
+  //      else hist.DrawClone("E1 same");
+  //      hist.Clear();
+  //    }
 
 
 
-//    canv1.cd(1);
+  //    canv1.cd(1);
 
-  /*
+
 
   TH1F hist1("hist1", "hist", nbins, thetaMin, thetaMax);
   for (auto entry : hits_to_add) {
@@ -221,8 +219,8 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
   }
 
   //    hist4.Draw("E1");
-  */
-//    canv1.cd(5);
+
+  //    canv1.cd(5);
 
   for (auto stereoHitPair : hits_to_add) {
     double theta1 = stereoHitPair.first.getPolarAngle();
@@ -235,17 +233,17 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
 
   }
 
-//    TCanvas canv1("canv1", "canv", 0, 0, 1400, 600);
-//    hist.Draw("E1");
-//    canv1.SaveAs(Form("tmp/stereohits/efficiency/ev_%i_tr_%i_2d_hipt.png", eventnr, tracknr));
-//    canv1.SaveAs(Form("tmp/stereohits/efficiency/ev_%i_tr_%i_2d_hipt.root", eventnr, tracknr));
+  //    TCanvas canv1("canv1", "canv", 0, 0, 1400, 600);
+  //    hist.Draw("E1");
+  //    canv1.SaveAs(Form("tmp/stereohits/efficiency/ev_%i_tr_%i_2d_hipt.png", eventnr, tracknr));
+  //    canv1.SaveAs(Form("tmp/stereohits/efficiency/ev_%i_tr_%i_2d_hipt.root", eventnr, tracknr));
 
   int maxBin = hist.GetMaximumBin();
   double meanTheta(0);
-//    double range1 = binWidth*(maxBin-2);
-//    double range2 = binWidth*(maxBin+2);
-//    double range1 = meanTheta - binWidth * 2;
-//    double range2 = meanTheta + binWidth * 2;
+  //    double range1 = binWidth*(maxBin-2);
+  //    double range2 = binWidth*(maxBin+2);
+  //    double range1 = meanTheta - binWidth * 2;
+  //    double range2 = meanTheta + binWidth * 2;
   double range1 = hist.GetBinCenter(maxBin - 3) * 3.1415 / 180.;
   double range2 = hist.GetBinCenter(maxBin + 3) * 3.1415 / 180.;
 
@@ -277,10 +275,10 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
       hit->setHitUsage(TrackHit::c_usedInTrack);
 
       //Compare to original CDCHit
-//      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
-//      double zHitOriginal = cdcSimHit->getPosWire().Z();
+  //      const CDCSimHit* cdcSimHit = DataStore::getRelatedToObj<CDCSimHit>(hit->getOriginalCDCHit());
+  //      double zHitOriginal = cdcSimHit->getPosWire().Z();
 
-//      cdcSimHit = nullptr;
+  //      cdcSimHit = nullptr;
 
       //        B2INFO("Delta Z position: " << zHitOriginal - hit->getZReference() << "; Z original: " << zHitOriginal);
 
@@ -289,16 +287,16 @@ void StereohitsProcesser::makeHistogramming(TrackCandidate* cand, std::vector<Tr
       //restore default hit coordinates
       hit->setZReference(0);
     }
-    /*
+
         std::vector<TrackHit*> stereoHitsToAdd;
         for (auto stereoHitPair : hits_to_add) {
           if(stereoHitPair.first.getTrackHit()->getHitUsage() != TrackHit::not_used) continue;
           stereoHitsToAdd.push_back(stereoHitPair.first.getTrackHit());
         }
-    */
-//    assignStereohitsByAngle(cand, meanTheta, stereoHitsToAdd);
 
-  }
+  //    assignStereohitsByAngle(cand, meanTheta, stereoHitsToAdd);
+
+  }*/
 
 }
 

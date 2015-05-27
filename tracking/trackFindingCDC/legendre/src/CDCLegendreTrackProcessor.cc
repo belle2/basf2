@@ -117,7 +117,6 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
   tracks.clear();
   tracks.reserve(m_trackList.size());
-  int createdTrackCandidatesCounter = 0;
 
   for (TrackCandidate* trackCand : m_trackList) {
     if (trackCand->getTrackHits().size() < 5) continue;
@@ -137,15 +136,8 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
                                  trackCand->getChargeSign());
 
     CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
-
-    Vector3D startingPosition = trackHitVector.front()->getOriginalWirePosition();
-    double sStartingPosition = trajectory3D.calcPerpS(startingPosition);
-    double zStartingPosition = trajectory3D.getTrajectorySZ().mapSToZ(sStartingPosition);
-
-    trajectory3D.setLocalOrigin(Vector3D(startingPosition.xy(), zStartingPosition));
     newTrackCandidate.setStartTrajectory3D(trajectory3D);
 
-    unsigned int sortingParameter = 0;
     for (TrackHit* trackHit : trackHitVector) {
       // TODO: Can we determine the plane?
       const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(trackHit->getOriginalCDCHit(), 0);
@@ -153,9 +145,7 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
       const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);
       newTrackCandidate.push_back(std::move(cdcRecoHit3D));
-      sortingParameter++;
     }
-    ++createdTrackCandidatesCounter;
   }
 }
 

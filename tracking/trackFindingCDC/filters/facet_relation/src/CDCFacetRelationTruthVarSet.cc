@@ -21,9 +21,6 @@ CDCFacetRelationTruthVarSet::CDCFacetRelationTruthVarSet(const std::string& pref
 
 bool CDCFacetRelationTruthVarSet::extract(const Relation<CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = extractNested(ptrFacetRelation);
-  if (not extracted or not ptrFacetRelation) return false;
-
   const CDCFacet* ptrFromFacet = ptrFacetRelation->first;
   const CDCFacet* ptrToFacet = ptrFacetRelation->second;
 

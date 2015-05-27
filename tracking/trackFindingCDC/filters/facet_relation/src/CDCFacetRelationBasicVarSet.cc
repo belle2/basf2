@@ -7,21 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationBasicVarSet.h>
 #include <assert.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCFacetRelationVarSet::CDCFacetRelationVarSet(const std::string& prefix) :
-  VarSet<CDCFacetRelationVarNames>(prefix)
+CDCFacetRelationBasicVarSet::CDCFacetRelationBasicVarSet(const std::string& prefix) :
+  Super(prefix)
 {
 }
 
-bool CDCFacetRelationVarSet::extract(const Relation<CDCFacet>* ptrFacetRelation)
+bool CDCFacetRelationBasicVarSet::extract(const Relation<CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = extractNested(ptrFacetRelation);
+  bool extracted = Super::extract(ptrFacetRelation);
   if (not extracted or not ptrFacetRelation) return false;
 
   const CDCFacet* ptrFromFacet = ptrFacetRelation->first;

@@ -7,11 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
-#include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/AllFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/MCFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/SimpleFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/RecordingFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/UnionRecordingFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationBasicVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationTruthVarSet.h>

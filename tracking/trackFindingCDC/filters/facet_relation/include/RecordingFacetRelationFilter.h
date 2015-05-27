@@ -12,17 +12,24 @@
 #include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationBasicVarSet.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitFacets.
-    class RecordingFacetRelationFilter: public RecordingFilter<CDCFacetRelationTruthVarSet> {
+    class RecordingFacetRelationFilter: public RecordingFilter<VariadicUnionVarSet<
+      CDCFacetRelationBasicVarSet,
+      CDCFacetRelationTruthVarSet> > {
 
     public:
       /// Constructor initialising the RecordingRelationFilter with standard root file name.
       RecordingFacetRelationFilter() :
-        RecordingFilter<CDCFacetRelationTruthVarSet>("CDCFacetRelationTruthRecords.root")
+        RecordingFilter<VariadicUnionVarSet<
+        CDCFacetRelationBasicVarSet,
+        CDCFacetRelationTruthVarSet> >("CDCFacetRelationTruthRecords.root")
       {;}
 
     };

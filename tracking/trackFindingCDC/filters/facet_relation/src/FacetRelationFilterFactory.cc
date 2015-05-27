@@ -40,6 +40,7 @@ FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"mc", "facet relations from monte carlo truth"},
     {"none", "no facet relation is valid, stop at facet creation."},
     {"recording", "record the encountered instances of facet relations"},
+    {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
   };
 }
@@ -57,6 +58,8 @@ FacetRelationFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<BaseFacetRelationFilter>(new SimpleFacetRelationFilter());
   } else if (filterName == string("recording")) {
     return std::unique_ptr<BaseFacetRelationFilter>(new RecordingFacetRelationFilter());
+  } else if (filterName == string("unionrecording")) {
+    return std::unique_ptr<BaseFacetRelationFilter>(new UnionRecordingFacetRelationFilter());
   } else {
     return std::unique_ptr<BaseFacetRelationFilter>(nullptr);
   }

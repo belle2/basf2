@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationVarSet.h>
+
 
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
@@ -51,8 +51,6 @@ namespace Belle2 {
         return facetRelationTruthNames[iName];
       }
 
-      /// Marking that the basic facet variables should be included.
-      typedef CDCFacetRelationVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from a facet relation.

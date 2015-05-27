@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <genfit/TrackCand.h>
+
 #include <boost/range/irange.hpp>
 
 #include <gtest/gtest.h>

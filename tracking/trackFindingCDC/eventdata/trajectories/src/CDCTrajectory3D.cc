@@ -15,13 +15,14 @@
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <genfit/TrackCand.h>
+
 #include <cmath>
 #include <cassert>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 
 

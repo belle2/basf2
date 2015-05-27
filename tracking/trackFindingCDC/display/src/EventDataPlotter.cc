@@ -14,6 +14,8 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+
+#include <genfit/TrackCand.h>
 #include <cmath>
 
 using namespace std;

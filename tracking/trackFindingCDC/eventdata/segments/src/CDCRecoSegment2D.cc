@@ -13,12 +13,11 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
+#include <genfit/TrackCand.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
 
 
 namespace {
@@ -45,7 +44,9 @@ namespace {
       tangentSegment.push_back(CDCTangent(firstRLWireHit, secondRLWireHit));
     }
 
-    if (tangentSegment.size() + 1 != rlWireHitSegment.size()) B2ERROR("Wrong number of tangents created.");
+    if (tangentSegment.size() + 1 != rlWireHitSegment.size()) {
+      B2ERROR("Wrong number of tangents created.");
+    }
 
   }
 
@@ -76,7 +77,9 @@ namespace {
       facetSegment.push_back(CDCFacet(firstRLWireHit, secondRLWireHit, thirdRLWireHit));
     }
 
-    if (facetSegment.size() + 2 != rlWireHitSegment.size()) B2ERROR("Wrong number of facets created.");
+    if (facetSegment.size() + 2 != rlWireHitSegment.size()) {
+      B2ERROR("Wrong number of facets created.");
+    }
 
   }
 

@@ -15,7 +15,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <genfit/TrackCand.h>
+
+namespace genfit {
+  class TrackCand;
+}
 
 namespace Belle2 {
   namespace TrackFindingCDC {

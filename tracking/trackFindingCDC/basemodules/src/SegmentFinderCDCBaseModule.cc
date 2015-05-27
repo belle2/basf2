@@ -19,6 +19,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
+//out type
+#include <genfit/TrackCand.h>
 
 using namespace std;
 using namespace Belle2;

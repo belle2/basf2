@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <genfit/TrackCand.h>
 
 using namespace std;
 using namespace Belle2;

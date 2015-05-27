@@ -8,15 +8,15 @@ from simulation import add_simulation
 import glob
 
 # Parameters
-nEvents = 1
+nEvents = 10000
 useEvtGen = True  # if false ParticleGun is used
-useRootInput = False  # read pre-simulated events from root-input
+useRootInput = True  # read pre-simulated events from root-input
 useRootOutputAfterSim = False  # use rootoutput after simulation
 useRootBeforeSampleGeneration = False  # use rootoutput just before the invokation of the sample generating module
 
 # In-/Output filenames (dummys for now)
-inFileName = 'EvtGen_nobg_25k.root'
-outFileName = 'EvtGen_nobg_25k.root'
+inFileName = 'EvtGen_bg_10k.root'
+outFileName = 'EvtGen_bg_10k.root'
 
 # ParticleGun parameters
 nTracks = 15  # number of tracks
@@ -39,8 +39,12 @@ secSetup = [
 tuneValue = 0.06  # expands the set cutoffs in the VXDTF in percent
 
 # background file setup
-bkgdir = '/home/maldi/belle2FW/bkg/'  # paht to background files
+bkgdir = '/home/asehephy/belle2FW/bkg/'  # paht to background files
 bkgfiles = glob.glob(bkgdir + "*.root")
+
+# used components
+components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD']
+# components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'SVD']
 
 # module registration
 # EventInfoSetter
@@ -86,8 +90,12 @@ particlegun.param(param_particlegun)
 gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
-geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',
-                              'PXD', 'SVD'])  # 'components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',........
+geometry.param('components', components)
+
+beambkgmix = register_module('BeamBkgMixer')
+beambkgmix.param('backgroundFiles', bkgfiles)
+# beambkgmix.param('scaleFactors', )
+beambkgmix.param('components', components)
 
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)  # need for MCTrackfinder to work correctly
@@ -102,6 +110,8 @@ spCreatorPXD.param('SpacePoints', 'pxdOnly')
 
 # SpacePoint to TrueHit connector (only setting params here that are needed and differ from default)
 sp2thConnector = register_module('SpacePoint2TrueHitConnector')
+sp2thConnector.logging.log_level = LogLevel.DEBUG
+sp2thConnector.logging.debug_level = 2
 param_sp2thConnector = {
     'DetectorTypes': ['PXD', 'SVD'],
     'TrueHitNames': ['', ''],
@@ -116,28 +126,60 @@ sp2thConnector.param(param_sp2thConnector)
 
 # for now misuse the VXDTF to get three hit combinations
 vxdtf = register_module('VXDTF')
-vxdtf.logging.log_level = LogLevel.DEBUG
-vxdtf.logging.debug_level = 1
+vxdtf.logging.log_level = LogLevel.ERROR
+vxdtf.logging.debug_level = 10
 param_vxdtf = {
     # NOTE: the activateAlwaysTrueNHit is currently not compiled (in the head relase!) into the code
     # setting the filters to false individually
     'sectorSetup': secSetup,
     'GFTrackCandidatesColName': 'vxdTracks',
-    'activateAlwaysTrue3Hit': [True],
-    'activateAlwaysTrue4Hit': [True],
+    # 'activateAlwaysTrue3Hit': [True],
+    # 'activateAlwaysTrue4Hit': [True],
+    'activateAlwaysFalse2Hit': [False],
+    'activateAlwaysFalse3Hit': [False],
+    'activateAlwaysFalse4Hit': [False],
+    'activateAlwaysTrue2Hit': [False],
+    'activateAlwaysTrue3Hit': [False],
+    'activateAlwaysTrue4Hit': [False],
+    'activateAngles3D': [False],
+    'activateAngles3DHioC': [False],
+    'activateAnglesRZ': [False],
+    'activateAnglesRZHioC': [False],
+    'activateAnglesXY': [False],
+    'activateAnglesXYHioC': [False],
+    'activateCircleFit': [False],
+    'activateDeltaDistance2IP': [False],
+    'activateDeltaDistance2IPHioC': [False],
+    'activateDeltaPt': [False],
+    'activateDeltaPtHioC': [False],
+    'activateDeltaSOverZ': [False],
+    'activateDeltaSlopeRZ': [False],
+    'activateDeltaSlopeRZHioC': [False],
+    'activateDeltaSlopeZOverS': [False],
+    'activateDistance2IP': [False],
+    'activateDistance2IPHioC': [False],
+    'activateDistanceZ': [False],
+    'activateHelixParameterFit': [False],
+    'activateHelixParameterFitHioC': [False],
+    'activateNormedDistance3D': [False],
+    'activatePT': [False],
+    'activatePTHioC': [False],
+    'activateRandom2Hit': [False],
+    'activateRandom3Hit': [False],
+    'activateRandom4Hit': [False],
+    'activateSlopeRZ': [False],
+    'activateZigZagRZ': [False],
+    'activateZigZagXY': [False],
+    'activateZigZagXYWithSigma': [False],
+
     'activateDistance3D': [True],
     'activateDistanceXY': [True],
-    'activateDistanceZ': [False],
-    # 'activateAngles3D': [False],
-    # 'activateAngles3DHioC': [False],
-    # 'activateAnglesXYHioC': [False],
-    # 'activateDeltaDistance2IPHioC': [False],
-    # 'activateDeltaPtHioC': [False],
-    # 'activateSlopeRZ': [False],
-    # 'activateZigZagXY': [False],
+
     'filterOverlappingTCs': 'none',
     'killEventForHighOccupancyThreshold': 100000,
+    'tccMinState': 1,
     'tuneCutoffs': tuneValue,
+    'cleanOverlappingSet': False,
 }
 vxdtf.param(param_vxdtf)
 
@@ -197,12 +239,13 @@ if not useRootInput:
     else:
         main.add_module(particlegun)
 
-    # main.add_module(gearbox)  # add gearbox and geometry in before add_simulation so that they are in the right order
-    # main.add_module(geometry)
-    # main.add_module(g4sim)  # add g4sim with custom settings
+    main.add_module(gearbox)  # add gearbox and geometry in before add_simulation so that they are in the right order
+    main.add_module(geometry)
+    main.add_module(beambkgmix)
+    main.add_module(g4sim)  # add g4sim with custom settings
     # add the simulation (including clusterizing and digitizing)
     # NOTE: using RSVD only here (not RCDC)
-    add_simulation(main, ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'], bkgfiles)
+    add_simulation(main, components)  # , bkgfiles)
 else:
     main.add_module(rootinput)
     main.add_module(eventinfoprinter)

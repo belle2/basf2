@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/MultiVarSet.h>
+#include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 #include <tracking/trackFindingCDC/varsets/EvalVariadic.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
@@ -25,13 +25,13 @@ namespace Belle2 {
 
     /**
        Class that accomodates many variable sets and presents them as on set of variables.
-       In contrast to the MultiVarSet the individual VarSets are given as variadic template parameters.
+       In contrast to the UnionVarSet the individual VarSets are given as variadic template parameters.
 
-       Dummy implementation based on MultiVarSet. The MultiVarSet can be optimized and leverage that
+       Dummy implementation based on UnionVarSet. The UnionVarSet can be optimized and leverage that
        the types of all nested variable sets are known at compile time.
     */
     template<class... VarSets_>
-    class VariadicMultiVarSet : public BaseVarSet<typename FirstType<VarSets_...>::Object> {
+    class VariadicUnionVarSet : public BaseVarSet<typename FirstType<VarSets_...>::Object> {
 
     private:
       /// Type of the super class
@@ -46,7 +46,7 @@ namespace Belle2 {
       typedef BaseVarSet<Object> ContainedVarSet;
 
     public:
-      VariadicMultiVarSet(const std::string& prefix = "")
+      VariadicUnionVarSet(const std::string& prefix = "")
       {
         EvalVariadic{
           (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new VarSets_(prefix))) , true)...
@@ -97,7 +97,7 @@ namespace Belle2 {
 
     private:
       /// Container for the multiple variable sets.
-      MultiVarSet<Object> m_multiVarSet;
+      UnionVarSet<Object> m_multiVarSet;
 
     }; //end class
   } //end namespace TrackFindingCDC

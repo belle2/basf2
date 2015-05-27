@@ -10,19 +10,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MultiRecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/CDCFacetVarSets.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitFacets.
-    class MultiRecordingFacetFilter: public MultiRecordingFilter<CDCFacet> {
+    class UnionRecordingFacetFilter: public UnionRecordingFilter<CDCFacet> {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      MultiRecordingFacetFilter() :
-        MultiRecordingFilter<CDCFacet>("CDCFacetTruthRecords.root")
+      UnionRecordingFacetFilter() :
+        UnionRecordingFilter<CDCFacet>("CDCFacetTruthRecords.root")
       {;}
 
       /// Valid names of variable sets for facets.

@@ -17,4 +17,4 @@
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 
 #include <tracking/trackFindingCDC/filters/facet/RecordingFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/MultiRecordingFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>

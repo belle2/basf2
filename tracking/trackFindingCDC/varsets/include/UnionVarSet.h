@@ -25,7 +25,7 @@ namespace Belle2 {
        Class that accomodates many variable sets and presents them as on set of variables
     */
     template<class Object_>
-    class MultiVarSet : public BaseVarSet<Object_> {
+    class UnionVarSet : public BaseVarSet<Object_> {
 
     private:
       /// Type of the super class

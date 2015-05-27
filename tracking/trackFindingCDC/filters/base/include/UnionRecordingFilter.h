@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 
-#include <tracking/trackFindingCDC/varsets/MultiVarSet.h>
+#include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 #include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
@@ -19,11 +19,11 @@ namespace Belle2 {
 
     /// Filter based on a tmva method.
     template<class Object_>
-    class MultiRecordingFilter: public RecordingFilter<MultiVarSet<Object_>> {
+    class UnionRecordingFilter: public RecordingFilter<UnionVarSet<Object_>> {
 
     private:
       /// Type of the super class
-      typedef RecordingFilter<MultiVarSet<Object_>> Super;
+      typedef RecordingFilter<UnionVarSet<Object_>> Super;
 
     public:
       /// Type of the object to be analysed.
@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      MultiRecordingFilter(const std::string& defaultRootFileName = "records.root",
+      UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
                            const std::string& defaultTreeName = "records") :
         Super(defaultRootFileName, defaultTreeName)
       {;}
@@ -39,7 +39,7 @@ namespace Belle2 {
       /// Initialize the recorder before event processing.
       virtual void initialize() override
       {
-        MultiVarSet<Object>& multiVarSet = Super::getVarSet();
+        UnionVarSet<Object>& multiVarSet = Super::getVarSet();
 
         /// Create and add the concrete varsets from the varset parameter.
         for (std::string name : getVarSetNames()) {
@@ -57,7 +57,7 @@ namespace Belle2 {
       virtual void terminate() override
       {
         Super::terminate();
-        MultiVarSet<Object>& multiVarSet = Super::getVarSet();
+        UnionVarSet<Object>& multiVarSet = Super::getVarSet();
         multiVarSet.clear();
       }
 

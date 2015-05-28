@@ -78,20 +78,20 @@ class Particle(object):
             @param preCutConfig intermediate pre cut configuration
             @param postCutConfig post cut configuration
         """
-        # Is the correct pdg name as a string of the particle with an optional additional user label seperated by :
+        #: pdg name of the particle with an optional additional user label seperated by :
         self.identifier = identifier + ':generic' if len(identifier.split(':')) < 2 else identifier
         v = self.identifier.split(':')
-        # The name of the particle as correct pdg name e.g. K+, pi-, D*0.
+        #: The name of the particle as correct pdg name e.g. K+, pi-, D*0.
         self.name = v[0]
-        # Additional label like hasMissing or has2Daughters
+        #: Additional label like hasMissing or has2Daughters
         self.label = v[1]
-        # multivariate analysis configuration (see MVAConfiguration)
+        #: multivariate analysis configuration (see MVAConfiguration)
         self.mvaConfig = mvaConfig
-        # DecayChannel objects added by addChannel() method.
+        #: DecayChannel objects added by addChannel() method.
         self.channels = []
-        # intermediate cut configuration (see PreCutConfiguration)
+        #: intermediate cut configuration (see PreCutConfiguration)
         self.preCutConfig = preCutConfig
-        # post cut configuration (see PostCutConfiguration)
+        #: post cut configuration (see PostCutConfiguration)
         self.postCutConfig = postCutConfig
 
     @property

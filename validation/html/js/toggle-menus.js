@@ -1,7 +1,7 @@
 $(document).ready(function(){
     loadcontent();
     $('.reportbug').click( function(){
-	window.open('https://belle2.cc.kek.jp/redmine/projects/support/issues/new');
+	window.open('https://belle2.cc.kek.jp/redmine/projects/development/issues/new');
     });
 
 

@@ -29,7 +29,9 @@ void CDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCD
   for (CDCTrack& track : tracks) {
     CDCObservations2D szObservations;
     for (const CDCRecoHit3D& recoHit : track) {
-      szObservations.append(recoHit.getPerpS(), recoHit.getRecoZ());
+      if (recoHit.getStereoType() != AXIAL) {
+        szObservations.append(recoHit.getPerpS(), recoHit.getRecoZ());
+      }
     }
 
     if (szObservations.size() > 2) {

@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -88,7 +88,7 @@ float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
 }
 
 
-const TVector3 CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
+const Vector3D CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getSimHitLookUp().getRecoPos3D(ptrHit);
 }

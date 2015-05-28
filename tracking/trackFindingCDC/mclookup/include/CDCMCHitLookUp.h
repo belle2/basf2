@@ -19,6 +19,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    class Vector3D;
+
     /// Interface class to the Monte Carlo information for individual hits
     /** This class provides a stable interface for the underlying implementation for look ups
      *  into the Monte Carlo informations for the first stage of the algorithm.*/
@@ -53,7 +55,7 @@ namespace Belle2 {
       float getRefDriftLength(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the primary ionisation for the hit.
-      const TVector3 getRecoPos3D(const CDCHit* ptrHit) const;
+      const Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the ionisation of the primary simulated hit for the hit.
       const TVector3 getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;

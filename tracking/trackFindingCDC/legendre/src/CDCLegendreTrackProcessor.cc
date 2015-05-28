@@ -135,17 +135,23 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()), Vector2D(momentum.x(), momentum.y()),
                                  trackCand->getChargeSign());
 
-    CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
-    newTrackCandidate.setStartTrajectory3D(trajectory3D);
-
     for (TrackHit* trackHit : trackHitVector) {
-      // TODO: Can we determine the plane?
-      const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(trackHit->getOriginalCDCHit(), 0);
+      RightLeftInfo rlInfo = RIGHT;
+      if (trajectory2D.getDist2D(trackHit->getUnderlayingCDCWireHit()->getRefPos2D()) < 0)
+        rlInfo = LEFT;
+      const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(trackHit->getOriginalCDCHit(), rlInfo);
       rlWireHit->getWireHit().getAutomatonCell().setTakenFlag();
 
       const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);
       newTrackCandidate.push_back(std::move(cdcRecoHit3D));
     }
+
+    // Set the start point of the trajectory to the first hit
+    newTrackCandidate.sort();
+
+    trajectory2D.setLocalOrigin(newTrackCandidate.front().getRecoPos2D());
+    CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
+    newTrackCandidate.setStartTrajectory3D(trajectory3D);
   }
 }
 
@@ -253,17 +259,14 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
     TrackHit* trackHit = new TrackHit(cdcWireHit);
-    if (trackHit->checkHitDriftLength()) {
-      if (trackHit->getIsAxial())
-        m_axialHitList.push_back(trackHit);
-      else
-        m_stereoHitList.push_back(trackHit);
+    if (trackHit->checkHitDriftLength() and trackHit->getIsAxial()) {
+      m_axialHitList.push_back(trackHit);
     } else {
       delete trackHit;
     }
   }
   B2DEBUG(90,
-          "Number of hits to be used by track finder: " << m_stereoHitList.size() << " stereo " << m_axialHitList.size() << " axial.");
+          "Number of hits to be used by track finder: " << m_axialHitList.size() << " axial.");
 }
 
 void TrackProcessor::deleteHitsOfAllBadTracks()

@@ -89,7 +89,8 @@ GenFitterVXDTBModule::GenFitterVXDTBModule() :
 
   //input
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
-           "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", string(""));
+           "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)",
+           string(""));
   addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string(""));
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
@@ -98,30 +99,44 @@ GenFitterVXDTBModule::GenFitterVXDTBModule() :
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
   //select the filter and set some parameters
-  addParam("FilterId", m_filterId, "Set to 'Kalman' use Kalman Filter, 'DAF' to use the DAF and 'simpleKalman' for the Kalman without reference track", string("DAF"));
+  addParam("FilterId", m_filterId,
+           "Set to 'Kalman' use Kalman Filter, 'DAF' to use the DAF and 'simpleKalman' for the Kalman without reference track", string("DAF"));
   addParam("NMinIterations", m_nMinIter, "Minimum number of iterations for the Kalman filter", int(3));
   addParam("NMaxIterations", m_nMaxIter, "Maximum number of iterations for the Kalman filter", int(10));
   addParam("NMaxFailedHits", m_nMaxFailed, "Maximum number of of failed hits before aborting the fit", int(5));
-  addParam("ProbCut", m_probCut, "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));
-  addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output", bool(false));
-  addParam("UseClusters", m_useClusters, "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
-  addParam("PDGCodes", m_pdgCodes, "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)", vector<int>(0));
+  addParam("ProbCut", m_probCut,
+           "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001", double(0.001));
+  addParam("StoreFailedTracks", m_storeFailed, "Set true if the tracks where the fit failed should also be stored in the output",
+           bool(false));
+  addParam("UseClusters", m_useClusters,
+           "if set to true cluster hits (PXD/SVD clusters) will be used for fitting. If false Gaussian smeared trueHits will be used", true);
+  addParam("PDGCodes", m_pdgCodes,
+           "List of PDG codes used to set the mass hypothesis for the fit. All your codes will be tried with every track. The sign of your codes will be ignored and the charge will always come from the genfit::TrackCand. If you do not set any PDG code the code will be taken from the genfit::TrackCand. This is the default behavior)",
+           vector<int>(0));
   //output
-  addParam("GFTracksColName", m_gfTracksColName, "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
-  addParam("TracksColName", m_tracksColName, "Name of collection holding the final Tracks (will be created by this module). NOT IMPLEMENTED!", string(""));
+  addParam("GFTracksColName", m_gfTracksColName,
+           "Name of collection holding the final genfit::Tracks (will be created by this module)", string(""));
+  addParam("TracksColName", m_tracksColName,
+           "Name of collection holding the final Tracks (will be created by this module). NOT IMPLEMENTED!", string(""));
 
-  addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks", bool(false));
-  addParam("DAFTemperatures", m_dafTemperatures, "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
+  addParam("HelixOutput", m_createTextFile, "Set true if you want to have a text file with perigee helix parameters of all tracks",
+           bool(false));
+  addParam("DAFTemperatures", m_dafTemperatures,
+           "set the annealing scheme (temperatures) for the DAF. Length of vector will determine DAF iterations", vector<double>(1, -999.0));
   addParam("energyLossBetheBloch", m_energyLossBetheBloch, "activate the material effect: EnergyLossBetheBloch", true);
   addParam("noiseBetheBloch", m_noiseBetheBloch, "activate the material effect: NoiseBetheBloch", true);
   addParam("noiseCoulomb", m_noiseCoulomb, "activate the material effect: NoiseCoulomb", true);
   addParam("energyLossBrems", m_energyLossBrems, "activate the material effect: EnergyLossBrems", true);
   addParam("noiseBrems", m_noiseBrems, "activate the material effect: NoiseBrems", true);
-  addParam("noEffects", m_noEffects, "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
+  addParam("noEffects", m_noEffects,
+           "switch off all material effects in Genfit. This overwrites all individual material effects switches", false);
   addParam("MSCModel", m_mscModel, "Multiple scattering model", string("Highland"));
-  addParam("resolveWireHitAmbi", m_resolveWireHitAmbi, "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).", string("default"));
+  addParam("resolveWireHitAmbi", m_resolveWireHitAmbi,
+           "Determines how the ambiguity in wire hits is to be dealt with.  This only makes sense for the Kalman fitters.  Values are either 'default' (use the default for the respective fitter algorithm), 'weightedAverage', 'unweightedClosestToReference' (default for the Kalman filter), or 'unweightedClosestToPrediction' (default for the Kalman filter without reference track).",
+           string("default"));
 
-  addParam("beamSpot", m_beamSpot, "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
+  addParam("beamSpot", m_beamSpot,
+           "point to which the fitted track will be extrapolated in order to put together the TrackFitResults", vector<double>(3, 0.0));
 
   addParam("suppressGFExceptionOutput", m_suppressGFExceptionOutput, "Suppress error messages in GenFit.", true);
 
@@ -362,7 +377,8 @@ void GenFitterVXDTBModule::event()
 
       B2DEBUG(99, "Fit track with start values: ");
 
-      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() << " " << momentumSeed.Mag());
+      B2DEBUG(100, "Start values: momentum (x,y,z,abs): " << momentumSeed.x() << "  " << momentumSeed.y() << "  " << momentumSeed.z() <<
+              " " << momentumSeed.Mag());
       //B2DEBUG(100, "Start values: momentum std: " << sqrt(covSeed(3, 3)) << "  " << sqrt(covSeed(4, 4)) << "  " << sqrt(covSeed(5, 5)));
       B2DEBUG(100, "Start values: pos:   " << posSeed.x() << "  " << posSeed.y() << "  " << posSeed.z());
       //B2DEBUG(100, "Start values: pos std:   " << sqrt(covSeed(0, 0)) << "  " << sqrt(covSeed(1, 1)) << "  " << sqrt(covSeed(2, 2)));
@@ -460,7 +476,8 @@ void GenFitterVXDTBModule::event()
       }
       B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ")");
 
-      if (aTrackCandPointer->getNHits() < 3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
+      if (aTrackCandPointer->getNHits() <
+          3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
         B2WARNING("Genfit2Module: only " << aTrackCandPointer->getNHits() << " were assigned to the Track! This Track will not be fitted!");
         ++m_failedFitCounter;
         continue;
@@ -744,8 +761,10 @@ void GenFitterVXDTBModule::endRun()
   B2INFO("      " << m_successfulGFTrackCandFitCounter << " track candidates were fitted successfully");
   B2INFO("      in total " << m_successfulFitCounter << " tracks were fitted");
   if (m_failedFitCounter > 0) {
-    B2WARNING("GenFitter: " << m_failedGFTrackCandFitCounter << " of " << m_successfulGFTrackCandFitCounter + m_failedGFTrackCandFitCounter << " track candidates could not be fitted in this run");
-    B2WARNING("GenFitter: " << m_failedFitCounter << " of " << m_successfulFitCounter + m_failedFitCounter << " tracks could not be fitted in this run");
+    B2WARNING("GenFitter: " << m_failedGFTrackCandFitCounter << " of " << m_successfulGFTrackCandFitCounter +
+              m_failedGFTrackCandFitCounter << " track candidates could not be fitted in this run");
+    B2WARNING("GenFitter: " << m_failedFitCounter << " of " << m_successfulFitCounter + m_failedFitCounter <<
+              " tracks could not be fitted in this run");
   }
 }
 

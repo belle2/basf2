@@ -4,6 +4,7 @@
 #include "daq/slc/apps/rocontrold/EB0Controller.h"
 #include "daq/slc/apps/rocontrold/Stream0Controller.h"
 #include "daq/slc/apps/rocontrold/Stream1Controller.h"
+#include "daq/slc/apps/rocontrold/EB1TXController.h"
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/nsm/NSMData.h>
@@ -39,6 +40,7 @@ namespace Belle2 {
     EB0Controller m_eb0;
     std::vector<Stream0Controller> m_stream0;
     Stream1Controller m_stream1;
+    EB1TXController m_eb1tx;
 
   };
 

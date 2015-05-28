@@ -101,6 +101,7 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
+    m_eb1tx.init(this, 0, "eb1tx", obj);
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
   }
@@ -113,6 +114,7 @@ void ROCallback::term() throw()
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[0].term();
   }
+  m_eb1tx.term();
 }
 
 void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
@@ -135,6 +137,9 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   if (!m_stream1.load(obj, 10)) {
     throw (RCHandlerException("Faield to boot stream1"));
   }
+  if (!m_eb1tx.load(obj, 0)) {
+    throw (RCHandlerException("Faield to boot eb1tx"));
+  }
   set("stream1.pid", m_stream1.getControl().getProcess().get_id());
   LogFile::debug("Booted stream1");
   try_wait();
@@ -156,6 +161,7 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
   if (!m_stream1.start(expno, runno)) {
     throw (RCHandlerException("Faield to start stream1"));
   }
+  m_eb1tx.start(expno, runno);
 }
 
 void ROCallback::stop() throw(RCHandlerException)
@@ -186,6 +192,8 @@ void ROCallback::abort() throw(RCHandlerException)
     set(vname, -1);
   }
   set("eb0.pid", -1);
+  m_eb1tx.abort();
+  set("eb1tx.pid", -1);
 }
 
 void ROCallback::monitor() throw(RCHandlerException)
@@ -218,6 +226,9 @@ void ROCallback::monitor() throw(RCHandlerException)
   if (state == RCState::RUNNING_S || state == RCState::READY_S ||
       state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
       state == RCState::STARTING_TS) {
+    if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
+      throw (RCHandlerException("eb0 : crashed"));
+    }
     if (!m_stream1.getControl().isAlive()) {
       setState(RCState::NOTREADY_S);
       throw (RCHandlerException("stream1 : crashed"));
@@ -225,8 +236,11 @@ void ROCallback::monitor() throw(RCHandlerException)
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
         setState(RCState::NOTREADY_S);
-        throw (RCHandlerException(" stream0-%d : crashed", (int)i));
+        throw (RCHandlerException("stream0-%d : crashed", (int)i));
       }
+    }
+    if (m_eb1tx.isUsed() && !m_eb1tx.getControl().isAlive()) {
+      throw (RCHandlerException("eb1tx : crashed"));
     }
   }
 }

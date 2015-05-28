@@ -27,7 +27,7 @@ namespace Belle2 {
 
       /**
        * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
-       * The QuadTree has two dimensions: slope in z-direction and z0.
+       * The QuadTree has two dimensions: inverse slope in z-direction and z0.
        * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
        * and each hit is assigned to the track.
        * */

@@ -49,7 +49,8 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
                                 Processor::rangeY(-20, 20));
 
   Processor::ReturnList hits_set;
-  std::vector<Processor::ReturnList> possibleStereoSegments;
+  typedef std::pair<Processor::QuadTree*, Processor::ReturnList> Result;
+  std::vector<Result> possibleStereoSegments;
 
   // Fill in every unused stereo hit. Calculate the correct z-information before.
   for (const CDCRLWireHit& rlWireHit : wireHitTopology.getRLWireHits()) {
@@ -68,8 +69,8 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
 
   Processor::CandidateProcessorLambda lmdCandidateProcessing = [&](const Processor::ReturnList & items,
   Processor::QuadTree * node) -> void {
-    possibleStereoSegments.push_back(std::move(items));
-    B2DEBUG(100, "Theta: " << node->getXBin(0) << "; Z0: " << node->getYBin(0) << "; nhits: " << items.size());
+    possibleStereoSegments.push_back(std::make_pair(node, std::move(items)));
+    B2DEBUG(100, "Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
   };
 
   Processor qtProcessor(6, ranges);
@@ -79,19 +80,22 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
   if (possibleStereoSegments.size() == 0)
     return;
 
-  auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Processor::ReturnList & a,
-  const Processor::ReturnList & b) {
-    return a.size() < b.size();
+  auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Result & a,
+  const Result & b) {
+    return a.second.size() < b.second.size();
   });
 
-  for (CDCRecoHit3D* hit : *maxList) {
-    track.push_back(*hit);
-    hit->getWireHit().getAutomatonCell().setTakenFlag();
+
+
+  for (CDCRecoHit3D* hit : maxList->second) {
+    if (not hit->getWireHit().getAutomatonCell().hasAssignedFlag()) {
+      track.push_back(*hit);
+      hit->getWireHit().getAutomatonCell().setTakenFlag();
+    }
   }
 
   for (CDCRecoHit3D* recoHit : hits_set) {
-    if (not recoHit->getWireHit().getAutomatonCell().hasTakenFlag())
-      delete recoHit;
+    delete recoHit;
   }
 }
 

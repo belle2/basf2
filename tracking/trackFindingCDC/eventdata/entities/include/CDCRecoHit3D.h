@@ -297,6 +297,18 @@ namespace Belle2 {
         return zDistance * zDistance;
       }
 
+      /// Calculates the z slope with a given z0
+      /**
+       * We assume a line from the point (0, 0, z0) to the reco position. The slope of this line is returned.
+       */
+      FloatType calculateZSlopeWithZ0(FloatType z0)
+      {
+        FloatType z = getRecoZ();
+        FloatType radius = getRecoPos2D().norm();
+
+        return radius / (z - z0);
+      }
+
 
     private:
       const CDCRLWireHit* m_rlWireHit;  ///< Memory for the oriented wire hit reference

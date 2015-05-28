@@ -108,7 +108,7 @@ namespace Belle2 {
     };
 
     /** A QuadTreeProcessor for StereoTrackHits
-     * The two axis are the slope in z direction and the z0.
+     * The two axis are the inverse slope in z direction and the z0.
      * We loop over the z0 and calculate the z-slope with the x-y-z-position the recoHit has.
      *  */
     class StereoHitQuadTreeProcessor : public QuadTreeProcessorTemplate<float, float, CDCRecoHit3D, 2, 2> {
@@ -124,21 +124,18 @@ namespace Belle2 {
       {
         float dist[2][2];
 
-        float slopeMin = node->getXMin();
-        float slopeMax = node->getXMax();
+        float inverseSlopeMin = node->getXMin();
+        float inverseSlopeMax = node->getXMax();
         float zMin = node->getYMin();
         float zMax = node->getYMax();
 
-        float hitRadius = hit->getRecoPos2D().norm();
-        float hitZ = hit->getRecoZ();
+        float inverseSlopeForMinimum = 1 / hit->calculateZSlopeWithZ0(zMin);
+        float inverseSlopeForMaximum = 1 / hit->calculateZSlopeWithZ0(zMax);
 
-        float slopeForMinimum = hitZ / (hitRadius - zMin);
-        float slopeForMaximum = hitZ / (hitRadius - zMax);
-
-        dist[0][0] = slopeMin - slopeForMinimum;
-        dist[0][1] = slopeMin - slopeForMaximum;
-        dist[1][0] = slopeMax - slopeForMinimum;
-        dist[1][1] = slopeMax - slopeForMaximum;
+        dist[0][0] = inverseSlopeMin - inverseSlopeForMinimum;
+        dist[0][1] = inverseSlopeMin - inverseSlopeForMaximum;
+        dist[1][0] = inverseSlopeMax - inverseSlopeForMinimum;
+        dist[1][1] = inverseSlopeMax - inverseSlopeForMaximum;
 
         return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
       }

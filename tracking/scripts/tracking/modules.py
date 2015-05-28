@@ -15,6 +15,8 @@ import tracking.metamodules as metamodules
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
+from ROOT import Belle2
+
 
 def get_logger():
     return logging.getLogger(__name__)
@@ -346,15 +348,28 @@ class CDCFitter(metamodules.PathModule):
 
 class CDCEventDisplay(metamodules.WrapperModule):
 
-    """ Add the b2display module of the cdc display to the path """
+    """ Add the b2display or the cdc display module of the cdc display to the path """
 
     def __init__(self, full_display=True):
 
         if full_display:
-            display_module = StandardEventGenerationRun.get_basf2_module("Display", showTrackCandidates=True, showMCInfo=False)
+            display_module = StandardEventGenerationRun.get_basf2_module("Display", showTrackCandidates=True,
+                                                                         showTrackLevelObjects=False, showMCInfo=False,
+                                                                         hideObjects=["Unassigned RecoHits"])
         else:
             display_module = CDCSVGDisplayModule()
+            display_module.draw_hits = False
             display_module.draw_gftrackcand_trajectories = True
             display_module.draw_gftrackcands = True
+            display_module.draw_wrong_rl_infos_in_tracks = False
+            display_module.draw_wrong_rl_infos_in_segments = False
 
         super(CDCEventDisplay, self).__init__(display_module)
+
+
+class CDCMCFiller(basf2.Module):
+
+    """ Fill the later needed mc information """
+
+    def event(self):
+        Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()

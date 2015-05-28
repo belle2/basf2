@@ -197,6 +197,12 @@ class CDCSVGDisplayModule(Module):
         # Draw the trajectories stored in the output Genfit tracks
         self.draw_gftrackcand_trajectories = True and False
 
+        # Draw a red cdc hit of the rl info of the track reco hits is wrong, else a green one
+        self.draw_wrong_rl_infos_in_tracks = True and False
+
+        # Draw a red cdc hit of the rl info of the segment reco hits is wrong, else a green one
+        self.draw_wrong_rl_infos_in_segments = True and False
+
         # Name of the CDC Hits store array
         self.cdc_hits_store_array_name = "CDCHits"
 
@@ -630,6 +636,33 @@ class CDCSVGDisplayModule(Module):
         if self.draw_tracks:
             styleDict = {'stroke': attributemaps.listColors}
             plotter.draw_storevector('CDCTrackVector', **styleDict)
+
+        # Wrong RL Info
+        if self.draw_wrong_rl_infos_in_tracks:
+            styleDict = {'stroke': attributemaps.WrongRLColorMap()}
+
+            pystoreobj = Belle2.PyStoreObj('CDCTrackVector')
+
+            if pystoreobj:
+                # Wrapper around std::vector like
+                wrapped_vector = pystoreobj.obj()
+                vector = wrapped_vector.get()
+
+                for track in vector:
+                    plotter.draw_iterable(track.items(), **styleDict)
+
+        if self.draw_wrong_rl_infos_in_segments:
+            styleDict = {'stroke': attributemaps.WrongRLColorMap()}
+
+            pystoreobj = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
+
+            if pystoreobj:
+                # Wrapper around std::vector like
+                wrapped_vector = pystoreobj.obj()
+                vector = wrapped_vector.get()
+
+                for track in vector:
+                    plotter.draw_iterable(track.items(), **styleDict)
 
         # Draw Track Trajectories
         if self.draw_track_trajectories:

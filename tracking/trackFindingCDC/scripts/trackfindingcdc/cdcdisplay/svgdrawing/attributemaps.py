@@ -186,6 +186,34 @@ class RLColorMap(CDCHitColorMap):
         return 'Local right left passage variable: green <-> right, red <-> left, orange <-> not determinable.'
 
 
+class WrongRLColorMap():
+
+    """
+    CDCRecoHit3D to color map for the correctness of the rl information
+    """
+
+    def __call__(self, iCDCRecoHit, cdcRecoHit3D):
+        """
+        This function maps the cdcRecoHit3D to the color which inidcated the correctness of the rl passage
+        """
+
+        cdcHit = cdcRecoHit3D.getWireHit().getHit()
+
+        mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
+        rlInfo = mcHitLookUp.getRLInfo(cdcHit)
+
+        if rlInfo == cdcRecoHit3D.getRLInfo():
+            return 'green'
+        else:
+            return 'red'
+
+    def __str__(self):
+        """
+        Informal string summarizing the translation from right left passage variable to colors.
+        """
+        return 'Correct RL info: gree, wrong RL info: red'
+
+
 class PosFlagColorMap(CDCHitColorMap):
 
     """

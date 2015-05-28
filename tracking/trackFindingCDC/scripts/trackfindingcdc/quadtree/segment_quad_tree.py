@@ -10,14 +10,6 @@ import logging
 import sys
 
 
-class Filler(basf2.Module):
-
-    """ Fill the later needed mc information """
-
-    def event(self):
-        Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
-
-
 class SegmentQuadTreeRun(StandardEventGenerationRun):
 
     """ Create segments and plot them in a segment quad tree """

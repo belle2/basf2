@@ -154,8 +154,9 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
   int n = 0;
   int read_size = 0;
   while (1) {
-    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
-      if (errno == EINTR) {
+    errno = 0;
+    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) <= 0) {
+      if (errno == EINTR || errno == EAGAIN) {
         continue;
       } else {
         char err_buf[500];
@@ -250,7 +251,6 @@ int DesSerPrePC::Connect()
 
 int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_events_in_sendblock, int* num_nodes_in_sendblock)
 {
-
   int* temp_buf = NULL; // buffer for data-body
   int flag = 0;
 

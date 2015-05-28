@@ -56,20 +56,8 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
 
       // Calculate minimum and maximum angle:
       // TODO: Might not be needed, as we can assume the hits are sorted!
-      double minimumAngle = 4;
-      double maximumAngle = 0;
-
-      for (const CDCRecoHit3D& recoHit : trackCand) {
-        double currentAngle = recoHit.getPerpS(trajectory.getTrajectory2D());
-        if (currentAngle > 0) {
-          if (currentAngle < minimumAngle) {
-            minimumAngle = currentAngle;
-          }
-          if (currentAngle > maximumAngle) {
-            maximumAngle = currentAngle;
-          }
-        }
-      }
+      double minimumAngle = trackCand.front().getPerpS();
+      double maximumAngle = trackCand.back().getPerpS();
 
       // For the reconstructed segment there are only two possible cases:
       // (1) the segment is full axial. We fit the hits of the segment together with the axial hits of the track.
@@ -84,19 +72,20 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
             observationsCircle.append(recoHit2D);
         }
 
-        // Add the hits from the TrackCand to the circle fit
-        for (const CDCRecoHit3D& recoHit : trackCand) {
-          if (recoHit.getStereoType() == AXIAL) {
-            observationsCircle.append(recoHit.getWireHit().getRefPos2D());
+        if (observationsCircle.size() > 0) {
+          // Add the hits from the TrackCand to the circle fit
+          for (const CDCRecoHit3D& recoHit : trackCand) {
+            if (recoHit.getStereoType() == AXIAL) {
+              observationsCircle.append(recoHit.getWireHit().getRefPos2D());
+            }
           }
+
+          // Fit the circle trajectory
+          CDCTrajectory2D trajectory2D;
+          circleFitter.update(trajectory2D, observationsCircle);
+          m_fittingMatrix(counterSegment, counterTracks) = trajectory2D.getPValue();
+          // we do not set the z-Matrix or the zDistMatrix here
         }
-
-        // Fit the circle trajectory
-        CDCTrajectory2D trajectory2D;
-        circleFitter.update(trajectory2D, observationsCircle);
-        m_fittingMatrix(counterSegment, counterTracks) = trajectory2D.getPValue();
-        // we do not set the z-Matrix or the zDistMatrix here
-
       } else if (segment.getStereoType() == STEREO_U or segment.getStereoType() == STEREO_V) {
         CDCObservations2D observationsSZ;
 

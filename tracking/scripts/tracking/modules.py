@@ -87,12 +87,14 @@ class CDCFullFinder(metamodules.PathModule):
 
     """Full finder sequence for the CDC with a step of Legendre tracking first and cellular automaton tracking second."""
 
-    def __init__(self, output_track_cands_store_array_name="TrackCands"):
+    def __init__(self, output_track_cands_store_array_name="TrackCands",
+                 tmva_cut=0.1):
 
-        modules = [CDCBackgroundHitFinder(),
+        modules = [CDCBackgroundHitFinder(tmva_cut=tmva_cut),
                    CDCLegendreTrackFinder(),
                    CDCLocalTrackFinder(),
-                   CDCNotAssignedHitsCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name)]
+                   CDCNotAssignedHitsCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name)
+                   ]
 
         super(CDCFullFinder, self).__init__(modules=modules)
 

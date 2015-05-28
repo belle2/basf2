@@ -75,7 +75,7 @@ EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
 
 EKLM::Reconstructor::~Reconstructor()
 {
-  delete m_TimeParams;
+  delete[] m_TimeParams;
 }
 
 bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)

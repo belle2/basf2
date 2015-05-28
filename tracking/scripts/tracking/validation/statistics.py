@@ -107,7 +107,7 @@ def is_discrete_series(xs, max_n_unique=None):
     """
 
     if max_n_unique is None:
-        max_n_unique = statistics.default_max_n_unique_for_discrete
+        max_n_unique = default_max_n_unique_for_discrete
 
     # FIXME: improve test for discrete variable
     unique_xs = np.unique(xs)

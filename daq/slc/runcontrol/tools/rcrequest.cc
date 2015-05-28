@@ -50,5 +50,21 @@ int main(int argc, const char** argv)
   } else {
     NSMCommunicator::send(NSMMessage(node, cmd));
   }
+  try {
+    NSMCommunicator& com(NSMCommunicator::select(30));
+    const NSMMessage& msg(com.getMessage());
+    const NSMCommand cmd = msg.getRequestName();
+    if (cmd == NSMCommand::OK) {
+      LogFile::info("Success");
+    } else if (cmd == NSMCommand::ERROR) {
+      LogFile::error(msg.getNodeName(), msg.getData());
+    } else if (cmd == NSMCommand::FATAL) {
+      LogFile::fatal(msg.getNodeName(), msg.getData());
+    }
+  } catch (const TimeoutException& e) {
+    LogFile::warning("timeout");
+  } catch (const IOException& e) {
+    LogFile::error(e.what());
+  }
   return 0;
 }

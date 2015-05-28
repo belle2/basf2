@@ -266,7 +266,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       getNode().getState() == RCState::READY_S ||
       getNode().getState() == RCState::PAUSED_S) {
     if (!m_con.isAlive()) {
-      throw (RCHandlerException("Process down : basf2"));
+      throw (RCHandlerException(m_con.getName() + " : crashed"));
     }
   }
 }

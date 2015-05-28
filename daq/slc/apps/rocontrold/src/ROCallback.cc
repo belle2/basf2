@@ -214,15 +214,18 @@ void ROCallback::monitor() throw(RCHandlerException)
     }
     data.flush();
   }
-  if (getNode().getState() == RCState::RUNNING_S ||
-      getNode().getState() == RCState::READY_S ||
-      getNode().getState() == RCState::PAUSED_S) {
+  const RCState state(getNode().getState());
+  if (state == RCState::RUNNING_S || state == RCState::READY_S ||
+      state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
+      state == RCState::STARTING_TS) {
     if (!m_stream1.getControl().isAlive()) {
-      throw (RCHandlerException("Process down : stream1"));
+      setState(RCState::NOTREADY_S);
+      throw (RCHandlerException("stream1 : crashed"));
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
-        throw (RCHandlerException("Process down : stream0-%d", (int)i));
+        setState(RCState::NOTREADY_S);
+        throw (RCHandlerException(" stream0-%d : crashed", (int)i));
       }
     }
   }

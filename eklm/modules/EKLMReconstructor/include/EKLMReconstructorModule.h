@@ -13,6 +13,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/reconstruction/Reconstructor.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -65,6 +66,9 @@ namespace Belle2 {
 
     /** Geometry data. */
     EKLM::GeometryData m_geoDat;
+
+    /* Reconstructor. */
+    EKLM::Reconstructor* m_rec;
 
   };
 

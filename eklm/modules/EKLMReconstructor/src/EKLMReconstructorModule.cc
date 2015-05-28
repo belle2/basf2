@@ -41,16 +41,17 @@ void EKLMReconstructorModule::initialize()
 
 void EKLMReconstructorModule::beginRun()
 {
+  m_rec = new EKLM::Reconstructor(&m_geoDat);
 }
 
 void EKLMReconstructorModule::event()
 {
-  EKLM::Reconstructor recon(&m_geoDat);
-  recon.create2dHits();
+  m_rec->create2dHits();
 }
 
 void EKLMReconstructorModule::endRun()
 {
+  delete m_rec;
 }
 
 void EKLMReconstructorModule::terminate()

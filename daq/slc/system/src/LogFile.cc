@@ -1,7 +1,6 @@
 #include "daq/slc/system/LogFile.h"
 
 #include <daq/slc/base/ConfigFile.h>
-#include <daq/slc/base/Date.h>
 #include <daq/slc/base/StringUtil.h>
 
 #include <iostream>
@@ -24,6 +23,7 @@ unsigned int LogFile::g_filesize = 0;
 Mutex LogFile::g_mutex;
 LogFile::Priority LogFile::g_threshold;
 std::string LogFile::g_filename;
+Date LogFile::g_date;
 
 LogFile::Priority LogFile::getPriority(const std::string& str)
 {
@@ -50,8 +50,9 @@ void LogFile::open(const std::string& filename, Priority threshold)
     ConfigFile config("slowcontrol");
     system(("mkdir -p " + config.get("logfile.dir") + "/" + filename).c_str());
     g_filename = filename;
-    g_filepath = config.get("logfile.dir") + "/" + filename + "/"
-                 + Date().toString("%Y.%m.%d.log");
+    g_date = Date();
+    g_filepath = config.get("logfile.dir") + "/" + filename + "/latest.log";
+    //+ date.toString("%Y.%m.%d.log");
     g_threshold = threshold;
     g_opened = true;
     open();
@@ -145,12 +146,13 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     return 0;
   }
   Date date;
-  if (g_filesize >= 1024 * 1024 * 2) {
+  if (g_date.getDay() != date.getDay() ||
+      g_filesize >= 1024 * 1024 * 2) {
     g_stream.close();
     ConfigFile config("slowcontrol");
     rename(g_filepath.c_str(),
            (config.get("logfile.dir") + "/" + g_filename + "/" +
-            date.toString("%Y.%m.%d.%H.%M.log")).c_str());
+            g_date.toString("%Y.%m.%d.%H.%M.log")).c_str());
     g_mutex.unlock();
     open();
     g_mutex.lock();

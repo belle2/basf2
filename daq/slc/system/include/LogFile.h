@@ -3,6 +3,8 @@
 
 #include <daq/slc/system/Mutex.h>
 
+#include <daq/slc/base/Date.h>
+
 #include <string>
 #include <fstream>
 #include <stdarg.h>
@@ -32,6 +34,7 @@ namespace Belle2 {
     static Mutex g_mutex;
     static Priority g_threshold;
     static std::string g_filename;
+    static Date g_date;
 
     // member functions
   public:

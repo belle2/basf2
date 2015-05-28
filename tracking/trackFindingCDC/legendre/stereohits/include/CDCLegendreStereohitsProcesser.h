@@ -20,6 +20,7 @@ namespace Belle2 {
     class TrackCandidate;
     class StereoHit;
     class CDCTrack;
+    class CDCRLWireHit;
 
     class StereohitsProcesser {
     public:
@@ -49,6 +50,9 @@ namespace Belle2 {
       /** Return position of the hit on the track expressed in rads */
       // has to be refactored
       double getAlpha(TrackCandidate* cand, std::pair<double, double> pos);
+
+      /** Returns a bool if the rlWire can be matched to a track. This is calculated with the track charge and the superlayer information */
+      bool rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrack& track);
     };
   }
 

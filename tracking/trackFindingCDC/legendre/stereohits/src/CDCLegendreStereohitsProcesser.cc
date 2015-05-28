@@ -10,6 +10,32 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrack& track)
+{
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  if (rlWireHit.getStereoType() == AXIAL or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
+    return false;
+
+  const Vector2D& center = trajectory2D.getGlobalCircle().center();
+  double trackPhi = center.phi();
+  double hitPhi = rlWireHit.getRefPos2D().phi();
+
+
+  double phi_diff = trackPhi - hitPhi;
+  if (not std::isnan(phi_diff)) {
+    phi_diff = TVector2::Phi_0_2pi(phi_diff);
+  }
+
+  int charge = 1;
+  if (phi_diff <= TMath::Pi())
+    charge = -1;
+
+  if (trajectory2D.getChargeSign() != charge)
+    return false;
+
+  return true;
+}
+
 void StereohitsProcesser::makeHistogramming(CDCTrack& track)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -27,29 +53,16 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
 
   // Fill in every unused stereo hit. Calculate the correct z-information before.
   for (const CDCRLWireHit& rlWireHit : wireHitTopology.getRLWireHits()) {
-    if (rlWireHit.getStereoType() == AXIAL or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
-      continue;
+    if (rlWireHitMatchesTrack(rlWireHit, track)) {
+      const CDCWire& wire = rlWireHit.getWire();
+      const double forwardZ = wire.getSkewLine().forwardZ();
+      const double backwardZ = wire.getSkewLine().backwardZ();
 
-    const Vector2D& center = trajectory2D.getGlobalCircle().center();
-    double phi = rlWireHit.getRefPos2D().phi();
-
-    double phi_diff = TVector2::Phi_0_2pi(center.phi() - phi);
-
-    int charge = 1;
-    if (phi_diff <= TMath::Pi())
-      charge = -1;
-
-    if (trajectory2D.getChargeSign() != charge)
-      continue;
-
-    const CDCWire& wire = rlWireHit.getWire();
-    const double forwardZ = wire.getSkewLine().forwardZ();
-    const double backwardZ = wire.getSkewLine().backwardZ();
-
-    Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
-    if (backwardZ < recoPos3D.z() and recoPos3D.z() < forwardZ) {
-      FloatType perpS = trajectory2D.calcPerpS(recoPos3D.xy());
-      hits_set.push_back(new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS));
+      Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
+      if (backwardZ < recoPos3D.z() and recoPos3D.z() < forwardZ) {
+        FloatType perpS = trajectory2D.calcPerpS(recoPos3D.xy());
+        hits_set.push_back(new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS));
+      }
     }
   }
 

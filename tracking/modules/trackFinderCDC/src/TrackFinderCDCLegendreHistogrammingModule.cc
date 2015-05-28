@@ -20,6 +20,7 @@ void CDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCD
   for (CDCTrack& track : tracks) {
     //assign stereohits to the track
     stereohitsProcesser.makeHistogramming(track);
+    track.sort();
   }
 
   // Refit the tracks

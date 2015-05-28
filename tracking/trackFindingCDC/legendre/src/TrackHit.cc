@@ -21,7 +21,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-TrackHit::TrackHit(const CDCHit* hit, int)
+TrackHit::TrackHit(const CDCHit* hit, int) : TrackHit()
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   initializeFromWireHit(wireHitTopology.getWireHit(hit));

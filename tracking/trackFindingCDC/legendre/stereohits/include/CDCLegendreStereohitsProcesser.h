@@ -1,38 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Viktor Trusov                                            *
+ * Contributors: Viktor Trusov, Nils Braun                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-
-#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohit.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeNeighborFinder.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-
-#include <TVector3.h>
-#include <TVector2.h>
-
-#include "boost/foreach.hpp"
-
-#include <list>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <TMath.h>
+#include <utility>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -40,47 +19,36 @@ namespace Belle2 {
     class TrackHit;
     class TrackCandidate;
     class StereoHit;
+    class CDCTrack;
 
     class StereohitsProcesser {
     public:
 
-      StereohitsProcesser();
-
-      ~StereohitsProcesser();
-
-
-      /** Assign stereohits to the track with known polar angle */
-      void assignStereohitsByAngle(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
+      /**
+       * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
+       * The QuadTree has two dimensions: slope in z-direction and z0.
+       * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
+       * and each hit is assigned to the track.
+       * */
+      void makeHistogramming(CDCTrack& track);
 
       /** Return displacements of the stereohit against the track */
+      // has to be refactored?
       std::pair<StereoHit, StereoHit> getDisplacements(TrackCandidate* cand, TrackHit* hit, int trackCharge = 0);
 
-      /** Return displacement (inner or outer) of the stereohit against the track */
-      StereoHit getDisplacement(TrackCandidate* cand, TrackHit* hit, int InnerOuter);
-
-      /** Return displacement (inner or outer) of the stereohit against the track */
-      void makeHistogramming(TrackCandidate* cand, std::vector<TrackHit*>& stereohits);
-
-      /** Return position of the hit on the track expressed in rads */
-      double getAlpha(TrackCandidate* cand, std::pair<double, double> pos);
-
-      void assignStereohitsByAngleWithQuadtree(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
-
-      void MaxFastHoughStereofinding(
-        std::vector<TrackHit*>& hitsToAdd,
-        std::vector<std::pair<StereoHit, StereoHit>>& hits,
-        const int level,
-        const double lambda_min,
-        const double lambda_max,
-        const double z0_min,
-        const double z0_max);
-
-      inline bool sameSign(double n1, double n2, double n3, double n4)
-      {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
+      /** Assign stereohits to the track with known polar angle */
+      // has to be refactored? unused?
+      void assignStereohitsByAngle(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
 
     private:
-      QuadTreeLegendre m_cdcLegendreQuadTree; /**< Quad tree, which is used for finding stereohits with known polar angle */
 
+      /** Return displacement (inner or outer) of the stereohit against the track */
+      // has to be refactored
+      StereoHit getDisplacement(TrackCandidate* cand, TrackHit* hit, int InnerOuter);
+
+      /** Return position of the hit on the track expressed in rads */
+      // has to be refactored
+      double getAlpha(TrackCandidate* cand, std::pair<double, double> pos);
     };
   }
 

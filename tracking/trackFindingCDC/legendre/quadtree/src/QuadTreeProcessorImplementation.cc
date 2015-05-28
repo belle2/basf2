@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Viktor Trusov, Thomas Hauth                              *
+ * Contributors: Viktor Trusov, Thomas Hauth, Nils Braun                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

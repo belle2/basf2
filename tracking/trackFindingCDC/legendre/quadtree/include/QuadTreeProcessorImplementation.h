@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -103,6 +104,55 @@ namespace Belle2 {
         } else {
           return ChildRanges(rangeX(node->getXBin(i), node->getXBin(i + 1)), rangeY(node->getYBin(j), node->getYBin(j + 1)));
         }
+      }
+    };
+
+    /** A QuadTreeProcessor for StereoTrackHits
+     * The two axis are the slope in z direction and the z0.
+     * We loop over the z0 and calculate the z-slope with the x-y-z-position the recoHit has.
+     *  */
+    class StereoHitQuadTreeProcessor : public QuadTreeProcessorTemplate<float, float, CDCRecoHit3D, 2, 2> {
+
+    public:
+
+      StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges) : QuadTreeProcessorTemplate(lastLevel, ranges) { }
+
+      /**
+       * Do only insert the hit into a node if the slope and z information calculated from this hit belongs into this node
+       */
+      bool insertItemInNode(QuadTree* node, CDCRecoHit3D* hit, unsigned int /*slope_index*/, unsigned int /*z0_index*/) const override
+      {
+        float dist[2][2];
+
+        float slopeMin = node->getXMin();
+        float slopeMax = node->getXMax();
+        float zMin = node->getYMin();
+        float zMax = node->getYMax();
+
+        float hitRadius = hit->getRecoPos2D().norm();
+        float hitZ = hit->getRecoZ();
+
+        float slopeForMinimum = hitZ / (hitRadius - zMin);
+        float slopeForMaximum = hitZ / (hitRadius - zMax);
+
+        dist[0][0] = slopeMin - slopeForMinimum;
+        dist[0][1] = slopeMin - slopeForMaximum;
+        dist[1][0] = slopeMax - slopeForMinimum;
+        dist[1][1] = slopeMax - slopeForMaximum;
+
+        return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
+      }
+
+      /**
+       * Return the new ranges. We use the standard ranges.
+       */
+      ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
+      {
+        float slopeMin = node->getXBin(i);
+        float slopeMax = node->getXBin(i + 1);
+        float zMin = node->getYBin(j);
+        float zMax = node->getYBin(j + 1);
+        return ChildRanges(rangeX(slopeMin, slopeMax), rangeY(zMin, zMax));
       }
     };
 

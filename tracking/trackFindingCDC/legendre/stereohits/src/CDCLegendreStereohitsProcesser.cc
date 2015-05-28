@@ -37,7 +37,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
 
     int charge = 1;
     if (phi_diff <= TMath::Pi())
-      charge = 1;
+      charge = -1;
 
     if (trajectory2D.getChargeSign() != charge)
       continue;

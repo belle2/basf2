@@ -301,13 +301,6 @@ void GenFitterVXDTBModule::event()
   B2DEBUG(149, "GenFitter: Number of SVDClusters: " << nSVDClusters);
   if (nSVDClusters == 0) {B2DEBUG(100, "GenFitter: SVDClustersCollection is empty!");}
 
-  if (m_filterId == 0) {
-    B2DEBUG(99, "Kalman filter with " << m_nMinIter << " to " << m_nMaxIter << " iterations will be used ");
-  } else {
-    B2DEBUG(99, "DAF with probability cut " << m_probCut << " will be used ");
-  }
-
-
   //StoreArrays to store the fit results
   StoreArray < Track > tracks;
   tracks.create();

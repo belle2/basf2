@@ -1,0 +1,15 @@
+Import('env')
+
+#env['LIBS'] = ['tracking_dataobjects', 'testbeam_vxd_dataobjects']
+
+env['LIBS'] = [
+    'pxd_dataobjects',
+    'tracking',
+    'vxd', 'vxd_dataobjects', 
+    'framework',
+    'Geom',
+    '$ROOT_LIBS',
+    ]
+
+
+Return('env')

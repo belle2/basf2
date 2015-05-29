@@ -25,7 +25,7 @@ namespace Belle2 {
   template<class HitType>
   class Segment {
   protected:
-    /** ********************************* members ********************************* **/
+    /** ************************* DATA MEMBERS ************************* */
 
     /** pointer to hit forming the outer end of the Segment. */
     HitType* m_outerHit;
@@ -51,9 +51,9 @@ namespace Belle2 {
     /** sets flag whether Segment is allowed to be the seed of a new track candidate or not */
     bool m_seed;
 
-  public:
-    /** ********************************* constructors ********************************* **/
 
+  public:
+    /** ************************* CONSTRUCTORS ************************* */
 
     /** Default constructor for the ROOT IO. */
     Segment():
@@ -83,8 +83,18 @@ namespace Belle2 {
       m_stateUpgrade(false),
       m_seed(true) {}
 
-    /** ********************************* getter ********************************* **/
 
+    /** ************************* OPERATORS ************************* */
+
+    /** overloaded '=='-operator */
+    bool operator==(const Segment& b) const
+    {
+      return (*getInnerHit() == *b.getInnerHit() and * getOuterHit() == *b.getOuterHit());
+    }
+
+
+    /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
+/// getters:
 
     /** returns state of Segment (CA-feature) */
     inline int getState() const { return m_state; }
@@ -117,8 +127,8 @@ namespace Belle2 {
     /** returns outer secID of current Segment */
     inline FullSecID::BaseType* getOuterSecID() const { return m_outerSector; }
 
-    /** ********************************* setter ********************************* **/
 
+/// setters:
 
     /** increases state during CA update step */
     inline void increaseState() { m_state++; }
@@ -129,7 +139,7 @@ namespace Belle2 {
 
 
     /** sets flag whether Cell is allowed to be the seed of a new track candidate or not */
-    inline void setSeed(bool isSeed) { m_seed = isSeed; }
+    inline void setSeed(bool isSeedTrue) { m_seed = isSeedTrue; }
 
 
     /** sets flag whether Cell is active (takes part during current CA iteration) or inactive (does not take part, it is 'dead') */

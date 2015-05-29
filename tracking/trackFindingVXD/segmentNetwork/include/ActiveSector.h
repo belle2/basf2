@@ -25,7 +25,7 @@ namespace Belle2 {
   template<class StaticSectorType, class HitType>
   class ActiveSector {
   protected:
-    /** ********************************* members ********************************* **/
+    /** ************************* DATA MEMBERS ************************* */
 
     /** Pointer to real sector after design of SectorMap */
     const StaticSectorType* m_staticSector;
@@ -35,8 +35,7 @@ namespace Belle2 {
 
 
   public:
-    /** ********************************* constructors ********************************* **/
-
+    /** ************************* CONSTRUCTORS ************************* */
 
     /** Default constructor for root compatibility */
     ActiveSector(): m_staticSector(NULL) {}
@@ -44,11 +43,11 @@ namespace Belle2 {
     /** Constructor.
     *      //      * @param staticSector pointer to static sector associated with this one.
      *      //      */
-    ActiveSector(StaticSectorType* staticSector):
+    ActiveSector(const StaticSectorType* staticSector):
       m_staticSector(staticSector) {}
 
-    /** ********************************* operator overload ********************************* **/
 
+    /** ************************* OPERATORS ************************* */
 
     /** overloaded '=='-operator for sorting algorithms */
     bool operator==(const ActiveSector& b) const
@@ -70,8 +69,9 @@ namespace Belle2 {
       return (getFullSecID() > b.getFullSecID());
     }
 
-    /** ********************************* getter ********************************* **/
 
+    /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
+/// getters:
 
     /** returns all indices of attached Hits */
     inline const std::vector<HitType*>& getHits() const { return m_hits; }
@@ -88,8 +88,8 @@ namespace Belle2 {
     /** returns VxdID of sensor carrying current sector */
     inline FullSecID::BaseType getFullSecID() const { return m_staticSector->getFullSecID(); }
 
-    /** ********************************* setter ********************************* **/
 
+/// setters:
 
     /** adds new Segment to vector of inner Cells attached to current hit */
     inline void addHit(HitType* newNode) { m_hits.push_back(newNode); }

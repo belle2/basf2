@@ -98,6 +98,8 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
             m_nodename.c_str(), b2nsm_strerror());
   }
 
+  // Node status = Unconfigured
+  RFNSM_Status::Instance().set_state(RFSTATE_UNCONFIGURED);
 }
 
 RFNSM::~RFNSM()
@@ -123,7 +125,10 @@ void RFNSM::AllocMem(char* format)
 // Wrapper functions to be hooked to NSM
 void RFNSM::m_Configure(NSMmsg* msg, NSMcontext* ctx)
 {
+  fflush(stdout);
   int stat = g_nsmserver->Configure(msg, ctx);
+  fflush(stdout);
+  RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
   if (stat == 0)
     b2nsm_ok(msg, "Configured", NULL);
   else
@@ -132,7 +137,10 @@ void RFNSM::m_Configure(NSMmsg* msg, NSMcontext* ctx)
 
 void RFNSM::m_UnConfigure(NSMmsg* msg, NSMcontext* ctx)
 {
+  fflush(stdout);
   int stat = g_nsmserver->UnConfigure(msg, ctx);
+  fflush(stdout);
+  RFNSM_Status::Instance().set_state(RFSTATE_UNCONFIGURED);
   if (stat == 0)
     b2nsm_ok(msg, "Unconfigured", NULL);
   else
@@ -186,11 +194,15 @@ void RFNSM::m_Restart(NSMmsg* msg, NSMcontext* ctx)
 
 void RFNSM::m_Status(NSMmsg* msg, NSMcontext* ctx)
 {
+  /* Old imp
   int stat = g_nsmserver->Status(msg, ctx);
   if (stat == 0)
     b2nsm_ok(msg, "Status", NULL);
   else
     b2nsm_error(msg, NULL);
+  */
+  int curstate = RFNSM_Status::Instance().get_state();
+  b2nsm_ok(msg, RFSTATE[curstate].c_str(), NULL);
 
 }
 
@@ -244,4 +256,14 @@ void RFNSM_Status::set_flag(int val)
 int RFNSM_Status::get_flag()
 {
   return m_flag;
+}
+
+void RFNSM_Status::set_state(int val)
+{
+  m_state = val;
+}
+
+int RFNSM_Status::get_state()
+{
+  return m_state;
 }

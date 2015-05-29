@@ -16,13 +16,9 @@
 //    ^ "unconfigure"            "resume"
 //    +---------"restart"
 //
-#define RFSTATE_OFFLINE 0
-#define RFSTATE_TRANS_CONFIG 1
-#define RFSTATE_CONFIGURED 2
-#define RFSTATE_TRANS_RUN 3
-#define RFSTATE_RUNNING 4
-#define RFSTATE_PAUSE 5
-
+#define RFSTATE_UNCONFIGURED 0
+#define RFSTATE_CONFIGURED 1
+#define RFSTATE_TRANSITION 2
 
 #include <string>
 #include <stdio.h>
@@ -35,6 +31,8 @@
 
 #include "daq/rfarm/manager/RFServerBase.h"
 #include "daq/rfarm/manager/RfNodeInfo.h"
+
+static std::string RFSTATE[] = { "Unconfigured", "Configured", "Transition" };
 
 namespace Belle2 {
 
@@ -49,8 +47,12 @@ namespace Belle2 {
     void set_flag(int);
     int get_flag();
 
+    void set_state(int);
+    int get_state();
+
   private:
     int m_flag;
+    int m_state;
     static RFNSM_Status* s_instance;
   };
 

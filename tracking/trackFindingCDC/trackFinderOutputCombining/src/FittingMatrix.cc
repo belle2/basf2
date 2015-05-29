@@ -52,6 +52,11 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
       m_zMatrix(counterSegment, counterTracks) = 0;
       m_zDistMatrix(counterSegment, counterTracks) = 0;
 
+      if (segment.getAutomatonCell().hasTakenFlag()) {
+        B2INFO("Skipping segment...")
+        continue;
+      }
+
       const CDCTrajectory3D& trajectory = trackCand.getStartTrajectory3D();
 
       // Calculate minimum and maximum angle:
@@ -117,8 +122,10 @@ void FittingMatrix::fillHitsInto(const CDCRecoSegment2D& recoSegment, CDCTrack& 
 {
   const CDCTrajectory2D& trajectory2D = bestTrackCand.getStartTrajectory3D().getTrajectory2D();
   for (const CDCRecoHit2D& recoHit : recoSegment) {
-    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
-    bestTrackCand.push_back(recoHit3D);
+    if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
+      bestTrackCand.push_back(recoHit3D);
+    }
   }
 }
 

@@ -25,11 +25,11 @@ void StereoSegmentTrackMatcherModule::fillHitLookUp(std::vector<CDCRecoSegment2D
 {
   m_hitSegmentLookUp.clear();
   for (const CDCRecoSegment2D& segment : segments) {
-    if (segment.getStereoType() == 0)
+    if (segment.getStereoType() == AXIAL)
       continue;
     for (const CDCRecoHit2D& recoHit : segment) {
       const CDCHit* cdcHit = recoHit.getWireHit().getHit();
-      m_hitSegmentLookUp.emplace(cdcHit, &segment);
+      m_hitSegmentLookUp.insert(std::make_pair(cdcHit, &segment));
     }
   }
 }
@@ -51,7 +51,7 @@ void StereoSegmentTrackMatcherModule::fillTrackLookUp(std::vector<CDCRecoSegment
   // prepare lookup
   m_segmentTrackLookUp.clear();
   for (const CDCRecoSegment2D& segment : segments) {
-    m_segmentTrackLookUp.emplace(&segment, std::set<TrackFindingCDC::CDCTrack*>());
+    m_segmentTrackLookUp.insert(std::make_pair(&segment, std::set<TrackFindingCDC::CDCTrack*>()));
   }
 
   for (CDCTrack& track : tracks) {

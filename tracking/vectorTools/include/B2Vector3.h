@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
     /** Constructor expecting 3 coordinates */
-    B2Vector3(const DataType x, const DataType y, const DataType z): m_coordinates {x, y, z} {};
+    B2Vector3(const DataType xVal, const DataType yVal, const DataType zVal): m_coordinates {xVal, yVal, zVal} {};
 
 
 //     /** Constructor using a hard copy */
@@ -429,13 +429,13 @@ namespace Belle2 {
     /**  Vector orthogonal to this one. */
     inline B2Vector3<DataType> Orthogonal() const
     {
-      DataType x = X() < 0.0 ? -X() : X();
-      DataType y = Y() < 0.0 ? -Y() : Y();
-      DataType z = Z() < 0.0 ? -Z() : Z();
-      if (x < y) {
-        return x < z ? B2Vector3<DataType>(0, Z(), -Y()) : B2Vector3<DataType>(Y(), -X(), 0);
+      DataType xVal = X() < 0.0 ? -X() : X();
+      DataType yVal = Y() < 0.0 ? -Y() : Y();
+      DataType zVal = Z() < 0.0 ? -Z() : Z();
+      if (xVal < yVal) {
+        return xVal < zVal ? B2Vector3<DataType>(0, Z(), -Y()) : B2Vector3<DataType>(Y(), -X(), 0);
       } else {
-        return y < z ? B2Vector3<DataType>(-Z(), 0, X()) : B2Vector3<DataType>(Y(), -X(), 0);
+        return yVal < zVal ? B2Vector3<DataType>(-Z(), 0, X()) : B2Vector3<DataType>(Y(), -X(), 0);
       }
     }
 

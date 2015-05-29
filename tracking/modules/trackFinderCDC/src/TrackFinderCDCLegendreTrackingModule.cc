@@ -99,7 +99,7 @@ void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CD
 
 void CDCLegendreTrackingModule::startNewEvent()
 {
-  B2INFO("**********   CDCTrackingModule  ************");
+  B2DEBUG(100, "**********   CDCTrackingModule  ************");
   m_cdcLegendreTrackDrawer->event();
 
   B2DEBUG(100, "Initializing hits");

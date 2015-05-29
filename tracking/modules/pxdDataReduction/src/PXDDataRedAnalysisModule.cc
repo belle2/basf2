@@ -48,7 +48,7 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule()
     m_ROIListName(),          /**< ROI list name */
 
     m_rootFilePtr(NULL), /**< pointer at root file used for storing infos for debugging and validating purposes */
-    m_rootFileName(NULL), /**< root file name */
+    m_rootFileName(""), /**< root file name */
     m_writeToRoot(false), /**< if true,  m_rootFileName will be filled with info */
 
     m_rootEvent(-1),   /**<  event number*/

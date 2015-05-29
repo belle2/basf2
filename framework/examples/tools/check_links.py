@@ -8,11 +8,6 @@ import os
 import sys
 import tempfile
 
-if len(sys.argv) < 2:
-    print "Test disabled, start with -- --really argument to run it manually."
-    sys.exit(0)
-
-
 # define main() for building executables
 maincc = tempfile.mkstemp(suffix='.cc')
 mainccfd = open(maincc[1], 'w+')
@@ -42,6 +37,7 @@ def checkLinks(subdir):
             tmpfile.close()  # might not work
             print "passed: " + lib
         except:
+            print "FAILED: " + lib
             pass
 
 checkLinks('lib')

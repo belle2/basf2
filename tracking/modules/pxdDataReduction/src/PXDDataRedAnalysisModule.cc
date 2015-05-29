@@ -42,15 +42,139 @@ REG_MODULE(PXDDataRedAnalysis)
 //-----------------------------------------------------------------
 
 PXDDataRedAnalysisModule::PXDDataRedAnalysisModule()
-  : Module()
-  , n_tracks(0)
-  , n_tracksWithDigits(0)
-  , n_pxdDigit(0)
-  , n_pxdDigitInROI(0)
-  , n_noHit2(0)
-  , n_noHit3(0)
-  , n_noROI4(0)
-  , n_noROI5(0)
+  : Module(),
+    m_gfTrackCandsColName(),  /**< TrackCand list name */
+    m_PXDInterceptListName(), /**< Intercept list name */
+    m_ROIListName(),          /**< ROI list name */
+
+    m_rootFilePtr(NULL), /**< pointer at root file used for storing infos for debugging and validating purposes */
+    m_rootFileName(NULL), /**< root file name */
+    m_writeToRoot(false), /**< if true,  m_rootFileName will be filled with info */
+
+    m_rootEvent(-1),   /**<  event number*/
+    m_gEff(NULL), /**< efficiency graph */
+    m_h1digiIn(NULL), /**< digits contained in ROI histogram*/
+    m_h1digiOut2(NULL), /**< lost digit: ROI exist with right vxdID */
+    m_h1digiOut3(NULL), /**< lost digit: ROI exist with wrong vxdID */
+    m_h1digiOut4(NULL), /**< lost digit: ROI does not exist, intercept with right vxdID */
+    m_h1digiOut5(NULL), /**< lost digit: ROI does not exist, intercept with wrong vxdID */
+
+//histograms
+    m_h1ptAll(NULL), /**< distribution of transverse momentum for all PDXDigits*/
+    m_h1pt(NULL), /**< distribution of transverse momentum for PDXDigits contained in a ROI*/
+    m_h1ptBad(NULL), /**< distribution of transverse momentum for PDXDigits  when no ROI exists and intercept has wrong vxdid*/
+
+    m_h1GlobalTime(NULL), /**< distribution of global time for PDXDigits contained in a ROI*/
+    m_h1GlobalTimeFail(NULL), /**< distribution of global time for PDXDigits not contained in a ROI*/
+    m_h1GlobalTimeNoROI(NULL), /**< distribution of global time for PDXDigits when no ROI exists*/
+    m_h1GlobalTimeBad(NULL), /**< distribution of global time for PDXDigits when no ROI exists and intercept has wrong vxdid*/
+
+    m_h1CoorUBad(NULL), /**< distribution of U cell positions for PDXDigits when no ROI exists and vxdid intercept is wrong*/
+    m_h1CoorVBad(NULL), /**< distribution of U cell positions for PDXDigits when no ROI exists and vxdid intercept is wrong*/
+    m_h2CoorUVBad(NULL), /**< distribution of U cell positions for PDXDigits when no ROI exists and vxdid intercept is wrong*/
+
+    m_h1PullU(NULL), /**< distribution of U pulls for PDXDigits contained in a ROI*/
+    m_h1PullV(NULL), /**< distribution of V pulls for PDXDigits contained in a ROI*/
+    m_h1PullUFail(NULL), /**< distribution of U pulls for PDXDigits NOT contained in a ROI*/
+    m_h1PullVFail(NULL), /**< distribution of V pulls for PDXDigits NOT contained in a ROI*/
+    m_h1PullUNoROI(NULL), /**< distribution of U pulls for PDXDigits when no ROI exists*/
+    m_h1PullVNoROI(NULL), /**< distribution of V pulls for PDXDigits when no ROI exists*/
+
+    m_h1ResidU(NULL), /**< distribution of U resid for intercepts contained in a ROI*/
+    m_h1ResidV(NULL), /**< distribution of V resid for intercepts contained in a ROI*/
+    m_h1ResidUFail(NULL), /**< distribution of U resid for intercepts NOT contained in a ROI*/
+    m_h1ResidVFail(NULL), /**< distribution of V resid for intercepts NOT contained in a ROI*/
+    m_h1ResidUNoROI(NULL), /**< distribution of U resid for intercepts when no ROI exists*/
+    m_h1ResidVNoROI(NULL), /**< distribution of V resid for intercepts when no ROI exists*/
+
+    m_h1SigmaU(NULL), /**< distribution of sigmaU for intercepts contained in a ROI*/
+    m_h1SigmaV(NULL), /**< distribution of sigmaV for intercepts contained in a ROI*/
+    m_h1SigmaUFail(NULL), /**< distribution of sigmaU for intercepts NOT contained in a ROI*/
+    m_h1SigmaVFail(NULL), /**< distribution of sigmaV for intercepts NOT contained in a ROI*/
+    m_h1SigmaUNoROI(NULL), /**< distribution of sigmaU for intercepts when no ROI exists*/
+    m_h1SigmaVNoROI(NULL), /**< distribution of sigmaV for intercepts when no ROI exists*/
+
+    m_h1DistUFail(NULL),  /**< distribution of distance between ROI and PXDDigits not contained in it in U direction */
+    m_h1DistVFail(NULL),  /**< distribution of distance between ROI and PXDDigits not contained in it in V direction */
+    m_h2DistUVFail(NULL),  /**< distribution of distance between ROI and PXDDigits not contained in it in U,V plane */
+
+    m_h1totROIs(NULL), /**< distribution of number of ROIs*/
+    m_h1nROIs(NULL), /**< distribution of number of ROIs*/
+    m_h1nROIs_all(NULL), /**< distribution of number of ROIs*/
+    m_h1redFactor(NULL), /**< distribution of number of ROIs*/
+
+    m_h1totarea(NULL), /**< distribution of ROI areas*/
+    m_h1area(NULL), /**< distribution of ROI areas*/
+    m_h1areaFail(NULL), /**< distribution of ROI areas when PXDDigit is not contained*/
+
+    m_h1Theta(NULL), /**< distribution of theta when the PXDDigit is contained in a ROI */
+    m_h1ThetaBad(NULL), /**< distribution of theta when the PXDDigit is contained in a ROI */
+    m_h1CosTheta(NULL), /**< distribution of costheta when the PXDDigit is contained in a ROI */
+    m_h1CosThetaMCPart(NULL), /**< distribution of costheta when the PXDDigit is contained in a ROI */
+    m_h1CosThetaBad(NULL), /**< distribution of costheta when the PXDDigit is contained in a ROI */
+    m_h1Phi(NULL), /**< distribution of phi when the PXDDigit is contained in a ROI */
+    m_h1Lambda(NULL), /**< distribution of lambda when the PXDDigit is contained in a ROI */
+    m_h1PhiBad(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID */
+    m_h1PhiBad_L1(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
+    m_h1PhiBad_L2(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
+    m_h1PhiBadLambda0_L2(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
+    m_h1PhiBadLambda0_L1(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
+    m_h1PhiBadLambdaF_L2(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
+    m_h1PhiBadLambdaF_L1(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
+    m_h1LambdaBad(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID */
+    m_h1LambdaBad_timeL1(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
+    m_h1LambdaBad_timeG1(NULL), /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
+
+    m_hNhits(NULL), /**< number of hits per candidate*/
+    m_hNhitsBad(NULL), /**< number of hits per candidate, no digits in ROI*/
+
+    m_h2Map(NULL), /**<sensor perp,phi */
+    m_h2MapBad_L1(NULL), /**<sensor perp,phi - no digit in - layer2*/
+    m_h2MapBad_L2(NULL), /**<sensor perp,phi - no digit in - layer1*/
+
+//variables
+    m_globalTime(0.), /**< global hit time */
+    m_coorU(0.), /**< intercept U coordinate*/
+    m_coorV(0.), /**< intercept V coordinate*/
+    m_sigmaU(0.), /**< intercept U stat error*/
+    m_sigmaV(0.), /**< intercept V stat error*/
+    m_vxdID(-1), /**< VXD ID*/
+
+    m_coorUmc(0.), /**< true intercept U coordinate*/
+    m_coorVmc(0.), /**< true intercept V coordinate*/
+    m_Uidmc(-1), /**< true intercept U id  */
+    m_Vidmc(-1), /**< true intercept V id  */
+    m_vxdIDmc(-1), /**< true intercept VXD id  */
+    pT(0.), /**< transverse momentum */
+    m_momXmc(0.), /**< true p along X */
+    m_momYmc(0.),/**< true p along Y */
+    m_momZmc(0.), /**< true p along Z */
+    m_thetamc(0.), /**< true theta*/
+//    double m_theta;
+    m_costhetamc(0.), /**< true cos theta */
+    m_costhetaMCPart(0.), /**< cos theta of MC particle */
+    m_phimc(0.),  /**< true phi */
+    m_lambdamc(0.),  /**< true lambda = pi/2 - theta*/
+
+    n_tracks(0), /**< number of tracks */
+    n_tracksWithDigits(0), /**< number of tracks with digits */
+    n_pxdDigit{0}, /**< number of pxd digits*/
+    n_pxdDigitInROI{0}, /**< number of pxd digits*/
+//    unsigned int n_noHit;
+    nnoHit2{0}, /**< number of lost digits in bins of pt: no hit, correct vxdID*/
+    nnoHit3{0}, /**< number of lost digits in bins of pt: no hit, wrong vxdID*/
+    nnoROI4{0},  /**< number of lost digits in bins of pt: no ROI, intercepts with correct vxdID*/
+    nnoROI5{0},  /**< number of lost digits in bins of pt: no ROI, intercepts with wrong vxdID*/
+
+    NtrackHit(0), /**< nuner of tracks with hits */
+    NtrackNoHit2(0), /**< nuner of tracks with no digits in ROI (correct vxdID) */
+    NtrackNoHit3(0), /**< nuner of tracks with no digits in ROI (wrong vxdID) */
+    NtrackNoROI4(0), /**< nuner of tracks with no ROI (intercept with correct vxdID) */
+    NtrackNoROI5(0), /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
+
+
+    m_nNoMCPart(-1) /**< number of tracks with no MC particles*/
+
 {
   //Set module properties
   setDescription("This module performs the analysis of the PXDDataReduction module output");
@@ -123,7 +247,8 @@ void PXDDataRedAnalysisModule::initialize()
   m_h1GlobalTime = new TH1F("hGlobalTime", "global time for PXDDigits contained in ROI", 100, 0, 1);
   m_h1GlobalTimeFail = new TH1F("hGlobalTimeFail", "global time for PXDDigits NOT contained in ROI", 500, 0, 10);
   m_h1GlobalTimeNoROI = new TH1F("hGlobalTimeNoROI", "global time for PXDDigits when no ROI exists", 500, 0, 10);
-  m_h1GlobalTimeBad = new TH1F("hGlobalTimeBad", "global time for PXDDigits when no ROI exists and intercept has wrong vxdID", 500, 0, 10);
+  m_h1GlobalTimeBad = new TH1F("hGlobalTimeBad", "global time for PXDDigits when no ROI exists and intercept has wrong vxdID", 500, 0,
+                               10);
 
   m_h1PullU = new TH1F("hPullU", "U pulls for PXDDigits contained in ROI", 100, -6, 6);
   m_h1PullV = new TH1F("hPullV", "V pulls for PXDDigits contained in ROI", 100, -6, 6);

@@ -85,13 +85,41 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
     return a.second.size() < b.second.size();
   });
 
+  // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
+  Processor::ReturnList& foundStereoHits = maxList->second;
+  Processor::QuadTree* node = maxList->first;
 
+  std::vector<CDCRecoHit3D*> doubledRecoHits;
+  doubledRecoHits.reserve(foundStereoHits.size() / 2);
 
-  for (CDCRecoHit3D* hit : maxList->second) {
-    if (not hit->getWireHit().getAutomatonCell().hasAssignedFlag()) {
-      track.push_back(*hit);
-      hit->getWireHit().getAutomatonCell().setTakenFlag();
+  for (Processor::ReturnList::iterator outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
+       ++outerIterator) {
+    const CDCHit* currentHit = (*outerIterator)->getWireHit().getHit();
+    for (Processor::ReturnList::iterator innerIterator = foundStereoHits.begin(); innerIterator != outerIterator; ++innerIterator) {
+      if (currentHit == (*innerIterator)->getWireHit().getHit()) {
+        FloatType lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMin());
+        FloatType lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMax());
+        FloatType lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMin());
+        FloatType lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMax());
+
+        if (fabs((lambda11 + lambda12) / 2 - node->getXMean()) < fabs((lambda21 + lambda22) / 2 - node->getXMean())) {
+          doubledRecoHits.push_back(*outerIterator);
+        } else {
+          doubledRecoHits.push_back(*innerIterator);
+        }
+      }
     }
+  }
+
+  foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
+  foundStereoHits.end(), [&doubledRecoHits](CDCRecoHit3D * recoHit3D) -> bool {
+    return std::find(doubledRecoHits.begin(), doubledRecoHits.end(), recoHit3D) != doubledRecoHits.end();
+  }), foundStereoHits.end());
+
+  for (CDCRecoHit3D* hit : foundStereoHits) {
+    if (hit->getWireHit().getAutomatonCell().hasTakenFlag()) B2FATAL("Adding already found hit")
+      track.push_back(*hit);
+    hit->getWireHit().getAutomatonCell().setTakenFlag();
   }
 
   for (CDCRecoHit3D* recoHit : hits_set) {

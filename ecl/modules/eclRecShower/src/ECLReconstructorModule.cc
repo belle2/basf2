@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen,Vishal                                       *
+ * Contributors: Poyuan Chen, Vishal                                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -97,14 +97,6 @@ void ECLReconstructorModule::initialize()
   ECLClusterArray.registerRelationTo(TrackArray);
   ECLClusterArray.registerRelationTo(ECLShowerArray);
 
-  // Following lines are obsolete.
-  // StoreArray<ECLHitAssignment>::registerPersistent();
-  // StoreArray<ECLShower>::registerPersistent();
-  //
-  // StoreArray<ECLCluster>::registerPersistent();
-  // RelationArray::registerPersistent<ECLCluster, ECLShower>("", "");
-  // RelationArray::registerPersistent<ECLCluster, Track>("", "");
-
 }
 
 void ECLReconstructorModule::beginRun()
@@ -115,7 +107,7 @@ void ECLReconstructorModule::beginRun()
 
 void ECLReconstructorModule::event()
 {
-  //Input Array
+  // Input Array
   StoreArray<ECLDigit> eclDigiArray;
   if (!eclDigiArray) {
     B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
@@ -123,66 +115,47 @@ void ECLReconstructorModule::event()
   }
 
 
-  //Fill information with extrapolate..
-  //.. Vishal
+  // Get extrapolated track information.
   readExtrapolate();
   StoreArray<Track> Tracks;
-
-
 
   cout.unsetf(ios::scientific);
   cout.precision(6);
   TRecEclCF& cf = TRecEclCF::Instance();
   cf.Clear();
 
-  //cout<<"Event "<< m_nEvent<<" Total input entries of Digi Array  "<<eclDigiArray->GetEntriesFast()<<endl;
-
   TEclEnergyHit ss;
   for (int ii = 0; ii < eclDigiArray.getEntries(); ii++) {
     ECLDigit* aECLDigi = eclDigiArray[ii];
     float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
-    //float FitTime      =  (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;//in us
+    //float FitTime = (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;
+    //in us -> obsolete, for record. 20150529 KM.
 
     int cId         = (aECLDigi->getCellId() - 1);
     if (FitEnergy < 0.) {continue;}
-
+    // Register hit to cluster finder, cf.
     cf.Accumulate(m_nEvent, FitEnergy, cId);
   }
 
+  // The cluster finder is called.
   cf.SearchCRs();
   cf.Attributes();
 
   int nShower = 0;
 
+  // Loop over Connected Region (CR).
   for (std::vector<TEclCFCR>::const_iterator iCR = cf.CRs().begin();
        iCR != cf.CRs().end(); ++iCR) {
 
-
-    for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin(); iShower != iCR->Showers().end(); ++iShower) {
+    // Each Shower is pointed from the CR.
+    for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin();
+         iShower != iCR->Showers().end(); ++iShower) {
       TEclCFShower iSh = (*iShower).second;
 
-      //.. To fill Highest Energy in single crystal in a shower
-      //.. and fit time for that particular cyrstal in Timing for now
-      //.. Also no. of tracks -- Vishal
+      // In order for finding the highest energy crystal in a shower and
+      // that crystals' timing. 20150529 K.Miyabayashi
       double v_HiEnergy = -9999999;
       double v_TIME = -10;
-      // bool  i_extMatch = false;
-      int v_NofTracks = 0;
-
-
-      //... This is where the ECLCluster dataobject is filled
-      //... i_Mdst is simply the number and used to relate with ECLShower
-      //... Vishal
-      StoreArray<ECLCluster> eclMdstArray;
-      if (!eclMdstArray) eclMdstArray.create();
-      eclMdstArray.appendNew();
-      int i_Mdst = eclMdstArray.getEntries() - 1;
-
-      //Object for relation of ECLCluster to others
-      //.. 16-5-2k14
-      const ECLCluster* ecluster = eclMdstArray[i_Mdst];
-
-
 
       std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
@@ -196,35 +169,15 @@ void ECLReconstructorModule::event()
         eclHaArray[m_HANum]->setShowerId(nShower);
         eclHaArray[m_HANum]->setCellId(iHA->Id() + 1);
 
-
-        //... Below simply check for the TrackCellid for particular id
-        //... Based on tracks, it count the number of tracks
-        //... Also related to the id of the track which is filled to
-        //... m_TrackCellId[] in ECLReconstructorModule::readExtrapolate()
-        //... Vishal
-
-        RelationArray ECLClustertoTracks(eclMdstArray, Tracks);
-        if (m_TrackCellId[iHA->Id()] >= 0) {
-
-          //.. 16-5-2k14
-          const Track*  v_track = Tracks[m_TrackCellId[iHA->Id()]];
-          ecluster->addRelationTo(v_track);
-
-
-          ++v_NofTracks;
-        }
-
-
-        //... To get ECLDigit information for particular shower
-        //... in order to get FitEnergy and FitTime for each crystal
-        //... in particular shower. To speed up Mapping to be used.
-        //... Vishal
+        // From ECLDigit information, the highest energy crystal is found.
+        // To speed up, Mapping to be used, by Vishal
         for (int i_DigiLoop = 0; i_DigiLoop < eclDigiArray.getEntries();
              i_DigiLoop++) {
           ECLDigit* aECLDigi = eclDigiArray[i_DigiLoop];
           if (aECLDigi->getCellId() != (iHA->Id() + 1))continue;
           float v_FitEnergy    = (aECLDigi->getAmp()) / 20000.;
           float v_FitTime      =  aECLDigi->getTimeFit();
+          // If the crystal has highest energy, keep its information.
           if (v_HiEnergy < v_FitEnergy) {
             v_HiEnergy = v_FitEnergy;
             v_TIME = v_FitTime;
@@ -237,16 +190,12 @@ void ECLReconstructorModule::event()
       double preliminaryCalibration = correctionFactor(energyBfCorrect, (*iShower).second.Theta()) ;
       double sEnergy = (*iShower).second.Energy() / preliminaryCalibration;
 
-
       //... Calibration for Highest Energy in Shower
       //... Assuming that scaling will be constant
       //... TODO more careful study in future.
       //... Vishal
       double HighCalibrationFactor = v_HiEnergy / energyBfCorrect;
       double HiEnergyinShower = sEnergy * HighCalibrationFactor;
-
-
-
 
       StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
@@ -266,9 +215,8 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
       eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
 
-
-
       double sTheta = (*iShower).second.Theta();
+      // In ECLShower convention, off-diagonals are ignored.
       float ErrorMatrix[3] = {
         errorE(sEnergy),
         errorTheta(sEnergy, sTheta),
@@ -276,16 +224,7 @@ void ECLReconstructorModule::event()
       };
       eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
 
-
-      //... This is where the ECLCluster dataobject is filled
-      //... i_Mdst is simply the number and used to relate with ECLShower
-      //... Vishal
-
-
-      eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
-      eclRecShowerArray[m_hitNum]->setPhi((float)(*iShower).second.Phi());
-      eclRecShowerArray[m_hitNum]->setR((float)(*iShower).second.Distance());
-
+      // For ECLCluster, keep room for off-diagonals though for a while 0.
       float Mdst_Error[6] = {
         errorE(sEnergy),
         0,
@@ -295,46 +234,56 @@ void ECLReconstructorModule::event()
         errorTheta(sEnergy, sTheta)
       };
 
+      // Fill ECLCluster here
+      // RelationArray ECLClustertoShower has been removed.
+      StoreArray<ECLCluster> eclMdstArray;
+      if (!eclMdstArray) eclMdstArray.create();
+      // Loose timing cut is applied. 20150529 K.Miyabayashi
+      if (-300.0 < v_TIME && v_TIME < 200.0) {
+        eclMdstArray.appendNew();
+        int i_Mdst = eclMdstArray.getEntries() - 1;
 
-      //.. Fill ECLCluster here
-      //      RelationArray ECLClustertoShower(eclMdstArray, eclRecShowerArray);
-      eclMdstArray[i_Mdst]->setError(Mdst_Error);
-      eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
-      eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
-      eclMdstArray[i_Mdst]->setTheta((float)(*iShower).second.Theta());
-      eclMdstArray[i_Mdst]->setPhi((float)(*iShower).second.Phi());
-      eclMdstArray[i_Mdst]->setR((float)(*iShower).second.Distance());
-      eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
-      eclMdstArray[i_Mdst]->setEnedepSum((float)(*iShower).second.UncEnergy());
+        // Simple match with tracks.
+        int v_NofTracks = 0;
+        std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
+        for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
+             iHA != HAs.end(); ++iHA) {
+          RelationArray ECLClustertoTracks(eclMdstArray, Tracks);
+          if (m_TrackCellId[iHA->Id()] >= 0) {
+            // Implemented 20140516
+            const Track*  v_track = Tracks[m_TrackCellId[iHA->Id()]];
+            eclMdstArray[i_Mdst]->addRelationTo(v_track);
+            ++v_NofTracks;
+          }// End of if branch to see matching with tracks.
+        }// End of loop over ShowerHitAssociateion, HA.
 
-      // To check if matches with charged tracks or not
-      bool v_isTrack = false;
-      if (v_NofTracks > 0) {v_isTrack = true;}
-      else { v_isTrack = false;}
-      eclMdstArray[i_Mdst]->setisTrack(v_isTrack);
-      eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
-      eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
+        eclMdstArray[i_Mdst]->setError(Mdst_Error);
+        eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
+        eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
+        eclMdstArray[i_Mdst]->setTheta((float)(*iShower).second.Theta());
+        eclMdstArray[i_Mdst]->setPhi((float)(*iShower).second.Phi());
+        eclMdstArray[i_Mdst]->setR((float)(*iShower).second.Distance());
+        eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
+        eclMdstArray[i_Mdst]->setEnedepSum((float)(*iShower).second.UncEnergy());
 
-      //Object for relation of ECLShower to ECLCLuster
-      //.. 16-5-2k14
-      const ECLShower* eclshower = eclRecShowerArray[m_hitNum];
+        // To check if matches with charged tracks or not
+        bool v_isTrack = false;
+        if (v_NofTracks > 0) {v_isTrack = true;}
+        else { v_isTrack = false;}
+        eclMdstArray[i_Mdst]->setisTrack(v_isTrack);
+        eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
+        eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
 
-
-
-      //... Relation of ECLCluster to ECLShower
-      ecluster->addRelationTo(eclshower);
-
-
-      //..... ECLCluster is completed here......
-
-
-
-
-      nShower++;
-
+        //Object for relation of ECLShower to ECLCLuster
+        //.. 16-5-2k14
+        const ECLShower* eclshower = eclRecShowerArray[m_hitNum];
+        //... Relation of ECLCluster to ECLShower
+        eclMdstArray[i_Mdst]->addRelationTo(eclshower);
+        //..... ECLCluster is completed here......
+      }// End of timing cut branch.
+      nShower++; // Increment counter for ECLShower.
     }//EclCFShowerMap
   }//vector<TEclCFCR>
-
   m_nEvent++;
 }
 
@@ -522,7 +471,7 @@ void ECLReconstructorModule::readExtrapolate()
 
     typedef RelationIndex<Track, ExtHit>::Element relElement_t;
     for (int i_trkLoop = 0; i_trkLoop < Tracks.getEntries(); ++i_trkLoop) {
-      BOOST_FOREACH(const relElement_t & rel, TracksToExtHits.getElementsFrom(Tracks[i_trkLoop])) {
+      BOOST_FOREACH(const relElement_t& rel, TracksToExtHits.getElementsFrom(Tracks[i_trkLoop])) {
         const ExtHit* extHit = rel.to;
         if (extHit->getPdgCode() != pdgCodePiP && extHit->getPdgCode() != pdgCodePiM) continue;
         if ((extHit->getDetectorID() != myDetID) || (extHit->getCopyID() == 0)) continue;

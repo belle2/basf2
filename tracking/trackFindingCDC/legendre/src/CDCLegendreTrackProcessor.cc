@@ -140,6 +140,8 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
       if (trajectory2D.getDist2D(trackHit->getUnderlayingCDCWireHit()->getRefPos2D()) < 0)
         rlInfo = LEFT;
       const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(trackHit->getOriginalCDCHit(), rlInfo);
+      if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
+        continue;
       rlWireHit->getWireHit().getAutomatonCell().setTakenFlag();
 
       const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);

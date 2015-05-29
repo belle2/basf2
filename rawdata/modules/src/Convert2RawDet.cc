@@ -172,7 +172,7 @@ void Convert2RawDetModule::convertDataObject(RawDataBlock* raw_dblk)
         StoreArray<RawTRG> ary;
         (ary.appendNew())->SetBuffer(temp_buf, nwords, delete_flag, temp_num_eve, temp_num_nodes);
       } else {
-        printf("[FATAL] Undefained detector ID(0x%.8x). Exiting...\n", subsys_id);
+        printf("[FATAL] Undefined detector ID(0x%.8x). Exiting...\n", subsys_id);
         exit(1);
       }
 

@@ -23,6 +23,8 @@
 
 #include <genfit/ICalibrationParametersDerivatives.h>
 
+#include <tracking/vectorTools/B2Vector3.h>
+
 #include <memory>
 
 
@@ -62,6 +64,22 @@ namespace Belle2 {
     std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
     virtual const genfit::HMatrixU* constructHMatrix(const genfit::AbsTrackRep*) const;
 
+
+    /**
+     * Get the vector pointing from the wire to the fitted trajectory
+     * as well as the direction of the track in the fitted point.
+     * Uses the cardinal TrackRep if rep == NULL.  Returns false if
+     * the track is not fitted in this point for the requested
+     * TrackRep.  If the hit does not belong to a track, an error is
+     * issued and false returned.  If usePlaneFromFit is used,
+     * constructPlane is not called to evaluate the closest point on
+     * the wire to the track.  Instead the origin of the plane of the
+     * fitted state is used (which will be the same point if the wire
+     * is not bent).
+     */
+    bool getFlyByDistanceVector(B2Vector3D& pointingVector, B2Vector3D& trackDir,
+                                const genfit::AbsTrackRep* rep = NULL,
+                                bool usePlaneFromFit = false);
 
     /**
      * select how to resolve the left/right ambiguity:

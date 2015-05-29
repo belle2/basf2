@@ -15,6 +15,8 @@
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/AbsTrackRep.h>
 #include <genfit/RKTrackRep.h>
+#include <genfit/TrackPoint.h>
+#include <genfit/AbsFitterInfo.h>
 #include <genfit/Exception.h>
 #include <genfit/HMatrixU.h>
 
@@ -240,6 +242,43 @@ const genfit::HMatrixU* CDCRecoHit::constructHMatrix(const genfit::AbsTrackRep* 
 
   return new genfit::HMatrixU();
 }
+
+
+bool CDCRecoHit::getFlyByDistanceVector(B2Vector3D& pointingVector,
+                                        B2Vector3D& trackDir,
+                                        const genfit::AbsTrackRep* rep,
+                                        bool usePlaneFromFit)
+{
+  const genfit::TrackPoint* tp = this->getTrackPoint();
+  if (!tp) {
+    B2ERROR("No genfit::TrackPoint for CDCRecoHit.");
+    return false;
+  }
+  const genfit::AbsFitterInfo* fi = tp->getFitterInfo(rep);
+  if (!fi) {
+    B2DEBUG(200, "No genfit::AbsFitterInfo for this CDCRecoHit.");
+    return false;
+  }
+
+  const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
+  B2Vector3D fittedPoca = mop.getPos();
+  // constructPlane places the coordinate center in the POCA to the
+  // wire.  Using this is the default behavior.  If this should be too
+  // slow, as it has to re-evaluate the POCA, alternatively the user
+  // can set usePlaneFromFit which uses the plane determined by the
+  // track fit.
+  B2Vector3D pocaOnWire = (usePlaneFromFit
+                           ? mop.getPlane()->getO()
+                           : this->constructPlane(mop)->getO());
+
+  // The vector from the wire to the track.
+  pointingVector = fittedPoca - pocaOnWire;
+
+  trackDir = mop.getMom();
+  trackDir.SetMag(1.);
+  return true;
+}
+
 
 std::vector< int > CDCRecoHit::labels()
 {

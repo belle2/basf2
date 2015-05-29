@@ -179,7 +179,7 @@ TRecEclCF::Attributes(void)
 /// need to take args for calib or track match ... for 2nd phase recon
 {
   for (std::vector<TEclCFCR>::iterator iCR = fCRs.begin(); iCR != fCRs.end(); ++iCR) {
-// all showers in one cr will be assigned uncorrected values
+    // all showers in one cr will be assigned uncorrected values
     iCR->UncAttributes();  // don't know how to correct yet
 
     /// Energy/Angle[r] corrections
@@ -203,15 +203,6 @@ TRecEclCF::Attributes(void)
   }
 }
 
-
-/* for new correction 2k.sep.22nd */
-/* comment for Basf2 unused warning
-void
-TRecEclCF::
-NewEACorr(TEclCFShower& s)
-{
-}
-*/
 //
 // const member functions
 //

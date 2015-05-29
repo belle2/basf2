@@ -113,7 +113,7 @@ namespace Belle2 {
      * All bits are checked before using them, so if they are used by other code we know what happens.
      */
     enum ETObjectBits {
-      c_IsTransient = BIT(19), /**< The corresponding StoreEntry is transient. */
+      c_IsTransient = BIT(19), /**< The corresponding StoreEntry has flag c_DontWriteOut. */
       c_IsNull = BIT(20), /**< object is not valid for current event, set StoreEntry::ptr to NULL. */
       c_PersistentDurability = BIT(21) /**< Object is of persistent durability. */
     };

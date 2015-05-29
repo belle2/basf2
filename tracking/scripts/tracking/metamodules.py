@@ -316,8 +316,12 @@ class PathModule(basf2.Module):
         self.if_true(path, basf2.AfterConditionPath.CONTINUE)
 
         # Pass a telling name to the C++ world
+        if modules is None:
+            itemCount = 0
+        else:
+            itemCount = len(modules)
         self.set_name("{path_module} ({items} modules):".format(path_module=self.__class__.__name__,
-                                                                items=len(modules)))
+                                                                items=itemCount))
 
     @classmethod
     def from_modules(cls, *modules):

@@ -359,8 +359,9 @@ class CDCEventDisplay(metamodules.WrapperModule):
         else:
             display_module = CDCSVGDisplayModule()
             display_module.draw_hits = False
-            display_module.draw_gftrackcand_trajectories = True
-            display_module.draw_gftrackcands = True
+            display_module.draw_track_trajectories = True
+            display_module.draw_tracks = False
+            display_module.draw_takenflag = True
             display_module.draw_wrong_rl_infos_in_tracks = False
             display_module.draw_wrong_rl_infos_in_segments = False
 
@@ -373,3 +374,60 @@ class CDCMCFiller(basf2.Module):
 
     def event(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+
+
+class CDCStereoSegmentTrackMatcher(metamodules.WrapperModule):
+
+    def __init__(self, output_track_cands_store_array_name=None,
+                 track_cands_store_vector_name="CDCTrackVector",
+                 segments_store_vector_name="CDCRecoSegment2DVector"):
+        matcher_module = StandardEventGenerationRun.get_basf2_module("StereoSegmentTrackMatcher", WriteGFTrackCands=False,
+                                                                     SkipHitsPreparation=True,
+                                                                     TracksStoreObjNameIsInput=True,
+                                                                     SegmentsStoreObjName=segments_store_vector_name,
+                                                                     TracksStoreObjName=track_cands_store_vector_name)
+
+        if output_track_cands_store_array_name is not None:
+            matcher_module.param({'WriteGFTrackCands': True,
+                                  'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        super(CDCStereoSegmentTrackMatcher, self).__init__(matcher_module)
+
+
+class CDCHitUniqueAssumer(basf2.Module):
+
+    def initialize(self):
+        self.number_of_doubled_hits = 0
+        self.number_of_total_hits = 0
+        self.number_of_hits_with_wrong_flags = 0
+
+    def event(self):
+        track_store_vector = Belle2.PyStoreObj('CDCTrackVector')
+
+        if track_store_vector:
+            # Wrapper around std::vector like
+            wrapped_vector = track_store_vector.obj()
+            tracks = wrapped_vector.get()
+
+            for track in tracks:
+                # Unset all taken flags
+                for recoHit in track.items():
+                    if not recoHit.getWireHit().getAutomatonCell().hasTakenFlag():
+                        self.number_of_hits_with_wrong_flags += 1
+
+            for track in tracks:
+                # Now check that we only have every wire hit once
+                for recoHit in track.items():
+                    self.number_of_total_hits += 1
+                    if recoHit.getWireHit().getAutomatonCell().hasAssignedFlag():
+                        self.number_of_doubled_hits += 1
+                    recoHit.getWireHit().getAutomatonCell().setAssignedFlag()
+
+                for innerTrack in tracks:
+                    for recoHit in innerTrack.items():
+                        recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag()
+
+    def terminate(self):
+        print "Number of doubled hits:", self.number_of_doubled_hits
+        print "Number of hits with wrong taken flag:", self.number_of_hits_with_wrong_flags
+        print "Number of total hits:", self.number_of_total_hits

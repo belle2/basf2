@@ -233,6 +233,11 @@ void FragmentationModule::event()
       // Set all(!) particles from the generator to primary
       p->addStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
 
+      // Set FSR flag from PYTHIA TimeShower:QEDshowerByQ
+      if (pythia->event[iPythiaPart].status() == 51 && pythia->event[iPythiaPart].id() == 22) {
+        p->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
+      }
+
       // Set stable at generator level
       if (pythia->event[iPythiaPart].statusHepMC() == 1) {
         p->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);

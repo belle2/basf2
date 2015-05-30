@@ -54,7 +54,8 @@ namespace Belle2 {
     /*! Get TVector3 Positon assuming gamma comes from IP
      * @return assuming Positon (0,0,0) of Gamma
      */
-    TVector3 getPositon() const {
+    TVector3 getPositon() const
+    {
       TVector3 Positon(0., 0., 0.);
       return Positon;
     }
@@ -90,12 +91,9 @@ namespace Belle2 {
     */
 
 
-    void getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const;
-    //! The method to get return TMatrixT<float>   4 Momentum Error Matrix
-    /*! Get  TMatrixT<float>   4 Momentum and Vertex Error Matrix by reading ECLShower through ShowerId
-     * @return Matrix which from convertion from Error E, Theta, Phi of ECLShower
-    */
-
+    // void getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const;
+    // The method to get return TMatrixT<float>, to become obsolete.
+    // 20150531 KM.
 
   private:
     int m_ShowerId;        /**< shower id of this Gamma */

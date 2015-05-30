@@ -46,12 +46,6 @@ namespace Belle2 {
     ~EKLMHit2d();
 
     /**
-     * Get strip number (from EKLMDigit).
-     * @param[in] plane  Number if plane.
-     */
-    int getStrip(int plane);
-
-    /**
      * Set Chi^2 of the crossing point.
      * @param[in] chi Chi^2.
      */
@@ -69,7 +63,7 @@ namespace Belle2 {
     float m_ChiSq;
 
     /** Needed to make Belle2::EKLMHit2d storable. */
-    ClassDef(Belle2::EKLMHit2d, 3);
+    ClassDef(Belle2::EKLMHit2d, 4);
 
   };
 

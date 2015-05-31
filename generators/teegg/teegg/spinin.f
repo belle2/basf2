@@ -1,0 +1,55 @@
+
+CDECK  ID>, SPININ. 
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C
+C    COMPUTATION OF THE BASIC QUANTITIES
+C    NEEDED FOR THE HELICITY AMPLITUDES EVALUATION
+C      INPUT   ==> VECTORS P1,P2,P3,P4,P5,P6    ( COMMON /MOMENZ/ )
+C          FORMAT: (PX,PY,PZ,E,M)
+C      OUTPUT  ==> BASIC QUANTITIES SP,SM,U,E,D ( COMMON /PRODUX/ )
+C                  ( SP --> S+  / SM --> S- )
+C
+C                              C.MANA & M.MARTINEZ   DESY-86
+C
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+      SUBROUTINE SPININ(INF)
+      IMPLICIT DOUBLE PRECISION(A-H,O-Z)
+      COMPLEX*16 SP,SM
+      COMMON / MOMENZ / P1,P2,P3,P4,P5,P6
+      COMMON / PRODUX / SP,SM,U,E,D
+      DIMENSION P1(5),P2(5),P3(5),P4(5),P5(5),P6(5)
+      DIMENSION Q(5,6),SP(6,6),SM(6,6),D(6,6)
+      DIMENSION E(6),U(6)
+      EQUIVALENCE ( P1(1) , Q(1,1) )
+C
+      DO 1 I=1,6
+      U(I) = DSQRT( 2.*( Q(4,I) - Q(1,I) )  )
+      E(I) = Q(5,I)/U(I)
+    1 CONTINUE
+      DO 2 I=1,6
+      DO 2 J=I,6
+      SP(I,J)= DCMPLX( Q(2,I) , Q(3,I) ) * U(J)/U(I)
+     .        -DCMPLX( Q(2,J) , Q(3,J) ) * U(I)/U(J)
+      SP(J,I)=-SP(I,J)
+      SM(I,J)=-DCONJG( SP(I,J) )
+      SM(J,I)=-SM(I,J)
+      D(I,J) = SP(I,J)*SM(J,I) + (E(I)*U(J))**2 + (E(J)*U(I))**2
+      D(J,I) = D(I,J)
+    2 CONTINUE
+C
+      IF(INF.LT.1) RETURN
+      WRITE(6,100)
+  100 FORMAT(' ',40(1H-),' SPININ INF  ',40(1H-))
+      WRITE(6,101) (P1(I),P2(I),P3(I),P4(I),P5(I),P6(I),I=1,5)
+  101 FORMAT('0INPUT (PX ,PY ,PZ ,E ,M ) ',/,(6G15.6))
+      WRITE(6,102) (U(I),E(I),I=1,6)
+  102 FORMAT('0VECTORS U(I) AND E(I)',/,(2G15.6))
+      WRITE(6,104) ((SP(I,J),J=1,6),I=1,6)
+  104 FORMAT('0MATRIX SP(I,J)',/,(6('  ',2G10.3)))
+      WRITE(6,105) ((SM(I,J),J=1,6),I=1,6)
+  105 FORMAT('0MATRIX SM(I,J)',/,(6('  ',2G10.3)))
+      WRITE(6,107) ((D(I,J),J=1,6),I=1,6)
+  107 FORMAT('0MATRIX D(I,J)',/,(6('  ',G15.6)))
+      RETURN
+      END

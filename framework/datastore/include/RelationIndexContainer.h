@@ -96,7 +96,7 @@ namespace Belle2 {
     ElementIndex&  index() { return m_index; }
 
     /** Get the AccessorParams of the underlying relation. */
-    const AccessorParams& getAccessorParams()     const { return m_storeRel; }
+    AccessorParams getAccessorParams() const { return m_storeRel.getAccessorParams(); }
 
     /** Get the AccessorParams of the StoreArray the relation points from. */
     const AccessorParams& getFromAccessorParams() const { return m_storeFrom; }
@@ -107,18 +107,18 @@ namespace Belle2 {
   protected:
     /** Constructor to create a new IndexContainer.
      *
-     *  @param params pair of name and durability
+     *  @param relArray RelationArray to build the relation for
      */
-    RelationIndexContainer(const AccessorParams& params): m_storeRel(params), m_valid(false)
+    RelationIndexContainer(const RelationArray& relArray): m_storeRel(relArray), m_valid(false)
     {
       rebuild(true);
     }
 
     /** Restrict copies */
-    RelationIndexContainer(const RelationIndexContainer&);
+    RelationIndexContainer(const RelationIndexContainer&) = delete;
 
     /** Restrict copies */
-    RelationIndexContainer& operator=(const RelationIndexContainer&);
+    RelationIndexContainer& operator=(const RelationIndexContainer&) = delete;
 
     /** Rebuild the index.
      *
@@ -130,8 +130,8 @@ namespace Belle2 {
     /** Instance of the index. */
     ElementIndex m_index;
 
-    /** AccessorParams of the underlying relation. */
-    AccessorParams m_storeRel;
+    /** the underlying relation. */
+    RelationArray m_storeRel;
 
     /** AccessorParams of the StoreArray the relation points from. */
     AccessorParams m_storeFrom;
@@ -149,10 +149,9 @@ namespace Belle2 {
   /** Rebuild the index. */
   template<class FROM, class TO> void RelationIndexContainer<FROM, TO>::rebuild(bool force)
   {
-    RelationArray storeRel(m_storeRel);
-    m_valid = storeRel.isValid();
+    m_valid = m_storeRel.isValid();
     if (!m_valid) {
-      B2DEBUG(200, "Relation " << m_storeRel.first << " does not exist, cannot build index");
+      B2DEBUG(100, "Relation " << m_storeRel.getName() << " does not exist, cannot build index");
       m_index.clear();
       m_storeFrom = AccessorParams();
       m_storeTo = AccessorParams();
@@ -161,42 +160,44 @@ namespace Belle2 {
 
     //Check if relation has been modified since we created the index
     //If not, keep old contents
-    if (!force && !storeRel.getModified()) return;
+    if (!force && !m_storeRel.getModified()) return;
+
+    B2DEBUG(100, "Building index for " << m_storeRel.getName());
 
     //Reset modification flag
-    storeRel.setModified(false);
+    m_storeRel.setModified(false);
 
-    //Clear index
     m_index.clear();
 
     //Get related StoreArrays
-    m_storeFrom = storeRel.getFromAccessorParams();
-    m_storeTo = storeRel.getToAccessorParams();
+    m_storeFrom = m_storeRel.getFromAccessorParams();
+    m_storeTo = m_storeRel.getToAccessorParams();
     const StoreArray<FROM> storeFrom(m_storeFrom.first, m_storeFrom.second);
     const StoreArray<TO>   storeTo(m_storeTo.first, m_storeTo.second);
 
-    //Get number of entries in relation and stores
-    unsigned int nRel = storeRel.getEntries();
-    RelationElement::index_type nFrom = storeFrom.getEntries();
-    RelationElement::index_type nTo = storeTo.getEntries();
+    //Get number of entries in relation and stores (also checks template type versus DataStore contents)
+    const RelationElement::index_type nFrom = storeFrom.getEntries();
+    const RelationElement::index_type nTo = storeTo.getEntries();
+    const unsigned int nRel = m_storeRel.getEntries();
 
     //Loop over all RelationElements and add them to index
     for (unsigned int i = 0; i < nRel; ++i) {
-      const RelationElement& r = storeRel[i];
+      const RelationElement& r = m_storeRel[i];
       RelationElement::index_type idxFrom = r.getFromIndex();
-      if (idxFrom >= nFrom) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: from-index (" << idxFrom << ") out of range");
+      if (idxFrom >= nFrom)
+        B2FATAL("Relation " <<  m_storeRel.getName() << " is inconsistent: from-index (" << idxFrom << ") out of range");
       const FROM* from = storeFrom[idxFrom];
 
       //Loop over index and weight vector at once
-      typedef std::vector< RelationElement::index_type> idx_t;
-      typedef std::vector< RelationElement::weight_type> wgt_t;
-      const idx_t& indices = r.getToIndices();
-      const wgt_t& weights = r.getWeights();
-      idx_t::const_iterator itIdx = indices.begin();
-      wgt_t::const_iterator itWgt = weights.begin();
-      for (; itIdx != indices.end() && itWgt != weights.end(); ++itIdx, ++itWgt) {
-        RelationElement::index_type idxTo = *itIdx;
-        if (idxTo >= nTo) B2FATAL("Relation " <<  m_storeRel.first << " is inconsistent: to-index (" << idxTo << ") out of range");
+      const auto& indices = r.getToIndices();
+      const auto& weights = r.getWeights();
+      auto itIdx = indices.begin();
+      auto itWgt = weights.begin();
+      const auto& idxEnd = indices.end();
+      for (; itIdx != idxEnd; ++itIdx, ++itWgt) {
+        const RelationElement::index_type idxTo = *itIdx;
+        if (idxTo >= nTo)
+          B2FATAL("Relation " <<  m_storeRel.getName() << " is inconsistent: to-index (" << idxTo << ") out of range");
         const TO* to = storeTo[idxTo];
         m_index.insert(Element(idxFrom, idxTo, from, to, *itWgt));
       }

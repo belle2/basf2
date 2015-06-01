@@ -241,10 +241,22 @@ namespace Belle2 {
     int getEntries() const { return isValid() ? ((*m_relations)->getEntries()) : 0; }
 
     /** Return the AccessorParams the attached relation points from. */
-    const AccessorParams& getFromAccessorParams() const { ensureAttached(); return m_accessorFrom; }
+    const AccessorParams& getFromAccessorParams() const
+    {
+      ensureAttached();
+      if (m_accessorFrom.first.empty())
+        B2FATAL("trying to get accessor params from non-existing relation (this is likely a framework bug)");
+      return m_accessorFrom;
+    }
 
     /** Return the AccessorParams the attached relation points to. */
-    const AccessorParams& getToAccessorParams() const { ensureAttached(); return m_accessorTo; }
+    const AccessorParams& getToAccessorParams() const
+    {
+      ensureAttached();
+      if (m_accessorTo.first.empty())
+        B2FATAL("trying to get accessor params from non-existing relation (this is likely a framework bug)");
+      return m_accessorTo;
+    }
 
     /** Get modified flag of underlying container. */
     bool getModified() const { assertValid(); return (*m_relations)->getModified(); }
@@ -399,15 +411,11 @@ namespace Belle2 {
     /** Attach to relation, if necessary. */
     void ensureAttached() const
     {
-      if (m_relations) return;
+      if (m_relations)
+        return;
 
       const_cast<RelationArray*>(this)->m_relations = reinterpret_cast<RelationContainer**>(DataStore::Instance().getObject(*this));
-      if (m_relations && *m_relations) {
-        if (isValid() && (*m_relations)->isDefaultConstructed()) {
-          //no relation found, mark as invalid
-          const_cast<RelationArray*>(this)->m_relations = 0;
-          return;
-        }
+      if (m_relations && *m_relations && !(*m_relations)->isDefaultConstructed()) {
         AccessorParams fromAccessorRel((*m_relations)->getFromName(), (DataStore::EDurability)(*m_relations)->getFromDurability());
         AccessorParams toAccessorRel((*m_relations)->getToName(), (DataStore::EDurability)(*m_relations)->getToDurability());
         //set if unset
@@ -417,6 +425,9 @@ namespace Belle2 {
           const_cast<RelationArray*>(this)->m_accessorTo = toAccessorRel;
         checkRelation("from", m_accessorFrom, fromAccessorRel);
         checkRelation("to", m_accessorTo, toAccessorRel);
+      } else {
+        //no relation found, mark as invalid
+        const_cast<RelationArray*>(this)->m_relations = nullptr;
       }
     }
 

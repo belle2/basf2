@@ -56,7 +56,7 @@ namespace Belle2 {
         indexContainer = std::dynamic_pointer_cast<RelationIndexContainer<FROM, TO>>(it->second);
       }
       if (!indexContainer) {
-        indexContainer.reset(new RelationIndexContainer<FROM, TO>(relation.getAccessorParams()));
+        indexContainer.reset(new RelationIndexContainer<FROM, TO>(relation));
         relations[name] = indexContainer;
       } else {
         indexContainer->rebuild(false);

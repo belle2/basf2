@@ -51,6 +51,12 @@ namespace Belle2 {
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns 1 if the combination of the particle the function acts upon
+     * and a particle from the provided particle list is in the cut and 0 if it is not.
+     */
+    Manager::FunctionPtr veto(const std::vector<std::string>& arguments);
+
+    /**
      * Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.
      * First arguments must be TOP or ARICH
      * Second argument must be a valid variable name

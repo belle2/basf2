@@ -226,9 +226,11 @@ namespace Belle2 {
           for (unsigned int i = 0; i < roeList->getListSize(); i++)
           {
             const Particle* roeParticle = roeList->getParticle(i);
-            if (particle->overlapsWith(roeParticle)) {
+            if (not particle->overlapsWith(roeParticle)) {
               TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
-              Particle tempParticle = Particle(tempCombination, pdgCode);
+              std::vector<int> indices = { particle->getArrayIndex(), roeParticle->getArrayIndex() };
+              Particle tempParticle = Particle(tempCombination, pdgCode, Particle::c_Unflavored, indices, particle->getArrayPointer());
+              tempParticle.setFlavorType();
               if (cut.check(&tempParticle)) {
                 return 1;
               }

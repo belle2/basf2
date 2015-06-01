@@ -153,12 +153,6 @@ namespace Belle2 {
       return s;
     }
 
-    /** Return the storage name for a relation with given name between the given types. */
-    template<class FROM, class TO> static std::string relationName(const std::string& name)
-    {
-      return ((name.empty()) ? defaultArrayName<FROM, TO>() : name);
-    }
-
     /** Return storage name for a relation between two arrays of the given names. */
     static std::string relationName(const std::string& fromName, const std::string& toName)
     {

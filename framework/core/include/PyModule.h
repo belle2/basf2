@@ -12,11 +12,8 @@
 #define PYMODULE_H
 
 #include <boost/python/call_method.hpp>
-#include <boost/python/wrapper.hpp>
 
 #include <framework/core/Module.h>
-
-#include <string>
 
 namespace Belle2 {
   /** Python wrapper for Belle2::Module.
@@ -79,6 +76,7 @@ namespace Belle2 {
       boost::python::call_method<void>(m_self, "terminate");
     }
 
+  private:
     //@{
     /** default implementation used when Python module doesn't supply its own */
     virtual void def_initialize() override final
@@ -112,7 +110,6 @@ namespace Belle2 {
     }
     //@}
 
-  private:
     PyObject* m_self; /**< the actual python module */
   };
 }

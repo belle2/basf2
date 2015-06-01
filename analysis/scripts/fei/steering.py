@@ -477,6 +477,7 @@ def fullEventInterpretation(selection_path, particles):
     for finalParticle in finalParticles:
         dag.addNeeded('SignalProbability_' + finalParticle.identifier)
         dag.addNeeded('ParticleList_' + finalParticle.identifier)
+        dag.addNeeded('HumanReadableParticleList_' + finalParticle.identifier)
 
     fei_path = create_path()
 

@@ -1,6 +1,5 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/LogSystem.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/FileSystem.h>
@@ -14,27 +13,22 @@ using namespace Belle2;
 
 namespace {
 
-  /** Test opening Belle2.xml and accessing nodes from Gearbox */
+  /** Test opening xml file and accessing nodes from Gearbox */
   TEST(GearBox, Open)
   {
-    //LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::c_Debug);
-    //LogSystem::Instance().getLogConfig()->setDebugLevel(1000);
-
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
     backends.push_back("file:");
     gb.setBackends(backends);
-    gb.open("geometry/Belle2.xml");
+    gb.open("geometry/SuperKEKB.xml");
     queue<GearDir> nodes;
     nodes.push(GearDir());
-    int iterations = 0;
-    while (!nodes.empty() and iterations < 10000) {
+    while (!nodes.empty()) {
       GearDir node = nodes.front();
       nodes.pop();
       for (const GearDir& child : node.getNodes("*")) {
         nodes.push(child);
       }
-      iterations++;
     }
     gb.close();
   }

@@ -40,7 +40,7 @@ void plot(const TString &input_filename)
   TFile *output_file = new TFile("dedx_internals.root", "RECREATE");
   output_file->cd();
 
-  tree->Project("layer_ID", "DedxTracks.dedxLayer", "");
+  tree->Project("layer_ID(70,-10,60)", "DedxTracks.dedxLayer", "");
 
   TH1* hist = (TH1*)output_file->Get("layer_ID");
   hist->SetTitle("layer ID for each dE/dx measurement");

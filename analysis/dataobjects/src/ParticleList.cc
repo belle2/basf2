@@ -24,6 +24,11 @@
 using namespace std;
 using namespace Belle2;
 
+ParticleList::~ParticleList()
+{
+  delete m_antiList;
+}
+
 void ParticleList::initialize(int pdg, std::string name)
 {
   m_pdg    = pdg;
@@ -232,13 +237,14 @@ void ParticleList::print() const
 
 ParticleList& ParticleList::getAntiParticleList() const
 {
-  StoreObjPtr<ParticleList> antiList(m_antiListName);
-  if (antiList) {
-    return *antiList;
-  } else {
-    B2FATAL("Anti-particle list " << m_antiListName << " for " << m_thisListName <<
-            " not found, even though one was set via bindAntiParticleList(). Maybe you only saved one list into a .root file?");
+  if (!m_antiList) {
+    m_antiList = new StoreObjPtr<ParticleList>(m_antiListName);
+    if (!m_antiList->isValid()) {
+      B2FATAL("Anti-particle list " << m_antiListName << " for " << m_thisListName <<
+              " not found, even though one was set via bindAntiParticleList(). Maybe you only saved one list into a .root file?");
+    }
   }
+  return **m_antiList;
 }
 
 ClassImp(ParticleList)

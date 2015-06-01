@@ -18,6 +18,7 @@
 
 
 namespace Belle2 {
+  template <class T> class StoreObjPtr;
 
   /**
    * ParticleList is a container class that stores a collection of Particle objects. The particles are internally
@@ -143,8 +144,12 @@ namespace Belle2 {
       m_pdgbar(0),
       m_particleStore("Particles"),
       m_thisListName(),
-      m_antiListName() {
+      m_antiListName(),
+      m_antiList(nullptr)
+    {
     }
+
+    ~ParticleList();
 
     /**
      * Sets the PDG code and name of this ParticleList.
@@ -275,7 +280,8 @@ namespace Belle2 {
      * @param forAntiParticle - whether the Particle or SelfConjugatedParticle should be returned for this (false) or anti-particle list (true)
      * @return number of particles or self-conjugated particles in the list or anti-particle list
      */
-    unsigned getNParticlesOfType(EParticleType K, bool forAntiParticle = false) const {
+    unsigned getNParticlesOfType(EParticleType K, bool forAntiParticle = false) const
+    {
       return getList(K, forAntiParticle).size();
     }
 
@@ -301,12 +307,16 @@ namespace Belle2 {
     int m_pdg;                   /**< PDG code of Particle */
     int m_pdgbar;                /**< PDG code of antiparticle */
     std::vector<int> m_fsList;   /**< list of 0-based indices of flavor-specific Particles (particles that have an anti-particle) */
-    std::vector<int> m_scList;   /**< list of 0-based indices of self-conjugated Particles (particles that do not have an anti-particle) */
+    std::vector<int>
+    m_scList;   /**< list of 0-based indices of self-conjugated Particles (particles that do not have an anti-particle) */
 
     std::string m_particleStore; /**< name of Particle store array */
 
     std::string m_thisListName;  /**< name of this ParticleList */
     std::string m_antiListName;  /**< name of ParticleList for anti-particles */
+
+    /** keep anti-list around for performance. */
+    mutable StoreObjPtr<ParticleList>* m_antiList; //! transient
 
     ClassDef(ParticleList, 3); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 

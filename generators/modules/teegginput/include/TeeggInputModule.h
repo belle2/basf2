@@ -53,9 +53,8 @@ namespace Belle2 {
     virtual void terminate();
 
   protected:
-
+    /** Returns beam energy given HER, LER and crossing angle. */
     double getBeamEnergyCM(double e1, double e2, double angle);
-
 
     /** Module parameters */
     std::string m_vacPol; /**< Vacuum polarization: off, hadr5 or hmnt. */
@@ -88,9 +87,8 @@ namespace Belle2 {
     Teegg m_generator;   /**< The Teegg generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
 
-    /** Variables */
-    TFile* m_fileExtraInfo;
-    TNtuple* m_ntuple;
+    TFile* m_fileExtraInfo; /**< file for special event by event weights. */
+    TNtuple* m_ntuple; /**< ntuple with weights. */
 
     template <typename T>
     std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */

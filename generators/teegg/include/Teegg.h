@@ -163,24 +163,20 @@ namespace Belle2 {
      */
     void setCMSEnergy(double cmsEnergy) { m_cmsEnergy = cmsEnergy; }
 
-
-    void init();
+    void init(); /**< Initialize generator. */
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      */
     void generateEvent(MCParticleGraph& mcGraph);
 
-//     /** Returns weight
-//      * @param SDif Returns weight
-//      */
-    double getT() {return m_t;};
-    double getW2() {return m_w2;};
-    double getWeight() {return m_weight;};
-    double getReANSK() {return m_reansk;};
-    double getReANSK2() {return m_reansk2;};
-    double getFullANSK() {return m_fullansk;};
-    double getFullANSK2() {return m_fullansk2;};
+    double getT() {return m_t;}; /**< returns kinematic variable T. */
+    double getW2() {return m_w2;}; /**< returns kinematic variable W2. */
+    double getWeight() {return m_weight;}; /**< returnsweight. */
+    double getReANSK() {return m_reansk;}; /**< returns real part of alpha. */
+    double getReANSK2() {return m_reansk2;}; /**< returns real part of alpha squared. */
+    double getFullANSK() {return m_fullansk;}; /**< returns full  alpha. */
+    double getFullANSK2() {return m_fullansk2;}; /**< returns full  alpha squared. */
 
     /**
      * Terminates the generator.
@@ -227,11 +223,11 @@ namespace Belle2 {
 
     double m_t;  /**< T=-Q2 */
     double m_w2;  /**< W2 */
-    double m_weight;  /** weight per event */
-    double m_reansk;  /** vacuum polarization contribution from NSK routine, real part only */
-    double m_reansk2;  /** vacuum polarization contribution from NSK routine squared, real part only */
-    double m_fullansk;  /** vacuum polarization contribution from NSK routine */
-    double m_fullansk2;  /** vacuum polarization contribution from NSK routine squared */
+    double m_weight;  /**< weight per event */
+    double m_reansk;  /**< vacuum polarization contribution from NSK routine, real part only */
+    double m_reansk2;  /**< vacuum polarization contribution from NSK routine squared, real part only */
+    double m_fullansk;  /**< vacuum polarization contribution from NSK routine */
+    double m_fullansk2;  /**< vacuum polarization contribution from NSK routine squared */
 
 //     bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
     TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */

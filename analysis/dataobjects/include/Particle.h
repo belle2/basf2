@@ -616,6 +616,11 @@ namespace Belle2 {
       return m_arrayPointer;
     }
 
+    /**
+     * sets m_flavorType using m_pdgCode
+     */
+    void setFlavorType();
+
   private:
 
     // persistent data members
@@ -676,10 +681,6 @@ namespace Belle2 {
      */
     void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
 
-    /**
-     * sets m_flavorType using m_pdgCode
-     */
-    void setFlavorType();
 
     ClassDef(Particle, 7); /**< Class to store reconstructed particles. */
 

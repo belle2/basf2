@@ -154,6 +154,9 @@ void RootInputModule::event()
       const long chainentry = m_tree->GetChainEntryNumber(entry);
       B2INFO("RootInput: will read entry " << chainentry << " (entry " << entry << " in current file) next.");
       m_nextEntry = chainentry;
+    } else {
+      B2ERROR("Couldn't find entry (" << InputController::getNextEvent() << ", " << InputController::getNextRun() << ", " <<
+              InputController::getNextExperiment() << ") in file! Loading entry " << m_nextEntry << " instead.");
     }
   }
   InputController::eventLoaded(m_nextEntry);
@@ -240,7 +243,10 @@ void RootInputModule::readTree()
     }
   }
 
-  if (m_parentLevel > 0) readParentTrees();
+  if (m_parentLevel > 0) {
+    if (!readParentTrees())
+      B2FATAL("Could not read data from parent file!");
+  }
 }
 
 
@@ -371,13 +377,13 @@ bool RootInputModule::createParentStoreEntries()
 
 bool RootInputModule::readParentTrees()
 {
-  StoreObjPtr<EventMetaData> eventMetaData;
+  const StoreObjPtr<EventMetaData> eventMetaData;
   long experiment = eventMetaData->getExperiment();
   long run = eventMetaData->getRun();
   long event = eventMetaData->getEvent();
   long entry = -1;
 
-  FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;
+  const FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;
   for (int level = 0; level < m_parentLevel; level++) {
 
     // check whether the current parent tree contains the current event
@@ -388,7 +394,7 @@ bool RootInputModule::readParentTrees()
         B2ERROR("Failed to get parent data");
         return false;
       }
-      FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
+      const FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
       tree = m_parentTrees[metaData.getId()];
       entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
       if (entry != -1) {
@@ -404,7 +410,7 @@ bool RootInputModule::readParentTrees()
       m_currentParent[level] = -1;
       for (int iParent = 0; iParent < int(parentMetaData->size()); iParent++) {
         if (iParent == m_currentParent[level]) continue;
-        FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
+        const FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
 
         // only consider parents who can contain the current event according to their metadata
         if (metaData.containsEvent(experiment, run, event)) {

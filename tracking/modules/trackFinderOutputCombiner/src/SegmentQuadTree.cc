@@ -94,7 +94,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
 
   if (m_param_debugOutput) {
     // Debug output
-    const auto& debugMap = qtProcessor.printDebugInformation();
+    const auto& debugMap = qtProcessor.getDebugInformation();
 
     TFile file("output.root", "RECREATE");
     TH2F histUnused("histUnused", "QuadTreeContent - unused Items", std::pow(2, m_param_level), 0, m_nbinsTheta, std::pow(2,

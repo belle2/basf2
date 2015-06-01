@@ -115,7 +115,7 @@ namespace Belle2 {
 
     public:
       StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
-                                 bool debugOutput = false) : QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput) { }
+                                 bool debugOutput = false) : QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput, false) { }
 
       /**
        * Do only insert the hit into a node if the slope and z information calculated from this hit belongs into this node
@@ -138,18 +138,6 @@ namespace Belle2 {
         dist[1][1] = inverseSlopeMax - inverseSlopeForMaximum;
 
         return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
-      }
-
-      /**
-       * Return the new ranges. We use the standard ranges.
-       */
-      ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
-      {
-        float slopeMin = node->getXBin(i);
-        float slopeMax = node->getXBin(i + 1);
-        float zMin = node->getYBin(j);
-        float zMax = node->getYBin(j + 1);
-        return ChildRanges(rangeX(slopeMin, slopeMax), rangeY(zMin, zMax));
       }
     };
 
@@ -226,18 +214,6 @@ namespace Belle2 {
         }
 
         return true;
-      }
-
-      /**
-       * We us the standard ranges here.
-       */
-      ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override
-      {
-        int thetaMin = node->getXBin(i);
-        int thetaMax = node->getXBin(i + 1);
-        float rMin = node->getYBin(j);
-        float rMax = node->getYBin(j + 1);
-        return ChildRanges(rangeX(thetaMin, thetaMax), rangeY(rMin, rMax));
       }
 
     private:

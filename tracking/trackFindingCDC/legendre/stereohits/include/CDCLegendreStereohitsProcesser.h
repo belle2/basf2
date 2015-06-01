@@ -26,6 +26,9 @@ namespace Belle2 {
     class StereohitsProcesser {
     public:
 
+      /** Simple Constructor */
+      StereohitsProcesser(bool debugOutput = false) : m_param_debugOutput(debugOutput) { }
+
       /**
        * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
        * The QuadTree has two dimensions: inverse slope in z-direction and z0.
@@ -54,6 +57,8 @@ namespace Belle2 {
 
       /** Returns a bool if the rlWire can be matched to a track. This is calculated with the track charge and the superlayer information */
       bool rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D);
+
+      bool m_param_debugOutput; /// Flag to turn on debug output
     };
   }
 

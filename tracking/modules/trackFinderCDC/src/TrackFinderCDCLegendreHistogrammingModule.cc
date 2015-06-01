@@ -15,7 +15,7 @@ REG_MODULE(CDCLegendreHistogramming)
 void CDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   //create object which will add stereohits to tracks
-  StereohitsProcesser stereohitsProcesser;
+  StereohitsProcesser stereohitsProcesser(m_param_debugOutput);
 
   for (CDCTrack& track : tracks) {
     //assign stereohits to the track

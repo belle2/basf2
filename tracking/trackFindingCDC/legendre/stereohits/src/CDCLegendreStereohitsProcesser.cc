@@ -4,6 +4,9 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
+#include <TFile.h>
+#include <TH2F.h>
+
 #define SQR(x) ((x)*(x)) //we will use it in least squares fit
 
 using namespace std;
@@ -72,9 +75,30 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
     B2DEBUG(100, "Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
   };
 
-  Processor qtProcessor(6, ranges);
+  unsigned int level = 6;
+  Processor qtProcessor(level, ranges, m_param_debugOutput);
   qtProcessor.provideItemsSet(hits_set);
   qtProcessor.fillGivenTree(lmdCandidateProcessing, 5);
+
+  /* DEBUG */
+  if (m_param_debugOutput) {
+    // Debug output
+    const auto& debugMap = qtProcessor.getDebugInformation();
+
+    TFile file("quadtree_content.root", "RECREATE");
+    TH2F hist("hist", "QuadTreeContent", std::pow(2, level), ranges.first.first, ranges.first.second, std::pow(2, level),
+              ranges.second.first, ranges.second.second);
+
+    for (const auto& debug : debugMap) {
+      const auto& positionInformation = debug.first;
+      const auto& quadItemsVector = debug.second;
+      hist.Fill(positionInformation.first, positionInformation.second, quadItemsVector.size());
+    }
+
+    hist.Write();
+    file.Clone();
+  }
+  /* DEBUG */
 
   if (possibleStereoSegments.size() == 0)
     return;

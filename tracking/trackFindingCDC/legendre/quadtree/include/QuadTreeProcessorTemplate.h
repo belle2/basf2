@@ -44,8 +44,8 @@ namespace Belle2 {
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.
        * @param lastLevel describing the last search level for the quad tree creation.
        */
-      QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges, bool debugOutput = false) :
-        m_lastLevel(lastLevel), m_debugOutput(debugOutput), m_debugOutputMap()
+      QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges, bool debugOutput = false, bool setUsedFlag = true) :
+        m_lastLevel(lastLevel), m_debugOutput(debugOutput), m_debugOutputMap(), m_param_setUsedFlag(setUsedFlag)
       {
         createQuadTree(ranges);
       }
@@ -62,7 +62,7 @@ namespace Belle2 {
       /**
        * Return the debug information if collected
        */
-      const std::map<std::pair<int, float>, std::vector<ItemType*>>& printDebugInformation()
+      const std::map<std::pair<typeX, typeY>, std::vector<ItemType*>>& getDebugInformation()
       {
         return m_debugOutputMap;
       }
@@ -76,7 +76,14 @@ namespace Belle2 {
        * If you don nt want to provide custom ranges, just return ChildRanges(rangeX(node->getXBin(iX), node->getXBin(iX + 1)),
        * rangeY(node->getYBin(iY), node->getYBin(iY + 1)));
        */
-      virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const = 0;
+      virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
+      {
+        typeX xMin = node->getXBin(iX);
+        typeX xMax = node->getXBin(iX + 1);
+        typeY yMin = node->getYBin(iY);
+        typeY yMax = node->getYBin(iY + 1);
+        return ChildRanges(rangeX(xMin, xMax), rangeY(yMin, yMax));
+      }
 
       /**
        * Implement that function if you want to provide a new processor. It is called when filling the quad tree after creation.
@@ -192,7 +199,7 @@ namespace Belle2 {
         resultItems.reserve(quadTreeItems.size());
 
         for (ItemType* quadTreeItem : quadTreeItems) {
-          quadTreeItem->setUsedFlag();
+          quadTreeItem->setUsedFlag(m_param_setUsedFlag);
           resultItems.push_back(quadTreeItem->getPointer());
         }
 
@@ -206,7 +213,7 @@ namespace Belle2 {
       virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
                                  bool checkThreshold) final {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
-        (node->getLevel()));
+        (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
         if (node->getItemsVector().size() < nItemsThreshold)
           return;
         if (checkThreshold)
@@ -322,7 +329,8 @@ namespace Belle2 {
       unsigned int m_lastLevel; /**< The last level to be filled */
       QuadTree* m_quadTree; /**< The quad tree we work with */
       bool m_debugOutput; /**< A flag to control the creation of the debug output */
-      std::map<std::pair<int, float>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
+      std::map<std::pair<typeX, typeY>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
+      bool m_param_setUsedFlag; /**< Set the used flag after every lambda function call */
     };
   }
 }

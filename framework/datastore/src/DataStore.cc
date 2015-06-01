@@ -371,28 +371,31 @@ bool DataStore::findStoreEntry(const TObject* object, DataStore::StoreEntry*& en
   return false;
 }
 
-void DataStore::getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass,
-                              EDurability durability) const
+const std::vector<std::string>& DataStore::getArrayNames(const std::string& arrayName, const TClass* arrayClass,
+                                                         EDurability durability) const
 {
+  static vector<string> names;
+  names.clear();
   if (arrayName.empty()) {
     static std::unordered_map<const TClass*, string> classToArrayName;
     const auto& it = classToArrayName.find(arrayClass);
     if (it != classToArrayName.end()) {
-      names.push_back(it->second);
+      names.emplace_back(it->second);
     } else {
-      std::string result = defaultArrayName(arrayClass->GetName());
+      const std::string& result = defaultArrayName(arrayClass->GetName());
       classToArrayName[arrayClass] = result;
-      names.push_back(result);
+      names.emplace_back(result);
     }
   } else if (arrayName == "ALL") {
     for (auto& mapEntry : m_storeEntryMap[durability]) {
       if (mapEntry.second.ptr and mapEntry.second.isArray and mapEntry.second.objClass->InheritsFrom(arrayClass)) {
-        names.push_back(mapEntry.second.name);
+        names.emplace_back(mapEntry.second.name);
       }
     }
   } else {
-    names.push_back(arrayName);
+    names.emplace_back(arrayName);
   }
+  return names;
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,
@@ -464,8 +467,7 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
   if (!findStoreEntry(object, entry, index)) return result;
 
   // get names of store arrays to search
-  std::vector<string> names;
-  getArrayNames(names, withName, withClass);
+  const std::vector<string>& names = getArrayNames(withName, withClass);
 
   // loop over found store arrays
   for (const std::string& name : names) {
@@ -512,8 +514,7 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
   if (!findStoreEntry(object, entry, index)) return RelationEntry(nullptr);
 
   // get names of store arrays to search
-  std::vector<string> names;
-  getArrayNames(names, withName, withClass);
+  const std::vector<string>& names = getArrayNames(withName, withClass);
 
   // loop over found store arrays
   for (const std::string& name : names) {
@@ -562,7 +563,7 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
         const string& relationsName = (searchSide == c_ToSide) ? relationName(array.getName(), name) : relationName(name, array.getName());
         const StoreEntryConstIter& it = m_storeEntryMap[durability].find(relationsName);
         if (it != m_storeEntryMap[durability].end())
-          arrays.push_back(name);
+          arrays.emplace_back(name);
       }
     }
   }
@@ -571,9 +572,7 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
 }
 std::vector<std::string> DataStore::getListOfArrays(const TClass* arrayClass, EDurability durability) const
 {
-  std::vector<std::string> arrays;
-  getArrayNames(arrays, "ALL", arrayClass, durability);
-  return arrays;
+  return getArrayNames("ALL", arrayClass, durability);
 }
 
 std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDurability durability) const
@@ -587,7 +586,7 @@ std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDu
         continue; //ignore relations in list
 
       if (obj->IsA()->InheritsFrom(objClass))
-        list.push_back(entrypair.first);
+        list.emplace_back(entrypair.first);
     }
   }
   return list;

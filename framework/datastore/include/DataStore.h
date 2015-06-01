@@ -559,20 +559,19 @@ namespace Belle2 {
      */
     bool checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const;
 
-    /** Fill the vector with the names of store arrays.
+    /** Returns a vector with the names of store arrays matching the given name and class. Note that the returned reference is only valid until the next call.
      *
-     *  @param names      The resulting vector of array names.
      *  @param arrayName  A given array name, the special string "ALL" for all arrays deriving from the given class, or an empty string for the default array name.
      *  @param arrayClass The class of the array(s).
      */
-    void getArrayNames(std::vector<std::string>& names, const std::string& arrayName, const TClass* arrayClass,
-                       EDurability durability = c_Event) const;
+    const std::vector<std::string>& getArrayNames(const std::string& arrayName, const TClass* arrayClass,
+                                                  EDurability durability = c_Event) const;
 
     /** For an array containing RelationsObjects, update index and entry cache for entire contents.
      *
      * You must ensure the array actually contains objects inheriting from RelationObject!
      */
-    void updateRelationsObjectCache(StoreEntry& entry);
+    static void updateRelationsObjectCache(StoreEntry& entry);
 
     /** Maps (name, durability) key to StoreEntry objects. */
     StoreEntryMap m_storeEntryMap[c_NDurabilityTypes];

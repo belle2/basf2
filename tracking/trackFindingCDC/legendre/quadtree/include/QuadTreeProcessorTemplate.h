@@ -44,7 +44,8 @@ namespace Belle2 {
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.
        * @param lastLevel describing the last search level for the quad tree creation.
        */
-      QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges) : m_lastLevel(lastLevel)
+      QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges, bool debugOutput = false) :
+        m_lastLevel(lastLevel), m_debugOutput(debugOutput), m_debugOutputMap()
       {
         createQuadTree(ranges);
       }
@@ -56,6 +57,14 @@ namespace Belle2 {
       {
         clear();
         delete m_quadTree;
+      }
+
+      /**
+       * Return the debug information if collected
+       */
+      const std::map<std::pair<int, float>, std::vector<ItemType*>>& printDebugInformation()
+      {
+        return m_debugOutputMap;
       }
 
     protected:
@@ -83,9 +92,17 @@ namespace Belle2 {
        * Override that function if you want to receive debug output whenever the children of a node are filled the first time
        * Maybe you want to make some nice plots or statistics.
        */
-      virtual void afterFillDebugHook(QuadTreeChildren*)
+      virtual void afterFillDebugHook(QuadTreeChildren* children)
       {
-
+        if (m_debugOutput) {
+          children->apply(
+          [&](QuadTree * childNode) {
+            if (childNode->getLevel() == getLastLevel()) {
+              m_debugOutputMap.insert(std::make_pair(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector()));
+            }
+          }
+          );
+        }
       }
 
     public:
@@ -304,6 +321,8 @@ namespace Belle2 {
 
       unsigned int m_lastLevel; /**< The last level to be filled */
       QuadTree* m_quadTree; /**< The quad tree we work with */
+      bool m_debugOutput; /**< A flag to control the creation of the debug output */
+      std::map<std::pair<int, float>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
     };
   }
 }

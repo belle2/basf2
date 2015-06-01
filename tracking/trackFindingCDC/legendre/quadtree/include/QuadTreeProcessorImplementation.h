@@ -114,8 +114,8 @@ namespace Belle2 {
     class StereoHitQuadTreeProcessor : public QuadTreeProcessorTemplate<float, float, CDCRecoHit3D, 2, 2> {
 
     public:
-
-      StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges) : QuadTreeProcessorTemplate(lastLevel, ranges) { }
+      StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
+                                 bool debugOutput = false) : QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput) { }
 
       /**
        * Do only insert the hit into a node if the slope and z information calculated from this hit belongs into this node
@@ -162,29 +162,7 @@ namespace Belle2 {
        */
       QuadTreeProcessorSegments(unsigned char lastLevel, const ChildRanges& ranges, const Vector2D& conformalTransformationPosition,
                                 bool debugOutput = false) :
-        QuadTreeProcessorTemplate(lastLevel, ranges), m_origin(conformalTransformationPosition), m_debugOutput(debugOutput) {}
-
-      /**
-       * We do override the afterFillDebugHook to get some nice debug output
-       * @todo implement a way to save this on the datastore
-       */
-      void afterFillDebugHook(QuadTreeChildren* children) override
-      {
-        if (m_debugOutput) {
-          children->apply(
-          [&](QuadTree * childNode) {
-            if (childNode->getLevel() == getLastLevel()) {
-              m_debugOutputMap.insert(std::make_pair(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector()));
-            }
-          }
-          );
-        }
-      }
-
-      const std::map<std::pair<int, float>, std::vector<ItemType*>>& printDebugInformation()
-      {
-        return m_debugOutputMap;
-      }
+        QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput), m_origin(conformalTransformationPosition) {}
 
       /**
        * Insert only if the sinogram of the front or the back part of the segment goes through the node.
@@ -263,9 +241,7 @@ namespace Belle2 {
       }
 
     private:
-      std::map<std::pair<int, float>, std::vector<ItemType*>> m_debugOutputMap;
       Vector2D m_origin; /**< The origin of the conformal transformation */
-      bool m_debugOutput; /**< A flag to control the creation of the debug output */
     };
 
   }

@@ -325,7 +325,8 @@ namespace Belle2 {
       TLorentzVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
       TLorentzVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       TLorentzVector vec = tagVec + sigVec;
-      return (sqrt(vec.Px() * vec.Px() + vec.Py() * vec.Py() + vec.Pz() * vec.Pz()));
+      //return (sqrt(vec.Px() * vec.Px() + vec.Py() * vec.Py() + vec.Pz() * vec.Pz()));
+      return vec.Vect().Mag();
 
     }
 

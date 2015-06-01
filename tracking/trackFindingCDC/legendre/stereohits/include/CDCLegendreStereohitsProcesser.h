@@ -21,6 +21,7 @@ namespace Belle2 {
     class StereoHit;
     class CDCTrack;
     class CDCRLWireHit;
+    class CDCTrajectory2D;
 
     class StereohitsProcesser {
     public:
@@ -52,7 +53,7 @@ namespace Belle2 {
       double getAlpha(TrackCandidate* cand, std::pair<double, double> pos);
 
       /** Returns a bool if the rlWire can be matched to a track. This is calculated with the track charge and the superlayer information */
-      bool rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrack& track);
+      bool rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D);
     };
   }
 

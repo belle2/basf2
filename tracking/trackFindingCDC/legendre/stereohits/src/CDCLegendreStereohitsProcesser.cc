@@ -10,9 +10,8 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrack& track)
+bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D)
 {
-  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   if (rlWireHit.getStereoType() == AXIAL or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
     return false;
 
@@ -54,7 +53,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
 
   // Fill in every unused stereo hit. Calculate the correct z-information before.
   for (const CDCRLWireHit& rlWireHit : wireHitTopology.getRLWireHits()) {
-    if (rlWireHitMatchesTrack(rlWireHit, track)) {
+    if (rlWireHitMatchesTrack(rlWireHit, trajectory2D)) {
       const CDCWire& wire = rlWireHit.getWire();
       const double forwardZ = wire.getSkewLine().forwardZ();
       const double backwardZ = wire.getSkewLine().backwardZ();

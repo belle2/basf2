@@ -95,7 +95,9 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
   long entry = tree->GetEntryNumberWithIndex(major, minor);
 
   if (entry == -1) {
-    B2ERROR("Couldn't find entry with index " << major << ", " << minor);
+    //should be handled by caller
+    B2DEBUG(100, "Couldn't find entry (" << event << ", " << run << ", " << experiment << ") in file! (major index: " << major <<
+            ", minor index: " << minor << ")");
   }
   return entry;
 }

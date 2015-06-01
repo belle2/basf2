@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Performs wildcard expansion using wordexp(), returns matches. */
     std::vector<std::string> expandWordExpansions(const std::vector<std::string>& filenames);
 
-    /** return entry number with given (event, run, experiment) from tree. Returns -1 on error. */
+    /** return entry number with given (event, run, experiment) from tree. Returns -1 if not found. */
     long getEntryNumberWithEvtRunExp(TTree* tree, long event, long run, long experiment);
 
     /** Build TTreeIndex on tree (assumes EventMetaData branch exists there). */

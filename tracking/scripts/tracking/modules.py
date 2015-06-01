@@ -93,9 +93,10 @@ class CDCFullFinder(metamodules.PathModule):
                  tmva_cut=0.1):
 
         modules = [CDCBackgroundHitFinder(tmva_cut=tmva_cut),
-                   CDCLegendreTrackFinder(),
                    CDCLocalTrackFinder(),
-                   CDCNotAssignedHitsCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name)
+                   CDCBackgroundHitFinder(tmva_cut=tmva_cut),
+                   CDCLegendreTrackFinder(),
+                   CDCStereoSegmentTrackMatcher(output_track_cands_store_array_name=output_track_cands_store_array_name)
                    ]
 
         super(CDCFullFinder, self).__init__(modules=modules)
@@ -143,7 +144,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
     def __init__(self, delete_hit_information=False,
                  output_track_cands_store_array_name=None,
                  output_track_cands_store_vector_name="CDCTrackVector",
-                 assign_stereo_hits=True):
+                 assign_stereo_hits=True, debug_output=False):
 
         module_list = []
 
@@ -162,7 +163,8 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
                                                                           SkipHitsPreparation=True,
                                                                           TracksStoreObjNameIsInput=True,
                                                                           WriteGFTrackCands=False,
-                                                                          TracksStoreObjName=output_track_cands_store_vector_name)
+                                                                          TracksStoreObjName=output_track_cands_store_vector_name,
+                                                                          DebugOutput=debug_output)
 
         if assign_stereo_hits:
             module_list.append(last_tracking_module)
@@ -326,7 +328,7 @@ class CDCFitter(metamodules.PathModule):
                                                                                         whichGeometry=fit_geometry)
         gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
                                                                         PDGCodes=[211],
-                                                                        FilterId="DAF",
+                                                                        FilterId="Kalman",
                                                                         StoreFailedTracks=False,
                                                                         GFTrackCandidatesColName=input_track_cands_store_array_name,
                                                                         GFTracksColName=output_tracks_store_array_name,

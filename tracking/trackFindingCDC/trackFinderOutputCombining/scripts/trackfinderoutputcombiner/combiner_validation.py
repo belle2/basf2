@@ -14,6 +14,7 @@ import glob
 
 from trackfinderoutputcombiner.validation import add_local_track_finder, add_validation, add_new_combiner,\
     add_legendre_track_finder, add_old_combiner, add_mc_track_finder
+import tracking.modules as modules
 from tracking.validation.extract_information_from_tracking_validation_output import (initialize_results,
                                                                                      extract_information_from_file)
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
@@ -37,107 +38,62 @@ class CombinerValidationRun(StandardEventGenerationRun):
     segment_train_filter = "simple"
     segment_track_filter = "simple"
     use_hard_candidates = False
-
-    def add_mc_combination(self, main_path):
-        mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
-        mc_track_matcher_module.param({'UseCDCHits': True,
-                                       'UseSVDHits': False,
-                                       'UsePXDHits': False,
-                                       'RelateClonesToMCParticles': True,
-                                       'MCGFTrackCandsColName': "MCTrackCands",
-                                       'PRGFTrackCandsColName': self.legendre_track_cands_store_array_name})
-        main_path.add_module(mc_track_matcher_module)
-        mc_track_matcher_module = basf2.register_module('MCTrackMatcher')
-        mc_track_matcher_module.param({'UseCDCHits': True,
-                                       'UseSVDHits': False,
-                                       'UsePXDHits': False,
-                                       'RelateClonesToMCParticles': True,
-                                       'MCGFTrackCandsColName': "MCTrackCands",
-                                       'PRGFTrackCandsColName': self.local_track_cands_store_array_name})
-        main_path.add_module(mc_track_matcher_module)
-        naive_combiner_module = basf2.register_module("NaiveCombiner")
-        naive_combiner_module.param({"TracksFromLegendreFinder": self.legendre_track_cands_store_array_name,
-                                     "NotAssignedTracksFromLocalFinder": self.local_track_cands_store_array_name,
-                                     "UseMCInformation": False,
-                                     "ResultTrackCands": "NaiveCombinerTrackCands"})
-        main_path.add_module(naive_combiner_module)
+    mode = "Naive"
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
 
-        main_path = super(CombinerValidationRun, self).create_path()
-
-        add_mc_track_finder(main_path)
-        add_legendre_track_finder(main_path, output_track_cands_store_array_name=self.legendre_track_cands_store_array_name)
-
-        drawing_module = CDCSVGDisplayModule()
-        drawing_module.draw_tracks = True
-        drawing_module.draw_track_trajectories = True
-        # main_path.add_module(drawing_module)
-
-        add_local_track_finder(main_path, output_track_cands_store_array_name="LocalTrackCands")
-
-        drawing_module = CDCSVGDisplayModule()
-        drawing_module.draw_segments_id = True
-        # main_path.add_module(drawing_module)
-
-        add_old_combiner(
-            main_path,
+        not_assigned_hits_combiner = modules.CDCNotAssignedHitsCombiner(
             output_track_cands_store_array_name="OldCombinerTrackCands",
             use_second_stage=self.use_hard_candidates)
 
-        drawing_module = CDCSVGDisplayModule()
-        drawing_module.draw_track_trajectories = True
-        drawing_module.draw_tracks = True
-        # main_path.add_module(drawing_module)
+        segment_track_combiner = modules.CDCSegmentTrackCombiner(output_track_cands_store_array_name="ResultTrackCands",
+                                                                 segment_track_chooser_filter=self.segment_track_chooser_filter,
+                                                                 segment_track_chooser_cut=self.segment_track_chooser_cut,
+                                                                 segment_train_filter=self.segment_train_filter,
+                                                                 segment_track_filter=self.segment_track_filter)
 
-        add_new_combiner(main_path, output_track_cands_store_array_name="ResultTrackCands",
-                         segment_track_chooser_filter=self.segment_track_chooser_filter,
-                         segment_track_chooser_cut=self.segment_track_chooser_cut,
-                         segment_train_filter=self.segment_train_filter,
-                         segment_track_filter=self.segment_track_filter)
+        main_path = super(CombinerValidationRun, self).create_path()
 
-        drawing_module = CDCSVGDisplayModule()
-        drawing_module.draw_tracks = True
-        drawing_module.draw_track_trajectories = True
-        # main_path.add_module(drawing_module)
+        add_mc_track_finder(main_path)
+        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name=self.legendre_track_cands_store_array_name))
 
-        add_validation(
-            main_path,
-            track_candidates_store_array_name="ResultTrackCands",
-            output_file_name="evaluation/Combiner%.2f_%s_%s_%s_%s.root" % (self.segment_track_chooser_cut,
-                                                                           self.segment_track_chooser_filter,
-                                                                           self.segment_train_filter,
-                                                                           self.segment_track_filter,
-                                                                           str(self.use_hard_candidates)))
+        if self.mode == "SegmentTrackCombiner":
+            main_path.add_module(not_assigned_hits_combiner)
+            main_path.add_module(segment_track_combiner)
 
-        if not os.path.exists("evaluation/OldCombiner_%s.root" % self.use_hard_candidates):
-            add_validation(
-                main_path,
-                track_candidates_store_array_name="OldCombinerTrackCands",
-                output_file_name="evaluation/OldCombiner_%s.root" % self.use_hard_candidates)
+            main_path.add_module(
+                modules.CDCValidation(
+                    track_candidates_store_array_name="ResultTrackCands",
+                    output_file_name="evaluation/Combiner%.2f_%s_%s_%s_%s.root" %
+                    (self.segment_track_chooser_cut, self.segment_track_chooser_filter,
+                     self.segment_train_filter, self.segment_track_filter, str(self.use_hard_candidates))))
 
-        if not os.path.exists("evaluation/Legendre.root"):
-            add_validation(
-                main_path,
-                track_candidates_store_array_name=self.legendre_track_cands_store_array_name,
-                output_file_name="evaluation/Legendre.root")
+            if not os.path.exists("evaluation/OldCombiner_%s.root" % self.use_hard_candidates):
+                main_path.add_module(modules.CDCValidation(
+                    track_candidates_store_array_name="OldCombinerTrackCands",
+                    output_file_name="evaluation/OldCombiner_%s.root" % self.use_hard_candidates))
 
-        if not os.path.exists("evaluation/Naive.root"):
-            self.add_mc_combination(main_path)
-            add_validation(
-                main_path,
-                track_candidates_store_array_name="NaiveCombinerTrackCands",
-                output_file_name="evaluation/Naive.root")
+        elif self.mode == "Naive":
+            if not os.path.exists("evaluation/Naive.root"):
+                main_path.add_module(self.get_basf2_module("NaiveCombiner", SkipHitsPreparation=True,
+                                                           TracksStoreObjNameIsInput=True,
+                                                           WriteGFTrackCands=True,
+                                                           GFTrackCandsStoreArrayName="NaiveCombinerTrackCands"))
+                main_path.add_module(modules.CDCValidation(track_candidates_store_array_name="NaiveCombinerTrackCands",
+                                                           output_file_name="evaluation/Naive.root"))
 
-        if not os.path.exists("evaluation/Trasan.root"):
-            trasan_track_finder = self.get_basf2_module("Trasan", GFTrackCandidatesColName="TrasanTrackCands")
-            main_path.add_module(trasan_track_finder)
-            add_validation(
-                main_path,
-                track_candidates_store_array_name="TrasanTrackCands",
-                output_file_name="evaluation/Trasan.root")
+            if not os.path.exists("evaluation/Legendre.root"):
+                main_path.add_module(
+                    modules.CDCValidation(
+                        track_candidates_store_array_name=self.legendre_track_cands_store_array_name,
+                        output_file_name="evaluation/Legendre.root"))
+
+            if not os.path.exists("evaluation/Trasan.root"):
+                main_path.add_module(self.get_basf2_module("Trasan", GFTrackCandidatesColName="TrasanTrackCands"))
+                main_path.add_module(modules.CDCValidation(track_candidates_store_array_name="TrasanTrackCands",
+                                                           output_file_name="evaluation/Trasan.root"))
 
         return main_path
 
@@ -175,12 +131,20 @@ def extract_parameters(x):
     return main(*x)
 
 
-def main(tmva_cut, segment_chooser_filter, segment_train_filter, track_filter, use_hard_candidates):
+def main(mode, tmva_cut, segment_chooser_filter, segment_train_filter, track_filter, use_hard_candidates):
 
     if segment_chooser_filter != "tmva" and tmva_cut > 0:
         return
 
+    if mode != "SegmentTrackCombiner" and (
+            segment_chooser_filter != "simple" or segment_train_filter != "simple" or
+            track_filter != "simple" or tmva_cut != 0 or use_hard_candidates):
+        return
+
+    print mode, tmva_cut, segment_chooser_filter, segment_train_filter, track_filter, use_hard_candidates
+
     run = CombinerValidationRun()
+    run.mode = mode
     run.segment_track_chooser_cut = tmva_cut
     run.segment_track_chooser_filter = segment_chooser_filter
     run.segment_train_filter = segment_train_filter
@@ -199,6 +163,8 @@ if __name__ == "__main__":
                                    ["simple", "mc"],
                                    [True, False]
                                 ])
-    # scanner.scan_parameter_space()
-    main(0, "mc", "simple", "simple", False)
+
+    short_scanner = ParameterScanner(main,
+                                     [["Naive", "SegmentTrackCombiner"], [0.0], ["simple", "mc"], ["simple"], ["simple"], [False]])
+    short_scanner.scan_parameter_space()
     print_data()

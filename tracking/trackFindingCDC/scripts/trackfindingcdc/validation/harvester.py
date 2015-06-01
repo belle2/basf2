@@ -9,7 +9,7 @@ import numpy as np
 class ReconstructionPositionHarvester(HarvestingModule):
     #: Harvester module to check for the reconstructed positions
 
-    def __init__(self, tracks_store_vector_name, output_file_name):
+    def __init__(self, output_file_name, tracks_store_vector_name="CDCTrackVector"):
         super(
             ReconstructionPositionHarvester,
             self).__init__(

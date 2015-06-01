@@ -17,7 +17,7 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 import numpy as np
 
 from trackfindingcdc.validation.harvester import ReconstructionPositionHarvester
-from tracking.modules import CDCBackgroundHitFinder
+from trackfindingcdc.quadtree.quadTreePlotter import StereoQuadTreePlotter
 
 
 class TestingModule(basf2.Module):
@@ -129,30 +129,30 @@ class HitCleaner(basf2.Module):
 class FullRun(StandardEventGenerationRun):
     #: Tester module for all cdc tracking in on path (plus combiners)
 
-    n_events = 10
+    n_events = 1
     show_not_fitted_tracks = False
 
     def create_path(self):
         #: Creates the path with all the modules in a row
         main_path = super(FullRun, self).create_path()
 
-        add_mc_track_finder(main_path, mc_track_cands_store_array_name="MCTrackCands")
-        main_path.add_module(modules.CDCBackgroundHitFinder())
-        main_path.add_module(modules.CDCLocalTrackFinder())
-        main_path.add_module(modules.CDCBackgroundHitFinder())
-        main_path.add_module(modules.CDCLegendreTrackFinder())
-        main_path.add_module(modules.CDCStereoSegmentTrackMatcher())
-        main_path.add_module(modules.CDCNotAssignedHitsCombiner(output_track_cands_store_array_name="TrackCands"))
+        add_mc_track_finder(main_path)
+        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands"))
 
-        main_path.add_module(modules.CDCHitUniqueAssumer())
+        main_path.add_module(StereoQuadTreePlotter())
+
+        # main_path.add_module(modules.CDCNotAssignedHitsCombiner(output_track_cands_store_array_name="TrackCands"))
+
+        # main_path.add_module(modules.CDCHitUniqueAssumer())
 
         # Enable these modules for further testing
         # main_path.add_module(modules.CDCMCFiller())
-        # main_path.add_module(ReconstructionPositionHarvester(tracks_store_vector_name="CDCTrackVector",
-        #                                                      output_file_name="reconstruction_position.root"))
+        # main_path.add_module(ReconstructionPositionHarvester(output_file_name="reconstruction_position.root"))
         # main_path.add_module(HitCleaner())
-        # main_path.add_module(modules.CDCEventDisplay(full_display=False))
         # main_path.add_module(modules.CDCFitter(input_track_cands_store_array_name="TrackCands"))
+        # main_path.add_module(modules.CDCEventDisplay(full_display=True))
+
+        return main_path
 
         if self.show_not_fitted_tracks:
             main_path.add_module(TestingModule(track_store_array_name="TrackCands"))

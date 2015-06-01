@@ -20,24 +20,23 @@ import seaborn as sb
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 
 
-class SegmentQuadTreePlotter(basf2.Module):
+class QuadTreePlotter(basf2.Module):
 
-    file_name_of_quad_tree_content = "output.root"
+    def __init__(self):
+        basf2.Module.__init__(self)
+        self.file_name_of_quad_tree_content = "quadtree_content.root"
+        self.draw_quad_tree_content = True and False
+        self.range_x_min = 0
+        self.range_x_max = 0
+        self.range_y_min = 0
+        self.range_y_max = 0
 
-    draw_quad_tree_content = True and False
-    draw_segment_intersection = True and False
-    draw_segment = True and False
-    draw_segment_averaged = True and False
-    draw_segment_fitted = True and False
-    draw_mc_information = True and False
-    draw_mc_hits = True and False
+    def plot_quad_tree_content(self):
+        if not self.draw_quad_tree_content:
+            return
 
-    theta_shifted = False
-    maximum_theta = np.pi
-
-    def plotQuadTreeContent(self, input_file):
-        hist = input_file.Get("histUsed")
-        histUnused = input_file.Get("histUnused")
+        input_file = ROOT.TFile(self.file_name_of_quad_tree_content)
+        hist = input_file.Get("hist")
 
         xList = list()
         yList = list()
@@ -53,11 +52,11 @@ class SegmentQuadTreePlotter(basf2.Module):
 
         for iX in xrange(1, xAxis.GetNbins() + 1):
             for iY in xrange(1, yAxis.GetNbins() + 1):
-                length_list += [hist.GetBinContent(iX, iY) + histUnused.GetBinContent(iX, iY)]
-                width_list += [xAxis.GetBinWidth(iX) / 8192 * self.maximum_theta]
+                length_list += [hist.GetBinContent(iX, iY)]
+                width_list += [xAxis.GetBinWidth(iX)]
                 height_list += [yAxis.GetBinWidth(iY)]
                 y_list += [yAxis.GetBinLowEdge(iY)]
-                x_list += [xAxis.GetBinLowEdge(iX) / 8192 * self.maximum_theta]
+                x_list += [xAxis.GetBinLowEdge(iX)]
 
         cm = plt.get_cmap('Blues')
         cNorm = colors.Normalize(vmin=0, vmax=max(length_list))
@@ -66,6 +65,37 @@ class SegmentQuadTreePlotter(basf2.Module):
         for length, height, width, x, y in zip(length_list, height_list, width_list, x_list, y_list):
             patch = patches.Rectangle((x, y), width=width, height=height, facecolor=scalarMap.to_rgba(length), lw=1)
             plt.gca().add_patch(patch)
+
+    def save_and_show_file(self):
+        fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
+        plt.savefig(fileName)
+        procDisplay = subprocess.Popen(['eog', fileName])
+        raw_input("Press Enter to continue..")
+
+    def init_plotting(self):
+        plt.clf()
+        plt.xlim(self.range_x_min, self.range_x_max)
+        plt.ylim(self.range_y_min, self.range_y_max)
+        plt.xticks([])
+        plt.yticks([])
+
+    def event(self):
+        self.init_plotting()
+        self.plot_quad_tree_content()
+        self.save_and_show_file()
+
+
+class SegmentQuadTreePlotter(QuadTreePlotter):
+
+    draw_segment_intersection = True and False
+    draw_segment = True and False
+    draw_segment_averaged = True and False
+    draw_segment_fitted = True and False
+    draw_mc_information = True and False
+    draw_mc_hits = True and False
+
+    theta_shifted = False
+    maximum_theta = np.pi
 
     def calculateIntersectionInQuadTreePicture(self, first, second):
         positionFront = first.getRecoPos2D().conformalTransformed()
@@ -117,19 +147,18 @@ class SegmentQuadTreePlotter(basf2.Module):
         return theta, r
 
     def event(self):
-        plt.clf()
-
         if self.theta_shifted:
-            plt.xlim(-self.maximum_theta / 2, self.maximum_theta / 2)
+            self.range_x_min = -self.maximum_theta / 2
+            self.range_x_max = self.maximum_theta / 2
         else:
-            plt.xlim(0, self.maximum_theta)
-        plt.ylim(-0.05, 0.05)
-        plt.xticks([])
-        plt.yticks([])
+            self.range_x_min = 0
+            self.range_x_max = self.maximum_theta
 
-        if self.draw_quad_tree_content:
-            input_file = ROOT.TFile(self.file_name_of_quad_tree_content)
-            self.plotQuadTreeContent(input_file)
+        self.range_y_min = -0.05
+        self.range_y_max = 0.05
+
+        self.init_plotting()
+        self.plotQuadTreeContent()
 
         if self.draw_segment_intersection:
             map = attributemaps.SegmentMCTrackIdColorMap()
@@ -207,8 +236,102 @@ class SegmentQuadTreePlotter(basf2.Module):
 
         self.save_and_show_file()
 
-    def save_and_show_file(self):
-        fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
-        plt.savefig(fileName)
-        procDisplay = subprocess.Popen(['eog', fileName])
-        raw_input("Press Enter to continue..")
+
+class StereoQuadTreePlotter(QuadTreePlotter):
+
+    draw_mc_hits = False
+    draw_mc_tracks = False
+    draw_track_hits = True
+
+    def create_trajectory_from_track(self, track):
+        Vector3D = Belle2.TrackFindingCDC.Vector3D
+        Trajectory3D = Belle2.TrackFindingCDC.CDCTrajectory3D
+
+        position = Vector3D(track.getPosSeed())
+        momentum = Vector3D(track.getMomSeed())
+        charge = track.getChargeSeed()
+
+        return Trajectory3D(position, momentum, charge)
+
+    def create_reco_hit(self, cdcHit, trajectory3D, rlInfo):
+        wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+
+        CDCRecoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D
+        rightLeftWireHit = wireHitTopology.getRLWireHit(cdcHit, rlInfo)
+        if rightLeftWireHit.getStereoType() != 0:
+            recoHit = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
+            return recoHit
+        else:
+            return None
+
+    def event(self):
+        self.draw_quad_tree_content = True
+
+        self.range_x_min = -2 - np.sqrt(3)
+        self.range_x_max = 2 + np.sqrt(3)
+
+        self.range_y_min = -20
+        self.range_y_max = 20
+
+        self.init_plotting()
+        self.plot_quad_tree_content()
+
+        if self.draw_mc_hits:
+            map = attributemaps.listColors
+            array = Belle2.PyStoreArray("MCTrackCands")
+            cdcHits = Belle2.PyStoreArray("CDCHits")
+
+            for track in array:
+                mcTrackID = track.getMcTrackId()
+                trajectory = self.create_trajectory_from_track(track)
+
+                for cdcHitID in track.getHitIDs(Belle2.Const.CDC):
+                    cdcHit = cdcHits[cdcHitID]
+                    recoHit = self.create_reco_hit(cdcHit, trajectory, -1)
+
+                    if recoHit:
+                        z0 = [-20, 20]
+                        l = [1.0 / recoHit.calculateZSlopeWithZ0(z) for z in z0]
+                        plt.plot(l, z0, marker="", color=map[mcTrackID % len(map)], ls="-", alpha=0.2)
+
+                    recoHit = self.create_reco_hit(cdcHit, trajectory, 1)
+
+                    if recoHit:
+                        z0 = [-20, 20]
+                        l = [1.0 / recoHit.calculateZSlopeWithZ0(z) for z in z0]
+                        plt.plot(l, z0, marker="", color=map[mcTrackID % len(map)], ls="-", alpha=0.2)
+
+        if self.draw_mc_tracks:
+            map = attributemaps.listColors
+            array = Belle2.PyStoreArray("MCTrackCands")
+            cdcHits = Belle2.PyStoreArray("CDCHits")
+
+            mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp().getInstance()
+            mcHitLookUp.fill()
+
+            for track in array:
+                mcTrackID = track.getMcTrackId()
+                trajectory = self.create_trajectory_from_track(track)
+                z0 = trajectory.getTrajectorySZ().getStartZ()
+
+                for cdcHitID in track.getHitIDs(Belle2.Const.CDC):
+                    cdcHit = cdcHits[cdcHitID]
+                    recoHit = self.create_reco_hit(cdcHit, trajectory, mcHitLookUp.getRLInfo(cdcHit))
+
+                    if recoHit:
+                        l = 1.0 / recoHit.calculateZSlopeWithZ0(z0)
+                        plt.plot(l, z0, marker="o", color=map[mcTrackID % len(map)], ls="", alpha=0.2)
+
+        if self.draw_track_hits:
+            map = attributemaps.listColors
+            items = Belle2.PyStoreObj("CDCTrackVector")
+            wrapped_vector = items.obj()
+            vector = wrapped_vector.get()
+
+            for id, track in enumerate(vector):
+                for recoHit in track.items():
+                    z0 = [-20, 20]
+                    l = [1.0 / recoHit.calculateZSlopeWithZ0(z) for z in z0]
+                    plt.plot(l, z0, marker="", color=map[id % len(map)], ls="-", alpha=0.4)
+
+        self.save_and_show_file()

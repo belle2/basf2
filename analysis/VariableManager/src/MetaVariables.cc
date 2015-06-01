@@ -18,6 +18,7 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/utility/EvtPDLUtil.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -215,9 +216,10 @@ namespace Belle2 {
           }
         }
 
+        auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
         Variable::Cut cut(cutString);
 
-        auto func = [roeListName, cut, pdgCode](const Particle * particle) -> double {
+        auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
           StoreObjPtr<ParticleList> roeList(roeListName);
@@ -229,8 +231,7 @@ namespace Belle2 {
             if (not particle->overlapsWith(roeParticle)) {
               TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
               std::vector<int> indices = { particle->getArrayIndex(), roeParticle->getArrayIndex() };
-              Particle tempParticle = Particle(tempCombination, pdgCode, Particle::c_Unflavored, indices, particle->getArrayPointer());
-              tempParticle.setFlavorType();
+              Particle tempParticle = Particle(tempCombination, pdgCode, flavourType, indices, particle->getArrayPointer());
               if (cut.check(&tempParticle)) {
                 return 1;
               }

@@ -139,6 +139,11 @@ namespace Belle2 {
     double missingMass(const Particle* part);
 
     /**
+     * returns the magnitude of the difference of the Momenta of signal and tag side in the CMS Frame
+     */
+    double missingMomentum(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);

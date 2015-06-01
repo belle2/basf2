@@ -319,6 +319,16 @@ namespace Belle2 {
       return (-tagVec - sigVec).M2();
     }
 
+    double missingMomentum(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
+      TLorentzVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
+      TLorentzVector vec = tagVec + sigVec;
+      return (sqrt(vec.Px() * vec.Px() + vec.Py() * vec.Py() + vec.Pz() * vec.Pz()));
+
+    }
+
     // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -1217,6 +1227,7 @@ namespace Belle2 {
                       "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
     REGISTER_VARIABLE("missingMass", missingMass,
                       "missing mass of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
+    REGISTER_VARIABLE("missingMomentum", missingMomentum, "Missing Momentum of the Signal Side in CMS Frame");
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");

@@ -153,11 +153,7 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
     trajectory2D.setLocalOrigin(newTrackCandidate.front().getRecoPos2D());
 
-    FloatType perpSOfFirstHit = newTrackCandidate.front().getPerpS(trajectory2D);
-    FloatType perpSOfLastHit = newTrackCandidate.back().getPerpS(trajectory2D);
-    if (perpSOfLastHit < perpSOfFirstHit) {
-      trajectory2D.reverse();
-    }
+    // Maybe we should reverse the trajectory here, is this right?
 
     CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
     newTrackCandidate.setStartTrajectory3D(trajectory3D);

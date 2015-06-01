@@ -53,7 +53,6 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
       m_zDistMatrix(counterSegment, counterTracks) = 0;
 
       if (segment.getAutomatonCell().hasTakenFlag()) {
-        B2INFO("Skipping segment...")
         continue;
       }
 
@@ -125,6 +124,7 @@ void FittingMatrix::fillHitsInto(const CDCRecoSegment2D& recoSegment, CDCTrack& 
     if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
       bestTrackCand.push_back(recoHit3D);
+      recoHit.getWireHit().getAutomatonCell().setTakenFlag();
     }
   }
 }

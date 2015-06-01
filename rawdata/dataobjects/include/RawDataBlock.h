@@ -101,14 +101,10 @@ namespace Belle2 {
 
     //! flag for deleting m_buffer in destructer( 0:delete, 1: not delete)
     //! When using pre-allocated buffer, the buffer should be reused and not deleted in the destructer
-    int m_use_prealloc_buf;
-
-    //! no longer used
-    int m_which_part;
+    int m_use_prealloc_buf; //! not record
 
     /// To drive from TObject
-    ClassDef(RawDataBlock, 1);
-
+    ClassDef(RawDataBlock, 2);
   };
 
 }

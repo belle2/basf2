@@ -59,9 +59,8 @@ namespace Belle2 {
     /** Returns true if no information was set yet or Clear() was called. */
     bool isDefaultConstructed() const
     {
-      return (m_fromName == "" and m_toName == ""
-              and getEntries() == 0 and
-              m_fromDurability == -1 and m_toDurability == -1);
+      return (m_fromDurability == -1 and m_toDurability == -1 and
+              m_fromName.empty() and m_toName.empty() and getEntries() == 0);
     }
 
     /** Clear container to free memory. Prefer to deleting objects of this type. */

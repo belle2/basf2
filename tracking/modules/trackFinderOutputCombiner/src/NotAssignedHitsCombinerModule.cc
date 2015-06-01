@@ -104,9 +104,35 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCRecoSegment2D & segment) -> bool { return segment.getAutomatonCell().hasTakenFlag(); }),
                  segments.end());
 
-  // Prepare the tracks for output
+  // Refit the tracks
+  const CDCRiemannFitter& circleFitter = CDCRiemannFitter::getFitter();
+  const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+
+  CDCObservations2D axialObservations;
+  CDCObservations2D stereoObservations;
+
   for (CDCTrack& track : tracks) {
-    track.sort();
+
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      if (recoHit3D.getStereoType() == AXIAL) {
+        axialObservations.append(recoHit3D.getWireHit().getRefPos2D());
+      } else {
+        stereoObservations.append(recoHit3D.getPerpS(), recoHit3D.getRecoZ());
+      }
+    }
+
+    CDCTrajectory2D trajectory2D;
+    CDCTrajectorySZ trajectorySZ = CDCTrajectorySZ::basicAssumption();
+
+    circleFitter.update(trajectory2D, axialObservations);
+    if (stereoObservations.size() > 3)
+      szFitter.update(trajectorySZ, stereoObservations);
+
+    CDCTrajectory3D trajectory3D(trajectory2D, trajectorySZ);
+    track.setStartTrajectory3D(trajectory3D);
+
+    axialObservations.clear();
+    stereoObservations.clear();
   }
 }
 
@@ -142,6 +168,7 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<CDCRecoSegmen
     if (segments[counterOuter].getStereoType() == AXIAL) {
       if (numberOfPossibleFits > 0
           && highestChi2 > m_fittingMatrix.getParamMinimalChi2()) {
+        B2DEBUG(100, "Highest Chi2 is " << highestChi2)
         m_fittingMatrix.addSegmentToResultTrack(counterOuter, bestFitIndex,
                                                 segments, tracks);
       }

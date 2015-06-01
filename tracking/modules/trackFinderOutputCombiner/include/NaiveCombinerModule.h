@@ -9,40 +9,25 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
+#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 
 namespace Belle2 {
 
-  class NaiveCombinerModule : public Module {
+  class NaiveCombinerModule : public TrackFinderCDCFromSegmentsModule {
 
   public:
 
     NaiveCombinerModule();
 
-    ~NaiveCombinerModule() {};
-
-    void initialize();
-
-    void beginRun() {};
-
-    void event();
-
-    void endRun() {};
-
-    void terminate() {};
 
   private:
-    std::string
-    m_param_tracksFromLegendreFinder;                        /**< Bad TrackCandidates collection name from the legendre finder. */
-    std::string
-    m_param_notAssignedTracksFromLocalFinder;                        /**< TrackCandidates collection name from the local finder. */
-    std::string
-    m_param_resultTrackCands;                   /**< TrackCandidates collection name from the combined results of the two recognition algorithm. The CDCHits are assumed to come from m_param_cdcHitsColName1. */
-    std::string m_param_mcTrackCands;                   /**< When UseMCInformation is enabled, you need to set the MCTrackCands here. */
+    /**
+     * Fill all segments and tracks to the output list
+     */
+    void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
 
-    std::string
-    m_param_cdcHitsColName;                        /**< The CDCHits collection name for the first pattern recognition algorithm. */
-    bool m_param_useMCInformation;                             /**< Uses the MC information from the MCTrackFinder and the MCMatcher to merge tracks */
+
+    std::string m_param_mcTrackCands;                   /**< When UseMCInformation is enabled, you need to set the MCTrackCands here. */
+    bool m_param_useMCInformation;                      /**< Uses the MC information from the MCTrackFinder and the MCMatcher to merge tracks */
   };
 }

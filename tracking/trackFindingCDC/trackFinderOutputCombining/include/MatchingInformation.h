@@ -126,7 +126,7 @@ namespace Belle2 {
     class SegmentInformation : public MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation> {
     public:
       SegmentInformation(TrackFindingCDC::CDCRecoSegment2D* segment) :
-        MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation>(segment), m_usedInTrack(false)
+        MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation>(segment)
       {
       }
 
@@ -134,19 +134,6 @@ namespace Belle2 {
       {
         return getObject();
       }
-
-      bool isUsedInTrack() const
-      {
-        return m_usedInTrack;
-      }
-
-      void setUsedInTrack(bool usedInTrack = true)
-      {
-        m_usedInTrack = usedInTrack;
-      }
-
-    private:
-      bool m_usedInTrack;
     };
   }
 }

@@ -183,11 +183,6 @@ namespace Belle2 {
         return m_param_minimal_z_difference;
       }
 
-      /**
-       * Fill the hits into a given track candidate.
-       */
-      static void fillHitsInto(const CDCRecoSegment2D& recoSegment, CDCTrack& bestTrackCand);
-
       static SegmentStatus calculateSegmentStatus(const CDCRecoSegment2D& segment,
                                                   const CDCTrack& resultTrackCand);
 

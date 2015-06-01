@@ -21,6 +21,8 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
   m_lookup.resize(wireTopology.N_SUPERLAYERS);
 
   for (CDCRecoSegment2D& segment : segments) {
+    if (segment.getAutomatonCell().hasTakenFlag())
+      continue;
     ILayerType superlayerID = segment.getISuperLayer();
     m_lookup[superlayerID].push_back(new SegmentInformation(&segment));
     B2DEBUG(200, "Added new segment to segment lookup: " << segment.getTrajectory2D())
@@ -97,24 +99,6 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
 
       trackInformation->clearGoodSegmentTrain();
     }
-
-    // Count the number of segments we have still left
-    unsigned int notUsedSegments = std::count_if(segmentsList.begin(),
-    segmentsList.end(), [](const SegmentInformation * segmentInformation) -> bool {
-      if (segmentInformation->isUsedInTrack())
-      {
-        segmentInformation->getSegment()->getAutomatonCell().setTakenFlag();
-        return false;
-      } else {
-        segmentInformation->getSegment()->getAutomatonCell().unsetTakenFlag();
-        return true;
-      }
-    });
-
-    if (notUsedSegments > 0) {
-      B2DEBUG(100, "Still " << notUsedSegments << " not used in this superlayer.")
-    }
-
   }
 }
 
@@ -219,16 +203,30 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
   clearSmallerCombinations(trainsOfSegments);
 }
 
+void SegmentTrackCombiner::addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track)
+{
+  if (segment.getAutomatonCell().hasTakenFlag())
+    return;
+
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  for (const CDCRecoHit2D& recoHit : segment) {
+    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag())
+      continue;
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
+    track.push_back(recoHit3D);
+    recoHit.getWireHit().getAutomatonCell().setTakenFlag();
+  }
+
+  segment.getAutomatonCell().setTakenFlag();
+}
+
+
 void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTrack)
 {
-  const CDCTrajectory2D& trajectory2D = matchingTrack->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
+  addSegmentToTrack(*(segmentInformation->getSegment()), *(matchingTrack->getTrackCand()));
 
-  segmentInformation->setUsedInTrack();
-  for (const CDCRecoHit2D& recoHit : segmentInformation->getSegment()->items()) {
-    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
-    matchingTrack->getTrackCand()->push_back(recoHit3D);
-    matchingTrack->getPerpSList().push_back(
-      trajectory2D.calcPerpS(recoHit.getRecoPos2D()));
+  for (const CDCRecoHit3D& recoHit : matchingTrack->getTrackCand()->items()) {
+    matchingTrack->getPerpSList().push_back(recoHit.getPerpS());
   }
   matchingTrack->calcPerpS();
 }

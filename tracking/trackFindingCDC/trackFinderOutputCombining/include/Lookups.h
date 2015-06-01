@@ -137,6 +137,8 @@ namespace Belle2 {
         m_segmentLookUp.clear();
       }
 
+      static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track);
+
     private:
       const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */
 

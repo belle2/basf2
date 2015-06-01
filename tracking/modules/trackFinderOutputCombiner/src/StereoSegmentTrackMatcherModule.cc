@@ -102,15 +102,7 @@ void StereoSegmentTrackMatcherModule::generate(std::vector<CDCRecoSegment2D>& se
     const std::set<TrackFindingCDC::CDCTrack*>& matchingTracks = segmentTrackCombination.second;
     if (matchingTracks.size() == 1) {
       CDCTrack* track = *(matchingTracks.begin());
-      segment->getAutomatonCell().setTakenFlag();
-      const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
-      for (const CDCRecoHit2D& recoHit2D : *segment) {
-        if (not recoHit2D.getWireHit().getAutomatonCell().hasTakenFlag()) {
-          CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
-          recoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
-          track->push_back(recoHit3D);
-        }
-      }
+      SegmentTrackCombiner::addSegmentToTrack(*segment, *track);
     }
   }
 

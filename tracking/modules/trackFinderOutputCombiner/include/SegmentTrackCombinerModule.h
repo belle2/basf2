@@ -159,34 +159,6 @@ namespace Belle2 {
     {
       m_combiner.fillWith(tracks, segments);
       m_combiner.combine(*m_ptrSegmentTrackChooser, *m_ptrSegmentTrainFilter, *m_ptrSegmentTrackFilter);
-
-      // Delete all used segments
-      segments.erase(std::remove_if(segments.begin(), segments.end(), [](const TrackFindingCDC::CDCRecoSegment2D & segment) -> bool {
-        return segment.getAutomatonCell().hasTakenFlag();
-      }), segments.end());
-
-      B2DEBUG(100, "After all there are " << segments.size() << " Segments left in this event.")
-
-      /*// Reset the taken flag for the hits of all the unused segments
-      for (const TrackFindingCDC::CDCRecoSegment2D& segment : segments) {
-        for (const TrackFindingCDC::CDCRecoHit2D& recoHit : segment) {
-          tracks.emplace_back();
-          TrackFindingCDC::CDCTrack & newCDCTrack = tracks.back();
-
-          const TrackFindingCDC::CDCRiemannFitter& fitter = TrackFindingCDC::CDCRiemannFitter::getFitter();
-          TrackFindingCDC::CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
-          fitter.update(trajectory2D, segment);
-
-          TrackFindingCDC::CDCTrajectory3D trajectory3D(trajectory2D, TrackFindingCDC::CDCTrajectorySZ::basicAssumption());
-          newCDCTrack.setStartTrajectory3D(trajectory3D);
-
-          for(const TrackFindingCDC::CDCRecoHit2D & recoHit2D : segment) {
-            TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(recoHit2D->getRLWireHit(), trajectory2D);
-            newCDCTrack.push_back(recoHit3D);
-          }
-        }
-      }*/
-
       m_combiner.clear();
     }
   }

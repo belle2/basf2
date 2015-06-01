@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/FittingMatrix.h>
-#include <framework/datastore/StoreArray.h>
 
-#include <framework/gearbox/Const.h>
-
-#include <genfit/TrackCand.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -22,8 +19,6 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <Eigen/Dense>
-#include <genfit/WireTrackCandHit.h>
-#include <cdc/dataobjects/CDCHit.h>
 
 
 using namespace Belle2;
@@ -117,18 +112,6 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
   }
 }
 
-void FittingMatrix::fillHitsInto(const CDCRecoSegment2D& recoSegment, CDCTrack& bestTrackCand)
-{
-  const CDCTrajectory2D& trajectory2D = bestTrackCand.getStartTrajectory3D().getTrajectory2D();
-  for (const CDCRecoHit2D& recoHit : recoSegment) {
-    if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
-      bestTrackCand.push_back(recoHit3D);
-      recoHit.getWireHit().getAutomatonCell().setTakenFlag();
-    }
-  }
-}
-
 
 void FittingMatrix::addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack,
                                             const std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& resultTrackCands)
@@ -136,7 +119,7 @@ void FittingMatrix::addSegmentToResultTrack(FittingMatrix::SegmentCounter counte
   B2DEBUG(100, "Adding Segment #" << counterSegment << " with Track #" << counterTrack);
   const TrackFindingCDC::CDCRecoSegment2D& recoSegment = recoSegments[counterSegment];
   CDCTrack& trackCandidate = resultTrackCands[counterTrack];
-  FittingMatrix::fillHitsInto(recoSegment, trackCandidate);
+  SegmentTrackCombiner::addSegmentToTrack(recoSegment, trackCandidate);
   resetSegment(counterSegment);
   m_segmentIsUsed[counterSegment] = true;
 }

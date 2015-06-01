@@ -8,18 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/ContinuumSuppression/CleoCones.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <analysis/dataobjects/Particle.h>
 #include <iostream>
 #include <iomanip>
 #include <math.h>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <analysis/ContinuumSuppression/CleoCones.h>
 
 namespace Belle2 {
 

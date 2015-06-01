@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#include <analysis/dataobjects/Particle.h>
 namespace Belle2 {
+  class Particle;
 
   void addContinuumSuppression(const Particle* particle);
 

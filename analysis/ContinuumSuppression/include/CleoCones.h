@@ -11,26 +11,12 @@
 #ifndef CLEOCONES_H
 #define CLEOCONES_H
 
+#include <TVector3.h>
+
 #include <vector>
-#include <map>
-#include <string>
-#include <utility>
-#include <iostream>
-#include <sstream>
-
-#include <analysis/VariableManager/Manager.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/ContinuumSuppression/FuncPtr.h>
-
-#include <analysis/utility/PCmsLabTransform.h>
 
 namespace Belle2 {
 
-  class Particle;
-//class TVector3;
 
 // ----------------------------------------------------------------------
 // CleoCones
@@ -45,11 +31,13 @@ namespace Belle2 {
 
     ~CleoCones() {};
 
-    std::vector<float> cleo_cone_with_all() {
+    std::vector<float> cleo_cone_with_all()
+    {
       return m_cleo_cone_with_all;
     }
 
-    std::vector<float> cleo_cone_with_roe() {
+    std::vector<float> cleo_cone_with_roe()
+    {
       return m_cleo_cone_with_roe;
     }
 

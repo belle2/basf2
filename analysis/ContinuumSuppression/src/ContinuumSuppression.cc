@@ -15,8 +15,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -32,8 +31,6 @@ namespace Belle2 {
 
   void addContinuumSuppression(const Particle* particle)
   {
-    StoreObjPtr<Particle>     particles;
-
     // Output
     StoreArray<ContinuumSuppression> qqArray;
     // Create ContinuumSuppression object

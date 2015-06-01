@@ -444,7 +444,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
                                                            RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(relationsName, c_Event);
   if (relIndex) {
     // add it to index (so we avoid expensive rebuilding later)
-    relIndex->index().insert(RelationIndex<TObject, TObject>::Element(fromIndex, toIndex, fromObject, toObject, weight));
+    relIndex->index().emplace(fromIndex, toIndex, fromObject, toObject, weight);
   } else {
     //mark for rebuilding later on
     relContainer->setModified(true);
@@ -471,9 +471,6 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
 
   // loop over found store arrays
   for (const std::string& name : names) {
-    const StoreEntryConstIter& arrayIter = m_storeEntryMap[c_Event].find(name);
-    if (arrayIter == m_storeEntryMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
-
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
@@ -518,9 +515,6 @@ RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* 
 
   // loop over found store arrays
   for (const std::string& name : names) {
-    const StoreEntryConstIter& arrayIter = m_storeEntryMap[c_Event].find(name);
-    if (arrayIter == m_storeEntryMap[c_Event].end() or arrayIter->second.ptr == nullptr) continue;
-
     // get the relations from -> to
     const string& relationsName = (searchSide == c_ToSide) ? relationName(entry->name, name) : relationName(name, entry->name);
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);

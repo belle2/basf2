@@ -25,7 +25,7 @@ void StereoSegmentTrackMatcherModule::fillHitLookUp(std::vector<CDCRecoSegment2D
 {
   m_hitSegmentLookUp.clear();
   for (const CDCRecoSegment2D& segment : segments) {
-    if (segment.getStereoType() == AXIAL)
+    if (segment.getStereoType() == AXIAL or segment.getAutomatonCell().hasTakenFlag())
       continue;
     for (const CDCRecoHit2D& recoHit : segment) {
       const CDCHit* cdcHit = recoHit.getWireHit().getHit();
@@ -36,7 +36,6 @@ void StereoSegmentTrackMatcherModule::fillHitLookUp(std::vector<CDCRecoSegment2D
 
 const CDCRecoSegment2D* StereoSegmentTrackMatcherModule::findMatchingSegment(const CDCRecoHit3D& recoHit)
 {
-
   const CDCHit* cdcHit = recoHit.getWireHit().getHit();
   auto foundElement = m_hitSegmentLookUp.find(cdcHit);
   if (foundElement == m_hitSegmentLookUp.end()) {
@@ -44,6 +43,35 @@ const CDCRecoSegment2D* StereoSegmentTrackMatcherModule::findMatchingSegment(con
   } else {
     return foundElement->second;
   }
+}
+
+bool segmentMatchesToTrack(const CDCRecoSegment2D* segment, const CDCTrack& track)
+{
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  double z0 = track.getStartTrajectory3D().getTrajectorySZ().getStartZ();
+
+  double slopeMeanTrack = 0;
+  double slopeMeanSegment = 0;
+  unsigned int numberTrackHits = 0;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (recoHit.getStereoType() != AXIAL) {
+      slopeMeanTrack += recoHit.calculateZSlopeWithZ0(z0);
+      numberTrackHits += 1;
+    }
+  }
+
+  for (const CDCRecoHit2D& recoHit2D : *segment) {
+    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
+    slopeMeanSegment += recoHit3D.calculateZSlopeWithZ0(z0);
+  }
+
+  slopeMeanSegment /= segment->size();
+  slopeMeanTrack /= numberTrackHits;
+
+  //B2INFO(slopeMeanTrack << " segment: " << slopeMeanSegment);
+  //return fabs((slopeMeanTrack - slopeMeanSegment) / slopeMeanTrack) < 0.1;
+  return true;
 }
 
 void StereoSegmentTrackMatcherModule::fillTrackLookUp(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks)
@@ -56,9 +84,9 @@ void StereoSegmentTrackMatcherModule::fillTrackLookUp(std::vector<CDCRecoSegment
 
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit : track) {
-      const CDCRecoSegment2D* matching_segment = findMatchingSegment(recoHit);
-      if (matching_segment != nullptr) {
-        m_segmentTrackLookUp[matching_segment].insert(&track);
+      const CDCRecoSegment2D* matchingSegment = findMatchingSegment(recoHit);
+      if (matchingSegment != nullptr and segmentMatchesToTrack(matchingSegment, track)) {
+        m_segmentTrackLookUp[matchingSegment].insert(&track);
       }
     }
   }
@@ -84,5 +112,10 @@ void StereoSegmentTrackMatcherModule::generate(std::vector<CDCRecoSegment2D>& se
         }
       }
     }
+  }
+
+  for (CDCTrack& track : tracks) {
+    // Refit?
+    track.sort();
   }
 }

@@ -132,6 +132,13 @@ namespace Belle2 {
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
     /**
+     * returns the squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and
+     * tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and
+     * the tag side must be the first, the signal side the second daughter!
+     */
+    double missingMass(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);

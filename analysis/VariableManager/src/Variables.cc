@@ -309,6 +309,16 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
+    double missingMass(const Particle* part)
+    {
+      PCmsLabTransform T;
+      double beamEnergy = T.getCMSEnergy();
+      TLorentzVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
+      TLorentzVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
+      tagVec.SetE(-beamEnergy);
+      return (-tagVec - sigVec).M2();
+    }
+
     // released energy --------------------------------------------------
 
     double particleQ(const Particle* part)
@@ -691,7 +701,7 @@ namespace Belle2 {
       double pion0Mass = 0.135;           // neutral pion mass from PDG
       double deltaE = 0.03;               // mass range around pion0Mass that will be accepted
 
-      StoreObjPtr<ParticleList> PhotonList("gamma");
+      StoreObjPtr<ParticleList> PhotonList("gamma:veto");
 
       const Particle* sig_Photon = particle->getDaughter(1)->getDaughter(0);
       TLorentzVector vec = sig_Photon->get4Vector();
@@ -1205,6 +1215,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance, "signed deviation of particle's invariant mass from its nominal mass");
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
+    REGISTER_VARIABLE("missingMass", missingMass,
+                      "missing mass of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,               "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -1286,7 +1298,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
                       "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
-                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.")
+                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("False", False, "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");

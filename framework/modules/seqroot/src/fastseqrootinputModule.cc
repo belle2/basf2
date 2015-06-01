@@ -100,6 +100,7 @@ void FastSeqRootInputModule::initialize()
   int size;
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
 
+  /* OLD implementation w/o StreamerInfo
   // Read 1st event in DataStore
   size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
   if (size > 0) {
@@ -109,6 +110,36 @@ void FastSeqRootInputModule::initialize()
     B2FATAL("SeqRootInput : Error in reading first event");
   }
   delete[] evtbuf;
+  */
+
+  //Read StreamerInfo and the first event
+  int info_cnt = 0;
+  while (true) {
+    char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+    int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (size > 0) {
+      EvtMessage* evtmsg = new EvtMessage(evtbuf);
+      m_streamer->restoreDataStore(evtmsg);
+      if (evtmsg->type() == MSG_STREAMERINFO) {
+        // StreamerInfo was read
+        B2INFO("Reading StreamerInfo");
+        if (info_cnt != 0) B2FATAL("SeqRootInput : Reading StreamerInfos twice");
+        info_cnt++;
+      } else {
+        // first event was read
+        delete[] evtbuf;
+        delete evtmsg;
+        break;
+      }
+      delete[] evtbuf;
+      delete evtmsg;
+
+    } else {
+      B2FATAL("SeqRootInput : Error in reading first event");
+    }
+  }
+
+
 
   // Create a new sustainable thread to read events and queue them
   // to decoder

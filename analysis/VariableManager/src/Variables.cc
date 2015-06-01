@@ -312,7 +312,7 @@ namespace Belle2 {
     double missingMass(const Particle* part)
     {
       PCmsLabTransform T;
-      double beamEnergy = T.getCMSEnergy();
+      double beamEnergy = T.getCMSEnergy() / 2.;
       TLorentzVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
       TLorentzVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       tagVec.SetE(-beamEnergy);

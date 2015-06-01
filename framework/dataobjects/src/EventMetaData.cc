@@ -23,7 +23,8 @@ EventMetaData::EventMetaData(unsigned long event, unsigned long run, unsigned lo
   m_experiment(experiment),
   m_time(0),
   m_parent_index(UINT_MAX),
-  m_generated_weight(1.0)
+  m_generated_weight(1.0),
+  m_error_flag(0)
 {}
 
 void EventMetaData::setEndOfData()

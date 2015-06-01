@@ -29,6 +29,12 @@ namespace Belle2 {
     /** Destructor. */
     ~EventMetaData() {}
 
+    /** bit-flag format of m_error_flag  */
+    enum EventErrorFlag {
+      c_B2LinkCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
+      c_HLTError       = 0x2  /**< Error is returned from HLT modules. */
+    };
+
     /** Event Setter.
      *
      *  @param event The current event number.
@@ -105,6 +111,33 @@ namespace Belle2 {
     void setGeneratedWeight(double weight)
     {
       m_generated_weight = weight;
+    }
+
+    /** Set Error Flag
+     *
+     *   @param error_flag a bit flag for an error event.
+     */
+    void setErrorFlag(unsigned int error_flag)
+    {
+      m_error_flag = error_flag;
+    }
+
+    /** Add Error Flag
+     *
+     *   @param error_flag a bit flag for an error event.
+     */
+    void addErrorFlag(EventErrorFlag event_error_flag)
+    {
+      m_error_flag |= event_error_flag;
+    }
+
+    /** Get error flag
+     *
+     *  @return Error flag for this event.
+     */
+    unsigned int getErrorFlag() const
+    {
+      return m_error_flag;
     }
 
     /** Event Getter.
@@ -184,6 +217,7 @@ namespace Belle2 {
      */
     bool operator!= (const EventMetaData& eventMetaData) const { return !(*this == eventMetaData); }
 
+
   private:
 
     unsigned long m_event; /**< Event number.  */
@@ -200,7 +234,9 @@ namespace Belle2 {
 
     double m_generated_weight; /**< Generated weight.  */
 
-    ClassDef(EventMetaData, 2); /**< Store event number, run number, and experiment number. */
+    unsigned int m_error_flag;  /**< Error flag.  */
+
+    ClassDef(EventMetaData, 3); /**< Store event number, run number, and experiment number. */
   }; //class
 } // namespace Belle2
 #endif // EVENTMETADATA

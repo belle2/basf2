@@ -102,14 +102,16 @@ void DataStore::setInitializeActive(bool active)
   }
 }
 
-std::string DataStore::defaultObjectName(std::string classname)
+std::string DataStore::defaultObjectName(const std::string& classname)
 {
-  if (classname == "genfit::Track")
-    return "GF2Track";
+  const static string gfclass = "genfit::Track";
+  const static string gfobjectname = "GF2Track";
+  if (classname == gfclass)
+    return gfobjectname;
   //Strip qualifiers like namespaces
-  size_t colon = classname.rfind("::");
+  size_t colon = classname.rfind(':');
   if (colon != std::string::npos) {
-    classname = classname.substr(colon + 2);
+    return classname.substr(colon + 1);
   }
   return classname;
 }

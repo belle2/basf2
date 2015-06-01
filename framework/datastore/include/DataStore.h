@@ -107,7 +107,7 @@ namespace Belle2 {
 
     //--------------------------------- default name stuff -----------------------------------------------------
     /** Return the default storage name for given class name. */
-    static std::string defaultObjectName(std::string classname);
+    static std::string defaultObjectName(const std::string& classname);
 
     /** Return the default storage name for an object of the given type. */
     template<class T> static std::string defaultObjectName()
@@ -125,13 +125,18 @@ namespace Belle2 {
     /** Return the default storage name for an given class name. */
     static std::string defaultArrayName(const std::string& classname)
     {
-      return defaultObjectName(classname) + 's';
+      const std::string& objName = defaultObjectName(classname);
+      std::string s;
+      s.reserve(objName.length() + 1);
+      s += objName;
+      s += 's';
+      return s;
     }
 
     /** Return the default storage name for an array of the given type. */
     template<class T> static std::string defaultArrayName()
     {
-      const static std::string s = defaultObjectName<T>() + 's';
+      const static std::string s = defaultArrayName(defaultObjectName<T>());
       return s;
     }
 
@@ -144,7 +149,7 @@ namespace Belle2 {
     /** Return the default storage name for a relation between the given types. */
     template<class FROM, class TO> static std::string defaultRelationName()
     {
-      const static std::string s = defaultArrayName<FROM>() + "To" + defaultArrayName<TO>();
+      const static std::string s = relationName(defaultArrayName<FROM>(), defaultArrayName<TO>());
       return s;
     }
 
@@ -157,7 +162,12 @@ namespace Belle2 {
     /** Return storage name for a relation between two arrays of the given names. */
     static std::string relationName(const std::string& fromName, const std::string& toName)
     {
-      return fromName + "To" + toName;
+      std::string s;
+      s.reserve(fromName.length() + toName.length() + 2);
+      s += fromName;
+      s += "To";
+      s += toName;
+      return s;
     }
 
     //------------------------------ Accessing objects and arrays ----------------------------------------------

@@ -1,5 +1,10 @@
 Import('env')
 
-env['LIBS'] = []
+env['SUBLIB'] = True
+env['LIBS'] = ['framework',
+	       'cdc',
+	       'rawdata_dataobjects',
+	       'cdc_dataobjects',
+         'trg_trg']
 
 Return('env')

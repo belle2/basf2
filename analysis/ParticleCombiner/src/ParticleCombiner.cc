@@ -225,11 +225,18 @@ namespace Belle2 {
 
   Particle ParticleGenerator::getCurrentParticle() const
   {
-
-    TLorentzVector vec(0., 0., 0., 0.);
-    for (unsigned i = 0; i < m_particles.size(); i++) {
-      vec += m_particles[i]->get4Vector();
+    //TLorentzVector performance is quite horrible, do it ourselves.
+    double px = 0;
+    double py = 0;
+    double pz = 0;
+    double E = 0;
+    for (const Particle* d : m_particles) {
+      px += d->getPx();
+      py += d->getPy();
+      pz += d->getPz();
+      E += d->getEnergy();
     }
+    const TLorentzVector vec(px, py, pz, E);
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,

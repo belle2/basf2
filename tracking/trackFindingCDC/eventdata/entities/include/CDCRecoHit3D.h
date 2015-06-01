@@ -301,7 +301,7 @@ namespace Belle2 {
       /**
        * We assume a line from the point (0, 0, z0) to the reco position. The slope of this line is returned.
        */
-      FloatType calculateZSlopeWithZ0(FloatType z0)
+      FloatType calculateZSlopeWithZ0(FloatType z0) const
       {
         FloatType z = getRecoZ();
         FloatType radius = getRecoPos2D().norm();

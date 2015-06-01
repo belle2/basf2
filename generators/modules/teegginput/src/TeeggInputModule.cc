@@ -59,12 +59,11 @@ TeeggInputModule::TeeggInputModule() : Module()
   addParam("EPSPHI", m_EPSPHI, "Param. epsilon_phi ('cutoff' of the phi_ks peak)", 1.0e-4);
   addParam("WGHT1M", m_WGHT1M, "Maximum weight for generation of QP0, cos(theta QP)", 1.001);
   addParam("WGHTMX", m_WGHTMX, "Maximum weight for the trial events", 1.000);
-  addParam("RADCOR", m_sRADCOR, "Specifies radiative correction (NONE SOFT or HARD)", std::string("NONE"));
-  addParam("CONFIG", m_sCONFIG, "Specifies the event configuration (EGAMMA GAMMA, GAMMAE or ETRON)", std::string("EGAMMA"));
-  addParam("MATRIX", m_sMATRIX, "Specifies which eeg matrix element (BK BKM2 TCHAN or EPA)", std::string("BKM2"));
-  addParam("MTRXGG", m_sMTRXGG, "Specifies which eegg matrix element (EPADC BEEGG or MEEGG)", std::string("EPADC"));
+  addParam("RADCOR", m_sRADCOR, "Specifies radiative correction (NONE, SOFT or HARD)", std::string("NONE"));
+  addParam("CONFIG", m_sCONFIG, "Specifies the event configuration (EGAMMA, GAMMA, GAMMAE or ETRON)", std::string("EGAMMA"));
+  addParam("MATRIX", m_sMATRIX, "Specifies which eeg matrix element (BK, BKM2, TCHAN or EPA)", std::string("BKM2"));
+  addParam("MTRXGG", m_sMTRXGG, "Specifies which eegg matrix element (EPADC, BEEGG or MEEGG)", std::string("EPADC"));
   addParam("UNWGHT", m_UNWGHT, "If true then generate unweighted events", 1);
-
 }
 
 
@@ -81,7 +80,11 @@ void TeeggInputModule::initialize()
   //Depending on the settings, use the Belle II or Belle boost
   double ecm = -1.; //center of mass energy, >0 if boost is set
 
-  //open extrafile
+  // initialize
+  m_fileExtraInfo = NULL;
+  m_ntuple = NULL;
+
+  // open extrafile that will contain VP correction weights
   if (m_fileNameExtraInfo != "") {
     m_fileExtraInfo = new TFile(m_fileNameExtraInfo.c_str(), "RECREATE") ;
     m_fileExtraInfo->cd();

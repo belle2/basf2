@@ -128,6 +128,18 @@ void Teegg::setDefaultSettings()
   m_WGHT1M = 1.001;
   m_WGHTMX = 1.000;
 
+  m_RADCOR    = -1;
+  m_CONFIG    = -1;
+  m_MATRIX    = -1;
+  m_MTRXGG    = -1;
+  m_UNWGHT    = 1;
+  m_t         = 0.0;
+  m_w2        = 1.0;
+  m_weight    = 1.0;
+  m_reansk    = 0.0;
+  m_fullansk  = 0.0;
+  m_reansk2   = 0.0;
+  m_fullansk2 = 0.0;
 }
 
 void Teegg::init()

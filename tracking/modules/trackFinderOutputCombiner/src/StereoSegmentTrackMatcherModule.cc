@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/trackFinderOutputCombiner/StereoSegmentTrackMatcherModule.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -79,6 +80,8 @@ void StereoSegmentTrackMatcherModule::fillTrackLookUp(std::vector<CDCRecoSegment
   // prepare lookup
   m_segmentTrackLookUp.clear();
   for (const CDCRecoSegment2D& segment : segments) {
+    if (segment.getAutomatonCell().hasTakenFlag())
+      continue;
     m_segmentTrackLookUp.insert(std::make_pair(&segment, std::set<TrackFindingCDC::CDCTrack*>()));
   }
 

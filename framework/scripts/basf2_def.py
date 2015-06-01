@@ -454,9 +454,9 @@ def serialize_module(module):
 def deserialize_module(module_state):
     module = fw.register_module(module_state['type'])
     module.set_name(module_state['name'])
-    if module_state['condition'] is not None:
+    if 'condition' in module_state and module_state['condition'] is not None:
         deserialize_condition(module, module_state)
-    if module_state['flag']:
+    if 'flag' in module_state and module_state['flag']:
         # for some modules, this flag might be changed from the default
         module.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
     for parameter_state in module_state['parameters']:

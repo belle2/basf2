@@ -165,6 +165,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
 
   // TODO: avoid hard coded values
   m_pdgCode = 22;
+  setFlavorType();
 
   m_px = eclCluster->getPx();
   m_py = eclCluster->getPy();
@@ -192,6 +193,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
 
   // TODO: avoid hard coded values
   m_pdgCode = 130;
+  setFlavorType();
 
   set4Vector(klmCluster->getMomentum());
   setVertex(klmCluster->getPosition());

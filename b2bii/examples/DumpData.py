@@ -29,6 +29,9 @@ fix = register_module('B2BIIFixMdst')
 # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
 main.add_module(fix)
 
+emptypath = create_path()
+fix.if_value('<=0', emptypath)  # discard 'bad events' marked by fixmdst
+
 # Convert MDST Module
 convert = register_module('B2BIIConvertMdst')
 # convert.logging.set_log_level(LogLevel.DEBUG)

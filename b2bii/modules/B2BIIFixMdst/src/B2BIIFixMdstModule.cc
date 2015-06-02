@@ -157,7 +157,7 @@ namespace Belle2 {
 
     setDescription("Used to fix the old Belle I mdst files before processing. This module was taken from the old Belle I code and converted into a basf2 module."
                    "There are a lot of magic numbers in this module, where do they come from? Noone knows..."
-                   "Return value is -1 if something went wrong!");
+                   "Return value is -1 if something went wrong, do not use these events!");
 
     addParam("Scale_momenta", m_scale_momenta, "Apply scale_momenta", 1);
     addParam("scale_momenta_scale_data", m_scale_momenta_scale_data, "scale_momenta scale_data", 0.0f);

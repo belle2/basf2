@@ -9,6 +9,9 @@ env['LIBS'] = [
     'framework',
     'Geom',
     '$ROOT_LIBS',
+    'genfit2',
+    'svd_dataobjects',
+    'tracking_dataobjects'
     ]
 
 

@@ -56,7 +56,7 @@ void test2_Validation_pi0() {
 
     /* Take the pi0tuple prepared by the NtupleMaker */
     TChain * recoTree = new TChain("pi0tuple");
-    recoTree->AddFile("GenericB.ntup.root");
+    recoTree->AddFile("../GenericB.ntup.root");
 
     //Plots for online/web validation
     TFile* output = new TFile("test2_Validation_pi0_output.root","recreate");

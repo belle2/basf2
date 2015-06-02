@@ -11,7 +11,7 @@ from basf2 import *
 from ROOT import Belle2
 
 # suppress messages and warnings during processing:
-set_log_level(LogLevel.WARNING)
+set_log_level(LogLevel.RESULT)
 
 # event info setter
 eventinfosetter = register_module('EventInfoSetter')
@@ -32,7 +32,7 @@ progress = register_module('Progress')
 # add fragmentation module
 fragmentation = register_module('Fragmentation')
 fragmentation.param('ParameterFile', '../modules/fragmentation/data/pythia_belle2.dat')
-fragmentation.param('ListPYTHIAEvent', 0)
+fragmentation.param('ListPYTHIAEvent', 1)
 fragmentation.param('UseEvtGen', 0)
 fragmentation.param('EvtPdl', os.path.expandvars('$BELLE2_EXTERNALS_DIR/evtgen/share/evt.pdl'))
 fragmentation.param('DecFile', os.path.expandvars('$BELLE2_EXTERNALS_DIR/evtgen/share/DECAY_2010.DEC'))
@@ -49,6 +49,11 @@ main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(rootinput)
 main.add_module(fragmentation)
+
+# branch to an empty path if PYTHIA failed
+emptypath = create_path()
+fragmentation.if_value('<1', emptypath)
+
 main.add_module(rootoutput)
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+# main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
 process(main)

@@ -75,6 +75,8 @@ namespace Belle2 {
 
     MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */
 
+    int nAll;   /**< number of events created. */
+    int nGood;   /**< number of events with successful fragmentation. */
 
     int nAdded;  /**< number of added particles. */
     int addParticleToPYTHIA(MCParticle& mcParticle);   /**< picks particles and adds them to a pythia event. */

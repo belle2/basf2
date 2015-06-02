@@ -80,6 +80,10 @@ void FragmentationModule::terminate()
 
   // print internal pythia error statistics
   pythia->stat();
+
+  double ratio = 0.; //ratio of good over all events
+  if (nAll) ratio = 100.0 * nGood / nAll;
+  B2RESULT("Total number of events: " << nAll << ", of these fragmented: " << nGood << ", ratio: " << ratio << "%");
 }
 
 //-----------------------------------------------------------------
@@ -124,6 +128,10 @@ void FragmentationModule::initialize()
 
   // List variable(s) that differ from their defaults
   pythia->settings.listChanged();
+
+  // Reset event counters
+  nAll = 0;
+  nGood = 0;
 }
 
 //-----------------------------------------------------------------
@@ -186,9 +194,14 @@ void FragmentationModule::event()
   // ...
 
   // Do the fragmentation using PYTHIA
+  setReturnValue(1); //return value is 1...
+  nAll = nAll + 1;
   if (!pythia->next()) {
     B2WARNING("pythia->next() failed, event generation aborted prematurely! Printing PythiaEvent.list():");
     PythiaEvent->list();
+    setReturnValue(-1); //return value becomes -1 if trials were not successfull
+  } else {
+    nGood = nGood + 1;
   }
 
   // use evtgen to perform the decay

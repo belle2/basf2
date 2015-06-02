@@ -1539,6 +1539,8 @@ class Plotuple:
                 line += '<td>n/a</td>'
             line += '</tr>'
             html.append(line)
+        elif self.reference is None and 'reference' not in self.list_of_revisions:
+            pass
         # If there is a reference object, print the reference values as the
         # first row of the table
         else:

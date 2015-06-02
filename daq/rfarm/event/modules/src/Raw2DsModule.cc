@@ -97,15 +97,16 @@ void Raw2DsModule::event()
 
 void Raw2DsModule::registerRawCOPPERs()
 {
-  // Get a record from ringbuf
-  int size;
 
+
+  // Get a record from ringbuf
+  int error_flag = 0;
+  int size;
   int* evtbuf = new int[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     usleep(100);
     //    usleep(20);
   }
-
   B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<
          " (proc= " << (int)getpid() << ")");
 
@@ -118,8 +119,9 @@ void Raw2DsModule::registerRawCOPPERs()
   }
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;
-
   B2INFO("Raw2DS: Ncprs=" << ncprs << " Nwords=" << nwords);
+
+
   // Get buffer header
   int* bufbody = evtbuf + SendHeader::SENDHDR_NWORDS;
 
@@ -152,9 +154,7 @@ void Raw2DsModule::registerRawCOPPERs()
     tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
     //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
     int subsysid = tempcpr.GetNodeID(cprid);
-
-    //    subsysid = (subsysid & 0xff000000) >> 24;
-    //    printf("#################%.8x\n", subsysid);
+    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
 
     // Switch to each detector and register RawXXX
     if ((subsysid & DETECTOR_MASK) == CDC_ID) {
@@ -196,8 +196,8 @@ void Raw2DsModule::registerRawCOPPERs()
   evtmetadata->setExperiment(sndhdr.GetExpNum());
   evtmetadata->setRun(sndhdr.GetRunNum());
   evtmetadata->setEvent(sndhdr.GetEventNumber());
-  //  printf ( "ExpNo = %d, RunNo = %d, EvtNo = %d\n", sndhdr.GetExpNum(),
-  //       sndhdr.GetRunNum(), sndhdr.GetEventNumber() );
+  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+
   delete[] evtbuf;
 
   B2INFO("Raw2Ds: DataStore Restored!!");

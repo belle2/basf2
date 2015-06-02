@@ -78,6 +78,8 @@ void RawInputModule::initialize()
 
 void RawInputModule::registerRawCOPPERs()
 {
+
+  int error_flag = 0;
   // BUffer
   char* evtbuf = new char[MAXEVTSIZE];
   // Get a record from file
@@ -123,6 +125,8 @@ void RawInputModule::registerRawCOPPERs()
       (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
       continue;
     }
+
+    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
 
     // Get subsys id
     int subsysid = tempcpr.GetNodeID(cprid) & DETECTOR_MASK;
@@ -170,6 +174,7 @@ void RawInputModule::registerRawCOPPERs()
   evtmetadata->setExperiment(1);
   evtmetadata->setRun(1);
   evtmetadata->setEvent(m_nevt);
+  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
 
   delete[] evtbuf;
 

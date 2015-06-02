@@ -98,7 +98,7 @@ void FastSeqRootInputModule::initialize()
   if (m_file->status() <= 0)
     B2FATAL("FastSeqRootInput : Error in opening input file : " << m_inputFileName);
   int size;
-  //  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
 
   /* OLD implementation w/o StreamerInfo
   // Read 1st event in DataStore

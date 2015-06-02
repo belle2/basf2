@@ -298,23 +298,26 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
   //  if ( false ) {
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
+    char err_buf[500];
+
+    // dump an event
     int copper_nwords = copper_buf[ tmp_header.POS_NWORDS ];
     PrintData(copper_buf, copper_nwords);
+    // Check whether packet-CRC error has occcured or not.
     if (copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & (0x1 << tmp_header.B2LINK_PACKET_CRC_ERROR)) {
+      //
       // Do not stop data
-      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error eve %8d : %x %x %d\n",
-             GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
-      // Modify XOR checksum due to adding a bit flag
-      copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
-      ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
-      copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
-      copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
-      ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
-
+      //
+      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8d : %x %x %d\n",
+             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+//       sprintf(err_buf,"[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %8d sub %4d eve %8d : %x %x %d\n %s %s %d\n",
+//             GetRunNo(n), GetSubRunNo(n),   GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num), __FILE__, __PRETTY_FUNCTION__, __LINE__);
     } else {
+      //
       // Stop taking data
-      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error eve %8d : %x %x %d\n",
-             GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+      //
+      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error run %d sub %d eve %8d : %x %x %d\n",
+             GetRunNo(n), GetSubRunNo(n), GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
       int* temp_buf = GetFINESSEBuffer(n, finesse_num);
       printf("%.8x ", 0);
       for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
@@ -323,12 +326,18 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       }
       printf("\n");
       fflush(stdout);
-      char err_buf[500];
+
       sprintf(err_buf,
-              "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting...\n %s %s %d\n",
-              (unsigned short)(*buf & 0xFFFF), temp_crc16, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+              "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting... run %d sub %d eve %d\n %s %s %d\n",
+              (unsigned short)(*buf & 0xFFFF), temp_crc16, GetRunNo(n), GetSubRunNo(n), GetEveNo(n), __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
     }
+    // Modify XOR checksum due to adding a bit flag
+    copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
+    ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
+    copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
+    copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
+    ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
   }
 
   return 1;

@@ -121,6 +121,12 @@ textarea {
     width:722px;
 }
 
+#content .object_wrap img
+{
+    width: 688px;
+    min-height: 491px;
+}
+
 #content .object_wrap:last-child
 {
     border:0;

@@ -644,7 +644,7 @@ def generate_new_plots(list_of_revisions):
         print 2*'\n'
 
         # Close the div for the package
-        html_output.write('</div>\n<br>\n<br>\n\n')
+        html_output.write('</div>\n\n')
 
     # Add JavaScript for the fixed headers
     # Admittedly, this is an ugly workaround...

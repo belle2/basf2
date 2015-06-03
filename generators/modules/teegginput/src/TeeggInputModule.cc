@@ -64,6 +64,10 @@ TeeggInputModule::TeeggInputModule() : Module()
   addParam("MATRIX", m_sMATRIX, "Specifies which eeg matrix element (BK, BKM2, TCHAN or EPA)", std::string("BKM2"));
   addParam("MTRXGG", m_sMTRXGG, "Specifies which eegg matrix element (EPADC, BEEGG or MEEGG)", std::string("EPADC"));
   addParam("UNWGHT", m_UNWGHT, "If true then generate unweighted events", 1);
+
+  // initialize
+  m_fileExtraInfo = 0;
+  m_ntuple = 0;
 }
 
 
@@ -79,10 +83,6 @@ void TeeggInputModule::initialize()
 
   //Depending on the settings, use the Belle II or Belle boost
   double ecm = -1.; //center of mass energy, >0 if boost is set
-
-  // initialize
-  m_fileExtraInfo = NULL;
-  m_ntuple = NULL;
 
   // open extrafile that will contain VP correction weights
   if (m_fileNameExtraInfo != "") {

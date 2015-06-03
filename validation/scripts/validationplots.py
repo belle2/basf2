@@ -981,8 +981,8 @@ def create_packages_list_html(list_of_packages, list_of_revisions):
                     shortname = filename
 
                 # Write to HTML
-                pkgs.write('<a href="#{0}_{1}">{2}</a><br>\n'
-                           .format(pkg, filename, shortname))
+                pkgs.write('<a href="#{0}_{1}" title="{2}">{3}</a><br>\n'
+                           .format(pkg, filename, rootfile, shortname))
 
             pkgs.write('</div>')
 

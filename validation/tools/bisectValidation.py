@@ -15,6 +15,17 @@ exit code 0 for good commit, code 125 to ignore the current commit or code 1 for
 Information contained within .root files produced by the official validation scripcts or your
 custom scripts can be used to distingush between good and bad commits.
 
+The syntaxn of the --check-quantity option is the following:
+<root filename>:<quantity>:<compare op>:<value>
+
+<quantity> is the name of a histogram in the given root file. For histograms, three values are
+           extracted, which can be selected vial the number given in bracktets []:
+           0 = mean of the histogram
+           1 = average of the bin content
+           2 = zero-supressed average of the bin content
+<compare op> can be ">" or "<"
+<value> is the reference value as a float to compare to
+
 As an example, to identfiy the commit which made the tracking efficiency drop below 0.93, the
 following snippet can be used:
 
@@ -86,6 +97,8 @@ def extract_information_from_file(file_name, results):
     root_file.Close()
 
     return results
+
+# parses the quantity string, including its brackets
 
 
 def parseCheckQuantity(quantString):

@@ -762,14 +762,14 @@ class CDCSVGDisplayModule(Module):
                 print "Non Genfit tracks present"
 
         fileName = self.new_output_filename()
-        plotter.saveSVGFile(fileName)
+        plotter.savePNGFile(fileName)
 
         if self.interactive:
             print " Use the 'display' command to show the svg file", fileName, \
                 'generated for the last event'
 
             # 'display' is part of the ImageMagic package commonly installed in linux
-            procDisplay = subprocess.Popen(['display', fileName])
+            procDisplay = subprocess.Popen(['eog', fileName])
             # procDisplay = subprocess.Popen(['display','-background','white',
             # '-flatten',fileName])
             # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])
@@ -794,7 +794,7 @@ class CDCSVGDisplayModule(Module):
         Generates a new unique name for the current event without the folder prefix
         """
 
-        output_basename = datetime.now().isoformat() + '.svg'
+        output_basename = datetime.now().isoformat() + '.png'
         return output_basename
 
     def new_output_filename(self):

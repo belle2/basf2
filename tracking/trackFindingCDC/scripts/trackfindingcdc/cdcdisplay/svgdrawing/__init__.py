@@ -162,3 +162,37 @@ class CDCSVGPlotter:
         eventdata_plotter.setCanvasWidth(svgWidth)
 
         return eventdata_plotter.save(svgFileName)
+
+    def savePNGFile(self, pngFileName='display.png'):
+        """
+        Save the current dom object representation to disk as a png.
+        """
+
+        import cairosvg
+        import os
+
+        temp_file_name = "tmp.svg"
+        eventdata_plotter = self.eventdata_plotter
+
+        boundingBox = eventdata_plotter.getBoundingBox()
+
+        height = boundingBox.getHeight()
+        width = boundingBox.getWidth()
+
+        totalPoints = 1120 * 1120
+        svgHeight = round(math.sqrt(totalPoints * float(height)
+                                    / width))
+        svgWidth = round(math.sqrt(totalPoints * float(width)
+                                   / height))
+
+        eventdata_plotter.setCanvasHeight(svgHeight)
+        eventdata_plotter.setCanvasWidth(svgWidth)
+
+        eventdata_plotter.save(temp_file_name)
+
+        with open(temp_file_name, "r") as temp_file:
+            with open(pngFileName, "w") as output_file:
+                svg_code = temp_file.read()
+                cairosvg.svg2png(bytestring=svg_code, write_to=output_file)
+
+        os.remove(temp_file_name)

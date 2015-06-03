@@ -241,7 +241,9 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
     draw_mc_hits = False
     draw_mc_tracks = False
-    draw_track_hits = True
+    draw_track_hits = False
+    draw_last_track = True
+    delete_bad_hits = False
 
     def create_trajectory_from_track(self, track):
         Vector3D = Belle2.TrackFindingCDC.Vector3D
@@ -333,5 +335,34 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                     z0 = [-20, 20]
                     l = [1.0 / recoHit.calculateZSlopeWithZ0(z) for z in z0]
                     plt.plot(l, z0, marker="", color=map[id % len(map)], ls="-", alpha=0.4)
+
+        if self.draw_last_track:
+            items = Belle2.PyStoreObj("CDCTrackVector")
+            wrapped_vector = items.obj()
+            vector = wrapped_vector.get()
+            track = vector[-1]
+            trajectory = track.getStartTrajectory3D().getTrajectory2D()
+            map = attributemaps.listColors
+
+            mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp().getInstance()
+            mcHitLookUp.fill()
+
+            wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+            for rlWireHit in wireHitTopology.getRLWireHits().items():
+
+                recoHit = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(rlWireHit, trajectory)
+
+                if rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) and self.delete_bad_hits:
+                    continue
+                if not recoHit.isInCDC() and self.delete_bad_hits:
+                    continue
+
+                if recoHit in track.items():
+                    color = map[len(vector) % len(map)]
+                else:
+                    color = "black"
+                z0 = [-20, 20]
+                l = [1.0 / recoHit.calculateZSlopeWithZ0(z) for z in z0]
+                plt.plot(l, z0, marker="", ls="-", alpha=0.4, color=color)
 
         self.save_and_show_file()

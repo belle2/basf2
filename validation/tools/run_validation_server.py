@@ -64,6 +64,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         """!
         How to deal with a GET-request
         """
+
         path = self.path
 
         # Usually 'Content-type' is empty, except for AJAX-requests
@@ -72,7 +73,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             contentType = 'text/html'
 
-        log.debug("GET: Requesting %s" % path)
+        log.debug("GET: Requesting %s" % self.path)
 
         # Either we are dealing with a file request, or an AJAX-request
         if contentType.startswith('text/html'):
@@ -218,6 +219,11 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         @return: Tuple of the returncode of request, the file itself,
             and the file type
         """
+
+        if '?' in self.path:
+            self.path = self.path.split('?')[0]
+            if self.path.endswith('/'):
+                self.path = self.path[:-1]
 
         docRoot = './'
         docPath = "%s%s" % (docRoot, self.path)

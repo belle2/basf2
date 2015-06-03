@@ -1676,6 +1676,11 @@ class Plotuple:
                     '<p><strong>Check for:</strong> {2}</p>\n'
                     .format(self.contact, self.description, self.check))
 
+        # Give the possibility to share the plot!
+        html.append('<p><strong>Share this plot:</strong> <input type="test" '
+                    'value="index.html?PackageOverview=false#{0}" size="60"'
+                    'onClick="this.select();"></p>'.format(prmn))
+
         html.append('</div>\n</div>\n\n')
 
         return html

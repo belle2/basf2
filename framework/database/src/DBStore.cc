@@ -38,17 +38,6 @@ DBStore& DBStore::Instance()
 }
 
 
-std::string DBStore::defaultObjectName(std::string classname)
-{
-  //Strip qualifiers like namespaces
-  size_t colon = classname.rfind("::");
-  if (colon != std::string::npos) {
-    classname = classname.substr(colon + 2);
-  }
-  return classname;
-}
-
-
 bool DBStore::checkType(const DBEntry& dbEntry, const TClass* objClass, bool array) const
 {
   // Check whether the existing entry and the requested object are both arrays or both single objects

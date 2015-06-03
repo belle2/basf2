@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/database/DBEntry.h>
+#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -44,51 +45,15 @@ namespace Belle2 {
     static DBStore& Instance();
 
     /**
-     * Return the default database name for given class name.
+     * Return the database name for an object of the given type and name.
      */
-    static std::string defaultObjectName(std::string classname);
+    template<class T> static std::string objectName(const std::string& name) { return DataStore::objectName<T>(name); }
 
-    /**
-     * Return the default database name for an object of the given type.
-     */
-    template<class T> static std::string defaultObjectName()
-    {
-      const static std::string s = defaultObjectName(T::Class_Name());
-      return s;
-    }
 
     /**
      * Return the database name for an object of the given type and name.
      */
-    template<class T> static std::string objectName(const std::string& name)
-    {
-      return ((name.empty()) ? defaultObjectName<T>() : name);
-    }
-
-    /**
-     * Return the default database name for an array given class name.
-     */
-    static std::string defaultArrayName(const std::string& classname)
-    {
-      return defaultObjectName(classname) + 's';
-    }
-
-    /**
-     * Return the default database name for an array of the given type.
-     */
-    template<class T> static std::string defaultArrayName()
-    {
-      const static std::string s = defaultObjectName<T>() + 's';
-      return s;
-    }
-
-    /**
-     * Return the database name for an object of the given type and name.
-     */
-    template<class T> static std::string arrayName(const std::string& name)
-    {
-      return ((name.empty()) ? defaultArrayName<T>() : name);
-    }
+    template<class T> static std::string arrayName(const std::string& name) { return DataStore::arrayName<T>(name); }
 
     /** Destructor. */
     ~DBStore();

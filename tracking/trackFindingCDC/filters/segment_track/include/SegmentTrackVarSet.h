@@ -45,7 +45,8 @@ namespace Belle2 {
       "track_is_curler",
       "superlayer_already_full",
       "z_distance",
-      "theta_distance"
+      "theta_distance",
+      "number_of_hits_in_common"
     };
 
     /** Class that specifies the names of the variables
@@ -55,7 +56,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 15;
+      static const size_t nNames = 16;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

@@ -43,6 +43,7 @@ namespace Belle2 {
                   > SegmentTrackCombinerModule;
 
   namespace TrackFindingCDC {
+    /// This module matches the found segments and the found tracks with a given filter.
     template < class SegmentTrackChooser,
                class SegmentTrainFilter,
                class SegmentTrackFilter>
@@ -151,6 +152,7 @@ namespace Belle2 {
       std::unique_ptr<SegmentTrackFilter> m_ptrSegmentTrackFilter;
     };
 
+    /// Do the combination work. See the SegmentTrackCombiner for more details.
     template < class SegmentTrackChooser,
                class SegmentTrainFilter,
                class SegmentTrackFilter>

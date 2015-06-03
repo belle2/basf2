@@ -32,6 +32,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   double maxmimumHitDistanceBack = 0;
   double outOfCDC = 0; // 0 means no, 1 means yes
   double hitsInSameRegion = 0;
+  double hitsInCommon = 0;
 
   const CDCRecoHit2D& front = segment->front();
   const CDCRecoHit2D& back = segment->back();
@@ -103,6 +104,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       if (distanceBack > maxmimumHitDistanceBack) {
         maxmimumHitDistanceBack = distanceBack;
       }
+    }
+  }
+
+  // Count number of common hits
+  for (const CDCRecoHit3D& trackHit : track->items()) {
+    if (std::find_if(segment->begin(), segment->end(), [&trackHit](const CDCRecoHit2D & segmentHit) {
+    return segmentHit.getWireHit().getHit() == trackHit.getWireHit().getHit();
+    }) != segment->end()) {
+      hitsInCommon += 1;
     }
   }
 
@@ -189,6 +199,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   var<named("out_of_CDC")>() = outOfCDC;
   var<named("hits_in_same_region")>() = hitsInSameRegion;
+
+  var<named("number_of_hits_in_common")>() = hitsInCommon;
 
   return true;
 }

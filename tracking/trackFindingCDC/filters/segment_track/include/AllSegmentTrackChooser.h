@@ -7,10 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/trackFinderOutputCombiner/StereoSegmentTrackMatcherModule.h>
+#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackChooser.h>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class AllSegmentTrackChooser : public BaseSegmentTrackChooser {
+      /** Accept all segment track combinations */
+      virtual CellWeight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>&)
+      {
+        return 1;
+      }
 
-REG_MODULE(StereoSegmentTrackMatcher);
+    };
+  }
+}

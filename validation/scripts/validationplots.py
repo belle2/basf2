@@ -173,15 +173,18 @@ def files_in_pkg(pkg, list_of_revisions):
     and reference files in this package. Gives only the file names!
     """
 
-    # Get a list of all files (plot and reference)
-    all_files = get_plot_files(list_of_revisions) + get_reference_files()
-
     # Remove all files that do not belong to the given package
     # Also, only remember the name of the file, not the full path
     in_pkg = []
-    for rootfile in all_files:
+    for rootfile in get_plot_files(list_of_revisions):
         head, tail = os.path.split(rootfile)
         if head.endswith(pkg):
+            in_pkg.append(tail)
+
+    # treat reference files specially, because they are located as <pkgname>/validation/<filname>.root
+    for rootfile in get_reference_files():
+        head, tail = os.path.split(rootfile)
+        if head.endswith(pkg + "/validation"):
             in_pkg.append(tail)
 
     return sorted(in_pkg)
@@ -377,7 +380,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                 if not desc[plts]:
                     desc[plts] = "n/a"
                 # setting up our filters
-                classes = ["imidzes_"+package, "fltr"]
+                classes = ["imidzes_" + package, "fltr"]
                 if p_value[plts] <= 1:
                     classes.append('p_value_leq_1')
                 if p_value[plts] <= 0.01:
@@ -467,7 +470,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                         "\n</td>{3}\n".format(el.strip(),
                                               pre, plts, end,
                                               " ".join(classes),
-                                              100/k, package))
+                                              100 / k, package))
         html.append("</tr>\n</table>\n")
         # the save button
         html.append("\n<div width=\"100%\" align=\"right\" "
@@ -604,10 +607,10 @@ def generate_new_plots(list_of_revisions):
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
             objects_in_pkg_and_file = find_root_object(objects_in_pkg,
-                                                       rootfile=".*"+rootfile+".*")
+                                                       rootfile=".*" + rootfile + ".*")
             # And then the reference objects
             objects_in_pkg_and_file += find_root_object(reference_objects,
-                                                        rootfile=".*"+rootfile+".*")
+                                                        rootfile=".*" + rootfile + ".*")
 
             # A list in which we keep all the plotuples for this file
             list_of_plotuples = []
@@ -641,7 +644,7 @@ def generate_new_plots(list_of_revisions):
             html_output.write('</section>')
 
         # Make the command line output more readable
-        print 2*'\n'
+        print 2 * '\n'
 
         # Close the div for the package
         html_output.write('</div>\n\n')
@@ -982,6 +985,7 @@ def create_packages_list_html(list_of_packages, list_of_revisions):
 ##############################################################################
 
 class RootObject:
+
     """!
     Wraps a ROOT object (either a histogram or an n-tuple) together with the
     available meta-information about it.
@@ -1107,6 +1111,7 @@ class RootObject:
 
 
 class Plotuple:
+
     """!
     A Plotuple is either a Plot or an N-Tuple
 
@@ -1557,7 +1562,7 @@ class Plotuple:
 
             # Now get the color of the revision
             color = (ROOT.gROOT.GetColor(get_style(ind, len(self.elements))
-                     .GetLineColor()).AsHexString())
+                                         .GetLineColor()).AsHexString())
 
             line = '<tr><td style="color: {0};">'.format(color)
             line += ntuple.revision + '</td>'
@@ -1620,8 +1625,8 @@ class Plotuple:
 
         html.append('<div class="wrap_boxes descriptions">\n')
         if len(self.key) > 45:
-            h2 = "-<br>".join([self.key[i:i+45] for i
-                              in range(0, len(self.key), 45)])
+            h2 = "-<br>".join([self.key[i:i + 45] for i
+                               in range(0, len(self.key), 45)])
         else:
             h2 = self.key
         html.append('<div class="hidebutton" width="100%" align="right" '

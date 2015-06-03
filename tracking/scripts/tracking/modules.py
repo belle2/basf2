@@ -87,17 +87,25 @@ class StandardTrackingReconstructionModule(metamodules.PathModule):
 
 class CDCFullFinder(metamodules.PathModule):
 
-    """Full finder sequence for the CDC with a step of Legendre tracking first and cellular automaton tracking second."""
+    """
+    Full finder sequence for the CDC with a step of Legendre tracking first and cellular automaton tracking second.
+
+
+    Attributes
+    ----------
+    output_track_cands_store_array_name: The name for output of the genfit::TrackCands
+    tmva_cut: the cut for the BackgroundHitFinder
+    """
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
                  tmva_cut=0.1):
 
-        modules = [CDCBackgroundHitFinder(tmva_cut=tmva_cut),
-                   CDCLocalTrackFinder(),
-                   CDCBackgroundHitFinder(tmva_cut=tmva_cut),
-                   CDCLegendreTrackFinder(),
-                   CDCStereoSegmentTrackMatcher(output_track_cands_store_array_name=output_track_cands_store_array_name)
-                   ]
+        modules = [
+            CDCBackgroundHitFinder(
+                tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
+                tmva_cut=tmva_cut), CDCLegendreTrackFinder(
+                debug_output=False), CDCStereoSegmentTrackMatcher(
+                    output_track_cands_store_array_name=output_track_cands_store_array_name, filter="tmva")]
 
         super(CDCFullFinder, self).__init__(modules=modules)
 
@@ -106,6 +114,10 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
 
     """ Adds the background hit finder to the path. The vectors with __Temp get registered but not created.
     WARNING: Pleasy remember that even a tmva_cut of 0 does remove hits!
+
+    Attributes
+    ----------
+    tmva_cut: the cut for the tmva. 0.1 is the default und should be reasonable enough.
     """
 
     def __init__(self, tmva_cut=0.1):
@@ -134,6 +146,10 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
 class CDCLegendreTrackFinder(metamodules.PathModule):
 
     """Add the legendre finder to the path.
+
+
+    Attributes
+    ----------
     If assign_stereo_hits is True, also add the Histogramming module (default)
     If delete_hit_information is True, all already marked hits get unmarked (not default)
     If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
@@ -182,6 +198,10 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
 class CDCLocalTrackFinder(metamodules.WrapperModule):
 
     """ Add the local finder to the path.
+
+
+    Attributes
+    ----------
     If delete_hit_information is True, all already marked hits get unmarked (not default)
     If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
     With output_segments_store_vector_name you can control the output vector of the CDCRecoSegments2D. Be aware that every content
@@ -217,6 +237,9 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
 class CDCNotAssignedHitsCombiner(metamodules.WrapperModule):
 
     """Add the old combiner module to the path
+
+    Attributes
+    ----------
     If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
     With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
     of this vector will be replaced by the output of this module
@@ -248,6 +271,9 @@ class CDCNotAssignedHitsCombiner(metamodules.WrapperModule):
 class CDCSegmentTrackCombiner(metamodules.WrapperModule):
 
     """ Add the new combiner module to the path
+
+    Attributes
+    ----------
     If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
     With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
     of this vector will be replaced by the output of this module
@@ -287,6 +313,9 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
 class CDCValidation(metamodules.PathModule):
 
     """Add a validation and a mc track matcher to the path
+
+    Attributes
+    ----------
     With track_candidates_store_array_name you can choose the name of the genfit::TrackCands this validation should be created for
     With output_file_name you can choose the file name for the results
 
@@ -318,7 +347,15 @@ class CDCValidation(metamodules.PathModule):
 
 class CDCFitter(metamodules.PathModule):
 
-    """ Add the genfit module to te path """
+    """ Add the genfit module to te path
+
+    Attributes
+    ----------
+    setup_geometry: Load the SetupGenfitExtrapolation module
+    input_track_cands_store_array_name: store array name for input genfit::TrackCands
+    output_tracks_store_array_name: store array name for output G2Tracks
+
+    """
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
                  input_track_cands_store_array_name="TrackCands",
@@ -360,10 +397,10 @@ class CDCEventDisplay(metamodules.WrapperModule):
                                                                          hideObjects=["Unassigned RecoHits"])
         else:
             display_module = CDCSVGDisplayModule()
-            display_module.draw_hits = False
+            display_module.draw_hits = True
             display_module.draw_track_trajectories = True
-            display_module.draw_tracks = False
-            display_module.draw_takenflag = True
+            display_module.draw_tracks = True
+            display_module.draw_takenflag = False
             display_module.draw_wrong_rl_infos_in_tracks = False
             display_module.draw_wrong_rl_infos_in_segments = False
 
@@ -380,14 +417,31 @@ class CDCMCFiller(basf2.Module):
 
 class CDCStereoSegmentTrackMatcher(metamodules.WrapperModule):
 
+    """
+    Add the StereoSegmentTrackMatcher module to the path
+
+    Attributes
+    ----------
+    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
+    With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With segments_store_vector_name you can control the input vector of the CDCRecoSegments2D. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With the other parameters you can control the filters of the StereoSegmentTrackMatcher
+    """
+
     def __init__(self, output_track_cands_store_array_name=None,
                  track_cands_store_vector_name="CDCTrackVector",
-                 segments_store_vector_name="CDCRecoSegment2DVector"):
-        matcher_module = StandardEventGenerationRun.get_basf2_module("StereoSegmentTrackMatcher", WriteGFTrackCands=False,
+                 segments_store_vector_name="CDCRecoSegment2DVector",
+                 filter="all", tmva_cut=0.9):
+        matcher_module = StandardEventGenerationRun.get_basf2_module("StereoSegmentTrackMatcherDev", WriteGFTrackCands=False,
                                                                      SkipHitsPreparation=True,
                                                                      TracksStoreObjNameIsInput=True,
                                                                      SegmentsStoreObjName=segments_store_vector_name,
-                                                                     TracksStoreObjName=track_cands_store_vector_name)
+                                                                     TracksStoreObjName=track_cands_store_vector_name,
+                                                                     SegmentTrackChooser=filter,
+                                                                     SegmentTrackChooserParameters={"cut": str(tmva_cut)}
+                                                                     )
 
         if output_track_cands_store_array_name is not None:
             matcher_module.param({'WriteGFTrackCands': True,
@@ -397,6 +451,11 @@ class CDCStereoSegmentTrackMatcher(metamodules.WrapperModule):
 
 
 class CDCHitUniqueAssumer(basf2.Module):
+
+    """
+    A small helper module to look for double assigned hits.
+    Prints a summary after execution
+    """
 
     def initialize(self):
         self.number_of_doubled_hits = 0

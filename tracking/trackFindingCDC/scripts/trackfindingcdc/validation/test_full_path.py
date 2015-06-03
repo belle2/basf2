@@ -51,18 +51,15 @@ class FullRun(StandardEventGenerationRun):
         add_mc_track_finder(main_path)
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands"))
 
-        # main_path.add_module(StereoQuadTreePlotter())
-
-        # main_path.add_module(modules.CDCNotAssignedHitsCombiner(output_track_cands_store_array_name="TrackCands"))
-
-        # main_path.add_module(modules.CDCHitUniqueAssumer())
-
         # Enable these modules for further testing
+        # main_path.add_module(StereoQuadTreePlotter())
+        # main_path.add_module(modules.CDCNotAssignedHitsCombiner(output_track_cands_store_array_name="TrackCands"))
+        # main_path.add_module(modules.CDCHitUniqueAssumer())
         # main_path.add_module(modules.CDCMCFiller())
         # main_path.add_module(ReconstructionPositionHarvester(output_file_name="reconstruction_position.root"))
         # main_path.add_module(HitCleaner())
         # main_path.add_module(modules.CDCFitter(input_track_cands_store_array_name="TrackCands"))
-        # main_path.add_module(modules.CDCEventDisplay(full_display=True))
+        # main_path.add_module(modules.CDCEventDisplay(full_display=False))
 
         if self.show_not_fitted_tracks:
             main_path.add_module(TestingModule(track_store_array_name="TrackCands"))

@@ -315,6 +315,11 @@ textarea {
     display: none;
 }
 
+#selectall
+{
+    float: right;
+    border: 0 !important;
+}
 
 #serverwarning
 {

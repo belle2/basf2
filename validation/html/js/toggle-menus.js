@@ -4,7 +4,6 @@ $(document).ready(function(){
 	window.open('https://belle2.cc.kek.jp/redmine/projects/development/issues/new');
     });
 
-
     $('.revisions').click(function() {
             $('#revisions').slideToggle("fast");
     });
@@ -20,7 +19,12 @@ $(document).ready(function(){
 
     $('#packages').load('packages.html', function() {
 	$('input[type="checkbox"][name="packages"]').click(function(){
-            $("#"+$(this).attr("value")).toggle();
+            if ( $(this).is(':checked') ) {
+		$("#"+$(this).attr("value")).show();
+            }
+	    else {
+		$("#"+$(this).attr("value")).hide();
+	    }
 	});
     });
 
@@ -43,5 +47,22 @@ $(document).ready(function(){
 			$(".hidetext").each(function(){$(this).text("(hide)");});
 		}
 	});
+
+   
+   $('[name=selectall]').click( function(e) {
+        e.stopPropagation();
+   });
+
+   $('[name=selectall]').change( function() {
+	$('[name=packages]').each( function() {
+	    $(this).prop('checked', $('[name=selectall]').is(':checked'));
+	    if ( $(this).is(':checked')	) {
+		$("#"+$(this).attr("value")).show();
+      	    }
+	    else {
+		$("#"+$(this).attr("value")).hide();
+            }
+	});
+   });
 
 });

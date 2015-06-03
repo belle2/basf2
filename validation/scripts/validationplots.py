@@ -49,6 +49,14 @@ def nPvLT(pValDict, number):
     return 1
 
 
+def strip_ext(path):
+    """
+    Takes a path and returns only the name of the file, without the
+    extension on the file name
+    """
+    return os.path.splitext(os.path.split(path)[1])[0]
+
+
 def available_revisions():
     """
     Loops over the results folder and looks for revisions. It then returns an
@@ -181,7 +189,8 @@ def files_in_pkg(pkg, list_of_revisions):
         if head.endswith(pkg):
             in_pkg.append(tail)
 
-    # treat reference files specially, because they are located as <pkgname>/validation/<filname>.root
+    # Treat reference files specially, because they are located as
+    # <pkgname>/validation/<filename>.root
     for rootfile in get_reference_files():
         head, tail = os.path.split(rootfile)
         if head.endswith(pkg + "/validation"):
@@ -317,10 +326,10 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     # it is better to search the existing images than loop over plots
     desc = {}
     p_value = {}
-    key = ""
     for item in list_of_plotuples:
-        desc[item.key] = item.description
-        p_value[item.key] = item.pvalue
+        mod_key = '{0}_{1}'.format(strip_ext(item.rootfile), item.key)
+        desc[mod_key] = item.description
+        p_value[mod_key] = item.pvalue
 
     ident = []
     html = []
@@ -372,8 +381,8 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                 # first, print that we are attaching an image to the grid
                 print "Adding {0} to the plot matrix".format(plts[:-4])
                 # set our image path
-                img = './plots/./{0}/'.format('_'.join(sorted(
-                    list_of_revisions)) + "/" + package + pth) + plts
+                img = './plots/{0}/{1}/{2}'.format('_'.join(sorted(
+                    list_of_revisions)), package, plts)
                 # get the plot key from the file path
                 plts = plts[:-4].strip()
                 # if there is no description, say it
@@ -586,6 +595,8 @@ def generate_new_plots(list_of_revisions):
             if rootfile_name not in files_in_pkg:
                 files_in_pkg.append(rootfile_name)
         files_in_pkg.sort()
+
+        print 'Files in pkg:', files_in_pkg
 
         # Now we loop over all files that belong to the package to
         # group the plots correctly
@@ -1372,18 +1383,19 @@ class Plotuple:
                 title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'
-                .format('_'
-                        .join(sorted(self
-                                     .list_of_revisions))) + self.package)
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
+                + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
         # Save the plot as PNG and PDF
-        canvas.Print(path + '/%s.png' % self.key)
-        canvas.Print(path + '/%s.pdf' % self.key)
+        canvas.Print('{0}/{1}_{2}.png'.format(path, strip_ext(self.rootfile),
+                                              self.key))
+        canvas.Print('{0}/{1}_{2}.pdf'.format(path, strip_ext(self.rootfile),
+                                              self.key))
 
-        self.file = './{0}/'.format('/'.join(path.split('/')[2:])) + self.key
+        self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
+                                           strip_ext(self.rootfile), self.key)
 
     def create_histogram_plot(self, mode):
         """!
@@ -1494,18 +1506,19 @@ class Plotuple:
                     title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'
-                .format('_'
-                        .join(sorted(self
-                                     .list_of_revisions))) + self.package)
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
+                + self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
         # Save the plot as PNG and PDF
-        canvas.Print(path + '/%s.png' % self.key)
-        canvas.Print(path + '/%s.pdf' % self.key)
+        canvas.Print('{0}/{1}_{2}.png'.format(path, strip_ext(self.rootfile),
+                                              self.key))
+        canvas.Print('{0}/{1}_{2}.pdf'.format(path, strip_ext(self.rootfile),
+                                              self.key))
 
-        self.file = './{0}/'.format('/'.join(path.split('/')[2:])) + self.key
+        self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
+                                           strip_ext(self.rootfile), self.key)
 
     def create_ntuple_table(self):
         """!
@@ -1583,11 +1596,13 @@ class Plotuple:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        with open(path + '/' + self.key + '.html', 'w+') as html_file:
+        with open('{0}/{1}_{2}.html'.format(path, strip_ext(self.rootfile),
+                                            self.key), 'w+') as html_file:
             for line in html:
                 html_file.write(line + '\n')
 
-        self.file = '{0}/{1}'.format(path, self.key)
+        self.file = '{0}/{1}_{2}'.format(path, strip_ext(self.rootfile),
+                                         self.key)
 
     def html(self):
         """!
@@ -1620,6 +1635,7 @@ class Plotuple:
             html.append('<a href="./plots/{0}.pdf">'
                         '<img src="./plots/{0}.png"></a>\n'
                         .format(self.file))
+            print '\n'+self.file+'\n'
 
         html.append('</div>\n')
 

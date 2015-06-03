@@ -19,6 +19,6 @@ import basf2
 basf2.set_random_seed(1337)
 
 tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
-generateTestPlots("")
+generateTestPlots("Script A")
 
 tfile.Close()

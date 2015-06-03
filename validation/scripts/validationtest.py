@@ -13,7 +13,7 @@ from ROOT import TFile, TNtuple, TH1F, TF1, TRandom3, gRandom
 
 
 def generateTestPlots(prefix):
-    tntuple = TNtuple("ntuple_test" + prefix, "ntuple test" + prefix, "x:y:z:k")
+    tntuple = TNtuple("ntuple_test", "ntuple test", "x:y:z:k")
 
     array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0])
     tntuple.Fill(array_of_values)
@@ -25,7 +25,7 @@ def generateTestPlots(prefix):
     # Overwrite the former TNtuple if one was there
     tntuple.Write()
 
-    gausH = TH1F("gaus_histogram" + prefix, "Gaus Histogram" + prefix, 100, -3, 3)
+    gausH = TH1F("gaus_histogram", prefix + " Gaus Histogram", 100, -3, 3)
     gausH.FillRandom("gaus", 5000)
 
     tntuple.SetAlias('Description', "Gaus Histogram text")
@@ -34,7 +34,7 @@ def generateTestPlots(prefix):
 
     gausH.Write()
 
-    gausH = TH1F("exp_histogram" + prefix, "Exp Histogram" + prefix, 100, 0, 10)
+    gausH = TH1F("exp_histogram", prefix + " Exp Histogram", 100, 0, 10)
 
     exp_fn = TF1("exp_fn", "exp(-x)", 0, 10)
     gausH.FillRandom("exp_fn", 5000)
@@ -49,7 +49,7 @@ def generateTestPlots(prefix):
     # execution
     basf2.set_random_seed(datetime.now().microsecond)
 
-    gausH = TH1F("gaus_changing_histogram" + prefix, "Gaus Changing Histogram" + prefix, 100, -5, 5)
+    gausH = TH1F("gaus_changing_histogram", prefix + " Gaus Changing Histogram", 100, -5, 5)
     mean = gRandom.Uniform(-1.0, 1.0)
 
     for i in range(5000):

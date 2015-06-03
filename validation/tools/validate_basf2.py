@@ -36,6 +36,7 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 ###############################################################################
 
 class Validation:
+
     """!
     This is the class that provides all global variables, like 'list_of_files'
     etc. There is only one instance of this class with name 'validation. This
@@ -98,6 +99,12 @@ class Validation:
         # The list of packages to be included in the validation. If we are
         # running a complete validation, this will be None.
         self.packages = None
+
+        # This list of packages which will be ignored by default. This is only
+        # the validation package itself, because it only creates test-plots
+        # for validation development. To see only the validation-package output,
+        # use the --test command line flag
+        self.ignored_packages = ["validation"]
 
         # Additional arguments for basf2, if we received any from the command
         #  line arguments
@@ -254,6 +261,10 @@ class Validation:
             for unwanted_key in unwanted_keys:
                 del validation_folders[unwanted_key]
 
+        # remove packages which have been explicitly ignored
+        for ignored in self.ignored_packages:
+            del validation_folders[ignored]
+
         # Now write to self.list_of_packages which packages we have collected
         self.list_of_packages = validation_folders.keys()
 
@@ -271,7 +282,6 @@ class Validation:
         # which we are going to perform the validation in self.list_of_scripts
 
     def log_failed(self):
-
         """!
         This method logs all scripts with property failed into a single file
         to be read in run_validation_server.py
@@ -293,7 +303,6 @@ class Validation:
         list_failed.close()
 
     def log_skipped(self):
-
         """!
         This method logs all scripts with property skipped into a single file
         to be read in run_validation_server.py
@@ -315,7 +324,6 @@ class Validation:
         list_skipped.close()
 
     def set_runtime_data(self):
-
         """!
         This method sets runtime property of each script.
         """
@@ -338,7 +346,7 @@ class Validation:
                 suma = 0.0
                 for dict_key in run_times:
                     suma += float(run_times[dict_key])
-                script.runtime = suma/len(run_times)
+                script.runtime = suma / len(run_times)
         runtimes.close()
 
     def run_validation(self):
@@ -533,6 +541,7 @@ class Validation:
 
 
 class Script:
+
     """!
     The object representation of a steering file.
 
@@ -842,6 +851,11 @@ def parse_cmd_line_arguments():
                         "useful for local basf2 instances where there is no"
                         "BuildBot'. Default is 'current'",
                         type=str, nargs='?', default='current')
+    parser.add_argument("--test", help="Execute validation in testing mode"
+                        "where only the validation scripts contained in the"
+                        "validation package are executed. During regular"
+                        "validation, these scripts are ignored.",
+                        action='store_true')
 
     # Return the parsed arguments!
     return parser.parse_args()
@@ -1004,6 +1018,12 @@ try:
     # Check if we are performing a dry run (don't actually start scripts)
     if cmd_arguments.dry:
         validation.dry = True
+
+    # If running in test mode, only execute scripts in validation packgase
+    if cmd_arguments.test:
+        validation.ignored_packages = []
+        validation.packages = ["validation"]
+        validation.log.note('Running in test mode')
 
     # Now collect the steering files which will be used in this validation.
     # This will fill validation.list_of_sf_paths with values.

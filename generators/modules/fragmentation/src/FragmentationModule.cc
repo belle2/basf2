@@ -60,10 +60,12 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string("../modules/fragmentation/data/ccbar.dec"));
 
   //initialize member variables
-  evtgen      = 0;
-  nAdded      = 0;
-  nQuarks     = 0;
-  nVpho       = 0;
+  evtgen  = 0;
+  nAdded  = 0;
+  nQuarks = 0;
+  nVpho   = 0;
+  nAll    = 0;
+  nGood   = 0;
 
   pythia = nullptr;
   PythiaEvent = nullptr;
@@ -128,10 +130,6 @@ void FragmentationModule::initialize()
 
   // List variable(s) that differ from their defaults
   pythia->settings.listChanged();
-
-  // Reset event counters
-  nAll = 0;
-  nGood = 0;
 }
 
 //-----------------------------------------------------------------

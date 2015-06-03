@@ -321,6 +321,10 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     # let the user know that where we are
     print "Plot matrix creation from images from " + folder
 
+    # Get the file the Plotuples are from. Beware, this is a filthy hack and
+    # the entire function should probably be redone!
+    rootfile = strip_ext(list_of_plotuples[0].rootfile)
+
     # get description and p_value for every plot, we actually don't need
     # the list, we are working with descriptions, pvalues and keys only
     # it is better to search the existing images than loop over plots
@@ -372,7 +376,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                     'max=\"50\" value=\"25\">&nbsp;'
                     '<span id="slidernumber_{0}">25</span>'
                     '%&nbsp;&nbsp;&nbsp;\n</td>\n</tr>\n'
-                    '</table>\n<p></p>\n'.format(package))
+                    '</table>\n<p></p>\n'.format(rootfile))
 
         # creation of the actual plot matrix
         for plts in sorted(os.listdir(folder)):
@@ -389,7 +393,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                 if not desc[plts]:
                     desc[plts] = "n/a"
                 # setting up our filters
-                classes = ["imidzes_" + package, "fltr"]
+                classes = ["imidzes_" + rootfile, "fltr"]
                 if p_value[plts] <= 1:
                     classes.append('p_value_leq_1')
                 if p_value[plts] <= 0.01:
@@ -406,7 +410,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                             '</a></span>'
                             '\n'.format(pre, img, plts, desc[plts],
                                         " ".join(classes),
-                                        package,
+                                        rootfile,
                                         pre1))
                 # save which plots we are using, this string will
                 # be then pasted into id="" html tag
@@ -433,7 +437,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                     " value=\"{1}\"><table style='width:100%; "
                     "border:none'>\n<input type=\"hidden\" name=\"size\" "
                     "class=\"slidernumber_{0}\" value=\"25\">"
-                    "\n<tr>".format(package, pre))
+                    "\n<tr>".format(rootfile, pre))
         # this is here for aesthetics. If we have the largest
         # name of a plot with a length up to
         # 5 letters, we can fit 5 of these names into one line of text
@@ -479,7 +483,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                         "\n</td>{3}\n".format(el.strip(),
                                               pre, plts, end,
                                               " ".join(classes),
-                                              100 / k, package))
+                                              100.0 / k, rootfile))
         html.append("</tr>\n</table>\n")
         # the save button
         html.append("\n<div width=\"100%\" align=\"right\" "

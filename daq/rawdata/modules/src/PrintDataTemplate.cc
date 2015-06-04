@@ -119,9 +119,16 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 {
 
-  printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
+  printf(": Event %8d node 0x%.8x block %d by: sum det %d by : A %d by B %d by C %d by D %d by\n",
          raw_copper->GetEveNo(i), raw_copper->GetNodeID(i),
-         raw_copper->GetBlockNwords(i) * sizeof(int));
+         raw_copper->GetBlockNwords(i) * sizeof(int),
+         sizeof(int) * (raw_copper->GetDetectorNwords(i, 0) + raw_copper->GetDetectorNwords(i, 1) +
+                        raw_copper->GetDetectorNwords(i, 2) + raw_copper->GetDetectorNwords(i, 3)),
+         sizeof(int) * (raw_copper->GetDetectorNwords(i, 0)),
+         sizeof(int) * (raw_copper->GetDetectorNwords(i, 1)),
+         sizeof(int) * (raw_copper->GetDetectorNwords(i, 2)),
+         sizeof(int) * (raw_copper->GetDetectorNwords(i, 3))
+        );
 
   printBuffer(raw_copper->GetWholeBuffer(), raw_copper->TotalBufNwords());
   //

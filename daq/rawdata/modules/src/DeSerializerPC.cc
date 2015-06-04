@@ -712,7 +712,7 @@ void DeSerializerPCModule::event()
   }
 
   if (n_basf2evt % 20000 == 0 || n_basf2evt < 10) {
-    RateMonitor(eve_copper_0);
+    RateMonitor(eve_copper_0, subrun_copper_0, run_copper_0);
   }
   n_basf2evt++;
   if (g_status.isAvailable()) {

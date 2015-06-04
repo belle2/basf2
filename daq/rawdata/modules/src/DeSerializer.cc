@@ -289,7 +289,7 @@ int* DeSerializerModule::getPreAllocBuf()
 }
 
 
-void DeSerializerModule::RateMonitor(unsigned int nevt)
+void DeSerializerModule::RateMonitor(unsigned int nevt, int subrun, int run)
 {
   double cur_time = getTimeSec();
   double total_time = cur_time - m_start_time;
@@ -298,7 +298,8 @@ void DeSerializerModule::RateMonitor(unsigned int nevt)
   struct tm* t_st;
   time(&timer);
   t_st = localtime(&timer);
-  printf("[DEBUG] Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
+  printf("[INFO] run %d sub %d Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
+         run, subrun,
          nevt, (nevt  - m_prev_nevt) / interval / 1.e3,
          (m_totbytes - m_prev_totbytes) / interval / 1.e6,
          total_time,

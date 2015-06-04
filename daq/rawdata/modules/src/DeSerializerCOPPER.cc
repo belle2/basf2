@@ -580,7 +580,8 @@ void DeSerializerCOPPERModule::event()
   //
   //  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
   if (n_basf2evt % 100 == 0) {
-    RateMonitor(m_prev_ftsweve32);
+    RateMonitor(m_prev_ftsweve32,  m_prev_runsubrun_no & RawHeader_latest::SUBRUNNO_MASK ,
+                (m_prev_runsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT);
   }
   n_basf2evt++;
   if (g_status.isAvailable()) {

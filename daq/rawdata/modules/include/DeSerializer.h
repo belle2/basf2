@@ -161,7 +161,7 @@ namespace Belle2 {
     }
 
     //! monitor rate
-    void RateMonitor(unsigned int nevt);
+    void RateMonitor(unsigned int nevt, int subrun = -1, int run = -1);
 
 
     //! # of already used buffers

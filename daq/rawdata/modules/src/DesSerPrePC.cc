@@ -85,7 +85,6 @@ int* DesSerPrePC::getNewBuffer(int nwords, int* delete_flag)
 
   int* temp_buf = NULL;
   // Prepare buffer
-  //  printf( "[DEBUG] ############ %d %d %d %d\n", nwords, BUF_SIZE_WORD, m_num_usedbuf, NUM_PREALLOC_BUF );
   if (nwords >  BUF_SIZE_WORD) {
     *delete_flag = 1;
     temp_buf = new int[ nwords ];
@@ -107,9 +106,6 @@ int* DesSerPrePC::getNewBuffer(int nwords, int* delete_flag)
 
 void DesSerPrePC::initialize()
 {
-  printf("Checkinit1 1\n") ;
-  fflush(stdout);
-
   B2INFO("DeSerializerPrePC: initialize() started.");
 
   // allocate buffer
@@ -143,8 +139,6 @@ void DesSerPrePC::initialize()
   m_prev_copper_ctr = 0xFFFFFFFF;
   m_prev_evenum = 0xFFFFFFFF;
 
-  printf("Checkinit1 2\n") ;
-  fflush(stdout);
   B2INFO("DeSerializerPrePC: initialize() done.");
 }
 
@@ -175,8 +169,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
 
 int DesSerPrePC::Connect()
 {
-  printf("Check1.5 %d\n", m_num_connections);
-  fflush(stdout);
+
   for (int i = 0; i < m_num_connections; i++) {
     //
     // Connect to a downstream node
@@ -201,13 +194,13 @@ int DesSerPrePC::Connect()
     int val1 = 0;
     setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &val1, sizeof(val1));
 
-    printf("[DEBUG] Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]);
+    B2INFO("[DEBUG] Connecting to " << m_hostname_from[ i ].c_str() << " port " << m_port_from[ i ]);
     while (1) {
       if (connect(sd, (struct sockaddr*)(&socPC), sizeof(socPC)) < 0) {
         perror("Failed to connect. Retrying...");
         usleep(500000);
       } else {
-        printf("[DEBUG] Done\n");
+        B2INFO("Done");
         break;
       }
     }
@@ -217,21 +210,14 @@ int DesSerPrePC::Connect()
     int val, len;
     len = sizeof(val);
     getsockopt(m_socket_recv[ i ], SOL_SOCKET, SO_RCVBUF, &val, (socklen_t*)&len);
-#ifdef DEBUG
-    printf("[DEBUG] SO_RCVBUF %d\n", val);
-#endif
+    //    B2INFO("SO_RCVBUF" << val);
     getsockopt(m_socket_recv[ i ], SOL_SOCKET, SO_SNDBUF, &val, (socklen_t*)&len);
-#ifdef DEBUG
-    printf("[DEBUG] SO_SNDBUF %d\n", val);
-#endif
+    //    B2DEBUG("SO_SNDBUF" <<  val);
     getsockopt(m_socket_recv[ i ], IPPROTO_TCP, TCP_MAXSEG, &val, (socklen_t*)&len);
-#ifdef DEBUG
-    printf("[DEBUG] TCP_MAXSEG %d\n", val);
-#endif
+    //    B2DEBUG("TCP_MAXSEG" <<  val);
     getsockopt(m_socket_recv[ i ], IPPROTO_TCP, TCP_NODELAY, &val, (socklen_t*)&len);
-#ifdef DEBUG
-    printf("[DEBUG] TCP_NODELAY %d\n", val);
-#endif
+    //    B2DEBUG("TCP_NODELAY" <<  val);
+
     if (m_status.isAvailable()) {
       sockaddr_in sa;
       memset(&sa, 0, sizeof(sockaddr_in));
@@ -243,7 +229,7 @@ int DesSerPrePC::Connect()
     }
 
   }
-  printf("[DEBUG] Initialization finished\n");
+  B2INFO("[DEBUG] Initialization finished");
   return 0;
 }
 
@@ -308,7 +294,6 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
     // Data size check1
     //
     if (rawblk_nwords > (int)(2.5e6)) {
-      printf("[DEBUG] *******HDR**********\n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
@@ -1118,8 +1103,7 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
 void DesSerPrePC::Accept()
 {
 
-  printf("ACCept 1\n");
-  fflush(stdout);
+
   //
   // Connect to cprtb01
   //
@@ -1173,8 +1157,7 @@ void DesSerPrePC::Accept()
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
-  printf("ACCept 2\n");
-  fflush(stdout);
+
   //
   // Accept
   //
@@ -1184,8 +1167,6 @@ void DesSerPrePC::Accept()
   fflush(stdout);
   //  B2INFO("Accepting... : port " << m_port_to << " server " << m_hostname_local.c_str() );
   B2INFO("Accepting...");
-  printf("ACCept 3\n");
-  fflush(stdout);
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
     sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
@@ -1194,8 +1175,7 @@ void DesSerPrePC::Accept()
   } else {
     //    B2INFO("Connection is established: port " << htons(sock_accept.sin_port) << " address " <<  sock_accept.sin_addr.s_addr );
     B2INFO("Done.");
-    printf("Done");
-    fflush(stdout);
+
     //    set timepout option
     struct timeval timeout;
     timeout.tv_sec = 1;

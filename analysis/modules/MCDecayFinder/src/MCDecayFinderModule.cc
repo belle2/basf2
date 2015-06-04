@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald, Marko Staric                           *
+* Contributors: Christian Oswald, Marko Staric, Phillip Urquijo          *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -14,6 +14,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/EvtPDLUtil.h>
 
 #include <string>
 #include <memory>
@@ -31,17 +33,25 @@ MCDecayFinderModule::MCDecayFinderModule() : Module()
   //Parameter definition
   addParam("decayString", m_strDecay, "DecayDescriptor string.");
   addParam("listName", m_listName, "Name of the output particle list");
-  addParam("writeOut", m_writeOut, "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+  addParam("writeOut", m_writeOut,
+           "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 }
 
 void MCDecayFinderModule::initialize()
 {
-  B2WARNING("This is an untested prototype. Do not use for any production purposes.");
+  B2WARNING("MCDecayFinder is not yet configured to deal with matches that require intermediate resonances to be ignored.");
 
   m_decaydescriptor.init(m_strDecay);
 
   m_particleStore = std::string("FoundParticles") + m_listName;
-  B2INFO("particle store used: " << m_particleStore);
+  B2DEBUG(1, "particle store used: " << m_particleStore);
+
+  m_antiListName = ParticleListName::antiParticleListName(m_listName);
+  m_isSelfConjugatedParticle = (m_listName == m_antiListName);
+
+  B2DEBUG(1, "particle list name: " << m_listName);
+  B2DEBUG(1, "antiparticle list name: " << m_antiListName);
+
 
   // Register output particle list, particle store and relation to MCParticles
   StoreObjPtr<ParticleList> particleList(m_listName);
@@ -54,6 +64,11 @@ void MCDecayFinderModule::initialize()
   particles.registerInDataStore(flags);
   extraInfoMap.registerInDataStore();
   particles.registerRelationTo(mcparticles, DataStore::c_Event, flags);
+
+  if (!m_isSelfConjugatedParticle) {
+    StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
+    antiParticleList.registerInDataStore(flags);
+  }
 }
 
 void MCDecayFinderModule::event()
@@ -64,8 +79,15 @@ void MCDecayFinderModule::event()
   // Get output particle list
   StoreObjPtr<ParticleList> outputList(m_listName);
   outputList.create();
-  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName);
+  outputList->initialize(m_decaydescriptor.getMother()->getPDGCode(), m_listName, m_particleStore);
   outputList->setParticleCollectionName(m_particleStore);
+
+  if (!m_isSelfConjugatedParticle) {
+    StoreObjPtr<ParticleList> antiOutputList(m_antiListName);
+    antiOutputList.create();
+    antiOutputList->initialize(-1 * m_decaydescriptor.getMother()->getPDGCode(), m_antiListName, m_particleStore);
+    outputList->bindAntiParticleList(*(antiOutputList));
+  }
 
   // retrieve list of MCParticles
   StoreArray<MCParticle> mcparticles;
@@ -81,7 +103,7 @@ void MCDecayFinderModule::event()
     for (int iCC = 0; iCC < 2; iCC++) {
       std::unique_ptr<DecayTree<MCParticle>> decay(match(mcparticles[i], m_decaydescriptor, iCC));
       if (decay->getObj()) {
-        B2INFO("Match!");
+        B2DEBUG(1, "Match!");
         int iIndex = write(decay.get());
         outputList->addParticle(particles[iIndex]);
       }
@@ -101,15 +123,19 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // Load PDG codes and compare,
   int iPDGD = d->getMother()->getPDGCode();
   int iPDGP = mcp->getPDG();
+
+  bool isSelfConjugatedParticle = !(EvtPDLUtil::hasAntiParticle(iPDGD));
+
   if (!isCC && iPDGD != iPDGP) return decay;
-  else if (isCC && iPDGD != -iPDGP) return decay;
-  B2INFO("PDG code matched: " << iPDGP);
+  else if (isCC && (iPDGD != -iPDGP && !isSelfConjugatedParticle)) return decay;
+  else if (isCC && (iPDGD !=  iPDGP &&  isSelfConjugatedParticle)) return decay;
+  B2DEBUG(1, "PDG code matched: " << iPDGP);
 
   // Get number of daughters in the decay descriptor.
   // If no daughters in decay descriptor, no more checks needed.
   int nDaughtersD = d->getNDaughters();
   if (nDaughtersD == 0) {
-    B2INFO("DecayDescriptor has no Daughters, everything OK!");
+    B2DEBUG(1, "DecayDescriptor has no Daughters, everything OK!");
     decay->setObj(const_cast<MCParticle*>(mcp));
     return decay;
   }
@@ -127,10 +153,10 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // 2) if radiated photons are included the number of daughters has to be equal!
   bool isIgnorePhotons = d->isIgnorePhotons();
   if (isIgnorePhotons && nDaughtersD > nDaughtersP) {
-    B2INFO("DecayDescriptor has more daughters than MCParticle!");
+    B2DEBUG(1, "DecayDescriptor has more daughters than MCParticle!");
     return decay;
   } else if (!isIgnorePhotons && nDaughtersD != nDaughtersP) {
-    B2INFO("DecayDescriptor must have same number of daughters as MCParticle!");
+    B2DEBUG(1, "DecayDescriptor must have same number of daughters as MCParticle!");
     return decay;
   }
 
@@ -178,19 +204,18 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
   bool isInclusive = d->isInclusive();
   if (!isInclusive) {
-    B2INFO("Decay is not inclusive, check for left over MCParticles!\n")
+    B2DEBUG(1, "Decay is not inclusive, check for left over MCParticles!\n")
     for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
       // Check if additional photons are to be ignored
-      B2INFO("Found a " << daughtersP[*itDP]->getPDG());
       if (isIgnorePhotons && daughtersP[*itDP]->getPDG() == 22) continue;
-      B2INFO("There was an additional particle left which is not a photon. Something is going wrong here!");
+      B2DEBUG(1, "There was an additional particle left which is not a photon. Found " << daughtersP[*itDP]->getPDG());
       return decay;
     }
   } else {
-    B2INFO("Inclusive decay, no need to check for additional unmatched particles!");
+    B2DEBUG(1, "Inclusive decay, no need to check for additional unmatched particles!");
   }
   decay->setObj(const_cast<MCParticle*>(mcp));
-  B2INFO("Match found!");
+  B2DEBUG(1, "Match found!");
   return decay;
 }
 

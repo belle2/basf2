@@ -23,26 +23,37 @@ class ProTool(object):
 
     Attributes
     ----------
-    attr1 : name
-        Name if the Class.
+    name : str
+        Name of the Class.
+    io : function
+        Returns the logger
+
     """
 
     def __init__(self, name):
-        """
-
-        Parameters
-        ----------
-        name : str
-            Name of the class
+        """ init function
+        :param name: name of the class
         """
         self.name = name
 
     @property
     def io(self):
+        """
+        Logging function
+        :return: logger
+        """
         return logging.getLogger(self.name)
 
 
 def create_figure(self, width=None, square=False, ratio=None):
+    """
+    Create a new figure
+    :param self:
+    :param width:
+    :param square:
+    :param ratio:
+    :return:
+    """
     if ratio is None:
         ratio = 1.618
     if width is None:

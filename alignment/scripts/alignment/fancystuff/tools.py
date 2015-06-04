@@ -120,26 +120,31 @@ def draw_flat_correlation(x, y, ax=None, draw_label=True, width=5):
 
 
 class ProfilePlot():
+    """ Basic Profile plot
 
-    """
-    Basic Profile plot
+    Creates the profile Histogram from x and y distrinbutions
     It plots mean(y) in bins of x
 
+    Attributes:
+        x_axis (array)  : Binning in x
+        mean (array)    : Mean of y in bin x
+        err (array)     : Std of Mean y in bin x
+        label (string)  : Matplotlib label for the plot
     """
 
     def __init__(self, x, y, x_axis=None, n_bins=None, label=None):
-        """
-        Creates the profile Histogram from x and y distrinbutions
-        :param x:
-        :param y:
-        :param x_axis:
-        :param label:
+        """ init function
+        :param x:       Distribution in x
+        :param y:       Distribution in y
+        :param n_bins:  (optional) n bins in x, is set automatically if not provided
+        :param x_axis:  binning for the x-axis
+        :param label:   Matplotlib label for the plot
         """
         if x_axis is None:
             x_axis = transform.get_optimal_bin_size(len(x))
         if n_bins is not None:
             x_axis = n_bins
-        self.y, self.x_axis = np.histogram(x, x_axis)
+        _, self.x_axis = np.histogram(x, x_axis)
         self.mean = []
         self.err = []
         self.label = label
@@ -154,8 +159,6 @@ class ProfilePlot():
             else:
                 self.mean.append(np.mean(y[bin_range]))
                 self.err.append(np.sqrt(np.var(y[bin_range]) / n_y_in_bin))
-
-        self.ready = True
 
     def draw(self, color='black'):
         """ Draw function

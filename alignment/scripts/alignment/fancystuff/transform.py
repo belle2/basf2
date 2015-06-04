@@ -24,6 +24,19 @@ class Transform(ProTool):
     Base Class for the transformations.
     The function _fit() is overwritten by the sub classes.
 
+    Attributes
+    ----------
+    n_bins : int, optional
+        Binning in x, will be set automatically
+    max : float
+        Maximum of the fitted distribution
+    min : float
+        Minimum of the fitted distribution
+    is_processed : bool
+        Status flag
+    name : str
+        Name of the transformation
+
     """
 
     def __init__(self, name="Original", n_bins=None):
@@ -151,6 +164,11 @@ class CDF(Transform):
     Calculates the cumulative distribution (CDF)
     Can be used for the flat transformation.
 
+    Attributes
+    ----------
+    spline : InterpolatedUnivariateSpline
+        Spline, fitting the CDF
+
     """
 
     def __init__(self, *args):
@@ -160,22 +178,20 @@ class CDF(Transform):
         """
         Transform.__init__(self, "CDF", *args)
         self.spline = None
-        self.y = []
-        self.x = []
 
     def _fit(self, x, y=None):
         """
         Fit function calculates the cumulative distribution with numpy percentile.
 
-        :param x:   Inout distribution
+        :param x:   Input distribution
         :param y:   Will not be used in this transformation
         """
         self.io.debug("Fitting CDF")
-        self.y = np.linspace(0, 100, 2 * self.n_bins)
-        self.x = pd.Series(np.percentile(x, list(self.y)))
+        y_ = np.linspace(0, 100, 2 * self.n_bins)
+        x_ = pd.Series(np.percentile(x, list(y_)))
 
         # Count same values
-        vc = self.x.value_counts()
+        vc = x_.value_counts()
         vc = vc.sort_index()
 
         # replace same values
@@ -186,8 +202,8 @@ class CDF(Transform):
                 except IndexError:
                     nex_val = vc.index[i] + 0.01
                 fill = np.linspace(vc.index[i], nex_val, xi)
-                self.x[self.x == vc.index[i]] = fill
-        self.spline = InterpolatedUnivariateSpline(self.x, self.y)
+                x_[x_ == vc.index[i]] = fill
+        self.spline = InterpolatedUnivariateSpline(x_, y_)
 
     def _transform(self, x):
         """
@@ -204,6 +220,11 @@ class ToFlat(Transform):
     """
     This transformation uses the CDF to transform input data to a
     flat transformation.
+
+    Attributes
+    ----------
+    cdf : Transform.CDF
+        Transformation with the CDF
 
     """
 

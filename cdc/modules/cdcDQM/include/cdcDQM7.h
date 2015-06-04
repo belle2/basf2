@@ -1,4 +1,4 @@
-/* Nanae Taniguchi 2015.05.19 */
+/* Nanae Taniguchi 2015.05.21 */
 
 #ifndef CDCDQM7MODULE_H
 #define CDCDQM7MODULE_H
@@ -28,11 +28,10 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-    TH1F* h_cdc;         // histogram
-    TH1F* h_tdc;
-    TH1F* h_adc;
-    TH1F* h_layer;
-    TH1F* h_nhits;
+    TH1F* h_tdc;         // histogram tdc
+    TH1F* h_adc;         // histogram fadc sum
+    TH1F* h_layer;         // histogram ilayer hits
+    TH1F* h_nhits;         // histogram cell hit in first ilayer
 
   };
 }

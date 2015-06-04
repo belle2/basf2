@@ -1,22 +1,17 @@
-/* Nanae Taniguchi 2015.05.19 */
+/* Nanae Taniguchi 2015.05.21 */
 
 #include <cdc/modules/cdcDQM/cdcDQM7.h>
 
 #include <framework/core/HistoModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreDefs.h>
 #include <framework/datastore/DataStore.h>
 
 #include <framework/datastore/StoreArray.h>
 
-//#include <framework/datastore/EventMetaData.h>
-
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
 
 #include "TH1F.h"
-#include "TVector3.h"
 
 #include <stdio.h>
 
@@ -48,6 +43,11 @@ cdcDQM7Module::~cdcDQM7Module()
 // Function to define histograms
 //-----------------------------------------------------------------
 
+TH1F* h_tdc; // TDC hit
+TH1F* h_adc; // FADC sum
+TH1F* h_layer; // ilayer hit
+TH1F* h_nhits; // cell hits in the first ilayer
+
 void cdcDQM7Module::defineHisto()
 {
   h_tdc = new TH1F("TDC", "TDC", 100, 7400, 8400);
@@ -66,6 +66,7 @@ void cdcDQM7Module::defineHisto()
 void cdcDQM7Module::initialize()
 {
   REG_HISTOGRAM   // required to register histograms to HistoManager
+
 }
 
 void cdcDQM7Module::beginRun()
@@ -79,7 +80,7 @@ void cdcDQM7Module::event()
   int nent = cdcHits.getEntries();
 
   for (int i = 0; i < nent; i++) {
-    CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
+    CDCHit* cdchit = (CDCHit*)cdcHits[i];
 
     h_tdc->Fill(cdchit->getTDCCount());
     h_adc->Fill(cdchit->getADCCount());

@@ -48,6 +48,7 @@ def parse_cmd_line_arguments():
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     """!
     Defines how the BaseHTTPServer handles HTTP Requests (GET or POST)
+    @var path: The path of the request, e.g. the file that is being requested
     """
 
     def logRequest(s):
@@ -87,8 +88,6 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.send_header('Content-length', len(respContent))
         self.end_headers()
         self.wfile.write(respContent)
-
-        print
 
     def parse_POST(self):
         """!

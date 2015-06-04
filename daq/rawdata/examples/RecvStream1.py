@@ -16,7 +16,7 @@ if len(argvs) != 4:
     sys.exit()
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.INFO)
 
 # Modules
 receiver = register_module('DeSerializerPC')

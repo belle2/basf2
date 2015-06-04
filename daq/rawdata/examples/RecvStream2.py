@@ -16,8 +16,7 @@ if len(argvs) != 5:
     sys.exit()
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-# set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.INFO)
 
 # Modules
 processor = register_module('DesSerPrePCMain')

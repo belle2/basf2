@@ -22,11 +22,11 @@ import sys
 argvs = sys.argv
 
 if len(argvs) < 6:
-    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER node ID> <bit flag of FINNESEs> <Use NSM(Network Shared Memory)? yes=1/no=0> <NSM nodename>'
+    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER node ID> '
+    print '<bit flag of FINNESEs> <Use NSM(Network Shared Memory)? yes=1/no=0> <NSM nodename>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
 
 # Reader

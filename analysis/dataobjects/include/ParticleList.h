@@ -160,7 +160,7 @@ namespace Belle2 {
      * @param pdg PDG code of particles to be hold in this list
      * @param name of the particle list
      */
-    void initialize(int pdg, std::string name);
+    void initialize(int pdg, std::string name, std::string particleStoreName = "Particles");
 
     /**
      * Binds particle and anti-particle ParticleLists. After the lists are bound any action performed on ParticleList

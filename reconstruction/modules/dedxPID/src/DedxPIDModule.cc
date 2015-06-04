@@ -389,7 +389,8 @@ void DedxPIDModule::event()
           TVector3 wireDoca = poca - wirePoca;
 
           // the sign of the doca is defined here to be positive in the +x dir
-          double doca = wireDoca.x() / abs(wireDoca.x()) * wireDoca.Perp();
+          double doca = wireDoca.Perp();
+          if (wireDoca.x() < 0) doca = -1.0 * doca;
           double entAng = cdcgeo.getAlpha(wirePoca, pocaMom);
 
           LinearGlobalADCCountTranslator translator;

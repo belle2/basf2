@@ -59,6 +59,7 @@ BeamDigitizerModule::BeamDigitizerModule() : Module()
   setDescription("Beamabort digitizer module");
 
   //Default values are set here. New values can be in BEAMABORT.xml.
+  addParam("PreampGain", m_PreampGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4 * 1e12);
 
 }
 
@@ -85,17 +86,49 @@ void BeamDigitizerModule::event()
 
   StoreArray<MCParticle> particles;
   StoreArray<BeamabortSimHit> BeamSimHits;
-
+  StoreArray<BeamabortHit> BeamHits;
   //Skip events with no BeamSimHits, but continue the event counter
   if (BeamSimHits.getEntries() == 0) {
     Event++;
     return;
   }
 
+  //Declare and initialze energy and time
+  double edep[nBEAM];
+  double time[nBEAM];
+  double itime[nBEAM];
+  double volt[nBEAM];
+  int pdg[nBEAM];
+  for (int i = 0; i < nBEAM; i++) {
+    edep[i] = 0;
+    time[i] = 0;
+    itime[i] = 0;
+    volt[i] = 0;
+    pdg[i] = 0;
+  }
+
+  int nentries = BeamSimHits.getEntries();
+  for (int i = 0; i < nentries; i++) {
+    BeamabortSimHit* aHit = BeamSimHits[i];
+    int detNb = aHit->getCellId();
+    edep[detNb] += aHit->getEnergyDep();
+    time[detNb] += aHit->getFlightTime();
+    itime[detNb] ++;
+    int PDG = aHit->getPDGCode();
+    if (PDG == 22) pdg[detNb] = 1;
+  }
+
+  for (int i = 0; i < nBEAM; i++) {
+    if (itime[i] > 0) {
+      time[i] /= itime[i];
+      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_PreampGain;
+      BeamHits.appendNew(BeamabortHit(i, edep[i], volt[i], time[i], pdg[i]));
+    }
+  }
+
   Event++;
 
 }
-
 //read tube centers, impulse response, and garfield drift data filename from BEAMABORT.xml
 void BeamDigitizerModule::getXMLData()
 {
@@ -103,13 +136,13 @@ void BeamDigitizerModule::getXMLData()
 
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-
-    BEAMCenter.push_back(TVector3(activeParams.getLength("BEAMpos_x"), activeParams.getLength("BEAMpos_y"),
-                                  activeParams.getLength("BEAMpos_z")));
+    BEAMCenter.push_back(TVector3(activeParams.getLength("z_beamabort"), activeParams.getLength("r_beamabort"),
+                                  activeParams.getLength("Phi")));
     nBEAM++;
   }
+  m_PreampGain = content.getDouble("PreampGain");
 
-  B2INFO("BeamDigitizer: Aquired beam locations and gas parameters");
+  B2INFO("BeamDigitizer: Aquired pin locations and gas parameters");
   B2INFO("              from BEAMABORT.xml. There are " << nBEAM << " BEAMs implemented");
 
 }

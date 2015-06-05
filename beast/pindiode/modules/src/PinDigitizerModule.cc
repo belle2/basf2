@@ -59,6 +59,7 @@ PinDigitizerModule::PinDigitizerModule() : Module()
   setDescription("Pindiode digitizer module");
 
   //Default values are set here. New values can be in PINDIODE.xml.
+  addParam("CrematGain", m_CrematGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4 * 1e12);
 
 }
 
@@ -85,13 +86,45 @@ void PinDigitizerModule::event()
 
   StoreArray<MCParticle> particles;
   StoreArray<PindiodeSimHit> PinSimHits;
-
+  StoreArray<PindiodeHit> PinHits;
   //Skip events with no PinSimHits, but continue the event counter
   if (PinSimHits.getEntries() == 0) {
     Event++;
     return;
   }
 
+  //Declare and initialze energy and time
+  double edep[nPIN];
+  double time[nPIN];
+  double itime[nPIN];
+  double volt[nPIN];
+  int pdg[nPIN];
+  for (int i = 0; i < nPIN; i++) {
+    edep[i] = 0;
+    time[i] = 0;
+    itime[i] = 0;
+    volt[i] = 0;
+    pdg[i] = 0;
+  }
+
+  int nentries = PinSimHits.getEntries();
+  for (int i = 0; i < nentries; i++) {
+    PindiodeSimHit* aHit = PinSimHits[i];
+    int detNb = aHit->getCellId();
+    edep[detNb] += aHit->getEnergyDep();
+    time[detNb] += aHit->getFlightTime();
+    itime[detNb] ++;
+    int PDG = aHit->getPDGCode();
+    if (PDG == 22) pdg[detNb] = 1;
+  }
+
+  for (int i = 0; i < nPIN; i++) {
+    if (itime[i] > 0) {
+      time[i] /= itime[i];
+      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_CrematGain;
+      PinHits.appendNew(PindiodeHit(i, edep[i], volt[i], time[i], pdg[i]));
+    }
+  }
 
   Event++;
 
@@ -103,11 +136,11 @@ void PinDigitizerModule::getXMLData()
 
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-
-    PINCenter.push_back(TVector3(activeParams.getLength("PINpos_x"), activeParams.getLength("PINpos_y"),
-                                 activeParams.getLength("PINpos_z")));
+    PINCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
+                                 activeParams.getLength("Phi")));
     nPIN++;
   }
+  m_CrematGain = content.getDouble("CrematGain");
 
   B2INFO("PinDigitizer: Aquired pin locations and gas parameters");
   B2INFO("              from PINDIODE.xml. There are " << nPIN << " PINs implemented");

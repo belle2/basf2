@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BeamabortSIMHIT_H
-#define BeamabortSIMHIT_H
+#ifndef BEAMABORTSIMHIT_H
+#define BEAMABORTSIMHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
 
@@ -31,7 +31,8 @@ namespace Belle2 {
   class BeamabortSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    BeamabortSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0, 0) {;}
+    BeamabortSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0,
+          0, 0) {;}
     //! Useful Constructor
     BeamabortSimHit(
       int CellId,            /**< Cell ID */
@@ -41,7 +42,8 @@ namespace Belle2 {
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position        /**< Position */
-    ): SimHitBase() {
+    ): SimHitBase()
+    {
       m_CellId = CellId;
       m_TrackId = TrackId;
       m_Pdg = Pdg;

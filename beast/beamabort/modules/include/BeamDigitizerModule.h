@@ -69,6 +69,8 @@ namespace Belle2 {
       int nBEAM = 0;
       /** BEAM coordinate */
       std::vector<TVector3> BEAMCenter;
+      /** Preamp gain */
+      double m_PreampGain;
       /** Event counter */
       int Event = 0;
 

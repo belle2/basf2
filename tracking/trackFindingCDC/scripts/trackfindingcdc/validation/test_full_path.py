@@ -58,8 +58,8 @@ class FullRun(StandardEventGenerationRun):
         # main_path.add_module(modules.CDCMCFiller())
         # main_path.add_module(ReconstructionPositionHarvester(output_file_name="reconstruction_position.root"))
         # main_path.add_module(HitCleaner())
-        # main_path.add_module(modules.CDCFitter(input_track_cands_store_array_name="TrackCands"))
-        # main_path.add_module(modules.CDCEventDisplay(full_display=False))
+        main_path.add_module(modules.CDCFitter(input_track_cands_store_array_name="TrackCands"))
+        main_path.add_module(modules.CDCEventDisplay(full_display=True))
 
         if self.show_not_fitted_tracks:
             main_path.add_module(TestingModule(track_store_array_name="TrackCands"))

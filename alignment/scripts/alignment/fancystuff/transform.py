@@ -45,11 +45,21 @@ class Transform(ProTool):
         :param name:    Name
         :param n_bins:  Binning for the transformations
         """
+        # Binning in x, will be set automatically
         self.n_bins = n_bins
+
+        # Maximum of the fitted distribution
         self.max = 0
+
+        # Minimum of the fitted distribution
         self.min = 0
+
+        # Status flag
         self.is_processed = False
+
+        # Name of the transformation
         self.name = name
+
         ProTool.__init__(self, "Transform." + self.name)
 
     def _initialise(self, x):
@@ -177,6 +187,8 @@ class CDF(Transform):
         :param args: None
         """
         Transform.__init__(self, "CDF", *args)
+
+        # Spline, fitting the CDF
         self.spline = None
 
     def _fit(self, x, y=None):
@@ -234,6 +246,8 @@ class ToFlat(Transform):
         :param args: None
         """
         Transform.__init__(self, "Flat", *args)
+
+        # Transformation with the CDF
         self.cdf = CDF(*args)
 
     def _fit(self, x, y=None):

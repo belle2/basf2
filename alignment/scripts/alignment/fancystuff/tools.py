@@ -144,9 +144,17 @@ class ProfilePlot():
             x_axis = transform.get_optimal_bin_size(len(x))
         if n_bins is not None:
             x_axis = n_bins
+
+        # Binning in x
         _, self.x_axis = np.histogram(x, x_axis)
+
+        # Mean of y in bin x
         self.mean = []
+
+        # Std of Mean y in bin x
         self.err = []
+
+        # Matplotlib label for the plot
         self.label = label
 
         # Calculating the Profile histogram

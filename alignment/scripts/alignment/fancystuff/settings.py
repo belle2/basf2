@@ -32,8 +32,9 @@ class ProTool(object):
 
     def __init__(self, name):
         """ init function
-        :param name: name of the class
+        :param name: Name of the class
         """
+        # Name of the class
         self.name = name
 
     @property

@@ -98,14 +98,15 @@ class CDCFullFinder(metamodules.PathModule):
     """
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
-                 tmva_cut=0.1):
+                 tmva_cut=0.1, stereo_tmva_cut=0.9):
 
         modules = [
             CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
                 debug_output=False), CDCStereoSegmentTrackMatcher(
-                    output_track_cands_store_array_name=output_track_cands_store_array_name, filter="tmva")]
+                    output_track_cands_store_array_name=output_track_cands_store_array_name, filter="tmva",
+                    tmva_cut=stereo_tmva_cut)]
 
         super(CDCFullFinder, self).__init__(modules=modules)
 
@@ -371,6 +372,8 @@ class CDCFitter(metamodules.PathModule):
                                                                         GFTracksColName=output_tracks_store_array_name,
                                                                         BuildBelle2Tracks=False)
 
+        gen_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
+
         track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder',
                                                                     GFTracksColName=output_tracks_store_array_name,
                                                                     GFTrackCandidatesColName=input_track_cands_store_array_name)
@@ -393,7 +396,7 @@ class CDCEventDisplay(metamodules.WrapperModule):
 
         if full_display:
             display_module = StandardEventGenerationRun.get_basf2_module("Display", showTrackCandidates=True,
-                                                                         showTrackLevelObjects=False, showMCInfo=False,
+                                                                         showTrackLevelObjects=True, showMCInfo=False,
                                                                          hideObjects=["Unassigned RecoHits"])
         else:
             display_module = CDCSVGDisplayModule()

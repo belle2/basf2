@@ -142,7 +142,8 @@ void
 TRGGDL::update(bool) {
     TRGDebug::enterStage("TRGGDL update");
 
-    cout << TRGDebug::tab() << "do nothing..." << endl;
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << name() << " do nothing..." << endl;
     
     TRGDebug::leaveStage("TRGGDL update");
 }
@@ -165,7 +166,8 @@ void
 TRGGDL::fastSimulation(void) {
     TRGDebug::enterStage("TRGGDL fastSim");
 
-    cout << TRGDebug::tab() << "do nothing..." << endl;
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << name() << " do nothing..." << endl;
     
     TRGDebug::leaveStage("TRGGDL fastSim");
 }
@@ -272,6 +274,7 @@ TRGGDL::firmwareSimulation(void) {
                                 _clock,
                                 * _tsb,
                                 3,
+                                7,
                                 TRGGDL::timingDecision);
 
     if (TRGDebug::level()) {

@@ -43,6 +43,7 @@ class TRGCDCSegmentHit;
 class TRGCDCFrontEnd;
 class TRGCDCMerger;
 class TRGCDCTSFBoard;
+class TRGCDCTracker2D;
 class TRGCDCTrackSegmentFinder;
 class TRGCDCPerfectFinder;
 class TRGCDCHoughFinder;
@@ -386,9 +387,10 @@ class TRGCDC {
     const TRGCDCMerger * merger(unsigned id) const;
 
     /// returns a TSF board.
-    //const TRGCDCTSFBoard * tsfboard(unsigned id) const;
     const TRGCDCTrackSegmentFinder * tsfboard(unsigned id) const;
 
+    /// returns a 2D tracker board.
+    const TRGCDCTracker2D * tracker2D(unsigned id) const;
 
   private:
 
@@ -572,8 +574,10 @@ class TRGCDC {
     std::vector<TRGCDCMerger *> _mergers;
 
     /// CDC trigger tsf boards.
-//    std::vector <TRGCDCTSFBoard *> _tsfboards;
     std::vector <TRGCDCTrackSegmentFinder *> _tsfboards;
+
+    /// CDC 2D finder boards.
+    std::vector <TRGCDCTracker2D *> _tracker2Ds;
 
     /// Track Segement Finder.
     TRGCDCTrackSegmentFinder* _tsFinder;
@@ -594,7 +598,6 @@ class TRGCDC {
     TRGCDCFitter3D * _fitter3D;
 
     /// EventTime
-//  TRGCDCEventTime *_eventTime;
     std::vector<TRGCDCEventTime *> _eventTime;
 
     /// Event number
@@ -867,16 +870,16 @@ TRGCDC::merger(unsigned a) const {
     return _mergers[a];
 }
 
-//inline
-//const TRGCDCTSFBoard *
-//TRGCDC::tsfboard(unsigned a) const{
-//    return _tsfboards[a];
-//}
-
 inline
 const TRGCDCTrackSegmentFinder *
 TRGCDC::tsfboard(unsigned a)const{
 	return _tsfboards[a];
+}
+
+inline
+const TRGCDCTracker2D *
+TRGCDC::tracker2D(unsigned a)const{
+	return _tracker2Ds[a];
 }
 
 inline

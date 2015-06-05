@@ -46,6 +46,7 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/TrackSegmentFinder.h"
+#include "trg/cdc/Tracker2D.h"
 #include "trg/cdc/PerfectFinder.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Hough3DFinder.h"
@@ -1952,7 +1953,7 @@ TRGCDC::neighbor(const TCWire & w0, const TCWire & w1) const {
 
 void
 TRGCDC::simulate(void) {
-    //cout << "               -------------A TRGCDC is simulated-------------"<< endl; //JB: Please use TRGDebug
+
     TRGDebug::enterStage("TRGCDC simulate");
 
     const bool fast = (_simulationMode & 1);
@@ -1962,13 +1963,12 @@ TRGCDC::simulate(void) {
     if (firm)
         firmwareSimulation();
 
-    //cout << "               -------------End of simulate-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC simulate");
 }
 
 void
 TRGCDC::fastSimulation(void) {
-    //cout << "               -------------A TRGCDC is fastsimulated-------------"<< endl; //JB: Please use TRGDebug
+
     TRGDebug::enterStage("TRGCDC fastSimulation");
 
 #ifdef TRGCDC_DISPLAY
@@ -2409,19 +2409,18 @@ TRGCDC::fastSimulation(void) {
 
     TRGDebug::leaveStage("TRGCDC fastSimulation");
     return;
-    //cout << "               -------------End of fastsimulate-------------"<< endl; //JB: Please use TRGDebug
 }
 
 void
 TRGCDC::firmwareSimulation(void) {
 
-    //cout << "               -------------A TRGCDC is firmwaresimulated -------------"<< endl; //JB: Please use TRGDebug
-    TRGDebug::enterStage("TRGCDC firmwareSimulation");
-
-    //...Wire level simulation is in update().
 #ifdef TRGCDC_DISPLAY
     D->beginningOfEvent();
 #endif
+
+    TRGDebug::enterStage("TRGCDC firmwareSimulation");
+
+    //...Wire level simulation is in update().
 
     //...Front ends...
     const unsigned nFronts = _fronts.size();
@@ -2435,59 +2434,20 @@ TRGCDC::firmwareSimulation(void) {
         _fronts[i]->simulate();
     }
 
-    //// Get results
-    //vector<TRGSignalBundle*> feSignalBundle(2);
-    //feSignalBundle[0] = _fronts[254]->getOSB();
-    //feSignalBundle[1] = _fronts[278]->getOSB();
-    //// Print results
-    //for(int iFE=0; iFE<feSignalBundle.size(); iFE++){
-    //  cout<<"FE"<<iFE<<" output"<<endl;
-    //  vector<int> changeHistory = feSignalBundle[iFE]->stateChanges();
-    //  for(int iHistory=0; iHistory<changeHistory.size(); iHistory++){
-    //    int t_time = changeHistory[iHistory];
-    //    TRGState t_feState = feSignalBundle[iFE]->state(t_time);
-    //    string t_feOutput = t_feState;
-    //    cout<<"["<<t_time<<"]: "<<t_feOutput<<endl;
-    //  }
-    //}
-
-    //// Get TRG output
-    //TObjString rootTRGRawInformation;
-    //for(int iWindow=0; iWindow<m_rootTRGRawInformation->GetEntriesFast(); iWindow++){
-    //  rootTRGRawInformation = *(TObjString*)m_rootTRGRawInformation->At(iWindow);
-    //  stringstream t_trgRawInformation; 
-    //  t_trgRawInformation << rootTRGRawInformation.String();
-    //  cout<<"["<<iWindow<<"]: "<<t_trgRawInformation.str().substr(0,64)<<endl;
-    //}
-
-    //// Compare results
-    //for(int iWindow=0; iWindow<m_rootTRGRawInformation->GetEntriesFast(); iWindow++){
-    //  // TRG Firmware
-    //  rootTRGRawInformation = *(TObjString*)m_rootTRGRawInformation->At(iWindow);
-    //  stringstream t_trgRawInformation; 
-    //  t_trgRawInformation << rootTRGRawInformation.String();
-    //  // TRG simulation. One clock is used as simulated calculation time.
-    //  string t_feOutput = feSignalBundle[0]->state(iWindow+1);
-    //  //if(t_trgRawInformation.str().substr(0,64) != t_feOutput)
-    //  if(t_trgRawInformation.str().substr(5,56) != t_feOutput.substr(5,56)) {
-    //    cout<<"[Error] Firmware and TSIM do not match"<<endl;
-    //    //cout<<"Firmware ["<<iWindow<<"]: "<<t_trgRawInformation.str().substr(0,64)<<endl;
-    //    //cout<<"TSIM     ["<<iWindow<<"]: "<<t_feOutput<<endl;
-    //    cout<<"Firmware ["<<iWindow<<"]: "<<t_trgRawInformation.str().substr(8,56)<<endl;
-    //    cout<<"TSIM     ["<<iWindow+1<<"]: "<<t_feOutput.substr(8,56)<<endl;
-    //  }
-    //}
-
     //...Mergers...
     const unsigned nMergers = _mergers.size();
     for (unsigned i = 0; i < nMergers; i++) {
         _mergers[i]->simulate(); 
     }
 
+    // unsigned oldLevel = TRGDebug::level();
+    // TRGDebug::level(1);
+
     //...TSFs...
     const unsigned nTSFBoards = _tsfboards.size();
     for (unsigned i=0;i<nTSFBoards; i++){
 	_tsfboards[i]->simulateBoard();
+        _tsfboards[i]->simulateFor2D();
     }
 
     //...Event Time... In ns scale. 
@@ -2503,6 +2463,14 @@ TRGCDC::firmwareSimulation(void) {
     }
     //cout<< endl;
     //cout<<"Event timing: "<<t_eventTime<<endl;
+
+    //...Tracker2D...
+    const unsigned nTracker2Ds = _tracker2Ds.size();
+    for (unsigned i = 0; i < nTracker2Ds; i++) {
+        _tracker2Ds[i]->simulate();
+    }
+
+//    TRGDebug::level(oldLevel);
 
 #ifdef TRGCDC_DISPLAY
     dump("hits");
@@ -2532,14 +2500,12 @@ TRGCDC::firmwareSimulation(void) {
     //     }
 #endif
 
-    //cout << "               -------------End of firmwaresimulate-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC firmwareSimulation");
 }
 
 void
 TRGCDC::configure(void) {
 
-    //cout << "               -------------A TRGCDC is configured-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC configure");
 
     //...Open configuration file...
@@ -2553,77 +2519,6 @@ TRGCDC::configure(void) {
     //...Read configuration data...
     char b[800];
     unsigned lines = 0;
-    // string cdcVersion = "";
-    // string configVersion = "";
-
-
-    /*
-    // A temporary one to list the content of the configuration file
-    unsigned fbase=0, mbase=0, mno=0;
-    while (! infile.eof()) {
-    infile.getline(b, 800);
-    const string l(b);
-    string cdr = l;
-
-    bool skip = false;
-    unsigned wid = 0;
-    unsigned lid = 0;
-    unsigned fid = 0;
-    unsigned mid = 0;
-    unsigned tid = 0;
-    for (unsigned i = 0; i < 5; i++) {
-    const string car = TRGUtil::carstring(cdr);
-    cdr = TRGUtil::cdrstring(cdr);
-
-    if (car == "#") {
-    cout << l << endl;
-    skip = true;
-    break;
-    } else if (car == "CDC") {
-    cout << l << endl;
-    skip = true;
-    break;
-    }
-
-    if (i == 0) {
-    wid = atoi(car.c_str());
-    } else if (i == 1) {
-    lid = atoi(car.c_str());
-    } else if (i == 2) {
-    fid = atoi(car.c_str());
-    } else if (i == 3) {
-    mid = atoi(car.c_str());
-    } else if (i == 4) {
-    tid = atoi(car.c_str());
-    }
-    }
-    if (!skip) {
-    int  delta_fid = 0, newmid=99999;
-    if  (mid != 99999) {   // modify mid from original config file to have 2 FE to 1 merger unit
-    switch (tid) {
-    case 0: fbase = 10;      mbase = 0;       mno = 10; break;
-    case 1: fbase = 30;      mbase = 10;      mno = 10; break;
-    case 2: fbase = 50;      mbase = 20;      mno = 12; break;
-    case 3: fbase = 74;      mbase = 32;      mno = 14; break;
-    case 4: fbase = 102;     mbase = 46;      mno = 16; break;
-    case 5: fbase = 134;     mbase = 62;      mno = 18; break;
-    case 6: fbase = 170;     mbase = 80;      mno = 20; break;
-    case 7: fbase = 210;     mbase = 100;     mno = 22; break;
-    case 8: fbase = 254;     mbase = 122;     mno = 24; break;
-    default: cout << "tid/mid = " << tid << " / " << mid << " ---> somthing wrong!!!!" << endl; break;
-    }
-    delta_fid = fid - fbase;
-    if (delta_fid >= mno) delta_fid -= mno;
-    if ( (delta_fid<0) || ( delta_fid>mno) ) cout <<  "Mid calculation wrong at layer/FE = " << lid << "/" << fid << endl;
-    newmid = delta_fid + mbase;
-    }
-    //	  cout  << "     "  <<  wid << "        " << lid << "       " << fid << "       "  << mid << "       " << newmid << "       " << tid << endl;
-    cout  << "      "  <<  wid << "          " << lid << "          " << fid << "       "  << newmid << "       " << tid << endl;
-    mid = newmid;
-    }
-    }
-    */
-
     while (! infile.eof()) {
         infile.getline(b, 800);
         const string l(b);
@@ -2644,12 +2539,8 @@ TRGCDC::configure(void) {
                 skip = true;
                 break;
             } else if (car == "CDC") {
-	      // if (l.find("CDC Wire Config Version") != string::npos)
-	      // cdcVersion = l;
-	      // else if (l.find("CDC TRG Config Version") != string::npos)
-	      // configVersion = l;
-	      skip = true;
-	      break;
+                skip = true;
+                break;
             }
 
             if (i == 0) {
@@ -2669,8 +2560,6 @@ TRGCDC::configure(void) {
             continue;
         if (lines != wid)
             continue;
-
-	//cout << " wireid " << wid << " layerid " << lid << " Front-end id" << fid << " Merger id " << mid << endl;
 
         //...Make a front-end board if necessary...
         bool newFrontEnd = false;
@@ -2695,19 +2584,16 @@ TRGCDC::configure(void) {
             }
             f = new TCFrontEnd(name, t, _clock, _clockD, _clockUser3125);
 	
-//	cout << "New FE name: " << name << endl;
-
             _fronts.push_back(f);
         }
         f->push_back(_wires[wid]);
 
-//	cout << "Wire # " << wid << "is pushed back into FE " << f->name() << endl;
-        //...Make a merger board if necessary...
-        // 2013,0908: physjg: I think this should be done only when a new frontboard is created.
-        //                    i.e., inlcuded in the if(!f) { .... } block.
+        //...Make a merger board if necessary...  2013,0908: physjg: I
+        // think this should be done only when a new frontboard is
+        // created.  i.e., inlcuded in the if(!f) { .... } block.
+        // Or I can put this part inside the new FrontEnd creation
+        // part, well, seems not good in coding
         //
-        // Or I can put this part inside the new FrontEnd creation part, well, seems not good in coding
-
 	bool newMerger=false;
         TCMerger * m = 0;
         if (newFrontEnd) {
@@ -2741,23 +2627,20 @@ TRGCDC::configure(void) {
                 m->appendInput(ch);
             }
         }
-	
+
+        //...Make a TSF board if necessary...
 	if (newMerger){
-//	  TCTSFBoard * t=0;
             TSFinder * t=0;
             if(tid !=99999){
                 if(tid<_tsfboards.size())
                     t=_tsfboards[tid];
                 if(!t){
-                    const string name = "CDCTSFBoard_"+TRGUtil::itostring(tid);
+                    const string name = "CDCTSFBoard"+TRGUtil::itostring(tid);
                     TSFinder::boardType tt=TSFinder::unknown;
                     if(_wires[wid]->superLayerId()==0)
-                        //tt=TCTSFBoard::innerType;
                         tt=TSFinder::innerType;
                     else
-                        //tt=TCTSFBoard::outerType;
                         tt=TSFinder::outerType;
-//	      t = new TCTSFBoard(name,
                     t = new TSFinder(*this,
                                      name,
                                      tt,
@@ -2766,7 +2649,6 @@ TRGCDC::configure(void) {
                                      _clockUser3125,
                                      _clockUser6250,
                                      _tsSL[tid]);
-                    //  t->initialize(_innerTSLUTFilename, _outerTSLUTFilename);
                     _tsfboards.push_back(t);
                 }
                 t->push_back(m);
@@ -2784,7 +2666,43 @@ TRGCDC::configure(void) {
     }
     infile.close();
 
-    //cout << "               -------------End of configure-------------"<< endl; //JB: Please use TRGDebug
+    //...Make a 2D finder...
+    for (unsigned i = 0; i < 4; i++) {
+        const string name = "CDC2DBoard" + TRGUtil::itostring(i);
+        TCTracker2D * t = new TCTracker2D(name,
+                                          _clock,
+                                          _clockD,
+                                          _clockUser6250,
+                                          _clockUser6250);
+        _tracker2Ds.push_back(t);
+        for (unsigned j = 0; j < 9; j++) {
+            TCTSFinder * tsf = _tsfboards[j];
+            const string n = tsf->name() + string("-") + t->name();
+            TRGChannel * ch = new TRGChannel(n, * tsf, * t);
+            tsf->appendOutput(ch);
+            t->appendInput(ch);
+        }
+        const string n = t->name() + string("-") + "CDC3DBoard" +
+            TRGUtil::itostring(i);
+        TRGChannel * ch = new TRGChannel(n, * t, * t);
+        // last (* t) should be 3D tracker in future
+        t->appendOutput(ch);
+    }
+
+    //...For debug...
+    if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << "TSF configuration" << endl;
+        for (unsigned i = 0; i < _tsfboards.size(); i++) {
+            const TSFinder & t = * _tsfboards[i];
+            t.dump("detail", TRGDebug::tab() + "    ");
+        }
+        cout << TRGDebug::tab() << "Tracker2D configuration" << endl;
+        for (unsigned i = 0; i < _tracker2Ds.size(); i++) {
+            const TCTracker2D & t = * _tracker2Ds[i];
+            t.dump("detail", TRGDebug::tab() + "    ");
+        }
+    }
+
     TRGDebug::leaveStage("TRGCDC configure");
 }
 

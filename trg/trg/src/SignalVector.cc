@@ -62,9 +62,22 @@ TRGSignalVector::~TRGSignalVector() {
 void
 TRGSignalVector::dump(const string & msg,
 		      const string & pre) const {
+
     cout << pre << _name << ":" << size() << " signal(s)" << endl;
-    for (unsigned i = 0; i < size(); i++)
-	(* this)[i].dump(msg, "    " + pre);
+
+    const bool det = msg.find("detail") != string::npos;
+    const bool clk = msg.find("clock") != string::npos;
+
+    if (det || clk)
+	cout << pre << ":clock=" << _clock->name();
+
+    if (det)
+        for (unsigned i = 0; i < size(); i++)
+            (* this)[i].dump(msg, "    " + pre);
+    else
+        for (unsigned i = 0; i < size(); i++)
+            if ((* this)[i].active())
+                (* this)[i].dump(msg, "    " + pre);
 }
 
 // TRGSignalVector
@@ -112,6 +125,7 @@ TRGSignalVector::stateChanges(void) const {
 	    last = j;
 	}
     }
+
     return list2;
 }
 
@@ -147,5 +161,19 @@ TRGSignalVector::set(const TRGState & s, int cp) {
     }
     return * this;
 }
+
+bool
+TRGSignalVector::operator==(const TRGSignalVector & a) const {
+    if (size() != a.size())
+        return false;
+
+    for (unsigned i = 0; i < size(); i++) {
+        if ((* this)[i] != a[i])
+            return false;
+    }
+
+    return true;
+}
+
 
 } // namespace Belle2

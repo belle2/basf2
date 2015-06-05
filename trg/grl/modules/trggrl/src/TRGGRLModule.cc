@@ -79,7 +79,7 @@ TRGGRLModule::~TRGGRLModule() {
 void
 TRGGRLModule::initialize() {
 
-    TRGDebug::level(_debugLevel);
+//  TRGDebug::level(_debugLevel);
 
     if (TRGDebug::level()) {
 	cout << "TRGGRLModule::initialize ... options" << endl;

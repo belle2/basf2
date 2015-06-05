@@ -42,6 +42,10 @@ class TRGChannel {
     /// returns name.
     const std::string & name(void) const;
 
+    /// returns signal.
+    // const TRGSignalBundle * signal(void) const;
+    TRGSignalBundle * signal(void) const;
+
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
@@ -50,7 +54,8 @@ class TRGChannel {
   public:// Modifiers.
 
     /// sets input data.
-    const TRGSignalBundle * input(const TRGSignalBundle *);
+    // const TRGSignalBundle * signal(const TRGSignalBundle *);
+    TRGSignalBundle * signal(TRGSignalBundle *);
 
   private:
 
@@ -64,7 +69,7 @@ class TRGChannel {
     const TRGBoard & _receiver;
 
     /// Input data.
-    const TRGSignalBundle * _data;
+    TRGSignalBundle * _data;
 };
 
 //-----------------------------------------------------------------------------
@@ -76,9 +81,15 @@ TRGChannel::name(void) const {
 }
 
 inline
-const TRGSignalBundle *
-TRGChannel::input(const TRGSignalBundle * a) {
+TRGSignalBundle *
+TRGChannel::signal(TRGSignalBundle * a) {
     _data = a;
+    return _data;
+}
+
+inline
+TRGSignalBundle *
+TRGChannel::signal(void) const {
     return _data;
 }
 

@@ -173,7 +173,9 @@ TRGClock::clockCounter(void) const {
         TRGSignal s("tmp", * this);
 
         //...From 0 to 1280*5...
-        for (int j = 0; j < 1280*5; j++) {
+//      const int maxN = 1280 * 5;
+        const int maxN = 400;
+        for (int j = 0; j < maxN; j++) {
             if (((j - cicle / 2) % cicle) == 0)
                 s.set(j, j + cicle / 2);
         }

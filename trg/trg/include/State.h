@@ -117,6 +117,9 @@ class TRGState {
     /// Copy operator.
     bool operator<(const TRGState &) const;
 
+    /// shifts bits.
+    TRGState & shift(unsigned i);
+
   public:// Utilities
 
     /// Coverts from bool array to unsigned.
@@ -319,6 +322,24 @@ TRGState::toUnsigned(unsigned n, const bool * a) {
 	}
     }
     return b;
+}
+
+inline
+TRGState &
+TRGState::shift(unsigned a) {
+
+    if (! active()) return * this;
+
+    if (a == 0) return * this;
+
+    for (int i = _size - 1; i >= 0; --i) {
+        if (i < int(a))
+            set(i, false);
+        else
+            set(i, active(i - a));
+    }
+
+    return * this;
 }
 
 } // namespace Belle2

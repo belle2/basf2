@@ -12,8 +12,9 @@
 //-----------------------------------------------------------------------------
 
 #include <iostream>
-#include "trg/trg/Board.h"
 #include "trg/trg/Clock.h"
+#include "trg/trg/Board.h"
+#include "trg/trg/Channel.h"
 
 using namespace std;
 
@@ -39,14 +40,22 @@ TRGBoard::~TRGBoard() {
 void
 TRGBoard::dump(const string & msg, const string & pre) const {
     cout << pre << _name;
+    const string tab = pre + "    ";
     if (msg.find("detail") != string::npos) {
 	cout << endl;
-	cout << pre << "[System clock:" << _clockSystem->name() << "]" << endl;
-	cout << pre << "[Data clock:" << _clockData->name() << "]" << endl;
-	cout << pre << "[Input user clock:" << _clockUserInput->name() << "]"
-	     << endl;
-	cout << pre << "[Output user clock:" << _clockUserOutput->name()
-	     << "]";
+	cout << pre << "System clock:" << _clockSystem->name() << endl;
+	cout << pre << "Data clock:" << _clockData->name() << endl;
+	cout << pre << "Input user clock:" << _clockUserInput->name() << endl;
+	cout << pre << "Output user clock:" << _clockUserOutput->name()
+             << endl;
+        cout << pre << "Input channels" << endl;
+        for (unsigned i = 0; i < _inputChannels.size(); i++) {
+            cout << tab << _inputChannels[i]->name() << endl;
+        }
+        cout << pre << "Output channels" << endl;
+        for (unsigned i = 0; i < _outputChannels.size(); i++) {
+            cout << tab << _outputChannels[i]->name() << endl;
+        }
     }
     cout << endl;
 }

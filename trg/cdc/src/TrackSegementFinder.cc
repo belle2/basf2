@@ -18,6 +18,7 @@
 #include "TVectorD.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/State.h"
+#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Cell.h"
@@ -37,6 +38,10 @@
 using namespace std;
 
 namespace Belle2 {
+
+//...For debug : yi...
+vector<TRGSignalVector * > dbgIn;
+vector<TRGSignalVector * > dbgOut;
 
 TRGCDCTrackSegmentFinder::TRGCDCTrackSegmentFinder(const TRGCDC & TRGCDC,
                                                    bool makeRootFile,
@@ -194,7 +199,7 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
     const TRGClock &dClock = TRGCDC::getTRGCDC()->dataClock();
 
     //... Make input signal bundle
-    TRGSignalVector input(name()+"inputMerger",dClock);
+    TRGSignalVector inputv(name()+"inputMerger",dClock);
     const string ni= name()+"InputSignalBundle";
 //    _tisb = new TRGSignalBundle(ni, dClock);
 
@@ -207,8 +212,10 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
     vector <int> tmpCTimeListT;
     vector <int> changeTimeListT;
     inputM.resize((*this).size());
-    for(unsigned i=0;i<(*this).size();i++){
-	inputM[i] = new TRGSignalVector(*( (*(*this)[i]->output())[0]));
+//yi for(unsigned i=0;i<(*this).size();i++){
+    for (unsigned i = 0; i < nInput(); i++) {
+//yi 	inputM[i] = new TRGSignalVector(*( (*(*this)[i]->output())[0]));
+ 	inputM[i] = new TRGSignalVector(* (* input(i)->signal())[0]);
     }
 
 //    TRGSignalVector *inputM= new TRGSignalVector(*( (*(*this)[0]->output())[0]));
@@ -216,13 +223,13 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
     for (unsigned i=0;i<inputM[0]->size();i++){
 
       TRGSignal msig = (*(inputM[0]))[i];
-      input += msig;
+      inputv += msig;
     }
-  
+
     vector<TRGSignalVector*> separateTS;
-    TRGSignalVector* clockCounter = new TRGSignalVector(input[236]);
+    TRGSignalVector* clockCounter = new TRGSignalVector(inputv[236]);
     for(int i=0;i<8;i++){
-      clockCounter->push_back(input[236+i]);
+      clockCounter->push_back(inputv[236+i]);
     }
     separateTS.resize(16);
     //separateTS.resize((*this).size()*16);
@@ -231,59 +238,59 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
     findOUTEvt.resize(nTS);
     if(type()==outerType){
       for(int i=0;i<nTS;i++){
-        separateTS[i]= new TRGSignalVector(input[i+208]);
+        separateTS[i]= new TRGSignalVector(inputv[i+208]);
        /// HitMap
         if(i==0){
-  	  separateTS[i]->push_back(input[255]);
+  	  separateTS[i]->push_back(inputv[255]);
         } else{
-          separateTS[i]->push_back(input[i-1]);
+          separateTS[i]->push_back(inputv[i-1]);
         }
-        separateTS[i]->push_back(input[i]);
+        separateTS[i]->push_back(inputv[i]);
         if(i==nTS){
-          separateTS[i]->push_back(input[255]);
+          separateTS[i]->push_back(inputv[255]);
         }
         else{
-          separateTS[i]->push_back(input[i+1]);
+          separateTS[i]->push_back(inputv[i+1]);
         }
         if(i==0){
-          separateTS[i]->push_back(input[255]);
+          separateTS[i]->push_back(inputv[255]);
         }
         else{
-        separateTS[i]->push_back(input[i+15]);
+        separateTS[i]->push_back(inputv[i+15]);
         }
-        separateTS[i]->push_back(input[i+16]);
-        separateTS[i]->push_back(input[i+32]);
+        separateTS[i]->push_back(inputv[i+16]);
+        separateTS[i]->push_back(inputv[i+32]);
         if(i==0){
-          separateTS[i]->push_back(input[255]);
+          separateTS[i]->push_back(inputv[255]);
         }
         else{
-          separateTS[i]->push_back(input[i+47]);
+          separateTS[i]->push_back(inputv[i+47]);
         }
-        separateTS[i]->push_back(input[i+48]);
+        separateTS[i]->push_back(inputv[i+48]);
         if(i==0){
-          separateTS[i]->push_back(input[255]);
+          separateTS[i]->push_back(inputv[255]);
         }
         else{
-          separateTS[i]->push_back(input[i+63]);
+          separateTS[i]->push_back(inputv[i+63]);
         }
-        separateTS[i]->push_back(input[i+64]);
+        separateTS[i]->push_back(inputv[i+64]);
         if(i==nTS){
-          separateTS[i]->push_back(input[255]);
+          separateTS[i]->push_back(inputv[255]);
         }
         else{
-          separateTS[i]->push_back(input[i+65]);
+          separateTS[i]->push_back(inputv[i+65]);
         }
   
   /// priority timing
-        separateTS[i]->push_back(input[4*i+80]);
-        separateTS[i]->push_back(input[4*i+81]);
-        separateTS[i]->push_back(input[4*i+82]);
-        separateTS[i]->push_back(input[4*i+83]);
+        separateTS[i]->push_back(inputv[4*i+80]);
+        separateTS[i]->push_back(inputv[4*i+81]);
+        separateTS[i]->push_back(inputv[4*i+82]);
+        separateTS[i]->push_back(inputv[4*i+83]);
   /// fastest timing
-        separateTS[i]->push_back(input[4*i+144]);
-        separateTS[i]->push_back(input[4*i+145]);
-        separateTS[i]->push_back(input[4*i+146]);
-        separateTS[i]->push_back(input[4*i+147]);
+        separateTS[i]->push_back(inputv[4*i+144]);
+        separateTS[i]->push_back(inputv[4*i+145]);
+        separateTS[i]->push_back(inputv[4*i+146]);
+        separateTS[i]->push_back(inputv[4*i+147]);
   /// clock counter part
         const TRGSignalVector & cc = dClock.clockCounter();
 //      cc.dump();
@@ -307,6 +314,10 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
         if(ee.size()){
           tmpCTimeListE.insert(tmpCTimeListE.end(),ee.begin(),ee.end());
         }
+
+        //...iw for debug...
+        dbgIn.push_back(separateTS[i]);
+        dbgOut.push_back(findOUTTrack[i]);
       }
 
       for (unsigned i=0; i<tmpCTimeListT.size();i++){
@@ -366,7 +377,7 @@ void TRGCDCTrackSegmentFinder::simulateBoard(void){
 
 vector <TRGSignalVector*>
 TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
-   
+
 //variables for common
   const string na = "TSCandidate" + TRGUtilities::itostring(tsid) + " in " + name();
   TCSegment * tsi = _tsSL[tsid];
@@ -472,6 +483,10 @@ TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid){
   result.push_back(resultE);
 
   delete [] LUTValue;
+  delete Hitmap;
+  delete pTime;
+  delete fTime;
+
   return result;
 }
 
@@ -1020,4 +1035,324 @@ void TRGCDCTrackSegmentFinder::saveNNTSInformation(std::vector<TRGCDCSegment* >&
   TRGCDCTrackSegmentFinder::push_back(const TRGCDCMerger *a){
     std::vector<const TRGCDCMerger *>::push_back(a);
   }
+
+
+void TRGCDCTrackSegmentFinder::simulateFor2D(void){
+
+    if (_type == innerType)
+        return;
+
+    const string sn = "TSF::simulateFor2D : " + name();
+    TRGDebug::enterStage(sn);
+
+    //...Delete old objects...
+    for (unsigned i = 0; i < 4; i++) {
+        if (output(i))
+            if (output(i)->signal())
+                delete output(i)->signal();
+    }
+    for (unsigned i = 0; i < _tsfIn.size(); i++) {
+        delete _tsfIn[i];
+    }
+    _tsfIn.clear();
+    for (unsigned i = 0; i < _tsfOut.size(); i++) {
+        delete _tsfOut[i];
+    }
+    _tsfOut.clear();
+    for (unsigned i = 0; i < _toBeDeleted.size(); i++) {
+        delete _toBeDeleted[i];
+    }
+    _toBeDeleted.clear();
+
+    //...Loop over mergers to create a super layer hit map...
+    //   Edges on Merger data are not taken into account
+    vector<TRGSignal * > hitMap[5];
+    vector<TRGSignal * > priMap;
+    vector<TRGSignal * > fasMap;
+    vector<TRGSignal * > secMap;
+
+    for (unsigned m = 0; m < nInput(); m++) {
+        TRGSignalBundle * b = input(m)->signal();
+
+        for (unsigned i = 0; i < 16; i++) {
+            for (unsigned j = 0; j < 5; j++) {
+                hitMap[j].push_back(& ((* b)[0][0][j * 16 + i]));
+            }
+            secMap.push_back(& ((* b)[0][0][208 + i]));
+            priMap.push_back(& ((* b)[0][0][80 + i * 4]));
+            priMap.push_back(& ((* b)[0][0][80 + i * 4 + 1]));
+            priMap.push_back(& ((* b)[0][0][80 + i * 4 + 2]));
+            priMap.push_back(& ((* b)[0][0][80 + i * 4 + 3]));
+            fasMap.push_back(& ((* b)[0][0][144 + i * 4]));
+            fasMap.push_back(& ((* b)[0][0][144 + i * 4 + 1]));
+            fasMap.push_back(& ((* b)[0][0][144 + i * 4 + 2]));
+            fasMap.push_back(& ((* b)[0][0][144 + i * 4 + 3]));
+        }
+    }
+
+    //...Storage preparation...
+    const unsigned nTSF = nInput() * 16;
+    vector<TRGSignalVector * > trker[4];
+    vector<int> tsfStateChanges;
+//    const TRGSignalVector & cc = clockData().clockCounter();
+
+    //...Form a TSF...
+    for (unsigned t = 0; t < nTSF; t++) {
+
+        const string n = name() + "-" + TRGUtilities::itostring(t);
+        TRGSignalVector * s = new TRGSignalVector(n, clockData());
+        _tsfIn.push_back(s);
+
+        s->push_back(* secMap[t]);
+
+        if (t == 0) {
+            s->push_back(* (hitMap[0][nTSF - 1]));
+            s->push_back(* (hitMap[0][0]));
+            s->push_back(* (hitMap[0][1]));
+            s->push_back(* (hitMap[1][nTSF - 1]));
+            s->push_back(* (hitMap[1][0]));
+            s->push_back(* (hitMap[2][0]));
+            s->push_back(* (hitMap[3][nTSF - 1]));
+            s->push_back(* (hitMap[3][0]));
+            s->push_back(* (hitMap[4][nTSF - 1]));
+            s->push_back(* (hitMap[4][0]));
+            s->push_back(* (hitMap[4][1]));
+        }
+        else if (t == (nTSF - 1)) {
+            s->push_back(* (hitMap[0][nTSF - 2]));
+            s->push_back(* (hitMap[0][nTSF - 1]));
+            s->push_back(* (hitMap[0][0]));
+            s->push_back(* (hitMap[1][nTSF - 2]));
+            s->push_back(* (hitMap[1][nTSF - 1]));
+            s->push_back(* (hitMap[2][nTSF - 1]));
+            s->push_back(* (hitMap[3][nTSF - 2]));
+            s->push_back(* (hitMap[3][nTSF - 1]));
+            s->push_back(* (hitMap[4][nTSF - 2]));
+            s->push_back(* (hitMap[4][nTSF - 1]));
+            s->push_back(* (hitMap[4][0]));
+        }
+        else {
+            s->push_back(* (hitMap[0][t - 1]));
+            s->push_back(* (hitMap[0][t]));
+            s->push_back(* (hitMap[0][t + 1]));
+            s->push_back(* (hitMap[1][t - 1]));
+            s->push_back(* (hitMap[1][t]));
+            s->push_back(* (hitMap[2][t]));
+            s->push_back(* (hitMap[3][t - 1]));
+            s->push_back(* (hitMap[3][t]));
+            s->push_back(* (hitMap[4][t - 1]));
+            s->push_back(* (hitMap[4][t]));
+            s->push_back(* (hitMap[4][t + 1]));
+        }
+
+        //...Priority timing...
+        s->push_back(* priMap[t * 4 + 0]);
+        s->push_back(* priMap[t * 4 + 1]);
+        s->push_back(* priMap[t * 4 + 2]);
+        s->push_back(* priMap[t * 4 + 3]);
+
+        //...Fastest timing...
+        s->push_back(* fasMap[t * 4 + 0]);
+        s->push_back(* fasMap[t * 4 + 1]);
+        s->push_back(* fasMap[t * 4 + 2]);
+        s->push_back(* fasMap[t * 4 + 3]);
+
+        //...Clock counter is omitted...
+        
+        //...Simulate TSF...
+        vector<TRGSignalVector * > result = findTSHit2(s, t);
+        TRGSignalVector * forTracker = result[0];
+        _tsfOut.push_back(forTracker);
+        _toBeDeleted.push_back(result[1]);
+
+        //...State change list...
+        vector<int> sc = forTracker->stateChanges();
+        for (unsigned i = 0; i < sc.size(); i++) {
+            bool skip = false;
+            for (unsigned j = 0; j < tsfStateChanges.size(); j++) {
+                if (tsfStateChanges[j] == sc[i]) {
+                    skip = true;
+                    break;
+                }
+            }
+            if (! skip) tsfStateChanges.push_back(sc[i]);
+        }
+
+        //...Store it for each tracker division...
+        const unsigned pos = t / (nTSF / 4);
+        if (pos == 0) {
+            trker[0].push_back(forTracker);
+            trker[1].push_back(forTracker);
+        }
+        else if (pos == 1) {
+            trker[1].push_back(forTracker);
+            trker[2].push_back(forTracker);
+        }
+        else if (pos == 2) {
+            trker[2].push_back(forTracker);
+            trker[3].push_back(forTracker);
+        }
+        else {
+            trker[3].push_back(forTracker);
+            trker[4].push_back(forTracker);
+        }
+
+        //...Test...
+        if (TRGDebug::level() && t < 16) {
+            bool ok = ((* result[0]) == (* dbgOut[t])); // track part only
+
+            if (ok) {
+                cout << TRGDebug::tab() << name() << "...Comparison OK"
+                     << endl;
+            }
+            else {
+                cout << TRGDebug::tab() << name()
+                     << "...Comparison is not OK" << endl;
+                dbgOut[t]->dump("", "kt :");
+                result[0]->dump("", "2d :");
+                dbgIn[t]->dump("", "kt i:");
+                s->dump("", "2d i:");
+            }
+        }
+    }
+
+    //...Sort state changes...
+    std::sort(tsfStateChanges.begin(), tsfStateChanges.end());
+
+    //...Output for 2D...
+    for (unsigned i = 0; i < 4; i++) {
+        TRGSignalVector * tOut = packerOuterTracker(trker[i],
+                                                    tsfStateChanges,
+                                                    22);
+        string n = name() + "trker" + TRGUtilities::itostring(i);
+        TRGSignalBundle * b = new TRGSignalBundle(n, clockData());
+        b->push_back(tOut);
+        output(i)->signal(b);
+    }
+
+    //...Test...
+    dbgIn.clear();
+    dbgOut.clear();
+
+    TRGDebug::leaveStage(sn);
+}
+
+vector <TRGSignalVector *>
+TSFinder::findTSHit2(TRGSignalVector * eachInput, int tsid){
+
+//variables for common
+    const string na = "TSCandidate" + TRGUtilities::itostring(tsid) + " in " + name();
+    TCSegment * tsi = _tsSL[tsid];
+    vector <TRGSignalVector*> result;
+
+//variables for EvtTime & Low pT
+    vector<bool> fTimeVect;
+//  int tmpFTime = 0 ;
+
+//variables for Tracker & N.N
+    vector <bool> tmpOutBool;
+
+    TRGSignalVector* resultT = new TRGSignalVector(na, eachInput->clock(),22);
+    TRGSignalVector* resultE = new TRGSignalVector(na, eachInput->clock(),10);
+    TRGSignalVector* Hitmap = new TRGSignalVector(na+"HitMap",eachInput->clock(),0);
+    TRGSignalVector* pTime= new TRGSignalVector(na+"PriorityTime",eachInput->clock(),0);
+    TRGSignalVector* fTime= new TRGSignalVector(na+"FastestTime",eachInput->clock(),0);
+    for (unsigned i=0; i<12;i++){
+        Hitmap->push_back((*eachInput)[i]);
+        (*Hitmap)[i].widen(16);
+    }
+    for(unsigned i=0;i<4;i++){
+        pTime->push_back((*eachInput)[i+12]);
+        fTime->push_back((*eachInput)[i+16]);
+    }
+
+    //...Clock counter...
+    const TRGSignalVector & cc = eachInput->clock().clockCounter();
+    for(unsigned i = 0; i < 5; i++) {
+        pTime->push_back(cc[i]);
+        fTime->push_back(cc[i]);
+    }
+
+    vector <int> changeTime = Hitmap->stateChanges();
+
+    int * LUTValue = new int[changeTime.size()];
+    if(changeTime.size()){
+        int hitPosition=0;
+        bool fTimeBool[10];
+        int tmpPTime = 0 ;
+        int tmpCTime = 0 ;
+        int tmpOutInt;
+        fTime->state(changeTime[0]).copy2bool(fTimeBool);
+        fTimeBool[9]=true;
+        fTimeVect.insert(fTimeVect.begin(),fTimeBool,fTimeBool+10);
+        //tmpFTime = mkint(fTime->state(changeTime[0]));
+        bool eOUT= true;
+        for(unsigned i=0;i<changeTime.size();i++){
+            LUTValue[i] = tsi->LUT()->getValue(mkint(Hitmap->state(changeTime[i])));
+
+            /// output for EvtTime & Low pT tracker module
+            if((LUTValue[i])&&(eOUT)){
+                resultE->set(fTimeVect,changeTime[i]);
+                eOUT= false;
+            }
+     
+            bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
+            bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i])|(*Hitmap)[8].riseEdge(changeTime[i]));
+
+            /// output for Tracker & N.N
+            //ready for output
+            if(priority1rise){
+                hitPosition=3;
+                tmpPTime= mkint(pTime->state(changeTime[i]));
+                tmpCTime = changeTime[i];
+            }else if(priority2rise){
+                if(!hitPosition){
+                    tmpPTime = mkint(pTime->state(changeTime[i]));
+                    tmpCTime = changeTime[i];
+                    if((*Hitmap)[0].state(changeTime[i])) hitPosition = 2;
+                    else hitPosition = 1;
+                }
+            }
+
+            // output selection
+            if((hitPosition)&&(LUTValue[i])&&((changeTime[i]-tmpCTime)<16)){
+                tmpOutInt = tsid*pow(2,13)+tmpPTime*pow(2,4)+LUTValue[i]*pow(2,2)+hitPosition;
+                tmpOutBool = mkbool(tmpOutInt, 22);
+                if(hitPosition==3){
+                    if(priority1rise) resultT->set(tmpOutBool,changeTime[i]);
+                    else{
+                        if((LUTValue[i]==1)|(LUTValue[i]==2)){
+                            if((LUTValue[i-1]==1)|(LUTValue[i-1]==2)){
+                            }else resultT->set(tmpOutBool,changeTime[i]);
+                        }else{
+                            if(!(LUTValue[i-1])) resultT->set(tmpOutBool,changeTime[i]);
+                        }
+                    }
+                }else{
+                    if(priority2rise) resultT->set(tmpOutBool,changeTime[i]);
+                    else{
+                        if((LUTValue[i]==1)|(LUTValue[i]==2)){
+                            if((LUTValue[i-1]==1)|(LUTValue[i-1]==2)){
+                            }else resultT->set(tmpOutBool,changeTime[i]);
+                        }else{
+                            if(!(LUTValue[i])) resultT->set(tmpOutBool,changeTime[i]);
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+    result.push_back(resultT);
+    result.push_back(resultE);
+
+    delete [] LUTValue;
+    delete Hitmap;
+    delete pTime;
+    delete fTime;
+
+    return result;
+}
+
 } // namespace Belle2

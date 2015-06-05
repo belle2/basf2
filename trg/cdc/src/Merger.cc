@@ -22,6 +22,7 @@
 #include "trg/trg/Utilities.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/State.h"
+#include "trg/trg/Channel.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/FrontEnd.h"
@@ -149,6 +150,8 @@ TRGCDCMerger::dump(const string & message, const string & pre) const {
 void
 TRGCDCMerger::simulate(void) {
 
+    TRGDebug::enterStage("Merger simulattion");
+
   //...Clear input signal bundle...                                               
   if (_misb) {
     for (unsigned i = 0; i < _misb->size(); i++)
@@ -230,6 +233,9 @@ TRGCDCMerger::simulate(void) {
   }
   mosb = _mosb;
 
+  //...Output to a channel...
+  output(0)->signal(_mosb);
+
 //  cout<<"Merger output start"<<endl;
 //  _mosb->dump("detail", TRGDebug::tab());
 //  cout<<"Merger output end"<<endl;
@@ -243,6 +249,7 @@ TRGCDCMerger::simulate(void) {
   delete input1;
   delete input2;
 
+  TRGDebug::leaveStage("Merger simulattion");
 }
 
 

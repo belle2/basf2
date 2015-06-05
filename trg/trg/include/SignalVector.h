@@ -84,6 +84,12 @@ class TRGSignalVector : public std::vector<TRGSignal> {
     /// appends TRGSignal.
     TRGSignalVector & operator+=(const TRGSignal &);
 
+    /// compare two TRGSignalVectors.
+    bool operator==(const TRGSignalVector &) const;
+
+    /// compare two TRGSignalVectors.
+    bool operator!=(const TRGSignalVector &) const;
+
   private:
 
     /// Name
@@ -111,6 +117,12 @@ inline
 const TRGClock &
 TRGSignalVector::clock(void) const {
     return * _clock;
+}
+
+inline
+bool
+TRGSignalVector::operator!=(const TRGSignalVector & a) const {
+    return (! operator==(a));
 }
 
 } // namespace Belle2

@@ -104,6 +104,9 @@ class TRGSignal {
     /// edge at clock t1.
     const TRGSignal & set(int t0, int t1);
 
+    /// makes signal inverted.
+    const TRGSignal & invert(void);
+
   public:// Operators
 
     /// returns AND result.
@@ -135,6 +138,12 @@ class TRGSignal {
 
     /// returns timing of i'th edge.
     const TRGTime * operator[](unsigned i) const;
+
+    /// returns true if two are the same.
+    bool operator==(const TRGSignal &) const;
+
+    /// returns true if two are the same.
+    bool operator!=(const TRGSignal &) const;
 
   private:
 
@@ -298,6 +307,12 @@ inline
 const TRGClock &
 TRGSignal::clock(void) const {
     return * _clock;
+}
+
+inline
+bool
+TRGSignal::operator!=(const TRGSignal & a) const {
+    return (! operator==(a));
 }
 
 } // namespace Belle2

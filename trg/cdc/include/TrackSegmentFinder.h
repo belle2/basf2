@@ -22,6 +22,7 @@
 #include "trg/trg/SignalBundle.h"
 
 #ifdef TRGCDC_SHORT_NAMES
+#define TCTSFinder TRGCDCTrackSegmentFinder
 #define TSFinder TRGCDCTrackSegmentFinder
 #endif
 
@@ -31,7 +32,6 @@ namespace Belle2 {
   class TRGCDCSegment;
   class TRGCDCSegmentHit;
   class TRGCDCMerger;
-
 
   class TRGCDCTrackSegmentFinder 
       : public TRGBoard,
@@ -44,16 +44,20 @@ namespace Belle2 {
 	  unknown   = 999};
 
     // Constructor.
-    TRGCDCTrackSegmentFinder(const TRGCDC& , bool makeRootFile, bool logicLUTFlag);
+    TRGCDCTrackSegmentFinder(const TRGCDC &,
+                             bool makeRootFile,
+                             bool logicLUTFlag);
 
-    TRGCDCTrackSegmentFinder(const  TRGCDC&,
+    // Constructor.
+    TRGCDCTrackSegmentFinder(const  TRGCDC &,
 			     const std::string & name,
 		 	     boardType type,
 			     const TRGClock & systemClock,
 			     const TRGClock & dataClock,
 			     const TRGClock & userClockInput,
 			     const TRGClock & userClockOutput,
-			     std::vector<TCSegment *> & tsSL);
+			     std::vector<TRGCDCSegment *> & tsSL);
+
     // Destructor.
     ~TRGCDCTrackSegmentFinder();
 
@@ -115,8 +119,10 @@ namespace Belle2 {
 //    static TRGState packerOuterEvt(const TRGState & input);
 
     /// Use LUT for find TSHit
-    //void findTSHit(void);
     vector<TRGSignalVector*> findTSHit(TRGSignalVector * eachInput, int);
+  
+    /// Use LUT for find TSHit (clock counter cost effective version)
+    vector<TRGSignalVector*> findTSHit2(TRGSignalVector * eachInput, int);
   
     /// Packing output for tracker
     TRGSignalVector* packerOuterTracker(vector<TRGSignalVector*>, vector<int>, int);
@@ -133,7 +139,9 @@ namespace Belle2 {
 
     /// firmware simulation.
     void simulateBoard(void);
-    //void simulateBoard(std::vector <TRGCDCSegment * > & tsSL);
+
+      /// Firmware simulation only for 2D : yi
+      void simulateFor2D(void);
 
     double mkint(TRGState );
 
@@ -152,6 +160,14 @@ namespace Belle2 {
     TRGSignalBundle * _tosbT;
     std::vector<TCSegment *> _tsSL;
 
+      /// TSF input storage
+      std::vector<TRGSignalVector *> _tsfIn;
+
+      /// TSF response storeage
+      std::vector<TRGSignalVector *> _tsfOut;
+
+      /// One time info. to be deleted in next event;
+      std::vector<TRGSignalVector *> _toBeDeleted;
   };
 
 } // namespace Belle2

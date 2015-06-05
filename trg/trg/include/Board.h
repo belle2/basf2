@@ -55,6 +55,18 @@ class TRGBoard {
     /// returns Aurora user clock for output.
     const TRGClock & clockUserOutput(void) const;
 
+    /// returns #input channels.
+    unsigned nInput(void) const;
+
+    /// returns input channel i.
+    const TRGChannel * input(unsigned i) const;
+
+    /// returns #output channels.
+    unsigned nOutput(void) const;
+
+    /// returns output channel i.
+    TRGChannel * output(unsigned i) const;
+
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
     void dump(const std::string & message = "",
@@ -135,6 +147,32 @@ void
 TRGBoard::appendOutput(TRGChannel * a) {
     _outputChannels.push_back(a);
 }
+
+inline
+const TRGChannel *
+TRGBoard::input(unsigned a) const {
+    return _inputChannels[a];
+}
+
+inline
+TRGChannel *
+TRGBoard::output(unsigned a) const {
+    return _outputChannels[a];
+}
+
+inline
+unsigned
+TRGBoard::nInput(void) const {
+    return _inputChannels.size();
+}
+
+
+inline
+unsigned
+TRGBoard::nOutput(void) const {
+    return _outputChannels.size();
+}
+
 
 } // namespace Belle2
 

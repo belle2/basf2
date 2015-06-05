@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <cctype>
 #include "trg/trg/Clock.h"
 #include "trg/trg/Signal.h"
 
@@ -130,6 +131,12 @@ void
 TRGSignal::dump(const string & msg,
                 const string & pre) const {
 
+    string tmp;
+    tmp.resize(_name.size());
+    transform(_name.cbegin(), _name.cend(), tmp.begin(), ::toupper);
+
+    const bool ctr = tmp.find("CLOCKCOUNTER") != string::npos;
+
     cout << pre << _name << ":#signal=" << _history.size();
 
     if (msg.find("clock") != string::npos ||
@@ -139,7 +146,7 @@ TRGSignal::dump(const string & msg,
 
     cout << endl;
 
-    if (_history.size()) {
+    if (_history.size() && (! ctr)) {
         for (unsigned i = 0; i < _history.size(); i++)
             _history[i].dump(msg, pre + "    ");
     }
@@ -435,6 +442,41 @@ TRGSignal::consistencyCheck(void) const {
     }
 
     return false;
+}
+
+const TRGSignal &
+TRGSignal::invert(void) {
+    if (_history.size()) {
+        for (unsigned i = 0; i < _history.size(); i++)
+            _history[i].reverse();
+    }
+    else {
+        TRGTime time0(_clock->min(), true, * _clock);
+        TRGTime time1(_clock->max(), false, * _clock);
+        _history.push_back(time0);
+        _history.push_back(time1);
+
+        // _clock->dump();
+        // cout << "min,max=" << _clock->min() << "," << _clock->max() << endl;
+        // time0.dump();
+        // time1.dump();
+
+    }
+
+    return * this;
+}
+
+bool
+TRGSignal::operator==(const TRGSignal & a) const {
+    if (_history.size() != a._history.size())
+        return false;
+
+    for (unsigned i = 0; i < _history.size(); i++) {
+        if (_history[i] != a._history[i])
+            return false;
+    }
+
+    return true;
 }
 
 } // namespace Belle2

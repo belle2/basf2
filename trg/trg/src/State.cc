@@ -16,6 +16,7 @@
 #include <iostream>
 #include <ctype.h>
 #include <cstring>
+#include "trg/trg/Utilities.h"
 #include "trg/trg/State.h"
 
 using namespace std;
@@ -153,8 +154,11 @@ TRGState::~TRGState() {
 void
 TRGState::dump(const string & msg,
 	       const string & pre) const {
-//    if (msg.find("bin") != string::npos) {
-  msg.find("bin");
+
+//  bool bin = true;
+    bool large = (_size > 60) || msg.find("large") != string::npos;
+
+    if (! large) {
 	cout << pre << "size=" << _size << ",";
 	for (unsigned i = 0; i < _size; i++) {
 	    const unsigned j = _size - i - 1;
@@ -166,38 +170,102 @@ TRGState::dump(const string & msg,
 		cout << "0";
 	}
 	cout << dec << endl;
-//    }
-//  else {
-// 	cout << pre << "size=" << _size << ",0x";
-// 	bool first = true;
-// 	for (unsigned i = 0; i < _n; i++) {
-// 	    const unsigned j = _n - i - 1;
-// 	    if (((j % 4) == 3) && (! first))
-// 		cout << "_";
-// 	    cout << hex << _state[j];
-// 	    first = false;
-// 	}
-// 	cout << dec << endl;
+    }
+    else {
+	cout << pre << "size=" << _size << endl;
 
-// 	cout << pre << "size=" << _size << ",0x";
-// 	bool first = true;
-// 	for (unsigned i = 0; i < _n; i++) {
-// 	    const unsigned j = _n - i - 1;
-// 	    if (! first)
-// 		cout << "_";
-// 	    cout << hex << _state[j];
-// 	    cout << "(";
-// 	    for (unsigned k = 0; k < 4; k++) {
-// 		unsigned c = ((_state[j] >> (4 - k + 1) * 8) & 0xff);
-// 		if (c < 0x10)
-// 		    cout << ".";
-// 		cout << c;
-// 	    }
-// 	    cout << ")";
-// 	    first = false;
-// 	}
-// 	cout << dec << endl;
-//    }
+        const unsigned nPerLines = 64;
+        const unsigned lines = _size / nPerLines + 1;
+        const unsigned rem = _size % nPerLines;
+
+        cout << "TRGState" << 
+            "    +56      +48      +40      +32      +24      +16       +8"
+             << "       +0" << endl;
+
+        bool skipLast = false;
+	for (unsigned i = 0; i < lines; i++) {
+            const unsigned n0 = (i == 0) ? rem - 1 : nPerLines - 1;
+            const int n1 = 0;
+            const int os = (lines - i - 1) * nPerLines;
+
+            const string b = TRGUtilities::itostring(os);
+
+            TRGState s = subset(n1 + os, n0 - n1 + 1);
+
+//            s.dump("", "*** ");
+
+            bool skip = false;
+            if (! s.active())
+                skip = true;
+
+            if (skip && (! skipLast)) {
+                cout << "... (all zero)" << endl;
+                skipLast = true;
+            }
+
+            if (skip) {
+                skipLast = true;
+                continue;
+            }
+
+            skipLast = false;
+
+            cout.width(5);
+            cout << b;
+            cout << " ";
+
+            if (i == 0) {
+                unsigned n = nPerLines - rem + (nPerLines - rem) / 8;
+                if (rem % 8) ++n;
+                for (unsigned j = 0; j < n; j++)
+                    cout << " ";
+            }
+
+            for (int j = n0; j >= n1; --j) {
+                const unsigned v = (* this)[j + os];
+
+                    if ((j % 8) == 7) 
+                        cout << "_";
+                    if (v)
+                        cout << "1";
+                    else
+                        cout << "0";
+            }
+            cout << endl;
+        }
+    }
+
+    // else {
+    //     cout << pre << "size=" << _size << ",0x";
+    //     bool first = true;
+    //     for (unsigned i = 0; i < _n; i++) {
+    //         const unsigned j = _n - i - 1;
+    //         if (((j % 4) == 3) && (! first))
+    //     	cout << "_";
+    //         cout << hex << _state[j];
+    //         first = false;
+    //     }
+    //     cout << dec << endl;
+
+    //     cout << pre << "size=" << _size << ",0x";
+    //     bool first = true;
+    //     for (unsigned i = 0; i < _n; i++) {
+    //         const unsigned j = _n - i - 1;
+    //         if (! first)
+    //     	cout << "_";
+    //         cout << hex << _state[j];
+    //         cout << "(";
+    //         for (unsigned k = 0; k < 4; k++) {
+    //     	unsigned c = ((_state[j] >> (4 - k + 1) * 8) & 0xff);
+    //     	if (c < 0x10)
+    //     	    cout << ".";
+    //     	cout << c;
+    //         }
+    //         cout << ")";
+    //         first = false;
+    //     }
+    //     cout << dec << endl;
+    // }
 }
 
 TRGState &

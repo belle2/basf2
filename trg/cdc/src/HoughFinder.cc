@@ -290,9 +290,11 @@ TRGCDCHoughFinder::selectBestHits(const vector<TCLink *> & links) const {
     vector<TCLink *> layers[9];
     TCLink::separate(links, 9, layers);
 
-    for (unsigned i = 0; i < 9; i++) {
-	cout << TRGDebug::tab() << "layer " << i << endl;
-	TCLink::dump(layers[i], "", TRGDebug::tab(4));
+    if (TRGDebug::level()) {
+        for (unsigned i = 0; i < 9; i++) {
+            cout << TRGDebug::tab() << "layer " << i << endl;
+            TCLink::dump(layers[i], "");
+        }
     }
 
     //...Select links to be removed...

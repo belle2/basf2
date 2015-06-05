@@ -87,6 +87,12 @@ class TRGTime {
     /// oring two TRGTime. A result is TRGSignal.
     TRGSignal operator|(const TRGSignal &) const;
 
+    /// returns true if two are the same.
+    bool operator==(const TRGTime &) const;
+
+    /// returns false if two are the same.
+    bool operator!=(const TRGTime &) const;
+
     /// sets and returns timing in clock position.
     int time(int newTime);
 
@@ -166,6 +172,22 @@ inline
 int
 TRGTime::time(int a) {
     return _time = a;
+}
+
+inline
+bool
+TRGTime::operator==(const TRGTime & a) const {
+    if (_time != a._time) return false;
+    if (_edge != a._edge) return false;
+    if (_clock != a._clock) return false;
+    // no name check
+    return true;
+}
+
+inline
+bool
+TRGTime::operator!=(const TRGTime & a) const {
+    return (! operator==(a));
 }
 
 } // namespace Belle2

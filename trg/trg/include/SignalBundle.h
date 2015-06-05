@@ -49,6 +49,7 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
 		    const TRGClock & clock,
 		    const TRGSignalBundle & input,
                     const unsigned outputBitSize,
+                    const unsigned registerBitSize,
 		    TRGState (* packer)(const TRGState & in,
                                         TRGState & registers,
                                         bool & logicStillActive));

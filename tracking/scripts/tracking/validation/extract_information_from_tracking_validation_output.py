@@ -22,7 +22,7 @@ def extract_information_from_file(file_name, results):
 
         if "overview_figures_of_merit" in str(name):
             root_obj.GetEntry(0)
-            for branch in overview_table.GetListOfBranches():
+            for branch in root_obj.GetListOfBranches():
                 branch_name = branch.GetName()
                 if branch_name in results:
                     results[branch_name].append(100.0 * float(getattr(root_obj, branch.GetName())))

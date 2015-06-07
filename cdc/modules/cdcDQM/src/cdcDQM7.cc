@@ -80,7 +80,7 @@ void cdcDQM7Module::event()
   int nent = cdcHits.getEntries();
 
   for (int i = 0; i < nent; i++) {
-    CDCHit* cdchit = (CDCHit*)cdcHits[i];
+    CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
 
     h_tdc->Fill(cdchit->getTDCCount());
     h_adc->Fill(cdchit->getADCCount());

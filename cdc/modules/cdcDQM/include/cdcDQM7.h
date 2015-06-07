@@ -12,6 +12,7 @@ namespace Belle2 {
   class cdcDQM7Module : public HistoModule {  // <- derived from HistoModule class
 
   public:
+
     //! Constructor
     cdcDQM7Module();
     //! Destructor
@@ -28,10 +29,10 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-    TH1F* h_tdc;         // histogram tdc
-    TH1F* h_adc;         // histogram fadc sum
-    TH1F* h_layer;         // histogram ilayer hits
-    TH1F* h_nhits;         // histogram cell hit in first ilayer
+    TH1F* h_tdc;         //! histogram tdc
+    TH1F* h_adc;         //! histogram fadc sum
+    TH1F* h_layer;         //! histogram ilayer hits
+    TH1F* h_nhits;         //! histogram cell hit in first ilayer
 
   };
 }

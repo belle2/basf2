@@ -20,7 +20,7 @@ class CDCSegmentPairRecordingRun(RecordingRun):
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     output_file_name = "CDCSegmentPairTruthRecords.root"
-    varsets = ["skimmed_fitless", "truth", ]
+    varsets = ["skimmed_fitless", "filter(truth)", ]
 
     recording_filter_parameter_name = "SegmentPairFilterParameters"
 

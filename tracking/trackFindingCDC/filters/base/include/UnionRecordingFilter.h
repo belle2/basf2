@@ -10,6 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 #include <boost/algorithm/string.hpp>
@@ -33,7 +35,8 @@ namespace Belle2 {
       /// Constructor of the filter.
       UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
                            const std::string& defaultTreeName = "records") :
-        Super(defaultRootFileName, defaultTreeName)
+        Super(defaultRootFileName, defaultTreeName),
+        m_filterFactory("truth")
       {;}
 
       /// Initialize the recorder before event processing.
@@ -90,11 +93,49 @@ namespace Belle2 {
 
       /// Getter for the list of valid names of concret variable sets.
       virtual std::vector<std::string> getValidVarSetNames() const
-      { return std::vector<std::string> (); }
+      {
+        // Get all filter names and make a var set name for each.
+        std::map<std::string, std::string> filterNamesAndDescriptions =
+          m_filterFactory.getValidFilterNamesAndDescriptions();
+
+        std::vector<std::string> varSetNames;
+        varSetNames.reserve(filterNamesAndDescriptions.size());
+        for (const std::pair<std::string, std::string>& filterNameAndDescription :
+             filterNamesAndDescriptions) {
+          const std::string& filterName = filterNameAndDescription.first;
+
+          std::string varSetName = "filter(" + filterName + ")";
+          varSetNames.push_back(varSetName);
+        }
+
+        return varSetNames;
+      }
 
       /// Create a variable set for the given name.
-      virtual std::unique_ptr<BaseVarSet<Object>> createVarSet(const std::string& /*name*/) const
-      { return std::unique_ptr<BaseVarSet<Object>>(nullptr); }
+      virtual std::unique_ptr<BaseVarSet<Object>> createVarSet(const std::string& name) const
+      {
+        B2INFO("name = " << name);
+        B2INFO("name starts with filter( " << boost::starts_with(name, "filter("));
+        B2INFO("name ends with ) " << boost::ends_with(name, ")"));
+
+        if (boost::starts_with(name, "filter(") and boost::ends_with(name, ")")) {
+          B2INFO("Detected filter name");
+          std::string filterName = name.substr(7, name.size() - 8);
+          B2INFO("filterName = " << filterName);
+          std::unique_ptr<Filter<Object>> filter = m_filterFactory.create(filterName);
+          if (not filter) {
+            B2WARNING("Could not construct filter for name " << filterName);
+            return std::unique_ptr<BaseVarSet<Object>>(nullptr);
+          } else {
+            std::string prefix = filterName + "_";
+            BaseVarSet<Object>* filterVarSet = new FilterVarSet<Filter<Object>>(prefix,
+                std::move(filter));
+            return std::unique_ptr<BaseVarSet<Object> >(filterVarSet);
+          }
+        } else {
+          return std::unique_ptr<BaseVarSet<Object> >(nullptr);
+        }
+      }
 
       /// Splits the comma separated variable names list into a vector of names.
       std::vector<std::string> getVarSetNames() const
@@ -111,6 +152,10 @@ namespace Belle2 {
     private:
       /// A string containing the comma separated names of concrete variable sets to be recorded.
       std::string m_commaSeparatedVarSetNames;
+
+      /// FilterFactory
+      FilterFactory<Filter<Object>> m_filterFactory;
+
     };
   }
 }

@@ -43,6 +43,8 @@ void RiemannsMethod::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& ob
     updateWithoutDriftLength(trajectory2D, observations2D);
   }
 
+  ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
+  if (isCoaligned == BACKWARD) trajectory2D.reverse();
 }
 
 
@@ -50,7 +52,7 @@ void RiemannsMethod::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& ob
 void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
 {
 
-  CDCObservations2D::EigenObservationMatrix&&  eigenObservation = observations2D.getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = observations2D.getObservationMatrix();
   size_t nObservations = observations2D.size();
 
 
@@ -142,7 +144,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDC
 void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
 {
 
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = observations2D.getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = observations2D.getObservationMatrix();
   size_t nObservations = observations2D.size();
 
   //cout << "updateWithRightLeft : " << endl;

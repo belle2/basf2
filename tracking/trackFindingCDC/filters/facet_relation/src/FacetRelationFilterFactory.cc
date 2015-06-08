@@ -17,50 +17,59 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FacetRelationFilterFactory::FacetRelationFilterFactory(const std::string& defaultFilterName) :
-  FilterFactory<BaseFacetRelationFilter>(defaultFilterName)
+FilterFactory<Filter<Relation<CDCFacet> > >::FilterFactory(const std::string& defaultFilterName) :
+  Super(defaultFilterName)
 {
 }
 
-std::string FacetRelationFilterFactory::getFilterPurpose() const
+std::string FilterFactory<Filter<Relation<CDCFacet> > >::getFilterPurpose() const
 {
   return "Facet relation filter to be used during the construction of the facet network.";
 }
 
-std::string FacetRelationFilterFactory::getModuleParamPrefix() const
+std::string FilterFactory<Filter<Relation<CDCFacet> > >::getModuleParamPrefix() const
 {
   return "FacetRelation";
 }
 
 std::map<std::string, std::string>
-FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
+FilterFactory<Filter<Relation<CDCFacet> > >::getValidFilterNamesAndDescriptions() const
 {
-  return {
+  std::map<std::string, std::string>
+  filterNames = Super::getValidFilterNamesAndDescriptions();
+
+  filterNames.insert({
     {"all", "all facet relations are valid"},
-    {"mc", "facet relations from monte carlo truth"},
+    {"mc", "depricated alias for 'truth'"},
+    {"truth", "facet relations from monte carlo truth"},
     {"none", "no facet relation is valid, stop at facet creation."},
     {"recording", "record the encountered instances of facet relations"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
-  };
+  });
+
+  return filterNames;
 }
 
-std::unique_ptr<BaseFacetRelationFilter>
-FacetRelationFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<Filter<Relation<CDCFacet> > >
+FilterFactory<Filter<Relation<CDCFacet> > >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<BaseFacetRelationFilter>(new BaseFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new BaseFacetRelationFilter());
   } else if (filterName == string("all")) {
-    return std::unique_ptr<BaseFacetRelationFilter>(new AllFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new AllFacetRelationFilter());
+  } else if (filterName == string("truth")) {
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new MCFacetRelationFilter());
   } else if (filterName == string("mc")) {
-    return std::unique_ptr<BaseFacetRelationFilter>(new MCFacetRelationFilter());
+    B2WARNING("Filter name 'mc' is depricated in favour of 'truth'");
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new MCFacetRelationFilter());
   } else if (filterName == string("simple")) {
-    return std::unique_ptr<BaseFacetRelationFilter>(new SimpleFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new SimpleFacetRelationFilter());
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseFacetRelationFilter>(new RecordingFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new RecordingFacetRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<BaseFacetRelationFilter>(new UnionRecordingFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new UnionRecordingFacetRelationFilter());
   } else {
-    return std::unique_ptr<BaseFacetRelationFilter>(nullptr);
+    return Super::create(filterName);
   }
 }

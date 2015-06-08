@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 
 
 FilterFactory<Filter<CDCSegmentPair> >::FilterFactory(const std::string& defaultFilterName) :
-  FilterFactoryBase<BaseSegmentPairFilter>(defaultFilterName)
+  Super(defaultFilterName)
 {
 }
 
@@ -36,38 +36,38 @@ std::map<std::string, std::string>
 FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
-  varSetNames = Super::getValidFilterNamesAndDescriptions();
+  filterNames = Super::getValidFilterNamesAndDescriptions();
 
-  std::map<std::string, std::string>
-  additionalVarSetNames = {
+  filterNames.insert({
     {"all", "all segment pairs are valid"},
+    {"mc", "depricated alias for 'truth'"},
     {"truth", "monte carlo truth"},
     {"none", "no segment pair is valid"},
     {"recording", "record the encountered instances of segment pairs"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
-  };
-
-  varSetNames.insert(additionalVarSetNames.begin(), additionalVarSetNames.end());
-  return varSetNames;
-
+  });
+  return filterNames;
 }
 
-std::unique_ptr<BaseSegmentPairFilter>
-FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) const
+std::unique_ptr<Filter<CDCSegmentPair>>
+                                     FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<BaseSegmentPairFilter>(new BaseSegmentPairFilter());
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new BaseSegmentPairFilter());
   } else if (filterName == string("all")) {
-    return std::unique_ptr<BaseSegmentPairFilter>(new AllSegmentPairFilter());
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new AllSegmentPairFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<BaseSegmentPairFilter>(new MCSegmentPairFilter());
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
+  } else if (filterName == string("mc")) {
+    B2WARNING("Filter name 'mc' is depricated in favour of 'truth'");
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
   } else if (filterName == string("simple")) {
-    return std::unique_ptr<BaseSegmentPairFilter>(new SimpleSegmentPairFilter());
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseSegmentPairFilter>(new RecordingSegmentPairFilter());
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new RecordingSegmentPairFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<BaseSegmentPairFilter>(new UnionRecordingSegmentPairFilter());
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new UnionRecordingSegmentPairFilter());
   } else {
     return Super::create(filterName);
   }

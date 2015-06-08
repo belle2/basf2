@@ -19,15 +19,22 @@ namespace Belle2 {
     /// Records the encountered CDCWireHitFacets.
     class UnionRecordingFacetFilter: public UnionRecordingFilter<CDCFacet> {
 
+    private:
+      /// Type of the base class
+      typedef  UnionRecordingFilter<CDCFacet> Super;
+
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      UnionRecordingFacetFilter() :
-        UnionRecordingFilter<CDCFacet>("CDCFacetTruthRecords.root")
+      UnionRecordingFacetFilter() : Super("CDCFacetTruthRecords.root")
       {;}
 
       /// Valid names of variable sets for facets.
       virtual std::vector<std::string> getValidVarSetNames() const override
-      { return {"fitless", "fit", "truth"}; }
+      {
+        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
+        varSetNames.insert(varSetNames.end(), {"fitless", "fit", "truth"});
+        return varSetNames;
+      }
 
       /// Create a concrete variables set for facets from a name.
       virtual
@@ -40,7 +47,7 @@ namespace Belle2 {
         } else if (name == "truth") {
           return std::unique_ptr<BaseVarSet<CDCFacet> >(new CDCFacetTruthVarSet());
         } else {
-          return std::unique_ptr<BaseVarSet<CDCFacet> >(nullptr);
+          return Super::createVarSet(name);
         }
       }
     };

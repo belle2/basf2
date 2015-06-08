@@ -19,6 +19,10 @@ namespace Belle2 {
     /// Records the encountered relations between facets.
     class UnionRecordingFacetRelationFilter: public UnionRecordingFilter<Relation<CDCFacet> > {
 
+    private:
+      /// Type of the base class
+      typedef  UnionRecordingFilter<Relation<CDCFacet> > Super;
+
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
       UnionRecordingFacetRelationFilter() :
@@ -27,7 +31,11 @@ namespace Belle2 {
 
       /// Valid names of variable sets for facets.
       virtual std::vector<std::string> getValidVarSetNames() const override
-      { return {"basic", "truth"}; }
+      {
+        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
+        varSetNames.insert(varSetNames.end(), {"basic", "truth"});
+        return varSetNames;
+      }
 
       /// Create a concrete variables set for facets from a name.
       virtual
@@ -38,7 +46,7 @@ namespace Belle2 {
         } else if (name == "truth") {
           return std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >(new CDCFacetRelationTruthVarSet());
         } else {
-          return std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >(nullptr);
+          return Super::createVarSet(name);
         }
       }
     };

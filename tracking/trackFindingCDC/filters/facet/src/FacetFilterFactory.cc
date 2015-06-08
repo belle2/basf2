@@ -17,54 +17,64 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FacetFilterFactory::FacetFilterFactory(const std::string& defaultFilterName) :
-  FilterFactory<BaseFacetFilter>(defaultFilterName)
+FilterFactory<Filter<CDCFacet> >::FilterFactory(const std::string& defaultFilterName) :
+  Super(defaultFilterName)
 {
 }
 
-std::string FacetFilterFactory::getFilterPurpose() const
+std::string FilterFactory<Filter<CDCFacet> >::getFilterPurpose() const
 {
   return "Facet filter to be used during the construction of facets.";
 }
 
-std::string FacetFilterFactory::getModuleParamPrefix() const
+std::string FilterFactory<Filter<CDCFacet> >::getModuleParamPrefix() const
 {
   return "Facet";
 }
 
-std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDescriptions() const
+std::map<std::string, std::string>
+FilterFactory<Filter<CDCFacet> >::getValidFilterNamesAndDescriptions() const
 {
-  return {
+  std::map<std::string, std::string>
+  filterNames = Super::getValidFilterNamesAndDescriptions();
+
+  filterNames.insert({
     {"all", "all facets are valid"},
     {"fitless", "only checking the feasability of right left passage information"},
-    {"mc", "monte carlo truth"},
+    {"mc", "depricated alias for 'truth'"},
+    {"truth", "monte carlo truth"},
     {"none", "no facet is valid, stop at cluster generation."},
     {"realistic", "mc free with more realistic criteria"},
     {"recording", "record the encountered instances of facets"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
-  };
+  });
+  return filterNames;
 }
 
-std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<Filter<CDCFacet> >
+FilterFactory<Filter<CDCFacet> >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<BaseFacetFilter>(new BaseFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new BaseFacetFilter());
   } else if (filterName == string("all")) {
-    return std::unique_ptr<BaseFacetFilter>(new AllFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new AllFacetFilter());
+  } else if (filterName == string("truth")) {
+    return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
   } else if (filterName == string("mc")) {
-    return std::unique_ptr<BaseFacetFilter>(new MCFacetFilter());
+    B2WARNING("Filter name 'mc' is depricated in favour of 'truth'");
+    return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
   } else if (filterName == string("fitless")) {
-    return std::unique_ptr<BaseFacetFilter>(new FitlessFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new FitlessFacetFilter());
   } else if (filterName == string("simple")) {
-    return std::unique_ptr<BaseFacetFilter>(new SimpleFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new SimpleFacetFilter());
   } else if (filterName == string("realistic")) {
-    return std::unique_ptr<BaseFacetFilter>(new RealisticFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter());
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseFacetFilter>(new RecordingFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new RecordingFacetFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<BaseFacetFilter>(new UnionRecordingFacetFilter());
+    return std::unique_ptr<Filter<CDCFacet> >(new UnionRecordingFacetFilter());
   } else {
-    return std::unique_ptr<BaseFacetFilter>(nullptr);
+    return Super::create(filterName);
   }
 }

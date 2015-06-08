@@ -16,6 +16,7 @@
 #include <pxd/dataobjects/PXDRawAdc.h>
 #include <pxd/dataobjects/PXDRawPedestal.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
+#include <pxd/dataobjects/PXDRawCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
@@ -51,6 +52,7 @@ namespace Belle2 {
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
       std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
+      std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
       /**  Swap the endianess of the ONSEN header yes/no */
       bool m_headerEndianSwap;
@@ -81,9 +83,12 @@ namespace Belle2 {
       StoreArray<PXDRawAdc> m_storeRawAdc;
       /** Output array for Raw Adc:Pedestals. */
       StoreArray<PXDRawPedestal> m_storeRawPedestal;
+      /** Output array for Clusters. */
+      StoreArray<PXDRawCluster> m_storeRawCluster;
 
-      /** Unpack one event (several frames) stored in RawPXD object.
+      /** Unpack one event (several frames) stored in RawPXD object./ Unpack one cluster stored in Cluster object.
        * @param px RawPXD data object
+       * @param cl Cluster data object
        */
       void unpack_event(RawPXD& px);
 
@@ -127,8 +132,18 @@ namespace Belle2 {
        * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
-      void unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID,
-                      unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+
+      //// WARUM SO VIELE SACHEN DIE ÜBERGEBEN WERDEN???
+//       void unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID,
+//                       unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+
+      void unpack_fce(void* data, unsigned int length, VxdID vxd_id);
+
+      /**
+       * @param data
+       * @param vxd_id dhe compact ID.
+       * @param length Pixel row coordinate.
+       */
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits
 

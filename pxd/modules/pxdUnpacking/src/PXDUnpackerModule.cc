@@ -27,7 +27,7 @@
 // DHH like before, but now 4 bits
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
-#define DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1
+#define DHHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1 //CLUSTER FRAME
 #define DHHC_FRAME_HEADER_DATA_TYPE_COMMODE     0x6
 #define DHHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
 #define DHHC_FRAME_HEADER_DATA_TYPE_DHH_START   0x3
@@ -119,7 +119,7 @@ struct dhhc_frame_header_word0 {
   };
   void print(void) const
   {
-    const char* dhhc_type_name[16] = {
+    const char* dhhc_type_name[17] = {
       (const char*)"DHP_RAW",
       (const char*)"FCE_RAW",
       (const char*)"GHOST  ",
@@ -135,7 +135,8 @@ struct dhhc_frame_header_word0 {
       (const char*)"C_END  ",
       (const char*)"ONS_DHP",
       (const char*)"ONS_TRG",
-      (const char*)"ONS_ROI"
+      (const char*)"ONS_ROI",
+      (const char*)"DHE_CLUSTER"
     };
     B2INFO("DHHC FRAME TYP " << hex << getFrameType() << " -> " << dhhc_type_name[getFrameType()] << " (ERR " << getErrorFlag() <<
            ") data " << data);
@@ -357,7 +358,7 @@ struct dhhc_onsen_roi_frame {
     B2INFO("DHHC HLT/ROI Frame");
   };
 
-  unsigned int check_inner_crc(unsigned int /*length*/) const
+  unsigned int check_inner_crc(unsigned int length) const
   {
     /// Parts of the data are now in the ONSEN Trigger frame, therefore the inner CRC cannot be checked that easily!
     // TODO can be re-implemented if needed
@@ -455,6 +456,7 @@ struct dhhc_dhh_end_frame {
   };
   inline unsigned int getDHHId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
 };
+
 
 ///*********************************************************************************
 ///****************** DHHC Frame Wrapper Code starts here **************************
@@ -615,7 +617,10 @@ PXDUnpackerModule::PXDUnpackerModule() :
   m_storeRawHits(),
   m_storeROIs(),
   m_storeRawAdc(),
-  m_storeRawPedestal()
+  m_storeRawPedestal(),
+
+  ////Cluster store
+  m_storeRawCluster()
 {
   //Set module properties
   setDescription("Unpack Raw PXD Hits from ONSEN data stream");
@@ -629,17 +634,21 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
-
+  addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
 }
 
 void PXDUnpackerModule::initialize()
 {
   StoreArray<RawPXD>::required(m_RawPXDsName);
+//   StoreArray<Cluster>::required(m_RawClusterName);
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
   m_storeRawPedestal.registerInDataStore(m_PXDRawPedestalsName);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName);
+
+  ////CLUSTER CLASS
+  m_storeRawCluster.registerInDataStore(m_RawClusterName);
   /// actually, later we do not want to store ROIs and Pedestals into output file ...  aside from debugging
 
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
@@ -863,38 +872,13 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 };
 
-// PQ: Commented out argument names to prevent compiler warnings about unused arguments
-void PXDUnpackerModule::unpack_fce(void* /*data*/, unsigned int /*frame_len*/, unsigned int /*dhh_first_readout_frame_id_lo*/,
-                                   unsigned int /*dhh_ID*/, unsigned /*dhh_DHPport*/, unsigned /*dhh_reformat*/, unsigned short /*toffset*/, VxdID /*vxd_id*/)
+void PXDUnpackerModule::unpack_fce(void* data, unsigned int length, VxdID vxd_id)
 {
-  // PQ: Commented out to prevent compiler warning about a variable not used.
-  //unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  //ubig16_t* dhp_fce = (ubig16_t*)data;
 
-  /// Actually, the format is not fixed yet, thus any depacking is guessing right now :-/
-  /// It seems, there is nod DHP Frame header here
-//   for(unsigned int i=0; i<nr_words; i++){
-//     if((dhp_fce[i]&0x8000)==0){
-//       B2INFO("Cluster Start Row ");
-  /*
-    * Start Of Row
-      – SOR[15]: ’0’ Start of Row flag
-      – SOR[14]: Start of Cluster flag
-      – SOR[13:12]: dE/dx information (to be filled by the Karlsruhe group)
-      – SOR[11:10]: DHP index
-      – SOR[9:0]: Row Address
-  */
-//     }else{
-//       B2INFO("... Pixel Word ");
-  /*
-   * Pixel word
-      – PW[15]: ’1’ Pixel word flag
-      – PW[14]: Increment row flag. ’1’ - Increment row address, ’0’ - keep row address
-      – PW[13:8]: Column address
-      – PW[7:0]: ADC value
-  */
-//     }
-//   }
+  ubig16_t* dhe_fce = (ubig16_t*)data;
+  unsigned int len = length;
+
+  if (!m_doNotStore) m_storeRawCluster.appendNew(dhe_fce, len, vxd_id);
 }
 
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo,
@@ -1175,12 +1159,7 @@ void PXDUnpackerModule::unpack_dhhc_frame(void* data, const int len, const int F
       m_errorMask |= dhhc.check_crc();
       found_mask_active_dhp |= 1 << dhhc.data_direct_readout_frame->getDHPPort();
 
-      unpack_dhp(data, len - 4,
-                 dhh_first_readout_frame_id_lo,
-                 dhhc.data_direct_readout_frame->getDHHId(),
-                 dhhc.data_direct_readout_frame->getDHPPort(),
-                 dhhc.data_direct_readout_frame->getDataReformattedFlag(),
-                 dhh_first_offset, currentVxdId);
+      unpack_fce(data, len - 4, currentVxdId);
       break;
     };
     case DHHC_FRAME_HEADER_DATA_TYPE_COMMODE: {

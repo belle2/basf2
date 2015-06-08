@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/CDCFacetRelationVarSets.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,30 +23,13 @@ namespace Belle2 {
       typedef  UnionRecordingFilter<Relation<CDCFacet> > Super;
 
     public:
-      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      UnionRecordingFacetRelationFilter() : Super()
-      {;}
-
       /// Valid names of variable sets for facets.
-      virtual std::vector<std::string> getValidVarSetNames() const override
-      {
-        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-        varSetNames.insert(varSetNames.end(), {"basic", "truth"});
-        return varSetNames;
-      }
+      virtual std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for facets from a name.
       virtual
-      std::unique_ptr<BaseVarSet<Relation<CDCFacet> > > createVarSet(const std::string& name) const override
-      {
-        if (name == "basic") {
-          return std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >(new CDCFacetRelationBasicVarSet());
-        } else if (name == "truth") {
-          return std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >(new CDCFacetRelationTruthVarSet());
-        } else {
-          return Super::createVarSet(name);
-        }
-      }
+      std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >
+      createVarSet(const std::string& name) const override;
     };
   }
 }

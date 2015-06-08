@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/segment_pair/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairVarSets.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,34 +23,14 @@ namespace Belle2 {
       typedef  UnionRecordingFilter<CDCSegmentPair> Super;
 
     public:
-      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      UnionRecordingSegmentPairFilter() : Super()
-      {;}
-
       /// Valid names of variable sets for segment pairs.
-      virtual std::vector<std::string> getValidVarSetNames() const override
-      {
-        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-        varSetNames.insert(varSetNames.end(), {"fitless", "skimmed_fitless", "fit", "truth"});
-        return varSetNames;
-      }
+      virtual std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for segment pairs from a name.
       virtual
-      std::unique_ptr<BaseVarSet<CDCSegmentPair>> createVarSet(const std::string& name) const override
-      {
-        if (name == "fitless") {
-          return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairFitlessVarSet());
-        } else if (name == "skimmed_fitless") {
-          return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairSkimmedFitlessVarSet());
-        } else if (name == "fit") {
-          return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairFitVarSet());
-        } else if (name == "truth") {
-          return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairTruthVarSet());
-        } else {
-          return Super::createVarSet(name);
-        }
-      }
+      std::unique_ptr<BaseVarSet<CDCSegmentPair> >
+      createVarSet(const std::string& name) const override;
+
     };
   }
 }

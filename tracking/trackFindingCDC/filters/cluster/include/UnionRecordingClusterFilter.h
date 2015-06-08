@@ -11,7 +11,9 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterVarSets.h>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,29 +27,16 @@ namespace Belle2 {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      UnionRecordingClusterFilter() : Super("BackgroundHitFinder.root")
-      {;}
+      UnionRecordingClusterFilter();
 
       /// Valid names of variable sets for clusters.
-      virtual std::vector<std::string> getValidVarSetNames() const override
-      {
-        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-        varSetNames.insert(varSetNames.end(), {"basic", "truth"});
-        return varSetNames;
-      }
+      virtual std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for clusters from a name.
       virtual
-      std::unique_ptr<BaseVarSet<CDCWireHitCluster>> createVarSet(const std::string& name) const override
-      {
-        if (name == "basic") {
-          return std::unique_ptr<BaseVarSet<CDCWireHitCluster> >(new CDCWireHitClusterBasicVarSet());
-        } else if (name == "truth") {
-          return std::unique_ptr<BaseVarSet<CDCWireHitCluster> >(new CDCWireHitClusterBkgTruthVarSet());
-        } else {
-          return Super::createVarSet(name);
-        }
-      }
+      std::unique_ptr<BaseVarSet<CDCWireHitCluster> >
+      createVarSet(const std::string& name) const override;
+
     };
   }
 }

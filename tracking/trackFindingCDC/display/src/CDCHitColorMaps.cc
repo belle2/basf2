@@ -76,22 +76,22 @@ std::string BackgroundTagColorMap::map(const int&, const CDCHit& cdcHit)
   CDCSimHit* cdcSimHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   short backgroundtag = cdcSimHit->getBackgroundTag();
   switch (backgroundtag) {
-    case cdcSimHit->bg_none: return "orange";
-    case cdcSimHit->bg_Coulomb_LER: return "red";
-    case cdcSimHit->bg_Coulomb_HER: return "darkred";
-    case cdcSimHit->bg_RBB_LER: return "blue";
-    case cdcSimHit->bg_RBB_HER: return "darkblue";
-    case cdcSimHit->bg_Touschek_LER: return "green";
-    case cdcSimHit->bg_Touschek_HER: return "darkgreen";
-    case cdcSimHit->bg_twoPhoton: return "violet";
-    case cdcSimHit->bg_RBB_gamma: return "skyblue";
-    case cdcSimHit->bg_RBB_LER_far: return "turquoise";
-    case cdcSimHit->bg_RBB_HER_far: return "darkturquoise";
-    case cdcSimHit->bg_Touschek_LER_far: return "olivergreen";
-    case cdcSimHit->bg_Touschek_HER_far: return "darkolivegreen";
-    case cdcSimHit->bg_SynchRad_LER: return "goldenrod";
-    case cdcSimHit->bg_SynchRad_HER: return "darkgoldenrod";
-    case cdcSimHit->bg_other: return "orange";
+    case SimHitBase::BG_TAG::bg_none: return "orange";
+    case SimHitBase::BG_TAG::bg_Coulomb_LER: return "red";
+    case SimHitBase::BG_TAG::bg_Coulomb_HER: return "darkred";
+    case SimHitBase::BG_TAG::bg_RBB_LER: return "blue";
+    case SimHitBase::BG_TAG::bg_RBB_HER: return "darkblue";
+    case SimHitBase::BG_TAG::bg_Touschek_LER: return "green";
+    case SimHitBase::BG_TAG::bg_Touschek_HER: return "darkgreen";
+    case SimHitBase::BG_TAG::bg_twoPhoton: return "violet";
+    case SimHitBase::BG_TAG::bg_RBB_gamma: return "skyblue";
+    case SimHitBase::BG_TAG::bg_RBB_LER_far: return "turquoise";
+    case SimHitBase::BG_TAG::bg_RBB_HER_far: return "darkturquoise";
+    case SimHitBase::BG_TAG::bg_Touschek_LER_far: return "olivergreen";
+    case SimHitBase::BG_TAG::bg_Touschek_HER_far: return "darkolivegreen";
+    case SimHitBase::BG_TAG::bg_SynchRad_LER: return "goldenrod";
+    case SimHitBase::BG_TAG::bg_SynchRad_HER: return "darkgoldenrod";
+    case SimHitBase::BG_TAG::bg_other: return "orange";
     default:
       B2INFO("Background tag " << backgroundtag << " not associated with a color.\n");
       return ("orange");

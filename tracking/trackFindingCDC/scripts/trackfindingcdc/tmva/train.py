@@ -32,6 +32,7 @@ class FastBDTClassifier(object):
 
     @staticmethod
     def load_plugins(name):
+        """Helper function to setup the fast boosted decision tree in TMVA"""
         base = "TMVA@@MethodBase"
         regexp1 = ".*_" + str(name) + ".*"
         regexp2 = ".*" + str(name) + ".*"
@@ -47,17 +48,53 @@ class FastBDTClassifier(object):
                  output_file_name=None,
                  truth=None,
                  exclude=[],
-                 select=[]):
+                 select=[],
+                 replace_nan=None):
+        """Setup a fast boosted decision tree for classification from TMVA.
 
-        self.output_file_name = output_file_name or name + ".root"
-        self.name = name
+        Parameters
+        ----------
+        name : str
+            A name for the decision tree
+        output_file_name : str, optional
+            Name of the output file to which the trained expertise is written
+            Default is the name postfixed by .root
+        truth :  str, optional
+            Name of the branch carrying the classification target
+            Defaults to the shortest branch name containing "truth"
+         exclude : list(str), optional
+            Branch names to be excluded from the training.
+            Defaults to excluding nothing.
+         select : list(str)
+            Branch names to be used for training.
+            Defaults to selecting all.
+        replace_nan : float
+            Finite value with which to replace non-finit values (typically -999)
+            Defaults to no replacement.
+        """
+
         self.load_plugins("FastBDT")
 
+        #: A name for the decision tree
+        self.name = name
+
+        #: Name of the output file to which the trained expertise is written
+        self.output_file_name = output_file_name or name + ".root"
+
+        #: Branch names to be excluded from the training.
         self.exclude = exclude
+
+        #: Branch names to be used for training.
         self.select = select
+
+        #: Name of the branch carrying the classification target.
         self.truth = truth
 
+        #: Finite value with which to replace non-finit values (typically -999)
+        self.replace_nan = replace_nan
+
     def train(self, input_tree):
+        """Train the boosted decision tree to model to classification target"""
 
         if isinstance(self.output_file_name, str):
             output_file = ROOT.TFile(self.output_file_name, "RECREATE")
@@ -100,7 +137,13 @@ class FastBDTClassifier(object):
             variable_names.remove("weight")
 
         for variable_name in variable_names:
-            factory.AddVariable(variable_name)
+            if self.replace_nan:
+                replace_nan = self.replace_nan
+                variable_expression = "TMath::Finite({0})?{0}:{1}".format(variable_name, replace_nan)
+            else:
+                variable_expression = variable_name
+
+            factory.AddVariable(variable_expression)
 
         if "weight" in column_names and "weight" not in exclude:
             get_logger().info("Setting weight column")

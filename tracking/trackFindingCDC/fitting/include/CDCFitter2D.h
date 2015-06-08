@@ -90,24 +90,25 @@ namespace Belle2 {
                   const StartHits& startHits,
                   const EndHits& endHits) const
       {
-
         CDCObservations2D observations2D;
         if (m_usePosition) {
           observations2D.append(startHits, true);
-          observations2D.append(endHits, true);
         }
         if (m_useOrientation) {
           observations2D.append(startHits, false);
+        }
+
+        if (m_usePosition) {
+          observations2D.append(endHits, true);
+        }
+        if (m_useOrientation) {
           observations2D.append(endHits, false);
         }
 
         if (observations2D.size() < 4) {
           trajectory2D.clear();
-          return;
         } else {
           FitMethod::update(trajectory2D, observations2D);
-          ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
-          if (isCoaligned == BACKWARD) trajectory2D.reverse();
         }
       }
 
@@ -127,11 +128,8 @@ namespace Belle2 {
 
         if (observations2D.size() < 4) {
           trajectory2D.clear();
-          return;
         } else {
           FitMethod::update(trajectory2D, observations2D);
-          ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
-          if (isCoaligned == BACKWARD) trajectory2D.reverse();
         }
       }
 

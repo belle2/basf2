@@ -159,7 +159,8 @@ namespace Belle2 {
       NSMData& data(NSM2CACallback::get().getData(name));
       if (!data.isAvailable()) return 1;
       DBField::Type type;
-      const void* buf = data.find(StringUtil::join(str, ".", 3), type);
+      int length;
+      const void* buf = data.find(StringUtil::join(str, ".", 3), type, length);
       if (type == DBField::FLOAT) {
         return read_in(record, *(const float*)buf);
       } else if (type == DBField::DOUBLE) {
@@ -179,7 +180,8 @@ namespace Belle2 {
         return 1;
       }
       DBField::Type type;
-      const void* buf = data.find(StringUtil::join(str, ".", 3), type);
+      int length;
+      const void* buf = data.find(StringUtil::join(str, ".", 3), type, length);
       if (type == DBField::CHAR) {
         return read_in(record, *(const char*)buf);
       } else if (type == DBField::CHAR) {

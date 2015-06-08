@@ -12,5 +12,6 @@
 #pragma link C++ class Belle2::TrackFindingCDC::SVGPrimitivePlotter-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::EventDataPlotter-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCSVGPlotter-;
 
 #endif

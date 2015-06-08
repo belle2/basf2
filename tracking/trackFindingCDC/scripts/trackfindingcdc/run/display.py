@@ -13,7 +13,9 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
 
     output_folder = '/tmp'
     iteractive = True
-    show_all_drawoptions = False  # Also show draw options that are related to the cellular automaton track finder on the command line?
+
+    # Also show draw options that are related to the cellular automaton track finder on the command line?
+    show_all_drawoptions = False
 
     def __init__(self):
         super(CDCDisplayRun, self).__init__()

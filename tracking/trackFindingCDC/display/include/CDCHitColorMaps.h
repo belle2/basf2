@@ -1,0 +1,286 @@
+/*
+ * CDCHitColorMaps.h
+ *
+ *  Created on: Jun 8, 2015
+ *      Author: dschneider
+ */
+
+#ifndef CDCHITCOLORMAPS_H_
+#define CDCHITCOLORMAPS_H_
+
+#include <tracking/trackFindingCDC/display/ColorMaps.h>
+#include <map>
+#include <cdc/dataobjects/CDCHit.h>
+
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /**
+     * Virtual base class for CDCHit to color map objects.
+     */
+    class CDCHitColorMap {
+    public:
+
+      /**
+       * Constructor.
+       *
+       * Sets m_bkgHitColor to "orange".
+       */
+      CDCHitColorMap() : m_bkgHitColor("orange") {};
+
+      /**
+       * Destructor.
+       */
+      virtual ~CDCHitColorMap() {};
+
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      virtual std::string map(const int&, const CDCHit&) {return m_bkgHitColor;}
+
+      /**
+       * Informal string summarizing the translation variables to colors.
+       */
+      virtual std::string info() {return m_bkgHitColor;}
+
+    protected:
+      /**
+       * The default color to be used.
+       */
+      std::string m_bkgHitColor;
+    };
+
+    /**
+     * Defines a PDGCode to Color Map.
+     */
+    class ColorByPDGCode : public CDCHitColorMap {
+    public:
+      /**
+       * Constructor setting up a PDGCode to Color map.
+       */
+      ColorByPDGCode() : m_missingPDGColor("lime"),
+        m_colorByPDGCode(
+      {
+        { -999, m_bkgHitColor},
+        {11, "blue"},
+        { -11, "blue"},
+        {13, "turquoise"},
+        { -13, "turquoise"},
+        {15, "cyan"},
+        { -15, "cyan"},
+        {211, "green"},
+        { -211, "green"},
+        {321, "olive"},
+        { -321, "olive"},
+        {2212, "red"},
+        { -2212, "red"},
+      }
+      ) {};
+    protected:
+      /**
+       * Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map.
+       */
+      std::string m_missingPDGColor;
+      /**
+       * Map to define the color for the most relevant.
+       */
+      std::map<int, std::string> m_colorByPDGCode;
+    };
+
+    /**
+     * CDCHit to color map highlighting the CDCHits with 0 drift length.
+     */
+    class ZeroDriftLengthColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit) ;
+    };
+
+    /**
+     * CDCHit to stroke width map highlighting the CDCHits with 0 drift length.
+     */
+    class ZeroDriftLengthStrokeWidthMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a stroke width.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit) ;
+    };
+
+    /**
+     * CDCHit to color map highlighting the CDCHits that posses the do not use flag.
+     */
+    class TakenFlagColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit) ;
+    };
+
+    /**
+     * CDCHit to color map by their local right left passage information from Monte Carlo truth
+     */
+    class RLColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+      /**
+       * Informal string summarizing the translation from right left passage variable to colors.
+       */
+      std::string info();
+    };
+
+    /**
+     * CDCHit to color map by their assoziated CDCSimHit::getPosFlag property.
+     */
+    class PosFlagColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+      /**
+       * Informal string summarizing the translation from CDCSimHit::getPosFlag variable to colors.
+       */
+      std::string info();
+    };
+
+    /**
+     * CDCHit to color map by their assoziated CDCSimHit::getBackgroundTag property.
+     */
+    class BackgroundTagColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+      /**
+       * Informal string summarizing the translation from CDCSimHit::getBackgroundTag variable to colors.
+       */
+      std::string info();
+    };
+
+    /**
+     * CDCHit to color map by their Monte Carlo segment id
+     */
+    class MCSegmentIdColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+    };
+
+    /**
+     * CDCHit to color map by their assoziated CDCSimHit::getFlightTime.
+     */
+    class TOFColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+      /**
+       * Translates the given floating point time of flight to a color.
+       */
+      std::string timeOfFlightToColor(const double& timeOfFlight);
+    };
+
+    /**
+     * CDCHit to color map indicating the reassignment to a different MCParticle.
+     */
+    class ReassignedSecondaryMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+    };
+
+    class MCParticleColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Constructor setting up a Monte Carlo id to color map which is continously filled
+       * as new during the event.
+       */
+      MCParticleColorMap(): m_newColors( {}), m_iColor(0) {};
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+    private:
+      ListColors m_listColors;
+      std::map<int, std::string> m_newColors;
+      int m_iColor;
+    };
+
+    /**
+     * CDCHit to color map by the associated MCParticle::getPDG()
+     */
+    class MCPDGCodeColorMap : public ColorByPDGCode {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+      /**
+       * Informal string summarizing the translation from pdg codes to colors.
+       */
+      std::string info();
+    };
+
+    /**
+     * CDCHit to color map by the isPrimary information as well as the secondary process type in case the particle is not primary.
+     */
+    class MCPrimaryColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Constructor setting up a map to count the hits for each secondary type.
+       */
+      MCPrimaryColorMap(): m_nHitsBySecondaryType( {}) {};
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+      /**
+       * Informal string summarizing the translation from seconday process codes to colors.
+       */
+      std::string info();
+    private:
+      std::map<std::vector<int>, int> m_nHitsBySecondaryType;
+    };
+
+    /**
+     * CDCHit to color map by the associated CDCSimHit::getPDG().
+     */
+    class SimHitPDGCodeColorMap : public ColorByPDGCode {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+    };
+
+    /**
+     * CDCHit to color map by CDCSimHit::getBackgroundTag().
+     */
+    class SimHitIsBkgColorMap : public CDCHitColorMap {
+    public:
+      /**
+       * Function call to map the CDCHit id and object to a color.
+       */
+      std::string map(const int& iCDCHit, const CDCHit& cdcHit);
+    };
+
+  }//namespace TrackFindingCDC
+}//namespace Belle2
+
+
+
+#endif /* CDCHITCOLORMAPS_H_ */

@@ -46,12 +46,13 @@ FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() con
     {"recording", "record the encountered instances of segment pairs"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
+    {"fitless", "mc free with simple criteria without the common fit"},
   });
   return filterNames;
 }
 
-std::unique_ptr<Filter<CDCSegmentPair>>
-                                     FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) const
+std::unique_ptr<Filter<CDCSegmentPair> >
+FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new BaseSegmentPairFilter());
@@ -64,6 +65,8 @@ std::unique_ptr<Filter<CDCSegmentPair>>
     return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
+  } else if (filterName == string("fitless")) {
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new FitlessSegmentPairFilter());
   } else if (filterName == string("recording")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new RecordingSegmentPairFilter());
   } else if (filterName == string("unionrecording")) {

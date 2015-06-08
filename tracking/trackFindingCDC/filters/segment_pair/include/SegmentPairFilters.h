@@ -13,5 +13,6 @@
 #include <tracking/trackFindingCDC/filters/segment_pair/AllSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/SimpleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/FitlessSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/RecordingSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/UnionRecordingSegmentPairFilter.h>

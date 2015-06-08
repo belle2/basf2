@@ -119,7 +119,7 @@ struct dhhc_frame_header_word0 {
   };
   void print(void) const
   {
-    const char* dhhc_type_name[17] = {
+    const char* dhhc_type_name[16] = {
       (const char*)"DHP_RAW",
       (const char*)"FCE_RAW",
       (const char*)"GHOST  ",
@@ -135,8 +135,7 @@ struct dhhc_frame_header_word0 {
       (const char*)"C_END  ",
       (const char*)"ONS_DHP",
       (const char*)"ONS_TRG",
-      (const char*)"ONS_ROI",
-      (const char*)"DHE_CLUSTER"
+      (const char*)"ONS_ROI"
     };
     B2INFO("DHHC FRAME TYP " << hex << getFrameType() << " -> " << dhhc_type_name[getFrameType()] << " (ERR " << getErrorFlag() <<
            ") data " << data);
@@ -640,7 +639,6 @@ PXDUnpackerModule::PXDUnpackerModule() :
 void PXDUnpackerModule::initialize()
 {
   StoreArray<RawPXD>::required(m_RawPXDsName);
-//   StoreArray<Cluster>::required(m_RawClusterName);
   //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName);
@@ -871,7 +869,9 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
     // checked already above
   }
 };
-
+////WARUM SO VIELE SACHEN IE ÜBERGEBEN WERDEN????
+// void PXDUnpackerModule::unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo,
+//                                    unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id)
 void PXDUnpackerModule::unpack_fce(void* data, unsigned int length, VxdID vxd_id)
 {
 

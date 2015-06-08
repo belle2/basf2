@@ -15,415 +15,79 @@
          whitespace, comma or semi-colon -->
     <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
     </bar>
-    <CrematGain>1.4*1e12</CrematGain>
 
-    <!-- 0-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 1-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 2-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 3-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
+    <CrematGain>1.4</CrematGain>
 
-   <!-- 8-1 -->
+       
+    <!-- backward, horizontal placement -->
+    <!-- 2-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
+      <z_pindiode unit="cm">-9.925</z_pindiode>
+      <r_pindiode unit="cm">3.1</r_pindiode>
       <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
+      <Phi unit="deg">45.0</Phi>
+    </Active>
+    <!-- 2-2 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-9.925</z_pindiode>
+      <r_pindiode unit="cm">3.1</r_pindiode>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">135.0</Phi>
+    </Active>
+    <!-- 2-3 -->
+    <Active>
+      <Material>PINDIODE-Material</Material>
+      <z_pindiode unit="cm">-9.925</z_pindiode>
+      <r_pindiode unit="cm">3.1</r_pindiode>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">225.0</Phi>
    </Active>
-   <!-- 9-2 -->
-    <Active>
+   <!-- 2-4 -->
+   <Active>
       <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
+      <z_pindiode unit="cm">-9.925</z_pindiode>
+      <r_pindiode unit="cm">3.1</r_pindiode>
       <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 10-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 11-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-   <!-- 16-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 17-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 18-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 19-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
+      <Phi unit="deg">315.0</Phi>
    </Active>
 
+  <!-- forward, horizontal placement -->
+  <!-- 4-1 -->
+  <Active>
+    <Material>PINDIODE-Material</Material>
+    <z_pindiode unit="cm">12.925</z_pindiode>
+    <r_pindiode unit="cm">3.1</r_pindiode>
+    <ThetaZ unit="deg">90.0</ThetaZ>
+    <Phi unit="deg">45.0</Phi>
+  </Active>
+  <!-- 4-2 -->
+  <Active>
+    <Material>PINDIODE-Material</Material>
+    <z_pindiode unit="cm">12.925</z_pindiode>
+    <r_pindiode unit="cm">3.1</r_pindiode>
+    <ThetaZ unit="deg">90.0</ThetaZ>
+    <Phi unit="deg">135.0</Phi>
+  </Active>
+  <!-- 4-3 -->
+  <Active>
+    <Material>PINDIODE-Material</Material>
+    <z_pindiode unit="cm">12.925</z_pindiode>
+    <r_pindiode unit="cm">3.1</r_pindiode>
+    <ThetaZ unit="deg">90.0</ThetaZ>
+    <Phi unit="deg">225.0</Phi>
+  </Active>
+  <!-- 4-4 -->
+  <Active>
+    <Material>PINDIODE-Material</Material>
+    <z_pindiode unit="cm">12.925</z_pindiode>
+    <r_pindiode unit="cm">3.1</r_pindiode>
+    <ThetaZ unit="deg">90.0</ThetaZ>
+    <Phi unit="deg">315.0</Phi>
+  </Active>
 
-    <!-- 24-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 25-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 26-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 27-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">10.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-   <!-- 28-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">8.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 33-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 34-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 35-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">6.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
-   <!-- 40-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 41-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 42-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 43-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">2.0</z_pindiode>
-      <r_pindiode unit="cm">6.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
-
-   <!-- 44-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 45-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 46-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 47-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-100.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-   <!-- 48-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 49-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 50-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 51-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">166.0</z_pindiode>
-      <r_pindiode unit="cm">36.8</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
-
-
-   <!-- 44-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 45-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 46-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 47-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
-   <!-- 44-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 45-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 46-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 47-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">-400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
-
-
-   <!-- 44-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 45-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 46-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 47-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">200.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
-   <!-- 44-1 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">0.0</Phi>
-   </Active>
-   <!-- 45-2 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">90.0</Phi>
-   </Active>
-   <!-- 46-3 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">-90.0</Phi>
-   </Active>
-   <!-- 47-4 -->
-    <Active>
-      <Material>PINDIODE-Material</Material>
-      <z_pindiode unit="cm">400.0</z_pindiode>
-      <r_pindiode unit="cm">80</r_pindiode>
-      <ThetaZ unit="deg">90.0</ThetaZ>
-      <Phi unit="deg">180.0</Phi>
-   </Active>
-
+  
 
   </Content>
 </DetectorComponent>

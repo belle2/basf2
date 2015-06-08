@@ -59,7 +59,7 @@ PinDigitizerModule::PinDigitizerModule() : Module()
   setDescription("Pindiode digitizer module");
 
   //Default values are set here. New values can be in PINDIODE.xml.
-  addParam("CrematGain", m_CrematGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4 * 1e12);
+  addParam("CrematGain", m_CrematGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4);
 
 }
 
@@ -72,7 +72,7 @@ void PinDigitizerModule::initialize()
   B2INFO("PinDigitizer: Initializing");
   StoreArray<PindiodeHit>::registerPersistent();
 
-  //get the garfield drift data, gas, and PIN paramters
+  //get xml data
   getXMLData();
 
 }
@@ -94,12 +94,12 @@ void PinDigitizerModule::event()
   }
 
   //Declare and initialze energy and time
-  double edep[nPIN];
-  double time[nPIN];
-  double itime[nPIN];
-  double volt[nPIN];
+  double edep[2 * nPIN];
+  double time[2 * nPIN];
+  double itime[2 * nPIN];
+  double volt[2 * nPIN];
   int pdg[nPIN];
-  for (int i = 0; i < nPIN; i++) {
+  for (int i = 0; i < 2 * nPIN; i++) {
     edep[i] = 0;
     time[i] = 0;
     itime[i] = 0;
@@ -111,6 +111,7 @@ void PinDigitizerModule::event()
   for (int i = 0; i < nentries; i++) {
     PindiodeSimHit* aHit = PinSimHits[i];
     int detNb = aHit->getCellId();
+    if (detNb > 2 * nPIN)continue;
     edep[detNb] += aHit->getEnergyDep();
     time[detNb] += aHit->getFlightTime();
     itime[detNb] ++;
@@ -118,10 +119,10 @@ void PinDigitizerModule::event()
     if (PDG == 22) pdg[detNb] = 1;
   }
 
-  for (int i = 0; i < nPIN; i++) {
+  for (int i = 0; i < 2 * nPIN; i++) {
     if (itime[i] > 0) {
       time[i] /= itime[i];
-      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_CrematGain;
+      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_CrematGain * 1e12;
       PinHits.appendNew(PindiodeHit(i, edep[i], volt[i], time[i], pdg[i]));
     }
   }

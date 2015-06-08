@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import os.path
+
+import tracking.utilities as utilities
+
+from trackfindingcdc.tmva.train import ClassificationOverview
+
+import ROOT.TFile
+
+import logging
+
+
+def main():
+    argument_parser = utilities.DefaultHelpArgumentParser()
+
+    argument_parser.add_argument(
+        "records_file_path",
+        help="ROOT file containing the TTree of records on which to train a boosted decision tree.",
+    )
+
+    argument_parser.add_argument(
+        "-t",
+        "--input-tree-name",
+        default="records",
+        help="Name of the input TTree in the ROOT file",
+    )
+
+    arguments = argument_parser.parse_args()
+
+    records_file_path = arguments.records_file_path
+    input_tree_name = arguments.input_tree_name
+
+    records_tfile = ROOT.TFile(records_file_path, "READ")
+    input_tree = records_tfile.Get(input_tree_name)
+
+    records_folder_path, records_file_name = os.path.split(records_file_path)
+    records_file_basename, ext = os.path.splitext(records_file_name)
+
+    overview_file_name = records_file_basename + ".overview" + ext
+    overview_file_path = os.path.join(records_folder_path, overview_file_name)
+
+
+    overview = ClassificationOverview(overview_file_name)
+    overview.train(input_tree)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
+    main()  

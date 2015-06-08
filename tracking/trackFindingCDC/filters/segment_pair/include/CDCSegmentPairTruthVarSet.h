@@ -11,56 +11,17 @@
 
 #include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
-    static char const* const segmentPairTruthNames[] = {
-      "truth"
-    };
-
-    /** Class that specifies the names of the variables
-     *  that should be generated from a segment pair.
-     */
-    class CDCSegmentPairTruthVarNames : public VarNames<CDCSegmentPair> {
-
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(segmentPairTruthNames);
-
-      /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
-      static char const* getName(int iName)
-      {
-        return segmentPairTruthNames[iName];
-      }
-    };
-
     /** Class that computes floating point variables from segment pair.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class  CDCSegmentPairTruthVarSet : public VarSet<CDCSegmentPairTruthVarNames> {
-
+    class  CDCSegmentPairTruthVarSet : public FilterVarSet<MCSegmentPairFilter> {
     public:
       /// Construct the varset and take an optional prefix.
       CDCSegmentPairTruthVarSet(const std::string& prefix = "");
-
-      /// Generate and assign the variables from the segmentPair
-      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
-
-      /// Initialize the varset before event processing
-      virtual void initialize() IF_NOT_CINT(override final);
-
-      /// Initialize the varset before event processing
-      virtual void terminate() IF_NOT_CINT(override final);
-
-    public:
-      /// SegmentPair filter that gives if the segment pair is a true segmentPair.
-      MCSegmentPairFilter m_mcSegmentPairFilter;
-
     };
   }
 }

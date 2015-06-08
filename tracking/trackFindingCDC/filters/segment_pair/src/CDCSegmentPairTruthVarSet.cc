@@ -15,28 +15,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCSegmentPairTruthVarSet::CDCSegmentPairTruthVarSet(const std::string& prefix) :
-  VarSet<CDCSegmentPairTruthVarNames>(prefix)
+  FilterVarSet<MCSegmentPairFilter>(prefix + "truth_",
+                                    std::unique_ptr<MCSegmentPairFilter>(new MCSegmentPairFilter()))
 {
-}
-
-bool CDCSegmentPairTruthVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
-{
-  bool extracted = extractNested(ptrSegmentPair);
-  if (not extracted or not ptrSegmentPair) return false;
-
-  const CDCSegmentPair& segmentPair = *ptrSegmentPair;
-
-  const CellWeight mcWeight = m_mcSegmentPairFilter(segmentPair);
-  var<named("truth")>() =  not isNotACell(mcWeight);
-  return true;
-}
-
-void CDCSegmentPairTruthVarSet::initialize()
-{
-  m_mcSegmentPairFilter.initialize();
-}
-
-void CDCSegmentPairTruthVarSet::terminate()
-{
-  m_mcSegmentPairFilter.terminate();
 }

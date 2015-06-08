@@ -161,6 +161,8 @@ Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
 
 Vector2D CDCRecoHit2D::getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
 {
+  return trajectory2D.getClosest(getRecoPos2D());
+
   /// FIXME: Think about if this is the correct behaviour.
-  return reconstruct3D(trajectory2D).xy();
+  //return reconstruct3D(trajectory2D).xy();
 }

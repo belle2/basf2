@@ -11,13 +11,13 @@ from trackfindingcdc.validation.recording import RecordingRun
 import logging
 
 
-class CDCClustersRecordingRun(RecordingRun):
+class CDCClusterRecordingRun(RecordingRun):
     """Run for recording clusters encountered at the filter"""
     n_events = 50
-    # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
+    bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     output_file_name = "CDCClusterTruthRecords.root"
-    varsets = ["basic", "filter(truth)", ]
+    varsets = ["basic", "truth", ]
 
     recording_filter_parameter_name = "ClusterFilterParameters"
 

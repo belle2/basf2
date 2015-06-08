@@ -1,0 +1,53 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+#include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterVarSets.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /// Records the encountered CDCWireHitClusters.
+    class UnionRecordingClusterFilter: public UnionRecordingFilter<CDCWireHitCluster> {
+
+    private:
+      /// Type of the base class
+      typedef  UnionRecordingFilter<CDCWireHitCluster> Super;
+
+    public:
+      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
+      UnionRecordingClusterFilter() : Super("BackgroundHitFinder.root")
+      {;}
+
+      /// Valid names of variable sets for clusters.
+      virtual std::vector<std::string> getValidVarSetNames() const override
+      {
+        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
+        varSetNames.insert(varSetNames.end(), {"basic", "truth"});
+        return varSetNames;
+      }
+
+      /// Create a concrete variables set for clusters from a name.
+      virtual
+      std::unique_ptr<BaseVarSet<CDCWireHitCluster>> createVarSet(const std::string& name) const override
+      {
+        if (name == "basic") {
+          return std::unique_ptr<BaseVarSet<CDCWireHitCluster> >(new CDCWireHitClusterBasicVarSet());
+        } else if (name == "truth") {
+          return std::unique_ptr<BaseVarSet<CDCWireHitCluster> >(new CDCWireHitClusterBkgTruthVarSet());
+        } else {
+          return Super::createVarSet(name);
+        }
+      }
+    };
+  }
+}

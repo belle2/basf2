@@ -11,18 +11,30 @@
 
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+
 #include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBkgTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBasicVarSet.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitClusters.
-    class RecordingClusterFilter: public RecordingFilter<CDCWireHitClusterBkgTruthVarSet> {
+    class RecordingClusterFilter:
+      public RecordingFilter<VariadicUnionVarSet<CDCWireHitClusterBkgTruthVarSet,
+      CDCWireHitClusterBasicVarSet> > {
+
+    private:
+      /// Type of the base class
+      typedef RecordingFilter<VariadicUnionVarSet<
+      CDCWireHitClusterBkgTruthVarSet,
+      CDCWireHitClusterBasicVarSet
+      > > Super;
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      RecordingClusterFilter() :
-        RecordingFilter<CDCWireHitClusterBkgTruthVarSet>("BackgroundHitFinder.root")
+      RecordingClusterFilter() : Super("BackgroundHitFinder.root")
       {;}
 
     };

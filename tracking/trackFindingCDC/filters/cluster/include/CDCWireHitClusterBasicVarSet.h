@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const clusterNames[14] = {
+    static char const* const clusterBasicNames[14] = {
       "is_stereo",
       "superlayer_id",
       "size",
@@ -52,7 +52,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
      */
-    class CDCWireHitClusterVarNames : public VarNames<CDCWireHitCluster> {
+    class CDCWireHitClusterBasicVarNames : public VarNames<CDCWireHitCluster> {
 
     public:
       /// Number of variables to be generated.
@@ -77,18 +77,18 @@ namespace Belle2 {
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return clusterNames[iName];
+        return clusterBasicNames[iName];
       }
     };
 
     /** Class that computes floating point variables from a wire hit clusters.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class CDCWireHitClusterVarSet : public VarSet<CDCWireHitClusterVarNames> {
+    class CDCWireHitClusterBasicVarSet : public VarSet<CDCWireHitClusterBasicVarNames> {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      CDCWireHitClusterVarSet(const std::string& prefix = "");
+      CDCWireHitClusterBasicVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCWireHitCluster* cluster) IF_NOT_CINT(override final);

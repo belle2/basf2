@@ -13,3 +13,4 @@
 #include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/TMVAClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/RecordingClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>

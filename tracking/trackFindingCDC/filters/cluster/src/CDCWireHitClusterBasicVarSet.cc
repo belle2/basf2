@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBasicVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
@@ -22,18 +22,18 @@ using namespace TrackFindingCDC;
 /// Important to define the constexpr here such that it gains external linkage.
 //constexpr const char* const TrackFindingCDC::clusterNames[11];
 
-CDCWireHitClusterVarSet::CDCWireHitClusterVarSet(const std::string& prefix) :
-  VarSet<CDCWireHitClusterVarNames>(prefix),
+CDCWireHitClusterBasicVarSet::CDCWireHitClusterBasicVarSet(const std::string& prefix) :
+  VarSet<CDCWireHitClusterBasicVarNames>(prefix),
   m_superLayerCenters()
 {
 }
 
-void CDCWireHitClusterVarSet::initialize()
+void CDCWireHitClusterBasicVarSet::initialize()
 {
   prepareSuperLayerCenterArray();
 }
 
-bool CDCWireHitClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
+bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
   extractNested(ptrCluster);
   if (not ptrCluster) return false;
@@ -113,7 +113,7 @@ bool CDCWireHitClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
   return true;
 }
 
-void CDCWireHitClusterVarSet::prepareSuperLayerCenterArray()
+void CDCWireHitClusterBasicVarSet::prepareSuperLayerCenterArray()
 {
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 

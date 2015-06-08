@@ -9,10 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterVarSet.h>
+#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
+#include <vector>
+#include <string>
+#include <assert.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Forward declaration of the CDCWireHitCluster.
+    class CDCWireHitCluster;
+
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
     static char const* const clusterBkgTruthNames[4] = {
@@ -31,24 +42,11 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 4;
 
-      /// Names of the variables to be generated.
-      // IF_NOT_CINT(constexpr)
-      // static char const* const names[nNames] = {
-      //   "n_background_hits_truth",
-      //   "background_fraction_truth",
-      //   "weight",
-      //   "truth"
-      //   // Note: Variables with Monte Carlo information should carry truth in their name.
-      // };
-
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
         return clusterBkgTruthNames[iName];
       }
-
-      /// Marking that the basic cluster variables should be included.
-      typedef CDCWireHitClusterVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from a wire hit clusters.

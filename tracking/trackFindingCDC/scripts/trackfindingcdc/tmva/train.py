@@ -62,10 +62,10 @@ class FastBDTClassifier(object):
         truth :  str, optional
             Name of the branch carrying the classification target
             Defaults to the shortest branch name containing "truth"
-         exclude : list(str), optional
+        exclude : list(str), optional
             Branch names to be excluded from the training.
             Defaults to excluding nothing.
-         select : list(str)
+        select : list(str)
             Branch names to be used for training.
             Defaults to selecting all.
         replace_nan : float

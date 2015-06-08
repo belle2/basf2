@@ -27,7 +27,7 @@ namespace Belle2 {
 
       /// Valid names of variable sets for segment pairs.
       virtual std::vector<std::string> getValidVarSetNames() const override
-      { return {"fitless", "fit", "truth"}; }
+      { return {"fitless", "skimmed_fitless", "fit", "truth"}; }
 
       /// Create a concrete variables set for segment pairs from a name.
       virtual
@@ -35,6 +35,8 @@ namespace Belle2 {
       {
         if (name == "fitless") {
           return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairFitlessVarSet());
+        } else if (name == "skimmed_fitless") {
+          return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairSkimmedFitlessVarSet());
         } else if (name == "fit") {
           return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairFitVarSet());
         } else if (name == "truth") {

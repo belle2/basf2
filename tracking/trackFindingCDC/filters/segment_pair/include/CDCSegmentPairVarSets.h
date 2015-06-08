@@ -10,5 +10,6 @@
 
 #pragma once
 #include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairFitlessVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairSkimmedFitlessVarSet.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairFitVarSet.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairTruthVarSet.h>

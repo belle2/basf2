@@ -125,10 +125,6 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   var<named("end_first_to_start_last_hit_phi_difference")>() = endFirstToStartLastHitPhiDifference;
 
-  if (fabs(endFirstToStartLastHitPosPhiDifference) > 1) return false;
-  if (fabs(endFirstToStartLastHitPhiDifference) > 1.4) return false;
-
-
   const Vector3D stereoLastRecoPosition3D = stereoLastHit.reconstruct3D(axialFit);
   const Vector3D stereoFirstRecoPosition3D = stereoFirstHit.reconstruct3D(axialFit);
 
@@ -159,35 +155,11 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("stereo_hits_min_dist_z_backward_wall")>() = nanmin(stereoFirstHitDistZBackwardWall,
                                                          stereoLastHitDistZBackwardWall);
 
-
-  if (var<named("stereo_hits_max_dist_z_forward_wall")>() > 100) {
-    return false;
-  }
-
-  if (var<named("stereo_hits_min_dist_z_forward_wall")>() < -300) {
-    return false;
-  }
-
-  if (var<named("stereo_hits_max_dist_z_backward_wall")>() > 300) {
-    return false;
-  }
-
-  if (var<named("stereo_hits_min_dist_z_backward_wall")>() < -100) {
-    return false;
-  }
-
   var<named("start_arc_length_front_offset")>() = startFit.getPerpSFrontOffset(startSegment, endSegment);
   var<named("end_arc_length_front_offset")>() = endFit.getPerpSFrontOffset(startSegment, endSegment);
 
   var<named("start_arc_length_back_offset")>() = startFit.getPerpSBackOffset(startSegment, endSegment);
   var<named("end_arc_length_back_offset")>() = endFit.getPerpSBackOffset(startSegment, endSegment);
-
-  if (var<named("start_arc_length_front_offset")>() < 0 or
-      var<named("end_arc_length_front_offset")>() < 0 or
-      var<named("start_arc_length_back_offset")>() < 0 or
-      var<named("end_arc_length_back_offset")>() < 0) {
-    return false;
-  }
 
   return true;
   /*

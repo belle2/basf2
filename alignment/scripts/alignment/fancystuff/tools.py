@@ -1,9 +1,10 @@
-__author__ = 'swehle'
+# -*- coding: utf-8 -*-
 """ Tools collection
 
 In the tools collection all plotting tools are gathered.
 
 """
+__author__ = 'swehle'
 
 import transform
 from settings import create_figure
@@ -120,6 +121,7 @@ def draw_flat_correlation(x, y, ax=None, draw_label=True, width=5):
 
 
 class ProfilePlot():
+
     """ Basic Profile plot
 
     Creates the profile Histogram from x and y distrinbutions
@@ -145,16 +147,16 @@ class ProfilePlot():
         if n_bins is not None:
             x_axis = n_bins
 
-        # Binning in x
+        #: Binning in x
         _, self.x_axis = np.histogram(x, x_axis)
 
-        # Mean of y in bin x
+        #: Mean of y in bin x
         self.mean = []
 
-        # Std of Mean y in bin x
+        #: Std of Mean y in bin x
         self.err = []
 
-        # Matplotlib label for the plot
+        #: Matplotlib label for the plot
         self.label = label
 
         # Calculating the Profile histogram

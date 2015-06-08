@@ -34,7 +34,7 @@ class ProTool(object):
         """ init function
         :param name: Name of the class
         """
-        # Name of the class
+        #: Name of the class
         self.name = name
 
     @property

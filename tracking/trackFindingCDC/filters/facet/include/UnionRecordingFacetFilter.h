@@ -31,7 +31,7 @@ namespace Belle2 {
 
       /// Create a concrete variables set for facets from a name.
       virtual
-      std::unique_ptr<BaseVarSet<Object>> createVarSet(const std::string& name) const override
+      std::unique_ptr<BaseVarSet<CDCFacet>> createVarSet(const std::string& name) const override
       {
         if (name == "fitless") {
           return std::unique_ptr<BaseVarSet<CDCFacet> >(new CDCFacetFitlessVarSet());

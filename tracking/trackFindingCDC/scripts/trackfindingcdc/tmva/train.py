@@ -112,7 +112,7 @@ class FastBDTClassifier(object):
         truth = self.truth
 
         if truth is None:
-            truth = "truth"
+            truth = get_truth_name(column_names)
 
         if truth not in column_names:
             raise KeyError("Truth column {truth} not in tree {tree}".format(truth=truth, tree=tree_name))

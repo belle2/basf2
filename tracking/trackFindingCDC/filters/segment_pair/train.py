@@ -17,7 +17,8 @@ def main():
     overview = ClassificationOverview("CDCSegmentPairOverview.root")
     classifer = FastBDTClassifier(
         "CDCSegmentPair",
-        "CDCSegmentPairWeights.root"
+        "CDCSegmentPairWeights.root",
+        replace_nan=-999,
     )
 
     input_file_name = "CDCSegmentPairTruthRecords.root"

@@ -28,6 +28,15 @@ def main():
         help="Name of the input TTree in the ROOT file",
     )
 
+    argument_parser.add_argument(
+        "-r",
+        "--replace-nan",
+        default=None,
+        type=int,
+        help="Choose a value to replace all non finit values (NaN, +inf, -Inf) of input variables.",
+    )
+
+
     arguments = argument_parser.parse_args()
 
     records_file_path = arguments.records_file_path
@@ -48,7 +57,7 @@ def main():
     classifer = FastBDTClassifier(
         decision_tree_name,
         weights_file_path,
-        replace_nan=-999,
+        replace_nan=arguments.replace_nan,
     )
 
     classifer.train(input_tree)
@@ -56,4 +65,4 @@ def main():
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
-    main()  
+    main()

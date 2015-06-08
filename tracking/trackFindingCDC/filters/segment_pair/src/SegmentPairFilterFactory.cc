@@ -17,42 +17,50 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName) :
-  FilterFactory<BaseSegmentPairFilter>(defaultFilterName)
+FilterFactory<Filter<CDCSegmentPair> >::FilterFactory(const std::string& defaultFilterName) :
+  FilterFactoryBase<BaseSegmentPairFilter>(defaultFilterName)
 {
 }
 
-std::string SegmentPairFilterFactory::getFilterPurpose() const
+std::string FilterFactory<Filter<CDCSegmentPair> >::getFilterPurpose() const
 {
   return "Segment pair filter to be used during the construction of segment pairs.";
 }
 
-std::string SegmentPairFilterFactory::getModuleParamPrefix() const
+std::string FilterFactory<Filter<CDCSegmentPair> >::getModuleParamPrefix() const
 {
   return "SegmentPair";
 }
 
 std::map<std::string, std::string>
-SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
+FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() const
 {
-  return {
+  std::map<std::string, std::string>
+  varSetNames = Super::getValidFilterNamesAndDescriptions();
+
+  std::map<std::string, std::string>
+  additionalVarSetNames = {
     {"all", "all segment pairs are valid"},
-    {"mc", "monte carlo truth"},
+    {"truth", "monte carlo truth"},
     {"none", "no segment pair is valid"},
     {"recording", "record the encountered instances of segment pairs"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
   };
+
+  varSetNames.insert(additionalVarSetNames.begin(), additionalVarSetNames.end());
+  return varSetNames;
+
 }
 
 std::unique_ptr<BaseSegmentPairFilter>
-SegmentPairFilterFactory::create(const std::string& filterName) const
+FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
     return std::unique_ptr<BaseSegmentPairFilter>(new BaseSegmentPairFilter());
   } else if (filterName == string("all")) {
     return std::unique_ptr<BaseSegmentPairFilter>(new AllSegmentPairFilter());
-  } else if (filterName == string("mc")) {
+  } else if (filterName == string("truth")) {
     return std::unique_ptr<BaseSegmentPairFilter>(new MCSegmentPairFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<BaseSegmentPairFilter>(new SimpleSegmentPairFilter());
@@ -61,6 +69,6 @@ SegmentPairFilterFactory::create(const std::string& filterName) const
   } else if (filterName == string("unionrecording")) {
     return std::unique_ptr<BaseSegmentPairFilter>(new UnionRecordingSegmentPairFilter());
   } else {
-    return std::unique_ptr<BaseSegmentPairFilter>(nullptr);
+    return Super::create(filterName);
   }
 }

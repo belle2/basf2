@@ -17,21 +17,27 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Factory that can creates apropriate segment pair filter instance from parameters.
+     * Specialisation the filter factory for segment pairs
+     *
+     * It knows about all available filters and their parameters.
+     * Can collaborate with a Module and expose these parameters to the user in steering files.
+     */
+    template<>
+    class FilterFactory<Filter<CDCSegmentPair> > :
+      public FilterFactoryBase<Filter<CDCSegmentPair> > {
 
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering files.
-    */
-    class SegmentPairFilterFactory : public FilterFactory<BaseSegmentPairFilter> {
+    private:
+      /// Type of the base class
+      typedef FilterFactoryBase<Filter<CDCSegmentPair> > Super;
 
     public:
       /** Fill the default filter name and parameter values*/
-      SegmentPairFilterFactory(const std::string& defaultFilterName = "simple");
+      FilterFactory<Filter<CDCSegmentPair> >(const std::string& defaultFilterName = "simple");
 
-      using FilterFactory<BaseSegmentPairFilter>::create;
+      using Super::create;
 
       /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseSegmentPairFilter> create(const std::string& name) const override;
+      virtual std::unique_ptr<Filter<CDCSegmentPair> > create(const std::string& name) const override;
 
       /** Getter for a descriptive purpose of the clusterfilter.*/
       virtual std::string getFilterPurpose() const override;
@@ -43,5 +49,8 @@ namespace Belle2 {
       virtual std::string getModuleParamPrefix() const override;
 
     };
+
+    typedef FilterFactory<Filter<CDCSegmentPair> > SegmentPairFilterFactory;
+
   }
 }

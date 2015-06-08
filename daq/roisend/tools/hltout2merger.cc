@@ -90,15 +90,15 @@ HRP_init_connect_to_merger_meger(const char* host, const unsigned short port)
 
 
 static const mqd_t
-HRP_init_mqueue(void)
+HRP_init_mqueue(char* name)
 {
   mqd_t ret;
   struct mq_attr attr;
   mode_t previous_mode;
-  const char* name = ROI_MQ_NAME;
+  //  const char* name = ROI_MQ_NAME;
 
 
-  if (name[0] != '/' || strchr(name + 1, '/')) { errno = EINVAL; return -1;}
+  //  if (name[0] != '/' || strchr(name + 1, '/')) { errno = EINVAL; return -1;}
 
   ret = mq_unlink(name);
   if (ret == (mqd_t) - 1 && errno != ENOENT) {
@@ -210,11 +210,15 @@ main(int argc, char* argv[])
 {
   int i;
   int sd;
-  mqd_t mqd;
+  mqd_t mqd[10];
   const size_t n_bytes_header  = sizeof(struct h2m_header_t);
   const size_t n_bytes_footer  = sizeof(struct h2m_footer_t);
   char merger_host[256];
   unsigned short merger_port;
+
+  int num_queue = 1;
+  char qname[10][256];
+  strcpy(qname[0], ROI_MQ_NAME);
 
 
   if (argc < 3) {
@@ -240,6 +244,14 @@ main(int argc, char* argv[])
       exit(1);
     }
     merger_port = atoi(p);
+
+    if (argc > 3) {
+      num_queue = argc - 3;
+      for (int i = 0; i < argc - 3; i++) {
+        p = argv[i + 3];
+        strcpy(qname[i], p);
+      }
+    }
   }
 
 
@@ -260,15 +272,18 @@ main(int argc, char* argv[])
     }
     printf("%s:%d: main(): Connected to MERGER_MERGE\n", __FILE__, __LINE__);
 
-    mqd = HRP_init_mqueue();
-    if (mqd == (mqd_t) - 1) {
-      ERROR(HRP_init_mqueue);
-      exit(1);
+    for (int i = 0; i < num_queue; i++) {
+      mqd[i] = HRP_init_mqueue(qname[i]);
+      if (mqd[i] == (mqd_t) - 1) {
+        ERROR(HRP_init_mqueue);
+        exit(1);
+      }
     }
     printf("%s:%d: main(): Ready to accept RoI\n", __FILE__, __LINE__);
   }
 
   /* forever (mq_receive -> send) */
+  int curqid = 0;
   for (i = 0;; i++) {
     unsigned char* ptr_packet;
     size_t n_bytes_packet;
@@ -293,11 +308,13 @@ main(int argc, char* argv[])
       ssize_t n_bytes_footer = sizeof(struct h2m_header_t);
 
       ptr_roi        = buf + n_bytes_header;
-      n_bytes_roi    = HRP_roi_get(mqd, ptr_roi, ROI_IO_TIMEOUT);
+      n_bytes_roi    = HRP_roi_get(mqd[curqid], ptr_roi, ROI_IO_TIMEOUT);
       if (n_bytes_roi == -1) {
         ERROR(n_bytes_roi);
         exit(1);
       }
+      curqid++;
+      if (curqid >= num_queue) curqid = 0;
 
       ptr_header     = buf;
       n_bytes_header = HRP_build_header((struct h2m_header_t*)ptr_header, ptr_roi, n_bytes_roi);
@@ -341,7 +358,11 @@ main(int argc, char* argv[])
 
   /* termination: never reached */
   HRP_term_connect_to_merger_meger(sd);
-  HRP_term_mqueue(mqd);
+  //  HRP_term_mqueue(mqd);
+  for (int i = 0; i < num_queue; i++) {
+    mq_close(mqd[i]);
+    mq_unlink(qname[i]);
+  }
 
 
   return 0;

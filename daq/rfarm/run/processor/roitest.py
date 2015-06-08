@@ -39,12 +39,8 @@ main.add_module(raw2ds)
 # main.add_module (histo)
 histo = register_module('DqmHistoManager')
 histo.param("Port", 9991)
-histo.param("DumpInterval", 200)
+histo.param("DumpInterval", 10000)
 main.add_module(histo)
-
-# Renumber module
-# renum = register_module('ReNumber' )
-# main.add_module ( renum )
 
 # Monitor module
 monitor = register_module('MonitorData')
@@ -83,6 +79,7 @@ main.add_module(progress)
 
 # Debug modules
 elapsed = register_module('ElapsedTime')
+elapsed.param('EventInterval', 10000)
 main.add_module(elapsed)
 
 # Process events

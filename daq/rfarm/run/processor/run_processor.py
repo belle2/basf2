@@ -28,12 +28,12 @@ inputrb = argvs[1]
 outputrb = argvs[2]
 histport = argvs[3]
 # ncore = argvs[4]
-ncore = "16"
+ncore = "20"
 
 script = "processor.py"
 
 # run basf2
-proc = subprocess.Popen("basf2 " + script + " " + inputrb + " " + outputrb + " " + histport + " " + ncore, shell=True)
+proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb + " " + histport + " " + ncore, shell=True)
 
 # Just sleep
 proc.wait()

@@ -18,21 +18,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCSegmentPairs.
-    class RecordingSegmentPairFilter:
-      public RecordingFilter<VariadicUnionVarSet<CDCSegmentPairTruthVarSet,
-      CDCSegmentPairFitVarSet> > {
+    using RecordingSegmentPairFilter =
+      RecordingFilter<VariadicUnionVarSet<CDCSegmentPairTruthVarSet,
+      CDCSegmentPairFitVarSet> >;
 
-    private:
-      /// Type of the base class.
-      typedef RecordingFilter<VariadicUnionVarSet<CDCSegmentPairTruthVarSet,
-              CDCSegmentPairFitVarSet> > Super;
-
-    public:
-      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      RecordingSegmentPairFilter() :
-        Super("CDCSegmentPairTruthRecords.root")
-      {;}
-
-    };
   }
 }

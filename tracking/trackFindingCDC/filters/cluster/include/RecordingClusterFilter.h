@@ -21,22 +21,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitClusters.
-    class RecordingClusterFilter:
-      public RecordingFilter<VariadicUnionVarSet<CDCWireHitClusterBkgTruthVarSet,
-      CDCWireHitClusterBasicVarSet> > {
+    using RecordingClusterFilter =
+      RecordingFilter<VariadicUnionVarSet<CDCWireHitClusterBkgTruthVarSet,
+      CDCWireHitClusterBasicVarSet> >;
 
-    private:
-      /// Type of the base class
-      typedef RecordingFilter<VariadicUnionVarSet<
-      CDCWireHitClusterBkgTruthVarSet,
-      CDCWireHitClusterBasicVarSet
-      > > Super;
-
-    public:
-      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      RecordingClusterFilter() : Super("BackgroundHitFinder.root")
-      {;}
-
-    };
   }
 }

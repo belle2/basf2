@@ -25,8 +25,7 @@ namespace Belle2 {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      UnionRecordingSegmentPairFilter() :
-        UnionRecordingFilter<CDCSegmentPair>("CDCSegmentPairTruthRecords.root")
+      UnionRecordingSegmentPairFilter() : Super()
       {;}
 
       /// Valid names of variable sets for segment pairs.

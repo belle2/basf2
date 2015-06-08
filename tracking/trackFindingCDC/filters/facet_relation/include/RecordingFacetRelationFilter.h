@@ -19,19 +19,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Records the encountered CDCWireHitFacets.
-    class RecordingFacetRelationFilter: public RecordingFilter<VariadicUnionVarSet<
-      CDCFacetRelationBasicVarSet,
-      CDCFacetRelationTruthVarSet> > {
+    /// Records the encountered facet relations.
+    using  RecordingFacetRelationFilter =
+      RecordingFilter<VariadicUnionVarSet<CDCFacetRelationBasicVarSet,
+      CDCFacetRelationTruthVarSet> >;
 
-    public:
-      /// Constructor initialising the RecordingRelationFilter with standard root file name.
-      RecordingFacetRelationFilter() :
-        RecordingFilter<VariadicUnionVarSet<
-        CDCFacetRelationBasicVarSet,
-        CDCFacetRelationTruthVarSet> >("CDCFacetRelationTruthRecords.root")
-      {;}
-
-    };
   }
 }

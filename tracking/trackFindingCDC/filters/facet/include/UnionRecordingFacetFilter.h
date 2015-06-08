@@ -25,7 +25,7 @@ namespace Belle2 {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      UnionRecordingFacetFilter() : Super("CDCFacetTruthRecords.root")
+      UnionRecordingFacetFilter() : Super()
       {;}
 
       /// Valid names of variable sets for facets.

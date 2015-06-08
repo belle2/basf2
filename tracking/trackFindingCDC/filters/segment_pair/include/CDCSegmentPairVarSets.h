@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#include <tracking/trackFindingCDC/filters/segment_pair/BaseSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair/AllSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair/SimpleSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair/RecordingSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair/UnionRecordingSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairFitlessVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairFitVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairTruthVarSet.h>

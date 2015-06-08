@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+#ifndef CDCAXIALSTEREOSEGMENTPAIRFITLESSVARSET_H
+#define CDCAXIALSTEREOSEGMENTPAIRFITLESSVARSET_H
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
@@ -28,76 +30,77 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const segmentPairVarNames[] = {
-      "startFit_startISuperLayer",
-      "endFit_startISuperLayer",
-      "startFit_nextISuperLayer",
-      "endFit_previousISuperLayer",
-      "startFit_nextAxialISuperLayer",
-      "endFit_previousAxialISuperLayer",
+    static char const* const segmentPairFitlessVarNames[] = {
+      "start_fit_superlayer_id",
+      "end_fit_superlayer_id",
+
+      "next_superlayer_id_difference",
+      "previous_superlayer_id_difference",
+
+      "end_first_to_start_last_hit_phi_difference",
+
+      "end_first_hit_is_outside_cdc",
+      "start_last_hit_is_outside_cdc",
+
+      "arc_length2d_gap",
+
+      "start_fit_chi2",
+      "end_fit_chi2",
+
+      "start_fit_curvature_xy",
+      "end_fit_curvature_xy",
 
       "startFit_totalPerpS_startSegment",
       "endFit_totalPerpS_startSegment" ,
-      "commonFit_totalPerpS_startSegment" ,
 
       "startFit_totalPerpS_endSegment",
       "endFit_totalPerpS_endSegment",
-      "commonFit_totalPerpS_endSegment",
 
       "startFit_isForwardOrBackwardTo_startSegment",
       "endFit_isForwardOrBackwardTo_startSegment",
-      "commonFit_isForwardOrBackwardTo_startSegment",
 
       "startFit_isForwardOrBackwardTo_endSegment",
       "endFit_isForwardOrBackwardTo_endSegment",
-      "commonFit_isForwardOrBackwardTo_endSegment",
 
       "startFit_perpSGap",
       "endFit_perpSGap",
-      "commonFit_perpSGap",
 
       "startFit_perpSFrontOffset" ,
       "endFit_perpSFrontOffset",
-      "commonFit_perpSFrontOffset",
+
       "startFit_perpSBackOffset",
       "endFit_perpSBackOffset",
-      "commonFit_perpSBackOffset",
+
       "startFit_dist2DToCenter_endSegment",
       "endFit_dist2DToCenter_startSegment",
+
       "startFit_dist2DToFront_endSegment",
       "endFit_dist2DToBack_startSegment",
+
       "startFit_absMom2D",
       "endFit_absMom2D",
+
       "momAngleAtCenter_endSegment" ,
       "momAngleAtCenter_startSegment" ,
-      "startFit_chi2" ,
-      "endFit_chi2" ,
-      "commonFit_chi2" ,
-      "commonFit_szSlope",
-      "commonFit_szSlope_variance" ,
-      "szFit_szSlope",
 
       "axialFit_curvatureXY" ,
       "axialFit_curvatureXY_variance" ,
-
-      "commonFit_curvatureXY" ,
-      "commonFit_curvatureXY_variance"
     };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a segment
      */
-    class CDCSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    class CDCSegmentPairFitlessVarNames : public VarNames<CDCSegmentPair> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(segmentPairVarNames);
+      static const size_t nNames = size(segmentPairFitlessVarNames);
 
       /// Getter for the name a the given index
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return segmentPairVarNames[iName];
+        return segmentPairFitlessVarNames[iName];
       }
 
       /// Marking that the basic facet variables should be included.
@@ -115,27 +118,17 @@ namespace Belle2 {
     /** Class that computes floating point variables from a facet relation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class CDCSegmentPairFitVarSet : public VarSet<CDCSegmentPairVarNames> {
+    class CDCSegmentPairFitlessVarSet : public VarSet<CDCSegmentPairFitlessVarNames> {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCSegmentPairFitVarSet(const std::string& prefix = "");
+      CDCSegmentPairFitlessVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the segment pair
       virtual bool extract(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
-
-
-    private:
-      /// Returns the xy fitter instance that is used by this filter.
-      const CDCRiemannFitter& getRiemannFitter() const
-      { return m_riemannFitter; }
-
-    private:
-      /// Memory of the Riemann fitter for the circle fits.
-      CDCRiemannFitter m_riemannFitter;
-
     };
   }
 }
 
 
+#endif // CDCAXIALSTEREOSEGMENTFITLESSPAIRVARSET_H

@@ -9,8 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_pair/CDCSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -35,9 +37,6 @@ namespace Belle2 {
       {
         return segmentPairTruthNames[iName];
       }
-
-      /// Marking that the basic segmentPair variables should be included.
-      typedef CDCSegmentPairVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from segment pair.

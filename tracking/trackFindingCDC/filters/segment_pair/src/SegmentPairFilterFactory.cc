@@ -40,6 +40,7 @@ SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
     {"mc", "monte carlo truth"},
     {"none", "no segment pair is valid"},
     {"recording", "record the encountered instances of segment pairs"},
+    {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
   };
 }
@@ -57,6 +58,8 @@ SegmentPairFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<BaseSegmentPairFilter>(new SimpleSegmentPairFilter());
   } else if (filterName == string("recording")) {
     return std::unique_ptr<BaseSegmentPairFilter>(new RecordingSegmentPairFilter());
+  } else if (filterName == string("unionrecording")) {
+    return std::unique_ptr<BaseSegmentPairFilter>(new UnionRecordingSegmentPairFilter());
   } else {
     return std::unique_ptr<BaseSegmentPairFilter>(nullptr);
   }

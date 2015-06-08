@@ -20,8 +20,11 @@ class CDCSegmentPairTruthRecordingRun(StandardEventGenerationRun):
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
     segment_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
     segment_finder_module.param({
-        "SegmentPairFilter": "recording",
-        "SegmentPairFilterParameters": {"root_file_name": "CDCSegmentPairTruthRecords.root"},
+        "SegmentPairFilter": "unionrecording",
+        "SegmentPairFilterParameters": {
+            "root_file_name": "CDCSegmentPairTruthRecords.root",
+            "varsets": "fitless,truth",
+        },
         "SegmentPairRelationFilter": "none"
     })
 

@@ -51,8 +51,24 @@ namespace {
     return iter_pair_range<Iter>(x);
   }
 
-}
+  typedef int DetId;
+  typedef int HitId;
+  typedef int TrackCandId;
 
+  typedef std::pair<DetId, HitId> DetHitIdPair;
+
+  struct CompDetHitIdPair {
+
+    bool operator()(const std::pair<DetId, HitId>& lhs,
+                    const std::pair<std::pair<DetId, HitId>, TrackCandId>& rhs)
+    { return lhs < rhs.first; }
+
+    bool operator()(const std::pair<std::pair<DetId, HitId>, TrackCandId>& lhs,
+                    const std::pair<DetId, HitId>& rhs)
+    { return lhs.first < rhs; }
+  };
+
+}
 
 using namespace std;
 using namespace Belle2;
@@ -216,9 +232,6 @@ void MCMatcherTracksModule::event()
   }
 
   //### Build a detector_id hit_id to trackcand map for easier lookup later ###
-  typedef int DetId;
-  typedef int HitId;
-  typedef int TrackCandId;
 
   std::map< pair< DetId, HitId>, TrackCandId > mcTrackCandId_by_hitId;
 
@@ -236,9 +249,6 @@ void MCMatcherTracksModule::event()
         const DetId detId = hit->getDetId();
 
         itMCInsertHint = mcTrackCandId_by_hitId.insert(itMCInsertHint, make_pair(pair<DetId, HitId>(detId, hitId), mcTrackCandId));
-
-        // equivalent but not yet in the standard library ?
-        //itMCInsertHint = mcTrackCandId_by_hitId.emplace_hint(itMCInsertHint, pair<DetId, HitId>(detId, hitId), iHit);
       }
     }
   }
@@ -247,12 +257,16 @@ void MCMatcherTracksModule::event()
 
 
 
-  //  Use multimap here in case hits are assigned to more than one patter recognition track
-  std::multimap< pair< DetId, HitId >, TrackCandId> prTrackCandId_by_hitId;
+  //  Use set instead of multimap to handel to following situation
+  //  * One hit may be assigned to multiple tracks should contribute to the efficiency of both tracks
+  //  * One hit assigned twice or more to the same hit should not contribute to the purity multiple times
+  //  The first part is handled well by the multimap. But to enforce that one hit is also only assigned
+  //  once to a track we use a set.
+  std::set< std::pair< pair< DetId, HitId >, TrackCandId> > prTrackCandId_by_hitId;
 
   {
     TrackCandId prTrackCandId = -1;
-    std::multimap< pair< DetId, HitId>, TrackCandId>::iterator itPRInsertHint = prTrackCandId_by_hitId.end();
+    auto itPRInsertHint = prTrackCandId_by_hitId.end();
 
     for (const genfit::TrackCand& prTrackCand : prGFTrackCands) {
       ++prTrackCandId;
@@ -264,10 +278,6 @@ void MCMatcherTracksModule::event()
         const DetId detId = hit->getDetId();
 
         itPRInsertHint = prTrackCandId_by_hitId.insert(itPRInsertHint, make_pair(pair<DetId, HitId>(detId, hitId), prTrackCandId));
-
-        // equivalent but not yet in the standard library ?
-        //itPRInsertHint = prTrackCandId_by_hitId.emplace_hint(itPRInsertHint, pair<DetId, HitId>(detId, hitId), iHit);
-
       }
     }
   }
@@ -370,11 +380,13 @@ void MCMatcherTracksModule::event()
 
       // Seek all prTrackCands
       //  use as range adapter to convert the iterator pair form equal_range to a range base iterable struct
-      auto range_prTrackCandIds_for_detId_hitId_pair = as_range(prTrackCandId_by_hitId.equal_range(detId_hitId_pair));
+      auto range_prTrackCandIds_for_detId_hitId_pair = equal_range(prTrackCandId_by_hitId.begin(),
+                                                       prTrackCandId_by_hitId.end(),
+                                                       detId_hitId_pair, CompDetHitIdPair());
 
       // add the degrees of freedom to every prTrackCand that has this hit
       for (const pair<pair<DetId, HitId>, TrackCandId>& detId_hitId_pair_and_prTrackCandId :
-           range_prTrackCandIds_for_detId_hitId_pair) {
+           as_range(range_prTrackCandIds_for_detId_hitId_pair)) {
 
         TrackCandId prTrackCandId = detId_hitId_pair_and_prTrackCandId.second;
 

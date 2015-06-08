@@ -12,8 +12,13 @@ set_log_level(LogLevel.ERROR)
 argvs = sys.argv
 argc = len(argvs)
 
-print argvs[1]
-print argc
+# print argvs[1]
+# print argc
+# argvs[1] = input ring buffer
+# argvs[2] = input ring buffer
+# argvs[3] = RoI queue name
+
+print "MQname = " + argvs[3]
 
 # detecor components to be reconstructed
 components = [
@@ -67,6 +72,7 @@ main.add_module(rbuf2ds)
 
 # RoI sender
 roisender = register_module('ROISender')
+roisender.param("MessageQueueName", argvs[3])
 roisender.param("MessageQueueDepth", 20)
 roisender.param("MessageSize", 16384)
 roisender.param("ROIpayloadName", "ROIpayload")
@@ -74,10 +80,12 @@ main.add_module(roisender)
 
 # Add Progress
 progress = register_module("Progress")
+progress.param('maxN', 4)
 main.add_module(progress)
 
 # Add Elapsed Time
 etime = register_module("ElapsedTime")
+etime.param("EventInterval", 20000)
 main.add_module(etime)
 
 # Add Ds2Raw

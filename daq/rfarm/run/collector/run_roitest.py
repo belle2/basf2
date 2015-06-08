@@ -50,16 +50,18 @@ ncol = 3
 
 # Collector script
 # col_script = "EvtGenSimRec.py"
-col_script = "collector.py"
+# col_script = "collector.py"
 # col_script = "fastcollector.py"
-# col_script = "roitest.py"
+col_script = "roitest.py"
 
 inrblist = []
 outrblist = []
+roiqlist = []
 
 for i in range(0, ncol):
     inrblist.append(inputrb + str(i + 1))
     outrblist.append(outputrb + str(i + 1))
+    roiqlist.append('/roi' + str(i))
 
 print inrblist
 print outrblist
@@ -90,7 +92,7 @@ procmrb2rb = subprocess.Popen(cmdmrb2rb, shell='True')
 procbasf2 = []
 # run basf2
 for i in range(0, ncol):
-    basf2cmd = "basf2 --no-stats " + col_script + " " + inrblist[i] + " " + outrblist[i]
+    basf2cmd = "basf2 --no-stats " + col_script + " " + inrblist[i] + " " + outrblist[i] + " " + roiqlist[i]
     print basf2cmd
     procbasf2.append(subprocess.Popen(basf2cmd, shell='True'))
 

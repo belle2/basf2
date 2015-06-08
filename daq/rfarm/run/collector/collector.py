@@ -62,11 +62,12 @@ main.add_module(rbuf2ds)
 
 # Add Progress
 progress = register_module("Progress")
+progress.param('maxN', 4)
 main.add_module(progress)
 
 # Add Elapsed Time
 elapsed = register_module("ElapsedTime")
-elapsed.param("EventInterval", 10000)
+elapsed.param("EventInterval", 20000)
 main.add_module(elapsed)
 
 # Add Ds2Rbuf

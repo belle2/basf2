@@ -6,6 +6,7 @@ import numpy as np
 import math
 import contextlib
 
+import tracking.validation.plot
 
 # Vectorised version of the error function for numpy arrays
 try:
@@ -94,6 +95,31 @@ def root_save_name(name):
     deletechars = r"/$\#{}()"
     name = name.replace(' ', '_').replace('-', '_').translate(None, deletechars)
     return name
+
+
+def root_browse(tobject):
+    """Open a browser and show the given object.
+
+    Parameters
+    ----------
+    tobject : ROOT.TObject
+        The object to be shown
+    Returns
+    -------
+    ROOT.TBrowser
+        The new TBrowser used to show the object.
+    """
+    tracking.validation.plot.ValidationPlot.set_tstyle()
+
+    tbrowser = ROOT.TBrowser()
+    if isinstance(tobject, ROOT.TObject):
+        if hasattr(tobject, "Browse"):
+            tobject.Browse(tbrowser)
+        else:
+            tbrowser.BrowseObject(tobject)
+    else:
+        raise ValueError("Can only browse ROOT objects inheriting from TObject.")
+    return tbrowser
 
 
 def is_primary(mc_particle):

@@ -5,7 +5,6 @@ import sys
 import os.path
 
 import tracking.utilities as utilities
-
 from trackfindingcdc.tmva.train import ClassificationOverview
 
 import ROOT.TFile
@@ -28,6 +27,13 @@ def main():
         help="Name of the input TTree in the ROOT file",
     )
 
+    argument_parser.add_argument(
+        "-s",
+        "--show",
+        action="store_true",
+        help="Show the overview immediatly."
+        )
+
     arguments = argument_parser.parse_args()
 
     records_file_path = arguments.records_file_path
@@ -43,10 +49,16 @@ def main():
     overview_file_path = os.path.join(records_folder_path, overview_file_name)
 
 
-    overview = ClassificationOverview(overview_file_name)
+    overview = ClassificationOverview(overview_file_path)
     overview.train(input_tree)
+
+    if arguments.show:
+        import tracking.validation.utilities
+        tfile = ROOT.TFile(overview_file_path)
+        tracking.validation.utilities.root_browse(tfile)
+        raw_input("Press enter to close.")
 
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
-    main()  
+    main()

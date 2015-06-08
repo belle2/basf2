@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Trains a boosted decision tree from a TTree set of records."""
+
 import os
 import sys
 import os.path
@@ -36,6 +38,13 @@ def main():
         help="Choose a value to replace all non finit values (NaN, +inf, -Inf) of input variables.",
     )
 
+    argument_parser.add_argument(
+        "-s",
+        "--show",
+        action="store_true",
+        help="Show the overview immediatly."
+        )
+
 
     arguments = argument_parser.parse_args()
 
@@ -61,6 +70,13 @@ def main():
     )
 
     classifer.train(input_tree)
+
+    if arguments.show:
+        import tracking.validation.utilities
+        tfile = ROOT.TFile(weights_file_path)
+        tracking.validation.utilities.root_browse(tfile)
+        raw_input("Press enter to close.")
+
 
 
 if __name__ == "__main__":

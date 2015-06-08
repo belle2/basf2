@@ -48,22 +48,36 @@ int RFRoiSender::Configure(NSMmsg*, NSMcontext*)
   char* roisw = m_conf->getconf("roisender", "enabled");
   if (strstr(roisw, "yes") == 0) return 0;
 
-  // 1. Parameters for RoI sender and merger
+  // 1. Run merger first
   char* merger = m_conf->getconf("roisender", "merger");
-  char* sender = m_conf->getconf("roisender", "sender");
-  char* onsenhost = m_conf->getconf("roisender", "onsenhost");
-  char* onsenport = m_conf->getconf("roisender", "onsenport");
   char* mergerport = m_conf->getconf("roisender", "mergerport");
   char* mergerhost = m_conf->getconf("roisender", "mergerhost");
+  char* onsenhost = m_conf->getconf("roisender", "onsenhost");
+  char* onsenport = m_conf->getconf("roisender", "onsenport");
 
-  // 2. Run merger first
   // Note: merger should be run on a separate host in Belle2DAQ
-  m_pid_merger = m_proc->Execute(merger, onsenhost, onsenport, mergerport);
+  if (strstr(merger, "none") == 0) {
+    m_pid_merger = m_proc->Execute(merger, onsenhost, onsenport, mergerport);
+    sleep(2);
+  }
 
-  sleep(2);
+  // 2. Run sender
+  char* sender = m_conf->getconf("roisender", "sender");
+  int nqueue = m_conf->getconfi("roisender", "nqueues");
+  char* qbase = m_conf->getconf("roisender", "qnamebase");
 
-  // 3. Run sender
-  m_pid_sender = m_proc->Execute(sender, mergerhost, mergerport);
+  char* arglist[20];
+  arglist[0] = mergerhost;
+  arglist[1] = mergerport;
+  int nargs = 2;
+  char roiqs[10][256];
+  for (int i = 0; i < nqueue; i++) {
+    sprintf(roiqs[i], "/roi%d", i);
+    arglist[i + 2] = roiqs[i];
+    nargs++;
+  }
+  //  m_pid_sender = m_proc->Execute(sender, mergerhost, mergerport);
+  m_pid_sender = m_proc->Execute(sender, nargs, arglist);
 
   return 0;
 

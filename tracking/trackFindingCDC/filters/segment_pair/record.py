@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import os.path
 import basf2
-from tracking.run.event_generation import StandardEventGenerationRun
+
+import sys
+
+from trackfindingcdc.validation.recording import RecordingRun
 
 import logging
 
@@ -14,32 +14,29 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-class CDCSegmentPairTruthRecordingRun(StandardEventGenerationRun):
+class CDCSegmentPairRecordingRun(RecordingRun):
     n_events = 100
     generator_name = "simple_gun"
     # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
-    segment_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
-    segment_finder_module.param({
+
+    output_file_name = "CDCSegmentPairTruthRecords.root"
+    varsets = ["skimmed_fitless", "truth", ]
+
+    recording_filter_parameter_name = "SegmentPairFilterParameters"
+
+    recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
+    recording_finder_module.param({
         "SegmentPairFilter": "unionrecording",
         "SegmentPairFilterParameters": {
-            "root_file_name": "CDCSegmentPairTruthRecords.root",
-            "varsets": "fitless,truth",
+            "root_file_name": output_file_name,
+            "varsets": ",".join(varsets),
         },
         "SegmentPairRelationFilter": "none"
     })
 
-    def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
-        main_path = super(CDCSegmentPairTruthRecordingRun, self).create_path()
-
-        segment_finder_module = self.get_basf2_module(self.segment_finder_module)
-        main_path.add_module(segment_finder_module)
-        return main_path
-
 
 def main():
-    run = CDCSegmentPairTruthRecordingRun()
+    run = CDCSegmentPairRecordingRun()
     run.configure_and_execute_from_commandline()
 
 if __name__ == "__main__":

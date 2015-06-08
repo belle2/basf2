@@ -19,6 +19,10 @@ namespace Belle2 {
     /// Records the encountered CDCSegmentPairs.
     class UnionRecordingSegmentPairFilter: public UnionRecordingFilter<CDCSegmentPair> {
 
+    private:
+      /// Type of the base class
+      typedef  UnionRecordingFilter<CDCSegmentPair> Super;
+
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
       UnionRecordingSegmentPairFilter() :
@@ -27,7 +31,11 @@ namespace Belle2 {
 
       /// Valid names of variable sets for segment pairs.
       virtual std::vector<std::string> getValidVarSetNames() const override
-      { return {"fitless", "skimmed_fitless", "fit", "truth"}; }
+      {
+        std::vector<std::string> varSetNames = Super::getValidVarSetNames();
+        varSetNames.insert(varSetNames.end(), {"fitless", "skimmed_fitless", "fit", "truth"});
+        return varSetNames;
+      }
 
       /// Create a concrete variables set for segment pairs from a name.
       virtual
@@ -42,7 +50,7 @@ namespace Belle2 {
         } else if (name == "truth") {
           return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new CDCSegmentPairTruthVarSet());
         } else {
-          return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(nullptr);
+          return Super::createVarSet(name);
         }
       }
     };

@@ -407,9 +407,9 @@ namespace Belle2 {
       s  << p->getPDGCode();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (mcp) {
-        s << " -> MC: " << mcp->getPDG() << ", mcErrors: " << MCMatching::getMCErrors(p, mcp);
+        unsigned int flags = MCMatching::getMCErrors(p, mcp);
+        s << " -> MC: " << mcp->getPDG() << ", mcErrors: " << flags << " (" << MCMatching::explainFlags(flags) << ")";
         s << ", mc-index " << mcp->getIndex();
-        s << ", mc-pdg " << mcp->getPDG();
       } else {
         s << " (no MC match)";
       }

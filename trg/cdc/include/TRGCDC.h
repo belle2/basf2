@@ -29,7 +29,9 @@ template <class T> class Point3D;
 
 namespace Belle2 {
 
-class CDCGeometryPar;
+namespace CDC {
+class CDCGeometryPar; 
+}
 class TRGTime;
 class TRGClock;
 class TRGLink;
@@ -184,6 +186,9 @@ class TRGCDC {
     float fudgeFactor(float);
 
   public:// Geometry
+
+    /// returns a pointer to CDCGeometryPar
+    CDC::CDCGeometryPar* m_cdcp;
 
     /// returns a pointer to a wire. 0 will be returned if 'wireId' is
     /// invalid.

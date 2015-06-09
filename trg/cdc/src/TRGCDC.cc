@@ -296,9 +296,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     TRGDebug::enterStage("TRGCDC initialize");
 
     //...CDC...
-    Belle2::CDC::CDCGeometryPar & cdc2 =
-        Belle2::CDC::CDCGeometryPar::Instance();
-    const unsigned nLayers = cdc2.nWireLayers();
+    m_cdcp = &(Belle2::CDC::CDCGeometryPar::Instance());
+    const unsigned nLayers = m_cdcp->nWireLayers();
 
     //...Loop over layers...
     int superLayerId = -1;
@@ -313,11 +312,11 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     float fwrLast = 0;
     unsigned axialStereoSuperLayerId = 0;
     for (unsigned i = 0; i < nLayers; i++) {
-        const unsigned nWiresInLayer = cdc2.nWiresInLayer(i);
+        const unsigned nWiresInLayer = m_cdcp->nWiresInLayer(i);
 
 
         //...Axial or stereo?...
-        int nShifts = cdc2.nShifts(i);
+        int nShifts = m_cdcp->nShifts(i);
         bool axial = true;
         if (nShifts != 0)
             axial = false;
@@ -358,8 +357,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 	//cout << "ia: " << ia << " is: " << is << " ias: " << ias << " iss: " << iss << endl;
 
         //...Calculate radius...
-        const float swr = cdc2.senseWireR(i);
-        float fwr = cdc2.fieldWireR(i);
+        const float swr = m_cdcp->senseWireR(i);
+        float fwr = m_cdcp->fieldWireR(i);
         if (i == nLayers - 2)
             fwrLast = fwr;
         else if (i == nLayers - 1)
@@ -376,10 +375,10 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                                               _superLayers[superLayerId]->size(),
                                               axialStereoLayerId,
                                               axialStereoSuperLayerId,
-                                              cdc2.zOffsetWireLayer(i),
+                                              m_cdcp->zOffsetWireLayer(i),
                                               nShifts,
-                                              M_PI * cdc2.senseWireR(i)
-                                              * cdc2.senseWireR(i)
+                                              M_PI * m_cdcp->senseWireR(i)
+                                              * m_cdcp->senseWireR(i)
                                               / double(nWiresInLayer),
                                               nWiresInLayer,
                                               innerRadius,
@@ -393,12 +392,12 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 
         //...Loop over all wires in a layer...
         for (unsigned j = 0; j < nWiresInLayer; j++) {
-            const P3D fp = P3D(cdc2.wireForwardPosition(i, j).x(),
-                               cdc2.wireForwardPosition(i, j).y(),
-                               cdc2.wireForwardPosition(i, j).z());
-            const P3D bp = P3D(cdc2.wireBackwardPosition(i, j).x(),
-                               cdc2.wireBackwardPosition(i, j).y(),
-                               cdc2.wireBackwardPosition(i, j).z());
+            const P3D fp = P3D(m_cdcp->wireForwardPosition(i, j).x(),
+                               m_cdcp->wireForwardPosition(i, j).y(),
+                               m_cdcp->wireForwardPosition(i, j).z());
+            const P3D bp = P3D(m_cdcp->wireBackwardPosition(i, j).x(),
+                               m_cdcp->wireBackwardPosition(i, j).y(),
+                               m_cdcp->wireBackwardPosition(i, j).z());
             TCWire * tw = new TCWire(nWires++, j, * layer, fp, bp, _clockFE);
             _wires.push_back(tw);
             layer->push_back(tw);
@@ -572,8 +571,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
         if (TRGDebug::level() > 9) {
             const TCCell & wi = * slayer[0]->front();
             const unsigned layerId = wi.layerId();
-            cout << layerId << "," << cdc2.senseWireR(layerId) << ","
-                 << cdc2.fieldWireR(layerId) << endl;
+            cout << layerId << "," << m_cdcp->senseWireR(layerId) << ","
+                 << m_cdcp->fieldWireR(layerId) << endl;
             cout << "    super layer " << i << " radius=" << _r[i]
                  << "(r^2=" << _r2[i] << ")" << endl;
         }
@@ -1023,7 +1022,13 @@ TRGCDC::update(bool) {
 
 
             //...TDC count...
-            const int tdcCount = h.getTDCCount();
+            // For common start mode. [For before r15735 revision]
+            //const int tdcCount = h.getTDCCount();
+            //[FIXME] For common stop mode. Should make a better solution.
+            const int tdcCount = (8192.)/m_cdcp->getTdcBinWidth() - h.getTDCCount();
+            // A more flexable fix, but not a goot solution.
+            //const int tdcCount = m_cdcp->getT0(WireID(h.getID())) - h.getTDCCount();
+            //cout<<"[TRGCDC] t0["<<h.getID()<<"]: "<<m_cdcp->getT0(WireID(h.getID()))<<endl;
 
             //...Drift length from TDC...
             const float driftLength = tdcCount * (40. / 10000.);

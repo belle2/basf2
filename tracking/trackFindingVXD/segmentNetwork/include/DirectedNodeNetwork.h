@@ -46,6 +46,14 @@ namespace Belle2 {
     std::vector< DirectedNode<EntryType>* > m_nodes;
 
 
+    /** temporal storage for last outer node added, used for speed-up */
+    DirectedNode<EntryType>* m_lastOuterNode;
+
+
+    /** temporal storage for last inner node added, used for speed-up */
+    DirectedNode<EntryType>* m_lastInnerNode;
+
+
     /** keeps track of current outerEnds (nodes which have no outerNodes) - entries are the index numbers of the nodes which currently form an outermost node */
     std::vector<unsigned int> m_outerEnds;
 
@@ -55,6 +63,16 @@ namespace Belle2 {
 
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
+
+
+    /** DEBUG: mini helper function for printing. */
+//  template<class T>
+//  static std::string miniPrinter(const std::vector<T>& vec)
+//  {
+//    std::string out = "had entries: ";
+//    for (const T entry : vec) { out += std::to_string(entry) + " "; }
+//    return out;
+//  }
 
 
     /** make_unique, same as make_shared, but for unique_ptr. This is only needed because some people forgot to put make_unique into C++11.
@@ -77,23 +95,23 @@ namespace Belle2 {
 
 
     /** checks whether given 'toBeFound' is already in the vector.
-    * returns iterator of toBeFound if found, returns givenVector.end() if not
+    * returns iterator of toBeFound if found, returns givenVector.rend() if not
      */
     template<class T, class AnEntry>
-    static typename std::vector<AnEntry >::iterator isInVector(const T& toBeFound, std::vector<AnEntry >& givenVector)
+    static typename std::vector<AnEntry >::reverse_iterator isInVector(const T& toBeFound, std::vector<AnEntry >& givenVector)
     {
-      return std::find(givenVector.begin(), givenVector.end(), toBeFound);
+      return std::find(givenVector.rbegin(), givenVector.rend(), toBeFound);
     }
 
 
     /** checks whether given 'toBeFound' is already in the vector of pointers to something.
-    * returns iterator of toBeFound if found, returns givenVector.end() if not
+    * returns iterator of toBeFound if found, returns givenVector.rend() if not
     * WARNING This part is commented out until ROOT 6 is there! */
 //  template<class AnyType>
-//  typename std::vector<std::unique_ptr<DirectedNode<EntryType>> >::iterator isInVectorOfPtrs(const AnyType& toBeFound)
+//  typename std::vector<std::unique_ptr<DirectedNode<EntryType>> >::reverse_iterator isInVectorOfPtrs(const AnyType& toBeFound)
 //  {
-//    return std::find_if(m_nodes.begin(),
-//              m_nodes.end(),
+//    return std::find_if(m_nodes.rbegin(),
+//              m_nodes.rend(),
 //              [&] (const std::unique_ptr<DirectedNode<EntryType>>& vecEntry) -> bool {
 //              DirectedNode<EntryType>& entryReference = *vecEntry;
 //              return entryReference == toBeFound;
@@ -103,12 +121,12 @@ namespace Belle2 {
 
 
     /** checks whether given 'toBeFound' is already in the vector of pointers to something.
-    * returns iterator of toBeFound if found, returns givenVector.end() if not */
+    * returns iterator of toBeFound if found, returns givenVector.rend() if not */
     template<class AnyType>
-    typename std::vector< DirectedNode<EntryType>* >::iterator isInVectorOfPtrs(const AnyType& toBeFound)
+    typename std::vector< DirectedNode<EntryType>* >::reverse_iterator isInVectorOfPtrs(const AnyType& toBeFound)
     {
-      return std::find_if(m_nodes.begin(),
-                          m_nodes.end(),
+      return std::find_if(m_nodes.rbegin(),
+                          m_nodes.rend(),
                           [&](const DirectedNode<EntryType>* vecEntry) -> bool
       { return *vecEntry == toBeFound; }
                          );
@@ -118,45 +136,103 @@ namespace Belle2 {
     /** links nodes with each other. returns true if everything went well, returns false, if not  */
     static bool linkNodes(DirectedNode<EntryType>& outerNode, DirectedNode<EntryType>& innerNode)
     {
-      auto outerPos = std::find(outerNode.getInnerNodes().begin(), outerNode.getInnerNodes().end(), &innerNode);
-      auto innerPos = std::find(innerNode.getOuterNodes().begin(), innerNode.getOuterNodes().end(), &outerNode);
-
       // not successful if one of them was already added to the other one:
-      if (outerPos != outerNode.getInnerNodes().end() or innerPos != innerNode.getOuterNodes().end()) { return false; }
+      if (std::find(outerNode.getInnerNodes().begin(), outerNode.getInnerNodes().end(), &innerNode) != outerNode.getInnerNodes().end()) { return false; }
+      if (std::find(innerNode.getOuterNodes().begin(), innerNode.getOuterNodes().end(), &outerNode) != innerNode.getOuterNodes().end()) { return false; }
 
       outerNode.addInnerNode(innerNode);
       innerNode.addOuterNode(outerNode);
       return true;
     }
 
-    /** adds newNode as a new end to the endVector and replaces old one if necessary */
-    static bool updateNetworkEnd(DirectedNode<EntryType>& oldNode, DirectedNode<EntryType>& newNode,
+
+    /** adds newNode as a new end to the endVector and replaces old one if necessary. Returns true if network has been updated */
+    static bool updateNetworkEnd(DirectedNode<EntryType>& oldNode,
+                                 DirectedNode<EntryType>& newNode,
                                  std::vector<unsigned int>& endVector)
     {
+      bool newIsInner = false;
+      if (newNode.getInnerNodes().empty()) { newIsInner = true; }
+//    B2WARNING("DirectedNodeNetwork::updateNetworkEnd(): before doing anything: endVector " << miniPrinter(endVector) << ". oldNodeIndex/newNodeIndex: " << oldNode.getIndex() << "/" << newNode.getIndex() << ", newNode isInner: " << (newIsInner ? "true" : "false") )
+
       auto iter = isInVector(oldNode.getIndex(), endVector);
-      if (iter != endVector.end()) {
+      if (iter != endVector.rend()) { // old node was in endVector
         unsigned int oldIndex = *iter;
         *iter = newNode.getIndex();
-        B2WARNING("DirectedNodeNetwork::updateNetworkEnd(): oldNode has index " << oldNode.getIndex() <<
-                  ", newNode has index: " << newNode.getIndex() << ", oldNode was part of endVector and will therefore replaced (oldIndex was " <<
-                  oldIndex << " and newIndex is " << *iter << ")!")
+        B2DEBUG(250, "DirectedNodeNetwork::updateNetworkEnd(): oldNode has index " << oldNode.getIndex() <<
+                ", newNode (wasInnerNode: " << (newIsInner ? "true" : "false") <<
+                ") has index: " << newNode.getIndex() <<
+                ", oldNode was part of endVector and will therefore replaced (oldIndex was " << oldIndex <<
+                " and newIndex is " << *iter <<
+                ")!")
         return true;
       }
-      B2WARNING("DirectedNodeNetwork::updateNetworkEnd(): oldNode has index " << oldNode.getIndex() <<
-                ", newNode has index: " << newNode.getIndex() <<
-                ", oldNode is not part of endVector and will therefore not replaced (endVector[0]/size() is: " << endVector.at(
-                  0) << "/" << endVector.size() << "), newNode will be added instead!")
+      B2DEBUG(250, "DirectedNodeNetwork::updateNetworkEnd(): oldNode has index " << oldNode.getIndex() <<
+              ", newNode has (wasInnerNode: " << (newIsInner ? "true" : "false") <<
+              ") index: " << newNode.getIndex() <<
+              ", oldNode is not part of endVector and will therefore not replaced (endVector[0]/size() is: " << endVector.at(0) <<
+              "/" << endVector.size() <<
+              "), newNode will be added instead!")
       endVector.push_back(newNode.getIndex());
       return false;
     }
+
+
+    /** to a given existing node, the newEntry will be added to the network if not there yet and they will be linked (returning true) if they weren't linked yet.
+    * returns false if linking didn't work */
+    bool addToExistingNode(DirectedNode<EntryType>* existingNode, EntryType& newEntry, bool newIsInner)
+    {
+      // check if entry is already in network.
+      auto nodeIter = isInVectorOfPtrs(newEntry);
+
+      DirectedNode<EntryType>* outerNode = NULL;
+      DirectedNode<EntryType>* innerNode = NULL;
+
+      // assign nodePointers, create new nodes if needed:
+      if (newIsInner) {
+        outerNode = existingNode;
+        if (nodeIter == m_nodes.rend()) {
+          innerNode = &addNode(newEntry);
+
+          auto iterPos = std::find(m_innerEnds.begin(), m_innerEnds.end(), outerNode->getIndex());
+          if (iterPos != m_innerEnds.end()) { *iterPos = innerNode->getIndex(); }
+          else { m_innerEnds.push_back(innerNode->getIndex()); }
+
+          B2DEBUG(250, "DirectedNodeNetwork::addToExistingNode(): newEntry is inner and new with index: " << innerNode->getIndex())
+        } else {
+          innerNode = *nodeIter;
+        }
+      } else {
+        innerNode = existingNode;
+
+        if (nodeIter == m_nodes.rend()) {
+          outerNode = &addNode(newEntry);
+
+          auto iterPos = std::find(m_outerEnds.begin(), m_outerEnds.end(), innerNode->getIndex());
+          if (iterPos != m_outerEnds.end()) { *iterPos = outerNode->getIndex(); }
+          else { m_outerEnds.push_back(outerNode->getIndex()); }
+
+          B2DEBUG(250, "DirectedNodeNetwork::addToExistingNode(): newEntry is outer and new with index: " << outerNode->getIndex())
+        } else {
+          outerNode = *nodeIter;
+        }
+      }
+
+      m_lastInnerNode = innerNode;
+      m_lastOuterNode = outerNode;
+      return linkNodes(*outerNode, *innerNode);
+    }
+
   public:
 
 
-    /** ************************* DESTRUCTOR ************************* */
+    /** ************************* CONSTRUCTOR/DESTRUCTOR ************************* */
 
 
     /** standard constructor for ROOT IO */
-    DirectedNodeNetwork() {}
+    DirectedNodeNetwork() :
+      m_lastOuterNode(NULL),
+      m_lastInnerNode(NULL) {}
 
 
     /** destructor taking care of cleaning up the pointer-mess - WARNING only needed when using classic pointers for the nodes! */
@@ -171,6 +247,37 @@ namespace Belle2 {
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 
+
+    /** to the last outerNode added, another innerNode will be attached */
+    void addInnerToLastOuterNode(EntryType& innerEntry)
+    {
+      if (m_lastOuterNode == NULL) { B2FATAL("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+
+      bool wasSuccessful = addToExistingNode(m_lastOuterNode, innerEntry, true);
+
+      if (wasSuccessful) {
+        B2DEBUG(250, "DirectedNodeNetwork::addInnerToLastOuterNode(): linking was successful!")
+        return;
+      }
+      B2ERROR("DirectedNodeNetwork::addInnerToLastOuterNode(): last OuterNode and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
+    }
+
+
+    /** to the last innerNode added, another outerNode will be attached */
+    void addOuterToLastInnerNode(EntryType& outerEntry)
+    {
+      if (m_lastOuterNode == NULL) { B2FATAL("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()) }
+
+      bool wasSuccessful = addToExistingNode(m_lastInnerNode, outerEntry, false);
+
+      if (wasSuccessful) {
+        B2DEBUG(250, "DirectedNodeNetwork::addOuterToLastInnerNode(): linking was successful!")
+        return;
+      }
+      B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): last InnerNode and outerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
+    }
+
+
     /** takes two entries and weaves them into the network */
     void linkTheseEntries(EntryType& outerEntry, EntryType& innerEntry)
     {
@@ -178,65 +285,75 @@ namespace Belle2 {
       auto outerNodeIter = isInVectorOfPtrs(outerEntry);
       auto innerNodeIter = isInVectorOfPtrs(innerEntry);
 
-      /** case: none of the entries are added yet:
+      /** case 1: none of the entries are added yet:
        *  create nodes for both and link with each other, where outerEntry will be carried by outer node and inner entry by inner node
        *  outerNode will be added to outerEnds, and innerNode will be added to innerEnds.
        * */
-      if (outerNodeIter == m_nodes.end() and innerNodeIter == m_nodes.end()) {
+      if (outerNodeIter == m_nodes.rend() and innerNodeIter == m_nodes.rend()) {
         DirectedNode<EntryType>& newOuterNode = addNode(outerEntry);
         DirectedNode<EntryType>& newInnerNode = addNode(innerEntry);
 
         linkNodes(newOuterNode, newInnerNode);
+        m_lastInnerNode = &newInnerNode;
+        m_lastOuterNode = &newOuterNode;
 
         m_outerEnds.push_back(newOuterNode.getIndex());
         m_innerEnds.push_back(newInnerNode.getIndex());
 
-        B2WARNING("DirectedNodeNetwork::linkTheseEntries(): outerNode is new with index " << newOuterNode.getIndex() <<
-                  ", innerNode is new with index: " << newInnerNode.getIndex())
+        B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode is new with index " << newOuterNode.getIndex() <<
+                ", innerNode is new with index: " << newInnerNode.getIndex())
         return;
       }
 
-      /** case: the outerEntry was already in the network, but not innerEntry:
+      /** case 2: the outerEntry was already in the network, but not innerEntry:
        *  add new node(innerEntry) to network
        *  add innerNode to existing outerNode
        *  add innerNode to innerEnds, if outerNode was in innerEnds before, replace old one with new innerNode
        * */
-      if (outerNodeIter != m_nodes.end() and innerNodeIter == m_nodes.end()) {
+      if (outerNodeIter != m_nodes.rend() and innerNodeIter == m_nodes.rend()) {
         DirectedNode<EntryType>& outerNode = **outerNodeIter;
         DirectedNode<EntryType>& newInnerNode = addNode(innerEntry);
 
         linkNodes(outerNode, newInnerNode);
+        m_lastInnerNode = &newInnerNode;
+        m_lastOuterNode = &outerNode;
 
+//      B2INFO("DirectedNodeNetwork::linkTheseEntries(): outerNode existed, innerNode not. B4 updateNetworkEnd, innerEnds: " << miniPrinter(m_innerEnds) << "\n outerEnds: " << miniPrinter(m_outerEnds))
         bool outerNodeReplaced = updateNetworkEnd(outerNode, newInnerNode, m_innerEnds);
 
-        B2WARNING("DirectedNodeNetwork::linkTheseEntries(): outerNode was already there with index " << outerNode.getIndex() <<
-                  ", innerNode is new with index: " << newInnerNode.getIndex() <<
-                  ", outerNode was innerNode before: " << (outerNodeReplaced ? "true" : "false"))
+        B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode was already there with index " << outerNode.getIndex() <<
+                ", innerNode is new with index: " << newInnerNode.getIndex() <<
+                ", outerNode was innerNode before: " << (outerNodeReplaced ? "true" : "false"))
         return;
       }
 
-      /** case: outerNode was not there yet, but innerEntry was:
+      /** case 3: outerNode was not there yet, but innerEntry was:
        *  add new node(outerEntry) to network
        *  add outerNode to existing innerNode
        *  add outerNode to outerEnds, if innerNode was in outerEnds before, replace old one with new outerNode
        * */
-      if (outerNodeIter == m_nodes.end() and innerNodeIter != m_nodes.end()) {
+      if (outerNodeIter == m_nodes.rend() and innerNodeIter != m_nodes.rend()) {
         DirectedNode<EntryType>& newOuterNode = addNode(outerEntry);
         DirectedNode<EntryType>& innerNode = **innerNodeIter;
 
         linkNodes(newOuterNode, innerNode);
+        m_lastInnerNode = &innerNode;
+        m_lastOuterNode = &newOuterNode;
 
+//      B2INFO("DirectedNodeNetwork::linkTheseEntries(): innerNode existed, outerNode not. B4 updateNetworkEnd, innerEnds: " << miniPrinter(m_innerEnds) << "\n outerEnds: " << miniPrinter(m_outerEnds))
         bool innerNodeReplaced = updateNetworkEnd(innerNode, newOuterNode, m_outerEnds);
 
-        B2WARNING("DirectedNodeNetwork::linkTheseEntries(): outerNode is new with index " << newOuterNode.getIndex() <<
-                  ", innerNode was already there with index: " << innerNode.getIndex() <<
-                  ", innerNode was outerNode before: " << (innerNodeReplaced ? "true" : "false"))
+        B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode is new with index " << newOuterNode.getIndex() <<
+                ", innerNode was already there with index: " << innerNode.getIndex() <<
+                ", innerNode was outerNode before: " << (innerNodeReplaced ? "true" : "false"))
         return;
       }
 
-      /// case: both are already in the network ...
+      /** case: both are already in the network ... */
       DirectedNode<EntryType>& outerNode = **outerNodeIter;
+      bool wasInnermostNode = (outerNode.getInnerNodes().size() == 0) ? true : false;
       DirectedNode<EntryType>& innerNode = **innerNodeIter;
+      bool wasOutermostNode = (innerNode.getOuterNodes().size() == 0) ? true : false;
 
       bool wasSuccessful = linkNodes(outerNode, innerNode);
 
@@ -247,18 +364,26 @@ namespace Belle2 {
        *  if outerNode was in innerEnds before, replace old one with new innerNode
        * */
       if (wasSuccessful) {
-        bool outerNodeReplaced = updateNetworkEnd(outerNode, innerNode, m_innerEnds);
-        bool innerNodeReplaced = updateNetworkEnd(innerNode, outerNode, m_outerEnds);
+        m_lastInnerNode = &innerNode;
+        m_lastOuterNode = &outerNode;
 
-        B2WARNING("DirectedNodeNetwork::linkTheseEntries(): outerNode already there with index " << outerNode.getIndex() <<
-                  ", innerNode was already there with index: " << innerNode.getIndex() <<
-                  ", outerNode was innerNode before: " << (innerNodeReplaced ? ("true") : ("false"))  <<
-                  ", innerNode was outerNode before: " << (outerNodeReplaced ? ("true") : ("false")))
+        if (wasInnermostNode) {
+          auto innerPos = std::find(m_innerEnds.begin(), m_innerEnds.end(), outerNode.getIndex());
+          if (innerPos != m_innerEnds.end()) { m_innerEnds.erase(innerPos); }
+        }
+
+        if (wasOutermostNode) {
+          auto outerPos = std::find(m_outerEnds.begin(), m_outerEnds.end(), innerNode.getIndex());
+          if (outerPos != m_outerEnds.end()) { m_outerEnds.erase(outerPos); }
+        }
+
+        B2DEBUG(250, "DirectedNodeNetwork::linkTheseEntries(): outerNode already there with index " << outerNode.getIndex() <<
+                ", innerNode was already there with index: " << innerNode.getIndex())
         return;
       }
 
-      /// case: both are already there and already linked:
-      B2WARNING("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
+      /** case: both are already there and already linked: */
+      B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
     }
 
 /// getters:
@@ -270,7 +395,7 @@ namespace Belle2 {
       std::vector<DirectedNode<EntryType>*> outerEnds;
       for (unsigned int index : m_outerEnds) {
 //         outerEnds.push_back(m_nodes[index].get());
-        outerEnds.push_back(m_nodes[index]);
+        outerEnds.push_back(m_nodes[index]->getPtr());
       }
       return outerEnds;
     }
@@ -282,7 +407,7 @@ namespace Belle2 {
       std::vector<DirectedNode<EntryType>*> innerEnds;
       for (unsigned int index : m_innerEnds) {
 //    innerEnds.push_back(m_nodes[index].get());
-        innerEnds.push_back(m_nodes[index]);
+        innerEnds.push_back(m_nodes[index]->getPtr());
       }
       return innerEnds;
     }
@@ -292,10 +417,27 @@ namespace Belle2 {
     DirectedNode<EntryType>* getNode(EntryType& toBeFound)
     {
       auto iter = isInVectorOfPtrs(toBeFound);
-      if (iter == m_nodes.end()) return NULL;
+      if (iter == m_nodes.rend()) return NULL;
 //    return iter->get();
       return *iter;
     }
+
+
+    /** returns pointer to the node carrying the entry which has the given index. If no fitting entry was found, NULL is returned. */
+    DirectedNode<EntryType>* getNodeWithIndex(unsigned int index)
+    {
+//    if (index < size()) { return m_nodes[index].get(); }
+      if (index < size()) { return m_nodes[index]->getPtr(); }
+      return NULL;
+    }
+
+
+    /** returns pointer to the last outer node added. */
+    DirectedNode<EntryType>* getLastOuterNode() { return m_lastOuterNode; }
+
+
+    /** returns pointer to the last inner node added. */
+    DirectedNode<EntryType>* getLastInnerNode() { return m_lastInnerNode; }
 
 
 //  std::vector<std::unique_ptr<DirectedNode<EntryType>> >& getNodes() { return m_nodes; }

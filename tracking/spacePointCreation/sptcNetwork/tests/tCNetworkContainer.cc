@@ -75,6 +75,8 @@ namespace TCNetworkContainerTests {
       pxdClusterData.registerInDataStore();
       spacePointTrackCandData.registerInDataStore();
 
+      networkContainerInDataStore.registerInDataStore();
+
       spacePointData.registerRelationTo(pxdClusterData);
 
       DataStore::Instance().setInitializeActive(false);
@@ -132,6 +134,8 @@ namespace TCNetworkContainerTests {
     StoreArray<SpacePoint> spacePointData; /**< some spacePoints for testing. */
     StoreArray<PXDCluster> pxdClusterData; /**< some pxd clusters for testing. */
     StoreArray<SpacePointTrackCand> spacePointTrackCandData; /**< some spacePointTrackCands for testing. */
+
+    StoreArray<SpTcNetwork> networkContainerInDataStore;
   };
 
 
@@ -411,7 +415,10 @@ namespace TCNetworkContainerTests {
   TEST_F(TCNetworkContainerTest, TestSpTcNetwork)
   {
     /// create and fill network with SpacePointTrackCands
-    SpTcNetwork realisticNetwork;
+
+    SpTcNetwork* realisticNetworkPtr = networkContainerInDataStore.appendNew();
+    SpTcNetwork& realisticNetwork = *realisticNetworkPtr;
+
     EXPECT_EQ(0, realisticNetwork.size());
     EXPECT_EQ(0, realisticNetwork.getNCompetitors());
     EXPECT_EQ(0, realisticNetwork.getNTCsAlive());

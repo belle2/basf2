@@ -55,31 +55,38 @@ namespace Belle2 {
     DirectedNode(EntryType& entry, unsigned int index) : m_entry(entry), m_index(index) {}
 
 
+    /** copy constructor */
+    DirectedNode(const DirectedNode& node) : m_entry(node.m_entry), m_innerNodes(node.m_innerNodes), m_outerNodes(node.m_outerNodes),
+      m_index(node.m_index)
+    {
+      B2ERROR("DirectedNode-copy-constructor has been called!")
+    }
+
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
     /** adds new links to the inward direction */
 //  void addInnerNode(std::shared_ptr<DirectedNode<EntryType> > newNode)
     void addInnerNode(DirectedNode<EntryType>& newNode)
     {
-      B2WARNING("DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
-                " and innerNodesSize: " << m_innerNodes.size() << ")!")
+      B2DEBUG(250, "DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
+              " and innerNodesSize: " << m_innerNodes.size() << ")!")
       m_innerNodes.push_back(&newNode);
 //    auto* newPtr(&newNode);
 //    B2WARNING("newPtr = " << newPtr << " and newPtr->getIndex: " << newPtr->getIndex())
 //    m_innerNodes.push_back(newPtr); // WARNING ERROR does not work...
 
 //    m_innerNodes.push_back(newNode.getIndex());
-      B2WARNING("push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size())
+      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size())
     }
 
 
     /** adds new links to the outward direction */
     void addOuterNode(DirectedNode<EntryType>& newNode)
     {
-      B2WARNING("DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
-                " and innerNodesSize: " << m_innerNodes.size() << ")!")
+      B2DEBUG(250, "DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
+              " and innerNodesSize: " << m_innerNodes.size() << ")!")
       m_outerNodes.push_back(&newNode);
-      B2WARNING("push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size())
+      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size())
     }
 
 

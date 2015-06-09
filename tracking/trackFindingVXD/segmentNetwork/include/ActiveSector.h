@@ -78,7 +78,7 @@ namespace Belle2 {
 
 
     /** returns all IDs for inner sectors stored in the static SectorMap*/
-    inline const std::vector<FullSecID::BaseType>& getInnerSecIDs() const { return m_staticSector->getInnerSecIDs(); }
+    inline const std::vector<FullSecID>& getInnerSecIDs() const { return m_staticSector->getInnerSecIDs(); }
 
 
     /** returns pointer to associated static Sector in StoreArray */
@@ -86,12 +86,19 @@ namespace Belle2 {
 
 
     /** returns VxdID of sensor carrying current sector */
-    inline FullSecID::BaseType getFullSecID() const { return m_staticSector->getFullSecID(); }
+    inline FullSecID getFullSecID() const { return m_staticSector->getFullSecID(); }
 
 
 /// setters:
 
-    /** adds new Segment to vector of inner Cells attached to current hit */
-    inline void addHit(HitType* newNode) { m_hits.push_back(newNode); }
+    /** adds new Hit to vector of Hits */
+    inline void addHit(HitType* newHit) { m_hits.push_back(newHit); }
+
+
+    /** adds new several new hits to vector of hits  */
+    inline void addHits(std::vector<HitType*>& newHits)
+    {
+      for (HitType* aHit : newHits) { addHit(aHit); }
+    }
   };
 } //Belle2 namespace

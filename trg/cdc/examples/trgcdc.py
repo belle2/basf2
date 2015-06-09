@@ -6,12 +6,14 @@
 # 2015/01/28 : Updated for build-2015-01-03 //JB
 # 2015/02/02 : Added KKGen, Background, RootInput/RootOutput //JB
 # 2015/05/18 : Fixed background file issue. //JB
+# 2015/06/09 : Updated for release-00-05-00 //JB
 
 from basf2 import *
 import glob
 
 #...suppress messages and warnings during processing...
 set_log_level(LogLevel.ERROR)
+# 0 means using different seed every time.
 set_random_seed(0)
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
@@ -50,7 +52,7 @@ evtmetagen.param({'evtNumList': [10], 'runList': [1]})
 
 #...Geometry...
 # Set what dectectors to simulate.
-geobuilder.param('Components', simulatedComponents)
+geobuilder.param('components', simulatedComponents)
 # Set verbose of geometry simulation
 #geobuilder.log_level = LogLevel.INFO
 
@@ -125,6 +127,7 @@ param_cdcdigi = {'Fraction': 1,
 cdcdigitizer.param(param_cdcdigi)
 cdcdigitizer.param('AddInWirePropagationDelay', True)
 cdcdigitizer.param('AddTimeOfFlight', True)
+cdcdigitizer.param('UseSimpleDigitization', True)
 
 #...CDC Trigger...
 #---General settings---
@@ -141,6 +144,7 @@ cdctrg.param('FastSimulationMode', 0)
 #TSLUT (latest version @ 2014.07)
 cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir,"trg/cdc/innerLUT_v2.2.coe"))
 cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.coe"))
+# 0: (Default) Logic TSF, 1: LUT TSF
 #cdctrg.param('TSFLogicLUT', 1)
 #cdctrg.param('TSFRootFile',1)
 #---2D finder settings---
@@ -150,7 +154,6 @@ cdctrg.param('HoughFinderMeshY',26)
 #---3D finder settings---
 #cdctrg.param('Hough3DRootFile',1)
 # 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder
-# 0: (Default) Logic TSF, 1: LUT TSF
 #cdctrg.param('Finder3DMode',2)
 #---3D fitter settings---
 #cdctrg.param('Fitter3DRootFile',1)

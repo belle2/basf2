@@ -460,6 +460,12 @@ namespace Belle {
     for (unsigned i = 0; i < nHits; i++) {
       const Belle2::CDCHit& h = * CDCHits[i];
 
+      //...TDC count...
+      const int tdcCount = h.getTDCCount();
+      //...Drift length from TDC...
+      const float driftLength = _ptrToTDCTranslator->getDriftLength(tdcCount, Belle2::WireID(h.getID()));
+      if (driftLength < 0.) continue;
+
       //      //...Check validity (skip broken channel)...
       //      if (! (h->m_stat & CellHitFindingValid)) continue;
 
@@ -505,12 +511,12 @@ namespace Belle {
       TWire& w = * (TWire*) wire(layerId, wireId);
 
       //...TDC count...
-      const int tdcCount = h.getTDCCount();
+      //      const int tdcCount = h.getTDCCount();
 
       //...Drift length from TDC...
       //      const float driftLength = tdcCount * (40. / 10000.);
       //      const float driftLengthError = 0.013;
-      const float driftLength = _ptrToTDCTranslator->getDriftLength(tdcCount, Belle2::WireID(h.getID()));
+      //      const float driftLength = _ptrToTDCTranslator->getDriftLength(tdcCount, Belle2::WireID(h.getID()));
       const float driftLengthError = sqrt(_ptrToTDCTranslator->getDriftLengthResolution(driftLength, Belle2::WireID(h.getID())));
       //      std::cout <<"tdcCount,driftLength,driftLengthError= " << tdcCount <<" "<< driftLength <<" "<< driftLengthError << std::endl;
 

@@ -157,8 +157,14 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
             B0.addExtraInfo('NKLMClustersInROE', NKLMClustersInROE)
 
 # ModeCode= 0 for Teacher or =1 for Expert mode
-global ModeCode
-ModeCode = float()
+
+
+def SetModeCode(mode='Expert'):
+    global ModeCode
+    if mode == 'Expert':
+        ModeCode = 1
+    else:
+        ModeCode = 0
 
 # Directory where the weights of the trained Methods are saved
 workingDirectory = os.environ['BELLE2_LOCAL_DIR'] \
@@ -641,12 +647,7 @@ def FlavorTagger(
     B2INFO('    Working directory is: ' + workingDirectory)
     B2INFO(' ')
 
-    global ModeCode
-
-    if mode == 'Expert':
-        ModeCode = 1
-    else:
-        ModeCode = 0
+    SetModeCode(mode)
 
     roe_path = create_path()
     emptypath = create_path()

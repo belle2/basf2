@@ -86,7 +86,7 @@ void SegmentNetworkProducerModule::endRun()
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter)
+  B2INFO("SegmentNetworkProducerModule:endRun: events: " << m_eventCounter << " and invEvents: " << invEvents)
 
   // TODO debug output with counters!
 }

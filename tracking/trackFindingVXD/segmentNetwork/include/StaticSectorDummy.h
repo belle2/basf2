@@ -9,10 +9,15 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
+
 
 // C++-std:
 #include <vector>
+
+
+
 
 namespace Belle2 {
 
@@ -33,7 +38,7 @@ namespace Belle2 {
 
 
     /** standard constructor */
-    StaticSectorDummy() : aSecID(FullSecID()) {}
+    StaticSectorDummy() : aSecID(FullSecID())/*, m_dummyFilter(Range(0., 1.))*/ {}
 
     /** constructor */
     StaticSectorDummy(FullSecID secID) : aSecID(secID) {}
@@ -52,6 +57,16 @@ namespace Belle2 {
 
     /** returns FullSecID of this sector */
     FullSecID getFullSecID() const { return aSecID; }
+
+
+    /** applies all filters enabled for combination of sectors (this Sector and sector with passed fullSecID on given spacePoints, returns true if accepted */
+    template<class HitType>
+    bool accept(FullSecID, HitType&, HitType&) const { return true; }
+
+    /** applies all filters enabled for combination of sectors (this Sector and sector with passed fullSecID on given spacePoints, returns true if accepted */
+    template<class HitType>
+    bool accept(FullSecID, FullSecID, HitType&, HitType&, HitType&) const { return true; }
+
   };
 
   /** non-memberfunction Comparison for equality with FullSecID <-> StaticSectorDummy */
@@ -59,4 +74,5 @@ namespace Belle2 {
   {
     return (a == b.getFullSecID());
   }
+
 } //Belle2 namespace

@@ -89,6 +89,19 @@ namespace Belle2 {
     inline FullSecID getFullSecID() const { return m_staticSector->getFullSecID(); }
 
 
+    /** for given pair of Hits, the static sector will provide the filters for testing and apply them, returns true if it was accepted */
+    bool acceptTwoHitCombination(FullSecID secID, HitType& outerHit, HitType& innerHit)
+    {
+      return m_staticSector->accept(secID, outerHit, innerHit);
+    }
+
+    /** for given triple of Hits, the static sector will provide the filters for testing and apply them, returns true if it was accepted */
+    bool acceptThreeHitCombination(FullSecID centerSecID, FullSecID innerSecID, HitType& outerHit, HitType& centerHit,
+                                   HitType& innerHit)
+    {
+      return m_staticSector->accept(centerSecID, innerSecID, outerHit, centerHit, innerHit);
+    }
+
 /// setters:
 
     /** adds new Hit to vector of Hits */

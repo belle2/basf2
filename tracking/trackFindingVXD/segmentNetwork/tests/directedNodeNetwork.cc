@@ -14,6 +14,8 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
+#include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
+
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <framework/datastore/StoreArray.h>
@@ -520,57 +522,72 @@ namespace DirectedNodeNetworkTests {
   {
     // testing to write that container now onto the datastore:
     DirectedNodeNetworkContainer* realisticNetworkPtr = networkContainerInDataStore.appendNew();
-    DirectedNodeNetwork<SpacePoint> spNetwork = realisticNetworkPtr->accessSpacePointNetwork();
-    EXPECT_EQ(0, spNetwork.size());
+    DirectedNodeNetwork<TrackNode> hitNetwork = realisticNetworkPtr->accessHitNetwork();
+    vector<TrackNode*> trackNodes = realisticNetworkPtr->accessTrackNodes();
+
+    StaticSectorDummy dummyStaticSector = StaticSectorDummy();
+    ActiveSector<StaticSectorDummy, TrackNode> dummyActiveSector = ActiveSector<StaticSectorDummy, TrackNode>(&dummyStaticSector);
+
+    EXPECT_EQ(0, hitNetwork.size());
 
     unsigned nEntries = spacePointData.getEntries();
+    for (SpacePoint& aSP : spacePointData) {
+      trackNodes.push_back(new TrackNode());
+      TrackNode* node = trackNodes.back();
+      node->spacePoint = &aSP;
+      node->sector = &dummyActiveSector;
+    }
+
     // filling: correct usage:
     // tests case when both nodes are new and when inner one is new, but outer one not:
     for (unsigned int index = 1 ; index < nEntries; index++) {
-      SpacePoint& outerSP = *spacePointData[index - 1];
-      SpacePoint& innerSP = *spacePointData[index];
+      TrackNode* outerNode = trackNodes[index - 1];
+      TrackNode* innerNode = trackNodes[index];
+      SpacePoint& outerSP = *(outerNode->spacePoint);
+      SpacePoint& innerSP = *(innerNode->spacePoint);
 
       B2INFO("CreateRealisticNetwork: index " << index);
 
       // correct order: outerEntry, innerEntry:
-      spNetwork.linkTheseEntries(outerSP, innerSP);
+      hitNetwork.linkTheseEntries(*outerNode, *innerNode);
 
       // innerEnd has been updated:
-      EXPECT_EQ(innerSP, spNetwork.getInnerEnds().at(0)->getEntry());
+      EXPECT_EQ(innerSP, *(hitNetwork.getInnerEnds().at(0)->getEntry().spacePoint));
 
       // entries are now in network:
-      EXPECT_EQ(outerSP, *spNetwork.getNode(outerSP));
-      EXPECT_EQ(innerSP, *spNetwork.getNode(innerSP));
+      EXPECT_EQ(outerSP, *(hitNetwork.getNode(*outerNode)->getEntry().spacePoint));
+      EXPECT_EQ(innerSP, *(hitNetwork.getNode(*innerNode)->getEntry().spacePoint));
+      EXPECT_EQ(*outerNode, *hitNetwork.getNode(*outerNode));
+      EXPECT_EQ(*innerNode, *hitNetwork.getNode(*innerNode));
 
       // get all nodes of outer node, expected: 1 inner and no outerNodes:
-      auto& innerNodes = spNetwork.getNode(outerSP)->getInnerNodes();
-      auto& outerNodes = spNetwork.getNode(innerSP)->getOuterNodes();
+      auto& innerNodes = hitNetwork.getNode(*outerNode)->getInnerNodes();
+      auto& outerNodes = hitNetwork.getNode(*innerNode)->getOuterNodes();
       EXPECT_EQ(1, innerNodes.size());
       EXPECT_EQ(1, outerNodes.size());
 
       // array[index] is now linked as inner node of array[index-1]:
-      EXPECT_EQ(*(innerNodes.at(0)), *(spNetwork.getNode(innerSP)));
+      EXPECT_EQ(*(innerNodes.at(0)), *(hitNetwork.getNode(*innerNode)));
     }
 
-    EXPECT_EQ(0, spNetwork.getNode(*spacePointData[0])->getOuterNodes().size()); // the outermost node has no outerNodes
-    EXPECT_EQ(0, spNetwork.getNode(*spacePointData[4])->getInnerNodes().size()); // the innermost node has no innerNodes
+    EXPECT_EQ(0, hitNetwork.getNode(*trackNodes[0])->getOuterNodes().size()); // the outermost node has no outerNodes
+    EXPECT_EQ(0, hitNetwork.getNode(*trackNodes[4])->getInnerNodes().size()); // the innermost node has no innerNodes
 
     // some extra sanity checks, are inner- and outerEnds as expected?
-    EXPECT_EQ(nEntries, spNetwork.size());
-    std::vector<DirectedNode<SpacePoint>*> outerEnds = spNetwork.getOuterEnds();
-    std::vector<DirectedNode<SpacePoint>*> innerEnds = spNetwork.getInnerEnds();
+    EXPECT_EQ(nEntries, hitNetwork.size());
+    std::vector<DirectedNode<TrackNode>*> outerEnds = hitNetwork.getOuterEnds();
+    std::vector<DirectedNode<TrackNode>*> innerEnds = hitNetwork.getInnerEnds();
     EXPECT_EQ(1, outerEnds.size());
     EXPECT_EQ(1, innerEnds.size());
 
-    DirectedNode<SpacePoint>* outermostNode = outerEnds.at(0);
-    EXPECT_EQ(*spacePointData[0], outermostNode->getEntry());
-    EXPECT_EQ(outermostNode->getEntry(), *outermostNode);
-    EXPECT_EQ(*spacePointData[1], *(outermostNode->getInnerNodes().at(0)));
+    DirectedNode<TrackNode>* outermostNode = outerEnds.at(0);
+    EXPECT_EQ(*spacePointData[0], *(outermostNode->getEntry().spacePoint));
+    EXPECT_EQ(*spacePointData[1], *(outermostNode->getInnerNodes().at(0)->getEntry().spacePoint));
 
-    DirectedNode<SpacePoint>* innermostNode = innerEnds.at(0);
-    EXPECT_EQ(*spacePointData[4], innermostNode->getEntry());
+    DirectedNode<TrackNode>* innermostNode = innerEnds.at(0);
+    EXPECT_EQ(*spacePointData[4], *(innermostNode->getEntry().spacePoint));
     EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
-    EXPECT_EQ(*spacePointData[3], *(innermostNode->getOuterNodes().at(0)));
+    EXPECT_EQ(*spacePointData[3], *(innermostNode->getOuterNodes().at(0)->getEntry().spacePoint));
 
 
 
@@ -579,38 +596,41 @@ namespace DirectedNodeNetworkTests {
     VXD::SensorInfoBase aSensorInfo = provideSensorInfo(aID, 2, 4, 5);
 
     PXDCluster pxdCluster = providePXDCluster(2.3 , 4.2, aID);
-    SpacePoint shallBecomeNewOutermostSP = SpacePoint(&pxdCluster, &aSensorInfo);
+    SpacePoint newSP = SpacePoint(&pxdCluster, &aSensorInfo);
+    TrackNode newNode = TrackNode();
+    newNode.spacePoint = & newSP;
+    newNode.sector = &dummyActiveSector;
 
 
     // testing case, when outer node is new, but inner one not:
-    SpacePoint& oldOuterSP = outermostNode->getEntry();;
-    spNetwork.linkTheseEntries(shallBecomeNewOutermostSP, oldOuterSP);
-    EXPECT_EQ(6, spNetwork.size());
+    TrackNode& oldNode = outermostNode->getEntry();
+    hitNetwork.linkTheseEntries(newNode, oldNode);
+    EXPECT_EQ(6, hitNetwork.size());
 
-    std::vector<DirectedNode<SpacePoint>*> newOuterEnds = spNetwork.getOuterEnds();
+    std::vector<DirectedNode<TrackNode>*> newOuterEnds = hitNetwork.getOuterEnds();
     EXPECT_EQ(1, newOuterEnds.size());
-    DirectedNode<SpacePoint>* newOutermostNode = newOuterEnds.at(0);
-    EXPECT_NE(oldOuterSP, newOutermostNode->getEntry());
-    EXPECT_EQ(shallBecomeNewOutermostSP, newOutermostNode->getEntry());
-    EXPECT_EQ(*spacePointData[0], *(newOutermostNode->getInnerNodes().at(0)));
-    EXPECT_EQ(shallBecomeNewOutermostSP, *(outermostNode->getOuterNodes().at(0)));
+    DirectedNode<TrackNode>* newOutermostNode = newOuterEnds.at(0);
+    EXPECT_NE(oldNode, newOutermostNode->getEntry());
+    EXPECT_EQ(newNode, newOutermostNode->getEntry());
+    EXPECT_EQ(*spacePointData[0], *(newOutermostNode->getInnerNodes().at(0)->getEntry().spacePoint));
+    EXPECT_EQ(newNode, *(outermostNode->getOuterNodes().at(0)));
 
 
     // testing case, when outer both were there, but not linked yet:
-    spNetwork.linkTheseEntries(*spacePointData[0], *spacePointData[2]);
-    EXPECT_EQ(6, spNetwork.size()); // size of network does not change
-    std::vector<DirectedNode<SpacePoint>*> moreInnerEnds = spNetwork.getNode(*spacePointData[0])->getInnerNodes();
+    hitNetwork.linkTheseEntries(*trackNodes[0], *trackNodes[2]);
+    EXPECT_EQ(6, hitNetwork.size()); // size of network does not change
+    std::vector<DirectedNode<TrackNode>*> moreInnerEnds = hitNetwork.getNode(*trackNodes[0])->getInnerNodes();
     EXPECT_EQ(2, moreInnerEnds.size());
-    EXPECT_EQ(*spacePointData[1], *moreInnerEnds.at(0));
-    EXPECT_EQ(*spacePointData[2], *moreInnerEnds.at(1));
+    EXPECT_EQ(*trackNodes[1], *moreInnerEnds.at(0));
+    EXPECT_EQ(*trackNodes[2], *moreInnerEnds.at(1));
 
 
     // testing case, when outer both were there and already linked:
-    spNetwork.linkTheseEntries(*spacePointData[0], *spacePointData[2]);
+    hitNetwork.linkTheseEntries(*trackNodes[0], *trackNodes[2]);
 
     // nothing was added, everything the same as last case:
-    EXPECT_EQ(6, spNetwork.size());
-    std::vector<DirectedNode<SpacePoint>*> evenMoreInnerEnds = spNetwork.getNode(*spacePointData[0])->getInnerNodes();
+    EXPECT_EQ(6, hitNetwork.size());
+    std::vector<DirectedNode<TrackNode>*> evenMoreInnerEnds = hitNetwork.getNode(*trackNodes[0])->getInnerNodes();
     EXPECT_EQ(moreInnerEnds.size(), evenMoreInnerEnds.size());
     EXPECT_EQ(*moreInnerEnds.at(0), *evenMoreInnerEnds.at(0));
     EXPECT_EQ(*moreInnerEnds.at(1), *evenMoreInnerEnds.at(1));

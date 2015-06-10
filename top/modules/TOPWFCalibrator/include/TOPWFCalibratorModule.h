@@ -15,6 +15,7 @@
 #include <string>
 #include <TProfile.h>
 #include <top/calibration/IRSConstants.h>
+#include <top/calibration/ASICChannelConstants.h>
 
 namespace Belle2 {
 
@@ -80,7 +81,6 @@ namespace Belle2 {
     int m_barID; /**< ID of TOP module to calibrate */
 
     TProfile* m_profile[c_NumChannels][c_NumWindows]; /**< profile histograms */
-
 
   };
 

@@ -10,13 +10,16 @@
 
 // Own include
 #include <top/modules/TOPWFCalibrator/TOPWFCalibratorModule.h>
-
 #include <framework/core/ModuleManager.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+// framework - Database
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/Database.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -29,7 +32,9 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include <TClonesArray.h>
 #include <sstream>
+#include <list>
 
 using namespace std;
 
@@ -150,13 +155,16 @@ namespace Belle2 {
       }
     }
     numWindows++;
-    B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows: " << numWindows);
+    B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows: " <<
+           numWindows);
 
-    IRSConstants constants;
-    constants.setFileName(m_outputFileName);
+    TClonesArray constants("Belle2::TOP::ASICChannelConstants");
 
     for (int channel = 0; channel < c_NumChannels; channel++) {
-      auto* channelConstants = new ASICChannelConstants(m_barID, channel, numWindows);
+      //auto* channelConstants = new ASICChannelConstants(m_barID, channel, numWindows);
+      //auto* channelConstants = m_IRSConstants.appendNew(m_barID, channel, numWindows);
+      new(constants[channel]) ASICChannelConstants(m_barID, channel, numWindows);
+      auto* channelConstants = (ASICChannelConstants*) constants[channel];
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
         if (prof) {
@@ -169,20 +177,20 @@ namespace Belle2 {
           }
         }
       }
-
-      constants.setConstants(channelConstants);
     }
 
-    constants.writeConstants(evtMetaData->getRun());
+    Database::setGlobalTag("TestDatabase.root");
+
+    IntervalOfValidity iov(0, 0, 9999, 999999);
+    Database::Instance().storeData("ASICChannelConstants", &constants, iov);
+
 
     int all = 0;
     int incomplete = 0;
-    for (int channel = 0; channel < c_NumChannels; channel++) {
-      auto* chan = constants.getConstants(m_barID, channel);
-      if (chan) {
-        all++;
-        if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
-      }
+    for (int channel = 0; channel < constants.GetEntriesFast(); channel++) {
+      const auto* chan = (ASICChannelConstants*) constants[channel];
+      all++;
+      if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
     }
 
     B2RESULT("TOPWFCalibratorModule: bar ID = " << m_barID <<

@@ -66,8 +66,8 @@ $(document).ready(function() {
                 }
 
                 // If there was a problem with the AJAX request:
-            }).error(function(json) {
-                $("#content").html('There was a problem!');
+            }).error(function(xhr, status, error) {
+                $("#content").html(xhr.responseText);
 
                 // Always hide the layer
             }).always(function() {

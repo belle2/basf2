@@ -6,8 +6,7 @@ import BaseHTTPServer
 import logging as log
 import os
 import sys
-import time
-import subprocess
+import traceback
 import mimetypes
 from urlparse import parse_qs
 from cgi import parse_header, parse_multipart
@@ -19,6 +18,29 @@ except ImportError:
     import json
 
 from validationplots import create_plots
+
+
+def get_error():
+    """!
+    In case of an error, return some information for debugging purposes.
+    """
+
+    respCode = 500
+    respContent = '<h1>There was a problem</h1>'
+    respContent += '<b>I don\'t really know what went wrong, but here is the '\
+                   'Exception message and the Python call stack. Good luck! ' \
+                   ';-) </b> <br> <hr> <br>'
+    respContent += '<small><pre>'
+    respContent += traceback.format_exc() + '</pre><br><hr><br>\n\n'
+    respContent += '<pre>'
+    respContent += '\n'.join(traceback.format_stack())
+    respContent += '</pre>'
+    respContentType = 'text/html'
+
+    log.error('An error occurred. This is the traceback of the exception: \n' +
+              traceback.format_exc())
+
+    return respCode, respContent, respContentType
 
 
 def parse_cmd_line_arguments():
@@ -51,7 +73,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     @var path: The path of the request, e.g. the file that is being requested
     """
 
-    def logRequest(s):
+    def logRequest(self):
         """!
         Writes the message in 's' to the log, which is by default printed to
         stdout
@@ -59,14 +81,12 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         @param s: The string containing the log message
         @return: None
         """
-        log.debug("%s: %s/%s" % (s.client_address, s.command, s.path))
+        log.debug("%s: %s/%s" % (self.client_address, self.command, self.path))
 
     def do_GET(self):
         """!
         How to deal with a GET-request
         """
-
-        path = self.path
 
         # Usually 'Content-type' is empty, except for AJAX-requests
         if 'Content-type' in self.headers:
@@ -76,11 +96,20 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         log.debug("GET: Requesting %s" % self.path)
 
+        # Set defaults
+        respCode, respContent, respContentType = None, None, None
+
         # Either we are dealing with a file request, or an AJAX-request
         if contentType.startswith('text/html'):
-            (respCode, respContent, respContentType) = self.do_GET_FILE()
+            try:
+                (respCode, respContent, respContentType) = self.do_GET_FILE()
+            except Exception:
+                (respCode, respContent, respContentType) = get_error()
         elif contentType.startswith('application/json'):
-            (respCode, respContent, respContentType) = self.do_GET_JSON()
+            try:
+                (respCode, respContent, respContentType) = self.do_GET_JSON()
+            except Exception:
+                (respCode, respContent, respContentType) = get_error()
 
         # Send results back to browser
         self.send_response(respCode)
@@ -131,9 +160,12 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
                                              "Missing input parameter"}))
                 return
 
-            (respCode,
-             respContent,
-             respContType) = self.do_GET_JSON(data['input'])
+            try:
+                (respCode,
+                 respContent,
+                 respContType) = self.do_GET_JSON(data['input'])
+            except Exception:
+                (respCode, respContent, respContType) = get_error()
 
             self.send_response(respCode)
             self.send_header('Content-type', respContType)
@@ -273,7 +305,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         # Used to check if a web server is running
         if '/ajax/pingserver' in self.path:
-            return (200, json.dumps({}), 'application/json')
+            return 200, json.dumps({}), 'application/json'
 
         # Used to get a list of all log files
         if '/ajax/listlogs' in self.path:
@@ -364,7 +396,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
                                     .format(filepath, filename))
                 html.append('<br>')
 
-            return (200, json.dumps('\n'.join(html)), 'application/json')
+            return 200, json.dumps('\n'.join(html)), 'application/json'
 
         # Get the number of scripts that had issues
         if '/ajax/scriptcount' in self.path:
@@ -391,13 +423,13 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
                                           number_of_skipped_scripts)
 
             # Answer the AJAX request
-            return (200, json.dumps(result), 'application/json')
+            return 200, json.dumps(result), 'application/json'
 
         # Used to generate new plots
         if '/ajax/makeplots' in self.path:
             log.debug('Creating plots for revisions ' + ', '.join(data))
             create_plots(revisions=data)
-            return (200, json.dumps({}), 'application/json')
+            return 200, json.dumps({}), 'application/json'
 
 
 ###############################################################################

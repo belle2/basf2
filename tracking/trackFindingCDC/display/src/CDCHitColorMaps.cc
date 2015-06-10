@@ -244,10 +244,10 @@ std::string MCPrimaryColorMap::map(const int&, const CDCHit& cdcHit)
     int secondaryProcess = mcParticle->getSecondaryPhysicsProcess();
     if (secondaryProcess > 0) {
       motherMCParticle = mcParticle->getMother();
-      secondary_type = {{motherMCParticle->getPDG()}, {mcParticle->getPDG()}};
+      secondary_type = {motherMCParticle->getPDG(), mcParticle->getPDG()};
     } else {
       //motherMCParticle = None;
-      secondary_type = {{ -999}, {mcParticle->getPDG()}};
+      secondary_type = { -999, mcParticle->getPDG()};
     }
 
     if (m_nHitsBySecondaryType.count(secondary_type) == 0) m_nHitsBySecondaryType[secondary_type] = 0;

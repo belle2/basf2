@@ -289,9 +289,12 @@ void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int
     part.setStatus(MCParticle::c_IsVirtual);
   } else if (isInitial) {
     part.setStatus(MCParticle::c_Initial);
-  } else {
-    part.setStatus(MCParticle::c_PrimaryParticle);
   }
+
+  // all particle of a generator are primary
+  part.addStatus(MCParticle::c_PrimaryParticle);
+  // all particles produced by BABAYAGA are stable
+  part.addStatus(MCParticle::c_StableInGenerator);
 
   part.setPDG(pdg);
   part.setFirstDaughter(0);

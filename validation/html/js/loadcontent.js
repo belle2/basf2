@@ -29,6 +29,36 @@ function loadcontent() {
             }
 
         }).done(function() {
+
+	    $.get("content.html", function(data) {
+
+    // Read the lines
+    var lines = data.split("\n");
+
+    // Extract the first line and remove the comment symbols
+    var json = jQuery.parseJSON(lines[0].replace("<!-- ", "").replace(" -->", ""));
+
+    console.log(json.revisions);
+
+    // Read out when content.html was modified the last time and write that
+    // onto the page (under the navigation bar)
+    $(".lastmodified").html(json.lastModified);
+
+    // Now we check which revisions are included in the 'content.html' file we have just
+    // loaded. We loop over all revision checkboxes:
+    $('input[type="checkbox"][name="revisions"]').each(function() {
+        // If the revision that belongs to the checkbox is contained in the 'content.html'
+        // we activate it
+        if ($.inArray($(this).attr("value"), json.revisions) >= 0) {
+            $(this).prop('checked', true);
+        }
+        // Otherwise we deactivate it
+        else {
+            $(this).prop('checked', false);
+        }
+    });
+});
+
             $("input.matrix-toggle").click(function() {
                 $("span#" + this.value).toggle();
             });

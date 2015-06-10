@@ -31,36 +31,7 @@ $(document).ready(function() {
                 // Load the 'content.html' which has been modified by the AJAX request
                 if (loadcontent() == true) {
 
-                    // After we have loaded the content.html into the website, we open the file with
-                    // JavaScript and read it linewise
-                    $.get("content.html", function(data) {
-
-                        // Read the lines
-                        var lines = data.split("\n");
-
-                        // Extract the first line and remove the comment symbols
-                        var json = jQuery.parseJSON(lines[0].replace("<!-- ", "").replace(" -->", ""));
-
-                        // Read out when content.html was modified the last time and write that
-                        // onto the page (under the navigation bar)
-                        $(".lastmodified").html(json.lastModified);
-
-                        // Now we check which revisions are included in the 'content.html' file we have just
-                        // loaded. We loop over all revision checkboxes:
-                        $('input[type="checkbox"][name="revisions"]').each(function() {
-                            // If the revision that belongs to the checkbox is contained in the 'content.html'
-                            // we activate it
-                            if ($.inArray($(this).attr("value"), json.revisions) >= 0) {
-                                $(this).prop('checked', true);
-                            }
-                            // Otherwise we deactivate it
-                            else {
-                                $(this).prop('checked', false);
-                            }
-                        });
-                    });
-
-                    // Finally, we call MathJax again to re-typeset all equations in the 'content.html'
+                    // Call MathJax again to re-typeset all equations in the 'content.html'
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 
                 }

@@ -25,7 +25,7 @@ namespace Belle2 {
      */
     template <class Object, class ColorMap = CDCHitColorMap>
     class Colorizer {
-      typedef std::auto_ptr<ColorMap>(Colorizer::*MethodPtr)();
+      typedef std::unique_ptr<ColorMap>(Colorizer::*MethodPtr)();
     public:
       /**
        * Default Constructor.
@@ -87,7 +87,7 @@ namespace Belle2 {
         m_strokeSet = true;
         if (m_listOfMappingNames.count(methodName) == 1) {
           m_strokeMethodPtr = (this->*m_listOfMappingNames[methodName])();
-        } else m_strokeMethodPtr = std::auto_ptr<ColorMap>(new ReturnInputString<Object, ColorMap>(methodName));
+        } else m_strokeMethodPtr = std::unique_ptr<ColorMap>(new ReturnInputString<Object, ColorMap>(methodName));
       }
 
       /**
@@ -102,7 +102,7 @@ namespace Belle2 {
         m_strokeWidthSet = true;
         if (m_listOfMappingNames.count(methodName) == 1) {
           m_strokeWidthMethodPtr = (this->*m_listOfMappingNames[methodName])();
-        } else m_strokeWidthMethodPtr = std::auto_ptr<ColorMap>(new ReturnInputString<Object, ColorMap>(methodName));
+        } else m_strokeWidthMethodPtr = std::unique_ptr<ColorMap>(new ReturnInputString<Object, ColorMap>(methodName));
       }
 
       /**
@@ -131,16 +131,16 @@ namespace Belle2 {
        * Construct and return a pointer to the ColorMap.
        */
       template<class T>
-      std::auto_ptr<ColorMap> constructMappingClass()
+      std::unique_ptr<ColorMap> constructMappingClass()
       {
-        std::auto_ptr<ColorMap> mappingClass(new T);
+        std::unique_ptr<ColorMap> mappingClass(new T);
         return (mappingClass);
       }
 
       bool m_strokeSet;
       bool m_strokeWidthSet;
-      std::auto_ptr<ColorMap> m_strokeMethodPtr;
-      std::auto_ptr<ColorMap> m_strokeWidthMethodPtr;
+      std::unique_ptr<ColorMap> m_strokeMethodPtr;
+      std::unique_ptr<ColorMap> m_strokeWidthMethodPtr;
       /**
        * A string to pointer-to-member-function map.
        *
@@ -161,7 +161,7 @@ namespace Belle2 {
       void setStroke(std::string stroke)
       {
         Colorizer<Object, ReturnInputValue<Object>>::m_strokeSet = true;
-        Colorizer<Object, ReturnInputValue<Object>>::m_strokeMethodPtr = std::auto_ptr<ReturnInputValue<Object>>
+        Colorizer<Object, ReturnInputValue<Object>>::m_strokeMethodPtr = std::unique_ptr<ReturnInputValue<Object>>
                                                  (new ReturnInputValue<Object>(stroke));
       }
 
@@ -171,7 +171,7 @@ namespace Belle2 {
       void setStrokeWidth(std::string strokeWidth)
       {
         Colorizer<Object, ReturnInputValue<Object>>::m_strokeWidthSet = true;
-        Colorizer<Object, ReturnInputValue<Object>>::m_strokeWidthMethodPtr = std::auto_ptr<ReturnInputValue<Object>>
+        Colorizer<Object, ReturnInputValue<Object>>::m_strokeWidthMethodPtr = std::unique_ptr<ReturnInputValue<Object>>
                                                  (new ReturnInputValue<Object>(strokeWidth));
       }
     };
@@ -215,7 +215,7 @@ namespace Belle2 {
        */
       ListColorsColorizer() : Colorizer<Object, ListColorsColorMap<Object>>()
       {
-        Colorizer<Object, ListColorsColorMap<Object>>::m_strokeMethodPtr = std::auto_ptr<ListColorsColorMap<Object>>
+        Colorizer<Object, ListColorsColorMap<Object>>::m_strokeMethodPtr = std::unique_ptr<ListColorsColorMap<Object>>
                                                    (new ListColorsColorMap<Object>());
         Colorizer<Object, ListColorsColorMap<Object>>::m_strokeSet = true;
       }

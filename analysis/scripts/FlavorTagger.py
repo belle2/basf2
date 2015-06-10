@@ -157,6 +157,7 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
             B0.addExtraInfo('NKLMClustersInROE', NKLMClustersInROE)
 
 # ModeCode= 0 for Teacher or =1 for Expert mode
+global ModeCode
 ModeCode = float()
 
 # Directory where the weights of the trained Methods are saved

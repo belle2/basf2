@@ -300,38 +300,42 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         bool accepted = outerHit->getEntry().sector->acceptThreeHitCombination(
                           centerHit->getEntry().sector->getFullSecID(),
                           innerHit->getEntry().sector->getFullSecID(),
-                          *outerHit,
-                          *centerHit,
-                          *innerHit);
+                          outerHit->getEntry(),
+                          centerHit->getEntry(),
+                          innerHit->getEntry());
 
         if (accepted == false) continue; // skip combinations which weren't accepted
 
         // create innerSegment first (order of storage in vector<segments> is irrelevant):
-        Segment<TrackNode>* tempSegment = new Segment<TrackNode>(
+        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
           outerHit->getEntry().sector->getFullSecID(),
           centerHit->getEntry().sector->getFullSecID(),
-          outerHit,
-          centerHit);
-        Segment<TrackNode>* innerSegment = segmentNetwork.getNode(*tempSegment);
-        if (innerSegment == NULL) {
-          segments.push_back(tempSegment);
-          innerSegment = segments.back();
-        } else { delete tempSegment; }
+          &outerHit->getEntry(),
+          &centerHit->getEntry());
+        DirectedNode<Segment<TrackNode>>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
+        if (tempSegmentnode == NULL) {
+          segments.push_back(innerSegment);
+        } else {
+          delete innerSegment;
+          innerSegment = &tempSegmentnode->getEntry();
+        }
 
         // store combination of hits in network:
 
         if (isFirstIteration) {
           // create outerSector:
-          Segment<TrackNode>* tempSegment = new Segment<TrackNode>(
+          Segment<TrackNode>* outerSegment = new Segment<TrackNode>(
             outerHit->getEntry().sector->getFullSecID(),
             centerHit->getEntry().sector->getFullSecID(),
-            outerHit,
-            centerHit);
-          Segment<TrackNode>* outerSegment = segmentNetwork.getNode(*tempSegment);
-          if (outerSegment == NULL) {
-            segments.push_back(tempSegment);
-            outerSegment = segments.back();
-          } else { delete tempSegment; }
+            &outerHit->getEntry(),
+            &centerHit->getEntry());
+          DirectedNode<Segment<TrackNode>>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
+          if (tempSegmentnode == NULL) {
+            segments.push_back(outerSegment);
+          } else {
+            delete outerSegment;
+            outerSegment = &tempSegmentnode->getEntry();
+          }
 
           segmentNetwork.linkTheseEntries(*outerSegment, *innerSegment);
           isFirstIteration = false;

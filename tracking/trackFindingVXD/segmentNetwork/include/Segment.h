@@ -74,10 +74,10 @@ namespace Belle2 {
     *      //      * @param innerNode pointer to inner Hit associated with this segment.
       *      //      */
     Segment(FullSecID::BaseType outerSector, FullSecID::BaseType innerSector, HitType* outerNode, HitType* innerNode):
-      m_outerSector(outerSector),
-      m_innerSector(innerSector),
       m_outerHit(outerNode),
       m_innerHit(innerNode),
+      m_outerSector(outerSector),
+      m_innerSector(innerSector),
       m_state(0),
       m_activated(true),
       m_stateUpgrade(false),

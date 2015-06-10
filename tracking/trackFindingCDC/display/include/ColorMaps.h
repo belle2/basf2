@@ -110,11 +110,12 @@ namespace Belle2 {
     template<class Object>
     class ListColorsColorMap {
     public:
+      virtual ~ListColorsColorMap() = default;
 
       /**
        * Function call to map the Object id and object to a color.
        */
-      std::string map(const int& index, const Object&) const
+      virtual std::string map(const int& index, const Object&)
       {
         return m_listColors[index % m_listColors.size()];
       }
@@ -158,7 +159,7 @@ namespace Belle2 {
       /**
        * Function call to map the object id and object to a color/stroke-width.
        */
-      std::string map(const int&, const Object&) const
+      std::string map(const int&, const Object&) override
       {
         return m_inputString;
       }

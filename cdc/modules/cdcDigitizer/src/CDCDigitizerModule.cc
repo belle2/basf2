@@ -78,11 +78,11 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "A switch used to control adding time of flight into the final drift time or not; this is for signal hits.", true);
   addParam("AddTimeOfFlight4Bg",   m_addTimeOfFlight4Bg,
            "The same switch but for beam bg. hits.", true);
-  addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output hits with negative drift time", false);
+  addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output hits with negative drift time", true);
 
   //Switch to control sense wire sag
   addParam("CorrectForWireSag",   m_correctForWireSag,
-           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not", false);
+           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not", true);
 
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,

@@ -263,7 +263,8 @@ class Validation:
 
         # remove packages which have been explicitly ignored
         for ignored in self.ignored_packages:
-            del validation_folders[ignored]
+            if ignored in validation_folders:
+                del validation_folders[ignored]
 
         # Now write to self.list_of_packages which packages we have collected
         self.list_of_packages = validation_folders.keys()

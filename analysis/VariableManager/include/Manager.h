@@ -140,6 +140,11 @@ namespace Belle2 {
        */
       const Var* getVariable(std::string name);
 
+      /**
+       * Get variables belonging to the given keys
+       */
+      std::vector<const Belle2::Variable::Manager::Var*> getVariables(const std::vector<std::string>& variables);
+
       /** Add alias
        * Return tru if the alias was successfully added
        */

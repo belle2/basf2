@@ -26,15 +26,24 @@
 #include <TVectorF.h>
 #include <TVector3.h>
 
+
 namespace Belle2 {
   namespace Variable {
 
-    double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdg)
+    bool almostContains(const std::vector<double>& vector, int value)
+    {
+      for (const auto& item : vector)
+        if (std::abs(value - item) < 1e-3)
+          return true;
+      return false;
+    }
+
+    double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdgs)
     {
       StoreArray<MCParticle> mcParticles;
       int counter = 0;
       for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getStatus(MCParticle::c_PrimaryParticle) and abs(mcParticles[i]->getPDG()) == pdg[0])
+        if (mcParticles[i]->getStatus(MCParticle::c_PrimaryParticle) and almostContains(pdgs, std::abs(mcParticles[i]->getPDG())))
           counter++;
       }
       return counter;

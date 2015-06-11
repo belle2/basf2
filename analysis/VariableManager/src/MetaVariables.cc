@@ -103,6 +103,57 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr formula(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        char operation = ' ';
+        int pos = 0;
+
+        if (arguments[0].find('+') != std::string::npos) {
+          pos = arguments[0].find('+');
+          operation = '+';
+        } else if (arguments[0].find('-') != std::string::npos) {
+          pos = arguments[0].find('-');
+          operation = '-';
+        } else if (arguments[0].find('*') != std::string::npos) {
+          pos = arguments[0].find('*');
+          operation = '*';
+        } else if (arguments[0].find('/') != std::string::npos) {
+          pos = arguments[0].find('/');
+          operation = '/';
+        } else if (arguments[0].find('^') != std::string::npos) {
+          pos = arguments[0].find('^');
+          operation = '^';
+        }
+
+        if (operation != ' ') {
+          std::string lhs = std::string("formula(") + arguments[0].substr(0, pos) + std::string(")");
+          std::string rhs = std::string("formula(") + arguments[0].substr(pos + 1) + std::string(")");
+
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(lhs);
+          const Variable::Manager::Var* var2 = Manager::Instance().getVariable(rhs);
+
+          auto func = [var, operation, var2](const Particle * particle) -> double {
+            switch (operation)
+            {
+              case '+': return var->function(particle) + var2->function(particle);
+              case '-': return var->function(particle) - var2->function(particle);
+              case '*': return var->function(particle) * var2->function(particle);
+              case '/': return var->function(particle) / var2->function(particle);
+              case '^': return std::pow(var->function(particle), var2->function(particle));
+            }
+            return 0;
+          };
+          return func;
+        } else {
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+          return var->function;
+        }
+      } else {
+        B2FATAL("Wrong number of arguments for meta function formula");
+      }
+    }
+
     Manager::FunctionPtr isInRegion(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -339,6 +390,7 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MetaFunctions");
+    REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula, "Calculate formula, no parenthesis allowed yet.");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle as current reference frame.");
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame, "Use the CMS frame as current reference frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, "Use the lab frame as current reference frame.");

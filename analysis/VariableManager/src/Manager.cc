@@ -43,6 +43,22 @@ const Variable::Manager::Var* Variable::Manager::getVariable(std::string name)
   return mapIter->second.get();
 }
 
+std::vector<const Variable::Manager::Var*> Variable::Manager::getVariables(const std::vector<std::string>& variables)
+{
+
+  std::vector<const Variable::Manager::Var*> variable_pointers;
+  for (auto& variable : variables) {
+    const Var* x = getVariable(variable);
+    if (x == nullptr) {
+      B2WARNING("Couldn't find variable " << variable << " via the Variable::Manager. Check the name!");
+    }
+    variable_pointers.push_back(x);
+  }
+  return variable_pointers;
+
+}
+
+
 bool Variable::Manager::addAlias(const std::string& alias, const std::string& variable)
 {
 

@@ -32,6 +32,7 @@
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
+#include <G4VUserPhysicsList.hh>
 #include <G4PhysListFactory.hh>
 #include <G4ProcessVector.hh>
 #include <G4OpticalPhysics.hh>
@@ -353,40 +354,6 @@ void FullSimModule::terminate()
   //And clean up the run manager
   if (m_visManager != nullptr) delete m_visManager;
   RunManager::Instance().destroy();
-  // Delete the Geant4 nuclear cascade tables ... grrr!
-  delete G4CascadeChannelTables::GetTable(gam * neu);
-  delete G4CascadeChannelTables::GetTable(gam * pro);
-  delete G4CascadeChannelTables::GetTable(k0 * neu);
-  delete G4CascadeChannelTables::GetTable(k0 * pro);
-  delete G4CascadeChannelTables::GetTable(k0b * neu);
-  delete G4CascadeChannelTables::GetTable(k0b * pro);
-  delete G4CascadeChannelTables::GetTable(kmi * neu);
-  delete G4CascadeChannelTables::GetTable(kmi * pro);
-  delete G4CascadeChannelTables::GetTable(kpl * neu);
-  delete G4CascadeChannelTables::GetTable(kpl * pro);
-  delete G4CascadeChannelTables::GetTable(lam * neu);
-  delete G4CascadeChannelTables::GetTable(lam * pro);
-  delete G4CascadeChannelTables::GetTable(neu * neu);
-  delete G4CascadeChannelTables::GetTable(neu * pro);
-  delete G4CascadeChannelTables::GetTable(pi0 * neu);
-  delete G4CascadeChannelTables::GetTable(pi0 * pro);
-  delete G4CascadeChannelTables::GetTable(pim * neu);
-  delete G4CascadeChannelTables::GetTable(pim * pro);
-  delete G4CascadeChannelTables::GetTable(pip * neu);
-  delete G4CascadeChannelTables::GetTable(pip * pro);
-  delete G4CascadeChannelTables::GetTable(pro * pro);
-  delete G4CascadeChannelTables::GetTable(s0 * neu);
-  delete G4CascadeChannelTables::GetTable(s0 * pro);
-  delete G4CascadeChannelTables::GetTable(sm * neu);
-  delete G4CascadeChannelTables::GetTable(sm * pro);
-  delete G4CascadeChannelTables::GetTable(sp * neu);
-  delete G4CascadeChannelTables::GetTable(sp * pro);
-  delete G4CascadeChannelTables::GetTable(xi0 * neu);
-  delete G4CascadeChannelTables::GetTable(xi0 * pro);
-  delete G4CascadeChannelTables::GetTable(xim * neu);
-  delete G4CascadeChannelTables::GetTable(xim * pro);
-  delete G4CascadeChannelTables::GetTable(om * neu);
-  delete G4CascadeChannelTables::GetTable(om * pro);
   // Delete the step limiter process
   delete m_stepLimiter;
   // Delete the objects associated with transport in magnetic field

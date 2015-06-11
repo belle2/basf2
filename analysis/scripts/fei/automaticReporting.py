@@ -679,9 +679,9 @@ def createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postC
         ROOT.gROOT.SetBatch(True)
 
         # Set mva placeholders
-        placeholders['mvaROOTFilename'] = tmvaTraining[:-7] + '.root'  # Strip .config of filename
-        placeholders['mvaTMVAFilename'] = tmvaTraining[:-7] + '_1.root'  # Strip .config of filename
-        placeholders['mvaLogFilename'] = tmvaTraining[:-7] + '.log'  # Strip .config of filename
+        placeholders['mvaROOTFilename'] = tmvaTraining[:-9] + '.root'  # Strip _1.config of filename
+        placeholders['mvaTMVAFilename'] = tmvaTraining[:-7] + '.root'  # Strip .config of filename
+        placeholders['mvaLogFilename'] = tmvaTraining[:-9] + '.log'  # Strip _1.config of filename
         placeholders['mvaName'] = mvaConfig.name
         placeholders['mvaType'] = mvaConfig.type
         placeholders['mvaConfig'] = addHyphenations(mvaConfig.config)

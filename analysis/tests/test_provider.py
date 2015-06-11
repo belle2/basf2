@@ -552,7 +552,7 @@ class TestCalculateNumberOfBins(unittest.TestCase):
     def test_CalculateNumberOfBinsLowStatistic(self):
         # Returns Nbins config string for TMVA
         self.assertEqual(CalculateNumberOfBins(self.resource, {'nSignal': 10000}),
-                         'NbinsMVAPdf=50:')
+                         'CreateMVAPdfs:NbinsMVAPdf=50:')
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -560,7 +560,7 @@ class TestCalculateNumberOfBins(unittest.TestCase):
     def test_CalculateNumberOfBinsMediumStatistic(self):
         # Returns Nbins config string for TMVA
         self.assertEqual(CalculateNumberOfBins(self.resource, {'nSignal': 1e5 + 1}),
-                         'NbinsMVAPdf=100:')
+                         'CreateMVAPdfs:NbinsMVAPdf=100:')
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -568,7 +568,7 @@ class TestCalculateNumberOfBins(unittest.TestCase):
     def test_CalculateNumberOfBinsHighStatistic(self):
         # Returns Nbins config string for TMVA
         self.assertEqual(CalculateNumberOfBins(self.resource, {'nSignal': 1e6 + 1}),
-                         'NbinsMVAPdf=200:')
+                         'CreateMVAPdfs:NbinsMVAPdf=200:')
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -586,46 +586,40 @@ class TestGenerateTrainingData(unittest.TestCase):
 
     def test_GenerateTrainingData(self):
         # Returns None if TrainingData does not exists
-        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, 'NbinsMVAPdf=100:', None),
+        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, None),
                          None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds TMVATeacher for given ParticleList
-        result.path.add_module('TMVATeacher', prefix='D0:1_42', methods=[('FastBDT', 'Plugin', 'NbinsMVAPdf=100:TMVAConfigString')],
-                               factoryOption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                               prepareOption='SplitMode=random:!V',
+        result.path.add_module('TMVATeacher', prefix='D0:1_42',
                                variables=['p', 'pt'],
-                               createMVAPDFs=True,
-                               target='isSignal',
+                               sample='isSignal',
+                               spectators=['isSignal'],
                                listNames=['D0:1'],
                                inverseSamplingRates={0: 3},
-                               doNotTrain=True)
+                               maxSamples=int(2e7))
         self.assertEqual(self.resource, result)
 
     def test_GenerateTrainingDataWithAdditionalDependencies(self):
         # Returns None if TrainingData does not exists
-        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, 'NbinsMVAPdf=100:',
-                                              ['VertexFit1', 'VertexFit2']),
+        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, ['VertexFit1', 'VertexFit2']),
                          None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds TMVATeacher for given ParticleList
-        result.path.add_module('TMVATeacher', prefix='D0:1_42', methods=[('FastBDT', 'Plugin', 'NbinsMVAPdf=100:TMVAConfigString')],
-                               factoryOption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                               prepareOption='SplitMode=random:!V',
+        result.path.add_module('TMVATeacher', prefix='D0:1_42',
                                variables=['p', 'pt'],
-                               createMVAPDFs=True,
-                               target='isSignal',
+                               sample='isSignal',
+                               spectators=['isSignal'],
                                listNames=['D0:1'],
                                inverseSamplingRates={0: 3},
-                               doNotTrain=True)
+                               maxSamples=int(2e7))
         self.assertEqual(self.resource, result)
 
     def test_GenerateTrainingDataWithFile(self):
         with temporary_file('D0:1_42.root'):
             # Returns filename if TrainingData does exists
-            self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, 'NbinsMVAPdf=100:',
-                                                  None),
+            self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, None),
                              'D0:1_42.root')
             # Enables caching
             result = MockResource(cache=True)
@@ -633,8 +627,7 @@ class TestGenerateTrainingData(unittest.TestCase):
 
     def test_GenerateTrainingDataWithUnfullfilledDependencies(self):
         # Returns None if Dependency is not fulfilled
-        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, 'NbinsMVAPdf=100:',
-                                              ['Vertex1', None]),
+        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, {0: 3}, ['Vertex1', None]),
                          None)
         # Enables caching
         result = MockResource(cache=True)
@@ -642,8 +635,7 @@ class TestGenerateTrainingData(unittest.TestCase):
 
     def test_GenerateTrainingDataMissingParticleList(self):
         # Returns None if ParticleList is None
-        self.assertEqual(GenerateTrainingData(self.resource, None, self.mvaConfig, {0: 3}, 'NbinsMVAPdf=100:',
-                                              None),
+        self.assertEqual(GenerateTrainingData(self.resource, None, self.mvaConfig, {0: 3}, None),
                          None)
         # Enables caching
         result = MockResource(cache=True)
@@ -689,10 +681,6 @@ class TestGenerateSPlotModel(unittest.TestCase):
         self.assertListEqual(GenerateSPlotModel(self.resource, 'Name', mvaConfig, self.distribution),
                              [{'cut': '1.5 < M < 1.9'},
                               {'modelFileName': 'model_Name_42.root',
-                               'modelObjectName': 'model',
-                               'modelPlotComponentNames': ['sig', 'bkg'],
-                               'modelYieldsObjectNames': ['bkgfrac', 'sigfrac'],
-                               'modelYieldsInitialFractions': [0.75, 0.25],
                                'discriminatingVariables': ['M']}])
         # Enables caching
         result = MockResource(cache=True)
@@ -731,16 +719,12 @@ class TestGenerateTrainingDataUsingSPlot(unittest.TestCase):
                                           model='M')
         self.sPlotParameters = [{'cut': '1.8 < M < 1.9'},
                                 {'modelFileName': 'FileName',
-                                 'modelObjectName': 'ObjectName',
-                                 'modelPlotComponentNames': ['PlotComponentNames'],
-                                 'modelYieldsObjectNames': ['YieldsObjectNames'],
-                                 'modelYieldsInitialFractions': [1.0],
                                  'discriminatingVariables': ['M']}]
 
     def test_GenerateTrainingDataUsingSPlot(self):
         # Returns None if TrainingData does not exists
         self.assertEqual(GenerateTrainingDataUsingSPlot(self.resource, 'D0:1', self.mvaConfig, self.sPlotParameters,
-                                                        'NbinsMVAPdf=100:', None), None)
+                                                        None), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds TMVATeacher for given ParticleList
@@ -748,21 +732,17 @@ class TestGenerateTrainingDataUsingSPlot(unittest.TestCase):
                                inputListNames='D0:1',
                                cut='1.8 < M < 1.9',
                                writeOut=False)
-        result.path.add_module('TMVASPlotTeacher', prefix='D0:1_42',
-                               methods=[('FastBDT', 'Plugin', 'NbinsMVAPdf=100:TMVAConfigString')],
-                               factoryOption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                               prepareOption='SplitMode=random:!V',
+        result.path.add_module('TMVATeacher', prefix='D0:1_42',
                                variables=['p', 'pt'],
-                               createMVAPDFs=True,
                                listNames=['D0:1_tmp'],
-                               doNotTrain=True,
-                               **self.sPlotParameters[1])
+                               spectators=['M'],
+                               maxSamples=int(2e7))
         self.assertEqual(self.resource, result)
 
     def test_GenerateTrainingDataUsingSPlotWithAdditionalDependencies(self):
         # Returns None if TrainingData does not exists
         self.assertEqual(GenerateTrainingDataUsingSPlot(self.resource, 'D0:1', self.mvaConfig, self.sPlotParameters,
-                                                        'NbinsMVAPdf=100:', ['VertexFit1', 'VertexFit2']), None)
+                                                        ['VertexFit1', 'VertexFit2']), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds TMVATeacher for given ParticleList
@@ -770,22 +750,17 @@ class TestGenerateTrainingDataUsingSPlot(unittest.TestCase):
                                inputListNames='D0:1',
                                cut='1.8 < M < 1.9',
                                writeOut=False)
-        result.path.add_module('TMVASPlotTeacher', prefix='D0:1_42',
-                               methods=[('FastBDT', 'Plugin', 'NbinsMVAPdf=100:TMVAConfigString')],
-                               factoryOption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                               prepareOption='SplitMode=random:!V',
+        result.path.add_module('TMVATeacher', prefix='D0:1_42',
                                variables=['p', 'pt'],
-                               createMVAPDFs=True,
                                listNames=['D0:1_tmp'],
-                               doNotTrain=True,
-                               **self.sPlotParameters[1])
+                               spectators=['M'],
+                               maxSamples=int(2e7))
         self.assertEqual(self.resource, result)
 
     def test_GenerateTrainingDataUsingSPlotWithFile(self):
         with temporary_file('D0:1_42.root'):
             # Returns filename if TrainingData does exists
-            self.assertEqual(GenerateTrainingDataUsingSPlot(self.resource, 'D0:1', self.mvaConfig, self.sPlotParameters,
-                                                            'NbinsMVAPdf=100:', None),
+            self.assertEqual(GenerateTrainingDataUsingSPlot(self.resource, 'D0:1', self.mvaConfig, self.sPlotParameters, None),
                              'D0:1_42.root')
             # Enables caching
             result = MockResource(cache=True)
@@ -793,16 +768,15 @@ class TestGenerateTrainingDataUsingSPlot(unittest.TestCase):
 
     def test_GenerateTrainingDataUsingSPlotWithUnfullfilledDependencies(self):
         # Returns None if Dependency is not fulfilled
-        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, self.sPlotParameters,
-                                              'NbinsMVAPdf=100:', ['Vertex1', None]), None)
+        self.assertEqual(GenerateTrainingData(self.resource, 'D0:1', self.mvaConfig, self.sPlotParameters, ['Vertex1', None]),
+                         None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
     def test_GenerateTrainingDataUsingSPlotMissingParticleList(self):
         # Returns None if ParticleList is None
-        self.assertEqual(GenerateTrainingData(self.resource, None, self.mvaConfig, self.sPlotParameters,
-                                              'NbinsMVAPdf=100:', None), None)
+        self.assertEqual(GenerateTrainingData(self.resource, None, self.mvaConfig, self.sPlotParameters, None), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -812,12 +786,9 @@ def MockSubprocessFailCall(command, shell):
     assert shell
     expectation = "externTeacher --methodName 'FastBDT' --methodType 'Plugin'"\
                   " --methodConfig 'CreateMVAPdfs:Nbins=100:TMVAConfigString' --target 'isSignal'"\
-                  " --variables 'p' 'pt'"\
-                  " --factoryOption '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification'"\
-                  " --prepareOption 'SplitMode=random:!V' --prefix 'trainingData'"\
-                  " --maxEventsPerClass 10000000"\
+                  " --variables 'p' 'pt' --prefix 'trainingData'"\
                   " > 'trainingData'.log 2>&1"
-    assert command == expectation
+    assert command == expectation, command
 
 # If you're afraid of black magic, ignore the following lines
 
@@ -834,13 +805,10 @@ def MockSubprocessSuccessCall(command, shell):
     assert shell
     expectation = "externTeacher --methodName 'FastBDT' --methodType 'Plugin'"\
                   " --methodConfig 'CreateMVAPdfs:Nbins=100:TMVAConfigString' --target 'isSignal'"\
-                  " --variables 'p' 'pt'"\
-                  " --factoryOption '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification'"\
-                  " --prepareOption 'SplitMode=random:!V' --prefix 'trainingData'"\
-                  " --maxEventsPerClass 10000000"\
+                  " --variables 'p' 'pt' --prefix 'trainingData'"\
                   " > 'trainingData'.log 2>&1"
-    assert command == expectation
-    open('trainingData.config', 'a').close()
+    assert command == expectation, command
+    open('trainingData_1.config', 'a').close()
 
 
 # If you're afraid of black magic, ignore the following lines
@@ -863,18 +831,20 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
                                           model=None)
 
     def test_TrainMultivariateClassifierAlreadyTrained(self):
-        with temporary_file('trainingData.config'):
+        with temporary_file('trainingData_1.config'):
             # Returns config filename if training was sucessfull
             self.assertEqual(
                 TrainMultivariateClassifier(
-                    self.resource, self.mvaConfig, 'Nbins=100:', 'trainingData.root'), 'trainingData.config')
+                    self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:', 'trainingData.root'),
+                'trainingData_1.config')
             # Enables caching
             result = MockResource(cache=True, env={'externTeacher': 'externTeacher'})
             self.assertEqual(self.resource, result)
 
     def test_TrainMultivariateClassifierMissingTrainingData(self):
         # Returns None if training is not possible due to missing training data
-        self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'Nbins=100:', None), None)
+        self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig,
+                                                     'CreateMVAPdfs:Nbins=100:', None), None)
         # Enables caching
         result = MockResource(cache=True, env={'externTeacher': 'externTeacher'})
         self.assertEqual(self.resource, result)
@@ -885,19 +855,20 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
                      '<string>', 'exec')
         # Returns None if training was did not create correct file
         with self.assertRaises(RuntimeError):
-            TrainMultivariateClassifier(self.resource, self.mvaConfig, 'Nbins=100:', 'trainingData.root')
+            TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
+                                        'trainingData.root')
 
     def test_TrainMultivariateClassifierTrainingSuccessfull(self):
         # I call upon the mighty god of Python!
         exec compile(InjectMockSubprocessSuccess().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
                      '<string>', 'exec')
         # Returns config filename if training was did not create correct file
-        self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig,
-                                                     'Nbins=100:', 'trainingData.root'), 'trainingData.config')
+        self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
+                                                     'trainingData.root'), 'trainingData_1.config')
         # Enables caching
         result = MockResource(cache=True, usesMultiThreading=True, env={'externTeacher': 'externTeacher'})
         self.assertEqual(self.resource, result)
-        os.remove('trainingData.config')
+        os.remove('trainingData_1.config')
 
 
 class TestSignalProbability(unittest.TestCase):
@@ -914,26 +885,25 @@ class TestSignalProbability(unittest.TestCase):
         # Returns hash if sucessfull
         self.assertEqual(
             SignalProbability(
-                self.resource, 'D0:1', self.mvaConfig, {
-                    0: 3}, 'Nbins=100:', 'configMVC.config'), '42')
+                self.resource, 'D0:1', self.mvaConfig, 'configMVC_1.config'), '42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds TMVAExpert for given ParticleList
         result.path.add_module('TMVAExpert', prefix='configMVC', method='FastBDT',
-                               signalFraction=-2, expertOutputName='SignalProbability',
-                               signalClass=1, inverseSamplingRates={0: 3}, listNames=['D0:1'])
+                               signalFraction=-1, expertOutputName='SignalProbability',
+                               signalClass=1, transformToProbability=True, listNames=['D0:1'])
         self.assertEqual(self.resource, result)
 
     def test_SignalProbabilityMissingConfigMVC(self):
         # Returns None if training is not possible due to missing MVC weight file
-        self.assertEqual(SignalProbability(self.resource, 'D0:1', self.mvaConfig, {0: 3}, 'Nbins=100:', None), None)
+        self.assertEqual(SignalProbability(self.resource, 'D0:1', self.mvaConfig, None), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
     def test_SignalProbabilityMissingParticleList(self):
         # Returns None if training is not possible due to missing ParticleList
-        self.assertEqual(SignalProbability(self.resource, None, self.mvaConfig, {0: 3}, 'Nbins=100:', 'configMVC.config'), None)
+        self.assertEqual(SignalProbability(self.resource, None, self.mvaConfig, 'configMVC_1.config'), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)

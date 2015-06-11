@@ -301,7 +301,6 @@ def fullEventInterpretation(selection_path, particles):
                     mvaConfig='MVAConfig_' + particle.identifier,
                     particleList='MatchedParticleList_' + particle.identifier,
                     inverseSamplingRates='InverseSamplingRate_' + particle.identifier,
-                    Nbins='Nbins_' + particle.identifier,
                     additionalDependencies='None')
             # Train and apply MVC on raw ParticleList
             dag.add('TrainedMVC_' + particle.identifier, provider.TrainMultivariateClassifier,
@@ -311,8 +310,6 @@ def fullEventInterpretation(selection_path, particles):
             dag.add('SignalProbability_' + particle.identifier, provider.SignalProbability,
                     mvaConfig='MVAConfig_' + particle.identifier,
                     particleList='RawParticleList_' + particle.identifier,
-                    inverseSamplingRates='InverseSamplingRate_' + particle.identifier,
-                    Nbins='Nbins_' + particle.identifier,
                     configFilename='TrainedMVC_' + particle.identifier)
         else:
             for channel in particle.channels:
@@ -338,7 +335,6 @@ def fullEventInterpretation(selection_path, particles):
                         mvaConfig='MVAConfig_' + channel.name,
                         particleList='MatchedParticleList_' + channel.name,
                         inverseSamplingRates='InverseSamplingRate_' + channel.name,
-                        Nbins='Nbins_' + channel.name,
                         additionalDependencies=additionalDependencies)
 
                 # Train and apply MVC on raw ParticleList
@@ -349,8 +345,6 @@ def fullEventInterpretation(selection_path, particles):
                 dag.add('SignalProbability_' + channel.name, provider.SignalProbability,
                         mvaConfig='MVAConfig_' + channel.name,
                         particleList='RawParticleList_' + channel.name,
-                        inverseSamplingRates='InverseSamplingRate_' + channel.name,
-                        Nbins='Nbins_' + channel.name,
                         configFilename='TrainedMVC_' + channel.name)
 
                 # Train additional sPlot training to test sPlot
@@ -370,7 +364,8 @@ def fullEventInterpretation(selection_path, particles):
                     dag.add('SPlotTrainedMVC_' + channel.name, provider.TrainMultivariateClassifier,
                             mvaConfig='MVAConfig_' + channel.name,
                             Nbins='Nbins_' + channel.name,
-                            trainingData='SPlotTrainingData_' + channel.name)
+                            trainingData='SPlotTrainingData_' + channel.name,
+                            inverseSamplingRates='InverseSamplingRate_' + channel.name)
                     dag.addNeeded('SPlotTrainedMVC_' + channel.name)
                 else:
                     dag.add('SPlotModel_' + channel.name, None)

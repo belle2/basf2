@@ -338,21 +338,20 @@ def CalculateNumberOfBins(resource, distribution):
     resource.cache = True
     if distribution is None:
         return
-    Nbins = 'NbinsMVAPdf=50:'
+    Nbins = 'CreateMVAPdfs:NbinsMVAPdf=50:'
     if distribution['nSignal'] > 1e5:
-        Nbins = 'NbinsMVAPdf=100:'
+        Nbins = 'CreateMVAPdfs:NbinsMVAPdf=100:'
     if distribution['nSignal'] > 1e6:
-        Nbins = 'NbinsMVAPdf=200:'
+        Nbins = 'CreateMVAPdfs:NbinsMVAPdf=200:'
     return Nbins
 
 
-def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates, Nbins, additionalDependencies):
+def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates, additionalDependencies):
     """
     Generates the training data for the training of an MVC
         @param resource object
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
-        @param Nbins number of bins
         @param inverseSamplingRates dictionary of inverseSampling Rates for signal (1) and background (0)
         @return string ROOT filename
     """
@@ -366,15 +365,12 @@ def GenerateTrainingData(resource, particleList, mvaConfig, inverseSamplingRates
         teacher = register_module('TMVATeacher')
         teacher.set_name('TMVATeacher_' + particleList)
         teacher.param('prefix', removeJPsiSlash(particleList + '_' + resource.hash))
-        teacher.param('methods', [(mvaConfig.name, mvaConfig.type, Nbins + mvaConfig.config)])  # Add number of bins for pdfs
-        teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
-        teacher.param('prepareOption', 'SplitMode=random:!V')
         teacher.param('variables', mvaConfig.variables)
-        teacher.param('createMVAPDFs', True)
-        teacher.param('target', mvaConfig.target)
+        teacher.param('sample', mvaConfig.target)
+        teacher.param('spectators', [mvaConfig.target])
         teacher.param('listNames', [particleList])
         teacher.param('inverseSamplingRates', inverseSamplingRates)
-        teacher.param('doNotTrain', True)
+        teacher.param('maxSamples', int(2e7))
         resource.path.add_module(teacher)
         resource.condition = ('EventType', '==0')
         resource.halt = True
@@ -405,11 +401,7 @@ def GenerateSPlotModel(resource, name, mvaConfig, distribution):
     # TODO allow user to specify modelFileName using the model parameter
     # TODO Set Initial Fit values using Monte Carlo!
     modelFileName = removeJPsiSlash('model_{name}_{hash}.root'.format(name=name, hash=resource.hash))
-    modelObjectName = 'model'
-    modelYieldsObjectNames = ['bkgfrac', 'sigfrac']
-    total = float(distribution['nBackground'] + distribution['nSignal'])
-    modelYieldsInitialFractions = [distribution['nBackground']/total, distribution['nSignal']/total]
-    modelPlotComponentNames = ['sig', 'bkg']
+
     low = max(distribution['range'][0], distribution['signalPeak'] - 3 * distribution['signalWidth'])
     high = min(distribution['signalPeak'] + 3 * distribution['signalWidth'], distribution['range'][1])
     var = distribution['variable']
@@ -434,32 +426,29 @@ def GenerateSPlotModel(resource, name, mvaConfig, distribution):
 
         # Add signal and background
         # initial value and maximal value will be set inside TMVASPlotTeacher
-        bkgfrac = RooRealVar("bkgfrac", "fraction of background", 42, 0., 42)
-        sigfrac = RooRealVar("sigfrac", "fraction of background", 42, 0., 42)
+        total = float(distribution['nBackground'] + distribution['nSignal'])
+        bkgfrac = RooRealVar("background", "fraction of background", distribution['nBackground']/total)
+        sigfrac = RooRealVar("signal", "fraction of background", distribution['nSignal']/total)
 
         bkgfrac.setConstant(kFALSE)
         sigfrac.setConstant(kFALSE)
 
-        model = RooAddPdf(modelObjectName, "bkg+sig", RooArgList(bkg, sig), RooArgList(bkgfrac, sigfrac))
+        model = RooAddPdf("model", "bkg+sig", RooArgList(bkg, sig), RooArgList(bkgfrac, sigfrac))
 
         # Write model to file and close the file, so TMVASPlotTeacher can open it
         # It's important to use ROOT.TFile here, otherwise the test will fail
         modelFile = ROOT.TFile(modelFileName, "RECREATE")
-        model.Write(modelObjectName)
+        model.Write("model")
         modelFile.ls()
         modelFile.Close()
 
     model = [{'cut': '{} < {} < {}'.format(low, var, high)},
              {'modelFileName': modelFileName,
-              'modelObjectName': modelObjectName,
-              'modelPlotComponentNames': modelPlotComponentNames,
-              'modelYieldsObjectNames': modelYieldsObjectNames,
-              'modelYieldsInitialFractions': modelYieldsInitialFractions,
               'discriminatingVariables': [var]}]
     return model
 
 
-def GenerateTrainingDataUsingSPlot(resource, particleList, mvaConfig, sPlotParameters, Nbins, additionalDependencies):
+def GenerateTrainingDataUsingSPlot(resource, particleList, mvaConfig, sPlotParameters, additionalDependencies):
     """
     Generates the training data for the training of an MVC
         @param resource object
@@ -478,18 +467,13 @@ def GenerateTrainingDataUsingSPlot(resource, particleList, mvaConfig, sPlotParam
     if not os.path.isfile(rootFilename):
         modularAnalysis.cutAndCopyList(particleList + '_tmp', particleList, sPlotParameters[0]['cut'],
                                        path=resource.path, writeOut=False)
-        teacher = register_module('TMVASPlotTeacher')
-        teacher.set_name('TMVASPlotTeacher_' + particleList)
+        teacher = register_module('TMVATeacher')
+        teacher.set_name('TMVATeacher_' + particleList)
         teacher.param('prefix', removeJPsiSlash(particleList + '_' + resource.hash))
-        teacher.param('methods', [(mvaConfig.name, mvaConfig.type, Nbins + mvaConfig.config)])  # Add number of bins for pdfs
-        teacher.param('factoryOption', '!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification')
-        teacher.param('prepareOption', 'SplitMode=random:!V')
         teacher.param('variables', mvaConfig.variables)
-        teacher.param('createMVAPDFs', True)
         teacher.param('listNames', [particleList + '_tmp'])
-        teacher.param('doNotTrain', True)
-        for parameter, value in sPlotParameters[1].iteritems():
-            teacher.param(parameter, value)
+        teacher.param('spectators', sPlotParameters[1]['discriminatingVariables'])
+        teacher.param('maxSamples', int(2e7))
         resource.path.add_module(teacher)
 
         B2WARNING("SPlot is still using MC-data! Otherwise we couldn't test it, due to the lack of real data!")
@@ -511,23 +495,18 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
     resource.cache = True
     if trainingData is None:
         return
-    configFilename = trainingData[:-5] + '.config'
+    configFilename = trainingData[:-5] + '_1.config'
 
     if not os.path.isfile(configFilename):
         command = (
             "{externTeacher} --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
-            " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
-            " --maxEventsPerClass {maxEvents}"
-            " > '{prefix}'.log 2>&1".format(
+            " --variables '{variables}' --prefix '{prefix}' > '{prefix}'.log 2>&1".format(
                 externTeacher=resource.env['externTeacher'],
                 name=mvaConfig.name,
                 type=mvaConfig.type,
-                config='CreateMVAPdfs:' + Nbins + mvaConfig.config,
+                config=Nbins + mvaConfig.config,
                 target=mvaConfig.target,
                 variables="' '".join(mvaConfig.variables),
-                foption='!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification',
-                poption='SplitMode=random:!V',
-                maxEvents=int(1e7),
                 prefix=trainingData[:-5]))
         B2INFO("Used following command to invoke teacher\n" + command)
         # The training of the MVC can run in parallel!
@@ -541,14 +520,12 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
     return configFilename
 
 
-def SignalProbability(resource, particleList, mvaConfig, inverseSamplingRates, Nbins, configFilename):
+def SignalProbability(resource, particleList, mvaConfig, configFilename):
     """
     Calculates the SignalProbability of a ParticleList using the previously trained MVC
         @param resource object
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
-        @param inverseSamplingRates dictionary of inverseSampling Rates for signal (1) and background (0)
-        @param Nbins number of bins
         @param configFilename name of file which contains the weights of thhe previously trained MVC
         @return string config filename
     """
@@ -557,12 +534,12 @@ def SignalProbability(resource, particleList, mvaConfig, inverseSamplingRates, N
         return
     expert = register_module('TMVAExpert')
     expert.set_name('TMVAExpert_' + particleList)
-    expert.param('prefix', configFilename[:-7])
+    expert.param('prefix', configFilename[:-9])  # without _1.config suffix
     expert.param('method', mvaConfig.name)
-    expert.param('signalFraction', -2)  # Use signalFraction from training
+    expert.param('signalFraction', -1)  # Use signalFraction from training
+    expert.param('transformToProbability', True)
     expert.param('expertOutputName', 'SignalProbability')
     expert.param('signalClass', 1)
-    expert.param('inverseSamplingRates', inverseSamplingRates)
     expert.param('listNames', [particleList])
     resource.path.add_module(expert)
     return resource.hash

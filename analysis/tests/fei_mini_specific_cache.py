@@ -28,6 +28,7 @@ assert len(glob.glob('mcParticlesCount.root')) == 1
 assert 0 == os.system(cmd)
 # fsp training, final variablestontuple
 assert 0 == os.system(cmd)
+assert 0 == os.system(cmd)
 # fsp training, final variablestontuple
 assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 4

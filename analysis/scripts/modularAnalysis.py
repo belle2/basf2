@@ -504,7 +504,7 @@ def trainTMVAMethod(
     decayString,
     variables,
     methods=[('FastBDT', 'Plugin',
-              '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
+              '!H:!V:CreateMVAPdfs:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
               )],
     target='isSignal',
     prefix='TMVA',
@@ -522,7 +522,7 @@ def trainTMVAMethod(
     @param path         modules are added to this path
     """
 
-    teacher = register_module('TMVATeacher')
+    teacher = register_module('TMVAOnTheFlyTeacher')
     teacher.param('prefix', prefix)
     teacher.param('methods', methods)
     teacher.param('variables', variables)
@@ -547,7 +547,7 @@ def applyTMVAMethod(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param method name of the TMVA method
     @param expertOutputName extra-info name which is used to store the classifier output in the particle
-    @param signalFraction to calculate probability, -1 if no transformation, -2 to use training signal/background
+    @param signalFraction to calculate probability, -1 for training fraction
     @param signalClass is the cluster to calculate the probability of beeing signal
     @param prefix prefix which is used to identify the weight files created by TMVA
     @param workingDirectory in which the expert finds the config file and the weight file directory

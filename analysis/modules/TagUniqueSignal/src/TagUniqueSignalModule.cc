@@ -68,7 +68,7 @@ void TagUniqueSignalModule::event()
         extraInfoValue = 1.0;
     }
     if (part->hasExtraInfo(m_extraInfoName)) {
-      B2WARNING("Extra Info with given name is already set! I won't set it again!")
+      B2FATAL("Extra Info with given name is already set! This module can only be used once per particle.")
     } else {
       part->addExtraInfo(m_extraInfoName, extraInfoValue);
     }

@@ -1,0 +1,10 @@
+#!/bin/bash
+# Runs the externTeacher tool as a job on the cluster
+
+f=`tempfile`
+echo "Use $f as temporary file"
+echo "externTeacher $*" > "$f"
+cat "$f"
+echo bsub -K -q mx -e "$f".elog -o "$f".log "$f"
+rm $f
+

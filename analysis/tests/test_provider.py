@@ -855,7 +855,7 @@ class InjectMockSubprocessSuccess(ast.NodeTransformer):
 class TestTrainMultivariateClassifier(unittest.TestCase):
 
     def setUp(self):
-        self.resource = MockResource()
+        self.resource = MockResource(env={'externTeacher': 'externTeacher'})
         self.mvaConfig = MVAConfiguration(name='FastBDT', type='Plugin',
                                           config='TMVAConfigString',
                                           variables=['p', 'pt'],
@@ -869,14 +869,14 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
                 TrainMultivariateClassifier(
                     self.resource, self.mvaConfig, 'Nbins=100:', 'trainingData.root'), 'trainingData.config')
             # Enables caching
-            result = MockResource(cache=True)
+            result = MockResource(cache=True, env={'externTeacher': 'externTeacher'})
             self.assertEqual(self.resource, result)
 
     def test_TrainMultivariateClassifierMissingTrainingData(self):
         # Returns None if training is not possible due to missing training data
         self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'Nbins=100:', None), None)
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(cache=True, env={'externTeacher': 'externTeacher'})
         self.assertEqual(self.resource, result)
 
     def test_TrainMultivariateClassifierTrainingFailed(self):
@@ -895,7 +895,7 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig,
                                                      'Nbins=100:', 'trainingData.root'), 'trainingData.config')
         # Enables caching
-        result = MockResource(cache=True, usesMultiThreading=True)
+        result = MockResource(cache=True, usesMultiThreading=True, env={'externTeacher': 'externTeacher'})
         self.assertEqual(self.resource, result)
         os.remove('trainingData.config')
 

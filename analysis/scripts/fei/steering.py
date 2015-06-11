@@ -41,6 +41,8 @@ def getCommandLineOptions():
     parser.add_argument('-cache', '--cache', dest='cache', type=str, default=None,
                         help='Use the given file to cache results between multiple executions.'
                              'Data from previous runs has to be provided as input!')
+    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='externTeacher',
+                        help='Use this command to invoke extern teacher: externTeacher or externClusterTeacher')
     parser.add_argument('-prune', '--prune', dest='prune', action='store_true',
                         help='Prune ParticleStoreArray and ParticleLists')
     parser.add_argument('-boost', '--boost', dest='boost', action='store_true',
@@ -165,6 +167,7 @@ def fullEventInterpretation(selection_path, particles):
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
     dag.env['rerunCachedProviders'] = args.rerunCachedProviders
+    dag.env['externTeacher'] = args.externTeacher
 
     # Add basic properties defined by the user of all Particles as Resources into the graph
     for particle in particles:

@@ -515,10 +515,11 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
 
     if not os.path.isfile(configFilename):
         command = (
-            "externTeacher --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
+            "{externTeacher} --methodName '{name}' --methodType '{type}' --methodConfig '{config}' --target '{target}'"
             " --variables '{variables}' --factoryOption '{foption}' --prepareOption '{poption}' --prefix '{prefix}'"
             " --maxEventsPerClass {maxEvents}"
             " > '{prefix}'.log 2>&1".format(
+                externTeacher=resource.env['externTeacher'],
                 name=mvaConfig.name,
                 type=mvaConfig.type,
                 config='CreateMVAPdfs:' + Nbins + mvaConfig.config,

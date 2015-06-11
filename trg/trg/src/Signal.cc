@@ -23,13 +23,13 @@ using namespace std;
 namespace Belle2 {
 
 TRGSignal::TRGSignal(const TRGClock & c) :
-    _name("no signal"),
+    _name("?"),
     _clock(& c),
     _history() {
 }
 
 TRGSignal::TRGSignal(const TRGTime & t0, const TRGTime & t1) :
-    _name("no name"),
+    _name("?"),
     _clock(& t0.clock()),
     _history() {
 #if TRG_DEBUG
@@ -42,32 +42,35 @@ TRGSignal::TRGSignal(const TRGTime & t0, const TRGTime & t1) :
 
     _history.push_back(t0);
     _history.push_back(t1);
+
 #if TRG_DEBUG
     consistencyCheck();
 #endif
 }
 
 TRGSignal::TRGSignal(const TRGClock & c, int t0, int t1) :
-    _name("no name"),
+    _name("?"),
     _clock(& c),
     _history() {
     TRGTime time0(t0, true, c);
     TRGTime time1(t1, false, c);
     _history.push_back(time0);
     _history.push_back(time1);
+
 #if TRG_DEBUG
     consistencyCheck();
 #endif
 }
 
 TRGSignal::TRGSignal(const TRGClock & c, double t0, double t1) :
-    _name("no name"),
+    _name("?"),
     _clock(& c),
     _history() {
     TRGTime time0(t0, true, c);
     TRGTime time1(t1, false, c);
     _history.push_back(time0);
     _history.push_back(time1);
+
 #if TRG_DEBUG
     consistencyCheck();
 #endif
@@ -201,8 +204,8 @@ TRGSignal::andOperation(const vector<TRGTime> & history) {
         else
             --riseC;
 
-// 	cout << "riseC,i,e,t=" << riseC << "," << i << "," << edge
-// 	     << "," << t._history[i].time() << endl;
+ 	// cout << "riseC,i,e,t=" << riseC << "," << i << "," << edge
+ 	//      << "," << history[i].time() << endl;
 
         if (riseC == 2) {
             tmp.push_back(history[i]);
@@ -364,7 +367,10 @@ TRGSignal::width(unsigned a) const {
 }
 
 const TRGSignal &
-TRGSignal::set(int t0, int t1) {
+TRGSignal::set(int t0, int t1, bool state) {
+    if (! state)
+        return unset(t0, t1);
+
     TRGSignal s(clock(), t0, t1);
     (* this) |= s;
 
@@ -377,13 +383,15 @@ TRGSignal::set(int t0, int t1) {
 }
 
 const TRGSignal &
-TRGSignal::set(double t0, double t1) {
-    TRGSignal s(clock(), t0, t1);
-    (* this) |= s;
+TRGSignal::unset(int t0, int t1) {
+    if (active(t0, t1)) {
+        TRGSignal x(clock(), t0, t1);
+        x.invert();
+        (* this) &= x;
+    }
 
 #if TRG_DEBUG
-    if (consistencyCheck())
-	cout << "TRGSignal::set ... t0, t1=" << t0 << "," << t1 << endl;
+    consistencyCheck();
 #endif
 
     return * this;
@@ -424,7 +432,7 @@ TRGSignal::consistencyCheck(void) const {
 	if (t1.edge() != false)
 	    err |= (1 << (i + 1));
 
-	if (t0.time() == t1.time())
+	if ((t0.time() == t1.time()) || (t0.time() > t1.time()))
 	    errTiming |= (1 << (i + 1));
     }
 
@@ -449,19 +457,31 @@ TRGSignal::invert(void) {
     if (_history.size()) {
         for (unsigned i = 0; i < _history.size(); i++)
             _history[i].reverse();
+        if (_history[0].time() > _clock->min()) {
+            TRGTime t0(_clock->min(), true, * _clock);
+            _history.insert(_history.begin(), t0);
+        }
+        else {
+            _history.erase(_history.begin());
+        }
+        if (_history.end()->time() < _clock->max()) {
+            TRGTime t0(_clock->max(), false, * _clock);
+            _history.push_back(t0);
+        }
+        else {
+            _history.erase(_history.end());
+        }
     }
     else {
         TRGTime time0(_clock->min(), true, * _clock);
         TRGTime time1(_clock->max(), false, * _clock);
         _history.push_back(time0);
         _history.push_back(time1);
-
-        // _clock->dump();
-        // cout << "min,max=" << _clock->min() << "," << _clock->max() << endl;
-        // time0.dump();
-        // time1.dump();
-
     }
+
+#if TRG_DEBUG
+    consistencyCheck();
+#endif
 
     return * this;
 }

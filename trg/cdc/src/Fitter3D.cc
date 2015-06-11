@@ -86,7 +86,7 @@ namespace Belle2 {
     m_mConstV["wirePhi2DError"][2] = 0.0025806;
     m_mConstV["wirePhi2DError"][3] = 0.0019084; 
     m_mConstV["wirePhi2DError"][4] = 0.001514;
-    m_mConstV["driftPhi2DError"] = vector<double> (4);
+    m_mConstV["driftPhi2DError"] = vector<double> (5);
     m_mConstV["driftPhi2DError"][0] = 0.0085106;
     m_mConstV["driftPhi2DError"][1] = 0.0039841;
     m_mConstV["driftPhi2DError"][2] = 0.0025806;

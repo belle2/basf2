@@ -71,10 +71,14 @@ class TRGSignal {
     /// returns true if there is a signal.
     bool active(void) const;
 
+    /// returns true if there is a signal.
+    bool active(int clk0, int clk1) const;
+
     /// returns true if signal is active in given clock position.
     bool state(int clockPosition) const;
 
-    /// returns true if signal is active and rising edge in give clock position.
+    /// returns true if signal is active and rising edge in give clock
+    /// position.
     bool riseEdge(int clockPosition) const;
 
     /// returns a list of clock position of state change.
@@ -102,7 +106,11 @@ class TRGSignal {
 
     /// makes a pulse with leading edge at clock t0 and with trailing
     /// edge at clock t1.
-    const TRGSignal & set(int t0, int t1);
+    const TRGSignal & set(int t0, int t1, bool state = true);
+
+    /// clear(or unset) with leading edge at clock t0 and with trailing
+    /// edge at clock t1.
+    const TRGSignal & unset(int t0, int t1);
 
     /// makes signal inverted.
     const TRGSignal & invert(void);
@@ -313,6 +321,25 @@ inline
 bool
 TRGSignal::operator!=(const TRGSignal & a) const {
     return (! operator==(a));
+}
+
+inline
+bool
+TRGSignal::active(int c0, int c1) const {
+    for (unsigned i = 0; i < _history.size(); i++) {
+        if (! _history[i].edge()) {
+            const int t0 = _history[i - 1].time();
+            const int t1 = _history[i].time();
+
+            if ((c0 > t0) && (c0 < t1))
+                return true;
+            if ((c1 > t0) && (c1 < t1))
+                return true;
+            if ((c1 < t0) && (c1 < t1))
+                return false;
+        }
+    }
+    return false;
 }
 
 } // namespace Belle2

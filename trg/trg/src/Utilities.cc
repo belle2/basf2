@@ -47,9 +47,11 @@ TRGUtil::dateStringF(void) {
 
 std::string
 TRGUtil::itostring(int i) {
-    std::ostringstream s;
-    s << i;
-    return s.str();
+    // std::ostringstream s;
+    // s << i;
+    // return s.str();
+
+    return std::to_string(i);
 }
 
 std::string

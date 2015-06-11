@@ -2451,7 +2451,7 @@ TRGCDC::firmwareSimulation(void) {
     //...TSFs...
     const unsigned nTSFBoards = _tsfboards.size();
     for (unsigned i=0;i<nTSFBoards; i++){
-	_tsfboards[i]->simulateBoard();
+//	_tsfboards[i]->simulateBoard();
         _tsfboards[i]->simulateFor2D();
     }
 
@@ -2475,7 +2475,7 @@ TRGCDC::firmwareSimulation(void) {
         _tracker2Ds[i]->simulate();
     }
 
-//    TRGDebug::level(oldLevel);
+//  TRGDebug::level(oldLevel);
 
 #ifdef TRGCDC_DISPLAY
     dump("hits");
@@ -2573,7 +2573,7 @@ TRGCDC::configure(void) {
             f = _fronts[fid];
         if (! f) {
             newFrontEnd = true;
-            const string name = "CDCFrontEnd_" + TRGUtil::itostring(fid);
+            const string name = "CDCFrontEnd" + TRGUtil::itostring(fid);
             TCFrontEnd::boardType t = TCFrontEnd::unknown;
             if (_wires[wid]->superLayerId() == 0) {
                 if (_wires[wid]->localLayerId() < 5)
@@ -2607,7 +2607,7 @@ TRGCDC::configure(void) {
                     m = _mergers[mid];
                 if (! m) {
 		    newMerger = true;
-                    const string name = "CDCMerger_" + TRGUtil::itostring(mid);
+                    const string name = "CDCMerger" + TRGUtil::itostring(mid);
                     TCMerger::unitType mt = TCMerger::unknown;
                     if (_wires[wid]->superLayerId() == 0) 
                         mt = TCMerger::innerType;

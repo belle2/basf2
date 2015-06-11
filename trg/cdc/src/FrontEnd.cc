@@ -154,7 +154,7 @@ TRGCDCFrontEnd::simulate(void) {
     }
 
     //...Clock...
-    const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
+    const TRGClock & dClock = clockData();
 
     //...Input from wires...
     const unsigned nWires = size();
@@ -175,12 +175,12 @@ TRGCDCFrontEnd::simulate(void) {
     pattern->name(name() + "@dataClock");
     _isb->push_back(pattern);
 
-#ifdef TRG_DEBUG
-    if (input.active()) {
-        input.dump("detail", TRGDebug::tab());
-        pattern->dump("detail", TRGDebug::tab());
-    }
-#endif
+    // if (TRGDebug::level() > 1) {
+    //     if (input.active()) {
+    //         input.dump("", TRGDebug::tab());
+    //         pattern->dump("", TRGDebug::tab());
+    //     }
+    // }
 
     // output wire hit info into a .log file
     // ofstream wireinfo((name()+"_wireinfo.log").c_str());
@@ -278,7 +278,7 @@ wireinfo << endl;
 
 
 #ifdef TRG_DEBUG
-                    bit5->dump("detail", TRGDebug::tab());
+//                    bit5->dump("detail", TRGDebug::tab());
 #endif
                 }
             }
@@ -286,13 +286,6 @@ wireinfo << endl;
 
         _isb->push_back(bit5);
     }
-
-#ifdef TRG_DEBUG
-    _isb->dump("detail", TRGDebug::tab());
-#endif
-    //cout<<"Input signal vector Start"<<endl;
-    //_isb->dump("detail", TRGDebug::tab());
-    //cout<<"Input signal vector End"<<endl;
 
     //...Data clock...
     // Data clock position data is omitted. Is this problem?
@@ -324,15 +317,12 @@ wireinfo << endl;
                                    256,
                                    TCFrontEnd::packerOuterOutside);
 
-    //cout<<"Output signal vector Start"<<endl;
-    //_osb->dump("detail", TRGDebug::tab());
-    //cout<<"Output signal vector End"<<end;
-
-    //dump _osb into a log file
-    //dump_log();
-
-
-
+    if (TRGDebug::level() > 1) {
+        cout << TRGDebug::tab() << name() << " input bundle" << endl;
+        _isb->dump("", TRGDebug::tab() + "    ");
+        cout << TRGDebug::tab() << name() << " output bundle" << endl;
+        _osb->dump("", TRGDebug::tab() + "    ");
+    }
 }
 
 TRGState
@@ -564,7 +554,7 @@ TCFrontEnd::packerInnerInside(const TRGState & input) {
 #ifdef TRG_DEBUG
     // input.dump("detail", TRGDebug::tab() + "FrontEnd_II in ");
     // s.dump("detail", TRGDebug::tab() + "FrontEnd_II out ");
-    unpackerInnerInside(input, s);
+//    unpackerInnerInside(input, s);
 #endif
 
     //...Termination...
@@ -924,7 +914,7 @@ TCFrontEnd::packerInnerOutside(const TRGState & input) {
         //s.set(p, 5, timing[47]);
 
 #ifdef TRG_DEBUG
-        unpackerInnerOutside(input, s);
+//        unpackerInnerOutside(input, s);
 #endif
 
         delete[] b;
@@ -1108,7 +1098,7 @@ TCFrontEnd::packerOuterInside(const TRGState & input) {
     //s.set(p, 5, timing[31]);
 
 #ifdef TRG_DEBUG
-    unpackerOuterInside(input, s);
+//    unpackerOuterInside(input, s);
 #endif
 
     delete[] b;
@@ -1280,7 +1270,7 @@ TCFrontEnd::packerOuterOutside(const TRGState & input) {
     //s.set(p, 5, timing[31]);
 
 #ifdef TRG_DEBUG
-    unpackerOuterOutside(input, s);
+//    unpackerOuterOutside(input, s);
 #endif
 
     delete[] b;

@@ -174,7 +174,7 @@ TRGSignalBundle::TRGSignalBundle(const string & name,
     const unsigned n = outputStates.size();
     for (unsigned i = 0; i < n; i++) {
       	const TRGState * s = outputStates[i];
-	sb->set((*s), newStates[i]);
+	sb->set((* s), newStates[i]);
 	delete s;
     }
 

@@ -149,8 +149,10 @@ namespace HandleRoot {
   }
 
   void writeRoot(TFile* file){
-    file->Write();
-    file->Close();
+      if (file) {
+          file->Write();
+          file->Close();
+      }
   }
 
   void terminateRoot(

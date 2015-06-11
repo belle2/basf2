@@ -101,7 +101,7 @@ namespace Belle2 {
 
     bool m_makeRootFile;
 
-    public:
+  public:
 
     /// return version
     static std::string version(void);
@@ -146,8 +146,20 @@ namespace Belle2 {
     double mkint(TRGState );
 
     vector<bool> mkbool(int, int);
-    private:
 
+  private:
+
+    /// Make TRGSivnals for the priority timing bits.
+      void priorityTimingOuter(unsigned tsfID,
+                               const unsigned nTSF,
+                               TRGSignalVector & s) const;
+
+    /// Make TRGSivnals for the fastest timing bits.
+      void fastestTimingOuter(unsigned tsfID,
+                              const unsigned nTSF,
+                              TRGSignalVector & s) const;
+
+  private:
 
     /// Unit type.
     boardType _type;
@@ -160,15 +172,36 @@ namespace Belle2 {
     TRGSignalBundle * _tosbT;
     std::vector<TCSegment *> _tsSL;
 
-      /// TSF input storage
-      std::vector<TRGSignalVector *> _tsfIn;
+    /// TSF input storage
+    std::vector<TRGSignalVector *> _tsfIn;
 
-      /// TSF response storeage
-      std::vector<TRGSignalVector *> _tsfOut;
+    /// TSF response storeage
+    std::vector<TRGSignalVector *> _tsfOut;
 
-      /// One time info. to be deleted in next event;
-      std::vector<TRGSignalVector *> _toBeDeleted;
-  };
+    /// One time info. to be deleted in next event;
+    std::vector<TRGSignalVector *> _toBeDeleted;
+
+    /// Internal data of wire hit map.
+    std::vector<TRGSignal * > _hitMap[5];
+
+    /// Internal data of the priority hit timing.
+    std::vector<TRGSignal * > _priMap;
+
+    /// Internal data of the fastest hit timing.
+    std::vector<TRGSignal * > _fasMap;
+
+    /// Internal data of the priority cell hit position flag.
+    std::vector<TRGSignal * > _secMap;
+
+    /// Internal data of the edge timing information.
+    std::vector<TRGSignal * > _edg0Map;
+
+    /// Internal data of the edge timing information.
+    std::vector<TRGSignal * > _edg1Map;
+
+    /// Internal data of the edge timing information.
+    std::vector<TRGSignal * > _edg2Map;
+};
 
 } // namespace Belle2
 

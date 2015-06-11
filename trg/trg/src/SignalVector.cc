@@ -73,11 +73,13 @@ TRGSignalVector::dump(const string & msg,
 
     if (det)
         for (unsigned i = 0; i < size(); i++)
-            (* this)[i].dump(msg, "    " + pre);
+            (* this)[i].dump(msg, "    " +  pre + "bit" +
+                                 TRGUtil::itostring(i) + ":");
     else
         for (unsigned i = 0; i < size(); i++)
             if ((* this)[i].active())
-                (* this)[i].dump(msg, "    " + pre);
+                (* this)[i].dump(msg, "    " + pre + "bit" +
+                                 TRGUtil::itostring(i) + ":");
 }
 
 // TRGSignalVector
@@ -154,10 +156,8 @@ const TRGSignalVector &
 TRGSignalVector::set(const TRGState & s, int cp) {
     const unsigned n = s.size();
     for (unsigned i = 0; i < n; i++) {
-	if (s[i]) {
-	    TRGSignal & signal = (* this)[i];
-	    signal.set(cp, cp + 1);
-	}
+        TRGSignal & signal = (* this)[i];
+        signal.set(cp, cp + 1, s[i]);
     }
     return * this;
 }

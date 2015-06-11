@@ -164,9 +164,8 @@ TRGCDCMerger::simulate(void) {
     delete _mosb;
   }
 
-  //...Clock...                                                                   
-  const TRGClock & dClock = TRGCDC::getTRGCDC()->dataClock();
-
+  //...Clock...
+  const TRGClock & dClock = clockData();
 
   // ... Make input signal bundle .... ???
   TRGSignalVector input( name()+"inputFrontEnds", dClock);
@@ -204,10 +203,6 @@ TRGCDCMerger::simulate(void) {
   fedata->name(name() + "@dataClock");
   _misb->push_back(fedata);
   
-
-#ifdef TRG_DEBUG
-  _misb->dump("detail", TRGDebug::tab());
-#endif
 //  cout<<"Merger input start"<<endl;
 //  _misb->dump("detail", TRGDebug::tab());
 //  cout<<"Merger input end"<<endl;
@@ -216,7 +211,7 @@ TRGCDCMerger::simulate(void) {
   // Data clock position data is omitted. Is this problem?   
  
   //...Make output signal bundle...              
-  const string no = name() + "OutputSignalBundle";
+  const string no = name() + "OutSigBundle";
   if (type() == innerType) {
     _mosb = new TRGSignalBundle(no,
                                 dClock,
@@ -236,18 +231,14 @@ TRGCDCMerger::simulate(void) {
   //...Output to a channel...
   output(0)->signal(_mosb);
 
-//  cout<<"Merger output start"<<endl;
-//  _mosb->dump("detail", TRGDebug::tab());
-//  cout<<"Merger output end"<<endl;
-
-//	dump_log();	//dump details of _mosb into a .log file
-
-
-
-
   // Terminate
   delete input1;
   delete input2;
+
+    if (TRGDebug::level() > 1) {
+        _misb->dump("", TRGDebug::tab());
+        _mosb->dump("", TRGDebug::tab());
+    }
 
   TRGDebug::leaveStage("Merger simulattion");
 }
@@ -451,9 +442,9 @@ TCMerger::packerInner(const TRGState & input) {
   // no process for these at this moment
 
 //...Debug...     
-#ifdef TRG_DEBUG
-  unpackerInner(input, s);
-#endif
+  if (TRGDebug::level() > 1) {
+      unpackerInner(input, s);
+  }
 
 //...Termination...                                                                                             
   delete[] binput;
@@ -724,10 +715,9 @@ TCMerger::packerOuter(const TRGState & input ) {
 
 
 //...Debug...                            
-#ifdef TRG_DEBUG
-// s.dump("detail", TRGDebug::tab() + "Merger innerType out ");
-   unpackerOuter(input, s);
-#endif
+  if (TRGDebug::level() > 1) {
+      unpackerOuter(input, s);
+  }
 
 //...Termination...                                                                               
   delete[] binput;
@@ -747,7 +737,7 @@ TCMerger:: unpackerInner(const TRGState & input,
 
   unsigned ipos=0, o = 0;
 
-  cout << "=========================== Merger unpackerInner ================================= "<< endl;
+  cout << "======================= Merger unpackerInner ================================= "<< endl;
   cout << "input bit information: " << endl;
   for (unsigned bi=0; bi< input.size(); bi++) {
     if ( input[bi] ) cout << "* " ; else cout << ". ";
@@ -915,7 +905,7 @@ TCMerger:: unpackerInner(const TRGState & input,
   }
   cout  << endl;
 
-  cout << "=====================    End of Merger unpackerInner    ========================= "<< endl;
+  cout << "==================    End of Merger unpackerInner    ========================= "<< endl;
 
 
 }
@@ -931,7 +921,7 @@ TCMerger:: unpackerOuter(const TRGState & input,
 
   unsigned o = 0;
 
-  cout << "=========================== Merger unpackerOuter================================== "<< endl;
+  cout << "======================= Merger unpackerOuter================================== "<< endl;
   cout << "input bit information: " << endl;
   for (unsigned bi=0; bi< input.size(); bi++) {
     if ( input[bi] ) cout << "* " ; else cout << ". ";
@@ -1102,7 +1092,7 @@ TCMerger:: unpackerOuter(const TRGState & input,
   }
   cout  << endl;
 
-  cout << "=====================     End of Merger unpackerOuter    ========================= "<< endl;
+  cout << "=================     End of Merger unpackerOuter    ========================= "<< endl;
 
 
 }

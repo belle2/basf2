@@ -119,7 +119,8 @@ void DummyDataSourceModule::event()
   int nwords_1st = 0, nwords_2nd = 0, nwords_3rd = 0, nwords_4th = 0;
 
   //  nwords_1st = n_basf2evt % 10;
-  nwords_1st = n_basf2evt % 100 + 1;
+  //  nwords_1st = n_basf2evt % 100 + 1;
+  nwords_1st = 1;
   if (nwords_1st > 10000 || nwords_1st <= 0) {
     printf("ERRORORRRR nword1st %d\n", nwords_1st);
     fflush(stdout);
@@ -135,7 +136,8 @@ void DummyDataSourceModule::event()
   }
 
   //  nwords_2nd = (n_basf2evt + 1) % 10;
-  nwords_2nd = (n_basf2evt + 1) % 300 + 200;
+  //  nwords_2nd = (n_basf2evt + 1) % 300 + 200;
+  nwords_2nd = 1;
   if (nwords_2nd > 10000 || nwords_2nd <= 0) {
     printf("ERRORORRRR nword2nd %d\n", nwords_2nd);
     fflush(stdout);
@@ -151,7 +153,8 @@ void DummyDataSourceModule::event()
   }
 
   //  nwords_3rd = 3 * (n_basf2evt + 2) % 10;
-  nwords_3rd = 3 * (n_basf2evt + 2) % 200 + 100;
+  //  nwords_3rd = 3 * (n_basf2evt + 2) % 200 + 100;
+  nwords_3rd = 1;
   if (nwords_3rd > 10000 || nwords_3rd <= 0) {
     printf("ERRORORRRR nword3rd %d\n", nwords_3rd);
     fflush(stdout);
@@ -167,7 +170,8 @@ void DummyDataSourceModule::event()
   }
 
   //  nwords_4th = 4 * (n_basf2evt + 3)  % 10;
-  nwords_4th = 4 * (n_basf2evt + 3)  % 20 + 300;
+  //  nwords_4th = 4 * (n_basf2evt + 3)  % 20 + 300;
+  nwords_4th = 1;
   if (nwords_4th > 10000 || nwords_4th <= 0) {
     printf("ERRORORRRR nwor_4th %d\n", nwords_4th);
     fflush(stdout);
@@ -230,9 +234,25 @@ void DummyDataSourceModule::event()
     }
   }
 
-  if (n_basf2evt % 1000 == 0) {
-    printf("Dummy data : Event # %.8d\n", n_basf2evt);
+  if (n_basf2evt % 10000 == 0) {
+    double cur_time = getTimeSec();
+    double interval = cur_time - m_prev_time;
+    double total_time = cur_time - m_start_time;
+    if (n_basf2evt == 0) {
+      interval = 1;
+    }
+    printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
+           n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC,
+           (n_basf2evt  - m_prev_nevt)*NUM_EVT_PER_BASF2LOOP_PC / interval / 1.e3,
+           (m_totbytes - m_prev_totbytes) / interval / 1.e6,
+           total_time,
+           interval);
     fflush(stdout);
+    m_prev_time = cur_time;
+    m_prev_totbytes = m_totbytes;
+    m_prev_nevt = n_basf2evt;
+
+
   }
 
   n_basf2evt++;

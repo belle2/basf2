@@ -90,6 +90,21 @@ namespace Belle2 {
     //! start flag
     int m_start_flag;
 
+    double m_start_time;
+    double m_prev_time;
+    int prev_event;
+    double m_prev_totbytes;
+    int m_prev_nevt;
+
+    //! store time info.
+    double getTimeSec()
+    {
+      struct timeval t;
+      gettimeofday(&t, NULL);
+      return (t.tv_sec + t.tv_usec * 1.e-6);
+    }
+
+
   };
 
 } // end namespace Belle2

@@ -1,11 +1,33 @@
 #pragma once
 
+#include <TBranch.h>
+
 #include <string>
 #include <sstream>
+#include <functional>
 
 namespace Belle2 {
   /** General utility functions */
   namespace Utils {
+
+    /**
+     * Reduce a branch of a TTree
+     * @return reduced branch
+     */
+    template<class T>
+    T reduceTBranch(TBranch* branch, std::function<T(T, T)> f, T reduced = T())
+    {
+      T object;
+      branch->SetAddress(&object);
+      int nevents = branch->GetEntries();
+      for (int i = 0; i < nevents; ++i) {
+        branch->GetEvent(i);
+        reduced = f(reduced, object);
+      }
+      return reduced;
+    }
+
+
     /**
      * Return current value of the high performance clock.
      *

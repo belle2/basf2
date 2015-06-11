@@ -50,6 +50,11 @@ TempDirCreator::~TempDirCreator()
   remove_all(m_tmpdir);
 }
 
+std::string TempDirCreator::getTempDir() const
+{
+  return m_tmpdir;
+}
+
 bool Belle2::TestHelpers::angleNear(double expected, double actual, double absError)
 {
   return fabs(remainder(expected - actual, 2 * M_PI)) < absError;

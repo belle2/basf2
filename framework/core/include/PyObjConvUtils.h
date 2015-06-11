@@ -90,6 +90,8 @@ namespace Belle2 {
     /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<unsigned int> { /** type name. */ static std::string name() { return "unsigned int"; } };
     /** Converts a template argument into a string for corresponding Python type. */
+    template<> struct Type<unsigned long int> { /** type name. */ static std::string name() { return "unsigned long int"; } };
+    /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<int> { /** type name. */ static std::string name() { return "int"; } };
     /** Converts a template argument into a string for corresponding Python type. */
     template<> struct Type<bool> { /** type name. */ static std::string name() { return "bool"; } };

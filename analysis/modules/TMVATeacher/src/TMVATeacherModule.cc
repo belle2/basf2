@@ -9,19 +9,25 @@
  **************************************************************************/
 
 #include <analysis/modules/TMVATeacher/TMVATeacherModule.h>
+#include <analysis/TMVAInterface/Config.h>
+#include <analysis/TMVAInterface/SPlot.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+
+#include <analysis/VariableManager/Utility.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/logging/Logger.h>
+
+#include <memory>
 
 namespace Belle2 {
 
 
   REG_MODULE(TMVATeacher)
 
-  TMVATeacherModule::TMVATeacherModule() : Module(), m_target_var(nullptr)
+  TMVATeacherModule::TMVATeacherModule() : Module()
   {
     setDescription("Trains TMVA method with given particle lists as training samples. "
                    "The target variable has to be an integer valued variable which defines the clusters in the sample. "
@@ -32,94 +38,113 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
     std::vector<std::string> empty;
-    addParam("listNames", m_listNames, "Particles from these ParticleLists are used as input. If no name is given the teacher is applied to every event once, and one can only use variables which accept nullptr as Particle*", empty);
-    addParam("methods", m_methods, "Vector of Tuples with (Name, Type, Config) of the methods. Valid types are: BDT, KNN, Fisher, Plugin. For type 'Plugin', the plugin matching the Name attribute will be loaded (e.g. NeuroBayes). The Config is passed to the TMVA Method and is documented in the TMVA UserGuide.");
-    addParam("prefix", m_methodPrefix, "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information", std::string("TMVA"));
-    addParam("workingDirectory", m_workingDirectory, "Working directory in which the config file and the weight file directory is created", std::string("."));
+    addParam("listNames", m_listNames,
+             "Particles from these ParticleLists are used as input. If no name is given the teacher is applied to every event once, and one can only use variables which accept nullptr as Particle*",
+             empty);
+    addParam("prefix", m_prefix,
+             "Prefix which is used by the TMVAInterface to store its config file $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information",
+             std::string("TMVA"));
+    addParam("workingDirectory", m_workingDirectory,
+             "Working directory in which the config file and the weight file directory is created", std::string("."));
     addParam("variables", m_variables, "Input variables used by the TMVA method");
-    addParam("spectators", m_spectators, "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input.", empty);
-    addParam("target", m_target, "Target used by the method, has to be an integer-valued variable which defines clusters in the sample.");
-    addParam("weight", m_weight, "Weight used by the method, has to be a variable defined in the variable manager.", std::string("constant(1.0)"));
-    addParam("factoryOption", m_factoryOption, "Option passed to TMVA::Factory", std::string("!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification"));
-    addParam("prepareOption", m_prepareOption, "Option passed to TMVA::Factory::PrepareTrainingAndTestTree", std::string("SplitMode=random:!V"));
-    addParam("createMVAPDFs", m_createMVAPDFs, "Creates the MVA PDFs for signal and background. This is needed to transform the output of the trained method to a probability.", true);
-    addParam("useExistingData", m_useExistingData, "Use existing data which is already stored in the $prefix.root file.", false);
-    addParam("doNotTrain", m_doNotTrain, "Do not train, create only datafile with samples. Useful if you want to train outside of basf2 with the externTeacher tool.", false);
-    addParam("maxEventsPerClass", m_maxEventsPerClass, "Maximum number of events per class passed to TMVA. 0 means no limit.", static_cast<unsigned int>(0));
+    addParam("spectators", m_spectators,
+             "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input.", empty);
+    addParam("maxSamples", m_maxSamples, "Maximum number of samples. 0 means no limit.", 0lu);
+    addParam("sample", m_sample,
+             "Variable used for inverse sampling rates. Usually this is the same as the target", std::string(""));
     std::map<int, unsigned int> defaultInverseSamplingRates;
-    addParam("inverseSamplingRates", m_inverseSamplingRates, "Map of class id and inverse sampling rate for this class.", defaultInverseSamplingRates);
+    addParam("inverseSamplingRates", m_inverseSamplingRates, "Map of class id and inverse sampling rate for this class.",
+             defaultInverseSamplingRates);
 
-  }
-
-  TMVATeacherModule::~TMVATeacherModule()
-  {
   }
 
   void TMVATeacherModule::initialize()
   {
-    for (auto & name : m_listNames) {
+    for (auto& name : m_listNames) {
       StoreObjPtr<ParticleList>::required(name);
     }
 
-    std::vector<TMVAInterface::Method> methods;
-    for (auto & x : m_methods) {
-      std::string config = std::get<2>(x);
-      if (m_createMVAPDFs)
-        config = std::string("CreateMVAPdfs:") + config;
-      methods.push_back(TMVAInterface::Method(std::get<0>(x), std::get<1>(x), config, m_variables, m_spectators));
+    if (m_sample == "" and m_inverseSamplingRates.size() > 0) {
+      B2FATAL("Received inverseSamplingRates but no sampling variable was given");
     }
-    m_teacher = std::make_shared<TMVAInterface::Teacher>(m_methodPrefix, m_workingDirectory, m_target, m_weight, methods, m_useExistingData);
 
     Variable::Manager& manager = Variable::Manager::Instance();
-    m_target_var = manager.getVariable(m_target);
+    if (m_sample != "") {
+      const Variable::Manager::Var* m_sample_var = manager.getVariable(m_sample);
+      if (m_sample_var == nullptr) {
+        B2ERROR("Couldn't find sample variable " << m_sample << " via the Variable::Manager. Check the name!")
+      }
+
+      if (m_sample != "" and std::find(m_spectators.begin(), m_spectators.end(), m_sample) == m_spectators.end()) {
+        m_spectators.push_back(m_sample);
+      }
+    } else {
+      m_sample_var = nullptr;
+    }
+    m_nSamples = 0;
+
+    std::vector<TMVAInterface::Method> methods;
+    for (auto& tuple : m_methods)
+      methods.push_back(TMVAInterface::Method(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)));
+
+    TMVAInterface::TeacherConfig config(m_prefix, m_workingDirectory, m_variables, m_spectators, methods);
+    m_teacher = std::make_shared<TMVAInterface::Teacher>(config, false);
 
   }
 
   void TMVATeacherModule::terminate()
   {
     if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-      if (not m_doNotTrain) {
-        m_teacher->train(m_factoryOption, m_prepareOption, m_maxEventsPerClass);
-      }
       m_teacher->writeTree();
     }
     m_teacher.reset();
   }
 
-  bool TMVATeacherModule::checkSampling(int target)
+  float TMVATeacherModule::getInverseSamplingRateWeight(const Particle* particle)
   {
+    m_nSamples++;
+
+    if (m_maxSamples != 0 and m_nSamples > m_maxSamples) {
+      return 0.0;
+    }
+
+    if (m_sample_var == nullptr)
+      return 1.0;
+
+    int target = static_cast<int>(m_sample_var->function(particle) + 0.5);
     if (m_inverseSamplingRates.find(target) != m_inverseSamplingRates.end()) {
       if (m_iSamples.find(target) == m_iSamples.end()) {
         m_iSamples[target] = 0;
       }
       m_iSamples[target]++;
       if (m_iSamples[target] % m_inverseSamplingRates[target] != 0)
-        return false;
-      else
+        return 0;
+      else {
         m_iSamples[target] = 0;
+        return m_inverseSamplingRates[target];
+      }
     }
-    return true;
+    return 1.0;
   }
+
 
   void TMVATeacherModule::event()
   {
-    for (auto & listName : m_listNames) {
+    for (auto& listName : m_listNames) {
       StoreObjPtr<ParticleList> list(listName);
       // Calculate Signal Probability for Particles
       for (unsigned i = 0; i < list->getListSize(); ++i) {
         const Particle* particle = list->getParticle(i);
-        int target = int(m_target_var->function(particle) + 0.5);
-        if (checkSampling(target)) {
-          m_teacher->addClassSample(particle, target);
-        }
+        float weight = getInverseSamplingRateWeight(particle);
+        if (weight > 0)
+          m_teacher->addSample(particle, weight);
       }
     }
 
     if (m_listNames.empty()) {
-      int target = int(m_target_var->function(nullptr) + 0.5);
-      if (checkSampling(target)) {
-        m_teacher->addClassSample(nullptr, target);
-      }
+      float weight = getInverseSamplingRateWeight(nullptr);
+      if (weight > 0)
+        m_teacher->addSample(nullptr, weight);
     }
   }
 

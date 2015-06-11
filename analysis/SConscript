@@ -8,7 +8,10 @@ env['LIBS'] = [
 	    '$ROOT_LIBS',
             'TMVA',
 	    'EG', 
-	    'EvtGen'
+	    'EvtGen',
+      'RooFit',
+      'RooFitCore',
+      'RooStats',
             ]
 Return('env')
 

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
-
+#include <analysis/TMVAInterface/Config.h>
 #include <boost/property_tree/ptree_fwd.hpp>
 
 #include <vector>
@@ -38,43 +38,33 @@ namespace Belle2 {
        * @param methodName name of the method which is used by this expert
        * @param signalClass Class which is considered as signal
        */
-      Expert(std::string prefix, std::string workingDirectory, std::string methodName, int signalClass);
+      Expert(ExpertConfig config, bool transformToProbability);
 
       /**
        * Analyse a Particle with the given method and calculates signal probability
        * @param particle the particle which should be analysed
-       * @param signalFraction which is used to transform the method output to a probability. -1 to disable the transformation.
        * @return signal probability of the particle
        */
-      float analyse(const Particle*, float signalFraction = -1);
+      float analyse(const Particle*);
+
+      /**
+       * Analyse a vector with the given method and calculates signal probability
+       * @param vector containing features and spectators in correct order
+       * @return signal probability of the particle
+       */
+      float analyse(const std::vector<float>&);
 
 
     private:
-      /**
-       * Load variables from config file
-       */
-      std::vector<std::string> getVariablesFromXML(const boost::property_tree::ptree& pt) const;
 
       /**
-       * Load spectators from config file
+       * Internal analyse function
        */
-      std::vector<std::string> getSpectatorsFromXML(const boost::property_tree::ptree& pt) const;
+      float _analyse();
 
-      /**
-       * Load class fractions from config file
-       */
-      std::map<int, float> getClassFractionsFromXML(const boost::property_tree::ptree& pt) const;
-
-      /**
-       * Load TMVA::Reader from config file
-       */
-      std::shared_ptr<TMVA::Reader> getReaderFromXML(const boost::property_tree::ptree& pt);
-
-    private:
-      int m_signalClass; /**< Class which is considered as signal */
-      std::string m_methodName; /**< name of the method which is used for the expert */
-      bool m_reverse; /**< true if the reader returns background probability */
-      std::map<int, float> m_classFractions; /**< class fraction in training sample */
+      float m_signalFraction; /**< Signal fraction in training */
+      ExpertConfig m_config; /**< Expert config */
+      bool m_transformToProbability; /**< Transform output of classifier to a probability */
 
       std::shared_ptr<TMVA::Reader> m_reader; /**<TMVA::Reader, which steers the booked TMVA method */
       std::vector<float> m_input; /**< Store place for the input variables */

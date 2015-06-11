@@ -10,6 +10,7 @@
 #pragma once
 
 #include <analysis/TMVAInterface/Method.h>
+#include <analysis/TMVAInterface/Config.h>
 #include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
@@ -18,6 +19,7 @@
 
 #include <vector>
 #include <string>
+#include <set>
 
 class TFile;
 class TTree;
@@ -32,20 +34,19 @@ namespace Belle2 {
 
     /**
      * Interface to ROOT TMVA Factory.
+     * Takes care of extracting variables, spectators and the target from the given particles.
+     * Trains defined TMVA methods.
+     * Saves all necessary information to use the Expert into a .config file.
      */
     class Teacher  {
 
     public:
       /**
-       * @param prefix which used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml
-       * @param workingDirectory where the config file and weight file directory is stored
-       * @param target the name of the target variable (registered in Variable::Manager), which is used as expected output for the chosen TMVA method
-       * @param weight the name of the weight variable (registered in Variable::Manager)
-       * @param methods vector of Method
+       * Creates a new Teacher object
+       * @param config configuration object
        * @param useExistingData if correct TFile and TTree exists already exists, use the stored samples for training
        */
-      Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight, std::vector<Method> methods,
-              bool useExistingData = false);
+      Teacher(TeacherConfig config, bool useExistingData = false);
 
       /**
        * Destructor
@@ -65,22 +66,33 @@ namespace Belle2 {
       /**
        * Adds a training sample. The necessary variables are calculated from the provided particle
        * @param particle Particle which serves as training sample, target variable must be available for this particle.
+       * @param weight Additional weight for this sample
        */
-      void addSample(const Particle* particle);
+      void addSample(const Particle* particle, float weight = 1);
 
       /**
-       * Adds a training sample. The necessary variables are calculated from the provided particle
-       * @param particle Particle which serves as training sample, target variable must be available for this particle.
-       * @param classid class to which this sample belongs
-       */
-      void addClassSample(const Particle* particle, int classid);
-
-      /**
-       * Set a variable `branchName` for all samples that are already in the tree. If a branch with this name exists, it will be replaced. Otherwise, it will be added.
+       * Add a variable `branchName` for all samples that are already in the tree.
        * @param branchName Name of the variable the
        * @param values Float values that should be assigned to the samples. Have to be ordered like the samples that reside in the tree. If the Teacher was invoked with `useExistingData`, remember that there are entries in the tree before the ones that are added with `addSample` or `addClassSample`.
        */
-      void setVariable(const std::string branchName, const std::vector<float>& values);
+      void addVariable(const std::string branchName, const std::vector<float>& values);
+
+      /**
+       * Get branch in tree as vector
+       */
+      std::vector<float> getVariable(const std::string branchName);
+
+      /**
+       * Get row in tree as vector
+       */
+      std::vector<float> getRow(unsigned int index);
+
+
+      /**
+       * Returns distinct integer values in a branch
+       */
+      std::set<int> getDistinctIntegerValues(const std::string branchName);
+
 
       /**
        * Writes tree to a file
@@ -91,32 +103,78 @@ namespace Belle2 {
        * Train, test and evaluate all methods
        * @param factoryOption options which are passed to the TMVA::Factory constructor, in most cases default options should be fine.
        * @param prepareOption options which are passed to the TMVA::Factory::PrepareTrainingAndTestTree, in most cases default options should be fine.
+       * @param target target used for training, if empty sPlot mode is used!
+       * @param weight additional weight variable (multiplied with original weight of each sample)
        * @param maxEventsPerClass maximum number of events given to TMVA per class. TMVA internally uses a vector instead of a tree and therefore looses out-of-core ability.
+       * @param splot use every sample twice assuming weight's are splot weights regardless of the assigned classid
        */
-      void train(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification",
-                 std::string prepareOption = "SplitMode=random:!V", unsigned long int maxEventsPerClass = 0);
+      void trainClassification(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification",
+                               std::string prepareOption = "SplitMode=random:!V",
+                               std::string target = "",
+                               std::string weight = "");
 
-    private:
       /**
-       * Train a class against the rest and return ptree with the configuration of the resulting trainig.
+       * Train, test and evaluate all methods using sPlot
        */
-      boost::property_tree::ptree trainClass(std::string factoryOption, std::string prepareOption,
-                                             std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass);
+      void trainSPlot(std::string modelFileName,
+                      std::vector<std::string> discriminatingVariables,
+                      std::string weight = "");
+    private:
+
+      /**
+       * Internal train method used by both, SPlot and Classification Training
+       * @param factoryOption
+       * @param prepareOption
+       * @param target
+       * @param signal_weight
+       * @param background_weight
+       */
+      void train(std::string factoryOption, std::string prepareOption, std::string target, std::string signal_weight,
+                 std::string background_weight);
+
+      /**
+       * Set Branch Addresses of m_input
+       */
+      void setBranchAddresses();
+
+      /**
+       * Get class id for splot signal
+       */
+      int getSPlotClass() const { return splot_class; }
+
+      /**
+       * Set class id for splot signal
+       */
+      void setSPlotClass(int _splot_class) { splot_class = _splot_class; }
+
+      /**
+       * Returns Tree with all samples with the given classID
+       * @param classID
+       */
+      TTree* getClassTree(std::string target, int classID);
+
+      /**
+       * Train a class against the rest and return ptree with the configuration of the resulting training.
+       */
+      void trainClass(std::map<int, TTree*> class_trees, std::string factoryOption, std::string prepareOption,
+                      std::string signal_weight, std::string background_weight, int signalClass);
+
+      double sumOfFormula(std::string formula, TTree* tree) const;
 
     private:
-      std::string
-      m_prefix; /**< used to identify the outputted training files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml */
-      std::string m_workingDirectory; /**< workingDirectory where the config file and weight file directory is stored */
-      std::vector<Method> m_methods; /**< Name, Type and Config of methods */
+      TeacherConfig m_config; /**< configuration object of the MVA Interface */
 
       TFile* m_file; /**< stores TTree and training histograms created by TMVA */
       StoreObjPtr<RootMergeable<TTree>> m_tree; /**< holds training and test signal samples */
 
-      const Variable::Manager::Var* m_target_var; /**< Variable Pointer to target variable */
-      int m_target; /**< Storage for the target variable */
-      const Variable::Manager::Var* m_weight_var; /**< Variable Pointer to weight variable */
-      float m_weight; /**< Storage for the weight variable */
+      std::vector<const Variable::Manager::Var*> m_variables; /**< Pointers to the input variables loaded from VariableManager */
+      std::vector<const Variable::Manager::Var*> m_spectators; /**< Pointers to the input spectators loaded from VariableManager */
+
+      float m_original_weight; /**< Storage for the original weight of the sample */
       std::vector<float> m_input; /**< Storage for input variables */
+
+      int splot_class; /**< Class id for splot signal */
+
     };
 
   }

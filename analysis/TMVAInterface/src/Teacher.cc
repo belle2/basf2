@@ -8,18 +8,23 @@
  **************************************************************************/
 
 #include <analysis/TMVAInterface/Teacher.h>
+#include <analysis/utility/WorkingDirectoryManager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RootMergeable.h>
+#include <framework/utilities/Utils.h>
+#include <analysis/TMVAInterface/Config.h>
+#include <analysis/TMVAInterface/SPlot.h>
+#include <analysis/TMVAInterface/Expert.h>
 
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
 
 #include <TFile.h>
 #include <TTree.h>
+#include <TTreeFormula.h>
 #include <TString.h>
-#include <TSystem.h>
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -32,85 +37,99 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(std::string prefix, std::string workingDirectory, std::string target, std::string weight,
-                     std::vector<Method> methods, bool useExistingData) : m_prefix(prefix),
-      m_workingDirectory(workingDirectory), m_methods(methods), m_file(nullptr), m_tree("", DataStore::c_Persistent)
+    Teacher::Teacher(TeacherConfig config, bool useExistingData) : m_config(config), m_file(nullptr), m_tree("",
+          DataStore::c_Persistent), splot_class(1)
     {
 
-      // Change the working directory to the user defined working directory
-      std::string oldDirectory = gSystem->WorkingDirectory();
-      gSystem->ChangeDirectory(m_workingDirectory.c_str());
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
-      // Get Pointer to Variable::Manager::Var for the provided target name
-      Variable::Manager& manager = Variable::Manager::Instance();
-      m_target_var =  manager.getVariable(target);
-      if (m_target_var == nullptr) {
-        B2FATAL("Couldn't find target variable " << target << " via the Variable::Manager. Check the name!")
-      }
-      m_target = 0;
+      // Get Pointers to Variable::Manager::Var for the provided variables
+      m_variables = m_config.getVariablesFromManager();
+      m_spectators = m_config.getSpectatorsFromManager();
 
-      // Get Pointer to Variable::Manager::Var for the provided weight name
-      m_weight_var =  manager.getVariable(weight);
-      if (m_weight_var == nullptr) {
-        B2FATAL("Couldn't find weight variable " << weight << " via the Variable::Manager. Check the name!")
-      }
-      m_weight = 0;
+      auto variable_names = m_config.getVariables();
+      auto spectator_names = m_config.getSpectators();
 
       // Create new tree which stores the input and target variable
-      const auto& variables = m_methods[0].getVariables();
-      const auto& spectators = m_methods[0].getSpectators();
-      m_input.resize(variables.size() + spectators.size());
+      m_input.resize(variable_names.size() + spectator_names.size(), 0);
 
       // If we want to use existing data we open the file in UPDATE mode,
       // otherwise we recreate the file (overwrite it!)
-      std::string mode = "RECREATE";
-      if (useExistingData) {
-        mode = "UPDATE";
-      }
-
-      m_file = TFile::Open((m_prefix + ".root").c_str(), mode.c_str());
+      m_file = TFile::Open(m_config.getFileName().c_str(), (useExistingData) ? "UPDATE" : "RECREATE");
       m_file->cd();
-      std::string tree_name = m_prefix + "_tree";
 
       // Search for an existing tree in the file
       TTree* tree = nullptr;
+
+      // Load tree from existing data
       if (useExistingData) {
-        m_file->GetObject((tree_name).c_str(), tree);
+        m_file->GetObject(m_config.getTreeName().c_str(), tree);
+
+        if (not tree) {
+          B2INFO("Did not found a tree named " << m_config.getTreeName() << " searching for another tree.");
+          TIter next(m_file->GetListOfKeys());
+          while (TObject* obj = next()) {
+            if (std::string(obj->GetName()).find("_tree") != std::string::npos) {
+              B2INFO("Found tree with name " << obj->GetName());
+              m_file->GetObject(obj->GetName(), tree);
+              break;
+            }
+          }
+        }
+
+        if (tree) {
+
+          int nentries = tree->GetEntries();
+          TBranch* b = tree->GetBranch("__weight__");
+          if (not b) {
+            B2WARNING("Couldn't find weight branch named __weight__. Adding it automatically");
+            float value = 1.0;
+            TBranch* newBranch = tree->Branch("__weight__", &value);
+            for (int i = 0; i < nentries; ++i)
+              newBranch->Fill();
+            tree->Write();
+          }
+        } else {
+          B2WARNING("Couldn't find existing data, create new tree: Filename was " << m_config.getFileName() << ", Treename was " <<
+                    m_config.getTreeName());
+        }
       }
 
+      // If tree is not available yet create a new one
       if (tree == nullptr) {
+        tree = new TTree(m_config.getTreeName().c_str(), m_config.getTreeName().c_str());
 
-        if (useExistingData)
-          B2WARNING("Couldn't find existing data, create new tree");
+        for (unsigned int i = 0; i < variable_names.size(); ++i)
+          tree->Branch(Variable::makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
+        for (unsigned int i = 0; i < spectator_names.size(); ++i)
+          tree->Branch(Variable::makeROOTCompatible(spectator_names[i]).c_str(), &m_input[i + variable_names.size()]);
+        tree->Branch("__weight__", &m_original_weight);
 
-        tree = new TTree(tree_name.c_str(), tree_name.c_str());
-
-        for (unsigned int i = 0; i < variables.size(); ++i)
-          tree->Branch(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-        for (unsigned int i = 0; i < spectators.size(); ++i)
-          tree->Branch(Variable::makeROOTCompatible(spectators[i]->name).c_str(), &m_input[i + variables.size()]);
-        tree->Branch(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
-        tree->Branch("__weight__", &m_weight);
-
-      } else {
-        for (unsigned int i = 0; i < variables.size(); ++i)
-          tree->SetBranchAddress(Variable::makeROOTCompatible(variables[i]->name).c_str(), &m_input[i]);
-        for (unsigned int i = 0; i < spectators.size(); ++i)
-          tree->SetBranchAddress(Variable::makeROOTCompatible(spectators[i]->name).c_str(), &m_input[i + variables.size()]);
-        tree->SetBranchAddress(Variable::makeROOTCompatible(m_target_var->name).c_str(), &m_target);
-        tree->SetBranchAddress("__weight__", &m_weight);
       }
-
-      m_tree.registerInDataStore(tree_name, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+      m_tree.registerInDataStore(m_config.getTreeName(), DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
       m_tree.construct();
       m_tree->assign(tree);
 
-      gSystem->ChangeDirectory(oldDirectory.c_str());
+      setBranchAddresses();
 
+    }
+
+    void Teacher::setBranchAddresses()
+    {
+
+      auto variable_names = m_config.getVariables();
+      auto spectator_names = m_config.getSpectators();
+
+      m_tree->get().SetBranchAddress("__weight__", &m_original_weight);
+      for (unsigned int i = 0; i < variable_names.size(); ++i)
+        m_tree->get().SetBranchAddress(Variable::makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
+      for (unsigned int i = 0; i < spectator_names.size(); ++i)
+        m_tree->get().SetBranchAddress(Variable::makeROOTCompatible(spectator_names[i]).c_str(), &m_input[i + variable_names.size()]);
     }
 
     void Teacher::writeTree()
     {
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
       m_file->cd();
       m_tree->get().Write("", TObject::kOverwrite);
       m_tree->get().SetDirectory(nullptr);
@@ -119,258 +138,142 @@ namespace Belle2 {
     Teacher::~Teacher()
     {
       if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
+        WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
         m_tree->get().SetDirectory(nullptr);
         m_file->Close();
       }
     }
 
-    void Teacher::addSample(const Particle* particle)
-    {
-      // The target variable is converted to an integer
-      m_target = static_cast<int>(m_target_var->function(particle) + 0.5);
-      addClassSample(particle, m_target);
-    }
 
-    void Teacher::addClassSample(const Particle* particle, int classid)
+    void Teacher::addSample(const Particle* particle, float weight)
     {
-      // Change the working directory to the user defined working directory
-      std::string oldDirectory = gSystem->WorkingDirectory();
-      gSystem->ChangeDirectory(m_workingDirectory.c_str());
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+
+      m_original_weight = weight;
 
       // Fill the tree with the input variables
-      const auto& variables = m_methods[0].getVariables();
-      for (unsigned int i = 0; i < variables.size(); ++i) {
-        m_input[i] = variables[i]->function(particle);
+      for (unsigned int i = 0; i < m_variables.size(); ++i) {
+        if (m_variables[i] != nullptr)
+          m_input[i] = m_variables[i]->function(particle);
         if (!std::isfinite(m_input[i])) {
-          B2ERROR("Output of variable " << variables[i]->name << " is " << m_input[i] << ", please fix it. Candidate will be skipped.");
+          B2ERROR("Output of variable " << m_variables[i]->name << " is " << m_input[i] << ", please fix it. Candidate will be skipped.");
           return;
         }
       }
 
-      const auto& spectators = m_methods[0].getSpectators();
-      for (unsigned int i = 0; i < spectators.size(); ++i) {
-        m_input[i + variables.size()] = spectators[i]->function(particle);
-        if (!std::isfinite(m_input[i + variables.size()])) {
-          B2ERROR("Output of spectator " << variables[i]->name << " is " << m_input[i + variables.size()] <<
+      for (unsigned int i = 0; i < m_spectators.size(); ++i) {
+        if (m_spectators[i] != nullptr)
+          m_input[i + m_variables.size()] = m_spectators[i]->function(particle);
+        if (!std::isfinite(m_input[i + m_variables.size()])) {
+          B2ERROR("Output of spectator " << m_spectators[i]->name << " is " << m_input[i + m_variables.size()] <<
                   ", please fix it. Candidate will be skipped.");
           return;
         }
       }
 
-      // The target variable is converted to an integer
-      m_target = classid;
-
-      // Calculate weight of this candidate/event
-      m_weight = m_weight_var->function(particle);
-
       m_tree->get().Fill();
 
-      gSystem->ChangeDirectory(oldDirectory.c_str());
     }
 
-    void Teacher::setVariable(const std::string branchName, const std::vector<float>& values)
+    std::vector<float> Teacher::getRow(unsigned int index)
     {
+      m_tree->get().GetEvent(index, 1);
+      return m_input;
+    }
+
+
+    void Teacher::addVariable(const std::string branchName, const std::vector<float>& values)
+    {
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+
       std::cout << "Teacher: Set values of branch " << branchName << std::endl;
-      if (m_tree->get().GetEntries() >= 0) {
-        if (ULong64_t(m_tree->get().GetEntries()) != values.size()) {
-          B2FATAL("setVariable(" << branchName << ", ...): Not the right number of values provided. The tree contains " <<
-                  m_tree->get().GetEntries() << " entries, the provided vector contains " << values.size() << ".");
-        }
-      } else {
-        B2FATAL("setVariable(" << branchName << ", ...): Tree inside Teacher has negative number of entries.");
+      int nentries = m_tree->get().GetEntries();
+      if (nentries != static_cast<int>(values.size())) {
+        B2FATAL("addVariable(" << branchName << ", ...): Not the right number of values provided. The tree contains " <<
+                m_tree->get().GetEntries() << " entries, the provided vector contains " << values.size() << ".");
       }
 
       // The tree will be cloned into the same file.
-      // TODO: Is this necessary?
       m_file->cd();
 
-      // Enable all existing branches except `branchName`, suppressing the
-      // error message in case the branch does not yet exist.
-      UInt_t suppressErrorMessage;
-      m_tree->get().SetBranchStatus("*", 1);
-      m_tree->get().SetBranchStatus(branchName.c_str(), 0, &suppressErrorMessage);
-
-      // Clone the tree and set a new name.
-      //   If the name is not set to something different than the
-      //   original tree, file->Delete() can not distinguish between
-      //   them.
-      // TODO: decide if the option 'fast' can/should be chosen.
-      TTree* newTree = m_tree->get().CloneTree();
-      std::string oldTreeName = m_tree->get().GetName();
-      std::string newTreeName = oldTreeName + std::string("_new");
-      newTree->SetName(newTreeName.c_str());
+      // Delete branch if necessary
+      TBranch* b = m_tree->get().GetBranch(branchName.c_str());
+      if (b) {
+        m_tree->get().GetListOfBranches()->Remove(b);
+        m_tree->get().GetListOfBranches()->Compress();
+        TLeaf* l = m_tree->get().GetLeaf(branchName.c_str());
+        if (l) {
+          m_tree->get().GetListOfLeaves()->Remove(l);
+          m_tree->get().GetListOfLeaves()->Compress();
+        }
+        m_tree->get().Write();
+      }
 
       // Add new branch and fill it. It is already checked that `values` has enough entries.
       float value;
-      TBranch* newBranch = newTree->Branch(branchName.c_str(), &value);
+      TBranch* newBranch = m_tree->get().Branch(branchName.c_str(), &value);
       for (auto& v : values) {
         value = v;
         newBranch->Fill();
       }
+      newBranch->ResetAddress();
+      m_file->Write(branchName.c_str());
 
-      // Use the new tree, delete the old one from the file, assign same name to new tree.
-      // Remember: now the file is twice as big, as ROOT doesn't rewrite it.
-      // TODO: decide if we want to write a new file, to get rid of the overhead. Can we
-      // clone the tree directly into a new file?
-      m_tree->assign(newTree);
-      std::string namecycle = oldTreeName + std::string(";*");
-      m_file->Delete(namecycle.c_str());
-      m_tree->get().SetName(oldTreeName.c_str());
-
-      // Write using RootMergeable.
-      // TODO: why does this line break the tree? without it, everything works.
-      //m_tree->write(m_file);
     }
 
-    void Teacher::train(std::string factoryOption, std::string prepareOption, unsigned long int maxEventsPerClass)
+    std::vector<float> Teacher::getVariable(const std::string branchName)
     {
 
-      // Change the working directory to the user defined working directory
-      std::string oldDirectory = gSystem->WorkingDirectory();
-      gSystem->ChangeDirectory(m_workingDirectory.c_str());
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
-      m_file->cd();
+      int nentries = m_tree->get().GetEntries();
+      std::vector<float> values(nentries);
 
-      std::map<int, unsigned long int> cluster_count;
-      TBranch* targetBranch  = m_tree->get().GetBranch(Variable::makeROOTCompatible(m_target_var->name).c_str());
-      targetBranch->SetAddress(&m_target);
-
-      unsigned long int nevent = m_tree->get().GetEntries();
-      for (unsigned long int i = 0; i < nevent; i++) {
-        targetBranch->GetEvent(i);
-        auto it = cluster_count.find(m_target);
-        if (it == cluster_count.end())
-          cluster_count[m_target] = 1;
-        else
-          it->second++;
+      float object;
+      m_tree->get().SetBranchStatus("*", 0);
+      m_tree->get().SetBranchStatus(branchName.c_str(), 1);
+      m_tree->get().SetBranchAddress(branchName.c_str(), &object);
+      for (int i = 0; i < nentries; ++i) {
+        m_tree->get().GetEvent(i);
+        values[i] = object;
       }
+      m_tree->get().SetBranchStatus("*", 1);
 
-      // Calculate the total number of events
-      std::vector<int> classesWhichReachedMaximum;
-      unsigned long int total = 0;
-      for (auto& x : cluster_count) {
-        if (maxEventsPerClass != 0 and x.second > maxEventsPerClass) {
-          classesWhichReachedMaximum.push_back(x.first);
-        }
-        total += x.second;
-      }
+      // Reset all branch addresses
+      setBranchAddresses();
 
-      // Add to the output config xml file the different clusters and their fractions
-      boost::property_tree::ptree pt;
-      for (auto& x : cluster_count) {
-        boost::property_tree::ptree node;
-        node.put("ID", x.first);
-        node.put("Count", x.second);
-        node.put("MaxEventUsedInTraining", maxEventsPerClass);
-        node.put("Fraction", static_cast<double>(x.second) / total);
-        pt.add_child("Setup.Clusters.Cluster", node);
-      }
-
-
-      // Remove constant variables from all methods,
-      // this is a common problem using TMVA. TMVA checks if a variable is constant
-      // and exits the programme if this is the case!
-      // We need to prevent this, therefore we remove all constant variables here.
-      std::vector<std::string> cleaned_variables;
-      for (auto& x : m_methods[0].getVariables()) {
-        std::string varname = Variable::makeROOTCompatible(x->name);
-        if (m_tree->get().GetMinimum(varname.c_str()) < m_tree->get().GetMaximum(varname.c_str())) {
-          cleaned_variables.push_back(x->name);
-        } else {
-          B2WARNING("Removed variable " << x->name << " from TMVA training because it's constant!")
-        }
-      }
-
-      std::vector<std::string> spectator_names;
-      for (auto& x : m_methods[0].getSpectators()) {
-        spectator_names.push_back(x->name);
-      }
-
-      for (auto& method : m_methods) {
-        method = Method(method.getName(), method.getTypeAsString(), method.getConfig(), cleaned_variables, spectator_names);
-      }
-
-      for (auto& x : m_methods[0].getVariables()) {
-        boost::property_tree::ptree node;
-        node.put("Name", x->name);
-        pt.add_child("Setup.Variables.Variable", node);
-      }
-
-      for (auto& x : m_methods[0].getSpectators()) {
-        boost::property_tree::ptree node;
-        node.put("Name", x->name);
-        pt.add_child("Setup.Spectators.Spectator", node);
-      }
-
-      if (cluster_count.size() <= 1) {
-        B2ERROR("Found less than two clusters in sample, no training necessary!")
-        return;
-      } else if (cluster_count.size() ==  2) {
-        int maxId = cluster_count.begin()->first;
-        for (const auto& pair : cluster_count) {
-          if (pair.first > maxId)
-            maxId = pair.first;
-        }
-        auto node = trainClass(factoryOption, prepareOption, cluster_count, maxEventsPerClass, maxId);
-        pt.add_child("Setup.Trainings.Training", node);
-      } else {
-        for (const auto& pair : cluster_count) {
-          auto node = trainClass(factoryOption, prepareOption, cluster_count, maxEventsPerClass, pair.first);
-          pt.add_child("Setup.Trainings.Training", node);
-        }
-      }
-
-#if BOOST_VERSION < 105600
-      boost::property_tree::xml_writer_settings<char> settings('\t', 1);
-#else
-      boost::property_tree::xml_writer_settings<std::string> settings('\t', 1);
-#endif
-
-      boost::property_tree::xml_parser::write_xml(m_prefix + ".config", pt, std::locale(), settings);
-
-      gSystem->ChangeDirectory(oldDirectory.c_str());
+      return values;
     }
 
-    boost::property_tree::ptree Teacher::trainClass(std::string factoryOption, std::string prepareOption,
-                                                    std::map<int, unsigned long int>& cluster_count, unsigned long int maxEventsPerClass, int signalClass)
+    std::set<int> Teacher::getDistinctIntegerValues(const std::string branchName)
     {
 
-      std::stringstream signal;
-      signal << signalClass;
-      std::string jobName = m_prefix + "_" + signal.str();
+      int nentries = m_tree->get().GetEntries();
+      std::set<int> distinct_values;
 
-      TFile classFile((jobName + ".root").c_str(), "RECREATE");
-      classFile.cd();
-
-      boost::property_tree::ptree node;
-
-      TMVA::Tools::Instance();
-      TMVA::Factory factory(jobName, &classFile, factoryOption);
-
-      // Add variables to the factory
-      for (auto& var : m_methods[0].getVariables()) {
-        factory.AddVariable(Variable::makeROOTCompatible(var->name));
+      if (m_tree->get().GetBranch(branchName.c_str()) == 0) {
+        return distinct_values;
       }
 
-      for (auto& var : m_methods[0].getSpectators()) {
-        factory.AddSpectator(Variable::makeROOTCompatible(var->name));
+      float object;
+      m_tree->get().SetBranchStatus("*", 0);
+      m_tree->get().SetBranchStatus(branchName.c_str(), 1);
+      m_tree->get().SetBranchAddress(branchName.c_str(), &object);
+      for (int i = 0; i < nentries; ++i) {
+        m_tree->get().GetEvent(i);
+        distinct_values.insert(static_cast<int>(object + 0.5));
       }
+      m_tree->get().SetBranchStatus("*", 1);
 
-      factory.SetWeightExpression("__weight__");
+      // Reset all branch addresses
+      setBranchAddresses();
 
-      auto signalCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " == " + signal.str()).c_str());
-      unsigned long int signalEvents = (maxEventsPerClass == 0) ? cluster_count[signalClass] : maxEventsPerClass;
+      return distinct_values;
+    }
 
-      auto backgroundCut = TCut((Variable::makeROOTCompatible(m_target_var->name) + " != " + signal.str()).c_str());
-      unsigned long int backgroundEvents = 0;
-      if (maxEventsPerClass == 0) {
-        for (const auto& pair : cluster_count) {
-          if (pair.first != signalClass)
-            backgroundEvents += pair.second;
-        }
-      } else {
-        backgroundEvents = maxEventsPerClass;
-      }
+    TTree* Teacher::getClassTree(std::string target, int classID)
+    {
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
       // Copy Events from original tree to new signal and background tree.
       // Unfortunately this is necessary because TMVA internally uses vectors to store the data,
@@ -378,34 +281,255 @@ namespace Belle2 {
       // The options nTrain_Background and nTest_Background (same for *_Signal) are applied
       // after this transformation to vectors, therefore they're too late to prevent a allocation of huge amount of memory
       // if one has many background events.
-      if ((unsigned long int)m_tree->get().GetEntries(signalCut) > maxEventsPerClass)
-        factory.AddSignalTree(m_tree->get().CopyTree(signalCut)->CopyTree("", "", signalEvents));
-      else
-        factory.AddSignalTree(m_tree->get().CopyTree(signalCut));
-      if ((unsigned long int)m_tree->get().GetEntries(backgroundCut) > maxEventsPerClass)
-        factory.AddBackgroundTree(m_tree->get().CopyTree(backgroundCut)->CopyTree("", "", backgroundEvents));
-      else
-        factory.AddBackgroundTree(m_tree->get().CopyTree(backgroundCut));
+
+      TCut cut;
+      if (target != "")
+        cut = (std::string("abs(") + Variable::makeROOTCompatible(target) + " - " + std::to_string(classID) +
+               std::string(") < 1e-2")).c_str();
+
+      TTree* tree = m_tree->get().CopyTree(cut);
+
+      if (tree->GetEntries() == 0) {
+        B2WARNING("Tree containing class " << classID << " has no entries!");
+      }
+      return tree;
+    }
+
+    void Teacher::trainSPlot(std::string modelFileName, std::vector<std::string> discriminatingVariables, std::string weight)
+    {
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+
+      std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification";
+      std::string prepareOption = "!V:SplitMode=alternate:MixMode=Block:NormMode=None";
+
+      std::map<std::string, std::vector<float>> discriminatingVariablesMap;
+
+      for (auto& var : discriminatingVariables) {
+        discriminatingVariablesMap[var] = getVariable(var);
+      }
+
+      TMVAInterface::SPlot splot(modelFileName, discriminatingVariablesMap);
+      for (auto& var : discriminatingVariables) {
+        splot.plot(m_config.getPrefix(), var);
+      }
+
+      addVariable("__weight__splot__", splot.getSPlotWeights());
+      addVariable("__weight__cdf__", splot.getCDFWeights());
+
+      // Perform splot training with __weight__cdf__
+      std::string signal_splot_weight = "__weight__ * __weight__splot__";
+      std::string background_splot_weight = "__weight__ * (1 - __weight__splot__)";
+
+      if (weight != "") {
+        signal_splot_weight += " * (" + weight + ")";
+        background_splot_weight += " * (" + weight + ")";
+      }
+
+      // Perform ordinary splot training
+      setSPlotClass(1);
+      std::cerr << "Use following weight " << signal_splot_weight << " " << background_splot_weight << std::endl;
+      train(factoryOption, prepareOption, "", signal_splot_weight, background_splot_weight);
+
+      /*
+       * SAC sPlot anti-correlation training
+       * The idea is to use the probabilities from the cdf training as boost weights
+       * for another splot training, using only the orthogonal part of the data.
+       *
+       * At the moment this doesn't work sadly.
+       */
+      /*
+
+      // Perform splot training with __weight__cdf__
+      std::string signal_cdf_weight = "__weight__ * __weight__cdf__";
+      std::string background_cdf_weight = "__weight__ * (1 - __weight__cdf__)";
+
+      if (weight != "") {
+        signal_cdf_weight += " * (" + weight + ")";
+        background_cdf_weight += " * (" + weight + ")";
+      }
+
+      setSPlotClass(2);
+      train(factoryOption, prepareOption, "", signal_cdf_weight, background_cdf_weight);
+
+      // Perform splot training using inverse classifier-output multiplied with splot weights and cdf_weights
+      std::string methodName = m_config.getMethods()[0].getName();
+      if (m_config.getMethods().size() > 1) {
+        B2WARNING("Train more than one method with advanced sPlot technique, the output of the first method is used as sPlot anti-correlation boost!");
+      }
+
+      TMVAInterface::ExpertConfig config(m_config.getPrefix(), m_config.getWorkingDirectory(), methodName, 1);
+      auto expert = std::make_shared<TMVAInterface::Expert>(config, true);
+
+      // Just to be save, we reset all branch addresses before we access them via getRow!
+      setBranchAddresses();
+
+      unsigned int nEvents = splot.getSPlotWeights().size();
+      std::vector<float> probability(nEvents);
+      for (unsigned int i = 0; i < nEvents; ++i) {
+        // Regularisation: Map output to [0.1, 0.9]
+        probability[i] = expert->analyse(getRow(i))*0.8 + 0.1;
+      }
+      addVariable("__weight__probability__", probability);
+
+      //SAC sPlot anti-correlation training
+      //std::string signal_sac_weight = "__weight__ *  __weight__splot__ / __weight__probability__ * __weight__cdf__";
+      //std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) / (1 - __weight__probability__) * (1 - __weight__cdf__)";
+      std::string signal_sac_weight = "__weight__ *  __weight__splot__ / __weight__probability__ * __weight__cdf__";
+      std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) / (1 - __weight__probability__) * (1 - __weight__cdf__)";
+
+      if (weight != "") {
+        signal_sac_weight += " * (" + weight + ")";
+        background_sac_weight += " * (" + weight + ")";
+      }
+
+      setSPlotClass(3);
+      train(factoryOption, prepareOption, "", signal_sac_weight, background_sac_weight);
+
+      */
+
+      // Enable all branches
+      // Otherwise the __weight__splot__ branch seems to be not available in the file.
+      m_tree->get().SetBranchStatus("*", 1);
+
+    }
+
+    void Teacher::train(std::string factoryOption, std::string prepareOption, std::string target, std::string signal_weight,
+                        std::string background_weight)
+    {
+
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+      m_file->cd();
+
+      // Remove constant variables from all methods,
+      // this is a common problem using TMVA. TMVA checks if a variable is constant
+      // and exits the program if this is the case!
+      // We need to prevent this, therefore we remove all constant variables here.
+      std::vector<std::string> cleaned_variables;
+
+      for (auto& x : m_config.getVariables()) {
+        std::string varname = Variable::makeROOTCompatible(x);
+        if (m_tree->get().GetMinimum(varname.c_str()) < m_tree->get().GetMaximum(varname.c_str())) {
+          cleaned_variables.push_back(x);
+        } else {
+          B2WARNING("Removed variable " << x << " from TMVA training because it's constant!")
+        }
+      }
+
+      m_config = TeacherConfig(m_config.getPrefix(), m_config.getWorkingDirectory(), cleaned_variables, m_config.getSpectators(),
+                               m_config.getMethods());
+      m_variables = m_config.getVariablesFromManager();
+
+      std::set<int> classes = getDistinctIntegerValues(target);
+
+      if (classes.size() == 0 and target != "") {
+        B2FATAL("Found 0 classes in data.");
+      }
+
+      std::map<int, TTree*> class_trees;
+      if (classes.size() == 0) {
+
+        classes.insert(getSPlotClass());
+        classes.insert(0);
+
+        class_trees[getSPlotClass()] = getClassTree(target, 0);
+        class_trees[0] = getClassTree(target, 0);
+
+      } else {
+        for (const auto& value : classes) {
+          class_trees[value] = getClassTree(target, value);
+        }
+      }
+
+      if (classes.size() ==  2) {
+        int maxId = *classes.begin();
+        for (const auto& value : classes) {
+          if (value > maxId)
+            maxId = value;
+        }
+        trainClass(class_trees, factoryOption, prepareOption, signal_weight, background_weight, maxId);
+      } else {
+        for (const auto& value : classes) {
+          trainClass(class_trees, factoryOption, prepareOption, signal_weight, background_weight, value);
+        }
+      }
+    }
+
+    void Teacher::trainClassification(std::string factoryOption, std::string prepareOption, std::string target, std::string weight)
+    {
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+
+      std::string signal_weight = "__weight__";
+      std::string background_weight = "__weight__";
+
+      if (weight != "") {
+        signal_weight += " * (" + weight + ")";
+        background_weight += " * (" + weight + ")";
+      }
+
+      train(factoryOption, prepareOption, target, signal_weight, background_weight);
+
+    }
+
+    double Teacher::sumOfFormula(std::string formula, TTree* tree) const
+    {
+      double sum = 0;
+      TTreeFormula form("form", formula.c_str(), tree);
+      form.GetNdata();
+      int nentries = tree->GetEntries();
+      for (int i = 0; i < nentries; ++i) {
+        tree->GetEvent(i);
+        sum += form.EvalInstance();
+      }
+      return sum;
+    }
+
+
+    void Teacher::trainClass(std::map<int, TTree*> class_trees, std::string factoryOption, std::string prepareOption,
+                             std::string signal_weight, std::string background_weight, int signalClass)
+    {
+      WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+
+      std::string jobName = m_config.getPrefix() + "_" + std::to_string(signalClass);
+      TFile classFile((jobName + ".root").c_str(), "RECREATE");
+      classFile.cd();
+
+      TMVA::Tools::Instance();
+      TMVA::Factory factory(jobName, &classFile, factoryOption);
+
+      // Add variables to the factory
+      for (auto& var : m_config.getVariables()) {
+        factory.AddVariable(Variable::makeROOTCompatible(var));
+      }
+
+      for (auto& var : m_config.getSpectators()) {
+        factory.AddSpectator(Variable::makeROOTCompatible(var));
+      }
+
+      factory.SetSignalWeightExpression(signal_weight);
+      factory.SetBackgroundWeightExpression(background_weight);
+
+      factory.AddSignalTree(class_trees[signalClass]);
+      float sum_sig = sumOfFormula(signal_weight, class_trees[signalClass]);
+      float sum_bck = 0;
+      for (const auto& pair : class_trees) {
+        if (pair.first != signalClass) {
+          factory.AddBackgroundTree(pair.second);
+          sum_bck += sumOfFormula(background_weight, pair.second);
+        }
+      }
+
       factory.PrepareTrainingAndTestTree("", prepareOption);
 
-      // Append the trained methods to the config xml file
-      for (auto& method : m_methods) {
-        boost::property_tree::ptree method_node;
-        method_node.put("SignalID", signalClass);
-        method_node.put("MethodName", method.getName());
-        method_node.put("MethodType", method.getTypeAsString());
-        method_node.put("Samplefile", m_prefix + ".root");
-        method_node.put("Weightfile", std::string("weights/") + jobName + std::string("_") + method.getName() +
-                        std::string(".weights.xml"));
-        factory.BookMethod(method.getType(), method.getName(), method.getConfig());
-        node.add_child("Methods.Method", method_node);
+      for (const auto& method : m_config.getMethods()) {
+        factory.BookMethod(method.getTypeAsString(), method.getName(), method.getConfig());
       }
 
       factory.TrainAllMethods();
       factory.TestAllMethods();
       factory.EvaluateAllMethods();
 
-      return node;
+      float signalFraction = sum_sig / (sum_sig + sum_bck);
+      m_config.save(signalClass, signalFraction);
 
     }
 

@@ -70,7 +70,7 @@ namespace Belle2 {
 
     Variable::Manager& manager = Variable::Manager::Instance();
     if (m_sample != "") {
-      const Variable::Manager::Var* m_sample_var = manager.getVariable(m_sample);
+      m_sample_var = manager.getVariable(m_sample);
       if (m_sample_var == nullptr) {
         B2ERROR("Couldn't find sample variable " << m_sample << " via the Variable::Manager. Check the name!")
       }

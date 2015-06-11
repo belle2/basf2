@@ -323,7 +323,10 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
 
     # Get the file the Plotuples are from. Beware, this is a filthy hack and
     # the entire function should probably be redone!
-    rootfile = strip_ext(list_of_plotuples[0].rootfile)
+    if list_of_plotuples:
+        rootfile = strip_ext(list_of_plotuples[0].rootfile)
+    else:
+        return ['<strong>List of Plotuples was empty!</strong><br><br>']
 
     # get description and p_value for every plot, we actually don't need
     # the list, we are working with descriptions, pvalues and keys only
@@ -491,7 +494,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                     "Saves the matrix exactly as you see in bigger "
                     "resolution as .png image.\nOption PDF: Creates an "
                     ".pdf file out of selected plots shown in the "
-                    "matrix. Will not be formated, each plot is a new "
+                    "matrix. Will not be formatted, each plot is a new "
                     "page of the .pdf file, plots will be placed in "
                     "order one after another.'>\n<select name='type'>"
                     "<option value='png'>Save the matrix as PNG image"

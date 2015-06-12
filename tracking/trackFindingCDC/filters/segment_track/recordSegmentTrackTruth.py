@@ -9,6 +9,7 @@ from trackfinderoutputcombiner.validation import (add_mc_track_finder, add_legen
 from tracking.run.event_generation import StandardEventGenerationRun
 import logging
 import sys
+from tracking import modules
 
 
 class SegmentTrackTruthRecordingRun(StandardEventGenerationRun):
@@ -20,12 +21,8 @@ class SegmentTrackTruthRecordingRun(StandardEventGenerationRun):
         # based on the properties in the base class.
         main_path = super(SegmentTrackTruthRecordingRun, self).create_path()
 
-        add_mc_track_finder(main_path)
-        add_background_hit_finder(main_path)
-        add_legendre_track_finder(main_path)
-        add_local_track_finder(main_path)
-        add_old_combiner(main_path)
-        add_new_combiner(main_path, segment_track_chooser_filter="recording")
+        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name=None))
+        main_path.add_module(modules.CDCSegmentTrackCombiner(segment_track_chooser_filter="recording"))
 
         return main_path
 

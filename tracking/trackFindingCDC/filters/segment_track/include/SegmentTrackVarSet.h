@@ -30,7 +30,7 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
     static char const* const segmentTrackNames[] = {
-      //"is_stereo",
+      "is_stereo",
       "segment_size",
       "track_size",
       "maxmimum_trajectory_distance_front",
@@ -56,7 +56,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 16;
+      static const size_t nNames = 17;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

@@ -44,13 +44,6 @@ bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCRecoSegment2D*, c
     var<named("segment_is_fake_truth")>() = 0.0;
 
     double numberOfCorrectHits = 0;
-    for (const CDCRecoHit2D& recoHit : segment->items()) {
-      if (mcHitLookup.getMCTrackId(recoHit->getWireHit()->getHit()) == segmentMCMatch) {
-        numberOfCorrectHits++;
-      }
-    }
-
-    numberOfCorrectHits = 0;
     for (const CDCRecoHit3D& recoHit : track->items()) {
       if (mcHitLookup.getMCTrackId(recoHit->getWireHit()->getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;

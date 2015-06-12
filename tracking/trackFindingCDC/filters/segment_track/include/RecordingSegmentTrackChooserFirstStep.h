@@ -16,12 +16,12 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class RecordingSegmentTrackChooser: public RecordingFilter<SegmentTrackTruthVarSet> {
+    class RecordingSegmentTrackChooserFirstStep: public RecordingFilter<SegmentTrackTruthVarSet> {
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      RecordingSegmentTrackChooser() :
-        RecordingFilter<SegmentTrackTruthVarSet>("SegmentTrackChooser.root")
+      RecordingSegmentTrackChooserFirstStep() :
+        RecordingFilter<SegmentTrackTruthVarSet>("SegmentTrackChooserFirstStep.root")
       {;}
 
     };

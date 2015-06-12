@@ -173,7 +173,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     var<named("fit_neigh")>() = -1;
   }
 
-  //var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
+  var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
   var<named("segment_size")>() = segment->size();
   var<named("track_size")>() = track->size();
 

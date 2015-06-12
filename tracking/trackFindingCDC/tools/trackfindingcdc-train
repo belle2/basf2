@@ -5,6 +5,7 @@
 import os
 import sys
 import os.path
+import subprocess
 
 import tracking.utilities as utilities
 
@@ -44,6 +45,12 @@ def main():
         action="store_true",
         help="Show the overview immediatly."
         )
+    
+    argument_parser.add_argument(
+        "--show-tmva-results",
+        action="store_true",
+        help="Show the tmva results immediatly."
+        )
 
 
     arguments = argument_parser.parse_args()
@@ -77,6 +84,8 @@ def main():
         tracking.validation.utilities.root_browse(tfile)
         raw_input("Press enter to close.")
 
+    if arguments.show_tmva_results:
+        subprocess.Popen(['showTMVAResults', weights_file_path])
 
 
 if __name__ == "__main__":

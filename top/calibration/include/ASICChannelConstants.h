@@ -74,7 +74,7 @@ namespace Belle2 {
        */
       bool setPedestals(const ASICPedestals& pedestals)
       {
-        unsigned i = pedestals.getAsicWindow();
+        unsigned i = pedestals.getAsicWindowID();
         if (i < m_pedestals.size()) {
           if (m_pedestals[i]) {
             *m_pedestals[i] = pedestals;
@@ -96,7 +96,7 @@ namespace Belle2 {
         if (m_gains.empty()) {
           for (unsigned i = 0; i < m_pedestals.size(); i++) m_gains.push_back(NULL);
         }
-        unsigned i = gains.getAsicWindow();
+        unsigned i = gains.getAsicWindowID();
         if (i < m_gains.size()) {
           if (m_gains[i]) {
             *m_gains[i] = gains;

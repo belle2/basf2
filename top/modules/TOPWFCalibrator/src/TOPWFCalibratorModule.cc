@@ -30,11 +30,12 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 
+// database classes
+#include <top/calibration/ASICChannelConstants.h>
+
 #include "TFile.h"
-#include "TTree.h"
 #include <TClonesArray.h>
 #include <sstream>
-#include <list>
 
 using namespace std;
 
@@ -58,13 +59,16 @@ namespace Belle2 {
     setDescription("Calibration of waveforms (under development)");
 
     // Add parameters
-    addParam("outputFileName", m_outputFileName, "Output root file (DB)",
+    addParam("outputFileName", m_outputFileName, "Output root file to emulate DB",
              string("WFCalibration.root"));
 
-    addParam("histogramFileName", m_histogramFileName, "Output root file (histograms)",
+    addParam("histogramFileName", m_histogramFileName, "Output root file for histograms",
              string(""));
 
     addParam("barID", m_barID, "ID of TOP module to calibrate");
+
+    addParam("runLow", m_runLow, "IOV:  run lowest", 0);
+    addParam("runHigh", m_runHigh, "IOV:  run highest", 0);
 
     for (int i = 0; i < c_NumChannels; i++) {
       for (int k = 0; k < c_NumWindows; k++) {
@@ -161,10 +165,8 @@ namespace Belle2 {
     TClonesArray constants("Belle2::TOP::ASICChannelConstants");
 
     for (int channel = 0; channel < c_NumChannels; channel++) {
-      //auto* channelConstants = new ASICChannelConstants(m_barID, channel, numWindows);
-      //auto* channelConstants = m_IRSConstants.appendNew(m_barID, channel, numWindows);
       new(constants[channel]) ASICChannelConstants(m_barID, channel, numWindows);
-      auto* channelConstants = (ASICChannelConstants*) constants[channel];
+      auto* channelConstants = static_cast<ASICChannelConstants*>(constants[channel]);
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
         if (prof) {
@@ -179,16 +181,17 @@ namespace Belle2 {
       }
     }
 
-    Database::setGlobalTag("TestDatabase.root");
+    Database::setGlobalTag(m_outputFileName);
 
-    IntervalOfValidity iov(0, 0, 9999, 999999);
+    auto expNo = evtMetaData->getExperiment();
+    IntervalOfValidity iov(expNo, m_runLow, expNo, m_runHigh);
     Database::Instance().storeData("ASICChannelConstants", &constants, iov);
 
 
     int all = 0;
     int incomplete = 0;
     for (int channel = 0; channel < constants.GetEntriesFast(); channel++) {
-      const auto* chan = (ASICChannelConstants*) constants[channel];
+      const auto* chan = static_cast<ASICChannelConstants*>(constants[channel]);
       all++;
       if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
     }

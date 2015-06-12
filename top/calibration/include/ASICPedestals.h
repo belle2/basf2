@@ -57,7 +57,7 @@ namespace Belle2 {
        * Return ASIC window number
        * @return window ID
        */
-      unsigned getAsicWindow() const {return m_asicWindow;}
+      unsigned getAsicWindowID() const {return m_asicWindow;}
 
       /**
        * Return window size (number of pedestal samples)
@@ -70,7 +70,7 @@ namespace Belle2 {
        * @param i sample number
        * @return pedestal value
        */
-      float getPedestal(unsigned i) const
+      float getValue(unsigned i) const
       {
         if (i < c_WindowSize) {
           return (m_pedestals[i] & 0x00FF) + m_offset;
@@ -83,7 +83,7 @@ namespace Belle2 {
        * @param i sample number
        * @return pedestal uncertainty
        */
-      float getPedestalError(unsigned i) const
+      float getError(unsigned i) const
       {
         if (i < c_WindowSize) {
           return (m_pedestals[i] >> 8) / sqrt(12.0);

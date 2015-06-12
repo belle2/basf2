@@ -10,13 +10,14 @@
 
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
 #include <vector>
 #include <list>
 #include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
     class CDCTrack;
     class SegmentInformation;
     class TrackInformation;
@@ -133,6 +134,11 @@ namespace Belle2 {
       TrackFindingCDC::CDCRecoSegment2D* getSegment() const
       {
         return getObject();
+      }
+
+      bool isAlreadyTaken() const
+      {
+        return getSegment()->getAutomatonCell().hasTakenFlag();
       }
     };
   }

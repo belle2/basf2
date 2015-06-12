@@ -82,6 +82,8 @@ void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFir
   segmentTrackLookUp.clear();
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
+      if (segment->isAlreadyTaken())
+        continue;
       segmentTrackLookUp.insert(std::make_pair(segment, std::set<TrackInformation*>()));
     }
   }
@@ -98,6 +100,9 @@ void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFir
 
   for (auto& segmentTrackCombination : segmentTrackLookUp) {
     SegmentInformation* segment = segmentTrackCombination.first;
+    if (segment->isAlreadyTaken())
+      continue;
+
     const std::set<TrackInformation*>& matchingTracks = segmentTrackCombination.second;
     if (matchingTracks.size() == 1) {
       TrackInformation* track = *(matchingTracks.begin());
@@ -118,6 +123,9 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
 
     // Search for all matching tracks for a given segment
     for (SegmentInformation* segmentInformation : segmentsList) {
+      if (segmentInformation->isAlreadyTaken()) {
+        continue;
+      }
       matchTracksToSegment(segmentInformation, segmentTrackChooserSecondStep);
     }
 
@@ -383,7 +391,6 @@ void SegmentTrackCombiner::matchTracksToSegment(SegmentInformation* segmentInfor
                                                 BaseSegmentTrackChooser& segmentTrackChooser)
 {
   for (TrackInformation* trackInformation : m_trackLookUp) {
-    segmentTrackChooser.clear();
     if (isNotACell(segmentTrackChooser(std::make_pair(segmentInformation->getSegment(), trackInformation->getTrackCand())))) {
       B2DEBUG(110, "Found not matchable in " << segmentInformation->getSegment()->getISuperLayer())
     } else {

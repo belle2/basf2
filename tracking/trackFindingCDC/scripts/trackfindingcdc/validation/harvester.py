@@ -139,6 +139,8 @@ class SegmentFakeRatesModule(HarvestingModule):
         mc_track_matcher_local = self.mc_track_matcher_local
         mc_track_matcher_legendre = self.mc_track_matcher_legendre
 
+        cdc_hits = self.cdcHits
+
         is_background = mc_track_matcher_local.isBackgroundPRTrackCand(local_track_cand)
         is_ghost = mc_track_matcher_local.isGhostPRTrackCand(local_track_cand)
         is_matched = mc_track_matcher_local.isMatchedPRTrackCand(local_track_cand)
@@ -148,8 +150,9 @@ class SegmentFakeRatesModule(HarvestingModule):
 
         # Stereo Track?
         first_cdc_hit_id = local_track_cand.getHitIDs(Belle2.Const.CDC)[0]
-        first_cdc_hit = self.cdcHits[first_cdc_hit_id]
+        first_cdc_hit = cdc_hits[first_cdc_hit_id]
         is_stereo = first_cdc_hit.getISuperLayer() % 2 == 1
+        superlayer_of_segment = first_cdc_hit.getISuperLayer()
 
         has_partner = np.NaN
         hit_purity_of_partner = np.NaN
@@ -157,6 +160,7 @@ class SegmentFakeRatesModule(HarvestingModule):
         mc_track_pt = np.NaN
         number_of_new_hits = local_track_cand.getNHits()
         number_of_hits = local_track_cand.getNHits()
+        number_of_hits_in_same_superlayer = np.NaN
 
         if is_clone_or_matched:
             related_mc_track_cand = mc_track_matcher_local.getRelatedMCTrackCand(local_track_cand)
@@ -175,6 +179,13 @@ class SegmentFakeRatesModule(HarvestingModule):
                 local_hits_new = local_hits - legendre_hits
                 number_of_new_hits = len(local_hits_new)
 
+                # Count number of hits in this superlayer
+                number_of_hits_in_same_superlayer = 0
+                for cdc_hit_ID in legendre_hits:
+                    cdc_hit = cdc_hits[cdc_hit_ID]
+                    if cdc_hit.getISuperLayer() == superlayer_of_segment:
+                        number_of_hits_in_same_superlayer += 1
+
         return dict(is_background=is_background,
                     is_ghost=is_ghost,
                     is_matched=is_matched,
@@ -187,7 +198,8 @@ class SegmentFakeRatesModule(HarvestingModule):
                     hit_purity_of_partner=hit_purity_of_partner,
                     hit_efficiency_of_partner=hit_efficiency_of_partner,
                     number_of_new_hits=number_of_new_hits,
-                    number_of_hits=number_of_hits)
+                    number_of_hits=number_of_hits,
+                    number_of_hits_in_same_superlayer=number_of_hits_in_same_superlayer)
 
     save_tree = refiners.save_tree(folder_name="tree")
 

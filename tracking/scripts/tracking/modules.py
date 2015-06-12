@@ -122,8 +122,8 @@ class CDCFullFinder(metamodules.PathModule):
                                     segment_track_chooser_first_step_filter=first_filter,
                                     segment_track_chooser_second_step_cut=second_tmva_cut,
                                     segment_track_chooser_second_step_filter=second_filter,
-                                    segment_track_filter="mc",
-                                    segment_train_filter="mc")]
+                                    segment_track_filter="none",
+                                    segment_train_filter="none")]
 
         metamodules.PathModule.__init__(self, modules=modules)
 

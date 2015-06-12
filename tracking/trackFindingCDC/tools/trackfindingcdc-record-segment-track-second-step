@@ -2,14 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-from trackfinderoutputcombiner.validation import (add_mc_track_finder, add_legendre_track_finder,
-                                                  add_local_track_finder, add_new_combiner,
-                                                  add_old_combiner,
-                                                  add_background_hit_finder)
 from tracking.run.event_generation import StandardEventGenerationRun
 import logging
 import sys
 from tracking import modules
+from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 
 class SegmentTrackSecondStepRecordingRun(StandardEventGenerationRun):
@@ -21,8 +18,10 @@ class SegmentTrackSecondStepRecordingRun(StandardEventGenerationRun):
         # based on the properties in the base class.
         main_path = super(SegmentTrackSecondStepRecordingRun, self).create_path()
 
-        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name=None))
-        main_path.add_module(modules.CDCSegmentTrackCombiner(segment_track_chooser_filter="recording"))
+        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands", 
+                                                   first_filter="tmva", 
+                                                   second_tmva_cut=0.75,
+                                                   second_filter="recording"))
 
         return main_path
 
@@ -35,3 +34,4 @@ def main():
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
     main()
+

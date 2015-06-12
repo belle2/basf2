@@ -122,7 +122,7 @@ namespace Belle2 {
     {
       m_hitSegmentLookUp.clear();
       for (const CDCRecoSegment2D& segment : segments) {
-        if (segment.getStereoType() == AXIAL or segment.getAutomatonCell().hasTakenFlag())
+        if (segment.getAutomatonCell().hasTakenFlag())
           continue;
         for (const CDCRecoHit2D& recoHit : segment) {
           const CDCHit* cdcHit = recoHit.getWireHit().getHit();
@@ -180,6 +180,21 @@ namespace Belle2 {
     void StereoSegmentTrackMatcherModuleImpl<SegmentTrackChooser>::generate(std::vector<CDCRecoSegment2D>& segments,
         std::vector<CDCTrack>& tracks)
     {
+      // Mark the segments which are fully found by the legendre track finder as taken
+      for (const CDCRecoSegment2D& segment : segments) {
+        bool oneHitDoesNotHaveTakenFlag = false;
+        for (const CDCRecoHit2D& recoHit : segment) {
+          if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+            oneHitDoesNotHaveTakenFlag = true;
+            break;
+          }
+        }
+
+        if (not oneHitDoesNotHaveTakenFlag) {
+          segment.getAutomatonCell().setTakenFlag();
+        }
+      }
+
       fillHitLookUp(segments);
       fillTrackLookUp(segments, tracks);
 

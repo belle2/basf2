@@ -38,7 +38,7 @@ bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, c
   return true;
 }
 
-void StereohitsProcesser::makeHistogramming(CDCTrack& track)
+void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_param_level, unsigned int m_param_minimumHits)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -75,10 +75,10 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track)
     B2DEBUG(100, "Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
   };
 
-  unsigned int level = 6;
+  unsigned int level = m_param_level;
   Processor qtProcessor(level, ranges, m_param_debugOutput);
   qtProcessor.provideItemsSet(hits_set);
-  qtProcessor.fillGivenTree(lmdCandidateProcessing, 5);
+  qtProcessor.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
 
   /* DEBUG */
   if (m_param_debugOutput) {

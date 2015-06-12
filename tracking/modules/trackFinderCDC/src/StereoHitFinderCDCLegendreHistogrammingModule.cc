@@ -1,4 +1,4 @@
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCLegendreHistogrammingModule.h>
+#include <tracking/modules/trackFinderCDC/StereoHitFinderCDCLegendreHistogrammingModule.h>
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
@@ -10,16 +10,16 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 //ROOT macro
-REG_MODULE(CDCLegendreHistogramming)
+REG_MODULE(StereoHitFinderCDCLegendreHistogramming)
 
-void CDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   //create object which will add stereohits to tracks
   StereohitsProcesser stereohitsProcesser(m_param_debugOutput);
 
   for (CDCTrack& track : tracks) {
     //assign stereohits to the track
-    stereohitsProcesser.makeHistogramming(track);
+    stereohitsProcesser.makeHistogramming(track, m_param_quadTreeLevel, m_param_minimumHitsInQuadTree);
     track.sort();
   }
 

@@ -10,6 +10,8 @@
 
 #include <tracking/modules/trackFinderOutputCombiner/NaiveCombinerModule.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrackChooser.h>
 
 using namespace std;
 using namespace Belle2;
@@ -20,11 +22,6 @@ REG_MODULE(NaiveCombiner);
 NaiveCombinerModule::NaiveCombinerModule() : TrackFinderCDCFromSegmentsModule()
 {
   setDescription("Tries to combine the two outputs of two implementations of the track finder algorithm.");
-
-  addParam("MCTrackCands",
-           m_param_mcTrackCands,
-           "When UseMCInformation is enabled, you need to set the MCTrackCands here.",
-           std::string("MCTrackCands"));
 
   addParam("UseMCInformation",
            m_param_useMCInformation,
@@ -54,7 +51,50 @@ void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D
         tracks.pop_back();
     }
   } else {
-    B2FATAL("Not implemented")
+    CDCMCManager::getInstance().fill();
+
+    const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+    const CDCMCHitLookUp& mcHitLookup =  CDCMCHitLookUp::getInstance();
+
+
+    for (const CDCRecoSegment2D& segment : segments) {
+      if (segment.getAutomatonCell().hasTakenFlag())
+        continue;
+
+      ITrackType segmentMCMatch = mcSegmentLookup.getMCTrackId(&segment);
+      if (segmentMCMatch == INVALID_ITRACK)
+        continue;
+
+      bool hasPartner = false;
+
+      for (CDCTrack& track : tracks) {
+        double numberOfCorrectHits = 0;
+        for (const CDCRecoHit3D& recoHit : track) {
+          if (mcHitLookup.getMCTrackId(recoHit->getWireHit()->getHit()) == segmentMCMatch) {
+            numberOfCorrectHits++;
+          }
+        }
+
+        if (numberOfCorrectHits / track.size() > 0.5) {
+          hasPartner = true;
+          SegmentTrackCombiner::addSegmentToTrack(segment, track);
+          break;
+        }
+      }
+
+      if (not hasPartner) {
+        tracks.emplace_back();
+        CDCTrack& newTrack = tracks.back();
+
+        const CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
+        CDCTrajectory3D trajectory(trajectory2D, CDCTrajectorySZ::basicAssumption());
+        newTrack.setStartTrajectory3D(trajectory);
+
+        SegmentTrackCombiner::addSegmentToTrack(segment, newTrack);
+        if (newTrack.size() == 0)
+          tracks.pop_back();
+      }
+    }
   }
 }
 

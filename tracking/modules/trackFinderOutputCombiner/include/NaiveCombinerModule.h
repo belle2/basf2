@@ -19,15 +19,12 @@ namespace Belle2 {
 
     NaiveCombinerModule();
 
-
   private:
     /**
      * Fill all segments and tracks to the output list
      */
     void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
 
-
-    std::string m_param_mcTrackCands;                   /**< When UseMCInformation is enabled, you need to set the MCTrackCands here. */
     bool m_param_useMCInformation;                      /**< Uses the MC information from the MCTrackFinder and the MCMatcher to merge tracks */
   };
 }

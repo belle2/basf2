@@ -39,6 +39,8 @@ namespace Belle2 {
       {
       }
 
+      virtual ~FilterFactoryBase() { }
+
       /** Add the parameters of the filter to the module */
       void exposeParameters(TrackFinderCDCBaseModule* module);
 

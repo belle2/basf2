@@ -10,19 +10,9 @@
 
 #include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerDevModule.h>
 
-#include <tracking/trackFindingCDC/filters/segment_track/RecordingSegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/segment_track/TMVASegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrackChooser.h>
-
-#include <tracking/trackFindingCDC/filters/segment_track/RecordingSegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/TMVASegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrainFilter.h>
-
-#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrackFilter.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-
 #include <framework/datastore/StoreArray.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -32,93 +22,38 @@ REG_MODULE(SegmentTrackCombinerDev);
 
 SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   SegmentTrackCombinerImplModule<>(),
-  m_param_segmentTrackChooser("simple"),
-  m_param_segmentTrainFilter("simple"),
-  m_param_segmentTrackFilter("simple")
+  m_segmentTrackChooserFirstStepFactory("tmva"),
+  m_segmentTrackChooserSecondStepFactory("tmva"),
+  m_segmentTrainFilterFactory("simple"),
+  m_segmentTrackFilterFactory("simple")
 {
   setDescription("Versatile module with adjustable filters for segment track combination.");
 
-  addParam("SegmentTrackChooser",
-           m_param_segmentTrackChooser, "", string("simple"));
-
-  addParam("SegmentTrackChooserParameters",
-           m_param_segmentTrackChooserParameters,
-           "Key - Value pairs depending on the filter",
-           map<string, string>());
-
-  addParam("SegmentTrainFilter",
-           m_param_segmentTrainFilter, "", string("simple"));
-
-  addParam("SegmentTrainFilterParameters",
-           m_param_segmentTrainFilterParameters,
-           "Key - Value pairs depending on the filter",
-           map<string, string>());
-
-  addParam("SegmentTrackFilter",
-           m_param_segmentTrackFilter, "", string("simple"));
+  m_segmentTrackChooserFirstStepFactory.exposeParameters(this);
+  m_segmentTrackChooserSecondStepFactory.exposeParameters(this);
+  m_segmentTrainFilterFactory.exposeParameters(this);
+  m_segmentTrackFilterFactory.exposeParameters(this);
 }
 
 void SegmentTrackCombinerDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooser(new BaseSegmentTrackChooser());
+  std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserFirstStep = m_segmentTrackChooserFirstStepFactory.create();
+  setSegmentTrackChooserFirstStep(std::move(ptrSegmentTrackChooserFirstStep));
 
-  if (m_param_segmentTrackChooser == string("none")) {
-    ptrSegmentTrackChooser.reset(new BaseSegmentTrackChooser());
-  } else if (m_param_segmentTrackChooser == string("simple")) {
-    ptrSegmentTrackChooser.reset(new SimpleSegmentTrackChooser());
-  } else if (m_param_segmentTrackChooser == string("mc")) {
-    ptrSegmentTrackChooser.reset(new MCSegmentTrackChooser());
-  } else if (m_param_segmentTrackChooser == string("recording")) {
-    ptrSegmentTrackChooser.reset(new RecordingSegmentTrackChooser());
-  } else if (m_param_segmentTrackChooser == string("tmva")) {
-    ptrSegmentTrackChooser.reset(new TMVASegmentTrackChooser());
-  } else {
-    B2ERROR("Unrecognised SegmentTrackChooser option " << m_param_segmentTrackChooser);
-  }
+  std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserSecondStep = m_segmentTrackChooserSecondStepFactory.create();
+  setSegmentTrackChooserSecondStep(std::move(ptrSegmentTrackChooserSecondStep));
 
-  // Takes ownership
-  setSegmentTrackChooser(std::move(ptrSegmentTrackChooser));
-  getSegmentTrackChooser()->setParameters(m_param_segmentTrackChooserParameters);
-
-  // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseSegmentTrainFilter> ptrSegmentTrainFilter(new BaseSegmentTrainFilter());;
-
-  if (m_param_segmentTrainFilter == string("none")) {
-    ptrSegmentTrainFilter.reset(new BaseSegmentTrainFilter());
-  } else if (m_param_segmentTrainFilter == string("simple")) {
-    ptrSegmentTrainFilter.reset(new SimpleSegmentTrainFilter());
-  } else if (m_param_segmentTrainFilter == string("mc")) {
-    ptrSegmentTrainFilter.reset(new MCSegmentTrainFilter());
-  } else if (m_param_segmentTrainFilter == string("recording")) {
-    ptrSegmentTrainFilter.reset(new RecordingSegmentTrainFilter());
-  } else if (m_param_segmentTrainFilter == string("tmva")) {
-    ptrSegmentTrainFilter.reset(new TMVASegmentTrainFilter());
-  } else {
-    B2ERROR("Unrecognised SegmentTrainFilter option " << m_param_segmentTrainFilter);
-  }
-
-  // Takes ownership
+  std::unique_ptr<BaseSegmentTrainFilter> ptrSegmentTrainFilter = m_segmentTrainFilterFactory.create();
   setSegmentTrainFilter(std::move(ptrSegmentTrainFilter));
-  getSegmentTrainFilter()->setParameters(m_param_segmentTrainFilterParameters);
 
-  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilter(new BaseSegmentTrackFilter());
-  if (m_param_segmentTrackFilter == string("none")) {
-    ptrSegmentTrackFilter.reset(new BaseSegmentTrackFilter());
-  } else if (m_param_segmentTrackFilter == string("simple")) {
-    ptrSegmentTrackFilter.reset(new SimpleSegmentTrackFilter());
-  } else if (m_param_segmentTrackFilter == string("mc")) {
-    ptrSegmentTrackFilter.reset(new MCSegmentTrackFilter());
-  } else {
-    B2ERROR("Unrecognised SegmentTrackFilter option " << m_param_segmentTrackFilter);
-  }
-
-  // Takes ownership
+  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilter = m_segmentTrackFilterFactory.create();
   setSegmentTrackFilter(std::move(ptrSegmentTrackFilter));
 
   SegmentTrackCombinerImplModule<>::initialize();
 
-  if (getSegmentTrackChooser()->needsTruthInformation() or
+  if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
+      getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
       getSegmentTrackFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
@@ -129,7 +64,8 @@ void SegmentTrackCombinerDevModule::initialize()
 
 void SegmentTrackCombinerDevModule::event()
 {
-  if (getSegmentTrackChooser()->needsTruthInformation() or
+  if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
+      getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
       getSegmentTrackFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();

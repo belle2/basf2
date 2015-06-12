@@ -9,11 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_train/MCSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/SegmentTrackVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the construction of good segment - track pairs
-    typedef MCSegmentTrainFilter MCSegmentTrackFilter;
+
+    /// Background cluster detection based on TMVA.
+    class TMVASegmentTrackChooser: public TMVAFilter<SegmentTrackVarSet> {
+
+    public:
+      /// Constructor initialising the TMVAFilter with standard training name for this filter.
+      TMVASegmentTrackChooser(const std::string& filename  = "SegmentTrackChooserFirstStep.root") :
+        TMVAFilter<SegmentTrackVarSet>(filename)
+      {;}
+
+    };
   }
 }

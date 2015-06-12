@@ -9,11 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_train/MCSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainTruthVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the construction of good segment - track pairs
-    typedef MCSegmentTrainFilter MCSegmentTrackFilter;
+
+    class RecordingSegmentTrainFilter: public RecordingFilter<SegmentTrainTruthVarSet> {
+
+    public:
+      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
+      RecordingSegmentTrainFilter() :
+        RecordingFilter<SegmentTrainTruthVarSet>("SegmentTrainFilter.root")
+      {
+        setParameter("returned_cell_weight", "1.0");
+      }
+
+    };
   }
 }

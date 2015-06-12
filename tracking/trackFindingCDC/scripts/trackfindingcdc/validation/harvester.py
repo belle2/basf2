@@ -109,6 +109,7 @@ class WrongRLInfoCounter(HarvestingModule):
 
 
 class SegmentFakeRatesModule(HarvestingModule):
+    #: Harvesting module to check for basic matching information of the found segments
 
     def __init__(
             self,
@@ -187,5 +188,69 @@ class SegmentFakeRatesModule(HarvestingModule):
                     hit_efficiency_of_partner=hit_efficiency_of_partner,
                     number_of_new_hits=number_of_new_hits,
                     number_of_hits=number_of_hits)
+
+    save_tree = refiners.save_tree(folder_name="tree")
+
+
+class SegmentFinderParameterExtractorModule(HarvestingModule):
+    #: Harvester module to extract momentum and position information from the found segments and tracks
+
+    def __init__(self, local_track_cands_store_array_name, mc_track_cands_store_array_name, output_file_name):
+        super(
+            SegmentFinderParameterExtractorModule,
+            self).__init__(
+            foreach=local_track_cands_store_array_name,
+            output_file_name=output_file_name)
+
+        self.mc_track_cands_store_array_name = mc_track_cands_store_array_name
+
+        self.mc_track_matcher = Belle2.TrackMatchLookUp(self.mc_track_cands_store_array_name,
+                                                        self.foreach)
+
+    def peel(self, local_track_cand):
+        mc_track_matcher = self.mc_track_matcher
+
+        is_matched = mc_track_matcher.isMatchedPRTrackCand(local_track_cand)
+        is_background = mc_track_matcher.isBackgroundPRTrackCand(local_track_cand)
+        is_ghost = mc_track_matcher.isGhostPRTrackCand(local_track_cand)
+
+        related_mc_track_cand = mc_track_matcher.getRelatedMCTrackCand(local_track_cand)
+
+        track_momentum = np.NaN
+        track_position = np.NaN
+        track_pt = np.NaN
+        track_phi = np.NaN
+
+        segment_momentum = np.NaN
+        segment_position = np.NaN
+        segment_pt = np.NaN
+        segment_phi = np.NaN
+
+        if is_matched:
+            track_momentum = related_mc_track_cand.getPosSeed()
+            track_position = related_mc_track_cand.getPosSeed()
+            track_pt = track_momentum.Pt()
+            track_phi = track_momentum.Phi()
+            trajectory_track = Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(track_position),
+                                                                      Belle2.TrackFindingCDC.Vector3D(track_momentum),
+                                                                      related_mc_track_cand.getChargeSeed())
+
+            segment_momentum = local_track_cand.getMomSeed()
+            segment_position = local_track_cand.getPosSeed()
+            segment_pt = segment_momentum.Pt()
+            segment_phi = segment_momentum.Phi()
+            trajectory_segment = Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(segment_position),
+                                                                        Belle2.TrackFindingCDC.Vector3D(segment_momentum),
+                                                                        local_track_cand.getChargeSeed())
+
+        return dict(is_matched=is_matched,
+                    is_background=is_background,
+                    is_ghost=is_ghost,
+                    segment_pt=segment_pt,
+                    track_pt=track_pt,
+                    difference_pt=segment_pt - track_pt,
+                    segment_phi=segment_phi,
+                    track_phi=track_phi,
+                    difference_phi=segment_phi - track_phi)
 
     save_tree = refiners.save_tree(folder_name="tree")

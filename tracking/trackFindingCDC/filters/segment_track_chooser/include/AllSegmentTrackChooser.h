@@ -9,11 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_train/MCSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the construction of good segment - track pairs
-    typedef MCSegmentTrainFilter MCSegmentTrackFilter;
+    class AllSegmentTrackChooser : public BaseSegmentTrackChooser {
+      /** Accept all segment track combinations */
+      virtual CellWeight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>&)
+      {
+        return 1;
+      }
+
+    };
   }
 }

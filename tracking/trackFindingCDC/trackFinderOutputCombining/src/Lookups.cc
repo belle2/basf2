@@ -16,15 +16,40 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
 {
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
+  // Mark the segments which are fully found by the legendre track finder as taken
+  for (const CDCRecoSegment2D& segment : segments) {
+    bool oneHitDoesNotHaveTakenFlag = false;
+    for (const CDCRecoHit2D& recoHit : segment) {
+      if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+        oneHitDoesNotHaveTakenFlag = true;
+        break;
+      }
+    }
+
+    if (not oneHitDoesNotHaveTakenFlag) {
+      segment.getAutomatonCell().setTakenFlag();
+    }
+  }
+
   // Calculate a lookup SuperLayerID -> Segments
   m_lookup.clear();
   m_lookup.resize(wireTopology.N_SUPERLAYERS);
+
+  // Calculate a lookup cdcHit-> Segment (we use cdcHits here, not cdcwirehits)
+  m_hitSegmentLookUp.clear();
 
   for (CDCRecoSegment2D& segment : segments) {
     if (segment.getAutomatonCell().hasTakenFlag())
       continue;
     ILayerType superlayerID = segment.getISuperLayer();
-    m_lookup[superlayerID].push_back(new SegmentInformation(&segment));
+    SegmentInformation* newSegmentInformation = new SegmentInformation(&segment);
+    m_lookup[superlayerID].push_back(newSegmentInformation);
+
+    for (const CDCRecoHit2D& recoHit : segment) {
+      const CDCHit* cdcHit = recoHit.getWireHit().getHit();
+      m_hitSegmentLookUp.insert(std::make_pair(cdcHit, newSegmentInformation));
+    }
+
     B2DEBUG(200, "Added new segment to segment lookup: " << segment.getTrajectory2D())
   }
 }
@@ -50,7 +75,39 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
   }
 }
 
-void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
+void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep)
+{
+  // prepare lookup
+  std::map<SegmentInformation*, std::set<TrackInformation*>> segmentTrackLookUp;
+  segmentTrackLookUp.clear();
+  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+    for (SegmentInformation* segment : segments) {
+      segmentTrackLookUp.insert(std::make_pair(segment, std::set<TrackInformation*>()));
+    }
+  }
+
+  for (TrackInformation* track : m_trackLookUp) {
+    for (const CDCRecoHit3D& recoHit : track->getTrackCand()->items()) {
+      SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
+      if (matchingSegment != nullptr
+          and not isNotACell(segmentTrackChooserFirstStep(std::make_pair(matchingSegment->getSegment(), track->getTrackCand())))) {
+        segmentTrackLookUp[matchingSegment].insert(track);
+      }
+    }
+  }
+
+  for (auto& segmentTrackCombination : segmentTrackLookUp) {
+    SegmentInformation* segment = segmentTrackCombination.first;
+    const std::set<TrackInformation*>& matchingTracks = segmentTrackCombination.second;
+    if (matchingTracks.size() == 1) {
+      TrackInformation* track = *(matchingTracks.begin());
+      SegmentTrackCombiner::addSegmentToTrack(segment, track);
+    }
+  }
+}
+
+
+void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserSecondStep,
                                    BaseSegmentTrainFilter& segmentTrainFilter,
                                    BaseSegmentTrackFilter& segmentTrackFilter)
 {
@@ -61,7 +118,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooser,
 
     // Search for all matching tracks for a given segment
     for (SegmentInformation* segmentInformation : segmentsList) {
-      matchTracksToSegment(segmentInformation, segmentTrackChooser);
+      matchTracksToSegment(segmentInformation, segmentTrackChooserSecondStep);
     }
 
     // Go through all tracks and delete the cases were we have more than one train/segment

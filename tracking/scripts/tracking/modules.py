@@ -106,18 +106,19 @@ class CDCFullFinder(metamodules.PathModule):
     ----------
     output_track_cands_store_array_name: The name for output of the genfit::TrackCands
     tmva_cut: the cut for the BackgroundHitFinder
-    stereo_tmva_cut: the cut for the StereoSegmentTrackMatcher
+    combiner_tmva_cut: the cut for the first step of the SegmentTrackCombiner
     """
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
-                 tmva_cut=0.1, stereo_tmva_cut=0.9):
+                 tmva_cut=0.1, combiner_tmva_cut=0.9):
 
         modules = [
             CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
-                debug_output=False), CDCStereoSegmentTrackMatcher(
-                    output_track_cands_store_array_name=output_track_cands_store_array_name, tmva_cut=stereo_tmva_cut)]
+                debug_output=False), CDCSegmentTrackCombiner(
+                    output_track_cands_store_array_name=output_track_cands_store_array_name,
+                    segment_track_chooser_first_step_cut=combiner_tmva_cut)]
 
         metamodules.PathModule.__init__(self, modules=modules)
 
@@ -137,7 +138,7 @@ class CDCNaiveFinder(metamodules.PathModule):
     def __init__(self, output_track_cands_store_array_name="TrackCands",
                  tmva_cut=0.1, stereo_tmva_cut=0.9, use_mc_information=False):
 
-        full_finder = CDCFullFinder(tmva_cut=tmva_cut, output_track_cands_store_array_name=None, stereo_tmva_cut=stereo_tmva_cut)
+        full_finder = CDCFullFinder(tmva_cut=tmva_cut, output_track_cands_store_array_name=None, combiner_tmva_cut=stereo_tmva_cut)
         modules = full_finder._path.modules()
         modules.append(
             StandardEventGenerationRun.get_basf2_module(
@@ -326,23 +327,34 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
     def __init__(self, output_track_cands_store_array_name=None,
                  track_cands_store_vector_name="CDCTrackVector",
                  segments_store_vector_name="CDCRecoSegment2DVector",
-                 segment_track_chooser_filter="simple",
-                 segment_track_chooser_cut=0,
-                 segment_train_filter="simple",
-                 segment_track_filter="simple"):
+                 segment_track_chooser_first_step_filter="tmva",
+                 segment_track_chooser_second_step_filter="none",
+                 segment_track_chooser_first_step_cut=0.9,
+                 segment_track_chooser_second_step_cut=0,
+                 segment_train_filter="none",
+                 segment_track_filter="none"):
 
-        combiner_module = StandardEventGenerationRun.get_basf2_module("SegmentTrackCombinerDev",
-                                                                      SegmentTrackChooser=segment_track_chooser_filter,
-                                                                      SegmentTrainFilter=segment_train_filter,
-                                                                      SegmentTrackFilter=segment_track_filter,
-                                                                      WriteGFTrackCands=False,
-                                                                      SkipHitsPreparation=True,
-                                                                      TracksStoreObjNameIsInput=True,
-                                                                      SegmentsStoreObjName=segments_store_vector_name,
-                                                                      TracksStoreObjName=track_cands_store_vector_name)
+        combiner_module = StandardEventGenerationRun.get_basf2_module(
+            "SegmentTrackCombinerDev",
+            SegmentTrackChooserFirstStepFilter=segment_track_chooser_first_step_filter,
+            SegmentTrackChooserSecondStepFilter=segment_track_chooser_second_step_filter,
+            SegmentTrainFilter=segment_train_filter,
+            SegmentTrackFilter=segment_track_filter,
+            WriteGFTrackCands=False,
+            SkipHitsPreparation=True,
+            TracksStoreObjNameIsInput=True,
+            SegmentsStoreObjName=segments_store_vector_name,
+            TracksStoreObjName=track_cands_store_vector_name)
 
-        if segment_track_chooser_filter == "tmva":
-            combiner_module.param('SegmentTrackChooserParameters', {"cut": str(segment_track_chooser_cut)})
+        if segment_track_chooser_first_step_filter == "tmva":
+            combiner_module.param(
+                'SegmentTrackChooserFirstStepFilterParameters', {
+                    "cut": str(segment_track_chooser_first_step_cut)})
+
+        if segment_track_chooser_second_step_filter == "tmva":
+            combiner_module.param(
+                'SegmentTrackChooserSecondStepFilterParameters', {
+                    "cut": str(segment_track_chooser_second_step_cut)})
 
         if output_track_cands_store_array_name is not None:
             combiner_module.param({'WriteGFTrackCands': True,
@@ -361,20 +373,21 @@ class CDCValidation(metamodules.PathModule):
     With output_file_name you can choose the file name for the results
 
     TODO: Do only create the mc_track_matching relations if not already present
-    TODO: Create a parameter to only do the validation if the file is not already present (something like force overwrite)
     """
 
     def __init__(self, track_candidates_store_array_name, output_file_name):
         from tracking.validation.module import SeparatedTrackingValidationModule
 
-        mc_track_matcher_module = StandardEventGenerationRun.get_basf2_module(
-            'MCTrackMatcher',
-            UseCDCHits=True,
-            UseSVDHits=False,
-            UsePXDHits=False,
-            RelateClonesToMCParticles=True,
-            MCGFTrackCandsColName="MCTrackCands",
-            PRGFTrackCandsColName=track_candidates_store_array_name)
+        mc_track_finder_module = StandardEventGenerationRun.get_basf2_module('TrackFinderMCTruth',
+                                                                             UseCDCHits=True,
+                                                                             WhichParticles=[],
+                                                                             GFTrackCandidatesColName="MCTrackCands")
+
+        mc_track_finder_module_if_module = metamodules.IfStoreArrayNotPresentModule(
+            mc_track_finder_module,
+            storearray_name="MCTrackCands")
+
+        mc_track_matcher_module = CDCMCMatcher(track_cands_store_array_name=track_candidates_store_array_name)
 
         validation_module = SeparatedTrackingValidationModule(
             name="",
@@ -383,7 +396,7 @@ class CDCValidation(metamodules.PathModule):
             trackCandidatesColumnName=track_candidates_store_array_name,
             expert_level=2)
 
-        super(CDCValidation, self).__init__(modules=[mc_track_matcher_module, validation_module])
+        super(CDCValidation, self).__init__(modules=[mc_track_finder_module_if_module, mc_track_matcher_module, validation_module])
 
 
 class CDCFitter(metamodules.PathModule):
@@ -460,6 +473,8 @@ class CDCMCFiller(basf2.Module):
 
 class CDCMCMatcher(metamodules.WrapperModule):
 
+    """ Add the mc mathcer module for convenience """
+
     def __init__(self, mc_track_cands_store_array_name="MCTrackCands",
                  track_cands_store_array_name="TrackCands"):
 
@@ -472,41 +487,6 @@ class CDCMCMatcher(metamodules.WrapperModule):
                                                                               PRGFTrackCandsColName=track_cands_store_array_name)
 
         metamodules.WrapperModule.__init__(self, module=mc_track_matcher_module)
-
-
-class CDCStereoSegmentTrackMatcher(metamodules.WrapperModule):
-
-    """
-    Add the StereoSegmentTrackMatcher module to the path
-
-    Attributes
-    ----------
-    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
-    With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
-    of this vector will be replaced by the output of this module
-    With segments_store_vector_name you can control the input vector of the CDCRecoSegments2D. Be aware that the content
-    of this vector will be replaced by the output of this module
-    With the other parameters you can control the filters of the StereoSegmentTrackMatcher
-    """
-
-    def __init__(self, output_track_cands_store_array_name=None,
-                 track_cands_store_vector_name="CDCTrackVector",
-                 segments_store_vector_name="CDCRecoSegment2DVector",
-                 filter="tmva", tmva_cut=0.9):
-        matcher_module = StandardEventGenerationRun.get_basf2_module("StereoSegmentTrackMatcherDev", WriteGFTrackCands=False,
-                                                                     SkipHitsPreparation=True,
-                                                                     TracksStoreObjNameIsInput=True,
-                                                                     SegmentsStoreObjName=segments_store_vector_name,
-                                                                     TracksStoreObjName=track_cands_store_vector_name,
-                                                                     SegmentTrackChooser=filter,
-                                                                     SegmentTrackChooserParameters={"cut": str(tmva_cut)}
-                                                                     )
-
-        if output_track_cands_store_array_name is not None:
-            matcher_module.param({'WriteGFTrackCands': True,
-                                  'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
-
-        super(CDCStereoSegmentTrackMatcher, self).__init__(matcher_module)
 
 
 class CDCHitUniqueAssumer(basf2.Module):

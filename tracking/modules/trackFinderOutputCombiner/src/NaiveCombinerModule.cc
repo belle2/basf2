@@ -11,7 +11,7 @@
 #include <tracking/modules/trackFinderOutputCombiner/NaiveCombinerModule.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-#include <tracking/trackFindingCDC/filters/segment_track/MCSegmentTrackChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/MCSegmentTrackChooser.h>
 
 using namespace std;
 using namespace Belle2;

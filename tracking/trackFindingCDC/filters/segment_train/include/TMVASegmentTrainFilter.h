@@ -9,11 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_train/MCSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the construction of good segment - track pairs
-    typedef MCSegmentTrainFilter MCSegmentTrackFilter;
+
+    /// Background cluster detection based on TMVA.
+    class TMVASegmentTrainFilter: public TMVAFilter<SegmentTrainVarSet> {
+
+    public:
+      /// Constructor initialising the TMVAFilter with standard training name for this filter.
+      TMVASegmentTrainFilter() :
+        TMVAFilter<SegmentTrainVarSet>("SegmentTrainFilter")
+      {;}
+
+    };
   }
 }

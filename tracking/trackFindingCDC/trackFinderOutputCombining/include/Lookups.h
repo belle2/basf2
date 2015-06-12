@@ -11,9 +11,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
-#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -58,7 +58,9 @@ namespace Belle2 {
       std::vector<ListType> m_lookup; /**< The internal store for the elements list */
     };
 
-    /** We use this class for storing our segment lists - one for each superlayer */
+    /** We use this class for storing our segment lists - one for each superlayer
+     * This lookup serves (as an addon) also as lookup for the relation cdchit -> segment
+     * */
     class SegmentLookUp : public LookUpBase<CDCRecoSegment2D, std::vector<SegmentInformation*>> {
     public:
       /** Create the lists. Do not forget to call clear before the next event. */
@@ -73,8 +75,23 @@ namespace Belle2 {
           }
         }
       }
+
+      SegmentInformation* findSegmentForHit(const CDCRecoHit3D& recoHit)
+      {
+        const CDCHit* cdcHit = recoHit.getWireHit().getHit();
+        auto foundElement = m_hitSegmentLookUp.find(cdcHit);
+        if (foundElement == m_hitSegmentLookUp.end()) {
+          return nullptr;
+        } else {
+          return foundElement->second;
+        }
+      }
+
+    private:
+      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp;
     };
 
+    /** And we use this class for storing our Track Information */
     class TrackLookUp : public LookUpBase<CDCTrack, TrackInformation*> {
     public:
       /** Create the lists. Do not forget to call clear before the next event. */
@@ -124,9 +141,11 @@ namespace Belle2 {
        * - Now we really have a one-on-one relation between tracks and segments. We can put them all together.
        */
 
-      void combine(BaseSegmentTrackChooser& segmentTrackChooser,
+      void combine(BaseSegmentTrackChooser& segmentTrackChooserSecondStep,
                    BaseSegmentTrainFilter& segmentTrainFilter,
                    BaseSegmentTrackFilter& segmentTrackFilter);
+
+      void match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep);
 
       /**
        * Clear all the pointer vectors.

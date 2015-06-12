@@ -11,6 +11,10 @@
 
 #include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerModule.h>
 
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/SegmentTrackChooserFactory.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackFilterFactory.h>
+
 namespace Belle2 {
 
   /// Module for the combination of tracks and segments. Development edition.
@@ -28,35 +32,30 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    /** Parameter: Chooser to be used for matching segments and tracks
-    Valid values are:
-    + "simple"
-    + "recording"
-    # "tmva"
+
+    /**
+       Factory for the segment track chooser filter for the first step, knowing all the available filters and
+       their respective parameters
     */
-    std::string m_param_segmentTrackChooser;
+    Belle2::TrackFindingCDC::SegmentTrackChooserFirstStepFactory m_segmentTrackChooserFirstStepFactory;
 
-    /** Parameter: Segment Track Chooser parameters forwarded to the chooser
-     *  Meaning of the Key - Value pairs depend on the filter
-     */
-    std::map<std::string, std::string> m_param_segmentTrackChooserParameters;
-
-    /** Parameter: Filter to be used for construction segment trains
-    Valid values are:
-    + "simple"
+    /**
+       Factory for the segment track chooser filter for the second step, knowing all the available filters and
+       their respective parameters
     */
-    std::string m_param_segmentTrainFilter;
+    Belle2::TrackFindingCDC::SegmentTrackChooserSecondStepFactory m_segmentTrackChooserSecondStepFactory;
 
-    /** Parameter: Segment Train Filter  parameters forwarded to the chooser
-     *  Meaning of the Key - Value pairs depend on the filter
-     */
-    std::map<std::string, std::string> m_param_segmentTrainFilterParameters;
-
-    /** Parameter: Filter to be used to do an uniqe segment train <-> track matching
-    Valid values are:
-    + "simple"
+    /**
+       Factory for the segment train filter, knowing all the available filters and
+       their respective parameters
     */
-    std::string m_param_segmentTrackFilter;
+    Belle2::TrackFindingCDC::SegmentTrainFilterFactory m_segmentTrainFilterFactory;
+
+    /**
+       Factory for the segment train filter, knowing all the available filters and
+       their respective parameters
+    */
+    TrackFindingCDC::SegmentTrackFilterFactory m_segmentTrackFilterFactory;
 
   }; // end class
 } // end namespace Belle2

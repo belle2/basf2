@@ -2,7 +2,6 @@
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking import modules
-from trackfinderoutputcombiner.validation import add_mc_track_finder
 
 import logging
 import sys
@@ -21,13 +20,15 @@ class FullRun(StandardEventGenerationRun):
         #: Creates the path with all the modules in a row
         main_path = super(FullRun, self).create_path()
 
-        add_mc_track_finder(main_path)
-        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands", stereo_tmva_cut=self.tmva_cut))
+        main_path.add_module(
+            modules.CDCFullFinder(
+                output_track_cands_store_array_name="TrackCands",
+                combiner_tmva_cut=self.tmva_cut))
 
         main_path.add_module(
             modules.CDCValidation(
                 track_candidates_store_array_name="TrackCands",
-                output_file_name="output_%f.root" % self.tmva_cut))
+                output_file_name="output_%.2f.root" % self.tmva_cut))
 
         return main_path
 
@@ -61,5 +62,5 @@ if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
 
     short_scanner = ParameterScanner(main,
-                                     [np.arange(0.8, 1.0, 0.1)])
+                                     [np.arange(0.4, 1.0, 0.05)])
     short_scanner.scan_parameter_space()

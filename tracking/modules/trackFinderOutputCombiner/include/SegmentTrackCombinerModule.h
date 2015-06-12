@@ -12,12 +12,12 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
-#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
+#include <tracking/trackFindingCDC/filters/segment_track_chooser/SimpleSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SimpleSegmentTrainFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <vector>
@@ -29,7 +29,8 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Forward declaration of the module implementing the segment track combiner based on various filters
-    template < class SegmentTrackChooser = TrackFindingCDC::BaseSegmentTrackChooser,
+    template < class SegmentTrackChooserFirstStep = TrackFindingCDC::BaseSegmentTrackChooser,
+               class SegmentTrackChooserSecondStep = TrackFindingCDC::BaseSegmentTrackChooser,
                class SegmentTrainFilter = TrackFindingCDC::BaseSegmentTrainFilter,
                class SegmentTrackFilter  = TrackFindingCDC::BaseSegmentTrackFilter>
     class SegmentTrackCombinerImplModule;
@@ -38,13 +39,15 @@ namespace Belle2 {
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
   typedef TrackFindingCDC::SegmentTrackCombinerImplModule <
   TrackFindingCDC::SimpleSegmentTrackChooser,
+                  TrackFindingCDC::SimpleSegmentTrackChooser,
                   TrackFindingCDC::SimpleSegmentTrainFilter,
                   TrackFindingCDC::SimpleSegmentTrackFilter
                   > SegmentTrackCombinerModule;
 
   namespace TrackFindingCDC {
     /// This module matches the found segments and the found tracks with a given filter.
-    template < class SegmentTrackChooser,
+    template < class SegmentTrackChooserFirstStep,
+               class SegmentTrackChooserSecondStep,
                class SegmentTrainFilter,
                class SegmentTrackFilter>
     class SegmentTrackCombinerImplModule : public TrackFinderCDCFromSegmentsModule {
@@ -55,7 +58,8 @@ namespace Belle2 {
        */
       SegmentTrackCombinerImplModule(): TrackFinderCDCFromSegmentsModule(),
         m_combiner(),
-        m_ptrSegmentTrackChooser(new SegmentTrackChooser),
+        m_ptrSegmentTrackChooserFirstStep(new SegmentTrackChooserFirstStep),
+        m_ptrSegmentTrackChooserSecondStep(new SegmentTrackChooserSecondStep),
         m_ptrSegmentTrainFilter(new SegmentTrainFilter),
         m_ptrSegmentTrackFilter(new SegmentTrackFilter) { }
 
@@ -64,8 +68,12 @@ namespace Belle2 {
       {
         TrackFinderCDCFromSegmentsModule::initialize();
 
-        if (m_ptrSegmentTrackChooser) {
-          m_ptrSegmentTrackChooser->initialize();
+        if (m_ptrSegmentTrackChooserFirstStep) {
+          m_ptrSegmentTrackChooserFirstStep->initialize();
+        }
+
+        if (m_ptrSegmentTrackChooserSecondStep) {
+          m_ptrSegmentTrackChooserSecondStep->initialize();
         }
 
         if (m_ptrSegmentTrainFilter) {
@@ -82,8 +90,12 @@ namespace Belle2 {
       {
         TrackFinderCDCFromSegmentsModule::terminate();
 
-        if (m_ptrSegmentTrackChooser) {
-          m_ptrSegmentTrackChooser->terminate();
+        if (m_ptrSegmentTrackChooserFirstStep) {
+          m_ptrSegmentTrackChooserFirstStep->terminate();
+        }
+
+        if (m_ptrSegmentTrackChooserSecondStep) {
+          m_ptrSegmentTrackChooserSecondStep->terminate();
         }
 
         if (m_ptrSegmentTrainFilter) {
@@ -103,15 +115,27 @@ namespace Belle2 {
 
     public:
       /// Getter for the current SegmentTrackChooser. The module keeps ownership of the pointer.
-      SegmentTrackChooser* getSegmentTrackChooser()
+      SegmentTrackChooserFirstStep* getSegmentTrackChooserFirstStep()
       {
-        return m_ptrSegmentTrackChooser.get();
+        return m_ptrSegmentTrackChooserFirstStep.get();
       }
 
       /// Setter for the SegmentTrackChooser. The module takes ownership of the pointer.
-      void setSegmentTrackChooser(std::unique_ptr<SegmentTrackChooser> ptrClusterFilter)
+      void setSegmentTrackChooserFirstStep(std::unique_ptr<SegmentTrackChooserFirstStep> ptrSegmentTrackChooserFirstStep)
       {
-        m_ptrSegmentTrackChooser = std::move(ptrClusterFilter);
+        m_ptrSegmentTrackChooserFirstStep = std::move(ptrSegmentTrackChooserFirstStep);
+      }
+
+      /// Getter for the current SegmentTrackChooser. The module keeps ownership of the pointer.
+      SegmentTrackChooserSecondStep* getSegmentTrackChooserSecondStep()
+      {
+        return m_ptrSegmentTrackChooserSecondStep.get();
+      }
+
+      /// Setter for the SegmentTrackChooser. The module takes ownership of the pointer.
+      void setSegmentTrackChooserSecondStep(std::unique_ptr<SegmentTrackChooserSecondStep> ptrSegmentTrackChooserSecondStep)
+      {
+        m_ptrSegmentTrackChooserSecondStep = std::move(ptrSegmentTrackChooserSecondStep);
       }
 
       /// Getter for the current SegmentTrainFilter. The module keeps ownership of the pointer.
@@ -142,8 +166,11 @@ namespace Belle2 {
       /// Object that handles the combination
       SegmentTrackCombiner m_combiner;
 
-      /// Reference to the chooser to be used for matching segments and tracks
-      std::unique_ptr<SegmentTrackChooser> m_ptrSegmentTrackChooser;
+      /// Reference to the chooser to be used for matching segments and tracks in the first step
+      std::unique_ptr<SegmentTrackChooserFirstStep> m_ptrSegmentTrackChooserFirstStep;
+
+      /// Reference to the chooser to be used for matching segments and tracks in the second step
+      std::unique_ptr<SegmentTrackChooserSecondStep> m_ptrSegmentTrackChooserSecondStep;
 
       /// Reference to the filter to be used for construction segment trains
       std::unique_ptr<SegmentTrainFilter> m_ptrSegmentTrainFilter;
@@ -153,14 +180,16 @@ namespace Belle2 {
     };
 
     /// Do the combination work. See the SegmentTrackCombiner for more details.
-    template < class SegmentTrackChooser,
+    template < class SegmentTrackChooserFirstStep,
+               class SegmentTrackChooserSecondStep,
                class SegmentTrainFilter,
                class SegmentTrackFilter>
-    void SegmentTrackCombinerImplModule<SegmentTrackChooser, SegmentTrainFilter, SegmentTrackFilter>::generate(
+    void SegmentTrackCombinerImplModule<SegmentTrackChooserFirstStep, SegmentTrackChooserSecondStep, SegmentTrainFilter, SegmentTrackFilter>::generate(
       std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks)
     {
       m_combiner.fillWith(tracks, segments);
-      m_combiner.combine(*m_ptrSegmentTrackChooser, *m_ptrSegmentTrainFilter, *m_ptrSegmentTrackFilter);
+      m_combiner.match(*m_ptrSegmentTrackChooserFirstStep);
+      m_combiner.combine(*m_ptrSegmentTrackChooserSecondStep, *m_ptrSegmentTrainFilter, *m_ptrSegmentTrackFilter);
       m_combiner.clear();
     }
   }

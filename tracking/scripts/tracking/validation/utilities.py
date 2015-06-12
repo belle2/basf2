@@ -6,8 +6,6 @@ import numpy as np
 import math
 import contextlib
 
-import tracking.validation.plot
-
 # Vectorised version of the error function for numpy arrays
 try:
     from scipy.special import erf
@@ -109,6 +107,7 @@ def root_browse(tobject):
     ROOT.TBrowser
         The new TBrowser used to show the object.
     """
+    import tracking.validation.plot
     tracking.validation.plot.ValidationPlot.set_tstyle()
 
     tbrowser = ROOT.TBrowser()

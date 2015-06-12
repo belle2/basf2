@@ -47,6 +47,12 @@ class WrapperModule(basf2.Module):
         #: The wrapped module
         self.module = module
 
+        # Forward the logging parameters
+        self.set_log_level(self.module.logging.log_level)
+        self.set_debug_level(self.module.logging.debug_level)
+        self.set_abort_level(self.module.logging.abort_level)
+        self.set_log_info(self.module.logging.log_level, self.module.logging.get_info(self.module.logging.log_level))
+
         # Forward the name of this module to the C++ world
         self.set_name(name)
 

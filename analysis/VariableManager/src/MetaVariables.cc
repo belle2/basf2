@@ -389,6 +389,25 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          const MCParticle* mcp = particle->getRelated<MCParticle>();
+          if (!mcp)
+            return -999;
+
+          Particle tmpPart(mcp);
+          return var->function(&tmpPart);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function matchedMC");
+      }
+    }
+
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula, "Calculate formula, no parenthesis allowed yet.");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle as current reference frame.");
@@ -409,6 +428,8 @@ namespace Belle2 {
                       "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut.");
+    REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
+                      "Returns variable output for the matched MCParticle by constructing a temporary Particle from it (this may not work too well if your variable requires accessing daughters of the particle). Returns -999 if no matched MCParticle exists.");
 
   }
 }

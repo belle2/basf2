@@ -68,11 +68,14 @@ void SegmentNetworkProducerModule::event()
   m_eventCounter++;
   B2INFO("\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n")
 
+  // make sure that network exists:
+  if (! m_network) { m_network.create(); }
+
   vector< RawSectorData > collectedData = matchSpacePointToSectors();
 
   buildActiveSectorNetwork(collectedData);
 
-  buildSpacePointNetwork();
+  buildTrackNodeNetwork();
 
   buildSegmentNetwork();
 
@@ -100,7 +103,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
 {
   // TODO add counters!
   std::vector< RawSectorData > collectedData;
-  std::vector<TrackNode* >& trackNodes = m_network->accessTrackNodes();
+  std::vector<TrackNode* >& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
 
   for (StoreArray<SpacePoint>& storeArray : m_spacePoints) {
 
@@ -115,7 +118,6 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       }
 
       TrackNode* trackNode = new TrackNode();
-//    trackNode->sector = sectorFound;
       trackNode->spacePoint = &aSP;
       trackNodes.push_back(trackNode);
 
@@ -137,15 +139,14 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
         iter->hits.push_back(trackNode);
       }
 
-    }
-  }
+    } // loop over SpacePoints in StoreArray
+  } // loop over StoreArrays
 
   // store IP-coordinates
   if (m_PARAMAddVirtualIP == true) {
     m_network->setVirtualInteractionPoint(); // TODO pass relevant parameters!
     TrackNode* vIP = m_network->getVirtualInteractionPoint();
     StaticSectorDummy* sectorFound = findSectorForSpacePoint(*vIP->spacePoint);
-//  vIP->sector = sectorFound;
     collectedData.push_back({FullSecID(), false, NULL, sectorFound, {vIP}}); // TODO: which FullSecID for the vIP?
   }
 
@@ -167,14 +168,11 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
     ActiveSector<StaticSectorDummy, TrackNode>* outerSector = new ActiveSector<StaticSectorDummy, TrackNode>
     (outerSectorData.staticSector);
 
-    // keep track if there are inner sectors with hits in them:
-    bool hadValidInnerSectors = false;
-
+    // skip double-adding of nodes into the network after first iteration -> speeding up the code:
+    bool isFirstIteration = true;
     // find innerSectors of outerSector and add them to the network:
     const std::vector<FullSecID>& innerSecIDs = outerSector->getInnerSecIDs();
 
-    // skip double-adding of nodes into the network after first iteration -> speeding up the code:
-    bool isFirstIteration = true;
     for (const FullSecID innerSecID : innerSecIDs) {
       vector<RawSectorData>::iterator pos =
         std::find_if(
@@ -184,20 +182,10 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
       { return (entry.wasCreated == false) and (entry.secID == innerSecID); }
         );
 
+      // current inner sector has no SpacePoints in this event:
       if (pos == collectedData.end()) { continue; }
 
-      // when accepting combination the first time, take care of outer sector:
-      if (hadValidInnerSectors == false) {
-        hadValidInnerSectors = true;
-        outerSectorData.wasCreated = true;
-        outerSectorData.sector = outerSector;
-        for (auto* hit : outerSectorData.hits) { hit->sector = outerSector; }
-        // add all SpacePoints of this sector to ActiveSector:
-        outerSector->addHits(outerSectorData.hits);
-        activeSectors.push_back(outerSector);
-      }
-
-      // take care of inner sector:
+      // take care of inner sector first:
       ActiveSector<StaticSectorDummy, TrackNode>* innerSector = NULL;
       if (pos->wasCreated) { // was already there
         innerSector = pos->sector;
@@ -211,16 +199,24 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         activeSectors.push_back(innerSector);
       }
 
-      if (isFirstIteration) { // TODO: could be merged with the hadValidInnerSectors-part, since it is not important, which of the sectors was added first to the activeSectors-vector!
+      // when accepting combination the first time, take care of outer sector:
+      if (isFirstIteration) {
+        outerSectorData.wasCreated = true;
+        outerSectorData.sector = outerSector;
+        for (auto* hit : outerSectorData.hits) { hit->sector = outerSector; }
+        // add all SpacePoints of this sector to ActiveSector:
+        outerSector->addHits(outerSectorData.hits);
+        activeSectors.push_back(outerSector);
+
         activeSectorNetwork.linkTheseEntries(*outerSector, *innerSector);
-        isFirstIteration = true;
+        isFirstIteration = false;
         continue;
       }
       activeSectorNetwork.addInnerToLastOuterNode(*innerSector);
     } // inner sector loop
 
     // discard outerSector if no valid innerSector could be found
-    if (hadValidInnerSectors == false) { delete outerSector; }
+    if (isFirstIteration == true) { delete outerSector; }
     /** WARNING this could lead to the situation, that a sector can be created twice! (but time consuming hit-adding will only be done once)
      * - once as an innerEnd of a network, where it gets deleted here, since no valid inner Sectors exist
      * - then again when it is the innerSector of another outer one! shall this be optimized?
@@ -230,7 +226,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 
 
 /** old name: segFinder. use SpacePoints stored in ActiveSectors to store and link them in a DirectedNodeNetwork< SpacePoint > */
-void SegmentNetworkProducerModule::buildSpacePointNetwork()
+void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 {
   // TODO add counters!
   DirectedNodeNetwork<ActiveSector<StaticSectorDummy, Belle2::TrackNode>>& activeSectorNetwork =
@@ -321,7 +317,6 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         }
 
         // store combination of hits in network:
-
         if (isFirstIteration) {
           // create outerSector:
           Segment<TrackNode>* outerSegment = new Segment<TrackNode>(

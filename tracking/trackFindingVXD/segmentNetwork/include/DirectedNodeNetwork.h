@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-  /// TODO optimize: the way this pseudo code is written, there is a high probability that Segments are recreated (and detected by the network) several times.
+  /// TODO optimize: the way this code is written, there is a high probability that Segments are recreated (and detected by the network) several times.
   /// since the network can handle them, it is not utterly wrong (because the results are fine and no clones will be stored) but it definitely costs some time.
 
   /** A network container where the nodes can carry any entryType.
@@ -104,11 +104,11 @@ namespace Belle2 {
     }
 
 
-    /** checks whether given 'toBeFound' is already in the vector of pointers to something.
-    * returns iterator of toBeFound if found, returns givenVector.rend() if not
+    /** checks whether given 'toBeFound' is already in the network.
+    * returns iterator of toBeFound if found, returns m_nodes.rend() if not
     * WARNING This part is commented out until ROOT 6 is there! */
 //  template<class AnyType>
-//  typename std::vector<std::unique_ptr<DirectedNode<EntryType>> >::reverse_iterator isInVectorOfPtrs(const AnyType& toBeFound)
+//  typename std::vector<std::unique_ptr<DirectedNode<EntryType>> >::reverse_iterator isInNetwork(const AnyType& toBeFound)
 //  {
 //    return std::find_if(m_nodes.rbegin(),
 //              m_nodes.rend(),
@@ -120,10 +120,10 @@ namespace Belle2 {
 //  }
 
 
-    /** checks whether given 'toBeFound' is already in the vector of pointers to something.
-    * returns iterator of toBeFound if found, returns givenVector.rend() if not */
+    /** checks whether given 'toBeFound' is already in the network.
+    * returns iterator of toBeFound if found, returns m_nodes.rend() if not */
     template<class AnyType>
-    typename std::vector< DirectedNode<EntryType>* >::reverse_iterator isInVectorOfPtrs(const AnyType& toBeFound)
+    typename std::vector< DirectedNode<EntryType>* >::reverse_iterator isInNetwork(const AnyType& toBeFound)
     {
       return std::find_if(m_nodes.rbegin(),
                           m_nodes.rend(),
@@ -183,7 +183,7 @@ namespace Belle2 {
     bool addToExistingNode(DirectedNode<EntryType>* existingNode, EntryType& newEntry, bool newIsInner)
     {
       // check if entry is already in network.
-      auto nodeIter = isInVectorOfPtrs(newEntry);
+      auto nodeIter = isInNetwork(newEntry);
 
       DirectedNode<EntryType>* outerNode = NULL;
       DirectedNode<EntryType>* innerNode = NULL;
@@ -191,7 +191,7 @@ namespace Belle2 {
       // assign nodePointers, create new nodes if needed:
       if (newIsInner) {
         outerNode = existingNode;
-        if (nodeIter == m_nodes.rend()) {
+        if (nodeIter == m_nodes.rend()) { // new node was not in network yet
           innerNode = &addNode(newEntry);
 
           auto iterPos = std::find(m_innerEnds.begin(), m_innerEnds.end(), outerNode->getIndex());
@@ -282,8 +282,8 @@ namespace Belle2 {
     void linkTheseEntries(EntryType& outerEntry, EntryType& innerEntry)
     {
       // check if entries are already in network.
-      auto outerNodeIter = isInVectorOfPtrs(outerEntry);
-      auto innerNodeIter = isInVectorOfPtrs(innerEntry);
+      auto outerNodeIter = isInNetwork(outerEntry);
+      auto innerNodeIter = isInNetwork(innerEntry);
 
       /** case 1: none of the entries are added yet:
        *  create nodes for both and link with each other, where outerEntry will be carried by outer node and inner entry by inner node
@@ -349,20 +349,20 @@ namespace Belle2 {
         return;
       }
 
-      /** case: both are already in the network ... */
+      /** case 4: both are already in the network ... */
       DirectedNode<EntryType>& outerNode = **outerNodeIter;
-      bool wasInnermostNode = (outerNode.getInnerNodes().size() == 0) ? true : false;
+      bool wasInnermostNode = (outerNode.getInnerNodes().empty()) ? true : false;
       DirectedNode<EntryType>& innerNode = **innerNodeIter;
-      bool wasOutermostNode = (innerNode.getOuterNodes().size() == 0) ? true : false;
+      bool wasOutermostNode = (innerNode.getOuterNodes().empty()) ? true : false;
 
       bool wasSuccessful = linkNodes(outerNode, innerNode);
 
-      /** ... but were not linked to each other yet:
-       *  add innerNode to existing outerNode
-       *  add outerNode to existing innerNode
-       *  if innerNode was in outerEnds before, replace old one with new outerNode
-       *  if outerNode was in innerEnds before, replace old one with new innerNode
-       * */
+      /** case 4A: ... but were not linked to each other yet:
+         *  add innerNode to existing outerNode
+         *  add outerNode to existing innerNode
+         *  if innerNode was in outerEnds before, replace old one with new outerNode
+         *  if outerNode was in innerEnds before, replace old one with new innerNode
+         * */
       if (wasSuccessful) {
         m_lastInnerNode = &innerNode;
         m_lastOuterNode = &outerNode;
@@ -382,7 +382,7 @@ namespace Belle2 {
         return;
       }
 
-      /** case: both are already there and already linked: */
+      /** case 4B: both are already there and already linked: */
       B2ERROR("DirectedNodeNetwork::linkTheseEntries(): outerEntry and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!")
     }
 
@@ -416,7 +416,7 @@ namespace Belle2 {
     /** returns pointer to the node carrying the entry which is equal to given parameter. If no fitting entry was found, NULL is returned. */
     DirectedNode<EntryType>* getNode(EntryType& toBeFound)
     {
-      auto iter = isInVectorOfPtrs(toBeFound);
+      auto iter = isInNetwork(toBeFound);
       if (iter == m_nodes.rend()) return NULL;
 //    return iter->get();
       return *iter;

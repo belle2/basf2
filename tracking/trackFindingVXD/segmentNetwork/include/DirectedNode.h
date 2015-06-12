@@ -133,6 +133,8 @@ namespace Belle2 {
     /** allows const access to stored entry (needed for external operator overload */
     const EntryType& getConstEntry() const { return m_entry; }
 
+
+    /** returns Pointer to this node */
     DirectedNode<EntryType>* getPtr() { return this; }
   };
 

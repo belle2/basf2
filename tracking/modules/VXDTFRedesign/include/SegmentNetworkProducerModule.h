@@ -49,7 +49,6 @@ namespace Belle2 {
 
       std::vector<StaticSectorDummy*> sectors;
 
-
       ~StaticSectorMap()
       {
         for (auto* aSector : sectors) { delete aSector; }
@@ -182,8 +181,8 @@ namespace Belle2 {
     void buildActiveSectorNetwork(std::vector< RawSectorData >& collectedData);
 
 
-    /** old name: segFinder. use SpacePoints stored in ActiveSectors to build SpacePoints which will stored and linked in a DirectedNodeNetwork< SpacePoint > */
-    void buildSpacePointNetwork();
+    /** old name: segFinder. use SpacePoints stored in ActiveSectors to build SpacePoints which will stored and linked in a DirectedNodeNetwork< TrackNode > */
+    void buildTrackNodeNetwork();
 
 
     /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment > */

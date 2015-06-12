@@ -166,6 +166,16 @@ def SetModeCode(mode='Expert'):
     else:
         ModeCode = 0
 
+# Get the global ModeCode
+
+
+def GetModeCode():
+    global ModeCode
+    if ModeCode == 1:
+        return 1
+    else:
+        return 0
+
 # Directory where the weights of the trained Methods are saved
 workingDirectory = os.environ['BELLE2_LOCAL_DIR'] \
     + '/analysis/data/FlavorTagging/TrainedMethods'

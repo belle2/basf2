@@ -85,6 +85,17 @@ class StandardTrackingReconstructionModule(metamodules.PathModule):
         super(StandardTrackingReconstructionModule, self).__init__(path)
 
 
+class Printer(metamodules.WrapperModule):
+
+    """
+    Add the PrintCollections modules to the path.
+    This metamodule is just for convenience.
+    """
+
+    def __init__(self):
+        metamodules.WrapperModule.__init__(self, StandardEventGenerationRun.get_basf2_module("PrintCollections"))
+
+
 class CDCFullFinder(metamodules.PathModule):
 
     """
@@ -95,6 +106,7 @@ class CDCFullFinder(metamodules.PathModule):
     ----------
     output_track_cands_store_array_name: The name for output of the genfit::TrackCands
     tmva_cut: the cut for the BackgroundHitFinder
+    stereo_tmva_cut: the cut for the StereoSegmentTrackMatcher
     """
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
@@ -105,10 +117,38 @@ class CDCFullFinder(metamodules.PathModule):
                 tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
                 debug_output=False), CDCStereoSegmentTrackMatcher(
-                    output_track_cands_store_array_name=output_track_cands_store_array_name, filter="tmva",
-                    tmva_cut=stereo_tmva_cut)]
+                    output_track_cands_store_array_name=output_track_cands_store_array_name, tmva_cut=stereo_tmva_cut)]
 
-        super(CDCFullFinder, self).__init__(modules=modules)
+        metamodules.PathModule.__init__(self, modules=modules)
+
+
+class CDCNaiveFinder(metamodules.PathModule):
+
+    """
+    Full finder with naive combiner in the end. Can use MC-Information
+
+    Attributes
+    ---------_
+    output_track_cands_store_array_name: The name for output of the genfit::TrackCands
+    tmva_cut: the cut for the BackgroundHitFinder
+    stereo_tmva_cut: the cut for the StereoSegmentTrackMatcher
+    """
+
+    def __init__(self, output_track_cands_store_array_name="TrackCands",
+                 tmva_cut=0.1, stereo_tmva_cut=0.9, use_mc_information=False):
+
+        full_finder = CDCFullFinder(tmva_cut=tmva_cut, output_track_cands_store_array_name=None, stereo_tmva_cut=stereo_tmva_cut)
+        modules = full_finder._path.modules()
+        modules.append(
+            StandardEventGenerationRun.get_basf2_module(
+                "NaiveCombiner",
+                SkipHitsPreparation=True,
+                TracksStoreObjNameIsInput=True,
+                WriteGFTrackCands=True,
+                GFTrackCandsStoreArrayName=output_track_cands_store_array_name,
+                UseMCInformation=use_mc_information))
+
+        metamodules.PathModule.__init__(self, modules=modules)
 
 
 class CDCBackgroundHitFinder(metamodules.WrapperModule):
@@ -372,7 +412,7 @@ class CDCFitter(metamodules.PathModule):
                                                                         GFTracksColName=output_tracks_store_array_name,
                                                                         BuildBelle2Tracks=False)
 
-        gen_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
+        # gen_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
 
         track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder',
                                                                     GFTracksColName=output_tracks_store_array_name,
@@ -415,7 +455,23 @@ class CDCMCFiller(basf2.Module):
     """ Fill the later needed mc information """
 
     def event(self):
-        Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+        Belle2.TrackFindingCDC.CDCMCManager.getInstance().fill()
+
+
+class CDCMCMatcher(metamodules.WrapperModule):
+
+    def __init__(self, mc_track_cands_store_array_name="MCTrackCands",
+                 track_cands_store_array_name="TrackCands"):
+
+        mc_track_matcher_module = StandardEventGenerationRun.get_basf2_module('MCTrackMatcher',
+                                                                              UseCDCHits=True,
+                                                                              UseSVDHits=False,
+                                                                              UsePXDHits=False,
+                                                                              RelateClonesToMCParticles=True,
+                                                                              MCGFTrackCandsColName=mc_track_cands_store_array_name,
+                                                                              PRGFTrackCandsColName=track_cands_store_array_name)
+
+        metamodules.WrapperModule.__init__(self, module=mc_track_matcher_module)
 
 
 class CDCStereoSegmentTrackMatcher(metamodules.WrapperModule):
@@ -436,7 +492,7 @@ class CDCStereoSegmentTrackMatcher(metamodules.WrapperModule):
     def __init__(self, output_track_cands_store_array_name=None,
                  track_cands_store_vector_name="CDCTrackVector",
                  segments_store_vector_name="CDCRecoSegment2DVector",
-                 filter="all", tmva_cut=0.9):
+                 filter="tmva", tmva_cut=0.9):
         matcher_module = StandardEventGenerationRun.get_basf2_module("StereoSegmentTrackMatcherDev", WriteGFTrackCands=False,
                                                                      SkipHitsPreparation=True,
                                                                      TracksStoreObjNameIsInput=True,

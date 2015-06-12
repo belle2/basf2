@@ -326,7 +326,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     if list_of_plotuples:
         rootfile = strip_ext(list_of_plotuples[0].rootfile)
     else:
-        return ['<strong>List of Plotuples was empty!</strong><br><br>']
+        return ['<strong>List of Plottuples was empty!</strong><br><br>']
 
     # get description and p_value for every plot, we actually don't need
     # the list, we are working with descriptions, pvalues and keys only
@@ -1642,7 +1642,7 @@ class Plotuple:
             html.append('<a href="./plots/{0}.pdf">'
                         '<img src="./plots/{0}.png"></a>\n'
                         .format(self.file))
-            print '\n'+self.file+'\n'
+            print '\n' + self.file + '\n'
 
         html.append('</div>\n')
 

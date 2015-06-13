@@ -12,6 +12,7 @@
 #include <analysis/TMVAInterface/Method.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
+#include <boost/version.hpp>
 
 #include <vector>
 #include <string>

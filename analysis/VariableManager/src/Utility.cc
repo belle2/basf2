@@ -2,8 +2,9 @@
 #include <analysis/VariableManager/Manager.h>
 #include <framework/logging/Logger.h>
 
+#include <string>
+
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
 #include <iostream>
@@ -76,9 +77,13 @@ void Belle2::Variable::Cut::init(Parameter str)
       if (not processBinaryNumericConditions(str)) {
         operation = NONE;
         try {
-          number = boost::lexical_cast<float>(str);
+          std::string::size_type n;
+          number = std::stof(str, &n);
+          if (n != str.size()) {
+            B2WARNING("Could only parse a part of the given string " << str << " to a numeric value " << number);
+          }
           isNumeric = true;
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           isNumeric = false;
           Variable::Manager& manager = Variable::Manager::Instance();
           var = manager.getVariable(str);

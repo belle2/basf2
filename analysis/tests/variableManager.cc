@@ -224,6 +224,36 @@ namespace {
     EXPECT_FALSE(a.check(nullptr));
     a.init("1 < 2 or 3 == 4 and 5 > 6");
     EXPECT_TRUE(a.check(nullptr));
+
+    a.init("15 != 0x15");
+    EXPECT_TRUE(a.check(nullptr));
+
+    a.init("15 == 0xF");
+    EXPECT_TRUE(a.check(nullptr));
+
+    // Should give an warning but should work
+    EXPECT_B2WARNING(a.init("15 == 15.0 bla"));
+    EXPECT_TRUE(a.check(nullptr));
+
+    a.init("1e-3 < 1e3");
+    EXPECT_TRUE(a.check(nullptr));
+
+    a.init("1e-3 == 0.001");
+    EXPECT_TRUE(a.check(nullptr));
+
+    a.init("1000 < infinity");
+    EXPECT_TRUE(a.check(nullptr));
+
+    a.init("1000 > infinity");
+    EXPECT_FALSE(a.check(nullptr));
+
+    a.init("1000 < nan");
+    EXPECT_FALSE(a.check(nullptr));
+
+    a.init("1000 > nan");
+    EXPECT_FALSE(a.check(nullptr));
+
+
   }
 
   TEST(VariableTest, makeROOTCompatible)

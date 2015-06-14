@@ -532,7 +532,7 @@ namespace Belle2 {
       // Get the shift of one half-sector relative to the other in the G4UnionSolid's reference frame
       double dr = sqrt(wo * wo + (k_barCryInnerR * k_barCryInnerR - Q1.mag2())) - wo - ri;
       G4ThreeVector halfSectorShift(dr * cos(-0.5 * dPhi), dr * sin(-0.5 * dPhi), 0.0);
-      G4RotationMatrix* halfSectorRotate = new G4RotationMatrix(-0.5 * dPhi, 0.0, 0.0);
+      G4RotationMatrix halfSectorRotate(-0.5 * dPhi, 0.0, 0.0);
       // Construct the (displaced) origin of the tilted full sector
       G4ThreeVector Q2 = Q0 + u1 * (Q0 * (v1 - v3) / sin(dPhi));
 
@@ -550,7 +550,7 @@ namespace Belle2 {
                                                           crystalContainer_Z, crystalContainer_I, crystalContainer_O);
       G4UnionSolid* crystalSectorSolid = new G4UnionSolid("eclBarrelCrystalSectorSolid",
                                                           crystalHalfSectorSolid, crystalHalfSectorSolid,
-                                                          halfSectorRotate, halfSectorShift);
+                                                          &halfSectorRotate, halfSectorShift);
       G4LogicalVolume* crystalSectorLogical = new G4LogicalVolume(crystalSectorSolid, medAir, "eclBarrelCrystalSectorLogical");
       // Cannot use G4PVParameterised(): incompatible with TGeo and VGM. So make 72 placed copies instead.
       // BarrelSectorParameterisation* barrelSectorParameterisation = new BarrelSectorParameterisation(TrSector, nSectors);

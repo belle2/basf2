@@ -12,12 +12,8 @@
 #include <ecl/modules/eclElectronId/ECLElectronIdModule.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
-#include <framework/datastore/RelationIndex.h>
-#include <G4ParticleTable.hh>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <ecl/electronId/ECLMuonPdf.h>
@@ -53,7 +49,6 @@ void ECLElectronIdModule::initialize()
   ECLPidLikelihoodArray.registerInDataStore();
   Tracks.registerRelationTo(ECLPidLikelihoodArray);
 
-
   string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
   string muParams = FileSystem::findFile("/data/ecl/muons.dat");
   string piParams = FileSystem::findFile("/data/ecl/pions.dat");
@@ -81,11 +76,16 @@ void ECLElectronIdModule::event()
     const Track* track = Tracks[t];
     auto relShowers = track->getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
-    double energy(0);
+    double energy(0), maxEnergy(0), e9e25(0);
     int nCrystals(0);
     int nClusters(relShowers.size());
     for (auto sh : relShowers) {
-      energy += sh.GetEnergy();
+      double shEnergy = sh.GetEnergy();
+      energy += shEnergy;
+      if (shEnergy > maxEnergy) {
+        maxEnergy = shEnergy;
+        e9e25 = sh.GetE9oE25();
+      }
       nCrystals += int(sh.getNHits());
     }
     float likelihoods [ Const::ChargedStable::c_SetSize ] ;
@@ -107,18 +107,7 @@ void ECLElectronIdModule::event()
 
     } // end loop on hypo
 
-    //    track-> addRelationTo(ecllogL.appendNew(ECLPidLikelihood(likelihoods)));
-    track-> addRelationTo(ecllogL.appendNew(likelihoods, energy, eop, 0, nCrystals, nClusters));
-
-    /*
-    RelationVector<ECLPidLikelihood> rel = track->getRelationsTo<ECLPidLikelihood>();
-    int pos = rel.size();
-    const ECLPidLikelihood* data = rel[pos-1];
-    cout << "Relation n. " << pos
-    << " added. Track = " << track << " eclpidlikelihood = " << data
-    << endl;
-    */
-
+    track-> addRelationTo(ecllogL.appendNew(likelihoods, energy, eop, e9e25, nCrystals, nClusters));
   } // end loop on Tracks
 }
 

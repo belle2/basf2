@@ -89,9 +89,6 @@ namespace Belle2 {
       void readErrorMatrix7x7(double Energy, double Theta,
                               double Phi, TMatrixFSym& ErrorMatrix);
 
-      /** read Extrapolate CellID */
-      void readExtrapolate();
-
       /**calculate Px using Energy, Theta and Phi */
       float Px(double Energy, double Theta, double Phi);
 

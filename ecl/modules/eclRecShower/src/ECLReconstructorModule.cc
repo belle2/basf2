@@ -64,7 +64,7 @@ REG_MODULE(ECLReconstructor)
 ECLReconstructorModule::ECLReconstructorModule() : Module()
 {
   //Set module properties
-  setDescription("Creates ECLRecShower from ECLDigi.");
+  setDescription("Creates ECLShower from ECLDigi and ECLCluster from ECLShower and Relations among them.");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -83,20 +83,15 @@ void ECLReconstructorModule::initialize()
   // CPU time start
   m_timeCPU = clock() * Unit::us;
 
-  // Get tracks.
-  StoreArray<Track> TrackArray;
-
   // ECL relevant objects.
   StoreArray<ECLHitAssignment> HitAssignArray;
   StoreArray<ECLShower> ECLShowerArray;
   StoreArray<ECLCluster> ECLClusterArray;
+
   HitAssignArray.registerInDataStore();
   ECLShowerArray.registerInDataStore();
   ECLClusterArray.registerInDataStore();
-  // ECL related relations.
-  ECLClusterArray.registerRelationTo(TrackArray);
   ECLClusterArray.registerRelationTo(ECLShowerArray);
-
 }
 
 void ECLReconstructorModule::beginRun()
@@ -113,11 +108,6 @@ void ECLReconstructorModule::event()
     B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
     return;
   }
-
-
-  // Get extrapolated track information.
-  readExtrapolate();
-  StoreArray<Track> Tracks;
 
   cout.unsetf(ios::scientific);
   cout.precision(6);
@@ -214,7 +204,7 @@ void ECLReconstructorModule::event()
       eclRecShowerArray[m_hitNum]->setStatus((*iShower).second.Status());
       eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
       eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
-
+      eclRecShowerArray[m_hitNum]->setTime((float) v_TIME);
       double sTheta = (*iShower).second.Theta();
       // In ECLShower convention, off-diagonals are ignored.
       float ErrorMatrix[3] = {
@@ -236,26 +226,14 @@ void ECLReconstructorModule::event()
 
       // Fill ECLCluster here
       // RelationArray ECLClustertoShower has been removed.
+
+
       StoreArray<ECLCluster> eclMdstArray;
       if (!eclMdstArray) eclMdstArray.create();
       // Loose timing cut is applied. 20150529 K.Miyabayashi
       if (-300.0 < v_TIME && v_TIME < 200.0) {
         eclMdstArray.appendNew();
         int i_Mdst = eclMdstArray.getEntries() - 1;
-
-        // Simple match with tracks.
-        int v_NofTracks = 0;
-        std::vector<MEclCFShowerHA> HAs = iSh.HitAssignment();
-        for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
-             iHA != HAs.end(); ++iHA) {
-          RelationArray ECLClustertoTracks(eclMdstArray, Tracks);
-          if (m_TrackCellId[iHA->Id()] >= 0) {
-            // Implemented 20140516
-            const Track*  v_track = Tracks[m_TrackCellId[iHA->Id()]];
-            eclMdstArray[i_Mdst]->addRelationTo(v_track);
-            ++v_NofTracks;
-          }// End of if branch to see matching with tracks.
-        }// End of loop over ShowerHitAssociateion, HA.
 
         eclMdstArray[i_Mdst]->setError(Mdst_Error);
         eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
@@ -265,13 +243,7 @@ void ECLReconstructorModule::event()
         eclMdstArray[i_Mdst]->setR((float)(*iShower).second.Distance());
         eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
         eclMdstArray[i_Mdst]->setEnedepSum((float)(*iShower).second.UncEnergy());
-
-        // To check if matches with charged tracks or not
-        bool v_isTrack = false;
-        if (v_NofTracks > 0) {v_isTrack = true;}
-        else { v_isTrack = false;}
-        eclMdstArray[i_Mdst]->setisTrack(v_isTrack);
-        eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
+        eclMdstArray[i_Mdst]->setNofCrystals((*iShower).second.NHits());
         eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
 
         //Object for relation of ECLShower to ECLCLuster
@@ -281,6 +253,7 @@ void ECLReconstructorModule::event()
         eclMdstArray[i_Mdst]->addRelationTo(eclshower);
         //..... ECLCluster is completed here......
       }// End of timing cut branch.
+
       nShower++; // Increment counter for ECLShower.
     }//EclCFShowerMap
   }//vector<TEclCFCR>
@@ -454,6 +427,7 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
 // Copied from ECLGammaReconstructorModule to avoid dependency
 // Vishal, One way is to use ECLTrackShowerMatchModule but I simply use
 // funciton here
+/*
 void ECLReconstructorModule::readExtrapolate()
 {
   for (int i = 0; i < 8736; i++) {
@@ -483,6 +457,8 @@ void ECLReconstructorModule::readExtrapolate()
   }//if extTrackCands
 
 }
+
+*/
 //.................................................
 
 

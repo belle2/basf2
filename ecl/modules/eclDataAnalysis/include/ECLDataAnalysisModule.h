@@ -212,6 +212,9 @@ namespace Belle2 {
     std::vector<double>* m_trkPx;
     std::vector<double>* m_trkPy;
     std::vector<double>* m_trkPz;
+    std::vector<double>* m_trkP;
+    std::vector<double>* m_trkTheta;
+    std::vector<double>* m_trkPhi;
     std::vector<double>* m_trkX;
     std::vector<double>* m_trkY;
     std::vector<double>* m_trkZ;

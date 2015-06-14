@@ -180,6 +180,9 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_trkPx(0),
     m_trkPy(0),
     m_trkPz(0),
+    m_trkP(0),
+    m_trkTheta(0),
+    m_trkPhi(0),
     m_trkX(0),
     m_trkY(0),
     m_trkZ(0),
@@ -320,8 +323,8 @@ void ECLDataAnalysisModule::initialize()
   StoreArray<ECLHit>::required();
   StoreArray<ECLShower>::required();
   StoreArray<ECLCluster>::required();
-  StoreArray<ECLGamma>::required();
-  StoreArray<ECLPi0>::required();
+  // StoreArray<ECLGamma>::required();
+  // StoreArray<ECLPi0>::required();
   StoreArray<MCParticle>::required();
 
   if (m_doTracking == true) {
@@ -465,6 +468,9 @@ void ECLDataAnalysisModule::initialize()
   m_trkPx = new std::vector<double>();
   m_trkPy = new std::vector<double>();
   m_trkPz = new std::vector<double>();
+  m_trkP  = new std::vector<double>();
+  m_trkTheta = new std::vector<double>();
+  m_trkPhi = new std::vector<double>();
   m_trkX = new std::vector<double>();
   m_trkY = new std::vector<double>();
   m_trkZ = new std::vector<double>();
@@ -621,6 +627,9 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("trkPx",         "std::vector<double>", &m_trkPx);
     m_tree->Branch("trkPy",         "std::vector<double>", &m_trkPy);
     m_tree->Branch("trkPz",         "std::vector<double>", &m_trkPz);
+    m_tree->Branch("trkP",         "std::vector<double>", &m_trkP);
+    m_tree->Branch("trkTheta",         "std::vector<double>", &m_trkTheta);
+    m_tree->Branch("trkPhi",         "std::vector<double>", &m_trkPhi);
     m_tree->Branch("trkPosx",       "std::vector<double>", &m_trkX);
     m_tree->Branch("trkPosy",       "std::vector<double>", &m_trkY);
     m_tree->Branch("trkPosz",      "std::vector<double>",  &m_trkZ);
@@ -701,7 +710,9 @@ void ECLDataAnalysisModule::event()
   m_mcSecondaryPhysProc->clear();
 
   m_trkIdx->clear();
-  m_trkPdg->clear();  m_trkCharge->clear();   m_trkPx->clear();  m_trkPy->clear();  m_trkPz->clear();
+  m_trkPdg->clear();  m_trkCharge->clear();
+  m_trkPx->clear();  m_trkPy->clear();  m_trkPz->clear();
+  m_trkPhi->clear();  m_trkTheta->clear();  m_trkPhi->clear();
   m_trkX->clear();  m_trkY->clear();  m_trkZ->clear();
 
   m_eclpidtrkIdx->clear(); m_eclpidEnergy->clear();   m_eclpidEop->clear();   m_eclpidE9E25->clear();   m_eclpidNCrystals->clear();
@@ -1069,6 +1080,10 @@ void ECLDataAnalysisModule::event()
       m_trkPy->push_back(atrk->getMomentum().Y());
       m_trkPz->push_back(atrk->getMomentum().Z());
 
+      m_trkP->push_back(atrk->getMomentum().Mag());
+      m_trkTheta->push_back(atrk->getMomentum().Theta());
+      m_trkPhi->push_back(atrk->getMomentum().Phi());
+
       m_trkX->push_back(atrk->getPosition().X());
       m_trkY->push_back(atrk->getPosition().Y());
       m_trkZ->push_back(atrk->getPosition().Z());
@@ -1086,7 +1101,7 @@ void ECLDataAnalysisModule::event()
         m_eclLogLikeMu -> push_back(eclpid-> getLogLikelihood(Const::muon));
         m_eclLogLikePi -> push_back(eclpid-> getLogLikelihood(Const::pion));
       } else {
-        m_eclpidtrkIdx -> push_back(-1);
+        m_eclpidtrkIdx -> push_back(m_trkMultip);
         m_eclpidEnergy -> push_back(0);
         m_eclpidEop    -> push_back(0);
         m_eclpidE9E25  -> push_back(0);

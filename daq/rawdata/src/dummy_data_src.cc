@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -11,6 +12,8 @@
 #define NWORDS_PER_COPPER 48 // 16 -> 1kB/16COPER
 #define LISTENQ 1
 #define SERVER
+
+using namespace std;
 
 double getTimeSec()
 {
@@ -38,7 +41,8 @@ void fillDataContents(int* buf, int nwords, unsigned int node_id)
   //
   offset = 6;
   buf[ offset +  0 ] = nwords - 6 - 2;
-  buf[ offset +  1 ] = 0x7f7f010c;
+  //  buf[ offset +  1 ] = 0x7f7f010c;
+  buf[ offset +  1 ] = 0x7f7f820c;
   buf[ offset +  2 ] = exp_run;
   unsigned int ctime = 0x12345601;
   buf[ offset +  4 ] = ctime;
@@ -164,10 +168,10 @@ int main(int argc, char** argv)
   fillDataContents(buff, total_words, node_id);
 
 
-//  for(int i = 0 ; i < total_words ; i++){
-//     printf("%.8x ", buff[ i ]);
-//     if( i % 10 == 9 ) printf("\n");
-//   }
+  //  for(int i = 0 ; i < total_words ; i++){
+  //     printf("%.8x ", buff[ i ]);
+  //     if( i % 10 == 9 ) printf("\n");
+  //   }
 
 #ifdef SERVER
   listenfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -190,10 +194,10 @@ int main(int argc, char** argv)
   printf("Done."); fflush(stdout);
 #else
 
-//   if( argc != 3 ){
-//     printf("Usage : %s <IPaddress> <port>\n", argv[0]);
-//     exit(1);
-//   }
+  //   if( argc != 3 ){
+  //     printf("Usage : %s <IPaddress> <port>\n", argv[0]);
+  //     exit(1);
+  //   }
 
   if ((connfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("socket error");
@@ -230,19 +234,23 @@ int main(int argc, char** argv)
   unsigned long long int prev_cnt = 0;
   unsigned long long int start_cnt = 300000;
   for (;;) {
-
     addEvent(buff, total_words, cnt);
     //    printf("cnt %d bytes\n", cnt*total_words); fflush(stdout);
     //    sprintf( buff, "event %d dessa", cnt );
-    write(connfd, buff, total_words * sizeof(int));
-    //    usleep(100000);
+    int ret = 0;
+    if ((ret = write(connfd, buff, total_words * sizeof(int))) <= 0) {
+      printf("[FATAL] Return value %d\n", ret);
+      fflush(stdout);
+      exit(1);
+    }
+
     cnt++;
 
     if (cnt == start_cnt) init_time = getTimeSec();
     if (cnt % 10000 == 1) {
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
-        printf("raun %d evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+        printf("run %d evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
                run_no,
                cnt,
                cur_time - init_time,
@@ -254,12 +262,10 @@ int main(int argc, char** argv)
         fflush(stdout);
         prev_time = cur_time;
         prev_cnt = cnt;
-        if (cur_time - init_time > 120) exit(1);
       } else {
         //  printf("Eve %lld\n", cnt);fflush(stdout);
       }
     }
-
   }
   close(connfd);
 }

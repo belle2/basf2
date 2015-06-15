@@ -23,8 +23,8 @@
 #include "trg/trg/Debug.h"
 #include "trg/trg/State.h"
 #include "trg/trg/Channel.h"
-#include "trg/cdc/Wire.h"
 #include "trg/cdc/TRGCDC.h"
+#include "trg/cdc/Wire.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/Tracker2D.h"
 #include "trg/cdc/TrackSegmentFinder.h"
@@ -33,17 +33,35 @@ using namespace std;
 
 namespace Belle2 {
 
-unsigned
-TRGCDCTracker2D::nTSFs(void) {
-    return (160 + 160 + 192 + 224 + 256 + 288 + 320 + 352 + 384) / 2 ;
-}
+TRGState TRGCDCTracker2D::_ts(160 + 192 + 256 + 320 + 384);
 
 TRGCDCTracker2D::TRGCDCTracker2D(const std::string & name,
                                  const TRGClock & systemClock,
                                  const TRGClock & dataClock,
                                  const TRGClock & userClockInput,
                                  const TRGClock & userClockOutput)
-    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput) {
+    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
+      _nTSF(0) {
+
+    //...# of TSFs...
+    const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+    for (unsigned i = 0; i < 9; i++) {
+        const unsigned n = cdc.nSegments(i);
+        _n.push_back(n);
+        _nTSF += n;
+    }
+
+    //...Consistency check...
+    if (_nTSF != nTSF())
+        cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
+             << endl;
+    for (unsigned i = 0; i < 5; i++)
+        if (_n[i] != nTSF(i))
+            cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
+                 << endl;
+    if (_n[0] != _ts.size())
+        cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
+             << endl;
 }
 
 TRGCDCTracker2D::~TRGCDCTracker2D() {
@@ -98,7 +116,7 @@ TRGCDCTracker2D::simulate(void) {
                                                 clockData(),
                                                 isb,
                                                 256,
-                                                nTSFs() * 16,
+                                                _nTSF / 2 * 16,
                                                 TCTracker2D::packer);
     output(0)->signal(osb);
 
@@ -120,7 +138,7 @@ TCTracker2D::packer(const TRGState & input,
     //   ...
 
     //...Shift registers (TSF hit history pipe)...
-    for (unsigned i = 0; i < nTSFs(); i++) {
+    for (unsigned i = 0; i < nTSF() / 2; i++) {
         TRGState s = registers.subset(i * 16, 16);
         s.shift(1);
         registers.set(i * 16, s);
@@ -130,7 +148,11 @@ TCTracker2D::packer(const TRGState & input,
     //   Get TSF hit information. The drift time information is ignored.
     unpacker(input, registers);
 
+    //...Make TSF hit...
+    hitInformation(registers);
+
     //...Do core logic...
+    HoughMapping();
 
     //...Make output...
     logicStillActive = registers.active();
@@ -173,6 +195,41 @@ TCTracker2D:: unpacker(const TRGState & input,
     }
 
     TRGDebug::leaveStage(sn);
+}
+
+void
+TCTracker2D::hitInformation(const TRGState & registers) {
+
+    //...Clear info...
+    _ts.clear();
+
+    //...Set TSF hit information...
+    for (unsigned i = 0; i < nTSF(); i++) {
+        bool active = registers.subset(i * 16, 16).active();
+        if (active)
+            _ts.set(i, true);
+    }
+}
+
+unsigned
+TCTracker2D::nTSF(void) {
+    return 160 + 192 + 256 + 320 + 384;
+}
+
+unsigned
+TCTracker2D::nTSF(unsigned i) {
+    if (i == 0)
+        return 160;
+    else if (i == 1)
+        return 192;
+    else if (i == 2)
+        return 256;
+    else if (i == 3)
+        return 320;
+    else if (i == 4)
+        return 384;
+    else
+        return 0;
 }
 
 } // namespace Belle2

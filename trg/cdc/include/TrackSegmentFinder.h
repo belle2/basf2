@@ -140,8 +140,11 @@ namespace Belle2 {
     /// firmware simulation.
     void simulateBoard(void);
 
-      /// Firmware simulation only for 2D : yi
-      void simulateFor2D(void);
+      /// Firmware simulation for the outers. yi
+      void simulateInner(void);
+
+      /// Firmware simulation for the outers. yi
+      void simulateOuter(void);
 
     double mkint(TRGState );
 

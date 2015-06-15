@@ -2452,7 +2452,8 @@ TRGCDC::firmwareSimulation(void) {
     const unsigned nTSFBoards = _tsfboards.size();
     for (unsigned i=0;i<nTSFBoards; i++){
 //	_tsfboards[i]->simulateBoard();
-        _tsfboards[i]->simulateFor2D();
+//      _tsfboards[i]->simulateInner();
+        _tsfboards[i]->simulateOuter();
     }
 
     //...Event Time... In ns scale. 
@@ -2861,5 +2862,12 @@ void TRGCDC::saveTRGRawInformation(vector<string > & trgInformations) {
 //  } // End of layer loop
 //
 //}
+
+unsigned
+TRGCDC::nSegments(unsigned id) const {
+    if (id < _tsLayers.size())
+        return _tsLayers[id]->size();
+    return 0;
+}
 
 } // namespace Belle2

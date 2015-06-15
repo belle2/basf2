@@ -25,6 +25,7 @@
 
 namespace Belle2 {
 
+class TRGState;
 class TRGCDCTrackSegmentFinder;
 
 /// A class to represent a CDC 2D tracker board
@@ -48,9 +49,6 @@ class TRGCDCTracker2D
     /// returns  version.
     static std::string version(void);
 
-    /// returns \# of TSF in this 2D tracker board.
-    static unsigned nTSFs(void);
-
   public:// Modifiers
 
     /// simulates firmware.
@@ -58,14 +56,22 @@ class TRGCDCTracker2D
 
   public:// VHDL utilities
 
+    /// returns \# of TSF.
+    static unsigned nTSF(void);
+
+    /// returns \# of TSF in super layer i. (i=0 to 4)
+    static unsigned nTSF(unsigned i);
+
     /// Unpack TSF output.
-    static void unpacker(const TRGState & input,
-                         TRGState & output);
+    static void unpacker(const TRGState & input, TRGState & output);
 
     /// Packer for 3D tracker.
     static TRGState packer(const TRGState & input,
                            TRGState & registers,
                            bool & logicStillActive);
+
+    /// Do core logic simulation.
+    static void HoughMapping(void);
 
   public:// Configuration
 
@@ -77,7 +83,21 @@ class TRGCDCTracker2D
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
     
-  private: 
+  private:
+
+    /// Gets TSF hit information for one certin clock from the registers.
+    static void hitInformation(const TRGState & registers);
+
+  private:
+
+    /// \# of TSFs.
+    unsigned _nTSF;
+
+    /// \# of TSFs in super layer i.
+    std::vector<unsigned> _n;
+
+    /// Keeps TS hit info.
+    static TRGState _ts;
 };
 
 //-----------------------------------------------------------------------------

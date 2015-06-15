@@ -79,7 +79,7 @@ class TRGState {
     void clear(void);
 
     /// sets state at bit i.
-    const TRGState & set(unsigned position, bool);
+    const TRGState & set(unsigned position, bool state = true);
 
     /// sets state.
     const TRGState & set(unsigned position,
@@ -340,6 +340,13 @@ TRGState::shift(unsigned a) {
     }
 
     return * this;
+}
+
+inline
+void
+TRGState::clear(void) {
+    for (unsigned i = 0;i < _n; i++)
+        _state[i] = 0;
 }
 
 } // namespace Belle2

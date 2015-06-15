@@ -207,7 +207,8 @@ class TRGCDC {
     /// returns a pointer to a layer. 0 will be returned if 'id' is invalid.
     const TRGCDCLayer * layer(unsigned id) const;
 
-    /// returns a pointer to a super-layer. 0 will be returned if 'id' is invalid.
+    /// returns a pointer to a super-layer. 0 will be returned if 'id'
+    /// is invalid.
     const std::vector<TRGCDCLayer *> * superLayer(unsigned id) const;
 
     /// returns \# of wire layers in a super layer. 0 will be returned
@@ -265,6 +266,9 @@ class TRGCDC {
     /// returns a pointer to a track segment layer. 0 will be returned
     /// if 'id' is invalid.
     const TRGCDCLayer * segmentLayer(unsigned id) const;
+
+    /// returns \# of track segments in a layer.
+    unsigned nSegments(unsigned id) const;
 
     /// trackList for fast simulation
     std::vector<TRGCDCTrack *> trackList;

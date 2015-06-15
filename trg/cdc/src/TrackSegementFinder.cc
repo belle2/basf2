@@ -1035,7 +1035,7 @@ void TRGCDCTrackSegmentFinder::saveNNTSInformation(std::vector<TRGCDCSegment* >&
   }
 
 
-void TRGCDCTrackSegmentFinder::simulateFor2D(void){
+void TRGCDCTrackSegmentFinder::simulateOuter(void){
 
     if (_type == innerType)
         return;

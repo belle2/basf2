@@ -160,7 +160,8 @@ namespace Belle2 {
 
     /** Sub run Getter.
      *
-     *  @return The number of the current sub run.
+     *  @return Sub-run number, increases indicate recovery from DAQ-internal trouble without
+     *          change to detector constants. Not supposed to be used by offline analysis.
      */
     unsigned long getSubrun() const
     {
@@ -224,7 +225,8 @@ namespace Belle2 {
 
     unsigned long m_run; /**< Run number.  */
 
-    unsigned long m_subrun; /**< Sub-run number.  */
+    unsigned long
+    m_subrun; /**< Sub-run number, increases indicate recovery from DAQ-internal trouble without change to detector constants. Not supposed to be used by offline analysis.  */
 
     unsigned long m_experiment; /**< Experiment number.  */
 

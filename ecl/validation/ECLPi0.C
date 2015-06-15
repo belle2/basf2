@@ -16,7 +16,7 @@ void ECLPi0()
 {
   // open the file with simulated and reconstructed EvtGen particles
   TFile* input = TFile::Open("../ECLPi0Output.root");
-  TTree* tree = (TTree*) input->Get("tree");
+  TTree* tree = (TTree*) input->Get("m_tree");
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("ECLPi0.root", "recreate");
@@ -27,7 +27,7 @@ void ECLPi0()
   hPi0s->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed energy for 1 GeV Pi0s")); 
   hPi0s->GetListOfFunctions()->Add(new TNamed("Check","Should not be biased"));
   hPi0s->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  tree->Draw("ECLPi0s.m_Energy>>hPi0s");
+  tree->Draw("eclPi0Energy>>hPi0s");
   hPi0s->Write();
 
   // an example of a 1D histogram
@@ -38,7 +38,7 @@ void ECLPi0()
   hPi0mass->GetListOfFunctions()->Add(new TNamed("Check", 
     "Should not be biased"));
   hPi0mass->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
-  tree->Draw("ECLPi0s.m_Mass>>hPi0mass");
+  tree->Draw("eclPi0Mass>>hPi0mass");
   hPi0mass->Write();
 
   // an example of a 1D histogram

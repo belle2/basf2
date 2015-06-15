@@ -22,7 +22,7 @@ main = create_path()
 
 # Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # random number for generation
@@ -104,7 +104,7 @@ add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'EclDataAnalysis_500MeV_10000_EclCDCArichVXD_BWD.root')
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_500MeV_100000_Full_FWD.root')
 ecldataanalysis.param('doTracking', 0)
 main.add_module(ecldataanalysis)
 

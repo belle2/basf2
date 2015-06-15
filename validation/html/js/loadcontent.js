@@ -1,112 +1,141 @@
-function loadcontent() {
-    $("#content").load("content.html", function() {
-        $.get("content.html", function(data) {
+function loadcontent(joined_revisions) {
 
-            // Loop over all packages checkboxes and hide those packages that are not selected for display
-            $('[name=packages]:not(:checked)').each(function() {
-                $("#" + $(this).attr("value")).css("display", "none");
-            });
+	// Check if we were given a set if revisions.
+	// If this is the case, we will load all .html files from the corresponding
+	// plots folder.
+	// If no revisions are explicitly given (e.g. when the site is loaded
+	// initially), we use the default files in the base directory
+	if (joined_revisions !== undefined) {
+		path = "./plots/" + joined_revisions + "/";
+	} else {
+		path = "./";
+	}
 
-            /* If the content is reloaded, make sure that the description boxes are displayed or not,
-	       in accordance with the checkbox  */
-            if ($('.displaydescriptions').is(':checked')) {
-                $('.wrap_boxes').each(function() {
-                    $(this).css("display", "block");
-                });
-            } else {
-                $('.wrap_boxes').each(function() {
-                    $(this).css("display", "none");
-                });
-            }
-            if ($('.package_overview').is(':checked')) {
-                $('.nomatrix').each(function() {
-                    $(this).removeClass("show");
-                });
-            } else {
-                $('.nomatrix').each(function() {
-                    $(this).addClass("show");
-                });
-            }
+	// Load the list of revisions
+	// This does not depend on the selected revisions, hence we can always use
+	// the version from the base directory
+	$("#revisions").load('./revisions.html');
 
-        }).done(function() {
+	// Load the list of packages
+	$("#packages").load(path + 'packages.html');
 
-	    $.get("content.html", function(data) {
+	// Load the contents, i.e. the plots and tables
+	$("#content").load(path + 'content.html', function() {
 
-    // Read the lines
-    var lines = data.split("\n");
+		// After the contents where loaded, we need to update some things
+		// that require information from the content.html file 
+		$.get(path + 'content.html', function(data) {
 
-    // Extract the first line and remove the comment symbols
-    var json = jQuery.parseJSON(lines[0].replace("<!-- ", "").replace(" -->", ""));
+			// 1. UPDATE THE "LAST MODIFIED"-INFORMATION
+			// Read in all lines from content.html
+			var lines = data.split("\n");
 
-    console.log(json.revisions);
+			// Extract the first line and remove the comment symbols, then
+			// parse the information into an associative JSON array
+			var json = jQuery.parseJSON(lines[0].replace("<!-- ", "").replace(" -->", ""));
 
-    // Read out when content.html was modified the last time and write that
-    // onto the page (under the navigation bar)
-    $(".lastmodified").html(json.lastModified);
+			// Read out when content.html was modified the last time and write
+			// that onto the page (under the navigation bar)
+			$(".lastmodified").html(json.lastModified);
 
-    // Now we check which revisions are included in the 'content.html' file we have just
-    // loaded. We loop over all revision checkboxes:
-    $('input[type="checkbox"][name="revisions"]').each(function() {
-        // If the revision that belongs to the checkbox is contained in the 'content.html'
-        // we activate it
-        if ($.inArray($(this).attr("value"), json.revisions) >= 0) {
-            $(this).prop('checked', true);
-        }
-        // Otherwise we deactivate it
-        else {
-            $(this).prop('checked', false);
-        }
-    });
-});
+			// 2. MAKE SURE THAT PLOTS SHOWN AND PLOTS IN MENU ARE SYNCHRONIZED
+			// Now we check which revisions are included in the 'content.html'
+			// file we have just loaded. We loop over all revision checkboxes:
+			$('input[type="checkbox"][name="revisions"]').each(function() {
+				// If the revision that belongs to the checkbox is contained in
+				// the 'content.html' we activate it
+				if ($.inArray($(this).attr("value"), json.revisions) >= 0) {
+					$(this).prop('checked', true);
+				}
+				// Otherwise we deactivate it
+				else {
+					$(this).prop('checked', false);
+				}
+			});
 
-            $("input.matrix-toggle").click(function() {
-                $("span#" + this.value).toggle();
-            });
+			// 3. HIDE PACKAGES NOT SELECTED FOR DISPLAY
+			// Loop over all packages checkboxes and hide those packages that
+			// are not selected for display
+			$('[name=packages]:not(:checked)').each(function() {
+				$("#" + $(this).attr("value")).css("display", "none");
+			});
 
-            $("input.plot-size").on("input", function() {
-                var range_val = this.value;
-                var range_id = this.id;
-                $(".imidzes_" + range_id).css("width", (range_val - 2) + "%");
-                $("#slidernumber_" + range_id).text(range_val);
-                $("input.slidernumber_" + range_id).val(range_val);
-            });
+			// 4. SHOW/HIDE BOXES FROM MATRIX VIEW AS SPECIFIED IN OPTIONS
+			// If the content is reloaded, make sure that the description boxes
+			// are displayed or not, in accordance with the checkbox
+			if ($('.displaydescriptions').is(':checked')) {
+				$('.wrap_boxes').each(function() {
+					$(this).css("display", "block");
+				});
+			} else {
+				$('.wrap_boxes').each(function() {
+					$(this).css("display", "none");
+				});
+			}
+			if ($('.package_overview').is(':checked')) {
+				$('.nomatrix').each(function() {
+					$(this).removeClass("show");
+				});
+			} else {
+				$('.nomatrix').each(function() {
+					$(this).addClass("show");
+				});
+			}
 
-            $(".hide").on("click", function() {
-                $(".wrap_" + this.id).toggle();
-                $(this).text($(this).text() == "(hide)" ? "(show)" : "(hide)");
-            });
-            $('.selectall').on("click", function() {
-                var checked = this.checked;
-                $(this).closest('form').find(':checkbox').each(function() {
-                    $(this).prop("checked", checked);
-                    if (checked) {
-                        $("#" + this.value).css("display", "block");
-                    } else {
-                        $("#" + this.value).css("display", "none");
-                    }
-                });
-            });
-            $('.imidz').on("click", function() {
-                if (!$(this).attr("id")) {
-                    var plot_show_id = this.name;
-                } else {
-                    var plot_show_id = this.id;
-                }
-                if ($("." + plot_show_id).css("display") == "none") {
-                    if ($('input[type="checkbox"][name="overview"]').prop('checked')) {
-                        $(".nomatrix").each(function() {
-                            $(this).removeClass("show");
-                        });
-                    }
-                    $("." + plot_show_id).addClass("show");
-                }
+			// 5. DO A LOT OF STUFF REGARDING THE MATRIX VIEW THAT NOBODY
+			//    BOTHERED TO COMMENT...
+			$("input.matrix-toggle").click(function() {
+				$("span#" + this.value).toggle();
+			});
 
-            });
-            $(".hidebutton").on("click", function() {
-                $(this).closest(".nomatrix").removeClass("show");
-            });
+			$("input.plot-size").on("input", function() {
+				var range_val = this.value;
+				var range_id = this.id;
+				$(".imidzes_" + range_id).css("width", (range_val - 2) + "%");
+				$("#slidernumber_" + range_id).text(range_val);
+				$("input.slidernumber_" + range_id).val(range_val);
+			});
 
-        });
-    });
-    return true;
+			$(".hide").on("click", function() {
+				$(".wrap_" + this.id).toggle();
+				$(this).text($(this).text() == "(hide)" ? "(show)" : "(hide)");
+			});
+			$('.selectall').on("click", function() {
+				var checked = this.checked;
+				$(this).closest('form').find(':checkbox').each(function() {
+					$(this).prop("checked", checked);
+					if (checked) {
+						$("#" + this.value).css("display", "block");
+					} else {
+						$("#" + this.value).css("display", "none");
+					}
+				});
+			});
+			$('.imidz').on("click", function() {
+				if (!$(this).attr("id")) {
+					var plot_show_id = this.name;
+				} else {
+					var plot_show_id = this.id;
+				}
+				if ($("." + plot_show_id).css("display") == "none") {
+					if ($('input[type="checkbox"][name="overview"]').prop('checked')) {
+						$(".nomatrix").each(function() {
+							$(this).removeClass("show");
+						});
+					}
+					$("." + plot_show_id).addClass("show");
+				}
+
+			});
+			$(".hidebutton").on("click", function() {
+				$(this).closest(".nomatrix").removeClass("show");
+			});
+
+		}).done(function() {
+			return true;
+		}).error(function() {
+			return false;
+		});
+	});
+
 }

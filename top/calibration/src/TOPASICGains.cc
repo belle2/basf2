@@ -8,15 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/calibration/ASICGains.h>
+#include <top/calibration/TOPASICGains.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
-bool TOP::ASICGains::setGains(const std::vector<float>& gains, float error)
+bool TOPASICGains::setGains(const std::vector<float>& gains, float error)
 {
 
-  if (gains.size() != c_WindowSize) return false;
+  if (gains.size() != c_WindowSize) {
+    B2ERROR("TOPASICGains::setGains:  vector with wrong number of elements");
+    return false;
+  }
 
   // TODO: better procedure!
   for (int i = 0; i < c_WindowSize; i++) {
@@ -34,7 +38,7 @@ bool TOP::ASICGains::setGains(const std::vector<float>& gains, float error)
 }
 
 
-ClassImp(TOP::ASICGains)
+ClassImp(TOPASICGains);
 
 
 

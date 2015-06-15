@@ -31,7 +31,8 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 
 // database classes
-#include <top/calibration/ASICChannelConstants.h>
+#include <framework/database/DBStore.h>
+#include <top/calibration/TOPASICChannel.h>
 
 #include "TFile.h"
 #include <TClonesArray.h>
@@ -40,7 +41,6 @@
 using namespace std;
 
 namespace Belle2 {
-  using namespace TOP;
 
   //-----------------------------------------------------------------
   //                 Register module
@@ -162,15 +162,16 @@ namespace Belle2 {
     B2INFO("TOPWFCalibratorModule: number of active ASIC storage windows: " <<
            numWindows);
 
-    TClonesArray constants("Belle2::TOP::ASICChannelConstants");
+    TClonesArray constants("Belle2::TOPASICChannel");
+    const auto name = DBStore::arrayName<TOPASICChannel>("");
 
     for (int channel = 0; channel < c_NumChannels; channel++) {
-      new(constants[channel]) ASICChannelConstants(m_barID, channel, numWindows);
-      auto* channelConstants = static_cast<ASICChannelConstants*>(constants[channel]);
+      new(constants[channel]) TOPASICChannel(m_barID, channel, numWindows);
+      auto* channelConstants = static_cast<TOPASICChannel*>(constants[channel]);
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
         if (prof) {
-          ASICPedestals pedestals(window);
+          TOPASICPedestals pedestals(window);
           pedestals.setPedestals(prof);
           bool ok = channelConstants->setPedestals(pedestals);
           if (!ok) {
@@ -185,13 +186,13 @@ namespace Belle2 {
 
     auto expNo = evtMetaData->getExperiment();
     IntervalOfValidity iov(expNo, m_runLow, expNo, m_runHigh);
-    Database::Instance().storeData("ASICChannelConstants", &constants, iov);
+    Database::Instance().storeData(name, &constants, iov);
 
 
     int all = 0;
     int incomplete = 0;
     for (int channel = 0; channel < constants.GetEntriesFast(); channel++) {
-      const auto* chan = static_cast<ASICChannelConstants*>(constants[channel]);
+      const auto* chan = static_cast<TOPASICChannel*>(constants[channel]);
       all++;
       if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
     }

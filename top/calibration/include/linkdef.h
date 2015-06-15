@@ -5,8 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TOP::ASICPedestals+;
-#pragma link C++ class Belle2::TOP::ASICGains+;
-#pragma link C++ class Belle2::TOP::ASICChannelConstants+;
+#pragma link C++ class Belle2::TOPASICPedestals+;
+#pragma link C++ class Belle2::TOPASICGains+;
+#pragma link C++ class Belle2::TOPASICChannel+;
 
 #endif

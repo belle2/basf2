@@ -78,7 +78,9 @@ void B2BIIMdstInputModule::initialize()
   m_fd = new Belle::Panther_FileIO(m_inputFileName.c_str(), BBS_READ);
 
   // Read first record (does not contain event data)
-  m_fd->read();
+  if (m_fd->read() == -1) {
+    B2FATAL("Couldn't read file '" << m_inputFileName << "'!");
+  }
   m_nevt++;
 
   B2DEBUG(1, "B2BIIMdstInput: initialized.");

@@ -160,6 +160,9 @@ def serve_existing_plots(list_of_revisions):
     :return: No return value
     """
 
+    print "File exists already and will be served from archive!"
+
+    """
     # The path where the content.html should be
     src = './plots/{0}/content.html'.\
         format('_'.join(sorted(list_of_revisions)))
@@ -173,6 +176,7 @@ def serve_existing_plots(list_of_revisions):
     else:
         sys.exit('Wanted to use plots from the archive, but the corresponding '
                  'content.html file could not be found!')
+    """
 
 
 def files_in_pkg(pkg, list_of_revisions):
@@ -568,7 +572,14 @@ def generate_new_plots(list_of_revisions):
     create_packages_list_html(list_of_packages, list_of_revisions)
 
     # Open the output file
-    html_output = open('./content.html', 'w+')
+    # First: Create destination directory if it does not yet exist
+    content_dir = './plots/{0}'.format('_'.join(sorted(
+        list_of_revisions)))
+    if not os.path.exists(content_dir):
+        os.makedirs(content_dir)
+
+    # Now open the file to which we will write all the content HTML
+    html_output = open('{0}/content.html'.format(content_dir), 'w+')
 
     # Write meta-data, i.e. creation date and revisions contained in the file
     created = str(datetime.datetime.utcfromtimestamp(int(time.time())))
@@ -682,23 +693,6 @@ def generate_new_plots(list_of_revisions):
 
     # Close the file stream for the HTML file
     html_output.close()
-
-    # Now copy that file to the folder with the plots
-
-    # The path where we need it
-    src = './content.html'
-
-    # Create destination directory if it does not yet exist
-    dest_dir = './plots/{0}/'.format('_'.join(sorted(
-        list_of_revisions)))
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
-
-    # The path where the content.html should be
-    dst = './plots/{0}/content.html'.format('_'.join(sorted(
-        list_of_revisions)))
-
-    shutil.copyfile(src, dst)
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference):
@@ -933,7 +927,8 @@ def create_revision_list_html():
     Creates a HTML-list of all available revisions with checkboxes and the
     font color set accordingly to the line style of the revision in the plots.
     """
-    revisions = open('./revisions.html', 'w+')
+
+    revisions = open('revisions.html', 'w+')
     revisions.write('<label><input type="checkbox" name="revisions" '
                     ' value="reference" checked>&nbsp;<span '
                     'style="color: black;">reference</span></label><br>\n')
@@ -956,7 +951,14 @@ def create_revision_list_html():
 def create_packages_list_html(list_of_packages, list_of_revisions):
 
     # Create a file with all available packages
-    with open('./packages.html', 'w+') as pkgs:
+    # First: Create destination directory if it does not yet exist
+    content_dir = './plots/{0}'.format('_'.join(sorted(
+        list_of_revisions)))
+    if not os.path.exists(content_dir):
+        os.makedirs(content_dir)
+
+    # Now open the file to which we will write list of packages
+    with open('{0}/packages.html'.format(content_dir), 'w+') as pkgs:
         for pkg in sorted(list_of_packages):
 
             # Write the checkbox to the HTML
@@ -1743,3 +1745,22 @@ def create_plots(revisions=None, force=False):
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(list_of_revisions)
+
+        # Check if we generated the default view (i.e. all available revisions
+        # and the references). If this is the case, copy these files to the
+        # base directory
+        if (sorted(list_of_revisions) ==
+           sorted(['reference'] + available_revisions())):
+
+            # The path where the content.html and packages.html should be
+            src = './plots/{0}/'.format('_'.join(sorted(list_of_revisions)))
+
+            # The path where we need them
+            dst = './'
+
+            # Actually copy the files
+            shutil.copyfile(src + 'content.html', dst + 'content.html')
+            shutil.copyfile(src + 'packages.html', dst + 'packages.html')
+
+            print 'Copied generated content.html and packages.html to the ' \
+                  'base directory! \n'

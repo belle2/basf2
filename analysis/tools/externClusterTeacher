@@ -1,10 +1,13 @@
 #!/bin/bash
 # Runs the externTeacher tool as a job on the cluster
 
-f=`mktemp`
+rf=`mktemp`
+f=$(basename $rf)
 echo "Use $f as temporary file"
-echo "externTeacher $*" > "$f"
+printf " %q" externTeacher "$@" > "$f" 
+#echo "externTeacher $*" > "$f"
 cat "$f"
-bsub -K -q lx -e "$f".elog -o "$f".log "$f"
-rm $f
-
+chmod +x ./"$f"
+echo bsub -K -q sx -e "$f".elog -o "$f".log "$f"
+bsub -K -q sx -e "$f".elog -o "$f".log ./"$f"
+#rm $f

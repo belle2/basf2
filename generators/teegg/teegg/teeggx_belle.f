@@ -52,11 +52,15 @@ C Input parameters common:
      >,                WGHT1M,WGHTMX, FRAPHI,EPSPHI
       INTEGER          ISEED, RADCOR,CONFIG,MATRIX,MTRXGG
       LOGICAL          UNWGHT
+      
+      INTEGER          VACPOL
 
       COMMON/TINPAR/EB,TEVETO,TEMIN,TGMIN,TGVETO,EEMIN,EGMIN
      >,             PEGMIN,EEVETO,EGVETO,PHVETO,CUTOFF,EPS
      >,             WGHT1M,WGHTMX, FRAPHI,EPSPHI
      >,             ISEED, RADCOR,CONFIG,MATRIX,MTRXGG, UNWGHT
+     
+      COMMON/VACPOLPAR/VACPOL
 
 C EB     = energy of electron beam in GeV
 C TEVETO = maximum theta of e+ in final state (in radians)
@@ -165,10 +169,13 @@ C NACC  = number of accepted events so far
 	UNWGHT = .FALSE.
       ENDIF
       
+      WRITE(*,*) 'UNWGHT',UNWGHT
+      
       RADCOR = NPAR(1)
       CONFIG = NPAR(2)
       MATRIX = NPAR(3)
       MTRXGG = NPAR(4)
+      VACPOL = NPAR(5)
       
       EB      = XPAR(30)/2.0d0 !beam energy, not CM energy here
       TEVETO  = XPAR(0)
@@ -193,5 +200,6 @@ C NACC  = number of accepted events so far
       WRITE(*,*) 'CONFIG',CONFIG
       WRITE(*,*) 'MATRIX', MATRIX
       WRITE(*,*) 'MTRXGG', MTRXGG
+      WRITE(*,*) 'VACPOL', VACPOL
       
       END

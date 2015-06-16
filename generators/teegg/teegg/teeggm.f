@@ -46,6 +46,17 @@ CDECK  ID>, TEEGGM.
       EXTERNAL TEEGGL,LPASS
       LOGICAL  TEEGGL,LPASS
 
+      DOUBLE PRECISION EB,TEVETO,TEMIN,TGMIN,TGVETO,EEMIN,EGMIN
+     >,                PEGMIN,EEVETO,EGVETO,PHVETO,CUTOFF,EPS
+     >,                WGHT1M,WGHTMX, FRAPHI,EPSPHI
+      INTEGER          ISEED, RADCOR,CONFIG,MATRIX,MTRXGG
+      LOGICAL          UNWGHT
+      
+      COMMON/TINPAR/EB,TEVETO,TEMIN,TGMIN,TGVETO,EEMIN,EGMIN
+     >,             PEGMIN,EEVETO,EGVETO,PHVETO,CUTOFF,EPS
+     >,             WGHT1M,WGHTMX, FRAPHI,EPSPHI
+     >,             ISEED, RADCOR,CONFIG,MATRIX,MTRXGG, UNWGHT
+
 
       INTEGER NEV,NXTPAR
       REAL XTRATM
@@ -60,7 +71,6 @@ CDECK  ID>, TEEGGM.
       
       DOUBLE PRECISION W2
       COMMON / KINEMATICS / W2
-
       
       INTEGER MODE, NPAR(0:99)
       DOUBLE PRECISION XPAR(0:99)
@@ -78,8 +88,20 @@ CDECK  ID>, TEEGGM.
       
       DOUBLE PRECISION SUMT
       
+      INTEGER VACPOL
+      COMMON/VACPOLPAR/VACPOL
+      
       double complex ALPHANSK, ALPHANSKRES
       external ALPHANSK
+      
+      real*8 energy,
+     &       vprehadsp, vprehadtm, vpimhad,
+     &       vprelepsp, vpreleptm, vpimlep,
+     &       vpretopsp, vpretoptm
+      integer nrflag
+      external vphlmntv2
+      
+      real*8 vpresult, vpresult2
 
 
 C NEV    = Number of events to be generated.
@@ -122,13 +144,25 @@ C Call the generating routine. (Generates one event).
             
 C           Fill extra information            
             TT=T
-            TWEIGHT=WGHT
+            IF (UNWGHT) THEN
+              TWEIGHT=1.0
+            ELSE
+	      TWEIGHT=WGHT
+	    ENDIF
+	      
             TW2=W2
-
-            REANSK    = DBLE(ABS(ALPHANSK(-T, 0)))
-            FULLANSK  = DBLE(ABS(ALPHANSK(-T, 1)))
-            REANSK2   = DBLE(REANSK*REANSK)
-            FULLANSK2 = DBLE(FULLANSK*FULLANSK)
+            
+C           Vacuum Polarization (TF)
+	    vpresult = 1.0
+            IF (VACPOL.EQ.42) THEN
+              nrflag = 0
+              call vphlmntv2(SQRT(-T),vprehadsp,vprehadtm,vpimhad,vprelepsp,vpreleptm,vpimlep,vpretopsp,vpretoptm,nrflag)
+              vpresult=(1.d0/(1.d0  - vprehadtm - vpreleptm - vpretoptm))
+            ELSEIF (VACPOL.EQ.43) THEN
+	      vpresult = DBLE(ABS(ALPHANSK(-T, 1)))
+            ENDIF
+            vpresult2 = vpresult*vpresult
+            TWEIGHT=TWEIGHT*vpresult2
 
             SUMT = SUMT+T
 

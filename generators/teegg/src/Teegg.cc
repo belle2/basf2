@@ -11,6 +11,8 @@
 #include <generators/teegg/Teegg.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <TDatabasePDG.h>
 #include <TLorentzVector.h>
@@ -46,10 +48,6 @@ extern "C" {
     double t;
     double w2;
     double weight;
-    double reansk;
-    double fullansk;
-    double reansk2;
-    double fullansk2;
   } teeggextra_;
 
 
@@ -105,7 +103,7 @@ void Teegg::setDefaultSettings()
   m_alphaQED0        = 1.0 / 137.0359895;
   m_massElectron     = 0.51099906 * Unit::MeV;
 
-  m_vacPol  = "OFF";
+  m_sVACPOL = "HLMNT";
   m_sRADCOR = "NONE";
   m_sCONFIG = "EGAMMA";
   m_sMATRIX = "BKM2";
@@ -132,14 +130,11 @@ void Teegg::setDefaultSettings()
   m_CONFIG    = -1;
   m_MATRIX    = -1;
   m_MTRXGG    = -1;
+  m_VACPOL    = -1;
   m_UNWGHT    = 1;
   m_t         = 0.0;
   m_w2        = 1.0;
   m_weight    = 1.0;
-  m_reansk    = 0.0;
-  m_fullansk  = 0.0;
-  m_reansk2   = 0.0;
-  m_fullansk2 = 0.0;
 }
 
 void Teegg::init()
@@ -168,14 +163,14 @@ void Teegg::generateEvent(MCParticleGraph& mcGraph)
     storeParticle(mcGraph, photMom, 22);
   }
 
-  //Fill extra information
-  m_t         = teeggextra_.t;
-  m_w2        = teeggextra_.w2;
-  m_weight    = teeggextra_.weight;
-  m_reansk    = teeggextra_.reansk;
-  m_fullansk  = teeggextra_.fullansk;
-  m_reansk2   = teeggextra_.reansk2;
-  m_fullansk2 = teeggextra_.fullansk2;
+  // Get extra information
+  m_t      = teeggextra_.t;
+  m_w2     = teeggextra_.w2;
+  m_weight = teeggextra_.weight;
+
+  // Fill event weight
+  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
+  eventMetaDataPtr->setGeneratedWeight(m_weight);
 }
 
 void Teegg::term()
@@ -202,13 +197,13 @@ void Teegg::applySettings()
   //--------------------
   m_npar[0] = m_UNWGHT; //producing strange results...
 
-  if (m_sRADCOR == "NONE") m_RADCOR = 3;
+  if (m_sRADCOR == "NONE") m_RADCOR = 3; //DEFAULT
   else if (m_sRADCOR == "SOFT") m_RADCOR = 2;
   else if (m_sRADCOR == "HARD") m_RADCOR = 1;
   else m_sRADCOR = 3;
   m_npar[1] = m_RADCOR;
 
-  if (m_sCONFIG == "EGAMMA") m_CONFIG = 11;
+  if (m_sCONFIG == "EGAMMA") m_CONFIG = 11; //DEFAULT
   else if (m_sCONFIG == "ETRON") m_CONFIG = 12;
   else if (m_sCONFIG == "GAMMA") m_CONFIG = 13;
   else if (m_sCONFIG == "GAMMAE") m_CONFIG = 14;
@@ -216,18 +211,24 @@ void Teegg::applySettings()
   m_npar[2] = m_CONFIG;
 
   if (m_sMATRIX == "BK") m_MATRIX = 21;
-  else if (m_sMATRIX == "BKM2") m_MATRIX = 22;
+  else if (m_sMATRIX == "BKM2") m_MATRIX = 22; //DEFAULT
   else if (m_sMATRIX == "TCHAN") m_MATRIX = 23;
   else if (m_sMATRIX == "EPA") m_MATRIX = 24;
   else m_MATRIX = 22;
   m_npar[3] = m_MATRIX;
 
-  if (m_sMTRXGG == "EPADC") m_MTRXGG = 31;
+  if (m_sMTRXGG == "EPADC") m_MTRXGG = 31; //DEFAULT
   else if (m_sMTRXGG == "BEEGG") m_MTRXGG = 32;
   else if (m_sMTRXGG == "MEEGG") m_MTRXGG = 33;
   else if (m_sMTRXGG == "HEEGG") m_MTRXGG = 34;
   else m_MTRXGG = 31;
   m_npar[4] = m_MTRXGG;
+
+  if (m_sVACPOL == "OFF") m_VACPOL = 41;
+  else if (m_sVACPOL == "HLMNT") m_VACPOL = 42; //DEFAULT
+  else if (m_sVACPOL == "NSK") m_VACPOL = 43;
+  else m_VACPOL = 42;
+  m_npar[5] = m_VACPOL;
 
   //--------------------
   // Double parameters

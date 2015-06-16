@@ -38,8 +38,8 @@ TeeggInputModule::TeeggInputModule() : Module()
   setDescription("Generates events with TEEGG.");
 
   //Parameter definition
-  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner, default) or hmnt (Teubner)",
-           std::string("OFF"));
+  addParam("VACPOL", m_sVACPOL, "Vacuum polarization: off, nsk (Novosibirsk) or hlmnt (Teubner et al., default)",
+           std::string("hlmnt"));
   addParam("CMSEnergy", m_cmsEnergy, "CMS energy [GeV] (default: take from xml)", 0.0);
   addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
   addParam("ExtraFile", m_fileNameExtraInfo, "ROOT file that contains additional information.", std::string(""));
@@ -88,7 +88,7 @@ void TeeggInputModule::initialize()
   if (m_fileNameExtraInfo != "") {
     m_fileExtraInfo = new TFile(m_fileNameExtraInfo.c_str(), "RECREATE") ;
     m_fileExtraInfo->cd();
-    m_ntuple = new TNtuple("ntuple", "data", "t:w2:weight:reansk:fullansk:reansk2:fullansk2");
+    m_ntuple = new TNtuple("ntuple", "data", "t:w2:weight");
 
   }
 
@@ -138,7 +138,7 @@ void TeeggInputModule::initialize()
     m_generator.setCMSEnergy(m_cmsEnergy);
   }
 
-  m_generator.setVacPol(m_vacPol);
+  m_generator.setVACPOL(m_sVACPOL);
   m_generator.setTEVETO(m_TEVETO);
   m_generator.setTEMIN(m_TEMIN);
   m_generator.setTGMIN(m_TGMIN);
@@ -173,8 +173,7 @@ void TeeggInputModule::event()
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
   if (m_fileExtraInfo) {
-    m_ntuple->Fill(m_generator.getT(), m_generator.getW2(), m_generator.getWeight(), m_generator.getReANSK(), m_generator.getFullANSK(),
-                   m_generator.getReANSK2(), m_generator.getFullANSK2());
+    m_ntuple->Fill(m_generator.getT(), m_generator.getW2(), m_generator.getWeight());
   }
 }
 

@@ -57,7 +57,7 @@ namespace Belle2 {
     double getBeamEnergyCM(double e1, double e2, double angle);
 
     /** Module parameters */
-    std::string m_vacPol; /**< Vacuum polarization: off, hadr5 or hmnt. */
+    std::string m_sVACPOL; /**< Vacuum polarization: off, hlmnt (default) or nsk via weights. */
     double m_cmsEnergy; /**< CMS energy. */
     int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     std::string m_fileNameExtraInfo; /**< Extra ROOT file that contains the weight distribution to check overweight bias. */
@@ -111,7 +111,7 @@ namespace Belle2 {
   {
     std::pair<T, T> p;
     if (vec.size() != 2) {
-      B2ERROR("The parameter " + name + " has to have exactly 2 elements !")
+      B2ERROR("The parameter " + name + " has to have exactly 2 elements!")
     } else {
       p.first  = vec[0];
       p.second = vec[1];

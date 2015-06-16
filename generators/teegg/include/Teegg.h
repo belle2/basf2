@@ -49,7 +49,7 @@ namespace Belle2 {
     /** specifies which vacuum polarization code (NOT IMPLEMENTED YET)
     * @param vacpol vacuum polarization code (NOT IMPLEMENTED YET)
     */
-    void setVacPol(std::string vacpol = "OFF") {m_vacPol = vacpol;}
+    void setVACPOL(std::string vacpol = "HLMNT") {m_sVACPOL = vacpol;}
 
     /** set maximum theta of e+ in final state (in radians)
      * @param teveto maximum theta of e+ in final state (in radians)
@@ -170,13 +170,17 @@ namespace Belle2 {
      */
     void generateEvent(MCParticleGraph& mcGraph);
 
-    double getT() {return m_t;}; /**< returns kinematic variable T. */
-    double getW2() {return m_w2;}; /**< returns kinematic variable W2. */
-    double getWeight() {return m_weight;}; /**< returnsweight. */
-    double getReANSK() {return m_reansk;}; /**< returns real part of alpha. */
-    double getReANSK2() {return m_reansk2;}; /**< returns real part of alpha squared. */
-    double getFullANSK() {return m_fullansk;}; /**< returns full  alpha. */
-    double getFullANSK2() {return m_fullansk2;}; /**< returns full  alpha squared. */
+    /** returns kinematic variable T.
+    */
+    double getT() {return m_t;};
+
+    /** returns kinematic variable W2.
+    */
+    double getW2() {return m_w2;};
+
+    /** returns weight.
+    */
+    double getWeight() {return m_weight;};
 
     /**
      * Terminates the generator.
@@ -191,7 +195,6 @@ namespace Belle2 {
     double m_alphaQED0;             /**< QED coupling constant at Q=0. */
     double m_massElectron;          /**< muon mass. */
 
-    std::string m_vacPol;           /**< vacuum polarization: off, hadr5 (Jegerlehner) or hmnt (Teubner). */
     double m_cmsEnergy;             /**< CMS Energy = 2*Ebeam [GeV]. */
 
     double m_TEVETO; /**< maximum theta of e+ in final state (in radians)*/
@@ -211,10 +214,12 @@ namespace Belle2 {
     double m_WGHT1M; /**< maximum weight for generation of QP0, cos(theta QP)*/
     double m_WGHTMX; /**< maximum weight for the trial events*/
 
+    int m_VACPOL; /**< vacuum polarization: off, nsk (Novosibirsk) or hlmnt (Teubner). */
     int m_RADCOR; /**< specifies radiative correction (NONE SOFT or HARD)*/
     int m_CONFIG; /**< specifies the event configuration (EGAMMA GAMMA or ETRON)*/
     int m_MATRIX; /**< specifies which eeg matrix element (BK BKM2 TCHAN or EPA)*/
     int m_MTRXGG; /**< specifies which eegg matrix element (EPADC BEEGG or MEEGG)*/
+    std::string m_sVACPOL;  /**< vacuum polarization: off, nsk (Novosibirsk) or hlmnt (Teubner). */
     std::string m_sRADCOR; /**< specifies radiative correction (NONE SOFT or HARD)*/
     std::string m_sCONFIG; /**< specifies the event configuration (EGAMMA GAMMA or ETRON)*/
     std::string m_sMATRIX; /**< specifies which eeg matrix element (BK BKM2 TCHAN or EPA)*/
@@ -224,10 +229,6 @@ namespace Belle2 {
     double m_t;  /**< T=-Q2 */
     double m_w2;  /**< W2 */
     double m_weight;  /**< weight per event */
-    double m_reansk;  /**< vacuum polarization contribution from NSK routine, real part only */
-    double m_reansk2;  /**< vacuum polarization contribution from NSK routine squared, real part only */
-    double m_fullansk;  /**< vacuum polarization contribution from NSK routine */
-    double m_fullansk2;  /**< vacuum polarization contribution from NSK routine squared */
 
 //     bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
     TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */

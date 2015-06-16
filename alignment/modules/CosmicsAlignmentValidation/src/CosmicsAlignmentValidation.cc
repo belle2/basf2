@@ -1,4 +1,4 @@
-#include <alignment/modules/CosmicsAlignmentValidation/inc/CosmicsAlignmentValidation.h>
+#include <alignment/modules/CosmicsAlignmentValidation/CosmicsAlignmentValidation.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -28,7 +28,9 @@ using namespace Belle2;
 REG_MODULE(CosmicsAlignmentValidation)
 
 CosmicsAlignmentValidationModule::CosmicsAlignmentValidationModule() :
-  Module()
+  Module(),
+  file(NULL),
+  tree(NULL)
 {
   setDescription("Alignment Validation with Cosmics");
 

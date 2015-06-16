@@ -44,18 +44,18 @@ PCmsLabTransform::PCmsLabTransform()
   double Eher = HER.getEnergy("energy");
   double Eler = LER.getEnergy("energy");
   double cross_angle = HER.getAngle("angle") - LER.getAngle("angle");
-  double angle = HER.getAngle("angle");
+  double angle = -LER.getAngle("angle");
   update(Eher, Eler, cross_angle, angle);
   m_initialized = true;
 }
 
 
-void PCmsLabTransform::update(double Eher, double Eler, double cross_angle, double angle)
+void PCmsLabTransform::update(double Eher, double Eler, double cross_angle, double angle_ler)
 {
   // this function is a polished copy of generators/utilities/src/cm2LabBoost.cc
 
   // Low energy beam
-  double angleLerToB = M_PI - angle;
+  double angleLerToB = M_PI - angle_ler;
   double pLerZ = Eler * cos(angleLerToB);
   double pLerX = Eler * sin(angleLerToB);
   double pLerY = 0.;
@@ -63,7 +63,7 @@ void PCmsLabTransform::update(double Eher, double Eler, double cross_angle, doub
   vlLer.SetXYZM(pLerX, pLerY, pLerZ, Const::electronMass);
 
   // High energy beam
-  double angleHerToB = cross_angle - angle;
+  double angleHerToB = cross_angle - angle_ler;
   double pHerZ = Eher * cos(angleHerToB);
   double pHerX = Eher * sin(angleHerToB);
   double pHerY = 0.;
@@ -80,7 +80,7 @@ void PCmsLabTransform::update(double Eher, double Eler, double cross_angle, doub
   // boost e- to CMS system
   TLorentzVector vlEleCms = lab2cmsBoost * vlHer;
 
-  // now rotate CMS such that z-axis is oriented as incomming e-
+  // now rotate CMS such that incoming e- is parallel to z-axis
   TVector3 zaxis(0., 0., 1.);
   TVector3 rotaxis = zaxis.Cross(vlEleCms.Vect()) * (1. / vlEleCms.Vect().Mag());
   double rotangle = TMath::ASin(rotaxis.Mag());
@@ -91,7 +91,7 @@ void PCmsLabTransform::update(double Eher, double Eler, double cross_angle, doub
 
   m_cmsEnergy = m_boost.M();
 
-  B2INFO("PCmsLabTransform: " << Eher << " " << Eler << " " << cross_angle << " " << angle);
+  B2INFO("PCmsLabTransform: " << Eher << " " << Eler << " " << cross_angle << " " << angle_ler);
 
 }
 

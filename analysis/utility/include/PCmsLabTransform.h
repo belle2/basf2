@@ -33,15 +33,16 @@ namespace Belle2 {
      * @param Eher energy of High Energy Ring
      * @param Eler energy of Low Energy Ring
      * @param cross_angle beam crossing angle
-     * @param angle angle of low energy beam in respect to z-axis
+     * @param angle_ler angle between inverse direction of low energy beam and z-axis
      */
-    void update(double Eher, double Eler, double cross_angle, double angle);
+    void update(double Eher, double Eler, double cross_angle, double angle_ler);
 
     /**
      * Returns Lorentz transformation from CMS to Lab
      * @return const reference to Lorentz rotation matrix
      */
-    const TLorentzRotation& rotateCmsToLab() const {
+    const TLorentzRotation& rotateCmsToLab() const
+    {
       return m_cms2lab;
     }
 
@@ -49,7 +50,8 @@ namespace Belle2 {
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
      */
-    const TLorentzRotation& rotateLabToCms() const {
+    const TLorentzRotation& rotateLabToCms() const
+    {
       return m_lab2cms;
     }
 
@@ -57,7 +59,8 @@ namespace Belle2 {
      * Returns boost vector
      * @return const reference to Lorentz vector
      */
-    const TLorentzVector& getBoostVector() const {
+    const TLorentzVector& getBoostVector() const
+    {
       return m_boost;
     }
 
@@ -65,7 +68,8 @@ namespace Belle2 {
      * Returns CMS energy of e+e-
      * @return CMS energy of e+e-
      */
-    double getCMSEnergy() const {
+    double getCMSEnergy() const
+    {
       return m_cmsEnergy;
     }
 

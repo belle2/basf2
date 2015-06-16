@@ -1140,9 +1140,9 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
 
   double maxTime = 5000.; //in ns
-  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
-    maxTime = m_XT[iCLayer][lrp][ialpha][itheta][6];
-  }
+  //  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
+  //    maxTime = m_XT[iCLayer][lrp][ialpha][itheta][6];
+  //  }
 
   double t0 = 0.;
   double d0 = getDriftLength(t0, iCLayer, lr, alpha, theta) - dist;

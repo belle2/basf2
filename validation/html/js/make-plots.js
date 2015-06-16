@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 	// The on-click events if a user requests a new set of revisions:
-	$(document.body).on('click', '#regenerate', function() {
+	$('#menu').on('click', '#regenerate', function() {
 
 		// Get an array with the values of all checked checkboxes, i.e. the
 		// revisions requested by the user, and sort it alphabetically
@@ -31,7 +31,7 @@ $(document).ready(function() {
 			// packages.html and revisions.html
 		}).done(function(json) {
 
-			loadcontent(joined_revisions);
+			loadcontent(joined_revisions, true);
 
 			// If however there was a problem with the AJAX request, print the
 			// error message that the server sent back

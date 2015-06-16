@@ -991,14 +991,6 @@ def create_packages_list_html(list_of_packages, list_of_revisions):
 
             pkgs.write('</div>')
 
-        # Add JavaScript that shows/hides the boxes with the files
-        pkgs.write('<script type="text/javascript"> \n'
-                   '$(".pkg_container_head").click( function() { \n'
-                   '$(".pkg_container").each( function(){$(this).hide();});\n'
-                   '$(".pkg_"+$(this).attr("name")).show(); \n'
-                   '}); \n'
-                   '</script> \n')
-
 
 ##############################################################################
 #                             Class Definition                               #

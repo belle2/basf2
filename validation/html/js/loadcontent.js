@@ -1,4 +1,4 @@
-function loadcontent(joined_revisions) {
+function loadcontent(joined_revisions, reload_checkboxes) {
 
 	// Check if we were given a set if revisions.
 	// If this is the case, we will load all .html files from the corresponding
@@ -17,7 +17,41 @@ function loadcontent(joined_revisions) {
 	$("#revisions").load('./revisions.html');
 
 	// Load the list of packages
-	$("#packages").load(path + 'packages.html');
+	// If the function is called with the reload_checkboxes parameter, that 
+	// means the call is coming from make-plots.js, and we might need to
+	// restore the selection
+	// All this is necessary due to the asynchronous nature of the load()-call.
+	// Hence we can't put this into the make-plots.js where it would make more
+	// sense.
+	if (reload_checkboxes !== undefined) {
+
+		// Remember which packages were selected by the user
+		var selected = [];
+		$('input[type="checkbox"][name="packages"]').each(function() {
+			if ($(this).is(':checked')) {
+				selected.push($(this).attr('value'));
+			}
+		});
+
+		// Now load the packages.html file
+		$("#packages").load(path + 'packages.html', function() {
+
+			// Unselect packages that were unselected before (and hide the
+			// corresponding packages)
+			$('input[type="checkbox"][name="packages"]').each(function() {
+				// If it was not selected before, deactive it
+				if ($.inArray($(this).attr('value'), selected) == -1) {
+					$(this).prop('checked', false);
+					$('#' + $(this).attr('value')).hide();
+				}
+			});
+		});
+	}
+	// If there is no reload_checkboxes parameter, it is because the page is
+	// loaded for the first time and we want all checkboxes to be checked!
+	else {
+		$("#packages").load(path + 'packages.html');
+	}
 
 	// Load the contents, i.e. the plots and tables
 	$("#content").load(path + 'content.html', function() {
@@ -131,11 +165,6 @@ function loadcontent(joined_revisions) {
 				$(this).closest(".nomatrix").removeClass("show");
 			});
 
-		}).done(function() {
-			return true;
-		}).error(function() {
-			return false;
 		});
 	});
-
 }

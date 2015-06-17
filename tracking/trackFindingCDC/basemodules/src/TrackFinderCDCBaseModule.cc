@@ -203,7 +203,7 @@ size_t TrackFinderCDCBaseModule::copyRemainingHits()
 }
 
 
-void TrackFinderCDCBaseModule::prepareEvent()
+void TrackFinderCDCBaseModule::event()
 {
   prepareHits();
 
@@ -212,15 +212,6 @@ void TrackFinderCDCBaseModule::prepareEvent()
   if (not m_param_tracksStoreObjNameIsInput) {
     storedTracks.create();
   }
-}
-
-
-
-void TrackFinderCDCBaseModule::event()
-{
-  prepareEvent();
-
-  StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
   std::vector<CDCTrack>& outputTracks = *storedTracks;
 
   // Either we just have to let the generate-method fill the outputTracks,

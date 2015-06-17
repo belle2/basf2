@@ -48,15 +48,10 @@ namespace Belle2 {
     /// Called when entering a new run.
     virtual void beginRun();
 
-    /** Once per event called for before processing starts
-     *  Meant for submodules to do their setup work.
-     */
-    virtual void prepareEvent();
-
     /// Processes the event and generates track candidates
     virtual void event();
 
-    /// Generates the tracks into the output argument. To be overriden in a concrete subclass.
+    /// Load the hits from the StoreArray and blocks the already used ones.
     size_t prepareHits();
 
     /** Copies the CDCHits that are not blocked at the end of the processing

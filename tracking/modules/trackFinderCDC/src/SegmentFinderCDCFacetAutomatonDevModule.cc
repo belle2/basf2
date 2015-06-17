@@ -24,16 +24,18 @@ using namespace TrackFindingCDC;
 REG_MODULE(SegmentFinderCDCFacetAutomatonDev);
 
 SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule() :
-  SegmentFinderCDCFacetAutomatonImplModule<>(c_Symmetric),
+  Super(c_Symmetric),
   m_clusterFilterFactory("all"),
   m_facetFilterFactory("realistic"),
-  m_facetRelationFilterFilterFactory("simple")
+  m_facetRelationFilterFilterFactory("simple"),
+  m_segmentRelationFilterFilterFactory("none")
 {
   setDescription("Versatile module with adjustable filters for segment generation.");
 
   m_clusterFilterFactory.exposeParameters(this);
   m_facetFilterFactory.exposeParameters(this);
   m_facetRelationFilterFilterFactory.exposeParameters(this);
+  m_segmentRelationFilterFilterFactory.exposeParameters(this);
 }
 
 void SegmentFinderCDCFacetAutomatonDevModule::initialize()
@@ -49,11 +51,16 @@ void SegmentFinderCDCFacetAutomatonDevModule::initialize()
   ptrFacetRelationFilter = m_facetRelationFilterFilterFactory.create();
   setFacetRelationFilter(std::move(ptrFacetRelationFilter));
 
-  SegmentFinderCDCFacetAutomatonImplModule<>::initialize();
+  std::unique_ptr<BaseSegmentRelationFilter>
+  ptrSegmentRelationFilter = m_segmentRelationFilterFilterFactory.create();
+  setSegmentRelationFilter(std::move(ptrSegmentRelationFilter));
+
+  Super::initialize();
 
   if (getClusterFilter()->needsTruthInformation() or
       getFacetFilter()->needsTruthInformation() or
-      getFacetRelationFilter()->needsTruthInformation()) {
+      getFacetRelationFilter()->needsTruthInformation() or
+      getSegmentRelationFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -63,9 +70,10 @@ void SegmentFinderCDCFacetAutomatonDevModule::event()
 {
   if (getClusterFilter()->needsTruthInformation() or
       getFacetFilter()->needsTruthInformation() or
-      getFacetRelationFilter()->needsTruthInformation()) {
+      getFacetRelationFilter()->needsTruthInformation() or
+      getSegmentRelationFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 
-  SegmentFinderCDCFacetAutomatonImplModule<>::event();
+  Super::event();
 }

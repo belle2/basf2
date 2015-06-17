@@ -14,12 +14,17 @@
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segment_relation/SegmentRelationFilterFactory.h>
 
 namespace Belle2 {
 
   /// Module for the cellular automaton tracking for the CDC on regular events
   class SegmentFinderCDCFacetAutomatonDevModule:
     public Belle2::TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule<> {
+
+  private:
+    /// Type of the base class
+    typedef SegmentFinderCDCFacetAutomatonImplModule<> Super;
 
   public:
     /// Constructor of the module. Setting up parameters and description.
@@ -28,7 +33,7 @@ namespace Belle2 {
     /// Initialize the Module before event processing
     virtual void initialize() override;
 
-    /// Event method exectured for each event.
+    /// Processes the current event
     virtual void event() override;
 
   private:
@@ -50,6 +55,12 @@ namespace Belle2 {
     */
     Belle2::TrackFindingCDC::FacetRelationFilterFactory m_facetRelationFilterFilterFactory;
 
+
+    /**
+       Factory for the segment relation filter, knowing all the available filters and
+       their respective parameters
+    */
+    Belle2::TrackFindingCDC::SegmentRelationFilterFactory m_segmentRelationFilterFilterFactory;
 
   }; // end class
 } // end namespace Belle2

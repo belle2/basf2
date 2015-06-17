@@ -142,10 +142,9 @@ namespace Belle2 {
 
       }
 
-      virtual void prepareEvent() override
+      /// Processes the current event
+      void event() override
       {
-        Super::prepareEvent();
-
         /// Attain cluster vector on the DataStore if needed.
         if (m_param_writeClusters) {
           StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedClusters(m_param_clustersStoreObjName);
@@ -163,6 +162,8 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<CDCTangentSegment> > storedTangentSegments(m_param_tangentSegmentsStoreObjName);
           storedTangentSegments.create();
         }
+
+        Super::event();
       }
 
       /// Generates the segment from Monte Carlo information. Default orientation is the flight direction.

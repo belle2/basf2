@@ -50,10 +50,11 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual CellWeight operator()(const Relation<CDCRecoSegment2D>& relation) override final
+      virtual CellWeight operator()(const Relation<CDCRecoSegment2D>& relation) override
       {
         const CDCRecoSegment2D* ptrFrom = relation.first;
         const CDCRecoSegment2D* ptrTo = relation.second;
+        if (ptrFrom == ptrTo) return NOT_A_NEIGHBOR; // Prevent relation to same.
         if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
         return operator()(*ptrFrom, *ptrTo);
       }

@@ -48,11 +48,19 @@ namespace Belle2 {
       /// Averages the reconstructed positions from hits that overlap in adjacent facet in the given facet path.
       static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
 
+      /** Flattens a series of segments to one segment.
+       *  Does not copy any fit.
+       */
+      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoSegment2D*>& segmentPath);
 
-      /// Reconstruct from wire hits with attached right left passage hypotheses by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
+      /** Reconstruct from wire hits with attached right left passage hypotheses
+       *  by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
+       */
       static CDCRecoSegment2D reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment);
 
-      /// Reconstruct from wire hits with attached right left passage hypotheses by constructing facets between adjacent hits triples and averaging the reconstucted position.
+      /** Reconstruct from wire hits with attached right left passage hypotheses
+       *  by constructing facets between adjacent hits triples and averaging the reconstucted position.
+       */
       static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
       ///Implements the standard swap idiom
@@ -73,6 +81,13 @@ namespace Belle2 {
       /// Defines segments and superlayers to be coaligned.
       friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCRecoSegment2D& segment)
       { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
+
+      /// Allow automatic taking of the address.
+      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
+       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
+      operator const Belle2::TrackFindingCDC::CDCRecoSegment2D* () const
+      { return this; }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const

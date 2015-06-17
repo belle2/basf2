@@ -217,6 +217,19 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
 }
 
 
+CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegment2D*>& segmentPath)
+{
+  CDCRecoSegment2D result;
+  for (const CDCRecoSegment2D* ptrSegment : segmentPath) {
+    assert(ptrSegment);
+    const CDCRecoSegment2D& segment = *ptrSegment;
+    for (const CDCRecoHit2D& recoHit2D : segment) {
+      result.push_back(recoHit2D);
+    }
+  }
+  return result;
+}
+
 
 
 

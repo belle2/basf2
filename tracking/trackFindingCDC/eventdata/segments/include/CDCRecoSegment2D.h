@@ -184,6 +184,18 @@ namespace Belle2 {
 
       }
 
+      /// Indicates if two segments share some wire hits
+      bool sharesWireHit(const CDCRecoSegment2D& segment) const
+      {
+        for (const CDCRecoHit2D& recoHit : segment) {
+          const CDCWireHit& wireHit = recoHit.getWireHit();
+          if (hasWireHit(wireHit)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       /// Getter for the two dimensional trajectory fitted to the segment
       CDCTrajectory2D& getTrajectory2D() const
       { return m_trajectory2D; }

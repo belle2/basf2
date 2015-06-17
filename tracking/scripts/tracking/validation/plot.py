@@ -341,12 +341,22 @@ class ValidationPlot(object):
             x_taxis = histogram.GetXaxis()
             for i_x_bin, x_bin_label in enumerate(x_bin_labels):
                 x_taxis.SetBinLabel(i_x_bin + 1, x_bin_label)
+            self.add_stats_entry(histogram, "dx", 0)
+
+        else:
+            x_bin_width = x_bin_edges[1] - x_bin_edges[0]
+            self.add_stats_entry(histogram, "dx", x_bin_width)
 
         if y_bin_labels:
             get_logger().info("Scatter plot %s is discrete in y.", name)
             y_taxis = histogram.GetYaxis()
             for i_y_bin, y_bin_label in enumerate(y_bin_labels):
                 y_taxis.SetBinLabel(i_y_bin + 1, y_bin_label)
+            self.add_stats_entry(histogram, "dy", 0)
+
+        else:
+            y_bin_width = y_bin_edges[1] - y_bin_edges[0]
+            self.add_stats_entry(histogram, "dy", y_bin_width)
 
         self.create(histogram, xs, ys=ys, weights=weights, stackby=stackby)
 
@@ -368,19 +378,42 @@ class ValidationPlot(object):
 
     def fit_gaus(self):
         """Fit a gaus belle curve to a one dimensional histogram"""
-        self.fit('gaus', 'LM')
+        title = "gaus"
+        formula = "gaus"
+        fit_tf1 = ROOT.TF1("Fit", formula)
+        fit_tf1.SetTitle(title)
+        fit_tf1.SetParName(0, "n")
+        fit_tf1.SetParName(1, "mean")
+        fit_tf1.SetParName(2, "std")
+        self.fit(fit_tf1, 'LM')
 
     def fit_line(self):
         """Fit a general line to a one dimensional histogram"""
-        self.fit('x++1', 'M')
+        title = "line"
+        formula = "x++1"
+        fit_tf1 = ROOT.TF1("Fit", formula)
+        fit_tf1.SetTitle(title)
+        fit_tf1.SetParName(0, "slope")
+        fit_tf1.SetParName(1, "intercept")
+        self.fit(fit_tf1, 'M')
 
     def fit_const(self):
         """Fit a constant function to a one dimensional histogram"""
-        self.fit('[0]', 'M')
+        title = "const"
+        formula = "[0]"
+        fit_tf1 = ROOT.TF1("Fit", formula)
+        fit_tf1.SetTitle(title)
+        fit_tf1.SetParName(0, "intercept")
+        self.fit(fit_tf1, 'M')
 
     def fit_diag(self):
         """Fit a diagonal line through the origin to a one dimensional histogram"""
-        self.fit('[0]*x', 'M')
+        title = "diag"
+        formula = "[0]*x"
+        fit_tf1 = ROOT.TF1("Fit", formula)
+        fit_tf1.SetTitle(title)
+        fit_tf1.SetParName(0, "slope")
+        self.fit(fit_tf1, 'M')
 
     def fit(self, formula, options):
         """Fit a user defined function to a one dimensional histogram"""
@@ -398,10 +431,14 @@ class ValidationPlot(object):
         lower_bound = xaxis.GetBinLowEdge(1)
         upper_bound = xaxis.GetBinUpEdge(n_bins)
 
-        fit_tf1 = ROOT.TF1("Fit",
-                           formula,
-                           lower_bound,
-                           upper_bound)
+        if isinstance(formula, ROOT.TF1):
+            fit_tf1 = formula
+            fit_tf1.SetRange(lower_bound, upper_bound)
+        else:
+            fit_tf1 = ROOT.TF1("Fit",
+                               formula,
+                               lower_bound,
+                               upper_bound)
         get_logger().info('Fitting with %s', fit_tf1.GetExpFormula())
 
         # Make sure the fitted function is not automatically added since we want to do that one our own.
@@ -658,6 +695,11 @@ class ValidationPlot(object):
             x_taxis = histogram.GetXaxis()
             for i_bin, bin_label in enumerate(bin_labels):
                 x_taxis.SetBinLabel(i_bin + 1, bin_label)
+            self.add_stats_entry(histogram, "dx", 0)
+
+        else:
+            bin_width = bin_edges[1] - bin_edges[0]
+            self.add_stats_entry(histogram, "dx", bin_width)
 
         self.create(histogram,
                     xs,
@@ -722,12 +764,16 @@ class ValidationPlot(object):
                 for histogram in reversed(histograms):
                     if isinstance(histogram, ROOT.TProfile):
                         histogram = self.convert_tprofile_to_tgrapherrors(histogram)
-                    plot.Add(histogram)
+                        plot.Add(histogram, "APZ")
+                    else:
+                        plot.Add(histogram)
             else:
                 for histogram in histograms:
                     if isinstance(histogram, ROOT.TProfile):
                         histogram = self.convert_tprofile_to_tgrapherrors(histogram)
-                    plot.Add(histogram)
+                        plot.Add(histogram, "APZ")
+                    else:
+                        plot.Add(histogram)
 
         self.histograms = histograms
         self.plot = plot
@@ -924,7 +970,7 @@ class ValidationPlot(object):
         for i, (x, y) in enumerate(zip(plot_xs, plot_ys)):
             graph.SetPoint(i, x, y)
 
-        self.add_stats_entry(graph, 'Entries', np.sum(np.isfinite(xs)))
+        self.add_stats_entry(graph, 'count', np.sum(np.isfinite(xs)))
 
         self.add_nan_inf_stats(graph, 'x', xs)
         self.add_nan_inf_stats(graph, 'y', ys)
@@ -945,10 +991,10 @@ class ValidationPlot(object):
         if y_n_overflow:
             self.add_stats_entry(graph, 'y overf.', y_n_overflow)
 
-        self.add_stats_entry(graph, 'x mean', graph.GetMean(1))
+        self.add_stats_entry(graph, 'x avg', graph.GetMean(1))
         self.add_stats_entry(graph, 'x std', graph.GetRMS(1))
 
-        self.add_stats_entry(graph, 'y mean', graph.GetMean(2))
+        self.add_stats_entry(graph, 'y avg', graph.GetMean(2))
         self.add_stats_entry(graph, 'y std', graph.GetRMS(2))
 
         self.add_stats_entry(graph, 'cov', graph.GetCovariance())
@@ -1606,9 +1652,11 @@ class ValidationPlot(object):
         lower_bound = ROOT.Double()
         upper_bound = ROOT.Double()
         fit_tf1.GetRange(lower_bound, upper_bound)
+        title = fit_tf1.GetTitle()
 
         combined_formula = additional_stats_tf1.GetName() + '+' + fit_tf1.GetName()
         combined_tf1 = ROOT.TF1("Combined", combined_formula, lower_bound, upper_bound)
+        combined_tf1.SetTitle(title)
 
         # Transfer the fitted parameters
         chi2 = fit_tf1.GetChisquare()

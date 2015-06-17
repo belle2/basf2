@@ -61,6 +61,11 @@ namespace Belle2 {
         // no best candidate analysis needed
         // (only makes sense with minimal clusters to avoid evaluating of uncommon paths)
 
+
+        for (const Item& item : itemRange) {
+          item.unsetAndForwardMaskedFlag();
+        }
+
         bool created = false;
         B2DEBUG(100, "Apply multipass cellular automat");
         do {
@@ -76,12 +81,12 @@ namespace Belle2 {
 
             //Block the used items
             for (const Item* item : newPath) {
-              item->setAndForwardTakenFlag();
+              item->setAndForwardMaskedFlag();
             }
 
             //Block the items that have already used components
             for (const Item& item : itemRange) {
-              item.receiveTakenFlag();
+              item.receiveMaskedFlag();
             }
 
             paths.push_back(std::move(newPath));

@@ -27,15 +27,29 @@ namespace Belle2 {
     class AutomatonCell  {
 
     public:
-      typedef unsigned CellFlags; ///< Type for the additional status flags of cells in the cellular automata
-      static const CellFlags ASSIGNED = 1; ///< Constant for a already updated cell
-      static const CellFlags START = 2; ///< Constant for a cell that marks the start of a path
-      static const CellFlags CYCLE = 4; ///< Constant marker for the detection of cycles in the cellular automata
-      static const CellFlags TAKEN = 8; ///< Constant for a cell that has been taken by a segment / track
-      static const CellFlags BACKGROUND = 16; ///< Constant for a cell that is marked as background.
+      /// Type for the additional status flags of cells in the cellular automata
+      typedef unsigned CellFlags;
+
+      /// Constant for a already updated cell
+      static const CellFlags ASSIGNED = 1;
+
+      /// Constant for a cell that marks the start of a path
+      static const CellFlags START = 2;
+
+      /// Constant marker for the detection of cycles in the cellular automata
+      static const CellFlags CYCLE = 4;
+
+      /// Constant for a cell that has been masked for the current run of the cellular automaton.
+      static const CellFlags MASKED = 8;
+
+      /// Constant for a cell that has been taken by track
+      static const CellFlags TAKEN = 16;
+
+      /// Constant for a cell that is marked as background.
+      static const CellFlags BACKGROUND = 32;
 
       /// Constant summing all possible cell flags
-      static const CellFlags ALL_FLAGS = ASSIGNED + START + CYCLE + TAKEN + BACKGROUND;
+      static const CellFlags ALL_FLAGS = ASSIGNED + START + CYCLE + MASKED + TAKEN + BACKGROUND;
 
 
     public:
@@ -127,6 +141,20 @@ namespace Belle2 {
 
 
 
+      /// Sets the masked flag to the given value. Default value true.
+      void setMaskedFlag(bool setTo = true) const
+      { setFlags<MASKED>(setTo); }
+
+      /// Resets the masked flag to false.
+      void unsetMaskedFlag() const
+      { setFlags<MASKED>(false); }
+
+      /// Gets the current state of the masked marker flag.
+      bool hasMaskedFlag() const
+      { return hasAnyFlags(MASKED); }
+
+
+
       /// Sets the taken flag to the given value. Default value true.
       void setTakenFlag(bool setTo = true) const
       { setFlags<TAKEN>(setTo); }
@@ -172,8 +200,9 @@ namespace Belle2 {
        *  const CellFlags ASSIGNED = 1; \n
        *  const CellFlags START = 2; \n
        *  const CellFlags CYCLE = 4; \n
-       *  const CellFlags TAKEN = 8; \n
-       *  const CellFlags BACKGROUND = 16; \n
+       *  const CellFlags MASKED = 8; \n
+       *  const CellFlags TAKEN = 16; \n
+       *  const CellFlags BACKGROUND = 32; \n
        *  Use rather hasAnyFlags() to retrieve stats even for single state values.
        */
       const CellFlags& getFlags() const { return m_flags; }
@@ -190,9 +219,14 @@ namespace Belle2 {
 
 
     private:
-      mutable CellWeight m_weight; ///< Storage for the cell weight
-      mutable CellFlags m_flags; ///< Storage for the cell status flags
-      mutable CellState m_state; ///< Storage for the cell state set by the cellular automata
+      /// Storage for the cell weight
+      mutable CellWeight m_weight;
+
+      /// Storage for the cell status flags
+      mutable CellFlags m_flags;
+
+      /// Storage for the cell state set by the cellular automata
+      mutable CellState m_state;
 
 
     }; //class

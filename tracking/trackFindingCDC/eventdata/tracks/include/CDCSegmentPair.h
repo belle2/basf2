@@ -208,23 +208,32 @@ namespace Belle2 {
       void clearTrajectory3D() const
       { getTrajectory3D().clear(); }
 
-      /// Sets the taken flag of the segment triple's automaton cell and of the three contained segments.
-      void setAndForwardTakenFlag() const
+
+      /// Unsets the masked flag of the segment triple's automaton cell and of the three contained segments.
+      void unsetAndForwardMaskedFlag() const
       {
-        getAutomatonCell().setTakenFlag();
-        getStartSegment()->setAndForwardTakenFlag();
-        getEndSegment()->setAndForwardTakenFlag();
+        getAutomatonCell().unsetMaskedFlag();
+        getStartSegment()->unsetAndForwardMaskedFlag();
+        getEndSegment()->unsetAndForwardMaskedFlag();
       }
 
-      /// If one of the contained segments is marked as taken this segment triple is set be taken as well.
-      void receiveTakenFlag() const
+      /// Sets the masked flag of the segment triple's automaton cell and of the three contained segments.
+      void setAndForwardMaskedFlag() const
       {
-        getStartSegment()->receiveTakenFlag();
-        getEndSegment()->receiveTakenFlag();
+        getAutomatonCell().setMaskedFlag();
+        getStartSegment()->setAndForwardMaskedFlag();
+        getEndSegment()->setAndForwardMaskedFlag();
+      }
 
-        if (getStartSegment()->getAutomatonCell().hasTakenFlag() or
-            getEndSegment()->getAutomatonCell().hasTakenFlag()) {
-          getAutomatonCell().setTakenFlag();
+      /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
+      void receiveMaskedFlag() const
+      {
+        getStartSegment()->receiveMaskedFlag();
+        getEndSegment()->receiveMaskedFlag();
+
+        if (getStartSegment()->getAutomatonCell().hasMaskedFlag() or
+            getEndSegment()->getAutomatonCell().hasMaskedFlag()) {
+          getAutomatonCell().setMaskedFlag();
         }
       }
 

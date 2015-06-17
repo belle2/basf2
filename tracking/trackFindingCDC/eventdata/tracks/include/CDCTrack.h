@@ -117,6 +117,46 @@ namespace Belle2 {
       const CDCTrajectory3D& getEndTrajectory3D() const
       { return m_endTrajectory3D; }
 
+      /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell()
+      { return m_automatonCell; }
+
+      /// Constant getter for the automaton cell.
+      const AutomatonCell& getAutomatonCell() const
+      { return m_automatonCell; }
+
+      /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
+      void unsetAndForwardMaskedFlag() const
+      {
+        getAutomatonCell().unsetMaskedFlag();
+        for (const CDCRecoHit3D& recoHit3D : *this) {
+          const CDCWireHit& wireHit = recoHit3D.getWireHit();
+          wireHit.getAutomatonCell().unsetMaskedFlag();
+        }
+      }
+
+      /// Set the masked flag of the automaton cell of this segment and forward the masked flag to all contained wire hits.
+      void setAndForwardMaskedFlag() const
+      {
+        getAutomatonCell().setMaskedFlag();
+        for (const CDCRecoHit3D& recoHit3D : *this) {
+          const CDCWireHit& wireHit = recoHit3D.getWireHit();
+          wireHit.getAutomatonCell().setMaskedFlag();
+        }
+      }
+
+      /// Check all contained wire hits if one has the masked flag. Set the masked flag of this segment in case at least one of the contained wire hits is flagged as masked.
+      void receiveMaskedFlag() const
+      {
+        for (const CDCRecoHit3D& recoHit3D : *this) {
+          const CDCWireHit& wireHit = recoHit3D.getWireHit();
+          if (wireHit.getAutomatonCell().hasMaskedFlag()) {
+            getAutomatonCell().setMaskedFlag();
+            return;
+          }
+        }
+      }
+
 
 
       /// Reverse the track inplace
@@ -126,12 +166,14 @@ namespace Belle2 {
       CDCTrack reversed() const;
 
     private:
+      /// Memory for the automaton cell.
+      AutomatonCell m_automatonCell;
+
       /// Memory for the three dimensional trajectory at the start of the track
       CDCTrajectory3D m_startTrajectory3D;
 
       /// Memory for the three dimensional trajectory at the end of the track
       CDCTrajectory3D m_endTrajectory3D;
-
 
     }; //class
 

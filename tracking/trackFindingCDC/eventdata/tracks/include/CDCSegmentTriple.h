@@ -112,25 +112,33 @@ namespace Belle2 {
       void clearTrajectories() const
       { clearTrajectorySZ(); CDCAxialSegmentPair::clearTrajectory2D(); }
 
-      /// Sets the taken flag of the segment triple's automaton cell. Also forward the taken to the contained segments and the contained wire hits.
-      void setAndForwardTakenFlag() const
+      /// Unsets the masked flag of the segment triple's automaton cell, of the contained segments and of the contained wire hits.
+      void unsetAndForwardMaskedFlag() const
       {
-        getAutomatonCell().setTakenFlag();
-        CDCAxialSegmentPair::setAndForwardTakenFlag();
-        getMiddle()->setAndForwardTakenFlag();
+        getAutomatonCell().unsetMaskedFlag();
+        CDCAxialSegmentPair::unsetAndForwardMaskedFlag();
+        getMiddle()->unsetAndForwardMaskedFlag();
       }
 
-      /// If one of the contained segments is marked as taken this segment triple is set be taken as well.
-      void receiveTaken() const
+      /// Sets the masked flag of the segment triple's automaton cell. Also forward the masked to the contained segments and the contained wire hits.
+      void setAndForwardMaskedFlag() const
       {
-        CDCAxialSegmentPair::receiveTakenFlag();
-        getMiddle()->receiveTakenFlag();
+        getAutomatonCell().setMaskedFlag();
+        CDCAxialSegmentPair::setAndForwardMaskedFlag();
+        getMiddle()->setAndForwardMaskedFlag();
+      }
 
-        if (getStart()->getAutomatonCell().hasTakenFlag() or
-            getMiddle()->getAutomatonCell().hasTakenFlag() or
-            getEnd()->getAutomatonCell().hasTakenFlag()) {
+      /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
+      void receiveMaskedFlag() const
+      {
+        CDCAxialSegmentPair::receiveMaskedFlag();
+        getMiddle()->receiveMaskedFlag();
 
-          getAutomatonCell().setTakenFlag();
+        if (getStart()->getAutomatonCell().hasMaskedFlag() or
+            getMiddle()->getAutomatonCell().hasMaskedFlag() or
+            getEnd()->getAutomatonCell().hasMaskedFlag()) {
+
+          getAutomatonCell().setMaskedFlag();
 
         }
       }

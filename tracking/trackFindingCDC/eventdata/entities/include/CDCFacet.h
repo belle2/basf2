@@ -155,24 +155,34 @@ namespace Belle2 {
       /// Calculates the sum of squared distances of the trajectory to the three hits.
       FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 
-      /// Sets the taken flag of the facet's automaton cell and of the three contained wire hits
-      void setAndForwardTakenFlag() const
+
+      /// Unset the masked flag of the facet's automaton cell and of the three contained wire hits
+      void unsetAndForwardMaskedFlag() const
       {
-        getAutomatonCell().setTakenFlag();
-        getStartWireHit().getAutomatonCell().setTakenFlag();
-        getMiddleWireHit().getAutomatonCell().setTakenFlag();
-        getEndWireHit().getAutomatonCell().setTakenFlag();
+        getAutomatonCell().unsetMaskedFlag();
+        getStartWireHit().getAutomatonCell().unsetMaskedFlag();
+        getMiddleWireHit().getAutomatonCell().unsetMaskedFlag();
+        getEndWireHit().getAutomatonCell().unsetMaskedFlag();
       }
 
-      /// If one of the contained wire hits is marked as taken this facet is set be taken as well.
-      void receiveTakenFlag() const
+      /// Sets the masked flag of the facet's automaton cell and of the three contained wire hits
+      void setAndForwardMaskedFlag() const
+      {
+        getAutomatonCell().setMaskedFlag();
+        getStartWireHit().getAutomatonCell().setMaskedFlag();
+        getMiddleWireHit().getAutomatonCell().setMaskedFlag();
+        getEndWireHit().getAutomatonCell().setMaskedFlag();
+      }
+
+      /// If one of the contained wire hits is marked as masked this facet is set be masked as well.
+      void receiveMaskedFlag() const
       {
 
-        if (getStartWireHit().getAutomatonCell().hasTakenFlag() or
-            getMiddleWireHit().getAutomatonCell().hasTakenFlag() or
-            getEndWireHit().getAutomatonCell().hasTakenFlag()) {
+        if (getStartWireHit().getAutomatonCell().hasMaskedFlag() or
+            getMiddleWireHit().getAutomatonCell().hasMaskedFlag() or
+            getEndWireHit().getAutomatonCell().hasMaskedFlag()) {
 
-          getAutomatonCell().setTakenFlag();
+          getAutomatonCell().setMaskedFlag();
         }
       }
 

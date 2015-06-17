@@ -29,9 +29,7 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    ///Implemetation of the cellular automaton
-    /** Implements the weighted cellular automaton algorithm respecting the DO_NOT_USE flags of the cells
-     *  not to be traversed. */
+    /** Implements the weighted cellular automaton algorithm */
     template<class Item>
     class CellularAutomaton {
 
@@ -81,7 +79,7 @@ namespace Belle2 {
 
         for (const Item& item : itemRange) {
           const AutomatonCell& automatonCell = item.getAutomatonCell();
-          if (automatonCell.hasTakenFlag()) continue;
+          if (automatonCell.hasMaskedFlag()) continue;
           if (automatonCell.hasCycleFlag()) continue;
 
           if (not automatonCell.hasAssignedFlag()) {
@@ -147,7 +145,7 @@ namespace Belle2 {
       const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const
       {
         //--- blocked cells do not contribute a continuation ---
-        if (item.getAutomatonCell().hasTakenFlag()) {
+        if (item.getAutomatonCell().hasMaskedFlag()) {
           item.getAutomatonCell().setCellState(NAN);
           item.getAutomatonCell().setAssignedFlag();
           return item.getAutomatonCell().getCellState();
@@ -161,7 +159,7 @@ namespace Belle2 {
         for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(&item)) {
           //advance to valid neighbor
           const Item* ptrNeighbor = getNeighbor(relation);
-          if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasTakenFlag()) {
+          if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasMaskedFlag()) {
 
             const Item& neighbor = *ptrNeighbor;
 
@@ -306,7 +304,7 @@ namespace Belle2 {
 
 
           } //end if itItem->getCellState() == 0
-        } //end itItem
+         } //end itItem
 
       }*/
 

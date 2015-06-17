@@ -169,7 +169,7 @@ namespace Belle2 {
       {
         return
           cell.hasStartFlag() and
-          not cell.hasTakenFlag() and
+          not cell.hasMaskedFlag() and
           not cell.hasCycleFlag() and
           minStateToFollow <= cell.getCellState();
       }
@@ -202,7 +202,7 @@ namespace Belle2 {
 
         return (
                  not neighborCell.hasCycleFlag() and
-                 not neighborCell.hasTakenFlag() and
+                 not neighborCell.hasMaskedFlag() and
                  (itemCell.getCellState() == (neighborCell.getCellState() + weight + itemCell.getCellWeight()))
                );
       }

@@ -157,31 +157,37 @@ namespace Belle2 {
       /// Constant getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
-      /// Set the taken flag of the automaton cell of this segment and forward the taken flag to all contained wire hits.
-      void setAndForwardTakenFlag() const
+
+      /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
+      void unsetAndForwardMaskedFlag() const
       {
-        getAutomatonCell().setTakenFlag();
+        getAutomatonCell().unsetMaskedFlag();
         for (const CDCRecoHit2D& recoHit2D : *this) {
           const CDCWireHit& wireHit = recoHit2D.getWireHit();
-
-          wireHit.getAutomatonCell().setTakenFlag();
-
+          wireHit.getAutomatonCell().unsetMaskedFlag();
         }
       }
 
-      /// Check all contained wire hits if one has the taken flag. Set the taken flag of this segment in case at least one of the contained wire hits is flagged as taken.
-      void receiveTakenFlag() const
+      /// Set the masked flag of the automaton cell of this segment and forward the masked flag to all contained wire hits.
+      void setAndForwardMaskedFlag() const
+      {
+        getAutomatonCell().setMaskedFlag();
+        for (const CDCRecoHit2D& recoHit2D : *this) {
+          const CDCWireHit& wireHit = recoHit2D.getWireHit();
+          wireHit.getAutomatonCell().setMaskedFlag();
+        }
+      }
+
+      /// Check all contained wire hits if one has the masked flag. Set the masked flag of this segment in case at least one of the contained wire hits is flagged as masked.
+      void receiveMaskedFlag() const
       {
         for (const CDCRecoHit2D& recoHit2D : *this) {
           const CDCWireHit& wireHit = recoHit2D.getWireHit();
-
-          if (wireHit.getAutomatonCell().hasTakenFlag()) {
-            getAutomatonCell().setTakenFlag();
+          if (wireHit.getAutomatonCell().hasMaskedFlag()) {
+            getAutomatonCell().setMaskedFlag();
             return;
           }
-
         }
-
       }
 
       /// Indicates if two segments share some wire hits
@@ -235,9 +241,14 @@ namespace Belle2 {
       { m_iSuperCluster = iSuperCluster; }
 
     private:
-      mutable AutomatonCell
-      m_automatonCell; ///< Memory for the automaton cell. It is declared mutable because it can vary rather freely despite of the hit content might be required fixed
-      mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment
+      /** Memory for the automaton cell.
+       *  It is declared mutable because it can vary
+       *  rather freely despite of the hit content might be required fixed.
+       */
+      mutable AutomatonCell m_automatonCell;
+
+      /// Memory for the two dimensional trajectory fitted to this segment
+      mutable CDCTrajectory2D m_trajectory2D;
 
       /// Memory for the global super cluster id.
       size_t m_iSuperCluster;

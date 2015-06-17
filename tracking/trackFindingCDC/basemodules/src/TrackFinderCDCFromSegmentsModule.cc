@@ -66,10 +66,24 @@ void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
 
   generate(segments, tracks);
 
+  // Create tracks from left over segments
+  for (const CDCRecoSegment2D& segment : segments) {
+    segment.unsetAndForwardMaskedFlag();
+  }
+
+  for (const CDCTrack& track : tracks) {
+    track.unsetAndForwardMaskedFlag();
+  }
+
+  for (const CDCRecoSegment2D& segment : segments) {
+    segment.receiveMaskedFlag();
+  }
+
+
   if (not m_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {
-    // Instance of the leftover single segment tracks creator.
+
     for (const CDCRecoSegment2D& segment : segments) {
-      if (segment.getAutomatonCell().hasTakenFlag()) continue;
+      if (segment.getAutomatonCell().hasMaskedFlag()) continue;
 
       ISuperLayerType iSuperLayer = segment.getISuperLayer();
       if (m_minimalHitsForSingleSegmentTrackBySuperLayerId.count(iSuperLayer) and
@@ -77,9 +91,9 @@ void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
 
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));
-          segment.setAndForwardTakenFlag();
+          segment.setAndForwardMaskedFlag();
           for (const CDCRecoSegment2D& segment : segments) {
-            segment.receiveTakenFlag();
+            segment.receiveMaskedFlag();
           }
         }
       }

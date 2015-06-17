@@ -17,9 +17,8 @@
 
 namespace Belle2 {
 
-  /** The PXD Raw Hit class
-    * This class stores information about PXD Pixel hits
-    * and makes them available in a root tree
+  /** The PXD Raw Cluster class
+    * This class stores Cluster as whole without unpacking
     */
   class PXDRawCluster : public RelationsObject {
   public:
@@ -58,13 +57,6 @@ namespace Belle2 {
       return m_vxdID;
     }
 
-    /** Get the dhe ID.
-    * @return ID of the sensor.
-    */
-//      int getBla() const
-//      {
-//        return m_bla;
-//      }
   protected:
     unsigned int m_length;
     unsigned short* m_cluster; // [m_length] /**< Buffer of size m_length shorts  */

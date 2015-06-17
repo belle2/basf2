@@ -287,10 +287,13 @@ class ValidationPlot(object):
                     stackby=stackby,
                     reverse_stack=False)
 
+        return self
+
     def hist2d(self,
                xs,
                ys,
                weights=None,
+               stackby=None,
                bins=(None, None),
                lower_bound=(None, None),
                upper_bound=(None, None),
@@ -301,12 +304,12 @@ class ValidationPlot(object):
 
         name = self.name
 
-        x_bins, y_bins = unpack_2d_param(bins)
-        x_lower_bound, y_lower_bound = unpack_2d_param(lower_bound)
-        x_upper_bound, y_upper_bound = unpack_2d_param(upper_bound)
-        x_outlier_z_score, y_outlier_z_score = unpack_2d_param(outlier_z_score)
-        x_include_exceptionals, y_include_exceptionals = unpack_2d_param(include_exceptionals)
-        x_allow_discrete, y_allow_discrete = unpack_2d_param(allow_discrete)
+        x_bins, y_bins = self.unpack_2d_param(bins)
+        x_lower_bound, y_lower_bound = self.unpack_2d_param(lower_bound)
+        x_upper_bound, y_upper_bound = self.unpack_2d_param(upper_bound)
+        x_outlier_z_score, y_outlier_z_score = self.unpack_2d_param(outlier_z_score)
+        x_include_exceptionals, y_include_exceptionals = self.unpack_2d_param(include_exceptionals)
+        x_allow_discrete, y_allow_discrete = self.unpack_2d_param(allow_discrete)
 
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
                                                              bins=x_bins,
@@ -345,30 +348,21 @@ class ValidationPlot(object):
             for i_y_bin, y_bin_label in enumerate(y_bin_labels):
                 y_taxis.SetBinLabel(i_y_bin + 1, y_bin_label)
 
-        histograms = []
-
-        self.fill_into(histogram, xs, ys, weights=weights)
-
-        histograms.append(histogram)
-        plot = histogram
+        self.create(histogram, xs, ys=ys, weights=weights, stackby=stackby)
 
         # Adjust the discrete bins after the filling to be equidistant
         if x_bin_labels:
-            x_taxis = histogram.GetXaxis()
-            x_bin_edges = array.array("d", range(len(x_bin_labels) + 1))
-            x_taxis.Set(n_x_bins, x_bin_edges)
+            for histogram in self.histograms:
+                x_taxis = histogram.GetXaxis()
+                x_bin_edges = array.array("d", range(len(x_bin_labels) + 1))
+                x_taxis.Set(n_x_bins, x_bin_edges)
 
         # Adjust the discrete bins after the filling to be equidistant
         if y_bin_labels:
-            x_taxis = histogram.GetXaxis()
-            y_bin_edges = array.array("d", range(len(y_bin_labels) + 1))
-            y_taxis.Set(n_y_bins, y_bin_edges)
-
-        self.histograms = histograms
-        self.plot = plot
-
-        # Add description, check, contact and titles to the histogram
-        self.attach_attributes()
+            for histogram in self.histogram:
+                x_taxis = histogram.GetXaxis()
+                y_bin_edges = array.array("d", range(len(y_bin_labels) + 1))
+                y_taxis.Set(n_y_bins, y_bin_edges)
 
         return self
 
@@ -845,12 +839,24 @@ class ValidationPlot(object):
 
         return histograms
 
-    def set_color(self, plot, color):
-        """Fill the data into the plot object"""
-        if isinstance(plot, ROOT.TGraph):
-            plot.SetMarkerColor(color)
+    def set_color(self, tobject, root_i_color):
+        """Set the color of the ROOT object.
+
+        By default the line color of a TGraph should be invisible, so do not change it
+        For other objects set the marker and the line color
+
+        Parameters
+        ----------
+        tobject : Plotable object inheriting from TAttLine and TAttMarker such as TGraph or TH1
+            Object of which the color should be set.
+        root_i_color : int
+            Color index of the ROOT color table
+        """
+        if isinstance(tobject, ROOT.TGraph):
+            tobject.SetMarkerColor(root_i_color)
         else:
-            plot.SetLineColor(color)
+            tobject.SetLineColor(root_i_color)
+            tobject.SetMarkerColor(root_i_color)
 
     def fill_into(self, plot, xs, ys=None, weights=None, filter=None):
         """Fill the data into the plot object"""
@@ -1734,6 +1740,10 @@ def test():
     stacked_validation_profile = ValidationPlot('test_stacked_profile')
     stacked_validation_profile.profile(x1, y1, stackby=stackby)
 
+    # Make a two dimensional histogram with two species
+    stacked_validation_hist2d = ValidationPlot('test_stacked_hist2d')
+    stacked_validation_hist2d.hist2d(x1, y1, stackby=stackby)
+
     # Test a profile with a diagonal fit
     x = np.linspace(-1, 1, 1000)
     y = x.copy()
@@ -1759,6 +1769,7 @@ def test():
         stacked_validation_histogram.write(tdirectory2)
         stacked_validation_scatter.write()
         stacked_validation_profile.write()
+        stacked_validation_hist2d.write()
 
     tfile.Close()
 

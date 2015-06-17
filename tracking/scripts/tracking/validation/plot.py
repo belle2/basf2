@@ -781,6 +781,9 @@ class ValidationPlot(object):
 
     @classmethod
     def convert_tprofile_to_tgrapherrors(cls, tprofile):
+        if isinstance(tprofile, ROOT.TGraph):
+            return tprofile
+
         x_taxis = tprofile.GetXaxis()
         n_bins = x_taxis.GetNbins()
 
@@ -1117,8 +1120,8 @@ class ValidationPlot(object):
                 additional_stats[label] = value
         return additional_stats
 
-    @staticmethod
-    def cumulate(histogram, cumulation_direction=None):
+    @classmethod
+    def cumulate(cls, histogram, cumulation_direction=None):
         """Cumulates the histogram inplace.
 
         Parameters
@@ -1152,11 +1155,12 @@ class ValidationPlot(object):
 
         if isinstance(histogram, ROOT.TProfile):
             tprofile = histogram
-            # Turn the profile histogram into normal histogram where we can set the new content and errors
-            histogram = tprofile.ProjectionX()
-            histogram.SetName(tprofile.GetName())
+            # Turn the profile histogram into graph where we can set the new content and errors
+            tgraph = cls.convert_tprofile_to_tgrapherrors(histogram)
+            tgraph.SetName(tprofile.GetName())
 
             n_bins = histogram.GetNbinsX()
+            n_points = n_bins
             cumulated_content = 0.0
             cumulated_entries = 0
             cumulated_std = 0.0
@@ -1167,6 +1171,7 @@ class ValidationPlot(object):
                 i_bins = reversed(i_bins)
 
             for i_bin in i_bins:
+                i_point = i_bin - 1
                 bin_content = tprofile.GetBinContent(i_bin)
                 bin_entries = tprofile.GetBinEffectiveEntries(i_bin)
                 bin_std = tprofile.GetBinError(i_bin)
@@ -1187,8 +1192,16 @@ class ValidationPlot(object):
                     # empty bin does not add anything to the cumulation
                     pass
 
-                histogram.SetBinContent(i_bin, cumulated_content)
-                histogram.SetBinError(i_bin, cumulated_std)
+                if i_point >= 0 and i_point < n_points:
+                    x = tgraph.GetX()[i_point]
+                    # x = ROOT.Double()
+                    # y = ROOT.Double()
+                    # tgraph.GetPoint(i_point, x, y)
+                    tgraph.SetPoint(i_point, x, cumulated_content)
+
+                    x_error = tgraph.GetErrorX(i_point)
+                    tgraph.SetPointError(i_point, x_error, cumulated_std)
+            return tgraph
 
         else:
             # Always include the overflow bins.
@@ -1204,7 +1217,7 @@ class ValidationPlot(object):
                 cumulated_content += bin_content
                 histogram.SetBinContent(i_bin, cumulated_content)
 
-        return histogram
+            return histogram
 
     def determine_bin_edges(self,
                             xs,

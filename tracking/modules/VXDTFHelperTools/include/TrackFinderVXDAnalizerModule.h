@@ -187,7 +187,6 @@ namespace Belle2 {
         return bestResult;
       }
 
-      void amOasch();
 
     protected:
 

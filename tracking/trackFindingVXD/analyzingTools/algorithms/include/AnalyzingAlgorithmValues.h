@@ -86,19 +86,20 @@ namespace Belle2 {
 
   // TODO
   /**
-   * wie gehts weiter:
-   * die ganzen values-Algorithmen einbauen (und was sonst nocht in TrackFinderVXDAnalizerModule.h angesprochen wird).
-   * AnalyzingAlgorithmFactory updaten.
+   * next steps:
+   * implement all values-algorithms here (simply everything which can be found in TrackFinderVXDAnalizerModule.h.
+   * update AnalyzingAlgorithmFactory
    *
    * TrackFinderVXDAnalizerModule:
-   *  Parameter basteln, vector of vectors (for each entry : firstVector == parameter2collect) { .first = dataType, .second = algorithmType })
+   *  implement parameter, vector of vectors (for each entry : firstVector == parameter2collect) { .first = dataType, .second = algorithmType })
    *
    * in TrackFinderVXDAnalizerModule::initialize()
-   * alle übergebenen Parameter, die in Root gesammelt werden, sollen eingelesen werden (factory übersetzt) und in container gesammelt (nach tcType geclustert, sowie nach typen, wo 1 oder 2 tcs übergeben werden)
-   * das so bauen, dass die im event einfach übergeben werden können
-   * das so bauen, dass das Root-branch füllen auch eingepackt wird
+   * all parameters passed shall be streamed into RootParameterTracker, which takes care of root-storing.
+   *  is clustered via tcType and types where 1 or 2 tcs are passed.
    *
-   * Auswertung testen
+   * implement it in a way that is easy to use within events
+   * implement the feature for the root-Tracker to take care of branches too.
+   *
    */
 
   /** Class for storing an algorithm determining the residual of momentum in theta (in degrees) */

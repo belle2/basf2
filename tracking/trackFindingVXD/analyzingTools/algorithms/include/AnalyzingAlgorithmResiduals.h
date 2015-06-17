@@ -12,6 +12,9 @@
 // tracking:
 #include <tracking/trackFindingVXD/analyzingTools/algorithms/AnalyzingAlgorithmBase.h>
 
+// root:
+#include <TMath.h>
+
 // stl:
 #include <string>
 

@@ -42,6 +42,8 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
     B2WARNING("RootParameterTracker::addParameters(), Root file not initialized yet! Please call RootParameterTracker::initialize(...) first!")
     B2FATAL("RootParameterTracker::addParameters(), Root file not initialized yet! Please call RootParameterTracker::initialize(...) first!")
   }
+  m_file->cd();
+  m_file->ls();
 
   B2WARNING("RootParameterTracker::addParameters(), given parameters are tcTypeName/algorithmName: " << tcTypeName << "/" <<
             algorithmName)
@@ -63,23 +65,23 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
   /// make sure that container for algorithms of given tcType exists:
   auto* algorithms4tcType = m_algorithmBox.find(tcTypeName);
   if (algorithms4tcType == NULL) {
-    AnalyzingAlgorithm<double> newAlgorithm = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>(algorithmName);
+    AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>(algorithmName);
     m_algorithmBox.push_back({
       tcTypeName,
-      {std::move(newAlgorithm)}
+      {newAlgorithm}
     }
                             );
     algorithms4tcType = m_algorithmBox.find(algorithmName);
   } else { // there is already a vector of algorithms for that
-    std::vector<AnalyzingAlgorithm<double> >::iterator foundPos = std::find_if(
+    std::vector<AnalyzingAlgorithm<double>* >::iterator foundPos = std::find_if(
           algorithms4tcType->begin(),
           algorithms4tcType->end(),
-          [&](const AnalyzingAlgorithm<double>& anAlgorithm) -> bool
-    { return algorithmName == anAlgorithm.getID(); }
+          [&](const AnalyzingAlgorithm<double>* anAlgorithm) -> bool
+    { return algorithmName == anAlgorithm->getID(); }
         );
     if (foundPos == algorithms4tcType->end()) {
-      AnalyzingAlgorithm<double> newAlgorithm = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>(algorithmName);
-      algorithms4tcType->push_back(std::move(newAlgorithm));
+      AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>(algorithmName);
+      algorithms4tcType->push_back(newAlgorithm);
     } else {
       B2WARNING("RootParameterTracker::addParameters() given tcTypeName/algorithmName: " << tcTypeName <<
                 "/" << algorithmName <<
@@ -90,8 +92,9 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
   B2WARNING("RootParameterTracker::addParameters(), m_algorithmBox has " << m_algorithmBox.size() << " entries")
 
   /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination
-  auto* data4tcType = m_dataBox.find(tcTypeName);
+  auto* data4tcType = m_dataBox.find(tcTypeName); // contains all algorithms stored for given tcTypeName
   if (data4tcType == NULL) {
+    B2WARNING("RootParameterTracker::addParameters(), tcType " << tcTypeName << " not yet added to m_dataBox, doing it now...")
     m_dataBox.push_back({
       tcTypeName,
       StringKeyBox<std::vector<double>*>()
@@ -99,18 +102,24 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
                        );
     data4tcType = m_dataBox.find(tcTypeName);
   }
-  auto** data4algorithm = data4tcType->find(algorithmName);
+  B2WARNING("RootParameterTracker::addParameters(), m_dataBox has " << m_dataBox.size() << " entries")
+  B2WARNING("RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() << " entries (b4 data4algorithm-check)")
+  auto** data4algorithm = data4tcType->find(algorithmName); // contains all calculated values stored for given algorithmName
   if (data4algorithm == NULL) {
+    B2WARNING("RootParameterTracker::addParameters(), algorithm " << algorithmName << " not yet added to m_dataBox.find(" << tcTypeName
+              << "), doing it now...")
     data4tcType->push_back({
       algorithmName,
       new std::vector<double>()
     }
                           );
     data4algorithm = data4tcType->find(algorithmName);
+    auto* newBranch = (*tree4tcType)->Branch(algorithmName.c_str(), *data4algorithm);
+    newBranch->Print();
   }
-  B2WARNING("RootParameterTracker::addParameters(), m_dataBox has " << m_dataBox.size() << " entries")
+  B2WARNING("RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() <<
+            " entries (after data4algorithm-check)")
   B2WARNING("RootParameterTracker::addParameters(), data4algorithm has " << (*data4algorithm)->size() << " entries")
 
   /// link data to the branch:
-  (*tree4tcType)->Branch(algorithmName.c_str(), *data4algorithm);
 }

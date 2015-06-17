@@ -18,9 +18,10 @@
 
 namespace Belle2 {
 
-  /** Base class (functor) for storing an algorithm determining the data one wants to have */
+
+  /** Base class for storing an algorithm determining the data one wants to have */
   template <class DataType, class TCInfoType, class VectorType>
-  class AnalyzingAlgorithmBase {
+  class AnalyzingAlgorithmBase { /*: public VirtualAnalyzingAlgorithm<DataType, TCInfoType, VectorType>*/
   protected:
 
     /** carries unique ID */
@@ -32,10 +33,19 @@ namespace Belle2 {
     /** constructor used for inheriting classes */
     AnalyzingAlgorithmBase(std::string newID) : m_iD(newID)/*, m_origin(0,0,0)*/ {}
 
+    /** copy constructor */
+    AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) : m_iD(algo.m_iD)
+    {
+      B2ERROR("AnalyzingAlgorithmBase-copy-constructor has been called!")
+    }
+
   public:
 
     /** constructor */
     AnalyzingAlgorithmBase() : m_iD("AnalyzingAlgorithmBase")/*, m_origin(0,0,0)*/ {}
+
+    /** virtual destructor - derived classes need to write their own destructors if any other data members are added. */
+    virtual ~AnalyzingAlgorithmBase() {}
 
     /** operator for comparison. */
     inline bool operator == (const AnalyzingAlgorithmBase& b) const { return m_iD == b.getID(); }

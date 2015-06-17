@@ -80,7 +80,10 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
   vector<vector<string> > parametersToBeTracked = {
     {"Contaminated", "AnalyzingAlgorithmResidualP"},
     {"Clean", "AnalyzingAlgorithmResidualP"},
-    {"Perfect", "AnalyzingAlgorithmResidualP"}
+    {"Perfect", "AnalyzingAlgorithmResidualP"},
+    {"Contaminated", "AnalyzingAlgorithmResidualPosition"},
+    {"Clean", "AnalyzingAlgorithmResidualPosition"},
+    {"Perfect", "AnalyzingAlgorithmResidualPosition"}
   };
 
   //Set module properties
@@ -163,10 +166,12 @@ void TrackFinderVXDAnalizerModule::initialize()
   AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>().setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1],
       m_PARAMorigin[2]));
 
-  AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3> algo = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>
+  AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>* algo = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>
       (string("AnalyzingAlgorithmBase"));
 
-  B2DEBUG(1, " TrackFinderVXDAnalizerModule::initialize(): algo is " << algo.getID())
+  B2DEBUG(1, " TrackFinderVXDAnalizerModule::initialize(): algo is " << algo->getID())
+
+  delete algo;
 
   if (m_PARAMwriteToRoot == true) {
 //     if ((m_PARAMrootFileName.size()) != 2) {
@@ -490,8 +495,8 @@ void TrackFinderVXDAnalizerModule::event()
   /// now deal with all the root-cases:
   // TODO:
 
-  m_rootParameterTracker.prepareRoot(testTCVector);
-  m_rootParameterTracker.prepareRoot(referenceTCVector);
+  m_rootParameterTracker.collectData(testTCVector);
+  m_rootParameterTracker.collectData(referenceTCVector);
 
   m_rootParameterTracker.fillRoot();
 
@@ -645,18 +650,14 @@ void TrackFinderVXDAnalizerModule::endRun()
 //            m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(
 //            100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * (m_caTrackCounter -
 //                m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
-
-  amOasch();
 }
 
 
 void TrackFinderVXDAnalizerModule::terminate()
 {
 
-//   amOasch();
-//
-//   if (m_PARAMwriteToRoot == false) { return; }
-//   m_rootParameterTracker.terminate();
+  if (m_PARAMwriteToRoot == false) { return; }
+  m_rootParameterTracker.terminate();
 //   if (m_treePtr != NULL) {
 //     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
 //     m_treePtr->Write();
@@ -665,4 +666,3 @@ void TrackFinderVXDAnalizerModule::terminate()
 }
 
 
-void TrackFinderVXDAnalizerModule::amOasch() { B2WARNING("bin amOasch!"); }

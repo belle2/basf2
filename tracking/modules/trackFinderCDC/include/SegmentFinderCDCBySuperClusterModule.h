@@ -132,6 +132,13 @@ namespace Belle2 {
 
       /// Neighborhood type for segments.
       typedef WeightedNeighborhood<const CDCRecoSegment2D> CDCSegmentNeighborhood;
+
+      /// Memory for the segments in each super cluster
+      std::vector<std::vector<CDCRecoSegment2D> > m_segmentsByISuperCluster;
+
+      /// Memory for the symmetrised segments in each super cluster
+      std::vector<std::vector<CDCRecoSegment2D> > m_symmetricSegmentsByISuperCluster;
+
     }; // end class SegmentFinderCDCBySuperClusterModule
 
 
@@ -153,6 +160,9 @@ namespace Belle2 {
 
       // Event global super cluster id for each super cluster.
       int iSuperCluster = -1;
+
+      m_segmentsByISuperCluster.clear();
+      m_symmetricSegmentsByISuperCluster.clear();
 
       for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
 
@@ -183,7 +193,9 @@ namespace Belle2 {
           std::sort(std::begin(superCluster), std::end(superCluster));
           assert(std::is_sorted(std::begin(superCluster), std::end(superCluster)));
 
-          std::vector<CDCRecoSegment2D> segmentsInSuperCluster;
+
+          m_segmentsByISuperCluster.emplace_back();
+          std::vector<CDCRecoSegment2D>& segmentsInSuperCluster = m_segmentsByISuperCluster.back();
           segmentsInSuperCluster.clear();
 
           generateSegmentsFromSuperCluster(superCluster, segmentsInSuperCluster);
@@ -192,10 +204,11 @@ namespace Belle2 {
             segment.setISuperCluster(iSuperCluster);
           }
 
-          std::vector<CDCRecoSegment2D> symmetricSegmentsInSuperCluster;
-
+          m_symmetricSegmentsByISuperCluster.emplace_back();
+          std::vector<CDCRecoSegment2D>& symmetricSegmentsInSuperCluster = m_symmetricSegmentsByISuperCluster.back();
           symmetricSegmentsInSuperCluster.clear();
           segmentsInSuperCluster.reserve(2 * segmentsInSuperCluster.size());
+
           for (const CDCRecoSegment2D& segment : segmentsInSuperCluster) {
             symmetricSegmentsInSuperCluster.push_back(segment);
             symmetricSegmentsInSuperCluster.push_back(segment.reversed());
@@ -215,10 +228,6 @@ namespace Belle2 {
           for (const std::vector<const CDCRecoSegment2D*>& segmentPath : segmentPaths) {
             segments.push_back(CDCRecoSegment2D::condense(segmentPath));
           }
-
-          // segments.insert(segments.end(),
-          //      std::make_move_iterator(segmentsInSuperCluster.begin()),
-          //      std::make_move_iterator(segmentsInSuperCluster.end()));
 
         } // end super cluster loop
 

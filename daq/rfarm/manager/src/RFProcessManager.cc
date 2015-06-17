@@ -159,7 +159,7 @@ int RFProcessManager::CheckOutput()
       if (nsmc->sock > highest) highest = nsmc->sock;
       FD_SET(nsmc->sock, &fdset);
     } else {
-      printf("No NSM context is available\n");
+      //printf("No NSM context is available\n");
     }
     // Time out parameter
     struct timeval tv;

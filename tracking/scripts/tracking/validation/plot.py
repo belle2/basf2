@@ -203,6 +203,7 @@ class ValidationPlot(object):
                 xs,
                 ys,
                 weights=None,
+                stackby=None,
                 bins=None,
                 lower_bound=None,
                 upper_bound=None,
@@ -218,6 +219,7 @@ class ValidationPlot(object):
                        xs,
                        ys,
                        weights=weights,
+                       stackby=stackby,
                        bins=bins,
                        lower_bound=lower_bound,
                        upper_bound=upper_bound,
@@ -267,14 +269,12 @@ class ValidationPlot(object):
 
         graph.SetName(self.name)
         graph.SetMarkerStyle(6)
+        graph.GetHistogram().SetOption("AP")  # <-- this has no effect?
 
         # Trying to make the graph lines invisible
         color_index = 0  # white
-        graph.SetLineColor(color_index)
         # Transperent white
         graph.SetLineColorAlpha(color_index, 0)
-        # No line width
-        graph.SetLineWidth(0)
         graph.SetLineStyle(self.very_sparse_dots_line_style_index)
 
         # Transport the lower and upper bound as ranges of the axis
@@ -282,7 +282,6 @@ class ValidationPlot(object):
         graph.GetYaxis().SetLimits(y_lower_bound, y_upper_bound)
 
         self.create(graph,
-                    ROOT.TMultiGraph,
                     xs=xs,
                     ys=ys,
                     stackby=stackby,
@@ -667,7 +666,6 @@ class ValidationPlot(object):
                 x_taxis.SetBinLabel(i_bin + 1, bin_label)
 
         self.create(histogram,
-                    ROOT.THStack,
                     xs,
                     ys=ys,
                     weights=weights,
@@ -685,7 +683,6 @@ class ValidationPlot(object):
 
     def create(self,
                histogram_template,
-               stack_factory,
                xs,
                ys=None,
                weights=None,
@@ -704,10 +701,6 @@ class ValidationPlot(object):
             plot = histogram
 
         else:
-            # No TProfile allowed here
-            if isinstance(histogram_template, ROOT.TProfile):
-                raise ValueError("Cannot stack TProfile histograms.")
-
             stackby = np.array(stackby, copy=False)
             name = histogram_template.GetName()
 
@@ -722,21 +715,97 @@ class ValidationPlot(object):
                 histograms = [self.cumulate(histogram, cumulation_direction=cumulation_direction)
                               for histogram in histograms]
 
-            plot = stack_factory()
+            if isinstance(histogram_template, (ROOT.TProfile, ROOT.TGraph)):
+                plot = ROOT.TMultiGraph()
+            else:
+                plot = ROOT.THStack()
+
             plot.SetName(name + "_stacked")
 
             # Add the histogram in reverse order such
             # that the signal usually is on the bottom an well visible
             if reverse_stack:
                 for histogram in reversed(histograms):
+                    if isinstance(histogram, ROOT.TProfile):
+                        histogram = self.convert_tprofile_to_tgrapherrors(histogram)
                     plot.Add(histogram)
             else:
                 for histogram in histograms:
+                    if isinstance(histogram, ROOT.TProfile):
+                        histogram = self.convert_tprofile_to_tgrapherrors(histogram)
                     plot.Add(histogram)
 
         self.histograms = histograms
         self.plot = plot
         self.attach_attributes()
+
+    @classmethod
+    def convert_tprofile_to_tgrapherrors(cls, tprofile):
+        x_taxis = tprofile.GetXaxis()
+        n_bins = x_taxis.GetNbins()
+
+        bin_ids_with_underflow = range(n_bins + 1)
+        bin_ids_without_underflow = range(1, n_bins + 1)
+
+        bin_centers = np.array([x_taxis.GetBinCenter(i_bin) for i_bin in bin_ids_without_underflow])
+        bin_widths = np.array([x_taxis.GetBinWidth(i_bin) for i_bin in bin_ids_without_underflow])
+        bin_x_errors = bin_widths / 2.0
+
+        # Now for the histogram content not including the underflow
+        bin_contents = np.array([tprofile.GetBinContent(i_bin) for i_bin in bin_ids_without_underflow])
+        bin_y_errors = np.array([tprofile.GetBinError(i_bin) for i_bin in bin_ids_without_underflow])
+
+        tgrapherrors = ROOT.TGraphErrors(n_bins, bin_centers, bin_contents, bin_x_errors, bin_y_errors)
+
+        tgrapherrors.GetHistogram().SetOption("APZ")  # <-- This has no effect?
+
+        tgrapherrors.SetLineColor(tprofile.GetLineColor())
+        tgrapherrors.SetLineColor(tprofile.GetLineColor())
+
+        # Copy all functions and stats entries
+        for tobject in tprofile.GetListOfFunctions():
+            tgrapherrors.GetListOfFunctions().Add(tobject.Clone())
+
+        # Add stats entries that are displayed for profile plots
+        cls.add_stats_entry(tgrapherrors, 'count', tprofile.GetEntries())
+
+        stats_values = np.array([np.nan] * 6)
+        tprofile.GetStats(stats_values)
+
+        sum_w = stats_values[0]
+        sum_w2 = stats_values[1]
+        sum_wx = stats_values[2]
+        sum_wx2 = stats_values[3]
+        sum_wy = stats_values[4]
+        sum_wy2 = stats_values[5]
+
+        cls.add_stats_entry(tgrapherrors,
+                            "x avg",
+                            sum_wx / sum_w)
+
+        cls.add_stats_entry(tgrapherrors,
+                            "x std",
+                            np.sqrt(sum_wx2 * sum_w - sum_wx * sum_wx) / sum_w)
+
+        cls.add_stats_entry(tgrapherrors,
+                            "y avg",
+                            sum_wy / sum_w)
+
+        cls.add_stats_entry(tgrapherrors,
+                            "y std",
+                            np.sqrt(sum_wy2 * sum_w - sum_wy * sum_wy) / sum_w)
+
+        cls.add_stats_entry(tgrapherrors,
+                            'cov',
+                            tgrapherrors.GetCovariance())
+
+        print " Corr ", tgrapherrors.GetCorrelationFactor()
+
+        cls.add_stats_entry(tgrapherrors,
+                            'corr',
+                            tgrapherrors.GetCorrelationFactor())
+
+        return tgrapherrors
 
     def fill_into_grouped(self,
                           histogram_template,
@@ -1661,6 +1730,10 @@ def test():
     stacked_validation_scatter = ValidationPlot('test_stacked_scatter')
     stacked_validation_scatter.scatter(x1, y1, stackby=stackby)
 
+    # Make a profile plot with the two species
+    stacked_validation_profile = ValidationPlot('test_stacked_profile')
+    stacked_validation_profile.profile(x1, y1, stackby=stackby)
+
     # Test a profile with a diagonal fit
     x = np.linspace(-1, 1, 1000)
     y = x.copy()
@@ -1681,16 +1754,16 @@ def test():
         diagonal_plot.write(tdirectory1)
         cumulated_profile.write(tdirectory1)
         cumulated_histogram.write(tdirectory1)
-        stacked_validation_scatter.write()
 
     with root_cd("stacked") as tdirectory2:
         stacked_validation_histogram.write(tdirectory2)
+        stacked_validation_scatter.write()
+        stacked_validation_profile.write()
 
     tfile.Close()
 
     tfile = ROOT.TFile('test.root')
     tBrowser = ROOT.TBrowser()
-    tBrowser.SetDrawOption("AP")
     tBrowser.BrowseObject(tfile)
     raw_input()
     tfile.Close()

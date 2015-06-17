@@ -33,10 +33,15 @@ int main(int argc, char** argv)
     perror("file open");
     exit(-1);
   }
+
   //  RingBuffer* rbuf = new RingBuffer(argv[1], RBUFSIZE);
   RingBuffer* rbuf = new RingBuffer(argv[1]);
   rbuf->dump_db();
   char* evbuf = new char[MAXEVTSIZE];
+
+  // Skip the first record (StreamerInfo)
+  int is = file->read(evbuf, MAXEVTSIZE);
+  if (is <= 0) exit(-1);
 
   for (;;) {
     int is = file->read(evbuf, MAXEVTSIZE);

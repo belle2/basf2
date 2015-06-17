@@ -2123,7 +2123,7 @@ c data -----------------------------------------------------
 c begin ====================================================
 
       if ( ( w_input .lt. w(1) ) .or. ( w(IMAX) .lt. w_input ) ) then
-         write(*,*) "ERROR: w outside range of Delta alpha tabulation"
+!          write(*,*) "ERROR: w outside range of Delta alpha tabulation"
          a_sp_out  =  0.d0
          da_sp_out = 0.d0
          a_tm_out  =  0.d0
@@ -3346,7 +3346,7 @@ c data -----------------------------------------------------
 c begin ====================================================
 
       if ( ( w_input .lt. w(1) ) .or. ( w(IMAX) .lt. w_input ) ) then
-         write(*,*) "ERROR: w outside range of R tabulation"
+!          write(*,*) "ERROR: w outside range of R tabulation"
          r_out = 0.d0
          dr_out = 0.d0
          return
@@ -5325,7 +5325,7 @@ c data -----------------------------------------------------
 c begin ====================================================
 
       if ( ( w_input .lt. w(1) ) .or. ( w(IMAX) .lt. w_input ) ) then
-         write(*,*) "ERROR: w outside range of Delta alpha tabulation"
+!          write(*,*) "ERROR: w outside range of Delta alpha tabulation"
          a_sp_out  =  0.d0
          da_sp_out = 0.d0
          a_tm_out  =  0.d0
@@ -6552,7 +6552,7 @@ c data -----------------------------------------------------
 c begin ====================================================
 
       if ( ( w_input .lt. w(1) ) .or. ( w(IMAX) .lt. w_input ) ) then
-         write(*,*) "ERROR: w outside range of R tabulation"
+!          write(*,*) "ERROR: w outside range of R tabulation"
          r_out = 0.d0
          dr_out = 0.d0
          return

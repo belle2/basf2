@@ -13,10 +13,11 @@
 
 #include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segment_pair_relation/SegmentPairRelationFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/track_relation/TrackRelationFilterFactory.h>
 
 namespace Belle2 {
 
-  /// Module for the cellular automaton tracking for the CDC on regular events
+  /// Module for the second stage cellular automaton tracking for the CDC on regular events with filter adjustable in steering file.
   class TrackFinderCDCSegmentPairAutomatonDevModule:
     public Belle2::TrackFindingCDC::TrackFinderCDCSegmentPairAutomatonImplModule<> {
 
@@ -32,16 +33,22 @@ namespace Belle2 {
 
   private:
     /**
-       Factory for the cluster filter, knowing all the available filters and
+       Factory for the segment pair filter, knowing all the available filters and
        their respective parameters
     */
     Belle2::TrackFindingCDC::SegmentPairFilterFactory m_segmentPairFilterFactory;
 
     /**
-       Factory for the cluster filter, knowing all the available filters and
+       Factory for the segment pair relation filter, knowing all the available filters and
        their respective parameters
     */
     Belle2::TrackFindingCDC::SegmentPairRelationFilterFactory m_segmentPairRelationFilterFactory;
+    /**
+       Factory for the track relation filter for merging, knowing all the available filters and
+       their respective parameters
+    */
+    Belle2::TrackFindingCDC::TrackRelationFilterFactory m_trackRelationFilterFactory;
+
 
   }; // end class
 } // end namespace Belle2

@@ -12,6 +12,7 @@
 
 #include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilters.h>
 #include <tracking/trackFindingCDC/filters/segment_pair_relation/SegmentPairRelationFilters.h>
+#include <tracking/trackFindingCDC/filters/track_relation/TrackRelationFilters.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
@@ -26,12 +27,14 @@ REG_MODULE(TrackFinderCDCSegmentPairAutomatonDev);
 TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonDevModule() :
   TrackFinderCDCSegmentPairAutomatonImplModule<>(c_None),
   m_segmentPairFilterFactory("simple"),
-  m_segmentPairRelationFilterFactory("simple")
+  m_segmentPairRelationFilterFactory("simple"),
+  m_trackRelationFilterFactory("none")
 {
   setDescription("Versatile module with adjustable filters for track generation.");
 
   m_segmentPairFilterFactory.exposeParameters(this);
   m_segmentPairRelationFilterFactory.exposeParameters(this);
+  m_trackRelationFilterFactory.exposeParameters(this);
 }
 
 void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
@@ -44,10 +47,15 @@ void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
   ptrSegmentPairRelationFilter = m_segmentPairRelationFilterFactory.create();
   setSegmentPairRelationFilter(std::move(ptrSegmentPairRelationFilter));
 
+  std::unique_ptr<BaseTrackRelationFilter>
+  ptrTrackRelationFilter = m_trackRelationFilterFactory.create();
+  setTrackRelationFilter(std::move(ptrTrackRelationFilter));
+
   TrackFinderCDCSegmentPairAutomatonImplModule<>::initialize();
 
   if (getSegmentPairFilter()->needsTruthInformation() or
-      getSegmentPairRelationFilter()->needsTruthInformation()) {
+      getSegmentPairRelationFilter()->needsTruthInformation() or
+      getTrackRelationFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -56,7 +64,8 @@ void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
 void TrackFinderCDCSegmentPairAutomatonDevModule::event()
 {
   if (getSegmentPairFilter()->needsTruthInformation() or
-      getSegmentPairRelationFilter()->needsTruthInformation()) {
+      getSegmentPairRelationFilter()->needsTruthInformation() or
+      getTrackRelationFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 

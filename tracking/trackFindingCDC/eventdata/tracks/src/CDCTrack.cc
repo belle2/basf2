@@ -45,6 +45,18 @@ CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
   // TODO: Maybe enhance the estimation of the z coordinate with the superlayer slopes.
 }
 
+CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
+{
+  if (trackPath.empty()) {
+    return CDCTrack();
+  } else if (trackPath.size() == 1) {
+    return CDCTrack(*(trackPath[0]));
+  } else {
+    B2WARNING("Remember to implement multi track concatination");
+    return CDCTrack(*(trackPath[0]));
+  }
+}
+
 
 
 bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
@@ -84,7 +96,7 @@ void CDCTrack::reverse()
 
 CDCTrack CDCTrack::reversed() const
 {
-  CDCTrack reversedTrack;
+  CDCTrack reversedTrack(*this);
   reversedTrack.reverse();
   return reversedTrack;
 }

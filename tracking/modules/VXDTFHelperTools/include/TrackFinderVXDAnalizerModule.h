@@ -44,49 +44,6 @@ namespace Belle2 {
 
 
 
-
-
-//    /** Base class (functor) for storing an algorithm determining the data one wants to have */
-//    template <class DataType>
-//    class AnalyzingAlgorithmBase {
-//    protected:
-//    /** carries unique ID */
-//    const static std::string m_iD;
-//    public:
-//
-//    /** operator for comparison. */
-//    inline bool operator == (const AnalyzingAlgorithmBase& b) const { return m_iD == b.getID(); }
-//
-//    /** returns unique ID */
-//    std::string getID() const { return m_iD; }
-//
-//    /** pure virtual class to calculate data. takes two TCInfos */
-//    template <class TCInfoType, class VectorType>
-//    virtual DataType calcData(const TCInfoType& refTC, const TCInfoType& testTC) = 0;
-//    };
-//
-//    /** Root data collector */
-//    template <class DataType>
-//    class RootDataCollector {
-//    protected:
-//    std::vector<DataType> m_collectedData;
-//    std::string m_name;
-//    AnalyzingAlgorithmBase m_calcAlgorithm;
-//
-//    public:
-//
-      //    RootDataCollector(std::string name, AnalyzingAlgorithmBase<DataType> algorithm) : m_name(name), m_calcAlgorithm(algorithm) {}
-//
-//    std::string getName() { return m_name; }
-//
-//    std::vector<DataType>* linkToData() { return & m_collectedData; }
-//
-//    void reset4event() { m_collectedData.clear(); }
-//
-//    void addData(const AnalyzerTCInfo& refTC, const AnalyzerTCInfo& testTC) { m_collectedData.push_back(m_calcAlgorithm.calcData(refTC, testTC)); }
-//    };
-
-
       /** internal datastore for root export */
       struct RootVariables  {
         std::vector<double>
@@ -230,6 +187,7 @@ namespace Belle2 {
         return bestResult;
       }
 
+      void amOasch();
 
     protected:
 

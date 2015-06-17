@@ -14,8 +14,11 @@
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/trackFindingVXD/analyzingTools/TCType.h>
 
-
+// fw:
 #include <framework/logging/Logger.h>
+
+// root:
+#include <TVector3.h>
 
 // stl:
 #include <vector>
@@ -28,22 +31,6 @@ namespace Belle2 {
   /** simple class storing infos relevant for a TC for analizing it. */
   class AnalizerTCInfo {
   public:
-
-
-//     /** allows classifying TCs */
-//     enum TCType {
-//       Unclassified, // a TC which was not classified yet
-//       Lost, // reference TCs which were not found by test TF
-//       Ghost, // did not reach m_PARAMqiThreshold
-//    SmallStump, // TC too short
-//       Clone, // reached threshold but for the same reference TC a better partner was already found
-//       Contaminated, // more than m_PARAMqiThreshold in purity
-//       Clean, // test TC has 100% purity for the particle type but not all hits of reference TC were found
-//       Perfect, // test TC is identical with a reference TC (have exactly the same hits and no extra ones)
-//    AllTCTypes, // all other test types are smaller than this value
-//       Reference, // reference TC
-//       NTypes // number of tcTypes available
-//     };
 
 
     /** carries the global coordinates of the position of the seed hit (typically the innermost hit) */

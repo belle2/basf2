@@ -136,6 +136,8 @@ void TrackFinderVXDAnalizerModule::initialize()
             m_PARAMorigin.size() << " reset to standard (0, 0, 0)")
     m_PARAMorigin = {0, 0, 0};
   }
+
+  // deal with root-related stuff
   if (m_PARAMwriteToRoot == false) { return; }
 
   if ((m_PARAMrootFileName.size()) != 2) {
@@ -149,10 +151,10 @@ void TrackFinderVXDAnalizerModule::initialize()
   }
 
   // deal with algorithms:
+  m_rootParameterTracker.initialize(m_PARAMrootFileName[0] + ".root", m_PARAMrootFileName[1]);
   for (auto& parameterSet : m_PARAMparametersToBeTracked) {
     if (parameterSet.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'parametersToBeTracked' was mis-used! Please read the documentation!") }
 
-    m_rootParameterTracker.createFile(m_PARAMrootFileName[0] + ".root", m_PARAMrootFileName[1]);
     // store in internal bla, prepare branch
     m_rootParameterTracker.addParameters(parameterSet[0], parameterSet[1]);
   }
@@ -284,10 +286,10 @@ void TrackFinderVXDAnalizerModule::initialize()
 void TrackFinderVXDAnalizerModule::event()
 {
 
-
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(1, "################## entering TFAnalizer - event " << m_eventCounter << " ######################");
+  B2DEBUG(1, "################## entering TrackFinderVXDAnalizerModule - event " << m_eventCounter << " ######################");
+  B2WARNING("################## entering TrackFinderVXDAnalizerModule - event " << m_eventCounter << " ######################");
 
 //   RootVariables rootVariables; // storing all root related infos
 //   m_forRootCountFoundIDs.clear(); // reset foundIDs-counter
@@ -643,17 +645,24 @@ void TrackFinderVXDAnalizerModule::endRun()
 //            m_mcTrackVectorCounter) << "%/" << double(100 * m_countedPerfectRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(
 //            100 * m_countedCleanRecoveries) / double(m_mcTrackVectorCounter) << "%/" << double(100 * (m_caTrackCounter -
 //                m_countReconstructedTCs)) / double(m_countReconstructedTCs) << "%")
+
+  amOasch();
 }
 
 
 void TrackFinderVXDAnalizerModule::terminate()
 {
 
-  m_rootParameterTracker.terminate();
-  if (m_treePtr != NULL) {
-    m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
-    m_treePtr->Write();
-    m_rootFilePtr->Close();
-  }
+//   amOasch();
+//
+//   if (m_PARAMwriteToRoot == false) { return; }
+//   m_rootParameterTracker.terminate();
+//   if (m_treePtr != NULL) {
+//     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
+//     m_treePtr->Write();
+//     m_rootFilePtr->Close();
+//   }
 }
 
+
+void TrackFinderVXDAnalizerModule::amOasch() { B2WARNING("bin amOasch!"); }

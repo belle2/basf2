@@ -14,9 +14,7 @@
 
 // stl:
 #include <string>
-// #include <unordered_map>
 #include <map>
-
 
 
 
@@ -73,39 +71,4 @@ namespace Belle2 {
     /** static map allowing translation from a given name stored as a string to its type */
     static std::map<std::string, Type> m_fromStringToType;
   };
-
-
-  /** setting static dictionary translating type -> string */
-  std::map<TCType::Type, std::string> TCType::m_fromTypeToString = {
-    {TCType::UnknownType, std::string("UnknownType")},
-    {TCType::Unclassified, std::string("Unclassified")},
-    {TCType::Lost, std::string("Lost")},
-    {TCType::Ghost, std::string("Ghost")},
-    {TCType::SmallStump, std::string("SmallStump")},
-    {TCType::Clone, std::string("Clone")},
-    {TCType::Contaminated, std::string("Contaminated")},
-    {TCType::Clean, std::string("Clean")},
-    {TCType::Perfect, std::string("Perfect")},
-    {TCType::AllTCTypes, std::string("AllTCTypes")},
-    {TCType::Reference, std::string("Reference")},
-    {TCType::NTypes, std::string("NTypes")}
-  };
-
-
-  /** setting static dictionary translating string -> type */
-  std::map<std::string, TCType::Type> TCType::m_fromStringToType = {
-    {std::string("UnknownType"), TCType::UnknownType},
-    {std::string("Unclassified"), TCType::Unclassified},
-    {std::string("Lost"), TCType::Lost},
-    {std::string("Ghost"), TCType::Ghost},
-    {std::string("SmallStump"), TCType::SmallStump},
-    {std::string("Clone"), TCType::Clone},
-    {std::string("Contaminated"), TCType::Contaminated},
-    {std::string("Clean"), TCType::Clean},
-    {std::string("Perfect"), TCType::Perfect},
-    {std::string("AllTCTypes"), TCType::AllTCTypes},
-    {std::string("Reference"), TCType::Reference},
-    {std::string("NTypes"), TCType::NTypes}
-  };
-
 }

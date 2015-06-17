@@ -48,6 +48,11 @@ namespace Belle2 {
     /// Called when entering a new run.
     virtual void beginRun();
 
+    /** Once per event called for before processing starts
+     *  Meant for submodules to do their setup work.
+     */
+    virtual void prepareEvent();
+
     /// Processes the event and generates track candidates
     virtual void event();
 

@@ -37,7 +37,8 @@ namespace Belle2 {
     /// Forward declaration of the module implementing the segment generation by cellular automaton on facets using specific filter instances.
     template<class ClusterFilter = BaseClusterFilter,
              class FacetFilter = BaseFacetFilter,
-             class FacetRelationFilter = BaseFacetRelationFilter>
+             class FacetRelationFilter = BaseFacetRelationFilter,
+             class SegmentRelationFilter = BaseSegmentRelationFilter>
     class SegmentFinderCDCFacetAutomatonImplModule;
   }
 
@@ -49,16 +50,22 @@ namespace Belle2 {
                   SegmentFinderCDCFacetAutomatonModule;
 
   namespace TrackFindingCDC {
-    template<class ClusterFilter, class FacetFilter, class FacetRelationFilter>
-    class SegmentFinderCDCFacetAutomatonImplModule : public SegmentFinderCDCBySuperClusterModule {
+    template<class ClusterFilter,
+             class FacetFilter,
+             class FacetRelationFilter,
+             class SegmentRelationFilter>
+    class SegmentFinderCDCFacetAutomatonImplModule :
+      public SegmentFinderCDCBySuperClusterModule<SegmentRelationFilter> {
 
     private:
       /// Type of the base class
-      typedef SegmentFinderCDCBySuperClusterModule Super;
+      typedef SegmentFinderCDCBySuperClusterModule<SegmentRelationFilter> Super;
+
+      using ETrackOrientation = typename Super::ETrackOrientation;
 
     public:
       /// Default constructor initialising the filters with the default settings
-      SegmentFinderCDCFacetAutomatonImplModule(ETrackOrientation segmentOrientation = c_None) :
+      SegmentFinderCDCFacetAutomatonImplModule(ETrackOrientation segmentOrientation = ETrackOrientation::c_None) :
         Super(segmentOrientation),
         m_ptrClusterFilter(new ClusterFilter()),
         m_ptrFacetFilter(new FacetFilter()),
@@ -71,37 +78,37 @@ namespace Belle2 {
         m_param_tangentSegmentsStoreObjName("CDCTangentSegmentVector")
       {
 
-        setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
+        this->setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
 
-        addParam("WriteClusters",
-                 m_param_writeClusters,
-                 "Switch if clusters shall be written to the DataStore",
-                 false);
+        this->addParam("WriteClusters",
+                       m_param_writeClusters,
+                       "Switch if clusters shall be written to the DataStore",
+                       false);
 
-        addParam("ClustersStoreObjName",
-                 m_param_clustersStoreObjName,
-                 "Name of the output StoreObjPtr of the clusters generated within this module.",
-                 std::string("CDCWireHitClusterVector"));
+        this->addParam("ClustersStoreObjName",
+                       m_param_clustersStoreObjName,
+                       "Name of the output StoreObjPtr of the clusters generated within this module.",
+                       std::string("CDCWireHitClusterVector"));
 
-        addParam("WriteFacets",
-                 m_param_writeFacets,
-                 "Switch if facets shall be written to the DataStore",
-                 false);
+        this->addParam("WriteFacets",
+                       m_param_writeFacets,
+                       "Switch if facets shall be written to the DataStore",
+                       false);
 
-        addParam("FacetsStoreObjName",
-                 m_param_facetsStoreObjName,
-                 "Name of the output StoreObjPtr of the facets generated within this module.",
-                 std::string("CDCFacetVector"));
+        this->addParam("FacetsStoreObjName",
+                       m_param_facetsStoreObjName,
+                       "Name of the output StoreObjPtr of the facets generated within this module.",
+                       std::string("CDCFacetVector"));
 
-        addParam("WriteTangentSegments",
-                 m_param_writeTangentSegments,
-                 "Switch if tangent segments shall be written to the DataStore",
-                 false);
+        this->addParam("WriteTangentSegments",
+                       m_param_writeTangentSegments,
+                       "Switch if tangent segments shall be written to the DataStore",
+                       false);
 
-        addParam("TangentSegmentsStoreObjName",
-                 m_param_tangentSegmentsStoreObjName,
-                 "Name of the output StoreObjPtr of the tangent segments generated within this module.",
-                 std::string("CDCTangentSegmentVector"));
+        this->addParam("TangentSegmentsStoreObjName",
+                       m_param_tangentSegmentsStoreObjName,
+                       "Name of the output StoreObjPtr of the tangent segments generated within this module.",
+                       std::string("CDCTangentSegmentVector"));
       }
 
       /// Initialize the Module before event processing
@@ -205,7 +212,7 @@ namespace Belle2 {
         m_ptrFacetFilter = std::move(ptrFacetFilter);
       }
 
-      /// Getter for the current facet filter. The module keeps ownership of the pointer.
+      /// Getter for the current facet relation filter. The module keeps ownership of the pointer.
       FacetRelationFilter* getFacetRelationFilter()
       {
         return m_ptrFacetRelationFilter.get();
@@ -283,12 +290,17 @@ namespace Belle2 {
     }; // end class SegmentFinderCDCFacetAutomatonImplModule
 
 
-    template<class ClusterFilter, class FacetFilter, class FacetRelationFilter>
-    void SegmentFinderCDCFacetAutomatonImplModule <ClusterFilter,
-         FacetFilter,
-         FacetRelationFilter
-         >::generateSegmentsFromSuperCluster(const CDCWireHitCluster& superCluster,
-                                             std::vector<CDCRecoSegment2D>& segments)
+    template<class ClusterFilter,
+             class FacetFilter,
+             class FacetRelationFilter,
+             class SegmentRelationFilter>
+    void
+    SegmentFinderCDCFacetAutomatonImplModule <ClusterFilter,
+                                             FacetFilter,
+                                             FacetRelationFilter,
+                                             SegmentRelationFilter>
+                                             ::generateSegmentsFromSuperCluster(const CDCWireHitCluster& superCluster,
+                                                 std::vector<CDCRecoSegment2D>& segments)
     {
       // create the neighborhood
       B2DEBUG(100, "Creating the CDCWireHit neighborhood");

@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
 #include <tracking/trackFindingCDC/filters/wirehit_relation/WholeWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_relation/BaseSegmentRelationFilter.h>
 
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -28,6 +29,7 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    template<class SegmentRelationFilter = BaseSegmentRelationFilter>
     class SegmentFinderCDCBySuperClusterModule : public SegmentFinderCDCBaseModule {
 
     private:
@@ -37,6 +39,7 @@ namespace Belle2 {
       /// Default constructor initialising the filters with the default settings
       SegmentFinderCDCBySuperClusterModule(ETrackOrientation segmentOrientation = c_None) :
         SegmentFinderCDCBaseModule(segmentOrientation),
+        m_ptrSegmentRelationFilter(new SegmentRelationFilter()),
         m_param_writeSuperClusters(false),
         m_param_superClustersStoreObjName("CDCWireHitSuperClusterVector")
       {
@@ -62,6 +65,11 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_superClustersStoreObjName);
         }
 
+        if (m_ptrSegmentRelationFilter) {
+          m_ptrSegmentRelationFilter->initialize();
+        }
+
+
       }
 
       /// Generates the segment.
@@ -69,13 +77,35 @@ namespace Belle2 {
 
 
       /// Generates the segment in the given super cluster of hits
-      virtual void generateSegmentsFromSuperCluster(const CDCWireHitCluster& superCluster,
-                                                    std::vector<CDCRecoSegment2D>& segments);
+      virtual void generateSegmentsFromSuperCluster(const CDCWireHitCluster& /*superCluster*/,
+                                                    std::vector<CDCRecoSegment2D>& /*segments*/)
+      {
+      }
 
       virtual void terminate() override
       {
+        if (m_ptrSegmentRelationFilter) {
+          m_ptrSegmentRelationFilter->terminate();
+        }
+
         Super::terminate();
       }
+
+      /// Getter for the current segment relation filter. The module keeps ownership of the pointer.
+      SegmentRelationFilter* getSegmentRelationFilter()
+      {
+        return m_ptrSegmentRelationFilter.get();
+      }
+
+      /// Setter for the segment relation filter used to connect segments in a network. The module takes ownership of the pointer.
+      void setSegmentRelationFilter(std::unique_ptr<SegmentRelationFilter> ptrSegmentRelationFilter)
+      {
+        m_ptrSegmentRelationFilter = std::move(ptrSegmentRelationFilter);
+      }
+
+    private:
+      /// Reference to the relation filter to be used to construct the segment network in each supercluster
+      std::unique_ptr<SegmentRelationFilter> m_ptrSegmentRelationFilter;
 
     private:
       /// Parameter: Switch if superclusters shall be written to the DataStore
@@ -100,8 +130,81 @@ namespace Belle2 {
       /// Instance of the hit cluster generator
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
+
     }; // end class SegmentFinderCDCBySuperClusterModule
 
+
+
+
+    template<class SegmentRelationFilter>
+    void
+    SegmentFinderCDCBySuperClusterModule<SegmentRelationFilter>
+    ::generateSegments(std::vector<CDCRecoSegment2D>& segments)
+    {
+      /// Attain super cluster vector on the DataStore if needed.
+      if (m_param_writeSuperClusters) {
+        StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedSuperClusters(m_param_superClustersStoreObjName);
+        storedSuperClusters.create();
+      }
+
+      const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+      const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+      // Event global super cluster id for each super cluster.
+      int iSuperCluster = -1;
+
+      for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
+
+        const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
+
+        //create the secondary neighborhood of wire hits
+        B2DEBUG(100, "Creating the secondary CDCWireHit neighborhood");
+        m_secondaryWirehitNeighborhood.clear();
+
+        const bool withSecondaryNeighborhood = true;
+        m_secondaryWirehitNeighborhood.appendUsing<WholeWireHitRelationFilter<withSecondaryNeighborhood>>(wireHitsInSuperlayer);
+        assert(m_secondaryWirehitNeighborhood.isSymmetric());
+
+        B2DEBUG(100, "  seconaryWirehitNeighborhood.size() = " << m_secondaryWirehitNeighborhood.size());
+
+        // Create the super clusters
+        B2DEBUG(100, "Creating the CDCWireHit super clusters");
+        m_superClustersInSuperLayer.clear();
+        m_wirehitClusterizer.create(wireHitsInSuperlayer,
+                                    m_secondaryWirehitNeighborhood,
+                                    m_superClustersInSuperLayer);
+
+        B2DEBUG(100, "Created " << m_superClustersInSuperLayer.size() <<
+                " CDCWireHit superclusters in superlayer");
+
+        for (CDCWireHitCluster& superCluster : m_superClustersInSuperLayer) {
+          ++iSuperCluster;
+          std::sort(std::begin(superCluster), std::end(superCluster));
+          assert(std::is_sorted(std::begin(superCluster), std::end(superCluster)));
+
+          generateSegmentsFromSuperCluster(superCluster, segments);
+
+          //segments.back().setISuperCluster(iSuperCluster);
+
+          // Combine matching segments
+
+        } // end super cluster loop
+
+        // Move clusters to the DataStore
+        if (m_param_writeSuperClusters) {
+          StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >
+          storedSuperClusters(m_param_superClustersStoreObjName);
+          std::vector<CDCWireHitCluster>& superClusters = *storedSuperClusters;
+          superClusters.insert(superClusters.end(),
+                               std::make_move_iterator(m_superClustersInSuperLayer.begin()),
+                               std::make_move_iterator(m_superClustersInSuperLayer.end()));
+        }
+
+        m_superClustersInSuperLayer.clear();
+        m_secondaryWirehitNeighborhood.clear();
+
+      } // end for superlayer loop
+    }
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

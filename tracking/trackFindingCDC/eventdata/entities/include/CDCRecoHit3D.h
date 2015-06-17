@@ -114,6 +114,9 @@ namespace Belle2 {
       /** Returns the recohit with the opposite right left information */
       CDCRecoHit3D reversed() const;
 
+      /// Make the wire hit automatically castable to its underlying cdcHit
+      operator const Belle2::CDCHit* () const
+      { return static_cast<const CDCHit*>(getRLWireHit()); }
 
 
       /// Equality comparision based on wire hit, right left passage information and reconstructed position.

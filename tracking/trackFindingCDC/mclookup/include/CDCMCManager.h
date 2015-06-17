@@ -17,6 +17,7 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -56,6 +57,9 @@ namespace Belle2 {
       static const CDCMCSegmentLookUp& getMCSegmentLookUp()
       { return getInstance().m_mcSegmentLookUp; }
 
+      /// Getter for the singletone instance of the CDCMCTrackLookUp
+      static const CDCMCTrackLookUp& getMCTrackLookUp()
+      { return getInstance().m_mcTrackLookUp; }
 
     public:
       /// Clears all Monte Carlo information present in the last event
@@ -82,6 +86,9 @@ namespace Belle2 {
 
       /// Memory for the singletone CDCMCSegmentLookUp
       CDCMCSegmentLookUp m_mcSegmentLookUp;
+
+      /// Memory for the singletone CDCMCTrackLookUp
+      CDCMCTrackLookUp m_mcTrackLookUp;
 
     }; //class
   } // end namespace TrackFindingCDC

@@ -23,35 +23,36 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  CDCMCManager* g_mcManager = nullptr;
+
 }
+
 
 CDCMCManager::CDCMCManager() : m_eventMetaData(-999, -999, -999)
 {
 }
+
 
 CDCMCManager::~CDCMCManager()
 {
 }
 
 
-
 CDCMCManager& CDCMCManager::getInstance()
 {
-  if (not g_mcManager) g_mcManager = new CDCMCManager;
-  return *g_mcManager;
+  static CDCMCManager mcManager;
+  return mcManager;
 }
-
 
 
 void CDCMCManager::clear()
 {
-  m_mcMap.clear();
+  m_mcTrackLookUp.clear();
+  m_mcSegmentLookUp.clear();
+  //m_mcHitLookUp.clear(); // Currently has no clear
+
   m_mcTrackStore.clear();
   m_simHitLookUp.clear();
-
-  //m_mcHitLookUp.clear();
-  m_mcSegmentLookUp.clear();
+  m_mcMap.clear();
 }
 
 void CDCMCManager::fill()
@@ -78,6 +79,3 @@ void CDCMCManager::fill()
     m_eventMetaData = *storedEventMetaData;
   }
 }
-
-
-

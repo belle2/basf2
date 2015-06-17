@@ -10,17 +10,17 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCMCSegmentLookUp  : public CDCMCHitCollectionLookUp<CDCRecoSegment2D> {
+    class CDCMCTrackLookUp  : public CDCMCHitCollectionLookUp<CDCTrack> {
 
     public:
       /// Getter for the singletone instance
       static
-      const CDCMCSegmentLookUp&
+      const CDCMCTrackLookUp&
       getInstance();
 
     };

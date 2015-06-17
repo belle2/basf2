@@ -7,23 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-    class CDCMCSegmentLookUp  : public CDCMCHitCollectionLookUp<CDCRecoSegment2D> {
 
-    public:
-      /// Getter for the singletone instance
-      static
-      const CDCMCSegmentLookUp&
-      getInstance();
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-    };
-
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+const CDCMCTrackLookUp&
+CDCMCTrackLookUp
+::getInstance()
+{
+  return CDCMCManager::getMCTrackLookUp();
+}

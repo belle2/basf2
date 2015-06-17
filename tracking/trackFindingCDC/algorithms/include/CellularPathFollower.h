@@ -58,9 +58,9 @@ namespace Belle2 {
 
       /// Follow paths from all start items marked with the start flag
       template<class ItemRange>
-      std::vector<Path>&&  followAll(const ItemRange& itemRange,
-                                     const WeightedNeighborhood<const Item>& neighborhood,
-                                     CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+      std::vector<Path> followAll(const ItemRange& itemRange,
+                                  const WeightedNeighborhood<const Item>& neighborhood,
+                                  CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
       {
 
         m_paths.clear();

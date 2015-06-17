@@ -68,7 +68,7 @@ namespace Belle2 {
           //B2DEBUG(100,"Apply cellular automat");
           const Item* highestCell = m_cellularAutomaton.applyTo(itemRange, neighborhood);
 
-          Path&& newPath = m_cellularPathFollower.followSingle(highestCell, neighborhood, m_minStateToFollow);
+          Path newPath = m_cellularPathFollower.followSingle(highestCell, neighborhood, m_minStateToFollow);
 
           if (newPath.empty()) {
             created = false;

@@ -127,6 +127,10 @@ class ValidationPlot(object):
     are exposed as properties of this class.
     """
 
+    #: A an index that reference to a dot spacing such that the line is almost invisible for scatter
+    very_sparse_dots_line_style_index = 28
+    # This line style is defined in the set_tstyle method below.
+
     def __init__(self, name):
         """Constructor of the ValidationPlot
 
@@ -230,6 +234,7 @@ class ValidationPlot(object):
     def scatter(self,
                 xs,
                 ys,
+                stackby=None,
                 lower_bound=(None, None),
                 upper_bound=(None, None),
                 outlier_z_score=(None, None),
@@ -258,28 +263,30 @@ class ValidationPlot(object):
             include_exceptionals=y_include_exceptionals
         )
 
-        plot = ROOT.TGraph()
+        graph = ROOT.TGraph()
 
-        plot.SetName(self.name)
-        plot.SetMarkerStyle(2)
-        # Trying to make the plot lines invisible
+        graph.SetName(self.name)
+        graph.SetMarkerStyle(6)
+
+        # Trying to make the graph lines invisible
         color_index = 0  # white
-        plot.SetLineColor(color_index)
-        plot.SetLineWidth(0)
+        graph.SetLineColor(color_index)
+        # Transperent white
+        graph.SetLineColorAlpha(color_index, 0)
+        # No line width
+        graph.SetLineWidth(0)
+        graph.SetLineStyle(self.very_sparse_dots_line_style_index)
 
         # Transport the lower and upper bound as ranges of the axis
-        plot.GetXaxis().SetLimits(x_lower_bound, x_upper_bound)
-        plot.GetYaxis().SetLimits(y_lower_bound, y_upper_bound)
+        graph.GetXaxis().SetLimits(x_lower_bound, x_upper_bound)
+        graph.GetYaxis().SetLimits(y_lower_bound, y_upper_bound)
 
-        self.fill_into(plot, xs, ys)
-
-        self.plot = plot
-
-        # TGraph are mostly compatible with the histogram classes for our purposes.
-        self.histograms = [plot, ]
-
-        # Add description, check, contact and titles to the histograms
-        self.attach_attributes()
+        self.create(graph,
+                    ROOT.TMultiGraph,
+                    xs=xs,
+                    ys=ys,
+                    stackby=stackby,
+                    reverse_stack=False)
 
     def hist2d(self,
                xs,
@@ -659,9 +666,37 @@ class ValidationPlot(object):
             for i_bin, bin_label in enumerate(bin_labels):
                 x_taxis.SetBinLabel(i_bin + 1, bin_label)
 
+        self.create(histogram,
+                    ROOT.THStack,
+                    xs,
+                    ys=ys,
+                    weights=weights,
+                    stackby=stackby,
+                    cumulation_direction=cumulation_direction,
+                    reverse_stack=True)
+        # Reverse the stack to have the signal distribution at the bottom
+
+        # Adjust the discrete bins after the filling to be equidistant
+        if bin_labels:
+            for histogram in self.histograms:
+                x_taxis = histogram.GetXaxis()
+                bin_edges = array.array("d", range(len(bin_labels) + 1))
+                x_taxis.Set(n_bins, bin_edges)
+
+    def create(self,
+               histogram_template,
+               stack_factory,
+               xs,
+               ys=None,
+               weights=None,
+               stackby=None,
+               cumulation_direction=None,
+               reverse_stack=None):
+
         histograms = []
 
         if stackby is None:
+            histogram = histogram_template
             self.fill_into(histogram, xs, ys, weights=weights)
             if cumulation_direction is not None:
                 histogram = self.cumulate(histogram, cumulation_direction=cumulation_direction)
@@ -670,41 +705,37 @@ class ValidationPlot(object):
 
         else:
             # No TProfile allowed here
-            if isinstance(histogram, ROOT.TProfile):
+            if isinstance(histogram_template, ROOT.TProfile):
                 raise ValueError("Cannot stack TProfile histograms.")
 
             stackby = np.array(stackby, copy=False)
+            name = histogram_template.GetName()
 
-            histograms = self.fill_into_grouped(histogram,
+            histograms = self.fill_into_grouped(histogram_template,
                                                 xs,
-                                                ys,
+                                                ys=ys,
                                                 weights=weights,
                                                 groupbys=stackby,
                                                 groupby_label="stack")
 
             if cumulation_direction is not None:
-                histograms = [self.cumulate(histogram, cumulation_direction=cumulation_direction) for histogram in histograms]
+                histograms = [self.cumulate(histogram, cumulation_direction=cumulation_direction)
+                              for histogram in histograms]
 
-            plot = ROOT.THStack(name + "_stacked", '')
+            plot = stack_factory()
+            plot.SetName(name + "_stacked")
 
-            # Add the histogram in reverse order such that the signal usually is on the bottom an well visible
-            for histogram in reversed(histograms):
-                plot.Add(histogram)
-
-            # Set the reference histogram to be the lowest (usually the signal histogram)
-            if histograms:
-                plot.SetHistogram(histograms[-1])
-
-        # Adjust the discrete bins after the filling to be equidistant
-        if bin_labels:
-            for histogram in histograms:
-                x_taxis = histogram.GetXaxis()
-                bin_edges = array.array("d", range(len(bin_labels) + 1))
-                x_taxis.Set(n_bins, bin_edges)
+            # Add the histogram in reverse order such
+            # that the signal usually is on the bottom an well visible
+            if reverse_stack:
+                for histogram in reversed(histograms):
+                    plot.Add(histogram)
+            else:
+                for histogram in histograms:
+                    plot.Add(histogram)
 
         self.histograms = histograms
         self.plot = plot
-
         self.attach_attributes()
 
     def fill_into_grouped(self,
@@ -730,13 +761,27 @@ class ValidationPlot(object):
             histogram_for_value = histogram_template.Clone(name + '_' + str(value))
             i_root_color = i_value + 1
 
-            histogram_for_value.SetLineColor(i_root_color)
+            self.set_color(histogram_for_value, i_root_color)
+
             if groupby_label:
                 self.add_stats_entry(histogram_for_value, groupby_label, value)
-            self.fill_into(histogram_for_value, xs, weights=weights, filter=indices_for_value)
+
+            self.fill_into(histogram_for_value,
+                           xs,
+                           ys=ys,
+                           weights=weights,
+                           filter=indices_for_value)
+
             histograms.append(histogram_for_value)
 
         return histograms
+
+    def set_color(self, plot, color):
+        """Fill the data into the plot object"""
+        if isinstance(plot, ROOT.TGraph):
+            plot.SetMarkerColor(color)
+        else:
+            plot.SetLineColor(color)
 
     def fill_into(self, plot, xs, ys=None, weights=None, filter=None):
         """Fill the data into the plot object"""
@@ -1546,8 +1591,8 @@ class ValidationPlot(object):
         self.ylabel = self.ylabel
         self.title = self.title
 
-    @staticmethod
-    def set_tstyle():
+    @classmethod
+    def set_tstyle(cls):
         """Set the style such that the additional stats entries are shown by the TBrowser"""
         belle2_validation_style_name = "belle2_validation_style"
         belle2_validation_tstyle = ROOT.gROOT.GetStyle(belle2_validation_style_name)
@@ -1560,6 +1605,8 @@ class ValidationPlot(object):
             opt_stat = 111111
             belle2_validation_tstyle.SetOptStat(opt_stat)
             ROOT.gROOT.SetStyle(belle2_validation_style_name)
+
+            belle2_validation_tstyle.SetLineStyleString(cls.very_sparse_dots_line_style_index, "4 2000")
 
         else:
             belle2_validation_tstyle.cd()
@@ -1585,9 +1632,10 @@ def test():
     validation_histogram.hist(normal_distributed_values)
     validation_histogram.title = 'A normal distribution'
     validation_histogram.xlabel = 'normal'
-    # validation_histogram.ylabel = 'frequency'
+    validation_histogram.ylabel = 'frequency'
     validation_histogram.fit_gaus()
 
+    # Test for a cumulated histogram - cumulation from left to right
     cumulated_histogram = ValidationPlot('test_cum_hist')
     cumulated_histogram.hist(normal_distributed_values, cumulation_direction=1)
     cumulated_histogram.title = 'A cumulated normal distribution'
@@ -1595,11 +1643,23 @@ def test():
     cumulated_histogram.ylabel = 'cdf'
     cumulated_histogram.show()
 
-    # Test stacked plotting
-    # Make a random selection of 10%
-    stackby = np.random.binomial(1.0, 0.10, 1000)
+    # Test stacked histogram
+    # Make a random selection of 40%
+    stackby = np.random.binomial(1.0, 0.40, 1000)
     stacked_validation_histogram = ValidationPlot('test_stacked_hist')
     stacked_validation_histogram.hist(normal_distributed_values, stackby=stackby)
+
+    # Make a scatterplot with two species.
+    x = np.random.randn(1000)
+    y = 3 * np.random.randn(1000)
+    ones = np.ones_like(x)
+    angle = np.pi / 2
+
+    x1 = np.where(stackby != 0, np.cos(angle) * ones, ones) * x + np.where(stackby != 0, np.sin(angle) * ones, ones) * y
+    y1 = np.where(stackby != 0, np.sin(angle) * ones, ones) * x - np.where(stackby != 0, np.cos(angle) * ones, ones) * y
+
+    stacked_validation_scatter = ValidationPlot('test_stacked_scatter')
+    stacked_validation_scatter.scatter(x1, y1, stackby=stackby)
 
     # Test a profile with a diagonal fit
     x = np.linspace(-1, 1, 1000)
@@ -1621,6 +1681,7 @@ def test():
         diagonal_plot.write(tdirectory1)
         cumulated_profile.write(tdirectory1)
         cumulated_histogram.write(tdirectory1)
+        stacked_validation_scatter.write()
 
     with root_cd("stacked") as tdirectory2:
         stacked_validation_histogram.write(tdirectory2)
@@ -1629,6 +1690,7 @@ def test():
 
     tfile = ROOT.TFile('test.root')
     tBrowser = ROOT.TBrowser()
+    tBrowser.SetDrawOption("AP")
     tBrowser.BrowseObject(tfile)
     raw_input()
     tfile.Close()

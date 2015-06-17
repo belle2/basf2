@@ -50,14 +50,14 @@ namespace Belle2 {
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
-      /** Parameter dhhc<->dhh list, mapping from steering file */
-      std::vector< std::vector<int >> m_dhh_to_dhhc;
+      /** Parameter dhc<->dhe list, mapping from steering file */
+      std::vector< std::vector<int >> m_dhe_to_dhc;
 
-//       /** mapping calculated from m_dhh_to_dhhc for easier handling */
-//       std::map <int, int> dhh_mapto_dhhc;
+//       /** mapping calculated from m_dhe_to_dhc for easier handling */
+//       std::map <int, int> dhe_mapto_dhc;
 
-      /** mapping calculated from m_dhh_to_dhhc for easier handling */
-      std::map <int, std::vector <int>> m_dhhc_mapto_dhh;
+      /** mapping calculated from m_dhe_to_dhc for easier handling */
+      std::map <int, std::vector <int>> m_dhc_mapto_dhe;
 
       /** Event counter */
       unsigned int m_packed_events;
@@ -68,10 +68,10 @@ namespace Belle2 {
       /** Exp+Run Nr */
       unsigned short m_run_nr_word2;
 
-      /** For one DHHC event, we utilize one header (writing out, beware of endianess!) */
+      /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
 
-      /** For one DHHC event, we utilize one payload for all DHH/DHP frames */
+      /** For one DHC event, we utilize one payload for all DHE/DHP frames */
       std::vector <std::vector <unsigned char>> m_onsen_payload;
 
       /** For current processed frames */
@@ -82,25 +82,25 @@ namespace Belle2 {
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
 
-      /** Pack one event (several DHHC) stored in seperate RawPXD object.
+      /** Pack one event (several DHC) stored in seperate RawPXD object.
        */
       void pack_event(void);
 
-      /** Pack one DHHC (several DHH) stored in one RawPXD object.
+      /** Pack one DHC (several DHE) stored in one RawPXD object.
        */
-      void pack_dhhc(int dhhc_id, int dhh_mask, int* dhh_ids);
+      void pack_dhc(int dhc_id, int dhe_mask, int* dhe_ids);
 
-      /** Pack one DHH (several DHP) to buffer.
+      /** Pack one DHE (several DHP) to buffer.
        */
-      void pack_dhh(int dhh_id, int dhp_mask);
+      void pack_dhe(int dhe_id, int dhp_mask);
 
       /** Pack one DHP to buffer.
        */
-      void pack_dhp(int dhp_id, int dhh_id, int dhh_reformat);
+      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat);
 
       /** Pack one DHP RAW to buffer.
        */
-      void pack_dhp_raw(int dhp_id, int dhh_id, bool adcpedestal);
+      void pack_dhp_raw(int dhp_id, int dhe_id, bool adcpedestal);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame

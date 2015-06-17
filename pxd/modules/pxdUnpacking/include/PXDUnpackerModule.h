@@ -98,51 +98,48 @@ namespace Belle2 {
        * @param Frame_Number current frame number
        * @param Frames_in_event number of frames in PxdRaw object (subevent)
        */
-      void unpack_dhhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event);
+      void unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event);
 
-      /** Unpack DHP data within one DHH frame
+      /** Unpack DHP data within one DHE frame
        * @param data pointer to dhp data
        * @param len length of dhp data
-       * @param dhh_first_readout_frame_lo 16 bit of the first readout frame from DHH Start
-       * @param dhh_ID raw DHH ID from DHHC frame
-       * @param dhh_DHPport raw DHP port from DHHC frame
-       * @param dhh_reformat flag if DHH did reformatting
+       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
+       * @param dhe_reformat flag if DHE did reformatting
        * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
-      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport,
-                      unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+      void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
+                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id);
 
-      /** Unpack DHP RAW data within one DHH frame (pedestals, etc)
+      /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
        * @param data pointer to dhp data
        * @param len length of dhp data
-       * @param dhh_ID raw DHH ID from DHHC frame
-       * @param dhh_DHPport raw DHP port from DHHC frame
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
        * @param vxd_id vertex Detector ID
        */
-      void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhh_ID, unsigned dhh_DHPport, VxdID vxd_id);
+      void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id);
 
-      /** Unpack DHP/FCE data within one DHH frame
+      /** Unpack DHP/FCE data within one DHE frame
        * @param data pointer to dhp data
        * @param len length of dhp data
-       * @param dhh_first_readout_frame_lo 16 bit of the first readout frame from DHH Start
-       * @param dhh_ID raw DHH ID from DHHC frame
-       * @param dhh_DHPport raw DHP port from DHHC frame
-       * @param dhh_reformat flag if DHH did reformatting
+       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
+       * @param dhe_reformat flag if DHE did reformatting
        * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
 
-      //// WARUM SO VIELE SACHEN DIE ÜBERGEBEN WERDEN???
-//       void unpack_fce(void* data, unsigned int frame_len, unsigned int dhh_first_readout_frame_id_lo, unsigned int dhh_ID,
-//                       unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
 
-      void unpack_fce(void* data, unsigned int length, VxdID vxd_id);
+      void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
       /**
-       * @param data
-       * @param vxd_id dhe compact ID.
-       * @param length Pixel row coordinate.
+       * @param length
+       * @param data dhe compact ID.
+       * @param vxd_id Pixel row coordinate.
        */
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits

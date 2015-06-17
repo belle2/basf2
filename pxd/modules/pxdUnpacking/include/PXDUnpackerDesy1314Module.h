@@ -46,17 +46,17 @@ namespace Belle2 {
 
       /**  Swap the endianess of the ONSEN header yes/no */
       bool m_headerEndianSwap;
-      /**  Run in DHHC mode yes/no */
-      bool m_DHHCmode;
+      /**  Run in DHC mode yes/no */
+      bool m_DHCmode;
       /**  ignore missing DATCON */
       bool m_ignoreDATCON;
-      /**  ignore wrong nr of frames info in DHHC Start*/
+      /**  ignore wrong nr of frames info in DHC Start*/
       bool m_ignore_headernrframes;
-      /**  ignore missing DHPs from DHP mask in DHH Start*/
+      /**  ignore missing DHPs from DHP mask in DHE Start*/
       bool m_ignore_dhpmask;
       /**  ignore wrong DHP size for empty dhp frames (bug in Davids core) and checksum */
       bool m_ignore_empty_dhp_wrong_size;
-      /**  ignore wrong DHP ports in DHH header vs DHP header */
+      /**  ignore wrong DHP ports in DHE header vs DHP header */
       bool m_ignore_dhpportdiffer;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
@@ -86,18 +86,20 @@ namespace Belle2 {
        * @param data pointer to frame
        * @param len length of frame
        */
-      void unpack_dhhc_frame(void* data, int len, bool pad, int& last_wie, unsigned int& last_evtnr, int Frame_Number, int Frames_in_event);
+      void unpack_dhc_frame(void* data, int len, bool pad, int& last_wie, unsigned int& last_evtnr, int Frame_Number,
+                            int Frames_in_event);
 
-      /** Unpack DHP data within one DHH frame
+      /** Unpack DHP data within one DHE frame
        * @param data pointer to dhp data
        * @param len length of dhp data
-       * @param dhh_first_readout_frame_lo 16 bit of the first readout frame from DHH Start
-       * @param dhh_ID raw DHH ID from DHHC frame
-       * @param dhh_DHPport raw DHP port from DHHC frame
-       * @param dhh_reformat flag if DHH did reformatting
+       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
+       * @param dhe_reformat flag if DHE did reformatting
        * @param toffset triggered row (offset)
        */
-      void unpack_dhp(void* data, unsigned int len, unsigned int dhh_first_readout_frame_lo, unsigned int dhh_ID, unsigned dhh_DHPport, unsigned dhh_reformat, unsigned short toffset, VxdID vxd_id);
+      void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
+                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id);
 
     };//end class declaration
 

@@ -26,41 +26,53 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawCluster():
-      m_length(0), m_vxdID(0)
-    {};
+      m_length(0), m_cluster(0), m_vxdID(0) {};
 
     /**
-     * @param vxdID
      * @param length
+     * @param data
+     * @param vxdID
      */
 
-    PXDRawCluster(void* data, unsigned int length, VxdID vxdID):
-      m_length(length), m_vxdID(vxdID)
-    {};
+    PXDRawCluster(unsigned short* data, unsigned int length, VxdID vxdID);
 
-    /** Get the dhe ID.
-     * @return ID of the sensor.
-     */
-    VxdID getVxdID() const
-    {
-      return m_vxdID;
-    }
-
-    /** Get length  of frame
-    * @return length of rame
-    */
     unsigned int getLength() const
     {
       return m_length;
     }
 
+    /** Get static pointer to data.
+     * @param j Index of m_cluster
+     * @return pointer.
+     */
+    unsigned short getData(unsigned int j) const
+    {
+      return (m_cluster[j]);
+    }
+
+    /** Get the dhe ID.
+    * @return ID of the sensor.
+    */
+    VxdID getVxdID() const
+    {
+      return m_vxdID;
+    }
+
+    /** Get the dhe ID.
+    * @return ID of the sensor.
+    */
+//      int getBla() const
+//      {
+//        return m_bla;
+//      }
   protected:
-    unsigned short m_vxdID;
     unsigned int m_length;
+    unsigned short* m_cluster; // [m_length] /**< Buffer of size m_length shorts  */
+    unsigned short m_vxdID;
 
     // ~PXDRawCluster();
 
-    ClassDef(PXDRawCluster, 1);
+    ClassDef(PXDRawCluster, 3);
   };
 
 

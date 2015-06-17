@@ -137,9 +137,9 @@ namespace Belle2 {
       void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
       /**
-       * @param length
-       * @param data dhe compact ID.
-       * @param vxd_id Pixel row coordinate.
+       * @param length length of cluster data
+       * @param data pointer to cluster data
+       * @param vxd_id vertex Detector ID
        */
 
       int nr5bits(int i) const;/// helper function to "count" nr of set bits within lower 5 bits

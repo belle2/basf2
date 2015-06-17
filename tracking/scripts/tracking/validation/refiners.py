@@ -9,7 +9,7 @@ from tracking.validation.fom import ValidationFiguresOfMerit
 from tracking.validation.classification import ClassificationAnalysis
 from tracking.validation.pull import PullAnalysis
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
-from tracking.validation.utilities import root_cd, root_save_name
+from tracking.root_utils import root_cd, root_save_name
 
 import ROOT
 

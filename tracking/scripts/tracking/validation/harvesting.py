@@ -14,7 +14,7 @@ from ROOT import Belle2  # make Belle2 namespace available
 
 from tracking.modules import BrowseTFileOnTerminateModule
 from tracking.utilities import coroutine
-from tracking.validation.utilities import root_cd
+from tracking.root_utils import root_cd
 from tracking.validation.refiners import Refiner
 
 import tracking.run.tracked_event_generation

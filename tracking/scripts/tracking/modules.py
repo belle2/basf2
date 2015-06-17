@@ -12,6 +12,7 @@ import ROOT
 import logging
 
 import tracking.metamodules as metamodules
+import tracking.root_utils as root_utils
 from tracking.run.event_generation import StandardEventGenerationRun
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
@@ -49,22 +50,10 @@ class BrowseTFileOnTerminateModule(basf2.Module):
 
         Opens the ROOT file an opens a Browser to show it.
         """
-
-        if isinstance(self.root_file, ROOT.TFile):
-            tfile = self.root_file
-        else:
-            tfile = ROOT.TFile(self.root_file)
-
-        tBrowser = ROOT.TBrowser()
-        tBrowser.BrowseObject(tfile)
-        tBrowser.Show()
-
-        # FIXME: Is there a way to listen to the close event of the TBrowser?
-        raw_input('Press enter to close.')
-
-        # If we opened the file ourselves close it again.
-        if not isinstance(self.root_file, ROOT.TFile):
-            tfile.Close()
+        with root_utils.root_open(self.root_file) as tfile:
+            root_utils.root_browse(tfile)
+            # FIXME: Is there a way to listen to the close event of the TBrowser?
+            raw_input('Press enter to close.')
 
         super(BrowseTFileOnTerminateModule, self).terminate()
 

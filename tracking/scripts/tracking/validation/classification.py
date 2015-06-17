@@ -7,7 +7,8 @@ from tracking.validation.fom import ValidationFiguresOfMerit
 import tracking.validation.scores as scores
 
 # get error function as a np.ufunc vectorised for numpy array
-from tracking.validation.utilities import erf, root_save_name
+from tracking.validation.utilities import erf
+from tracking.root_utils import root_save_name
 import tracking.validation.statistics as statistics
 
 import math

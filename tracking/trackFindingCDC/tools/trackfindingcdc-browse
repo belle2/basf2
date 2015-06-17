@@ -8,7 +8,7 @@ import os.path
 
 import tracking.utilities as utilities
 
-from tracking.validation.utilities import root_browse
+from tracking.root_utils import root_browse, root_open
 
 import ROOT.TFile
 
@@ -25,11 +25,9 @@ def main():
 
     arguments = argument_parser.parse_args()
 
-    root_file_path = arguments.root_file_path
-    tfile = ROOT.TFile(root_file_path, "READ")
-
-    root_browse(tfile)
-    raw_input("Close with return key.")
+    with root_open(arguments.root_file_path, "READ") as tfile:
+        root_browse(tfile)
+        raw_input("Close with return key.")
 
 
 if __name__ == "__main__":

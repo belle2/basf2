@@ -4,7 +4,8 @@
 from tracking.validation.plot import ValidationPlot, compose_axis_label, get_unit
 
 # get error function as a np.ufunc vectorised for numpy array
-from tracking.validation.utilities import erf, root_save_name
+from tracking.validation.utilities import erf
+from tracking.root_utils import root_save_name
 
 import math
 import collections

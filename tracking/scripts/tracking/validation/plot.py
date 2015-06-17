@@ -9,7 +9,7 @@ import numpy as np
 
 import ROOT
 
-from tracking.validation.utilities import root_cd, root_save_name
+from tracking.root_utils import root_cd, root_save_name
 
 import tracking.validation.statistics as statistics
 

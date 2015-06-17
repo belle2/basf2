@@ -5,7 +5,7 @@ import collections
 import array
 import ROOT
 
-from tracking.validation.utilities import root_cd, root_save_name
+from tracking.root_utils import root_cd, root_save_name
 
 
 class ValidationFiguresOfMerit(collections.MutableMapping):
@@ -35,8 +35,14 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
                          self.figures_by_name.items())
 
     def write(self, tdirectory=None):
-        """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
+        """Writes the figures of merit as a TNtuple.
 
+        Parameters
+        ----------
+        tdirectory : ROOT.TDirectory, optional
+            The directory to which the TNtuple shall be written.
+            Defaults to the current directory.
+        """
         name = self.name
 
         if not self.figures_by_name:
@@ -124,8 +130,14 @@ class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
         return 'Not supported.'
 
     def write(self, tdirectory=None):
-        """Writes the figures of merit as a TNtuple to the currently open TFile in the format complient with the validation frame work."""
+        """Writes the figures of merit as a TNtuple.
 
+        Parameters
+        ----------
+        tdirectory : ROOT.TDirectory, optional
+            The directory to which the TNtuple shall be written.
+            Defaults to the current directory.
+        """
         name = self.name
         figure_names = [root_save_name(key) for key in self.figures_by_name.keys()]
         values = list(self.figures_by_name.values())

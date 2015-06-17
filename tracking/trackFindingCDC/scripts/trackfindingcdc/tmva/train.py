@@ -3,10 +3,12 @@ import basf2
 from ROOT import gSystem
 import ROOT
 
+import os
+import os.path
 import numpy as np
 
 import tracking.validation.classification as classification
-from tracking.validation.utilities import root_cd
+from tracking.root_utils import root_cd
 
 import logging
 
@@ -165,6 +167,39 @@ class FastBDTClassifier(object):
 
         if isinstance(self.output_file_name, str):
             output_file.Close()
+
+
+def show_tmva_results(file_path):
+    """Start the TMVA gui
+
+    Parameters
+    ----------
+    file_path : str
+        Path to a result file of a tmva training.
+    """
+
+    tmva_gui_script_dir_path = os.path.join(
+        os.environ["BELLE2_EXTERNALS_DIR"],
+        "share",
+        "root",
+        "tmva"
+        )
+
+    tmva_gui_script_file_path = os.path.join(
+        tmva_gui_script_dir_path,
+        "TMVAGui.C"
+        )
+
+    file_path = os.path.realpath(file_path)
+
+    save_working_dir_path = os.getcwd()
+    os.chdir(tmva_gui_script_dir_path)
+
+    tmva_gui_command = ".x " + tmva_gui_script_file_path + '("' + file_path + '")'
+    ROOT.gROOT.ProcessLine(tmva_gui_command)
+    raw_input("Press enter to continue.")
+
+    os.chdir(save_working_dir_path)
 
 
 class ClassificationOverview:

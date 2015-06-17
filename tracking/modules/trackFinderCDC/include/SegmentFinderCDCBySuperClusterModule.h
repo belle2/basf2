@@ -130,7 +130,8 @@ namespace Belle2 {
       /// Instance of the hit cluster generator
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
-
+      /// Neighborhood type for segments.
+      typedef WeightedNeighborhood<const CDCRecoSegment2D> CDCSegmentNeighborhood;
     }; // end class SegmentFinderCDCBySuperClusterModule
 
 
@@ -182,11 +183,42 @@ namespace Belle2 {
           std::sort(std::begin(superCluster), std::end(superCluster));
           assert(std::is_sorted(std::begin(superCluster), std::end(superCluster)));
 
-          generateSegmentsFromSuperCluster(superCluster, segments);
+          std::vector<CDCRecoSegment2D> segmentsInSuperCluster;
+          segmentsInSuperCluster.clear();
 
-          //segments.back().setISuperCluster(iSuperCluster);
+          generateSegmentsFromSuperCluster(superCluster, segmentsInSuperCluster);
 
-          // Combine matching segments
+          for (CDCRecoSegment2D& segment : segmentsInSuperCluster) {
+            segment.setISuperCluster(iSuperCluster);
+          }
+
+          std::vector<CDCRecoSegment2D> symmetricSegmentsInSuperCluster;
+
+          symmetricSegmentsInSuperCluster.clear();
+          segmentsInSuperCluster.reserve(2 * segmentsInSuperCluster.size());
+          for (const CDCRecoSegment2D& segment : segmentsInSuperCluster) {
+            symmetricSegmentsInSuperCluster.push_back(segment);
+            symmetricSegmentsInSuperCluster.push_back(segment.reversed());
+          }
+
+          CDCSegmentNeighborhood segmentsNeighborhood;
+          segmentsNeighborhood.clear();
+          segmentsNeighborhood.createUsing(*m_ptrSegmentRelationFilter,
+                                           symmetricSegmentsInSuperCluster);
+
+          MultipassCellularPathFinder<CDCRecoSegment2D> cellularPathFinder;
+          std::vector< std::vector<const CDCRecoSegment2D*> > segmentPaths;
+          cellularPathFinder.apply(symmetricSegmentsInSuperCluster,
+                                   segmentsNeighborhood,
+                                   segmentPaths);
+
+          for (const std::vector<const CDCRecoSegment2D*>& segmentPath : segmentPaths) {
+            segments.push_back(CDCRecoSegment2D::condense(segmentPath));
+          }
+
+          // segments.insert(segments.end(),
+          //      std::make_move_iterator(segmentsInSuperCluster.begin()),
+          //      std::make_move_iterator(segmentsInSuperCluster.end()));
 
         } // end super cluster loop
 

@@ -10,58 +10,29 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/track_relation/BaseTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of track relations based on MC information.
-    class MCTrackRelationFilter : public Filter<Relation<CDCTrack> > {
+    class MCTrackRelationFilter : public MCSymmetricFilterMixin<Filter<Relation<CDCTrack> > > {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCTrack> > Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<CDCTrack> > > Super;
 
     public:
-      /// Constructor
-      MCTrackRelationFilter(bool allowReverse = true) :
-        m_param_allowReverse(allowReverse) {;}
-
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  symmetric -  Accept the track relation if the reverse track relation
-       *               is correct preserving the progagation reversal symmetry
-       *               on this level of detail.
-       *               Allowed values "true", "false". Default is "true".
+      /** Constructor also setting the switch ,
+       *  if the reversed version of a track relation (in comparision to MC truth) shall be accepted.
        */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+      MCTrackRelationFilter(bool allowReverse = true) : Super(allowReverse) {;}
 
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
-
-      /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
-
+    public:
       /// Checks if a track relation is a good combination.
       virtual NeighborWeight operator()(const CDCTrack& fromTrack,
                                         const CDCTrack& toTrack) override final;
-
-    public:
-      /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse)
-      { m_param_allowReverse = allowReverse; }
-
-      /// Getter for the allow reverse parameter
-      bool getAllowReverse() const
-      { return m_param_allowReverse; }
-
-    private:
-      /// Switch to indicate if the reversed version of the track pair shall also be accepted (default is true).
-      bool m_param_allowReverse;
 
     }; // end class MCTrackRelationFilter
 

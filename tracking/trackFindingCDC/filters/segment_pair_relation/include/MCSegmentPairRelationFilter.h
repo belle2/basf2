@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/segment_pair_relation/BaseSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/MCSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
@@ -18,11 +19,11 @@ namespace Belle2 {
 
     ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
     class MCSegmentPairRelationFilter :
-      public Filter<Relation<CDCSegmentPair>> {
+      public MCSymmetricFilterMixin<Filter<Relation<CDCSegmentPair> > > {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCSegmentPair>> Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<CDCSegmentPair> > > Super;
 
     public:
       /// Importing all overloads from the super class
@@ -42,40 +43,16 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       virtual void terminate() IF_NOT_CINT(override final);
 
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  symmetric -  Accept the relation of segment pairs also if the reverse relation is correct
-       *               preserving the progagation reversal symmetry on this level of detail.
-       *               Allowed values "true", "false". Default is "true".
-       */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
-
-      /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
-
-
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight operator()(const CDCSegmentPair& fromSegmentPair,
                                         const CDCSegmentPair& toSegmentPair) IF_NOT_CINT(override final);
 
     public:
       /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse)
+      void setAllowReverse(bool allowReverse) override
       {
+        Super::setAllowReverse(allowReverse);
         m_mcSegmentPairFilter.setAllowReverse(allowReverse);
-      }
-
-      /// Getter for the allow reverse parameter
-      bool getAllowReverse() const
-      {
-        return m_mcSegmentPairFilter.getAllowReverse();
       }
 
     private:

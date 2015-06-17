@@ -22,45 +22,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-void MCFacetFilter::setParameter(const std::string& key, const std::string& value)
-{
-  if (key == "symmetric") {
-    if (value == "true") {
-      m_param_allowReverse = true;
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else if (value == "false") {
-      m_param_allowReverse = false;
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else {
-      Super::setParameter(key, value);
-    }
-  } else {
-    Super::setParameter(key, value);
-  }
-}
-
-std::map<std::string, std::string> MCFacetFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["symmetric"] =  "Accept the facet if the reverse facet is correct "
-                      "preserving the progagation reversal symmetry on this level of detail."
-                      "Allowed values 'true', 'false'. Default is 'true'.";
-  return des;
-}
-
-bool MCFacetFilter::needsTruthInformation()
-{
-  return true;
-}
-
 CellWeight MCFacetFilter::operator()(const CDCFacet& facet)
 {
   const int inTrackHitDistanceTolerance = 3;
   bool isCorrectFacet = operator()(facet,
                                    inTrackHitDistanceTolerance);
 
-  bool isCorrectReverseFacet = m_param_allowReverse and operator()(facet.reversed(),
+  bool isCorrectReverseFacet = getAllowReverse() and operator()(facet.reversed(),
                                inTrackHitDistanceTolerance);
 
   if (isCorrectFacet or isCorrectReverseFacet) {

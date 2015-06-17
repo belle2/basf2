@@ -11,15 +11,17 @@
 
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    ///Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetRelationFilter : public Filter<Relation<CDCFacet>> {
+
+    /// Class filtering the neighborhood of facets with monte carlo information
+    class MCFacetRelationFilter : public MCSymmetricFilterMixin<Filter<Relation<CDCFacet> > > {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCFacet>> Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<CDCFacet> > > Super;
 
     public:
       /// Importing all overloads from the super class
@@ -29,7 +31,8 @@ namespace Belle2 {
       /** Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */
-      MCFacetRelationFilter(bool allowReverse = true) : m_mcFacetFilter(allowReverse) {;}
+      MCFacetRelationFilter(bool allowReverse = true) :
+        Super(allowReverse), m_mcFacetFilter(allowReverse) {;}
 
     public:
       /// May be used to clear information from former events. Currently unused.
@@ -41,26 +44,6 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       virtual void terminate() IF_NOT_CINT(override final);
 
-
-    public:
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  symmetric -  Accept the relation facet if the reverse relation facet is correct
-       *               preserving the progagation reversal symmetry on this level of detail.
-       *               Allowed values "true", "false". Default is "true".
-       */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
-
-      /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
-
     public:
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return NOT_A_NEIGHBOR if relation shall be rejected.
@@ -70,15 +53,10 @@ namespace Belle2 {
 
     public:
       /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse)
+      virtual void setAllowReverse(bool allowReverse) override
       {
+        Super::setAllowReverse(allowReverse);
         m_mcFacetFilter.setAllowReverse(allowReverse);
-      }
-
-      /// Getter for the allow reverse parameter
-      bool getAllowReverse() const
-      {
-        return m_mcFacetFilter.getAllowReverse();
       }
 
     private:

@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
-  m_param_allowReverse(allowReverse),
+  Super(allowReverse),
   m_mcAxialSegmentPairFilter(allowReverse)
 {
 }
@@ -32,12 +32,14 @@ MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
 void MCSegmentTripleFilter::clear()
 {
   m_mcAxialSegmentPairFilter.clear();
+  Super::clear();
 }
 
 
 
 void MCSegmentTripleFilter::initialize()
 {
+  Super::initialize();
   m_mcAxialSegmentPairFilter.initialize();
 }
 
@@ -46,38 +48,7 @@ void MCSegmentTripleFilter::initialize()
 void MCSegmentTripleFilter::terminate()
 {
   m_mcAxialSegmentPairFilter.terminate();
-}
-
-
-void MCSegmentTripleFilter::setParameter(const std::string& key, const std::string& value)
-{
-  if (key == "symmetric") {
-    if (value == "true") {
-      m_param_allowReverse = true;
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else if (value == "false") {
-      m_param_allowReverse = false;
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else {
-      Super::setParameter(key, value);
-    }
-  } else {
-    Super::setParameter(key, value);
-  }
-}
-
-std::map<std::string, std::string> MCSegmentTripleFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["symmetric"] =  "Accept the segment triple if the reverse segment triple is correct "
-                      "preserving the progagation reversal symmetry on this level of detail."
-                      "Allowed values 'true', 'false'. Default is 'true'.";
-  return des;
-}
-
-bool MCSegmentTripleFilter::needsTruthInformation()
-{
-  return true;
+  Super::terminate();
 }
 
 
@@ -124,7 +95,7 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
 
 
   if ((startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
-      (m_param_allowReverse and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
+      (getAllowReverse() and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
 
     // Do fits
     setTrajectoryOf(segmentTriple);
@@ -135,7 +106,6 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   }
 
   return NOT_A_CELL;
-
 }
 
 

@@ -22,47 +22,19 @@ MCSegmentTripleRelationFilter::MCSegmentTripleRelationFilter(bool allowReverse) 
 void MCSegmentTripleRelationFilter::clear()
 {
   m_mcSegmentTripleFilter.clear();
+  Super::clear();
 }
 
 void MCSegmentTripleRelationFilter::initialize()
 {
+  Super::initialize();
   m_mcSegmentTripleFilter.initialize();
 }
 
 void MCSegmentTripleRelationFilter::terminate()
 {
   m_mcSegmentTripleFilter.terminate();
-}
-
-void MCSegmentTripleRelationFilter::setParameter(const std::string& key, const std::string& value)
-{
-  if (key == "symmetric") {
-    if (value == "true") {
-      setAllowReverse(true);
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else if (value == "false") {
-      setAllowReverse(false);
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else {
-      Super::setParameter(key, value);
-    }
-  } else {
-    Super::setParameter(key, value);
-  }
-}
-
-std::map<std::string, std::string> MCSegmentTripleRelationFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["symmetric"] =  "Accept the facet relation if the reverse segment triple relation is correct "
-                      "preserving the progagation reversal symmetry on this level of detail."
-                      "Allowed values 'true', 'false'. Default is 'true'.";
-  return des;
-}
-
-bool MCSegmentTripleRelationFilter::needsTruthInformation()
-{
-  return true;
+  Super::terminate();
 }
 
 NeighborWeight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& triple,

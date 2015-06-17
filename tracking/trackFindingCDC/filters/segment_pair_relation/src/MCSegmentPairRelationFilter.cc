@@ -14,6 +14,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse) :
+  Super(allowReverse),
   m_mcSegmentPairFilter(allowReverse)
 {
 }
@@ -22,12 +23,14 @@ MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse) :
 void MCSegmentPairRelationFilter::clear()
 {
   m_mcSegmentPairFilter.clear();
+  Super::clear();
 }
 
 
 
 void MCSegmentPairRelationFilter::initialize()
 {
+  Super::initialize();
   m_mcSegmentPairFilter.initialize();
 }
 
@@ -36,40 +39,9 @@ void MCSegmentPairRelationFilter::initialize()
 void MCSegmentPairRelationFilter::terminate()
 {
   m_mcSegmentPairFilter.terminate();
+  Super::terminate();
 }
 
-
-
-void MCSegmentPairRelationFilter::setParameter(const std::string& key, const std::string& value)
-{
-  if (key == "symmetric") {
-    if (value == "true") {
-      m_mcSegmentPairFilter.setAllowReverse(true);
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else if (value == "false") {
-      m_mcSegmentPairFilter.setAllowReverse(false);
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else {
-      Super::setParameter(key, value);
-    }
-  } else {
-    Super::setParameter(key, value);
-  }
-}
-
-std::map<std::string, std::string> MCSegmentPairRelationFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["symmetric"] =  "Accept the facet relation if the reverse axial stereo segment pair relation is correct "
-                      "preserving the progagation reversal symmetry on this level of detail."
-                      "Allowed values 'true', 'false'. Default is 'true'.";
-  return des;
-}
-
-bool MCSegmentPairRelationFilter::needsTruthInformation()
-{
-  return true;
-}
 
 NeighborWeight
 MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,

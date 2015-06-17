@@ -13,16 +13,17 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/filters/segment_triple/BaseSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the constuction of segment triples based on monte carlo information
-    class MCSegmentTripleFilter  : public Filter<CDCSegmentTriple> {
+    class MCSegmentTripleFilter  : public MCSymmetricFilterMixin<Filter<CDCSegmentTriple> > {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCSegmentTriple> Super;
+      typedef MCSymmetricFilterMixin<Filter<CDCSegmentTriple> > Super;
 
     public:
       /// Constructor initializing the symmetry flag.
@@ -38,53 +39,24 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       virtual void terminate() IF_NOT_CINT(override final);
 
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  symmetric -  Accept the axial segment triple if the reverse segment triple
-       *               is correct preserving the progagation reversal symmetry
-       *               on this level of detail.
-       *               Allowed values "true", "false". Default is "true".
-       */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
-
-      /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
-
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
       virtual CellWeight operator()(const CDCSegmentTriple& triple) IF_NOT_CINT(override final);
 
     private:
-      /// Sets the trajectories of the segment triple from Monte Carlo information. IS executed for good segment triples.
+      /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.
       void setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const;
 
     public:
       /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse)
+      void setAllowReverse(bool allowReverse) override
       {
-        m_param_allowReverse = allowReverse;
+        Super::setAllowReverse(allowReverse);
         m_mcAxialSegmentPairFilter.setAllowReverse(allowReverse);
       }
 
-      /// Getter for the allow reverse parameter
-      bool getAllowReverse() const
-      {
-        return m_param_allowReverse;
-      }
-
     private:
-      /// Switch to indicate if the reversed version of the segment triple shall also be accepted (default is true).
-      bool m_param_allowReverse;
-
       /// Instance of the cell filter to reject neighborhoods of false cells.
       MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
-
 
     }; // end class MCSegmentTripleFilter
   } //end namespace TrackFindingCDC

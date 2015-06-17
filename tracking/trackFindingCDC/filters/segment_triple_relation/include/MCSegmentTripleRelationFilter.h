@@ -9,21 +9,21 @@
  **************************************************************************/
 #pragma once
 
-
 #include <tracking/trackFindingCDC/filters/segment_triple_relation/BaseSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
-
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     ///Class filtering the neighborhood of segment triples with monte carlo information
-    class MCSegmentTripleRelationFilter: public Filter<Relation<CDCSegmentTriple>> {
+    class MCSegmentTripleRelationFilter:
+      public MCSymmetricFilterMixin<Filter<Relation<CDCSegmentTriple> > > {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCSegmentTriple>> Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<CDCSegmentTriple> > > Super;
 
     public:
       /// Importing all overloads from the super class
@@ -42,40 +42,16 @@ namespace Belle2 {
       /// Forwards the terminate method from the module
       virtual void terminate() IF_NOT_CINT(override final);
 
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  symmetric -  Accept the relation of segment triples also if the reverse relation is correct
-       *               preserving the progagation reversal symmetry on this level of detail.
-       *               Allowed values "true", "false". Default is "true".
-       */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
-
-      /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() IF_NOT_CINT(override final);
-
-
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return NOT_A_NEIGHBOR if relation shall be rejected.*/
       virtual NeighborWeight operator()(const CDCSegmentTriple& triple,
                                         const CDCSegmentTriple& neighborTriple) IF_NOT_CINT(override final);
 
       /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse)
+      void setAllowReverse(bool allowReverse) override
       {
+        Super::setAllowReverse(allowReverse);
         m_mcSegmentTripleFilter.setAllowReverse(allowReverse);
-      }
-
-      /// Getter for the allow reverse parameter
-      bool getAllowReverse() const
-      {
-        return m_mcSegmentTripleFilter.getAllowReverse();
       }
 
     private:
@@ -87,4 +63,3 @@ namespace Belle2 {
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
-

@@ -16,12 +16,14 @@ using namespace TrackFindingCDC;
 void MCFacetRelationFilter::clear()
 {
   m_mcFacetFilter.clear();
+  Super::clear();
 }
 
 
 
 void MCFacetRelationFilter::initialize()
 {
+  Super::initialize();
   m_mcFacetFilter.initialize();
 }
 
@@ -30,40 +32,9 @@ void MCFacetRelationFilter::initialize()
 void MCFacetRelationFilter::terminate()
 {
   m_mcFacetFilter.terminate();
+  Super::terminate();
 }
 
-
-
-void MCFacetRelationFilter::setParameter(const std::string& key, const std::string& value)
-{
-  if (key == "symmetric") {
-    if (value == "true") {
-      m_mcFacetFilter.setAllowReverse(true);
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else if (value == "false") {
-      m_mcFacetFilter.setAllowReverse(false);
-      B2INFO("Filter received parameter '" << key << "' " << value);
-    } else {
-      Super::setParameter(key, value);
-    }
-  } else {
-    Super::setParameter(key, value);
-  }
-}
-
-std::map<std::string, std::string> MCFacetRelationFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["symmetric"] =  "Accept the facet relation if the reverse facet relation is correct "
-                      "preserving the progagation reversal symmetry on this level of detail."
-                      "Allowed values 'true', 'false'. Default is 'true'.";
-  return des;
-}
-
-bool MCFacetRelationFilter::needsTruthInformation()
-{
-  return true;
-}
 
 
 NeighborWeight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,

@@ -119,6 +119,7 @@ simulation.param('PhotonFraction', 0.3)
 # ARICH Reconstruction parameters
 # arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.param('inputTrackType', 0)
+arichRECO.param('storeHist', 10000)
 # =============================================================================
 
 # Do the simulation

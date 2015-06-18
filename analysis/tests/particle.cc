@@ -115,6 +115,97 @@ namespace {
 
   }
 
+  /** test identification of copies */
+  TEST_F(ParticleTest, Copies)
+  {
+    StoreArray<Particle> particles;
+
+    // create some particles
+    Particle* T1Pion     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 1));
+    Particle* T2Pion     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 2));
+
+    // T1PionCopy is a copy of T1Pion (both are created from the same Track and are pions)
+    Particle* T1PionCopy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 211, Particle::c_Flavored, Particle::c_Track, 1));
+
+    // T1Kaon is not a coy of T1Pion (both are created from the same Track, but are of different hypothesis)
+    Particle* T1Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 1));
+    Particle* T2Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 2));
+    Particle* T3Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 3));
+    Particle* T4Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 4));
+
+    // T1Gamma
+    Particle* T1Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+                                                        1));
+    // T2Gamma
+    Particle* T2Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+                                                        2));
+
+    EXPECT_TRUE(T1Pion->isCopyOf(T1PionCopy));
+    EXPECT_FALSE(T1Pion->isCopyOf(T1Kaon));
+    EXPECT_FALSE(T1Pion->isCopyOf(T1Gamma));
+    EXPECT_FALSE(T2Gamma->isCopyOf(T1Gamma));
+
+    // Construct composite particles
+    Particle* D0Pi1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    D0Pi1Pi2->appendDaughter(T1Pion);
+    D0Pi1Pi2->appendDaughter(T2Pion);
+
+    Particle* D0Pi1Pi2Copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    D0Pi1Pi2Copy->appendDaughter(T1Pion);
+    D0Pi1Pi2Copy->appendDaughter(T2Pion);
+
+    Particle* D0Pi1Pi2Copy2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    D0Pi1Pi2Copy2->appendDaughter(T1PionCopy);
+    D0Pi1Pi2Copy2->appendDaughter(T2Pion);
+
+    Particle* D0K1K2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    D0K1K2->appendDaughter(T1Kaon);
+    D0K1K2->appendDaughter(T2Kaon);
+
+    Particle* D0K1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    D0K1Pi2->appendDaughter(T1Kaon);
+    D0K1Pi2->appendDaughter(T2Pion);
+
+    EXPECT_FALSE(D0Pi1Pi2->isCopyOf(D0K1K2));
+    EXPECT_FALSE(D0Pi1Pi2->isCopyOf(D0K1Pi2));
+    EXPECT_TRUE(D0Pi1Pi2->isCopyOf(D0Pi1Pi2Copy));
+    EXPECT_TRUE(D0Pi1Pi2->isCopyOf(D0Pi1Pi2Copy2));
+    EXPECT_TRUE(D0Pi1Pi2Copy->isCopyOf(D0Pi1Pi2Copy2));
+
+    // even more composite particles
+    Particle* D0K3K4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    D0K3K4->appendDaughter(T3Kaon);
+    D0K3K4->appendDaughter(T4Kaon);
+
+    Particle* B0_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    B0_1->appendDaughter(D0Pi1Pi2);
+    B0_1->appendDaughter(D0K3K4);
+
+    Particle* B0_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    B0_2->appendDaughter(D0Pi1Pi2Copy);
+    B0_2->appendDaughter(D0K3K4);
+
+    Particle* B0_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    B0_3->appendDaughter(D0Pi1Pi2Copy2);
+    B0_3->appendDaughter(D0K3K4);
+
+    EXPECT_TRUE(B0_1->isCopyOf(B0_2));
+    EXPECT_TRUE(B0_1->isCopyOf(B0_3));
+    EXPECT_TRUE(B0_2->isCopyOf(B0_3));
+
+    Particle* B0_4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    B0_4->appendDaughter(D0Pi1Pi2);
+    B0_4->appendDaughter(D0K1K2);
+
+    Particle* B0_5 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    B0_5->appendDaughter(D0Pi1Pi2);
+    B0_5->appendDaughter(T1Kaon);
+    B0_5->appendDaughter(T2Kaon);
+
+    EXPECT_FALSE(B0_1->isCopyOf(B0_4));
+    EXPECT_FALSE(B0_4->isCopyOf(B0_5));
+  }
+
   /** test string -> index mapping. */
   TEST_F(ParticleTest, ExtraInfoMap)
   {

@@ -41,11 +41,11 @@ inputMdstList(['/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx0/mc35_ccbar_BG
 
 # Do the analysis
 fillParticleList('gamma:all', '')
-fillParticleList('pi+:good', 'chiProb > 0.001 and piid > 0.5 and abs(dz) < 4.0 and abs(dr) < 0.2')
-fillParticleList('pi-:good', 'chiProb > 0.001 and piid > 0.5 and abs(dz) < 4.0 and abs(dr) < 0.2')
+fillParticleList('pi+:good', '')
+fillParticleList('pi-:good', '')
 
-reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', 1)
-reconstructDecay('pi0  -> gamma:all gamma:all', '0.115<=M<=0.152', 1)
+reconstructDecay('K_S0 -> pi+:good pi-:good', '', 1)
+reconstructDecay('pi0  -> gamma:all gamma:all', '', 1)
 reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2')
 
 matchMCTruth('B0')

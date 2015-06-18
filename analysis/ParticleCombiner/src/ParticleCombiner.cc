@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Anze Zupanc                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -121,6 +121,25 @@ namespace Belle2 {
 
     m_isSelfConjugated = decaydescriptor.isSelfConjugated();
 
+    // check if input lists can contain copies
+    // remember (list_i, list_j) pairs, where list_i and list_j can contain copies
+    m_inputListsCollide = false;
+    m_collidingLists.clear();
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      const DecayDescriptorParticle* daughter_i = decaydescriptor.getDaughter(i)->getMother();
+      for (unsigned int j = i + 1; j < m_numberOfLists; ++j) {
+        const DecayDescriptorParticle* daughter_j = decaydescriptor.getDaughter(j)->getMother();
+
+        if (abs(daughter_i->getPDGCode()) != abs(daughter_j->getPDGCode()))
+          continue;
+
+        if (daughter_i->getLabel() != daughter_j->getLabel()) {
+          m_inputListsCollide = true;
+          m_collidingLists.push_back(std::make_pair(i, j));
+        }
+      }
+    }
+
   }
 
   void ParticleGenerator::init()
@@ -132,7 +151,104 @@ namespace Belle2 {
     m_usedCombinations.clear();
     m_indices.resize(m_numberOfLists);
     m_particles.resize(m_numberOfLists);
+
+    if (m_inputListsCollide)
+      initIndicesToUniqueIDMap();
   }
+
+  void ParticleGenerator::initIndicesToUniqueIDMap()
+  {
+    m_indicesToUniqueIDs.clear();
+
+    unsigned inputParticlesCount = 0;
+    for (unsigned int i = 0; i < m_numberOfLists; ++i)
+      inputParticlesCount +=  m_plists[i]->getListSize();
+
+    m_indicesToUniqueIDs.reserve(inputParticlesCount);
+
+    int uniqueID = 1;
+
+    for (unsigned i = 0; i < m_collidingLists.size(); i++) {
+      StoreObjPtr<ParticleList> listA =  m_plists[m_collidingLists[i].first];
+      StoreObjPtr<ParticleList> listB =  m_plists[m_collidingLists[i].second];
+
+      bool sameSign = (listA->getPDGCode() == listB->getPDGCode());
+
+      // if sameSign == true then
+      // 1. compare FS to FS particles in lists A and B
+      // 2. compare anti-FS to anti-FS particles in lists A and B
+      // else
+      // 1. compare FS to anti-FS particles in lists A and B
+      // 2. compare anti-FS to FS particles in lists A and B
+      // and in either case compare
+      // 3. compare SC to SC particles in lists A and B
+      if (sameSign) {
+        fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_FlavorSpecificParticle, false),
+                                 listB->getList(ParticleList::c_FlavorSpecificParticle, false), uniqueID);
+        fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_FlavorSpecificParticle, true),
+                                 listB->getList(ParticleList::c_FlavorSpecificParticle, true),  uniqueID);
+      } else {
+        fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_FlavorSpecificParticle, false),
+                                 listB->getList(ParticleList::c_FlavorSpecificParticle, true),  uniqueID);
+        fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_FlavorSpecificParticle, true),
+                                 listB->getList(ParticleList::c_FlavorSpecificParticle, false), uniqueID);
+      }
+
+      fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_SelfConjugatedParticle),
+                               listB->getList(ParticleList::c_SelfConjugatedParticle),  uniqueID);
+    }
+
+    // assign unique ids to others as well
+    for (unsigned i = 0; i < m_numberOfLists; i++) {
+      StoreObjPtr<ParticleList> listA =  m_plists[i];
+
+      fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_FlavorSpecificParticle, true),  uniqueID);
+      fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_FlavorSpecificParticle, false), uniqueID);
+      fillIndicesToUniqueIDMap(listA->getList(ParticleList::c_SelfConjugatedParticle), uniqueID);
+    }
+  }
+
+  void ParticleGenerator::fillIndicesToUniqueIDMap(const std::vector<int>& listA, const std::vector<int>& listB, int& uniqueID)
+  {
+    const Particle* A, *B;
+    bool aIsAlreadyIn = false;
+    bool bIsAlreadyIn = false;
+    bool copies = false;
+    for (unsigned i = 0; i < listA.size(); i++) {
+      aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+
+      if (not aIsAlreadyIn)
+        m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
+
+      for (unsigned j = 0; j < listB.size(); j++) {
+        bIsAlreadyIn = m_indicesToUniqueIDs.count(listB[j]) ? true : false;
+
+        if (bIsAlreadyIn)
+          continue;
+
+        // are these two particles copies
+        A = m_particleArray[ listA[i] ];
+        B = m_particleArray[ listB[j] ];
+        copies = B->isCopyOf(A);
+
+        if (copies)
+          m_indicesToUniqueIDs[ listB[j] ] = m_indicesToUniqueIDs[ listA[i] ];
+      }
+    }
+  }
+
+
+  void ParticleGenerator::fillIndicesToUniqueIDMap(const std::vector<int>& listA, int& uniqueID)
+  {
+    bool aIsAlreadyIn = false;
+    for (unsigned i = 0; i < listA.size(); i++) {
+      aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+
+      if (not aIsAlreadyIn)
+        m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
+    }
+  }
+
 
   bool ParticleGenerator::loadNext()
   {
@@ -252,7 +368,6 @@ namespace Belle2 {
 
   bool ParticleGenerator::currentCombinationHasDifferentSources()
   {
-
     std::vector<Particle*> stack = m_particles;
     static std::vector<int> sources; // stack for particle sources
     sources.clear();
@@ -261,6 +376,7 @@ namespace Belle2 {
       Particle* p = stack.back();
       stack.pop_back();
       const std::vector<int>& daughters = p->getDaughterIndices();
+
       if (daughters.empty()) {
         int source = p->getMdstSource();
         for (unsigned i = 0; i < sources.size(); i++) {
@@ -277,9 +393,34 @@ namespace Belle2 {
 
   bool ParticleGenerator::currentCombinationIsUnique()
   {
-    const std::set<int> indexSet(m_indices.begin(), m_indices.end());
+    std::set<int> indexSet;
+    if (not m_inputListsCollide)
+      indexSet.insert(m_indices.begin(), m_indices.end());
+    else
+      for (unsigned int i = 0; i < m_numberOfLists; i++)
+        indexSet.insert(m_indicesToUniqueIDs.at(m_indices[i]));
+
     bool elementInserted = m_usedCombinations.insert(indexSet).second;
     return elementInserted;
   }
 
+  bool ParticleGenerator::inputListsCollide(std::pair<unsigned, unsigned> pair) const
+  {
+    for (unsigned i = 0; i < m_collidingLists.size(); i++)
+      if (pair == m_collidingLists[i])
+        return true;
+
+    return false;
+  }
+
+  int ParticleGenerator::getUniqueID(int index) const
+  {
+    if (not m_inputListsCollide)
+      return 0;
+
+    if (not m_indicesToUniqueIDs.count(index))
+      return -1;
+
+    return m_indicesToUniqueIDs.at(index);
+  }
 }

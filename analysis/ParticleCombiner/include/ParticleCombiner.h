@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Anze Zupanc                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,9 @@
 #include <vector>
 #include <set>
 #include <unordered_set>
+#include <unordered_map>
+
+#include <utility>
 
 #include <boost/functional/hash/extensions.hpp>
 
@@ -134,6 +137,31 @@ namespace Belle2 {
      */
     Particle getCurrentParticle() const;
 
+    /**
+     * True if input lists collide (can contain copies of particles in the input lists).
+     * When this is true the combiner uses specially determined unique particle's IDs instead
+     * of its StoreArray indices in order to check the uniqueness of each combination.
+     *
+     * The function is needed only to (unit) test correct running of the combiner.
+     */
+    bool inputListsCollide() const {return m_inputListsCollide; };
+
+    /**
+     * True if the pair of input lists collide.
+     *
+     * Needed only for tests.
+     */
+    bool inputListsCollide(std::pair<unsigned, unsigned> pair) const;
+
+    /**
+     * Returns the unique ID assigned to Particle with given index from the IndicesToUniqueID map.
+     * If the Particle's index is not found in the map -1 is returned instead.
+     * If the map was never filled (inputListsCollide is false) 0 is returned.
+     *
+     * Needed only for tests.
+     */
+    int getUniqueID(int index) const;
+
   private:
     /**
      * Loads the next combination. Returns false if there is no next combination
@@ -146,16 +174,49 @@ namespace Belle2 {
     bool loadNextSelfConjugatedParticle();
 
     /**
-     * Check that all FS particles of a combination differ
+     * Check that all FS particles of a combination differ. The comparison is made
+     * at the MDST objects level. If for example a kaon and a pion Particle's are
+     * created from the same MSDT Track object, then these two Particles have the
+     * same source and the function will return false.
+     *
      * @return true if all FS particles of a combination differ
      */
     bool currentCombinationHasDifferentSources();
 
     /**
-     * Check that the combination is unique
+     * Check that the combination is unique. Especially in the case of reconstructing
+     * self conjugated decays we get combinations like M -> A B and M -> B A. These two
+     * particles are the same and hence only one combination of the two should be kept.
+     * This function takes care of this. It keeps track of all combinations that were
+     * already accepted (ordered set of unique IDs of daughter particles) and if the
+     * current combination is already found in the set it is discarded. The unique ID
+     * of daughter particles are either their StoreArray indices (if input lists do not
+     * collide) or specially set unique IDs during initialization phase (if input lists
+     * collide).
+     *
      * @return true if indices not found in the stack; if true indices pushed to stack
      */
     bool currentCombinationIsUnique();
+
+    /**
+     * In the case input daughter particle lists collide (two or more lists contain copies of Particles)
+     * the Particle's Store Array index can not be longer used as its unique identifier, which is needed
+     * to check for uniqueness of accpeted combinations. Instead unique identifier is created for all particles
+     * in the input particle lists and use those when checking for uniqueness of current combination.
+     */
+    void initIndicesToUniqueIDMap();
+
+    /**
+     * Assignes unique IDs to all particles in list A, which do not have the unique ID already assigned. The same unique ID
+     * is assigned to copies of particles from list A found in the list B. This function has to be executed first.
+     *
+     */
+    void fillIndicesToUniqueIDMap(const std::vector<int>& listA, const std::vector<int>& listB, int& uniqueID);
+
+    /**
+     * Assignes unique IDs to all particles in list A, which do not have the unique ID already assigned.
+     */
+    void fillIndicesToUniqueIDMap(const std::vector<int>& listA, int& uniqueID);
 
   private:
 
@@ -174,8 +235,12 @@ namespace Belle2 {
     const StoreArray<Particle> m_particleArray; /**< Global list of particles. */
     std::vector<Particle*> m_particles; /**< Pointers to the particle objects of the current combination */
     std::vector<int> m_indices;         /**< Indices stored in the ParticleLists of the current combination */
-    std::unordered_set<std::set<int>> m_usedCombinations; /**< already used combinations (as sets of indices). */
+    std::unordered_set<std::set<int>> m_usedCombinations; /**< already used combinations (as sets of indices or unique IDs). */
 
+    bool m_inputListsCollide; /**< True if the daughter lists can contain copies of Particles */
+    std::vector<std::pair<unsigned, unsigned>> m_collidingLists; /**< pairs of lists that can contain copies. */
+    std::unordered_map<int, int>
+    m_indicesToUniqueIDs; /**< map of store array indices of input Particles to their unique IDs. Necessary if input lists collide. */
   };
 
 

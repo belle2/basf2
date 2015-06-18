@@ -124,6 +124,9 @@ namespace Belle2 {
     /// Use LUT for find TSHit (clock counter cost effective version)
     vector<TRGSignalVector*> findTSHit2(TRGSignalVector * eachInput, int);
   
+    /// Simulates inner TSF responce.
+    vector<TRGSignalVector*> simulateInner(TRGSignalVector & eachInput, int);
+  
     /// Packing output for tracker
     TRGSignalVector* packerOuterTracker(vector<TRGSignalVector*>, vector<int>, int);
 
@@ -153,9 +156,17 @@ namespace Belle2 {
   private:
 
     /// Make TRGSivnals for the priority timing bits.
-      void priorityTimingOuter(unsigned tsfID,
-                               const unsigned nTSF,
-                               TRGSignalVector & s) const;
+      void priorityTiming(unsigned tsfID,
+                          const unsigned nTSF,
+                          TRGSignalVector & s,
+                          const TRGSignal & center,
+                          const TRGSignal & right,
+                          const TRGSignal & left) const;
+
+    /// Make TRGSivnals for the fastest timing bits.
+      void fastestTimingInner(unsigned tsfID,
+                              const unsigned nTSF,
+                              TRGSignalVector & s) const;
 
     /// Make TRGSivnals for the fastest timing bits.
       void fastestTimingOuter(unsigned tsfID,
@@ -204,6 +215,12 @@ namespace Belle2 {
 
     /// Internal data of the edge timing information.
     std::vector<TRGSignal * > _edg2Map;
+
+    /// Internal data of the edge timing information.
+    std::vector<TRGSignal * > _edg3Map;
+
+    /// Internal data of the edge timing information.
+    std::vector<TRGSignal * > _edg4Map;
 };
 
 } // namespace Belle2

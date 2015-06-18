@@ -85,22 +85,48 @@ class TRGCDCTracker2D
     
   private:
 
+    /// Sets constants.
+    void setConstants(void);
+
     /// Gets TSF hit information for one certin clock from the registers.
     static void hitInformation(const TRGState & registers);
 
   private:
 
     /// \# of TSFs.
-    unsigned _nTSF;
+    static unsigned _nTSF;
 
     /// \# of TSFs in super layer i.
-    std::vector<unsigned> _n;
+    static std::vector<unsigned> _n;
 
     /// Keeps TS hit info.
     static TRGState _ts;
 };
 
 //-----------------------------------------------------------------------------
+
+inline
+unsigned
+TCTracker2D::nTSF(void) {
+    return 160 + 192 + 256 + 320 + 384;
+}
+
+inline
+unsigned
+TCTracker2D::nTSF(unsigned i) {
+    if (i == 0)
+        return 160;
+    else if (i == 1)
+        return 192;
+    else if (i == 2)
+        return 256;
+    else if (i == 3)
+        return 320;
+    else if (i == 4)
+        return 384;
+    else
+        return 0;
+}
 
 } // namespace Belle2
 

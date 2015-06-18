@@ -33,6 +33,8 @@ using namespace std;
 
 namespace Belle2 {
 
+unsigned TRGCDCTracker2D::_nTSF = 0;
+vector<unsigned> TRGCDCTracker2D::_n;
 TRGState TRGCDCTracker2D::_ts(160 + 192 + 256 + 320 + 384);
 
 TRGCDCTracker2D::TRGCDCTracker2D(const std::string & name,
@@ -40,28 +42,7 @@ TRGCDCTracker2D::TRGCDCTracker2D(const std::string & name,
                                  const TRGClock & dataClock,
                                  const TRGClock & userClockInput,
                                  const TRGClock & userClockOutput)
-    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
-      _nTSF(0) {
-
-    //...# of TSFs...
-    const TRGCDC & cdc = * TRGCDC::getTRGCDC();
-    for (unsigned i = 0; i < 9; i++) {
-        const unsigned n = cdc.nSegments(i);
-        _n.push_back(n);
-        _nTSF += n;
-    }
-
-    //...Consistency check...
-    if (_nTSF != nTSF())
-        cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
-             << endl;
-    for (unsigned i = 0; i < 5; i++)
-        if (_n[i] != nTSF(i))
-            cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
-                 << endl;
-    if (_n[0] != _ts.size())
-        cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
-             << endl;
+    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput) {
 }
 
 TRGCDCTracker2D::~TRGCDCTracker2D() {
@@ -87,6 +68,12 @@ TRGCDCTracker2D::simulate(void) {
 
     const string sn = "TRGCDC 2D simulate : " + name();
     TRGDebug::enterStage(sn);
+
+    static bool first = true;
+    if (first) {
+        setConstants();
+        first = false;
+    }
 
     //...Delete old objects...
     if (nOutput())
@@ -211,25 +198,40 @@ TCTracker2D::hitInformation(const TRGState & registers) {
     }
 }
 
-unsigned
-TCTracker2D::nTSF(void) {
-    return 160 + 192 + 256 + 320 + 384;
-}
+void
+TCTracker2D::setConstants(void) {
 
-unsigned
-TCTracker2D::nTSF(unsigned i) {
-    if (i == 0)
-        return 160;
-    else if (i == 1)
-        return 192;
-    else if (i == 2)
-        return 256;
-    else if (i == 3)
-        return 320;
-    else if (i == 4)
-        return 384;
-    else
-        return 0;
+    //...# of TSFs...
+    const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+    _nTSF = 0;
+    for (unsigned i = 0; i < 5; i++) {       // Ax only
+        const unsigned n = cdc.nSegments(i * 2);
+        _n.push_back(n);
+        _nTSF += n;
+    }
+
+    //...Consistency check...
+    if (_nTSF != nTSF()) {
+        cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
+             << endl;
+        cout << "                      _nTSF,nTSF()=" << _nTSF << "," << nTSF()
+             << endl;
+    }
+    for (unsigned i = 0; i < 5; i++) {
+        if (_n[i] != nTSF(i)) {
+            cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
+                 << endl;
+            cout << "                      i,_n[i],nTSF(i)=" << i << ","
+                 << _n[i] << "," << nTSF(i) << endl;
+        }
+
+    }
+    if (_nTSF != _ts.size()) {
+        cout << "TRGCDCTracker2D !!! # of TSF is inconsistent internally"
+             << endl;
+        cout << "                    _nTSF,_ts.size()=" << _nTSF << ","
+             << _ts.size() << endl;
+    }
 }
 
 } // namespace Belle2

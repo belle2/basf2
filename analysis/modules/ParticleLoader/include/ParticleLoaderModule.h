@@ -15,7 +15,6 @@
 #include <framework/gearbox/Const.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
@@ -150,38 +149,6 @@ namespace Belle2 {
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
 
-    // static members
-    // (this is part of a temporary solution)
-    static EventMetaData m_event; /**< event for which the following are valid */
-    static std::vector<int> m_trackIndices; /**<Store array indices of all kaons, pions, electrons, muons, protons */
-    static std::vector<int> m_gammaIndices; /**<Store array indices of all gamma */
-    static std::vector<int> m_kshortIndices; /**<Store array indices of K0S gamma */
-    static std::vector<int> m_klongIndices; /**<Store array indices of K0L gamma */
-
-    /**
-     * Loads all MDST objects as Particles
-     */
-    void loadFromReconstruction();
-
-    /**
-     * Fill charged particle lists
-     */
-    void fillChargedParticleLists();
-
-    /**
-     * Fill gamma particle lists
-     */
-    void fillGammaParticleLists();
-
-    /**
-     * Fill K0short particle lists
-     */
-    void fillKshortParticleLists();
-
-    /**
-     * Fill K0long particle lists
-     */
-    void fillKlongParticleLists();
   };
 
 } // Belle2 namespace

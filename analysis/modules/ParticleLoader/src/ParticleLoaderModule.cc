@@ -38,12 +38,6 @@ using namespace std;
 
 namespace Belle2 {
 
-  EventMetaData ParticleLoaderModule::m_event = EventMetaData();
-  vector<int> ParticleLoaderModule::m_trackIndices;
-  vector<int> ParticleLoaderModule::m_gammaIndices;
-  vector<int> ParticleLoaderModule::m_kshortIndices;
-  vector<int> ParticleLoaderModule::m_klongIndices;
-
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -105,13 +99,13 @@ namespace Belle2 {
       Variable::Cut* cut = get<c_CutPointer>(mcParticle2Plist);
       delete cut;
     }
+
   }
 
   void ParticleLoaderModule::initialize()
   {
-    m_event.setEndOfData();
-
     B2INFO("ParticleLoader's Summary of Actions:");
+
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     StoreArray<PIDLikelihood> pidlikelihoods;
@@ -220,246 +214,14 @@ namespace Belle2 {
       particleExtraInfoMap.create();
     }
 
-    // part of the temporary solution
-    // will change in future
-    const StoreObjPtr<EventMetaData> eventmetadata;
-    if (*eventmetadata != m_event) {
-      m_event = *eventmetadata;
-      /*
-      B2INFO("Size track = " << m_trackIndices.size());
-      B2INFO("Size gamma = " << m_gammaIndices.size());
-      B2INFO("Size K0S   = " << m_kshortIndices.size());
-      B2INFO("Size K0L   = " << m_klongIndices.size());
-      */
-      if (!m_useMCParticles)
-        loadFromReconstruction();
-
-      /*
-      B2INFO("Size track = " << m_trackIndices.size());
-      B2INFO("Size gamma = " << m_gammaIndices.size());
-      B2INFO("Size K0S   = " << m_kshortIndices.size());
-      B2INFO("Size K0L   = " << m_klongIndices.size());
-      */
-    }
-    // --
 
     if (m_useMCParticles)
       mcParticlesToParticles();
     else {
-      fillChargedParticleLists();
-      fillGammaParticleLists();
-      fillKshortParticleLists();
-      fillKlongParticleLists();
-      /*
       tracksToParticles();
       eclClustersToParticles();
       klmClustersToParticles();
       v0sToParticles();
-      */
-    }
-  }
-
-  void ParticleLoaderModule::loadFromReconstruction()
-  {
-    StoreArray<Track> Tracks;
-    StoreArray<ECLCluster> ECLClusters;
-    StoreArray<V0> V0s;
-    StoreArray<KLMCluster> KLMClusters;
-    StoreArray<Particle> Particles;
-    StoreArray<MCParticle> mcParticles;
-
-    // clear existing vectors of indices
-    m_trackIndices.clear();
-    m_gammaIndices.clear();
-    m_kshortIndices.clear();
-    m_klongIndices.clear();
-
-    const Const::ChargedStable charged[] = {Const::electron,
-                                            Const::muon,
-                                            Const::pion,
-                                            Const::kaon,
-                                            Const::proton
-                                           };
-    //B2INFO("Tracks to particles: Tracks = " << Tracks.getEntries());
-    // load reconstructed tracks as e, mu, pi, K, p
-    for (int i = 0; i < Tracks.getEntries(); i++) {
-      const Track* track = Tracks[i];
-      const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
-      const MCParticle* mcParticle = track->getRelated<MCParticle>();
-      for (int k = 0; k < 5; k++) {
-        Particle particle(track, charged[k]);
-        if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
-          Particle* newPart = Particles.appendNew(particle);
-          if (pid)
-            newPart->addRelationTo(pid);
-          if (mcParticle)
-            newPart->addRelationTo(mcParticle);
-
-          m_trackIndices.push_back(newPart->getArrayIndex());
-        }
-      }
-    }
-
-    // load reconstructed neutral ECL cluster's as photon
-    //B2INFO("ECLClusters to Particles: ECLClusters = " << ECLClusters.getEntries());
-    for (int i = 0; i < ECLClusters.getEntries(); i++) {
-      const ECLCluster* cluster      = ECLClusters[i];
-
-      if (!cluster->isNeutral())
-        continue;
-
-      // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-      // ECLCluster can be matched to multiple MCParticles
-      // order the relations by weights and set Particle -> multiple MCParticle relation
-      // preserve the weight
-      RelationVector<MCParticle> mcRelations = cluster->getRelationsTo<MCParticle>();
-      // order relations bt weights
-      std::vector<std::pair<int, double>> weightsAndIndices;
-      for (unsigned int iMCParticle = 0; iMCParticle < mcRelations.size(); iMCParticle++) {
-        const MCParticle* relMCParticle = mcRelations[iMCParticle];
-        double weight = mcRelations.weight(iMCParticle);
-        if (relMCParticle)
-          weightsAndIndices.push_back(std::make_pair(relMCParticle->getArrayIndex(), weight));
-      }
-      // sort descending by weight
-      std::sort(weightsAndIndices.begin(), weightsAndIndices.end(), [](const std::pair<int, double>& left,
-      const std::pair<int, double>& right) {
-        return left.second > right.second;
-      });
-
-      // create Particle
-      Particle particle(cluster);
-      if (particle.getParticleType() == Particle::c_ECLCluster) { // should always hold but...
-        Particle* newPart = Particles.appendNew(particle);
-
-        // set relation
-        for (unsigned int j = 0; j < weightsAndIndices.size(); j++) {
-          const MCParticle* relMCParticle = mcParticles[weightsAndIndices[j].first];
-          double weight = weightsAndIndices[j].second;
-
-          // TODO: study this further and avoid hardcoded values
-          // set the relation only if the MCParticle's energy contribution
-          // to this cluster ammounts to at least 25%
-          if (relMCParticle)
-            if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
-              newPart->addRelationTo(relMCParticle, weight);
-        }
-        m_gammaIndices.push_back(newPart->getArrayIndex());
-      }
-    }
-
-    // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
-    //B2INFO("V0s to particles: V0 = " << V0s.getEntries());
-    for (int i = 0; i < V0s.getEntries(); i++) {
-      // TODO: make it const once V0 dataobject is corrected (const qualifier properly applied)
-      V0* v0 = V0s[i];
-
-      std::pair<Track*, Track*> v0Tracks = v0->getTracks();
-      std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
-
-      // load Kshort -> pi- pi+
-      Particle piP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, Const::pion);
-      Particle piM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, Const::pion);
-
-      const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
-      const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
-
-      const MCParticle* mcParticleP = (v0Tracks.first)->getRelated<MCParticle>();
-      const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
-
-      // add V0 daughters to the Particle StoreArray
-      Particle* newPiP = Particles.appendNew(piP);
-      if (pidP)
-        newPiP->addRelationTo(pidP);
-      if (mcParticleP)
-        newPiP->addRelationTo(mcParticleP);
-
-      Particle* newPiM = Particles.appendNew(piM);
-      if (pidM)
-        newPiM->addRelationTo(pidM);
-      if (mcParticleM)
-        newPiM->addRelationTo(mcParticleM);
-
-      TLorentzVector v0Momentum = newPiP->get4Vector() + newPiM->get4Vector();
-
-      // TODO: avoid hard-coded values
-      Particle v0P(v0Momentum, Const::Kshort.getPDGCode());
-      v0P.appendDaughter(newPiP);
-      v0P.appendDaughter(newPiM);
-
-      Particle* newPart = Particles.appendNew(v0P);
-
-      m_kshortIndices.push_back(newPart->getArrayIndex());
-    }
-
-    // load reconstructed neutral KLM cluster's as photons
-    //B2INFO("KLMClusters to Particles: KLMClusters = " << KLMClusters.getEntries());
-    for (int i = 0; i < KLMClusters.getEntries(); i++) {
-      const KLMCluster* cluster      = KLMClusters[i];
-
-      if (cluster->getAssociatedTrackFlag())
-        continue;
-
-      const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-
-      Particle particle(cluster);
-
-      if (particle.getParticleType() == Particle::c_KLMCluster) { // should always hold but...
-        Particle* newPart = Particles.appendNew(particle);
-
-        if (mcParticle)
-          newPart->addRelationTo(mcParticle);
-
-        m_klongIndices.push_back(newPart->getArrayIndex());
-      }
-    }
-
-    //B2INFO("ParticleLoader::loadFromReconstruction size=" << Particles.getEntries());
-  }
-
-
-  void ParticleLoaderModule::fillKshortParticleLists()
-  {
-    if (m_V02Plists.empty()) // nothing to do
-      return;
-
-    // create all lists
-    for (auto v02Plist : m_V02Plists) {
-      string listName = get<c_PListName>(v02Plist);
-      string antiListName = get<c_AntiPListName>(v02Plist);
-      int pdgCode = get<c_PListPDGCode>(v02Plist);
-      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(v02Plist);
-
-      StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
-
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
-
-        antiPlist->bindAntiParticleList(*(plist));
-      }
-    }
-
-    StoreArray<Particle> particles;
-
-    for (unsigned i = 0; i < m_kshortIndices.size(); i++) {
-      const Particle* particle = particles[m_kshortIndices[i]];
-
-      for (auto v02Plist : m_V02Plists) {
-        int pdgCode = get<c_PListPDGCode>(v02Plist);
-        if (abs(Const::Kshort.getPDGCode()) != abs(pdgCode))
-          continue;
-
-        string listName = get<c_PListName>(v02Plist);
-        Variable::Cut* cut = get<c_CutPointer>(v02Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(particle))
-          plist->addParticle(particle);
-      }
     }
   }
 
@@ -546,53 +308,6 @@ namespace Belle2 {
     }
   }
 
-  void ParticleLoaderModule::fillChargedParticleLists()
-  {
-    if (m_Tracks2Plists.empty()) // nothing to do
-      return;
-
-    StoreArray<Particle> particles;
-
-    // create all lists
-    for (auto track2Plist : m_Tracks2Plists) {
-      string listName = get<c_PListName>(track2Plist);
-      string antiListName = get<c_AntiPListName>(track2Plist);
-      int pdgCode = get<c_PListPDGCode>(track2Plist);
-      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(track2Plist);
-
-      StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
-
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
-
-        antiPlist->bindAntiParticleList(*(plist));
-      }
-    }
-
-    for (unsigned i = 0; i < m_trackIndices.size(); i++) {
-      const Particle* particle = particles[m_trackIndices[i]];
-
-      for (auto track2Plist : m_Tracks2Plists) {
-        string listName = get<c_PListName>(track2Plist);
-        int pdgCode = get<c_PListPDGCode>(track2Plist);
-
-        if (abs(pdgCode) != abs(particle->getPDGCode()))
-          continue;
-
-        Variable::Cut* cut = get<c_CutPointer>(track2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(particle))
-          plist->addParticle(particle);
-      }
-    }
-  }
-
-
   void ParticleLoaderModule::tracksToParticles()
   {
     if (m_Tracks2Plists.empty()) // nothing to do
@@ -645,47 +360,6 @@ namespace Belle2 {
           if (cut->check(newPart))
             plist->addParticle(newPart);
         }
-      }
-    }
-  }
-
-  void ParticleLoaderModule::fillGammaParticleLists()
-  {
-    if (m_ECLClusters2Plists.empty()) // nothing to do
-      return;
-
-    // create all lists
-    for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-      string listName = get<c_PListName>(eclCluster2Plist);
-      string antiListName = get<c_AntiPListName>(eclCluster2Plist);
-      int pdgCode = get<c_PListPDGCode>(eclCluster2Plist);
-      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(eclCluster2Plist);
-
-      StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
-
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
-
-        antiPlist->bindAntiParticleList(*(plist));
-      }
-    }
-
-    StoreArray<Particle> particles;
-    for (unsigned i = 0; i < m_gammaIndices.size(); i++) {
-      const Particle* particle = particles[m_gammaIndices[i]];
-
-      // add particle to list if it passes the selection criteria
-      for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-        string listName = get<c_PListName>(eclCluster2Plist);
-        Variable::Cut* cut = get<c_CutPointer>(eclCluster2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(particle))
-          plist->addParticle(particle);
       }
     }
   }
@@ -775,48 +449,6 @@ namespace Belle2 {
           if (cut->check(newPart))
             plist->addParticle(newPart);
         }
-      }
-    }
-  }
-
-  void ParticleLoaderModule::fillKlongParticleLists()
-  {
-    if (m_KLMClusters2Plists.empty()) // nothing to do
-      return;
-
-    // create all lists
-    for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-      string listName = get<c_PListName>(klmCluster2Plist);
-      string antiListName = get<c_AntiPListName>(klmCluster2Plist);
-      int pdgCode = get<c_PListPDGCode>(klmCluster2Plist);
-      bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(klmCluster2Plist);
-
-      StoreObjPtr<ParticleList> plist(listName);
-      plist.create();
-      plist->initialize(pdgCode, listName);
-
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
-
-        antiPlist->bindAntiParticleList(*(plist));
-      }
-    }
-
-    StoreArray<Particle> particles;
-
-    for (unsigned i = 0; i < m_klongIndices.size(); i++) {
-      const Particle* particle = particles[m_klongIndices[i]];
-
-      // add particle to list if it passes the selection criteria
-      for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-        string listName = get<c_PListName>(klmCluster2Plist);
-        Variable::Cut* cut = get<c_CutPointer>(klmCluster2Plist);
-        StoreObjPtr<ParticleList> plist(listName);
-
-        if (cut->check(particle))
-          plist->addParticle(particle);
       }
     }
   }

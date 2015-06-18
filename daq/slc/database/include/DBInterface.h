@@ -48,7 +48,7 @@ namespace Belle2 {
     std::string m_user;
     std::string m_password;
     int m_port;
-    char m_buf[1024 * 100];
+    char* m_buf;
 
   };
 

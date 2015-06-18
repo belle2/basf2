@@ -18,11 +18,12 @@ DBInterface::DBInterface(const std::string& host,
   m_user = user;
   m_password = password;
   m_port = port;
+  m_buf = new char[1024000];
 }
 
 DBInterface::~DBInterface() throw()
 {
-
+  delete [] m_buf;
 }
 
 void DBInterface::execute(const char* text, ...) throw(DBHandlerException)

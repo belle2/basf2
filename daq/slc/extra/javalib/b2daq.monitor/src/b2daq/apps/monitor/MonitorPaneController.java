@@ -10,12 +10,8 @@ import b2daq.database.ConfigObject;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMData;
-import b2daq.nsm.ui.NSMDataProperty;
-import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
-import b2daq.nsm.NSMObserver;
 import b2daq.runcontrol.core.RCCommand;
-import b2daq.ui.NetworkConfigPaneController;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,27 +28,12 @@ import javafx.stage.Stage;
  *
  * @author tkonno
  */
-public class MonitorPaneController implements Initializable, NSMObserver {
-
-    @FXML
-    private NetworkConfigPaneController networkconfigController;
-
-    private final HashMap<String, NSMObserver> flowmonitors = new HashMap<>();
-    private String[] namelist = null;
+public class MonitorPaneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     }
-
-    @Override
-    public void handleOnConnected() {
-        for (NSMDataProperty pro : getNSMDataProperties()) {
-            NSMListenerService.requestNSMGet(pro.getDataname(),
-                    pro.getFormat(), pro.getRevision());
-        }
-        networkconfigController.setState(true, true);
-    }
-
+/*
     @Override
     public void handleOnReceived(NSMMessage msg) {
         if (msg == null) {
@@ -149,25 +130,5 @@ public class MonitorPaneController implements Initializable, NSMObserver {
         } else if (command.equals(RCCommand.OK)) {
         }
     }
-
-    @Override
-    public void handleOnDisConnected() {
-    }
-
-    @Override
-    public void log(LogMessage log) {
-        System.out.println(log.getMessage());
-    }
-
-    public NetworkConfigPaneController getNetworkConfig() {
-        return networkconfigController;
-    }
-
-    public String[] getNameList() {
-        return namelist;
-    }
-
-    public ObservableList<NSMDataProperty> getNSMDataProperties() {
-        return networkconfigController.getNSMDataProperties();
-    }
+*/
 }

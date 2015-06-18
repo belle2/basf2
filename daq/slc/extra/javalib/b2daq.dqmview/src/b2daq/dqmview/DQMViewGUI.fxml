@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import b2daq.hvcontrol.ui.*?>
+<?import b2daq.ui.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
@@ -37,7 +37,6 @@
         </MenuBar>
         <HBox alignment="CENTER_LEFT" minHeight="44.0" prefHeight="44.0" prefWidth="700.0" spacing="20.0" VBox.vgrow="NEVER">
             <children>
-                <StateLabel fx:id="slabel" prefHeight="27.0" prefWidth="112.0" />
                 <Label alignment="CENTER" text="Run # :" />
                 <Label fx:id="label_runno" text="0000.0000.000" />
             <Label alignment="CENTER" text="Last update :" />

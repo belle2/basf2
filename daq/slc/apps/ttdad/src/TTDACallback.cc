@@ -6,6 +6,8 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <unistd.h>
+
 namespace Belle2 {
 
   class NSMVHandlerTrigft : public NSMVHandlerInt {
@@ -83,8 +85,7 @@ void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   add(new NSMVHandlerInt("ftsw", true, false, m_ftswid));
   add(new NSMVHandlerTrigft(*this, "trigft"));
-  add(new NSMVHandlerTriggerType(*this, "trigger_type",
-                                 obj.getText("trigger_type")));
+  add(new NSMVHandlerTriggerType(*this, "trigger_type", obj.getText("trigger_type")));
   try {
     trigft();
   } catch (const RCHandlerException& e) {
@@ -123,9 +124,10 @@ void TTDACallback::start(int expno, int runno) throw(RCHandlerException)
     int pars[2] = { expno, runno };
     send(NSMMessage(m_ttdnode, NSMCommand(12, "START"), 2, pars));
   } else {
-    std::string cmd = StringUtil::form("regft -%d 160 0x%x", m_ftswid, runno << 8);
+    std::string cmd = StringUtil::form("/home/usr/nakao/bin/regft -%d 160 0x%x", m_ftswid, runno << 8);
     LogFile::debug(cmd);
     system(cmd.c_str());
+    sleep(1);
     trigft();
   }
 }
@@ -135,7 +137,7 @@ void TTDACallback::stop() throw(RCHandlerException)
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
   } else {
-    std::string cmd = StringUtil::form("trigft -%d stop", m_ftswid);
+    std::string cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d reset", m_ftswid);
     LogFile::debug(cmd);
     system(cmd.c_str());
   }
@@ -180,8 +182,17 @@ void TTDACallback::trigft() throw(RCHandlerException)
     if (m_ttdnode.getName().size() > 0) {
       send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 3, pars));
     } else {
-      std::string cmd = StringUtil::form("trigft -%d %s %d %d", m_ftswid,
-                                         m_trigger_type.c_str(), pars[1], pars[2]);
+      std::string cmd = StringUtil::form("/home/usr/nakao/bin/utimeft -%d", m_ftswid);
+      LogFile::debug(cmd);
+      system(cmd.c_str());
+      sleep(1);
+      cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d reset", m_ftswid);
+      LogFile::debug(cmd);
+      system(cmd.c_str());
+      sleep(1);
+      //cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d %s %d %d", m_ftswid,
+      //           m_trigger_type.c_str(), pars[1], pars[2]);
+      cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d %s", m_ftswid);
       LogFile::debug(cmd);
       system(cmd.c_str());
     }

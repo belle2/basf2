@@ -35,8 +35,8 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
     private Label label_update;
     @FXML
     private Label label_directory;
-    @FXML
-    private HVStateLabel slabel;
+    //@FXML
+    //private HVStateLabel slabel;
     @FXML
     private StackPane tabpane;
 
@@ -53,7 +53,7 @@ public class DQMViewGUIController implements Initializable, DQMObserver {
             ArrayList<PackageInfo> info_v) {
         _main_panel.initPanels(pack_v, _side_panel);
         _side_panel.init(pack_v);
-        slabel.set("RUNNING", Color.CYAN, Color.CYAN, Color.BLACK);
+        //slabel.set("RUNNING", Color.CYAN, Color.CYAN, Color.BLACK);
         _main_panel.getPane().setDisable(false);
         _side_panel.getPane().setDisable(false);
     }

@@ -6,14 +6,16 @@
 package b2daq.apps.monitor;
 
 import b2daq.database.ConfigObject;
+import b2daq.database.FieldInfo;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
+import b2daq.nsm.NSMDATASetHandler;
+import b2daq.nsm.NSMDATASetParamHandler;
 import b2daq.nsm.NSMData;
-import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
-import b2daq.nsm.NSMObserver;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.runcontrol.core.RCState;
 import b2daq.runcontrol.ui.RCStateLabel;
 import java.io.IOException;
@@ -37,7 +39,7 @@ import javafx.scene.paint.Color;
  *
  * @author tkonno
  */
-public class RORCDataFlowTableController implements Initializable, NSMObserver {
+public class RORCDataFlowTableController implements Initializable {
 
     @FXML
     private VBox pane;
@@ -71,40 +73,23 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
         label_dest.setText("eb1tx");
     }
 
-    @Override
-    public void handleOnConnected() {
-        //h1.setLineColor(Color.LIMEGREEN);
-    }
-
-    @Override
-    public void handleOnReceived(NSMMessage msg) {
-        if (msg == null) {
-            return;
-        }
-        try {
-            NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.DATASET)) {
-                NSMData data = NSMListenerService.getData(label_nodename.getText()+"_STATUS");
-                ConfigObject cobj = NSMListenerService.getDB(label_nodename.getText());
-                if (cobj == null) {
-                    //NSMListenerService.requestDBGet(label_nodename.getText(), 
-                    //        data.getInt("configid", 0));
-                }
-                if (data == null || !data.getFormat().matches("rorc_status")) {
-                    return;
-                }
+    public void init(String dataname) {
+        String format = "rorc_status";
+        NSMRequestHandlerUI.get().add(new NSMDATASetHandler(dataname, format) {
+            @Override
+            public boolean handleDataSet(NSMData data) {
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
                 switch (data.getInt("state")) {
                     default:
-                    state.update(RCState.NOTREADY_S);
-                    break;
+                        state.update(RCState.NOTREADY_S);
+                        break;
                     case 3:
-                    state.update(RCState.READY_S);
-                    break;
+                        state.update(RCState.READY_S);
+                        break;
                     case 4:
-                    state.update(RCState.RUNNING_S);
-                    break;
+                        state.update(RCState.RUNNING_S);
+                        break;
                 }
                 if (table_stat.getItems().size() < data.getInt("nnodes")) {
                     table_stat.getItems().clear();
@@ -117,19 +102,19 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
                 int connected_in = 1;
                 int connected_out = -1;
                 for (int i = 0; i < data.getInt("nnodes"); i++) {
-                    NSMData cdata = (NSMData)data.getObject("ro", i);
-                    NSMData node = (NSMData)data.getObject("node", i);
+                    NSMData cdata = (NSMData) data.getObject("ro", i);
+                    NSMData node = (NSMData) data.getObject("node", i);
                     if (i == 0) {
-                        connected_out = (cdata.getInt("connection_out") == 1)?1:-1;
+                        connected_out = (cdata.getInt("connection_out") == 1) ? 1 : -1;
                     } else {
                         if (cdata.getInt("connection_out") != 1 && node.getInt("excluded") == 0) {
                             connected_in = -1;
                         }
                     }
-                    DataFlow flow = (DataFlow)table_stat.getItems().get(i);
-                    if (cobj != null && flow.getNode().isEmpty()) {
-                        //flow.setNode(cobj.getObject("node", i).getObject("runtype").getNode());
-                    }
+                    DataFlow flow = (DataFlow) table_stat.getItems().get(i);
+                        //if (cobj != null && flow.getNode().isEmpty()) {
+                    //flow.setNode(cobj.getObject("node", i).getObject("runtype").getNode());
+                    //}
                     flow.setLoadavg(cdata.getFloat("loadavg"));
                     flow.setNqueueIn(cdata.getInt("nqueue_in"));
                     flow.setNeventIn(cdata.getInt("nevent_in"));
@@ -144,20 +129,10 @@ public class RORCDataFlowTableController implements Initializable, NSMObserver {
                 }
                 setConnection(c_in, connected_in);
                 setConnection(c_out, connected_out);
+                return true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger.getLogger(RORCDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
-        }
-    }
+        });
 
-    @Override
-    public void handleOnDisConnected() {
-        //h1.setLineColor(Color.DEEPPINK);
-    }
-
-    @Override
-    public void log(LogMessage log) {
     }
 
     void setNodeName(String nodename) {

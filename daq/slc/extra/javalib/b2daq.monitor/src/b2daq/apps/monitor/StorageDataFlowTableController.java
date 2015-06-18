@@ -9,10 +9,10 @@ import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommand;
+import b2daq.nsm.NSMDATASetHandler;
 import b2daq.nsm.NSMData;
-import b2daq.nsm.NSMListenerService;
 import b2daq.nsm.NSMMessage;
-import b2daq.nsm.NSMObserver;
+import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.runcontrol.core.RCState;
 import b2daq.runcontrol.ui.RCStateLabel;
 import java.io.IOException;
@@ -38,7 +38,7 @@ import javafx.util.Callback;
  *
  * @author tkonno
  */
-public class StorageDataFlowTableController implements Initializable, NSMObserver {
+public class StorageDataFlowTableController implements Initializable {
 
     @FXML
     private VBox pane;
@@ -74,7 +74,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
     private TableView table_disk;
     @FXML
     private Label label_nodename;
-    
+
     static private final SimpleDateFormat dateformat = new SimpleDateFormat("HH:mm:ss yyyy/MM/dd");
 
     @Override
@@ -93,7 +93,7 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                             getStyleClass().removeAll("disk-full", "disk-fine", "disk-writing");
                             if (usage.getAvailable() < 10) {
                                 getStyleClass().add("disk-full");
-                            } else if (usage.getAccess()==1) {
+                            } else if (usage.getAccess() == 1) {
                                 getStyleClass().add("disk-writing");
                             } else {
                                 getStyleClass().add("disk-fine");
@@ -106,23 +106,11 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
         });
     }
 
-    @Override
-    public void handleOnConnected() {
-        //h1.setLineColor(Color.LIMEGREEN);
-    }
-
-    @Override
-    public void handleOnReceived(NSMMessage msg) {
-        if (msg == null) {
-            return;
-        }
-        try {
-            NSMCommand command = new NSMCommand(msg.getReqName());
-            if (command.equals(NSMCommand.DATASET)) {
-                NSMData data = NSMListenerService.getData(label_nodename.getText() + "_STATUS");
-                if (data == null || !data.getFormat().matches("storage_status")) {
-                    return;
-                }
+    public void init(String dataname) {
+        String format = "storage_status";
+        NSMRequestHandlerUI.get().add(new NSMDATASetHandler(dataname, format) {
+            @Override
+            public boolean handleDataSet(NSMData data) {
                 label_runno.setText(String.format("%04d.%04d.%03d", data.getInt("expno"),
                         data.getInt("runno"), data.getInt("subno")));
                 switch (data.getInt("state")) {
@@ -138,19 +126,19 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 }
                 float nbytes = data.getFloat("nbytes");
                 String unit = "[MB]";
-                if (nbytes > 1024*1024) {
-                    nbytes /= (1024*1024);
+                if (nbytes > 1024 * 1024) {
+                    nbytes /= (1024 * 1024);
                     unit = "[TB]";
-                } else if(nbytes > 1024) {
+                } else if (nbytes > 1024) {
                     nbytes /= 1024;
                     unit = "[GB]";
                 }
                 label_nbytes_val.setText(String.format("%02.2f", nbytes) + " " + unit);
-                label_nfiles_val.setText(""+data.getInt("nfiles"));
-                label_txqueue_val.setText(String.format("%02.2f", data.getObject("node", 0).getInt("nqueue_in") /1024f) + " [kB]");
-                label_rxqueue_val.setText(String.format("%02.2f", data.getObject("node", 1).getInt("nqueue_out") * 4/1024f) + " [kB]");
-                label_inbuffer_val.setText(String.format("%02.2f", data.getObject("node", 0).getInt("nqueue_out") * 4/1024f) + " [kB]");
-                label_recbuffer_val.setText(String.format("%02.2f", data.getObject("node", 1).getInt("nqueue_in") /1024f) + " [kB]");
+                label_nfiles_val.setText("" + data.getInt("nfiles"));
+                label_txqueue_val.setText(String.format("%02.2f", data.getObject("node", 0).getInt("nqueue_in") / 1024f) + " [kB]");
+                label_rxqueue_val.setText(String.format("%02.2f", data.getObject("node", 1).getInt("nqueue_out") * 4 / 1024f) + " [kB]");
+                label_inbuffer_val.setText(String.format("%02.2f", data.getObject("node", 0).getInt("nqueue_out") * 4 / 1024f) + " [kB]");
+                label_recbuffer_val.setText(String.format("%02.2f", data.getObject("node", 1).getInt("nqueue_in") / 1024f) + " [kB]");
                 if (table_disk.getItems().size() < data.getInt("ndisks")) {
                     table_disk.getItems().clear();
                     for (int i = 0; i < data.getInt("ndisks"); i++) {
@@ -160,8 +148,8 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 for (int i = 0; i < data.getInt("ndisks"); i++) {
                     NSMData cdata = (NSMData) data.getObject("disk", i);
                     DiskUsage disk = (DiskUsage) table_disk.getItems().get(i);
-                    
-                    if (i+1==data.getInt("diskid")) {
+
+                    if (i + 1 == data.getInt("diskid")) {
                         disk.setAccess(1);
                         disk.setStatus("WRITING");
                     } else {
@@ -220,18 +208,9 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
                 }
                 setConnection(c_in, connected_in);
                 setConnection(c_out, connected_out);
+                return true;
             }
-        } catch (Exception e) {
-            Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
-        }
-    }
-
-    @Override
-    public void handleOnDisConnected() {
-    }
-
-    @Override
-    public void log(LogMessage log) {
+        });
     }
 
     void setNodeName(String nodename) {
@@ -240,18 +219,23 @@ public class StorageDataFlowTableController implements Initializable, NSMObserve
 
     String getNodeName() {
         return label_nodename.getText();
+
     }
 
     static StorageDataFlowTableController create(String name) {
         try {
-            FXMLLoader loader = new FXMLLoader(StorageDataFlowTableController.class.getResource("StorageDataFlowTable.fxml"));
+            FXMLLoader loader = new FXMLLoader(StorageDataFlowTableController.class
+                    .getResource("StorageDataFlowTable.fxml"));
             loader.load();
             StorageDataFlowTableController controller = loader.getController();
+
             controller.setNodeName(name);
             return controller;
         } catch (IOException e) {
             e.printStackTrace();
-            Logger.getLogger(StorageDataFlowTableController.class.getName()).log(Level.SEVERE, null, e);
+            Logger
+                    .getLogger(StorageDataFlowTableController.class
+                            .getName()).log(Level.SEVERE, null, e);
         }
         return null;
     }

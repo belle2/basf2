@@ -422,6 +422,40 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   return false;
 }
 
+bool Particle::isCopyOf(const Particle* oParticle) const
+{
+  // the name of the game is to as quickly as possible determine
+  // that the Particles are not copies
+  if (this->getPDGCode() != oParticle->getPDGCode())
+    return false;
+
+  unsigned nDaughters = this->getNDaughters();
+  if (nDaughters != oParticle->getNDaughters())
+    return false;
+
+  if (nDaughters) {
+    // has daughters: check if the decay chain is the same and it ends with
+    // the same FSPs
+    std::vector<int> thisDecayChain(nDaughters * 2);
+    std::vector<int> othrDecayChain(nDaughters * 2);
+
+    for (unsigned i = 0; i < nDaughters; i++) {
+      this->getDaughter(i)->fillDecayChain(thisDecayChain);
+      oParticle->getDaughter(i)->fillDecayChain(othrDecayChain);
+    }
+
+    for (unsigned i = 0; i < thisDecayChain.size(); i++)
+      if (thisDecayChain[i] != othrDecayChain[i])
+        return false;
+
+  } else {
+    // has no daughters: it's a FSP, compare MDST source and index
+    return this->getMdstSource() == oParticle->getMdstSource();
+  }
+
+  return true;
+}
+
 const Track* Particle::getTrack() const
 {
   if (m_particleType == c_Track) {
@@ -571,6 +605,15 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
   // this is not FSP (go one level down)
   for (unsigned i = 0; i < getNDaughters(); i++)
     getDaughter(i)->fillFSPDaughters(fspDaughters);
+}
+
+void Particle::fillDecayChain(std::vector<int>& decayChain) const
+{
+  decayChain.push_back(m_pdgCode);
+  decayChain.push_back(getMdstSource());
+
+  for (unsigned i = 0; i < getNDaughters(); i++)
+    getDaughter(i)->fillDecayChain(decayChain);
 }
 
 

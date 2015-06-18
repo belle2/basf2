@@ -532,6 +532,26 @@ namespace Belle2 {
     bool overlapsWith(const Particle* oParticle) const;
 
     /**
+     * Returns true if this Particle and oParticle are copies of each other.
+     * Copies are defined as:
+     *  o) The decay chain of both Particles is exactly the same
+     *  o) Both Particles are constructed from exactly the same final state particles
+     *
+     *   - Examples: M1 -> (C1 -> F1 F2) (C2 -> F3 F4)
+     *               M2 -> (C1 -> F1 F2) (C2 -> F3 F5)
+     *               M3 -> (C1 -> F1 F2) F3 F4
+     *               M4 -> (C1 -> F1 F2) (C2 -> F3 F4) and M4 is kinematically fitted (its momentum updated)
+     *
+     * M1 and M2 are not copies since condition 2 is not fulfilled.
+     * M1 and M3 are not copies since condition 1 is not fulfilled.
+     * M1 and M4 are copies since both conditions are fulfilled.
+     *
+     * @param oParticle pointer to other particle
+     * @return true if particles are copies of each-other, otherwise false
+     */
+    bool isCopyOf(const Particle* oParticle) const;
+
+    /**
      * Returns the pointer to the Track object that was used to create this Particle (ParticleType == c_Track).
      * NULL pointer is returned, if the Particle was not made from Track.
      * @return const pointer to the Track
@@ -675,6 +695,16 @@ namespace Belle2 {
      * @param fspDaughters vector of daughter particles
      */
     void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+
+    /**
+     * Fill vector with (PDGCode, MdstSource) pairs for the entire decay chain.
+     * Used to determine if two Particles are copies or not.
+     *
+     * Function is called recursively
+     * @param decayChain vector of (PDGCode, MdstSource) pairs for each particle in the decay chain of this particle
+     */
+    // TODO: this can be optimized for speed
+    void fillDecayChain(std::vector<int>& decayChain) const;
 
     /**
      * sets m_flavorType using m_pdgCode

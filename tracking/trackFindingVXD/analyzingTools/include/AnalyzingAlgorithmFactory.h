@@ -52,6 +52,8 @@ namespace Belle2 {
 
     if (algorithmID == AnalyzingAlgorithmResidualPosition<DataType, TCInfoType, VectorType>()) { return new AnalyzingAlgorithmResidualPosition<DataType, TCInfoType, VectorType>(); }
 
+    if (algorithmID == AnalyzingAlgorithmResidualPositionXY<DataType, TCInfoType, VectorType>()) { return new AnalyzingAlgorithmResidualPositionXY<DataType, TCInfoType, VectorType>(); }
+
 
     /// values of single entries
     if (algorithmID == AnalyzingAlgorithmValuePX<DataType, TCInfoType, VectorType>()) { return new AnalyzingAlgorithmValuePX<DataType, TCInfoType, VectorType>(); }

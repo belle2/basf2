@@ -106,8 +106,8 @@ namespace Belle2 {
       if (m_file != NULL) {
         B2FATAL("RootParameterTracker::initialize(), there was a file already linked to this ParameterTracker, which is invalid, please read the documentation!")
       }
-      B2WARNING("RootParameterTracker::initialize(), given parameters are fileName/fileTreatment: " << fileName << "/" <<
-                fileTreatment)
+      B2DEBUG(5, "RootParameterTracker::initialize(), given parameters are fileName/fileTreatment: " << fileName << "/" <<
+              fileTreatment)
       m_file = new TFile(fileName.c_str(), fileTreatment.c_str()); // alternative: UPDATE
       m_file->ls();
     }
@@ -120,12 +120,18 @@ namespace Belle2 {
     /** take vector and fill for each tcType stored in rootParameterTracker */
     void collectData(const std::vector<AnalizerTCInfo>& tcVector)
     {
-      B2WARNING("RootParameterTracker::collectData(), size of given tcVector is: " << tcVector.size())
-      B2DEBUG(1, "RootParameterTracker::collectData(), size of given tcVector is: " << tcVector.size())
+      /** Production notes:
+       * take internal container where all the requested parameters are tracked:
+       * for currenttcType in internalAlgorithmContainer:
+       *  for tc in tcVector
+       *   if tc.tctype == currenttcType
+       *    fill internalLinkContainer with result of applied algorithm
+       * */
+      B2DEBUG(15, "RootParameterTracker::collectData(), size of given tcVector is: " << tcVector.size())
 
       for (const AnalizerTCInfo& tc : tcVector) {
         std::string tcTypeName = TCType().getTypeName(tc.getType());
-        B2DEBUG(1, "RootParameterTracker::collectData(), executing TC of type: " << tcTypeName)
+        B2DEBUG(50, "RootParameterTracker::collectData(), executing TC of type: " << tcTypeName)
         auto* foundAlgorithms = m_algorithmBox.find(tcTypeName);
 
         // skip if there are no algorithms stored for this tcType:
@@ -134,65 +140,56 @@ namespace Belle2 {
         auto* foundData = m_dataBox.find(tcTypeName); // a KeyValBox with all data collected to given tcTypeName
 
         if (foundData == NULL) {
-          B2ERROR("RootParameterTracker::collectData(), while algorithms exist for tcType " << tcTypeName <<
-                  ", there is no data linked to same type. This is a sign for unintended behavior! Skipping TC...")
+          B2WARNING("RootParameterTracker::collectData(), while algorithms exist for tcType " << tcTypeName <<
+                    ", there is no data linked to same type. This is a sign for unintended behavior! Skipping TC...")
           continue;
         }
 
-        B2DEBUG(1, "RootParameterTracker::collectData(), foundAlgorithms-size: " << foundAlgorithms->size())
+        B2DEBUG(50, "RootParameterTracker::collectData(), foundAlgorithms-size: " << foundAlgorithms->size())
 
         // loop over algorithms to collect their data:
         for (auto* anAlgorithm : *foundAlgorithms) {
           std::string algoName = anAlgorithm->getID();
-          B2DEBUG(1, "RootParameterTracker::collectData(), executing algorithm of type: " << algoName)
+          B2DEBUG(50, "RootParameterTracker::collectData(), executing algorithm of type: " << algoName)
 
           std::vector<double>** data4algorithm = foundData->find(algoName);
 
           if (data4algorithm == NULL) {
-            B2ERROR("RootParameterTracker::collectData(), there is no data linked to algorithm " << algoName <<
-                    ", although algorithm exist. This is a sign for unintended behavior! Skipping TC...")
+            B2WARNING("RootParameterTracker::collectData(), there is no data linked to algorithm " << algoName <<
+                      ", although algorithm exist. This is a sign for unintended behavior! Skipping TC...")
             continue;
           }
 
-          B2DEBUG(1, "RootParameterTracker::collectData(),  data4algorithm-size: " << (*data4algorithm)->size())
+          B2DEBUG(50, "RootParameterTracker::collectData(),  data4algorithm-size: " << (*data4algorithm)->size())
 
-          if (tc.assignedTC == NULL) {
-            B2ERROR("RootParameterTracker::collectData(), second tc is missing, can not do anything! TODO that has to be fixed!");
-            continue;
-          } else {
-            double calcVal = anAlgorithm->calcData(tc, *tc.assignedTC);
+          try {
+            double calcVal = anAlgorithm->calcData(tc);
             (*data4algorithm)->push_back(calcVal);
-            B2WARNING("RootParameterTracker::collectData(), tc with type " << tcTypeName <<
-                      " applied algorithm " << algoName <<
-                      " and got " << calcVal << " as a result!")
+            B2DEBUG(20, "RootParameterTracker::collectData(), tc with type " << tcTypeName <<
+                    " and applied algorithm " << algoName <<
+                    " and got " << calcVal << " as a result!")
+          }  catch (AnalyzingAlgorithm<double>::No_refTC_Attached& anException) {
+            B2WARNING("RootParameterTracker::collectData(), Exception caught for tc with type " << tcTypeName <<
+                      " and applied algorithm " << algoName <<
+                      ". Failed with exception: " << anException.what() <<
+                      " -> skipping tc!");
           }
         }
-
       }
-      // TODO
-      /**
-       * take internal container where all the requested parameters are tracked:
-       * for currenttcType in internalAlgorithmContainer:
-       *  for tc in tcVector
-       *   if tc.tctype == currenttcType
-       *    fill internalLinkContainer with result of applied algorithm
-       * */
     }
 
 
     /** fills tree/branches with their stuff, clear intermediate results afterwards */
     void fillRoot()
     {
-      B2WARNING("RootParameterTracker::fillRoot() was called...")
-      B2DEBUG(1, "RootParameterTracker::fillRoot() was called. Executing " << m_treeBox.size() << " ttrees.")
+      B2DEBUG(15, "RootParameterTracker::fillRoot(), Executing " << m_treeBox.size() << " ttrees.")
 
       m_file->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
-
-      m_file->ls();
+//       m_file->ls();
 
       for (auto& boxEntry : m_treeBox) {
         int nBytesWritten = boxEntry.second->Fill();
-        B2DEBUG(1, "RootParameterTracker::fillRoot() ttree " << boxEntry.first << " got " << nBytesWritten << " Bytes written")
+        B2DEBUG(20, "RootParameterTracker::fillRoot() ttree " << boxEntry.first << " got " << nBytesWritten << " Bytes written")
         boxEntry.second->Print();
       }
 
@@ -207,6 +204,7 @@ namespace Belle2 {
     /** final cleanup and closing rootFile */
     void terminate()
     {
+      B2DEBUG(2, "RootParameterTracker::terminate(), Writing results to root-file and clean up heap.")
       if (m_file == NULL) {
         B2WARNING("RootParameterTracker::terminate(): no rootFile found! skipping writing data into root file!")
         return;
@@ -217,7 +215,11 @@ namespace Belle2 {
 
       for (auto& boxEntry : m_treeBox) {
         boxEntry.second->Write();
-        boxEntry.second->Print();
+
+        if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 5, PACKAGENAME()) == true) {
+          B2DEBUG(5, "RootParameterTracker::terminate(), TTree " << boxEntry.first << " was written:")
+          boxEntry.second->Print();
+        }
       }
       m_file->Close();
 

@@ -11,6 +11,10 @@
 
 // fw:
 #include <framework/logging/Logger.h>
+#include <framework/core/FrameworkExceptions.h>
+
+// tracking:
+#include<tracking/trackFindingVXD/analyzingTools/TCType.h>
 
 // stl:
 #include <string>
@@ -21,17 +25,45 @@ namespace Belle2 {
 
   /** Base class for storing an algorithm determining the data one wants to have */
   template <class DataType, class TCInfoType, class VectorType>
-  class AnalyzingAlgorithmBase { /*: public VirtualAnalyzingAlgorithm<DataType, TCInfoType, VectorType>*/
+  class AnalyzingAlgorithmBase {
   protected:
+
+    /** minimal struct for keeping track which tc is which */
+    struct TcPair {
+      /** standard constructor sets NULL-ptrs. */
+      TcPair() : refTC(NULL), testTC(NULL) {}
+
+      /** constructor sets valid values */
+      TcPair(const TCInfoType& aRefTC, const TCInfoType& aTestTC) : refTC(&aRefTC), testTC(&aTestTC) {}
+
+      /** here the reference TC will be stored */
+      const TCInfoType* refTC;
+
+      /** here the TC to be tested will be stored */
+      const TCInfoType* testTC;
+    };
+
 
     /** carries unique ID */
     std::string m_iD;
 
+
     /** stores the origin used for some calculations, can be set here */
     static VectorType m_origin;
 
+
+    /** if true, for testTC the values of attached refTC will be stored instead of own values.
+     *
+     * - why are there values of the mcTC stored?
+     * we want to know the real data, not the guesses of the reconstructed data.
+     * Deviations of reference values to guesses of the reconstructed data will be stored in resiudals anyway.
+     */
+    static bool m_storeRefTCDataForTestTC;
+
+
     /** constructor used for inheriting classes */
-    AnalyzingAlgorithmBase(std::string newID) : m_iD(newID)/*, m_origin(0,0,0)*/ {}
+    AnalyzingAlgorithmBase(std::string newID) : m_iD(newID) {}
+
 
     /** copy constructor */
     AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) : m_iD(algo.m_iD)
@@ -39,28 +71,80 @@ namespace Belle2 {
       B2ERROR("AnalyzingAlgorithmBase-copy-constructor has been called!")
     }
 
+
+    /** virtual class to determine the correct TC to be used for algorithm calculation.
+    *
+    * - throws exeption if there are problems.
+    * More explanations @ m_storeRefTCDataForTestTC.
+    */
+    virtual const TCInfoType& chooseCorrectTC(const TCInfoType& aTC) const
+    {
+      // capture cases of reference TC first:
+      if (aTC.tcType == TCType::Reference or aTC.tcType == TCType::Lost) { return aTC; }
+
+      // is no reference TC and own data usage is allowed:
+      if (m_storeRefTCDataForTestTC == false) { return aTC; }
+
+      // handle cases when attached reference TC has to be used instead of own data:
+      if (aTC.assignedTC != NULL) { return *aTC.assignedTC; }
+
+      throw AnalyzingAlgorithmBase::No_refTC_Attached();
+    }
+
+
+    /** makes sure that TcPair.refTC and .testTC are correctly set - throws exeption if there are problems */
+    virtual const TcPair chooseCorrectPairOfTCs(const TCInfoType& aTC) const
+    {
+      // capture bad case, where second TC is missing:
+      if (aTC.assignedTC == NULL) { throw AnalyzingAlgorithmBase::No_refTC_Attached(); }
+
+      if (aTC.tcType == TCType::Reference or aTC.tcType == TCType::Lost) {
+        return TcPair(aTC, *aTC.assignedTC);
+      }
+      return TcPair(*aTC.assignedTC, aTC);
+    }
+
   public:
 
+    /** this exception is thrown if m_storeRefTCDataForTestTC is true and no refTC could be found */
+    BELLE2_DEFINE_EXCEPTION(No_refTC_Attached,
+                            "To given testTC no refTC was attached, could not provide valid data for algorithm - no value returned!");
+
+
     /** constructor */
-    AnalyzingAlgorithmBase() : m_iD("AnalyzingAlgorithmBase")/*, m_origin(0,0,0)*/ {}
+    AnalyzingAlgorithmBase() : m_iD("AnalyzingAlgorithmBase") {}
+
 
     /** virtual destructor - derived classes need to write their own destructors if any other data members are added. */
     virtual ~AnalyzingAlgorithmBase() {}
 
+
     /** operator for comparison. */
     inline bool operator == (const AnalyzingAlgorithmBase& b) const { return m_iD == b.getID(); }
+
 
     /** returns unique ID */
     std::string getID() const { return m_iD; }
 
+
     /** returns current value for the origin */
     VectorType getOrigin() const { return m_origin; }
 
+
     /** set origin for all inherited classes */
-    void setOrigin(VectorType newOrigin) const { m_origin = newOrigin ; }
+    void setOrigin(VectorType newOrigin) { m_origin = newOrigin; }
+
+
+    /** returns current choice for behavior of algorithms in terms of storing reference or testData for successfully matched TCs */
+    VectorType willRefTCdataBeUsed4TestTCs() const { return m_storeRefTCDataForTestTC; }
+
+
+    /** set behavior of algorithms in terms of storing reference or testData for successfully matched TCs */
+    void setWillRefTCdataBeUsed4TestTCs(bool newBehavior) { m_storeRefTCDataForTestTC = newBehavior; }
+
 
     /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType&, const TCInfoType&)
+    virtual DataType calcData(const TCInfoType&)
     {
       B2ERROR(" AnalyzingAlgorithmBase::calcData: if you can see this, the code tried to return the actual baseClass instead of the inherited ones - this is unintended behavior! The TCs had the types: ")
 
@@ -73,6 +157,10 @@ namespace Belle2 {
   template<class DataType, class TCInfoType, class VectorType>
   VectorType AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_origin = VectorType(0, 0, 0);
 
+
+  /** setting the static storeRefTCDataForTestTC to a standard value */
+  template<class DataType, class TCInfoType, class VectorType>
+  bool AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_storeRefTCDataForTestTC = false;
 
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>

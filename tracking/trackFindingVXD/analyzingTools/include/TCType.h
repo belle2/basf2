@@ -71,4 +71,8 @@ namespace Belle2 {
     /** static map allowing translation from a given name stored as a string to its type */
     static std::map<std::string, Type> m_fromStringToType;
   };
+
+
+
+  /// equality-operators!
 }

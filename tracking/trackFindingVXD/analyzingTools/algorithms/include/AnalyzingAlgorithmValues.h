@@ -28,8 +28,9 @@ namespace Belle2 {
     /** constructor */
     AnalyzingAlgorithmValuePX() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePX")) {}
 
-    /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.X(); }
+    /** returns the momentum in X */
+    virtual DataType calcData(const TCInfoType& aTC)
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.X(); }
   };
 
 
@@ -41,8 +42,9 @@ namespace Belle2 {
     /** constructor */
     AnalyzingAlgorithmValuePY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePY")) {}
 
-    /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Y(); }
+    /** returns the momentum in Y */
+    virtual DataType calcData(const TCInfoType& aTC)
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Y(); }
   };
 
 
@@ -54,34 +56,37 @@ namespace Belle2 {
     /** constructor */
     AnalyzingAlgorithmValuePZ() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePZ")) {}
 
-    /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Z(); }
+    /** returns the momentum in Z */
+    virtual DataType calcData(const TCInfoType& aTC)
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Z(); }
   };
 
 
 
-  /** Class for storing an algorithm determining the residual of momentum in pT */
+  /** Class for storing an algorithm determining the momentum in pT */
   template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValuePT : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePT() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePT")) {}
 
-    /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Perp(); }
+    /** returns the momentum in pT */
+    virtual DataType calcData(const TCInfoType& aTC)
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Perp(); }
   };
 
 
 
-  /** Class for storing an algorithm determining the residual of momentum in |p| */
+  /** Class for storing an algorithm determining the momentum in |p| */
   template <class DataType, class TCInfoType, class VectorType>
   class AnalyzingAlgorithmValueP : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
     AnalyzingAlgorithmValueP() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValueP")) {}
 
-    /** virtual class to calculate data. takes two TCInfos */
-    virtual DataType calcData(const TCInfoType& aTC, const TCInfoType&) { return aTC.momSeed.Mag(); }
+    /** returns the momentum in |p| */
+    virtual DataType calcData(const TCInfoType& aTC)
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Mag(); }
   };
 
   // TODO
@@ -102,56 +107,56 @@ namespace Belle2 {
    *
    */
 
-  /** Class for storing an algorithm determining the residual of momentum in theta (in degrees) */
+  /** Class for storing an algorithm determining the momentum in theta (in degrees) */
 //   template <class DataType, class TCInfoType, class VectorType>
 //   class AnalyzingAlgorithmResidualTheta : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
 //   public:
 //  /** constructor */
 //  AnalyzingAlgorithmResidualTheta() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmResidualTheta")) {}
 //
-//  /** virtual class to calculate data. takes two TCInfos */
+  /** returns the momentum in theta (in degrees) */
 //  virtual DataType calcData(const TCInfoType& refTC, const TCInfoType& testTC)
 //  { return refTC.momSeed.Theta() * 180.*TMath::InvPi() - testTC.momSeed.Theta() * 180.*TMath::InvPi(); }
 //   };
 //
 //
 //
-//   /** Class for storing an algorithm determining the residual of momentum in phi (in degrees) */
+  /** Class for storing an algorithm determining the momentum in phi (in degrees) */
 //   template <class DataType, class TCInfoType, class VectorType>
 //   class AnalyzingAlgorithmResidualPhi : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
 //   public:
 //  /** constructor */
 //  AnalyzingAlgorithmResidualPhi() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmResidualPhi")) {}
 //
-//  /** virtual class to calculate data. takes two TCInfos */
+  /** returns the momentum in phi (in degrees) */
 //  virtual DataType calcData(const TCInfoType& refTC, const TCInfoType& testTC)
 //  { return refTC.momSeed.Phi() * 180.*TMath::InvPi() - testTC.momSeed.Phi() * 180.*TMath::InvPi(); }
 //   };
 //
 //
 //
-//   /** Class for storing an algorithm determining the residual of momentum in its angle (direction residual in degrees) */
+  /** Class for storing an algorithm determining the momentum in its angle (direction residual in degrees) */
 //   template <class DataType, class TCInfoType, class VectorType>
 //   class AnalyzingAlgorithmResidualPAngle : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
 //   public:
 //  /** constructor */
 //  AnalyzingAlgorithmResidualPAngle() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmResidualPAngle")) {}
 //
-//  /** virtual class to calculate data. takes two TCInfos */
+  /** returns the momentum in its angle (direction residual in degrees) */
 //  virtual DataType calcData(const TCInfoType& refTC, const TCInfoType& testTC)
 //  { return testTC.momSeed.Angle(refTC.momSeed) * 180.*TMath::InvPi(); }
 //   };
 //
 //
 //
-//   /** Class for storing an algorithm determining the residual of pT in angle (transverse direction residual in degrees) */
+  /** Class for storing an algorithm determining the pT in angle (transverse direction residual in degrees) */
 //   template <class DataType, class TCInfoType, class VectorType>
 //   class AnalyzingAlgorithmResidualPTAngle : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
 //   public:
 //  /** constructor */
 //  AnalyzingAlgorithmResidualPTAngle() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmResidualPTAngle")) {}
 //
-//  /** virtual class to calculate data. takes two TCInfos */
+  /** returns the pT in angle (transverse direction residual in degrees) */
 //  virtual DataType calcData(const TCInfoType& refTC, const TCInfoType& testTC) {
 //    VectorType refMom = refTC.momSeed;
 //    refMom.SetZ(0.);
@@ -163,14 +168,30 @@ namespace Belle2 {
 //
 //
 //
-//   /** Class for storing an algorithm determining the residual of the seed position in 3D */
+  /** Class for storing an algorithm determining the the seed position in 3D */
 //   template <class DataType, class TCInfoType, class VectorType>
 //   class AnalyzingAlgorithmResidualPosition : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
 //   public:
 //  /** constructor */
 //  AnalyzingAlgorithmResidualPosition() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmResidualPosition")) {}
 //
-//  /** virtual class to calculate data. takes two TCInfos */
+  /** returns the the seed position in 3D */
 //  virtual DataType calcData(const TCInfoType& refTC, const TCInfoType& testTC) { return refTC.posSeed.Mag() - testTC.posSeed.Mag(); }
+//   };
+
+  /** Class for storing an algorithm determining the seed position in XY (=r) */
+//   template <class DataType, class TCInfoType, class VectorType>
+//   class AnalyzingAlgorithmResidualPosition : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
+//   public:
+//  /** constructor */
+//  AnalyzingAlgorithmResidualPositionXY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
+//  (std::string("AnalyzingAlgorithmResidualPosition")) {}
+//
+  /** returns the seed position in XY (=r) */
+//  virtual DataType calcData(const TCInfoType& aTC)
+//  {
+//    TcPair tcs = chooseCorrectPairOfTCs(aTC);
+//    return tcs.refTC.posSeed.Perp() - tcs.testTC.posSeed.Perp();
+//  }
 //   };
 }

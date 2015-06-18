@@ -39,15 +39,12 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
    * */
 
   if (m_file == NULL) {
-    B2WARNING("RootParameterTracker::addParameters(), Root file not initialized yet! Please call RootParameterTracker::initialize(...) first!")
     B2FATAL("RootParameterTracker::addParameters(), Root file not initialized yet! Please call RootParameterTracker::initialize(...) first!")
   }
   m_file->cd();
-  m_file->ls();
+//   m_file->ls();
 
-  B2WARNING("RootParameterTracker::addParameters(), given parameters are tcTypeName/algorithmName: " << tcTypeName << "/" <<
-            algorithmName)
-  B2DEBUG(1, "RootParameterTracker::addParameters(), given parameters are tcTypeName/algorithmName: " << tcTypeName << "/" <<
+  B2DEBUG(5, "RootParameterTracker::addParameters(), given parameters are tcTypeName/algorithmName: " << tcTypeName << "/" <<
           algorithmName)
 
   ///make sure that tree exists:
@@ -60,7 +57,7 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
                        );
     tree4tcType = m_treeBox.find(tcTypeName);
   }
-  B2WARNING("RootParameterTracker::addParameters(), m_treeBox has " << m_treeBox.size() << " entries")
+  B2DEBUG(5, "RootParameterTracker::addParameters(), m_treeBox has " << m_treeBox.size() << " entries")
 
   /// make sure that container for algorithms of given tcType exists:
   auto* algorithms4tcType = m_algorithmBox.find(tcTypeName);
@@ -89,12 +86,12 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
       return;
     }
   }
-  B2WARNING("RootParameterTracker::addParameters(), m_algorithmBox has " << m_algorithmBox.size() << " entries")
+  B2DEBUG(5, "RootParameterTracker::addParameters(), m_algorithmBox has " << m_algorithmBox.size() << " entries")
 
   /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination
   auto* data4tcType = m_dataBox.find(tcTypeName); // contains all algorithms stored for given tcTypeName
   if (data4tcType == NULL) {
-    B2WARNING("RootParameterTracker::addParameters(), tcType " << tcTypeName << " not yet added to m_dataBox, doing it now...")
+    B2DEBUG(5, "RootParameterTracker::addParameters(), tcType " << tcTypeName << " not yet added to m_dataBox, doing it now...")
     m_dataBox.push_back({
       tcTypeName,
       StringKeyBox<std::vector<double>*>()
@@ -102,12 +99,12 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
                        );
     data4tcType = m_dataBox.find(tcTypeName);
   }
-  B2WARNING("RootParameterTracker::addParameters(), m_dataBox has " << m_dataBox.size() << " entries")
-  B2WARNING("RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() << " entries (b4 data4algorithm-check)")
+  B2DEBUG(5, "RootParameterTracker::addParameters(), m_dataBox has " << m_dataBox.size() << " entries")
+  B2DEBUG(5, "RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() << " entries (b4 data4algorithm-check)")
   auto** data4algorithm = data4tcType->find(algorithmName); // contains all calculated values stored for given algorithmName
   if (data4algorithm == NULL) {
-    B2WARNING("RootParameterTracker::addParameters(), algorithm " << algorithmName << " not yet added to m_dataBox.find(" << tcTypeName
-              << "), doing it now...")
+    B2DEBUG(5, "RootParameterTracker::addParameters(), algorithm " << algorithmName << " not yet added to m_dataBox.find(" << tcTypeName
+            << "), doing it now...")
     data4tcType->push_back({
       algorithmName,
       new std::vector<double>()
@@ -117,9 +114,9 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
     auto* newBranch = (*tree4tcType)->Branch(algorithmName.c_str(), *data4algorithm);
     newBranch->Print();
   }
-  B2WARNING("RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() <<
-            " entries (after data4algorithm-check)")
-  B2WARNING("RootParameterTracker::addParameters(), data4algorithm has " << (*data4algorithm)->size() << " entries")
+  B2DEBUG(5, "RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() <<
+          " entries (after data4algorithm-check)")
+  B2DEBUG(5, "RootParameterTracker::addParameters(), data4algorithm has " << (*data4algorithm)->size() << " entries")
 
   /// link data to the branch:
 }

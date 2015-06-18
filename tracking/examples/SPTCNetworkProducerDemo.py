@@ -52,7 +52,7 @@ if len(argv) > 4:
 secSetup = ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD']
 tuneValue = 0.22
 
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.WARNING)
 set_random_seed(initialValue)
 
 eventinfosetter = register_module('EventInfoSetter')
@@ -197,7 +197,6 @@ tcNetworkProducer.param('tcArrayName', 'SPTracks')
 tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
 tcNetworkProducer.param('checkSPsInsteadOfClusters', checkSPs)
 
-# trackSetEval = register_module('TrackSetEvaluatorGreedy')
 trackSetEval = register_module('TrackSetEvaluatorHopfieldNN')
 trackSetEval.logging.log_level = debugLevel1
 trackSetEval.logging.debug_level = dLevel1
@@ -210,7 +209,17 @@ analizer.logging.log_level = debugLevel2
 analizer.logging.debug_level = dLevel2
 analizer.param('testTCname', 'SPTracks')
 analizer.param('referenceTCname', 'SPTracksReference')
-analizer.param('writeToRoot', False)
+analizer.param('writeToRoot', True)
+analizer.param('parametersToBeTracked', [
+    ["Contaminated", "AnalyzingAlgorithmResidualP"],
+    ["Contaminated", "AnalyzingAlgorithmResidualPosition"],
+    ["Contaminated", "AnalyzingAlgorithmValuePT"],
+    ["Clean", "AnalyzingAlgorithmResidualP"],
+    ["Clean", "AnalyzingAlgorithmResidualPosition"],
+    ["Clean", "AnalyzingAlgorithmValuePT"],
+    ["Perfect", "AnalyzingAlgorithmResidualP"],
+    ["Perfect", "AnalyzingAlgorithmResidualPosition"],
+    ["Perfect", "AnalyzingAlgorithmValuePT"]])
 
 
 log_to_file('sptcNetworkDemoOutput.txt', append=False)

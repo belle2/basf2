@@ -23,7 +23,7 @@ except ImportError:
 import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
-from validationscript import Script
+from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
     find_creator, parse_cmd_line_arguments, draw_progress_bar
 
@@ -142,7 +142,7 @@ class Validation:
 
         # Make sure dependent scripts of skipped scripts are skipped, too.
         for script_object in self.list_of_scripts:
-            if script_object.status == 'skipped':
+            if script_object.status == ScriptStatus.skipped:
                 self.skip_script(script_object)
 
     def build_headers(self):
@@ -162,9 +162,9 @@ class Validation:
         """
         # Print a warning if the status of the script is changed and then
         # set it to 'skipped'.
-        if script_object.status not in ['skipped', 'failed']:
+        if script_object.status not in [ScriptStatus.skipped, ScriptStatus.failed]:
             self.log.warning('Skipping ' + script_object.path)
-            script_object.status = 'skipped'
+            script_object.status = ScriptStatus.skipped
 
         # Also skip all dependent scripts.
         for dependent_script in self.list_of_scripts:
@@ -292,7 +292,7 @@ class Validation:
 
         # Select only failed scripts
         list_of_failed_scripts = [script for script in self.list_of_scripts if
-                                  script.status == "failed"]
+                                  script.status == ScriptStatus.failed]
 
         # log the name of all failed scripts
         for script in list_of_failed_scripts:
@@ -313,7 +313,7 @@ class Validation:
 
         # Select only failed scripts
         list_of_skipped_scripts = [script for script in self.list_of_scripts if
-                                   script.status == "skipped"]
+                                   script.status == ScriptStatus.skipped]
 
         # log the name of all failed scripts
         for script in list_of_skipped_scripts:
@@ -388,7 +388,7 @@ class Validation:
 
         # The list of scripts that have to be processed
         remaining_scripts = [script for script in self.list_of_scripts
-                             if script.status == 'waiting']
+                             if script.status == ScriptStatus.waiting]
 
         # Sort the list of scripts that have to be processed by runtime,
         # execute slow scripts first
@@ -401,7 +401,7 @@ class Validation:
             for script_object in remaining_scripts:
 
                 # If the script is currently running
-                if script_object.status == 'running':
+                if script_object.status == ScriptStatus.running:
 
                     # Check if the script has finished:
                     result = script_object.control.\
@@ -420,10 +420,10 @@ class Validation:
 
                         # Check for the return code and set variables
                         # accordingly
-                        script_object.status = 'done'
+                        script_object.status = ScriptStatus.finished
                         script_object.returncode = result[1]
                         if result[1] != 0:
-                            script_object.status = 'failed'
+                            script_object.status = ScriptStatus.failed
                             self.log.warning('exit_status was {0} for {1}'
                                              .format(result[1],
                                                      script_object.path))
@@ -443,9 +443,9 @@ class Validation:
                         # Some printout in quiet mode
                         if self.quiet:
                             waiting = [script for script in remaining_scripts
-                                       if script.status == 'waiting']
+                                       if script.status == ScriptStatus.waiting]
                             running = [script for script in remaining_scripts
-                                       if script.status == 'running']
+                                       if script.status == ScriptStatus.running]
                             print 'Finished [{0},{1}]: {2} -> {3}'.\
                                 format(len(waiting), len(running),
                                        script_object.path,
@@ -470,11 +470,11 @@ class Validation:
                         self.log.debug('Starting ' + script_object.path)
 
                         # Set script object variables accordingly
-                        if script_object.status == 'failed':
+                        if script_object.status == ScriptStatus.failed:
                             self.log.warning('Starting of {0} failed'.
                                              format(script_object.path))
                         else:
-                            script_object.status = 'running'
+                            script_object.status = ScriptStatus.running
 
                         # Actually start the script execution
                         script_object.control.execute(script_object,
@@ -486,16 +486,16 @@ class Validation:
                         # Some printout in quiet mode
                         if self.quiet:
                             waiting = [_ for _ in remaining_scripts
-                                       if _.status == 'waiting']
+                                       if _.status == ScriptStatus.waiting]
                             running = [_ for _ in remaining_scripts
-                                       if _.status == 'running']
+                                       if _.status == ScriptStatus.running]
                             print 'Started [{0},{1}]: {2}'.\
                                 format(len(waiting), len(running),
                                        script_object.path)
 
             # Update the list of scripts that have to be processed
             remaining_scripts = [script for script in remaining_scripts if
-                                 script.status in ['waiting', 'running']]
+                                 script.status in [ScriptStatus.waiting, ScriptStatus.running]]
 
             # Sort them again, Justin Case
             remaining_scripts.sort(key=lambda x: x.runtime, reverse=True)

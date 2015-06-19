@@ -17,6 +17,34 @@ except ImportError:
 from validationfunctions import find_creator
 
 
+class ScriptStatus:
+
+    """!
+    Enumeration of the states a script can be during its execution
+    cycle
+    """
+
+    # script is waiting for execution
+    class waiting:
+        pass
+
+    # script is running atm
+    class running:
+        pass
+
+    # script execution has been successfully finished
+    class finished:
+        pass
+
+    # script execution has failed
+    class failed:
+        pass
+
+    # script has been marked to be skipped
+    class skipped:
+        pass
+
+
 class Script:
 
     """!
@@ -67,8 +95,8 @@ class Script:
         self.dependencies = []
 
         # Current status of the script.
-        # Possible values: 'waiting', 'running', 'finished', 'failed'
-        self.status = 'waiting'
+        # Possible values: waiting, running, finished, failed, skipped
+        self.status = ScriptStatus.waiting
 
         # Which control is used for executing the script, i.e. cluster or
         # local. Useful when using different script level, e.g. data creation
@@ -109,7 +137,7 @@ class Script:
                     self.log.error('Unmatched dependency for {0}:'
                                    '{1} has no creator!'
                                    .format(self.path, root_file))
-                    self.status = 'skipped'
+                    self.status = ScriptStatus.skipped
 
                 # If creator(s) could be found, add those scripts to the
                 # list of scripts on which self depends

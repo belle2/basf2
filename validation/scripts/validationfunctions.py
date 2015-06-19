@@ -10,10 +10,12 @@ import os
 import glob
 import argparse
 
+import validationscript
 
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
+
 
 def get_start_time():
     """!
@@ -211,7 +213,9 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
 
     # Get statistics: Number of finished scripts + number of scripts in total
     finished_scripts = len([_ for _ in list_of_scripts if
-                            _.status in ['done', 'failed', 'skipped']])
+                            _.status in [validationscript.ScriptStatus.finished,
+                                         validationscript.ScriptStatus.failed,
+                                         validationscript.ScriptStatus.skipped]])
     all_scripts = len(list_of_scripts)
     percent = 100.0 * finished_scripts / all_scripts
 
@@ -238,7 +242,7 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
 
     # Print the list of currently running scripts:
     running = [os.path.basename(__.path) for __ in list_of_scripts
-               if __.status == 'running']
+               if __.status == validationscript.ScriptStatus.running]
 
     # If nothing is repeatedly running
     if not running:

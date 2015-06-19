@@ -116,6 +116,12 @@ namespace Belle2 {
      */
     const std::vector<const Belle2::SpacePoint*>& getHits() const { return m_trackSpacePoints; }
 
+    /** returns a const_iterator (begin()) for easily looping over hits of SpacePointTrackCand */
+    std::vector<const Belle2::SpacePoint*>::const_iterator begin() const { return m_trackSpacePoints.begin(); }
+
+    /** returns a const_iterator (end()) for easily looping over hits of SpacePointTrackCand */
+    std::vector<const Belle2::SpacePoint*>::const_iterator end() const { return m_trackSpacePoints.end(); }
+
     /**
      * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand)
      * including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex wil be returned!).

@@ -49,12 +49,13 @@ public:
    *@param parentMass mass of the parent (B) meson.
    *@param DMass mass of the scalar type daughter (D) meson.
    *@param DstarMass mass of the vector type daughter (D*) meson.
-   *@param bottomMass mass of the bottom quark mass
+   *@param bottomMass mass of the bottom quark mass (running mass at the energy of bottom quark mass)
    *@param charmMass mass of the charm quark mass (running mass at the energy of bottom quark mass)
    * The constructor initializes the parameters of the decay.
    * The recommended values of AS1 and AR3 by authors of PRD87,034028 are 1+/-1.
    */
-  EvtBSemiTauonicHelicityAmplitudeCalculator(const double rho12, const double rhoA12, const double ffR11, const double ffR21, const double AS1, const double AR3,
+  EvtBSemiTauonicHelicityAmplitudeCalculator(const double rho12, const double rhoA12, const double ffR11, const double ffR21,
+                                             const double AS1, const double AR3,
                                              const double bottomMass, const double charmMass,
                                              const EvtComplex& CV1, const EvtComplex& CV2, const EvtComplex& CS1, const EvtComplex& CS2, const EvtComplex& CT,
                                              const double parentMass, const double DMass, const double DstarMass);
@@ -564,10 +565,10 @@ private:
   /** daughter vector (D*) meson mass.   */
   double m_mDst;
 
-  /** b quark mass (MSbar mass), used for scalar form factor term */
+  /** b quark mass (running mass at m_b scale), used for scalar form factor term */
   double m_mBottom;
 
-  /** c quark mass (MSbar mass or running mass at m_b scale?), used for scalar form factor term ) */
+  /** c quark mass (running mass at m_b scale), used for scalar form factor term ) */
   double m_mCharm;
 
   /** Wilson coefficient CV1.   */

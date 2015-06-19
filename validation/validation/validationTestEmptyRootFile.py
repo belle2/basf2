@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
+<header>
+<output>validationTestEmptyRootFile.root</output>
+<contact>Thomas Hauth, Thomas.Hauth@kit.edu</contact>
+</header>
+"""
+
+"""
 This file will not generate an output root file to probe
 the validation suite properly handles this case.
 """

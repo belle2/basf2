@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
+<header>
+<output>validationTestPlotsA.root</output>
+<contact>Thomas Hauth, Thomas.Hauth@kit.edu</contact>
+</header>
+"""
+
+"""
 This file will generate various output into a root-file to have
 a fast turn-around during development
 """

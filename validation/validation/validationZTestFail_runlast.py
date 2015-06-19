@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
+<header>
+<contact>Thomas Hauth, Thomas.Hauth@kit.edu</contact>
+</header>
+"""
+
+"""
 This file will exit with an exit code != 0 to probe the
 validation correctly detects and reports this.
 """

@@ -87,17 +87,17 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
   // ( hel0->sp1 , hel1->sp1 )
   EvtComplex l_SpFromHel[2][2]; // {0,1} from {1,-1}
   EvtId l_num = p->getDaug(1)->getId();
-  if (l_num == EM || l_num == MUM || l_num == TAUM) {
-    l_SpFromHel[0][0] = conj(l_HelFromSp.get(0, 0));
-    l_SpFromHel[0][1] = conj(l_HelFromSp.get(1, 0));
-    l_SpFromHel[1][0] = conj(l_HelFromSp.get(0, 1));
-    l_SpFromHel[1][1] = conj(l_HelFromSp.get(1, 1));
-  } else {
-    l_SpFromHel[0][1] = conj(l_HelFromSp.get(0, 0));
-    l_SpFromHel[0][0] = conj(l_HelFromSp.get(1, 0));
-    l_SpFromHel[1][1] = conj(l_HelFromSp.get(0, 1));
-    l_SpFromHel[1][0] = conj(l_HelFromSp.get(1, 1));
-  }
+//  if (l_num == EM || l_num == MUM || l_num == TAUM) {
+  l_SpFromHel[0][0] = conj(l_HelFromSp.get(0, 0));
+  l_SpFromHel[0][1] = conj(l_HelFromSp.get(1, 0));
+  l_SpFromHel[1][0] = conj(l_HelFromSp.get(0, 1));
+  l_SpFromHel[1][1] = conj(l_HelFromSp.get(1, 1));
+//  } else {
+//    l_SpFromHel[0][1] = conj(l_HelFromSp.get(0, 0));
+//    l_SpFromHel[0][0] = conj(l_HelFromSp.get(1, 0));
+//    l_SpFromHel[1][1] = conj(l_HelFromSp.get(0, 1));
+//    l_SpFromHel[1][0] = conj(l_HelFromSp.get(1, 1));
+//  }
 
   // meson spin state to helicity state
   const double D_theta = acos(p4d.get(3) / p4d.d3mag());
@@ -122,7 +122,15 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
     for (int lsp = 0; lsp < 2; lsp++) {
       for (int dhel = 0; dhel < 3; dhel++) {
         for (int lhel = 0; lhel < 2; lhel++) {
-          spinamp[dsp][lsp] += l_SpFromHel[lsp][lhel] * D_SpFromHel[dsp][dhel] * helamp[dhel][lhel];
+          // b -> l, D*+
+          if (l_num == EM || l_num == MUM || l_num == TAUM) {
+            spinamp[dsp][lsp] += l_SpFromHel[lsp][lhel] * D_SpFromHel[dsp][dhel] * helamp[dhel][lhel];
+          }
+          // b-bar -> anti-l, D*-
+          else {
+            spinamp[dsp][lsp] += l_SpFromHel[lsp][lhel] * D_SpFromHel[dsp][dhel] * (lhel == 0 ? +1 : -1) * (dhel == 1 ? +1 : -1)
+                                 * conj(helamp[2 - dhel][1 - lhel]);
+          }
         }
       }
     }
@@ -139,10 +147,13 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
   CalcHelAmp->setMDst(orig_mD);
 
   // consistency check
-  double helprob = abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0]) + abs2(helamp[2][1]);
-  double spinprob = abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1]);
+  double helprob = abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0])
+                   + abs2(helamp[2][1]);
+  double spinprob = abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1])
+                    + abs2(spinamp[2][0]) + abs2(spinamp[2][1]);
   if (fabs(helprob - spinprob) / helprob > 1E-6 || !finite(helprob) || !finite(spinprob)) {
-    report(ERROR, "EvtGen") << "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan." << std::endl;
+    report(ERROR, "EvtGen") << "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan."
+                            << std::endl;
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "w: %g costau: %g hel probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",
@@ -150,7 +161,8 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
             abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0]) + abs2(helamp[2][1]));
 
     fprintf(stderr, "w: %g costau: %g probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",
-            w, costau, abs2(spinamp[0][0]), abs2(spinamp[0][1]), abs2(spinamp[1][0]), abs2(spinamp[1][1]), abs2(spinamp[2][0]), abs2(spinamp[2][1]),
+            w, costau, abs2(spinamp[0][0]), abs2(spinamp[0][1]), abs2(spinamp[1][0]), abs2(spinamp[1][1]), abs2(spinamp[2][0]),
+            abs2(spinamp[2][1]),
             abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1]));
 
     // Debugging information

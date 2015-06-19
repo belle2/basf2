@@ -79,24 +79,31 @@ void EvtBSemiTauonicScalarMesonAmplitude::CalcAmp(EvtParticle* p,
   // ( hel0->sp1 , hel1->sp1 )
   EvtComplex l_SpFromHel[2][2]; // {0,1} from {1,-1}
   EvtId l_num = p->getDaug(1)->getId();
-  if (l_num == EM || l_num == MUM || l_num == TAUM) {
-    l_SpFromHel[0][0] = conj(l_HelFromSp.get(0, 0));
-    l_SpFromHel[0][1] = conj(l_HelFromSp.get(1, 0));
-    l_SpFromHel[1][0] = conj(l_HelFromSp.get(0, 1));
-    l_SpFromHel[1][1] = conj(l_HelFromSp.get(1, 1));
-  } else {
-    l_SpFromHel[0][1] = conj(l_HelFromSp.get(0, 0));
-    l_SpFromHel[0][0] = conj(l_HelFromSp.get(1, 0));
-    l_SpFromHel[1][1] = conj(l_HelFromSp.get(0, 1));
-    l_SpFromHel[1][0] = conj(l_HelFromSp.get(1, 1));
-  }
+//  if (l_num == EM || l_num == MUM || l_num == TAUM) {
+  l_SpFromHel[0][0] = conj(l_HelFromSp.get(0, 0));
+  l_SpFromHel[0][1] = conj(l_HelFromSp.get(1, 0));
+  l_SpFromHel[1][0] = conj(l_HelFromSp.get(0, 1));
+  l_SpFromHel[1][1] = conj(l_HelFromSp.get(1, 1));
+//  } else {
+//    l_SpFromHel[0][1] = conj(l_HelFromSp.get(0, 0));
+//    l_SpFromHel[0][0] = conj(l_HelFromSp.get(1, 0));
+//    l_SpFromHel[1][1] = conj(l_HelFromSp.get(0, 1));
+//    l_SpFromHel[1][0] = conj(l_HelFromSp.get(1, 1));
+//  }
 
   // calculate spin amplitudes
   EvtComplex spinamp[2];
 
   for (int lsp = 0; lsp < 2; lsp++) {
     for (int lhel = 0; lhel < 2; lhel++) {
-      spinamp[lsp] += l_SpFromHel[lsp][lhel] * helamp[lhel];
+      // b -> l
+      if (l_num == EM || l_num == MUM || l_num == TAUM) {
+        spinamp[lsp] += l_SpFromHel[lsp][lhel] * helamp[lhel];
+      }
+      // b-bar -> anti-l
+      else {
+        spinamp[lsp] += l_SpFromHel[lsp][lhel] * (lhel == 0 ? +1 : -1) * conj(helamp[1 - lhel]);
+      }
     }
   }
 
@@ -107,7 +114,8 @@ void EvtBSemiTauonicScalarMesonAmplitude::CalcAmp(EvtParticle* p,
   double helprob = abs2(helamp[0]) + abs2(helamp[1]);
   double spinprob = abs2(spinamp[0]) + abs2(spinamp[1]);
   if (fabs(helprob - spinprob) / helprob > 1E-6) {
-    report(ERROR, "EvtGen") << "EvtBSemiTauonicScalarMesonAmplitude total helicity prob does not match with total spin prob." << std::endl;
+    report(ERROR, "EvtGen") << "EvtBSemiTauonicScalarMesonAmplitude total helicity prob does not match with total spin prob."
+                            << std::endl;
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "w: %g costau: %g hel probs: %g\t%g\ttot: %g\n",
             w, costau, abs2(helamp[0]), abs2(helamp[1]), abs2(helamp[0]) + abs2(helamp[1]));

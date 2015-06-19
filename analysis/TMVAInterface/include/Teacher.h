@@ -75,12 +75,12 @@ namespace Belle2 {
        * @param branchName Name of the variable the
        * @param values Float values that should be assigned to the samples. Have to be ordered like the samples that reside in the tree. If the Teacher was invoked with `useExistingData`, remember that there are entries in the tree before the ones that are added with `addSample` or `addClassSample`.
        */
-      void addVariable(const std::string branchName, const std::vector<float>& values);
+      void addVariable(const std::string& branchName, const std::vector<float>& values);
 
       /**
        * Get branch in tree as vector
        */
-      std::vector<float> getVariable(const std::string branchName);
+      std::vector<float> getVariable(const std::string& branchName);
 
       /**
        * Get row in tree as vector
@@ -91,7 +91,7 @@ namespace Belle2 {
       /**
        * Returns distinct integer values in a branch
        */
-      std::set<int> getDistinctIntegerValues(const std::string branchName);
+      std::set<int> getDistinctIntegerValues(const std::string& branchName);
 
 
       /**

@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TMVAInterface {
 
     SPlot::SPlot(std::string modelFileName, const std::map<std::string, std::vector<float>>& discriminatingVariables) : model(nullptr),
-      m_modelObjectName("model"), m_modelYieldsObjectNames{"signal", "background"}, m_modelPlotComponentNames{"sig", "bkg"}
+      m_modelObjectName("model"), m_modelYieldsObjectNames( {"signal", "background"}), m_modelPlotComponentNames({"sig", "bkg"})
     {
 
       workspace = std::make_shared<RooWorkspace>("SPlotWorkspace");

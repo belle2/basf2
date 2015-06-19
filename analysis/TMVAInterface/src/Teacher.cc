@@ -182,7 +182,7 @@ namespace Belle2 {
     }
 
 
-    void Teacher::addVariable(const std::string branchName, const std::vector<float>& values)
+    void Teacher::addVariable(const std::string& branchName, const std::vector<float>& values)
     {
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
@@ -221,7 +221,7 @@ namespace Belle2 {
 
     }
 
-    std::vector<float> Teacher::getVariable(const std::string branchName)
+    std::vector<float> Teacher::getVariable(const std::string& branchName)
     {
 
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
@@ -245,7 +245,7 @@ namespace Belle2 {
       return values;
     }
 
-    std::set<int> Teacher::getDistinctIntegerValues(const std::string branchName)
+    std::set<int> Teacher::getDistinctIntegerValues(const std::string& branchName)
     {
 
       int nentries = m_tree->get().GetEntries();
@@ -421,12 +421,12 @@ namespace Belle2 {
 
       std::set<int> classes = getDistinctIntegerValues(target);
 
-      if (classes.size() == 0 and target != "") {
+      if (classes.empty() and target != "") {
         B2FATAL("Found 0 classes in data.");
       }
 
       std::map<int, TTree*> class_trees;
-      if (classes.size() == 0) {
+      if (classes.empty()) {
 
         classes.insert(getSPlotClass());
         classes.insert(0);

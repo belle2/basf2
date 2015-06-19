@@ -26,11 +26,11 @@ RestFrame::RestFrame(const Particle* particle)
 
 const ReferenceFrame& ReferenceFrame::GetCurrent()
 {
-  if (m_reference_frames.size() > 0) {
-    return *m_reference_frames.top();
-  } else {
+  if (m_reference_frames.empty()) {
     static LabFrame _default;
     return _default;
+  } else {
+    return *m_reference_frames.top();
   }
 }
 

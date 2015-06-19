@@ -102,7 +102,7 @@ namespace Belle2 {
         B2INFO(" - " << particle->getArrayIndex() << " = " << particle->getPDGCode() << "[" << i << "]");
         if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
           std::cout << "[INFO]     o) daughter indices = ";
-          const std::vector<int> daughters = particle->getDaughterIndices();
+          const std::vector<int>& daughters = particle->getDaughterIndices();
           for (unsigned j = 0; j < daughters.size(); ++j) {
             std::cout << " " << daughters[j];
           }
@@ -128,7 +128,7 @@ namespace Belle2 {
   {
     Variable::Manager& manager = Variable::Manager::Instance();
 
-    for (auto & varName : m_variables) {
+    for (auto& varName : m_variables) {
       auto var = manager.getVariable(varName);
       if (var == nullptr) {
         B2ERROR("ParticlePrinter: Variable::Manager doesn't have variable" << varName)

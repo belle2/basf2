@@ -115,7 +115,7 @@ void RestOfEvent::print() const
 
 void RestOfEvent::printIndices(std::set<int> indices) const
 {
-  if (indices.size() == 0)
+  if (indices.empty())
     return;
 
   std::cout << "     -> ";

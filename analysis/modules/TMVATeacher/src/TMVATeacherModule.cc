@@ -27,7 +27,7 @@ namespace Belle2 {
 
   REG_MODULE(TMVATeacher)
 
-  TMVATeacherModule::TMVATeacherModule() : Module()
+  TMVATeacherModule::TMVATeacherModule() : Module(), m_sample_var(nullptr), m_maxSamples(0), m_nSamples(0)
   {
     setDescription("Trains TMVA method with given particle lists as training samples. "
                    "The target variable has to be an integer valued variable which defines the clusters in the sample. "
@@ -64,7 +64,7 @@ namespace Belle2 {
       StoreObjPtr<ParticleList>::required(name);
     }
 
-    if (m_sample == "" and m_inverseSamplingRates.size() > 0) {
+    if (m_sample == "" and not m_inverseSamplingRates.empty()) {
       B2FATAL("Received inverseSamplingRates but no sampling variable was given");
     }
 

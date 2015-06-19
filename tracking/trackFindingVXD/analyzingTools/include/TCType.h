@@ -28,6 +28,7 @@ namespace Belle2 {
       UnknownType, // the type of this TC is not even unclassified but completely unknown, normally a hint for errors
       Unclassified, // a TC which was not classified yet
       Lost, // reference TCs which were not found by test TF
+      RefOutlier, // reference TC which was rejected by some cuts or thresholds set by some classifier
       Ghost, // did not reach m_PARAMqiThreshold
       SmallStump, // TC too short
       Clone, // reached threshold but for the same reference TC a better partner was already found
@@ -61,6 +62,31 @@ namespace Belle2 {
         return TCType::m_fromStringToType[std::string("UnknownType")];
       }
       return pos->second;
+    }
+
+
+    /** returns true if given TCType is a reference-Type, false if not */
+    static bool isReference(TCType::Type aType)
+    {
+      return aType == TCType::Reference
+             or aType == TCType::Lost
+             or aType == TCType::RefOutlier;
+    }
+
+
+    /** returns true if given TCType is a testTC-Type, false if not */
+    static bool isTestTC(TCType::Type aType)
+    {
+      return aType > TCType::RefOutlier
+             and aType < TCType::AllTCTypes;
+    }
+
+
+    /** returns true if given TCType is a testTC-Type and did successfully reconstruct a track */
+    static bool isGoodTestTC(TCType::Type aType)
+    {
+      return aType > TCType::Clone
+             and aType < TCType::AllTCTypes;
     }
 
 

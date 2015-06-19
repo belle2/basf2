@@ -13,6 +13,7 @@
 #include <tracking/trackFindingVXD/analyzingTools/AnalizerTCInfo.h>
 #include <tracking/trackFindingVXD/analyzingTools/AnalyzingAlgorithmFactory.h>
 #include <tracking/trackFindingVXD/analyzingTools/KeyValBox.h>
+// #include <tracking/trackFindingVXD/analyzingTools/algorithms/AnalyzingAlgorithmClusterBased.h> // TODO
 #include <framework/logging/Logger.h>
 
 // root:
@@ -66,21 +67,16 @@ namespace Belle2 {
     StringKeyBox<TTree*> m_treeBox;
 
 
-    /** contains all the algorithms to be applied onto the AnalizerTCInfo-instances.
+    /** contains all the algorithms and its raw data to be streamed into ttrees.
      *
-     * key is tcType,
-     * val collects all the algorithms to be applied on that tcType */
-    StringKeyBox< std::vector<AnalyzingAlgorithm<double>* > > m_algorithmBox;
-
-
-    /** contains all the raw data to be streamed into ttrees.
-     *
-     * key of dataBox is tcType,
+     * key of algoDataBox is tcType,
      * val is another box with:
      *  key is algorithmType
-     *  val is pointer to data collected for that algorithm
+     *  val is pair:
+     *   .first is the algorithm to be applied onto the AnalizerTCInfo-instances.
+     *   .second is the data collected for .first to be streamed into ttrees.
      */
-    StringKeyBox< StringKeyBox< std::vector<double>* > > m_dataBox;
+    StringKeyBox< StringKeyBox< std::pair<AnalyzingAlgorithm<double>*, std::vector<double>*> > > m_algoDataBox;
 
 
     /** stores pointer to file */
@@ -132,39 +128,30 @@ namespace Belle2 {
       for (const AnalizerTCInfo& tc : tcVector) {
         std::string tcTypeName = TCType().getTypeName(tc.getType());
         B2DEBUG(50, "RootParameterTracker::collectData(), executing TC of type: " << tcTypeName)
-        auto* foundAlgorithms = m_algorithmBox.find(tcTypeName);
 
-        // skip if there are no algorithms stored for this tcType:
-        if (foundAlgorithms == NULL) { continue; }
+        auto* foundTCTypeData = m_algoDataBox.find(tcTypeName); // a KeyValBox with all algorithms and data collected to given tcTypeName
 
-        auto* foundData = m_dataBox.find(tcTypeName); // a KeyValBox with all data collected to given tcTypeName
+        // skip if there is nothing stored for this tcType:
+        if (foundTCTypeData == NULL) { continue; }
 
-        if (foundData == NULL) {
-          B2WARNING("RootParameterTracker::collectData(), while algorithms exist for tcType " << tcTypeName <<
-                    ", there is no data linked to same type. This is a sign for unintended behavior! Skipping TC...")
-          continue;
-        }
-
-        B2DEBUG(50, "RootParameterTracker::collectData(), foundAlgorithms-size: " << foundAlgorithms->size())
-
-        // loop over algorithms to collect their data:
-        for (auto* anAlgorithm : *foundAlgorithms) {
+        // looping over algorithms:
+        for (/*std::pair< std::string, std::pair<AnalyzingAlgorithm<double>*, std::vector<double>*> >*/ auto& entry : *foundTCTypeData) {
+          // increase readability:
+          auto* anAlgorithm = entry.second.first;
+          auto* dataVector = entry.second.second;
+          // sanity check: key has to be compatible with stored algorithm:
           std::string algoName = anAlgorithm->getID();
-          B2DEBUG(50, "RootParameterTracker::collectData(), executing algorithm of type: " << algoName)
-
-          std::vector<double>** data4algorithm = foundData->find(algoName);
-
-          if (data4algorithm == NULL) {
-            B2WARNING("RootParameterTracker::collectData(), there is no data linked to algorithm " << algoName <<
-                      ", although algorithm exist. This is a sign for unintended behavior! Skipping TC...")
+          if (entry.first != algoName) {
+            B2ERROR("RootParameterTracker::collectData() key (" << entry.first << ") of container does not match to its content (" << algoName
+                    << ") - skipping entry! ")
             continue;
           }
-
-          B2DEBUG(50, "RootParameterTracker::collectData(),  data4algorithm-size: " << (*data4algorithm)->size())
+          B2DEBUG(50, "RootParameterTracker::collectData(), executing algorithm of type: " << algoName << " with collected data-entries of "
+                  << dataVector->size())
 
           try {
             double calcVal = anAlgorithm->calcData(tc);
-            (*data4algorithm)->push_back(calcVal);
+            dataVector->push_back(calcVal);
             B2DEBUG(20, "RootParameterTracker::collectData(), tc with type " << tcTypeName <<
                     " and applied algorithm " << algoName <<
                     " and got " << calcVal << " as a result!")
@@ -174,8 +161,8 @@ namespace Belle2 {
                       ". Failed with exception: " << anException.what() <<
                       " -> skipping tc!");
           }
-        }
-      }
+        }// looping over algorithms
+      } // looping over TCs
     }
 
 
@@ -193,9 +180,9 @@ namespace Belle2 {
         boxEntry.second->Print();
       }
 
-      for (auto& data2tcType : m_dataBox) {
-        for (auto& data2algorithm : data2tcType.second) {
-          data2algorithm.second->clear();
+      for (auto& algoData2tcType : m_algoDataBox) {
+        for (auto& algoPack : algoData2tcType.second) {
+          algoPack.second.second->clear();
         }
       }
     }
@@ -223,9 +210,10 @@ namespace Belle2 {
       }
       m_file->Close();
 
-      for (auto& vecOfAlgorithms : m_algorithmBox) {
-        for (auto* algoPtr : vecOfAlgorithms.second) {
-          delete algoPtr;
+      for (auto& algoData2tcType : m_algoDataBox) {
+        for (auto& algoPack : algoData2tcType.second) {
+          delete algoPack.second.first; // algorithm
+          delete algoPack.second.second; // vector(data) to algorithm
         }
       }
     }

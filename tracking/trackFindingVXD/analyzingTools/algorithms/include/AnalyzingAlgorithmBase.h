@@ -79,8 +79,8 @@ namespace Belle2 {
     */
     virtual const TCInfoType& chooseCorrectTC(const TCInfoType& aTC) const
     {
-      // capture cases of reference TC first:
-      if (aTC.tcType == TCType::Reference or aTC.tcType == TCType::Lost) { return aTC; }
+      // capture cases of aTC == referenceTC first:
+      if (TCType::isReference(aTC.tcType)) { return aTC; }
 
       // is no reference TC and own data usage is allowed:
       if (m_storeRefTCDataForTestTC == false) { return aTC; }
@@ -146,8 +146,7 @@ namespace Belle2 {
     /** virtual class to calculate data. takes two TCInfos */
     virtual DataType calcData(const TCInfoType&)
     {
-      B2ERROR(" AnalyzingAlgorithmBase::calcData: if you can see this, the code tried to return the actual baseClass instead of the inherited ones - this is unintended behavior! The TCs had the types: ")
-
+      B2ERROR(" AnalyzingAlgorithmBase::calcData: if you can see this, the code tried to return the actual baseClass instead of the inherited ones - this is unintended behavior!")
       return DataType();
     }
   };
@@ -162,12 +161,14 @@ namespace Belle2 {
   template<class DataType, class TCInfoType, class VectorType>
   bool AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_storeRefTCDataForTestTC = false;
 
+
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>
   inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, std::string b)
   {
     return (a.getID() == b);
   }
+
 
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>

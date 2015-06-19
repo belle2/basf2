@@ -47,7 +47,7 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
   B2DEBUG(5, "RootParameterTracker::addParameters(), given parameters are tcTypeName/algorithmName: " << tcTypeName << "/" <<
           algorithmName)
 
-  ///make sure that tree exists:
+///make sure that tree exists:
   TTree** tree4tcType = m_treeBox.find(tcTypeName);
   if (tree4tcType == NULL) {
     m_treeBox.push_back({
@@ -59,64 +59,40 @@ void RootParameterTracker::addParameters(std::string tcTypeName, std::string alg
   }
   B2DEBUG(5, "RootParameterTracker::addParameters(), m_treeBox has " << m_treeBox.size() << " entries")
 
-  /// make sure that container for algorithms of given tcType exists:
-  auto* algorithms4tcType = m_algorithmBox.find(tcTypeName);
+/// make sure that container for algorithms of given tcType exists:
+  auto* algorithms4tcType = m_algoDataBox.find(tcTypeName);
   if (algorithms4tcType == NULL) {
+    B2DEBUG(5, "RootParameterTracker::addParameters(), tcType " << tcTypeName << " not yet added to m_algoDataBox, doing it now...")
+    m_algoDataBox.push_back({
+      tcTypeName,
+      StringKeyBox<std::pair<AnalyzingAlgorithm<double>*, std::vector<double>*> >()
+    });
+    algorithms4tcType = m_algoDataBox.find(tcTypeName);
+  }
+  B2DEBUG(5, "RootParameterTracker::addParameters(), m_algoDataBox has " << m_algoDataBox.size() << " tcTypes stored")
+
+/// make sure that algorithm and its dataStuff exists:
+  auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
+  if (data4AlgorithmOftcType == NULL) {
+    B2DEBUG(5, "RootParameterTracker::addParameters(), algorithm " << algorithmName <<
+            " not yet added to m_algoDataBox[tcType], doing it now...")
     AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>(algorithmName);
-    m_algorithmBox.push_back({
-      tcTypeName,
-      {newAlgorithm}
-    }
-                            );
-    algorithms4tcType = m_algorithmBox.find(algorithmName);
-  } else { // there is already a vector of algorithms for that
-    std::vector<AnalyzingAlgorithm<double>* >::iterator foundPos = std::find_if(
-          algorithms4tcType->begin(),
-          algorithms4tcType->end(),
-          [&](const AnalyzingAlgorithm<double>* anAlgorithm) -> bool
-    { return algorithmName == anAlgorithm->getID(); }
-        );
-    if (foundPos == algorithms4tcType->end()) {
-      AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>(algorithmName);
-      algorithms4tcType->push_back(newAlgorithm);
-    } else {
-      B2WARNING("RootParameterTracker::addParameters() given tcTypeName/algorithmName: " << tcTypeName <<
-                "/" << algorithmName <<
-                " was already added and will not be added again. This is a sign for unintended behavior - skipping addParameters()!")
-      return;
-    }
-  }
-  B2DEBUG(5, "RootParameterTracker::addParameters(), m_algorithmBox has " << m_algorithmBox.size() << " entries")
-
-  /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination
-  auto* data4tcType = m_dataBox.find(tcTypeName); // contains all algorithms stored for given tcTypeName
-  if (data4tcType == NULL) {
-    B2DEBUG(5, "RootParameterTracker::addParameters(), tcType " << tcTypeName << " not yet added to m_dataBox, doing it now...")
-    m_dataBox.push_back({
-      tcTypeName,
-      StringKeyBox<std::vector<double>*>()
-    }
-                       );
-    data4tcType = m_dataBox.find(tcTypeName);
-  }
-  B2DEBUG(5, "RootParameterTracker::addParameters(), m_dataBox has " << m_dataBox.size() << " entries")
-  B2DEBUG(5, "RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() << " entries (b4 data4algorithm-check)")
-  auto** data4algorithm = data4tcType->find(algorithmName); // contains all calculated values stored for given algorithmName
-  if (data4algorithm == NULL) {
-    B2DEBUG(5, "RootParameterTracker::addParameters(), algorithm " << algorithmName << " not yet added to m_dataBox.find(" << tcTypeName
-            << "), doing it now...")
-    data4tcType->push_back({
+    algorithms4tcType->push_back({
       algorithmName,
-      new std::vector<double>()
-    }
-                          );
-    data4algorithm = data4tcType->find(algorithmName);
-    auto* newBranch = (*tree4tcType)->Branch(algorithmName.c_str(), *data4algorithm);
-    newBranch->Print();
-  }
-  B2DEBUG(5, "RootParameterTracker::addParameters(), data4tcType has " << data4tcType->size() <<
-          " entries (after data4algorithm-check)")
-  B2DEBUG(5, "RootParameterTracker::addParameters(), data4algorithm has " << (*data4algorithm)->size() << " entries")
+      {
+        newAlgorithm,
+        new std::vector<double>()
+      }
+    });
+    data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
 
-  /// link data to the branch:
+/// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
+    auto* newBranch = (*tree4tcType)->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
+    newBranch->Print();
+  } else {
+    B2WARNING("RootParameterTracker::addParameters() given tcTypeName/algorithmName: " << tcTypeName <<
+              "/" << algorithmName <<
+              " was already added and will not be added again. This is a sign for unintended behavior - nothing will be added!")
+  }
+  B2DEBUG(5, "RootParameterTracker::addParameters(), m_algoDataBox[tcType] has " << algorithms4tcType->size() << " algorithms stored")
 }

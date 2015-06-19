@@ -116,11 +116,11 @@ namespace Belle2 {
 
   /** Class for storing an algorithm determining the residual (ref-test) of momentum in theta (in degrees) */
   template <class DataType, class TCInfoType, class VectorType>
-  class AnalyzingAlgorithmResidualTheta : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
+  class AnalyzingAlgorithmResidualPTheta : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmResidualTheta() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualTheta")) {}
+    AnalyzingAlgorithmResidualPTheta() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
+      (std::string("AnalyzingAlgorithmResidualPTheta")) {}
 
     /** returns the residual (ref-test) of momentum in theta (in degrees) */
     virtual DataType calcData(const TCInfoType& aTC)
@@ -134,11 +134,11 @@ namespace Belle2 {
 
   /** Class for storing an algorithm determining the residual (ref-test) of momentum in phi (in degrees) */
   template <class DataType, class TCInfoType, class VectorType>
-  class AnalyzingAlgorithmResidualPhi : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
+  class AnalyzingAlgorithmResidualPPhi : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmResidualPhi() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPhi")) {}
+    AnalyzingAlgorithmResidualPPhi() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
+      (std::string("AnalyzingAlgorithmResidualPPhi")) {}
 
     /** returns the residual (ref-test) of momentum in phi (in degrees) */
     virtual DataType calcData(const TCInfoType& aTC)
@@ -202,7 +202,7 @@ namespace Belle2 {
     virtual DataType calcData(const TCInfoType& aTC)
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->posSeed.Mag() - tcs.testTC->posSeed.Mag();
+      return (tcs.refTC->posSeed - tcs.testTC->posSeed).Mag();
     }
   };
 
@@ -220,7 +220,7 @@ namespace Belle2 {
     virtual DataType calcData(const TCInfoType& aTC)
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
-      return tcs.refTC->posSeed.Perp() - tcs.testTC->posSeed.Perp();
+      return (tcs.refTC->posSeed - tcs.testTC->posSeed).Perp();
     }
   };
 

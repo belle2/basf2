@@ -12,7 +12,7 @@ import os
 env['LIBS'] = [
     #'genfit2', 
     #'pxd_dataobjects', 
-    #'svd_dataobjects', 
+    'svd_dataobjects', 
     #'vxd',
     #'vxd_dataobjects', 
     #'framework', 

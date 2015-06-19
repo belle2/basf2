@@ -194,7 +194,6 @@ namespace Belle2 {
       } else return -2;
     }
 
-
     double isRestOfEventB0Flavor_Norm(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -525,28 +524,6 @@ namespace Belle2 {
       if (chargeTarget_K * chargeTarget_pi == -1) {
         return 1;
       } else return 0;
-    }
-
-    // Flavor Information in Transition --------------------------------------------------
-    double hasCharmoniumDaughter(const Particle* particle)
-    {
-      int Status = 0;
-
-      if (!particle)
-        Status = -999;
-
-      int nDaughters = int(particle->getNDaughters());
-      if (nDaughters < 1)
-        Status = -999;
-
-      const std::vector<Particle*> daughters = particle->getDaughters();
-
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
-        if ((abs(daughterPDG) / 10) % 10 == 4 && (abs(daughterPDG) / 100) % 10 == 4) // charmonium state: b->c anti-c q transition
-          Status = 1;
-      }
-      return Status;
     }
 
     //FLAVOR TAGGING RELATED:
@@ -1137,40 +1114,7 @@ namespace Belle2 {
       return particle->getExtraInfo("MC_Flavor");
     }
 
-    // Flavor Information in Transition --------------------------------------------------
-    double hasCharmedDaughter(const Particle* particle, const std::vector<double>& transition)
-    {
-      int Status = 0;
 
-      if (abs(transition[0]) != 1)
-        B2ERROR("The parameter variable hasCharmedDaughter() only accepts 1 or -1 as an argument.");
-
-      if (!particle)
-        Status = -999;
-
-      int nDaughters = int(particle->getNDaughters());
-      if (nDaughters < 1)
-        Status = -999;
-
-      int motherPDGSign = (particle->getPDGCode()) / (abs(particle->getPDGCode()));
-      const std::vector<Particle*> daughters = particle->getDaughters();
-
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
-        int daughterPDGSign = daughterPDG / (abs(daughterPDG));
-
-        if (transition[0] == 1) {
-          if (((abs(daughterPDG) / 100) % 10 == 4 || (abs(daughterPDG) / 1000) % 10 == 4)
-              && motherPDGSign == daughterPDGSign) // charmed meson or baryon and b->anti-c transition
-            Status = 1;
-        } else if (transition[0] == -1) {
-          if (((abs(daughterPDG) / 100) % 10 == 4 || (abs(daughterPDG) / 1000) % 10 == 4)
-              && motherPDGSign == -daughterPDGSign) // charmed meson or baryon and b->c transition
-            Status = 1;
-        }
-      }
-      return Status;
-    }
 
     VARIABLE_GROUP("Flavour tagging");
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,
@@ -1210,9 +1154,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
     REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges,
                       "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
-    REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
-                      "Returns 1 if a b->c anti-c q or a anti-b -> anti-c c anti-q transition is present in a decay.");
-
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
     REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", InputQrOf,
                       "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
@@ -1233,9 +1174,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
                       "Returns the highest probability value for the given category")
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
-
-    REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
-                      "Returns information regarding the charm quark presence in the decay.");
 
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
 

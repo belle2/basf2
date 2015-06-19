@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -369,13 +369,6 @@ namespace Belle2 {
      * returns 1 if the particles selected as target kaon and slow pion in the respective flavour tagging categories have oposite charges, 0 else.
      */
     double KaonPionHaveOpositeCharges(const Particle* particle);
-
-    /**
-     * returns information regarding the charm quark presence in the decay
-     *
-     * hasCharmoniumDaughter returns 1 if there is a b->c anti-c q or an anti-b->anti-c c anti-q transition present, 0 otherwise
-     */
-    double hasCharmoniumDaughter(const Particle* particle);
 
     /**
      * return energy recoiling against given Particle

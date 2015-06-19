@@ -213,124 +213,7 @@ namespace Belle2 {
       return constant[0];
     }
 
-    // Misc --------------------------------------------------
 
-    double hasNDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3)
-    {
-
-      int p_PDG = args3[0];
-      int p_N = args3[1];
-      int p_Sign = args3[2];
-
-      if (args3.size() != 3) {
-        B2ERROR("This function accepts three arguments!");
-        return -999.0;
-      }
-
-      if (!particle) {
-        B2ERROR("This particle does not exist!");
-        return -999.0;
-      }
-
-      int nDaughters = int(particle->getNDaughters());
-
-      if (nDaughters < 1) {
-        B2ERROR("This particle has no daughters!");
-        return -999.0;
-      }
-
-      if (p_PDG == 0) {
-        B2ERROR("Looking for particles with PDG = 0!");
-        return -999.0;
-      }
-
-      if (p_N < 0) {
-        B2ERROR("Second argument should be >= 0");
-        return -999.0;
-      }
-
-      if (abs(p_Sign) != 1) {
-        B2ERROR("Third argument should be 1 or -1!");
-        return -999.0;
-      }
-
-      int Count = 0;
-
-      const std::vector<Particle*> daughters = particle->getDaughters();
-
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
-
-        if (p_Sign == 1) {
-          if (abs(daughterPDG) == abs(p_PDG)) // same PDG codes, sign independent
-            Count++;
-        } else if (p_Sign == -1) {
-          if (daughterPDG == p_PDG) // same PDG codes, sign dependent
-            Count++;
-        }
-      }
-
-      // check conditions
-      if (Count == p_N)
-        return 1.0;
-      else
-        return 0.0;
-    }
-
-    double hasDaughterWithPDG(const Particle* particle, const std::vector<double>& args2)
-    {
-      int p_PDG = args2[0];
-      int p_Sign = args2[1];
-
-      if (args2.size() != 2) {
-        B2ERROR("This function accepts two arguments!");
-        return -999.0;
-      }
-
-      if (!particle) {
-        B2ERROR("This particle does not exist!");
-        return -999.0;
-      }
-
-      int nDaughters = int(particle->getNDaughters());
-
-      if (nDaughters < 1) {
-        B2ERROR("This particle has no daughters!");
-        return -999.0;
-      }
-
-      if (p_PDG == 0) {
-        B2ERROR("Looking for particles with PDG = 0!");
-        return -999.0;
-      }
-
-      if (abs(p_Sign) != 1) {
-        B2ERROR("Second argument should be 1 or -1!");
-        return -999.0;
-      }
-
-      int Status = 0;
-
-      const std::vector<Particle*> daughters = particle->getDaughters();
-
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int daughterPDG = daughters[iDaughter]->getPDGCode();
-
-        if (p_Sign == 1) {
-          if (abs(daughterPDG) == abs(p_PDG)) // same PDG codes, sign independent
-            Status = 1;
-        } else if (p_Sign == -1) {
-          if (daughterPDG == p_PDG) // same PDG codes, sign dependent
-            Status = 1;
-        }
-      }
-
-      // check conditions
-      if (Status == 1)
-        return 1.0;
-      else
-        return 0.0;
-    }
 
     VARIABLE_GROUP("ParameterFunctions");
     REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent ,
@@ -350,11 +233,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("constant(i)", Constant, "Returns constant number");
 
     REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
-
-    REGISTER_VARIABLE("hasNDaughtersWithPDG(PDG,N,Sign)", hasNDaughtersWithPDG,
-                      "Returns information regarding a specific number of daughters with a specific PDG code.");
-    REGISTER_VARIABLE("hasDaughterWithPDG(PDG,Sign)", hasDaughterWithPDG,
-                      "Returns information regarding a daughter with a specific PDG code.");
 
 
   }

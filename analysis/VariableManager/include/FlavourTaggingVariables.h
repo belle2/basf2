@@ -183,14 +183,6 @@ namespace Belle2 {
     Manager::FunctionPtr FSCVariables(const std::vector<std::string>& arguments);
 
     /**
-     * returns information regarding the charm quark presence in the decay
-     *
-     * hasCharmedDaughter(-1) returns 1 if there is a b->c or an anti-b->anti-c transition present, 0 otherwise
-     * hasCharmedDaughter(1) returns 1 if there is a b->anti-c of an anti-b->c transition present, 0 otherwise
-     */
-    double hasCharmedDaughter(const Particle* particle, const std::vector<double>& transition);
-
-    /**
      * Flavour of Btag from trained Method
      */
     double particleClassifiedFlavor(const Particle* particle);

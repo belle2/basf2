@@ -59,7 +59,7 @@ BeamDigitizerModule::BeamDigitizerModule() : Module()
   setDescription("Beamabort digitizer module");
 
   //Default values are set here. New values can be in BEAMABORT.xml.
-  addParam("PreampGain", m_PreampGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4 * 1e12);
+  addParam("PreampGain", m_PreampGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4);
 
 }
 
@@ -121,7 +121,7 @@ void BeamDigitizerModule::event()
   for (int i = 0; i < nBEAM; i++) {
     if (itime[i] > 0) {
       time[i] /= itime[i];
-      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_PreampGain;
+      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_PreampGain * 1e12;
       BeamHits.appendNew(BeamabortHit(i, edep[i], volt[i], time[i], pdg[i]));
     }
   }
@@ -136,7 +136,7 @@ void BeamDigitizerModule::getXMLData()
 
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-    BEAMCenter.push_back(TVector3(activeParams.getLength("z_beamabort"), activeParams.getLength("r_beamabort"),
+    BEAMCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
                                   activeParams.getLength("Phi")));
     nBEAM++;
   }

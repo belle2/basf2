@@ -58,6 +58,7 @@ void Raw2DsModule::initialize()
   StoreObjPtr<EventMetaData>::registerPersistent();
 
   // Initialize Array of RawCOPPER
+  StoreArray<RawDataBlock>::registerPersistent();
   StoreArray<RawCOPPER>::registerPersistent();
   StoreArray<RawSVD>::registerPersistent();
   StoreArray<RawCDC>::registerPersistent();

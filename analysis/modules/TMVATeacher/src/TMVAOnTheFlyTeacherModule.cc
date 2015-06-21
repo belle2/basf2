@@ -88,13 +88,6 @@ namespace Belle2 {
       }
     }
 
-    for (auto& x : m_methods) {
-      if (std::get<2>(x).find("CreateMVAPdfs") == std::string::npos) {
-        B2WARNING("Config string of one or more methods doesn't contain option CreateMVAPdfs,"
-                  "but this option is required to transform the output of the trained method into a probability");
-      }
-    }
-
     TMVATeacherModule::initialize();
 
 

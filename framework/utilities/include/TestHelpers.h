@@ -102,6 +102,41 @@ namespace Belle2 {
  */
 #define EXPECT_B2WARNING(x) EXPECT_LOGMESSAGE(x, Belle2::LogConfig::c_Warning);
 
+/** \def EXPECT_NO_LOGMESSAGE(x, loglevel)
+ *
+ *  Command x should not print any message of given loglevel using basf2's logging system.
+ *  \sa EXPECT_NO_B2FATAL
+ *  \sa EXPECT_NO_B2ERROR
+ *  \sa EXPECT_NO_B2WARNING
+ */
+#define EXPECT_NO_LOGMESSAGE(x, loglevel) \
+  { \
+    int nmessages_before = Belle2::LogSystem::Instance().getMessageCounter(loglevel); \
+    { \
+      x; \
+    } \
+    int nmessages_after = Belle2::LogSystem::Instance().getMessageCounter(loglevel); \
+    EXPECT_TRUE(nmessages_after == nmessages_before) << "Message of level " << #loglevel << " found, but non expected."; \
+  }
+
+/** \def EXPECT_NO_B2FATAL(x)
+ *
+ *  command x should print no B2FATAL.
+ */
+#define EXPECT_NO_B2FATAL(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Fatal);
+
+/** \def EXPECT_NO_B2ERROR(x)
+ *
+ *  command x should print no B2ERROR.
+ */
+#define EXPECT_NO_B2ERROR(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Error);
+
+/** \def EXPECT_NO_B2WARNING(x)
+ *
+ *  command x should print no B2WARNING.
+ */
+#define EXPECT_NO_B2WARNING(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Warning);
+
 /** \def TEST_CONTEXT(x)
  *
  *  Adds a message to all EXCEPTS and ASSERT in the current scope and any called or nested scopes

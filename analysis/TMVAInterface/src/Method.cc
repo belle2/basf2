@@ -17,6 +17,17 @@ namespace Belle2 {
     Method::Method(const std::string& name, const std::string& type, const std::string& config) : m_name(name), m_type(type),
       m_config(config)
     {
+
+      if (m_config.find("CreateMVAPdfs") == std::string::npos) {
+        B2WARNING("Config string of method " << name << " doesn't contain option CreateMVAPdfs,"
+                  "but this option is required to transform the output of the trained method into a probability."
+                  "Hint: Probabely you want to set NbinsMVAPdfs too!");
+      } else if (m_config.find("NbinsMVAPdf=") == std::string::npos) {
+        B2WARNING("Config string of method " << name << " doesn't contain option NbinsMVAPdf,"
+                  "I strongly recommend to set this option to a value between 50 and 200, the default value of TMVA is sqrt(NEvents) which is way too high for bigger samples!"
+                  "A save choice would be NbinsMVAPdf=100 (which means your classifier will output in the end 100 different values if you transform its output to a probability");
+      }
+
       // Automatically load Plugin if necessary. The given name has to correspond to the method name
       if (m_type == "Plugins" or m_type == "Plugin") {
         m_type = "Plugins";

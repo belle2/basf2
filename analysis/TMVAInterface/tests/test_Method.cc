@@ -19,43 +19,50 @@ namespace {
 
   TEST(MethodTest, BuiltinMethodIsConstructedCorrectly)
   {
-    auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100");
+    auto method = Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100");
     EXPECT_EQ(method.getName(), "BoostedDecisionTrees");
     EXPECT_EQ(method.getTypeAsEnum(), TMVA::Types::kBDT);
     EXPECT_EQ(method.getTypeAsString(), "BDT");
-    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs:NTrees=100");
+    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100");
   }
 
   TEST(MethodTest, PluginMethodIsConstructedCorrectly)
   {
-    auto method = Method("MockPlugin", "Plugins", "!H:!V:CreateMVAPdfs");
+    auto method = Method("MockPlugin", "Plugins", "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100");
     EXPECT_EQ(method.getName(), "MockPlugin");
     EXPECT_EQ(method.getTypeAsEnum(), TMVA::Types::kPlugins);
     EXPECT_EQ(method.getTypeAsString(), "Plugins");
-    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs");
+    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100");
   }
 
   TEST(MethodTest, PluginMethodIsConstructedCorrectlyEvenWithSuffix)
   {
-    auto method = Method("MockPluginSuffix", "Plugins", "!H:!V:CreateMVAPdfs");
+    auto method = Method("MockPluginSuffix", "Plugins", "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100");
     EXPECT_EQ(method.getName(), "MockPluginSuffix");
     EXPECT_EQ(method.getTypeAsEnum(), TMVA::Types::kPlugins);
     EXPECT_EQ(method.getTypeAsString(), "Plugins");
-    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs");
+    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100");
   }
 
   TEST(MethodTest, FastBDTIsAvailable)
   {
-    auto method = Method("FastBDT", "Plugins", "!H:!V:CreateMVAPdfs");
+    auto method = Method("FastBDT", "Plugins", "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100");
     EXPECT_EQ(method.getName(), "FastBDT");
     EXPECT_EQ(method.getTypeAsEnum(), TMVA::Types::kPlugins);
     EXPECT_EQ(method.getTypeAsString(), "Plugins");
-    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs");
+    EXPECT_EQ(method.getConfig(), "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100");
   }
 
   TEST(MethodTest, BuiltinMethodFailsCorrectly)
   {
-    EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NTrees=100"), ".*");
+    EXPECT_DEATH(Method("BoostedDecisionTree", "DOES_NOT_EXIST", "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100"), ".*");
+  }
+
+  TEST(MethodTest, BuiltinMethodWarnsMissingOptions)
+  {
+    EXPECT_NO_B2WARNING(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100"));
+    EXPECT_B2WARNING(Method("BoostedDecisionTree", "BDT", "!H:!V:NbinsMVAPdf=100:NTrees=100"));
+    EXPECT_B2WARNING(Method("BoostedDecisionTree", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100"));
   }
 
 }

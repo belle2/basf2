@@ -30,8 +30,8 @@ following snippet can be used:
 
 git bisect good <last good release>
 git bisect bad <first bad release>
-git bisect run bisectValidation.py --execute runTrackingEfficiency.sh_explicit
-    --check-quantity "TrackingValidation.root:hEfficiency[2]:>:0.93"
+git bisect run bisect_validation.py --script 13_trackingEfficiency_createPlots.py
+    --check-quantity "results/current/tracking/TrackingValidation.root:hEfficiency[2]:>:0.93"
 
  Author: The Belle II Collaboration
  Contributors: Thomas Hauth

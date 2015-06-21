@@ -4,7 +4,6 @@
 # Normal library imports
 import logging
 import os
-import re
 import timeit
 import sys
 import time

@@ -43,6 +43,7 @@ int main(int argc, char** argv)
   ibuf.open(argv[1], atoi(argv[2]) * 1000000, true);
   info.reportReady();
   TCPSocket socket(argv[3], atoi(argv[4]));
+  info.reportReady();
   int* evtbuf = new int[10000000];
   BinData data;
   data.setBuffer(evtbuf);
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
     while (socket.get_fd() <= 0) {
       try {
         socket.connect();
-        B2INFO("storagein: Connected to eb2.");
+        B2INFO("storagein: Connected to data source");
         socket.setBufferSize(32 * 1024 * 1024);
         ntried = 0;
         if (info.isAvailable()) {

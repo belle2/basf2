@@ -42,147 +42,143 @@
 using namespace Belle2;
 
 const unsigned long long GB = 1024 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 4 * GB;
-int g_nfiles = 0;
-int g_nfiles_closed = 0;
-int g_diskid = 0;
-std::string g_file_diskid;
-std::string g_file_nfiles;
-std::string g_file_dbtmp;
-Mutex g_mutex;
-DBInterface* g_db = NULL;
-
-bool insertdb(const std::string& sql)
-{
-  try {
-    g_db->connect();
-    g_db->execute(sql.c_str());
-    g_db->close();
-  } catch (const DBHandlerException& e) {
-    std::ofstream fout(g_file_dbtmp.c_str(), std::ios::app);
-    fout << sql << std::endl;
-    fout.close();
-    return false;
-  }
-  return true;
-}
+const unsigned long long MAX_FILE_SIZE = 1 * GB;
+const char* g_table = "fileinfo";
 
 class FileHandler {
 
-private:
-  FILE* m_file;
-  char* m_buf;
-  int m_id;
-  std::string m_path;
-
 public:
-  FileHandler()
+  FileHandler(DBInterface& db, const std::string& runtype,
+              const char* host, const char* dbtmp)
+    : m_db(db), m_runtype(runtype), m_host(host), m_dbtmp(dbtmp)
   {
     m_file = NULL;
     m_buf = NULL;
-    m_id = 0;
   }
-  FileHandler(const std::string& dir, int ndisks, int expno, int runno)
+  ~FileHandler() throw()
   {
-    open(dir, ndisks, expno, runno);
   }
-  ~FileHandler() throw() {}
 
 public:
-  bool open(const std::string& dir, int ndisks, int expno, int runno)
-  {
-    char filename[1024];
-    g_mutex.lock();
-    bool available = true;
-    if (ndisks > 0) {
-      int diskid = g_diskid;
-      if (g_diskid == 0) {
-        std::ifstream fin(g_file_diskid.c_str());
-        fin >> g_diskid;
-        if (g_diskid == 0) g_diskid = 1;
-      }
-      available = false;
-      for (int i = 0; i < ndisks; i++) {
-        struct statvfs statfs;
-        sprintf(filename, "%s%02d", dir.c_str(), g_diskid);
-        statvfs(filename, &statfs);
-        float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
-        if (usage < 0.9) {
-          sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), g_diskid);
-          std::ifstream fin(filename);
-          int flag = 0;
-          fin >> flag;
-          if (flag != 1) {
-            available = true;
-            break;
-          }
-        }
-        g_diskid++;
-        if (g_diskid > ndisks) g_diskid = 1;
-      }
-      if (!available) {
-        B2FATAL("No disk available for writing");
-      }
+  int getDiskId() { return m_diskid; }
+  int getFileId() { return m_fileid; }
 
-      if (diskid != g_diskid) {
-        std::ofstream fout(g_file_diskid.c_str());
-        fout << g_diskid;
-        fout.close();
-        sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), diskid);
-        fout.open(filename);
-        fout << 1;
+public:
+  int open(const std::string& dir, int ndisks, int expno, int runno)
+  {
+    m_fileid = 0;
+    m_diskid = 1;
+    try {
+      m_db.connect();
+      m_db.execute("select fileid, diskid from %s where expno = %d and runno = %d "
+                   "and path_daq like '%s:_%s' and runtype='%s' order by id desc;",
+                   g_table, expno, runno, m_host.c_str(), "%%", m_runtype.c_str());
+      DBRecordList record_v(m_db.loadRecords());
+      if (record_v.size() > 0) {
+        DBRecord& record(record_v[0]);
+        m_fileid = (record.hasField("fileid")) ? record.getInt("fileid") + 1 : 0;
+        m_diskid = (record.hasField("diskid")) ? record.getInt("diskid") : 1;
+        std::cout << "db: fileid: " << m_fileid << std::endl;
       }
-      if (g_nfiles > 0) {
-        sprintf(filename, "%s%02d/storage/e%4.4dr%6.6d.sroot-%d",
-                dir.c_str(), g_diskid, expno, runno, g_nfiles);
-      } else {
-        sprintf(filename, "%s%02d/storage/e%4.4dr%6.6d.sroot",
-                dir.c_str(), g_diskid, expno, runno);
-      }
-    } else {
-      if (g_nfiles > 0) {
-        sprintf(filename, "%s/storage/e%4.4dr%6.6d.sroot-%d",
-                dir.c_str(), expno, runno, g_nfiles);
-      } else {
-        sprintf(filename, "%s/storage/e%4.4dr%6.6d.sroot",
-                dir.c_str(), expno, runno);
-      }
+      m_db.close();
+    } catch (const DBHandlerException& e) {
+      LogFile::error("Failed to access db for read: %s", e.what());
+      return -1;
     }
-    g_nfiles++;
-    std::ofstream fout(g_file_nfiles.c_str());
-    fout << g_nfiles << " " << expno << " " << runno;
-    m_id = g_nfiles;
-    g_mutex.unlock();
+    std::cout << "fileid: " << m_fileid << std::endl;
+    char filename[1024];
+    bool available = false;
+    for (int i = 0; i < ndisks; i++) {
+      struct statvfs statfs;
+      sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
+      statvfs(filename, &statfs);
+      float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
+      if (usage < 0.9) {
+        sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
+        std::ifstream fin(filename);
+        int flag = 0;
+        fin >> flag;
+        if (fin.eof() || flag != 1) {
+          available = true;
+          B2INFO("disk : " << m_diskid << " is available");
+          break;
+        }
+        fin.close();
+        B2INFO("disk : " << m_diskid << " is full");
+      } else {
+        sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
+        std::ofstream fout(filename);
+        fout << 1;
+        fout.close();
+        B2WARNING("disk : " << m_diskid << " is full " << usage);
+      }
+      m_diskid++;
+      if (m_diskid > ndisks) m_diskid = 1;
+    }
+    if (!available) B2FATAL("No disk available for writing");
+    if (m_fileid > 0) {
+      sprintf(filename, "%s%02d/storage/%s.%4.4d.%6.6d.sroot-%d",
+              dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno, m_fileid);
+    } else if (m_fileid == 0) {
+      sprintf(filename, "%s%02d/storage/%s.%4.4d.%6.6d.sroot",
+              dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno);
+    }
+    if ((m_file = fopen(filename, "r")) != NULL) {
+      B2FATAL("File : " << filename << " already exists!");
+    }
     m_file = fopen(filename, "w");
     m_path = filename;
     if (m_file == NULL) {
-      B2ERROR("failed to open file : " << filename);
-      return false;
+      B2ERROR("Failed to open file : " << filename);
+      return -1;
     } else {
-      insertdb(StringUtil::form("insert into fileinfo (path, expno, runno, fileid, diskid, time_create)"
-                                " values ('%s', %d, %d, %d, %d, current_timestamp);",
-                                filename, expno, runno, m_id - 1, g_diskid));
-      m_buf = (char*)malloc(MAX_FILE_SIZE / 100);
-      setvbuf(m_file, m_buf, _IOFBF, MAX_FILE_SIZE / 100);
-      B2INFO("file " << filename << " opened");
+      char sql[1000];
+      sprintf(sql, "insert into %s (path_daq, runtype, expno, runno, fileid, diskid, time_create)"
+              " values ('%s:%s', '%s', %d, %d, %d, %d, current_timestamp) returning id;",
+              g_table, m_host.c_str(), filename, m_runtype.c_str(), expno, runno, m_fileid, m_diskid);
+      try {
+        m_db.connect();
+        m_db.execute(sql);
+        DBRecordList record_v(m_db.loadRecords());
+        m_id = (record_v.size() > 0) ? record_v[0].getInt("id") : 0;
+        m_db.close();
+      } catch (const DBHandlerException& e) {
+        LogFile::error("Failed to access db for read: %s", e.what());
+        std::ofstream fout(m_dbtmp.c_str(), std::ios::app);
+        fout << sql << std::endl;
+        fout.close();
+        return -1;
+      }
     }
-    return available;
+    m_buf = (char*)malloc(MAX_FILE_SIZE / 100);
+    setvbuf(m_file, m_buf, _IOFBF, MAX_FILE_SIZE / 4000);
+    B2INFO("file " << filename << " opened");
+    return m_id;
   }
 
   void close()
   {
     if (m_file != NULL) {
       fclose(m_file);
-      insertdb(StringUtil::form("update fileinfo set time_close = "
-                                "current_timestamp where path = '%s'",
-                                m_path.c_str()));
-      g_nfiles_closed++;
+      char sql[1000];
+      sprintf(sql, "update %s set time_close = "
+              "current_timestamp where id = %d", g_table, m_id);
+      try {
+        m_db.connect();
+        m_db.execute(sql);
+        m_db.close();
+      } catch (const DBHandlerException& e) {
+        LogFile::error("Failed to access db for update: %s", e.what());
+        std::ofstream fout(m_dbtmp.c_str(), std::ios::app);
+        fout << sql << std::endl;
+        fout.close();
+      }
+      m_file = NULL;
     }
     if (m_buf != NULL) {
       free(m_buf);
+      m_buf = NULL;
     }
-    m_file = NULL;
-    m_buf = NULL;
   }
 
   int write(char* evbuf, int nbyte)
@@ -195,122 +191,77 @@ public:
     return m_file != NULL;
   }
 
-};
-
-class FileCloser {
-
-public:
-  static FileHandler getFile()
-  {
-    g_mutex.lock();
-    while (g_file_q.empty()) {
-      g_cond.wait(g_mutex);
-    }
-    FileHandler file = g_file_q.front();
-    g_file_q.pop();
-    g_mutex.unlock();
-    return file;
-  }
-
-public:
-  static void closeAll()
-  {
-    while (!g_file_q.empty()) {
-      g_file_q.front().close();
-      g_file_q.pop();
-    }
-  }
-
 private:
-  static std::queue<FileHandler> g_file_q;
-  static Mutex g_mutex;
-  static Cond g_cond;
-
-private:
-  FileHandler m_handler;
-  std::string m_dir;
-  int m_ndisks;
-  int m_expno;
-  int m_runno;
-
-public:
-  FileCloser(const FileHandler& handler,
-             const std::string dir,
-             int ndisks, int expno, int runno)
-    : m_handler(handler), m_dir(dir),
-      m_ndisks(ndisks), m_expno(expno), m_runno(runno) {}
-
-public:
-  void run()
-  {
-    g_mutex.lock();
-    g_file_q.push(FileHandler(m_dir, m_ndisks, m_expno, m_runno));
-    g_cond.signal();
-    g_mutex.unlock();
-    m_handler.close();
-  }
+  DBInterface& m_db;
+  std::string m_runtype;
+  std::string m_host;
+  std::string m_dbtmp;
+  int m_id;
+  std::string m_path;
+  int m_diskid;
+  int m_fileid;
+  FILE* m_file;
+  char* m_buf;
 
 };
 
-std::queue<FileHandler> FileCloser::g_file_q;
-Mutex FileCloser::g_mutex;
-Cond FileCloser::g_cond;
+FileHandler* g_file = NULL;
 
 void signalHandler(int)
 {
-  FileCloser::closeAll();
+  if (g_file) g_file->close();
   exit(1);
 }
 
 int main(int argc, char** argv)
 {
-  if (argc < 4) {
-    printf("%s : ibufname ibufsize path "
-           "filepath_diskid filepath_nfile filepath_dbtmp "
-           "ndisk obufname obufsize [nodename, nodeid]\n", argv[0]);
+  if (argc < 8) {
+    printf("%s : <ibufname> <ibufsize> <hostname> <runtype> <path> <ndisk> "
+           "<filepath_dbtmp> [ <obufname> <obufsize> nodename, nodeid]\n", argv[0]);
     return 1;
   }
+  const char* ibufname = argv[1];
+  const int ibufsize = atoi(argv[2]);
+  const char* hostname = argv[3];
+  const char* runtype = argv[4];
+  const char* path = argv[5];
+  const int ndisks = atoi(argv[6]);
+  const char* file_dbtmp = argv[7];
+  const char* obufname = (argc > 7) ? argv[8] : "";
+  const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
+  const char* nodename = (argc > 9) ? argv[10] : "";
+  const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
+  RunInfoBuffer info;
+  const bool use_info = nodeid >= 0;
+  if (use_info) info.open(nodename, nodeid);
+  SharedEventBuffer ibuf;
+  ibuf.open(ibufname, ibufsize * 1000000, true);
   signal(SIGINT, signalHandler);
   ConfigFile config("slowcontrol");
-  g_db = new PostgreSQLInterface(config.get("database.host"),
-                                 config.get("database.dbname"),
-                                 config.get("database.user"),
-                                 config.get("database.password"),
-                                 config.getInt("database.port"));
+  PostgreSQLInterface db(config.get("database.host"),
+                         config.get("database.dbname"),
+                         config.get("database.user"),
+                         config.get("database.password"),
+                         config.getInt("database.port"));
   const unsigned interval = 10;
-  RunInfoBuffer info;
-  const bool use_info = (argc > 10);
-  if (use_info) {
-    info.open(argv[9], atoi(argv[10]));
-  }
-  SharedEventBuffer ibuf;
-  ibuf.open(argv[1], atol(argv[2]) * 1000000, true);
-  const std::string dir = argv[3];
-  int ndisks = atoi(argv[4]);
-  g_file_diskid = argv[5];
-  g_file_nfiles = argv[6];
-  g_file_dbtmp = argv[7];
   unsigned int expno_tmp = 0;
   unsigned int runno_tmp = 0;
-  std::ifstream fin(g_file_nfiles.c_str());
-  fin >> g_nfiles >> expno_tmp >> runno_tmp;
   SharedEventBuffer obuf;
-  obuf.open(argv[8], atol(argv[9]) * 1000000, true);
+  if (obufsize > 0) obuf.open(obufname, obufsize * 1000000, true);
+  if (use_info) info.reportReady();
   B2INFO("storagerecord: started recording.");
-  if (use_info) {
-    info.reportRunning();
-  }
-
   int* evtbuf = new int[10000000];
   unsigned long long nbyte_out = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
   unsigned int subno = 0;
-  FileHandler file;
+  g_file = new FileHandler(db, runtype, hostname, file_dbtmp);
+  FileHandler& file(*g_file);
   SharedEventBuffer::Header iheader;
   while (true) {
     ibuf.read(evtbuf, true, &iheader);
+    if (use_info) info.reportRunning();
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
     if (expno < iheader.expno || runno < iheader.runno) {
@@ -333,14 +284,11 @@ int main(int argc, char** argv)
       oheader->runno = runno;
       obuf.unlock();
       if (expno_tmp != expno || runno_tmp != runno) {
-        g_nfiles = 0;
         expno_tmp = 0;
         runno_tmp = 0;
       }
-      std::ofstream fout(g_file_nfiles.c_str());
-      fout << g_nfiles;
-      file.open(dir, ndisks, expno, runno);
-      PThread(new FileCloser(FileHandler(), dir, ndisks, expno, runno));
+      if (file) file.close();
+      file.open(path, ndisks, expno, runno);
     }
     if (use_info) {
       info.addInputCount(1);
@@ -348,21 +296,21 @@ int main(int argc, char** argv)
     }
     if (file) {
       if (nbyte_out > MAX_FILE_SIZE) {
-        PThread(new FileCloser(file, dir, ndisks, expno, runno));
+        file.close();
         nbyte_out = 0;
-        file = FileCloser::getFile();
+        file.open(path, ndisks, expno, runno);
       }
       file.write((char*)evtbuf, nbyte);
       nbyte_out += nbyte;
-      if (count_out % interval == 0 && obuf.isWritable(nword)) {
+      if (obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
         obuf.write(evtbuf, nword, true);
       }
       count_out++;
       if (use_info) {
         info.addOutputCount(1);
         info.addOutputNBytes(nbyte);
-        info.get()->reserved[0] = g_nfiles_closed;
-        info.get()->reserved[1] = g_diskid;
+        info.get()->reserved[0] = file.getFileId();
+        info.get()->reserved[1] = file.getDiskId();
         info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
       }
     } else {

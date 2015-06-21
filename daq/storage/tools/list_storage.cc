@@ -47,7 +47,7 @@ const char* g_table = "fileinfo";
 
 int main(int argc, char** argv)
 {
-  if (argc > 1 && strcmp(argv[1], "-h") == 0) {
+  if (argc > 1 && strcmp(argv[1], "-help") == 0) {
     printf("%s : [-h hostname] [-l runlabel] [-e expnumber] [-r runnumber] [-n number_of_file ] \n", argv[0]);
     return 1;
   }

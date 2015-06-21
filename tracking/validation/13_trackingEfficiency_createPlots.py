@@ -15,7 +15,8 @@
 
 """
 <header>
-    <input>trackingEfficiency_pt_0.10GeV.root,trackingEfficiency_pt_0.25GeV.root,
+    <input>trackingEfficiency_pt_0.05GeV.root,
+    trackingEfficiency_pt_0.10GeV.root,trackingEfficiency_pt_0.25GeV.root,
     trackingEfficiency_pt_0.40GeV.root,trackingEfficiency_pt_0.60GeV.root,
     trackingEfficiency_pt_1.00GeV.root,trackingEfficiency_pt_1.50GeV.root,
     trackingEfficiency_pt_2.00GeV.root,trackingEfficiency_pt_3.00GeV.root,

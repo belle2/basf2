@@ -122,11 +122,11 @@ class Validation:
     def build_dependencies(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
-        calls their get_dependencies()-method.
+        calls their compute_dependencies()-method.
         @return: None
         """
         for script_object in self.list_of_scripts:
-            script_object.get_dependencies(self.list_of_scripts)
+            script_object.compute_dependencies(self.list_of_scripts)
 
         # The following code is only necessary while there are still a lot of
         # steering files without proper headers.
@@ -346,6 +346,56 @@ class Validation:
                     suma += float(run_times[dict_key])
                 script.runtime = suma / len(run_times)
         runtimes.close()
+
+    def get_script_by_name(self, name):
+        """!
+
+        """
+
+        l = [s for s in self.list_of_scripts if s.name == name]
+        if len(l) == 1:
+            return l[0]
+        else:
+            return None
+
+    def apply_script_selection(self, script_selection):
+        """!
+        This method will take the validation file name ( e.g. "FullTrackingValidation.py" ), determine
+        all the script it depends and set the status of theses scripts to "waiting",
+        The status of all other scripts will be set to "skipped", which means they will not be executed
+        in the validation run.
+        """
+
+        # change file extension
+        script_selection = [Script.sanitize_file_name(s) for s in script_selection]
+
+        scripts_to_enable = set()
+
+        # find the dependencies of each selected script
+        for script in script_selection:
+            scripts_to_enable.add(script)
+            script_obj = self.get_script_by_name(script)
+
+            if script_obj is None:
+                self.log.error("Script with name {0} cannot be found, skipping for selection"
+                               .format(script))
+                continue
+
+            others = script_obj.get_recursive_dependencies(self.list_of_scripts)
+            scripts_to_enable = scripts_to_enable.union(others)
+
+        # enable all selections and dependencies
+        for script_obj in self.list_of_scripts:
+            if script_obj.name in scripts_to_enable:
+                self.log.warning("Enabling script {0} because it was selected or a selected "
+                                 "script depends on it."
+                                 .format(script_obj.name))
+                script_obj.status = ScriptStatus.waiting
+            else:
+                self.log.warning("Disabling script {0} because it was not "
+                                 "selected."
+                                 .format(script_obj.name))
+                script_obj.status = ScriptStatus.skipped
 
     def run_validation(self):
         """!
@@ -618,6 +668,11 @@ try:
     # Build dependencies for every script object we have created
     validation.log.note('Building dependencies for Script objects...')
     validation.build_dependencies()
+
+    # select only specific scripts, if this option has been set
+    if cmd_arguments.select:
+        validation.log.note("Applying selection for validation scripts")
+        validation.apply_script_selection(cmd_arguments.select)
 
     # Start the actual validation
     validation.log.note('Starting the validation...')

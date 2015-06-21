@@ -83,7 +83,7 @@ class Script:
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
         # by an underscore. Useful e.g. for cluster controls.
-        self.name = re.sub(r'[\W_]+', '_', str(os.path.basename(self.path)))
+        self.name = Script.sanitize_file_name(str(os.path.basename(self.path)))
 
         # The package to which the steering file belongs
         self.package = package
@@ -107,6 +107,13 @@ class Script:
         # The returncode of the script. Should be 0 if all went well.
         self.returncode = None
 
+    @staticmethod
+    def sanitize_file_name(file_name):
+        """!
+        Replaces the . between the file name and extension with an underscore _
+        """
+        return re.sub(r'[\W_]+', '_', file_name)
+
     def dump(self):
         """!
         Print out all properties = attributes of a script.
@@ -115,7 +122,41 @@ class Script:
         print
         pp.pprint(vars(self))
 
-    def get_dependencies(self, list_of_scripts):
+    def get_recursive_dependencies(self, list_of_scripts, level=0):
+        """!
+        Loops over all dependencies of this script and recursively retrieves
+        their sub-dependencies
+        """
+
+        if level > 50:
+            self.log.error('Recurisve dependency lookup reached level {0} and will quit now.'
+                           'Possibly circular dependcencies in the validation scripts ?'
+                           .format(level))
+
+        all_deps = set()
+        for dep in self.dependencies:
+            # only add, if not already in the dependencies list
+            all_deps.add(dep.name)
+
+            next_level = level + 1
+
+            # find script object
+            dep_script = [x for x in list_of_scripts if x.name == dep.name]
+            rec_deps = []
+            if len(dep_script) == 1:
+                rec_deps = dep_script[0].get_recursive_dependencies(list_of_scripts, next_level)
+            else:
+                self.log.error('Depending script with the name {0} could not be found in the list of '
+                               'registered scripts.'
+                               .format(dep.name))
+
+            # only add, if not already in the dependencies list
+            for rc in rec_deps:
+                all_deps.add(rc)
+
+        return all_deps
+
+    def compute_dependencies(self, list_of_scripts):
         """!
         Loops over the input files given in the header and tries to find the
         corresponding Script objects, which will then be stored in the

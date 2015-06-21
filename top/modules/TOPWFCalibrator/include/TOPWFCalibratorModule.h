@@ -73,7 +73,6 @@ namespace Belle2 {
           c_NumWindows = 512
          };
 
-    std::string m_outputFileName;    /**< output file name (root file emulating DB) */
     std::string m_histogramFileName; /**< output file name for histograms */
     int m_barID;                     /**< ID of TOP module to calibrate */
     int m_runLow;          /**< IOV: from run */

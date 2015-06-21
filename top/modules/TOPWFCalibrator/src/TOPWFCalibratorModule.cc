@@ -59,9 +59,6 @@ namespace Belle2 {
     setDescription("Calibration of waveforms (under development)");
 
     // Add parameters
-    addParam("outputFileName", m_outputFileName, "Output root file to emulate DB",
-             string("WFCalibration.root"));
-
     addParam("histogramFileName", m_histogramFileName, "Output root file for histograms",
              string(""));
 
@@ -181,8 +178,6 @@ namespace Belle2 {
         }
       }
     }
-
-    Database::setGlobalTag(m_outputFileName);
 
     auto expNo = evtMetaData->getExperiment();
     IntervalOfValidity iov(expNo, m_runLow, expNo, m_runHigh);

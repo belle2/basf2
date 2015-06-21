@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-
 Utility script to be used in conjuction with the git bisect functionality [1] to
 search for degredations in validation variables. To use it, you can set the last known
 good git commit and the first known bad commit and start the bistecting process.
@@ -22,7 +21,7 @@ The syntaxn of the --check-quantity option is the following:
            extracted, which can be selected vial the number given in bracktets []:
            0 = mean of the histogram
            1 = average of the bin content
-           2 = zero-supressed average of the bin content
+           2 = zero-suppressed average of the bin content
 <compare op> can be ">" or "<"
 <value> is the reference value as a float to compare to
 
@@ -44,10 +43,10 @@ http://git-scm.com/docs/git-bisect
 
 import os
 import sys
-import argparse
 import ROOT
 
 import argparse
+from functools import reduce
 
 # this is a 1:1 copy of tracking/scripts/tracking/validation/extract_information_from_tracking_validation_output.py
 # which is made necessary at the moment, because the method was recently improved and git bisect might checkout
@@ -69,7 +68,7 @@ def extract_information_from_file(file_name, results):
 
         if "overview_figures_of_merit" in str(name):
             root_obj.GetEntry(0)
-            for branch in overview_table.GetListOfBranches():
+            for branch in graph_or_table.GetListOfBranches():
                 branch_name = branch.GetName()
                 if branch_name in results:
                     results[branch_name].append(100.0 * float(getattr(root_obj, branch.GetName())))
@@ -81,18 +80,18 @@ def extract_information_from_file(file_name, results):
                 # useful for efficiency over <X> plots
                 nbinsx = root_obj.GetNbinsX()
                 sum = 0.0
-                sumZeroSupressed = 0.0
-                countZeroSupressed = 0
+                sumZeroSuppressed = 0.0
+                countZeroSuppressed = 0
                 for i in range(nbinsx):
                     v = root_obj.GetBinContent(i + 1)
                     sum = sum + v  # from first bin, ignored underflow (i=0) and overflow (i=nbinsx+1) bins
                     if v > 0.0:
-                        sumZeroSupressed = sumZeroSupressed + v
-                        countZeroSupressed = countZeroSupressed + 1
+                        sumZeroSuppressed = sumZeroSuppressed + v
+                        countZeroSuppressed = countZeroSuppressed + 1
                 meanY = sum / nbinsx
-                meanYzeroSupressed = sum / countZeroSupressed
+                meanYzeroSuppressed = sum / countZeroSuppressed
 
-                results[root_obj.GetName()] = (root_obj.GetMean(), meanY, meanYzeroSupressed)
+                results[root_obj.GetName()] = (root_obj.GetMean(), meanY, meanYzeroSuppressed)
 
     root_file.Close()
 
@@ -134,7 +133,10 @@ parser.add_argument('--check-quantity', action="append",
                     help='Check for a quantity in validation files')
 parser.add_argument('--execute', action="append",
                     help='File to execute after the compile and before the quantity check')
-
+parser.add_argument('--script', action="append",
+                    help='Name of validation script to run after the compile '
+                         'and before the quantity check. Only this validation script and '
+                         'all scripts it depends on are executed.')
 # check quantity format
 # 'filename.root:hEfficiency[2]:<:0.95'
 args = parser.parse_args()
@@ -158,12 +160,29 @@ print "Exit code of compile was " + str(exitCode)
 if exitCode > 0 and argsVar["report_compile_fail"]:
     sys.exit(125)  # tell git to ignore this failed build
 
-# execute validation
+# execute validation script
+if argsVar["script"] is None:
+    argsVar["script"] = []
+
+validation_scripts = reduce(lambda x, y: x + " " + y, "")
+if len(validation_scripts) > 0:
+    validation_call = "validate_basf2.py -s " + validation_scripts
+    exitCode = os.system(validation_call)
+
+    print "Exit code of " + validation_call + " was " + str(exitCode)
+
+    if exitCode > 0:
+        if argsVar["report_execution_fail"]:
+            sys.exit(1)  # tell git about this failed run ...
+        else:
+            sys.exit(125)  # tell git to ignore this failed validation
+
+# execute provided file
 if argsVar["execute"] is None:
     argsVar["execute"] = []
 
 for ex in argsVar["execute"]:
-    print "Excuting " + str(ex)
+    print "Executing " + str(ex)
     exitCode = os.system(ex.strip('"'))
     print "Exit code of " + str(ex) + " was " + str(exitCode)
 

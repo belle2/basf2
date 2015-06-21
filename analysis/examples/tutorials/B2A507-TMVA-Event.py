@@ -43,7 +43,8 @@ teacher.param('target', 'isInRegion(KLMEnergy, 0, 0.1)')
 teacher.param(
     'methods', [
         ('FastBDT', 'Plugin',
-         '!H:!V:VarTransform=N,D,G:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')])
+         '!H:!V:VarTransform=N,D,G:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:'
+         'NTreeLayers=3')])
 main.add_module(teacher)
 
 process(main)

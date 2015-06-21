@@ -47,9 +47,10 @@ teacher.param('listNames', 'e-')
 # And in addition it takes nearly the same arguments as the externTeacher module
 # methodName, methodType and methodConfig are given as a tuple. It's possible to define more than one method!
 teacher.param('methods',
-              [('TMVABDT', 'BDT',
-                '!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.10:GradBaggingFraction=0.5:nCuts=256:MaxDepth=3'),
-               ('FastBDT', 'Plugin', '!H:!V:CreateMVAPdfs:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')])
+              [('TMVABDT', 'BDT', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100:BoostType=Grad:'
+                'Shrinkage=0.10:GradBaggingFraction=0.5:nCuts=256:MaxDepth=3'),
+               ('FastBDT', 'Plugin', '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100:Shrinkage=0.10:'
+                'RandRatio=0.5:NCutLevel=8:NTreeLayers=3')])
 # The target is automatically added as a spectator, so no need to do it by hand as before
 teacher.param('target', 'isSignal')
 main.add_module(teacher)

@@ -74,8 +74,8 @@ print statistics
 # You will get a warning due to a missing __weight__ branch, this branch is automatically added.
 import subprocess
 subprocess.call("externTeacher --workingDirectory TMVA --prefix VariablesToNtuple --methodName FastBDT --methodType Plugin "
-                "--methodConfig '!H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3' "
-                "--target isSignal --variables eid 'useCMSFrame(p)' chiProb", shell=True)
+                "--methodConfig '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:"
+                "NTreeLayers=3' --target isSignal --variables eid 'useCMSFrame(p)' chiProb", shell=True)
 
 # For the ntuple file there is no feature which can simply be used as target (so a feature which returns 0 or 1).
 # So we need to add one by hand.
@@ -104,8 +104,8 @@ file.Close()
 # this is fine for the training. As mentioned before you must provide the correct aliases to apply this training later.
 # Or rename all the used branches accordingly (however this is shouldn't be done by a layman).
 subprocess.call("externTeacher --workingDirectory TMVA --prefix NtupleTools --methodName FastBDT --methodType Plugin "
-                "--methodConfig '!H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3' "
-                "--target isSignal --variables e_PIDe e_P e_TrPval", shell=True)
+                "--methodConfig '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:"
+                "NTreeLayers=3' --target isSignal --variables e_PIDe e_P e_TrPval", shell=True)
 
 
 main = create_path()

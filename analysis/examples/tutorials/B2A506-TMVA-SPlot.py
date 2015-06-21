@@ -101,7 +101,8 @@ modelFile.Close()
 # and the discriminating variable.
 import subprocess
 subprocess.call("externTeacher --workingDirectory TMVA --prefix SPlot --methodName FastBDT --methodType Plugin "
-                "--methodConfig '!H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3' "
+                "--methodConfig '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:"
+                "NTreeLayers=3' "
                 "--variables 'daughter(0, Kid)' 'daughter(1, piid)' 'daughter(0, chiProb)' 'daughter(1, chiProb)' "
                 "'useRestFrame(daughter(0, p))' 'useRestFrame(daughter(1, p))' 'dr' 'dz' 'chiProb' "
                 "--modelFileName SPlotModel.root --discriminatingVariables M", shell=True)

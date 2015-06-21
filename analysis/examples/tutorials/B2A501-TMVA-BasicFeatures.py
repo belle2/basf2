@@ -67,8 +67,8 @@ print statistics
 # We pass the configuration for method we want to use, the target variable, and the feature variables.
 import subprocess
 subprocess.call("externTeacher --workingDirectory TMVA --prefix Basic --methodName FastBDT --methodType Plugin "
-                "--methodConfig '!H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3' "
-                "--target isSignal --variables eid 'useCMSFrame(p)' chiProb", shell=True)
+                "--methodConfig '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:"
+                "NCutLevel=8:NTreeLayers=3' --target isSignal --variables eid 'useCMSFrame(p)' chiProb", shell=True)
 
 # We create another path, and apply the training on the same data,
 # usually one wants to use an independent data set for this step.

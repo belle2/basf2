@@ -58,8 +58,8 @@ print statistics
 # The TMVAExpert module will use the correct training if the correct signalClass id is passed as an argument.
 import subprocess
 subprocess.call("externTeacher --workingDirectory TMVA --prefix Multiclass --methodName FastBDT --methodType Plugin "
-                "--methodConfig '!H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3' "
-                "--target 'abs(mcPDG)' --variables eid muid Kid piid prid 'useCMSFrame(p)' chiProb", shell=True)
+                "--methodConfig '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:"
+                "NTreeLayers=3' --target 'abs(mcPDG)' --variables eid muid Kid piid prid 'useCMSFrame(p)' chiProb", shell=True)
 
 main = create_path()
 inputMdstList(filelist, path=main)

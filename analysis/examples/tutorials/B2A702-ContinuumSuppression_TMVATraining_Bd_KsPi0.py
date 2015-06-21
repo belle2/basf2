@@ -136,8 +136,9 @@ variables = [
 
 # Define the methods
 methods = [
-    ('FastBDT', 'Plugin', 'H:V:CreateMVAPdfs:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'),
-    ('NeuroBayes', 'Plugin', 'H:V:CreateMVAPdfs:NtrainingIter=20:Preprocessing=612:ShapeTreat=DIAG:TrainingMethod=BFGS')
+    ('FastBDT', 'Plugin', 'H:V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'),
+    ('NeuroBayes', 'Plugin', 'H:V:CreateMVAPdfs:NbinsMVAPdf=100:NtrainingIter=20:Preprocessing=612:ShapeTreat=DIAG:'
+     'TrainingMethod=BFGS')
 ]
 
 

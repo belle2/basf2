@@ -78,8 +78,8 @@ print statistics
 # the average signal weight is 1 AND SumSignalEvents == SumBackgroundEvents)
 import subprocess
 subprocess.call("externTeacher --workingDirectory TMVA --prefix Sampling --methodName FastBDT --methodType Plugin "
-                "--methodConfig '!H:!V:CreateMVAPdfs:NTrees=400:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3' "
-                "--target isSignal --variables eid 'useCMSFrame(p)' chiProb "
+                "--methodConfig '!H:!V:CreateMVAPdfs:NbinsMVAPdf=100:NTrees=400:Shrinkage=0.10:RandRatio=0.5:"
+                "NCutLevel=8:NTreeLayers=3' --target isSignal --variables eid 'useCMSFrame(p)' chiProb "
                 "--prepareOption '!V:SplitMode=random:MixMode=SameAsSplitMode:NormMode=EqualNumEvents'", shell=True)
 
 # TMVA offers a lot of possibilities, there is a TMVAUserGuide which describes covers the possibilities.

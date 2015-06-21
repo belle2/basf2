@@ -28,10 +28,10 @@ The syntaxn of the --check-quantity option is the following:
 As an example, to identfiy the commit which made the tracking efficiency drop below 0.93, the
 following snippet can be used:
 
-git bisect good 057a1feb7f6c3a8fe39514ff85680980e730e520
-git bisect bad 2b69fa4
+git bisect good <last good release>
+git bisect bad <first bad release>
 git bisect run bisectValidation.py --execute runTrackingEfficiency.sh_explicit
-                                   --check-quantity "TrackingValidation.root:hEfficiency[2]:>:0.93"
+    --check-quantity "TrackingValidation.root:hEfficiency[2]:>:0.93"
 
  Author: The Belle II Collaboration
  Contributors: Thomas Hauth
@@ -97,10 +97,12 @@ def extract_information_from_file(file_name, results):
 
     return results
 
-# parses the quantity string, including its brackets
-
 
 def parseCheckQuantity(quantString):
+    """!
+    parses the quantity string, including its brackets
+    """
+
     fragments = quantString.split(":")
     if len(fragments) == 4:
         filename = fragments[0].strip()
@@ -120,15 +122,23 @@ def parseCheckQuantity(quantString):
 
     return (filename, quant, comp, val)
 
-parser = argparse.ArgumentParser(description='Evaluate status of the compile and validation of a specific basf2 revision.')
+# setup argument parser options
+parser = argparse.ArgumentParser(description='Evaluate status of the compile and validation of a '
+                                             'specific basf2 revision.')
+parser.add_argument('--skip-compile', action='store_true',
+                    default=False,
+                    help='Do not trigger a compile, useful for saving time when '
+                    'setting up the quantity checks.')
 parser.add_argument('--report-compile-fail', action='store_true',
                     default=False,
-                    help='Report a bad revision to git if the code base did not compile. By default, failing compiles are ignored.')
+                    help='Report a bad revision to git if the code base did not'
+                         'compile. By default, failing compiles are ignored.')
 parser.add_argument(
     '--report-execution-fail',
     action='store_true',
     default=False,
-    help='Report a bad revision to git if the provided script has an error code != 0. By default, this is reported to git.')
+    help='Report a bad revision to git if the provided script has an '
+         'error code != 0. By default, this is reported to git.')
 parser.add_argument('--check-quantity', action="append",
                     help='Check for a quantity in validation files')
 parser.add_argument('--execute', action="append",
@@ -137,11 +147,15 @@ parser.add_argument('--script', action="append",
                     help='Name of validation script to run after the compile '
                          'and before the quantity check. Only this validation script and '
                          'all scripts it depends on are executed.')
-# check quantity format
-# 'filename.root:hEfficiency[2]:<:0.95'
 args = parser.parse_args()
 argsVar = vars(args)
 
+# output current git commit and svn revision
+os.system("echo -n 'git commit ' && git rev-parse HEAD")
+os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse HEAD`")
+
+# see if quantities must be checkd and
+# make sure the expression can be properly parsed
 if argsVar["check_quantity"] is None:
     argsVar["check_quantity"] = []
 
@@ -149,22 +163,18 @@ c_parsed = []
 for c_string in argsVar["check_quantity"]:
     c_parsed = c_parsed + [parseCheckQuantity(c_string)]
 
-print argsVar
-print "Compiling revision ..."
-
-os.system("echo -n 'git commit ' && git rev-parse HEAD")
-os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse HEAD`")
-
-exitCode = os.system("scons -j8")
-print "Exit code of compile was " + str(exitCode)
-if exitCode > 0 and argsVar["report_compile_fail"]:
-    sys.exit(125)  # tell git to ignore this failed build
+if argsVar["skip_compile"] is False:
+    print "Compiling revision ..."
+    exitCode = os.system("scons -j8")
+    print "Exit code of compile was " + str(exitCode)
+    if exitCode > 0 and argsVar["report_compile_fail"]:
+        sys.exit(125)  # tell git to ignore this failed build
 
 # execute validation script
 if argsVar["script"] is None:
     argsVar["script"] = []
 
-validation_scripts = reduce(lambda x, y: x + " " + y, "")
+validation_scripts = reduce(lambda x, y: x + " " + y, argsVar["script"], "")
 if len(validation_scripts) > 0:
     validation_call = "validate_basf2.py -s " + validation_scripts
     exitCode = os.system(validation_call)

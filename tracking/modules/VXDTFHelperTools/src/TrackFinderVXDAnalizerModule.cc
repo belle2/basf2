@@ -18,6 +18,7 @@
 #include <tracking/spacePointCreation/PurityCalculatorTools.h>
 #include <tracking/trackFindingVXD/analyzingTools/AnalizerTCInfo.h>
 #include <tracking/trackFindingVXD/analyzingTools/AnalyzingAlgorithmFactory.h>
+#include <tracking/trackFindingVXD/analyzingTools/AlgoritmType.h>
 #include <tracking/vectorTools/B2Vector3.h>
 
 //root-stuff
@@ -48,24 +49,27 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
   rootFileNameVals.push_back("TrackFinderVXDAnalizerResults");
   rootFileNameVals.push_back("RECREATE");
 
-  vector<vector<string> > parametersToBeTracked = {
-    {"Contaminated", "AnalyzingAlgorithmResidualP"},
-    {"Clean", "AnalyzingAlgorithmResidualP"},
-    {"Perfect", "AnalyzingAlgorithmResidualP"},
-    {"Contaminated", "AnalyzingAlgorithmResidualPosition"},
-    {"Clean", "AnalyzingAlgorithmResidualPosition"},
-    {"Perfect", "AnalyzingAlgorithmResidualPosition"},
-    {"Contaminated", "AnalyzingAlgorithmValuePT"},
-    {"Clean", "AnalyzingAlgorithmValuePT"},
-    {"Perfect", "AnalyzingAlgorithmValuePT"}
+
+  vector< vector< vector< string> > > trackedParametersDouble = {
+    {{"Contaminated"}, {"AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"}},
+    {{"Clean"}, {"AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"}},
+    {{"Perfect"}, {"AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"}}
+  };
+
+  vector< vector< vector< string> > > trackedParametersInt = {
+    {{"Clean"}, {"AnalyzingAlgorithmLostUClusters", "AnalyzingAlgorithmLostVClusters"}}
+  };
+
+
+  vector< vector< vector< string> > > trackedParametersVecDouble = {
+    {{"Clean"}, {"AnalyzingAlgorithmLostUEDep", "AnalyzingAlgorithmLostVEDep"}}
   };
 
   //Set module properties
   setDescription("analyzes quality of SpacePointTrackCands delivered by a test-TF compared to a reference TF");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-//   addParam("fileExportMcTracks", m_PARAMFileExportMcTracks, "export mc Trackfinder tracks into file", bool(false)); // TODO outdated, to be deleted...
-  //   addParam("fileExportTfTracks", m_PARAMFileExportTfTracks, "export vxd Trackfinder tracks into file", bool(false)); // TODO outdated, to be deleted...
+
   addParam("referenceTCname", m_PARAMreferenceTCname, "the name of the storeArray container provided by the reference TF",
            string("mcTracks"));
   addParam("testTCname", m_PARAMtestTCname, "the name of the storeArray container provided by the TF to be evaluated", string(""));
@@ -93,9 +97,19 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
            " only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot'=true  ",
            rootFileNameVals);
 
-  addParam("parametersToBeTracked", m_PARAMparametersToBeTracked,
-           "accepts a vector of pairs of entries, each pair determines a TC type (first entry) and the algorithm to be used (second entry)",
-           parametersToBeTracked);
+  addParam("trackedParametersDouble", m_PARAMtrackedParametersDouble,
+           "set here all parameters to be tracked which use an algorithm storing one double per tc. Accepts a vector of vector of vector of strings of entries. Sample usage in steering file: param('trackedParametersDouble', [ [ ['Perfect'], ['AnalyzingAlgorithmValuePX', 'AnalyzingAlgorithmResidualP'] ] ]) first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType",
+           trackedParametersDouble);
+
+  addParam("trackedParametersInt", m_PARAMtrackedParametersInt,
+           "set here all parameters to be tracked which use an algorithm storing one int per tc. Accepts a vector of vector of vector of strings of entries. Sample usage in steering file: param('trackedParametersDouble', [ [ ['Contaminated'], ['AnalyzingAlgorithmLostUClusters', 'AnalyzingAlgorithmLostVClusters'] ] ]) first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType",
+           trackedParametersInt);
+
+  addParam("trackedParametersVecDouble", m_PARAMtrackedParametersVecDouble,
+           "set here all parameters to be tracked which use an algorithm storing one vector< double> per tc. Accepts a vector of vector of vector of strings of entries. Sample usage in steering file: param('trackedParametersDouble', [ [ ['Clean'], ['AnalyzingAlgorithmLostUEDep', 'AnalyzingAlgorithmLostVEDep'] ] ]) first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType",
+           trackedParametersVecDouble);
+
+
   addParam("origin", m_PARAMorigin, " only allowed size: 3. stores coordinates of the origin used", {0, 0, 0});
   addParam("useMCDataForValues", m_PARAMuseMCDataForValues,
            "if true, for testTC the values of attached refTC will be stored instead of own values. - why are there values of the refTC stored? we want to know the real data, not the guesses of the reconstructed data. Deviations of reference values to guesses of the reconstructed data will be stored in resiudals anyway."
@@ -127,31 +141,82 @@ void TrackFinderVXDAnalizerModule::initialize()
       output += "'" + entry + "' ";
     }
     B2FATAL("TrackFinderVXDAnalizer::initialize(), rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
-            <<
-            output)
+            << output)
   }
 
   // deal with algorithms:
   m_rootParameterTracker.initialize(m_PARAMrootFileName[0] + ".root", m_PARAMrootFileName[1]);
-  for (auto& parameterSet : m_PARAMparametersToBeTracked) {
-    if (parameterSet.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'parametersToBeTracked' was mis-used! Please read the documentation!") }
+  // typedef for increased readability:
+  using AlgorithmDouble = AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>;
+  using AlgorithmInt = AnalyzingAlgorithmBase<int, AnalizerTCInfo, TVector3>;
+  using AlgorithmVecDouble = AnalyzingAlgorithmBase<vector<double>, AnalizerTCInfo, TVector3>;
 
-    // store in internal bla, prepare branch
-    m_rootParameterTracker.addParameters(parameterSet[0], parameterSet[1]);
+
+  // prepare all algorithms which store a double per tc:
+  for (auto& parameterPackage : m_PARAMtrackedParametersDouble) {
+    // check if parameterPackage has two entries: first is TCType, second is vector of algorithms
+    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+
+    // check if vector for tcType is really only one entry
+    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+
+    std::string tcTypeName = parameterPackage.front()[0];
+    if (TCType::isValidName(tcTypeName) == false)
+    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")") }
+
+    // for each algorithm, store a branch:
+    for (auto& algorithm : parameterPackage.back()) {
+      if (AlgoritmType::isValidName(algorithm) == false)
+      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersDouble' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")") }
+      m_rootParameterTracker.addParameters4DoubleAlgorithms(tcTypeName, algorithm);
+    }
   }
+  AlgorithmDouble::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmDouble::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 
+  // prepare all algorithms which store an int per tc:
+  for (auto& parameterPackage : m_PARAMtrackedParametersInt) {
+    // check if parameterPackage has two entries: first is TCType, second is vector of algorithms
+    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (wrong number of added parameters)") }
 
-  AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>().setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1],
-      m_PARAMorigin[2]));
+    // check if vector for tcType is really only one entry
+    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (wrong number of added parameters)") }
 
-  AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>().setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
+    std::string tcTypeName = parameterPackage.front()[0];
+    if (TCType::isValidName(tcTypeName) == false)
+    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")") }
 
-//   AnalyzingAlgorithmBase<double, AnalizerTCInfo, TVector3>* algo = AnalyzingAlgorithmFactory<double, AnalizerTCInfo, TVector3>
-//       (string("AnalyzingAlgorithmBase"));
-//
-//   B2DEBUG(1, " TrackFinderVXDAnalizerModule::initialize(): algo is " << algo->getID())
-//
-//   delete algo;
+    // for each algorithm, store a branch:
+    for (auto& algorithm : parameterPackage.back()) {
+      if (AlgoritmType::isValidName(algorithm) == false)
+      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersInt' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")") }
+      m_rootParameterTracker.addParameters4IntAlgorithms(tcTypeName, algorithm);
+    }
+  }
+  AlgorithmInt::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmInt::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
+
+  // prepare all algorithms which store a vector< double> per tc:
+  for (auto& parameterPackage : m_PARAMtrackedParametersVecDouble) {
+    // check if parameterPackage has two entries: first is TCType, second is vector of algorithms
+    if (parameterPackage.size() != 2) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+
+    // check if vector for tcType is really only one entry
+    if (parameterPackage.front().size() != 1) { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (wrong number of added parameters)") }
+
+    std::string tcTypeName = parameterPackage.front()[0];
+    if (TCType::isValidName(tcTypeName) == false)
+    { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (invalid tcType: " << tcTypeName << ")") }
+
+    // for each algorithm, store a branch:
+    for (auto& algorithm : parameterPackage.back()) {
+      if (AlgoritmType::isValidName(algorithm) == false)
+      { B2FATAL("TrackFinderVXDAnalizer::initialize(), parameter 'trackedParametersVecDouble' was mis-used! Please read the documentation! (invalid algorithmType: " << algorithm << ")") }
+      m_rootParameterTracker.addParameters4VecDoubleAlgorithms(tcTypeName, algorithm);
+    }
+  }
+  AlgorithmVecDouble::setOrigin(TVector3(m_PARAMorigin[0], m_PARAMorigin[1], m_PARAMorigin[2]));
+  AlgorithmVecDouble::setWillRefTCdataBeUsed4TestTCs(m_PARAMuseMCDataForValues);
 }
 
 
@@ -161,9 +226,6 @@ void TrackFinderVXDAnalizerModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(10, "################## entering TrackFinderVXDAnalizerModule - event " << m_eventCounter << " ######################");
-
-//   RootVariables rootVariables; // storing all root related infos
-//   m_forRootCountFoundIDs.clear(); // reset foundIDs-counter
 
   int nReferenceTCs = m_referenceTCs.getEntries();
   m_mcTrackCounter += nReferenceTCs;

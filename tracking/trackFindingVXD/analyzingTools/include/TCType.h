@@ -19,7 +19,7 @@
 
 
 namespace Belle2 {
-  /** Small class containing enums and converter from and to strings */
+  /** Small class for classifying types of reconstructed track candidates. Contains enums and converter from and to strings */
   class TCType {
   public:
 
@@ -41,13 +41,28 @@ namespace Belle2 {
     };
 
 
+    // WARNING TODO: and isValidString (and for AlgorithmType the same...)
+    /** checks if a type given is a valid type for a TCType */
+    static bool isValidType(TCType::Type type)
+    {
+      return ((TCType::s_fromTypeToString.find(type) == TCType::s_fromTypeToString.end()) ? false : true);
+    }
+
+
+    /** checks if the name given is a valid name for a TCType */
+    static bool isValidName(std::string type)
+    {
+      return ((TCType::s_fromStringToType.find(type) == TCType::s_fromStringToType.end()) ? false : true);
+    }
+
+
     /** for given TCType the corresponding string-name will be returned. For invalid types, UnknownType will be passed */
     static std::string getTypeName(TCType::Type type)
     {
-      auto pos = TCType::m_fromTypeToString.find(type);
-      if (pos == TCType::m_fromTypeToString.end()) {
+      auto pos = TCType::s_fromTypeToString.find(type);
+      if (pos == TCType::s_fromTypeToString.end()) {
         B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!")
-        return TCType::m_fromTypeToString[UnknownType];
+        return TCType::s_fromTypeToString[UnknownType];
       }
       return pos->second;
     }
@@ -56,10 +71,10 @@ namespace Belle2 {
     /** for given string name of a TCType the corresponding TCType will be returned. For invalid types, UnknownType will be passed */
     static TCType::Type getTypeEnum(std::string type)
     {
-      auto pos = TCType::m_fromStringToType.find(type);
-      if (pos == TCType::m_fromStringToType.end()) {
+      auto pos = TCType::s_fromStringToType.find(type);
+      if (pos == TCType::s_fromStringToType.end()) {
         B2ERROR("TCType::getTypeName(): given iD " << type << " is not a valid TCType, returnint TCType::UnknownType!")
-        return TCType::m_fromStringToType[std::string("UnknownType")];
+        return TCType::s_fromStringToType[std::string("UnknownType")];
       }
       return pos->second;
     }
@@ -92,10 +107,10 @@ namespace Belle2 {
 
   protected:
     /** static map allowing translation from a given type to its name stored as a string */
-    static std::map<Type, std::string> m_fromTypeToString;
+    static std::map<Type, std::string> s_fromTypeToString;
 
     /** static map allowing translation from a given name stored as a string to its type */
-    static std::map<std::string, Type> m_fromStringToType;
+    static std::map<std::string, Type> s_fromStringToType;
   };
 
 

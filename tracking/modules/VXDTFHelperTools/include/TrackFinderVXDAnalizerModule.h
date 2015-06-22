@@ -37,107 +37,29 @@ namespace Belle2 {
     public:
 
 
-
-
-      /** internal datastore for root export */
-      struct RootVariables  {
-        std::vector<double>
-        PXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF*/
-        std::vector<double>
-        PYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF */
-        std::vector<double>
-        PZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF */
-
-        std::vector<double> MCMomValues; /**< used to store all momentum values of tracks reconstructed by the MCTF */
-        std::vector<double> CAMomValues; /**< used to store all momentum values of tracks reconstructed by the CATF */
-
-        std::vector<double>
-        CAMomResiduals; /**< used to store all momentum residuals (true - estimated) of tracks reconstructed by the CATF */
-
-        std::vector<double> MCpTValues; /**< used to store all pT values of tracks reconstructed by the MCTF */
-        std::vector<double> CApTValues; /**< used to store all pT values of tracks reconstructed by the CATF */
-        std::vector<double> totalpTValues; /**< used to store all pT values of tracks existing no matter they produced hits or not */
-
-        std::vector<double>
-        CApTResiduals; /**< used to store all pT residuals (true - estimated) of tracks reconstructed by the CATF */
-
-        std::vector<double> MCThetaValues; /**< used to store all theta values of tracks reconstructed by the MCTF */
-        std::vector<double> CAThetaValues; /**< used to store all theta values of tracks reconstructed by the CATF */
-        std::vector<double> totalThetaValues; /**< used to store all theta values of tracks existing no matter they produced hits or not */
-
-        std::vector<double>
-        CAThetaResiduals; /**< used to store all theta residuals (true - estimated) of tracks reconstructed by the CATF */
-
-
-        std::vector<double> MCPhiValues; /**< used to store all Phi values of tracks reconstructed by the MCTF */
-        std::vector<double> CAPhiValues; /**< used to store all Phi values of tracks reconstructed by the CATF */
-        std::vector<double> totalPhiValues; /**< used to store all Phi values of tracks existing no matter they produced hits or not */
-
-        std::vector<double>
-        CAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of tracks reconstructed by the CATF */
-
-        std::vector<double>
-        MCVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the MCTF */
-        std::vector<double>
-        CAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the CATF */
-        std::vector<double>
-        totalVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
-
-        std::vector<double>
-        MCVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the MCTF */
-        std::vector<double>
-        CAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the CATF */
-        std::vector<double>
-        totalVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
-
-        std::vector<double>
-        MCVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the MCTF */
-        std::vector<double>
-        CAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the CATF */
-        std::vector<double>
-        totalVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
-
-        std::vector<double>
-        CAMomResidualAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of full tracks reconstructed by the CATF */
-
-        std::vector<double>
-        CApTResidualAngles; /**< used to store all residuals (true - estimated) of the pT vectors difference in direction of full tracks reconstructed by the CATF */
-
-        std::vector<double>
-        CASeedPositionResiduals; /**< used to store all residuals (true - estimated) of position of the seed hit of tracks reconstructed by the CATF*/
-
-        std::vector<int> mCreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the MCTF */
-        std::vector<int> cAreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the CATF */
-
-        std::vector<int> lostUClusters; /**< used to store the number of uClusters of lost MCTCs not found by the TF */
-        std::vector<int> lostVClusters; /**< used to store the number of vClusters of lost MCTCs not found by the TF */
-        std::vector<int> totalMcUClusters; /**< used to store the number of uClusters of all MCTCs */
-        std::vector<int> totalMcVClusters; /**< used to store the number of vClusters of all MCTCs */
-
-        std::vector<double> lostUClusterEDep; /**< used to store the energy deposition of uClusters of lost MCTCs not found by the TF */
-        std::vector<double> lostVClusterEDep; /**< used to store the energy deposition of vClusters of lost MCTCs not found by the TF */
-        std::vector<double> totalMcUClusterEDep; /**< used to store the energy deposition of uClusters of all MCTCs */
-        std::vector<double> totalMcVClusterEDep; /**< used to store the energy deposition of vClusters of all MCTCs */
-      };
-
-
       /** constructor */
       TrackFinderVXDAnalizerModule();
+
 
       /** destructor */
       virtual ~TrackFinderVXDAnalizerModule() {}
 
+
       /** inizialize function */
       virtual void initialize();
+
 
       /** beginRun function */
       virtual void beginRun() {}
 
+
       /** event function */
       virtual void event();
 
+
       /** endRun function */
       virtual void endRun();
+
 
       /** terminate function */
       virtual void terminate();
@@ -237,171 +159,41 @@ namespace Belle2 {
       double m_PARAMminTMomentumFilter; /**< to narrow down the relevant mcTracks, this minFilter can be set to filter tracks having lower transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
       double m_PARAMmaxTMomentumFilter; /**< to narrow down the relevant mcTracks, this maxFilter can be set to filter tracks having higher transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
 
-      std::vector< std::vector < std::string > >
-      m_PARAMparametersToBeTracked; /**< accepts a vector of pairs of entries, each pair determines a TC type (first entry) and the algorithm to be used (second entry */
-// rootStuff:
+      /**< set here all parameters to be tracked which use an algorithm storing one double per tc.
+      *
+      * Accepts a vector of vector of vector of strings of entries.
+      * Sample usage in steering file:
+      * param('trackedParametersDouble', [ [ ["Perfect"], ["AnalyzingAlgorithmValuePX", "AnalyzingAlgorithmResidualP"] ] ])
+      * first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType */
+      std::vector< std::vector<std::vector<std::string> > > m_PARAMtrackedParametersDouble;
+
+      /**< set here all parameters to be tracked which use an algorithm storing one int per tc.
+       *
+       * Accepts a vector of vector of vector of strings of entries.
+       * Sample usage in steering file:
+       * param('trackedParametersDouble', [ [ ["Contaminated"], ["AnalyzingAlgorithmLostUClusters", "AnalyzingAlgorithmLostVClusters"] ] ])
+       * first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType */
+      std::vector< std::vector<std::vector<std::string> > > m_PARAMtrackedParametersInt;
+
+      /**< set here all parameters to be tracked which use an algorithm storing one vector< double> per tc.
+       *
+       * Accepts a vector of vector of vector of strings of entries.
+       * Sample usage in steering file:
+       * param('trackedParametersDouble', [ [ ["Clean"], ["AnalyzingAlgorithmLostUEDep", "AnalyzingAlgorithmLostVEDep"] ] ])
+       * first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType */
+      std::vector< std::vector<std::vector<std::string> > > m_PARAMtrackedParametersVecDouble;
+
+
+      // rootStuff:
       bool m_PARAMwriteToRoot; /**< if true, analysis data is stored to root file with file name chosen by 'rootFileName' */
       std::vector<std::string>
-      m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used only if 'writeToRoot' = true */
-//       TFile* m_rootFilePtr; /**< pointer at root file used for p-value-output */
-//       TTree* m_treePtr; /**< pointer at root tree used for p-value-output */
-//       std::vector<double>
-//       m_rootTotalPXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF*/
-//       std::vector<double>
-//       m_rootTotalPYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF */
-//       std::vector<double>
-//       m_rootTotalPZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF */
-//
-//       std::vector<double>
-//       m_rootCleanPXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF (clean) */
-//       std::vector<double>
-//       m_rootCleanPYresiduals;/**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean) */
-//       std::vector<double>
-//       m_rootCleanPZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean) */
-//
-//       std::vector<double>
-//       m_rootCompletePXresiduals; /**< used to store all residuals (true - estimated) of the momentum in x-direction which were reconstructed by the VXDTF  (clean and no hits missing) */
-//       std::vector<double>
-//       m_rootCompletePYresiduals; /**< used to store all residuals (true - estimated) of the momentum in y-direction which were reconstructed by the VXDTF (clean and no hits missing) */
-//       std::vector<double>
-//       m_rootCompletePZresiduals; /**< used to store all residuals (true - estimated) of the momentum in z-direction which were reconstructed by the VXDTF (clean and no hits missing) */
-//
-//       std::vector<double> m_rootTotalMCMomValues; /**< used to store all momentum values of tracks reconstructed by the MCTF */
-//       std::vector<double> m_rootTotalCAMomValues; /**< used to store all momentum values of tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCleanCAMomValues; /**< used to store all momentum values of clean tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCompleteCAMomValues; /**< used to store all momentum values of full tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootTotalMomValues; /**< used to store all momentum values of tracks existing no matter they produced hits or not */
-//
-//       std::vector<double>
-//       m_rootTotalCAMomResiduals; /**< used to store all momentum residuals (true - estimated) of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAMomResiduals; /**< used to store all momentum residuals (true - estimated) of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAMomResiduals; /**< used to store all momentum residuals (true - estimated) of full tracks reconstructed by the CATF */
-//
-//       std::vector<double> m_rootTotalMCpTValues; /**< used to store all pT values of tracks reconstructed by the MCTF */
-//       std::vector<double> m_rootTotalCApTValues; /**< used to store all pT values of tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCleanCApTValues; /**< used to store all pT values of clean tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCompleteCApTValues; /**< used to store all pT values of full tracks reconstructed by the CATF */
-//       std::vector<double> m_rootTotalpTValues; /**< used to store all pT values of tracks existing no matter they produced hits or not */
-//
-//       std::vector<double>
-//       m_rootTotalCApTResiduals; /**< used to store all pT residuals (true - estimated) of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCApTResiduals; /**< used to store all pT residuals (true - estimated) of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCApTResiduals; /**< used to store all pT residuals (true - estimated) of full tracks reconstructed by the CATF */
-//
-//       std::vector<double> m_rootTotalMCThetaValues; /**< used to store all theta values of tracks reconstructed by the MCTF */
-//       std::vector<double> m_rootTotalCAThetaValues; /**< used to store all theta values of tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCleanCAThetaValues; /**< used to store all theta values of clean tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCompleteCAThetaValues; /**< used to store all theta values of full tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootTotalThetaValues; /**< used to store all theta values of tracks existing no matter they produced hits or not */
-//
-//       std::vector<double>
-//       m_rootTotalCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAThetaResiduals; /**< used to store all theta residuals (true - estimated) of full tracks reconstructed by the CATF */
-//
-//       std::vector<double> m_rootTotalMCPhiValues; /**< used to store all Phi values of tracks reconstructed by the MCTF */
-//       std::vector<double> m_rootTotalCAPhiValues; /**< used to store all Phi values of tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCleanCAPhiValues; /**< used to store all Phi values of clean tracks reconstructed by the CATF */
-//       std::vector<double> m_rootCompleteCAPhiValues; /**< used to store all Phi values of full tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootTotalPhiValues; /**< used to store all Phi values of tracks existing no matter they produced hits or not */
-//
-//       std::vector<double>
-//       m_rootTotalCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAPhiResiduals; /**< used to store all Phi residuals (true - estimated) of full tracks reconstructed by the CATF */
-//
-//
-//       std::vector<double>
-//       m_rootTotalMCVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the MCTF */
-//       std::vector<double>
-//       m_rootTotalCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of full tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootTotalVertex2IP3DValues; /**< used to store all Vertex2IP3D (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
-//
-//       std::vector<double>
-//       m_rootTotalMCVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the MCTF */
-//       std::vector<double>
-//       m_rootTotalCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of full tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootTotalVertex2IPXYValues; /**< used to store all Vertex2IPXY (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
-//
-//       std::vector<double>
-//       m_rootTotalMCVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the MCTF */
-//       std::vector<double>
-//       m_rootTotalCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of full tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootTotalVertex2IPZValues; /**< used to store all Vertex2IPZ (distance of vertex to origin) values of tracks existing no matter they produced hits or not */
-//
-//
-//       std::vector<double>
-//       m_rootTotalCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCAMomResidualsAngles; /**< used to store all residuals (true - estimated) of the total momentum vectors difference in direction of full tracks reconstructed by the CATF */
-//
-//       std::vector<double>
-//       m_rootTotalCApTResidualsAngles; /**< used to store all residuals (true - estimated) of the pT vectors difference in direction of tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCleanCApTResidualsAngles; /**< used to store all residuals (true - estimated) of the pT vectors difference in direction of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCApTResidualsAngles; /**< used to store all residuals (true - estimated) of the pT vectors difference in direction of full tracks reconstructed by the CATF */
-//
-//       std::vector<double>
-//       m_rootTotalCASeedPositionResiduals; /**< used to store all residuals (true - estimated) of position of the seed hit of tracks reconstructed by the CATF*/
-//       std::vector<double>
-//       m_rootCleanCASeedPositionResiduals; /**< used to store all residuals (true - estimated) of position of the seed hit of clean tracks reconstructed by the CATF */
-//       std::vector<double>
-//       m_rootCompleteCASeedPositionResiduals; /**< used to store all residuals (true - estimated) of position of the seed hit of full tracks reconstructed by the CATF */
+      m_PARAMrootFileName; /**< only two entries accepted, first one is the root filename, second one is 'RECREATE' or 'UPDATE' which is the write mode for the root file, parameter is used  */
 
-      std::vector<int> m_rootMCreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the MCTF */
-      std::vector<int> m_rootCAreconstructedTrackLength; /**< used to store all track length values of tracks reconstructed by the CATF */
-
-
-      std::vector<int> m_rootLostUClusters; /**< used to store the number of uClusters of lost MCTCs not found by the TF */
-      std::vector<int> m_rootLostVClusters; /**< used to store the number of vClusters of lost MCTCs not found by the TF */
-      std::vector<int> m_rootTotalMcUClusters; /**< used to store the number of uClusters of all MCTCs */
-      std::vector<int> m_rootTotalMcVClusters; /**< used to store the number of vClusters of all MCTCs */
-
-      std::vector<double>
-      m_rootLostUClusterEDep; /**< used to store the energy deposition of uClusters of lost MCTCs not found by the TF */
-      std::vector<double>
-      m_rootLostVClusterEDep; /**< used to store the energy deposition of vClusters of lost MCTCs not found by the TF */
-      std::vector<double> m_rootTotalMcUClusterEDep; /**< used to store the energy deposition of uClusters of all MCTCs */
-      std::vector<double> m_rootTotalMcVClusterEDep; /**< used to store the energy deposition of vClusters of all MCTCs */
-
+      // TODO: check if the following issue is still there for new RootParameterTracker-design:
       std::vector<int>
       m_forRootCountFoundIDs; /**< dirty hack to guarantee that no double found TCs are counted for the efficiency, gets deleted at the beginning of each event and stores each found ID of the event once */
 
 
-
-      /// WARNING TODO maybe outdated, check if still needed or to be implemented before deleting them!
-//       bool m_PARAMFileExportMcTracks; /**< possibly needed later (currently not in use), exports McTracks to File */
-//       bool m_PARAMFileExportTfTracks; /**< possibly needed later (currently not in use), exports TfTracks to File */
-//       bool m_PARAMprintExtentialAnalysisData; /**< set true, if you want to cout special Info to the shell (where it can be stored into a file and grep-ed to find specific info) */
     private:
 
     };

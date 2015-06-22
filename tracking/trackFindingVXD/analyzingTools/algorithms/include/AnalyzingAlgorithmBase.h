@@ -15,6 +15,7 @@
 
 // tracking:
 #include<tracking/trackFindingVXD/analyzingTools/TCType.h>
+#include<tracking/trackFindingVXD/analyzingTools/AlgoritmType.h>
 
 // stl:
 #include <string>
@@ -45,11 +46,11 @@ namespace Belle2 {
 
 
     /** carries unique ID */
-    std::string m_iD;
+    AlgoritmType::Type m_iD;
 
 
     /** stores the origin used for some calculations, can be set here */
-    static VectorType m_origin;
+    static VectorType s_origin;
 
 
     /** if true, for testTC the values of attached refTC will be stored instead of own values.
@@ -62,8 +63,10 @@ namespace Belle2 {
 
 
     /** constructor used for inheriting classes */
-    AnalyzingAlgorithmBase(std::string newID) : m_iD(newID) {}
+    AnalyzingAlgorithmBase(AlgoritmType::Type newID) : m_iD(newID) {}
 
+    /** constructor used for inheriting classes */
+    AnalyzingAlgorithmBase(std::string newID) : m_iD(AlgoritmType::getTypeEnum(newID)) {}
 
     /** copy constructor */
     AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) : m_iD(algo.m_iD)
@@ -112,7 +115,7 @@ namespace Belle2 {
 
 
     /** constructor */
-    AnalyzingAlgorithmBase() : m_iD("AnalyzingAlgorithmBase") {}
+    AnalyzingAlgorithmBase() : m_iD(AlgoritmType::AnalyzingAlgorithmBase) {}
 
 
     /** virtual destructor - derived classes need to write their own destructors if any other data members are added. */
@@ -124,23 +127,25 @@ namespace Belle2 {
 
 
     /** returns unique ID */
-    std::string getID() const { return m_iD; }
+    AlgoritmType::Type getID() const { return m_iD; }
 
+    /** returns unique ID as a string */
+    std::string getIDName() const { return AlgoritmType::getTypeName(m_iD); }
 
     /** returns current value for the origin */
-    VectorType getOrigin() const { return m_origin; }
+    static VectorType& getOrigin() { return s_origin; }
 
 
     /** set origin for all inherited classes */
-    void setOrigin(VectorType newOrigin) { m_origin = newOrigin; }
+    static void setOrigin(VectorType newOrigin) { s_origin = newOrigin; }
 
 
     /** returns current choice for behavior of algorithms in terms of storing reference or testData for successfully matched TCs */
-    VectorType willRefTCdataBeUsed4TestTCs() const { return m_storeRefTCDataForTestTC; }
+    static bool willRefTCdataBeUsed4TestTCs() { return m_storeRefTCDataForTestTC; }
 
 
     /** set behavior of algorithms in terms of storing reference or testData for successfully matched TCs */
-    void setWillRefTCdataBeUsed4TestTCs(bool newBehavior) { m_storeRefTCDataForTestTC = newBehavior; }
+    static void setWillRefTCdataBeUsed4TestTCs(bool newBehavior) { m_storeRefTCDataForTestTC = newBehavior; }
 
 
     /** virtual class to calculate data. takes two TCInfos */
@@ -154,7 +159,7 @@ namespace Belle2 {
 
   /** setting the static origin to a standard value */
   template<class DataType, class TCInfoType, class VectorType>
-  VectorType AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_origin = VectorType(0, 0, 0);
+  VectorType AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin = VectorType(0, 0, 0);
 
 
   /** setting the static storeRefTCDataForTestTC to a standard value */
@@ -165,16 +170,24 @@ namespace Belle2 {
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>
   inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, std::string b)
-  {
-    return (a.getID() == b);
-  }
+  { return (a.getIDName() == b); }
 
 
   /** non-memberfunction Comparison for equality with a std::string */
   template <class DataType, class TCInfoType, class VectorType>
   inline bool operator == (std::string a, const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& b)
-  {
-    return (a == b.getID());
-  }
+  { return (a == b.getIDName()); }
+
+
+  /** non-memberfunction Comparison for equality with a AlgoritmType::Type */
+  template <class DataType, class TCInfoType, class VectorType>
+  inline bool operator == (const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& a, AlgoritmType::Type b)
+  { return (a.getID() == b); }
+
+
+  /** non-memberfunction Comparison for equality with a AlgoritmType::Type */
+  template <class DataType, class TCInfoType, class VectorType>
+  inline bool operator == (AlgoritmType::Type a, const AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>& b)
+  { return (a == b.getID()); }
 
 }

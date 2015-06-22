@@ -12,7 +12,7 @@
 using namespace Belle2;
 
 /** setting static dictionary translating type -> string */
-std::map<Belle2::TCType::Type, std::string> Belle2::TCType::m_fromTypeToString = {
+std::map<Belle2::TCType::Type, std::string> Belle2::TCType::s_fromTypeToString = {
   {Belle2::TCType::UnknownType, std::string("UnknownType")},
   {Belle2::TCType::Unclassified, std::string("Unclassified")},
   {Belle2::TCType::Lost, std::string("Lost")},
@@ -30,7 +30,7 @@ std::map<Belle2::TCType::Type, std::string> Belle2::TCType::m_fromTypeToString =
 
 
 /** setting static dictionary translating string -> type */
-std::map<std::string, Belle2::TCType::Type> Belle2::TCType::m_fromStringToType = {
+std::map<std::string, Belle2::TCType::Type> Belle2::TCType::s_fromStringToType = {
   {std::string("UnknownType"), Belle2::TCType::UnknownType},
   {std::string("Unclassified"), Belle2::TCType::Unclassified},
   {std::string("Lost"), Belle2::TCType::Lost},

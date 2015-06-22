@@ -26,10 +26,10 @@ namespace Belle2 {
   class AnalyzingAlgorithmValuePX : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmValuePX() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePX")) {}
+    AnalyzingAlgorithmValuePX() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(AlgoritmType::AnalyzingAlgorithmValuePX) {}
 
     /** returns the momentum in X */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.X(); }
   };
 
@@ -40,10 +40,10 @@ namespace Belle2 {
   class AnalyzingAlgorithmValuePY : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmValuePY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePY")) {}
+    AnalyzingAlgorithmValuePY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(AlgoritmType::AnalyzingAlgorithmValuePY) {}
 
     /** returns the momentum in Y */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Y(); }
   };
 
@@ -54,10 +54,10 @@ namespace Belle2 {
   class AnalyzingAlgorithmValuePZ : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmValuePZ() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePZ")) {}
+    AnalyzingAlgorithmValuePZ() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(AlgoritmType::AnalyzingAlgorithmValuePZ) {}
 
     /** returns the momentum in Z */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Z(); }
   };
 
@@ -68,10 +68,10 @@ namespace Belle2 {
   class AnalyzingAlgorithmValuePT : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmValuePT() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValuePT")) {}
+    AnalyzingAlgorithmValuePT() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(AlgoritmType::AnalyzingAlgorithmValuePT) {}
 
     /** returns the momentum in pT */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Perp(); }
   };
 
@@ -82,10 +82,10 @@ namespace Belle2 {
   class AnalyzingAlgorithmValueP : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
   public:
     /** constructor */
-    AnalyzingAlgorithmValueP() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(std::string("AnalyzingAlgorithmValueP")) {}
+    AnalyzingAlgorithmValueP() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>(AlgoritmType::AnalyzingAlgorithmValueP) {}
 
     /** returns the momentum in |p| */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Mag(); }
   };
 
@@ -97,10 +97,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePTheta() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmValuePTheta")) {}
+      (AlgoritmType::AnalyzingAlgorithmValuePTheta) {}
 
     /** returns the momentum in theta (in degrees) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Theta() * 180.*TMath::InvPi(); }
   };
 
@@ -112,10 +112,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmValuePPhi() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmValuePPhi")) {}
+      (AlgoritmType::AnalyzingAlgorithmValuePPhi) {}
 
     /** returns the momentum in phi (in degrees) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Phi() * 180.*TMath::InvPi(); }
   };
 
@@ -128,11 +128,11 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmValueDistSeed2IP() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmValueDistSeed2IP")) {}
+      (AlgoritmType::AnalyzingAlgorithmValueDistSeed2IP) {}
 
     /** returns the the seed position in 3D */
-    virtual DataType calcData(const TCInfoType& aTC)
-    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_origin).Mag(); }
+    DataType calcData(const TCInfoType& aTC) override
+    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin).Mag(); }
   };
 
 
@@ -143,11 +143,11 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmValueDistSeed2IPXY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmValueDistSeed2IPXY")) {}
+      (AlgoritmType::AnalyzingAlgorithmValueDistSeed2IPXY) {}
 
     /** returns the seed position in XY (=r) */
-    virtual DataType calcData(const TCInfoType& aTC)
-    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::m_origin).Perp(); }
+    DataType calcData(const TCInfoType& aTC) override
+    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin).Perp(); }
   };
 
 

@@ -30,10 +30,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPX() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPX")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPX) {}
 
     /** returns the residual (ref-test) of momentum in X */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.X() - tcs.testTC->momSeed.X();
@@ -48,10 +48,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPY")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPY) {}
 
     /** returns the residual (ref-test) of momentum in Y */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.Y() - tcs.testTC->momSeed.Y();
@@ -66,10 +66,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPZ() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPZ")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPZ) {}
 
     /** returns the residual (ref-test) of momentum in Z */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.Z() - tcs.testTC->momSeed.Z();
@@ -84,10 +84,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPT() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPT")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPT) {}
 
     /** returns the residual (ref-test) of momentum in pT */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.Perp() - tcs.testTC->momSeed.Perp();
@@ -102,10 +102,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualP() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualP")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualP) {}
 
     /** returns the residual (ref-test) of momentum in |p| */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.Mag() - tcs.testTC->momSeed.Mag();
@@ -120,10 +120,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPTheta() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPTheta")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPTheta) {}
 
     /** returns the residual (ref-test) of momentum in theta (in degrees) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.Theta() * 180.*TMath::InvPi() - tcs.testTC->momSeed.Theta() * 180.*TMath::InvPi();
@@ -138,10 +138,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPPhi() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPPhi")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPPhi) {}
 
     /** returns the residual (ref-test) of momentum in phi (in degrees) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.refTC->momSeed.Phi() * 180.*TMath::InvPi() - tcs.testTC->momSeed.Phi() * 180.*TMath::InvPi();
@@ -156,10 +156,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPAngle() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPAngle")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPAngle) {}
 
     /** returns the residual (ref-test) of momentum in its angle (direction residual in degrees) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return tcs.testTC->momSeed.Angle(tcs.refTC->momSeed) * 180.*TMath::InvPi();
@@ -174,10 +174,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPTAngle() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPTAngle")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPTAngle) {}
 
     /** returns the residual (ref-test) of pT in angle (transverse direction residual in degrees) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       VectorType refMom = tcs.refTC->momSeed;
@@ -196,10 +196,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPosition() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPosition")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPosition) {}
 
     /** returns the residual (ref-test) of the seed position in 3D */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return (tcs.refTC->posSeed - tcs.testTC->posSeed).Mag();
@@ -214,10 +214,10 @@ namespace Belle2 {
   public:
     /** constructor */
     AnalyzingAlgorithmResidualPositionXY() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
-      (std::string("AnalyzingAlgorithmResidualPositionXY")) {}
+      (AlgoritmType::AnalyzingAlgorithmResidualPositionXY) {}
 
     /** returns the residual (ref-test) of the seed position in XY (=r) */
-    virtual DataType calcData(const TCInfoType& aTC)
+    DataType calcData(const TCInfoType& aTC) override
     {
       const auto tcs = AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectPairOfTCs(aTC);
       return (tcs.refTC->posSeed - tcs.testTC->posSeed).Perp();

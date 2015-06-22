@@ -47,7 +47,7 @@ namespace Belle2 {
    */
 
 
-  /** takes care of collecting data and storing it to root branches. */
+  /** takes care of collecting data of track candidates and storing it to root branches. */
   class RootParameterTracker {
   protected:
 
@@ -59,6 +59,18 @@ namespace Belle2 {
     template<class DataType> using AnalyzingAlgorithm = AnalyzingAlgorithmBase<DataType, AnalizerTCInfo, TVector3>;
 
 
+    /** contains algorithms and its raw data to be streamed into ttrees.
+     *
+     * key of AlgoDataBox is tcType,
+     * val is another box with:
+     *  key is algorithmType
+     *  val is pair:
+     *   .first is the algorithm to be applied onto the AnalizerTCInfo-instances.
+     *   .second is the data collected for .first to be streamed into ttrees. */
+    template<class DataType> using AlgoDataBox =
+      StringKeyBox<StringKeyBox<std::pair<AnalyzingAlgorithm<DataType>*, std::vector<DataType>*>>>;
+
+
     /** contains all the trees for rootFile-filling later-on.
     *
     * Key is tcTypeName as a string
@@ -67,20 +79,58 @@ namespace Belle2 {
     StringKeyBox<TTree*> m_treeBox;
 
 
-    /** contains all the algorithms and its raw data to be streamed into ttrees.
-     *
-     * key of algoDataBox is tcType,
-     * val is another box with:
-     *  key is algorithmType
-     *  val is pair:
-     *   .first is the algorithm to be applied onto the AnalizerTCInfo-instances.
-     *   .second is the data collected for .first to be streamed into ttrees.
-     */
-    StringKeyBox< StringKeyBox< std::pair<AnalyzingAlgorithm<double>*, std::vector<double>*> > > m_algoDataBox;
+    /** contains all algorithms and its data storing one double per TC */
+    AlgoDataBox<double> m_algoDataDouble;
+
+
+    /** contains all algorithms and its data storing one int per TC */
+    AlgoDataBox<int> m_algoDataInt;
+
+
+    /** contains all algorithms and its data storing one vector of double per TC */
+    AlgoDataBox<std::vector<double>> m_algoDataVecDouble;
 
 
     /** stores pointer to file */
     TFile* m_file;
+
+
+    /** checks if ttree for given tcTypeName exists and creates it if not. returns ttree for given tcType */
+    TTree* prepareTTree(std::string tcTypeName)
+    {
+      if (m_file == NULL) {
+        B2FATAL("RootParameterTracker::prepareTTree(), Root file not initialized yet! Please call RootParameterTracker::initialize(...) first!")
+      }
+      m_file->cd();
+      //   m_file->ls();
+
+      ///make sure that tree exists:
+      TTree** tree4tcType = m_treeBox.find(tcTypeName);
+      if (tree4tcType == NULL) {
+        m_treeBox.push_back({
+          tcTypeName,
+          new TTree(tcTypeName.c_str(), (std::string("collects data collected to tcType ") + tcTypeName).c_str())
+        }
+                           );
+        tree4tcType = m_treeBox.find(tcTypeName);
+      }
+      B2DEBUG(5, "RootParameterTracker::prepareTTree(), m_treeBox has " << m_treeBox.size() << " entries")
+
+      return *tree4tcType;
+    }
+
+
+    /** takes aTC with tcTypeName and applies the algorithms for it */
+    void collectData4DoubleAlgorithms(std::string tcTypeName, const AnalizerTCInfo& aTC);
+
+
+    /** takes aTC with tcTypeName and applies the algorithms for it */
+    void collectData4IntAlgorithms(std::string tcTypeName, const AnalizerTCInfo& aTC);
+
+
+    /** takes aTC with tcTypeName and applies the algorithms for it */
+    void collectData4VecDoubleAlgorithms(std::string tcTypeName, const AnalizerTCInfo& aTC);
+
 
   public:
 
@@ -109,8 +159,22 @@ namespace Belle2 {
     }
 
 
-    /** for given tcTypename <-> algorithmName-combination, this tracker will be prepared for tracking them in a root-file. */
-    void addParameters(std::string tcTypeName, std::string algorithmName);
+    /** relevant for all algorithms storing one double per TC:
+    *
+    * for given tcTypename <-> algorithmName-combination, this tracker will be prepared for tracking them in a root-file. */
+    void addParameters4DoubleAlgorithms(std::string tcTypeName, std::string algorithmName);
+
+
+    /** relevant for all algorithms storing one int per TC:
+     *
+     * for given tcTypename <-> algorithmName-combination, this tracker will be prepared for tracking them in a root-file. */
+    void addParameters4IntAlgorithms(std::string tcTypeName, std::string algorithmName);
+
+
+    /** relevant for all algorithms storing one vector of double per TC:
+     *
+     * for given tcTypename <-> algorithmName-combination, this tracker will be prepared for tracking them in a root-file. */
+    void addParameters4VecDoubleAlgorithms(std::string tcTypeName, std::string algorithmName);
 
 
     /** take vector and fill for each tcType stored in rootParameterTracker */
@@ -126,42 +190,12 @@ namespace Belle2 {
       B2DEBUG(15, "RootParameterTracker::collectData(), size of given tcVector is: " << tcVector.size())
 
       for (const AnalizerTCInfo& tc : tcVector) {
-        std::string tcTypeName = TCType().getTypeName(tc.getType());
+        std::string tcTypeName = TCType::getTypeName(tc.getType());
         B2DEBUG(50, "RootParameterTracker::collectData(), executing TC of type: " << tcTypeName)
 
-        auto* foundTCTypeData = m_algoDataBox.find(tcTypeName); // a KeyValBox with all algorithms and data collected to given tcTypeName
-
-        // skip if there is nothing stored for this tcType:
-        if (foundTCTypeData == NULL) { continue; }
-
-        // looping over algorithms:
-        for (/*std::pair< std::string, std::pair<AnalyzingAlgorithm<double>*, std::vector<double>*> >*/ auto& entry : *foundTCTypeData) {
-          // increase readability:
-          auto* anAlgorithm = entry.second.first;
-          auto* dataVector = entry.second.second;
-          // sanity check: key has to be compatible with stored algorithm:
-          std::string algoName = anAlgorithm->getID();
-          if (entry.first != algoName) {
-            B2ERROR("RootParameterTracker::collectData() key (" << entry.first << ") of container does not match to its content (" << algoName
-                    << ") - skipping entry! ")
-            continue;
-          }
-          B2DEBUG(50, "RootParameterTracker::collectData(), executing algorithm of type: " << algoName << " with collected data-entries of "
-                  << dataVector->size())
-
-          try {
-            double calcVal = anAlgorithm->calcData(tc);
-            dataVector->push_back(calcVal);
-            B2DEBUG(20, "RootParameterTracker::collectData(), tc with type " << tcTypeName <<
-                    " and applied algorithm " << algoName <<
-                    " and got " << calcVal << " as a result!")
-          }  catch (AnalyzingAlgorithm<double>::No_refTC_Attached& anException) {
-            B2WARNING("RootParameterTracker::collectData(), Exception caught for tc with type " << tcTypeName <<
-                      " and applied algorithm " << algoName <<
-                      ". Failed with exception: " << anException.what() <<
-                      " -> skipping tc!");
-          }
-        }// looping over algorithms
+        collectData4DoubleAlgorithms(tcTypeName, tc);
+        collectData4IntAlgorithms(tcTypeName, tc);
+        collectData4VecDoubleAlgorithms(tcTypeName, tc);
       } // looping over TCs
     }
 
@@ -180,7 +214,19 @@ namespace Belle2 {
         boxEntry.second->Print();
       }
 
-      for (auto& algoData2tcType : m_algoDataBox) {
+      for (auto& algoData2tcType : m_algoDataDouble) {
+        for (auto& algoPack : algoData2tcType.second) {
+          algoPack.second.second->clear();
+        }
+      }
+
+      for (auto& algoData2tcType : m_algoDataInt) {
+        for (auto& algoPack : algoData2tcType.second) {
+          algoPack.second.second->clear();
+        }
+      }
+
+      for (auto& algoData2tcType : m_algoDataVecDouble) {
         for (auto& algoPack : algoData2tcType.second) {
           algoPack.second.second->clear();
         }
@@ -210,7 +256,21 @@ namespace Belle2 {
       }
       m_file->Close();
 
-      for (auto& algoData2tcType : m_algoDataBox) {
+      for (auto& algoData2tcType : m_algoDataDouble) {
+        for (auto& algoPack : algoData2tcType.second) {
+          delete algoPack.second.first; // algorithm
+          delete algoPack.second.second; // vector(data) to algorithm
+        }
+      }
+
+      for (auto& algoData2tcType : m_algoDataInt) {
+        for (auto& algoPack : algoData2tcType.second) {
+          delete algoPack.second.first; // algorithm
+          delete algoPack.second.second; // vector(data) to algorithm
+        }
+      }
+
+      for (auto& algoData2tcType : m_algoDataVecDouble) {
         for (auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm

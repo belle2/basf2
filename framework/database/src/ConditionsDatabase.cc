@@ -56,6 +56,11 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     ConditionsService::getInstance()->getPayloads(m_globalTag, std::to_string(m_currentExperiment), std::to_string(m_currentRun));
   }
 
+  if (!ConditionsService::getInstance()->payloadExists("topcaf" + name)) {
+    B2ERROR("No payload " << name << " found in the database.");
+    return result;
+  }
+
   std::string filename = ConditionsService::getInstance()->getPayloadFileURL("topcaf", name);
   if (filename.empty()) {
     B2ERROR("Failed to get " << name << " from database.");
@@ -88,7 +93,7 @@ bool ConditionsDatabase::storeData(const std::string& name, TObject* object, Int
   TDirectory* saveDir = gDirectory;
   TFile* file = TFile::Open("payload.root", "RECREATE");
 
-  object->Write(name.c_str());
+  object->Write(name.c_str(), TObject::kSingleKey);
   file->WriteObject(&iov, "IoV");
 
   file->Close();

@@ -83,3 +83,49 @@ DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablenam
   }
   return logs;
 }
+
+DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablename,
+                                    const std::string& nodename, const std::string& begin_date,
+                                    const std::string& end_date, int max)
+{
+  DAQLogMessageList logs;
+  try {
+    if (!db.isConnected()) db.connect();
+    std::stringstream ss;
+    ss << "select node, extract(epoch from date) date, priority, message "
+       << "from " << tablename << " ";
+    bool hasand = false;
+    if (nodename.size() > 0) {
+      hasand = true;
+      ss << "where node = '" << nodename << "' ";
+    }
+    if (begin_date.size() > 0) {
+      if (hasand) ss << "and ";
+      else {
+        ss << "where ";
+        hasand = true;
+      }
+      ss << "date >= '" << begin_date << "' ";
+    }
+    if (end_date.size() > 0) {
+      if (hasand) ss << "and ";
+      else {
+        ss << "where ";
+      }
+      ss << "date <= '" << end_date << "' ";
+    }
+    ss << "order by id desc ";
+    if (max > 0) ss << "limit " << max;
+    db.execute(ss.str().c_str());
+    DBRecordList record_v(db.loadRecords());
+    for (size_t i = 0; i < record_v.size(); i++) {
+      DBRecord& record(record_v[i]);
+      logs.push_back(DAQLogMessage(record.get("node"),
+                                   LogFile::getPriority(record.get("priority")),
+                                   record.get("message"), Date(record.getInt("date"))));
+    }
+  } catch (const DBHandlerException& e) {
+    LogFile::error(e.what());
+  }
+  return logs;
+}

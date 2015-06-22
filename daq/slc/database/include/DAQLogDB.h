@@ -20,6 +20,12 @@ namespace Belle2 {
                                      const std::string& tablename,
                                      const std::string& nodename = "",
                                      int max = 0);
+    static DAQLogMessageList getLogs(DBInterface& db,
+                                     const std::string& tablename,
+                                     const std::string& nodename,
+                                     const std::string& begin_date,
+                                     const std::string& end_date,
+                                     int max = 0);
   };
 
 }

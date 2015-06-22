@@ -6,26 +6,57 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
+#include <cstring>
 
 using namespace Belle2;
 
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    LogFile::debug("usage: %s <tablename> [<nodename>] [<max>]", argv[0]);
+    LogFile::debug("usage: %s <tablename> [-n <nodename>] [-m <max>] [-b begin_date] [-e end_date]", argv[0]);
     return 1;
   }
   const std::string tablename = argv[1];
-  const std::string nodename = (argc > 2) ? StringUtil::toupper(argv[2]) : "";
-  const int max = (argc > 3) ? atoi(argv[3]) : 0;
+  std::string nodename;
+  int max = 0;
+  std::stringstream ss_begin;
+  std::stringstream ss_end;
+  for (int i = 2; i < argc; i++) {
+    if (strcmp(argv[i], "-m") == 0) {
+      i++;
+      if (i < argc) max = atoi(argv[i]);
+    }
+    if (strcmp(argv[i], "-n") == 0) {
+      i++;
+      if (i < argc) nodename = argv[i];
+    }
+    if (strcmp(argv[i], "-b") == 0) {
+      i++;
+      if (i < argc - 1) {
+        ss_begin << argv[i] << " ";
+        i++;
+        ss_begin << argv[i];
+      }
+    }
+    if (strcmp(argv[i], "-e") == 0) {
+      i++;
+      if (i < argc - 1) {
+        ss_end << argv[i] << " ";
+        i++;
+        ss_end << argv[i];
+      }
+    }
+  }
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),
                          config.get("database.user"),
                          config.get("database.password"),
                          config.getInt("database.port"));
-  DAQLogMessageList logs = DAQLogDB::getLogs(db, tablename, nodename, max);
+  DAQLogMessageList logs = DAQLogDB::getLogs(db, tablename, nodename,
+                                             ss_begin.str(), ss_end.str(), max);
   for (size_t i = 0; i < logs.size(); i++) {
     switch (logs[i].getPriority()) {
       case LogFile::DEBUG:   std::cout << "\x1b[49m\x1b[39m"; break;

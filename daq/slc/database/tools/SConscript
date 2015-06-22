@@ -1,7 +1,8 @@
 Import('env')
 
-env['TOOLS_LIBS']['loglist'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['logget'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['dblist'] = ['daq', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['dbloglist'] = ['daq', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['dbcreate'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['dbget'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['dbprovider'] = ['daq', 'framework', '$PGSQL_LIBS']

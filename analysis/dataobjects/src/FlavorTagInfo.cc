@@ -29,14 +29,6 @@ void FlavorTagInfo::setTrack(Track* track)
   m_tracks.push_back(track);
 }
 
-void FlavorTagInfo::setTracks(std::vector<Track*> tracks)
-{
-
-  for (unsigned i = 0; i < tracks.size(); i++) {
-    m_tracks.push_back(tracks[i]);
-  }
-}
-
 
 void FlavorTagInfo::setCatProb(float catProb)
 {
@@ -89,35 +81,14 @@ void FlavorTagInfo::setIsFromB(int isIt)
   m_isFromB.push_back(isIt);
 }
 
-void FlavorTagInfo::setIsFromBGeneral(int isIt)
-{
-  m_isFromBGeneral = isIt;
-}
-
-
-void FlavorTagInfo::setROEComesFromB(int isIt)
-{
-  m_ROEComesFromB = isIt;
-}
-
 void FlavorTagInfo::setGoodTracksPurityFT(float pur)
 {
   m_goodTracksPurityFT = pur;
 }
 
-void FlavorTagInfo::setGoodBadTracksRatioFT(float ratio)
-{
-  m_goodBadTracksRatioFT = ratio;
-}
-
 void FlavorTagInfo::setGoodTracksPurityROE(float pur)
 {
   m_goodTracksPurityROE = pur;
-}
-
-void FlavorTagInfo::setGoodBadTracksRatioROE(float ratio)
-{
-  m_goodBadTracksRatioROE = ratio;
 }
 
 void FlavorTagInfo::setGoodTracksROE(int goodTracks)
@@ -140,14 +111,10 @@ void FlavorTagInfo::setBadTracksFT(int badTraks)
   m_badTracksFT = badTraks;
 }
 
-void FlavorTagInfo::setFTandROEGoodTracksRatio(float ratio)
-{
-  m_FTandROEGoodTracksRatio = ratio;
-}
 
-void FlavorTagInfo::setProdVertexMotherZ(float prodVer)
+void FlavorTagInfo::setProdPointResolutionZ(float deltaProdZ)
 {
-  m_prodVerZ.push_back(prodVer);
+  m_prodPointResZ.push_back(deltaProdZ);
 }
 
 void FlavorTagInfo::setD0(double D0)
@@ -228,35 +195,18 @@ std::vector<int> FlavorTagInfo::getIsFromB()
   return m_isFromB;
 }
 
-int FlavorTagInfo::getIsFromBGeneral()
-{
-  return m_isFromBGeneral;
-}
-
-int FlavorTagInfo::getROEComesFromB()
-{
-  return m_ROEComesFromB;
-}
 
 float FlavorTagInfo::getGoodTracksPurityFT()
 {
   return m_goodTracksPurityFT;
 }
 
-float FlavorTagInfo::getGoodBadTracksRatioFT()
-{
-  return m_goodBadTracksRatioFT;
-}
 
 float FlavorTagInfo::getGoodTracksPurityROE()
 {
   return m_goodTracksPurityROE;
 }
 
-float FlavorTagInfo::getGoodBadTracksRatioROE()
-{
-  return m_goodBadTracksRatioROE;
-}
 
 int FlavorTagInfo::getGoodTracksROE()
 {
@@ -278,15 +228,10 @@ int FlavorTagInfo::getBadTracksFT()
   return m_badTracksFT;
 }
 
-float FlavorTagInfo::getFTandROEGoodTracksRatio()
-{
-  return m_FTandROEGoodTracksRatio;
-}
 
-
-std::vector<float> FlavorTagInfo::getProdVertexMotherZ()
+std::vector<float> FlavorTagInfo::getProdPointResolutionZ()
 {
-  return m_prodVerZ;
+  return m_prodPointResZ;
 }
 
 

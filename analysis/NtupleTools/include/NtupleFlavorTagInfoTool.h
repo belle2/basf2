@@ -20,35 +20,38 @@
 namespace Belle2 {
   /* WORK IN PROGRESS */
 
-  /** Writes all the Flavor Tag Information to flat ntuple. All members are arrays,
-   whose elements correspond to all the categories used in the TMVA algorithm*/
+  /** Writes all information in the FlavorTagInfo DataObject to a flat ntuple. Some of the elements
+   * beneath are arrays, correspoding to the vectors inside the FlavorTagInfo object. That is, one
+   * element of the vector per category. For more information, check FlavorTagInfo.h and the
+   * FlavorTagger.py script. */
   class NtupleFlavorTagInfoTool : public NtupleFlatTool {
   private:
-    /** probability of the selected track to be daugther of the Btag (given by TMVA) */
+    /** probability of each track to be a primary track */
     float* m_targetP;
-    /** probability of the selected track to belong to each category (given by TMVA)*/
+    /** probability of the event to belong to each category */
     float* m_categoryP;
-    /** absolute momentum **/
+    /** absolute 3 momentum of each track **/
     float* m_P;
-    /** 0 - not from Btag, 1-5 - code of the parent meson  **/
+    /** code of each track regarding its MC matched mother (legend in FlavorTagInfo.h)  **/
     float* m_isFromB;
+    /** impact parameter D0 of each track **/
     float* m_D0;
+    /** impact parameter Z0 of each track **/
     float* m_Z0;
-    float* m_MCvertex;
-
-    /* Information obtained from the MC about the nature of the tracks in the
-     *FlavorTagInfo DataObject */
-    float m_isFromBGeneral;
-    float m_ROEComesFromB;
+    /** resolution of the production point of each track **/
+    float* m_prodPointResolutionZ;
+    /** purity of tracks coming from Btag in the FlavorTagInfo object **/
     float m_goodTracksPurityFT;
-    float m_goodBadTracksRatioFT;
+    /** purity of tracks coming from Btag in the RestOfEvent object **/
     float m_goodTracksPurityROE;
-    float m_goodBadTracksRatioROE;
+    /** number of tracks not coming from Btag in the RestOfEvent object **/
     float m_badTracksROE;
+    /** number of tracks not coming from Btag in the RestOfEvent object **/
     float m_goodTracksROE;
+    /** number of tracks coming from Btag in the FlavorTagInfo object **/
     float m_badTracksFT;
+    /** number of tracks coming from Btag in the FlavorTagInfo object **/
     float m_goodTracksFT;
-    float m_FTandROEGoodTracksRatio;
     /** categories used in the TMVA */
     std::string m_categories[8] = {"Electron", "Muon", "KinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "MaximumP"};
 

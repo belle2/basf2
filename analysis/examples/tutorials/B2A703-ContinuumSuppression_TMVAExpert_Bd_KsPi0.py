@@ -50,22 +50,22 @@ from stdV0s import stdKshorts
 
 # _____________________________________________________________________________________________________________________________________
 # Bd -> Ks Pi0 signal MC privately produced with BGx0.
-testSIG = ['/gpfs/fs02/belle/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014/root/*30*']
-fullSIG = ['/gpfs/fs02/belle/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014/root/*']
+testSIG = ['/gpfs/fs02/belle2/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014/root/*30*']
+fullSIG = ['/gpfs/fs02/belle2/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014/root/*']
 
 # Bd -> Ks Pi0 skim of BGx0 MC 3.5 continuum MC.
-testCC = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/mc35_ccbar_BGx0_s03.mdst.root']
-testSS = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/mc35_ssbar_BGx0_s03.mdst.root']
-testDD = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/mc35_ddbar_BGx0_s03.mdst.root']
-testUU = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/mc35_uubar_BGx0_s03.mdst.root']
-fullCC = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/*']
-fullSS = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/*']
-fullDD = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/*']
-fullUU = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/*']
+testCC = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/mc35_ccbar_BGx0_s03.mdst.root']
+testSS = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/mc35_ssbar_BGx0_s03.mdst.root']
+testDD = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/mc35_ddbar_BGx0_s03.mdst.root']
+testUU = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/mc35_uubar_BGx0_s03.mdst.root']
+fullCC = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/*']
+fullSS = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/*']
+fullDD = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/*']
+fullUU = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/*']
 
 # Bd -> Ks Pi0 skim of BGx0 MC 3.5 generic MC. (Dataset too small to make a 'test' sample).
-fullCH = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/charged/*']
-fullMX = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/mixed/*']
+fullCH = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/charged/*']
+fullMX = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/mixed/*']
 # _____________________________________________________________________________________________________________________________________
 
 

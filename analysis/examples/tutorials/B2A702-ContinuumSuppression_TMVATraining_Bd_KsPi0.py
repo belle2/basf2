@@ -24,7 +24,7 @@
 # To run NeuroBayes on KEKCC execute the following before running:
 #  export PHIT_LICENCE_PATH=${PHIT_LICENCE_PATH=${SWBELLE}/local/etc/neurobayes}
 #  export PHIT_LICENCE_SERVER=bweb3.cc.kek.jp:16820
-#  source /sw/belle/local/neurobayes/belle_default_64bit/setup_neurobayes.sh
+#  source /sw/belle2/local/neurobayes/belle_default_64bit/setup_neurobayes.sh
 #
 # Usage:
 #  ./B2A702-ContinuumSuppression_TMVATraining_Bd_KsPi0.py <test,full>
@@ -60,20 +60,20 @@ from stdV0s import stdKshorts
 # _____________________________________________________________________________________________________________________________________
 # Test skim of BGx0 MC 3.5    -    (2 min to process)
 testSIG1 = [
-    '/gpfs/fs02/belle/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014_500k/root/EvtGenSimRec_Bd_KsPi0_noBeamBkgd_*10*.root']
+    '/gpfs/fs02/belle2/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014_500k/root/EvtGenSimRec_Bd_KsPi0_noBeamBkgd_*10*.root']
 testSIG2 = [
-    '/gpfs/fs02/belle/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014_500k/root/EvtGenSimRec_Bd_KsPi0_noBeamBkgd_*20*.root']
-testCC = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/mc35_ccbar_BGx0_s01.mdst.root']
-testSS = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/mc35_ssbar_BGx0_s01.mdst.root']
-testDD = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/mc35_ddbar_BGx0_s01.mdst.root']
-testUU = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/mc35_uubar_BGx0_s01.mdst.root']
+    '/gpfs/fs02/belle2/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014_500k/root/EvtGenSimRec_Bd_KsPi0_noBeamBkgd_*20*.root']
+testCC = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/mc35_ccbar_BGx0_s01.mdst.root']
+testSS = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/mc35_ssbar_BGx0_s01.mdst.root']
+testDD = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/mc35_ddbar_BGx0_s01.mdst.root']
+testUU = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/mc35_uubar_BGx0_s01.mdst.root']
 
 # Full skim of BGx0 MC 3.5    -    (1 hour to process)
-fullSIG = ['/gpfs/fs02/belle/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014_500k/root/*']
-fullCC = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/*']
-fullSS = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/*']
-fullDD = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/*']
-fullUU = ['/gpfs/fs02/belle/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/*']
+fullSIG = ['/gpfs/fs02/belle2/users/pablog/mcGeneration_belle2/Bd_KsPi0_BGx0_2014_500k/root/*']
+fullCC = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ccbar/*']
+fullSS = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ssbar/*']
+fullDD = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/ddbar/*']
+fullUU = ['/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC35_2014/Bd_KsPi0/mdst/uubar/*']
 # _____________________________________________________________________________________________________________________________________
 
 

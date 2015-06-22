@@ -30,7 +30,7 @@ checkTH = False
 # flags for SPTCNetworkProducer
 # debugLevel = LogLevel.DEBUG
 debugLevel1 = LogLevel.INFO
-debugLevel2 = LogLevel.DEBUG
+debugLevel2 = LogLevel.INFO
 dLevel1 = 1
 dLevel2 = 101
 checkSPs = False
@@ -210,16 +210,10 @@ analizer.logging.debug_level = dLevel2
 analizer.param('testTCname', 'SPTracks')
 analizer.param('referenceTCname', 'SPTracksReference')
 analizer.param('writeToRoot', True)
-analizer.param('parametersToBeTracked', [
-    ["Contaminated", "AnalyzingAlgorithmResidualP"],
-    ["Contaminated", "AnalyzingAlgorithmResidualPosition"],
-    ["Contaminated", "AnalyzingAlgorithmValuePT"],
-    ["Clean", "AnalyzingAlgorithmResidualP"],
-    ["Clean", "AnalyzingAlgorithmResidualPosition"],
-    ["Clean", "AnalyzingAlgorithmValuePT"],
-    ["Perfect", "AnalyzingAlgorithmResidualP"],
-    ["Perfect", "AnalyzingAlgorithmResidualPosition"],
-    ["Perfect", "AnalyzingAlgorithmValuePT"]])
+
+analizer.param('trackedParametersDouble', [
+    [["Perfect"], ["AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"]]
+    ])
 
 
 log_to_file('sptcNetworkDemoOutput.txt', append=False)

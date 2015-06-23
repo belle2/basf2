@@ -18,9 +18,17 @@ def generateTestPlots(prefix):
     array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0])
     tntuple.Fill(array_of_values)
 
-    tntuple.SetAlias('Description', "description text")
-    tntuple.SetAlias('Check', "check text")
-    tntuple.SetAlias('Contact', "contact text")
+    tntuple.SetAlias('Description', "This is a description test. "
+                     "Lorem ipsum sit dolor amet.  We also support $\LaTeX$! "
+                     "\n <br> \n For example, here is the infamous "
+                     "Einstein-Pythagoras-theorem: \n "
+                     "$$a^2 + b^2 = \\frac{E}{m}$$ \n Of course, you can also"
+                     "do other things, like $\\theta = 90^\circ$ or $D^- "
+                     "\\rightarrow D^0 \pi^- \pi^+$. \n Sometimes it is "
+                     "necessary to escape commands with a double backslash, "
+                     "because e.g. \\theta will be interpreted as [tab]heta.")
+    tntuple.SetAlias('Check', "This is the check text.")
+    tntuple.SetAlias('Contact', "Name of the contact person.")
 
     # Overwrite the former TNtuple if one was there
     tntuple.Write()
@@ -56,7 +64,7 @@ def generateTestPlots(prefix):
         v = gRandom.Gaus(mean, 1.0)
         gausH.Fill(v)
 
-    tntuple.SetAlias('Description', "Gaus Changing Histogram text")
+    tntuple.SetAlias('Description', "Gaus Changing Histogram text.")
     tntuple.SetAlias('Check', "Gaus Changing Histogram check text")
     tntuple.SetAlias('Contact', "Gaus Changing Histogram contact text")
 

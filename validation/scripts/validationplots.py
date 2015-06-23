@@ -1675,8 +1675,9 @@ class Plotuple:
 
         # Give the possibility to share the plot!
         html.append('<p><strong>Share this plot:</strong> <input type="test" '
-                    'value="index.html?PackageOverview=false#{0}" size="60"'
-                    'onClick="this.select();"></p>'.format(prmn))
+                    'value="index.html?PackageOverview=false&Revisions={0}'
+                    '#{1}" size="60" onClick="this.select();"></p>'
+                    .format('_'.join(self.list_of_revisions), prmn))
 
         html.append('</div>\n</div>\n\n')
 

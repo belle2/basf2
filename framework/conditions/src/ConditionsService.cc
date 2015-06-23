@@ -152,7 +152,7 @@ void ConditionsService::parse_payloads(std::string temp)
   XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
 
   // display recursively all nodes and subnodes
-  DisplayNodes(xml, mainnode, 1);
+  // DisplayNodes(xml, mainnode, 1);
 
   // parse the payloads
   XMLNodePointer_t iov_node = xml->GetChild(mainnode);

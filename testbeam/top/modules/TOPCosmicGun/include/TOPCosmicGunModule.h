@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Matthew Barrett                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <string>
+#include "TH1.h"
+#include "TFile.h"
+
 
 namespace Belle2 {
 
@@ -62,10 +65,30 @@ namespace Belle2 {
      */
     virtual void terminate();
 
+
+
+
+
   private:
-    std::vector<double> m_upperPad; /**< upper rectangular surface (z,x,Dz,Dx,y) */
-    std::vector<double> m_lowerPad; /**< lower rectangular surface (z,x,Dz,Dx,y)*/
-    double m_startTime;             /**< start time (time at upperPad) */
+    std::vector<double> m_upperPad; /**< Upper rectangular surface (z,x,Dz,Dx,y). */
+    std::vector<double> m_lowerPad; /**< Lower rectangular surface (z,x,Dz,Dx,y). */
+    double m_momentum; /**< Momentum for generation of mono-energetic cosmic ray muons (GeV/c). */
+    double m_momentumCutOff; /**< Minimum momentum for generated muons (GeV/c). */
+    double m_startTime;             /**< start time (time at upperPad). */
+
+    std::string m_momentumDistributionType; /**< Type of momentum distribution to use: "monoEnergetic", "histogram". */
+    std::string m_momentumHistogramFileName; /**< Name of ROOT file containing momentum histogram. */
+    std::string m_momentumHistogramName; /**< Name of momentum histogram in ROOT file. */
+    TFile* m_momentumHistogramFile; /**< ROOT file containing momentum histogram. */
+    TH1F* m_momentumDistribution; /**< Momentum (in GeV/c) distribution (root histogram). */
+
+    std::string m_angularDistributionType; /**< Type of angular distribution to use: "none", "cosSquared", "histogram". */
+    std::string m_angularHistogramFileName; /**< Name of ROOT file containing angular histogram. */
+    std::string m_angularHistogramName; /**< Name of histogram in ROOT file. */
+    TFile* m_angularHistogramFile; /**< ROOT file containing angular histogram. */
+    TH1F* m_angularDistribution;  /**< Angular distribution (root histogram). */
+
+
 
   };
 

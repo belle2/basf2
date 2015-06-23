@@ -136,7 +136,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterToBkgWeight;
     std::vector<double>* m_eclClusterSimHitSum;
     std::vector<int>* m_eclClusterToShower;
-    std::vector<int>* m_eclClusterToTrack;
+    //std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy;
     std::vector<double>* m_eclClusterEnergyError;
     std::vector<double>* m_eclClusterTheta;

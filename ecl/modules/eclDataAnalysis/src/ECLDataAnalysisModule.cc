@@ -108,7 +108,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclClusterToBkgWeight(0),
     m_eclClusterSimHitSum(0),
     m_eclClusterToShower(0),
-    m_eclClusterToTrack(0),
+//m_eclClusterToTrack(0),
     m_eclClusterEnergy(0),
     m_eclClusterEnergyError(0),
     m_eclClusterTheta(0),
@@ -550,7 +550,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterToBkgWeight",      "std::vector<double>",       &m_eclClusterToBkgWeight);
   m_tree->Branch("eclClusterSimHitSum",      "std::vector<double>",       &m_eclClusterSimHitSum);
   m_tree->Branch("eclClusterToShower",      "std::vector<int>",       &m_eclClusterToShower);
-  m_tree->Branch("eclClusterToTrack",      "std::vector<int>",       &m_eclClusterToTrack);
+  //m_tree->Branch("eclClusterToTrack",      "std::vector<int>",       &m_eclClusterToTrack);
   m_tree->Branch("eclClusterEnergy",     "std::vector<double>",    &m_eclClusterEnergy);
   m_tree->Branch("eclClusterEnergyError",  "std::vector<double>",    &m_eclClusterEnergyError);
   m_tree->Branch("eclClusterTheta",      "std::vector<double>",    &m_eclClusterTheta);
@@ -696,7 +696,7 @@ void ECLDataAnalysisModule::event()
   m_eclClusterToMcWeight3->clear(); m_eclClusterToMc4->clear();
   m_eclClusterToMcWeight4->clear(); m_eclClusterToMc5->clear();
   m_eclClusterToMcWeight5->clear(); m_eclClusterToBkgWeight->clear(); m_eclClusterSimHitSum->clear();
-  m_eclClusterToShower->clear(); m_eclClusterToTrack->clear();
+  m_eclClusterToShower->clear(); //m_eclClusterToTrack->clear();
   m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear();
   m_eclClusterNofCrystals->clear();  m_eclClusterCrystalHealth->clear();  m_eclClusterMergedPi0->clear();

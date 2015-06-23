@@ -152,10 +152,12 @@ void ConditionsService::parse_payloads(std::string temp)
   XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
 
   // display recursively all nodes and subnodes
-  //DisplayNodes(xml, mainnode, 1);
+  DisplayNodes(xml, mainnode, 1);
 
   // parse the payloads
-  XMLNodePointer_t payload_node = xml->GetChild(mainnode);
+  XMLNodePointer_t iov_node = xml->GetChild(mainnode);
+  XMLNodePointer_t payload_node = xml->GetChild(iov_node);
+
   XMLNodePointer_t child_node;
 
   std::string PackageName, ModuleName, PayloadURL, Checksum;
@@ -220,7 +222,8 @@ void ConditionsService::parse_payloads(std::string temp)
         ConditionsService::getInstance()->addChecksum(payloadKey, Checksum);
       }
     }
-    payload_node = xml->GetNext(payload_node);
+    iov_node = xml->GetNext(iov_node);
+    payload_node = xml->GetChild(iov_node);
   }
 
   // Release memory before exit

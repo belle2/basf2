@@ -44,6 +44,10 @@
 #include <analysis/NtupleTools/NtupleSLTool.h>
 #include <analysis/NtupleTools/NtupleErrMatrixTool.h>
 #include <analysis/NtupleTools/NtupleEventWeightsTool.h>
+#include <analysis/NtupleTools/NtupleLETRGTool.h>
+#include <analysis/NtupleTools/NtupleLECDCTool.h>
+#include <analysis/NtupleTools/NtupleLEECLTool.h>
+#include <analysis/NtupleTools/NtupleLEKLMTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -124,7 +128,10 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "SL") return new NtupleSLTool(tree, d);
   else if (strToolName == "ErrMatrix") return new NtupleErrMatrixTool(tree, d);
   else if (strToolName == "EventWeights") return new NtupleEventWeightsTool(tree, d);
-
+  else if (strToolName == "LETRG")  return new NtupleLETRGTool(tree, d);
+  else if (strToolName == "LECDC")  return new NtupleLECDCTool(tree, d);
+  else if (strToolName == "LEECL")  return new NtupleLEECLTool(tree, d);
+  else if (strToolName == "LEKLM")  return new NtupleLEKLMTool(tree, d);
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;
 }

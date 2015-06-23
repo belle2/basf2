@@ -52,7 +52,12 @@ namespace Belle2 {
     typedef std::tuple <
     std::string,          // Name of the variable
         std::vector<double>,  // special tune parameter
-        std::vector<bool>     // enabled
+        std::vector< std::tuple<bool> > // enables the filter
+        // Why putting a bool inside a std:tuple?
+        // Because the vector< bool > is a space-efficient specialization
+        // and we cannot expose to python as a parameter an element of
+        // of a vector< bool > since it cannot provide reference acces to
+        // its content.
         > JakobVariable_t;
 
     std::vector< JakobVariable_t > m_variables;
@@ -60,12 +65,12 @@ namespace Belle2 {
     JakobVariable_t&      Variable(unsigned int);
     std::string           VariableName(unsigned int);
     std::vector<double>& VariableTunings(unsigned int);
-    double  VariableTuning(unsigned int variableIndex,
-                           unsigned int setupIndex);
+    double&   VariableTuning(unsigned int variableIndex,
+                             unsigned int setupIndex);
 
-    std::vector<bool>&    VariableEnables(unsigned int);
-    const bool& VariableEnable(unsigned int variableIndex,
-                               unsigned int setupIndex);
+    std::vector< std::tuple< bool > >&    VariableEnables(unsigned int);
+    bool& VariableEnable(unsigned int variableIndex,
+                         unsigned int setupIndex);
 
 
     std::vector< const VXDTFSecMap* > m_SectorMaps;

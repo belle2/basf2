@@ -52,8 +52,8 @@ SegmentFilterConverterModule::SegmentFilterConverterModule() : Module()
 
   m_variables.resize(FilterID::numFilters);
 
-  vector<bool>   activateTRUE  = { true };
-  vector<bool>   activateFALSE = { false };
+  vector< tuple< bool >>   activateTRUE  = { tuple<bool>(true) };
+  vector< tuple<bool>>   activateFALSE = { tuple<bool>(false) };
   vector<double> tuneZERO = { 0 };
 
 
@@ -202,9 +202,6 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
                         (1. + m_PARAMtuneCutoffs + VariableTuning(filterID, setupIndex));
       }
 
-
-      cout << VariableEnable(FilterID::distance3D , setupIndex);
-
       auto friendSectorsSegmentFilter =
         (
           (
@@ -336,10 +333,11 @@ SegmentFilterConverterModule::endRun()
 SegmentFilterConverterModule::JakobVariable_t&
 SegmentFilterConverterModule::Variable(unsigned int n)
 {
-  static JakobVariable_t inCaseOfErrors;
+
   if (n >= m_variables.size()) {
     B2WARNING("Trying to access an undefined variable");
-    return inCaseOfErrors;
+    static JakobVariable_t dummyVariable;
+    return dummyVariable;
   }
   return m_variables[n];
 
@@ -351,36 +349,38 @@ SegmentFilterConverterModule::VariableName(unsigned int variableIndex)
   return get<0>(Variable(variableIndex)) ;
 }
 
-std::vector<double>&
+vector<double>&
 SegmentFilterConverterModule::VariableTunings(unsigned int variableIndex)
 {
   return get<1>(Variable(variableIndex)) ;
 }
 
-double
+double&
 SegmentFilterConverterModule::VariableTuning(unsigned int variableIndex,
                                              unsigned int setupIndex)
 {
   auto tunings = VariableTunings(variableIndex);
-  if (tunings.size() == 0)
-    return 0.;
+  if (tunings.size() == 0) {
+    B2WARNING("Trying to access an uninitialized variable");
+    static double dummyDouble = 0.;
+    return dummyDouble;
+  }
   setupIndex = std::min(setupIndex, (unsigned int)(tunings.size() - 1));
   return tunings[ setupIndex ];
 }
 
-
-std::vector<bool>&
+vector< tuple<bool> >&
 SegmentFilterConverterModule::VariableEnables(unsigned int variableIndex)
 {
   return get<2>(Variable(variableIndex)) ;
 }
 
-const bool&
+bool&
 SegmentFilterConverterModule::VariableEnable(unsigned int variableIndex,
                                              unsigned int setupIndex)
 {
-  std::vector< bool >& enables = VariableEnables(variableIndex);
+  auto& enables = VariableEnables(variableIndex);
   setupIndex = std::min(setupIndex, (unsigned int) enables.size() - 1);
-  return enables[ setupIndex ];
+  return get<0>(enables[ setupIndex ]);
 
 }

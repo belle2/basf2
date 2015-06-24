@@ -85,7 +85,7 @@ TrgEclCluster::TrgEclCluster(): _BRICN(0), _FWDICN(0), _BWDICN(0)
     ClusterPositionY[iNCluster] = 0;
     ClusterPositionZ[iNCluster] = 0;
     NofTCinCluster[iNCluster] = 0;
-
+    MaxTCId[iNCluster] = 0;
   }
 
 
@@ -332,7 +332,8 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
       if (!(tc_upper != 0 || tc_left != 0)) {
         if (!(tc_lower != 0 && tc_lower_left != 0)) {
 
-
+          double maxTC = 0;
+          int maxTCId = 999;
           for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
             if (iii % 12 == 0) {
               if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
@@ -349,15 +350,20 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
             ClusterPositionY[_BRICN] += TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81] * TCFirePosition[_BrCluster[_BRICN][iNearTC] - 81][1];
             ClusterPositionZ[_BRICN] += TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81] * TCFirePosition[_BrCluster[_BRICN][iNearTC] - 81][2];
 
+            if (maxTC < TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81]) {
+              maxTC = TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81];
+              maxTCId = _BrCluster[_BRICN][iNearTC] ;
+
+            }
+
+
           }
           ClusterTiming[_BRICN] /= ClusterEnergy[_BRICN];
           ClusterPositionX[_BRICN] /= ClusterEnergy[_BRICN];
           ClusterPositionY[_BRICN] /= ClusterEnergy[_BRICN];
           ClusterPositionZ[_BRICN] /= ClusterEnergy[_BRICN];
-
-
+          MaxTCId[_BRICN] = maxTCId;
           if (ClusterTiming[_BRICN] == 0 && ClusterEnergy[_BRICN]) {continue;}
-
           _BRICN++;
           _icnquadrant[1][quad_sec]++;
         }
@@ -374,7 +380,8 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
       _BrCluster[_BRICN][8] = tc_upper_left; //lower right;
 
       if (!(tc_upper != 0)) {
-
+        double maxTC = 0;
+        int maxTCId = 999;
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
           if (iii % 12 == 0) {
             if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
@@ -391,7 +398,11 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
           ClusterPositionX[_BRICN] += TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81] * TCFirePosition[_BrCluster[_BRICN][iNearTC] - 81][0];
           ClusterPositionY[_BRICN] += TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81] * TCFirePosition[_BrCluster[_BRICN][iNearTC] - 81][1];
           ClusterPositionZ[_BRICN] += TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81] * TCFirePosition[_BrCluster[_BRICN][iNearTC] - 81][2];
+          if (maxTC < TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81]) {
+            maxTC = TCFireEnergy[_BrCluster[_BRICN][iNearTC] - 81];
+            maxTCId = _BrCluster[_BRICN][iNearTC] ;
 
+          }
 
 
         }
@@ -400,7 +411,7 @@ TrgEclCluster::setBarrelICN(int HitTC[][80])
         ClusterPositionX[_BRICN] /= ClusterEnergy[_BRICN];
         ClusterPositionY[_BRICN] /= ClusterEnergy[_BRICN];
         ClusterPositionZ[_BRICN] /= ClusterEnergy[_BRICN];
-
+        MaxTCId[_BRICN] = maxTCId;
         if (ClusterTiming[_BRICN] == 0 && ClusterEnergy[_BRICN]) {continue;}
 
         _BRICN++;
@@ -528,10 +539,12 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 
     if (!(_FwCluster[_FWDICN][1] != 0 || _FwCluster[_FWDICN][7] != 0))
       if (!(_FwCluster[_FWDICN][5] != 0 && _FwCluster[_FWDICN][6] != 0)) {
-
+        double maxTC = 0;
+        int maxTCId = 999;
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
           if (_FwCluster[_FWDICN][iNearTC] != 0) {NofTCinCluster[_BRICN + _FWDICN]++;}
           else {continue;}
+          if ((iNearTC == 3 || iNearTC == 4) && _FwCluster[_FWDICN][iNearTC] == _FwCluster[_FWDICN][iNearTC - 1]) {continue;}
           ClusterEnergy[_BRICN + _FWDICN] +=   TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
           ClusterTiming[_BRICN + _FWDICN] +=   TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFireTiming[_FwCluster[_FWDICN][iNearTC] -
                                                1];
@@ -541,12 +554,18 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
                                                 1][1];
           ClusterPositionZ[_BRICN + _FWDICN] += TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFirePosition[_FwCluster[_FWDICN][iNearTC] -
                                                 1][2];
+
+          if (maxTC < TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1]) {
+            maxTC = TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
+            maxTCId = _FwCluster[_FWDICN][iNearTC] ;
+
+          }
         }
         ClusterTiming[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
         ClusterPositionX[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
         ClusterPositionY[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
         ClusterPositionZ[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
-
+        MaxTCId[_BRICN + _FWDICN] = maxTCId;
 
 
         _FWDICN++;
@@ -597,7 +616,8 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 
 
     if (!(_FwCluster[_FWDICN][1] != 0)) {
-
+      double maxTC = 0;
+      int maxTCId = 999;
       for (int iNearTC = 0; iNearTC < 6; iNearTC ++) {
         if (_FwCluster[_FWDICN][iNearTC] != 0) {NofTCinCluster[_BRICN + _FWDICN]++;}
         else {continue;}
@@ -610,11 +630,17 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
                                               1][1];
         ClusterPositionZ[_BRICN + _FWDICN] += TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFirePosition[_FwCluster[_FWDICN][iNearTC] -
                                               1][2];
+        if (maxTC < TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1]) {
+          maxTC = TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
+          maxTCId = _FwCluster[_FWDICN][iNearTC] ;
+
+        }
       }
       ClusterTiming[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
       ClusterPositionX[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
       ClusterPositionY[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
       ClusterPositionZ[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
+      MaxTCId[_BRICN + _FWDICN] = maxTCId;
 
       if (ClusterTiming[_BRICN + _FWDICN] == 0 && ClusterEnergy[_BRICN + _FWDICN] == 0) {continue;}
       _FWDICN++;
@@ -657,11 +683,13 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 
       if (!(_FwCluster[_FWDICN][1] != 0 || _FwCluster[_FWDICN][7] != 0)) {
         if ((_FwCluster[_FWDICN][5] != 0 && _FwCluster[_FWDICN][6] != 0)) {
-
+          double maxTC = 0;
+          int maxTCId = 999;
           for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
             if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
             if (_FwCluster[_FWDICN][iNearTC] != 0) {NofTCinCluster[_BRICN + _FWDICN]++;}
             else {continue;}
+
             ClusterEnergy[_BRICN + _FWDICN] +=   TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
             ClusterTiming[_BRICN + _FWDICN] +=   TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFireTiming[_FwCluster[_FWDICN][iNearTC] -
                                                  1];
@@ -671,11 +699,16 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
                                                   1][1];
             ClusterPositionZ[_BRICN + _FWDICN] += TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFirePosition[_FwCluster[_FWDICN][iNearTC] -
                                                   1][2];
+            if (maxTC < TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1]) {
+              maxTC = TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
+              maxTCId = _FwCluster[_FWDICN][iNearTC] ;
+            }
           }
           ClusterTiming[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionX[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionY[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionZ[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
+          MaxTCId[_BRICN + _FWDICN] = maxTCId;
           if (ClusterTiming[_BRICN + _FWDICN] == 0 && ClusterEnergy[_BRICN + _FWDICN] == 0) {continue;}
           _FWDICN++;
           _icnquadrant[0][quad_sec]++;
@@ -704,7 +737,8 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 
       if (!(_FwCluster[_FWDICN][1] != 0 || _FwCluster[_FWDICN][7] != 0)) {
         if ((_FwCluster[_FWDICN][5] != 0 && _FwCluster[_FWDICN][6] != 0)) {
-
+          double maxTC = 0;
+          int maxTCId = 999;
           for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
             if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
             if (_FwCluster[_FWDICN][iNearTC] != 0) {NofTCinCluster[_BRICN + _FWDICN]++;}
@@ -718,11 +752,17 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
                                                   1][1];
             ClusterPositionZ[_BRICN + _FWDICN] += TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFirePosition[_FwCluster[_FWDICN][iNearTC] -
                                                   1][2];
+            if (maxTC < TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1]) {
+              maxTC = TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
+              maxTCId = _FwCluster[_FWDICN][iNearTC] ;
+            }
           }
           ClusterTiming[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionX[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionY[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionZ[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
+          MaxTCId[_BRICN + _FWDICN] = maxTCId;
+
           if (ClusterTiming[_BRICN + _FWDICN] == 0 && ClusterEnergy[_BRICN + _FWDICN] == 0) {continue;}
 
           _FWDICN++;
@@ -731,7 +771,6 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
       }
     }
     if (iii > 29) {
-
       _FwCluster[_FWDICN][0] = TCFire[iii];
       _FwCluster[_FWDICN][1] = TCFire[iii - 2]; // top
       _FwCluster[_FWDICN][2] = 0;// right top
@@ -752,6 +791,8 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
 
       if (!(_FwCluster[_FWDICN][1] != 0 || _FwCluster[_FWDICN][7] != 0)) {
         if ((_FwCluster[_FWDICN][5] != 0 && _FwCluster[_FWDICN][6] != 0)) {
+          double maxTC = 0;
+          int maxTCId = 999;
 
           for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
             if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
@@ -767,11 +808,16 @@ TrgEclCluster::setForwardICN(int HitTC[][80])
             ClusterPositionZ[_BRICN + _FWDICN] += TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1] * TCFirePosition[_FwCluster[_FWDICN][iNearTC] -
                                                   1][2];
 
+            if (maxTC < TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1]) {
+              maxTC = TCFireEnergy[_FwCluster[_FWDICN][iNearTC] - 1];
+              maxTCId = _FwCluster[_FWDICN][iNearTC] ;
+            }
           }
           ClusterTiming[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionX[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionY[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
           ClusterPositionZ[_BRICN + _FWDICN] /= ClusterEnergy[_BRICN + _FWDICN];
+          MaxTCId[_BRICN + _FWDICN] = maxTCId;
           if (ClusterTiming[_BRICN + _FWDICN] == 0 && ClusterEnergy[_BRICN + _FWDICN] == 0) {continue;}
 
           _FWDICN++;
@@ -855,7 +901,6 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
     }
   }
 
-
   for (int iii = 0 ; iii < 32 ; iii ++) {
     int quad_sec = (iii / 20);
     if (TCFire[iii] == 0) { continue; }
@@ -882,6 +927,8 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
     }
     if (!(_BwCluster[_BWDICN][1] != 0 || _BwCluster[_BWDICN][7] != 0)) {
       if (!(_BwCluster[_BWDICN][5] != 0 && _BwCluster[_BWDICN][6] != 0)) {
+        double maxTC = 0;
+        int maxTCId = 999;
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
           if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
           if (_BwCluster[_BWDICN][iNearTC] != 0) {NofTCinCluster[_BRICN + _FWDICN + _BWDICN]++;}
@@ -896,12 +943,16 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
                                                           TCFirePosition[_BwCluster[_BWDICN][iNearTC] - 513][1];
           ClusterPositionZ[_BRICN + _FWDICN + _BWDICN] += TCFireEnergy[_BwCluster[_BWDICN][iNearTC] - 513] *
                                                           TCFirePosition[_BwCluster[_BWDICN][iNearTC] - 513][2];
+          if (maxTC < TCFireEnergy[_BwCluster[_BWDICN][iNearTC] - 513]) {
+            maxTC = TCFireEnergy[_BwCluster[_BWDICN][iNearTC] - 513];
+            maxTCId = _BwCluster[_BWDICN][iNearTC]  ;
+          }
         }
         ClusterTiming[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
         ClusterPositionX[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
         ClusterPositionY[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
         ClusterPositionZ[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
-
+        MaxTCId[_BRICN +  _FWDICN + _BWDICN] = maxTCId;
 
         if (ClusterTiming[_BRICN + _FWDICN + _BWDICN] == 0 && ClusterEnergy[_BRICN + _FWDICN + _BWDICN] == 0) {continue;}
         _BWDICN++;
@@ -947,6 +998,8 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
 
     if (!(_BwCluster[_BWDICN][1] != 0 || _BwCluster[_BWDICN][7] != 0)) {
       if (!(_BwCluster[_BWDICN][5] != 0 && _BwCluster[_BWDICN][6] != 0)) {
+        double maxTC = 0;
+        int maxTCId = 999;
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
 
           if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
@@ -964,11 +1017,17 @@ int TrgEclCluster::setBackwardICN(int HitTC[][80])
                                                           TCFirePosition[_BwCluster[_BWDICN][iNearTC] - 513][1];
           ClusterPositionZ[_BRICN + _FWDICN + _BWDICN] += TCFireEnergy[_BwCluster[_BWDICN][iNearTC] - 513] *
                                                           TCFirePosition[_BwCluster[_BWDICN][iNearTC] - 513][2];
+          if (maxTC < TCFireEnergy[_BwCluster[_BWDICN][iNearTC] - 513]) {
+            maxTC = TCFireEnergy[_BwCluster[_BWDICN][iNearTC] - 513];
+            maxTCId = _BwCluster[_BWDICN][iNearTC]  ;
+          }
         }
         ClusterTiming[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
         ClusterPositionX[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
         ClusterPositionY[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
         ClusterPositionZ[_BRICN + _FWDICN + _BWDICN] /= ClusterEnergy[_BRICN + _FWDICN + _BWDICN];
+        MaxTCId[_BRICN +  _FWDICN + _BWDICN] = maxTCId;
+
         if (ClusterTiming[_BRICN + _FWDICN + _BWDICN] == 0 && ClusterEnergy[_BRICN + _FWDICN + _BWDICN] == 0) {continue;}
 
 

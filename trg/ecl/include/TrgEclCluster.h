@@ -73,9 +73,13 @@ namespace Belle2 {
 
     int getNofCluster() {return _BRICN + _FWDICN + _BWDICN;}
     int getNofTCinCluster(int icluster) {return NofTCinCluster[icluster];}
+
+
     double getClusterEnergy(int icluster) {return ClusterEnergy[icluster];}
     double getClusterTiming(int icluster) {return ClusterTiming[icluster];}
     TVector3 getClusterPosition(int icluster) {return TVector3(ClusterPositionX[icluster], ClusterPositionY[icluster], ClusterPositionZ[icluster]);}
+    int getMaxTCId(int icluster) {return MaxTCId[icluster];}
+
     //
     //
     // get Beam bkg veto flag.
@@ -106,6 +110,8 @@ namespace Belle2 {
     double ClusterPositionX[100];
     double ClusterPositionY[100];
     double ClusterPositionZ[100];
+    int MaxTCId[100];
+
 
 
     TrgEclMapping* _TCMap;

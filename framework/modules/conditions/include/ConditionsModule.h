@@ -45,7 +45,6 @@ namespace Belle2 {
 
     /** The global tag */
     std::string m_globalTag;
-    std::string m_file_local;
 
     /** The experiment name */
     std::string m_experimentName;

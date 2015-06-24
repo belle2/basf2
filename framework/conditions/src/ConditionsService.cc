@@ -50,7 +50,7 @@ void ConditionsService::getPayloads(std::string GlobalTag, std::string Experimen
   int count = 0;
 
   if (curl) {
-    std::string REST_payloads = m_RESTbase + "payloads/?gtName=" + GlobalTag + "&expName=" + ExperimentName + "&runName=" + RunName;
+    std::string REST_payloads = m_RESTbase + "iovPayloads/?gtName=" + GlobalTag + "&expName=" + ExperimentName + "&runName=" + RunName;
     B2INFO("rest payload call: " << REST_payloads);
     m_buffer.clear();
     curl_easy_setopt(curl, CURLOPT_URL, REST_payloads.c_str());

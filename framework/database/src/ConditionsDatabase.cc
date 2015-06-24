@@ -83,8 +83,9 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     return result;
   }
 
-  // FIXME: to be replaced by the IoV obtained from the conditions service
-  result.second = IntervalOfValidity(event.getExperiment(), event.getRun(), event.getExperiment(), event.getRun());
+  conditionsPayload paylodInfo = ConditionsService::getInstance()->getPayloadInfo("topcaf", name);
+  result.second = IntervalOfValidity(stoi(paylodInfo.expInitial), stoi(paylodInfo.runInitial), stoi(paylodInfo.expFinal),
+                                     stoi(paylodInfo.runFinal));
   return result;
 }
 

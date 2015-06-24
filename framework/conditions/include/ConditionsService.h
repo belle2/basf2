@@ -21,6 +21,36 @@
 
 namespace Belle2 {
 
+  /** The conditionsPayload structure holds the information related to payloads. */
+  struct conditionsPayload {
+
+    /** The package name. */
+    std::string package;
+
+    /** The module name. */
+    std::string module;
+
+    /** The earliest run for the IOV. */
+    std::string runInitial;
+
+    /** The experiment for the earliest run in the IOV. */
+    std::string expInitial;
+
+    /** The last run for the IOV. */
+    std::string runFinal;
+
+    /** The experiment for the last run in the IOV. */
+    std::string expFinal;
+
+    /** The checksum for the payload */
+    std::string md5Checksum;
+
+    /** The relative path and file name for the payload */
+    std::string logicalFileName;
+
+  };
+
+
   /** The conditions service will store and retrieve conditions payloads.  This service is under construction and currently needs
    *  particular file directories and database permissions which will eventually be generalized for distributed use.  Currently
    *  must be used at hep.pnnl.gov.
@@ -31,7 +61,6 @@ namespace Belle2 {
    *           a singleton.
    *
    */
-
   class ConditionsService {
 
   public:
@@ -70,28 +99,44 @@ namespace Belle2 {
     void setFILEbaselocal(std::string FILEBaseLocal) {m_FILElocal = FILEBaseLocal;};
 
 
-    /** Adds a payload URL to the payload map.
-     *  @param PackageModuleName The concatenation of the package.name and module.name.
-     *  @param PayloadURL The payload URL.
-     *
-     *  @return Nothing yet
-     */
-    void addPayloadURL(std::string PackageModuleName, std::string PayloadURL) {m_runPayloads[PackageModuleName] = PayloadURL;};
-
     /** Check to see if a payload key is already registered in the payload map.
      *  @param PackageModuleName The concatenation of the package.name and module.name.
      *
      *  @return true if payload exists, false if not.
      */
-    bool payloadExists(std::string PackageModuleName) {return (m_runPayloads.find(PackageModuleName) != m_runPayloads.end());}
+    bool payloadExists(std::string PackageModuleName) {return (m_payloads.find(PackageModuleName) != m_payloads.end());}
 
-    /** Adds a payload checksum to the payload map.
+    /** Adds a payload to the payload map.
      *  @param PackageModuleName The concatenation of the package.name and module.name.
-     *  @param Checksum The payload MD5 checksum.
+     *  @param payload The payload information data structure.
      *
      *  @return Nothing yet
      */
-    void addChecksum(std::string PackageModuleName, std::string Checksum) {m_runChecksums[PackageModuleName] = Checksum;};
+    void addPayloadInfo(std::string PackageModuleName, conditionsPayload payload) {m_payloads[PackageModuleName] = payload;};
+
+    /** Get payload information from the payload map.
+     *
+     *  @param packageName A string identifier for the payload type.  Does not necessarily need to be the BASF2 package.
+     *  @param moduleName A string identifier for the payload type.  Does not necessarily need to be the BASF2 module.
+     *
+     *  @return conditionsPayload The payload information data structure. NULL if payload not found.
+     */
+    conditionsPayload getPayloadInfo(std::string packageName,
+                                     std::string moduleName) {return getPayloadInfo(packageName + moduleName);};
+
+    /** Get payload information from the payload map.
+     *  @param PackageModuleName The concatenation of the package.name and module.name.
+     *
+     *  @return conditionsPayload The payload information data structure. NULL if payload not found.
+     */
+    conditionsPayload getPayloadInfo(std::string PackageModuleName);
+
+    /** Get payload information map.
+     *  @param PackageModuleName The concatenation of the package.name and module.name.
+     *
+     *  @return std::map<std::string, conditionsPayload> The payload information map.  The key is the concatenation of package and module.  NULL if payload not found.
+     */
+    std::map<std::string, conditionsPayload> getPayloadInfoMap(void) {return m_payloads;};
 
     /** Adds a payload file to the conditions database.
      *  @param payloadFileName The file name of the payload.
@@ -182,14 +227,8 @@ namespace Belle2 {
     /** A buffer to temporarily get rid of compiler warnings */
     std::string m_buffer;
 
-    /** Map of payloads under construction **/
-    std::map<std::string, TList*> m_currentPayloads;
-
-    /** Map of payloads in DB for a particular run, <PackageNameModuleName, PayloadURL> **/
-    std::map<std::string, std::string> m_runPayloads;
-
-    /** Map of checksums from DB for a particular run, <PackageNameModuleName, Checksum> **/
-    std::map<std::string, std::string> m_runChecksums;
+    /** Map of payloads for current experiment and run. */
+    std::map<std::string, conditionsPayload> m_payloads;
 
   };
 }

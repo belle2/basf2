@@ -40,7 +40,7 @@ ConditionsService::~ConditionsService()
 void ConditionsService::getPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName)
 {
 
-  m_runPayloads.clear();
+  m_payloads.clear(); // not sure we should do this here.
 
   CURL* curl;
   CURLcode res;
@@ -68,7 +68,7 @@ void ConditionsService::getPayloads(std::string GlobalTag, std::string Experimen
   }
   parse_payloads(m_buffer);
 
-  B2INFO("Conditions service retrieved " << m_runPayloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
+  B2INFO("Conditions service retrieved " << m_payloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
          RunName << " listed under global tag " << GlobalTag);
 
   return ;
@@ -152,7 +152,7 @@ void ConditionsService::parse_payloads(std::string temp)
   XMLNodePointer_t mainnode = xml->DocGetRootElement(xmldoc);
 
   // display recursively all nodes and subnodes
-  // DisplayNodes(xml, mainnode, 1);
+  //  DisplayNodes(xml, mainnode, 1);
 
   // parse the payloads
   XMLNodePointer_t iov_node = xml->GetChild(mainnode);
@@ -166,20 +166,21 @@ void ConditionsService::parse_payloads(std::string temp)
   std::string nodeName;
 
   while (payload_node) {
-
+    conditionsPayload payload;
     nodeName = xml->GetNodeName(payload_node);
     attr = xml->GetFirstAttr(payload_node);
     B2INFO("Parsing payload... " << nodeName << " with id " << xml->GetAttrValue(attr));
     if (nodeName == "payload") { /// Found a payload, now parse the needed information.
+
       child_node = xml->GetChild(payload_node);
       while (child_node) { // Search for the module
         nodeName = xml->GetNodeName(child_node);
 
         if (nodeName == "payloadUrl") {
-          PayloadURL = xml->GetNodeContent(child_node);
+          payload.logicalFileName = xml->GetNodeContent(child_node);
         }
         if (nodeName == "checksum") {
-          Checksum = xml->GetNodeContent(child_node);
+          payload.md5Checksum = xml->GetNodeContent(child_node);
         }
         if (nodeName == "basf2Module") { // module found
           XMLNodePointer_t module_node = child_node;
@@ -188,7 +189,7 @@ void ConditionsService::parse_payloads(std::string temp)
             nodeName = xml->GetNodeName(child_node);
             if (nodeName == "name") {
               // Get the module name.
-              ModuleName = xml->GetNodeContent(child_node);
+              payload.module = xml->GetNodeContent(child_node);
             } else if (nodeName == "basf2Package") {
               XMLNodePointer_t package_node = child_node;
               child_node = xml->GetChild(child_node);
@@ -196,7 +197,7 @@ void ConditionsService::parse_payloads(std::string temp)
                 nodeName = xml->GetNodeName(child_node);
                 if (nodeName == "name") {
                   // Get the module name.
-                  PackageName = xml->GetNodeContent(child_node);
+                  payload.package = xml->GetNodeContent(child_node);
                 }
                 child_node = xml->GetNext(child_node);
               }
@@ -208,20 +209,68 @@ void ConditionsService::parse_payloads(std::string temp)
         }
         child_node = xml->GetNext(child_node);
       }
+    }
 
-      if (PackageName.size() == 0 || ModuleName.size() == 0 || PayloadURL.size() == 0) {
-        B2ERROR("ConditionsService::parse_payload Payload not parsed correctly.");
-      } else {
-        std::string payloadKey = PackageName + ModuleName;
-        if (ConditionsService::getInstance()->payloadExists(payloadKey)) {
-          B2FATAL("Found duplicate payload key " << payloadKey << " while parsing conditions payloads. ");
+    payload_node = xml->GetNext(payload_node);
+    nodeName = xml->GetNodeName(payload_node);
+    if (nodeName == "payloadIov") { /// Found a payload, now parse the needed information.
+      child_node = xml->GetChild(payload_node);
+      while (child_node) { // Search for the runs
+        std::string iovNodeName = xml->GetNodeName(child_node);
+        if ((iovNodeName == "initialRunId") || (iovNodeName == "finalRunId")) {
+          XMLNodePointer_t run_node = child_node;
+          std::string runName, expName;
+          child_node = xml->GetChild(child_node);
+          while (child_node) { // Search for the run name and experiment
+            nodeName = xml->GetNodeName(child_node);
+            if (nodeName == "name") {
+              runName = xml->GetNodeContent(child_node);
+            }
+            if (nodeName == "experiment") {
+              XMLNodePointer_t exp_node = child_node;
+              child_node = xml->GetChild(child_node);
+              while (child_node) { // Search for the experiment name
+                nodeName = xml->GetNodeName(child_node);
+                if (nodeName == "name") {
+                  expName = xml->GetNodeContent(child_node);
+                }
+                child_node = xml->GetNext(child_node);
+              }
+              child_node = exp_node;
+            }
+
+            child_node = xml->GetNext(child_node);
+          }
+          child_node = run_node;
+          if (iovNodeName == "initialRunId") {
+            payload.runInitial = runName;
+            payload.expInitial = expName;
+          }
+          if (iovNodeName == "finalRunId") {
+            payload.runFinal = runName;
+            payload.expFinal = expName;
+          }
         }
-        B2INFO("Found payload for module " << ModuleName << " in package " << PackageName << " at URL " << PayloadURL <<
-               ".  Storing with key: " << payloadKey << " and checksum: " << Checksum);
-        ConditionsService::getInstance()->addPayloadURL(payloadKey, PayloadURL);
-        ConditionsService::getInstance()->addChecksum(payloadKey, Checksum);
+        child_node = xml->GetNext(child_node);
       }
     }
+
+    if (payload.package.size() == 0 || payload.module.size() == 0 || payload.logicalFileName.size() == 0) {
+      B2ERROR("ConditionsService::parse_payload Payload not parsed correctly.");
+    } else {
+      std::string payloadKey = payload.package + payload.module;
+      if (ConditionsService::getInstance()->payloadExists(payloadKey)) {
+        B2ERROR("Found duplicate payload key " << payloadKey <<
+                " while parsing conditions payloads. Using refusing to add payload with identical key.");
+      } else {
+        B2INFO("Found payload for module " << payload.module << " in package " << payload.package
+               << " at URL " << payload.logicalFileName << ".  Storing with key: "
+               << payloadKey << " and checksum: " << payload.md5Checksum << ".  IOV (exp/run) from "
+               << payload.expInitial << "/" << payload.runInitial << " to " << payload.expFinal << "/" << payload.runFinal);
+        ConditionsService::getInstance()->addPayloadInfo(payloadKey, payload);
+      }
+    }
+
     iov_node = xml->GetNext(iov_node);
     payload_node = xml->GetChild(iov_node);
   }
@@ -233,6 +282,16 @@ void ConditionsService::parse_payloads(std::string temp)
 
 }
 
+conditionsPayload ConditionsService::getPayloadInfo(std::string PackageModuleName)
+{
+  conditionsPayload payload;
+  if (payloadExists(PackageModuleName)) {
+    payload = m_payloads[PackageModuleName];
+  } else {
+    B2WARNING("Payload information requested for " << PackageModuleName << ", but not found.");
+  }
+  return payload;
+}
 
 void ConditionsService::writePayloadFile(std::string payloadFileName,
                                          std::string packageName,
@@ -326,7 +385,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
   if (!payloadExists(packageName + moduleName)) {
     B2FATAL("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
   }
-  std::string remote_file = m_runPayloads[packageName + moduleName];
+  std::string remote_file = m_payloads[packageName + moduleName].logicalFileName;
   std::string local_file = m_FILEbase + remote_file; // This will work for local files and CVMFS.
 
 
@@ -365,14 +424,14 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
         }
       }
       checksum = TMD5::FileChecksum(local_file.c_str()); // check checksum
-    } else if (checksum->AsString() == m_runChecksums[packageName + moduleName]) {
+    } else if (checksum->AsString() == m_payloads[packageName + moduleName].md5Checksum) {
       B2INFO("Found file: " << local_file << " with correct MD5 checksum: " << checksum->AsString());
       return local_file;
     }
 
 
     TMD5* checksum_new;
-    while (checksum->AsString() != m_runChecksums[packageName + moduleName]) { // then there was a checksum mis-match
+    while (checksum->AsString() != m_payloads[packageName + moduleName].md5Checksum) { // then there was a checksum mis-match
       gSystem->Sleep(1000);
       checksum_new = TMD5::FileChecksum(local_file.c_str()); // check checksum again
       if (std::string(checksum->AsString()) != std::string(checksum_new->AsString())) {   // Then we are downloading the file already.
@@ -380,7 +439,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
         B2INFO("checksum: " << checksum->AsString() << "\tchecksum_new: " << checksum_new->AsString());
         checksum = checksum_new;
       } else { // File isn't downloading, but checksums don't match.  Throw an error.
-        B2FATAL("Error with file " << local_file.c_str() << " checksum expected: " << m_runChecksums[packageName + moduleName] <<
+        B2FATAL("Error with file " << local_file.c_str() << " checksum expected: " << m_payloads[packageName + moduleName].md5Checksum <<
                 " found: " << checksum->AsString());
         return NULL;
       }
@@ -391,9 +450,9 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
   TMD5* checksum = TMD5::FileChecksum(local_file.c_str()); // check if the file exists
   if (!checksum) { // file isn't there.  Toss an error.
     B2ERROR("Did not find file " << local_file << " check inputs.");
-  } else if (std::string(checksum->AsString()) != m_runChecksums[packageName +
-             moduleName]) { // MD5 checksum doesn't match the database entry.
-    B2FATAL("Conditions file " << local_file << " error! Expected MD5 checksum " << m_runChecksums[packageName + moduleName] <<
+  } else if (std::string(checksum->AsString()) != m_payloads[packageName +
+                                                             moduleName].md5Checksum) { // MD5 checksum doesn't match the database entry.
+    B2FATAL("Conditions file " << local_file << " error! Expected MD5 checksum " << m_payloads[packageName + moduleName].md5Checksum <<
             " and calculated checksum " << checksum->AsString());
     return NULL;
   }

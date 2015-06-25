@@ -137,10 +137,10 @@ GenFitterModule::GenFitterModule() :
            true);
   addParam("RealisticCDCGeoTranslator", m_realisticCDCGeoTranslator,
            "If true, realistic CDC geometry translators will be used (wire sag, misalignment).",
-           false);
+           true);
   addParam("CDCWireSag", m_enableWireSag,
            "Whether to enable wire sag in the CDC geometry translation.  Needs to agree with simulation/digitization.",
-           false);
+           true);
   addParam("UseTrackTime", m_useTrackTime,
            "Determines whether the realistic TDC track time converter and the "
            "CDCRecoHits will take the track propagation time into account.  "

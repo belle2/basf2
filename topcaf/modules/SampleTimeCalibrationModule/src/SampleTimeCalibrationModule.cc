@@ -422,12 +422,12 @@ void SampleTimeCalibrationModule::FillWaveform(const EventWaveformPacket* in_wp)
   double sample_t = in_wp->GetTime();
   double coarse_t = double(coarse_int) * 64.0 / rate;
   double delta_t = m_tdc + sample_t - coarse_t;
-  B2INFO("delta_t: " << delta_t << " = " << m_tdc << " + " << sample_t << " - " << coarse_t);
+  //  B2INFO("delta_t: " << delta_t << " = " << m_tdc << " + " << sample_t << " - " << coarse_t);
 
   int time_win = max_bin / 64.; //Which window in ROI
   int peak_win = win + time_win;
   double shift_time_bin = max_bin - 64.0 * time_win;
-  B2INFO("channel_id: " << channel_id << "\tshift_time_bin: " << shift_time_bin << " = " << max_bin << " - 64.0 * " << time_win);
+  //  B2INFO("channel_id: " << channel_id << "\tshift_time_bin: " << shift_time_bin << " = " << max_bin << " - 64.0 * " << time_win);
   std::pair<double, double> p = std::make_pair(shift_time_bin, delta_t);
 
   //Start Add

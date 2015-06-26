@@ -121,6 +121,10 @@ bool LocalDatabase::storeData(const std::string& name, TObject* object, Interval
   }
 
   tree->Fill();
+  TDirectory* saveDir = gDirectory;
+  m_dbFile->cd();
+  tree->Write();
+  saveDir->cd();
 
   return true;
 }

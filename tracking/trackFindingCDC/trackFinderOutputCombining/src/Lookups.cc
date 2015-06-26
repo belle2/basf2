@@ -127,8 +127,8 @@ void SegmentTrackCombiner::filter(BaseBackgroundSegmentsFilter& backgroundSegmen
 
 
 void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserSecondStep,
-                                   BaseSegmentTrainFilter& segmentTrainFilter,
-                                   BaseSegmentTrackFilter& segmentTrackFilter)
+                                   BaseSegmentTrainFilter& /*segmentTrainFilter*/,
+                                   BaseSegmentTrackFilter& /*segmentTrackFilter*/)
 {
   B2DEBUG(100, "Starting combining work.");
 
@@ -148,10 +148,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
         segmentInformation->clearMatches();
       }
     }
-  }
-
-  return;
-  /*
+    /*
     // Go through all tracks and delete the cases were we have more than one train/segment
     for (TrackInformation* trackInformation : m_trackLookUp) {
       // Try to find the longest trains of segments
@@ -186,8 +183,8 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
         tryToCombineSegmentTrainAndMatchedTracks(goodTrain, segmentTrackFilter);
 
       trackInformation->clearGoodSegmentTrain();
-    }
-  }*/
+    }*/
+  }
 }
 
 const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFittingSegmentTrain(

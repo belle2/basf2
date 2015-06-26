@@ -52,7 +52,7 @@ namespace Belle2 {
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a wire hits cluster.
+     *  that should be generated from a segment.
      */
     class BackgroundSegmentVarNames : public VarNames<CDCRecoSegment2D> {
 
@@ -67,7 +67,7 @@ namespace Belle2 {
       }
     };
 
-    /** Class that computes floating point variables from a pair of track and segment.
+    /** Class that computes floating point variables from the segments.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
     class BackgroundSegmentVarSet : public VarSet<BackgroundSegmentVarNames> {

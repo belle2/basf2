@@ -9,7 +9,11 @@ import sys
 
 
 class BackgroundSegmentsRecordingRun(StandardEventGenerationRun):
-    n_events = 50
+    """
+    Record the variables for the BackgroundSegmentsFilter in the SegmentsTrackCombinerModule
+    """
+    
+    n_events = 5000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):

@@ -91,7 +91,7 @@ namespace Belle2 {
       }
 
     private:
-      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp;
+      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp; /**< The added segment<->hit lookup */
     };
 
     /** And we use this class for storing our Track Information */
@@ -139,7 +139,8 @@ namespace Belle2 {
       void match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep);
 
       /**
-       *
+       * Filter out the segments that are fake or background. Mark them as taken.
+       * For deciding which is background or not we use the given filter.
        * @param backgroundSegmentFilter
        */
       void filter(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);

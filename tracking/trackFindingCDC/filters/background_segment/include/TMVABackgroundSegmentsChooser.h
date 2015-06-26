@@ -20,7 +20,7 @@ namespace Belle2 {
 
     public:
       /// Constructor initialising the TMVAFilter with standard training name for this filter.
-      TMVABackgroundSegmentsFilter(const std::string& filename  = "BackgroundSegmentsFilter.root") :
+      TMVABackgroundSegmentsFilter(const std::string& filename  = "BackgroundSegmentsFilter") :
         TMVAFilter<BackgroundSegmentVarSet>(filename)
       {;}
 

@@ -56,12 +56,12 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     ConditionsService::getInstance()->getPayloads(m_globalTag, std::to_string(m_currentExperiment), std::to_string(m_currentRun));
   }
 
-  if (!ConditionsService::getInstance()->payloadExists("topcaf" + name)) {
+  if (!ConditionsService::getInstance()->payloadExists("dbstore" + name)) {
     B2ERROR("No payload " << name << " found in the database.");
     return result;
   }
 
-  std::string filename = ConditionsService::getInstance()->getPayloadFileURL("topcaf", name);
+  std::string filename = ConditionsService::getInstance()->getPayloadFileURL("dbstore", name);
   if (filename.empty()) {
     B2ERROR("Failed to get " << name << " from database.");
     return result;
@@ -83,7 +83,7 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     return result;
   }
 
-  conditionsPayload paylodInfo = ConditionsService::getInstance()->getPayloadInfo("topcaf", name);
+  conditionsPayload paylodInfo = ConditionsService::getInstance()->getPayloadInfo("dbstore", name);
   result.second = IntervalOfValidity(stoi(paylodInfo.expInitial), stoi(paylodInfo.runInitial), stoi(paylodInfo.expFinal),
                                      stoi(paylodInfo.runFinal));
   return result;
@@ -101,7 +101,7 @@ bool ConditionsDatabase::storeData(const std::string& name, TObject* object, Int
   delete file;
   saveDir->cd();
 
-  ConditionsService::getInstance()->writePayloadFile("payload.root", "topcaf", name);
+  ConditionsService::getInstance()->writePayloadFile("payload.root", "dbstore", name);
   remove("payload.root");
 
   return true;

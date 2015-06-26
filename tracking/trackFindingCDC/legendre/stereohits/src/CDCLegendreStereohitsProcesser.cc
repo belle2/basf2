@@ -384,8 +384,7 @@ double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, dou
   double alpha = acos(1. - (SQR(pos.first - cand->getReferencePoint().X()) + SQR(pos.second - cand->getReferencePoint().Y())) /
                       (2.*SQR(cand->getRadius())));
 
-  double hitPhi(0.);
-  hitPhi = atan(pos.second / pos.first);
+  double hitPhi;
 
   //distribute the phi values from 0 to 2pi
   if (pos.first >= 0 && pos.second >= 0) {

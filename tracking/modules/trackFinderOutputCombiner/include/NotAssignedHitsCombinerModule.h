@@ -36,7 +36,6 @@ namespace Belle2 {
      * Try to combine the segments and the tracks
      */
     void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
-    double calculateGoodFitIndex(const TrackFindingCDC::CDCTrack& trackCandidate, const TrackFindingCDC::CDCRecoSegment2D segment);
     double calculateThetaOfTrackCandidate(const TrackFindingCDC::CDCTrack& trackCandidate);
     void findEasyCandidates(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
                             std::vector<TrackFindingCDC::CDCTrack>& tracks);

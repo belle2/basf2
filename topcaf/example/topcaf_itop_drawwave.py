@@ -83,13 +83,13 @@ else:
 camacconverter = register_module('Camac')
 camacDict = {'inputFilename': args.inputDir + args.inputRun + ".cmc",
 
-             'crateID': 13369927,  # leps june 2013 itop test beam
-             'ftswSlot': 7,  # leps june 2013 itop test beam
-             'ftswWord': 3  # leps june 2013 itop test beam
+             #             'crateID': 13369927,  # leps june 2013 itop test beam
+             #             'ftswSlot': 7,  # leps june 2013 itop test beam
+             #             'ftswWord': 3  # leps june 2013 itop test beam
 
-             #             'crateID'            : 0x00cc0200,  # 2014 itop crt
-             #             'ftswSlot'           : 6,  # 2014 itop crt
-             #             'ftswWord'           : 5  # 2014 itop crt
+             'crateID': 0x00cc0200,  # 2014 itop crt
+             'ftswSlot': 6,  # 2014 itop crt
+             'ftswWord': 5  # 2014 itop crt
 
              }
 camacconverter.param(camacDict)

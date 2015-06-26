@@ -99,7 +99,7 @@ void PedestalModule::beginRun()
       if (!cl->InheritsFrom("TProfile")) continue;
       TProfile* profile = (TProfile*)key->ReadObj();
       std::string name_key = profile->GetName();
-      unsigned int window_id = strtoul(name_key.c_str(), NULL, 0);
+      topcaf_channel_id_t window_id = strtoul(name_key.c_str(), NULL, 0);
       m_sample2ped[window_id] = profile;
     }
 
@@ -121,7 +121,7 @@ void PedestalModule::event()
       if ((m_mode == 0)) { // Calculate pedestals from waveform
 
         //      B2INFO("PedestalModule::GetChannelID(): " <<   evtwave_ptr->GetChannelID() );
-        unsigned int channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
+        topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
         const std::vector<double> v_samples = evtwave_ptr->GetSamples();
         int nsamples = v_samples.size();
 
@@ -143,7 +143,7 @@ void PedestalModule::event()
         //      EventWaveformPacket *out_wp = new EventWaveformPacket(*evtwave_ptr);
 
         //Bad channel ID need to improve!!!
-        unsigned int channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
+        topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
         //      unsigned int window_id = GetWindowID(evtwave_ptr);
 
         //Look up reference pedestal and correct
@@ -195,10 +195,10 @@ void  PedestalModule::terminate()
 
       if (m_out_ped_file) {m_out_ped_file->cd();}
 
-      std::map<unsigned int, TProfile*>::iterator it_ct = m_sample2ped.begin();
+      std::map<topcaf_channel_id_t, TProfile*>::iterator it_ct = m_sample2ped.begin();
 
       for (; it_ct != m_sample2ped.end(); ++it_ct) {
-        unsigned int key =  it_ct->first;
+        topcaf_channel_id_t key =  it_ct->first;
         m_sample2ped[key]->Write();
       }
 
@@ -216,10 +216,10 @@ void  PedestalModule::terminate()
 
       if (m_out_ped_file) {m_out_ped_file->cd();}
 
-      std::map<unsigned int, TProfile*>::iterator it_ct = m_sample2ped.begin();
+      std::map<topcaf_channel_id_t, TProfile*>::iterator it_ct = m_sample2ped.begin();
 
       for (; it_ct != m_sample2ped.end(); ++it_ct) {
-        unsigned int key =  it_ct->first;
+        topcaf_channel_id_t key =  it_ct->first;
         m_sample2ped[key]->Write();
       }
 

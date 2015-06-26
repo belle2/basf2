@@ -12,7 +12,11 @@
 
 namespace Belle2 {
 
+  typedef unsigned long long topcaf_channel_id_t;
+
   class EventWaveformPacket: public Packet {
+
+
 
   public:
     EventWaveformPacket();
@@ -22,7 +26,7 @@ namespace Belle2 {
     ~EventWaveformPacket();
 
     //--- Getters ---//
-    unsigned int GetChannelID() const {return m_channel_id;}
+    topcaf_channel_id_t GetChannelID() const {return m_channel_id;}
     int GetEventNumber() const {return m_evt_num;}
     int GetRefWindow() const {return  m_asic_refwin;}
     int GetNumWaveSegments() const {return  m_nwave_seg;}
@@ -49,11 +53,11 @@ namespace Belle2 {
     void SetQuality(double quality) {m_quality = quality;}
 
   private:
-    unsigned int m_channel_id;
+    topcaf_channel_id_t m_channel_id;
     packet_word_t m_evt_num;
     packet_word_t m_asic_win, m_nwave_seg;
     packet_word_t m_nsamples;
-    unsigned char m_asic_ch, m_asic_row, m_asic_col;
+    unsigned short m_asic_ch, m_asic_row, m_asic_col;
     unsigned short m_asic_refwin;
     std::vector< double > v_samples;
     double m_time, m_amp, m_rate, m_quality;

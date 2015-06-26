@@ -122,7 +122,7 @@ void SampleTimeCalibrationModule::beginRun()
       if (!cl->InheritsFrom("TH1D")) continue;
       TH1D* h = (TH1D*)key->ReadObj();
       std::string name_key = h->GetName();
-      unsigned int channel_id = strtoul(name_key.c_str(), NULL, 0);
+      topcaf_channel_id_t channel_id = strtoul(name_key.c_str(), NULL, 0);
 
       m_in_chid2samplecalib[channel_id] = h;
     }
@@ -296,10 +296,10 @@ void  SampleTimeCalibrationModule::terminate()
       m_corr_residual_h->Write();
 
     //Save Channel sample time info.
-    std::map<unsigned int, TProfile*>::iterator it_ct =  m_out_sample2time.begin();
+    std::map<topcaf_channel_id_t, TProfile*>::iterator it_ct =  m_out_sample2time.begin();
     for (; it_ct != m_out_sample2time.end(); ++it_ct) {
 
-      unsigned int key =  it_ct->first;
+      topcaf_channel_id_t key =  it_ct->first;
 
       if (m_out_file)
         m_out_sample2time[key]->Write();
@@ -310,9 +310,9 @@ void  SampleTimeCalibrationModule::terminate()
 
     //TMinuit All channels
     TH1D* rms_h = new TH1D("rms_h", "rms_h", 250, 0.05, 0.15);
-    std::map<unsigned int, v_cell_dt_pair>::iterator iter;
+    std::map<topcaf_channel_id_t, v_cell_dt_pair>::iterator iter;
     for (iter = m_ch2cell_dt.begin(); iter != m_ch2cell_dt.end(); iter++) {
-      unsigned int ch_id = iter->first;
+      topcaf_channel_id_t ch_id = iter->first;
       std::string s_channel_calib = "SampleTimeCalibration_" + std::to_string(ch_id);
       TH1D* channel_time_calib_h = new TH1D(s_channel_calib.c_str(), s_channel_calib.c_str(), 64, 0, 64);
       g_times = iter->second;
@@ -411,7 +411,7 @@ void fcnSamplingTime(int& npar, double* gin, double& f, double* par, int iflag)
 //Method used to record time valies from waveform
 void SampleTimeCalibrationModule::FillWaveform(const EventWaveformPacket* in_wp)
 {
-  unsigned int channel_id = in_wp->GetChannelID();
+  topcaf_channel_id_t channel_id = in_wp->GetChannelID();
   unsigned short win = in_wp->GetASICWindow();
   unsigned int refwin = in_wp->GetRefWindow();
   int coarse_int = refwin > win ? refwin - win : 64 - (win - refwin);
@@ -422,11 +422,12 @@ void SampleTimeCalibrationModule::FillWaveform(const EventWaveformPacket* in_wp)
   double sample_t = in_wp->GetTime();
   double coarse_t = double(coarse_int) * 64.0 / rate;
   double delta_t = m_tdc + sample_t - coarse_t;
-
+  B2INFO("delta_t: " << delta_t << " = " << m_tdc << " + " << sample_t << " - " << coarse_t);
 
   int time_win = max_bin / 64.; //Which window in ROI
   int peak_win = win + time_win;
   double shift_time_bin = max_bin - 64.0 * time_win;
+  B2INFO("channel_id: " << channel_id << "\tshift_time_bin: " << shift_time_bin << " = " << max_bin << " - 64.0 * " << time_win);
   std::pair<double, double> p = std::make_pair(shift_time_bin, delta_t);
 
   //Start Add
@@ -464,7 +465,7 @@ void SampleTimeCalibrationModule::FillWaveform(const EventWaveformPacket* in_wp)
 double SampleTimeCalibrationModule::CalibrateWaveform(const EventWaveformPacket* in_wp)
 {
 
-  unsigned int channel_id = in_wp->GetChannelID();
+  topcaf_channel_id_t channel_id = in_wp->GetChannelID();
   unsigned short win = in_wp->GetASICWindow();
   double time_bin = in_wp->GetTimeBin();
   int time_win = time_bin / 64.; //Which window in ROI

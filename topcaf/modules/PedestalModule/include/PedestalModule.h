@@ -52,7 +52,7 @@ namespace Belle2 {
     //var
     std::string m_out_ped_filename, m_in_ped_filename;
     TFile* m_in_ped_file, *m_out_ped_file;
-    std::map<unsigned int, TProfile*> m_sample2ped;
+    std::map<topcaf_channel_id_t, TProfile*> m_sample2ped;
 
     Int_t m_conditions;
     Int_t m_mode;

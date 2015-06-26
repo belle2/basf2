@@ -1,4 +1,6 @@
 #include <topcaf/dataobjects/EventWaveformPacket.h>
+#include <iostream>
+#include <iomanip>
 
 using namespace Belle2;
 
@@ -21,15 +23,25 @@ EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
   m_nsamples = m_packet_payload[6];
   v_samples.resize(m_nsamples, 0);
 
+  std::cout << "Waveform Header" << std::endl;
+  for (unsigned int c = 0 ; c < 7 ; c++) {
+    packet_word_t myword = m_packet_payload[c];
+    std::cout << c << "\t...\t0x" << std::setfill('0') << std::setw(8) << std::hex << myword << std::dec << std::endl;
+  }
+
   for (unsigned int s = 0; s < (m_nsamples / 2); s++) {
     packet_word_t point = m_packet_payload[(7 + s)];
     v_samples[s * 2] = (point & (0x00000FFF));
     v_samples[s * 2 + 1] = ((point & (0x0FFF0000)) >> 16);
   }
-  m_channel_id = m_scrod_id * 1E8
-                 + m_asic_row * 1E6
-                 + m_asic_col * 1E4
-                 + m_asic_ch * 1E2;
+  m_channel_id = (m_scrod_id * 1E8
+                  + m_asic_row * 1E6
+                  + m_asic_col * 1E4
+                  + m_asic_ch * 1E2);
+  std::cout << "m_channel_id: " << m_channel_id << "\t scrod: " << m_scrod_id
+            << "\t asic_row: " << m_asic_row << "\t asic_col: " << m_asic_col
+            << "\t asic_ch: " << m_asic_ch << std::endl;
+
 
   //Set default values
   m_amp = 0;

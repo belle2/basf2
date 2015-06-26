@@ -161,6 +161,7 @@ class SegmentFakeRatesModule(HarvestingModule):
         number_of_new_hits = local_track_cand.getNHits()
         number_of_hits = local_track_cand.getNHits()
         number_of_hits_in_same_superlayer = np.NaN
+        partner_has_stereo_information = np.NaN
 
         if is_clone_or_matched:
             related_mc_track_cand = mc_track_matcher_local.getRelatedMCTrackCand(local_track_cand)
@@ -180,11 +181,15 @@ class SegmentFakeRatesModule(HarvestingModule):
                 number_of_new_hits = len(local_hits_new)
 
                 # Count number of hits in this superlayer
+                partner_has_stereo_information = 0
                 number_of_hits_in_same_superlayer = 0
                 for cdc_hit_ID in legendre_hits:
                     cdc_hit = cdc_hits[cdc_hit_ID]
                     if cdc_hit.getISuperLayer() == superlayer_of_segment:
                         number_of_hits_in_same_superlayer += 1
+
+                    if cdc_hit.getISuperLayer() % 2 == 1:
+                        partner_has_stereo_information = 1
 
         return dict(is_background=is_background,
                     is_ghost=is_ghost,
@@ -199,7 +204,8 @@ class SegmentFakeRatesModule(HarvestingModule):
                     hit_efficiency_of_partner=hit_efficiency_of_partner,
                     number_of_new_hits=number_of_new_hits,
                     number_of_hits=number_of_hits,
-                    number_of_hits_in_same_superlayer=number_of_hits_in_same_superlayer)
+                    number_of_hits_in_same_superlayer=number_of_hits_in_same_superlayer,
+                    partner_has_stereo_information=partner_has_stereo_information)
 
     save_tree = refiners.save_tree(folder_name="tree")
 

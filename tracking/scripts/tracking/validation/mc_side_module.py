@@ -14,7 +14,8 @@ from ROOT import Belle2
 
 class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
-    """Module to collect matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding."""
+    """Module to collect matching information about the found particles and to generate
+       validation plots and figures of merit on the performance of track finding."""
 
     def __init__(
             self,
@@ -22,18 +23,19 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
             contact,
             output_file_name=None,
             trackCandidatesColumnName="TrackCands",
+            mcTrackCandidatesColumnName='MCTrackCands',
             expert_level=None):
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
 
-        super(MCSideTrackingValidationModule, self).__init__(foreach="MCTrackCands",
+        super(MCSideTrackingValidationModule, self).__init__(foreach=mcTrackCandidatesColumnName,
                                                              name=name,
                                                              output_file_name=output_file_name,
                                                              contact=contact,
                                                              expert_level=expert_level)
 
         self.trackCandidatesColumnName = trackCandidatesColumnName
-        self.mcTrackCandidatesColumnName = "MCTrackCands"
+        self.mcTrackCandidatesColumnName = mcTrackCandidatesColumnName
 
     def initialize(self):
         super(MCSideTrackingValidationModule, self).initialize()
@@ -136,7 +138,9 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
 
 class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
 
-    """Module to collect more matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding. This module gives information on the number of hits etc. """
+    """Module to collect more matching information about the found particles and to generate
+       validation plots and figures of merit on the performance of track finding. This module
+       gives information on the number of hits etc. """
 
     def prepare(self):
         super(ExpertMCSideTrackingValidationModule, self).prepare()
@@ -175,8 +179,10 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
         mc_track_cand_cdc_hit_ids = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
 
         ratio = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
-        ratio_hits_in_mc_tracks_and_in_good_pr_tracks = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_good_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
-        ratio_hits_in_mc_tracks_and_in_fake_pr_tracks = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_fake_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
+        ratio_hits_in_mc_tracks_and_in_good_pr_tracks = np.divide(
+            1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_good_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
+        ratio_hits_in_mc_tracks_and_in_fake_pr_tracks = np.divide(
+            1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_fake_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
 
         hit_crops = dict(
             mc_number_of_hits=len(mc_track_cand_cdc_hit_ids),
@@ -193,12 +199,14 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     # Refiners to be executed on terminate #
     # #################################### #
     save_ratio_hits_in_mc_tracks_and_in_pr_tracks_hist = refiners.save_histograms(
-        select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in MCTracks found by the track finder")  # renaming quantity to name that is more suitable for display
+        # renaming quantity to name that is more suitable for display
+        select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in MCTracks found by the track finder")
     )
 
     save_ratio_hits_in_missing_mc_tracks_and_in_pr_tracks_hist = refiners.save_histograms(
         filter_on="is_missing",  # filter on missing to mimic what ratio_hits_in_missing_mc_tracks_and_in_pr_tracks used to be
-        select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in missing MCTracks found by the track finder")  # renaming quantity to name that is more suitable for display
+        # renaming quantity to name that is more suitable for display
+        select=dict(ratio_hits_in_mc_tracks_and_in_pr_tracks="ratio of hits in missing MCTracks found by the track finder")
     )
 
 

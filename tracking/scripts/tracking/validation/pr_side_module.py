@@ -14,7 +14,8 @@ from ROOT import Belle2
 
 class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
-    """Module to collect matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding."""
+    """Module to collect matching information about the found particles and to generate
+       validation plots and figures of merit on the performance of track finding."""
 
     def __init__(
             self,
@@ -22,6 +23,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             contact,
             output_file_name=None,
             trackCandidatesColumnName="TrackCands",
+            mcTrackCandidatesColumnName='MCTrackCands',
             expert_level=None):
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
@@ -33,7 +35,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
                                                              expert_level=expert_level)
 
         self.trackCandidatesColumnName = trackCandidatesColumnName
-        self.mcTrackCandidatesColumnName = "MCTrackCands"
+        self.mcTrackCandidatesColumnName = mcTrackCandidatesColumnName
 
     def initialize(self):
         super(PRSideTrackingValidationModule, self).initialize()
@@ -93,7 +95,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     save_tree = refiners.save_tree(folder_name="pr_tree", name="pr_tree", above_expert_level=1)
 
     save_clone_rate = refiners.save_fom(
-        name="{module.name}_overview_figures_of_merit",  # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
+        name="{module.name}_overview_figures_of_merit",
+        # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
         title="Overview figures in {module.title}",
         description="clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches)",
         key="clone rate",
@@ -103,9 +106,11 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
     )
 
     save_fake_rate = refiners.save_fom(
-        name="{module.name}_overview_figures_of_merit",  # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
+        name="{module.name}_overview_figures_of_merit",
+        # Same as in the mc side module to combine the overview figures of merit into the same TNTuple
         title="Overview figures in {module.title}",
-        description="fake_rate - ratio of pattern recognition tracks that are not related to a particle (background, ghost) to all pattern recognition tracks",
+        description="fake_rate - ratio of pattern recognition tracks that are not related to a particle" +
+                    "(background, ghost) to all pattern recognition tracks",
         key="fake rate",
         select="is_fake",
         aggregation=np.mean,
@@ -159,7 +164,9 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
 class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
-    """Module to collect more matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding. This module gives information on the number of hits etc."""
+    """Module to collect more matching information about the found particles and to
+       generate validation plots and figures of merit on the performance of track finding.
+       This module gives information on the number of hits etc."""
 
     def prepare(self):
         super(ExpertPRSideTrackingValidationModule, self).prepare()

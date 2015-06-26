@@ -37,6 +37,7 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
                  contact,
                  output_file_name=None,
                  trackCandidatesColumnName="TrackCands",
+                 mcTrackCandidatesColumnName="MCTrackCands",
                  expert_level=None):
 
         # Output TFile to be opened in the initialize methode
@@ -49,18 +50,21 @@ class SeparatedTrackingValidationModule(metamodules.PathModule):
                                                 contact,
                                                 output_file_name=output_file_name,
                                                 trackCandidatesColumnName=trackCandidatesColumnName,
+                                                mcTrackCandidatesColumnName=mcTrackCandidatesColumnName,
                                                 expert_level=expert_level)
 
         pr_side_module = self.PRSideModule(name,
                                            contact,
                                            output_file_name=output_file_name,
                                            trackCandidatesColumnName=trackCandidatesColumnName,
+                                           mcTrackCandidatesColumnName=mcTrackCandidatesColumnName,
                                            expert_level=expert_level)
 
         mc_side_module = self.MCSideModule(name,
                                            contact,
                                            output_file_name=output_file_name,
                                            trackCandidatesColumnName=trackCandidatesColumnName,
+                                           mcTrackCandidatesColumnName=mcTrackCandidatesColumnName,
                                            expert_level=expert_level)
 
         self.modules = [
@@ -141,7 +145,8 @@ class AlwaysPassFilter(object):
 
 class TrackingValidationModule(basf2.Module):
 
-    """Module to collect matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding."""
+    """Module to collect matching information about the found particles and to
+       generate validation plots and figures of merit on the performance of track finding."""
 
     def __init__(
         self,
@@ -372,7 +377,8 @@ class TrackingValidationModule(basf2.Module):
         figures_of_merit.description = \
             """
 finding_efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
-fake_rate - ratio of pattern recognition tracks that are not related to a particle (background, ghost) to all pattern recognition tracks <br/>
+fake_rate - ratio of pattern recognition tracks that are not related to a particle
+            (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
 """
         figures_of_merit.check = ''
@@ -451,7 +457,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
         # Show all parameters and the fit result in the plots
         # if viewed in the browser or the validation
-        opt_fit = 0112
+        opt_fit = 0o112
         ROOT.gStyle.SetOptFit(opt_fit)
 
         figures_of_merit.write()

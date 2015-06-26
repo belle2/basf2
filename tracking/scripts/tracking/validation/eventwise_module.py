@@ -21,6 +21,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
                  contact,
                  output_file_name=None,
                  trackCandidatesColumnName='TrackCands',
+                 mcTrackCandidatesColumnName='MCTrackCands',
                  expert_level=None):
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
@@ -32,7 +33,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
                                                                 expert_level=expert_level)
 
         self.trackCandidatesColumnName = trackCandidatesColumnName
-        self.mcTrackCandidatesColumnName = "MCTrackCands"
+        self.mcTrackCandidatesColumnName = mcTrackCandidatesColumnName
         self.cdcHitsColumnname = "CDCHits"
 
     def initialize(self):

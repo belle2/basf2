@@ -107,6 +107,28 @@ void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFir
     if (matchingTracks.size() == 1) {
       TrackInformation* track = *(matchingTracks.begin());
       SegmentTrackCombiner::addSegmentToTrack(segment, track);
+    } else {
+      // Take the one with the most hits in common
+      TrackInformation* trackWithTheMostHitsInCommon = nullptr;
+      unsigned int mostHitsInCommon = 0;
+
+      for (TrackInformation* track : matchingTracks) {
+        unsigned int hitsInCommon = 0;
+        for (const CDCRecoHit3D& recoHit : track->getTrackCand()->items()) {
+          SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
+          if (matchingSegment != nullptr and matchingSegment == segment) {
+            hitsInCommon++;
+          }
+        }
+        if (hitsInCommon > mostHitsInCommon) {
+          mostHitsInCommon = hitsInCommon;
+          trackWithTheMostHitsInCommon = track;
+        }
+      }
+
+      if (trackWithTheMostHitsInCommon != nullptr) {
+        SegmentTrackCombiner::addSegmentToTrack(segment, trackWithTheMostHitsInCommon);
+      }
     }
   }
 }
@@ -127,6 +149,11 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
         continue;
       }
       matchTracksToSegment(segmentInformation, segmentTrackChooserSecondStep);
+
+      if (segmentInformation->getMatches().size() == 1) {
+        SegmentTrackCombiner::addSegmentToTrack(segmentInformation, segmentInformation->getMatches()[0]);
+        segmentInformation->clearMatches();
+      }
     }
 
     // Go through all tracks and delete the cases were we have more than one train/segment

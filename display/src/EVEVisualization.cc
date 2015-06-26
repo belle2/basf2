@@ -920,16 +920,16 @@ void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
 EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
 {
   if (!particle) {
-    if (!m_mcparticleTracks[particle].simhits) {
+    if (!m_mcparticleTracks[nullptr].simhits) {
       const TString pointsTitle("Unassigned SimHits");
-      m_mcparticleTracks[particle].simhits = new TEvePointSet(pointsTitle);
-      m_mcparticleTracks[particle].simhits->SetTitle(pointsTitle);
-      m_mcparticleTracks[particle].simhits->SetMarkerStyle(6);
-      m_mcparticleTracks[particle].simhits->SetMainColor(c_unassignedHitColor);
-      //m_mcparticleTracks[particle].simhits->SetMainTransparency(50);
-      m_mcparticleTracks[particle].track = NULL;
+      m_mcparticleTracks[nullptr].simhits = new TEvePointSet(pointsTitle);
+      m_mcparticleTracks[nullptr].simhits->SetTitle(pointsTitle);
+      m_mcparticleTracks[nullptr].simhits->SetMarkerStyle(6);
+      m_mcparticleTracks[nullptr].simhits->SetMainColor(c_unassignedHitColor);
+      //m_mcparticleTracks[nullptr].simhits->SetMainTransparency(50);
+      m_mcparticleTracks[nullptr].track = NULL;
     }
-    return &m_mcparticleTracks[particle];
+    return &m_mcparticleTracks[nullptr];
   }
 
   if (m_hideSecondaries and !particle->hasStatus(MCParticle::c_PrimaryParticle)) {

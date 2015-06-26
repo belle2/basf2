@@ -239,5 +239,10 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   var<named("segment_super_layer")>() = segment->getISuperLayer();
 
+  bool other_side_of_detector = false;
+  double phiBetweenTrackAndSegment = trajectoryTrack.getStartMom2D().angleWith(segment->front().getRecoPos2D());
+
+  var<named("phi_between_track_and_segment")>() = phiBetweenTrackAndSegment;
+
   return true;
 }

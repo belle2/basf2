@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <assert.h>
 
@@ -23,14 +22,8 @@ using namespace TrackFindingCDC;
 //constexpr const char* const TrackFindingCDC::clusterNames[11];
 
 CDCWireHitClusterBasicVarSet::CDCWireHitClusterBasicVarSet(const std::string& prefix) :
-  VarSet<CDCWireHitClusterBasicVarNames>(prefix),
-  m_superLayerCenters()
+  VarSet<CDCWireHitClusterBasicVarNames>(prefix)
 {
-}
-
-void CDCWireHitClusterBasicVarSet::initialize()
-{
-  prepareSuperLayerCenterArray();
 }
 
 bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
@@ -111,17 +104,4 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
   var<named("mean_inner_distance")>() = totalInnerDistance / size;
   var<named("mean_number_of_neighbors")>() = 1.0 * totalNNeighbors / size;
   return true;
-}
-
-void CDCWireHitClusterBasicVarSet::prepareSuperLayerCenterArray()
-{
-  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-
-  m_superLayerCenters.clear();
-  m_superLayerCenters.reserve(wireTopology.getNSuperLayers());
-
-  for (const CDCWireSuperLayer& superLayer : wireTopology.getWireSuperLayers()) {
-    Float_t superLayerCenter = superLayer.getMiddleCylindricalR();
-    m_superLayerCenters.push_back(superLayerCenter);
-  }
 }

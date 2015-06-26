@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
 #include <vector>
 #include <string>
 #include <assert.h>
@@ -48,6 +50,7 @@ namespace Belle2 {
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
       VarSet(const std::string& prefix = "") :
+        m_superLayerCenters(),
         m_variables(prefix),
         m_nestedVarSet(prefix)
       {;}
@@ -108,6 +111,9 @@ namespace Belle2 {
       }
 
     protected:
+      /// The cylinder radius of the super layer centers
+      std::vector<double> m_superLayerCenters;
+
       /** Getter for the index from the name.
        *  Looks through the associated names and returns the right index if found
        *  Returns nVars (one after the last element) if not found.
@@ -137,6 +143,20 @@ namespace Belle2 {
         IF_NOT_CINT(static_assert(iVar < nVars,
                                   "Requested variable index exceeds number variables.");)
         return m_variables[iVar];
+      }
+
+      /// Prepare the superlayer center array with information coming from the CDCWireTopology.
+      void prepareSuperLayerCenterArray()
+      {
+        const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+
+        m_superLayerCenters.clear();
+        m_superLayerCenters.reserve(wireTopology.getNSuperLayers());
+
+        for (const CDCWireSuperLayer& superLayer : wireTopology.getWireSuperLayers()) {
+          Float_t superLayerCenter = superLayer.getMiddleCylindricalR();
+          m_superLayerCenters.push_back(superLayerCenter);
+        }
       }
 
     public:

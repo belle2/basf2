@@ -94,15 +94,10 @@ namespace Belle2 {
       virtual bool extract(const CDCWireHitCluster* cluster) IF_NOT_CINT(override final);
 
       /// Initialize the peeler before event processing
-      virtual void initialize() IF_NOT_CINT(override final);
-
-    private:
-      /// Prepare the superlayer center array with information coming from the CDCWireTopology.
-      void prepareSuperLayerCenterArray();
-
-    private:
-      /// The cylinder radius of the super layer centers
-      std::vector<double> m_superLayerCenters;
+      virtual void initialize() IF_NOT_CINT(override final)
+      {
+        prepareSuperLayerCenterArray();
+      }
     };
   }
 }

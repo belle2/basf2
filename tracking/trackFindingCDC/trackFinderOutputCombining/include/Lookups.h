@@ -61,6 +61,8 @@ namespace Belle2 {
 
     /** We use this class for storing our segment lists - one for each superlayer
      * This lookup serves (as an addon) also as lookup for the relation cdchit -> segment
+     * When filling the lookup we only process not already taken segments.
+     * Before doing so we mark all segments as taken if all of their hits are already in a track.
      * */
     class SegmentLookUp : public LookUpBase<CDCRecoSegment2D, std::vector<SegmentInformation*>> {
     public:
@@ -127,12 +129,29 @@ namespace Belle2 {
       }
 
       /**
+       * Match the easy segment-track pairs. Easy in this context means we assume at least one common hit.
+       * Because one common hit may be to less, we use a filter after having found the match.
+       * There are some difficulties in the case that one segment has hits in common with more than one track
+       * and the filter gives a positive result in more than one case.
+       * In this case we combine it with the track for which the filter gives the highest result.
+       * @param segmentTrackChooserFirstStep
+       */
+      void match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep);
+
+      /**
+       *
+       * @param backgroundSegmentFilter
+       */
+      void filter(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
+
+      /**
        * Do the heavy combining works:
        * - Go through all superlayers
        * - In each superlayer: Go through all segments in this superlayer and match them to the tracks.
        *   If a match is made is calculated using the method segmentMatchesToTrack.
        *   After that we have a segment <-> track network.
-       * - Go through all tracks and try to concatenate the segments in this superlayer to a larger segment train that fits together.
+       *   If there is a unique relation, add the segment to the track (only the new hits).
+       * - With the remaining ones: Go through all tracks and try to concatenate the segments in this superlayer to a larger segment train that fits together.
        *   For deciding if a list of segments could be a train we use the method couldBeASegmentTrain.
        * - If there is more than one segment (or train of segments) in this superlayer, that match to this track, we use a fit to decide
        *   which train of segments should be kept.
@@ -146,8 +165,6 @@ namespace Belle2 {
                    BaseSegmentTrainFilter& segmentTrainFilter,
                    BaseSegmentTrackFilter& segmentTrackFilter);
 
-      void match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep);
-      void filter(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
 
       /**
        * Clear all the pointer vectors.

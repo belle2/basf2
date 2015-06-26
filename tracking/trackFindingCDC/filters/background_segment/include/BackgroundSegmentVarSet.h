@@ -28,12 +28,27 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
     static char const* const backgroundSegmentNames[] = {
-      "segment_size",
-      "form_function",
-      "superlayer",
       "is_stereo",
-      "number_of_stretched_layers",
-      ""
+      "superlayer_id",
+      "size",
+
+      "number_of_hit_layers",
+      //"form_function",
+
+      "total_number_of_neighbors",
+      "mean_number_of_neighbors",
+
+      "total_drift_length",
+      "mean_drift_length",
+      "variance_drift_length",
+
+      "total_inner_distance",
+      "mean_inner_distance",
+      "distance_to_superlayer_center",
+
+      "total_adc_count",
+      "mean_adc_count",
+      "variance_adc_count"
     };
 
     /** Class that specifies the names of the variables
@@ -43,7 +58,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 1;
+      static const size_t nNames = 15;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
@@ -63,6 +78,12 @@ namespace Belle2 {
 
       /// Generate and assign the variables from the pair
       virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override final);
+
+      /// Initialize the peeler before event processing
+      virtual void initialize() IF_NOT_CINT(override final)
+      {
+        prepareSuperLayerCenterArray();
+      }
     };
   }
 }

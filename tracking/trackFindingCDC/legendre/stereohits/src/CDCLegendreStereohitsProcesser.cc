@@ -384,17 +384,14 @@ double StereohitsProcesser::getAlpha(TrackCandidate* cand, std::pair<double, dou
   double alpha = acos(1. - (SQR(pos.first - cand->getReferencePoint().X()) + SQR(pos.second - cand->getReferencePoint().Y())) /
                       (2.*SQR(cand->getRadius())));
 
-  double hitPhi;
+  double hitPhi = atan(pos.second / pos.first);
 
   //distribute the phi values from 0 to 2pi
-  if (pos.first >= 0 && pos.second >= 0) {
-    hitPhi = atan(pos.second / pos.first);
-  }
   if (pos.first < 0) {
-    hitPhi = TMath::Pi() + atan(pos.second / pos.first);
+    hitPhi += TMath::Pi();
   }
   if (pos.first >= 0 && pos.second < 0) {
-    hitPhi = 2 * TMath::Pi() + atan(pos.second / pos.first);
+    hitPhi += 2 * TMath::Pi();
   }
 
 //  int charge = cand->getChargeSign();

@@ -17,12 +17,8 @@ class SegmentTrackFirstStepRecordingRun(StandardEventGenerationRun):
         # based on the properties in the base class.
         main_path = super(SegmentTrackFirstStepRecordingRun, self).create_path()
 
-        main_path.add_module(modules.CDCBackgroundHitFinder())
-        main_path.add_module(modules.CDCLocalTrackFinder())
-        main_path.add_module(modules.CDCBackgroundHitFinder())
-        main_path.add_module(modules.CDCLegendreTrackFinder())
-        main_path.add_module(modules.CDCSegmentTrackCombiner(segment_track_chooser_first_step_filter="recording", 
-                                                             segment_track_chooser_second_step_filter="none"))
+        main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
+                                                   first_filter="recording"))
         return main_path
 
 

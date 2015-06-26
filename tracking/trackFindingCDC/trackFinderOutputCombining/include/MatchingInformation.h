@@ -66,7 +66,7 @@ namespace Belle2 {
         m_isSorted = true;
       }
 
-      void addMatch(MatchingType* match, double filterResult)
+      void addMatch(MatchingType* match, double filterResult = 0)
       {
         m_listOfMatches.push_back(std::make_pair(match, filterResult));
         m_isSorted = false;

@@ -23,6 +23,7 @@ REG_MODULE(SegmentTrackCombinerDev);
 SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   SegmentTrackCombinerImplModule<>(),
   m_segmentTrackChooserFirstStepFactory("tmva"),
+  m_backgroundSegmentsFilterFactory("tmva"),
   m_segmentTrackChooserSecondStepFactory("tmva"),
   m_segmentTrainFilterFactory("simple"),
   m_segmentTrackFilterFactory("simple")
@@ -30,6 +31,7 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   setDescription("Versatile module with adjustable filters for segment track combination.");
 
   m_segmentTrackChooserFirstStepFactory.exposeParameters(this);
+  m_backgroundSegmentsFilterFactory.exposeParameters(this);
   m_segmentTrackChooserSecondStepFactory.exposeParameters(this);
   m_segmentTrainFilterFactory.exposeParameters(this);
   m_segmentTrackFilterFactory.exposeParameters(this);
@@ -40,6 +42,9 @@ void SegmentTrackCombinerDevModule::initialize()
   // Set the filters before they get initialized in the base module.
   std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserFirstStep = m_segmentTrackChooserFirstStepFactory.create();
   setSegmentTrackChooserFirstStep(std::move(ptrSegmentTrackChooserFirstStep));
+
+  std::unique_ptr<BaseBackgroundSegmentsFilter> ptrBackgroundSegmentsFilter = m_backgroundSegmentsFilterFactory.create();
+  setBackgroundSegmentFilter(std::move(ptrBackgroundSegmentsFilter));
 
   std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserSecondStep = m_segmentTrackChooserSecondStepFactory.create();
   setSegmentTrackChooserSecondStep(std::move(ptrSegmentTrackChooserSecondStep));
@@ -53,6 +58,7 @@ void SegmentTrackCombinerDevModule::initialize()
   SegmentTrackCombinerImplModule<>::initialize();
 
   if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
+      getBackgroundSegmentFilter()->needsTruthInformation() or
       getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
       getSegmentTrackFilter()->needsTruthInformation()) {
@@ -65,6 +71,7 @@ void SegmentTrackCombinerDevModule::initialize()
 void SegmentTrackCombinerDevModule::event()
 {
   if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
+      getBackgroundSegmentFilter()->needsTruthInformation() or
       getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
       getSegmentTrackFilter()->needsTruthInformation()) {

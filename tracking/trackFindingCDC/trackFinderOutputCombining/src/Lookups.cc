@@ -107,27 +107,19 @@ void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFir
     if (matchingTracks.size() == 1) {
       TrackInformation* track = *(matchingTracks.begin());
       SegmentTrackCombiner::addSegmentToTrack(segment, track);
-    } else {
-      // Take the one with the most hits in common
-      TrackInformation* trackWithTheMostHitsInCommon = nullptr;
-      unsigned int mostHitsInCommon = 0;
+    }
+  }
+}
 
-      for (TrackInformation* track : matchingTracks) {
-        unsigned int hitsInCommon = 0;
-        for (const CDCRecoHit3D& recoHit : track->getTrackCand()->items()) {
-          SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
-          if (matchingSegment != nullptr and matchingSegment == segment) {
-            hitsInCommon++;
-          }
-        }
-        if (hitsInCommon > mostHitsInCommon) {
-          mostHitsInCommon = hitsInCommon;
-          trackWithTheMostHitsInCommon = track;
-        }
-      }
-
-      if (trackWithTheMostHitsInCommon != nullptr) {
-        SegmentTrackCombiner::addSegmentToTrack(segment, trackWithTheMostHitsInCommon);
+void SegmentTrackCombiner::filter(BaseBackgroundSegmentsFilter& backgroundSegmentsFilter)
+{
+  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+    for (SegmentInformation* segment : segments) {
+      if (segment->isAlreadyTaken())
+        continue;
+      Weight filterResult = backgroundSegmentsFilter(segment->getSegment());
+      if (isNotACell(filterResult)) {
+        segment->getSegment()->getAutomatonCell().setTakenFlag();
       }
     }
   }
@@ -150,12 +142,16 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
       }
       matchTracksToSegment(segmentInformation, segmentTrackChooserSecondStep);
 
-      if (segmentInformation->getMatches().size() == 1) {
-        SegmentTrackCombiner::addSegmentToTrack(segmentInformation, segmentInformation->getMatches()[0]);
+      TrackInformation* bestMatch = segmentInformation->getBestMatch();
+      if (bestMatch != nullptr) {
+        SegmentTrackCombiner::addSegmentToTrack(segmentInformation, bestMatch);
         segmentInformation->clearMatches();
       }
     }
+  }
 
+  return;
+  /*
     // Go through all tracks and delete the cases were we have more than one train/segment
     for (TrackInformation* trackInformation : m_trackLookUp) {
       // Try to find the longest trains of segments
@@ -191,7 +187,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
 
       trackInformation->clearGoodSegmentTrain();
     }
-  }
+  }*/
 }
 
 const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFittingSegmentTrain(
@@ -205,8 +201,11 @@ const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFitti
   for (TrainOfSegments& trainOfSegments : trainsOfSegments) {
     if (trainOfSegments.size() > 0) {
       for (SegmentInformation* segmentInformation : trainOfSegments) {
-        std::vector<TrackInformation*>& matchedTracks = segmentInformation->getMatches();
-        matchedTracks.erase(std::remove(matchedTracks.begin(), matchedTracks.end(), trackInformation), matchedTracks.end());
+        std::vector<std::pair<TrackInformation*, double>>& matchedTracks = segmentInformation->getMatches();
+        matchedTracks.erase(std::remove_if(matchedTracks.begin(),
+        matchedTracks.end(), [&trackInformation](const std::pair<TrackInformation*, double>& pair) -> bool {
+          return pair.first == trackInformation;
+        }), matchedTracks.end());
       }
 
       CellWeight currentProbability = segmentTrackFilter(std::make_pair(trainOfSegments, trackInformation->getTrackCand()));
@@ -220,7 +219,7 @@ const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFitti
   if (bestFittingTrain != nullptr) {
     // We have to readd the matches we want to keep
     for (SegmentInformation* segmentInformation : *bestFittingTrain) {
-      segmentInformation->addMatch(trackInformation);
+      segmentInformation->addMatch(trackInformation, bestProbability);
     }
 
     return bestFittingTrain;
@@ -261,14 +260,15 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
                                                const TrackInformation* trackInformation,
                                                BaseSegmentTrainFilter& segmentTrainFilter)
 {
-  const std::vector<SegmentInformation*>& matchedSegments = trackInformation->getMatches();
+  const std::vector<std::pair<SegmentInformation*, double>>& matchedSegments = trackInformation->getMatches();
 
   trainsOfSegments.clear();
   trainsOfSegments.emplace_back();
 
   const CDCTrajectory2D& trajectory2D = trackInformation->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
 
-  for (SegmentInformation* segment : matchedSegments) {
+  for (const std::pair<SegmentInformation*, double>& pair : matchedSegments) {
+    SegmentInformation* segment = pair.first;
     std::list<std::vector<SegmentInformation*>> innerSet;
     for (std::vector<SegmentInformation*> x : trainsOfSegments) {
       x.push_back(segment);
@@ -323,13 +323,14 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
   matchingTrack->calcPerpS();
 }
 
+
 void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments,
     TrackFindingCDC::BaseSegmentTrackFilter& segmentTrackFilter)
 {
   B2DEBUG(100, "Trying to combine " << trainOfSegments.size() << " segment(s) with their track(s)...")
   for (SegmentInformation* segmentInformation : trainOfSegments) {
 
-    std::vector<TrackInformation*>& matchingTracks = segmentInformation->getMatches();
+    std::vector<std::pair<TrackInformation*, double>>& matchingTracks = segmentInformation->getMatches();
     B2DEBUG(100, "Segment has " << matchingTracks.size() << " partners.")
 
     if (matchingTracks.size() == 0) {
@@ -346,7 +347,8 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
 
     matchingTracks.erase(
       std::remove_if(matchingTracks.begin(), matchingTracks.end(), [&segmentInformation,
-    &matchesAboveTrack](TrackInformation * possiblyMatch) -> bool {
+    &matchesAboveTrack](const std::pair<TrackInformation*, double>& pair) -> bool {
+      TrackInformation* possiblyMatch = pair.first;
       const CDCTrajectory2D& trajectory2D = possiblyMatch->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
       double perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
       double perpSBack = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
@@ -361,12 +363,13 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
     }), matchingTracks.end());
 
     if (matchingTracks.size() == 1) {
-      bestMatch = matchingTracks[0];
+      bestMatch = matchingTracks[0].first;
       B2DEBUG(100, "Combining segment with track: " << bestMatch->getTrackCand())
     } else if (matchingTracks.size() > 1) {
       B2DEBUG(100, matchingTracks.size() << " are too many possible partners! We choose the best one:")
 
-      for (TrackInformation* trackInformation : matchingTracks) {
+      for (const std::pair<TrackInformation*, double>& pair : matchingTracks) {
+        TrackInformation* trackInformation = pair.first;
         std::vector<SegmentInformation*> temporaryTrain = {segmentInformation};
         CellWeight fitProbability = segmentTrackFilter(std::make_pair(temporaryTrain, trackInformation->getTrackCand()));
 
@@ -418,23 +421,25 @@ void SegmentTrackCombiner::matchTracksToSegment(SegmentInformation* segmentInfor
                                                 BaseSegmentTrackChooser& segmentTrackChooser)
 {
   for (TrackInformation* trackInformation : m_trackLookUp) {
-    if (isNotACell(segmentTrackChooser(std::make_pair(segmentInformation->getSegment(), trackInformation->getTrackCand())))) {
+    double filterResult = segmentTrackChooser(std::make_pair(segmentInformation->getSegment(), trackInformation->getTrackCand()));
+    if (isNotACell(filterResult)) {
       B2DEBUG(110, "Found not matchable in " << segmentInformation->getSegment()->getISuperLayer())
     } else {
       B2DEBUG(110, "Found matchable in " << segmentInformation->getSegment()->getISuperLayer())
-      trackInformation->addMatch(segmentInformation);
-      segmentInformation->addMatch(trackInformation);
+      trackInformation->addMatch(segmentInformation, filterResult);
+      segmentInformation->addMatch(trackInformation, filterResult);
     }
   }
 }
+
 
 void SegmentTrackCombiner::createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments,
                                                          const TrackInformation* trackInformation,
                                                          BaseSegmentTrainFilter& segmentTrainFilter)
 {
-  const std::vector<SegmentInformation*>& matchedSegments = trackInformation->getMatches();
+  const std::vector<std::pair<SegmentInformation*, double>>& matchedSegments = trackInformation->getMatches();
   if (matchedSegments.size() == 1) {
-    trainsOfSegments.push_back(matchedSegments);
+    trainsOfSegments.push_back({ matchedSegments[0].first });
   } else if (matchedSegments.size() > 1 and matchedSegments.size() <= 5) {
     makeAllCombinations(trainsOfSegments, trackInformation, segmentTrainFilter);
   } else if (matchedSegments.size() > 5) {

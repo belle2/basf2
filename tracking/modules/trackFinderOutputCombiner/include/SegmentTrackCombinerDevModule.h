@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/filters/segment_track_chooser/SegmentTrackChooserFactory.h>
 #include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilterFactory.h>
 
 namespace Belle2 {
 
@@ -40,6 +41,12 @@ namespace Belle2 {
     Belle2::TrackFindingCDC::SegmentTrackChooserFirstStepFactory m_segmentTrackChooserFirstStepFactory;
 
     /**
+       Factory for the background segment filter, knowing all the available filters and
+       their respective parameters
+    */
+    Belle2::TrackFindingCDC::BackgroundSegmentsFilterFactory m_backgroundSegmentsFilterFactory;
+
+    /**
        Factory for the segment track chooser filter for the second step, knowing all the available filters and
        their respective parameters
     */
@@ -55,7 +62,7 @@ namespace Belle2 {
        Factory for the segment train filter, knowing all the available filters and
        their respective parameters
     */
-    TrackFindingCDC::SegmentTrackFilterFactory m_segmentTrackFilterFactory;
+    Belle2::TrackFindingCDC::SegmentTrackFilterFactory m_segmentTrackFilterFactory;
 
   }; // end class
 } // end namespace Belle2

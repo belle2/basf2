@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/background_segment/BaseBackgroundSegmentsFilter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -146,6 +147,7 @@ namespace Belle2 {
                    BaseSegmentTrackFilter& segmentTrackFilter);
 
       void match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep);
+      void filter(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
 
       /**
        * Clear all the pointer vectors.

@@ -99,7 +99,10 @@ class CDCFullFinder(metamodules.PathModule):
     """
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
-                 tmva_cut=0.1, first_tmva_cut=0.75, second_tmva_cut=0.2, first_filter="tmva", second_filter="none"):
+                 tmva_cut=0.1,
+                 first_filter="tmva", first_tmva_cut=0.67,
+                 background_filter="all", background_filter_tmva_cut=0.0,
+                 second_filter="none", second_tmva_cut=0.2):
 
         modules = [
             CDCBackgroundHitFinder(
@@ -109,6 +112,8 @@ class CDCFullFinder(metamodules.PathModule):
             CDCSegmentTrackCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name,
                                     segment_track_chooser_first_step_cut=first_tmva_cut,
                                     segment_track_chooser_first_step_filter=first_filter,
+                                    background_segment_filter=background_filter,
+                                    background_segment_cut=background_filter_tmva_cut,
                                     segment_track_chooser_second_step_cut=second_tmva_cut,
                                     segment_track_chooser_second_step_filter=second_filter,
                                     segment_track_filter="none",
@@ -325,8 +330,10 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
                  track_cands_store_vector_name="CDCTrackVector",
                  segments_store_vector_name="CDCRecoSegment2DVector",
                  segment_track_chooser_first_step_filter="tmva",
+                 background_segment_filter="all",
                  segment_track_chooser_second_step_filter="none",
                  segment_track_chooser_first_step_cut=0.75,
+                 background_segment_cut=0.0,
                  segment_track_chooser_second_step_cut=0.25,
                  segment_train_filter="simple",
                  segment_track_filter="simple"):
@@ -334,6 +341,7 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
         combiner_module = StandardEventGenerationRun.get_basf2_module(
             "SegmentTrackCombinerDev",
             SegmentTrackChooserFirstStepFilter=segment_track_chooser_first_step_filter,
+            BackgroundSegmentsFilter=background_segment_filter,
             SegmentTrackChooserSecondStepFilter=segment_track_chooser_second_step_filter,
             SegmentTrainFilter=segment_train_filter,
             SegmentTrackFilter=segment_track_filter,
@@ -347,6 +355,11 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
             combiner_module.param(
                 'SegmentTrackChooserFirstStepFilterParameters', {
                     "cut": str(segment_track_chooser_first_step_cut)})
+
+        if background_segment_filter == "tmva":
+            combiner_module.param(
+                'BackgroundSegmentsFilterParameters', {
+                    "cut": str(background_segment_cut)})
 
         if segment_track_chooser_second_step_filter == "tmva":
             combiner_module.param(

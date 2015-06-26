@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Makoto Uchida                                            *
+ * Contributors: Satoru Yamada and Makoto Uchida                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCUnpackerModule_H
-#define CDCUnpackerModule_H
+#ifndef CDCPACKERMODULE_H
+#define CDCPACKERMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -28,21 +28,21 @@ namespace Belle2 {
   namespace CDC {
 
     /**
-     * CDCUnpackerModule: The CDC Raw Hits Decoder.
+     * CDCPackerModule: The CDC Raw Hits Decoder.
      */
 
-    class CDCUnpackerModule : public Module {
+    class CDCPackerModule : public Module {
 
     public:
       /**
        * Constructor of the module.
        */
-      CDCUnpackerModule();
+      CDCPackerModule();
 
       /**
        * Destructor of the module.
        */
-      virtual ~CDCUnpackerModule();
+      virtual ~CDCPackerModule();
 
       /**
        * Initializes the Module.
@@ -78,9 +78,7 @@ namespace Belle2 {
       void setCDCPacketHeader(int* buf)
       {
 
-        //        printf("buf[0] 0x%8x", buf[0]);
-        //        printf("buf[1] 0x%8x", buf[1]);
-        //        printf("buf[2] 0x%8x", buf[2]);
+        printf("buf[0] 0x%8x", buf[0]);
         if ((buf[0] & 0xff000000) == 0x22000000) { // raw data mode.
           m_dataType = 1;
         } else if ((buf[0] & 0xff000000) == 0x20000000) { // suppressed data mode.
@@ -96,6 +94,8 @@ namespace Belle2 {
         m_triggerNumber = buf[2];
 
       }
+
+      int getFEEID(int copper_id, int slot_id);
 
       /**
        * Getter for CDC data mode.
@@ -153,8 +153,9 @@ namespace Belle2 {
        */
       const WireID getWireID(int iBoard, int iCh);
 
-
-      void printBuffer(int* buf, int nwords);
+      /**
+       * Setter for FADC threshold.
+       */
     private:
 
       int m_event; /// Event number.
@@ -270,6 +271,10 @@ namespace Belle2 {
        */
       WireID m_map[300][48];
 
+      int m_fee_board[9][8][384];
+      int m_fee_ch[9][8][384];
+      int m_eWire_nhit[36882];
+
 
     };//end class declaration
 
@@ -277,5 +282,5 @@ namespace Belle2 {
   } //end CDC namespace;
 } // end namespace Belle2
 
-#endif // CDCUnpackerModule_H
+#endif // CDCPackerModule_H
 

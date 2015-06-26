@@ -170,6 +170,13 @@ void CDCUnpackerModule::event()
       for (int iFiness = 0; iFiness < 4; ++iFiness) {
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
+
+
+        if (m_enablePrintOut == true) {
+          B2INFO("CDCUnpacker : Print out CDC data block.");
+          printBuffer(ibuf, nWord);
+        }
+
         const int c_headearWords = 3;
 
         if (nWord < c_headearWords) {
@@ -189,6 +196,7 @@ void CDCUnpackerModule::event()
 
         if (dataLength != (nWord - c_headearWords)) {
           B2ERROR("Inconsistent data size between COPPER and CDC FEE.");
+          B2ERROR("data length " << dataLength << " nWord " << nWord);
           continue;
         }
         B2INFO("CDCUnpacker : Data size " << dataLength <<  " words.");
@@ -212,16 +220,13 @@ void CDCUnpackerModule::event()
 
           for (int it = 0; it < dataLength; ++it) {
             int index = it + c_headearWords;
-            //                swbuf[it * 2] = static_cast<unsigned short>((ibuf[index] & 0xffff0000) >> 16);
-            //                swbuf[it * 2 + 1] = static_cast<unsigned short>(ibuf[index] & 0xffff);
+
             m_buffer.push_back(static_cast<unsigned short>((ibuf[index] & 0xffff0000) >> 16));
             m_buffer.push_back(static_cast<unsigned short>(ibuf[index] & 0xffff));
-            //    printf("%4d %4x %4x %8x \n", it, swbuf[it*2],swbuf[it*2+1],ibuf[index]);
           }
 
           const int fadcTdcChannels = 48; // Total channels of FADC or TDC.
           const int nSamples = swDataLength / (2 * fadcTdcChannels); // Number of samplings.
-
 
           std::vector<unsigned short> fadcs;
           std::vector<unsigned short> tdcs;
@@ -234,7 +239,7 @@ void CDCUnpackerModule::event()
 
             for (int iSample = 0; iSample < nSamples; ++iSample) {
               // FADC value for each sample and channel.
-              //unsigned short fadc = swbuf[iCh + 2 * fadcTdcChannels * iSample];
+
               unsigned short fadc = m_buffer.at(iCh + 2 * fadcTdcChannels * iSample);
 
               if (fadc > m_fadcThreshold) {
@@ -316,8 +321,6 @@ void CDCUnpackerModule::event()
           m_buffer.clear();
           for (int it = 0; it < dataLength; ++it) {
             int index = it + c_headearWords;
-            //                swbuf[it * 2] = static_cast<unsigned short>((ibuf[index] & 0xffff0000) >> 16);
-            //                swbuf[it * 2 + 1] = static_cast<unsigned short>(ibuf[index] & 0xffff);
             m_buffer.push_back(static_cast<unsigned short>((ibuf[index] & 0xffff0000) >> 16));
             m_buffer.push_back(static_cast<unsigned short>(ibuf[index] & 0xffff));
             // for debug.
@@ -329,10 +332,14 @@ void CDCUnpackerModule::event()
             unsigned short header = m_buffer.at(it);        // Header.
             unsigned short ch = (header & 0xff00) >> 8; // Channel ID in FE.
             unsigned short length = (header & 0xff) / 2; // Data length in short word.
-            if (length == 1) {
-              B2WARNING("CDCUnpacker : data length is 1 short word.");
+
+            //      printf("header 0x%x \n", header);
+            printf("channel 0x%x \n", ch);
+            printf("length 0x%x \n", length);
+            if (!((length == 4) || (length == 5))) {
+              B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
               it += length;
-              continue;
+              return;
             }
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
@@ -340,6 +347,7 @@ void CDCUnpackerModule::event()
             unsigned short tdc1 = 0;                  // TDC count.
             unsigned short tdc2 = 0;                  // 2nd TDC count.
             unsigned short tdcFlag = 0;               // Multiple hit or not (1 for multi hits, 0 for single hit).
+
             if (length == 4) {
               tdc1 = m_buffer.at(it + 3);
             } else if (length == 5) {
@@ -361,7 +369,8 @@ void CDCUnpackerModule::event()
               //        if(tdc1+m_tdcOffset>8191){
               //    tdc1 = 2630;
               //        }
-              CDCHit* hit = cdcHits.appendNew(tdc1 + m_tdcOffset, fadcSum, wireId, tdc2);
+              //              CDCHit* hit = cdcHits.appendNew(tdc1 + m_tdcOffset, fadcSum, wireId, tdc2);
+              CDCHit* hit = cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
 
               if (m_enableStoreCDCRawHit == true) {
                 // Store to the CDCRawHit object.
@@ -425,3 +434,17 @@ void CDCUnpackerModule::loadMap()
 
 }
 
+
+void CDCUnpackerModule::printBuffer(int* buf, int nwords)
+{
+
+  for (int j = 0; j < nwords; ++j) {
+    printf(" %.8x", buf[j]);
+    if ((j + 1) % 10 == 0) {
+      printf("\n");
+    }
+  }
+  printf("\n");
+
+  return;
+}

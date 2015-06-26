@@ -372,12 +372,19 @@ class CDCValidation(metamodules.PathModule):
     TODO: Do only create the mc_track_matching relations if not already present
     """
 
-    def __init__(self, track_candidates_store_array_name, output_file_name):
+    def __init__(
+            self,
+            output_file_name,
+            track_candidates_store_array_name="TrackCands",
+            use_pxd=False,
+            use_cdc=True,
+            use_svd=False):
         from tracking.validation.module import SeparatedTrackingValidationModule
 
-        mc_track_finder_module_if_module = CDCMCFinder()
+        mc_track_finder_module_if_module = CDCMCFinder(use_cdc=use_cdc, use_pxd=use_pxd, use_svd=use_svd)
 
-        mc_track_matcher_module = CDCMCMatcher(track_cands_store_array_name=track_candidates_store_array_name)
+        mc_track_matcher_module = CDCMCMatcher(track_cands_store_array_name=track_candidates_store_array_name,
+                                               use_cdc=use_cdc, use_pxd=use_pxd, use_svd=use_svd)
 
         validation_module = SeparatedTrackingValidationModule(
             name="",
@@ -391,9 +398,11 @@ class CDCValidation(metamodules.PathModule):
 
 class CDCMCFinder(metamodules.IfStoreArrayNotPresentModule):
 
-    def __init__(self):
+    def __init__(self, use_cdc=True, use_svd=False, use_pxd=False):
         mc_track_finder_module = StandardEventGenerationRun.get_basf2_module('TrackFinderMCTruth',
-                                                                             UseCDCHits=True,
+                                                                             UseCDCHits=use_cdc,
+                                                                             UseSVDHits=use_svd,
+                                                                             UsePXDHits=use_pxd,
                                                                              WhichParticles=[],
                                                                              GFTrackCandidatesColName="MCTrackCands")
 
@@ -420,13 +429,10 @@ class CDCFitter(metamodules.PathModule):
                                                                                         whichGeometry=fit_geometry)
         gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
                                                                         PDGCodes=[211],
-                                                                        FilterId="Kalman",
                                                                         StoreFailedTracks=False,
                                                                         GFTrackCandidatesColName=input_track_cands_store_array_name,
                                                                         GFTracksColName=output_tracks_store_array_name,
                                                                         BuildBelle2Tracks=False)
-
-        # gen_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
 
         track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder',
                                                                     GFTracksColName=output_tracks_store_array_name,
@@ -477,12 +483,13 @@ class CDCMCMatcher(metamodules.WrapperModule):
     """ Add the mc mathcer module for convenience """
 
     def __init__(self, mc_track_cands_store_array_name="MCTrackCands",
-                 track_cands_store_array_name="TrackCands"):
+                 track_cands_store_array_name="TrackCands",
+                 use_cdc=True, use_svd=False, use_pxd=False):
 
         mc_track_matcher_module = StandardEventGenerationRun.get_basf2_module('MCTrackMatcher',
-                                                                              UseCDCHits=True,
-                                                                              UseSVDHits=False,
-                                                                              UsePXDHits=False,
+                                                                              UseCDCHits=use_cdc,
+                                                                              UseSVDHits=use_svd,
+                                                                              UsePXDHits=use_pxd,
                                                                               RelateClonesToMCParticles=True,
                                                                               MCGFTrackCandsColName=mc_track_cands_store_array_name,
                                                                               PRGFTrackCandsColName=track_cands_store_array_name)

@@ -39,6 +39,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   // Calculate distances
   const CDCTrajectory2D& trajectoryTrack = track->getStartTrajectory3D().getTrajectory2D();
+  const CDCTrajectorySZ& szTrajectoryTrack = track->getStartTrajectory3D().getTrajectorySZ();
 
 
   maxmimumTrajectoryDistanceFront = trajectoryTrack.getDist2D(front.getWireHit().getRefPos2D());
@@ -54,8 +55,6 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       fitter.update(trajectorySegment, *segment);
     }
   } else {
-    const CDCTrajectorySZ& szTrajectoryTrack = track->getStartTrajectory3D().getTrajectorySZ();
-
     CDCObservations2D observations;
     for (const CDCRecoHit2D& recoHit : segment->items()) {
       CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
@@ -139,6 +138,39 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     }
   }
 
+  const CDCTrajectorySZ& trajectorySZ = track->getStartTrajectory3D().getTrajectorySZ();
+  double szSlope = trajectorySZ.getSZSlope();
+
+  bool hasZInformation = szSlope != 0;
+  double max_hit_z_distance = -1;
+  double sum_hit_z_distance = 0;
+  double stereo_quad_tree_distance = 0;
+
+  if (hasZInformation) {
+    double thetaFirstSegmentHit = -10;
+
+    for (const CDCRecoHit2D& recoHit2D : segment->items()) {
+      Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack);
+      double perpS = recoHit2D.getPerpS(trajectoryTrack);
+
+
+      double current_z_distance = std::abs(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));
+      if (std::isnan(current_z_distance))
+        continue;
+
+      if (thetaFirstSegmentHit == -10) {
+        thetaFirstSegmentHit = reconstructedPosition.theta();
+      }
+      sum_hit_z_distance += current_z_distance;
+      if (current_z_distance > max_hit_z_distance) {
+        max_hit_z_distance = current_z_distance;
+      }
+    }
+
+    double thetaTrack = track->getStartFitMom3D().theta();
+    stereo_quad_tree_distance = thetaTrack - thetaFirstSegmentHit;
+  }
+
 
   for (const CDCRecoHit2D& recoHit : segment->items()) {
     if (isAxialSegment) {
@@ -176,6 +208,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
   var<named("segment_size")>() = segment->size();
   var<named("track_size")>() = track->size();
+  var<named("mean_hit_z_distance")>() = sum_hit_z_distance;
+  var<named("max_hit_z_distance")>() = max_hit_z_distance;
+  var<named("stereo_quad_tree_distance")>() = stereo_quad_tree_distance;
 
   var<named("pt_of_track")>() = std::isnan(trajectoryTrack.getAbsMom2D()) ? 0.0 : trajectoryTrack.getAbsMom2D();
   var<named("track_is_curler")>() = trajectoryTrack.getExit().hasNAN();
@@ -201,6 +236,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("hits_in_same_region")>() = hitsInSameRegion;
 
   var<named("number_of_hits_in_common")>() = hitsInCommon;
+
+  var<named("segment_super_layer")>() = segment->getISuperLayer();
 
   return true;
 }

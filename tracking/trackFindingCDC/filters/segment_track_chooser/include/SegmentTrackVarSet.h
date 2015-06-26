@@ -46,7 +46,11 @@ namespace Belle2 {
       "superlayer_already_full",
       "z_distance",
       "theta_distance",
-      "number_of_hits_in_common"
+      "number_of_hits_in_common",
+      "mean_hit_z_distance",
+      "max_hit_z_distance",
+      "stereo_quad_tree_distance",
+      "segment_super_layer"
     };
 
     /** Class that specifies the names of the variables
@@ -56,7 +60,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 17;
+      static const size_t nNames = 21;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

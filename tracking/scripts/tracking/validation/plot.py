@@ -949,9 +949,6 @@ class ValidationPlot(object):
         y_lower_bound = y_axis.GetXmin()
         y_upper_bound = y_axis.GetXmax()
 
-        print x_lower_bound, x_upper_bound
-        print y_lower_bound, y_upper_bound
-
         x_underflow_indices = xs < x_lower_bound
         x_overflow_indices = xs > x_upper_bound
 

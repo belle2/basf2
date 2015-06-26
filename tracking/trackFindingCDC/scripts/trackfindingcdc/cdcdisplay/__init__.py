@@ -778,7 +778,7 @@ class CDCSVGDisplayModule(Module):
                 cppplotter.drawCDCTracks('CDCTrackVector', 'ListColors', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
-            plotter.draw_storevector('CDCTrackVector', **styleDict)
+                plotter.draw_storevector('CDCTrackVector', **styleDict)
 
         # Wrong RL Info
         if self.draw_wrong_rl_infos_in_tracks:
@@ -834,7 +834,7 @@ class CDCSVGDisplayModule(Module):
         # Draw the genfit track candidates
         if self.draw_gftrackcands:
             if self.use_cpp:
-                cppplotter.drawGFTrackCands('TrackCands', 'ListColors', '')
+                cppplotter.drawGFTrackCands(self.track_cands_store_array_name, 'ListColors', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray(self.track_cands_store_array_name, **styleDict)

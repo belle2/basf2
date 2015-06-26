@@ -193,7 +193,9 @@ namespace Belle2 {
       m_combiner.combine(*m_ptrSegmentTrackChooserSecondStep, *m_ptrSegmentTrainFilter, *m_ptrSegmentTrackFilter);
       m_combiner.clear();
 
-      // Refit the tracks
+      /*
+       * REFITTING LEADS TO STRANGE RESULTS!
+       * // Refit the tracks
       const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
       const CDCRiemannFitter& xyFitter = CDCRiemannFitter::getFitter();
 
@@ -213,12 +215,14 @@ namespace Belle2 {
           trajectory2D.reverse();
         }
 
-        CDCTrajectory3D trajectory3D(trajectory2D, szTrajectory);
-        track.setStartTrajectory3D(trajectory3D);
+       *if(szTrajectory.isFitted()) {
+          CDCTrajectory3D trajectory3D(trajectory2D, szTrajectory);
+          track.setStartTrajectory3D(trajectory3D);
+        }
 
 
 
-      }
+      }*/
 
       /*// Add the remaining segments
       for(CDCTrack & track : tracks) {

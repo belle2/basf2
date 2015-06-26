@@ -20,6 +20,7 @@
 #include <tracking/trackFindingCDC/filters/segment_train/SimpleSegmentTrainFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -191,6 +192,56 @@ namespace Belle2 {
       m_combiner.match(*m_ptrSegmentTrackChooserFirstStep);
       m_combiner.combine(*m_ptrSegmentTrackChooserSecondStep, *m_ptrSegmentTrainFilter, *m_ptrSegmentTrackFilter);
       m_combiner.clear();
+
+      // Refit the tracks
+      const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+      const CDCRiemannFitter& xyFitter = CDCRiemannFitter::getFitter();
+
+      for (CDCTrack& track : tracks) {
+        CDCTrajectory2D trajectory2D;
+        CDCObservations2D observations;
+        for (const CDCRecoHit3D& recoHit : track) {
+          observations.append(recoHit);
+        }
+        xyFitter.update(trajectory2D, observations);
+
+        CDCTrajectorySZ szTrajectory;
+        szFitter.update(szTrajectory, track);
+
+        trajectory2D.setLocalOrigin(track.front().getRecoPos2D());
+        if (trajectory2D.calcPerpS(track.back().getRecoPos2D()) < 0) {
+          trajectory2D.reverse();
+        }
+
+        CDCTrajectory3D trajectory3D(trajectory2D, szTrajectory);
+        track.setStartTrajectory3D(trajectory3D);
+
+
+
+      }
+
+      /*// Add the remaining segments
+      for(CDCTrack & track : tracks) {
+        const CDCTrajectory2D & trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+        const CDCTrajectorySZ & trajectorySZ = track.getStartTrajectory3D().getTrajectorySZ();
+        double szSlope = trajectorySZ.getSZSlope();
+
+        bool hasZInformation = szSlope != 0;
+
+        if(hasZInformation) {
+          for(const CDCRecoSegment2D & segment : segments) {
+            if(segment.getAutomatonCell().hasTakenFlag())
+              continue;
+
+            for(const CDCRecoHit2D & recoHit2D : segment) {
+              Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectory2D);
+              double perpS = recoHit2D.getPerpS(trajectory2D);
+
+              B2INFO(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));
+            }
+          }
+        }
+      }*/
     }
   }
 }

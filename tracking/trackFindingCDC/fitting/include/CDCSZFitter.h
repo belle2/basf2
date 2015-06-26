@@ -48,13 +48,18 @@ namespace Belle2 {
                   const CDCStereoRecoSegment2D& stereoSegment,
                   const CDCTrajectory2D& axialTrajectory2D) const;
 
-      /// Update the trajectory with a fit in the sz direction to the three dimensional hits
+      /**
+       * Update the trajectory with a fit in the sz direction to the three dimensional hits.
+       * Do only update the trajectory if the number of usable stereo hits exceeds 3.
+       */
       void update(CDCTrajectorySZ& trajectory,
                   const CDCRecoHit3DVector& recoHits3D) const
       {
         CDCObservations2D observationsSZ;
         appendSZ(observationsSZ, recoHits3D);
-        update(trajectory, observationsSZ);
+        if (observationsSZ.size() > 3) {
+          update(trajectory, observationsSZ);
+        }
       }
 
       /// Fits a linear sz trajectory to the s and z coordinates given in the observations.

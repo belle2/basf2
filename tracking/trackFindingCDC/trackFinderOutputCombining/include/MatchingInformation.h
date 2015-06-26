@@ -25,15 +25,16 @@ namespace Belle2 {
     template <class OwnType, class MatchingType>
     class MatchingInformation {
     public:
-      typedef std::vector<MatchingType*> ListOfMatchCandidates;
+      typedef std::vector<std::pair<MatchingType*, double>> ListOfMatchCandidates;
 
-      MatchingInformation(OwnType* input) : m_object(input)
+      MatchingInformation(OwnType* input) : m_object(input), m_isSorted(true)
       {
         m_listOfMatches.reserve(5);
       };
 
       ListOfMatchCandidates& getMatches()
       {
+        m_isSorted = false;
         return m_listOfMatches;
       }
 
@@ -42,14 +43,33 @@ namespace Belle2 {
         return m_listOfMatches;
       }
 
+      MatchingType* getBestMatch()
+      {
+        if (m_listOfMatches.size() > 0) {
+          if (not m_isSorted) {
+            std::sort(m_listOfMatches.begin(), m_listOfMatches.end(), [](const std::pair<MatchingType*, double>& a,
+            const std::pair<MatchingType*, double>& b) -> bool {
+              return a.second < b.second;
+            });
+            m_isSorted = true;
+          }
+
+          return m_listOfMatches[0].first;
+        } else {
+          return nullptr;
+        }
+      }
+
       void clearMatches()
       {
         m_listOfMatches.clear();
+        m_isSorted = true;
       }
 
-      void addMatch(MatchingType* match)
+      void addMatch(MatchingType* match, double filterResult)
       {
-        m_listOfMatches.push_back(match);
+        m_listOfMatches.push_back(std::make_pair(match, filterResult));
+        m_isSorted = false;
       }
 
       OwnType* getObject() const
@@ -60,6 +80,7 @@ namespace Belle2 {
     private:
       OwnType* m_object;
       ListOfMatchCandidates m_listOfMatches;
+      bool m_isSorted;
     };
 
     class TrackInformation : public MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation> {

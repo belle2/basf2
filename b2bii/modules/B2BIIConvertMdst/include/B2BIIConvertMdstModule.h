@@ -35,6 +35,16 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
+#include "CLHEP/Vector/ThreeVector.h"
+#include "CLHEP/Vector/LorentzVector.h"
+#include "CLHEP/Matrix/SymMatrix.h"
+#include "CLHEP/Geometry/Point3D.h"
+
+using namespace CLHEP;
+using namespace HepGeom;
+
+typedef Point3D<double> HepPoint3D;
+
 #include <string>
 #include <map>
 
@@ -118,6 +128,12 @@ namespace Belle2 {
      */
     void convertMdstPi0Table();
 
+    /**
+     * Reads and converts all entries of Mdst_vee2 Panther table to V0 dataobjects and adds them to StoreArray<V0>. V0 daughters are converted from Mdst_Vee_Daughters to
+     * TrackFitResults, which are appended to the TrackFitResult StoreArray.
+     */
+    void convertMdstVee2Table();
+
     //-----------------------------------------------------------------------------
     // CONVERT OBJECTS
     //-----------------------------------------------------------------------------
@@ -138,6 +154,35 @@ namespace Belle2 {
      * If running on MC, the Track -> MCParticle relation is set as well.
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
+    void convertMdstChargedObjectAlternative(const Belle::Mdst_charged& belleTrack, Track* track);
+
+    /**
+     * Creates TrackFitResult and fills it.
+     */
+    TrackFitResult createTrackFitResult(const HepLorentzVector& momentum,
+                                        const HepPoint3D&              position,
+                                        const HepSymMatrix&     error,
+                                        const short int charge,
+                                        const Const::ParticleType& pType,
+                                        const float pValue,
+                                        const uint64_t hitPatternCDCInitializer,
+                                        const uint32_t hitPatternVXDInitializer);
+
+    /**
+     * Fills 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
+     */
+    void belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
+                               HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
+
+    /**
+     * Fills 4-momentum, position and 7x7 error matrix from Belle Vee daughter.
+     */
+    void belleVeeDaughterToCartesian(const Belle::Mdst_vee2& vee, const int charge, const Const::ParticleType& pType,
+                                     HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
+    /**
+     * Converts Mdst_vee2 record to V0 object.
+     */
+    void convertMdstVee2Object(const Belle::Mdst_vee2& belleVee2, V0* v0);
 
     /** Get PID information for belleTrack and add it to PIDLikelihood (with relation from track). */
     void convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track);
@@ -196,6 +241,19 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
+    /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
+    /** Belle error matrix elements are in the following order
+     *  px/py/pz/E/x/y/z or in indices are (0,1,2,3,4,5,6)
+     *  Belle II error matrix elements are in the following order
+     *  x/y/z/px/py/pz or in indices (0,1,2,3,4,5).
+     * The conversion of indices is therefore:
+     * 4 -> 0, 5 -> 1, 6 -> 2, 0 -> 3, 1 -> 4, 2 -> 5,
+     * and 3 -> nothing.
+     */
+    const int ERRMCONV[7] = {3, 4, 5, -1, 0, 1, 2};
+
+    /** B filed in TESLA */
+    const double BFIELD = 1.5;
   };
 
 } // end namespace Belle2

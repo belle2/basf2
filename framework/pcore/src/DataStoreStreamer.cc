@@ -505,31 +505,71 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
   TIter next(list);
   TStreamerInfo* info;
   TObjLink* lnk = list->FirstLink();
+
+  vector<string> class_name;
+  class_name.clear();
+
   // First call BuildCheck for regular class
   while (lnk) {
     info = (TStreamerInfo*)lnk->GetObject();
-    TObject* element = info->GetElements()->UncheckedAt(0);
-    Bool_t isstl = element && strcmp("This", element->GetName()) == 0;
-    if (!isstl) {
-      info->BuildCheck();
-      //              if (gDebug > 0)
-      B2INFO("importing TStreamerInfo: " << info->GetName() <<
-             " version = " << info->GetClassVersion());
+
+    int ovlap = 0;
+    vector<string>::iterator itr;
+    for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
+      if (strcmp((*itr).c_str(), info->GetName()) == 0) {
+        ovlap = 1;
+        B2INFO("Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
+        break;
+      }
+    }
+
+    // If the same class is in the object, ignore it. ( Otherwise it causes error. )
+    if (ovlap == 0) {
+      string temp_classname = info->GetName();
+      class_name.push_back(temp_classname);
+
+      TObject* element = info->GetElements()->UncheckedAt(0);
+      Bool_t isstl = element && strcmp("This", element->GetName()) == 0;
+      if (!isstl) {
+        info->BuildCheck();
+        //              if (gDebug > 0)
+        B2INFO("importing TStreamerInfo: " << info->GetName() <<
+               " version = " << info->GetClassVersion());
+      }
     }
     lnk = lnk->Next();
   }
 
+
+  class_name.clear();
   // Then call BuildCheck for stl class
   lnk = list->FirstLink();
   while (lnk) {
     info = (TStreamerInfo*)lnk->GetObject();
-    TObject* element = info->GetElements()->UncheckedAt(0);
-    Bool_t isstl = element && strcmp("This", element->GetName()) == 0;
-    if (isstl) {
-      info->BuildCheck();
-      //              if (gDebug > 0)
-      B2INFO("STL importing TStreamerInfo: " << info->GetName() <<
-             " version = " << info->GetClassVersion());
+
+    int ovlap = 0;
+    vector<string>::iterator itr;
+    for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
+      if (strcmp((*itr).c_str(), info->GetName()) == 0) {
+        ovlap = 1;
+        B2INFO("STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
+        break;
+      }
+    }
+
+    // If the same class is in the object, ignore it. ( Otherwise it causes error. )
+    if (ovlap == 0) {
+      string temp_classname = info->GetName();
+      class_name.push_back(temp_classname);
+
+      TObject* element = info->GetElements()->UncheckedAt(0);
+      Bool_t isstl = element && strcmp("This", element->GetName()) == 0;
+      if (isstl) {
+        info->BuildCheck();
+        //              if (gDebug > 0)
+        B2INFO("STL importing TStreamerInfo: " << info->GetName() <<
+               " version = " << info->GetClassVersion());
+      }
     }
     lnk = lnk->Next();
   }

@@ -14,6 +14,7 @@ import sys
 import subprocess
 import copy
 from string import Template
+from functools import reduce
 
 
 def removeJPsiSlash(filename):
@@ -877,10 +878,11 @@ def makeDiagPlotPerChannel(tmvaFilename, plotName, methodName):
     testTree.Project('background' + probabilityVar, probabilityVar, 'className == "Background"')
     signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
     testTree.Project('signal' + probabilityVar, probabilityVar, 'className == "Signal"')
-    makeDiagPlot(signalHist, bgHist, plotName)
+    plotLabel = ';raw classifier output;purity per bin'
+    makeDiagPlot(signalHist, bgHist, plotName, plotLabel)
 
 
-def makeDiagPlot(signalHist, bgHist, plotName):
+def makeDiagPlot(signalHist, bgHist, plotName, plotLabel=None):
     ROOT.gROOT.SetBatch(True)
     nbins = 100
     import array
@@ -906,8 +908,9 @@ def makeDiagPlot(signalHist, bgHist, plotName):
     canvas = ROOT.TCanvas(plotTitle + plotName, plotTitle, 1200, 800)
     canvas.cd()
 
-    purityPerBin.SetTitle(';classifier output;'
-                          + 'purity per bin')
+    if not plotLabel:
+        plotLabel = ';classifier output;purity per bin'
+    purityPerBin.SetTitle(plotLabel)
     purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
     purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
     purityPerBin.GetXaxis().SetTitleSize(0.05)

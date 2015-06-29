@@ -144,7 +144,7 @@ void TrackBuilderModule::event()
     for (const auto& gfTrack : gfTracks) {
 
       int iGFTrack = -1;
-      for (int i = 0; i < gfTracks.size(); ++i) {
+      for (unsigned int i = 0; i < gfTracks.size(); ++i) {
         if (&gfTrack == gfTracks[i]) {
           iGFTrack = i;
           break;

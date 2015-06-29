@@ -42,6 +42,38 @@ namespace Belle2 {
       return end - 1;
     }
 
+    unsigned long int findIgnoringParenthesis(std::string str, std::string pattern, unsigned int begin = 0)
+    {
+
+      if (str.size() < pattern.size())
+        return std::string::npos;
+
+      for (unsigned int i = begin; i < str.size() - pattern.size(); ++i) {
+        if (str[i] == '[') {
+          i += findMatchedParenthesis(str.substr(i), '[', ']');
+          continue;
+        }
+        if (str[i] == '(') {
+          i += findMatchedParenthesis(str.substr(i), '(', ')');
+          continue;
+        }
+        if (str[i] == '{') {
+          i += findMatchedParenthesis(str.substr(i), '{', '}');
+          continue;
+        }
+
+        for (unsigned int j = 0; j < pattern.size(); ++j) {
+          if (str[i + j] != pattern[j]) {
+            break;
+          }
+          if (j == pattern.size() - 1) {
+            return i;
+          }
+        }
+      }
+      return std::string::npos;
+    }
+
     std::vector<std::string> splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close)
     {
 
@@ -130,14 +162,14 @@ namespace Belle2 {
       unsigned long int begin = findMatchedParenthesis(str);
       unsigned long int pos = 0;
 
-      if ((pos =  str.find(" or ", begin)) != std::string::npos && str.substr(begin, pos - begin).find("[") == std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, " or ", begin)) != std::string::npos) {
         operation = OR;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 4)));
         return true;
       }
 
-      if ((pos =  str.find(" and ", begin)) != std::string::npos && str.substr(begin, pos - begin).find("[") == std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, " and ", begin)) != std::string::npos) {
         operation = AND;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 5)));
@@ -152,37 +184,37 @@ namespace Belle2 {
     {
 
       unsigned long int pos = 0;
-      if ((pos =  str.find("<=")) != std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, "<=")) != std::string::npos) {
         operation = LE;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 2)));
         return true;
       }
-      if ((pos =  str.find("<")) != std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, "<")) != std::string::npos) {
         operation = LT;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 1)));
         return true;
       }
-      if ((pos =  str.find(">=")) != std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, ">=")) != std::string::npos) {
         operation = GE;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 2)));
         return true;
       }
-      if ((pos =  str.find(">")) != std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, ">")) != std::string::npos) {
         operation = GT;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 1)));
         return true;
       }
-      if ((pos =  str.find("==")) != std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, "==")) != std::string::npos) {
         operation = EQ;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 2)));
         return true;
       }
-      if ((pos =  str.find("!=")) != std::string::npos) {
+      if ((pos =  findIgnoringParenthesis(str, "!=")) != std::string::npos) {
         operation = NE;
         left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos)));
         right = std::unique_ptr<Cut>(new Cut(str.substr(pos + 2)));
@@ -198,9 +230,11 @@ namespace Belle2 {
       unsigned long int pos1 = 0;
       unsigned long int pos2 = 0;
       for (auto& c : {"<", ">", "!", "="}) {
-        if (((pos1 =  str.find(c)) != std::string::npos) and
-            ((pos2 =  str.find("<", pos1 + 2)) != std::string::npos or (pos2 =  str.find(">", pos1 + 2)) != std::string::npos
-             or (pos2 =  str.find("!", pos1 + 2)) != std::string::npos or (pos2 =  str.find("=", pos1 + 2)) != std::string::npos)) {
+        if (((pos1 =  findIgnoringParenthesis(str, c)) != std::string::npos) and
+            ((pos2 =  findIgnoringParenthesis(str, "<", pos1 + 2)) != std::string::npos
+             or (pos2 =  findIgnoringParenthesis(str, ">", pos1 + 2)) != std::string::npos
+             or (pos2 =  findIgnoringParenthesis(str, "!", pos1 + 2)) != std::string::npos
+             or (pos2 =  findIgnoringParenthesis(str, "=", pos1 + 2)) != std::string::npos)) {
           operation = AND;
           left = std::unique_ptr<Cut>(new Cut(str.substr(0, pos2)));
           if (str[pos1 + 1] == '=')

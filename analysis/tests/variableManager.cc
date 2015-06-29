@@ -21,6 +21,14 @@ namespace {
       result += x;
     return result;
   }
+  Manager::FunctionPtr dummyMetaVar(const std::vector<std::string>& arguments)
+  {
+    std::string arg = arguments[0];
+    auto func = [arg](const Particle * particle) -> double {
+      return arg.size();
+    };
+    return func;
+  }
 
   /** test VariableManager. */
   TEST(VariableTest, Manager)
@@ -94,6 +102,14 @@ namespace {
     EXPECT_DOUBLE_EQ(Manager::Instance().getVariable("testingthedummyvarwithparameters(3,5)")->function(nullptr), 8.0);
     EXPECT_DOUBLE_EQ(Manager::Instance().getVariable("testingthedummyvarwithparameters(3,7,8)")->function(nullptr), 18.0);
 
+    Manager::Instance().registerVariable("testingthedummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar,
+                                         "blah");
+    dummy = Manager::Instance().getVariable("testingthedummymetavar(1 < 2)");
+    ASSERT_NE(dummy, nullptr);
+    EXPECT_DOUBLE_EQ(dummy->function(nullptr), 5.0);
+    EXPECT_DOUBLE_EQ(Manager::Instance().getVariable("testingthedummymetavar(123)")->function(nullptr), 3.0);
+
+
     //also test the macro (with other name)
     REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters2(4,5)");
@@ -121,6 +137,7 @@ namespace {
   {
 
     Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
+    Manager::Instance().registerVariable("dummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar, "blah");
 
     std::unique_ptr<Cut> a = Cut::Compile("1.2 < 1.5 ");
     EXPECT_TRUE(a->check(nullptr));
@@ -179,6 +196,11 @@ namespace {
     a = Cut::Compile("dummyvar < 100.0");
     EXPECT_TRUE(a->check(nullptr));
     a = Cut::Compile("dummyvar <= dummyvar <= dummyvar");
+    EXPECT_TRUE(a->check(nullptr));
+
+    a = Cut::Compile("dummymetavar(123) < 100.0");
+    EXPECT_TRUE(a->check(nullptr));
+    a = Cut::Compile("dummymetavar(1) <= dummymetavar(1<) <= dummymetavar(1<3)");
     EXPECT_TRUE(a->check(nullptr));
 
     a = Cut::Compile("1 < 2 and 3 < 4");

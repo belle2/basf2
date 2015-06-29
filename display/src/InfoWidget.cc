@@ -15,6 +15,16 @@
 
 using namespace Belle2;
 
+namespace {
+  DataStore::EDurability getDurability(TString d)
+  {
+    if (d == "persistent")
+      return DataStore::c_Persistent;
+    if (d == "event")
+      return DataStore::c_Event;
+    B2FATAL("Invalid URI scheme '" << d << "' specified!");
+  }
+}
 InfoWidget::InfoWidget(const TGWindow* p):
   TGHtml(p, 400, 600, -1)
 {
@@ -94,33 +104,59 @@ void InfoWidget::show(const char* uri, bool clearSelection)
 
 TString InfoWidget::createMainPage() const
 {
-  const TString scheme = "event:";
   TString info = getHeader();
-  info += "<p>Arrays/Objects of <tt>c_Event</tt> durability:</p>";
-  info += "<h2>Arrays</h2>";
-  for (std::string name : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::c_Event)) {
-    const StoreArray<TObject> array(name);
-    int nEntries = array.getEntries();
-    if (nEntries)
-      info += TString::Format("<a href='%s%s/'>%s (%d)</a><br>", scheme.Data(), name.c_str(), name.c_str(), nEntries);
-    else
-      info += TString::Format("%s (%d)<br>", name.c_str(), nEntries);
-  }
 
-  info += "<h2>Objects</h2>";
-  for (std::string name : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::c_Event)) {
-    const StoreObjPtr<TObject> obj(name);
-    if (obj)
-      info += TString::Format("<a href='%s%s/'>%s</a><br>", scheme.Data(), name.c_str(), name.c_str());
-    else
-      info += TString::Format("%s<br>", name.c_str());
+  const char* schemes[] = {"event", "persistent"};
+  const DataStore::EDurability durabilities[] = { DataStore::c_Event, DataStore::c_Persistent };
+  const char* durabilyNames[] = {"c_Event", "c_Persistent"};
+
+  for (int i = 0; i < 2; i++) {
+    const TString scheme = schemes[i];
+    auto arrayNames = DataStore::Instance().getListOfArrays(TObject::Class(), durabilities[i]);
+    if (!arrayNames.empty()) {
+      info += "<h2>Arrays";
+      if (i > 0) {
+        info += " (<tt>";
+        info += durabilyNames[i];
+        info += "</tt>)";
+      }
+      info += "</h2>";
+    }
+    for (std::string name : arrayNames) {
+      const StoreArray<TObject> array(name, durabilities[i]);
+      int nEntries = array.getEntries();
+      if (nEntries)
+        info += TString::Format("<a href='%s:%s/'>%s (%d)</a><br>", scheme.Data(), name.c_str(), name.c_str(), nEntries);
+      else
+        info += TString::Format("%s (%d)<br>", name.c_str(), nEntries);
+    }
+
+    auto objNames = DataStore::Instance().getListOfObjects(TObject::Class(), durabilities[i]);
+    if (!objNames.empty()) {
+      info += "<h2>Objects";
+      if (i > 0) {
+        info += " (<tt>";
+        info += durabilyNames[i];
+        info += "</tt>)";
+      }
+      info += "</h2>";
+    }
+    for (std::string name : objNames) {
+      const StoreObjPtr<TObject> obj(name, durabilities[i]);
+      if (obj)
+        info += TString::Format("<a href='%s:%s/'>%s</a><br>", scheme.Data(), name.c_str(), name.c_str());
+      else
+        info += TString::Format("%s<br>", name.c_str());
+    }
+    if (i == 0)
+      info += "<hr>";
   }
   return info;
 }
 
 TString InfoWidget::createArrayPage(const URI& uri) const
 {
-  const StoreArray<TObject> array(uri.entryName.Data());
+  const StoreArray<TObject> array(uri.entryName.Data(), getDurability(uri.scheme));
   TString info = getHeader(uri);
   if (array.getEntries() != 0) {
     info += HtmlClassInspector::getClassInfo(array[0]->IsA());
@@ -130,9 +166,9 @@ TString InfoWidget::createArrayPage(const URI& uri) const
     TString name = ObjectInfo::getName(array[i]);
     if (name != "")
       name = " - " + name;
-    info += TString::Format("<a href='%s:%s/%d'>%s</a><br>",
+    info += TString::Format("<a href='%s:%s/%d'>%s[%d]%s</a><br>",
                             uri.scheme.Data(), uri.entryName.Data(), i,
-                            (ObjectInfo::getIdentifier(array[i]) + name).Data());
+                            uri.entryName.Data(), i, name.Data());
   }
   return info;
 }
@@ -149,8 +185,8 @@ TString InfoWidget::createObjectPage(const URI& uri) const
 TString InfoWidget::getHeader(const URI& uri) const
 {
   int numEntries = -1;
-  if (!uri.object or uri.arrayIndex != -1) {
-    const StoreArray<TObject> array(uri.entryName.Data());
+  if (uri.entryName.Length() != 0 and (!uri.object or uri.arrayIndex != -1)) {
+    const StoreArray<TObject> array(uri.entryName.Data(), getDurability(uri.scheme));
     numEntries = array.getEntries();
   }
 
@@ -284,13 +320,7 @@ InfoWidget::URI::URI(const TString& uri):
     object = reinterpret_cast<TObject*>(path.Atoll());
   } else if (path.Length() > 0 and path != "/") {
     //event/persistent
-    DataStore::EDurability durability;
-    if (scheme == "event")
-      durability = DataStore::c_Event;
-    else if (scheme == "persistent")
-      durability = DataStore::c_Persistent;
-    else
-      B2FATAL("Invalid URI scheme '" << scheme << "' specified!");
+    DataStore::EDurability durability = getDurability(scheme);
 
     Ssiz_t delim = path.Last('/');
     Ssiz_t idxFieldLength = path.Length() - delim - 1;

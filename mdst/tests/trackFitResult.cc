@@ -64,6 +64,7 @@ namespace Belle2 {
       EXPECT_EQ(charge, myResult.getChargeSign());
       EXPECT_EQ(pValue, myResult.getPValue());
       EXPECT_EQ(pType, myResult.getParticleType());
+      EXPECT_EQ(pType.getPDGCode(), myResult.getPDG());
 
     }
   } // Testcases for getters

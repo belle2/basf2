@@ -121,8 +121,11 @@ namespace Belle2 {
     TMatrixDSym getCovariance6(const float bField = 1.5) const
     { return getUncertainHelix().getCartesianCovariance(bField); }
 
-    /** Getter for ParticleCode of the mass hypothesis of the track fit. */
+    /** Getter for ParticleType of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const { return Const::ParticleType(m_pdg); }
+
+    /** Getter for PDG of the mass hypothesis of the track fit. */
+    int getPDG() const { return m_pdg; }
 
     /** Return track charge (1 or -1).
      *

@@ -365,12 +365,6 @@ namespace Belle2 {
 
       ARICHBtestGeometryPar* m_arichbtgp = ARICHBtestGeometryPar::Instance();
 
-      for (unsigned int i = 0; i < m_agelrefind.size(); i++) {
-        char aeroname[255];
-        sprintf(aeroname, "Aerogel%d", i + 1);
-        createAerogel(aeroname, m_agelrefind[i],  m_ageltrlen[i]);
-      }
-
       // experimental box
 
       GearDir boxParams(content, "ExperimentalBox");
@@ -574,9 +568,9 @@ namespace Belle2 {
       for (unsigned int ilayer = 0; ilayer < m_agelthickness.size(); ilayer++) {
         char aeroname[100];
         sprintf(aeroname, "Aerogel%d", ilayer + 1);
+        G4Material* tileMaterial = createAerogel(aeroname, m_agelrefind[ilayer],  m_ageltrlen[ilayer]);
         double sizeZ = m_agelthickness[ilayer] * CLHEP::mm / Unit::mm;
-        string tileMat(aeroname);
-        G4Material* tileMaterial = Materials::get(tileMat);
+
         if (!m_arichbtgp->getAverageAgel()) {
           m_arichgp->setAeroRefIndex(ilayer, m_agelrefind[ilayer]);
           m_arichgp->setAerogelZPosition(ilayer, (posZ - zFrame / 2.) * Unit::mm / CLHEP::mm);

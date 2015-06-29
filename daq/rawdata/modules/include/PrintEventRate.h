@@ -28,11 +28,16 @@ namespace Belle2 {
     //! Module functions to be called from event process
     virtual void event();
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
-
+    virtual void endRun();
   protected:
+    int m_run;
+    unsigned int m_cur_utime;
+    unsigned int m_cur_event;
+    unsigned int start_utime;
+    unsigned int start_event;
     unsigned int prev_utime;
     unsigned int prev_event;
-
+    int m_size;
 
   };
 

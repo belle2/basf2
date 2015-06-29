@@ -154,7 +154,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Failed to receive data(%s). Exiting...", strerror(errno));
+        sprintf(err_buf, "Failed to receive data(%s). %d %d. Exiting...", strerror(errno), read_size, errno);
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);
@@ -729,6 +729,27 @@ void DesSerPrePC::DataAcquisition()
       }
 #endif
     }
+
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC) % 10000 == 0) {
+      double interval = cur_time - m_prev_time;
+      double total_time = cur_time - m_start_time;
+      printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
+             n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC,
+             (n_basf2evt  - m_prev_nevt)*NUM_EVT_PER_BASF2LOOP_PC / interval / 1.e3,
+             (m_totbytes - m_prev_totbytes) / interval / 1.e6,
+             total_time,
+             interval);
+      fflush(stdout);
+
+      m_prev_time = cur_time;
+      m_prev_totbytes = m_totbytes;
+      m_prev_nevt = n_basf2evt;
+      cur_time = getTimeSec();
+    }
+
+
+
+
 
 #ifdef NONSTOP
     if (g_run_stop == 1) {

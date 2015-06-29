@@ -235,7 +235,7 @@ namespace Belle2 {
   DEFINE_UNIT(rad   , 1.); /**< Standard of [angle] */
   DEFINE_UNIT(GeV   , 1.); /**< Standard of [energy, momentum, mass] */
   DEFINE_UNIT(K     , 1.); /**< Standard of [temperature] */
-  DEFINE_UNIT(T     , 1.); /**< Standard of [magnetic field] */
+  DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< Standard of [magnetic field] */
   DEFINE_UNIT(e     , 1.); /**< Standard of [electric charge] */
   DEFINE_UNIT_NAME(g_cm3 , 1., "g/cm3"); /**< Standard of [density] */
 
@@ -295,9 +295,6 @@ namespace Belle2 {
   DEFINE_UNIT_NAME(g_mm3   , Unit::g_cm3 / Unit::mm3, "g/mm3");  /**< [g/mm^3] */
   DEFINE_UNIT_NAME(mg_mm3  , Unit::mg_cm3 / Unit::mm3, "mg/mm3"); /**< [mg/mm^3] */
   DEFINE_UNIT_NAME(kg_mm3  , Unit::kg_cm3 / Unit::mm3, "kg/mm3"); /**< [kg/mm^3] */
-
-// magnetic field units
-  DEFINE_UNIT(TinStdUnits  , Unit::V * Unit::s / Unit::m2); /**< [Vs/m^2] */
 
   double Unit::convertValue(double value, const std::string& unitString)
   {

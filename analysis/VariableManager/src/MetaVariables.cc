@@ -296,6 +296,28 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr countDaughters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[1];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+        auto func = [cut](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          unsigned int n = 0;
+          for (auto& daughter : particle->getDaughters())
+          {
+            if (cut->check(daughter))
+              ++n;
+          }
+          return n;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function countDaughters");
+      }
+    }
+
 
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments)
     {
@@ -415,6 +437,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, "Use the lab frame as current reference frame.");
     REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion,
                       "Returns 1 if given variable is inside a given region. Otherwise 0.");
+    REGISTER_VARIABLE("countDaughters(condition)", countDaughters, "Returns number of direct daughters which satisfy given condition.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf, "Returns sum of a variable over all daughters.");

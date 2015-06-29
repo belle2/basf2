@@ -50,15 +50,17 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   addParam("decayString", m_decayString, "Decay to reconstruct, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString ");
-  Variable::Cut::Parameter emptyCut;
-  addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+  addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
 
   HistParams defaultHistParams = std::make_tuple(100, 0, 6);
-  addParam("histParams", m_histParams, "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)", defaultHistParams);
+  addParam("histParams", m_histParams,
+           "Tuple specifying number of bins, lower and upper boundary of the variable histogram. (for invariant mass M in GeV)",
+           defaultHistParams);
   addParam("fileName", m_fileName, "Name of the TFile where the histograms are saved.");
   addParam("variable", m_variable, "Variable for which the distributions are calculated");
   addParam("target", m_targetVariable, "Variable which defines signal and background.", std::string("isSignal"));
-  addParam("customBinning", m_customBinning, "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
+  addParam("customBinning", m_customBinning,
+           "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
   addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
 }
 
@@ -113,7 +115,8 @@ void PreCutHistMakerModule::initialize()
   }
 
   if (setOfPDGs.size() != setOfInputListNames.size()) {
-    B2ERROR("You're using at least two different input lists for the same particle in decay '" << m_decayString << "'. This won't work at the moment. [Can be implemented by going over all input particle lists in fillParticleLists() and adding Particles to all temporary lists where they are found in the corresponding input lists.]");
+    B2ERROR("You're using at least two different input lists for the same particle in decay '" << m_decayString <<
+            "'. This won't work at the moment. [Can be implemented by going over all input particle lists in fillParticleLists() and adding Particles to all temporary lists where they are found in the corresponding input lists.]");
   }
 
 
@@ -159,14 +162,15 @@ void PreCutHistMakerModule::initialize()
     B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_targetVariable)
   }
 
-  m_cut.init(m_cutParameter);
+  m_cut = Variable::Cut::Compile(m_cutParameter);
 
   m_generator_all = new ParticleGenerator(m_decayString);
   m_generator_signal = new ParticleGenerator(onlySignal_decayString.str());
 }
 
 
-void getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>& daughters, const std::multiset<int>& expectedDaughterPDGsAbs, std::map<int, int>& foundPDGs)
+void getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>& daughters,
+                          const std::multiset<int>& expectedDaughterPDGsAbs, std::map<int, int>& foundPDGs)
 {
   const std::vector<MCParticle*>& mcDaughters = mcparticle.getDaughters();
   for (auto d : mcDaughters) {
@@ -182,7 +186,8 @@ void getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>
   }
 }
 
-bool getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>& daughters, const std::multiset<int>& expectedDaughterPDGsAbs)
+bool getMatchingDaughters(const MCParticle& mcparticle, std::vector<MCParticle*>& daughters,
+                          const std::multiset<int>& expectedDaughterPDGsAbs)
 {
   std::map<int, int> foundPDGs;
   getMatchingDaughters(mcparticle, daughters, expectedDaughterPDGsAbs, foundPDGs);
@@ -217,7 +222,7 @@ bool hasAntiParticle(int pdg)
 
 void PreCutHistMakerModule::clearTemporaryLists()
 {
-  for (auto & list : m_tmpLists) {
+  for (auto& list : m_tmpLists) {
     int pdg = list->getPDGCode();
     std::string name = list.getName();
     list.create(true);
@@ -240,16 +245,16 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
   //TODO: are there cases where we want misID-ed Particles? (e.g. pdg different mcPart)
   std::map<int, StoreObjPtr<ParticleList>> pdgToTmpList;
   std::map<int, StoreObjPtr<ParticleList>> pdgToInputList;
-  for (auto & plist : m_tmpLists) {
+  for (auto& plist : m_tmpLists) {
     pdgToTmpList[abs(plist->getPDGCode())] = plist;
   }
-  for (auto & plist : m_inputLists) {
+  for (auto& plist : m_inputLists) {
     pdgToInputList[abs(plist->getPDGCode())] = plist;
   }
 
-  for (const MCParticle * mcPart : mcDaughters) {
+  for (const MCParticle* mcPart : mcDaughters) {
     const auto& particles = mcPart->getRelationsWith<Particle>();
-    for (const Particle & p : particles) {
+    for (const Particle& p : particles) {
 
       const auto& it = pdgToTmpList.find(abs(p.getPDGCode()));
       if (it != pdgToTmpList.end()) {
@@ -263,7 +268,7 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
   }
 
   //check if all lists are filled
-  for (auto & plist : m_tmpLists) {
+  for (auto& plist : m_tmpLists) {
     if (plist->getListSize() == 0)
       return false;
   }
@@ -282,7 +287,7 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
     if (m_targetVar->function(part) < 0.5)
       continue;
     m_withoutCut->get().Fill(1);
-    if (!m_cut.check(&particle))
+    if (!m_cut->check(&particle))
       continue;
     m_histogramSignal->get().Fill(m_var->function(part));
   }
@@ -297,7 +302,7 @@ void PreCutHistMakerModule::saveAllCombinations()
     while (m_generator_all->loadNext()) {
       const Particle part = m_generator_all->getCurrentParticle();
       m_withoutCut->get().Fill(0);
-      if (!m_cut.check(&part))
+      if (!m_cut->check(&part))
         continue;
       m_histogramAll->get().Fill(m_var->function(&part), m_inverseSamplingRate);
     }
@@ -332,7 +337,7 @@ void PreCutHistMakerModule::event()
 
   //combinations for signal decays
   StoreArray<MCParticle> mcparticles;
-  for (const MCParticle & mcparticle : mcparticles) {
+  for (const MCParticle& mcparticle : mcparticles) {
     if (abs(mcparticle.getPDG()) == abs(m_pdg)) {
       //we found a matching mcparticle, but is it the same decay?
 

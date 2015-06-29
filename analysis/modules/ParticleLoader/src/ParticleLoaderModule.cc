@@ -55,7 +55,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    std::vector<std::tuple<std::string, Variable::Cut::Parameter>> emptyDecayStringsAndCuts;
+    std::vector<std::tuple<std::string, std::string>> emptyDecayStringsAndCuts;
 
     addParam("decayStringsWithCuts", m_decayStringsWithCuts,
              "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString and https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions).",
@@ -74,32 +74,6 @@ namespace Belle2 {
 
   ParticleLoaderModule::~ParticleLoaderModule()
   {
-  }
-
-  void ParticleLoaderModule::terminate()
-  {
-    // clean-up the memory
-    for (auto track2Plist : m_Tracks2Plists) {
-      Variable::Cut* cut = get<c_CutPointer>(track2Plist);
-      delete cut;
-    }
-    for (auto v02Plist : m_V02Plists) {
-      Variable::Cut* cut = get<c_CutPointer>(v02Plist);
-      delete cut;
-    }
-    for (auto eclCluster2Plist : m_ECLClusters2Plists) {
-      Variable::Cut* cut = get<c_CutPointer>(eclCluster2Plist);
-      delete cut;
-    }
-    for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-      Variable::Cut* cut = get<c_CutPointer>(klmCluster2Plist);
-      delete cut;
-    }
-    for (auto mcParticle2Plist : m_MCParticles2Plists) {
-      Variable::Cut* cut = get<c_CutPointer>(mcParticle2Plist);
-      delete cut;
-    }
-
   }
 
   void ParticleLoaderModule::initialize()
@@ -132,7 +106,7 @@ namespace Belle2 {
 
         // parsing of the input tuple (DecayString, Cut)
         string decayString = get<0>(decayStringCutTuple);
-        Variable::Cut::Parameter cutParameter = get<1>(decayStringCutTuple);
+        std::string cutParameter = get<1>(decayStringCutTuple);
 
         // obtain the output particle lists from the decay string
         bool valid = m_decaydescriptor.init(decayString);
@@ -172,7 +146,7 @@ namespace Belle2 {
           continue;
         }
 
-        Variable::Cut* cut = new Variable::Cut(cutParameter);
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutParameter));
 
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
@@ -299,7 +273,7 @@ namespace Belle2 {
           continue;
 
         string listName = get<c_PListName>(v02Plist);
-        Variable::Cut* cut = get<c_CutPointer>(v02Plist);
+        auto& cut = get<c_CutPointer>(v02Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
         if (cut->check(newPart))
@@ -344,7 +318,7 @@ namespace Belle2 {
       for (auto track2Plist : m_Tracks2Plists) {
         string listName = get<c_PListName>(track2Plist);
         int pdgCode = get<c_PListPDGCode>(track2Plist);
-        Variable::Cut* cut = get<c_CutPointer>(track2Plist);
+        auto& cut = get<c_CutPointer>(track2Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
         Const::ChargedStable type(abs(pdgCode));
@@ -443,7 +417,7 @@ namespace Belle2 {
         // add particle to list if it passes the selection criteria
         for (auto eclCluster2Plist : m_ECLClusters2Plists) {
           string listName = get<c_PListName>(eclCluster2Plist);
-          Variable::Cut* cut = get<c_CutPointer>(eclCluster2Plist);
+          auto& cut = get<c_CutPointer>(eclCluster2Plist);
           StoreObjPtr<ParticleList> plist(listName);
 
           if (cut->check(newPart))
@@ -501,7 +475,7 @@ namespace Belle2 {
         // add particle to list if it passes the selection criteria
         for (auto klmCluster2Plist : m_KLMClusters2Plists) {
           string listName = get<c_PListName>(klmCluster2Plist);
-          Variable::Cut* cut = get<c_CutPointer>(klmCluster2Plist);
+          auto&  cut = get<c_CutPointer>(klmCluster2Plist);
           StoreObjPtr<ParticleList> plist(listName);
 
           if (cut->check(newPart))
@@ -556,7 +530,7 @@ namespace Belle2 {
         if (m_addDaughters) appendDaughtersRecursive(newPart);
 
         string listName = get<c_PListName>(mcParticle2Plist);
-        Variable::Cut* cut = get<c_CutPointer>(mcParticle2Plist);
+        auto&  cut = get<c_CutPointer>(mcParticle2Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
         if (cut->check(newPart))

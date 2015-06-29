@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
   }
 
   TMVAInterface::TeacherConfig config(prefix, workingDirectory, variables, spectators, methods);
-  auto teacher = std::make_shared<TMVAInterface::Teacher>(config, true);
+  auto teacher = std::unique_ptr<TMVAInterface::Teacher>(new TMVAInterface::Teacher(config, true));
 
   target = Variable::makeROOTCompatible(target);
   weight = Variable::makeROOTCompatible(weight);

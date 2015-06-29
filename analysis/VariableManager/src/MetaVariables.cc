@@ -268,7 +268,7 @@ namespace Belle2 {
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
-        Variable::Cut cut(cutString);
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
           if (particle == nullptr)
@@ -283,7 +283,7 @@ namespace Belle2 {
               TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
               std::vector<int> indices = { particle->getArrayIndex(), roeParticle->getArrayIndex() };
               Particle tempParticle = Particle(tempCombination, pdgCode, flavourType, indices, particle->getArrayPointer());
-              if (cut.check(&tempParticle)) {
+              if (cut->check(&tempParticle)) {
                 return 1;
               }
             }

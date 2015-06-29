@@ -80,7 +80,7 @@ namespace Belle2 {
     std::map<int, unsigned long int> m_class_count; /**< Number of samples with this class id */
 
     std::vector<std::tuple<std::string, std::string, std::string>> m_methods; /**< tuple(name, type, config) for every method */
-    std::shared_ptr<TMVAInterface::Teacher> m_teacher; /**< Used TMVA method */
+    std::unique_ptr<TMVAInterface::Teacher> m_teacher; /**< Used TMVA method */
 
     unsigned long int m_maxSamples; /**< Maximum number of samples */
     unsigned long int m_nSamples; /**< Current number of samples */

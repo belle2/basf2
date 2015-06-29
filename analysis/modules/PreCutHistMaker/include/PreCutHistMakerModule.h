@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <memory>
 
 namespace Belle2 {
   class Particle;
@@ -91,19 +92,21 @@ namespace Belle2 {
     std::string m_targetVariable; /**< Variable which defines ginal and background */
     const Variable::Manager::Var* m_targetVar; /**< Pointer to target variable stored in the variable manager */
 
-    std::vector<StoreObjPtr<ParticleList>> m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
+    std::vector<StoreObjPtr<ParticleList>>
+                                        m_tmpLists; /**< temporary particle lists (contain subsets of contents of input lists, filled from MC truth). */
     StoreObjPtr<RootMergeable<TH1D>> m_withoutCut; /**< histogram containing signal and background amount without previous cut */
     StoreObjPtr<RootMergeable<TH1D>> m_histogramSignal; /**< signal histogram for combined particle. */
     StoreObjPtr<RootMergeable<TH1D>> m_histogramAll; /**< signal+background histogram for combined particle. */
 
-    ParticleGenerator* m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
+    ParticleGenerator*
+    m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
     ParticleGenerator* m_generator_all; /**< Combines particles for signal+background. */
 
     unsigned int m_inverseSamplingRate; /**< Sampling rate for 'all' histogram. */
     unsigned long int m_iEvent; /**< Event counter, used for sampling rate */
 
-    Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
-    Variable::Cut m_cut; /**< cut object which performs the cuts */
+    std::string m_cutParameter;  /**< selection criteria */
+    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
   };
 

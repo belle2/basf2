@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PHYSICSTRIGGERMODULE_H
-#define PHYSICSTRIGGERMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
-#include <string>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
+#include <framework/core/Module.h>
+
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   /**
@@ -76,10 +77,10 @@ namespace Belle2 {
     int m_userCustomOpen;
 
     /**Access users' cut */
-    Variable::Cut::Parameter m_userCustomCut;
+    std::string m_userCustomCut;
 
     /**Access users' cut*/
-    Variable::Cut m_cut;
+    std::unique_ptr<Variable::Cut> m_cut;
 
     /**hadron criteria*/
 
@@ -243,5 +244,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* PHYSICSTRIGGERMODULE_H */

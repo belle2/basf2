@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLESELECTORMODULE_H
-#define PARTICLESELECTORMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
-#include <string>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+
+#include <framework/core/Module.h>
+
+#include <string>
+#include <memory>
 
 namespace Belle2 {
 
@@ -49,10 +51,9 @@ namespace Belle2 {
 
     std::string m_listName;   /**< output particle list name */
 
-    Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
-    Variable::Cut m_cut; /**< cut object which performs the cuts */
+    std::string m_cutParameter;  /**< selection criteria */
+    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
   };
 
 } // Belle2 namespace
 
-#endif

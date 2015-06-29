@@ -18,7 +18,7 @@ namespace Belle2 {
       m_modelObjectName("model"), m_modelYieldsObjectNames( {"signal", "background"}), m_modelPlotComponentNames({"sig", "bkg"})
     {
 
-      workspace = std::make_shared<RooWorkspace>("SPlotWorkspace");
+      workspace = std::unique_ptr<RooWorkspace>(new RooWorkspace("SPlotWorkspace"));
       TFile modelFile(modelFileName.c_str());
 
       // Check if it's derived from RooAbsPdf
@@ -38,7 +38,7 @@ namespace Belle2 {
       }
       // for each discriminating variable, remember the values, as this information is needed within the sPlot algorithm
 
-      discriminating_values = std::make_shared<RooDataSet>("discriminating_values", "discriminating_values", vars);
+      discriminating_values = std::unique_ptr<RooDataSet>(new RooDataSet("discriminating_values", "discriminating_values", vars));
 
       int numberOfEvents = discriminatingVariables.begin()->second.size();
       for (int i = 0; i < numberOfEvents; ++i) {

@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLELISTMANIPULATORMODULE_H
-#define PARTICLELISTMANIPULATORMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
-#include <string>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+
+#include <framework/core/Module.h>
+
+#include <string>
+#include <memory>
 
 namespace Belle2 {
 
@@ -82,8 +84,8 @@ namespace Belle2 {
     std::string m_outputAntiListName;   /**< output anti-particle list name */
     bool m_isSelfConjugatedParticle;    /**< flag that indicates whether an anti-particle does not exist and therefore the output anti-ParticleList should not be created */
 
-    Variable::Cut::Parameter m_cutParameter;  /**< selection criteria */
-    Variable::Cut m_cut; /**< cut object which performs the cuts */
+    std::string m_cutParameter;  /**< selection criteria */
+    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
     bool m_writeOut;                     /**< toggle Particle List btw. transient/writeOut */
 
@@ -121,4 +123,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

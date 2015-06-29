@@ -22,6 +22,7 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <memory>
 
 namespace Belle2 {
 
@@ -57,7 +58,7 @@ namespace Belle2 {
    */
   class ParticleLoaderModule : public Module {
 
-    typedef std::tuple<int, std::string, std::string, bool, Variable::Cut*> PList;
+    typedef std::tuple<int, std::string, std::string, bool, std::shared_ptr<Variable::Cut>> PList;
     enum PListIndex {
       c_PListPDGCode, c_PListName, c_AntiPListName, c_IsPListSelfConjugated, c_CutPointer
     };
@@ -79,11 +80,6 @@ namespace Belle2 {
      * This method is called at the beginning of data processing.
      */
     virtual void initialize();
-
-    /**
-     * Terminate the module.
-     */
-    virtual void terminate();
 
     /**
      * Event processor.
@@ -136,8 +132,8 @@ namespace Belle2 {
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
 
-    std::vector<std::tuple<std::string, Variable::Cut::Parameter>>
-                                                                m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
+    std::vector<std::tuple<std::string, std::string>>
+                                                   m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
 
 
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */

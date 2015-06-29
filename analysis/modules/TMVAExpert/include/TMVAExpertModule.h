@@ -58,7 +58,7 @@ namespace Belle2 {
     int m_signalClass; /**< Class which is considered signal.  */
     float m_signalFraction; /**< signalFraction to calculate probability, -1 the training signal fraction is used */
     bool m_transformToProbability; /**< Transform classifier output to a porbability using given signal fraction */
-    std::shared_ptr<TMVAInterface::Expert> m_method; /**< Method used to calculate the target variable */
+    std::unique_ptr<TMVAInterface::Expert> m_method; /**< Method used to calculate the target variable */
 
   };
 

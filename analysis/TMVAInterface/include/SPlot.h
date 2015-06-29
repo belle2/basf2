@@ -65,8 +65,8 @@ namespace Belle2 {
 
     private:
 
-      std::shared_ptr<RooWorkspace> workspace;
-      std::shared_ptr<RooDataSet> discriminating_values;
+      std::unique_ptr<RooWorkspace> workspace;
+      std::unique_ptr<RooDataSet> discriminating_values;
       RooAbsPdf* model;
       std::vector<float> splot_weights;
       std::vector<float> cdf_weights;

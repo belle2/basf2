@@ -358,7 +358,7 @@ namespace Belle2 {
       }
 
       TMVAInterface::ExpertConfig config(m_config.getPrefix(), m_config.getWorkingDirectory(), methodName, 1);
-      auto expert = std::make_shared<TMVAInterface::Expert>(config, true);
+      auto expert = std::unique_ptr<TMVAInterface::Expert>(TMVAInterface::Expert(config, true));
 
       // Just to be save, we reset all branch addresses before we access them via getRow!
       setBranchAddresses();

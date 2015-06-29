@@ -41,10 +41,12 @@ namespace Belle2 {
 
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("decayString", m_decayString, "Input ParticleList name (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
+    addParam("decayString", m_decayString,
+             "Input ParticleList name (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
 
-    Variable::Cut::Parameter emptyCut;
-    addParam("cut", m_cutParameter, "Selection criteria to be applied, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions", emptyCut);
+    addParam("cut", m_cutParameter,
+             "Selection criteria to be applied, see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions",
+             std::string(""));
   }
 
   void ParticleSelectorModule::initialize()
@@ -67,7 +69,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> particleList(m_listName);
     particleList.isRequired(m_listName);
 
-    m_cut.init(m_cutParameter);
+    m_cut = Variable::Cut::Compile(m_cutParameter);
 
     B2INFO("ParticleSelector: " << m_listName);
     B2INFO("   -> With cuts  : " << m_cutParameter);
@@ -88,7 +90,7 @@ namespace Belle2 {
     unsigned int n = plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
       const Particle* part = plist->getParticle(i);
-      if (!m_cut.check(part)) toRemove.push_back(part->getArrayIndex());
+      if (!m_cut->check(part)) toRemove.push_back(part->getArrayIndex());
     }
     plist->removeParticles(toRemove);
   }

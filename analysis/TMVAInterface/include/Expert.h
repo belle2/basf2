@@ -13,11 +13,13 @@
 #include <analysis/TMVAInterface/Config.h>
 #include <boost/property_tree/ptree_fwd.hpp>
 
+#include <TMVA/Tools.h>
+#include <TMVA/Reader.h>
+
 #include <vector>
 #include <string>
 #include <map>
 #include <memory>
-namespace TMVA { class Reader; }
 
 namespace Belle2 {
   class Particle;
@@ -66,7 +68,7 @@ namespace Belle2 {
       ExpertConfig m_config; /**< Expert config */
       bool m_transformToProbability; /**< Transform output of classifier to a probability */
 
-      std::shared_ptr<TMVA::Reader> m_reader; /**<TMVA::Reader, which steers the booked TMVA method */
+      std::unique_ptr<TMVA::Reader> m_reader; /**<TMVA::Reader, which steers the booked TMVA method */
       std::vector<float> m_input; /**< Store place for the input variables */
       std::vector<const Variable::Manager::Var*> m_variables; /**< Pointers to the input variables */
       std::vector<const Variable::Manager::Var*> m_spectators; /**< Pointers to the input spectators */

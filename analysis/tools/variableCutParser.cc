@@ -13,23 +13,25 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 using namespace Belle2;
 
 int main()
 {
   std::string condition;
-  std::cout << "This program allows you to test variable conditions (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/VariableManager ).\n";
+  std::cout <<
+            "This program allows you to test variable conditions (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/VariableManager ).\n";
   std::cout << "Please input a condition " << std::flush;
   std::getline(std::cin, condition);
 
-  Variable::Cut cut(condition);
+  std::unique_ptr<Variable::Cut> cut = Variable::Cut::Compile(condition);
 
-  cut.print();
+  cut->print();
 
   TLorentzVector momentum(1, 2, 3, 4);
   Particle p(momentum, 421);
-  std::cout << "This condition is: " << (cut.check(&p) ? "True" : "False") << std::endl;
+  std::cout << "This condition is: " << (cut->check(&p) ? "True" : "False") << std::endl;
 
   return 0;
 }

@@ -77,7 +77,7 @@ namespace Belle2 {
     }
 
     TMVAInterface::ExpertConfig config(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass, m_signalFraction);
-    m_method = std::make_shared<TMVAInterface::Expert>(config, m_transformToProbability);
+    m_method = std::unique_ptr<TMVAInterface::Expert>(new TMVAInterface::Expert(config, m_transformToProbability));
 
   }
 

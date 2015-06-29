@@ -50,13 +50,11 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("decayString", m_decayString, "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
-
-    Variable::Cut::Parameter emptyCut;
-    addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
-
-    addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)", 0);
-
+    addParam("decayString", m_decayString,
+             "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
+    addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
+    addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
+             0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
@@ -107,7 +105,7 @@ namespace Belle2 {
       antiParticleList.registerInDataStore(flags);
     }
 
-    m_cut.init(m_cutParameter);
+    m_cut = Variable::Cut::Compile(m_cutParameter);
 
   }
 
@@ -135,7 +133,7 @@ namespace Belle2 {
     while (m_generator->loadNext()) {
 
       const Particle& particle = m_generator->getCurrentParticle();
-      if (!m_cut.check(&particle))
+      if (!m_cut->check(&particle))
         continue;
 
       Particle* newParticle = particles.appendNew(particle);

@@ -15,9 +15,6 @@
 #include <analysis/utility/WorkingDirectoryManager.h>
 #include <framework/logging/Logger.h>
 
-#include <TMVA/Tools.h>
-#include <TMVA/Reader.h>
-
 #include <TSystem.h>
 
 #include <boost/property_tree/xml_parser.hpp>
@@ -35,7 +32,7 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_reader = std::make_shared<TMVA::Reader>("!Color:!Silent");
+      m_reader = std::unique_ptr<TMVA::Reader>(new TMVA::Reader("!Color:!Silent"));
       m_variables = config.getVariablesFromManager();
       m_spectators = config.getSpectatorsFromManager();
       m_signalFraction = config.getSignalFraction();

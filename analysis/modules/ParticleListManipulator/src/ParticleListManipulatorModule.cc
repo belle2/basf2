@@ -54,8 +54,7 @@ namespace Belle2 {
     addParam("inputListNames", m_inputListNames,
              "list of input ParticleList names", defaultList);
 
-    Variable::Cut::Parameter emptyCut;
-    addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+    addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
@@ -106,7 +105,7 @@ namespace Belle2 {
       antiParticleList.registerInDataStore(flags);
     }
 
-    m_cut.init(m_cutParameter);
+    m_cut = Variable::Cut::Compile(m_cutParameter);
   }
 
   void ParticleListManipulatorModule::beginRun()
@@ -166,7 +165,7 @@ namespace Belle2 {
         fillUniqueIdentifier(part, idSeq);
         bool uniqueSeq = isUnique(idSeq);
 
-        if (uniqueSeq && m_cut.check(part)) {
+        if (uniqueSeq && m_cut->check(part)) {
           plist->addParticle(part);
           m_particlesInTheList.push_back(idSeq);
         }

@@ -88,7 +88,7 @@ namespace Belle2 {
       methods.push_back(TMVAInterface::Method(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)));
 
     TMVAInterface::TeacherConfig config(m_prefix, m_workingDirectory, m_variables, m_spectators, methods);
-    m_teacher = std::make_shared<TMVAInterface::Teacher>(config, false);
+    m_teacher = std::unique_ptr<TMVAInterface::Teacher>(new TMVAInterface::Teacher(config, false));
 
   }
 

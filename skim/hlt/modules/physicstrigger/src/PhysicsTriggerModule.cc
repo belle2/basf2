@@ -59,8 +59,7 @@ PhysicsTriggerModule::PhysicsTriggerModule() : Module()
   addParam("ParameterCutIndex", m_parameterCutIndex, "control selection criteria condition", 2);
 
   addParam("UserCustomOpen", m_userCustomOpen, "the switch of customing the selection criteria by user", 0);
-  Variable::Cut::Parameter emptyCut;
-  addParam("UserCustomCut", m_userCustomCut, "the user-custom selection criteria", emptyCut);
+  addParam("UserCustomCut", m_userCustomCut, "the user-custom selection criteria", std::string(""));
   initializeForEvent();
 //  ReadParameters();
 }
@@ -75,7 +74,7 @@ void PhysicsTriggerModule::initialize()
   StoreArray<HLTTag>::registerPersistent();
   StoreArray<PhysicsTriggerInformation>::registerPersistent();
   ReadParameters();
-  m_cut.init(m_userCustomCut);
+  m_cut = Variable::Cut::Compile(m_userCustomCut);
 }
 
 void PhysicsTriggerModule::beginRun()
@@ -191,7 +190,7 @@ bool  PhysicsTriggerModule::eventUserSelect()
   B2DEBUG(200, "User custom selection is open");
   const Particle* part = NULL;
   bool Fval = false;
-  if (m_cut.check(part))
+  if (m_cut->check(part))
     Fval = true;
   else
     Fval = false;

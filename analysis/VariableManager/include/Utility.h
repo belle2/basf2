@@ -18,7 +18,7 @@ namespace Belle2 {
 
     /**
      * Returns position of the matched closing parenthesis if the first character in the given
-     * string contains an opening parenthesis. Otherweise return 0.
+     * string contains an opening parenthesis. Otherwise return 0.
      */
     unsigned long int findMatchedParenthesis(std::string str, char open = '[', char close = ']');
 
@@ -31,24 +31,23 @@ namespace Belle2 {
     /**
      * This class implements a common way to implement cut/selection functionality for particle lists.
      * Every module which wants to perform cuts should use this object.
-     * As a parameter the module has to require Cut::Parameter.
-     * This Cut::Parameter has to be passed as an argument to the init function of the Cut object before a cut is performed.
+     * As a parameter the module has to require std::string.
+     * This std::string has to be passed as an argument to the static Compile method of the Cut class, which returns a unique_ptr to the Cut object.
      * Cuts can be performed via the check method.
      * In detail:
      *
      * private section of the module:
-     *   Variable::Cut::Parameter m_cutParameter;
-     *   Variable::Cut m_cut;
+     *   std::string m_cutParameter;
+     *   std::unique_ptr<Variable::Cut> m_cut;
      *
      * constructor of the module:
-     *   Variable::Cut::Parameter emptyCut;
-     *   addParam("cut", m_cutParameter, "Selection criteria to be applied", emptyCut);
+     *   addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
      *
-     * init function of the module:
-     *   m_cut.init(m_cutParameter);
+     * initialize method of the module:
+     *   m_cut = Variable::Cut::Compile(m_cutParameter);
      *
      * event function of the module:
-     *   if(m_cut.check(particlePointer)) {
+     *   if(m_cut->check(particlePointer)) {
      *     do something
      *   }
      *
@@ -64,31 +63,22 @@ namespace Belle2 {
      * daughter0(M) < daughter1(M)
      * [M > 1.5 or M < 0.5] and 0.2 < getExtraInfo(SignalProbability) < 0.7
      *
-     * == and != conditions are evaluated not exactly because we deal with flaoting point values
+     * == and != conditions are evaluated not exactly because we deal with floating point values
      * instead two floating point number are equal if their distance in their integral ordering is less than 3.
      */
     class Cut {
 
     public:
-
       /**
-       * Typedef to std::string. If we want to change the cut syntax in the future
-       * and require another type we can change this type here without touching every module
+       * Creates an instance of a cut and returns a unique_ptr to it, if you need a copy-able oject instead
+       * you can cast it to a shared_ptr using std::shared_ptr<Variable::Cut>(Cut::Compile(cutString))
+       * @param cut the string defining the cut
+       * @return std::unique_ptr<Cut>
        */
-      typedef std::string Parameter;
-
-      /**
-       * Constructor of the cut. Call init with given string
-       * @param str Cut is initaliszed with the specified cuts. Default are no cuts
-       */
-      Cut(Parameter str = "");
-
-      /**
-       * Initialises Cut object with the given cuts
-       * @param str Cut is initaliszed with the specified cuts.
-       */
-      void init(Parameter str);
-
+#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
+#else
+      static std::unique_ptr<Cut> Compile(std::string cut);
+#endif
       /**
        * Check if the current cuts are passed by the given particle
        * @param p pointer to the particle object
@@ -100,7 +90,26 @@ namespace Belle2 {
        */
       void print() const;
 
+
     private:
+      /**
+       * Constructor of the cut. Call init with given string
+       * @param str Cut is initaliszed with the specified cuts. Default are no cuts
+       */
+      Cut(std::string str);
+
+#if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
+#else
+      /**
+       * Delete Copy constructor
+       */
+      Cut(const Cut&) = delete;
+
+      /**
+       * Delete assign operator
+       */
+      Cut& operator=(const Cut&) = delete;
+#endif
 
       /**
        * Preprocess cut string. Trim string and delete global parenthesis
@@ -149,8 +158,8 @@ namespace Belle2 {
       const Variable::Manager::Var* var; /**< set if there was a valid variable in this cut */
 #if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
 #else
-      std::shared_ptr<Cut> left; /**< Left-side cut */
-      std::shared_ptr<Cut> right; /**< Right-side cut */
+      std::unique_ptr<Cut> left; /**< Left-side cut */
+      std::unique_ptr<Cut> right; /**< Right-side cut */
 #endif
       //NOTE: do not put any data members between the endif and end of class! this would change the class layout in memory
     };

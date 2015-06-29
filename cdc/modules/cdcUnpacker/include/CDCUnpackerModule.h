@@ -78,9 +78,6 @@ namespace Belle2 {
       void setCDCPacketHeader(int* buf)
       {
 
-        //        printf("buf[0] 0x%8x", buf[0]);
-        //        printf("buf[1] 0x%8x", buf[1]);
-        //        printf("buf[2] 0x%8x", buf[2]);
         if ((buf[0] & 0xff000000) == 0x22000000) { // raw data mode.
           m_dataType = 1;
         } else if ((buf[0] & 0xff000000) == 0x20000000) { // suppressed data mode.
@@ -153,15 +150,12 @@ namespace Belle2 {
        */
       const WireID getWireID(int iBoard, int iCh);
 
-
+      /**
+       * Print out the CDC data block in hex.
+       *  @param buf pointer to the buffer in RawCDC (RawCOPPER).
+       *  @param nwords number of words to be printed out.
+       */
       void printBuffer(int* buf, int nwords);
-    private:
-
-      int m_event; /// Event number.
-      int m_fadcThreshold;  /// FADC threshold.
-      //      int m_overflow; /// TDC overflow.
-      int m_tdcOffset; /// TDC offset (nsec).
-
 
     private:
 
@@ -194,16 +188,6 @@ namespace Belle2 {
        * Trigger number.
        */
       int m_triggerNumber;
-
-      ///**
-      //       * Number of good blocks.
-      //       */
-      //            int m_nGoodBlocks;
-
-      //      /**
-      //       * Number of error blocks.
-      //       */
-      //      int m_nErrorBlocks;
 
       /**
        * Enable/Disable to store CDCRawHit.
@@ -270,6 +254,15 @@ namespace Belle2 {
        */
       WireID m_map[300][48];
 
+      /**
+       * FADC threshold.
+       */
+      int m_fadcThreshold;
+
+      /**
+       * TDC offset (nsec).
+       */
+      int m_tdcOffset;
 
     };//end class declaration
 

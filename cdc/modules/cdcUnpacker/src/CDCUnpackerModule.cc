@@ -95,7 +95,6 @@ void CDCUnpackerModule::initialize()
   loadMap();
 
   B2INFO("CDCUnpacker: FADC threshold: " << m_fadcThreshold);
-  m_event = 0;
 }
 
 void CDCUnpackerModule::beginRun()
@@ -214,8 +213,6 @@ void CDCUnpackerModule::event()
         if (dataType == 1) { //  Raw data mode.
           B2INFO("CDCUnpacker : Raw data mode.");
 
-          //              unsigned short swbuf[3000];
-
           m_buffer.clear();
 
           for (int it = 0; it < dataLength; ++it) {
@@ -246,9 +243,8 @@ void CDCUnpackerModule::event()
                 fadcSum += fadc;
               }
               // TDC count for each sample and channel.
-              //      unsigned short tdc = swbuf[iCh + 2 * fadcTdcChannels * iSample + offset]&0x7fff;
+
               unsigned short tdc = m_buffer.at(iCh + 2 * fadcTdcChannels * iSample + offset) & 0x7fff;
-              //      unsigned short tdcIsValid =(swbuf[iCh + 2 * fadcTdcChannels * iSample + offset]&0x8000)>>15;
               unsigned short tdcIsValid = (m_buffer.at(iCh + 2 * fadcTdcChannels * iSample + offset) & 0x8000) >> 15;
               if (tdcIsValid == 1) { // good tdc data.
                 if (tdc > 0) { // if hit timng is 0, skip.
@@ -333,9 +329,6 @@ void CDCUnpackerModule::event()
             unsigned short ch = (header & 0xff00) >> 8; // Channel ID in FE.
             unsigned short length = (header & 0xff) / 2; // Data length in short word.
 
-            //      printf("header 0x%x \n", header);
-            printf("channel 0x%x \n", ch);
-            printf("length 0x%x \n", length);
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
               it += length;
@@ -425,7 +418,6 @@ void CDCUnpackerModule::loadMap()
   int iCh;
 
   while (!ifs.eof()) {
-    //    ifs >>  isl >> icl >> iw >> lay >> cpr >> finess >> ch;
     ifs >>  isl >> icl >> iw >> iBoard >> iCh;
     const WireID  wireId(isl, icl, iw);
     m_map[iBoard][iCh] = wireId;

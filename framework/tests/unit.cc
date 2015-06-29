@@ -33,7 +33,7 @@ namespace {
     EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "rad"));
     EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "GeV"));
     EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "K"));
-    EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "T"));
+    EXPECT_DOUBLE_EQ(1e-4, Unit::convertValue(1.0, "T"));
     EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "e"));
     EXPECT_DOUBLE_EQ(1.0, Unit::convertValue(1.0, "g/cm3"));
 

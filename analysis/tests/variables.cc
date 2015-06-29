@@ -1,5 +1,10 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
+#include <framework/datastore/StoreArray.h>
+#include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
@@ -105,6 +110,48 @@ namespace {
       EXPECT_FLOAT_EQ(1.0, particleCosTheta(&p));
       EXPECT_FLOAT_EQ(0.0, particlePhi(&p));
     }
+
+  }
+
+  class MetaVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreArray<Particle>::registerPersistent();
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(MetaVariableTest, countDaughters)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("countDaughters(charge > 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(p), 3.0);
+
+    var = Manager::Instance().getVariable("countDaughters(abs(charge) > 0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(p), 6.0);
 
   }
 

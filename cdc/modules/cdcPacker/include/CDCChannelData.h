@@ -1,0 +1,160 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Satoru Yamada and Makoto Uchida                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#ifndef CDCCHANNELDATA_H
+#define CDCCHANNELDATA_H
+
+namespace Belle2 {
+
+  namespace CDC {
+
+
+    /**
+     * CDCChannelData.
+     * CDC channel data contains the real data for
+     * 1 hit channel.
+     */
+
+    class CDCChannelData {
+    public:
+
+      CDCChannelData() : m_board(0), m_channel(0), m_length(0), m_tot(0),
+        m_adc(0), m_tdc(0), m_tdc2(0), m_f2ndHit(false) {}
+
+
+      /**
+       * Constructor of the class fo the "2 hits" event.
+       */
+
+      inline CDCChannelData(int board, int ch, int len, int tot,
+                            int adc, int tdc, int tdc2)
+      {
+        m_board = board;
+        m_channel = ch;
+        m_length = len;
+        m_tot = tot;
+        m_adc = adc;
+        m_tdc = tdc;
+        m_tdc2 = tdc2;
+        m_f2ndHit = true;
+      }
+
+      /**
+       * Constructor of the class fo the "1 hit" event.
+       */
+      inline CDCChannelData(int board, int ch, int len, int tot,
+                            int adc, int tdc)
+      {
+        m_board = board;
+        m_channel = ch;
+        m_length = len;
+        m_tot = tot;
+        m_adc = adc;
+        m_tdc = tdc;
+        m_f2ndHit = false;
+      }
+
+      /**
+       * Get the channel ID.
+       */
+      inline int getChannel() const
+      {
+        return m_channel;
+      }
+
+      /**
+       * Get the board ID.
+       */
+      inline int getBoard() const
+      {
+        return m_board;
+      }
+
+      /**
+       * Get 1st word for this channel data.
+       */
+      inline int get1stWord() const
+      {
+        return ((m_channel << 24) | (m_length << 16) | m_tot);
+      }
+
+      /**
+       * Get 2nd word for this channel data.
+       */
+      inline int get2ndWord() const
+      {
+        return ((m_adc << 16) | (m_tdc));
+      }
+
+      /**
+       * Get 3rd word for this channel data.
+       */
+      inline int get3rdWord() const
+      {
+        return ((m_tdc2 << 16) | (0x0000));
+      }
+
+      /**
+       * Get the flag of 2nd hit.
+       * true : 2 hit event, false : 1 hit event.
+       */
+      inline bool getFlag2ndHit() const
+      {
+        return m_f2ndHit;
+      }
+
+    private:
+
+      /**
+       * Board ID (0-300).
+       */
+      int m_board;
+
+      /**
+       * Channel ID (0-47).
+       */
+      int m_channel;
+
+      /**
+       * Data length.
+       */
+      int m_length;
+
+      /**
+       * Time over threshold.
+       */
+      int m_tot;
+
+      /**
+       * FADC count.
+       */
+      int m_adc;
+
+      /**
+       * TDC count.
+       */
+      int m_tdc;
+
+      /**
+       * TDC count of 2nd hit.
+       */
+      int m_tdc2;
+
+      /**
+       * Flag for 2nd hit.
+       */
+      bool m_f2ndHit;
+    };
+
+
+  } //end CDC namespace;
+} // end namespace Belle2
+
+#endif // CDCCHANNELDATA_H

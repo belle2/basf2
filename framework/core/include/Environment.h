@@ -65,6 +65,9 @@ namespace Belle2 {
     /** Returns number of events in run 1 for EventInfoSetter module, or 0 for no override. */
     int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
+    /** Return the number of events, from either input or -n command line override (if less). */
+    int getNumberOfEvents() const;
+
     /** Override input file names for modules */
     void setInputFilesOverride(const std::vector<std::string>& names) { m_inputFilesOverride = names; }
 

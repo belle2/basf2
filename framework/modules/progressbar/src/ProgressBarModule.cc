@@ -9,7 +9,6 @@
 
 #include <framework/modules/progressbar/ProgressBarModule.h>
 
-#include <framework/core/InputController.h>
 #include <framework/core/Environment.h>
 #include <framework/utilities/Utils.h>
 
@@ -29,11 +28,7 @@ ProgressBarModule::ProgressBarModule() : Module(), m_evtNr(0), m_nTotal(0), m_st
 void ProgressBarModule::initialize()
 {
   m_evtNr = 0;
-  m_nTotal = InputController::numEntries();
-  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
-  if (numEventsArgument != 0 and (m_nTotal == 0 or numEventsArgument < m_nTotal))
-    m_nTotal = numEventsArgument;
-
+  m_nTotal = Environment::Instance().getNumberOfEvents();
   m_startTime = (long)(Utils::getClock() / 1e9);
   m_lastPrint = m_startTime;
 }

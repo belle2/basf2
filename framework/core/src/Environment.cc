@@ -13,6 +13,7 @@
 #include <framework/core/Environment.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/logging/LogConfig.h>
+#include <framework/core/InputController.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/shared_ptr.hpp>
@@ -34,6 +35,17 @@ Environment& Environment::Instance()
 const list<string>& Environment::getModuleSearchPaths() const
 {
   return ModuleManager::Instance().getModuleSearchPaths();
+}
+
+int Environment::getNumberOfEvents() const
+{
+  int numEventsFromInput = InputController::numEntries();
+  int numEventsFromArgument = getNumberEventsOverride();
+  if (numEventsFromArgument != 0
+      && (numEventsFromInput == 0 || numEventsFromArgument < numEventsFromInput))
+    return numEventsFromArgument;
+  else
+    return numEventsFromInput;
 }
 
 

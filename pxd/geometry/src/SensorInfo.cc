@@ -44,7 +44,7 @@ const TVector3 SensorInfo::getBField(const TVector3& point) const
   TVector3 pointGlobal = pointToGlobal(point);
   TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
   TVector3 bLocal = vectorToLocal(bGlobal);
-  return Unit::TinStdUnits * bLocal;
+  return Unit::T * bLocal;
 }
 
 const TVector3 SensorInfo::getDriftVelocity(const TVector3& E,

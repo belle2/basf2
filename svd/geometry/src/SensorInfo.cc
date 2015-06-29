@@ -63,7 +63,7 @@ const TVector3& SensorInfo::getBField(const TVector3& point) const
     TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
     TVector3 bLocal = vectorToLocal(bGlobal);
     oldPoint = point;
-    oldField = bLocal * Unit::TinStdUnits;
+    oldField = bLocal * Unit::T;
   }
   return oldField;
 }

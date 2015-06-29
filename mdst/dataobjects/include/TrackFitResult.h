@@ -190,7 +190,7 @@ namespace Belle2 {
 
     /** Getter for covariance matrix of perigee parameters in matrix form.
      *
-     *  @return
+     * The order is given by TFRParName: d0, phi0, omega, z0, lambda.
      */
     TMatrixDSym getCovariance5() const;
 
@@ -262,8 +262,7 @@ namespace Belle2 {
      */
     const uint32_t m_hitPatternVXDInitializer;
 
-    /** Streamer version. */
-    ClassDef(TrackFitResult, 6);
+    ClassDef(TrackFitResult, 6); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.
        ver 5: CDC Hit Pattern now a single variable (add schema evolution rule).

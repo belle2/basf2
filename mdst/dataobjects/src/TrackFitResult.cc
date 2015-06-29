@@ -103,6 +103,6 @@ std::string TrackFitResult::getInfoHTML() const
 {
   std::stringstream out;
   out << "<b>PDG</b>: " << m_pdg << "<br>";
-  out << "<b>Covariance Matrix</b>: " << HTML::getString(getCovariance5()) << "<br>";
+  out << "<b>Covariance Matrix (d0, phi0, omega, z0, lambda)</b>: " << HTML::getString(getCovariance5()) << "<br>";
   return out.str();
 }

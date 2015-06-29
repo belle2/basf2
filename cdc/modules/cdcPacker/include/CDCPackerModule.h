@@ -73,12 +73,11 @@ namespace Belle2 {
       virtual void terminate();
 
       /**
-       * Set CDC Packet header
+       * Set CDC Packet header.
        */
       void setCDCPacketHeader(int* buf)
       {
 
-        printf("buf[0] 0x%8x", buf[0]);
         if ((buf[0] & 0xff000000) == 0x22000000) { // raw data mode.
           m_dataType = 1;
         } else if ((buf[0] & 0xff000000) == 0x20000000) { // suppressed data mode.
@@ -95,6 +94,11 @@ namespace Belle2 {
 
       }
 
+      /**
+       * Getter for Front End Electronics ID.
+       * @param copper_id Copper ID.
+       * @param slod_id FINNES slot ID (0-3).
+       */
       int getFEEID(int copper_id, int slot_id);
 
       /**
@@ -137,7 +141,6 @@ namespace Belle2 {
       /**
        * Getter for FE board ID.
        */
-
       int getBoardId()
       {
         return m_boardId;
@@ -153,9 +156,6 @@ namespace Belle2 {
        */
       const WireID getWireID(int iBoard, int iCh);
 
-      /**
-       * Setter for FADC threshold.
-       */
     private:
 
       int m_event; /// Event number.
@@ -271,10 +271,26 @@ namespace Belle2 {
        */
       WireID m_map[300][48];
 
+      /**
+       * Assignment map of FE board ID to the cell.
+       * 1st column : Super Layer (0-8).
+       * 2nd column : Local Layer (0-6 or 0-8).
+       * 3rd column : Wire ID (phi).
+       */
       int m_fee_board[9][8][384];
-      int m_fee_ch[9][8][384];
-      int m_eWire_nhit[36882];
 
+      /**
+       * Assignment map of FE board channel to the cell.
+       * 1st column : Super Layer (0-8).
+       * 2nd column : Local Layer (0-6 or 0-8).
+       * 3rd column : Wire ID (phi).
+       */
+      int m_fee_ch[9][8][384];
+
+      /**
+       * Number of hits in the cell.
+       */
+      int m_eWire_nhit[36882];
 
     };//end class declaration
 

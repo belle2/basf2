@@ -10,6 +10,7 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcPacker/CDCPackerModule.h>
+#include <cdc/modules/cdcPacker/CDCChannelData.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
@@ -26,77 +27,6 @@
 #include <fstream>
 #include <iomanip>
 #include <cstring>
-
-class ChData {
-public:
-
-  ChData() : m_board(0), m_channel(0), m_length(0), m_tot(0),
-    m_adc(0), m_tdc(0), m_tdc2(0), m_f2ndHit(false) {}
-
-  inline ChData(int board, int ch, int len, int tot,
-                int adc, int tdc, int tdc2)
-  {
-    m_board = board;
-    m_channel = ch;
-    m_length = len;
-    m_tot = tot;
-    m_adc = adc;
-    m_tdc = tdc;
-    m_tdc2 = tdc2;
-    m_f2ndHit = true;
-  }
-
-  inline ChData(int board, int ch, int len, int tot,
-                int adc, int tdc)
-  {
-    m_board = board;
-    m_channel = ch;
-    m_length = len;
-    m_tot = tot;
-    m_adc = adc;
-    m_tdc = tdc;
-    m_f2ndHit = false;
-  }
-
-  inline int getChannel() const
-  {
-    return m_channel;
-  }
-
-  inline int getBoard() const
-  {
-    return m_board;
-  }
-
-  inline int get1stWord() const
-  {
-    return ((m_channel << 24) | (m_length << 16) | m_tot);
-  }
-
-  inline int get2ndWord() const
-  {
-    return ((m_adc << 16) | (m_tdc));
-  }
-
-  inline int get3rdWord() const
-  {
-    return ((m_tdc2 << 16) | (0x0000));
-  }
-  inline bool getFlag2ndHit() const
-  {
-    return m_f2ndHit;
-  }
-
-private:
-  int m_board;
-  int m_channel;
-  int m_length;
-  int m_tot;
-  int m_adc;
-  int m_tdc;
-  int m_tdc2;
-  bool m_f2ndHit;
-};
 
 using namespace std;
 using namespace Belle2;
@@ -232,7 +162,7 @@ void CDCPackerModule::event()
 
   const int ch_data_bytes = 8;  // 8bytes ( 1hit/ch case)
 
-  std::vector<ChData> chDatas;
+  std::vector<CDCChannelData> chDatas;
   chDatas.clear();
 
   for (int i = 0; i < cdcHits.getEntries(); i++) {
@@ -259,7 +189,7 @@ void CDCPackerModule::event()
       // increase 8 bytes (4 bhytes).
       //      B2INFO("CDCPacker : 1st hit");
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
-      ChData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0, adc, tdc);
+      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0, adc, tdc);
       chDatas.push_back(chd);
     } else if (eWire_nhit[ eWire ] == 1) { // 2 hit timings for one cell.
       // increase another 2 bytes (1 word) for 2nd hit timing.
@@ -322,13 +252,6 @@ void CDCPackerModule::event()
           }
         }
       }
-      /*
-      for( int k = packet_header_words ; k < nwords[j]; k++){
-      // *( buf[ j ] + k ) = m_event + ( i << 20 ) + ( j << 16 );
-      *( buf[ j ] + k ) = ( k - packet_header_words )/(ch_data_bytes/4);
-      // *( buf[ j ] + k ) = ch_data[k];
-      }
-      */
     }
 
     RawCDC* raw_cdc = rawCDCs.appendNew();
@@ -348,15 +271,6 @@ void CDCPackerModule::event()
 void CDCPackerModule::endRun()
 {
   B2INFO("CDCPacker : End run.");
-
-  // print out hit distribution
-//   for(int i = 0; i < 36882;i++){
-//     int sly = i/4096;
-//     int ily = ( i % 4096 )/512;
-//     int iwire = ( i % 512 );
-//     if( m_eWire_nhit[i] > 0 )   printf("HIT %d %d %d\n", i, m_eWire_nhit[i], m_fee_board[sly][ily][iwire]);
-//   }
-
 }
 
 void CDCPackerModule::terminate()

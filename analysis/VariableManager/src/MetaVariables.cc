@@ -299,7 +299,7 @@ namespace Belle2 {
     Manager::FunctionPtr countDaughters(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
-        std::string cutString = arguments[1];
+        std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
         auto func = [cut](const Particle * particle) -> double {
           if (particle == nullptr)

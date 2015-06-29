@@ -6,13 +6,13 @@
 
 /*
 <header>
-<input>VXDCDCMergerSinglePartTruthFinder.root</input>
-<output>VXDCDCMergerSinglePartTruthFinderHist.root</output>
+<input>VXDCDCMergerSinglePartTruthFinderBkg.root</input>
+<output>VXDCDCMergerSinglePartTruthFinderBkgHist.root</output>
 <contact>tracking@belle2.kek.jp</contact>
 </header>
 */
 
-void VXDCDCMergerSinglePartTruthFinder(){
+void VXDCDCMergerSinglePartTruthFinderBkg(){
 
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
@@ -21,7 +21,7 @@ void VXDCDCMergerSinglePartTruthFinder(){
   TTree* tree = (TTree*) inputFile->Get("Stats");
 
   // write output file for the validation histograms
-  TFile* output = TFile::Open("VXDCDCMergerSinglePartTruthFinderHistBkg.root", "recreate");
+  TFile* output = TFile::Open("VXDCDCMergerSinglePartTruthFinderBkgHist.root", "recreate");
 
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
@@ -139,68 +139,68 @@ void VXDCDCMergerSinglePartTruthFinder(){
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *eff_ptsptt = new TH1F("eff_ptsptt","Eff vs Pt Truth Track Finder Single Muon with Bkg",100,0.,5.);
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_ptsptt","TruthTag==1&&GoodTag==1");
-  eff_ptsptt->SetMaximum(1.1);
-  eff_ptsptt->Sumw2();
+  TH1F *eff_ptsptt_bkg = new TH1F("eff_ptsptt_bkg","Eff vs Pt Truth Track Finder Single Muon with Bkg",100,0.,5.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_ptsptt_bkg","TruthTag==1&&GoodTag==1");
+  eff_ptsptt_bkg->SetMaximum(1.1);
+  eff_ptsptt_bkg->Sumw2();
   gPad->RedrawAxis();
   //eff_ptsptt->Divide(h22);
   //eff_ptsptt->GetYaxis()->SetRange(0,2);
   //eff_ptsptt->Draw("E");
-  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt Truth Track Finder Single Muon with Bkg",100,0.,5.);
+  TH1F *eff_pt_bkg = new TH1F("eff_pt_bkg", "Eff vs Pt Truth Track Finder Single Muon with Bkg",100,0.,5.);
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
-  eff_ptsptt->GetXaxis()->SetTitle("Pt (GeV)");
-  eff_ptsptt->GetYaxis()->SetTitle("Efficiency");
-  eff_ptsptt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
-  eff_ptsptt->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
-  eff_ptsptt->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_pt=eff_ptsptt;
-  eff_pt->Divide(eff_ptsptt, h22, 1.0, 1.0, "B");
+  eff_ptsptt_bkg->GetXaxis()->SetTitle("Pt (GeV)");
+  eff_ptsptt_bkg->GetYaxis()->SetTitle("Efficiency");
+  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
+  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
+  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_pt_bkg=eff_ptsptt_bkg;
+  eff_pt_bkg->Divide(eff_ptsptt_bkg, h22, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
   gStyle->SetOptStat("e");
-  eff_pt->GetYaxis()->SetRangeUser(0,1.1);
+  eff_pt_bkg->GetYaxis()->SetRangeUser(0,1.1);
   gPad->RedrawAxis();
-  eff_pt->Draw("E");
+  eff_pt_bkg->Draw("E");
   //leg1->Draw();
     //c1->SaveAs("plots/EffvsPt_5GeV_muons_1000_Theta.jpg");
-  eff_pt->Write();
-  delete eff_pt;
+  eff_pt_bkg->Write();
+  delete eff_pt_bkg;
 
   TH1F *h24 = new TH1F("h24","Eff vs Theta Truth Track Finder with Bkg",50, -1, 1.);
   h24->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h24","TruthTag==1");
   h24->Sumw2();
-  TH1F *eff_thetasptt = new TH1F("eff_thetasptt","Eff vs Theta Truth Track Finder Single Muon with Bkg",50, -1, 1.);
-  eff_thetasptt->SetMaximum(1.1);
-  tree->Draw("(Pz/(P))>>eff_thetasptt","TruthTag==1&&GoodTag==1");
-  eff_thetasptt->Sumw2();
+  TH1F *eff_thetasptt = new TH1F("eff_thetasptt_bkg","Eff vs Theta Truth Track Finder Single Muon with Bkg",50, -1, 1.);
+  eff_thetasptt_bkg->SetMaximum(1.1);
+  tree->Draw("(Pz/(P))>>eff_thetasptt_bkg","TruthTag==1&&GoodTag==1");
+  eff_thetasptt_bkg->Sumw2();
   gPad->RedrawAxis();
   //eff_thetasptt->Divide(h24);
   //eff_thetasptt->GetYaxis()->SetRange(0,2);
   //eff_thetasptt->Draw("E");
-  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta Truth Track Finder Single Muon with Bkg", 50, -1, 1.);
+  TH1F *eff_theta_bkg = new TH1F("eff_theta_bkg", "Eff vs Theta Truth Track Finder Single Muon with Bkg", 50, -1, 1.);
   //TLegend *leg2= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. theta");
-  eff_thetasptt->GetXaxis()->SetTitle("Polar Angle (rad)");
-  eff_thetasptt->GetYaxis()->SetTitle("Efficiency");
-  eff_thetasptt->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
-  eff_thetasptt->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
-  eff_thetasptt->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_theta=eff_thetasptt;
-  eff_theta->Divide(eff_thetasptt, h24, 1.0, 1.0, "B");
+  eff_thetasptt_bkg->GetXaxis()->SetTitle("Polar Angle (rad)");
+  eff_thetasptt_bkg->GetYaxis()->SetTitle("Efficiency");
+  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
+  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
+  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_theta_bkg=eff_thetasptt_bkg;
+  eff_theta_bkg->Divide(eff_thetasptt_bkg, h24, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
   //st->SetX1NDC(0.7); //new x start position
   //st->SetX2NDC(0.1); //new x end position
   //gPad->SetOptStat(1)
   //leg2->Draw();
   gStyle->SetOptStat("e");
-  eff_theta->GetYaxis()->SetRangeUser(0,1.1);
+  eff_theta_bkg->GetYaxis()->SetRangeUser(0,1.1);
   gPad->RedrawAxis();
-  eff_theta->Draw("E");
+  eff_theta_bkg->Draw("E");
     //c1->SaveAs("plots/EffvsTheta_5GeV_muons_1000_Theta.jpg");
-  eff_theta->Write();
-  delete eff_theta;
+  eff_theta_bkg->Write();
+  delete eff_theta_bkg;
 
   h2->SetLineWidth(3);
   h2->SetLineColor(1);

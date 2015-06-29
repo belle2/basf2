@@ -9,17 +9,19 @@
 
 """
 <header>
-<output>VXDCDCMergerSinglePartTruthFinder.root</output>
+<output>VXDCDCMergerSinglePartTruthFinderBkg.root</output>
 <contact>Benjamin Oberhof, tracking@belle2.kek.jp</contact>
 </header>
 """
 
 import os
 import random
+import glob
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -233,7 +235,7 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'GFTracksColName': 'GFTracks',
     'TrackCandColName': 'TracksCand',
     'UnMergedCands': 'UnMergedCand',
-    'root_output_filename': '../VXDCDCMergerSinglePartTruthFinder.root',
+    'root_output_filename': '../VXDCDCMergerSinglePartTruthFinderBkg.root',
     'chi2_max': 100,
     'merge_radius': 2.0,
 }
@@ -296,11 +298,15 @@ matcher2 = register_module('MCTrackMatcher')
 # matcher2.param('MCGFTrackCandsColName','MCGFTrackCands')
 matcher2.param('PRGFTrackCandsColName', 'CDCTracksCand')
 
-bg = None
+# bg = None
+# bkgdir = 'bkg/'
+
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
     print 'Warning: variable BELLE2_BACKGROUND_DIR is not set'
+
+# bg = glob.glob(bkgdir+'*.root')
 
 # Create paths
 main = create_path()
@@ -319,12 +325,15 @@ main.add_module(pGun)
 # main.add_module(svdDigitizer)
 # main.add_module(svdClusterizer)
 # main.add_module(cdcDigitizer)
-add_simulation(main, bg)
+add_simulation(main, bkgfiles=bg)
+# add_reconstruction(main)
+# add_reconstruction(main)
 main.add_module(si_mctrackfinder)
 # main.add_module(vxd_trackfinder)
 main.add_module(cdc_mctrackfinder)
 # main.add_module(cdc_trackfinder)
 # main.add_module(cdcmcmatching)
+# main.add_module(display)
 main.add_module(mctf)
 main.add_module(matcher1)
 main.add_module(matcher2)
@@ -336,7 +345,7 @@ main.add_module(track_splitter)
 # main.add_module(vxd_cdcTracksMerger)
 main.add_module(vxd_cdcTracksMergerAnalysis)
 # main.add_module(HighlighterModule())
-# main.add_module(display)
+
 
 # ---main.add_module(output)
 

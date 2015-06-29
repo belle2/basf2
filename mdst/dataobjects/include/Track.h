@@ -63,6 +63,9 @@ namespace Belle2 {
       m_trackFitIndices[chargedStable.getIndex()] = index;
     }
 
+    /** Returns the number of fitted hypothesis which are stored in this track. */
+    unsigned int getNumberOfFittedHypothesis() const;
+
   private:
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];

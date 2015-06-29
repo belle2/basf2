@@ -64,10 +64,6 @@ namespace Belle2 {
     m_isSelfConjugatedParticle = 0;
   }
 
-  ParticleListManipulatorModule::~ParticleListManipulatorModule()
-  {
-  }
-
   void ParticleListManipulatorModule::initialize()
   {
     m_pdgCode  = 0;
@@ -106,10 +102,6 @@ namespace Belle2 {
     }
 
     m_cut = Variable::Cut::Compile(m_cutParameter);
-  }
-
-  void ParticleListManipulatorModule::beginRun()
-  {
   }
 
   void ParticleListManipulatorModule::event()
@@ -171,15 +163,6 @@ namespace Belle2 {
         }
       }
     }
-  }
-
-
-  void ParticleListManipulatorModule::endRun()
-  {
-  }
-
-  void ParticleListManipulatorModule::terminate()
-  {
   }
 
   void ParticleListManipulatorModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence)

@@ -17,6 +17,7 @@ namespace TMVA {
 
   /**
    * Mock TMVA Plugin for writing tests
+   * @FIXME Use override here as soon as we switched to root6
    */
   class MethodMockPlugin : public MethodBase {
 
@@ -50,51 +51,51 @@ namespace TMVA {
     /**
      * Method
      */
-    void Train();
+    virtual void Train();
 
     /**
      * Method
      */
-    void Init();
+    virtual void Init();
 
     /**
      * Method
      */
-    void Reset();
+    virtual void Reset();
 
     /**
      * Method
      */
-    void AddWeightsXMLTo(void* parent) const;
+    virtual void AddWeightsXMLTo(void* parent) const;
 
     /**
      * Method
      */
-    void ReadWeightsFromXML(void* parent);
+    virtual void ReadWeightsFromXML(void* parent);
 
     using MethodBase::ReadWeightsFromStream;
 
     /**
      * Method
      */
-    void ReadWeightsFromStream(std::istream& istr);
+    virtual void ReadWeightsFromStream(std::istream& istr);
 
 
     /**
      * Method
      */
-    Double_t GetMvaValue(Double_t* err = 0, Double_t* errUpper = 0);
+    virtual Double_t GetMvaValue(Double_t* err = 0, Double_t* errUpper = 0);
 
     /**
      * Method
      */
-    const Ranking* CreateRanking();
+    virtual const Ranking* CreateRanking();
 
 
     /**
      * Method
      */
-    void DeclareOptions();
+    virtual void DeclareOptions();
 
     /**
      * Method
@@ -104,7 +105,7 @@ namespace TMVA {
     /**
      * Method
      */
-    void GetHelpMessage() const;
+    virtual void GetHelpMessage() const;
 
   private:
 

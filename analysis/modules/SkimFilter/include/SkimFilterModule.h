@@ -37,15 +37,14 @@ namespace Belle2 {
   public:
     /** Constructor. */
     SkimFilterModule();
-    /** Destructor. */
-    ~SkimFilterModule() {}
+
     /** Initialises the module.
      */
-    void initialize();
+    virtual void initialize() override;
     /** Method called for each event. */
-    void event();
+    virtual void event() override;
     /** Write TTree to file, and close file if necessary. */
-    void terminate();
+    virtual void terminate() override;
   };
 } // end namespace Belle2
 

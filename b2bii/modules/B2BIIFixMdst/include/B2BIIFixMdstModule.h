@@ -94,22 +94,22 @@ namespace Belle2 {
     /**
      * Initialize the module.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when a new run is started.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     static double get_Benergy()
     {

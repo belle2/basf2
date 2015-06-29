@@ -64,10 +64,6 @@ namespace Belle2 {
     m_generator = 0;
   }
 
-  ParticleCombinerModule::~ParticleCombinerModule()
-  {
-  }
-
   void ParticleCombinerModule::initialize()
   {
     // clear everything
@@ -95,7 +91,7 @@ namespace Belle2 {
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>::required(daughter->getFullName());
     }
-    m_generator = new ParticleGenerator(m_decayString);
+    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString));
 
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
@@ -107,10 +103,6 @@ namespace Belle2 {
 
     m_cut = Variable::Cut::Compile(m_cutParameter);
 
-  }
-
-  void ParticleCombinerModule::beginRun()
-  {
   }
 
   void ParticleCombinerModule::event()
@@ -144,15 +136,6 @@ namespace Belle2 {
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);
     }
-  }
-
-  void ParticleCombinerModule::endRun()
-  {
-  }
-
-  void ParticleCombinerModule::terminate()
-  {
-    delete m_generator;
   }
 
 } // end Belle2 namespace

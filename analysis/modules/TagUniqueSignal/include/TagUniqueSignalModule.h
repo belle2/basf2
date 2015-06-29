@@ -19,21 +19,15 @@ namespace Belle2 {
     TagUniqueSignalModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TagUniqueSignalModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
-
+    virtual void initialize() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
   private:
 

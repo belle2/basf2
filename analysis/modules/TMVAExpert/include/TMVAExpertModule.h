@@ -36,17 +36,17 @@ namespace Belle2 {
     /**
      * Initialize the module.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called for each event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

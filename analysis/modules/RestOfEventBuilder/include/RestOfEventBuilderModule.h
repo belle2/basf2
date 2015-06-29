@@ -36,10 +36,10 @@ namespace Belle2 {
     RestOfEventBuilderModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** n */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

@@ -33,21 +33,12 @@ namespace Belle2 {
     addParam("removeFSR", m_removeFSR, "If true, final state radiation (FSR) photons are removed from the decay string.", true);
   }
 
-  ParticleMCDecayStringModule::~ParticleMCDecayStringModule()
-  {
-  }
-
   void ParticleMCDecayStringModule::initialize()
   {
     StoreObjPtr<ParticleList>::required(m_listName);
 
     StoreObjPtr<DecayHashMap> dMap;
     dMap.registerInDataStore();
-  }
-
-  void ParticleMCDecayStringModule::terminate()
-  {
-
   }
 
   void ParticleMCDecayStringModule::event()

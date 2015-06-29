@@ -38,20 +38,15 @@ namespace Belle2 {
     RemoveParticlesNotInListsModule();
 
     /**
-     * Destructor
-     */
-    virtual ~RemoveParticlesNotInListsModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
-    virtual void event();
+    virtual void event() override;
 
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:

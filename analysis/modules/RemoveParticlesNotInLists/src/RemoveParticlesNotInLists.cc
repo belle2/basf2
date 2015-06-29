@@ -26,10 +26,6 @@ RemoveParticlesNotInListsModule::RemoveParticlesNotInListsModule(): m_nRemoved(0
   addParam("particleLists", m_particleLists, "Keep the Particles and their daughters in these ParticleLists.");
 }
 
-RemoveParticlesNotInListsModule::~RemoveParticlesNotInListsModule()
-{
-}
-
 void RemoveParticlesNotInListsModule::initialize()
 {
   StoreArray<Particle> particles;

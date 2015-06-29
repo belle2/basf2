@@ -36,11 +36,9 @@ namespace Belle2 {
     /** Destructor. */
     ~MCDecayFinderModule() {}
     /** Initialises the module.*/
-    void initialize();
+    virtual void initialize() override;
     /** Method called for each event. */
-    void event();
-    /** Write TTree to file, and close file if necessary. */
-    void terminate() {};
+    virtual void event() override;
     /** Search for MCParticles matching the given DecayString. */
     DecayTree<MCParticle>* match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC);
     /** Create Particle from matched MCParticle and write to Particle list. */

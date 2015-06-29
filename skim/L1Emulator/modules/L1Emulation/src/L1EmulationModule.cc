@@ -56,7 +56,7 @@ L1EmulationModule::L1EmulationModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("UserCustomOpen", m_userCustomOpen, "the switch of customing the L1 Trigger by user", 0);
-  Variable::Cut::Parameter emptyCut;
+  std::string emptyCut;
   for (int i = 1; i <= 50; i++) {
     char name[10];
     sprintf(name, "TRG%d", i);
@@ -73,7 +73,8 @@ void L1EmulationModule::initialize()
 {
   B2INFO("L1EmulationModule processing");
   StoreArray<L1EmulationInformation>::registerPersistent();
-  m_cut.init(m_userCut[0]);
+  m_cut = Variable::Cut::Compile(m_userCut[0]);
+
   Total_Event = 0;
   for (int i = 0; i < 50; i++) {
     TRG_Event[i] = 0;
@@ -155,8 +156,11 @@ void L1EmulationModule::eventSelect()
   int count = 0;
   int record = -1;
   for (int i = 0; i < 50; i++) {
-    m_cut.init(m_userCut[i]);
-    if (m_userCut[i].size() && m_cut.check(part)) {
+    // TODO: This is extremely inefficient
+    // The Cut objects should be created once in initialize!
+    // Because parsing the cut string and generating the cut objects is (extremely) slow!
+    m_cut = Variable::Cut::Compile(m_userCut[i]);
+    if (m_userCut[i].size() && m_cut->check(part)) {
       m_summary[i] = 1;
       if (i == 0)LEInfo->setECLBhabha(1);
       else if (i == 1) LEInfo->setBhabhaVeto(1);

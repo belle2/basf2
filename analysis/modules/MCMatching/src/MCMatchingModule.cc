@@ -43,10 +43,6 @@ namespace Belle2 {
   }
 
 
-  MCMatchingModule::~MCMatchingModule()
-  {
-  }
-
   void MCMatchingModule::initialize()
   {
     StoreArray<Particle> particles;
@@ -57,9 +53,6 @@ namespace Belle2 {
     m_plist.isRequired(m_listName);
   }
 
-  void MCMatchingModule::beginRun()
-  {
-  }
 
   void MCMatchingModule::event()
   {
@@ -75,12 +68,5 @@ namespace Belle2 {
     }
   }
 
-  void MCMatchingModule::endRun()
-  {
-  }
-
-  void MCMatchingModule::terminate()
-  {
-  }
 
 } // end Belle2 namespace

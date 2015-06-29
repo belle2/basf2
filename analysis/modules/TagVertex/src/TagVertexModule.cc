@@ -68,10 +68,6 @@ namespace Belle2 {
 
   }
 
-  TagVertexModule::~TagVertexModule()
-  {
-  }
-
   void TagVertexModule::initialize()
   {
 
@@ -156,14 +152,6 @@ namespace Belle2 {
 //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
     analysis::RaveSetup::getInstance()->reset();
 
-  }
-
-  void TagVertexModule::endRun()
-  {
-  }
-
-  void TagVertexModule::terminate()
-  {
   }
 
   bool TagVertexModule::doVertexFit(Particle* Breco)

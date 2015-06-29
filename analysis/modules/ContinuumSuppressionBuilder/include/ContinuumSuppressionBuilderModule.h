@@ -33,10 +33,10 @@ namespace Belle2 {
     ContinuumSuppressionBuilderModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** n */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

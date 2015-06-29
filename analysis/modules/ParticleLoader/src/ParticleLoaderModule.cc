@@ -72,9 +72,6 @@ namespace Belle2 {
              false);
   }
 
-  ParticleLoaderModule::~ParticleLoaderModule()
-  {
-  }
 
   void ParticleLoaderModule::initialize()
   {

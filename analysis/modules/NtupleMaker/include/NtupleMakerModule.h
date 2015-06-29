@@ -73,16 +73,15 @@ namespace Belle2 {
   public:
     /** Constructor. */
     NtupleMakerModule();
-    /** Destructor. */
-    ~NtupleMakerModule() {}
+
     /** Initialises the module. At the moment this contains the
     construction of a DecayDescriptor object. This will by replaced
     by a simple call to the parser. */
-    void initialize();
+    virtual void initialize() override;
     /** Method called for each event. */
-    void event();
+    virtual void event() override;
     /** Write TTree to file, and close file if necessary. */
-    void terminate();
+    virtual void terminate() override;
   };
 } // end namespace Belle2
 

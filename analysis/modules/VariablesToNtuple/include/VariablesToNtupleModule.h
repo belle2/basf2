@@ -28,17 +28,17 @@ namespace Belle2 {
   public:
     /** Constructor. */
     VariablesToNtupleModule();
-    /** Destructor. */
-    ~VariablesToNtupleModule() {}
+
     /** Initialises the module.
      *
      * Prepares variables and sets up ntuple columns.
      */
-    void initialize();
+    virtual void initialize() override;
     /** Method called for each event. */
-    void event();
+    virtual void event() override;
     /** Write TTree to file, and close file if necessary. */
-    void terminate();
+    virtual void terminate() override;
+
   private:
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;

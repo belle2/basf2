@@ -31,10 +31,10 @@ namespace Belle2 {
      * Constructor
      */
     BestCandidateSelectionModule();
-    virtual ~BestCandidateSelectionModule();
+    virtual ~BestCandidateSelectionModule() override;
 
-    virtual void initialize();
-    virtual void event();
+    virtual void initialize() override;
+    virtual void event() override;
 
   private:
     std::string m_inputListName; /**< name of input particle list. */

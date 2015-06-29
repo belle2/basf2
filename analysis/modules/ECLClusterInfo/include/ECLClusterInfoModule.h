@@ -39,13 +39,13 @@ namespace Belle2 {
     ECLClusterInfoModule();
 
     /**  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  */
-    virtual void event();
+    virtual void event() override;
 
     /**  */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 

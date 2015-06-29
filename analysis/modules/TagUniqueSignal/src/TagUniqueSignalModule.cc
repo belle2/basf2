@@ -33,10 +33,6 @@ TagUniqueSignalModule::TagUniqueSignalModule() : Module(), m_targetVar(nullptr)
            string("uniqueSignal"));
 }
 
-TagUniqueSignalModule::~TagUniqueSignalModule()
-{
-}
-
 void TagUniqueSignalModule::initialize()
 {
   StoreObjPtr<ParticleList>::required(m_particleList);

@@ -68,11 +68,11 @@ namespace Belle2 {
     /**the number of events triggered by TRGi and TRGj simultaneously */
     int TRG_Event_Matrix[50][50];
     /**the TRG*/
-    Variable::Cut::Parameter m_userCut[50];
+    std::string m_userCut[50];
 
 
     /**Access users' cut*/
-    Variable::Cut m_cut;
+    std::unique_ptr<Variable::Cut> m_cut;
 
     /**Trigger results*/
     int m_summary[50];

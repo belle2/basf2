@@ -22,13 +22,11 @@ namespace Belle2 {
   public:
     /** Constructor. */
     VariableToReturnValueModule();
-    /** Destructor. */
-    ~VariableToReturnValueModule() {}
 
     /** Initialize */
-    void initialize();
+    virtual void initialize() override;
     /** Method called for each event. */
-    void event();
+    virtual void event() override;
 
   private:
     /** function pointer corresponding to given variable. */

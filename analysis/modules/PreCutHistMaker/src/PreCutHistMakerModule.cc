@@ -64,10 +64,6 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
 }
 
-PreCutHistMakerModule::~PreCutHistMakerModule()
-{
-}
-
 void PreCutHistMakerModule::initialize()
 {
   StoreArray<MCParticle>::required();
@@ -164,8 +160,8 @@ void PreCutHistMakerModule::initialize()
 
   m_cut = Variable::Cut::Compile(m_cutParameter);
 
-  m_generator_all = new ParticleGenerator(m_decayString);
-  m_generator_signal = new ParticleGenerator(onlySignal_decayString.str());
+  m_generator_all = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString));
+  m_generator_signal = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(onlySignal_decayString.str()));
 }
 
 
@@ -374,6 +370,4 @@ void PreCutHistMakerModule::terminate()
     delete m_file;
   }
 
-  delete m_generator_signal;
-  delete m_generator_all;
 }

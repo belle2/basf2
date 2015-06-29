@@ -65,10 +65,6 @@ namespace Belle2 {
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
   }
 
-  ParticleVertexFitterModule::~ParticleVertexFitterModule()
-  {
-  }
-
   void ParticleVertexFitterModule::initialize()
   {
     // magnetic field
@@ -138,17 +134,6 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::getInstance()->reset();
   }
-
-
-  void ParticleVertexFitterModule::endRun()
-  {
-  }
-
-  void ParticleVertexFitterModule::terminate()
-  {
-  }
-
-
 
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)
   {

@@ -38,13 +38,13 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
     /**
      * Event function
      */
-    virtual void event();
+    virtual void event() override;
 
 
   private:

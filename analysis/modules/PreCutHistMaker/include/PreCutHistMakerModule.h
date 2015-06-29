@@ -45,20 +45,14 @@ namespace Belle2 {
     PreCutHistMakerModule();
 
     /**
-     * Destructor
-     */
-    virtual ~PreCutHistMakerModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
+    virtual void event() override;
 
-    virtual void event();
-
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -98,9 +92,9 @@ namespace Belle2 {
     StoreObjPtr<RootMergeable<TH1D>> m_histogramSignal; /**< signal histogram for combined particle. */
     StoreObjPtr<RootMergeable<TH1D>> m_histogramAll; /**< signal+background histogram for combined particle. */
 
-    ParticleGenerator*
+    std::unique_ptr<ParticleGenerator>
     m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
-    ParticleGenerator* m_generator_all; /**< Combines particles for signal+background. */
+    std::unique_ptr<ParticleGenerator> m_generator_all; /**< Combines particles for signal+background. */
 
     unsigned int m_inverseSamplingRate; /**< Sampling rate for 'all' histogram. */
     unsigned long int m_iEvent; /**< Event counter, used for sampling rate */

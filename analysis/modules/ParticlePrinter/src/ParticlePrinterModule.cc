@@ -54,10 +54,6 @@ namespace Belle2 {
 
   }
 
-  ParticlePrinterModule::~ParticlePrinterModule()
-  {
-  }
-
   void ParticlePrinterModule::initialize()
   {
     if (!m_listName.empty()) {
@@ -73,10 +69,6 @@ namespace Belle2 {
                 << ". DecayString should not contain any daughters, only the mother particle.");
     } else
       B2ERROR("ParticlePrinterModule::initialize Empty list name!");
-  }
-
-  void ParticlePrinterModule::beginRun()
-  {
   }
 
   void ParticlePrinterModule::event()
@@ -112,15 +104,6 @@ namespace Belle2 {
       }
     }
     B2INFO("[ParticlePrinterModule] END   ------------------------------");
-  }
-
-
-  void ParticlePrinterModule::endRun()
-  {
-  }
-
-  void ParticlePrinterModule::terminate()
-  {
   }
 
 

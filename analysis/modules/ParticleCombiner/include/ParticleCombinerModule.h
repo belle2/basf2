@@ -44,38 +44,16 @@ namespace Belle2 {
     ParticleCombinerModule();
 
     /**
-     * Destructor
-     */
-    virtual ~ParticleCombinerModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
-
-    /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun();
+    virtual void initialize() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate();
 
   private:
 
@@ -83,7 +61,7 @@ namespace Belle2 {
 
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the decay being reconstructed */
-    ParticleGenerator* m_generator; /**< Generates the combinations */
+    std::unique_ptr<ParticleGenerator> m_generator; /**< Generates the combinations */
 
     std::string m_listName;   /**< output particle list name */
     std::string m_antiListName;   /**< output anti-particle list name */

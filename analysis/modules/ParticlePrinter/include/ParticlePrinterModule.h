@@ -32,38 +32,15 @@ namespace Belle2 {
     ParticlePrinterModule();
 
     /**
-     * Destructor
-     */
-    virtual ~ParticlePrinterModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
-
-    /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun();
+    virtual void initialize() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate();
+    virtual void event() override;
 
   private:
 

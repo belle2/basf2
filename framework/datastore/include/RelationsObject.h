@@ -102,7 +102,7 @@ namespace Belle2 {
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 #else
     /** Constructor, forwards all arguments to BASE constructor. */
-    template<class ...Args> RelationsInterface(Args&& ... params):
+    template<class ...Args> explicit RelationsInterface(Args&& ... params):
       BASE(std::forward<Args>(params)...),
       m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) { }
 #endif

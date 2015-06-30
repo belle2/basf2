@@ -46,7 +46,7 @@ namespace Belle2 {
      *
      *  @param relations  The vector of relation objects.
      */
-    RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
+    explicit RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
 
     /** Accessor for the relations vector.
      *

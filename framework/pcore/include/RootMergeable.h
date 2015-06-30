@@ -57,7 +57,7 @@ namespace Belle2 {
     RootMergeable() : m_wrapped(nullptr) {  }
 #else
     /** Constructor, forwards all arguments to T constructor. */
-    template<class ...Args> RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
+    template<class ...Args> explicit RootMergeable(Args&& ... params) : m_wrapped(new T(std::forward<Args>(params)...)) { }
 #endif
 
     virtual ~RootMergeable() { delete m_wrapped; }

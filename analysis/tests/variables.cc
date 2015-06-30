@@ -118,6 +118,11 @@ namespace {
     /** register Particle array + ParticleExtraInfoMap object. */
     virtual void SetUp()
     {
+      Gearbox& gearbox = Gearbox::getInstance();
+      gearbox.setBackends({std::string("file:")});
+      gearbox.close();
+      gearbox.open("geometry/Belle2.xml", false);
+
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
       StoreArray<Particle>::registerPersistent();
@@ -153,6 +158,96 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_DOUBLE_EQ(var->function(p), 6.0);
 
+  }
+
+  TEST_F(MetaVariableTest, useRestFrame)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    p.setVertex(TVector3(1.0, 2.0, 2.0));
+
+    const Manager::Var* var = Manager::Instance().getVariable("p");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+
+    var = Manager::Instance().getVariable("E");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    var = Manager::Instance().getVariable("distance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+
+    var = Manager::Instance().getVariable("useRestFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), 0.0, 1e-9);
+
+    var = Manager::Instance().getVariable("useRestFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.4358899);
+
+    var = Manager::Instance().getVariable("useRestFrame(distance)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.0);
+  }
+
+  TEST_F(MetaVariableTest, useLabFrame)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    p.setVertex(TVector3(1.0, 2.0, 2.0));
+
+    const Manager::Var* var = Manager::Instance().getVariable("p");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+
+    var = Manager::Instance().getVariable("E");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    var = Manager::Instance().getVariable("distance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+
+    var = Manager::Instance().getVariable("useLabFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+
+    var = Manager::Instance().getVariable("useLabFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    var = Manager::Instance().getVariable("useLabFrame(distance)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+  }
+
+  TEST_F(MetaVariableTest, useCMSFrame)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    p.setVertex(TVector3(1.0, 2.0, 2.0));
+
+    const Manager::Var* var = Manager::Instance().getVariable("p");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+
+    var = Manager::Instance().getVariable("E");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+
+    var = Manager::Instance().getVariable("distance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+
+    var = Manager::Instance().getVariable("useCMSFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.68176979);
+
+    var = Manager::Instance().getVariable("useCMSFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.80920333);
+
+    var = Manager::Instance().getVariable("useCMSFrame(distance)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.1853244);
   }
 
 }

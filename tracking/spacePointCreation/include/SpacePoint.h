@@ -199,7 +199,7 @@ namespace Belle2 {
 
 
     /** return the VxdID of the sensor inhabiting the Cluster of the SpacePoint */
-    VxdID::baseType getVxdID() const { return m_vxdID; }
+    VxdID getVxdID() const { return m_vxdID; }
 
 
 
@@ -280,7 +280,7 @@ namespace Belle2 {
     *
     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
-    static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID::baseType vxdID,
+    static B2Vector3F getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID vxdID,
                                            const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
@@ -296,7 +296,7 @@ namespace Belle2 {
      * The normalized coordinates are independent of wedged-sensor-issues
        */
     static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal,
-        VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+        VxdID vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -311,7 +311,7 @@ namespace Belle2 {
     *  If no sensorInfo is passed, the member gets its own pointer to it.
     */
     static std::pair<SpBaseType, SpBaseType> convertNormalizedToLocalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitNormalized,
-        Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
+        Belle2::VxdID vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
@@ -322,7 +322,7 @@ namespace Belle2 {
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      *
      */
-    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType> hitLocalUnwedged, VxdID::baseType vxdID,
+    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType> hitLocalUnwedged, VxdID vxdID,
                                  const VXD::SensorInfoBase* aSensorInfo = NULL)
     {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }

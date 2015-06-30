@@ -113,9 +113,13 @@ namespace Belle2 {
         }
                            );
         tree4tcType = m_treeBox.find(tcTypeName);
+        B2WARNING("RootParameterTracker::prepareTTree: new tree for tcType " << tcTypeName << " created, m_treeBox has now " <<
+                  m_treeBox.size() << " entries")
+        return *tree4tcType;
       }
-      B2DEBUG(5, "RootParameterTracker::prepareTTree(), m_treeBox has " << m_treeBox.size() << " entries")
 
+      B2WARNING("RootParameterTracker::prepareTTree: ttree for tcType " << tcTypeName << " is reused, m_treeBox has " << m_treeBox.size()
+                << " entries")
       return *tree4tcType;
     }
 

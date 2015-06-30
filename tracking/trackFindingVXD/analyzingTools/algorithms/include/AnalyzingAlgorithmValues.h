@@ -151,6 +151,19 @@ namespace Belle2 {
   };
 
 
+  /** Class for storing an algorithm determining the distance seedHit to IP in XY (=r) */
+  template <class DataType, class TCInfoType, class VectorType>
+  class AnalyzingAlgorithmValueDistSeed2IPZ : public AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType> {
+  public:
+    /** constructor */
+    AnalyzingAlgorithmValueDistSeed2IPZ() : AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>
+      (AlgoritmType::AnalyzingAlgorithmValueDistSeed2IPZ) {}
+
+    /** returns the seed position in XY (=r) */
+    DataType calcData(const TCInfoType& aTC) override
+    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed.Z() - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin.Z()); }
+  };
+
   // TODO
   /**
    * next steps:

@@ -51,18 +51,67 @@ TrackFinderVXDAnalizerModule::TrackFinderVXDAnalizerModule() : Module()
 
 
   vector< vector< vector< string> > > trackedParametersDouble = {
-    {{"Contaminated"}, {"AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"}},
-    {{"Clean"}, {"AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"}},
-    {{"Perfect"}, {"AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"}}
+    { {"Reference"},
+      {"AnalyzingAlgorithmValueP", "AnalyzingAlgorithmValuePT", "AnalyzingAlgorithmValuePTheta", "AnalyzingAlgorithmValuePPhi", "AnalyzingAlgorithmValueDistSeed2IPXY", "AnalyzingAlgorithmValueDistSeed2IPZ"}
+    },
+    { {"Lost"},
+      {"AnalyzingAlgorithmValueP", "AnalyzingAlgorithmValuePT", "AnalyzingAlgorithmValuePTheta", "AnalyzingAlgorithmValuePPhi", "AnalyzingAlgorithmValueDistSeed2IPXY", "AnalyzingAlgorithmValueDistSeed2IPZ"}
+    },
+    { {"Contaminated"},
+      {
+        "AnalyzingAlgorithmValueP", "AnalyzingAlgorithmValuePT", "AnalyzingAlgorithmValuePTheta", "AnalyzingAlgorithmValuePPhi", "AnalyzingAlgorithmValueDistSeed2IPXY", "AnalyzingAlgorithmValueDistSeed2IPZ",
+        "AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPT", "AnalyzingAlgorithmResidualPTheta", "AnalyzingAlgorithmResidualPPhi", "AnalyzingAlgorithmResidualPTAngle"
+      }
+    },
+    { {"Clean"},
+      {
+        "AnalyzingAlgorithmValueP", "AnalyzingAlgorithmValuePT", "AnalyzingAlgorithmValuePTheta", "AnalyzingAlgorithmValuePPhi", "AnalyzingAlgorithmValueDistSeed2IPXY", "AnalyzingAlgorithmValueDistSeed2IPZ",
+        "AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPT", "AnalyzingAlgorithmResidualPTheta", "AnalyzingAlgorithmResidualPPhi", "AnalyzingAlgorithmResidualPTAngle"
+      }
+    },
+    { {"Perfect"},
+      {
+        "AnalyzingAlgorithmValueP", "AnalyzingAlgorithmValuePT", "AnalyzingAlgorithmValuePTheta", "AnalyzingAlgorithmValuePPhi", "AnalyzingAlgorithmValueDistSeed2IPXY", "AnalyzingAlgorithmValueDistSeed2IPZ",
+        "AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPT", "AnalyzingAlgorithmResidualPTheta", "AnalyzingAlgorithmResidualPPhi", "AnalyzingAlgorithmResidualPTAngle"
+      }
+    },
   };
 
   vector< vector< vector< string> > > trackedParametersInt = {
-    {{"Clean"}, {"AnalyzingAlgorithmLostUClusters", "AnalyzingAlgorithmLostVClusters"}}
+    { {"Reference"},
+      {"AnalyzingAlgorithmTotalUClusters", "AnalyzingAlgorithmTotalVClusters"}
+    },
+    { {"Lost"},
+      {"AnalyzingAlgorithmTotalUClusters", "AnalyzingAlgorithmTotalVClusters"}
+    },
+    { {"Contaminated"},
+      {"AnalyzingAlgorithmTotalUClusters", "AnalyzingAlgorithmTotalVClusters", "AnalyzingAlgorithmLostUClusters", "AnalyzingAlgorithmLostVClusters"}
+    },
+    { {"Clean"},
+      {"AnalyzingAlgorithmTotalUClusters", "AnalyzingAlgorithmTotalVClusters", "AnalyzingAlgorithmLostUClusters", "AnalyzingAlgorithmLostVClusters"}
+    },
+    { {"Perfect"},
+      {"AnalyzingAlgorithmTotalUClusters", "AnalyzingAlgorithmTotalVClusters", "AnalyzingAlgorithmLostUClusters", "AnalyzingAlgorithmLostVClusters"}
+    }
   };
 
 
   vector< vector< vector< string> > > trackedParametersVecDouble = {
-    {{"Clean"}, {"AnalyzingAlgorithmLostUEDep", "AnalyzingAlgorithmLostVEDep"}}
+    { {"Reference"},
+      {"AnalyzingAlgorithmTotalUEDep", "AnalyzingAlgorithmTotalVEDep"}
+    },
+    { {"Lost"},
+      {"AnalyzingAlgorithmTotalUEDep", "AnalyzingAlgorithmTotalVEDep"}
+    },
+    { {"Contaminated"},
+      {"AnalyzingAlgorithmTotalUEDep", "AnalyzingAlgorithmTotalVEDep", "AnalyzingAlgorithmLostUEDep", "AnalyzingAlgorithmLostVEDep"}
+    },
+    { {"Clean"},
+      {"AnalyzingAlgorithmTotalUEDep", "AnalyzingAlgorithmTotalVEDep", "AnalyzingAlgorithmLostUEDep", "AnalyzingAlgorithmLostVEDep"}
+    },
+    { {"Perfect"},
+      {"AnalyzingAlgorithmTotalUEDep", "AnalyzingAlgorithmTotalVEDep", "AnalyzingAlgorithmLostUEDep", "AnalyzingAlgorithmLostVEDep"}
+    }
   };
 
   //Set module properties

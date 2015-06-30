@@ -111,7 +111,7 @@ namespace Belle2 {
    */
   TEST_F(SpacePointTest, testConstructorSVD)
   {
-    VxdID::baseType aVxdID = VxdID(3, 3, 3), anotherVxdID = VxdID(1, 1, 1);
+    VxdID aVxdID = VxdID(3, 3, 3), anotherVxdID = VxdID(1, 1, 1);
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
     VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
 
@@ -210,7 +210,7 @@ namespace Belle2 {
   TEST_F(SpacePointTest, testRootIOPXDCluster)
   {
     string fNameCluster = "demoClusters.root";
-    VxdID::baseType aVxdID = VxdID(1, 2, 3);
+    VxdID aVxdID = VxdID(1, 2, 3);
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
 
 
@@ -303,7 +303,7 @@ namespace Belle2 {
   {
     /// does not work - TODO solve!
     string fNameSP = "demoSPs.root";
-    VxdID::baseType aVxdID = VxdID(1, 2, 3);
+    VxdID aVxdID = VxdID(1, 2, 3);
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, 2.3, 4.2);
 
 

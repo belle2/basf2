@@ -23,15 +23,20 @@ namespace Belle2 {
   /** the node-class.
    *
    * carries an instance of a class which shall be woven into a network.
+   * additionally a Cell can be attached for Cellular Automaton functionality.
+   * If you don't need the Cell-features, just insert an empty dummy-class.
+   * or use ../tracking/trackFindingVXD/segmentNetwork/VoidMetaInfo.h, where such a dummy class is defined.
    *
-   * prerequesites for entryClass:
+   * prerequesites for template EntryType:
    * - has to have an == operator defined
+   * prerequisites for template MetaInfoType:
+   * - has to have a public constructor with no arguments passed.
    */
-  template<typename EntryType>
+  template<typename EntryType, typename MetaInfoType>
   class DirectedNode {
 
     /** only the DirectedNodeNetwork can create DirectedNodes and link them */
-    template<typename AnyType> friend class DirectedNodeNetwork;
+    template<typename AnyType, typename AnyOtherType> friend class DirectedNodeNetwork;
 
   protected:
     /** ************************* DATA MEMBERS ************************* */
@@ -40,33 +45,34 @@ namespace Belle2 {
     EntryType& m_entry;
 
     /** carries all links to inner nodes */
-    std::vector<DirectedNode<EntryType>*> m_innerNodes;
+    std::vector<DirectedNode<EntryType, MetaInfoType>*> m_innerNodes;
 
     /** carries all links to outer nodes */
-    std::vector<DirectedNode<EntryType>*> m_outerNodes;
+    std::vector<DirectedNode<EntryType, MetaInfoType>*> m_outerNodes;
 
     /** is the index position of this node in the network */
     unsigned int m_index;
+
+    /** contains a MetaInfo for doing extra-stuff (whatever you need) */
+    MetaInfoType m_metaInfo;
 
 
     /** ************************* CONSTRUCTORS ************************* */
 
     /** protected constructor. accepts an entry which can not be changed any more */
-    DirectedNode(EntryType& entry, unsigned int index) : m_entry(entry), m_index(index) {}
+    DirectedNode(EntryType& entry, unsigned int index) : m_entry(entry), m_index(index), m_metaInfo(MetaInfoType()) {}
 
 
     /** copy constructor */
     DirectedNode(const DirectedNode& node) : m_entry(node.m_entry), m_innerNodes(node.m_innerNodes), m_outerNodes(node.m_outerNodes),
-      m_index(node.m_index)
-    {
-      B2ERROR("DirectedNode-copy-constructor has been called!")
-    }
+      m_index(node.m_index), m_metaInfo(node.m_metaInfo)
+    { B2ERROR("DirectedNode-copy-constructor has been called!") }
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
     /** adds new links to the inward direction */
-//  void addInnerNode(std::shared_ptr<DirectedNode<EntryType> > newNode)
-    void addInnerNode(DirectedNode<EntryType>& newNode)
+    //  void addInnerNode(std::shared_ptr<DirectedNode<EntryType, MetaInfoType> > newNode)
+    void addInnerNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
       B2DEBUG(250, "DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
               " and innerNodesSize: " << m_innerNodes.size() << ")!")
@@ -81,7 +87,7 @@ namespace Belle2 {
 
 
     /** adds new links to the outward direction */
-    void addOuterNode(DirectedNode<EntryType>& newNode)
+    void addOuterNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
       B2DEBUG(250, "DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
               " and innerNodesSize: " << m_innerNodes.size() << ")!")
@@ -118,12 +124,12 @@ namespace Belle2 {
 /// getters
 
     /** returns links to all inner nodes attached to this one */
-    std::vector<DirectedNode<EntryType>*>& getInnerNodes() { return m_innerNodes; }
+    std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }
 //     std::vector<std::shared_ptr<DirectedNode<EntryType> > >& getInnerNodes() { return m_innerNodes; }
 
 
     /** returns links to all outer nodes attached to this one */
-    std::vector<DirectedNode<EntryType>*>& getOuterNodes() { return m_outerNodes; }
+    std::vector<DirectedNode<EntryType, MetaInfoType>*>& getOuterNodes() { return m_outerNodes; }
 
 
     /** allows access to stored entry */
@@ -135,16 +141,19 @@ namespace Belle2 {
 
 
     /** returns Pointer to this node */
-    DirectedNode<EntryType>* getPtr() { return this; }
-  };
+    DirectedNode<EntryType, MetaInfoType>* getPtr() { return this; }
 
+
+    /** returns reference to MetaInfoType attached to this node */
+    MetaInfoType& getMetaInfo() { return m_metaInfo; }
+  };
 
   /** ************************* NON-MEMBER FUNCTIONS ************************* */
 
 
   /** non-memberfunction Comparison for equality with EntryType <-> DirectedNode< EntryType > */
-  template < typename EntryType>
-  inline bool operator == (const EntryType& a, const DirectedNode<EntryType>& b)
+  template <class EntryType, class MetaInfoType>
+  inline bool operator == (const EntryType& a, const DirectedNode<EntryType, MetaInfoType>& b)
   {
     return (a == b.getConstEntry());
   }

@@ -68,7 +68,7 @@ m_isAssigned(false)
   if (nClusters == 0 or nClusters > 2) {
     throw InvalidNumberOfClusters();
   } else {
-    vector<VxdID::baseType> vxdIDs;
+    vector<VxdID> vxdIDs;
     vector<bool> isUType;
     for (const SVDCluster* aCluster : clusters) {
       if (aCluster == NULL) throw InvalidNumberOfClusters();
@@ -172,7 +172,7 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 
 
 std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLocalToNormalizedCoordinates(
-  const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitLocal, Belle2::VxdID::baseType vxdID,
+  const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitLocal, Belle2::VxdID vxdID,
   const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
@@ -201,7 +201,7 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertLoc
 
 
 std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertNormalizedToLocalCoordinates(
-  const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitNormalized, Belle2::VxdID::baseType vxdID,
+  const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>& hitNormalized, Belle2::VxdID vxdID,
   const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
@@ -225,7 +225,7 @@ std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType> SpacePoint::convertNor
 
 
 B2Vector3<SpacePoint::SpBaseType> SpacePoint::getGlobalCoordinates(const std::pair<SpacePoint::SpBaseType, SpacePoint::SpBaseType>&
-    hitLocal, Belle2::VxdID::baseType vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
+    hitLocal, Belle2::VxdID vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global
   // coordinates.

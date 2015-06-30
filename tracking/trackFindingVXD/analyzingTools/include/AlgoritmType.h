@@ -38,6 +38,7 @@ namespace Belle2 {
       AnalyzingAlgorithmValuePPhi,
       AnalyzingAlgorithmValueDistSeed2IP,
       AnalyzingAlgorithmValueDistSeed2IPXY,
+      AnalyzingAlgorithmValueDistSeed2IPZ,
       /// residual type, stores double. defined in ..tracking/trackFindingVXD/analyzingTools/algorithms/AnalyzingAlgorithmResiduals.h:
       AnalyzingAlgorithmResidualPX,
       AnalyzingAlgorithmResidualPY,

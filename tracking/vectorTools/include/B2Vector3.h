@@ -68,28 +68,12 @@ namespace Belle2 {
     B2Vector3(const DataType xVal, const DataType yVal, const DataType zVal): m_coordinates {xVal, yVal, zVal} {};
 
 
-//     /** Constructor using a hard copy */
-//     B2Vector3(const DataType coordinates[3]): m_coordinates(coordinates) {};
-
-//  /** Constructor using a hard copy - needed for root */
-//  B2Vector3(DataType coordinates[3]): m_coordinates(coordinates) {};
-
     /** Constructor using a reference */
-    B2Vector3(const DataType(& coordinates)[3])
-    {
-      for (unsigned i = 0 ; i < 3; ++i) {
-        m_coordinates[i] = coordinates[i];
-      }
-    };
+    B2Vector3(const DataType(& coords)[3]): m_coordinates {coords[0], coords[1], coords[2]} {};
 
 
     /** Constructor using a pointer */
-    B2Vector3(const DataType(* coordinates)[3])
-    {
-      for (unsigned i = 0 ; i < 3; ++i) {
-        m_coordinates[i] = (*coordinates)[i];
-      }
-    };
+    B2Vector3(const DataType(* coords)[3]): m_coordinates {(*coords)[0], (*coords)[1], (*coords)[2]} {};
 
 
     /** Constructor expecting a TVector3, please be careful, when DataType is not a basic type! */
@@ -929,26 +913,26 @@ namespace Belle2 {
    *
    * The leaves will be named as the Type::variable_nEntry, where nEntry is the nth entry of the B2Vector3
    */
-// // // // // // // // // // // // // // // //   template < typename DataType>
-// // // // // // // // // // // // // // // //   void B2Vector3<DataType>::persist(TTree* t, const std::string& branchName, const std::string& variableName)
-// // // // // // // // // // // // // // // //   {
-// // // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // // //     std::string leafList;
-// // // // // // // // // // // // // // // //     leafList += B2Vector3<DataType>::name() + "::" + variableName;
-// // // // // // // // // // // // // // // //     leafList += "X:";
-// // // // // // // // // // // // // // // //     leafList += TBranchLeafType(B2Vector3<DataType>::X());
-// // // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // // //     leafList += B2Vector3<DataType>::name() + "::" + variableName;
-// // // // // // // // // // // // // // // //     leafList += "Y:";
-// // // // // // // // // // // // // // // //     leafList += TBranchLeafType(B2Vector3<DataType>::Y());
-// // // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // // //     leafList += B2Vector3<DataType>::name() + "::" + variableName;
-// // // // // // // // // // // // // // // //     leafList += "Z:";
-// // // // // // // // // // // // // // // //     leafList += TBranchLeafType(B2Vector3<DataType>::Z());
-// // // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // // // //  TBranch* branch = new TBranch(t, branchName.c_str() , & B2Vector3<DataType>::m_coordinates, leafList.c_str());
-// // // // // // // // // // // // // // // //     TBranch* branch = new TBranch(t, branchName.c_str() , & B2Vector3<DataType>::m_coordinates, leafList.c_str());
-// // // // // // // // // // // // // // // //     t->GetListOfBranches()->Add(branch);
-// // // // // // // // // // // // // // // //   }
+// // //   template < typename DataType>
+// // //   void B2Vector3<DataType>::persist(TTree* t, const std::string& branchName, const std::string& variableName)
+// // //   {
+// // //
+// // //     std::string leafList;
+// // //     leafList += B2Vector3<DataType>::name() + "::" + variableName;
+// // //     leafList += "X:";
+// // //     leafList += TBranchLeafType(B2Vector3<DataType>::X());
+// // //
+// // //     leafList += B2Vector3<DataType>::name() + "::" + variableName;
+// // //     leafList += "Y:";
+// // //     leafList += TBranchLeafType(B2Vector3<DataType>::Y());
+// // //
+// // //     leafList += B2Vector3<DataType>::name() + "::" + variableName;
+// // //     leafList += "Z:";
+// // //     leafList += TBranchLeafType(B2Vector3<DataType>::Z());
+// // //
+// // // //  TBranch* branch = new TBranch(t, branchName.c_str() , & B2Vector3<DataType>::m_coordinates, leafList.c_str());
+// // //     TBranch* branch = new TBranch(t, branchName.c_str() , & B2Vector3<DataType>::m_coordinates, leafList.c_str());
+// // //     t->GetListOfBranches()->Add(branch);
+// // //   }
 
 } // end namespace Belle2

@@ -164,8 +164,8 @@ namespace DirectedNodeNetworkTests {
     // here some tool-definitions first:
 
     /** small lambda function for checking existence of a given node in a given vector */
-    auto nodeWasFound = [&](std::vector<DirectedNode<int>*>& nodes, DirectedNode<int>* node) -> bool {
-      for (DirectedNode<int>* otherNode : nodes)
+    auto nodeWasFound = [&](std::vector<DirectedNode<int, VoidMetaInfo>*>& nodes, DirectedNode<int, VoidMetaInfo>* node) -> bool {
+      for (DirectedNode<int, VoidMetaInfo>* otherNode : nodes)
       {
         if (node->getEntry() == otherNode->getEntry()) { return true; }
       }
@@ -173,9 +173,9 @@ namespace DirectedNodeNetworkTests {
     };
 
     /** small lambda function for printing all the nodes for debugging */
-    auto printNodeEntries = [&](std::vector<DirectedNode<int>*>& nodes) -> std::string {
+    auto printNodeEntries = [&](std::vector<DirectedNode<int, VoidMetaInfo>*>& nodes) -> std::string {
       std::string output = "Nodes got the following entries: ";
-      for (DirectedNode<int>* node : nodes)
+      for (DirectedNode<int, VoidMetaInfo>* node : nodes)
       {
         output += std::to_string(node->getEntry()) + " ";
       }
@@ -189,7 +189,7 @@ namespace DirectedNodeNetworkTests {
     std::vector<int> onTheFlyCreatedInts; // the user has to take care about the lifetime of the objects to be linked in the network!
     EXPECT_EQ(5, intArray.size());
 
-    DirectedNodeNetwork<int> intNetwork;
+    DirectedNodeNetwork<int, VoidMetaInfo> intNetwork;
     EXPECT_EQ(0, intNetwork.size());
 
     B2INFO("tests case when both nodes are new and when inner one is new, but outer one not")
@@ -220,17 +220,17 @@ namespace DirectedNodeNetworkTests {
 
     // some extra sanity checks, are inner- and outerEnds as expected?
     EXPECT_EQ(intArray.size(), intNetwork.size());
-    std::vector<DirectedNode<int>*> outerEnds = intNetwork.getOuterEnds();
-    std::vector<DirectedNode<int>*> innerEnds = intNetwork.getInnerEnds();
+    std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds = intNetwork.getOuterEnds();
+    std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
     EXPECT_EQ(1, outerEnds.size());
     EXPECT_EQ(1, innerEnds.size());
 
-    DirectedNode<int>* outermostNode = outerEnds.at(0);
+    DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds.at(0);
     EXPECT_EQ(intArray.at(0), outermostNode->getEntry());
     EXPECT_EQ(outermostNode->getEntry(), *outermostNode);
     EXPECT_EQ(intArray.at(1), *(outermostNode->getInnerNodes().at(0)));
 
-    DirectedNode<int>* innermostNode = innerEnds.at(0);
+    DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds.at(0);
     EXPECT_EQ(intArray.at(4), innermostNode->getEntry());
     EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
     EXPECT_EQ(intArray.at(3), *(innermostNode->getOuterNodes().at(0)));
@@ -266,17 +266,17 @@ namespace DirectedNodeNetworkTests {
 
       // some extra sanity checks, are inner- and outerEnds as expected?
       EXPECT_EQ(10, intNetwork.size());
-      std::vector<DirectedNode<int>*> outerEnds = intNetwork.getOuterEnds();
-      std::vector<DirectedNode<int>*> innerEnds = intNetwork.getInnerEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds = intNetwork.getOuterEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
       EXPECT_EQ(2, outerEnds.size());
       EXPECT_EQ(2, innerEnds.size());
 
-      DirectedNode<int>* outermostNode = outerEnds.at(1);
+      DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds.at(1);
       EXPECT_EQ(intArray2.at(0), outermostNode->getEntry());
       EXPECT_EQ(outermostNode->getEntry(), *outermostNode);
       EXPECT_EQ(intArray2.at(1), *(outermostNode->getInnerNodes().at(0)));
 
-      DirectedNode<int>* innermostNode = innerEnds.at(1);
+      DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds.at(1);
       EXPECT_EQ(intArray2.at(4), innermostNode->getEntry());
       EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
       EXPECT_EQ(intArray2.at(3), *(innermostNode->getOuterNodes().at(0)));
@@ -303,7 +303,7 @@ namespace DirectedNodeNetworkTests {
 
         if (index > 1) continue; // the following tests do not work for paths crossing each other, therefore tests would fail
         // innerEnd has been updated:
-        std::vector<DirectedNode<int>*> innerEnds = intNetwork.getInnerEnds();
+        std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
         EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray3.at(index))));
         B2INFO("innerEnds after indices " << index - 1 << "/" << index << " are: " << printNodeEntries(innerEnds))
 
@@ -319,19 +319,19 @@ namespace DirectedNodeNetworkTests {
       // some extra sanity checks, are inner- and outerEnds as expected?
       EXPECT_EQ(13, intNetwork.size());
       B2INFO(" theWholeNetwork: \n" << printNodeEntries(intNetwork.getNodes()))
-      std::vector<DirectedNode<int>*> outerEnds = intNetwork.getOuterEnds();
-      std::vector<DirectedNode<int>*> innerEnds = intNetwork.getInnerEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds = intNetwork.getOuterEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
       EXPECT_EQ(3, outerEnds.size());
       EXPECT_EQ(3, innerEnds.size());
       B2INFO("outerEnds are: \n" << printNodeEntries(outerEnds));
       B2INFO("innerEnds are: \n" << printNodeEntries(innerEnds));
 
-      DirectedNode<int>* outermostNode = outerEnds.at(2);
+      DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds.at(2);
       EXPECT_EQ(intArray3.at(0), outermostNode->getEntry());
       EXPECT_EQ(outermostNode->getEntry(), *outermostNode);
       EXPECT_EQ(intArray3.at(1), *(outermostNode->getInnerNodes().at(0)));
 
-      DirectedNode<int>* innermostNode = innerEnds.at(2);
+      DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds.at(2);
       EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray3.at(4))));
       EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
       B2INFO("searching for: " << intArray3.at(3) << ", while innermostNode->getOuterNodes() are: \n" << printNodeEntries(
@@ -350,9 +350,9 @@ namespace DirectedNodeNetworkTests {
       EXPECT_FALSE(NULL == intNetwork.getNode(newInnerInt));
       EXPECT_EQ(14, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
-      std::vector<DirectedNode<int>*> newOuterEnds = intNetwork.getOuterEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> newOuterEnds = intNetwork.getOuterEnds();
       EXPECT_EQ(3, newOuterEnds.size());  // did not change, new outermost node replaced old one
-      DirectedNode<int>* newOutermostNode = newOuterEnds.at(0);
+      DirectedNode<int, VoidMetaInfo>* newOutermostNode = newOuterEnds.at(0);
       EXPECT_NE(oldOuterInt, newOutermostNode->getEntry());
       EXPECT_EQ(newInnerInt, newOutermostNode->getEntry());
       EXPECT_EQ(1, newOutermostNode->getInnerNodes().size());
@@ -365,8 +365,8 @@ namespace DirectedNodeNetworkTests {
       onTheFlyCreatedInts.push_back(23);
       int& newOuterInt = onTheFlyCreatedInts.back();
       int& existingInt = intArray.at(1); // neither an outer nor an inner end before.
-      std::vector<DirectedNode<int>*> oldOuterEnds = intNetwork.getOuterEnds();
-      std::vector<DirectedNode<int>*> oldInnerEnds = intNetwork.getInnerEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> oldOuterEnds = intNetwork.getOuterEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> oldInnerEnds = intNetwork.getInnerEnds();
 
       auto& oldNodes = intNetwork.getNodes();
       EXPECT_EQ(3, oldOuterEnds.size());
@@ -379,12 +379,12 @@ namespace DirectedNodeNetworkTests {
       EXPECT_FALSE(NULL == intNetwork.getNode(newOuterInt));
       EXPECT_EQ(sizeB4 + 1, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
-      DirectedNode<int>* existingNode = intNetwork.getNode(existingInt);
+      DirectedNode<int, VoidMetaInfo>* existingNode = intNetwork.getNode(existingInt);
       EXPECT_EQ(1, existingNode->getInnerNodes().size());
       EXPECT_EQ(2, existingNode->getOuterNodes().size());
-      std::vector<DirectedNode<int>*> newOuterEnds = intNetwork.getOuterEnds();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> newOuterEnds = intNetwork.getOuterEnds();
       EXPECT_EQ(4, newOuterEnds.size());  // did change, new outermost node co-existing with old outermost one
-      DirectedNode<int>* newOutermostNode = newOuterEnds.at(3);
+      DirectedNode<int, VoidMetaInfo>* newOutermostNode = newOuterEnds.at(3);
       EXPECT_EQ(newOuterInt, newOutermostNode->getEntry());
       EXPECT_EQ(1, newOutermostNode->getInnerNodes().size());
       EXPECT_EQ(existingInt, newOutermostNode->getInnerNodes().at(0)->getEntry());
@@ -401,7 +401,7 @@ namespace DirectedNodeNetworkTests {
       EXPECT_EQ(sizeB4, intNetwork.size()); // size of network does not change
       EXPECT_EQ(3, intNetwork.getInnerEnds().size()); // this can not change here
       EXPECT_EQ(4, intNetwork.getOuterEnds().size());
-      std::vector<DirectedNode<int>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(2, innerEnds.size());
       EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(1))));
       EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(2))));
@@ -414,7 +414,7 @@ namespace DirectedNodeNetworkTests {
       EXPECT_EQ(sizeB4, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       EXPECT_EQ(4, intNetwork.getOuterEnds().size());
-      std::vector<DirectedNode<int>*> moreInnerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> moreInnerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(innerEnds.size(), moreInnerEnds.size());
       EXPECT_TRUE(nodeWasFound(innerEnds, moreInnerEnds.at(0)));
       EXPECT_TRUE(nodeWasFound(innerEnds, moreInnerEnds.at(1)));
@@ -428,7 +428,7 @@ namespace DirectedNodeNetworkTests {
       intNetwork.addInnerToLastOuterNode(intArray.at(3));
       EXPECT_EQ(networkSizeB4, intNetwork.size());
       EXPECT_EQ(nInnerEndsB4, intNetwork.getInnerEnds().size());
-      std::vector<DirectedNode<int>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(3, innerEnds.size());
 
       EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(1))));
@@ -444,7 +444,7 @@ namespace DirectedNodeNetworkTests {
       intNetwork.addInnerToLastOuterNode(intArray.at(3));
       EXPECT_EQ(networkSizeB4, intNetwork.size());
       EXPECT_EQ(nInnerEndsB4, intNetwork.getInnerEnds().size());
-      std::vector<DirectedNode<int>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getNode(intArray.at(0))->getInnerNodes();
       EXPECT_EQ(3, innerEnds.size());
 
       EXPECT_TRUE(nodeWasFound(innerEnds, intNetwork.getNode(intArray.at(1))));
@@ -478,7 +478,7 @@ namespace DirectedNodeNetworkTests {
       intNetwork.addOuterToLastInnerNode(intArray2.at(1));
       EXPECT_EQ(networkSizeB4, intNetwork.size());
       EXPECT_EQ(nOuterEndsB4, intNetwork.getOuterEnds().size());
-      std::vector<DirectedNode<int>*> outerNodes = intNetwork.getNode(lastInnerNodeInt)->getOuterNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> outerNodes = intNetwork.getNode(lastInnerNodeInt)->getOuterNodes();
       EXPECT_EQ(2, outerNodes.size());
     }
 
@@ -490,7 +490,7 @@ namespace DirectedNodeNetworkTests {
       intNetwork.addOuterToLastInnerNode(intArray2.at(1));
       EXPECT_EQ(networkSizeB4, intNetwork.size());
       EXPECT_EQ(nOuterEndsB4, intNetwork.getOuterEnds().size());
-      std::vector<DirectedNode<int>*> outerNodes = intNetwork.getNode(lastInnerNodeInt)->getOuterNodes();
+      std::vector<DirectedNode<int, VoidMetaInfo>*> outerNodes = intNetwork.getNode(lastInnerNodeInt)->getOuterNodes();
       EXPECT_EQ(2, outerNodes.size());
     }
 
@@ -522,7 +522,7 @@ namespace DirectedNodeNetworkTests {
   {
     // testing to write that container now onto the datastore:
     DirectedNodeNetworkContainer* realisticNetworkPtr = networkContainerInDataStore.appendNew();
-    DirectedNodeNetwork<TrackNode> hitNetwork = realisticNetworkPtr->accessHitNetwork();
+    DirectedNodeNetwork<TrackNode, VoidMetaInfo> hitNetwork = realisticNetworkPtr->accessHitNetwork();
     vector<TrackNode*> trackNodes = realisticNetworkPtr->accessTrackNodes();
 
     StaticSectorDummy dummyStaticSector = StaticSectorDummy();
@@ -575,16 +575,16 @@ namespace DirectedNodeNetworkTests {
 
     // some extra sanity checks, are inner- and outerEnds as expected?
     EXPECT_EQ(nEntries, hitNetwork.size());
-    std::vector<DirectedNode<TrackNode>*> outerEnds = hitNetwork.getOuterEnds();
-    std::vector<DirectedNode<TrackNode>*> innerEnds = hitNetwork.getInnerEnds();
+    std::vector<DirectedNode<TrackNode, VoidMetaInfo>*> outerEnds = hitNetwork.getOuterEnds();
+    std::vector<DirectedNode<TrackNode, VoidMetaInfo>*> innerEnds = hitNetwork.getInnerEnds();
     EXPECT_EQ(1, outerEnds.size());
     EXPECT_EQ(1, innerEnds.size());
 
-    DirectedNode<TrackNode>* outermostNode = outerEnds.at(0);
+    DirectedNode<TrackNode, VoidMetaInfo>* outermostNode = outerEnds.at(0);
     EXPECT_EQ(*spacePointData[0], *(outermostNode->getEntry().spacePoint));
     EXPECT_EQ(*spacePointData[1], *(outermostNode->getInnerNodes().at(0)->getEntry().spacePoint));
 
-    DirectedNode<TrackNode>* innermostNode = innerEnds.at(0);
+    DirectedNode<TrackNode, VoidMetaInfo>* innermostNode = innerEnds.at(0);
     EXPECT_EQ(*spacePointData[4], *(innermostNode->getEntry().spacePoint));
     EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
     EXPECT_EQ(*spacePointData[3], *(innermostNode->getOuterNodes().at(0)->getEntry().spacePoint));
@@ -607,9 +607,9 @@ namespace DirectedNodeNetworkTests {
     hitNetwork.linkTheseEntries(newNode, oldNode);
     EXPECT_EQ(6, hitNetwork.size());
 
-    std::vector<DirectedNode<TrackNode>*> newOuterEnds = hitNetwork.getOuterEnds();
+    std::vector<DirectedNode<TrackNode, VoidMetaInfo>*> newOuterEnds = hitNetwork.getOuterEnds();
     EXPECT_EQ(1, newOuterEnds.size());
-    DirectedNode<TrackNode>* newOutermostNode = newOuterEnds.at(0);
+    DirectedNode<TrackNode, VoidMetaInfo>* newOutermostNode = newOuterEnds.at(0);
     EXPECT_NE(oldNode, newOutermostNode->getEntry());
     EXPECT_EQ(newNode, newOutermostNode->getEntry());
     EXPECT_EQ(*spacePointData[0], *(newOutermostNode->getInnerNodes().at(0)->getEntry().spacePoint));
@@ -619,7 +619,7 @@ namespace DirectedNodeNetworkTests {
     // testing case, when outer both were there, but not linked yet:
     hitNetwork.linkTheseEntries(*trackNodes[0], *trackNodes[2]);
     EXPECT_EQ(6, hitNetwork.size()); // size of network does not change
-    std::vector<DirectedNode<TrackNode>*> moreInnerEnds = hitNetwork.getNode(*trackNodes[0])->getInnerNodes();
+    std::vector<DirectedNode<TrackNode, VoidMetaInfo>*> moreInnerEnds = hitNetwork.getNode(*trackNodes[0])->getInnerNodes();
     EXPECT_EQ(2, moreInnerEnds.size());
     EXPECT_EQ(*trackNodes[1], *moreInnerEnds.at(0));
     EXPECT_EQ(*trackNodes[2], *moreInnerEnds.at(1));
@@ -630,7 +630,7 @@ namespace DirectedNodeNetworkTests {
 
     // nothing was added, everything the same as last case:
     EXPECT_EQ(6, hitNetwork.size());
-    std::vector<DirectedNode<TrackNode>*> evenMoreInnerEnds = hitNetwork.getNode(*trackNodes[0])->getInnerNodes();
+    std::vector<DirectedNode<TrackNode, VoidMetaInfo>*> evenMoreInnerEnds = hitNetwork.getNode(*trackNodes[0])->getInnerNodes();
     EXPECT_EQ(moreInnerEnds.size(), evenMoreInnerEnds.size());
     EXPECT_EQ(*moreInnerEnds.at(0), *evenMoreInnerEnds.at(0));
     EXPECT_EQ(*moreInnerEnds.at(1), *evenMoreInnerEnds.at(1));

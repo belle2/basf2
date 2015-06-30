@@ -1,0 +1,11 @@
+Import('env')
+
+#env['LIBS'] = ['tracking_dataobjects', 'testbeam_vxd_dataobjects']
+
+env['LIBS'] = [
+    'framework',
+    'tracking',
+    ]
+
+
+Return('env')

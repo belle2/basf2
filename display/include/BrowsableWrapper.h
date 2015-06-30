@@ -14,7 +14,7 @@ namespace Belle2 {
   class BrowsableWrapper : public TQObject, public TObject {
   public:
     /** Wrap the given object, does NOT take ownership. */
-    BrowsableWrapper(TObject* wrapped): m_wrapped(wrapped) { }
+    explicit BrowsableWrapper(TObject* wrapped): m_wrapped(wrapped) { }
     virtual ~BrowsableWrapper() { }
 
     /** Reimplementation to store additional info on current state. */

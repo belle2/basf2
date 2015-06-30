@@ -16,7 +16,7 @@ namespace Belle2 {
   class InfoWidget : public TGHtml {
   public:
     /** ctor. */
-    InfoWidget(const TGWindow* p);
+    explicit InfoWidget(const TGWindow* p);
     ~InfoWidget();
 
     /** reset for new event. */

@@ -17,7 +17,8 @@ env['LIBS'] = [
               'svd_dataobjects',
               'top_dataobjects',
               'vxd_dataobjects',
-	          'genfit2'
+	          'genfit2',
+              'skim_L1Emulator_dataobjects'
 	          ]
 Return('env')
 

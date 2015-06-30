@@ -288,7 +288,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     }
 
     HepPoint3D dauPivot(belleV0.vx(), belleV0.vy(), belleV0.vz());
-    int trackFitPIndex, trackFitMIndex;
+    int trackFitPIndex = -1;
+    int trackFitMIndex = -1;
     if (trackID[0] >= 1) {
       if (belleV0.daut()) {
         HepLorentzVector belle_momentum;
@@ -399,9 +400,6 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       B2INFO("V0.px/pz/pz/E = " << belleV0.px() << "/" << belleV0.py() << "/" << belleV0.pz() << "/" << belleV0.energy());
       B2INFO("B2.px/pz/pz/E = " << V0P.getPx() << "/" << V0P.getPy() << "/" << V0P.getPz() << "/" << V0P.getEnergy());
     }
-
-    // convert MDST_Vee2 -> V0
-    //convertMdstVee2Object(belleV0, v0);
   }
 
 }
@@ -822,10 +820,6 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     if (mhyp == 2)
       testTrackConversion(belleTrack, trackFit);
   }
-}
-
-void B2BIIConvertMdstModule::convertMdstVee2Object(const Belle::Mdst_vee2& belleVee2, V0* v0)
-{
 }
 
 void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& genHepevt, MCParticleGraph::GraphParticle* mcParticle)

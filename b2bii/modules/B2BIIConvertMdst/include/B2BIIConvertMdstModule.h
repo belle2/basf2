@@ -179,10 +179,6 @@ namespace Belle2 {
      */
     void belleVeeDaughterToCartesian(const Belle::Mdst_vee2& vee, const int charge, const Const::ParticleType& pType,
                                      HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
-    /**
-     * Converts Mdst_vee2 record to V0 object.
-     */
-    void convertMdstVee2Object(const Belle::Mdst_vee2& belleVee2, V0* v0);
 
     /** Get PID information for belleTrack and add it to PIDLikelihood (with relation from track). */
     void convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track);

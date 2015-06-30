@@ -1,9 +1,9 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2015 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Anze Zupanc                                              *
+* Contributors: Chunhua LI                                               *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -11,7 +11,6 @@
 #include <analysis/NtupleTools/NtupleLEECLTool.h>
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/L1EmulatorVariables.h>
-#include <skim/L1Emulator/modules/L1Emulation/L1EmulationModule.h>
 #include <skim/L1Emulator/dataobjects/L1EmulationInformation.h>
 #include <TBranch.h>
 #include <cmath>
@@ -51,15 +50,12 @@ void NtupleLEECLTool::eval(const Particle* particle)
 //   B2ERROR("NtupleDeltaEMbcTool::eval - no Particle found!");
 //    return;
 //  }
-//vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
-//  if (selparticles.empty()){cout<<"noParticle"<<endl;selparticles.push_back(NULL);// return;
+//vector<const Particle*> particle = m_decaydescriptor.getSelectionParticles(particle);
+//  if (particle.empty()){cout<<"noParticle"<<endl;particle.push_back(NULL);// return;
 //}
-  const Particle* selparticles = NULL;
-// Particle* selparticles = NULL;
 
-
-  m_ICN = Variable::nClustersLE(selparticles);
-  m_Etot = Variable::EtotLE(selparticles);
+  m_ICN = Variable::nClustersLE(particle);
+  m_Etot = Variable::EtotLE(particle);
 //m_ECLtoGDL    =LEecl::getECLtoGDL();
 //L1EmulationInformation* LEInfo= LEInfos[0];
 //std::vector<float> phisum=LEInfos[0]->getRingSum();
@@ -67,16 +63,16 @@ void NtupleLEECLTool::eval(const Particle* particle)
 // for(int i=0;i<17;i++)m_RingSum[i]=phisum[i];
 // for(int i=0;i<18;i++)m_BhabhaType[i]=bhabhatype[i];
 
-  m_Vp4E1[0] = Variable::EC1LE(selparticles);
-  m_Vp4E1[1] = Variable::RC1LE(selparticles);
-  m_Vp4E1[2] = Variable::ThetaC1LE(selparticles);
-  m_Vp4E1[3] = Variable::PhiC1LE(selparticles);
+  m_Vp4E1[0] = Variable::EC1LE(particle);
+  m_Vp4E1[1] = Variable::RC1LE(particle);
+  m_Vp4E1[2] = Variable::ThetaC1LE(particle);
+  m_Vp4E1[3] = Variable::PhiC1LE(particle);
 
 
-  m_Vp4E2[0] = Variable::EC2LE(selparticles);
-  m_Vp4E2[1] = Variable::RC2LE(selparticles);
-  m_Vp4E2[2] = Variable::ThetaC2LE(selparticles);
-  m_Vp4E2[3] = Variable::PhiC2LE(selparticles);
+  m_Vp4E2[0] = Variable::EC2LE(particle);
+  m_Vp4E2[1] = Variable::RC2LE(particle);
+  m_Vp4E2[2] = Variable::ThetaC2LE(particle);
+  m_Vp4E2[3] = Variable::PhiC2LE(particle);
 
-  m_AngleGG = Variable::AngleGGLE(selparticles);
+  m_AngleGG = Variable::AngleGGLE(particle);
 }

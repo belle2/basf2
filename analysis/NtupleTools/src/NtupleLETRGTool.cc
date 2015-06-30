@@ -1,9 +1,9 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2015 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Anze Zupanc                                              *
+* Contributors: Chunhua LI                                               *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -11,7 +11,6 @@
 #include <analysis/NtupleTools/NtupleLETRGTool.h>
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/L1EmulatorVariables.h>
-#include <skim/L1Emulator/modules/L1Emulation/L1EmulationModule.h>
 #include <skim/L1Emulator/dataobjects/L1EmulationInformation.h>
 #include <TBranch.h>
 #include <cmath>
@@ -25,12 +24,8 @@ void NtupleLETRGTool::setupTree()
   m_tree->Branch("Summary",  &m_GDL[0], "Summary[50]/I");
 }
 
-void NtupleLETRGTool::eval(const Particle* particle)
+void NtupleLETRGTool::eval(const Particle*)
 {
-// if (!particle) {
-//   B2ERROR("NtupleDeltaEMbcTool::eval - no Particle found!");
-//    return;
-//  }
 //vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
 //  if (selparticles.empty()){cout<<"noParticle"<<endl;selparticles.push_back(NULL);// return;
 //}

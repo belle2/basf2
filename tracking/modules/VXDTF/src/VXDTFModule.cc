@@ -1025,7 +1025,8 @@ void VXDTFModule::the_real_event()
           StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName); // needed since I use it only within if-parenthesis
 
           int indexNumber = finalTrackCandidates.getEntries(); // valid for both, GFTrackCand and InfoBoard
-          gfTC.setMcTrackId(indexNumber); // so the GFTrackCand knows which index of infoBoard is assigned to it
+          gfTC.setMcTrackId(
+            indexNumber); // so the GFTrackCand knows which index of infoBoard is assigned to it WARNING: this breaks some routines for fitting, if activated!
 
           newBoard.assignGFTC(indexNumber); // same number aDEBUGs for the GFTrackCand
           newBoard.fitIsPossible(aTC->getFitSucceeded());
@@ -3843,12 +3844,12 @@ int VXDTFModule::segFinder(PassData* currentPass)
           accepted = currentPass->twoHitFilterBox.checkDist3D(FilterID::distance3D);
           if (accepted == true) {
             simpleSegmentQI++;
-            B2DEBUG(10, " dist3d: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
+            B2DEBUG(150, " dist3d: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
                     currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D()
                     << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).second)
             acceptedRejectedFilters.push_back({FilterID::distance3D, true});
           } else {
-            B2DEBUG(10, " dist3d: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
+            B2DEBUG(150, " dist3d: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
                     currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDist3D()
                     << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).second)
             acceptedRejectedFilters.push_back({FilterID::distance3D, false});
@@ -3864,12 +3865,12 @@ int VXDTFModule::segFinder(PassData* currentPass)
           accepted = currentPass->twoHitFilterBox.checkDistXY(FilterID::distanceXY);
           if (accepted == true) {
             simpleSegmentQI++;
-            B2DEBUG(10, " distxy: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
+            B2DEBUG(150, " distxy: segment approved! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
                     currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY()
                     << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).second)
             acceptedRejectedFilters.push_back({FilterID::distanceXY, true});
           } else {
-            B2DEBUG(10, " distxy: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
+            B2DEBUG(150, " distxy: segment discarded! SectorCombi: " << mainSecID << "/" << friendSecID << ", minCutoff: " <<
                     currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).first << ", calcValue: " << currentPass->twoHitFilterBox.calcDistXY()
                     << ", maxCutoff: " << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).second)
             acceptedRejectedFilters.push_back({FilterID::distanceXY, false});
@@ -4070,7 +4071,7 @@ int VXDTFModule::segFinder(PassData* currentPass)
         }
 
         if (activatedSegmentsCounter > m_PARAMkillEventForHighOccupancyThreshold) {
-          B2DEBUG(1, "number of activated segments reached threshold " << activatedSegmentsCounter << ", stopping segFinder now")
+          B2DEBUG(5, "number of activated segments reached threshold " << activatedSegmentsCounter << ", stopping segFinder now")
           return discardedSegmentsCounter;
         } // security check
       } //iterating through all my friendHits

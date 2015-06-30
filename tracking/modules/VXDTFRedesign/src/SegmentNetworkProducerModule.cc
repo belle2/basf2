@@ -161,7 +161,8 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 {
   // TODO add counters!
 
-  DirectedNodeNetwork<ActiveSector<StaticSectorDummy, TrackNode>>& activeSectorNetwork = m_network->accessActiveSectorNetwork();
+  DirectedNodeNetwork<ActiveSector<StaticSectorDummy, TrackNode>, VoidMetaInfo>& activeSectorNetwork =
+    m_network->accessActiveSectorNetwork();
   vector<ActiveSector<StaticSectorDummy, TrackNode>*>& activeSectors = m_network->accessActiveSectors();
 
   for (RawSectorData& outerSectorData : collectedData) {
@@ -229,9 +230,9 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 {
   // TODO add counters!
-  DirectedNodeNetwork<ActiveSector<StaticSectorDummy, Belle2::TrackNode>>& activeSectorNetwork =
-        m_network->accessActiveSectorNetwork();
-  DirectedNodeNetwork<Belle2::TrackNode>& hitNetwork = m_network->accessHitNetwork();
+  DirectedNodeNetwork<ActiveSector<StaticSectorDummy, Belle2::TrackNode>, VoidMetaInfo>& activeSectorNetwork =
+    m_network->accessActiveSectorNetwork();
+  DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
@@ -276,21 +277,21 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 void SegmentNetworkProducerModule::buildSegmentNetwork()
 {
   // TODO add counters!
-  DirectedNodeNetwork<Belle2::TrackNode>& hitNetwork = m_network->accessHitNetwork();
-  DirectedNodeNetwork<Segment< Belle2::TrackNode>>& segmentNetwork = m_network->accessSegmentNetwork();
+  DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
+  DirectedNodeNetwork<Segment< Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   vector<Belle2::Segment<Belle2::TrackNode>* >& segments = m_network->accessSegments();
 
-  for (DirectedNode<TrackNode>* outerHit : hitNetwork.getNodes()) {
-    const vector<DirectedNode<TrackNode>*>& centerHits = outerHit->getInnerNodes();
+  for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
+    const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
     if (centerHits.empty()) continue; // go to next outerHit
 
-    for (DirectedNode<TrackNode>* centerHit : centerHits) {
-      const vector<DirectedNode<TrackNode>*>& innerHits = centerHit->getInnerNodes();
+    for (DirectedNode<TrackNode, VoidMetaInfo>* centerHit : centerHits) {
+      const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& innerHits = centerHit->getInnerNodes();
       if (innerHits.empty()) continue; // go to next centerHit
 
       // skip double-adding of nodes into the network after first iteration -> speeding up the code:
       bool isFirstIteration = true;
-      for (DirectedNode<TrackNode>* innerHit : innerHits) {
+      for (DirectedNode<TrackNode, VoidMetaInfo>* innerHit : innerHits) {
 
         // applying filters provided by the sectorMap:
         bool accepted = outerHit->getEntry().sector->acceptThreeHitCombination(
@@ -308,7 +309,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           centerHit->getEntry().sector->getFullSecID(),
           &outerHit->getEntry(),
           &centerHit->getEntry());
-        DirectedNode<Segment<TrackNode>>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
+        DirectedNode<Segment<TrackNode>, CACell>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
         if (tempSegmentnode == NULL) {
           segments.push_back(innerSegment);
         } else {
@@ -324,7 +325,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
             centerHit->getEntry().sector->getFullSecID(),
             &outerHit->getEntry(),
             &centerHit->getEntry());
-          DirectedNode<Segment<TrackNode>>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
+          DirectedNode<Segment<TrackNode>, CACell>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
           if (tempSegmentnode == NULL) {
             segments.push_back(outerSegment);
           } else {

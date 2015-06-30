@@ -250,4 +250,60 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), 3.1853244);
   }
 
+  TEST_F(MetaVariableTest, extraInfo)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    p.addExtraInfo("pi", 3.14);
+
+    const Manager::Var* var = Manager::Instance().getVariable("extraInfo(pi)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 3.14);
+  }
+
+  TEST_F(MetaVariableTest, formula)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("formula(px + py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -0.3);
+
+    var = Manager::Instance().getVariable("formula(px - py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+
+    var = Manager::Instance().getVariable("formula(px * py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -0.04);
+
+    var = Manager::Instance().getVariable("formula(py / px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -4.0);
+
+    var = Manager::Instance().getVariable("formula(px ^ E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.01);
+
+    var = Manager::Instance().getVariable("formula(px * py + pz)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
+
+    var = Manager::Instance().getVariable("formula(pz + px * py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
+  }
+
+  TEST_F(MetaVariableTest, passesCut)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("passesCut(E < 3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1);
+    EXPECT_FLOAT_EQ(var->function(&p2), 0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), -999);
+
+  }
+
 }

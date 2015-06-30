@@ -29,57 +29,18 @@ set_log_level(LogLevel.ERROR)
 # Register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
 # Set the number of events to be processed (1000 events)
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # eventinfoprinter = register_module('EventInfoPrinter')
 
 # Fixed random seed
 set_random_seed(123456)
 
-pGun = register_module('ParticleGun')
-param_pGun = {
-    'pdgCodes': [22],
-    'nTracks': 0,
-    'momentumGeneration': 'fixed',
-    'momentumParams': [1],
-    'thetaGeneration': 'uniform',
-    'thetaParams': [0., 180.],
-    'phiGeneration': 'uniform',
-    'phiParams': [0, 360],
-    'vertexGeneration': 'uniform',
-    'xVertexParams': [0., 0.],
-    'yVertexParams': [0., 0.],
-    'zVertexParams': [0., 0.],
-}
-pGun.param(param_pGun)
-
-# simpleoutput = register_module('RootOutput')
-# simpleoutput.param('outputFileName', '../ECLPionOutput.root')
 eclanalysis = register_module('ECLDataAnalysis')
 eclanalysis.param('rootFileName', '../ECLBkgOutput.root')
-# eclanalysis.param('doTracking', 1)
+eclanalysis.param('doTracking', 1)
 
-# Add Bkg in Simulation
-bkgdir = '/sw/belle2/bkg/'
-bkgFiles = [
-    bkgdir + 'Coulomb_HER_100us.root',
-    bkgdir + 'Coulomb_LER_100us.root',
-    bkgdir + 'Coulomb_HER_100usECL.root',
-    bkgdir + 'Coulomb_LER_100usECL.root',
-    bkgdir + 'RBB_HER_100us.root',
-    bkgdir + 'RBB_LER_100us.root',
-    bkgdir + 'RBB_HER_100usECL.root',
-    bkgdir + 'RBB_LER_100usECL.root',
-    bkgdir + 'Touschek_HER_100us.root',
-    bkgdir + 'Touschek_LER_100us.root',
-    bkgdir + 'Touschek_HER_100usECL.root',
-    bkgdir + 'Touschek_LER_100usECL.root',
-]
-
-# bg = []
-# if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
-#    bg += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
-bg = None
+# bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
@@ -89,11 +50,9 @@ else:
 main = create_path()
 main.add_module(eventinfosetter)
 # main.add_module(eventinfoprinter)
-# main.add_module(pGun)
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 main.add_module(eclanalysis)
-# main.add_module(simpleoutput)
 
 process(main)
 print statistics

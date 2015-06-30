@@ -11,7 +11,7 @@
 
 """
 <header>
-<output>ECLClusterOutput_500mev.root</output>
+<output>ECLClusterOutput.root</output>
 <contact>Elisa Manoni, ecl2ml@bpost.kek.jp</contact>
 </header>
 """
@@ -61,7 +61,7 @@ add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', '../ECLClusterOutput_500mev.root')
+ecldataanalysis.param('rootFileName', '../ECLClusterOutput.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 

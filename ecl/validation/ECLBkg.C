@@ -1,7 +1,7 @@
-/* ECLBkg.C 
+/* makePlots.C 
  * ROOT macro for ECL validation plots 
  * Author: Benjamin Oberhof 
- * 2014
+ * 2015-06
 */
 
 /*
@@ -12,11 +12,33 @@
 </header>
 */
 
-void ECLBkg()
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TNtuple.h>
+#include <TCut.h>
+
+void ECLBkg(TTree* bkg_tree);
+
+void makePlots() 
+{
+  // open the file with input data (flat ntuple)
+
+  TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
+  TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
+
+  ECLBkg(bkg_tree);
+  // numberOfPhotons(top);
+  // trackResolutions(top);
+
+}
+
+void ECLBkg(TTree* bkg_tree)
 {
 
-  TFile* inputFile = TFile::Open("../ECLBkgOutput.root");
-  TTree* tree = (TTree*) inputFile->Get("m_tree");
+  // TFile* inputFile = TFile::Open("../ECLBkgOutput.root");
+  // TTree* tree = (TTree*) inputFile->Get("m_tree");
 
   TFile* output = TFile::Open("ECLBkg.root", "recreate");
 
@@ -37,5 +59,5 @@ void ECLBkg()
   bkgClusterMultip->Write();
  
   output->Close();
-  delete output;
+  // delete output;
 }

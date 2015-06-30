@@ -3,7 +3,7 @@
 
 """
 <header>
-<output>ECLPi0Output.root</output>
+<output>ECLPionOutput.root</output>
 <contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
 </header>
 """

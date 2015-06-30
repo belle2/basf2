@@ -1,7 +1,7 @@
 
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Chunhua LI                                               *
@@ -420,7 +420,7 @@ namespace Belle2 {
       return result;
     }
 
-    double eclBhabha(const Particle* particle)
+    double eclBhabha(const Particle*)
     {
       double result = 0;
       StoreArray<L1EmulationInformation> LEins;
@@ -428,7 +428,7 @@ namespace Belle2 {
       return result;
     }
 
-    double BhabhaVeto(const Particle* particle)
+    double BhabhaVeto(const Particle*)
     {
       double result = 0;
       StoreArray<L1EmulationInformation> LEinsb;
@@ -436,7 +436,7 @@ namespace Belle2 {
       return result;
     }
 
-    double ggVeto(const Particle* particle)
+    double ggVeto(const Particle*)
     {
       double result = 0;
       StoreArray<L1EmulationInformation> LEinsb;

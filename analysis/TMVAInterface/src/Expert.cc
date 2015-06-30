@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TSystem.h>
+#include <TMVA/Tools.h>
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>

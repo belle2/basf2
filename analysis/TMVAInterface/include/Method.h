@@ -9,12 +9,9 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
-
 #include <TMVA/Types.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
   namespace TMVAInterface {

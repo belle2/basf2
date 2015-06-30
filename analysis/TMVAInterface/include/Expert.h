@@ -11,14 +11,11 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/TMVAInterface/Config.h>
-#include <boost/property_tree/ptree_fwd.hpp>
 
-#include <TMVA/Tools.h>
 #include <TMVA/Reader.h>
 
 #include <vector>
 #include <string>
-#include <map>
 #include <memory>
 
 namespace Belle2 {

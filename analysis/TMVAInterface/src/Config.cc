@@ -15,10 +15,9 @@
 #include <TMVA/Tools.h>
 #include <TMVA/Reader.h>
 
-#include <TSystem.h>
-
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/version.hpp>
 
 namespace Belle2 {
 

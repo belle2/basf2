@@ -35,7 +35,6 @@
 #include <TImage.h>
 #include <TAxis.h>
 
-#include <framework/logging/LogSystem.h>
 #include <framework/logging/Logger.h>
 
 #include <string>

@@ -10,14 +10,12 @@
 #pragma once
 
 #include <analysis/TMVAInterface/Method.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
-#include <boost/version.hpp>
 
 #include <vector>
 #include <string>
-#include <map>
-#include <memory>
 
 namespace Belle2 {
 

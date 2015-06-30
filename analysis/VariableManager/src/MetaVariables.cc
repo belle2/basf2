@@ -154,26 +154,24 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr isInRegion(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr passesCut(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 3) {
-        float low = 0;
-        float high = 0;
-        try {
-          low = boost::lexical_cast<float>(arguments[1]);
-          high = boost::lexical_cast<float>(arguments[2]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second and third argument of isInRegion meta function must be floats!");
-          return nullptr;
-        }
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var, low, high](const Particle * particle) -> double {
-          double result = var->function(particle);
-          return (result >= low and result <= high) ? 1.0 : 0.0;
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+        auto func = [cut](const Particle * particle) -> double {
+
+          if (particle == nullptr)
+            return -999;
+          if (cut->check(particle))
+            return 1;
+          else
+            return 0;
+
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function isInRegion");
+        B2FATAL("Wrong number of arguments for meta function passesCut");
       }
     }
 
@@ -435,8 +433,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle as current reference frame.");
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame, "Use the CMS frame as current reference frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, "Use the lab frame as current reference frame.");
-    REGISTER_VARIABLE("isInRegion(variable, low, high)", isInRegion,
-                      "Returns 1 if given variable is inside a given region. Otherwise 0.");
+    REGISTER_VARIABLE("passesCut(cut)", passesCut,
+                      "Returns 1 if particle passes the given cut otherwise 0 (and -999 if particle is a nullptr).");
     REGISTER_VARIABLE("countDaughters(condition)", countDaughters, "Returns number of direct daughters which satisfy given condition.");
     REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");

@@ -37,7 +37,7 @@ teacher.param('prefix', 'Event')
 teacher.param('variables', ['nTracks', 'nECLClusters', 'nKLMClusters', 'ECLEnergy'])
 # This training shall identify if the energy in the klm is below 0.1 GeV, a more reasonable training
 # would be in the variable isContinuumEvent, however in this case you would need special continuum MC
-teacher.param('target', 'isInRegion(KLMEnergy, 0, 0.1)')
+teacher.param('target', 'passesCut(KLMEnergy < 0.1)')
 # In addition we normalise, decorrelate and transform the input variables to a gaussian using the TMVA option VarTransform,
 # there are a lot more possibilities, e.g. you can restrict the transformations to a subset of variables
 teacher.param(
@@ -67,7 +67,7 @@ main.add_module(expert)
 
 ntuple = register_module('VariablesToNtuple')
 ntuple.param('fileName', 'TMVA/EventOutput.root')
-ntuple.param('variables', ['extraInfo(SignalProbability)', 'isInRegion(KLMEnergy, 0, 0.1)'])
+ntuple.param('variables', ['extraInfo(SignalProbability)', 'passesCut(KLMEnergy < 0.1)'])
 # Again, we leave the particleList empty!
 main.add_module(ntuple)
 

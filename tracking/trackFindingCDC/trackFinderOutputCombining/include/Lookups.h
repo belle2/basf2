@@ -62,7 +62,6 @@ namespace Belle2 {
     /** We use this class for storing our segment lists - one for each superlayer
      * This lookup serves (as an addon) also as lookup for the relation cdchit -> segment
      * When filling the lookup we only process not already taken segments.
-     * Before doing so we mark all segments as taken if all of their hits are already in a track.
      * */
     class SegmentLookUp : public LookUpBase<CDCRecoSegment2D, std::vector<SegmentInformation*>> {
     public:
@@ -79,6 +78,7 @@ namespace Belle2 {
         }
       }
 
+      /** Return the segment that has this hit */
       SegmentInformation* findSegmentForHit(const CDCRecoHit3D& recoHit)
       {
         const CDCHit* cdcHit = recoHit.getWireHit().getHit();
@@ -91,10 +91,12 @@ namespace Belle2 {
       }
 
     private:
-      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp; /**< The added segment<->hit lookup */
+      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp; /**< The added hit -> segment lookup */
     };
 
-    /** And we use this class for storing our Track Information */
+    /** And we use this class for storing our Track Information
+     * This lookup serves (as an addon) also as lookup for the relation cdchit -> track
+     * */
     class TrackLookUp : public LookUpBase<CDCTrack, TrackInformation*> {
     public:
       /** Create the lists. Do not forget to call clear before the next event. */
@@ -107,6 +109,21 @@ namespace Belle2 {
           delete trackInformation;
         }
       }
+
+      /** Return the track that has this hit */
+      TrackInformation* findTrackForHit(const CDCRecoHit2D& recoHit)
+      {
+        const CDCHit* cdcHit = recoHit.getWireHit().getHit();
+        auto foundElement = m_hitTrackLookUp.find(cdcHit);
+        if (foundElement == m_hitTrackLookUp.end()) {
+          return nullptr;
+        } else {
+          return foundElement->second;
+        }
+      }
+
+    private:
+      std::map<const CDCHit*, TrackInformation*> m_hitTrackLookUp; /**< The added hit -> track lookup */
     };
 
     /** Class which does the segment - track combining */

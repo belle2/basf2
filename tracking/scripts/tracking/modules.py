@@ -102,7 +102,7 @@ class CDCFullFinder(metamodules.PathModule):
                  tmva_cut=0.1,
                  first_filter="tmva", first_tmva_cut=0.67,
                  background_filter="tmva", background_filter_tmva_cut=0.6,
-                 second_filter="none", second_tmva_cut=0.2):
+                 second_filter="none", second_tmva_cut=0):
 
         modules = [
             CDCBackgroundHitFinder(

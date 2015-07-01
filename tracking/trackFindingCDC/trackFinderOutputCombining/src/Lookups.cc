@@ -16,31 +16,17 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
 {
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-  // Mark the segments which are fully found by the legendre track finder as taken
-  for (const CDCRecoSegment2D& segment : segments) {
-    bool oneHitDoesNotHaveTakenFlag = false;
-    for (const CDCRecoHit2D& recoHit : segment) {
-      if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
-        oneHitDoesNotHaveTakenFlag = true;
-        break;
-      }
-    }
-
-    if (not oneHitDoesNotHaveTakenFlag) {
-      segment.getAutomatonCell().setTakenFlag();
-    }
-  }
-
   // Calculate a lookup SuperLayerID -> Segments
   m_lookup.clear();
   m_lookup.resize(wireTopology.N_SUPERLAYERS);
 
-  // Calculate a lookup cdcHit-> Segment (we use cdcHits here, not cdcwirehits)
+  // Calculate a lookup cdcHit-> Segment (we use cdcHits here, not cdcWireHits)
   m_hitSegmentLookUp.clear();
 
   for (CDCRecoSegment2D& segment : segments) {
     if (segment.getAutomatonCell().hasTakenFlag())
       continue;
+
     ILayerType superlayerID = segment.getISuperLayer();
     SegmentInformation* newSegmentInformation = new SegmentInformation(&segment);
     m_lookup[superlayerID].push_back(newSegmentInformation);
@@ -60,6 +46,9 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
   m_lookup.clear();
   m_lookup.reserve(tracks.size());
 
+  // Calculate a lookup cdcHit-> Track (we use cdcHits here, not cdcwirehits)
+  m_hitTrackLookUp.clear();
+
   // Calculate a lookup Track -> TrackInformation
   for (CDCTrack& trackCand : tracks) {
     TrackInformation* trackInformation = new TrackInformation(&trackCand);
@@ -71,42 +60,114 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
     }
     trackInformation->calcPerpS();
     m_lookup.push_back(trackInformation);
+
+    for (const CDCRecoHit3D& recoHit : trackCand) {
+      const CDCHit* cdcHit = recoHit.getWireHit().getHit();
+      m_hitTrackLookUp.insert(std::make_pair(cdcHit, trackInformation));
+    }
+
     B2DEBUG(200, "Added new track to track lookup: " << trackCand.getStartTrajectory3D().getTrajectory2D())
   }
 }
 
 void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep)
 {
-  // prepare lookup
-  std::map<SegmentInformation*, std::set<TrackInformation*>> segmentTrackLookUp;
-  segmentTrackLookUp.clear();
+  // Mark the segments which are fully found by the legendre track finder as taken
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
-      if (segment->isAlreadyTaken())
-        continue;
-      segmentTrackLookUp.insert(std::make_pair(segment, std::set<TrackInformation*>()));
-    }
-  }
+      bool oneHitDoesNotHaveTakenFlag = false;
 
-  for (TrackInformation* track : m_trackLookUp) {
-    for (const CDCRecoHit3D& recoHit : track->getTrackCand()->items()) {
-      SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
-      if (matchingSegment != nullptr
-          and not isNotACell(segmentTrackChooserFirstStep(std::make_pair(matchingSegment->getSegment(), track->getTrackCand())))) {
-        segmentTrackLookUp[matchingSegment].insert(track);
+      for (const CDCRecoHit2D& recoHit : segment->getSegment()->items()) {
+        if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+          oneHitDoesNotHaveTakenFlag = true;
+          break;
+        }
+      }
+
+      if (not oneHitDoesNotHaveTakenFlag) {
+        // Ensure that all hits belong to the same track!
+        std::set<TrackInformation*> tracksWithHitsInCommon;
+        for (const CDCRecoHit2D& recoHit : segment->getSegment()->items()) {
+          TrackInformation* trackWithHit = m_trackLookUp.findTrackForHit(recoHit);
+          if (trackWithHit != nullptr) {
+            tracksWithHitsInCommon.insert(trackWithHit);
+          }
+        }
+
+        if (tracksWithHitsInCommon.size() == 1) {
+          segment->getSegment()->getAutomatonCell().setTakenFlag();
+        }
       }
     }
   }
 
-  for (auto& segmentTrackCombination : segmentTrackLookUp) {
-    SegmentInformation* segment = segmentTrackCombination.first;
-    if (segment->isAlreadyTaken())
-      continue;
+  // prepare lookup
+  for (TrackInformation* track : m_trackLookUp) {
+    for (const CDCRecoHit3D& recoHit : track->getTrackCand()->items()) {
+      SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
 
-    const std::set<TrackInformation*>& matchingTracks = segmentTrackCombination.second;
-    if (matchingTracks.size() == 1) {
-      TrackInformation* track = *(matchingTracks.begin());
-      SegmentTrackCombiner::addSegmentToTrack(segment, track);
+      if (matchingSegment == nullptr) {
+        continue;
+      }
+
+      if (matchingSegment->isAlreadyTaken()) {
+        continue;
+      }
+
+      // Check if we did not already have the track in the list
+      const SegmentInformation::ListOfMatchCandidates& currentlyMatched = matchingSegment->getMatches();
+      if (std::find_if(currentlyMatched.begin(),
+      currentlyMatched.end(), [&track](const std::pair<TrackInformation*, double>& pair) -> bool {
+      return pair.first == track;
+    }) != currentlyMatched.end()) {
+        continue;
+      }
+
+      // Call the filter and add the match
+      double filterResult = segmentTrackChooserFirstStep(std::make_pair(matchingSegment->getSegment(), track->getTrackCand()));
+      if (not isNotACell(filterResult)) {
+        matchingSegment->addMatch(track, filterResult);
+      }
+    }
+  }
+
+  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+    for (SegmentInformation* segment : segments) {
+      if (segment->isAlreadyTaken())
+        continue;
+
+      const SegmentInformation::ListOfMatchCandidates& matchingTracks = segment->getMatches();
+
+      if (matchingTracks.size() == 0)
+        continue;
+
+      TrackInformation* bestMatch = segment->getBestMatch();
+
+      if (matchingTracks.size() > 1) {
+        // Delete the hits from the other track(s)
+        for (const std::pair<TrackInformation*, double>& matchingPair : matchingTracks) {
+          TrackInformation* notBestTrack = matchingPair.first;
+
+          if (notBestTrack == bestMatch) {
+            continue;
+          }
+
+          CDCTrack* cdcTrack = notBestTrack->getTrackCand();
+
+          cdcTrack->erase(std::remove_if(cdcTrack->begin(), cdcTrack->end(), [this, &segment](const CDCRecoHit3D & recoHit) -> bool {
+            if (m_segmentLookUp.findSegmentForHit(recoHit) == segment)
+            {
+              recoHit->getWireHit().getAutomatonCell().unsetTakenFlag();
+              return true;
+            } else {
+              return false;
+            }
+          }), cdcTrack->end());
+        }
+      }
+
+      // Add the segment to the track with the highest probability to match
+      SegmentTrackCombiner::addSegmentToTrack(segment, bestMatch);
     }
   }
 }

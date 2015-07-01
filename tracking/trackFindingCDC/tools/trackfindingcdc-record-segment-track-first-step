@@ -18,7 +18,9 @@ class SegmentTrackFirstStepRecordingRun(StandardEventGenerationRun):
         main_path = super(SegmentTrackFirstStepRecordingRun, self).create_path()
 
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
-                                                   first_filter="recording"))
+                                                   first_filter="recording",
+                                                   second_filter="none",
+                                                   background_filter="none"))
         return main_path
 
 

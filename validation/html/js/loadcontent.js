@@ -116,7 +116,20 @@ function loadcontent(joined_revisions, reload_checkboxes) {
 				});
 			}
 
-			// 5. DO A LOT OF STUFF REGARDING THE MATRIX VIEW THAT NOBODY
+			// 5. UPDATE THE SHARE-PLOT INPUT FIELDS, AND PREPEND THE CURRENT
+			//    HOSTNAME ETC. TO THE PATH
+			var loc = window.location;
+			var currentURL = loc.protocol + '//' + loc.host + '/';
+			
+			$('.share_plot').each(function(){
+			
+				var path = $(this).attr('value');
+				console.log(path);
+				$(this).val(currentURL + path);
+			
+			});
+
+			// 6. DO A LOT OF STUFF REGARDING THE MATRIX VIEW THAT NOBODY
 			//    BOTHERED TO COMMENT...
 			$("input.matrix-toggle").click(function() {
 				$("span#" + this.value).toggle();

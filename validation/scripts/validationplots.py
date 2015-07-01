@@ -1674,9 +1674,10 @@ class Plotuple:
                     .format(self.contact, self.description, self.check))
 
         # Give the possibility to share the plot!
-        html.append('<p><strong>Share this plot:</strong> <input type="test" '
+        html.append('<p><strong>Share this plot/n-tuple:</strong> '
+                    '<input type="text" class="share_plot" '
                     'value="index.html?PackageOverview=false&Revisions={0}'
-                    '#{1}" size="60" onClick="this.select();"></p>'
+                    '#{1}" size="50" onClick="this.select();"></p>'
                     .format('_'.join(self.list_of_revisions), prmn))
 
         html.append('</div>\n</div>\n\n')

@@ -428,7 +428,7 @@ class ProgressBarViewer(object):
         js = """
         <script type="text/Javascript">
         function set_event_number(number) {
-            $("#""" + self.js_name + """ > .event_number").html("Event: " + number + "");
+            $("#""" + self.js_name + """ > .event_number").html("Percentage: " + 100 * number + "");
 
             var progressbar = $("#""" + self.js_name + """ > .progressbar");
             var progressbarValue = progressbar.find( ".ui-progressbar-value" );
@@ -440,9 +440,7 @@ class ProgressBarViewer(object):
                 progressbar.progressbar({value: 100});
                 progressbarValue.css({"background": '#CC3300'});
             } else {
-                var value = parseInt(number);
-                var order = value / Math.pow(10, Math.floor(Math.log10(value)));
-                progressbar.progressbar({value: 10 * order});
+                progressbar.progressbar({value: 100*number});
                 progressbarValue.css({"background": '#000000'});
             }
         }
@@ -500,21 +498,24 @@ class ProgressPython(basf2.Module):
         basf2.Module.__init__(self)
         self.queue = queue
         self.event_number = 0
+        self.total_number_of_events = 0
         self.queue.send(self.event_number)
 
     def initialize(self):
         """ Send start to the connection """
         self.queue.send("start")
 
+        # Receive the total number of events
+
+        import ROOT
+        self.total_number_of_events = ROOT.Belle2.Environment.Instance().getNumberOfEvents()
+
     def event(self):
         """ Send the event number to the connection """
-        if self.event_number == 0:
-            order = 10
+        if self.total_number_of_events != 0:
+            self.queue.send(1.0 * self.event_number / self.total_number_of_events)
         else:
-            order = 10 ** math.floor(math.log10(self.event_number))
-
-        if self.event_number % order == 0:
-            self.queue.send(self.event_number)
+            self.queue.send(self.total_number_of_events)
         self.event_number += 1
 
     def terminate(self):

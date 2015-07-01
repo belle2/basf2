@@ -92,13 +92,15 @@ namespace Belle2 {
         //Create LADDER, LADDER is made of 7 layers
         G4double r = activeParams.getLength("r_plume") * CLHEP::cm;
         G4double z = activeParams.getLength("z_plume") * CLHEP::cm;
-        G4double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;
+        G4double phi = activeParams.getAngle("Phi");
         G4double thetaZ = activeParams.getAngle("ThetaZ");
 
-        G4double ElecBandY = activeParams.getLength("ElecBandY");
+        G4double ElecBandY = activeParams.getLength("ElecBandY") * CLHEP::cm;
         G4double SensorDistance = activeParams.getLength("SensorDistance") * CLHEP::cm;
-        G4double SensorLengthX = activeParams.getInt("nPixelsX") * activeParams.getLength("pitchX") * CLHEP::cm;
-        G4double SensorLengthY = activeParams.getInt("nPixelsY") * activeParams.getLength("pitchY") * CLHEP::cm;
+        G4double SensorLengthX = (activeParams.getInt("nPixelsX") * activeParams.getLength("pitchX")) * CLHEP::cm;
+        G4double SensorLengthY = (activeParams.getInt("nPixelsY") * activeParams.getLength("pitchY")) * CLHEP::cm;
+
+        G4double AirGap = activeParams.getLength("AirGap") * CLHEP::cm;
 
         //IRB:
         G4double SubstrateThickness = activeParams.getLength("SubstrateThickness") * CLHEP::cm;
@@ -108,49 +110,44 @@ namespace Belle2 {
         G4double KaptonThickness = activeParams.getLength("KaptonThickness") * CLHEP::cm;
         G4double AluminiumThickness = activeParams.getLength("AluminiumThickness") * CLHEP::cm;
 
-
-        //create foam layer
+        //create air volume that contains all layers
         G4double dx_foam = SensorLengthY / 2. + ElecBandY / 2.;
         G4double dy_foam = (SensorLengthX * 6. + 5.*SensorDistance) / 2.;
         G4double DistanceFromFoamCenter = activeParams.getLength("DistanceFromFoamCenter") * CLHEP::cm;
+        G4double dz_env = DistanceFromFoamCenter + KaptonThickness + GlueThickness +
+                          AluminiumThickness + SubstrateThickness + EpitaxialThickness +
+                          MetalThickness + 12. * AirGap;
 
+        G4Box* s_env = new G4Box("s_env", dx_foam, dy_foam, dz_env);
+        G4LogicalVolume* l_env = new G4LogicalVolume(s_env, geometry::Materials::get("G4_AIR"), "l_env");
+        G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2.0) * G4Translate3D(0, r, z) * G4RotateX3D(- M_PI / 2.0 - thetaZ);
+        new G4PVPlacement(transform, l_env, "p_env", &topVolume, false, 0);
 
+        //create foam layer
         G4Box* s_foam = new G4Box("Foam", dx_foam, dy_foam, DistanceFromFoamCenter);
         G4LogicalVolume* l_foam = new G4LogicalVolume(s_foam, geometry::Materials::get("SiC"), "l_foam");
-        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_foam, "p_foam", &topVolume, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_foam, "p_foam", l_env, false, 1);
 
         //create glue layers
         G4Box* s_glue = new G4Box("s_glue", dx_foam, dy_foam, GlueThickness / 2.);
         G4LogicalVolume* l_glue = new G4LogicalVolume(s_glue, geometry::Materials::get("Glue"), "s_glue");
-        transform = G4RotateZ3D(phi) * G4Translate3D(0, r - (DistanceFromFoamCenter + 1e-5 * CLHEP::cm + GlueThickness / 2.),
-                                                     z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_glue, "p_glue_0", &topVolume, false, 0);
-        transform = G4RotateZ3D(phi) * G4Translate3D(0, r + (DistanceFromFoamCenter + 1e-5 * CLHEP::cm + GlueThickness / 2.),
-                                                     z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_glue, "p_glue_1", &topVolume, false, 0);
+        G4double r_glue = DistanceFromFoamCenter + AirGap + GlueThickness / 2.;
+        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_glue), l_glue, "p_glue_0", l_env, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, r_glue), l_glue, "p_glue_1", l_env, false, 0);
 
         //create Kapton layers
         G4Box* s_Kapton = new G4Box("s_Kapton", dx_foam, dy_foam, KaptonThickness / 2.);
         G4LogicalVolume* l_Kapton = new G4LogicalVolume(s_Kapton, geometry::Materials::get("Kapton") , "l_Kapton");
-        transform = G4RotateZ3D(phi) * G4Translate3D(0,
-                                                     r - (DistanceFromFoamCenter + 2e-5 * CLHEP::cm + GlueThickness + KaptonThickness / 2.), z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_Kapton, "p_Kapton_0", &topVolume, false, 0);
-        transform = G4RotateZ3D(phi) * G4Translate3D(0,
-                                                     r + (DistanceFromFoamCenter + 2e-5 * CLHEP::cm + GlueThickness + KaptonThickness / 2.), z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_Kapton, "p_Kapton_1", &topVolume, false, 0);
+        G4double r_Kapton = r_glue + AirGap + (GlueThickness + KaptonThickness) / 2.;
+        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_Kapton), l_Kapton, "p_Kapton_0", l_env, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, r_Kapton), l_Kapton, "p_Kapton_1", l_env, false, 0);
 
         //create metal layers
         G4Box* s_metal = new G4Box("s_metal", dx_foam, dy_foam, AluminiumThickness / 2.);
         G4LogicalVolume* l_metal = new G4LogicalVolume(s_metal, geometry::Materials::get("Aluminium"), "l_metal");
-        transform = G4RotateZ3D(phi) * G4Translate3D(0,
-                                                     r - (DistanceFromFoamCenter + 3e-5 * CLHEP::cm + GlueThickness + KaptonThickness + AluminiumThickness / 2.),
-                                                     z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_metal, "p_metal_0", &topVolume, false, 0);
-        transform = G4RotateZ3D(phi) * G4Translate3D(0,
-                                                     r + (DistanceFromFoamCenter + 3e-5 * CLHEP::cm + GlueThickness + KaptonThickness + AluminiumThickness / 2.),
-                                                     z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_metal, "p_metal_1", &topVolume, false, 0);
+        G4double r_metal = r_Kapton + AirGap + (KaptonThickness + AluminiumThickness) / 2.;
+        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_metal), l_metal, "p_metal_0", l_env, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, r_metal), l_metal, "p_metal_1", l_env, false, 0);
 
         l_foam->SetVisAttributes(FoamVisAtt);
         l_Kapton->SetVisAttributes(KaptonVisAtt);
@@ -159,63 +156,67 @@ namespace Belle2 {
 
         //create Mimosa Sensors, 12 per ladder, made of 3 layers
         G4double x_array[] = { -2.5, -1.5, -0.5, 0.5, 1.5, 2.5};
-        G4double r_epitaxial1 = r - (DistanceFromFoamCenter + KaptonThickness + GlueThickness + AluminiumThickness +
-                                     SubstrateThickness + EpitaxialThickness / 2. + 5e-5 * CLHEP::cm);
-        G4double r_epitaxial2 = r + (DistanceFromFoamCenter + KaptonThickness + GlueThickness + AluminiumThickness +
-                                     SubstrateThickness + EpitaxialThickness / 2. + 5e-5 * CLHEP::cm);
+        G4double r_substrate = r_metal + AirGap + (AluminiumThickness + SubstrateThickness) / 2.;
+        G4double r_epitaxial = r_substrate + AirGap + (SubstrateThickness + EpitaxialThickness) / 2.;
+        G4double r_metalized = r_epitaxial + AirGap + (EpitaxialThickness + MetalThickness) / 2.;
 
-        G4double r_metalized1 = r - (DistanceFromFoamCenter + KaptonThickness + GlueThickness + AluminiumThickness +
-                                     SubstrateThickness + EpitaxialThickness + MetalThickness / 2. + 6e-5 * CLHEP::cm);
-        G4double r_metalized2 = r + (DistanceFromFoamCenter + KaptonThickness + GlueThickness + AluminiumThickness +
-                                     SubstrateThickness + EpitaxialThickness + MetalThickness / 2. + 6e-5 * CLHEP::cm);
+        //----------------------------------------------------------------------------//
+        //                            Substrate Layer                                 //
+        //----------------------------------------------------------------------------//
+        G4Box* s_substrate = new G4Box("s_substrate", SensorLengthY / 2. , SensorLengthX / 2. , SubstrateThickness / 2.);
+        G4LogicalVolume* l_substrate = new G4LogicalVolume(s_substrate, geometry::Materials::get("Silicon"), "l_substrate");
+        //----------------------------------------------------------------------------//
+        //                            Epitaxial Layer                                 //
+        //----------------------------------------------------------------------------//
+        G4Box* s_epitaxial = new G4Box("s_epitaxial", SensorLengthY / 2. , SensorLengthX / 2., EpitaxialThickness / 2.);
+        G4LogicalVolume* l_epitaxial = new G4LogicalVolume(s_epitaxial, geometry::Materials::get("Silicon"), "l_epitaxial", 0, m_sensitive);
+        //----------------------------------------------------------------------------//
+        //                            Metalized Layer                                 //
+        //----------------------------------------------------------------------------//
+        G4Box* s_metalized = new G4Box("s_metalized", SensorLengthY / 2. , SensorLengthX / 2. , MetalThickness / 2.);
+        G4LogicalVolume* l_metalized = new G4LogicalVolume(s_metalized, geometry::Materials::get("SiO2Al"), "l_metalized");
 
-        G4double r_substrate1 = r - (DistanceFromFoamCenter + KaptonThickness + GlueThickness + AluminiumThickness +
-                                     SubstrateThickness / 2. + 4e-5 * CLHEP::cm);
-        G4double r_substrate2 = r + (DistanceFromFoamCenter + KaptonThickness + GlueThickness + AluminiumThickness +
-                                     SubstrateThickness / 2. + 4e-5 * CLHEP::cm);
+        l_epitaxial->SetUserLimits(new G4UserLimits(stepSize));
+        l_substrate->SetVisAttributes(SubstrateVisAtt);
+        l_epitaxial->SetVisAttributes(EpitaxialVisAtt);
+        l_metalized->SetVisAttributes(MetalizedVisAtt);
 
         for (int i = 0; i < 12; i++) {
           //----------------------------------------------------------------------------//
           //                            Substrate Layer                                 //
           //----------------------------------------------------------------------------//
-
-          G4Box* s_substrate = new G4Box("s_substrate", SensorLengthY / 2. , SensorLengthX / 2. , SubstrateThickness / 2.);
-          G4LogicalVolume* l_substrate = new G4LogicalVolume(s_substrate, geometry::Materials::get("Silicon"), "l_substrate");
-          if (i < 6) transform = G4RotateZ3D(phi) * G4Translate3D(0, r_substrate1,
-                                                                    z - x_array[i] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          else transform = G4RotateZ3D(phi) * G4Translate3D(0, r_substrate2,
-                                                              z - x_array[i - 6] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          new G4PVPlacement(transform, l_substrate, "p_substrate",  &topVolume, false, 0);
-
-          //----------------------------------------------------------------------------//
-          //                            Metalized Layer                                 //
-          //----------------------------------------------------------------------------//
-
-          G4Box* s_metalized = new G4Box("s_metalized", SensorLengthY / 2. , SensorLengthX / 2. , MetalThickness / 2.);
-          G4LogicalVolume* l_metalized = new G4LogicalVolume(s_metalized, geometry::Materials::get("SiO2Al"), "l_metalized");
-          if (i < 6) transform = G4RotateZ3D(phi) * G4Translate3D(0, r_metalized1,
-                                                                    z - x_array[i] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          else transform = G4RotateZ3D(phi) * G4Translate3D(0, r_metalized2,
-                                                              z - x_array[i - 6] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          new G4PVPlacement(transform, l_metalized, "p_metalized", &topVolume, false, 0);
-
+          G4String name = "";
+          G4ThreeVector MSpos = G4ThreeVector(0, 0, 0);
+          if (i < 6) {
+            name = "p_substrate_bot";
+            MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i], -r_substrate);
+          } else {
+            name = "p_substrate_top";
+            MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i - 6], r_substrate);
+          }
+          new G4PVPlacement(0, MSpos, l_substrate, name,  l_env, false, 0);
           //----------------------------------------------------------------------------//
           //                            Epitaxial Layer                                 //
           //----------------------------------------------------------------------------//
-
-          G4Box* s_epitaxial = new G4Box("s_epitaxial", SensorLengthY / 2. , SensorLengthX / 2., EpitaxialThickness / 2.);
-          G4LogicalVolume* l_epitaxial = new G4LogicalVolume(s_epitaxial, geometry::Materials::get("Silicon"), "l_epitaxial", 0, m_sensitive);
-          l_epitaxial->SetUserLimits(new G4UserLimits(stepSize));
-          if (i < 6) transform = G4RotateZ3D(phi) * G4Translate3D(0, r_epitaxial1,
-                                                                    z - x_array[i] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          else transform = G4RotateZ3D(phi) * G4Translate3D(0, r_epitaxial2,
-                                                              z - x_array[i - 6] * (SensorLengthX + SensorDistance)) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          new G4PVPlacement(transform, l_epitaxial, "p_epitaxial", &topVolume, false, LadderID * 12 + i);
-
-          l_substrate->SetVisAttributes(SubstrateVisAtt);
-          l_epitaxial->SetVisAttributes(EpitaxialVisAtt);
-          l_metalized->SetVisAttributes(MetalizedVisAtt);
-
+          if (i < 6) {
+            name = "p_epitaxial_bot";
+            MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i], -r_epitaxial);
+          } else {
+            name = "p_epitaxial_top";
+            MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i - 6], r_epitaxial);
+          }
+          new G4PVPlacement(0, MSpos, l_epitaxial, name,  l_env, false, LadderID * 12 + i);
+          //----------------------------------------------------------------------------//
+          //                            Metalized Layer                                 //
+          //----------------------------------------------------------------------------//
+          if (i < 6) {
+            name = "p_metalized_bot";
+            MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i], -r_metalized);
+          } else {
+            name = "p_metalized_top";
+            MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i - 6], r_metalized);
+          }
+          new G4PVPlacement(0, MSpos, l_metalized, name,  l_env, false, 0);
         }
         LadderID++;
       }

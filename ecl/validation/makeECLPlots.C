@@ -224,6 +224,8 @@ void ECL2D(TTree* bkg_tree)
   TH2F* BDyz5 = new TH2F("BDyz5", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz6 = new TH2F("BDyz6", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   
+  gStyle->SetOptStat(00000);
+
   BDyz->GetXaxis()->SetTitle("x (m)");
   BDyz->GetYaxis()->SetTitle("y (m)");
   BDyz->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the ecl (upper part is phi<0, lower part phi>0)")); 

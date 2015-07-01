@@ -34,12 +34,13 @@ import os
 import sys
 
 # Set parameters
-if len(sys.argv) != 4:
-    sys.exit('Must provide enough arguments: [# of events] [output path] [output name]')
+if len(sys.argv) != 5:
+    sys.exit('Must provide arguments: [# of events] [output path] [output name] [sim & rec ?: 1/0]')
 
 nEvents = int(sys.argv[1])
 outputDir = sys.argv[2]
 outputName = sys.argv[3]
+simrec = int(sys.argv[4])
 
 # Add "/" to the end of the output path
 if not outputDir.endswith('/'):
@@ -75,18 +76,18 @@ matchMCTruth('B0:all')
 # ---------------------------------------------------
 
 # Select charmless (discard b -> c and b-> c anti-c transitions, upper vertex b -> anti-c allowed)
-cutAndCopyList('B+:charmless', 'B+:all', '-0.5 < hasCharmedDaughter(-1) < 0.5 and -0.5 < hasCharmoniumDaughter < 0.5')
-cutAndCopyList('B0:charmless', 'B0:all', '-0.5 < hasCharmedDaughter(-1) < 0.5 and -0.5 < hasCharmoniumDaughter < 0.5')
+cutAndCopyList('B+:charmless', 'B+:all', 'hasCharmedDaughter(-1) == 0 and hasCharmoniumDaughter == 0')
+cutAndCopyList('B0:charmless', 'B0:all', 'hasCharmedDaughter(-1) == 0 and hasCharmoniumDaughter == 0')
 
-# Select non-leptonic events (hasNDaughtersWithPDG(PDG,N,Sign))
+# Select non-leptonic events
 cutAndCopyList(
     'B+:charmlessH',
     'B+:charmless',
-    'hasNDaughtersWithPDG(11,0,1) > 0.5 and hasNDaughtersWithPDG(13,0,1) > 0.5 and hasNDaughtersWithPDG(15,0,1) > 0.5')
+    'countDaughters(abs(mcPDG) == 11) == 0 and countDaughters(abs(mcPDG) == 13) == 0 and countDaughters(abs(mcPDG) == 15) == 0')
 cutAndCopyList(
     'B0:charmlessH',
     'B0:charmless',
-    'hasNDaughtersWithPDG(11,0,1) > 0.5 and hasNDaughtersWithPDG(13,0,1) > 0.5 and hasNDaughtersWithPDG(15,0,1) > 0.5')
+    'countDaughters(abs(mcPDG) == 11) == 0 and countDaughters(abs(mcPDG) == 13) == 0 and countDaughters(abs(mcPDG) == 15) == 0')
 
 # Create empty path
 empty_path = create_path()
@@ -106,11 +107,12 @@ skim.if_false(empty_path)
 # BKG files for running at KEKCC
 bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
 
-# Simulation
-add_simulation(analysis_main, None, bkgFiles)
-
-# Reconstruction
-add_reconstruction(analysis_main)
+# Simulation with BKG and reconstruction
+if(simrec == 1):
+    add_simulation(analysis_main, None, bkgFiles)
+    add_reconstruction(analysis_main)
+elif(simrec != 0):
+    sys.exit('Last argument should be 0 or 1!')
 
 # ---------------------------------------------------
 # SAVE TO OUTPUT

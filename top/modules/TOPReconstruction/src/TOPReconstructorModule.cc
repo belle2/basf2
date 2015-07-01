@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPPull.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -87,6 +88,9 @@ namespace Belle2 {
              "track smearing sigma in Phi [radians]", 0.0);
     addParam("maxTime", m_maxTime,
              "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+    addParam("PDGCode", m_PDGCode,
+             "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
+             211);
 
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
@@ -128,6 +132,10 @@ namespace Belle2 {
     topLikelihoods.registerRelationTo(extHits);
     topLikelihoods.registerRelationTo(barHits);
     tracks.registerRelationTo(topLikelihoods);
+
+    StoreArray<TOPPull> topPulls;
+    topPulls.registerInDataStore(DataStore::c_DontWriteOut);
+    tracks.registerRelationTo(topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check for module debug level
 
@@ -180,6 +188,9 @@ namespace Belle2 {
     StoreArray<TOPLikelihood> topLikelihoods;
     topLikelihoods.create();
 
+    StoreArray<TOPPull> topPulls;
+    topPulls.create();
+
     // create reconstruction object
 
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
@@ -211,11 +222,10 @@ namespace Belle2 {
     // reconstruct track-by-track and store the results
 
     StoreArray<Track> tracks;
-    for (int i = 0; i < tracks.getEntries(); ++i) {
-      const Track* track = tracks[i];
+    for (const auto& track : tracks) {
 
       // construct TOPtrack from mdst track
-      TOPtrack trk(track);
+      TOPtrack trk(&track, Const::pion, m_PDGCode);
       if (!trk.isValid()) continue;
 
       // optional track smearing (needed for some MC studies)
@@ -243,9 +253,18 @@ namespace Belle2 {
       TOPLikelihood* topL = topLikelihoods.appendNew(reco.getFlag(), nphot,
                                                      logl, estPhot, estBkg);
       // make relations:
-      track->addRelationTo(topL);
+      track.addRelationTo(topL);
       topL->addRelationTo(trk.getExtHit());
       topL->addRelationTo(trk.getBarHit());
+
+      // store pulls
+      int ich; float t, t0, wid, fic, wt;
+      for (int k = 0; k < reco.getPullSize(); k++) {
+        reco.getPull(k, ich, t, t0, wid, fic, wt);
+        auto* pull = topPulls.appendNew(ich, t, t0, wid, fic, wt);
+        track.addRelationTo(pull);
+      }
+
     }
 
   }

@@ -497,7 +497,7 @@
       INTEGER ICH
       INTEGER N, KK
       REAL TOP, T_0, WIDTH, PHIC, UT
-      INTEGER IRTRA
+      INTEGER ICHID
 #include "TOP_CONS.fi"
 #include "TOP_PIK.fi"
 #include "TOP_TRACK.fi"
@@ -514,8 +514,8 @@
       PARAMETER (NB=10000)
       INTEGER NT
       REAL TIME(NB), T0(NB), WID(NB), FIC(NB), WT(NB)
-      INTEGER RTRA(NB)
-      SAVE NT, TIME, T0, WID, FIC, WT, RTRA
+      INTEGER CHID(NB)
+      SAVE NT, TIME, T0, WID, FIC, WT, CHID
 
       SFOT=STFS+STFB
       IF(SFOT.EQ.0) RETURN
@@ -550,7 +550,7 @@
             WID(NT)=SIGMA(I,K)
             FIC(NT)=PIK_FIC(K,ICH)-PI
             WT(NT)=W(I,K)/S
-            RTRA(NT)=I_RTRA
+            CHID(NT)=ICH
          ENDDO
       ENDDO
 
@@ -561,7 +561,7 @@
       WID(NT)=0.
       FIC(NT)=0.
       WT(NT)=BGR/S
-      RTRA(NT)=I_RTRA
+      CHID(NT)=ICH
       RETURN
 
       ENTRY CLEAR_PULLS
@@ -572,7 +572,7 @@
       N=NT
       RETURN
 
-      ENTRY GET_PULLS(KK,TOP,T_0,WIDTH,PHIC,UT,IRTRA)
+      ENTRY GET_PULLS(KK,TOP,T_0,WIDTH,PHIC,UT,ICHID)
       UT=0.
       IF(KK.LT.1.OR.KK.GT.NT) RETURN
       TOP=TIME(KK)
@@ -580,7 +580,7 @@
       WIDTH=WID(KK)
       PHIC=FIC(KK)
       UT=WT(KK)
-      IRTRA=RTRA(KK)
+      ICHID=CHID(KK)
       RETURN
 
       END

@@ -26,10 +26,11 @@
 
 // dataobject classes
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPPull.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 
 // root
-#include "TH1F.h"
-#include "TH2F.h"
 #include "TVector3.h"
 #include "TDirectory.h"
 
@@ -63,8 +64,14 @@ namespace Belle2 {
     // Add parameters
     addParam("histogramDirectoryName", m_histogramDirectoryName,
              "histogram directory in ROOT file", string("TOP"));
-
+    addParam("momentumCut", m_momentumCut,
+             "momentum cut used to histogram pulls etc.", 2.0);
+    addParam("pValueCut", m_pValueCut,
+             "track p-value cut used to histogram pulls etc.", 0.001);
+    addParam("usePionID", m_usePionID,
+             "use pion ID from TOP to histogram pulls etc.", true);
   }
+
 
   TOPDQMModule::~TOPDQMModule()
   {
@@ -108,6 +115,39 @@ namespace Belle2 {
       m_hitTimes.push_back(h1);
     }
 
+
+    m_recoTime = new TH1F("recoTime", "reco: time distribution",
+                          500, 0, 50);
+    m_recoTime->GetXaxis()->SetTitle("time [ns]");
+
+    m_recoTimeBg = new TH1F("recoTimeBg", "reco: time distribution (bkg)",
+                            500, 0, 50);
+    m_recoTimeBg->GetXaxis()->SetTitle("time [ns]");
+
+    m_recoTimeMinT0 = new TH1F("recoTimeMinT0", "reco: time in respect to first PDF peak",
+                               200, -10, 10);
+    m_recoTimeMinT0->GetXaxis()->SetTitle("time [ns]");
+
+    m_recoTimeDiff = new TH1F("recoTimeDiff", "reco: time resolution",
+                              100, -1.0, 1.0);
+    m_recoTimeDiff->GetXaxis()->SetTitle("time residual [ns]");
+
+    m_recoPull = new TH1F("recoPull", "reco: pulls",
+                          100, -10, 10);
+    m_recoPull->GetXaxis()->SetTitle("pull");
+
+    m_recoTimeDiff_Phic = new TH2F("recoTimeDiff_Phic",
+                                   "reco: time resolution vs. phiCer",
+                                   90, -180, 180, 100, -1.0, 1.0);
+    m_recoTimeDiff_Phic->GetXaxis()->SetTitle("Cerenkov azimuthal angle [deg]");
+    m_recoTimeDiff_Phic->GetYaxis()->SetTitle("time residuals [ns]");
+
+    m_recoPull_Phic = new TProfile("recoPull_Phic",
+                                   "reco: pulls vs phiCer",
+                                   90, -180, 180, -10, 10, "S");
+    m_recoPull_Phic->GetXaxis()->SetTitle("Cerenkov azimuthal angle [deg]");
+    m_recoPull_Phic->GetYaxis()->SetTitle("pulls");
+
     // cd back to root directory
     oldDir->cd();
   }
@@ -123,6 +163,7 @@ namespace Belle2 {
     REG_HISTOGRAM;
 
     StoreArray<TOPDigit>::required();
+    StoreArray<Track>::optional();
 
   }
 
@@ -134,8 +175,7 @@ namespace Belle2 {
   {
 
     StoreArray<TOPDigit> digits;
-
-    for (TOPDigit& digit : digits) {
+    for (const auto& digit : digits) {
       m_barHits->Fill(digit.getBarID());
       int i = digit.getBarID() - 1;
       if (i < 0 || i >= m_topgp->getNbars()) {
@@ -144,6 +184,35 @@ namespace Belle2 {
       }
       m_channelHits[i]->Fill(digit.getChannelID());
       m_hitTimes[i]->Fill(digit.getTDC());
+    }
+
+    StoreArray<Track> tracks;
+    for (const auto& track : tracks) {
+      const auto* trackFit = track.getTrackFitResult(Const::pion);
+      if (!trackFit) continue;
+      if (trackFit->getMomentum().Mag() < m_momentumCut) continue;
+      if (trackFit->getPValue() < m_pValueCut) continue;
+      if (m_usePionID) {
+        const auto* top = track.getRelated<TOPLikelihood>();
+        if (!top) continue;
+        if (top->getLogL_pi() < top->getLogL_K()) continue;
+        if (top->getLogL_pi() < top->getLogL_p()) continue;
+      }
+
+      const auto pulls = track.getRelationsWith<TOPPull>();
+      for (const auto& pull : pulls) {
+        if (pull.isSignal()) {
+          double phiCer = pull.getPhiCer() / Unit::deg;
+          m_recoTimeDiff->Fill(pull.getTimeDiff(), pull.getWeight());
+          m_recoTimeDiff_Phic->Fill(phiCer, pull.getTimeDiff(), pull.getWeight());
+          m_recoPull->Fill(pull.getPull(), pull.getWeight());
+          m_recoPull_Phic->Fill(phiCer, pull.getPull(), pull.getWeight());
+        } else {
+          m_recoTime->Fill(pull.getTime());
+          m_recoTimeBg->Fill(pull.getTime(), pull.getWeight());
+          m_recoTimeMinT0->Fill(pull.getTimeDiff());
+        }
+      }
     }
 
   }

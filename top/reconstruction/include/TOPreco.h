@@ -221,14 +221,15 @@ namespace Belle2 {
       /**
        * Get pulls: K-th pull
        * @param K counter
+       * @param channelID software channel ID (1-based)
        * @param T photon time
        * @param T0 PDF mean time
        * @param Wid PDF sigma
        * @param PhiCer azimuthal Cerenkov angle
        * @param Wt weight
        */
-      void getPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
-                   double& Wt);
+      void getPull(int K, int& channelID, float& T, float& T0, float& Wid,
+                   float& PhiCer, float& Wt);
 
       /**
        * Return PDF for channel chID at time t for mass hypothesis mass

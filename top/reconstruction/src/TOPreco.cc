@@ -217,14 +217,12 @@ namespace Belle2 {
       return n;
     }
 
-    void TOPreco::getPull(int K, double& T, double& T0, double& Wid, double& PhiCer,
-                          double& Wt)
+    void TOPreco::getPull(int K, int& ich, float& t, float& t0, float& wid,
+                          float& fic, float& wt)
     {
-      float t, t0, wid, fic, wt;
-      int dum;
       K++;
-      get_pulls_(&K, &t, &t0, &wid, &fic, &wt, &dum);
-      T = t; T0 = t0; Wid = wid; PhiCer = fic; Wt = wt;
+      get_pulls_(&K, &t, &t0, &wid, &fic, &wt, &ich);
+      ich++; // convert to 1-based
     }
 
     double TOPreco::getPDF(int chID, double T, double Mass)

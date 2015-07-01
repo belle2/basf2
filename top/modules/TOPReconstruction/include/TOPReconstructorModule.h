@@ -80,6 +80,7 @@ namespace Belle2 {
     double m_sigmaTheta;   /**< track smearing in Theta (r.m.s) */
     double m_sigmaPhi;     /**< track smearing in Phi (r.m.s) */
     double m_maxTime;      /**< optional time limit for photons */
+    int m_PDGCode;   /**< PDG code of hypothesis to construct pulls */
 
     // others
     int m_debugLevel;      /**< debug level from logger */

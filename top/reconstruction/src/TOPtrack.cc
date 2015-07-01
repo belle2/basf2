@@ -48,8 +48,10 @@ namespace Belle2 {
     {}
 
 
-    TOPtrack::TOPtrack(const Track* track, const Const::ChargedStable& chargedStable):
-      m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(0),
+    TOPtrack::TOPtrack(const Track* track,
+                       const Const::ChargedStable& chargedStable,
+                       int pdg):
+      m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(pdg),
       m_atTop(false), m_barID(0),
       m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
     {
@@ -87,7 +89,7 @@ namespace Belle2 {
         return;
       }
       m_charge = fitResult->getChargeSign();
-      if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
+      if (m_pdg == 0 and m_mcParticle) m_pdg = m_mcParticle->getPDG();
       m_barID = m_extHit->getCopyID();
       m_valid = true;
     }

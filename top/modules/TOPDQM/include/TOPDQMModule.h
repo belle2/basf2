@@ -25,6 +25,7 @@
 #include <vector>
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 
 namespace Belle2 {
 
@@ -84,6 +85,9 @@ namespace Belle2 {
 
     // module parameters
     std::string m_histogramDirectoryName; /**< histogram directory in ROOT file */
+    double m_momentumCut; /**< momentum cut */
+    double m_pValueCut;   /**< pValue cut */
+    bool m_usePionID; /**< use pion ID in track selection */
 
     // TOP geometry parameters
     TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
@@ -92,6 +96,13 @@ namespace Belle2 {
     TH1F* m_barHits;  /**< number of hits per bar */
     std::vector<TH1F*> m_channelHits;   /**< number of hits per channel for each bar */
     std::vector<TH1F*> m_hitTimes;   /**< time distribution for each bar */
+    TH1F* m_recoTime;           /**< time distribution */
+    TH1F* m_recoTimeBg;         /**< time distribution background */
+    TH1F* m_recoTimeMinT0;      /**< time distribution in respect to the first peak */
+    TH1F* m_recoTimeDiff;       /**< residual distribution */
+    TH1F* m_recoPull;           /**< pull distribution */
+    TH2F* m_recoTimeDiff_Phic;  /**< residuals vs phiCer */
+    TProfile* m_recoPull_Phic;  /**< pulls vs phiCer */
 
   };
 

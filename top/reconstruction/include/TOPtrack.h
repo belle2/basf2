@@ -56,9 +56,11 @@ namespace Belle2 {
        * Constructor from mdst track - isValid() must be checked before using the object
        * @param track mdst track pointer
        * @param chargedStable hypothesis used in mdst track extrapolation (default: pion)
+       * @param pdg PDG code to construct pulls, if 0 MC truth is used
        */
       TOPtrack(const Track* track,
-               const Const::ChargedStable& chargedStable = Const::pion);
+               const Const::ChargedStable& chargedStable = Const::pion,
+               int pdg = 0);
 
       /**
        * Check if track is properly defined

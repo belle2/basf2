@@ -158,6 +158,7 @@ class SegmentFakeRatesModule(HarvestingModule):
         hit_purity_of_partner = np.NaN
         hit_efficiency_of_partner = np.NaN
         mc_track_pt = np.NaN
+        mc_track_dist = np.NaN
         number_of_new_hits = local_track_cand.getNHits()
         number_of_hits = local_track_cand.getNHits()
         number_of_hits_in_same_superlayer = np.NaN
@@ -168,6 +169,7 @@ class SegmentFakeRatesModule(HarvestingModule):
             has_partner = (mc_track_matcher_legendre.isMatchedMCTrackCand(related_mc_track_cand) or
                            mc_track_matcher_legendre.isMergedMCTrackCand(related_mc_track_cand))
             mc_track_pt = related_mc_track_cand.getMomSeed().Pt()
+            mc_track_dist = related_mc_track_cand.getPosSeed().Mag()
             if has_partner:
                 partner_legendre_track_cand = mc_track_matcher_legendre.getRelatedPRTrackCand(related_mc_track_cand)
                 hit_purity_of_partner = abs(mc_track_matcher_legendre.getRelatedPurity(partner_legendre_track_cand))
@@ -191,7 +193,9 @@ class SegmentFakeRatesModule(HarvestingModule):
                     if cdc_hit.getISuperLayer() % 2 == 1:
                         partner_has_stereo_information = 1
 
-        return dict(is_background=is_background,
+        return dict(superlayer_of_segment=superlayer_of_segment,
+                    mc_track_dist=mc_track_dist,
+                    is_background=is_background,
                     is_ghost=is_ghost,
                     is_matched=is_matched,
                     is_clone=is_clone,

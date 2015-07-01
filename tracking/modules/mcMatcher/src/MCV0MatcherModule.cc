@@ -50,9 +50,9 @@ void MCV0MatcherModule::initialize()
   StoreArray<V0>::required(m_V0ColName);
   StoreArray<MCParticle>::required(m_MCParticleColName);
 
-  StoreArray<V0> V0s(m_V0ColName);
+  StoreArray<V0> v0s(m_V0ColName);
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
-  V0s.registerRelationTo(mcParticles);
+  v0s.registerRelationTo(mcParticles);
 }
 
 
@@ -62,7 +62,7 @@ void MCV0MatcherModule::beginRun()
 
 void MCV0MatcherModule::event()
 {
-  StoreArray<V0> v0s;
+  StoreArray<V0> v0s(m_V0ColName);
   B2DEBUG(200, (v0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
 
   for (auto& v0 : v0s) {

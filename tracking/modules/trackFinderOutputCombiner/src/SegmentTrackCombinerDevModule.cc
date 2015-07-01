@@ -24,6 +24,7 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   SegmentTrackCombinerImplModule<>(),
   m_segmentTrackChooserFirstStepFactory("tmva"),
   m_backgroundSegmentsFilterFactory("tmva"),
+  m_newSegmentsFilterFactory("tmva"),
   m_segmentTrackChooserSecondStepFactory("tmva"),
   m_segmentTrainFilterFactory("simple"),
   m_segmentTrackFilterFactory("simple")
@@ -32,6 +33,7 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
 
   m_segmentTrackChooserFirstStepFactory.exposeParameters(this);
   m_backgroundSegmentsFilterFactory.exposeParameters(this);
+  m_newSegmentsFilterFactory.exposeParameters(this);
   m_segmentTrackChooserSecondStepFactory.exposeParameters(this);
   m_segmentTrainFilterFactory.exposeParameters(this);
   m_segmentTrackFilterFactory.exposeParameters(this);
@@ -46,6 +48,9 @@ void SegmentTrackCombinerDevModule::initialize()
   std::unique_ptr<BaseBackgroundSegmentsFilter> ptrBackgroundSegmentsFilter = m_backgroundSegmentsFilterFactory.create();
   setBackgroundSegmentFilter(std::move(ptrBackgroundSegmentsFilter));
 
+  std::unique_ptr<BaseNewSegmentsFilter> ptrNewSegmentsFilter = m_newSegmentsFilterFactory.create();
+  setNewSegmentFilter(std::move(ptrNewSegmentsFilter));
+
   std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserSecondStep = m_segmentTrackChooserSecondStepFactory.create();
   setSegmentTrackChooserSecondStep(std::move(ptrSegmentTrackChooserSecondStep));
 
@@ -59,6 +64,7 @@ void SegmentTrackCombinerDevModule::initialize()
 
   if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
       getBackgroundSegmentFilter()->needsTruthInformation() or
+      getNewSegmentFilter()->needsTruthInformation() or
       getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
       getSegmentTrackFilter()->needsTruthInformation()) {
@@ -72,6 +78,7 @@ void SegmentTrackCombinerDevModule::event()
 {
   if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
       getBackgroundSegmentFilter()->needsTruthInformation() or
+      getNewSegmentFilter()->needsTruthInformation() or
       getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
       getSegmentTrackFilter()->needsTruthInformation()) {

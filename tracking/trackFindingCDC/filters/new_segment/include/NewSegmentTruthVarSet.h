@@ -9,83 +9,56 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
+#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentVarSet.h>
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
-#include <vector>
-#include <string>
-#include <assert.h>
-
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
 
-
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const backgroundSegmentNames[] = {
-      "is_stereo",
-      "superlayer_id",
-      "size",
-
-      "number_of_hit_layers",
-      //"form_function",
-
-      "total_number_of_neighbors",
-      "mean_number_of_neighbors",
-
-      "total_drift_length",
-      "mean_drift_length",
-      "variance_drift_length",
-
-      "total_inner_distance",
-      "mean_inner_distance",
-      "distance_to_superlayer_center",
-
-      "total_adc_count",
-      "mean_adc_count",
-      "variance_adc_count",
-
-      "number_of_taken_hits"
+    static char const* const newSegmentTruthNames[] = {
+      "segment_is_fake_truth",
+      "track_is_alrady_found_truth",
+      "truth"
     };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a segment.
      */
-    class BackgroundSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    class NewSegmentTruthVarNames : public VarNames<CDCRecoSegment2D> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 16;
+      static const size_t nNames = 3;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return backgroundSegmentNames[iName];
+        return newSegmentTruthNames[iName];
       }
+
+      /// Marking that the basic cluster variables should be included.
+      typedef NewSegmentVarSet NestedVarSet;
     };
 
-    /** Class that computes floating point variables from the segments.
+    /** Class that computes floating point variables from a segment.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class BackgroundSegmentVarSet : public VarSet<BackgroundSegmentVarNames> {
+    class NewSegmentTruthVarSet : public VarSet<NewSegmentTruthVarNames> {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      BackgroundSegmentVarSet(const std::string& prefix = "") : VarSet<BackgroundSegmentVarNames>(prefix) { }
+      NewSegmentTruthVarSet(const std::string& prefix = "") : VarSet<NewSegmentTruthVarNames>(prefix) { }
 
-      /// Generate and assign the variables from the pair
+      /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override final);
 
-      /// Initialize the peeler before event processing
-      virtual void initialize() IF_NOT_CINT(override final)
-      {
-        prepareSuperLayerCenterArray();
-      }
     };
   }
 }

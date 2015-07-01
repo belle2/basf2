@@ -10,31 +10,35 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentVarSet.h>
+#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Filter for the construction of good segment - track pairs
-    class SimpleBackgroundSegmentsFilter : public FilterOnVarSet<BackgroundSegmentVarSet> {
+    class MCNewSegmentsFilter : public FilterOnVarSet<NewSegmentTruthVarSet> {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<BackgroundSegmentVarSet> Super;
+      typedef FilterOnVarSet<NewSegmentTruthVarSet> Super;
 
     public:
       /// Constructor
-      SimpleBackgroundSegmentsFilter() : Super() { }
+      MCNewSegmentsFilter() : Super() { }
 
-    public:
-      virtual CellWeight operator()(const CDCRecoSegment2D& segment) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCRecoSegment2D& segment) IF_NOT_CINT(override final)
+      {
+        Super::operator()(segment);
+        const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
 
-    private:
-
+        if (varSet.at("truth") == 0.0)
+          return NOT_A_CELL;
+        else
+          return 1.0;
+      }
     };
   }
 }

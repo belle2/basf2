@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentVarSet.h>
+#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -20,7 +20,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool BackgroundSegmentVarSet::extract(const CDCRecoSegment2D* segment)
+bool NewSegmentVarSet::extract(const CDCRecoSegment2D* segment)
 {
   extractNested(segment);
 
@@ -96,6 +96,10 @@ bool BackgroundSegmentVarSet::extract(const CDCRecoSegment2D* segment)
     }
   }
 
+  // Fit information
+  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+  CDCTrajectory2D trajectory = fitter.fit(*segment);
+
   var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
   var<named("size")>() = size;
 
@@ -118,5 +122,9 @@ bool BackgroundSegmentVarSet::extract(const CDCRecoSegment2D* segment)
   var<named("mean_adc_count")>() = totalADCCount / size;
   var<named("mean_inner_distance")>() = totalInnerDistance / size;
   var<named("mean_number_of_neighbors")>() = 1.0 * totalNNeighbors / size;
+
+  var<named("fit_prob")>() = trajectory.getPValue();
+  //var<named("fitted_pt")>() = trajectory.getAbsMom2D();
+  var<named("fitted_d0")>() = trajectory.getDist2D(Vector2D());
   return true;
 }

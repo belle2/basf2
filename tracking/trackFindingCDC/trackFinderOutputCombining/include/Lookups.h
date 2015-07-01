@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/background_segment/BaseBackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/BaseNewSegmentsFilter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -161,6 +162,13 @@ namespace Belle2 {
        * @param backgroundSegmentFilter
        */
       void filter(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
+
+      /**
+       * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.
+       * For deciding which is new or not we use the given filter.
+       * @param newSegmentFilter
+       */
+      void filterOutNewSegments(BaseNewSegmentsFilter& newSegmentFilter);
 
       /**
        * Do the heavy combining works:

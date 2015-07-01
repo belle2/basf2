@@ -7,20 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/trackFindingCDC/filters/background_segment/SimpleBackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-using namespace std;
-using namespace Belle2;
-using namespace TrackFindingCDC;
-
-
-CellWeight SimpleBackgroundSegmentsFilter::operator()(const CDCRecoSegment2D& segment)
-{
-  Super::operator()(segment);
-
-  // TODO
-
-  // Means: yes
-  return 1.0;
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    typedef Filter<CDCRecoSegment2D> BaseNewSegmentsFilter;
+  }
 }

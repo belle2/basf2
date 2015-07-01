@@ -7,27 +7,25 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/background_segment/MCBackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/AllBackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/RecordingBackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/new_segment/MCNewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/TMVANewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/RecordingNewSegmentsFilter.h>
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-#include <tracking/trackFindingCDC/filters/background_segment/TMVABackgroundSegmentsFilter.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 std::map<std::string, std::string>
-BackgroundSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
+NewSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
 
   filterNames.insert({
     {"truth", "monte carlo truth"},
-    {"all", "set all segments as good"},
     {"none", "no segment track combination is valid"},
     {"recording", "record variables to a TTree"},
     {"tmva", "test with a tmva method"}
@@ -35,30 +33,28 @@ BackgroundSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
   return filterNames;
 }
 
-std::unique_ptr<BaseBackgroundSegmentsFilter>
-BackgroundSegmentsFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseNewSegmentsFilter>
+NewSegmentsFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new BaseBackgroundSegmentsFilter());
+    return std::unique_ptr<BaseNewSegmentsFilter>(new BaseNewSegmentsFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new MCBackgroundSegmentsFilter());
-  } else if (filterName == string("all")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new AllBackgroundSegmentsFilter());
+    return std::unique_ptr<BaseNewSegmentsFilter>(new MCNewSegmentsFilter());
   } else if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter());
+    return std::unique_ptr<BaseNewSegmentsFilter>(new TMVANewSegmentsFilter());
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter());
+    return std::unique_ptr<BaseNewSegmentsFilter>(new RecordingNewSegmentsFilter());
   } else {
     return Super::create(filterName);
   }
 }
 
-std::string BackgroundSegmentsFilterFactory::getFilterPurpose() const
+std::string NewSegmentsFilterFactory::getFilterPurpose() const
 {
   return "Segment background finder.";
 }
 
-std::string BackgroundSegmentsFilterFactory::getModuleParamPrefix() const
+std::string NewSegmentsFilterFactory::getModuleParamPrefix() const
 {
-  return "BackgroundSegments";
+  return "NewSegments";
 }

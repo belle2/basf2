@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/background_segment/BaseBackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/BaseNewSegmentsFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
@@ -22,15 +22,15 @@ namespace Belle2 {
      * It knows about all available filters and their parameters.
      * Can collaborate with a Module and expose these parameters to the user in steering files.
      */
-    class BackgroundSegmentsFilterFactory : public FilterFactory<BaseBackgroundSegmentsFilter> {
+    class NewSegmentsFilterFactory : public FilterFactory<BaseNewSegmentsFilter> {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseBackgroundSegmentsFilter> Super;
+      typedef FilterFactory<BaseNewSegmentsFilter> Super;
 
     public:
       /** Fill the default filter name and parameter values*/
-      BackgroundSegmentsFilterFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
+      NewSegmentsFilterFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
 
       using Super::create;
 
@@ -38,7 +38,7 @@ namespace Belle2 {
       virtual std::string getFilterPurpose() const override;
 
       /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseBackgroundSegmentsFilter> create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseNewSegmentsFilter> create(const std::string& name) const override;
 
       /** Getter for the valid filter names and a description for each */
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
@@ -46,6 +46,5 @@ namespace Belle2 {
       /** Getter for the prefix prepended to a Module parameter.*/
       virtual std::string getModuleParamPrefix() const override;
     };
-
   }
 }

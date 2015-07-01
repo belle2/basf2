@@ -186,6 +186,21 @@ void SegmentTrackCombiner::filter(BaseBackgroundSegmentsFilter& backgroundSegmen
   }
 }
 
+void SegmentTrackCombiner::filterOutNewSegments(BaseNewSegmentsFilter& newSegmentsFilter)
+{
+  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+    for (SegmentInformation* segment : segments) {
+      if (segment->isAlreadyTaken())
+        continue;
+      Weight filterResult = newSegmentsFilter(segment->getSegment());
+      if (not isNotACell(filterResult)) {
+        segment->getSegment()->getAutomatonCell().setTakenFlag();
+        segment->getSegment()->getAutomatonCell().setAssignedFlag();
+      }
+    }
+  }
+}
+
 
 void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserSecondStep,
                                    BaseSegmentTrainFilter& /*segmentTrainFilter*/,

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sb
+sb.set()
 import pandas as pd
 from root_pandas import read_root
 import numpy as np
@@ -90,7 +91,7 @@ class IPythonHandler:
         TODO
         ----
 
-        Create a pool of workers!
+        Create a pool of workers! Return a CalculationList with some small helper functions!
         """
 
         calculation_list = _Basf2CalculationList(path_creator_function, *list_of_parameters)
@@ -428,7 +429,11 @@ class ProgressBarViewer(object):
         js = """
         <script type="text/Javascript">
         function set_event_number(number) {
-            $("#""" + self.js_name + """ > .event_number").html("Percentage: " + 100 * number + "");
+            if(isNaN(number)) {
+                $("#""" + self.js_name + """ > .event_number").html("Status: " + number + "");
+            } else {
+                $("#""" + self.js_name + """ > .event_number").html("Percentage: " + 100 * number + "");
+            }
 
             var progressbar = $("#""" + self.js_name + """ > .progressbar");
             var progressbarValue = progressbar.find( ".ui-progressbar-value" );
@@ -499,7 +504,7 @@ class ProgressPython(basf2.Module):
         self.queue = queue
         self.event_number = 0
         self.total_number_of_events = 0
-        self.queue.send(self.event_number)
+        self.queue.send("init")
 
     def initialize(self):
         """ Send start to the connection """
@@ -512,15 +517,19 @@ class ProgressPython(basf2.Module):
 
     def event(self):
         """ Send the event number to the connection """
-        if self.total_number_of_events != 0:
-            self.queue.send(1.0 * self.event_number / self.total_number_of_events)
-        else:
-            self.queue.send(self.total_number_of_events)
+        if self.total_number_of_events == 0:
+            return
+
+        current_percentage = 1.0 * self.event_number / self.total_number_of_events
+
+        if 100 * current_percentage % 5 == 0:
+            self.queue.send(current_percentage)
+
         self.event_number += 1
 
     def terminate(self):
         """ Send stop to the connection """
-        self.queue.send(self.event_number)
+        self.queue.send(1)
         self.queue.send("end")
 
 
@@ -645,3 +654,37 @@ class TrackingValidationResult:
         if self.additional_information:
             result.update(self.additional_information)
         return df.append(result, ignore_index=True)
+
+
+class TMVAPlotter():
+
+    def __init__(self):
+        pass
+
+    def grouper(self, data, truth_value, non_truth_value, truth_column):
+        if data.size == 0:
+            return None
+        if (data[truth_column] == 1).all():
+            return truth_value
+        else:
+            return non_truth_value
+
+    def hatcher(self, X, truth_column):
+        return self.grouper(X, "//", "", truth_column)
+
+    def filler(self, X, truth_column):
+        return self.grouper(X, False, True, truth_column)
+
+    def labeler(self, X, truth_column):
+        return self.grouper(X, "signal", "background", truth_column)
+
+    def plot_splitted(self, data, column_name, title=None, truth_column="truth"):
+        grouped = data.groupby(data[truth_column])
+        for name, X in grouped:
+            X[column_name].hist(normed=True, histtype="bar", hatch=self.hatcher(X, truth_column),
+                                fill=self.filler(X, truth_column), label=self.labeler(X, truth_column))
+
+        plt.title(title)
+        plt.legend()
+
+tmvaPlotter = TMVAPlotter()

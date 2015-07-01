@@ -9,21 +9,25 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilter.h>
+
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Background cluster detection based on TMVA.
-    class TMVABackgroundSegmentsFilter: public TMVAFilter<BackgroundSegmentVarSet> {
+    /// Filter for the construction of good segment trains - track pairs
+    class SimpleSegmentInformationListTrackFilter : public BaseSegmentInformationListTrackFilter {
 
     public:
-      /// Constructor initialising the TMVAFilter with standard training name for this filter.
-      TMVABackgroundSegmentsFilter(const std::string& filename  = "BackgroundSegmentsFilter") :
-        TMVAFilter<BackgroundSegmentVarSet>(filename)
-      {;}
+      /// Constructor
+      SimpleSegmentInformationListTrackFilter() : BaseSegmentInformationListTrackFilter() { }
 
+    public:
+      virtual CellWeight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair) IF_NOT_CINT(
+        override final);
     };
   }
 }

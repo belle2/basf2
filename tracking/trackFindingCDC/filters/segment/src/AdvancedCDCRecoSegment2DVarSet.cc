@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment/AdvancedRecoSegment2DVarSet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -20,7 +20,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool NewSegmentVarSet::extract(const CDCRecoSegment2D* segment)
+bool AdvancedCDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* segment)
 {
   extractNested(segment);
 

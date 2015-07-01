@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
@@ -30,7 +30,9 @@ namespace Belle2 {
 
     public:
       /** Fill the default filter name and parameter values*/
-      SegmentTrainFilterFactory(const std::string& defaultFilterName = "simple");
+      SegmentTrainFilterFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName)
+      {
+      }
 
       using Super::create;
 
@@ -38,13 +40,19 @@ namespace Belle2 {
       virtual std::unique_ptr<BaseSegmentTrainFilter> create(const std::string& name) const override;
 
       /** Getter for a descriptive purpose of the filter.*/
-      virtual std::string getFilterPurpose() const override;
+      virtual std::string getFilterPurpose() const override
+      {
+        return "Segment train filter to be used during the construction of segment trains.";
+      }
 
       /** Getter for the valid filter names and a description for each */
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
       /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override;
+      virtual std::string getModuleParamPrefix() const override
+      {
+        return "SegmentTrain";
+      }
 
     };
   }

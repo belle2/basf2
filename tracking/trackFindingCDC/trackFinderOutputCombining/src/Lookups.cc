@@ -70,7 +70,7 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
   }
 }
 
-void SegmentTrackCombiner::match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep)
+void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirstStep)
 {
   // Mark the segments which are fully found by the legendre track finder as taken
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
@@ -202,9 +202,9 @@ void SegmentTrackCombiner::filterOutNewSegments(BaseNewSegmentsFilter& newSegmen
 }
 
 
-void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserSecondStep,
+void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackChooserSecondStep,
                                    BaseSegmentTrainFilter& /*segmentTrainFilter*/,
-                                   BaseSegmentTrackFilter& /*segmentTrackFilter*/)
+                                   BaseSegmentInformationListTrackFilter& /*segmentTrackFilter*/)
 {
   B2DEBUG(100, "Starting combining work.");
 
@@ -264,7 +264,8 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackChooser& segmentTrackChooserS
 }
 
 const SegmentTrackCombiner::TrainOfSegments* SegmentTrackCombiner::findBestFittingSegmentTrain(
-  std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation, BaseSegmentTrackFilter& segmentTrackFilter)
+  std::list<TrainOfSegments>& trainsOfSegments, TrackInformation* trackInformation,
+  BaseSegmentInformationListTrackFilter& segmentTrackFilter)
 {
   // We can easily delete all matches here as we have them in the list anyway
   trackInformation->clearMatches();
@@ -398,7 +399,7 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
 
 
 void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments,
-    TrackFindingCDC::BaseSegmentTrackFilter& segmentTrackFilter)
+    TrackFindingCDC::BaseSegmentInformationListTrackFilter& segmentTrackFilter)
 {
   B2DEBUG(100, "Trying to combine " << trainOfSegments.size() << " segment(s) with their track(s)...")
   for (SegmentInformation* segmentInformation : trainOfSegments) {
@@ -491,7 +492,7 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
 }
 
 void SegmentTrackCombiner::matchTracksToSegment(SegmentInformation* segmentInformation,
-                                                BaseSegmentTrackChooser& segmentTrackChooser)
+                                                BaseSegmentTrackFilter& segmentTrackChooser)
 {
   for (TrackInformation* trackInformation : m_trackLookUp) {
     double filterResult = segmentTrackChooser(std::make_pair(segmentInformation->getSegment(), trackInformation->getTrackCand()));

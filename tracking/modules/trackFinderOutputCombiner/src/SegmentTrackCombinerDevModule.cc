@@ -42,7 +42,7 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
 void SegmentTrackCombinerDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserFirstStep = m_segmentTrackChooserFirstStepFactory.create();
+  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackChooserFirstStep = m_segmentTrackChooserFirstStepFactory.create();
   setSegmentTrackChooserFirstStep(std::move(ptrSegmentTrackChooserFirstStep));
 
   std::unique_ptr<BaseBackgroundSegmentsFilter> ptrBackgroundSegmentsFilter = m_backgroundSegmentsFilterFactory.create();
@@ -51,13 +51,13 @@ void SegmentTrackCombinerDevModule::initialize()
   std::unique_ptr<BaseNewSegmentsFilter> ptrNewSegmentsFilter = m_newSegmentsFilterFactory.create();
   setNewSegmentFilter(std::move(ptrNewSegmentsFilter));
 
-  std::unique_ptr<BaseSegmentTrackChooser> ptrSegmentTrackChooserSecondStep = m_segmentTrackChooserSecondStepFactory.create();
+  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackChooserSecondStep = m_segmentTrackChooserSecondStepFactory.create();
   setSegmentTrackChooserSecondStep(std::move(ptrSegmentTrackChooserSecondStep));
 
   std::unique_ptr<BaseSegmentTrainFilter> ptrSegmentTrainFilter = m_segmentTrainFilterFactory.create();
   setSegmentTrainFilter(std::move(ptrSegmentTrainFilter));
 
-  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilter = m_segmentTrackFilterFactory.create();
+  std::unique_ptr<BaseSegmentInformationListTrackFilter> ptrSegmentTrackFilter = m_segmentTrackFilterFactory.create();
   setSegmentTrackFilter(std::move(ptrSegmentTrackFilter));
 
   SegmentTrackCombinerImplModule<>::initialize();

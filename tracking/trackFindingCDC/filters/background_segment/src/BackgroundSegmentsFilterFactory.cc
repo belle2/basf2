@@ -8,12 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/background_segment/MCBackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/AllBackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/RecordingBackgroundSegmentsFilter.h>
-
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-#include <tracking/trackFindingCDC/filters/background_segment/TMVABackgroundSegmentsFilter.h>
 
 using namespace std;
 using namespace Belle2;
@@ -45,9 +40,9 @@ BackgroundSegmentsFilterFactory::create(const std::string& filterName) const
   } else if (filterName == string("all")) {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new AllBackgroundSegmentsFilter());
   } else if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter());
+    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter("BackgroundSegments.root"));
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter());
+    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter("BackgroundSegments.root"));
   } else {
     return Super::create(filterName);
   }

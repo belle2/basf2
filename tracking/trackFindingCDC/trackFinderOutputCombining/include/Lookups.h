@@ -11,11 +11,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BaseBackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/new_segment/BaseNewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -154,7 +154,7 @@ namespace Belle2 {
        * In this case we combine it with the track for which the filter gives the highest result.
        * @param segmentTrackChooserFirstStep
        */
-      void match(BaseSegmentTrackChooser& segmentTrackChooserFirstStep);
+      void match(BaseSegmentTrackFilter& segmentTrackChooserFirstStep);
 
       /**
        * Filter out the segments that are fake or background. Mark them as taken.
@@ -187,9 +187,9 @@ namespace Belle2 {
        * - Now we really have a one-on-one relation between tracks and segments. We can put them all together.
        */
 
-      void combine(BaseSegmentTrackChooser& segmentTrackChooserSecondStep,
+      void combine(BaseSegmentTrackFilter& segmentTrackChooserSecondStep,
                    BaseSegmentTrainFilter& segmentTrainFilter,
-                   BaseSegmentTrackFilter& segmentTrackFilter);
+                   BaseSegmentInformationListTrackFilter& segmentTrackFilter);
 
 
       /**
@@ -208,13 +208,14 @@ namespace Belle2 {
 
       /** Find the best fitting train of segments to a given track from the list */
       const TrainOfSegments* findBestFittingSegmentTrain(std::list<TrainOfSegments>& trainsOfSegments,
-                                                         TrackInformation* trackInformation, BaseSegmentTrackFilter& segmentTrackFilter);
+                                                         TrackInformation* trackInformation, BaseSegmentInformationListTrackFilter& segmentTrackFilter);
 
       /** Go through all segments a combine them to their best matches */
-      void tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments, BaseSegmentTrackFilter& segmentTrackFilter);
+      void tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments,
+                                                    BaseSegmentInformationListTrackFilter& segmentTrackFilter);
 
       /** Do the Segment <-> Track matching */
-      void matchTracksToSegment(SegmentInformation* segmentInformation, BaseSegmentTrackChooser& segmentTrackChooser);
+      void matchTracksToSegment(SegmentInformation* segmentInformation, BaseSegmentTrackFilter& segmentTrackChooser);
 
       /** Make all possible subsets of a given list */
       void makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation,

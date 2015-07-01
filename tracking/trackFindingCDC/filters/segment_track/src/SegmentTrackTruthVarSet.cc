@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/SegmentTrackTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>

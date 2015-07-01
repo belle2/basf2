@@ -12,16 +12,15 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/SimpleSegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/segment_track/BaseSegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_train/BaseSegmentTrainFilter.h>
+
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_train/SimpleSegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BaseBackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/TMVABackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/new_segment/BaseNewSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/new_segment/TMVANewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_information_list_track/SimpleSegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_track/SimpleSegmentTrackFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
@@ -34,23 +33,23 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Forward declaration of the module implementing the segment track combiner based on various filters
-    template < class SegmentTrackChooserFirstStep = TrackFindingCDC::BaseSegmentTrackChooser,
+    template < class SegmentTrackChooserFirstStep = TrackFindingCDC::BaseSegmentTrackFilter,
                class BackgroundSegmentFilter = TrackFindingCDC::BaseBackgroundSegmentsFilter,
                class NewSegmentFilter = TrackFindingCDC::BaseNewSegmentsFilter,
-               class SegmentTrackChooserSecondStep = TrackFindingCDC::BaseSegmentTrackChooser,
+               class SegmentTrackChooserSecondStep = TrackFindingCDC::BaseSegmentTrackFilter,
                class SegmentTrainFilter = TrackFindingCDC::BaseSegmentTrainFilter,
-               class SegmentTrackFilter  = TrackFindingCDC::BaseSegmentTrackFilter>
+               class SegmentTrackFilter  = TrackFindingCDC::BaseSegmentInformationListTrackFilter>
     class SegmentTrackCombinerImplModule;
   }
 
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
   typedef TrackFindingCDC::SegmentTrackCombinerImplModule <
-  TrackFindingCDC::SimpleSegmentTrackChooser,
+  TrackFindingCDC::SimpleSegmentTrackFilter,
                   TrackFindingCDC::TMVABackgroundSegmentsFilter,
                   TrackFindingCDC::TMVANewSegmentsFilter,
-                  TrackFindingCDC::SimpleSegmentTrackChooser,
+                  TrackFindingCDC::SimpleSegmentTrackFilter,
                   TrackFindingCDC::SimpleSegmentTrainFilter,
-                  TrackFindingCDC::SimpleSegmentTrackFilter
+                  TrackFindingCDC::SimpleSegmentInformationListTrackFilter
                   > SegmentTrackCombinerModule;
 
   namespace TrackFindingCDC {

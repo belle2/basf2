@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     IF_NOT_CINT(constexpr)
-    static char const* const backgroundSegmentNames[] = {
+    static char const* const advancedCDCRecoSegment2DVarNames[] = {
       "is_stereo",
       "superlayer_id",
       "size",
@@ -50,33 +50,37 @@ namespace Belle2 {
       "mean_adc_count",
       "variance_adc_count",
 
-      "number_of_taken_hits"
+      "number_of_taken_hits",
+
+      "fit_prob",
+      "fitted_pt",
+      "fitted_d0"
     };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a segment.
      */
-    class BackgroundSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    class AdvancedCDCRecoSegment2DVarNames : public VarNames<CDCRecoSegment2D> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 16;
+      static const size_t nNames = 19;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
       {
-        return backgroundSegmentNames[iName];
+        return advancedCDCRecoSegment2DVarNames[iName];
       }
     };
 
     /** Class that computes floating point variables from the segments.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class BackgroundSegmentVarSet : public VarSet<BackgroundSegmentVarNames> {
+    class AdvancedCDCRecoSegment2DVarSet : public VarSet<AdvancedCDCRecoSegment2DVarNames> {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      BackgroundSegmentVarSet(const std::string& prefix = "") : VarSet<BackgroundSegmentVarNames>(prefix) { }
+      AdvancedCDCRecoSegment2DVarSet(const std::string& prefix = "") : VarSet<AdvancedCDCRecoSegment2DVarNames>(prefix) { }
 
       /// Generate and assign the variables from the pair
       virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override final);

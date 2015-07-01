@@ -10,28 +10,26 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentTruthVarSet.h>
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter for the construction of good segment - track pairs
-    class MCBackgroundSegmentsFilter : public FilterOnVarSet<BackgroundSegmentTruthVarSet> {
+    /// Base MC Filter
+    template <class TruthVarSet>
+    class MCFilter : public FilterOnVarSet<TruthVarSet> {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<BackgroundSegmentTruthVarSet> Super;
+      typedef FilterOnVarSet<TruthVarSet> Super;
+      typedef typename TruthVarSet::Object Object;
 
     public:
       /// Constructor
-      MCBackgroundSegmentsFilter() : Super() { }
+      MCFilter() : Super() { }
 
-      virtual CellWeight operator()(const CDCRecoSegment2D& segment) IF_NOT_CINT(override final)
+      virtual CellWeight operator()(const Object& object) IF_NOT_CINT(override final)
       {
-        Super::operator()(segment);
+        Super::operator()(object);
         const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
 
         if (varSet.at("truth") == 0.0)

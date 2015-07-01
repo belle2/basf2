@@ -7,7 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segment_information_list_track/SimpleSegmentInformationListTrackFilter.h>
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
@@ -16,7 +17,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 std::map<std::string, std::string>
-NewSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
+SegmentInformationListTrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -24,34 +25,28 @@ NewSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
   filterNames.insert({
     {"truth", "monte carlo truth"},
     {"none", "no segment track combination is valid"},
-    {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
+    {"simple", "mc free with simple criteria"},
+    {"tmva", "test using tmva methods"},
+    {"recording", "Record to a ttree"}
+
   });
   return filterNames;
 }
 
-std::unique_ptr<BaseNewSegmentsFilter>
-NewSegmentsFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseSegmentInformationListTrackFilter>
+SegmentInformationListTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new BaseNewSegmentsFilter());
+    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new BaseSegmentInformationListTrackFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new MCNewSegmentsFilter());
+    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new MCSegmentInformationListTrackFilter());
+  } else if (filterName == string("simple")) {
+    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new SimpleSegmentInformationListTrackFilter());
   } else if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new TMVANewSegmentsFilter("NewSegmentsFilter.root"));
+    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new TMVASegmentInformationListTrackFilter());
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new RecordingNewSegmentsFilter("NewSegmentsFilter.root"));
+    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new RecordingSegmentInformationListTrackFilter());
   } else {
     return Super::create(filterName);
   }
-}
-
-std::string NewSegmentsFilterFactory::getFilterPurpose() const
-{
-  return "Segment background finder.";
-}
-
-std::string NewSegmentsFilterFactory::getModuleParamPrefix() const
-{
-  return "NewSegments";
 }

@@ -9,20 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/BaseSegmentTrackChooser.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/SegmentTrackTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    class RecordingSegmentTrackChooser: public RecordingFilter<SegmentTrackTruthVarSet> {
-
-    public:
-      /// Constructor initialising the RecordingFilter with standard root file name for this filter.
-      RecordingSegmentTrackChooser(const std::string& filename = "SegmentTrackChooserFirstStep.root") :
-        RecordingFilter<SegmentTrackTruthVarSet>(filename)
-      {;}
+    template <class Type>
+    class AllFilter : public Type {
+      /** Accept all segment track combinations */
+      virtual CellWeight operator()(const typename Type::Object&) override final
+      {
+        return 1;
+      }
 
     };
   }

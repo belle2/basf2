@@ -10,12 +10,26 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    typedef Filter<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>> BaseSegmentTrainFilter;
+    using BaseSegmentTrainFilter = Filter<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>>;
+
+    using MCSegmentTrainFilter = MCFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
+
+    using RecordingSegmentTrainFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
+
+    using AllSegmentTrainFilter = AllFilter<BaseSegmentTrainFilter>;
+
+    using TMVASegmentTrainFilter = TMVAFilter<SegmentTrainVarSet>;
   }
 }

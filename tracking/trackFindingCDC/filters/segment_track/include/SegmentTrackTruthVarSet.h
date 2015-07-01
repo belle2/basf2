@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_track_chooser/SegmentTrackVarSet.h>
-
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
@@ -45,9 +43,6 @@ namespace Belle2 {
       {
         return segmentTrackTruthNames[iName];
       }
-
-      /// Marking that the basic cluster variables should be included.
-      typedef SegmentTrackVarSet NestedVarSet;
     };
 
     /** Class that computes floating point variables from a wire hit clusters.

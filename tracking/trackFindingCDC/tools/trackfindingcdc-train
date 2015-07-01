@@ -52,6 +52,13 @@ def main():
         action="store_true",
         help="Show the tmva results immediatly."
         )
+    
+    argument_parser.add_argument(
+        "--truth",
+        type=str,
+        default="truth",
+        help="Name of the column containing the truth information."
+        )
 
 
     arguments = argument_parser.parse_args()
@@ -74,6 +81,7 @@ def main():
             decision_tree_name,
             weights_file_path,
             replace_nan=arguments.replace_nan,
+            truth=arguments.truth
             )
 
         classifer.train(input_tree)

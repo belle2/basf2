@@ -341,7 +341,6 @@ class CDCSVGDisplayModule(Module):
         # Draw wires from cdcwire objects
         # Now prefered way of ploting the wires
         if self.draw_wires:
-            print 'Drawing wires'
             theCDCWireTopology = \
                 Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
 
@@ -366,8 +365,6 @@ class CDCSVGDisplayModule(Module):
         """
         Event method of the module. Draws the event into a new svg file.
         """
-
-        print '##################### DISPLAY EVENT ###########################'
 
         # Clone the plotter that contains the wires already
         if self.use_cpp:

@@ -4,14 +4,15 @@
 import os
 import sys
 
-if len(sys.argv) != 5:
+if len(sys.argv) != 6:
     sys.exit(
-        'Must provide enough arguments: [# of jobs] [# of events per job] [output directory] [output file name without ".root"]')
+        'Must provide arguments: [# of jobs] [# of events/job] [output dir] [output filename without ".root"] [sim & rec ?: 1/0]')
 
 nJobs = int(sys.argv[1])
 nEvents = int(sys.argv[2])
 outputDir = sys.argv[3]
 outputName = sys.argv[4]
+simrec = sys.argv[5]
 
 # Log directory for log files
 logDirectory = 'log/'
@@ -28,7 +29,7 @@ for x in range(1, nJobs + 1):
     logFile = logDirectory + 'charmlessSL-' + str(nEvents) + '-' + str(x) + '.log'
     # Define command string
     command = 'bsub -q s -o ' + logFile + ' basf2 skimCharmlessSL.py ' + \
-        str(nEvents) + ' ' + outputDir + ' ' + outputName + '-' + str(x) + '.root'
+        str(nEvents) + ' ' + outputDir + ' ' + outputName + '-' + str(x) + '.root' + ' ' + simrec
     # Print out the command
     print command
     # Evaluate the command

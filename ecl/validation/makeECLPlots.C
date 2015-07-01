@@ -26,7 +26,7 @@ void ECLMuon(TTree* muon_tree);
 void ECLPi0(TTree* pi0_tree);
 void ECLPion(TTree* pion_tree);
 
-void makePlots() 
+void makeECLPlots() 
 {
   
   TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
@@ -137,35 +137,35 @@ void ECLCluster(TTree* cluster_tree)
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
   cluster_tree->Draw("eclClusterMultip>>hMultip");
 
-  TH1F* hEnergy = new TH1F("hEnergy","Reconstructed Cluster Energy", 100, 0., 0.55);
+  TH1F* hEnergy = new TH1F("hEnergy","Reconstructed Cluster Energy", 120, 0., 0.6);
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Deposited energy for 500 MeV/c single photons"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnergy->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   cluster_tree->Draw("eclClusterEnergy>>hEnergy");
 
-  TH1F* hEnDepSum = new TH1F("hEnDepSum","Uncorrected Reconstructed Cluster Energy", 100, 0., 0.55);
+  TH1F* hEnDepSum = new TH1F("hEnDepSum","Uncorrected Reconstructed Cluster Energy", 120, 0., 0.6);
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 500 MeV/c single photons"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnDepSum->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   cluster_tree->Draw("eclClusterEnergyDepSum>>hEnDepSum");
 
-  TH1F* hHighestE = new TH1F("hHighestE","Highest Energy Deposit", 100, 0., 0.55);
+  TH1F* hHighestE = new TH1F("hHighestE","Highest Energy Deposit", 100, 0., 0.50);
   hHighestE->GetListOfFunctions()->Add(new TNamed("Description", "Highest energy deposited in a crystal for 500 MeV/c single photons"));
   hHighestE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hHighestE->GetXaxis()->SetTitle("Deposited Energy(GeV)");
   hHighestE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   cluster_tree->Draw("eclClusterHighestE>>hHighestE");
 
-  TH1F* hE9oE25 = new TH1F("hE9oE25","E9/E25", 100, 0., 1.05);
+  TH1F* hE9oE25 = new TH1F("hE9oE25","E9/E25", 120, 0., 1.2);
   hE9oE25->GetListOfFunctions()->Add(new TNamed("Description", "Energy deposited in 3x3 matrix around most energetic deposit over energy deposited in 5x5 matrix around most energetic deposit 500 MeV/c single photons"));
   hE9oE25->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape."));
   hE9oE25->GetXaxis()->SetTitle("E9oE25");
   hE9oE25->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   cluster_tree->Draw("eclClusterE9oE25>>hE9oE25");
 
-  TH1F* hphi = new TH1F("hphi", "Reconstructed #phi Angle", 50,-3.155,3.155);
+  TH1F* hphi = new TH1F("hphi", "Reconstructed #phi Angle", 128, -3.2, 3.2);
   hphi->GetListOfFunctions()->Add(new TNamed("Description", "Reconstructed #phi angle of the cluster for 500 MeV/c single photons"));
   hphi->GetListOfFunctions()->Add(new TNamed("Check","Consistent shape, flat distribution"));
   hphi->GetXaxis()->SetTitle("#phi (rad)");
@@ -191,7 +191,7 @@ void ECLBkg(TTree* bkg_tree)
 
   TFile* output = TFile::Open("ECLBkg.root", "recreate");
 
-  TH1F* bkgClusterE = new TH1F("bkgClusterE", "Cluster energy, bkg only", 100, 0., 0.5);
+  TH1F* bkgClusterE = new TH1F("bkgClusterE", "Cluster energy, bkg only", 60, 0., 0.3);
   bkgClusterE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for bkg clusters")); 
   bkgClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be peaked at 0"));
@@ -199,10 +199,10 @@ void ECLBkg(TTree* bkg_tree)
   bkg_tree->Draw("eclClusterEnergy>>bkgClusterE","eclClusterEnergy>0");
   bkgClusterE->Write();
 
-  TH1F* bkgClusterMultip = new TH1F("bkgClusterMultip", "Cluster multiplicity bkg only", 150, 0, 300);
+  TH1F* bkgClusterMultip = new TH1F("bkgClusterMultip", "Cluster multiplicity bkg only", 100, 0, 100);
   bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity Bkg");
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for bkg")); 
-  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 160 (Jan 2015)"));
+  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2016)"));
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   bkg_tree->Draw("eclClusterMultip>>bkgClusterMultip","eclClusterMultip>0");
   bkgClusterMultip->Write();
@@ -216,66 +216,56 @@ void ECL2D(TTree* bkg_tree)
 
   TFile* output = TFile::Open("ECL2D.root", "recreate");
 
-  TH2F* BDyz = new TH2F("BDyz", "Cluster position", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz1 = new TH2F("BDyz1", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz2 = new TH2F("BDyz2", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz3 = new TH2F("BDyz3", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz4 = new TH2F("BDyz4", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz5 = new TH2F("BDyz5", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz6 = new TH2F("BDyz6", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
+  TCanvas* c1=new TCanvas("c1","",800,600);
+  //gStyle->SetOptStat(0);
+
+  TH2F* BDyz = new TH2F("BDyz", "SimHit position transverse plane", 800, -150, 250, 720, -180, 180);
+  TH2F* BDyz2 = new TH2F("BDyz2", "SimHit position transverse plane", 800, -150, 250, 720, -180, 180);
   
-  BDyz->GetXaxis()->SetTitle("x (m)");
-  BDyz->GetYaxis()->SetTitle("y (m)");
-  BDyz->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the ecl (upper part is phi<0, lower part phi>0)")); 
+  BDyz->GetXaxis()->SetTitle("x (cm)");
+  BDyz->GetYaxis()->SetTitle("y (cm)");
+  BDyz->GetListOfFunctions()->Add(new TNamed("Description","SimHit position in the ecl")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  //1.9616 x1 FWD
+  bkg_tree->Draw("(TMath::Sqrt(eclSimHitX*eclSimHitX+eclSimHitY*eclSimHitY)):(eclSimHitZ)>>BDyz","eclSimHitY>0");
+  bkg_tree->Draw("(-TMath::Sqrt(eclSimHitX*eclSimHitX+eclSimHitY*eclSimHitY)):(eclSimHitZ)>>BDyz2","eclSimHitY<0");
 
-  bkg_tree->Draw("(TMath::Tan(eclClusterTheta))*(1.9616):1.9616>>BDyz","TMath::Abs(eclClusterTheta)<31.36*(3.1415/180)&&(eclClusterPhi<0)");
-  bkg_tree->Draw("1.250:(1.250*(TMath::Cos(eclClusterTheta))/((TMath::Sin(eclClusterTheta))))>>BDyz2","(eclClusterTheta>32.20*(3.1415/180))&&eclClusterTheta<(180-51.28)*(3.1415/180)&&(eclClusterPhi<0)");
-  bkg_tree->Draw("(-TMath::Tan(eclClusterTheta))*(1.0216):-1.0216>>BDyz3","TMath::Abs(eclClusterTheta)>(180-48.5)*(3.1415/180)&&eclClusterPhi<(0)");
-  bkg_tree->Draw("(-(TMath::Tan(eclClusterTheta))*(1.9616)):1.9616>>BDyz4","TMath::Abs(eclClusterTheta)<31.36*(3.1415/180)&&(eclClusterPhi>0)");
-  bkg_tree->Draw("(-1.250):(1.250*(TMath::Cos(eclClusterTheta))/((TMath::Sin(eclClusterTheta))))>>BDyz5","(eclClusterTheta>32.20*(3.1415/180))&&eclClusterTheta<(180-51.28)*(3.1415/180)&&(eclClusterPhi>0)");
-  bkg_tree->Draw("((TMath::Tan(eclClusterTheta))*(1.0216)):-1.0216>>BDyz6","TMath::Abs(eclClusterTheta)>(180-48.5)*(3.1415/180)&&(eclClusterPhi>0)");
+  BDyz->Add(BDyz2);
 
-  BDyz->Add(BDyz2, 1);
-  BDyz->Add(BDyz3, 1);
-  BDyz->Add(BDyz4, 1);
-  BDyz->Add(BDyz5, 1);
-  BDyz->Add(BDyz6, 1);
   BDyz->Draw("colz");
   BDyz->Write();
 
-  TH2F* BDyz7 = new TH2F("BDyz7", "Cluster position FWD", 200, -2, 2, 200, -1.5, 1.5);
-  TH2F* BDyz8 = new TH2F("BDyz8", "Cluster position BWD", 200, -2, 2, 200, -1.5, 1.5);
+  TH2F* BDyz7 = new TH2F("BDyz7", "SimHit position FWD", 800, -200, 200, 600, -150, 150);
+  TH2F* BDyz8 = new TH2F("BDyz8", "SimHit position BWD", 800, -200, 200, 600, -150, 150);
 
-  BDyz7->GetXaxis()->SetTitle("x (m)");
-  BDyz7->GetYaxis()->SetTitle("y (m)");
-  BDyz7->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the FWD ecl")); 
+  BDyz7->GetXaxis()->SetTitle("x (cm)");
+  BDyz7->GetYaxis()->SetTitle("y (cm)");
+  BDyz7->GetListOfFunctions()->Add(new TNamed("Description","SimHit position in the FWD ecl")); 
   BDyz7->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz7->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  bkg_tree->Draw("(2.402*TMath::Cos(eclClusterPhi)*TMath::Sin(eclClusterTheta)):(2.402*TMath::Sin(eclClusterPhi)*TMath::Sin(eclClusterTheta))>>BDyz7","TMath::Abs(eclClusterTheta)<31.36*(3.1415/180)");
+  bkg_tree->Draw("(eclSimHitX):(eclSimHitY)>>BDyz7","eclSimHitCellId<1153");
   BDyz7->Draw("colz");
   BDyz7->Write();
 
-  BDyz8->GetXaxis()->SetTitle("x (m)");
-  BDyz8->GetYaxis()->SetTitle("y (m)");
-  BDyz8->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the BWD ecl")); 
+  BDyz8->GetXaxis()->SetTitle("x (cm)");
+  BDyz8->GetYaxis()->SetTitle("y (cm)");
+  BDyz8->GetListOfFunctions()->Add(new TNamed("Description","SimHit position in the BWD ecl")); 
   BDyz8->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz8->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  bkg_tree->Draw("(1.669*TMath::Cos(eclClusterPhi)*TMath::Sin(eclClusterTheta)):(1.669*TMath::Sin(eclClusterPhi)*TMath::Sin(eclClusterTheta))>>BDyz8","TMath::Abs(eclClusterTheta)>(180-48.5)*(3.1415/180)");
+  bkg_tree->Draw("(eclSimHitX):(eclSimHitY)>>BDyz8","eclSimHitCellId>7776");
   BDyz8->Draw("colz");
   BDyz8->Write();
 
-  TH2F* BDyz9 = new TH2F("BDyz9", "Cluster position barrel", 200, -2, 2, 200, -1.5, 1.5);
-  BDyz9->GetXaxis()->SetTitle("x (m)");
-  BDyz9->GetYaxis()->SetTitle("y (m)");
-  BDyz9->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in barrel ecl")); 
+  TH2F* BDyz9 = new TH2F("BDyz9", "SimHit position barrel", 960, -240, 240, 720, -180, 180);
+  BDyz9->GetXaxis()->SetTitle("x (cm)");
+  BDyz9->GetYaxis()->SetTitle("y (cm)");
+  BDyz9->GetListOfFunctions()->Add(new TNamed("Description","SimHit position in barrel ecl")); 
   BDyz9->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz9->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  bkg_tree->Draw("(1.250*TMath::Cos(eclClusterPhi)):(1.250*TMath::Sin(eclClusterPhi))>>BDyz9","(32.20*(3.1415/180))<eclClusterTheta<(180-51.28)*(3.1415/180)");
+  bkg_tree->Draw("(eclSimHitX):(eclSimHitY)>>BDyz9","eclSimHitCellId>1152&&eclSimHitCellId<7776");
   BDyz9->Draw("colz");
   BDyz9->Write();
-  
+
   output->Close();
-  //delete output;
 }

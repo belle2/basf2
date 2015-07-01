@@ -23,7 +23,7 @@ namespace Belle2 {
     L3Track();
 
     //! Constructor with flag
-    L3Track(const TVectorD& h);
+    explicit L3Track(const TVectorD& h);
 
     //! Destructor
     virtual ~L3Track() {}

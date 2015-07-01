@@ -61,7 +61,7 @@ components_sim = [
     'ARICH',
     'BKLM',
     'ECL',
-    ]
+]
 
 # simulation
 add_simulation(analysis_main, components_sim)
@@ -98,7 +98,7 @@ components_rec = [  # 'PXD',
     'ARICH',
     'BKLM',
     'ECL',
-    ]
+]
 
 # reconstruction
 add_reconstruction(analysis_main, components_rec)

@@ -22,7 +22,7 @@ namespace Belle2 {
     L3Tag();
 
     //! Constructor with summary
-    L3Tag(int summaryWord);
+    explicit L3Tag(int summaryWord);
 
     //! Constructor with summary energy sum and number of tracks
     L3Tag(int summaryWord, double Esum, int nTrks);

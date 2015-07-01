@@ -33,7 +33,7 @@ components = [
     'BKLM',
     'EKLM',
     'STR',
-    ]
+]
 add_simulation(main, components)
 
 # Level3 trigger module
@@ -73,7 +73,7 @@ branches = [
     'L3Tags',
     'L3Tracks',
     'L3Clusters',
-    ]
+]
 
 branches += [
     'Tracks',
@@ -89,7 +89,7 @@ branches += [
     'EKLMK0Ls',
     'MCParticlesToTracks',
     'ECLShowersToMCParticles',
-    ]
+]
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'output.root')

@@ -153,8 +153,8 @@ namespace Belle2 {
   FTSegment::FTSegment(FTSuperLayer* super, FTList<FTWire*>& hits)
     : m_wireHits(hits),
       m_superLayer(*super),
-      m_innerBoundHits(*(new FTList<FTWire*>(3))),
-      m_outerBoundHits(*(new FTList<FTWire*>(3))),
+      m_innerBoundHits(*(new FTList<FTWire * >(3))),
+      m_outerBoundHits(*(new FTList<FTWire * >(3))),
       m_sList(NULL),
       m_zList(NULL),
       m_track(NULL)

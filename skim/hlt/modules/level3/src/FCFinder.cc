@@ -40,8 +40,8 @@ FCFinder::instance(void)
 
 FCFinder::FCFinder()
   : m_crystal(NULL),
-    m_ehits(*(new FTList<FCCrystal*>(500))),
-    m_clusters(*(new FTList<FCCluster*>(20)))
+    m_ehits(*(new FTList<FCCrystal * >(500))),
+    m_clusters(*(new FTList<FCCluster * >(20)))
 {
 }
 

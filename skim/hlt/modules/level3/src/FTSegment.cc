@@ -22,7 +22,11 @@ FTSegment::examine()
 {
   int stat = -1;
   const int minLength = (m_superLayer.superLayerId() & 1) ? 0 : 2;
-  FTList<FTWire*> wireHitsByLocalLayer[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+  FTList<FTWire*> wireHitsByLocalLayer[8] = {
+    FTList<FTWire*>(3), FTList<FTWire*>(3), FTList<FTWire*>(3),
+    FTList<FTWire*>(3), FTList<FTWire*>(3), FTList<FTWire*>(3),
+    FTList<FTWire*>(3), FTList<FTWire*>(3)
+  };
   FTWire** hptr = m_wireHits.firstPtr();
   FTWire** const last = m_wireHits.lastPtr();
   do {

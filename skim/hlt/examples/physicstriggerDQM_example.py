@@ -16,8 +16,7 @@ logging.log_level = LogLevel.INFO
 emptypath = create_path()
 
 filelistSIG = \
-    ['/group/belle2/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s00/mixed_e0001r000*BGx1.mdst.root'
-     ,
+    ['/group/belle2/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s00/mixed_e0001r000*BGx1.mdst.root',
      '/group/belle2/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s00/charged_e0001r000*_s00_BGx1.mdst.root'
      ]
 

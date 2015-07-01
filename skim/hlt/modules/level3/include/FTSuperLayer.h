@@ -126,10 +126,10 @@ namespace Belle2 {
     : m_superLayerId(superLayerID),
       m_Nlayer(NLayer),
       m_isAxial(isAxial),
-      m_complicatedSegments((superLayerID) ? NULL : new FTList<FTSegment*>(20)),
-      m_wireHits(*(new FTList<FTWire*>(500))),
-      m_singleHits(*(new FTList<FTWire*>(100))),
-      m_segments(*(new FTList<FTSegment*>(20))),
+      m_complicatedSegments((superLayerID) ? NULL : new FTList<FTSegment * >(20)),
+      m_wireHits(*(new FTList<FTWire * >(500))),
+      m_singleHits(*(new FTList<FTWire * >(100))),
+      m_segments(*(new FTList<FTSegment * >(20))),
       m_haveSmallCell(haveSmallCell),
       m_firstLayer(first)
   {

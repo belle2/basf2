@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     //! default constructor
-    FTList(const int lengthToAlloc = 100);
+    explicit FTList(const int lengthToAlloc = 100);
 
     //! copy constructor
     FTList(const FTList<T>&);
@@ -103,7 +103,7 @@ namespace Belle2 {
     : m_length(0),
       m_remain(lengthToAlloc),
       m_lengthToAlloc(lengthToAlloc),
-      m_obj(static_cast<T*>(std::malloc(lengthToAlloc* sizeof(T))))
+      m_obj(static_cast<T*>(std::malloc(lengthToAlloc * sizeof(T))))
   {
     if (!m_obj) B2FATAL("FTList::m_obj malloc failed");
   }

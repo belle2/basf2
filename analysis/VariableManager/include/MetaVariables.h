@@ -44,6 +44,19 @@ namespace Belle2 {
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the sine value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr sin(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the cosine value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr cos(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns function which returns the variable of the nth daughter of the given particle
      * First argument in the argument vector must be an integer corresponding to the nth daughter.
      * Second argument the name of the variable.

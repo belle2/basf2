@@ -222,6 +222,28 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr sin(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::sin(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function sin");
+      }
+    }
+
+    Manager::FunctionPtr cos(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::cos(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function sin");
+      }
+    }
+
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -429,20 +451,58 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("MetaFunctions");
-    REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula, "Calculate formula, no parenthesis allowed yet.");
-    REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame, "Use the rest frame of the given particle as current reference frame.");
-    REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame, "Use the CMS frame as current reference frame.");
-    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, "Use the lab frame as current reference frame.");
+    REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
+                      "Returns the result of the given formula, where v1-v6 are variables.\n"
+                      "Useful Calculate formula, no parenthesis allowed yet.");
+    REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
+                      "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
+                      "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");
+    REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
+                      "Returns the value of the variable using the CMS frame as current reference frame.\n"
+                      "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
+    REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame,
+                      "Returns the value of the variable using the lab frame as current reference frame.\n"
+                      "The lab frame is the default reference frame, usually you don't need to use this meta-variable.\n"
+                      "E.g. useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
+                      "     useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
-                      "Returns 1 if particle passes the given cut otherwise 0 (and -999 if particle is a nullptr).");
-    REGISTER_VARIABLE("countDaughters(condition)", countDaughters, "Returns number of direct daughters which satisfy given condition.");
-    REGISTER_VARIABLE("daughter(n, variable)", daughter, "Returns value of variable for the nth daughter.");
-    REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf, "Returns product of a variable over all daughters.");
-    REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf, "Returns sum of a variable over all daughters.");
-    REGISTER_VARIABLE("extraInfo(name)", extraInfo, "Returns extra info stored under the given name.");
-    REGISTER_VARIABLE("abs(variable)", abs, "Returns absolute value of the given variable.");
-    REGISTER_VARIABLE("NBDeltaIfMissing(dectector, pid_variable)", NBDeltaIfMissing,
-                      "Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.");
+                      "Returns 1 if particle passes the cut otherwise 0.\n"
+                      "Useful if you want to write out if a particle would have passed a cut or not.\n"
+                      "Returns -999 if particle is a nullptr.");
+    REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
+                      "Returns number of direct daughters which satisfy the cut.\n"
+                      "Used by the skimming package (for what exactly?)\n"
+                      "Returns -999 if particle is a nullptr.");
+    REGISTER_VARIABLE("daughter(i, variable)", daughter,
+                      "Returns value of variable for the i-th daughter."
+                      "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"
+                      "     daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n"
+                      "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+    REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
+                      "Returns product of a variable over all daughters.\n"
+                      "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");
+    REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf,
+                      "Returns sum of a variable over all daughters.\n"
+                      "E.g. daughterSumOf(nDaughters) returns the number of grand-daughters.");
+    REGISTER_VARIABLE("extraInfo(name)", extraInfo,
+                      "Returns extra info stored under the given name.\n"
+                      "The extraInfo has to be set first by a module like TMVAExpert.\n"
+                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the TMVAExpert.");
+    REGISTER_VARIABLE("abs(variable)", abs,
+                      "Returns absolute value of the given variable.\n"
+                      "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
+    REGISTER_VARIABLE("sin(variable)", sin,
+                      "Returns sin value of the given variable.\n"
+                      "E.g. sin(?) returns the sine of the value of the variable.");
+    REGISTER_VARIABLE("cos(variable)", cos,
+                      "Returns cos value of the given variable.\n"
+                      "E.g. sin(?) returns the cosine of the value of the variable.");
+    REGISTER_VARIABLE("NBDeltaIfMissing(detector, variable)", NBDeltaIfMissing,
+                      "Returns value of variable if pid information of detector is available otherwise -999 (delta function of NeuroBayes).\n"
+                      "Possible values for detector are TOP and ARICH.\n"
+                      "Useful as a feature variable for the NeuroBayes classifier, which tags missing values with -999.\n"
+                      "E.g. NBDeltaIfMissing(TOP, eid_TOP) returns electron id of TOP if this information is available, otherwise -999.\n"
+                      "     NBDeltaIfMissing(ARICH, Kid_ARICH) returns kaon id of ARICH if this information is available, otherwise -999.");
     REGISTER_VARIABLE("KSFWVariables(variable,finalState)", KSFWVariables,
                       "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
@@ -450,7 +510,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut.");
     REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
-                      "Returns variable output for the matched MCParticle by constructing a temporary Particle from it (this may not work too well if your variable requires accessing daughters of the particle). Returns -999 if no matched MCParticle exists.");
+                      "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
+                      "This may not work too well if your variable requires accessing daughters of the particle.\n"
+                      "E.g. matchedMC(p) returns the total momentum of the related MCParticle.\n"
+                      "Returns -999 if no matched MCParticle exists.");
 
   }
 }

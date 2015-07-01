@@ -216,10 +216,16 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("ParameterFunctions");
-    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdg)", NumberOfMCParticlesInEvent ,
-                      "Returns number of MC Particles (including anti particles) with the given pdg in the event.");
+    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent ,
+                      "Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.\n"
+                      "Used in the FEI to determine to calculate reconstruction efficiencies.\n"
+                      "The variable is event-based and does not need a valid particle pointer as input.");
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass ,
-                      "Returns invariant mass of the given daughter particles.");
+                      "Returns invariant mass of the given daughter particles.\n"
+                      "E.g. daughterInvariantMass(0, 1) returns the invariant mass of the first and second daughter.\n"
+                      "     daughterInvariantMass(0, 1, 2) returns the invariant mass of the first, second and third daughter.\n"
+                      "Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.\n"
+                      "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
                       "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
     REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters");
@@ -230,9 +236,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance,
                       "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
 
-    REGISTER_VARIABLE("constant(i)", Constant, "Returns constant number");
-
-    REGISTER_VARIABLE("CleoCone(i)", CleoCones, "Cleo cones (i-th cone)");
+    REGISTER_VARIABLE("constant(float i)", Constant,
+                      "Returns i.\n"
+                      "Useful for debugging purposes and in conjunction with the formula meta-variable.");
+    REGISTER_VARIABLE("CleoCone(integer i)", CleoCones,
+                      "Returns i-th cleo cones.\n"
+                      "Useful for ContinuumSuppression.\n"
+                      "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
+                      "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
 
 
   }

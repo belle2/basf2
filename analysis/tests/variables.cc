@@ -9,6 +9,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <gtest/gtest.h>
 
@@ -126,6 +127,7 @@ namespace {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
       StoreArray<Particle>::registerPersistent();
+      StoreArray<MCParticle>::registerPersistent();
       DataStore::Instance().setInitializeActive(false);
     }
 
@@ -303,6 +305,184 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(&p), 1);
     EXPECT_FLOAT_EQ(var->function(&p2), 0);
     EXPECT_FLOAT_EQ(var->function(nullptr), -999);
+
+  }
+
+  TEST_F(MetaVariableTest, NumberOfMCParticlesInEvent)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
+
+    StoreArray<MCParticle> mcParticles;
+    auto* mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(11);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(22);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(-11);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(11);
+
+
+    const Manager::Var* var = Manager::Instance().getVariable("NumberOfMCParticlesInEvent(11)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 2);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterInvariantMass)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(2, 2, 2, 4.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterInvariantMass(6)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -999.0);
+
+    var = Manager::Instance().getVariable("daughterInvariantMass(0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 2.0);
+
+    var = Manager::Instance().getVariable("daughterInvariantMass(0, 1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 4.0);
+
+    var = Manager::Instance().getVariable("daughterInvariantMass(0, 1, 2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 6.0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughter)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(i * 1.0, 1, 1, 1), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughter(6, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -999.0);
+
+    var = Manager::Instance().getVariable("daughter(0, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(p), 0.0, 1e-6);
+
+    var = Manager::Instance().getVariable("daughter(1, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 1.0);
+
+    var = Manager::Instance().getVariable("daughter(2, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 2.0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterProductOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterProductOf(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 24.0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterSumOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterSumOf(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 10.0);
+
+  }
+
+  TEST_F(MetaVariableTest, constant)
+  {
+
+    const Manager::Var* var = Manager::Instance().getVariable("constant(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 1.0);
+
+    var = Manager::Instance().getVariable("constant(0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
+
+  }
+
+  TEST_F(MetaVariableTest, abs)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ -0.1 , -0.4, 0.8, 4.0 }, -11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("abs(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.1);
+    EXPECT_FLOAT_EQ(var->function(&p2), 0.1);
+
+  }
+
+  TEST_F(MetaVariableTest, sin)
+  {
+    Particle p({ 3.14159265359 / 2.0 , -0.4, 0.8, 1.0}, 11);
+    Particle p2({ 0.0 , -0.4, 0.8, 1.0 }, -11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_ALL_NEAR(var->function(&p2), 0.0, 1e-6);
+
+  }
+
+  TEST_F(MetaVariableTest, cos)
+  {
+    Particle p({ 3.14159265359 / 2.0 , -0.4, 0.8, 1.0}, 11);
+    Particle p2({ 0.0 , -0.4, 0.8, 1.0 }, -11);
+
+    const Manager::Var* var = Manager::Instance().getVariable("cos(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), 0.0, 1e-6);
+    EXPECT_FLOAT_EQ(var->function(&p2), 1.0);
 
   }
 

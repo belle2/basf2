@@ -40,20 +40,11 @@ BackgroundSegmentsFilterFactory::create(const std::string& filterName) const
   } else if (filterName == string("all")) {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new AllBackgroundSegmentsFilter());
   } else if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter("BackgroundSegments.root"));
+    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter("BackgroundSegmentsFilter"));
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter("BackgroundSegments.root"));
+    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter("BackgroundSegmentsFilter.root"));
   } else {
     return Super::create(filterName);
   }
 }
 
-std::string BackgroundSegmentsFilterFactory::getFilterPurpose() const
-{
-  return "Segment background finder.";
-}
-
-std::string BackgroundSegmentsFilterFactory::getModuleParamPrefix() const
-{
-  return "BackgroundSegments";
-}

@@ -124,7 +124,6 @@ bool AdvancedCDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* segment)
   var<named("mean_number_of_neighbors")>() = 1.0 * totalNNeighbors / size;
 
   var<named("fit_prob")>() = trajectory.getPValue();
-  //var<named("fitted_pt")>() = trajectory.getAbsMom2D();
   var<named("fitted_d0")>() = trajectory.getDist2D(Vector2D());
   return true;
 }

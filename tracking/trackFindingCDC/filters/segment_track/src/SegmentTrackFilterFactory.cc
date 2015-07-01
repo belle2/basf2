@@ -50,7 +50,7 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFirstStepFactory::create(const std::string& filterName) const
 {
   if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterFirstStep.root"));
+    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterFirstStep"));
   } else if (filterName == string("recording")) {
     return std::unique_ptr<BaseSegmentTrackFilter>(new RecordingSegmentTrackFilter("SegmentTrackFilterFirstStep.root"));
   } else {
@@ -62,7 +62,7 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterSecondStepFactory::create(const std::string& filterName) const
 {
   if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterSecondStep.root"));
+    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterSecondStep"));
   } else if (filterName == string("recording")) {
     return std::unique_ptr<BaseSegmentTrackFilter>(new RecordingSegmentTrackFilter("SegmentTrackFilterSecondStep.root"));
   } else {

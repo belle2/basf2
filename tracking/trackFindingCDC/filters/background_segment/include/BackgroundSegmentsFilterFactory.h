@@ -35,7 +35,10 @@ namespace Belle2 {
       using Super::create;
 
       /** Getter for a descriptive purpose of the filter.*/
-      virtual std::string getFilterPurpose() const override;
+      virtual std::string getFilterPurpose() const override
+      {
+        return "Segment background finder.";
+      }
 
       /** Create a filter with the given name, does not set filter specific parameters. */
       virtual std::unique_ptr<BaseBackgroundSegmentsFilter> create(const std::string& name) const override;
@@ -44,7 +47,10 @@ namespace Belle2 {
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
       /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override;
+      virtual std::string getModuleParamPrefix() const override
+      {
+        return "BackgroundSegments";
+      }
     };
 
   }

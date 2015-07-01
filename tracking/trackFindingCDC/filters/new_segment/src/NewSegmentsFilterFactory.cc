@@ -38,7 +38,7 @@ NewSegmentsFilterFactory::create(const std::string& filterName) const
   } else if (filterName == string("truth")) {
     return std::unique_ptr<BaseNewSegmentsFilter>(new MCNewSegmentsFilter());
   } else if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new TMVANewSegmentsFilter("NewSegmentsFilter.root"));
+    return std::unique_ptr<BaseNewSegmentsFilter>(new TMVANewSegmentsFilter("NewSegmentsFilter"));
   } else if (filterName == string("recording")) {
     return std::unique_ptr<BaseNewSegmentsFilter>(new RecordingNewSegmentsFilter("NewSegmentsFilter.root"));
   } else {

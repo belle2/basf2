@@ -9,7 +9,7 @@ import sys
 
 
 class SegmentTrackFirstStepRecordingRun(StandardEventGenerationRun):
-    n_events = 50
+    n_events = 500
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):
@@ -20,7 +20,8 @@ class SegmentTrackFirstStepRecordingRun(StandardEventGenerationRun):
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
                                                    first_filter="recording",
                                                    second_filter="none",
-                                                   background_filter="none"))
+                                                   background_filter="none",
+                                                   new_segments_filter="none"))
         return main_path
 
 

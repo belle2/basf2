@@ -23,11 +23,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     using BaseNewSegmentsFilter = Filter<CDCRecoSegment2D>;
 
-    using NewSegmentTruthVarSet = VariadicUnionVarSet<CDCRecoSegment2DTruthVarSet, AdvancedCDCRecoSegment2DVarSet>;
+    using MCNewSegmentsFilter = MCFilter<VariadicUnionVarSet<CDCRecoSegment2DTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
 
-    using MCNewSegmentsFilter = MCFilter<NewSegmentTruthVarSet>;
-
-    using RecordingNewSegmentsFilter = RecordingFilter<NewSegmentTruthVarSet>;
+    using RecordingNewSegmentsFilter =
+      RecordingFilter<VariadicUnionVarSet<CDCRecoSegment2DTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
 
     using AllNewSegmentsFilter = AllFilter<BaseNewSegmentsFilter>;
 

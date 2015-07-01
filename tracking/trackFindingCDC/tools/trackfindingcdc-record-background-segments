@@ -13,7 +13,7 @@ class BackgroundSegmentsRecordingRun(StandardEventGenerationRun):
     Record the variables for the BackgroundSegmentsFilter in the SegmentsTrackCombinerModule
     """
     
-    n_events = 5000
+    n_events = 2000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):
@@ -23,6 +23,7 @@ class BackgroundSegmentsRecordingRun(StandardEventGenerationRun):
 
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
                                                    background_filter="recording",
+                                                   new_segments_filter="none",
                                                    second_filter="none"))
         return main_path
 

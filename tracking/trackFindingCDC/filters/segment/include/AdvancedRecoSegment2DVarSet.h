@@ -53,7 +53,6 @@ namespace Belle2 {
       "number_of_taken_hits",
 
       "fit_prob",
-      "fitted_pt",
       "fitted_d0"
     };
 
@@ -64,7 +63,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 19;
+      static const size_t nNames = 18;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

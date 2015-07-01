@@ -51,7 +51,7 @@ namespace Belle2 {
       /** Getter for the prefix prepended to a Module parameter.*/
       virtual std::string getModuleParamPrefix() const override
       {
-        return "SegmentTrack";
+        return "SegmentInformationListTrack";
       }
 
     };

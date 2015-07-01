@@ -232,6 +232,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     v0finder = register_module('V0Finder')
     path.add_module(v0finder)
 
+    # V0 Monte Carlo matching
+    path.add_module('MCV0Matcher')
+
     # dE/dx PID
     dEdxPID = register_module('DedxPID')
     dEdxPID.param('useSVD', use_vxd)

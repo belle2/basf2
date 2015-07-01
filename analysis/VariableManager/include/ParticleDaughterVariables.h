@@ -37,27 +37,6 @@ namespace Belle2 {
     double hasCharmoniumDaughter(const Particle* particle);
 
     /**
-     * returns information regarding daughters with a specific PDG code. It accepts the PDG code of interest, the number of particles of interest and an
-     * option to take (-1) or not to take (1) the sign of the PDG code into account.
-     *
-     * Example
-     * hasNDaughtersWithPDG(11,1,1) returns 1 if ONE daughter with the PDG code 11 or -11 (e- or e+) exists, 0 otherwise
-     * hasNDaughtersWithPDG(-11,2,-1) returns 1 if TWO daughters with the PDG code -11 (e+) exist, 0 otherwise
-     * hasNDaughtersWithPDG(11,0,1) returns 1 if there are NONE daughters with the PDG code 11 or -11 (e- or e+), 0 otherwise
-     */
-    double hasNDaughtersWithPDG(const Particle* particle, const std::vector<double>& args3);
-
-    /**
-     * returns information regarding daughters with a specific PDG code. It accepts the PDG code of interest and an
-     * option to take (-1) or not to take (1) the sign of the PDG code into account.
-     *
-     * Example
-     * hasDaughterWithPDG(11,1) returns 1 if there is at least one daughter with the PDG code 11 or -11 (e- or e+), 0 otherwise
-     * hasDaughterWithPDG(-11,1) returns 1 if there is at least one daughter with the PDG code -11 (e+), 0 otherwise
-     */
-    double hasDaughterWithPDG(const Particle* particle, const std::vector<double>& args2);
-
-    /**
      * returns information regarding daughters being real photons from EVTGEN or from PHOTOS, which are added later
      *
      * Example

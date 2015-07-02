@@ -30,8 +30,8 @@ assert 0 == os.system(cmd)
 assert 0 == os.system(cmd)
 # fsp training, final variablestontuple
 assert 0 == os.system(cmd)
-assert len(glob.glob('weights/*')) == 4
-assert len(glob.glob('var*.root*')) == 2
+assert len(glob.glob('weights/*')) == 6
+assert len(glob.glob('var*.root*')) == 3
 assert len(glob.glob('FEIsummary.tex')) == 1
 os.unlink('FEIsummary.tex')
 

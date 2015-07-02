@@ -194,7 +194,8 @@ def fullEventInterpretation(selection_path, particles):
     for particle in particles:
         if particle.isFSP:
             dag.add('RawParticleList_' + particle.identifier, provider.SelectParticleList,
-                    particleName='Name_' + particle.identifier)
+                    particleName='Name_' + particle.identifier,
+                    particleLabel='Label_' + particle.identifier)
             dag.add('MatchedParticleList_' + particle.identifier, provider.MatchParticleList,
                     particleList='RawParticleList_' + particle.identifier)
         else:
@@ -211,6 +212,7 @@ def fullEventInterpretation(selection_path, particles):
         # Copy all channel lists into a single particle list
         dag.add('ParticleList_' + particle.identifier, provider.CopyParticleLists,
                 particleName='Name_' + particle.identifier,
+                particleLabel='Label_' + particle.identifier,
                 particleLists=['RawParticleList_' + particle.identifier] if particle.isFSP
                 else ['RawParticleList_' + channel.name for channel in particle.channels],
                 postCut='PostCut_' + particle.identifier,

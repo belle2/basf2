@@ -63,7 +63,7 @@ def LoadGeometry(resource):
     resource.path.add_module(geometry)
 
 
-def SelectParticleList(resource, particleName):
+def SelectParticleList(resource, particleName, particleLabel):
     """
     Creates a ParticleList gathering up all Particles with the given particleName
         @param resource object
@@ -113,11 +113,12 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, deca
     return particleList
 
 
-def CopyParticleLists(resource, particleName, particleLists, postCut, signalProbabilities):
+def CopyParticleLists(resource, particleName, particleLabel, particleLists, postCut, signalProbabilities):
     """
     Creates a ParticleList gathering up all particles in the given inputLists
         @param resource object
         @param particleName valid pdg particle name
+        @param particleLabel user defined label
         @param particleLists list of ParticleLists name defning which ParticleLists are copied to the new list
         @param postCut dictionary containing 'cutstring'
         @param signalProbabilities signal probability of the particle lists

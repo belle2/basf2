@@ -116,7 +116,7 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_SelectParticleList(self):
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+'), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic'), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': False}, cache=True)
         # Adds ParticleLoader
@@ -127,7 +127,7 @@ class TestSelectParticleList(unittest.TestCase):
         # Set environment to ROE
         self.resource.env['ROE'] = True
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+'), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic'), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': True}, cache=True)
         # Adds ParticleLoader with cut
@@ -189,7 +189,7 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleLists(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'],
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', ['D0:1', 'D0:2', 'D0:3'],
                                            self.postCut, ['S1', 'S2', 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
@@ -200,7 +200,8 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsWithoutPostCut(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'], None, ['S1', 'S2', 'S3']), 'D0:42')
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', ['D0:1', 'D0:2', 'D0:3'],
+                                           None, ['S1', 'S2', 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleListManipulator for given decay
@@ -210,7 +211,8 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsSomeNone(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', None, 'D0:3'], self.postCut, ['S1', 'S2', 'S3']), 'D0:42')
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', ['D0:1', None, 'D0:3'],
+                                           self.postCut, ['S1', 'S2', 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleListManipulator for given decay
@@ -220,14 +222,15 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsAllNone(self):
         # Returns None if all ParticleLists are None
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', [None, None, None], self.postCut, ['S1', 'S2', 'S3']), None)
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', [None, None, None],
+                                           self.postCut, ['S1', 'S2', 'S3']), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
     def test_CopyParticleListsSomeSignalProbabilitiesNone(self):
         # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'],
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', ['D0:1', 'D0:2', 'D0:3'],
                                            self.postCut, ['S1', None, 'S3']), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
@@ -238,7 +241,8 @@ class TestCopyParticleLists(unittest.TestCase):
 
     def test_CopyParticleListsAllSignalProbabilitiesNone(self):
         # Returns None if all ParticleLists are None
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', ['D0:1', 'D0:2', 'D0:3'], self.postCut, [None, None, None]), None)
+        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', ['D0:1', 'D0:2', 'D0:3'],
+                                           self.postCut, [None, None, None]), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)

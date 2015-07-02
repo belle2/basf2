@@ -38,6 +38,7 @@ mvaConfig_chargedFSP = MVAConfiguration(
 
 particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP))
+particles.append(Particle('pi+:special', mvaConfig_chargedFSP))
 particles.append(Particle('K+', mvaConfig_chargedFSP))
 
 

@@ -24,8 +24,8 @@ assert 0 == os.system(cmd)
 assert 0 == os.system(cmd)
 # fsp training and D hists
 assert 0 == os.system(cmd)
-assert len(glob.glob('weights/*')) == 4
-assert len(glob.glob('CutHistograms_D0*.root')) == 1
+assert len(glob.glob('weights/*')) == 6
+assert len(glob.glob('CutHistograms_D0*.root')) == 2
 # D channels ignored.
 assert 0 == os.system(cmd)
 assert len(glob.glob('D0*.root')) == 0

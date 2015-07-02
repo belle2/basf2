@@ -55,11 +55,16 @@ preCutConfiguration_nonFSP = PreCutConfiguration(
 
 particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP))
+particles.append(Particle('pi+:special', mvaConfig_chargedFSP))
 particles.append(Particle('K+', mvaConfig_chargedFSP))
 
 
 p = Particle('D0', mvaConfig_D, preCutConfiguration_nonFSP)
 p.addChannel(['K-', 'pi+'])
+particles.append(p)
+
+p = Particle('D0:special', mvaConfig_D, preCutConfiguration_nonFSP)
+p.addChannel(['K-', 'pi+:special'])
 particles.append(p)
 
 feistate = fullEventInterpretation(None, particles)

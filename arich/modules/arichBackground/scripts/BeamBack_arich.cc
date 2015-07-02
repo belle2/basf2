@@ -230,7 +230,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
       //  energy deposit from a hit (two volumes are sensitive el. board and hapd bottom, commonly I show results for board.
       //  Anyhow the rates are approximately equal.)
       if (pdg != 2112) {
-        if (source == 5) edep *= 5; // ?? this is scaling of Coulomb LER ?? check this
+        if (source == 5) edep *= 1.0; // ?? this is scaling of Coulomb LER ?? check this
         if (type == 0) edep_board[modID - 1][source] += edep;
         if (type == 1) edep_hapd[modID - 1][source]  += edep;
       }
@@ -245,7 +245,7 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
 
         // contibution to neutron flux
         if (type == 0) {
-          if (source == 5) phnw *= 5; // ?? this is scaling of Coulomb LER ?? check this
+          if (source == 5) phnw *= 1.0; // ?? this is scaling of Coulomb LER ?? check this
           nflux_board[modID - 1][source] += phnw * trlen / 0.2; // trlen/0.2, this is kind of cos(theta) correction to the flux.
           // trlen = track length in volume, and 0.2cm is thickness of board.
           nenergy->Fill(lee);

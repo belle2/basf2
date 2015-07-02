@@ -104,12 +104,14 @@ namespace Belle2 {
       TrHits->Branch("en", &en, "en/D");
 
 
-      if (m_bkgType == "RBB_HER")      source = 1;
+      if (m_bkgType == "RBB_HER")           source = 1;
       else if (m_bkgType == "RBB_LER")      source = 2;
       else if (m_bkgType == "Touschek_HER") source = 3;
       else if (m_bkgType == "Touschek_LER") source = 4;
       else if (m_bkgType == "Coulomb_HER")  source = 5;
       else if (m_bkgType == "Coulomb_LER")  source = 6;
+      else if (m_bkgType == "BHWide_HER")   source = 7;
+      else if (m_bkgType == "BHWide_LER")   source = 8;
       else                                source = atoi(m_bkgType.c_str());
 
     }

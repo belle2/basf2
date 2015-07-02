@@ -99,7 +99,7 @@ namespace Belle2 {
     void generate(double* output) const
     {
       Eigen::VectorXd x = generate();
-      for (unsigned int i = 0; i < x.rows(); ++i) { output[i] = x(i); }
+      for (int i = 0; i < x.rows(); ++i) { output[i] = x(i); }
     }
 
     /** Generate a set of correlated random numbers with the previouly set

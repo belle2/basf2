@@ -9,7 +9,7 @@ a fast turn-around during development
 import basf2
 import array
 from datetime import datetime
-from ROOT import TFile, TNtuple, TH1F, TF1, TRandom3, gRandom
+from ROOT import TFile, TNtuple, TH1F, TF1, TRandom3, gRandom, TNamed
 
 
 def generateTestPlots(prefix):
@@ -36,9 +36,9 @@ def generateTestPlots(prefix):
     gausH = TH1F("gaus_histogram", prefix + " Gaus Histogram", 100, -3, 3)
     gausH.FillRandom("gaus", 5000)
 
-    tntuple.SetAlias('Description', "Gaus Histogram text")
-    tntuple.SetAlias('Check', "Gaus Histogram check text")
-    tntuple.SetAlias('Contact', "Gaus Histogram contact text")
+    gausH.GetListOfFunctions().Add(TNamed('Description', "Gaus Histogram Description"))
+    gausH.GetListOfFunctions().Add(TNamed('Check', "Gaus Histogram Check"))
+    gausH.GetListOfFunctions().Add(TNamed('Contact', "Gaus Histogram Contact"))
 
     gausH.Write()
 
@@ -47,9 +47,9 @@ def generateTestPlots(prefix):
     exp_fn = TF1("exp_fn", "exp(-x)", 0, 10)
     gausH.FillRandom("exp_fn", 5000)
 
-    tntuple.SetAlias('Description', "Exp Histogram text")
-    tntuple.SetAlias('Check', "Exp Histogram check text")
-    tntuple.SetAlias('Contact', "Exp Histogram contact text")
+    gausH.GetListOfFunctions().Add(TNamed('Description', "Exp Histogram Description"))
+    gausH.GetListOfFunctions().Add(TNamed('Check', "Exp Histogram Check"))
+    gausH.GetListOfFunctions().Add(TNamed('Contact', "Exp Histogram Contact"))
 
     gausH.Write()
 
@@ -64,8 +64,8 @@ def generateTestPlots(prefix):
         v = gRandom.Gaus(mean, 1.0)
         gausH.Fill(v)
 
-    tntuple.SetAlias('Description', "Gaus Changing Histogram text.")
-    tntuple.SetAlias('Check', "Gaus Changing Histogram check text")
-    tntuple.SetAlias('Contact', "Gaus Changing Histogram contact text")
+    gausH.GetListOfFunctions().Add(TNamed('Description', "Gaus Changing Histogram Description"))
+    gausH.GetListOfFunctions().Add(TNamed('Check', "Gaus Changing Histogram Check"))
+    gausH.GetListOfFunctions().Add(TNamed('Contact', "Gaus Changing Histogram Contact"))
 
     gausH.Write()

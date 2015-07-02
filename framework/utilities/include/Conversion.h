@@ -12,9 +12,10 @@
 namespace Belle2 {
 
   /**
-   * Converts a string to type T
-   * @param str string which is converted to type T
-   * @return converted type T
+   * Converts a string to type T (one of float, double, long double, int, long int, unsigned long int).
+   *
+   * Throws std::invalid_argument on conversion errors, out_of_range if T cannot hold the given value.
+   * You can catch both possible exception types of the function (invalid_argument and out_of_range) using the base class logic_error
    */
   template<typename T>
   T convert_string(const std::string& str);

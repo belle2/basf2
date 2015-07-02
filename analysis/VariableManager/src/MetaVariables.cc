@@ -347,6 +347,9 @@ namespace Belle2 {
           set = Const::TOP;
         } else if (arguments[0] == "ARICH") {
           set = Const::ARICH;
+        } else {
+          B2FATAL("Encountered unsupported sub-detector type " + arguments[0] + " in NBDeltaIfMissing only TOP and ARICH are supported."
+                  "Note that other sub-detectors providing PID information like ECL, dEdx do not have missing values!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, set](const Particle * particle) -> double {

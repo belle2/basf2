@@ -2,14 +2,17 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
-#include <framework/datastore/StoreArray.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/utility/ReferenceFrame.h>
+
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
-#include <analysis/utility/ReferenceFrame.h>
+
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <gtest/gtest.h>
 
@@ -119,11 +122,6 @@ namespace {
     /** register Particle array + ParticleExtraInfoMap object. */
     virtual void SetUp()
     {
-      Gearbox& gearbox = Gearbox::getInstance();
-      gearbox.setBackends({std::string("file:")});
-      gearbox.close();
-      gearbox.open("geometry/Belle2.xml", false);
-
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
       StoreArray<Particle>::registerPersistent();
@@ -164,6 +162,11 @@ namespace {
 
   TEST_F(MetaVariableTest, useRestFrame)
   {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
     p.setVertex(TVector3(1.0, 2.0, 2.0));
 
@@ -224,6 +227,11 @@ namespace {
 
   TEST_F(MetaVariableTest, useCMSFrame)
   {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
     p.setVertex(TVector3(1.0, 2.0, 2.0));
 
@@ -483,6 +491,103 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_ALL_NEAR(var->function(&p), 0.0, 1e-6);
     EXPECT_FLOAT_EQ(var->function(&p2), 1.0);
+
+  }
+
+  TEST_F(MetaVariableTest, NBDeltaIfMissing)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<PIDLikelihood>::registerPersistent();
+    StoreArray<PIDLikelihood> likelihood;
+    StoreArray<Particle> particles;
+    particles.registerRelationTo(likelihood);
+    DataStore::Instance().setInitializeActive(false);
+
+    auto* l1 = likelihood.appendNew();
+    l1->setLogLikelihood(Const::TOP, Const::electron, 0.5);
+    l1->setLogLikelihood(Const::ARICH, Const::electron, 0.5);
+    l1->setLogLikelihood(Const::ECL, Const::electron, 0.5);
+    l1->setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    l1->setLogLikelihood(Const::ARICH, Const::pion, 0.5);
+    l1->setLogLikelihood(Const::ECL, Const::pion, 0.5);
+
+    auto* l2 = likelihood.appendNew();
+    l2->setLogLikelihood(Const::TOP, Const::electron, 0.5);
+    l2->setLogLikelihood(Const::ECL, Const::electron, 0.5);
+    l2->setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    l2->setLogLikelihood(Const::ECL, Const::pion, 0.5);
+
+    auto* l3 = likelihood.appendNew();
+    l3->setLogLikelihood(Const::TOP, Const::electron, 0.5);
+    l3->setLogLikelihood(Const::TOP, Const::pion, 0.5);
+
+    auto* l4 = likelihood.appendNew();
+    l4->setLogLikelihood(Const::ECL, Const::electron, 0.5);
+    l4->setLogLikelihood(Const::ECL, Const::pion, 0.5);
+
+    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p1->addRelationTo(l1);
+
+    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p2->addRelationTo(l2);
+
+    auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p3->addRelationTo(l3);
+
+    auto* p4 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p4->addRelationTo(l4);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, eid_TOP, 1)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(ECL, eid_ECL)"));
+
+    const Manager::Var* var = Manager::Instance().getVariable("NBDeltaIfMissing(TOP, eid_TOP)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 0.5);
+    EXPECT_FLOAT_EQ(var->function(p2), 0.5);
+    EXPECT_FLOAT_EQ(var->function(p3), 0.5);
+    EXPECT_FLOAT_EQ(var->function(p4), -999.0);
+
+    var = Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, eid_ARICH)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 0.5);
+    EXPECT_FLOAT_EQ(var->function(p2), -999.0);
+    EXPECT_FLOAT_EQ(var->function(p3), -999.0);
+    EXPECT_FLOAT_EQ(var->function(p4), -999.0);
+
+  }
+
+  TEST_F(MetaVariableTest, matchedMC)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    auto* mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(11);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p1->addRelationTo(mcParticle);
+
+    mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(-11);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p2->addRelationTo(mcParticle);
+
+    mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(22);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p3->addRelationTo(mcParticle);
+
+    const Manager::Var* var = Manager::Instance().getVariable("matchedMC(charge)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), -1);
+    EXPECT_FLOAT_EQ(var->function(p2), 1);
+    EXPECT_FLOAT_EQ(var->function(p3), 0);
+
 
   }
 

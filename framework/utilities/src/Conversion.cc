@@ -6,6 +6,7 @@
  */
 
 #include <framework/utilities/Conversion.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

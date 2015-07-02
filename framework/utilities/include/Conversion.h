@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <string>
 
 namespace Belle2 {

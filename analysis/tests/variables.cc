@@ -14,6 +14,9 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <analysis/utility/ReferenceFrame.h>
+#include <analysis/dataobjects/ParticleList.h>
+
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -588,6 +591,62 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(p2), 1);
     EXPECT_FLOAT_EQ(var->function(p3), 0);
 
+  }
+
+  TEST_F(MetaVariableTest, veto)
+  {
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    const Particle* p = particles.appendNew(Particle({0.8 , 0.8 , 1.131370849898476039041351 , 1.6}, 22,
+                                                     Particle::c_Unflavored, Particle::c_Undefined, 1));
+
+    StoreObjPtr<ParticleList> outputList("pList1");
+    DataStore::Instance().setInitializeActive(true);
+    outputList.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    outputList.create();
+    outputList->initialize(22, "pList1");
+
+    particles.appendNew(Particle({0.5 , 0.4953406774856531014212777 , 0.5609256753154148484773173 , 0.9}, 22,
+                                 Particle::c_Unflavored, Particle::c_Undefined, 2));         //m=0.135
+    particles.appendNew(Particle({0.5 , 0.2 , 0.72111 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));    //m=0.3582
+    particles.appendNew(Particle({0.4 , 0.2 , 0.78102 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));    //m=0.3908
+    particles.appendNew(Particle({0.5 , 0.4 , 0.89443 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 5));    //m=0.2369
+    particles.appendNew(Particle({0.3 , 0.3 , 0.42426 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 6));    //m=0.0036
+
+    outputList->addParticle(1, 22, Particle::c_Unflavored);
+    outputList->addParticle(2, 22, Particle::c_Unflavored);
+    outputList->addParticle(3, 22, Particle::c_Unflavored);
+    outputList->addParticle(4, 22, Particle::c_Unflavored);
+    outputList->addParticle(5, 22, Particle::c_Unflavored);
+
+    StoreObjPtr<ParticleList> outputList2("pList2");
+    DataStore::Instance().setInitializeActive(true);
+    outputList2.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    outputList2.create();
+    outputList2->initialize(22, "pList2");
+
+    particles.appendNew(Particle({0.5 , -0.4 , 0.63246 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 7));    //m=1.1353
+    particles.appendNew(Particle({0.5 , 0.2 , 0.72111 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 8));     //m=0.3582
+    particles.appendNew(Particle({0.4 , 0.2 , 0.78102 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 9));     //m=0.3908
+    particles.appendNew(Particle({0.5 , 0.4 , 0.89443 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 10));    //m=0.2369
+    particles.appendNew(Particle({0.3 , 0.3 , 0.42426 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 11));    //m=0.0036
+
+    outputList2->addParticle(6, 22, Particle::c_Unflavored);
+    outputList2->addParticle(7, 22, Particle::c_Unflavored);
+    outputList2->addParticle(8, 22, Particle::c_Unflavored);
+    outputList2->addParticle(9, 22, Particle::c_Unflavored);
+    outputList2->addParticle(10, 22, Particle::c_Unflavored);
+
+    const Manager::Var* var = Manager::Instance().getVariable("veto(pList1, 0.130 < M < 0.140)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(p), 1);
+
+    var = Manager::Instance().getVariable("veto(pList2, 0.130 < M < 0.140)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(p), 0);
 
   }
 

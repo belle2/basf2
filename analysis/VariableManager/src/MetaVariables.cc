@@ -296,7 +296,6 @@ namespace Belle2 {
             return -999;
           StoreObjPtr<ParticleList> roeList(roeListName);
           TLorentzVector vec = particle->get4Vector();
-
           for (unsigned int i = 0; i < roeList->getListSize(); i++)
           {
             const Particle* roeParticle = roeList->getParticle(i);

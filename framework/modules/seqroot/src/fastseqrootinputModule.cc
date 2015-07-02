@@ -7,6 +7,7 @@
 //         6 - Sep - 2012     modified to use DataStoreStreamer, clean up
 //        29 - Nov - 2013     object destreaming in threads
 //-
+#if false
 
 #include <framework/modules/seqroot/fastseqrootinputModule.h>
 
@@ -241,3 +242,4 @@ void FastSeqRootInputModule::terminate()
   B2INFO("FastSeqRootInput: terminate called");
 }
 
+#endif

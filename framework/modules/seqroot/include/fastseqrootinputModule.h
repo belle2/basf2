@@ -9,6 +9,8 @@
 #ifndef FASTSEQROOT_INPUT_H
 #define FASTSEQROOT_INPUT_H
 
+#if false
+
 #include <framework/core/Module.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/SeqFile.h>
@@ -72,5 +74,7 @@ namespace Belle2 {
     double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
   };
 } // end namespace Belle2
+
+#endif
 
 #endif

@@ -6,7 +6,7 @@
  */
 
 #include <framework/utilities/Conversion.h>
-#include <framework/logging/Logger.h>
+#include <stdexcept>
 
 namespace Belle2 {
 
@@ -21,7 +21,7 @@ namespace Belle2 {
     std::string::size_type n;
     float number = std::stof(str, &n);
     if (n != str.size()) {
-      B2WARNING("Could only parse a part of the given string " << str << " to a float value " << number);
+      throw std::invalid_argument("Could only parse a part of the given string " + str);
     }
     return number;
   }
@@ -37,7 +37,7 @@ namespace Belle2 {
     std::string::size_type n;
     double number = std::stod(str, &n);
     if (n != str.size()) {
-      B2WARNING("Could only parse a part of the given string " << str << " to a double value " << number);
+      throw std::invalid_argument("Could only parse a part of the given string " + str);
     }
     return number;
   }
@@ -53,7 +53,7 @@ namespace Belle2 {
     std::string::size_type n;
     long double number = std::stold(str, &n);
     if (n != str.size()) {
-      B2WARNING("Could only parse a part of the given string " << str << " to a long double value " << number);
+      throw std::invalid_argument("Could only parse a part of the given string " + str);
     }
     return number;
   }
@@ -69,7 +69,7 @@ namespace Belle2 {
     std::string::size_type n;
     int number = std::stoi(str, &n);
     if (n != str.size()) {
-      B2WARNING("Could only parse a part of the given string " << str << " to a integer value " << number);
+      throw std::invalid_argument("Could only parse a part of the given string " + str);
     }
     return number;
   }
@@ -85,7 +85,7 @@ namespace Belle2 {
     std::string::size_type n;
     long int number = std::stol(str, &n);
     if (n != str.size()) {
-      B2WARNING("Could only parse a part of the given string " << str << " to a long integer value " << number);
+      throw std::invalid_argument("Could only parse a part of the given string " + str);
     }
     return number;
   }
@@ -101,7 +101,7 @@ namespace Belle2 {
     std::string::size_type n;
     unsigned long int number = std::stoul(str, &n);
     if (n != str.size()) {
-      B2WARNING("Could only parse a part of the given string " << str << " to a long integer value " << number);
+      throw std::invalid_argument("Could only parse a part of the given string " + str);
     }
     return number;
   }

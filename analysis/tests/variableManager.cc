@@ -24,7 +24,7 @@ namespace {
   Manager::FunctionPtr dummyMetaVar(const std::vector<std::string>& arguments)
   {
     std::string arg = arguments[0];
-    auto func = [arg](const Particle * particle) -> double {
+    auto func = [arg](const Particle*) -> double {
       return arg.size();
     };
     return func;
@@ -253,8 +253,10 @@ namespace {
     a = Cut::Compile("15 == 0xF");
     EXPECT_TRUE(a->check(nullptr));
 
-    // Should give an warning but should work
-    EXPECT_B2WARNING(a = Cut::Compile("15 == 15.0 bla"));
+    // Should throw an exception
+    EXPECT_THROW(a = Cut::Compile("15 == 15.0 bla"), std::runtime_error);
+    EXPECT_TRUE(a->check(nullptr));
+    EXPECT_THROW(a = Cut::Compile("15 == 15e1000"), std::out_of_range);
     EXPECT_TRUE(a->check(nullptr));
 
     a = Cut::Compile("1e-3 < 1e3");

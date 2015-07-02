@@ -14,13 +14,17 @@ def printVars():
 
     print 'Available variables in Variable::Manager:'
     allVars = variables.getVariables()
-    rows = []
-    group = ''
+    vars = []
     for v in allVars:
-        if v.group != group:
-            group = v.group
+        vars.append((v.group, v.name, v.description))
+
+    rows = []
+    current_group = ''
+    for (group, name, description) in sorted(vars):
+        if current_group != group:
+            current_group = group
             rows.append([group])
-        rows.append([v.name, v.description])
+        rows.append([name, description])
     pretty_print_description_list(rows)
 
 

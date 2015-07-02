@@ -111,7 +111,7 @@ def pretty_print_description_list(rows):
     """
     term_width = get_terminal_width()
     # indentation width
-    module_width = 15
+    module_width = 40
     # text wrapper class to format description to terminal width
     import textwrap
     wrapper = textwrap.TextWrapper(width=term_width, initial_indent="",
@@ -139,7 +139,11 @@ def pretty_print_description_list(rows):
             # module name (at least module_width)
             wrapper.initial_indent = max(module_width, len(name) + 1) * " "
             # and output a bold module name and the description next to it
-            print bold(name.ljust(module_width - 1)), wrapper.fill(description).lstrip()
+            for i, line in enumerate(description.splitlines()):
+                if i == 0:
+                    print bold(name.ljust(module_width - 1)), wrapper.fill(line).lstrip()
+                else:
+                    print wrapper.fill(line)
 
     print term_width * '-'
     print ''
@@ -214,15 +218,23 @@ def print_all_modules(moduleList, package=''):
 
     term_width = get_terminal_width()
 
-    table = []
+    modules = []
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
         try:
             current_module = register_module(moduleName)
             if package == '' or current_module.package() == package:
-                table.append((moduleName, current_module.description()))
+                modules.append((current_module.package(), moduleName, current_module.description()))
         except:
             B2ERROR('The module could not be loaded. This is most likely '
                     + 'caused by a library with missing links.')
+
+    table = []
+    current_package = ''
+    for (packageName, moduleName, description) in sorted(modules):
+        if current_package != packageName:
+            current_package = packageName
+            table.append((current_package,))
+        table.append((moduleName, description))
     if package != '' and len(table) == 0:
         B2FATAL('Print module information: No module or package named "'
                 + package + '" found!')

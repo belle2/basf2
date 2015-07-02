@@ -53,7 +53,7 @@ namespace Belle2 {
     virtual ~CondParser();
 
     /**
-     * Parses a given condition expression and returns the operator and the integer value.
+     * Parses a given condition expression and sets the operator and the integer value.
      *
      * The condition has to be of the form: [comparison operator][integer]
      * e.g. ">5", "=7", "!= 0"

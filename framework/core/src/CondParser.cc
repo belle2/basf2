@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <framework/core/CondParser.h>
+#include <framework/utilities/Conversion.h>
 
 #include <boost/algorithm/string/erase.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -53,11 +53,7 @@ bool CondParser::parseCondition(string expression, EConditionOperators& condOper
   condOperator = foundIter->second;
 
   //Try to translate the remaining text to a number
-  try {
-    condValue = boost::lexical_cast<int>(expression.substr(iOperator, expression.length() - 1));
-  } catch (boost::bad_lexical_cast&) {
-    return false;
-  }
+  condValue = convert_string<int>(expression.substr(iOperator, expression.length() - 1));
   return true;
 }
 

@@ -23,6 +23,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/utilities/Conversion.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -249,7 +250,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         int daughterNumber = 0;
         try {
-          daughterNumber = boost::lexical_cast<int>(arguments[0]);
+          daughterNumber = Belle2::convert_string<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of daughter meta function must be integer!");
           return nullptr;
@@ -280,7 +281,7 @@ namespace Belle2 {
           B2INFO("Use pdgCode 11 as default in meta variable veto, other arguments: " << roeListName << ", " << cutString)
         } else {
           try {
-            pdgCode = boost::lexical_cast<int>(arguments[2]);
+            pdgCode = Belle2::convert_string<int>(arguments[2]);;
           } catch (boost::bad_lexical_cast&) {
             B2WARNING("Third argument of veto meta function must be integer!");
             return nullptr;
@@ -412,8 +413,8 @@ namespace Belle2 {
         double low = 0;
         double high = 0;
         try {
-          low  = boost::lexical_cast<double>(arguments[1]);
-          high = boost::lexical_cast<double>(arguments[2]);
+          low  = Belle2::convert_string<double>(arguments[1]);
+          high = Belle2::convert_string<double>(arguments[2]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("Second and third argument of transformedNetworkOutput meta function must be doubles!");
           return nullptr;

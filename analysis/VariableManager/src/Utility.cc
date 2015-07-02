@@ -1,6 +1,7 @@
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/VariableManager/Manager.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
 
 #include <string>
 
@@ -115,11 +116,7 @@ namespace Belle2 {
           if (not processBinaryNumericConditions(str)) {
             operation = NONE;
             try {
-              std::string::size_type n;
-              number = std::stof(str, &n);
-              if (n != str.size()) {
-                B2WARNING("Could only parse a part of the given string " << str << " to a numeric value " << number);
-              }
+              number = Belle2::convert_string<float>(str);
               isNumeric = true;
             } catch (std::invalid_argument&) {
               isNumeric = false;

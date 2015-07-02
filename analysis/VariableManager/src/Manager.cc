@@ -4,15 +4,16 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <exception>
+#include <string>
 
 using namespace Belle2;
 
@@ -101,7 +102,7 @@ bool Variable::Manager::createVariable(const std::string& name)
 
   // Check if name is a simple number
   if (boost::regex_match(name, results, boost::regex("^([0-9]+\\.?[0-9]*)$"))) {
-    float float_number = boost::lexical_cast<float>(results[1]);
+    float float_number = std::stof(results[1]);
     auto func = [float_number](const Particle*) -> double {
       return float_number;
     };
@@ -126,11 +127,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       std::vector<double> arguments;
       for (auto& arg : functionArguments) {
         double number = 0;
-        try {
-          number = boost::lexical_cast<double>(arg);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Argument for parameter function cannot be converted to float: " << arg);
-        }
+        number = Belle2::convert_string<float>(arg);
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;

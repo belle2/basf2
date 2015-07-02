@@ -8,8 +8,9 @@ a fast turn-around during development
 
 import basf2
 import array
+import numpy as np
 from datetime import datetime
-from ROOT import TFile, TNtuple, TH1F, TF1, TRandom3, gRandom, TNamed
+from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed
 
 
 def generateTestPlots(prefix):
@@ -29,16 +30,19 @@ def generateTestPlots(prefix):
                      "because e.g. \\theta will be interpreted as [tab]heta.")
     tntuple.SetAlias('Check', "This is the check text.")
     tntuple.SetAlias('Contact', "Name of the contact person.")
+    tntuple.SetAlias('MetaOptions', "some_meta_options")
 
     # Overwrite the former TNtuple if one was there
     tntuple.Write()
 
+    # Gauss Histogram
     gausH = TH1F("gaus_histogram", prefix + " Gaus Histogram", 100, -3, 3)
     gausH.FillRandom("gaus", 5000)
 
-    gausH.GetListOfFunctions().Add(TNamed('Description', "Gaus Histogram Description"))
+    gausH.GetListOfFunctions().Add(TNamed('Description', "xlog"))
     gausH.GetListOfFunctions().Add(TNamed('Check', "Gaus Histogram Check"))
     gausH.GetListOfFunctions().Add(TNamed('Contact', "Gaus Histogram Contact"))
+    gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logx, nostats"))
 
     gausH.Write()
 
@@ -47,9 +51,10 @@ def generateTestPlots(prefix):
     exp_fn = TF1("exp_fn", "exp(-x)", 0, 10)
     gausH.FillRandom("exp_fn", 5000)
 
-    gausH.GetListOfFunctions().Add(TNamed('Description', "Exp Histogram Description"))
+    gausH.GetListOfFunctions().Add(TNamed('Description', "ylog"))
     gausH.GetListOfFunctions().Add(TNamed('Check', "Exp Histogram Check"))
     gausH.GetListOfFunctions().Add(TNamed('Contact', "Exp Histogram Contact"))
+    gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logy, nostats, C"))
 
     gausH.Write()
 
@@ -64,8 +69,26 @@ def generateTestPlots(prefix):
         v = gRandom.Gaus(mean, 1.0)
         gausH.Fill(v)
 
-    gausH.GetListOfFunctions().Add(TNamed('Description', "Gaus Changing Histogram Description"))
+    gausH.GetListOfFunctions().Add(TNamed('Description', "xlog ylog with stats"))
     gausH.GetListOfFunctions().Add(TNamed('Check', "Gaus Changing Histogram Check"))
     gausH.GetListOfFunctions().Add(TNamed('Contact', "Gaus Changing Histogram Contact"))
+    gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logx, logy"))
 
     gausH.Write()
+
+    # Example for a 2D histogram
+    hist2d = TH2F("example_2d_histogram", "example_2d_title",
+                  60, -3, 3, 60, -3, 3)
+
+    mean = (0, 0)
+    cov = [[1, 0], [0, 1]]
+    for i in range(10000):
+        x, y = np.random.multivariate_normal(mean, cov)
+        hist2d.Fill(x, y)
+
+    hist2d.GetListOfFunctions().Add(TNamed('Description', "Some 2D Histogram"))
+    hist2d.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
+    hist2d.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
+    hist2d.GetListOfFunctions().Add(TNamed('MetaOptions', "contz"))
+
+    hist2d.Write()

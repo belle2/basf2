@@ -825,6 +825,18 @@ def create_RootObjects_from_file(root_file, is_reference):
                 if metadatum is None:
                     metadatum = 'n/a'
 
+            # Now check for meta-options (colz, log-scale, etc.)
+            metaoptions = []
+            if root_object.FindObject('MetaOptions'):
+                # Get the title. If there is no title, set metaoptions to an
+                # empty list again. Otherwise parse the string of options into
+                # a list of options (split on comma, remove whitespaces).
+                metaoptions = root_object.FindObject('MetaOptions').GetTitle()
+                if metaoptions is None:
+                    metaoptions = []
+                else:
+                    metaoptions = [_.strip() for _ in metaoptions.split(',')]
+
         # If we are dealing with an n-tuple
         elif root_object_type == 'TNtuple':
 
@@ -849,6 +861,13 @@ def create_RootObjects_from_file(root_file, is_reference):
                 if metadatum == '':
                     metadatum = 'n/a'
 
+            # Now check for meta-options (colz, log-scale, etc.)
+            metaoptions = root_object.GetAlias('MetaOptions')
+            if metaoptions:
+                # If there are meta-options, split the string on commas and
+                # remove unnecessary whitespaces
+                metaoptions = [_.strip() for _ in metaoptions.split(',')]
+
             # Overwrite 'root_object' with the dictionary that contains the
             # values, because the values are what we want to save, and we
             # want to use the same RootObject()-call for both histograms and
@@ -869,7 +888,7 @@ def create_RootObjects_from_file(root_file, is_reference):
                                        name, root_object,
                                        root_object_type, dir_date,
                                        description, check, contact,
-                                       is_reference))
+                                       metaoptions, is_reference))
 
     # Close the ROOT file before we open the next one!
     ROOT_Tfile.Close()
@@ -1024,7 +1043,7 @@ class RootObject:
 
     def __init__(self, revision, package, rootfile, key, root_object,
                  root_object_type, date, description, check, contact,
-                 is_reference):
+                 metaoptions, is_reference):
         """!
         The constructor. Sets the element up and store the information in a
         dict, but also sets up object variables for simplified access.
@@ -1050,6 +1069,8 @@ class RootObject:
         @param contact: A name or preferably an e-mail address of the person
                 who is responsible for this plot and may be contacted in case
                 of problems
+        @param metaoptions: Meta-options for the plot, e.g. 'colz' for histo-
+                grams, or log-scale for the axes, etc.
         @param is_reference: A boolean value telling if an object is a
                 reference object or a normal plot/n-tuple object from a
                 revision. Possible Values: True for reference objects,
@@ -1073,6 +1094,7 @@ class RootObject:
                      'description': description,
                      'contact': contact,
                      'date': date,
+                     'metaoptions': metaoptions,
                      'is_reference': is_reference}
 
         # For convenient access, define the following variables, which are
@@ -1109,6 +1131,9 @@ class RootObject:
 
         # The date of the object (identical with the date of its rootfile)
         self.date = self.data['date']
+
+        # Meta-options for the object, e.g. colz or log-scale for the axes
+        self.metaoptions = self.data['metaoptions']
 
         # Boolean value if it is an object from a reference file or not
         self.is_reference = self.data['is_reference']
@@ -1219,6 +1244,9 @@ class Plotuple:
         # A contact person for the histogram/n-tuple which this Plotuple object
         # will yield
         self.contact = self.newest.contact
+
+        # The meta-options for this Plotuple object
+        self.metaoptions = self.newest.metaoptions
 
         # The package to which the elements in this Plotuple object belong
         self.package = self.newest.package
@@ -1424,9 +1452,20 @@ class Plotuple:
         if self.reference is not None and self.newest:
             self.chi2test(canvas)
 
+        # Allow possibility to turn off the stats box
+        if 'nostats' in self.metaoptions:
+            ROOT.gStyle.SetOptStat("")
+        else:
+            ROOT.gStyle.SetOptStat("nemr")
+
         # Now we distinguish between 1D and 2D histograms
         # If we have a 1D histogram
         if mode == '1D':
+
+            if 'logx' in self.metaoptions:
+                canvas.SetLogx()
+            if 'logy' in self.metaoptions:
+                canvas.SetLogy()
 
             # A variable which holds whether we
             # have drawn on the canvas already or not
@@ -1478,7 +1517,16 @@ class Plotuple:
             # If we have a one-dimensional histogram
             if mode == '1D':
                 if not drawn:
-                    plot.object.DrawCopy(plot.object.GetOption())
+
+                    # Get additional options for 1D histograms
+                    additional_options = ''
+                    for _ in ['C']:
+                        if _ in self.metaoptions:
+                            additional_options += ' ' + _
+
+                    # Draw the reference on the canvas
+                    plot.object.DrawCopy(plot.object.GetOption() +
+                                         additional_options)
                     drawn = True
                 else:
                     plot.object.DrawCopy("SAME")
@@ -1496,8 +1544,15 @@ class Plotuple:
                 pad = canvas.cd(self.elements.index(plot) + i)
                 pad.SetFillColor(ROOT.kWhite)
 
+                # Get additional options for 2D histograms
+                additional_options = ''
+                for _ in ['col', 'colz', 'cont', 'contz', 'box']:
+                    if _ in self.metaoptions:
+                        additional_options += ' ' + _
+
                 # Draw the reference on the canvas
-                plot.object.DrawCopy(plot.object.GetOption())
+                plot.object.DrawCopy(plot.object.GetOption() +
+                                     additional_options)
                 pad.Update()
                 pad.GetFrame().SetFillColor(ROOT.kWhite)
 
@@ -1679,6 +1734,13 @@ class Plotuple:
                     'value="index.html?PackageOverview=false&Revisions={0}'
                     '#{1}" size="50" onClick="this.select();"></p>'
                     .format('_'.join(self.list_of_revisions), prmn))
+
+        # Display the meta-options used for this plot (if there are any)
+        if self.metaoptions:
+            html.append('<p><strong>Used meta-options:</strong> '
+                        '<input type="text" class="meta-options" '
+                        'value="{0}" size="50" onClick="this.select();"></p>'
+                        .format(self.metaoptions))
 
         html.append('</div>\n</div>\n\n')
 

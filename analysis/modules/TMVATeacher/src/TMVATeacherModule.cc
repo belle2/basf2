@@ -111,7 +111,7 @@ namespace Belle2 {
     if (m_sample_var == nullptr)
       return 1.0;
 
-    int target = static_cast<int>(m_sample_var->function(particle) + 0.5);
+    long target = std::lround(m_sample_var->function(particle));
     if (m_inverseSamplingRates.find(target) != m_inverseSamplingRates.end()) {
       if (m_iSamples.find(target) == m_iSamples.end()) {
         m_iSamples[target] = 0;

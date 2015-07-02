@@ -26,6 +26,8 @@
 #include <TVectorF.h>
 #include <TVector3.h>
 
+#include <cmath>
+
 
 namespace Belle2 {
   namespace Variable {
@@ -55,11 +57,11 @@ namespace Belle2 {
         return -999;
 
       TLorentzVector sum;
-      const std::vector<Particle*> daughters = particle->getDaughters();
-      int nDaughters = int(daughters.size());
+      const auto& daughters = particle->getDaughters();
+      int nDaughters = static_cast<int>(daughters.size());
 
       for (auto& double_daughter : daughter_indexes) {
-        int daughter = static_cast<int>(double_daughter + 0.5);
+        long daughter = std::lround(double_daughter);
         if (daughter >= nDaughters)
           return -999;
 
@@ -74,8 +76,8 @@ namespace Belle2 {
       if (!particle)
         return -999;
 
-      int daughter = static_cast<int>(daughters[0] + 0.5);
-      if (daughter >= int(particle->getNDaughters()))
+      long daughter = std::lround(daughters[0]);
+      if (daughter >= static_cast<int>(particle->getNDaughters()))
         return -999;
 
       double motherMass = particle->getMass();
@@ -89,8 +91,8 @@ namespace Belle2 {
       if (!particle)
         return -999;
 
-      int daughter = static_cast<int>(daughters[0] + 0.5);
-      if (daughter >= int(particle->getNDaughters()))
+      long daughter = std::lround(daughters[0]);
+      if (daughter >= static_cast<int>(particle->getNDaughters()))
         return -999;
 
       float result = 0.0;
@@ -138,8 +140,8 @@ namespace Belle2 {
       if (!particle)
         return -999;
 
-      int daughter = static_cast<int>(daughters[0] + 0.5);
-      if (daughter >= int(particle->getNDaughters()))
+      long daughter = std::lround(daughters[0]);
+      if (daughter >= static_cast<int>(particle->getNDaughters()))
         return -999;
 
       double massDiff = massDifference(particle, daughters);
@@ -161,8 +163,8 @@ namespace Belle2 {
       TLorentzVector motherMomentum = particle->get4Vector();
       TVector3       motherBoost    = -(motherMomentum.BoostVector());
 
-      int daughter = static_cast<int>(daughters[0] + 0.5);
-      if (daughter >= int(particle->getNDaughters()))
+      long daughter = std::lround(daughters[0]);
+      if (daughter >= static_cast<int>(particle->getNDaughters()))
         return -999;
 
       TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
@@ -178,12 +180,12 @@ namespace Belle2 {
       if (!particle)
         return -999;
 
-      int nDaughters = int(particle->getNDaughters());
+      int nDaughters = static_cast<int>(particle->getNDaughters());
       if (nDaughters != 2)
         return -999;
 
-      int daughter1 = static_cast<int>(daughters[0] + 0.5);
-      int daughter2 = static_cast<int>(daughters[1] + 0.5);
+      long daughter1 = std::lround(daughters[0]);
+      long daughter2 = std::lround(daughters[1]);
       if (daughter1 >= nDaughters || daughter2 >= nDaughters)
         return -999;
 

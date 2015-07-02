@@ -261,7 +261,7 @@ namespace Belle2 {
       m_tree->get().SetBranchAddress(branchName.c_str(), &object);
       for (int i = 0; i < nentries; ++i) {
         m_tree->get().GetEvent(i);
-        distinct_values.insert(static_cast<int>(object + 0.5));
+        distinct_values.insert(std::lround(object));
       }
       m_tree->get().SetBranchStatus("*", 1);
 

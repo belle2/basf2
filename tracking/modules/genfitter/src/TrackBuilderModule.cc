@@ -106,20 +106,19 @@ void TrackBuilderModule::event()
   //Relations for Tracks
   RelationArray tracksToMcParticles(tracks, mcParticles);
   RelationArray gfTracksToTrackFitResults(gfTracks, trackFitResults);
-//  RelationArray gfTrackCandidatesToMcParticles(trackCandidates, mcParticles);
   RelationArray gfTrackCandidatesToTrackFitResults(trackCandidates, trackFitResults);
 
   // Utility used to match everything up
-//  RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
-//  RelationIndex<genfit::Track, MCParticle> gfTracksToMCPart(gfTracks, mcParticles);
-  RelationIndex<genfit::TrackCand, MCParticle> gfTrackCandsToMCPart(trackCandidates, mcParticles);
+  RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
+  RelationIndex<genfit::Track, MCParticle> gfTracksToMCPart(gfTracks, mcParticles);
 
+  for (int iGFTrack = 0; iGFTrack < gfTracks.getEntries(); ++iGFTrack) {
+    assert(gfTracks[iGFTrack]);
+    const genfit::Track* gfTrack = gfTracks[iGFTrack];
 
-  for (const auto& trackCandidate : trackCandidates) {
-    const auto gfTracks = DataStore::getRelationsFromObj<genfit::Track>(&trackCandidate, m_gfTrackCandsColName);
-
-    if (gfTracks.size() == 0) {
-      B2DEBUG(100, "No genfit::Track for genfit::TrackCand");
+    const genfit::TrackCand* trackCand = DataStore::getRelatedToObj<genfit::TrackCand>(gfTrack, m_gfTrackCandsColName);
+    if (!trackCand) {
+      B2ERROR("No genfit::TrackCand for genfit::Track");
       continue;
     }
     // We need to know the index of the TrackCand in the StoreArray in
@@ -128,7 +127,7 @@ void TrackBuilderModule::event()
     // it in this ugly way.
     int iTrackCand = -1;
     for (int i = 0; i < trackCandidates.getEntries(); ++i) {
-      if (&trackCandidate == trackCandidates[i]) {
+      if (trackCand == trackCandidates[i]) {
         iTrackCand = i;
         break;
       }
@@ -138,101 +137,98 @@ void TrackBuilderModule::event()
       continue;
     }
 
+    // We create an empty track.  If, in the end, we manage to fill
+    // any TrackFitResults for it, we put a copy into the StoreArray.
     Track newTrack;
     bool haveTFR = false;
 
-    for (const auto& gfTrack : gfTracks) {
-
-      int iGFTrack = -1;
-      for (unsigned int i = 0; i < gfTracks.size(); ++i) {
-        if (&gfTrack == gfTracks[i]) {
-          iGFTrack = i;
-          break;
-        }
-      }
-      if (iGFTrack == -1) {
-        B2ERROR("No StoreArray entry corresponding to GFTrack.");
+    for (unsigned int iRep = 0; iRep < gfTrack->getNumReps(); ++iRep) {
+      const genfit::AbsTrackRep* trackRep = gfTrack->getTrackRep(iRep);
+      int iPDG = trackRep->getPDG();
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(iPDG)))) {
+        B2DEBUG(100,
+                "Track fitted with hypothesis that is not a ChargedStable (PDG code = "
+                << iPDG << ")");
         continue;
       }
 
-      for (unsigned int iRep = 0; iRep < gfTrack.getNumReps(); ++iRep) {
-        const auto trackRep = gfTrack.getTrackRep(iRep);
-        const auto pdgCode = trackRep->getPDG();
-        if (!Const::chargedStableSet.contains(Const::ParticleType(abs(pdgCode)))) {
-          B2DEBUG(100, "Track fitted with hypothesis that is not a ChargedStable (PDG code = " << pdgCode << ")");
-          continue;
-        }
-        Const::ChargedStable chargedStable(abs(pdgCode));
+      Const::ChargedStable chargedStable(abs(iPDG));
 
-        bool fitSuccess = gfTrack.hasFitStatus(trackRep);
-        genfit::FitStatus* fs = 0;
-        genfit::KalmanFitStatus* kfs = 0;
-        if (fitSuccess) {
-          fs = gfTrack.getFitStatus(trackRep);
-          fitSuccess = fitSuccess && fs->isFitted();
-          fitSuccess = fitSuccess && fs->isFitConverged();
-          kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
-          fitSuccess = fitSuccess && kfs;
-        }
-
-        // Ignore tracks that could not be fitted.
-        if (!fitSuccess)
-          continue;
-
-        //fill hit patterns VXD and CDC
-        HitPatternVXD theHitPatternVXD =  getHitPatternVXD(gfTrack);
-        uint32_t hitPatternVXDInitializer = (uint32_t)theHitPatternVXD.getInteger();
-
-        HitPatternCDC theHitPatternCDC =  getHitPatternCDC(gfTrack);
-        long long int hitPatternCDCInitializer = (long long int)theHitPatternCDC.getInteger();
-
-        // To calculate the correct starting helix parameters, one
-        // has to extrapolate the track to its 'start' (here: take
-        // point of closest approach to the origin)
-
-        TVector3 pos(m_beamSpot.at(0), m_beamSpot.at(1), m_beamSpot.at(2)); //origin
-        TVector3 lineDirection(0, 0, 1); // beam axis
-        TVector3 poca(0., 0., 0.); //point of closest approach
-        TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
-        TMatrixDSym cov(6);
-
-        try {
-          //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
-          genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
-          mop.extrapolateToLine(pos, lineDirection);
-          mop.getPosMomCov(poca, dirInPoca, cov);
-
-          B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
-          B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
-
-          int charge = fs->getCharge();
-          double pVal = fs->getPVal();
-          double Bx, By, Bz;
-          genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(),
-                                                           Bx, By, Bz);
-          trackFitResults.appendNew(poca, dirInPoca, cov, charge, chargedStable,
-                                    pVal, Bz / 10.,  hitPatternCDCInitializer, hitPatternVXDInitializer);
-          B2DEBUG(100, "Built TrackFitResult for hypothesis PDG = " << pdgCode);
-
-          int tfrIndex = trackFitResults.getEntries() - 1;
-          newTrack.setTrackFitResultIndex(chargedStable, tfrIndex);
-          haveTFR = true;
-
-          gfTracksToTrackFitResults.add(iGFTrack, tfrIndex);
-          gfTrackCandidatesToTrackFitResults.add(iTrackCand, tfrIndex);
-        } catch (...) {
-          B2WARNING("Something went wrong during the extrapolation of fit results!");
-        }
+      bool fitSuccess = gfTrack->hasFitStatus(trackRep);
+      genfit::FitStatus* fs = 0;
+      genfit::KalmanFitStatus* kfs = 0;
+      if (fitSuccess) {
+        fs = gfTrack->getFitStatus(trackRep);
+        fitSuccess = fitSuccess && fs->isFitted();
+        fitSuccess = fitSuccess && fs->isFitConverged();
+        kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+        fitSuccess = fitSuccess && kfs;
       }
+
+      // Ignore tracks that could not be fitted.
+      if (!fitSuccess)
+        continue;
+
+      //fill hit patterns VXD and CDC
+      HitPatternVXD theHitPatternVXD =  getHitPatternVXD(*gfTrack);
+      uint32_t hitPatternVXDInitializer = (uint32_t)theHitPatternVXD.getInteger();
+
+      HitPatternCDC theHitPatternCDC =  getHitPatternCDC(*gfTrack);
+      long long int hitPatternCDCInitializer = (long long int)theHitPatternCDC.getInteger();
+
+      // To calculate the correct starting helix parameters, one
+      // has to extrapolate the track to its 'start' (here: take
+      // point of closest approach to the origin)
+
+      TVector3 pos(m_beamSpot.at(0), m_beamSpot.at(1), m_beamSpot.at(2)); //origin
+      TVector3 lineDirection(0, 0, 1); // beam axis
+      TVector3 poca(0., 0., 0.); //point of closest approach
+      TVector3 dirInPoca(0., 0., 0.); //direction of the track at the point of closest approach
+      TMatrixDSym cov(6);
+
+      try {
+        //extrapolate the track to the origin, the results are stored directly in poca and dirInPoca
+        genfit::MeasuredStateOnPlane mop = gfTrack->getFittedState(iRep);
+        mop.extrapolateToLine(pos, lineDirection);
+        mop.getPosMomCov(poca, dirInPoca, cov);
+
+        B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
+        B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
+
+        //Create relations
+        //if (aTrackCandPointer->getMcTrackId() >= 0) {
+        //tracksToMcParticles.add(trackCounter, aTrackCandPointer->getMcTrackId());
+        //}
+
+        int charge = fs->getCharge();
+        double pVal = fs->getPVal();
+        double Bx, By, Bz;
+        genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(),
+                                                         Bx, By, Bz);
+        trackFitResults.appendNew(poca, dirInPoca, cov, charge, chargedStable,
+                                  pVal, Bz / 10.,  hitPatternCDCInitializer, hitPatternVXDInitializer);
+        B2DEBUG(100, "Built TrackFitResult for hypothesis PDG = " << iPDG);
+
+        int tfrIndex = trackFitResults.getEntries() - 1;
+        newTrack.setTrackFitResultIndex(chargedStable, tfrIndex);
+        haveTFR = true;
+
+        gfTracksToTrackFitResults.add(iGFTrack, tfrIndex);
+        gfTrackCandidatesToTrackFitResults.add(iTrackCand, tfrIndex);
+      } catch (...) {
+        B2WARNING("Something went wrong during the extrapolation of fit results!");
+      }
+
     }
+
     if (haveTFR) {
       // Create a StoreArray entry from a copy.
       Track* tr = tracks.appendNew(newTrack);
 
       B2DEBUG(50, "Built Belle2::Track");
-      //Do MC association.
+      // Do MC association.
       if (mcParticles.getEntries() > 0) {
-        auto relationToMCPart = gfTrackCandsToMCPart.getFirstElementFrom(trackCandidate);
+        auto relationToMCPart = gfTracksToMCPart.getFirstElementFrom(gfTrack);
         // relationToMCPart can be a nullptr (as of 2015-05-08 this
         // happens in framework/tests/streamer_test.py), so we have to
         // guard against this.  Otherwise we check if the relation
@@ -241,7 +237,6 @@ void TrackBuilderModule::event()
           tr->addRelationTo(relationToMCPart->to);
           B2DEBUG(100, "Associated new Belle2::Track with Belle2::MCParticle");
         }
-
       }
     }
   }

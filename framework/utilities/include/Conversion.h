@@ -18,7 +18,7 @@ namespace Belle2 {
    * You can catch both possible exception types of the function (invalid_argument and out_of_range) using the base class logic_error
    */
   template<typename T>
-  T convert_string(const std::string& str);
+  T convertString(const std::string& str);
 
 
 }

@@ -116,7 +116,7 @@ namespace Belle2 {
           if (not processBinaryNumericConditions(str)) {
             operation = NONE;
             try {
-              number = Belle2::convert_string<float>(str);
+              number = Belle2::convertString<float>(str);
               isNumeric = true;
             } catch (std::invalid_argument&) {
               isNumeric = false;

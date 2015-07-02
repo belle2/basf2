@@ -16,7 +16,7 @@ namespace Belle2 {
    * @return converted float
    */
   template<>
-  float convert_string(const std::string& str)
+  float convertString(const std::string& str)
   {
     std::string::size_type n;
     float number = std::stof(str, &n);
@@ -32,7 +32,7 @@ namespace Belle2 {
    * @return converted double
    */
   template<>
-  double convert_string(const std::string& str)
+  double convertString(const std::string& str)
   {
     std::string::size_type n;
     double number = std::stod(str, &n);
@@ -48,7 +48,7 @@ namespace Belle2 {
    * @return converted long double
    */
   template<>
-  long double convert_string(const std::string& str)
+  long double convertString(const std::string& str)
   {
     std::string::size_type n;
     long double number = std::stold(str, &n);
@@ -64,7 +64,7 @@ namespace Belle2 {
    * @return converted int
    */
   template<>
-  int convert_string(const std::string& str)
+  int convertString(const std::string& str)
   {
     std::string::size_type n;
     int number = std::stoi(str, &n);
@@ -80,7 +80,7 @@ namespace Belle2 {
    * @return converted long int
    */
   template<>
-  long int convert_string(const std::string& str)
+  long int convertString(const std::string& str)
   {
     std::string::size_type n;
     long int number = std::stol(str, &n);
@@ -96,7 +96,7 @@ namespace Belle2 {
    * @return converted unsigned long int
    */
   template<>
-  unsigned long int convert_string(const std::string& str)
+  unsigned long int convertString(const std::string& str)
   {
     std::string::size_type n;
     unsigned long int number = std::stoul(str, &n);

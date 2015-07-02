@@ -53,7 +53,7 @@ bool CondParser::parseCondition(string expression, EConditionOperators& condOper
   condOperator = foundIter->second;
 
   //Try to translate the remaining text to a number
-  condValue = convert_string<int>(expression.substr(iOperator, expression.length() - 1));
+  condValue = convertString<int>(expression.substr(iOperator, expression.length() - 1));
   return true;
 }
 

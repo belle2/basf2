@@ -26,7 +26,8 @@ using namespace Belle2;
 
 REG_MODULE(EKLMTimeCalibration)
 
-EKLMTimeCalibrationModule::EKLMTimeCalibrationModule() : Module()
+EKLMTimeCalibrationModule::EKLMTimeCalibrationModule() :
+  calibration::CalibrationModule()
 {
   setDescription("Module for EKLM calibration.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -42,7 +43,7 @@ EKLMTimeCalibrationModule::~EKLMTimeCalibrationModule()
 {
 }
 
-void EKLMTimeCalibrationModule::initialize()
+void EKLMTimeCalibrationModule::Prepare()
 {
   int i;
   char str[128];
@@ -77,11 +78,7 @@ void EKLMTimeCalibrationModule::initialize()
   delete t;
 }
 
-void EKLMTimeCalibrationModule::beginRun()
-{
-}
-
-void EKLMTimeCalibrationModule::event()
+void EKLMTimeCalibrationModule::CollectData()
 {
   int i, j, k, n, n2, vol;
   double l, hitTime;
@@ -162,11 +159,12 @@ void EKLMTimeCalibrationModule::event()
   }
 }
 
-void EKLMTimeCalibrationModule::endRun()
+void EKLMTimeCalibrationModule::closeParallelFiles()
 {
 }
 
-void EKLMTimeCalibrationModule::terminate()
+calibration::CalibrationModule::ECalibrationModuleResult
+EKLMTimeCalibrationModule::Calibrate()
 {
   int i;
   m_outputFile->cd();
@@ -176,5 +174,17 @@ void EKLMTimeCalibrationModule::terminate()
   }
   delete[] m_Tree;
   delete m_outputFile;
+  return calibration::CalibrationModule::c_Success;
+}
+
+calibration::CalibrationModule::ECalibrationModuleMonitoringResult
+EKLMTimeCalibrationModule::Monitor()
+{
+  return calibration::CalibrationModule::c_MonitoringSuccess;
+}
+
+bool EKLMTimeCalibrationModule::StoreInDataBase()
+{
+  return true;
 }
 

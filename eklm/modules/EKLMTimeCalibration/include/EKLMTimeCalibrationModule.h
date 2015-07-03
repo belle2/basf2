@@ -19,6 +19,7 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
+#include <calibration/CalibrationModule.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 
@@ -29,7 +30,7 @@ namespace Belle2 {
    * @details
    * Module for generation of transformation and alignment data.
    */
-  class EKLMTimeCalibrationModule : public Module {
+  class EKLMTimeCalibrationModule : public calibration::CalibrationModule {
 
     /**
      * Event (hit): time, distance from hit to SiPM.
@@ -54,27 +55,33 @@ namespace Belle2 {
     /**
      * Initializer.
      */
-    void initialize();
-
-    /**
-     * Called when entering a new run.
-     */
-    void beginRun();
+    void Prepare();
 
     /**
      * This method is called for each event.
      */
-    void event();
+    void CollectData();
 
     /**
-     * This method is called if the current run ends.
+     * Close files opened in parallel event processes.
      */
-    void endRun();
+    void closeParallelFiles();
 
     /**
-     * This method is called at the end of the event processing.
+     * Calibration.
      */
-    void terminate();
+    calibration::CalibrationModule::ECalibrationModuleResult Calibrate();
+
+    /**
+     * Monitor calibration results.
+     */
+    calibration::CalibrationModule::ECalibrationModuleMonitoringResult
+    Monitor();
+
+    /**
+     * Store calibration results.
+     */
+    bool StoreInDataBase();
 
   private:
 

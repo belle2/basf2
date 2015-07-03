@@ -1,34 +1,40 @@
+import numpy as np
+import math
+import string
+import random
+
+
+# Plotting imports
 import matplotlib.pyplot as plt
 import seaborn as sb
 sb.set()
 import pandas as pd
 from root_pandas import read_root
-import numpy as np
 
-
-from contextlib import contextmanager
-import tempfile
-import os
-import time
+# System import
 import sys
+import time
+import os
+import tempfile
+from contextlib import contextmanager
 
+# basf2 imports
 import basf2
+import ROOT
+from ROOT import Belle2
+
+# multiprocessing imports
 from multiprocessing import Process, Queue, queues, Pipe
 from Queue import Empty
 import pybasf2
 
-import string
-import random
-
+# Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from IPython.core.display import Image, display, Javascript
-try:
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", category=FutureWarning)
     from IPython.html import widgets
-except:
-    pass
-import math
-import ROOT
-from ROOT import Belle2
 
 
 class IPythonHandler:

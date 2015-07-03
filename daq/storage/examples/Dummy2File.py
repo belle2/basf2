@@ -21,8 +21,8 @@ from basf2 import *
 import sys
 argvs = sys.argv
 
-if len(argvs) < 2:
-    print 'Usage : DummyDataPacker.py <# of events>'
+if len(argvs) < 3:
+    print 'Usage : DummyDataPacker.py <runno> <maxevents>'
     sys.exit()
 
 # Set the log level to show only error and fatal messages
@@ -30,20 +30,31 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-max_event = int(argvs[1])
-packer = register_module('DummyDataPacker')
-packer.param('MaxEventNum', max_event)
+# runno = int(argvs[1])
+# max_event = int(argvs[2])
+# packer = register_module('DummyDataPacker')
+# packer.param('RunNumber', runno)
+# packer.param('MaxEventNum', max_event)
 # root = register_module('RootOutput')
 # root.param('outputFileName', argvs[2])
-dump = register_module('Ds2RawFile')
+# dump = register_module('Ds2RawFile')
+
+root = register_module('SeqRootInput')
+# root.param('inputFileName', argvs[2])
+
+output = register_module('StorageSerializer')
+output.param('OutputBufferName', 'OTEST')
+output.param('OutputBufferSize', 10)
+output.param('compressionLevel', 0)
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
-main.add_module(packer)
-# main.add_module(root)
-main.add_module(dump)
+# main.add_module(packer)
+main.add_module(root)
+# main.add_module(dump)
+main.add_module(output)
 
 # Process all events
 process(main)

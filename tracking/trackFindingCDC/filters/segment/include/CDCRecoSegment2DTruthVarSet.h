@@ -22,7 +22,8 @@ namespace Belle2 {
     static char const* const cdcRecoSegment2DTruthNames[] = {
       "segment_is_fake_truth",
       "track_is_already_found_truth",
-      "segment_is_new_track_truth"
+      "segment_is_new_track_truth",
+      "truth"
     };
 
     /** Class that specifies the names of the variables
@@ -32,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 3;
+      static const size_t nNames = 4;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)
@@ -51,7 +52,7 @@ namespace Belle2 {
       CDCRecoSegment2DTruthVarSet(const std::string& prefix = "") : VarSet<CDCRecoSegment2DTruthVarNames>(prefix) { }
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override);
 
     };
   }

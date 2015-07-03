@@ -100,8 +100,8 @@ class CDCFullFinder(metamodules.PathModule):
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
                  tmva_cut=0.1,
-                 first_filter="tmva", first_tmva_cut=0.75,
-                 background_filter="tmva", background_filter_tmva_cut=0.6,
+                 first_filter="tmva", first_tmva_cut=0.70,
+                 background_filter="tmva", background_filter_tmva_cut=0.4,
                  new_segments_filter="none", new_segments_filter_tmva_cut=0,
                  second_filter="none", second_tmva_cut=0):
 
@@ -111,16 +111,17 @@ class CDCFullFinder(metamodules.PathModule):
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
                 debug_output=False),
             CDCSegmentTrackCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name,
-                                    segment_track_chooser_first_step_cut=first_tmva_cut,
-                                    segment_track_chooser_first_step_filter=first_filter,
+                                    segment_track_filter_first_step_cut=first_tmva_cut,
+                                    segment_track_filter_first_step_filter=first_filter,
                                     background_segment_filter=background_filter,
                                     background_segment_cut=background_filter_tmva_cut,
                                     new_segment_filter=new_segments_filter,
                                     new_segment_cut=new_segments_filter_tmva_cut,
-                                    segment_track_chooser_second_step_cut=second_tmva_cut,
-                                    segment_track_chooser_second_step_filter=second_filter,
-                                    segment_track_filter="none",
-                                    segment_train_filter="none")]
+                                    segment_track_filter_second_step_cut=second_tmva_cut,
+                                    segment_track_filter_second_step_filter=second_filter,
+                                    segment_train_filter="none",
+                                    segment_information_list_track_filter="none")
+        ]
 
         metamodules.PathModule.__init__(self, modules=modules)
 
@@ -163,7 +164,7 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
     tmva_cut: the cut for the tmva. 0.1 is the default und should be reasonable enough.
     """
 
-    def __init__(self, tmva_cut=0.1):
+    def __init__(self, tmva_cut):
         self.tmva_cut = tmva_cut
 
         if self.tmva_cut < 0 or self.tmva_cut > 1:
@@ -330,38 +331,38 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
     """
 
     def __init__(self,
-                 segment_track_chooser_first_step_filter,
-                 segment_track_chooser_first_step_cut,
+                 segment_track_filter_first_step_filter,
+                 segment_track_filter_first_step_cut,
                  background_segment_filter,
                  background_segment_cut,
                  new_segment_filter,
                  new_segment_cut,
-                 segment_track_chooser_second_step_filter,
-                 segment_track_chooser_second_step_cut,
+                 segment_track_filter_second_step_filter,
+                 segment_track_filter_second_step_cut,
                  segment_train_filter,
-                 segment_track_filter,
+                 segment_information_list_track_filter,
                  output_track_cands_store_array_name=None,
                  track_cands_store_vector_name="CDCTrackVector",
                  segments_store_vector_name="CDCRecoSegment2DVector"):
 
         combiner_module = StandardEventGenerationRun.get_basf2_module(
             "SegmentTrackCombinerDev",
-            SegmentTrackChooserFirstStepFilter=segment_track_chooser_first_step_filter,
+            SegmentTrackFilterFirstStepFilter=segment_track_filter_first_step_filter,
             BackgroundSegmentsFilter=background_segment_filter,
             NewSegmentsFilter=new_segment_filter,
-            SegmentTrackChooserSecondStepFilter=segment_track_chooser_second_step_filter,
+            SegmentTrackFilterSecondStepFilter=segment_track_filter_second_step_filter,
             SegmentTrainFilter=segment_train_filter,
-            SegmentTrackFilter=segment_track_filter,
+            SegmentInformationListTrackFilter=segment_information_list_track_filter,
             WriteGFTrackCands=False,
             SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             SegmentsStoreObjName=segments_store_vector_name,
             TracksStoreObjName=track_cands_store_vector_name)
 
-        if segment_track_chooser_first_step_filter == "tmva":
+        if segment_track_filter_first_step_filter == "tmva":
             combiner_module.param(
-                'SegmentTrackChooserFirstStepFilterParameters', {
-                    "cut": str(segment_track_chooser_first_step_cut)})
+                'SegmentTrackFilterFirstStepFilterParameters', {
+                    "cut": str(segment_track_filter_first_step_cut)})
 
         if background_segment_filter == "tmva":
             combiner_module.param(
@@ -373,10 +374,10 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
                 'NewSegmentsFilterParameters', {
                     "cut": str(new_segment_cut)})
 
-        if segment_track_chooser_second_step_filter == "tmva":
+        if segment_track_filter_second_step_filter == "tmva":
             combiner_module.param(
-                'SegmentTrackChooserSecondStepFilterParameters', {
-                    "cut": str(segment_track_chooser_second_step_cut)})
+                'SegmentTrackFilterSecondStepFilterParameters', {
+                    "cut": str(segment_track_filter_second_step_cut)})
 
         if output_track_cands_store_array_name is not None:
             combiner_module.param({'WriteGFTrackCands': True,
@@ -434,6 +435,33 @@ class CDCMCFinder(metamodules.IfStoreArrayNotPresentModule):
         metamodules.IfStoreArrayNotPresentModule.__init__(self, mc_track_finder_module, storearray_name="MCTrackCands")
 
 
+class CDCRecoFitter(metamodules.PathModule):
+
+    def __init__(self, setup_geometry=True, fit_geometry="Geant4",
+                 input_track_cands_store_array_name="TrackCands"):
+
+        setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
+                                                                                        whichGeometry=fit_geometry)
+
+        reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
+            "RecoTrackCreator",
+            TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
+        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter")
+        reco_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
+        track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilderFromRecoTracks')
+        track_builder.set_log_level(basf2.LogLevel.DEBUG)
+
+        module_list = []
+        if setup_geometry:
+            module_list.append(setup_genfit_extrapolation_module)
+
+        module_list.append(reco_track_creator_module)
+        module_list.append(reco_fitter_module)
+        module_list.append(track_builder)
+
+        super(CDCRecoFitter, self).__init__(modules=module_list)
+
+
 class CDCFitter(metamodules.PathModule):
 
     """ Add the genfit module to te path
@@ -446,29 +474,26 @@ class CDCFitter(metamodules.PathModule):
 
     """
 
-    def __init__(self, setup_geometry=True, fit_geometry="Geant4",
-                 input_track_cands_store_array_name="TrackCands",
-                 output_tracks_store_array_name="GF2Tracks"):
+    def __init__(self, setup_geometry=True, fit_geometry="Geant4", build_tracks=True):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
         gen_fitter_module = StandardEventGenerationRun.get_basf2_module('GenFitter',
                                                                         PDGCodes=[211],
-                                                                        StoreFailedTracks=False,
-                                                                        GFTrackCandidatesColName=input_track_cands_store_array_name,
-                                                                        GFTracksColName=output_tracks_store_array_name,
                                                                         BuildBelle2Tracks=False)
 
-        track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder',
-                                                                    GFTracksColName=output_tracks_store_array_name,
-                                                                    GFTrackCandidatesColName=input_track_cands_store_array_name)
+        gen_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
+
+        track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder')
+        track_builder.set_log_level(basf2.LogLevel.DEBUG)
 
         module_list = []
         if setup_geometry:
             module_list.append(setup_genfit_extrapolation_module)
 
         module_list.append(gen_fitter_module)
-        module_list.append(track_builder)
+        if build_tracks:
+            module_list.append(track_builder)
 
         super(CDCFitter, self).__init__(modules=module_list)
 

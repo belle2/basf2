@@ -72,5 +72,6 @@ bool CDCRecoSegment2DTruthVarSet::extract(const CDCRecoSegment2D* segment)
   var<named("track_is_already_found_truth")>() = trackIsAlreadyFound;
   var<named("segment_is_fake_truth")>() = segmentIsFake;
   var<named("segment_is_new_track_truth")>() = not segmentIsFake and not trackIsAlreadyFound;
+  var<named("truth")>() = false; // override in children class
   return true;
 }

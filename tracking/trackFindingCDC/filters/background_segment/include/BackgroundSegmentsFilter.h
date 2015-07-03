@@ -21,12 +21,32 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /** Class that computes floating point variables from a segment.
+     *  that can be forwarded to a flat TNTuple or a TMVA method
+     */
+    class BackgroundSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
+
+    public:
+      /// Construct the peeler and take an optional prefix.
+      BackgroundSegmentTruthVarSet(const std::string& prefix = "") : CDCRecoSegment2DTruthVarSet(prefix) { }
+
+      /// Generate and assign the variables from the cluster
+      virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override final)
+      {
+        CDCRecoSegment2DTruthVarSet::extract(segment);
+
+        var<named("truth")>() = var<named("segment_is_fake_truth")>();
+        return true;
+      }
+    };
+
+
     using BaseBackgroundSegmentsFilter = Filter<CDCRecoSegment2D>;
 
-    using MCBackgroundSegmentsFilter = MCFilter<VariadicUnionVarSet<CDCRecoSegment2DTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
+    using MCBackgroundSegmentsFilter = MCFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
 
     using RecordingBackgroundSegmentsFilter =
-      RecordingFilter<VariadicUnionVarSet<CDCRecoSegment2DTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
+      RecordingFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
 
     using AllBackgroundSegmentsFilter = AllFilter<BaseBackgroundSegmentsFilter>;
 

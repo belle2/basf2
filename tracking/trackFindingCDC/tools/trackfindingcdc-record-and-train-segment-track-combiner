@@ -18,7 +18,7 @@ rm -rf weights
 if [ ! -e "BackgroundSegmentsFilter.root" ]; then
 	trackfindingcdc-record-background-segments -i "$1"
 fi
-trackfindingcdc-train BackgroundSegmentsFilter.root --truth segment_is_fake_truth
+trackfindingcdc-train BackgroundSegmentsFilter.root
 mv weights/BackgroundSegmentsFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
 rm -rf weights
 
@@ -26,7 +26,7 @@ rm -rf weights
 if [ ! -e "NewSegmentsFilter.root" ]; then
 	trackfindingcdc-record-new-segments -i "$1"
 fi
-trackfindingcdc-train NewSegmentsFilter.root --truth segment_is_new_track_truth
+trackfindingcdc-train NewSegmentsFilter.root
 mv weights/NewSegments_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
 rm -rf weights
 

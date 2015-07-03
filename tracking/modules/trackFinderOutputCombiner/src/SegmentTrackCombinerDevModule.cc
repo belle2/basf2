@@ -24,10 +24,10 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   SegmentTrackCombinerImplModule<>(),
   m_segmentTrackChooserFirstStepFactory("tmva"),
   m_backgroundSegmentsFilterFactory("tmva"),
-  m_newSegmentsFilterFactory("tmva"),
-  m_segmentTrackChooserSecondStepFactory("tmva"),
-  m_segmentTrainFilterFactory("simple"),
-  m_segmentTrackFilterFactory("simple")
+  m_newSegmentsFilterFactory("none"),
+  m_segmentTrackChooserSecondStepFactory("none"),
+  m_segmentTrainFilterFactory("none"),
+  m_segmentTrackFilterFactory("none")
 {
   setDescription("Versatile module with adjustable filters for segment track combination.");
 

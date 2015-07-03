@@ -252,7 +252,7 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("Print out variables to reduce unused-variables-warnings : %p %u\n", finesse_buf, finesse_nwords);
+  printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
   string err_str = err_buf;
   throw (err_str);
 
@@ -308,7 +308,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       //
       // Do not stop data
       //
-      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8d : %x %x %d\n",
+      printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8u : %x %x %d\n",
              GetRunNo(n), GetSubRunNo(n), GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
 //       sprintf(err_buf,"[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %8d sub %4d eve %8d : %x %x %d\n %s %s %d\n",
 //             GetRunNo(n), GetSubRunNo(n),   GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num), __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -316,7 +316,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       //
       // Stop taking data
       //
-      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error run %d sub %d eve %8d : %x %x %d\n",
+      printf("[FATAL] POST B2link event CRC16 error without B2link Packet CRC error run %d sub %d eve %8u : %x %x %d\n",
              GetRunNo(n), GetSubRunNo(n), GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
       int* temp_buf = GetFINESSEBuffer(n, finesse_num);
       printf("%.8x ", 0);
@@ -328,7 +328,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       fflush(stdout);
 
       sprintf(err_buf,
-              "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting... run %d sub %d eve %d\n %s %s %d\n",
+              "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting... run %d sub %d eve %u\n %s %s %d\n",
               (unsigned short)(*buf & 0xFFFF), temp_crc16, GetRunNo(n), GetSubRunNo(n), GetEveNo(n), __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;     throw (err_str);
     }

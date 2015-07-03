@@ -78,7 +78,7 @@ void RawTLU::CheckData(int n,
 #endif
 
   if (GetEveNo(n) != GetTLUEventTag(n)) {
-    sprintf(err_buf, "invalid TLU event tag : blodk %d header eve # %d TLU tag %d. Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "invalid TLU event tag : blodk %d header eve # %u TLU tag %u. Exiting...\n %s %s %d\n",
             n, GetEveNo(n), GetTLUEventTag(n), __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }

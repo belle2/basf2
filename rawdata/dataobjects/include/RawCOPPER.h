@@ -153,7 +153,8 @@ namespace Belle2 {
     //! Get Detected Error bitflag
     void AddErrorBitFlag(int n, unsigned int error_bit_flag);
 
-    unsigned int GetNodeID(int n);     //! get node-ID from data
+    //! get node-ID from data
+    unsigned int GetNodeID(int n);
 
     //
     // Get information from 13words "COPPER header" attached by COPPER board

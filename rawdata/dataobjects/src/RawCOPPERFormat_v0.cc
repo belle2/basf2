@@ -337,7 +337,7 @@ void RawCOPPERFormat_v0::CheckData(int n,
 
 
 #ifdef DEBUG
-  printf("[DEBUG] eve %d %d %d %d %d\n",
+  printf("[DEBUG] eve %u %d %d %d %d\n",
          GetEveNo(n),
          Get1stDetectorNwords(n),
          Get2ndDetectorNwords(n),

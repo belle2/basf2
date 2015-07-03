@@ -252,7 +252,7 @@ int PostRawCOPPERFormat_v1::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("Print out variables to reduce unused-variables-warnings : %p %u\n", finesse_buf, finesse_nwords);
+  printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
   string err_str = err_buf;
   throw (err_str);
 

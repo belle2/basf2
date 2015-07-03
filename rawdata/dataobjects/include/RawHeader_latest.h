@@ -115,32 +115,42 @@ namespace Belle2 {
     //! Add Detected Error bitflag
     void AddErrorBitFlag(unsigned int error_bit_flag);
 
-    int GetOffset1stFINESSE();  //! get contents of header
+    //! get contents of header
+    int GetOffset1stFINESSE();
 
-    int GetOffset2ndFINESSE();  //! get contents of header
+    //! get contents of header
+    int GetOffset2ndFINESSE();
 
-    int GetOffset3rdFINESSE();  //! get contents of header
+    //! get contents of header
+    int GetOffset3rdFINESSE();
 
-    int GetOffset4thFINESSE();  //! get contents of header
+    //! get contents of header
+    int GetOffset4thFINESSE();
 
     //    int GetNumNodes();  //! get contents of header
 
     //    int GetNodeInfo(int node_no, int* node_id);    //! get contents of header
 
-    unsigned int GetTTCtimeTRGType();  //! get contents of header
+    //! get contents of header
+    unsigned int GetTTCtimeTRGType();
 
-    int GetTTCtime();  //! get contents of header
+    //! get contents of header
+    int GetTTCtime();
 
-    int GetTRGType();  //! get TRGType
+    //! get TRGType
+    int GetTRGType();
 
-    unsigned int GetTTUtime();  //! get contents of header
+    //! get contents of header
+    unsigned int GetTTUtime();
 
-    void GetTTTimeVal(struct  timeval* tv);    //! get contents of header
+    //! get contents of header
+    void GetTTTimeVal(struct  timeval* tv);
 
     /// Get magic word to check the data corruption
     //    unsigned int GetMagicWordEntireHeader();
 
-    void CheckHeader(int* buf);    //! check the contents of header
+    //! check the contents of header
+    void CheckHeader(int* buf);
 
     /*
       Experimental(10bit) #, Run#(14bit), restat# bit mask(8bit)

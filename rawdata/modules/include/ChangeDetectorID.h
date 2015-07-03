@@ -31,6 +31,8 @@ namespace Belle2 {
 
     // Data members
   private:
+
+    //! detector ID to be written in RawHeader
     unsigned int m_new_detector_id;
 
   };

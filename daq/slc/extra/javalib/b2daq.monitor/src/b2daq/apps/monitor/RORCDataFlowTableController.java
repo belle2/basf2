@@ -5,16 +5,10 @@
  */
 package b2daq.apps.monitor;
 
-import b2daq.database.ConfigObject;
-import b2daq.database.FieldInfo;
 import b2daq.dqm.graphics.HistogramCanvas;
 import b2daq.graphics.GShape;
-import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommand;
 import b2daq.nsm.NSMDATASetHandler;
-import b2daq.nsm.NSMDATASetParamHandler;
 import b2daq.nsm.NSMData;
-import b2daq.nsm.NSMMessage;
 import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.runcontrol.core.RCState;
 import b2daq.runcontrol.ui.RCStateLabel;

@@ -63,7 +63,6 @@ public class PSSettingMainPanelController {
         NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_hvnode.getName(), "ncrates", NSMVar.INT) {
             @Override
             public boolean handleVSet(NSMVar var) {
-                System.out.println(m_node+" " + var.getName());
                 int ncrates = var.getInt();
                 for (int i = 0; i < ncrates; i++) {
                     try {

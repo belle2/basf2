@@ -44,7 +44,7 @@ public abstract class NSMDBSetHandler extends NSMRequestHandler {
         if (cmd.equals(NSMCommand.DBSET)) {
             ConfigObject obj = (ConfigObject) msg.getObject();
             String confname = obj.getName();
-            if (obj.getName().equals(m_node+"@"+m_name)) {
+            if (confname.equals(m_node+"@"+m_name)) {
                 return handleDBSet((ConfigObject) msg.getObject());
             }
         }

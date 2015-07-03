@@ -83,7 +83,7 @@ public class PSChannelSettingPanelController {
     }
 
     private void addValues() {
-        if (m_slot > 0 && m_channel > 0) {
+        if (m_slot > 0 && m_channel >= 0) {
             NSMRequestHandlerUI.get().add(new NSMVSetHandler(false, m_hvnode.getName(), getVName("rampup"), NSMVar.FLOAT) {
                 @Override
                 public boolean handleVSet(NSMVar var) {

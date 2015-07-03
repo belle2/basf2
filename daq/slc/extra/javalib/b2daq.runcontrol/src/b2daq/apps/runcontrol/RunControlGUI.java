@@ -5,15 +5,18 @@
  */
 package b2daq.apps.runcontrol;
 
+import b2daq.io.ConfigFile;
 import b2daq.logger.core.LogMessage;
 import b2daq.nsm.NSMCommunicator;
 import b2daq.nsm.NSMConfig;
 import b2daq.nsm.ui.NSMRequestHandlerUI;
 import b2daq.ui.LoginDialog;
+import java.io.File;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -25,8 +28,14 @@ public class RunControlGUI extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        NSMConfig conf = LoginDialog.showDialog(".runcontrol.ini", "Connect to Run control",
-                "localhost", 9090, "ecl01", "b2slow2.kek.jp", 9122, "rcgui");
+        FileChooser fc = new FileChooser();
+        fc.setTitle("select file");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("init", "*.init"));
+        File f = fc.showOpenDialog(stage);
+        ConfigFile config = new ConfigFile(f.getPath());
+        NSMConfig conf = LoginDialog.showDialog(f.getPath(), "Connect to Run control",
+                config.getString("hostname"), config.getInt("port"), "",
+                config.getString("nsmhost"), config.getInt("nsmport"), config.getString("nsmnode"));
         RunControlMainPane root = new RunControlMainPane(conf.getNsmNode());
         NSMCommunicator.get().reconnect(conf.getHostname(), conf.getPort(), conf.getGuiNode(), conf.getNsmHost(), conf.getNsmPort());
         NSMCommunicator.get().add(NSMRequestHandlerUI.get());

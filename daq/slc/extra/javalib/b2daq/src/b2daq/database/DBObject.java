@@ -320,7 +320,7 @@ public abstract class DBObject implements Serializable {
                 }
             }
             if (!hasObject(name)) {
-                System.out.println();
+                System.out.println("");
             }
         }
     }

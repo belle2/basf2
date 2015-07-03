@@ -285,7 +285,6 @@ public class NSMData extends DBObject {
                 index = Integer.parseInt(s);
             }
             name_out = name_in.substring(name_in.indexOf(".") + 1);
-            System.out.println("KONNO");
             return ((NSMData) data_v.get(index)).find(name_out);
         }
         int index = 0;

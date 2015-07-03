@@ -35,12 +35,12 @@ public class NSMRequestHandlerUI extends NSMRequestHandler {
         m_available = true;
         synchronized (m_handler) {
             int nhandlers = m_handler.size();
-            for (int n = 0; n < nhandlers; n++) {
-                final NSMRequestHandler handler = m_handler.get(n);
-                Platform.runLater(() -> {
+            Platform.runLater(() -> {
+                for (int n = 0; n < nhandlers; n++) {
+                    final NSMRequestHandler handler = m_handler.get(n);
                     handler.connected();
-                });
-            }
+                }
+            });
         }
         return true;
     }
@@ -53,13 +53,13 @@ public class NSMRequestHandlerUI extends NSMRequestHandler {
             for (int i = 0; i < nhandlers; i++) {
                 handlers.add(m_handler.get(i));
             }
-            for (NSMRequestHandler handler : handlers) {
-                Platform.runLater(() -> {
+            Platform.runLater(() -> {
+                for (NSMRequestHandler handler : handlers) {
                     if (handler.handle(cmd, msg) && handler.isOnce()) {
                         m_handler.remove(handler);
                     }
-                });
-            }
+                }
+            });
         }
         return true;
     }

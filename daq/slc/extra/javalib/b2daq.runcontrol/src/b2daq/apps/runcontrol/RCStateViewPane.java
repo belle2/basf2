@@ -84,7 +84,10 @@ public class RCStateViewPane extends GridPane {
                                 @Override
                                 public boolean handleVSet(NSMVar var2) {
                                     String node = var2.getName().replace(".rcconfig", "");
-                                    m_rcconfig.put(node, var2.getText());
+                                    String config = var2.getText();
+                                    String str[] = config.split("@");
+                                    if (str.length > 1) config = str[1];
+                                    m_rcconfig.put(node, config);
                                     return true;
                                 }
                             };
@@ -193,8 +196,8 @@ public class RCStateViewPane extends GridPane {
             if (state.equals(RCState.NOTREADY_S) || state.equals(RCState.READY_S)) {
                 menu.getItems().add(vset);
                 vset.setOnAction((ActionEvent event) -> {
-                    VSetDialog.showDialog(null, "NSMV Set "+m_node, 
-                            "NSM Variable at "+m_node, m_node);
+                    VSetDialog.showDialog(null, "NSMV Set " + m_node,
+                            "NSM Variable at " + m_node, m_node);
                 });
             }
             if (state.equals(RCState.NOTREADY_S) || state.equals(RCState.READY_S)
@@ -226,15 +229,13 @@ public class RCStateViewPane extends GridPane {
                                 @Override
                                 public boolean handleDBListSet(String[] list) {
                                     String message = "RC Config for " + nodename;
-                                    String conf = RunConfigDialog.showDialog(getScene(), message, message, nodename + "@" + m_config, list);
-                                    if (conf == null) {
-                                        return true;
-                                    }
+                                    String[] s = m_config.split("@");
+                                    if (s.length > 1) m_config = s[1];
+                                    String conf = RunConfigDialog.showDialog(getScene(), message, message, m_config, list);
+                                    if (conf == null) return true;
                                     m_config = conf;
-                                    String[] s = conf.split("@");
-                                    if (s.length > 1) {
-                                        m_config = s[1];
-                                    }
+                                    s = conf.split("@");
+                                    if (s.length > 1) m_config = s[1];
                                     try {
                                         NSMCommunicator.get().requestVSet(m_nodename, new NSMVar(vname, m_config));
                                     } catch (IOException e) {
@@ -287,23 +288,53 @@ public class RCStateViewPane extends GridPane {
             String node1 = item1.getText();
             String config = m_rcconfig.get(node1.toLowerCase());
             String table = m_table.get(node1.toLowerCase());
-            System.out.println(node1 +" " + config + " " + table);
-            NSMDBSetHandler handler = new NSMDBSetHandler(table, node1, config, true) {
-                @Override
-                public boolean handleDBSet(ConfigObject obj) {
-                    ConfigViewPane dialog = new ConfigViewPane(obj);
-                    Scene scene1 = new Scene(dialog, 350, 550);
-                    Stage stage = new Stage(StageStyle.DECORATED);
-                    stage.setScene(scene1);
-                    stage.initModality(Modality.WINDOW_MODAL);
-                    stage.setResizable(true);
-                    stage.setTitle(obj.getName());
-                    stage.show();
-                    return true;
-                }
-            };
-            NSMRequestHandlerUI.get().add(handler);
+            if (config != null) {
+                String str[] = config.split("@");
+                if (str.length > 1) config = str[1];
+                NSMDBSetHandler handler = new NSMDBSetHandler(table, node1, config, true) {
+                    @Override
+                    public boolean handleDBSet(ConfigObject obj) {
+                        ConfigViewPane dialog = new ConfigViewPane(obj);
+                        Scene scene1 = new Scene(dialog, 350, 550);
+                        Stage stage = new Stage(StageStyle.DECORATED);
+                        stage.setScene(scene1);
+                        stage.initModality(Modality.WINDOW_MODAL);
+                        stage.setResizable(true);
+                        stage.setTitle(obj.getName());
+                        stage.show();
+                        return true;
+                    }
+                };
+                NSMRequestHandlerUI.get().add(handler);
+            } else {
+                String vname = node1.toLowerCase() + ".rcconfig";
+                NSMRequestHandlerUI.get().add(new NSMVSetHandler(true, m_nodename, vname, NSMVar.TEXT) {
+                    @Override
+                    public boolean handleVSet(NSMVar var) {
+                        String config = var.getText();
+                        String str[] = config.split("@");
+                        if (str.length > 1) config = str[1];
+                        String nodename = var.getName().replace(".rcconfig", "").toUpperCase();
+                        String table = m_table.get(nodename.toLowerCase());
+                        NSMDBSetHandler handler = new NSMDBSetHandler(table, nodename, config, true) {
+                            @Override
+                            public boolean handleDBSet(ConfigObject obj) {
+                                ConfigViewPane dialog = new ConfigViewPane(obj);
+                                Scene scene1 = new Scene(dialog, 350, 550);
+                                Stage stage = new Stage(StageStyle.DECORATED);
+                                stage.setScene(scene1);
+                                stage.initModality(Modality.WINDOW_MODAL);
+                                stage.setResizable(true);
+                                stage.setTitle(obj.getName());
+                                stage.show();
+                                return true;
+                            }
+                        };
+                        NSMRequestHandlerUI.get().add(handler);
+                        return true;
+                    }
+                });
+            }
         });
-
     }
 }

@@ -5,24 +5,9 @@
  */
 package b2daq.apps.monitor;
 
-import b2daq.core.LogLevel;
-import b2daq.database.ConfigObject;
-import b2daq.logger.core.LogMessage;
-import b2daq.nsm.NSMCommand;
-import b2daq.nsm.NSMData;
-import b2daq.nsm.NSMMessage;
-import b2daq.runcontrol.core.RCCommand;
 import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.ResourceBundle;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 
 /**
  *

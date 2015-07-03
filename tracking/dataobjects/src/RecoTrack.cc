@@ -1,141 +1,209 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/WireID.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 
-#include <algorithm>
-#include <utility>
-
+#include <genfit/AbsKalmanFitter.h>
+#include <genfit/RKTrackRep.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/KalmanFitStatus.h>
 
 using namespace Belle2;
-using namespace std;
 
 ClassImp(RecoTrack);
 
-RecoTrack::RecoTrack(const std::string& cdcHitsName,
-                     const std::string& svdHitsName,
-                     const std::string& pxdHitsName,
-                     const SorterBaseCDCHit sorterBaseCDCHit,
-                     const SorterBaseVXDHit sorterBaseVXDHit) :
-  m_hitPatternCDCInitializer(0), m_hitPatternVXDInitializer(0),
-  m_cdcHitsName(cdcHitsName), m_assumeSortedCDC(false),
-  m_sorterBaseCDC(sorterBaseCDCHit), m_sortingCacheCDC(true),
-  m_svdHitsName(svdHitsName), m_pxdHitsName(pxdHitsName),
-  m_assumeSortedVXD(false),
-  m_sorterBaseVXD(sorterBaseVXDHit),
-  m_sortingCacheVXD(true)
-
+RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
+                                          const std::string& storeArrayNameOfRecoTracks,
+                                          const std::string& storeArrayNameOfCDCHits,
+                                          const std::string& storeArrayNameOfSVDHits,
+                                          const std::string& storeArrayNameOfPXDHits,
+                                          const std::string& storeArrayNameOfRecoHitInformation
+                                         )
 {
-  m_cdcHitIndicesPositive.reserve(1000);
-  m_cdcHitIndicesNegative.reserve(1000);
-  m_svdHitIndicesPositive.reserve(32);
-  m_svdHitIndicesNegative.reserve(32);
-  m_pxdHitIndicesPositive.reserve(8);
-  m_pxdHitIndicesNegative.reserve(8);
-}
 
-void RecoTrack::setCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
-                                 const short pseudocharge)
-{
-  pseudocharge > 0 ?
-  (m_cdcHitIndicesPositive = cdcHitIndices) :
-  (m_cdcHitIndicesNegative = cdcHitIndices);
-  m_sortingCacheCDC = false;
-}
+  StoreArray<RecoTrack> recoTracks(storeArrayNameOfRecoTracks);
+  StoreArray<UsedCDCHit> cdcHits(storeArrayNameOfCDCHits);
+  StoreArray<UsedSVDHit> svdHits(storeArrayNameOfSVDHits);
+  StoreArray<UsedPXDHit> pxdHits(storeArrayNameOfPXDHits);
 
-void RecoTrack::addCDCHitIndex(const std::pair< unsigned short, short> cdcHitIndex,
-                               const short pseudoCharge)
-{
-  pseudoCharge > 0 ?
-  (m_cdcHitIndicesPositive.push_back(cdcHitIndex)) :
-  (m_cdcHitIndicesNegative.push_back(cdcHitIndex));
-  m_sortingCacheCDC = false;
-}
+  // Set the tracking parameters
+  const TVector3& position = trackCand->getPosSeed();
+  const TVector3& momentum = trackCand->getMomSeed();
+  const short int charge = trackCand->getChargeSeed();
 
-void RecoTrack::addCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
-                                 const short pseudoCharge)
-{
-  pseudoCharge > 0 ?
-  m_cdcHitIndicesPositive.insert(m_cdcHitIndicesPositive.end(), cdcHitIndices.begin(), cdcHitIndices.end()) :
-  m_cdcHitIndicesNegative.insert(m_cdcHitIndicesNegative.end(), cdcHitIndices.begin(), cdcHitIndices.end());
-  m_sortingCacheCDC = false;
-}
+  RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge,
+                                                 storeArrayNameOfCDCHits, storeArrayNameOfSVDHits,
+                                                 storeArrayNameOfPXDHits, storeArrayNameOfRecoHitInformation);
 
-bool RecoTrack::hasCDCHit(const unsigned short hitIndex, const short rightLeft)
-{
-  return ((m_cdcHitIndicesNegative.end() !=
-           std::find(m_cdcHitIndicesNegative.begin(), m_cdcHitIndicesNegative.end(), make_pair(hitIndex, rightLeft)))
-          or
-          (m_cdcHitIndicesPositive.end() !=
-           std::find(m_cdcHitIndicesPositive.begin(), m_cdcHitIndicesPositive.end(), make_pair(hitIndex, rightLeft)))
-         );
-}
-
-void RecoTrack::fillHitPatternCDC(const short pseudoCharge)
-{
-  StoreArray<CDCHit> cdcHits(m_cdcHitsName);
-  HitPatternCDC      hitPatternCDC;
-  auto& cdcHitIndices =
-    pseudoCharge > 0 ? m_cdcHitIndicesPositive : m_cdcHitIndicesNegative;
-
-  for (auto hitPair : cdcHitIndices) {
-    // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
-    WireID wireID(cdcHits[hitPair.first]->getID());
-    // Then I set the corresponding layer in the hit pattern.
-    hitPatternCDC.setLayer(wireID.getICLayer());
+  for (unsigned int hitIndex = 0; hitIndex < trackCand->getNHits(); hitIndex++) {
+    genfit::TrackCandHit* trackCandHit = trackCand->getHit(hitIndex);
+    const int detID = trackCandHit->getDetId();
+    const int hitID = trackCandHit->getHitId();
+    const double sortingParameter = trackCandHit->getSortingParameter();
+    if (detID == Const::CDC) {
+      UsedCDCHit* cdcHit = cdcHits[hitID];
+      newRecoTrack->addCDCHit(cdcHit, sortingParameter);
+    } else if (detID == Const::SVD) {
+      UsedSVDHit* svdHit = svdHits[hitID];
+      newRecoTrack->addSVDHit(svdHit, sortingParameter);
+    } else if (detID == Const::PXD) {
+      UsedPXDHit* pxdHit = pxdHits[hitID];
+      newRecoTrack->addPXDHit(pxdHit, sortingParameter);
+    }
   }
-  m_hitPatternCDCInitializer = hitPatternCDC.getInteger();
+
+  return newRecoTrack;
 }
 
-void RecoTrack::fillHitPatternVXD(const short /*pseudoCharge*/)
+genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
 {
-  //Do something similar as for the CDC
+  genfit::TrackCand* createdTrackCand = new genfit::TrackCand();
+
+  // Set the trajectory parameters
+  createdTrackCand->setPosMomSeed(getPosition(), getMomentum(), getCharge());
+
+  // Add the hits
+  mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedCDCHit * const hit) {
+    createdTrackCand->addHit(Const::CDC, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedSVDHit * const hit) {
+    createdTrackCand->addHit(Const::SVD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedPXDHit * const hit) {
+    createdTrackCand->addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+
+  // Add the hits
+  return createdTrackCand;
 }
 
-
-void RecoTrack::resetHitIndices(const short pseudoCharge,
-                                const Const::EDetector detector)
+template <class HitType>
+void RecoTrack::addHitToGenfitTrack(Const::EDetector detector,
+                                    const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory,
+                                    RecoHitInformation& recoHitInformation, HitType* const cdcHit)
 {
-  if ((detector == Const::EDetector::CDC or
-       detector == Const::EDetector::invalidDetector) and
-      pseudoCharge >= 0)
-    m_cdcHitIndicesPositive.clear();
+  genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, cdcHit->getArrayIndex(), -1,
+      recoHitInformation.getSortingParameter());
+  genfit::AbsMeasurement* measurement = measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
+                                        trackCandHit);
+  genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
+  trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
+  insertPoint(trackPoint);
+};
 
-  if ((detector == Const::EDetector::CDC or
-       detector == Const::EDetector::invalidDetector) and
-      pseudoCharge <= 0)
-    m_cdcHitIndicesNegative.clear();
+void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit)
+{
 
-  if ((detector == Const::EDetector::SVD or
-       detector == Const::EDetector::invalidDetector) and
-      pseudoCharge >= 0)
-    m_svdHitIndicesPositive.clear();
+  m_lastFitSucessfull = false;
 
-  if ((detector == Const::EDetector::SVD or
-       detector == Const::EDetector::invalidDetector) and
-      pseudoCharge <= 0)
-    m_svdHitIndicesNegative.clear();
+  // Create a measurement factory
+  StoreArray<UsedPXDHit> pxdHits(m_storeArrayNameOfPXDHits);
+  StoreArray<UsedSVDHit> svdHits(m_storeArrayNameOfSVDHits);
+  StoreArray<UsedCDCHit> cdcHits(m_storeArrayNameOfCDCHits);
 
-  if ((detector == Const::EDetector::PXD or
-       detector == Const::EDetector::invalidDetector) and
-      pseudoCharge >= 0)
-    m_pxdHitIndicesPositive.clear();
+  // Create the related measurement factory
+  genfit::MeasurementFactory<genfit::AbsMeasurement> measurementFactory;
+  if (pxdHits.isOptional())
+    measurementFactory.addProducer(Const::PXD, new genfit::MeasurementProducer<RecoTrack::UsedPXDHit, PXDRecoHit>(pxdHits.getPtr()));
+  if (svdHits.isOptional())
+    measurementFactory.addProducer(Const::SVD, new genfit::MeasurementProducer<RecoTrack::UsedSVDHit, SVDRecoHit>(svdHits.getPtr()));
+  if (cdcHits.isOptional())
+    measurementFactory.addProducer(Const::CDC, new genfit::MeasurementProducer<RecoTrack::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
 
-  if ((detector == Const::EDetector::PXD or
-       detector == Const::EDetector::invalidDetector) and
-      pseudoCharge <= 0)
-    m_pxdHitIndicesNegative.clear();
+  // Create a track representation
+  // Set the pdg code accordingly if the user gave us the wrong charge sign
+  TParticlePDG* particleWithPDGCode = TDatabasePDG::Instance()->GetParticle(pdgCodeForFit);
+  // Note that for leptons positive PDG codes correspond to the
+  // negatively charged particles.
+  if (std::signbit(particleWithPDGCode->Charge()) != std::signbit(getCharge()))
+    pdgCodeForFit *= -1;
+  if (TDatabasePDG::Instance()->GetParticle(pdgCodeForFit)->Charge()
+      != getCharge() * 3)
+    B2FATAL("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).");
+
+  genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(pdgCodeForFit);
+  addTrackRep(trackRep);
+
+  // create TrackPoints
+  // Loop over all hits and create a abs measurement with the factory.
+  // then create a TrackPoint from that and set the sorting parameter
+  mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedCDCHit>, this, Const::CDC,
+                                                             measurementFactory, std::placeholders::_1, std::placeholders::_2));
+  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedSVDHit>, this, Const::SVD,
+                                                             measurementFactory, std::placeholders::_1, std::placeholders::_2));
+  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
+                                                             measurementFactory, std::placeholders::_1, std::placeholders::_2));
+
+
+  const TVector3& position = getPosition();
+  const TVector3& momentum = getMomentum();
+
+  // TODO!
+  // Set the covariance seed
+  TMatrixDSym covSeed(6);
+  covSeed(0, 0) = 1e-3;
+  covSeed(1, 1) = 1e-3;
+  covSeed(2, 2) = 4e-3;
+  covSeed(3, 3) = 0.01e-3;
+  covSeed(4, 4) = 0.01e-3;
+  covSeed(5, 5) = 0.04e-3;
+  setCovSeed(covSeed);
+
+  // Set the timing seed
+  // Particle velocity in cm / ns.
+  const double m = particleWithPDGCode->Mass();
+  const double p = momentum.Mag();
+  const double E = hypot(m, p);
+  const double beta = p / E;
+  const double v = beta * Const::speedOfLight;
+
+  // Arc length from IP to posSeed in cm.
+  // Calculate the arc-length.  Helix doesn't provide a way of
+  // obtaining this directly from the difference in z, as it
+  // only provide arc-lengths in the transverse plane, so we do
+  // it like this.
+  const TVector3& perigeePosition = getPosition();
+  const Helix h(perigeePosition, momentum, particleWithPDGCode->Charge() / 3, 1.5);
+  const double s2D = h.getArcLength2DAtCylindricalR(perigeePosition.Perp());
+  const double s = s2D * hypot(1, h.getTanLambda());
+
+  // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.
+  double timeSeed = s / v;
+
+  if (!(timeSeed > -1000)) {
+    // Guard against NaN or just something silly.
+    B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
+    timeSeed = 0;
+  }
+  setTimeSeed(timeSeed);
+
+  const int nHitsInTrack = getNumPointsWithMeasurement();
+  B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
+
+  B2DEBUG(100, "Start values: momentum (x,y,z,abs): "
+          << momentum.x() << "  " << momentum.y() << "  "
+          << momentum.z() << " " << momentum.Mag());
+  B2DEBUG(100, "Start values: pos:   " << position.x() << "  " << position.y() << "  " << position.z());
+  B2DEBUG(100, "Start values: pdg:      " << pdgCodeForFit << " time: " << timeSeed);
+
+  // Fit the track
+  fitter->processTrack(this);
+
+  // Postprocessing of the fitted track
+  bool fitSuccess = hasFitStatus(trackRep);
+  genfit::FitStatus* fs = 0;
+  genfit::KalmanFitStatus* kfs = 0;
+  if (fitSuccess) {
+    fs = getFitStatus(trackRep);
+    fitSuccess = fitSuccess && fs->isFitted();
+    fitSuccess = fitSuccess && fs->isFitConverged();
+    kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+    fitSuccess = fitSuccess && kfs;
+  }
+  m_lastFitSucessfull = fitSuccess;
 }

@@ -13,20 +13,20 @@ typedef void* (*getfee_t)(void);
 
 int main(int argc, char** argv)
 {
-  if (Daemon::start(argv[1], argc, argv, 1, "<nodename>")) {
-    ConfigFile config("slowcontrol");
-    std::string host = config.get("nsm.host");
+  if (Daemon::start(argv[1], argc, argv, 3, "<nodename> <hostname> <port>")) {
+    //ConfigFile config("slowcontrol");
+    std::string host = argv[2];//config.get("nsm.host");
     RFCallback* callback = new RFCallback();
     if (host.size() == 0) {
       LogFile::error("nsm.host is empty");
       return 1;
     }
-    int port = config.getInt("nsm.port");
+    int port = atoi(argv[3]);//config.getInt("nsm.port");
     if (port < 0) {
       LogFile::error("nsm.port is not a positive integer");
       return 1;
     }
-    std::string name =  argv[1];//config.get("nsm.nodename");
+    std::string name = argv[1];//config.get("nsm.nodename");
     if (name.size() == 0) {
       LogFile::error("nsm.nodename is empty");
       return 1;

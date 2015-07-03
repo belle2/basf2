@@ -35,7 +35,7 @@ void RFCallback::init(NSMCommunicator& /*com*/) throw()
 
 void RFCallback::configure() throw()
 {
-  sleep(2);
+  //sleep(2);
   LogFile::info("configured");
   state = "Configured";
   reply(NSMMessage(NSMCommand::OK, state));
@@ -43,7 +43,7 @@ void RFCallback::configure() throw()
 
 void RFCallback::unconfigure() throw()
 {
-  sleep(2);
+  //sleep(2);
   LogFile::info("unconfigured");
   state = "Unconfigured";
   reply(NSMMessage(NSMCommand::OK, state));

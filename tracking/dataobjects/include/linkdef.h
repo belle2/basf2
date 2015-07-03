@@ -41,6 +41,7 @@
 #pragma link C++ class Belle2::ROIid+;
 #pragma link C++ class Belle2::ROIpayload+;
 #pragma link C++ class Belle2::PXDIntercept+;
+#pragma link C++ class Belle2::RelationsInterface<genfit::Track>+; //implicit
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
 

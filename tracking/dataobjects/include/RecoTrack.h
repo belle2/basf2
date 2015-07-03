@@ -26,7 +26,9 @@
 
 #include <framework/gearbox/Const.h>
 
-class FitConfiguration;
+namespace genfit {
+  class AbsFitter;
+}
 
 namespace Belle2 {
   // Forward declarations
@@ -42,7 +44,7 @@ namespace Belle2 {
    *
    *   TODO: Time, Cov
    */
-  class RecoTrack : public RelationsObject {
+  class RecoTrack : public RelationsInterface<genfit::Track> {
   public:
     /**
      * Copy the definitions from the RecoHitInformation to this class,
@@ -59,33 +61,14 @@ namespace Belle2 {
      * Empty constructor for ROOT.
      */
     RecoTrack() :
-      m_helix(),
+      m_charge(),
+      m_measurementFactory(),
+      m_measurementFactoryIsInitialized(false),
       m_storeArrayNameOfCDCHits(),
       m_storeArrayNameOfSVDHits(),
       m_storeArrayNameOfPXDHits(),
-      m_storeArrayNameOfRecoHitInformation()
-    {}
-
-    /**
-     * Construct a RecoTrack with the given helix and the given names for the hits.
-     * If you do not provide information for the hit store array names, the standard parameters are used.
-     * @param helix The helix of the track. Please keep in mind that the given arc length when adding hits should be
-     *        calculated using this helix.
-     * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
-     * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
-     * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-     * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
-     */
-    RecoTrack(const Helix& helix,
-              const std::string& storeArrayNameOfCDCHits = "CDCHits",
-              const std::string& storeArrayNameOfSVDHits = "SVDHits",
-              const std::string& storeArrayNameOfPXDHits = "PXDHits",
-              const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations") :
-      m_helix(helix),
-      m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
-      m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
-      m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
-      m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
+      m_storeArrayNameOfRecoHitInformation(),
+      m_lastFitSucessfull(false)
     {}
 
     /**
@@ -94,24 +77,27 @@ namespace Belle2 {
        * @param position A position on the helix. Only the perigee of the helix will be saved.
        * @param momentum The momentum of the helix on the given position.
        * @param charge The charge of the helix
-       * @param bz The magnetic field in z direction used to extrapolate the position and momentum of the helix.
        * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
        * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
        * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
        * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
        */
     RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
-              const double bZ,
               const std::string& storeArrayNameOfCDCHits = "CDCHits",
               const std::string& storeArrayNameOfSVDHits = "SVDHits",
               const std::string& storeArrayNameOfPXDHits = "PXDHits",
               const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations") :
-      m_helix(position, momentum, charge, bZ),
+      m_charge(charge),
+      m_measurementFactory(),
+      m_measurementFactoryIsInitialized(false),
       m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
       m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
       m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
-      m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
-    {}
+      m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation),
+      m_lastFitSucessfull(false)
+    {
+      setStateSeed(position, momentum);
+    }
 
     /**
      * Create a reco track from a genfit::TrackCand and save it to the given store array.
@@ -123,7 +109,7 @@ namespace Belle2 {
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
      * @return The newly created reco track.
      */
-    static RecoTrack* createFromTrackCand(genfit::TrackCand* trackCand,
+    static RecoTrack* createFromTrackCand(const genfit::TrackCand* trackCand,
                                           const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
                                           const std::string& storeArrayNameOfCDCHits = "CDCHits",
                                           const std::string& storeArrayNameOfSVDHits = "SVDHits",
@@ -331,34 +317,21 @@ namespace Belle2 {
     }
 
     // Helix Stuff
-    const Helix& getHelix() const
+    TVector3 getPosition() const
     {
-      return m_helix;
-    }
-
-    void replaceHelix(const Helix& helix)
-    {
-      m_helix = helix;
-    }
-
-    TVector3 getPerigee() const
-    {
-      return getHelix().getPerigee();
+      const TVectorD& seed = getStateSeed();
+      return TVector3(seed(0), seed(1), seed(2));
     }
 
     TVector3 getMomentum() const
     {
-      return getHelix().getMomentum();
+      const TVectorD& seed = getStateSeed();
+      return TVector3(seed(3), seed(4), seed(5));
     }
 
     short int getCharge() const
     {
-      return getHelix().getChargeSign();
-    }
-
-    double calculateArcLength(const double x, const double y) const
-    {
-      return getHelix().getArcLength2DAtXY(x, y);
+      return m_charge;
     }
 
     // Hit Pattern stuff
@@ -387,12 +360,24 @@ namespace Belle2 {
       return hitPatternVXD;
     }
 
+#ifndef __CINT__
+    void fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit);
+#endif
+
+    bool wasLastFitSucessfull() const
+    {
+      return m_lastFitSucessfull;
+    }
+
   private:
-    Helix m_helix;
+    unsigned short int m_charge;
+    genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
+    bool m_measurementFactoryIsInitialized;
     std::string m_storeArrayNameOfCDCHits;
     std::string m_storeArrayNameOfSVDHits;
     std::string m_storeArrayNameOfPXDHits;
     std::string m_storeArrayNameOfRecoHitInformation;
+    bool m_lastFitSucessfull;
 
 
 #ifndef __CINT__
@@ -483,6 +468,9 @@ namespace Belle2 {
     }
 
     template <class HitType>
+    void addHitToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation, HitType* const cdcHit);
+
+    template <class HitType>
     unsigned int getNumberOfHitsOfGivenType(const std::string& storeArrayNameOfHits) const
     {
       return getRelationsFrom<HitType>(storeArrayNameOfHits).size();
@@ -532,6 +520,6 @@ namespace Belle2 {
 
     //-----------------------------------------------------------------------------------
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 2);
+    ClassDef(RecoTrack, 3);
   };
 }

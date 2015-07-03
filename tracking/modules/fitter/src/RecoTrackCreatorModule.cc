@@ -26,7 +26,7 @@ RecoTrackCreatorModule::RecoTrackCreatorModule() :
   addParam("RecoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the output reco tracks.",
            std::string("RecoTracks"));
   addParam("RecoHitInformationStoreArrayName", m_param_recoHitInformationStoreArrayName,
-           "StoreArray name of the output reco hit information.", std::string("RecoHitInformation"));
+           "StoreArray name of the output reco hit information.", std::string("RecoHitInformations"));
 
   addParam("CDCHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.", std::string("CDCHits"));
   addParam("PXDHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.", std::string("PXDHits"));
@@ -42,9 +42,30 @@ void RecoTrackCreatorModule::initialize()
 
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.registerInDataStore();
+  recoTracks.registerRelationTo(trackCandidates);
 
   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
   recoHitInformations.registerInDataStore();
+
+  StoreArray<RecoTrack::CDCHit> cdcHits(m_param_cdcHitsStoreArrayName);
+  if (cdcHits.isOptional()) {
+    cdcHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(cdcHits);
+  }
+
+  StoreArray<RecoTrack::SVDHit> svdHits(m_param_svdHitsStoreArrayName);
+  if (svdHits.isOptional()) {
+    svdHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(svdHits);
+  }
+
+  StoreArray<RecoTrack::PXDHit> pxdHits(m_param_pxdHitsStoreArrayName);
+  if (pxdHits.isOptional()) {
+    pxdHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(pxdHits);
+  }
+
+  recoTracks.registerRelationTo(recoHitInformations);
 }
 
 void RecoTrackCreatorModule::event()
@@ -58,8 +79,10 @@ void RecoTrackCreatorModule::event()
   recoHitInformations.create();
 
   for (const genfit::TrackCand& trackCandidate : trackCandidates) {
-    RecoTrack::createFromTrackCand(&trackCandidate, m_param_recoTracksStoreArrayName,
-                                   m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
-                                   m_param_recoHitInformationStoreArrayName);
+    RecoTrack* newRecoTrack = RecoTrack::createFromTrackCand(&trackCandidate, m_param_recoTracksStoreArrayName,
+                                                             m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
+                                                             m_param_recoHitInformationStoreArrayName);
+
+    newRecoTrack->addRelationTo(&trackCandidate);
   }
 }

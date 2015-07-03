@@ -68,8 +68,7 @@ namespace Belle2 {
       TVector3 position(0, 1, 2);
       TVector3 momentum(-1, -0.5, 1.123);
       short int charge = 1;
-      double bZ = 1.5;
-      m_recoTrack = recoTracks.appendNew(position, momentum, charge, bZ,
+      m_recoTrack = recoTracks.appendNew(position, momentum, charge,
                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
     }
 
@@ -183,8 +182,7 @@ namespace Belle2 {
     TVector3 momentum(4, 23, 5.6);
     short int charge = 1;
     // We can not add these parameters immediately - we hve to convert them to the perigee parameters
-    Helix convertionHelix(position, momentum, charge, 1.5);
-    newCreatedTrackCand->setPosMomSeed(convertionHelix.getPerigee(), convertionHelix.getMomentum(), convertionHelix.getChargeSign());
+    newCreatedTrackCand->setPosMomSeed(position, momentum, charge);
     newCreatedTrackCand->addHit(Const::CDC, 0, -1, 0);
     newCreatedTrackCand->addHit(Const::CDC, 1, -1, 1);
     newCreatedTrackCand->addHit(Const::CDC, 2, -1, 2);
@@ -238,11 +236,5 @@ namespace Belle2 {
     const auto& cdcHitListTwo = m_recoTrack->getCDCHitList();
     ASSERT_EQ(cdcHitListOne.size(), 3);
     ASSERT_EQ(cdcHitListTwo.size(), 3);
-    /*EXPECT_EQ(cdcHitListOne[0]->getID(), cdcHitListTwo[0]->getID());
-    EXPECT_EQ(cdcHitListOne[1]->getID(), cdcHitListTwo[1]->getID());
-    EXPECT_EQ(cdcHitListOne[2]->getID(), cdcHitListTwo[2]->getID());*/
-
-    //EXPECT_ALL_NEAR(TrackFindingCDC::Vector3D(recoTrackFromGenfit->getPerigee()), TrackFindingCDC::Vector3D(m_recoTrack->getPerigee()), 1E-10);
-    //EXPECT_ALL_NEAR(TrackFindingCDC::Vector3D(recoTrackFromGenfit->getMomentum()), TrackFindingCDC::Vector3D(m_recoTrack->getMomentum()), 1E-10);
   }
 }

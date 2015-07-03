@@ -3,523 +3,346 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Nils Braun                                  *
+ * Contributors: Martin Heck                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
+#include <tracking/dataobjects/SorterBaseCDCHit.h>
+#include <tracking/dataobjects/SorterBaseVXDHit.h>
+
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <svd/dataobjects/SVDCluster.h>
+
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-#include <framework/dataobjects/Helix.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 #include <genfit/Track.h>
 
 #include <vector>
 #include <string>
 
-#include <framework/datastore/StoreArray.h>
 
-#include <framework/gearbox/Const.h>
-
-namespace genfit {
-  class AbsFitter;
-}
+class FitConfiguration;
 
 namespace Belle2 {
-  // Forward declarations
-  class CDCHit;
-
   /** This is the Reconstruction Event-Data Model Track.
    *
    *  ///FIXME clean this comment!
    *  This class collects hits, performs fits and saves the Track parameters.
    *  Note: This class is still experimental.
    *  Totally missing:
-   *   - Fitting functionality -> relate to genfit::Track
-   *
-   *   TODO: Time, Cov
+   *   - Fitting functionality
+   *   - Storing of which Trackfinders have contributed hits to the RecoTrack
+   *     and the exact relation with the HitInfoManager.
+   *   - Sorting magic.
    */
-  class RecoTrack : public RelationsInterface<genfit::Track> {
+  class RecoTrack : public Belle2::RelationsInterface <genfit::Track> {
   public:
-    /**
-     * Copy the definitions from the RecoHitInformation to this class,
-     * to access it from the outside.
+    /** Constructor defining the used hit types.
+     *
+     *  You have to use names matching the types defined below.
+     *  @param cdcHitsName     Name of StoreArray with CDCHits to be used.
+     *  @param svdHitsName     Name of StoreArray with either SVDClusters or SVDTrueHits.
+     *  @param pxdHitsName     Name of StoreArray with either PXDClusters or PXDTrueHits.
+     *  \sa SVDHit
      */
-    typedef RecoHitInformation::RightLeftInformation RightLeftInformation;
-    typedef RecoHitInformation::TrackingDetector TrackingDetector;
-    typedef RecoHitInformation::OriginTrackFinder OriginTrackFinder;
-    typedef RecoHitInformation::CDCHit CDCHit;
-    typedef RecoHitInformation::PXDHit PXDHit;
-    typedef RecoHitInformation::SVDHit SVDHit;
+    RecoTrack(const std::string& cdcHitsName = "CDCHits",
+              const std::string& svdHitsName = "SVDClusters",
+              const std::string& pxdHitsName = "PXDClusters",
+              const SorterBaseCDCHit sorterBaseCDCHit = SorterBaseCDCHit(),
+              const SorterBaseVXDHit sorterBaseVXDHit = SorterBaseVXDHit());
 
-    /**
-     * Empty constructor for ROOT.
+    //--- Definitions for compile time configuration ------------------------------------
+    //-----------------------------------------------------------------------------------
+    /** Define, use of clusters or true hits for SVD.
+     *
+     *  You have to decide, if you want to use Clusters or true hits at compile-time.
+     *  In the real experiment, we want to use clusters without overhead from checking every time,
+     *  if we should use true hits instead.
      */
-    RecoTrack() :
-      m_charge(),
-      m_measurementFactory(),
-      m_measurementFactoryIsInitialized(false),
-      m_storeArrayNameOfCDCHits(),
-      m_storeArrayNameOfSVDHits(),
-      m_storeArrayNameOfPXDHits(),
-      m_storeArrayNameOfRecoHitInformation(),
-      m_lastFitSucessfull(false)
-    {}
+    typedef SVDCluster SVDHit;
 
-    /**
-       * Construct a RecoTrack with the given helix parameters and the given names for the hits.
-       * If you do not provide information for the hit store array names, the standard parameters are used.
-       * @param position A position on the helix. Only the perigee of the helix will be saved.
-       * @param momentum The momentum of the helix on the given position.
-       * @param charge The charge of the helix
-       * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
-       * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
-       * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-       * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
+    /** Define, use of clusters or true hits for PXD. */
+    typedef PXDCluster PXDHit;
+
+    //-------------------------------------- CDC Hit Handling ---------------------------
+    //-----------------------------------------------------------------------------------
+    /** Replacing the existing CDC indices with new indices.
+     *
+     *  @param pseudocharge  Shall those indices be used for the positive (or negative)
+     *                       arm of the track.
+     *  @sa m_cdcHitIndicesPositive
+     */
+    void setCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
+                          const short pseudocharge);
+
+    /** Adding a single index to the set of CDC Indices.
+     *
+     *  @param   pseudoCharge  Shall this index be used for the positive (or negative)
+     *                         arm of the track.
+     */
+    void addCDCHitIndex(const std::pair< unsigned short, short> cdcHitIndex,
+                        const short pseudoCharge);
+
+    /** Adding several CDC indices at the same time.
+     *
+     *  @param  pseudoCharge  Shall those indices be used for the positive (or negative)
+     *                        arm of the track.
+     */
+    void addCDCHitIndices(const std::vector< std::pair < unsigned short, short> >& cdcHitIndices,
+                          const short pseudoCharge);
+
+    /** Has the track any CDC Hits? */
+    bool hasCDCHits()
+    {
+      return !(m_cdcHitIndicesPositive.empty() and m_cdcHitIndicesNegative.empty());
+    }
+
+    /** Has the track this specific hit?
+     *
+     *  FIXME Again there is the question, what is right, what is left here.
+     */
+    bool hasCDCHit(const unsigned short hitIndex, const short rightLeft);
+
+    /** Fill HitPatternCDC with hits from track arm indicated by pseudoCharge. */
+    void fillHitPatternCDC(const short pseudoCharge);
+
+    /** Getter for the hit pattern of the CDC. */
+    HitPatternCDC getHitPatternCDC()
+    {
+      return HitPatternCDC(m_hitPatternCDCInitializer);
+    }
+
+    //-------------------------------------- VXD Hit Handling ---------------------------
+    //-----------------------------------------------------------------------------------
+    /** Replacing the existing SVD indices with new indices.
+     *
+     *  @param pseudocharge  Shall those indices be used for the positive (or negative)
+     *                       arm of the track.
+     */
+    void setSVDHitIndices(const std::vector< unsigned short >& svdHitIndices,
+                          const short pseudocharge)
+    {
+      pseudocharge > 0 ?
+      (m_svdHitIndicesPositive = svdHitIndices) : (m_svdHitIndicesNegative = svdHitIndices);
+    }
+
+    /** Replacing the existing PXD indices with new indices.
+     *
+     *  @param pseudocharge  Shall those indices be used for the positive (or negative)
+     *                       arm of the track.
+     */
+    void setPXDHitIndices(const std::vector< unsigned short >& pxdHitIndices,
+                          const short pseudocharge)
+    {
+      pseudocharge > 0 ?
+      (m_pxdHitIndicesPositive = pxdHitIndices) : (m_pxdHitIndicesNegative = pxdHitIndices);
+    }
+
+    /** Adding a single index to the set of SVD Indices.
+     *
+     *  @param   pseudoCharge  Shall this index be used for the positive (or negative)
+     *                         arm of the track.
+     *  @return  True, if the index was inserted,
+     *           false, if the index already existed before.
+     */
+    void addSVDHitIndex(const unsigned short svdHitIndex,
+                        const short pseudoCharge)
+    {
+      pseudoCharge > 0 ?
+      (m_svdHitIndicesPositive.push_back(svdHitIndex)) :
+      (m_svdHitIndicesNegative.push_back(svdHitIndex));
+    }
+
+    /** Adding a single index to the set of SVD Indices.
+     *
+     *  @param   pseudoCharge  Shall this index be used for the positive (or negative)
+     *                         arm of the track.
+     *  @return  True, if the index was inserted,
+     *           false, if the index already existed before.
+     */
+    void addPXDHitIndex(const unsigned short pxdHitIndex,
+                        const short pseudoCharge)
+    {
+      pseudoCharge > 0 ?
+      (m_pxdHitIndicesPositive.push_back(pxdHitIndex)) :
+      (m_pxdHitIndicesNegative.push_back(pxdHitIndex));
+    }
+
+    /** Adding several SVD indices at the same time.
+     *
+     *  In this case a vector is chosen as input, as this might be the favorable type at
+     *  creation of the hit indices.
+     *  @param  pseudoCharge  Shall those indices be used for the positive (or negative)
+     *                        arm of the track.
+     */
+    void addSVDHitIndices(const std::vector< unsigned short >& svdHitIndices,
+                          const short pseudoCharge)
+    {
+      pseudoCharge > 0 ?
+      m_svdHitIndicesPositive.insert(m_svdHitIndicesPositive.end(), svdHitIndices.begin(), svdHitIndices.end()) :
+      m_svdHitIndicesNegative.insert(m_svdHitIndicesNegative.end(), svdHitIndices.begin(), svdHitIndices.end());
+    }
+
+    /** Adding several PXD indices at the same time.
+     *
+     *  In this case a vector is chosen as input, as this might be the favorable type at
+     *  creation of the hit indices.
+     *  @param  pseudoCharge  Shall those indices be used for the positive (or negative)
+     *                        arm of the track.
+     */
+    void addPXDHitIndices(const std::vector< unsigned short >& pxdHitIndices,
+                          const short pseudoCharge)
+    {
+      pseudoCharge > 0 ?
+      m_pxdHitIndicesPositive.insert(m_pxdHitIndicesPositive.end(), pxdHitIndices.begin(), pxdHitIndices.end()) :
+      m_pxdHitIndicesNegative.insert(m_pxdHitIndicesNegative.end(), pxdHitIndices.begin(), pxdHitIndices.end());
+    }
+
+    /** Has the track SVD hits? */
+    bool hasSVDHits()
+    {
+      return !(m_svdHitIndicesPositive.empty() and m_svdHitIndicesNegative.empty());
+    }
+
+    /** Has the track PXD hits? */
+    bool hasPXDHits()
+    {
+      return !(m_pxdHitIndicesPositive.empty() and m_pxdHitIndicesNegative.empty());
+    }
+
+    /** Has the track VXD hits? */
+    bool hasVXDHits()
+    {
+      return (hasSVDHits() or hasPXDHits());
+    }
+
+    /** Fill HitPatternVXD with hits from track arm indicated by pseudoCharge. */
+    void fillHitPatternVXD(const short pseudoCharge);
+
+    /** Getter for the hit pattern of the VXD. */
+    HitPatternVXD getHitPatternVXD()
+    {
+      return HitPatternVXD(m_hitPatternVXDInitializer);
+    }
+
+    //-------------------------------------- General hit handling -----------------------
+    //-----------------------------------------------------------------------------------
+    /** Eliminating indices from this RecoTrack.
+     *
+     *  @param  pseudoCharge  Defines which arm of the track is reset.
+     *                        If set to 0, both arms will be reset.
+     *  @param detector       Says which detector should be cleared.
+     *                        If invalid detector is chose, this means
+     *                        all detectors get cleared.
+     */
+    void resetHitIndices(const short pseudoCharge,
+                         const Const::EDetector detector = Const::EDetector::invalidDetector);
+
+    //-------------------------------------- Fitting ------------------------------------
+    /** Fit the track with a fitConfiguration object. */
+    void fitTrack(const FitConfiguration& /*fitConfiguration*/)
+    {
+      /* This function has to move to the source file of course, but will consist of
+       * - recreating RecoHits
+       * - configure the fitter
+       * - hand "this" over to the fitter
+       *
+       *  We want to do it this way, so we can save fit configurations belonging to
+       *  certain genfit::TrackReps.
+       *  As we want to have potentially information from the fit in this class, I'm afraid
+       *  this little overloading of the RecoTrack class can't be avoided entirely.
        */
-    RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
-              const std::string& storeArrayNameOfCDCHits = "CDCHits",
-              const std::string& storeArrayNameOfSVDHits = "SVDHits",
-              const std::string& storeArrayNameOfPXDHits = "PXDHits",
-              const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations") :
-      m_charge(charge),
-      m_measurementFactory(),
-      m_measurementFactoryIsInitialized(false),
-      m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
-      m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
-      m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
-      m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation),
-      m_lastFitSucessfull(false)
-    {
-      setStateSeed(position, momentum);
-    }
-
-    /**
-     * Create a reco track from a genfit::TrackCand and save it to the given store array.
-     * @param trackCand The genfit::TrackCand from which to create the new object.
-     * @param storeArrayNameOfRecoTracks The store array where the new object should be saved.
-     * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
-     * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
-     * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-     * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
-     * @return The newly created reco track.
-     */
-    static RecoTrack* createFromTrackCand(const genfit::TrackCand* trackCand,
-                                          const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
-                                          const std::string& storeArrayNameOfCDCHits = "CDCHits",
-                                          const std::string& storeArrayNameOfSVDHits = "SVDHits",
-                                          const std::string& storeArrayNameOfPXDHits = "PXDHits",
-                                          const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations"
-                                         );
-
-    genfit::TrackCand* createGenfitTrackCand() const;
-
-    /**
-     * Adds a cdc hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
-     * @param cdcHit The pointer to a stored CDCHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
-     * @param rightLeftInformation
-     * @param foundByTrackFinder
-     * @return True if the hit was not already added to the track.
-     */
-    bool addCDCHit(CDCHit* cdcHit, const double sortingParameter,
-                   RightLeftInformation rightLeftInformation = RightLeftInformation::undefinedRightLeftInformation,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
-    {
-      return addHit(cdcHit, rightLeftInformation, foundByTrackFinder, sortingParameter);
-    }
-
-    bool addPXDHit(PXDHit* pxdHit, const double sortingParameter,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
-    {
-      return addHit(pxdHit, RightLeftInformation::undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
-    }
-
-    bool addSVDHit(SVDHit* svdHit, const double sortingParameter,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
-    {
-      return addHit(svdHit, RightLeftInformation::undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
-    }
-
-    RecoHitInformation* getRecoHitInformation(CDCHit* cdcHit) const
-    {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfCDCHits);
-    }
-
-    RecoHitInformation* getRecoHitInformation(SVDHit* cdcHit) const
-    {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfSVDHits);
-    }
-
-    RecoHitInformation* getRecoHitInformation(PXDHit* cdcHit) const
-    {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfPXDHits);
-    }
-
-    // Hits Information Questioning
-    template <class HitType>
-    TrackingDetector getTrackingDetector(HitType* hit) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return TrackingDetector::invalidTrackingDetector;
-      else
-        return recoHitInformation->getTrackingDetector();
-    }
-
-    template <class HitType>
-    RightLeftInformation getRightLeftInformation(HitType* hit) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return RightLeftInformation::invalidRightLeftInformation;
-      else
-        return recoHitInformation->getRightLeftInformation();
-    }
-
-    template <class HitType>
-    OriginTrackFinder getFoundByTrackFinder(HitType* hit) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return OriginTrackFinder::invalidTrackFinder;
-      else
-        return recoHitInformation->getFoundByTrackFinder();
-    }
-
-    template <class HitType>
-    double getSortingParameter(HitType* hit) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return std::nan("");
-      else
-        return recoHitInformation->getSortingParameter();
-    }
-
-    // Hits Information Questioning
-    template <class HitType>
-    bool setRightLeftInformation(HitType* hit, RightLeftInformation rightLeftInformation) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setRightLeftInformation(rightLeftInformation);
-
-      return true;
-    }
-
-    template <class HitType>
-    bool setFoundByTrackFinder(HitType* hit, OriginTrackFinder originTrackFinder) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setFoundByTrackFinder(originTrackFinder);
-
-      return true;
-    }
-
-    template <class HitType>
-    bool setSortingParameter(HitType* hit, double travelS) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setSortingParameter(travelS);
-
-      return true;
-    }
-
-    // Hits Added Questioning
-    bool hasCDCHits() const
-    {
-      return getRelatedFrom<CDCHit>(m_storeArrayNameOfCDCHits) != nullptr;
-    }
-
-    bool hasSVDHits() const
-    {
-      return getRelatedFrom<Belle2::RecoTrack::SVDHit>(m_storeArrayNameOfSVDHits) != nullptr;
-    }
-
-    bool hasPXDHits() const
-    {
-      return getRelatedFrom<Belle2::RecoTrack::PXDHit>(m_storeArrayNameOfPXDHits) != nullptr;
-    }
-
-    template <class HitType>
-    bool hasHit(HitType* hit) const
-    {
-      const RelationVector<RecoTrack>& relatedTracksToHit = hit->template getRelationsTo<RecoTrack>(getArrayName());
-      return std::find_if(relatedTracksToHit.begin(), relatedTracksToHit.end(), [this](const RecoTrack & recoTrack) {
-        return &recoTrack == this;
-      }) != relatedTracksToHit.end();
-    }
-
-    // Hits Questioning
-    unsigned int getNumberOfCDCHits() const
-    {
-      return getNumberOfHitsOfGivenType<CDCHit>(m_storeArrayNameOfCDCHits);
-    }
-
-    unsigned int getNumberOfSVDHits() const
-    {
-      return getNumberOfHitsOfGivenType<Belle2::RecoTrack::SVDHit>(m_storeArrayNameOfSVDHits);
-    }
-
-    unsigned int getNumberOfPXDHits() const
-    {
-      return getNumberOfHitsOfGivenType<Belle2::RecoTrack::PXDHit>(m_storeArrayNameOfPXDHits);
-    }
-
-    unsigned int getNumberOfTotalHits() const
-    {
-      return getNumberOfCDCHits() + getNumberOfPXDHits() + getNumberOfSVDHits();
-    }
-
-    std::vector<Belle2::CDCHit*> getCDCHitList() const
-    {
-      return getHitList<CDCHit>(m_storeArrayNameOfCDCHits);
-    }
-
-    std::vector<Belle2::RecoTrack::SVDHit*> getSVDHitList() const
-    {
-      return getHitList<Belle2::RecoTrack::SVDHit>(m_storeArrayNameOfSVDHits);
-    }
-
-    std::vector<Belle2::RecoTrack::PXDHit*> getPXDHitList() const
-    {
-      return getHitList<Belle2::RecoTrack::PXDHit>(m_storeArrayNameOfPXDHits);
-    }
-
-    std::vector<Belle2::CDCHit*> getSortedCDCHitList() const
-    {
-      return getSortedHitList<CDCHit>(m_storeArrayNameOfCDCHits);
-    }
-
-    std::vector<Belle2::RecoTrack::SVDHit*> getSortedSVDHitList() const
-    {
-      return getSortedHitList<Belle2::RecoTrack::SVDHit>(m_storeArrayNameOfSVDHits);
-    }
-
-    std::vector<Belle2::RecoTrack::PXDHit*> getSortedPXDHitList() const
-    {
-      return getSortedHitList<Belle2::RecoTrack::PXDHit>(m_storeArrayNameOfPXDHits);
-    }
-
-    // Helix Stuff
-    TVector3 getPosition() const
-    {
-      const TVectorD& seed = getStateSeed();
-      return TVector3(seed(0), seed(1), seed(2));
-    }
-
-    TVector3 getMomentum() const
-    {
-      const TVectorD& seed = getStateSeed();
-      return TVector3(seed(3), seed(4), seed(5));
-    }
-
-    short int getCharge() const
-    {
-      return m_charge;
-    }
-
-    // Hit Pattern stuff
-    HitPatternCDC getHitPatternCDC(const short pseudoCharge) const
-    {
-      HitPatternCDC hitPatternCDC;
-
-      mapOnHits<CDCHit>(m_storeArrayNameOfCDCHits, [&hitPatternCDC](const RecoHitInformation&, const CDCHit * const hit) -> void {
-        // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
-        WireID wireID(hit->getID());
-        // Then I set the corresponding layer in the hit pattern.
-        hitPatternCDC.setLayer(wireID.getICLayer());
-      }, [&pseudoCharge](const RecoHitInformation & hitInformation, const CDCHit * const) -> bool {
-        // Little trick: if we want the first half, we want the s to be 0 <= s <= pi,
-        // if we want the second half, we want the s to be -pi <= s <= 0. Because -pi <= s <= pi is assured
-        // by the RecoHitInformation, we only have to test of s > 0 or s < 0. For speed we test if s > 0 or -s > 0.
-        return pseudoCharge * hitInformation.getSortingParameter() > 0;
-      });
-      return hitPatternCDC;
-    }
-
-    HitPatternVXD getHitPatternVXD(const short pseudoCharge) const
-    {
-      HitPatternVXD hitPatternVXD;
-      /* TODO */
-      return hitPatternVXD;
-    }
-
-#ifndef __CINT__
-    void fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit);
-#endif
-
-    bool wasLastFitSucessfull() const
-    {
-      return m_lastFitSucessfull;
     }
 
   private:
-    unsigned short int m_charge;
-    genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
-    bool m_measurementFactoryIsInitialized;
-    std::string m_storeArrayNameOfCDCHits;
-    std::string m_storeArrayNameOfSVDHits;
-    std::string m_storeArrayNameOfPXDHits;
-    std::string m_storeArrayNameOfRecoHitInformation;
-    bool m_lastFitSucessfull;
+    //-------------------------------------- Hit Pattern Handling -----------------------
+    /** Member for initializing the information about hits in the CDC.
+     *
+     *  @sa HitPatternCDC
+     */
+    unsigned long m_hitPatternCDCInitializer;
 
+    /** Member for initializing the information about hits in the VXD.
+     *
+     *  @sa HitPatternVXD
+     */
+    unsigned int m_hitPatternVXDInitializer;
 
-#ifndef __CINT__
-    template<class HitType, class ...Args>
-    bool addHit(HitType* hit, Args&& ... params) const
-    {
-      if (hasHit(hit)) {
-        return false;
-      }
+    //-------------------------------------- Hit Indices Storage ------------------------
+    //-----------------------------------------------------------------------------------
+    /** Name of array of CDCHits to be accessed. */
+    std::string m_cdcHitsName;
 
-      StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfRecoHitInformation);
-      RecoHitInformation* newRecoHitInformation = recoHitInformations.appendNew(hit, params...);
+    /** Assume, that TrackFinders take care of sorting already, e.g. by replacing the vector.
+     *
+     *  FIXME Can't we handle this by having a Sorter, that does nothing?
+     *  E.g. by having things always return true.
+     */
+    bool m_assumeSortedCDC;
 
-      addHitWithHitInformation(hit, newRecoHitInformation);
+    /** Functor for sorting the CDC hits. */
+    const SorterBaseCDCHit m_sorterBaseCDC;
 
-      return true;
-    }
-#endif
+    /** Sorting cache for CDC.
+     *
+     *  To avoid sorting whenever a hit is added, sorting is done only before doing something,
+     *  that needs sorted vectors.
+     */
+    bool m_sortingCacheCDC;
 
-    template<class HitType>
-    void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType* const)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType* const)> pickFunction)
-    {
-      RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
-                                                                 (m_storeArrayNameOfRecoHitInformation);
+    /** CDC indices and right/left ambiguity resolution for the positive arm of the track.
+     *
+     *  The first element of the pair indicates the index, the second element is used
+     *  for the left right/left disambiguation.
+     *  FIXME What stands for left, what stands for right?
+     */
+    std::vector< std::pair < unsigned short, short> > m_cdcHitIndicesPositive;
 
-      for (RecoHitInformation& hitInformation : relatedHitInformation) {
-        HitType* const hit = hitInformation.getRelatedTo<HitType>(storeArrayNameOfHits);
-        if (hit != nullptr && pickFunction(hitInformation, hit)) {
-          mapFunction(hitInformation, hit);
-        }
-      }
-    }
+    /** CDC indices and right/left ambiguity resolution for the negative arm of the track.
+     *
+     *  @sa m_cdcHitIndicesPositive
+     */
+    std::vector< std::pair < unsigned short, short> > m_cdcHitIndicesNegative;
 
-    template<class HitType>
-    void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType* const)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType* const)> pickFunction) const
-    {
-      RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
-                                                                 (m_storeArrayNameOfRecoHitInformation);
+    //-----------------------------------------------------------------------------------
+    /** Name of array of SVDHits (true hits, or clusters) to be accessed. */
+    std::string m_svdHitsName;
 
-      for (const RecoHitInformation& hitInformation : relatedHitInformation) {
-        const HitType* const hit = hitInformation.getRelatedTo<HitType>(storeArrayNameOfHits);
-        if (hit != nullptr && pickFunction(hitInformation, hit)) {
-          mapFunction(hitInformation, hit);
-        }
-      }
-    }
+    /** Name of array of PXDHits (true hits or clusters) to be accessed. */
+    std::string m_pxdHitsName;
 
-    template<class HitType>
-    void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType* const)> mapFunction)
-    {
-      mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType * const) -> bool { return true; });
-    }
+    /** */
+    bool m_assumeSortedVXD;
 
-    template<class HitType>
-    void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType* const)> mapFunction) const
-    {
-      mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType * const) -> bool { return true; });
-    }
+    /** Functor for sorting the VXD hits. */
+    const SorterBaseVXDHit m_sorterBaseVXD;
 
-    template <class HitType>
-    bool addHitWithHitInformation(HitType* hit, RecoHitInformation* recoHitInformation) const
-    {
-      hit->addRelationTo(this);
-      addRelationTo(recoHitInformation);
+    /** */
+    bool m_sortingCacheVXD;
 
-      return true;
-    }
+    /** SVD indices of the positive arm of the track. */
+    std::vector<unsigned short> m_svdHitIndicesPositive;
 
-    template<class HitType>
-    RecoHitInformation* getRecoHitInformation(HitType* hit, const std::string& storeArrayNameOfHits) const
-    {
-      RelationVector<RecoHitInformation> relatedHitInformationToRecoTrack = getRelationsTo<RecoHitInformation>
-          (m_storeArrayNameOfRecoHitInformation);
+    /** SVD indices of the negative arm of the track. */
+    std::vector<unsigned short> m_svdHitIndicesNegative;
 
-      for (RecoHitInformation& recoHitInformation : relatedHitInformationToRecoTrack) {
-        if (recoHitInformation.getRelatedTo<HitType>(storeArrayNameOfHits) == hit) {
-          return &recoHitInformation;
-        }
-      }
+    /** PXD indices of the positive arm of the track. */
+    std::vector<unsigned short> m_pxdHitIndicesPositive;
 
-      return nullptr;
-    }
-
-    template <class HitType>
-    void addHitToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation, HitType* const cdcHit);
-
-    template <class HitType>
-    unsigned int getNumberOfHitsOfGivenType(const std::string& storeArrayNameOfHits) const
-    {
-      return getRelationsFrom<HitType>(storeArrayNameOfHits).size();
-    }
-
-    template<class HitType>
-    std::vector<HitType*> getSortedHitList(const std::string& storeArrayNameOfHits) const
-    {
-      const RelationVector<RecoHitInformation>& relatedHitInformation = getRelationsTo<RecoHitInformation>
-          (m_storeArrayNameOfRecoHitInformation);
-
-      std::vector<const RecoHitInformation*> relatedHitInformationAsVector;
-      relatedHitInformationAsVector.reserve(relatedHitInformation.size());
-      for (const RecoHitInformation& hitInformation : relatedHitInformation) {
-        relatedHitInformationAsVector.push_back(&hitInformation);
-      }
-      std::sort(relatedHitInformationAsVector.begin(), relatedHitInformationAsVector.end(), [](const RecoHitInformation * a,
-      const RecoHitInformation * b) -> bool {
-        return a->getSortingParameter() < b->getSortingParameter();
-      });
-
-      std::vector<HitType*> hitList;
-      hitList.reserve(relatedHitInformationAsVector.size());
-      for (const RecoHitInformation* hitInformation : relatedHitInformationAsVector) {
-        HitType* relatedHit = hitInformation->getRelatedTo<HitType>(storeArrayNameOfHits);
-        if (relatedHit != nullptr) {
-          hitList.push_back(relatedHit);
-        }
-      }
-
-      return hitList;
-    }
-
-    // Maybe an iterator would be better!
-    template<class HitType>
-    std::vector<HitType*> getHitList(const std::string& storeArrayNameOfHits) const
-    {
-      RelationVector<HitType> relatedHits = getRelationsFrom<HitType>(storeArrayNameOfHits);
-      std::vector<HitType*> hitList;
-      hitList.reserve(relatedHits.size());
-      for (HitType& hit : relatedHits) {
-        hitList.push_back(&hit);
-      }
-
-      return hitList;
-    }
+    /** PXD indices of the negative arm of the track. */
+    std::vector<unsigned short> m_pxdHitIndicesNegative;
 
     //-----------------------------------------------------------------------------------
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 3);
+    ClassDef(RecoTrack, 1);
   };
 }
+

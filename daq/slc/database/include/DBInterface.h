@@ -27,6 +27,7 @@ namespace Belle2 {
     virtual bool isConnected() throw() = 0;
     virtual void execute_imp(const char* command) throw(DBHandlerException) = 0;
     void execute(const char* command, ...) throw(DBHandlerException);
+    void execute(const std::string& command) throw(DBHandlerException);
     virtual void close() throw(DBHandlerException) = 0;
     virtual void clear() throw() = 0;
     virtual DBRecordList loadRecords() throw(DBHandlerException) = 0;

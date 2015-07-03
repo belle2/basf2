@@ -12,7 +12,13 @@ using namespace Belle2;
 
 bool NSMVHandlerRCConfig::handleGetText(std::string& val)
 {
-  val = m_rcnode.getConfig();
+  try {
+    m_callback.get(m_rcnode, "rcconfig", val);
+    m_rcnode.setConfig(val);
+  } catch (const IOException& e) {
+    LogFile::error(e.what());
+    return false;
+  }
   return true;
 }
 

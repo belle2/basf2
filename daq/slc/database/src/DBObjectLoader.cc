@@ -84,18 +84,18 @@ DBObject DBObjectLoader::load(DBInterface& db,
   if (!db.isConnected()) {
     db.connect();
   }
-  db.execute("select * from %s p where p.path like '%s._%%' and not exists "
-             "(select * from (select * from %s where path like '%s._%%') c where c.path "
-             "like p.path || '_%%') order by id",
-             tablename.c_str(), rootnode.c_str(),
-             tablename.c_str(), rootnode.c_str());
+  db.execute("select * from %s p where p.path like '%s._%s' and not exists "
+             "(select * from (select * from %s where path like '%s._%s') c where c.path "
+             "like p.path || '_%s') order by id", \
+             tablename.c_str(), rootnode.c_str(), "%%",
+             tablename.c_str(), rootnode.c_str(), "%%", "%%");
   DBRecordList record_v(db.loadRecords());
   DBObject obj;
   if (record_v.size() == 0) {
     StringList list = DBObjectLoader::getDBlist(db, tablename, configname);
     if (list.size() > 0) {
       configname = list[0];
-      return DBObjectLoader::load(db, tablename, configname, true);
+      return DBObjectLoader::load(db, tablename, configname, isfull);
     }
     return obj;
   }
@@ -329,9 +329,9 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
     if (grep.size() > 0) {
       const char* prefix = grep.c_str();
       db.execute("select name from %s where name = REPLACE(path, '.', '') "
-                 "and (name like '_%%%s_%%' or name like '_%%%s' or "
-                 "name like '%s_%%' or name = '%s') order by id desc;",
-                 tablename.c_str(), prefix, prefix, prefix, prefix);
+                 "and (name like '_%s%s_%s' or name like '_%s%s' or "
+                 "name like '%s_%s' or name = '%s') order by id desc;",
+                 tablename.c_str(), "%%", prefix, "%%", "%%", prefix, prefix, "%%", prefix);
     } else {
       db.execute("select name from %s where name = REPLACE(path, '.', '') "
                  "order by id desc;", tablename.c_str());

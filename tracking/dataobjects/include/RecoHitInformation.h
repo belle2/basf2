@@ -11,10 +11,12 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-
+#include <framework/core/FrameworkExceptions.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <TVector3.h>
+#include <TMath.h>
+#include <assert.h>
 
 namespace Belle2 {
   /**
@@ -33,14 +35,18 @@ namespace Belle2 {
 
   class RecoHitInformation : public RelationsObject {
   public:
+    BELLE2_DEFINE_EXCEPTION(InvalidArcLength, "The arc length should be in the range [-pi, pi] but you gave: %1%");
+
     enum RightLeftInformation {
       undefinedRightLeftInformation,
+      invalidRightLeftInformation,
       right,
       left
     };
 
     enum OriginTrackFinder {
       undefinedTrackFinder,
+      invalidTrackFinder,
       LegendreTrackFinder,
       LocalTrackFinder,
       SegmentTrackCombiner,
@@ -55,6 +61,7 @@ namespace Belle2 {
 
     enum TrackingDetector {
       undefinedTrackingDetector,
+      invalidTrackingDetector,
       SVD,
       PCD,
       CDC
@@ -67,21 +74,29 @@ namespace Belle2 {
     RecoHitInformation() :
       m_trackingDetector(TrackingDetector::undefinedTrackingDetector),
       m_rightLeftInformation(RightLeftInformation::undefinedRightLeftInformation),
-      m_reconstructedTravelS(0),
-      m_reconstructedPosition(),
+      m_reconstructedArcLength(0),
       m_foundByTrackFinder(OriginTrackFinder::undefinedTrackFinder),
       m_flag(RecoHitFlag::undefinedRecoHitFlag)
     {}
 
+    /**
+     * Create hit information for a CDC hit with the given information.
+     * @param cdcHit
+     * @param rightLeftInformation
+     * @param foundByTrackFinder
+     * @param travelS
+     * @param reconstructedPosition
+     */
     RecoHitInformation(CDCHit* cdcHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
-                       double travelS, const TVector3& reconstructedPosition) :
+                       double reconstructedArcLength) :
       m_trackingDetector(TrackingDetector::CDC),
       m_rightLeftInformation(rightLeftInformation),
-      m_reconstructedTravelS(travelS),
-      m_reconstructedPosition(reconstructedPosition),
+      m_reconstructedArcLength(0),
       m_foundByTrackFinder(foundByTrackFinder),
       m_flag(RecoHitFlag::undefinedRecoHitFlag)
     {
+      // we set the arc length seperately to catch the error
+      setReconstructedArcLength(reconstructedArcLength);
       addRelationTo(cdcHit);
     }
 
@@ -105,24 +120,18 @@ namespace Belle2 {
       m_foundByTrackFinder = foundByTrackFinder;
     }
 
-    double getReconstructedTravelS() const
+    double getReconstructedArcLength() const
     {
-      return m_reconstructedTravelS;
+      return m_reconstructedArcLength;
     }
 
-    void setReconstructedTravelS(double reconstructedTravelS)
+    void setReconstructedArcLength(double reconstructedArcLength)
     {
-      m_reconstructedTravelS = reconstructedTravelS;
-    }
-
-    const TVector3& getReconstructedPosition() const
-    {
-      return m_reconstructedPosition;
-    }
-
-    void setReconstructedPosition(const TVector3& reconstructedPosition)
-    {
-      m_reconstructedPosition = reconstructedPosition;
+      if (reconstructedArcLength <= TMath::Pi() and reconstructedArcLength >= -TMath::Pi()) {
+        m_reconstructedArcLength = reconstructedArcLength;
+      } else {
+        throw InvalidArcLength() << reconstructedArcLength;
+      }
     }
 
     RightLeftInformation getRightLeftInformation() const
@@ -148,13 +157,10 @@ namespace Belle2 {
   private:
     TrackingDetector m_trackingDetector;
     RightLeftInformation m_rightLeftInformation;
-    double m_reconstructedTravelS;
-    TVector3 m_reconstructedPosition;
+    double m_reconstructedArcLength; /**< From -pi to pi */
     OriginTrackFinder m_foundByTrackFinder;
     RecoHitFlag m_flag;
 
-    //-----------------------------------------------------------------------------------
-    /** Making this class a ROOT class.*/
-    ClassDef(RecoHitInformation, 1);
+    ClassDef(RecoHitInformation, 1); /**< This class implements additional information for hits */
   };
 }

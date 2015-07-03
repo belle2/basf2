@@ -24,6 +24,8 @@
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/CALogger.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
+#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
+
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
@@ -104,12 +106,12 @@ namespace Belle2 {
     PathCollectorRecursive <
     Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
            Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
-           Belle2::Segment<Belle2::TrackNode>,
-           std::vector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>*>
+           std::vector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>*>,
+           Belle2::NodeCompatibilityCheckerPathCollector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>>
            > m_pathCollector;
 
     /** tool for creating SPTCs, fills storeArray directly */
-    SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>, Belle2::TrackNode> m_sptcCreator;
+    SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
     /// input containers
     /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */

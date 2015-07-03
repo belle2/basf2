@@ -13,6 +13,7 @@
 
 // C++-std:
 #include <vector>
+#include <string>
 
 namespace Belle2 {
 
@@ -70,8 +71,16 @@ namespace Belle2 {
     }
 
 
+    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
+    friend std::ostream& operator<< (std::ostream& out, const ActiveSector& aSector) { out << aSector.getName(); return out; }
+
+
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
+
+    /** returns secID of this sector */
+    std::string getName() const {return getFullSecID().getFullSecString(); }
+
 
     /** returns all indices of attached Hits */
     inline const std::vector<HitType*>& getHits() const { return m_hits; }

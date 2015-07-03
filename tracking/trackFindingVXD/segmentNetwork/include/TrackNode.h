@@ -13,6 +13,8 @@
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 
+#include <string>
+
 
 
 namespace Belle2 {
@@ -57,14 +59,32 @@ namespace Belle2 {
       return (spacePointsAreEqual == true and sectorsAreEqual == true);
     }
 
+
     /** overloaded '!='-operator */
     bool operator!=(const TrackNode& b) const { return !(*this == b); }
+
+
+    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
+    friend std::ostream& operator<< (std::ostream& out, const TrackNode& aNode)
+    {
+      out << aNode.getName();
+      return out;
+    }
+
 
     /** constructor WARNING: sector-pointing has still to be decided! */
     TrackNode() : sector(NULL), spacePoint(NULL) {}
 
+
     /** destructor */
     ~TrackNode() {}
+
+
+    /** returns secID of this sector */
+    std::string getName() const
+    {
+      return "Sec: " + sector->getName() +  ", HitID: " + spacePoint->getName();
+    }
   };
 
 } //Belle2 namespace

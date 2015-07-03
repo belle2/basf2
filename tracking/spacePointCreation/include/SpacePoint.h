@@ -34,6 +34,7 @@
 #include <string>
 #include <utility> // std::pair
 #include <math.h>
+#include <iostream>
 
 namespace Belle2 {
   /** The SpacePoint class.
@@ -131,6 +132,10 @@ namespace Belle2 {
     }
 
 
+    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
+    friend std::ostream& operator<< (std::ostream& out, const SpacePoint& aSP) { out << aSP.getName(); return out; }
+
+
     /** Comparison if SpacePoints share Clusters.
     *
     * no real operator but comparable.
@@ -157,6 +162,16 @@ namespace Belle2 {
     }
 
 // getter:
+
+    /** returns secID of this sector */
+    std::string getName() const override
+    {
+      return "Index: " + std::to_string(getArrayIndex()) +
+             "Sensor: " + std::string(VxdID(m_vxdID)) +
+             ", Pos: " + std::to_string(X()) +
+             "|" + std::to_string(Y()) +
+             "|" + std::to_string(Z());
+    }
 
     /** return the x-value of the global position of the SpacePoint */
     SpBaseType X() const { return m_position.X(); }

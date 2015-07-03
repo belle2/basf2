@@ -96,8 +96,6 @@ namespace Belle2 {
     }
 
 
-    /** returns the index position of this node in the network */
-    unsigned int getIndex() const { return m_index; }
 
 
   public:
@@ -122,6 +120,8 @@ namespace Belle2 {
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters
+    /** returns the index position of this node in the network */
+    unsigned int getIndex() const { return m_index; }
 
     /** returns links to all inner nodes attached to this one */
     std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }

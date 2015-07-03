@@ -14,6 +14,7 @@
 
 // C++-std:
 #include <vector>
+#include <string>
 
 
 
@@ -93,8 +94,25 @@ namespace Belle2 {
     }
 
 
+    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
+    friend std::ostream& operator<< (std::ostream& out, const Segment& aSegment)
+    {
+      out << aSegment.getName();
+      return out;
+    }
+
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
+
+    /** returns secID of this sector */
+    std::string getName() const
+    {
+      return  "Outer: " + m_outerHit->getName() +
+              "(inSector: " + std::string(FullSecID(m_outerSector)) +
+              "), inner: " + m_innerHit->getName() +
+              "(inSector: " + std::string(FullSecID(m_innerSector)) + ")";
+    }
+
 
     /** returns state of Segment (CA-feature) */
     inline int getState() const { return m_state; }

@@ -38,9 +38,8 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_hitEnd = end;
   m_npe = 0;
   m_stripName = "Strip" + boost::lexical_cast<std::string>(it->first);
-
   m_histRange = m_digPar->nDigitizations * m_digPar->ADCSamplingTime;
-
+  m_FPGAParams = {0, 0, 0};
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)calloc(m_digPar->nDigitizations, sizeof(float));
   if (m_amplitudeDirect == NULL)

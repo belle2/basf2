@@ -114,9 +114,10 @@ namespace Belle2 {
         G4double dx_foam = SensorLengthY / 2. + ElecBandY / 2.;
         G4double dy_foam = (SensorLengthX * 6. + 5.*SensorDistance) / 2.;
         G4double DistanceFromFoamCenter = activeParams.getLength("DistanceFromFoamCenter") * CLHEP::cm;
+        //Envelop dimension Thickness not divided by 2 to take into account of the 2 sides of foam
         G4double dz_env = DistanceFromFoamCenter + KaptonThickness + GlueThickness +
                           AluminiumThickness + SubstrateThickness + EpitaxialThickness +
-                          MetalThickness + 12. * AirGap;
+                          MetalThickness + 6. * AirGap;
 
         G4Box* s_env = new G4Box("s_env", dx_foam, dy_foam, dz_env);
         G4LogicalVolume* l_env = new G4LogicalVolume(s_env, geometry::Materials::get("G4_AIR"), "l_env");

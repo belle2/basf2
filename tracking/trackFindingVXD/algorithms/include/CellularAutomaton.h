@@ -24,15 +24,20 @@ namespace Belle2 {
    */
   template<class ContainerType, class ValidatorType, class LoggerType>
   class CellularAutomaton : public TrackerAlgorithmBase<ContainerType, ValidatorType, LoggerType> {
-  protected:
-
   public:
+
 
     /** typedef for the baseClass to get rid of the template arguments */
     typedef TrackerAlgorithmBase<ContainerType, ValidatorType, LoggerType> BaseClass;
 
+
+
     /** constructor */
     CellularAutomaton() : BaseClass() {}
+
+
+    /** aborts CA after stopInRound iterations - mainly for debugging purposes: */
+    unsigned int stopInRound = BaseClass::m_validator.nMaxIterations + 2;
 
     /** actual algorithm of Cellular Automaton, returns number of rounds needed to finish or -1 if CA was aborted */
     int apply(ContainerType& aNetworkContainer) override
@@ -52,7 +57,7 @@ namespace Belle2 {
               " passes so far");
 
       // each iteration of following while loop is one CA-time-step
-      while (activeCells != 0) {
+      while (activeCells != 0 and caRound < stopInRound) {
         activeCells = 0;
 
         /// CAstep:
@@ -60,6 +65,7 @@ namespace Belle2 {
         for (auto* aNode : aNetworkContainer) {
           auto& currentCell = aNode->getMetaInfo();
           if (currentCell.isActivated() == false) { continue; }
+          goodNeighbours = 0;
 
           for (auto* aNeighbour :  aNode->getInnerNodes()) {
             // skip if neighbour has not the same state
@@ -74,8 +80,7 @@ namespace Belle2 {
             B2DEBUG(50, "CAstep: accepted cell found - had " << goodNeighbours <<
                     " good neighbours among " << aNode->getInnerNodes().size() <<
                     " neighbours in total!")
-          } else { currentCell.setActivationState(false); deadCells++; }
-          goodNeighbours = 0;
+          } else { /*currentCell.setActivationState(false);*/ deadCells++; } /// WARNING setActivationState does provoke unintended behavior, since sometimes states can not be upgraded in one round, but can in the next round!
         }//CAStep
 
         B2DEBUG(25, "CA: before update-step: at round " << caRound <<
@@ -109,34 +114,20 @@ namespace Belle2 {
         caRound++;
       } // CA main-loop
 
-      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 15, PACKAGENAME()) == false) { return caRound; }
+//       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 15, PACKAGENAME()) == false) { return caRound; }
 
-      /* Debugging section:
-       * for each caRound count number of cells found with stateValue == caRound, print results. */
-      std::vector<unsigned int> nCellsOfState;
-      unsigned int nRounds = caRound < 1 ? BaseClass::m_validator.nMaxIterations : caRound;
-      nCellsOfState.assign(nRounds, 0);
-
-      unsigned int nRound = 0;
-      if (nRound < nRounds) {
-        for (auto* aNode : aNetworkContainer) {
-          if (aNode->getMetaInfo().getState() == nRound) { nCellsOfState.at(nRound) += 1; }
-        }
-      }
-
-      // small lambda function for printing the results
-      auto miniPrint = [&]() -> std::string {
-        std::string out = "";
-        for (unsigned int i = 0; i < nCellsOfState.size(); i++)
-        { out += "had " + std::to_string(nCellsOfState[i]) + " cells of state " + std::to_string(i) + "\n"; }
-        return out;
-      };
+      /* Debugging section: print results. */
+      std::vector<unsigned int> nCellsOfState = countCellsOfState(caRound, aNetworkContainer);
 
       BaseClass::m_log.passResults.push_back({ caRound, nCellsOfState});   // .first int, second vector<unsigned int>
       B2DEBUG(15, "Pass " << BaseClass::m_log.nPasses <<
               " is finished with " << caRound <<
               " rounds (negative numbers indicate fail)! Of " << aNetworkContainer.size() <<
-              " cells total, their states were:\n" << miniPrint())
+              " cells total, their states were:\n" << BaseClass::m_log.getStringCellsOfState(nCellsOfState))
+      B2WARNING("Pass " << BaseClass::m_log.nPasses <<
+                " is finished with " << caRound <<
+                " rounds (negative numbers indicate fail)! Of " << aNetworkContainer.size() <<
+                " cells total, their states were:\n" << BaseClass::m_log.getStringCellsOfState(nCellsOfState))
       return caRound;
     }
 
@@ -147,7 +138,10 @@ namespace Belle2 {
     {
       unsigned int nSeeds = 0;
       for (auto* aNode : aNetworkContainer) {
-        if (BaseClass::m_validator.checkSeed(aNode->getMetaInfo()) == true) { nSeeds++; }
+        if (BaseClass::m_validator.checkSeed(aNode->getMetaInfo()) == true) {
+          aNode->getMetaInfo().setSeed(true);
+          nSeeds++;
+        }
       }
       B2DEBUG(15, "Last Pass " << BaseClass::m_log.nPasses <<
               " is finished with " << BaseClass::m_log.passResults.back().first <<
@@ -160,6 +154,26 @@ namespace Belle2 {
 
     /** returns current logging info of the algorithm (some stuff one wants to log about that algorithm */
     std::string printStatistics() override { return ""; }
+
+  protected:
+
+    /** for each caRound count number of cells found with stateValue == caRound */
+    std::vector<unsigned int>  countCellsOfState(unsigned int caRound, ContainerType& aNetworkContainer)
+    {
+      std::vector<unsigned int> nCellsOfState;
+      unsigned int nRounds = caRound < 1 ? BaseClass::m_validator.nMaxIterations : caRound;
+      nCellsOfState.assign(nRounds, 0);
+
+      unsigned int nRound = 0;
+      while (nRound < nRounds) {
+        for (auto* aNode : aNetworkContainer) {
+          if (aNode->getMetaInfo().getState() == nRound) { nCellsOfState.at(nRound) += 1; }
+          B2DEBUG(100, " got cell of state " << aNode->getMetaInfo().getState())
+        }
+        ++nRound;
+      }
+      return nCellsOfState;
+    }
   };
 
 } //Belle2 namespace

@@ -36,6 +36,7 @@ namespace Belle2 {
     static StorageDeserializerModule* g_module;
 
   public:
+    static StorageDeserializerModule* get() { return g_module; }
     static DataStorePackage& getPackage() { return g_module->m_package; }
     static RunInfoBuffer& getInfo() { return g_module->m_info; }
 

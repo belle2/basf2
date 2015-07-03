@@ -79,6 +79,9 @@ namespace Belle2 {
     unsigned long long m_nbyte;
     double m_ctime;
 
+  private:
+    int writeStreamerInfos();
+
   };
 } // end namespace Belle2
 

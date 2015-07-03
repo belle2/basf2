@@ -41,8 +41,6 @@ namespace Belle2 {
     bool close();
     bool unlink();
     bool lock() throw();
-    //bool rdlock() throw();
-    //bool wrlock() throw();
     bool unlock() throw();
     bool wait() throw();
     bool wait(int time) throw();
@@ -56,13 +54,17 @@ namespace Belle2 {
     bool isWritable(int nword) throw();
     bool isReadable(int nword) throw();
     unsigned int write(const int* buf, unsigned int nword,
-                       bool fouce, unsigned int serial = 0);
+                       bool fouce, unsigned int serial = 0)
+    {
+      return write(buf, nword, fouce, serial, false);
+    }
+    unsigned int write(const int* buf, unsigned int nword,
+                       bool fouce, unsigned int serial, bool unlocked);
     unsigned int read(int* buf, bool fouce, Header* hdr = NULL);
 
   private:
     std::string m_path;
     SharedMemory m_memory;
-    //MRWLock m_lock;
     MMutex m_mutex;
     MCond m_cond;
     Header* m_header;

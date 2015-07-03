@@ -13,6 +13,10 @@
 #include <daq/storage/modules/StorageDeserializer.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
+#include <TClonesArray.h>
+#include <TClass.h>
+#include <TList.h>
+
 #include <stdio.h>
 
 using namespace std;
@@ -35,7 +39,7 @@ StorageSerializerModule::StorageSerializerModule() : Module()
   //Parameter definition
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 1);
   addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
-  addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 100000000);
+  addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 10);
   B2DEBUG(1, "StorageSerializer: Constructor done.");
 }
 
@@ -63,48 +67,87 @@ void StorageSerializerModule::beginRun()
   B2INFO("StorageSerializer: beginRun called.");
 }
 
+int StorageSerializerModule::writeStreamerInfos()
+{
+  TList* minilist = 0 ;
+  for (int durability = 0; durability < DataStore::c_NDurabilityTypes; durability++) {
+    DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
+    for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
+      const TClass* entryClass = iter->second.objClass;
+      TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
+      B2INFO("Recording StreamerInfo : durability " << durability << " : Class Name " << entryClass->GetName());
+      if (!minilist) minilist  =  new TList();
+      minilist->Add((TObject*)vinfo);
+    }
+  }
+  if (minilist) {
+    m_msghandler->add(minilist, "StreamerInfo");
+    EvtMessage* msg = m_msghandler->encode_msg(MSG_STREAMERINFO);
+    (msg->header())->nObjects = 1;       // No. of objects
+    (msg->header())->nArrays = 0;    // No. of arrays
+    int nword = (msg->size() - 1) / 4 + 1;
+    m_obuf.write((int*)msg->buffer(), nword, false, 0, true);
+    int size = msg->size();
+    B2INFO("Wrote StreamerInfo to a file : " << size << "bytes");
+    delete msg;
+    delete minilist;
+    return size;
+  } else {
+    B2WARNING("No StreamerInfo in memory");
+  }
+  return 0;
+}
+
 void StorageSerializerModule::event()
 {
   StoreObjPtr<EventMetaData> evtmetadata;
   unsigned int expno = evtmetadata->getExperiment();
   unsigned int runno = evtmetadata->getRun();
   unsigned int subno = 0;//evtmetadata->getRun() & 0xFF;
-  SharedEventBuffer::Header* header = m_obuf.getHeader();
-  if (header->runno < runno || header->expno < expno) {
-    m_obuf.lock();
-    m_count = 0;
-    header->expno = expno;
-    header->runno = runno;
-    header->subno = subno;
-    m_obuf.unlock();
+  if (StorageDeserializerModule::get()) {
     RunInfoBuffer& info(StorageDeserializerModule::getInfo());
     if (info.isAvailable()) {
       info.setExpNumber(expno);
       info.setRunNumber(runno);
       info.setSubNumber(subno);
-      info.setOutputCount(0);
-      info.setOutputNBytes(0);
     }
   }
-  // Stream DataStore in EvtMessage
+  SharedEventBuffer::Header* header = m_obuf.getHeader();
+  m_obuf.lock();
+  bool configured = false;
+  if (header->runno < runno || header->expno < expno) {
+    configured = true;
+    m_count = 0;
+    B2INFO("New run detected: expno = " << expno << " runno = " << runno << " subno = " << subno);
+    header->expno = expno;
+    header->runno = runno;
+    header->subno = subno;
+    m_nbyte = writeStreamerInfos();
+    m_obuf.unlock();
+    return ;
+  } else {
+    m_obuf.unlock();
+  }
+
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
   int nword = (msg->size() - 1) / 4 + 1;
+  m_obuf.lock();
   m_obuf.write((int*)msg->buffer(), nword,
-               false, StorageDeserializerModule::getPackage().getSerial());
+               false, 0, true);
+  m_obuf.unlock();
   m_nbyte += msg->size();
   delete msg;
   if (m_count < 10000 && (m_count < 10 || (m_count > 10 && m_count < 100 && m_count % 10 == 0) ||
                           (m_count > 100 && m_count < 1000 && m_count % 100 == 0) ||
                           (m_count > 1000 && m_count < 10000 && m_count % 1000 == 0))) {
-    B2INFO("Storage count = " << m_count);
+    B2INFO("Storage count = " << m_count << " nword = " << nword);
   }
-  if (m_count % 10 == 0) {
+  if (m_count % 10 == 0 && StorageDeserializerModule::get()) {
     RunInfoBuffer& info(StorageDeserializerModule::getInfo());
     if (info.isAvailable()) {
       info.setOutputCount(m_count);
       info.addOutputNBytes(m_nbyte);
     }
-    m_count_0 = m_count;
     m_nbyte = 0;
   }
   m_count++;

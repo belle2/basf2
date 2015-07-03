@@ -111,8 +111,10 @@ void StorageDeserializerModule::event()
   if (evtmetadata.isValid()) {
     if (m_expno != evtmetadata->getExperiment() ||
         m_runno != evtmetadata->getRun()) {
-      m_info.setInputNBytes(m_package.getData().getByteSize());
-      m_info.setInputCount(1);
+      if (m_info.isAvailable()) {
+        m_info.setInputNBytes(m_package.getData().getByteSize());
+        m_info.setInputCount(1);
+      }
     }
     m_expno = evtmetadata->getExperiment();
     m_runno = evtmetadata->getRun();

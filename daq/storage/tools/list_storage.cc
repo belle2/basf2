@@ -47,8 +47,8 @@ const char* g_table = "fileinfo";
 
 int main(int argc, char** argv)
 {
-  if (argc > 1 && strcmp(argv[1], "-help") == 0) {
-    printf("%s : [-h hostname] [-l runlabel] [-e expnumber] [-r runnumber] [-n number_of_file ] \n", argv[0]);
+  if (argc < 2 || strcmp(argv[1], "-help") == 0) {
+    printf("%s : [-all] [-h hostname] [-t runtype] [-e expnumber] [-r runnumber] [-n number_of_file ] \n", argv[0]);
     return 1;
   }
   std::string hostname;
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     } else if (strcmp(argv[i], "-e") == 0) {
       i++;
       if (i < argc) expno = atoi(argv[i]);
-    } else if (strcmp(argv[i], "-l") == 0) {
+    } else if (strcmp(argv[i], "-t") == 0) {
       i++;
       if (i < argc) runno = atoi(argv[i]);
     } else if (strcmp(argv[i], "-n") == 0) {

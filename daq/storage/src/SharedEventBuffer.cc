@@ -129,12 +129,12 @@ bool SharedEventBuffer::isReadable(int nword) throw()
 }
 
 unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
-                                      bool fouce, unsigned int serial)
+                                      bool fouce, unsigned int serial, bool unlocked)
 {
   if (m_buf == NULL) return 0;
   if (nword == 0) return 0;
   if (nword > m_nword) return -1;
-  m_mutex.lock();
+  if (!unlocked) m_mutex.lock();
   m_header->nwriter++;
   while (!fouce && m_header->nreader > 0) {
     m_cond.wait(m_mutex);
@@ -171,7 +171,7 @@ unsigned int SharedEventBuffer::write(const int* buf, unsigned int nword,
   unsigned int count = ++m_header->count_in;
   m_header->nwriter--;
   m_cond.broadcast();
-  m_mutex.unlock();
+  if (!unlocked) m_mutex.unlock();
   return count;
 }
 

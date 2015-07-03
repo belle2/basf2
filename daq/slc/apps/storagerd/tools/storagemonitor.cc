@@ -33,8 +33,7 @@ int main(int argc, char** argv)
   ConfigFile config("slowcontrol");
   if (argc > 3) config.read(argv[3]);
   NSMCommunicator com;
-  com.init(NSMNode(node), config.get("nsm.global.host"),
-           config.getInt("nsm.global.port"));
+  com.init(NSMNode(node), config.get("nsm.host"), config.getInt("nsm.port"));
   NSMData data(stornode + "_STATUS", "storage_status", storage_status_revision);
   storage_status* info = (storage_status*)data.open(com);
   while (true) {
@@ -52,7 +51,7 @@ int main(int argc, char** argv)
     printf("\n");
     printf(" %13s | in |      count | freq [kHz] | rate [MB/s] | evtsize [kB]", "node");
     printf(" | out |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n");
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
       storage_status::node_status& node(info->node[i]);
       if (i == 2) continue;
       std::string name = "basf2";

@@ -16,10 +16,12 @@ using namespace Belle2;
 StoragerCallback::StoragerCallback()
 {
   setTimeout(1);
+  /*
   system("killall storagein");
   system("killall storagerecord");
   system("killall storageout");
   system("killall basf2");
+  */
 }
 
 StoragerCallback::~StoragerCallback() throw()
@@ -47,9 +49,7 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
     setUseSet("record.buf.size", false);
     setUseSet("record.dir", false);
     setUseSet("record.ndisks", false);
-    setUseSet("record.file.diskid", false);
-    setUseSet("record.file.nfiles", false);
-    setUseSet("record.file.dbtmp", false);
+    setUseSet("record.dbtmp", false);
     const DBObject& record(obj("record"));
     const size_t nproc = record.getInt("nproc");
     m_con = std::vector<ProcessController>();
@@ -90,7 +90,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   const DBObject& rbuf(record("buf"));
   const DBObject& isocket(input("socket"));
   const DBObject& osocket(output("socket"));
-  const DBObject& file(record("file"));
 
   if (!m_eb2rx.isAlive() && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
     const DBObject& eb2rx(obj("eb2rx"));
@@ -134,10 +133,11 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[1].setExecutable("storagerecord");
     m_con[1].addArgument(rbuf.getText("name"));
     m_con[1].addArgument("%d", rbuf.getInt("size"));
+    m_con[1].addArgument(record.getText("hostname"));
+    m_con[1].addArgument(record.getText("runtype"));
     m_con[1].addArgument(record.getText("dir"));
     m_con[1].addArgument("%d", record.getInt("ndisks"));
-    m_con[1].addArgument(file.getText("diskid"));
-    m_con[1].addArgument(file.getText("dbtmp"));
+    m_con[1].addArgument(record.getText("dbtmp"));
     m_con[1].addArgument(obuf.getText("name"));
     m_con[1].addArgument("%d", obuf.getInt("size"));
     m_con[1].addArgument(nodename + "_storagerecord");
@@ -154,7 +154,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   if (!m_con[2].isAlive() && output.getBool("used")) {
     m_con[2].clearArguments();
     m_con[2].setExecutable("storageout");
-    m_con[2].addArgument(obuf.getInt("oname"));
+    m_con[2].addArgument(obuf.getText("name"));
     m_con[2].addArgument("%d", obuf.getInt("size"));
     m_con[2].addArgument("%d", osocket.getInt("port"));
     m_con[2].addArgument(nodename + "_storageout");
@@ -202,6 +202,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
 
 void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
 {
+  /*
   storage_status* status = (storage_status*)m_data.get();
   status->stime = Time().getSecond();
   for (size_t i = 0; i < m_con.size(); i++) {
@@ -216,6 +217,7 @@ void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
     }
     LogFile::debug(name[i] + " started");
   }
+  */
 }
 
 void StoragerCallback::stop() throw(RCHandlerException)

@@ -85,7 +85,7 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   tree->SetBranchAddress("object", &object);
   IntervalOfValidity* iov = 0;
   tree->SetBranchAddress("iov", &iov);
-  for (int iEntry = 0; iEntry < tree->GetEntriesFast(); iEntry++) {
+  for (int iEntry = tree->GetEntriesFast() - 1; iEntry >= 0; iEntry--) {
     tree->GetEntry(iEntry);
     if (iov->contains(event)) {
       result.first = object;

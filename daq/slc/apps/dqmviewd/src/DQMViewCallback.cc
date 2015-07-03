@@ -46,7 +46,7 @@ void DQMViewCallback::init(NSMCommunicator&) throw()
   for (int i = 0; i < ntmap; i++) {
     std::string vname = StringUtil::form("dqm[%d]", i);
     const std::string pack_name = m_config.get(vname + ".name");
-    const std::string map_name = m_config.get(vname + "file");
+    const std::string map_name = m_config.get(vname + ".file");
     std::string mapfile = map_path + "/" + map_name;
     vname = StringUtil::form("package[%d]", i);
     add(new NSMVHandlerText(vname + ".name", true, false, pack_name));

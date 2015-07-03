@@ -13,8 +13,8 @@ typedef void* MonitorFunc_t(const char*, const char*);
 
 int main(int argc, char** argv)
 {
-  if (Daemon::start("dqm", argc, argv, 0, "")) {
-    ConfigFile config("slowcontrol", "dqm");
+  if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
+    ConfigFile config("slowcontrol", argv[1]);
     NSMNode node(config.get("nsm.nodename"));
     DQMViewCallback callback(node, config);
     if (node.getName().size() == 0) {

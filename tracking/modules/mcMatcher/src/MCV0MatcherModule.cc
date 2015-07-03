@@ -1,6 +1,5 @@
 #include <tracking/modules/mcMatcher/MCV0MatcherModule.h>
 
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
@@ -75,6 +74,10 @@ void MCV0MatcherModule::event()
 
     if (V0PartPlus == nullptr or V0PartMinus == nullptr) {
       B2DEBUG(200, "At least one track of the V0 does not have a MC related particle. It will be skipped for matching.");
+      continue;
+    }
+    if (!V0PartPlus->getMother() or !V0PartMinus->getMother()) {
+      B2DEBUG(200, "At least one track of the V0 does not have a mother MCParticle, skipping.");
       continue;
     }
 

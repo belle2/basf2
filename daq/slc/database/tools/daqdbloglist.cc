@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
+#include <cstdlib>
 
 using namespace Belle2;
 

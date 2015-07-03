@@ -26,9 +26,10 @@ void PostgreSQLInterface::connect() throw(DBHandlerException)
 #ifndef NOT_USE_PSQL
   if (isConnected()) return;
   m_mutex.lock();
-  m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s",
+  m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s port=%d",
                                            m_host.c_str(), m_database.c_str(),
-                                           m_user.c_str(), m_password.c_str()).c_str());
+                                           m_user.c_str(), m_password.c_str(),
+                                           m_port).c_str());
   if (PQstatus(m_sq_conn) == CONNECTION_BAD) {
     m_mutex.unlock();
     close();

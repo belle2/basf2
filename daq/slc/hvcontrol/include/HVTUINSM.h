@@ -10,14 +10,16 @@
 
 #include <list>
 
-#include <ncurses.h>
+//#include <ncurses.h>
 
 namespace Belle2 {
+
+  class NSMCommunicator;
 
   class HVTUINSM : public HVTUI {
 
   public:
-    HVTUINSM();
+    HVTUINSM(int crate = -1);
     virtual ~HVTUINSM() throw();
 
   public:
@@ -73,6 +75,7 @@ namespace Belle2 {
       virtual void setState(int crate, int slot, int channel, int state) throw(IOException);
       virtual void setVoltageMonitor(int crate, int slot, int channel, float voltage) throw(IOException);
       virtual void setCurrentMonitor(int crate, int slot, int channel, float current) throw(IOException);
+      virtual void timeout(NSMCommunicator&) throw() {}
 
     private:
       void push(const HVMessage& msg);
@@ -89,6 +92,7 @@ namespace Belle2 {
     HVCallback* m_nsm;
     NSMNode m_node;
     int m_max_unit;
+    int m_crate;
 
   };
 

@@ -16,6 +16,9 @@
 
 using namespace Belle2;
 
+bool g_init = false;
+HVCrateList::const_iterator g_icrate;
+
 void HVControlCallback::turnon() throw(HVHandlerException)
 {
   load(getConfig(0), false, false);
@@ -66,11 +69,17 @@ void HVControlCallback::load(const HVConfig& config,
         if (alloff) {
           setSwitch(crateid, slot, ch, false);
         } else if (loadpars) {
+          std::cout << crateid << "-" << slot << "-" << ch << " "
+                    << channel.getRampUpSpeed() << " "
+                    << channel.getRampDownSpeed() << " "
+                    << channel.getVoltageLimit() << " "
+                    << channel.getCurrentLimit() << std::endl;
           setRampUpSpeed(crateid, slot, ch, channel.getRampUpSpeed());
           setRampDownSpeed(crateid, slot, ch, channel.getRampDownSpeed());
           setVoltageDemand(crateid, slot, ch, (channel.isTurnOn()) ? channel.getVoltageDemand() : -1);
           setVoltageLimit(crateid, slot, ch, channel.getVoltageLimit());
           setCurrentLimit(crateid, slot, ch, channel.getCurrentLimit());
+          usleep(500000);
         } else {
           setSwitch(crateid, slot, ch, channel.isTurnOn());
         }
@@ -89,7 +98,6 @@ void HVControlCallback::init(NSMCommunicator&) throw()
   dbload(m_confignames);
   addAll(getConfig());
   initialize(getConfig());
-  //PThread(new HVNodeMonitor(this));
 }
 
 void HVControlCallback::dbload(const std::string& data) throw(IOException)
@@ -127,26 +135,46 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
   if (iconfig == getConfigs().end()) return;
   const HVConfig& config(*iconfig);
   const HVCrateList& crate_v(config.getCrates());
-  for (HVCrateList::const_iterator icrate = crate_v.begin();
-       icrate != crate_v.end(); icrate++) {
-    const HVCrate& crate(*icrate);
-    const HVChannelList& channel_v(crate.getChannels());
-    int crateid = crate.getId();
-    for (HVChannelList::const_iterator ichannel = channel_v.begin();
-         ichannel != channel_v.end(); ichannel++) {
-      const HVChannel& channel(*ichannel);
-      int slot = channel.getSlot();
-      int ch = channel.getChannel();
-      std::string state = HVMessage::getStateText((HVMessage::State)getState(crateid, slot, ch));
-      float vmon = getVoltageMonitor(crateid, slot, ch);
-      float cmon = getCurrentMonitor(crateid, slot, ch);
-      //LogFile::debug("vmon[%d][%d][%d] = %f", crateid, slot, ch, vmon);
-      std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
-      set(vname + "state", state);
-      set(vname + "vmon", vmon);
-      set(vname + "cmon", cmon);
-    }
+  int i = 0;
+  //for (HVCrateList::const_iterator icrate = crate_v.begin();
+  //     icrate != crate_v.end(); icrate++) {
+  if (!g_init || g_icrate == crate_v.end()) {
+    g_icrate = crate_v.begin();
+    g_init = true;
   }
+  const HVCrate& crate(*g_icrate);
+  const HVChannelList& channel_v(crate.getChannels());
+  int crateid = crate.getId();
+  for (HVChannelList::const_iterator ichannel = channel_v.begin();
+       ichannel != channel_v.end(); ichannel++) {
+    const HVChannel& channel(*ichannel);
+    int slot = channel.getSlot();
+    int ch = channel.getChannel();
+    int state = getState(crateid, slot, ch);
+    std::string state_s = HVMessage::getStateText((HVMessage::State)state);
+    float vmon = getVoltageMonitor(crateid, slot, ch);
+    float cmon = getCurrentMonitor(crateid, slot, ch);
+    std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
+    /*
+    set(vname + "state", state_s);
+    set(vname + "vmon", vmon);
+    set(vname + "cmon", cmon);
+    */
+    if (m_mon_tmp[crateid][i].state != state) {
+      set(vname + "state", state_s);
+      m_mon_tmp[crateid][i].state = state;
+    }
+    if (m_mon_tmp[crateid][i].vmon != vmon) {
+      set(vname + "vmon", vmon);
+      m_mon_tmp[crateid][i].vmon = vmon;
+    }
+    if (m_mon_tmp[crateid][i].cmon != cmon) {
+      set(vname + "cmon", cmon);
+      m_mon_tmp[crateid][i].cmon = cmon;
+    }
+    i++;
+  }
+  g_icrate++;
 }
 
 void HVControlCallback::monitor() throw()

@@ -58,6 +58,14 @@ namespace Belle2 {
     std::string m_table;
 
   private:
+    struct hvmon {
+      int state;
+      float vmon;
+      float cmon;
+    };
+    hvmon m_mon_tmp[30][200];
+
+  private:
     class HVNodeMonitor {
 
     public:

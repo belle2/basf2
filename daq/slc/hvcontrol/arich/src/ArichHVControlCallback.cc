@@ -1,5 +1,7 @@
 #include "daq/slc/hvcontrol/arich/ArichHVControlCallback.h"
 #include <daq/slc/hvcontrol/arich/ArichHVCommunicator.h>
+#include <daq/slc/hvcontrol/arich/zlibstream.h>
+#include <daq/slc/hvcontrol/arich/hvinfo.h>
 
 #include <daq/slc/database/DBInterface.h>
 
@@ -47,27 +49,50 @@ void ArichHVControlCallback::initialize(const HVConfig& hvconf) throw()
   }
 }
 
+int g_day = -1;
+zlibstream g_zs;
+
 void ArichHVControlCallback::update() throw()
 {
   for (size_t i = 0; i < m_acomm.size(); i++) {
     m_acomm[i].requestValueAll(0, 0);
-    if (getDB()) {
-      DBInterface& db(*getDB());
-      db.connect();
-      for (int j = 0; j < m_acomm[i].getNUnits(); j++) {
-        ArichHVUnit& unit(m_acomm[i].getUnit(j));
-        HVValue& param(unit.getValue());
-        HVChannel& ch(unit.getChannel());
-        db.execute("insert into hvinfo (record_time, crate, "
-                   "slot, channel, switchon, state, vmon, cmon) "
-                   "values (current_timestamp, %d, %d, %d, %d, %d, %.1f, %.1f);",
-                   m_acomm[i].getId(), ch.getSlot(),
-                   ch.getChannel(), param.isTurnOn(),
-                   unit.getStatus().getState(),
-                   unit.getStatus().getVoltageMon(),
-                   unit.getStatus().getCurrentMon());
-      }
+  }
+  Date date;
+  if (g_day != date.getDay()) {
+    g_zs.close();
+    g_zs = zlibstream();
+    g_zs.open(date.toString("%Y.%m.%d.%H.%M.dat"), "w");
+    g_day = date.getDay();
+  }
+  for (size_t i = 0; i < m_acomm.size(); i++) {
+    //if (getDB()) {
+    //  DBInterface& db(*getDB());
+    //  db.connect();
+    for (int j = 0; j < m_acomm[i].getNUnits(); j++) {
+      ArichHVUnit& unit(m_acomm[i].getUnit(j));
+      HVValue& param(unit.getValue());
+      HVChannel& ch(unit.getChannel());
+      hvinfo info;
+      info.record_time = (unsigned int)date.get();
+      info.crate = m_acomm[i].getId();
+      info.slot = ch.getSlot();
+      info.channel = ch.getChannel();
+      info.switchon = (int)unit.getStatus().getState();
+      info.vmon = unit.getStatus().getVoltageMon();
+      info.cmon = unit.getStatus().getCurrentMon();
+      g_zs.write(info);
+      /*
+      db.execute("insert into hvinfo (record_time, crate, "
+      "slot, channel, switchon, state, vmon, cmon) "
+      "values (current_timestamp, %d, %d, %d, %d, %d, %.1f, %.1f);",
+      m_acomm[i].getId(), ch.getSlot(),
+      ch.getChannel(), param.isTurnOn(),
+      unit.getStatus().getState(),
+      unit.getStatus().getVoltageMon(),
+      unit.getStatus().getCurrentMon());
+      */
     }
+    //}
   }
 }
 

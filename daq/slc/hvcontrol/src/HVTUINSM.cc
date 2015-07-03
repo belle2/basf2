@@ -22,8 +22,9 @@
 
 using namespace Belle2;
 
-HVTUINSM::HVTUINSM()
+HVTUINSM::HVTUINSM(int crate)
 {
+  m_crate = crate;
 }
 
 void HVTUINSM::initNSM(const std::string& cfilename,
@@ -49,14 +50,16 @@ void HVTUINSM::initNSM(const std::string& cfilename,
   for (HVCrateList::const_iterator icrate = crate_v.begin();
        icrate != crate_v.end(); icrate++) {
     const HVCrate& crate(*icrate);
-    const HVChannelList& channel_v(crate.getChannels());
-    int crateid = crate.getId();
-    for (HVChannelList::const_iterator ichannel = channel_v.begin();
-         ichannel != channel_v.end(); ichannel++) {
-      const HVChannel& channel(*ichannel);
-      int slot = channel.getSlot();
-      int ch = channel.getChannel();
-      addChannel(crateid, slot, ch);
+    if (m_crate < 0 || m_crate == crate.getId()) {
+      const HVChannelList& channel_v(crate.getChannels());
+      int crateid = crate.getId();
+      for (HVChannelList::const_iterator ichannel = channel_v.begin();
+           ichannel != channel_v.end(); ichannel++) {
+        const HVChannel& channel(*ichannel);
+        int slot = channel.getSlot();
+        int ch = channel.getChannel();
+        addChannel(crateid, slot, ch);
+      }
     }
   }
 

@@ -29,10 +29,10 @@ HVCallback::HVCallback() throw() : NSMCallback()
 
 bool HVCallback::perform(NSMCommunicator& com) throw()
 {
+  NSMMessage msg(com.getMessage());
   if (NSMCallback::perform(com)) return true;
   lock();
   try {
-    NSMMessage msg(com.getMessage());
     HVCommand cmd(msg.getRequestName());
     if (cmd == HVCommand::UNKNOWN) return false;
     HVState state(getNode().getState());
@@ -42,7 +42,13 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
       turnoff();
     } else if (state.isOff()) {
       if (cmd == HVCommand::CONFIGURE) {
-        m_confignames = msg.getData();
+        const char* data = msg.getData();
+        if (msg.getLength() && strlen(data) > 0) {
+          m_confignames = data;
+        } else {
+          LogFile::warning("No config name");
+        }
+        LogFile::debug("config name : %s", m_confignames.c_str());
         dbload(m_confignames);
         addAll(getConfig());
         configure(getConfig());
@@ -53,28 +59,29 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
       }
     } else if (state.isOn()) {
       if (cmd == HVCommand::STANDBY) {
-        if (state != HVState::STANDBY_S) {
-          getNode().setState(HVState::TRANSITION_TS);
-          m_state_demand = HVState::STANDBY_S;
-          standby();
-        }
+        //if (state != HVState::STANDBY_S) {
+        getNode().setState(HVState::TRANSITION_TS);
+        m_state_demand = HVState::STANDBY_S;
+        standby();
+        //}
       } else if (cmd == HVCommand::SHOULDER) {
-        if (state != HVState::SHOULDER_S) {
-          getNode().setState(HVState::TRANSITION_TS);
-          m_state_demand = HVState::SHOULDER_S;
-          shoulder();
-        }
+        //if (state != HVState::SHOULDER_S) {
+        getNode().setState(HVState::TRANSITION_TS);
+        m_state_demand = HVState::SHOULDER_S;
+        shoulder();
+        //}
       } else if (cmd == HVCommand::PEAK) {
-        if (state != HVState::PEAK_S) {
-          getNode().setState(HVState::TRANSITION_TS);
-          m_state_demand = HVState::PEAK_S;
-          peak();
-        }
+        //if (state != HVState::PEAK_S) {
+        getNode().setState(HVState::TRANSITION_TS);
+        m_state_demand = HVState::PEAK_S;
+        peak();
+        //}
       }
     }
   } catch (const HVHandlerException& e) {
     reply(NSMMessage(NSMCommand::ERROR, e.what()));
   }
+  set("state", getNode().getState().getLabel());
   unlock();
   return true;
 }
@@ -84,6 +91,7 @@ void HVCallback::addAll(const HVConfig& config) throw()
   const HVCrateList& crate_v(config.getCrates());
   reset();
   add(new NSMVHandlerText("configs", true, false, m_confignames));
+  add(new NSMVHandlerText("state", true, false, getNode().getState().getLabel()));
   add(new NSMVHandlerInt("ncrates", true, false, (int)crate_v.size()));
   for (HVCrateList::const_iterator icrate = crate_v.begin();
        icrate != crate_v.end(); icrate++) {

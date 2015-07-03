@@ -22,7 +22,13 @@ import random
 
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from IPython.core.display import Image, display, Javascript
+try:
+    from IPython.html import widgets
+except:
+    pass
 import math
+import ROOT
+from ROOT import Belle2
 
 
 class IPythonHandler:
@@ -288,6 +294,23 @@ class _Basf2Calculation():
         elif self.is_finished():
             return "finished"
 
+    def show_path(self):
+        """
+        Show the underlaying basf2 path in an interactive way
+        """
+
+        path_viewer = PathViewer(self.process.path)
+        path_viewer.show()
+
+    def show_collections(self):
+        """
+        Show some snapshots on the collections.
+        Remember to add the PrintCollectionsPython Module for that!
+        """
+
+        collections_viewer = CollectionsViewer(self.get("basf2.store_content"))
+        collections_viewer.show()
+
 
 class _Basf2CalculationQueueItem():
 
@@ -408,6 +431,46 @@ def tail_file(file_name):
             time.sleep(0.01)
 
 
+class PathViewer(object):
+
+    """
+    Viewer object for the basf2 path
+    """
+
+    def __init__(self, path):
+        self.path = path
+
+        self.styling_text = """
+        <style>
+            table{
+              border-collapse: separate;
+              border-spacing: 50px 0;
+            }
+
+            td {
+              padding: 10px 0;
+              }
+        </style>"""
+
+    def show(self):
+        a = widgets.Accordion()
+        children = []
+
+        for i, module in enumerate(self.path.modules()):
+            html = widgets.HTML()
+            html.value = self.styling_text + "<table>"
+            for param in module.available_params():
+                html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td>" + str(param.values) + "</td>" \
+                    + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
+            html.value += "</table>"
+            children.append(html)
+            a.set_title(i, module.name())
+
+        a.children = children
+
+        display(a)
+
+
 class ProgressBarViewer(object):
 
     """
@@ -469,6 +532,45 @@ class ProgressBarViewer(object):
         display(self)
 
 
+class CollectionsViewer(object):
+
+    """
+    Viewer object for the basf2 path
+    """
+
+    def __init__(self, collections):
+        self.collections = collections
+
+        self.styling_text = """
+        <style>
+            table{
+              border-collapse: separate;
+              border-spacing: 50px 0;
+            }
+
+            td {
+              padding: 10px 0;
+              }
+        </style>"""
+
+    def show(self):
+        a = widgets.Tab()
+        children = []
+
+        for i, event in enumerate(self.collections):
+            html = widgets.HTML()
+            html.value = self.styling_text + "<table>"
+            for store_array in event:
+                html.value += "<tr>" + "<td>" + store_array[0] + "</td>" + "<td>" + str(store_array[1]) + "</td>" + "</tr>"
+            html.value += "</table>"
+            children.append(html)
+            a.set_title(i, "Snapshot " + str(i))
+
+        a.children = children
+
+        display(a)
+
+
 class QueueDrawer(CDCSVGDisplayModule):
 
     def __init__(self, queue, label, *args, **kwargs):
@@ -489,6 +591,47 @@ def show_image(filename, show=True):
     if show:
         display(image)
     return image
+
+
+class PrintCollections(basf2.Module):
+
+    def __init__(self, queue):
+        self.queue = queue
+        basf2.Module.__init__(self)
+        self.store_content_list = []
+        self.event_number = 0
+        self.total_number_of_events = 0
+
+    def initialize(self):
+        import ROOT
+        self.total_number_of_events = ROOT.Belle2.Environment.Instance().getNumberOfEvents()
+
+    def event(self):
+
+        if self.total_number_of_events == 0:
+            return
+
+        current_percentage = 1.0 * self.event_number / self.total_number_of_events
+
+        if 100 * current_percentage % 10 == 0:
+            registered_store_arrays = Belle2.PyStoreArray.list()
+            registered_store_objects = Belle2.PyStoreObj.list()
+
+            event_store_content_list = []
+
+            for store_array_name in registered_store_arrays:
+                store_array = Belle2.PyStoreArray(store_array_name)
+                event_store_content_list.append([store_array_name, len(store_array)])
+
+            for store_array_name in registered_store_objects:
+                event_store_content_list.append([store_array_name, 0])
+
+            self.store_content_list.append(event_store_content_list)
+
+        self.event_number += 1
+
+    def terminate(self):
+        self.queue.put("basf2.store_content", self.store_content_list)
 
 
 class ProgressPython(basf2.Module):

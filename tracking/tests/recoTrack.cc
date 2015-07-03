@@ -12,7 +12,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/utilities/TestHelpers.h>
-
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <vector>
 
 
@@ -20,25 +20,29 @@ using namespace std;
 
 namespace Belle2 {
   /** Test class for the RecoTrack object. */
-  class RecoTrackTest : public Belle2::TestHelpers::TestWithGearbox {
+  class RecoTrackTest : public ::testing::Test {
   protected:
     void SetUp() override
     {
-      Belle2::TestHelpers::TestWithGearbox::SetUp();
+      m_storeArrayNameOfRecoTracks = "ILoveRecoTracks";
+      m_storeArrayNameOfCDCHits = "CDCHitsAreCool";
+      m_storeArrayNameOfSVDHits = "WhatAboutSVD";
+      m_storeArrayNameOfPXDHits = "PXDsILike";
+      m_storeArrayNameOfHitInformation = "ConnectingAll";
 
       //--- Setup -----------------------------------------------------------------------
       DataStore::Instance().setInitializeActive(true);
-      StoreArray<CDCHit>::registerPersistent("CDCHitsAreCoolVector");
-      StoreArray<SVDCluster>::registerPersistent("SVDHitsAreCoolVector");
-      StoreArray<PXDCluster>::registerPersistent("PXDHitsAreCoolVector");
-      StoreArray<RecoTrack>::registerPersistent("ILoveRecoTracks");
-      StoreArray<RecoHitInformation>::registerPersistent("ConnectingTwoWorlds");
+      StoreArray<CDCHit>::registerPersistent(m_storeArrayNameOfCDCHits);
+      StoreArray<SVDCluster>::registerPersistent(m_storeArrayNameOfSVDHits);
+      StoreArray<PXDCluster>::registerPersistent(m_storeArrayNameOfPXDHits);
+      StoreArray<RecoTrack>::registerPersistent(m_storeArrayNameOfRecoTracks);
+      StoreArray<RecoHitInformation>::registerPersistent(m_storeArrayNameOfHitInformation);
 
-      StoreArray<CDCHit> cdcHits("CDCHitsAreCoolVector");
-      StoreArray<SVDCluster> svdHits("SVDHitsAreCoolVector");
-      StoreArray<PXDCluster> pxdHits("PXDHitsAreCoolVector");
-      StoreArray<RecoTrack> recoTracks("ILoveRecoTracks");
-      StoreArray<RecoHitInformation> recoHitInformations("ConnectingTwoWorlds");
+      StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+      StoreArray<SVDCluster> svdHits(m_storeArrayNameOfSVDHits);
+      StoreArray<PXDCluster> pxdHits(m_storeArrayNameOfPXDHits);
+      StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
+      StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfHitInformation);
 
       cdcHits.registerRelationTo(recoTracks);
       svdHits.registerRelationTo(recoTracks);
@@ -66,16 +70,21 @@ namespace Belle2 {
       short int charge = 1;
       double bZ = 1.5;
       m_recoTrack = recoTracks.appendNew(position, momentum, charge, bZ,
-                                         "CDCHitsAreCoolVector", "SVDHitsAreCoolVector", "PXDHitsAreCoolVector", "ConnectingTwoWorlds");
+                                         m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
     }
 
     RecoTrack* m_recoTrack;
+    std::string m_storeArrayNameOfRecoTracks;
+    std::string m_storeArrayNameOfCDCHits;
+    std::string m_storeArrayNameOfSVDHits;
+    std::string m_storeArrayNameOfPXDHits;
+    std::string m_storeArrayNameOfHitInformation;
   };
 
   /** Test simple Setters and Getters. */
   TEST_F(RecoTrackTest, cdcHit)
   {
-    StoreArray<CDCHit> cdcHits("CDCHitsAreCoolVector");
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
 
     EXPECT_FALSE(m_recoTrack->hasCDCHits());
 
@@ -113,7 +122,7 @@ namespace Belle2 {
     EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoTrack::TrackingDetector::CDC);
     EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoTrack::RightLeftInformation::undefinedRightLeftInformation);
     EXPECT_EQ(recoHitInformation->getFoundByTrackFinder(), RecoTrack::OriginTrackFinder::undefinedTrackFinder);
-    EXPECT_EQ(recoHitInformation->getReconstructedArcLength(), 0.5);
+    EXPECT_EQ(recoHitInformation->getSortingParameter(), 0.5);
 
     cdcHit = cdcHits[1];
     recoHitInformation = m_recoTrack->getRecoHitInformation(cdcHit);
@@ -129,13 +138,15 @@ namespace Belle2 {
     EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoTrack::TrackingDetector::CDC);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoTrack::RightLeftInformation::undefinedRightLeftInformation);
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoTrack::OriginTrackFinder::undefinedTrackFinder);
-    EXPECT_EQ(m_recoTrack->getReconstructedArcLength(cdcHit), 0.5);
+    EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 0.5);
 
     EXPECT_TRUE(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoTrack::OriginTrackFinder::SegmentTrackCombiner));
     EXPECT_TRUE(m_recoTrack->setRightLeftInformation(cdcHit, RecoTrack::RightLeftInformation::left));
+    EXPECT_TRUE(m_recoTrack->setSortingParameter(cdcHit, 0.55));
 
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoTrack::OriginTrackFinder::SegmentTrackCombiner);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoTrack::RightLeftInformation::left);
+    EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 0.55);
 
     // with not added hits
     cdcHit = cdcHits[4];
@@ -143,7 +154,7 @@ namespace Belle2 {
     EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoTrack::TrackingDetector::invalidTrackingDetector);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoTrack::RightLeftInformation::invalidRightLeftInformation);
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoTrack::OriginTrackFinder::invalidTrackFinder);
-    EXPECT_TRUE(std::isnan(m_recoTrack->getReconstructedArcLength(cdcHit)));
+    EXPECT_TRUE(std::isnan(m_recoTrack->getSortingParameter(cdcHit)));
     // TODO FIXME
     //EXPECT_EQ(recoTrack.getReconstructedPosition(cdcHit).Mag(), 0);
 
@@ -162,5 +173,76 @@ namespace Belle2 {
     const HitPatternCDC& hitPatternEmpty = m_recoTrack->getHitPatternCDC(-1);
     EXPECT_EQ(hitPatternEmpty.hasAxialLayer(),  false);
     EXPECT_EQ(hitPatternEmpty.hasStereoLayer(), false);
+  }
+
+  TEST_F(RecoTrackTest, testGenfitConversionOne)
+  {
+    // Create a genfit track cand
+    genfit::TrackCand* newCreatedTrackCand = new genfit::TrackCand();
+    TVector3 position(4, 23, 5.6);
+    TVector3 momentum(4, 23, 5.6);
+    short int charge = 1;
+    // We can not add these parameters immediately - we hve to convert them to the perigee parameters
+    Helix convertionHelix(position, momentum, charge, 1.5);
+    newCreatedTrackCand->setPosMomSeed(convertionHelix.getPerigee(), convertionHelix.getMomentum(), convertionHelix.getChargeSign());
+    newCreatedTrackCand->addHit(Const::CDC, 0, -1, 0);
+    newCreatedTrackCand->addHit(Const::CDC, 1, -1, 1);
+    newCreatedTrackCand->addHit(Const::CDC, 2, -1, 2);
+
+    // convert it to a RecoTrack
+    RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,
+                                     m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits,
+                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+
+    // convert it back
+
+    genfit::TrackCand* exportedTrackCand = recoTrackFromGenfit->createGenfitTrackCand();
+
+    // Expect equal
+    ASSERT_EQ(exportedTrackCand->getNHits(), newCreatedTrackCand->getNHits());
+    EXPECT_NEAR(exportedTrackCand->getPosSeed().X(), newCreatedTrackCand->getPosSeed().X(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand->getPosSeed().Y(), newCreatedTrackCand->getPosSeed().Y(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand->getPosSeed().Z(), newCreatedTrackCand->getPosSeed().Z(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand->getMomSeed().X(), newCreatedTrackCand->getMomSeed().X(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand->getMomSeed().Y(), newCreatedTrackCand->getMomSeed().Y(), 1E-10);
+    EXPECT_NEAR(exportedTrackCand->getMomSeed().Z(), newCreatedTrackCand->getMomSeed().Z(), 1E-10);
+    EXPECT_EQ(exportedTrackCand->getChargeSeed(), newCreatedTrackCand->getChargeSeed());
+    EXPECT_EQ(exportedTrackCand->getHit(0)->getHitId(), newCreatedTrackCand->getHit(0)->getHitId());
+    EXPECT_EQ(exportedTrackCand->getHit(1)->getSortingParameter(), newCreatedTrackCand->getHit(1)->getSortingParameter());
+    EXPECT_EQ(exportedTrackCand->getHit(2)->getHitId(), newCreatedTrackCand->getHit(2)->getHitId());
+  }
+
+  TEST_F(RecoTrackTest, testGenfitConversionTwo)
+  {
+    EXPECT_FALSE(m_recoTrack->hasCDCHits());
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+    // Add three cdc hits to the track
+    m_recoTrack->addCDCHit(cdcHits[0], 0.5);
+    m_recoTrack->addCDCHit(cdcHits[1], 0.2, RecoTrack::RightLeftInformation::right);
+    m_recoTrack->addCDCHit(cdcHits[2], 2);
+
+    EXPECT_TRUE(m_recoTrack->hasCDCHits());
+
+    genfit::TrackCand* exportedTrackCand = m_recoTrack->createGenfitTrackCand();
+
+    ASSERT_EQ(exportedTrackCand->getNHits(), m_recoTrack->getNumberOfTotalHits());
+    ASSERT_EQ(m_recoTrack->getNumberOfTotalHits(), 3);
+
+    RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(exportedTrackCand, m_storeArrayNameOfRecoTracks,
+                                     m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits,
+                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+
+    ASSERT_EQ(recoTrackFromGenfit->getNumberOfCDCHits(), m_recoTrack->getNumberOfCDCHits());
+    const auto& cdcHitListOne = recoTrackFromGenfit->getCDCHitList();
+    const auto& cdcHitListTwo = m_recoTrack->getCDCHitList();
+    ASSERT_EQ(cdcHitListOne.size(), 3);
+    ASSERT_EQ(cdcHitListTwo.size(), 3);
+    /*EXPECT_EQ(cdcHitListOne[0]->getID(), cdcHitListTwo[0]->getID());
+    EXPECT_EQ(cdcHitListOne[1]->getID(), cdcHitListTwo[1]->getID());
+    EXPECT_EQ(cdcHitListOne[2]->getID(), cdcHitListTwo[2]->getID());*/
+
+    //EXPECT_ALL_NEAR(TrackFindingCDC::Vector3D(recoTrackFromGenfit->getPerigee()), TrackFindingCDC::Vector3D(m_recoTrack->getPerigee()), 1E-10);
+    //EXPECT_ALL_NEAR(TrackFindingCDC::Vector3D(recoTrackFromGenfit->getMomentum()), TrackFindingCDC::Vector3D(m_recoTrack->getMomentum()), 1E-10);
   }
 }

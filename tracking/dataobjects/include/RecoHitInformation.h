@@ -10,13 +10,12 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
-#include <framework/core/FrameworkExceptions.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
 
+#include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
-#include <TMath.h>
-#include <assert.h>
 
 namespace Belle2 {
   /**
@@ -27,7 +26,7 @@ namespace Belle2 {
    * The RecoHitInformation stores information on:
    *   - the TrackFinder that added the hit to the track
    *   - RL information for CDC hits
-   *   - the reconstructed s (the travel distance) on the track
+   *   - the sorting parameter of the hit. This should be (something like if you can not calculate the correct value) the arc length between -pi and pi.
    *   - additional flags
    *
    * The stored information can be used when transforming a RecoTrack into a genfit::Track or genfit::TrackCand
@@ -35,7 +34,20 @@ namespace Belle2 {
 
   class RecoHitInformation : public RelationsObject {
   public:
-    BELLE2_DEFINE_EXCEPTION(InvalidArcLength, "The arc length should be in the range [-pi, pi] but you gave: %1%");
+
+    /** Define, use of clusters or true hits for SVD.
+     *
+     *  You have to decide, if you want to use Clusters or true hits at compile-time.
+     *  In the real experiment, we want to use clusters without overhead from checking every time,
+     *  if we should use true hits instead.
+     */
+    typedef SVDCluster SVDHit;
+
+    /** Define, use of clusters or true hits for PXD. */
+    typedef PXDCluster PXDHit;
+
+    /** Define, use of CDC hits as CDC hits (for symmetry). */
+    typedef CDCHit CDCHit;
 
     enum RightLeftInformation {
       undefinedRightLeftInformation,
@@ -74,10 +86,11 @@ namespace Belle2 {
     RecoHitInformation() :
       m_trackingDetector(TrackingDetector::undefinedTrackingDetector),
       m_rightLeftInformation(RightLeftInformation::undefinedRightLeftInformation),
-      m_reconstructedArcLength(0),
+      m_sortingParameter(0),
       m_foundByTrackFinder(OriginTrackFinder::undefinedTrackFinder),
       m_flag(RecoHitFlag::undefinedRecoHitFlag)
-    {}
+    {
+    }
 
     /**
      * Create hit information for a CDC hit with the given information.
@@ -88,16 +101,37 @@ namespace Belle2 {
      * @param reconstructedPosition
      */
     RecoHitInformation(CDCHit* cdcHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
-                       double reconstructedArcLength) :
-      m_trackingDetector(TrackingDetector::CDC),
-      m_rightLeftInformation(rightLeftInformation),
-      m_reconstructedArcLength(0),
-      m_foundByTrackFinder(foundByTrackFinder),
-      m_flag(RecoHitFlag::undefinedRecoHitFlag)
+                       double sortingParameter) :
+      RecoHitInformation(cdcHit, TrackingDetector::CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
-      // we set the arc length seperately to catch the error
-      setReconstructedArcLength(reconstructedArcLength);
-      addRelationTo(cdcHit);
+    }
+
+    /**
+     * Create hit information for a CDC hit with the given information.
+     * @param cdcHit
+     * @param rightLeftInformation
+     * @param foundByTrackFinder
+     * @param travelS
+     * @param reconstructedPosition
+     */
+    RecoHitInformation(PXDHit* pxdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
+                       double sortingParameter) :
+      RecoHitInformation(pxdHit, TrackingDetector::CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
+    {
+    }
+
+    /**
+     * Create hit information for a CDC hit with the given information.
+     * @param cdcHit
+     * @param rightLeftInformation
+     * @param foundByTrackFinder
+     * @param travelS
+     * @param reconstructedPosition
+     */
+    RecoHitInformation(SVDHit* svdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
+                       double sortingParameter) :
+      RecoHitInformation(svdHit, TrackingDetector::CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
+    {
     }
 
     RecoHitFlag getFlag() const
@@ -120,18 +154,14 @@ namespace Belle2 {
       m_foundByTrackFinder = foundByTrackFinder;
     }
 
-    double getReconstructedArcLength() const
+    double getSortingParameter() const
     {
-      return m_reconstructedArcLength;
+      return m_sortingParameter;
     }
 
-    void setReconstructedArcLength(double reconstructedArcLength)
+    void setSortingParameter(double sortingParameter)
     {
-      if (reconstructedArcLength <= TMath::Pi() and reconstructedArcLength >= -TMath::Pi()) {
-        m_reconstructedArcLength = reconstructedArcLength;
-      } else {
-        throw InvalidArcLength() << reconstructedArcLength;
-      }
+      m_sortingParameter = sortingParameter;
     }
 
     RightLeftInformation getRightLeftInformation() const
@@ -149,17 +179,34 @@ namespace Belle2 {
       return m_trackingDetector;
     }
 
-    void setTrackingDetector(TrackingDetector trackingDetector)
-    {
-      m_trackingDetector = trackingDetector;
-    }
-
   private:
     TrackingDetector m_trackingDetector;
     RightLeftInformation m_rightLeftInformation;
-    double m_reconstructedArcLength; /**< From -pi to pi */
+    double m_sortingParameter; /**< From -pi to pi */
     OriginTrackFinder m_foundByTrackFinder;
     RecoHitFlag m_flag;
+
+    /**
+     * Create hit information for a generic hit hit with the given information.
+     * @param hit
+     * @param trackingDetektor
+     * @param rightLeftInformation
+     * @param foundByTrackFinder
+     * @param travelS
+     * @param reconstructedPosition
+     */
+    template <class HitType>
+    RecoHitInformation(HitType* hit, TrackingDetector trackingDetecktor, RightLeftInformation rightLeftInformation,
+                       OriginTrackFinder foundByTrackFinder,
+                       double sortingParameter) :
+      m_trackingDetector(trackingDetecktor),
+      m_rightLeftInformation(rightLeftInformation),
+      m_sortingParameter(sortingParameter),
+      m_foundByTrackFinder(foundByTrackFinder),
+      m_flag(RecoHitFlag::undefinedRecoHitFlag)
+    {
+      addRelationTo(hit);
+    }
 
     ClassDef(RecoHitInformation, 1); /**< This class implements additional information for hits */
   };

@@ -10,13 +10,6 @@
 
 #pragma once
 
-#include <tracking/dataobjects/SorterBaseCDCHit.h>
-#include <tracking/dataobjects/SorterBaseVXDHit.h>
-
-#include <pxd/dataobjects/PXDCluster.h>
-
-#include <svd/dataobjects/SVDCluster.h>
-
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
@@ -29,9 +22,9 @@
 #include <vector>
 #include <string>
 
-
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <framework/gearbox/Const.h>
 
 class FitConfiguration;
 
@@ -46,12 +39,21 @@ namespace Belle2 {
    *  Note: This class is still experimental.
    *  Totally missing:
    *   - Fitting functionality -> relate to genfit::Track
+   *
+   *   TODO: Time, Cov
    */
   class RecoTrack : public RelationsObject {
   public:
+    /**
+     * Copy the definitions from the RecoHitInformation to this class,
+     * to access it from the outside.
+     */
     typedef RecoHitInformation::RightLeftInformation RightLeftInformation;
     typedef RecoHitInformation::TrackingDetector TrackingDetector;
     typedef RecoHitInformation::OriginTrackFinder OriginTrackFinder;
+    typedef RecoHitInformation::CDCHit CDCHit;
+    typedef RecoHitInformation::PXDHit PXDHit;
+    typedef RecoHitInformation::SVDHit SVDHit;
 
     /**
      * Empty constructor for ROOT.
@@ -64,7 +66,16 @@ namespace Belle2 {
       m_storeArrayNameOfRecoHitInformation()
     {}
 
-
+    /**
+     * Construct a RecoTrack with the given helix and the given names for the hits.
+     * If you do not provide information for the hit store array names, the standard parameters are used.
+     * @param helix The helix of the track. Please keep in mind that the given arc length when adding hits should be
+     *        calculated using this helix.
+     * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
+     * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
+     * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
+     * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
+     */
     RecoTrack(const Helix& helix,
               const std::string& storeArrayNameOfCDCHits = "CDCHits",
               const std::string& storeArrayNameOfSVDHits = "SVDHits",
@@ -77,7 +88,18 @@ namespace Belle2 {
       m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
     {}
 
-
+    /**
+       * Construct a RecoTrack with the given helix parameters and the given names for the hits.
+       * If you do not provide information for the hit store array names, the standard parameters are used.
+       * @param position A position on the helix. Only the perigee of the helix will be saved.
+       * @param momentum The momentum of the helix on the given position.
+       * @param charge The charge of the helix
+       * @param bz The magnetic field in z direction used to extrapolate the position and momentum of the helix.
+       * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
+       * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
+       * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
+       * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
+       */
     RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
               const double bZ,
               const std::string& storeArrayNameOfCDCHits = "CDCHits",
@@ -91,38 +113,52 @@ namespace Belle2 {
       m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
     {}
 
-
-    /** Define, use of clusters or true hits for SVD.
-     *
-     *  You have to decide, if you want to use Clusters or true hits at compile-time.
-     *  In the real experiment, we want to use clusters without overhead from checking every time,
-     *  if we should use true hits instead.
+    /**
+     * Create a reco track from a genfit::TrackCand and save it to the given store array.
+     * @param trackCand The genfit::TrackCand from which to create the new object.
+     * @param storeArrayNameOfRecoTracks The store array where the new object should be saved.
+     * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
+     * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
+     * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
+     * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
+     * @return The newly created reco track.
      */
-    typedef SVDCluster SVDHit;
+    static RecoTrack* createFromTrackCand(genfit::TrackCand* trackCand,
+                                          const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
+                                          const std::string& storeArrayNameOfCDCHits = "CDCHits",
+                                          const std::string& storeArrayNameOfSVDHits = "SVDHits",
+                                          const std::string& storeArrayNameOfPXDHits = "PXDHits",
+                                          const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations"
+                                         );
 
-    /** Define, use of clusters or true hits for PXD. */
-    typedef PXDCluster PXDHit;
+    genfit::TrackCand* createGenfitTrackCand() const;
 
-#ifndef __CINT__
-    // Hits Adding
-    bool addCDCHit(CDCHit* cdcHit, RightLeftInformation rightLeftInformation = RightLeftInformation::undefinedRightLeftInformation,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
-    {
-      double normedOmegaOfTrack = std::abs(getHelix().getOmega());
-      B2ASSERT("Can not calculate the arc length of hits for a track without omega = 0. Please set the arc length by yourself.",
-               normedOmegaOfTrack > 1E-100);
-      const TrackFindingCDC::CDCWire* cdcWire = TrackFindingCDC::CDCWire::getInstance(*cdcHit);
-      const TrackFindingCDC::Vector2D& referenceHitPosition = cdcWire->getRefPos2D();
-      double arcLengthOfHit = calculateArcLength(referenceHitPosition.x(), referenceHitPosition.y());
-      return addCDCHit(cdcHit, arcLengthOfHit * normedOmegaOfTrack, rightLeftInformation, foundByTrackFinder);
-    }
-#endif
-
-    bool addCDCHit(CDCHit* cdcHit, const double reconstructedArcLength,
+    /**
+     * Adds a cdc hit with the given information to the reco track.
+     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * @param cdcHit The pointer to a stored CDCHit in the store array you provided earlier, which you want to add.
+     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param rightLeftInformation
+     * @param foundByTrackFinder
+     * @return True if the hit was not already added to the track.
+     */
+    bool addCDCHit(CDCHit* cdcHit, const double sortingParameter,
                    RightLeftInformation rightLeftInformation = RightLeftInformation::undefinedRightLeftInformation,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
     {
-      return addHit(cdcHit, rightLeftInformation, foundByTrackFinder, reconstructedArcLength);
+      return addHit(cdcHit, rightLeftInformation, foundByTrackFinder, sortingParameter);
+    }
+
+    bool addPXDHit(PXDHit* pxdHit, const double sortingParameter,
+                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
+    {
+      return addHit(pxdHit, RightLeftInformation::undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
+    }
+
+    bool addSVDHit(SVDHit* svdHit, const double sortingParameter,
+                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
+    {
+      return addHit(svdHit, RightLeftInformation::undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
     }
 
     RecoHitInformation* getRecoHitInformation(CDCHit* cdcHit) const
@@ -172,13 +208,13 @@ namespace Belle2 {
     }
 
     template <class HitType>
-    double getReconstructedArcLength(HitType* hit) const
+    double getSortingParameter(HitType* hit) const
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr)
         return std::nan("");
       else
-        return recoHitInformation->getReconstructedArcLength();
+        return recoHitInformation->getSortingParameter();
     }
 
     // Hits Information Questioning
@@ -202,6 +238,18 @@ namespace Belle2 {
         return false;
       else
         recoHitInformation->setFoundByTrackFinder(originTrackFinder);
+
+      return true;
+    }
+
+    template <class HitType>
+    bool setSortingParameter(HitType* hit, double travelS) const
+    {
+      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
+      if (recoHitInformation == nullptr)
+        return false;
+      else
+        recoHitInformation->setSortingParameter(travelS);
 
       return true;
     }
@@ -234,17 +282,22 @@ namespace Belle2 {
     // Hits Questioning
     unsigned int getNumberOfCDCHits() const
     {
-      return getNumberOfHits<CDCHit>(m_storeArrayNameOfCDCHits);
+      return getNumberOfHitsOfGivenType<CDCHit>(m_storeArrayNameOfCDCHits);
     }
 
     unsigned int getNumberOfSVDHits() const
     {
-      return getNumberOfHits<Belle2::RecoTrack::SVDHit>(m_storeArrayNameOfSVDHits);
+      return getNumberOfHitsOfGivenType<Belle2::RecoTrack::SVDHit>(m_storeArrayNameOfSVDHits);
     }
 
     unsigned int getNumberOfPXDHits() const
     {
-      return getNumberOfHits<Belle2::RecoTrack::PXDHit>(m_storeArrayNameOfPXDHits);
+      return getNumberOfHitsOfGivenType<Belle2::RecoTrack::PXDHit>(m_storeArrayNameOfPXDHits);
+    }
+
+    unsigned int getNumberOfTotalHits() const
+    {
+      return getNumberOfCDCHits() + getNumberOfPXDHits() + getNumberOfSVDHits();
     }
 
     std::vector<Belle2::CDCHit*> getCDCHitList() const
@@ -286,9 +339,6 @@ namespace Belle2 {
     void replaceHelix(const Helix& helix)
     {
       m_helix = helix;
-      mapOnHits<CDCHit>(m_storeArrayNameOfCDCHits, [](RecoHitInformation & recoHitInformation, CDCHit * const hit) -> void {
-
-      });
     }
 
     TVector3 getPerigee() const
@@ -299,6 +349,11 @@ namespace Belle2 {
     TVector3 getMomentum() const
     {
       return getHelix().getMomentum();
+    }
+
+    short int getCharge() const
+    {
+      return getHelix().getChargeSign();
     }
 
     double calculateArcLength(const double x, const double y) const
@@ -320,7 +375,7 @@ namespace Belle2 {
         // Little trick: if we want the first half, we want the s to be 0 <= s <= pi,
         // if we want the second half, we want the s to be -pi <= s <= 0. Because -pi <= s <= pi is assured
         // by the RecoHitInformation, we only have to test of s > 0 or s < 0. For speed we test if s > 0 or -s > 0.
-        return pseudoCharge * hitInformation.getReconstructedArcLength() > 0;
+        return pseudoCharge * hitInformation.getSortingParameter() > 0;
       });
       return hitPatternCDC;
     }
@@ -357,18 +412,6 @@ namespace Belle2 {
     }
 #endif
 
-    template <class HitType>
-    bool setReconstructedArcLength(HitType* hit, double travelS) const
-    {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setReconstructedArcLength(travelS);
-
-      return true;
-    }
-
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
                    std::function<void(RecoHitInformation&, HitType* const)> mapFunction,
@@ -379,8 +422,7 @@ namespace Belle2 {
 
       for (RecoHitInformation& hitInformation : relatedHitInformation) {
         HitType* const hit = hitInformation.getRelatedTo<HitType>(storeArrayNameOfHits);
-        assert(hit != nullptr);
-        if (pickFunction(hitInformation, hit)) {
+        if (hit != nullptr && pickFunction(hitInformation, hit)) {
           mapFunction(hitInformation, hit);
         }
       }
@@ -396,8 +438,7 @@ namespace Belle2 {
 
       for (const RecoHitInformation& hitInformation : relatedHitInformation) {
         const HitType* const hit = hitInformation.getRelatedTo<HitType>(storeArrayNameOfHits);
-        assert(hit != nullptr);
-        if (pickFunction(hitInformation, hit)) {
+        if (hit != nullptr && pickFunction(hitInformation, hit)) {
           mapFunction(hitInformation, hit);
         }
       }
@@ -442,7 +483,7 @@ namespace Belle2 {
     }
 
     template <class HitType>
-    unsigned int getNumberOfHits(const std::string& storeArrayNameOfHits) const
+    unsigned int getNumberOfHitsOfGivenType(const std::string& storeArrayNameOfHits) const
     {
       return getRelationsFrom<HitType>(storeArrayNameOfHits).size();
     }
@@ -460,7 +501,7 @@ namespace Belle2 {
       }
       std::sort(relatedHitInformationAsVector.begin(), relatedHitInformationAsVector.end(), [](const RecoHitInformation * a,
       const RecoHitInformation * b) -> bool {
-        return a->getReconstructedArcLength() < b->getReconstructedArcLength();
+        return a->getSortingParameter() < b->getSortingParameter();
       });
 
       std::vector<HitType*> hitList;

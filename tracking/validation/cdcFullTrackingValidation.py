@@ -5,13 +5,14 @@
 <header>
   <contact>tracking@belle2.kek.jp</contact>
   <output>CDCFullTrackingValidation.root</output>
-  <description>This script validates the full CDC tracking chain with a legendre step first and a cellular automaton setp second in Y(4S) runs.</description>
+  <description>This script validates the full CDC tracking chain with a legendre step first
+  and a cellular automaton step second in Y(4S) runs.</description>
 </header>
 """
 
 VALIDATION_OUTPUT_FILE = 'CDCFullTrackingValidation.root'
 N_EVENTS = 1000
-ACTIVE = False
+ACTIVE = True
 
 import basf2
 basf2.set_random_seed(1337)

@@ -120,8 +120,11 @@ bool RunInfoBuffer::waitReady(int timeout)
   if (getState() != RunInfoBuffer::READY &&
       getState() != RunInfoBuffer::RUNNING) {
     if (!wait(timeout)) {
-      unlock();
-      return false;
+      if (getState() != RunInfoBuffer::READY &&
+          getState() != RunInfoBuffer::RUNNING) {
+        unlock();
+        return false;
+      }
     }
   }
   unlock();

@@ -14,6 +14,34 @@ using namespace Belle2;
 
 ClassImp(RecoTrack);
 
+RecoTrack::RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
+                     const std::string& storeArrayNameOfCDCHits,
+                     const std::string& storeArrayNameOfSVDHits,
+                     const std::string& storeArrayNameOfPXDHits,
+                     const std::string& storeArrayNameOfRecoHitInformation) :
+  m_charge(charge),
+  m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
+  m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
+  m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
+  m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation),
+  m_lastFitSucessfull(false)
+{
+  setStateSeed(position, momentum);
+
+  // Create a measurement factory
+  StoreArray<UsedPXDHit> pxdHits(m_storeArrayNameOfPXDHits);
+  StoreArray<UsedSVDHit> svdHits(m_storeArrayNameOfSVDHits);
+  StoreArray<UsedCDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+  // Create the related measurement factory
+  if (pxdHits.isOptional())
+    m_measurementFactory.addProducer(Const::PXD, new genfit::MeasurementProducer<RecoTrack::UsedPXDHit, PXDRecoHit>(pxdHits.getPtr()));
+  if (svdHits.isOptional())
+    m_measurementFactory.addProducer(Const::SVD, new genfit::MeasurementProducer<RecoTrack::UsedSVDHit, SVDRecoHit>(svdHits.getPtr()));
+  if (cdcHits.isOptional())
+    m_measurementFactory.addProducer(Const::CDC, new genfit::MeasurementProducer<RecoTrack::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
+}
+
 RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
                                           const std::string& storeArrayNameOfRecoTracks,
                                           const std::string& storeArrayNameOfCDCHits,
@@ -84,75 +112,20 @@ genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
 
 template <class HitType>
 void RecoTrack::addHitToGenfitTrack(Const::EDetector detector,
-                                    genfit::MeasurementFactory<genfit::AbsMeasurement>* measurementFactory,
                                     RecoHitInformation& recoHitInformation, HitType* const cdcHit)
 {
   genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, cdcHit->getArrayIndex(), -1,
       recoHitInformation.getSortingParameter());
-  genfit::AbsMeasurement* measurement = measurementFactory->createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
+  genfit::AbsMeasurement* measurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
                                         trackCandHit);
   genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
   trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
   insertPoint(trackPoint);
 };
 
-void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit)
+void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
 {
-
-  m_lastFitSucessfull = false;
-
-  // Create a measurement factory
-  StoreArray<UsedPXDHit> pxdHits(m_storeArrayNameOfPXDHits);
-  StoreArray<UsedSVDHit> svdHits(m_storeArrayNameOfSVDHits);
-  StoreArray<UsedCDCHit> cdcHits(m_storeArrayNameOfCDCHits);
-
-  // Create the related measurement factory
-  genfit::MeasurementFactory<genfit::AbsMeasurement> measurementFactory;
-  if (pxdHits.isOptional())
-    measurementFactory.addProducer(Const::PXD, new genfit::MeasurementProducer<RecoTrack::UsedPXDHit, PXDRecoHit>(pxdHits.getPtr()));
-  if (svdHits.isOptional())
-    measurementFactory.addProducer(Const::SVD, new genfit::MeasurementProducer<RecoTrack::UsedSVDHit, SVDRecoHit>(svdHits.getPtr()));
-  if (cdcHits.isOptional())
-    measurementFactory.addProducer(Const::CDC, new genfit::MeasurementProducer<RecoTrack::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
-
-  // Create a track representation
-  // Set the pdg code accordingly if the user gave us the wrong charge sign
-  TParticlePDG* particleWithPDGCode = TDatabasePDG::Instance()->GetParticle(pdgCodeForFit);
-  // Note that for leptons positive PDG codes correspond to the
-  // negatively charged particles.
-  if (std::signbit(particleWithPDGCode->Charge()) != std::signbit(getCharge()))
-    pdgCodeForFit *= -1;
-  if (TDatabasePDG::Instance()->GetParticle(pdgCodeForFit)->Charge()
-      != getCharge() * 3)
-    B2FATAL("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).");
-
-  genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(pdgCodeForFit);
-  addTrackRep(trackRep);
-
-  // create TrackPoints
-  // Loop over all hits and create a abs measurement with the factory.
-  // then create a TrackPoint from that and set the sorting parameter
-  mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedCDCHit>, this, Const::CDC,
-                                                             &measurementFactory, std::placeholders::_1, std::placeholders::_2));
-  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedSVDHit>, this, Const::SVD,
-                                                             &measurementFactory, std::placeholders::_1, std::placeholders::_2));
-  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
-                                                             &measurementFactory, std::placeholders::_1, std::placeholders::_2));
-
-
-  const TVector3& position = getPosition();
   const TVector3& momentum = getMomentum();
-
-  // TODO!
-  // Set the covariance seed
-  TMatrixDSym covSeed(6);
-  covSeed(0, 0) = 1e-3;
-  covSeed(1, 1) = 1e-3;
-  covSeed(2, 2) = 4e-3;
-  covSeed(3, 3) = 0.01e-3;
-  covSeed(4, 4) = 0.01e-3;
-  covSeed(5, 5) = 0.04e-3;
-  setCovSeed(covSeed);
 
   // Set the timing seed
   // Particle velocity in cm / ns.
@@ -181,28 +154,60 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
     timeSeed = 0;
   }
   setTimeSeed(timeSeed);
+}
 
-  const int nHitsInTrack = getNumPointsWithMeasurement();
-  B2DEBUG(99, "Total Nr of Hits assigned to the Track: " << nHitsInTrack);
+void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit)
+{
+  m_lastFitSucessfull = false;
 
-  B2DEBUG(100, "Start values: momentum (x,y,z,abs): "
-          << momentum.x() << "  " << momentum.y() << "  "
-          << momentum.z() << " " << momentum.Mag());
-  B2DEBUG(100, "Start values: pos:   " << position.x() << "  " << position.y() << "  " << position.z());
-  B2DEBUG(100, "Start values: pdg:      " << pdgCodeForFit << " time: " << timeSeed);
+  // Create a track representation
+  // Set the pdg code accordingly if the user gave us the wrong charge sign
+  TParticlePDG* particleWithPDGCode = TDatabasePDG::Instance()->GetParticle(pdgCodeForFit);
+  // Note that for leptons positive PDG codes correspond to the
+  // negatively charged particles.
+  if (std::signbit(particleWithPDGCode->Charge()) != std::signbit(getCharge()))
+    pdgCodeForFit *= -1;
+  if (TDatabasePDG::Instance()->GetParticle(pdgCodeForFit)->Charge()
+      != getCharge() * 3)
+    B2FATAL("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).");
+
+  genfit::RKTrackRep* trackRep = new genfit::RKTrackRep(pdgCodeForFit);
+  addTrackRep(trackRep);
+
+  // TODO: It may be better to do this already when adding the hits to the reco track.
+  // create TrackPoints
+  // Loop over all hits and create a abs measurement with the factory.
+  // then create a TrackPoint from that and set the sorting parameter
+  mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedCDCHit>, this, Const::CDC,
+                                                             std::placeholders::_1, std::placeholders::_2));
+  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedSVDHit>, this, Const::SVD,
+                                                             std::placeholders::_1, std::placeholders::_2));
+  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
+                                                             std::placeholders::_1, std::placeholders::_2));
+
+  // TODO!
+  // Set the covariance seed
+  TMatrixDSym covSeed(6);
+  covSeed(0, 0) = 1e-3;
+  covSeed(1, 1) = 1e-3;
+  covSeed(2, 2) = 4e-3;
+  covSeed(3, 3) = 0.01e-3;
+  covSeed(4, 4) = 0.01e-3;
+  covSeed(5, 5) = 0.04e-3;
+  setCovSeed(covSeed);
+
+  calculateTimeSeed(particleWithPDGCode);
 
   // Fit the track
   fitter->processTrack(this);
 
   // Postprocessing of the fitted track
   bool fitSuccess = hasFitStatus(trackRep);
-  genfit::FitStatus* fs = 0;
-  genfit::KalmanFitStatus* kfs = 0;
   if (fitSuccess) {
-    fs = getFitStatus(trackRep);
+    genfit::FitStatus* fs = getFitStatus(trackRep);
     fitSuccess = fitSuccess && fs->isFitted();
     fitSuccess = fitSuccess && fs->isFitConverged();
-    kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+    genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
     fitSuccess = fitSuccess && kfs;
   }
   m_lastFitSucessfull = fitSuccess;

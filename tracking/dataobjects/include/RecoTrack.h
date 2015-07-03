@@ -41,6 +41,7 @@ namespace Belle2 {
    *   - Fitting functionality -> relate to genfit::Track
    *
    *    TODO: Covariance matrix
+   *    TODO: Hits are now only added to the recoTrack - not to the genfit::Track. We have to take care of this!
    */
   class RecoTrack : public RelationsInterface<genfit::Track> {
   public:
@@ -82,16 +83,7 @@ namespace Belle2 {
               const std::string& storeArrayNameOfCDCHits = "CDCHits",
               const std::string& storeArrayNameOfSVDHits = "SVDHits",
               const std::string& storeArrayNameOfPXDHits = "PXDHits",
-              const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations") :
-      m_charge(charge),
-      m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
-      m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
-      m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
-      m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation),
-      m_lastFitSucessfull(false)
-    {
-      setStateSeed(position, momentum);
-    }
+              const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations");
 
     /**
      * Create a reco track from a genfit::TrackCand and save it to the given store array.
@@ -531,6 +523,7 @@ namespace Belle2 {
     std::string m_storeArrayNameOfSVDHits; /**< Store array of added svd hits */
     std::string m_storeArrayNameOfPXDHits; /**< Store array of added pxd hits */
     std::string m_storeArrayNameOfRecoHitInformation;  /**< Store array of added reco hit information */
+    genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
     bool m_lastFitSucessfull; /**< Bool if the last fit was sucessfull */
 
 
@@ -669,8 +662,13 @@ namespace Belle2 {
      * @param cdcHit
      */
     template <class HitType>
-    void addHitToGenfitTrack(Const::EDetector detector, genfit::MeasurementFactory<genfit::AbsMeasurement>* measurementFactory,
-                             RecoHitInformation& recoHitInformation, HitType* const cdcHit);
+    void addHitToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation, HitType* const cdcHit);
+
+    /**
+     * Calculate the time seed before fitting.
+     * @param particleWithPDGCode the particle we use for calculating the time seed.
+     */
+    void calculateTimeSeed(TParticlePDG* particleWithPDGCode);
 
     /**
      * Get the number of hits for thee given hit type in the store array that are related to this track.

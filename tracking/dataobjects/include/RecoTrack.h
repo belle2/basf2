@@ -669,7 +669,7 @@ namespace Belle2 {
      * @param cdcHit
      */
     template <class HitType>
-    void addHitToGenfitTrack(Const::EDetector detector, const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory,
+    void addHitToGenfitTrack(Const::EDetector detector, genfit::MeasurementFactory<genfit::AbsMeasurement>* measurementFactory,
                              RecoHitInformation& recoHitInformation, HitType* const cdcHit);
 
     /**

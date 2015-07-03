@@ -60,8 +60,6 @@ namespace Belle2 {
 
   private:
     std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input and output reco tracks */
-    std::string m_param_tracksStoreArrayName; /**< StoreArray name of the output genfit::tracks */
-    std::string m_param_tracksCandsStoreArrayName; /**< StoreArray name of the genfit::TrackCands */
   };
 }
 

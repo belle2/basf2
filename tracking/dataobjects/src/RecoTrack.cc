@@ -84,12 +84,12 @@ genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
 
 template <class HitType>
 void RecoTrack::addHitToGenfitTrack(Const::EDetector detector,
-                                    const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory,
+                                    genfit::MeasurementFactory<genfit::AbsMeasurement>* measurementFactory,
                                     RecoHitInformation& recoHitInformation, HitType* const cdcHit)
 {
   genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, cdcHit->getArrayIndex(), -1,
       recoHitInformation.getSortingParameter());
-  genfit::AbsMeasurement* measurement = measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
+  genfit::AbsMeasurement* measurement = measurementFactory->createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
                                         trackCandHit);
   genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
   trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
@@ -133,11 +133,11 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
   // Loop over all hits and create a abs measurement with the factory.
   // then create a TrackPoint from that and set the sorting parameter
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedCDCHit>, this, Const::CDC,
-                                                             measurementFactory, std::placeholders::_1, std::placeholders::_2));
+                                                             &measurementFactory, std::placeholders::_1, std::placeholders::_2));
   mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedSVDHit>, this, Const::SVD,
-                                                             measurementFactory, std::placeholders::_1, std::placeholders::_2));
+                                                             &measurementFactory, std::placeholders::_1, std::placeholders::_2));
   mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
-                                                             measurementFactory, std::placeholders::_1, std::placeholders::_2));
+                                                             &measurementFactory, std::placeholders::_1, std::placeholders::_2));
 
 
   const TVector3& position = getPosition();

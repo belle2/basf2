@@ -32,26 +32,12 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("RecoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
            std::string("RecoTracks"));
-
-  addParam("TracksStoreArrayName", m_param_tracksStoreArrayName, "StoreArray name of the output genfit::tracks.",
-           std::string("GF2Tracks"));
-  addParam("TracksCandsStoreArrayName", m_param_tracksCandsStoreArrayName, "StoreArray name of the input genfit::TrackCands.",
-           std::string("TrackCands"));
 }
 
 void BaseRecoFitterModule::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
-
-  StoreArray<genfit::Track> tracks(m_param_tracksStoreArrayName);
-  tracks.registerInDataStore();
-
-  StoreArray<genfit::TrackCand> trackCands(m_param_tracksCandsStoreArrayName);
-  trackCands.isRequired();
-
-  trackCands.registerRelationTo(tracks);
-
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
@@ -72,28 +58,10 @@ void BaseRecoFitterModule::initialize()
 void BaseRecoFitterModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  StoreArray<genfit::Track> tracks(m_param_tracksStoreArrayName);
-  StoreArray<genfit::TrackCand> trackCandidates(m_param_tracksCandsStoreArrayName);
-  tracks.create();
-
-  RelationArray relationBetweenTrackCandidatesAndTracks(trackCandidates, tracks);
-  relationBetweenTrackCandidatesAndTracks.create();
 
   const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
 
   for (RecoTrack& recoTrack : recoTracks) {
     recoTrack.fit(fitter, 211);
-
-    // TEMPORAL
-    tracks.appendNew(recoTrack);
-
-    const genfit::TrackCand* relatedTrackCandidate = recoTrack.getRelated<genfit::TrackCand>(m_param_tracksCandsStoreArrayName);
-    int trackCandidatesIndex = 0;
-    for (; trackCandidatesIndex < trackCandidates.getEntries(); trackCandidatesIndex++) {
-      if (trackCandidates[trackCandidatesIndex] == relatedTrackCandidate)
-        break;
-    }
-    unsigned int tracksIndex = tracks.getEntries() - 1;
-    relationBetweenTrackCandidatesAndTracks.add(trackCandidatesIndex, tracksIndex);
   }
 }

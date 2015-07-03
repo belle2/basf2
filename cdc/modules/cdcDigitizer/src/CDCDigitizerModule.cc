@@ -187,7 +187,7 @@ void CDCDigitizerModule::event()
     m_driftLength = m_aCDCSimHit->getDriftLength() * Unit::cm;
 
     //include misalignment effects
-    //misalign flag should be always on since on/off is controlled by the input misalignment.xml file itself.
+    //basically misalign flag should be always on since on/off is controlled by the input misalignment.xml file itself.
     m_misalign = true;
 
     TVector3 bwpMisalign = m_cdcp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
@@ -196,6 +196,7 @@ void CDCDigitizerModule::event()
     TVector3 bwp = m_cdcp->wireBackwardPosition(m_wireID);
     TVector3 fwp = m_cdcp->wireForwardPosition(m_wireID);
 
+    //skip correction for wire-position misalignment if unnecessary
     if ((bwpMisalign - bwp).Mag() == 0. && (fwpMisalign - fwp).Mag() == 0.) m_misalign = false;
     //    std::cout << "a m_misalign= " << m_misalign << std::endl;
 
@@ -209,8 +210,9 @@ void CDCDigitizerModule::event()
         double bckYSag = bwp.y();
         double forYSag = fwp.y();
 
-        CDCGeometryPar::EWirePosition set = m_misalign ?
-                                            CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
+        //        CDCGeometryPar::EWirePosition set = m_misalign ?
+        //                                            CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
+        CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Misaligned;
         const int layerID = m_wireID.getICLayer();
         const int  wireID = m_wireID.getIWire();
         m_cdcp->getWireSagEffect(set, layerID, wireID, zpos, bckYSag, forYSag);
@@ -218,9 +220,9 @@ void CDCDigitizerModule::event()
         fwp.SetY(forYSag);
       }
 
-      const double L = 5.; //(cm) tentative
-      TVector3 posIn  = m_posTrack - L * m_momentum.Unit();
-      TVector3 posOut = m_posTrack + L * m_momentum.Unit();
+      const TVector3 L = 5. * m_momentum.Unit(); //(cm) tentative
+      TVector3 posIn  = m_posTrack - L;
+      TVector3 posOut = m_posTrack + L;
       TVector3 posTrack = m_posTrack;
       TVector3 posWire = m_posWire;
 
@@ -409,10 +411,11 @@ float CDCDigitizerModule::getdDdt(const float driftL)
     cout << " " << endl;
     cout << "CDCDigitizerModule::getdDdt" << endl;
     cout << "**layer= " << layer << endl;
+    cout << "alpha= " << 180.*alpha / M_PI << std::endl;
     if (layer == 55) {
       int lr = 0;
-      for (int i = 0; i < 100; ++i) {
-        t = 5 * i;
+      for (int i = 0; i < 1000; ++i) {
+        t = 1.0 * i;
         double d = m_cdcp->getDriftLength(t, layer, lr, alpha, theta);
         cout << t << " " << d << endl;
       }
@@ -425,7 +428,7 @@ float CDCDigitizerModule::getdDdt(const float driftL)
         double d = m_cdcp->getDriftLength(t, layer, lr, alpha, theta);
         cout << t << " " << d << endl;
       }
-      //      exit(-1);
+      exit(-1);
     }
 #endif
   }

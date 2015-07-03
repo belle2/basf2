@@ -343,8 +343,10 @@ void CDCGeometryPar::readWirePositionParams(const GearDir gbxParams, EWirePositi
       }
     }
 
-    double baseTension = M_PI * m_senseWireDensity *
-                         m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+    //    double baseTension = M_PI * m_senseWireDensity *
+    //    m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+    double baseTension = 0.;
+
     if (set == c_Misaligned) {
       m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity *
                                       m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
@@ -352,6 +354,7 @@ void CDCGeometryPar::readWirePositionParams(const GearDir gbxParams, EWirePositi
       m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
                                    m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
     }
+    //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
 
     if (m_debug) {
       std::cout << iL << " " << iC;
@@ -407,6 +410,10 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
     for (int i = 0; i < np - 1; ++i) {
       ifs >> xt[i];
     }
+
+    //    if (xt[1]*xt[7] < 0.) {
+    //      std::cout <<"xt[1],xt[7]= " << xt[1] <<" "<< xt[7] << std::endl;
+    //    }
 
     if (ifs.eof()) break;
 
@@ -1029,9 +1036,10 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
     m_BWirPosAlign   [L][C][i] = m_BWirPos[L][C][i];
   }
 
-  m_WireSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
-  m_WireSagCoefMisalign[L][C] = m_WireSagCoef[L][C];
-  m_WireSagCoefAlign   [L][C] = m_WireSagCoef[L][C];
+  //  m_WireSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
+  m_WireSagCoef        [L][C] = 0.;
+  m_WireSagCoefMisalign[L][C] = 0.;
+  m_WireSagCoefAlign   [L][C] = 0.;
 
 }
 
@@ -1133,11 +1141,11 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   const double eps = 2.5e-1;
   const double maxTrials = 100;
 
-  int ialpha = getAlphaBin(alpha);
-  int itheta = getThetaBin(theta);
+  //  int ialpha = getAlphaBin(alpha);
+  //  int itheta = getThetaBin(theta);
 
   //convert incoming- to outgoing-lr
-  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
+  //  unsigned short lrp = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
 
   double maxTime = 5000.; //in ns
   //  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
@@ -1166,6 +1174,8 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
               time << " " << d0);
   }
 
+  //  std::cout <<"dist0,dist1= " <<  dist <<" "<< getDriftLength(time, iCLayer, lr, alpha, theta) <<" "<< getDriftLength(time, iCLayer, lr, alpha, theta) - dist << std::endl;
+  //  std::cout <<"dist0,dist1= " <<  dist <<" "<< getDriftLength(time, iCLayer, lr, 0., theta) <<" "<< getDriftLength(time, iCLayer, lr, 0., theta) - dist << std::endl;
   return time;
 
 }

@@ -77,7 +77,7 @@ namespace Belle2 {
     //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
     //    m_wireSag = gd.getBool("WireSag");
     m_wireSag = false;
-    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
+    //    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
     m_modifiedLeftRightFlag = gd.getBool("ModifiedLeftRightFlag");
     B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 

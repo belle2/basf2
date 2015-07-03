@@ -186,9 +186,7 @@ namespace Belle2 {
       return m_time;
     }
 
-    /** Parent Index Getter.
-     *
-     *  @return The index of the current parent file, or UINT_MAX if not set.
+    /** Return index of the current parent file, or -1 if not set.
      */
     int getParentIndex() const
     {
@@ -232,7 +230,7 @@ namespace Belle2 {
 
     unsigned long long int m_time; /**< Time in ns since epoch (1970-01-01).  */
 
-    int m_parent_index; /**< Index of parent file.  */
+    int m_parent_index; /**< Index of parent file, or -1 if not set.  */
 
     double m_generated_weight; /**< Generated weight.  */
 

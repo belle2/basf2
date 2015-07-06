@@ -24,7 +24,8 @@ namespace Belle2 {
   class ECLHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLHit(): SimHitBase() {
+    ECLHit(): SimHitBase()
+    {
       m_CellId = 0;    /**< Cell ID */
       m_Edep = 0;    /**< deposited energy */
       m_TimeAve = 0; /**< average time */
@@ -36,7 +37,8 @@ namespace Belle2 {
       int CellId,
       float Edep,
       float TimeAve
-    ): SimHitBase() {
+    ): SimHitBase()
+    {
       m_CellId = CellId;
       m_Edep = Edep;
       m_TimeAve = TimeAve;
@@ -49,11 +51,11 @@ namespace Belle2 {
 
     /*! Set deposit energy
      */
-    void setEnergyDep(double Edep) { m_Edep = (float) Edep; }
+    void setEnergyDep(double Edep) { m_Edep = static_cast<float>(Edep); }
 
     /*! Set  average time
      */
-    void setTimeAve(double TimeAve) { m_TimeAve = (float)TimeAve; }
+    void setTimeAve(double TimeAve) { m_TimeAve = static_cast<float>(TimeAve); }
 
 
     /*! Get Cell ID
@@ -64,17 +66,17 @@ namespace Belle2 {
     /*! Get deposit energy
      * @return deposit energy
      */
-    double getEnergyDep() const { return (double) m_Edep; }
+    double getEnergyDep() const { return m_Edep; }
 
     /*! Get average time
      * @return deposit energy
      */
-    double getTimeAve() const {return (double) m_TimeAve;}
+    double getTimeAve() const { return m_TimeAve; }
 
     /*! Get average time (implementation of base class function)
      *  @return average time
      *  by Marko Staric */
-    float getGlobalTime() const {return m_TimeAve;}
+    float getGlobalTime() const { return m_TimeAve; }
 
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.

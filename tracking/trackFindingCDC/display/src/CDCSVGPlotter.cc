@@ -8,6 +8,11 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/display/CDCSVGPlotter.h>
 
+#include <cdc/dataobjects/CDCRecoHit.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/KalmanFitterInfo.h>
+#include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/Track.h>
 #include <tracking/trackFindingCDC/display/Colorizer.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
@@ -20,6 +25,11 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <cmath>
+
+using genfit::AbsTrackRep;
+using genfit::KalmanFitterInfo;
+using genfit::MeasuredStateOnPlane;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -212,10 +222,97 @@ void CDCSVGPlotter::drawGFTrackCandTrajectories(const std::string& storeArrayNam
   } else B2WARNING("No Genfit tracks present");
 }
 
-void CDCSVGPlotter::drawGFTracks(const std::string& storeObjName, const std::string&, const std::string&)
+void CDCSVGPlotter::drawGFTracks(const std::string& storeArrayName, const std::string&, const std::string&)
 {
-  StoreArray<genfit::Track> storeArray(storeObjName);
-  drawStoreArray<ListColorsColorizer<genfit::Track>>(storeArray, storeObjName);
+  StoreArray<genfit::Track> storeArray(storeArrayName);
+  drawStoreArray<ListColorsColorizer<genfit::Track>>(storeArray, storeArrayName);
+}
+
+void CDCSVGPlotter::drawGFTrackTrajectories(const std::string& storeArrayName, const std::string&, const std::string&)
+{
+  B2INFO("Drawing trajectories of the CDCTracks");
+  StoreArray<genfit::Track> cdcTracks(storeArrayName);
+  if (cdcTracks) {
+    int iGFTrack = 0;
+    std::map<std::string, std::string> attributeMap;
+    ListColorsColorizer<genfit::Track> colorizer;
+    for (const genfit::Track& gfTrack : cdcTracks) {
+      attributeMap["stroke"] = colorizer.mapStroke(iGFTrack, gfTrack);
+      ++iGFTrack;
+
+      StoreArray<CDCHit> storedHits;
+      std::vector<genfit::TrackPoint*> gfTrackPoints = gfTrack.getPoints();
+      AbsTrackRep* absTrackRep = gfTrack.getCardinalRep();
+
+      std::vector<std::vector<CDCRecoHit*>> recoHits;
+
+      const MeasuredStateOnPlane* fittedState(NULL);
+
+      float x = nanf("");
+      float y = nanf("");
+
+      int iTrackPoint = 0;
+      for (genfit::TrackPoint* gfTrackPoint : gfTrackPoints) {
+        recoHits.push_back({});
+
+        std::vector< genfit::AbsMeasurement* > absMeasurements = gfTrackPoint->getRawMeasurements();
+
+        for (auto absMeasurement : absMeasurements) {
+          recoHits[iTrackPoint].push_back(dynamic_cast<CDCRecoHit*>(absMeasurement));
+        }
+
+        // get the fitter infos ------------------------------------------------------------------
+        if (! gfTrackPoint->hasFitterInfo(absTrackRep)) {
+          B2ERROR("trackPoint has no fitterInfo for absTrackRep");
+          continue;
+        }
+
+        KalmanFitterInfo* kalmanFitterInfo = gfTrackPoint->getKalmanFitterInfo(absTrackRep);
+
+        if (!kalmanFitterInfo) {
+          B2ERROR("Can only display KalmanFitterInfo or GblFitterInfo");
+          continue;
+        }
+
+        if (kalmanFitterInfo && ! gfTrackPoint->hasRawMeasurements()) {
+          B2ERROR("trackPoint has no raw measurements");
+          continue;
+        }
+
+        if (kalmanFitterInfo && ! kalmanFitterInfo->hasPredictionsAndUpdates()) {
+          B2ERROR("KalmanFitterInfo does not have all predictions and updates");
+          continue;
+        }
+
+        try {
+          if (kalmanFitterInfo)
+            fittedState = &(kalmanFitterInfo->getFittedState(true));
+        } catch (std::exception& e) {
+          B2ERROR(e.what() << " - can not get fitted state");
+          continue;
+        }
+
+        TVector3 track_pos = absTrackRep->getPos(*fittedState);
+
+        if (!isnan(x))
+          m_eventdataPlotter.drawLine(x, y, track_pos.x(), track_pos.y(), attributeMap);
+        x = track_pos.x();
+        y = track_pos.y();
+        ++iTrackPoint;
+      }// for (genfit::TrackPoint* gfTrackPoint : gfTrackPoints)
+
+    }
+  } else {
+    B2WARNING(storeArrayName << " not present in the DataStore");
+    B2INFO("Current content of the DataStore:");
+    B2INFO("StoreArrays:");
+    for (auto n : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0)))
+      B2INFO(n);
+    B2INFO("");
+    B2INFO("StoreObjPtr:");
+    for (auto n : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0)))
+      B2INFO(n);
+  }
 }
 
 void CDCSVGPlotter::drawGFTrackCands(const std::string& storeArrayName, const std::string&, const std::string&)

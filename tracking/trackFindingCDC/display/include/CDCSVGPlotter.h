@@ -15,7 +15,6 @@ namespace Belle2 {
     class CDCSVGPlotter {
 
     public:
-      //Constructor methode.
       /**
        * Constructor.
        * @param animate Switch to make an animated event display by means of animated SVG.
@@ -80,24 +79,26 @@ namespace Belle2 {
       /**
        * Draw GFTrackCands.
        * @param storeArrayName The name of the StoreArray containing the GFTrackCands.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the GFTrackCand and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the GFTrackCand and its id to a stroke-width.
        */
       void drawGFTrackCands(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
 
       /**
        * Draw GFTrackCandTrajectories.
-       * @param storeArrayName The name of the StoreArray containing the GFTrackCandTrajectories.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the GFTrackCandTrajectory and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the GFTrackCandTrajectory and its id to a stroke-width.
+       * @param storeArrayName The name of the StoreArray containing the GFTrackCands.
        */
       void drawGFTrackCandTrajectories(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
 
       /**
        * Draw GFTracks.
-       * @param storeObjName The name of the StoreVector containing the GFTracks.
+       * @param storeArrayName The name of the StoreArray containing the GFTracks.
        */
-      void drawGFTracks(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+      void drawGFTracks(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
+
+      /**
+       * Draws GFTrackTrajectories.
+       * @param storeArrayName The name of the StoreArray containing the CDCTracks.
+       */
+      void drawGFTrackTrajectories(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
 
       /**
        * Draw the axial to stereo segment pairs from Monte Carlo truth.
@@ -112,8 +113,6 @@ namespace Belle2 {
        * Is only available if the local track finder is in the module chain and
        * specific compile time flags enable the transportation of this data:
        * @param storeObjName The name of the StoreVector containing the CDCTracks.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
       void drawCDCTracks(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
 

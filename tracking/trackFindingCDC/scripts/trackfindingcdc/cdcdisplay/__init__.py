@@ -202,6 +202,10 @@ class CDCSVGDisplayModule(Module):
 
         # Draw the output Genfit tracks
         self.draw_gftracks = True and False
+
+        # Draw the output Genfit track trajectories
+        self.draw_gftrack_trajectories = True and False
+
         # Draw the trajectories stored in the output Genfit tracks
         self.draw_gftrackcand_trajectories = True and False
 
@@ -252,6 +256,7 @@ class CDCSVGDisplayModule(Module):
             'draw_gftrackcands',
             'draw_gftracks',
             'draw_gftrackcand_trajectories',
+            'draw_gftrack_trajectories',
             'use_cpp',
             'use_python',
             'draw_segments_id',
@@ -938,6 +943,10 @@ class CDCSVGDisplayModule(Module):
                     plotter.draw_iterable(trajectories, **styleDict)
                 else:
                     print "Non Genfit tracks present"
+
+        # Draw the genfit track-trajectories
+        if self.draw_gftrack_trajectories:
+            cppplotter.drawGFTrackTrajectories('GF2Tracks', '', '')
 
         fileName = self.new_output_filename()
         cppfileName = self.new_output_filename()

@@ -242,6 +242,14 @@ void EventDataPlotter::drawOuterCDCWall(const AttributeMap& attributeMap)
   primitivePlotter.drawCircle(centerX, centerY, outerR, attributeMap);
 }
 
+void EventDataPlotter::drawLine(const float& startX, const float& startY, const float& endX, const float& endY,
+                                const AttributeMap& attributeMap)
+{
+  if (not m_ptrPrimitivePlotter) return;
+  PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+  primitivePlotter.drawLine(startX, startY, endX, endY, attributeMap);
+}
 /// --------------------- Draw Circle2D ------------------------
 void EventDataPlotter::draw(const Circle2D& circle,
                             AttributeMap attributeMap)

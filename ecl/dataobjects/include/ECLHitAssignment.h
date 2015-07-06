@@ -22,13 +22,6 @@ namespace Belle2 {
   class ECLHitAssignment : public RelationsObject {
   public:
 
-
-    //! The cell id of this hit.
-    int m_showerId;
-
-    //! The cell id of this hit.
-    int m_cellId;
-
     //! The method to set shower id
     void setShowerId(int showerId) { m_showerId = showerId; }
 
@@ -41,11 +34,11 @@ namespace Belle2 {
     //! The method to get cell id
     int getCellId() const { return m_cellId; }
 
-
     //! Empty constructor
     /*! Recommended for ROOT IO
     */
-    ECLHitAssignment() {
+    ECLHitAssignment()
+    {
       m_showerId = 0;
       m_cellId = 0;
       ;
@@ -55,13 +48,21 @@ namespace Belle2 {
     ECLHitAssignment(
       int showerId,
       int cellId
-    ) {
+    )
+    {
       m_showerId = showerId;
       m_cellId = cellId;
     }
 
     ClassDef(ECLHitAssignment, 1);/**< the class title */
 
+  private:
+
+    //! The cell id of this hit.
+    int m_showerId;
+
+    //! The cell id of this hit.
+    int m_cellId;
   };
 
 } // end namespace Belle2

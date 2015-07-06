@@ -247,15 +247,11 @@ namespace Belle2 {
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
     {
-      TVector3 momentum(0., 0., 0.);
-      double m_px = m_Energy * sin(m_Theta) * cos(m_Phi);
-      double m_py = m_Energy * sin(m_Theta) * sin(m_Phi);
-      double m_pz = m_Energy * cos(m_Theta);
-
-      momentum.SetX(m_px);
-      momentum.SetY(m_py);
-      momentum.SetZ(m_pz);
-      return momentum;
+      return TVector3(
+               m_Energy * sin(m_Theta) * cos(m_Phi),
+               m_Energy * sin(m_Theta) * sin(m_Phi),
+               m_Energy * cos(m_Theta)
+             );
     }
 
 

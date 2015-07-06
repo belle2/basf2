@@ -26,7 +26,8 @@ namespace Belle2 {
   class ECLShower : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    ECLShower() {
+    ECLShower()
+    {
       m_ShowerId = 0;      /**< Shower ID */
       m_Energy = 0;      /**< Energy (GeV) */
       m_Theta = 0;       /**< Theta (rad) */
@@ -116,19 +117,19 @@ namespace Belle2 {
     /*! Get Error of E, theta, phi
      * @return Error E, theta, phi
      */
-    void GetError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
+    void GetError(float  ErrorArray[3]) const { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
     /*! Get Error of Energy
      * @return Error of Energy
      */
-    float GetEnergyError() { return m_Error[0] ;}
+    float GetEnergyError() const { return m_Error[0] ;}
     /*! Get Error of theta
      * @return Error of theta
      */
-    float GetThetaError() { return  m_Error[1] ;}
+    float GetThetaError() const { return  m_Error[1] ;}
     /*! Get Error of phi
      * @return Error of phi
      */
-    float GetPhiError() {return m_Error[2] ;}
+    float GetPhiError() const {return m_Error[2] ;}
     /*! Get Mass
      * @return Mass
      */
@@ -190,19 +191,19 @@ namespace Belle2 {
     /*! Get Error of E, theta, phi
      * @return Error E, theta, phi
      */
-    void getError(float  ErrorArray[3]) { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
+    void getError(float  ErrorArray[3]) const { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
     /*! Get Error of Energy
      * @return Error of Energy
      */
-    float getEnergyError() { return m_Error[0] ;}
+    float getEnergyError() const { return m_Error[0] ;}
     /*! Get Error of theta
      * @return Error of theta
      */
-    float getThetaError() { return  m_Error[1] ;}
+    float getThetaError() const { return  m_Error[1] ;}
     /*! Get Error of phi
      * @return Error of phi
      */
-    float getPhiError() {return m_Error[2] ;}
+    float getPhiError() const {return m_Error[2] ;}
     /*! Get Mass
      * @return Mass
      */
@@ -244,7 +245,8 @@ namespace Belle2 {
 
 
     //! The method to get return  TVector3 Momentum
-    TVector3 getMomentum() const {
+    TVector3 getMomentum() const
+    {
       TVector3 momentum(0., 0., 0.);
       double m_px = m_Energy * sin(m_Theta) * cos(m_Phi);
       double m_py = m_Energy * sin(m_Theta) * sin(m_Phi);

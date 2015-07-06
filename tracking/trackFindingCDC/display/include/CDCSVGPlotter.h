@@ -94,6 +94,12 @@ namespace Belle2 {
       void drawGFTrackCandTrajectories(const std::string& storeArrayName, const std::string& stroke, const std::string& strokeWidth);
 
       /**
+       * Draw GFTracks.
+       * @param storeObjName The name of the StoreVector containing the GFTracks.
+       */
+      void drawGFTracks(const std::string& storeObjName, const std::string& stroke, const std::string& strokeWidth);
+
+      /**
        * Draw the axial to stereo segment pairs from Monte Carlo truth.
        * @param storeObjName The name of the StoreVector containing the CDCSegmentPairs.
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a color.

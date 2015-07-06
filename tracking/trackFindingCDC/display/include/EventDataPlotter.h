@@ -14,6 +14,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <genfit/Track.h>
 
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
@@ -200,6 +201,9 @@ namespace Belle2 {
 
       /// Draws the hit content of the Genfit track candidate.
       void draw(const genfit::TrackCand& gfTrackCand, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws the hit content of the Genfit track.
+      void draw(const genfit::Track& gfTrack, const AttributeMap& attributeMap = AttributeMap());
 
       /// Allow the drawing of pointers checking if the pointer is nonzero.
       template<class T>

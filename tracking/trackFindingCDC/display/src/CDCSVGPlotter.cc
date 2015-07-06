@@ -7,6 +7,8 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/display/CDCSVGPlotter.h>
+
+#include <genfit/Track.h>
 #include <tracking/trackFindingCDC/display/Colorizer.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -15,6 +17,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/filters/axial_segment_pair/MCAxialSegmentPairFilter.h>
 #include <genfit/TrackCand.h>
+
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
@@ -207,6 +210,12 @@ void CDCSVGPlotter::drawGFTrackCandTrajectories(const std::string& storeArrayNam
     }
     drawIterable(trajectories, colorizer);
   } else B2WARNING("No Genfit tracks present");
+}
+
+void CDCSVGPlotter::drawGFTracks(const std::string& storeObjName, const std::string&, const std::string&)
+{
+  StoreArray<genfit::Track> storeArray(storeObjName);
+  drawStoreArray<ListColorsColorizer<genfit::Track>>(storeArray, storeObjName);
 }
 
 void CDCSVGPlotter::drawGFTrackCands(const std::string& storeArrayName, const std::string&, const std::string&)

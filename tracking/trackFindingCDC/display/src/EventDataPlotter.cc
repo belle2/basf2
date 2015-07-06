@@ -12,11 +12,29 @@
 
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 
+
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <genfit/AbsFitterInfo.h>
 
+#include <genfit/AbsMeasurement.h>
+#include <genfit/AbsTrackRep.h>
+#include <genfit/GblFitterInfo.h>
+
+#include <genfit/KalmanFitterInfo.h>
+#include <genfit/MeasuredStateOnPlane.h>
+#include <genfit/Track.h>
 #include <genfit/TrackCand.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
+
 #include <cmath>
+#include <exception>
+
+using genfit::AbsFitterInfo;
+using genfit::AbsTrackRep;
+using genfit::GblFitterInfo;
+using genfit::KalmanFitterInfo;
+using genfit::MeasuredStateOnPlane;
 
 using namespace std;
 using namespace Belle2;
@@ -619,5 +637,78 @@ void EventDataPlotter::draw(const genfit::TrackCand& gfTrackCand, const Attribut
 
 }
 
+void EventDataPlotter::draw(const genfit::Track& gfTrack, const AttributeMap& attributeMap)
+{
+  StoreArray<CDCHit> storedHits;
+  std::vector<genfit::TrackPoint*> gfTrackPoints = gfTrack.getPoints();
+  AbsTrackRep* absTrackRep = gfTrack.getCardinalRep();
 
+  std::vector<std::vector<CDCRecoHit*>> recoHits;
 
+  const MeasuredStateOnPlane* fittedState(NULL);
+
+  int iTrackPoint = 0;
+  for (genfit::TrackPoint* gfTrackPoint : gfTrackPoints) {
+    recoHits.push_back({});
+
+    std::vector< genfit::AbsMeasurement* > absMeasurements = gfTrackPoint->getRawMeasurements();
+
+    for (auto absMeasurement : absMeasurements) {
+      recoHits[iTrackPoint].push_back(dynamic_cast<CDCRecoHit*>(absMeasurement));
+    }
+
+    // get the fitter infos ------------------------------------------------------------------
+    if (! gfTrackPoint->hasFitterInfo(absTrackRep)) {
+      B2ERROR("trackPoint has no fitterInfo for absTrackRep");
+      continue;
+    }
+
+    KalmanFitterInfo* kalmanFitterInfo = gfTrackPoint->getKalmanFitterInfo(absTrackRep);
+
+    if (!kalmanFitterInfo) {
+      B2ERROR("Can only display KalmanFitterInfo or GblFitterInfo");
+      continue;
+    }
+
+    if (kalmanFitterInfo && ! gfTrackPoint->hasRawMeasurements()) {
+      B2ERROR("trackPoint has no raw measurements");
+      continue;
+    }
+
+    if (kalmanFitterInfo && ! kalmanFitterInfo->hasPredictionsAndUpdates()) {
+      B2ERROR("KalmanFitterInfo does not have all predictions and updates");
+      continue;
+    }
+
+    try {
+      if (kalmanFitterInfo)
+        fittedState = &(kalmanFitterInfo->getFittedState(true));
+    } catch (std::exception& e) {
+      B2ERROR(e.what() << " - can not get fitted state");
+      continue;
+    }
+
+    genfit::MeasurementOnPlane* mop = kalmanFitterInfo->getMeasurementOnPlane(0);
+    const TVectorD& hit_coords = mop->getState();
+    double driftLenght = std::fabs(hit_coords(0));
+
+    B2Vector3D pointingVector;
+    B2Vector3D trackDir;
+
+    // 0 = index of AbsMeasurement
+    recoHits[iTrackPoint][0]->getFlyByDistanceVector(pointingVector, trackDir, absTrackRep, true);
+
+    TVector3 track_pos = absTrackRep->getPos(*fittedState);
+
+    PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+
+    float x = track_pos.x() - pointingVector.X();
+    float y = track_pos.y() - pointingVector.Y();
+    float radius = driftLenght;
+    primitivePlotter.startGroup();
+    primitivePlotter.drawCircle(x, y, radius, attributeMap);
+
+    primitivePlotter.endGroup();
+    ++iTrackPoint;
+  }// for (genfit::TrackPoint* gfTrackPoint : gfTrackPoints)
+}

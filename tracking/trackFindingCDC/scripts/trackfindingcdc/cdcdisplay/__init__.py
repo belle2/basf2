@@ -63,7 +63,7 @@ class CDCSVGDisplayModule(Module):
         # to view Monte Carlo information after the simulation is done
 
         # Flag to use cpp
-        self.use_cpp = True and False
+        self.use_cpp = True  # and False
 
         # Flag to use python
         self.use_python = True and False
@@ -197,9 +197,11 @@ class CDCSVGDisplayModule(Module):
 
         # Those are only available, if any track finder is in the module chain (not tested for others than the local track finder)
 
-        # Draw the output Genfit tracks
+        # Draw the output Genfit trackcands
         self.draw_gftrackcands = True and False
 
+        # Draw the output Genfit tracks
+        self.draw_gftracks = True and False
         # Draw the trajectories stored in the output Genfit tracks
         self.draw_gftrackcand_trajectories = True and False
 
@@ -248,6 +250,7 @@ class CDCSVGDisplayModule(Module):
             'draw_rlinfo',
             'draw_reassigned',
             'draw_gftrackcands',
+            'draw_gftracks',
             'draw_gftrackcand_trajectories',
             'use_cpp',
             'use_python',
@@ -836,6 +839,10 @@ class CDCSVGDisplayModule(Module):
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray(self.track_cands_store_array_name, **styleDict)
 
+        # Draw the genfit track
+        if self.draw_gftracks:
+            cppplotter.drawGFTracks('GF2Tracks', '', '')
+
         # Draw interaction point
         if self.draw_interaction_point:
             if self.use_cpp:
@@ -898,7 +905,7 @@ class CDCSVGDisplayModule(Module):
         # Draw the trajectories of the genfit track candidates
         if self.draw_gftrackcand_trajectories:
             if self.use_cpp:
-                cppplotter.drawGFTrackCandTrajectories(self.track_cands_store_array_name)
+                cppplotter.drawGFTrackCandTrajectories(self.track_cands_store_array_name, '', '')
             if self.use_python:
                 print 'Drawing trajectories of the exported Genfit tracks'
                 gftrackcand_storearray = Belle2.PyStoreArray(self.track_cands_store_array_name)

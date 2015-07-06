@@ -44,23 +44,23 @@ ECLElectronIdModule::~ECLElectronIdModule()
 
 void ECLElectronIdModule::initialize()
 {
-  StoreArray<Track> Tracks;
-  StoreArray<ECLPidLikelihood> ECLPidLikelihoodArray;
-  ECLPidLikelihoodArray.registerInDataStore();
-  Tracks.registerRelationTo(ECLPidLikelihoodArray);
+  StoreArray<Track> tracks;
+  StoreArray<ECLPidLikelihood> eclPidLikelihoods;
+  eclPidLikelihoods.registerInDataStore();
+  tracks.registerRelationTo(eclPidLikelihoods);
 
-  string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
-  string muParams = FileSystem::findFile("/data/ecl/muons.dat");
-  string piParams = FileSystem::findFile("/data/ecl/pions.dat");
+  const string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
+  const string muParams = FileSystem::findFile("/data/ecl/muons.dat");
+  const string piParams = FileSystem::findFile("/data/ecl/pions.dat");
 
   if (eParams.empty()  || muParams.empty() || piParams.empty())
     B2FATAL("Electron ID pdfs parameter files not found.");
 
-  (m_pdf[ Const::electron.getIndex() ] = new ECLElectronPdf) -> init(eParams.c_str());
-  (m_pdf[ Const::muon.getIndex() ] = new ECLMuonPdf) ->init(muParams.c_str());
-  (m_pdf[ Const::proton.getIndex() ] =
-     m_pdf[ Const::kaon.getIndex() ] =
-       m_pdf[ Const::pion.getIndex() ] = new ECLPionPdf) ->init(piParams.c_str());
+  (m_pdf[Const::electron.getIndex()] = new ECLElectronPdf)->init(eParams.c_str());
+  (m_pdf[Const::muon.getIndex()] = new ECLMuonPdf)->init(muParams.c_str());
+  (m_pdf[Const::proton.getIndex()] =
+     m_pdf[Const::kaon.getIndex()] =
+       m_pdf[Const::pion.getIndex()] = new ECLPionPdf)->init(piParams.c_str());
 }
 
 void ECLElectronIdModule::beginRun()
@@ -69,46 +69,51 @@ void ECLElectronIdModule::beginRun()
 
 void ECLElectronIdModule::event()
 {
-  StoreArray<Track> Tracks;
-  StoreArray<ECLPidLikelihood> ecllogL;
+  StoreArray<Track> tracks;
+  StoreArray<ECLPidLikelihood> eclPidLikelihoods;
 
-  for (int t = 0; t < Tracks.getEntries(); ++t) {
-    const Track* track = Tracks[t];
-    auto relShowers = track->getRelationsTo<ECLShower>();
+  for (const auto& track : tracks) {
+    const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
-    double energy(0), maxEnergy(0), e9e25(0);
-    int nCrystals(0);
-    int nClusters(relShowers.size());
-    for (auto sh : relShowers) {
-      double shEnergy = sh.GetEnergy();
+    double energy = 0;
+    double maxEnergy = 0;
+    double e9e25 = 0;
+    int nCrystals = 0;
+    int nClusters = relShowers.size();
+
+    for (const auto& eclShower : relShowers) {
+      const double shEnergy = eclShower.GetEnergy();
       energy += shEnergy;
       if (shEnergy > maxEnergy) {
         maxEnergy = shEnergy;
-        e9e25 = sh.GetE9oE25();
+        e9e25 = eclShower.GetE9oE25();
       }
-      nCrystals += int(sh.getNHits());
+      nCrystals += int(eclShower.getNHits());
     }
-    float likelihoods [ Const::ChargedStable::c_SetSize ] ;
-    double p, eop, costheta;
-    for (Const::ChargedStable hypo = Const::chargedStableSet.begin();
-         hypo != Const::chargedStableSet.end() ; ++hypo) {
 
-      const TrackFitResult* fitRes = track -> getTrackFitResult(hypo);
-      if (fitRes == 0) fitRes = track -> getTrackFitResult(Const::pion);
-      p = fitRes  -> getMomentum() . Mag();
+    float likelihoods[Const::ChargedStable::c_SetSize];
+    double eop;
+    for (const auto& hypo : Const::chargedStableSet) {
+      const TrackFitResult* fitRes = track.getTrackFitResult(hypo);
+      if (fitRes == 0) fitRes = track.getTrackFitResult(Const::pion);
+      const double p = fitRes->getMomentum().Mag();
       eop = energy / p;
-      costheta = fitRes  -> getMomentum() . CosTheta();
+      const double costheta = fitRes->getMomentum().CosTheta();
 
       if (fitRes != 0) {
         ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
-        if (currentpdf == 0) currentpdf = m_pdf[ Const::pion.getIndex() ]; // use pion pdf when specialized pdf is not assigned.
+        if (currentpdf == 0) {
+          currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
+        }
         likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p, costheta));
-      } else likelihoods[hypo.getIndex()] = -700;
-
+      } else {
+        likelihoods[hypo.getIndex()] = -700;
+      }
     } // end loop on hypo
 
-    track-> addRelationTo(ecllogL.appendNew(likelihoods, energy, eop, e9e25, nCrystals, nClusters));
-  } // end loop on Tracks
+    const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e25, nCrystals, nClusters);
+    track.addRelationTo(eclPidLikelihood);
+  } // end loop on tracks
 }
 
 void ECLElectronIdModule::endRun()
@@ -117,9 +122,9 @@ void ECLElectronIdModule::endRun()
 
 void ECLElectronIdModule::terminate()
 {
-  delete m_pdf[ Const::electron.getIndex() ];
-  delete m_pdf[ Const::muon.getIndex() ];
-  delete m_pdf[ Const::pion.getIndex() ];
-  if (m_pdf[ Const::proton.getIndex() ] != m_pdf[ Const::pion.getIndex() ]) delete m_pdf[ Const::proton.getIndex() ];
-  if (m_pdf[ Const::kaon.getIndex() ] != m_pdf[ Const::pion.getIndex() ]) delete m_pdf[ Const::kaon.getIndex() ];
+  delete m_pdf[Const::electron.getIndex()];
+  delete m_pdf[Const::muon.getIndex()];
+  delete m_pdf[Const::pion.getIndex()];
+  if (m_pdf[Const::proton.getIndex()] != m_pdf[Const::pion.getIndex()]) delete m_pdf[Const::proton.getIndex()];
+  if (m_pdf[Const::kaon.getIndex()] != m_pdf[Const::pion.getIndex()]) delete m_pdf[Const::kaon.getIndex()];
 }

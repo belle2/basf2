@@ -30,7 +30,10 @@ namespace Belle2 {
   class ECLGamma : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    ECLGamma() { m_ShowerId = 0;}
+    ECLGamma() : m_ShowerId(0) {}
+
+    /** Constructor */
+    ECLGamma(int showerId) : m_ShowerId(showerId) {}
 
     /*! Set Shower ID
      */

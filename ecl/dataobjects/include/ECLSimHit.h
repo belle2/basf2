@@ -28,8 +28,8 @@ namespace Belle2 {
   class ECLSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0, 0) {;}
-
+    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0,
+          0) {;}
 
     //! Useful Constructor
     ECLSimHit(
@@ -40,7 +40,8 @@ namespace Belle2 {
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position        /**< Position */
-    ): SimHitBase() {
+    ): SimHitBase()
+    {
       m_CellId = CellId;
       m_TrackId = TrackId;
       m_Pdg = Pdg;
@@ -48,11 +49,7 @@ namespace Belle2 {
       m_Edep = Edep;
       m_Momentum = Momentum;
       m_Position = Position;
-
     }
-
-
-
 
     /*! Set Cell ID
      */
@@ -68,11 +65,11 @@ namespace Belle2 {
 
     /*! Set Flight time from IP
      */
-    void setFlightTime(double FlightTime) { m_FlightTime = (float) FlightTime; }
+    void setFlightTime(double FlightTime) { m_FlightTime = static_cast<float>(FlightTime); }
 
     /*! Set Deposit energy
      */
-    void setEnergyDep(double Edep) { m_Edep = (float) Edep; }
+    void setEnergyDep(double Edep) { m_Edep = static_cast<float>(Edep); }
 
     /*! Set Momentum
      */
@@ -85,7 +82,6 @@ namespace Belle2 {
     /*! Set Position
      */
     void setPosition(TVector3 Position) { m_Position = Position; }
-
 
     /*! Get Cell ID
      * @return Cell ID
@@ -105,12 +101,12 @@ namespace Belle2 {
     /*! Get Flight time from IP
      * @return Flight time from IP
      */
-    double getFlightTime() const { return (double)m_FlightTime; }
+    double getFlightTime() const { return m_FlightTime; }
 
     /*! Get Deposit energy
      * @return Deposit energy
      */
-    double getEnergyDep() const { return (double) m_Edep; }
+    double getEnergyDep() const { return m_Edep; }
 
     /*! Get Momentum
      * @return Momentum
@@ -131,7 +127,7 @@ namespace Belle2 {
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_FlightTime += delta; }
+    void shiftInTime(float delta) { m_FlightTime += delta; }
 
 
   private:

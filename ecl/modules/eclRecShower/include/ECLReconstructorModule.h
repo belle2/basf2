@@ -62,46 +62,38 @@ namespace Belle2 {
       int    m_nRun;
       /** Event number */
       int    m_nEvent;
-      /** ECLReconstructor index */
-      int    m_hitNum;
-      /**  ECLHitAssignment. index */
-      int    m_HANum;
+
       /** function of sruare */
       double squ(double x) { return x * x; }
 
       /**calculate error of Energy with Energy  */
-      float errorE(double E);
+      double errorEnergy(double energy);
 
       /**calculate error of Theta with Energy and Theta  */
-      float errorTheta(double Energy, double Theta);
+      double errorTheta(double energy, double theta);
 
       /**calculate error of Phi with Energy and Theta  */
-      float errorPhi(double Energy, double Theta);
+      double errorPhi(double energy, double theta);
 
       /**calculate correction factor of energy depending on Energy and Theta  */
-      double correctionFactor(double Energy, double Theta);
+      double correctionFactor(double energy, double theta);
 
       /** Fill error matrix for Px, Py Pz and E */
-      void readErrorMatrix(double Energy, double Theta,
-                           double Phi, TMatrixFSym& ErrorMatrix);
+      void readErrorMatrix(double energy, double theta,
+                           double phi, TMatrixFSym& errorMatrix);
 
       /** Fill error matrix for Px, Py Pz and E */
-      void readErrorMatrix7x7(double Energy, double Theta,
-                              double Phi, TMatrixFSym& ErrorMatrix);
+      void readErrorMatrix7x7(double energy, double theta,
+                              double phi, TMatrixFSym& errorMatrix);
 
       /**calculate Px using Energy, Theta and Phi */
-      float Px(double Energy, double Theta, double Phi);
+      double Px(double energy, double theta, double phi);
 
       /** Calculate Py using Energy, Theta and Phi */
-      float Py(double Energy, double Theta, double Phi);
+      double Py(double energy, double theta, double phi);
 
       /** Calculate Pz using Energy, Theta  */
-      float Pz(double Energy, double Theta);
-
-      /** extrapolated cell */
-      int   m_TrackCellId[8736];
-
-
+      double Pz(double energy, double theta);
     };
   }//ECL
 }//Belle2

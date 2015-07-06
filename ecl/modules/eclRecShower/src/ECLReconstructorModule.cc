@@ -13,7 +13,6 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
 
-
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/rec_lib/TEclCFCR.h>
 #include <ecl/rec_lib/TRecEclCF.h>
@@ -21,11 +20,9 @@
 #include <ecl/rec_lib/TEclCFShower.h>
 #include <ecl/rec_lib/TRecEclCF.h>
 
-
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
-
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
@@ -34,7 +31,6 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationsObject.h>
-
 
 #include <boost/foreach.hpp>
 #include <G4ParticleTable.hh>
@@ -45,8 +41,7 @@
 // ROOT
 #include <TVector3.h>
 #include <TMatrixFSym.h>
-
-#define PI 3.14159265358979323846
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -71,7 +66,6 @@ ECLReconstructorModule::ECLReconstructorModule() : Module()
 
 ECLReconstructorModule::~ECLReconstructorModule()
 {
-
 }
 
 void ECLReconstructorModule::initialize()
@@ -108,20 +102,22 @@ void ECLReconstructorModule::event()
     B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
     return;
   }
+  // Output Arrays
+  StoreArray<ECLHitAssignment> eclHaArray;
+  StoreArray<ECLShower> eclRecShowerArray;
+  StoreArray<ECLCluster> eclMdstArray;
 
   cout.unsetf(ios::scientific);
   cout.precision(6);
   TRecEclCF& cf = TRecEclCF::Instance();
   cf.Clear();
 
-  TEclEnergyHit ss;
-  for (int ii = 0; ii < eclDigiArray.getEntries(); ii++) {
-    ECLDigit* aECLDigi = eclDigiArray[ii];
-    float FitEnergy    = (aECLDigi->getAmp()) / 20000.;//ADC count to GeV
+  for (const auto& aECLDigi : eclDigiArray) {
+    const double FitEnergy = (aECLDigi.getAmp()) / 20000.; // ADC count to GeV
     //float FitTime = (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;
     //in us -> obsolete, for record. 20150529 KM.
 
-    int cId         = (aECLDigi->getCellId() - 1);
+    const int cId = (aECLDigi.getCellId() - 1);
     if (FitEnergy < 0.) {continue;}
     // Register hit to cluster finder, cf.
     cf.Accumulate(m_nEvent, FitEnergy, cId);
@@ -134,13 +130,10 @@ void ECLReconstructorModule::event()
   int nShower = 0;
 
   // Loop over Connected Region (CR).
-  for (std::vector<TEclCFCR>::const_iterator iCR = cf.CRs().begin();
-       iCR != cf.CRs().end(); ++iCR) {
-
+  for (const auto& cr : cf.CRs()) {
     // Each Shower is pointed from the CR.
-    for (EclCFShowerMap::const_iterator iShower = iCR->Showers().begin();
-         iShower != iCR->Showers().end(); ++iShower) {
-      TEclCFShower iSh = (*iShower).second;
+    for (const auto& shower : cr.Showers()) {
+      TEclCFShower iSh = shower.second;
 
       // In order for finding the highest energy crystal in a shower and
       // that crystals' timing. 20150529 K.Miyabayashi
@@ -151,22 +144,17 @@ void ECLReconstructorModule::event()
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
            iHA != HAs.end(); ++iHA) {
 
-        StoreArray<ECLHitAssignment> eclHaArray;
         if (!eclHaArray) eclHaArray.create();
-        eclHaArray.appendNew();
-        m_HANum = eclHaArray.getEntries() - 1;
-
-        eclHaArray[m_HANum]->setShowerId(nShower);
-        eclHaArray[m_HANum]->setCellId(iHA->Id() + 1);
+        const auto eclHitAssignment = eclHaArray.appendNew();
+        eclHitAssignment->setShowerId(nShower);
+        eclHitAssignment->setCellId(iHA->Id() + 1);
 
         // From ECLDigit information, the highest energy crystal is found.
         // To speed up, Mapping to be used, by Vishal
-        for (int i_DigiLoop = 0; i_DigiLoop < eclDigiArray.getEntries();
-             i_DigiLoop++) {
-          ECLDigit* aECLDigi = eclDigiArray[i_DigiLoop];
-          if (aECLDigi->getCellId() != (iHA->Id() + 1))continue;
-          float v_FitEnergy    = (aECLDigi->getAmp()) / 20000.;
-          float v_FitTime      =  aECLDigi->getTimeFit();
+        for (const auto& aECLDigi : eclDigiArray) {
+          if (aECLDigi.getCellId() != (iHA->Id() + 1)) continue;
+          const double v_FitEnergy    = (aECLDigi.getAmp()) / 20000.;
+          const double v_FitTime      =  aECLDigi.getTimeFit();
           // If the crystal has highest energy, keep its information.
           if (v_HiEnergy < v_FitEnergy) {
             v_HiEnergy = v_FitEnergy;
@@ -175,82 +163,70 @@ void ECLReconstructorModule::event()
         } // i_DigiLoop
       } // MEclCFShowerHA LOOP
 
-
-      double energyBfCorrect = (*iShower).second.Energy();
-      double preliminaryCalibration = correctionFactor(energyBfCorrect, (*iShower).second.Theta()) ;
-      double sEnergy = (*iShower).second.Energy() / preliminaryCalibration;
+      const double energyBfCorrect = shower.second.Energy();
+      const double preliminaryCalibration = correctionFactor(energyBfCorrect, shower.second.Theta()) ;
+      const double sEnergy = shower.second.Energy() / preliminaryCalibration;
 
       //... Calibration for Highest Energy in Shower
       //... Assuming that scaling will be constant
       //... TODO more careful study in future.
       //... Vishal
-      double HighCalibrationFactor = v_HiEnergy / energyBfCorrect;
-      double HiEnergyinShower = sEnergy * HighCalibrationFactor;
+      const double HighCalibrationFactor = v_HiEnergy / energyBfCorrect;
+      const double HiEnergyinShower = sEnergy * HighCalibrationFactor;
 
-      StoreArray<ECLShower> eclRecShowerArray;
       if (!eclRecShowerArray) eclRecShowerArray.create();
-      eclRecShowerArray.appendNew();
-      m_hitNum = eclRecShowerArray.getEntries() - 1;
-      eclRecShowerArray[m_hitNum]->setShowerId(nShower);
-      eclRecShowerArray[m_hitNum]->setEnergy((float) sEnergy);
-      eclRecShowerArray[m_hitNum]->setTheta((float)(*iShower).second.Theta());
-      eclRecShowerArray[m_hitNum]->setPhi((float)(*iShower).second.Phi());
-      eclRecShowerArray[m_hitNum]->setR((float)(*iShower).second.Distance());
-      eclRecShowerArray[m_hitNum]->setMass((float)(*iShower).second.Mass());
-      eclRecShowerArray[m_hitNum]->setWidth((float)(*iShower).second.Width());
-      eclRecShowerArray[m_hitNum]->setE9oE25((float)(*iShower).second.E9oE25());
-      eclRecShowerArray[m_hitNum]->setE9oE25unf((float)(*iShower).second.E9oE25unf());
-      eclRecShowerArray[m_hitNum]->setNHits((*iShower).second.NHits());
-      eclRecShowerArray[m_hitNum]->setStatus((*iShower).second.Status());
-      eclRecShowerArray[m_hitNum]->setGrade((*iShower).second.Grade());
-      eclRecShowerArray[m_hitNum]->setUncEnergy((float)(*iShower).second.UncEnergy());
-      eclRecShowerArray[m_hitNum]->setTime((float) v_TIME);
-      double sTheta = (*iShower).second.Theta();
+      const auto eclRecShower = eclRecShowerArray.appendNew();
+      eclRecShower->setShowerId(nShower);
+      eclRecShower->setEnergy(sEnergy);
+      eclRecShower->setTheta(shower.second.Theta());
+      eclRecShower->setPhi(shower.second.Phi());
+      eclRecShower->setR(shower.second.Distance());
+      eclRecShower->setMass(shower.second.Mass());
+      eclRecShower->setWidth(shower.second.Width());
+      eclRecShower->setE9oE25(shower.second.E9oE25());
+      eclRecShower->setE9oE25unf(shower.second.E9oE25unf());
+      eclRecShower->setNHits(shower.second.NHits());
+      eclRecShower->setStatus(shower.second.Status());
+      eclRecShower->setGrade(shower.second.Grade());
+      eclRecShower->setUncEnergy(shower.second.UncEnergy());
+      eclRecShower->setTime(v_TIME);
+      const double sTheta = shower.second.Theta();
       // In ECLShower convention, off-diagonals are ignored.
       float ErrorMatrix[3] = {
-        errorE(sEnergy),
-        errorTheta(sEnergy, sTheta),
-        errorPhi(sEnergy, sTheta)
+        static_cast<float>(errorEnergy(sEnergy)),
+        static_cast<float>(errorTheta(sEnergy, sTheta)),
+        static_cast<float>(errorPhi(sEnergy, sTheta))
       };
-      eclRecShowerArray[m_hitNum]->setError(ErrorMatrix);
+      eclRecShower->setError(ErrorMatrix);
 
       // For ECLCluster, keep room for off-diagonals though for a while 0.
       float Mdst_Error[6] = {
-        errorE(sEnergy),
+        static_cast<float>(errorEnergy(sEnergy)),
         0,
-        errorPhi(sEnergy, sTheta),
+        static_cast<float>(errorPhi(sEnergy, sTheta)),
         0,
         0,
-        errorTheta(sEnergy, sTheta)
+        static_cast<float>(errorTheta(sEnergy, sTheta))
       };
 
       // Fill ECLCluster here
-      // RelationArray ECLClustertoShower has been removed.
-
-
-      StoreArray<ECLCluster> eclMdstArray;
       if (!eclMdstArray) eclMdstArray.create();
       // Loose timing cut is applied. 20150529 K.Miyabayashi
       if (-300.0 < v_TIME && v_TIME < 200.0) {
-        eclMdstArray.appendNew();
-        int i_Mdst = eclMdstArray.getEntries() - 1;
+        const auto eclCluster = eclMdstArray.appendNew();
 
-        eclMdstArray[i_Mdst]->setError(Mdst_Error);
-        eclMdstArray[i_Mdst]->setTiming((float) v_TIME);
-        eclMdstArray[i_Mdst]->setEnergy((float) sEnergy);
-        eclMdstArray[i_Mdst]->setTheta((float)(*iShower).second.Theta());
-        eclMdstArray[i_Mdst]->setPhi((float)(*iShower).second.Phi());
-        eclMdstArray[i_Mdst]->setR((float)(*iShower).second.Distance());
-        eclMdstArray[i_Mdst]->setE9oE25((float)(*iShower).second.E9oE25());
-        eclMdstArray[i_Mdst]->setEnedepSum((float)(*iShower).second.UncEnergy());
-        eclMdstArray[i_Mdst]->setNofCrystals((*iShower).second.NHits());
-        eclMdstArray[i_Mdst]->setHighestE((float)  HiEnergyinShower);
+        eclCluster->setError(Mdst_Error);
+        eclCluster->setTiming(v_TIME);
+        eclCluster->setEnergy(sEnergy);
+        eclCluster->setTheta(shower.second.Theta());
+        eclCluster->setPhi(shower.second.Phi());
+        eclCluster->setR(shower.second.Distance());
+        eclCluster->setE9oE25(shower.second.E9oE25());
+        eclCluster->setEnedepSum(shower.second.UncEnergy());
+        eclCluster->setNofCrystals(shower.second.NHits());
+        eclCluster->setHighestE(HiEnergyinShower);
 
-        //Object for relation of ECLShower to ECLCLuster
-        //.. 16-5-2k14
-        const ECLShower* eclshower = eclRecShowerArray[m_hitNum];
-        //... Relation of ECLCluster to ECLShower
-        eclMdstArray[i_Mdst]->addRelationTo(eclshower);
+        eclCluster->addRelationTo(eclRecShower);
         //..... ECLCluster is completed here......
       }// End of timing cut branch.
 
@@ -262,14 +238,12 @@ void ECLReconstructorModule::event()
 
 void ECLReconstructorModule::endRun()
 {
-
   m_nRun++;
 }
 
 void ECLReconstructorModule::terminate()
 {
   m_timeCPU = clock() * Unit::us - m_timeCPU;
-
 }
 
 
@@ -279,7 +253,6 @@ void ECLReconstructorModule::terminate()
 
 double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
 {
-
   //Used to break free of loop and also to check for any mistake in logic
   int  eCorrId = -10;
   //Corrections
@@ -287,14 +260,10 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
   //... The above initialiation (1,0,0,0) will provide calibration factor of 1
   //... i.e. is no correction : Vishal
 
-
-
-
   /*Register the ECL.xml file, which further register the
     ECL-FirstCorrection.xml file and use GearDir to access the elements*/
   GearDir ThetaBins("Detector/DetectorComponent[@name=\"ECL\"]/Content/ECLFirstCorrection/ThetaBins/");
   GearDir ThetaBinsContent(ThetaBins);
-
 
   /* Below section help in reducing the looping time
      checks which bin theta  should be, above or below
@@ -309,11 +278,11 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
   int MiddleBin = int((LoopStop) / 2); // Take in between the bins
 
   ThetaBinsContent.append((boost::format("ThetaBins[%1%]/") % (MiddleBin)).str());
-  if (Theta <  ThetaBinsContent.getAngle("ThetaEnd"))
-  {LoopStop = MiddleBin;}
-  else {LoopStart = MiddleBin + 1;}
-
-
+  if (Theta <  ThetaBinsContent.getAngle("ThetaEnd")) {
+    LoopStop = MiddleBin;
+  } else {
+    LoopStart = MiddleBin + 1;
+  }
 
   for (int iThetaBins = LoopStart; iThetaBins <= LoopStop; ++iThetaBins) {
     GearDir ThetaBinsContent(ThetaBins);
@@ -337,7 +306,7 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
 
   //Check, if there is some problem to get proper Theta !!!
   if (eCorrId < 1 || eCorrId > 15) {
-    B2ERROR("ECLShower theta out of range " << (Theta / PI * 180))
+    B2ERROR("ECLShower theta out of range " << (Theta / TMath::Pi() * 180))
   }
 
   double  preliminaryCalibration = energyCorrectPolynomial[0]
@@ -345,78 +314,7 @@ double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
                                    + energyCorrectPolynomial[2] * pow(log(Energy), 2)
                                    + energyCorrectPolynomial[3] * pow(log(Energy), 3);
 
-
-  /* OLD CODE to get correction with hard coded numbers.. To be removed in future -- Vishal
-
-  int  eCorrId = -1;
-  if (Theta > 0 && (Theta / PI * 180) < 32.2) {
-    eCorrId = 0;
-  } else if ((Theta / PI * 180) >= 32.2 && (Theta / PI * 180) < 35.0) {
-    eCorrId = 1;
-  } else if ((Theta / PI * 180) >= 35.0 && (Theta / PI * 180) < 37.5) {
-    eCorrId = 2;
-  } else if ((Theta / PI * 180) >= 37.5 && (Theta / PI * 180) < 40.0) {
-    eCorrId = 3;
-  } else if ((Theta / PI * 180) >= 40.0 && (Theta / PI * 180) < 42.5) {
-    eCorrId = 4;
-  } else if ((Theta / PI * 180) >= 42.5 && (Theta / PI * 180) < 45.0) {
-    eCorrId = 5;
-  } else if ((Theta / PI * 180) >= 45.0 && (Theta / PI * 180) < 55.0) {
-    eCorrId = 6;
-  } else if ((Theta / PI * 180) >= 55.0 && (Theta / PI * 180) < 65.0) {
-    eCorrId = 7;
-  } else if ((Theta / PI * 180) >= 65.0 && (Theta / PI * 180) < 75.0) {
-    eCorrId = 8;
-  } else if ((Theta / PI * 180) >= 75.0 && (Theta / PI * 180) < 85.0) {
-    eCorrId = 9;
-  } else if ((Theta / PI * 180) >= 85.0 && (Theta / PI * 180) < 95.0) {
-    eCorrId = 10;
-  } else if ((Theta / PI * 180) >= 95.0 && (Theta / PI * 180) < 105.0) {
-    eCorrId = 11;
-  } else if ((Theta / PI * 180) >= 105.0 && (Theta / PI * 180) < 115.0) {
-    eCorrId = 12;
-  } else if ((Theta / PI * 180) >= 115.0 && (Theta / PI * 180) < 128.7) {
-    eCorrId = 13;
-  } else if ((Theta / PI * 180) >= 128.7 && (Theta / PI * 180) <= 180) {
-    eCorrId = 14;
-
-  } else {
-    B2ERROR("ECLShower theta out of range " << (Theta / PI * 180));
-
-  }
-
-
-
-
-  double energyCorrectPolynomial[15][4] = {
-    {9.56670E-01, -2.28268E-03, -2.23364E-03, 2.41601E-04},
-    {9.39221E-01, -6.01211E-03, -1.01388E-03, 2.21742E-04},
-    {9.47695E-01, -4.00680E-03, -6.62361E-04, 3.51879E-04},
-    {9.46688E-01, -2.83932E-03, -6.50563E-04, 2.73304E-04},
-    {9.51124E-01, -3.64272E-03, -1.03425E-03, 2.14907E-04},
-    {9.53309E-01, -2.62172E-03, -8.97187E-04, 3.51823E-04},
-    {9.53309E-01, -2.62172E-03, -8.97187E-04, 3.51823E-04},
-    {9.58557E-01, -2.44004E-03, -1.49555E-03, 1.41088E-04},
-    {9.60535E-01, -2.77543E-03, -1.44099E-03, 2.44692E-04},
-    {9.61075E-01, -3.09389E-03, -1.45289E-03, 2.16016E-04},
-    {9.60538E-01, -3.35572E-03, -1.36629E-03, 2.30296E-04},
-    {9.61748E-01, -4.30415E-03, -1.05225E-03, 3.59288E-04},
-    {9.61925E-01, -4.44564E-03, -1.13480E-03, 2.55418E-04},
-    {9.58142E-01, -4.75945E-03, -6.66410E-04, 4.77996E-04},
-    {9.49364E-01, -3.31338E-03, -2.25274E-03, 1.43136E-04}
-  };
-
-
-
-
-  double  preliminaryCalibration = energyCorrectPolynomial[eCorrId][0]
-                                   + energyCorrectPolynomial[eCorrId][1] * pow(log(Energy), 1)
-                                   + energyCorrectPolynomial[eCorrId][2] * pow(log(Energy), 2)
-                                   + energyCorrectPolynomial[eCorrId][3] * pow(log(Energy), 3);
-  */
-
   return preliminaryCalibration;
-
 }
 
 
@@ -465,55 +363,55 @@ void ECLReconstructorModule::readExtrapolate()
 
 //................
 // Fill here Px, Py and Pz : Vishal
-float ECLReconstructorModule::Px(double Energy, double Theta, double Phi)
+double ECLReconstructorModule::Px(double energy, double theta, double phi)
 {
-  return float(Energy * sin(Theta) * cos(Phi));
+  return energy * sin(theta) * cos(phi);
 }
 
-float ECLReconstructorModule::Py(double Energy, double Theta, double Phi)
+double ECLReconstructorModule::Py(double energy, double theta, double phi)
 {
-  return float(Energy * sin(Theta) * sin(Phi));
+  return energy * sin(theta) * sin(phi);
 }
 
-float ECLReconstructorModule::Pz(double Energy, double Theta)
+double ECLReconstructorModule::Pz(double energy, double theta)
 {
-  return float(Energy * cos(Theta));
+  return energy * cos(theta);
 }
 //_______________
 
 
 //...............
 // Fill here Error on Energy
-float ECLReconstructorModule::errorE(double E)
+double ECLReconstructorModule::errorEnergy(double energy)
 {
-  double sigmaE = 0.01 * (0.047 / E + 1.105 / sqrt(sqrt(E)) + 0.8563) * E;
+  const double sigmaE = 0.01 * (0.047 / energy + 1.105 / sqrt(sqrt(energy)) + 0.8563) * energy;
   //double sigmaE = 0.01 * E * sqrt(squ(0.066 / E) + squ(0.81) / sqrt(E) + squ(1.34)) ;
   //sigmaE / E = 0.066% / E +- 0.81% / (E)^(1/4)  +- 1.34%//NIM A441, 401(2000)
-  return (float)sigmaE;
+  return sigmaE;
 }
 //_______________
 
 
 //...............
 // Fill here Error on Theta
-float ECLReconstructorModule::errorTheta(double Energy, double Theta)
+double ECLReconstructorModule::errorTheta(double energy, double theta)
 {
-  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
+  const double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(energy) + 1.8 / sqrt(sqrt(energy))) ;
   //sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
 
-  double zForward  =  196.2;
-  double zBackward = -102.2;
-  double Rbarrel   =  125.0;
+  const double zForward  =  196.2;
+  const double zBackward = -102.2;
+  const double Rbarrel   =  125.0;
 
-  double theta_f = atan2(Rbarrel, zForward);
-  double theta_b = atan2(Rbarrel, zBackward);
+  const double theta_f = atan2(Rbarrel, zForward);
+  const double theta_b = atan2(Rbarrel, zBackward);
 
-  if (Theta < theta_f) {
-    return (float)(sigmaX * squ(cos(Theta)) / zForward);
-  } else if (Theta > theta_b) {
-    return (float)(sigmaX * squ(cos(Theta)) / (-1 * zBackward));
+  if (theta < theta_f) {
+    return sigmaX * squ(cos(theta)) / zForward;
+  } else if (theta > theta_b) {
+    return sigmaX * squ(cos(theta)) / (-1 * zBackward);
   } else {
-    return (float)(sigmaX * sin(Theta) / Rbarrel)   ;
+    return sigmaX * sin(theta) / Rbarrel;
   }
 }
 //_______________
@@ -521,24 +419,24 @@ float ECLReconstructorModule::errorTheta(double Energy, double Theta)
 
 //...............
 // Fill here Error on Phi
-float ECLReconstructorModule::errorPhi(double Energy, double Theta)
+double ECLReconstructorModule::errorPhi(double energy, double theta)
 {
-  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(Energy) + 1.8 / sqrt(sqrt(Energy))) ;
+  double sigmaX = 0.1 * (0.27 + 3.4 / sqrt(energy) + 1.8 / sqrt(sqrt(energy))) ;
 //sigmaX (mm)=  0.27 + 3.4/ (E)^(1/2) + 1.8 / (E)^(1/4) ;E (GeV)
 
-  double zForward  =  196.2;
-  double zBackward = -102.2;
-  double Rbarrel   =  125.0;
+  const double zForward  =  196.2;
+  const double zBackward = -102.2;
+  const double Rbarrel   =  125.0;
 
-  double theta_f = atan2(Rbarrel, zForward);
-  double theta_b = atan2(Rbarrel, zBackward);
+  const double theta_f = atan2(Rbarrel, zForward);
+  const double theta_b = atan2(Rbarrel, zBackward);
 
-  if (Theta < theta_f) {
-    return (float)(sigmaX / (zForward * tan(Theta)))  ;
-  } else if (Theta > theta_b) {
-    return (float)(sigmaX / (zBackward * tan(Theta)))   ;
+  if (theta < theta_f) {
+    return sigmaX / (zForward * tan(theta));
+  } else if (theta > theta_b) {
+    return sigmaX / (zBackward * tan(theta));
   } else {
-    return (float)(sigmaX / Rbarrel);
+    return sigmaX / Rbarrel;
   }
 }
 //_______________
@@ -547,48 +445,47 @@ float ECLReconstructorModule::errorPhi(double Energy, double Theta)
 
 //.................
 // For filling error matrix on Px,Py and Pz here : Vishal
-void ECLReconstructorModule::readErrorMatrix(double Energy, double Theta,
-                                             double Phi, TMatrixFSym& ErrorMatrix)
+void ECLReconstructorModule::readErrorMatrix(double energy, double theta,
+                                             double phi, TMatrixFSym& errorMatrix)
 {
-  float EnergyError = float(ECLReconstructorModule::errorE(Energy));
-  float ThetaError =  float(ECLReconstructorModule::errorTheta(Energy, Theta));
-  float PhiError  =   float(ECLReconstructorModule::errorPhi(Energy, Theta));
+  const double energyError = ECLReconstructorModule::errorEnergy(energy);
+  const double thetaError =  ECLReconstructorModule::errorTheta(energy, theta);
+  const double phiError  =   ECLReconstructorModule::errorPhi(energy, theta);
 
   TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
-  errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
-  errEcl[ 1 ][ 0 ] = 0;
-  errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 1 ] = 0;
-  errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
+  errEcl[0][0] = energyError * energyError; // Energy
+  errEcl[1][0] = 0;
+  errEcl[1][1] = phiError * phiError; // Phi
+  errEcl[2][0] = 0;
+  errEcl[2][0] = 0;
+  errEcl[2][1] = 0;
+  errEcl[2][2] = thetaError * thetaError; // Theta
 
   TMatrixF  jacobian(4, 3);
-  float  cosPhi = cos(Phi);
-  float  sinPhi = sin(Phi);
-  float  cosTheta = cos(Theta);
-  float  sinTheta = sin(Theta);
-  float   E = float(Energy);
+  const double cosPhi = cos(phi);
+  const double sinPhi = sin(phi);
+  const double cosTheta = cos(theta);
+  const double sinTheta = sin(theta);
+  const double E = energy;
 
-
-  jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
-  jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
-  jacobian[ 0 ][ 2 ] =        E * cosPhi * cosTheta;
-  jacobian[ 1 ][ 0 ] =            sinPhi * sinTheta;
-  jacobian[ 1 ][ 1 ] =        E * cosPhi * sinTheta;
-  jacobian[ 1 ][ 2 ] =        E * sinPhi * cosTheta;
-  jacobian[ 2 ][ 0 ] =                     cosTheta;
-  jacobian[ 2 ][ 1 ] =           0.0;
-  jacobian[ 2 ][ 2 ] =  -1.0 * E          * sinTheta;
-  jacobian[ 3 ][ 0 ] =           1.0;
-  jacobian[ 3 ][ 1 ] =           0.0;
-  jacobian[ 3 ][ 2 ] =           0.0;
+  jacobian[0][0] =            cosPhi * sinTheta;
+  jacobian[0][1] = -1.0 * E * sinPhi * sinTheta;
+  jacobian[0][2] =        E * cosPhi * cosTheta;
+  jacobian[1][0] =            sinPhi * sinTheta;
+  jacobian[1][1] =        E * cosPhi * sinTheta;
+  jacobian[1][2] =        E * sinPhi * cosTheta;
+  jacobian[2][0] =                     cosTheta;
+  jacobian[2][1] =                          0.0;
+  jacobian[2][2] = -1.0 * E          * sinTheta;
+  jacobian[3][0] =                          1.0;
+  jacobian[3][1] =                          0.0;
+  jacobian[3][2] =                          0.0;
   TMatrixFSym errCart(4);
   errCart = errEcl.Similarity(jacobian);
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j <= i ; j++) {
-      ErrorMatrix[i][j] = errCart[i][j];
+      errorMatrix[i][j] = errCart[i][j];
     }
   }
 }
@@ -597,52 +494,52 @@ void ECLReconstructorModule::readErrorMatrix(double Energy, double Theta,
 
 //.................
 // For filling error matrix on Px,Py and Pz here 7x 7
-void ECLReconstructorModule::readErrorMatrix7x7(double Energy, double Theta,
-                                                double Phi, TMatrixFSym& ErrorMatrix)
+void ECLReconstructorModule::readErrorMatrix7x7(double energy, double theta,
+                                                double phi, TMatrixFSym& errorMatrix)
 {
-  float EnergyError = float(ECLReconstructorModule::errorE(Energy));
-  float ThetaError =  float(ECLReconstructorModule::errorTheta(Energy, Theta));
-  float PhiError  =   float(ECLReconstructorModule::errorPhi(Energy, Theta));
+  const double energyError = ECLReconstructorModule::errorEnergy(energy);
+  const double thetaError = ECLReconstructorModule::errorTheta(energy, theta);
+  const double phiError  = ECLReconstructorModule::errorPhi(energy, theta);
 
   TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
-  errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
-  errEcl[ 1 ][ 0 ] = 0;
-  errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 1 ] = 0;
-  errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
+  errEcl[0][0] = energyError * energyError; // Energy
+  errEcl[1][0] = 0;
+  errEcl[1][1] = phiError * phiError; // Phi
+  errEcl[2][0] = 0;
+  errEcl[2][0] = 0;
+  errEcl[2][1] = 0;
+  errEcl[2][2] = thetaError * thetaError; // Theta
 
-  TMatrixF  jacobian(4, 3);
-  float  cosPhi = cos(Phi);
-  float  sinPhi = sin(Phi);
-  float  cosTheta = cos(Theta);
-  float  sinTheta = sin(Theta);
-  float   E = float(Energy);
+  TMatrixF jacobian(4, 3);
+  const double cosPhi = cos(phi);
+  const double sinPhi = sin(phi);
+  const double cosTheta = cos(theta);
+  const double sinTheta = sin(theta);
+  const double E = energy;
 
 
-  jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
-  jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
-  jacobian[ 0 ][ 2 ] =        E * cosPhi * cosTheta;
-  jacobian[ 1 ][ 0 ] =            sinPhi * sinTheta;
-  jacobian[ 1 ][ 1 ] =        E * cosPhi * sinTheta;
-  jacobian[ 1 ][ 2 ] =        E * sinPhi * cosTheta;
-  jacobian[ 2 ][ 0 ] =                     cosTheta;
-  jacobian[ 2 ][ 1 ] =           0.0;
-  jacobian[ 2 ][ 2 ] =  -1.0 * E          * sinTheta;
-  jacobian[ 3 ][ 0 ] =           1.0;
-  jacobian[ 3 ][ 1 ] =           0.0;
-  jacobian[ 3 ][ 2 ] =           0.0;
+  jacobian[0][0] =            cosPhi * sinTheta;
+  jacobian[0][1] = -1.0 * E * sinPhi * sinTheta;
+  jacobian[0][2] =        E * cosPhi * cosTheta;
+  jacobian[1][0] =            sinPhi * sinTheta;
+  jacobian[1][1] =        E * cosPhi * sinTheta;
+  jacobian[1][2] =        E * sinPhi * cosTheta;
+  jacobian[2][0] =                     cosTheta;
+  jacobian[2][1] =                          0.0;
+  jacobian[2][2] = -1.0 * E          * sinTheta;
+  jacobian[3][0] =                          1.0;
+  jacobian[3][1] =                          0.0;
+  jacobian[3][2] =                          0.0;
   TMatrixFSym errCart(4);
   errCart = errEcl.Similarity(jacobian);
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j <= i ; j++) {
-      ErrorMatrix[i][j] = errCart[i][j];
+      errorMatrix[i][j] = errCart[i][j];
     }
   }
   for (int i = 4; i <= 6; ++i) {
-    ErrorMatrix[i][i] = 1.0;
+    errorMatrix[i][i] = 1.0;
   }
 
 }

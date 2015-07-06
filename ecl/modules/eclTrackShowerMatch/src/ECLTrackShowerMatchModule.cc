@@ -7,13 +7,14 @@
  **************************************************************************/
 
 #include <ecl/modules/eclTrackShowerMatch/ECLTrackShowerMatchModule.h>
+
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
-#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <G4ParticleTable.hh>
+#include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <set>
 
@@ -38,11 +39,11 @@ ECLTrackShowerMatchModule::~ECLTrackShowerMatchModule()
 
 void ECLTrackShowerMatchModule::initialize()
 {
-  StoreArray<Track> TrackArray;
-  StoreArray<ECLShower> ECLShowerArray;
-  StoreArray<ECLCluster> ECLClusterArray;
-  TrackArray.registerRelationTo(ECLShowerArray);
-  TrackArray.registerRelationTo(ECLClusterArray);
+  StoreArray<Track> tracks;
+  StoreArray<ECLShower> eclShowers;
+  StoreArray<ECLCluster> eclClusters;
+  tracks.registerRelationTo(eclShowers);
+  tracks.registerRelationTo(eclClusters);
 }
 
 void ECLTrackShowerMatchModule::beginRun()
@@ -51,40 +52,38 @@ void ECLTrackShowerMatchModule::beginRun()
 
 void ECLTrackShowerMatchModule::event()
 {
-  StoreArray<Track> Tracks;
-  StoreArray<ECLHitAssignment> eclHitAssignmentArray;
-  StoreArray<ECLShower> eclRecShowerArray;
-  StoreArray<ECLCluster> eclClusterArray;
+  StoreArray<Track> tracks;
+  StoreArray<ECLHitAssignment> eclHitAssignments;
+  StoreArray<ECLShower> eclRecShowers;
+  StoreArray<ECLCluster> eclClusters;
 
   Const::EDetector myDetID = Const::EDetector::ECL;
-  int pdgCodePiP = G4ParticleTable::GetParticleTable()->FindParticle("pi+")->GetPDGEncoding();
-  int pdgCodePiM = G4ParticleTable::GetParticleTable()->FindParticle("pi-")->GetPDGEncoding();
+  const int pdgCodePiPlus = Const::pion.getPDGCode();
+  const int pdgCodePiMinus = -1 * Const::pion.getPDGCode();
 
-  for (const Track& track : Tracks) {
-    //  for (int t = 0; t < Tracks.getEntries(); ++t) {
-    // const Track* track = Tracks[t];
+  for (const Track& track : tracks) {
     set<int> clid;
-    for (auto extHit : track.getRelationsTo<ExtHit>()) {
-      if (extHit.getPdgCode() != pdgCodePiP && extHit.getPdgCode() != pdgCodePiM) continue;
+    for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
+      if (extHit.getPdgCode() != pdgCodePiPlus && extHit.getPdgCode() != pdgCodePiMinus) continue;
       if ((extHit.getDetectorID() != myDetID) || (extHit.getCopyID() == 0)) continue;
-      int cell = extHit.getCopyID() + 1;
+      const int cell = extHit.getCopyID() + 1;
 
       int showerid = -1;
-      auto iHA =
-        find_if(eclHitAssignmentArray.begin(), eclHitAssignmentArray.end(),
+      const auto iHA =
+        find_if(eclHitAssignments.begin(), eclHitAssignments.end(),
       [&](const ECLHitAssignment & ha) { return ha.getCellId() == cell; }
                );
-      if (iHA != eclHitAssignmentArray.end()) showerid = iHA -> getShowerId();
+      if (iHA != eclHitAssignments.end()) showerid = iHA->getShowerId();
       if (showerid != -1) clid.insert(showerid);
 
     } // end loop on ExtHit
 
-    for (auto id : clid) {
-      auto ish = find_if(eclRecShowerArray.begin(), eclRecShowerArray.end(),
+    for (const auto& id : clid) {
+      const auto ish = find_if(eclRecShowers.begin(), eclRecShowers.end(),
       [&](const ECLShower & element) { return element.GetShowerId() == id; }
-                        );
-      if (ish != eclRecShowerArray.end()) {
-        ECLShower* shower = &(*ish);
+                              );
+      if (ish != eclRecShowers.end()) {
+        const ECLShower* shower = &(*ish);
         track.addRelationTo(shower);
         ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
         if (cluster != nullptr) {
@@ -93,7 +92,6 @@ void ECLTrackShowerMatchModule::event()
         }
       }
     } // end loop on shower id
-
   } // end loop on Tracks
 
 }

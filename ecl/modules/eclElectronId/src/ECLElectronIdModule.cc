@@ -92,7 +92,7 @@ void ECLElectronIdModule::event()
     }
 
     float likelihoods[Const::ChargedStable::c_SetSize];
-    double eop;
+    double eop = 0;
     for (const auto& hypo : Const::chargedStableSet) {
       const TrackFitResult* fitRes = track.getTrackFitResult(hypo);
       if (fitRes == 0) fitRes = track.getTrackFitResult(Const::pion);

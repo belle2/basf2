@@ -41,7 +41,7 @@ void* RunFileReader(void*)
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FastSeqRootInput)
+//REG_MODULE(FastSeqRootInput)
 
 //-----------------------------------------------------------------
 //                 Implementation

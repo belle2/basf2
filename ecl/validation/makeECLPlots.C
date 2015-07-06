@@ -29,6 +29,9 @@ void ECLPion(TTree* pion_tree);
 void makeECLPlots() 
 {
   
+  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
+  gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
+
   TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
   TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
   TFile* cluster_input = TFile::Open("../ECLClusterOutput.root");
@@ -79,22 +82,22 @@ void ECLPion(TTree* pion_tree){
 
   TFile* output = TFile::Open("ECLPion.root", "recreate");
 
-  TH1F* hClusterE = new TH1F("hClusterE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
-  hClusterE->GetXaxis()->SetTitle("Cluster energy (GeV)");
-  hClusterE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
-  hClusterE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));
-  hClusterE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  pion_tree->Draw("eclClusterEnergy>>hClusterE","eclClusterEnergy>0");
-  hClusterE->Write();
+  TH1F* hClusterE = new TH1F("hPionE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
+  hPionE->GetXaxis()->SetTitle("Cluster energy (GeV)");
+  hPionE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
+  hPionE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));
+  hPionE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  pion_tree->Draw("eclClusterEnergy>>hPionE","eclClusterEnergy>0");
+  hPionE->Write();
 
 
-  TH1F* hClusterMultip = new TH1F("hClusterMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
-  hClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
-  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
-  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
-  hClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  pion_tree->Draw("eclClusterMultip>>hClusterMultip","eclClusterMultip>0");
-  hClusterMultip->Write();
+  TH1F* hPionMultip = new TH1F("hPionMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
+  hPionMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
+  hPionMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
+  hPionMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
+  hPionMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+  pion_tree->Draw("eclClusterMultip>>hPionMultip","eclClusterMultip>0");
+  hPionMultip->Write();
   
   output->Close();
   //delete output;
@@ -216,15 +219,15 @@ void ECL2D(TTree* bkg_tree)
 
   TFile* output = TFile::Open("ECL2D.root", "recreate");
 
+  gStyle->SetOptStat(000000);
+
   TH2F* BDyz = new TH2F("BDyz", "Cluster position", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  TH2F* BDyz1 = new TH2F("BDyz1", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
+  //TH2F* BDyz1 = new TH2F("BDyz1", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz2 = new TH2F("BDyz2", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz3 = new TH2F("BDyz3", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz4 = new TH2F("BDyz4", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz5 = new TH2F("BDyz5", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
   TH2F* BDyz6 = new TH2F("BDyz6", "", 200, -1.5, 2.5, 100, -1.5, 1.5);
-  
-  gStyle->SetOptStat(00000);
 
   BDyz->GetXaxis()->SetTitle("x (m)");
   BDyz->GetYaxis()->SetTitle("y (m)");

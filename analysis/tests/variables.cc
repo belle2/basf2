@@ -120,6 +120,29 @@ namespace {
 
   }
 
+  TEST(VertexVariableTest, Variable)
+  {
+
+    // Connect gearbox for CMS variables
+
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    p.setPValue(0.5);
+    p.setVertex(TVector3(1.0, 2.0, 2.0));
+
+    EXPECT_FLOAT_EQ(1.0, particleDX(&p));
+    EXPECT_FLOAT_EQ(2.0, particleDY(&p));
+    EXPECT_FLOAT_EQ(2.0, particleDZ(&p));
+    EXPECT_FLOAT_EQ(std::sqrt(5.0), particleDRho(&p));
+    EXPECT_FLOAT_EQ(3.0, particleDistance(&p));
+    EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
+
+  }
+
   class MetaVariableTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */

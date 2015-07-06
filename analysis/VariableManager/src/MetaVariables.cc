@@ -511,7 +511,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
                       "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
-                      "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut.");
+                      "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
+                      "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
+                      "around the neutral Pion mass (e.g. 0.130 < M < 0.140). \n"
+                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1");
     REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"

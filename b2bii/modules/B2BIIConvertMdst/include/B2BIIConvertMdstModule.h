@@ -171,8 +171,8 @@ namespace Belle2 {
     /**
      * Fills 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
      */
-    void belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
-                               HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
+    int belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
+                              HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
 
     /**
      * Fills 4-momentum, position and 7x7 error matrix from Belle Vee daughter.
@@ -218,6 +218,12 @@ namespace Belle2 {
      * Compares the track momentum and position values for pion hypothesis.
      */
     void testTrackConversion(const Belle::Mdst_charged& belleTrack, const TrackFitResult* tfr);
+
+    /**
+     * Compares the track momentum and position values for pion hypothesis.
+     */
+    void testTrackConversion(const HepLorentzVector& momentum, const HepPoint3D& position, const HepSymMatrix& error,
+                             const int belle_charge, const TrackFitResult* trackFit);
 
     /**
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle

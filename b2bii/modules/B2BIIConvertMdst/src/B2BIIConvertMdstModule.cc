@@ -43,6 +43,11 @@ using namespace Belle2;
 
 const Const::ChargedStable B2BIIConvertMdstModule::c_belleHyp_to_chargedStable[c_nHyp] = { Const::electron, Const::muon, Const::pion, Const::kaon, Const::proton };
 
+bool approximatelyEqual(float a, float b, float epsilon)
+{
+  return fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * epsilon);
+}
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -157,7 +162,7 @@ void B2BIIConvertMdstModule::event()
   convertMdstPi0Table();
 
   // 7. Convert V0s
-  convertMdstVee2Table();
+  //convertMdstVee2Table();
 }
 
 //-----------------------------------------------------------------------------
@@ -185,7 +190,7 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
     auto track = tracks.appendNew();
 
     // convert MDST_Charged -> Track
-    convertMdstChargedObject(belleTrack, track);
+    convertMdstChargedObjectAlternative(belleTrack, track);
 
     convertPIDData(belleTrack, track);
 
@@ -788,6 +793,76 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   }
 }
 
+void B2BIIConvertMdstModule::convertMdstChargedObjectAlternative(const Belle::Mdst_charged& belleTrack, Track* track)
+{
+  StoreArray<TrackFitResult> trackFitResults;
+
+  Belle::Mdst_trk& trk = belleTrack.trk();
+
+  const double KAPPA2OMEGA = 1.5 * TMath::C() * 1E-11;
+
+  for (int mhyp = 0 ; mhyp < c_nHyp; ++mhyp) {
+    const Const::ChargedStable& pType = c_belleHyp_to_chargedStable[mhyp];
+
+    Belle::Mdst_trk_fit& trk_fit = trk.mhyp(mhyp);
+
+    // Convert helix parameters
+    std::vector<float> helixParam(5);
+
+    // param 0: d_0 = d_rho
+    helixParam[0] = trk_fit.helix(0);
+
+    // param 1: phi = phi_0 + pi/2
+    helixParam[1] = trk_fit.helix(1) +  TMath::Pi() / 2.0;
+
+    // param 2: omega = Kappa * alpha = Kappa * B[Tesla] * speed_of_light[m/s] * 1e-11
+    helixParam[2] = trk_fit.helix(2) * KAPPA2OMEGA;
+
+    // param 3: d_z = z0
+    helixParam[3] = trk_fit.helix(3);
+
+    // param 4: tan(Lambda) = cotTheta
+    helixParam[4] = trk_fit.helix(4);
+
+    std::vector<float> helixError(15);
+    helixError[0]  = trk_fit.error(0);
+    helixError[1]  = trk_fit.error(1);
+    helixError[2]  = trk_fit.error(3) * KAPPA2OMEGA * KAPPA2OMEGA;
+    helixError[3]  = trk_fit.error(6);
+    helixError[4]  = trk_fit.error(10);
+    helixError[5]  = trk_fit.error(2);
+    helixError[6]  = trk_fit.error(4) * KAPPA2OMEGA * KAPPA2OMEGA;
+    helixError[7]  = trk_fit.error(7);
+    helixError[8]  = trk_fit.error(11);
+    helixError[9]  = trk_fit.error(5) * KAPPA2OMEGA * KAPPA2OMEGA;
+    helixError[10] = trk_fit.error(8) * KAPPA2OMEGA * KAPPA2OMEGA;
+    helixError[11] = trk_fit.error(12) * KAPPA2OMEGA * KAPPA2OMEGA;
+    helixError[12] = trk_fit.error(9);
+    helixError[13] = trk_fit.error(13);
+    helixError[14] = trk_fit.error(14);
+
+    double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
+
+    //TODO what are hitPatternCDCInitializer and hitPatternVXDInitializer?
+    auto trackFit = trackFitResults.appendNew(helixParam, helixError, pType, pValue, -1, -1);
+
+    track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
+
+    double thisMass = pType.getMass();
+    HepLorentzVector belle_momentum;
+    HepSymMatrix     belle_error;
+    HepPoint3D       belle_position;
+    int belle_charge = belleHelixToCartesian(trk_fit, thisMass, HepPoint3D(0., 0., 0.),
+                                             belle_momentum, belle_position, belle_error);
+
+    // test conversion (pion hypothesis only)
+    if (mhyp == 2) {
+      testTrackConversion(belleTrack, trackFit);
+      testTrackConversion(belle_momentum, belle_position, belle_error, belle_charge, trackFit);
+    }
+  }
+}
+
 void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track)
 {
   StoreArray<TrackFitResult> trackFitResults;
@@ -803,8 +878,11 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
     double thisMass = pType.getMass();
 
-    belleHelixToCartesian(trk_fit, thisMass, HepPoint3D(0., 0., 0.),
-                          belle_momentum, belle_position, belle_error);
+    int belle_charge = belleHelixToCartesian(trk_fit, thisMass, HepPoint3D(0., 0., 0.),
+                                             belle_momentum, belle_position, belle_error);
+
+    if (belle_charge * belleTrack.charge() < 0)
+      B2WARNING("Belle charges (helix.charge != mdst_charged.charge) are opposite!");
 
     double pValue = TMath::Prob(trk_fit.chisq(), trk_fit.ndf());
 
@@ -817,8 +895,10 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
 
     // test conversion (pion hypothesis only)
-    if (mhyp == 2)
+    if (mhyp == 2) {
       testTrackConversion(belleTrack, trackFit);
+      testTrackConversion(belle_momentum, belle_position, belle_error, belle_charge, trackFit);
+    }
   }
 }
 
@@ -1023,6 +1103,53 @@ void B2BIIConvertMdstModule::testTrackConversion(const Belle::Mdst_charged& bell
   }
 }
 
+void B2BIIConvertMdstModule::testTrackConversion(const HepLorentzVector& momentum, const HepPoint3D& position,
+                                                 const HepSymMatrix& error, const int belle_charge, const TrackFitResult* trackFit)
+{
+  double b2Mom[] = {trackFit->getMomentum().X(), trackFit->getMomentum().Y(), trackFit->getMomentum().Z()};
+  double b1Mom[] = {momentum.px(), momentum.py(), momentum.pz()};
+
+  double b2Pos[] = {trackFit->getPosition().X(), trackFit->getPosition().Y(), trackFit->getPosition().Z()};
+  double b1Pos[] = {position.x(), position.y(), position.z()};
+
+  for (unsigned i = 0; i < 3; i++) {
+    if (!approximatelyEqual(b2Mom[i], b1Mom[i], 1e-1) || !approximatelyEqual(b2Pos[i], b1Pos[i], 1e-1)) {
+      B2WARNING("[B2BIIConvertMdstModule] conversion of Belle's track momentum/position has large deviation");
+      B2INFO(" B1 px/py/pz: " << b1Mom[0] << "/" << b1Mom[1] << "/" << b1Mom[2]);
+      B2INFO(" B2 px/py/pz: " << b2Mom[0] << "/" << b2Mom[1] << "/" << b2Mom[2]);
+      B2INFO(" B1  x/ y/ z: " << b1Pos[0] << "/" << b1Pos[1] << "/" << b1Pos[2]);
+      B2INFO(" B2  x/ y/ z: " << b2Pos[0] << "/" << b2Pos[1] << "/" << b2Pos[2]);
+      B2INFO(" B1/B2 charge : " << belle_charge << "/" << trackFit->getChargeSign());
+      break;
+    }
+  }
+
+  /*
+  TMatrixDSym errMatrix = trackFit->getCovariance6();
+  bool equal = true;
+  for (unsigned i = 0; i < 7; i++) {
+    if (i == 3)
+      continue;
+    for (unsigned j = 0; j < 7; j++) {
+      if (j == 3)
+        continue;
+
+      if (!approximatelyEqual(errMatrix(ERRMCONV[i], ERRMCONV[j]), error[i][j], 1e-1)) {
+  if(equal)
+    B2WARNING("[B2BIIConvertMdstModule] conversion of Belle's track error matrix has large deviation");
+  B2INFO(" - " << i << " " << j << " element : " << errMatrix(ERRMCONV[i], ERRMCONV[j]) << " vs. " << error[i][j]);
+  equal = false;
+      }
+    }
+  }
+
+  if(not equal) {
+    std::cout << error << std::endl;
+    errMatrix.Print();
+  }
+  */
+}
+
 void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName)
 {
   int bellePDGCode   = belleMC.idhep();
@@ -1088,9 +1215,9 @@ void B2BIIConvertMdstModule::belleVeeDaughterToCartesian(const Belle::Mdst_vee2&
 }
 
 
-void B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass,
-                                                   const HepPoint3D& newPivot,
-                                                   HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error)
+int B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass,
+                                                  const HepPoint3D& newPivot,
+                                                  HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error)
 {
   const HepPoint3D pivot(trk_fit.pivot_x(),
                          trk_fit.pivot_y(),
@@ -1120,13 +1247,18 @@ void B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& tr
   Ea[4][4] = trk_fit.error(14);
   Belle::Helix helix(pivot, a, Ea);
 
+  int charge = 0;
+  if (helix.kappa() > 0)
+    charge = 1;
+  else
+    charge = -1;
+
   if (newPivot.x() != 0. ||
       newPivot.y() != 0. ||
       newPivot.z() != 0.) {
 
     helix.pivot(newPivot);
     momentum = helix.momentum(0., mass, position, error);
-    return;
   } else {
     if (pivot.x() != 0. ||
         pivot.y() != 0. ||
@@ -1138,6 +1270,7 @@ void B2BIIConvertMdstModule::belleHelixToCartesian(const Belle::Mdst_trk_fit& tr
       momentum = helix.momentum(0., mass, position, error);
     }
   }
+  return charge;
 }
 
 TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const HepLorentzVector& momentum,

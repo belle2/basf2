@@ -29,7 +29,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter.param('evtNumList', [1000])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # Fixed random seed
@@ -62,7 +62,7 @@ param_pGun = {  # ---    'momentumParams': [0.4, 1.6],
                 # fixed, uniform
                 # [0, 5],
     'pdgCodes': [13],
-    'nTracks': 1,
+    'nTracks': 10,
     'varyNTracks': 0,
     'momentumGeneration': 'uniform',
     'momentumParams': [0, 5],
@@ -326,8 +326,6 @@ main.add_module(pGun)
 # main.add_module(svdClusterizer)
 # main.add_module(cdcDigitizer)
 add_simulation(main, bkgfiles=bg)
-# add_reconstruction(main)
-# add_reconstruction(main)
 main.add_module(si_mctrackfinder)
 # main.add_module(vxd_trackfinder)
 main.add_module(cdc_mctrackfinder)

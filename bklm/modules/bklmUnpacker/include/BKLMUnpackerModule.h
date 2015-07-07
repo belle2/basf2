@@ -47,6 +47,7 @@ namespace Belle2 {
     //! Terminate at the end of job
     virtual void terminate();
 
+
   private:
 
     //! fill m_electIdToModuleId from xml file
@@ -59,6 +60,12 @@ namespace Belle2 {
     //! @param channel the channel
     //! @param axis z or phi
     int getModuleId(int copperId, int finesseNum, int lane, int channel, int axis);
+
+    //!in case the module id is not found in the mapping and useDefaultModuleId flag is set, this computes the default
+    //!module id from the lane and the axis. Sector etc are set to 0
+    //! @param lane the lane number, giving for the rpcs the slot number in the crate
+    //! @param axis z or phi
+    int getDefaultModuleId(int lane, int axis);
 
     //! To be used to map electronics address to module id
     //! @param copperId id of the copper board
@@ -73,6 +80,16 @@ namespace Belle2 {
 
     //! length of one hit in 4 byte words. This is needed find the hits in the detector buffer
     const int hitLength = 2;
+
+    //! the flag to keep the Even packages
+    bool m_keepEvenPackages = false;
+    //!use default module id, if not found in mapping file
+    bool m_useDefaultModuleId = false;
+
+    //! offset of the scintillator ADC
+    const int m_scintADCOffset = 3400;
+    //! threshold for the scintillator ADC after subtracting the offset
+    const int m_scintThreshold = 15;
   };
 
 

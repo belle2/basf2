@@ -1,3 +1,4 @@
+
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
@@ -40,6 +41,9 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
   //setPropertyFlags(c_ParallelProcessingCertified); //not sure ibf true yet...
+  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
+  addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
+           false);
 }
 
 
@@ -59,17 +63,17 @@ void BKLMUnpackerModule::loadMap()
 {
   GearDir dir("/Detector/ElectronicsMapping/BKLM");
 
-  for (GearDir & copper : dir.getNodes("COPPER")) {
+  for (GearDir& copper : dir.getNodes("COPPER")) {
     // UNUSED int id=copper.getInt("ID");
     int copperId = copper.getInt("@id");
     //      cout <<"copper id: "<< id <<endl;
-    for (GearDir & slot : copper.getNodes("Slot")) {
+    for (GearDir& slot : copper.getNodes("Slot")) {
       int slotId = slot.getInt("@id");
       //      cout << "slotid : " << slotId << endl;
       B2INFO("slotid: " << slotId << endl;);
-      for (GearDir & lane : slot.getNodes("Lane")) {
+      for (GearDir& lane : slot.getNodes("Lane")) {
         int laneId = lane.getInt("@id");
-        for (GearDir & axis : lane.getNodes("Axis")) {
+        for (GearDir& axis : lane.getNodes("Axis")) {
           int axisId = axis.getInt("@id");
           int sector = axis.getInt("Sector");
           int isForward = axis.getInt("IsForward");
@@ -115,7 +119,8 @@ void BKLMUnpackerModule::event()
       B2ERROR("rawKLM has more than one entry");
       continue;
     }
-    B2INFO("num events in buffer: " << rawKLM[i]->GetNumEvents() << " number of nodes (copper boards) " << rawKLM[i]->GetNumNodes() << endl);
+    B2INFO("num events in buffer: " << rawKLM[i]->GetNumEvents() << " number of nodes (copper boards) " << rawKLM[i]->GetNumNodes() <<
+           endl);
     //getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents. Number of nodes is num copper boards
     for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
       //since the buffer has multiple events this gets each event/node... but how to disentangle events? Maybe only one event there?
@@ -137,7 +142,8 @@ void BKLMUnpackerModule::event()
         int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
         int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
         int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
-        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j, finesse_num) << " words, " << numHits << " hits)" << endl;
+        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,
+             finesse_num) << " words, " << numHits << " hits)" << endl;
         if (numDetNwords > 0)
           cout << "word counter is: " << ((buf_slot[numDetNwords - 1] >> 16) & 0xFFFF) << endl;
         cout << "trigger tag is " << rawKLM[i]->GetTRGType(j) << endl;
@@ -179,16 +185,19 @@ void BKLMUnpackerModule::event()
 
         //either no data (finesse not connected) or with the count word
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
-          char buffer[200];
-          sprintf(buffer, "word count incorrect: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
-          B2ERROR(buffer);
-          continue;
+          if (!m_keepEvenPackages) {
+            char buffer[200];
+            sprintf(buffer, "word count incorrect: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
+            B2ERROR(buffer);
+            continue;
+          }
         }
         B2INFO("this finesse has " << numHits << " hits " << endl);
 
         if (numDetNwords > 0)
           B2INFO("counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF) << endl);
-        for (int iHit = 0; iHit < numHits; iHit++) {
+        //careful, changed start to 1 to get rid of the first rpc hit which is meaningless (at least as long no rpc data is taken)
+        for (int iHit = 1; iHit < numHits; iHit++) {
           B2INFO("unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit * hitLength + 1] << endl);
           //--->first word is the leftmost, not rightmost
           unsigned short bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
@@ -205,37 +214,55 @@ void BKLMUnpackerModule::event()
           unsigned short ctime = bword2 & 0xFFFF; //full bword
           unsigned short tdc = bword3 & 0x7FF;
           unsigned short charge = bword4 & 0xFFF;
+
+
+          if ((1 == lane || 2 == lane)  && fabs(charge - m_scintADCOffset) < m_scintThreshold)
+            continue;
+
           //    cout <<"copperID: "<< copperId<<endl;
           B2INFO("copper: " << copperId << " finesse: " << finesse_num << ", ");
           //          B2INFO("Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl);
-          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl;
+          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
+               " charge: " << charge << endl;
 
           int electId = electCooToInt(copperId, finesse_num + 1, lane, axis);
+          int layer = lane;
+          int moduleId = 0;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
-            char buffer[200];
-            sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", copperId, finesse_num + 1, lane, axis);
-            B2INFO(buffer);
-            continue;
+            if (!m_useDefaultModuleId) {
+              char buffer[200];
+              sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", copperId, finesse_num + 1, lane, axis);
+              B2INFO(buffer);
+              continue;
+            } else {
+              //        cout <<"calling default with axis: " << axis <<endl;
+              moduleId = getDefaultModuleId(lane, axis);
+            }
+          } else { //found moduleId in the mapping
+            moduleId = m_electIdToModuleId[electId];
+            B2INFO(" electid: " << electId << " module: " << moduleId << endl);
+
+            layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+            //plane should already be set
+            //moduleId counts are zero based
+
+            //only channel and inrpc flag is not set yet
           }
-          int moduleId = m_electIdToModuleId[electId];
-          B2INFO(" electid: " << electId << " module: " << moduleId << endl);
+          if (layer > 14)
+            continue;
           //still have to add the channel and axis
-          int layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-          //plane should already be set
-          //moduleId counts are zero based
-
-          //only channel and inrpc flag is not set yet
-
           if (layer > 1)
             moduleId |= BKLM_INRPC_MASK;
-          moduleId |= ((channel - 1) << BKLM_STRIP_BIT) | ((channel - 1) << BKLM_MAXSTRIP_BIT);
+          moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
           //(copperId,finesse_num,lane,channel,axis);
+
           BKLMDigit digit(moduleId, ctime, tdc, charge);
           //  Digit.setModuleID();
           bklmDigits.appendNew(digit);
 
-          B2INFO("from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " << " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward() << endl);
+          B2INFO("from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " <<
+                 " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward() << endl);
         }
       } //finesse boards
 
@@ -288,5 +315,19 @@ void BKLMUnpackerModule::endRun()
 void BKLMUnpackerModule::terminate()
 {
 
+
+}
+
+
+int BKLMUnpackerModule::getDefaultModuleId(int lane, int axis)
+{
+
+  //attention: lane is zero based, so do not subtract 1
+  int  moduleId = (0)
+                  | ((0) << BKLM_SECTOR_BIT)
+                  | ((lane) << BKLM_LAYER_BIT)
+                  | ((axis) << BKLM_PLANE_BIT);
+
+  return moduleId;
 
 }

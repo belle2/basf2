@@ -104,67 +104,6 @@ namespace Belle2 {
         x_tpcbeamB = activeParams.getLength("x_tpcbeamB") * CLHEP::cm;
         y_tpcbeamB = activeParams.getLength("y_tpcbeamB") * CLHEP::cm;
         z_tpcbeamB = activeParams.getLength("z_tpcbeamB") * CLHEP::cm;
-        //plate orientation
-        /*
-        G4RotationMatrix* rotXx = new G4RotationMatrix();
-              //G4double AngleX = activeParams.getAngle("AngleX");
-        //G4double AngleY = activeParams.getAngle("AngleY");
-              //G4double AngleZ = activeParams.getAngle("AngleZ");
-        rotXx->rotateX( activeParams.getAngle("AngleX") );
-        rotXx->rotateY( activeParams.getAngle("AngleY") );
-              rotXx->rotateZ( activeParams.getAngle("AngleZ") );
-
-        //define tpc beam and plate dimensions
-        double betpcbeam = 190.8/2. * CLHEP::mm;
-        G4double dx_tpcbeam = 2.54 * 1.63 / 2.*CLHEP::cm;
-        G4double dy_tpcbeam = 2.54 * 1.63 / 2.*CLHEP::cm;
-        G4double dz_tpcbeam = 2200. / 2.*CLHEP::mm;
-        G4double dw_tpcbeam = 2.54 * 0.25 / 2.*CLHEP::cm;
-        G4double dx_plate = 2.54 * 0.35 / 2.*CLHEP::cm;
-        G4double dy_plate = betpcbeam + 4. * dy_tpcbeam;
-        G4double dz_plate = 400. / 2.*CLHEP::mm;
-
-        //create plate volume
-        G4VSolid* s_plate = new G4Box("s_plate", dx_plate, dy_plate, dz_plate);
-
-        //place plate volume
-        G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("MetalCopper") , "l_plate", 0, 0);
-
-
-        G4VSolid* s_tpcbeam_a = new G4Box("s_tpcbeam_a", dx_tpcbeam, dy_tpcbeam, dz_tpcbeam);
-        G4VSolid* s_tpcbeam_b = new G4Box("s_tpcbeam_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_tpcbeam);
-        G4VSolid* s_tpcbeampos = new G4SubtractionSolid("s_tpcbeampos", s_tpcbeam_a, s_tpcbeam_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
-        G4VSolid* s_tpcbeamneg = new G4SubtractionSolid("s_tpcbeamneg", s_tpcbeam_a, s_tpcbeam_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
-        G4VSolid* s_tpcbeam = new G4UnionSolid("s_tpcbeam", s_tpcbeampos, s_tpcbeamneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
-
-        //create tpc beam volumes
-        G4LogicalVolume* l_tpcbeam = new G4LogicalVolume(s_tpcbeam,  geometry::Materials::get("MetalCopper") , "l_tpcbeam", 0, 0);
-
-        //place plate volume
-        G4ThreeVector PH1SUSTRpos = G4ThreeVector(
-                    activeParams.getLength("x_tpcbeam") * CLHEP::cm,
-                    activeParams.getLength("y_tpcbeam") * CLHEP::cm,
-                    activeParams.getLength("z_tpcbeam") * CLHEP::cm
-                    );
-        new G4PVPlacement(rotXx, PH1SUSTRpos, l_plate, "p_plate", &topVolume, false, 1);
-
-        //place 1st tpc beam volume
-        PH1SUSTRpos = G4ThreeVector(
-                  activeParams.getLength("x_tpcbeam") * CLHEP::cm + dx_plate + dx_tpcbeam,
-                  activeParams.getLength("y_tpcbeam") * CLHEP::cm + betpcbeam + 2. * dy_tpcbeam,
-                  0.
-                  );
-        new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam1", &topVolume, false, 1);
-
-        //place 2nd tpc beam volume
-        PH1SUSTRpos = G4ThreeVector(
-                  activeParams.getLength("x_tpcbeam") * CLHEP::cm + dx_plate + dx_tpcbeam,
-                  activeParams.getLength("y_tpcbeam") * CLHEP::cm - betpcbeam - 2. * dy_tpcbeam,
-                  0.
-                  );
-        new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam2", &topVolume, false, 1);
-        detID++;
-        */
       }
 
       //TPC vertical: 4x @ 1614/ea
@@ -214,11 +153,14 @@ namespace Belle2 {
                                   );
       new G4PVPlacement(0, PH1SUSTRpos, l_plate, "p_plate", &topVolume, false, 1);
 
+      //offsets hori
+      G4double offset_h = 110.*CLHEP::cm + 80.*CLHEP::cm - 2. * dz_tpcbeam;
+
       //place 1st tpc beam volume
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamR + dx_plate + dx_tpcbeam,
                       y_tpcbeamR + betpcbeam + 2. * dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(0, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -226,7 +168,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamR + dx_plate + dx_tpcbeam,
                       y_tpcbeamR - betpcbeam - 2. * dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(0, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -243,7 +185,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamL - dx_plate - dx_tpcbeam,
                       y_tpcbeamL + betpcbeam + 2. * dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(0, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -251,7 +193,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamL - dx_plate - dx_tpcbeam,
                       y_tpcbeamL - betpcbeam - 2. * dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(0, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -271,7 +213,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamB + betpcbeam + 2. * dx_tpcbeam,
                       y_tpcbeamB - dx_plate - dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -279,7 +221,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamB - betpcbeam - 2. * dx_tpcbeam,
                       y_tpcbeamB - dx_plate - dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -298,7 +240,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamT + betpcbeam + 2. * dx_tpcbeam,
                       y_tpcbeamT + dx_plate + dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -306,7 +248,7 @@ namespace Belle2 {
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamT - betpcbeam - 2. * dx_tpcbeam,
                       y_tpcbeamT + dx_plate + dy_tpcbeam,
-                      0.
+                      -offset_h / 2.
                     );
       new G4PVPlacement(rotXx, PH1SUSTRpos, l_tpcbeam, "p_tpcbeam", &topVolume, false, 1);
 
@@ -320,33 +262,36 @@ namespace Belle2 {
       G4VSolid* s_tpcbeamv = new G4UnionSolid("s_tpcbeamv", s_tpcbeamvpos, s_tpcbeamvneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
       G4LogicalVolume* l_tpcbeamv = new G4LogicalVolume(s_tpcbeamv,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamv", 0, 0);
 
+      //offset verti
+      G4double offset_v = fabs(76.*CLHEP::cm - 2. * dz_tpcbeamv) / 2.;
+
       //place 1st vertical TPC beam
       G4RotationMatrix* rotX = new G4RotationMatrix();
       rotX->rotateX(90.*CLHEP::deg);
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamL - dx_plate - dx_tpcbeam - 2.*dx_tpcbeam,
-                      0.,
+                      offset_v / 2.,
                       -800.*CLHEP::mm
                     );
       new G4PVPlacement(rotX, PH1SUSTRpos, l_tpcbeamv, "p_tpcbeamv", &topVolume, false, 0);
       //place 2nd vertical TPC beam
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamR + dx_plate + dx_tpcbeam + 2.*dx_tpcbeam,
-                      0,
+                      offset_v / 2.,
                       -800.*CLHEP::mm
                     );
       new G4PVPlacement(rotX, PH1SUSTRpos, l_tpcbeamv, "p_tpcbeamv", &topVolume, false, 0);
       //place 3rd vertical TPC beam
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamL - dx_plate - dx_tpcbeam - 2.*dx_tpcbeam,
-                      0.,
+                      offset_v / 2.,
                       1100.*CLHEP::mm
                     );
       new G4PVPlacement(rotX, PH1SUSTRpos, l_tpcbeamv, "p_tpcbeamv", &topVolume, false, 0);
       //place 4th vertical TPC beam
       PH1SUSTRpos = G4ThreeVector(
                       x_tpcbeamR + dx_plate + dx_tpcbeam + 2.*dx_tpcbeam,
-                      0.,
+                      offset_v / 2.,
                       1100.*CLHEP::mm
                     );
       new G4PVPlacement(rotX, PH1SUSTRpos, l_tpcbeamv, "p_tpcbeamv", &topVolume, false, 0);
@@ -359,6 +304,7 @@ namespace Belle2 {
       G4VSolid* s_tpcbeamhpos = new G4SubtractionSolid("s_tpcbeamhpos", s_tpcbeamh_a, s_tpcbeamh_b, 0, G4ThreeVector(0, dw_tpcbeam, 0));
       G4VSolid* s_tpcbeamhneg = new G4SubtractionSolid("s_tpcbeanhneg", s_tpcbeamh_a, s_tpcbeamh_b, 0, G4ThreeVector(0, -dw_tpcbeam, 0));
       G4VSolid* s_tpcbeamh = new G4UnionSolid("s_tpcbeamh", s_tpcbeamhpos, s_tpcbeamhneg, 0, G4ThreeVector(0, -2.*dy_tpcbeam, 0));
+
       G4LogicalVolume* l_tpcbeamh = new G4LogicalVolume(s_tpcbeamh,  geometry::Materials::get("FG_Epoxy") , "l_tpcbeamh", 0, 0);
 
       //place 1st horizontal TPC beam
@@ -374,7 +320,7 @@ namespace Belle2 {
       //place 2nd horizontal TPC beam
       PH1SUSTRpos = G4ThreeVector(
                       0 * CLHEP::mm,
-                      y_tpcbeamT + dx_plate + dy_tpcbeam + 2. * dy_tpcbeam,
+                      y_tpcbeamT + dx_plate + 3. * dy_tpcbeam + 2. * dy_tpcbeam,
                       1100.*CLHEP::mm - 2. * dy_tpcbeam
                     );
       new G4PVPlacement(rotY, PH1SUSTRpos, l_tpcbeamh, "p_tpcbeamh", &topVolume, false, 0);
@@ -390,10 +336,11 @@ namespace Belle2 {
       //place 4th horizontal TPC beam
       PH1SUSTRpos = G4ThreeVector(
                       0 * CLHEP::mm,
-                      y_tpcbeamT + dx_plate + dy_tpcbeam + 2. * dy_tpcbeam,
+                      y_tpcbeamT + dx_plate + 3. * dy_tpcbeam + 2. * dy_tpcbeam,
                       -800.*CLHEP::mm + 4. * dy_tpcbeam
                     );
       new G4PVPlacement(rotY, PH1SUSTRpos, l_tpcbeamh, "p_tpcbeamh", &topVolume, false, 0);
+
       G4VisAttributes* brown = new G4VisAttributes(G4Colour(.5, .5, 0));
       brown->SetForceAuxEdgeVisible(true);
       l_tpcbeam->SetVisAttributes(brown);

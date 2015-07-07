@@ -11,12 +11,12 @@ eventinfosetter.param({'runList': [1], 'evtNumList': [1]})
 
 # We need the geometry parameters
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
+gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
 # as well as the geometry
 geometry = register_module('Geometry')
 geometry.set_log_level(LogLevel.INFO)
 # Restrict Geometry to certain components, in this case only PXD and SVD
-geometry.param('components', ['PLUME', 'CLAW'])
+geometry.param('components', ['PH1BPIPE'])
 
 # MaterialScan uses the Geant4 setup which is created by the FullSim module so
 # we need this as well

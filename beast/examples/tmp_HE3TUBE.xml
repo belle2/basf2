@@ -33,8 +33,9 @@
       <tube_outerRadius unit="cm">2.38</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
-      <gas_outerRadius unit="cm">2.38</gas_outerRadius>
+      <gas_outerRadius unit="cm">2.0</gas_outerRadius>
       <gas_hz unit="cm">7.62</gas_hz>
+      <wire_diameter unit="mm">0.030</wire_diameter>
     </Active>
     <Active>
       <Material>HE3TUBE-Material</Material>
@@ -50,8 +51,9 @@
       <tube_outerRadius unit="cm">2.38</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
-      <gas_outerRadius unit="cm">2.38</gas_outerRadius>
+      <gas_outerRadius unit="cm">2.0</gas_outerRadius>
       <gas_hz unit="cm">7.62</gas_hz>
+      <wire_diameter unit="mm">0.030</wire_diameter>
     </Active>
     <Active>
       <Material>HE3TUBE-Material</Material>
@@ -67,8 +69,9 @@
       <tube_outerRadius unit="cm">2.38</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
-      <gas_outerRadius unit="cm">2.38</gas_outerRadius>
+      <gas_outerRadius unit="cm">2.0</gas_outerRadius>
       <gas_hz unit="cm">7.62</gas_hz>
+      <wire_diameter unit="mm">0.030</wire_diameter>
     </Active>
     <Active>
       <Material>HE3TUBE-Material</Material>
@@ -84,8 +87,9 @@
       <tube_outerRadius unit="cm">2.38</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
-      <gas_outerRadius unit="cm">2.38</gas_outerRadius>
+      <gas_outerRadius unit="cm">2.0</gas_outerRadius>
       <gas_hz unit="cm">7.62</gas_hz>
+      <wire_diameter unit="mm">0.030</wire_diameter>
     </Active>
 
     <!--Default drift data-->

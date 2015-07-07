@@ -23,9 +23,9 @@ whitespace, comma or semi-colon -->
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
-<x_he3tube unit="cm">57.62000</x_he3tube>
+<x_he3tube unit="cm">41.73100</x_he3tube>
 <y_he3tube unit="cm">-4.38000</y_he3tube>
-<z_he3tube unit="cm">-40.00000</z_he3tube>
+<z_he3tube unit="cm">30.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -33,16 +33,17 @@ whitespace, comma or semi-colon -->
 <tube_outerRadius unit="cm">2.38</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
-<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <Active>
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
-<x_he3tube unit="cm">-57.62000</x_he3tube>
+<x_he3tube unit="cm">-41.73100</x_he3tube>
 <y_he3tube unit="cm">-4.38000</y_he3tube>
-<z_he3tube unit="cm">-40.00000</z_he3tube>
+<z_he3tube unit="cm">30.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -50,16 +51,17 @@ whitespace, comma or semi-colon -->
 <tube_outerRadius unit="cm">2.38</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
-<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <Active>
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">-4.38000</x_he3tube>
-<y_he3tube unit="cm">42.62000</y_he3tube>
-<z_he3tube unit="cm">-40.00000</z_he3tube>
+<y_he3tube unit="cm">41.73100</y_he3tube>
+<z_he3tube unit="cm">30.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -67,16 +69,17 @@ whitespace, comma or semi-colon -->
 <tube_outerRadius unit="cm">2.38</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
-<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <Active>
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">-4.38000</x_he3tube>
-<y_he3tube unit="cm">-42.62000</y_he3tube>
-<z_he3tube unit="cm">-40.00000</z_he3tube>
+<y_he3tube unit="cm">-41.73100</y_he3tube>
+<z_he3tube unit="cm">30.00000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
@@ -84,8 +87,9 @@ whitespace, comma or semi-colon -->
 <tube_outerRadius unit="cm">2.38</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
-<gas_outerRadius unit="cm">2.38</gas_outerRadius>
+<gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <!--Default drift data-->
 <DriftRadius unit="cm">

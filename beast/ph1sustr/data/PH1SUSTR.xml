@@ -17,18 +17,18 @@ whitespace, comma or semi-colon -->
 </bar>
 <Active>
 <Material>PH1SUSTR-Material</Material>
-<x_tpcbeamR unit="cm">60.00000</x_tpcbeamR>
+<x_tpcbeamR unit="cm">45.00000</x_tpcbeamR>
 <y_tpcbeamR unit="cm">0.00000</y_tpcbeamR>
-<z_tpcbeamR unit="cm">-40.00000</z_tpcbeamR>
-<x_tpcbeamL unit="cm">-60.00000</x_tpcbeamL>
+<z_tpcbeamR unit="cm">30.00000</z_tpcbeamR>
+<x_tpcbeamL unit="cm">-45.00000</x_tpcbeamL>
 <y_tpcbeamL unit="cm">0.00000</y_tpcbeamL>
-<z_tpcbeamL unit="cm">-40.00000</z_tpcbeamL>
+<z_tpcbeamL unit="cm">30.00000</z_tpcbeamL>
 <x_tpcbeamT unit="cm">0.00000</x_tpcbeamT>
 <y_tpcbeamT unit="cm">45.00000</y_tpcbeamT>
-<z_tpcbeamT unit="cm">-40.00000</z_tpcbeamT>
+<z_tpcbeamT unit="cm">30.00000</z_tpcbeamT>
 <x_tpcbeamB unit="cm">0.00000</x_tpcbeamB>
 <y_tpcbeamB unit="cm">-45.00000</y_tpcbeamB>
-<z_tpcbeamB unit="cm">-40.00000</z_tpcbeamB>
+<z_tpcbeamB unit="cm">30.00000</z_tpcbeamB>
 </Active>
 </Content>
 </DetectorComponent>

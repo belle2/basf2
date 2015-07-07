@@ -21,8 +21,8 @@ whitespace, comma or semi-colon -->
 <GEMGain2>50</GEMGain2>
 <GEMGainRMS1>0.2</GEMGainRMS1>
 <GEMGainRMS2>0.2</GEMGainRMS2>
-<ScaleGain1>10.0</ScaleGain1>
-<ScaleGain2>10.0</ScaleGain2>
+<ScaleGain1>10</ScaleGain1>
+<ScaleGain2>10</ScaleGain2>
 <GEMpitch>0.014</GEMpitch>
 <PixelThreshold>3000</PixelThreshold>
 <PixelThresholdRMS>150</PixelThresholdRMS>
@@ -64,62 +64,132 @@ whitespace, comma or semi-colon -->
 <v_DG>0.00100675</v_DG>
 <v_TG>0.0004079</v_TG>
 <v_CG>0.00038828</v_CG>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">12.7</dx_Vessel>
-<dy_Vessel unit="cm">10.16</dy_Vessel>
-<dz_Vessel unit="cm">30.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">90.0</AngleZ>
-<TPCpos_x unit="cm">54.92000</TPCpos_x>
-<TPCpos_y unit="cm">8.35000</TPCpos_y>
-<TPCpos_z unit="cm">-40.00000</TPCpos_z>
-</Active>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">12.7</dx_Vessel>
-<dy_Vessel unit="cm">10.16</dy_Vessel>
-<dz_Vessel unit="cm">30.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">90.0</AngleZ>
-<TPCpos_x unit="cm">-54.92000</TPCpos_x>
-<TPCpos_y unit="cm">8.35000</TPCpos_y>
-<TPCpos_z unit="cm">-40.00000</TPCpos_z>
-</Active>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">12.7</dx_Vessel>
-<dy_Vessel unit="cm">10.16</dy_Vessel>
-<dz_Vessel unit="cm">30.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">0.0</AngleZ>
-<TPCpos_x unit="cm">8.35000</TPCpos_x>
-<TPCpos_y unit="cm">39.92000</TPCpos_y>
-<TPCpos_z unit="cm">-40.00000</TPCpos_z>
-</Active>
-<Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
-<Material>MICROTPC-Material</Material>
-<dx_Vessel unit="cm">12.7</dx_Vessel>
-<dy_Vessel unit="cm">10.16</dy_Vessel>
-<dz_Vessel unit="cm">30.0</dz_Vessel>
-<AngleX unit="deg">0.0</AngleX>
-<AngleZ unit="deg">0.0</AngleZ>
-<TPCpos_x unit="cm">8.35000</TPCpos_x>
-<TPCpos_y unit="cm">-39.92000</TPCpos_y>
-<TPCpos_z unit="cm">-40.00000</TPCpos_z>
-</Active>
-</Content>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <TPCpos_x unit="cm">0.0</TPCpos_x>
+      <TPCpos_y unit="cm">-36.785</TPCpos_y>
+      <TPCpos_z unit="cm">-124.3</TPCpos_z>
+    </Active>
+    
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">112.5</AngleZ>
+      <TPCpos_x unit="cm">-34.9846</TPCpos_x>
+      <TPCpos_y unit="cm">11.3672</TPCpos_y>
+      <TPCpos_z unit="cm">-124.3</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <TPCpos_x unit="cm">0.0</TPCpos_x>
+      <TPCpos_y unit="cm">36.785</TPCpos_y>
+      <TPCpos_z unit="cm">-124.3</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">112.5</AngleZ>
+      <TPCpos_x unit="cm">34.9846</TPCpos_x>
+      <TPCpos_y unit="cm">-11.3672</TPCpos_y>
+      <TPCpos_z unit="cm">-124.3</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <TPCpos_x unit="cm">0.0</TPCpos_x>
+      <TPCpos_y unit="cm">-34.383</TPCpos_y>
+      <TPCpos_z unit="cm">196.5</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">67.5</AngleZ>
+      <TPCpos_x unit="cm">32.7002</TPCpos_x>
+      <TPCpos_y unit="cm">10.6249</TPCpos_y>
+      <TPCpos_z unit="cm">196.5</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+      <TPCpos_x unit="cm">0.0</TPCpos_x>
+      <TPCpos_y unit="cm">34.383</TPCpos_y>
+      <TPCpos_z unit="cm">196.5</TPCpos_z>
+    </Active>
+
+    <Active>
+      <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <MaterialGas>MICROTPC-Material</MaterialGas>
+      <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <Material>MICROTPC-Material</Material>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">67.5</AngleZ>
+      <TPCpos_x unit="cm">-32.7002</TPCpos_x>
+      <TPCpos_y unit="cm">-10.6249</TPCpos_y>
+      <TPCpos_z unit="cm">196.5</TPCpos_z>
+    </Active>
+
+    -->
+  </Content>
+
+
+
+
 </DetectorComponent>
 

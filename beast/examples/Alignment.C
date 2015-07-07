@@ -45,6 +45,7 @@ void Alignment()
       {0,-45.,40.}
     };
   */
+  /*MC campaign
   double PlatePos[4][3] = 
     {
       {60.,0,-40.},
@@ -52,6 +53,16 @@ void Alignment()
       {0,45.,-40.},
       {0,-45.,-40.}
     };
+  */
+
+  double PlatePos[4][3] = 
+    {
+      {45.,0,30.},
+      {-45.,0,30.},
+      {0,45.,30.},
+      {0,-45.,30.}
+    };
+
   /*
   double PlatePos[4][3] = 
     {
@@ -62,9 +73,10 @@ void Alignment()
     };
   */
   //Calculate TPC and Tube positions
-  double dx_tpc = 12.7;
-  double dy_tpc = 10.16;
+  double dx_tpc = 15.0;
+  double dy_tpc = 10.4;
   double tub_rad = 2.38;
+  double plate_hw = 2.54 * 0.35;
   double TPCpos[4][3];
   double Tubpos[4][3];
   for(int i=0;i<4;i++)
@@ -80,13 +92,13 @@ void Alignment()
 	  if(i<2){
 	    if(j==0 && PlatePos[i][j]>0)
 	      {
-		TPCpos[i][j]=PlatePos[i][j]-dy_tpc/2.;
-		Tubpos[i][j]=PlatePos[i][j]-tub_rad;
+		TPCpos[i][j]=PlatePos[i][j]-dy_tpc/2.-plate_hw;
+		Tubpos[i][j]=PlatePos[i][j]-tub_rad-plate_hw;
 	      }
 	    else if(j==0 && PlatePos[i][j]<0)
 	      {
-		TPCpos[i][j]=PlatePos[i][j]+dy_tpc/2.;
-		Tubpos[i][j]=PlatePos[i][j]+tub_rad;
+		TPCpos[i][j]=PlatePos[i][j]+dy_tpc/2.+plate_hw;
+		Tubpos[i][j]=PlatePos[i][j]+tub_rad+plate_hw;
 	      }
 	    else if(j==1){
 	      TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2.;
@@ -95,13 +107,13 @@ void Alignment()
 	  }else{
 	    if(j==1 && PlatePos[i][j]>0)
 	      {
-		TPCpos[i][j]=PlatePos[i][j]-dy_tpc/2.;
-		Tubpos[i][j]=PlatePos[i][j]-tub_rad;
+		TPCpos[i][j]=PlatePos[i][j]-dy_tpc/2.-plate_hw;
+		Tubpos[i][j]=PlatePos[i][j]-tub_rad-plate_hw;
               }
             else if(j==1 && PlatePos[i][j]<0)
 	      {
-                TPCpos[i][j]=PlatePos[i][j]+dy_tpc/2.;
-		Tubpos[i][j]=PlatePos[i][j]+tub_rad;
+                TPCpos[i][j]=PlatePos[i][j]+dy_tpc/2.+plate_hw;
+		Tubpos[i][j]=PlatePos[i][j]+tub_rad+plate_hw;
               }
             else if(j==0){
               TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2.;

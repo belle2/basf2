@@ -17,7 +17,7 @@
     </bar>
     <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
 
-    <LookAtRec>1</LookAtRec>
+    <LookAtRec>0</LookAtRec>
     <GEMGain1>40</GEMGain1>
     <GEMGain2>50</GEMGain2>
     <GEMGainRMS1>0.2</GEMGainRMS1>
@@ -71,9 +71,9 @@
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">12.7</dx_Vessel>
-      <dy_Vessel unit="cm">10.16</dy_Vessel>
-      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
       <TPCpos_x unit="cm">POS_X1</TPCpos_x>
@@ -86,9 +86,9 @@
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">12.7</dx_Vessel>
-      <dy_Vessel unit="cm">10.16</dy_Vessel>
-      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
       <TPCpos_x unit="cm">POS_X2</TPCpos_x>
@@ -101,9 +101,9 @@
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">12.7</dx_Vessel>
-      <dy_Vessel unit="cm">10.16</dy_Vessel>
-      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">0.0</AngleZ>
       <TPCpos_x unit="cm">POS_X3</TPCpos_x>
@@ -116,9 +116,9 @@
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">12.7</dx_Vessel>
-      <dy_Vessel unit="cm">10.16</dy_Vessel>
-      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <dx_Vessel unit="cm">15.0</dx_Vessel>
+      <dy_Vessel unit="cm">10.4</dy_Vessel>
+      <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <AngleZ unit="deg">0.0</AngleZ>
       <TPCpos_x unit="cm">POS_X4</TPCpos_x>

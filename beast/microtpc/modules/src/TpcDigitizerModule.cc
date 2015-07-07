@@ -62,8 +62,8 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   addParam("LookAtRec", m_LookAtRec, "Only look at nuclear recoils", 0);
   addParam("GEMGain1", m_GEMGain1, "GEM1 gain", 10.0);
   addParam("GEMGain2", m_GEMGain2, "GEM1 gain", 20.0);
-  addParam("GainRMS1", m_GEMGainRMS1, "GEM1 rms", 0.2);
-  addParam("GainRMS2", m_GEMGainRMS2, "GEM1 rms", 0.2);
+  addParam("GEMGainRMS1", m_GEMGainRMS1, "GEM1 rms", 0.2);
+  addParam("GEMGainRMS2", m_GEMGainRMS2, "GEM1 rms", 0.2);
   addParam("ScaleGain1", m_ScaleGain1, "scale gain 1 by a factor", 2.0);
   addParam("ScaleGain2", m_ScaleGain2, "scale gain 2 by a factor", 4.0);
   addParam("GEMpitch", m_GEMpitch, "GEM pitch", 0.014);
@@ -111,7 +111,7 @@ void TpcDigitizerModule::initialize()
   B2INFO("TpcDigitizer: Initializing");
   StoreArray<MicrotpcHit>::registerPersistent();
 
-  //get the garfield drift data, gas, and TPC paramters
+  //get xml data
   getXMLData();
 
   //converter: electron number to TOT part I

@@ -9,6 +9,8 @@
 #include <TRandom3.h>
 #include <TMath.h>
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -138,5 +140,42 @@ namespace Belle2 {
     }
   } // Testcases error propagation
 
+  /** Test special Setters and Getters. */
+  TEST_F(TrackFitResultTest, SpecialGetters)
+  {
+    double absError = 1e-6;
+    double bField = 1.5;
+
+    vector<TVector3> momentum;
+    vector<TVector3> position;
+
+    momentum.push_back(TVector3(0.00525037, 0.00167207, 1.11613));
+    position.push_back(TVector3(21.1138, -66.2984, 334.788));
+
+    momentum.push_back(TVector3(0.143028, 0.12043, 0.655792));
+    position.push_back(TVector3(33.373, -39.6353, 320.652));
+
+    momentum.push_back(TVector3(0.00635059, 0.027103, -0.37796));
+    position.push_back(TVector3(-0.00635059, -0.027103, -0.37796));
+
+    TMatrixDSym cov6(6);
+
+    auto pType = Belle2::Const::pion;
+    int charge[] = { -1, 1};
+    for (unsigned i = 0; i < momentum.size(); i++) {
+      for (unsigned j = 0; j < 2; j++) {
+        // Set up class for testing
+        TrackFitResult myResult(position[i], momentum[i], cov6, charge[j], pType, 0.5, bField, 0, 0);
+
+        // Test all vector elements
+        EXPECT_NEAR(position[i].X(), myResult.getPosition().X(), absError);
+        EXPECT_NEAR(position[i].Y(), myResult.getPosition().Y(), absError);
+        EXPECT_NEAR(position[i].Z(), myResult.getPosition().Z(), absError);
+        EXPECT_NEAR(momentum[i].Px(), myResult.getMomentum(bField).Px(), absError);
+        EXPECT_NEAR(momentum[i].Py(), myResult.getMomentum(bField).Py(), absError);
+        EXPECT_NEAR(momentum[i].Pz(), myResult.getMomentum(bField).Pz(), absError);
+      }
+    }
+  } // Testcases for special getters
 
 }  // namespace

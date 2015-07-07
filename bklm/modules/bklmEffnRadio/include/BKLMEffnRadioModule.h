@@ -100,7 +100,8 @@ namespace Belle2 {
     //! @param[in] refMod The reference module that defines the coordinate system used for the track
     //! @param[in] effLayer The layer of which we want to determine the efficiency, which is excluded from the tracking
     //! @return true if this is a valid candidate
-    bool validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D, vector<SimplePoint*>& points, const Belle2::bklm::Module* refMod, int effLayer);
+    bool validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D, vector<SimplePoint*>& points,
+                             const Belle2::bklm::Module* refMod, int effLayer);
     //! seet the plot style
     void set_plot_style();
     //! canvas to draw the module occupancy
@@ -155,6 +156,9 @@ namespace Belle2 {
     bklm::GeometryPar* m_GeoPar;
     //! to keep track which 2D hits where already used for tracks...
     set<int> m_pointIndices;
+    //! min seed layer distance
+    int minSeedLayerDistance = 3;
+
   };
 }
 

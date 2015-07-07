@@ -68,7 +68,12 @@ void BKLMEffnRadioModule::set_plot_style()
 
 }
 
-BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_eventCounter(0), m_cModule(nullptr), m_cModuleEff(nullptr), m_cModuleEff2D(nullptr), m_hTrackPhi(nullptr), m_hTrackTheta(nullptr), m_hHitsPerLayer(nullptr), m_hClusterSize(nullptr), m_hTracksPerEvent(nullptr), m_hHitsPerEvent1D(nullptr), m_hHitsPerEvent2D(nullptr), m_hHitsPerEventPerLayer1D(nullptr), m_hOccupancy1D(nullptr), m_eff2DFound(nullptr), m_eff2DExpected(nullptr), m_strips(nullptr), m_stripsEff(nullptr), m_file(nullptr), m_stripHits(nullptr), m_stripHitsEff(nullptr), m_stripNonHitsEff(nullptr), m_GeoPar(NULL)
+BKLMEffnRadioModule::BKLMEffnRadioModule() : Module(), m_minNumPointsOnTrack(7), m_maxEffDistance(10), m_eventCounter(0),
+  m_cModule(nullptr), m_cModuleEff(nullptr), m_cModuleEff2D(nullptr), m_hTrackPhi(nullptr), m_hTrackTheta(nullptr),
+  m_hHitsPerLayer(nullptr), m_hClusterSize(nullptr), m_hTracksPerEvent(nullptr), m_hHitsPerEvent1D(nullptr),
+  m_hHitsPerEvent2D(nullptr), m_hHitsPerEventPerLayer1D(nullptr), m_hOccupancy1D(nullptr), m_eff2DFound(nullptr),
+  m_eff2DExpected(nullptr), m_strips(nullptr), m_stripsEff(nullptr), m_file(nullptr), m_stripHits(nullptr), m_stripHitsEff(nullptr),
+  m_stripNonHitsEff(nullptr), m_GeoPar(NULL)
 {
   setDescription("Get efficiency and generate radio plots for bklm");
   addParam("filename", m_filename, "Output root filename", string("eff_output.root"));
@@ -169,9 +174,9 @@ void BKLMEffnRadioModule::initialize()
         m_stripsEff[i][iLay][j] = new TBox** [2];
         if (!m_strips[i][iLay][j] || !m_stripsEff[i][iLay][j])
         {B2INFO("no strips! j" << endl); B2ERROR("no strip");}
-        m_stripHits[i][iLay][j] = new int*[2];
-        m_stripHitsEff[i][iLay][j] = new int*[2];
-        m_stripNonHitsEff[i][iLay][j] = new int*[2];
+        m_stripHits[i][iLay][j] = new int* [2];
+        m_stripHitsEff[i][iLay][j] = new int* [2];
+        m_stripNonHitsEff[i][iLay][j] = new int* [2];
         m_hOccupancy1D[i][iLay][j] = new TH1D*[2];
         //theta/phi, use the size of the RPC modules as the range
         //z for each module is about 220cm (440 fwd+bkwd), y is 167-275 cm...
@@ -278,17 +283,19 @@ void BKLMEffnRadioModule::event()
   m_hHitsPerEvent1D->Fill(hits1D.getEntries());
   int hitsPerLayer[16];
   memset(hitsPerLayer, 0, 16 * sizeof(int));
-  for (int h = 0; h < hits1D.getEntries(); h++) {
+  for (int h = 0;  h < hits1D.getEntries(); h++) {
     int sector = hits1D[h]->getSector() - 1;
     if ((sector < 0) || (sector >= 8)) {
       B2INFO("sector:" << sector << endl);
       B2ERROR("wrong sector number ");
+      continue;
     }
     int layer = hits1D[h]->getLayer() - 1;
     //      cout <<"layer is : "<< layer <<endl;
     if ((layer < 0) || (layer >= 15)) {
       B2INFO("layer: " << layer << endl);
       B2ERROR("wrong layer number");
+      continue;
     }
     hitsPerLayer[layer]++;
     int fwd = 0;
@@ -315,6 +322,7 @@ void BKLMEffnRadioModule::event()
       isPhi = 1;
     }
     for (int c = channelMin; c <= channelMax; c++) {
+      //      cout <<"sector: " << sector <<" layer: "<< layer<<" fwd: " << fwd <<" isPhi: " << isPhi <<" channel: " << c <<endl;
       m_stripHits[sector][layer][fwd][isPhi][c]++;
       m_hOccupancy1D[sector][layer][fwd][isPhi]->Fill(c);
     }
@@ -359,7 +367,8 @@ void BKLMEffnRadioModule::terminate()
     float lInd = i / (float)48;
     float colorIndex = lInd * 48 + 51;
     int roundInd = fabs(lInd * maxStripHits + 0.5);
-    B2INFO("lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd << endl);
+    B2INFO("lInd is " << lInd << " color index is: " << colorIndex << " max strip: " << maxStripHits << " round ind: " << roundInd <<
+           endl);
     char buffer[200];
     sprintf(buffer, "%d", roundInd);
 
@@ -518,7 +527,7 @@ void BKLMEffnRadioModule::getEffs()
         int layer2 = hits2D[h2]->getLayer();
         if (effLayer == layer1)
           continue;
-        if (abs(layer1 - layer2) < 3)
+        if (abs(layer1 - layer2) < minSeedLayerDistance)
           continue;
 
         //for good extrapolation, we don't want to be too far away...
@@ -673,7 +682,8 @@ void BKLMEffnRadioModule::getEffs()
 
 
 //check if we find another hit in this module that is close to the track
-bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D, vector<SimplePoint*>& points, const Belle2::bklm::Module* refMod, int effLayer)
+bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D,
+                                              vector<SimplePoint*>& points, const Belle2::bklm::Module* refMod, int effLayer)
 {
 
   set<int> locIndices;

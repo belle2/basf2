@@ -16,6 +16,7 @@
 #include <G4AssemblyVolume.hh>
 #include <G4Transform3D.hh>
 #include "globals.hh"
+#include <string>
 #include "TString.h"
 #include "Riostream.h"
 //#include <boost/algorithm/string.hpp>

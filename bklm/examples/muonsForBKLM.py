@@ -29,11 +29,11 @@ set_log_level(LogLevel.INFO)
 
 # EventInfoSetter - generate event meta data
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter.param('evtNumList', [50000])
 
 # Particle gun
 particlegun = register_module('ParticleGun')
-particlegun.param('nTracks', 2)
+particlegun.param('nTracks', 1)
 particlegun.param('pdgCodes', [13, -13])
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [20, 30])
@@ -52,7 +52,7 @@ paramloader = register_module('Gearbox')
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
 
-geobuilder.param('Components', ['BKLM'])
+geobuilder.param('components', ['BKLM'])
 
 # Full Geant4 simulation
 g4sim = register_module('FullSim')
@@ -93,4 +93,3 @@ main.add_module(bklmEff)
 
 # Process 100 events
 process(main)
-

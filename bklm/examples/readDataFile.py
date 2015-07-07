@@ -24,8 +24,9 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('RootInput')
-# input = register_module('SeqRootInput')
+# input = register_module('RootInput')
+input = register_module('SeqRootInput')
+conversion = register_module('Convert2RawDet')
 # input.param('inputFileName', '/x02/data/e0000r000554.sroot')
 
 # EventInfoSetter - generate event meta data
@@ -39,12 +40,14 @@ print 'Gearbox registered '
 # Geometry builder
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
-geobuilder.param('Components', ['BKLM'])
+geobuilder.param('components', ['BKLM'])
 bklmUnpack = register_module('BKLMUnpacker')
+# bklmUnpack.param("keepEvenPackages",1);
+bklmUnpack.param("useDefaultModuleId", 1)
 bklmreco = register_module('BKLMReconstructor')
-bklmreco.log_level = LogLevel.INFO
+# bklmreco.log_level = LogLevel.INFO
 
-                           # efficiencies...
+# efficiencies...
 bklmEff = register_module('BKLMEffnRadio')
 
 print 'backend set '
@@ -62,6 +65,7 @@ main = create_path()
 # Add modules to main path
 # main.add_module(eventinfosetter)
 main.add_module(input)
+main.add_module(conversion)
 main.add_module(gearbox)
 main.add_module(geobuilder)
 

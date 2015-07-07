@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'cdc', 'cdc_dataobjects', 'tracking_dataobjects', 'top',
+               'mdst_dataobjects', 'reconstruction_dataobjects', 'geometry', 
+               'genfit2', '$ROOT_LIBS', 'gfortran']
+
+Return('env')

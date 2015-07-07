@@ -24,6 +24,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
@@ -217,7 +218,6 @@ void DedxPIDModule::event()
   StoreArray<MCParticle> mcparticles;
   const int num_mcparticles = mcparticles.getEntries();
 
-  StoreArray<CDCHit> cdcHits;
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
 
@@ -234,8 +234,7 @@ void DedxPIDModule::event()
   //
   // **************************************************
 
-  for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-    const Track* track = tracks[iTrack];
+  for (const auto& track : tracks) {
     m_trackID++;
 
     std::shared_ptr<DedxTrack> dedxTrack = std::make_shared<DedxTrack>();
@@ -246,15 +245,15 @@ void DedxPIDModule::event()
     //  Should be ok in most cases, for MC fitting this will return the fit with the
     //  true PDG value. At some point, it might be worthwhile to look into using a
     //  different fit if the differences are large
-    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    const TrackFitResult* fitResult = track.getTrackFitResult(Const::pion);
     if (!fitResult) {
-      B2WARNING("No related fit for track " << iTrack << "...");
+      B2WARNING("No related fit for track ...");
       continue;
     }
 
     if ((m_enableDebugOutput or m_onlyPrimaryParticles) and num_mcparticles != 0) {
       // find MCParticle corresponding to this track
-      const MCParticle* mcpart = track->getRelatedTo<MCParticle>();
+      const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
       if (mcpart) {
         if (m_onlyPrimaryParticles && !mcpart->hasStatus(MCParticle::c_PrimaryParticle)) {
@@ -273,32 +272,6 @@ void DedxPIDModule::event()
       }
     }
 
-    // dE/dx values will be calculated using associated genfit::Track
-    const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
-    if (!gftrack) {
-      B2WARNING("No related track for this fit...");
-      continue;
-    }
-
-    // use the cardinal track representation (by default, the first element)
-    genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
-    const genfit::AbsFitterInfo* fitterInfo = gftrack->getPointWithMeasurement(0)->getFitterInfo(trackrep);
-    if (!fitterInfo) {
-      B2WARNING("No fitterInfo found, skipping track...");
-      continue;
-    }
-    if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
-      B2ERROR("GFTrack is pruned, please run DedxPID only on unpruned tracks! Skipping this track.");
-      continue;
-    }
-
-    genfit::TrackCand* gftrackcand = fitResult->getRelatedFrom<genfit::TrackCand>();
-    if (!gftrackcand || gftrackcand->getNHits() == 0) {
-      B2WARNING("Track has no associated hits, skipping");
-      continue;
-    }
-    gftrackcand->sortHits();
-
     // get momentum (at origin) from fit result
     const TVector3& trackPos = fitResult->getPosition();
     const TVector3& trackMom = fitResult->getMomentum();
@@ -306,8 +279,19 @@ void DedxPIDModule::event()
     dedxTrack->m_cosTheta = trackMom.CosTheta();
     dedxTrack->m_charge = fitResult->getChargeSign();
 
-    // this enables an extrapolation of the track fit
-    genfit::StateOnPlane pocaState = fitterInfo->getFittedState(true);
+    // dE/dx values will be calculated using associated genfit::Track
+    const genfit::Track* gftrack = fitResult->getRelatedFrom<genfit::Track>();
+    if (!gftrack) {
+      B2WARNING("No related track for this fit...");
+      continue;
+    }
+
+    // Check to see if the track is pruned
+    genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
+    if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
+      B2ERROR("GFTrack is pruned, please run DedxPID only on unpruned tracks! Skipping this track.");
+      continue;
+    }
 
     //used for PXD/SVD hits
     const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
@@ -316,47 +300,66 @@ void DedxPIDModule::event()
     if (m_useCDC) {
       double layerdE = 0.0; // total charge in current layer
       double layerdx = 0.0; // total path length in current layer
+      double cdcMom = 0.0; // momentum valid in the CDC
 
-      // get the momentum valid in the CDC
-      WireID wireID0(0);
-      const TVector3& wirePosF0 = cdcgeo.wireForwardPosition(wireID0);
-      const TVector3& wirePosB0 = cdcgeo.wireBackwardPosition(wireID0);
-      const TVector3 wireDir0 = (wirePosB0 - wirePosF0).Unit();
-      double cdcMom = dedxTrack->m_p;
-      try {
-        trackrep->extrapolateToLine(pocaState, wirePosF0, wireDir0);
-        cdcMom = trackrep->getMom(pocaState).Mag();
-      } catch (genfit::Exception) {
-        B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": genfit::Track extrapolation failed (in CDC)");
-      }
-      dedxTrack->m_p_cdc = cdcMom;
+      // Get the TrackPoints, which contain the hit information we need.
+      // Then iterate over each point.
+      int tpcounter = 0;
+      const std::vector< genfit::TrackPoint* > gftrackPoints = gftrack->getPointsWithMeasurement();
+      for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
+           tp != gftrackPoints.end(); tp++) {
+        tpcounter++;
 
-      const std::vector<int>& cdcHitIDs = gftrackcand->getHitIDs(Const::CDC);
-      for (unsigned int iCDC = 0; iCDC < cdcHitIDs.size(); ++iCDC) {
-        int cdcIDx = cdcHitIDs[iCDC];
+        // should also be possible to use this for svd and pxd hits...
+        genfit::AbsMeasurement* aAbsMeasurementPtr = (*tp)->getRawMeasurement(0);
+        const CDCRecoHit* cdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
+        if (!cdcRecoHit) continue;
+        const CDCHit* cdcHit = cdcRecoHit->getCDCHit();
+
+        // get the poca on the wire and track momentum for this hit
+        const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo(trackrep);
+        if (!fi) {
+          B2WARNING("No fitter info, skipping...");
+          continue;
+        }
+        const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
+        B2Vector3D fittedPoca = mop.getPos();
+        const TVector3& pocaMom = mop.getMom();
+        if (tp == gftrackPoints.begin() || cdcMom == 0) {
+          cdcMom = pocaMom.Mag();
+          dedxTrack->m_p_cdc = cdcMom;
+        }
 
         // get the global wire ID (between 0 and 14336) and the layer info
-        const int wire = cdcHits[cdcIDx]->getIWire();
-        WireID wireID(cdcHits[cdcIDx]->getID());
-        int layer = cdcHits[cdcIDx]->getILayer();
-        int superlayer = cdcHits[cdcIDx]->getISuperLayer();
+        WireID wireID = cdcRecoHit->getWireID();
+        const int wire = wireID.getIWire();
+        int layer = cdcHit->getILayer();
+        int superlayer = cdcHit->getISuperLayer();
         int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
 
-        const bool lastHit = (iCDC + 1 >= cdcHitIDs.size());
-        bool last_hit_in_current_layer = lastHit;
+        // if multiple hits in a layer, we may combine the hits
+        const bool lastHit = (tp + 1 == gftrackPoints.end());
+        bool lastHitInCurrentLayer = lastHit;
         if (!lastHit) {
           //peek at next hit
-          const int nextcdcIDx = cdcHitIDs[iCDC + 1];
-          const int nextLayer = cdcHits[nextcdcIDx]->getILayer();
-          const int nextSuperlayer = cdcHits[nextcdcIDx]->getISuperLayer();
-          const int nextLayerFull = (nextSuperlayer == 0) ? nextLayer : (8 + (nextSuperlayer - 1) * 6 + nextLayer);
-          last_hit_in_current_layer = (nextLayerFull != currentLayer);
+          genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
+          const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
+          if (!nextcdcRecoHit) {
+            lastHitInCurrentLayer == true;
+            break;
+          }
+          const CDCHit* nextcdcHit = nextcdcRecoHit->getCDCHit();
+          const int nextILayer = nextcdcHit->getILayer();
+          const int nextSuperlayer = nextcdcHit->getISuperLayer();
+          const int nextLayer = (nextSuperlayer == 0) ? nextILayer : (8 + (nextSuperlayer - 1) * 6 + nextILayer);
+          lastHitInCurrentLayer = (nextLayer != currentLayer);
         }
 
         // find the position of the endpoints of the sense wire
         const TVector3& wirePosF = cdcgeo.wireForwardPosition(wireID);
         const TVector3& wirePosB = cdcgeo.wireBackwardPosition(wireID);
         const TVector3 wireDir = (wirePosB - wirePosF).Unit();
+
         int nWires = cdcgeo.nWiresInLayer(currentLayer);
 
         // radii of field wires for this layer
@@ -377,48 +380,56 @@ void DedxPIDModule::event()
         const DedxPoint bl = DedxPoint(-bottomHalfWidth, -bottomHeight);
         DedxDriftCell c = DedxDriftCell(tl, tr, br, bl);
 
-        // determine the doca for this hit
-        try {
+        // get the doca and entrance angle information.
+        // constructPlane places the coordinate center in the POCA to the
+        // wire.  Using this is the default behavior.  If this should be too
+        // slow, as it has to re-evaluate the POCA
+        //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
 
-          // extrapolate the track to the sense wire of interest
-          trackrep->extrapolateToLine(pocaState, wirePosF, wireDir);
+        // uses the plane determined by the track fit.
+        B2Vector3D pocaOnWire = mop.getPlane()->getO();
 
-          TVector3 poca = trackrep->getPos(pocaState);
-          TVector3 pocaMom = trackrep->getMom(pocaState);
-          TVector3 wirePoca = wirePosF + (poca - wirePosF).Dot(wireDir) * wireDir;
-          TVector3 wireDoca = poca - wirePoca;
+        // The vector from the wire to the track.
+        B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
 
-          // the sign of the doca is defined here to be positive in the +x dir
-          double doca = wireDoca.Perp();
-          if (wireDoca.x() < 0) doca = -1.0 * doca;
-          double entAng = cdcgeo.getAlpha(wirePoca, pocaMom);
+        // the sign of the doca is defined here to be positive in the +x dir
+        double doca = B2WireDoca.Perp();
+        if (B2WireDoca.X() < 0) doca = -1.0 * doca;
 
-          LinearGlobalADCCountTranslator translator;
-          int adcCount = cdcHits[cdcIDx]->getADCCount(); // pedestal subtracted?
-          double hitCharge = translator.getCharge(adcCount, wireID, false, poca.z(), pocaMom.Phi());
-          int driftT = cdcHits[cdcIDx]->getTDCCount();
+        // The opening angle of the track momentum direction
+        const double px = pocaMom.x();
+        const double py = pocaMom.y();
+        const double wx = pocaOnWire.x();
+        const double wy = pocaOnWire.y();
+        const double cross = wx * py - wy * px;
+        const double dot   = wx * px + wy * py;
+        double entAng = atan2(cross, dot);
 
-          RealisticTDCCountTranslator realistictdc;
-          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID);
-          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID);
+        LinearGlobalADCCountTranslator translator;
+        double adcCount = cdcHit->getADCCount(); // pedestal subtracted?
+        double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
+        int driftT = cdcHit->getTDCCount();
 
-          // now calculate the path length for this hit
-          double celldx = c.dx(doca, entAng);
-          if (!c.isValid()) continue;
+        RealisticTDCCountTranslator realistictdc;
+        double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
+        double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, pocaOnWire.Z(), pocaMom.Phi(),
+                                    pocaMom.Theta());
 
-          layerdE += adcCount;
-          layerdx += celldx;
+        // now calculate the path length for this hit
+        double celldx = c.dx(doca, entAng);
+        if (!c.isValid()) continue;
 
-          double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
-          if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes);
-        } catch (genfit::Exception) {
-          B2WARNING("Event " << m_eventID << ", Track: " << iTrack << ": genfit::Track extrapolation failed (in CDC)");
-          continue;
-        }
+        layerdE += adcCount;
+        layerdx += celldx;
 
-        if (last_hit_in_current_layer) {
+        // save individual hits
+        double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
+        if (m_enableDebugOutput)
+          dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                            driftDRealistic, driftDRealisticRes);
+
+        // check if there are any more hits in this layer
+        if (lastHitInCurrentLayer) {
           double totalDistance = layerdx / sin(trackMom.Theta());
           double layerDedx = layerdE / totalDistance;
           // drop hits with path lengths less than 20% of the cell height
@@ -426,8 +437,8 @@ void DedxPIDModule::event()
           //      continue;
           //    }
 
+          // save the information for this layer
           if (layerDedx > 0) {
-            // save the information for this hit
             dedxTrack->addDedx(currentLayer, totalDistance, layerDedx);
             if (!m_pdfFile.empty() and m_useIndividualHits) {
               // use the momentum valid in the cdc
@@ -453,6 +464,14 @@ void DedxPIDModule::event()
         dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
       }
     }
+
+    // Now get the genfit::TrackCand to extract the VXD hits
+    genfit::TrackCand* gftrackcand = fitResult->getRelatedFrom<genfit::TrackCand>();
+    if (!gftrackcand || gftrackcand->getNHits() == 0) {
+      B2WARNING("Track has no associated hits, skipping");
+      continue;
+    }
+    gftrackcand->sortHits();
 
     if (m_usePXD) {
       const std::vector<int>& pxdClusterIDs = gftrackcand->getHitIDs(Const::PXD);
@@ -484,13 +503,13 @@ void DedxPIDModule::event()
     if (m_enableDebugOutput) {
       // book the information for this track
       DedxTrack* newDedxTrack = dedxArray.appendNew(*dedxTrack);
-      track->addRelationTo(newDedxTrack);
+      track.addRelationTo(newDedxTrack);
     }
 
     // save DedxLikelihood
     if (!m_pdfFile.empty()) {
       DedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_cdcLogl, dedxTrack->m_svdLogl);
-      track->addRelationTo(likelihoodObj);
+      track.addRelationTo(likelihoodObj);
     }
 
   } // end of loop over tracks

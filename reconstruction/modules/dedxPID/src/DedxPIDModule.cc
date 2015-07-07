@@ -345,7 +345,7 @@ void DedxPIDModule::event()
           genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
           const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
           if (!nextcdcRecoHit) {
-            lastHitInCurrentLayer == true;
+            lastHitInCurrentLayer = true;
             break;
           }
           const CDCHit* nextcdcHit = nextcdcRecoHit->getCDCHit();
@@ -411,7 +411,7 @@ void DedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         RealisticTDCCountTranslator realistictdc;
-        double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
+        double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
         double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, pocaOnWire.Z(), pocaMom.Phi(),
                                     pocaMom.Theta());
 

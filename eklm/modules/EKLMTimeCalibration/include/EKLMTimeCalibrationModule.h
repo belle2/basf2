@@ -85,8 +85,17 @@ namespace Belle2 {
 
   private:
 
+    /** Perform data collection. */
+    bool m_performDataCollection;
+
+    /** Perform calibration. */
+    bool m_performCalibration;
+
     /** Output file name. */
-    std::string m_outputFileName;
+    std::string m_dataOutputFileName;
+
+    /** Output file name. */
+    std::string m_calibrationOutputFileName;
 
     /** Output file */
     TFile* m_outputFile;

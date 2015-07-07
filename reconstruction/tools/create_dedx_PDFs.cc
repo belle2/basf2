@@ -18,7 +18,7 @@
 using namespace Belle2;
 
 /** Number of bins on dE/dx axis. */
-const int num_dedx_bins_hits = 100;
+const int num_dedx_bins = 100;
 
 
 /** Save 2d PDFs of dE/dx vs. momentum for use with the DedxPID module.
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     for (int iPart = 0; iPart < num_pdg_codes; iPart++) {
       TH2F* hists[Dedx::c_num_detectors]; //one for each Detector
       const int pdg_code = Const::chargedStableSet.at(iPart).getPDGCode();
-      const int num_dedx_bins = use_truncated_mean ? (num_dedx_bins_hits) : num_dedx_bins_hits;
+      //const int num_dedx_bins = use_truncated_mean ? (num_dedx_bins_hits) : num_dedx_bins_hits;
 
       for (int detector = 0; detector < Dedx::c_num_detectors; detector++) {
         std::cout << "i " << i << ", d" << detector << "\n";

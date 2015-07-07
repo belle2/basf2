@@ -80,6 +80,7 @@ namespace Belle2 {
       StoreArray<MicrotpcSimHit> MicrotpcHits;
       if (!MicrotpcHits.isValid()) MicrotpcHits.create();
       MicrotpcSimHit* hit = MicrotpcHits.appendNew(
+                              trackID,
                               depEnergy,
                               nielEnergy,
                               tkPDG,

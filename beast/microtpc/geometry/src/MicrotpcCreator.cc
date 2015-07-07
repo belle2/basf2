@@ -332,7 +332,8 @@ namespace Belle2 {
         G4double dz_GasTPC = (z_Ring[10] - dz_Ring - z_GEM[0] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
         //cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);
-        G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matGas), "l_GasTPC", 0, m_sensitive);
+        string matScaleGas = activeParams.getString("ScaleGas");
+        G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matScaleGas), "l_GasTPC", 0, m_sensitive);
 
         //Lets limit the Geant4 stepsize inside the volume
         l_GasTPC->SetUserLimits(new G4UserLimits(stepSize));

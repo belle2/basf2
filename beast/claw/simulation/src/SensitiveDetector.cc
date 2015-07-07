@@ -85,6 +85,7 @@ namespace Belle2 {
       StoreArray<ClawSimHit> ClawHits;
       if (!ClawHits.isValid()) ClawHits.create();
       ClawSimHit* hit = ClawHits.appendNew(
+                          trackID,
                           depEnergy,
                           attEdep,
                           tkPDG,

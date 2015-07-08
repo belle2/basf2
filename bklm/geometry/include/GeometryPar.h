@@ -293,7 +293,7 @@ namespace Belle2 {
     private:
 
       //! Hidden constructor
-      GeometryPar(const GearDir&);
+      explicit GeometryPar(const GearDir&);
 
       //! Hidden copy constructor
       GeometryPar(GeometryPar&);

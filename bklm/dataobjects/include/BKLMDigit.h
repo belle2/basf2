@@ -29,11 +29,11 @@ namespace Belle2 {
     //! Constructor with initial values for an RPC hit
     //! @param simHit pointer to the BKLMSimHit
     //! @param strip RPC strip number in a contiguous set
-    BKLMDigit(const BKLMSimHit* simHit, int strip);
+    explicit BKLMDigit(const BKLMSimHit* simHit, int strip);
 
     //! Constructor with initial values for a scint hit
     //! @param simHit pointer to the BKLMSimHit
-    BKLMDigit(const BKLMSimHit* simHit);
+    explicit BKLMDigit(const BKLMSimHit* simHit);
 
     //!Constructor with initial values for a real data hit
     //! @param moduleID gives sector, layer and strip

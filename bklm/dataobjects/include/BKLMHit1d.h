@@ -30,7 +30,7 @@ namespace Belle2 {
 
     //! Constructor with initial values
     //! @param digits vector of contiguous BKLMDigits
-    BKLMHit1d(const std::vector<Belle2::BKLMDigit*>& digits);
+    explicit BKLMHit1d(const std::vector<Belle2::BKLMDigit*>& digits);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);

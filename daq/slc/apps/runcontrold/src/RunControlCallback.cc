@@ -168,6 +168,11 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         std::string operators;
         get("operators", operators);
         obj.addText("opeeators", operators);
+        for (size_t i = 0; i < m_node_v.size(); i++) {
+          RCNode& node(m_node_v[i]);
+          std::string vname = StringUtil::form("node[%d]", (int)i);
+          set(vname + ".rcconfig", node.getConfig());
+        }
         dbrecord(obj, expno, runno);
       } else {
         throw (RCHandlerException("DB is not available"));
@@ -408,16 +413,27 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
       if (cmd == RCCommand::CONFIGURE)
         m_msg.setData(node.getConfig());
       try {
-        while (cmd == RCCommand::LOAD && node.isSequential() &&
-               !m_callback.check(node.getName(), RCState::READY_S)) {
+        if (cmd == RCCommand::LOAD) {
           try {
-            m_callback.wait(node, RCCommand::OK, 1);
-          } catch (const TimeoutException& e) {
-            continue;
+            std::string val;
+            m_callback.get(node, "rcconfig", val);
+            node.setConfig(val);
           } catch (const IOException& e) {
             LogFile::error(e.what());
             m_enabled = false;
             return;
+          }
+          while (node.isSequential() &&
+                 !m_callback.check(node.getName(), RCState::READY_S)) {
+            try {
+              m_callback.wait(node, RCCommand::OK, 1);
+            } catch (const TimeoutException& e) {
+              continue;
+            } catch (const IOException& e) {
+              LogFile::error(e.what());
+              m_enabled = false;
+              return;
+            }
           }
         }
         if (NSMCommunicator::send(m_msg)) {

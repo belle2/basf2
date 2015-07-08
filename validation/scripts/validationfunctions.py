@@ -161,6 +161,10 @@ def parse_cmd_line_arguments():
                         "validation package are executed. During regular"
                         "validation, these scripts are ignored.",
                         action='store_true')
+    parser.add_argument("--view", help="Once the validation is finished, start"
+                                       "the local web server and display the validation"
+                                       "results in the system's default browser.",
+                        action='store_true')
 
     # Return the parsed arguments!
     return parser.parse_args()

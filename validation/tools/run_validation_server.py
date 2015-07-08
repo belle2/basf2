@@ -8,6 +8,7 @@ import os
 import sys
 import traceback
 import mimetypes
+import webbrowser
 from urlparse import parse_qs
 from cgi import parse_header, parse_multipart
 from save import create_image_matrix, merge_multiple_plots
@@ -44,30 +45,31 @@ def get_error():
 
 
 def parse_cmd_line_arguments():
-        """!
-        Sets up a parser for command line arguments,
-        parses them and returns the arguments.
-        @return: An object containing the parsed command line arguments.
-        Arguments are accessed like they are attributes of the object,
-        i.e. [name_of_object].[desired_argument]
-        """
+    """!
+    Sets up a parser for command line arguments,
+    parses them and returns the arguments.
+    @return: An object containing the parsed command line arguments.
+    Arguments are accessed like they are attributes of the object,
+    i.e. [name_of_object].[desired_argument]
+    """
 
-        # Set up the command line parser
-        parser = argparse.ArgumentParser()
+    # Set up the command line parser
+    parser = argparse.ArgumentParser()
 
-        # Define the accepted command line flags and read them in
-        parser.add_argument("-ip", "--ip", help="The IP address on which the"
-                            "server starts. Default is 'localhost'.",
-                            type=str, default='localhost')
-        parser.add_argument("-p", "--port", help="The port number on which"
-                            " the server starts. Default is '8000'.",
-                            type=str, default=8000)
+    # Define the accepted command line flags and read them in
+    parser.add_argument("-ip", "--ip", help="The IP address on which the"
+                        "server starts. Default is 'localhost'.",
+                        type=str, default='localhost')
+    parser.add_argument("-p", "--port", help="The port number on which"
+                        " the server starts. Default is '8000'.",
+                        type=str, default=8000)
 
-        # Return the parsed arguments!
-        return parser.parse_args()
+    # Return the parsed arguments!
+    return parser.parse_args()
 
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
+
     """!
     Defines how the BaseHTTPServer handles HTTP Requests (GET or POST)
     @var path: The path of the request, e.g. the file that is being requested
@@ -446,15 +448,11 @@ def run(ip='localhost', port=8000):
     log.info("Server: Waiting for requests... \n")
     httpd.serve_forever()
 
-# Only execute if the file is not imported
-if __name__ == '__main__':
 
+def configure_and_run(ip='localhost', port=8000, parseCommandLine=False, openSite=False):
     # Only execute the program if a basf2 release is set up!
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')
-
-    # Parse command line arguments
-    cmd_arguments = parse_cmd_line_arguments()
 
     # Make sure the output of validate_basf2.py is there
     if not os.path.isdir('html/results'):
@@ -470,14 +468,26 @@ if __name__ == '__main__':
                     datefmt='%H:%M:%S')
 
     # Define the server address and port
-    ip = cmd_arguments.ip
-    port = int(cmd_arguments.port)
+    # only if we got some specific
+    if parseCommandLine:
+        # Parse command line arguments
+        cmd_arguments = parse_cmd_line_arguments()
+
+        ip = cmd_arguments.ip
+        port = int(cmd_arguments.port)
 
     # Start the server!
     try:
         log.info("Server: Starting HTTP server on {0}:{1}".format(ip, port))
+
+        if openSite:
+            webbrowser.open("http://" + ip + ":" + str(port))
         run(ip=ip, port=port)
         log.info("Server: Terminating")
     # Terminate upon KeyboardInterrupt
-    except KeyboardInterrupt, k:
+    except KeyboardInterrupt as k:
         print "Server: Terminated by user!"
+
+# Only execute if the file is not imported
+if __name__ == '__main__':
+    configure_and_run(parseCommandLine=True)

@@ -35,7 +35,7 @@ namespace Belle2 {
       typedef std::multimap <Identifier, Identifier, std::less <Identifier> > MMap;
 
       /** Constructors and destructor */
-      TEclCFCR(int id = 0);
+      explicit TEclCFCR(int id = 0);
       /** Constructors */
       TEclCFCR(const TEclCFCR& rhs);
       virtual ~TEclCFCR();
@@ -52,26 +52,31 @@ namespace Belle2 {
 
       // member functions
       /** get Id */
-      Identifier Id() const {
+      Identifier Id() const
+      {
         return fId;
       }
       /** get mass */
-      EclGeV Mass() const {
+      EclGeV Mass() const
+      {
         return fMass;
       }
 
       /** get Energy */
-      EclGeV Energy() const {
+      EclGeV Energy() const
+      {
         return
           fEnergy;
       }
       /** get Width */
-      double Width() const {
+      double Width() const
+      {
         return
           fWidth;
       }
       /** do  Accumulate */
-      void Accumulate(TEclEnergyHit& ahit) {
+      void Accumulate(TEclEnergyHit& ahit)
+      {
         fEnergyHits[ahit.CellId()] = ahit;
       }
 
@@ -100,17 +105,20 @@ namespace Belle2 {
       void Attributes(void);
 
       /** get Showers */
-      const EclCFShowerMap& Showers(void) const {
+      const EclCFShowerMap& Showers(void) const
+      {
         return
           fShowers;
       }
       /** get EnergyHits */
-      const EclEnergyHitMap& EnergyHits(void) const {
+      const EclEnergyHitMap& EnergyHits(void) const
+      {
         return
           fEnergyHits;
       }
       /** get Seeds */
-      const EclEnergyHitMap& Seeds(void) const {
+      const EclEnergyHitMap& Seeds(void) const
+      {
         return
           fSeeds;
       }

@@ -33,7 +33,7 @@ namespace Belle2 {
     ECLGamma() : m_ShowerId(0) {}
 
     /** Constructor */
-    ECLGamma(int showerId) : m_ShowerId(showerId) {}
+    explicit ECLGamma(int showerId) : m_ShowerId(showerId) {}
 
     /*! Set Shower ID
      */

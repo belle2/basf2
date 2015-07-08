@@ -37,7 +37,8 @@ namespace Belle2 {
       typedef EclIdentifier Identifier;
 
       /** construct MEclCFShowerHA */
-      MEclCFShowerHA() {
+      MEclCFShowerHA()
+      {
         fId = 0;
         fFraction = 0;
       }
@@ -47,7 +48,8 @@ namespace Belle2 {
       MEclCFShowerHA(const MEclCFShowerHA& a)
         : fId(a.fId), fFraction(a.fFraction) {}
       /** define operator= for  MEclCFShowerHA */
-      MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs) {
+      MEclCFShowerHA& operator=(const MEclCFShowerHA& rhs)
+      {
         if (this != &rhs) {
           fId = rhs.fId;
           fFraction = rhs.fFraction;
@@ -57,11 +59,13 @@ namespace Belle2 {
       /** construct MEclCFShowerHA with  fId(id), fFraction(w) */
       MEclCFShowerHA(int id, double w): fId(id), fFraction(w) {}
       /** Get fId */
-      Identifier Id(void) const {
+      Identifier Id(void) const
+      {
         return fId;
       }
       /** Get fFraction */
-      double Fraction(void) const {
+      double Fraction(void) const
+      {
         return fFraction;
       }
     private:
@@ -102,7 +106,8 @@ namespace Belle2 {
 
       // Constructors and destructor
       /** construct TEclCFShower with  fId(id) */
-      TEclCFShower(int id = 0) : fId(id) {
+      explicit TEclCFShower(int id = 0) : fId(id)
+      {
         fEnergy = 0.0;  //gcc does not initialize...
         fE3x3 = 0.0;
         fE5x5 = 0.0;
@@ -115,7 +120,8 @@ namespace Belle2 {
         fError = CLHEP::HepSymMatrix(3, 1);
       }
       ///
-      virtual ~TEclCFShower() {
+      virtual ~TEclCFShower()
+      {
       }
 
       /** construct TEclCFShower with aShower */
@@ -140,11 +146,13 @@ namespace Belle2 {
 
         , fStatus(aShower.fStatus)
         , fGrade(aShower.fGrade)
-        , fHA(aShower.fHA) {
+        , fHA(aShower.fHA)
+      {
       }
 
       /// assignment operator(s)
-      TEclCFShower& operator=(const TEclCFShower& rhs) {
+      TEclCFShower& operator=(const TEclCFShower& rhs)
+      {
         if (this != &rhs) {
           fId = rhs.fId;
           fEnergy = rhs.fEnergy;
@@ -168,95 +176,112 @@ namespace Belle2 {
       }
 
       /// comparison operators
-      bool operator==(const TEclCFShower& rhs) const {
+      bool operator==(const TEclCFShower& rhs) const
+      {
         return
           fId == rhs.fId;
       }
       /// comparison operators
-      bool operator!=(const TEclCFShower& rhs) const {
+      bool operator!=(const TEclCFShower& rhs) const
+      {
         return
           fId != rhs.fId;
       }
       /// comparison operators
-      bool operator<(const TEclCFShower& rhs) const {
+      bool operator<(const TEclCFShower& rhs) const
+      {
         return
           fId < rhs.fId;
       }
 
 
       ///member functions Accumulate  from belle Library
-      void Accumulate(Identifier cId, EclGeV energy, double w = 1.0) {
+      void Accumulate(Identifier cId, EclGeV energy, double w = 1.0)
+      {
         fEnergy += (energy * w);
         Assign(cId, w);
       }
       ///member functions Assign  from belle Library
-      void Assign(Identifier cId, double w = 1.0) {
+      void Assign(Identifier cId, double w = 1.0)
+      {
         fHA.push_back(MEclCFShowerHA(cId, w));
       }
 
 //      void UncAttributes(void);
 
       /** currently only getters are implemented... */
-      Identifier Id(void) const {
+      Identifier Id(void) const
+      {
         return
           fId;
       }
       ///get fEnergy
-      EclGeV Energy(void) const {
+      EclGeV Energy(void) const
+      {
         return
           fEnergy;
       }
       /// correct runtime with vertex info?
-      EclRad Theta(void) const {
+      EclRad Theta(void) const
+      {
         return
           fTheta;
       }
       /// get fPhi
-      EclRad Phi(void) const {
+      EclRad Phi(void) const
+      {
         return
           fPhi;
       }
       ///get fDistance
-      EclCM Distance(void) const {
+      EclCM Distance(void) const
+      {
         return
           fDistance;
       }
       ///get fError
-      const CLHEP::HepSymMatrix& Error(void) const {
+      const CLHEP::HepSymMatrix& Error(void) const
+      {
         return
           fError;
       }
 
       ///get Mass
-      EclGeV Mass(void) const {
+      EclGeV Mass(void) const
+      {
         return
           fMass;
       }
       ///get Width
-      EclCM  Width(void) const {
+      EclCM  Width(void) const
+      {
         return
           fWidth;
       }
       ///get  fE3x3 / fE5x5
-      double E9oE25(void) const {
+      double E9oE25(void) const
+      {
         return
           fE3x3 / fE5x5;
 //      fE9oE25;
       }
       /// get E9oE25unf
-      double E9oE25unf(void) const {
+      double E9oE25unf(void) const
+      {
         return
           fE3x3unf / fE5x5unf;
 //      fE9oE25unf;
       }
       /// get NHits
-      int NHits(void) const {
+      int NHits(void) const
+      {
         return
           fHA.size();
 //      fNHits;
       }
       ///weighted #of hits
-      double WNHits(void) const {
+      double WNHits(void) const
+      {
         double n = 0.0;
         for (std::vector<MEclCFShowerHA>::const_iterator i = fHA.begin();
              i != fHA.end(); ++i)
@@ -264,39 +289,46 @@ namespace Belle2 {
         return n;
       }
       ///get NHitsUsed
-      double NHitsUsed(void) const {
+      double NHitsUsed(void) const
+      {
         return
           NHits();  // not implemented yet
 //      fNHits;
       }
       ///get Status
-      int Status(void) const {
+      int Status(void) const
+      {
         return
           fStatus;
       }
       /// backward compatibility
-      EGrade Grade(void) const {
+      EGrade Grade(void) const
+      {
         return
           fGrade;
       }
       ///get Grade
-      void Grade(EGrade g) {
+      void Grade(EGrade g)
+      {
         if (g > fGrade)
           fGrade = g;
       }
 
       /// don't use these, if you don't know...
-      EclGeV UncEnergy(void) const {
+      EclGeV UncEnergy(void) const
+      {
         return
           fE5x5unf;
       }
       ///get TotEnergy
-      EclGeV TotEnergy(void) const {
+      EclGeV TotEnergy(void) const
+      {
         return
           fE5x5;
       }
       ///get HitAssignment
-      const std::vector<MEclCFShowerHA>& HitAssignment(void) const {
+      const std::vector<MEclCFShowerHA>& HitAssignment(void) const
+      {
         return
           fHA;
       }

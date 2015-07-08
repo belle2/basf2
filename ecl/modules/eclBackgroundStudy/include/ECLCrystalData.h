@@ -87,7 +87,7 @@ public :
   /** Blank Constructor */
   ECLCrystalData();
   /** CrystalID constructor */
-  ECLCrystalData(int cid);
+  explicit ECLCrystalData(int cid);
   /** theta, phi ID constructor */
   ECLCrystalData(int tid, int pid);
   /** destructor */

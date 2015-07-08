@@ -103,9 +103,9 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    std::for_each(m_node_v.begin(), m_node_v.end(),
-                  Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
-    setState(RCState::RECOVERING_RS);
+    //std::for_each(m_node_v.begin(), m_node_v.end(),
+    //              Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
+    //setState(RCState::RECOVERING_RS);
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
@@ -151,6 +151,17 @@ void RunControlCallback::load(const DBObject& obj) throw(RCHandlerException)
 void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
 {
   try {
+    DBObject& obj(getDBObject());
+    for (size_t i = 0; i < m_node_v.size(); i++) {
+      RCNode& node(m_node_v[i]);
+      std::string val;
+      get(node, "rcconfig", val);
+      LogFile::info("%s config : %s", node.getName().c_str(), val.c_str());
+      node.setConfig(val);
+      std::string vname = StringUtil::form("node[%d]", (int)i);
+      set(vname + ".rcconfig", val);
+      (obj("node", i))("rcconfig").setPath(val);
+    }
     if (expno == 0 || runno == 0) {
       if (getDB()) {
         DBInterface& db(*getDB());
@@ -161,23 +172,12 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         runno = m_runno.getRunNumber();
         set("tstart", (int)m_runno.getRecordTime());
         set("ismaster", (int)true);
-        DBObject& obj(getDBObject());
         std::string comment;
         get("comment", comment);
         obj.addText("comment", comment);
         std::string operators;
         get("operators", operators);
         obj.addText("opeeators", operators);
-        for (size_t i = 0; i < m_node_v.size(); i++) {
-          RCNode& node(m_node_v[i]);
-          std::string val;
-          get(node, "rcconfig", val);
-          LogFile::info("%s config : %s", node.getName().c_str(), val.c_str());
-          node.setConfig(val);
-          std::string vname = StringUtil::form("node[%d]", (int)i);
-          set(vname + ".rcconfig", val);
-          (obj("node", i))("rcconfig").setPath(val);
-        }
         dbrecord(obj, expno, runno);
       } else {
         throw (RCHandlerException("DB is not available"));

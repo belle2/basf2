@@ -170,8 +170,13 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         obj.addText("opeeators", operators);
         for (size_t i = 0; i < m_node_v.size(); i++) {
           RCNode& node(m_node_v[i]);
+          std::string val;
+          get(node, "rcconfig", val);
+          LogFile::info("%s config : %s", node.getName().c_str(), val.c_str());
+          node.setConfig(val);
           std::string vname = StringUtil::form("node[%d]", (int)i);
-          set(vname + ".rcconfig", node.getConfig());
+          set(vname + ".rcconfig", val);
+          (obj("node", i))("rcconfig").setPath(val);
         }
         dbrecord(obj, expno, runno);
       } else {
@@ -414,15 +419,6 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
         m_msg.setData(node.getConfig());
       try {
         if (cmd == RCCommand::LOAD) {
-          try {
-            std::string val;
-            m_callback.get(node, "rcconfig", val);
-            node.setConfig(val);
-          } catch (const IOException& e) {
-            LogFile::error(e.what());
-            m_enabled = false;
-            return;
-          }
           while (node.isSequential() &&
                  !m_callback.check(node.getName(), RCState::READY_S)) {
             try {

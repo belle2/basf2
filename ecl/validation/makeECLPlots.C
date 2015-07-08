@@ -82,7 +82,7 @@ void ECLPion(TTree* pion_tree){
 
   TFile* output = TFile::Open("ECLPion.root", "recreate");
 
-  TH1F* hClusterE = new TH1F("hPionE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
+  TH1F* hPionE = new TH1F("hPionE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
   hPionE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hPionE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
   hPionE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));

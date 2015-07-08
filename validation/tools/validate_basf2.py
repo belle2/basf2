@@ -100,7 +100,7 @@ class Validation:
         # the validation package itself, because it only creates test-plots
         # for validation development. To see only the validation-package output,
         # use the --test command line flag
-        self.ignored_packages = ["validation"]
+        self.ignored_packages = ["validation-test"]
 
         # Additional arguments for basf2, if we received any from the command
         #  line arguments
@@ -652,7 +652,7 @@ try:
     # If running in test mode, only execute scripts in validation packgase
     if cmd_arguments.test:
         validation.ignored_packages = []
-        validation.packages = ["validation"]
+        validation.packages = ["validation-test"]
         validation.log.note('Running in test mode')
 
     # Now collect the steering files which will be used in this validation.

@@ -92,6 +92,10 @@ def get_validation_folders(location, basepaths, log):
     if os.path.isdir(basepaths[location] + '/validation'):
         results['validation'] = basepaths[location] + '/validation'
 
+    # get the special folder containing the validation tests
+    if os.path.isdir(basepaths[location] + '/validation/validation-test'):
+        results['validation-test'] = basepaths[location] + '/validation/validation-test'
+
     # Now get a list of all folders with name 'validation' which are
     # subfolders of a folder (=package) in the release directory
     package_dirs = glob.glob(os.path.join(basepaths[location], '*',

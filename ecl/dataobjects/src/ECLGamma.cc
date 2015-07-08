@@ -15,31 +15,26 @@ using namespace Belle2;
 
 TVector3 ECLGamma::getMomentum() const
 {
-  TVector3 momentum(0., 0., 0.);
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->getEnergy();
-  double m_theta = aECLShower->getTheta();
-  double m_phi = aECLShower->getPhi();
-  double m_px = m_energy * sin(m_theta) * cos(m_phi);
-  double m_py = m_energy * sin(m_theta) * sin(m_phi);
-  double m_pz = m_energy * cos(m_theta);
+  const double energy = aECLShower->getEnergy();
+  const double theta = aECLShower->getTheta();
+  const double phi = aECLShower->getPhi();
+  const double px = energy * sin(theta) * cos(phi);
+  const double py = energy * sin(theta) * sin(phi);
+  const double pz = energy * cos(theta);
 
-  momentum.SetX(m_px);
-  momentum.SetY(m_py);
-  momentum.SetZ(m_pz);
-  return momentum;
+  return TVector3(px, py, pz);
 }
 
 float ECLGamma::getPx() const
 {
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->getEnergy();
-  double m_theta = aECLShower->getTheta();
-  double m_phi = aECLShower->getPhi();
-  double m_px = m_energy * sin(m_theta) * cos(m_phi);
-  return (float)m_px;
+  const double energy = aECLShower->getEnergy();
+  const double theta = aECLShower->getTheta();
+  const double phi = aECLShower->getPhi();
+  return energy * sin(theta) * cos(phi);
 }
 
 
@@ -47,22 +42,19 @@ float ECLGamma::getPy() const
 {
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->getEnergy();
-  double m_theta = aECLShower->getTheta();
-  double m_phi = aECLShower->getPhi();
-  double m_py = m_energy * sin(m_theta) * sin(m_phi);
-  return (float)m_py;
+  const double energy = aECLShower->getEnergy();
+  const double theta = aECLShower->getTheta();
+  const double phi = aECLShower->getPhi();
+  return energy * sin(theta) * sin(phi);
 }
 
 float ECLGamma::getPz() const
 {
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->getEnergy();
-  double m_theta = aECLShower->getTheta();
-  double m_pz = m_energy * cos(m_theta);
-
-  return (float)m_pz;
+  const double energy = aECLShower->getEnergy();
+  const double theta = aECLShower->getTheta();
+  return energy * cos(theta);
 }
 
 
@@ -71,8 +63,7 @@ float ECLGamma::getEnergy() const
   TVector3 momentum(0., 0., 0.);
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->getEnergy();
-  return (float)m_energy;
+  return aECLShower->getEnergy();
 }
 
 
@@ -82,113 +73,49 @@ void ECLGamma::getErrorMatrix(TMatrixFSym& m_errorMatrix) const
 
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double EnergyError = aECLShower->getEnergyError();
-  double ThetaError = aECLShower->getThetaError();
-  double PhiError = aECLShower->getPhiError();
-  double m_energy = aECLShower->getEnergy();
-  double m_theta = aECLShower->getTheta();
-  double m_phi = aECLShower->getPhi();
+  const double EnergyError = aECLShower->getEnergyError();
+  const double ThetaError = aECLShower->getThetaError();
+  const double PhiError = aECLShower->getPhiError();
+  const double energy = aECLShower->getEnergy();
+  const double theta = aECLShower->getTheta();
+  const double phi = aECLShower->getPhi();
 
   TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
-  errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
-  errEcl[ 1 ][ 0 ] = 0;
-  errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 1 ] = 0;
-  errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
+  errEcl[0][0] = EnergyError * EnergyError; // Energy
+  errEcl[1][0] = 0;
+  errEcl[1][1] = PhiError * PhiError; // Phi
+  errEcl[2][0] = 0;
+  errEcl[2][0] = 0;
+  errEcl[2][1] = 0;
+  errEcl[2][2] = ThetaError * ThetaError; // Theta
 
   TMatrixF  jacobian(4, 3);
-  double  cosPhi = cos(m_phi);
-  double  sinPhi = sin(m_phi);
-  double  cosTheta = cos(m_theta);
-  double  sinTheta = sin(m_theta);
-  double   E = m_energy;
+  const double cosPhi = cos(phi);
+  const double sinPhi = sin(phi);
+  const double cosTheta = cos(theta);
+  const double sinTheta = sin(theta);
+  const double E = energy;
 
-  jacobian[ 0 ][ 0 ] =       cosPhi * sinTheta;
-  jacobian[ 0 ][ 1 ] =  -E * sinPhi * sinTheta;
-  jacobian[ 0 ][ 2 ] =   E * cosPhi * cosTheta;
-  jacobian[ 1 ][ 0 ] =       sinPhi * sinTheta;
-  jacobian[ 1 ][ 1 ] =   E * cosPhi * sinTheta;
-  jacobian[ 1 ][ 2 ] =   E * sinPhi * cosTheta;
-  jacobian[ 2 ][ 0 ] =            cosTheta;
-  jacobian[ 2 ][ 1 ] =           0.0;
-  jacobian[ 2 ][ 2 ] =  -E      * sinTheta;
-  jacobian[ 3 ][ 0 ] =           1.0;
-  jacobian[ 3 ][ 1 ] =           0.0;
-  jacobian[ 3 ][ 2 ] =           0.0;
+  jacobian[0][0] =       cosPhi * sinTheta;
+  jacobian[0][1] =  -E * sinPhi * sinTheta;
+  jacobian[0][2] =   E * cosPhi * cosTheta;
+  jacobian[1][0] =       sinPhi * sinTheta;
+  jacobian[1][1] =   E * cosPhi * sinTheta;
+  jacobian[1][2] =   E * sinPhi * cosTheta;
+  jacobian[2][0] =            cosTheta;
+  jacobian[2][1] =           0.0;
+  jacobian[2][2] =  -E      * sinTheta;
+  jacobian[3][0] =           1.0;
+  jacobian[3][1] =           0.0;
+  jacobian[3][2] =           0.0;
   TMatrixFSym errCart(4);
   errCart = errEcl.Similarity(jacobian);
 
-
-  //std::cout<<"Gamma ErrorMatrixA ";
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j <= i ; j++) {
       m_errorMatrix[i][j] = errCart[i][j];
-      //std::cout<<m_errorMatrix[i][j]<<" ";
     }
   }
-  //std::cout<<std::endl;
 }
-
-/*
-void ECLGamma::getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const
-{
-
-  StoreArray<ECLShower> eclRecShowerArray;
-  ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double EnergyError = aECLShower->GetEnergyError();
-  double ThetaError = aECLShower->GetThetaError();
-  double PhiError = aECLShower->GetPhiError();
-  double m_energy = aECLShower->GetEnergy();
-  double m_theta = aECLShower->GetTheta();
-  double m_phi = aECLShower->GetPhi();
-
-  TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
-  errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy
-  errEcl[ 1 ][ 0 ] = 0;
-  errEcl[ 1 ][ 1 ] = PhiError * PhiError; // Phi
-  errEcl[ 2 ][ 0 ] = 0;
-  errEcl[ 2 ][ 1 ] = 0;
-  errEcl[ 2 ][ 2 ] = ThetaError * ThetaError; // Theta
-
-  TMatrixF  jacobian(4, 3);
-  double  cosPhi = cos(m_phi);
-  double  sinPhi = sin(m_phi);
-  double  cosTheta = cos(m_theta);
-  double  sinTheta = sin(m_theta);
-  double   E = m_energy;
-
-  jacobian[ 0 ][ 0 ] =       cosPhi * sinTheta;
-  jacobian[ 0 ][ 1 ] =  -E * sinPhi * sinTheta;
-  jacobian[ 0 ][ 2 ] =   E * cosPhi * cosTheta;
-  jacobian[ 1 ][ 0 ] =       sinPhi * sinTheta;
-  jacobian[ 1 ][ 1 ] =   E * cosPhi * sinTheta;
-  jacobian[ 1 ][ 2 ] =   E * sinPhi * cosTheta;
-  jacobian[ 2 ][ 0 ] =            cosTheta;
-  jacobian[ 2 ][ 1 ] =           0.0;
-  jacobian[ 2 ][ 2 ] =  -E      * sinTheta;
-  jacobian[ 3 ][ 0 ] =           1.0;
-  jacobian[ 3 ][ 1 ] =           0.0;
-  jacobian[ 3 ][ 2 ] =           0.0;
-  TMatrixFSym errCart(4);
-  errCart = errEcl.Similarity(jacobian);
-
-  //std::cout<<"Gamma ErrorMatrixA ";
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j <= i ; j++) {
-      m_errorMatrix[i][j] = errCart[i][j];
-      //std::cout<<m_errorMatrix[i][j]<<" ";
-    }
-  }
-  m_errorMatrix[4][4] = 1.;
-  m_errorMatrix[5][5] = 1.;
-  m_errorMatrix[6][6] = 1.;
-
-  //std::cout<<std::endl;
-}
-
-*/
-
 
 ClassImp(ECLGamma)

@@ -42,12 +42,7 @@ namespace Belle2 {
     /*! Get Shower Id
      * @return Shower Id
      */
-    int GetShowerId() const { return m_ShowerId ; }
-
-    /*! Get Shower Id
-     * @return Shower Id
-     */
-    int getShowerId() const { return m_ShowerId ; }
+    int getShowerId() const { return m_ShowerId; }
 
     /*! Get TVector3 Momentum reading ECLShower through ShowerId
      * @return Momentum from ECLShower
@@ -89,10 +84,6 @@ namespace Belle2 {
      */
     void getErrorMatrix(TMatrixFSym& m_errorMatrix) const;
     //! The method to get return TMatrixT<float>   4 Momentum Error Matrix
-
-    // void getErrorMatrix7x7(TMatrixFSym& m_errorMatrix) const;
-    // The method to get return TMatrixT<float>, to become obsolete.
-    // 20150531 KM.
 
   private:
     int m_ShowerId;        /**< shower id of this Gamma */

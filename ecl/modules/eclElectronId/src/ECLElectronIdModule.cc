@@ -82,11 +82,11 @@ void ECLElectronIdModule::event()
     int nClusters = relShowers.size();
 
     for (const auto& eclShower : relShowers) {
-      const double shEnergy = eclShower.GetEnergy();
+      const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;
       if (shEnergy > maxEnergy) {
         maxEnergy = shEnergy;
-        e9e25 = eclShower.GetE9oE25();
+        e9e25 = eclShower.getE9oE25();
       }
       nCrystals += int(eclShower.getNHits());
     }

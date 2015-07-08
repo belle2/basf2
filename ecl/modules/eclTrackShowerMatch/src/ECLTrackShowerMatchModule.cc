@@ -80,7 +80,7 @@ void ECLTrackShowerMatchModule::event()
 
     for (const auto& id : clid) {
       const auto ish = find_if(eclRecShowers.begin(), eclRecShowers.end(),
-      [&](const ECLShower & element) { return element.GetShowerId() == id; }
+      [&](const ECLShower & element) { return element.getShowerId() == id; }
                               );
       if (ish != eclRecShowers.end()) {
         const ECLShower* shower = &(*ish);

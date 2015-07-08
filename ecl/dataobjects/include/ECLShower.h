@@ -97,152 +97,75 @@ namespace Belle2 {
     /*! Get Shower Id
      * @return Shower Id
      */
-    int GetShowerId() const { return m_ShowerId ; }
+    int getShowerId() const { return m_ShowerId; }
     /*! Get Energy
      * @return Energy
      */
-    float GetEnergy() const { return m_Energy ; }
+    float getEnergy() const { return m_Energy; }
     /*! Get Theta
      * @return Theta
      */
-    float GetTheta() const { return m_Theta ; }
+    float getTheta() const { return m_Theta; }
     /*! Get Phi
      * @return Phi
      */
-    float GetPhi() const { return m_Phi ; }
+    float getPhi() const { return m_Phi; }
     /*! Get R
      * @return R
      */
-    float GetR() const { return m_R ; }
+    float getR() const { return m_R; }
     /*! Get Error of E, theta, phi
      * @return Error E, theta, phi
      */
-    void GetError(float  ErrorArray[3]) const { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
+    void getError(float  ErrorArray[3]) const { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i]; } }
     /*! Get Error of Energy
      * @return Error of Energy
      */
-    float GetEnergyError() const { return m_Error[0] ;}
+    float getEnergyError() const { return m_Error[0];}
     /*! Get Error of theta
      * @return Error of theta
      */
-    float GetThetaError() const { return  m_Error[1] ;}
+    float getThetaError() const { return  m_Error[1];}
     /*! Get Error of phi
      * @return Error of phi
      */
-    float GetPhiError() const {return m_Error[2] ;}
+    float getPhiError() const {return m_Error[2];}
     /*! Get Mass
      * @return Mass
      */
-    float GetMass() const { return m_Mass ; }
+    float getMass() const { return m_Mass; }
     /*! Get Width
      * @return Width
      */
-    float GetWidth() const { return m_Width ; }
+    float getWidth() const { return m_Width; }
     /*! Get E9oE25
      * @return E9oE25
      */
-    float GetE9oE25() const { return m_E9oE25 ; }
+    float getE9oE25() const { return m_E9oE25; }
     /*! Get E9oE25unf
      * @return E9oE25unf
      */
-    float GetE9oE25unf() const { return m_E9oE25unf ; }
+    float getE9oE25unf() const { return m_E9oE25unf; }
     /*! Get NHits
      * @return NHits
      */
-    float GetNHits() const { return m_NHits ; }
+    float getNHits() const { return m_NHits; }
     /*! Get Status
      * @return Status
      */
-    int GetStatus() const { return m_Status ; }
+    int getStatus() const { return m_Status; }
     /*! Get Grade
      * @return Grade
      */
-    int GetGrade() const { return m_Grade  ; }
+    int getGrade() const { return m_Grade; }
     /*! Get UncEnergy
      * @return UncEnergy
      */
-    float GetUncEnergy() const { return m_UncEnergy ; }
+    float getUncEnergy() const { return m_UncEnergy; }
     /*! Get Time
      * @return Time
      */
-    float GetTime() const { return m_Time ; }
-
-
-    /*! Get Shower Id
-     * @return Shower Id
-     */
-    int getShowerId() const { return m_ShowerId ; }
-    /*! Get Energy
-     * @return Energy
-     */
-    float getEnergy() const { return m_Energy ; }
-    /*! Get Theta
-     * @return Theta
-     */
-    float getTheta() const { return m_Theta ; }
-    /*! Get Phi
-     * @return Phi
-     */
-    float getPhi() const { return m_Phi ; }
-    /*! Get R
-     * @return R
-     */
-    float getR() const { return m_R ; }
-    /*! Get Error of E, theta, phi
-     * @return Error E, theta, phi
-     */
-    void getError(float  ErrorArray[3]) const { for (int i = 0; i < 3; i++) { ErrorArray[i] = m_Error[i] ;} }
-    /*! Get Error of Energy
-     * @return Error of Energy
-     */
-    float getEnergyError() const { return m_Error[0] ;}
-    /*! Get Error of theta
-     * @return Error of theta
-     */
-    float getThetaError() const { return  m_Error[1] ;}
-    /*! Get Error of phi
-     * @return Error of phi
-     */
-    float getPhiError() const {return m_Error[2] ;}
-    /*! Get Mass
-     * @return Mass
-     */
-    float getMass() const { return m_Mass ; }
-    /*! Get Width
-     * @return Width
-     */
-    float getWidth() const { return m_Width ; }
-    /*! Get E9oE25
-     * @return E9oE25
-     */
-    float getE9oE25() const { return m_E9oE25 ; }
-    /*! Get E9oE25unf
-     * @return E9oE25unf
-     */
-    float getE9oE25unf() const { return m_E9oE25unf ; }
-    /*! Get NHits
-     * @return NHits
-     */
-    float getNHits() const { return m_NHits ; }
-    /*! Get Status
-     * @return Status
-     */
-    int getStatus() const { return m_Status ; }
-    /*! Get Grade
-     * @return Grade
-     */
-    int getGrade() const { return m_Grade  ; }
-    /*! Get UncEnergy
-     * @return UncEnergy
-     */
-    float getUncEnergy() const { return m_UncEnergy ; }
-    /*! Get Time
-     * @return Time
-     */
-    float getTime() const { return m_Time ; }
-
-
-
+    float getTime() const { return m_Time; }
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const

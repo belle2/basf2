@@ -18,9 +18,9 @@ TVector3 ECLGamma::getMomentum() const
   TVector3 momentum(0., 0., 0.);
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->GetEnergy();
-  double m_theta = aECLShower->GetTheta();
-  double m_phi = aECLShower->GetPhi();
+  double m_energy = aECLShower->getEnergy();
+  double m_theta = aECLShower->getTheta();
+  double m_phi = aECLShower->getPhi();
   double m_px = m_energy * sin(m_theta) * cos(m_phi);
   double m_py = m_energy * sin(m_theta) * sin(m_phi);
   double m_pz = m_energy * cos(m_theta);
@@ -35,9 +35,9 @@ float ECLGamma::getPx() const
 {
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->GetEnergy();
-  double m_theta = aECLShower->GetTheta();
-  double m_phi = aECLShower->GetPhi();
+  double m_energy = aECLShower->getEnergy();
+  double m_theta = aECLShower->getTheta();
+  double m_phi = aECLShower->getPhi();
   double m_px = m_energy * sin(m_theta) * cos(m_phi);
   return (float)m_px;
 }
@@ -47,9 +47,9 @@ float ECLGamma::getPy() const
 {
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->GetEnergy();
-  double m_theta = aECLShower->GetTheta();
-  double m_phi = aECLShower->GetPhi();
+  double m_energy = aECLShower->getEnergy();
+  double m_theta = aECLShower->getTheta();
+  double m_phi = aECLShower->getPhi();
   double m_py = m_energy * sin(m_theta) * sin(m_phi);
   return (float)m_py;
 }
@@ -58,8 +58,8 @@ float ECLGamma::getPz() const
 {
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->GetEnergy();
-  double m_theta = aECLShower->GetTheta();
+  double m_energy = aECLShower->getEnergy();
+  double m_theta = aECLShower->getTheta();
   double m_pz = m_energy * cos(m_theta);
 
   return (float)m_pz;
@@ -71,7 +71,7 @@ float ECLGamma::getEnergy() const
   TVector3 momentum(0., 0., 0.);
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double m_energy = aECLShower->GetEnergy();
+  double m_energy = aECLShower->getEnergy();
   return (float)m_energy;
 }
 
@@ -82,12 +82,12 @@ void ECLGamma::getErrorMatrix(TMatrixFSym& m_errorMatrix) const
 
   StoreArray<ECLShower> eclRecShowerArray;
   ECLShower* aECLShower = eclRecShowerArray[m_ShowerId];
-  double EnergyError = aECLShower->GetEnergyError();
-  double ThetaError = aECLShower->GetThetaError();
-  double PhiError = aECLShower->GetPhiError();
-  double m_energy = aECLShower->GetEnergy();
-  double m_theta = aECLShower->GetTheta();
-  double m_phi = aECLShower->GetPhi();
+  double EnergyError = aECLShower->getEnergyError();
+  double ThetaError = aECLShower->getThetaError();
+  double PhiError = aECLShower->getPhiError();
+  double m_energy = aECLShower->getEnergy();
+  double m_theta = aECLShower->getTheta();
+  double m_phi = aECLShower->getPhi();
 
   TMatrixFSym  errEcl(3);   // 3x3 initialize to zero
   errEcl[ 0 ][ 0 ] = EnergyError * EnergyError; // Energy

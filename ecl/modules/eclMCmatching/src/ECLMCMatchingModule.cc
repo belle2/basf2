@@ -256,9 +256,14 @@ void ECLMCMatchingModule::event()
     }
   } // imdst
 
+  B2INFO("Event: " << m_nEvent);
   for (int ii = 0; ii < ECLClustertoMCPart.getEntries(); ii++) {
-    //cout << "ClusterID: " << ECLClustertoMCPart[ii].getFromIndex() << " Energy: " <<  eclClusterArray[ECLClustertoMCPart[ii].getFromIndex()]->getEnergy() << " MCParticle: " << ECLClustertoMCPart[ii].getToIndex() <<  " Weight: " << ECLClustertoMCPart[ii].getWeight() << endl;
+    B2INFO("ClusterID: " << ECLClustertoMCPart[ii].getFromIndex());
+    B2INFO("Energy: " <<  eclClusterArray[ECLClustertoMCPart[ii].getFromIndex()]->getEnergy());
+    B2INFO("From MCParticle: " << ECLClustertoMCPart[ii].getToIndex());
+    B2INFO("With weight: " << ECLClustertoMCPart[ii].getWeight());
   }
+  B2INFO("-------------------------");
   m_nEvent++;
 }
 

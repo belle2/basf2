@@ -62,8 +62,10 @@ void ECLPi0(TTree* pi0_tree)
   hPi0s->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed energy for 1 GeV Pi0s")); 
   hPi0s->GetListOfFunctions()->Add(new TNamed("Check","Should not be biased"));
   hPi0s->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  gPad->RedrawAxis();
   pi0_tree->Draw("eclPi0Energy>>hPi0s");
   hPi0s->Write();
+  delete hPi0s;
 
   TH1F* hPi0mass = new TH1F("hPi0mass", "ECL combined Pi0 Mass for 1 GeV/c Pi0", 100, 0.08, 0.18);
   hPi0mass->GetXaxis()->SetTitle("Pi0 combined mass (GeV/c^{2})");
@@ -72,8 +74,10 @@ void ECLPi0(TTree* pi0_tree)
   hPi0mass->GetListOfFunctions()->Add(new TNamed("Check", 
     "Should not be biased"));
   hPi0mass->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
+  gPad->RedrawAxis();
   pi0_tree->Draw("eclPi0Mass>>hPi0mass");
   hPi0mass->Write();
+  delete hPi0mass;
 
   output->Close();
 }

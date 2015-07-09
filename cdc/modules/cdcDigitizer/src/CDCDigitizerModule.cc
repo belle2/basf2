@@ -499,6 +499,16 @@ unsigned short CDCDigitizerModule::getADCCount(const float charge)
 {
   // The current value is taken from E. Nakano from some test beam results. This should be a somewhat realistic value, but doesn't need to be exact.
   // Similar as geometry parameters are for the ideal geometry, not the real one.
-  float conversionChargeToADC = (100.0 / 3.2) * 1e6;
-  return static_cast<unsigned short>(conversionChargeToADC * charge);
+  const float conversionChargeToADC = (100.0 / 3.2) * 1e6;
+  //  return static_cast<unsigned short>(conversionChargeToADC * charge);
+  //round-down -> round-up to be consistent with real adc module
+  unsigned short adcCount = static_cast<unsigned short>(std::ceil(conversionChargeToADC * charge));
+  /*
+  unsigned short adcCount1 = static_cast<unsigned short>(conversionChargeToADC * charge) + 1;
+  if (adcCount != adcCount1) {
+    std::cout << adcCount <<" " << adcCount1 << std::endl;
+    exit(-1);
+  }
+  */
+  return adcCount;
 }

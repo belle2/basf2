@@ -32,9 +32,11 @@ namespace Belle2 {
                       bool,
                       float, float)
       {
-        const float EnergyLossOffset =  1.6 * 1e-8; // GeV
+        //        const float EnergyLossOffset =  1.6 * 1e-8; // GeV
+        //        return (adcCount * m_conversionFactor + EnergyLossOffset);
 
-        return (adcCount * m_conversionFactor + EnergyLossOffset);
+        //round-down -> round-up to be consistent with real adc module
+        return (static_cast<float>(adcCount) - 0.5) * m_conversionFactor;
       }
 
     private:

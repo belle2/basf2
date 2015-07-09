@@ -174,8 +174,26 @@ namespace Belle2 {
       // Get Material
       //----------------
 
+      //N.B. In the following two lines, the He density is taken from cdc/data/CDC-Materials.xml; the Ethane density is from G4_ETHANE (not from geometry/data/BasicMaterials.xml (the material 'Ethane' in BasicMaterials.xml is actually not defined since its name is found in the G4 internal material table).
+      /*
       G4Material* medHelium = G4Material::GetMaterial(Helium.c_str());
       G4Material* medEthane = geometry::Materials::get(Ethane.c_str());
+      */
+      /*
+      std::cout << (geometry::Materials::get("G4_He"))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
+      std::cout << (geometry::Materials::get(Helium.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
+      std::cout << (geometry::Materials::get(Ethane.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
+      std::cout << (geometry::Materials::get(Aluminum.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
+      std::cout << (geometry::Materials::get(Tungsten.c_str()))->GetDensity()/(CLHEP::g/CLHEP::cm3) << std::endl;
+      //      exit(-1);
+      */
+      //N.B. There is no need to deinfe Helium, Aluminum and Tungsten in CDC-Materials.xml. Instead, they should be taken from the G4 internal table, i.e. G4_He, G4_Al and G4_W. => Modify the following code and CDC-Materials.xml eventually.
+      G4NistManager* man = G4NistManager::Instance();
+      const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
+      G4Material* medHelium = man->ConstructNewGasMaterial("CDCHeGas",
+                                                           "G4_He", realTemperture, 1. * CLHEP::atmosphere);
+      G4Material* medEthane = man->ConstructNewGasMaterial("CDCEthaneGas", "G4_ETHANE", realTemperture, 1. * CLHEP::atmosphere);
+
       G4Material* medAluminum = G4Material::GetMaterial(Aluminum.c_str());
       G4Material* medTungsten = G4Material::GetMaterial(Tungsten.c_str());
       G4Material* medCFRP = geometry::Materials::get(CFRP.c_str());
@@ -235,7 +253,8 @@ namespace Belle2 {
 
       // Create cdc gas
       double density = denHelium + denEthane + denAluminum + denTungsten;
-      G4Material* cdcMed = new G4Material("CDCGasWire", density, 4);
+      //      G4Material* cdcMed = new G4Material("CDCGasWire", density, 4);
+      G4Material* cdcMed = new G4Material("CDCGasWire", density, 4, kStateGas, realTemperture);
       cdcMed->AddMaterial(medHelium, denHelium / density);
       cdcMed->AddMaterial(medEthane, denEthane / density);
       cdcMed->AddMaterial(medTungsten, denTungsten / density);
@@ -246,7 +265,8 @@ namespace Belle2 {
 
       if (cdcgp.getMaterialDefinitionMode() == 2) {
         double density = denHelium + denEthane;
-        cdcMedGas = new G4Material("realCDCGas", density, 2);
+        //  cdcMedGas = new G4Material("CDCRealGas", density, 2);
+        cdcMedGas = new G4Material("CDCRealGas", density, 2, kStateGas, realTemperture);
         cdcMedGas->AddMaterial(medHelium, denHelium / density);
         cdcMedGas->AddMaterial(medEthane, denEthane / density);
         /*

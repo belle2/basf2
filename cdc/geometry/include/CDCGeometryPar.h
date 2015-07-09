@@ -737,9 +737,9 @@ namespace Belle2 {
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
 
-      double m_XT[MAX_N_SLAYERS][2][19][7][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
-      double m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
-      double m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
+      float m_XT[MAX_N_SLAYERS][2][19][7][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
+      float m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
+      float m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire. */
 
       unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/

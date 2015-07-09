@@ -337,7 +337,6 @@ namespace Belle2 {
        *
        * At the moment this doesn't work sadly.
        */
-      /*
 
       // Perform splot training with __weight__cdf__
       std::string signal_cdf_weight = "__weight__ * __weight__cdf__";
@@ -357,8 +356,8 @@ namespace Belle2 {
         B2WARNING("Train more than one method with advanced sPlot technique, the output of the first method is used as sPlot anti-correlation boost!");
       }
 
-      TMVAInterface::ExpertConfig config(m_config.getPrefix(), m_config.getWorkingDirectory(), methodName, 1);
-      auto expert = std::unique_ptr<TMVAInterface::Expert>(TMVAInterface::Expert(config, true));
+      TMVAInterface::ExpertConfig config(m_config.getPrefix(), std::string("."), methodName, 1);
+      auto expert = std::unique_ptr<TMVAInterface::Expert>(new TMVAInterface::Expert(config, true));
 
       // Just to be save, we reset all branch addresses before we access them via getRow!
       setBranchAddresses();
@@ -367,7 +366,7 @@ namespace Belle2 {
       std::vector<float> probability(nEvents);
       for (unsigned int i = 0; i < nEvents; ++i) {
         // Regularisation: Map output to [0.1, 0.9]
-        probability[i] = expert->analyse(getRow(i))*0.8 + 0.1;
+        probability[i] = expert->analyse(getRow(i)) * 0.8 + 0.1;
       }
       addVariable("__weight__probability__", probability);
 
@@ -385,7 +384,6 @@ namespace Belle2 {
       setSPlotClass(3);
       train(factoryOption, prepareOption, "", signal_sac_weight, background_sac_weight);
 
-      */
 
       // Enable all branches
       // Otherwise the __weight__splot__ branch seems to be not available in the file.

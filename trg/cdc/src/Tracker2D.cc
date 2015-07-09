@@ -81,7 +81,7 @@ TRGCDCTracker2D::simulate(void) {
             if (output(i)->signal())
                 delete output(i)->signal();
 
-    //...Create an input signal bundle from 5 TSF boards...
+    //...Create a combined input signal bundle from 5 TSF boards...
     TRGSignalBundle isb = TRGSignalBundle(name() +
                                           "-InputSignalBundle",
                                           clockData());
@@ -156,25 +156,34 @@ TCTracker2D:: unpacker(const TRGState & input,
 
     //...Constants...
 //  const unsigned noHit = 0b11111111;
+    const unsigned sizeSB = 420; // bits
+    const unsigned sizeTS = 21;  // bits
+    const unsigned sizeID = 8;   // bits
+    const unsigned posID  = 13;  // bit position
 
     //...Store hit TSF id...
-    unsigned tsfId[5][22]; // Max. 22 TSF ID is sent
+    unsigned tsfId[5][20]; // Max. 20 TSF ID is sent
+    bool hitFound = false;
     for (unsigned i = 0; i < 5; i++) {
-        for (unsigned j = 0; j < 22; j++) {
-            tsfId[i][j] = input.subset(i * 141 + 22 * j + 13, 9);
-            if (tsfId[i][j] != 0)
-                output.set(tsfId[i][j] * 16, true);
+        for (unsigned j = 0; j < 20; j++) {
+            unsigned jr = 20 - j - 1;
+            tsfId[i][jr] = input.subset(i * sizeSB + sizeTS * jr + posID,
+                                        sizeID);
+            if (tsfId[i][jr] != 0) {
+                output.set(tsfId[i][jr] * 16, true);
+                hitFound = true;
+            }
         }
     }
 
-    if (TRGDebug::level()) {
+    if (TRGDebug::level() && hitFound) {
         input.dump("", TRGDebug::tab() + "input bits:");
-
         cout << TRGDebug::tab() << "TSF hit ID" << endl;
         for (unsigned i = 0; i < 5; i++) {
-            cout << TRGDebug::tab() << "    ASL" << i << endl;
+            cout << TRGDebug::tab() << "    ASL" << i
+                 << " < " << nTSF(i) / 2 << endl;
             cout << TRGDebug::tab() << "        ";
-            for (unsigned j = 0; j < 22; j++) {
+            for (unsigned j = 0; j < 20; j++) {
                 cout << tsfId[i][j] << ",";
             }
             cout << endl;
@@ -191,7 +200,7 @@ TCTracker2D::hitInformation(const TRGState & registers) {
     _ts.clear();
 
     //...Set TSF hit information...
-    for (unsigned i = 0; i < nTSF(); i++) {
+    for (unsigned i = 0; i < nTSF() / 2; i++) {
         bool active = registers.subset(i * 16, 16).active();
         if (active)
             _ts.set(i, true);

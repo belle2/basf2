@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <limits>
 #include <iostream>
+#include <fstream>
 #include "trg/trg/Constants.h"
 #include "trg/trg/Utilities.h"
 #include "trg/trg/Debug.h"
@@ -285,6 +286,76 @@ TRGSignalBundle::ored(void) const {
     }
 
     return TRGSignal();
+}
+
+void
+TRGSignalBundle::dumpCOE(const string & fnIn) const {
+
+    string fn = fnIn;
+
+    if (fnIn.size() == 0)
+        fn = name();
+
+    //...Open a file to output...
+    ofstream file(fn, ios::out);
+    if (! file.is_open()) {
+ 	cout << "!!! " << name() << " can not open file : " << fn << endl;
+        return;
+    }
+
+    //...Determine start clock to output...
+    int clk0 = _clock->max();
+    vector<int> sc = stateChanges();
+    for (unsigned i = 0; i < sc.size(); i++) {
+        if (state(sc[i]).active()) {
+            clk0 = sc[i];
+            break;
+        }
+    }
+
+    //...Determine end clock to output...
+    int clk1 = _clock->min();
+    for (unsigned i = 0; i < sc.size(); i++) {
+        if (sc[i] < clk0)
+            continue;
+
+        if (state(sc[i]).active()) {
+            clk1 = sc[i];
+        }
+    }
+
+    //...No active case...
+    if (clk0 > clk1) {
+        clk0 = 0;
+        clk1 = 1;
+    }
+
+    TRGState tmp = state(0);
+    const TRGSignalVector & cc = _clock->clockCounter();
+
+    file << "; " << name() << endl;
+    file << "; generated at " << TRGUtil::dateString() << endl;
+    file << "; start clock = " << clk0 << endl;
+    file << "; end clock = " << clk1 << endl;
+    file << "; bit size = " << tmp.size() << " + clock counter(" << cc.size()
+         << ")" << endl;
+    file << ";" << endl;
+    file << "memory_initialization_radix=2;" << endl;
+    file << "memory_initialization_vector=" << endl;
+
+    for (int i = clk0; i <= clk1; i++) {
+        TRGState sd = state(i);
+        TRGState sc = cc.state(i);
+        file << sc;
+        file << sd;
+        if (i == clk1)
+            file << ";" << endl;
+        else
+            file << "," << endl;
+    }
+
+    file.close();
+    
 }
 
 } // namespace Belle2

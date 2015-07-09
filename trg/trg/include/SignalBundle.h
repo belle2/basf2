@@ -85,6 +85,9 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
+    /// makes coe output.
+    void dumpCOE(const std::string & fileName = "") const;
+
   public:// Operators
 
     /// changes clock.

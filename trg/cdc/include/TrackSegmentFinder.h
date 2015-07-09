@@ -121,14 +121,10 @@ namespace Belle2 {
     /// Use LUT for find TSHit
     vector<TRGSignalVector*> findTSHit(TRGSignalVector * eachInput, int);
   
-    /// Use LUT for find TSHit (clock counter cost effective version)
-    vector<TRGSignalVector*> findTSHit2(TRGSignalVector * eachInput, int);
-  
-    /// Simulates inner TSF responce.
-    vector<TRGSignalVector*> simulateInner(TRGSignalVector & eachInput, int);
-  
     /// Packing output for tracker
-    TRGSignalVector* packerOuterTracker(vector<TRGSignalVector*>, vector<int>, int);
+    TRGSignalVector * packerOuterTracker(vector<TRGSignalVector *> &,
+                                       vector<int> &,
+                                       const unsigned);
 
     /// Packing output for evtTime & Low pT
     TRGSignalVector* packerOuterEvt(vector<TRGSignalVector*>, vector<int>, int);
@@ -143,11 +139,44 @@ namespace Belle2 {
     /// firmware simulation.
     void simulateBoard(void);
 
-      /// Firmware simulation for the outers. yi
-      void simulateInner(void);
+      /// Firmware simulation. yi
+      void simulate(void);
 
-      /// Firmware simulation for the outers. yi
-      void simulateOuter(void);
+      /// Firmware simulation. Unified version of inner and outer : yi
+      void simulate2(void);
+
+      /// Creates the hit maps for the inner.
+      void hitMapInner(void);
+
+      /// Creates the hit maps for the outer.
+      void hitMapOuter(void);
+
+      /// Creates input signals to TSF for the inner.
+      void inputInner(const unsigned id,
+                      const unsigned nTSF,
+                      TRGSignalVector * s);
+
+      /// Creates input signals to TSF for the outer.
+      void inputOuter(const unsigned id,
+                      const unsigned nTSF,
+                      TRGSignalVector * s);
+
+      /// Simulate TSF response for the inner
+      vector<TRGSignalVector *> simulateInner(TRGSignalVector & in,
+                                              unsigned id);
+  
+      /// Simulate TSF response for the inner
+      vector<TRGSignalVector *> simulateOuter(TRGSignalVector * in,
+                                              unsigned id);
+
+      /// Simulate TSF response (unified version)
+      vector<TRGSignalVector *> simulateTSF(TRGSignalVector * in,
+                                            unsigned id);
+
+      /// Output packer for tracker
+      TRGSignalVector * packerForTracker(vector<TRGSignalVector *> &,
+                                         vector<int> &,
+                                         const unsigned);
 
     double mkint(TRGState );
 
@@ -155,7 +184,13 @@ namespace Belle2 {
 
   private:
 
-    /// Make TRGSivnals for the priority timing bits.
+      /// Firmware simulation for the outers. yi
+      void simulateInner(void);
+
+      /// Firmware simulation for the outers. yi
+      void simulateOuter(void);
+
+      /// Make TRGSignals for the priority timing bits.
       void priorityTiming(unsigned tsfID,
                           const unsigned nTSF,
                           TRGSignalVector & s,
@@ -163,15 +198,18 @@ namespace Belle2 {
                           const TRGSignal & right,
                           const TRGSignal & left) const;
 
-    /// Make TRGSivnals for the fastest timing bits.
+      /// Make TRGSignals for the fastest timing bits.
       void fastestTimingInner(unsigned tsfID,
                               const unsigned nTSF,
                               TRGSignalVector & s) const;
 
-    /// Make TRGSivnals for the fastest timing bits.
+      /// Make TRGSignals for the fastest timing bits.
       void fastestTimingOuter(unsigned tsfID,
                               const unsigned nTSF,
                               TRGSignalVector & s) const;
+
+      /// Add TSF ID to timing signal vector for the output.
+      static void addID(TRGSignalVector & s, unsigned id);
 
   private:
 

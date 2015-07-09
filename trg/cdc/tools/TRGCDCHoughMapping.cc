@@ -63,6 +63,11 @@ main(int, char **) {
     outc << endl << "}" << endl;
 
     outc.close();
+
+    //...Termination...
+    cout << "Files generated" << endl;
+    cout << "    c++ for tsim firmware : " << fnc << endl;
+//  cout << "    text file for axial super layer : " << 
 }
 
 void
@@ -275,10 +280,13 @@ superLayer(const unsigned id) {
                     
                 }
 
-                else if(r2=1 && r1!=1) {
+//iw            else if(r2=1 && r1!=1) {
+                else if (r2 ==1 && r1 != 1) {
 
                     if( r2<=rminus  ) {
-                        if( r2=1 && minus1>0 ) {    u=u+1;
+//iw                    if( r2=1 && minus1>0 ) {    u=u+1;
+                        if (r2 == 1 && minus1 > 0) {
+                            u = u + 1;
                             if (u!=0) {
  //                 outputp <<setw(11)<<"I"<<u<<"=>TS("<< i+1  <<"),"<< endl;
  //                  outputp <<SL<<" "<< i <<" "  ;

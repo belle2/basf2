@@ -60,6 +60,9 @@ class TRGSignalVector : public std::vector<TRGSignal> {
     /// returns true if there is a signal.
     bool active(void) const;
 
+    /// returns true if there is a signal at clock position.
+    bool active(int clockPosition) const;
+
     /// returns a list of clock position of state change.
     std::vector<int> stateChanges(void) const;
 
@@ -83,6 +86,9 @@ class TRGSignalVector : public std::vector<TRGSignal> {
 
     /// appends TRGSignal.
     TRGSignalVector & operator+=(const TRGSignal &);
+
+    /// appends TRGSignalVector.
+    TRGSignalVector & operator+=(const TRGSignalVector &);
 
     /// compare two TRGSignalVectors.
     bool operator==(const TRGSignalVector &) const;

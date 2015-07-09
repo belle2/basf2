@@ -33,6 +33,9 @@ class TRGState {
     /// Default constructor.
     TRGState(unsigned bitSize = 0);
 
+    /// Constructor with unsigned.
+    TRGState(unsigned bitSize, unsigned value);
+
     /// Constructor.
     TRGState(std::vector<bool> states);
 

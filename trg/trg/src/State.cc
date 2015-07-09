@@ -39,6 +39,23 @@ TRGState::TRGState(unsigned bitSize)
 	_state = (unsigned *) calloc(_n, _su);
 }
 
+TRGState::TRGState(unsigned bitSize, unsigned value)
+    : _size(bitSize),
+      _n(0),
+      _state(0) {
+    _n = _size / _bsu;
+    if (_size % _bsu) ++_n;
+    if (_n)
+	_state = (unsigned *) calloc(_n, _su);
+
+    for (unsigned i = 0; i < bitSize; i++) {
+	const unsigned wp = i / _bsu;
+	const unsigned bp = i % _bsu;
+	if (value & (1 << i))
+	    _state[wp] |= (1 << bp);
+    }
+}
+
 TRGState::TRGState(unsigned bitSize, const bool * const s)
     : _size(bitSize),
       _n(0),
@@ -144,7 +161,6 @@ TRGState::TRGState(const char * inChar, unsigned inType)
   }
 
 }
-
 
 TRGState::~TRGState() {
     if (_state)

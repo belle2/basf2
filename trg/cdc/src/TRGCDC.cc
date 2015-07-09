@@ -1984,116 +1984,63 @@ TRGCDC::fastSimulation(void) {
     const bool trackSegmentSimulationOnly = _fastSimulationMode & 1;
     const bool trackSegmentClockSimulation = _fastSimulationMode & 2;
 
+    //...TSF simulation...
     _tsFinder->doit(_tss,
                     trackSegmentClockSimulation,
                     _segmentHits,
                     _segmentHitsSL);
-
-    //    //...Store TS hits...
-    //    const unsigned n = _tss.size();
-    //    for (unsigned i = 0; i < n; i++) {
-    //	TCSegment & s = * _tss[i];
-    //	s.simulate(trackSegmentClockSimulation);
-    //	if (s.signal().active()) {
-    //            TCSHit * th = new TCSHit(s);
-    //            s.hit(th);
-    //            _segmentHits.push_back(th);
-    //            _segmentHitsSL[s.layerId()].push_back(th);
-    //
-    //	    //...Create TCShit...
-    ////	    unsigned j = 0;
-    ////	    const TCWire * w = s[j];
-    ////	    TCSHit * th = 0;
-    ////	    while (w) {
-    ////		const TCWHit * h = w->hit();
-    ////		if (h) {
-    ////		    if (! th) {
-    ////			th = new TCSHit(s);
-    ////			s.hit(th);
-    ////			_segmentHits.push_back(th);
-    ////			_segmentHitsSL[s.layerId()].push_back(th);
-    ////		    }
-    ////		    s._hits.push_back(h);
-    ////		}
-    ////		w = s[++j];
-    ////	    }
-    //	}
-    //    }
-    //
-    //    if (TRGDebug::level() > 1) {
-    //	cout << TRGDebug::tab() << "TS hit list" << endl;
-    //	string dumpOption = "trigger";
-    //	if (TRGDebug::level() > 2)
-    //	    dumpOption = "detail";
-    //	for (unsigned i = 0; i < nSegments(); i++) {
-    //	    const TCSegment & s = segment(i);
-    //	    if (s.signal().active())
-    //		s.dump(dumpOption, TRGDebug::tab(4));
-    //	}
-    //
-    //	cout << TRGDebug::tab() << "TS hit list (2)" << endl;
-    //	if (TRGDebug::level() > 2)
-    //	    dumpOption = "detail";
-    //	for (unsigned i = 0; i < _segmentHits.size(); i++) {
-    //	    const TCSHit & s = * _segmentHits[i];
-    //	    s.dump(dumpOption, TRGDebug::tab(4));
-    //	}
-    //
-    //	cout << TRGDebug::tab() << "TS hit list (3)" << endl;
-    //	if (TRGDebug::level() > 2)
-    //	    dumpOption = "detail";
-    //	for (unsigned j = 0; j < _superLayers.size(); j++) {
-    //	    for (unsigned i = 0; i < _segmentHitsSL[j].size(); i++) {
-    //		const vector<TCSHit*> & s = _segmentHitsSL[j];
-    //		for (unsigned k = 0; k < s.size(); k++)
-    //		    s[k]->dump(dumpOption, TRGDebug::tab(4));
-    //	    }
-    //	}
-    //    }
-
 
     if (trackSegmentSimulationOnly) {
         TRGDebug::leaveStage("TRGCDC fast simulation");
         return;
     }
 
-    //...2D tracker : Hough finder...
-    //cout<<"################start##########"<<endl; //JB: Please use TRGDebug
-	  if (TRGDebug::level()) cout << TRGDebug::tab() <<"################start##########"<<endl;
-    //vector<TCTrack *> trackList;
+    //...2D tracker...
     if (_perfect2DFinder)
         _pFinder->doit(trackList);
     else
         _hFinder->doit(trackList);
-    //cout<<"################end##########"<<endl; //JB: Please use TRGDebug
-    if (TRGDebug::level()) cout << TRGDebug::tab() <<"################end##########"<<endl;
-    //cout<<"Number of tracks: "<<trackList.size()<<endl; //JB: Please use TRGDebug
-    if (TRGDebug::level()) cout << TRGDebug::tab() <<"Number of tracks: "<<trackList.size()<<endl;
 
-    for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
-        const TCRelation& trackRelation = trackList[iTrack]->relation();
-        const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
-        //cout<<"Pt: "<<trackMCParticle.getMomentum().Pt()<<endl; //JB: Please use TRGDebug
-        if (TRGDebug::level()) cout << TRGDebug::tab() <<"Pt: "<<trackMCParticle.getMomentum().Pt()<<endl;
-	ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
-	vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
-	ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
-	if(trackMCParticle.getCharge()>0)
-            {phiout << (trackMCParticle.getMomentum().Phi()-M_PI/2)*360/(2*M_PI)<< endl;}
-	if(trackMCParticle.getCharge()<0 && (trackMCParticle.getMomentum().Phi()+M_PI/2)<0)
-            {phiout << ((trackMCParticle.getMomentum().Phi()+M_PI/2)+2*M_PI)*360/(2*M_PI)<< endl;}
-	else if(trackMCParticle.getCharge()<0 && (trackMCParticle.getMomentum().Phi()+M_PI/2)>0)
-            {phiout << (trackMCParticle.getMomentum().Phi()+M_PI/2)*360/(2*M_PI)<< endl;}
-    }
+    if (TRGDebug::level())
+        cout << TRGDebug::tab() << "Number of tracks : " << trackList.size()
+             << endl;
 
-    //...Perfect position test...
-    if (trackList.size()) {
-        vector<HepGeom::Point3D<double> > ppos =
-            trackList[0]->perfectPosition();
-        if (TRGDebug::level()) {
-            if (ppos.size() != 9) {
-                cout << TRGDebug::tab() << "There are only " << ppos.size()
-                     << " perfect positions" << endl;
+    //...Check MC relations...
+    for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
+        const TCRelation & trackRelation = trackList[iTrack]->relation();
+        const MCParticle & trackMCParticle = trackRelation.mcParticle(0);
+
+        if (TRGDebug::level())
+            cout << TRGDebug::tab() << "Pt : "
+                 << trackMCParticle.getMomentum().Pt() << endl;
+
+        //...Whose code?...
+        if (0) {
+            ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
+            vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
+            ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
+            if (trackMCParticle.getCharge()>0)
+                {phiout << (trackMCParticle.getMomentum().Phi()-M_PI/2)
+                        *360/(2*M_PI)<< endl;}
+            if (trackMCParticle.getCharge()<0 &&
+                (trackMCParticle.getMomentum().Phi()+M_PI/2)<0)
+                {phiout << ((trackMCParticle.getMomentum().Phi()+M_PI/2)+
+                            2*M_PI)*360/(2*M_PI)<< endl;}
+            else if(trackMCParticle.getCharge()<0 &&
+                    (trackMCParticle.getMomentum().Phi()+M_PI/2)>0)
+                {phiout << (trackMCParticle.getMomentum().Phi()+M_PI/2)
+                        *360/(2*M_PI)<< endl;}
+        }
+
+        //...Perfect position test...
+        if (trackList.size()) {
+            vector<HepGeom::Point3D<double> > ppos =
+                trackList[0]->perfectPosition();
+            if (TRGDebug::level()) {
+                if (ppos.size() != 9) {
+                    cout << TRGDebug::tab() << "There are only " << ppos.size()
+                         << " perfect positions" << endl;
+                }
             }
         }
     }
@@ -2445,15 +2392,15 @@ TRGCDC::firmwareSimulation(void) {
         _mergers[i]->simulate(); 
     }
 
-    // unsigned oldLevel = TRGDebug::level();
-    // TRGDebug::level(1);
+    unsigned oldLevel = TRGDebug::level();
+    TRGDebug::level(1);
 
     //...TSFs...
     const unsigned nTSFBoards = _tsfboards.size();
     for (unsigned i=0;i<nTSFBoards; i++){
-//	_tsfboards[i]->simulateBoard();
-//      _tsfboards[i]->simulateInner();
-        _tsfboards[i]->simulateOuter();
+//iw	_tsfboards[i]->simulateBoard();
+//      _tsfboards[i]->simulate();
+        _tsfboards[i]->simulate2();
     }
 
     //...Event Time... In ns scale. 
@@ -2476,7 +2423,7 @@ TRGCDC::firmwareSimulation(void) {
         _tracker2Ds[i]->simulate();
     }
 
-//  TRGDebug::level(oldLevel);
+    TRGDebug::level(oldLevel);
 
 #ifdef TRGCDC_DISPLAY
     dump("hits");

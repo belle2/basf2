@@ -96,12 +96,28 @@ TRGSignalVector::operator+=(const TRGSignal & left) {
     return * this;
 }
 
+TRGSignalVector &
+TRGSignalVector::operator+=(const TRGSignalVector & left) {
+    for (unsigned i = 0; i < left.size(); i++)
+        push_back(left[i]);
+    return * this;
+}
+
 bool
 TRGSignalVector::active(void) const {
     for (unsigned i = 0; i < size(); i++)
 	if ((* this)[i].active())
 	    return true;
     return false;
+}
+
+bool
+TRGSignalVector::active(int c) const {
+    TRGState s = state(c);
+    if (s.active())
+        return true;
+    else
+        return false;
 }
 
 std::vector<int>

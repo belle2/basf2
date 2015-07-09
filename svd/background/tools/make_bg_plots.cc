@@ -20,10 +20,10 @@ using namespace Belle2::SVD;
 typedef map<string, TFile*> filemap;
 /** Pairs (short name, ymax) to list quantities to plot and (optional) plot scales.*/
 set<tuple<string, double>> bar_quantities = {
-  tuple<string, double>("dose", 0.0),
-  tuple<string, double>("neutronFlux", 0.0),
-  tuple<string, double>("firedU", 0.0),
-  tuple<string, double>("firedV", 0.0),
+  tuple<string, double>("dose", 260.0),
+  tuple<string, double>("neutronFlux", 1.1e11),
+  tuple<string, double>("firedU", 5.0e6),
+  tuple<string, double>("firedV", 2.5e6),
   tuple<string, double>("occupancyU", 0.0),
   tuple<string, double>("occupancyV", 0.0)
 };

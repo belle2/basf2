@@ -11,7 +11,7 @@ from ROOT import Belle2
 
 class SVDTrigger(Module):
 
-    """Returns 1 if current event contains at least one SVDSimHit or one 
+    """Returns 1 if current event contains at least one SVDSimHit or one
        SVD-related BeamBackHit, 0 otherwise"""
 
     def initialize(self):

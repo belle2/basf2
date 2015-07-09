@@ -3,7 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr, Peter Kvasnicka                                              *
+ * Contributors: Thomas Kuhr, Peter Kvasnicka                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
   ("help,h", "print all available options")
   ("file", prog::value<string>(), "file name")
   ("time,t", prog::value<double>(), "real time of background sample in microseconds")
+  ("name,n", prog::value<string>(), "name of the background component")
   ;
 
   prog::positional_options_description posOptDesc;
@@ -57,10 +58,14 @@ int main(int argc, char* argv[])
       return 1;
     }
   }
+  bool setName = (varMap.count("name") > 0);
 
   // read parameters
   string fileName = varMap["file"].as<string>();
   double realTime = varMap["time"].as<double>();
+  string compName;
+  if (setName)
+    compName = varMap["name"].as<string>();
 
   // open the root file
   gErrorIgnoreLevel = kError;
@@ -91,6 +96,8 @@ int main(int argc, char* argv[])
 
   // update the IDs and write the updated BackgroundMetaData to the file
   bgMetaData->setRealTime(realTime * Unit::us);
+  if (setName)
+    bgMetaData->setBackgroundType(compName);
   if (newTree) {
     newTree->Fill();
     newTree->Write();
@@ -100,6 +107,8 @@ int main(int argc, char* argv[])
 
   cout << "File: " << fileName << endl;
   cout << "Real time set to " << realTime << " microseconds." << endl << endl;
+  if (setName)
+    cout << "Background type set to " << compName.c_str() << endl;
 
   return 0;
 }

@@ -33,7 +33,8 @@ namespace Belle2 {
         /** Constructor takes name, unit and range for the quantity. */
         BgValue(
           std::string name, std::string unit, double rangeLow, double rangeHigh, int nBins):
-          m_name(name), m_unit(unit), m_rangeLow(rangeLow), m_rangeHigh(rangeHigh), m_nBins(nBins) {
+          m_name(name), m_unit(unit), m_rangeLow(rangeLow), m_rangeHigh(rangeHigh), m_nBins(nBins)
+        {
           m_axisLabel = name + " [" + unit + "]";
         }
         std::string m_name;     /**< full name of the quantity */
@@ -133,6 +134,9 @@ namespace Belle2 {
         {"Touschek HER", 46},
         {"RBB LER", 29},      // greenish
         {"RBB HER", 30},
+        {"BHWide LER", 32},
+        {"BHWide_X", 36},
+        {"BHWide HER", 34},
         {"twoPhoton", 40},      // blue
         {"SynchRad LER", 25},      // grayish
         {"SynchRad HER", 28}

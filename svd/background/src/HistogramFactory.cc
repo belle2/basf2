@@ -25,8 +25,8 @@ HistogramFactory::HistogramFactory()
 {
   // Define the BgValues here. If useful, can be read from an xml.
   // Don't know the ranges for some cases.
-  m_valueDescriptions.insert(make_pair("dose", BgValue("Dose", "Gy/smy", 0, 1e3, 20)));
-  m_valueDescriptions.insert(make_pair("exposition", BgValue("Exposition", "J/cm2/s", 0, 1, 20)));
+  m_valueDescriptions.insert(make_pair("dose", BgValue("Dose", "Gy/smy", 0, 1e2, 20)));
+  m_valueDescriptions.insert(make_pair("exposition", BgValue("Exposition", "J/cm2/s", 0, 0.05, 20)));
   m_valueDescriptions.insert(make_pair("neutronFlux", BgValue("Neutron flux", "Hz/cm2", 0, 1e10, 20)));
   m_valueDescriptions.insert(make_pair("protonFlux", BgValue("Proton flux", "Hz/cm2", 0, 1e10, 20)));
   m_valueDescriptions.insert(make_pair("pionFlux", BgValue("Pion flux", "Hz/cm2", 0, 1e10, 20)));
@@ -158,16 +158,19 @@ TCanvas* HistogramFactory::PlotStackedBars(const component_tuples component_data
   hBarStack->Draw("B");
   hBarStack->GetXaxis()->SetTitle("SVD layer");
   if (ymax > 0) { // Set fixed scale
-    hBarStack->GetYaxis()->SetLimits(0, ymax);
-    hBarStack->GetYaxis()->SetRangeUser(0, ymax);
+    hBarStack->SetMinimum(0);
+    hBarStack->SetMaximum(ymax);
   }
+  hBarStack->GetYaxis()->SetLimits(0, ymax);
+  hBarStack->GetYaxis()->SetRangeUser(0, ymax);
   hBarStack->GetYaxis()->SetTitle(getAxisLabel(valueName).c_str());
   hBarLegend->Draw();
   c_barPlot->Modified(); c_barPlot->Update();
   return c_barPlot;
 }
 
-TCanvas* HistogramFactory::PlotCompareBars(TFile* f1, TFile* f2, const pair<string, string>& categories, const string& componentName, const string& valueName)
+TCanvas* HistogramFactory::PlotCompareBars(TFile* f1, TFile* f2, const pair<string, string>& categories,
+                                           const string& componentName, const string& valueName)
 {
   // Retrieve full value name from the BgValues map
   string fullValueName(getTitle(valueName));
@@ -238,9 +241,9 @@ TH1F* HistogramFactory::MakeFluencePlot(const string& componentName, const strin
   std::replace(comp_id.begin(), comp_id.end(), ' ', '_');
   string histo_name = "hStack_" + comp_id;
   string histo_title(componentName);  // keep original component name for legend; will not be used in actual plot anyway.
-  auto range = getRange(valueName);
+  // auto range = getRange(valueName);
   int nBins = getNBins(valueName);
-  TH1F* result = new TH1F(histo_name.c_str(), histo_title.c_str(), nBins, range.first, range.second);
+  TH1F* result = new TH1F(histo_name.c_str(), histo_title.c_str(), nBins, 0, 5);
   //form and set y-axis title
   result->GetYaxis()->SetTitle(getAxisLabel(valueName).c_str());
   result->SetFillColor(component_colors[componentName]);

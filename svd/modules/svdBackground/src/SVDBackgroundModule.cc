@@ -216,7 +216,7 @@ void SVDBackgroundModule::event()
 
   // Exposition and dose
   currentSensorID.setID(0);
-  for (const SVDSimHit & hit : storeSimHits) {
+  for (const SVDSimHit& hit : storeSimHits) {
     // Update if we have a new sensor
     VxdID sensorID = hit.getSensorID();
     if (sensorID != currentSensorID) {
@@ -255,7 +255,7 @@ void SVDBackgroundModule::event()
   // Neutron flux
   B2DEBUG(100, "Neutron flux")
   currentSensorID.setID(0);
-  for (const SVDTrueHit & hit : storeTrueHits) {
+  for (const SVDTrueHit& hit : storeTrueHits) {
     VxdID sensorID = hit.getSensorID();
     // Update if we are on a new sensor
     if (sensorID != currentSensorID) {
@@ -278,7 +278,7 @@ void SVDBackgroundModule::event()
     if (!simhit) { //either something is very wrong, or we just don't have the relation. Try to find an appropriate SimHit manually.
       double minDistance = 1.0e10;
       TVector3 hitPosition(hit.getEntryU(), hit.getEntryV(), hit.getEntryW());
-      for (const SVDSimHit & related : storeSimHits) {
+      for (const SVDSimHit& related : storeSimHits) {
         double distance = (hitPosition - related.getPosIn()).Mag();
         if (distance < minDistance) {
           minDistance = distance;
@@ -301,7 +301,8 @@ void SVDBackgroundModule::event()
       double m0 = 0.940;
       kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
       nielWeight = m_nielNeutrons->getNielFactor(kineticEnergy / Unit::MeV);
-      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber,
+                                    nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_neutronFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                     stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_neutronFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -311,7 +312,8 @@ void SVDBackgroundModule::event()
       double m0 = 0.938;
       kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
       nielWeight = m_nielProtons->getNielFactor(kineticEnergy / Unit::MeV);
-      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber,
+                                    nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_protonFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                    stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_protonFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -321,7 +323,8 @@ void SVDBackgroundModule::event()
       double m0 = 0.135;
       kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
       nielWeight = m_nielPions->getNielFactor(kineticEnergy / Unit::MeV);
-      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber,
+                                    nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_pionFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                  stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_pionFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -331,7 +334,8 @@ void SVDBackgroundModule::event()
       double m0 = 0.511e-3;
       kineticEnergy = sqrt(hitMomentum.Mag2() + m0 * m0) - m0;
       nielWeight = m_nielElectrons->getNielFactor(kineticEnergy / Unit::MeV);
-      bData.m_neutronFluxBars->Fill(currentLayerNumber, nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
+      bData.m_neutronFluxBars->Fill(currentLayerNumber,
+                                    nielWeight * stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_electronFlux[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
                                                      stepLength / currentSensorThickness / currentLayerArea / currentComponentTime * c_smy);
       bData.m_electronFluxNIEL[currentLayerNumber]->Fill(kineticEnergy / Unit::MeV,
@@ -346,7 +350,8 @@ void SVDBackgroundModule::event()
 
     // Only set weight for supported particles
     nielWeight = std::isfinite(nielWeight) ? nielWeight : 0.0;
-    bData.m_sensorData[currentSensorID].m_neutronFlux += nielWeight * stepLength / currentSensorThickness / currentSensorArea / currentComponentTime * c_smy;
+    bData.m_sensorData[currentSensorID].m_neutronFlux += nielWeight * stepLength / currentSensorThickness / currentSensorArea /
+                                                         currentComponentTime * c_smy;
 
     // Store data in a SVDNeutronFluxEvent object
     TVector3 localPos(hit.getU(), hit.getV(), hit.getW());
@@ -377,7 +382,7 @@ void SVDBackgroundModule::event()
   double tau_event = currentComponentTime / numberOfEvents;
   // Number of background events that contribute to sensitive time window of SVD
   double w_event = tau_sensitive / tau_event;
-  for (const SVDDigit & digit : storeDigits) {
+  for (const SVDDigit& digit : storeDigits) {
     // Filter out digits that give less than 1 ADU
     if (digit.getCharge() < 1) continue;
     VxdID sensorID = digit.getSensorID();

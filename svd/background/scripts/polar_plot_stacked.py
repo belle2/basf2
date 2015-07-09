@@ -20,31 +20,31 @@ dose_data = {'Touschek_HER': {
     4: np.zeros((10, 3)),
     5: np.zeros((12, 4)),
     6: np.zeros((16, 5)),
-    }, 'Touschek_LER': {
+}, 'Touschek_LER': {
     3: np.zeros((7, 2)),
     4: np.zeros((10, 3)),
     5: np.zeros((12, 4)),
     6: np.zeros((16, 5)),
-    }}
+}}
 
 layer_phi0 = {
     3: 33.624 * np.pi / 180,
     4: 8 * np.pi / 180,
     5: -8 * np.pi / 180,
     6: -4 * np.pi / 180,
-    }
+}
 layer_nladders = {
     3: 7,
     4: 10,
     5: 12,
     6: 16,
-    }
+}
 layer_nsensors = {
     3: 2,
     4: 3,
     5: 4,
     6: 5,
-    }
+}
 
 fileName = '/data/belle2/BG/Feb2015/output/base_kekcc/base_touschek_histo.root'
 print 'reading from file ', fileName
@@ -57,7 +57,7 @@ for iev in range(0, nev):
     tree.GetEntry(iev)
 
     dose_data[str(tree.component)][tree.layer][tree.ladder - 1, tree.sensor
-            - 1] = 100 * tree.dose
+                                               - 1] = 100 * tree.dose
 
 overlap_factor = 0.0  # Overlap of neighbour bars relative to bar width
 
@@ -77,7 +77,7 @@ for layer in layers:
             bottom=bottoms,
             label=str(sensor + 1),
             align='center',
-            )
+        )
         bottoms += dose_data[component][layer][:, sensor]
         for bar in bars:
             bar.set_facecolor(plt.cm.Paired(0.1 + 0.15 * sensor))
@@ -93,7 +93,7 @@ for layer in layers:
             va='center',
             fontsize=7,
             color='b',
-            )
+        )
 
     for tick in ax.yaxis.get_major_ticks():
         tick.label.set_fontsize(7)
@@ -110,10 +110,9 @@ for layer in layers:
         ha='left',
         va='center',
         fontsize=7,
-        )
+    )
 
     ax.legend(title='Sensor', fontsize=9, bbox_to_anchor=(1.4, 0.5))
     ax.set_title('Layer ' + str(layer), x=0.0, y=0.97)
     show()
 savefig('layers.png')
-

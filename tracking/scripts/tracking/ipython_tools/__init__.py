@@ -147,9 +147,7 @@ class Basf2Process(Process):
             basf2.logging.zero_counters()
             basf2.log_to_file(file_name)
             basf2.process(self.path)
-            statistics = Basf2CalculationQueueStatistics()
-            statistics.init_with_cpp(basf2.statistics)
-            self.result_queue.put("basf2.statistics", statistics)
+            self.result_queue.put("basf2.statistics", Basf2CalculationQueueStatistics(basf2.statistics))
         except:
             raise
         finally:

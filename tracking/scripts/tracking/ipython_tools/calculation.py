@@ -229,6 +229,16 @@ class Basf2Calculation():
 
         self.create_widgets_for_all_processes(f, index)
 
+    def show_statistics(self, index=None):
+        """
+        Show the statistics in a smart manner
+        """
+
+        def f(process):
+            return viewer.StatisticsViewer(self.get_statistics(process))
+
+        self.create_widgets_for_all_processes(f, index)
+
 
 class Basf2CalculationList():
 

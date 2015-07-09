@@ -67,6 +67,32 @@ class Basf2CalculationQueueItem():
         self.item = item
 
 
+class dotdict(dict):
+
+    """dot.notation access to dictionary attributes"""
+
+    def __getattr__(self, attr):
+        return self.get(attr)
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
+class ModuleStatistics():
+
+    def __init__(self, stats, categories):
+        self.name = stats.name
+        self.time_sum = self.get_dict(stats.time_sum, categories)
+        self.time_mean = self.get_dict(stats.time_mean, categories)
+        self.time_stddev = self.get_dict(stats.time_stddev, categories)
+        self.memory_sum = self.get_dict(stats.memory_sum, categories)
+        self.memory_mean = self.get_dict(stats.memory_mean, categories)
+        self.memory_stddev = self.get_dict(stats.memory_stddev, categories)
+        self.calls = self.get_dict(stats.calls, categories)
+
+    def get_dict(self, function, categories):
+        return {name: function(category) for name, category in categories}
+
+
 class Basf2CalculationQueueStatistics():
 
     """
@@ -74,25 +100,28 @@ class Basf2CalculationQueueStatistics():
     So we write a wrapper which unpacks the needed properties.
     """
 
-    def __init__(self):
+    def __str__(self):
+        return self.str
+
+    def __repr__(self):
+        return self.str
+
+    def __init__(self, statistics):
         self.module = []
 
-    def init_with_cpp(self, statistics):
+        categories = [("INIT", statistics.INIT),
+                      ("BEGIN_RUN", statistics.BEGIN_RUN),
+                      ("EVENT", statistics.EVENT),
+                      ("END_RUN", statistics.END_RUN),
+                      ("TERM", statistics.TERM),
+                      ("TOTAL", statistics.TOTAL)]
+
         for stats in statistics.modules:
-            self.append_module_statistics(stats, statistics)
+            self.append_module_statistics(stats, categories)
 
-    def get_dict(self, function, statistics):
-        return {
-            category: function(category) for category in [
-                statistics.INIT,
-                statistics.BEGIN_RUN,
-                statistics.EVENT,
-                statistics.END_RUN,
-                statistics.TERM]}
+        self.append_module_statistics(statistics.getGlobal(), categories)
 
-    def append_module_statistics(self, stats, statistics):
-        module_stats = {
-            "name": stats.name, "time": self.get_dict(
-                stats.time, statistics), "calls": self.get_dict(
-                stats.calls, statistics)}
-        self.module.append(module_stats)
+        self.str = statistics()
+
+    def append_module_statistics(self, stats, categories):
+        self.module.append(ModuleStatistics(stats, categories))

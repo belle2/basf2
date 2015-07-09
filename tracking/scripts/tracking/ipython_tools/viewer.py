@@ -8,7 +8,27 @@ import random
 import string
 
 
-class PathViewer(object):
+class Basf2Widget(object):
+
+    """
+    A base class for widgets in basf2
+    """
+
+    def create(self):
+        """
+        Override this method!
+        """
+        return None
+
+    def show(self):
+        """
+        Show the widget
+        """
+        a = self.create()
+        display(a)
+
+
+class PathViewer(Basf2Widget):
 
     """
     Viewer object for the basf2 path.
@@ -23,12 +43,12 @@ class PathViewer(object):
 
         self.styling_text = """
         <style>
-            table{
+            .path-table table{
               border-collapse: separate;
               border-spacing: 50px 0;
             }
 
-            td {
+            .path-table td {
               padding: 10px 0;
               }
         </style>"""
@@ -42,7 +62,7 @@ class PathViewer(object):
 
         for i, module in enumerate(self.path.modules()):
             html = widgets.HTML()
-            html.value = self.styling_text + "<table>"
+            html.value = self.styling_text + "<table class=\"path-table\">"
             for param in module.available_params():
                 html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td>" + str(param.values) + "</td>" \
                     + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
@@ -54,15 +74,8 @@ class PathViewer(object):
 
         return a
 
-    def show(self):
-        """
-        Show the widget
-        """
-        a = self.create()
-        display(a)
 
-
-class ProgressBarViewer(object):
+class ProgressBarViewer(Basf2Widget):
 
     """
     Viewer Object used to print data to the IPython Notebook.
@@ -129,7 +142,7 @@ class ProgressBarViewer(object):
         display(self)
 
 
-class CollectionsViewer(object):
+class CollectionsViewer(Basf2Widget):
 
     """
     Viewer object for the basf2 store entries.
@@ -144,12 +157,12 @@ class CollectionsViewer(object):
 
         self.styling_text = """
         <style>
-            table{
+            .coll-table {
               border-collapse: separate;
               border-spacing: 50px 0;
             }
 
-            td {
+            .coll-table td {
               padding: 10px 0;
               }
         </style>"""
@@ -164,7 +177,7 @@ class CollectionsViewer(object):
 
         for i, event in enumerate(self.collections):
             html = widgets.HTML()
-            html.value = self.styling_text + "<table>"
+            html.value = self.styling_text + "<table class=\"coll-table\">"
             for store_array in event["store_content"]:
                 html.value += "<tr>" + "<td>" + store_array[0] + "</td>" + "<td>" + str(store_array[1]) + "</td>" + "</tr>"
             html.value += "</table>"
@@ -175,13 +188,55 @@ class CollectionsViewer(object):
 
         return a
 
-    def show(self):
-        """
-        Show the widget
-        """
 
-        a = self.create()
-        display(a)
+class StatisticsViewer(Basf2Widget):
+
+    def __init__(self, statistics):
+        self.statistics = statistics
+
+        self.styling_text = """
+        <style>
+            .stat-table {
+              border-collapse: collapsed;
+              border: 1px solid black;
+            }
+            .stat-table td {
+                padding: 5px;
+            }
+            .stat-table tr:nth-child(even) {background: #FFF}
+            .stat-table tr:nth-child(2n+3) {background: #EEE}
+            .stat-table tr:first-child {
+                background: #AAA;
+                font-weight: bold
+            }
+            .stat-table tr:last-child {
+                border: 1px solid black;
+                font-weight: bold
+            }
+        </style>"""
+
+    def create(self):
+        html = widgets.HTML()
+        html.value = self.styling_text + "<table class=\"stat-table\"><tr>"
+        html.value += "<td>Name</td>"
+        html.value += "<td>Calls</td>"
+        html.value += "<td>Memory(MB)</td>"
+        html.value += "<td>Time(s)</td>"
+        html.value += "<td colspan=\"3\">Time(ms)/call</td>"
+        html.value += "</tr>"
+
+        for module in self.statistics.module:
+            html.value += "<tr>"
+            html.value += "<td>%s</td>" % module.name
+            html.value += "<td style=\"text-align: right\">%d</td>" % module.calls["EVENT"]
+            html.value += "<td style=\"text-align: right\">%d</td>" % (module.memory_sum["EVENT"] / 1024)
+            html.value += "<td style=\"text-align: right\">%.2f</td>" % (module.time_sum["EVENT"] / 1e9)
+            html.value += "<td style=\"text-align: right\">%.2f</td><td>&plusmn;</td><td>%.2f</td>" % (
+                module.time_mean["EVENT"] / 1e6, module.time_stddev["EVENT"] / 1e6)
+            html.value += "</tr>"
+
+        html.value += "</table>"
+        return html
 
 
 class ProcessViewer(object):

@@ -65,6 +65,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand* trackCand,
                                                  storeArrayNameOfCDCHits, storeArrayNameOfSVDHits,
                                                  storeArrayNameOfPXDHits, storeArrayNameOfRecoHitInformation);
 
+  newRecoTrack->setCovSeed(trackCand->getCovSeed());
+
   for (unsigned int hitIndex = 0; hitIndex < trackCand->getNHits(); hitIndex++) {
     genfit::TrackCandHit* trackCandHit = trackCand->getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
@@ -176,7 +178,7 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
 
   // TODO: It may be better to do this already when adding the hits to the reco track.
   // create TrackPoints
-  // Loop over all hits and create a abs measurement with the factory.
+  // Loop over all hits and create an abs measurement with the factory.
   // then create a TrackPoint from that and set the sorting parameter
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedCDCHit>, this, Const::CDC,
                                                              std::placeholders::_1, std::placeholders::_2));
@@ -187,14 +189,18 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
 
   // TODO!
   // Set the covariance seed
-  TMatrixDSym covSeed(6);
-  covSeed(0, 0) = 1e-3;
-  covSeed(1, 1) = 1e-3;
-  covSeed(2, 2) = 4e-3;
-  covSeed(3, 3) = 0.01e-3;
-  covSeed(4, 4) = 0.01e-3;
-  covSeed(5, 5) = 0.04e-3;
-  setCovSeed(covSeed);
+
+  TMatrixDSym covSeed = getCovSeed();
+  if (covSeed(0, 0) == 0 and covSeed(1, 1) == 0 and covSeed(2, 2) == 0 and covSeed(3, 3) == 0 and covSeed(4, 4) == 0
+      and covSeed(5, 5) == 0) {
+    covSeed(0, 0) = 1e-3;
+    covSeed(1, 1) = 1e-3;
+    covSeed(2, 2) = 4e-3;
+    covSeed(3, 3) = 0.01e-3;
+    covSeed(4, 4) = 0.01e-3;
+    covSeed(5, 5) = 0.04e-3;
+    setCovSeed(covSeed);
+  }
 
   calculateTimeSeed(particleWithPDGCode);
 

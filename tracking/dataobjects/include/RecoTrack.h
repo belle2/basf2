@@ -523,7 +523,9 @@ namespace Belle2 {
     std::string m_storeArrayNameOfSVDHits; /**< Store array of added svd hits */
     std::string m_storeArrayNameOfPXDHits; /**< Store array of added pxd hits */
     std::string m_storeArrayNameOfRecoHitInformation;  /**< Store array of added reco hit information */
+#ifndef __CINT__
     genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
+#endif
     bool m_lastFitSucessfull; /**< Bool if the last fit was sucessfull */
 
 

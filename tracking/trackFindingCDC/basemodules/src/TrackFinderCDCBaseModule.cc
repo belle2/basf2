@@ -269,20 +269,6 @@ void TrackFinderCDCBaseModule::event()
     StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_gfTrackCandsStoreArrayName);
     storedGFTrackCands.create();
     for (CDCTrack& track : outputTracks) {
-      // Postprocess track
-      // 1. Recalculate the reconstructed position of all hits
-      const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
-      const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-      for (CDCRecoHit3D& recoHit : track) {
-        // TODO: Also change the position of stereo hits?
-        double reconstructedPerpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D());
-        recoHit.setPerpS(reconstructedPerpS);
-      }
-
-      // 2. Sort the hits according to their reconstructed perpS
-      track.sort();
-
-
       genfit::TrackCand gfTrackCand;
       if (track.fillInto(gfTrackCand)) {
         storedGFTrackCands.appendNew(gfTrackCand);

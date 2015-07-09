@@ -386,6 +386,40 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
         super(CDCSegmentTrackCombiner, self).__init__(combiner_module)
 
 
+class CDCTrackQualityAsserter(metamodules.WrapperModule):
+
+    """ Add the TrackQualityAsserterCDC module to the path
+
+    Attributes
+    ----------
+    If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
+    With track_cands_store_vector_name you can control the input vector of the CDCTracks. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With segments_store_vector_name you can control the input vector of the CDCRecoSegments2D. Be aware that the content
+    of this vector will be replaced by the output of this module
+    With the other parameters you can control the filters of the SegmentTrackCombiner
+    """
+
+    def __init__(self,
+                 output_track_cands_store_array_name=None,
+                 minimal_perp_s_cut=1,
+                 track_cands_store_vector_name="CDCTrackVector"):
+
+        module = StandardEventGenerationRun.get_basf2_module(
+            "TrackQualityAsserterCDC",
+            MinimalPerpSCut=minimal_perp_s_cut,
+            WriteGFTrackCands=False,
+            SkipHitsPreparation=True,
+            TracksStoreObjNameIsInput=True,
+            TracksStoreObjName=track_cands_store_vector_name)
+
+        if output_track_cands_store_array_name is not None:
+            module.param({'WriteGFTrackCands': True,
+                          'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        metamodules.WrapperModule.__init__(self, module)
+
+
 class CDCValidation(metamodules.PathModule):
 
     """Add a validation and a mc track matcher to the path

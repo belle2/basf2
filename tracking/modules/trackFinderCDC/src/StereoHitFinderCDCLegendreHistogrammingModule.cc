@@ -23,7 +23,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
     track.sort();
   }
 
-  // Refit the tracks
+  // Fit the tracks
   const CDCSZFitter& fitter = CDCSZFitter::getFitter();
 
   for (CDCTrack& track : tracks) {

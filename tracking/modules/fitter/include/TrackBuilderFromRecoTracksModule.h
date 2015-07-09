@@ -13,7 +13,14 @@
 
 #include <string>
 
+namespace genfit {
+  class AbsTrackRep;
+}
+
 namespace Belle2 {
+
+  class RecoTrack;
+  class Track;
 
   class TrackBuilderFromRecoTracksModule : public Module {
 
@@ -50,6 +57,9 @@ namespace Belle2 {
   private:
     std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input reco tracks */
     std::string m_param_tracksStoreArrayName; /**< StoreArray name of the output belle tracks */
+    std::string m_param_trackCandidatesStoreArrayName; /**< StoreArray name of the input track candidates related to the reco tracks. */
+
+    bool createTrackFitResult(const RecoTrack& recoTrack, Track& newBelleTrack, const genfit::AbsTrackRep* trackRep);
   };
 }
 

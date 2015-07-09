@@ -447,9 +447,9 @@ class CDCRecoFitter(metamodules.PathModule):
             "RecoTrackCreator",
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
         reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter")
-        reco_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
-        track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilderFromRecoTracks')
-        track_builder.set_log_level(basf2.LogLevel.DEBUG)
+        track_builder = StandardEventGenerationRun.get_basf2_module(
+            'TrackBuilderFromRecoTracks',
+            TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
 
         module_list = []
         if setup_geometry:

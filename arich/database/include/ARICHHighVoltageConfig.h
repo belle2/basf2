@@ -58,16 +58,6 @@ namespace Belle2 {
      */
     void setHighVoltageID(int id) { m_id = id;}
 
-    /** Return Time of the constant creation
-     * @return Time of the constant creation
-     */
-    TTimeStamp getTimeStamp() const {return m_timeStamp; }
-
-    /** Set Time of the constant creation
-     * @param Time of the constant creation
-     */
-    void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
-
     /** Return Cable Identifier
      * @return Cable Identifier
      */
@@ -131,17 +121,25 @@ namespace Belle2 {
      */
     void setRateDuringRampDown(double rampD) { m_rampDown = rampD;}
 
+    /** Return Time of the constant creation
+     * @return Time of the constant creation
+     */
+    TTimeStamp getTimeStamp() const {return m_timeStamp; }
 
+    /** Set Time of the constant creation
+     * @param Time of the constant creation
+     */
+    void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 
   private:
     int m_id;                     /**< Physical Identifier on the device */
-    double m_rampUp;              /**< Rate of the Voltage increase during ramp up */
-    double m_rampDown;            /**< Rate of the Voltage increase during ramp down */
-    TTimeStamp m_timeStamp;       /**< Time of the constant creation */
     ARICHCableInfo m_cable;       /**< Physical Cable Identifier */
     double m_vSet;                /**< Set High Voltage */
     double m_vMax;                /**< Set Maximum High Voltage */
     double m_iMax;                /**< Set Maximum Current */
+    double m_rampUp;              /**< Rate of the Voltage increase during ramp up */
+    double m_rampDown;            /**< Rate of the Voltage increase during ramp down */
+    TTimeStamp m_timeStamp;       /**< Time of the constant creation */
 
     ClassDef(ARICHHighVoltageConfig, 1);  /**< ClassDef */
   };

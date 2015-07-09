@@ -176,7 +176,7 @@ namespace Belle2 {
      * Add a channel number to the list of dead channels
      * @param channel ASIC channel number
      */
-    int addDeadChannel(unsigned int channel) {m_deadChannel.push_back(channel); }
+    void appendDeadChannel(unsigned int channel) {m_deadChannel.push_back(channel); }
 
 
     /**
@@ -196,7 +196,7 @@ namespace Belle2 {
      * Add a channel number to the list of cut channels
      * @param channel ASIC channel number
      */
-    int addCutChannel(unsigned int ichannel) { m_cutChannel.push_back(ichannel); }
+    void appendCutChannel(unsigned int ichannel) { m_cutChannel.push_back(ichannel); }
 
 
     /**

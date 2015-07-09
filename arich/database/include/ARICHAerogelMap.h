@@ -50,6 +50,10 @@ namespace Belle2 {
      */
     std::string getAerogelID();
 
+    /** Set Aerogel Identifier
+     * @param Aerogel Identifier
+     */
+    void setAerogelIdentifier(const std::string& agelid) {m_id = agelid; }
 
     /**
       * Return Aerogel Ring Identifier
@@ -58,10 +62,22 @@ namespace Belle2 {
     int getAerogelRingID() const {return m_ring;}
 
     /**
+     * Set Aerogel Ring Identifier
+     * @param Ring Identifier
+     */
+    void setAerogelRingID(int ring) {m_ring = ring;}
+
+    /**
      * Return Aerogel Column Identifier
      * @return Aerogel Column
      */
     int getAerogelColumnID() const {return m_column;}
+
+    /**
+     * Set Aerogel Column Identifier
+     * @param Column Identifier
+     */
+    void setAerogelColumnID(int column) {m_column = column;}
 
     /**
      * Return Aerogel Layer Identifier
@@ -81,40 +97,20 @@ namespace Belle2 {
      */
     TTimeStamp getAerogelTimeStamp() const {return m_timeStamp; }
 
+    /** Set Aerogel installation date
+     * @param Aerogel installation date
+     */
+    void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
+
     /** Return comment
      * @return comment
      */
     std::string getAerogelMapComment();
 
-    /** Set Aerogel Identifier
-     * @param Aerogel Identifier
-     */
-    void setAerogelIdentifier(const std::string& agelid) {m_id = agelid; }
-
-    /**
-     * Set Aerogel Ring Identifier
-     * @param Ring Identifier
-     */
-    void setAerogelRingID(int ring) {m_ring = ring;}
-
-    /**
-     * Set Aerogel Column Identifier
-     * @param Column Identifier
-     */
-    void setAerogelColumnID(int column) {m_column = column;}
-
-    /** Set Aerogel installation date
-     *
-     */
-    TTimeStamp setAerogelTimeStamp();
-
     /** Set comment
      * @param comment
      */
-    std::string setAerogelMapComment(const std::string& comment) {m_comment = comment; }
-
-
-
+    void setAerogelMapComment(const std::string& comment) {m_comment = comment; }
 
 
   private:

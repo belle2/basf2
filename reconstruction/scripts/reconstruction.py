@@ -63,14 +63,6 @@ def add_posttracking_reconstruction(path, components=None):
         ecl_shower_rec = register_module('ECLReconstructor')
         path.add_module(ecl_shower_rec)
 
-        # gamma reconstruction
-        gamma_rec = register_module('ECLGammaReconstructor')
-        path.add_module(gamma_rec)
-
-        # pi0 reconstruction
-        pi0_rec = register_module('ECLPi0Reconstructor')
-        path.add_module(pi0_rec)
-
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)

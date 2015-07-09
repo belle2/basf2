@@ -34,16 +34,18 @@ namespace Belle2 {
     HitPatternVXD();
 
     /** Initialize the pattern with some short.*/
-    HitPatternVXD(const unsigned int initValue) : m_pattern(initValue)
+    explicit HitPatternVXD(const unsigned int initValue) : m_pattern(initValue)
     {}
 
     /** Getter for the underlying integer type.*/
-    unsigned int getInteger() const {
+    unsigned int getInteger() const
+    {
       return m_pattern.to_ulong();
     }
 
     /** Getter for underlying bitset.*/
-    std::bitset<32> getBitset() const {
+    std::bitset<32> getBitset() const
+    {
       return m_pattern;
     }
 
@@ -51,7 +53,8 @@ namespace Belle2 {
      * Get total number of hits in PXD and SVD.
      * TODO: add ingoing arm ndfs
      */
-    unsigned short getNdf() const {
+    unsigned short getNdf() const
+    {
       return 2 * getNPXDHits() + getNSVDHits();
     }
 
@@ -60,7 +63,8 @@ namespace Belle2 {
      * the mode of the PXD.
      * @param pxdmode 0/1 is normal/gated
      */
-    unsigned short getNVXDLayers(const unsigned short pxdmode = 0) const {
+    unsigned short getNVXDLayers(const unsigned short pxdmode = 0) const
+    {
       return getNPXDLayers(pxdmode) + getNSVDLayers();
     }
 
@@ -74,7 +78,8 @@ namespace Belle2 {
      * @param uHits
      * @param vHits
      */
-    void setSVDLayer(const unsigned short svdLayer, unsigned short uHits, unsigned short vHits) {
+    void setSVDLayer(const unsigned short svdLayer, unsigned short uHits, unsigned short vHits)
+    {
       // take care of input which could result in wrong behaviour
       B2ASSERT("SVD layer is out of range.", svdLayer <= 3);
       resetSVDLayer(svdLayer);
@@ -93,7 +98,8 @@ namespace Belle2 {
      * @param svdLayer: SVD Layer numeration from inner to outer is 0 to 3.
      * @return
      */
-    std::pair<const unsigned short, const unsigned short> getSVDLayer(const unsigned short svdLayer) const {
+    std::pair<const unsigned short, const unsigned short> getSVDLayer(const unsigned short svdLayer) const
+    {
       B2ASSERT("SVD layer is out of range.", svdLayer <= 3);
       std::bitset<32> uHitsPattern(m_pattern & (s_SVDLayerMasks[svdLayer] & s_SVDuvMasks[0]));
       std::bitset<32> vHitsPattern(m_pattern & (s_SVDLayerMasks[svdLayer] & s_SVDuvMasks[1]));
@@ -106,7 +112,8 @@ namespace Belle2 {
      * Reset the number of hits in a specific layer of the SVD.
      * @param svdLayer: SVD Layer numeration from inner to outer is 0 to 3.
      */
-    void resetSVDLayer(const unsigned short svdLayer) {
+    void resetSVDLayer(const unsigned short svdLayer)
+    {
       B2ASSERT("SVD layer is out of range.", svdLayer <= 3);
       m_pattern &= ~s_SVDLayerMasks[svdLayer];
       return;
@@ -115,7 +122,8 @@ namespace Belle2 {
     /**
      * Get total number of hits in the SVD.
      */
-    unsigned short getNSVDHits() const {
+    unsigned short getNSVDHits() const
+    {
       unsigned short svdHits = 0;
       for (unsigned short svdLayer = 0; svdLayer <= 3; ++svdLayer) {
         std::pair<const unsigned short, const unsigned short> svdHitPair = getSVDLayer(svdLayer);
@@ -126,7 +134,8 @@ namespace Belle2 {
 
 
     /// Returns the total number of activated layers of the SVD.
-    unsigned short getNSVDLayers() const {
+    unsigned short getNSVDLayers() const
+    {
       unsigned short nSVD = 0;
       // there are 4 SVD layers ...
       for (unsigned short layer = 0; layer < 4; ++layer) {
@@ -140,7 +149,8 @@ namespace Belle2 {
      * Get the first activated svd layer index.
      * If there is no hit in the SVD pattern, -1 is returned.
      */
-    short getFirstSVDLayer() const {
+    short getFirstSVDLayer() const
+    {
       // there are 4 SVD layers ...
       for (unsigned short layer = 0; layer < 4; ++layer) {
         std::pair<const unsigned short, const unsigned short> hits(getSVDLayer(layer));
@@ -153,7 +163,8 @@ namespace Belle2 {
      * Get the last activated svd layer index.
      * If there is no hit in the SVD pattern, -1 is returned.
      */
-    short getLastSVDLayer() const {
+    short getLastSVDLayer() const
+    {
       // there are 4 SVD layers ...
       for (short layer = 3; layer >= 0; --layer) {
         std::pair<const unsigned short, const unsigned short> hits(getSVDLayer(layer));
@@ -172,7 +183,8 @@ namespace Belle2 {
      * @param mode: normal mode is 0, gated mode is 1.
      * @param nHits 0-3 hits possible
      */
-    void setPXDLayer(const unsigned short pxdLayer, unsigned short nHits, const unsigned int mode = 0) {
+    void setPXDLayer(const unsigned short pxdLayer, unsigned short nHits, const unsigned int mode = 0)
+    {
       B2ASSERT("PXD layer is out of range.", pxdLayer <= 1);
       // take care of human error
       resetPXDLayer(pxdLayer, mode);
@@ -188,7 +200,8 @@ namespace Belle2 {
      * @param nLayer: PXD layer numeration is 0 and 1.
      * @param mode: normal mode is 0, gated mode is 1.
      */
-    unsigned short getPXDLayer(const unsigned short pxdLayer, const unsigned short mode = 0) const {
+    unsigned short getPXDLayer(const unsigned short pxdLayer, const unsigned short mode = 0) const
+    {
       B2ASSERT("PXD layer is out of range.", pxdLayer <= 1);
       std::bitset<32> hits(m_pattern & (s_PXDLayerMasks[pxdLayer] & s_PXDModeMasks[mode]));
       return (hits >>= (4 * pxdLayer + 2 * mode)).to_ulong();
@@ -199,7 +212,8 @@ namespace Belle2 {
      * @param nLayer: PXD layer numeration is 0 and 1.
      * @param mode: normal mode is 0, gated mode is 1.
      */
-    void resetPXDLayer(const unsigned short pxdLayer, const unsigned short mode = 0) {
+    void resetPXDLayer(const unsigned short pxdLayer, const unsigned short mode = 0)
+    {
       B2ASSERT("PXD layer is out of range.", pxdLayer <= 1);
       m_pattern &= ~(s_PXDLayerMasks[pxdLayer] & s_PXDModeMasks[mode]);
     }
@@ -207,7 +221,8 @@ namespace Belle2 {
     /**
      * Get total number of hits in the PXD.
      */
-    unsigned short getNPXDHits() const {
+    unsigned short getNPXDHits() const
+    {
       unsigned short pxdHits = 0;
       for (unsigned short pxdLayer = 0; pxdLayer <= 1; ++pxdLayer) {
         for (unsigned short mode = 0; mode <= 1; ++mode) {
@@ -220,7 +235,8 @@ namespace Belle2 {
     /** Returns the total number of activated layers of the PXD.
      * @param mode: normal mode is 0, gated mode is 1.
      */
-    unsigned short getNPXDLayers(const unsigned short mode = 0) const {
+    unsigned short getNPXDLayers(const unsigned short mode = 0) const
+    {
       unsigned short nPXD = 0;
       // there are 2 PXD layers ...
       for (unsigned short layer = 0; layer < 2; ++layer) {
@@ -233,7 +249,8 @@ namespace Belle2 {
      * If there is no hit in the PXD pattern, -1 is returned.
      * @param mode: normal mode is 0, gated mode is 1.
      */
-    short getFirstPXDLayer(const unsigned short mode = 0) const {
+    short getFirstPXDLayer(const unsigned short mode = 0) const
+    {
       for (unsigned short layer = 0; layer < 2; ++layer) {
         if (getPXDLayer(layer, mode) > 0) return layer;
       }
@@ -244,7 +261,8 @@ namespace Belle2 {
      * If there is no hit in the PXD pattern, -1 is returned.
      * @param mode: normal mode is 0, gated mode is 1.
      */
-    short getLastPXDLayer(const unsigned short mode = 0) const {
+    short getLastPXDLayer(const unsigned short mode = 0) const
+    {
       for (short layer = 1; layer >= 0; --layer) {
         if (getPXDLayer(layer, mode) > 0) return layer;
       }

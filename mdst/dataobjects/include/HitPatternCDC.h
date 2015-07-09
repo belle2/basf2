@@ -39,11 +39,12 @@ namespace Belle2 {
     HitPatternCDC() {}
 
     /** Initialize the pattern with some long int.*/
-    HitPatternCDC(ULong64_t initValue) : m_pattern(initValue)
+    explicit HitPatternCDC(ULong64_t initValue) : m_pattern(initValue)
     {}
 
     /** Getter for underlying integer type. */
-    ULong64_t getInteger() const {
+    ULong64_t getInteger() const
+    {
       if (sizeof(unsigned long) >= 8) {
         return m_pattern.to_ulong();
       } else {
@@ -52,18 +53,21 @@ namespace Belle2 {
     }
 
     /** Getter for underlying bit set. */
-    std::bitset<64> getBitSet() const {
+    std::bitset<64> getBitSet() const
+    {
       return m_pattern;
     }
 
     /** Get the approximate total Number of CDC hits in the fit. */
-    unsigned short getNHits() const {
+    unsigned short getNHits() const
+    {
       // Shift the 8 MSBs to the right and return their value as integer.
       return static_cast<unsigned short int>((m_pattern >> 56).to_ulong());
     }
 
     /** Sets the 8 MSBs to the total number of hits in the CDC.*/
-    void setNHits(unsigned short nHits) {
+    void setNHits(unsigned short nHits)
+    {
       if (nHits > 256) {
         // Maximum with 8 available bits
         nHits = 255;
@@ -86,7 +90,8 @@ namespace Belle2 {
      *
      *  This function may throw an out-of-range exception.
      */
-    void setLayer(const unsigned short layer) {
+    void setLayer(const unsigned short layer)
+    {
       B2ASSERT("Layer is out of range.", layer <= 55);
       m_pattern.set(layer);
     }
@@ -95,13 +100,15 @@ namespace Belle2 {
      *
      *  This function may throw an out-of-range exception.
      */
-    void resetLayer(const unsigned short layer) {
+    void resetLayer(const unsigned short layer)
+    {
       B2ASSERT("Layer is out of range.", layer <= 55);
       m_pattern.reset(layer);
     }
 
     /** Getter for single layer.*/
-    bool hasLayer(const unsigned short layer) const {
+    bool hasLayer(const unsigned short layer) const
+    {
       B2ASSERT("Layer is out of range.", layer <= 55);
       return m_pattern[layer];
     }
@@ -110,7 +117,8 @@ namespace Belle2 {
     /** Returns the index of the first layer with a hit.
      * If there is no hit in the whole pattern, -1 is returned.
      */
-    short getFirstLayer() const {
+    short getFirstLayer() const
+    {
       for (unsigned int i = 0; i < m_pattern.size(); ++i) {
         if ((m_pattern & ~s_infoLayerMask).test(i)) return i;
       }
@@ -120,7 +128,8 @@ namespace Belle2 {
     /** Returns the index of the last layer with a hit.
      * If there is no hit in the whole pattern, -1 is returned.
      */
-    short getLastLayer() const {
+    short getLastLayer() const
+    {
       // m_pattern.size()-8 because the first 8 bits are not pattern
       for (unsigned int i = m_pattern.size() - 8; i > 0; --i) {
         // -1 because of the index couting...
@@ -133,13 +142,15 @@ namespace Belle2 {
     // ----------------------------------------------------------------
 
     /** Getter for Super-Layer match.*/
-    bool hasSLayer(const unsigned short sLayer) const {
+    bool hasSLayer(const unsigned short sLayer) const
+    {
       B2ASSERT("Super layer outof range.", sLayer <= 8);
       return ((m_pattern & s_sLayerMasks[sLayer]).any());
     }
 
     /** Reset complete superLayer, e.g. because segment shouldn't belong to that track.*/
-    void resetSLayer(const unsigned short sLayer) {
+    void resetSLayer(const unsigned short sLayer)
+    {
       B2ASSERT("Super layer outof range.", sLayer <= 8);
       for (unsigned short int ii = 0; ii < m_pattern.size(); ++ii) {
         if ((s_sLayerMasks[sLayer])[ii]) {resetLayer(ii);}
@@ -147,7 +158,8 @@ namespace Belle2 {
     }
 
     /** Get the pattern in a specific super layer. */
-    std::bitset<64> getSLayerPattern(const unsigned short sLayer) {
+    std::bitset<64> getSLayerPattern(const unsigned short sLayer)
+    {
       return m_pattern & s_sLayerMasks[sLayer];
     }
 
@@ -156,14 +168,16 @@ namespace Belle2 {
      *  In case of multiple layers with two or more hits or
      *  any layers with more than two hits leads to under-counting.
      */
-    unsigned short getSLayerNHits(const unsigned short sLayer) const {
+    unsigned short getSLayerNHits(const unsigned short sLayer) const
+    {
       B2ASSERT("Super layer outof range.", sLayer <= 8);
       return static_cast<unsigned short>((m_pattern & s_sLayerMasks[sLayer]).count());
     }
 
     /** Getter for longest run of consecutive layers with hits in the Super-Layer.
      * TODO: Maybe a better solution can be found here*/
-    unsigned short getLongestContRunInSL(const unsigned short sLayer) const {
+    unsigned short getLongestContRunInSL(const unsigned short sLayer) const
+    {
       B2ASSERT("Super layer outof range.", sLayer <= 8);
       unsigned short max = 0;
       unsigned short counter = 0;
@@ -185,18 +199,21 @@ namespace Belle2 {
     // ----------------------------------------------------------------
 
     /** Reset the complete hit pattern. */
-    void resetPattern() {
+    void resetPattern()
+    {
       m_pattern.reset();
     }
 
     /** True, if at least one axial layer is true.*/
-    bool hasAxialLayer() const {
+    bool hasAxialLayer() const
+    {
       return ((s_sLayerMasks[0] | s_sLayerMasks[2] | s_sLayerMasks[4] | s_sLayerMasks[6] | s_sLayerMasks[8])
               & m_pattern).any();
     }
 
     /** True, if at least one axial layer is true.*/
-    bool hasStereoLayer() const {
+    bool hasStereoLayer() const
+    {
       return ((s_sLayerMasks[1] | s_sLayerMasks[3] | s_sLayerMasks[5] | s_sLayerMasks[7])
               & m_pattern).any();
     }

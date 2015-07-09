@@ -5,7 +5,8 @@
 <header>
   <output>EvtGenSim.root</output>
   <contact>tkuhr</contact>
-  <description>This steering file produces 10000 generic BBbar events with EvtGen and runs the detector simulation with mixed in background.</description>
+  <description>This steering file produces 10000 generic BBbar events with EvtGen
+  and runs the detector simulation with mixed in background.</description>
 </header>
 """
 
@@ -31,7 +32,7 @@ main.add_module(evtgeninput)
 
 # detector simulation
 bg = None
-if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
@@ -50,9 +51,7 @@ print statistics
 
 from validation import *
 statistics_plots('EvtGenSim_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with generic EvtGen events'
-                 , prefix='EvtGenSim')
+                 jobDesc='a standard simulation job with generic EvtGen events', prefix='EvtGenSim')
 event_timing_plot('../EvtGenSim.root', 'EvtGenSim_statistics.root',
                   contact='tkuhr',
-                  jobDesc='a standard simulation job with generic EvtGen events'
-                  , prefix='EvtGenSim')
+                  jobDesc='a standard simulation job with generic EvtGen events', prefix='EvtGenSim')

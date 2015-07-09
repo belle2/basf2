@@ -6,7 +6,8 @@
   <input>KKMCSim.root</input>
   <output>KKMCRec.root,KKMCmdst.root</output>
   <contact>tkuhr</contact>
-  <description>This steering file run the standard reconstruction on an input file with tau pair events.</description>
+  <description>This steering file run the standard reconstruction on
+  an input file with tau pair events.</description>
 </header>
 """
 

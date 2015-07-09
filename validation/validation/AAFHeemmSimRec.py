@@ -5,7 +5,8 @@
 <header>
   <output>AAFHeemmSimRec.root</output>
   <contact>ferber</contact>
-  <description>This steering file produces 100 non radiative ee->eemm events with AAFH, runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
+  <description>This steering file produces 100 non radiative ee->eemm events with AAFH,
+  runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
 </header>
 """
 
@@ -47,12 +48,12 @@ aafh.param({
         1.216e+00,
         5.583e+00,
         6.155e+00,
-        ],
+    ],
     'suppressionLimits': [1e100] * 4,
-    })
+})
 main.add_module(aafh)
 
-## register the preselection module
+# register the preselection module
 generatorpreselection = register_module('GeneratorPreselection')
 generatorpreselection.param({
     'nChargedMin': 1,
@@ -64,14 +65,14 @@ generatorpreselection.param({
     'MinPhotonEnergy': 0.50,
     'MinPhotonTheta': 12.,
     'MaxPhotonTheta': 156.,
-    })
+})
 
 main.add_module(generatorpreselection)
 generatorpreselection.if_value('<1', emptypath)
 
 # detector simulation
 bg = None
-if os.environ.has_key('BELLE2_BACKGROUND_DIR'):
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
@@ -92,10 +93,14 @@ process(main)
 print statistics
 
 from validation import *
-statistics_plots('AAFHeemmSimRec_statistics.root', contact='ferber',
-                 jobDesc='a standard simulation and reconstruction job with non radiative ee->eemm events using AAFH'
-                 , prefix='AAFHeemmSimRec')
-event_timing_plot('../AAFHeemmSimRec.root', 'AAFHeemmSimRec_statistics.root',
-                  contact='ferber',
-                  jobDesc='a standard simulation and reconstruction job with non radiative ee->eemm events using AAFH'
-                  , prefix='AAFHeemmSimRec')
+statistics_plots(
+    'AAFHeemmSimRec_statistics.root',
+    contact='ferber',
+    jobDesc='a standard simulation and reconstruction job with non radiative ee->eemm events using AAFH',
+    prefix='AAFHeemmSimRec')
+event_timing_plot(
+    '../AAFHeemmSimRec.root',
+    'AAFHeemmSimRec_statistics.root',
+    contact='ferber',
+    jobDesc='a standard simulation and reconstruction job with non radiative ee->eemm events using AAFH',
+    prefix='AAFHeemmSimRec')

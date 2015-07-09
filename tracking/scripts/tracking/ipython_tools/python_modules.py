@@ -49,7 +49,7 @@ class PrintCollections(basf2.Module):
             for store_array_name in registered_store_objects:
                 event_store_content_list.append([store_array_name, 0])
 
-        self.store_content_list.append({"number": self.event_number, "store_content": event_store_content_list})
+            self.store_content_list.append({"number": self.event_number, "store_content": event_store_content_list})
 
         self.event_number += 1
 

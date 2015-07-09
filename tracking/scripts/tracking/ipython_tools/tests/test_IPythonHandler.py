@@ -7,7 +7,9 @@ class TestIPythonHandler(TestCase):
 
     def create_path(self):
         path = basf2.create_path()
-        path.add_module("EventInfoSetter")
+        info_setter = basf2.register_module("EventInfoSetter")
+        info_setter.param("evtNumList", [100])
+        path.add_module(info_setter)
         path.add_module("Gearbox")
         path.add_module("Geometry")
 

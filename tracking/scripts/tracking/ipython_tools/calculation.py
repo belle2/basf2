@@ -12,10 +12,17 @@ class Basf2Calculation():
     """
 
     def __init__(self, process_list):
-        if not process_list:
-            raise ValueError("Given process list is invalid")
-
         self.process_list = process_list
+
+    def __iter__(self):
+        """
+        Make the class iterable over all single processes
+        """
+        for process in self.process_list:
+            yield Basf2Calculation(process)
+
+    def __len__(self):
+        return len(self.process_list)
 
     def stop(self, index=None):
         """
@@ -66,7 +73,7 @@ class Basf2Calculation():
 
                 process.join()
                 if display_bar:
-                    if self.has_failed():
+                    if self.has_failed(process):
                         f.update("failed!")
                     else:
                         f.update("finished")

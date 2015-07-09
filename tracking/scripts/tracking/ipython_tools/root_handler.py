@@ -5,6 +5,8 @@ sb.set()
 import pandas as pd
 from root_pandas import read_root
 
+import numpy as np
+
 
 class TrackingValidationResult:
     #: This class represents a loaded validation root file.

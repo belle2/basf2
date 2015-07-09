@@ -1,7 +1,7 @@
 import viewer
 import queue
 import inspect
-from test.pystone import Proc0
+import time
 
 
 class Basf2Calculation():
@@ -75,6 +75,8 @@ class Basf2Calculation():
                             break
                         if display_bar:
                             f.update(result)
+
+                    time.sleep(0.001)
 
                 process.join()
                 if display_bar:

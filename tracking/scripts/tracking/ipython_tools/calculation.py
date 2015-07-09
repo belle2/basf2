@@ -1,6 +1,7 @@
 import viewer
 import queue
 import inspect
+from test.pystone import Proc0
 
 
 class Basf2Calculation():
@@ -61,6 +62,8 @@ class Basf2Calculation():
         TODO: Show all status bars and show them smaller
         """
         def f(process):
+            if process.path is None:
+                return
             if process.already_run:
                 f = None
                 if display_bar:
@@ -130,7 +133,7 @@ class Basf2Calculation():
         """
         Return the modules in the given path.
         """
-        return self.map_on_processes(lambda process: process.path.modules(), index)
+        return self.map_on_processes(lambda process: process.path.modules() if process.path is not None else None, index)
 
     def get(self, name, index=None):
         """
@@ -210,7 +213,8 @@ class Basf2Calculation():
         """
 
         def f(process):
-            return viewer.PathViewer(process.path)
+            if process.path is not None:
+                return viewer.PathViewer(process.path)
 
         self.create_widgets_for_all_processes(f, index)
 

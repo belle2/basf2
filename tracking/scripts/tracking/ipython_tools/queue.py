@@ -65,3 +65,34 @@ class Basf2CalculationQueueItem():
     def __init__(self, name, item):
         self.name = name
         self.item = item
+
+
+class Basf2CalculationQueueStatistics():
+
+    """
+    As the basf2 statistics is not pickable, wa can not store it into the result_queue.
+    So we write a wrapper which unpacks the needed properties.
+    """
+
+    def __init__(self):
+        self.module = []
+
+    def init_with_cpp(self, statistics):
+        for stats in statistics.modules:
+            self.append_module_statistics(stats, statistics)
+
+    def get_dict(self, function, statistics):
+        return {
+            category: function(category) for category in [
+                statistics.INIT,
+                statistics.BEGIN_RUN,
+                statistics.EVENT,
+                statistics.END_RUN,
+                statistics.TERM]}
+
+    def append_module_statistics(self, stats, statistics):
+        module_stats = {
+            "name": stats.name, "time": self.get_dict(
+                stats.time, statistics), "calls": self.get_dict(
+                stats.calls, statistics)}
+        self.module.append(module_stats)

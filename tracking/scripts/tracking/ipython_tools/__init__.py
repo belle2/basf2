@@ -19,6 +19,7 @@ from multiprocessing import Process, Pipe
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from IPython.core.display import Image, display
+from tracking.ipython_tools.queue import Basf2CalculationQueueStatistics
 
 
 class IPythonHandler:
@@ -92,7 +93,7 @@ class IPythonHandler:
 
         calculation_list = calculation.Basf2CalculationList(path_creator_function, *list_of_parameters)
         all_paths, all_queues = calculation_list.create_all_paths()
-        process_list = [Basf2Process(path=path, result_queue=q) for path, q in zip(all_paths, all_queues) if path]
+        process_list = [Basf2Process(path=path, result_queue=q) for path, q in zip(all_paths, all_queues)]
         return calculation.Basf2Calculation(process_list)
 
     def create_queue(self):
@@ -115,23 +116,23 @@ class Basf2Process(Process):
     """
 
     def __init__(self, path, result_queue, **kwargs):
-        if path is None:
-            raise ValueError("Invalid path")
-
         self.path = path
 
         if result_queue is None:
             raise ValueError("Invalid result_queue")
 
-        self.progress_queue_local, self.progress_queue_remote = Pipe()
-        self.path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
-        self.path.add_module(python_modules.PrintCollections(result_queue))
         self.result_queue = result_queue
-
         self.already_run = False
 
-        self._log_file_name = tempfile.mktemp()
-        Process.__init__(self, target=self.start_process, kwargs={"file_name": self._log_file_name}, **kwargs)
+        if self.path:
+            self.progress_queue_local, self.progress_queue_remote = Pipe()
+            self.path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
+            self.path.add_module(python_modules.PrintCollections(result_queue))
+
+            self._log_file_name = tempfile.mktemp()
+            Process.__init__(self, target=self.start_process, kwargs={"file_name": self._log_file_name}, **kwargs)
+        else:
+            Process.__init__(self, target=lambda: None, **kwargs)
 
     def start_process(self, file_name):
         """
@@ -146,7 +147,9 @@ class Basf2Process(Process):
             basf2.logging.zero_counters()
             basf2.log_to_file(file_name)
             basf2.process(self.path)
-            self.result_queue.put("basf2.statistics", basf2.statistics())
+            statistics = Basf2CalculationQueueStatistics()
+            statistics.init_with_cpp(basf2.statistics)
+            self.result_queue.put("basf2.statistics", statistics)
         except:
             raise
         finally:

@@ -156,24 +156,24 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *eff_ptspttlp = new TH1F("eff_ptspttlp","Eff vs Pt Truth Track Finder Single Muon",100,0.,1.)
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_ptspttlp","TruthTag==1&&GoodTag==1");
-  eff_ptspttlp->SetMaximum(1.1);
-  eff_ptspttlp->Sumw2();
+  TH1F *ptspttlp = new TH1F("ptspttlp","Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>ptspttlp","TruthTag==1&&GoodTag==1");
+  ptspttlp->SetMaximum(1.1);
+  ptspttlp->Sumw2();
   gPad->RedrawAxis();
-  TH1F *eff_pt = new TH1F("eff_pt", "Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
-  eff_ptspttlp->GetXaxis()->SetTitle("Pt (GeV)");
-  eff_ptspttlp->GetYaxis()->SetTitle("Efficiency");
-  eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
-  eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
-  eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_pt->Divide(eff_ptspttlp, h22, 1.0, 1.0, "B");
+  TH1F *eff_ptlp = new TH1F("eff_ptlp", "Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
+  ptspttlp->GetXaxis()->SetTitle("Pt (GeV)");
+  ptspttlp->GetYaxis()->SetTitle("Efficiency");
+  ptspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
+  ptspttlp->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
+  ptspttlp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_ptlp->Divide(ptspttlp, h22, 1.0, 1.0, "B");
   gStyle->SetOptStat("e");
-  eff_pt->GetYaxis()->SetRangeUser(0,1.1);
+  eff_ptlp->GetYaxis()->SetRangeUser(0,1.1);
   gPad->RedrawAxis();
-  eff_pt->Draw("E");
-  eff_pt->Write();
-  delete eff_pt;
+  eff_ptlp->Draw("E");
+  eff_ptlp->Write();
+  delete eff_ptlp;
 
   TH1F *h24 = new TH1F("h24","Eff vs Theta Truth Track Finder",50, -1, 1.);
   h24->SetMaximum(1.1);
@@ -200,30 +200,30 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   eff_theta->Write();
   delete eff_theta;
 
-  h2->SetLineWidth(3);
-  h2->SetLineColor(1);
-  h2->GetYaxis()->SetRange(0,2);
-  h2->Draw();
+  //h2->SetLineWidth(3);
+  //h2->SetLineColor(1);
+  //h2->GetYaxis()->SetRange(0,2);
+  //h2->Draw();
   /*  h3->SetLineColor(3);
   h3->SetLineWidth(3);
   h3->Draw("same");
   h4->SetLineColor(4);
   h4->SetLineWidth(3);
   h4->Draw("same");*/
-  h1->SetLineColor(2);
-  h1->SetLineWidth(3);
-  h1->Draw("same");
+  //h1->SetLineColor(2);
+  //h1->SetLineWidth(3);
+  //h1->Draw("same");
   //h1->Write();
   //c1->SaveAs("plots/TrueMergedTrk_5GeV_muons_1000_Theta.jpg");
 
-  h3->SetLineColor(4);
-  h3->SetLineWidth(3);
+  //h3->SetLineColor(4);
+  //h3->SetLineWidth(3);
   //  h3->GetYaxis()->SetRange(-1.,1.);
   //h3->Draw();
-  h4->SetLineColor(3);
-  h4->SetLineWidth(3);
-  h4->Draw();
-  h3->Draw("same");
+  //h4->SetLineColor(3);
+  //h4->SetLineWidth(3);
+  //h4->Draw();
+  //h3->Draw("same");
   //h3->Write();
   //c1->SaveAs("plots/VXDCDCTrk_5GeV_muons_1000_Theta.jpg");
 

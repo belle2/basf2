@@ -139,6 +139,15 @@ class TRGCDCModule : public Module {
     /// Min. peak height for the Hough finder.
     int _hFinderPeakMin;
 
+    /// Hough mapping methode parameter.
+    int _hFinderMapping;
+
+    /// Hough mapping file for charge plus.
+    std::string _hFinderMappingFilePlus;
+
+    /// Hough mapping file for charge minus.
+    std::string _hFinderMappingFileMinus;
+
     /// Switch for the Logic/LUT TSF.
     bool _fLogicLUTTSF;
 

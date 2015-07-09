@@ -106,6 +106,9 @@ TRGCDC::getTRGCDC(const string & configFile,
                   unsigned houghFinderMeshX,
                   unsigned houghFinderMeshY,
                   unsigned houghFinderPeakMin,
+                  unsigned houghMapping,
+                  const string & houghMappingFilePlus,
+                  const string & houghMappingFileMinus,
                   bool fLogicLUTTSF,
                   bool fLRLUT,
                   bool fevtTime,
@@ -137,6 +140,9 @@ TRGCDC::getTRGCDC(const string & configFile,
                           houghFinderMeshX,
                           houghFinderMeshY,
                           houghFinderPeakMin,
+                          houghMapping,
+                          houghMappingFilePlus,
+                          houghMappingFileMinus,
                           fLogicLUTTSF,
                           fLRLUT,
                           fevtTime,
@@ -193,6 +199,9 @@ TRGCDC::TRGCDC(const string & configFile,
                unsigned houghFinderMeshX,
                unsigned houghFinderMeshY,
                unsigned houghFinderPeakMin,
+               unsigned houghMapping,
+               const string & houghMappingFilePlus,
+               const string & houghMappingFileMinus,
                bool fLogicLUTTSF,
                bool fLRLUT,
                bool fevtTime,
@@ -249,9 +258,7 @@ TRGCDC::TRGCDC(const string & configFile,
       _eventTime(0),
       _trgCDCDataInputMode(trgCDCDataInputMode) {
 
-    //cout << "		-------------A TRGCDC is declared-------------" << endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC constructor");
-
 
 #ifdef TRGCDC_DISPLAY
     int argc = 0;
@@ -270,29 +277,28 @@ TRGCDC::TRGCDC(const string & configFile,
              << "           mode=0x" << hex << _simulationMode << dec << endl;
     }
 
-    initialize(houghFinderMeshX, houghFinderMeshY, houghFinderPeakMin);
+    initialize(houghFinderMeshX,
+               houghFinderMeshY,
+               houghFinderPeakMin,
+               houghMapping,
+               houghMappingFilePlus,
+               houghMappingFileMinus);
 
     if (TRGDebug::level()) {
         cout << "TRGCDC ... TRGCDC created with " << _configFilename << endl;
-/*
-  Belle2_GDL::GDLSystemClock.dump();
-  _clock.dump();
-  _clockFE.dump();
-  _clockD.dump();
-*/
     }
 
-    //cout << "               -------------A TRGCDC is ending declared-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC constructor");
-
 }
 
 void
 TRGCDC::initialize(unsigned houghFinderMeshX,
                    unsigned houghFinderMeshY,
-                   unsigned houghFinderPeakMin) {
+                   unsigned houghFinderPeakMin,
+                   unsigned houghMapping,
+                   const string & houghMappingFilePlus,
+                   const string & houghMappingFileMinus) {
 
-    //cout << "               -------------A TRGCDC is initialized!!"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC initialize");
 
     //...CDC...
@@ -330,7 +336,11 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             axialStereoLayerId = is;
         }
 
-	//cout << "No "  << i << " nWiresInLayer: "  << nWiresInLayer << " axial: " << axial << " nShifts: " << nShifts << endl;
+        if (TRGDebug::level() > 1) {
+            cout << TRGDebug::tab() << "No "  << i << " nWiresInLayer: "
+                 << nWiresInLayer << " axial: " << axial << " nShifts: "
+                 << nShifts << endl;
+        }
 
         //...Is this in a new super layer?...
         if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
@@ -350,11 +360,15 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             lastShifts = nShifts;
         }
 
-	//cout <<"(lastNWires,nWiresInLayer) " << lastNWires << " " << nWiresInLayer << endl;
-	//cout << "(lastShifts,nShifts) " << lastShifts << " " << nShifts << endl;
-	//cout << "superLayerId: " << superLayerId << endl;
-
-	//cout << "ia: " << ia << " is: " << is << " ias: " << ias << " iss: " << iss << endl;
+        if (TRGDebug::level() > 1) {
+            cout << TRGDebug::tab() << "(lastNWires,nWiresInLayer) "
+                 << lastNWires << " " << nWiresInLayer << endl;
+            cout << TRGDebug::tab() << "(lastShifts,nShifts) " << lastShifts
+                 << " " << nShifts << endl;
+            cout << "superLayerId: " << superLayerId << endl;
+            cout << "ia: " << ia << " is: " << is << " ias: " << ias
+                 << " iss: " << iss << endl;
+        }
 
         //...Calculate radius...
         const float swr = m_cdcp->senseWireR(i);
@@ -365,10 +379,12 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             fwr = swr + (swr - fwrLast);
         const float innerRadius = swr - (fwr - swr);
         const float outerRadius = swr + (fwr - swr);
-/*
-  if (TRGDebug::level() > 9)
-  cout << "lyr " << i << ", in=" << innerRadius << ", out="  << outerRadius << ", swr=" << swr << ", fwr" << fwr << endl;
-*/
+
+        if (TRGDebug::level() > 1)
+            cout << TRGDebug::tab() << "lyr " << i << ", in=" << innerRadius
+                 << ", out="  << outerRadius << ", swr=" << swr << ", fwr"
+                 << fwr << endl;
+
         //...New layer...
         TRGCDCLayer * layer = new TRGCDCLayer(i,
                                               superLayerId,
@@ -403,7 +419,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
             layer->push_back(tw);
         }
     }
-
 
     //...event Time...
     _eventTime.push_back(new TCEventTime(*this));
@@ -508,19 +523,8 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                 cells.push_back(c);
             }
 
-            //...Create a track segment...
-//            TRGCDCSegment * ts = new TRGCDCSegment(idTS++,
-//                                                   * layer,
-//                                                   w,
-//                                                   _clockD,
-//                                                   _eventTime.back(),
-//						   _innerTSLUTFilename,
-//						   _outerTSLUTFilename,
-//                                                   cells);
-    
             TRGCDCSegment * ts;
             if(w.superLayerId()){
-
                 ts = new TRGCDCSegment(idTS++,
                                        * layer,
                                        w,
@@ -529,7 +533,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                                        _outerTSLUTFilename,
                                        cells);
             }
-
             else{
                 ts = new TRGCDCSegment(idTS++,
                                        * layer,
@@ -578,8 +581,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
         }
     }
 
-//*-----------------comment_begin-------------------
-
     //...Track Segment Finder...
     _tsFinder = new TSFinder(*this, _fileTSF, _fLogicLUTTSF);
 
@@ -594,31 +595,31 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                              * this,
                              houghFinderMeshX,
                              houghFinderMeshY,
-                             houghFinderPeakMin);
+                             houghFinderPeakMin,
+                             houghMapping,
+                             houghMappingFilePlus,
+                             houghMappingFileMinus);
 
     //...Hough 3D Finder...
     _h3DFinder = new TCH3DFinder(*this, _fileHough3D, _finder3DMode);
 
     //...3D fitter...
-    map<string, bool> flags = {{"fLRLUT",_fLRLUT},{"fEvtTime",_fevtTime},{"fzierror",_fzierror},
-                               {"fmcLR",_fmclr},{"fRootFile",_fileFitter3D}};
+    map<string, bool> flags = {{"fLRLUT",_fLRLUT},
+                               {"fEvtTime",_fevtTime},
+                               {"fzierror",_fzierror},
+                               {"fmcLR",_fmclr},
+                               {"fRootFile",_fileFitter3D}};
     _fitter3D = new TCFitter3D("Fitter3D",
                                _rootFitter3DFilename,
                                * this,
                                flags);
     _fitter3D->initialize();
 
-
-//----------------comment_end----------------*/
-
     //...For module simulation (Front-end)...
     configure();
 
     //...Initialize event number...
     m_eventNum = 1;
-
-
-//----------------comment_begin-------------------
 
     //...Initialize root file...
     if(_makeRootFile) m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
@@ -646,7 +647,6 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     _tracks2D = new TClonesArray("TVectorD");
     _tree2D->Branch("track parameters", & _tracks2D,32000,0);
 
-
     //...Initialize firmware ROOT input
     //m_minCDCTdc = 9999;
     //m_maxCDCTdc = 0;
@@ -663,43 +663,37 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     m_treeROOTInput->Branch("rootTRGHitInformation", &m_rootTRGHitInformation,32000,0);
     m_treeROOTInput->Branch("rootTRGRawInformation", &m_rootTRGRawInformation,32000,0);
 
-//----------------comment_end----------------
-
-
-
-    //cout << "               -------------End TRGCDC initialization-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC initialize");
-
 }
 
 void
 TRGCDC::terminate(void) {
 
-    //cout << "               -------------A TRGCDC is terminated-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC terminate");
-///*
-    if(_tsFinder) {
+
+    if (_tsFinder) {
         _tsFinder->terminate();
     }
-    if(_fitter3D) {
+    if (_fitter3D) {
         _fitter3D->terminate();
     }
-    if(_h3DFinder) {
+    if (_hFinder) {
+        _hFinder->terminate();
+    }
+    if (_h3DFinder) {
         _h3DFinder->terminate();
     }
-    if(_makeRootFile) {
+    if (_makeRootFile) {
         m_file->Write();
         m_file->Close();
     }
-//*/
-    //cout << "               -------------End of termination-------------"<< endl; //JB: Please use TRGDebug
-    TRGDebug::leaveStage("TRGCDC terminate");
 
+    TRGDebug::leaveStage("TRGCDC terminate");
 }
 
 void
 TRGCDC::dump(const string & msg) const {
-    //cout << "               -------------A TRGCDC is dumped-------------"<< endl; //JB: Please use TRGDebug
+
     TRGDebug::enterStage("TRGCDC dump");
 
     if (msg.find("name")    != string::npos ||
@@ -820,7 +814,6 @@ TRGCDC::dump(const string & msg) const {
         }
     }
 
-    //cout << "               -------------End of dump-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC dump");
 }
 
@@ -875,7 +868,6 @@ TRGCDC::wire(float , float) const {
 void
 TRGCDC::clear(void) {
 
-    //cout << "               -------------A TRGCDC is cleared-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC clear");
 
     TCWHit::removeAll();
@@ -909,7 +901,6 @@ TRGCDC::clear(void) {
     for (unsigned i = 0; i < 9; i++)
         _segmentHitsSL[i].clear();
 
-    //cout << "               -------------End of clear-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC clear");
 }
 
@@ -923,7 +914,6 @@ TRGCDC::update(bool) {
     trackList.clear();
     trackList3D.clear();
 
-    //cout << "               -------------A TRGCDC is updated-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC update");
 
     if (_trgCDCDataInputMode != 0) {
@@ -1106,7 +1096,6 @@ TRGCDC::update(bool) {
 
     }
 
-    //cout << "               -------------End of updating-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC update");
 
 }
@@ -1115,7 +1104,6 @@ TRGCDC::update(bool) {
 void
 TRGCDC::updateByData(int inputMode) {
 
-    //cout << "               -------------A TRGCDC is updateByData-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC updateByData");
 
     //...Clear old information...
@@ -1511,17 +1499,14 @@ TRGCDC::updateByData(int inputMode) {
 
     m_eventNum++;
 
-
-    //cout << "               -------------End of updateByData-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC updateByData");
-
 }
 
 
 
 void
 TRGCDC::classification(void) {
-    //cout << "               -------------classification-------------"<< endl; //JB: Please use TRGDebug
+
     TRGDebug::enterStage("TRGCDC classification");
 
     unsigned n = _hits.size();
@@ -1591,7 +1576,6 @@ TRGCDC::classification(void) {
         h->state(state);
     }
 
-    //cout << "               -------------End of classification-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::leaveStage("TRGCDC classification");
 }
 
@@ -1912,7 +1896,6 @@ TRGCDC::axialStereoSuperLayerId(unsigned aors, unsigned i) const {
 
 TRGCDC::~TRGCDC() {
 
-    //cout << "               -------------A TRGCDC is destructed-------------"<< endl; //JB: Please use TRGDebug
     TRGDebug::enterStage("TRGCDC destructor");
     clear();
 
@@ -1995,11 +1978,11 @@ TRGCDC::fastSimulation(void) {
         return;
     }
 
-    //...2D tracker...
+    //...2D finder and fitter...
     if (_perfect2DFinder)
         _pFinder->doit(trackList);
     else
-        _hFinder->doit(trackList);
+        _hFinder->doit2(trackList);
 
     if (TRGDebug::level())
         cout << TRGDebug::tab() << "Number of tracks : " << trackList.size()

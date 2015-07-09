@@ -24,14 +24,15 @@ class TTree;
 class TClonesArray;
 
 namespace HepGeom {
-template <class T> class Point3D;
+    template <class T> class Point3D;
 }
 
 namespace Belle2 {
 
 namespace CDC {
-class CDCGeometryPar; 
+    class CDCGeometryPar; 
 }
+
 class TRGTime;
 class TRGClock;
 class TRGLink;
@@ -80,6 +81,9 @@ class TRGCDC {
                               unsigned houghFinderMeshX = 96,
                               unsigned houghFinderMeshY = 96,
                               unsigned houghFinderPeakMin = 5,
+                              unsigned houghMapping = 1,
+                              const std::string & houghMappingFilePlus = "?",
+                              const std::string & houghMappingFileMinus = "?",
                               bool fLogicLUTTSF = 0,
                               bool fLRLUT = 1,
 			      bool fevtTime = 1,
@@ -119,6 +123,9 @@ class TRGCDC {
            unsigned houghFinderMeshX,
            unsigned houghFinderMeshY,
            unsigned houghFinderPeakMin,
+           unsigned houghMapping,
+           const std::string & houghMappingFilePlus,
+           const std::string & houghMappingFileMinus,
            bool fLogicLUTTSF,
            bool fLRLUT,
 	   bool fevtTime,
@@ -137,7 +144,10 @@ class TRGCDC {
     /// initializes CDC geometry.
     void initialize(unsigned houghFinderMeshX,
 		    unsigned houghFinderMeshY,
-		    unsigned houghFinderPeakMin);
+		    unsigned houghFinderPeakMin,
+                    unsigned houghMapping,
+                    const std::string & houghMappingFilePlus,
+                    const std::string & houghMappingFileMinus);
 
     /// configures trigger modules for firmware simulation.
     void configure(void);

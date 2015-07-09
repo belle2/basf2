@@ -89,6 +89,9 @@ class TRGCDCHoughPlaneMulti2 : public TRGCDCHoughPlane {
               unsigned layerId,
               int weight = 1);
 
+    /// Sets entry.
+    unsigned setEntry(unsigned serialId, unsigned layerId, unsigned n);
+
     /// Merge layers into one.
     void merge(void);
 
@@ -226,6 +229,16 @@ inline
 unsigned
 TRGCDCHoughPlaneMulti2::nLayers(void) const {
     return _nLayers;
+}
+
+inline
+unsigned
+TRGCDCHoughPlaneMulti2::setEntry(unsigned serialId,
+                                 unsigned layerId,
+                                 unsigned n) {
+    _usage[layerId] = true;
+    _layers[layerId]->setEntry(serialId, n);
+    return n;
 }
 
 } // namespace Belle2

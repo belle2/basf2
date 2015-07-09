@@ -119,7 +119,7 @@ namespace Belle2 {
       return pid->getProbability(Const::electron, Const::pion, set);
     }
 
-    double particleElectronIdECL(const Particle* part)
+    double particleElectronECLId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid) return 0.5;
@@ -295,7 +295,7 @@ namespace Belle2 {
       return 0;
     }
 
-    double particleMissingECL(const Particle* part)
+    double particleMissingECLId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
       if (!pid)
@@ -323,7 +323,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("K_vs_piid", particleKaonId, "kaon vs pion identification probability");
     REGISTER_VARIABLE("pi_vs_eid", particlePionvsElectronId, "pion vs electron identification probability");
-    REGISTER_VARIABLE("pi_vs_edEdxid", particlePionvsElectrondEdxId, "pion vs electron identification probability from dEdx measurement");
+    REGISTER_VARIABLE("pi_vs_edEdxid", particlePionvsElectrondEdxId,
+                      "pion vs electron identification probability from dEdx measurement");
 
     REGISTER_VARIABLE("eid_dEdx", particleElectrondEdxId, "electron identification probability from dEdx measurement");
     REGISTER_VARIABLE("muid_dEdx", particleMuondEdxId, "muon identification probability from dEdx measurement");
@@ -345,7 +346,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
     REGISTER_VARIABLE("missing_ARICH", particleMissingARICHId, "1.0 if identification probability from ARICH is missing");
 
-    REGISTER_VARIABLE("eid_ECL", particleElectronIdECL, "electron identification probability from ECL");
-    REGISTER_VARIABLE("missing_ECL", particleMissingECL, "1.0 if identification probability from ECL is missing");
+    REGISTER_VARIABLE("eid_ECL", particleElectronECLId, "electron identification probability from ECL");
+    REGISTER_VARIABLE("missing_ECL", particleMissingECLId, "1.0 if identification probability from ECL is missing");
   }
 }

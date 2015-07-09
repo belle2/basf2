@@ -1,4 +1,5 @@
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/PIDVariables.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
@@ -161,6 +162,48 @@ namespace {
     EXPECT_FLOAT_EQ(std::sqrt(5.0), particleDRho(&p));
     EXPECT_FLOAT_EQ(3.0, particleDistance(&p));
     EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
+
+    {
+      UseReferenceFrame<CMSFrame> dummy;
+      EXPECT_FLOAT_EQ(1.0261739, particleDX(&p));
+      EXPECT_FLOAT_EQ(2.0, particleDY(&p));
+      EXPECT_FLOAT_EQ(2.256825, particleDZ(&p));
+      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0261739 * 1.0261739), particleDRho(&p));
+      EXPECT_FLOAT_EQ(3.1853244, particleDistance(&p));
+      EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
+    }
+
+    {
+      Particle p2({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+      p2.setPValue(0.5);
+      p2.setVertex(TVector3(1.0, 2.0, 2.0));
+
+      UseReferenceFrame<RestFrame> dummy(&p2);
+      EXPECT_FLOAT_EQ(0.0, particleDX(&p));
+      EXPECT_FLOAT_EQ(0.0, particleDY(&p));
+      EXPECT_FLOAT_EQ(0.0, particleDZ(&p));
+      EXPECT_FLOAT_EQ(0.0, particleDRho(&p));
+      EXPECT_FLOAT_EQ(0.0, particleDistance(&p));
+      EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
+    }
+
+    /* Test with a distance between mother and daughter vertex. One
+     * has to calculate the result by hand to test the code....
+
+    {
+      Particle p2({ 0.0 , 1.0, 0.0, 1.0 }, 11);
+      p2.setPValue(0.5);
+      p2.setVertex(TVector3(1.0, 0.0, 2.0));
+
+      UseReferenceFrame<RestFrame> dummy(&p2);
+      EXPECT_FLOAT_EQ(0.0, particleDX(&p));
+      EXPECT_FLOAT_EQ(2.0, particleDY(&p));
+      EXPECT_FLOAT_EQ(0.0, particleDZ(&p));
+      EXPECT_FLOAT_EQ(2.0, particleDRho(&p));
+      EXPECT_FLOAT_EQ(2.0, particleDistance(&p));
+      EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
+    }
+         */
 
   }
 
@@ -691,6 +734,187 @@ namespace {
     var = Manager::Instance().getVariable("veto(pList2, 0.130 < M < 0.140)");
     ASSERT_NE(var, nullptr);
     EXPECT_DOUBLE_EQ(var->function(p), 0);
+
+  }
+
+  class PIDVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreArray<Particle>::registerPersistent();
+      StoreArray<MCParticle>::registerPersistent();
+      StoreArray<PIDLikelihood>::registerPersistent();
+      StoreArray<PIDLikelihood> likelihood;
+      StoreArray<Particle> particles;
+      particles.registerRelationTo(likelihood);
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(PIDVariableTest, LogLikelihood)
+  {
+    StoreArray<PIDLikelihood> likelihood;
+    StoreArray<Particle> particles;
+
+    auto* l1 = likelihood.appendNew();
+    l1->setLogLikelihood(Const::TOP, Const::electron, 0.18);
+    l1->setLogLikelihood(Const::ARICH, Const::electron, 0.16);
+    l1->setLogLikelihood(Const::ECL, Const::electron, 0.14);
+    l1->setLogLikelihood(Const::CDC, Const::electron, 0.12);
+    l1->setLogLikelihood(Const::SVD, Const::electron, 0.1);
+
+    l1->setLogLikelihood(Const::TOP, Const::pion, 0.2);
+    l1->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
+    l1->setLogLikelihood(Const::ECL, Const::pion, 0.24);
+    l1->setLogLikelihood(Const::CDC, Const::pion, 0.26);
+    l1->setLogLikelihood(Const::SVD, Const::pion, 0.28);
+
+    l1->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
+    l1->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
+    l1->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
+    l1->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
+    l1->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
+
+    l1->setLogLikelihood(Const::TOP, Const::proton, 0.4);
+    l1->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
+    l1->setLogLikelihood(Const::ECL, Const::proton, 0.44);
+    l1->setLogLikelihood(Const::CDC, Const::proton, 0.46);
+    l1->setLogLikelihood(Const::SVD, Const::proton, 0.48);
+
+    l1->setLogLikelihood(Const::TOP, Const::muon, 0.5);
+    l1->setLogLikelihood(Const::ARICH, Const::muon, 0.52);
+    l1->setLogLikelihood(Const::ECL, Const::muon, 0.54);
+    l1->setLogLikelihood(Const::CDC, Const::muon, 0.56);
+    l1->setLogLikelihood(Const::SVD, Const::muon, 0.58);
+
+    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    electron->addRelationTo(l1);
+    auto* pion = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+    pion->addRelationTo(l1);
+    auto* muon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    muon->addRelationTo(l1);
+    auto* kaon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 321);
+    kaon->addRelationTo(l1);
+    auto* proton = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 2212);
+    proton->addRelationTo(l1);
+
+    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(electron),  0.7 - 0.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLPion(electron),  0.7 - 1.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(electron),  0.7 - 1.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLProton(electron),  0.7 - 2.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(electron),  0.7 - 2.7);
+
+    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(pion),  1.2 - 0.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLPion(pion),  1.2 - 1.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(pion),  1.2 - 1.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLProton(pion),  1.2 - 2.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(pion),  1.2 - 2.7);
+
+    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(kaon),  1.7 - 0.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLPion(kaon),  1.7 - 1.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(kaon),  1.7 - 1.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLProton(kaon),  1.7 - 2.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(kaon),  1.7 - 2.7);
+
+    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(proton), 2.2 - 0.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLPion(proton), 2.2 - 1.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(proton), 2.2 - 1.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLProton(proton), 2.2 - 2.2);
+    EXPECT_ALL_NEAR(particleDeltaLogLMuon(proton),  2.2 - 2.7, 1e-6);
+
+    EXPECT_FLOAT_EQ(particleDeltaLogLElectron(muon),  2.7 - 0.7);
+    EXPECT_FLOAT_EQ(particleDeltaLogLPion(muon),  2.7 - 1.2);
+    EXPECT_FLOAT_EQ(particleDeltaLogLKaon(muon),  2.7 - 1.7);
+    EXPECT_ALL_NEAR(particleDeltaLogLProton(muon),  2.7 - 2.2, 1e-6);
+    EXPECT_FLOAT_EQ(particleDeltaLogLMuon(muon),  2.7 - 2.7);
+
+    EXPECT_FLOAT_EQ(particleElectronId(electron), 1.0 / (1.0 + std::exp(1.2 - 0.7)));
+    EXPECT_FLOAT_EQ(particleMuonId(muon), 1.0 / (1.0 + std::exp(1.2 - 2.7)));
+    EXPECT_FLOAT_EQ(particlePionId(pion), 1.0 / (1.0 + std::exp(1.7 - 1.2)));
+    EXPECT_FLOAT_EQ(particleKaonId(kaon), 1.0 / (1.0 + std::exp(1.2 - 1.7)));
+    EXPECT_FLOAT_EQ(particleProtonId(proton), 1.0 / (1.0 + std::exp(1.2 - 2.2)));
+    EXPECT_FLOAT_EQ(particlePionvsElectronId(pion), 1.0 / (1.0 + std::exp(0.7 - 1.2)));
+
+    EXPECT_FLOAT_EQ(particleElectrondEdxId(electron), 1.0 / (1.0 + std::exp(0.54 - 0.22)));
+    EXPECT_FLOAT_EQ(particleMuondEdxId(muon), 1.0 / (1.0 + std::exp(0.54 - 1.14)));
+    EXPECT_FLOAT_EQ(particlePiondEdxId(pion), 1.0 / (1.0 + std::exp(0.74 - 0.54)));
+    EXPECT_FLOAT_EQ(particleKaondEdxId(kaon), 1.0 / (1.0 + std::exp(0.54 - 0.74)));
+    EXPECT_FLOAT_EQ(particleProtondEdxId(proton), 1.0 / (1.0 + std::exp(0.54 - 0.94)));
+    EXPECT_FLOAT_EQ(particlePionvsElectrondEdxId(pion), 1.0 / (1.0 + std::exp(0.22 - 0.54)));
+
+    EXPECT_FLOAT_EQ(particleElectronTOPId(electron), 1.0 / (1.0 + std::exp(0.2 - 0.18)));
+    EXPECT_FLOAT_EQ(particleMuonTOPId(muon), 1.0 / (1.0 + std::exp(0.2 - 0.5)));
+    EXPECT_FLOAT_EQ(particlePionTOPId(pion), 1.0 / (1.0 + std::exp(0.3 - 0.2)));
+    EXPECT_FLOAT_EQ(particleKaonTOPId(kaon), 1.0 / (1.0 + std::exp(0.2 - 0.3)));
+    EXPECT_FLOAT_EQ(particleProtonTOPId(proton), 1.0 / (1.0 + std::exp(0.2 - 0.4)));
+
+    EXPECT_FLOAT_EQ(particleElectronARICHId(electron), 1.0 / (1.0 + std::exp(0.22 - 0.16)));
+    EXPECT_FLOAT_EQ(particleMuonARICHId(muon), 1.0 / (1.0 + std::exp(0.22 - 0.52)));
+    EXPECT_FLOAT_EQ(particlePionARICHId(pion), 1.0 / (1.0 + std::exp(0.32 - 0.22)));
+    EXPECT_FLOAT_EQ(particleKaonARICHId(kaon), 1.0 / (1.0 + std::exp(0.22 - 0.32)));
+    EXPECT_FLOAT_EQ(particleProtonARICHId(proton), 1.0 / (1.0 + std::exp(0.22 - 0.42)));
+
+    EXPECT_FLOAT_EQ(particleElectronECLId(electron), 1.0 / (1.0 + std::exp(0.24 - 0.14)));
+
+  }
+
+  TEST_F(PIDVariableTest, MissingLikelihood)
+  {
+    StoreArray<PIDLikelihood> likelihood;
+    StoreArray<Particle> particles;
+
+    auto* l1 = likelihood.appendNew();
+    l1->setLogLikelihood(Const::TOP, Const::electron, 0.18);
+    l1->setLogLikelihood(Const::ECL, Const::electron, 0.14);
+    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    electron->addRelationTo(l1);
+
+    auto* l2 = likelihood.appendNew();
+    l2->setLogLikelihood(Const::TOP, Const::pion, 0.2);
+    l2->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
+    l2->setLogLikelihood(Const::ECL, Const::pion, 0.24);
+    l2->setLogLikelihood(Const::CDC, Const::pion, 0.26);
+    l2->setLogLikelihood(Const::SVD, Const::pion, 0.28);
+    auto* pion = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+    pion->addRelationTo(l2);
+
+    auto* l3 = likelihood.appendNew();
+    l3->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
+    l3->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
+    auto* kaon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 321);
+    kaon->addRelationTo(l3);
+
+    auto* l4 = likelihood.appendNew();
+    l4->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
+    l4->setLogLikelihood(Const::ECL, Const::proton, 0.44);
+    l4->setLogLikelihood(Const::CDC, Const::proton, 0.46);
+    l4->setLogLikelihood(Const::SVD, Const::proton, 0.48);
+    auto* proton = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 2212);
+    proton->addRelationTo(l4);
+
+    EXPECT_FLOAT_EQ(particleMissingTOPId(electron), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingTOPId(pion), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingTOPId(kaon), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingTOPId(proton), 1.0);
+
+    EXPECT_FLOAT_EQ(particleMissingARICHId(electron), 1.0);
+    EXPECT_FLOAT_EQ(particleMissingARICHId(pion), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingARICHId(kaon), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingARICHId(proton), 0.0);
+
+    EXPECT_FLOAT_EQ(particleMissingECLId(electron), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingECLId(pion), 0.0);
+    EXPECT_FLOAT_EQ(particleMissingECLId(kaon), 1.0);
+    EXPECT_FLOAT_EQ(particleMissingECLId(proton), 0.0);
 
   }
 

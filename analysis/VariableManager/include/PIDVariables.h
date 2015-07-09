@@ -88,6 +88,12 @@ namespace Belle2 {
      * return electron Id
      */
     double particleElectronARICHId(const Particle* part);
+
+    /**
+     * return electron Id
+     */
+    double particleElectronECLId(const Particle* part);
+
     /**
      * return muon Id
      */
@@ -177,6 +183,11 @@ namespace Belle2 {
      * return 1 if TOPId is missing
      */
     double particleMissingTOPId(const Particle*);
+
+    /**
+     * return 1 if ECLId is missing
+     */
+    double particleMissingECLId(const Particle* part);
   }
 } // Belle2 namespace
 

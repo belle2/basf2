@@ -63,17 +63,27 @@ def LoadGeometry(resource):
     resource.path.add_module(geometry)
 
 
-def SelectParticleList(resource, particleName, particleLabel):
+def SelectParticleList(resource, particleName, particleLabel, preCutConfig):
     """
     Creates a ParticleList gathering up all Particles with the given particleName
         @param resource object
         @param particleName valid pdg particle name
         @param particleLabel user defined label
+        @param preCutConfig
         @return name of ParticleList
     """
     resource.cache = True
     particleList = particleName + ':' + resource.hash
-    cut = 'isInRestOfEvent > 0.5' if resource.env['ROE'] else ''
+
+    if preCutConfig is not None and resource.env['ROE']:
+        cut = '[' + preCutConfig.userCut + '] and isInRestOfEvent > 0.5'
+    elif preCutConfig is not None:
+        cut = preCutConfig.userCut
+    elif resource.env['ROE']:
+        cut = 'isInRestOfEvent > 0.5'
+    else:
+        cut = ''
+
     modularAnalysis.fillParticleList(particleList, cut, writeOut=True, path=resource.path)
     return particleList
 

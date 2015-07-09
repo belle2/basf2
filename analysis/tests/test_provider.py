@@ -116,7 +116,17 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_SelectParticleList(self):
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic'), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic',
+                                            PreCutConfiguration(None, None, None, None, 'eid > 0.2')), 'e+:42')
+        # Enables caching
+        result = MockResource(env={'ROE': False}, cache=True)
+        # Adds ParticleLoader
+        result.path.add_module('ParticleLoader', decayStringsWithCuts=[('e+:42', 'eid > 0.2')], writeOut=True)
+        self.assertEqual(self.resource, result)
+
+    def test_SelectParticleListWithoutCut(self):
+        # Returns name of ParticleList
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', None), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': False}, cache=True)
         # Adds ParticleLoader
@@ -127,11 +137,25 @@ class TestSelectParticleList(unittest.TestCase):
         # Set environment to ROE
         self.resource.env['ROE'] = True
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic'), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic',
+                                            PreCutConfiguration(None, None, None, None, 'eid > 0.2')), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': True}, cache=True)
         # Adds ParticleLoader with cut
-        result.path.add_module('ParticleLoader', decayStringsWithCuts=[('e+:42', 'isInRestOfEvent > 0.5')], writeOut=True)
+        result.path.add_module('ParticleLoader',
+                               decayStringsWithCuts=[('e+:42', '[eid > 0.2] and isInRestOfEvent > 0.5')], writeOut=True)
+        self.assertEqual(self.resource, result)
+
+    def test_SelectParticleListInROEWithoutCut(self):
+        # Set environment to ROE
+        self.resource.env['ROE'] = True
+        # Returns name of ParticleList
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', None), 'e+:42')
+        # Enables caching
+        result = MockResource(env={'ROE': True}, cache=True)
+        # Adds ParticleLoader with cut
+        result.path.add_module('ParticleLoader',
+                               decayStringsWithCuts=[('e+:42', 'isInRestOfEvent > 0.5')], writeOut=True)
         self.assertEqual(self.resource, result)
 
 

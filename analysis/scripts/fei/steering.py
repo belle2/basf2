@@ -195,7 +195,8 @@ def fullEventInterpretation(selection_path, particles):
         if particle.isFSP:
             dag.add('RawParticleList_' + particle.identifier, provider.SelectParticleList,
                     particleName='Name_' + particle.identifier,
-                    particleLabel='Label_' + particle.identifier)
+                    particleLabel='Label_' + particle.identifier,
+                    preCutConfig='PreCutConfig_' + particle.identifier)
             dag.add('MatchedParticleList_' + particle.identifier, provider.MatchParticleList,
                     particleList='RawParticleList_' + particle.identifier)
         else:

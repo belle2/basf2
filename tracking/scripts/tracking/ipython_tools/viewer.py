@@ -33,9 +33,9 @@ class PathViewer(object):
               }
         </style>"""
 
-    def show(self):
+    def create(self):
         """
-        Display the widget
+        Create the widget
         """
         a = widgets.Accordion()
         children = []
@@ -52,6 +52,13 @@ class PathViewer(object):
 
         a.children = children
 
+        return a
+
+    def show(self):
+        """
+        Show the widget
+        """
+        a = self.create()
         display(a)
 
 
@@ -147,9 +154,9 @@ class CollectionsViewer(object):
               }
         </style>"""
 
-    def show(self):
+    def create(self):
         """
-        Show the widget
+        Create the widget
         """
 
         a = widgets.Tab()
@@ -165,5 +172,44 @@ class CollectionsViewer(object):
             a.set_title(i, "Event " + str(event.number))
 
         a.children = children
+
+        return a
+
+    def show(self):
+        """
+        Show the widget
+        """
+
+        a = self.create()
+        display(a)
+
+
+class ProcessViewer(object):
+
+    """
+    A widget to summarize all the infromation from different processes.
+    Must be filled with the widgets of the single processes
+    """
+
+    def __init__(self, children):
+        self.children = children
+
+    def create(self):
+        """
+        Create the widget
+        """
+        a = widgets.Accordion()
+        a.children = self.children
+        return a
+
+    def show(self):
+        """
+        Show the widget
+        """
+        if len(self.children) > 0:
+            a = self.create()
+
+        else:
+            a = widgets.HTML("<strong>Calculation list empty. Nothing to show.</strong>")
 
         display(a)

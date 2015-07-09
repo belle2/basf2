@@ -57,6 +57,8 @@ class Basf2Calculation():
         Shows a progress bar with the number of processed events.
         Please keep in mind that you can not execute cells in the notebook when having called wait_for_end
         (but before - although a calculation is running.).
+
+        TODO: Show all status bars and show them smaller
         """
         def f(process):
             if process.already_run:
@@ -85,6 +87,10 @@ class Basf2Calculation():
         self.map_on_processes(f, index)
 
     def map_on_processes(self, map_function, index):
+        """
+        Calculate a function on all processes and colltect the results if index is None.
+        Else calculate the function only one the given process or the process number.
+        """
         if len(self.process_list) == 1:
             return map_function(self.process_list[0])
         else:
@@ -178,32 +184,46 @@ class Basf2Calculation():
 
         return self.map_on_processes(f, index)
 
-    def show_path(self, return_widget=False):
+    def create_widgets_for_all_processes(self, widget_function, index=None):
+        """
+        Create a overview widget for all processes or only one for the given process.
+        """
+
+        widget = None
+
+        if len(self.process_list) == 1:
+            widget = widget_function(self.process_list[0])
+        else:
+            if index is None:
+                widget = viewer.ProcessViewer(map(widget_function, self.process_list))
+            else:
+                if isinstance(index, int):
+                    widget = widget_function(self.process_list[index])
+                else:
+                    widget = widget_function(index)
+
+        widget.show()
+
+    def show_path(self, index=None):
         """
         Show the underlaying basf2 path in an interactive way
         """
 
-        raise NotImplementedError()
+        def f(process):
+            return viewer.PathViewer(process.path)
 
-        path_viewer = viewer.PathViewer(self.process_list.path)
-        path_viewer.show()
+        self.create_widgets_for_all_processes(f, index)
 
-        if return_widget:
-            return path_viewer
-
-    def show_collections(self, return_widget=False):
+    def show_collections(self, index=None):
         """
         Show some snapshots on the collections.
         Remember to add the PrintCollectionsPython Module for that!
         """
 
-        raise NotImplementedError()
+        def f(process):
+            return viewer.CollectionsViewer(self.get("basf2.store_content", process))
 
-        collections_viewer = viewer.CollectionsViewer(self.get("basf2.store_content"))
-        collections_viewer.show()
-
-        if return_widget:
-            return collections_viewer
+        self.create_widgets_for_all_processes(f, index)
 
 
 class Basf2CalculationList():

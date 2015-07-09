@@ -18,6 +18,7 @@ from multiprocessing import Process, Pipe
 
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
+from IPython.core.display import Image, display
 
 
 class IPythonHandler:

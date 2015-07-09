@@ -19,7 +19,7 @@ class Basf2Calculation():
         Make the class iterable over all single processes
         """
         for process in self.process_list:
-            yield Basf2Calculation(process)
+            yield Basf2Calculation([process])
 
     def __len__(self):
         return len(self.process_list)

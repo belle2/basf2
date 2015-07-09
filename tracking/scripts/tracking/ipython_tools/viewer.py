@@ -165,11 +165,11 @@ class CollectionsViewer(object):
         for i, event in enumerate(self.collections):
             html = widgets.HTML()
             html.value = self.styling_text + "<table>"
-            for store_array in event.store_content:
+            for store_array in event["store_content"]:
                 html.value += "<tr>" + "<td>" + store_array[0] + "</td>" + "<td>" + str(store_array[1]) + "</td>" + "</tr>"
             html.value += "</table>"
             children.append(html)
-            a.set_title(i, "Event " + str(event.number))
+            a.set_title(i, "Event " + str(event["number"]))
 
         a.children = children
 
@@ -198,8 +198,10 @@ class ProcessViewer(object):
         """
         Create the widget
         """
-        a = widgets.Accordion()
-        a.children = self.children
+        a = widgets.Tab()
+        for i in xrange(len(self.children)):
+            a.set_title(i, "Process " + str(i))
+        a.children = [children.create() for children in self.children]
         return a
 
     def show(self):

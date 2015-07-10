@@ -563,6 +563,7 @@ def applyTMVAMethod(
     signalFraction=-1,
     signalClass=1,
     prefix='TMVA',
+    transformToProbability=True,
     workingDirectory='.',
     path=analysis_main,
 ):
@@ -585,6 +586,7 @@ def applyTMVAMethod(
     expert.param('listNames', decayString)
     expert.param('expertOutputName', expertOutputName)
     expert.param('signalFraction', signalFraction)
+    expert.param('transformToProbability', transformToProbability)
     expert.param('signalClass', signalClass)
     path.add_module(expert)
 

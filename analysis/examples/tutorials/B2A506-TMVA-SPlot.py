@@ -82,8 +82,8 @@ a1.setConstant(kFALSE)
 bkg = RooChebychev("bkg", "Background", M, RooArgList(a0, a1))
 
 # The names signal and background for the PDF yields are assumend in the TMVAInterface code! So use them!
-bkgfrac = RooRealVar("signal", "fraction of background", 0.99)
-sigfrac = RooRealVar("background", "fraction of background", 0.01)
+sigfrac = RooRealVar("signal", "fraction of signal", 0.5)
+bkgfrac = RooRealVar("background", "fraction of background", 0.5)
 bkgfrac.setConstant(kFALSE)
 sigfrac.setConstant(kFALSE)
 

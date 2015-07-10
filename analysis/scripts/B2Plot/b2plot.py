@@ -69,13 +69,17 @@ class Plotter(BasePlotter):
             self.bin_centers[column] = (numpy.roll(patches, 1) + patches)[1:] / 2.0
             self.bin_widths[column] = (numpy.roll(patches, 1) - patches)[1:] / 2.0
             # Save maximum and minimum for x and y dimension
-            self.xmax = max(data[column].max(), self.xmax)
-            self.xmin = min(data[column].min(), self.xmin)
-            self.ymax = max(signal_hist.max(), bckgrd_hist.max(), self.ymax)
-            self.ymin = min(signal_hist.min(), bckgrd_hist.min(), self.ymin)
+            self.xmax = numpy.nanmax([data[column].max(), self.xmax])
+            self.xmin = numpy.nanmin([data[column].min(), self.xmin])
+            self.ymax = numpy.nanmax([signal_hist.max(), bckgrd_hist.max(), self.ymax])
+            self.ymin = numpy.nanmin([signal_hist.min(), bckgrd_hist.min(), self.ymin])
 
     def roc_plot(self, axis):
         plots = []
+        ymax = float(1)
+        ymin = float(0)
+        xmax = float(1)
+        xmin = float(0)
         for column in self.columns:
             signal = self.signal[column]
             bckgrd = self.bckgrd[column]
@@ -88,11 +92,16 @@ class Plotter(BasePlotter):
             purity = cumsignal / (cumsignal + cumbckgrd)
             purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
 
+            ymax = numpy.nanmax([purity.max(), ymax])
+            ymin = numpy.nanmin([purity.min(), ymin])
+            xmax = numpy.nanmax([efficiency.max(), xmax])
+            xmin = numpy.nanmin([efficiency.min(), xmin])
+
             p = self.datapoint_plot(axis, efficiency, purity, xerr=efficiency_error, yerr=purity_error, label=column)
             plots.append(p)
 
-        axis.set_xlim((0, 1))
-        axis.set_ylim((0, 1))
+        axis.set_xlim((xmin, xmax))
+        axis.set_ylim((ymin, ymax))
         axis.get_xaxis().set_label_text('Efficiency')
         axis.get_yaxis().set_label_text('Purity')
         axis.set_title('ROC Plot')
@@ -101,6 +110,10 @@ class Plotter(BasePlotter):
 
     def roc2_plot(self, axis):
         plots = []
+        ymax = float(1)
+        ymin = float(0)
+        xmax = float(1)
+        xmin = float(0)
         for column in self.columns:
             signal = self.signal[column]
             bckgrd = self.bckgrd[column]
@@ -114,11 +127,16 @@ class Plotter(BasePlotter):
             rejection = cumbckgrd / bckgrd.sum()
             rejection_error = binom_error(cumbckgrd, bckgrd.sum())
 
+            ymax = numpy.nanmax([rejection.max(), ymax])
+            ymin = numpy.nanmin([rejection.min(), ymin])
+            xmax = numpy.nanmax([efficiency.max(), xmax])
+            xmin = numpy.nanmin([efficiency.min(), xmin])
+
             p = self.datapoint_plot(axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error, label=column)
             plots.append(p)
 
-        axis.set_xlim((0, 1))
-        axis.set_ylim((0, 1))
+        axis.set_xlim((xmin, xmax))
+        axis.set_ylim((ymin, ymax))
         axis.get_xaxis().set_label_text('Signal Efficiency')
         axis.get_yaxis().set_label_text('Background Rejection')
         axis.set_title('ROC Plot')
@@ -127,6 +145,8 @@ class Plotter(BasePlotter):
 
     def diag_plot(self, axis, line=None):
         plots = []
+        ymax = float(1)
+        ymin = float(0)
         for column in self.columns:
             signal = self.signal[column]
             bckgrd = self.bckgrd[column]
@@ -136,12 +156,16 @@ class Plotter(BasePlotter):
             purity = signal / (signal + bckgrd)
             purity_error = binom_error(signal, signal + bckgrd)
 
+            ymax = numpy.nanmax([purity.max(), ymax])
+            ymin = numpy.nanmin([purity.min(), ymin])
+
             p = self.datapoint_plot(axis, bin_centers, purity, xerr=bin_widths, yerr=purity_error, label=column)
             plots.append(p)
 
         axis.plot((self.xmin, self.xmax) if line is None else line, (0, 1), color='black')
         axis.set_xlim((self.xmin, self.xmax))
-        axis.set_ylim((0, 1))
+
+        axis.set_ylim((ymin, ymax))
         axis.get_xaxis().set_label_text(self.quantity)
         axis.get_yaxis().set_label_text('Purity')
         axis.set_title('Diagonal Plot')
@@ -151,6 +175,7 @@ class Plotter(BasePlotter):
     def dist_plot(self, axis):
         plots = []
         ymax = float('-inf')
+        ymin = float(0)
         for column in self.columns:
             signal = self.signal[column]
             bckgrd = self.bckgrd[column]
@@ -160,7 +185,8 @@ class Plotter(BasePlotter):
             signal_error = poisson_error(signal)
             bckgrd_error = poisson_error(bckgrd)
 
-            ymax = max(signal.max() + signal_error.max(), bckgrd.max() + bckgrd_error.max(), ymax)
+            ymax = numpy.nanmax([signal.max() + signal_error.max(), bckgrd.max() + bckgrd_error.max(), ymax])
+            ymin = numpy.nanmin([signal.min(), bckgrd.min(), ymin])
 
             p = self.datapoint_plot(axis, bin_centers, signal, xerr=bin_widths, yerr=signal_error, label=column + ' Signal')
             plots.append(p)
@@ -168,7 +194,7 @@ class Plotter(BasePlotter):
             plots.append(p)
 
         axis.set_xlim((self.xmin, self.xmax))
-        axis.set_ylim((0, ymax))
+        axis.set_ylim((ymin, ymax))
         axis.get_xaxis().set_label_text(self.quantity)
         axis.get_yaxis().set_label_text('N')
         axis.set_title('Distribution Plot')
@@ -191,10 +217,10 @@ class ComparisonPlotter(BasePlotter):
         self.bin_patches = self.plotter_a.bin_patches[column_a]
         self.bin_centers = self.plotter_a.bin_centers[column_a]
         self.bin_widths = self.plotter_a.bin_widths[column_a]
-        self.xmax = max(self.plotter_a.xmax, self.plotter_b.xmax)
-        self.xmin = min(self.plotter_a.xmin, self.plotter_b.xmin)
-        self.ymax = max(self.plotter_a.ymax, self.plotter_b.ymax)
-        self.ymin = min(self.plotter_a.ymin, self.plotter_b.ymin)
+        self.xmax = numpy.nanmax([self.plotter_a.xmax, self.plotter_b.xmax])
+        self.xmin = numpy.nanmin([self.plotter_a.xmin, self.plotter_b.xmin])
+        self.ymax = numpy.nanmax([self.plotter_a.ymax, self.plotter_b.ymax])
+        self.ymin = numpy.nanmin([self.plotter_a.ymin, self.plotter_b.ymin])
         self.signal_a = self.plotter_a.signal[column_a]
         self.signal_b = self.plotter_b.signal[column_b]
         self.bckgrd_a = self.plotter_a.bckgrd[column_a]

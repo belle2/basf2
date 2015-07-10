@@ -41,9 +41,37 @@ namespace Belle2 {
      *         or empty if file wasn't found.
      */
     static std::string findFile(const std::string& path);
+
+    /**
+     * Helper class for locking a file
+     */
+    class Lock {
+    public:
+
+      /**
+       * Construct a Lock object for the given file
+       * @param fileName  Name of the file to be locked
+       */
+      Lock(std::string fileName);
+
+      /**
+       * Destructor. Releases the lock
+       */
+      ~Lock();
+
+      /**
+       * Try to lock the file
+       * @param timeout  Time in seconds until it is tried to get a lock
+       * @return  True if the lock could be obtained
+       */
+      bool lock(int timeout = 20);
+
+    private:
+      int m_file;  /**< File descriptor of file to be locked */
+    };
+
   private:
     /** no instances. */
     FileSystem() {}
   };
-
 }

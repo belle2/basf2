@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Thomas Kuhr                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,9 @@
 
 //dlopen etc.
 #include <dlfcn.h>
+#include <chrono>
+#include <random>
+#include <sys/file.h>
 
 using namespace std;
 using namespace Belle2;
@@ -81,3 +84,33 @@ std::string FileSystem::findFile(const string& path)
   else
     return string("");
 }
+
+
+FileSystem::Lock::Lock(std::string fileName)
+{
+  m_file = open(fileName.c_str(), O_RDWR | O_CREAT, 0640);
+}
+
+FileSystem::Lock::~Lock()
+{
+  if (m_file >= 0) close(m_file);
+}
+
+bool FileSystem::Lock::lock(int timeout)
+{
+  if (m_file < 0) return false;
+
+  auto const maxtime = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
+  std::default_random_engine random;
+  std::uniform_int_distribution<int> uniform(1, 100);
+
+  while (std::chrono::steady_clock::now() < maxtime) {
+    int lock = flock(m_file, LOCK_EX | LOCK_NB);
+    if (lock == 0) return true;
+    auto next = std::chrono::steady_clock::now() + std::chrono::milliseconds(uniform(random));
+    while (std::chrono::steady_clock::now() < next);
+  }
+
+  return false;
+}
+

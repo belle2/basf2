@@ -11,57 +11,92 @@
 
 #include <framework/database/Database.h>
 
-class TFile;
+#include <string>
+#include <map>
+#include <vector>
+#include <utility>
 
 
 namespace Belle2 {
   /**
-   * Implentation of a database backend that uses a root file for the data
-   * storage and is not optimized. The implementation should only be used
-   * for test purposes.
+   * Implentation of a database backend that uses local root files for the
+   * payload storage and a text file for the assignment of IoVs to payloads.
    */
   class LocalDatabase: public Database {
   public:
 
     /**
      * Method to set the database instance to a local database.
+     *
+     * @param fileName   The name of the database text file with the IoV assignments.
+     * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
+     * @param logLevel   The level of log messages about not-found payloads.
+     * @return           A pointer to the created database instance
      */
-    static void createInstance();
+    static void createInstance(const std::string& fileName = "database.txt", const std::string& payloadDir = "",
+                               LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
 
     /**
      * Request an object from the database.
      *
      * @param event      The metadata of the event for which the object should be valid.
-     * @param name       Name that identifies the object in the database.
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name);
+    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& package,
+                                                            const std::string& module);
 
     /**
      * Store an object in the database.
      *
-     * @param name       Name that identifies the object in the database.
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
      * @param object     The object that should be stored in the database.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& name, TObject* object, IntervalOfValidity& iov);
+    virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov);
 
   private:
-    /** Hidden constructor, as it is a singleton. */
-    explicit LocalDatabase();
+    /**
+     * Hidden constructor, as it is a singleton.
+     *
+     * @param fileName   The name of the database text file with the IoV assignments.
+     * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
+     */
+    explicit LocalDatabase(const std::string& fileName, const std::string& payloadDir = "");
 
     /** Hidden copy constructor, as it is a singleton. */
     LocalDatabase(const LocalDatabase&);
 
-    /** Hidden destructor, as it is a singleton. */
-    ~LocalDatabase();
+    /** Read IoVs of payloads from database file.
+     * @return   True if the database could be successfully read. */
+    bool readDatabase();
 
-    /** Connect to the database. Currently this mean opening the database file.
-     * @return   True if the connection to the databse could be successfully established. */
-    bool connectDatabase();
+    /**
+     * If a default payload exists return it with an infinite IoV.
+     * Otherwise return a null pointer if empty IoV
+     *
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
+     * @param object     The object that should be stored in the database.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    std::pair<TObject*, IntervalOfValidity> tryDefault(const std::string& package, const std::string& module);
 
-    /** A root file that contains the database content. */
-    TFile* m_dbFile;
+    /** Write IoVs of payloads to database file.
+     * @return   True if the database could be successfully written. */
+    bool writeDatabase();
+
+    /** The database file name. */
+    std::string m_fileName;
+
+    /** The directory of payloads. */
+    std::string m_payloadDir;
+
+    /** Map of packages to map of modules to vector of revisions and assigned IoVs. */
+    std::map<std::string, std::map<std::string, std::vector<std::pair<int, IntervalOfValidity>>>> m_database;
   };
 } // namespace Belle2

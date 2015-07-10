@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/LogConfig.h>
 
 #include <string>
 #include <utility>
@@ -36,20 +37,31 @@ namespace Belle2 {
     static Database& Instance();
 
     /**
-     * Function to set the global tag.
+     * Helper function to set the database instance.
+     * If the current instance is a DatabaseChain the given database is added to it.
      *
-     * @param tag  The global tag identifier
+     * @param database   The database object.
      */
-    static void setGlobalTag(std::string tag) {Instance().m_globalTag = tag;};
+    static void setInstance(Database* database);
+
+    /**
+     * Reset the database instance.
+     */
+    static void reset();
+
+    /** Destructor, resets the instance pointer if needed. */
+    virtual ~Database();
 
     /**
      * Request an object from the database.
      *
      * @param event      The metadata of the event for which the object should be valid.
-     * @param name       Name that identifies the object in the database.
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) = 0;
+    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& package,
+                                                            const std::string& module) = 0;
 
     /**
      * Struct for bulk queries.
@@ -59,8 +71,10 @@ namespace Belle2 {
        * Constructor
        * @param aName  The identifier of the object
        */
-      DBQuery(std::string aName, TObject* aObject = 0, IntervalOfValidity aIov = 0): name(aName), object(aObject), iov(aIov) {};
-      std::string        name;   /**< Identifier of the object */
+      DBQuery(const std::string& aPackage, const std::string& aModule, TObject* aObject = 0,
+              IntervalOfValidity aIov = 0): package(aPackage), module(aModule), object(aObject), iov(aIov) {};
+      std::string        package; /**< First part of identifier of the object */
+      std::string        module; /**< Second part of identifier of the object */
       TObject*           object; /**< Pointer to the object */
       IntervalOfValidity iov;    /**< Interval of validity of the object */
     };
@@ -76,12 +90,23 @@ namespace Belle2 {
     /**
      * Store an object in the database.
      *
-     * @param name       Name that identifies the object in the database.
+     * @param package    Name of the package that identifies the object in the database.
+     * @param module     Name of the module that identifies the object in the database.
      * @param object     The object that should be stored in the database.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& name, TObject* object, IntervalOfValidity& iov) = 0;
+    virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov) = 0;
+
+    /**
+     * Store an object in the database with the default package name "dbstore".
+     *
+     * @param module     Name of the module that identifies the object in the database.
+     * @param object     The object that should be stored in the database.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    bool storeData(const std::string& module, TObject* object, IntervalOfValidity& iov) {return storeData("dbstore", module, object, iov);};
 
     /**
      * Store multiple objects in the database.
@@ -96,20 +121,35 @@ namespace Belle2 {
      */
     static void exposePythonAPI();
 
-  protected:
-    /** The global tag. Currently used for the database file name. */
-    std::string m_globalTag;
+    /**
+     * Set level of log messages about not-found payloads.
+     *
+     * @param logLevel  The level of log messages about not-found payloads.
+     */
+    void setLogLevel(LogConfig::ELogLevel logLevel = LogConfig::c_Warning) {m_logLevel = logLevel;};
 
+
+  protected:
     /** Pointer to the database instance. */
     static Database* s_instance;
 
     /** Hidden constructor, as it is a singleton. */
-    Database(std::string tag): m_globalTag(tag) {};
+    Database() : m_logLevel(LogConfig::c_Warning) {};
 
     /** Hidden copy constructor, as it is a singleton. */
     Database(const Database&) {};
 
-    /** Hidden destructor, as it is a singleton. */
-    virtual ~Database() {};
+    /** Helper function to construct a payload file name. */
+    std::string payloadFileName(const std::string& path, const std::string& package, const std::string& module, int revision) const;
+
+    /** Helper function to read an object from a payload file. */
+    TObject* readPayload(const std::string& fileName, const std::string& module) const;
+
+    /** Helper function to write an object to a payload file. */
+    bool writePayload(const std::string& fileName, const std::string& module, const TObject* object,
+                      const IntervalOfValidity* iov = 0) const;
+
+    /** Level of log messages about not found objects. */
+    LogConfig::ELogLevel m_logLevel;
   };
 } // namespace Belle2

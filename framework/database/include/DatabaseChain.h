@@ -10,35 +10,35 @@
 #pragma once
 
 #include <framework/database/Database.h>
+#include <framework/database/IntervalOfValidity.h>
+
+#include <string>
+#include <vector>
 
 
 namespace Belle2 {
   /**
-   * Database backend that uses the conditions service.
+   * Implentation of a database backend that uses a chain of other
+   * database backends to obtain the payloads.
    */
-  class ConditionsDatabase: public Database {
+  class DatabaseChain: public Database {
   public:
 
     /**
-     * Method to set the database instance to the central database with default parameters.
+     * Method to set the database instance to a local database.
      *
-     * @param globalTag   The name of the global tag
+     * @param resetIoVs   A flag to indicate whether IoVs from non-primary databases should be set to the current run
+     * @param logLevel    The level of log messages about not-found payloads.
      * @return            A pointer to the created database instance
      */
-    static void createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+    static void createInstance(bool resetIoVs = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
 
     /**
-     * Method to set the database instance to the central database.
+     * Add a database backend.
      *
-     * @param globalTag      The name of the global tag
-     * @param restBaseName   Base name for REST services
-     * @param fileBaseName   Base name for conditions files
-     * @param fileBaseLocal  Directory name for local conditions files copies
-     * @param logLevel       The level of log messages about not-found payloads.
-     * @return               A pointer to the created database instance
+     * @param database      The backend instance.
      */
-    static void createInstance(const std::string& globalTag, const std::string& restBaseName, const std::string& fileBaseName,
-                               const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+    void addDatabase(Database* database);
 
     /**
      * Request an object from the database.
@@ -61,31 +61,19 @@ namespace Belle2 {
     virtual bool storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov);
 
   private:
-    /**
-     * Hidden constructor, as it is a singleton.
-     *
-     * @param globalTag      The name of the global tag
-     * @param payloadDir     The name of the directory in which the payloads are atored.
-     * @param restBaseName   Base name for REST services
-     */
-    explicit ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir = "");
+    /** Hidden constructor, as it is a singleton. */
+    explicit DatabaseChain(bool resetIoVs) : m_resetIoVs(resetIoVs) {};
 
     /** Hidden copy constructor, as it is a singleton. */
-    ConditionsDatabase(const ConditionsDatabase&);
+    DatabaseChain(const DatabaseChain&);
 
     /** Hidden destructor, as it is a singleton. */
-    virtual ~ConditionsDatabase() {};
+    ~DatabaseChain();
 
-    /** Global tag. */
-    std::string m_globalTag;
+    /** The database file name. */
+    std::vector<Database*> m_databases;
 
-    /** The directory of payloads. */
-    std::string m_payloadDir;
-
-    /** Experiment number for which the payloads were obtained. */
-    int m_currentExperiment;
-
-    /** Run number for which the payloads were obtained. */
-    int m_currentRun;
+    /** Flag whether the IoVs obtained from non-primary databases should be reset to a single run. */
+    bool m_resetIoVs;
   };
 } // namespace Belle2

@@ -1,7 +1,11 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
+#include <framework/database/LocalDatabase.h>
+#include <framework/database/ConditionsDatabase.h>
+#include <framework/database/DatabaseChain.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/EventDependency.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/TestHelpers.h>
@@ -11,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/filesystem.hpp>
 #include <list>
 #include <cstdio>
 
@@ -23,6 +28,12 @@ namespace {
   class DataBaseTest : public ::testing::Test {
   protected:
 
+    /** Type of database to be tested */
+    enum EDatabaseType {c_local, c_central, c_chain};
+
+    /** Type of database to be tested */
+    EDatabaseType m_dbType = c_local;
+
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
     virtual void SetUp()
     {
@@ -30,29 +41,56 @@ namespace {
       DataStore::Instance().setInitializeActive(true);
       evtPtr.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
-      evtPtr.construct(0, 1, 1);
+      evtPtr.construct(0, 0, 1);
 
-      list<Database::DBQuery> query;
-      Database::setGlobalTag("TestDatabase.root");
-      TClonesArray array("TObject");
-      for (int experiment = 1; experiment <= 5; experiment++) {
-        IntervalOfValidity iov(experiment, 0, experiment, 0);
-
-        TString name = "Experiment ";
-        name += experiment;
-        query.push_back(Database::DBQuery("TNamed", new TNamed(name, name), iov));
-
-        new(array[experiment - 1]) TObject;
-        array[experiment - 1]->SetUniqueID(experiment);
-        Database::Instance().storeData("TObjects", &array, iov);
+      switch (m_dbType) {
+        case c_local:
+          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          break;
+        case c_central:
+          ConditionsDatabase::createDefaultInstance("default");
+          break;
+        case c_chain:
+          DatabaseChain::createInstance();
+          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          ConditionsDatabase::createDefaultInstance("default");
+          break;
       }
-      Database::Instance().storeData(query);
+
+      if (m_dbType != c_central) {
+        list<Database::DBQuery> query;
+        TClonesArray array("TObject");
+        for (int experiment = 1; experiment <= 5; experiment++) {
+          IntervalOfValidity iov(experiment, -1, experiment, -1);
+
+          TString name = "Experiment ";
+          name += experiment;
+          query.push_back(Database::DBQuery("dbstore", "TNamed", new TNamed(name, name), iov));
+
+          new(array[experiment - 1]) TObject;
+          array[experiment - 1]->SetUniqueID(experiment);
+          Database::Instance().storeData("dbstore", "TObjects", &array, iov);
+        }
+        if (m_dbType != c_chain) {
+          Database::Instance().storeData(query);
+        }
+
+        EventDependency intraRunDep(new TNamed("A", "A"));
+        intraRunDep.add(10, new TNamed("B", "B"));
+        intraRunDep.add(50, new TNamed("C", "C"));
+        IntervalOfValidity iov1(1, 1, 1, 1);
+        Database::Instance().storeData("dbstore", "IntraRun", &intraRunDep, iov1);
+        IntervalOfValidity iov2(1, 2, 1, -1);
+        Database::Instance().storeData("dbstore", "IntraRun", new TNamed("X", "X"), iov2);
+      }
     }
 
     /** clear datastore */
     virtual void TearDown()
     {
-      remove("TestDatabase.root");
+      if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
+      Database::reset();
+      DataStore::Instance().reset();
     }
 
   };
@@ -61,23 +99,23 @@ namespace {
   TEST_F(DataBaseTest, IntervalOfValidity)
   {
     EXPECT_TRUE(IntervalOfValidity().empty());
-    EXPECT_FALSE(IntervalOfValidity(1, 0, 0, 0).empty());
-    EXPECT_FALSE(IntervalOfValidity(0, 0, 1, 0).empty());
+    EXPECT_FALSE(IntervalOfValidity(1, -1, -1, -1).empty());
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, 1, -1).empty());
     EXPECT_FALSE(IntervalOfValidity(1, 2, 3, 4).empty());
 
     EventMetaData event(0, 8, 15);  // experiment 15, run 8
     EXPECT_FALSE(IntervalOfValidity().contains(event));
-    EXPECT_FALSE(IntervalOfValidity(16, 1, 0, 0).contains(event));
-    EXPECT_FALSE(IntervalOfValidity(16, 0, 0, 0).contains(event));
-    EXPECT_FALSE(IntervalOfValidity(15, 9, 0, 0).contains(event));
-    EXPECT_TRUE(IntervalOfValidity(15, 8, 0, 0).contains(event));
-    EXPECT_TRUE(IntervalOfValidity(15, 8, 15, 0).contains(event));
+    EXPECT_FALSE(IntervalOfValidity(16, 1, -1, -1).contains(event));
+    EXPECT_FALSE(IntervalOfValidity(16, -1, -1, -1).contains(event));
+    EXPECT_FALSE(IntervalOfValidity(15, 9, -1, -1).contains(event));
+    EXPECT_TRUE(IntervalOfValidity(15, 8, -1, -1).contains(event));
+    EXPECT_TRUE(IntervalOfValidity(15, 8, 15, -1).contains(event));
     EXPECT_TRUE(IntervalOfValidity(15, 8, 15, 8).contains(event));
-    EXPECT_TRUE(IntervalOfValidity(15, 0, 15, 8).contains(event));
-    EXPECT_TRUE(IntervalOfValidity(0, 0, 15, 8).contains(event));
-    EXPECT_FALSE(IntervalOfValidity(0, 0, 15, 7).contains(event));
-    EXPECT_FALSE(IntervalOfValidity(0, 0, 14, 0).contains(event));
-    EXPECT_FALSE(IntervalOfValidity(0, 0, 14, 1).contains(event));
+    EXPECT_TRUE(IntervalOfValidity(15, -1, 15, 8).contains(event));
+    EXPECT_TRUE(IntervalOfValidity(-1, -1, 15, 8).contains(event));
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, 15, 7).contains(event));
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, 14, -1).contains(event));
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, 14, 1).contains(event));
   }
 
   /** Test database access via DBObjPtr */
@@ -143,6 +181,36 @@ namespace {
     EXPECT_B2FATAL(DBArray<EventMetaData> wrongType("TObjects"));
   }
 
+  /** Test intra-run dependency */
+  TEST_F(DataBaseTest, IntraRun)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    DBObjPtr<TNamed> intraRun("IntraRun");
+
+    evtPtr->setExperiment(1);
+    evtPtr->setRun(1);
+    evtPtr->setEvent(9);
+    DBStore::Instance().update();
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "A") == 0);
+
+    evtPtr->setEvent(10);
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
+
+    evtPtr->setEvent(49);
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
+
+    evtPtr->setEvent(50);
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "C") == 0);
+
+    evtPtr->setRun(2);
+    DBStore::Instance().update();
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "X") == 0);
+  }
+
   /** Test the database content change notification */
   TEST_F(DataBaseTest, HasChanged)
   {
@@ -151,7 +219,7 @@ namespace {
     DBStore::Instance().update();
 
     DBObjPtr<TNamed> named;
-    EXPECT_FALSE(named.hasChanged());
+    EXPECT_TRUE(named.hasChanged());
 
     evtPtr->setExperiment(1);
     EXPECT_FALSE(named.hasChanged());
@@ -170,6 +238,31 @@ namespace {
     evtPtr->setExperiment(7);
     DBStore::Instance().update();
     EXPECT_TRUE(named.hasChanged());
+
+    evtPtr->setExperiment(1);
+    evtPtr->setRun(1);
+    evtPtr->setEvent(1);
+    DBObjPtr<TNamed> intraRun("IntraRun");
+    DBStore::Instance().update();
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(intraRun.hasChanged());
+
+    evtPtr->setEvent(2);
+    DBStore::Instance().updateEvent();
+    EXPECT_FALSE(intraRun.hasChanged());
+
+    evtPtr->setEvent(10);
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(intraRun.hasChanged());
+
+    evtPtr->setEvent(1000);
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(intraRun.hasChanged());
+
+    evtPtr->setRun(4);
+    DBStore::Instance().update();
+    DBStore::Instance().updateEvent();
+    EXPECT_TRUE(intraRun.hasChanged());
   }
 
 }  // namespace

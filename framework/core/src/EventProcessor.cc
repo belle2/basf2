@@ -269,6 +269,8 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
 
       m_previousEventMetaData = *m_eventMetaDataPtr;
 
+      DBStore::Instance().updateEvent();
+
     } else {
       //Check for a second master module
       if (m_eventMetaDataPtr && (*m_eventMetaDataPtr != m_previousEventMetaData)) {

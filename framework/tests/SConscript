@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'framework_io', '$ROOT_LIBS', '$XML_LIBS']
+env['LIBS'] = ['framework', 'framework_io', '$ROOT_LIBS', 'boost_filesystem', 'boost_system', '$XML_LIBS']
 
 Return('env')

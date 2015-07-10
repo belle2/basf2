@@ -24,14 +24,13 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor. By default an empty validity interval is created where low and high experiment numbers are 0.
-     * @param experimentLow   lowest experiment number of the validity range, 0 means no bound
-     * @param runLow          lowest run number in the experiment with number experimentLow of the validity range, 0 means no bound
-     * @param experimentHigh  highest experiment number of the validity range, 0 means no bound
-     * @param runHigh         highest run number in the experiment with number experimentHigh of the validity range, 0 means no bound
+     * Constructor. By default an empty validity interval is created where low and high experiment numbers are -1.
+     * @param experimentLow   lowest experiment number of the validity range, -1 means no bound
+     * @param runLow          lowest run number in the experiment with number experimentLow of the validity range, -1 means no bound
+     * @param experimentHigh  highest experiment number of the validity range, -1 means no bound
+     * @param runHigh         highest run number in the experiment with number experimentHigh of the validity range, -1 means no bound
      */
-    IntervalOfValidity(unsigned long experimentLow = 0, unsigned long runLow = 0, unsigned long experimentHigh = 0,
-                       unsigned long runHigh = 0);
+    IntervalOfValidity(int experimentLow = -1, int runLow = -1, int experimentHigh = -1, int runHigh = -1);
 
     /**
      * Destructor.
@@ -49,7 +48,7 @@ namespace Belle2 {
      * Function that checks whether the validity interval is empty.
      * @return             true if the validity interval is empty.
      */
-    bool empty() const {return (!m_experimentLow && !m_experimentHigh);};
+    bool empty() const {return ((m_experimentLow < 0) && (m_experimentHigh < 0));};
 
     /**
      * Check whether two intervals of validity are identical.
@@ -68,24 +67,38 @@ namespace Belle2 {
       return !(*this == other);
     }
 
+    /** Input stream operator for reading IoV data from a text file.
+     *
+     *  @param input The input stream.
+     *  @param metaData The InervalOfValidity object.
+     */
+    friend std::istream& operator>> (std::istream& input, IntervalOfValidity& iov);
+
+    /** Output stream operator for writing IoV data to a text file.
+     *
+     *  @param output The output stream.
+     *  @param metaData The IntervalOfValidity object.
+     */
+    friend std::ostream& operator<< (std::ostream& output, const IntervalOfValidity& iov);
+
   private:
 
     /** Lowest experiment number. 0 means no bound.
      */
-    unsigned long m_experimentLow;
+    int m_experimentLow;
 
     /** Lowest run number. 0 means no bound.
      */
-    unsigned long m_runLow;
+    int m_runLow;
 
     /** Highest experiment number. 0 means no bound.
      */
-    unsigned long m_experimentHigh;
+    int m_experimentHigh;
 
     /** Highest run number. 0 means no bound.
      */
-    unsigned long m_runHigh;
+    int m_runHigh;
 
-    ClassDef(IntervalOfValidity, 1);  /**< describes the interval of experiments/runs for which an object in the database is valid. */
+    ClassDef(IntervalOfValidity, 2);  /**< describes the interval of experiments/runs for which an object in the database is valid. */
   };
 }

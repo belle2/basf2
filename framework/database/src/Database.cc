@@ -16,6 +16,10 @@
 #include <framework/logging/Logger.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
+#include <framework/database/DatabaseChain.h>
+#include <framework/database/DBStore.h>
+
+#include <TFile.h>
 
 using namespace std;
 using namespace Belle2;
@@ -29,11 +33,41 @@ Database& Database::Instance()
   return *s_instance;
 }
 
+void Database::setInstance(Database* database)
+{
+  if (s_instance) {
+    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance);
+    if (chain) {
+      chain->addDatabase(database);
+    } else {
+      B2WARNING("The already created database instance is replaced by a new instance.");
+      delete s_instance;
+      s_instance = database;
+      DBStore::Instance().reset();
+    }
+  } else {
+    s_instance = database;
+  }
+}
+
+void Database::reset()
+{
+  delete s_instance;
+  s_instance = 0;
+  DBStore::Instance().reset();
+}
+
+
+Database::~Database()
+{
+  if (s_instance == this) s_instance = 0;
+}
+
 
 void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)
 {
   for (auto& entry : query) {
-    auto objectIov = getData(event, entry.name);
+    auto objectIov = getData(event, entry.package, entry.module);
     entry.object = objectIov.first;
     entry.iov = objectIov.second;
   }
@@ -43,9 +77,64 @@ bool Database::storeData(std::list<DBQuery>& query)
 {
   bool result = true;
   for (auto& entry : query) {
-    result = result && storeData(entry.name, entry.object, entry.iov);
+    result = result && storeData(entry.package, entry.module, entry.object, entry.iov);
   }
   return result;
+}
+
+
+std::string Database::payloadFileName(const std::string& path, const std::string& package, const std::string& module,
+                                      int revision) const
+{
+  std::string result = package + "_" + module;
+  if (revision > 0) result += "_rev_" + std::to_string(revision);
+  result += ".root";
+  if (!path.empty()) result = path + "/" + result;
+  return result;
+}
+
+TObject* Database::readPayload(const std::string& fileName, const std::string& module) const
+{
+  TObject* result = 0;
+
+  TDirectory* saveDir = gDirectory;
+  TFile* file = TFile::Open(fileName.c_str());
+  saveDir->cd();
+  if (!file || !file->IsOpen()) {
+    B2ERROR("Could not open payload file " << fileName << ".");
+    delete file;
+    return result;
+  }
+
+  result = file->Get(module.c_str());
+  delete file;
+  if (!result) {
+    B2ERROR("Failed to get " << module  << " from payload file" << fileName << ".");
+  }
+
+  return result;
+}
+
+bool Database::writePayload(const std::string& fileName, const std::string& module, const TObject* object,
+                            const IntervalOfValidity* iov) const
+{
+  TDirectory* saveDir = gDirectory;
+  TFile* file = TFile::Open(fileName.c_str(), "RECREATE");
+  if (!file || !file->IsOpen()) {
+    B2ERROR("Could not open payload file " << fileName << ".");
+    delete file;
+    saveDir->cd();
+    return false;
+  }
+
+  object->Write(module.c_str(), TObject::kSingleKey);
+  if (iov) file->WriteObject(iov, "IoV");
+
+  file->Close();
+  delete file;
+  saveDir->cd();
+
+  return true;
 }
 
 
@@ -53,7 +142,6 @@ void Database::exposePythonAPI()
 {
   using namespace boost::python;
 
-  def("set_global_tag", &Database::setGlobalTag);
   def("use_local_database", &LocalDatabase::createInstance);
   def("use_central_database", &ConditionsDatabase::createDefaultInstance);
   def("use_central_database", &ConditionsDatabase::createInstance);

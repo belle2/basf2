@@ -16,6 +16,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 
 namespace Belle2 {
@@ -59,24 +60,36 @@ namespace Belle2 {
     ~DBStore();
 
     /**
-     * Returns the entry with the requested name in the DBStore.
+     * Returns the entry with the requested package and module name in the DBStore.
      * If the DBStore entry does not exist yet it is added to the map.
      *
-     * If the DBStore map already contains an object under the key name
+     * If the DBStore map already contains an object under the key
      * with a DIFFERENT type than the given type one, an error will be reported. <br>
      *
-     * @param name       Name under which the object is stored in the database (and in the DBStore).
+     * @param package    Package name under which the object is stored in the database (and in the DBStore).
+     * @param module     Module name under which the object is stored in the database (and in the DBStore).
      * @param objClass   The class of the object.
      * @param array      Whether it is a TClonesArray or not.
      * @return           DBEntry, or NULL if the requested type does not match the one in the DBStore
      */
-    DBEntry* getEntry(const std::string& name, const TClass* objClass, bool array);
+    DBEntry* getEntry(const std::string& package, const std::string& module, const TClass* objClass, bool array);
 
     /**
      * Updates all objects that are outside their interval of validity.
      * This method is called by the framework for each new run.
      */
     void update();
+
+    /**
+     * Updates all intra-run dependent objects.
+     * This method is called by the framework for each event.
+     */
+    void updateEvent();
+
+    /**
+     * Invalidate all payloads.
+     */
+    void reset();
 
 
   private:
@@ -105,8 +118,13 @@ namespace Belle2 {
      */
     bool checkType(const DBEntry& dbEntry, const TObject* object) const;
 
-    /** Map of names to DBEntry objects. */
-    std::map<std::string, DBEntry> m_dbEntries;
+    void updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOfValidity>& objectIov);
+
+    /** Map of package and module names to DBEntry objects. */
+    std::map<std::string, std::map<std::string, DBEntry>> m_dbEntries;
+
+    /** Vector of intra-run dependent conditions. */
+    std::vector<DBEntry*> m_intraRunDependencies;
 
     /**
      * StoreObjPtr for the EventMetaData to get the current experiment and run

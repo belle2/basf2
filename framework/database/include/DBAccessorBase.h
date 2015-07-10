@@ -30,11 +30,12 @@ namespace Belle2 {
      * @param objClass   The type of the object.
      * @param isArray    Flag that indicates whether this is a single object or a TClonesArray.
      */
-    DBAccessorBase(const std::string& name,
+    DBAccessorBase(const std::string& package,
+                   const std::string& module,
                    const TClass* objClass,
                    bool isArray)
     {
-      m_entry = DBStore::Instance().getEntry(name, objClass, isArray);
+      m_entry = DBStore::Instance().getEntry(package, module, objClass, isArray);
       m_iov = m_entry->iov;
     };
 
@@ -45,15 +46,25 @@ namespace Belle2 {
     virtual ~DBAccessorBase() {};
 
     /**
-     * Return name under which the object is saved in the DBStore.
+     * Return package name under which the object is saved in the DBStore.
      */
-    const std::string& getName() const { return m_entry->name; }
+    const std::string& getPackage() const { return m_entry->package; }
+
+    /**
+     * Return module name under which the object is saved in the DBStore.
+     */
+    const std::string& getModule() const { return m_entry->module; }
+
+    /**
+     * Return package + module name under which the object is saved in the DBStore.
+     */
+    std::string getName() const { return getPackage() + "/" + getModule(); }
 
     /**
      * Check whether a valid object was obtained from the database.
      * @return          True if the object exists.
      **/
-    inline bool isValid() const {return m_entry && m_entry->object;}
+    inline bool isValid() const {return m_entry->object;}
 
     inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
 
@@ -62,7 +73,7 @@ namespace Belle2 {
      */
     virtual bool operator==(const DBAccessorBase& other)
     {
-      return getName() == other.getName();
+      return getPackage() == other.getPackage() && getModule() == other.getModule();
     }
 
     /**
@@ -78,8 +89,9 @@ namespace Belle2 {
      */
     bool hasChanged()
     {
-      bool result = (m_iov != m_entry->iov);
+      bool result = ((m_iov != m_entry->iov) || (m_ptr != m_entry->object));
       m_iov = m_entry->iov;
+      m_ptr = m_entry->object;
       return result;
     }
 
@@ -89,6 +101,9 @@ namespace Belle2 {
 
     /** IoV at last call to hasChanged. */
     IntervalOfValidity m_iov;
+
+    /** object pointer at last call to hasChanged. */
+    TObject* m_ptr;
 
   };
 }

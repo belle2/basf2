@@ -29,6 +29,26 @@
     
     <botMaterial desc="Material of reflective bottom">TOPPMTBottom</botMaterial>
     <BottomThickness desc="Bottom thickness of the PMT" unit="mm">2</BottomThickness>
+
+    <reflectiveEdge>
+      <width unit="mm">2.25</width>
+      <thickness unit="mm">0.2</thickness>
+      <Surface>
+        <Properties>
+          <Property name="REFLECTIVITY" unit="eV">
+            <value energy="1.0">0.70</value> 
+            <value energy="2.0">0.70</value> 
+            <value energy="3.0">0.70</value> 
+            <value energy="4.0">0.70</value> 
+            <value energy="5.0">0.70</value> 
+            <value energy="6.0">0.70</value> 
+          </Property>
+        </Properties>
+        <Type>dielectric_metal</Type>
+        <Finish>polished</Finish>
+        <Model>glisur</Model>
+      </Surface>
+    </reflectiveEdge>
     
     <PadXNum desc="Number of pads in x direction">4</PadXNum>
     <PadYNum desc="Number of pads in y direction">4</PadYNum>

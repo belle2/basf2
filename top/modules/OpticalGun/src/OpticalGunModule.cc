@@ -94,8 +94,10 @@ namespace Belle2 {
     StoreArray<MCParticle>::registerPersistent();
 
     // parameters check
-    if (m_wavelength < 150 || m_wavelength > 1000)
+    if (m_wavelength < 150 or m_wavelength > 1000)
       B2FATAL("Wavelength does not correspond to optical photons");
+    if (m_na < 0 or m_na > 1)
+      B2FATAL("Numerical aperture must be between 0 and 1");
 
     // set other private variables
     m_cosAlpha = cos(m_alpha * Unit::deg);
@@ -237,11 +239,15 @@ namespace Belle2 {
   {
     // NA is defined as the aperture where the amplitude is 5% of that of the
     // peak, which translates into 2.45 sigma for a gaussian distribution
-    double x = gRandom->Gaus(0., asin(m_na) / 2.45);
-    double y = gRandom->Gaus(0., asin(m_na) / 2.45);
-    double z = sqrt(1. - x * x - y * y);
-    z = (m_theta > 0) ? z : -z;
-    return TVector3(x, y, z);
+    double x = 0;
+    double y = 0;
+    double z = 0;
+    do {
+      x = gRandom->Gaus(0., asin(m_na) / 2.45);
+      y = gRandom->Gaus(0., asin(m_na) / 2.45);
+      z = 1. - x * x - y * y;
+    } while (z < 0);
+    return TVector3(x, y, sqrt(z));
   }
 
   TVector3 OpticalGunModule::getDirectionUniform() const

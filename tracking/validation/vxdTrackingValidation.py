@@ -26,8 +26,15 @@ class VXD(TrackingValidationRun):
     generator_module = 'EvtGenInput'
     components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
                   ]
+    secSetup = \
+        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+         ]
+    tuneValue = 0.22
     finder_module = basf2.register_module('VXDTF')
-    finder_module.param({})  # what parameters should be set for the vxd track finding, why is it not working by default?
+    param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.22}
+    finder_module.param(param_vxdtf)
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

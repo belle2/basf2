@@ -63,7 +63,9 @@ def parse_cmd_line_arguments():
     parser.add_argument("-p", "--port", help="The port number on which"
                         " the server starts. Default is '8000'.",
                         type=str, default=8000)
-
+    parser.add_argument("-v", "--view", help="Open validation website"
+                        " in the system's default browser.",
+                        action='store_true')
     # Return the parsed arguments!
     return parser.parse_args()
 
@@ -475,6 +477,7 @@ def configure_and_run(ip='localhost', port=8000, parseCommandLine=False, openSit
 
         ip = cmd_arguments.ip
         port = int(cmd_arguments.port)
+        openSite = cmd_arguments.view
 
     # Start the server!
     try:

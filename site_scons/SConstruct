@@ -65,7 +65,8 @@ global_env = Environment(ENV = os.environ,
                          EXTBINDIR = os.path.join('$EXTDIR', 'bin', extsubdir),
                          LINK='g++',
                          SHLINK='g++',
-                         CCFLAGS = ['-Wall', '-isystem$EXTINCDIR', '-isystem' + sysconfig.get_python_inc(), '-std=c++11'],
+                         CCFLAGS = ['-Wall', '-isystem$EXTINCDIR', '-isystem' + sysconfig.get_python_inc()],
+                         CXXFLAGS = ['-std=c++11'],
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
                          CPPPATH = ['include'],
                          LIBPATH = ['$LIBDIR', sysconfig.get_config_var('LIBDIR'), '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
@@ -161,9 +162,8 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
     if not config.configure(global_env):
         Exit(1)
 
-# remove C++11 flag for cint
+# Copy flags for cint
 global_env['CINTFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']]
-global_env['CINTFLAGS'].remove('-std=c++11')
 
 special_targets = ['tests', 'test_all', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
 explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and not '/' in p.rstrip('/') and os.path.isdir(p)]

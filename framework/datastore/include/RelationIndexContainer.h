@@ -109,7 +109,7 @@ namespace Belle2 {
      *
      *  @param relArray RelationArray to build the relation for
      */
-    RelationIndexContainer(const RelationArray& relArray): m_storeRel(relArray), m_valid(false)
+    explicit RelationIndexContainer(const RelationArray& relArray): m_storeRel(relArray), m_valid(false)
     {
       rebuild(true);
     }

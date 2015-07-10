@@ -48,7 +48,7 @@ namespace Belle2 {
     class Timer {
     public:
       /** Constructor, with some identifying text */
-      Timer(std::string text = "");
+      explicit Timer(std::string text = "");
       ~Timer();
     private:
       double m_startTime; /**< time at start (in ns). */

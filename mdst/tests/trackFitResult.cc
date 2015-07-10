@@ -140,42 +140,44 @@ namespace Belle2 {
     }
   } // Testcases error propagation
 
-  /** Test special Setters and Getters. */
-  TEST_F(TrackFitResultTest, SpecialGetters)
+  /** Helix -> Cartesian -> Helix -> Cartesian */
+  TEST_F(TrackFitResultTest, H2C2H2C)
   {
-    double absError = 1e-6;
+    double absError = 1e-4;
     double bField = 1.5;
 
-    vector<TVector3> momentum;
-    vector<TVector3> position;
+    // perigee helix parameters
+    std::vector<float> hp(5);
+    hp[0] = 51.8142;
+    hp[1] = 6.99831e-01;
+    hp[2] = -2.40505e-02;
+    hp[3] = 320.652;
+    hp[4] = 3.50734;
+    std::vector<float> hpErr(15);
 
-    momentum.push_back(TVector3(0.00525037, 0.00167207, 1.11613));
-    position.push_back(TVector3(21.1138, -66.2984, 334.788));
-
-    momentum.push_back(TVector3(0.143028, 0.12043, 0.655792));
-    position.push_back(TVector3(33.373, -39.6353, 320.652));
-
-    momentum.push_back(TVector3(0.00635059, 0.027103, -0.37796));
-    position.push_back(TVector3(-0.00635059, -0.027103, -0.37796));
-
-    TMatrixDSym cov6(6);
+    // corresponding cartesian coordinates
+    TVector3 momentum(0.143028, 0.12043, 0.655792);
+    TVector3 position(33.373, -39.6353, 320.652);
 
     auto pType = Belle2::Const::pion;
-    int charge[] = { -1, 1};
-    for (unsigned i = 0; i < momentum.size(); i++) {
-      for (unsigned j = 0; j < 2; j++) {
-        // Set up class for testing
-        TrackFitResult myResult(position[i], momentum[i], cov6, charge[j], pType, 0.5, bField, 0, 0);
 
-        // Test all vector elements
-        EXPECT_NEAR(position[i].X(), myResult.getPosition().X(), absError);
-        EXPECT_NEAR(position[i].Y(), myResult.getPosition().Y(), absError);
-        EXPECT_NEAR(position[i].Z(), myResult.getPosition().Z(), absError);
-        EXPECT_NEAR(momentum[i].Px(), myResult.getMomentum(bField).Px(), absError);
-        EXPECT_NEAR(momentum[i].Py(), myResult.getMomentum(bField).Py(), absError);
-        EXPECT_NEAR(momentum[i].Pz(), myResult.getMomentum(bField).Pz(), absError);
-      }
-    }
-  } // Testcases for special getters
+    TrackFitResult fromHelixP(hp, hpErr, pType, 0.5, 0, 0);
+    EXPECT_NEAR(fromHelixP.getMomentum(bField).Px(), momentum.Px(), absError);
+    EXPECT_NEAR(fromHelixP.getMomentum(bField).Py(), momentum.Py(), absError);
+    EXPECT_NEAR(fromHelixP.getMomentum(bField).Pz(), momentum.Pz(), absError);
+    EXPECT_NEAR(fromHelixP.getPosition().X(), position.X(), absError);
+    EXPECT_NEAR(fromHelixP.getPosition().Y(), position.Y(), absError);
+    EXPECT_NEAR(fromHelixP.getPosition().Z(), position.Z(), absError);
+
+    TMatrixDSym cov6(6);
+    TrackFitResult fromHelixP2Cartesian(fromHelixP.getPosition(), fromHelixP.getMomentum(bField), cov6, fromHelixP.getChargeSign(),
+                                        pType, 0.5, bField, 0, 0);
+    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Px(), momentum.Px(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Py(), momentum.Py(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Pz(), momentum.Pz(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().X(), position.X(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Y(), position.Y(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Z(), position.Z(), absError);
+  }
 
 }  // namespace

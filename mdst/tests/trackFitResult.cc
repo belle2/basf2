@@ -143,7 +143,7 @@ namespace Belle2 {
   /** Helix -> Cartesian -> Helix -> Cartesian */
   TEST_F(TrackFitResultTest, H2C2H2C)
   {
-    double absError = 1e-4;
+    double absError = 1e-6;
     double bField = 1.5;
 
     // perigee helix parameters
@@ -155,29 +155,20 @@ namespace Belle2 {
     hp[4] = 3.50734;
     std::vector<float> hpErr(15);
 
-    // corresponding cartesian coordinates
-    TVector3 momentum(0.143028, 0.12043, 0.655792);
-    TVector3 position(33.373, -39.6353, 320.652);
-
     auto pType = Belle2::Const::pion;
 
     TrackFitResult fromHelixP(hp, hpErr, pType, 0.5, 0, 0);
-    EXPECT_NEAR(fromHelixP.getMomentum(bField).Px(), momentum.Px(), absError);
-    EXPECT_NEAR(fromHelixP.getMomentum(bField).Py(), momentum.Py(), absError);
-    EXPECT_NEAR(fromHelixP.getMomentum(bField).Pz(), momentum.Pz(), absError);
-    EXPECT_NEAR(fromHelixP.getPosition().X(), position.X(), absError);
-    EXPECT_NEAR(fromHelixP.getPosition().Y(), position.Y(), absError);
-    EXPECT_NEAR(fromHelixP.getPosition().Z(), position.Z(), absError);
 
     TMatrixDSym cov6(6);
     TrackFitResult fromHelixP2Cartesian(fromHelixP.getPosition(), fromHelixP.getMomentum(bField), cov6, fromHelixP.getChargeSign(),
                                         pType, 0.5, bField, 0, 0);
-    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Px(), momentum.Px(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Py(), momentum.Py(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Pz(), momentum.Pz(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().X(), position.X(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Y(), position.Y(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Z(), position.Z(), absError);
+
+    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Px(), fromHelixP.getMomentum(bField).Px(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Py(), fromHelixP.getMomentum(bField).Py(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Pz(), fromHelixP.getMomentum(bField).Pz(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().X(), fromHelixP.getPosition().X(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Y(), fromHelixP.getPosition().Y(), absError);
+    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Z(), fromHelixP.getPosition().Z(), absError);
   }
 
 }  // namespace

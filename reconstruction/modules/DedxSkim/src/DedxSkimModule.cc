@@ -11,7 +11,6 @@
 #include "reconstruction/modules/DedxSkim/DedxSkimModule.h"
 
 #include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <cdc/dataobjects/CDCHit.h>

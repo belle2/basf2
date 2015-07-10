@@ -11,13 +11,10 @@
 // Own include
 #include <reconstruction/modules/PIDNtuple/PIDNtupleModule.h>
 
-#include <framework/core/ModuleManager.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>

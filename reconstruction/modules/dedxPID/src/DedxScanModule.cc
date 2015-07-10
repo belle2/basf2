@@ -12,7 +12,6 @@
 #include <reconstruction/modules/dedxPID/LineHelper.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 

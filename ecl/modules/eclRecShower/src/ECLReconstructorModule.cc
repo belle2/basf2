@@ -78,14 +78,14 @@ void ECLReconstructorModule::initialize()
   m_timeCPU = clock() * Unit::us;
 
   // ECL relevant objects.
-  StoreArray<ECLHitAssignment> HitAssignArray;
-  StoreArray<ECLShower> ECLShowerArray;
-  StoreArray<ECLCluster> ECLClusterArray;
+  StoreArray<ECLHitAssignment> eclHitAssignments;
+  StoreArray<ECLShower> eclShowers;
+  StoreArray<ECLCluster> eclClusters;
 
-  HitAssignArray.registerInDataStore();
-  ECLShowerArray.registerInDataStore();
-  ECLClusterArray.registerInDataStore();
-  ECLClusterArray.registerRelationTo(ECLShowerArray);
+  eclHitAssignments.registerInDataStore();
+  eclShowers.registerInDataStore();
+  eclClusters.registerInDataStore();
+  eclClusters.registerRelationTo(eclShowers);
 }
 
 void ECLReconstructorModule::beginRun()
@@ -103,9 +103,9 @@ void ECLReconstructorModule::event()
     return;
   }
   // Output Arrays
-  StoreArray<ECLHitAssignment> eclHaArray;
-  StoreArray<ECLShower> eclRecShowerArray;
-  StoreArray<ECLCluster> eclMdstArray;
+  StoreArray<ECLHitAssignment> eclHitAssignments;
+  StoreArray<ECLShower> eclShowers;
+  StoreArray<ECLCluster> eclClusters;
 
   cout.unsetf(ios::scientific);
   cout.precision(6);
@@ -144,8 +144,8 @@ void ECLReconstructorModule::event()
       for (std::vector<MEclCFShowerHA>::iterator iHA = HAs.begin();
            iHA != HAs.end(); ++iHA) {
 
-        if (!eclHaArray) eclHaArray.create();
-        const auto eclHitAssignment = eclHaArray.appendNew();
+        if (!eclHitAssignments) eclHitAssignments.create();
+        const auto eclHitAssignment = eclHitAssignments.appendNew();
         eclHitAssignment->setShowerId(nShower);
         eclHitAssignment->setCellId(iHA->Id() + 1);
 
@@ -174,8 +174,8 @@ void ECLReconstructorModule::event()
       const double HighCalibrationFactor = v_HiEnergy / energyBfCorrect;
       const double HiEnergyinShower = sEnergy * HighCalibrationFactor;
 
-      if (!eclRecShowerArray) eclRecShowerArray.create();
-      const auto eclRecShower = eclRecShowerArray.appendNew();
+      if (!eclShowers) eclShowers.create();
+      const auto eclRecShower = eclShowers.appendNew();
       eclRecShower->setShowerId(nShower);
       eclRecShower->setEnergy(sEnergy);
       eclRecShower->setTheta(shower.second.Theta());
@@ -210,10 +210,10 @@ void ECLReconstructorModule::event()
       };
 
       // Fill ECLCluster here
-      if (!eclMdstArray) eclMdstArray.create();
+      if (!eclClusters) eclClusters.create();
       // Loose timing cut is applied. 20150529 K.Miyabayashi
       if (-300.0 < v_TIME && v_TIME < 200.0) {
-        const auto eclCluster = eclMdstArray.appendNew();
+        const auto eclCluster = eclClusters.appendNew();
 
         eclCluster->setError(Mdst_Error);
         eclCluster->setTiming(v_TIME);

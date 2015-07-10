@@ -10,12 +10,14 @@
 
 #pragma once
 #include <TObject.h>
-#include <TString.h>
+#include <vector>
 #include <TTimeStamp.h>
-
-class ARICHMergerInfo;
-class ARICHSensorModuleInfo;
-class ARICHCableInfo;
+#include <arich/database/ARICHMergerInfo.h>
+#include <arich/database/ARICHSensorModuleInfo.h>
+#include <arich/database/ARICHCableInfo.h>
+//class ARICHMergerInfo;
+//class ARICHSensorModuleInfo;
+//class ARICHCableInfo;
 namespace Belle2 {
   /**
    *   Mapping of the Sensor Board Connections to the detector
@@ -26,17 +28,21 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHSensorModuleMap(): m_sextant(0), m_ring(0), m_column(0), m_port(0), m_timeStamp(0, 0, 0, kTRUE, 0) {};
+    ARICHSensorModuleMap(): m_sextant(0), m_ring(0), m_column(0), m_port(0), m_timeStamp(0, 0, 0, kTRUE, 0)
+    {
+      for (unsigned ii = 0; ii < 4; ii++) m_cableBias[ii] = ARICHCableInfo(0, 0, 0);
+    };
 
     /**
      * Constructor
      */
-    ARICHSensorModuleMap(int sextant, int ring, int column, int port, TTimeStamp timeStamp)
+    ARICHSensorModuleMap(int sextant, int ring, int column, int port, ARICHCableInfo* cableBias, TTimeStamp timeStamp)
     {
       m_sextant = sextant;
       m_ring = ring;
       m_column = column;
       m_port = port;
+      for (unsigned ii = 0; ii < 4; ii++) m_cableBias[ii] = cableBias[ii];
       m_timeStamp = timeStamp;
     }
 
@@ -115,13 +121,13 @@ namespace Belle2 {
      * @param i index of the chip
      * @return Cable Bias Voltage Identifier
      */
-    ARICHCableInfo* getCableBiasVoltageId(unsigned int i) {if (i < 4) return m_cableBias[i]; else return NULL; }
+    ARICHCableInfo getCableBiasVoltageId(unsigned int i) {if (i < 4) return m_cableBias[i]; else return ARICHCableInfo(0, 0, 0); }
 
     /** Set Cable Bias Voltage Identifier
      * @param i index of the chip
      * @param Cable Bias Voltage Identifier
      */
-    void setCableBiasVoltageId(unsigned int i, ARICHCableInfo* cableBias) {if (i < 4) m_cableBias[i] = cableBias; }
+    void setCableBiasVoltageId(unsigned int i, ARICHCableInfo* cableBias) {if (i < 4) m_cableBias[i] = cableBias[i]; }
 
     /** Get Cable Guard Identifier
      * @return Cable Identifier
@@ -152,7 +158,7 @@ namespace Belle2 {
     ARICHMergerInfo       m_merger;  /**< Merger Board identifier  */
     int m_port;                      /**< Merger Board port identifier */
     ARICHCableInfo m_cableHv;        /**< HV Cable Identifier */
-    ARICHCableInfo* m_cableBias[4];  /**< Bias Cable Identifier */
+    ARICHCableInfo m_cableBias[4];   /**< Bias Cable Identifier */
     ARICHCableInfo m_cableGuard;     /**< Guard Cable Identifier */
     TTimeStamp m_timeStamp;          /**< Installation Date */
 

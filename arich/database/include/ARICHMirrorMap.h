@@ -13,7 +13,9 @@
 #include <TObject.h>
 #include <TTimeStamp.h>
 #include <string>
-class ARICHMirrorInfo;
+#include <arich/database/ARICHMirrorInfo.h>
+
+//class ARICHMirrorInfo;
 namespace Belle2 {
   /**
   *   Mapping of the mirrors on the detector
@@ -23,13 +25,14 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHMirrorMap(): m_column(0), m_timeStamp(0, 0, 0, kTRUE, 0) {};
+    ARICHMirrorMap(): m_mirror(NULL), m_column(0), m_timeStamp(0, 0, 0, kTRUE, 0) {};
 
     /**
      * Constructor
      */
-    ARICHMirrorMap(int column, TTimeStamp timeStamp)
+    ARICHMirrorMap(ARICHMirrorInfo* mirror, int column, TTimeStamp timeStamp)
     {
+      m_mirror = mirror;
       m_column = column;
       m_timeStamp = timeStamp;
     }

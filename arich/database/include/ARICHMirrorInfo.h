@@ -21,14 +21,15 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHMirrorInfo(): m_id(0) {};
+    ARICHMirrorInfo(): m_id(0), m_reflectivity(NULL) {};
 
     /**
      * Constructor
      */
-    ARICHMirrorInfo(int id)
+    ARICHMirrorInfo(int id, TGraph* reflectivity)
     {
       m_id = id;
+      m_reflectivity = reflectivity;
     }
 
     /** Return Mirror Identifier

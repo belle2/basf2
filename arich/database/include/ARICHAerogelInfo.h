@@ -48,7 +48,7 @@ namespace Belle2 {
     /** Set Aerogel Identifier
      * @param Aerogel Identifier
      */
-    void setAerogelIdentifier(const std::string& agelid) {m_id = agelid; }
+    void setAerogelID(const std::string& agelid) {m_id = agelid; }
 
     /** Return Refractive Index of Aerogel
      * @return Refractive Index of Aerogel

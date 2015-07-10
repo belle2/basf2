@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Rok Pestotnik, Manca Mrvar                                              *
+ * Contributors: Rok Pestotnik, Manca Mrvar                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,7 +13,8 @@
 #include <TH1F.h>
 #include <string>
 #include <TGraph.h>
-class ARICHHapdChipInfo;
+#include <arich/database/ARICHHapdChipInfo.h>
+//class ARICHHapdChipInfo;
 namespace Belle2 {
   /**
   *   Contains manufacturer data of the photo sensor - HAPD
@@ -30,17 +31,24 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHHapdInfo(): m_qe400(0), m_highVoltage(0), m_guardVoltage(0), m_current(0) {};
+    ARICHHapdInfo(): m_qe400(0), m_highVoltage(0), m_guardVoltage(0), m_current(0), m_quantumEfficiency(NULL), m_pulseHeight(NULL)
+    {
+      for (unsigned ii = 0; ii < 4; ii++) m_HAPDChipInfo[ii] = NULL;
+    };
 
     /**
      * Constructor
      */
-    ARICHHapdInfo(float qe400, float hv, float gv, float I)
+    ARICHHapdInfo(float qe400, float hv, float gv, float I, ARICHHapdChipInfo** HAPDChipInfo, TGraph* quantumEfficiency,
+                  TH1F* pulseHeight)
     {
       m_qe400 = qe400;
       m_highVoltage = hv;
       m_guardVoltage = gv;
       m_current = I;
+      for (unsigned ii = 0; ii < 4; ii++) m_HAPDChipInfo[ii] = HAPDChipInfo[ii];
+      m_quantumEfficiency = quantumEfficiency;
+      m_pulseHeight = pulseHeight;
     }
 
     /**

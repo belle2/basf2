@@ -27,16 +27,17 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHComponentTest(): m_id(0), m_timeStamp(0, 0, 0, kTRUE, 0), m_type(0) {};
+    ARICHComponentTest(): m_id(0), m_timeStamp(0, 0, 0, kTRUE, 0), m_type(0), m_data(NULL) {};
 
     /**
      * Constructor
      */
-    ARICHComponentTest(int id, TTimeStamp timeStamp, int type)
+    ARICHComponentTest(int id, TTimeStamp timeStamp, int type, TObject* data)
     {
       m_id = id;
       m_timeStamp = timeStamp;
       m_type = type;
+      m_data = data;
     }
 
     /**

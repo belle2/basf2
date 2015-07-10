@@ -10,9 +10,8 @@
 
 #pragma once
 #include <TObject.h>
-#include <TH2D.h>
+#include <TH2F.h>
 #include <TGraph.h>
-#include <TList.h>
 #include <vector>
 namespace Belle2 {
 
@@ -26,17 +25,27 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHHapdChipInfo(): m_biasVoltage(0), m_gain(0), m_channelId(0) {};
+    ARICHHapdChipInfo(): m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL), m_bombardmentGain(NULL), m_bombardmentCurrent(NULL),
+      m_avalancheGain(NULL), m_avalancheCurrent(NULL), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0) {};
 
     /**
      * Constructor
      */
-    ARICHHapdChipInfo(float biasVoltage, float gain, int channel)
+    ARICHHapdChipInfo(float biasVoltage, float gain, TGraph* leakCurrent, TGraph* bombardmentGain, TGraph* bombardmentCurrent,
+                      TGraph* avalancheGain, TGraph* avalancheCurrent, TH2F* biasVoltage2D, TH2F* biasCurrent2D, int channel)
     {
       m_biasVoltage = biasVoltage;
       m_gain = gain;
+      m_leakCurrent = leakCurrent;
+      m_bombardmentGain = bombardmentGain;
+      m_bombardmentCurrent = bombardmentCurrent;
+      m_avalancheGain = avalancheGain;
+      m_avalancheCurrent = avalancheCurrent;
+      m_biasVoltage2D = biasVoltage2D;
+      m_biasCurrent2D = biasCurrent2D;
       m_channelId = channel;
     }
+
 
     /**
      * Destructor
@@ -174,10 +183,9 @@ namespace Belle2 {
 
     /**
      * Add a channel number to the list of dead channels
-     * @param channel ASIC channel number
+     * @param channel HAPD channel number
      */
     void appendDeadChannel(unsigned int channel) {m_deadChannel.push_back(channel); }
-
 
     /**
      * Return size of the list of dead channels
@@ -194,10 +202,9 @@ namespace Belle2 {
 
     /**
      * Add a channel number to the list of cut channels
-     * @param channel ASIC channel number
+     * @param channel HAPD channel number
      */
     void appendCutChannel(unsigned int ichannel) { m_cutChannel.push_back(ichannel); }
-
 
     /**
      * Return size of the list of cut channels
@@ -211,11 +218,11 @@ namespace Belle2 {
     TGraph* m_leakCurrent;          /**< Leakege Current as a function of bias voltage */
     TGraph* m_bombardmentGain;      /**< Bombardment Gain as a function of high voltage */
     TGraph* m_bombardmentCurrent;   /**< Bombardment Current as a function of high voltage */
-    TGraph* m_avalancheGain;      /**< Avalanche Gain as a function of bias voltage */
+    TGraph* m_avalancheGain;        /**< Avalanche Gain as a function of bias voltage */
     TGraph* m_avalancheCurrent;     /**< Avalanche Current as a function of bias voltage */
     TH2F*   m_biasVoltage2D;        /**< Bias Voltage as a function of the channel */
-    TH2F*   m_biasCurrent2D;      /**< Bias Current as a function of the channel */
-    int m_channelId;        /**< Channel Number for the Bombardment and Avalanche measurements information */
+    TH2F*   m_biasCurrent2D;        /**< Bias Current as a function of the channel */
+    int m_channelId;                /**< Channel Number for the Bombardment and Avalanche measurements information */
     std::vector<unsigned int> m_deadChannel;      /**< List of dead channels on the HAPD chip */
     std::vector<unsigned int> m_cutChannel;       /**< List of cut channels on the HAPD chip */
 

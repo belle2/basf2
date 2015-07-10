@@ -10,7 +10,7 @@
 
 #pragma once
 #include <TObject.h>
-#include <TList.h>
+#include <vector>
 #include <string>
 #include <TTimeStamp.h>
 
@@ -24,7 +24,9 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHAsicInfo(): m_timeStamp(0, 0, 0, kTRUE, 0), m_quality(0) {};
+    ARICHAsicInfo(): m_timeStamp(0, 0, 0, kTRUE, 0), m_quality(0)
+    {
+    };
 
     /**
      * Constructor
@@ -39,8 +41,6 @@ namespace Belle2 {
      * Destructor
      */
     ~ARICHAsicInfo() {};
-
-
 
     /** Return Asic Identifier
      * @return Asic Identifier
@@ -82,33 +82,52 @@ namespace Belle2 {
      */
     void setCommment();
 
-    /** Return List of dead channels
-     * @return List of dead channels
+    /**
+     * Return a channel number from the list of dead channels
+     * @param i index of the element in the list
+     * @return channel id
      */
-    TList* getDeadChannels() const {return m_deadChannels; }
+    std::string getDeadChannel(unsigned int i) const { if (i < m_deadChannel.size()) return m_deadChannel[i]; else return NULL;}
 
-    /** Set List of dead channels
-     * @param List of dead channels
+    /**
+     * Add a channel number to the list of dead channels
+     * @param channel ASIC channel id
      */
-    void setDeadChannels(TList* deadChannels) {m_deadChannels = deadChannels; }
+    void appendDeadChannel(std::string channel) {m_deadChannel.push_back(channel); }
 
-    /** Return List of cut channels
-     * @return List of cut channels
+    /**
+     * Return size of the list of dead channels
+     * @return size
      */
-    TList* getCutChannels() const {return m_cutChannels; }
+    int getDeadChannelsSize() const {return m_deadChannel.size();}
 
-    /** Set List of cut channels
-     * @param List of cut channels
+    /**
+     * Return a channel number from the list of cut channels
+     * @param i index of the element in the list
+     * @return channel id
      */
-    void setCutChannels(TList* cutChannels) {m_cutChannels = cutChannels; }
+    std::string getCutChannel(unsigned int i) const { if (i < m_cutChannel.size()) return m_cutChannel[i]; else return NULL;}
+
+    /**
+     * Add a channel number to the list of cut channels
+     * @param channel ASIC channel id
+     */
+    void appendCutChannel(std::string ichannel) { m_cutChannel.push_back(ichannel); }
+
+    /**
+     * Return size of the list of cut channels
+     * @return size
+     */
+    int getCutChannelsSize() const {return m_cutChannel.size();}
+
 
   private:
     std::string m_id;        /**< Asic Identifier */
     TTimeStamp m_timeStamp;  /**< Test Date of the measurement */
     int m_quality;           /**< Quality class of the chip */
     std::string m_comment;   /**< Comment */
-    TList* m_deadChannels;   /**< List of dead channels on the ASIC chip */
-    TList* m_cutChannels;    /**< List of cut channels on the ASIC chip */
+    std::vector<std::string> m_deadChannel;   /**< List of dead channels on the ASIC chip */
+    std::vector<std::string> m_cutChannel;    /**< List of cut channels on the ASIC chip */
 
     ClassDef(ARICHAsicInfo, 1);  /**< ClassDef */
   };

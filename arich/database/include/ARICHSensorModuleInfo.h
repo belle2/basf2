@@ -13,9 +13,10 @@
 #include <TList.h>
 #include <string>
 #include <TTimeStamp.h>
-
-class ARICHFEBoardInfo;
-class ARICHHapdInfo;
+#include <arich/database/ARICHFEBoardInfo.h>
+#include <arich/database/ARICHHapdInfo.h>
+//class ARICHFEBoardInfo;
+//class ARICHHapdInfo;
 namespace Belle2 {
   /**
   *   Sensor Module Information
@@ -25,14 +26,18 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHSensorModuleInfo(): m_id(0), m_timeStamp(0, 0, 0, kTRUE, 0) {};
+    ARICHSensorModuleInfo(): m_id(0), m_FEB(NULL), m_HAPD(NULL), m_timeStamp(0, 0, 0, kTRUE, 0)
+    {
+    };
 
     /**
      * Constructor
      */
-    ARICHSensorModuleInfo(int id, TTimeStamp timeStamp)
+    ARICHSensorModuleInfo(int id, ARICHFEBoardInfo* FEB, ARICHHapdInfo* HAPD, TTimeStamp timeStamp)
     {
       m_id = id;
+      m_FEB = FEB;
+      m_HAPD = HAPD;
       m_timeStamp = timeStamp;
     }
 
@@ -93,10 +98,10 @@ namespace Belle2 {
 
   private:
     int m_id;                    /**< Sensor Module identifier */
-    ARICHFEBoardInfo* m_FEB;      /**< HapdInfo Sensor identifier */
-    ARICHHapdInfo* m_HAPD;        /**< FEBoardInfo Front End Board identifier */
+    ARICHFEBoardInfo* m_FEB;     /**< HapdInfo Sensor identifier */
+    ARICHHapdInfo* m_HAPD;       /**< FEBoardInfo Front End Board identifier */
     TTimeStamp m_timeStamp;      /**< Production Date */
-    std::string m_comment;   /**< optional comment */
+    std::string m_comment;       /**< optional comment */
 
     ClassDef(ARICHSensorModuleInfo, 1);  /**< ClassDef */
   };

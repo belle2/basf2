@@ -10,10 +10,10 @@
 
 #pragma once
 #include <TObject.h>
-#include <TList.h>
 #include <string>
 #include <TTimeStamp.h>
-class ARICHAsicInfo;
+#include <arich/database/ARICHAsicInfo.h>
+//class ARICHAsicInfo;
 
 namespace Belle2 {
   /**

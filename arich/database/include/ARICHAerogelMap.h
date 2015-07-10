@@ -12,7 +12,8 @@
 #include <TObject.h>
 #include <TTimeStamp.h>
 #include <string>
-class ARICHAerogelInfo;
+#include <arich/database/ARICHAerogelInfo.h>
+//class ARICHAerogelInfo;
 namespace Belle2 {
   /**
   *   Map of the Aerogel placement
@@ -28,16 +29,20 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHAerogelMap(): m_ring(0), m_column(0), m_timeStamp(0, 0, 0, kTRUE, 0) {};
+    ARICHAerogelMap(): m_ring(0), m_column(0), m_timeStamp(0, 0, 0, kTRUE, 0)
+    {
+      for (unsigned ii = 0; ii < c_layers; ii++) m_layer[ii] = 0;
+    };
 
     /**
      * Constructor
      */
-    ARICHAerogelMap(int ring, int column, TTimeStamp timeStamp)
+    ARICHAerogelMap(int ring, int column, unsigned int* layer, TTimeStamp timeStamp)
     {
       m_ring = ring;
       m_column = column;
       m_timeStamp = timeStamp;
+      for (unsigned ii = 0; ii < c_layers; ii++) m_layer[ii] = layer[ii];
     }
 
     /**

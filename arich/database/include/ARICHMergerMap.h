@@ -10,9 +10,12 @@
 
 #pragma once
 #include <TObject.h>
-class ARICHMergerInfo;
-class ARICHB2LinkInfo;
-class ARICHCableInfo;
+#include <arich/database/ARICHMergerInfo.h>
+#include <arich/database/ARICHB2LinkInfo.h>
+#include <arich/database/ARICHCableInfo.h>
+//class ARICHMergerInfo;
+//class ARICHB2LinkInfo;
+//class ARICHCableInfo;
 namespace Belle2 {
   /**
   *   Mapping of the merger board to the detector

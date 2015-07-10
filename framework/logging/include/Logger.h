@@ -57,6 +57,11 @@
       B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line); \
     } }
 
+/** send generic log message if the log level is enabled. */
+#define B2LOG(loglevel, debuglevel, streamText) { \
+    B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__); \
+  }
+
 /**
  * \def B2DEBUG(level, streamText)
  * Send a debug message, use lower values for level for more important messages.

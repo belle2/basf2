@@ -20,10 +20,9 @@ PXDRawCluster::PXDRawCluster(unsigned short* data, unsigned int length,  VxdID v
 {
   m_cluster = new unsigned short[m_length];//
   boost::spirit::endian::ubig16_t* d = (boost::spirit::endian::ubig16_t*)data;
-  for (unsigned int i = 0 ; i < m_length ; i++) { // m_length/2
+  for (unsigned int i = 0 ; i < m_length ; i++) {
     m_cluster[i] = d[i]; //We have to do 16bit endian swap, TODO VERIFY this!
   }
-
 };
 
 ClassImp(PXDRawCluster)

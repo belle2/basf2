@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                                           *
+ * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /** The PXD Raw Cluster class
-    * This class stores Cluster as whole without unpacking
+    * This class stores Hardware Cluster as whole without unpacking
     */
   class PXDRawCluster : public RelationsObject {
   public:
@@ -28,20 +28,20 @@ namespace Belle2 {
       m_length(0), m_cluster(0), m_vxdID(0) {};
 
     /**
-     * @param length
-     * @param data
-     * @param vxdID
+     * @param length  //length of cluster frame in shorts
+     * @param data  //pointer to the first word in cluster frame
+     * @param vxdID //Vertex Detector ID of the half ladder the cluster originates
      */
 
     PXDRawCluster(unsigned short* data, unsigned int length, VxdID vxdID);
 
-    unsigned int getLength() const
+    unsigned int getLength() const //length of cluster in short words
     {
       return m_length;
     }
 
     /** Get static pointer to data.
-     * @param j Index of m_cluster
+     * @param j Index of pointer in data
      * @return pointer.
      */
     unsigned short getData(unsigned int j) const
@@ -49,8 +49,8 @@ namespace Belle2 {
       return (m_cluster[j]);
     }
 
-    /** Get the dhe ID.
-    * @return ID of the sensor.
+    /** Get the Vertex Detector ID of the half ladder the cluster originates from.
+    * @return Vertex Detector ID.
     */
     VxdID getVxdID() const
     {

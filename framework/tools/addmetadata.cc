@@ -67,8 +67,8 @@ int main(int argc, char* argv[])
   string guid = varMap["guid"].as<string>();
   string lfn = varMap["lfn"].as<string>();
   int logFile = 0;
-  if (varMap.count("logid")) {
-    logFile = varMap["logid"].as<int>();
+  if (varMap.count("logfile")) {
+    logFile = varMap["logfile"].as<int>();
   }
 
   // open the root file

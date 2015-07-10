@@ -26,7 +26,7 @@ void EventDependency::add(unsigned int event, TObject* object)
 int EventDependency::getIndex(const EventMetaData& event) const
 {
   int result = 0;
-  for (int eventNumber : m_eventNumbers) {
+  for (unsigned int eventNumber : m_eventNumbers) {
     if (eventNumber > event.getEvent()) return result;
     result++;
   }

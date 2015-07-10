@@ -154,10 +154,21 @@ struct dhc_start_frame {
   const unsigned int crc32;
   /// fixed length, only for reading
 
+  unsigned short getRunSubrun(void) const
+  {
+    return run_subrun;
+  };
+
+  unsigned short getExp(void) const
+  {
+    return exp_run;
+  };
+
   unsigned short getEventNrLo(void) const
   {
     return trigger_nr_lo;
   };
+
   bool isFakedData(void) const
   {
     if (word0.data != 0x5800) return false;
@@ -870,14 +881,33 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 };
 
+uint16_t swap_uint16(uint16_t val)
+{
+  return (val << 8) | (val >> 8);
+}
+
 void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
 {
-
-  unsigned int l;
-  l = (length) / 2;
-
-  if (!m_doNotStore) m_storeRawCluster.appendNew(data, l, vxd_id);
-
+//   for(unsigned int j=0; j < length ; j++){
+  ubig16_t* cluster = (ubig16_t*)data;
+//   }
+  int nr_words; //words in dhp frame
+  unsigned int words_in_cluster = 0; //counts words in cluster
+  nr_words = length / 2;
+  B2INFO("nr_words : " << nr_words);
+  for (int i = 2 ; i < nr_words ; i++) {
+    if (i != 2) { //skip header
+      if ((((cluster[i] & 0x8000) == 0)
+           && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
+        if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
+        words_in_cluster = 0;
+      }
+    }
+    words_in_cluster++;
+    if (i == nr_words - 1) {
+      if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster + 1], words_in_cluster, vxd_id);
+    }
+  }
 }
 
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
@@ -1034,6 +1064,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static bool isFakedData_event = false;
 
 
+
   dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
 //   error_flag = false;
 
@@ -1146,9 +1177,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     };
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
     case DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
-      B2INFO("Error: FCE type not yet supported ");
-      countedDHCFrames++;
 
+      countedDHCFrames++;
       if (verbose) hw->print();
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
@@ -1158,6 +1188,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
+      B2INFO("UNPACK FCE FRAME with len " << hex << len)
       unpack_fce((unsigned short*) data, len - 4, currentVxdId);
 
 

@@ -27,7 +27,7 @@ namespace Belle2 {
     public:
 
       //! constructor
-      ExtStepLengthLimitProcess(const G4String& processName = "ExtStepLengthLimitProcess");
+      explicit ExtStepLengthLimitProcess(const G4String& processName = "ExtStepLengthLimitProcess");
 
       //! destructor
       ~ExtStepLengthLimitProcess();

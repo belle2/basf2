@@ -34,7 +34,7 @@ namespace Belle2 {
        * Loads the physics list specified by its name.
        * @param physicsListName The name of the physics list which should be loaded.
        */
-      PhysicsList(const std::string& physicsListName);
+      explicit PhysicsList(const std::string& physicsListName);
 
       /** The PhysicsList destructor. */
       virtual ~PhysicsList();

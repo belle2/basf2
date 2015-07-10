@@ -39,7 +39,7 @@ namespace Belle2 {
        * The constructor of the user info class.
        * @param data The data which should be payloaded to the class.
        */
-      UserInfo(Payload data) : Info(), m_data(data), m_status(0), m_fraction(1.0), m_trajectory(nullptr) {}
+      explicit UserInfo(Payload data) : Info(), m_data(data), m_status(0), m_fraction(1.0), m_trajectory(nullptr) {}
 
       /**
        * Returns the payloaded data.

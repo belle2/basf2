@@ -27,7 +27,7 @@ namespace Belle2 {
     public:
 
       //! constructor
-      ExtMagFieldLimitProcess(const G4String& processName = "ExtMagFieldLimitProcess");
+      explicit ExtMagFieldLimitProcess(const G4String& processName = "ExtMagFieldLimitProcess");
 
       //! destructor
       ~ExtMagFieldLimitProcess();

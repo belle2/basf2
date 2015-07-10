@@ -3,7 +3,6 @@ import matplotlib
 import matplotlib.figure
 import matplotlib.gridspec
 import pandas
-import seaborn
 import scipy
 import scipy.stats
 
@@ -96,6 +95,32 @@ class Plotter(BasePlotter):
         axis.set_ylim((0, 1))
         axis.get_xaxis().set_label_text('Efficiency')
         axis.get_yaxis().set_label_text('Purity')
+        axis.set_title('ROC Plot')
+        axis.legend(handles=plots,  loc=3)
+        return plots
+
+    def roc2_plot(self, axis):
+        plots = []
+        for column in self.columns:
+            signal = self.signal[column]
+            bckgrd = self.bckgrd[column]
+
+            cumsignal = (signal.sum() - signal.cumsum()).astype('float')
+            cumbckgrd = (bckgrd.cumsum()).astype('float')
+
+            efficiency = cumsignal / signal.sum()
+            efficiency_error = binom_error(cumsignal, signal.sum())
+
+            rejection = cumbckgrd / bckgrd.sum()
+            rejection_error = binom_error(cumbckgrd, bckgrd.sum())
+
+            p = self.datapoint_plot(axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error, label=column)
+            plots.append(p)
+
+        axis.set_xlim((0, 1))
+        axis.set_ylim((0, 1))
+        axis.get_xaxis().set_label_text('Signal Efficiency')
+        axis.get_yaxis().set_label_text('Background Rejection')
         axis.set_title('ROC Plot')
         axis.legend(handles=plots,  loc=3)
         return plots
@@ -238,6 +263,7 @@ def write(figure, filename):
 
 if __name__ == '__main__':
 
+    import seaborn
     # Set nice searborn settings
     seaborn.set(font_scale=3)
     seaborn.set_style('whitegrid')

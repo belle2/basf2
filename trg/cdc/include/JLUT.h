@@ -35,6 +35,8 @@ class TRGCDCJLUT {
 
     /// Contructor.
     TRGCDCJLUT(const std::string & name="no_name");
+
+    /// Copy constructor.
     TRGCDCJLUT(const TRGCDCJLUT& in);
 
     /// Destructor.
@@ -54,8 +56,10 @@ class TRGCDCJLUT {
     /// set LookUpTable(LUT) data.
     void setData(int inputBitsize, int outputBitSize, const std::string & filename, bool twoscomplement=0);
 
-    /// set LUT function.
+    /// set LUT function directly using int values.
     void setFunction(std::function<int(int)> function);
+
+    /// set LUT function using JSignals.
     int setFloatFunction(std::function<double(double)> function,
                           TRGCDCJSignal const & input,
                           TRGCDCJSignal const & minInv, TRGCDCJSignal const & maxInv, double outputToReal,
@@ -82,8 +86,10 @@ class TRGCDCJLUT {
     /// get output bitsize
     int getOutputBitsize() const;
 
-    /// get LUT function.
+    /// get LUT function using int values.
     std::function<int(int)> getFunction();
+
+    /// get LUT function using float values.
     std::function<double(double)> getFloatFunction();
 
     /// get output type.
@@ -92,8 +98,10 @@ class TRGCDCJLUT {
     /// get output type.
     int getOutputType() const;
 
-    /// get output.
+    /// get output using int values.
     int getOutput(int) const;
+
+    /// get output using float values.
     double getFloatOutput(double) const;
 
     /// Print variables for LUT
@@ -105,15 +113,16 @@ class TRGCDCJLUT {
     /// Storage for values used in function.
     std::vector<double> m_const;
 
-    /// Operate
+    /// Operate on LUT. (Will be deprecated.)
     std::string operate(std::string out, std::string in, std::map<std::string, std::map<std::string, double>* >& m_intStorage);
-    // Returns LUT value. Out is LUT value + offset. (LUT value + offset do not obey addition bitsize rules.)
+
+    /// Returns LUT value. Out is LUT value + offset. (LUT value + offset do not obey addition bitsize rules.)
     TRGCDCJSignal const operate(TRGCDCJSignal const& in, TRGCDCJSignal & out);
-    TRGCDCJSignal const operate(TRGCDCJSignal const& in, TRGCDCJSignal & out, int) const;
-    // Output is LUT Out + offset. Input is non offset input. 
+
+    /// Output is LUT Out + offset. Input is non offset input. 
     void operateNoOffset(TRGCDCJSignal const& in, TRGCDCJSignal & out) const;
 
-    // Creates vhdlCode for lut.
+    /// Creates vhdlCode for lut.
     std::string const lutVhdlCode(std::string const & shiftOffsetInput) const;
 
   private:
@@ -126,7 +135,6 @@ class TRGCDCJLUT {
 
     /// LUT filename.
     std::string m_fileName;
-    std::string m_outFileName;
 
     /// LUT function.
     std::function<int(int)> m_function;
@@ -143,25 +151,46 @@ class TRGCDCJLUT {
     /// output bitsize. Number of bits.
     int m_outputBitsize;
 
+    /// VHDL write flag for signals. 1: Write is on. 0: Write is off.
     bool m_write;
 
     /// Changing float function to int function variables.
     double m_inputOffset;
-    double m_inputActualMax;
-    double m_inputActualOffset;
+
+    /// The float offset of the output for LUT.
     double m_outputOffset;
+
+    /// The integer offset of the output for LUT.
     double m_outputIntMax;
+
+    /// The factor of the input integer to change to float value.
     double m_inputToReal;
+
+    /// The factor to change integer to float value.
     double m_toReal;
-    // Below is needed.
+
+    /// The number of bits to shift to make input the wanted bit width.
     int m_inputShiftBits;
+
+    /// The output type of the LUT. (Will be deprecated.)
     double m_outputType;
+
+    /// The output bit width with offset. (Will be deprecated.)
     double m_outputNBitsWithOffset;
-    // Simpiler signals.
+
+    /// The minimum input signal.
     TRGCDCJSignal m_inputMin;
+
+    /// The maximum input signal.
     TRGCDCJSignal m_inputMax;
+
+    /// The minimum output signal that is bit shifted.
     TRGCDCJSignal m_shiftOutputMin;
+
+    /// The maximum output value that is bit shifted.
     TRGCDCJSignal m_shiftOffsetOutputMax;
+
+    /// The bt shifted offset signal of input.
     TRGCDCJSignal m_shiftOffsetInput;
 
 };

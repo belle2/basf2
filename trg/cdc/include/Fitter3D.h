@@ -58,6 +58,7 @@ namespace Belle2 {
     int doit(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
 
+    /// Does track fitting using JSignals.
     int doitComplex(const std::vector<TRGCDCTrack *> & trackListIn,
              std::vector<TRGCDCTrack *> & trackListOut);
     /// Utility functions.
@@ -66,12 +67,16 @@ namespace Belle2 {
     void getMCValues( TRGCDCTrack* aTrack );
 
     /// Functions for saving.
+    // Save VHDL and code files.
     void saveVhdlAndCoe();
+    // Saves all signals for debugging.
     void saveAllSignals();
+    // Saves all I/O signals for debugging.
     void saveIoSignals();
 
-
+    // Gets name of class.
     std::string name(void) const;
+    // Gets version of class.
     std::string version(void) const;
     
     private:
@@ -85,9 +90,9 @@ namespace Belle2 {
       std::map<std::string, double> m_mDouble;
       /// Map to hold vector values for Fitter3D.
       std::map<std::string, std::vector<double> > m_mVector;
-      /// Map to hold const values for Fitter3D.
-      std::map<std::string, double> m_mConstants;
+      /// Map to hold constant values for Fitter3D.
       std::map<std::string, double> m_mConstD;
+      /// Map to hold constant vectcors for Fitter3D.
       std::map<std::string, std::vector<double> > m_mConstV;
       /// Map to hold input options.
       std::map<std::string, bool> m_mBool;
@@ -101,12 +106,23 @@ namespace Belle2 {
 
       /// Members for saving.
       std::string m_rootFitter3DFileName;
+
+      /// Tfile for Fitter3D root file.
       TFile* m_fileFitter3D;
+
+      /// TTree for tracks of fitter3D.
       TTree* m_treeTrackFitter3D;
+
+      /// TTree for constants of fitter3D.
       TTree* m_treeConstantsFitter3D;
+
+      /// TVectorD map for saving values to root file.
       std::map<std::string, TVectorD*> m_mTVectorD;
+      /// TClonesArray map for saving values to root file.
       std::map<std::string, TClonesArray*> m_mTClonesArray;
+      /// Array of saved signals.
       std::map<std::string, std::vector<signed long long> > m_mSavedSignals;
+      /// Array of I/O signals.
       std::map<std::string, std::vector<signed long long> > m_mSavedIoSignals;
 
   };

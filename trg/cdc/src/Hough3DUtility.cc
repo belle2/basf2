@@ -485,6 +485,8 @@ void Hough3DFinder::runFinderVersion1(vector<double> &trackVariables, vector<vec
       //Change to actual value
       actualCot=houghCot*m_cotStepSize+m_cotStart;
       actualZ0=tempHoughZ0*m_z0StepSize;
+      // To remove warning of actualCot and actualZ0.
+      if(1 == 2) cout<<actualCot<<actualZ0<<endl;
 
       for(int layer=0; layer<4; layer++){
         m_houghMesh[houghCot][houghZ0] += m_houghMeshLayer[houghCot][houghZ0][layer];
@@ -576,7 +578,7 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
 
   for( int iLayer=0; iLayer<4; iLayer++){
     m_stAxPhi[iLayer] = Fitter3DUtility::calStAxPhi(charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], rho, fitPhi0);
-    if(stTSs[iLayer].size()==0) cout<<"stTSs["<<iLayer<<"] is zero"<<endl;
+    //if(stTSs[iLayer].size()==0) cout<<"stTSs["<<iLayer<<"] is zero"<<endl;
     for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++){
       // Find number of wire difference
       tsDiffSt = m_stAxPhi[iLayer] - stTSs[iLayer][iTS];
@@ -620,6 +622,8 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
   for(int iLayer=0; iLayer<4; iLayer++){
     if((*m_geoCandidatesIndex)[iLayer].size()==0) {
       //cout<<"No St Candidate in GeoFinder"<<endl;
+      m_bestTS[iLayer] = 999;
+      m_bestTSIndex[iLayer] = 999;
     } else {
       double bestDiff=999;
       for(int iTS=0; iTS<int((*m_geoCandidatesIndex)[iLayer].size()); iTS++){
@@ -745,6 +749,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     if(m_rr[iLayer]/(2*rho) > 1 ) rho = m_rr[iLayer]/2;
     // This is done in real space
     double acos_real = acos(m_rr[iLayer]/(2*rho));
+    // Holds the maximum and minumum value for arc cos(radius/2/rho). 
 
     // For integer space
     Fitter3DUtility::findExtreme(m_findArcCosMax, m_findArcCosMin, acos_real);

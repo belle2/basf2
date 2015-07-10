@@ -24,10 +24,10 @@ namespace HandleRoot {
          std::map<std::string, TVectorD*> & eventMapTVectorD, 
          std::map<std::string, TClonesArray*> & trackMapTVectorD
   ){
-    for(map<string,TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); it++){
+    for(map<string,TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); ++it){
       it->second->Clear();
     }
-    for(map<string,TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); it++){
+    for(map<string,TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); ++it){
       it->second->Clear();
     }
   }
@@ -51,16 +51,16 @@ namespace HandleRoot {
     // Add Run tree
     (*runTree) = new TTree((prefix+"runTree").c_str(), "run");
     // Make storage and save for saving m_mConstD.
-    for(map<string, double>::iterator it=constMapD.begin(); it!=constMapD.end(); it++){
+    for(map<string, double>::iterator it=constMapD.begin(); it!=constMapD.end(); ++it){
       runMapTVectorD[prefix+"Double"+(*it).first] = new TVectorD(1, &(*it).second);
     }
     // Make storage and save for saving m_mConstV
-    for(map<string, vector<double> >::iterator it=constMapV.begin(); it!=constMapV.end(); it++){
+    for(map<string, vector<double> >::iterator it=constMapV.begin(); it!=constMapV.end(); ++it){
       unsigned t_vectorSize = it->second.size();
       runMapTVectorD[prefix+"Vector"+(*it).first] = new TVectorD(t_vectorSize, &((*it).second)[0]);
     }
     // Adding branch
-    for(map<string,TVectorD*>::iterator it=runMapTVectorD.begin(); it!=runMapTVectorD.end(); it++){
+    for(map<string,TVectorD*>::iterator it=runMapTVectorD.begin(); it!=runMapTVectorD.end(); ++it){
       (*runTree)->Branch(it->first.c_str(),&it->second, 32000,0);
     }
     // Fill tree
@@ -71,29 +71,29 @@ namespace HandleRoot {
     (*eventTree) = new TTree((prefix+"eventTree").c_str(), "event");
     // Events
     // Make storage for saving m_mEventD
-    for(map<string, double>::iterator it=eventMapD.begin(); it!=eventMapD.end(); it++){
+    for(map<string, double>::iterator it=eventMapD.begin(); it!=eventMapD.end(); ++it){
       eventMapTVectorD[prefix+"EventDouble"+(*it).first] = new TVectorD(1);
     }
     // Make storage for saving m_mEventV
-    for(map<string, vector<double> >::iterator it=eventMapV.begin(); it!=eventMapV.end(); it++){
+    for(map<string, vector<double> >::iterator it=eventMapV.begin(); it!=eventMapV.end(); ++it){
       unsigned t_vectorSize = it->second.size();
       eventMapTVectorD[prefix+"EventVector"+(*it).first] = new TVectorD(t_vectorSize);
     }
     // Adding branch
-    for(map<string,TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); it++){
+    for(map<string,TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); ++it){
       (*eventTree)->Branch(it->first.c_str(),&it->second, 32000,0);
     }
     // Tracks
     // Make storage for saving m_mDouble
-    for(map<string, double>::iterator it=trackMapD.begin(); it!=trackMapD.end(); it++){
+    for(map<string, double>::iterator it=trackMapD.begin(); it!=trackMapD.end(); ++it){
       trackMapTVectorD[prefix+"TrackDouble"+(*it).first] = new TClonesArray("TVectorD");
     }
     // Make storage for saving m_mVector
-    for(map<string, vector<double> >::iterator it=trackMapV.begin(); it!=trackMapV.end(); it++){
+    for(map<string, vector<double> >::iterator it=trackMapV.begin(); it!=trackMapV.end(); ++it){
       trackMapTVectorD[prefix+"TrackVector"+(*it).first] = new TClonesArray("TVectorD");
     }
     // Adding branch
-    for(map<string,TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); it++){
+    for(map<string,TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); ++it){
       (*eventTree)->Branch(it->first.c_str(),&it->second, 32000,0);
     }
 
@@ -121,11 +121,11 @@ namespace HandleRoot {
          std::map<std::string, double> & trackMapD, std::map<std::string, std::vector<double> > & trackMapV
   ){
     // Save m_mDouble
-    for(map<string, double >::iterator it=trackMapD.begin(); it!=trackMapD.end(); it++){
+    for(map<string, double >::iterator it=trackMapD.begin(); it!=trackMapD.end(); ++it){
       new((*trackMapTVectorD[prefix+"TrackDouble"+(*it).first])[trackMapD["iSave"]]) TVectorD(1, &(*it).second);
     }
     // Save m_mVector
-    for(map<string, vector<double> >::iterator it=trackMapV.begin(); it!=trackMapV.end(); it++){
+    for(map<string, vector<double> >::iterator it=trackMapV.begin(); it!=trackMapV.end(); ++it){
       unsigned t_vectorSize = it->second.size();
       new((*trackMapTVectorD[prefix+"TrackVector"+(*it).first])[trackMapD["iSave"]]) TVectorD(t_vectorSize, &((*it).second)[0]);
     }
@@ -138,11 +138,11 @@ namespace HandleRoot {
          std::map<std::string, double> & eventMapD, std::map<std::string, std::vector<double> > & eventMapV
   ){
     // Save m_mEventD
-    for(map<string, double>::iterator it=eventMapD.begin(); it!=eventMapD.end(); it++){
+    for(map<string, double>::iterator it=eventMapD.begin(); it!=eventMapD.end(); ++it){
       eventMapTVectorD[prefix+"EventDouble"+(*it).first]->Use(1,&(*it).second);
     }
     // Save m_mEventV
-    for(map<string, vector<double> >::iterator it=eventMapV.begin(); it!=eventMapV.end(); it++){
+    for(map<string, vector<double> >::iterator it=eventMapV.begin(); it!=eventMapV.end(); ++it){
       unsigned t_vectorSize = it->second.size();
       if(t_vectorSize!=0) eventMapTVectorD[prefix+"EventVector"+(*it).first]->Use(t_vectorSize, &((*it).second)[0]);
     }
@@ -160,13 +160,13 @@ namespace HandleRoot {
          std::map<std::string, TVectorD*> & eventMapTVectorD, 
          std::map<std::string, TClonesArray*> & trackMapTVectorD 
   ){
-    for(map<string,TVectorD*>::iterator it=runMapTVectorD.begin(); it!=runMapTVectorD.end(); it++){
+    for(map<string,TVectorD*>::iterator it=runMapTVectorD.begin(); it!=runMapTVectorD.end(); ++it){
       delete it->second;
     }
-    for(map<string,TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); it++){
+    for(map<string,TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); ++it){
       delete it->second;
     }
-    for(map<string,TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); it++){
+    for(map<string,TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); ++it){
       delete it->second;
     }
   }
@@ -228,7 +228,7 @@ namespace HandleRoot {
          std::map<std::string, double> & constMapD, std::map<std::string, std::vector<double> > & constMapV
   ){
     // Get all constant information
-    for(map<string, TVectorD*>::iterator it=runMapTVectorD.begin(); it!=runMapTVectorD.end(); it++){
+    for(map<string, TVectorD*>::iterator it=runMapTVectorD.begin(); it!=runMapTVectorD.end(); ++it){
       string t_name = it->first.substr(prefix.size()+6);
       string t_type = it->first.substr(prefix.size(),6);
       if(t_type=="Double"){
@@ -250,7 +250,7 @@ namespace HandleRoot {
          std::map<std::string, double> & eventMapD, std::map<std::string, std::vector<double> > & eventMapV
   ){
     // Get all event information
-    for(map<string, TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); it++){
+    for(map<string, TVectorD*>::iterator it=eventMapTVectorD.begin(); it!=eventMapTVectorD.end(); ++it){
       string t_name = it->first.substr((prefix+"Event").size()+6);
       string t_type = it->first.substr((prefix+"Event").size(),6);
       if(t_type=="Double"){
@@ -271,7 +271,7 @@ namespace HandleRoot {
          std::map<std::string, TClonesArray*> & trackMapTVectorD, 
          std::map<std::string, double> & trackMapD, std::map<std::string, std::vector<double> > & trackMapV
   ){
-    for(map<string, TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); it++){
+    for(map<string, TClonesArray*>::iterator it=trackMapTVectorD.begin(); it!=trackMapTVectorD.end(); ++it){
       string t_name = it->first.substr((prefix+"Track").size()+6);
       string t_type = it->first.substr((prefix+"Track").size(),6);
       if(t_type=="Double"){

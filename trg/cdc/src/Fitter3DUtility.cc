@@ -52,6 +52,65 @@ int Fitter3DUtility::findSign(double *phi2){
 
 void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &myphi0){
 
+  cout<<"Fitter3DUtility::rPhiFit() will be deprecated. Please use Fitter3DUtility::rPhiFitter(). phierror was changed to inv phi error."<<endl;
+  double invphierror[5];
+  for(unsigned i=0; i<5; i++){
+    invphierror[i] = 1 / phierror[i];
+  }
+  rPhiFitter(rr,phi2,invphierror,rho,myphi0);
+
+  // Print input values
+  //for(unsigned iSL=0; iSL<5; iSL++){
+  //  cout<<"SL["<<iSL<<"] rr: "<<rr[iSL]<<" phi: "<<phi2[iSL]<<" phiError: "<<phierror[iSL]<<endl;
+  //}
+
+  //double Trg_PI=3.141592653589793; 
+  //double A,B,C,D,E,hcx,hcy;
+  //double fiterror[5];
+  ////double G;
+  ////Calculate fit error
+  //for(unsigned i=0;i<5;i++){
+  //  fiterror[i]=sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi2[4]-phi2[2])+rr[2]*rr[2])/(sin(phi2[4]-phi2[2])*sin(phi2[4]-phi2[2]))-rr[i]*rr[i])*phierror[i];
+  //}
+
+  ////r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
+  //A=0,B=0,C=0,D=0,E=0,hcx=0,hcy=0;
+  ////G=0;
+  //for(unsigned i=0;i<5;i++){
+  //  A+=cos(phi2[i])*cos(phi2[i])/(fiterror[i]*fiterror[i]);
+  //  B+=sin(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+  //  C+=cos(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+  //  D+=rr[i]*cos(phi2[i])/(fiterror[i]*fiterror[i]);
+  //  E+=rr[i]*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+  //  //G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
+  //}
+  //hcx=D*B-E*C;    //helix center x
+  //hcx/=2*(A*B-C*C);
+  //hcy=E*A-D*C;    //helix center y
+  //hcy/=2*(A*B-C*C);
+  //rho=sqrt(hcx*hcx + hcy*hcy);  //radius of helix
+  //myphi0=atan2(hcy,hcx);
+  //if(myphi0<0) myphi0 += 2*Trg_PI;
+  //myphi0=atan(hcy/hcx);
+  //if(hcx<0 && hcy>0) myphi0 += Trg_PI;
+  //if(hcx<0 && hcy<0) myphi0 += Trg_PI;
+  //if(hcx>0 && hcy<0) myphi0 += Trg_PI*2.0;
+
+  //// For chi2
+  // double pchi2 = -2*hcx*D-2*hcy*E+G;
+  // pchi2/=3;
+
+  //// Another way to calculate chi2
+  //double pchi3 = 0.; //iw
+  //for(unsigned i=0;i<5;i++){
+  //  pchi3+=(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])*(2*(hcx*cos(phi2[i])+hcy*sin(phi2[i]))-rr[i])/(fiterror[i]*fiterror[i]);
+  //}
+  //pchi3/=3;
+  
+}
+
+void Fitter3DUtility::rPhiFitter(double *rr, double *phi2, double *invphierror, double &rho, double &myphi0){
+
   // Print input values
   //for(unsigned iSL=0; iSL<5; iSL++){
   //  cout<<"SL["<<iSL<<"] rr: "<<rr[iSL]<<" phi: "<<phi2[iSL]<<" phiError: "<<phierror[iSL]<<endl;
@@ -59,22 +118,26 @@ void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double
 
   double Trg_PI=3.141592653589793; 
   double A,B,C,D,E,hcx,hcy;
-  double fiterror[5];
+  double invFiterror[5];
   //double G;
   //Calculate fit error
   for(unsigned i=0;i<5;i++){
-    fiterror[i]=sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi2[4]-phi2[2])+rr[2]*rr[2])/(sin(phi2[4]-phi2[2])*sin(phi2[4]-phi2[2]))-rr[i]*rr[i])*phierror[i];
+    // Sometimes SL8 and SL4 will not be hit. So cannot use below calculation.
+    invFiterror[i]=1/sqrt((rr[4]*rr[4]-2*rr[4]*rr[2]*cos(phi2[4]-phi2[2])+rr[2]*rr[2])/(sin(phi2[4]-phi2[2])*sin(phi2[4]-phi2[2]))-rr[i]*rr[i])*invphierror[i];
+    //invFiterror[i]=invphierror[i];
+    //invFiterror[i]=invphierror[i]*rr[i];
+    //invFiterror[i]=invphierror[i]/rr[i];
   }
 
   //r-phi fitter(2D Fitter) ->calculate pt and radius of track-> input for 3D fitter.
   A=0,B=0,C=0,D=0,E=0,hcx=0,hcy=0;
   //G=0;
   for(unsigned i=0;i<5;i++){
-    A+=cos(phi2[i])*cos(phi2[i])/(fiterror[i]*fiterror[i]);
-    B+=sin(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-    C+=cos(phi2[i])*sin(phi2[i])/(fiterror[i]*fiterror[i]);
-    D+=rr[i]*cos(phi2[i])/(fiterror[i]*fiterror[i]);
-    E+=rr[i]*sin(phi2[i])/(fiterror[i]*fiterror[i]);
+    A+=cos(phi2[i])*cos(phi2[i])*(invFiterror[i]*invFiterror[i]);
+    B+=sin(phi2[i])*sin(phi2[i])*(invFiterror[i]*invFiterror[i]);
+    C+=cos(phi2[i])*sin(phi2[i])*(invFiterror[i]*invFiterror[i]);
+    D+=rr[i]*cos(phi2[i])*(invFiterror[i]*invFiterror[i]);
+    E+=rr[i]*sin(phi2[i])*(invFiterror[i]*invFiterror[i]);
     //G+=rr[i]*rr[i]/(fiterror[i]*fiterror[i]);
   }
   hcx=D*B-E*C;    //helix center x
@@ -101,6 +164,7 @@ void Fitter3DUtility::rPhiFit(double *rr, double *phi2, double *phierror, double
   //pchi3/=3;
   
 }
+
 
 void Fitter3DUtility::rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS){
 

@@ -398,7 +398,7 @@ TCSegment::priorityPosition(void)const{
     }
     if(priorityL->hit()){
       if(priorityR->hit()){
-        if((priorityR->hit()->drift())>(priorityR->hit()->drift())) return 1;
+        if((priorityL->hit()->drift())>(priorityR->hit()->drift())) return 1;
         else return 2;
       }else return 2;
     }else if(priorityR->hit()){

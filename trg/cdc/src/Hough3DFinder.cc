@@ -462,22 +462,22 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
 
 
         // Check if there is a TS in each super layer.
-        if(stTSs[0].size()==0) {
-          if(TRGDebug::level()) cout<<"[0] No TS"<<endl; 
-          continue;
-        }
-        if(stTSs[1].size()==0) {
-          if(TRGDebug::level()) cout<<"[1] No TS"<<endl; 
-          continue;
-        }
-        if(stTSs[2].size()==0) {
-          if(TRGDebug::level()) cout<<"[2] No TS"<<endl; 
-          continue;
-        }
-        if(stTSs[3].size()==0) {
-          if(TRGDebug::level()) cout<<"[3] No TS"<<endl; 
-          continue;
-        }
+        //if(stTSs[0].size()==0) {
+        //  if(TRGDebug::level()) cout<<"[0] No TS"<<endl; 
+        //  continue;
+        //}
+        //if(stTSs[1].size()==0) {
+        //  if(TRGDebug::level()) cout<<"[1] No TS"<<endl; 
+        //  continue;
+        //}
+        //if(stTSs[2].size()==0) {
+        //  if(TRGDebug::level()) cout<<"[2] No TS"<<endl; 
+        //  continue;
+        //}
+        //if(stTSs[3].size()==0) {
+        //  if(TRGDebug::level()) cout<<"[3] No TS"<<endl; 
+        //  continue;
+        //}
 
         // Set input for Hough 3D finder
         // Get 2D track parameters.
@@ -513,6 +513,10 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         double tempR[9], tempPhi[9];
         double phiError[5];
         phiError[0] = 0.0085106; phiError[1] = 0.0039841; phiError[2] = 0.0025806; phiError[3] = 0.0019084; phiError[4] = 0.001514;
+        double invPhiError[5];
+        for(unsigned iAx=0; iAx<5; iAx++){
+          invPhiError[iAx] = 1/phiError[iAx];
+        }
         for(int iLayer=0; iLayer<5; iLayer++) {
             tempR[iLayer] = m_axR[iLayer];
             tempPhi[iLayer] = axPhi[iLayer];
@@ -521,7 +525,7 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
             tempR[iLayer+5] = 0;
             tempPhi[iLayer+5] = 0;
         }
-        Fitter3DUtility::rPhiFit(tempR,tempPhi,phiError,rho,fitPhi0);
+        Fitter3DUtility::rPhiFitter(tempR,tempPhi,invPhiError,rho,fitPhi0);
         fitPt = rho*0.3*1.5;
 
         int charge = int(aTrack.charge());
@@ -554,11 +558,22 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         vector<double> tempResult;
         m_Hough3DFinder->getValues("bestTSIndex",tempResult);
         for(int iTS=0; iTS<4; iTS++) {
-            p_bestTS[iTS] = p_stTSs[iTS][(int)tempResult[iTS]];
-            //bestTS[iTS] = stTSs[iTS][(int)tempResult[iTS]];
+            if(tempResult[iTS] == 999){
+              p_bestTS[iTS] = 0;
+            } else {
+              p_bestTS[iTS] = p_stTSs[iTS][(int)tempResult[iTS]];
+              //bestTS[iTS] = stTSs[iTS][(int)tempResult[iTS]];
+            }
         }
         m_Hough3DFinder->getValues("bestTS",tempResult);
-        for(int iLayer=0; iLayer<4; iLayer++) bestTS[iLayer] = tempResult[iLayer];
+        for(int iLayer=0; iLayer<4; iLayer++) {
+          if(tempResult[iLayer] == 999){
+            bestTS[iLayer] = 999;
+          } else {
+            bestTS[iLayer] = tempResult[iLayer];
+          }
+
+        }
         if(m_Hough3DFinder->getMode()==1){
             m_Hough3DFinder->getValues("bestZ0", tempResult);
             bestZ0 = tempResult[0];

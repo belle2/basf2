@@ -106,7 +106,7 @@ namespace Belle2{
 
   void TRGCDCJSignalData::buffersVhdlCode() {
     // Define.
-    for(map<string,vector<int> >::const_iterator it = m_buffers.begin(); it!=m_buffers.end(); it++){
+    for(map<string,vector<int> >::const_iterator it = m_buffers.begin(); it!=m_buffers.end(); ++it){
       string const & name = it->first;
       int const & type = it->second[0];
       int const & bitwidth = it->second[1];
@@ -119,7 +119,7 @@ namespace Belle2{
       m_vhdlDefine += "signal " + name + "_b : " + arrayName + " := (others=>(others=>'0'));\n";
     }
     // Process.
-    for(map<string,vector<int> >::const_iterator it = m_buffers.begin(); it!=m_buffers.end(); it++){
+    for(map<string,vector<int> >::const_iterator it = m_buffers.begin(); it!=m_buffers.end(); ++it){
       string const & name = it->first;
       int const & buffer = it->second[2];
       m_vhdlInProcess += name + "_b(" + to_string(0) + ") <= " + name + ";\n";
@@ -131,7 +131,7 @@ namespace Belle2{
   }
 
   void TRGCDCJSignalData::signalsVhdlCode() {
-    for(map<string,vector<int> >::const_iterator it = m_signals.begin(); it!=m_signals.end(); it++){
+    for(map<string,vector<int> >::const_iterator it = m_signals.begin(); it!=m_signals.end(); ++it){
       string const & name = it->first;
       int const & type = it->second[0];
       int const & bitwidth = it->second[1];

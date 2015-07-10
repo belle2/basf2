@@ -94,7 +94,7 @@ void
 TRGCDCSegmentHit::operator delete(void * t) {
     for (vector<TRGCDCSegmentHit *>::iterator it = _all.begin();
 	 it != _all.end();
-	 it++) {
+	 ++it) {
 	if ((* it) == (TRGCDCSegmentHit *) t) {
 	    _all.erase(it);
 	    break;

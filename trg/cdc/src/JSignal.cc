@@ -1375,13 +1375,15 @@ namespace Belle2{
   }
 
   int TRGCDCJSignal::calBitwidth() const {
-    int t_bitwidth = ceil(log(max(m_maxInt, llabs(m_minInt))+1)/log(2));
+    //int t_bitwidth = ceil(log(max(m_maxInt, llabs(m_minInt))+1)/log(2));
+    int t_bitwidth = ceil(log1p(max(m_maxInt, llabs(m_minInt)))/log(2));
     if(calType() != 1) t_bitwidth++;
     return t_bitwidth;
   }
 
   int TRGCDCJSignal::calBitwidth(int type, signed long long minInt, signed long long maxInt) {
-    int t_bitwidth = ceil(log(max(maxInt, llabs(minInt))+1)/log(2));
+    //int t_bitwidth = ceil(log(max(maxInt, llabs(minInt))+1)/log(2));
+    int t_bitwidth = ceil(log1p(max(maxInt, llabs(minInt)))/log(2));
     if(type != 1) t_bitwidth++;
     return t_bitwidth;
   }

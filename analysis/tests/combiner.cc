@@ -301,13 +301,16 @@ namespace {
       std::vector<MockParticle> received_particles;
       std::vector<Particle*> added_particles;
       for (unsigned int i = 0; i < expected_particles.size(); ++i) {
-        EXPECT_TRUE(generator.loadNext());
-        const Particle& particle = generator.getCurrentParticle();
-        Particle* part = particles.appendNew(particle);
-        added_particles.push_back(part);
-        auto daughter_indices = part->getDaughterIndices();
-        received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
-                                                     daughter_indices.end())));
+        bool next = generator.loadNext();
+        EXPECT_TRUE(next);
+        if (next) {
+          const Particle& particle = generator.getCurrentParticle();
+          Particle* part = particles.appendNew(particle);
+          added_particles.push_back(part);
+          auto daughter_indices = part->getDaughterIndices();
+          received_particles.push_back(std::make_tuple(part->getFlavorType(), part->getPDGCode(), std::set<int>(daughter_indices.begin(),
+                                                       daughter_indices.end())));
+        }
       }
       EXPECT_FALSE(generator.loadNext());
 
@@ -329,18 +332,27 @@ namespace {
     int operator*(int index)
     {
       StoreObjPtr<ParticleList> list(listName);
+      // Check if index is smaller than FlavorSpecific+SelfConjugatedList
+      // There's not possibility to check only SelfConjugated, so this has to do for the moment
+      EXPECT_LT(index, list->getListSize());
       return list->getList(ParticleList::c_SelfConjugatedParticle)[index];
     }
 
     int operator+(int index)
     {
       StoreObjPtr<ParticleList> list(listName);
+      // Check if index is smaller than FlavorSpecific+SelfConjugatedList
+      // There's not possibility to check only SelfConjugated, so this has to do for the moment
+      EXPECT_LT(index, list->getListSize());
       return list->getList(ParticleList::c_FlavorSpecificParticle)[index];
     }
 
     int operator-(int index)
     {
       StoreObjPtr<ParticleList> list(antiListName);
+      // Check if index is smaller than FlavorSpecific+SelfConjugatedList
+      // There's not possibility to check only SelfConjugated, so this has to do for the moment
+      EXPECT_LT(index, list->getListSize());
       return list->getList(ParticleList::c_FlavorSpecificParticle)[index];
     }
 
@@ -399,6 +411,88 @@ namespace {
     DS.addExpectedParticle(Particle::c_Flavored, -413, {D0 * 1, pi - 0});
 
     DS.addAndCheckParticlesFromGenerator();
+
+  }
+
+  TEST_F(ParticleCombinerTest, RareBDecay)
+  {
+    TestParticleList e("e+");
+    e.addParticle(1);
+    e.addAntiParticle(2);
+    e.addParticle(3);
+    e.addAntiParticle(4);
+
+    TestParticleList gamma("gamma");
+    gamma.addParticle(5);
+    gamma.addParticle(6);
+    gamma.addParticle(7);
+
+    TestParticleList mu("mu+");
+    for (int i = 0; i < 100; ++i) {
+      mu.addParticle(7 + 2 * i + 1);
+      mu.addAntiParticle(7 + 2 * i + 2);
+    }
+
+    {
+      TestParticleList BP("B+ -> e+");
+      BP.addExpectedParticle(Particle::c_Flavored, 521, {e + 0});
+      BP.addExpectedParticle(Particle::c_Flavored, 521, {e + 1});
+      BP.addExpectedParticle(Particle::c_Flavored, -521, {e - 0});
+      BP.addExpectedParticle(Particle::c_Flavored, -521, {e - 1});
+      BP.addAndCheckParticlesFromGenerator();
+
+      TestParticleList BP2("B+:eg -> e+ gamma");
+      for (int j = 0; j < 3; ++j) {
+        BP2.addExpectedParticle(Particle::c_Flavored, 521, {e + 0, gamma * j});
+        BP2.addExpectedParticle(Particle::c_Flavored, 521, {e + 1, gamma * j});
+        BP2.addExpectedParticle(Particle::c_Flavored, -521, {e - 0, gamma * j});
+        BP2.addExpectedParticle(Particle::c_Flavored, -521, {e - 1, gamma * j});
+      }
+      BP2.addAndCheckParticlesFromGenerator();
+
+      // Here we expect "few" combinations, because we combine the same list
+      TestParticleList Y("Upsilon(4S) -> B+ B-");
+      Y.addExpectedParticle(Particle::c_Unflavored, 300553, {BP + 0, BP - 0});
+      Y.addExpectedParticle(Particle::c_Unflavored, 300553, {BP + 0, BP - 1});
+      Y.addExpectedParticle(Particle::c_Unflavored, 300553, {BP + 1, BP - 0});
+      Y.addExpectedParticle(Particle::c_Unflavored, 300553, {BP + 1, BP - 1});
+      Y.addAndCheckParticlesFromGenerator();
+
+      // Here we expect "more" combinations, because we combine the different list
+      TestParticleList Y2("Upsilon(4S):eg -> B+:eg B-");
+      for (int j = 0; j < 3; ++j) {
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 + (0 + 2 * j), BP - 0});
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 + (0 + 2 * j), BP - 1});
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 + (1 + 2 * j), BP - 0});
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 + (1 + 2 * j), BP - 1});
+
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 - (0 + 2 * j), BP + 0});
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 - (0 + 2 * j), BP + 1});
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 - (1 + 2 * j), BP + 0});
+        Y2.addExpectedParticle(Particle::c_Unflavored, 300553, {BP2 - (1 + 2 * j), BP + 1});
+      }
+      Y2.addAndCheckParticlesFromGenerator();
+
+    }
+
+    {
+      TestParticleList BP("B+:mu -> mu+");
+      for (int i = 0; i < 100; ++i) {
+        BP.addExpectedParticle(Particle::c_Flavored, 521, {mu + i});
+        BP.addExpectedParticle(Particle::c_Flavored, -521, {mu - i});
+      }
+      BP.addAndCheckParticlesFromGenerator();
+    }
+    {
+      TestParticleList BP("B+:mg -> mu+ gamma");
+      for (int j = 0; j < 3; ++j) {
+        for (int i = 0; i < 100; ++i) {
+          BP.addExpectedParticle(Particle::c_Flavored, 521, {mu + i, gamma * j});
+          BP.addExpectedParticle(Particle::c_Flavored, -521, {mu - i, gamma * j});
+        }
+      }
+      BP.addAndCheckParticlesFromGenerator();
+    }
 
   }
 

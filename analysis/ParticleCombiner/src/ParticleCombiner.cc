@@ -360,7 +360,7 @@ namespace Belle2 {
       case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_particleArray.getPtr());
-      default: B2FATAL("Thomas you have a serious bug in the particle combiner");
+      default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }
 
     return Particle(); // This should never happen

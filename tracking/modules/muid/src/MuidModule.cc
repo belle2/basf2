@@ -1198,18 +1198,30 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   double logL_e = -1.0E20;
   if (outcome != 0) { // extrapolation reached KLM sensitive volume
     if (charge > 0.0) {
+      std::cout << ",muon";
       muon = m_MuonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",pion";
       pion = m_PionPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",kaon";
       kaon = m_KaonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",proton";
       proton = m_ProtonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",deuteron";
       deuteron = m_DeuteronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",electron";
       electron = m_PositronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
     } else {
+      std::cout << ",muon";
       muon = m_MuonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",pion";
       pion = m_PionMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",kaon";
       kaon = m_KaonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",proton";
       proton = m_AntiprotonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",deuteron";
       deuteron = m_AntideuteronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      std::cout << ",electron";
       electron = m_ElectronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
     }
     if (muon > 0.0) logL_mu = log(muon);

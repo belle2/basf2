@@ -156,6 +156,24 @@ namespace Belle2 {
     //           hits from the corresponding Ext track crossings
 
     if ((outcome <= 0) || (outcome > MUID_MaxOutcome)) return 0.0;
+    //double r = getPDFRange(outcome, lastExtLayer, layerDifference);
+    //double c = getPDFRchisq(outcome, ndof, chiSquared);
+    //std::cout << "," << outcome << "," << lastExtLayer << "," << layerDifference << "," << ndof << "," << chiSquared << "," << r << "," << c << "," << r*c << std::endl;
+    static int first = 2;
+    if (first > 0) {
+      first--;
+      std::cout << std::endl;
+      for (int r = 0; r < 250; ++r) {
+        double rr = 0.2 * (r - 0.5);
+        std::cout << "," << rr;
+        for (int o = 1; o < 5; ++o) {
+          for (int n = 2; n < 30; n += 2) {
+            std::cout << "," << getPDFRchisq(o, n, rr * n);
+          }
+        }
+        std::cout << std::endl;
+      }
+    }
     return getPDFRange(outcome, lastExtLayer, layerDifference) * getPDFRchisq(outcome, ndof, chiSquared);
 
   }

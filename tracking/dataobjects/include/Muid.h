@@ -25,7 +25,7 @@ namespace Belle2 {
 
     //! Constructor with initial value
     //! @param pdgCode PDG code of the hypothesis used for this extrapolation
-    Muid(int pdgCode);
+    explicit Muid(int pdgCode);
 
     //! Destructor
     virtual ~Muid() {}

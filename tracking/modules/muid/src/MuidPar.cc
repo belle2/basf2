@@ -192,7 +192,8 @@ namespace Belle2 {
         double corr = dx * (m_ReducedChiSquaredD1[outcome][halfNdof][i] +
                             dx * (m_ReducedChiSquaredD2[outcome][halfNdof][i] +
                                   dx * m_ReducedChiSquaredD3[outcome][halfNdof][i]));
-        if (corr > 0.0) pdf += corr;
+        double pdfcorr = pdf + corr;
+        if (pdfcorr > 0.0) pdf = pdfcorr;
       }
     }
     return pdf;

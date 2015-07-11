@@ -37,15 +37,15 @@ class TRGCDCJSignal {
   TRGCDCJSignal();
   /// Copy constructor.
   TRGCDCJSignal(TRGCDCJSignalData *);
-  // Actual to integer constructor with clock.
+  /// Actual to integer constructor with clock.
   TRGCDCJSignal(int const & bitwidth, double const & value, double const & min, double const & max, int const & clock, TRGCDCJSignalData *);
-  // Actual to integer constructor with clock set to 0.
+  /// Actual to integer constructor with clock set to 0.
   TRGCDCJSignal(int const & bitwidth, double const & value, double const & min, double const & max, TRGCDCJSignalData *);
-  // Integer constructor.
+  /// Integer constructor.
   TRGCDCJSignal(signed long long const & intValue, double const & toReal, signed long long const & minInt, signed long long const & maxInt, double const & actual, double const & minActual, double const & maxActual, int const & finishClock, TRGCDCJSignalData *, bool b_slv=0);
-  // Constant constructor.
+  /// Constant constructor.
   TRGCDCJSignal(double const & value, double const & toReal, TRGCDCJSignalData *);
-  // Slv constructor
+  /// Slv constructor
   TRGCDCJSignal(std::vector<bool> const & slvValue, int const& finishClock, TRGCDCJSignalData* );
 
   /// Destructor.
@@ -57,13 +57,13 @@ class TRGCDCJSignal {
   TRGCDCJSignal& assignTo (TRGCDCJSignal const rhs, int targetClock);
   /// Assign operator.
   TRGCDCJSignal& operator<= (TRGCDCJSignal const rhs);
-  // Unary operator.
+  /// Unary operator.
   TRGCDCJSignal const operator- () const;
-  // Arithmetic add operator.
+  /// Arithmetic add operator.
   TRGCDCJSignal const operator+ (TRGCDCJSignal const& rhs) const;
-  // Arithmetic minus operator.
+  /// Arithmetic minus operator.
   TRGCDCJSignal const operator- (TRGCDCJSignal const& rhs) const;
-  // Arithmetic multiply operator.
+  /// Arithmetic multiply operator.
   TRGCDCJSignal const operator* (TRGCDCJSignal const& rhs) const;
 
   /// Methods.
@@ -74,7 +74,7 @@ class TRGCDCJSignal {
   TRGCDCJSignal const offset(TRGCDCJSignal const valueMin) const;
   /// Outputs a signal that is not offset.
   TRGCDCJSignal const invOffset(TRGCDCJSignal const valueMin) const;
-  /// Case. Reference is what is used to determine. Target is what is going to be assigned. Data is (Assignment, From, To)... (Assignment). Last is default.
+  /// Case method. Reference is what is used to determine. Target is what is going to be assigned. Data is (Assignment, From, To)... (Assignment). Last is default.
   /// Choose with target clock. Also has input for target min and target max signal.
   static void choose(TRGCDCJSignal & target, TRGCDCJSignal const & targetMin, TRGCDCJSignal const & targetMax, TRGCDCJSignal const & reference, std::vector<std::vector<TRGCDCJSignal> > data, int targetClock);
   /// Chooes method. Also has input for target min and target max signal.
@@ -102,17 +102,17 @@ class TRGCDCJSignal {
   /// Change singal to std_logic_vector.
   static TRGCDCJSignal const toSlv(TRGCDCJSignal const &);
 
-  // Change slv to signed with target clock.
+  /// Change slv to signed with target clock.
   static TRGCDCJSignal const slvToSigned(TRGCDCJSignal const & in, double const & toReal, signed long long const & minInt, signed long long const & maxInt, double const & actual, double const & minActual, double const & maxActual, int const & finishClock);
-  // Change slv to signed.
+  /// Change slv to signed.
   static TRGCDCJSignal const slvToSigned(TRGCDCJSignal const & in);
-  // Change slv to unsigned with target clock.
+  /// Change slv to unsigned with target clock.
   static TRGCDCJSignal const slvToUnsigned(TRGCDCJSignal const & in, double const & toReal, signed long long const & minInt, signed long long const & maxInt, double const & actual, double const & minActual, double const & maxActual, int const & finishClock);
-  // Change slv to unsigned with target clock.
+  /// Change slv to unsigned with target clock.
   static TRGCDCJSignal const slvToUnsigned(TRGCDCJSignal const & in);
-  // Change signed to slv.
+  /// Change signed to slv.
   static TRGCDCJSignal const signedToSlv(TRGCDCJSignal const & in);
-  // Change unsigned to slv.
+  /// Change unsigned to slv.
   static TRGCDCJSignal const unsignedToSlv(TRGCDCJSignal const & in);
 
   /// Compare two signals.
@@ -192,100 +192,100 @@ class TRGCDCJSignal {
   std::string getVhdlOutputFile() const;
 
   /// Utilities.
-  // Matches unit by shifting bits.
+  /// Matches unit by shifting bits.
   void matchUnit(TRGCDCJSignal& first, TRGCDCJSignal& second) const;
-  // Swaps the TRGCDCJSignals.
+  /// Swaps the TRGCDCJSignals.
   void swap(TRGCDCJSignal& first, TRGCDCJSignal& second) const;
-  // Orders the TRGCDCJSignals by bitsize. Next priority is unsigned, signed, minus unsigned. 1: was swapped. 0: was not swapped.
+  /// Orders the TRGCDCJSignals by bitsize. Next priority is unsigned, signed, minus unsigned. 1: was swapped. 0: was not swapped.
   bool orderLargestBitsize(TRGCDCJSignal& large, TRGCDCJSignal& small) const;
-  // Calculate max value for a binary number.
+  /// Calculate max value for a binary number.
   signed long long calMaxInteger() const;
-  // Calculate min value for a binary number.
+  /// Calculate min value for a binary number.
   signed long long calMinInteger() const;
-  // Absolute TRGCDCJSignal. Removes 1 bit if signed or minus unsigned.
+  /// Absolute TRGCDCJSignal. Removes 1 bit if signed or minus unsigned.
   static TRGCDCJSignal const absolute(TRGCDCJSignal const & first);
   //// Calculates output bitwidth and type for operation.
   //void calTypeBitwidth(TRGCDCJSignal const & first, std::string operation, TRGCDCJSignal const & second, int & type, int & bitwidth) const;
-  // Calculates integer value with unit of a TRGCDCJSignal.
+  /// Calculates integer value with unit of a TRGCDCJSignal.
   static signed long long calInt(double value, TRGCDCJSignal const & mother);
-  // Calculates vhdl bitwidth and type for operation.
+  /// Calculates vhdl bitwidth and type for operation.
   static void calVhdlTypeBitwidth(TRGCDCJSignal const & first, std::string operation, TRGCDCJSignal const & second, int & type, int & bitwidth);
-  // Initializes the argument signals for the signal.
+  /// Initializes the argument signals for the signal.
   void initArgumentSignals();
-  // Combines arguments of signals.
+  /// Combines arguments of signals.
   static void combineArguments(TRGCDCJSignal const & first, TRGCDCJSignal const & second, TRGCDCJSignal & result ) ;
-  //  Initializes the vhdl code.
+  ///  Initializes the vhdl code.
   void initVhdlCode();
-  // Changes signal type to signed type in VHDL.
+  /// Changes signal type to signed type in VHDL.
   void toSignedVhdlCode();
-  // Changes signal type to unsigned type in VHDL.
+  /// Changes signal type to unsigned type in VHDL.
   void toUnsignedVhdlCode();
-  // Writes vhdl code using two signals.
+  /// Writes vhdl code using two signals.
   static void vhdlCode(TRGCDCJSignal const & first, std::string operation, TRGCDCJSignal const & second, TRGCDCJSignal const & result, std::string & targtVhdlCode);
-  // Writes vhdl code using one signal.
+  /// Writes vhdl code using one signal.
   static void vhdlCode(std::string operation, TRGCDCJSignal const & first, TRGCDCJSignal const & result, std::string & targetVhdlCode);
-  // Writes final vhdl code.
+  /// Writes final vhdl code.
   static std::string replaceWithSignalNames(std::string const & fromVhdlCode, std::vector<std::pair<std::string, std::vector<int> > > const & fromVhdlSignals, int const & finishClock, std::map<std::string, std::vector<int> > & buffers);
-  // Writes the assign vhdl code.
+  /// Writes the assign vhdl code.
   static std::string assignVhdlCode(TRGCDCJSignal const & target, TRGCDCJSignal const & from);
-  // Writes the choose vhdl code.
+  /// Writes the choose vhdl code.
   static std::string chooseVhdlCode(TRGCDCJSignal const & target, TRGCDCJSignal const & reference, std::vector<std::vector<TRGCDCJSignal> > const & data);
-  // Writes the ifElse vhdl code.
+  /// Writes the ifElse vhdl code.
   static std::string ifElseVhdlCode(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal *, TRGCDCJSignal> > > > const & data);
-  // Prints vhdl code.
+  /// Prints vhdl code.
   void printVhdl(std::string vhdlCode);
-  // Checks underflow or overflow for TRGCDCJSignal.
+  /// Checks underflow or overflow for TRGCDCJSignal.
   void checkInt(std::string name) const;
-  // Checks if signal is same signal
+  /// Checks if signal is same signal
   static bool isSameSignal(TRGCDCJSignal const & lhs, TRGCDCJSignal const & rhs);
-  // Values => [name, value, bitwidth, min, max, clock]
-  // Changes values to signals.
+  /// Values => [name, value, bitwidth, min, max, clock]
+  /// Changes values to signals.
   static void valuesToMapSignals(std::vector<std::tuple<std::string, double,int,double,double, int> > const & inValues, Belle2::TRGCDCJSignalData* inCommonData, std::map<std::string, Belle2::TRGCDCJSignal> & outMap);
-  // Choose => [signalName, FpgaEffects(=1)/NoFpgaEffects(=0)]
-  // Values => [name, value, bitwidth, min, max, clock]
-  // Changes signals to values.
+  /// Choose => [signalName, FpgaEffects(=1)/NoFpgaEffects(=0)]
+  /// Values => [name, value, bitwidth, min, max, clock]
+  /// Changes signals to values.
   static void mapSignalsToValues(std::map<std::string, Belle2::TRGCDCJSignal>const & inMap, std::vector<std::pair<std::string, int> > const & inChoose, std::vector<std::tuple<std::string, double,int,double,double,int> > & outValues);
   
   private:
 
   /// Memebers.
-  // Name of signal
+  /// Name of signal
   std::string m_name;
-  // Type of signal.
-  int m_type; // +1: unsigned. -1: unsigned.
-  // Bitwidth of signal.
+  /// Type of signal.
+  int m_type; /// +1: unsigned. -1: unsigned.
+  /// Bitwidth of signal.
   int m_bitsize;
-  // integer value of signal.
+  /// integer value of signal.
   signed long long m_int;
-  // storage for std_logic_vector. (Will be deprecated.)
+  /// storage for std_logic_vector. (Will be deprecated.)
   std::vector<bool> m_slv;
-  // The minimum integer value.
+  /// The minimum integer value.
   signed long long m_minInt;
-  // The maximum integer value.
+  /// The maximum integer value.
   signed long long m_maxInt;
-  // The float value.
+  /// The float value.
   double m_actual;
-  // The minimum float value.
+  /// The minimum float value.
   double m_minActual;
-  // The maximum float value.
+  /// The maximum float value.
   double m_maxActual;
-  // The toReal value.
+  /// The toReal value.
   double m_toReal;
-  // The debug flag.
+  /// The debug flag.
   bool m_debug;
-  // Holds the vhdl code.
+  /// Holds the vhdl code.
   std::string m_vhdlCode;
-  // vector<int> is {type, bitwidth, clock}
-  // Holds the arguments that made the signal.
+  /// vector<int> is {type, bitwidth, clock}
+  /// Holds the arguments that made the signal.
   std::vector<std::pair<std::string, std::vector<int> > > m_argumentSignals;
-  // Holds the clock tick when the signal is valid.
+  /// Holds the clock tick when the signal is valid.
   int m_finishClock;
   //bool m_printVhdl;
-  // The common JSignalData.
+  /// The common JSignalData.
   TRGCDCJSignalData * m_commonData;
 
 };
 
-} // namespace Belle2
+} /// namespace Belle2
 
 #endif /* TRGCDCJSignal_FLAG_ */

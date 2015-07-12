@@ -7,6 +7,7 @@
 # 2015/02/02 : Added KKGen, Background, RootInput/RootOutput //JB
 # 2015/05/18 : Fixed background file issue. //JB
 # 2015/06/09 : Updated for release-00-05-00 //JB
+# 2015/07/12 : Updated for 2D trgcdc update //JB
 
 from basf2 import *
 import glob
@@ -14,7 +15,7 @@ import glob
 #...suppress messages and warnings during processing...
 set_log_level(LogLevel.ERROR)
 # 0 means using different seed every time.
-set_random_seed(0)
+set_random_seed(1)
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
 
@@ -148,9 +149,12 @@ cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.
 #cdctrg.param('TSFLogicLUT', 1)
 #cdctrg.param('TSFRootFile',1)
 #---2D finder settings---
+cdctrg.param('HoughFinderMappingFilePlus', os.path.join(basf2datadir,"trg/cdc/HoughMappingMinus20140808.dat"))
+cdctrg.param('HoughFinderMappingFileMinus', os.path.join(basf2datadir,"trg/cdc/HoughMappingPlus20140807.dat"))
 cdctrg.param('2DFinderPerfect',1)
-cdctrg.param('HoughFinderMeshX',160)
-cdctrg.param('HoughFinderMeshY',26)
+#cdctrg.param('HoughFinderMeshX',160)
+#cdctrg.param('HoughFinderMeshY',26)
+#cdctrg.param('HoughFinderPeakMin',4)
 #---3D finder settings---
 #cdctrg.param('Hough3DRootFile',1)
 # 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder

@@ -15,6 +15,7 @@ namespace Belle2{
 };
 
 
+/// A class that holds functions for 3D tracking.
 class Fitter3DUtility{
 
   public:

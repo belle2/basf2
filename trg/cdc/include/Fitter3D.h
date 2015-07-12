@@ -67,16 +67,16 @@ namespace Belle2 {
     void getMCValues( TRGCDCTrack* aTrack );
 
     /// Functions for saving.
-    // Save VHDL and code files.
+    /// Save VHDL and code files.
     void saveVhdlAndCoe();
-    // Saves all signals for debugging.
+    /// Saves all signals for debugging.
     void saveAllSignals();
-    // Saves all I/O signals for debugging.
+    /// Saves all I/O signals for debugging.
     void saveIoSignals();
 
-    // Gets name of class.
+    /// Gets name of class.
     std::string name(void) const;
-    // Gets version of class.
+    /// Gets version of class.
     std::string version(void) const;
     
     private:
@@ -97,11 +97,11 @@ namespace Belle2 {
       /// Map to hold input options.
       std::map<std::string, bool> m_mBool;
 
-      // Map to hold JSignals.
+      /// Map to hold JSignals.
       std::map<std::string, TRGCDCJSignal> m_mSignalStorage;
-      // Map to hold JLuts.
+      /// Map to hold JLuts.
       std::map<std::string, TRGCDCJLUT*> m_mLutStorage;
-      // For VHDL code.
+      /// For VHDL code.
       TRGCDCJSignalData* m_commonData;
 
       /// Members for saving.
@@ -127,7 +127,7 @@ namespace Belle2 {
 
   };
 
-} // Namespace Belle2
+} /// Namespace Belle2
 
 
 #endif

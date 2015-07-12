@@ -26,6 +26,7 @@ namespace Belle2 {
 
 class TRGCDCJSignal;
 
+/// A class to hold common data for JSignals.
 class TRGCDCJSignalData {
   friend class TRGCDCJSignal;
   friend class TRGCDCJLUT;
@@ -95,6 +96,6 @@ class TRGCDCJSignalData {
 
 };
 
-} // namespace Belle2
+} /// namespace Belle2
 
 #endif /* TRGCDCJSignalData_FLAG_ */

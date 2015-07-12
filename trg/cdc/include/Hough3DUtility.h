@@ -4,6 +4,7 @@
 #define HOUGH3DUTILITY_H
 
 
+/// A class to finded stereo TS hits related to 2D tracks.
 class Hough3DFinder {
   public: 
     /// 3D finder constructor.
@@ -128,22 +129,38 @@ class Hough3DFinder {
     /// Holds output values of the GeoFinder.
     std::vector<double> m_FPGAOutput;
     /// Find min and max values
-    /// Holds the maximum and minimum value for rho. 
-    double m_findRhoMax, m_findRhoMin;
-    /// Holds the maximum and minimum value for integer rho. 
-    double m_findRhoIntMax, m_findRhoIntMin;
-    /// Holds the maximum and minimum value for phi0. 
-    double m_findPhi0Max, m_findPhi0Min;
-    /// Holds the maximum and minimum value for integer phi0. 
-    double m_findPhi0IntMax, m_findPhi0IntMin;
-    /// Holds the maximum and minimum value for arc cos(radius/2/rho). 
-    double m_findArcCosMax, m_findArcCosMin;
-    /// Holds the maximum and minimum value for intger arc cos(radius/2/rho). 
-    double m_findArcCosIntMax, m_findArcCosIntMin;
-    /// Holds the maximum and minimum value for fitted axial phi location between superlayers.
-    double m_findPhiZMax, m_findPhiZMin;
-    /// Holds the maximum and minimum value for fitted integer axial phi location between superlayers.
-    double m_findPhiZIntMax, m_findPhiZIntMin;
+    /// Holds the maximum value for rho. 
+    double m_findRhoMax;
+    /// Holds the minimum value for rho. 
+    double m_findRhoMin;
+    /// Holds the maximum value for integer rho. 
+    double m_findRhoIntMax;
+    /// Holds the minimum value for integer rho. 
+    double m_findRhoIntMin;
+    /// Holds the maximum value for phi0. 
+    double m_findPhi0Max;
+    /// Holds the minimum value for phi0. 
+    double m_findPhi0Min;
+    /// Holds the maximum value for integer phi0. 
+    double m_findPhi0IntMax;
+    /// Holds the minimum value for integer phi0. 
+    double m_findPhi0IntMin;
+    /// Holds the maximum value for arc cos(radius/2/rho). 
+    double m_findArcCosMax;
+    /// Holds the minimum value for arc cos(radius/2/rho). 
+    double  m_findArcCosMin;
+    /// Holds the maximum value for intger arc cos(radius/2/rho). 
+    double m_findArcCosIntMax;
+    /// Holds the minimum value for intger arc cos(radius/2/rho). 
+    double m_findArcCosIntMin;
+    /// Holds the maximum for fitted axial phi location between superlayers.
+    double m_findPhiZMax;
+    /// Holds the minimum value for fitted axial phi location between superlayers.
+    double  m_findPhiZMin;
+    /// Holds the maximum value for fitted integer axial phi location between superlayers.
+    double m_findPhiZIntMax;
+    /// Holds the minimum value for fitted integer axial phi location between superlayers.
+    double m_findPhiZIntMin;
     /// Integer space
     /// The rho max and min value for integer geo finder.
     double m_rhoMax, m_rhoMin;

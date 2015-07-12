@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+/// A class that holds FPGA related functions.
 class FpgaUtility{
 
   public:

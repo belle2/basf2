@@ -5,6 +5,7 @@ env['LIBS'] = ['framework',
 	       'cdc',
 	       'rawdata_dataobjects',
 	       'cdc_dataobjects',
+	       'trg_cdc_dataobjects',
          'trg_trg']
 #env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})
 #env.Append(CPPDEFINES = {'TRGCDC_DISPLAY_HOUGH':None})

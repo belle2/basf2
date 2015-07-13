@@ -20,6 +20,11 @@
 #include "trg/cdc/modules/trgcdc/TRGCDCModule.h"
 #include "trg/trg/Debug.h"
 
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -294,6 +299,14 @@ TRGCDCModule::initialize() {
              << _hFinderPeakMin
              << endl;
     }
+
+    // register DataStore elements
+    StoreArray<CDCTriggerSegmentHit>::registerPersistent();
+    StoreArray<CDCTriggerSegmentHit> segmentHits;
+    StoreArray<CDCHit> cdcHits;
+    StoreArray<MCParticle> mcparticles;
+    segmentHits.registerRelationTo(cdcHits);
+    mcparticles.registerRelationTo(segmentHits);
 }
 
 void

@@ -24,6 +24,7 @@
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
+#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 #include "rawdata/dataobjects/RawDataBlock.h"
 #include "rawdata/dataobjects/RawCOPPER.h"   
 #include "trg/trg/Debug.h"
@@ -1971,6 +1972,31 @@ TRGCDC::fastSimulation(void) {
                     trackSegmentClockSimulation,
                     _segmentHits,
                     _segmentHitsSL);
+
+    // write hits to datastore
+    StoreArray<CDCTriggerSegmentHit> storeSegmentHits;
+    StoreArray<CDCHit> cdcHits;
+    for (unsigned its = 0; its < _segmentHits.size(); ++its) {
+      const CDCHit* priorityHit = cdcHits[_segmentHits[its]->iCDCHit()];
+      const TCSegment* segment = static_cast<const TCSegment*>(&_segmentHits[its]->cell());
+      const CDCTriggerSegmentHit* storeHit =
+        storeSegmentHits.appendNew(*priorityHit,
+                                   segment->id(),
+                                   segment->priorityPosition(),
+                                   segment->LUT()->getValue(segment->lutPattern()));
+      // relation to all CDC hits in segment
+      for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
+        const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
+        if (wire->signal().active()) {
+          storeHit->addRelationTo(cdcHits[wire->hit()->iCDCHit()]);
+        }
+      }
+      // relation to MCParticles (same as priority hit)
+      RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
+      for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
+        mcrel[imc]->addRelationTo(storeHit, mcrel.weight(imc));
+      }
+    }
 
     if (trackSegmentSimulationOnly) {
         TRGDebug::leaveStage("TRGCDC fastSimulation");

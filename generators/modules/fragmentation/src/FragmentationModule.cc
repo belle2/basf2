@@ -54,21 +54,21 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("ParameterFile", m_parameterfile, "Input parameter file for PYTHIA",
            std::string("../modules/fragmentation/data/pythia_default.dat"));
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
-  addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific deays", 0);
-  addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
-  addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
-  addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string("../modules/fragmentation/data/ccbar.dec"));
+  addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1;
+           addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
+           addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
+           addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
 
-  //initialize member variables
-  evtgen  = 0;
-  nAdded  = 0;
-  nQuarks = 0;
-  nVpho   = 0;
-  nAll    = 0;
-  nGood   = 0;
+           //initialize member variables
+           evtgen  = 0;
+           nAdded  = 0;
+           nQuarks = 0;
+           nVpho   = 0;
+           nAll    = 0;
+           nGood   = 0;
 
-  pythia = nullptr;
-  PythiaEvent = nullptr;
+           pythia = nullptr;
+           PythiaEvent = nullptr;
 
 }
 
@@ -118,13 +118,12 @@ void FragmentationModule::initialize()
 
   // Set EvtGen (after pythia->init())
   evtgen = 0;
-//   EvtExternalGenList genlist; //COMMENT IN FOR PYTHIA8.206+
-//   EvtAbsRadCorr *radCorrEngine = genlist.getPhotosModel(); //COMMENT IN FOR PYTHIA8.206+
+  EvtExternalGenList* genlist = new EvtExternalGenList();
+  EvtAbsRadCorr* radCorrEngine = genlist->getPhotosModel();
 
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
-    evtgen = new EvtGenDecays(pythia, m_DecFile, m_EvtPdl); //COMMENT OUT FOR PYTHIA8.206+
-    //evtgen = new EvtGenDecays(pythia, m_DecFile, m_EvtPdl, &genlist, radCorrEngine); //COMMENT IN FOR PYTHIA8.206+
+    evtgen = new EvtGenDecays(pythia, m_DecFile, m_EvtPdl, genlist, radCorrEngine);
     evtgen->readDecayFile(m_UserDecFile);
   }
 
@@ -247,6 +246,11 @@ void FragmentationModule::event()
       // Set FSR flag from PYTHIA TimeShower:QEDshowerByQ
       if (pythia->event[iPythiaPart].status() == 51 && pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
+      }
+
+      // Set PHOTOS flag from PYTHIA-EvtGen
+      if (pythia->event[iPythiaPart].status() == 94 && pythia->event[iPythiaPart].id() == 22) {
+        p->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
       }
 
       // Set stable at generator level

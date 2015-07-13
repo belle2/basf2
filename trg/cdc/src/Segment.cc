@@ -55,6 +55,7 @@ TRGCDCSegment::TRGCDCSegment(unsigned id,
 	     w.backwardPosition()),
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
+      _storeHit(0),
       _eventTime(eventTime),
       m_TSLUTFileName(TSLUTFile){
       m_TSLUT = new TCLUT();
@@ -156,6 +157,7 @@ TRGCDCSegment::clear(void) {
     TCCell::clear();
     _signal.clear();
     _hits.clear();
+    _storeHit = 0;
 }
 
 string

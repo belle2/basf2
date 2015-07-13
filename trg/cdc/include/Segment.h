@@ -31,6 +31,7 @@ class TRGCDCLUT;
 class TRGCDCWireHit;
 class TRGCDCSegmentHit;
 class TRGCDCEventTime;
+class CDCTriggerSegmentHit;
 
 /// A class to represent a wire in CDC.
 class TRGCDCSegment : public TRGCDCCell {
@@ -74,6 +75,9 @@ const TRGCDCWire & fasterWire(const TRGCDCWire*, const TRGCDCWire*)const;
 
     /// returns a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit * hit(void) const;
+
+    /// returns a pointer to a CDCTriggerSegmentHit.
+    const CDCTriggerSegmentHit* storeHit(void) const;
 
     /// returns hit pattern.
     unsigned hitPattern(void) const;
@@ -131,6 +135,9 @@ int priorityPosition(void)const;
     /// sets a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit * hit(const TRGCDCSegmentHit *);
 
+    /// sets a pointer to a CDCTriggerSegmentHit.
+    const CDCTriggerSegmentHit* storeHit(const CDCTriggerSegmentHit*);
+
   public:
 
     /// simulates time-indegrated TF hit 
@@ -158,6 +165,9 @@ int priorityPosition(void)const;
 
     /// Wire hits.
     std::vector<const TRGCDCWireHit *> _hits;
+
+    /// DataStore hit.
+    const CDCTriggerSegmentHit* _storeHit;
 
     /// EventTime class.
     const TRGCDCEventTime * const _eventTime;
@@ -204,6 +214,17 @@ TRGCDCSegment::hit(void) const {
     return  (const TRGCDCSegmentHit *) TRGCDCCell::hit();
 }
 
+inline
+const CDCTriggerSegmentHit*
+TRGCDCSegment::storeHit(const CDCTriggerSegmentHit* h) {
+    return _storeHit = h;
+}
+
+inline
+const CDCTriggerSegmentHit*
+TRGCDCSegment::storeHit(void) const {
+    return _storeHit;
+}
 
 inline
 const TRGCDCLUT *

@@ -1984,7 +1984,8 @@ TRGCDC::fastSimulation(void) {
                                    segment->id(),
                                    segment->priorityPosition(),
                                    segment->LUT()->getValue(segment->lutPattern()));
-      // relation to all CDC hits in segment
+      _tss[segment->id()]->storeHit(storeHit);
+      // relation to all CDCHits in segment
       for (unsigned iw = 0; iw < segment->wires().size(); ++iw) {
         const TRGCDCWire* wire = (TRGCDCWire*)(*segment)[iw];
         if (wire->signal().active()) {

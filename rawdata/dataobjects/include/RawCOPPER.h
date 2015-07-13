@@ -135,6 +135,8 @@ namespace Belle2 {
     //! get Experimental # from header
     int GetExpNo(int n);    //! get Experimental # from header
 
+    unsigned int GetExpRunSubrun(int n);    //! Exp# (10bit) run# (14bit) restart # (8bit)
+
     int GetRunNoSubRunNo(int n);    //! run# (14bit) restart # (8bit)
 
     int GetRunNo(int n);    //! get run # (14bit)
@@ -345,6 +347,12 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->GetExpNo(n);
+  }
+
+  inline unsigned int RawCOPPER::GetExpRunSubrun(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetExpRunSubrun(n);
   }
 
   inline int RawCOPPER::GetRunNo(int n)

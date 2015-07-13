@@ -172,6 +172,8 @@ namespace Belle2 {
     /// get Experimental # from header
     virtual int GetExpNo(int n) = 0;    //! get Experimental # from header
 
+    virtual unsigned int GetExpRunSubrun(int n) = 0;    //! Exp# (10bit) run# (14bit) restart # (8bit)
+
     virtual int GetRunNoSubRunNo(int n) = 0;    //! run# (14bit) restart # (8bit)
 
     virtual int GetRunNo(int n) = 0;    //! get run # (14bit)

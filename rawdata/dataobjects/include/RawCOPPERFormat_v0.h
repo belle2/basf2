@@ -90,6 +90,8 @@ namespace Belle2 {
 
     int GetExpNo(int n);    //! get Experimental # from header
 
+    unsigned int GetExpRunSubrun(int n);    //! Exp# (10bit) run# (14bit) restart # (8bit)
+
     int GetRunNoSubRunNo(int n);    //! run# (14bit) restart # (8bit)
 
     int GetRunNo(int n);    //! get run # (14bit)
@@ -351,6 +353,12 @@ namespace Belle2 {
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetExpNo();
+  }
+
+  inline unsigned int RawCOPPERFormat_v0::GetExpRunSubrun(int n)
+  {
+    tmp_header.SetBuffer(GetBuffer(n));
+    return tmp_header.GetExpRunSubrun();
   }
 
   inline int RawCOPPERFormat_v0::GetRunNo(int n)

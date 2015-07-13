@@ -72,11 +72,12 @@ namespace Belle2 {
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    int prev_run_no, int* cur_run_no);
 
+    //! Exp# (10bit) run# (14bit) restart # (8bit)
+    unsigned int GetExpRunSubrun(int n);
+
     //! Get run #
     int GetRunNo(int n);
 
-    //! Get exp and run+subrun word
-    unsigned int GetExpRunWord(int n);
 
     //! Get subrun #
     int GetSubRunNo(int n);
@@ -158,10 +159,12 @@ namespace Belle2 {
 
   };
 
-  inline unsigned int RawFTSW::GetExpRunWord(int n)
+  inline unsigned int RawFTSW::GetExpRunSubrun(int n)
   {
     return (unsigned int)(m_buffer[ GetBufferPos(n) + POS_EXP_RUN_NO ]);
+
   }
+
 
   inline int RawFTSW::GetRunNo(int n)
   {

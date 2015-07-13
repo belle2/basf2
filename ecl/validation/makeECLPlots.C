@@ -6,8 +6,8 @@
 
 /*
 <header>
-<input>ECLBkgOutput.root, ECLClusterOutput.root, ECLMuonOutput.root, ECLPi0Output.root, ECLPionOutput.root</input>
-<output>ECLBkg.root, ECLCluster.root, ECLMuon.root, ECLPi0.root, ECLPion.root</output>
+<input>ECLBkgOutput.root, ECLClusterOutput.root, ECLMuonOutput.root, ECLPionOutput.root</input>
+<output>ECLBkg.root, ECLCluster.root, ECLMuon.root, ECLPion.root</output>
 <contact>ecl2ml@bpost.kek.jp</contact>
 </header>
 */
@@ -23,7 +23,7 @@ void ECL2D(TTree* bkg_tree);
 void ECLBkg(TTree* bkg_tree);
 void ECLCluster(TTree* cluster_tree);
 void ECLMuon(TTree* muon_tree);
-void ECLPi0(TTree* pi0_tree);
+//void ECLPi0(TTree* pi0_tree);
 void ECLPion(TTree* pion_tree);
 
 void makeECLPlots() 
@@ -38,8 +38,8 @@ void makeECLPlots()
   TTree* cluster_tree = (TTree*) cluster_input->Get("m_tree");
   TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
   TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
-  TFile* pi0_input = TFile::Open("../ECLPi0Output.root");
-  TTree* pi0_tree = (TTree*) pi0_input->Get("m_tree");
+  //  TFile* pi0_input = TFile::Open("../ECLPi0Output.root");
+  //  TTree* pi0_tree = (TTree*) pi0_input->Get("m_tree");
   TFile* pion_input = TFile::Open("../ECLPionOutput.root");
   TTree* pion_tree = (TTree*) pion_input->Get("m_tree");
 
@@ -47,11 +47,11 @@ void makeECLPlots()
   ECLBkg(bkg_tree);
   ECLCluster(cluster_tree);
   ECLMuon(muon_tree);
-  ECLPi0(pi0_tree);
+  //  ECLPi0(pi0_tree);
   ECLPion(pion_tree);
 
 }
-
+/*
 void ECLPi0(TTree* pi0_tree)
 {
 
@@ -80,7 +80,7 @@ void ECLPi0(TTree* pi0_tree)
   delete hPi0mass;
 
   output->Close();
-}
+  }*/
 
 void ECLPion(TTree* pion_tree){
 
@@ -238,6 +238,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the ecl (upper part is phi<0, lower part phi>0)")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
+
 
   bkg_tree->Draw("(TMath::Tan(eclClusterTheta))*(1.9616):1.9616>>BDyz","TMath::Abs(eclClusterTheta)<31.36*(3.1415/180)&&(eclClusterPhi<0)");
   bkg_tree->Draw("1.250:(1.250*(TMath::Cos(eclClusterTheta))/((TMath::Sin(eclClusterTheta))))>>BDyz2","(eclClusterTheta>32.20*(3.1415/180))&&eclClusterTheta<(180-51.28)*(3.1415/180)&&(eclClusterPhi<0)");

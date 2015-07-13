@@ -277,7 +277,7 @@ void DeSerializerFILEModule::event()
           temp_rawcopper.CheckData(0,
                                    m_dummy_evenum - 2, &temp_cur_evenum,
                                    m_dummy_evenum - 2, &temp_cur_copper_ctr,
-                                   m_prev_run_no, &m_run_no);
+                                   m_prev_exprunsubrun_no, &m_exprunsubrun_no);
 
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);

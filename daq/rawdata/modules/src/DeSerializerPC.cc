@@ -439,7 +439,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         }
 
 #ifdef DUMHSLB
-        exp_run_ftsw = temp_rawftsw->GetExpRunWord(block_id);
+        exp_run_ftsw = temp_rawftsw->GetExpRunSubrun(block_id);
         ctime_trgtype_ftsw = temp_rawftsw->GetTTCtimeTRGType(block_id);
         utime_ftsw = temp_rawftsw->GetTTUtime(block_id);
 #endif
@@ -447,7 +447,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 
 #ifndef NO_DATA_CHECK
         try {
-          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);
+          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
@@ -506,7 +506,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 
           temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
                                     m_prev_copper_ctr, &cur_copper_ctr,
-                                    m_prev_runsubrun_no, &m_runsubrun_no);
+                                    m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
@@ -558,7 +558,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 #endif
 
     // Event # monitor in runchange
-    if (m_prev_runsubrun_no != m_runsubrun_no) {
+    if (m_prev_exprunsubrun_no != m_exprunsubrun_no) {
       printf("[DEBUG] ##############################################\n");
       for (int m = 0; m < raw_datablk->GetNumEntries(); m++) {
         printf("[DEBUG] %d eve %u prev %u\n", m, eve_array[ m ], m_prev_evenum);
@@ -568,7 +568,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
     }
     m_prev_evenum = cur_evenum;
     m_prev_copper_ctr = cur_copper_ctr;
-    m_prev_runsubrun_no = m_runsubrun_no;
+    m_prev_exprunsubrun_no = m_exprunsubrun_no;
   }
   return;
 }

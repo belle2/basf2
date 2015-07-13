@@ -46,8 +46,14 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   m_hostname_local = host_send;
 
   m_shmflag = shmflag;
+
   m_nodename = nodename;
+
   m_nodeid = nodeid;
+
+  m_exprunsubrun_no = 0; // will obtain info from data
+
+  m_prev_exprunsubrun_no = 0xFFFFFFFF;
 
   B2INFO("DeSerializerPrePC: Constructor done.");
 }
@@ -446,7 +452,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         }
 
 #ifdef DUMHSLB
-        exp_run_ftsw = temp_rawftsw->GetExpRunWord(block_id);
+        exp_run_ftsw = temp_rawftsw->GetExpRunSubrun(block_id);
         ctime_trgtype_ftsw = temp_rawftsw->GetTTCtimeTRGType(block_id);
         utime_ftsw = temp_rawftsw->GetTTUtime(block_id);
 #endif
@@ -454,7 +460,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
 
 #ifndef NO_DATA_CHECK
         try {
-          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);
+          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
           char err_buf[500];
@@ -513,7 +519,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         try {
           temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
                                     m_prev_copper_ctr, &cur_copper_ctr,
-                                    m_prev_runsubrun_no, &m_runsubrun_no);
+                                    m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
           char err_buf[500];
@@ -567,7 +573,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
 //     }
     m_prev_evenum = cur_evenum;
     m_prev_copper_ctr = cur_copper_ctr;
-    m_prev_runsubrun_no = m_runsubrun_no;
+    m_prev_exprunsubrun_no = m_exprunsubrun_no;
   }
   return;
 }

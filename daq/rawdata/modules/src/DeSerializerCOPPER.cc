@@ -525,8 +525,8 @@ void DeSerializerCOPPERModule::event()
     // Fill header and trailer
     try {
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask,
-                                                              m_prev_ftsweve32, m_prev_runsubrun_no, &m_runsubrun_no);
-      m_prev_runsubrun_no = m_runsubrun_no;
+                                                              m_prev_ftsweve32, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
+      m_prev_exprunsubrun_no = m_exprunsubrun_no;
       //    fillNewRawCOPPERHeader( &temp_rawcopper );
     } catch (string err_str) {
       print_err.PrintError(m_shmflag, &g_status, err_str);
@@ -574,8 +574,8 @@ void DeSerializerCOPPERModule::event()
   //
   //  if (n_basf2evt % 100 == 0 || n_basf2evt < 10) {
   if (n_basf2evt % 100 == 0) {
-    RateMonitor(m_prev_ftsweve32,  m_prev_runsubrun_no & RawHeader_latest::SUBRUNNO_MASK ,
-                (m_prev_runsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT);
+    RateMonitor(m_prev_ftsweve32,  m_prev_exprunsubrun_no & RawHeader_latest::SUBRUNNO_MASK ,
+                (m_prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT);
   }
   n_basf2evt++;
   if (g_status.isAvailable()) {

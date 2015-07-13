@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define NWORDS_PER_COPPER 48 // 16 -> 1kB/16COPER
+#define NWORDS_PER_COPPER 16 // 16 -> 1kB/16COPER
 #define LISTENQ 1
 #define SERVER
 

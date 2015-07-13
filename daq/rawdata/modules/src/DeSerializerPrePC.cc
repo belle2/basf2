@@ -420,7 +420,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         }
 
 #ifdef DUMHSLB
-        exp_run_ftsw = temp_rawftsw->GetExpRunWord(block_id);
+        exp_run_ftsw = temp_rawftsw->GetExpRunSubrun(block_id);
         ctime_trgtype_ftsw = temp_rawftsw->GetTTCtimeTRGType(block_id);
         utime_ftsw = temp_rawftsw->GetTTUtime(block_id);
 #endif
@@ -428,7 +428,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
 
 #ifndef NO_DATA_CHECK
         try {
-          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_runsubrun_no, &m_runsubrun_no);
+          temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
@@ -489,7 +489,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
 
           temp_rawcopper->CheckData(0, m_prev_evenum, &cur_evenum,
                                     m_prev_copper_ctr, &cur_copper_ctr,
-                                    m_prev_runsubrun_no, &m_runsubrun_no);
+                                    m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
@@ -544,7 +544,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
 //     }
     m_prev_evenum = cur_evenum;
     m_prev_copper_ctr = cur_copper_ctr;
-    m_prev_runsubrun_no = m_runsubrun_no;
+    m_prev_exprunsubrun_no = m_exprunsubrun_no;
   }
   return;
 }

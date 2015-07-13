@@ -171,10 +171,10 @@ namespace Belle2 {
     int m_prev_run_no;
 
     //! run no.
-    int m_runsubrun_no;
+    unsigned int m_exprunsubrun_no;
 
     //! run no.
-    int m_prev_runsubrun_no;
+    unsigned int m_prev_exprunsubrun_no;
 
     //! exp no.
     int m_exp_no;

@@ -20,23 +20,30 @@
 from basf2 import *
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-# set_log_level(LogLevel.INFO)
+# set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('RootInput')
-# input = register_module('SeqRootInput')
+input = register_module('SeqRootInput')
 # input.param('inputFileName', '/x02/data/e0000r000554.sroot')
 
 # output
 output = register_module('PrintDataTemplate')
+
+unpack = register_module('CDCUnpacker')
+
+dump = register_module('RootOutput')
+prog = register_module('Progress')
 
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(input)
-main.add_module(output)
+# main.add_module(output)
+main.add_module(dump)
+# main.add_module(unpack)
+main.add_module(prog)
 
 # Process all events
 process(main)

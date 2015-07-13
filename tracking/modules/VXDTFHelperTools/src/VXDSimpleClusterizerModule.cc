@@ -43,6 +43,7 @@ VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 
 
   setDescription("The VXDSimpleClusterizerModule generates PXD/SVD Clusters using TrueHits. Energy-deposit threshold and gaussian smearing can be chosen, non-primary-particles can be filtered as well. Its purpose is fast clusterizing for tracking test procedures, using standardized PXD/SVD-Cluster");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("energyThresholdU", m_energyThresholdU,
            "particles with energy deposit in U lower than this will not create a cluster in SVD (GeV)", double(17.4E-6));

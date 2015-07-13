@@ -115,7 +115,7 @@ void Root2RawModule::event()
   rhdr.SetBuffer(svdarray[0]->GetBuffer(0));
   hdr.SetEventNumber(rhdr.GetEveNo());
   hdr.SetNodeID(0);
-  hdr.SetExpRunWord(rhdr.GetExpRunNumberWord());
+  hdr.SetExpRunWord(rhdr.GetExpRunSubrun());
 
   memcpy(evtbuf, hdr.GetBuffer(), hdr.GetHdrNwords()*sizeof(int));
   memcpy(databuf, trl.GetBuffer(), trl.GetTrlNwords()*sizeof(int));

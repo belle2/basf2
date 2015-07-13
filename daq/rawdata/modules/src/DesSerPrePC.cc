@@ -957,7 +957,7 @@ void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       tmp_header.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(tmp_header.GetEveNo());
       hdr->SetNodeID(tmp_header.GetNodeID());
-      hdr->SetExpRunWord(tmp_header.GetExpRunNumberWord());
+      hdr->SetExpRunWord(tmp_header.GetExpRunSubrun());
       break;
     }
 

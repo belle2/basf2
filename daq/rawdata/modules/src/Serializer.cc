@@ -205,7 +205,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       tmp_header.SetBuffer(rawdblk->GetBuffer(i));
       hdr->SetEventNumber(tmp_header.GetEveNo());
       hdr->SetNodeID(tmp_header.GetNodeID());
-      hdr->SetExpRunWord(tmp_header.GetExpRunNumberWord());
+      hdr->SetExpRunWord(tmp_header.GetExpRunSubrun());
       break;
     }
 
@@ -278,12 +278,18 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 #endif
         continue;
       } else {
+        perror("Connection Error");
         char err_buf[500];
         sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
+#ifdef NONSTOP
+        string err_str = err_buf;
+        throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
+#else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(1);
+#endif
       }
     }
     break;

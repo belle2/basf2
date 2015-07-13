@@ -39,6 +39,9 @@ namespace Belle2 {
     /** Generate a new event */
     MCInitialParticles& generate();
 
+    /** Return reference to nominal beam parameters */
+    const BeamParameters& getBeamParameters() const { return *m_beamParams; }
+
     /** function to be executed on initialize() */
     void initialize();
 

@@ -203,154 +203,160 @@ unsigned int PreRawCOPPERFormat_v1::GetB2LFEE32bitEventNumber(int n)
 void PreRawCOPPERFormat_v1::CheckData(int n,
                                       unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
                                       unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                                      int prev_runsubrun_no, int* cur_runsubrun_no)
+                                      unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
   char err_buf[500];
-  int err_flag = 0;
-  //
-  // check Magic words
-  //
-  if (!CheckCOPPERMagic(n)) {
-    sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
-            GetMagicDriverHeader(n),
-            GetMagicFPGAHeader(n),
-            GetMagicFPGATrailer(n),
-            GetMagicDriverTrailer(n),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    err_flag = 1;
-  }
+  sprintf(err_buf, "This function for format ver.1 is not supported. Exiting...\n %s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  string err_str = err_buf;
+  throw (err_str);
 
-  //
-  // Event # check
-  //
-  *cur_evenum_rawcprhdr = GetEveNo(n);
-  unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
-  if (*cur_evenum_rawcprhdr != evenum_feehdr) {
-    sprintf(err_buf,
-            "CORRUPTED DATA: Event # in PreRawCOPPERFormat_v1 header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
-            *cur_evenum_rawcprhdr, evenum_feehdr,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    err_flag = 1;
-  }
+//   char err_buf[500];
+//   int err_flag = 0;
+//   //
+//   // check Magic words
+//   //
+//   if (!CheckCOPPERMagic(n)) {
+//     sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
+//             GetMagicDriverHeader(n),
+//             GetMagicFPGAHeader(n),
+//             GetMagicFPGATrailer(n),
+//             GetMagicDriverTrailer(n),
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     err_flag = 1;
+//   }
 
-  //
-  // Check incrementation of event #
-  //
-  *cur_runsubrun_no = GetRunNoSubRunNo(n);
-  if (
-#ifdef WO_FIRST_EVENUM_CHECK
-    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
-#else
-    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
-#endif
-  ) {
-    if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
-      sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
-              n, prev_evenum, *cur_evenum_rawcprhdr,
-              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      err_flag = 1;
-    }
-  }
+//   //
+//   // Event # check
+//   //
+//   *cur_evenum_rawcprhdr = GetEveNo(n);
+//   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
+//   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
+//     sprintf(err_buf,
+//             "CORRUPTED DATA: Event # in PreRawCOPPERFormat_v1 header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
+//             *cur_evenum_rawcprhdr, evenum_feehdr,
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     err_flag = 1;
+//   }
 
-
-  *cur_copper_ctr = GetCOPPERCounter(n);
-  if (
-#ifdef WO_FIRST_EVENUM_CHECK
-    prev_copper_ctr != 0xFFFFFFFF
-#else
-    true
-#endif
-  ) {
-    if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
-      sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
-              n, prev_copper_ctr, *cur_copper_ctr,
-              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-#ifdef DESY
-      //
-      // In DESY test, we ignore this error
-      //
-      printf("[DEBUG] [INFO] %s", err_buf);
-#else
-      err_flag = 1;
-#endif
-
-    }
-  }
-
-  //
-  // Check is utime and ctime_trgtype same over different FINESSE data
-  //
-  CheckUtimeCtimeTRGType(n);
+//   //
+//   // Check incrementation of event #
+//   //
+//   *cur_runsubrun_no = GetRunNoSubRunNo(n);
+//   if (
+// #ifdef WO_FIRST_EVENUM_CHECK
+//     prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
+// #else
+//     prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
+// #endif
+//   ) {
+//     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
+//       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
+//               n, prev_evenum, *cur_evenum_rawcprhdr,
+//               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       err_flag = 1;
+//     }
+//   }
 
 
-  //
-  // Check checksum calculated by COPPER driver
-  //
-  if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
-    sprintf(err_buf,
-            "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
-            n,
-            GetBlockNwords(n),
-            *cur_evenum_rawcprhdr,
-            GetDriverChkSum(n),
-            CalcDriverChkSum(n),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    err_flag = 1;
-  }
+//   *cur_copper_ctr = GetCOPPERCounter(n);
+//   if (
+// #ifdef WO_FIRST_EVENUM_CHECK
+//     prev_copper_ctr != 0xFFFFFFFF
+// #else
+//     true
+// #endif
+//   ) {
+//     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
+//       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
+//               n, prev_copper_ctr, *cur_copper_ctr,
+//               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
+// #ifdef DESY
+//       //
+//       // In DESY test, we ignore this error
+//       //
+//       printf("[DEBUG] [INFO] %s", err_buf);
+// #else
+//       err_flag = 1;
+// #endif
+
+//     }
+//   }
+
+//   //
+//   // Check is utime and ctime_trgtype same over different FINESSE data
+//   //
+//   CheckUtimeCtimeTRGType(n);
 
 
-  //
-  // Check checksum calculated by DeSerializerCOPPER()
-  //
-  tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
-  unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
-  if (tmp_trailer.GetChksum() != xor_chksum) {
-    sprintf(err_buf,
-            "CORRUPTED DATA: PreRawCOPPERFormat_v1 checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
-            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    err_flag = 1;
-  }
+//   //
+//   // Check checksum calculated by COPPER driver
+//   //
+//   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
+//     sprintf(err_buf,
+//             "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
+//             n,
+//             GetBlockNwords(n),
+//             *cur_evenum_rawcprhdr,
+//             GetDriverChkSum(n),
+//             CalcDriverChkSum(n),
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     err_flag = 1;
+//   }
 
 
-#ifdef DEBUG
-  printf("[DEBUG] eve %d %d %d %d %d\n",
-         GetEveNo(n),
-         Get1stDetectorNwords(n),
-         Get2ndDetectorNwords(n),
-         Get3rdDetectorNwords(n),
-         Get4thDetectorNwords(n)
-        );
-  printf("[DEBUG] ===COPPER BLOCK==============\n");
-  printData(GetBuffer(n), GetBlockNwords(n));
+//   //
+//   // Check checksum calculated by DeSerializerCOPPER()
+//   //
+//   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
+//   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
+//   if (tmp_trailer.GetChksum() != xor_chksum) {
+//     sprintf(err_buf,
+//             "CORRUPTED DATA: PreRawCOPPERFormat_v1 checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+//             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     err_flag = 1;
+//   }
 
-  printf("[DEBUG] ===FINNESSE A ==============\n");
-  printData(Get1stDetectorBuffer(n), Get1stDetectorNwords(n));
 
-  printf("[DEBUG] ===FINNESSE B ==============\n");
-  printData(Get2ndDetectorBuffer(n), Get2ndDetectorNwords(n));
+// #ifdef DEBUG
+//   printf("[DEBUG] eve %d %d %d %d %d\n",
+//          GetEveNo(n),
+//          Get1stDetectorNwords(n),
+//          Get2ndDetectorNwords(n),
+//          Get3rdDetectorNwords(n),
+//          Get4thDetectorNwords(n)
+//         );
+//   printf("[DEBUG] ===COPPER BLOCK==============\n");
+//   printData(GetBuffer(n), GetBlockNwords(n));
 
-  printf("[DEBUG] ===FINNESSE C ==============\n");
-  printData(Get3rdDetectorBuffer(n), Get3rdDetectorNwords(n));
+//   printf("[DEBUG] ===FINNESSE A ==============\n");
+//   printData(Get1stDetectorBuffer(n), Get1stDetectorNwords(n));
 
-  printf("[DEBUG] ===FINNESSE D ==============\n");
-  printData(Get4thDetectorBuffer(n), Get4thDetectorNwords(n));
-  printf("[DEBUG] === END ==============\n");
+//   printf("[DEBUG] ===FINNESSE B ==============\n");
+//   printData(Get2ndDetectorBuffer(n), Get2ndDetectorNwords(n));
 
-#endif
+//   printf("[DEBUG] ===FINNESSE C ==============\n");
+//   printData(Get3rdDetectorBuffer(n), Get3rdDetectorNwords(n));
 
-  if (err_flag == 1) {
-    printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
-    PrintData(GetBuffer(n), GetBlockNwords(n));
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
-    throw (err_str);
+//   printf("[DEBUG] ===FINNESSE D ==============\n");
+//   printData(Get4thDetectorBuffer(n), Get4thDetectorNwords(n));
+//   printf("[DEBUG] === END ==============\n");
 
-    //     sleep(1234567);
-    //     exit(-1);
-  }
+// #endif
+
+//   if (err_flag == 1) {
+//     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+//     PrintData(GetBuffer(n), GetBlockNwords(n));
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf;
+//     throw (err_str);
+
+//     //     sleep(1234567);
+//     //     exit(-1);
+//   }
 
   return;
 
@@ -443,249 +449,258 @@ double PreRawCOPPERFormat_v1::GetEventUnixTime(int n)
 
 unsigned int PreRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
                                                           unsigned int m_trunc_mask, unsigned int prev_eve32,
-                                                          int prev_runsubrun_no, int* cur_runsubrun_no)
+                                                          unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
-  const int datablock_id = 0;
-  //  m_temp_value = 12345678;
-  //
-  // This function only fills RawHeader contents for the first datablock.
-  // # of block should be 1
-  if (m_num_nodes * m_num_events != 1) {
-    char err_buf[500];
-    sprintf(err_buf,
-            "This function should be used for PreRawCOPPERFormat_v1 containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n %s %s %d\n",
-            m_num_nodes, m_num_events,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;    throw (err_str);
 
-  }
+  char err_buf[500];
+  sprintf(err_buf, "This function for format ver.1 is not supported. Exiting...\n %s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  string err_str = err_buf;
+  throw (err_str);
 
-  //////////////////////////////////////////////////
-  //
-  // Fill info in RawHeader
-  //
-  //////////////////////////////////////////////////
+  return 0xffffffff;
 
-  //
-  // Initialize a RawHeader part
-  //
-  memset(m_buffer, 0, sizeof(int) * tmp_header.RAWHEADER_NWORDS);
-  m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] = tmp_header.RAWHEADER_NWORDS & tmp_header.HDR_NWORDS_MASK;
-  m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) &
-                                                  tmp_header.FORMAT_VERSION__MASK;
-  m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (0x80 << tmp_header.FORMAT_VERSION_SHIFT);   // PreFormat
-  m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= tmp_header.MAGIC_WORD;
+//   const int datablock_id = 0;
+//   //  m_temp_value = 12345678;
+//   //
+//   // This function only fills RawHeader contents for the first datablock.
+//   // # of block should be 1
+//   if (m_num_nodes * m_num_events != 1) {
+//     char err_buf[500];
+//     sprintf(err_buf,
+//             "This function should be used for PreRawCOPPERFormat_v1 containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n %s %s %d\n",
+//             m_num_nodes, m_num_events,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf;    throw (err_str);
 
-  //
-  // Check FINESSEs which containes data
-  //
-  int* copper_buf = &(m_buffer[ tmp_header.RAWHEADER_NWORDS ]);
-  if (copper_buf[ POS_CH_A_DATA_LENGTH ] == 0 &&
-      copper_buf[ POS_CH_B_DATA_LENGTH ] == 0 &&
-      copper_buf[ POS_CH_C_DATA_LENGTH ] == 0 &&
-      copper_buf[ POS_CH_D_DATA_LENGTH ] == 0) {
-    char err_buf[500];
-    sprintf(err_buf,
-            "No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
-  }
+//   }
 
-  //
-  //   Set total words info
-  //
-  int datablock_nwords =
-    tmp_header.RAWHEADER_NWORDS +
-    (copper_buf[ POS_DATA_LENGTH ]
-     + SIZE_COPPER_DRIVER_HEADER
-     + SIZE_COPPER_DRIVER_TRAILER)
-    + tmp_trailer.RAWTRAILER_NWORDS;
-  m_buffer[ tmp_header.POS_NWORDS ] = datablock_nwords;
+//   //////////////////////////////////////////////////
+//   //
+//   // Fill info in RawHeader
+//   //
+//   //////////////////////////////////////////////////
 
+//   //
+//   // Initialize a RawHeader part
+//   //
+//   memset(m_buffer, 0, sizeof(int) * tmp_header.RAWHEADER_NWORDS);
+//   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] = tmp_header.RAWHEADER_NWORDS & tmp_header.HDR_NWORDS_MASK;
+//   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) &
+//                                                   tmp_header.FORMAT_VERSION__MASK;
+//   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= (0x80 << tmp_header.FORMAT_VERSION_SHIFT);   // PreFormat
+//   m_buffer[ tmp_header.POS_VERSION_HDRNWORDS ] |= tmp_header.MAGIC_WORD;
 
-  //
-  // Check the consistency between data length and length in RawHeader
-  //
-  if (m_buffer[ tmp_header.POS_NWORDS ] != m_nwords) {
-    char err_buf[500];
-    sprintf(err_buf,
-            "CORRUPTED DATA: Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
-            m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
-  }
+//   //
+//   // Check FINESSEs which containes data
+//   //
+//   int* copper_buf = &(m_buffer[ tmp_header.RAWHEADER_NWORDS ]);
+//   if (copper_buf[ POS_CH_A_DATA_LENGTH ] == 0 &&
+//       copper_buf[ POS_CH_B_DATA_LENGTH ] == 0 &&
+//       copper_buf[ POS_CH_C_DATA_LENGTH ] == 0 &&
+//       copper_buf[ POS_CH_D_DATA_LENGTH ] == 0) {
+//     char err_buf[500];
+//     sprintf(err_buf,
+//             "No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf; throw (err_str);
+//     //     sleep(12345678);
+//     //     exit(-1);
+//   }
 
-  //
-  // Fill offset values
-  //
-  int offset_1st_finesse =  tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
-  int offset_2nd_finesse = offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ];
-  int offset_3rd_finesse = offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ];
-  int offset_4th_finesse = offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ];
-  m_buffer[ tmp_header.POS_OFFSET_1ST_FINESSE ] = offset_1st_finesse;
-  m_buffer[ tmp_header.POS_OFFSET_2ND_FINESSE ] = offset_2nd_finesse;
-  m_buffer[ tmp_header.POS_OFFSET_3RD_FINESSE ] = offset_3rd_finesse;
-  m_buffer[ tmp_header.POS_OFFSET_4TH_FINESSE ] = offset_4th_finesse;
-
-  //
-  // Fill Exp/Run value
-  //
-  int* finesse_buf = &
-                     (m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
-  m_buffer[ tmp_header.POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
+//   //
+//   //   Set total words info
+//   //
+//   int datablock_nwords =
+//     tmp_header.RAWHEADER_NWORDS +
+//     (copper_buf[ POS_DATA_LENGTH ]
+//      + SIZE_COPPER_DRIVER_HEADER
+//      + SIZE_COPPER_DRIVER_TRAILER)
+//     + tmp_trailer.RAWTRAILER_NWORDS;
+//   m_buffer[ tmp_header.POS_NWORDS ] = datablock_nwords;
 
 
-  //
-  // Fill event #
-  //
-  unsigned int cur_ftsw_eve32 =  finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
-  m_buffer[ tmp_header.POS_EVE_NO ] = cur_ftsw_eve32;
+//   //
+//   // Check the consistency between data length and length in RawHeader
+//   //
+//   if (m_buffer[ tmp_header.POS_NWORDS ] != m_nwords) {
+//     char err_buf[500];
+//     sprintf(err_buf,
+//             "CORRUPTED DATA: Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
+//             m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf; throw (err_str);
+//     //     sleep(12345678);
+//     //     exit(-1);
+//   }
 
-  //
-  // Copy FTSW words from B2LFEE header
-  //
-  m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
-  m_buffer[ tmp_header.POS_TTUTIME ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+//   //
+//   // Fill offset values
+//   //
+//   int offset_1st_finesse =  tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+//   int offset_2nd_finesse = offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ];
+//   int offset_3rd_finesse = offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ];
+//   int offset_4th_finesse = offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ];
+//   m_buffer[ tmp_header.POS_OFFSET_1ST_FINESSE ] = offset_1st_finesse;
+//   m_buffer[ tmp_header.POS_OFFSET_2ND_FINESSE ] = offset_2nd_finesse;
+//   m_buffer[ tmp_header.POS_OFFSET_3RD_FINESSE ] = offset_3rd_finesse;
+//   m_buffer[ tmp_header.POS_OFFSET_4TH_FINESSE ] = offset_4th_finesse;
 
-  //
-  // Set node ID, trunc_mask, data_type
-  //
-  m_buffer[ tmp_header.POS_NODE_ID ] = m_node_id;
-  m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
-
-
-  //////////////////////////////////////////////////
-  //
-  // Fill info in RawTrailer
-  //
-  //////////////////////////////////////////////////
-
-  //
-  // Calculate XOR checksum
-  //
-  unsigned int chksum_top = 0, chksum_body = 0, chksum_bottom = 0;
-
-  int top_end = tmp_header.RAWHEADER_NWORDS;
-  for (int i = 0; i < top_end; i++) {
-    chksum_top ^= m_buffer[ i ];
-  }
-  int body_end = datablock_nwords - SIZE_COPPER_DRIVER_TRAILER - tmp_trailer.RAWTRAILER_NWORDS;
-  for (int i = top_end; i < body_end; i++) {
-    chksum_body ^= m_buffer[ i ];
-  }
-
-  int bottom_end = datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS;
-  for (int i = body_end; i < bottom_end; i++) {
-    chksum_bottom ^= m_buffer[ i ];
-  }
-
-  //
-  // check COPPER driver checksum
-  //
-  if (chksum_body != (unsigned int)(m_buffer[ body_end ])) {
-    char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
-            chksum_body, m_buffer[ body_end ],
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
-  }
-
-  //
-  // Fill trailer info (checksum, magic word)
-  //
-  unsigned int chksum = chksum_top ^ chksum_body ^ chksum_bottom;
-  int* trl = &(m_buffer[ datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS ]);
-  trl[ tmp_trailer.POS_CHKSUM ] = chksum;
-  trl[ tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
+//   //
+//   // Fill Exp/Run value
+//   //
+//   int* finesse_buf = &
+//                      (m_buffer[ offset_1st_finesse ]); // In any finesse implementations, the top finesse buffer should be at offset_1st_finesse;
+//   m_buffer[ tmp_header.POS_EXP_RUN_NO ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
 
 
-  //////////////////////////////////////////////////
-  //
-  // Data check ( magic word, event incrementation )
-  //
-  //////////////////////////////////////////////////
+//   //
+//   // Fill event #
+//   //
+//   unsigned int cur_ftsw_eve32 =  finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
+//   m_buffer[ tmp_header.POS_EVE_NO ] = cur_ftsw_eve32;
+
+//   //
+//   // Copy FTSW words from B2LFEE header
+//   //
+//   m_buffer[ tmp_header.POS_TTCTIME_TRGTYPE ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
+//   m_buffer[ tmp_header.POS_TTUTIME ] = finesse_buf[ SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+
+//   //
+//   // Set node ID, trunc_mask, data_type
+//   //
+//   m_buffer[ tmp_header.POS_NODE_ID ] = m_node_id;
+//   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
 
 
-  //
-  // check magic words
-  //
-  int* fpga_trailer_magic = trl - (SIZE_COPPER_TRAILER - POS_MAGIC_COPPER_3);
-  int* driver_trailer_magic = trl - (SIZE_COPPER_TRAILER - POS_MAGIC_COPPER_4);
-  int err_flag = 0;
-  if ((unsigned int)(copper_buf[ POS_MAGIC_COPPER_1 ]) != COPPER_MAGIC_DRIVER_HEADER) {
-    err_flag = 1;
-  } else if ((unsigned int)(copper_buf[ POS_MAGIC_COPPER_2 ]) != COPPER_MAGIC_FPGA_HEADER) {
-    err_flag = 1;
-  } else if ((unsigned int)(*fpga_trailer_magic) != COPPER_MAGIC_FPGA_TRAILER) {
-    err_flag = 1;
-  } else if ((unsigned int)(*driver_trailer_magic) != COPPER_MAGIC_DRIVER_TRAILER) {
-    err_flag = 1;
-  }
-  if (err_flag == 1) {
-    char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
-            GetMagicDriverHeader(datablock_id),
-            GetMagicFPGAHeader(datablock_id),
-            GetMagicFPGATrailer(datablock_id),
-            GetMagicDriverTrailer(datablock_id),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] [ERROR] %s\n", err_buf);
-#ifndef NO_DATA_CHECK
-    string err_str = err_buf; throw (err_str);
+//   //////////////////////////////////////////////////
+//   //
+//   // Fill info in RawTrailer
+//   //
+//   //////////////////////////////////////////////////
 
-    //     sleep(12345678);
-    //     exit(-1);
-#endif
-  }
+//   //
+//   // Calculate XOR checksum
+//   //
+//   unsigned int chksum_top = 0, chksum_body = 0, chksum_bottom = 0;
 
-  //
-  // check incrementation of event #
-  //
+//   int top_end = tmp_header.RAWHEADER_NWORDS;
+//   for (int i = 0; i < top_end; i++) {
+//     chksum_top ^= m_buffer[ i ];
+//   }
+//   int body_end = datablock_nwords - SIZE_COPPER_DRIVER_TRAILER - tmp_trailer.RAWTRAILER_NWORDS;
+//   for (int i = top_end; i < body_end; i++) {
+//     chksum_body ^= m_buffer[ i ];
+//   }
 
-  if ((unsigned int)(prev_eve32 + 1) < 50) {
-//     printf("#################EVE cur %.8x prev %.8x\n", cur_ftsw_eve32, prev_eve32);
-//     fflush(stdout);
-  }
+//   int bottom_end = datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS;
+//   for (int i = body_end; i < bottom_end; i++) {
+//     chksum_bottom ^= m_buffer[ i ];
+//   }
+
+//   //
+//   // check COPPER driver checksum
+//   //
+//   if (chksum_body != (unsigned int)(m_buffer[ body_end ])) {
+//     char err_buf[500];
+//     sprintf(err_buf, "CORRUPTED DATA: COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
+//             chksum_body, m_buffer[ body_end ],
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("%s", err_buf); fflush(stdout);
+//     string err_str = err_buf; throw (err_str);
+//     //     sleep(12345678);
+//     //     exit(-1);
+//   }
+
+//   //
+//   // Fill trailer info (checksum, magic word)
+//   //
+//   unsigned int chksum = chksum_top ^ chksum_body ^ chksum_bottom;
+//   int* trl = &(m_buffer[ datablock_nwords - tmp_trailer.RAWTRAILER_NWORDS ]);
+//   trl[ tmp_trailer.POS_CHKSUM ] = chksum;
+//   trl[ tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
 
 
-  *cur_runsubrun_no = GetRunNoSubRunNo(datablock_id);
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
-    if (
-#ifdef WO_FIRST_EVENUM_CHECK
-      (prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)
-#else
-      prev_eve32 + 1 != cur_ftsw_eve32
-#endif
-    ) {
-#ifndef NO_DATA_CHECK
-      char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",
-              cur_ftsw_eve32, prev_eve32,
-              prev_runsubrun_no, *cur_runsubrun_no,
-              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("[DEBUG] [ERROR] %s\n", err_buf);
+//   //////////////////////////////////////////////////
+//   //
+//   // Data check ( magic word, event incrementation )
+//   //
+//   //////////////////////////////////////////////////
 
-      string err_str = err_buf;
-      printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
-      PrintData(GetBuffer(datablock_id), TotalBufNwords());
 
-      throw (err_str);
-      //      exit(-1);
-#endif
+//   //
+//   // check magic words
+//   //
+//   int* fpga_trailer_magic = trl - (SIZE_COPPER_TRAILER - POS_MAGIC_COPPER_3);
+//   int* driver_trailer_magic = trl - (SIZE_COPPER_TRAILER - POS_MAGIC_COPPER_4);
+//   int err_flag = 0;
+//   if ((unsigned int)(copper_buf[ POS_MAGIC_COPPER_1 ]) != COPPER_MAGIC_DRIVER_HEADER) {
+//     err_flag = 1;
+//   } else if ((unsigned int)(copper_buf[ POS_MAGIC_COPPER_2 ]) != COPPER_MAGIC_FPGA_HEADER) {
+//     err_flag = 1;
+//   } else if ((unsigned int)(*fpga_trailer_magic) != COPPER_MAGIC_FPGA_TRAILER) {
+//     err_flag = 1;
+//   } else if ((unsigned int)(*driver_trailer_magic) != COPPER_MAGIC_DRIVER_TRAILER) {
+//     err_flag = 1;
+//   }
+//   if (err_flag == 1) {
+//     char err_buf[500];
+//     sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
+//             GetMagicDriverHeader(datablock_id),
+//             GetMagicFPGAHeader(datablock_id),
+//             GetMagicFPGATrailer(datablock_id),
+//             GetMagicDriverTrailer(datablock_id),
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     printf("[DEBUG] [ERROR] %s\n", err_buf);
+// #ifndef NO_DATA_CHECK
+//     string err_str = err_buf; throw (err_str);
 
-    }
-  }
+//     //     sleep(12345678);
+//     //     exit(-1);
+// #endif
+//   }
 
-  return cur_ftsw_eve32;
+//   //
+//   // check incrementation of event #
+//   //
+
+//   if ((unsigned int)(prev_eve32 + 1) < 50) {
+// //     printf("#################EVE cur %.8x prev %.8x\n", cur_ftsw_eve32, prev_eve32);
+// //     fflush(stdout);
+//   }
+
+
+//   *cur_runsubrun_no = GetRunNoSubRunNo(datablock_id);
+//   if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
+//     if (
+// #ifdef WO_FIRST_EVENUM_CHECK
+//       (prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)
+// #else
+//       prev_eve32 + 1 != cur_ftsw_eve32
+// #endif
+//     ) {
+// #ifndef NO_DATA_CHECK
+//       char err_buf[500];
+//       sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",
+//               cur_ftsw_eve32, prev_eve32,
+//               prev_runsubrun_no, *cur_runsubrun_no,
+//               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       printf("[DEBUG] [ERROR] %s\n", err_buf);
+
+//       string err_str = err_buf;
+//       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
+//       PrintData(GetBuffer(datablock_id), TotalBufNwords());
+
+//       throw (err_str);
+//       //      exit(-1);
+// #endif
+
+//     }
+//   }
+
+//  return cur_ftsw_eve32;
 
 }
 

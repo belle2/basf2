@@ -92,8 +92,6 @@ namespace Belle2 {
 
     unsigned int GetExpRunSubrun(int n);    //! Exp# (10bit) run# (14bit) restart # (8bit)
 
-    int GetRunNoSubRunNo(int n);    //! run# (14bit) restart # (8bit)
-
     int GetRunNo(int n);    //! get run # (14bit)
 
     int GetSubRunNo(int n);    //! get subrun #(8bit)
@@ -189,7 +187,7 @@ namespace Belle2 {
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask,
-                                       unsigned int prev_eve32, int prev_run_no, int* cur_run_no);
+                                       unsigned int prev_eve32, unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! read COPPER driver's checksum value
     unsigned int GetDriverChkSum(int n);
@@ -201,7 +199,7 @@ namespace Belle2 {
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                   int prev_run_no, int* cur_run_no);
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! check data contents
     void CheckUtimeCtimeTRGType(int n);
@@ -372,12 +370,6 @@ namespace Belle2 {
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetSubRunNo();
-  }
-
-  inline int RawCOPPERFormat_v0::GetRunNoSubRunNo(int n)
-  {
-    tmp_header.SetBuffer(GetBuffer(n));
-    return tmp_header.GetRunNoSubRunNo();
   }
 
   inline unsigned int RawCOPPERFormat_v0::GetEveNo(int n)

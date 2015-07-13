@@ -96,8 +96,6 @@ namespace Belle2 {
 
     int GetExpNo();  //! get contents of header
 
-    int GetRunNoSubRunNo();    //! run# (14bit) restart # (8bit)
-
     int GetRunNo();    //! get run # (14bit)
 
     int GetSubRunNo();    //! get restart #(8bit)
@@ -383,12 +381,6 @@ namespace Belle2 {
             >> EXP_SHIFT);
   }
 
-  inline int RawHeader_v0::GetRunNoSubRunNo()
-  {
-    CheckGetBuffer();
-    return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]) &
-            (RUNNO_MASK | SUBRUNNO_MASK));
-  }
 
   inline int RawHeader_v0::GetRunNo()
   {

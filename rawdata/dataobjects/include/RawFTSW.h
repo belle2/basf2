@@ -70,7 +70,7 @@ namespace Belle2 {
     //! check the data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
-                   int prev_run_no, int* cur_run_no);
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
     unsigned int GetExpRunSubrun(int n);

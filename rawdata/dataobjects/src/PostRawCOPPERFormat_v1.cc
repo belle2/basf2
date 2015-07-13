@@ -150,56 +150,61 @@ unsigned int PostRawCOPPERFormat_v1::GetB2LFEE32bitEventNumber(int n)
 void PostRawCOPPERFormat_v1::CheckData(int n,
                                        unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
                                        unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                                       int prev_runsubrun_no, int* cur_runsubrun_no)
+                                       unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
+
   char err_buf[500];
-  int err_flag = 0;
+  sprintf(err_buf, "This function for format ver.1 is not supported. Exiting...\n %s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  string err_str = err_buf;
+  throw (err_str);
 
-  //
-  // Check incrementation of event #
-  //
-  *cur_evenum_rawcprhdr = GetEveNo(n);
-  *cur_runsubrun_no = GetRunNoSubRunNo(n);
-  if (
-#ifdef WO_FIRST_EVENUM_CHECK
-    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
-#else
-    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
-#endif
-  ) {
-    if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
-      sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
-              n, prev_evenum, *cur_evenum_rawcprhdr,
-              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      err_flag = 1;
-    }
-  }
-
-
-  //
-  // Check checksum calculated by DeSerializerCOPPER()
-  //
-  tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
-  unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
-  if (tmp_trailer.GetChksum() != xor_chksum) {
-    sprintf(err_buf,
-            "CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
-            n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    err_flag = 1;
-  }
+//   char err_buf[500];
+//   int err_flag = 0;
+//   //
+//   // Check incrementation of event #
+//   //
+//   *cur_evenum_rawcprhdr = GetEveNo(n);
+//   *cur_exprunsubrun_no = GetExpRunSubrun(n);
+//   if (
+//       prev_exprunsubrun_no == *cur_exprunsubrun_no
+// #ifdef WO_FIRST_EVENUM_CHECK
+//      && prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
+// #endif
+//   ) {
+//     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
+//       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
+//               n, prev_evenum, *cur_evenum_rawcprhdr,
+//               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//       err_flag = 1;
+//     }
+//   }
 
 
-  if (err_flag == 1) {
-    printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
-    PrintData(GetBuffer(n), GetBlockNwords(n));
-    printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
-    string err_str = err_buf;
-    throw (err_str);
+//   //
+//   // Check checksum calculated by DeSerializerCOPPER()
+//   //
+//   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
+//   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
+//   if (tmp_trailer.GetChksum() != xor_chksum) {
+//     sprintf(err_buf,
+//             "CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+//             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
+//             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+//     err_flag = 1;
+//   }
 
-    //     sleep(1234567);
-    //     exit(-1);
-  }
+
+//   if (err_flag == 1) {
+//     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
+//     PrintData(GetBuffer(n), GetBlockNwords(n));
+//     printf("Print out variables to reduce unused-variables-warnings : %u %u\n", prev_copper_ctr, *cur_copper_ctr);
+//     string err_str = err_buf;
+//     throw (err_str);
+
+//     //     sleep(1234567);
+//     //     exit(-1);
+//   }
 
   return;
 
@@ -234,13 +239,13 @@ double PostRawCOPPERFormat_v1::GetEventUnixTime(int n)
 
 unsigned int PostRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
                                                            unsigned int m_trunc_mask, unsigned int prev_eve32,
-                                                           int prev_runsubrun_no, int* cur_runsubrun_no)
+                                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u %d %d\n",
-         m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_runsubrun_no, *cur_runsubrun_no);
+         m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
   string err_str = err_buf;
   throw (err_str);
 

@@ -14,7 +14,6 @@ using namespace Belle2;
 
 //#define DESY
 //#define NO_DATA_CHECK
-//#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(PostRawCOPPERFormat_latest);
 
@@ -150,7 +149,7 @@ unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 void PostRawCOPPERFormat_latest::CheckData(int n,
                                            unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
                                            unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                                           int prev_runsubrun_no, int* cur_runsubrun_no)
+                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
   char err_buf[500];
   int err_flag = 0;
@@ -159,14 +158,9 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   // Check incrementation of event #
   //
   *cur_evenum_rawcprhdr = GetEveNo(n);
-  *cur_runsubrun_no = GetRunNoSubRunNo(n);
-  if (
-#ifdef WO_FIRST_EVENUM_CHECK
-    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
-#else
-    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
-#endif
-  ) {
+  *cur_exprunsubrun_no = GetExpRunSubrun(n);
+
+  if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
@@ -233,14 +227,14 @@ double PostRawCOPPERFormat_latest::GetEventUnixTime(int n)
 }
 
 unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
-    unsigned int m_trunc_mask, unsigned int prev_eve32,
-    int prev_runsubrun_no, int* cur_runsubrun_no)
+    unsigned int m_trunc_mask, unsigned int prev_eve32, unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
+
 {
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u %d %d\n",
-         m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_runsubrun_no, *cur_runsubrun_no);
+         m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
   string err_str = err_buf;
   throw (err_str);
 

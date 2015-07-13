@@ -203,7 +203,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 void PreRawCOPPERFormat_latest::CheckData(int n,
                                           unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
                                           unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                                          int prev_runsubrun_no, int* cur_runsubrun_no)
+                                          unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
   char err_buf[500];
@@ -237,14 +237,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   // Check incrementation of event #
   //
-  *cur_runsubrun_no = GetRunNoSubRunNo(n);
-  if (
-#ifdef WO_FIRST_EVENUM_CHECK
-    prev_evenum != 0xFFFFFFFF && *cur_evenum_rawcprhdr != 0
-#else
-    prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0
-#endif
-  ) {
+  *cur_exprunsubrun_no = GetExpRunSubrun(n);
+  if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr,
@@ -275,7 +269,6 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 #else
       err_flag = 1;
 #endif
-
     }
   }
 
@@ -443,7 +436,7 @@ double PreRawCOPPERFormat_latest::GetEventUnixTime(int n)
 
 unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
     unsigned int m_trunc_mask, unsigned int prev_eve32,
-    int prev_runsubrun_no, int* cur_runsubrun_no)
+    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
   const int datablock_id = 0;
   //  m_temp_value = 12345678;
@@ -706,20 +699,14 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
 
 
-  *cur_runsubrun_no = GetRunNoSubRunNo(datablock_id);
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
-    if (
-#ifdef WO_FIRST_EVENUM_CHECK
-      (prev_eve32 + 1 != cur_ftsw_eve32) && (prev_eve32 != 0xFFFFFFFF && cur_ftsw_eve32 != 0)
-#else
-      prev_eve32 + 1 != cur_ftsw_eve32
-#endif
-    ) {
+  *cur_exprunsubrun_no = GetExpRunSubrun(datablock_id);
+  if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
+    if (prev_eve32 + 1 != cur_ftsw_eve32) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",
               cur_ftsw_eve32, prev_eve32,
-              prev_runsubrun_no, *cur_runsubrun_no,
+              prev_exprunsubrun_no, *cur_exprunsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] [ERROR] %s\n", err_buf);
 

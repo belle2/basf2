@@ -137,8 +137,6 @@ namespace Belle2 {
 
     unsigned int GetExpRunSubrun(int n);    //! Exp# (10bit) run# (14bit) restart # (8bit)
 
-    int GetRunNoSubRunNo(int n);    //! run# (14bit) restart # (8bit)
-
     int GetRunNo(int n);    //! get run # (14bit)
 
     int GetSubRunNo(int n);    //! get subrun #(8bit)
@@ -249,7 +247,7 @@ namespace Belle2 {
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask,
-                                       unsigned int prev_eve32, int prev_run_no, int* cur_run_no);
+                                       unsigned int prev_eve32, unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! read COPPER driver's checksum value
     unsigned int GetDriverChkSum(int n);
@@ -264,7 +262,7 @@ namespace Belle2 {
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                   int prev_run_no, int* cur_run_no);
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! check data contents
     void CheckUtimeCtimeTRGType(int n);
@@ -366,12 +364,6 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->GetSubRunNo(n);
-  }
-
-  inline int RawCOPPER::GetRunNoSubRunNo(int n)
-  {
-    CheckVersionSetBuffer();
-    return m_access->GetRunNoSubRunNo(n);
   }
 
   inline unsigned int RawCOPPER::GetEveNo(int n)
@@ -669,14 +661,14 @@ namespace Belle2 {
   inline  void RawCOPPER::CheckData(int n,
                                     unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
                                     unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                                    int prev_runsubrun_no, int* cur_runsubrun_no)
+                                    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
   {
 
     CheckVersionSetBuffer();
     m_access->CheckData(n,
                         prev_evenum, cur_evenum_rawcprhdr,
                         prev_copper_ctr, cur_copper_ctr,
-                        prev_runsubrun_no,  cur_runsubrun_no);
+                        prev_exprunsubrun_no,  cur_exprunsubrun_no);
     return;
   }
 
@@ -706,12 +698,12 @@ namespace Belle2 {
 
   inline  unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
                                                         unsigned int m_trunc_mask, unsigned int prev_eve32,
-                                                        int prev_runsubrun_no, int* cur_runsubrun_no)
+                                                        unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
   {
     CheckVersionSetBuffer();
     return m_access->FillTopBlockRawHeader(m_node_id, m_data_type,
                                            m_trunc_mask, prev_eve32,
-                                           prev_runsubrun_no, cur_runsubrun_no);
+                                           prev_exprunsubrun_no, cur_exprunsubrun_no);
   }
 
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2

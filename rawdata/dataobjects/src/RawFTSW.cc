@@ -89,12 +89,12 @@ unsigned int RawFTSW::GetMagicTrailer(int n)
 
 void RawFTSW::CheckData(int n,
                         unsigned int prev_evenum, unsigned int* cur_evenum,
-                        int prev_runsubrun_no, int* cur_runsubrun_no)
+                        unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
   int err_flag = 0;
   char err_buf[500];
   *cur_evenum = GetEveNo(n);
-  *cur_runsubrun_no = GetRunNoSubRunNo(n);
+  *cur_exprunsubrun_no = GetExpRunSubrun(n);
 
 //     printf("[DEBUG] ========== dump a data block : block # %d==========\n", n);
 //     for (int k = 0 ; k < GetBlockNwords(n); k++) {
@@ -104,11 +104,7 @@ void RawFTSW::CheckData(int n,
 //     fflush(stderr);
 
 #ifndef NO_DATA_CHECK
-#ifdef WO_FIRST_EVENUM_CHECK
-  if (prev_evenum != 0xFFFFFFFF && *cur_evenum != 0) {
-#else
-  if (prev_runsubrun_no == *cur_runsubrun_no && prev_runsubrun_no >= 0) {
-#endif
+  if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n %s %s %d\n",
               n, prev_evenum, *cur_evenum, __FILE__, __PRETTY_FUNCTION__, __LINE__);

@@ -54,21 +54,21 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("ParameterFile", m_parameterfile, "Input parameter file for PYTHIA",
            std::string("../modules/fragmentation/data/pythia_default.dat"));
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
-  addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1;
-           addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
-           addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
-           addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
+  addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1);
+  addParam("EvtPdl", m_EvtPdl, "EvtGen particle data (e.g. evt.pdl)", std::string(""));
+  addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
+  addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
 
-           //initialize member variables
-           evtgen  = 0;
-           nAdded  = 0;
-           nQuarks = 0;
-           nVpho   = 0;
-           nAll    = 0;
-           nGood   = 0;
+  //initialize member variables
+  evtgen  = 0;
+  nAdded  = 0;
+  nQuarks = 0;
+  nVpho   = 0;
+  nAll    = 0;
+  nGood   = 0;
 
-           pythia = nullptr;
-           PythiaEvent = nullptr;
+  pythia = nullptr;
+  PythiaEvent = nullptr;
 
 }
 

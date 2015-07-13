@@ -11,13 +11,9 @@
 #ifndef ConditionsService_H
 #define ConditionsService_H
 
-#include <TList.h>
-#include <TObject.h>
-#include <TXMLEngine.h>
 #include <string>
 #include <map>
 #include <framework/core/Module.h>
-#include <curl/curl.h>
 
 namespace Belle2 {
 

@@ -16,7 +16,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 
-#include <dlfcn.h>
 #include <fstream>
 
 using namespace Belle2;

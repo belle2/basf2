@@ -9,7 +9,6 @@
 #include <framework/pcore/SeqFile.h>
 #include <framework/logging/Logger.h>
 
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

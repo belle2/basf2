@@ -3,10 +3,11 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <TFile.h>
-#include <TList.h>
 #include <TXMLEngine.h>
 #include <TMD5.h>
 #include <TSystem.h>
+
+#include <curl/curl.h>
 
 #include <iostream>
 #include <string>

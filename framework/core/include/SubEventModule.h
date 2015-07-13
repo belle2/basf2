@@ -11,12 +11,12 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/core/Path.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/datastore/StoreArray.h>
 
 
 namespace Belle2 {
+  class Path;
   /** Framework-internal module that implements the functionality of Path::forEach(). */
   class SubEventModule : public Module, public EventProcessor {
   public:

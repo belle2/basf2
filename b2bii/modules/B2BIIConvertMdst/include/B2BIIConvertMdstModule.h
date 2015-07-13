@@ -48,8 +48,8 @@ typedef Point3D<double> HepPoint3D;
 #include <string>
 #include <map>
 
-//uncomment this to enable ACC conversion (needs newer belle-legacy version)
-//#define HAVE_KID_ACC
+//enable ACC conversion (needs externals >= v00-06-01)
+#define HAVE_KID_ACC
 
 namespace Belle2 {
 

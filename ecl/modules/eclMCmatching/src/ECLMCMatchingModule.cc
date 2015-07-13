@@ -10,13 +10,12 @@
 
 #include <ecl/modules/eclMCmatching/ECLMCMatchingModule.h>
 
-//framework headers
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-//ecl package headers
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLDigit.h>
@@ -24,26 +23,23 @@
 #include <ecl/dataobjects/ECLHitAssignment.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
-
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
 
-
-//root
 #include <TVector3.h>
 
-//C++ STL
 #include <cstdlib>
 #include <iomanip>
 #include <math.h>
 #include <time.h>
 #include <iomanip>
-#include <utility> //contains pair
+#include <utility>
+#include <algorithm>
 
 using namespace std;
 using namespace boost;
 using namespace Belle2;
 using namespace ECL;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -71,28 +67,19 @@ void ECLMCMatchingModule::initialize()
 {
   // Initialize variables
   m_nRun    = 0 ;
-  m_nEvent  = 0 ;
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<MCParticle> MCParticleArray;
-  StoreArray<ECLHit> ECLHitArray;
-  StoreArray<ECLDigit> ECLDigitArray;
-  StoreArray<ECLShower> ECLShowerArray;
-  StoreArray<ECLCluster> ECLClusterArray;
-  MCParticleArray.registerRelationTo(ECLHitArray);
-  //MCParticleArray.registerRelationTo(ECLDigitArray);
-  ECLDigitArray.registerRelationTo(MCParticleArray);
-  ECLShowerArray.registerRelationTo(MCParticleArray);
-  ECLClusterArray.registerRelationTo(MCParticleArray);
-
+  StoreArray<MCParticle> mcParticles;
+  StoreArray<ECLHit> eclHits;
+  StoreArray<ECLDigit> eclDigits;
+  StoreArray<ECLShower> eclShowers;
+  StoreArray<ECLCluster> eclClusters;
+  mcParticles.registerRelationTo(eclHits);
+  eclDigits.registerRelationTo(mcParticles);
+  eclShowers.registerRelationTo(mcParticles);
+  eclClusters.registerRelationTo(mcParticles);
   StoreArray<ECLSimHit> ECLSimHitArray;
-  ECLSimHitArray.registerRelationTo(ECLHitArray);
-
-  // RelationArray::registerPersistent<ECLHit,MCParticle>("", ""); obsolete
-  // RelationArray::registerPersistent<ECLDigit,MCParticle>("", ""); obsolete
-  // RelationArray::registerPersistent<ECLShower,MCParticle>("", ""); obsolete
-  // RelationArray::registerPersistent<ECLCluster,MCParticle>("", ""); obsolete
-
+  ECLSimHitArray.registerRelationTo(eclHits);
 }
 
 void ECLMCMatchingModule::beginRun()
@@ -101,168 +88,140 @@ void ECLMCMatchingModule::beginRun()
 
 void ECLMCMatchingModule::event()
 {
+  StoreArray<MCParticle> mcParticles;
+  StoreArray<ECLHit> eclHits;
+  StoreArray<ECLDigit> eclDigits;
+  StoreArray<ECLSimHit> eclSimHits;
+  RelationArray mcParticleToECLHitRelationArray(mcParticles, eclHits);
+  RelationArray eclDigitToMCParticleRelationArray(eclDigits, mcParticles);
+  RelationArray eclHitToSimHitRelationArray(eclHits, eclSimHits);
+  RelationArray mcParticleToECLSimHitRelationArray(mcParticles, eclSimHits);
+
+  /****************************************************************************************/
 
   int DigiIndex[8736];
   int DigiOldTrack[8736];
-  for (int i = 0; i < 8736; i++) {
-    DigiIndex[i] = -1; DigiOldTrack[i] = -1;
-  }
+  std::fill_n(DigiIndex, 8736, -1);
+  std::fill_n(DigiOldTrack, 8736, -1);
 
-  StoreArray<MCParticle> mcParticles;
-  PrimaryTrackMap eclPrimaryMap;
-  eclPrimaryMap.clear();
-  int nParticles = mcParticles.getEntries();
-  if (nParticles > 1000)nParticles = 1000; //skip mcParticles from to speed up
-
-  for (int iPart = 0; iPart < nParticles ; iPart++) {
-    if (mcParticles[iPart]->getMother() == NULL
-        && !mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle)
-        && !mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator)) continue;
-
-    bool adhoc_StableInGeneratorFlag(mcParticles[iPart]->hasStatus(MCParticle::c_StableInGenerator));
-    if (mcParticles[iPart]->hasStatus(MCParticle::c_PrimaryParticle) && adhoc_StableInGeneratorFlag) {
-      if (mcParticles[iPart]->getArrayIndex() == -1) {
-        eclPrimaryMap.insert(pair<int, int>(iPart, iPart));
-      } else {eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(), mcParticles[iPart]->getArrayIndex()));}
-    } else {
-      if (mcParticles[iPart]->getMother() == NULL) continue;
-      if (eclPrimaryMap.find(mcParticles[iPart]->getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
-        eclPrimaryMap.insert(pair<int, int>(mcParticles[iPart]->getArrayIndex(),
-                                            eclPrimaryMap[mcParticles[iPart]->getMother()->getArrayIndex()]));
-      }//if mother of mcParticles is stored.
-    }//if c_StableInGenerator and c_PrimaryParticle
-  }//for mcParticles
-
-
-  StoreArray<ECLHit> eclHitArray;
-  RelationArray eclHitRel(mcParticles, eclHitArray);
-  StoreArray<ECLDigit> eclDigiArray;
-  RelationArray eclDigiToMCPart(eclDigiArray, mcParticles);
-  StoreArray<ECLSimHit> eclSimHitArray;
-  RelationArray eclHitToSimHit(eclHitArray, eclSimHitArray);
-  RelationArray eclSimHitRel(mcParticles, eclSimHitArray);
-
-  for (int ii = 0; ii < eclDigiArray.getEntries(); ii++) {
-    ECLDigit* aECLDigi = eclDigiArray[ii];
-    float FitEnergy    = (aECLDigi->getAmp()) / 20000.; //ADC count to GeV
-    int cId            = (aECLDigi->getCellId() - 1);
-    if (FitEnergy < 0.) {
+  for (const auto& eclDigit : eclDigits) {
+    float fitEnergy    = (eclDigit.getAmp()) / 20000.; //ADC count to GeV
+    int cId            = (eclDigit.getCellId() - 1);
+    if (fitEnergy < 0.) {
       continue;
     }
-    DigiIndex[cId] = ii;
+    DigiIndex[cId] = eclDigit.getArrayIndex();
   }
 
-  for (int index = 0; index < eclHitRel.getEntries(); index++) {
+  PrimaryTrackMap eclPrimaryMap;  // map<int, int>
+
+  for (const auto& mcParticle : mcParticles) {
+    if (mcParticle.getMother() == NULL) continue;
+
+    const int mcParticleIndex = mcParticle.getArrayIndex();
+    const int mcParticleMotherIndex = mcParticle.getMother()->getArrayIndex();
+
+    if (mcParticle.hasStatus(MCParticle::c_PrimaryParticle) and mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
+      eclPrimaryMap.insert(pair<int, int>(mcParticleIndex, mcParticleIndex));
+    } else if (eclPrimaryMap.find(mcParticle.getMother()->getArrayIndex()) != eclPrimaryMap.end()) {
+      eclPrimaryMap.insert(pair<int, int>(mcParticleIndex, eclPrimaryMap[mcParticleMotherIndex]));
+    }
+  } // mcParticles
+
+  for (int index = 0; index < mcParticleToECLHitRelationArray.getEntries(); index++) {
     int PrimaryIndex = -1;
-    map<int, int>::iterator iter = eclPrimaryMap.find(eclHitRel[index].getFromIndex());
+    const int mcParticleIndex = mcParticleToECLHitRelationArray[index].getFromIndex();
+    const map<int, int>::iterator iter = eclPrimaryMap.find(mcParticleIndex);
+
     if (iter != eclPrimaryMap.end()) {
       PrimaryIndex = iter->first; //it's the daughter
     } else continue;
 
-    for (int hit = 0; hit < (int)eclHitRel[index].getToIndices().size(); hit++) {
-      ECLHit* aECLHit = eclHitArray[eclHitRel[index].getToIndex(hit)];
+    for (int hit = 0; hit < (int)mcParticleToECLHitRelationArray[index].getToIndices().size(); hit++) {
+      const int eclHitIndex = mcParticleToECLHitRelationArray[index].getToIndex(hit);
+      const ECLHit* aECLHit = eclHits[eclHitIndex];
       int hitCellId         = aECLHit->getCellId() - 1;
       if (aECLHit->getBackgroundTag() != 0) continue;
 
       if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != PrimaryIndex) {
-        eclDigiToMCPart.add(DigiIndex[hitCellId], PrimaryIndex);
+        eclDigitToMCParticleRelationArray.add(DigiIndex[hitCellId], PrimaryIndex);
         DigiOldTrack[hitCellId] = PrimaryIndex;
       }
     }//for (int hit = 0
   }//for index
 
+  /****************************************************************************************/
 
-  StoreArray<ECLShower> eclRecShowerArray;
-  StoreArray<ECLHitAssignment> eclHitAssignmentArray;
-  RelationArray  eclShowerToMCPart(eclRecShowerArray, mcParticles);
-  RelationArray  eclShowerToMCParts(eclRecShowerArray, mcParticles);
-  map<int, float> mc_relations;
+  StoreArray<ECLShower> eclShowers;
+  StoreArray<ECLHitAssignment> eclHitAssignments;
+  RelationArray eclShowerToMCPart(eclShowers, mcParticles);
 
-  map<int, float> eclMCParticleContributionMap;;
-  eclMCParticleContributionMap.clear();
-  mc_relations.clear();
+  map<int, double> mc_relations;
+  map<int, double> eclMCParticleContributionMap;;
 
-  for (int iShower = 0; iShower < eclRecShowerArray.getEntries(); iShower++) {
-    ECLShower* aECLShower = eclRecShowerArray[iShower];
-    double showerId = aECLShower->getShowerId();
-    for (int iMCPart = 0; iMCPart < eclSimHitRel.getEntries(); iMCPart++) {
-      float ene = 0;
-      for (int iHA = 0; iHA <  eclHitAssignmentArray.getEntries(); iHA++) {
-        ECLHitAssignment* aECLHitAssignment = eclHitAssignmentArray[iHA];
-        int m_HAShowerId = aECLHitAssignment->getShowerId();
-        int m_HAcellId = aECLHitAssignment->getCellId() - 1 ;
-        if (m_HAShowerId != showerId)continue;
-        if (m_HAShowerId > showerId)break;
+  for (const auto& eclShower : eclShowers) {
+    const auto showerId = eclShower.getShowerId();
+    for (int iMCPart = 0; iMCPart < mcParticleToECLSimHitRelationArray.getEntries(); iMCPart++) {
+      double energy = 0;
+      for (const auto& eclHitAssignment : eclHitAssignments) {
+        const int m_HAShowerId = eclHitAssignment.getShowerId();
+        if (m_HAShowerId != showerId) continue;
+        if (m_HAShowerId > showerId) break;
 
-        for (int simhit = 0; simhit < (int)eclSimHitRel[iMCPart].getToIndices().size(); simhit++) {
-          ECLSimHit* aECLSimHit = eclSimHitArray[eclSimHitRel[iMCPart].getToIndex(simhit)];
-          int hitCellId         = aECLSimHit->getCellId() - 1;
-          if ((hitCellId != m_HAcellId)) continue;
-
-          map<int, float>::iterator iter =  eclMCParticleContributionMap.find((int) eclSimHitRel[iMCPart].getToIndex(simhit));
-          if (iter == eclMCParticleContributionMap.end()) {
-            ene = ene + aECLSimHit->getEnergyDep();
-          } else {
-            ene = ene + aECLSimHit->getEnergyDep();
-          }
-        }//for simhit
-      }//for hANum //iMCPart
-      if (ene > 0.) {
-        eclMCParticleContributionMap.insert(pair<int, float>((int) eclSimHitRel[iMCPart].getFromIndex(), ene));
+        for (int simhit = 0; simhit < (int)mcParticleToECLSimHitRelationArray[iMCPart].getToIndices().size(); simhit++) {
+          ECLSimHit* aECLSimHit = eclSimHits[mcParticleToECLSimHitRelationArray[iMCPart].getToIndex(simhit)];
+          if ((aECLSimHit->getCellId() - 1 != eclHitAssignment.getCellId() - 1)) continue;
+          energy = energy + aECLSimHit->getEnergyDep();
+        } // simhit
+      } // eclHitAssignment
+      if (energy > 0.) {
+        eclMCParticleContributionMap.insert(pair<int, double>((int) mcParticleToECLSimHitRelationArray[iMCPart].getFromIndex(), energy));
       }
-    }//for iMCPart //HA hANum
+    }//for iMCPart
 
     int PrimaryIndex = -1;
     int MaxContribution = 0;
-    for (map<int, float>::iterator i = eclMCParticleContributionMap.begin(); i != eclMCParticleContributionMap.end(); ++i) {
-      mc_relations[(*i).first] += (*i).second;
-      if ((*i).second > MaxContribution) {MaxContribution = (*i).second ;  PrimaryIndex = (*i).first ;}
+    for (const auto& pair : eclMCParticleContributionMap) {
+      mc_relations[pair.first] += pair.second;
+      if (pair.second > MaxContribution) {
+        MaxContribution = pair.second;
+        PrimaryIndex = pair.first;
+      }
     }
-
     eclMCParticleContributionMap.clear();
 
-    if (PrimaryIndex == -1) {
+    if (PrimaryIndex == -1) { //continue?
     } else {
-      for (map<int, float>::iterator i = mc_relations.begin(); i != mc_relations.end(); ++i) {
-        eclShowerToMCPart.add(showerId, (*i).first, (*i).second);
+      for (const auto& pair : mc_relations) {
+        eclShowerToMCPart.add(showerId, pair.first, pair.second);
       }
     }
     mc_relations.clear();
-  }//ShowerNum
+  } // eclShower
 
-  //... Related ECLClustertoMCParticle
-  //... First get relation of ECLCluster to ECLShower
-  //... Then exploit already available ECLShower relation to MCParticle
-  //... get the index of MCParticle from the relation of ECLShower and use it to associate ECLCluster
+  /****************************************************************************************/
 
-  StoreArray<ECLCluster> eclClusterArray;
-  RelationArray ECLClustertoMCPart(eclClusterArray, mcParticles);
-
-  for (int imdst = 0; imdst < eclClusterArray.getEntries(); ++imdst) {
-    const ECLCluster* cluster = eclClusterArray[imdst];
-    for (auto eclShower : cluster->getRelationsTo<ECLShower>()) {
-      ECLShower* veclShower = eclRecShowerArray[eclShower.getShowerId()];
-      for (auto MCpart : veclShower->getRelationsTo<MCParticle>()) {
-        for (int i = 0; i < eclShowerToMCPart.getEntries(); i++) {
-          if ((int)eclShowerToMCPart[i].getFromIndex() == eclShower.getShowerId()
-              && (int)eclShowerToMCPart[i].getToIndex() == MCpart.getArrayIndex()) {
-            //cout << "From: " << (int)eclShowerToMCPart[i].getFromIndex() << " To: " << (int)eclShowerToMCPart[i].getToIndex() << endl;
-            ECLClustertoMCPart.add(imdst, MCpart.getArrayIndex(), eclShowerToMCPart[i].getWeight());
-          }
-        }
-      }
+  // to create the relation between ECLCluster->MCParticle with the same weight as
+  // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
+  StoreArray<ECLCluster> eclClusters;
+  for (const auto& eclShower : eclShowers) {
+    const auto eclCluster = eclShower.getRelatedFrom<ECLCluster>();
+    const auto mcParticles = eclShower.getRelationsTo<MCParticle>();
+    for (int i = 0; i < mcParticles.size(); ++i) {
+      const auto mcParticle = mcParticles.object(i);
+      const auto weight = mcParticles.weight(i);
+      eclCluster->addRelationTo(mcParticle, weight);
     }
-  } // imdst
-
-  B2INFO("Event: " << m_nEvent);
-  for (int ii = 0; ii < ECLClustertoMCPart.getEntries(); ii++) {
-    B2INFO("ClusterID: " << ECLClustertoMCPart[ii].getFromIndex());
-    B2INFO("Energy: " <<  eclClusterArray[ECLClustertoMCPart[ii].getFromIndex()]->getEnergy());
-    B2INFO("From MCParticle: " << ECLClustertoMCPart[ii].getToIndex());
-    B2INFO("With weight: " << ECLClustertoMCPart[ii].getWeight());
   }
-  B2INFO("-------------------------");
-  m_nEvent++;
+
+  for (const auto& eclCluster : eclClusters) {
+    const auto mcParticleWeightPair = eclCluster.getRelatedToWithWeight<MCParticle>();
+    B2DEBUG(200, "ClusterID: " << eclCluster.getArrayIndex()
+            << " Energy: " <<  eclCluster.getEnergy()
+            << " MCParticle: " << mcParticleWeightPair.first->getArrayIndex()
+            << " Weight: " << mcParticleWeightPair.second);
+  }
+  B2DEBUG(200, "-------------------------");
 }
 
 

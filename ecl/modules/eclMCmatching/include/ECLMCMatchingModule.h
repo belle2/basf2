@@ -12,18 +12,15 @@
 #ifndef ECLMCMATCHINGMODULE_H_
 #define ECLMCMATCHINGMODULE_H_
 
-//basf2 framework headers
 #include <framework/core/Module.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 
-//C++/C standard lib elements.
 #include <string>
 #include <vector>
 #include <queue>
 #include <map>
 
-//ROOT
 #include <TRandom3.h>
 
 
@@ -63,15 +60,11 @@ namespace Belle2 {
       /** define a multimap for hits in showers */
       typedef std::multimap< int, int> MultiMap;
 
-
     private:
-
       /** CPU time     */
       double m_timeCPU;
       /** Run number   */
       int    m_nRun;
-      /** Event number */
-      int    m_nEvent;
 
     };
   } //ECL

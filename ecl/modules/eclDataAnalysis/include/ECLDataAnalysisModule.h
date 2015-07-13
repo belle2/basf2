@@ -60,6 +60,9 @@ namespace Belle2 {
 
   private:
 
+    /** members of ECLReconstructor Module
+     */
+
     TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
@@ -71,36 +74,36 @@ namespace Belle2 {
     //TFile* m_rootFile;
 
     // variables
-    int m_iExperiment;
-    int m_iRun;
-    int m_iEvent;
+    int m_iExperiment; /** Experiment number */
+    int m_iRun; /** Run number */
+    int m_iEvent; /** Event number */
 
     /*int m_eclTriggerMultip;
     std::vector<int>* m_eclTriggerIdx;
     std::vector<int>* m_eclTriggerCellId;
     std::vector<double>* m_eclTriggerTime;*/
 
-    int m_eclDigitMultip;
-    std::vector<int>* m_eclDigitIdx;
-    std::vector<int>* m_eclDigitToMc;
-    std::vector<int>* m_eclDigitCellId;
-    std::vector<int>* m_eclDigitAmp;
-    std::vector<int>* m_eclDigitTimeFit;
-    std::vector<int>* m_eclDigitFitQuality;
+    int m_eclDigitMultip; /** Number of ECLDigits per event */
+    std::vector<int>* m_eclDigitIdx; /** ECLDigit index */
+    std::vector<int>* m_eclDigitToMc; /** Index of MCParticle related to that ECLDigit */
+    std::vector<int>* m_eclDigitCellId; /** Number of ECLDigit CellId */
+    std::vector<int>* m_eclDigitAmp;  /** ECLDigit amplitude */
+    std::vector<int>* m_eclDigitTimeFit;  /** ECLDigit timing */
+    std::vector<int>* m_eclDigitFitQuality;  /** ECLDigit fit quality */
 
-    int m_eclSimHitMultip;
-    std::vector<int>* m_eclSimHitIdx;
-    std::vector<int>* m_eclSimHitToMc;
-    std::vector<int>* m_eclSimHitCellId;
-    std::vector<int>* m_eclSimHitPdg;
-    std::vector<double>* m_eclSimHitEnergyDep;
-    std::vector<double>* m_eclSimHitFlightTime;
-    std::vector<double>* m_eclSimHitX;
-    std::vector<double>* m_eclSimHitY;
-    std::vector<double>* m_eclSimHitZ;
-    std::vector<double>* m_eclSimHitPx;
-    std::vector<double>* m_eclSimHitPy;
-    std::vector<double>* m_eclSimHitPz;
+    int m_eclSimHitMultip;  /** Number of ECLSimHits per event */
+    std::vector<int>* m_eclSimHitIdx;  /** Index of ECLSimHit*/
+    std::vector<int>* m_eclSimHitToMc; /** Index of MCParticle related to that ECLSimHit */
+    std::vector<int>* m_eclSimHitCellId; /** ECLSimHit CellId */
+    std::vector<int>* m_eclSimHitPdg; /** PDG code of MCParticle associted to that ECLDigit */
+    std::vector<double>* m_eclSimHitEnergyDep; /** Energy deposition of ECLSimHit */
+    std::vector<double>* m_eclSimHitFlightTime; /** ??? */
+    std::vector<double>* m_eclSimHitX; /** ECLDigit X position */
+    std::vector<double>* m_eclSimHitY; /** ECLDigit Y position */
+    std::vector<double>* m_eclSimHitZ; /** ECLDigit Z position */
+    std::vector<double>* m_eclSimHitPx; /** ECLDigit PX */
+    std::vector<double>* m_eclSimHitPy; /** ECLDigit PY */
+    std::vector<double>* m_eclSimHitPz; /** ECLDigit PZ */
 
     int m_eclHitMultip;
     std::vector<int>* m_eclHitIdx;

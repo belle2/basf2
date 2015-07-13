@@ -1973,7 +1973,7 @@ TRGCDC::fastSimulation(void) {
                     _segmentHitsSL);
 
     if (trackSegmentSimulationOnly) {
-        TRGDebug::leaveStage("TRGCDC fast simulation");
+        TRGDebug::leaveStage("TRGCDC fastSimulation");
         return;
     }
 

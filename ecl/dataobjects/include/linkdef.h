@@ -12,8 +12,6 @@
 #pragma link C++ class Belle2::ECLHit+;
 #pragma link C++ class Belle2::ECLDebugHit+;
 #pragma link C++ class Belle2::ECLHitAssignment+;
-#pragma link C++ class Belle2::ECLGamma+;
-#pragma link C++ class Belle2::ECLPi0+;
 #pragma link C++ class Belle2::ECLShower+;
 #pragma link C++ class Belle2::ECLPidLikelihood+;
 #pragma link C++ class Belle2::ECLWaveformData+;

@@ -22,8 +22,6 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
-#include <ecl/dataobjects/ECLGamma.h>
-#include <ecl/dataobjects/ECLPi0.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 

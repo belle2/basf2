@@ -23,9 +23,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLGamma.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLPi0.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
@@ -736,8 +734,6 @@ void ECLDataAnalysisModule::event()
   StoreArray<ECLHit> hits;
   StoreArray<ECLShower> showers;
   StoreArray<ECLCluster> clusters;
-  StoreArray<ECLGamma> gammas;
-  StoreArray<ECLPi0> pi0s;
   StoreArray<MCParticle> mcParticles;
   RelationArray ECLClusterToMC(clusters, mcParticles);
   /*
@@ -806,49 +802,6 @@ void ECLDataAnalysisModule::event()
     } else
       m_eclHitToMc->push_back(-1);
 
-  }
-
-  m_eclGammaMultip = gammas.getEntries();
-  for (int igammas = 0; igammas < gammas.getEntries() ; igammas++) {
-    ECLGamma* aECLgammas = gammas[igammas];
-
-    m_eclGammaIdx->push_back(igammas);
-    m_eclGammaEnergy->push_back(aECLgammas->getEnergy());
-    m_eclGammaPx->push_back(aECLgammas->getPx());
-    m_eclGammaPy->push_back(aECLgammas->getPy());
-    m_eclGammaPz->push_back(aECLgammas->getPz());
-    m_eclGammaTheta->push_back(aECLgammas->getPositon().Theta());
-    m_eclGammaPhi->push_back(aECLgammas->getPositon().Phi());
-    m_eclGammaR->push_back(aECLgammas->getPositon().Mag());
-    if (aECLgammas->getRelated<ECLPi0>() != (nullptr)) {
-      const ECLPi0* gamma_pi0 = aECLgammas->getRelated<ECLPi0>();
-      m_eclGammaToPi0->push_back(gamma_pi0->getArrayIndex());
-    } else
-      m_eclGammaToPi0->push_back(-1);
-  }
-
-  m_eclPi0Multip = pi0s.getEntries();
-  for (int ipi0s = 0; ipi0s < pi0s.getEntries() ; ipi0s++) {
-    ECLPi0* aECLPi0s = pi0s[ipi0s];
-
-    m_eclPi0Idx->push_back(ipi0s);
-    m_eclPi0ShowerId1->push_back(aECLPi0s->getShowerId1());
-    m_eclPi0ShowerId2->push_back(aECLPi0s->getShowerId2());
-    m_eclPi0Energy->push_back(aECLPi0s->getEnergy());
-    m_eclPi0Px->push_back(aECLPi0s->getPx());
-    m_eclPi0Py->push_back(aECLPi0s->getPy());
-    m_eclPi0Pz->push_back(aECLPi0s->getPz());
-    m_eclPi0Mass->push_back(aECLPi0s->getMass());
-    m_eclPi0MassFit->push_back(aECLPi0s->getMassFit());
-    m_eclPi0Chi2->push_back(aECLPi0s->getChi2());
-    m_eclPi0PValue->push_back(aECLPi0s->getPValue());
-    /*
-    if (aECLPi0s->getRelated<ECLGamma>() != (nullptr)) {
-      const ECLGamma* gamma_pi0 = aECLPi0s->getRelated<ECLGamma>();
-      m_eclPi0ToGamma->push_back(gamma_pi0->getArrayIndex());
-    } else
-      m_eclPi0ToGamma->push_back(-1);
-    */
   }
 
   m_eclClusterMultip = clusters.getEntries();
@@ -1007,11 +960,6 @@ void ECLDataAnalysisModule::event()
     } else
       m_eclShowerToMc->push_back(-1);
 
-    if (aECLshowers->getRelated<ECLGamma>() != (nullptr)) {
-      const ECLGamma* gamma_shower = aECLshowers->getRelated<ECLGamma>();
-      m_eclShowerToGamma->push_back(gamma_shower->getArrayIndex());
-    } else
-      m_eclShowerToGamma->push_back(-1);
   }
 
   m_mcMultip = mcParticles.getEntries();

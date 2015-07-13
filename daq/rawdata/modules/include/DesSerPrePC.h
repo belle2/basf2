@@ -214,29 +214,6 @@ namespace Belle2 {
     CprErrorMessage print_err;
 
 
-#ifdef NONSTOP
-    //! for nonstop DAQ
-    int* m_ptr;
-
-    //! for nonstop DAQ
-    int checkRunStop();
-
-    //! for nonstop DAQ
-    int checkRunRecovery();
-
-    //! for nonstop DAQ
-    void openRunStopNshm();
-
-    //! for nonstop DAQ
-    void restartRun();
-
-    //! for nonstop DAQ
-    void pauseRun();
-
-    //! for nonstop DAQ
-    void waitRestart();
-#endif
-
     ///////////////////////////////
     // From Serializer.cc
     ///////////////////////////////
@@ -270,14 +247,12 @@ namespace Belle2 {
     //! buffer for shared memory
     int* m_cfg_sta;
 
-
   protected :
     //! Accept connection
     int Connect();
 
     //! receive data
     int recvFD(int fd, char* buf, int data_size_byte, int flag);
-
 
     //! receive data
     int* recvData(int* delete_flag, int* total_m_size_word, int* num_events_in_sendblock, int* num_nodes_in_sendblock);
@@ -296,7 +271,6 @@ namespace Belle2 {
 
     //! Reciever basf2 Socket
     std::vector<EvtSocketRecv*> m_recv;
-
 
     //! hostname of upstream Data Sources
     std::vector<std::string> m_hostname_from;
@@ -327,8 +301,6 @@ namespace Belle2 {
     //! Reciever Socket
     int m_socket_send;
 
-
-
     enum {
       COPPER = 1,
       ROPC = 2
@@ -340,43 +312,25 @@ namespace Belle2 {
     //! Destination port
     int m_port_to;
 
-
-
-
     //! EvtSocket
     EvtSocketSend* m_sock;
-
-
-
-
-
-
-
-
 
     //! How to handle data
     std::string p_method;
     int p_method_val;
-
-
-
-
-
-
-
 
 #ifdef NONSTOP
     //! for nonstop DAQ
     int* m_ptr;
 
     //! for nonstop DAQ
-    void openRunStopNshm();
-
-    //! for nonstop DAQ
     int checkRunStop();
 
     //! for nonstop DAQ
     int checkRunRecovery();
+
+    //! for nonstop DAQ
+    void openRunStopNshm();
 
     //! for nonstop DAQ
     void restartRun();
@@ -386,7 +340,6 @@ namespace Belle2 {
 
     //! for nonstop DAQ
     void waitRestart();
-
 #endif
 
     //! which format is used

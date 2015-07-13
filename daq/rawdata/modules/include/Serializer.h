@@ -189,17 +189,19 @@ namespace Belle2 {
     virtual int checkRunStop();
 
     //! for nonstop DAQ
-    virtual int checkRunRecovery();
-
-    //! for nonstop DAQ
     virtual void restartRun();
 
-    //! for nonstop DAQ
-    virtual void pauseRun();
+    /*     //! for nonstop DAQ */
+    /*     virtual int checkRunRecovery(); */
 
-    //! for nonstop DAQ
-    virtual void waitRestart();
+    /*     //! for nonstop DAQ */
+    /*     virtual void pauseRun(); */
 
+    /*     //! for nonstop DAQ */
+    /*     virtual void waitRestart(); */
+
+    //! connection is reset or not
+    int m_conn_alive;
 #endif
 
     //! which format is used

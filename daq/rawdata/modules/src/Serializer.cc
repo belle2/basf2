@@ -8,7 +8,7 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/Serializer.h>
 #include <daq/rawdata/modules/DeSerializer.h>
-
+#include <sys/uio.h>
 using namespace std;
 using namespace Belle2;
 
@@ -37,6 +37,11 @@ SerializerModule::SerializerModule() : Module()
   m_start_flag = 0;
   n_basf2evt = -1;
   m_compressionLevel = 0;
+
+#ifdef NONSTOP
+  m_conn_alive = 0;
+#endif
+
   //Parameter definition
   B2INFO("Tx: Constructor done.");
 }
@@ -49,7 +54,7 @@ SerializerModule::~SerializerModule()
 
 void SerializerModule::initialize()
 {
-
+  signal(SIGPIPE , SIG_IGN);
 
 #ifdef DUMMY
   m_buffer = new int[ BUF_SIZE_WORD ];
@@ -243,8 +248,10 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   iov[2].iov_base = (char*)send_trailer.GetBuffer();
   iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
+
   // Send Multiple buffers
   int n = 0;
+
   while (true) {
     if ((n = writev(m_socket, iov, NUM_BUFFER)) < 0) {
       if (errno == EINTR) {
@@ -263,9 +270,10 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
           printf("###########(Ser) Stop is detected after return from writev ###############\n");
           fflush(stdout);
           printf("\033[0m");
+
 #endif
-          pauseRun();
-          waitRestart();
+          string err_str = "RunPause";
+          throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
         }
 #endif
         continue;
@@ -297,6 +305,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   if (n != total_send_bytes) {
     B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retryring...");
     double retry_start = getTimeSec();
+
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
       n += Send(m_socket, (char*)iov[ 0 ].iov_base + n, iov[ 0 ].iov_len - n);
@@ -310,15 +319,15 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
       n += Send(m_socket, (char*)iov[ 2 ].iov_base + (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len),
                 iov[ 2 ].iov_len - (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len));
     }
+
     double retry_end = getTimeSec();
     B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
   }
-  //   printf( "[DEBUG] n %d total %d\n", n, total_send_bytes);
-  //  delete temp_buf;
 
   return total_send_bytes;
 
 }
+
 
 
 int SerializerModule::Send(int socket, char* buf, int size_bytes)
@@ -345,17 +354,29 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
           fflush(stdout);
           printf("\033[0m");
 #endif
-          pauseRun();
-          waitRestart();
+          string err_str = "EAGAIN";
+          throw (err_str);
         }
 #endif
         continue;
       } else {
+#ifdef NONSTOP
+        m_conn_alive = 0; // Reconnection is needed.
+#endif
         char err_buf[500];
-        sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
+#ifdef NONSTOP
+        sprintf(err_buf, "SEND ERROR1.(%s) ", strerror(errno));
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        string err_str = "ECONNRESET";
+        throw (err_str);
+#else
+        sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
+        printf("YES\n"); fflush(stdout);
         sleep(1234567);
+
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
+#endif
       }
     }
     sent_bytes += ret;
@@ -463,6 +484,10 @@ void SerializerModule::Accept()
     printf("%d %x\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr);
   }
 
+#ifdef NONSTOP
+  m_conn_alive = 1; // Connection flag is on.
+#endif
+
   return;
 
 }
@@ -530,15 +555,6 @@ int SerializerModule::checkRunStop()
   }
 }
 
-int SerializerModule::checkRunRecovery()
-{
-  if (*m_ptr) {
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
 void SerializerModule::restartRun()
 {
 #ifdef NONSTOP_DEBUG
@@ -552,36 +568,45 @@ void SerializerModule::restartRun()
   return;
 }
 
-
-void SerializerModule::pauseRun()
-{
-  g_run_stop = 1;
-#ifdef NONSTOP_DEBUG
-  printf("###########(Ser) Pause the run ###############\n");
-  fflush(stdout);
-#endif
-  return;
-}
+// int SerializerModule::checkRunRecovery()
+// {
+//   if (*m_ptr) {
+//     return 0;
+//   } else {
+//     return 1;
+//   }
+// }
 
 
-void SerializerModule::waitRestart()
-{
-  while (true) {
-#ifdef NONSTOP_DEBUG
-    printf("\033[31m");
-    printf("###########(Ser) Waiting for Restart ###############\n");
-    fflush(stdout);
-    printf("\033[0m");
-#endif
-    if (checkRunRecovery()) {
-      g_run_stop = 0;
-      g_run_recovery = 1;
-      break;
-    }
-    sleep(1);
-  }
-  return;
-}
+// void SerializerModule::pauseRun()
+// {
+//   g_run_stop = 1;
+// #ifdef NONSTOP_DEBUG
+//   printf("###########(Ser) Pause the run ###############\n");
+//   fflush(stdout);
+// #endif
+//   return;
+// }
+
+
+// void SerializerModule::waitRestart()
+// {
+//   while (true) {
+// #ifdef NONSTOP_DEBUG
+//     printf("\033[31m");
+//     printf("###########(Ser) Waiting for Restart ###############\n");
+//     fflush(stdout);
+//     printf("\033[0m");
+// #endif
+//     if (checkRunRecovery()) {
+//       g_run_stop = 0;
+//       g_run_recovery = 1;
+//       break;
+//     }
+//     sleep(1);
+//   }
+//   return;
+// }
 #endif
 
 
@@ -626,27 +651,20 @@ void SerializerModule::event()
 
     try {
       m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
-    } catch (string err_str) {
+      //    } catch (string err_str) {
+    } catch (...) {
 #ifdef NONSTOP
-      if (err_str == "EAGAIN") {
-        pauseRun();
-        break;
-      }
-#endif
-      //      print_err.PrintError(m_shmflag, &m_status, err_str);
+      g_run_stop = 1;
+      return; // Go to DeSerializer***() to wait for run-restart.
+#else
       exit(1);
+#endif
     }
     if (m_start_flag == 0) {
       B2INFO("Done. ");
       m_start_flag = 1;
     }
   }
-
-#ifdef NONSTOP
-  if (g_run_stop == 1) {
-    waitRestart();
-  }
-#endif
 
 
   //

@@ -316,13 +316,8 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   }
   m_bufary[entry][2] = checksum;
 #endif
-
-
-
   return temp_buf;
-
 }
-
 
 
 
@@ -455,7 +450,6 @@ void DeSerializerCOPPERModule::waitRestart()
 
 void DeSerializerCOPPERModule::event()
 {
-
 
 
 #ifdef NONSTOP

@@ -42,7 +42,8 @@ EvtGenInterface::~EvtGenInterface()
   if (m_Generator) delete m_Generator;
 }
 
-int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& parentParticle, const std::string& userFileName)
+int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& parentParticle,
+                           const std::string& userFileName)
 {
   B2INFO("Begin initialisation of EvtGen Interface.");
 
@@ -60,7 +61,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
   // Method to add User EvtGen models here
   if (!m_Generator) {
     int mixingType = EvtCPUtil::Coherent;
-    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels, mixingType);
+    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels,
+                             mixingType);
   }
   if (!userFileName.empty()) {
     m_Generator->readUDecay(userFileName.c_str());
@@ -75,7 +77,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType, const std::string& inclusiveParticle)
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType,
+                                   const std::string& inclusiveParticle)
 {
   //Init evtgen
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
@@ -203,4 +206,11 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->setProductionVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
   gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
+
+  //add PHOTOS flag
+  if (eParticle->getAttribute("FSR")) {
+    gParticle->addStatus(MCParticle::c_IsPHOTOSPhoton);
+    //B2DEBUG("FSR!");
+  }
+
 }

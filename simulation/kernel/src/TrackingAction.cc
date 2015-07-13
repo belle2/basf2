@@ -82,14 +82,14 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     //Get particle of current track
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
     //Set the Values of the particle which are already known
-    G4ThreeVector dpMom  = dynamicParticle->GetMomentum() * Unit::MeV;
-    G4ThreeVector trVtxPos = track->GetVertexPosition() * Unit::mm;
+    G4ThreeVector dpMom  = dynamicParticle->GetMomentum() / CLHEP::MeV * Unit::MeV;
+    G4ThreeVector trVtxPos = track->GetVertexPosition() / CLHEP::mm * Unit::mm;
     currParticle.setTrackID(track->GetTrackID());
     currParticle.setPDG(dynamicParticle->GetPDGcode());
-    currParticle.setMass(dynamicParticle->GetMass() * Unit::MeV);
-    currParticle.setEnergy(dynamicParticle->GetTotalEnergy() * Unit::MeV);
+    currParticle.setMass(dynamicParticle->GetMass() / CLHEP::MeV * Unit::MeV);
+    currParticle.setEnergy(dynamicParticle->GetTotalEnergy() / CLHEP::MeV * Unit::MeV);
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
-    currParticle.setProductionTime(track->GetGlobalTime() * Unit::ns);
+    currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
     currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
     //Primary or secondary particle?
     if (dynamicParticle->GetPrimaryParticle() != NULL) {  //Primary
@@ -172,9 +172,9 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     }
 
     //Set the values for the particle
-    G4ThreeVector decVtx = postStep->GetPosition() * Unit::mm;
+    G4ThreeVector decVtx = postStep->GetPosition() / CLHEP::mm * Unit::mm;
     currParticle.setDecayVertex(decVtx.x(), decVtx.y(), decVtx.z());
-    currParticle.setDecayTime(postStep->GetGlobalTime() * Unit::ns);
+    currParticle.setDecayTime(postStep->GetGlobalTime()); // Time does not need a conversion factor
     currParticle.setValidVertex(true);
 
     //Check if we can remove some points from the trajectory

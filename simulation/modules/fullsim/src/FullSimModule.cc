@@ -263,7 +263,8 @@ void FullSimModule::initialize()
     for (int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
       G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
       if (transport != nullptr) {
-        transport->SetThresholdImportantEnergy(m_thresholdImportantEnergy / Unit::MeV); //Geant4 energy unit is MeV
+        //Geant4 energy unit is MeV
+        transport->SetThresholdImportantEnergy(m_thresholdImportantEnergy / Unit::MeV * CLHEP::MeV);
         transport->SetThresholdTrials(m_thresholdTrials);
         break;
       }

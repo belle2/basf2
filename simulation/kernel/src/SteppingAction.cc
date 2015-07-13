@@ -71,15 +71,15 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     if (info && info->getTrajectory()) {
       MCParticleTrajectory& trajectory = *(info->getTrajectory());
       if (trajectory.empty()) {
-        const G4ThreeVector stepPos = step->GetPreStepPoint()->GetPosition() * Unit::mm;
-        const G4ThreeVector stepMom = step->GetPreStepPoint()->GetMomentum() * Unit::MeV;
+        const G4ThreeVector stepPos = step->GetPreStepPoint()->GetPosition() / CLHEP::mm * Unit::mm;
+        const G4ThreeVector stepMom = step->GetPreStepPoint()->GetMomentum() / CLHEP::MeV * Unit::MeV;
         trajectory.addPoint(
           stepPos.x(), stepPos.y(), stepPos.z(),
           stepMom.x(), stepMom.y(), stepMom.z()
         );
       }
-      const G4ThreeVector stepPos = step->GetPostStepPoint()->GetPosition() * Unit::mm;
-      const G4ThreeVector stepMom = step->GetPostStepPoint()->GetMomentum() * Unit::MeV;
+      const G4ThreeVector stepPos = step->GetPostStepPoint()->GetPosition() / CLHEP::mm * Unit::mm;
+      const G4ThreeVector stepMom = step->GetPostStepPoint()->GetMomentum() / CLHEP::MeV * Unit::MeV;
       trajectory.addPoint(
         stepPos.x(), stepPos.y(), stepPos.z(),
         stepMom.x(), stepMom.y(), stepMom.z()

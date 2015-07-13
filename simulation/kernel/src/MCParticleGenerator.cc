@@ -126,11 +126,11 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
   if (addToG4) {
     TLorentzVector mcPartMom4 = mcParticle.get4Vector();
     newPart = new G4PrimaryParticle(pdef,
-                                    mcPartMom4.X() / Unit::MeV,
-                                    mcPartMom4.Y() / Unit::MeV,
-                                    mcPartMom4.Z() / Unit::MeV,
-                                    mcPartMom4.E() / Unit::MeV);
-    newPart->SetMass(mcParticle.getMass() / Unit::MeV);
+                                    mcPartMom4.X() / Unit::MeV * CLHEP::MeV,
+                                    mcPartMom4.Y() / Unit::MeV * CLHEP::MeV,
+                                    mcPartMom4.Z() / Unit::MeV * CLHEP::MeV,
+                                    mcPartMom4.E() / Unit::MeV * CLHEP::MeV);
+    newPart->SetMass(mcParticle.getMass() / Unit::MeV * CLHEP::MeV);
     if (opticalPhoton) {
       TVector3 polarization = mcParticle.getDecayVertex(); // temporary stored here
       newPart->SetPolarization(polarization.X(), polarization.Y(), polarization.Z());
@@ -159,9 +159,9 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
   if ((lastG4Mother == NULL) && (addToG4)) {
     //Create the vertex
     TVector3 mcProdVtx = mcParticle.getProductionVertex();
-    G4PrimaryVertex* vertex = new G4PrimaryVertex(mcProdVtx.X() / Unit::mm,
-                                                  mcProdVtx.Y() / Unit::mm,
-                                                  mcProdVtx.Z() / Unit::mm,
+    G4PrimaryVertex* vertex = new G4PrimaryVertex(mcProdVtx.X() / Unit::mm * CLHEP::mm,
+                                                  mcProdVtx.Y() / Unit::mm * CLHEP::mm,
+                                                  mcProdVtx.Z() / Unit::mm * CLHEP::mm,
                                                   mcParticle.getProductionTime());
     vertex->SetPrimary(newPart);
 

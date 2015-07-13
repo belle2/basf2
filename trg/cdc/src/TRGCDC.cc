@@ -315,7 +315,7 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
     int ias = -1;
     int iss = -1;
     unsigned nWires = 0;
-    float fwrLast = 0;
+    float fwr = 0;
     unsigned axialStereoSuperLayerId = 0;
     for (unsigned i = 0; i < nLayers; i++) {
         const unsigned nWiresInLayer = m_cdcp->nWiresInLayer(i);
@@ -372,11 +372,10 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
 
         //...Calculate radius...
         const float swr = m_cdcp->senseWireR(i);
-        float fwr = m_cdcp->fieldWireR(i);
-        if (i == nLayers - 2)
-            fwrLast = fwr;
-        else if (i == nLayers - 1)
-            fwr = swr + (swr - fwrLast);
+        if (i < nLayers - 1)
+          fwr = m_cdcp->fieldWireR(i);
+        else
+          fwr = swr + (swr - m_cdcp->fieldWireR(i - 1));
         const float innerRadius = swr - (fwr - swr);
         const float outerRadius = swr + (fwr - swr);
 

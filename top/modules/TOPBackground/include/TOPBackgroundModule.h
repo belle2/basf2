@@ -116,6 +116,8 @@ namespace Belle2 {
     double m_TimeOfSimulation;      /**< Time of the simulation of the input file */
 
     TFile* m_rootFile;  /**< root file for saving histograms */
+    TTree* origingamma;  /**< tree for saving origingamma points */
+    TTree* originpe;  /**< tree for saving originpe points */
 
     TH1F* peflux;      /**< pe flux */
     TH1F* nflux;       /**< neutron flux */
@@ -144,6 +146,7 @@ namespace Belle2 {
 
     TGraph* prim_zx;     /**<  grapch zx */
     TGraph* prim_zy;     /**<  graph zy */
+    TGraph* module_occupancy;     /**<  graph zy */
 
     double PCBmass;      /**<  constant */
     double PCBarea;      /**<  constant */
@@ -151,7 +154,13 @@ namespace Belle2 {
     double evtoJ;        /**<  constant */
     double mtoc;         /**<  constant */
     int count;           /**<  counter */
-
+    int count_occ;           /**<  counter */
+    double origingamma_x; /**< points from origin_zx and _zy graphs */
+    double origingamma_y;
+    double origingamma_z;
+    double originpe_x; /**< points for origin of mother of photoelectrons (z=zdistg) */
+    double originpe_y;
+    double originpe_z;
   };
 
 } // Belle2 namespace

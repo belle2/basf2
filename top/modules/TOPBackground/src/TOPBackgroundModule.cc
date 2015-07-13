@@ -46,6 +46,8 @@ namespace Belle2 {
 
   TOPBackgroundModule::TOPBackgroundModule() : Module(),
     m_rootFile(0),
+    origingamma(0),
+    originpe(0),
     peflux(0),
     nflux(0),
     rdose(0),
@@ -67,12 +69,20 @@ namespace Belle2 {
     origin_zy(0),
     prim_zx(0),
     prim_zy(0),
+    module_occupancy(0),
     PCBmass(0),
     PCBarea(0),
     yearns(0),
     evtoJ(0),
     mtoc(0),
-    count(0)
+    count(0),
+    count_occ(0),
+    origingamma_x(0),
+    origingamma_y(0),
+    origingamma_z(0),
+    originpe_x(0),
+    originpe_y(0),
+    originpe_z(0)
   {
     // Set description()
     setDescription("A module to analyze beam background simulations regarding TOP");
@@ -97,15 +107,24 @@ namespace Belle2 {
 
     // Initializing the output root file
     m_rootFile = new TFile(m_OutputFileName.c_str(), "RECREATE");
+    origingamma = new TTree("origingamma", "tree");
+    originpe = new TTree("originpe", "tree2");
+
+    origingamma->Branch("x", &origingamma_x);
+    origingamma->Branch("y", &origingamma_y);
+    origingamma->Branch("z", &origingamma_z);
+    originpe->Branch("x", &originpe_x);
+    originpe->Branch("y", &originpe_y);
+    originpe->Branch("z", &originpe_z);
 
     peflux = new TH1F("Photoelectron flux", "Photoelectron flux", 33, -11.25, 360);
     nflux = new TH1F("Neutron flux", "Neutron flux", 33, -11.25, 360);
     rdose = new TH1F("Radiation dose", "Radiation dose", 33, -11.25, 360);
     zdist = new TH1F("Photoelectron origin", "Photoelectron origin", 200, -400, 400);
     genergy = new TH1F("Energy distribution of photons", "Energy distribution of photons", 150, 0, 5);
-    genergy2 = new TH1F("Energy distribution of gammas", "Energy distribution of gammas", 150, 0, 30);
+    genergy2 = new TH1F("Energy distribution of gammas", "Energy distribution of gammas", 500, 0, 5);
 
-    zdistg = new TH1F("Photoelectron flux z", "Photoelectron flux Z projection", 80, -400, 400);
+    zdistg = new TH1F("Photoelectron flux z", "Photoelectron flux Z projection", 800, -400, 400);
     originpt = new TH1F("P_t of origin electron", "P_t of origin electron", 300, 0.06, 0.14);
 
     nflux_bar = new TH2F("Neutron flux on bar", "Neutron flux on bar", 32, -114.8, 211.5, 16, -0, 360);
@@ -125,18 +144,24 @@ namespace Belle2 {
 
     prim_zx = new TGraph();
     prim_zy = new TGraph();
+    module_occupancy = new TGraph();
 
     origin_zy->SetName("originZY");
     origin_zx->SetName("originZX");
-
+    module_occupancy->SetName("occupancy");
     PCBmass = 0.417249;
     PCBarea = 496.725;
     yearns = 1.e13;
     evtoJ = 1.60217653 * 1e-10;
     mtoc = 1.97530864197531;
     count = 0;
-
-
+    count_occ = 0;
+    origingamma_x = 0;
+    origingamma_y = 0;
+    origingamma_z = 0;
+    originpe_x = 0;
+    originpe_y = 0;
+    originpe_z = 0;
   }
 
   void TOPBackgroundModule::beginRun()
@@ -157,11 +182,16 @@ namespace Belle2 {
     for (int i = 0; i < nHits; i++) {
       TOPDigit* aDigit = topDigits[i];
       int barID = aDigit->getBarID();
+
       peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
 
       const TOPSimHit* simHit = DataStore::getRelated<TOPSimHit>(aDigit);
+      int PMTID = simHit->getPmtID();
 
-      //  genergy->Fill(simHit->getEnergy());
+      module_occupancy->SetPoint(count_occ, PMTID , barID);
+      count_occ++;
+
+      if (simHit) genergy->Fill(simHit->getEnergy());
 
       const MCParticle* particle = DataStore::getRelated<MCParticle>(simHit);
 
@@ -177,6 +207,10 @@ namespace Belle2 {
 
             zdist->Fill(mother->getVertex().Z());
             zdistg->Fill(mother->getVertex().Z(), 1. / m_TimeOfSimulation / 32.0 / 16.0);
+            originpe_x = mother->getVertex().X();
+            originpe_y = mother->getVertex().Y();
+            originpe_z = mother->getVertex().Z();
+            originpe->Fill();
             TVector3 momentum = mother->getMomentum();
             if (m_BkgType.at(m_BkgType.size() - 3) == 'L') momentum.RotateY(0.0415);
             else if (m_BkgType.at(m_BkgType.size() - 3) == 'H') momentum.RotateY(-0.0415);
@@ -242,6 +276,10 @@ namespace Belle2 {
                               toptrk->getProductionPoint().X());
           origin_zy->SetPoint(count, toptrk->getProductionPoint().Z() / 0.999143,
                               toptrk->getProductionPoint().Y());
+          origingamma_x = toptrk->getProductionPoint().X();
+          origingamma_y = toptrk->getProductionPoint().Y();
+          origingamma_z = toptrk->getProductionPoint().Z();
+          origingamma->Fill();
           count++;
 
         } else {
@@ -347,6 +385,8 @@ namespace Belle2 {
      */
 
     m_rootFile->cd();
+    origingamma->Write();
+    originpe->Write();
     peflux->Write();
     zdist->Write();
     nflux->Write();
@@ -357,6 +397,7 @@ namespace Belle2 {
     gflux_bar->Write();
     origin_zx->Write();
     origin_zy->Write();
+    module_occupancy->Write();
     gorigin->Write();
     norigin->Write();
     zdistg->Write();

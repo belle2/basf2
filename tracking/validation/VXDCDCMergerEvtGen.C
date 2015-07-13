@@ -26,111 +26,111 @@ void VXDCDCMergerEvtGen(){
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
 
-  TH1F *h1 = new TH1F("h1","Merged Tracks EvtGen",10,0,10);
-  h1->GetXaxis()->SetTitle("# of merged tracks");
-  h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for EvtGen events")); 
-  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
-  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *EG1 = new TH1F("EG1","Merged Tracks EvtGen",10,0,10);
+  EG1->GetXaxis()->SetTitle("# of merged tracks");
+  EG1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for EvtGen events")); 
+  EG1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
+  EG1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //tree->Draw("eclClusterEnergy>>hClusterE","eclClusterEnergy>0");
-  //tree->Draw("MergedTracks>>h1");
-  //h1->Write();
+  //tree->Draw("MergedTracks>>EG1");
+  //EG1->Write();
   //c1->SaveAs("plots/MergedTracks_5GeV_muons_1000_Theta.jpg");
 
-  TH1F *h2 = new TH1F("h2","True Matched Tracks Truth Track Finder",10,0,10);
-  tree->Draw("TrueMatchedTracks>>h2");
-  //h2->Write();
+  TH1F *EG2 = new TH1F("EG2","True Matched Tracks Truth Track Finder",10,0,10);
+  tree->Draw("TrueMatchedTracks>>EG2");
+  //EG2->Write();
   //c1->SaveAs("plots/TrueMatchedTracks_5GeV_muons_1000_Theta.jpg");
 
-  TH1F *h3 = new TH1F("h3","CDCTracks",10,0,10);
-  tree->Draw("CDCTracks>>h3");
-  //h3->Write();
+  TH1F *EG3 = new TH1F("EG3","CDCTracks",10,0,10);
+  tree->Draw("CDCTracks>>EG3");
+  //EG3->Write();
   //c1->SaveAs("plots/CDCTracks_5GeV_muons_1000_Theta.jpg");
 
-  TH1F *h4 = new TH1F("h4","VXDTracks",10,0,10);
-  tree->Draw("VXDTracks>>h4");
-  //h4->Write();
+  TH1F *EG4 = new TH1F("EG4","VXDTracks",10,0,10);
+  tree->Draw("VXDTracks>>EG4");
+  //EG4->Write();
   //c1->SaveAs("plots/VXDTracks_5GeV_muons_1000_Theta.jpg");
 
-  TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
-  tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
-  h1->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
-  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *EG5 = new TH1F("EG5","Chi2",100,0,100);
+  tree->Draw("Chi2>>EG5","GoodTag==1&&TruthTag==1");
+  EG1->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
+  EG1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
+  EG1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/Chi2_5GeV_muons_1000_Theta.jpg");
   //h5->Write();
 
-  TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
-  h1->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
-  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *EG6 = new TH1F("EG6","Position Residual",100,0,0.5);
+  EG1->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
+  EG1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
+  EG1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/PosRes_5GeV_muons_1000_Theta.jpg");
-  //tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
-  //h6->Write();
+  //tree->Draw("PosRes>>EG6","GoodTag==1&&TruthTag==1");
+  //EG6->Write();
 
-  //TH1F *h7 = new TH1F("h7","Dx",100,-0.05,0.05);
-  //tree->Draw("Dx>>h7","GoodTag==1&&TruthTag==1");
+  //TH1F *EG7 = new TH1F("EG7","Dx",100,-0.05,0.05);
+  //tree->Draw("Dx>>EG7","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Dx_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h8 = new TH1F("h8","Dy",100,-0.05,0.05);
-  //tree->Draw("Dy>>h8","GoodTag==1&&TruthTag==1");
+  //TH1F *EG8 = new TH1F("EG8","Dy",100,-0.05,0.05);
+  //tree->Draw("Dy>>EG8","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Dy_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h9 = new TH1F("h9","Dz",100,-0.5,0.5);
-  //tree->Draw("Dz>>h9","GoodTag==1&&TruthTag==1");
+  //TH1F *EG9 = new TH1F("EG9","Dz",100,-0.5,0.5);
+  //tree->Draw("Dz>>EG9","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Dz_5GeV_muons_1000_Theta.jpg");
 
 
-  TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
-  h1->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
-  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  //tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
-  //h10->Write();
+  TH1F *EG10 = new TH1F("EG10","Momentum Resisual",100,0,0.5);
+  EG1->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
+  EG1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
+  EG1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  //tree->Draw("MomRes>>EG10","GoodTag==1&&TruthTag==1");
+  //EG10->Write();
 
-  //TH1F *h11 = new TH1F("h11","DMomx",100,-2,2);
-  //tree->Draw("DMomx>>h11","GoodTag==1&&TruthTag==1");
+  //TH1F *EG11 = new TH1F("EG11","DMomx",100,-2,2);
+  //tree->Draw("DMomx>>EG11","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/DMomx_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h12 = new TH1F("h12","DMomy",100,-2,2);
-  //tree->Draw("DMomy>>h12","GoodTag==1&&TruthTag==1");
+  //TH1F *EG12 = new TH1F("EG12","DMomy",100,-2,2);
+  //tree->Draw("DMomy>>EG12","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/DMomy_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h13 = new TH1F("h13","DMomz",100,-1,1);
-  //tree->Draw("DMomz>>h13","GoodTag==1&&TruthTag==1");
+  //TH1F *EG13 = new TH1F("EG13","DMomz",100,-1,1);
+  //tree->Draw("DMomz>>EG13","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/DMomz_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h14 = new TH1F("h14","P",100,4.8,5.2);
-  //tree->Draw("P>>h14","GoodTag==1&&TruthTag==1");
+  //TH1F *EG14 = new TH1F("EG14","P",100,4.8,5.2);
+  //tree->Draw("P>>EG14","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/P_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h15 = new TH1F("h15","Px",100,-6,6);
-  //tree->Draw("Px>>h15","GoodTag==1&&TruthTag==1");
+  //TH1F *EG15 = new TH1F("EG15","Px",100,-6,6);
+  //tree->Draw("Px>>EG15","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Px_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h16 = new TH1F("h16","Py",100,-6,6);
-  //tree->Draw("Py>>h16","GoodTag==1&&TruthTag==1");
+  //TH1F *EG16 = new TH1F("EG16","Py",100,-6,6);
+  //tree->Draw("Py>>EG16","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Py_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h17 = new TH1F("h17","Pz",100,-3,3);
-  //tree->Draw("Pz>>h17","GoodTag==1&&TruthTag==1");
+  //TH1F *EG17 = new TH1F("EG17","Pz",100,-3,3);
+  //tree->Draw("Pz>>EG17","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Pz_5GeV_muons_1000_Theta.jpg");
 
 
-  //TH1F *h18 = new TH1F("h18","VXDP",100,2,8);
-  //tree->Draw("VXDP>>h18","GoodTag==1&&TruthTag==1");
+  //TH1F *EG18 = new TH1F("EG18","VXDP",100,2,8);
+  //tree->Draw("VXDP>>EG18","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/VXDP_5GeV_muons_1000_Theta.jpg");
-  //h18->Write();
+  //EG18->Write();
 
-  //TH1F *h19 = new TH1F("h19","VXDPx",100,-8,8);
-  //tree->Draw("VXDPx>>h19","GoodTag==1&&TruthTag==1");
+  //TH1F *EG19 = new TH1F("EG19","VXDPx",100,-8,8);
+  //tree->Draw("VXDPx>>EG19","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/VXDPx_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h20 = new TH1F("h20","VXDPy",100,-8,8);
-  //tree->Draw("VXDPy>>h20","GoodTag==1&&TruthTag==1");
+  //TH1F *EG20 = new TH1F("EG20","VXDPy",100,-8,8);
+  //tree->Draw("VXDPy>>EG20","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/VXDPy_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h21 = new TH1F("h21","VXDP",100,-4,4);
-  //tree->Draw("VXDPz>>h21","GoodTag==1&&TruthTag==1");
+  //TH1F *EG21 = new TH1F("EG21","VXDP",100,-4,4);
+  //tree->Draw("VXDPz>>EG21","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/VXDPz_5GeV_muons_1000_Theta.jpg");
 
  /////////////SCANS//////////////
@@ -201,32 +201,33 @@ void VXDCDCMergerEvtGen(){
     //c1->SaveAs("plots/EffvsTheta_5GeV_muons_1000_Theta.jpg");
   eff_theta->Write();
   //delete eff_theta;
-
+  /*
   h2->SetLineWidth(3);
   h2->SetLineColor(1);
   h2->GetYaxis()->SetRange(0,2);
   h2->Draw();
-  /*  h3->SetLineColor(3);
+  h3->SetLineColor(3);
   h3->SetLineWidth(3);
   h3->Draw("same");
   h4->SetLineColor(4);
   h4->SetLineWidth(3);
   h4->Draw("same");*/
-  h1->SetLineColor(2);
-  h1->SetLineWidth(3);
-  h1->Draw("same");
+  //h1->SetLineColor(2);
+  //h1->SetLineWidth(3);
+  //h1->Draw("same");
   //h1->Write();
   //c1->SaveAs("plots/TrueMergedTrk_5GeV_muons_1000_Theta.jpg");
 
-  h3->SetLineColor(4);
-  h3->SetLineWidth(3);
+  //h3->SetLineColor(4);
+  //h3->SetLineWidth(3);
   //  h3->GetYaxis()->SetRange(-1.,1.);
   //h3->Draw();
-  h4->SetLineColor(3);
-  h4->SetLineWidth(3);
-  h4->Draw();
-  h3->Draw("same");
+  //h4->SetLineColor(3);
+  //h4->SetLineWidth(3);
+  //h4->Draw();
+  //h3->Draw("same");
   //h3->Write();
   //c1->SaveAs("plots/VXDCDCTrk_5GeV_muons_1000_Theta.jpg");
 
+  output->Close();
 }

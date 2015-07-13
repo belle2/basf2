@@ -202,31 +202,32 @@ void VXDCDCMergerSinglePart(){
   eff_theta->Write();
   //delete eff_theta;
 
-  h2->SetLineWidth(3);
-  h2->SetLineColor(1);
-  h2->GetYaxis()->SetRange(0,2);
-  h2->Draw();
+  //h2->SetLineWidth(3);
+  //h2->SetLineColor(1);
+  //h2->GetYaxis()->SetRange(0,2);
+  //h2->Draw();
   /*  h3->SetLineColor(3);
   h3->SetLineWidth(3);
   h3->Draw("same");
   h4->SetLineColor(4);
   h4->SetLineWidth(3);
   h4->Draw("same");*/
-  h1->SetLineColor(2);
-  h1->SetLineWidth(3);
-  h1->Draw("same");
+  //h1->SetLineColor(2);
+  //h1->SetLineWidth(3);
+  //h1->Draw("same");
   //h1->Write();
   //c1->SaveAs("plots/TrueMergedTrk_5GeV_muons_1000_Theta.jpg");
 
-  h3->SetLineColor(4);
-  h3->SetLineWidth(3);
+  //h3->SetLineColor(4);
+  //h3->SetLineWidth(3);
   //  h3->GetYaxis()->SetRange(-1.,1.);
   //h3->Draw();
-  h4->SetLineColor(3);
-  h4->SetLineWidth(3);
-  h4->Draw();
-  h3->Draw("same");
+  //h4->SetLineColor(3);
+  //h4->SetLineWidth(3);
+  //h4->Draw();
+  //h3->Draw("same");
   //h3->Write();
   //c1->SaveAs("plots/VXDCDCTrk_5GeV_muons_1000_Theta.jpg");
 
+  output->Close();
 }

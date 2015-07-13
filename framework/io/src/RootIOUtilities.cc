@@ -134,6 +134,8 @@ bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,0,0)
   return cl->TestBit(TClass::kHasCustomStreamerMember);
 #else
+  if (!cl->GetClassInfo())
+    return false; //no dictionary for class, so no streamers, either
   return gCint->ClassInfo_RootFlag(cl->GetClassInfo()) & 1;
 #endif
 }

@@ -122,6 +122,12 @@ void RootOutputModule::initialize()
 
       const TClass* entryClass = iter->second.objClass;
 
+      if (!entryClass->GetClassInfo()) {
+        B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
+                  "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
+        continue;
+      }
+
       if (!hasStreamer(entryClass))
         B2ERROR("The version number in the ClassDef() macro for class " << entryClass->GetName() << " must be at least 1 to enable I/O!");
 

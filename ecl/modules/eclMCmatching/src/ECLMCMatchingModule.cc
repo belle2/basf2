@@ -207,7 +207,7 @@ void ECLMCMatchingModule::event()
   for (const auto& eclShower : eclShowers) {
     const auto eclCluster = eclShower.getRelatedFrom<ECLCluster>();
     const auto mcParticles = eclShower.getRelationsTo<MCParticle>();
-    for (int i = 0; i < mcParticles.size(); ++i) {
+    for (unsigned int i = 0; i < mcParticles.size(); ++i) {
       const auto mcParticle = mcParticles.object(i);
       const auto weight = mcParticles.weight(i);
       eclCluster->addRelationTo(mcParticle, weight);

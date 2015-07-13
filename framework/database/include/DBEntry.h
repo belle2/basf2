@@ -23,7 +23,7 @@ namespace Belle2 {
    * See DBStore::m_dbEntryMap.
    */
   struct DBEntry {
-    DBEntry() : package(""), module(""), objClass(0), isArray(false), object(0) {};
+    DBEntry() : package(""), module(""), objClass(0), isArray(false), object(0), intraRunDependency(0) {};
 
     std::string package; /**< Package name of the entry in the database. Equal to the key in the first map. **/
     std::string module; /**< Module name of the entry in the database. Equal to the key in the second map. **/

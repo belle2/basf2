@@ -33,7 +33,7 @@ namespace Belle2 {
     DBAccessorBase(const std::string& package,
                    const std::string& module,
                    const TClass* objClass,
-                   bool isArray)
+                   bool isArray) : m_ptr(0)
     {
       m_entry = DBStore::Instance().getEntry(package, module, objClass, isArray);
       m_iov = m_entry->iov;

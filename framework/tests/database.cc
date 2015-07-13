@@ -219,7 +219,7 @@ namespace {
     DBStore::Instance().update();
 
     DBObjPtr<TNamed> named;
-    EXPECT_TRUE(named.hasChanged());
+    EXPECT_FALSE(named.hasChanged());
 
     evtPtr->setExperiment(1);
     EXPECT_FALSE(named.hasChanged());

@@ -91,7 +91,7 @@ namespace Belle2 {
 
     int GetHdrNwords();  //! get contents of header
 
-    unsigned int GetExpRunNumberWord(); //! get a run/exp number combined word
+    unsigned int GetExpRunSubrun(); //! get a run/exp number combined word
 
     int GetExpNo();  //! get contents of header
 
@@ -394,7 +394,7 @@ namespace Belle2 {
     return (m_buffer[ POS_EXP_RUN_NO ] & SUBRUNNO_MASK);
   }
 
-  inline unsigned int RawHeader_latest::GetExpRunNumberWord()
+  inline unsigned int RawHeader_latest::GetExpRunSubrun()
   {
     CheckGetBuffer();
     return ((unsigned int)(m_buffer[ POS_EXP_RUN_NO ]));

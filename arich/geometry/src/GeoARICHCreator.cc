@@ -119,10 +119,10 @@ namespace Belle2 {
         G4NistManager* man = G4NistManager::Instance();
         G4Material* medPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
         G4Material* boron   = man->FindOrBuildMaterial("G4_B");
-        // 30% borated polyethylene = SWX210
-        G4Material* boratedpoly30 = new G4Material("BoratedPoly30", 1.19 * CLHEP::g / CLHEP::cm3, 2);
-        boratedpoly30->AddMaterial(boron, 0.30);
-        boratedpoly30->AddMaterial(medPoly, 0.70);
+        // 10% borated polyethylene = SWX210 // 13.7.2015 switched from 30% to 10% boron
+        G4Material* boratedpoly10 = new G4Material("BoratedPoly10", 1.19 * CLHEP::g / CLHEP::cm3, 2);
+        boratedpoly10->AddMaterial(boron, 0.10);
+        boratedpoly10->AddMaterial(medPoly, 0.90);
 
         // neutron polyethylene shield parameters (for now hardcoded, should be moved to xml file)
         double zfrr = 1670;
@@ -139,8 +139,9 @@ namespace Belle2 {
         G4Tubs* nshield_shape = new G4Tubs("nshield_shape", radij1, radij2, (zbkk - zfrr) / 2., 0, 2 * M_PI);
         G4Tubs* nshield_shape1 = new G4Tubs("nshield_shape1", radij1, radij2, (zbkk1 - zfrr1) / 2., 0, 2 * M_PI);
         // please change here boratedpoly30 to boratedpoly05
-        G4LogicalVolume* nshield = new G4LogicalVolume(nshield_shape, boratedpoly30, "nShield");
-        G4LogicalVolume* nshield1 = new G4LogicalVolume(nshield_shape1, boratedpoly30, "nShield1");
+        G4LogicalVolume* nshield = new G4LogicalVolume(nshield_shape, boratedpoly10, "nShield");
+        G4LogicalVolume* nshield1 = new G4LogicalVolume(nshield_shape1, boratedpoly10, "nShield1");
+
         new G4PVPlacement(transform_nshield , nshield, "ARICH.nShield", envelope, false, 1);
         new G4PVPlacement(transform_nshield1 , nshield1, "ARICH.nShield1", envelope, false, 1);
 

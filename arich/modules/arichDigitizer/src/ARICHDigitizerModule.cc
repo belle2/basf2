@@ -54,6 +54,7 @@ namespace Belle2 {
     m_maxQE(0),
     m_arichgp(ARICHGeometryPar::Instance())
   {
+
     // Set description()
     setDescription("This module creates ARICHDigits from ARICHSimHits. Here spatial digitization is done, channel-by-channel QE is applied, and readout time window cut is applied.");
 
@@ -64,6 +65,7 @@ namespace Belle2 {
     addParam("InputColName", m_inColName, "ARICHSimHits collection name", string("ARICHSimHitArray"));
     addParam("OutputColName", m_outColName, "ARICHDigit collection name", string("ARICHDigitArray"));
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
+    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.4);
 
   }
 
@@ -116,9 +118,16 @@ namespace Belle2 {
     // Convert SimHits one by one to digitizer hits.
     //---------------------------------------------------------------------
 
-    // Get number of hits in this event
+    // We try to include the effect of opposite-polarity crosstalk among channels
+    // on each chip, which depend on number of p.e. on chip
+
+    std::map<pair<int, int>, int> photoElectrons; // this contains number of photoelectrons falling on each channel
+    std::map<pair<int, int>, int> chipHits; // this contains number of photoelectrons on each chip
+
+    // Get number of photon hits in this event
     int nHits = arichSimHits.getEntries();
-    // Loop over all hits
+
+    // Loop over all photon hits
     for (int iHit = 0; iHit < nHits; ++iHit) {
 
       ARICHSimHit* aSimHit = arichSimHits[iHit];
@@ -126,7 +135,7 @@ namespace Belle2 {
       // check for time window
       double globaltime = aSimHit->getGlobalTime();
 
-      if (globaltime < 0 || globaltime > m_timeWindow) continue;
+      if (globaltime < 0. || globaltime > m_timeWindow) continue;
 
       TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
 
@@ -138,24 +147,51 @@ namespace Belle2 {
       if (channelID < 0 || !m_arichgp->isActive(moduleID, channelID)) continue;
       // apply channel dependent QE scale factor
       double qe_scale =  m_arichgp->getChannelQE(moduleID, channelID) / m_maxQE;
-      if (qe_scale > 1) B2ERROR("Channel QE is higher than QE  applied in SensitiveDetector");
-      if (gRandom->Uniform(1) > qe_scale) continue;
+      if (qe_scale > 1.) B2ERROR("Channel QE is higher than QE applied in SensitiveDetector");
+      if (gRandom->Uniform(1.) > qe_scale) continue;
 
-      // Check if channel already registered hit in this event (no multiple hits)
-      bool newhit = true;
-      int nSig = arichDigits.getEntries();
-      for (int iSig = 0; iSig < nSig; ++iSig) {
-        ARICHDigit* aHit = arichDigits[iSig];
-        if (aHit->getModuleID() == moduleID && aHit->getChannelID() == channelID) { newhit = false; break; }
+      // photon was converted to photoelectron
+      chipHits[make_pair(moduleID, channelID / 36)] += 1;
+      photoElectrons[make_pair(moduleID, channelID)] += 1;
+
+    }
+
+    // loop over produced photoelectrons. Apply suppression due to the reverse polarization crosstalk
+    // among channels on the same chip, and produce hit bitmap (4 bits).
+
+    for (std::map<std::pair<int, int> , int>::iterator it = photoElectrons.begin(); it != photoElectrons.end(); ++it) {
+
+      std::pair<int, int> modch = it->first;
+      double npe = double(it->second);
+
+      // reduce efficiency
+      npe /= (1.0 + m_arichgp->getChipNegativeCrosstalk() * (double(chipHits[make_pair(modch.first, modch.second / 36)]) - 1.0));
+      if (npe < 1.0 && gRandom->Uniform(1) > npe) continue;
+
+      // Make hit bitmap (depends on number of p.e. on channel). For now bitmap is 0001 for signle p.e., 0011 for 2 p.e., ...
+      // More proper implementation is to be done ...
+      uint8_t bitmap = 0;
+      for (int i = 0; i < npe; i++) {
+        bitmap |= 1 << i;
+        if (i == 3) break;
       }
-      if (!newhit) continue;
 
-      // register new digit
-      arichDigits.appendNew(moduleID, channelID, globaltime);
+      // make new digit!
+      arichDigits.appendNew(modch.first, modch.second, bitmap);
 
-    } // for iHit
+    }
+
+    //--- add electronic noise hits
+    uint8_t bitmap = 1;
+    for (int id = 1; id < m_arichgp->getNMCopies() + 1; id++) {
+      int nbkg = gRandom->Poisson(m_bkgLevel);
+      for (int i = 0; i < nbkg; i++) {
+        arichDigits.appendNew(id, gRandom->Integer(144), bitmap);
+      }
+    }
 
     m_nEvent++;
+
   }
 
   void ARICHDigitizerModule::endRun()

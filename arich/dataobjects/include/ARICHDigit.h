@@ -13,6 +13,7 @@
 
 // ROOT
 #include <framework/datastore/RelationsObject.h>
+#include <stdint.h>
 
 namespace Belle2 {
 
@@ -29,7 +30,7 @@ namespace Belle2 {
     ARICHDigit():
       m_moduleID(-1),
       m_channelID(-1),
-      m_globalTime(0.0)
+      m_bitmap(0)
     {
       /*! does nothing */
     }
@@ -40,11 +41,11 @@ namespace Belle2 {
       \param channelID Id number of hit channel
       \param globalTime global time of hit
      */
-    ARICHDigit(int moduleID, int channelID, double globalTime)
+    ARICHDigit(int moduleID, int channelID, uint8_t bitmap)
     {
       m_moduleID = moduleID;
       m_channelID = channelID;
-      m_globalTime = (float) globalTime;
+      m_bitmap = bitmap;
     }
 
     //! Destructor
@@ -60,7 +61,8 @@ namespace Belle2 {
     int getChannelID() const { return m_channelID; }
 
     //! Get global time of hit
-    double getGlobalTime() const { return m_globalTime; }
+    uint8_t getBitmap() const { return m_bitmap; }
+
     /*
     //! Set ID number of module that registered hit
     void setModuleID(int moduleID) { m_moduleID = moduleID; }
@@ -75,9 +77,8 @@ namespace Belle2 {
 
     int m_moduleID;           /**< ID number of module that registered hit */
     int m_channelID;          /**< ID number of hit channel */
-    float m_globalTime;      /**< Global time of hit */
-
-    ClassDef(ARICHDigit, 1); /**< the class title */
+    uint8_t m_bitmap;          /**< bitmap */
+    ClassDef(ARICHDigit, 2); /**< the class title */
 
   };
 

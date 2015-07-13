@@ -449,6 +449,9 @@ namespace Belle2 {
         int modID = h->getModuleID();
 
         TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
+
+
+
         int nfoo[c_noOfHypotheses];
         for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; nfoo[iHyp] = nDetPhotons[iHyp];}
 
@@ -465,6 +468,10 @@ namespace Belle2 {
           for (int mirr = 0; mirr < refl; mirr++) {
             // calculate fi_ch for a given track refl
             TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
+
+            // if hit is more than 15cm from the track position on the detector plane, skip it.
+            // (not reconstructing hits with irrelevantly large Cherenkov angle)
+            if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
 
             if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &refractiveInd[iAerogel], &zaero[iAerogel],
                                 nAerogelLayers - iAerogel) < 0)  continue;

@@ -128,6 +128,8 @@ namespace Belle2 {
     double getQEScaling();
     //! get absorbtion probability for photons internally reflected in HAPD window
     double getWindowAbsorbtion();
+    //! get factor to suppress p.e. detection efficiency due to negative polarity crosstalk among chip channels
+    double getChipNegativeCrosstalk();
     //! set transmission length of "ilayer" aerogel layer
     void setAeroTransLength(int ilayer, double trlen);
     //! set refractive index of "ilayer" aerogel layer
@@ -197,6 +199,7 @@ namespace Belle2 {
     int m_NpointsQE;                      /*!< number of QE data points */
     double m_qeScale;                     /*!< QE scale factor for photons internally reflected in HAPD window */
     double m_windowAbsorbtion;            /*!< absorbtion probability for photons internally reflected in HAPD window */
+    double m_chipNegativeCrosstalk;       /*!< to simulate opposite polarity crosstalk among channels on chip */
     double m_QE[MAXPTS_QE];               /*!< quantum efficiency curve */
 
 
@@ -359,6 +362,10 @@ namespace Belle2 {
     return m_windowAbsorbtion;
   }
 
+  inline double ARICHGeometryPar::getChipNegativeCrosstalk()
+  {
+    return m_chipNegativeCrosstalk;
+  }
 
 
 } // end of namespace Belle2

@@ -125,6 +125,7 @@ namespace Belle2 {
     m_detZpos = detParams.getLength("Plane/zPosition");
     m_qeScale = detParams.getDouble("Module/qeScale");
     m_windowAbsorbtion = detParams.getDouble("Module/windowAbsorbtion");
+    m_chipNegativeCrosstalk = detParams.getDouble("Module/chipNegativeCrosstalk");
     string Type = content.getString("@type", "");
     if (Type == "beamtest") return;
     m_detInnerRadius = detParams.getLength("Plane/tubeInnerRadius");

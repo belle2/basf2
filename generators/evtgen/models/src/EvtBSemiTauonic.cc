@@ -142,7 +142,7 @@ void EvtBSemiTauonic::init()
         -1 /*dummy for D*mass*/);
     m_CalcAmp = new EvtBSemiTauonicScalarMesonAmplitude();
   } else {
-    report(ERROR, "EvtGen") << "BSemiTauonic model handles only scalar and vector meson daughters. Sorry." << endl;
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BSemiTauonic model handles only scalar and vector meson daughters. Sorry." << endl;
     ::abort();
   }
 }

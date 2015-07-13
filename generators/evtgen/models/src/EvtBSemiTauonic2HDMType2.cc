@@ -164,7 +164,8 @@ void EvtBSemiTauonic2HDMType2::init()
         -1 /*dummy for D*mass*/);
     m_CalcAmp = new EvtBSemiTauonicScalarMesonAmplitude();
   } else {
-    report(ERROR, "EvtGen") << "BSemiTauonic2HDMType2 model handles only scalar and vector meson daughters. Sorry." << endl;
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BSemiTauonic2HDMType2 model handles only scalar and vector meson daughters. Sorry." <<
+                                         endl;
     ::abort();
   }
 }

@@ -152,8 +152,9 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
   double spinprob = abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1])
                     + abs2(spinamp[2][0]) + abs2(spinamp[2][1]);
   if (fabs(helprob - spinprob) / helprob > 1E-6 || !finite(helprob) || !finite(spinprob)) {
-    report(ERROR, "EvtGen") << "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan."
-                            << std::endl;
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") <<
+                                         "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan."
+                                         << std::endl;
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
     fprintf(stderr, "w: %g costau: %g hel probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",

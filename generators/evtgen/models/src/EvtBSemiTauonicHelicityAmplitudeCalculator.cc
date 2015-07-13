@@ -54,7 +54,8 @@ EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalc
   std::cout << "D* meson mass: " << m_mDst << std::endl;
 }
 
-EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalculator(const double rho12, const double rhoA12, const double ffR11, const double ffR21, const double aS1, const double aR3,
+EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalculator(const double rho12, const double rhoA12,
+    const double ffR11, const double ffR21, const double aS1, const double aR3,
     const double bottomMass, const double charmMass,
     const EvtComplex& CV1, const EvtComplex& CV2, const EvtComplex& CS1, const EvtComplex& CS2, const EvtComplex& CT,
     const double parentMass, const double DMass, const double DstarMass)
@@ -107,7 +108,8 @@ EvtComplex EvtBSemiTauonicHelicityAmplitudeCalculator::helAmp(double mtau, int t
 }
 
 // Total amplitude
-EvtComplex EvtBSemiTauonicHelicityAmplitudeCalculator::helAmp(const EvtComplex& CV1, const EvtComplex& CV2, const EvtComplex& CS1, const EvtComplex& CS2, const EvtComplex& CT,
+EvtComplex EvtBSemiTauonicHelicityAmplitudeCalculator::helAmp(const EvtComplex& CV1, const EvtComplex& CV2, const EvtComplex& CS1,
+    const EvtComplex& CS2, const EvtComplex& CT,
     double mtau, int tauhel, int Dhel, double w, double costau) const
 {
   // sanity check

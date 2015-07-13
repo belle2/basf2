@@ -92,10 +92,10 @@ void EvtYmSToYnSpipiCLEOboost::init()
 
   if ((!(getDaug(1) == PIP && getDaug(2) == PIM)) &&
       (!(getDaug(1) == PI0 && getDaug(2) == PI0))) {
-    report(ERROR, "EvtGen") << "EvtYmSToYnSpipiCLEOboost generator expected "
-                            << " pi+ and pi- (or pi0 and pi0) "
-                            << "as 2nd and 3rd daughter. " << endl;
-    report(ERROR, "EvtGen") << "Will terminate execution!" << endl;
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "EvtYmSToYnSpipiCLEOboost generator expected "
+                                         << " pi+ and pi- (or pi0 and pi0) "
+                                         << "as 2nd and 3rd daughter. " << endl;
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Will terminate execution!" << endl;
     ::abort();
   }
 
@@ -134,7 +134,7 @@ void EvtYmSToYnSpipiCLEOboost::decay(EvtParticle* p)
   double M_mS = p->getP4().mass();
   double M_nS = v->getP4().mass();
 
-  // //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "M_nS = " << v->getP4().mass() << endl;
+  // //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "M_nS = " << v->getP4().mass() << endl;
 
   EvtVector4R P_nS;
   EvtVector4R P_pi1;
@@ -151,7 +151,7 @@ void EvtYmSToYnSpipiCLEOboost::decay(EvtParticle* p)
 
     double mX = EvtRandom::Flat(2.0 * m_pi, M_mS - M_nS);
 
-    //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "m_X = " << mX << endl;
+    //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "m_X = " << mX << endl;
 
     // Now create a two-body decay from the Y(mS) in its rest frame
     // of Y(mS) -> Y(nS) + X
@@ -190,7 +190,7 @@ void EvtYmSToYnSpipiCLEOboost::decay(EvtParticle* p)
       costheta = - p4[1].dot(P_YmS_X) / (p4[1].d3mag() * P_YmS_X.d3mag());
     }
 
-    // //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "cos(theta) = " << costheta << endl;
+    // //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "cos(theta) = " << costheta << endl;
 
 
 
@@ -257,10 +257,10 @@ void EvtYmSToYnSpipiCLEOboost::decay(EvtParticle* p)
   s1->init(getDaugs()[1], P_pi1);
   s2->init(getDaugs()[2], P_pi2);
 
-  //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "M_nS = " << v->getP4().mass() << endl;
-  //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "m_pi = " << s1->getP4().mass() << endl;
-  //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "m_pi = " << s2->getP4().mass() << endl;
-  //   report(INFO,"EvtYmSToYnSpipiCLEOboost")  << "M2 = "   << M2 << endl;
+  //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "M_nS = " << v->getP4().mass() << endl;
+  //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "m_pi = " << s1->getP4().mass() << endl;
+  //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "m_pi = " << s2->getP4().mass() << endl;
+  //   EvtGenReport(EVTGEN_INFO,"EvtYmSToYnSpipiCLEOboost")  << "M2 = "   << M2 << endl;
 
   // Pass the polarization of the parent Upsilon
   EvtVector4C ep0, ep1, ep2;

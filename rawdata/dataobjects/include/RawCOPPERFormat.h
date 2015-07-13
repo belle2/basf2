@@ -241,7 +241,7 @@ namespace Belle2 {
     //    virtual int* GetFTSW2Words(int n) = 0;
 
     //! get b2l block from "FEE b2link header"
-    virtual int* GetExpRunBuf(int n) = 0;
+    virtual int* GetExpRunSubrunBuf(int n) = 0;
 
     //! get b2l block from "FEE b2link header"
     virtual unsigned int GetB2LFEE32bitEventNumber(int n) = 0;

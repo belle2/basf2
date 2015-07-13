@@ -205,7 +205,7 @@ namespace Belle2 {
     //    virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from "FEE b2link header"
-    virtual int* GetExpRunBuf(int n);
+    virtual int* GetExpRunSubrunBuf(int n);
 
     //! get b2l block from "FEE b2link header"
     virtual unsigned int GetB2LFEE32bitEventNumber(int n);
@@ -531,10 +531,10 @@ namespace Belle2 {
     return m_access->Get4thDetectorBuffer(n);
   }
 
-  inline int* RawCOPPER::GetExpRunBuf(int n)
+  inline int* RawCOPPER::GetExpRunSubrunBuf(int n)
   {
     CheckVersionSetBuffer();
-    return m_access->GetExpRunBuf(n);
+    return m_access->GetExpRunSubrunBuf(n);
   }
 
   inline unsigned int RawCOPPER::GetMagicDriverHeader(int n)

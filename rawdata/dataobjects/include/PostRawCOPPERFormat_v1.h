@@ -91,7 +91,7 @@ namespace Belle2 {
     //    virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from "FEE b2link header"
-    virtual int* GetExpRunBuf(int n);
+    virtual int* GetExpRunSubrunBuf(int n);
 
     //! get b2l block from "FEE b2link header"
     virtual unsigned int GetB2LFEE32bitEventNumber(int n);
@@ -261,7 +261,7 @@ namespace Belle2 {
     return NULL;
   }
 
-  inline int* PostRawCOPPERFormat_v1::GetExpRunBuf(int n)
+  inline int* PostRawCOPPERFormat_v1::GetExpRunSubrunBuf(int n)
   {
     int pos_nwords = GetBufferPos(n) + tmp_header.POS_EXP_RUN_NO;
     return &(m_buffer[ pos_nwords ]);

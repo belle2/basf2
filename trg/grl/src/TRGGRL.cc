@@ -169,7 +169,7 @@ void
 TRGGRL::simulate(void) {
 
 	TRGCDC *_cdc = Belle2::TRGCDC::getTRGCDC();
-	vector<TRGCDCTrack *> trackList = _cdc->getTrackList();
+	vector<TRGCDCTrack *> trackList = _cdc->getTrackList2D();
 	vector<TRGCDCTrack *> trackList3D = _cdc->getTrackList3D();
 	StoreArray<TRGECLCluster> ClusterArray;
 

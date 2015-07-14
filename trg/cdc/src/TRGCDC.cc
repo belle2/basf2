@@ -13,20 +13,18 @@
 
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
-/////////////////
+
 #include <math.h>
 #include <iostream>
 #include <fstream>
-/////////////////
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-#include "mdst/dataobjects/MCParticle.h"
+#include "rawdata/dataobjects/RawDataBlock.h"
+#include "rawdata/dataobjects/RawCOPPER.h"   
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
-#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
-#include "rawdata/dataobjects/RawDataBlock.h"
-#include "rawdata/dataobjects/RawCOPPER.h"   
+#include "mdst/dataobjects/MCParticle.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/State.h"
@@ -68,7 +66,7 @@
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
 namespace Belle2_TRGCDC {
-Belle2::TRGCDCDisplayRphi * D = 0;
+    Belle2::TRGCDCDisplayRphi * D = 0;
 }
 using namespace Belle2_TRGCDC;
 #endif
@@ -92,7 +90,7 @@ TRGCDC::version(void) const {
 TRGCDC *
 TRGCDC::_cdc = 0;
 
-TRGCDC*
+TRGCDC *
 TRGCDC::getTRGCDC(const string & configFile,
                   unsigned simulationMode,
                   unsigned fastSimulationMode,
@@ -173,17 +171,18 @@ TRGCDC::getTRGCDC(void) {
 }
 
 vector<TCTrack *>
-TRGCDC::getTrackList(void) {
+TRGCDC::getTrackList2D(void) {
+    return _trackList2D;
+}
 
-    return trackList;
-
+vector<TCTrack *>
+TRGCDC::getTrackList2DFitted(void) {
+    return _trackList2DFitted;
 }
 
 vector<TCTrack *>
 TRGCDC::getTrackList3D(void) {
-
-    return trackList3D;
-
+    return _trackList3D;
 }
 
 TRGCDC::TRGCDC(const string & configFile,
@@ -911,8 +910,9 @@ TRGCDC::fastClear(void) {
 void
 TRGCDC::update(bool) {
 
-    trackList.clear();
-    trackList3D.clear();
+    _trackList2D.clear();
+    _trackList2DFitted.clear();
+    _trackList3D.clear();
 
     TRGDebug::enterStage("TRGCDC update");
 
@@ -2004,63 +2004,74 @@ TRGCDC::fastSimulation(void) {
         return;
     }
 
+#ifdef TRGCDC_DISPLAY
+//  dump("hits");
+    string stg = "fast simulation results";
+    string inf = "#segments=" + TRGUtilities::itostring(segmentHits().size());
+    D->clear();
+    D->stage(stg);
+    D->information(inf);
+    D->area().append(hits());
+    D->area().append(segmentHits());
+    D->show();
+    D->run();
+#endif
+
     //...2D finder and fitter...
     if (_perfect2DFinder)
-        _pFinder->doit(trackList);
+        _pFinder->doit(_trackList2DFitted);
     else
-        _hFinder->doit2(trackList);
-
-    if (TRGDebug::level())
-        cout << TRGDebug::tab() << "Number of tracks : " << trackList.size()
-             << endl;
+//      _hFinder->doit(_trackList2D, _trackList2DFitted);
+        _hFinder->doit2(_trackList2D, _trackList2DFitted);
+//      _hFinder->doit3(_trackList2D, _trackList2DFitted);
 
     //...Check MC relations...
-    for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
-        const TCRelation & trackRelation = trackList[iTrack]->relation();
-        const MCParticle & trackMCParticle = trackRelation.mcParticle(0);
+    // for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
+    //     const TCRelation & trackRelation = trackList[iTrack]->relation();
+    //     const MCParticle & trackMCParticle = trackRelation.mcParticle(0);
 
-        if (TRGDebug::level())
-            cout << TRGDebug::tab() << "Pt : "
-                 << trackMCParticle.getMomentum().Pt() << endl;
+    //     if (TRGDebug::level())
+    //         cout << TRGDebug::tab() << "Pt : "
+    //              << trackMCParticle.getMomentum().Pt() << endl;
 
-        //...Whose code?...
-        if (0) {
-            ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
-            vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
-            ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
-            if (trackMCParticle.getCharge()>0)
-                {phiout << (trackMCParticle.getMomentum().Phi()-M_PI/2)
-                        *360/(2*M_PI)<< endl;}
-            if (trackMCParticle.getCharge()<0 &&
-                (trackMCParticle.getMomentum().Phi()+M_PI/2)<0)
-                {phiout << ((trackMCParticle.getMomentum().Phi()+M_PI/2)+
-                            2*M_PI)*360/(2*M_PI)<< endl;}
-            else if(trackMCParticle.getCharge()<0 &&
-                    (trackMCParticle.getMomentum().Phi()+M_PI/2)>0)
-                {phiout << (trackMCParticle.getMomentum().Phi()+M_PI/2)
-                        *360/(2*M_PI)<< endl;}
-        }
+    //     //...Whose code?...
+    //     if (0) {
+    //         ofstream vhdlxOut("/home/ph202/p1p2/MCpt", fstream::app);//test
+    //         vhdlxOut << trackMCParticle.getMomentum().Pt() <<endl;
+    //         ofstream phiout("/home/ph202/p1p2/MCphi", fstream::app);
+    //         if (trackMCParticle.getCharge()>0)
+    //             {phiout << (trackMCParticle.getMomentum().Phi()-M_PI/2)
+    //                     *360/(2*M_PI)<< endl;}
+    //         if (trackMCParticle.getCharge()<0 &&
+    //             (trackMCParticle.getMomentum().Phi()+M_PI/2)<0)
+    //             {phiout << ((trackMCParticle.getMomentum().Phi()+M_PI/2)+
+    //                         2*M_PI)*360/(2*M_PI)<< endl;}
+    //         else if(trackMCParticle.getCharge()<0 &&
+    //                 (trackMCParticle.getMomentum().Phi()+M_PI/2)>0)
+    //             {phiout << (trackMCParticle.getMomentum().Phi()+M_PI/2)
+    //                     *360/(2*M_PI)<< endl;}
+    //     }
 
-        //...Perfect position test...
-        if (trackList.size()) {
-            vector<HepGeom::Point3D<double> > ppos =
-                trackList[0]->perfectPosition();
-            if (TRGDebug::level()) {
-                if (ppos.size() != 9) {
-                    cout << TRGDebug::tab() << "There are only " << ppos.size()
-                         << " perfect positions" << endl;
-                }
-            }
-        }
-    }
+    //     //...Perfect position test...
+    //     if (trackList.size()) {
+    //         vector<HepGeom::Point3D<double> > ppos =
+    //             trackList[0]->perfectPosition();
+    //         if (TRGDebug::level()) {
+    //             if (ppos.size() != 9) {
+    //                 cout << TRGDebug::tab() << "There are only " << ppos.size()
+    //                      << " perfect positions" << endl;
+    //             }
+    //         }
+    //     }
+    // }
 
     //...Stereo finder...
-    _h3DFinder->doit(trackList, m_eventNum);
+    _h3DFinder->doit(_trackList2DFitted, m_eventNum);
 
     //...Check tracks...
     if (TRGDebug::level()) {
-        for (unsigned i = 0; i < trackList.size(); i++) {
-            const TCTrack & t = * trackList[i];
+        for (unsigned i = 0; i < _trackList3D.size(); i++) {
+            const TCTrack & t = * _trackList3D[i];
             cout << ">   links=" << t.links().size() << endl;
             t.dump();
         }
@@ -2068,9 +2079,9 @@ TRGCDC::fastSimulation(void) {
 
     //...Check relations...
     if (TRGDebug::level()) {
-        for (unsigned i = 0; i < trackList.size(); i++) {
+        for (unsigned i = 0; i < _trackList3D.size(); i++) {
             //          trackList[i]->relation().dump();
-            trackList[i]->dump();
+            _trackList3D[i]->dump();
         }
     }
 
@@ -2080,278 +2091,40 @@ TRGCDC::fastSimulation(void) {
 
     //...3D tracker...
     //vector<TCTrack*> trackList3D;
-    _fitter3D->doit(trackList, trackList3D);
-    //_fitter3D->doitComplex(trackList, trackList3D);
+    //_fitter3D->doit(trackList, trackList3D);
+    _fitter3D->doitComplex(_trackList2DFitted, _trackList3D);
 
-
-    //...End of simulation...
-
-    //:::Fill root file:::
-    //...Event Time...
-    TClonesArray & evtTime = *m_evtTime;
-    evtTime.Clear();
-    TVectorD tempEvtTime(1);
-    tempEvtTime[0] = _eventTime.back()->getT0();
-    new(evtTime[0]) TVectorD(tempEvtTime);
-    //...MCParticle...
-    StoreArray<MCParticle> mcParticles;
-    //if (! mcParticles) {
-    //  cout << "TRGCDC !!! can not access to MCParticles" << endl;
-    //  TRGDebug::leaveStage("TRGCDC fast simulation");
-    //  return;
-    //}
-    TClonesArray & fitParameters = *m_fitParameters;
-    TClonesArray & mcParameters = *m_mcParameters;
-    TClonesArray & mcTrack4Vector = *m_mcTrack4Vector;
-    TClonesArray & mcTrackVertexVector = *m_mcTrackVertexVector;
-    TClonesArray & mcTrackStatus = *m_mcTrackStatus;
-    fitParameters.Clear();
-    mcParameters.Clear();
-    mcTrack4Vector.Clear();
-    mcTrackVertexVector.Clear();
-    mcTrackStatus.Clear();
-    int iFit = 0;
-    for (unsigned i = 0; i < trackList3D.size(); i++) {
-        const TCTrack & aTrack = *trackList3D[i];
-        if (aTrack.fitted()) {
-            double fitPt = aTrack.pt();
-            double fitPhi0 = aTrack.helix().phi0();
-            if(aTrack.charge()<0) {
-                fitPhi0 -= M_PI;
-                if (fitPhi0 < 0) fitPhi0 += 2 * M_PI;
-            }
-            double fitZ0 = aTrack.helix().dz();
-            double fitCot = aTrack.helix().tanl();
-            // pT, phi0, z0, cot
-            TVectorD tempFitParameters(4);
-            tempFitParameters[0] = fitPt;
-            tempFitParameters[1] = fitPhi0;
-            tempFitParameters[2] = fitZ0;
-            tempFitParameters[3] = fitCot;
-            new(fitParameters[iFit]) TVectorD(tempFitParameters);
-
-            const TCRelation & trackRelation = aTrack.relation();
-            const MCParticle & trackMCParticle = trackRelation.mcParticle(0);
-            //iw        const TCRelation & trackRelation3D = aTrack.relation3D();
-
-            double mcPt = trackMCParticle.getMomentum().Pt();
-            double mcPhi0 = 0.0;
-            if (trackMCParticle.getCharge() > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
-            if (trackMCParticle.getCharge() < 0) mcPhi0 = trackMCParticle.getMomentum().Phi() + M_PI / 2;
-            // Change range to [0,2pi]
-            if (mcPhi0 < 0) mcPhi0 += 2 * M_PI;
-            double mcZ0 = trackMCParticle.getVertex().Z() / 100;
-            double mcCot = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
-
-            tempFitParameters[0] = mcPt;
-            tempFitParameters[1] = mcPhi0;
-            tempFitParameters[2] = mcZ0;
-            tempFitParameters[3] = mcCot;
-            new(mcParameters[iFit]) TVectorD(tempFitParameters);
-            iFit += 1;
-        } // if fitted
-    } // trackList loop
-
-    // Store trackIDs that make a TS in the superlayer.
-    vector<vector<unsigned > > trackIDsLayer;
-    // Loop over all layers
-    for(unsigned iLayers=0; iLayers<nSegmentLayers(); iLayers++){
-        trackIDsLayer.push_back(vector<unsigned>());
-        // Loop over all TS in superlayer.
-        vector<const TCSHit *> const & hits = segmentHits(iLayers);
-        for(unsigned j=0; j<hits.size(); j++) {
-            const TCWHit * wh = hits[j]->segment().center().hit();
-            if(! wh) continue;
-            const unsigned trackID = wh->iMCParticle();
-            //cout<<"Found trackID "<<trackID<<" in Layer["<<iLayers<<"]? "<<binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), trackID)<<endl;
-            if(! binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), trackID)){
-                trackIDsLayer[iLayers].push_back(trackID);
-                //cout<<"Layer: "<<iLayers<<" trackID: "<<trackID<<endl;
-            }
-            // For comparing
-            sort(trackIDsLayer[iLayers].begin(),trackIDsLayer[iLayers].end());
-        } // End of loop over all TS in superlayer
-    } // End of loop over all layers
-    // Find common trackIDs.
-    vector<unsigned > trackIDs;
-
-    // Loop over last layer candidates
-    for(unsigned iTS=0; iTS<trackIDsLayer[nSegmentLayers()-1].size(); iTS++){
-        unsigned tempID = trackIDsLayer[nSegmentLayers()-1][iTS];
-        bool trackOK = 1;
-        // Loop over rest of the layers to compare
-        for(unsigned iLayers=0; iLayers<nSegmentLayers()-1; iLayers++){
-            //cout<<"Find "<<tempID<<" in Layer["<<iLayers<<"]: "<<binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), tempID)<<endl;
-            if(! binary_search(trackIDsLayer[iLayers].begin(), trackIDsLayer[iLayers].end(), tempID)){
-                trackOK *= 0; 
-            }
-        } // End of loop over rest of layers
-        if(trackOK==1) {
-            trackIDs.push_back(tempID);
-            //cout<<"trackID OK: "<<tempID<<endl;
-        }
-    } // End of loop over last layer candidates
-
+    if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << "Number of 2D tracks : "
+             << _trackList2D.size() << endl;
+        cout << TRGDebug::tab() << "Number of 2D fitted tracks : "
+             << _trackList2DFitted.size() << endl;
+        cout << TRGDebug::tab() << "Number of 3D tracks : "
+             << _trackList3D.size() << endl;
+    }
+ 
 #ifdef TRGCDC_DISPLAY
-    if (trackList.size() == 0) {
-        cout << "!!! No track found. Display will be stopped" << endl;
-        D->stop();
-    }
-#endif
-    _tracks2D->Clear();
-    for (unsigned i = 0; i < trackList.size(); i++) {
-        const TCTrack & trk = * trackList[i];
-
-        TCHelix h = trk.helix();
-        static const HepGeom::Point3D<double> Origin(0, 0, 0);
-        h.pivot(Origin);
-        const double chg = trk.charge();
-        const double pt = h.momentum().perp();
-        const double phi = h.phi0();
-        const double dr = h.dr();
-
-        const TCRelation & trkRelation = trk.relation();
-        const MCParticle & trkMC = trkRelation.mcParticle(0);
-        TCHelix hMC = TCHelix(
-            HepGeom::Point3D<double>(trkMC.getProductionVertex().x(),
-                                     trkMC.getProductionVertex().y(),
-                                     trkMC.getProductionVertex().z()),
-            CLHEP::Hep3Vector(trkMC.getMomentum().x(),
-                              trkMC.getMomentum().y(),
-                              trkMC.getMomentum().z()),
-            trkMC.getCharge());
-        hMC.pivot(Origin);
-        const double chgMC = trkMC.getCharge();
-        const double ptMC = hMC.momentum().perp();
-        const double phiMC = hMC.phi0();
-        const double drMC = hMC.dr();
-
-        TVectorD tvd(8);
-        tvd[0] = chg;
-        tvd[1] = pt;
-        tvd[2] = phi;
-        tvd[3] = dr;
-        tvd[4] = chgMC;
-        tvd[6] = ptMC;
-        tvd[6] = phiMC;
-        tvd[7] = drMC;
-
-        new((* _tracks2D)[i]) TVectorD(tvd);
-
-        //cout << "drMC = " << drMC << ", drmc2 = " << trkMC.getVertex().X()
-        //     << endl;
-    }
-
-    //...MC track information...
-    const unsigned localSwitch = 0;           // 0:for found MC trk only
-    // 1:for all MC trk
-    // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
-    TVectorD mcStatus(3);
-    int iStoredPart = 0;
-    if (localSwitch == 0) {
-
-        // Loop over all the found mc tracks.
-        for(unsigned i = 0; i < trackIDs.size(); i++) {
-            mcStatus[0] = mcParticles[trackIDs[i]]->getStatus();
-            mcStatus[1] = mcParticles[trackIDs[i]]->getPDG();
-            mcStatus[2] = mcParticles[trackIDs[i]]->getCharge();
-            new(mcTrackStatus[iStoredPart]) TVectorD(mcStatus);
-            new(mcTrack4Vector[iStoredPart])
-                TLorentzVector(mcParticles[trackIDs[i]]->get4Vector());
-            new(mcTrackVertexVector[iStoredPart])
-                TVector3(mcParticles[trackIDs[i]]->getVertex());
-            // cout << "ID: " << mcParticles[i]->getIndex()
-            // 	 << " Status: " << mcParticles[i]->getStatus()
-            // 	 << " PDG: " << mcParticles[i]->getPDG()
-            // 	 << " Charge: " << mcParticles[i]->getCharge()
-            // 	 << " pT: " << mcParticles[i]->get4Vector().Pt()
-            // 	 << endl;
-            iStoredPart += 1;
-        }
-    }
-    else if (localSwitch == 1) {
-
-        //...Get MC contribution list...
-        if (! _perfect2DFinder) {
-	  // vector<TCTrack *> dummyList;
-            _pFinder->doit(trackList);
-        }
-        const vector<int> & trackListMC = _pFinder->trackListMC();
-
-        // cout << "size=" << trackListMC.size() << endl;
-        // for (unsigned i = 0; i < trackListMC.size(); i++) {
-        //     cout << "    " << i << " " << trackListMC[i] << endl;
-        // }
-
-        //...Loop over all MC tracks...
-        for (signed i = 0; i < mcParticles.getEntries(); i++) {
-
-            //...Loop over contribution list...
-            bool found = false;
-            for (unsigned j = 0; j < trackListMC.size(); j++) {
-                if (mcParticles[i]->getIndex() == trackListMC[j]) {
-                    found = true;
-                    break;
-                }
-            }
-
-            //...Check contribution...
-            if (! found) continue;
-
-            //...Check pT...
-            if (mcParticles[i]->getMomentum().Mag() < 0.01) continue;
-
-            mcStatus[0] = mcParticles[i]->getStatus();
-            mcStatus[1] = mcParticles[i]->getPDG();
-            mcStatus[2] = mcParticles[i]->getCharge();
-
-            //...iw special...
-            mcStatus[2] = 0;
-            if (trackList.size())
-                mcStatus[2] += 1;
-            if (trackList3D.size())
-                mcStatus[2] += 10;
-
-            new(mcTrackStatus[iStoredPart]) TVectorD(mcStatus);
-            new(mcTrack4Vector[iStoredPart])
-                TLorentzVector(mcParticles[i]->get4Vector());
-            new(mcTrackVertexVector[iStoredPart])
-                TVector3(mcParticles[i]->getVertex());
-            //  cout << "ID: " << mcParticles[i]->getIndex()
-            // << " Status: " << mcParticles[i]->getStatus()
-            // << " PDG: " << mcParticles[i]->getPDG()
-            // << " Charge: " << mcParticles[i]->getCharge()
-            // << " pT: " << mcParticles[i]->get4Vector().Pt()
-            // << endl;
-            iStoredPart += 1;
-        }
-    }
-
-    //cout<<"Num Tracks: "<<iStoredPart<<endl;
-
-    if (iFit != 0) {
-        m_tree->Fill();
-    }
-    m_treeAllTracks->Fill();
-    _tree2D->Fill();
-
-    m_eventNum += 1;
-
-#ifdef TRGCDC_DISPLAY
-    dump("hits");
-    vector<const TCTrack*> tt;
-    tt.assign(trackList.begin(), trackList.end());
+//  dump("hits");
+    vector<const TCTrack*> t2;
+    t2.assign(_trackList2D.begin(), _trackList2D.end());
+    vector<const TCTrack*> t2f;
+    t2f.assign(_trackList2DFitted.begin(), _trackList2DFitted.end());
+    vector<const TCTrack*> t3;
+    t3.assign(_trackList3D.begin(), _trackList3D.end());
     D->endOfEvent();
-    string stg = "2D : Perfect Finding";
-    string inf = "   ";
+    stg = "fast simulation results";
+    inf = "red:2D, blue:2DF, green:3D";
     D->clear();
     D->stage(stg);
     D->information(inf);
     D->area().append(hits());
     D->area().append(segmentHits());
-    D->area().append(tt);
+    D->area().append(t2, Gdk::Color("red"));
+    D->area().append(t2f, Gdk::Color("blue"));
+    D->area().append(t3, Gdk::Color("green"));
     D->show();
     D->run();
+
     //     unsigned iFront = 0;
     //     while (const TCFrontEnd * f = _cdc.frontEnd(iFront++)) {
     //         D->clear();

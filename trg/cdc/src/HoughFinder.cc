@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------------------------
 // Filename : HoughFinder.cc
@@ -20,16 +20,25 @@
 #include <map>
 #include <iostream>
 #include <fstream>
+#include "TFile.h"
+#include "TTree.h"
+#include "framework/datastore/StoreArray.h"
+#include "framework/datastore/RelationArray.h"
+#include "cdc/geometry/CDCGeometryPar.h"
+#include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"
+#include "trg/trg/Utilities.h"
+#include "trg/trg/Time.h"
+#include "trg/trg/Signal.h"
+#include "trg/trg/Constants.h"
+#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Cell.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
-#include "cdc/geometry/CDCGeometryPar.h"
-#include "cdc/dataobjects/CDCHit.h"
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
@@ -37,34 +46,21 @@
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
-//////////////////////////////////
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Fitter3D.h"
-#include "trg/trg/Time.h"
-#include "trg/trg/Signal.h"
 #include "trg/cdc/Helix.h"
 #include "trg/cdc/FpgaUtility.h"
 #include "trg/cdc/JLUT.h"
 #include "trg/cdc/JSignal.h"
 #include "trg/cdc/JSignalData.h"
-
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
-#include "cdc/dataobjects/CDCSimHit.h"
-#include "trg/trg/Channel.h"
-#include "trg/trg/Utilities.h"
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Relation.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
-#include "trg/trg/Constants.h"
 #include "trg/cdc/EventTime.h"
-#include "TFile.h"
-#include "TTree.h"
-//////////////////////////////////
+
 #ifdef TRGCDC_DISPLAY_HOUGH
 #include "trg/cdc/DisplayRphi.h"
 #include "trg/cdc/DisplayHough.h"
@@ -214,9 +210,10 @@ TRGCDCHoughFinder::~TRGCDCHoughFinder() {
 }
 
 int
-TRGCDCHoughFinder::doFinding(vector<TCTrack *> & trackList) {
+TRGCDCHoughFinder::doFinding(vector<unsigned> peaks[],
+                             vector<TCTrack *> & trackList2D) const {
 
-    const string sn = "HoughFinder::doFinding";
+    const string sn = "Hough Finder Finding (trasan version)";
     TRGDebug::enterStage(sn);
 
     //...Initialization...
@@ -251,72 +248,24 @@ TRGCDCHoughFinder::doFinding(vector<TCTrack *> & trackList) {
 #endif
 
     //...Look for peaks which have 5 hits...
-    vector<unsigned> serialIds[2];
-    _peakFinder.peaks6(* _plane[0], _peakMin, false, serialIds[0]);
-    _peakFinder.peaks6(* _plane[1], _peakMin, false, serialIds[1]);
+    _peakFinder.peaks6(* _plane[0], _peakMin, false, peaks[0]);
+    _peakFinder.peaks6(* _plane[1], _peakMin, false, peaks[1]);
 
-    //...Peak loop...
-    unsigned nCircles = 0;
+    //...Peak loop to pick up segment hits...
+    // (no fit, using peak position only)
     for (unsigned pm = 0; pm < 2; pm++) {
-	for (unsigned i = 0; i < serialIds[pm].size(); i++) {
-	    const unsigned peakId = serialIds[pm][i];
-
-	    //...Get segment hits...
-	    vector<TCLink *> links;
-	    vector<const TCSegment *> segments;
-	    const unsigned nLayers = _plane[pm]->nLayers();
-	    for (unsigned j = 0; j < nLayers; j++) {
-		const vector<unsigned> & ptn =
-		    _plane[pm]->patternId(j, peakId);
-		for (unsigned k = 0; k < ptn.size(); k++) {
-		    const TCSegment & s = _cdc.axialSegment(j, ptn[k]);
-		    segments.push_back(& s);
-		    if (s.hit()) {
-			TCLink * l = new TCLink(0, s.hit());
-			links.push_back(l);
-		    }
-		}
-	    }
-
-	    //...Select best hits in each layer...
-	    const vector<TCLink *> bests = selectBestHits(links);
-
-	    //...Make a circle...
-	    TCCircle * cptr = new TCCircle(bests);
-	    TCCircle & c = * cptr;
-	    c.fit();
-	    c.name("CircleFitted_" + TRGUtil::itostring(nCircles));
-	    ++nCircles;
-
-	    if (TRGDebug::level()) {
-		cout << TRGDebug::tab() << "peak#" << nCircles << ":"
-		     << "plane" << pm << ",serialId=" << peakId << endl;
-		cout << TRGDebug::tab() << "segments below" << endl;
-		cout << TRGDebug::tab(4);
-		for (unsigned j = 0; j < segments.size(); j++) {
-		    cout << segments[j]->name();
-		    if (j != (segments.size() - 1))
-			cout << ",";
-		}
-		cout << endl;
-		cout << TRGDebug::tab() << "best links below" << endl;
-		TCLink::dump(bests, "", TRGDebug::tab(4));
- 		c.dump("detail", TRGDebug::tab() + "Circle> ");
-	    }
+	for (unsigned i = 0; i < peaks[pm].size(); i++) {
+	    const unsigned peakId = peaks[pm][i];
 
 	    //...Make a track...
-	    TCTrack & t = * new TCTrack(c);
-	    t.name("Track_" + TRGUtil::itostring(i));
-	    trackList.push_back(& t);
-	    if (TRGDebug::level()) {
-		t.relation().dump("", "        MCInfo");
-		t.dump("detail");
-	    }
+            TCTrack * t = makeTrack(peakId, pm);
+            trackList2D.push_back(t);
+
 #ifdef TRGCDC_DISPLAY_HOUGH
-	    vector<const TCCircle *> cc;
-	    cc.push_back(& c);
-	    stg = "2D : Peak Finding & circle making";
-	    inf = "   ";
+	    vector<const TCTrack *> cc;
+	    cc.push_back(t);
+	    const string stg = "doFinding : track made";
+	    const string inf = "   ";
 	    D->clear();
 	    D->stage(stg);
 	    D->information(inf);
@@ -326,10 +275,6 @@ TRGCDCHoughFinder::doFinding(vector<TCTrack *> & trackList) {
 	    D->show();
 	    D->run();
 #endif
-
- 	    //...Delete a circle...
- 	    delete cptr;
-
 	}
     }
 
@@ -374,250 +319,85 @@ TRGCDCHoughFinder::selectBestHits(const vector<TCLink *> & links) const {
 }
 
 int
-TRGCDCHoughFinder::doFitting(vector<TCTrack *> & trackList){
+TRGCDCHoughFinder::doFitting(vector<unsigned> peaks[],
+                             vector<TRGCDCTrack *> & trackList2DFitted) const {
 
-    const string sn = "Hough FinderFitting";
+    const string sn = "Hough Finder Fitting (trasan version)";
     TRGDebug::enterStage(sn);
 
-    if(m_commonData==0){
-        m_commonData = new Belle2::TRGCDCJSignalData();
-    }
+    //...Peak loop...
+    unsigned nCircles = 0;
+    for (unsigned pm = 0; pm < 2; pm++) {
+	for (unsigned i = 0; i < peaks[pm].size(); i++) {
+	    const unsigned peakId = peaks[pm][i];
 
-    //...Event time...
-    bool fEvtTime = true;
-    double eventTime = fEvtTime ? _cdc.getEventTime() : 0;
-    if (! fEvtTime)
-        eventTime = 0;
-    else
-        eventTime = _cdc.getEventTime();
+	    //...Get segment hits...
+	    vector<TCLink *> links;
+	    vector<const TCSegment *> segments;
+	    const unsigned nLayers = _plane[pm]->nLayers();
+	    for (unsigned j = 0; j < nLayers; j++) {
+		const vector<unsigned> & ptn =
+		    _plane[pm]->patternId(j, peakId);
+		for (unsigned k = 0; k < ptn.size(); k++) {
+		    const TCSegment & s = _cdc.axialSegment(j, ptn[k]);
+		    segments.push_back(& s);
+		    if (s.hit()) {
+			TCLink * l = new TCLink(0, s.hit());
+			links.push_back(l);
+		    }
+		}
+	    }
 
-    // Loop over all tracks
-    for(unsigned int iTrack=0; iTrack<trackList.size(); iTrack++){
-	TCTrack & aTrack = * trackList[iTrack];
-	CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
-	double phi02D, pt2D, Trg_PI;
-	vector<double> nWires(9);
-	vector<double> rr(9);
-	vector<double> rr2D;
-//	vector<double> wirePhi2DError({0.0085106, 0.0039841, 0.0025806, 0.0019084, 0.001514});
-	vector<double> wirePhi2DError(5);
-	wirePhi2DError[0] = 0.0085106;
-	wirePhi2DError[1] = 0.0039841;
-	wirePhi2DError[2] = 0.0025806;
-	wirePhi2DError[3] = 0.0019084;
-	wirePhi2DError[4] = 0.001514;
-//	vector<double> driftPhi2DError({0.0085106, 0.0039841, 0.0025806, 0.0019084, 0.001514});
-	vector<double> driftPhi2DError(5);
-	driftPhi2DError[0] = 0.0085106;
-	driftPhi2DError[1] = 0.0039841;
-	driftPhi2DError[2] = 0.0025806;
-	driftPhi2DError[3] = 0.0019084;
-	driftPhi2DError[4] = 0.001514;
-	Trg_PI = 3.141592653589793;
-        // Check if all superlayers have one TS
-        bool trackFull=1;
-        for (unsigned iSL = 0; iSL < _cdc.nSuperLayers(); iSL=iSL+2) {
-            // Check if all superlayers have one TS
-            const vector<TCLink *> & links = aTrack.links(iSL);
-            const unsigned nSegments = links.size();
+	    //...Select best hits in each layer...
+	    const vector<TCLink *> bests = selectBestHits(links);
 
-            if (TRGDebug::level())
-                cout << TRGDebug::tab() << "#segments in SL" << iSL << " : "
-                     << nSegments << endl;
+	    //...Make a circle...
+	    TCCircle c(bests);
+	    c.fit();
+	    c.name("CircleFitted_" + TRGUtil::itostring(nCircles));
+	    ++nCircles;
 
-            // Find if there is a TS with a priority hit.
-            // Loop over all TS in same superlayer.
-            bool priorityHitTS = 0;
-            for (unsigned iTS = 0; iTS < nSegments; iTS++) {
-                const TCSegment * _segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
-                if (_segment->center().hit() != 0)  priorityHitTS = 1;
-            }
-            if(nSegments != 1) {
-                if (nSegments == 0){
-                    trackFull = 0;
-                    if (TRGDebug::level())
-                        cout << TRGDebug::tab()
-                             << "=> Not enough TS." << endl;
-                }
-                else {
-                    if (TRGDebug::level())
-                        cout << TRGDebug::tab()
-                             << "=> multiple TS are assigned." << endl;
-                }
-            }
-            else{
-                if(priorityHitTS == 0){
-                    trackFull = 0;
-                    if (TRGDebug::level())
-                        cout << TRGDebug::tab()
-                             << "=> There are no priority hit TS"<<endl;
-                }	 
-            }
-        } // End superlayer loop
-        if(trackFull == 0){
-            TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
-            CLHEP::HepVector helixParameters(5);
-            helixParameters = aTrack.helix().a();
-            aTrack.setFitted(0);
-            aTrack.setHelix(helix);
-            continue;
-        }
+	    if (TRGDebug::level()) {
+		cout << TRGDebug::tab() << "peak#" << nCircles << ":"
+		     << "plane" << pm << ",serialId=" << peakId << endl;
+		cout << TRGDebug::tab() << "segments below" << endl;
+		cout << TRGDebug::tab(4);
+		for (unsigned j = 0; j < segments.size(); j++) {
+		    cout << segments[j]->name();
+		    if (j != (segments.size() - 1))
+			cout << ",";
+		}
+		cout << endl;
+		cout << TRGDebug::tab() << "best links below" << endl;
+		TCLink::dump(bests, "", TRGDebug::tab(1));
+ 		c.dump("detail", TRGDebug::tab() + "Circle> ");
+	    }
 
-	for(unsigned iSL=0; iSL<9; iSL++){
-            unsigned _layerId = _cdc.segment(iSL,0).center().layerId();
-            rr[iSL] = cdcp.senseWireR(_layerId);
-            nWires[iSL] = cdcp.nWiresInLayer(_layerId)*2;
+	    //...Make a track...
+	    TCTrack & t = * new TCTrack(c);
+	    t.name("Track_" + TRGUtil::itostring(i));
+	    trackList2DFitted.push_back(& t);
+
+	    if (TRGDebug::level()) {
+		t.relation().dump("", TRGDebug::tab());
+		t.dump("detail", TRGDebug::tab(1));
+	    }
+
+#ifdef TRGCDC_DISPLAY_HOUGH
+	    vector<const TCCircle *> cc;
+	    cc.push_back(& c);
+	    const string stg = "doFitting : trasan method";
+	    const string inf = "   ";
+	    D->clear();
+	    D->stage(stg);
+	    D->information(inf);
+	    D->area().append(_cdc.hits());
+	    D->area().append(_cdc.segmentHits());
+	    D->area().append(cc, Gdk::Color("blue"));
+	    D->show();
+	    D->run();
+#endif
 	}
-	rr2D = vector<double>({rr[0],rr[2],rr[4],rr[6],rr[8]});
-
-//	double eventNumber;
-//	eventNumber = _cdc.getEventNumber();
-
-	// Get wirePhi, Drift information
-	vector<double>wirePhi(9);
-	vector<double>driftLength(9);
-	vector<double>LR(9);
-	vector<double>lutLR(9);
-	vector<double>mcLR(9);
-	bool fmcLR=false, fLRLUT=true;
-	for (unsigned iSL = 0; iSL < 9; iSL=iSL+2) {
-            const vector<TCLink *> & links = aTrack.links(iSL);
-//	cout<<"nLinks: "<<aTrack.links(iSL).size()<<endl;
-//	cout<<"linkHit: "<<links[0]->hit()<<endl;
-            const TCSegment * _segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
-            wirePhi[iSL] =  _segment->localId()/nWires[iSL]*4*Trg_PI;
-//	cout<<"wirePhi: "<< _segment->localId()/nWires[iSL]*4*Trg_PI<<endl;
-            lutLR[iSL] = _segment->LUT()->getValue(_segment->lutPattern());
-//	cout<<"iSL: "<<iSL<<" "<<_segment->hit()<<endl;
-            mcLR[iSL] = _segment->hit()->mcLR();
-            driftLength[iSL] = _segment->hit()->drift();
-//	cout<<"driftLength: "<<_segment->hit()->drift()<<endl;
-            if(fmcLR==1) LR[iSL] = mcLR[iSL];
-            else if(fLRLUT==1) LR[iSL] = lutLR[iSL];
-            else LR[iSL] = 3;
-	}//End superlayer loop
-	// 2D fit values from IW 2D fitter
-	phi02D = aTrack.helix().phi0();
-	pt2D = aTrack.helix().curv()*0.01*0.3*1.5;
-	if(aTrack.charge()<0) {
-            phi02D = phi02D-Trg_PI;
-	    if(phi02D < 0) phi02D = phi02D + 2 * Trg_PI;
-	    pt2D = pt2D * -1;
-	}
-//cout << "#######" <<endl;
-//cout << "phi2D= " << phi02D << endl;
-//cout << "pt2D= " << pt2D << endl;
-//cout << "#######"<<endl;
-///////// Get 2D fit values from JB 2D fitter
-//	double charge = aTrack.charge();
-        // Set phi2DError for 2D fit
-	vector<double>phi2DError(5);
-        for (unsigned iAx = 0; iAx < 5; iAx++) {
-            if(LR[2*iAx] != 2) phi2DError[iAx] = driftPhi2DError[iAx];
-            else phi2DError[iAx] = wirePhi2DError[iAx];
-	}
-        // Calculate phi2D using driftTime.
-	vector<double>phi2D(5);
-        for (unsigned iAx = 0; iAx < 5; iAx++) {
-            phi2D[iAx] = Fitter3DUtility::calPhi(wirePhi[iAx*2],
-                                                 driftLength[iAx*2],
-                                                 eventTime,
-                                                 rr[iAx*2],
-                                                 LR[iAx*2]);
-            if (TRGDebug::level()) {
-                cout << TRGDebug::tab() << "eventTime: " << eventTime << endl;
-                for (int i = 0 ; i<5 ; i++) { 
-                    cout << TRGDebug::tab() << "phi2D: : " << phi2D[i] << endl;
-                    cout << TRGDebug::tab() << "wirePhi: " << wirePhi[i*2]
-                         << endl;
-                    cout << TRGDebug::tab() << "driftLength: " <<
-                        driftLength[i*2] << endl;
-                    cout << TRGDebug::tab() <<"LR: " << LR[i * 2] << endl;
-                }
-            }
-        }
-	// Fit2D
-        double rho, phi0, pt;
-        rho = 0;
-        phi0 = 0;
-	pt = 0;
-        Fitter3DUtility::rPhiFit(&rr2D[0],&phi2D[0],&phi2DError[0],rho, phi0);
-
-        pt = 0.3*1.5*rho/100;
-
-        if (TRGDebug::level()) {
-            cout << TRGDebug::tab() << "rho: " << rho << endl;
-            cout << TRGDebug::tab() << "pt:  " << pt << endl;
-        }
-//ofstream fitout("/home/belle2/kaiyu/2DFit/Pt", fstream::app);//test
-//	fitout<<pt<<endl;
-//ofstream dout("/home/belle2/kaiyu/2DFit/den", fstream::app);
-//      dout<<den<<endl;
-
-        /// LUT values
-	double rhoMin = 67;
-	double rhoMax = 1600;
-        int phiBitSize = 12;
-	int rhoBitSize = 12;
-	// Change to Signals
-        {
-            vector<tuple<string, double, int, double, double, int> > t_values = {
-                make_tuple("phi_0", phi2D[0], phiBitSize, -2*M_PI, 2*M_PI, 0),
-                make_tuple("phi_1", phi2D[1], phiBitSize, -2*M_PI, 2*M_PI, 0),
-                make_tuple("phi_2", phi2D[2], phiBitSize, -2*M_PI, 2*M_PI, 0),
-                make_tuple("phi_3", phi2D[3], phiBitSize, -2*M_PI, 2*M_PI, 0),
-                make_tuple("phi_4", phi2D[4], phiBitSize, -2*M_PI, 2*M_PI, 0),
-                make_tuple("rho", rho, rhoBitSize, rhoMin, rhoMax, 0),
-                make_tuple("2Drr_0", rr[0], 12, 18.8, 105.68, 0), 
-                make_tuple("2Drr_1", rr[2], 12, 18.8, 105.68, 0), 
-                make_tuple("2Drr_2", rr[4], 12, 18.8, 105.68, 0), 
-                make_tuple("2Drr_3", rr[6], 12, 18.8, 105.68, 0), 
-                make_tuple("2Drr_4", rr[8], 12, 18.8, 105.68, 0), 
-                //make_tuple("phi2DError_0"), phi2DError[0], 8,         
- 
-            };
-            TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
-        }
-        TRGCDCHoughFinder::calCosPhi(m_mSignalStorage, m_mLutStorage);
-        TRGCDCHoughFinder::calSinPhi(m_mSignalStorage, m_mLutStorage);
-        TRGCDCHoughFinder::rPhi(m_mSignalStorage, m_mLutStorage);
-        //m_mSignalStorage["phi_0"].dump();
-        //m_mSignalStorage["phi_1"].dump();
-        //m_mSignalStorage["phi_2"].dump();
-        //m_mSignalStorage["phi_3"].dump();
-        //m_mSignalStorage["phi_4"].dump();
-        //m_mSignalStorage["2Drr_0"].dump();
-        //m_mSignalStorage["2Drr_1"].dump();
-        //m_mSignalStorage["2Drr_2"].dump();
-        //m_mSignalStorage["2Drr_3"].dump();
-        //m_mSignalStorage["2Drr_4"].dump();
-        // Name signals only once.
-        if((*m_mSignalStorage.begin()).second.getName() == ""){
-            for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); it++){
-                (*it).second.setName((*it).first);
-            }
-
-            // Print Vhdl
-            if((*m_mSignalStorage.begin()).second.getName() != ""){
-                if(m_commonData->getPrintedToFile()==0){
-                    if(m_commonData->getPrintVhdl()==0){
-                        m_commonData->setVhdlOutputFile("Fitter2D.vhd");
-                        m_commonData->setPrintVhdl(1);
-                    } else {
-                        m_commonData->setPrintVhdl(0);
-                        m_commonData->entryVhdlCode();
-                        m_commonData->signalsVhdlCode();
-                        m_commonData->buffersVhdlCode();
-                        m_commonData->printToFile();
-                        // Print LUTs.
-                        for(map<string,TRGCDCJLUT*>::iterator it=m_mLutStorage.begin(); it!=m_mLutStorage.end(); it++){
-                            //it->second->makeCOE("./VHDL/LutData/"+it->first+".coe");
-                            it->second->makeCOE(it->first+".coe");
-                        }
-                    }
-                }
-            }
-        }
     }
 
     TRGDebug::leaveStage(sn);
@@ -1216,13 +996,15 @@ TRGCDCHoughFinder::mappingByFile2(const string & mappingFilePlus,
 }
 
 int
-TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
+TRGCDCHoughFinder::doit(std::vector<TRGCDCTrack *> & trackList2D,
+                        std::vector<TRGCDCTrack *> & trackList2DFitted) {
 
-    const string sn = "HoughFinder::doit";
+    const string sn = "HoughFinder::doit (trasan version)";
     TRGDebug::enterStage(sn);
 
-    doFinding(trackList);
-    doFitting(trackList);
+    vector<unsigned> peaks[2];
+    doFinding(peaks, trackList2D);
+    doFitting(peaks, trackList2DFitted);
 
     TRGDebug::leaveStage(sn);
 
@@ -1230,13 +1012,15 @@ TRGCDCHoughFinder::doit(vector<TCTrack *> & trackList) {
 }
 
 int
-TRGCDCHoughFinder::doit2(vector<TCTrack *> & trackList) {
+TRGCDCHoughFinder::doit2(std::vector<TRGCDCTrack *> & trackList2D,
+                         std::vector<TRGCDCTrack *> & trackList2DFitted) {
 
-    const string sn = "HoughFinder::doit2";
+    const string sn = "HoughFinder::doit2 (kaiyu version)";
     TRGDebug::enterStage(sn);
 
-    doFinding2(trackList);
-    doFitting(trackList);
+    vector<vector<unsigned>> peaks[2];
+    doFinding2(peaks, trackList2D);
+    doFitting2(trackList2D, trackList2DFitted);
 
     TRGDebug::leaveStage(sn);
 
@@ -1244,7 +1028,24 @@ TRGCDCHoughFinder::doit2(vector<TCTrack *> & trackList) {
 }
 
 int
-TRGCDCHoughFinder::doFinding2(vector<TCTrack *> & trackList) {
+TRGCDCHoughFinder::doit3(std::vector<TRGCDCTrack *> & trackList2D,
+                         std::vector<TRGCDCTrack *> & trackList2DFitted) {
+
+    const string sn = "HoughFinder::doit3 (dev version)";
+    TRGDebug::enterStage(sn);
+
+    vector<vector<unsigned>> peaks[2];
+    doFinding2(peaks, trackList2D);
+    doFitting3(trackList2D, trackList2DFitted);
+
+    TRGDebug::leaveStage(sn);
+
+    return 0;
+}
+
+int
+TRGCDCHoughFinder::doFinding2(std::vector<std::vector<unsigned>> peaks[],
+                              std::vector<TRGCDCTrack *> & trackList2D) {
 
     const string sn = "HoughFinder::doFinding2";
     TRGDebug::enterStage(sn);
@@ -1265,93 +1066,24 @@ TRGCDCHoughFinder::doFinding2(vector<TCTrack *> & trackList) {
     _plane[0]->merge();
     _plane[1]->merge();
 
-#ifdef TRGCDC_DISPLAY_HOUGH
-    string stg = sn;
-    string inf = "   ";
-    H0->stage(stg);
-    H0->information(inf);
-    H0->clear();
-    H0->area().append(_plane[0]);
-    H0->show();
-    H1->stage(stg);
-    H1->information(inf);
-    H1->clear();
-    H1->area().append(_plane[1]);
-    H1->show();
-#endif
-
     //...Look for peaks which have 5 hits...
-    vector<vector<unsigned>> peaks[2];
+//  vector<vector<unsigned>> peaks[2];
     _peakFinder.peaks7(* _plane[0], _peakMin, peaks[0]);
     _peakFinder.peaks7(* _plane[1], _peakMin, peaks[1]);
 
-    cout << "??? #peaks=" << peaks[0].size() << "," << peaks[1].size() << endl;
-
-    //...Peak loop...
-    unsigned nCircles = 0;
+    //...Peak loop to make tracks (no fit, using hough position only)...
     for (unsigned pm = 0; pm < 2; pm++) {
-//	for (unsigned i = 0; i < serialIds[pm].size(); i++) {
-//	    const unsigned peakId = serialIds[pm][i];
 	for (unsigned i = 0; i < peaks[pm].size(); i++) {
 	    const unsigned peakId = _plane[pm]->serialId(peaks[pm][i][0],
                                                          peaks[pm][i][1]);
+            TCTrack * t = makeTrack(peakId, pm);
+	    trackList2D.push_back(t);
 
-	    //...Get segment hits...
-	    vector<TCLink *> links;
-	    vector<const TCSegment *> segments;
-	    const unsigned nLayers = _plane[pm]->nLayers();
-	    for (unsigned j = 0; j < nLayers; j++) {
-		const vector<unsigned> & ptn =
-		    _plane[pm]->patternId(j, peakId);
-		for (unsigned k = 0; k < ptn.size(); k++) {
-		    const TCSegment & s = _cdc.axialSegment(j, ptn[k]);
-		    segments.push_back(& s);
-		    if (s.hit()) {
-			TCLink * l = new TCLink(0, s.hit());
-			links.push_back(l);
-		    }
-		}
-	    }
-
-	    //...Select best hits in each layer...
-	    const vector<TCLink *> bests = selectBestHits(links);
-
-	    //...Make a circle...
-	    TCCircle * cptr = new TCCircle(bests);
-	    TCCircle & c = * cptr;
-	    c.fit();
-	    c.name("CircleFitted_" + TRGUtil::itostring(nCircles));
-	    ++nCircles;
-
-	    if (TRGDebug::level()) {
-		cout << TRGDebug::tab() << "peak#" << nCircles << ":"
-		     << "plane" << pm << ",serialId=" << peakId << endl;
-		cout << TRGDebug::tab() << "segments below" << endl;
-		cout << TRGDebug::tab(4);
-		for (unsigned j = 0; j < segments.size(); j++) {
-		    cout << segments[j]->name();
-		    if (j != (segments.size() - 1))
-			cout << ",";
-		}
-		cout << endl;
-		cout << TRGDebug::tab() << "best links below" << endl;
-		TCLink::dump(bests, "", TRGDebug::tab(4));
- 		c.dump("detail", TRGDebug::tab() + "Circle> ");
-	    }
-
-	    //...Make a track...
-	    TCTrack & t = * new TCTrack(c);
-	    t.name("Track_" + TRGUtil::itostring(i));
-	    trackList.push_back(& t);
-	    if (TRGDebug::level()) {
-		t.relation().dump("", "        MCInfo");
-		t.dump("detail");
-	    }
 #ifdef TRGCDC_DISPLAY_HOUGH
-	    vector<const TCCircle *> cc;
-	    cc.push_back(& c);
-	    stg = "2D : Peak Finding & circle making";
-	    inf = "   ";
+	    vector<const TCTrack *> cc;
+	    cc.push_back(t);
+	    const string stg = "doFinding2 : track made";
+	    const string inf = "   ";
 	    D->clear();
 	    D->stage(stg);
 	    D->information(inf);
@@ -1361,15 +1093,601 @@ TRGCDCHoughFinder::doFinding2(vector<TCTrack *> & trackList) {
 	    D->show();
 	    D->run();
 #endif
-
- 	    //...Delete a circle...
- 	    delete cptr;
-
 	}
     }
 
     TRGDebug::leaveStage(sn);
     return 0;
+}
+
+int
+TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
+                              std::vector<TRGCDCTrack *> & trackList2DFitted) {
+
+    const string sn = "Hough Finder Fitting2";
+    TRGDebug::enterStage(sn);
+
+    if(m_commonData==0){
+        m_commonData = new Belle2::TRGCDCJSignalData();
+    }
+
+    //...Event time...
+    bool fEvtTime = true;
+    double eventTime = fEvtTime ? _cdc.getEventTime() : 0;
+    if (! fEvtTime)
+        eventTime = 0;
+    else
+        eventTime = _cdc.getEventTime();
+
+    // Loop over all tracks
+    for(unsigned int iTrack=0; iTrack<trackList2D.size(); iTrack++){
+        TCTrack & aTrack = * new TCTrack(* trackList2D[iTrack]);
+        trackList2DFitted.push_back(& aTrack);
+
+	CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+	double phi02D, pt2D, Trg_PI;
+	vector<double> nWires(9);
+	vector<double> rr(9);
+	vector<double> rr2D;
+//	vector<double> wirePhi2DError({0.0085106, 0.0039841, 0.0025806, 0.0019084, 0.001514});
+	vector<double> wirePhi2DError(5);
+	wirePhi2DError[0] = 0.0085106;
+	wirePhi2DError[1] = 0.0039841;
+	wirePhi2DError[2] = 0.0025806;
+	wirePhi2DError[3] = 0.0019084;
+	wirePhi2DError[4] = 0.001514;
+//	vector<double> driftPhi2DError({0.0085106, 0.0039841, 0.0025806, 0.0019084, 0.001514});
+	vector<double> driftPhi2DError(5);
+	driftPhi2DError[0] = 0.0085106;
+	driftPhi2DError[1] = 0.0039841;
+	driftPhi2DError[2] = 0.0025806;
+	driftPhi2DError[3] = 0.0019084;
+	driftPhi2DError[4] = 0.001514;
+	Trg_PI = 3.141592653589793;
+        // Check if all superlayers have one TS
+        bool trackFull=1;
+        for (unsigned iSL = 0; iSL < _cdc.nSuperLayers(); iSL=iSL+2) {
+            // Check if all superlayers have one TS
+            const vector<TCLink *> & links = aTrack.links(iSL);
+            const unsigned nSegments = links.size();
+
+            if (TRGDebug::level())
+                cout << TRGDebug::tab() << "#segments in SL" << iSL << " : "
+                     << nSegments << endl;
+
+            // Find if there is a TS with a priority hit.
+            // Loop over all TS in same superlayer.
+            bool priorityHitTS = 0;
+            for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+                const TCSegment * _segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+                if (_segment->center().hit() != 0)  priorityHitTS = 1;
+            }
+            if(nSegments != 1) {
+                if (nSegments == 0){
+                    trackFull = 0;
+                    if (TRGDebug::level())
+                        cout << TRGDebug::tab()
+                             << "=> Not enough TS." << endl;
+                }
+                else {
+                    if (TRGDebug::level())
+                        cout << TRGDebug::tab()
+                             << "=> multiple TS are assigned." << endl;
+                }
+            }
+            else{
+                if(priorityHitTS == 0){
+                    trackFull = 0;
+                    if (TRGDebug::level())
+                        cout << TRGDebug::tab()
+                             << "=> There are no priority hit TS"<<endl;
+                }	 
+            }
+        } // End superlayer loop
+        if(trackFull == 0){
+            TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
+            CLHEP::HepVector helixParameters(5);
+            helixParameters = aTrack.helix().a();
+            aTrack.setFitted(0);
+            aTrack.setHelix(helix);
+            continue;
+        }
+
+	for(unsigned iSL=0; iSL<9; iSL++){
+            unsigned _layerId = _cdc.segment(iSL,0).center().layerId();
+            rr[iSL] = cdcp.senseWireR(_layerId);
+            nWires[iSL] = cdcp.nWiresInLayer(_layerId)*2;
+	}
+	rr2D = vector<double>({rr[0],rr[2],rr[4],rr[6],rr[8]});
+
+//	double eventNumber;
+//	eventNumber = _cdc.getEventNumber();
+
+	// Get wirePhi, Drift information
+	vector<double>wirePhi(9);
+	vector<double>driftLength(9);
+	vector<double>LR(9);
+	vector<double>lutLR(9);
+	vector<double>mcLR(9);
+	bool fmcLR=false, fLRLUT=true;
+	for (unsigned iSL = 0; iSL < 9; iSL=iSL+2) {
+            const vector<TCLink *> & links = aTrack.links(iSL);
+//	cout<<"nLinks: "<<aTrack.links(iSL).size()<<endl;
+//	cout<<"linkHit: "<<links[0]->hit()<<endl;
+            const TCSegment * _segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+            wirePhi[iSL] =  _segment->localId()/nWires[iSL]*4*Trg_PI;
+//	cout<<"wirePhi: "<< _segment->localId()/nWires[iSL]*4*Trg_PI<<endl;
+            lutLR[iSL] = _segment->LUT()->getValue(_segment->lutPattern());
+//	cout<<"iSL: "<<iSL<<" "<<_segment->hit()<<endl;
+            mcLR[iSL] = _segment->hit()->mcLR();
+            driftLength[iSL] = _segment->hit()->drift();
+//	cout<<"driftLength: "<<_segment->hit()->drift()<<endl;
+            if(fmcLR==1) LR[iSL] = mcLR[iSL];
+            else if(fLRLUT==1) LR[iSL] = lutLR[iSL];
+            else LR[iSL] = 3;
+	}//End superlayer loop
+	// 2D fit values from IW 2D fitter
+	phi02D = aTrack.helix().phi0();
+	pt2D = aTrack.helix().curv()*0.01*0.3*1.5;
+	if(aTrack.charge()<0) {
+            phi02D = phi02D-Trg_PI;
+	    if(phi02D < 0) phi02D = phi02D + 2 * Trg_PI;
+	    pt2D = pt2D * -1;
+	}
+//cout << "#######" <<endl;
+//cout << "phi2D= " << phi02D << endl;
+//cout << "pt2D= " << pt2D << endl;
+//cout << "#######"<<endl;
+///////// Get 2D fit values from JB 2D fitter
+//	double charge = aTrack.charge();
+        // Set phi2DError for 2D fit
+	vector<double>phi2DError(5);
+        for (unsigned iAx = 0; iAx < 5; iAx++) {
+            if(LR[2*iAx] != 2) phi2DError[iAx] = driftPhi2DError[iAx];
+            else phi2DError[iAx] = wirePhi2DError[iAx];
+	}
+        // Calculate phi2D using driftTime.
+	vector<double>phi2D(5);
+        for (unsigned iAx = 0; iAx < 5; iAx++) {
+            phi2D[iAx] = Fitter3DUtility::calPhi(wirePhi[iAx*2],
+                                                 driftLength[iAx*2],
+                                                 eventTime,
+                                                 rr[iAx*2],
+                                                 LR[iAx*2]);
+            if (TRGDebug::level()) {
+                cout << TRGDebug::tab() << "eventTime: " << eventTime << endl;
+                for (int i = 0 ; i<5 ; i++) { 
+                    cout << TRGDebug::tab() << "phi2D: : " << phi2D[i] << endl;
+                    cout << TRGDebug::tab() << "wirePhi: " << wirePhi[i*2]
+                         << endl;
+                    cout << TRGDebug::tab() << "driftLength: " <<
+                        driftLength[i*2] << endl;
+                    cout << TRGDebug::tab() <<"LR: " << LR[i * 2] << endl;
+                }
+            }
+        }
+	// Fit2D
+        double rho, phi0, pt;
+        rho = 0;
+        phi0 = 0;
+	pt = 0;
+        Fitter3DUtility::rPhiFit(&rr2D[0],&phi2D[0],&phi2DError[0],rho, phi0);
+
+        pt = 0.3*1.5*rho/100;
+
+        if (TRGDebug::level()) {
+            cout << TRGDebug::tab() << "rho: " << rho << endl;
+            cout << TRGDebug::tab() << "pt:  " << pt << endl;
+        }
+//ofstream fitout("/home/belle2/kaiyu/2DFit/Pt", fstream::app);//test
+//	fitout<<pt<<endl;
+//ofstream dout("/home/belle2/kaiyu/2DFit/den", fstream::app);
+//      dout<<den<<endl;
+
+        /// LUT values
+	double rhoMin = 67;
+	double rhoMax = 1600;
+        int phiBitSize = 12;
+	int rhoBitSize = 12;
+	// Change to Signals
+        {
+            vector<tuple<string, double, int, double, double, int> > t_values = {
+                make_tuple("phi_0", phi2D[0], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_1", phi2D[1], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_2", phi2D[2], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_3", phi2D[3], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_4", phi2D[4], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("rho", rho, rhoBitSize, rhoMin, rhoMax, 0),
+                make_tuple("2Drr_0", rr[0], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_1", rr[2], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_2", rr[4], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_3", rr[6], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_4", rr[8], 12, 18.8, 105.68, 0), 
+                //make_tuple("phi2DError_0"), phi2DError[0], 8,         
+ 
+            };
+            TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
+        }
+        TRGCDCHoughFinder::calCosPhi(m_mSignalStorage, m_mLutStorage);
+        TRGCDCHoughFinder::calSinPhi(m_mSignalStorage, m_mLutStorage);
+        TRGCDCHoughFinder::rPhi(m_mSignalStorage, m_mLutStorage);
+        //m_mSignalStorage["phi_0"].dump();
+        //m_mSignalStorage["phi_1"].dump();
+        //m_mSignalStorage["phi_2"].dump();
+        //m_mSignalStorage["phi_3"].dump();
+        //m_mSignalStorage["phi_4"].dump();
+        //m_mSignalStorage["2Drr_0"].dump();
+        //m_mSignalStorage["2Drr_1"].dump();
+        //m_mSignalStorage["2Drr_2"].dump();
+        //m_mSignalStorage["2Drr_3"].dump();
+        //m_mSignalStorage["2Drr_4"].dump();
+        // Name signals only once.
+        if((*m_mSignalStorage.begin()).second.getName() == ""){
+            for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); it++){
+                (*it).second.setName((*it).first);
+            }
+
+            // Print Vhdl
+            if((*m_mSignalStorage.begin()).second.getName() != ""){
+                if(m_commonData->getPrintedToFile()==0){
+                    if(m_commonData->getPrintVhdl()==0){
+                        m_commonData->setVhdlOutputFile("Fitter2D.vhd");
+                        m_commonData->setPrintVhdl(1);
+                    } else {
+                        m_commonData->setPrintVhdl(0);
+                        m_commonData->entryVhdlCode();
+                        m_commonData->signalsVhdlCode();
+                        m_commonData->buffersVhdlCode();
+                        m_commonData->printToFile();
+                        // Print LUTs.
+                        for(map<string,TRGCDCJLUT*>::iterator it=m_mLutStorage.begin(); it!=m_mLutStorage.end(); it++){
+                            //it->second->makeCOE("./VHDL/LutData/"+it->first+".coe");
+                            it->second->makeCOE(it->first+".coe");
+                        }
+                    }
+                }
+            }
+        }
+
+#ifdef TRGCDC_DISPLAY_HOUGH
+        vector<const TCTrack *> cc;
+        cc.push_back(& aTrack);
+        const string stg = "doFitting2 : Kaiyu method";
+        const string inf = "   ";
+        D->clear();
+        D->stage(stg);
+        D->information(inf);
+        D->area().append(_cdc.hits());
+        D->area().append(_cdc.segmentHits());
+        D->area().append(cc, Gdk::Color("blue"));
+        D->show();
+        D->run();
+#endif
+    }
+
+    TRGDebug::leaveStage(sn);
+
+    return 0; 
+}
+
+int
+TRGCDCHoughFinder::doFitting3(std::vector<TRGCDCTrack *> & trackList2D,
+                              std::vector<TRGCDCTrack *> & trackList2DFitted) {
+
+    const string sn = "Hough Finder Fitting3";
+    TRGDebug::enterStage(sn);
+
+    if(m_commonData==0){
+        m_commonData = new Belle2::TRGCDCJSignalData();
+    }
+
+    //...Event time...
+    bool fEvtTime = true;
+    double eventTime = fEvtTime ? _cdc.getEventTime() : 0;
+    if (! fEvtTime)
+        eventTime = 0;
+    else
+        eventTime = _cdc.getEventTime();
+
+    // Loop over all tracks
+    for(unsigned int iTrack=0; iTrack<trackList2D.size(); iTrack++){
+        TCTrack & aTrack = * new TCTrack(* trackList2D[iTrack]);
+        trackList2DFitted.push_back(& aTrack);
+
+	CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
+	double phi02D, pt2D, Trg_PI;
+	vector<double> nWires(9);
+	vector<double> rr(9);
+	vector<double> rr2D;
+	vector<double> wirePhi2DError(5);
+	wirePhi2DError[0] = 0.0085106;
+	wirePhi2DError[1] = 0.0039841;
+	wirePhi2DError[2] = 0.0025806;
+	wirePhi2DError[3] = 0.0019084;
+	wirePhi2DError[4] = 0.001514;
+	vector<double> driftPhi2DError(5);
+	driftPhi2DError[0] = 0.0085106;
+	driftPhi2DError[1] = 0.0039841;
+	driftPhi2DError[2] = 0.0025806;
+	driftPhi2DError[3] = 0.0019084;
+	driftPhi2DError[4] = 0.001514;
+	Trg_PI = 3.141592653589793;
+
+        // Check if all superlayers have one TS
+        bool trackFull=1;
+        for (unsigned iSL = 0; iSL < _cdc.nSuperLayers(); iSL=iSL+2) {
+            // Check if all superlayers have one TS
+            const vector<TCLink *> & links = aTrack.links(iSL);
+            const unsigned nSegments = links.size();
+
+            if (TRGDebug::level())
+                cout << TRGDebug::tab() << "#segments in SL" << iSL << " : "
+                     << nSegments << endl;
+
+            // Find if there is a TS with a priority hit.
+            // Loop over all TS in same superlayer.
+            bool priorityHitTS = 0;
+            for (unsigned iTS = 0; iTS < nSegments; iTS++) {
+                const TCSegment * _segment = dynamic_cast<const TCSegment *>(& links[iTS]->hit()->cell());
+                if (_segment->center().hit() != 0)  priorityHitTS = 1;
+            }
+            if(nSegments != 1) {
+                if (nSegments == 0){
+                    trackFull = 0;
+                    if (TRGDebug::level())
+                        cout << TRGDebug::tab()
+                             << "=> Not enough TS." << endl;
+                }
+                else {
+                    if (TRGDebug::level())
+                        cout << TRGDebug::tab()
+                             << "=> multiple TS are assigned." << endl;
+                }
+            }
+            else{
+                if(priorityHitTS == 0){
+                    trackFull = 0;
+                    if (TRGDebug::level())
+                        cout << TRGDebug::tab()
+                             << "=> There are no priority hit TS"<<endl;
+                }	 
+            }
+        } // End superlayer loop
+        if(trackFull == 0){
+            TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
+            CLHEP::HepVector helixParameters(5);
+            helixParameters = aTrack.helix().a();
+            aTrack.setFitted(0);
+            aTrack.setHelix(helix);
+            continue;
+        }
+
+	for(unsigned iSL=0; iSL<9; iSL++){
+            unsigned _layerId = _cdc.segment(iSL,0).center().layerId();
+            rr[iSL] = cdcp.senseWireR(_layerId);
+            nWires[iSL] = cdcp.nWiresInLayer(_layerId)*2;
+	}
+	rr2D = vector<double>({rr[0],rr[2],rr[4],rr[6],rr[8]});
+
+//	double eventNumber;
+//	eventNumber = _cdc.getEventNumber();
+
+	// Get wirePhi, Drift information
+	vector<double>wirePhi(9);
+	vector<double>driftLength(9);
+	vector<double>LR(9);
+	vector<double>lutLR(9);
+	vector<double>mcLR(9);
+	bool fmcLR=false, fLRLUT=true;
+	for (unsigned iSL = 0; iSL < 9; iSL=iSL+2) {
+            const vector<TCLink *> & links = aTrack.links(iSL);
+//	cout<<"nLinks: "<<aTrack.links(iSL).size()<<endl;
+//	cout<<"linkHit: "<<links[0]->hit()<<endl;
+            const TCSegment * _segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
+            wirePhi[iSL] =  _segment->localId()/nWires[iSL]*4*Trg_PI;
+//	cout<<"wirePhi: "<< _segment->localId()/nWires[iSL]*4*Trg_PI<<endl;
+            lutLR[iSL] = _segment->LUT()->getValue(_segment->lutPattern());
+//	cout<<"iSL: "<<iSL<<" "<<_segment->hit()<<endl;
+            mcLR[iSL] = _segment->hit()->mcLR();
+            driftLength[iSL] = _segment->hit()->drift();
+//	cout<<"driftLength: "<<_segment->hit()->drift()<<endl;
+            if(fmcLR==1) LR[iSL] = mcLR[iSL];
+            else if(fLRLUT==1) LR[iSL] = lutLR[iSL];
+            else LR[iSL] = 3;
+	}//End superlayer loop
+	// 2D fit values from IW 2D fitter
+	phi02D = aTrack.helix().phi0();
+	pt2D = aTrack.helix().curv()*0.01*0.3*1.5;
+	if(aTrack.charge()<0) {
+            phi02D = phi02D-Trg_PI;
+	    if(phi02D < 0) phi02D = phi02D + 2 * Trg_PI;
+	    pt2D = pt2D * -1;
+	}
+//cout << "#######" <<endl;
+//cout << "phi2D= " << phi02D << endl;
+//cout << "pt2D= " << pt2D << endl;
+//cout << "#######"<<endl;
+///////// Get 2D fit values from JB 2D fitter
+//	double charge = aTrack.charge();
+        // Set phi2DError for 2D fit
+	vector<double>phi2DError(5);
+        for (unsigned iAx = 0; iAx < 5; iAx++) {
+            if(LR[2*iAx] != 2) phi2DError[iAx] = driftPhi2DError[iAx];
+            else phi2DError[iAx] = wirePhi2DError[iAx];
+	}
+        // Calculate phi2D using driftTime.
+	vector<double>phi2D(5);
+        for (unsigned iAx = 0; iAx < 5; iAx++) {
+            phi2D[iAx] = Fitter3DUtility::calPhi(wirePhi[iAx*2],
+                                                 driftLength[iAx*2],
+                                                 eventTime,
+                                                 rr[iAx*2],
+                                                 LR[iAx*2]);
+            if (TRGDebug::level()) {
+                cout << TRGDebug::tab() << "eventTime: " << eventTime << endl;
+                for (int i = 0 ; i<5 ; i++) { 
+                    cout << TRGDebug::tab() << "phi2D: : " << phi2D[i] << endl;
+                    cout << TRGDebug::tab() << "wirePhi: " << wirePhi[i*2]
+                         << endl;
+                    cout << TRGDebug::tab() << "driftLength: " <<
+                        driftLength[i*2] << endl;
+                    cout << TRGDebug::tab() <<"LR: " << LR[i * 2] << endl;
+                }
+            }
+        }
+	// Fit2D
+        double rho, phi0, pt;
+        rho = 0;
+        phi0 = 0;
+	pt = 0;
+        Fitter3DUtility::rPhiFit(&rr2D[0],&phi2D[0],&phi2DError[0],rho, phi0);
+
+        pt = 0.3*1.5*rho/100;
+
+        if (TRGDebug::level()) {
+            cout << TRGDebug::tab() << "rho: " << rho << endl;
+            cout << TRGDebug::tab() << "pt:  " << pt << endl;
+        }
+//ofstream fitout("/home/belle2/kaiyu/2DFit/Pt", fstream::app);//test
+//	fitout<<pt<<endl;
+//ofstream dout("/home/belle2/kaiyu/2DFit/den", fstream::app);
+//      dout<<den<<endl;
+
+        /// LUT values
+	double rhoMin = 67;
+	double rhoMax = 1600;
+        int phiBitSize = 12;
+	int rhoBitSize = 12;
+	// Change to Signals
+        {
+            vector<tuple<string, double, int, double, double, int> > t_values = {
+                make_tuple("phi_0", phi2D[0], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_1", phi2D[1], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_2", phi2D[2], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_3", phi2D[3], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("phi_4", phi2D[4], phiBitSize, -2*M_PI, 2*M_PI, 0),
+                make_tuple("rho", rho, rhoBitSize, rhoMin, rhoMax, 0),
+                make_tuple("2Drr_0", rr[0], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_1", rr[2], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_2", rr[4], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_3", rr[6], 12, 18.8, 105.68, 0), 
+                make_tuple("2Drr_4", rr[8], 12, 18.8, 105.68, 0), 
+                //make_tuple("phi2DError_0"), phi2DError[0], 8,         
+ 
+            };
+            TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
+        }
+        TRGCDCHoughFinder::calCosPhi(m_mSignalStorage, m_mLutStorage);
+        TRGCDCHoughFinder::calSinPhi(m_mSignalStorage, m_mLutStorage);
+        TRGCDCHoughFinder::rPhi(m_mSignalStorage, m_mLutStorage);
+        //m_mSignalStorage["phi_0"].dump();
+        //m_mSignalStorage["phi_1"].dump();
+        //m_mSignalStorage["phi_2"].dump();
+        //m_mSignalStorage["phi_3"].dump();
+        //m_mSignalStorage["phi_4"].dump();
+        //m_mSignalStorage["2Drr_0"].dump();
+        //m_mSignalStorage["2Drr_1"].dump();
+        //m_mSignalStorage["2Drr_2"].dump();
+        //m_mSignalStorage["2Drr_3"].dump();
+        //m_mSignalStorage["2Drr_4"].dump();
+        // Name signals only once.
+        if((*m_mSignalStorage.begin()).second.getName() == ""){
+            for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); it++){
+                (*it).second.setName((*it).first);
+            }
+
+            // Print Vhdl
+            if((*m_mSignalStorage.begin()).second.getName() != ""){
+                if(m_commonData->getPrintedToFile()==0){
+                    if(m_commonData->getPrintVhdl()==0){
+                        m_commonData->setVhdlOutputFile("Fitter2D.vhd");
+                        m_commonData->setPrintVhdl(1);
+                    } else {
+                        m_commonData->setPrintVhdl(0);
+                        m_commonData->entryVhdlCode();
+                        m_commonData->signalsVhdlCode();
+                        m_commonData->buffersVhdlCode();
+                        m_commonData->printToFile();
+                        // Print LUTs.
+                        for(map<string,TRGCDCJLUT*>::iterator it=m_mLutStorage.begin(); it!=m_mLutStorage.end(); it++){
+                            //it->second->makeCOE("./VHDL/LutData/"+it->first+".coe");
+                            it->second->makeCOE(it->first+".coe");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    TRGDebug::leaveStage(sn);
+
+    return 0; 
+}
+
+TCTrack *
+TRGCDCHoughFinder::makeTrack(const unsigned peakId, const unsigned pm) const {
+
+    //...Cal. pt and phi from the cell number...
+    const TCHTransformationCircle & tc =
+        (TCHTransformationCircle &) _plane[pm]->transformation();
+    unsigned x, y;
+    _plane[pm]->id(peakId, x, y);
+    const TRGPoint2D hp = _plane[pm]->position(x, y);
+    const TRGPoint2D cc = tc.circleCenter(hp);
+    const double r = cc.y();
+    const double phi = cc.x();
+//  const double ConstantAlpha = 222.376063; // for 1.5T
+//  const double pt = r / ConstantAlpha;
+
+    //...Make a circle...
+    TCCircle c(r, phi, pm ? 1. : -1., * _plane[pm]);
+    c.name("circle_" + TRGUtil::itostring(int(peakId) * (pm ? -1 : 1)));
+
+    if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << "plane" << pm << ",serialId=" << peakId
+             << endl;
+        c.dump("detail", TRGDebug::tab() + "Circle> ");
+    }
+
+    //...Get segment hits...
+    vector<TCLink *> links;
+    vector<const TCSegment *> segments;
+    const unsigned nLayers = _plane[pm]->nLayers();
+    for (unsigned j = 0; j < nLayers; j++) {
+        const vector<unsigned> & ptn =
+            _plane[pm]->patternId(j, peakId);
+        for (unsigned k = 0; k < ptn.size(); k++) {
+            const TCSegment & s = _cdc.axialSegment(j, ptn[k]);
+            segments.push_back(& s);
+            if (s.hit()) {
+                TCLink * l = new TCLink(0, s.hit());
+                links.push_back(l);
+            }
+        }
+    }
+    c.append(links);
+
+    if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << "attched segments below" << endl;
+        cout << TRGDebug::tab(4);
+        for (unsigned j = 0; j < segments.size(); j++) {
+            cout << segments[j]->name();
+            if (j != (segments.size() - 1))
+                cout << ",";
+        }
+        cout << endl;
+    }
+
+    //...Make a track...
+    TCTrack * t = new TCTrack(c);
+    t->name("track_" + TRGUtil::itostring(int(peakId) * (pm ? -1 : 1)));
+
+    if (TRGDebug::level()) {
+        t->relation().dump("", TRGDebug::tab());
+        t->dump("detail");
+    }
+
+    return t;
 }
 
 } // namespace Belle2

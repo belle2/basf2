@@ -100,7 +100,7 @@ class TRGCDCHoughPlaneBase {
     /// returns x and y for serialID.
     void id(unsigned serialId, unsigned & x, unsigned & y) const;
 
-    /// returns position for (x, y).
+    /// returns position in Hough plain for a cell (x, y)..
     TRGPoint2D position(unsigned x, unsigned y) const;
 
     /// returns neighbor cell.

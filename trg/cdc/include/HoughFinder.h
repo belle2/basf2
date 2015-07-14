@@ -65,10 +65,16 @@ class TRGCDCHoughFinder {
     void terminate();
 
     /// do track finding and fitting (old version).
-    int doit(std::vector<TRGCDCTrack *> & trackList);
+    int doit(std::vector<TRGCDCTrack *> & trackList2D,
+             std::vector<TRGCDCTrack *> & trackList2DFitted);
 
     /// do track finding and fitting (Kaiyu version).
-    int doit2(std::vector<TRGCDCTrack *> & trackList);
+    int doit2(std::vector<TRGCDCTrack *> & trackList2D,
+              std::vector<TRGCDCTrack *> & trackList2DFitted);
+
+    /// do track finding and fitting (development version)
+    int doit3(std::vector<TRGCDCTrack *> & trackList2D,
+              std::vector<TRGCDCTrack *> & trackList2DFitted);
 
   public:
 
@@ -89,14 +95,29 @@ class TRGCDCHoughFinder {
     void mappingByFile2(const std::string & mappingFilePlus,
                         const std::string & mappingFileMinus);
 
-    /// do track finding (both old and new logics will run).
-    int doFinding(std::vector<TRGCDCTrack *> & trackList);
+    /// do track finding. (trasan version)
+    int doFinding(std::vector<unsigned> peaks[],
+                  std::vector<TRGCDCTrack *> & trackList2D) const;
 
-    /// do track finding (only new logics will run).
-    int doFinding2(std::vector<TRGCDCTrack *> & trackList);
+    /// do track finding. (kaiyu version)
+    int doFinding2(std::vector<std::vector<unsigned>> peaks[],
+                   std::vector<TRGCDCTrack *> & trackList2D);
+
+    /// do track fitting. (old trasan version)
+    int doFitting(std::vector<unsigned> peaks[],
+                  std::vector<TRGCDCTrack *> & trackList2DFitted) const;
+
+    /// do track fitting. (kaiyu original)
+    int doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
+                   std::vector<TRGCDCTrack *> & trackList2DFitted);
 
     /// do track fitting.
-    int doFitting(std::vector<TRGCDCTrack *> & trackList);
+    int doFitting3(std::vector<TRGCDCTrack *> & trackList2D,
+                   std::vector<TRGCDCTrack *> & trackList2DFitted);
+
+    /// Make a track from serial ID in Hough plane. (no fit, segment
+    /// hit attached)
+    TRGCDCTrack * makeTrack(const unsigned serialID, const unsigned pm) const;
 
     ///  Utility functions.
     static double calPhi(TRGCDCSegmentHit const * segmentHit,

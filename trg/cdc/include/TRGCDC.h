@@ -100,12 +100,6 @@ class TRGCDC {
     /// configuration before calling this function.
     static TRGCDC * getTRGCDC(void);
 
-    /// return trackList
-    std::vector<TRGCDCTrack *> getTrackList(void);
-
-    /// return trackList3D
-    std::vector<TRGCDCTrack *> getTrackList3D(void);
-
   private:
 
     /// Constructor
@@ -195,6 +189,15 @@ class TRGCDC {
     /// sets and returns fudge factor for drift time error.
     float fudgeFactor(float);
 
+    /// returns 2D track list (no fit).
+    std::vector<TRGCDCTrack *> getTrackList2D(void);
+
+    /// returns 2D fitted track list.
+    std::vector<TRGCDCTrack *> getTrackList2DFitted(void);
+
+    /// returns 3D track list (fitted).
+    std::vector<TRGCDCTrack *> getTrackList3D(void);
+
   public:// Geometry
 
     /// returns a pointer to CDCGeometryPar
@@ -279,12 +282,6 @@ class TRGCDC {
 
     /// returns \# of track segments in a layer.
     unsigned nSegments(unsigned id) const;
-
-    /// trackList for fast simulation
-    std::vector<TRGCDCTrack *> trackList;
-
-    /// trackList3D for fast simulation
-    std::vector<TRGCDCTrack *> trackList3D;
 
   public:// Event by event hit information.
 
@@ -447,6 +444,15 @@ class TRGCDC {
 
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
+
+    /// Track list by 2D finding.
+    std::vector<TRGCDCTrack *> _trackList2D;
+
+    /// Track list for 2D fitted tracks.
+    std::vector<TRGCDCTrack *> _trackList2DFitted;
+
+    /// Track list for 3D fitted tracks.
+    std::vector<TRGCDCTrack *> _trackList3D;
 
     /// Switch for TRGCDC.root file.
     bool _makeRootFile;

@@ -112,17 +112,17 @@ namespace Belle2 {
     std::vector<double>* m_eclHitEnergyDep; /** ECLHit energy */
     std::vector<double>* m_eclHitTimeAve; /** ECLHit time */
 
-    int m_eclShowerMultip; /** Number of ECLShowers per event */
-    std::vector<int>* m_eclShowerIdx; /** ECLShower index */
-    std::vector<int>* m_eclShowerToMc; /** Index of MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToGamma; /** Index of ECLGamma related to ECLShower */
-    std::vector<double>* m_eclShowerEnergy; /** ECLShower energy */
-    std::vector<double>* m_eclShowerTheta; /** Polar direction of ECLShower */
-    std::vector<double>* m_eclShowerPhi; /** Azimuthal direction of ECLShower */
-    std::vector<double>* m_eclShowerR; /** Distance from IP of ECLShower */
-    std::vector<int>* m_eclShowerNHits; /** Number of ECLHits related to ECLShower */
-    std::vector<double>* m_eclShowerE9oE25; /** Ratio of 3x3 over 5x5 crystal matrices energies for ECLShower*/
-    std::vector<double>* m_eclShowerUncEnergy; /** Uncorrected ECLShower energy */
+    //int m_eclShowerMultip; /** Number of ECLShowers per event */
+    //std::vector<int>* m_eclShowerIdx; /** ECLShower index */
+    //std::vector<int>* m_eclShowerToMc; /** Index of MCParticle related to ECLShower */
+    //std::vector<int>* m_eclShowerToGamma; /** Index of ECLGamma related to ECLShower */
+    //std::vector<double>* m_eclShowerEnergy; /** ECLShower energy */
+    //std::vector<double>* m_eclShowerTheta; /** Polar direction of ECLShower */
+    //std::vector<double>* m_eclShowerPhi; /** Azimuthal direction of ECLShower */
+    //std::vector<double>* m_eclShowerR; /** Distance from IP of ECLShower */
+    //std::vector<int>* m_eclShowerNHits; /** Number of ECLHits related to ECLShower */
+    //std::vector<double>* m_eclShowerE9oE25; /** Ratio of 3x3 over 5x5 crystal matrices energies for ECLShower*/
+    //std::vector<double>* m_eclShowerUncEnergy; /** Uncorrected ECLShower energy */
 
     int m_eclClusterMultip;  /** Number of ECLClusterss per event */
     std::vector<int>* m_eclClusterIdx;  /** ECLCluster index */
@@ -139,7 +139,7 @@ namespace Belle2 {
     std::vector<double>*
     m_eclClusterToBkgWeight; /** Remaining energy contribution not associated to first five MCParticles related to ECLCluster */
     std::vector<double>* m_eclClusterSimHitSum; /** Energy contribution of first MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToShower; /** Index of ECLShower related to ECLCluster */
+    //std::vector<int>* m_eclClusterToShower; /** Index of ECLShower related to ECLCluster */
     //std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy; /** ECLCluster energy */
     std::vector<double>* m_eclClusterEnergyError; /** ECLCluster energy error*/
@@ -165,7 +165,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterEtaLikel; /** Flag for eta */
     std::vector<double>* m_eclClusterDeltaL; /** ??? */
     std::vector<double>* m_eclClusterBeta; /** ??? */
-
+    /*
     int m_eclGammaMultip;
     std::vector<int>* m_eclGammaIdx;
     std::vector<double>* m_eclGammaEnergy;
@@ -190,7 +190,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPi0MassFit;
     std::vector<double>* m_eclPi0Chi2;
     std::vector<double>* m_eclPi0PValue;
-
+    */
     int m_mcMultip;
     std::vector<int>* m_mcIdx;
     std::vector<int>* m_mcPdg;

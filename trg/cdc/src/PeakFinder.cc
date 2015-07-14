@@ -1352,6 +1352,7 @@ TRGCDCPeakFinder::p1p2Methode(TCHPlane & hp,
 	p.push_back(fcpx);
 	p.push_back(fcpy);
 	peak_xy.push_back(p);
+        p.clear();
 
 ///Find center peak(end)
 //cout << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl; //JB: Please use TRGDebug

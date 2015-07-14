@@ -195,7 +195,8 @@ void PXDHardwareClusterUnpackerModule::unpack_fce(void* data, unsigned int nr_wo
   unsigned short row_address = 0, column_address = 0;
   unsigned char adcs[nr_words];
   unsigned char adc_value = 0;
-  unsigned int all, dhp_id;
+  unsigned int all;
+  unsigned int dhp_id = 0;
   unsigned int index[nr_words];
   seed_pixel addr;
 

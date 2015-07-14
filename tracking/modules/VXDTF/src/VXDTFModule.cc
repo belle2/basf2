@@ -754,7 +754,7 @@ void VXDTFModule::the_real_event()
   StoreArray<genfit::TrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
   finalTrackCandidates.create();
   if (m_TESTERexpandedTestingRoutines == true) {
-    StoreArray<VXDTFInfoBoard> extraInfo4GFTCs;
+    StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName);
     extraInfo4GFTCs.create();
   }
 
@@ -3217,7 +3217,8 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   } // checking compatibility of TCs (compatible if they dont share hits, not compatible if they share ones)
 
   if (countCasesWhen2NeuronsAreCompatible == 0) {
-    B2DEBUG(2, "VXDTF event " << m_eventCounter << ": hopfield: no compatible neurons found, chosing TC by best QI...");
+    B2DEBUG(2, m_PARAMnameOfInstance << " event " << m_eventCounter <<
+            ": hopfield: no compatible neurons found, chosing TC by best QI...");
     int tempIndex = 0;
     double tempQI = tcVector[0]->getTrackQuality();
     for (int i = 1; i < nTCs; i++) {
@@ -6593,7 +6594,6 @@ std::vector<VXDTFHit> VXDTFModule::dealWithStrangeSensors(ActiveSensorsOfEvent& 
    * deliverVXDTFHitWrappedSVDHit(NULL, aClusterInfo)
    */
   ActiveSensorsOfEvent::iterator itCurrentSensor;
-  typedef pair<int, const SVDCluster*> ClusterBundle;
   vector<VXDTFHit> singleSidedHits;
   int nClusters = 0,
       threshold =
@@ -7645,9 +7645,9 @@ void VXDTFModule::setupPasses()
                 thisSector->getDistance() << " which has got " << nFriends << " friends for internal supportedCuttoffsList and " <<
                 thisSector->getFriendPointers().size() << " friendSectors as pointers");
         if (nFriends != uint(thisSector->getFriendMapSize()) or nFriends != thisSector->getFriendPointers().size()) {
-          B2WARNING(" number of friends do not match in sector " << FullSecID(mapEntry.first) <<
-                    ": friends by friendVector vs nEntries vs nFriendPointers in FriendMap: " << nFriends << "/" << thisSector->getFriendMapSize() <<
-                    "/" << thisSector->getFriendPointers().size())
+          B2WARNING(m_PARAMnameOfInstance << ": number of friends do not match in sector " << FullSecID(
+                      mapEntry.first) << ": friends by friendVector vs nEntries vs nFriendPointers in FriendMap: " << nFriends << "/" <<
+                    thisSector->getFriendMapSize() << "/" << thisSector->getFriendPointers().size())
         }
 
         for (VXDSector* aFriend : thisSector->getFriendPointers()) {

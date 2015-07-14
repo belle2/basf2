@@ -14,13 +14,16 @@ from tracking.validation.module import AlwaysPassFilter, \
 import basf2
 
 import ROOT
+
 ROOT.gSystem.Load('libtracking')
 from ROOT import Belle2
 
 
 class ExpertTrackingValidationModule(TrackingValidationModule):
 
-    """Module to collect more matching information about the found particles and to generate validation plots and figures of merit on the performance of track finding. This module gives information on the number of hits etc. """
+    """Module to collect more matching information about the found particles and to generate validation
+    plots and figures of merit on the performance of track finding. This module gives information on the
+    number of hits etc. """
 
     def __init__(
             self,
@@ -82,10 +85,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.mc_number_of_hits = collections.deque()
 
         # PT information
-        self.number_of_connected_tracks = collections.deque()  # This is the number of mcTrackCands sharing a hit with the track cand.
+        # This is the number of mcTrackCands sharing a hit with the track cand.
+        self.number_of_connected_tracks = collections.deque()
         self.number_of_wrong_hits = collections.deque()  # This number gives information about the "badness" of the fake.
-                                                         # It is calculated by going through all hits of the fake track and the connected mc track cands and counting the number.
-                                                         # These numbers are than summed up and substracted by the biggest number of hits this candidates shares with the mc track cands.
+        # It is calculated by going through all hits of the fake track and the connected mc track cands and counting the number.
+        # These numbers are than summed up and substracted by the biggest number
+        # of hits this candidates shares with the mc track cands.
         self.pr_number_of_hits = collections.deque()
         self.pr_number_of_matched_hits = collections.deque()
 
@@ -100,28 +105,31 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
         mcTrackCands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
         cdcHits = Belle2.PyStoreArray(self.cdcHitsColumnname)
+        if not cdcHits:
+            print "No CDC hits available, hit analysis incomplete"
+            return
 
         totalHitListMC = set([cdcHitID for mcTrackCand in mcTrackCands
-                             for cdcHitID in
-                             mcTrackCand.getHitIDs(Belle2.Const.CDC)])
+                              for cdcHitID in
+                              mcTrackCand.getHitIDs(Belle2.Const.CDC)])
         totalHitListPR = set([cdcHitID for trackCand in trackCands
-                             for cdcHitID in
-                             trackCand.getHitIDs(Belle2.Const.CDC)])
+                              for cdcHitID in
+                              trackCand.getHitIDs(Belle2.Const.CDC)])
 
         totalHitListPRGood = set([cdcHitID for trackCand in trackCands
-                                 for cdcHitID in
-                                 trackCand.getHitIDs(Belle2.Const.CDC)
-                                 if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)])
-
-        totalHitListPRClone = set([cdcHitID for trackCand in trackCands
                                   for cdcHitID in
                                   trackCand.getHitIDs(Belle2.Const.CDC)
-                                  if self.trackMatchLookUp.isClonePRTrackCand(trackCand)])
+                                  if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)])
+
+        totalHitListPRClone = set([cdcHitID for trackCand in trackCands
+                                   for cdcHitID in
+                                   trackCand.getHitIDs(Belle2.Const.CDC)
+                                   if self.trackMatchLookUp.isClonePRTrackCand(trackCand)])
         totalHitListPRFake = set([cdcHitID for trackCand in trackCands
-                                 for cdcHitID in
-                                 trackCand.getHitIDs(Belle2.Const.CDC)
-                                 if self.trackMatchLookUp.isGhostPRTrackCand(trackCand)
-                                 or self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)])
+                                  for cdcHitID in
+                                  trackCand.getHitIDs(Belle2.Const.CDC)
+                                  if self.trackMatchLookUp.isGhostPRTrackCand(trackCand)
+                                  or self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)])
 
         totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
 
@@ -185,8 +193,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             self.ratio_hits_in_mc_tracks_and_in_pr_tracks.append(ratio)
             if is_missing:
                 self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks.append(ratio)
-            self.ratio_hits_in_mc_tracks_and_in_good_pr_tracks.append(1.0 * len(mcTrackCandHits & totalHitListPRGood) / len(mcTrackCandHits))
-            self.ratio_hits_in_mc_tracks_and_in_fake_pr_tracks.append(1.0 * len(mcTrackCandHits & totalHitListPRFake) / len(mcTrackCandHits))
+            self.ratio_hits_in_mc_tracks_and_in_good_pr_tracks.append(
+                1.0 * len(mcTrackCandHits & totalHitListPRGood) / len(mcTrackCandHits))
+            self.ratio_hits_in_mc_tracks_and_in_fake_pr_tracks.append(
+                1.0 * len(mcTrackCandHits & totalHitListPRFake) / len(mcTrackCandHits))
 
             mcParticle = \
                 self.trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
@@ -213,15 +223,23 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         # Hit ratios #
         ######################
-        all_tracks_plot = self.profiles_by_parameters_base(xs=self.ratio_hits_in_mc_tracks_and_in_pr_tracks,
-                                                           quantity_name="ratio of hits in MCTracks found by the track finder", make_hist=True,
-                                                           parameter_names=[], profile_parameters={}, unit=None)
+        all_tracks_plot = self.profiles_by_parameters_base(
+            xs=self.ratio_hits_in_mc_tracks_and_in_pr_tracks,
+            quantity_name="ratio of hits in MCTracks found by the track finder",
+            make_hist=True,
+            parameter_names=[],
+            profile_parameters={},
+            unit=None)
 
         validation_plots.extend(all_tracks_plot)
 
-        missing_tracks_plot = self.profiles_by_parameters_base(xs=self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks,
-                                                               quantity_name="ratio of hits in missing MCTracks found by the track finder", make_hist=True,
-                                                               parameter_names=[], profile_parameters={}, unit=None)
+        missing_tracks_plot = self.profiles_by_parameters_base(
+            xs=self.ratio_hits_in_missing_mc_tracks_and_in_pr_tracks,
+            quantity_name="ratio of hits in missing MCTracks found by the track finder",
+            make_hist=True,
+            parameter_names=[],
+            profile_parameters={},
+            unit=None)
 
         validation_plots.extend(missing_tracks_plot)
 
@@ -229,7 +247,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             validation_plot.write()
 
         if self.write_tables:
-
             # MC Figures of merit
             mc_figures_of_merit = \
                 ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.name)

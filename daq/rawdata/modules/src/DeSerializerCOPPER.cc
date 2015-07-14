@@ -30,6 +30,7 @@ using namespace Belle2;
 int g_run_recovery = 0;
 int g_run_restarting = 0;
 int g_run_stop = 0;
+int g_run_error = 0;
 #endif
 
 //-----------------------------------------------------------------
@@ -227,6 +228,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
           printf("\033[0m");
           fflush(stdout);
 #endif
+          g_run_stop = 1;
           string err_str = "EAGAIN";
           throw (err_str);
         }
@@ -263,11 +265,11 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
       temp_buf = new int[ *m_size_word ];
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
       recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
-                           (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+                           (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte, *delete_flag);
     } else {
 
       recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
-                           (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte);
+                           (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte, *delete_flag);
     }
 
     if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
@@ -361,7 +363,7 @@ void DeSerializerCOPPERModule::openCOPPER()
 
 
 
-int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
+int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
 {
 
   int n = 0;
@@ -387,6 +389,14 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte)
           printf("###########(DesCpr) Stop is detected after return from readFD with EAGAIN ##\n");
           fflush(stdout);
 #endif
+          g_run_stop = 1;
+
+
+          if (delete_flag) {
+            B2WARNING("Delete buffer before going to Run-pause state");
+            delete buf;
+          }
+
           string err_str = "EAGAIN";
           throw (err_str);
         }
@@ -426,6 +436,21 @@ void DeSerializerCOPPERModule::restartRun()
 
 void DeSerializerCOPPERModule::waitRestart()
 {
+
+  // First, wait for run_stop
+  if (g_run_stop == 0 && g_run_error == 1) {
+    while (true) {
+#ifdef NONSTOP_DEBUG
+      printf("\033[31m");
+      printf("###########(DesCpr) Error stop. Waiting for RUNPAUSE  ###############\n");
+      printf("\033[0m");
+      fflush(stdout);
+#endif
+      if (checkRunStop()) break;
+      sleep(1);
+    }
+  }
+
   // close COPPER FIFO
   if (m_cpr_fd != -1) close(m_cpr_fd);
   m_cpr_fd = -1;
@@ -433,6 +458,12 @@ void DeSerializerCOPPERModule::waitRestart()
     if (checkRunRecovery()) {
       g_run_stop = 0;
       g_run_recovery = 1;
+#ifdef NONSTOP_DEBUG
+      printf("\033[31m");
+      printf("###########(DesCpr) Resume detected  ###############\n");
+      printf("\033[0m");
+      fflush(stdout);
+#endif
       break;
     }
 #ifdef NONSTOP_DEBUG
@@ -451,9 +482,9 @@ void DeSerializerCOPPERModule::waitRestart()
 void DeSerializerCOPPERModule::event()
 {
 
-
 #ifdef NONSTOP
-  if (g_run_recovery == 1) {
+  if (g_run_stop + g_run_error > 0 || checkRunStop()) {
+    waitRestart();
     restartRun();
   }
 #endif
@@ -500,8 +531,10 @@ void DeSerializerCOPPERModule::event()
         printf("###########(DesCpr) caught Exception ###############\n");
         fflush(stdout);
 #endif
-        pauseRun();
-        break;
+        g_run_stop = 1;
+        return;
+        //        pauseRun();
+        //        break;
       }
 #endif
       print_err.PrintError(m_shmflag, &g_status, err_str);
@@ -524,6 +557,8 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     try {
+      printf("eve %.8x prev run %.8x cur run %.8x : %d %d %d\n", m_prev_ftsweve32, m_prev_exprunsubrun_no, m_exprunsubrun_no
+             , g_run_stop, g_run_recovery, g_run_restarting); fflush(stdout);
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask,
                                                               m_prev_ftsweve32, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
       m_prev_exprunsubrun_no = m_exprunsubrun_no;
@@ -538,12 +573,6 @@ void DeSerializerCOPPERModule::event()
     }
     m_totbytes += m_size_word * sizeof(int);
   }
-
-#ifdef NONSTOP
-  if (g_run_stop == 1 || checkRunStop()) {
-    waitRestart();
-  }
-#endif
 
 
 

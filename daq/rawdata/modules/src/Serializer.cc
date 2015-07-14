@@ -272,7 +272,9 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
           printf("\033[0m");
 
 #endif
+          B2INFO("RunStop is detected.");
           string err_str = "RunPause";
+          g_run_stop = 1;
           throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
         }
 #endif
@@ -283,7 +285,9 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
+        B2INFO("Connection error is detected.");
         string err_str = err_buf;
+        g_run_error = 1;
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
 #else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -622,7 +626,7 @@ void SerializerModule::event()
 #ifdef NONSTOP
   if (g_run_restarting == 1) {
     restartRun();
-  } else if (g_run_recovery == 1) {
+  } else if (g_run_stop == 1) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
     printf("###########(Ser) Go back to Deseializer()  ###############\n");
@@ -660,7 +664,6 @@ void SerializerModule::event()
       //    } catch (string err_str) {
     } catch (...) {
 #ifdef NONSTOP
-      g_run_stop = 1;
       return; // Go to DeSerializer***() to wait for run-restart.
 #else
       exit(1);

@@ -82,7 +82,7 @@ namespace Belle2 {
     virtual int* readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word);
     virtual void openCOPPER();
     //! receive data
-    virtual int readFD(int fd, char* buf, int data_size_byte);
+    virtual int readFD(int fd, char* buf, int data_size_byte, int delete_flag);
 
     //! Module functions to be called from main process
     virtual void initializeCOPPER();

@@ -105,24 +105,24 @@ namespace Belle2 {
     std::vector<double>* m_eclSimHitPy; /** ECLDigit PY */
     std::vector<double>* m_eclSimHitPz; /** ECLDigit PZ */
 
-    int m_eclHitMultip;
-    std::vector<int>* m_eclHitIdx;
-    std::vector<int>* m_eclHitToMc;
-    std::vector<int>* m_eclHitCellId;
-    std::vector<double>* m_eclHitEnergyDep;
-    std::vector<double>* m_eclHitTimeAve;
+    int m_eclHitMultip; /** Number of ECLHits per event */
+    std::vector<int>* m_eclHitIdx; /** Index of ECLHits */
+    std::vector<int>* m_eclHitToMc; /** Index of MCParticle related to ECLHit */
+    std::vector<int>* m_eclHitCellId; /** ECLHit CellID */
+    std::vector<double>* m_eclHitEnergyDep; /** ECLHit energy */
+    std::vector<double>* m_eclHitTimeAve; /** ECLHit time */
 
-    int m_eclShowerMultip;
-    std::vector<int>* m_eclShowerIdx;
-    std::vector<int>* m_eclShowerToMc;
-    std::vector<int>* m_eclShowerToGamma;
-    std::vector<double>* m_eclShowerEnergy;
-    std::vector<double>* m_eclShowerTheta;
-    std::vector<double>* m_eclShowerPhi;
-    std::vector<double>* m_eclShowerR;
-    std::vector<int>* m_eclShowerNHits;
-    std::vector<double>* m_eclShowerE9oE25;
-    std::vector<double>* m_eclShowerUncEnergy;
+    int m_eclShowerMultip; /** Number of ECLShowers per event */
+    std::vector<int>* m_eclShowerIdx; /** ECLShower index */
+    std::vector<int>* m_eclShowerToMc; /** Index of MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToGamma; /** Index of ECLGamma related to ECLShower */
+    std::vector<double>* m_eclShowerEnergy; /** ECLShower energy */
+    std::vector<double>* m_eclShowerTheta; /** Polar direction of ECLShower */
+    std::vector<double>* m_eclShowerPhi; /** Azimuthal direction of ECLShower */
+    std::vector<double>* m_eclShowerR; /** Distance from IP of ECLShower */
+    std::vector<int>* m_eclShowerNHits; /** Number of ECLHits related to ECLShower */
+    std::vector<double>* m_eclShowerE9oE25; /** Ratio of 3x3 over 5x5 crystal matrices energies */
+    std::vector<double>* m_eclShowerUncEnergy; /** Uncorrected ECLShower energy */
 
     int m_eclClusterMultip;
     std::vector<int>* m_eclClusterIdx;

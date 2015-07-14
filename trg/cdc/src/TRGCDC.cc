@@ -31,6 +31,7 @@
 #include "trg/trg/Signal.h"
 #include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
+#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Layer.h"
@@ -106,9 +107,9 @@ TRGCDC::getTRGCDC(const string & configFile,
                   unsigned houghFinderMeshX,
                   unsigned houghFinderMeshY,
                   unsigned houghFinderPeakMin,
-                  unsigned houghMapping,
                   const string & houghMappingFilePlus,
                   const string & houghMappingFileMinus,
+                  unsigned houghDoit,
                   bool fLogicLUTTSF,
                   bool fLRLUT,
                   bool fevtTime,
@@ -140,9 +141,9 @@ TRGCDC::getTRGCDC(const string & configFile,
                           houghFinderMeshX,
                           houghFinderMeshY,
                           houghFinderPeakMin,
-                          houghMapping,
                           houghMappingFilePlus,
                           houghMappingFileMinus,
+                          houghDoit,
                           fLogicLUTTSF,
                           fLRLUT,
                           fevtTime,
@@ -200,9 +201,9 @@ TRGCDC::TRGCDC(const string & configFile,
                unsigned houghFinderMeshX,
                unsigned houghFinderMeshY,
                unsigned houghFinderPeakMin,
-               unsigned houghMapping,
                const string & houghMappingFilePlus,
                const string & houghMappingFileMinus,
+               unsigned houghDoit,
                bool fLogicLUTTSF,
                bool fLRLUT,
                bool fevtTime,
@@ -281,9 +282,9 @@ TRGCDC::TRGCDC(const string & configFile,
     initialize(houghFinderMeshX,
                houghFinderMeshY,
                houghFinderPeakMin,
-               houghMapping,
                houghMappingFilePlus,
-               houghMappingFileMinus);
+               houghMappingFileMinus,
+               houghDoit);
 
     if (TRGDebug::level()) {
         cout << "TRGCDC ... TRGCDC created with " << _configFilename << endl;
@@ -296,9 +297,9 @@ void
 TRGCDC::initialize(unsigned houghFinderMeshX,
                    unsigned houghFinderMeshY,
                    unsigned houghFinderPeakMin,
-                   unsigned houghMapping,
                    const string & houghMappingFilePlus,
-                   const string & houghMappingFileMinus) {
+                   const string & houghMappingFileMinus,
+                   unsigned houghDoit) {
 
     TRGDebug::enterStage("TRGCDC initialize");
 
@@ -596,9 +597,9 @@ TRGCDC::initialize(unsigned houghFinderMeshX,
                              houghFinderMeshX,
                              houghFinderMeshY,
                              houghFinderPeakMin,
-                             houghMapping,
                              houghMappingFilePlus,
-                             houghMappingFileMinus);
+                             houghMappingFileMinus,
+                             houghDoit);
 
     //...Hough 3D Finder...
     _h3DFinder = new TCH3DFinder(*this, _fileHough3D, _finder3DMode);
@@ -2022,9 +2023,7 @@ TRGCDC::fastSimulation(void) {
     if (_perfect2DFinder)
         _pFinder->doit(_trackList2DFitted);
     else
-//      _hFinder->doit(_trackList2D, _trackList2DFitted);
-        _hFinder->doit2(_trackList2D, _trackList2DFitted);
-//      _hFinder->doit3(_trackList2D, _trackList2DFitted);
+        _hFinder->doit(_trackList2D, _trackList2DFitted);
 
     //...Check MC relations...
     // for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {

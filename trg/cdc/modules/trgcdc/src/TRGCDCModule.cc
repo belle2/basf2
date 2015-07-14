@@ -69,9 +69,9 @@ TRGCDCModule::TRGCDCModule()
 //    _hFinderMeshY(24),
       _hFinderMeshY(16),
       _hFinderPeakMin(5),
-      _hFinderMapping(1),
       _hFinderMappingFilePlus("HoughMappingPlus20140807.dat"),
       _hFinderMappingFileMinus("HoughMappingMinus20140808.dat"),
+      _hFinderDoit(2),
       _fLogicLUTTSF(0),
       _fLRLUT(1),
       _fevtTime(1),
@@ -198,10 +198,6 @@ TRGCDCModule::TRGCDCModule()
              _hFinderPeakMin,
              "Hough finder min. peak height",
              _hFinderPeakMin);
-    addParam("HoughFinderMapping",
-             _hFinderMapping,
-             "Hough finder cell mapping methode",
-             _hFinderMapping);
     addParam("HoughFinderMappingFilePlus",
              _hFinderMappingFilePlus,
              "Hough finder cell mapping file for charge plus",
@@ -210,6 +206,10 @@ TRGCDCModule::TRGCDCModule()
              _hFinderMappingFileMinus,
              "Hough finder cell mapping file for charge minus",
              _hFinderMappingFileMinus);
+    addParam("HoughFinderDoit",
+             _hFinderDoit,
+             "Hough finder doit() version",
+             _hFinderDoit);
     addParam("Fitter3DLRLUT",
              _fLRLUT,
              "Using L/R LUT in fitter3D",
@@ -342,9 +342,9 @@ TRGCDCModule::beginRun() {
 				 _hFinderMeshX,
 				 _hFinderMeshY,
 				 _hFinderPeakMin,
-                                 _hFinderMapping,
                                  _hFinderMappingFilePlus,
                                  _hFinderMappingFileMinus,
+                                 _hFinderDoit,
                                  _fLogicLUTTSF,
 				 _fLRLUT,
 				 _fevtTime,

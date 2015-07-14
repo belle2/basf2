@@ -46,9 +46,9 @@ class TRGCDCHoughFinder {
                       unsigned nX,
                       unsigned nY,
 		      unsigned peakMin,
-                      unsigned mapping,
                       const std::string & mappingFilePlus,
-                      const std::string & mappingFileMinus);
+                      const std::string & mappingFileMinus,
+                      unsigned doit);
 
     /// Destructor
     virtual ~TRGCDCHoughFinder();
@@ -64,9 +64,20 @@ class TRGCDCHoughFinder {
     /// termination.
     void terminate();
 
-    /// do track finding and fitting (old version).
+    /// do track finding and fitting.
     int doit(std::vector<TRGCDCTrack *> & trackList2D,
              std::vector<TRGCDCTrack *> & trackList2DFitted);
+
+  public:
+
+    /// sets and returns switch to do perfect finding.
+    bool perfect(bool);
+
+  private:
+
+    /// do track finding and fitting (Trasan version).
+    int doit1(std::vector<TRGCDCTrack *> & trackList2D,
+              std::vector<TRGCDCTrack *> & trackList2DFitted);
 
     /// do track finding and fitting (Kaiyu version).
     int doit2(std::vector<TRGCDCTrack *> & trackList2D,
@@ -75,13 +86,6 @@ class TRGCDCHoughFinder {
     /// do track finding and fitting (development version)
     int doit3(std::vector<TRGCDCTrack *> & trackList2D,
               std::vector<TRGCDCTrack *> & trackList2DFitted);
-
-  public:
-
-    /// sets and returns switch to do perfect finding.
-    bool perfect(bool);
-
-  private:
 
     /// selects the best(fastest) hits in each super layer.
     std::vector<TRGCDCLink *> selectBestHits(
@@ -154,6 +158,9 @@ class TRGCDCHoughFinder {
     /// Circle Hough transformtion.
     TRGCDCHoughTransformationCircle _circleH;
 
+    /// Doit version.
+    const unsigned _doit;
+
     /// Peak finder.
     TRGCDCPeakFinder _peakFinder;
 
@@ -185,7 +192,7 @@ class TRGCDCHoughFinder {
     std::map<std::string, TRGCDCJLUT*> m_mLutStorage;
 
     /// For VHDL code.
-    TRGCDCJSignalData* m_commonData;
+    TRGCDCJSignalData * _commonData;
 };
 
 //-----------------------------------------------------------------------------

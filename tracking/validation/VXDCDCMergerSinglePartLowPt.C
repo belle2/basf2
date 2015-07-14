@@ -81,10 +81,10 @@ void VXDCDCMergerSinglePartLowPt(){
 
 
   TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
+  tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   h10->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
   h10->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h10->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   h10->Write();
 
   //TH1F *h11 = new TH1F("h11","DMomx",100,-2,2);

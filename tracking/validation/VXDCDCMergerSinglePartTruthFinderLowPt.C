@@ -93,6 +93,7 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
 
 
   TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
+  tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   h10->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
   h10->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h10->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
@@ -100,7 +101,7 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   //h5->GetYaxis()->SetTitle("Efficiency");
   //tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
   gStyle->SetOptStat("e");
-  tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
+
   gStyle->SetOptStat("e");
   h10->Write();
 
@@ -156,17 +157,17 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   h22->SetMaximum(1.1);
   tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>h22","TruthTag==1");
   h22->Sumw2();
-  TH1F *ptspttlp = new TH1F("ptspttlp","Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
-  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>ptspttlp","TruthTag==1&&GoodTag==1");
-  ptspttlp->SetMaximum(1.1);
-  ptspttlp->Sumw2();
+  TH1F *eff_ptspttlp = new TH1F("eff_ptspttlp","Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
+  tree->Draw("TMath::Sqrt((Px*Px+Py*Py))>>eff_ptspttlp","TruthTag==1&&GoodTag==1");
+  eff_ptspttlp->SetMaximum(1.1);
+  eff_ptspttlp->Sumw2();
   gPad->RedrawAxis();
   TH1F *eff_ptlp = new TH1F("eff_ptlp", "Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
-  ptspttlp->GetXaxis()->SetTitle("Pt (GeV)");
-  ptspttlp->GetYaxis()->SetTitle("Efficiency");
-  ptspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
-  ptspttlp->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
-  ptspttlp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_ptspttlp->GetXaxis()->SetTitle("Pt (GeV)");
+  eff_ptspttlp->GetYaxis()->SetTitle("Efficiency");
+  eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
+  eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
+  eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   eff_ptlp->Divide(ptspttlp, h22, 1.0, 1.0, "B");
   gStyle->SetOptStat("e");
   eff_ptlp->GetYaxis()->SetRangeUser(0,1.1);

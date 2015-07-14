@@ -2,6 +2,7 @@
 Scripts and functions to set the BeamParameters from known configurations
 """
 
+from __future__ import print_function, division, absolute_import
 from basf2 import *
 import math
 import numpy as np
@@ -64,23 +65,23 @@ beamparameter_presets = {
         "energyHER": 7.200,
         "energyLER": 4.114,
     }),
-    "Y1S-off": ("Y1S", {  # m(Y1S) - 50 MeV
+    "Y1S-off": ("Y1S", {  # m(Y1S) - 50 MeV = 9.410 GeV
         "energyHER": 6.230,
         "energyLER": 3.560,
     }),
-    "Y2S-off": ("Y2S", {  # m(Y2S) - 50 MeV
+    "Y2S-off": ("Y2S", {  # m(Y2S) - 50 MeV = 9.973 GeV
         "energyHER": 6.602,
         "energyLER": 3.773,
     }),
-    "Y3S-off": ("Y3S", {  # m(Y3S) - 50 MeV
+    "Y3S-off": ("Y3S", {  # m(Y3S) - 50 MeV = 10.305 GeV
         "energyHER": 6.822,
         "energyLER": 3.898,
     }),
-    "Y4S-off": ("Y4S", {  # m(Y4S) - 50 MeV
+    "Y4S-off": ("Y4S", {  # m(Y4S) - 50 MeV = 10.529 GeV
         "energyHER": 6.971,
         "energyLER": 3.983,
     }),
-    "Y5S-off": ("Y5S", {  # m(Y5S) - 50 MeV
+    "Y5S-off": ("Y5S", {  # m(Y5S) - 50 MeV = 10.826 GeV
         "energyHER": 7.167,
         "energyLER": 4.095,
     }),
@@ -152,6 +153,14 @@ def calculate_beamspot(pos_her, pos_ler, size_her, size_ler, angle_her, angle_le
 
 
 def add_beamparameters(path, name, **argk):
+    """Add BeamParameter module to a given path
+
+    Args:
+        path (basf2.Path instance): path to add the module to
+        name: name of the beamparameter settings to use
+
+    Additional keyword arguments will be passed directly to the module as parameters.
+    """
     if name not in beamparameter_presets:
         B2FATAL("Unknown beamparameter preset: '%s', use one of %s" %
                 (name, ", ".join(sorted(beamparameter_presets.keys()))))
@@ -211,30 +220,36 @@ if __name__ == "__main__":
     np.set_printoptions(precision=3)
 
     # calculate beamspot for SuperKEKB for testing
+    #: beamparameter defaults for SuperKEKB
     values = beamparameter_presets["SuperKEKB"][1]
     beampos_spot, cov_spot = calculate_beamspot(
         [0, 0, 0], [0, 0, 0],
         values["bunchHER"], values["bunchLER"],
         values["angleHER"], values["angleLER"],
     )
-    print "Beamspot position:"
-    print beampos_spot
-    print "Beamspot covariance:"
-    print cov_spot
-    print "Beamspot dimensions (in mm, axes in arbitary order):"
-    print np.linalg.eig(cov_spot)[0] ** .5 * 10
+    print("Beamspot position:")
+    print(beampos_spot)
+    print("Beamspot covariance:")
+    print(cov_spot)
+    print("Beamspot dimensions (in mm, axes in arbitary order):")
+    print(np.linalg.eig(cov_spot)[0] ** .5 * 10)
 
     # see if we can plot it
     try:
         from matplotlib import pyplot as pl
+        #: covariance matrix for her bunch
         cov_her = cov_matrix(values["bunchHER"], values["angleHER"])
+        #: covariance matrix for ler bunch
         cov_ler = cov_matrix(values["bunchLER"], values["angleLER"])
-        x = np.random.multivariate_normal([0, 0, 0], cov_her, 1000)
-        y = np.random.multivariate_normal([0, 0, 0], cov_ler, 1000)
-        z = np.random.multivariate_normal(beampos_spot, cov_spot, 1000)
-        pl.scatter(x[:, 2], x[:, 0], s=5, marker=".", c="b", edgecolors="None", label="HER")
-        pl.scatter(y[:, 2], y[:, 0], s=5, marker=".", c="r", edgecolors="None", label="LER")
-        pl.scatter(z[:, 2], z[:, 0], s=5, marker=".", c="g", edgecolors="None", label="spot")
+        #: random points according to her bunch covariance
+        points_her = np.random.multivariate_normal([0, 0, 0], cov_her, 1000)
+        #: random points according to ler bunch covariance
+        points_ler = np.random.multivariate_normal([0, 0, 0], cov_ler, 1000)
+        #: random points according to calculated beamspot
+        points_spot = np.random.multivariate_normal(beampos_spot, cov_spot, 1000)
+        pl.scatter(points_her[:, 2], points_her[:, 0], s=5, marker=".", c="b", edgecolors="None", label="HER")
+        pl.scatter(points_ler[:, 2], points_ler[:, 0], s=5, marker=".", c="r", edgecolors="None", label="LER")
+        pl.scatter(points_spot[:, 2], points_spot[:, 0], s=5, marker=".", c="g", edgecolors="None", label="spot")
         pl.legend()
         pl.xlabel("z / cm")
         pl.ylabel("x / cm")
@@ -244,12 +259,17 @@ if __name__ == "__main__":
         pass
 
     import ROOT
+    #: nominal SuperKEKB HER energy
     eher = values["energyHER"]
+    #: nominal SuperKEKB LER energy
     eler = values["energyLER"]
+    #: nominal SuperKEKB HER angle
     aher = values["angleHER"]
+    #: nominal SuperKEKB LER angle
     aler = values["angleLER"]
 
-    def get_4vector(energy, angle):
+    def __get_4vector(energy, angle):
+        """Calculate an 4vector for electron/positron from energy and angle"""
         m = 0.511e-3
         pz = (energy**2 - m**2)**.5
         v = ROOT.TLorentzVector(0, 0, pz, energy)
@@ -260,13 +280,15 @@ if __name__ == "__main__":
 
     # calculate beam energies for Y1S - Y4S by scaling them from the nominal
     # beam energies for the SuperKEKB preset
-    ler = get_4vector(eher, aher)
-    her = get_4vector(eler, aler)
-    ler.Print()
-    her.Print()
-    (her + ler).Print()
+    #: nominal SuperKEKB HER 4vector
+    ler = __get_4vector(eher, aher)
+    #: nominal SuperKEKB LER 4vector
+    her = __get_4vector(eler, aler)
+    #: nominal SuperKEKB CMS energy
     mass = (her + ler).M()
+    print("Nominal CMS Energy: ", mass)
 
+    #: target CMS energies from PDG
     targets = {
         "Y1S": 9460.30e-3,
         "Y2S": 10023.26e-3,
@@ -275,17 +297,19 @@ if __name__ == "__main__":
         "Y5S": 10876e-3
     }
     for name, energy in sorted(targets.items()):
+        #: scaling between nominal and target CMS energy
         scale = energy / mass
-        print """\
+        print("""\
             "%s": ("SuperKEKB", {  # m(%s) = %.3f GeV
                 "energyHER": %.3f,
                 "energyLER": %.3f,
-            }),""" % (name, name, energy, eher * scale, eler * scale)
+            }),""" % (name, name, energy, eher * scale, eler * scale))
 
     for name, energy in sorted(targets.items()):
+        #: scaling between nominal and target CMS energy for off resoncane, i.e. 50MeV lower
         scale = (energy - 50e-3) / mass
-        print """\
+        print("""\
             "%s-off": ("%s", {  # m(%s) - 50 MeV = %.3f GeV
                 "energyHER": %.3f,
                 "energyLER": %.3f,
-            }),""" % (name, name, name, energy, eher * scale, eler * scale)
+            }),""" % (name, name, name, energy - 50e-3, eher * scale, eler * scale))

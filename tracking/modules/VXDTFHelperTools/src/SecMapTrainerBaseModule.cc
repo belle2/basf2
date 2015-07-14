@@ -63,7 +63,7 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
   std::vector<std::string> defaultSecNames = {"fullRange"};
   std::vector<float> originVec = {0, 0, 0};
   std::vector<float> acceptedRegionForSensorsVec = { -1, -1};
-  std::vector<std::string> rootFileNameVals = {"FilterCalculatorResults", "UPDATE"};
+  std::vector<std::string> rootFileNameVals = {"SecMapTrainerBaseResults", "UPDATE"};
   std::vector<std::string> supportedDetectors = {"SVD"};
 
   addParam("exportSectorCoords", m_PARAMexportSectorCoords, "set true if you want to export coordinates of the sectors too",
@@ -104,7 +104,7 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
            int(0));
 
   addParam("multiHitsAllowed", m_PARAMmultiHitsAllowed,
-           "if this parameter is true, the FilterCalculatorModule ignores tracks which have more than one hit on the same sensor. If false, these tracks get filtered. There will be a warning, if parameter 'testBeam' is != 0 and this parameter is true, since there curlers shouldn't be possible",
+           "if this parameter is true, the SecMapTrainerBaseModule ignores tracks which have more than one hit on the same sensor. If false, these tracks get filtered. There will be a warning, if parameter 'testBeam' is != 0 and this parameter is true, since there curlers shouldn't be possible",
            bool(false));
 
   addParam("acceptedRegionForSensors", m_PARAMacceptedRegionForSensors,
@@ -279,7 +279,7 @@ void SecMapTrainerBaseModule::initialize()
             " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
     m_PARAMtestBeam = 0;
   }
-  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("FilterCalculatorWithSpacePointsModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!")}
+  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("SecMapTrainerBaseModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!")}
 
 
   if (m_PARAManalysisWriteToRoot == true) { // preparing output of analysis data:
@@ -359,7 +359,7 @@ void SecMapTrainerBaseModule::initialize()
                                                             m_PARAMpTcuts.at(i + 1), m_usePXD, m_useSVD, m_useTEL);
     secMap->insert({FullSecID().getFullSecString(), newCenterSector});
 
-    B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs in range " << secMap->getPtCuts().first <<
+    B2INFO("SecMapTrainerBaseModule-start: will use " << secMapName << " for storing cutoffs in range " << secMap->getPtCuts().first <<
            " - " << secMap->getPtCuts().second << " GeV/c")
     m_sectorMaps.push_back(secMap);
   }
@@ -381,7 +381,7 @@ void SecMapTrainerBaseModule::initialize()
                                                           m_usePXD, m_useSVD, m_useTEL);
   secMap->insert({FullSecID().getFullSecString(), newCenterSector});
 
-  B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs in range " << secMap->getPtCuts().first <<
+  B2INFO("SecMapTrainerBaseModule-start: will use " << secMapName << " for storing cutoffs in range " << secMap->getPtCuts().first <<
          " - " << secMap->getPtCuts().second << " GeV/c")
   m_sectorMaps.push_back(secMap);
 
@@ -422,7 +422,7 @@ void SecMapTrainerBaseModule::initialize()
 /// /// /// /// /// /// /// /// BEGIN RUN /// /// /// /// /// /// /// ///
 void SecMapTrainerBaseModule::beginRun()
 {
-  B2INFO("~~~~~~~~~~~FilterCalculator - beginRun ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - beginRun ~~~~~~~~~~")
 
 //   InitializeVariables();
 }
@@ -960,7 +960,7 @@ void SecMapTrainerBaseModule::event()
         if (thisSectorPos == thisSecMap->end()) { B2ERROR(" sector " << currentSector << " not found...")} /// WARNING TODO WTF?!?
 
         if (typeid(string).name() != typeid(friendSector).name()) {
-          B2WARNING("FilterCalculatorWithSpacePointsModule event " << m_eventCounter <<
+          B2WARNING("SecMapTrainerBaseModule event " << m_eventCounter <<
                     ": type of friendSector is no string, aborting tracklet...")
           continue;
         }

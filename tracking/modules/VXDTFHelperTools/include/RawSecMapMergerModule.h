@@ -23,7 +23,7 @@
 #include <utility> // std::pair
 
 //boost:
-#include "boost/tuple/tuple.hpp" // a generalized version of pair
+#include <boost/tuple/tuple.hpp> // a generalized version of pair
 #ifndef __CINT__
 #include <boost/chrono.hpp>
 #endif
@@ -92,7 +92,27 @@ namespace Belle2 {
     bool m_PARAMimportROOTorXML;
 
 
+    // ROOTorXML = True
+    bool m_PARAMsortByDistance2origin; /**< only needed if importROOTorXML = true: if set to true, sectors are not treated by layerID but by distance to origin. This has an effect on filtering bad sector combinations. Recommendation: use false for normal Belle2-VXD-case and true for beam test situations where layerIDs are mixed up */
+    std::string m_PARAMrootFileName; /**< only needed if importROOTorXML = true: sets the root filename */
+    bool m_PARAMprintFinalMaps; /**< only needed if importROOTorXML = true:  if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen */
 
+    bool m_PARMfilterRareCombinations; /**< only needed if importROOTorXML = true:  use this member if you want to steer whether rare sector-friend-combinations shall be filtered or not. Set true if you want to filter these combinations or set false if otherwise. */
+
+    double
+    m_PARAMrarenessFilter; /**< only needed if importROOTorXML = true:  use this member if you want to steer whether rare sector-friend-combinations shall be filtered or not, here you can set the threshold for filter. 100% = 1. 1% = 0.01%. Example: if you choose 0.01, all friendsectors which occur less often than in 1% of all cases when main sector was used, are deleted in the friendship-relations", double(0.0)) */
+
+    std::vector<int>
+    m_PARAMsampleThreshold; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen */
+    std::vector<double>
+    m_PARAMsmallSampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
+    std::vector<double>
+    m_PARAMsampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
+    std::vector<double>
+    m_PARAMstretchFactor; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly */
+
+
+    // ROOTorXML = False
     std::vector<double>
     m_PARAMsectorConfigU; /**< only needed if importROOTorXML = false:  allows defining the the config of the sectors in U direction value is valid for each sensor of chosen detector setup, minimum 2 values between 0.0 and 1.0 */
     std::vector<double>
@@ -108,17 +128,7 @@ namespace Belle2 {
 
 
 
-    std::vector<int>
-    m_PARAMsampleThreshold; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen */
-    std::vector<double>
-    m_PARAMsmallSampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
-    std::vector<double>
-    m_PARAMsampleQuantiles; /**< only needed if importROOTorXML = true:  behiavior of normal sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed */
-    std::vector<double>
-    m_PARAMstretchFactor; /**< only needed if importROOTorXML = true:  exactly two entries allowed: first: stretchFactor for small sample size for sector-combination, second: stretchFactor for normal sample size for sector-combination: WARNING if you simply want to produce wider cutoffs in the VXDTF, please use the tuning parameters there! This parameter here is only if you know what you are doing, since it changes the values in the XML-file directly */
-    bool m_PARAMsortByDistance2origin; /**< only needed if importROOTorXML = true: if set to true, sectors are not treated by layerID but by distance to origin. This has an effect on filtering bad sector combinations. Recommendation: use false for normal Belle2-VXD-case and true for beam test situations where layerIDs are mixed up */
-    std::string m_PARAMrootFileName; /**< only needed if importROOTorXML = true: sets the root filename */
-    bool m_PARAMprintFinalMaps; /**< if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen */
+
   private:
 
   };

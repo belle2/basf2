@@ -51,31 +51,13 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
 //   setPropertyFlags(c_ParallelProcessingCertified); /// WARNING this module should _not_ be used for parallel processing! Its task is to create the sector maps only once...
 
   /// setting standard values for steering parameters
-  std::vector<double> defaultConfigU; // sector sizes
-  defaultConfigU.push_back(0.0);
-  defaultConfigU.push_back(0.5);
-  defaultConfigU.push_back(1.0);
-  std::vector<double> defaultConfigV;
-  defaultConfigV.push_back(0.0);
-  defaultConfigV.push_back(0.33);
-  defaultConfigV.push_back(0.67);
-  defaultConfigV.push_back(1.0);
-  std::vector<double> originVec;
-  originVec.push_back(0);
-  originVec.push_back(0);
-  originVec.push_back(0);
-  std::vector<int> sampleThreshold;
-  sampleThreshold.push_back(1);
-  sampleThreshold.push_back(100);
-  std::vector<double> smallSampleQuantiles;
-  smallSampleQuantiles.push_back(0.);
-  smallSampleQuantiles.push_back(1.);
-  std::vector<double> sampleQuantiles;
-  sampleQuantiles.push_back(0.001);
-  sampleQuantiles.push_back(0.999);
-  std::vector<double> stretchFactor;
-  stretchFactor.push_back(0.02); // change by 2%
-  stretchFactor.push_back(0.);
+  std::vector<double> defaultConfigU = {0., 0.5, 1.}; // sector sizes
+  std::vector<double> defaultConfigV = {0., 0.33, 0.67, 1.};
+  std::vector<double> originVec = {0., 0., 0.};
+  std::vector<int> sampleThreshold = {1, 100};
+  std::vector<double> smallSampleQuantiles = {0., 1.};
+  std::vector<double> sampleQuantiles = {0.001, 0.999};
+  std::vector<double> stretchFactor = {0.02, 0.}; // lower stretchFactor: change by 2%
   std::string rootFileName = "FilterCalculatorResults";
 
 
@@ -112,6 +94,13 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
            "only needed if importROOTorXML = true: exactly two entries allowed: first: minimal sample size for sector-combination, second: threshold for 'small samples' where behavior is less strict. If sampleSize is bigger than second, normal behavior is chosen",
            sampleThreshold);
 
+  addParam("filterRareCombinations", m_PARMfilterRareCombinations,
+           "only needed if importROOTorXML = true: use this member if you want to steer whether rare sector-friend-combinations shall be filtered or not. Set true if you want to filter these combinations or set false if otherwise. ",
+           bool(false));
+
+  addParam("rarenessFilter", m_PARAMrarenessFilter,
+           "only needed if importROOTorXML = true: use this member if you want to steer whether rare sector-friend-combinations shall be filtered or not, here you can set the threshold for filter. 100% = 1. 1% = 0.01%. Example: if you choose 0.01, all friendsectors which occur less often than in 1% of all cases when main sector was used, are deleted in the friendship-relations",
+           double(0.0));
   addParam("smallSampleQuantiles", m_PARAMsmallSampleQuantiles,
            "only needed if importROOTorXML = true: behiavior of small sample sizes, exactly two entries allowed: first: lower quantile, second: upper quantile. only values between 0-1 are allowed",
            smallSampleQuantiles);
@@ -131,7 +120,8 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
   addParam("rootFileName", m_PARAMrootFileName, "only needed if importROOTorXML = true: sets the root filename", rootFileName);
 
   addParam("printFinalMaps", m_PARAMprintFinalMaps,
-           "if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen", bool(true));
+           "only needed if importROOTorXML = true: if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen",
+           bool(true));
 }
 
 
@@ -152,13 +142,15 @@ void RawSecMapMergerModule::initialize()
     if (int(m_PARAMsampleThreshold.size()) != 2) { B2FATAL(" parameter sampleThreshold is wrong, only exactly 2 entries allowed!")}
     if (int(m_PARAMsmallSampleQuantiles.size()) != 2) { B2FATAL(" parameter smallSampleQuantiles is wrong, only exactly 2 entries allowed!")}
     if (int(m_PARAMstretchFactor.size()) != 2) { B2FATAL(" parameter stretchFactor is wrong, only exactly 2 entries allowed!")}
+    if (m_PARAMrarenessFilter < 0. or m_PARAMrarenessFilter > 1.) {
+      B2WARNING("ExportSectorMapModule::initialize:  parameter rarenessFilter is set to " << m_PARAMrarenessFilter <<
+                ", which is not within the allowed range of 0 < x < 1! Setting to 0...!"); m_PARAMrarenessFilter = 0;
+    }
   } else { /// import via xml file
     if (int(m_PARAMsetOrigin.size()) != 3) {
       B2WARNING("RawSecMapMergerModule::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
       m_PARAMsetOrigin.clear();
-      m_PARAMsetOrigin.push_back(0);
-      m_PARAMsetOrigin.push_back(0);
-      m_PARAMsetOrigin.push_back(0);
+      m_PARAMsetOrigin = {0., 0., 0.};
     }
     B2INFO("RawSecMapMergerModule::initialize: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << ","
            << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
@@ -433,7 +425,7 @@ std::pair<int, int> RawSecMapMergerModule::importROOTMap()
     while ((key = (TKey*)next())) {
 
       try {
-        retrievedVector = dynamic_cast<SecMapVector*>
+        retrievedVector = static_cast<SecMapVector*>
                           (key->ReadObj()); // not very performant, but here, the performance is not an issue, especially since there is only a relatively small number of vectors imported - compared the size of their objects
       } catch (exception& e) {
         B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...")
@@ -443,7 +435,8 @@ std::pair<int, int> RawSecMapMergerModule::importROOTMap()
       countSecMapVectors++;
       B2INFO(" current secMapVector has " << retrievedVector->size() << " secMaps stored, this vector is number " << countSecMapVectors <<
              "!")
-      countExternalMaps += retrievedVector->size();
+      unsigned nExternalMaps = retrievedVector->size();
+      countExternalMaps += nExternalMaps;
 //      std::vector< Belle2::SecMapVector::MapPack>
       for (SecMapVector::MapPack& tempSecMap : retrievedVector->getFullVector()) {  // full VXDTFRawSecMap including name
         countMaps++;
@@ -454,10 +447,11 @@ std::pair<int, int> RawSecMapMergerModule::importROOTMap()
 
         /// merging intermediate maps to one map of each type:
         bool partnerMapFound = false;
+        unsigned nInternalMaps = importedMaps.size();
         for (SecMapVector::MapPack& anotherMap : importedMaps.getFullVector()) {  // loop over already existing maps
           ++countNumberOfComparisons;
-          B2INFO("Iteration " << countNumberOfComparisons << "current retrieved map: " << tempSecMap.first << ", current imported map: " <<
-                 anotherMap.first << " taken from SecMapVector with size of " << importedMaps.size())
+          B2INFO("Iteration " << countNumberOfComparisons << " (of " << nExternalMaps * nInternalMaps << "), current retrieved map: " <<
+                 tempSecMap.first << ", current imported map: " << anotherMap.first << " taken from SecMapVector with size of " << nInternalMaps)
           B2DEBUG(5, "tempSecMap.second, anotherMap.second:\ndetectorType: " << tempSecMap.second.getDetectorType() << ", " <<
                   anotherMap.second.getDetectorType() << ",  size: " << tempSecMap.second.size() << ", " << anotherMap.second.size() << ",  MapName: "
                   << tempSecMap.second.getMapName() << ", " << anotherMap.second.getMapName() << ",  MagneticField: " <<
@@ -514,6 +508,7 @@ std::pair<int, int> RawSecMapMergerModule::importROOTMap()
     aRawMapPack.second.setSmallStretchFactor(m_PARAMstretchFactor.at(0));
     aRawMapPack.second.setStretchFactor(m_PARAMstretchFactor.at(1));
     aRawMapPack.second.setFilterByDistance2Origin(m_PARAMsortByDistance2origin);
+    aRawMapPack.second.setRareSectorCombinations(m_PARMfilterRareCombinations, m_PARAMrarenessFilter);
     aRawMapPack.second.repairSecMap();
 
     VXDTFSecMap newMap;
@@ -525,34 +520,30 @@ std::pair<int, int> RawSecMapMergerModule::importROOTMap()
     string fileName = newMap.getMapName() + string(".xml");
     std::ofstream file(fileName.c_str());
 
-    string  tagName = "<" + newMap.getMapName() + ">\n";
-    string  endTagName = "\n</" + newMap.getMapName() + ">\n";
+    string tagName = "<" + newMap.getMapName() + ">\n";
+    string endTagName = "\n</" + newMap.getMapName() + ">\n";
 
     file << tagName << Stream::escapeXML(Stream::serializeAndEncode(&newMap)) << endTagName;
 //     file << tagName << Stream::escapeXML(Stream::serializeXML(&newMap)) << endTagName;
 
-    if (m_PARAMprintFinalMaps == true) {
-      unsigned sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0;
-      const VXDTFSecMap::FriendValue* currentCutOffTypes; // used only for counting cutoffTypes
+    unsigned sectorCtr = 0, friendCtr = 0, cutoffTypesCtr = 0;
 
-      for (const VXDTFSecMap::Sector& sectorEntry : newMap.getSectorMap()) {  // looping through sectors
-        const VXDTFSecMap::SectorValue& currentFriends = sectorEntry.second;
-        int nFriends = currentFriends.size();
+    for (const VXDTFSecMapTypedef::Sector& sectorEntry : newMap.getSectorMap()) {  // looping through sectors
+      const VXDTFSecMapTypedef::SectorValue& currentFriends = sectorEntry.second;
 
-        B2INFO("Opening sector " << FullSecID(sectorEntry.first) << " which has got " << nFriends << " friends");
+      if (m_PARAMprintFinalMaps == true) {B2DEBUG(1, "Opening sector " << FullSecID(sectorEntry.first) << " which has got " << currentFriends.size() << " friends");}
 
-        for (const VXDTFSecMap::Friend& friendEntry : currentFriends) {  // looping through friends
-          currentCutOffTypes = &friendEntry.second;
-          B2DEBUG(1, " > Opening sectorFriend " << FullSecID(friendEntry.first) << " having " << currentCutOffTypes->size() <<
-                  " cutoffTypes.");
-          cutoffTypesCtr += currentCutOffTypes->size();
-          ++friendCtr;
-        }
-        ++sectorCtr;
+      for (const VXDTFSecMapTypedef::Friend& friendEntry : currentFriends) {  // looping through friends
+        unsigned nTypes = friendEntry.second.size();
+
+        if (m_PARAMprintFinalMaps == true) {B2DEBUG(2, " > Opening sectorFriend " << FullSecID(friendEntry.first) << " having " << nTypes << " cutoffTypes.");}
+        cutoffTypesCtr += nTypes;
+        ++friendCtr;
       }
-      B2INFO("printFinalMaps: secMap " << newMap.getMapName() << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/"
-             << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
+      ++sectorCtr;
     }
+    B2INFO("printFinalMaps: secMap " << newMap.getMapName() << ": manually counted a total of " << sectorCtr << "/" << friendCtr << "/"
+           << cutoffTypesCtr << " setors/friends/cutoffs in sectorMap");
   }
 
   return (make_pair(countSectors, countTotalValues));

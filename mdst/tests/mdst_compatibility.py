@@ -74,14 +74,6 @@ class DataStorePrinter(object):
     This class is inteded to print the contents of dataobjects to the standard
     output to monitor changes to the contents among versions.
 
-    Args:
-        name (str): class name of the DataStore object
-        simple (list): list of member names to print which do not need any additional
-            arguments
-        withArgument (dict or None): dictionary of member names and a list of
-            all argument combinations to call them.
-        array (bool): if True
-
     For example:
 
     >>> printer = DataStorePrinter("MCParticle", ["getVertex"], {"hasStatus": [1, 2, 4]})
@@ -91,8 +83,7 @@ class DataStorePrinter(object):
     print someting like ::
 
         MCParticle#0
-          getVertex(): TVector3 A 3D physics vector (x,y,z)=(0.000000,0.000000,0.000000) \
-              (rho,theta,phi)=(0.000000,0.000000,0.000000)
+          getVertex(): (0,0,0)
           hasStatus(1): True
           hasStatus(2): False
           hasStatus(4): False
@@ -100,8 +91,22 @@ class DataStorePrinter(object):
     for each MCparticle
     """
     def __init__(self, name, simple, withArgument=None, array=True):
+        """
+        Initialize
+
+        Args:
+            name (str): class name of the DataStore object
+            simple (list): list of member names to print which do not need any additional
+                arguments
+            withArgument (dict or None): dictionary of member names and a list of
+                all argument combinations to call them.
+            array (bool): if True we print a StoreArray, otherwise a single StoreObjPtr
+        """
+        #: class name of the datastore object
         self.name = name
+        #: if True we print a StoreArray, otherwise a single StoreObjPtr
         self.array = array
+        #: list of object members to call and print their results
         self.object_members = []
 
         # add the simple members to the list of members to call with empty
@@ -116,7 +121,7 @@ class DataStorePrinter(object):
                     # convert args to a list
                     if not isinstance(args, list) or isinstance(args, tuple):
                         args = [args]
-                    # and add name,args tuple
+                    # and add (name,args,display,callback) tuple
                     self.object_members.append((member, args, None, None))
 
         # sort them to have fixed order

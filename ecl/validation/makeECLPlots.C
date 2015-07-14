@@ -87,20 +87,20 @@ void ECLPion(TTree* pion_tree){
   TFile* output = TFile::Open("ECLPion.root", "recreate");
 
   TH1F* hPionE = new TH1F("hPionE", "Cluster energy, 1 GeV charged pion", 100, 0., 1.2);
+  pion_tree->Draw("eclClusterEnergy>>hPionE","eclClusterEnergy>0");
   hPionE->GetXaxis()->SetTitle("Cluster energy (GeV)");
   hPionE->GetListOfFunctions()->Add(new TNamed("Description","Reconstructed cluster energy for single 1GeV charged pion")); 
   hPionE->GetListOfFunctions()->Add(new TNamed("Check","Typical energy should be 0.2 GeV"));
   hPionE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  pion_tree->Draw("eclClusterEnergy>>hPionE","eclClusterEnergy>0");
   hPionE->Write();
 
 
   TH1F* hPionMultip = new TH1F("hPionMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
+  pion_tree->Draw("eclClusterMultip>>hPionMultip","eclClusterMultip>0");
   hPionMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  pion_tree->Draw("eclClusterMultip>>hPionMultip","eclClusterMultip>0");
   hPionMultip->Write();
   
   output->Close();
@@ -113,20 +113,20 @@ void ECLMuon(TTree* muon_tree)
   TFile* output = TFile::Open("ECLMuon.root", "recreate");
 
   TH1F* hMuonsE = new TH1F("hMuonsE", "Reconstructed cluster energy for 1GeV muons, the typical energy is 0.2 GeV", 100, 0., 1.2);
+  muon_tree->Draw("eclClusterEnergy>>hMuonsE");
   hMuonsE->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Description","Energy release in the ECL for 1 GeV muons")); 
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 200 MeV"));
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
-  muon_tree->Draw("eclClusterEnergy>>hMuonsE","");
   hMuonsE->Write();
 
   TH1F* hMuonsFake = new TH1F("hMuonsFake","Fake reconstructed gamma for 1000 muons should be less than 5%", 10,0,10);
   // hMuonsFake->SetMaximum(6);
+  muon_tree->Draw("eclGammaIdx>>hMuonsFake","eclGammaMultip>0");
   hMuonsFake->GetXaxis()->SetTitle("Gamma Idx");
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Fake reconstructed gamma every 1000 muons")); 
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be low"));
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "ecl2ml@bpost.kek.jp")); 
-  muon_tree->Draw("eclGammaIdx>>hMuonsFake","eclGammaMultip>0");
   hMuonsFake->Write();
 
   //delete output;

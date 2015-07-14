@@ -121,49 +121,50 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerPhi; /** Azimuthal direction of ECLShower */
     std::vector<double>* m_eclShowerR; /** Distance from IP of ECLShower */
     std::vector<int>* m_eclShowerNHits; /** Number of ECLHits related to ECLShower */
-    std::vector<double>* m_eclShowerE9oE25; /** Ratio of 3x3 over 5x5 crystal matrices energies */
+    std::vector<double>* m_eclShowerE9oE25; /** Ratio of 3x3 over 5x5 crystal matrices energies for ECLShower*/
     std::vector<double>* m_eclShowerUncEnergy; /** Uncorrected ECLShower energy */
 
-    int m_eclClusterMultip;
-    std::vector<int>* m_eclClusterIdx;
-    std::vector<int>* m_eclClusterToMc1;
-    std::vector<double>* m_eclClusterToMcWeight1;
-    std::vector<int>* m_eclClusterToMc2;
-    std::vector<double>* m_eclClusterToMcWeight2;
-    std::vector<int>* m_eclClusterToMc3;
-    std::vector<double>* m_eclClusterToMcWeight3;
-    std::vector<int>* m_eclClusterToMc4;
-    std::vector<double>* m_eclClusterToMcWeight4;
-    std::vector<int>* m_eclClusterToMc5;
-    std::vector<double>* m_eclClusterToMcWeight5;
-    std::vector<double>* m_eclClusterToBkgWeight;
-    std::vector<double>* m_eclClusterSimHitSum;
-    std::vector<int>* m_eclClusterToShower;
+    int m_eclClusterMultip;  /** Number of ECLClusterss per event */
+    std::vector<int>* m_eclClusterIdx;  /** ECLCluster index */
+    std::vector<int>* m_eclClusterToMc1; /** Index of first MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMcWeight1; /** Energy contribution of first MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMc2; /** Index of second MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMcWeight2; /** Energy contribution of second MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMc3; /** Index of third MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMcWeight3; /** Energy contribution of third MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMc4; /** Index of fourth MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMcWeight4; /** Energy contribution of fourth MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMc5; /** Index of fifth MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMcWeight5; /** Energy contribution of fifth MCParticle related to ECLCluster */
+    std::vector<double>*
+    m_eclClusterToBkgWeight; /** Remaining energy contribution not associated to first five MCParticles related to ECLCluster */
+    std::vector<double>* m_eclClusterSimHitSum; /** Energy contribution of first MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToShower; /** Index of ECLShower related to ECLCluster */
     //std::vector<int>* m_eclClusterToTrack;
-    std::vector<double>* m_eclClusterEnergy;
-    std::vector<double>* m_eclClusterEnergyError;
-    std::vector<double>* m_eclClusterTheta;
-    std::vector<double>* m_eclClusterThetaError;
-    std::vector<double>* m_eclClusterPhi;
-    std::vector<double>* m_eclClusterPhiError;
-    std::vector<double>* m_eclClusterR;
-    std::vector<double>* m_eclClusterEnergyDepSum;
-    std::vector<double>* m_eclClusterTiming;
-    std::vector<double>* m_eclClusterTimingError;
-    std::vector<double>* m_eclClusterE9oE25;
-    std::vector<double>* m_eclClusterHighestE;
-    std::vector<double>* m_eclClusterLat;
-    std::vector<int>* m_eclClusterNofCrystals;
-    std::vector<int>* m_eclClusterCrystalHealth;
-    std::vector<double>* m_eclClusterMergedPi0;
-    std::vector<double>* m_eclClusterPx;
-    std::vector<double>* m_eclClusterPy;
-    std::vector<double>* m_eclClusterPz;
-    std::vector<bool>* m_eclClusterIsTrack;
-    std::vector<double>* m_eclClusterPi0Likel;
-    std::vector<double>* m_eclClusterEtaLikel;
-    std::vector<double>* m_eclClusterDeltaL;
-    std::vector<double>* m_eclClusterBeta;
+    std::vector<double>* m_eclClusterEnergy; /** ECLCluster energy */
+    std::vector<double>* m_eclClusterEnergyError; /** ECLCluster energy error*/
+    std::vector<double>* m_eclClusterTheta;  /** ECLCluster polar direction */
+    std::vector<double>* m_eclClusterThetaError;  /** ECLCluster error on polar direction */
+    std::vector<double>* m_eclClusterPhi;  /** ECLCluster azimuthal direction */
+    std::vector<double>* m_eclClusterPhiError;  /** ECLCluster error on azimuthal direction */
+    std::vector<double>* m_eclClusterR;  /** ECLCluster distance from IP */
+    std::vector<double>* m_eclClusterEnergyDepSum;  /** ECLCluster simulated energy */
+    std::vector<double>* m_eclClusterTiming;  /** ECLCluster time */
+    std::vector<double>* m_eclClusterTimingError;  /** ECLCluster time error */
+    std::vector<double>* m_eclClusterE9oE25;  /** Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
+    std::vector<double>* m_eclClusterHighestE; /** Highest energy deposit (per crystal) in ECLCluster */
+    std::vector<double>* m_eclClusterLat; /** ECLCluster shape parameter */
+    std::vector<int>* m_eclClusterNofCrystals;  /** Number of crystals in ECLCluster */
+    std::vector<int>* m_eclClusterCrystalHealth;  /** Crystal healt flag */
+    std::vector<double>* m_eclClusterMergedPi0;  /** Flag for merged pi0 */
+    std::vector<double>* m_eclClusterPx;  /** Reconstructed momentum along X */
+    std::vector<double>* m_eclClusterPy;  /** Reconstructed momentum along Y */
+    std::vector<double>* m_eclClusterPz;  /** Reconstructed momentum along Z */
+    std::vector<bool>* m_eclClusterIsTrack; /** Flag for charged clusters */
+    std::vector<double>* m_eclClusterPi0Likel; /** Flag for pi0 */
+    std::vector<double>* m_eclClusterEtaLikel; /** Flag for eta */
+    std::vector<double>* m_eclClusterDeltaL; /** ??? */
+    std::vector<double>* m_eclClusterBeta; /** ??? */
 
     int m_eclGammaMultip;
     std::vector<int>* m_eclGammaIdx;

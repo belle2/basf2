@@ -10,17 +10,14 @@
 
 #pragma once
 
-#include "tracking/modules/VXDTFHelperTools/FilterCalculatorModule.h"
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <framework/core/Module.h>
-#include "tracking/vxdCaTracking/TwoHitFilters.h"
-#include "tracking/vxdCaTracking/ThreeHitFilters.h"
-#include "tracking/vxdCaTracking/FourHitFilters.h"
-#include "tracking/dataobjects/FilterID.h"
-#include "tracking/dataobjects/FullSecID.h"
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <testbeam/vxd/dataobjects/TelTrueHit.h>
+#include <tracking/vxdCaTracking/TwoHitFilters.h>
+#include <tracking/vxdCaTracking/ThreeHitFilters.h>
+#include <tracking/vxdCaTracking/FourHitFilters.h>
+#include <tracking/dataobjects/FilterID.h>
+#include <tracking/dataobjects/FullSecID.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/VXDTFRawSecMap.h> // needed for rootExport
@@ -44,356 +41,441 @@
 namespace Belle2 {
 
 
-//   class VXDHit; /**< internal datastore for Hits */
-//   class VXDTrack; /**< internal datastore for tracks */
-//   class Sector;   /**< sector is a subunit of a sensor, please check low momentum trackfinder for more details (VXDTF) */
-//   class FMSectorFriends;  /**< info about compatible sectors to main sector */
-//   class HitFilter;  /**< internal datastore for hitinformation */
-//
-//
-//   /** internal datastore for Hits */
-//   class VXDHit {
-//   public:
-//     /** Constructor of class VXDHit*/
-//     VXDHit(short int hitType, std::string fullSecID, int aUniID, TVector3 hit, TVector3 mom, int pdg, TVector3 origin, float timeVal):
-//       m_type(hitType),
-//       m_secID(fullSecID),
-//       m_uniID(aUniID),
-//       m_pdg(pdg),
-//       m_timeStamp(timeVal)// value set by member setTrueHit(...)
-// //       m_pxdHit(NULL),
-// //       m_svdHit(NULL),
-//     { checkDirectionOfFlight(origin, hit, mom); }
-//
-//     /** Operator '<' overloaded using hit-time-information for comparison */
-//     bool operator<(const VXDHit& b) const { return this->getTimeStamp() < b.getTimeStamp(); }
-//     /** Operator '==' overloaded using hit-time-information for comparison */
-//     bool operator==(const VXDHit& b) const { return this->getTimeStamp() == b.getTimeStamp(); }
-//     /** Operator '>' overloaded using hit-time-information for comparison */
-//     bool operator>(const VXDHit& b) const { return this->getTimeStamp() > b.getTimeStamp(); }
-//
-//     /** returns type of VXDHit */
-//     short int getType() { return m_type; }
-//
-//     /** returns pdg-code of particle causing this hit */
-//     int getPDG() { return m_pdg; }
-//
-//     /** returns direction of particle movement. true for inward movement, false for outward movement */
-//     bool getParticleMovement() { return m_points2IP; }  // true for inward movement, false for outward movement
-//
-//     /** returns timeStamp of current hit */
-//     float getTimeStamp() const { return m_timeStamp; }
-//
-// //     /** returns pointer of trueHit, only valid if this the VXDHit is a svdHit */
-// //     const SVDTrueHit* getSVDHit() const { return m_svdHit; }
-//
-// //     /** returns pointer of trueHit, only valid if this the VXDHit is a pxdHit */
-// //     const PXDTrueHit* getPXDHit() const { return m_pxdHit; }
-//
-//     /** returns global hit position of current hit */
-//     TVector3 getHitPosition() { return m_hitPos; } // global coordinates
-//
-//     /** returns secID of sector containing this hit */
-//     std::string getSectorID() { return m_secID; }
-//
-//     /** returns uniID of sensor containing this hit */
-//     int getUniID() { return m_uniID; }
-//
-// //    template<class aTmpl>
-// //     void setTrueHit(const aTmpl* aHit) { // TODO why can't I use this? (it complains about being the wrong type...)
-// //      m_timeStamp = aHit->getGlobalTime();
-// //      m_trueHit = aHit;
-// //     } /**< setter for the TrueHit */
-//
-//
-//     /** setHit to vertex*/
-//     void setVertex()
-//     {
-//       m_type = Const::IR;
-//       m_timeStamp = 0.;
-//     }
-//
-//   protected:
-//     /** checks whether particle was flying towards the IR/origin or away from IR/origin when producing this hit*/
-//     void checkDirectionOfFlight(TVector3 origin, TVector3 hitPos, TVector3 momVec)
-//     {
-//       m_hitPos = hitPos;
-//       TVector3 vectororiginToHit = hitPos - origin;
-// //       origin -= hitPos; // vector hit <-> origin
-// //       double hitMag = origin.Mag();
-//       double momMag = (vectororiginToHit + momVec).Mag();
-// //       if (hitMag > momMag) { m_points2IP = true; }
-//       if (momMag < vectororiginToHit.Mag()) { m_points2IP = true; }
-//       else { m_points2IP = false; }
-//     }
-//
-//     short int m_type;  /**< Const::PXD for PXD, Const::SVD for SVD, Const::IR for Primary vertex, Const::invalidDetector for Telescope */
-//     bool m_points2IP;  /**< true, if momentum vector of current hit points to the interaction point (particle is flying inwards at that moment), false if not*/
-//     std::string m_secID; /**< ID of sector containing this hit */
-//     int m_uniID; /**< ID of sensor containing this hit */
-// //     template<class TemplateTrueHit>
-// //     const TemplateTrueHit* m_trueHit; /**< pointer to trueHit */
-// //     const PXDTrueHit* m_pxdHit; /**< pointer to pxdHit (only set if it is a pxdHit) */
-// //     const SVDTrueHit* m_svdHit; /**< pointer to svdHit (only set if it is a svdHit) */
-//     int m_pdg; /**< pdgCode of particle causing hit */
-//     float m_timeStamp; /**< timestamp of hit (real info, needed for sorting) */
-//     TVector3 m_hitPos; /**< global hit position */
-//   };
-//
-//
-//   /** internal datastore for tracks */
-//   class VXDTrack {
-//   public:
-//     typedef std::map<std::string, Sector> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
-//
-//     /** Constructor of class VXDTrack, when having only the particleNumber*/
-//     VXDTrack(int particleNumber):
-//       m_index(particleNumber),
-//       m_pT(0.),
-//       m_secMap(NULL) {}
-//
-//     /** Constructor of class VXDTrack*/
-//     VXDTrack(int particleNumber, double pT, MapOfSectors* secMapPtr):
-//       m_index(particleNumber),
-//       m_pT(pT),
-//       m_secMap(secMapPtr) {}
-//
-//     /** adds hit to Track */
-//     void addHit(VXDHit hit) { m_hitList.push_back(hit); }
-//
-//     /** returns hits of track */
-//     const std::list<VXDHit> getTrack() { return m_hitList; }
-//
-//     /** returns pointer to last hit added, is NULL if no hit added so far */
-//     const VXDHit* getLastHit()
-//     {
-//       int hitPos = m_hitList.size();
-//       if (hitPos != 0) {
-//         std::list<VXDHit>::iterator thisPos = m_hitList.end(); --thisPos;
-//         return &(*thisPos);
-//       }
-//       return NULL;
-//     }
-//
-//     /** returns indexNumber of current track */
-//     int getParticleID() { return m_index; }
-//
-//     /** returns number of hits attached to curren track */
-//     int size() { return m_hitList.size(); }
-//
-//     /** sorts hits depending on time stamp of each hit */
-//     void sort() { m_hitList.sort(); }
-//
-//     /** reverse hitlist*/
-//     void reverse() { m_hitList.reverse(); }
-//
-//     /** reset hitlist, should be done only, if there was a main problem with the hits included! */
-//     void resetHitList(std::list<VXDHit>& newList) { m_hitList = newList; }
-//
-//     /** set Pt of track */
-//     void setPt(double mom) { m_pT = mom; }
-//
-//     /** get Pt of track */
-//     double getPt() { return m_pT; }
-//
-//     /** get pointer to sectorMap relevant for track */
-//     MapOfSectors* getSecMap() { return m_secMap; }
-//
-//   protected:
-//     std::list<VXDHit> m_hitList; /**< contains hits attached to track */
-//     int m_index; /**< stores index number of track */
-//     double m_pT; /**< stores transverse momentum value for track classification */
-//     MapOfSectors* m_secMap; /**< pointer to sectorMap relevant for track */
-//   };
-//
-//
-//   /** internal datastore for hitinformation */
-//   class HitFilter {
-//   public:
-//     /** Constructor of class HitFilter*/
-//     HitFilter(unsigned int myName):
-//       m_filterName(myName) {}
-//
-//     /** add value to list */
-//     void addValue(double aValue) { m_valuePack.push_back(aValue); }
-//
-//     /** returns filter type */
-//     std::string getFilterType() { return FilterID().getFilterString(m_filterName); }
-//
-//     /** returns list of values */
-//     VXDTFRawSecMapTypedef::CutoffValues getValues() { return m_valuePack; } // returns std::list<double>
-//
-//     /** writes values in text File */
-//     void exportValues(std::string aFileName)
-//     {
-//       m_fileName = aFileName;
-//       m_valuePack.sort();
-//       m_exportValues.open(m_fileName.c_str(), std::ios_base::app);
-//       m_exportValues << FilterID().getFilterString(m_filterName) << "_";
-//       for (double value : m_valuePack) {
-//         m_exportValues << value << "|";
-//       }
-//       m_exportValues << std::endl;
-//       m_exportValues.close();
-//     }
-//
-//   protected:
-//     unsigned int m_filterName; /**< filter type coded as FilterID (e.g. distance3D) */
-//     std::list<double> m_valuePack; /**< list containing all values calculated during run */
-//     std::ofstream m_exportValues; /**< used for file export */
-//     std::string m_fileName; /**< file name of exported file */
-//   };
-//
-//
-//   /** info about compatible sectors to main sector */
-//   class FMSectorFriends {
-//   public:
-//     typedef std::pair<unsigned int, HitFilter*> MapEntry; /**< Entry of sectorMap */
-//
-//     /** Constructor of class FMSectorFriends*/
-//     FMSectorFriends(std::string myName):
-//       m_friendName(myName) {}
-//
-//     /** addsValue to specified filter type */
-//     void addValue(unsigned int aFilterType, double aValue)
-//     {
-//       if (m_filterMap.find(aFilterType) == m_filterMap.end()) {
-//         HitFilter* aFilterPointer =  new HitFilter(aFilterType);
-//         m_filterMap.insert(std::make_pair(aFilterType, aFilterPointer));
-//       }
-//       m_filterMap.find(aFilterType)->second->addValue(aValue);
-//     }
-//
-//     /** export filters to text file (used at endrun) */
-//     void exportFilters(std::string secName, std::string setupName)
-//     {
-//       m_fileName = (boost::format("%1%/%1%-Sector%2%Friend%3%.txt") % setupName % secName % m_friendName).str();
-//       for (MapEntry thisEntry : m_filterMap) {
-//         thisEntry.second->exportValues(m_fileName);
-//       }
-//     }
-//
-//     /** export filters to root file (used at endrun) */
-//     VXDTFRawSecMapTypedef::FriendValues exportFiltersRoot()
-//     {
-//       //        std::vector< std::pair<unsigned int, std::list<double> > >
-//       VXDTFRawSecMapTypedef::FriendValues completeInfoOfFriend;
-//       for (MapEntry thisEntry : m_filterMap) {
-//         completeInfoOfFriend.push_back(make_pair(thisEntry.first, thisEntry.second->getValues()));
-//       }
-//       return completeInfoOfFriend;
-//     }
-//
-//     /** clears info of all filters stored in current friend */
-//     void clearFilters()
-//     {
-//       for (MapEntry thisEntry : m_filterMap) {
-//         delete(thisEntry.second);
-//       }
-//     }
-//
-//   protected:
-//     std::map<unsigned int, HitFilter*>
-//     m_filterMap; /**< map of filters attached to current friend, is coded in FilterID which can be treated as unsigned int */
-//     std::string m_friendName; /**< name of current friend */
-//     std::string m_fileName; /**< file name of exported file */
-//   };
-//
-//
-//   /** sector is a subunit of a sensor, please check low momentum trackfinder for more details (VXDTF) */
-//   class Sector {
-//   public:
-//     typedef std::pair<std::string, FMSectorFriends> MapEntry;  /**< Entry of sectorMap */
-//     typedef std::pair<double, double> LocalCoordinates; /**< stores u and v in local coordinates */
-//
-//     /** constructor */
-//     Sector(std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV,
-//            double distance):
-//       m_usageCounter(1),
-//       m_secName(myName),
-//       m_edgeO(edge0),
-//       m_edgeU(edgeU),
-//       m_edgeV(edgeV),
-//       m_edgeUV(edgeUV),
-//       m_distanceToOrigin(distance)
-//     {
-//       m_friendMap.clear();
-//     }
-//
-//     /** adds new value of specified filter type for given friend */
-//     void addValue(std::string aFriend, unsigned int aFilterType, double aValue)
-//     {
-//       std::map<std::string, FMSectorFriends>::iterator friendPos = m_friendMap.find(aFriend);
-//       if (friendPos == m_friendMap.end()) {
-//         FMSectorFriends newFriend(aFriend);
-//         m_friendMap.insert(std::make_pair(aFriend, newFriend));
-//       }
-//       m_friendMap.find(aFriend)->second.addValue(aFilterType, aValue);
-//     }
-//
-//     /** exports Friends including info to text file */
-//     void exportFriends(std::string setupName)
-//     {
-//       for (MapEntry thisEntry : m_friendMap) {
-//         thisEntry.second.exportFilters(m_secName, setupName);
-//       }
-//     }
-//
-//     /** clears info of all friends stored in current sector */
-//     void clearFriends()
-//     {
-//       for (MapEntry thisEntry : m_friendMap) {
-//         thisEntry.second.clearFilters();
-//       }
-//     }
-//
-//     /** exports Friends including info to root file */
-//     VXDTFRawSecMapTypedef::SectorValues exportFriendsRoot()
-//     {
-//       VXDTFRawSecMapTypedef::SectorValues completeInfoOfSector;
-//       for (MapEntry thisEntry : m_friendMap) {
-//         completeInfoOfSector.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFiltersRoot()));
-//       }
-//       return completeInfoOfSector;
-//     }
-//
-//     /** returns name of sector */
-//     std::string getName() { return m_secName; }
-//
-//     /** returns name of sector */
-//     std::string getSectorID() { return m_secName; }
-//
-//     /** increases usage counter */
-//     void increaseCounter() { m_usageCounter++; }
-//
-//     /** decreases usage counter (needed when double hits are detected)*/
-//     void decreaseCounter() { m_usageCounter--; }
-//
-//     /** returns edge0 (local coordinates) */
-//     std::pair<float, float> getEdgeO() { return m_edgeO; }
-//
-//     /** returns edgeU (local coordinates) */
-//     std::pair<float, float> getEdgeU() { return m_edgeU; }
-//
-//     /** returns edgeV (local coordinates) */
-//     std::pair<float, float> getEdgeV() { return m_edgeV; }
-//
-//     /** returns edgeUV (local coordinates) */
-//     std::pair<float, float> getEdgeUV() { return m_edgeUV; }
-//
-//     /** returns distance of sector to origin of current secMap-geometry */
-//     double getDistance2Origin() { return m_distanceToOrigin; }
-//
-//   protected:
-//     int m_usageCounter; /**< counts number of times current sector is used */
-//     std::string m_secName; /**< name of sector  */
-//     std::pair<float, float> m_edgeO; /**< local coordinates of edge defined as origin within this module */
-//     std::pair<float, float> m_edgeU; /**< local coordinates of edge lying in U-direction compared to edgeO */
-//     std::pair<float, float> m_edgeV; /**< local coordinates of edge lying in V-direction compared to edgeO */
-//     std::pair<float, float> m_edgeUV; /**< local coordinates of diagonally lied edge compared to edgeO */
-//     std::map<std::string, FMSectorFriends> m_friendMap; /**< map of friends attached to thisSector */
-//     double m_distanceToOrigin; /**< stores Info of distance of this sector (using the the center of the sector) to the origin for current sector map (used by TB-version of VXDTF to determine where are the innermost and where are the outermost sectors) */
-//   };*/
+  namespace FilterCalcNames {
+
+    class VXDTrack; /**< internal datastore for tracks */
+    class Sector;   /**< sector is a subunit of a sensor, please check low momentum trackfinder for more details (VXDTF) */
+    class FMSectorFriends;  /**< info about compatible sectors to main sector */
+    class HitFilter;  /**< internal datastore for hitinformation */
+
+
+    /** internal datastore for Hits */
+    class VXDHit {
+    public:
+      /** Constructor of class VXDHit*/
+      VXDHit(short int hitType, std::string fullSecID, int aUniID, TVector3 hit, TVector3 mom, int pdg, TVector3 origin,
+             float timeVal = -1):
+        m_uniID(aUniID),
+        m_timeStamp(timeVal),
+        m_pdg(pdg),
+        m_secID(fullSecID),
+        m_type(hitType)
+      { checkDirectionOfFlight(origin, hit, mom); }
+
+      /** Operator '<' overloaded using hit-time-information for comparison */
+      bool operator<(const VXDHit& b) const { return this->getTimeStamp() < b.getTimeStamp(); }
+      /** Operator '==' overloaded using hit-time-information for comparison */
+      bool operator==(const VXDHit& b) const { return this->getTimeStamp() == b.getTimeStamp(); }
+      /** Operator '>' overloaded using hit-time-information for comparison */
+      bool operator>(const VXDHit& b) const { return this->getTimeStamp() > b.getTimeStamp(); }
+
+      /** returns type of VXDHit */
+      short int getType() { return m_type; }
+
+      /** returns pdg-code of particle causing this hit */
+      int getPDG() { return m_pdg; }
+
+      /** returns direction of particle movement. true for inward movement, false for outward movement */
+      bool getParticleMovement() { return m_points2IP; }  // true for inward movement, false for outward movement
+
+      /** returns timeStamp of current hit */
+      float getTimeStamp() const { return m_timeStamp; }
+
+      /** returns global hit position of current hit */
+      TVector3 getHitPosition() { return m_hitPos; } // global coordinates /// ISUSED
+
+      /** returns secID of sector containing this hit */
+      std::string getSectorID() { return m_secID; }/// ISUSED
+
+      /** returns uniID of sensor containing this hit */
+      int getUniID() { return m_uniID; }/// ISUSED
+
+      /** setHit to vertex*/
+      void setVertex()
+      {
+        m_type = Const::IR;
+        m_timeStamp = 0.;
+      } /// ISUSED
+
+    protected:
+      /** checks whether particle was flying towards the IR/origin or away from IR/origin when producing this hit*/
+      void checkDirectionOfFlight(TVector3 origin, TVector3 hitPos, TVector3 momVec)
+      {
+        m_hitPos = hitPos;
+        TVector3 vectororiginToHit = hitPos - origin;
+        float momMag = (vectororiginToHit + momVec).Mag();
+        if (momMag < vectororiginToHit.Mag()) { m_points2IP = true; }
+        else { m_points2IP = false; }
+      }
+
+      TVector3 m_hitPos; /**< global hit position */
+      int m_uniID; /**< ID of sensor containing this hit */
+      float m_timeStamp; /**< timestamp of hit (real info, needed for sorting) */
+      int m_pdg; /**< pdgCode of particle causing hit */
+      std::string m_secID; /**< ID of sector containing this hit */
+      short int m_type;  /**< Const::PXD for PXD, Const::SVD for SVD, Const::IR for Primary vertex, Const::invalidDetector for Telescope */
+      bool m_points2IP;  /**< true, if momentum vector of current hit points to the interaction point (particle is flying inwards at that moment), false if not*/
+    };
+
+
+
+    /** internal datastore for hitinformation */
+    class HitFilter {
+    public:
+      /** Constructor of class HitFilter*/
+      HitFilter(unsigned int myName):
+        m_filterName(myName) {}
+
+      /** add value to list */
+      void addValue(float aValue) { m_valuePack.push_back(aValue); }
+
+      /** returns filter type */
+      std::string getFilterType() { return FilterID().getFilterString(m_filterName); }
+
+      /** returns list of values */
+      VXDTFRawSecMapTypedef::CutoffValues getValues() { return m_valuePack; } // returns std::list<double>
+
+      /** writes values in text File */
+      void exportValues(std::string aFileName)
+      {
+        m_fileName = aFileName;
+        m_valuePack.sort();
+        m_exportValues.open(m_fileName.c_str(), std::ios_base::app);
+        m_exportValues << FilterID().getFilterString(m_filterName) << "_";
+        for (float value : m_valuePack) {
+          m_exportValues << value << "|";
+        }
+        m_exportValues << std::endl;
+        m_exportValues.close();
+      }
+
+    protected:
+      unsigned int m_filterName; /**< filter type coded as FilterID (e.g. distance3D) */
+      std::string m_fileName; /**< file name of exported file */
+      std::ofstream m_exportValues; /**< used for file export */
+      VXDTFRawSecMapTypedef::CutoffValues m_valuePack; /**< list containing all values calculated during run */
+    };
+
+
+
+    /** info about compatible sectors to main sector */
+    class FMSectorFriends {
+    public:
+      typedef std::pair<unsigned int, HitFilter*> MapEntry; /**< Entry of sectorMap */
+
+      /** Constructor of class FMSectorFriends*/
+      FMSectorFriends(std::string myName):
+        m_friendName(myName) {}
+
+      /** addsValue to specified filter type */
+      void addValue(unsigned int aFilterType, float aValue)
+      {
+        if (m_filterMap.find(aFilterType) == m_filterMap.end()) {
+          HitFilter* aFilterPointer =  new HitFilter(aFilterType);
+          m_filterMap.insert(std::make_pair(aFilterType, aFilterPointer));
+        }
+        m_filterMap.find(aFilterType)->second->addValue(aValue);
+      }
+
+      /** export filters to text file (used at endrun) */
+      void exportFilters(std::string secName, std::string setupName)
+      {
+        m_fileName = (boost::format("%1%/%1%-Sector%2%Friend%3%.txt") % setupName % secName % m_friendName).str();
+        for (MapEntry thisEntry : m_filterMap) {
+          thisEntry.second->exportValues(m_fileName);
+        }
+      }
+
+      /** export filters to root file (used at endrun) */
+      VXDTFRawSecMapTypedef::FriendValues exportFiltersRoot()
+      {
+        //        std::vector< std::pair<unsigned int, std::list<double> > >
+        VXDTFRawSecMapTypedef::FriendValues completeInfoOfFriend;
+        for (MapEntry thisEntry : m_filterMap) {
+          completeInfoOfFriend.push_back(make_pair(thisEntry.first, thisEntry.second->getValues()));
+        }
+        return completeInfoOfFriend;
+      }
+
+      /** clears info of all filters stored in current friend */
+      void clearFilters()
+      {
+        for (MapEntry thisEntry : m_filterMap) {
+          delete(thisEntry.second);
+        }
+      }
+
+    protected:
+      std::string m_friendName; /**< name of current friend */
+      std::string m_fileName; /**< file name of exported file */
+      std::map<unsigned int, HitFilter*>
+      m_filterMap; /**< map of filters attached to current friend, is coded in FilterID which can be treated as unsigned int */
+    };
+
+
+
+    /** sector is a subunit of a sensor, please check low momentum trackfinder for more details (VXDTF) */
+    class Sector {
+    public:
+      typedef std::pair<std::string, FMSectorFriends> MapEntry;  /**< Entry of sectorMap */
+      typedef std::pair<float, float> LocalCoordinates; /**< stores u and v in local coordinates */
+
+      /** constructor */
+      Sector(std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV,
+             float distance):
+        m_usageCounter(1),
+        m_distanceToOrigin(distance),
+        m_edgeO(edge0),
+        m_edgeU(edgeU),
+        m_edgeV(edgeV),
+        m_edgeUV(edgeUV),
+        m_secName(myName)
+      {
+        m_friendMap.clear();
+      }
+
+      /** adds new value of specified filter type for given friend */
+      void addValue(std::string aFriend, unsigned int aFilterType, float aValue)
+      {
+        std::map<std::string, FMSectorFriends>::iterator friendPos = m_friendMap.find(aFriend);
+        if (friendPos == m_friendMap.end()) {
+          FMSectorFriends newFriend(aFriend);
+          m_friendMap.insert(std::make_pair(aFriend, newFriend));
+        }
+        m_friendMap.find(aFriend)->second.addValue(aFilterType, aValue);
+      }
+
+      /** exports Friends including info to text file */
+      void exportFriends(std::string setupName)
+      {
+        for (MapEntry thisEntry : m_friendMap) {
+          thisEntry.second.exportFilters(m_secName, setupName);
+        }
+      }
+
+      /** clears info of all friends stored in current sector */
+      void clearFriends()
+      {
+        for (MapEntry thisEntry : m_friendMap) {
+          thisEntry.second.clearFilters();
+        }
+      }
+
+      /** exports Friends including info to root file */
+      VXDTFRawSecMapTypedef::SectorValues exportFriendsRoot()
+      {
+        VXDTFRawSecMapTypedef::SectorValues completeInfoOfSector;
+        for (MapEntry thisEntry : m_friendMap) {
+          completeInfoOfSector.push_back(make_pair(FullSecID(thisEntry.first).getFullSecID(), thisEntry.second.exportFiltersRoot()));
+        }
+        return completeInfoOfSector;
+      }
+
+      /** returns name of sector */
+      std::string getName() { return m_secName; }
+
+      /** returns name of sector */
+      std::string getSectorID() { return m_secName; }
+
+      /** increases usage counter */
+      void increaseCounter() { m_usageCounter++; }
+
+      /** decreases usage counter (needed when double hits are detected)*/
+      void decreaseCounter() { m_usageCounter--; }
+
+      /** returns edge0 (local coordinates) */
+      LocalCoordinates getEdgeO() { return m_edgeO; }
+
+      /** returns edgeU (local coordinates) */
+      LocalCoordinates getEdgeU() { return m_edgeU; }
+
+      /** returns edgeV (local coordinates) */
+      LocalCoordinates getEdgeV() { return m_edgeV; }
+
+      /** returns edgeUV (local coordinates) */
+      LocalCoordinates getEdgeUV() { return m_edgeUV; }
+
+      /** returns distance of sector to origin of current secMap-geometry */
+      float getDistance2Origin() { return m_distanceToOrigin; }
+
+    protected:
+      int m_usageCounter; /**< counts number of times current sector is used */
+      float m_distanceToOrigin; /**< stores Info of distance of this sector (using the the center of the sector) to the origin for current sector map (used by TB-version of VXDTF to determine where are the innermost and where are the outermost sectors) */
+      LocalCoordinates m_edgeO; /**< local coordinates of edge defined as origin within this module */
+      LocalCoordinates m_edgeU; /**< local coordinates of edge lying in U-direction compared to edgeO */
+      LocalCoordinates m_edgeV; /**< local coordinates of edge lying in V-direction compared to edgeO */
+      LocalCoordinates m_edgeUV; /**< local coordinates of diagonally lied edge compared to edgeO */
+      std::string m_secName; /**< name of sector  */
+      std::map<std::string, FilterCalcNames::FMSectorFriends> m_friendMap; /**< map of friends attached to thisSector */
+    };
+
+
+
+    /** simple sector-container storing a map and some essential infos */
+    class InternalRawSectorMap {
+    public:
+      typedef std::string SectorKey; /**< the sectorID as a string serves as key */
+      typedef std::map<SectorKey, Sector> MapOfSectors;  /**< stores whole sectorMap used for storing cutoffs */
+      typedef std::pair<const SectorKey, Sector> SecMapEntry; /**< represents an entry of the MapOfSectors */
+      typedef std::pair<float, float> LocalCoordinates; /**< stores u and v in local coordinates */
+
+      /** standard constructor.
+       *
+       * first parameter: name of the sectorMap as a string
+       * second parameter: min pT value, if < 0 or simply not passed, 0 as lower limit is asumed
+       * third parameter: max pT value, if < 0 or simply not passed, infinite upper limit is asumed
+       * **/
+      InternalRawSectorMap(std::string name, float pTsmear, float minPt, float maxPt = -1, bool usePXD = true, bool useSVD = true,
+                           bool useTEL = false):
+        m_pTsmear(pTsmear),
+        m_pTCuts( {minPt, maxPt}),
+                m_name(name),
+                m_usePXD(usePXD),
+                m_useSVD(useSVD),
+      m_useTEL(useTEL) {}
+
+
+      /** returns true, if given pTValue is in the accepted range, if not, returns false */
+      bool acceptPt(float pTval)
+      {
+        if (m_pTCuts.first > 0 and
+            pTval < (m_pTCuts.first - m_pTCuts.first * m_pTsmear)) return false;
+        if (m_pTCuts.second > 0 and
+            pTval > (m_pTCuts.second + m_pTCuts.first * m_pTsmear)) return false;
+        return true;
+      }
+
+      /** like size() of normal stl-containers */
+      unsigned int size() const { return m_map.size(); }
+
+      /** like clear() of normal stl-containers */
+      void clear() { m_map.clear(); }
+
+      /** like find() of std::map */
+      MapOfSectors::iterator find(SectorKey& key) { return m_map.find(key); }
+
+      /** like insert() of std::map */
+      std::pair<MapOfSectors::iterator, bool> insert(SecMapEntry newEntry) { return m_map.insert(newEntry); }
+
+      /** like end() of std::map */
+      MapOfSectors::iterator end() {return m_map.end(); }
+
+      /** returns pointer to map of Sectors */
+      MapOfSectors& getSecMap() { return m_map; }
+
+      /** returns the min (.first) and max (.second) cut for pT used for this map */
+      LocalCoordinates getPtCuts() const { return m_pTCuts; }
+
+      /** returns a human readable name for this map */
+      std::string getName() const { return m_name; }
+
+      /** if true, secMap accepts PXD-hits */
+      bool usePXD() const { return m_usePXD; }
+
+      /** if true, secMap accepts SVD-hits */
+      bool useSVD() const { return m_useSVD; }
+
+      /** if true, secMap accepts TEL-hits */
+      bool useTEL() const { return m_useTEL; }
+
+      /** if value > 0: .first is min distance to IP, .second is max distance to IP */
+      LocalCoordinates getAcceptedRegionForSensors() const { return m_acceptedRange; }
+
+      /** returns layerNumber of highest layerNumber allowed in sectorMap */
+      unsigned short getHighestAllowedLayer() const { return m_highestAllowedLayer; }
+
+    protected:
+      float m_pTsmear; /**< stores the allowed smearing range for ptCuts (1 > m_pTsmear > = 0) */
+      LocalCoordinates m_pTCuts; /**< .first stores lower, .second stores upper cut for pT */
+      LocalCoordinates m_acceptedRange; /**< if values > 0: .first is min distance to IP, .second is max distance to IP */
+      std::string m_name; /**< stores name for this InternalRawSectorMap */
+      unsigned short m_highestAllowedLayer;
+      bool m_usePXD; /**< if true, secMap accepts PXD-hits */
+      bool m_useSVD; /**< if true, secMap accepts SVD-hits */
+      bool m_useTEL; /**< if true, secMap accepts TEL-hits */
+      MapOfSectors m_map; /**< stores actual data */
+
+    };
+
+
+
+    /** internal datastore for tracks */
+    class VXDTrack {
+    public:
+      typedef std::map<std::string, Sector> MapOfSectors; /**< stores whole sectorMap used for storing cutoffs */
+      typedef std::pair<float, float> LocalCoordinates; /**< stores u and v in local coordinates */
+
+      /** Constructor of class VXDTrack, when having only the particleNumber*/
+      VXDTrack(int particleNumber):
+        m_index(particleNumber),
+        m_pT(0.),
+        m_secMap(NULL) {}
+
+      /** Constructor of class VXDTrack, when MCInfo is not available */
+      VXDTrack(float pT, InternalRawSectorMap::MapOfSectors* secMapPtr):
+        m_pT(pT),
+        m_secMap(secMapPtr) {}
+
+      /** Constructor of class VXDTrack*/
+      VXDTrack(int particleNumber, float pT, InternalRawSectorMap::MapOfSectors* secMapPtr):
+        m_index(particleNumber),
+        m_pT(pT),
+        m_secMap(secMapPtr) {}
+
+      /** adds hit to Track */
+      void addHit(VXDHit hit) { m_hitList.push_back(hit); } /// ISUSED
+
+      /** returns hits of track */
+      const std::list<VXDHit>& getTrack() const { return m_hitList; } /// ISUSED
+
+      /** returns pointer to last hit added, is NULL if no hit added so far */
+      const VXDHit* getLastHit()
+      {
+        int hitPos = m_hitList.size();
+        if (hitPos != 0) {
+          std::list<VXDHit>::iterator thisPos = m_hitList.end(); --thisPos;
+          return &(*thisPos);
+        }
+        return NULL;
+      }
+
+      /** returns indexNumber of current track */
+      int getParticleID() const { return m_index; } /// ISUSED
+
+      /** returns pdgCode of current track */
+      int getPDG() const { return m_pdg; }
+
+      /** returns number of hits attached to curren track */
+      int size() const { return m_hitList.size(); }  /// ISUSED
+
+      /** sorts hits depending on time stamp of each hit */
+      void sort() { m_hitList.sort(); }  /// ISUSED
+
+      /** reverse hitlist*/
+      void reverse() { m_hitList.reverse(); } /// ISUSED
+
+      /** reset hitlist, should be done only, if there was a main problem with the hits included! */
+      void resetHitList(std::list<VXDHit>& newList) { m_hitList = newList; }
+
+      /** set Pt of track */
+      void setPt(float mom) { m_pT = mom; } /// ISUSED
+
+      /** get Pt of track */
+      float getPt() const { return m_pT; } /// ISUSED
+
+      /** get pointer to sectorMap relevant for track */
+      InternalRawSectorMap::MapOfSectors* getSecMap() { return m_secMap; }
+
+    protected:
+      int m_index; /**< stores index number of track */
+      int m_pdg; /**< stores pdGCode of particle */
+      float m_pT; /**< stores transverse momentum value for track classification */
+      InternalRawSectorMap::MapOfSectors* m_secMap; /**< pointer to sectorMap relevant for track */
+      std::list<VXDHit> m_hitList; /**< contains hits attached to track */
+    };
+
+
+  } // namespace FilterCalcNames
 
 
   /** The SecMapTrainerBaseModule
@@ -406,8 +488,8 @@ namespace Belle2 {
 
 
   public:
-    typedef std::map<std::string, Sector> MapOfSectors;  /**< stores whole sectorMap used for storing cutoffs */
-    typedef std::pair<std::string, Sector> SecMapEntry; /**< represents an entry of the MapOfSectors */
+    typedef std::map<std::string, FilterCalcNames::Sector> MapOfSectors;  /**< stores whole sectorMap used for storing cutoffs */
+    typedef std::pair<std::string, FilterCalcNames::Sector> SecMapEntry; /**< represents an entry of the MapOfSectors */
 
     SecMapTrainerBaseModule();
 
@@ -446,22 +528,41 @@ namespace Belle2 {
       m_rootmomValuesInLayer1Ptr = NULL;
     }
 
-    template<class Tmpl>
-    bool createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* aSiTrueHitPtr, VXDTrack& newTrack,
-                            MapOfSectors*
-                            thisSecMap); /**< internal member - takes hit, calculates sector (and creates it if it is not existing yet) and creates internal VXDHit for further calculation. If return value is true, everything worked fine. If not, then hit was not created (no info about the sector-creation) */
+
 
     /** return chosen origin for secMap-creation */
-    TVector3 getOrigin() { return m_origin; }
+    TVector3 getOrigin() const { return m_origin; }
+
+
+
+    /** for given hit and sectorMap, the function returns true, if hit is accepted and false if not */
+    bool acceptHit(const SpacePoint* aSP, FilterCalcNames::InternalRawSectorMap* secMap);
+
+
+
+    /** can be accepted by several secMaps, because of momentum range or whatever  */
+    bool checkAcceptanceOfSecMap(FilterCalcNames::InternalRawSectorMap* secMap, const SpacePointTrackCand* currentTC);
+
+
+
+    /** converts to internal data structure and attaches it to given secMap */
+    FilterCalcNames::VXDTrack convertSPTC2VXDTrack(FilterCalcNames::InternalRawSectorMap* secMap,
+                                                   const SpacePointTrackCand*  currentTC);
+
+
+
+    /** for given hit and secMap, the correct secID is calculated */
+    std::string calcSecID(const SpacePoint* aSP, FilterCalcNames::InternalRawSectorMap* secMap);
+
+
+
   protected:
-    MapOfSectors m_sectorMap; /**< sectormap contains full info about sectors (will always be calculated) */
-    std::vector <MapOfSectors*>
+    std::vector <FilterCalcNames::InternalRawSectorMap*>
     m_sectorMaps; /**< vector contains sectormap for each range of transverse momentum chosen by m_pTcuts */
-    std::vector <double>
+    std::vector <float>
     m_PARAMpTcuts; /**< minimal number of entries is 1. first entry defines lower threshold for pT in GeV/c. Each further value defines a momentum range for a new sectorMap */
+    float m_PARAMpTCutSmearer; /**< has to be 100. > x >= 0, if > 0, the tracks near a pT cut are sorted into several secMaps. this parameter defines the border-area in percent  */
 
-
-    int m_PARAMtracksPerEvent; /**< contains number of tracks per event */
     int m_eventCounter; /**< knows current event number */
 //     int m_PARAMdetectorType; /**< sets detector type -1 for VXD, Const::PXD for PXD and Const::SVD for SVD */ WARNING OLD!
     std::vector<std::string>
@@ -474,24 +575,23 @@ namespace Belle2 {
     int m_badFilterValueCtr; /**< counts number of times, when calculation of filters produced "nan" */
     int m_numOfLayers; /**< knows number of layers used in chosen detector type */
     int m_totalHitCounter; /**< counts total number of hits occured */
-    int m_PARAMminTrackletLength; /**< threshold for minimum tracklet length (without IP). tracklets having less hits than this value will not be checked */
+    unsigned m_PARAMminTrackletLength; /**< threshold for minimum tracklet length (without IP). tracklets having less hits than this value will not be checked */
 
     int m_PARAMhighestAllowedLayer; /**< defines the highest layer number allowed for filtering (this way, low momentum tracks can be checked neglecting the highest layer) */
 
     short m_filterCharges; /**< this value can be set to: 1: allow only particles with positive charges, 0: allow all particles, -1: allow only particles with negative charges - standard is 0 */
-    double m_PARAMuniSigma; /**< standard value is 1/sqrt(12). Change this value for sharper or more diffuse hits (coupled with 'smearHits */
+    float m_PARAMuniSigma; /**< standard value is 1/sqrt(12). Change this value for sharper or more diffuse hits (coupled with 'smearHits */
     bool m_PARAMsmearHits; /**< set true if you want to smear hits */
     bool m_PARAMnoCurler; /**< set true if you want to exclude curling parts of tracks */
-    bool m_PARAMuseEvtgen; /**< set true if evtGen is used for filtergeneration, set false for pGun  */
-    double m_PARAMmaxXYvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (XY-plane) */
-    double m_PARAMmaxZvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (z-dist) */
-    std::vector<double>
+    float m_PARAMmaxXYvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (XY-plane) */
+    float m_PARAMmaxZvertexDistance; /**< allows to abort particles having their production vertex too far away from the origin (z-dist) */
+    std::vector<float>
     m_PARAMsetOrigin; /**< allows to reset orign (e.g. usefull for special cases like testbeams), only valid if 3 entries are found */
     int m_PARAMtestBeam; /**< some things which are important for the real detector are a problem for testbeams, if you want to use the filterCalculator and the testBeam = false does not work, then try setting the parameter to true */
     bool m_PARAMmultiHitsAllowed; /**< if this parameter is true, the FilterCalculatorModule ignores tracks which have more than one hit on the same sensor. If false, these tracks get filtered. There will be a warning, if parameter 'testBeam' is != 0 and this parameter is true, since there curlers shouldn't be possible */
-    std::vector<double>
+    std::vector<float>
     m_PARAMacceptedRegionForSensors;  /**< accepts pair of input values. first one defines minimal distance for sectors to the origin and second one defines maximum accepted distance for sectors. If anyone of these values is above 0, sectors will be sorted using their distance2Origin parameter, not their layerID */
-    double m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
+    float m_PARAMmagneticFieldStrength; /**< strength of magnetic field in Tesla, standard is 1.5T */
 
     bool m_PARAMsecMapWriteToAscii; /**< if true, secMap data is stored to ascii files (standard setting is true)*/
     // rootStuff:
@@ -557,6 +657,8 @@ namespace Belle2 {
     std::string m_PARAMsectorSetupFileName; /**< enables personal sector setups (can be loaded by the vxd track finder) */
     std::vector<std::string>
     m_PARAMsecMapNames; /**< enables personal sector setups (can be loaded by the vxd track finder), import one for each chosen momentum range */
+    std::string
+    m_PARAMspTCarrayName; /**< the name of the storeArray containing the SpacePointTrackCands used for the secMap-generation */
 
     TwoHitFilters m_twoHitFilterBox; /**< includes all filters using 2 hits */
     ThreeHitFilters m_threeHitFilterBox; /**< includes all filters using 3 hits */
@@ -577,6 +679,9 @@ namespace Belle2 {
     bool m_useTEL; /**< is set to true, if Telescope hits have to be used for tracking too */
     bool m_usePXD; /**< is set to true, if PXD hits have to be used for tracking too */
     bool m_useSVD; /**< is set to true, if SVD hits have to be used for tracking too */
+
+    StoreArray<SpacePointTrackCand>
+    m_spacePointTrackCands; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
   private:
   };
 }

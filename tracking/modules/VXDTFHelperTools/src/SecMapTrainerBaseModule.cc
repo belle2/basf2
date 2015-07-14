@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include "tracking/modules/VXDTFHelperTools/SecMapTrainerBaseModule.h"
+#include <tracking/modules/VXDTFHelperTools/SecMapTrainerBaseModule.h>
 
 #include <tracking/dataobjects/SecMapVector.h> // needed for rootExport
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -19,15 +19,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Const.h>
-// #include <pxd/geometry/SensorInfo.h>
-// #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include "tracking/vxdCaTracking/SharedFunctions.h"
-// #include <testbeam/vxd/geometry/SensorInfo.h>
+
 #include <TObject.h>
 
 // #include <boost/foreach.hpp>
@@ -36,6 +34,8 @@
 #include <TRandom.h>
 using namespace std;
 using namespace Belle2;
+using namespace FilterCalcNames;
+
 
 
 //-----------------------------------------------------------------
@@ -55,14 +55,14 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
 
   //Set module properties
   setDescription("This module calculates the relations of sectors and exports sector dependent filtervalues. Size of sectors and type of filters can be set by steering file. Only one track per event, needs many events for usefull outcome.");
-  setPropertyFlags(c_ParallelProcessingCertified);
+//   setPropertyFlags(c_ParallelProcessingCertified);
 
   std::vector<double> defaultConfigU = {0.0, 0.5, 1.0};
   std::vector<double> defaultConfigV = {0.0, 0.33, 0.67, 1.0};
-  std::vector<double> defaultpTcuts = { 0.035};
+  std::vector<float> defaultpTcuts = { 0.035};
   std::vector<std::string> defaultSecNames = {"fullRange"};
-  std::vector<double> originVec = {0, 0, 0};
-  std::vector<double> acceptedRegionForSensorsVec = { -1, -1};
+  std::vector<float> originVec = {0, 0, 0};
+  std::vector<float> acceptedRegionForSensorsVec = { -1, -1};
   std::vector<std::string> rootFileNameVals = {"FilterCalculatorResults", "UPDATE"};
   std::vector<std::string> supportedDetectors = {"SVD"};
 
@@ -72,28 +72,28 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
   addParam("sectorSetupFileName", m_PARAMsectorSetupFileName,
            "enables personal sector setups (can be loaded by the vxd track finder)", string("genericSectorMap"));
 
-  addParam("tracksPerEvent", m_PARAMtracksPerEvent,
-           "defines the number of exported tracks per event (should not be higher than real number of tracks per event)", int(1));
-
-  addParam("useEvtgen", m_PARAMuseEvtgen,
-           "warning, overrides tracksPerEvent if True! set true if evtGen is used for filtergeneration, set false for pGun", bool(false));
+  addParam("spTCarrayName", m_PARAMspTCarrayName,
+           "the name of the storeArray containing the SpacePointTrackCands used for the secMap-generation", string(""));
 
   addParam("pTcuts", m_PARAMpTcuts,
            "minimal number of entries is 1. first entry defines lower threshold for pT in GeV/c. Each further value defines a momentum range for a new sectorMap",
            defaultpTcuts);
 
-//   addParam("detectorType", m_PARAMdetectorType, "defines which detector type has to be exported. VXD: -1, PXD: 0, SVD: 1", int(1));
+  addParam("pTCutSmearer", m_PARAMpTCutSmearer,
+           "has to be 100. > x >= 0, if > 0, the tracks near a pT cut are sorted into several secMaps. this parameter defines the border-area in percent",
+           float(0.));
+
   addParam("detectorType", m_PARAMdetectorType,
            "defines which detector type has to be exported. Like geometry, simply add the detector types you want to include in the track candidates. Currently supported: PXD, SVD, VXD and TEL",
            supportedDetectors);
 
   addParam("maxXYvertexDistance", m_PARAMmaxXYvertexDistance,
            "allows to abort particles having their production vertex too far away from the origin (xy-plane) - WARNING for testbeam cases, this is a typical source for strange results!",
-           double(0.5));
+           float(0.5));
 
   addParam("maxZvertexDistance", m_PARAMmaxZvertexDistance,
            "allows to abort particles having their production vertex too far away from the origin (z-dist) - WARNING for testbeam cases, this is a typical source for strange results",
-           double(2.0));
+           float(2.0));
 
   addParam("setOrigin", m_PARAMsetOrigin,
            "standard origin is (0,0,0). If you want to have the map calculated for another origin, set here(x,y,z) - WARNING for testbeam cases, this is a typical source for strange results",
@@ -112,7 +112,7 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
            acceptedRegionForSensorsVec);
 
   addParam("magneticFieldStrength", m_PARAMmagneticFieldStrength, "set strength of magnetic field in Tesla, standard is 1.5T",
-           double(1.5));
+           float(1.5));
 
   addParam("analysisWriteToRoot", m_PARAManalysisWriteToRoot,
            " if true, analysis data is stored to root file with file name chosen by 'rootFileName'", bool(false));
@@ -142,18 +142,21 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
 
   addParam("uniSigma", m_PARAMuniSigma,
            "standard value is 1/sqrt(12). Change this value for sharper or more diffuse hits (coupled with 'smearHits')",
-           double(1 / sqrt(12.)));
+           float(1 / sqrt(12.)));
 
   addParam("smearHits", m_PARAMsmearHits, "if True, hits get smeared by pitch/uniSigma", bool(false));
 
   addParam("noCurler", m_PARAMnoCurler,
            "if True, curling tracks get reduced to first part of trajectory before starting to curl back", bool(false));
 
-  addParam("minTrackletLength", m_PARAMminTrackletLength, "defines the number of hits needed to be stored as a tracklet", int(3));
+  addParam("minTrackletLength", m_PARAMminTrackletLength, "defines the number of hits needed to be stored as a tracklet",
+           unsigned(3));
 
   addParam("filterCharges", m_filterCharges,
            "this value can be set to: 1: allow only particles with positive charges, 0: allow all particles, -1: allow only particles with negative charges - standard is 0",
            short(0));
+
+
   //2 hit filters:
   addParam("logDistanceXY", m_PARAMlogDistanceXY, "set 'true' if you want to log distances (XY) between trackHits", bool(true));
   addParam("logDistanceZ", m_PARAMlogDistanceZ, "set 'true' if you want to log distances (Z) between trackHits", bool(true));
@@ -276,7 +279,7 @@ void SecMapTrainerBaseModule::initialize()
             " which is not allowed. Setting to 0. If you do not know the correct choice, please type 'basf2 -m VXDTF' and read the description.")
     m_PARAMtestBeam = 0;
   }
-  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("SecMapTrainerBaseModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!")}
+  if (m_PARAMmultiHitsAllowed == true and m_PARAMtestBeam > 0) { B2WARNING("FilterCalculatorWithSpacePointsModule::Initialize: parameter 'multiHitsAllowed' is true although 'testBeamm' is " << m_PARAMtestBeam << "! Is this on purpose? Please check!")}
 
 
   if (m_PARAManalysisWriteToRoot == true) { // preparing output of analysis data:
@@ -285,13 +288,13 @@ void SecMapTrainerBaseModule::initialize()
       for (string entry : m_PARAMrootFileName) {
         output += "'" + entry + "' ";
       }
-      B2FATAL("FilterCalculator::initialize: rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
+      B2FATAL("SecMapTrainerBaseModule::initialize: rootFileName is set wrong, although parameter 'writeToRoot' is enabled! Actual entries are: "
               << output)
     }
   }
 
   if (m_filterCharges != -1 and m_filterCharges != 0 and m_filterCharges != 1) {
-    B2ERROR("FilterCalculatorModule::initialize: parameter filterCharges is set to " << m_filterCharges <<
+    B2ERROR("SecMapTrainerBaseModule::initialize: parameter filterCharges is set to " << m_filterCharges <<
             ", which is invalid, setting to standard (0)!")
     m_filterCharges = 0;
   }
@@ -300,8 +303,7 @@ void SecMapTrainerBaseModule::initialize()
   m_threeHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
   m_fourHitFilterBox.resetMagneticField(m_PARAMmagneticFieldStrength);
 
-  m_sectorMap.clear();
-  B2INFO("~~~~~~~~~~~FilterCalculator - initialize ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - initialize ~~~~~~~~~~")
 
 
   m_numOfLayers = 0;
@@ -332,19 +334,17 @@ void SecMapTrainerBaseModule::initialize()
   B2INFO("origin is set to: (x,y,z) (" << m_PARAMsetOrigin.at(0) << "," << m_PARAMsetOrigin.at(1) << "," << m_PARAMsetOrigin.at(
            2) << "), testBeam-mode is " << m_PARAMtestBeam << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
 
+  if (m_PARAMpTCutSmearer > 100 or m_PARAMpTCutSmearer < 0) { B2ERROR("pTCutSmearer was set to " << m_PARAMpTCutSmearer << ", which is not allowed, set to 0 now..."); m_PARAMpTCutSmearer = 0; }
 
-  StoreArray<MCParticle>::required();
-  if (m_useTEL) { StoreArray<TelTrueHit>::required(); }
-  if (m_usePXD) { StoreArray<PXDTrueHit>::required(); }
-  if (m_useSVD) { StoreArray<SVDTrueHit>::required(); }
-
+  m_spacePointTrackCands.isRequired(m_PARAMspTCarrayName);
 
 
   int numCuts = m_PARAMpTcuts.size();
+  Sector newCenterSector(FullSecID().getFullSecString(), {0, 0}, {0, 0}, {0, 0}, {0, 0}, 0);
 
   for (int i = 0; i < numCuts - 1; ++i) {
-    string secMapName = (boost::format("%1%$%2%to%3%MeV_%4%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(i) * 1000) % int(
-                           m_PARAMpTcuts.at(i + 1) * 1000) % m_detectorName).str();
+    string secMapName = (boost::format("%1%$%2%to%3%MeV_%4%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(i) * 1000.) % int(
+                           m_PARAMpTcuts.at(i + 1) * 1000.) % m_detectorName).str();
     for (int i = 0; i < int(secMapName.length()); ++i) {
       switch (secMapName.at(i)) {
         case '$':
@@ -354,8 +354,17 @@ void SecMapTrainerBaseModule::initialize()
       }
     }
     m_PARAMsecMapNames.push_back(secMapName);
-    B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
+
+    InternalRawSectorMap* secMap = new InternalRawSectorMap(secMapName, m_PARAMpTCutSmearer * 0.01, m_PARAMpTcuts.at(i),
+                                                            m_PARAMpTcuts.at(i + 1), m_usePXD, m_useSVD, m_useTEL);
+    secMap->insert({FullSecID().getFullSecString(), newCenterSector});
+
+    B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs in range " << secMap->getPtCuts().first <<
+           " - " << secMap->getPtCuts().second << " GeV/c")
+    m_sectorMaps.push_back(secMap);
   }
+
+  // adding last secMap
   string secMapName = (boost::format("%1%$moreThan%2%MeV_%3%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(
                          numCuts - 1) * 1000)  % m_detectorName).str();
   for (int i = 0; i < int(secMapName.length()); ++i) {
@@ -366,18 +375,18 @@ void SecMapTrainerBaseModule::initialize()
         secMapName.at(i) = '-';
     }
   }
-  B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs")
   m_PARAMsecMapNames.push_back(secMapName);
+
+  InternalRawSectorMap* secMap = new InternalRawSectorMap(secMapName, m_PARAMpTCutSmearer * 0.01, m_PARAMpTcuts.at(numCuts - 1), -1,
+                                                          m_usePXD, m_useSVD, m_useTEL);
+  secMap->insert({FullSecID().getFullSecString(), newCenterSector});
+
+  B2INFO("FilterCalculatorModule-start: will use " << secMapName << " for storing cutoffs in range " << secMap->getPtCuts().first <<
+         " - " << secMap->getPtCuts().second << " GeV/c")
+  m_sectorMaps.push_back(secMap);
 
 
   m_trackletMomentumCounter.resize(numCuts, 0);
-
-  for (int i = 0; i < int(m_PARAMpTcuts.size());) {
-    MapOfSectors* secMap = new MapOfSectors;
-    secMap->clear();
-    m_sectorMaps.push_back(secMap);
-    ++i;
-  }
 
 
 
@@ -423,383 +432,77 @@ void SecMapTrainerBaseModule::beginRun()
 /// /// /// /// /// /// /// /// EVENT /// /// /// /// /// /// /// ///
 void SecMapTrainerBaseModule::event()
 {
-  double pMaxInMeV = 100000., pMinInMeV = 10.; /// WARNING hardcoded values!
-
   //get the data
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   m_eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(5, "~~~~~~~~~~~FilterCalculator - event " << m_eventCounter << " ~~~~~~~~~~")
+  B2DEBUG(5, "~~~~~~~~~~~SecMapTrainerBaseModule - event " << m_eventCounter << " ~~~~~~~~~~")
 
   //simulated particles and hits
-  StoreArray<MCParticle> aMcParticleArray("");
-  int numOfMcParticles = aMcParticleArray.getEntries();
-  StoreArray<PXDTrueHit> aPxdTrueHitArray("");
-  int numOfPxdTrueHits = aPxdTrueHitArray.getEntries();
-  StoreArray<SVDTrueHit> aSvdTrueHitArray("");
-  int numOfSvdTrueHits = aSvdTrueHitArray.getEntries();
-  StoreArray<TelTrueHit> aTelTrueHitArray("");
-  int numOfTelTrueHits = aTelTrueHitArray.getEntries();
+  unsigned nSPTCs = m_spacePointTrackCands.getEntries();
 
-
-  if (numOfMcParticles == 0) {
-    B2WARNING("event " << m_eventCounter << ": there is no MCParticle!")
-    return;
-  }
-  if (numOfPxdTrueHits == 0 && m_usePXD == true) {
-    B2WARNING("event " << m_eventCounter << ": there are no PXDTrueHits")
-    return;
-  }
-  if (numOfSvdTrueHits == 0 && m_useSVD == true) {
-    B2WARNING("event " << m_eventCounter << ": there are no SVDTrueHits")
-    return;
-  }
-  if (numOfTelTrueHits == 0 && m_useTEL == true) {
-    B2WARNING("event " << m_eventCounter << ": there are no TelTrueHits")
+  if (nSPTCs == 0) {
+    B2WARNING("event " << m_eventCounter << ": there is no SpacePointTrackCandidate!")
     return;
   }
 
-  RelationIndex<MCParticle, PXDTrueHit> relationMcPxdTrueHit;
-  RelationIndex<MCParticle, SVDTrueHit> relationMcSvdTrueHit;
-  RelationIndex<MCParticle, TelTrueHit> relationMcTelTrueHit;
-
-  if (m_PARAMtracksPerEvent > numOfMcParticles) {
-    B2ERROR("FilterCalculatorModule: input parameter wrong (tracks per event) - reset to maximum value")
-    m_PARAMtracksPerEvent = numOfMcParticles;
-  }
-
-  B2DEBUG(5, "FilterCalculatorModule, event " << m_eventCounter << ": size of arrays, SvdTrueHit: " << numOfSvdTrueHits <<
-          ", mcPart: " << numOfMcParticles << ", PxDTrueHits: " << numOfPxdTrueHits << ", TelTrueHits: " << numOfTelTrueHits /*<< endl*/);
-
-
-  TVector3 oldpGlobal;
-  TVector3 oldhitGlobal;
   m_rootmomValuesInLayer1.clear();
   m_rootpTValuesInLayer1.clear();
 
-  /** collecting all hits of primary particles in a track for each particle and sorts them
-  *(first entry is first hit in detector, last hit is last one before leaving the detector forever)
-  **/
-  TVector3 hitGlobal, hitLocal, pGlobal, pLocal;
+  B2DEBUG(5, "SecMapTrainerBaseModule, event " << m_eventCounter << ": size of array nSpacePointTrackCands: " << nSPTCs);
 
-  vector<VXDTrack> tracksOfEvent;
+
   vector<VXDTrack> trackletsOfEvent; // tracks cut into bite-sized pieces for the filtering part
 
-  int trackThreshold = m_PARAMtracksPerEvent;
-  if (m_PARAMuseEvtgen == true) { trackThreshold = numOfMcParticles; }
+  for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
+    const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
+    B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored")
+    unsigned chosenMap = 0;
+    for (auto* secMap : m_sectorMaps) {
+      chosenMap++;
+      /// can be accepted by several secMaps, because of momentum range or whatever:
+      bool accepted = checkAcceptanceOfSecMap(secMap, currentTC);
 
-  for (int iPart = 0; iPart not_eq trackThreshold; ++iPart) {
-    const MCParticle* const aMcParticlePtr = aMcParticleArray[iPart];
-    aMcParticlePtr->fixParticleList();
-    int pdg = aMcParticlePtr->getPDG();
+      B2DEBUG(15, "currens SPTC with " << currentTC->getNHits() <<
+              " hits stored and pT of " << currentTC->getMomSeed().Perp() <<
+              "GeV/c was " << (accepted ? string("accepted") : string("rejected")) <<
+              " by secMap " << secMap->getName() <<
+              " having momCuts: " << secMap->getPtCuts().first <<
+              "/" << secMap->getPtCuts().second)
+      if (!accepted) continue;
+      m_trackletMomentumCounter.at(chosenMap - 1)++;
 
-    TVector3 mcVertexPos = aMcParticlePtr->getVertex();
-    TVector3 mcMomentum = aMcParticlePtr->getMomentum(); /// used for filtering depending on momentum of particle
+      /// converts to internal data structure and attaches it to given secMap
+      VXDTrack newTrack = convertSPTC2VXDTrack(secMap, currentTC);
 
-
-    /** getting full chain of track hits for each track */
-
-    /** now some conditions filtering that particle: */
-    // capture particles with wrong charge:
-    if (m_filterCharges != 0) { if (signbit(m_filterCharges) != signbit(aMcParticlePtr->getCharge())) { continue; } }
-
-    if (aMcParticlePtr->hasStatus(MCParticle::c_PrimaryParticle) == false) { continue; } // check whether current particle (and all its hits) belong to a primary particle
-
-    if (abs(mcVertexPos.Perp() - m_origin.Perp()) > m_PARAMmaxXYvertexDistance) {
-      B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart <<
-              " discarded because of bad rho-value (" << mcVertexPos.Perp() << " is bigger than threshold: " << m_PARAMmaxXYvertexDistance <<
-              ") of the particle-vertex")
-      continue;
+      trackletsOfEvent.push_back(std::move(newTrack)); // nTracklets >= nSPTCs
     }
-    if (abs(mcVertexPos.Z() - m_origin.Z()) > m_PARAMmaxZvertexDistance) {
-      B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart <<
-              " discarded because of bad z-value (" << abs(mcVertexPos[2]) << " is bigger than threshold: " << m_PARAMmaxZvertexDistance <<
-              ") of the particle-vertex")
-      continue;
-    }
-    double mcMomValue = mcMomentum.Perp();
-    if (mcMomValue < m_PARAMpTcuts.at(0)) {
-      B2DEBUG(10, "FilterCalculatorModule - event " << m_eventCounter << ": mcParticle with index " << iPart <<
-              " discarded because of bad pT-Value " << mcMomValue << " (below threshold of " << m_PARAMpTcuts.at(0) << ")")
-      continue;
-    } // filtering all particles having less than minimal threshold value of pT
-
-    int chosenSecMap = -1;
-    for (double ptCutoff : m_PARAMpTcuts) {
-      if (mcMomValue > ptCutoff) {
-        chosenSecMap++;
-      } else { break; }
-    }
-    if (chosenSecMap == -1) {
-      B2WARNING("FilterCalculatorModule - event " << m_eventCounter <<
-                ": invalid choice of sectorMap, please check parameter pTcuts in steering file")
-      continue;
-    }
+  }
 
 
-    B2DEBUG(20, "FilterCalculatorModule - event " << m_eventCounter << ": chosenSecMap is " << chosenSecMap <<
-            " with lower pt threshold of " << m_PARAMpTcuts.at(chosenSecMap) << " with particle id/pdg: " << iPart << "/" << pdg <<
-            " having pT: " << mcMomValue << "GeV/c")
-    MapOfSectors* thisSecMap = m_sectorMaps.at(chosenSecMap);
-
-    VXDTrack newTrack(iPart); // will now filled with PXD and SVD-Hits from same particle
-
-    if (m_usePXD == true) { // want PXDhits
-      B2DEBUG(20, "I'm in PXD and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
-
-      RelationIndex<MCParticle, PXDTrueHit>::range_from iterPairMcPxd = relationMcPxdTrueHit.getElementsFrom(aMcParticlePtr);
-      for (const auto& relElement : iterPairMcPxd) {
-        const PXDTrueHit* const aSiTrueHitPtr = relElement.to;
-
-        bool creatingHitSuccessfull = createSectorAndHit(Const::PXD, pdg, aSiTrueHitPtr, newTrack, thisSecMap);/// createSectorAndHit
-
-        if (creatingHitSuccessfull == true) {
-          m_pxdHitCounter++;
-          B2DEBUG(20, "adding new PXD hit of track " << iPart)
-        }
-      } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
-    } // finished adding PXD-Hits
-
-    if (m_useTEL == true) { // want TELhits
-      B2DEBUG(20, "I'm in TEL and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
-
-      RelationIndex<MCParticle, TelTrueHit>::range_from iterPairMcTel = relationMcTelTrueHit.getElementsFrom(aMcParticlePtr);
-      for (const auto& relElement : iterPairMcTel) {
-        const TelTrueHit* const aSiTrueHitPtr = relElement.to;
-
-        bool creatingHitSuccessfull = createSectorAndHit(Const::invalidDetector, pdg, aSiTrueHitPtr, newTrack,
-                                                         thisSecMap);/// createSectorAndHit
-
-        if (creatingHitSuccessfull == true) {
-          m_telHitCounter++;
-          B2DEBUG(20, "adding new TEL hit of track " << iPart)
-        }
-      } // now each hit knows in which direction the particle goes, in which sector it lies and where it is
-    } // finished adding TEL-Hits
-
-    if (m_useSVD == true) { // want SVDhits
-      B2DEBUG(20, "I'm in SVD and chosen detectorType is: " << Belle2::printMyStdVector(m_PARAMdetectorType))
-
-      RelationIndex<MCParticle, SVDTrueHit>::range_from iterPairMcSvd = relationMcSvdTrueHit.getElementsFrom(aMcParticlePtr);
-      for (const auto& relElement : iterPairMcSvd) {
-        const SVDTrueHit* const aSiTrueHitPtr = relElement.to;
-
-        bool creatingHitSuccessfull = createSectorAndHit(Const::SVD, pdg, aSiTrueHitPtr, newTrack, thisSecMap);/// createSectorAndHit
-
-        if (creatingHitSuccessfull == true) {
-          m_svdHitCounter++;
-          B2DEBUG(20, "adding new SVD hit of track " << iPart)
-        }
-      }
-    } // finished adding SVD-hits
-
-    /// before doing useful stuff with that new track, we check for strange behavior ( e.g. we do not want tracks which produce more than one hit at any sensor)
-    list<int> uniIDsOfTrack; // we collect uniIDs of the hits and filter them for double entries, therefore list
-    list<VXDHit> thisTrack = newTrack.getTrack();
-    for (VXDHit& hit : thisTrack) {
-      uniIDsOfTrack.push_back(hit.getUniID());
-    }
-    uniIDsOfTrack.sort();
-    uniIDsOfTrack.unique();
-    if (m_PARAMmultiHitsAllowed == false
-        and uniIDsOfTrack.size() != thisTrack.size()) { // means that there were more than one hit per sensor
-      B2INFO("event " << m_eventCounter << ": track of particle " << iPart << "(pT/theta:" << mcMomValue << "/" << mcMomentum.Theta() <<
-             ") had number of hits/traversed sensors: " << thisTrack.size() << "/" << uniIDsOfTrack.size() << " - skipping track!")
-      continue;
-    }
-
-
-    string aCenterSectorName = FullSecID().getFullSecString(); // virtual sector for decay vertices.
-    if (thisSecMap->find(aCenterSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-//       Sector newCenterSector(0, 0, 0, 0, 0, 0, 0, aCenterSectorName);
-      Sector newCenterSector(aCenterSectorName, {0, 0}, {0, 0}, {0, 0}, {0, 0}, 0);
-      thisSecMap->insert({aCenterSectorName, newCenterSector});
-    }
-    MCParticle* mcp = aMcParticleArray[newTrack.getParticleID()];
-//      TVector3 mcvertex = mcp->getVertex();
-    TVector3 mcvertex = m_origin; /// we do not know the real vertex, therefore  we are storing the origin assumed by the setup!
-    TVector3 mcmom = mcp->getMomentum();
-    int mcPdg = mcp->getPDG();
-    VXDHit newVirtualHit(Const::IR, aCenterSectorName, 0, mcvertex, mcmom, mcPdg, mcvertex, 0);
-    newVirtualHit.setVertex();
-    newTrack.setPt(mcmom.Perp()); // needed for dynamic classifying of sectormap
-
-    newTrack.sort(); // now all the hits are ordered by their global time, which allows cutting the tracks into tracklets where the momenta of all hits point into the same direction.
-
-    tracksOfEvent.push_back(newTrack);
-    thisTrack = newTrack.getTrack(); // reloading track after adding virtual center and sorting hits
-
-    if (thisTrack.size() > 30) { B2INFO("event: " << m_eventCounter << " beware, tracklength is " << thisTrack.size()) }
-    if (int (thisTrack.size()) > m_numOfLayers * 2) { m_longTrackCounter++; }
-    for (VXDHit& hit : thisTrack) {
-      B2DEBUG(20, "track has a hit in sector: " << hit.getSectorID())
-    }
-    int thisUniID, friendUniID;
-    list<VXDHit>::reverse_iterator riter, oldRiter;
-    for (riter = thisTrack.rbegin(); riter != thisTrack.rend();) {
-
-      VXDTrack newTracklet(newTrack.getParticleID(), newTrack.getPt(), thisSecMap);
-
-      bool direction = riter->getParticleMovement();
-      thisUniID = riter->getUniID();
-      oldRiter = riter;
-      B2DEBUG(20, "adding Hit to tracklet: ")
-      if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
-
-      B2DEBUG(20, "copying track-segment into tracklet")
-      ++riter;
-      if (m_PARAMtestBeam !=
-          0) { // does not care for particle movement since the particles do not come from the origin but from some arbritrary point of the coord system
-        while (riter != thisTrack.rend()) {
-          friendUniID = riter->getUniID();
-          if (thisUniID != friendUniID) { // do not want to add two hits of same track on same sensor...
-            if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
-          } else {
-            string thisSecName = riter->getSectorID();
-            B2DEBUG(5, "at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() <<
-                    "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() -
-                        riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) <<
-                    " in the same sensor :" << thisSecName << ". Hit discarded!")
-            thisSecMap->find(thisSecName)->second.decreaseCounter();
-            m_badHitsCounter++;
-          }
-          oldRiter = riter; ++riter; thisUniID = friendUniID;
-        }
-      } else { // assumes that the interaction point is at the origin (or at least very near to it)
-        if (riter != thisTrack.rend()) {
-          if (direction != riter->getParticleMovement()) { continue; }
-          while (direction == riter->getParticleMovement()) {
-            if (riter == thisTrack.rend()) { break; }
-            friendUniID = riter->getUniID();
-            if (thisUniID != friendUniID) {
-              if (dynamic_cast<VXDHit*>(&(*riter)) != NULL) { newTracklet.addHit(*riter); }
-            } else {
-              string thisSecName = riter->getSectorID();
-              B2DEBUG(5, "at event " << m_eventCounter << ": track " << newTrack.getParticleID() << " with momentum of " << newTrack.getPt() <<
-                      "GeV/c has got two trueHits with same direction of flight, distance of " << (oldRiter->getHitPosition() -
-                          riter->getHitPosition()).Mag() << " of each other and deltatimestamp " << (oldRiter->getTimeStamp() - riter->getTimeStamp()) <<
-                      " in the same sensor :" << thisSecName << ". Hit discarded!")
-              thisSecMap->find(thisSecName)->second.decreaseCounter();
-              m_badHitsCounter++;
-            }
-            oldRiter = riter; ++riter; thisUniID = friendUniID;
-          }
-        }
-      }
-      int numHits = newTracklet.size();
-      B2DEBUG(20, "after collecting hits for the tracklet, size of tracklet: " << numHits)
-
-      if (numHits > m_numOfLayers * 2 + 1) { m_longTrackletCounter++; } else { m_trackletLengthCounter.at(numHits - 1)++; }
-
-      B2DEBUG(20, "after adding size")
-      if (numHits >= m_PARAMminTrackletLength) {
-
-        if (direction == true) { // in that case the momentum vector of the tracklet points away from the IP -> outward movement
-          newTracklet.reverse(); // ->inward "movement" of the hits, needed for the filtering, no presorting needed, the hits were in the right order.
-          B2DEBUG(20, " change direction of tracklet...")
-        }
-
-        B2DEBUG(20, " now checking for bad tracklets...")
-        // what happens now: at this point, every tracklet has its outermost hits at the lowest position, therefore: hit[i].layer >= hit[i+1].layer
-        string currentSector, friendSector;
-        list<VXDHit> hitList = newTracklet.getTrack();
-        list<VXDHit>::iterator currentIt = hitList.begin(); // first hit is outermost hit
-        list<VXDHit>::iterator friendIt = hitList.begin(); ++friendIt;
-
-        int countedFails = 0;
-        while (friendIt != hitList.end()) {
-          currentSector = currentIt->getSectorID();
-          friendSector = friendIt->getSectorID();
-          if (int(currentSector.size()) == 0 || int(friendSector.size()) == 0) {
-            B2DEBUG(5, "FilterCalculatorModule event " << m_eventCounter << ": CurrentSector/FriendSector " << currentSector << "/" <<
-                    friendSector << " got size 0! ")
-            friendIt = hitList.end();
-            ++countedFails;
-          } else {
-            if ((currentSector.at(0) < friendSector.at(0)) and (m_PARAMtestBeam < 2)) {
-              // Testbeam has got mixed layer numbers when using telescope
-              B2WARNING("FilterCalculatorModule event " << m_eventCounter << ": tracklet has invalid sector-combination (outer/inner sector): " <<
-                        currentSector << "/" << friendSector << "pID: " << newTracklet.getParticleID() << ", pT: " << newTracklet.getPt() <<
-                        ", deleting friendHit")
-              friendIt = hitList.erase(friendIt);
-              ++countedFails;
-            } else {
-              ++currentIt; ++friendIt;
-            }
-          }
-        } // filtering bad hits at different layers
-
-        list<int> uniIDs;
-        for (VXDHit& hit : hitList) {
-          uniIDs.push_back(hit.getUniID());
-        }
-        int numUniIDsBeforeClean = uniIDs.size(), numUniIDsAfterClean;
-        uniIDs.sort();
-        uniIDs.unique();
-        numUniIDsAfterClean = uniIDs.size();
-        if (numUniIDsAfterClean !=
-            numUniIDsBeforeClean) {  // in this case, the same track passed the same sensor twice. extremely unlikely and an indicator for nasty tracks destroying the lookup table
-          B2DEBUG(5, "FilterCalculatorModule event " << m_eventCounter << ": tracklet with pID: " << newTracklet.getParticleID() <<
-                  ", has got multiple hits on the same sensor, discarding tracklet!")
-          ++countedFails;
-        } // filtering bad hits at the same sensor
-
-
-        if (countedFails >
-            0) {   // such strange tracks are extremely uncommon and wont be able to be reconstructed anyway, therefore they will be neglected anyway
-          B2ERROR("FilterCalculatorModule event " << m_eventCounter << ": tracklet failed with pID: " << newTracklet.getParticleID() <<
-                  ", has now following entries:")
-          string values;
-          for (VXDHit& hit : hitList) {
-            values += hit.getSectorID() + " ";
-          }
-          B2ERROR(values << "- tracklet will be discarded!")
-          riter = thisTrack.rend();
-          m_badTrackletCounter++;
-        } else {
-          B2DEBUG(20, " tracklet passed bad-tracklet-filters")
-          int chosenSecMap = -1;
-          for (double ptCutoff : m_PARAMpTcuts) {
-            if (mcMomValue > ptCutoff) {
-              chosenSecMap++;
-            } else { break; }
-          }
-          m_trackletMomentumCounter.at(chosenSecMap)++;
-          newTracklet.addHit(newVirtualHit); /// adding virtual hit to tracklet!
-
-          B2DEBUG(20, "adding tracklet to list")
-          trackletsOfEvent.push_back(newTracklet);
-        }
-
-      } else { B2DEBUG(20, "tracklet too small -> discarded") }
-
-      if (m_PARAMnoCurler == true) {  // do not store following tracklets, when no curlers shall be recorded...
-        riter = thisTrack.rend();
-      }
-    } // slicing current track into moouth sized tracklets
-  } // looping through particles
-
+  TVector3 hitGlobal;
   int nTotalHits = 0;
-  for (auto tracklet : trackletsOfEvent) {
+  float pMaxInMeV = 100000., pMinInMeV = 10.; /// WARNING hardcoded values!
+  for (auto& tracklet : trackletsOfEvent) {
     nTotalHits += tracklet.getTrack().size();
   }
-  B2DEBUG(5, "finished tracklet-generation. " << trackletsOfEvent.size() << " tracklets and " << tracksOfEvent.size() <<
-          " tracks found having mean of " << float(nTotalHits) / float(trackletsOfEvent.size()) << " hits per tracklet")
+  B2DEBUG(5, "finished tracklet-generation. " << trackletsOfEvent.size() << " tracklets and " << nSPTCs <<
+          " original tracks found having mean of " << float(nTotalHits) / float(trackletsOfEvent.size()) << " hits per tracklet")
   string currentSector, friendSector;
 //4hit-variables:
   TVector3 hitG, moHitG, graMoHitG, greGraMoHitG;
-  double deltaDistCircleCenter, deltapT;
+  float deltaDistCircleCenter, deltapT;
 // 3hit-variables:
   TVector3 motherHitGlobal, grandMotherHitGlobal;
-  double dist2IP, angles3D, anglesXY, anglesRZ, helixParameterFit, deltaSlopeZOverS, deltaSOverZ , deltaSlopeRZ, pT;
+  float dist2IP, angles3D, anglesXY, anglesRZ, helixParameterFit, deltaSlopeZOverS, deltaSOverZ , deltaSlopeRZ, pT;
 // 2hit-variables:
   TVector3 segmentVector;
-  double distanceXY, distanceZ, distance3D, normedDistance3D, slopeRZ;
+  float distanceXY, distanceZ, distance3D, normedDistance3D, slopeRZ;
 
   for (int i = 0; i < int(trackletsOfEvent.size()); i++) {
 
     bool firstrun = true, secondrun = true, thirdrun = true, lastRun = false;
     list<VXDHit> aTracklet = trackletsOfEvent.at(i).getTrack();
-    MapOfSectors* thisSecMap = trackletsOfEvent.at(i).getSecMap();
+    InternalRawSectorMap::MapOfSectors* thisSecMap = trackletsOfEvent.at(i).getSecMap();
     list<VXDHit>::iterator iter = aTracklet.begin(); // main iterator looping through the whole tracklet, "innermost Hit"
     list<VXDHit>::iterator it2HitsFilter =
       aTracklet.begin(); //important for 2hit-Filters: points to current hit of 2-hit-processes " next to innermost hit"
@@ -815,7 +518,7 @@ void SecMapTrainerBaseModule::event()
     B2DEBUG(20, "executing " << i + 1 << "th tracklet with size " << aTracklet.size() << " and hits in the sectors:\n" <<
             tcSectors.str() << endl)
 
-    MapOfSectors::iterator thisSectorPos;
+    InternalRawSectorMap::MapOfSectors::iterator thisSectorPos;
     for (; iter != aTracklet.end(); ++iter) {
       // moving from outermost hit inwards. iter points at the innermost hit of the current line of hits (means in the first iteration it points at the outermost hit, in the 2nd iteration it points at the inner hit next to the outermost hit and it2HitsFilter points to the outermost hit) with every iteration, iter leads the row of iterators inwards.
       list<VXDHit>::iterator tempIter = iter; ++tempIter;
@@ -852,7 +555,11 @@ void SecMapTrainerBaseModule::event()
               try {
                 deltapT = m_fourHitFilterBox.deltapT();
               } catch (FilterExceptions::Straight_Line& exception) {
-                B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltapT threw an exception: " << exception.what() <<
+                B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapT threw an exception: " << exception.what() <<
+                          ", value discarded...")
+                succeeded = false;
+              } catch (FilterExceptions::Circle_too_small& exception) {
+                B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapT threw an exception: " << exception.what() <<
                           ", value discarded...")
                 succeeded = false;
               }
@@ -878,6 +585,10 @@ void SecMapTrainerBaseModule::event()
               try {
                 deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
               } catch (FilterExceptions::Straight_Line& exception) {
+                B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenter threw an exception: " <<
+                          exception.what() << ", value discarded...")
+                succeeded = false;
+              } catch (FilterExceptions::Circle_too_small& exception) {
                 B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenter threw an exception: " <<
                           exception.what() << ", value discarded...")
                 succeeded = false;
@@ -955,6 +666,10 @@ void SecMapTrainerBaseModule::event()
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapTHighOccupancy threw an exception: " <<
                         exception.what() << ", value discarded...")
               succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltapTHighOccupancy threw an exception: " <<
+                        exception.what() << ", value discarded...")
+              succeeded = false;
             }
             if (std::isnan(deltapT) == false) {
               if (succeeded == true) {
@@ -977,6 +692,10 @@ void SecMapTrainerBaseModule::event()
             try {
               deltaDistCircleCenter =  m_fourHitFilterBox.deltaDistCircleCenter();
             } catch (FilterExceptions::Straight_Line& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenterHighOccupancy threw an exception: " <<
+                        exception.what() << ", value discarded...")
+              succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
               B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaDistCircleCenterHighOccupancy threw an exception: " <<
                         exception.what() << ", value discarded...")
               succeeded = false;
@@ -1010,6 +729,10 @@ void SecMapTrainerBaseModule::event()
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating dist2IP threw an exception: " << exception.what() <<
                         ", value discarded...")
               succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating dist2IP threw an exception: " << exception.what() <<
+                        ", value discarded...")
+              succeeded = false;
             }
             if (std::isnan(dist2IP) == false) {
               if (succeeded == true) {
@@ -1034,6 +757,10 @@ void SecMapTrainerBaseModule::event()
               pT = m_threeHitFilterBox.calcPt();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating pT threw an exception: " << exception.what() <<
+                        ", value discarded...")
+              succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating pT threw an exception: " << exception.what() <<
                         ", value discarded...")
               succeeded = false;
             }
@@ -1123,6 +850,10 @@ void SecMapTrainerBaseModule::event()
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating helixParameterFit threw an exception: " << exception.what()
                         << ", value discarded...")
               succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating helixParameterFit threw an exception: " << exception.what()
+                        << ", value discarded...")
+              succeeded = false;
             }
             if (std::isnan(helixParameterFit) == false) {
               if (succeeded == true) {
@@ -1149,6 +880,10 @@ void SecMapTrainerBaseModule::event()
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltaSOverZ threw an exception: " << exception.what() <<
                         ", value discarded...")
               succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaSOverZ threw an exception: " << exception.what() <<
+                        ", value discarded...")
+              succeeded = false;
             }
             if (std::isnan(deltaSOverZ) == false) {
               if (succeeded == true) {
@@ -1173,6 +908,10 @@ void SecMapTrainerBaseModule::event()
               deltaSlopeZOverS = m_threeHitFilterBox.calcDeltaSlopeZOverS();
             } catch (FilterExceptions::Straight_Line& exception) {
               B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating deltaSlopeZOverS threw an exception: " << exception.what() <<
+                        ", value discarded...")
+              succeeded = false;
+            } catch (FilterExceptions::Circle_too_small& exception) {
+              B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating deltaSlopeZOverS threw an exception: " << exception.what() <<
                         ", value discarded...")
               succeeded = false;
             }
@@ -1221,7 +960,8 @@ void SecMapTrainerBaseModule::event()
         if (thisSectorPos == thisSecMap->end()) { B2ERROR(" sector " << currentSector << " not found...")} /// WARNING TODO WTF?!?
 
         if (typeid(string).name() != typeid(friendSector).name()) {
-          B2WARNING("FilterCalculator event " << m_eventCounter << ": type of friendSector is no string, aborting tracklet...")
+          B2WARNING("FilterCalculatorWithSpacePointsModule event " << m_eventCounter <<
+                    ": type of friendSector is no string, aborting tracklet...")
           continue;
         }
 
@@ -1239,6 +979,10 @@ void SecMapTrainerBaseModule::event()
             dist2IP = m_threeHitFilterBox.calcCircleDist2IP();
           } catch (FilterExceptions::Straight_Line& exception) {
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating distHighOccupancy2IP threw an exception: " <<
+                      exception.what() << ", value discarded...")
+            succeeded = false;
+          } catch (FilterExceptions::Circle_too_small& exception) {
+            B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating distHighOccupancy2IP threw an exception: " <<
                       exception.what() << ", value discarded...")
             succeeded = false;
           }
@@ -1265,6 +1009,10 @@ void SecMapTrainerBaseModule::event()
             pT = m_threeHitFilterBox.calcPt();
           } catch (FilterExceptions::Straight_Line& exception) {
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating pTHighOccupancy threw an exception: " << exception.what() <<
+                      ", value discarded...")
+            succeeded = false;
+          } catch (FilterExceptions::Circle_too_small& exception) {
+            B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating pTHighOccupancy threw an exception: " << exception.what() <<
                       ", value discarded...")
             succeeded = false;
           }
@@ -1342,6 +1090,10 @@ void SecMapTrainerBaseModule::event()
             helixParameterFit = m_threeHitFilterBox.calcHelixParameterFit();
           } catch (FilterExceptions::Straight_Line& exception) {
             B2WARNING("3-hit-filter in event " << m_eventCounter << ": calculating helixParameterHighOccupancyFit threw an exception: " <<
+                      exception.what() << ", value discarded...")
+            succeeded = false;
+          } catch (FilterExceptions::Circle_too_small& exception) {
+            B2WARNING("4-hit-filter in event " << m_eventCounter << ": calculating helixParameterHighOccupancyFit threw an exception: " <<
                       exception.what() << ", value discarded...")
             succeeded = false;
           }
@@ -1482,7 +1234,7 @@ void SecMapTrainerBaseModule::event()
     m_rootFilePtr->cd();
     m_treeEventWisePtr->Fill();
   }
-  B2DEBUG(5, "FilterCalculator - event " << m_eventCounter << ", calculations done!")
+  B2DEBUG(5, "SecMapTrainerBaseModule - event " << m_eventCounter << ", calculations done!")
 }
 
 
@@ -1490,7 +1242,7 @@ void SecMapTrainerBaseModule::event()
 /// /// /// /// /// /// /// /// END RUN /// /// /// /// /// /// /// ///
 void SecMapTrainerBaseModule::endRun()
 {
-  B2INFO("~~~~~~~~~~~FilterCalculator - end of endRun ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - end of endRun ~~~~~~~~~~")
 }
 
 
@@ -1501,7 +1253,7 @@ void SecMapTrainerBaseModule::terminate()
   int totalTrackletCounter = 0;
   int totalHitCounter = 0;
   m_eventCounter++;
-  B2INFO("~~~~~~~~~~~FilterCalculator - terminate ~~~~~~~~~~")
+  B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - terminate ~~~~~~~~~~")
   for (int i = 0; i < int(m_PARAMsecMapNames.size()); ++i) {
     B2INFO(" within " << m_eventCounter << " events we got " << m_trackletMomentumCounter.at(i) << " tracklets in the " <<
            m_PARAMsecMapNames.at(i) << " setup")
@@ -1532,7 +1284,7 @@ void SecMapTrainerBaseModule::terminate()
 
   SecMapVector rawSectorMapVector;
 
-  for (MapOfSectors* thisMap : m_sectorMaps) {
+  for (InternalRawSectorMap* thisMap : m_sectorMaps) {
     int secMapSize = thisMap->size();
     ctr = 0;
     B2INFO("writing " << secMapSize << " entries of secmap " << m_PARAMsecMapNames.at(smCtr))
@@ -1540,8 +1292,9 @@ void SecMapTrainerBaseModule::terminate()
     VXDTFRawSecMapTypedef::StrippedRawSecMap rootSecMap;
     VXDTFRawSecMapTypedef::SectorDistancesMap
     distanceOfSectorsMap; // stores the secID in .first and the value for the distances in .second
+    InternalRawSectorMap::MapOfSectors* secMap =  &thisMap->getSecMap();
 
-    for (SecMapEntry thisEntry : *thisMap) {
+    for (InternalRawSectorMap::SecMapEntry& thisEntry : *secMap) {
       if (secMapSize > 10) {
         if ((ctr % int(0.1 * float(secMapSize))) == 0 && secMapSize > 0) { // this check produces segfault if secMapSize < 10
           B2INFO("writing entry " << ctr << ": " << thisEntry.first)
@@ -1583,31 +1336,28 @@ void SecMapTrainerBaseModule::terminate()
           B2DEBUG(10, "..." << FullSecID(afriend.first) << " with " << afriend.second.size() << " cutoffTypes")
         }
       }
-      bool doNotAddMapAgain = false;
-      if (doNotAddMapAgain == false) {   /// TODO why shouldn't I add a map? ATM these two lines are pretty useless...
-
-        // fill in data:
-        VXDTFRawSecMap newTemporarySecMap;
-        newTemporarySecMap.addSectorMap(rootSecMap);
-        newTemporarySecMap.setMapName(m_PARAMsecMapNames.at(smCtr));
-        newTemporarySecMap.setDetectorType(m_detectorName);
-        newTemporarySecMap.setSectorConfigU(m_PARAMsectorConfigU);
-        newTemporarySecMap.setSectorConfigV(m_PARAMsectorConfigV);
-        newTemporarySecMap.setOrigin(m_origin);
-        newTemporarySecMap.setMagneticFieldStrength(m_PARAMmagneticFieldStrength);
-        newTemporarySecMap.setLowerMomentumThreshold(m_PARAMpTcuts.at(smCtr));
-        newTemporarySecMap.addDistances(distanceOfSectorsMap);
-        newTemporarySecMap.setMinDistance2origin(m_PARAMacceptedRegionForSensors.at(0));
-        newTemporarySecMap.setMaxDistance2origin(m_PARAMacceptedRegionForSensors.at(1));
-        if (smCtr + 1 > int(m_PARAMpTcuts.size())) {
-          newTemporarySecMap.setHigherMomentumThreshold(std::numeric_limits<double>::max());
-        } else {
-          newTemporarySecMap.setHigherMomentumThreshold(m_PARAMpTcuts.at(smCtr));
-        }
-
-        SecMapVector::MapPack newMapPack = {m_PARAMsecMapNames.at(smCtr), newTemporarySecMap};
-        rawSectorMapVector.push_back(newMapPack);
+      // fill in data:
+      VXDTFRawSecMap newTemporarySecMap;
+      newTemporarySecMap.addSectorMap(rootSecMap);
+      newTemporarySecMap.setMapName(m_PARAMsecMapNames.at(smCtr));
+      newTemporarySecMap.setDetectorType(m_detectorName);
+      newTemporarySecMap.setSectorConfigU(m_PARAMsectorConfigU);
+      newTemporarySecMap.setSectorConfigV(m_PARAMsectorConfigV);
+      newTemporarySecMap.setOrigin(m_origin);
+      newTemporarySecMap.setMagneticFieldStrength(m_PARAMmagneticFieldStrength);
+      newTemporarySecMap.setLowerMomentumThreshold(m_PARAMpTcuts.at(smCtr));
+      newTemporarySecMap.addDistances(distanceOfSectorsMap);
+      newTemporarySecMap.setMinDistance2origin(m_PARAMacceptedRegionForSensors.at(0));
+      newTemporarySecMap.setMaxDistance2origin(m_PARAMacceptedRegionForSensors.at(1));
+//    newTemporarySecMap.setRareSectorCombinations({m_PARMfilterRareCombinations, m_PARAMrarenessFilter}); /// TODO, implement here, check if correctly used
+      if (smCtr + 1 > int(m_PARAMpTcuts.size())) {
+        newTemporarySecMap.setHigherMomentumThreshold(std::numeric_limits<float>::max());
+      } else {
+        newTemporarySecMap.setHigherMomentumThreshold(m_PARAMpTcuts.at(smCtr));
       }
+
+      SecMapVector::MapPack newMapPack = {m_PARAMsecMapNames.at(smCtr), newTemporarySecMap};
+      rawSectorMapVector.push_back(newMapPack);
 
       stringstream info;
       info << " there are " << rawSectorMapVector.size() <<
@@ -1638,162 +1388,214 @@ void SecMapTrainerBaseModule::terminate()
     TFile secMapFile(fileNameOnly.c_str(), m_PARAMrootFileName.at(1).c_str());
     rawSectorMapVector.Write();
     secMapFile.Close();
-    B2INFO(" FilterCalculatorModule::endRun: exporting secMaps via " << fileNameOnly)
+    B2INFO(" SecMapTrainerBaseModule::endRun: exporting secMaps via " << fileNameOnly)
   }
 
 
 
-  for (MapOfSectors* secMap : m_sectorMaps) {  //secMaps can be deleted
+  for (InternalRawSectorMap* secMap : m_sectorMaps) {  //secMaps can be deleted
     delete secMap;
   }
   m_sectorMaps.clear();
-  B2INFO(" FilterCalculatorModule, everything is done. Terminating.")
+  B2INFO(" SecMapTrainerBaseModule, everything is done. Terminating.")
 }
 
 
 
-template<class Tmpl>
-bool SecMapTrainerBaseModule::createSectorAndHit(Belle2::Const::EDetector detectorID, int pdg, const Tmpl* const aSiTrueHitPtr,
-                                                 VXDTrack& newTrack, MapOfSectors* thisSecMap)
+
+
+bool SecMapTrainerBaseModule::acceptHit(const SpacePoint* aSP, FilterCalcNames::InternalRawSectorMap* secMap)
 {
-  B2DEBUG(100, "createSectorAndHit Start");
+  // catch hits on layers too high
+  if (VxdID(aSP->getVxdID()).getLayerNumber() > secMap->getHighestAllowedLayer()) return false;
 
-  bool success = false; // tells us whether everything went fine
+  // catch hits which are on wrong detector
+  Belle2::VXD::SensorInfoBase::SensorType detectorType = aSP->getType();
+  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::PXD and secMap->usePXD() == false) return false;
+  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::SVD and secMap->useSVD() == false) return false;
+  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::TEL and secMap->useTEL() == false) return false;
 
-  double uTrue = aSiTrueHitPtr->getU();
-  double vTrue = aSiTrueHitPtr->getV();
-  double u = uTrue;
-  double v = vTrue;
-
-  // Parameters to get the different corners
-  std::pair<double, double> aRelCoordCorner1 = {0, 0};
-  std::pair<double, double> aRelCoordCorner2 = {0, 1};
-  std::pair<double, double> aRelCoordCorner3 = {1, 0};
-  std::pair<double, double> aRelCoordCorner4 = {1, 1};
-  std::pair<double, double> aRelCoordCenter = {0.5, 0.5};
-
-  VxdID aVxdID = aSiTrueHitPtr->getSensorID();
-  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& aSensorInfo = geometry.getSensorInfo(aVxdID);
-
-  // local(0,0,0) is the center of the sensorplane
-  double vSize1 = 0.5 * aSensorInfo.getVSize();
-  double uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
-
-  if (m_PARAMsmearHits == true) {
-    double sigmaU = 0, sigmaV = 0;
-    sigmaU = aSensorInfo.getUPitch(uTrue) * m_PARAMuniSigma;
-    sigmaV = aSensorInfo.getVPitch(vTrue) * m_PARAMuniSigma;
-
-    B2DEBUG(100, "smearing hits using sigU, sigV: " << sigmaU << " " << sigmaV << " at DetectorID: " << detectorID);
-    u = gRandom->Gaus(uTrue, sigmaU);
-    v = gRandom->Gaus(vTrue, sigmaV);
-
-    if (v + vSize1 < 0 or v > vSize1) { v = vTrue; } // boundary checks
-    uSizeAtHit = 0.5 * aSensorInfo.getUSize(v);
-
-    if (u + uSizeAtHit < 0 or u > uSizeAtHit) { u = uTrue; }  // boundary checks
+  // catch hits which are out of range
+  if (secMap->getAcceptedRegionForSensors().first > 0) {
+    if ((aSP->getPosition() - m_origin).Mag() < secMap->getAcceptedRegionForSensors().first) return false;
+  }
+  if (secMap->getAcceptedRegionForSensors().second > 0) {
+    if ((aSP->getPosition() - m_origin).Mag() > secMap->getAcceptedRegionForSensors().second) return false;
   }
 
-  TVector3 hitLocal(u, v, 0);
-  TVector3 hitGlobal = aSensorInfo.pointToGlobal(hitLocal);
-  TVector3 pGlobal = aSiTrueHitPtr->getMomentum(); // yet it is pLocal, simply reusing the vector
-  pGlobal = aSensorInfo.vectorToGlobal(pGlobal);
-
-  double uCoord = hitLocal[0] +
-                  uSizeAtHit; // *0,5 putting (0,0) from the center to the edge of the plane (considers the trapeziodal shape)
-  double vCoord = hitLocal[1] + vSize1;
-
-  m_totalHitCounter++;
-
-  string aSectorName;
-  unsigned int aSecID = 0;
-  double dist2Origin = 0;
-  VxdID::baseType aUniID = aVxdID.getID();
-  int aLayerID = aVxdID.getLayerNumber();
+  // passed all tests
+  return true;
+} /**< for given hit and sectorMap, the function returns true, if hit is accepted and false if not */
 
 
-  std::pair<double, double> aCoorNormalized,
-//            aCoorLocal = {uCoord, vCoord},
-      aCoorLocal = {u, v},
-      aCornerCoordinate;
-
-  // Normalization of the Coordinates
-  aCoorNormalized = SpacePoint::convertLocalToNormalizedCoordinates(aCoorLocal, aVxdID, &aSensorInfo);
-
-  B2DEBUG(10, "local hit coordinates (u,v): (" << hitLocal[0] << "," << hitLocal[1] << "), in normalized:(" << aCoorNormalized.first
-          << "," << aCoorNormalized.second << "), @layer: " << aLayerID << ", with sensorSizeU/V: " << aSensorInfo.getUSize() << "/" <<
-          aSensorInfo.getVSize());
-
-  // Calculate the SectorID (SectorTool-Object)
-  aSecID = SectorTools::calcSecID(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aCoorNormalized);
 
 
-  if (aSecID == std::numeric_limits<unsigned short>::max()) { return success; } // equals to false
 
-  // 1. Corner Calculate
-  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner1);
-  pair<double, double> localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+bool SecMapTrainerBaseModule::checkAcceptanceOfSecMap(FilterCalcNames::InternalRawSectorMap* secMap,
+                                                      const SpacePointTrackCand* currentTC)
+{
 
-  // 2. Corner Calculate
-  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner2);
-  pair<double, double> localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+  // catch wrong pT-range
+  if (secMap->acceptPt(currentTC->getMomSeed().Perp()) == false) return false;
 
-  // 3. Corner Calculate
-  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner3);
-  pair<double, double> localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
-
-  // 4. Corner Calculate
-  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner4);
-  pair<double, double> localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
-
-  // Center
-  aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
-
-  B2DEBUG(20, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
-  B2DEBUG(20, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
-  B2DEBUG(20, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
-
-  pair<double, double> aCenterOfSector = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
-//     TVector3 centerOfSector = TVector3((aRelCoor.first - 0.5) * aSensorInfo.getUSize(), (aRelCoor.second - 0.5) * aSensorInfo.getVSize(), 0);
-
-  dist2Origin = (aSensorInfo.pointToGlobal(TVector3(aCenterOfSector.first, aCenterOfSector.second, 0.)) - m_origin).Mag();
-
-  aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
-
-  B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" <<
-          aCenterOfSector.second << " for hit " << uCoord << "/" << vCoord);
-  B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" <<
-          localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" <<
-          localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second)
-
-
-  if (thisSecMap->find(aSectorName) == thisSecMap->end()) { // fallback solution using one secMap for whole range of pT
-    Sector newSector(aSectorName, localCorner00, localCorner10, localCorner01, localCorner11, dist2Origin);
-//       (std::string myName, LocalCoordinates edge0, LocalCoordinates edgeU, LocalCoordinates edgeV, LocalCoordinates edgeUV, double distance)
-
-    thisSecMap->insert({aSectorName, newSector});
-  } else {
-    thisSecMap->find(aSectorName)->second.increaseCounter();
+  // catch wrong charge
+  if (m_filterCharges != 0) {
+    if (std::abs(currentTC->getPdgCode()) > 10 and std::abs(currentTC->getPdgCode()) < 16) { // catch leptons
+      if (boost::math::sign(currentTC->getPdgCode()) == boost::math::sign(m_filterCharges)) return false;
+    } else {
+      if (boost::math::sign(currentTC->getPdgCode()) != boost::math::sign(m_filterCharges)) return false;
+    }
   }
-//   }
+
+  // catch TCs where more than one hit was on the same sensor
+  if (currentTC->hasHitsOnSameSensor()) return false;
+
+  // catch tracks which start too far away from orign
+  if (currentTC->getPosSeed().Perp() > m_PARAMmaxXYvertexDistance
+      or
+      std::abs(currentTC->getPosSeed().Z()) > m_PARAMmaxZvertexDistance) return false;
+
+  // catch tracks which are too short in any case
+  if (currentTC->getNHits() < m_PARAMminTrackletLength) return false;
+
+  // catch stuff which depends on single hits
+  unsigned int nGoodHits = 0;
+  for (const SpacePoint* aSP : currentTC->getHits()) {
+    if (acceptHit(aSP, secMap)) nGoodHits++; // pass all tests
+  }
+
+  // catch tracks which are too short because of hit-specific cuts
+  if (nGoodHits < m_PARAMminTrackletLength) return false;
+
+  // pass all tests
+  return true;
+} /**< can be accepted by several secMaps, because of momentum range or whatever  */
 
 
-  if (aLayerID <= m_PARAMhighestAllowedLayer) {
-    VXDHit newHit(detectorID, aSectorName, aUniID, hitGlobal, pGlobal, pdg, getOrigin(), aSiTrueHitPtr->getGlobalTime());
-//    newHit.setTrueHit(aSiTrueHitPtr);
-    newTrack.addHit(newHit);
-    success = true;
-    B2DEBUG(11, "newHit addet to track. secID: " << aSectorName << ", detectorID: " << detectorID << ", timeStamp: " <<
-            aSiTrueHitPtr->getGlobalTime())
+
+
+
+FilterCalcNames::VXDTrack SecMapTrainerBaseModule::convertSPTC2VXDTrack(FilterCalcNames::InternalRawSectorMap* secMap,
+    const SpacePointTrackCand*  currentTC)
+{
+  VXDTrack newTrack(currentTC->getMomSeed().Perp(), &secMap->getSecMap());
+
+  // collect hits which fullfill all given tests
+  std::vector<const SpacePoint*> goodSPs;
+  for (const SpacePoint* aSP : currentTC->getHits()) {
+    if (!acceptHit(aSP, secMap)) continue;
+    goodSPs.push_back(aSP);
+  }
+
+  // want to have hits going from outer to inner ones
+  if (currentTC->isOutgoing()) std::reverse(goodSPs.begin(), goodSPs.end());
+
+  for (const SpacePoint* aSP : goodSPs) {
+
+    std::string fullSecID = calcSecID(aSP, secMap);
+
+    if (fullSecID == string("-1")) { B2ERROR("a secID for spacePoint not found!"); continue; }
+
+    newTrack.addHit(
+      VXDHit(aSP->getType(),
+             fullSecID,
+             aSP->getVxdID(),
+             aSP->getPosition(),
+             TVector3(0, 0, 0),
+             currentTC->getPdgCode(),
+             getOrigin()
+            )
+    );
 
     if (m_PARAManalysisWriteToRoot == true /*and m_PARAMstoreExtraAnalysis == true*/) {
-      if (aLayerID == 1) {
-        m_rootmomValuesInLayer1.push_back(pGlobal.Mag());
-        m_rootpTValuesInLayer1.push_back(pGlobal.Perp());
+      if (FullSecID(fullSecID).getLayerID() == 1) {
+        m_rootmomValuesInLayer1.push_back(currentTC->getMomSeed().Mag());
+        m_rootpTValuesInLayer1.push_back(currentTC->getMomSeed().Perp());
       } // optional TODO here for the other layers too, if anyone wants to analyze that
     }
   }
 
-  return success;
-} /**< internal member - checks if given value is < threshold, if it is, reset to threshold */
+  if (newTrack.size() > m_numOfLayers * 2 + 1) { m_longTrackletCounter++; } else { m_trackletLengthCounter.at(newTrack.size() - 1)++; }
+
+  // add vertex (but without real vertexPosition, since origin is assumed)
+  VXDHit newVirtualHit(Const::IR, FullSecID().getFullSecString(), 0, getOrigin(), currentTC->getMomSeed(), currentTC->getPdgCode(),
+                       getOrigin(), 0);
+  newVirtualHit.setVertex();
+
+  newTrack.addHit(newVirtualHit);
+
+  return std::move(newTrack);
+} /**< converts to internal data structure and attaches it to given secMap */
+
+
+
+
+
+std::string SecMapTrainerBaseModule::calcSecID(const SpacePoint* aSP, FilterCalcNames::InternalRawSectorMap* secMap)
+{
+  VxdID thisSensor = aSP->getVxdID();
+  const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::getInstance().getSensorInfo(thisSensor);
+  std::string aSectorName;
+  unsigned int aSecID = 0;
+  float dist2Origin = 0;
+  VxdID::baseType aUniID = thisSensor.getID();
+  int aLayerID = thisSensor.getLayerNumber();
+  SectorTools::NormCoords aCoorNormalized = {aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV()};
+  SectorTools::NormCoords aCornerCoordinate;
+  SectorTools::NormCoords aRelCoordCorner1 = {0, 0};
+  SectorTools::NormCoords aRelCoordCorner2 = {0, 1};
+  SectorTools::NormCoords aRelCoordCorner3 = {1, 0};
+  SectorTools::NormCoords aRelCoordCorner4 = {1, 1};
+  SectorTools::NormCoords aRelCoordCenter = {0.5, 0.5};
+
+  // Calculate the SectorID (SectorTool-Object)
+  aSecID = SectorTools::calcSecID(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aCoorNormalized);
+
+  if (aSecID == std::numeric_limits<unsigned short>::max()) { return "-1"; } // equals to false
+
+  aSectorName = (boost::format("%1%_%2%_%3%") % aLayerID % aUniID % aSecID).str();
+
+
+  if (secMap->find(aSectorName) == secMap->end()) {
+    // 1. Corner Calculate
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner1);
+    SectorTools::NormCoords localCorner00 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+
+    // 2. Corner Calculate
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner2);
+    SectorTools::NormCoords localCorner01 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+
+    // 3. Corner Calculate
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner3);
+    SectorTools::NormCoords localCorner10 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+
+    // 4. Corner Calculate
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCorner4);
+    SectorTools::NormCoords localCorner11 = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+
+    // Center
+    aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
+    SectorTools::NormCoords aCenterOfSector = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
+
+    B2DEBUG(20, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
+    B2DEBUG(20, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
+    B2DEBUG(20, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
+
+    B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" <<
+            aCenterOfSector.second << " for hit " << aCoorNormalized.first << "/" << aCoorNormalized.second);
+    B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" <<
+            localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" <<
+            localCorner11.first << "," << localCorner11.second << "), centerU/V: " << aCenterOfSector.first << "/" << aCenterOfSector.second)
+
+
+    dist2Origin = (aSensorInfo.pointToGlobal(TVector3(aCenterOfSector.first, aCenterOfSector.second, 0.)) - m_origin).Mag();
+
+    Sector newSector(aSectorName, localCorner00, localCorner10, localCorner01, localCorner11, dist2Origin);
+
+    secMap->insert({aSectorName, newSector});
+  } else {
+    secMap->find(aSectorName)->second.increaseCounter();
+  }
+
+  return aSectorName;
+} /**< for given hit and secMap, the correct secID is calculated */

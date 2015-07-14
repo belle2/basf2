@@ -655,9 +655,11 @@ namespace Belle2 {
       m_mDouble["charge"] = double(aTrack.charge());
       // Set phi2DError for 2D fit
       m_mVector["phi2DError"] = vector<double> (5);
+      m_mVector["phi2DInvError"] = vector<double> (5);
       for (unsigned iAx = 0; iAx < 5; iAx++) {
         if(m_mVector["LR"][2*iAx] != 3) m_mVector["phi2DError"][iAx] = m_mConstV["driftPhi2DError"][iAx];
         else m_mVector["phi2DError"][iAx] = m_mConstV["wirePhi2DError"][iAx];
+        m_mVector["phi2DInvError"][iAx] = 1/m_mVector["phi2DError"][iAx];
       }
       // Calculate phi2D using driftTime.
       m_mVector["phi2D"] = vector<double> (5);
@@ -665,7 +667,7 @@ namespace Belle2 {
       // Fit2D
       m_mDouble["rho"] = 0;
       m_mDouble["phi0"] = 0;
-      Fitter3DUtility::rPhiFit(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DError"][0],m_mDouble["rho"], m_mDouble["phi0"]); 
+      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"]); 
       m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
 
 

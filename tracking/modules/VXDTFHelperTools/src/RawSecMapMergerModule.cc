@@ -47,7 +47,7 @@ REG_MODULE(RawSecMapMerger)
 RawSecMapMergerModule::RawSecMapMergerModule() : Module()
 {
   //Set module properties
-  setDescription("imports xml-files of sectorMaps and exports RAM-friendly versions of it");
+  setDescription("this module takes a root file containing a raw sectorMap created by the SecMapTrainerBaseModule and converts it to a sectormap which can be read by the VXDTF. Please check the parameters to be set...");
 //   setPropertyFlags(c_ParallelProcessingCertified); /// WARNING this module should _not_ be used for parallel processing! Its task is to create the sector maps only once...
 
   /// setting standard values for steering parameters

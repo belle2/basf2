@@ -54,7 +54,7 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() : Module()
   InitializeVariables();
 
   //Set module properties
-  setDescription("This module calculates the relations of sectors and exports sector dependent filtervalues. Size of sectors and type of filters can be set by steering file. Only one track per event, needs many events for usefull outcome.");
+  setDescription("this module analyzes a big number of events (pGun or evtGen) to create raw sectorMaps which are needed for the VXDTF. This information can be exported via ascii files (not recommended) and root files (default, recommended).");
 //   setPropertyFlags(c_ParallelProcessingCertified);
 
   std::vector<double> defaultConfigU = {0.0, 0.5, 1.0};

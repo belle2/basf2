@@ -650,7 +650,8 @@ void TFAnalizerModule::endRun()
   B2INFO("TFAnalizerModule: After " << m_eventCounter + 1 << " events there was a total number of " << m_mcTrackCounter <<
          " mcTrackCandidates and " << m_totalRealHits << " realHits. Of these TCs, " << m_mcTrackVectorCounter <<
          " mcTrackCandidates where used for analysis because of cutoffs.")
-  B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates, of those " << m_countAcceptedGFTCs <<
+  B2INFO("TFAnalizerModule: There were " << m_caTrackCounter << " caTrackCandidates in container " << m_PARAMcaTCname << ", of those "
+         << m_countAcceptedGFTCs <<
          " were stored in " << m_PARAMacceptedTCname << " and " << m_lostGFTCs << " lost TCs were stored in " << m_PARAMlostTCname <<
          " for further use, number of times where charge was guessed wrong: " << m_wrongChargeSignCounter <<
          ", number of caTCs which produced a double entry: " << m_countedDoubleEntries)

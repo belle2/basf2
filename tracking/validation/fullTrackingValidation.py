@@ -11,7 +11,7 @@
 
 VALIDATION_OUTPUT_FILE = 'FullTrackingValidation.root'
 N_EVENTS = 2000
-ACTIVE = True
+ACTIVE = False
 
 import basf2
 # necessary for the logging to work properly

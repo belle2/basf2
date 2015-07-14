@@ -155,12 +155,12 @@ namespace Belle2 {
     double mtoc;         /**<  constant */
     int count;           /**<  counter */
     int count_occ;           /**<  counter */
-    double origingamma_x; /**< points from origin_zx and _zy graphs */
-    double origingamma_y;
-    double origingamma_z;
-    double originpe_x; /**< points for origin of mother of photoelectrons (z=zdistg) */
-    double originpe_y;
-    double originpe_z;
+    double origingamma_x;  /**< points from origin_zx and _zy graphs: x */
+    double origingamma_y;  /**< points from origin_zx and _zy graphs: y */
+    double origingamma_z;  /**< points from origin_zx and _zy graphs: z */
+    double originpe_x;     /**< points for origin of mother of photoelectrons: x*/
+    double originpe_y;     /**< points for origin of mother of photoelectrons: y*/
+    double originpe_z;     /**< points for origin of mother of photoelectrons: z (=zdist)*/
   };
 
 } // Belle2 namespace

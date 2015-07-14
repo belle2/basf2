@@ -53,6 +53,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
+#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 
 #define NOT_USE_SOCKETLIB
 //#define NOT_SEND

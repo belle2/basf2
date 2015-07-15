@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>

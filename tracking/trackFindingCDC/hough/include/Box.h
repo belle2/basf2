@@ -9,8 +9,8 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/GenIndices.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/utilities/GenIndices.h>
 
 #include <framework/logging/Logger.h>
 

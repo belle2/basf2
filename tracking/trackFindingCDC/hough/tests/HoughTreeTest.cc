@@ -50,7 +50,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   // Execute the finding a couple of time to find a stable execution time.
   vector< pair<Phi0CurvBox, vector<TrackHit*> > > candidates;
 
-  // Is this still C++? Looks like JavaScript to me.
+  // Is this still C++? Looks like JavaScript to me :-).
   TimeItResult timeItResult = timeIt(100, true, [&]() {
     trackHitPhi0CurvQuadLegendre.seed(hitVector);
 

@@ -9,8 +9,8 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/GenIndices.h>
-#include <tracking/trackFindingCDC/hough/Product.h>
+#include <tracking/trackFindingCDC/utilities/GenIndices.h>
+#include <tracking/trackFindingCDC/utilities/Product.h>
 
 #include <tuple>
 #include <array>
@@ -61,7 +61,6 @@ namespace Belle2 {
           globalISubBox /= s_divisions[iIndex];
         }
         assert(globalISubBox == 0);
-        //return Box_(box.template getDivisionBounds<Is>(s_divisions[Is], indices[Is]) ...);
         return Box_(box.template getDivisionBoundsWithOverlap<Is>(std::get<Is>(m_overlaps),
                                                                   s_divisions[Is],
                                                                   indices[Is]) ...);
@@ -73,6 +72,8 @@ namespace Belle2 {
 
     };
 
+
+    // Extra mention of the constexpr such that it aquires external linkage.
     template<class Box_, std::size_t... divisions>
     const std::array<std::size_t, sizeof...(divisions)> LinearDivision<Box_, divisions...>::s_divisions;
   }

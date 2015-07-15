@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/WithWeight.h>
-#include <tracking/trackFindingCDC/hough/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 
 #include <vector>
 #include <algorithm>

@@ -70,7 +70,7 @@ namespace Belle2 {
         the tracking modules are not enabled at phyton level */
 
     /** Root tree and file for saving the output */
-    TTree* m_tree;
+    TTree* m_tree; /** Output tree */
     //TFile* m_rootFile;
 
     // variables
@@ -191,7 +191,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPi0Chi2;
     std::vector<double>* m_eclPi0PValue;
     */
-    int m_mcMultip;
+    int m_mcMultip; /** Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /** MCParticle index */
     std::vector<int>* m_mcPdg; /** MCParticle PDG code */
     std::vector<int>* m_mcMothPdg; /** MCParticle mother particle PDG code */
@@ -209,7 +209,7 @@ namespace Belle2 {
     std::vector<double>* m_mcProdVtxZ; /** MCParticle production vertex Z */
     std::vector<int>* m_mcSecondaryPhysProc; /** Flag for secondary physics process */
 
-    int m_trkMultip;
+    int m_trkMultip; /** Track Multiplicity */
     std::vector<int>* m_trkPdg; /** Track PDG code */
     std::vector<int>* m_trkIdx; /** Track index */
     std::vector<int>* m_trkCharge; /** Track charge */

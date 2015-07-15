@@ -10,10 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
-#include <tracking/trackFindingCDC/varsets/EvalVariadic.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
-
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+
+#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 #include <vector>
 #include <string>
@@ -46,6 +46,7 @@ namespace Belle2 {
       typedef BaseVarSet<Object> ContainedVarSet;
 
     public:
+      /// Create the union varset with the given prefix to all variables.
       VariadicUnionVarSet(const std::string& prefix = "")
       {
         EvalVariadic{

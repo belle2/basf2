@@ -522,6 +522,7 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
+          temp_rawcopper->PrintData(temp_rawcopper->GetWholeBuffer(), temp_rawcopper->TotalBufNwords());
           char err_buf[500];
           strcpy(err_buf, err_str.c_str());
           print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);

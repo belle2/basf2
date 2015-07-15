@@ -509,6 +509,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
         } catch (string err_str) {
+          temp_rawcopper->PrintData(temp_rawcopper->GetWholeBuffer(), temp_rawcopper->TotalBufNwords());
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }

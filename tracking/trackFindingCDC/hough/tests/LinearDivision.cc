@@ -7,9 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/hough/LinearBoxPartition.h>
+#include <tracking/trackFindingCDC/hough/LinearDivision.h>
 #include <tracking/trackFindingCDC/hough/Box.h>
-#include <tracking/trackFindingCDC/hough/WithWeight.h>
 
 #include <framework/logging/Logger.h>
 
@@ -31,17 +30,15 @@ TEST(TrackFindingCDCTest, SumInfinities)
 }
 
 
-
-
-
-TEST(TrackFindingCDCTest, LinearBoxPartition_getDivision)
+TEST(TrackFindingCDCTest, LinearDivision_createBoxes)
 {
   Box<float, float> box({0, 3}, {0, 2});
 
-  size_t nSubNodes =  LinearBoxPartition<3, 3>::s_nSubNodes;
+  size_t nSubNodes =  LinearDivision<Box<float, float>, 3, 3>::s_nSubBoxes;
   EXPECT_EQ(9, nSubNodes);
 
-  LinearBoxPartition<3, 2>::ChildrenStructure< Box<float, float> > subBoxes(box);
+  LinearDivision<Box<float, float>, 3, 2> subBoxFactory{};
+  std::array<Box<float, float>, 6 > subBoxes = subBoxFactory(box);
 
   size_t i = 0;
   for (Box<float, float>& subBox : subBoxes) {

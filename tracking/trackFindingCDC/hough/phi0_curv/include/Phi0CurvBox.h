@@ -13,7 +13,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
     /// Type for discrete float values
     typedef DiscreteValue<float> DiscreteFloat;
 

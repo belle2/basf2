@@ -227,6 +227,7 @@ namespace Belle2 {
       { return m_topNode; }
 
     private:
+      /// Create child nodes for the given parents.
       std::vector<Node>* createChildren(Node* parentNode)
       {
         Properties& parentProperties = *parentNode;
@@ -244,6 +245,7 @@ namespace Belle2 {
         return result;
       }
 
+      /// Aquire the next unused child node structure, recycling all memory.
       std::vector<Node>* getUnusedChildren()
       {
         if (m_nUsedChildren >= m_children.size()) {

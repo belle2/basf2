@@ -17,19 +17,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template<class T>
-    auto clearIfPresentImpl(T& obj, int) -> decltype(obj.clear())
-    { obj.clear(); }
-
-    template<class T>
-    auto clearIfPresentImpl(T& obj, long) -> decltype(void())
-    {;}
-
-    template<class T>
-    void clearIfPresent(T& obj)
-    { clearIfPresentImpl(obj, int(0)); }
-
-
     /// A mixin class to attach a set of weighted items to a class
     template<class T, class Item>
     class WithWeightedItems : public T {
@@ -45,6 +32,7 @@ namespace Belle2 {
       /// Make the constructor of the base type available
       using T::T;
 
+      /// Allow assignment of the base class.
       using T::operator=;
 
       /// Also forward the copy constructor form the base class object.

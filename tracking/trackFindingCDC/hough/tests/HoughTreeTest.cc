@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/hough/WeightedFastHough.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
+// #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>

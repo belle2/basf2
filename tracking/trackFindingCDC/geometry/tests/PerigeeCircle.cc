@@ -273,3 +273,29 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
 
 }
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
+{
+  FloatType expectedCurvature = 1.0 / 2.0;
+  FloatType expectedPhi0 = PI / 4.0;
+  FloatType impact = 0;
+
+  // Checks if the normal parameters n follow the same sign convention
+  const PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(expectedCurvature,
+                                      expectedPhi0,
+                                      impact);
+  const Vector2D& expectedPhi0Vec = perigeeCircle.tangential();
+
+  FloatType randomArcLength = 2.0;
+  Vector2D pos2D = perigeeCircle.atArcLength(randomArcLength);
+  Vector2D phiVec = perigeeCircle.tangential(pos2D);
+
+  FloatType curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
+  Vector2D phi0Vec = phiVec.flippedOver(pos2D);
+
+  EXPECT_NEAR(expectedCurvature, curvature, 10e-7);
+  EXPECT_NEAR(expectedPhi0Vec.x(), phi0Vec.x(), 10e-7);
+  EXPECT_NEAR(expectedPhi0Vec.y(), phi0Vec.y(), 10e-7);
+  EXPECT_NEAR(expectedPhi0, phi0Vec.phi(), 10e-7);
+  EXPECT_NEAR(1, phi0Vec.norm(), 10e-7);
+}

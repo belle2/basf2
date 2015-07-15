@@ -251,6 +251,13 @@ namespace Belle2 {
       Vector2D flippedSecond() const
       { return Vector2D(x(), -y()); }
 
+      /// Reflects this vector over line designated by the given vector.
+      Vector2D flippedOver(const Vector2D& reflectionLine) const
+      { return *this - orthogonalVector(reflectionLine) * 2; }
+
+      /// Reflects this vector along line designated by the given vector.
+      Vector2D flippedAlong(const Vector2D& flippingDirection) const
+      { return *this - parallelVector(flippingDirection) * 2; }
 
       /// Transforms the vector to conformal space inplace
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace */
@@ -272,6 +279,10 @@ namespace Belle2 {
       inline FloatType parallelComp(const Vector2D& relativTo) const
       { return relativTo.dot(*this) / relativTo.norm(); }
 
+      /// Calculates the part of this vector that is parallel to the given vector
+      inline Vector2D parallelVector(const Vector2D& relativTo) const
+      { return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared()); }
+
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
@@ -282,6 +293,10 @@ namespace Belle2 {
       /** The orthogonal component is the component parallel to relativeTo.orthogonal() */
       inline FloatType orthogonalComp(const Vector2D& relativTo) const
       { return relativTo.cross(*this) / relativTo.norm(); }
+
+      /// Calculates the part of this vector that is parallel to the given vector
+      inline Vector2D orthogonalVector(const Vector2D& relativTo) const
+      { return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal(); }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
@@ -328,6 +343,42 @@ namespace Belle2 {
       { return isForwardOrBackwardOf(rhs) == BACKWARD; }
 
 
+    private:
+      /// Check if three values have the same sign.
+      static bool sameSign(float n1, float n2, float n3)
+      {
+        return ((n1 > 0 and n2 > 0 and n3 > 0) or
+                (n1 < 0 and n2 < 0 and n3 < 0));
+      }
+
+    public:
+      /** Checks if this vector is between two other vectors
+       *  Between means here that when rotating the lower vector (first argument)
+       *  mathematically positively it becomes coaligned with this vector before
+       *  it becomes coalgined with the other vector.
+       */
+      bool isBetween(const Vector2D& lower, const Vector2D& upper) const
+      {
+        // Set up a linear (nonorthogonal) transformation that maps
+        // lower -> (1, 0)
+        // upper -> (0, 1)
+        // Check whether this transformation is orientation conserving
+        // If yes this vector must lie in the first quadrant to be between lower and upper
+        // If no it must lie in some other quadrant.
+        FloatType det = lower.cross(upper);
+        if (det == 0) {
+          // lower and upper are coaligned
+          return isRightOf(lower) and isLeftOf(upper);
+        } else {
+          bool flipsOrientation = det < 0;
+
+          FloatType transformedX = cross(upper);
+          FloatType transformedY = -cross(lower);
+          bool inFirstQuadrant = sameSign(det, transformedX, transformedY);
+
+          return inFirstQuadrant xor flipsOrientation;
+        }
+      }
 
       /// Swaps the coordinates in place
       inline void swapCoordinates() { std::swap(m_x, m_y); }

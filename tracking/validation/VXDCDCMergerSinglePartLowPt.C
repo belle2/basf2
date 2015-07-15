@@ -60,11 +60,11 @@ void VXDCDCMergerSinglePartLowPt(){
   h5->Write();
 
   TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
+  tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
   h6->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
   h6->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h6->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/PosRes_5GeV_muons_1000_Theta.jpg");
-  tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
   h6->Write();
 
   //TH1F *h7 = new TH1F("h7","Dx",100,-0.05,0.05);

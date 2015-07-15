@@ -238,29 +238,20 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   // Check incrementation of event #
   //
   *cur_exprunsubrun_no = GetExpRunSubrun(n);
+  *cur_copper_ctr = GetCOPPERCounter(n);
+
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
-      sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : Exiting...\n%s %s %d\n",
-              n, prev_evenum, *cur_evenum_rawcprhdr,
+      sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
+              n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
-  }
 
-
-  *cur_copper_ctr = GetCOPPERCounter(n);
-  if (
-#ifdef WO_FIRST_EVENUM_CHECK
-    prev_copper_ctr != 0xFFFFFFFF
-#else
-    true
-#endif
-  ) {
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
 #ifdef DESY
       //
       // In DESY test, we ignore this error
@@ -271,6 +262,8 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 #endif
     }
   }
+
+
 
   //
   // Check is utime and ctime_trgtype same over different FINESSE data

@@ -163,21 +163,21 @@ namespace Belle2 {
     ECLCluster myECLCluster;
     // Pick some arbitrary numbers to test with
     const bool isTrack = true;
-    const float energy = 1.165;
-    const float theta = 1.2;
-    const float phi = 1.2;
-    const float r = 1.2;
-    const float energyDepSum = 123.3;
-    const float timing = 17.2;
-    const float errorTiming = 1.1;
-    const float E9oE25 = 12.2;
-    const float highestE = 32.1;
-    const float lat = 21.5;
+    const double energy = 1.165;
+    const double theta = 1.2;
+    const double phi = 1.2;
+    const double r = 1.2;
+    const double energyDepSum = 123.3;
+    const double timing = 17.2;
+    const double errorTiming = 1.1;
+    const double E9oE25 = 12.2;
+    const double highestE = 32.1;
+    const double lat = 21.5;
     const int   nOfCrystals = 4;
     const int   crystHealth = 1;
-    const float mergedPi0 = 12.2;
+    const double mergedPi0 = 12.2;
     // Energy->[0], Phi->[2], Theta->[5]
-    float error[6] = {1.1, 1.2, 1.3, 1.4, 1.5, 1.6};
+    double error[6] = {1.1, 1.2, 1.3, 1.4, 1.5, 1.6};
 
     myECLCluster.setEnergy(energy);
     myECLCluster.setE9oE25(E9oE25);
@@ -261,12 +261,12 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(error[4], error3x3(2, 1));
     EXPECT_FLOAT_EQ(error[5] * error[5], error3x3(2, 2));
 
-    TMatrixFSym errorecl = error3x3;
-    TMatrixF  jacobian(4, 3);
-    const float cosPhi = cos(phi);
-    const float sinPhi = sin(phi);
-    const float cosTheta = cos(theta);
-    const float sinTheta = sin(theta);
+    TMatrixDSym errorecl = error3x3;
+    TMatrixD  jacobian(4, 3);
+    const double cosPhi = cos(phi);
+    const double sinPhi = sin(phi);
+    const double cosTheta = cos(theta);
+    const double sinTheta = sin(theta);
     jacobian(0, 0) = cosPhi * sinTheta;
     jacobian(0, 1) = -1.0 * energy * sinPhi * sinTheta;
     jacobian(0, 2) = energy * cosPhi * cosTheta;
@@ -279,7 +279,7 @@ namespace Belle2 {
     jacobian(3, 0) = 1.0;
     jacobian(3, 1) = 0.0;
     jacobian(3, 2) = 0.0;
-    TMatrixFSym error4x4expected(4);
+    TMatrixDSym error4x4expected(4);
     error4x4expected = errorecl.Similarity(jacobian);
 
     const auto error4x4 = myECLCluster.getError4x4();

@@ -15,7 +15,8 @@
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
-#include <TMatrixFSym.h>
+#include <TMatrixDSym.h>
+#include <TMatrixD.h>
 
 #include <cmath>
 
@@ -31,320 +32,201 @@ namespace Belle2 {
     /**
      *default constructor : all values are set to 0
      */
-    ECLCluster()
+    ECLCluster() :
+      m_isTrack(false),
+      m_Energy(0),
+      m_Theta(0),
+      m_Phi(0),
+      m_R(0),
+      m_EnedepSum(0),
+      m_Timing(0),
+      m_ErrorTiming(0),
+      m_E9oE25(0),
+      m_HighestE(0),
+      m_LAT(0),
+      m_NofCrystals(0),
+      m_CrystHealth(0),
+      m_MergedPi0(0)
     {
-      m_isTrack =
-        false; /**< To store relation to tracks [true] or not [false] (for timebeing, Pleaseuse function  isNeutral() [as it is for future] */
-      m_Energy = 0;   /**< Corrected energy (GeV) */
-      m_EnedepSum = 0; /**< Uncorrected Energy Deposited in a shower (GeV) */
-      m_Theta = 0;     /**< Theta (in radian) */
-      m_Phi = 0;       /**< Phi (in radian) */
-      m_R = 0;        /**<  R (in cm) */
-      m_E9oE25 = 0;   /**< E9/E25: photon-like & isolation cut */
-
-      // TODO
-      m_Timing = 0;   /**< Timing information (at present study going on)*/
-      m_ErrorTiming = 0;  /**< Timing Error (at present study going on)*/
-      m_HighestE = 0; /**< Highest Energy stored in a Crystal in a shower (GeV) */
-      m_LAT = 0; /**< Lateral distribution parameter (Not available now) */
-      m_NofCrystals = 0; /**< Number of Crystals in a shower (Not available now) */
-      m_CrystHealth = 0; /**< Crystal Health (Not available now)
-          -100 : healthy
-          10 : Bad
-          20 : Broken
-          30 : Dead  */
-      m_MergedPi0 = 0; /**< Likelihood of being Merged Pi0
-            (Not available now)
-            0 to 1 : Can be a Merged Pi0
-         */
-
       m_Error[0] = 0;
       m_Error[1] = 0;
       m_Error[2] = 0;
       m_Error[3] = 0;
       m_Error[4] = 0;
       m_Error[5] = 0;
-
     }
 
+    /*! Set Corrected Energy (GeV) */
+    void setEnergy(double Energy) { m_Energy = Energy; }
 
+    /*! Set Theta of Shower (radian) */
+    void setTheta(double Theta) { m_Theta = Theta; }
 
-    // Set the variables down here
+    /*! Set Phi of Shower (radian) */
+    void setPhi(double Phi) { m_Phi = Phi; }
 
-    /*! Set Corrected Energy (GeV)
-     */
-    void setEnergy(float Energy) {m_Energy = Energy;}
+    /*! Set R (in cm) */
+    void setR(double R) { m_R = R; }
 
-    /*! Set Theta of Shower (radian)
-     */
-    void setTheta(float Theta) { m_Theta = Theta;}
+    /*! Set Uncorrect Energy deposited (GeV)*/
+    void setEnedepSum(double EnedepSum) { m_EnedepSum = EnedepSum; }
 
-    /*! Set Phi of Shower (radian)
-     */
-    void setPhi(float Phi) { m_Phi = Phi;}
+    /*! Set Timing information */
+    void setTiming(double Timing) { m_Timing = Timing; }
 
-    /*! Set R (in cm)
-     */
-    void setR(float R) { m_R = R; }
+    /*! Set Error on Timing information */
+    void setErrorTiming(double ErrorTiming) { m_ErrorTiming = ErrorTiming; }
 
-    /*! Set Uncorrect Energy deposited (GeV)
-     */
-    void setEnedepSum(float EnedepSum) {m_EnedepSum = EnedepSum;}
+    /*! Set E9/E25 */
+    void setE9oE25(double E9oE25) { m_E9oE25 = E9oE25; }
 
-    /*! Set Timing information
-     */
-    void setTiming(float Timing) {m_Timing = Timing;}
+    /*! Set Highest Energy stored in a Crystal in a shower (GeV) */
+    void setHighestE(double HighestE) { m_HighestE = HighestE; }
 
-    /*! Set Error on Timing information
-     */
-    void setErrorTiming(float ErrorTiming) {m_ErrorTiming = ErrorTiming;}
+    /*! Set Lateral distribution parameter */
+    void setLAT(double LAT) { m_LAT = LAT; }
 
-    /*! Set E9/E25
-     */
-    void setE9oE25(float E9oE25) { m_E9oE25 = E9oE25; }
+    /*! Set Number of Crystals in a shower */
+    void setNofCrystals(int NofCrystals) { m_NofCrystals = NofCrystals; }
 
+    /*! Set Crystal health (Not now) */
+    void setCrystHealth(int CrystHealth) { m_CrystHealth = CrystHealth; }
 
-
-    /*! Set Highest Energy stored in a Crystal in a shower (GeV)
-     */
-    void setHighestE(float HighestE) { m_HighestE = HighestE; }
-
-
-    /*! Set Lateral distribution parameter
-     */
-    void setLAT(float LAT) {m_LAT = LAT;}
-
-    /*! Set Number of Crystals in a shower
-     */
-    void setNofCrystals(int NofCrystals) {m_NofCrystals = NofCrystals;}
-
-
-    /*! Set Crystal health (Not now)
-     */
-    void setCrystHealth(int CrystHealth)
-    {
-      m_CrystHealth = CrystHealth;
-    }
-
-    /*! Set high momentum pi0 likelihood
-     */
-    void setMergedPi0(float MergedPi0)
-    {
-      m_MergedPi0 = MergedPi0;
-    }
-
+    /*! Set high momentum pi0 likelihood */
+    void setMergedPi0(double MergedPi0) { m_MergedPi0 = MergedPi0; }
 
     /*! Set  Error Array(3x3)  for
       [0]->Error on Energy
       [2]->Error on Phi
       [5]->Error on Theta
     */
-    void setError(float ErrorArray[6])
+    void setError(double ErrorArray[6])
     {
       for (int i = 0; i < 6; ++i) {
         m_Error[i] = ErrorArray[i];
       }
     }
 
+    /*! Set m_isTrack true if the cluster matches with cluster */
+    void setisTrack(bool istrack) { m_isTrack = istrack; }
 
-    /*! Set m_isTrack true if the cluster matches with cluster
-     */
-    void setisTrack(bool istrack)
-    {
-      m_isTrack = istrack;
-    }
+    /*! Return Correct Energy (GeV) */
+    double getEnergy() const {return m_Energy;}
 
+    /*! Return Theta of Shower (radian) */
+    double getTheta() const {return m_Theta;}
 
-    // Get the value
+    /*! Return Phi of Shower (radian) */
+    double getPhi() const { return m_Phi;}
 
+    /*! Return R */
+    double getR() const { return m_R ; }
 
-    /*! Return Correct Energy (GeV)
-     */
-    float getEnergy() const {return m_Energy;}
+    /*! Return Error on Energy */
+    double getErrorEnergy() const {return m_Error[0];}
 
-    /*! Return Theta of Shower (radian)
-     */
-    float getTheta() const {return m_Theta;}
+    /*! Return Error on Theta of Shower */
+    double getErrorTheta() const {return m_Error[5];}
 
-    /*! Return Phi of Shower (radian)
-     */
-    float getPhi() const { return m_Phi;}
+    /*! Return Error on Phi of Shower */
+    double getErrorPhi() const { return m_Error[2];}
 
-    /*! Return R
-     */
-    float getR() const { return m_R ; }
+    /*! Return Uncorrect Energy deposited (GeV) */
+    double getEnedepSum() const {return m_EnedepSum;}
 
-    /*! Return Error on Energy
-     */
-    float getErrorEnergy() const {return m_Error[0];}
+    /*! Return Timing information */
+    double getTiming() const {return m_Timing;}
 
-    /*! Return Error on Theta of Shower
-     */
-    float getErrorTheta() const {return m_Error[5];}
+    /*! Return Error on Timing information */
+    double getErrorTiming() const {return m_ErrorTiming;}
 
-    /*! Return Error on Phi of Shower
-     */
-    float getErrorPhi() const { return m_Error[2];}
+    /*! Return E9/E25 */
+    double getE9oE25() const { return m_E9oE25; }
 
+    /*! Return HighestEnergy in a crystal in a shower */
+    double getHighestE() const {return m_HighestE; }
 
-    /*! Return Uncorrect Energy deposited (GeV)
-     */
-    float getEnedepSum() const {return m_EnedepSum;}
+    /*! Return LAT (shower variable) */
+    double getLAT() const {return m_LAT;}
 
-    /*! Return Timing information
-     */
-    float getTiming() const {return m_Timing;}
-
-    /*! Return Error on Timing information
-     */
-    float getErrorTiming() const {return m_ErrorTiming;}
-
-    /*! Return E9/E25
-     */
-    float getE9oE25() const { return m_E9oE25; }
-
-    /*! Return HighestEnergy in a crystal in a shower
-     */
-    float getHighestE() const {return m_HighestE; }
-
-
-    /*! Return LAT (shower variable)
-     */
-    float getLAT() const {return m_LAT;}
-
-    /*! Return Number of a Crystals in a shower
-     */
+    /*! Return Number of a Crystals in a shower */
     int getNofCrystals() const {return m_NofCrystals;}
 
-
-    /*! Return Crystal health (Not now)
-     */
+    /*! Return Crystal health (Not now) */
     int getCrystHealth() const { return m_CrystHealth;}
 
+    /*! Return high momentum pi0 likelihood */
+    double getMergedPi0() const { return m_MergedPi0;}
 
-    /*! Return high momentum pi0 likelihood
-     */
-    float getMergedPi0() const { return m_MergedPi0;}
+    /*! Return Px (GeV/c) */
+    double getPx() const { return getEnergy() * sin(getTheta()) * cos(getPhi()); }
 
-    // The method to get return TMatrixFSym  7 Momentum Error Matrix
+    /*! Return Py (GeV/c)  */
+    double getPy() const { return getEnergy() * sin(getTheta()) * sin(getPhi()); }
 
+    /*! Return Pz (GeV/c) */
+    double getPz() const { return getEnergy() * cos(getTheta()); }
 
-
-    //................
-    // Return here Px, Py and Pz
-
-    /*! Return Px (GeV/c)
-     */
-    float getPx() const
-    {
-      return float(m_Energy * sin(m_Theta) * cos(m_Phi));
-    }
-
-    /*! Return Py (GeV/c)
-     */
-    float getPy() const
-    {
-      return float(m_Energy * sin(m_Theta) * sin(m_Phi));
-    }
-
-    /*! Return Pz (GeV/c)
-     */
-    float getPz() const
-    {
-      return float(m_Energy * cos(m_Theta));
-    }
-
-    ///.......
-
-
-    /*! Return TVector3 momentum (Px,Py,Pz)
-     */
+    /*! Return TVector3 momentum (Px,Py,Pz) */
     TVector3 getMomentum() const
     {
-
-      return TVector3(float(m_Energy * sin(m_Theta) * cos(m_Phi)),
-                      float(m_Energy * sin(m_Theta) * sin(m_Phi)),
-                      float(m_Energy * cos(m_Theta)));
+      return TVector3(getPx(), getPy(), getPz());
     }
 
-
-
-    /*! Return 4Vector  (Px,Py,Pz,E)
-     */
+    /*! Return 4Vector  (Px,Py,Pz,E) */
     TLorentzVector get4Vector() const
     {
-      return TLorentzVector(float(m_Energy * sin(m_Theta) * cos(m_Phi)),
-                            float(m_Energy * sin(m_Theta) * sin(m_Phi)),
-                            float(m_Energy * cos(m_Theta)),
-                            m_Energy);
+      return TLorentzVector(getPx(), getPy(), getPz(), getEnergy());
     }
 
-
-
-    /*! Return TVector3 on cluster position /Shower center (x,y,z)
-     */
+    /*! Return TVector3 on cluster position /Shower center (x,y,z) */
     TVector3 getclusterPosition() const
     {
-      float cluster_x =  m_R * sin(m_Theta) * cos(m_Phi);
-      float cluster_y =  m_R * sin(m_Theta) * sin(m_Phi);
-      float cluster_z =  m_R * cos(m_Theta);
+      const double cluster_x =  getR() * sin(getTheta()) * cos(getPhi());
+      const double cluster_y =  getR() * sin(getTheta()) * sin(getPhi());
+      const double cluster_z =  getR() * cos(getTheta());
       return TVector3(cluster_x, cluster_y, cluster_z);
     }
 
     /*! Return TVector3 on  position on gamma's production
-      By default the position of gamma's production is (0,0,0)
-    */
-    TVector3 getPosition() const
+      By default the position of gamma's production is (0,0,0) */
+    TVector3 getPosition() const { return TVector3(0, 0, 0); }
+
+    /*! Return TMatrixDsym 4x4  error matrix (order should be: px,py,pz,E) */
+    TMatrixDSym getError4x4() const
     {
-      float x, y, z;
-      x = y = z = 0.0;
-      return TVector3(x, y, z);
-    }
+      TMatrixDSym errorecl = getError3x3();
 
+      TMatrixD  jacobian(4, 3);
+      const double cosPhi = cos(getPhi());
+      const double sinPhi = sin(getPhi());
+      const double cosTheta = cos(getTheta());
+      const double sinTheta = sin(getTheta());
+      const double E = getEnergy();
 
-    //.................
-    // For filling error matrix on Px,Py and Pz
-
-    /*! Return TMatrixFsym 4x4  error matrix (order should be: px,py,pz,E)
-    */
-
-    TMatrixFSym getError4x4() const
-    {
-      TMatrixFSym errorecl = getError3x3();
-
-      TMatrixF  jacobian(4, 3);
-      float cosPhi = cos(m_Phi);
-      float sinPhi = sin(m_Phi);
-      float cosTheta = cos(m_Theta);
-      float sinTheta = sin(m_Theta);
-      float E = m_Energy;
-
-      jacobian[ 0 ][ 0 ] =            cosPhi * sinTheta;
-      jacobian[ 0 ][ 1 ] =  -1.0 * E * sinPhi * sinTheta;
-      jacobian[ 0 ][ 2 ] =        E * cosPhi * cosTheta;
-      jacobian[ 1 ][ 0 ] =            sinPhi * sinTheta;
-      jacobian[ 1 ][ 1 ] =        E * cosPhi * sinTheta;
-      jacobian[ 1 ][ 2 ] =        E * sinPhi * cosTheta;
-      jacobian[ 2 ][ 0 ] =                     cosTheta;
-      jacobian[ 2 ][ 1 ] =           0.0;
-      jacobian[ 2 ][ 2 ] =  -1.0 * E          * sinTheta;
-      jacobian[ 3 ][ 0 ] =           1.0;
-      jacobian[ 3 ][ 1 ] =           0.0;
-      jacobian[ 3 ][ 2 ] =           0.0;
-      TMatrixFSym errCart(4);
+      jacobian(0, 0) =            cosPhi * sinTheta;
+      jacobian(0, 1) =  -1.0 * E * sinPhi * sinTheta;
+      jacobian(0, 2) =        E * cosPhi * cosTheta;
+      jacobian(1, 0) =            sinPhi * sinTheta;
+      jacobian(1, 1) =        E * cosPhi * sinTheta;
+      jacobian(1, 2) =        E * sinPhi * cosTheta;
+      jacobian(2, 0) =                     cosTheta;
+      jacobian(2, 1) =           0.0;
+      jacobian(2, 2) =  -1.0 * E          * sinTheta;
+      jacobian(3, 0) =           1.0;
+      jacobian(3, 1) =           0.0;
+      jacobian(3, 2) =           0.0;
+      TMatrixDSym errCart(4);
       errCart = errorecl.Similarity(jacobian);
       return errCart;
     }
-    //__________________________
 
-
-    /*! Return TMatrixFsym 7x7  error matrix (order should be: px,py,pz,E,x,y,z)
-     */
-    TMatrixFSym getError7x7() const
+    /*! Return TMatrixDsym 7x7  error matrix (order should be: px,py,pz,E,x,y,z) */
+    TMatrixDSym getError7x7() const
     {
-      const TMatrixFSym errCart = getError4x4();
+      const TMatrixDSym errCart = getError4x4();
 
-      TMatrixFSym errorMatrix(7);
+      TMatrixDSym errorMatrix(7);
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j <= i ; j++) {
           errorMatrix(i, j) = errorMatrix(j, i) = errCart(i, j);
@@ -356,11 +238,10 @@ namespace Belle2 {
       return errorMatrix;
     }
 
-    /*! Return TMatrixFsym 3x3 error matrix for E, Phi and Theta
-     */
-    TMatrixFSym getError3x3() const
+    /*! Return TMatrixDsym 3x3 error matrix for E, Phi and Theta */
+    TMatrixDSym getError3x3() const
     {
-      TMatrixFSym errorecl(3);
+      TMatrixDSym errorecl(3);
       errorecl(0, 0) = m_Error[0] * m_Error[0]; //Energy
       errorecl(1, 0) = m_Error[1];
       errorecl(1, 1) = m_Error[2] * m_Error[2]; // Phi
@@ -379,10 +260,7 @@ namespace Belle2 {
       false (for time being). Please use isNeutral function (as it will be kept
       for future)
      */
-    bool getisTrack() const
-    {
-      return m_isTrack;
-    }
+    bool getisTrack() const { return m_isTrack; }
 
     /*! Return true if cluster has no match with cluster, otherwise
       return false if cluster has match with track.
@@ -392,31 +270,17 @@ namespace Belle2 {
 
     //..... For FUTURE (to DO)
 
-    /*! Return pi0Likelihood for a shower (for future, Not available now)
-     */
-    float getpi0Likelihood() const
-    {
-      return 0.5;
-    }
-    /*! Return etaLikelihood for a shower (for future, Not available now)
-     */
-    float getetaLikelihood() const
-    {
-      return 0.5;
-    }
+    /*! Return pi0Likelihood for a shower (for future, Not available now) */
 
-    /*! Return deltaL for shower shape (for future, Not available now)
-     */
-    float getdeltaL() const
-    {
-      return 0;
-    }
-    /*! Return beta for shower shape (for future, Not available now)
-     */
-    float getbeta() const
-    {
-      return 0;
-    }
+    double getpi0Likelihood() const { return 0.5; }
+    /*! Return etaLikelihood for a shower (for future, Not available now) */
+    double getetaLikelihood() const { return 0.5; }
+
+    /*! Return deltaL for shower shape (for future, Not available now) */
+    double getdeltaL() const { return 0; }
+
+    /*! Return beta for shower shape (for future, Not available now) */
+    double getbeta() const { return 0; }
 
   private:
 

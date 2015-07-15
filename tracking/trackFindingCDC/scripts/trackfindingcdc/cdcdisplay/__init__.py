@@ -340,6 +340,10 @@ class CDCSVGDisplayModule(Module):
             if answer == 'y':
                 os.makedirs(output_folder)
 
+        # Make sure at least one backend is available
+        if not self.use_cpp and not self.use_python:
+            self.use_python = True
+
         if self.use_cpp:
             cppplotter = Belle2.TrackFindingCDC.CDCSVGPlotter(self.animate)
         if self.use_python:
@@ -950,6 +954,7 @@ class CDCSVGDisplayModule(Module):
 
         fileName = self.new_output_filename()
         cppfileName = self.new_output_filename()
+
         if self.use_cpp:
             cppplotter.saveSVGFile(cppfileName)
         if self.use_python:

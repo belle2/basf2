@@ -67,12 +67,14 @@ namespace Belle2 {
     {
       m_her = her;
       delete m_labToCMS;
+      m_labToCMS = nullptr;
     }
     /** Set the Low Energy Beam 4-momentum */
     void setLER(const TLorentzVector& ler)
     {
       m_ler = ler;
       delete m_labToCMS;
+      m_labToCMS = nullptr;
     }
     /** Set the vertex position */
     void setVertex(const TVector3& vertex)

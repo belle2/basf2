@@ -45,6 +45,8 @@ namespace Belle2 {
       /// Make the constructor of the base type available
       using T::T;
 
+      using T::operator=;
+
       /// Also forward the copy constructor form the base class object.
       WithWeightedItems(const T& t): T(t) {;}
 

@@ -19,25 +19,25 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class Item>
-    using Phi0OmegaFastHough = WeightedFastHough<Item,
-          Box<DiscreteAngle, float>,
-          QuadChildrenStructure>;
+    // template<class Item>
+    // using Phi0OmegaFastHough = WeightedFastHough<Item,
+    //       Box<DiscreteAngle, float>,
+    //       QuadChildrenStructure>;
 
-    template<class Item>
-    using D0Phi0FastHough = WeightedFastHough<Item,
-          Box<float, DiscreteAngle>,
-          QuadChildrenStructure>;
+    // template<class Item>
+    // using D0Phi0FastHough = WeightedFastHough<Item,
+    //       Box<float, DiscreteAngle>,
+    //       QuadChildrenStructure>;
 
-    template<class Item>
-    using D0Phi0OmegaFastHough = WeightedFastHough<Item,
-          Box<float, DiscreteAngle, float>,
-          OctoChildrenStructure>;
+    // template<class Item>
+    // using D0Phi0OmegaFastHough = WeightedFastHough<Item,
+    //       Box<float, DiscreteAngle, float>,
+    //       OctoChildrenStructure>;
 
-    template<class Item>
-    using Phi0OmegaTanLambdaFastHough = WeightedFastHough<Item,
-          Box<DiscreteAngle, float, float>,
-          OctoChildrenStructure>;
+    // template<class Item>
+    // using Phi0OmegaTanLambdaFastHough = WeightedFastHough<Item,
+    //       Box<DiscreteAngle, float, float>,
+    //       OctoChildrenStructure>;
 
   }
 }

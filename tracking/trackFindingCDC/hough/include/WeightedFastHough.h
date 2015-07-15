@@ -21,20 +21,22 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type of tree for paritioning the hough space
-    template<class Item, class Domain, template <class Node> class ChildStructure>
-    using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, Item>, ChildStructure>;
+    template<class Item, class Domain, class DomainDivsion>
+    using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, Item>, DomainDivsion>;
 
-    template<class Item, class Domain, template <class Node> class ChildrenStructure>
+    template<class Item, class Domain, class DomainDivsion>
     class WeightedFastHough {
     private:
       /// Type of the Tree the partitions using markable items the hough space
-      typedef WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, ChildrenStructure> FastHoughTree;
+      typedef WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> FastHoughTree;
 
       /// Node type of the tree
       typedef typename FastHoughTree::Node Node;
 
     public:
-      WeightedFastHough(const Domain& houghPlain) : m_tree(houghPlain) {;}
+      WeightedFastHough(const Domain& houghPlain,
+                        const DomainDivsion& domainDivision = DomainDivsion()) :
+        m_tree(houghPlain, domainDivision) {;}
 
     public:
       /// Take the item set and insert them into the top node of the hough space.
@@ -126,6 +128,8 @@ namespace Belle2 {
             node->createChildren();
             children = node->getChildren();
             for (Node& childNode : *children) {
+              assert(childNode.getChildren() == nullptr);
+              assert(childNode.size() == 0);
               auto measure = [&childNode, &weightItemInDomain](const Item * item) {
                 return weightItemInDomain(item, &childNode);
               };

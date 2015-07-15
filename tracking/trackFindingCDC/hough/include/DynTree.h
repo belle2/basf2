@@ -9,6 +9,7 @@
 **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/hough/CallIfApplicable.h>
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>
@@ -17,14 +18,17 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class Properties_, template <class Node> class ChildrenStructure_>
+    template<class Properties_, class SubPropertiesFactory_>
     class DynTree {
 
       /// Type of this class
-      typedef DynTree<Properties_, ChildrenStructure_> This;
+      typedef DynTree<Properties_, SubPropertiesFactory_> This;
 
       /// Type of the Properties
       typedef Properties_ Properties;
+
+      /// Type of the factory for the sub node properties
+      typedef SubPropertiesFactory_ SubPropertiesFactory;
 
     public:
       /// Class for a node in the tree
@@ -44,7 +48,7 @@ namespace Belle2 {
         typedef Properties_ Properties;
 
         /// Type of the container of the children of the node
-        typedef ChildrenStructure_<Node> Children;
+        typedef std::vector<Node> Children;
 
       private:
         /** Inheriting the constructors of the properties such that we can
@@ -54,12 +58,14 @@ namespace Belle2 {
         using Properties_::Properties_;
 
       public:
+        using Properties_::operator=;
+
+      public:
         /** Getter for the children.
          *  Get the dynamically created children.
          *  Returns nullptr if they have not yet been created
          */
         Children* getChildren()
-        // { return m_children.get(); }
         { return m_children; }
 
         /** Const getter for the children.
@@ -67,7 +73,6 @@ namespace Belle2 {
          *  Returns nullptr if they have not yet been created
          */
         const Children* getChildren() const
-        // { return m_children.get(); }
         { return m_children; }
 
         /// Creates the children of the node.
@@ -76,11 +81,9 @@ namespace Belle2 {
           // ensure the level value fits into unsigned char
           B2ASSERT("DynTree datastructure only supports levels < 255", getLevel() < 255);
 
-          const Node& parentNode = *this;
-          // m_children = std::unique_ptr<Children>(new Children(parentNode));
-
-          getTree()->m_children.emplace_back(parentNode);
-          m_children = &(getTree()->m_children.back());
+          // Call out to the tree, which is providing the memory for the nodes.
+          Node* parentNode = this;
+          m_children = getTree()->createChildren(parentNode);
 
           for (Node& child : *m_children) {
             child.m_level = getLevel() + 1;
@@ -90,11 +93,13 @@ namespace Belle2 {
         }
 
       private:
-        /// Delete the children of the node.
-        void deleteChildren()
+        /// Remove to node from the tree hierachy.
+        void unlink()
         {
-          // m_children.reset(nullptr);
+          m_parent = nullptr;
+          m_level = 0;
           m_children = nullptr;
+          m_tree = nullptr;
         }
 
       public:
@@ -103,7 +108,6 @@ namespace Belle2 {
          */
         template<class Walker>
         void walk(Walker& walker)
-        //void walk(std::function<bool(Node*)> walker)
         {
           bool walkChildren = walker(this);
           Children* children = getChildren();
@@ -121,7 +125,6 @@ namespace Belle2 {
          */
         template<class Walker, class PriorityMeasure>
         void walk(Walker& walker, PriorityMeasure& priority)
-        //void walk(std::function<bool(Node*)> walker, std::function<float(Node*)> priority)
         {
           bool walkChildren = walker(this);
           Children* children = getChildren();
@@ -166,7 +169,6 @@ namespace Belle2 {
           }
         }
 
-
         /// Get the level of the node
         std::size_t getLevel() const { return m_level; }
 
@@ -186,8 +188,10 @@ namespace Belle2 {
         Tree* getTree() const { return m_tree; }
 
       private:
+        /// Reference to the tree that contains this node
+        Tree* m_tree = nullptr;
+
         /// Children that are created only if needed
-        // std::unique_ptr<Children> m_children = nullptr;
         Children* m_children = nullptr;
 
         /// Level of the node within the tree
@@ -195,14 +199,13 @@ namespace Belle2 {
 
         /// Parent in the tree hierachy of this node.
         Node* m_parent = nullptr;
-
-        /// Reference to the tree that contains this node
-        Tree* m_tree = nullptr;
       };
 
     public:
       /// Constructor taking properties with which the top node of the tree is initialised.
-      DynTree(const Properties& properties) :
+      DynTree(const Properties& properties,
+              const SubPropertiesFactory& subPropertiesFactory = SubPropertiesFactory()) :
+        m_subPropertiesFactory(subPropertiesFactory),
         m_topNode(properties),
         m_children()
       {
@@ -223,38 +226,79 @@ namespace Belle2 {
       const Node& getTopNode() const
       { return m_topNode; }
 
+    private:
+      std::vector<Node>* createChildren(Node* parentNode)
+      {
+        Properties& parentProperties = *parentNode;
+        std::vector<Node>* result = getUnusedChildren();
+
+        auto subProperties = m_subPropertiesFactory(parentProperties);
+        result->resize(subProperties.size(), parentProperties);
+
+        size_t iSubNode = 0;
+        for (auto& properties : subProperties) {
+          clearIfApplicable(result->at(iSubNode));
+          result->at(iSubNode) = properties;
+          ++iSubNode;
+        }
+        return result;
+      }
+
+      std::vector<Node>* getUnusedChildren()
+      {
+        if (m_nUsedChildren >= m_children.size()) {
+          m_children.emplace_back();
+        }
+        ++m_nUsedChildren;
+        return &(m_children[m_nUsedChildren - 1]);
+      }
+
+    public:
       /// Forward walk to the top node
       template<class Walker>
       void walk(Walker& walker)
-      // void walk(std::function<bool(Node*)> walker)
       { getTopNode().walk(walker); }
 
       /// Forward walk to the top node
       template<class Walker, class PriorityMeasure>
       void walk(Walker& walker, PriorityMeasure& priority)
-      // void walk(std::function<bool(Node*)> walker, std::function<float(Node*)> priority)
       { getTopNode().walk(walker, priority); }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
       void fell()
       {
-        m_topNode.deleteChildren();
-        m_children.clear();
+        clearIfApplicable(m_topNode);
+        m_topNode.unlink();
+        m_topNode.m_tree = this;
+        for (typename Node::Children& children : m_children) {
+          for (Node& node : children) {
+            clearIfApplicable(node);
+            node.unlink();
+          }
+        }
+        m_nUsedChildren = 0;
       }
 
       /// Like fell but also releases all memory the tree has aquired during long execution.
       void raze()
       {
         fell();
+        m_children.clear();
         m_children.shrink_to_fit();
       }
 
     public:
+      /// Instance of the properties factory for the sub nodes
+      SubPropertiesFactory m_subPropertiesFactory;
+
       /// Memory for the top node of the tree
       Node m_topNode;
 
       /// Central point to provide memory for the child structures
       std::deque<typename Node::Children> m_children;
+
+      /// Last index of used children.
+      size_t m_nUsedChildren = 0;
 
     };
   }

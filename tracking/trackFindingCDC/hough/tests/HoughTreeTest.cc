@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingCDC/hough/phi0_curv/HitInPhi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/WeightedFastHough.h>
-#include <tracking/trackFindingCDC/hough/LinearBoxPartition.h>
+#include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 
@@ -173,7 +173,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   const double minWeight = 30.0;
 
   using HitPhi0CurvFastHough =
-    WeightedFastHough<TrackHit, Phi0CurvBox, LinearBoxPartition<phiDivisions, curvDivisions>::ChildrenStructure>;
+    WeightedFastHough<TrackHit, Phi0CurvBox, LinearDivision<Phi0CurvBox, phiDivisions, curvDivisions> >;
 
   DiscreteAngleArray discreteAngles(std::pow(phiDivisions, maxLevel) + 1);
   std::pair<DiscreteAngle, DiscreteAngle> phi0Range(discreteAngles.front(), discreteAngles.back());
@@ -239,6 +239,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
       }
     }
 
+    // B2INFO("Execution " << iExecution);
     /// Check if exactly two candidates have been found
     ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());
 

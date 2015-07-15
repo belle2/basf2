@@ -109,9 +109,9 @@ namespace Belle2 {
       { return getDivisionBounds(2, 1); }
 
       /// Indicate if the given value is in the range of the coordinate I
-      template<std::size_t I>
-      bool isIn(const Type<I>& value) const
-      { return getLowerBound<I>() <= value and value <= getUpperBound<I>(); }
+      template<std::size_t I, class OtherValue>
+      bool isIn(const OtherValue& value) const
+      { return getLowerBound<I>() < value and not(getUpperBound<I>() < value); }
 
     private:
       /// Indicates if any of the boolean values is true.

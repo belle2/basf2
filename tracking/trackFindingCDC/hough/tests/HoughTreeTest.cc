@@ -53,13 +53,12 @@ namespace {
     {
       return ((n1 > 0 and n2 > 0) or (n1 < 0 and n2 < 0));
     }
-
   public:
     /** Checks if the track hit is contained in a phi0 curv hough space.
      *  Returns 1.0 if it is contained, returns NAN if it is not contained.
      */
     inline Weight operator()(const TrackHit* hit,
-                             const Box<DiscreteAngle, float>* phi0CurvBox)
+                             const Phi0CurvBox* phi0CurvBox)
     {
       // TODO
       // Replace TrackHit with CDCWireHit or even better CDCRLWireHit !
@@ -74,7 +73,7 @@ namespace {
      *  is in the box.
      */
     inline Weight operator()(const CDCWireHit* wireHit,
-                             const Box<DiscreteAngle, float>* phi0CurvBox)
+                             const Phi0CurvBox* phi0CurvBox)
     {
       const FloatType driftLength = wireHit->getRefDriftLength();
       const Vector2D& pos2D =  wireHit->getRefPos2D();
@@ -91,7 +90,7 @@ namespace {
      *  is in the box.
      */
     inline Weight operator()(const CDCRLWireHit* rlWireHit,
-                             const Box<DiscreteAngle, float>* phi0CurvBox)
+                             const Phi0CurvBox* phi0CurvBox)
     {
       const FloatType signedDriftLength = rlWireHit-> getSignedRefDriftLength();
       const Vector2D& pos2D =  rlWireHit->getRefPos2D();
@@ -104,7 +103,7 @@ namespace {
 
     inline bool isObservationIn(const Vector2D& pos2D,
                                 const FloatType signedDriftLength,
-                                const Box<DiscreteAngle, float>* phi0CurvBox)
+                                const Phi0CurvBox* phi0CurvBox)
     {
       const FloatType r = pos2D.norm();
       return isObservationIn(r, pos2D, signedDriftLength, phi0CurvBox);
@@ -113,7 +112,7 @@ namespace {
     inline bool isObservationIn(const FloatType& r,
                                 const Vector2D& pos2D,
                                 const FloatType signedDriftLength,
-                                const Box<DiscreteAngle, float>* phi0CurvBox)
+                                const Phi0CurvBox* phi0CurvBox)
     {
 
       const FloatType rSquared = r * r;
@@ -124,8 +123,8 @@ namespace {
       };
 
       FloatType rSquareTimesHalfCurve[2] = {
-        rSquared* (phi0CurvBox->getLowerBound<1>() / 2),
-        rSquared* (phi0CurvBox->getUpperBound<1>() / 2)
+        rSquared* (static_cast<float>(phi0CurvBox->getLowerBound<1>()) / 2),
+        rSquared* (static_cast<float>(phi0CurvBox->getUpperBound<1>()) / 2)
       };
 
       float dist[2][2];
@@ -147,8 +146,8 @@ namespace {
       if (sameSign(parallelToPhi0[0], parallelToPhi0[1])) return false;
 
       // This two values could be precomputed if necessary
-      const FloatType curveMax = 2 / (r - signedDriftLength);
-      const FloatType curveMin = 2 / (-r - signedDriftLength);
+      const float curveMax = 2 / (r - signedDriftLength);
+      const float curveMin = 2 / (-r - signedDriftLength);
       return (phi0CurvBox->isIn<1>(curveMax) or phi0CurvBox->isIn<1>(curveMin));
       // TODO also extended version does not cover all cases...
 
@@ -163,7 +162,7 @@ namespace {
 TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 {
   // Prepare the hough algorithm
-  const size_t maxLevel = 13;
+  const size_t maxLevel = 12;
   const size_t phiDivisions = 2;
   const size_t curvDivisions = 2;
   const double minWeight = 30.0;
@@ -175,6 +174,9 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   std::pair<DiscreteAngle, DiscreteAngle> phi0Range(discreteAngles.front(), discreteAngles.back());
 
   // Look to higher momenta first, if the range has the lower bound at higher momenta
+
+  // DiscreteFloatArray discreteCurvs(-3.0, 0.0, std::pow(curvDivisions, maxLevel) + 1);
+  // std::pair<DiscreteFloat, DiscreteFloat > curvRange(discreteCurvs.front(), discreteCurvs.back());
   std::pair<float, float> curvRange(-3.0, 0.0);
 
   Phi0CurvBox phi0CurvHoughPlain(phi0Range, curvRange);
@@ -228,7 +230,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
         B2INFO("Candidate");
         B2INFO("size " << candidate.second.size());
         B2INFO("Phi " << candidate.first.getLowerBound<0>().getAngle());
-        B2INFO("Curv " << candidate.first.getCenter<1>());
+        B2INFO("Curv " << static_cast<FloatType>(candidate.first.getLowerBound<1>()));
       }
     }
 

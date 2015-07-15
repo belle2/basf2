@@ -111,7 +111,17 @@ namespace Belle2 {
     }
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    std::vector<double> linspace(const double& start, const double& end, const int n);
+    template<class T>
+    std::vector<T> linspace(const T& start, const T& end, const int n)
+    {
+      std::vector<T> result(n);
+      result[0] = start;
+      for (int i = 1; i < n - 1; ++i) {
+        result[i] = (start * (n - 1 - i) + end * i) / (n - 1);
+      }
+      result[n - 1] = end;
+      return result;
+    }
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

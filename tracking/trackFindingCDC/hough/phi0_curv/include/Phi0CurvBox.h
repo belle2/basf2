@@ -8,13 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/Box.h>
-#include <tracking/trackFindingCDC/hough/DiscreteAngle.h>
+#include <tracking/trackFindingCDC/hough/DiscreteAngles.h>
+#include <tracking/trackFindingCDC/hough/DiscreteValues.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Type for discrete float values
+    typedef DiscreteValue<float> DiscreteFloat;
+
+    /// Type for the container of the discrete values
+    typedef DiscreteValueArray<float> DiscreteFloatArray;
+
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    typedef Box<DiscreteAngle, float> Phi0CurvBox;
+    typedef Box<DiscreteAngle, float > Phi0CurvBox;
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

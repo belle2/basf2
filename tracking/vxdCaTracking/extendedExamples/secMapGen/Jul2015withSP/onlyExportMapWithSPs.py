@@ -8,11 +8,12 @@ from sys import argv
 
 #################
 
-generateSecMap = True  # <----------- hier umschalten zwischen secMapGenerierung und VXDTF!
+generateSecMap = True  # <----------- here you can switch between generating sectorMaps and testing with the VXDTF!
 useSimpleClusterizer = True
 useEvtGen = True
-useEDeposit = True  # <----- damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-
+# useEDeposit: If you want to work w/o E-deposit, edit pxd/data/PXD.xml and svd/data/SVD.xml,
+# where you have to activate see neutrons = true:
+useEDeposit = True
 #################
 # Important parameters:
 
@@ -24,8 +25,8 @@ initialValue = 1  # want random events, if set to 0
 pTcuts = [0.025, 0.1, 0.4]
 
 
-setupFileName = 'evtGenPGunR19500Jul2015Old'
-setupFileName2 = 'evtGenPGunR19500Jul2015New'
+setupFileName = 'evtGenPGunR19630Jul2015Old'
+setupFileName2 = 'evtGenPGunR19630Jul2015New'
 
 
 setupFileNamesvdStd = setupFileName + 'SVD' + 'Std'
@@ -45,11 +46,10 @@ eventinfosetter.param('evtNumList', [numEvents])
 
 
 eventinfoprinter = register_module('EventInfoPrinter')
-0
+
 
 gearbox = register_module('Gearbox')
 
-# geometry.set_log_level(LogLevel.INFO) INFO if set to true, complete list of components can be found...
 
 # Show progress of processing
 progress = register_module('Progress')

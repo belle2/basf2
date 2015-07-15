@@ -18,10 +18,10 @@ from sys import argv
 
 # ################
 
-generateSecMap = False  # <----------- here you can switch between generating sectorMaps and testing with the VXDTF!
+generateSecMap = True  # <----------- here you can switch between generating sectorMaps and testing with the VXDTF!
 useSimpleClusterizer = False
 useEvtGen = True
-usePGun = False
+usePGun = True
 # useEDeposit: If you want to work w/o E-deposit, edit pxd/data/PXD.xml and svd/data/SVD.xml,
 # where you have to activate see neutrons = true:
 useEDeposit = True
@@ -47,7 +47,7 @@ checkTH = False
 
 
 # flags for the pGun
-numTracks = 10
+numTracks = 5
 # transverseMomentum:
 momentumMin = 0.03  # GeV/c
 momentumMax = 0.3  # %
@@ -60,7 +60,7 @@ phiMax = 360.  # degrees
 
 
 # flags for the 2nd pGun
-numTracks2 = 10
+numTracks2 = 5
 # transverseMomentum:
 momentumMin2 = 0.3  # GeV/c
 momentumMax2 = 3.5  # %
@@ -75,8 +75,8 @@ phiMax2 = 360.  # degrees
 pTcuts = [0.025, 0.1, 0.4]
 
 # choose a meaningful name for the sectorMap:
-setupFileName = 'evtGenPGunR19500Jul2015Old'
-setupFileName2 = 'evtGenPGunR19500Jul2015New'
+setupFileName = 'evtGenPGunR19630Jul2015Old'
+setupFileName2 = 'evtGenPGunR19630Jul2015New'
 
 
 # set the relative coordinates for the secMapCreation:

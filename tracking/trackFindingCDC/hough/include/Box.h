@@ -81,11 +81,49 @@ namespace Belle2 {
 
       /// Get the lower partition in the coordinate I
       template<std::size_t I>
-      std::pair<Type<I>, Type<I> > getDivisionBounds(size_t nDivisions, size_t iDivision) const
+      std::pair<Type<I>, Type<I> >
+      getDivisionBounds(size_t nDivisions, size_t iDivision) const
       {
         assert(nDivisions > iDivision);
         return std::make_pair(getDivision<I>(nDivisions, iDivision),
                               getDivision<I>(nDivisions, iDivision + 1));
+      }
+
+      /// Get for the distance between two division bounds with overlap.
+      template<std::size_t I>
+      Width<I> getDivisionWidthWithOverlap(const Width<I>& overlap, size_t nDivisions) const
+      { return (getWidth<I>() + (nDivisions - 1) * overlap) / nDivisions; }
+
+      template<std::size_t I>
+      Type<I>
+      getLowerDivisionBoundWithOverlap(const Width<I>& overlap,
+                                       size_t nDivisions,
+                                       size_t iDivision) const
+      {
+        assert(nDivisions >= iDivision);
+        return getLowerBound<I>() + (getWidth<I>() - overlap) * iDivision / nDivisions;
+      }
+
+      template<std::size_t I>
+      Type<I>
+      getUpperDivisionBoundWithOverlap(const Width<I>& overlap,
+                                       size_t nDivisions,
+                                       size_t iDivision) const
+      {
+        assert(nDivisions >= iDivision);
+        return getUpperBound<I>() - (getWidth<I>() - overlap) * (nDivisions - iDivision - 1) / nDivisions;
+      }
+
+      /// Get the lower partition in the coordinate I
+      template<std::size_t I>
+      std::pair<Type<I>, Type<I> >
+      getDivisionBoundsWithOverlap(const Width<I>& overlap,
+                                   size_t nDivisions,
+                                   size_t iDivision) const
+      {
+        assert(nDivisions > iDivision);
+        return std::make_pair(getLowerDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision),
+                              getUpperDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision));
       }
 
       /// Get the center of the box in the coordinate I

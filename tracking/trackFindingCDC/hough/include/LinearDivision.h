@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/hough/GenIndices.h>
 #include <tracking/trackFindingCDC/hough/Product.h>
 
+#include <tuple>
 #include <array>
 #include <iterator>
 #include <assert.h>
@@ -30,22 +31,29 @@ namespace Belle2 {
       {{divisions...}};
 
     public:
+      LinearDivision(const typename Box_::Delta& overlaps = typename Box_::Delta()) :
+        m_overlaps(overlaps)
+      {;}
+
+    public:
       std::array<Box_, s_nSubBoxes> operator()(const Box_& box)
       {
         return makeSubBoxes(box, GenIndices<s_nSubBoxes>());
       }
 
       template<std::size_t... Is>
-      inline static std::array<Box_, s_nSubBoxes>
+      inline
+      std::array<Box_, s_nSubBoxes>
       makeSubBoxes(const Box_& box, IndexSequence<Is...> /*globalSubBoxIndex*/)
       {
         return {{ makeSubBox(box, Is, GenIndices<sizeof...(divisions)>())... }};
       }
 
       template<std::size_t... Is>
-      inline static Box_ makeSubBox(const Box_& box,
-                                    std::size_t globalISubBox,
-                                    IndexSequence<Is...> /*coordinatesIndex*/)
+      inline
+      Box_ makeSubBox(const Box_& box,
+                      std::size_t globalISubBox,
+                      IndexSequence<Is...> /*coordinatesIndex*/)
       {
         std::array<std::size_t, sizeof...(divisions)> indices;
         for (size_t iIndex = 0 ; iIndex <  sizeof...(divisions); ++iIndex) {
@@ -53,8 +61,16 @@ namespace Belle2 {
           globalISubBox /= s_divisions[iIndex];
         }
         assert(globalISubBox == 0);
-        return Box_(box.template getDivisionBounds<Is>(s_divisions[Is], indices[Is]) ...);
+        //return Box_(box.template getDivisionBounds<Is>(s_divisions[Is], indices[Is]) ...);
+        return Box_(box.template getDivisionBoundsWithOverlap<Is>(std::get<Is>(m_overlaps),
+                                                                  s_divisions[Is],
+                                                                  indices[Is]) ...);
       }
+
+    private:
+      /// Custom overlaps of the bounds at each division for each dimension.
+      typename Box_::Delta m_overlaps;
+
     };
 
     template<class Box_, std::size_t... divisions>

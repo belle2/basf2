@@ -37,6 +37,7 @@ TEST(TrackFindingCDCTest, LinearDivision_createBoxes)
   size_t nSubNodes =  LinearDivision<Box<float, float>, 3, 3>::s_nSubBoxes;
   EXPECT_EQ(9, nSubNodes);
 
+  //LinearDivision<Box<float, float>, 3, 2> subBoxFactory{Box<float, float>::Delta{0.0, 0.0}};
   LinearDivision<Box<float, float>, 3, 2> subBoxFactory{};
   std::array<Box<float, float>, 6 > subBoxes = subBoxFactory(box);
 

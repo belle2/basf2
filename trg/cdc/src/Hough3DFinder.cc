@@ -250,6 +250,20 @@ void TRGCDCHough3DFinder::terminate(void){
     }
 }
 
+void TRGCDCHough3DFinder::doit(vector<TCTrack *> const & trackList2D, vector<TCTrack *> & trackList3D ){
+  // Loop over trackList2D and copy to make a new trackList3D. Will delete it at TRGCDC.cc.
+  for(unsigned int iTrack=0; iTrack<trackList2D.size(); iTrack++){
+    TCTrack & aTrack = * new TCTrack(* trackList2D[iTrack]);
+    trackList3D.push_back(& aTrack);
+  }
+  doit(trackList3D);
+}
+
+void TRGCDCHough3DFinder::doit(vector<TCTrack *> const & trackList2D, vector<TCTrack *> & trackList3D, int eventNum){
+    m_eventNum = eventNum;
+    doit(trackList2D, trackList3D);
+}
+
 void TRGCDCHough3DFinder::doit(vector<TCTrack *> & trackList, int eventNum){
     m_eventNum = eventNum;
     doit(trackList);

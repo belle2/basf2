@@ -2066,7 +2066,7 @@ TRGCDC::fastSimulation(void) {
     // }
 
     //...Stereo finder...
-    _h3DFinder->doit(_trackList2DFitted, m_eventNum);
+    _h3DFinder->doit(_trackList2DFitted, _trackList3D, m_eventNum);
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -2090,9 +2090,8 @@ TRGCDC::fastSimulation(void) {
     _eventTime.back()->getT0();
 
     //...3D tracker...
-    //vector<TCTrack*> trackList3D;
-    //_fitter3D->doit(trackList, trackList3D);
-    _fitter3D->doitComplex(_trackList2DFitted, _trackList3D);
+    _fitter3D->doit(_trackList3D);
+    //_fitter3D->doitComplex(_trackList3D);
 
     if (TRGDebug::level()) {
         cout << TRGDebug::tab() << "Number of 2D tracks : "

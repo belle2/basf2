@@ -55,12 +55,11 @@ namespace Belle2 {
     void terminate();
 
     /// Does track fitting.
-    int doit(const std::vector<TRGCDCTrack *> & trackListIn,
-             std::vector<TRGCDCTrack *> & trackListOut);
+    int doit(std::vector<TRGCDCTrack *> & trackList);
 
     /// Does track fitting using JSignals.
-    int doitComplex(const std::vector<TRGCDCTrack *> & trackListIn,
-             std::vector<TRGCDCTrack *> & trackListOut);
+    int doitComplex(std::vector<TRGCDCTrack *> & trackList);
+
     /// Utility functions.
     static double calPhi(TRGCDCSegmentHit const * segmentHit, double eventTime);
     /// Function for mc debugging.

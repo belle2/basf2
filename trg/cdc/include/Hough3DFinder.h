@@ -35,6 +35,12 @@ class TRGCDCHough3DFinder {
     /// Destructor
     ~TRGCDCHough3DFinder();
     /// Member functions.
+    /// Finds tracks using tracklist2D and outputs to trackList3D.
+    /// Has parameter to choose between perfect and original finder.
+    void doit(std::vector<TRGCDCTrack *> const & trackList2D, std::vector<TRGCDCTrack *> & trackList3D);
+    /// Finds tracks using tracklist2D and outputs to trackList3D.
+    /// Finds tracks using tracklist. Saves event number. Has parameter to choose between perfect and original finder.
+    void doit(std::vector<TRGCDCTrack *> const & trackList2D, std::vector<TRGCDCTrack *> & trackList3D, int m_eventNum);
     /// Finds tracks using tracklist. Has parameter to choose between perfect and original finder.
     void doit(std::vector<TRGCDCTrack *> & trackList);
     /// Finds tracks using tracklist. Saves event number. Has parameter to choose between perfect and original finder.

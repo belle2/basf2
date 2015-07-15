@@ -156,8 +156,8 @@ namespace Belle2 {
 
   }
 
-  int TRGCDCFitter3D::doit(const std::vector<TRGCDCTrack *> & trackListIn,
-             std::vector<TRGCDCTrack *> & trackListOut){
+  int TRGCDCFitter3D::doit(std::vector<TRGCDCTrack *> & trackList)
+  {
 
     TRGDebug::enterStage("Fitter 3D");
 
@@ -174,9 +174,9 @@ namespace Belle2 {
 
     // Fitter3D
     // Loop over all tracks
-    for(unsigned iTrack=0; iTrack<trackListIn.size(); iTrack++){
+    for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
 
-      TCTrack & aTrack = * trackListIn[iTrack];
+      TCTrack & aTrack = * trackList[iTrack];
 
       ///////////////////////////////////////
       // Check if all superlayers have one TS for the track.
@@ -234,12 +234,7 @@ namespace Belle2 {
       //  }
       //} // End superlayer loop
       if(trackFull == 0){
-         TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
-         CLHEP::HepVector helixParameters(5);
-         helixParameters = aTrack.helix().a();
          aTrack.setFitted(0);
-         aTrack.setHelix(helix);
-         trackListOut.push_back(&aTrack);
          continue;
       }
 
@@ -281,12 +276,7 @@ namespace Belle2 {
         trackFull = 0;
       }
       if(trackFull == 0){
-         TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
-         CLHEP::HepVector helixParameters(5);
-         helixParameters = aTrack.helix().a();
          aTrack.setFitted(0);
-         aTrack.setHelix(helix);
-         trackListOut.push_back(&aTrack);
          continue;
       }
 
@@ -367,7 +357,6 @@ namespace Belle2 {
       Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"]); 
       m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
 
-
       /////////////////////////////////
       // 3D Fitter
       // Check which stereo super layers should be used.
@@ -405,12 +394,7 @@ namespace Belle2 {
         trackFull = 0;
       }
       if(trackFull == 0){
-         TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
-         CLHEP::HepVector helixParameters(5);
-         helixParameters = aTrack.helix().a();
          aTrack.setFitted(0);
-         aTrack.setHelix(helix);
-         trackListOut.push_back(&aTrack);
          continue;
       }
 
@@ -503,6 +487,17 @@ namespace Belle2 {
 
       //} //Reject low pt.
 
+        // Set track in trackList
+        // Set Helix parameters 
+        TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0)); 
+        CLHEP::HepVector a(5); 
+        a = aTrack.helix().a(); 
+        aTrack.setFitted(1); 
+        a[3] = m_mDouble["z0"];  
+        a[4] = m_mDouble["cot"]; 
+        helix.a(a); 
+        aTrack.setHelix(helix); 
+
       ///////////////
       // Save values
       if(m_mBool["fRootFile"]) {
@@ -551,8 +546,8 @@ namespace Belle2 {
 
   }
 
-  int TRGCDCFitter3D::doitComplex(const std::vector<TRGCDCTrack *> & trackListIn,
-             std::vector<TRGCDCTrack *> & trackListOut){
+  int TRGCDCFitter3D::doitComplex(std::vector<TRGCDCTrack *> & trackList)
+  {
 
     TRGDebug::enterStage("Fitter 3D");
 
@@ -571,9 +566,9 @@ namespace Belle2 {
 
     // Fitter3D
     // Loop over all tracks
-    for(unsigned iTrack=0; iTrack<trackListIn.size(); iTrack++){
+    for(unsigned iTrack=0; iTrack<trackList.size(); iTrack++){
 
-      TCTrack & aTrack = * trackListIn[iTrack];
+      TCTrack & aTrack = * trackList[iTrack];
 
       ///////////////////////////////////////
       // Check if all superlayers have one TS for the track.
@@ -604,12 +599,7 @@ namespace Belle2 {
         }
       } // End superlayer loop
       if(trackFull == 0){
-         TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
-         CLHEP::HepVector helixParameters(5);
-         helixParameters = aTrack.helix().a();
          aTrack.setFitted(0);
-         aTrack.setHelix(helix);
-         trackListOut.push_back(&aTrack);
          continue;
       }
 
@@ -830,16 +820,9 @@ namespace Belle2 {
         a[4] = m_mDouble["cot"]; 
         helix.a(a); 
         aTrack.setHelix(helix); 
-        // Fill track list 
-        trackListOut.push_back(&aTrack); 
 
       } else { //Reject low pt.
-        TRGCDCHelix helix(ORIGIN, CLHEP::HepVector(5,0), CLHEP::HepSymMatrix(5,0));
-        CLHEP::HepVector helixParameters(5);
-        helixParameters = aTrack.helix().a();
         aTrack.setFitted(0);
-        aTrack.setHelix(helix);
-        trackListOut.push_back(&aTrack);
       }
 
       ///////////////

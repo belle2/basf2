@@ -43,6 +43,11 @@ namespace Belle2 {
         const CDCSimHit* hit = cdcsimhits[iCDC]; //get iCDC'th entry in StoreArray
         // Use hit's data here...
       }
+
+      //or using range-based for:
+      for(const CDCSimHit& hit : cdcsimhits) {
+        // Use hit's data here...
+      }
       \endcode
    *
    *  Objects linked together using relations can also be obtained by querying

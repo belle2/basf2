@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/calibration/TOPASICGains.h>
+#include <top/dbobjects/TOPASICGains.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

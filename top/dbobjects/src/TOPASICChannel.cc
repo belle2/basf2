@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/calibration/TOPASICChannel.h>
+#include <top/dbobjects/TOPASICChannel.h>
 
 using namespace std;
 using namespace Belle2;

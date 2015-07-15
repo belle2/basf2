@@ -11,8 +11,8 @@
 #pragma once
 
 #include <TObject.h>
-#include <top/calibration/TOPASICPedestals.h>
-#include <top/calibration/TOPASICGains.h>
+#include <top/dbobjects/TOPASICPedestals.h>
+#include <top/dbobjects/TOPASICGains.h>
 #include <vector>
 
 namespace Belle2 {

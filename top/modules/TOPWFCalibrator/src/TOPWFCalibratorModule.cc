@@ -32,7 +32,7 @@
 
 // database classes
 #include <framework/database/DBStore.h>
-#include <top/calibration/TOPASICChannel.h>
+#include <top/dbobjects/TOPASICChannel.h>
 
 #include "TFile.h"
 #include <TClonesArray.h>

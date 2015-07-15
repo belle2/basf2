@@ -20,27 +20,35 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class Box_, size_t... divisions>
+    /** Factory object that constructs sub boxes from a given box with optional overlaps.
+     *  The number of divisions in each dimension are given as template parameters such
+     *  that the total number is know at compile time.
+     */
+    template<class Box_, std::size_t... divisions>
     class LinearDivision {
 
     public:
+      /// Number of sub boxes produced by this factory facility.
       static const std::size_t s_nSubBoxes = Product<divisions...>::value;
 
     private:
-      static constexpr const std::array<std::size_t, sizeof...(divisions)> s_divisions =
-      {{divisions...}};
+      /// Array of the number of divisions for each dimension.
+      static constexpr std::size_t s_divisions[sizeof...(divisions)] = {divisions...};
 
     public:
+      /// Initialise the sub box factory with specific overlaps.
       LinearDivision(const typename Box_::Delta& overlaps = typename Box_::Delta()) :
         m_overlaps(overlaps)
       {;}
 
     public:
+      /// Factory method to construct the subboxes with overlap from the given box.
       std::array<Box_, s_nSubBoxes> operator()(const Box_& box)
       {
         return makeSubBoxes(box, GenIndices<s_nSubBoxes>());
       }
 
+      /// Make all subboxs with overlap of the given box.
       template<std::size_t... Is>
       inline
       std::array<Box_, s_nSubBoxes>
@@ -49,6 +57,8 @@ namespace Belle2 {
         return {{ makeSubBox(box, Is, GenIndices<sizeof...(divisions)>())... }};
       }
 
+
+      /// Make the subbox with overlaps of the given box at global index.
       template<std::size_t... Is>
       inline
       Box_ makeSubBox(const Box_& box,
@@ -72,9 +82,8 @@ namespace Belle2 {
 
     };
 
-
     // Extra mention of the constexpr such that it aquires external linkage.
     template<class Box_, std::size_t... divisions>
-    const std::array<std::size_t, sizeof...(divisions)> LinearDivision<Box_, divisions...>::s_divisions;
+    constexpr std::size_t LinearDivision<Box_, divisions...>::s_divisions[sizeof...(divisions)];
   }
 }

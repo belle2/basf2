@@ -41,9 +41,6 @@ namespace Belle2 {
         /// Allow the tree access to the node constructor to create the top node.
         friend Tree;
 
-        /// Type of this class
-        typedef Node This;
-
         /// Type of the Properties
         typedef Properties_ Properties;
 
@@ -144,7 +141,7 @@ namespace Belle2 {
 
             // while( not prioritisedChildNode.empty() ) {
             // We know the number of children so we can make the loop counter explicit
-            for (int i = 0; i < nChildren; ++i) {
+            for (std::size_t i = 0; i < nChildren; ++i) {
               std::pop_heap(prioritisedChildNodes.begin(),
                             prioritisedChildNodes.end());
 

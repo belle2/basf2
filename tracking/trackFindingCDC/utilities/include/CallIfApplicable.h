@@ -27,7 +27,7 @@ namespace Belle2 {
      *  This implementation is selected with the function is not applicable.
      */
     template<class Function, class T>
-    void callIfApplicableImpl(Function&& function, T&& obj, long)
+    void callIfApplicableImpl(Function&&, T&&, long)
     {;}
 
     /** Invokes a function with one argument obj, but only if the call is allowed.

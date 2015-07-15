@@ -1,5 +1,6 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/PIDVariables.h>
+#include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
@@ -14,11 +15,14 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <gtest/gtest.h>
+
+#include <TRandom3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -206,6 +210,53 @@ namespace {
          */
 
   }
+
+  TEST(TrackVariablesTest, Variable)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<TrackFitResult>::registerPersistent();
+    StoreArray<Track>::registerPersistent();
+    StoreArray<Particle>::registerPersistent();
+    DataStore::Instance().setInitializeActive(false);
+
+    StoreArray<TrackFitResult> myResults;
+    StoreArray<Track> myTracks;
+    StoreArray<Particle> myParticles;
+
+    TRandom3 generator;
+
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+
+    // Generate a random put orthogonal pair of vectors in the r-phi plane
+    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+
+    // Add a random z component
+    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    Track mytrack;
+    mytrack.setTrackFitResultIndex(Const::electron, 0);
+    Track* savedTrack = myTracks.appendNew(mytrack);
+
+    Particle* part = myParticles.appendNew(savedTrack, Const::ChargedStable(11));
+
+    EXPECT_FLOAT_EQ(0.5, trackPValue(part));
+    EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
+    EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
+    EXPECT_FLOAT_EQ(3, trackNCDCHits(part));
+    EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
+    EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
+
+  }
+
 
   class MetaVariableTest : public ::testing::Test {
   protected:

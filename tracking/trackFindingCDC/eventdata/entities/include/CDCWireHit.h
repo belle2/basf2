@@ -133,6 +133,10 @@ namespace Belle2 {
       const Vector2D& getRefPos2D() const
       { return getWire().getRefPos2D(); }
 
+      /// The distance from the beam line at reference position of the underlying wire
+      FloatType getRefCylindricalR() const
+      { return getWire().getRefCylindricalR(); }
+
       /// Connection vector from the center of this wire hit to the other.
       Vector2D getRefVecTo2D(const CDCWireHit& to) const
       { return to.getRefPos2D() - getRefPos2D(); }

@@ -216,7 +216,7 @@ namespace Belle2 {
       Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
 
       /// Getter for the cylindrical radius at the wire reference position
-      FloatType getRefCylindricalR() const { return getRefPos2D().norm(); }
+      FloatType getRefCylindricalR() const { return m_refCylindricalR; }
 
       /// Getter for the closest distance to the beamline ( z-axes )
       FloatType getMinCylindricalR() const { return getRefPos2D().norm(); }
@@ -362,6 +362,8 @@ namespace Belle2 {
       WireID m_wireID; ///< The wireID of the wire
 
       BoundSkewLine m_skewLine; ///< The line representation of the wire
+      FloatType m_refCylindricalR;  ///< Precomputed distance to the beam line at the reference position.
+
 
       FloatType m_forwardPhiToRef; ///< Storage of the angle between forward and ref position in the xy projection (see getPhiRangeToRef() for details)
       FloatType m_backwardPhiToRef;///< Storage of the angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)

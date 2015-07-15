@@ -80,6 +80,7 @@ void CDCWire::initialize()
   TVector3 backwardPos = cdcgp.wireBackwardPosition(iCLayer, iWire);
 
   m_skewLine = BoundSkewLine(forwardPos, backwardPos);
+  m_refCylindricalR = getRefPos2D().norm();
 
   m_forwardPhiToRef = m_skewLine.forwardPhiToRef();
   m_backwardPhiToRef = m_skewLine.backwardPhiToRef();

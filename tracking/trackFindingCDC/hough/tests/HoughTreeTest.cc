@@ -14,23 +14,16 @@
 #include <tracking/trackFindingCDC/hough/WeightedFastHough.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
-
-#ifdef HAS_CALLGRIND
-#include <valgrind/callgrind.h>
-#endif
+#include <tracking/trackFindingCDC/utilities/TimeIt.h>
 
 #include <set>
 #include <cmath>
 #include <vector>
-#include <memory>
-#include <chrono>
-#include <algorithm>
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 {
@@ -79,7 +72,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   const double curvLowerBound = +0 - curvOverlap;
   const double curvUpperBound = maxCurv + curvOverlap;
 
-  DiscreteFloatArray discreteCurvs(curvLowerBound, curvUpperBound, nCurvBins);
+  DiscreteFloatArray discreteCurvs(curvLowerBound, curvUpperBound, nDiscreteCurv);
   std::pair<DiscreteFloat, DiscreteFloat > curvRange(discreteCurvs.getRange());
 
 
@@ -108,46 +101,15 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
       hitVector.push_back(trackHit);
   }
 
-  size_t nExecutions = 100;
-  std::vector<std::chrono::duration<double>> timeSpans;
-  timeSpans.reserve(nExecutions);
+  // Execute the finding a couple of time to find a stable execution time.
+  vector< pair<Phi0CurvBox, vector<TrackHit*> > > candidates;
 
-  for (size_t iExecution = 0;  iExecution < nExecutions; ++iExecution) {
-    // Feed the hits to the hough plain and execute the search
-    auto now = std::chrono::high_resolution_clock::now();
-
+  // Is this still C++? Looks like JavaScript to me.
+  TimeItResult timeItResult = timeIt(100, true, [&]() {
     hitPhi0CurvHough.seed(hitVector);
 
-#ifdef HAS_CALLGRIND
-    CALLGRIND_START_INSTRUMENTATION;
-#endif
-
     const double minWeight = 30.0;
-
-    vector< pair<Phi0CurvBox, vector<TrackHit*> > > candidates
-      = hitPhi0CurvHough.findHeavyLeavesDisjoint(hitInPhi0CurvBox, maxLevel, minWeight);
-
-#ifdef HAS_CALLGRIND
-    CALLGRIND_STOP_INSTRUMENTATION;
-#endif
-
-    auto later = std::chrono::high_resolution_clock::now();
-    timeSpans.push_back(std::chrono::duration_cast<std::chrono::duration<double>>(later - now));
-
-    // Exclude the timing of the resource release for comparision with the legendre test.
-    hitPhi0CurvHough.fell();
-
-    // Only output the candidates in the first execution
-    if (iExecution == 0) {
-      B2INFO("HoughTree took " << timeSpans.back().count() << " seconds " <<
-             "in first execution, found " << candidates.size() << " candidates");
-      for (std::pair<Phi0CurvBox, std::vector<TrackHit*> >& candidate : candidates) {
-        B2INFO("Candidate");
-        B2INFO("size " << candidate.second.size());
-        B2INFO("Phi " << candidate.first.getLowerBound<0>().getAngle());
-        B2INFO("Curv " << static_cast<float>(candidate.first.getLowerBound<1>()));
-      }
-    }
+    candidates = hitPhi0CurvHough.findHeavyLeavesDisjoint(hitInPhi0CurvBox, maxLevel, minWeight);
 
     // B2INFO("Execution " << iExecution);
     /// Check if exactly two candidates have been found
@@ -157,16 +119,22 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
     // The actual hit numbers are more than 30, but this is somewhat a lower bound
     EXPECT_GE(candidates[0].second.size(), 30);
     EXPECT_GE(candidates[1].second.size(), 30);
-  }
+
+    // Exclude the timing of the resource release for comparision with the legendre test.
+    hitPhi0CurvHough.fell();
+  });
 
   hitPhi0CurvHough.raze();
 
-  std::chrono::duration<double> sumTimeSpan =
-    std::accumulate(timeSpans.begin(), timeSpans.end(), std::chrono::duration<double>());
+  for (std::pair<Phi0CurvBox, std::vector<TrackHit*> >& candidate : candidates) {
+    B2INFO("Candidate");
+    B2INFO("size " << candidate.second.size());
+    B2INFO("Phi " << candidate.first.getLowerBound<0>().getAngle());
+    B2INFO("Curv " << static_cast<float>(candidate.first.getLowerBound<1>()));
+  }
 
-  std::chrono::duration<double> avgTimeSpan = sumTimeSpan / timeSpans.size();
-
-  B2INFO("On average: HoughTree took " << avgTimeSpan.count() << " seconds " <<
-         "in " << nExecutions << " executions.");
+  B2INFO("First execution took " << timeItResult.getSeconds(0) << " seconds ");
+  B2INFO("On average execution took " << timeItResult.getAverageSeconds() << " seconds " <<
+         "in " << timeItResult.getNExecutions() << " executions.");
 
 }

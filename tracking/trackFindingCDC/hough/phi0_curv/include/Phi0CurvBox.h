@@ -20,7 +20,32 @@ namespace Belle2 {
     typedef DiscreteValueArray<float> DiscreteCurvatureArray;
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    typedef Box<DiscreteAngle, DiscreteCurvature > Phi0CurvBox;
+    class Phi0CurvBox : public Box<DiscreteAngle, DiscreteCurvature > {
 
+    private:
+      /// Type of the base class
+      using Super = Box<DiscreteAngle, DiscreteCurvature >;
+
+    public:
+      /// Using the constructors of the base class
+      using Super::Super;
+
+    public:
+      /// Concise getter for the lower phi0 bound.
+      const Vector2D& getLowerPhi0Vec() const
+      { return getLowerBound<0>().getAngleVec(); }
+
+      /// Concise getter for the upper phi0 bound.
+      const Vector2D& getUpperPhi0Vec() const
+      { return getUpperBound<0>().getAngleVec(); }
+
+      /// Concise getter for the lower curvature bound.
+      const float& getLowerCurv() const
+      { return getLowerBound<1>().getValue(); }
+
+      /// Concise getter for the lower curvature bound.
+      const float& getUpperCurv() const
+      { return getUpperBound<1>().getValue(); }
+    };
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

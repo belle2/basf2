@@ -62,7 +62,7 @@ namespace Belle2 {
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);
         return in ? 1 : NAN;
-        // All facets are currently worth the weight
+        // All facets are currently worth the same weight
         // Facets contain three hits but in general contribute only one
         // additional hit due to overlaps with neighboring facets.
         // Hence we stick with 1 as weight here.
@@ -75,10 +75,10 @@ namespace Belle2 {
                                     const Phi0CurvBox* phi0CurvBox)
       {
 
-        const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerBound<0>().getAngleVec();
-        const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperBound<0>().getAngleVec();
+        const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
+        const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
-        // Allow containment keeping the reversal symmetry
+        // Allow containment keep the reversal symmetry
         if (phi0CurvBox->isIn<1>(curvature)) {
           return phi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
 

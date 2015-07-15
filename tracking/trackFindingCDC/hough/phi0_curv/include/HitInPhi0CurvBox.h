@@ -45,9 +45,6 @@ namespace Belle2 {
       inline Weight operator()(const TrackHit* hit,
                                const Phi0CurvBox* phi0CurvBox)
       {
-        // TODO
-        // Replace TrackHit with CDCWireHit or even better CDCRLWireHit !
-        // Also get rid of the conformal transformation !
         const CDCWireHit* wireHit = hit->getUnderlayingCDCWireHit();
         return operator()(wireHit, phi0CurvBox);
       }
@@ -101,13 +98,13 @@ namespace Belle2 {
       {
         const FloatType rReducedSquared = (r + signedDriftLength) * (r - signedDriftLength);
 
-        const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerBound<0>().getAngleVec();
-        const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperBound<0>().getAngleVec();
+        const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
+        const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
         const FloatType orthoToPhi0[2] = { pos2D.cross(lowerPhi0Vec), pos2D.cross(upperPhi0Vec) };
 
-        const float& lowerCurv = phi0CurvBox->getLowerBound<1>().getValue();
-        const float& upperCurv = phi0CurvBox->getUpperBound<1>().getValue();
+        const float& lowerCurv = phi0CurvBox->getLowerCurv();
+        const float& upperCurv = phi0CurvBox->getUpperCurv();
 
         const FloatType rSquareTimesHalfCurv[2] = {
           rReducedSquared* (lowerCurv / 2),
@@ -120,7 +117,7 @@ namespace Belle2 {
         dist[1][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[1] - signedDriftLength;
         dist[1][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[1] - signedDriftLength;
 
-        // Sinogram intersects at least on of the boundaries
+        // Sinogram separates at least on of the edges from the others.
         if (not sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) return true;
         if (not refined) return false;
 

@@ -80,6 +80,10 @@ namespace Belle2 {
       DiscreteValue<T> operator[](size_t i)
       { return DiscreteValue<T>(m_values.begin() + i); }
 
+      /// Get the full range of the discrete values
+      std::pair<DiscreteValue<T>, DiscreteValue<T> > getRange()
+      { return std::make_pair(front(), back()); }
+
     private:
       /// Memory for the values representing the discrete positions.
       std::vector<T> m_values;

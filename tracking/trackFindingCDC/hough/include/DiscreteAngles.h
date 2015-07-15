@@ -98,6 +98,10 @@ namespace Belle2 {
       DiscreteAngle operator[](size_t i)
       { return DiscreteAngle(m_angleVectors.begin() + i); }
 
+      /// Get the full range of the discrete values
+      std::pair<DiscreteAngle, DiscreteAngle> getRange()
+      { return std::make_pair(front(), back()); }
+
     private:
       /// Memory for the unit vectors representing the discrete angle.
       std::vector<Vector2D> m_angleVectors;

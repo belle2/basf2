@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/hough/WeightedFastHough.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
-// #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -36,33 +35,68 @@ using namespace TrackFindingCDC;
 TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 {
   // Prepare the hough algorithm
-  const size_t maxLevel = 12;
-  const size_t phiDivisions = 2;
-  const size_t curvDivisions = 2;
+  const size_t maxLevel = 13;
+  const size_t phi0Divisions = 2; // Division at each level
+  const size_t curvDivisions = 2; // Division at each level
 
   // const size_t maxLevel = 8;
   // const size_t phiDivisions = 3;
   // const size_t curvDivisions = 3;
 
-  const double minWeight = 30.0;
+  const size_t discretePhi0Overlap = 1;
+  const size_t discretePhi0Width = 2;
+
+  const size_t discreteCurvOverlap = 1;
+  const size_t discreteCurvWidth = 2;
+  const double maxCurv = 3.0;
+
+
+  // Setup thre discrete values for phi0
+  assert(discretePhi0Width > discretePhi0Overlap);
+  const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
+  const size_t nDiscretePhi0 = (discretePhi0Width - discretePhi0Overlap) * nPhi0Bins + discretePhi0Overlap + 1;
+
+  const double phi0Overlap = 2 * PI / (nPhi0Bins * (static_cast<double>(discretePhi0Width) / discretePhi0Overlap - 1) + 1);
+  B2INFO("phi0Overlap " << phi0Overlap);
+
+  // Adjust the phi0 bounds such that overlap occures at the wrap around of the phi0 range as well
+  const double phi0LowerBound = -PI - phi0Overlap;
+  const double phi0UpperBound = +PI + phi0Overlap;
+
+  DiscreteAngleArray discreteAngles(phi0LowerBound, phi0UpperBound, nDiscretePhi0);
+  std::pair<DiscreteAngle, DiscreteAngle> phi0Range(discreteAngles.getRange());
+
+  // Setup thre discrete values for the two dimensional curvature
+  assert(discreteCurvWidth > discreteCurvOverlap);
+  const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
+  const size_t nDiscreteCurv = (discreteCurvWidth - discreteCurvOverlap) * nCurvBins + discreteCurvOverlap + 1;
+
+  const double curvOverlap = maxCurv / (nCurvBins * (static_cast<double>(discreteCurvWidth) / discreteCurvOverlap - 1) + 1);
+  B2INFO("curvOverlap " << curvOverlap);
+
+
+  // Since the lower bound is slightly prefered we can bias to high momenta by putting them at the lower bound.
+  const double curvLowerBound = +0 - curvOverlap;
+  const double curvUpperBound = maxCurv + curvOverlap;
+
+  DiscreteFloatArray discreteCurvs(curvLowerBound, curvUpperBound, nCurvBins);
+  std::pair<DiscreteFloat, DiscreteFloat > curvRange(discreteCurvs.getRange());
+
+
+  // Compose the hough space
+  Phi0CurvBox phi0CurvHoughPlain(phi0Range, curvRange);
+
+  using Phi0CurvBoxDivision = LinearDivision<Phi0CurvBox, phi0Divisions, curvDivisions>;
+  Phi0CurvBox::Delta phi0CurvOverlaps{discretePhi0Overlap, discreteCurvOverlap};
+  Phi0CurvBoxDivision phi0CurvBoxDivision(phi0CurvOverlaps);
 
   using HitPhi0CurvFastHough =
-    WeightedFastHough<TrackHit, Phi0CurvBox, LinearDivision<Phi0CurvBox, phiDivisions, curvDivisions> >;
-
-  DiscreteAngleArray discreteAngles(std::pow(phiDivisions, maxLevel) + 1);
-  std::pair<DiscreteAngle, DiscreteAngle> phi0Range(discreteAngles.front(), discreteAngles.back());
-
-  // Look to higher momenta first, if the range has the lower bound at higher momenta
-
-  // DiscreteFloatArray discreteCurvs(-3.0, 0.0, std::pow(curvDivisions, maxLevel) + 1);
-  // std::pair<DiscreteFloat, DiscreteFloat > curvRange(discreteCurvs.front(), discreteCurvs.back());
-  std::pair<float, float> curvRange(-3.0, 0.0);
-
-  Phi0CurvBox phi0CurvHoughPlain(phi0Range, curvRange);
-  HitPhi0CurvFastHough hitPhi0CurvHough(phi0CurvHoughPlain);
+    WeightedFastHough<TrackHit, Phi0CurvBox, Phi0CurvBoxDivision>;
+  HitPhi0CurvFastHough hitPhi0CurvHough(phi0CurvHoughPlain, phi0CurvBoxDivision);
 
   const bool refined = false;
   HitInPhi0CurvBox<refined> hitInPhi0CurvBox;
+
 
   // Get the hits form the test event
   markAllHitsAsUnused();
@@ -87,6 +121,8 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 #ifdef HAS_CALLGRIND
     CALLGRIND_START_INSTRUMENTATION;
 #endif
+
+    const double minWeight = 30.0;
 
     vector< pair<Phi0CurvBox, vector<TrackHit*> > > candidates
       = hitPhi0CurvHough.findHeavyLeavesDisjoint(hitInPhi0CurvBox, maxLevel, minWeight);

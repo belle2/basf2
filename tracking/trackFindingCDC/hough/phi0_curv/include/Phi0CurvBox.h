@@ -20,7 +20,7 @@ namespace Belle2 {
     typedef DiscreteValueArray<float> DiscreteFloatArray;
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    typedef Box<DiscreteAngle, float > Phi0CurvBox;
+    typedef Box<DiscreteAngle, DiscreteFloat > Phi0CurvBox;
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

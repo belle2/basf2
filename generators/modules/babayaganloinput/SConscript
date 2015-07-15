@@ -1,5 +1,6 @@
 Import('env')
+# env['CONTINUE'] = False
 
-env['LIBS'] = ['generators_babayaganlo', 'mdst_dataobjects', 'generators', 'framework']
+env['LIBS'] = ['generators_cry', 'mdst_dataobjects', 'generators', 'framework', 'geometry']
 
 Return('env')

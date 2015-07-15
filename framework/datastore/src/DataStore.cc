@@ -246,14 +246,16 @@ bool DataStore::createObject(TObject* object, bool replace, const StoreAccessorB
     return false;
   }
 
-  if (entry->ptr && !replace) {
+  if (entry->ptr && !replace && object != entry->object) {
     B2ERROR("An " << accessor.readableName() << " was already created in the DataStore.");
     return false;
   }
 
   if (object) {
-    delete entry->object;
-    entry->object = object;
+    if (object != entry->object) {
+      delete entry->object;
+      entry->object = object;
+    }
     entry->ptr = entry->object;
   } else {
     entry->recreate();

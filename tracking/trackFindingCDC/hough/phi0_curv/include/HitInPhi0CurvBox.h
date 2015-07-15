@@ -99,43 +99,42 @@ namespace Belle2 {
                                   const FloatType signedDriftLength,
                                   const Phi0CurvBox* phi0CurvBox)
       {
+        const FloatType rReducedSquared = (r + signedDriftLength) * (r - signedDriftLength);
 
-        const FloatType rSquared = r * r;
+        const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerBound<0>().getAngleVec();
+        const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperBound<0>().getAngleVec();
 
-        FloatType orthoToPhi0 [2] = {
-          pos2D.cross(phi0CurvBox->getLowerBound<0>().getAngleVec()),
-          pos2D.cross(phi0CurvBox->getUpperBound<0>().getAngleVec())
-        };
+        const FloatType orthoToPhi0[2] = { pos2D.cross(lowerPhi0Vec), pos2D.cross(upperPhi0Vec) };
 
-        FloatType rSquareTimesHalfCurve[2] = {
-          rSquared* (static_cast<float>(phi0CurvBox->getLowerBound<1>()) / 2),
-          rSquared* (static_cast<float>(phi0CurvBox->getUpperBound<1>()) / 2)
+        const float& lowerCurv = phi0CurvBox->getLowerBound<1>().getValue();
+        const float& upperCurv = phi0CurvBox->getUpperBound<1>().getValue();
+
+        const FloatType rSquareTimesHalfCurv[2] = {
+          rReducedSquared* (lowerCurv / 2),
+          rReducedSquared* (upperCurv / 2)
         };
 
         float dist[2][2];
-        dist[0][0] = rSquareTimesHalfCurve[0] + orthoToPhi0[0] - signedDriftLength;
-        dist[0][1] = rSquareTimesHalfCurve[1] + orthoToPhi0[0] - signedDriftLength;
-        dist[1][0] = rSquareTimesHalfCurve[0] + orthoToPhi0[1] - signedDriftLength;
-        dist[1][1] = rSquareTimesHalfCurve[1] + orthoToPhi0[1] - signedDriftLength;
+        dist[0][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[0] - signedDriftLength;
+        dist[0][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[0] - signedDriftLength;
+        dist[1][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[1] - signedDriftLength;
+        dist[1][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[1] - signedDriftLength;
 
-        // Sinogram intersects at least on of the boundaries.
+        // Sinogram intersects at least on of the boundaries
         if (not sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) return true;
         if (not refined) return false;
 
-        // Extra check if the maximum / minimum of the sinogram is in the Box.
-        // Check if the slope sign changes
-        FloatType parallelToPhi0[2] = {
-          pos2D.dot(phi0CurvBox->getLowerBound<0>().getAngleVec()),
-          pos2D.dot(phi0CurvBox->getUpperBound<0>().getAngleVec())
-        };
-        if (sameSign(parallelToPhi0[0], parallelToPhi0[1])) return false;
+        // Continue to check if the extrema of the sinogram are in the box,
+        // while only touching only one boundary of the box
+        // (but not crossing two what the check above actually means).
+        // Currently only checking the positive curvature branch correctly
+        FloatType extremR = r - signedDriftLength;
+        bool extremRInCurvRange = not sameSign(extremR * lowerCurv - 1, extremR * upperCurv - 1);
+        if (not extremRInCurvRange) return false;
 
-        // This two values could be precomputed if necessary
-        const float curveMax = 2 / (r - signedDriftLength);
-        const float curveMin = 2 / (-r - signedDriftLength);
-        return (phi0CurvBox->isIn<1>(curveMax) or phi0CurvBox->isIn<1>(curveMin));
-        // TODO also extended version does not cover all cases...
-
+        Vector2D extremPhi0Vec = pos2D.orthogonal(CCW); // Not normalised but does not matter.
+        bool extremPhi0VecInPhi0Range = extremPhi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
+        return extremRInCurvRange and extremPhi0VecInPhi0Range;
       }
 
     };

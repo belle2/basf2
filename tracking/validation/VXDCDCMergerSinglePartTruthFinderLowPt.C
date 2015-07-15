@@ -91,7 +91,6 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   //tree->Draw("Dz>>h9","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Dz_5GeV_muons_1000_Theta.jpg");
 
-
   TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
   tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   h10->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
@@ -100,8 +99,6 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   h10->GetXaxis()->SetTitle("Mom Res");
   //h5->GetYaxis()->SetTitle("Efficiency");
   //tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
-  gStyle->SetOptStat("e");
-
   gStyle->SetOptStat("e");
   h10->Write();
 
@@ -168,7 +165,7 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
   eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
   eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  eff_ptlp->Divide(ptspttlp, h22, 1.0, 1.0, "B");
+  eff_ptlp->Divide(eff_ptspttlp, h22, 1.0, 1.0, "B");
   gStyle->SetOptStat("e");
   eff_ptlp->GetYaxis()->SetRangeUser(0,1.1);
   gPad->RedrawAxis();

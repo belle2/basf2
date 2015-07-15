@@ -55,7 +55,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
     trackHitPhi0CurvQuadLegendre.seed(hitVector);
 
     const double minWeight = 30.0;
-    const double maxCurv = 0.05;
+    const double maxCurv = 1.5;
     candidates = trackHitPhi0CurvQuadLegendre.find(minWeight, maxCurv);
 
     // B2INFO("Execution " << iExecution);

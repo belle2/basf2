@@ -60,17 +60,14 @@ namespace Belle2 {
 
   private:
 
-    /** members of ECLReconstructor Module
-     */
+    /** members of ECLReconstructor Module */
 
     TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
-    bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and
-        the tracking modules are not enabled at phyton level */
+    bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
 
-    /** Root tree and file for saving the output */
-    TTree* m_tree; /** Output tree */
+    TTree* m_tree; /** Root tree and file for saving the output */
     //TFile* m_rootFile;
 
     // variables

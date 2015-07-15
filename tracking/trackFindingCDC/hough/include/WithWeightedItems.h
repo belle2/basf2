@@ -10,18 +10,34 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/WithWeight.h>
+#include <tracking/trackFindingCDC/hough/CallIfApplicable.h>
 
 #include <vector>
 #include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    template<class T>
+    auto clearIfPresentImpl(T& obj, int) -> decltype(obj.clear())
+    { obj.clear(); }
+
+    template<class T>
+    auto clearIfPresentImpl(T& obj, long) -> decltype(void())
+    {;}
+
+    template<class T>
+    void clearIfPresent(T& obj)
+    { clearIfPresentImpl(obj, int(0)); }
+
 
     /// A mixin class to attach a set of weighted items to a class
     template<class T, class Item>
     class WithWeightedItems : public T {
 
     private:
+      /// Type of the base class
+      typedef T Super;
+
       /// Type of this class
       typedef WithWeightedItems<T, Item> This;
 
@@ -93,9 +109,14 @@ namespace Belle2 {
       size_t size() const
       { return m_items.size(); }
 
+    public:
       /// Clear the contained items.
       void clear()
-      { m_items.clear(); }
+      {
+        m_items.clear();
+        Super& super = *this;
+        clearIfApplicable(super);
+      }
 
     private:
       /// Memory for the weighted items.

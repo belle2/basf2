@@ -165,6 +165,11 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   const size_t maxLevel = 12;
   const size_t phiDivisions = 2;
   const size_t curvDivisions = 2;
+
+  // const size_t maxLevel = 8;
+  // const size_t phiDivisions = 3;
+  // const size_t curvDivisions = 3;
+
   const double minWeight = 30.0;
 
   using HitPhi0CurvFastHough =

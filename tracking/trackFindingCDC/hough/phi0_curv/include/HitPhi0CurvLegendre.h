@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/phi0_curv/HitInPhi0CurvBox.h>
-#include <tracking/trackFindingCDC/hough/WeightedFastHough.h>
+#include <tracking/trackFindingCDC/hough/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 #include <tracking/trackFindingCDC/hough/DiscreteAngles.h>
 
@@ -28,29 +28,20 @@ namespace Belle2 {
       using Phi0CurvBoxDivision = LinearDivision<Phi0CurvBox, phi0Divisions, curvDivisions>;
 
       /// Type of the fast hough tree structure
-      using HitPhi0CurvFastHoughTree = WeightedFastHough<Hit, Phi0CurvBox, Phi0CurvBoxDivision>;
-
-    private:
-      // Default parameters
-      // TODO: Cross check this values with old implementation, room further tuning?
-      // TODO: Expose these parameters to the constructor?
-      size_t m_maxLevel = 13;
-
-      size_t m_discretePhi0Overlap = 1;
-      size_t m_discretePhi0Width = 2;
-
-      size_t m_discreteCurvOverlap = 1;
-      size_t m_discreteCurvWidth = 2;
-      double m_maxCurv = 3.0;
-
-      /// Dummy initialisation of the other constructs
-      DiscreteAngleArray m_discretePhi0s{NAN, NAN, 1};
-      DiscreteCurvatureArray m_discreteCurvs{NAN, NAN, 1};
-
-      Phi0CurvBox m_phi0CurvHoughPlain{m_discretePhi0s.getRange(), m_discreteCurvs.getRange()};
-      std::unique_ptr<HitPhi0CurvFastHoughTree> m_hitPhi0CurvFastHoughTree{nullptr};
+      using HitPhi0CurvFastHoughTree = WeightedFastHoughTree<Hit, Phi0CurvBox, Phi0CurvBoxDivision>;
 
     public:
+      /// Constructor using the default values
+      HitPhi0CurvLegendre()
+      {;}
+
+      /// Constructor using the given maximal level.
+      HitPhi0CurvLegendre(size_t maxLevel) : m_maxLevel(maxLevel)
+      {;}
+
+    public:
+
+      /// Initialise the algorithm by constructing the hough tree from the parameters
       void initialize()
       {
         // Setup thre discrete values for phi0
@@ -94,12 +85,14 @@ namespace Belle2 {
 
       }
 
+      /// Prepare the leave finding by filling the top node with given hits
       void seed(std::vector<Hit*>& hits)
       {
         if (not m_hitPhi0CurvFastHoughTree) { initialize(); }
         m_hitPhi0CurvFastHoughTree->seed(hits);
       }
 
+      /// Find disjoint leaves heavier than minWeight
       std::vector<std::pair<Phi0CurvBox,  std::vector<Hit*> > >
       find(const Weight& minWeight, const double& maxCurv = NAN)
       {
@@ -123,13 +116,50 @@ namespace Belle2 {
         }
       }
 
+      /// Terminates the processing by striping all hit information from the tree
       void fell()
       { m_hitPhi0CurvFastHoughTree->fell(); }
 
+      /// Release all memory that the tree aquired during the runs.
       void raze()
       { m_hitPhi0CurvFastHoughTree->raze(); }
 
     private:
+      // Default parameters
+      // TODO: Cross check this values with old implementation, room further tuning?
+      // TODO: Expose these parameters to the constructor?
+
+      /// Maximal level of the tree to investigate
+      size_t m_maxLevel = 13;
+
+      /// Overlap of the leaves in phi0 counted in number of discrete values.
+      size_t m_discretePhi0Overlap = 1;
+
+      /// Width of the leaves at the maximal level in phi0 counted in number of discrete values.
+      size_t m_discretePhi0Width = 2;
+
+      /// Overlap of the leaves in the curvature counted in number of discrete values
+      size_t m_discreteCurvOverlap = 1;
+
+      /// Width of the leaves at the maximal level in teh curvature counted in number of discrete values.
+      size_t m_discreteCurvWidth = 2;
+
+      /// Maximal curvature value the tree should cover.
+      double m_maxCurv = 3.0;
+
+      // Dummy initialisation of the other constructs
+
+      /// Space for the discrete values that mark the usable bin bound in phi0
+      DiscreteAngleArray m_discretePhi0s{NAN, NAN, 1};
+
+      /// Space for the discrete values that mark the usable bin bound in the curvature
+      DiscreteCurvatureArray m_discreteCurvs{NAN, NAN, 1};
+
+      /// The top level hough plain
+      Phi0CurvBox m_phi0CurvHoughPlain{m_discretePhi0s.getRange(), m_discreteCurvs.getRange()};
+
+      /// Dynamic hough tree structure traversed in the leave search.
+      std::unique_ptr<HitPhi0CurvFastHoughTree> m_hitPhi0CurvFastHoughTree{nullptr};
 
     };
   }

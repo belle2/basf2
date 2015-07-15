@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth <thomas.hauth@kit.edu>                      *
+ * Contributors: Oliver Frost, Thomas Hauth <thomas.hauth@kit.edu>        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,16 +26,16 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 {
   // Prepare the hough algorithm
   const size_t maxLevel = 13;
-  const size_t phi0Divisions = 2; // Division at each level
-  const size_t curvDivisions = 2; // Division at each level
+  const size_t phi0Divisions = 2;
+  const size_t curvDivisions = 2;
 
   // const size_t maxLevel = 8;
   // const size_t phiDivisions = 3;
   // const size_t curvDivisions = 3;
 
-  using TrackHitPhi0CurvLegendre = HitPhi0CurvLegendre<TrackHit, phi0Divisions, curvDivisions>;
-  TrackHitPhi0CurvLegendre trackHitPhi0CurvLegendre;
-  trackHitPhi0CurvLegendre.initialize();
+  using TrackHitPhi0CurvQuadLegendre = HitPhi0CurvLegendre<TrackHit, phi0Divisions, curvDivisions>;
+  TrackHitPhi0CurvQuadLegendre trackHitPhi0CurvQuadLegendre(maxLevel);
+  trackHitPhi0CurvQuadLegendre.initialize();
 
   // Get the hits form the test event
   markAllHitsAsUnused();
@@ -52,11 +52,11 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 
   // Is this still C++? Looks like JavaScript to me.
   TimeItResult timeItResult = timeIt(100, true, [&]() {
-    trackHitPhi0CurvLegendre.seed(hitVector);
+    trackHitPhi0CurvQuadLegendre.seed(hitVector);
 
     const double minWeight = 30.0;
     const double maxCurv = 0.05;
-    candidates = trackHitPhi0CurvLegendre.find(minWeight, maxCurv);
+    candidates = trackHitPhi0CurvQuadLegendre.find(minWeight, maxCurv);
 
     // B2INFO("Execution " << iExecution);
     /// Check if exactly two candidates have been found
@@ -68,10 +68,10 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
     EXPECT_GE(candidates[1].second.size(), 30);
 
     // Exclude the timing of the resource release for comparision with the legendre test.
-    trackHitPhi0CurvLegendre.fell();
+    trackHitPhi0CurvQuadLegendre.fell();
   });
 
-  trackHitPhi0CurvLegendre.raze();
+  trackHitPhi0CurvQuadLegendre.raze();
 
   for (std::pair<Phi0CurvBox, std::vector<TrackHit*> >& candidate : candidates) {
     B2INFO("Candidate");

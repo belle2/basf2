@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth <thomas.hauth@kit.edu>                      *
+ * Contributors: Oliver Frost, Thomas Hauth <thomas.hauth@kit.edu>        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -90,7 +90,7 @@ namespace Belle2 {
 
         auto later = std::chrono::high_resolution_clock::now();
 
-        duration<double> timeSpan = duration_cast<duration<double>>(later - now);
+        duration<double> timeSpan = duration_cast<duration<double> >(later - now);
         timeSpans.push_back(timeSpan);
         tearDown();
       }

@@ -25,26 +25,26 @@ namespace Belle2 {
     using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, Item>, DomainDivsion>;
 
     template<class Item, class Domain, class DomainDivsion>
-    class WeightedFastHough {
+    class WeightedFastHoughTree :
+      public WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> {
+
     private:
       /// Type of the Tree the partitions using markable items the hough space
-      typedef WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> FastHoughTree;
+      typedef WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> Super;
 
     public:
-      /// Node type of the tree
-      typedef typename FastHoughTree::Node Node;
+      /// Inheriting the constructor from the base class.
+      using Super::Super;
 
-    public:
-      WeightedFastHough(const Domain& houghPlain,
-                        const DomainDivsion& domainDivision = DomainDivsion()) :
-        m_tree(houghPlain, domainDivision) {;}
+      /// Type of the node in the tree.
+      using Node = typename Super::Node;
 
     public:
       /// Take the item set and insert them into the top node of the hough space.
       void seed(std::vector<Item>& items)
       {
         fell();
-        Node& topNode = m_tree.getTopNode();
+        Node& topNode = this->getTopNode();
         for (Item& item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
@@ -57,7 +57,7 @@ namespace Belle2 {
       void seed(std::vector<Item*>& items)
       {
         fell();
-        Node& topNode = m_tree.getTopNode();
+        Node& topNode = this->getTopNode();
         for (Item* item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
@@ -67,7 +67,7 @@ namespace Belle2 {
       }
 
       template<class TreeWalker>
-      void walk(TreeWalker& walker)
+      void walkHeighWeightFirst(TreeWalker& walker)
       {
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.
@@ -78,7 +78,7 @@ namespace Belle2 {
           return node->getWeight();
         };
 
-        m_tree.walk(walker, priority);
+        this->walk(walker, priority);
       }
 
       template<class ItemInDomainMeasure>
@@ -140,7 +140,7 @@ namespace Belle2 {
           return true;
         };
 
-        walk(walker);
+        walkHeighWeightFirst(walker);
 
         return found;
       }
@@ -149,23 +149,20 @@ namespace Belle2 {
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
       void fell()
       {
-        m_tree.getTopNode().clear();
+        this->getTopNode().clear();
         m_marks.clear();
-        m_tree.fell();
+        Super::fell();
       }
 
       /// Like fell but also releases all memory the tree has aquired during long executions.
       void raze()
       {
         fell();
-        m_tree.raze();
+        Super::raze();
         m_marks.shrink_to_fit();
       }
 
     private:
-      /// The tree into to insert the items.
-      FastHoughTree m_tree;
-
       /// Memory of the used marks of the items.
       std::deque<bool> m_marks;
       // Note have to use a deque here because std::vector<bool> is special

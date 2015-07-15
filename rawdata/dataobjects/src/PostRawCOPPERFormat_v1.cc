@@ -154,7 +154,10 @@ void PostRawCOPPERFormat_v1::CheckData(int n,
 {
 
   char err_buf[500];
-  sprintf(err_buf, "This function for format ver.1 is not supported. Exiting...\n %s %s %d\n",
+  sprintf(err_buf,
+          "This function for format ver.1 is not supported. (n %d preveve %u eve %u  prectr %u ctr %u prevrun %u run %u) Exiting...\n %s %s %d\n",
+          n, prev_evenum, *cur_evenum_rawcprhdr, prev_copper_ctr, *cur_copper_ctr,
+          prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf;
   throw (err_str);

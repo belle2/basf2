@@ -52,6 +52,7 @@ void VXDCDCMergerSinglePartLowPt(){
   //c1->SaveAs("plots/VXDTracks_5GeV_muons_1000_Theta.jpg");
 
   TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
+  gStyle->SetOptStat("e");
   tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
   h5->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
   h5->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
@@ -60,6 +61,7 @@ void VXDCDCMergerSinglePartLowPt(){
   h5->Write();
 
   TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
+  gStyle->SetOptStat("e");
   tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
   h6->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
   h6->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
@@ -81,6 +83,7 @@ void VXDCDCMergerSinglePartLowPt(){
 
 
   TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
+  gStyle->SetOptStat("e");
   tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   h10->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
   h10->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));

@@ -9,7 +9,7 @@
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'VXDTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'SVDTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -21,17 +21,17 @@ import logging
 from tracking.validation.run import TrackingValidationRun
 
 
-class VXD(TrackingValidationRun):
+class SVD4Layer(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'EvtGenInput'
     components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
                   ]
     secSetup = \
-        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD']
+        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
+         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
     finder_module = basf2.register_module('VXDTF')
-    param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.22}
+    param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.06}
     finder_module.param(param_vxdtf)
     fit_geometry = None
     pulls = True
@@ -39,7 +39,7 @@ class VXD(TrackingValidationRun):
 
 
 def main():
-    validation_run = VXD()
+    validation_run = SVD4Layer()
     validation_run.configure_and_execute_from_commandline()
 
 

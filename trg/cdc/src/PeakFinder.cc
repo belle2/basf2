@@ -754,7 +754,7 @@ TRGCDCPeakFinder::p1p2(TCHPlane & hp,
             fcpx=abs(ix-159);}
         if(fcpi>=3){
             fcpys=1;}
-	fcpy=fcpy+(fcpn/80)*2+fcpys;
+	fcpy=fcpy+((fcpn-1)/80)*2+fcpys;
 
 	//cout << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test //JB: Please use TRGDebug
 	if (TRGDebug::level()) cout << TRGDebug::tab() << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test
@@ -1334,7 +1334,7 @@ TRGCDCPeakFinder::p1p2Methode(TCHPlane & hp,
             fcpx=abs(ix-159);}
         if(fcpi>=3){
             fcpys=1;}
-	fcpy=fcpy+(fcpn/80)*2+fcpys;
+	fcpy=fcpy+((fcpn-1)/80)*2+fcpys;
 
 	//cout << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test //JB: Please use TRGDebug
 	if (TRGDebug::level()) cout << TRGDebug::tab() << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test

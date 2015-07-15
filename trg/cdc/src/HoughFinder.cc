@@ -1406,7 +1406,7 @@ TRGCDCHoughFinder::makeTrack(const unsigned peakId, const unsigned pm) const {
 //  const double pt = r / ConstantAlpha;
 
     //...Make a circle...
-    TCCircle c(r, phi, pm ? 1. : -1., * _plane[pm]);
+    TCCircle c(r, phi, pm ? -1. : 1., * _plane[pm]);
     c.name("circle_" + TRGUtil::itostring(int(peakId) * (pm ? -1 : 1)));
 
     if (TRGDebug::level()) {

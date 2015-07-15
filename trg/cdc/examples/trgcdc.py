@@ -149,8 +149,8 @@ cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.
 #cdctrg.param('TSFLogicLUT', 1)
 #cdctrg.param('TSFRootFile',1)
 #---2D finder settings---
-cdctrg.param('HoughFinderMappingFilePlus', os.path.join(basf2datadir,"trg/cdc/HoughMappingMinus20140808.dat"))
-cdctrg.param('HoughFinderMappingFileMinus', os.path.join(basf2datadir,"trg/cdc/HoughMappingPlus20140807.dat"))
+cdctrg.param('HoughFinderMappingFileMinus', os.path.join(basf2datadir,"trg/cdc/HoughMappingMinus20140808.dat"))
+cdctrg.param('HoughFinderMappingFilePlus', os.path.join(basf2datadir,"trg/cdc/HoughMappingPlus20140807.dat"))
 cdctrg.param('2DFinderPerfect',1)
 #cdctrg.param('HoughFinderMeshX',160)
 #cdctrg.param('HoughFinderMeshY',26)

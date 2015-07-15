@@ -118,14 +118,31 @@ function loadcontent(joined_revisions, reload_checkboxes) {
 
 			// 5. UPDATE THE SHARE-PLOT INPUT FIELDS, AND PREPEND THE CURRENT
 			//    HOSTNAME ETC. TO THE PATH
-			var loc = window.location;
-			var currentURL = loc.protocol + '//' + loc.host + '/';
-			
+			var url = $(location).attr('href');
+			var n_index = url.indexOf('index.html');
+			var n_hashchar = url.indexOf('#');
+			var n_question = url.indexOf('?');
+
+			// If 'index.html' in URL:
+			if (n_index != -1){
+				var n = n_index;
+			} else {
+				// First occurence of either '#' or '?'
+				if (((n_hashchar==-1) && (n_question!=-1)) || ((n_hashchar!=-1) && (n_question==-1))){
+    					var n = Math.max(n_hashchar, n_question);
+				} else if (n_hashchar > -1 && n_question > -1) {
+    					var n = Math.min(n_hashchar, n_question);
+				} else {
+    					var n = url.length;
+				}
+			}
+
+			// Cut off URL after first occurence of '#' or '?'
+			var currentURL = url.substr(0, n);
+
 			$('.share_plot').each(function(){
-			
-				var path = $(this).attr('value');
-				console.log(path);
-				$(this).val(currentURL + path);
+				var curVal = $(this).attr('value');
+				$(this).val(currentURL+curVal);
 			
 			});
 

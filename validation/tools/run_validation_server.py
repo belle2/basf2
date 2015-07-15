@@ -431,7 +431,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         # Used to generate new plots
         if '/ajax/makeplots' in self.path:
-            log.debug('Creating plots for revisions ' + ', '.join(data))
+            log.debug('Creating plots for revisions: ' + str(data))
             create_plots(revisions=data)
             return 200, json.dumps({}), 'application/json'
 

@@ -234,13 +234,17 @@ namespace Belle2 {
         std::vector<Node>* result = getUnusedChildren();
 
         auto subProperties = m_subPropertiesFactory(parentProperties);
-        result->resize(subProperties.size(), parentProperties);
-
-        size_t iSubNode = 0;
-        for (auto& properties : subProperties) {
-          clearIfApplicable(result->at(iSubNode));
-          result->at(iSubNode) = properties;
-          ++iSubNode;
+        if (subProperties.empty()) {
+          result->clear();
+        } else {
+          // Initialize new elements with dummy property.
+          result->resize(subProperties.size(), subProperties.back());
+          size_t iSubNode = 0;
+          for (auto& properties : subProperties) {
+            clearIfApplicable(result->at(iSubNode));
+            result->at(iSubNode) = properties;
+            ++iSubNode;
+          }
         }
         return result;
       }

@@ -39,8 +39,8 @@ beamparameter_presets = {
         # covariance matrices for the beam parametrized in
         # (E, theta_x, theta_y) = energy and horizontal and vertical angular
         # spread
-        "covHER": np.array([0.00513])**2,
-        "covLER": np.array([0.002375])**2,
+        "covHER": np.array([0.00513]) ** 2,
+        "covLER": np.array([0.002375]) ** 2,
         # bunch size in cm
         "bunchHER": np.array([10.2e-3, 59e-6, 6.0]) * 1e-1,
         "bunchLER": np.array([7.75e-3, 59e-6, 5.0]) * 1e-1,
@@ -94,6 +94,10 @@ beamparameter_presets = {
         "energyHER": 100,
         "energyLER": 100,
     }),
+    "DAPHNE": (None, {
+        "energyHER": 1.02 / 2.,
+        "energyLER": 1.02 / 2.,
+    }),
 }
 
 
@@ -110,7 +114,7 @@ def cov_matrix(beamsize, angle):
     if angle < 0:
         angle = math.pi + angle
     rot = rot_matrix_y(angle)
-    cov = np.matrix(np.diag(beamsize**2))
+    cov = np.matrix(np.diag(beamsize ** 2))
     return rot * cov * rot.T
 
 
@@ -271,7 +275,7 @@ if __name__ == "__main__":
     def __get_4vector(energy, angle):
         """Calculate an 4vector for electron/positron from energy and angle"""
         m = 0.511e-3
-        pz = (energy**2 - m**2)**.5
+        pz = (energy ** 2 - m ** 2) ** .5
         v = ROOT.TLorentzVector(0, 0, pz, energy)
         if angle < 0:
             angle = math.pi + angle

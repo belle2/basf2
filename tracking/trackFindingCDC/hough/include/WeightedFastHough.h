@@ -30,6 +30,7 @@ namespace Belle2 {
       /// Type of the Tree the partitions using markable items the hough space
       typedef WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> FastHoughTree;
 
+    public:
       /// Node type of the tree
       typedef typename FastHoughTree::Node Node;
 
@@ -86,7 +87,6 @@ namespace Belle2 {
                               const size_t maxLevel,
                               const double minWeight)
       {
-        std::vector<std::pair<Domain,  std::vector<Item*> > > found;
         auto skipLowWeightNode = [minWeight](const Node * node) {
           return not(node->getWeight() >= minWeight);
         };

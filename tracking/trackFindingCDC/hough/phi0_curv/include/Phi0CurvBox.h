@@ -14,13 +14,13 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Type for discrete float values
-    typedef DiscreteValue<float> DiscreteFloat;
+    typedef DiscreteValue<float> DiscreteCurvature;
 
     /// Type for the container of the discrete values
-    typedef DiscreteValueArray<float> DiscreteFloatArray;
+    typedef DiscreteValueArray<float> DiscreteCurvatureArray;
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    typedef Box<DiscreteAngle, DiscreteFloat > Phi0CurvBox;
+    typedef Box<DiscreteAngle, DiscreteCurvature > Phi0CurvBox;
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

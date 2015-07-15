@@ -83,7 +83,8 @@ namespace Belle2 {
      * @return number of tagged SimHit entries
      */
     template<class SIMHIT>
-    int setBackgroundTag(StoreArray<SIMHIT>& simHits) {
+    int setBackgroundTag(StoreArray<SIMHIT>& simHits)
+    {
       if (!simHits.isValid()) return 0;
 
       int numEntries = simHits.getEntries();

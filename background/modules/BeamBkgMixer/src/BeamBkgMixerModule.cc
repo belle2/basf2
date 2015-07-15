@@ -71,8 +71,8 @@ namespace Belle2 {
 
     // Add parameters
     addParam("backgroundFiles", m_backgroundFiles,
-             "List of background (collision) files, "
-             "wildcards possible (as in TChain)");
+             "List of background (collision) files (wildcards not allowed - "
+             "use python glob.glob() to expand to list of files)");
     addParam("minTime", m_minTime,
              "Time window lower edge in nano seconds", -1000.0);
     addParam("maxTime", m_maxTime,
@@ -144,19 +144,23 @@ namespace Belle2 {
 
     for (auto file : m_backgroundFiles) {
 
-      // if wildcarding is not used in the name ...
-      if (!TString(file.c_str()).Contains("*")) {
-        TFile* f = TFile::Open(file.c_str(), "READ");
-        if (!f) {
-          B2ERROR(file << ": file not found");
-          continue;
-        }
-        if (!f->IsOpen()) {
-          B2ERROR(file << ": can't open file");
-          continue;
-        }
-        f->Close();
+      // wildcarding is not allowed anymore
+      if (TString(file.c_str()).Contains("*")) {
+        B2ERROR(file << ": wildcards are not allowed");
+        continue;
       }
+
+      // check the file existance
+      TFile* f = TFile::Open(file.c_str(), "READ");
+      if (!f) {
+        B2ERROR(file << ": file not found");
+        continue;
+      }
+      if (!f->IsOpen()) {
+        B2ERROR(file << ": can't open file");
+        continue;
+      }
+      f->Close();
 
       TChain persistent("persistent");
       int nFiles = persistent.Add(file.c_str());

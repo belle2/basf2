@@ -36,7 +36,7 @@ namespace Belle2 {
     typedef double FloatType;
 
     /// An additive measure of quality (e.g. logarithms of probabilities)
-    typedef float Weight;
+    typedef double Weight;
 
     /// Constant for the highest possible weight
     extern const Weight HIGHEST_WEIGHT;

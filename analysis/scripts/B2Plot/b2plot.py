@@ -2,6 +2,7 @@ import numpy
 import matplotlib
 import matplotlib.figure
 import matplotlib.gridspec
+import matplotlib.colors
 import pandas
 import scipy
 import scipy.stats
@@ -24,24 +25,15 @@ def poisson_error(n_tot):
     return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0/(1-0.6827)))
 
 
-class BasePlotter(object):
+class Plotter(object):
 
-    quantity = 'Classifier Output'
+    def __init__(self, data, columns, target, weight=None):
+        self.set_plot_options()
 
-    def datapoint_plot(self, axis, x, y, xerr=None, yerr=None, label=None):
-        p, = axis.plot(x, y, label=label)
-        color = p.get_color()
-        darker_color = map(lambda x: 0.5*x, p.get_color())
-        axis.errorbar(x, y, xerr=xerr, yerr=yerr, fmt='.', color=color, ecolor=darker_color, elinewidth=0.5, alpha=0.5)
-        axis.fill_between(x, y-yerr, y+yerr, alpha=0.5, color=color)
-        return p
-
-
-class Plotter(BasePlotter):
-    def __init__(self, data, columns=['SignalProbability'], target='isSignal', weight=None, binning={}):
         self.columns = columns
-        self.signal = {}
-        self.bckgrd = {}
+        self.hists = {}
+        self.weight = weight
+
         self.bin_patches = {}
         self.bin_centers = {}
         self.bin_widths = {}
@@ -49,21 +41,20 @@ class Plotter(BasePlotter):
         self.xmin = float('inf')
         self.ymax = float('-inf')
         self.ymin = float('inf')
+
+        self.target_values = data[target].unique()
+
         for column in columns:
-            # TODO Optional handle chunk wise dataframes from root_pandas
-            if column not in binning:
-                # Create histograms for signal and background with the same binning
-                _, patches = numpy.histogram(data[column], bins=100, weights=None if weight is None else data[weight])
-            else:
-                patches = binning[column]
-            signal_data = data[data[target] == 1]
-            bckgrd_data = data[data[target] == 0]
-            signal_hist, _ = numpy.histogram(signal_data[column], bins=patches,
-                                             weights=None if weight is None else signal_data[weight])
-            bckgrd_hist, _ = numpy.histogram(bckgrd_data[column], bins=patches,
-                                             weights=None if weight is None else bckgrd_data[weight])
-            self.signal[column] = signal_hist.astype('float')
-            self.bckgrd[column] = bckgrd_hist.astype('float')
+            _, patches = numpy.histogram(data[column], bins=100, weights=None if weight is None else data[weight])
+            self.hists[column] = {}
+            for t in self.target_values:
+                t_data = data[data[target] == t]
+                hist, _ = numpy.histogram(t_data[column], bins=patches,
+                                          weights=None if weight is None else t_data[weight])
+                self.ymax = numpy.nanmax([hist.max(), hist.max(), self.ymax])
+                self.ymin = numpy.nanmin([hist.min(), hist.min(), self.ymin])
+                self.hists[column][t] = hist.astype('float')
+
             # Save binning
             self.bin_patches[column] = patches
             self.bin_centers[column] = (numpy.roll(patches, 1) + patches)[1:] / 2.0
@@ -71,18 +62,54 @@ class Plotter(BasePlotter):
             # Save maximum and minimum for x and y dimension
             self.xmax = numpy.nanmax([data[column].max(), self.xmax])
             self.xmin = numpy.nanmin([data[column].min(), self.xmin])
-            self.ymax = numpy.nanmax([signal_hist.max(), bckgrd_hist.max(), self.ymax])
-            self.ymin = numpy.nanmin([signal_hist.min(), bckgrd_hist.min(), self.ymin])
 
-    def roc_plot(self, axis):
+    def add_data(self, data):
+        for column in self.columns:
+            self.target_values = numpy.unique(numpy.r_[self.target_values, data[target].unique()])
+            for t in self.target_value:
+                t_data = data[data[target] == t]
+                hist, _ = numpy.histogram(t_data[column], bins=self.patches[column],
+                                          weights=None if self.weight is None else t_data[self.weight])
+                self.ymax = numpy.nanmax([hist.max(), hist.max(), self.ymax])
+                self.ymin = numpy.nanmin([hist.min(), hist.min(), self.ymin])
+                if t in self.hists[column]:
+                    self.hists[column][t] += hist
+                else:
+                    self.hists[column][t] = hist
+            self.xmax = numpy.nanmax([data[column].max(), self.xmax])
+            self.xmin = numpy.nanmin([data[column].min(), self.xmin])
+
+    def set_plot_options(self,
+                         plot_kwargs={},
+                         errorbar_kwargs={'fmt': '.', 'elinewidth': 0.5, 'alpha': 0.5},
+                         errorband_kwargs={'alpha': 0.5}):
+        self.plot_kwargs = plot_kwargs
+        self.errorbar_kwargs = errorbar_kwargs
+        self.errorband_kwargs = errorband_kwargs
+
+    def datapoint_plot(self, axis, x, y, xerr=None, yerr=None, label=None):
+        p = e = f = color = None
+        if self.plot_kwargs is not None:
+            p, = axis.plot(x, y, label=label, **self.plot_kwargs)
+            color = matplotlib.colors.ColorConverter().to_rgb(p.get_color())
+        if self.errorbar_kwargs is not None:
+            darker_color = map(lambda x: 0.5*x, color)
+            e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, color=color, ecolor=darker_color, **self.errorbar_kwargs)
+        if self.errorband_kwargs is not None:
+            f = axis.fill_between(x, y-yerr, y+yerr, color=color, **self.errorband_kwargs)
+        return (p, e, f)
+
+    def roc_purity_plot(self, axis, signal_values, bckgrd_values):
         plots = []
         ymax = float(1)
         ymin = float(0)
         xmax = float(1)
         xmin = float(0)
         for column in self.columns:
-            signal = self.signal[column]
-            bckgrd = self.bckgrd[column]
+            bin_centers = self.bin_centers[column]
+            default = numpy.zeros(len(bin_centers))
+            signal = numpy.sum(self.hists[column].get(s, default) for s in signal_values)
+            bckgrd = numpy.sum(self.hists[column].get(b, default) for b in bckgrd_values)
 
             cumsignal = (signal.sum() - signal.cumsum()).astype('float')
             cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
@@ -102,21 +129,19 @@ class Plotter(BasePlotter):
 
         axis.set_xlim((xmin, xmax))
         axis.set_ylim((ymin, ymax))
-        axis.get_xaxis().set_label_text('Efficiency')
-        axis.get_yaxis().set_label_text('Purity')
-        axis.set_title('ROC Plot')
-        axis.legend(handles=plots,  loc=3)
         return plots
 
-    def roc2_plot(self, axis):
+    def roc_rejection_plot(self, axis, signal_values, bckgrd_values):
         plots = []
         ymax = float(1)
         ymin = float(0)
         xmax = float(1)
         xmin = float(0)
         for column in self.columns:
-            signal = self.signal[column]
-            bckgrd = self.bckgrd[column]
+            bin_centers = self.bin_centers[column]
+            default = numpy.zeros(len(bin_centers))
+            signal = numpy.sum(self.hists[column].get(s, default) for s in signal_values)
+            bckgrd = numpy.sum(self.hists[column].get(b, default) for b in bckgrd_values)
 
             cumsignal = (signal.sum() - signal.cumsum()).astype('float')
             cumbckgrd = (bckgrd.cumsum()).astype('float')
@@ -137,21 +162,19 @@ class Plotter(BasePlotter):
 
         axis.set_xlim((xmin, xmax))
         axis.set_ylim((ymin, ymax))
-        axis.get_xaxis().set_label_text('Signal Efficiency')
-        axis.get_yaxis().set_label_text('Background Rejection')
-        axis.set_title('ROC Plot')
-        axis.legend(handles=plots,  loc=3)
         return plots
 
-    def diag_plot(self, axis, line=None):
+    def diagonal_plot(self, axis, signal_values, bckgrd_values):
         plots = []
         ymax = float(1)
         ymin = float(0)
         for column in self.columns:
-            signal = self.signal[column]
-            bckgrd = self.bckgrd[column]
             bin_centers = self.bin_centers[column]
             bin_widths = self.bin_widths[column]
+
+            default = numpy.zeros(len(bin_centers))
+            signal = numpy.sum(self.hists[column].get(s, default) for s in signal_values)
+            bckgrd = numpy.sum(self.hists[column].get(b, default) for b in bckgrd_values)
 
             purity = signal / (signal + bckgrd)
             purity_error = binom_error(signal, signal + bckgrd)
@@ -162,116 +185,148 @@ class Plotter(BasePlotter):
             p = self.datapoint_plot(axis, bin_centers, purity, xerr=bin_widths, yerr=purity_error, label=column)
             plots.append(p)
 
-        axis.plot((self.xmin, self.xmax) if line is None else line, (0, 1), color='black')
+        axis.plot((self.xmin, self.xmax), (0, 1), color='black')
         axis.set_xlim((self.xmin, self.xmax))
-
         axis.set_ylim((ymin, ymax))
-        axis.get_xaxis().set_label_text(self.quantity)
-        axis.get_yaxis().set_label_text('Purity')
-        axis.set_title('Diagonal Plot')
-        axis.legend(handles=plots, loc=4)
         return plots
 
-    def dist_plot(self, axis):
+    def distribution_plot(self, axis, values):
         plots = []
         ymax = float('-inf')
         ymin = float(0)
         for column in self.columns:
-            signal = self.signal[column]
-            bckgrd = self.bckgrd[column]
             bin_centers = self.bin_centers[column]
             bin_widths = self.bin_widths[column]
 
-            signal_error = poisson_error(signal)
-            bckgrd_error = poisson_error(bckgrd)
+            default = numpy.zeros(len(bin_centers))
+            for v in values:
+                hist = numpy.sum(self.hists[column].get(s, default) for s in v)
+                hist_error = poisson_error(hist)
+                ymax = numpy.nanmax([hist.max() + hist_error.max(), ymax])
+                ymin = numpy.nanmin([hist.min(), ymin])
 
-            ymax = numpy.nanmax([signal.max() + signal_error.max(), bckgrd.max() + bckgrd_error.max(), ymax])
-            ymin = numpy.nanmin([signal.min(), bckgrd.min(), ymin])
+                p = self.datapoint_plot(axis, bin_centers, hist, xerr=bin_widths, yerr=hist_error, label=column + ' ' + str(v))
+                plots.append(p)
 
-            p = self.datapoint_plot(axis, bin_centers, signal, xerr=bin_widths, yerr=signal_error, label=column + ' Signal')
-            plots.append(p)
-            p = self.datapoint_plot(axis, bin_centers, bckgrd, xerr=bin_widths, yerr=bckgrd_error, label=column + ' Background')
+        axis.set_xlim((self.xmin, self.xmax))
+        axis.set_ylim((ymin, ymax))
+        return plots
+
+    def difference_plot(self, axis, signal_values, bckgrd_values):
+        plots = []
+        ymax = float('-inf')
+        ymin = float('inf')
+        for column in self.columns:
+            bin_centers = self.bin_centers[column]
+            bin_widths = self.bin_widths[column]
+
+            default = numpy.zeros(len(bin_centers))
+            signal = numpy.sum(self.hists[column].get(s, default) for s in signal_values)
+            bckgrd = numpy.sum(self.hists[column].get(b, default) for b in bckgrd_values)
+
+            hist = signal - bckgrd
+            hist_error = poisson_error(signal + bckgrd)
+
+            ymax = numpy.nanmax([hist.max() + hist_error.max(), ymax])
+            ymin = numpy.nanmin([hist.min() - hist_error.max(), ymin])
+            p = self.datapoint_plot(axis, bin_centers, hist, xerr=bin_widths, yerr=hist_error,
+                                    label=column + '(' + str(signal_values) + ' - ' + str(bckgrd_values) + ')')
             plots.append(p)
 
         axis.set_xlim((self.xmin, self.xmax))
         axis.set_ylim((ymin, ymax))
-        axis.get_xaxis().set_label_text(self.quantity)
-        axis.get_yaxis().set_label_text('N')
-        axis.set_title('Distribution Plot')
-        axis.legend(handles=plots,  loc=4)
         return plots
 
 
-class ComparisonPlotter(BasePlotter):
-    def __init__(self, data_a, data_b, column_a='Train', column_b='Test', target='isSignal', weight=None):
+def roc_purity_plot(plotter, axis, signal='Signal', background='Background'):
+    plots = plotter.roc_purity_plot(axis, signal_values=[signal], bckgrd_values=[background])
+    axis.set_title("ROC Purity Plot")
+    axis.get_xaxis().set_label_text('Efficiency')
+    axis.get_yaxis().set_label_text('Purity')
+    axis.legend(handles=map(lambda x: x[0], plots), loc=3)
 
-        # Create a common binning for data_a and data_b
-        _, patches = numpy.histogram(numpy.r_[data_a[column_a], data_b[column_b]], bins=100,
-                                     weights=None if weight is None else numpy.r_[data_a[weight], data_b[weight]])
 
-        self.plotter_a = Plotter(data_a, columns=[column_a], target=target, weight=weight, binning={column_a: patches})
-        self.plotter_b = Plotter(data_b, columns=[column_b], target=target, weight=weight, binning={column_b: patches})
+def roc_rejection_plot(plotter, axis, signal='Signal', background='Background'):
+    plots = plotter.roc_rejection_plot(axis, signal_values=[signal], bckgrd_values=[background])
+    axis.set_title("ROC Rejection Plot")
+    axis.get_xaxis().set_label_text('Signal Efficiency')
+    axis.get_yaxis().set_label_text('Background Rejection')
+    axis.legend(handles=map(lambda x: x[0], plots), loc=3)
 
-        self.column_a = column_a
-        self.column_b = column_b
-        self.bin_patches = self.plotter_a.bin_patches[column_a]
-        self.bin_centers = self.plotter_a.bin_centers[column_a]
-        self.bin_widths = self.plotter_a.bin_widths[column_a]
-        self.xmax = numpy.nanmax([self.plotter_a.xmax, self.plotter_b.xmax])
-        self.xmin = numpy.nanmin([self.plotter_a.xmin, self.plotter_b.xmin])
-        self.ymax = numpy.nanmax([self.plotter_a.ymax, self.plotter_b.ymax])
-        self.ymin = numpy.nanmin([self.plotter_a.ymin, self.plotter_b.ymin])
-        self.signal_a = self.plotter_a.signal[column_a]
-        self.signal_b = self.plotter_b.signal[column_b]
-        self.bckgrd_a = self.plotter_a.bckgrd[column_a]
-        self.bckgrd_b = self.plotter_b.bckgrd[column_b]
 
-        # Kolmogorov-Smirnov test on the data itself, not the bins (TODO better way to use binned data and its errors?)
-        self.ks_sig = scipy.stats.ks_2samp(data_a[data_a[target] == 1][column_a], data_b[data_b[target] == 1][column_b])
-        self.ks_bck = scipy.stats.ks_2samp(data_a[data_a[target] == 0][column_a], data_b[data_b[target] == 0][column_b])
+def diagonal_plot(plotter, axis, signal='Signal', background='Background'):
+    plots = plotter.diagonal_plot(axis, signal_values=[signal], bckgrd_values=[background])
+    axis.set_title("Diagonal Plot")
+    axis.get_xaxis().set_label_text('Classifier Output')
+    axis.get_yaxis().set_label_text('Purity')
+    axis.legend(handles=map(lambda x: x[0], plots), loc=4)
 
-    def dist_plot(self, axis):
-        plots = self.plotter_a.dist_plot(axis) + self.plotter_b.dist_plot(axis)
-        axis.set_xlim((self.xmin, self.xmax))
-        axis.set_ylim((0, self.ymax))
-        axis.legend(handles=plots, loc=3,
-                    # bbox_to_anchor=(0., -0.175, 1., .102), ncol=2, mode="expand", borderaxespad=0.
-                    )
-        axis.text(0.02, 0.96, "Kolmogorov-Smirnov test: signal (background) probability = {sig:.3f} ({bck:.3f})".format(
-                  sig=self.ks_sig[1], bck=self.ks_bck[1]),
-                  size=28, transform=axis.transAxes, bbox=dict(boxstyle="square,pad=0.3", fc="white", ec="w", lw=0, alpha=0))
-        return plots
 
-    def diff_plot(self, axis_signal, axis_bckgrd):
-        signal = self.signal_a - self.signal_b
-        signal_error = poisson_error(self.signal_a + self.signal_b)
-        bckgrd = self.bckgrd_a - self.bckgrd_b
-        bckgrd_error = poisson_error(self.bckgrd_a + self.bckgrd_b)
+def distribution_plot(plotter, axis):
+    plots = plotter.distribution_plot(axis, [['Signal'], ['Background']])
+    axis.set_title("Distribution Plot")
+    axis.get_xaxis().set_label_text('Classifier Output')
+    axis.get_yaxis().set_label_text('N')
+    axis.legend(map(lambda x: x[0], plots), sum(([x + '(Signal)', x + '(Background)'] for x in plotter.columns), []), loc=4)
 
-        ymin = min((signal-signal_error).min(), (bckgrd-bckgrd_error).min())
-        ymax = max((signal+signal_error).max(), (bckgrd+bckgrd_error).max())
 
-        p_signal = self.datapoint_plot(axis_signal, self.bin_centers, signal, xerr=self.bin_widths, yerr=signal_error,
-                                       label='(' + self.column_a + ' - ' + self.column_b + ') Signal')
-        axis_signal.set_xlim((self.xmin, self.xmax))
-        axis_signal.set_ylim(((signal-signal_error).min(), (signal+signal_error).max()))
-        axis_signal.get_xaxis().set_label_text(self.quantity)
-        axis_signal.get_yaxis().set_label_text('Difference')
-        axis_signal.legend(handles=[p_signal],  loc=4)
-        axis_signal.set_title('Signal Difference Plot')
+def difference_plot(plotter, axis, signal='Signal', background='Background'):
+    plots = plotter.difference_plot(axis, signal_values=[signal], bckgrd_values=[background])
+    axis.set_title("Difference Plot")
+    axis.get_xaxis().set_label_text('Classifier Output')
+    axis.get_yaxis().set_label_text('Difference')
+    axis.legend(handles=map(lambda x: x[0], plots), loc=4)
 
-        p_bckgrd = self.datapoint_plot(axis_bckgrd, self.bin_centers, bckgrd, xerr=self.bin_widths, yerr=bckgrd_error,
-                                       label='(' + self.column_a + ' - ' + self.column_b + ') Background')
-        axis_bckgrd.set_xlim((self.xmin, self.xmax))
-        axis_bckgrd.set_ylim(((bckgrd-bckgrd_error).min(), (bckgrd+bckgrd_error).max()))
-        axis_bckgrd.get_xaxis().set_label_text(self.quantity)
-        axis_bckgrd.get_yaxis().set_label_text('Difference')
-        axis_bckgrd.legend(handles=[p_bckgrd],  loc=4)
-        axis_bckgrd.set_title('Background Difference Plot')
-        return (p_signal, p_bckgrd)
+
+def overtraining_plot(plotter, axes,
+                      train_signal='Train-Signal', test_signal='Test-Signal',
+                      train_background='Train-Background', test_background='Test-Background'):
+    if len(plotter.columns) != 1:
+        raise RuntimeError('Overtraining plot with more than one column is not supported')
+    c = plotter.columns[0]
+
+    plots = plotter.distribution_plot(axes[0], [[train_signal], [test_signal], [train_background], [test_background]])
+    axes[0].set_title("Distribution Plot")
+    axes[0].get_xaxis().set_label_text('Classifier Output')
+    axes[0].get_yaxis().set_label_text('N')
+    axes[0].legend(map(lambda x: x[0], plots), [train_signal, test_signal, train_background, test_background], loc=4)
+    plotter.difference_plot(axes[1], [train_signal], [test_signal])
+    ks = scipy.stats.ks_2samp(plotter.hists[c][train_signal], plotter.hists[c][test_signal])
+    axes[1].set_title("Signal Difference Plot (Train - Test) KS = {ks:.3f}".format(ks=ks[1]))
+    axes[1].get_xaxis().set_label_text('Classifier Output')
+    axes[1].get_yaxis().set_label_text('Difference')
+    plotter.difference_plot(axes[2], [train_background], [test_background])
+    ks = scipy.stats.ks_2samp(plotter.hists[c][train_background], plotter.hists[c][test_background])
+    axes[2].set_title("Background Difference Plot (Train - Test) KS = {ks:.3f}".format(ks=ks[1]))
+    axes[2].get_xaxis().set_label_text('Classifier Output')
+    axes[2].get_yaxis().set_label_text('Difference')
+    plotter.difference_plot(axes[3], [train_background, train_signal], [test_background, test_signal])
+    axes[3].set_title("Total Difference Plot (Train - Test)")
+    axes[3].get_xaxis().set_label_text('Classifier Output')
+    axes[3].get_yaxis().set_label_text('Difference')
+
+
+def correlation_plot(data, background_mask, axis, x='FastBDT', y='NeuroBayes'):
+    quantiles = [30, 60, 90]
+    data[x + '_quantile'] = 0
+    for i, p in enumerate(numpy.percentile(data[x], q=quantiles)):
+        data.loc[data[x] > p, x + '_quantile'] = quantiles[i]
+
+    plotter = Plotter(data[background_mask], columns=[y], target=x + '_quantile')
+    plotter.set_plot_options(errorbar_kwargs=None, errorband_kwargs=None)
+    plotter.distribution_plot(axis, [[0] + quantiles, quantiles, quantiles[1:], quantiles[2:]])
+
+    axis.set_color_cycle(None)
+    plotter = Plotter(data, columns=[y], target=x + '_quantile')
+    plots = plotter.distribution_plot(axis, [[0] + quantiles, quantiles, quantiles[1:], quantiles[2:]])
+    axis.set_title(y + ' with different cuts on ' + x)
+    axis.get_xaxis().set_label_text(y)
+    axis.get_yaxis().set_label_text('N')
+    axis.legend(map(lambda x: x[0], plots), ['NoCut', 'Cut on 30% Quantile', 'Cut on 60% Quantile', 'Cut on 90% Quantile'], loc=4)
 
 
 def get_data(N, columns):
+    N /= 2
     n = len(columns) - 1
     xs = numpy.random.normal(0, size=(N, n))
     xb = numpy.random.normal(1, size=(N, n))
@@ -294,29 +349,42 @@ if __name__ == '__main__':
     seaborn.set(font_scale=3)
     seaborn.set_style('whitegrid')
 
-    # Do standard plots using plotter
+    # Standard plots
+    data = get_data(10000, columns=['FastBDT', 'NeuroBayes', 'isSignal'])
+    data['class'] = ''
+    data.loc[data['isSignal'] == 1, 'class'] = 'Signal'
+    data.loc[data['isSignal'] == 0, 'class'] = 'Background'
+    plotter = Plotter(data, columns=['FastBDT', 'NeuroBayes'], target='class')
+
     figure = matplotlib.figure.Figure(figsize=(20, 20))
     figure.set_tight_layout(True)
-    gs = matplotlib.gridspec.GridSpec(3, 1)
-
-    data = get_data(10000, columns=['FastBDT', 'NeuroBayes', 'isSignal'])
-    plotter = Plotter(data, columns=['FastBDT', 'NeuroBayes'], target='isSignal')
-    plotter.roc_plot(figure.add_subplot(gs[0, :]))
-    plotter.diag_plot(figure.add_subplot(gs[1, :]))
-    plotter.dist_plot(figure.add_subplot(gs[2, :]))
-
+    gs = matplotlib.gridspec.GridSpec(4, 1)
+    roc_purity_plot(plotter, figure.add_subplot(gs[0, :]))
+    roc_rejection_plot(plotter, figure.add_subplot(gs[1, :]))
+    diagonal_plot(plotter, figure.add_subplot(gs[2, :]))
+    distribution_plot(plotter, figure.add_subplot(gs[3, :]))
     write(figure, "comparison.png")
 
-    # Do overtraining plot using comparison plotter
+    # Correlation plot
     figure = matplotlib.figure.Figure(figsize=(20, 20))
     figure.set_tight_layout(True)
-    gs = matplotlib.gridspec.GridSpec(5, 4)
+    gs = matplotlib.gridspec.GridSpec(1, 1)
+    correlation_plot(data, data['class'] == 'Background', figure.add_subplot(gs[:, :]))
+    write(figure, "correlation.png")
 
-    train_data = get_data(5000, columns=['Train', 'isSignal'])
-    test_data = get_data(5000, columns=['Test', 'isSignal'])
+    # Overtraining plot
+    data['type'] = ''
+    data.type.iloc[:5000] = 'Train'
+    data.type.iloc[5000:] = 'Test'
+    data.loc[(data['isSignal'] == 1) & (data['type'] == 'Train'), 'class'] = 'Train-Signal'
+    data.loc[(data['isSignal'] == 1) & (data['type'] == 'Test'), 'class'] = 'Test-Signal'
+    data.loc[(data['isSignal'] == 0) & (data['type'] == 'Train'), 'class'] = 'Train-Background'
+    data.loc[(data['isSignal'] == 0) & (data['type'] == 'Test'), 'class'] = 'Test-Background'
+    plotter = Plotter(data, columns=['FastBDT'], target='class')
 
-    comparison_plotter = ComparisonPlotter(train_data, test_data)
-    comparison_plotter.dist_plot(figure.add_subplot(gs[:3, :]))
-    comparison_plotter.diff_plot(figure.add_subplot(gs[3, :]), figure.add_subplot(gs[4, :]))
-
+    figure = matplotlib.figure.Figure(figsize=(20, 20))
+    figure.set_tight_layout(True)
+    gs = matplotlib.gridspec.GridSpec(5, 1)
+    axes = [figure.add_subplot(gs[:2, :]), figure.add_subplot(gs[2, :]), figure.add_subplot(gs[3, :]), figure.add_subplot(gs[4, :])]
+    overtraining_plot(plotter, axes)
     write(figure, "overtraining.png")

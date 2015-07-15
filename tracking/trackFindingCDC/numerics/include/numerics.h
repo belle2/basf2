@@ -9,10 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <math.h>
-#include <utility>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
+#include <vector>
+#include <utility>
+#include <math.h>
 
 namespace Belle2 {
 
@@ -109,6 +110,8 @@ namespace Belle2 {
       return result;
     }
 
+    /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
+    std::vector<double> linspace(const double& start, const double& end, const int n);
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

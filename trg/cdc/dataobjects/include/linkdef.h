@@ -7,5 +7,6 @@
 
 // ROOT dictionaries will be build for all classes mentioned this way
 #pragma link C++ class Belle2::CDCTriggerSegmentHit+;
+#pragma link C++ class Belle2::CDCTriggerTrack+;
 
 #endif

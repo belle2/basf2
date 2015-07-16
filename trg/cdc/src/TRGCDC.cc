@@ -2096,6 +2096,7 @@ TRGCDC::fastSimulation(void) {
 
     // write tracks to datastore
     StoreArray<CDCTriggerTrack> storeTracks;
+    StoreArray<MCParticle> particles;
     for (unsigned itr = 0; itr < _trackList2DFitted.size(); ++itr) {
       const TCTrack* track2D;
       if (_trackList2D.size() > 0) {
@@ -2111,6 +2112,31 @@ TRGCDC::fastSimulation(void) {
         track->add2DFitResult(track2DFitted->pt(), track2DFitted->helix().phi0(), 0.);
       if (track3D->fitted())
         track->add3DFitResult(track3D->helix().dz(), track3D->helix().tanl(), 0.);
+      // relation to SegmentHits (from track3D to include both axial and stereo TS)
+      vector<TRGCDCLink*> links = track3D->links();
+      vector<unsigned> relParticleIds[nAxialSuperLayers()];
+      for (unsigned its = 0; its < links.size(); ++its) {
+        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        track->addRelationTo(segment->storeHit());
+        // get relation to MCParticles (derived from axial TS hits)
+        if (segment->axial()) {
+          unsigned iax = segment->storeHit()->getISuperLayer() / 2;
+          RelationVector<MCParticle> mcrel = segment->storeHit()->getRelationsFrom<MCParticle>();
+          for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
+            relParticleIds[iax].push_back(mcrel[imc]->getArrayIndex());
+          }
+        }
+      }
+      // make relations to MCParticles with proper weights
+      for (unsigned iax = 0; iax < nAxialSuperLayers(); ++iax) {
+        double weight = 1. / (nAxialSuperLayers() * relParticleIds[iax].size());
+        for (unsigned imc = 0; imc < relParticleIds[iax].size(); ++imc) {
+          track->addRelationTo(particles[relParticleIds[iax][imc]], weight);
+        }
+      }
+      RelationArray tracksToParticles(storeTracks, particles);
+      if (tracksToParticles.getEntries() > 0)
+        tracksToParticles.consolidate();
     }
 
     if (TRGDebug::level()>1) {

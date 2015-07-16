@@ -305,10 +305,13 @@ TRGCDCModule::initialize() {
     StoreArray<CDCTriggerSegmentHit>::registerPersistent();
     StoreArray<CDCTriggerSegmentHit> segmentHits;
     StoreArray<CDCTriggerTrack>::registerPersistent();
+    StoreArray<CDCTriggerTrack> tracks;
     StoreArray<CDCHit> cdcHits;
     StoreArray<MCParticle> mcparticles;
     segmentHits.registerRelationTo(cdcHits);
     mcparticles.registerRelationTo(segmentHits);
+    tracks.registerRelationTo(segmentHits);
+    tracks.registerRelationTo(mcparticles);
 }
 
 void

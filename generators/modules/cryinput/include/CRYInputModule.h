@@ -63,7 +63,7 @@ namespace Belle2 {
     double m_keepWidth;  /**< width of a box used to reject quickly non detector particles. */
     double m_keepHeight;  /**< height of a box used to reject quickly non detector particles. */
     double m_kineticEnergyThreshold;  /**< kinetic energy threshold. */
-    int m_maxTrials;
+    int m_maxTrials;  /**< maximum number of trials. */
 
     CRY m_generator;   /**< The CRY generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */

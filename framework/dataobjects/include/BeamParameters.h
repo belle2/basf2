@@ -54,7 +54,7 @@ namespace Belle2 {
      *     the matrix will not be checked but just the lower triangle will be used.
      *
      * @param energy beam energy
-     * @param angle angle between beam direction and z axis. Negative values are treatet as M_PI - abs(angle)
+     * @param angle angle between beam direction and z axis. Negative values are treated as M_PI - abs(angle)
      * @param cov entries of the covariance matrix.
      */
     void setHER(double energy, double angle, const std::vector<double>& cov);
@@ -71,7 +71,7 @@ namespace Belle2 {
      *     the matrix will not be checked but just the lower triangle will be used.
      *
      * @param energy beam energy
-     * @param angle angle between beam direction and z axis. Negative values are treatet as M_PI - abs(angle)
+     * @param angle angle between beam direction and z axis. Negative values are treated as M_PI - abs(angle)
      * @param cov entries of the covariance matrix.
      */
     void setLER(double energy, double angle, const std::vector<double>& cov);

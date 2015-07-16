@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/BeamParameters.h>
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
@@ -38,6 +39,7 @@
 #endif
 
 #include "belle_legacy/helix/Helix.h"
+#include "belle_legacy/benergy/BeamEnergy.h"
 
 using namespace Belle2;
 
@@ -122,6 +124,9 @@ void B2BIIConvertMdstModule::initializeDataStore()
   eclClusters.registerRelationTo(tracks);
   particles.registerRelationTo(mcParticles);
 
+  StoreObjPtr<BeamParameters> beamParams("", DataStore::c_Persistent);
+  beamParams.registerInDataStore();
+
   B2DEBUG(99, "[B2BIIConvertMdstModule::initializeDataStore] initialization of DataStore ended");
 }
 
@@ -129,6 +134,9 @@ void B2BIIConvertMdstModule::initializeDataStore()
 void B2BIIConvertMdstModule::beginRun()
 {
   B2INFO("B2BIIConvertMdst: beginRun called.");
+
+  //BeamEnergy class updated by fixmdst module in beginRun()
+  convertBeamEnergy();
 }
 
 
@@ -165,9 +173,28 @@ void B2BIIConvertMdstModule::event()
   //convertMdstVee2Table();
 }
 
+
 //-----------------------------------------------------------------------------
 // CONVERT TABLES
 //-----------------------------------------------------------------------------
+void B2BIIConvertMdstModule::convertBeamEnergy()
+{
+  StoreObjPtr<BeamParameters> beamParams("", DataStore::c_Persistent);
+
+  const double Eher = Belle::BeamEnergy::E_HER();
+  const double Eler = Belle::BeamEnergy::E_LER();
+  const double crossingAngle = Belle::BeamEnergy::Cross_angle();
+  const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
+  const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
+
+  std::vector<double> covariance; //0 entries = no error
+
+  if (!beamParams)
+    beamParams.create();
+  beamParams->setLER(Eler, angleLer, covariance);
+  beamParams->setHER(Eher, angleHer, covariance);
+}
+
 void B2BIIConvertMdstModule::convertMdstChargedTable()
 {
   // at this point MCParticles StoreArray should already exist

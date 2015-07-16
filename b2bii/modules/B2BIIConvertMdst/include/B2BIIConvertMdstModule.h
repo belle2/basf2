@@ -134,6 +134,9 @@ namespace Belle2 {
      */
     void convertMdstVee2Table();
 
+    /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
+    void convertBeamEnergy();
+
     //-----------------------------------------------------------------------------
     // CONVERT OBJECTS
     //-----------------------------------------------------------------------------

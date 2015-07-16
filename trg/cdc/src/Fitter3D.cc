@@ -493,10 +493,18 @@ namespace Belle2 {
         CLHEP::HepVector a(5); 
         a = aTrack.helix().a(); 
         aTrack.setFitted(1); 
+        if(m_mDouble["charge"]<0){
+          a[1] = fmod(m_mDouble["phi0"] + m_mConstD["Trg_PI"],2*m_mConstD["Trg_PI"]);
+        } else {
+          a[1] = m_mDouble["phi0"];
+        }
+        a[2] = 1/m_mDouble["pt"]*m_mDouble["charge"];
         a[3] = m_mDouble["z0"];  
         a[4] = m_mDouble["cot"]; 
         helix.a(a); 
         aTrack.setHelix(helix); 
+
+        //cout<<"charge="<<m_mDouble["charge"]<<" pt="<<m_mDouble["pt"]<<" phi_c="<<m_mDouble["phi0"]<<" z0="<<m_mDouble["z0"]<<" cot="<<m_mDouble["cot"]<<endl;
 
       ///////////////
       // Save values
@@ -816,6 +824,12 @@ namespace Belle2 {
         CLHEP::HepVector a(5); 
         a = aTrack.helix().a(); 
         aTrack.setFitted(1); 
+        if(m_mDouble["charge"]<0){
+          a[1] = fmod(m_mDouble["phi0"] + m_mConstD["Trg_PI"],2*m_mConstD["Trg_PI"]);
+        } else {
+          a[1] = m_mDouble["phi0"];
+        }
+        a[2] = 1/m_mDouble["pt"]*m_mDouble["charge"];
         a[3] = m_mDouble["z0"];  
         a[4] = m_mDouble["cot"]; 
         helix.a(a); 

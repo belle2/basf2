@@ -51,6 +51,7 @@
 #include "trg/cdc/HoughFinder.h"
 #include "trg/cdc/Hough3DFinder.h"
 #include "trg/cdc/Fitter3D.h"
+#include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
@@ -2092,6 +2093,42 @@ TRGCDC::fastSimulation(void) {
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
     //_fitter3D->doitComplex(_trackList3D);
+
+    if (TRGDebug::level()>1) {
+      for(unsigned iTrack=0; iTrack<_trackList3D.size(); iTrack++){
+        const TCTrack & aTrack = *_trackList3D[iTrack];
+        if (aTrack.fitted()) {
+          double fitPt = aTrack.pt();
+          double fitPhi0 = aTrack.helix().phi0();
+          int fitCharge = aTrack.charge();
+          if (fitCharge<0) {
+            fitPhi0 -= M_PI;
+            if (fitPhi0 < 0) fitPhi0 += 2 * M_PI;
+          }
+          double fitZ0 = aTrack.helix().dz();
+          double fitCot = aTrack.helix().tanl();
+          cout<<TRGDebug::tab()<<"Track["<<iTrack<<"]: charge="<<fitCharge<<" pt="<<fitPt<<" phi_c="<<fitPhi0<<" z0="<<fitZ0<<" cot="<<fitCot<<endl;
+          const TCRelation & trackRelation = aTrack.relation();
+          const MCParticle & trackMCParticle = trackRelation.mcParticle(0);
+          int mcCharge = trackMCParticle.getCharge();
+          double mcPt = trackMCParticle.getMomentum().Pt();
+          double mcPhi0 = 0.0;
+          if (mcCharge > 0) mcPhi0 = trackMCParticle.getMomentum().Phi() - M_PI / 2;
+          if (mcCharge < 0) mcPhi0 = trackMCParticle.getMomentum().Phi() + M_PI / 2;
+          // Change range to [0,2pi]
+          if (mcPhi0 < 0) mcPhi0 += 2 * M_PI;
+          // Calculated impact position
+          TVector3 vertex = trackMCParticle.getVertex();
+          TLorentzVector vector4 = trackMCParticle.get4Vector();
+          TVector2 helixCenter;
+          TVector3 impactPosition;
+          Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);
+          double mcZ0 = impactPosition.Z();
+          double mcCot = trackMCParticle.getMomentum().Pz() / trackMCParticle.getMomentum().Pt();
+          cout<<TRGDebug::tab()<<"Track["<<iTrack<<"]: mcCharge="<<mcCharge<<" mcPt="<<mcPt<<" mcPhi_c="<<mcPhi0<<" mcZ0="<<mcZ0<<" mcCot="<<mcCot<<endl;
+        }
+      }
+    }
 
     if (TRGDebug::level()) {
         cout << TRGDebug::tab() << "Number of 2D tracks : "

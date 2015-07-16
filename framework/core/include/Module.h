@@ -315,8 +315,7 @@ namespace Belle2 {
      * @return A reference to a module parameter having the correct type.
      */
     template<typename T>
-    ModuleParam<T>& getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
-        ModuleParamList::ModuleParameterTypeError);
+    ModuleParam<T>& getParam(const std::string& name) const;
 
     /** Create an independent copy of this module.
      *
@@ -532,8 +531,7 @@ namespace Belle2 {
   }
 
   template<typename T>
-  ModuleParam<T>& Module::getParam(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
-      ModuleParamList::ModuleParameterTypeError)
+  ModuleParam<T>& Module::getParam(const std::string& name) const
   {
     return m_moduleParamList.getParameter<T>(name);
   }

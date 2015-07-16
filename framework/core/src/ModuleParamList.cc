@@ -78,7 +78,7 @@ void ModuleParamList::setParameters(const ModuleParamList& params)
 //                                Private methods
 //==================================================================================
 
-ModuleParamPtr ModuleParamList::getParameterPtr(const std::string& name) const throw(ModuleParameterNotFoundError)
+ModuleParamPtr ModuleParamList::getParameterPtr(const std::string& name) const
 {
   //Check if a parameter with the given name exists
   std::map<std::string, ModuleParamPtr>::const_iterator mapIter;

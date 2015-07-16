@@ -115,7 +115,7 @@ namespace Belle2 {
      * @return A reference to a module parameter having the correct type.
      */
     template<typename T>
-    ModuleParam<T>& getParameter(const std::string& name) const throw(ModuleParameterNotFoundError, ModuleParameterTypeError);
+    ModuleParam<T>& getParameter(const std::string& name) const;
 
     /**
      * Returns true if unset parameters exist which the user has to set in the steering file.
@@ -181,7 +181,7 @@ namespace Belle2 {
      * @param name The unique name of the parameter.
      * @return A ModuleParamPtr to a module parameter.
      */
-    ModuleParamPtr getParameterPtr(const std::string& name) const throw(ModuleParameterNotFoundError);
+    ModuleParamPtr getParameterPtr(const std::string& name) const;
 
     /**
      * Returns the type identifier of the parameter as string.
@@ -251,8 +251,7 @@ namespace Belle2 {
 
 
   template<typename T>
-  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const throw(ModuleParameterNotFoundError,
-      ModuleParameterTypeError)
+  ModuleParam<T>& ModuleParamList::getParameter(const std::string& name) const
   {
     //Check if a parameter with the given name exists
     std::map<std::string, ModuleParamPtr>::const_iterator mapIter;

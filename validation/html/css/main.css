@@ -443,6 +443,7 @@ td.show
     display: none;
     margin-left: 18px;
     padding: 4px 0 4px 0;
+    border: 0 !important;
 }
 
 .plot_matrix {

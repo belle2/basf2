@@ -87,4 +87,12 @@ $(document).ready(function() {
 		});
 	});
 
+	// Toggle/untoggle list of ROOT files under packages
+        $(document.body).on('click', '.pkg_container_head', function() {
+		$('.pkg_container').each( function(){
+			$(this).hide();
+		});
+		$('.pkg_' + $(this).attr('name')).show();
+	});
+
 });

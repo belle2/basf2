@@ -24,6 +24,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 
 using namespace std;
 
@@ -303,6 +304,7 @@ TRGCDCModule::initialize() {
     // register DataStore elements
     StoreArray<CDCTriggerSegmentHit>::registerPersistent();
     StoreArray<CDCTriggerSegmentHit> segmentHits;
+    StoreArray<CDCTriggerTrack>::registerPersistent();
     StoreArray<CDCHit> cdcHits;
     StoreArray<MCParticle> mcparticles;
     segmentHits.registerRelationTo(cdcHits);

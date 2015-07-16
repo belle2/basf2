@@ -32,6 +32,7 @@
 #include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
+#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Layer.h"
@@ -55,7 +56,6 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
-#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 
 #define NOT_USE_SOCKETLIB
 //#define NOT_SEND
@@ -2093,6 +2093,25 @@ TRGCDC::fastSimulation(void) {
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
     //_fitter3D->doitComplex(_trackList3D);
+
+    // write tracks to datastore
+    StoreArray<CDCTriggerTrack> storeTracks;
+    for (unsigned itr = 0; itr < _trackList2DFitted.size(); ++itr) {
+      const TCTrack* track2D;
+      if (_trackList2D.size() > 0) {
+        track2D = _trackList2D[itr];
+      } else {
+        track2D = _trackList2DFitted[itr]; // in case of perfect finder
+      }
+      const TCTrack* track2DFitted = _trackList2DFitted[itr];
+      const TCTrack* track3D = _trackList3D[itr];
+      CDCTriggerTrack* track = storeTracks.appendNew();
+      track->add2DHoughResult(track2D->charge(), track2D->pt(), track2D->helix().phi0());
+      if (track2DFitted->fitted())
+        track->add2DFitResult(track2DFitted->pt(), track2DFitted->helix().phi0(), 0.);
+      if (track3D->fitted())
+        track->add3DFitResult(track3D->helix().dz(), track3D->helix().tanl(), 0.);
+    }
 
     if (TRGDebug::level()>1) {
       for(unsigned iTrack=0; iTrack<_trackList3D.size(); iTrack++){

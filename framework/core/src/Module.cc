@@ -253,16 +253,17 @@ void Module::setParamPythonDict(const boost::python::dict& dictionary)
 //                          Python API
 //=====================================================================
 
-boost::python::list* Module::getParamInfoListPython() const
+boost::shared_ptr<boost::python::list> Module::getParamInfoListPython() const
 {
   return m_moduleParamList.getParamInfoListPython();
 }
 
-/** Same as above member function, but return-by-value. */
-boost::python::list _getParamInfoListPython(const Module* m)
-{
-  boost::shared_ptr<boost::python::list> p(m->getParamInfoListPython());
-  return *p.get(); //copy
+namespace {
+  /** Same as above member function, but return-by-value. */
+  boost::python::list _getParamInfoListPython(const Module* m)
+  {
+    return *(m->getParamInfoListPython().get()); //copy the list object
+  }
 }
 
 #if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)

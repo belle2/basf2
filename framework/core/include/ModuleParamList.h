@@ -17,6 +17,8 @@
 
 #include <framework/core/PyObjConvUtils.h>
 
+#include <boost/shared_ptr.hpp>
+
 #include <map>
 #include <string>
 
@@ -137,7 +139,7 @@ namespace Belle2 {
      *
      * @return A python list containing the parameters of this parameter list.
      */
-    boost::python::list* getParamInfoListPython() const;
+    boost::shared_ptr<boost::python::list> getParamInfoListPython() const;
 
     /**
      * Implements a method for setting boost::python objects.

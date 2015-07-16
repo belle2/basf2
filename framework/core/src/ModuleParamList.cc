@@ -40,10 +40,9 @@ bool ModuleParamList::hasUnsetForcedParams() const
   });
 }
 
-boost::python::list* ModuleParamList::getParamInfoListPython() const
+boost::shared_ptr<boost::python::list> ModuleParamList::getParamInfoListPython() const
 {
-  // TODO Is this a memory leak?
-  boost::python::list* returnList = new boost::python::list;
+  boost::shared_ptr<boost::python::list> returnList(new boost::python::list);
   map<string, ModuleParamPtr>::const_iterator mapIter;
 
   for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); ++mapIter) {

@@ -336,7 +336,7 @@ namespace Belle2 {
      * a python list of all default values and the description of the parameter.
      * @return A python list containing the parameters of this parameter list.
      */
-    boost::python::list* getParamInfoListPython() const;
+    boost::shared_ptr<boost::python::list> getParamInfoListPython() const;
 
     /**
      * Exposes methods of the Module class to Python.

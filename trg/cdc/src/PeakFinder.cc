@@ -1252,29 +1252,28 @@ namespace Belle2 {
 
       //Y (vertical connection to lower neighbor)
       if (j > 80) {
-        // TODO: what about other case? cells in bottom row are still compared to left neighbor
         a = j - 80;
-      }
-      // loop over rest of candidates
-      for (unsigned k = 0; k < p1m.size(); k++) {
-        if (a == p1m[k][0]) {
-          aa = k;
-          // check connection to lower neighbor
-          // by predefined subpattern in 2x2 square
-          if (!udrel(p1m[aa], p1m[i])) {
-            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y no rel" << endl;
-            p1rel = false;
-          } else {
-            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y rel" << endl;
-            p1rel = true;
+        // loop over rest of candidates
+        for (unsigned k = 0; k < p1m.size(); k++) {
+          if (a == p1m[k][0]) {
+            aa = k;
+            // check connection to lower neighbor
+            // by predefined subpattern in 2x2 square
+            if (!udrel(p1m[aa], p1m[i])) {
+              if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y no rel" << endl;
+              p1rel = false;
+            } else {
+              if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y rel" << endl;
+              p1rel = true;
+            }
+            break;
           }
-          break;
         }
+        if (p1rel == true) {
+          continue;
+        }
+        p1rel = false;
       }
-      if (p1rel == true) {
-        continue;
-      }
-      p1rel = false;
 
       //Z (diagonal connection to lower left)
       if (j > 80) {

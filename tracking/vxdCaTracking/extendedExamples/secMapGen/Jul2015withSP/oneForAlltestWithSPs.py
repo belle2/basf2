@@ -43,7 +43,7 @@ initialValue = 3  # want random events, if set to 0
 
 
 # flags for GFTC2SPTC
-checkTH = False
+checkTH = True
 
 
 # flags for the pGun
@@ -614,7 +614,7 @@ else:
     main.add_module(analyzer2)
 
 if generateSecMap:
-    set_nprocesses(6)
+    set_nprocesses(7)
 else:
     set_nprocesses(0)
 

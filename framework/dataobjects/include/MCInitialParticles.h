@@ -126,7 +126,7 @@ namespace Belle2 {
   {
     TLorentzVector beam = m_her + m_ler;
     // Transformation from Lab system to CMS system
-    m_labToCMS = new TLorentzRotation(beam.BoostVector());
+    m_labToCMS = new TLorentzRotation(-beam.BoostVector());
     // boost HER e- from Lab system to CMS system
     const TLorentzVector electronCMS = (*m_labToCMS) * m_her;
     // now rotate CMS such that incomming e- is parallel to z-axis

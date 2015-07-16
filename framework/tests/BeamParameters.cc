@@ -9,6 +9,22 @@ using namespace std;
 using namespace Belle2;
 
 namespace {
+  TEST(BeamParameters, BoostUpsilon4SToLab)
+  {
+    BeamParameters beamparams;
+    //some values from Belle
+    beamparams.setLER(3.49841, M_PI, std::vector<double>());
+    beamparams.setHER(7.99638, 0.022, std::vector<double>());
+
+    TLorentzVector upsVec = beamparams.getHER() + beamparams.getLER();
+    const double mUpsilon = 10.5794;
+    TLorentzVector upsVecCMS = upsVec.Transform(beamparams.getLabToCMS());
+    EXPECT_TRUE(fabs(upsVecCMS.E() - mUpsilon) < 1e-2);
+    EXPECT_TRUE(fabs(upsVecCMS.X()) < 1e-15);
+    EXPECT_TRUE(fabs(upsVecCMS.Y()) < 1e-15);
+    EXPECT_TRUE(fabs(upsVecCMS.Z()) < 1e-15);
+  }
+
   /** Check if covariance matrix can be set from TMatrixDSym and that the upper
    * triangle is used */
   TEST(BeamParameters, CovFromMatrix)

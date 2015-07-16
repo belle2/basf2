@@ -15,7 +15,7 @@
 #    ./B2A701-ContinuumSuppressionExample.py mc35_ccbar_BGx0_s00.root mc35_ccbar_BGx0_s00.mdst.root
 #  -Queue (for the entire /mc35_ccbar_BGx0_s00/* directory):
 #    bsub -q l -e error_mc35_ccbar_BGx0_s00.log -o output_mc35_ccbar_BGx0_s00.log
-#     'basf2 ./rec_Bd_KsPi0.py mc35_ccbar_BGx0_s00.root mc35_ccbar_BGx0_s00.mdst.root
+#     'basf2 ./B2A701-ContinuumSuppressionExample.py mc35_ccbar_BGx0_s00.root mc35_ccbar_BGx0_s00.mdst.root
 #      -i "/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx0/mc35_ccbar_BGx0_s00/*"'
 #
 # This will produce a flat ntuple along with a skimmed mdst.root file

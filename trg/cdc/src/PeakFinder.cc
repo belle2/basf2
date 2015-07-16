@@ -284,6 +284,12 @@ namespace Belle2 {
   ////////////////////////////////////////////////
 
   ///...rlrel...
+  // right/left neighboring 2x2 squares
+  // a3 a4 | b3 b4
+  // a1 a2 | b1 b2
+  // unconnected if
+  // x x | . x   or    x . | x x
+  // x x | . x         x . | x x
   bool rlrel(vector<unsigned> a, vector<unsigned> b)
   {
     bool t = true;
@@ -298,6 +304,18 @@ namespace Belle2 {
     return t;
   }
   ///...udrel...
+  // up/down neighboring 2x2 squares
+  // b3 b4
+  // b1 b2
+  // -----
+  // a3 a4
+  // a1 a2
+  // unconnected if
+  // x x      x x     . .
+  // x x      . .     . .
+  // ---  or  ---  or ---
+  // . .      . .     x x
+  // . .      x x     x x
   bool udrel(vector<unsigned> a, vector<unsigned> b)
   {
     bool t = true;
@@ -317,6 +335,16 @@ namespace Belle2 {
     return t;
   }
   ///...mirel...
+  // diagonal neighboring 2x2 squares
+  //       b3 b4
+  //       b1 b2
+  // a3 a4
+  // a1 a2
+  // unconnected if
+  //     x x          x x           . x
+  //     . x          x x           . x
+  // x .      or  x .      or   x x
+  // x x          x .           x x
   bool mirel(vector<unsigned> a, vector<unsigned> b)
   {
     bool t = true;
@@ -335,17 +363,35 @@ namespace Belle2 {
     return t;
   }
 
-  ///...Find center Pattern1 form Pattern 2
+  ///...Find center Pattern1 from Pattern 2
+  // Pattern 2 is a 3x3 square of shape
+  // a6 a7 a8
+  // a3 a4 a5
+  // a0 a1 a2
+  // function returns index of peak depending on pattern
+  // (a2, a5 and a8 are ignored)
   unsigned short FindCP1(vector<unsigned> a)
   {
     unsigned center = 0;
     //...1...
+    //(x on, . off, return O)
+    // . .
+    // . .
+    // O .
     if (a[0] == 1 && a[1] == 0 && a[3] == 0 && a[4] == 0 && a[6] == 0 && a[7] == 0) {center = 0;}
     //...2...
+    //(x on, . off, return O)
+    // . .   . .   . .
+    // . .   x .   . x
+    // O x   O .   O .
     if (a[0] == 1 && a[1] == 1 && a[3] == 0 && a[4] == 0 && a[6] == 0 && a[7] == 0) {center = 0;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 0 && a[6] == 0 && a[7] == 0) {center = 0;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 0 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 0;}
     //...3...
+    //(x on, . off, return O)
+    // . .   . .   . .   x .   . x   x .   . x
+    // x .   . x   x x   O .   O .   . O   . O
+    // O x   O x   O .   x .   x .   x .   x .
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 0 && a[6] == 0 && a[7] == 0) {center = 0;}
     if (a[0] == 1 && a[1] == 1 && a[3] == 0 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 0;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 0;}
@@ -354,6 +400,10 @@ namespace Belle2 {
     if (a[0] == 1 && a[1] == 0 && a[3] == 0 && a[4] == 1 && a[6] == 1 && a[7] == 0) {center = 4;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 0 && a[4] == 1 && a[6] == 0 && a[7] == 1) {center = 4;}
     //...4...
+    //(x on, . off, return O)
+    // . .   x .   . x   x .   . x   x .   . x   x x   x x
+    // x x   O .   O .   . O   . O   O x   O x   O .   . O
+    // O x   x x   x x   x x   x x   x .   x .   x .   x .
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 0;}
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 0 && a[6] == 1 && a[7] == 0) {center = 3;}
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 0 && a[6] == 0 && a[7] == 1) {center = 3;}
@@ -364,17 +414,29 @@ namespace Belle2 {
     if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 0 && a[6] == 1 && a[7] == 1) {center = 3;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 0 && a[4] == 1 && a[6] == 1 && a[7] == 1) {center = 4;}
     //...5...
+    //(x on, . off, return O)
+    // x .   . x   x x   x x   x x
+    // O x   O x   O .   . O   O x
+    // x x   x x   x x   x x   x .
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 1 && a[6] == 1 && a[7] == 0) {center = 3;}
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 1 && a[6] == 0 && a[7] == 1) {center = 3;}
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 0 && a[6] == 1 && a[7] == 1) {center = 3;}
     if (a[0] == 1 && a[1] == 1 && a[3] == 0 && a[4] == 1 && a[6] == 1 && a[7] == 1) {center = 4;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 1 && a[6] == 1 && a[7] == 1) {center = 3;}
     //...6...
+    //(x on, . off, return O)
+    // x x
+    // O x
+    // x x
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 1 && a[6] == 1 && a[7] == 1) {center = 3;}
     return center;
   }
 
   ///...Pattern1 Center...
+  // Pattern 1 is a 2x2 square of shape
+  // a3 a4
+  // a1 a2
+  // function returns index of peak depending on pattern
   unsigned FindP1C(vector<unsigned> a)
   {
     unsigned hits = 0;
@@ -383,6 +445,9 @@ namespace Belle2 {
       if (a[k] == 1) {hits++;}
     }
     //...1...
+    //(x on, . off, return O)
+    // . .   . .   O .   . O
+    // O .   . O   . .   . .
     if (hits == 1) {
       if (a[1] == 1 && a[2] == 0 && a[3] == 0 && a[4] == 0) {center = 1;}
       if (a[1] == 0 && a[2] == 1 && a[3] == 0 && a[4] == 0) {center = 2;}
@@ -391,19 +456,22 @@ namespace Belle2 {
 
     }
     //...2...
+    //(x on, . off, return O)
+    // . .   x .   . x   x .   . x   O x
+    // O x   O .   O .   . O   . O   . .
     if (hits == 2) {
       if (a[1] == 1 && a[2] == 1 && a[3] == 0 && a[4] == 0) {center = 1;}
       if (a[1] == 1 && a[2] == 0 && a[3] == 1 && a[4] == 0) {center = 1;}
       if (a[1] == 1 && a[2] == 0 && a[3] == 0 && a[4] == 1) {center = 1;}
-
-
       if (a[1] == 0 && a[2] == 1 && a[3] == 1 && a[4] == 0) {center = 2;}
       if (a[1] == 0 && a[2] == 1 && a[3] == 0 && a[4] == 1) {center = 2;}
-
       if (a[1] == 0 && a[2] == 0 && a[3] == 1 && a[4] == 1) {center = 3;}
 
     }
     //...3...
+    //(x on, . off, return O)
+    // x .   . x   O x   x O
+    // O x   x O   x .   . x
     if (hits == 3) {
       if (a[1] == 1 && a[2] == 1 && a[3] == 1 && a[4] == 0) {center = 1;}
       if (a[1] == 1 && a[2] == 1 && a[3] == 0 && a[4] == 1) {center = 2;}
@@ -413,6 +481,9 @@ namespace Belle2 {
 
     }
     //...4...
+    //(x on, . off, return O)
+    // O x
+    // x x
     if (hits == 4) {
       if (a[1] == 1 && a[2] == 1 && a[3] == 1 && a[4] == 1) {center = 3;}
 
@@ -1033,7 +1104,6 @@ namespace Belle2 {
                                 const unsigned threshold,
                                 vector<vector<unsigned>>& peak_xy) const
   {
-
     const string sn = "p1p2";
     TRGDebug::enterStage(sn);
 
@@ -1042,6 +1112,9 @@ namespace Belle2 {
     static unsigned* candidates =
       (unsigned*) malloc(nCells * sizeof(unsigned));
     unsigned nActive = 0;
+    // only upper half of hough plane is used here (iy >= 11)
+    // TODO: implications on limits should be checked carefully
+    // can this be avoided?
     for (unsigned j = 11; j < hp.nY(); j++) {
       //minus x direction ,  plus  -x direction
       if ((hp.name()) == "circle hough minus")
@@ -1066,15 +1139,18 @@ namespace Belle2 {
 
     vector<unsigned> p;
     vector< vector<unsigned> > p1m;
-//iw vector< vector<unsigned> > peak_xy;
     unsigned short no = 0;
     //...create pattern1...begin
+    // divide the plane into squares of 2x2
+    // outer loop (n x m) goes over the squares,
+    // inner loop (j x k) goes over the cells in each square
+    // TODO: avoid hard coded limits?
     for (unsigned n = 0; n < 13; n++) {
       for (unsigned m = 0; m < 80; m++) {
         unsigned a = 0;
         unsigned b = 0;
         bool ot = false;
-        ++no;
+        ++no; // numbering starts at 1, not 0
         p.push_back(no);
         a = m * 2;
         b = n * 2;
@@ -1082,18 +1158,18 @@ namespace Belle2 {
         //...find 4 cells...begin
         for (unsigned j = 0; j < 2; j++) {
           unsigned yy = 0;
-          yy = 11 + b + j;
-          //cout <<"y="<<yy<<endl;//testp1
+          yy = 11 + b + j; // again offset of 11
           for (unsigned k = 0; k < 2; k++) {
             unsigned xx = 0;
             xx = a + k;
-            //cout <<"x="<<xx<<endl;//testp1
-            ///Plus plane transform
+            // Plus plane transform (x axis mirrored compared to minus plane)
             if ((hp.name()) == "circle hough plus") {
               int ixx = xx;
               xx = abs(ixx - 159);
             }
 
+            // go over the candidates and look for candidate in current cell
+            // if cell is peak candidate, add 1 to p, else add 0
             unsigned short t = 0;
             for (unsigned i = 0; i < nActive; i++) {
               unsigned id1 = candidates[i];
@@ -1111,65 +1187,59 @@ namespace Belle2 {
         }
         //...find 4 cells...end
 
+        // p = [n a b c d]
+        // n: number of 2x2 square
+        // a b c d: on/off flag for cells in 2x2 square
+        // shape:
+        //  c d
+        //  a b
         if (ot == true) {
           p1m.push_back(p);
         }
 
-        /*for(vector<vector<unsigned> >::size_type l=0;l<p1m.size();l++)
-          {for(vector<unsigned>::size_type m=0;m<p1m[l].size();m++)
-          cout<<"p1m["<<l<<"]="<<p1m[l][m]<<endl;
-          cout <<"========"<<endl; } *///testp1
-//for(vector<unsigned>::size_type l=0;l<p.size();l++)
-//cout <<"p["<<no<<"]="<<p[l]<<endl;
-//cout <<"========"<<endl;  //testp1
         vector<unsigned>().swap(p);
       }
     }
-//cout << "size of p1m=" << p1m.size() << endl; //JB: Please use TRGDebug
     if (TRGDebug::level()) cout << TRGDebug::tab() << "size of p1m=" << p1m.size() << endl;
-//cout << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl; //JB: Please use TRGDebug
     if (TRGDebug::level()) cout << TRGDebug::tab() << "~~~~~~~~~~~~~~~~~~~~~~~~~pattern1~~~~~~~~~~~~~~~~~~~" << endl;
-//...create pattern1...end   (output p1m)
+    //...create pattern1...end   (output p1m)
 
 
-//...Pattern2 & Find Peak...begin
-    //cout << ">>>>>>>>>>Pattern 2 & Find Peak Begin!!!>>>>>>>>>>" << endl; //JB: Please use TRGDebug
+    //...Pattern2 & Find Peak...begin
     if (TRGDebug::level()) cout << TRGDebug::tab() << ">>>>>>>>>>Pattern 2 & Find Peak Begin!!!>>>>>>>>>>" << endl;
+
     vector<unsigned> p0(5, 0);
     vector< vector<unsigned> > op2;
-///test(CFI)
-//unsigned short test_c=0;
-//unsigned short test_f=0;
-//unsigned short test_i=0;
-///test(CFI)
 
+    // loop over 2x2 peak candidates
     for (unsigned short i = 0; i < p1m.size(); i++) {
-      unsigned short j = p1m[i][0];
+      unsigned short j = p1m[i][0]; // 2x2 square number (starting at 1)
       unsigned short a = 0;
       unsigned short aa = 0;
       bool p1rel = false;
-      //cout << "no."<< j << endl;//test //JB: Please use TRGDebug
-      if (TRGDebug::level()) cout << TRGDebug::tab() << "no." << j << endl; //test
+      if (TRGDebug::level()) cout << TRGDebug::tab() << "no." << j << endl;
 
-// XYZ  (begin)
-      //X
+      // XYZ  (begin)
+      // check for connections to neighboring 2x2 candidates
+      // if connection is found, continue to next candidate
+
+      //X (horizontal connection to the left)
       if ((j % 80) == 1) {
         a = j + 79;
       } else {
         a = j - 1;
       }
-
+      // loop over rest of candidates
       for (unsigned k = 0; k < p1m.size(); k++) {
         if (a == p1m[k][0]) {
           aa = k;
-
+          // check connection to left neighbor
+          // by predefined subpattern in 2x2 square
           if (!rlrel(p1m[aa], p1m[i])) {
-            //cout << "no." <<  j << " & no." << a << " / X no rel" << endl;  ///test //JB: Please use TRGDebug
-            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / X no rel" << endl;  ///test
+            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / X no rel" << endl;
             p1rel = false;
           } else {
-            //cout << "no." <<  j << " & no." << a << " / X rel" << endl;  ///test //JB: Please use TRGDebug
-            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / X rel" << endl;  ///test
+            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / X rel" << endl;
             p1rel = true;
           }
           break;
@@ -1180,21 +1250,22 @@ namespace Belle2 {
       }
       p1rel = false;
 
-      //Y
+      //Y (vertical connection to lower neighbor)
       if (j > 80) {
+        // TODO: what about other case? cells in bottom row are still compared to left neighbor
         a = j - 80;
       }
-
+      // loop over rest of candidates
       for (unsigned k = 0; k < p1m.size(); k++) {
         if (a == p1m[k][0]) {
           aa = k;
+          // check connection to lower neighbor
+          // by predefined subpattern in 2x2 square
           if (!udrel(p1m[aa], p1m[i])) {
-            //cout << "no." <<  j << " & no." << a << " / Y no rel" << endl;  ///test //JB: Please use TRGDebug
-            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y no rel" << endl;  ///test
+            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y no rel" << endl;
             p1rel = false;
           } else {
-            //cout << "no." <<  j << " & no." << a << " / Y rel" << endl;  ///test //JB: Please use TRGDebug
-            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y rel" << endl;  ///test
+            if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Y rel" << endl;
             p1rel = true;
           }
           break;
@@ -1205,24 +1276,24 @@ namespace Belle2 {
       }
       p1rel = false;
 
-      //Z
+      //Z (diagonal connection to lower left)
       if (j > 80) {
         if ((j % 80) == 1) {
           a = j - 1;
         } else         {
           a = j - 81;
         }
+        // loop over test of candidates
         for (unsigned k = 0; k < p1m.size(); k++) {
           if (a == p1m[k][0]) {
             aa = k;
-
+            // check connection to lower left neighbor
+            // by predefined subpattern in 2x2 square
             if (!mirel(p1m[aa], p1m[i])) {
-              //cout << "no." <<  j << " & no." << a << " / Z no rel" << endl;  ///test //JB: Please use TRGDebug
-              if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Z no rel" << endl;  ///test
+              if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Z no rel" << endl;
               p1rel = false;
             } else {
-              //cout << "no." <<  j << " & no." << a << " / Z rel" << endl;  ///test //JB: Please use TRGDebug
-              if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Z rel" << endl;  ///test
+              if (TRGDebug::level()) cout << TRGDebug::tab() << "no." <<  j << " & no." << a << " / Z rel" << endl;
               p1rel = true;
             }
             break;
@@ -1233,10 +1304,16 @@ namespace Belle2 {
         }
         p1rel = false;
       }
+      // XYZ (end)
 
-/// XYZ (End)
-
-///Pattern2 value (begin)
+      // Pattern2 value (begin)
+      // make 3x3 square of 2x2 squares
+      // p2v = [A B C D E F G H I] (numbers of 2x2 squares in 3x3 square)
+      // A: number of current 2x2 candidate
+      // shape of p2v:
+      // G H I
+      // D E F
+      // A B C
       vector<unsigned> p2v;
       if ((j % 80) == 79) {
         p2v.push_back(j);
@@ -1260,7 +1337,6 @@ namespace Belle2 {
         p2v.push_back(j + 81);
         p2v.push_back(j + 82);
       }
-
       if ((j % 80) != 0 && (j % 80) != 79) {
         p2v.push_back(j);
         p2v.push_back(j + 1);
@@ -1272,17 +1348,22 @@ namespace Belle2 {
         p2v.push_back(j + 161);
         p2v.push_back(j + 162);
       }
+      // Pattern2 value(End)
 
-///Pattern2 value(End)
+      // make Pattern2(begin)
+      // get subpattern for each 2x2 square within 3x3 square
+      // stored in op2
 
-///make Pattern2(begin)
+      // loop over 3x3 square
       for (unsigned short imp2 = 0; imp2 < p2v.size(); imp2++) {
         unsigned short p2v_i = p2v[imp2];
+        // loop over 2x2 candidates
         for (unsigned short jmp2 = 0; jmp2 < p1m.size(); jmp2++) {
           unsigned short p1m_no = p1m[jmp2][0];
-          /// if none of match number in p1m then pass this scan
+          // if none of match number in p1m then pass this scan
           if (p2v_i != p1m_no) {
             if (jmp2 == (p1m.size() - 1)) {
+              // if no match is found use default (0 0 0 0 0)
               op2.push_back(p0);
             }
             continue;
@@ -1293,15 +1374,16 @@ namespace Belle2 {
         }
 
       }
-///make Pattern2(End)
+      // make Pattern2(End)
 
-///Pattern2 relation(Begin)
+      // Pattern2 relation(Begin)
+      // go over 3x3 square and keep only cells connected to lower left 2x2 square
       vector< vector<unsigned> >final_op2;
       vector<unsigned> p2_state;
-      ///A
+      // A (start point)
       final_op2.push_back(op2[0]);
       p2_state.push_back(1);
-      ///B
+      // B (keep if connected to A)
       if (rlrel(op2[0], op2[1])) {
         final_op2.push_back(op2[1]);
         p2_state.push_back(1);
@@ -1309,17 +1391,15 @@ namespace Belle2 {
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///C
+      // C (keep if connected to B)
       if (rlrel(op2[1], op2[2])) {
-        //test_c=3; //test(CFI)
         final_op2.push_back(op2[2]);
         p2_state.push_back(1);
       } else {
-        //test_c=0; //test(CFI)
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///D
+      // D (keep if connected to A)
       if (udrel(op2[0], op2[3])) {
         final_op2.push_back(op2[3]);
         p2_state.push_back(1);
@@ -1327,7 +1407,7 @@ namespace Belle2 {
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///E
+      // E (keep connected to A, B or D)
       if (mirel(op2[0], op2[4]) || udrel(op2[1], op2[4]) || rlrel(op2[3], op2[4])) {
         final_op2.push_back(op2[4]);
         p2_state.push_back(1);
@@ -1335,17 +1415,15 @@ namespace Belle2 {
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///F
+      // F (keep if connected to B, C or E)
       if (mirel(op2[1], op2[5]) || udrel(op2[2], op2[5]) || rlrel(op2[4], op2[5])) {
-        //test_f=6; //test(CFI)
         final_op2.push_back(op2[5]);
         p2_state.push_back(1);
       } else {
-        //test_f=0; //test(CFI)
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///G
+      // G (keep if connected to D)
       if (udrel(op2[3], op2[6])) {
         final_op2.push_back(op2[6]);
         p2_state.push_back(1);
@@ -1353,7 +1431,7 @@ namespace Belle2 {
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///H
+      // H (keep if connected to D, E or G)
       if (mirel(op2[3], op2[7]) || udrel(op2[4], op2[7]) || rlrel(op2[6], op2[7])) {
         final_op2.push_back(op2[7]);
         p2_state.push_back(1);
@@ -1361,87 +1439,75 @@ namespace Belle2 {
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      ///I
+      // I (keep if connected to E, F or H)
       if (mirel(op2[4], op2[8]) || udrel(op2[5], op2[8]) || rlrel(op2[7], op2[8])) {
-        //test_i=9; //test(CFI)
         final_op2.push_back(op2[8]);
         p2_state.push_back(1);
       } else {
-        //test_i=0; //test(CFI)
         final_op2.push_back(p0);
         p2_state.push_back(0);
       }
-      /*for(vector<vector<unsigned> >::size_type l=0;l<final_op2.size();l++)
-        {for(vector<unsigned>::size_type m=0;m<final_op2[l].size();m++)
-        cout<<final_op2[l][m]<<endl;
-        cout <<"========"<<endl; }*/ //testp2
+      // TODO: should compare connection to final_op2 instead of op2?
+      // otherwise e.g. op2 = A B-C with connection B-C
+      // would give final_op2 = A . C (should be A . .)
 
-///Pattern2 relation(End)
+      // Pattern2 relation(End)
 
-///Find center peak(begin)
-      unsigned short fcpi = 0;
-      unsigned short fcpn = 0;
-      unsigned short fcpx = 0;
-      unsigned short fcpxs = 0;
-      unsigned short fcpy = 11;
-      unsigned short fcpys = 0;
+      // Find center peak(begin)
+      unsigned short fcpi = 0;  // number of peak in 2x2 square (start: 1)
+      unsigned short fcpn = 0;  // number of peak 2x2 square (start: 1)
+      unsigned short fcpx = 0;  // x index in original hough plane (start: 0)
+      unsigned short fcpxs = 0; // x index in 2x2 square (0, 1)
+      unsigned short fcpy = 11; // y index in original hough plane (start: 11)
+      unsigned short fcpys = 0; // y index in 2x2 square (0, 1)
+
+      // p2_state:               vector of on/off flags for 3x3 square
+      // FindCP1(p2_state):      peak within 3x3 square by predefined pattern
+      // op2[FindCP1(p2_state)]: 2x2 subpattern of this peak
+      // FindP1C(...):           peak within 2x2 square by predefined pattern
       fcpi = FindP1C(op2[FindCP1(p2_state)]);
 
       fcpn = op2[FindCP1(p2_state)][0];
 
+      // get x index
       if (fcpi >= 3) {
         fcpxs = fcpi - 3;
-      }
-
-      else {
+      } else {
         fcpxs = fcpi - 1;
       }
       fcpx = ((fcpn - 1) % 80) * 2 + fcpxs;
+      // Plus plane transform back to original numbering
       if ((hp.name()) == "circle hough plus") {
         int ix = fcpx;
         fcpx = abs(ix - 159);
       }
+
+      // get y index
       if (fcpi >= 3) {
         fcpys = 1;
       }
       fcpy = fcpy + ((fcpn - 1) / 80) * 2 + fcpys;
 
-      //cout << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test //JB: Please use TRGDebug
       if (TRGDebug::level()) cout << TRGDebug::tab() << "center of peak  x=" << fcpx << "  y=" << fcpy << endl; //test
       ofstream vhdlxOut("/home/ph202/p1p2/phii", fstream::app);//test
-      //  vhdlxOut << "VHDL center of peak  x=" << fcpx << "  y=" << (fcpy-10) <<endl; //test
       vhdlxOut << (2 * fcpx + 1) * 1.125 << endl; //test
       ofstream vhdlyOut("/home/ph202/p1p2/ptt", fstream::app);
       vhdlyOut << 0.0045 * pow(10, (1.780875 + (fcpy - 10) * 0.08625)) << endl;
-
-
-
-//  ofstream vhdlyOut("/home/ph202/p1p2/vhdlinfory", fstream::app);//test
-//    vhdlyOut << (fcpy-10)  << endl;//test
 
       p.push_back(fcpx);
       p.push_back(fcpy);
       peak_xy.push_back(p);
       p.clear();
+      // Find center peak(end)
 
-///Find center peak(end)
-//cout << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl; //JB: Please use TRGDebug
       if (TRGDebug::level()) cout << TRGDebug::tab() << "~~~~~~~~~~Pattern 2 & Find Peak End!!!~~~~~~~~~~" << endl;
       vector<unsigned>().swap(p2_state);
       vector< vector<unsigned> >().swap(final_op2);
       vector<unsigned>().swap(p2v);
       vector< vector<unsigned> >().swap(op2);
-    }
-    //ofstream vhdlOut("/home/ph202/p1p2/vhdlinfor", fstream::app);//test
-    //vhdlOut <<  "                  "  << endl;//test
-    //vhdlOut.close();
-//    ofstream vhdlxOut("/home/ph202/p1p2/vhdlinforx", fstream::app);//test
-//    vhdlxOut << "   " << endl;//test
-//    vhdlxOut.close();
-//    ofstream vhdlyOut("/home/ph202/p1p2/vhdlinfory", fstream::app);//test
-//    vhdlyOut << "  "  << endl;//test
-//    vhdlyOut.close();
-//... Pattren 2...end
+    } // end of loop over 2x2 candidates
+
+    //... Pattern 2...end
 
     if (TRGDebug::level())
       cout << TRGDebug::tab() << "total peaks=" << peak_xy.size() << endl;
@@ -1450,31 +1516,8 @@ namespace Belle2 {
       ofstream effiOut("/home/ph202/p1p2/effi", fstream::app);
       effiOut << "1"  << endl;
     }
-    /*else if(peak_xy.size()==0)
-      {ofstream effiOut("/home/ph202/p1p2/effi", fstream::app);
-      effiOut << "0"  << endl;}*/
-
-//////////////////////////////////////////////
-
-    if ((hp.name()) == "circle hough minus") {
-//ofstream MinusOut("/home/ph202/p1p2/minus_p2_CFI_12", fstream::app);
-//MinusOut << test_c <<" " << test_f <<" "<< test_i << endl;
-//ofstream MinOut("/home/ph202/p1p2/test10mv", fstream::app);
-//MinOut << peak_xy.size() << endl;
-
-//cout << peak_xy.size()  << "   " << test_c << "   "<< test_f << "   " << test_i << endl;//test for cfi
-//MinOut.close();
-    } else {
-//ofstream PlusOut("/home/ph202/p1p2/test10v", fstream::app);
-//PlusOut << test_c << " "<< test_f << " " << test_i << endl;
-//ofstream PinOut("/home/ph202/p1p2/test10pv", fstream::app);
-//PinOut << peak_xy.size() << endl;
-//cout << peak_xy.size()  << "   " << test_c << "   "<< test_f << "   " << test_i << endl;
-//PinOut.close();
-    }
 
     vector< vector<unsigned> >().swap(p1m);
-//iw?    vector< vector<unsigned> >().swap(peak_xy); //test
 
     TRGDebug::leaveStage(sn);
   }

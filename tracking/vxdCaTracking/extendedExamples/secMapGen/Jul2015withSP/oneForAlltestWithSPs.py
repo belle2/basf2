@@ -575,8 +575,8 @@ main.add_module(g4sim)
 
 if generateSecMap:
     # # following modules only for secMapGen:
-    main.add_module(filterCalcSVDStd)
-    main.add_module(filterCalcVXDStd)
+    # main.add_module(filterCalcSVDStd)
+    # main.add_module(filterCalcVXDStd)
     if doExportXML:
         main.add_module(exportXML)
     if useSimpleClusterizer:

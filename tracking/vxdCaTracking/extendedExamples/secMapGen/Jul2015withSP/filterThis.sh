@@ -14,7 +14,7 @@ do
 	date
 	echo " Iteration " $i
 # 	evtAdd=$(( i - 1 ))
-	basf2 oneForAlltestWithSPs.py $i 500 >> $outPutFile
+	basf2 oneForAlltestWithSPs.py $i 5000 >> $outPutFile
 	date
 	echo "That was iteration number " $i
 	date
@@ -22,7 +22,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 20k
 mv *.xml 20k
@@ -41,7 +41,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 50k
 mv *.xml 50k
@@ -61,7 +61,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 100k
 mv *.xml 100k
@@ -81,7 +81,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 150k
 mv *.xml 150k
@@ -102,7 +102,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 200k
 mv *.xml 200k
@@ -122,7 +122,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 250k
 mv *.xml 250k
@@ -142,7 +142,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 300k
 mv *.xml 300k
@@ -162,7 +162,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 350k
 mv *.xml 350k
@@ -182,7 +182,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 400k
 mv *.xml 400k
@@ -202,7 +202,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 450k
 mv *.xml 450k
@@ -222,7 +222,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 500k
 mv *.xml 500k
@@ -242,7 +242,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 550k
 mv *.xml 550k
@@ -262,7 +262,7 @@ done
 date
 echo "starting exportSecMap"
 basf2 onlyExportMapWithSPs.py 1 >> $outPutFile
-basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
+# basf2 onlyExportMapWithSPs.py 0 >> $outPutFile2
 date
 mkdir 600k
 mv *.xml 600k

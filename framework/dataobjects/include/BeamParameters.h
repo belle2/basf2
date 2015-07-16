@@ -27,18 +27,20 @@ namespace Belle2 {
     using MCInitialParticles::setVertex;
 
     /** default constructor */
-    BeamParameters(): MCInitialParticles(), m_covHER(3), m_covLER(3), m_covVertex(3) {}
+    BeamParameters(): MCInitialParticles(), m_covHER{0}, m_covLER{0}, m_covVertex{0} {}
 
     /** Set the covariance matrix for HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
-     * actual direction in spread and theta_y is the vertical angle */
-    void setCovHER(const TMatrixDSym& cov) { m_covHER = cov; }
+     * actual direction in spread and theta_y is the vertical angle
+     * The upper triangle will be saved. */
+    void setCovHER(const TMatrixDSym& cov) { setCovMatrix(m_covHER, cov); }
     /** Set the covariance matrix for LER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
-     * actual direction in spread and theta_y is the vertical angle */
-    void setCovLER(const TMatrixDSym& cov) { m_covLER = cov; }
-    /** Set the covariance matrix of the vertex position */
-    void setCovVertex(const TMatrixDSym& cov) { m_covVertex = cov; }
+     * actual direction in spread and theta_y is the vertical angle.
+     * The upper triangle will be saved. */
+    void setCovLER(const TMatrixDSym& cov) { setCovMatrix(m_covLER, cov); }
+    /** Set the covariance matrix of the vertex position. The upper triangle will be saved. */
+    void setCovVertex(const TMatrixDSym& cov) { setCovMatrix(m_covVertex, cov); }
 
     /** Set the HER FourVector and error matrix from beam energy, angle and covariance entries.
      *
@@ -83,7 +85,7 @@ namespace Belle2 {
      *   - 6 entries will be interpreted as the upper triangle of the covariance matrix
      *     with the element order being (0, 0), (0, 1), (0, 2), (1, 1), (1, 2), (2, 2)
      *   - 9 entries for the full covariance matrix in row-major order. The symmetry of
-     *     the matrix will not be checked but just the lower triangle will be used.
+     *     the matrix will not be checked but just the upper triangle will be used.
      *
      * @param vertex vertex position
      * @param cov entries of the covariance matrix.
@@ -93,13 +95,13 @@ namespace Belle2 {
     /** Get the covariance matrix of HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
      * actual direction in spread and theta_y is the vertical angle */
-    const TMatrixDSym& getCovHER() const { return m_covHER; }
+    TMatrixDSym getCovHER() const { return getCovMatrix(m_covHER); }
     /** Get the covariance matrix of LER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and
      * actual direction in spread and theta_y is the vertical angle */
-    const TMatrixDSym& getCovLER() const { return m_covLER; }
+    TMatrixDSym getCovLER() const { return getCovMatrix(m_covLER); }
     /** Get the covariance matrix of the vertex position */
-    const TMatrixDSym& getCovVertex() const { return m_covVertex; }
+    TMatrixDSym getCovVertex() const { return getCovMatrix(m_covVertex); }
 
     /** Return energy smearing of LER */
     //double getEnergySmearingLER() const;
@@ -115,7 +117,7 @@ namespace Belle2 {
      * @param angle angle wrt z-axis
      */
     TLorentzVector getFourVector(double energy, double angle);
-    /** Obtain covariance matrix from vector of entries.
+    /** Set covariance matrix from vector of entries.
      *
      * The vector for the covariance matrix can have either 0, 1, 3, 6 or 9 entries:
      *   - 0 entries means no error.
@@ -129,18 +131,24 @@ namespace Belle2 {
      *   - 9 entries for the full covariance matrix in row-major order. The symmetry of
      *     the matrix will not be checked but just the lower triangle will be used.
      *
+     * @param pointer to the member which contains the matrix
      * @param cov entries for the covariance matrix
      * @return covariance matrix determined from the given entries
      */
-    TMatrixDSym getCovMatrix(const std::vector<double>& cov, bool common);
+    void setCovMatrix(Double32_t* member, const std::vector<double>& cov, bool common);
+    /** Set covariance matrix from ROOT Matrix object */
+    void setCovMatrix(Double32_t* member, const TMatrixDSym& cov);
+    /** Obtain covariance matrix from a given float array */
+    TMatrixDSym getCovMatrix(const Double32_t* member) const;
     /** Covariance matrix of the high energy beam at the IP */
-    TMatrixDSym m_covHER;
+    Double32_t m_covHER[6];
     /** Covariance matrix of the low energy beam at the IP */
-    TMatrixDSym m_covLER;
+    Double32_t m_covLER[6];
     /** Covariance matrix of the vertex position */
-    TMatrixDSym m_covVertex;
+    Double32_t m_covVertex[6];
+
     /** ROOT Dictionary */
-    ClassDef(BeamParameters, 1);
+    ClassDef(BeamParameters, 2);
   };
 
 } //Belle2 namespace

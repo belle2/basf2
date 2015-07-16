@@ -37,6 +37,28 @@ CRY::CRY()
   m_maxTrialsRun = 0;
   m_checkAcceptance = false;
   m_checkKeep = false;
+  m_acceptLength = 0.;
+  m_acceptWidth = 0.;
+  m_acceptHeight = 0.;
+  m_keepLength = 0.;
+  m_keepWidth = 0.;
+  m_keepHeight = 0.;
+  m_kineticEnergyThreshold = 0.;
+  m_maxTrials = 0.;
+  m_crySetup = NULL;
+  m_cryGenerator = NULL;
+  m_cryRNG = NULL;
+  m_xlow = 0.;
+  m_xhigh = 0.;
+  m_ylow = 0.;
+  m_yhigh = 0.;
+  m_zlow = 0.;
+  m_zhigh = 0.;
+  m_startTime = 0.;
+  m_newvtx[0] = 0.;
+  m_newvtx[1] = 0.;
+  m_newvtx[2] = 0.;
+
   setDefaultSettings();
 }
 
@@ -205,12 +227,12 @@ void CRY::generateEvent(MCParticleGraph& mcGraph)
         L2 = L1 + 1.e9 * Direction;
         TVector3 Hit(0., 0., 0.);
         int check = CheckLineBox(m_B1, m_B2, L1, L2, Hit);
-        if (check == true) eventInAcceptance++;
+        if (check > 0) eventInAcceptance++;
       }
 
     }
 
-    if ((m_checkAcceptance > 0 && eventInAcceptance > 0) || m_checkAcceptance == 0) {
+    if ((m_checkAcceptance == true && eventInAcceptance > 0) || m_checkAcceptance == false) {
       // all secondaries
       for (unsigned j = 0; j < ev->size(); j++) {
 

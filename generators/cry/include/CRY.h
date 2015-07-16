@@ -38,22 +38,27 @@ namespace Belle2 {
   // The following stuff is for the random number gererator
   template<class T> class RNGWrapper {
   public:
+
+    /** set object. */
     static void set(T* object, double (T::*func)(void));
+    /** random generator. */
     static double rng(void);
   private:
-    static T* m_obj;
-    static double (T::*m_func)(void);
+    static T* m_obj;  /**< directory that holds cosmic data files. */
+    static double (T::*m_func)(void);  /**< directory that holds cosmic data files. */
   };// end of RNGWrapper class
 
-  template<class T> T* RNGWrapper<T>::m_obj;
+  template<class T> T* RNGWrapper<T>::m_obj; /**< RNGWrapper. */
 
-  template<class T> double (T::*RNGWrapper<T>::m_func)(void);
+  template<class T> double (T::*RNGWrapper<T>::m_func)(void); /**< RNGWrapper. */
 
+  /** RNGWrapper. */
   template<class T> void RNGWrapper<T>::set(T* object, double (T::*func)(void))
   {
     m_obj = object; m_func = func;
   }
 
+  /** RNGWrapper. */
   template<class T> double RNGWrapper<T>::rng(void) { return (m_obj->*m_func)(); }
 }
 

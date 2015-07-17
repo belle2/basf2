@@ -4,7 +4,7 @@
 """
 <header>
   <input>EvtGenSim.root</input>
-  <output>EvtGenRec.root,EvtGenmdst.root</output>
+  <output>EvtRec.root,EvtRec_mdst.root</output>
   <contact>tkuhr</contact>
   <description>This steering file run the standard reconstruction on an input file with generic BBbar events.</description>
 </header>
@@ -37,9 +37,9 @@ main.add_module(register_module('Profile'))
 
 # output
 output = register_module('RootOutput')
-output.param('outputFileName', '../EvtGenRec.root')
+output.param('outputFileName', '../EvtRec.root')
 main.add_module(output)
-add_mdst_output(main, True, '../EvtGenmdst.root')
+add_mdst_output(main, True, '../EvtRec_mdst.root')
 
 process(main)
 
@@ -47,12 +47,12 @@ process(main)
 print statistics
 
 from validation import *
-statistics_plots('EvtGenRec_statistics.root', contact='tkuhr',
+statistics_plots('EvtRec_statistics.root', contact='tkuhr',
                  jobDesc='a standard reconstruction job with generic EvtGen events',
-                 prefix='EvtGenRec'
+                 prefix='EvtRec'
                  )
-event_timing_plot('../EvtGenRec.root', 'EvtGenRec_statistics.root',
+event_timing_plot('../EvtRec.root', 'EvtRec_statistics.root',
                   contact='tkuhr',
                   jobDesc='a standard reconstruction job with generic EvtGen events',
-                  prefix='EvtGenRec'
+                  prefix='EvtRec'
                   )

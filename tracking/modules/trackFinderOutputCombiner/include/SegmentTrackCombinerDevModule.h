@@ -20,9 +20,27 @@
 
 namespace Belle2 {
 
-  /// Module for the combination of tracks and segments. Development edition.
+  /// Module for the combination of tracks and segments.
   class SegmentTrackCombinerDevModule:
-    public Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule<> {
+    public Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule <
+    Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
+    Belle2::TrackFindingCDC::BaseBackgroundSegmentsFilter,
+    Belle2::TrackFindingCDC::BaseNewSegmentsFilter,
+    Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
+    Belle2::TrackFindingCDC::BaseSegmentTrainFilter,
+    Belle2::TrackFindingCDC::BaseSegmentInformationListTrackFilter,
+    Belle2::TrackFindingCDC::BaseTrackFilter
+    > {
+
+    typedef Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule <
+    Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
+           Belle2::TrackFindingCDC::BaseBackgroundSegmentsFilter,
+           Belle2::TrackFindingCDC::BaseNewSegmentsFilter,
+           Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
+           Belle2::TrackFindingCDC::BaseSegmentTrainFilter,
+           Belle2::TrackFindingCDC::BaseSegmentInformationListTrackFilter,
+           Belle2::TrackFindingCDC::BaseTrackFilter
+           > Super;
 
   public:
     /// Constructor of the module. Setting up parameters and description.
@@ -40,7 +58,7 @@ namespace Belle2 {
        Factory for the segment track chooser filter for the first step, knowing all the available filters and
        their respective parameters
     */
-    Belle2::TrackFindingCDC::SegmentTrackFilterFirstStepFactory m_segmentTrackChooserFirstStepFactory;
+    Belle2::TrackFindingCDC::SegmentTrackFilterFirstStepFactory m_segmentTrackFilterFirstStepFactory;
 
     /**
        Factory for the background segment filter, knowing all the available filters and
@@ -58,7 +76,7 @@ namespace Belle2 {
        Factory for the segment track chooser filter for the second step, knowing all the available filters and
        their respective parameters
     */
-    Belle2::TrackFindingCDC::SegmentTrackFilterSecondStepFactory m_segmentTrackChooserSecondStepFactory;
+    Belle2::TrackFindingCDC::SegmentTrackFilterSecondStepFactory m_segmentTrackFilterSecondStepFactory;
 
     /**
        Factory for the segment train filter, knowing all the available filters and
@@ -70,7 +88,7 @@ namespace Belle2 {
        Factory for the segment train filter, knowing all the available filters and
        their respective parameters
     */
-    Belle2::TrackFindingCDC::SegmentInformationListTrackFilterFactory m_segmentTrackFilterFactory;
+    Belle2::TrackFindingCDC::SegmentInformationListTrackFilterFactory m_segmentInformationListTrackFilterFactory;
 
     /**
        Factory for the track filter, knowing all the available filters and

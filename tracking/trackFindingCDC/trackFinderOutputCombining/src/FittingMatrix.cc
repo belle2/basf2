@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/FittingMatrix.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>

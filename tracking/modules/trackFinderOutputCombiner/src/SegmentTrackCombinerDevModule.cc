@@ -21,31 +21,31 @@ using namespace TrackFindingCDC;
 REG_MODULE(SegmentTrackCombinerDev);
 
 SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
-  SegmentTrackCombinerImplModule<>(),
-  m_segmentTrackChooserFirstStepFactory("tmva"),
+  Super(),
+  m_segmentTrackFilterFirstStepFactory("tmva"),
   m_backgroundSegmentsFilterFactory("tmva"),
   m_newSegmentsFilterFactory("none"),
-  m_segmentTrackChooserSecondStepFactory("none"),
+  m_segmentTrackFilterSecondStepFactory("none"),
   m_segmentTrainFilterFactory("none"),
-  m_segmentTrackFilterFactory("none"),
+  m_segmentInformationListTrackFilterFactory("none"),
   m_trackFilterFactory("all")
 {
   setDescription("Versatile module with adjustable filters for segment track combination.");
 
-  m_segmentTrackChooserFirstStepFactory.exposeParameters(this);
+  m_segmentTrackFilterFirstStepFactory.exposeParameters(this);
   m_backgroundSegmentsFilterFactory.exposeParameters(this);
   m_newSegmentsFilterFactory.exposeParameters(this);
-  m_segmentTrackChooserSecondStepFactory.exposeParameters(this);
+  m_segmentTrackFilterSecondStepFactory.exposeParameters(this);
   m_segmentTrainFilterFactory.exposeParameters(this);
-  m_segmentTrackFilterFactory.exposeParameters(this);
+  m_segmentInformationListTrackFilterFactory.exposeParameters(this);
   m_trackFilterFactory.exposeParameters(this);
 }
 
 void SegmentTrackCombinerDevModule::initialize()
 {
   // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackChooserFirstStep = m_segmentTrackChooserFirstStepFactory.create();
-  setSegmentTrackChooserFirstStep(std::move(ptrSegmentTrackChooserFirstStep));
+  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilterFirstStep = m_segmentTrackFilterFirstStepFactory.create();
+  setSegmentTrackFilterFirstStep(std::move(ptrSegmentTrackFilterFirstStep));
 
   std::unique_ptr<BaseBackgroundSegmentsFilter> ptrBackgroundSegmentsFilter = m_backgroundSegmentsFilterFactory.create();
   setBackgroundSegmentFilter(std::move(ptrBackgroundSegmentsFilter));
@@ -53,26 +53,27 @@ void SegmentTrackCombinerDevModule::initialize()
   std::unique_ptr<BaseNewSegmentsFilter> ptrNewSegmentsFilter = m_newSegmentsFilterFactory.create();
   setNewSegmentFilter(std::move(ptrNewSegmentsFilter));
 
-  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackChooserSecondStep = m_segmentTrackChooserSecondStepFactory.create();
-  setSegmentTrackChooserSecondStep(std::move(ptrSegmentTrackChooserSecondStep));
+  std::unique_ptr<BaseSegmentTrackFilter> ptrSegmentTrackFilterSecondStep = m_segmentTrackFilterSecondStepFactory.create();
+  setSegmentTrackFilterSecondStep(std::move(ptrSegmentTrackFilterSecondStep));
 
   std::unique_ptr<BaseSegmentTrainFilter> ptrSegmentTrainFilter = m_segmentTrainFilterFactory.create();
   setSegmentTrainFilter(std::move(ptrSegmentTrainFilter));
 
-  std::unique_ptr<BaseSegmentInformationListTrackFilter> ptrSegmentTrackFilter = m_segmentTrackFilterFactory.create();
-  setSegmentTrackFilter(std::move(ptrSegmentTrackFilter));
+  std::unique_ptr<BaseSegmentInformationListTrackFilter> ptrSegmentInformationListTrackFilter =
+    m_segmentInformationListTrackFilterFactory.create();
+  setSegmentInformationListTrackFilter(std::move(ptrSegmentInformationListTrackFilter));
 
   std::unique_ptr<BaseTrackFilter> ptrTrackFilter = m_trackFilterFactory.create();
   setTrackFilter(std::move(ptrTrackFilter));
 
-  SegmentTrackCombinerImplModule<>::initialize();
+  Super::initialize();
 
-  if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
+  if (getSegmentTrackFilterFirstStep()->needsTruthInformation() or
       getBackgroundSegmentFilter()->needsTruthInformation() or
       getNewSegmentFilter()->needsTruthInformation() or
-      getSegmentTrackChooserSecondStep()->needsTruthInformation() or
+      getSegmentTrackFilterSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
-      getSegmentTrackFilter()->needsTruthInformation() or
+      getSegmentInformationListTrackFilter()->needsTruthInformation() or
       getTrackFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
@@ -82,15 +83,15 @@ void SegmentTrackCombinerDevModule::initialize()
 
 void SegmentTrackCombinerDevModule::event()
 {
-  if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
+  if (getSegmentTrackFilterFirstStep()->needsTruthInformation() or
       getBackgroundSegmentFilter()->needsTruthInformation() or
       getNewSegmentFilter()->needsTruthInformation() or
-      getSegmentTrackChooserSecondStep()->needsTruthInformation() or
+      getSegmentTrackFilterSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
-      getSegmentTrackFilter()->needsTruthInformation() or
+      getSegmentInformationListTrackFilter()->needsTruthInformation() or
       getTrackFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 
-  SegmentTrackCombinerImplModule<>::event();
+  Super::event();
 }

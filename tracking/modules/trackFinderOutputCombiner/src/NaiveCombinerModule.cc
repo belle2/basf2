@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/trackFinderOutputCombiner/NaiveCombinerModule.h>
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 using namespace std;

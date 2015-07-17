@@ -1279,7 +1279,13 @@ TRGCDCHoughFinder::doFitting2(std::vector<TRGCDCTrack *> & trackList2D,
         rho = 0;
         phi0 = 0;
 	pt = 0;
-        Fitter3DUtility::rPhiFit(&rr2D[0],&phi2D[0],&phi2DError[0],rho, phi0);
+        vector<double>phi2DInvError(5);
+        for(unsigned iAx=0; iAx<5; iAx++){
+             phi2DInvError[iAx] = 1/phi2DError[iAx];
+        }
+
+        Fitter3DUtility::rPhiFitter(&rr2D[0],&phi2D[0],&phi2DInvError[0],rho, phi0); // By JB
+        //Fitter3DUtility::rPhiFit(&rr2D[0],&phi2D[0],&phi2DError[0],rho, phi0);
 
         pt = 0.3*1.5*rho/100;
 

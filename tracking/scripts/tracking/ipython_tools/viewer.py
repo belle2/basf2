@@ -1,4 +1,5 @@
-from IPython.core.display import Image, display, Javascript
+from IPython.core.display import display, Javascript
+from IPython.core.display import Image as display_Image
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", category=FutureWarning)
@@ -6,6 +7,7 @@ with warnings.catch_warnings():
 
 import random
 import string
+import os
 
 
 class Basf2Widget(object):
@@ -26,6 +28,52 @@ class Basf2Widget(object):
         """
         a = self.create()
         display(a)
+
+
+class ComparisonImageViewer(Basf2Widget):
+
+    def __init__(self, images1, images2):
+        self.images1 = images1
+        self.images2 = images2
+
+    def create(self):
+        a = widgets.Accordion()
+
+        children = []
+        for image1, image2 in zip(self.images1, self.images2):
+            html = widgets.Box()
+
+            if not os.path.exists(image1) or not os.path.exists(image2):
+                continue
+
+            image1_png = image1[:-3] + str("png")
+            if not os.path.exists(image1_png):
+                os.system("convert " + image1 + " " + image1_png)
+
+                if not os.path.exists(image1_png):
+                    continue
+
+            i1 = widgets.Image()
+            i1.width = "50%"
+            i1.value = open(image1_png).read()
+
+            image2_png = image2[:-3] + str("png")
+            if not os.path.exists(image2_png):
+                os.system("convert " + image2 + " " + image2_png)
+
+                if not os.path.exists(image2_png):
+                    continue
+            i2 = widgets.Image()
+            i2.width = "50%"
+            i2.value = open(image2_png).read()
+
+            box = widgets.Box()
+            box.children = [i1, i2]
+
+            children.append(box)
+
+        a.children = children
+        return a
 
 
 class PathViewer(Basf2Widget):

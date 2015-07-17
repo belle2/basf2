@@ -57,9 +57,14 @@ namespace Belle2 {
       std::vector<double> Hit3Y; /**< (global) Y-position of third SpacePoint of three hit combination */
       std::vector<double> Hit3Z; /**< (global) Z-position of third SpacePoint of three hit combination */
 
-      std::vector<int> Layer1; /**< Layer number of first SpacePounsigned short of the three hit combination */
-      std::vector<int> Layer2; /**< Layer number of second SpacePounsigned short of the three hit combination */
-      std::vector<int> Layer3; /**< Layer number of third SpacePounsigned short of the three hit combination */
+      std::vector<unsigned short> VxdId1; /**< Layer number of first SpacePounsigned short of the three hit combination */
+      std::vector<unsigned short> VxdId2; /**< Layer number of second SpacePounsigned short of the three hit combination */
+      std::vector<unsigned short> VxdId3; /**< Layer number of third SpacePounsigned short of the three hit combination */
+
+      std::vector<double> pT; /**< pT of associated MCParticle */
+      std::vector<double> Momentum; /**< total momentum of associated MCParticle */
+      std::vector<int> PDG; /**< pdg-code of associated MCParticle */
+      std::vector<double> Charge; /**< charge of associated MCParticle */
 
       std::vector<bool> Signal; /**< flag for specifying if combination is signal or noise */
     };
@@ -135,6 +140,6 @@ namespace Belle2 {
      * add a complete three hit combination to the m_combinations member
      * NOTE: in a final stage it has to be made sure that the SpacePoints in the combination are always in the right order
      */
-    void addHitCombination(const Belle2::SpacePointTrackCand& combination, bool signal, RootCombinations& combinations);
+    void addHitCombination(const Belle2::SpacePointTrackCand& combination, bool signal, int mcId, RootCombinations& combinations);
   };
 }

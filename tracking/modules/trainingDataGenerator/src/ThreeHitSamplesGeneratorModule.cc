@@ -13,11 +13,14 @@
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
 #include <utility> // pair
 
 #include <boost/algorithm/string.hpp>
+
+#include <tracking/trackFindingVXD/analyzingTools/TicTocTimer.h>
 
 using namespace std;
 using namespace Belle2;
@@ -81,14 +84,14 @@ void ThreeHitSamplesGeneratorModule::event()
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 499, PACKAGENAME())) {
         stringstream purInfoStr;
         for (auto& info : purInfos) {
-          purInfoStr << info.dumpToString();
+          B2DEBUG(499, "combination " << m_combCtr <<  ", PurityInfos:\n" << info.dumpToString());
         }
-        B2DEBUG(499, "combination " << m_combCtr <<  ", PurityInfos:\n" << purInfoStr.str(););
       }
 
       // only take a combination as signal if it is from a valid MCParticle and if purity is 1
-      bool isSignal = (purInfos[0].getPurity().first >= 0 && purInfos[0].getPurity().second == 1);
-      addHitCombination(comb, isSignal, m_combinations);
+      std::pair<int, double> mcId = purInfos[0].getPurity();
+      bool isSignal = (mcId.first >= 0 && mcId.second == 1);
+      addHitCombination(comb, isSignal, mcId.first, m_combinations);
     }
   }
 
@@ -128,11 +131,16 @@ void ThreeHitSamplesGeneratorModule::initializeRootFile(const std::string& filen
   m_treePtr->Branch("hit3Y", &m_combinations.Hit3Y);
   m_treePtr->Branch("hit3Z", &m_combinations.Hit3Z);
 
-  m_treePtr->Branch("signal", &m_combinations.Signal);
+  m_treePtr->Branch("truth", &m_combinations.Signal);
 
-  m_treePtr->Branch("layer1", &m_combinations.Layer1);
-  m_treePtr->Branch("layer2", &m_combinations.Layer2);
-  m_treePtr->Branch("layer3", &m_combinations.Layer3);
+  m_treePtr->Branch("vxdid1", &m_combinations.VxdId1);
+  m_treePtr->Branch("vxdid2", &m_combinations.VxdId2);
+  m_treePtr->Branch("vxdid3", &m_combinations.VxdId3);
+
+  m_treePtr->Branch("pT", &m_combinations.pT);
+  m_treePtr->Branch("momentum", &m_combinations.Momentum);
+  m_treePtr->Branch("charge", &m_combinations.Charge);
+  m_treePtr->Branch("pdg", &m_combinations.PDG);
 }
 
 // ============================================ SPLIT TRACKCAND N HIT COMBOS =======================================================
@@ -177,8 +185,8 @@ bool ThreeHitSamplesGeneratorModule::isValidHitCombination(const std::vector<con
   unsigned short prevLayer = VxdID((*combination.begin())->getVxdID()).getLayerNumber();
   for (auto itSP = combination.begin() + 1; itSP != combination.end(); ++itSP) { // do not use first SpacePoint
     unsigned short layer = VxdID((*itSP)->getVxdID()).getLayerNumber();
-    if (layer != prevLayer + 1) {
-      B2DEBUG(150, "The hits in the passed combination are not in subsequent order: previous layer = " << prevLayer <<
+    if (layer < prevLayer) {
+      B2DEBUG(150, "The hits in the passed combinations are not on monotically increasing layers: previous layer = " << prevLayer <<
               ", this layer = " << layer);
       ++m_invalidCombiCtr;
       // B2ERROR("==================================== INVALID =============================================");
@@ -192,7 +200,7 @@ bool ThreeHitSamplesGeneratorModule::isValidHitCombination(const std::vector<con
 }
 
 // ================================================== ADD HIT COMBINATION ==========================================================
-void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointTrackCand& combination, bool signal,
+void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointTrackCand& combination, bool signal, int mcId,
                                                        RootCombinations& combinations)
 {
   // TODO: make sure ordering is kept as it should be
@@ -211,11 +219,27 @@ void ThreeHitSamplesGeneratorModule::addHitCombination(const Belle2::SpacePointT
   combinations.Hit3Y.push_back(spacePoints[2]->Y());
   combinations.Hit3Z.push_back(spacePoints[2]->Z());
 
-  combinations.Layer1.push_back(VxdID(spacePoints[0]->getVxdID()).getLayerNumber());
-  combinations.Layer2.push_back(VxdID(spacePoints[1]->getVxdID()).getLayerNumber());
-  combinations.Layer3.push_back(VxdID(spacePoints[2]->getVxdID()).getLayerNumber());
+  combinations.VxdId1.push_back(spacePoints[0]->getVxdID());
+  combinations.VxdId2.push_back(spacePoints[1]->getVxdID());
+  combinations.VxdId3.push_back(spacePoints[2]->getVxdID());
 
   combinations.Signal.push_back(signal);
+
+  int pdg = 0; // default pdg-value for non-signal samples
+  double charge = -999, p = -1, pT = -1; // default values for non sig-nal samples
+  if (signal) {
+    StoreArray<MCParticle> mcParticles("");
+    MCParticle* particle = mcParticles[mcId];
+    pdg = particle->getPDG();
+    charge = particle->getCharge();
+    p = particle->getMomentum().Mag();
+    pT = particle->getMomentum().Pt();
+  }
+
+  combinations.pT.push_back(pT);
+  combinations.Momentum.push_back(p);
+  combinations.PDG.push_back(pdg);
+  combinations.Charge.push_back(charge);
 
   m_combCtr++;
   m_noiseSampleCtr += (!signal);

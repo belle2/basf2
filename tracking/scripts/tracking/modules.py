@@ -103,7 +103,8 @@ class CDCFullFinder(metamodules.PathModule):
                  first_filter="tmva", first_tmva_cut=0.70,
                  background_filter="tmva", background_filter_tmva_cut=0.4,
                  new_segments_filter="none", new_segments_filter_tmva_cut=0,
-                 second_filter="none", second_tmva_cut=0):
+                 second_filter="none", second_tmva_cut=0,
+                 track_filter="all", track_filter_cut=0):
 
         modules = [
             CDCBackgroundHitFinder(
@@ -111,16 +112,25 @@ class CDCFullFinder(metamodules.PathModule):
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
                 debug_output=False),
             CDCSegmentTrackCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name,
+
                                     segment_track_filter_first_step_cut=first_tmva_cut,
                                     segment_track_filter_first_step_filter=first_filter,
+
                                     background_segment_filter=background_filter,
                                     background_segment_cut=background_filter_tmva_cut,
+
                                     new_segment_filter=new_segments_filter,
                                     new_segment_cut=new_segments_filter_tmva_cut,
+
                                     segment_track_filter_second_step_cut=second_tmva_cut,
                                     segment_track_filter_second_step_filter=second_filter,
+
                                     segment_train_filter="none",
-                                    segment_information_list_track_filter="none")
+
+                                    segment_information_list_track_filter="none",
+
+                                    track_filter=track_filter,
+                                    track_filter_cut=track_filter_cut)
         ]
 
         metamodules.PathModule.__init__(self, modules=modules)
@@ -333,14 +343,23 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
     def __init__(self,
                  segment_track_filter_first_step_filter,
                  segment_track_filter_first_step_cut,
+
                  background_segment_filter,
                  background_segment_cut,
+
                  new_segment_filter,
                  new_segment_cut,
+
                  segment_track_filter_second_step_filter,
                  segment_track_filter_second_step_cut,
+
                  segment_train_filter,
+
                  segment_information_list_track_filter,
+
+                 track_filter,
+                 track_filter_cut,
+
                  output_track_cands_store_array_name=None,
                  track_cands_store_vector_name="CDCTrackVector",
                  segments_store_vector_name="CDCRecoSegment2DVector"):
@@ -353,6 +372,7 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
             SegmentTrackFilterSecondStepFilter=segment_track_filter_second_step_filter,
             SegmentTrainFilter=segment_train_filter,
             SegmentInformationListTrackFilter=segment_information_list_track_filter,
+            TrackFilter=track_filter,
             WriteGFTrackCands=False,
             SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
@@ -378,6 +398,11 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
             combiner_module.param(
                 'SegmentTrackFilterSecondStepFilterParameters', {
                     "cut": str(segment_track_filter_second_step_cut)})
+
+        if track_filter == "tmva":
+            combiner_module.param(
+                'TrackFilterParameters', {
+                    "cut": str(track_filter_cut)})
 
         if output_track_cands_store_array_name is not None:
             combiner_module.param({'WriteGFTrackCands': True,
@@ -472,7 +497,8 @@ class CDCMCFinder(metamodules.IfStoreArrayNotPresentModule):
 class CDCRecoFitter(metamodules.PathModule):
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
-                 input_track_cands_store_array_name="TrackCands"):
+                 input_track_cands_store_array_name="TrackCands",
+                 prob_cut=0.001):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
@@ -480,7 +506,7 @@ class CDCRecoFitter(metamodules.PathModule):
         reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
             "RecoTrackCreator",
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
-        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter")
+        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", ProbCut=prob_cut)
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)

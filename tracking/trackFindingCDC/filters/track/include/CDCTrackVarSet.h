@@ -23,19 +23,27 @@ namespace Belle2 {
       "size",
       "pt",
       "sz_slope",
-      "fit_prob_3d",
+      //"fit_prob_3d",
       //"fit_prob_2d",
-      "fit_prob_sz",
+      //"fit_prob_sz",
       "drift_length_mean",
       "drift_length_variance",
       "drift_length_max",
       "drift_length_min",
       "drift_length_sum",
+
       "adc_mean",
       "adc_variance",
       "adc_max",
       "adc_min",
       "adc_sum",
+
+      "empty_s_mean",
+      "empty_s_variance",
+      "empty_s_max",
+      "empty_s_min",
+      "empty_s_sum",
+
       "s_range",
     };
 
@@ -46,7 +54,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 16;
+      static const size_t nNames = 19;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

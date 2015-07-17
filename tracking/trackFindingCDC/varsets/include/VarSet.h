@@ -145,6 +145,17 @@ namespace Belle2 {
         return m_variables[iVar];
       }
 
+      /// Set the given variable to the value if the value is not NaN els set it to valueIfNaN.
+      template<int iVar>
+      void setVariableIfNotNaN(const Float_t& value, const Float_t& valueIfNaN = 0)
+      {
+        if (std::isnan(value)) {
+          var<iVar>() = valueIfNaN;
+        } else {
+          var<iVar>() = value;
+        }
+      }
+
       /// Prepare the superlayer center array with information coming from the CDCWireTopology.
       void prepareSuperLayerCenterArray()
       {

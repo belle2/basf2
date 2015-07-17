@@ -92,6 +92,7 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   if (size > 1) {
     double driftLengthVarianceSquared = (drift_length_sum_squared - drift_length_sum * drift_length_sum / size)  / (size - 1.0) ;
     double adcVarianceSquared = (adc_sum_squared - adc_sum * adc_sum / size)  / (size - 1.0) ;
+    double emptySVarianceSquared = (empty_s_sum_squared - empty_s_sum * empty_s_sum / size)  / (size - 1.0) ;
 
     if (driftLengthVarianceSquared > 0) {
       drift_length_variance = std::sqrt(driftLengthVarianceSquared);
@@ -105,9 +106,16 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
       adc_variance = 0;
     }
 
+    if (emptySVarianceSquared > 0) {
+      empty_s_variance = std::sqrt(emptySVarianceSquared);
+    } else {
+      empty_s_variance = 0;
+    }
+
   } else {
     drift_length_variance = -1;
     adc_variance = -1;
+    empty_s_variance = -1;
   }
 
   const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
@@ -115,21 +123,30 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   const CDCTrajectorySZ& trajectorySZ = trajectory3D.getTrajectorySZ();
 
   var<named("size")>() = size;
-  var<named("pt")>() = trajectory2D.getAbsMom2D();
-  var<named("fit_prob_3d")>() = trajectory3D.getPValue();
+  setVariableIfNotNaN<named("pt")>(trajectory2D.getAbsMom2D());
+  //var<named("fit_prob_3d")>() = trajectory3D.getPValue();
   //var<named("fit_prob_2d")>() = trajectory2D.getPValue();
-  var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
-  var<named("sz_slope")>() = trajectorySZ.getSZSlope();;
-  var<named("drift_length_mean")>() = drift_length_sum / size;
-  var<named("drift_length_variance")>() = drift_length_variance;
-  var<named("drift_length_max")>() = drift_length_max;
-  var<named("drift_length_min")>() = drift_length_min;
-  var<named("drift_length_sum")>() = drift_length_sum;
-  var<named("adc_mean")>() = adc_sum / size;
-  var<named("adc_variance")>() = adc_variance;
-  var<named("adc_max")>() = adc_max;
-  var<named("adc_min")>() = adc_min;
-  var<named("adc_sum")>() = adc_sum;
-  var<named("s_range")>() = s_range;
+  //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
+
+  setVariableIfNotNaN<named("sz_slope")>(trajectorySZ.getSZSlope());
+  setVariableIfNotNaN<named("drift_length_mean")>(drift_length_sum / size);
+  setVariableIfNotNaN<named("drift_length_variance")>(drift_length_variance);
+  setVariableIfNotNaN<named("drift_length_max")>(drift_length_max);
+  setVariableIfNotNaN<named("drift_length_min")>(drift_length_min);
+  setVariableIfNotNaN<named("drift_length_sum")>(drift_length_sum);
+
+  setVariableIfNotNaN<named("adc_mean")>(adc_sum / size);
+  setVariableIfNotNaN<named("adc_variance")>(adc_variance);
+  setVariableIfNotNaN<named("adc_max")>(adc_max);
+  setVariableIfNotNaN<named("adc_min")>(adc_min);
+  setVariableIfNotNaN<named("adc_sum")>(adc_sum);
+
+  setVariableIfNotNaN<named("empty_s_mean")>(empty_s_sum / size);
+  setVariableIfNotNaN<named("empty_s_sum")>(empty_s_sum);
+  setVariableIfNotNaN<named("empty_s_variance")>(empty_s_variance);
+  setVariableIfNotNaN<named("empty_s_max")>(empty_s_max);
+  setVariableIfNotNaN<named("empty_s_min")>(empty_s_min);
+  setVariableIfNotNaN<named("s_range")>(s_range);
+
   return true;
 }

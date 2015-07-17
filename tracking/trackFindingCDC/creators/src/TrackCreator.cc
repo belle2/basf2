@@ -120,7 +120,10 @@ void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
     CDCSegmentPairTrack::const_iterator itSegmentPair = segmentPairTrack.begin();
     const CDCSegmentPair* ptrFirstSegmentPair = *itSegmentPair++;
 
-    if (not ptrFirstSegmentPair) B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+    if (not ptrFirstSegmentPair) {
+      B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+      return;
+    }
     const CDCSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
 
     // Keep the fit of the first segment pair to set it as the fit at the start of the track
@@ -132,7 +135,10 @@ void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
     while (itSegmentPair != segmentPairTrack.end()) {
 
       const CDCSegmentPair* ptrSecondSegmentPair = *itSegmentPair++;
-      if (not ptrSecondSegmentPair) B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+      if (not ptrSecondSegmentPair) {
+        B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+        return;
+      }
 
 
       const CDCSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;

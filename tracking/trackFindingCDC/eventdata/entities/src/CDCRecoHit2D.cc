@@ -50,7 +50,10 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(
   const CDCSimHit& simHit
 )
 {
-  if (wireHit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
+  if (wireHit == nullptr) {
+    B2ERROR("Recohit with nullptr as wire hit");
+    return CDCRecoHit2D();
+  }
 
   // find out if the wire is right or left of the track ( view in flight direction )
   Vector3D trackPosToWire =  simHit.getPosWire();

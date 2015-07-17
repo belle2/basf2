@@ -53,53 +53,60 @@ namespace Belle2 {
     /** Get the sensor ID.
      * @return ID of the sensor.
      */
-    VxdID getSensorID() const {
+    VxdID getSensorID() const
+    {
       return m_sensorID;
     }
 
     /** Get u coordinate of hit position.
      * @return u coordinate of hit position.
      */
-    short getRow() const {
+    short getRow() const
+    {
       return m_row;
     }
 
     /** Get v coordinate of hit position.
      * @return v coordinate of hit position.
      */
-    short getColumn() const {
+    short getColumn() const
+    {
       return m_column;
     }
 
     /** Get collected charge.
      * @return charge collected in the pixel.
      */
-    short getCharge() const {
+    short getCharge() const
+    {
       return m_charge;
     }
 
     /** Get cluster start pixel in u direction.
      * @return row where reading begins.
      */
-    unsigned short getStartRow() const {
+    unsigned short getStartRow() const
+    {
       return m_startRow;
     }
 
     /** Get number of the Frames.
      * @return Number of the Frames.
      */
-    unsigned short getFrameNr() const {
+    unsigned short getFrameNr() const
+    {
       return m_frameNr;
     }
 
     /** Get Common Mode correction.
      * @return Common Mode correction.
      */
-    unsigned short getCommonMode() const {
+    unsigned short getCommonMode() const
+    {
       return m_commonMode;
     }
 
-  protected:
+  private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object*/
     short m_row;         /**< Absolute pixel position in u. */
     short m_column;         /**< Absolute pixel position in v. */

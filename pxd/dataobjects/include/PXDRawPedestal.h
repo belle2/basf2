@@ -43,25 +43,28 @@ namespace Belle2 {
     /** Get the sensor ID.
      * @return ID of the sensor.
      */
-    VxdID getSensorID() const {
+    VxdID getSensorID() const
+    {
       return m_sensorID;
     }
 
     /** Get static pointer to data.
      * @return pointer.
      */
-    const unsigned char* getData() const {
+    const unsigned char* getData() const
+    {
       return m_pedestals;
     }
 
     /** Get Chip
      * @return chip id.
      */
-    unsigned short getChip() const {
+    unsigned short getChip() const
+    {
       return m_dhp_header & 0x3;
     }
 
-  protected:
+  private:
     unsigned short m_sensorID; /**< Compressed sensor identifier. actually a VxdID object */
     unsigned short m_dhp_header; /**< needed for Chip id */
     unsigned char m_pedestals[64 * 1024]; /**< Raw Pedestal data as it is memory dumped by the DHP */

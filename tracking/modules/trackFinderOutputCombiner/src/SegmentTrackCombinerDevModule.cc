@@ -22,8 +22,8 @@ REG_MODULE(SegmentTrackCombinerDev);
 
 SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   Super(),
-  m_segmentTrackFilterFirstStepFactory("tmva"),
-  m_backgroundSegmentsFilterFactory("tmva"),
+  m_segmentTrackFilterFirstStepFactory("none"),
+  m_backgroundSegmentsFilterFactory("none"),
   m_newSegmentsFilterFactory("none"),
   m_segmentTrackFilterSecondStepFactory("none"),
   m_segmentTrainFilterFactory("none"),

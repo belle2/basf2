@@ -6,6 +6,22 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void SegmentTrackCombiner::clearAndRecover()
+{
+  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+    for (SegmentInformation* segmentInformation : segments) {
+      CDCRecoSegment2D* segment = segmentInformation->getSegment();
+      if (segment->getAutomatonCell().hasMaskedFlag()) {
+        segment->getAutomatonCell().unsetTakenFlag();
+        segment->getAutomatonCell().unsetMaskedFlag();
+      }
+    }
+  }
+
+  m_trackLookUp.clear();
+  m_segmentLookUp.clear();
+}
+
 void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirstStep)
 {
   // Mark the segments which are fully found by the legendre track finder as taken
@@ -108,14 +124,14 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
   }
 }
 
-void SegmentTrackCombiner::filter(BaseBackgroundSegmentsFilter& backgroundSegmentsFilter)
+void SegmentTrackCombiner::filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentsFilter)
 {
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
       if (segment->isAlreadyTaken())
         continue;
       Weight filterResult = backgroundSegmentsFilter(segment->getSegment());
-      if (isNotACell(filterResult)) {
+      if (not isNotACell(filterResult)) {
         segment->getSegment()->getAutomatonCell().setTakenFlag();
         segment->getSegment()->getAutomatonCell().setBackgroundFlag();
       }
@@ -139,7 +155,7 @@ void SegmentTrackCombiner::filterOutNewSegments(BaseNewSegmentsFilter& newSegmen
 }
 
 
-void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackChooserSecondStep,
+void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackFilterSecondStep,
                                    BaseSegmentTrainFilter& segmentTrainFilter,
                                    BaseSegmentInformationListTrackFilter& segmentTrackFilter)
 {
@@ -153,7 +169,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackChooserSe
       if (segmentInformation->isAlreadyTaken()) {
         continue;
       }
-      matchTracksToSegment(segmentInformation, segmentTrackChooserSecondStep);
+      matchTracksToSegment(segmentInformation, segmentTrackFilterSecondStep);
 
       TrackInformation* bestMatch = segmentInformation->getBestMatch();
       if (bestMatch != nullptr) {
@@ -161,6 +177,8 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackChooserSe
         segmentInformation->clearMatches();
       }
     }
+
+    // From here on the code is unused!
 
     // Go through all tracks and delete the cases were we have more than one train/segment
     for (TrackInformation* trackInformation : m_trackLookUp) {

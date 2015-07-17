@@ -252,10 +252,11 @@ namespace Belle2 {
     {
       m_combiner.fillWith(tracks, segments);
       m_combiner.match(*m_ptrSegmentTrackFilterFirstStep);
-      m_combiner.filter(*m_ptrBackgroundSegmentFilter);
+      m_combiner.filterSegments(*m_ptrBackgroundSegmentFilter);
       m_combiner.filterOutNewSegments(*m_ptrNewSegmentFilter);
       m_combiner.combine(*m_ptrSegmentTrackFilterSecondStep, *m_ptrSegmentTrainFilter, *m_ptrSegmentInformationListTrackFilter);
-      m_combiner.clear();
+      m_combiner.filterTracks(tracks, *m_ptrTrackFilter);
+      m_combiner.clearAndRecover();
 
       // Resort the perpS information
       for (CDCTrack& track : tracks) {
@@ -273,23 +274,6 @@ namespace Belle2 {
         }
 
         track.sortByPerpS();
-      }
-
-
-      // TODO
-      // Filter out bad tracks
-      tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [this](const CDCTrack & track) -> bool {
-        double filterResult = m_ptrTrackFilter->operator()(track);
-        return isNotACell(filterResult);
-      }), tracks.end());
-
-      // TODO
-      // Recover the new segments
-      for (CDCRecoSegment2D& segment : segments) {
-        if (segment.getAutomatonCell().hasMaskedFlag()) {
-          segment.getAutomatonCell().unsetTakenFlag();
-          segment.getAutomatonCell().unsetMaskedFlag();
-        }
       }
 
     }

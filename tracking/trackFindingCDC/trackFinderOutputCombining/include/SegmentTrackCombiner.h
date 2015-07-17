@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilter.h>
 #include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/track/TrackFilter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
@@ -60,7 +61,7 @@ namespace Belle2 {
        * For deciding which is background or not we use the given filter.
        * @param backgroundSegmentFilter
        */
-      void filter(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
+      void filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
 
       /**
        * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.
@@ -92,14 +93,23 @@ namespace Belle2 {
 
 
       /**
-       * Clear all the pointer vectors.
+       * Clear all the pointer vectors and reset the "new segments" to be not taken.
        */
-      void clear()
+      void clearAndRecover();
+
+      void filterTracks(std::vector<CDCTrack>& tracks, BaseTrackFilter& trackFilter)
       {
-        m_trackLookUp.clear();
-        m_segmentLookUp.clear();
+        tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [&trackFilter](const CDCTrack & track) -> bool {
+          double filterResult = trackFilter(track);
+          return isNotACell(filterResult);
+        }), tracks.end());
       }
 
+      /**
+       * Helper function to add a segment to a track with respecting the taken information
+       * @param segment
+       * @param track
+       */
       static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track);
 
     private:

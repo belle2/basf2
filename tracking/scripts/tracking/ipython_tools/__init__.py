@@ -46,15 +46,9 @@ class IPythonHandler:
 
     def __init__(self):
         """
-        Create 1000 log files for later logging.
-        We use a logrotate system to not create too many log files.
-        If you need more than 1000 log files at the same time, consider changing your code
+        Each created log file gets registered and deleted if there are more than 100 log files present
         """
-        self.started_calculations = []
-        self.log_file_names = []
-        self.log_file_name_counter = 0
-
-        self.create_log_files()
+        self.log_files = []
 
     def process(self, path, result_queue=None):
         """
@@ -113,12 +107,16 @@ class IPythonHandler:
         return calculation.Basf2Calculation(process_list)
 
     def next_log_file_name(self):
-        next_log_file_name = self.log_file_names[self.log_file_name_counter]
-        self.log_file_name_counter = (self.log_file_name_counter + 1) % len(self.log_file_names)
-        return next_log_file_name
+        next_log_file = tempfile.mkstemp()
+        self.log_files.append(next_log_file)
+        while len(self.log_files) > 100:
+            first_log_file = self.log_files.pop(0)
+            f = first_log_file[0]
+            log_file_name = first_log_file[1]
 
-    def create_log_files(self):
-        self.log_file_names = [tempfile.mktemp() for i in xrange(1000)]
+            f.close()
+            os.unlink(log_file_name)
+        return next_log_file[1]
 
     def create_queue(self):
         """

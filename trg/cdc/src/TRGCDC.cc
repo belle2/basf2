@@ -2109,9 +2109,11 @@ TRGCDC::fastSimulation(void) {
       CDCTriggerTrack* track = storeTracks.appendNew();
       track->add2DHoughResult(track2D->charge(), track2D->pt(), track2D->helix().phi0());
       if (track2DFitted->fitted())
-        track->add2DFitResult(track2DFitted->pt(), track2DFitted->helix().phi0(), 0.);
+        track->add2DFitResult(track2DFitted->pt(), track2DFitted->helix().phi0(),
+                              track2DFitted->get2DFitChi2());
       if (track3D->fitted())
-        track->add3DFitResult(track3D->helix().dz(), track3D->helix().tanl(), 0.);
+        track->add3DFitResult(track3D->helix().dz(), track3D->helix().tanl(),
+                              track3D->get3DFitChi2());
       // relation to SegmentHits (from track3D to include both axial and stereo TS)
       vector<TRGCDCLink*> links = track3D->links();
       vector<unsigned> relParticleIds[nAxialSuperLayers()];

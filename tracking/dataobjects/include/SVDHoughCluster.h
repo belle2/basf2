@@ -30,7 +30,7 @@ namespace Belle2 {
   class SVDHoughCluster : public TObject {
 
   public:
-    SVDHoughCluster(): trackID(0), hitPos(), sensorID(0) {}
+    SVDHoughCluster(): trackID(0), hitPos(), sensorID(0), qOH(0) {}
 
     SVDHoughCluster(unsigned int id, TVector3 pos, VxdID sensID = 0, unsigned int _qOH = 0): trackID(id), hitPos(pos),
       sensorID(sensID), qOH(_qOH) {}

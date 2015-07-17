@@ -11,6 +11,8 @@
 //#ifndef SVD_HOUGHTRACK_H
 //#define SVD_HOUGHTRACK_H
 
+#include <math.h>
+
 #include <root/TObject.h>
 #include <root/TVector3.h>
 #include <root/TMath.h>
@@ -59,13 +61,15 @@ namespace Belle2 {
     /** Set functions */
     void setTrackID(unsigned int id) { trackID = id; }
 
-    void setTrackParam(double in_r, double in_phi, double in_theta) {
+    void setTrackParam(double in_r, double in_phi, double in_theta)
+    {
       r = in_r; phi = in_phi; theta = in_theta;
     }
 
     void setHitPos(TVector3 pos) { hitPos = pos; }
 
-    void setStraightParam(double m1, double m2, double a1, double a2) {
+    void setStraightParam(double m1, double m2, double a1, double a2)
+    {
       straight = true;
       m_1 = m1;
       a_1 = a1;
@@ -75,10 +79,15 @@ namespace Belle2 {
 
   private:
     bool straight = false;
-    unsigned int trackID;
-    double r, phi, theta;
+    unsigned int trackID = -1;
+    double r = TMath::QuietNaN();
+    double phi = TMath::QuietNaN();
+    double theta = TMath::QuietNaN();
     TVector3 hitPos;
-    double m_1, a_1, m_2, a_2;
+    double m_1 = TMath::QuietNaN();
+    double a_1 = TMath::QuietNaN();
+    double m_2 = TMath::QuietNaN();
+    double a_2 = TMath::QuietNaN();
 
     ClassDef(SVDHoughTrack, 1)
 

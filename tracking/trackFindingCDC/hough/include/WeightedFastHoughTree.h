@@ -119,7 +119,7 @@ namespace Belle2 {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
               auto measure =
-              [&childNode, &weightItemInDomain](const WithSharedMark<T>& item) -> Weight {
+              [&childNode, &weightItemInDomain](WithSharedMark<T>& item) -> Weight {
                 // Weighting function should not see the mark, but only the item itself.
                 return weightItemInDomain(item, &childNode);
               };

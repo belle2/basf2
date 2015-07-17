@@ -67,7 +67,7 @@ namespace Belle2 {
       void insert(const This& items,
                   Measure& measure)
       {
-        for (const Item& item : items) {
+        for (Item item : items) {
           const Weight weight = measure(item);
           if (not std::isnan(weight)) {
             insert(item, weight);

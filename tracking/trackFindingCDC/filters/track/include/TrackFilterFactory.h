@@ -37,7 +37,7 @@ namespace Belle2 {
       /** Getter for a descriptive purpose of the filter.*/
       virtual std::string getFilterPurpose() const override
       {
-        return "Segment background finder.";
+        return "Track fake finder.";
       }
 
       /** Create a filter with the given name, does not set filter specific parameters. */

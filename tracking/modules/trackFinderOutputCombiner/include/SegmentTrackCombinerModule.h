@@ -52,7 +52,7 @@ namespace Belle2 {
                   TrackFindingCDC::BaseSegmentTrackFilter, // = No
                   TrackFindingCDC::BaseSegmentTrainFilter, // = No
                   TrackFindingCDC::BaseSegmentInformationListTrackFilter, // = No
-                  TrackFindingCDC::TMVATrackFilter
+                  TrackFindingCDC::AllTrackFilter
                   > SegmentTrackCombinerModule;
 
   namespace TrackFindingCDC {
@@ -77,7 +77,8 @@ namespace Belle2 {
         m_ptrNewSegmentFilter(new NewSegmentFilter),
         m_ptrSegmentTrackChooserSecondStep(new SegmentTrackChooserSecondStep),
         m_ptrSegmentTrainFilter(new SegmentTrainFilter),
-        m_ptrSegmentTrackFilter(new SegmentTrackFilter) { }
+        m_ptrSegmentTrackFilter(new SegmentTrackFilter),
+        m_ptrTrackFilter(new TrackFilter) { }
 
       /** Initialize the filter */
       void initialize() override
@@ -286,9 +287,9 @@ namespace Belle2 {
       m_combiner.filter(*m_ptrBackgroundSegmentFilter);
       m_combiner.filterOutNewSegments(*m_ptrNewSegmentFilter);
       m_combiner.combine(*m_ptrSegmentTrackChooserSecondStep, *m_ptrSegmentTrainFilter, *m_ptrSegmentTrackFilter);
-
       m_combiner.clear();
 
+      // Resort the perpS information
       for (CDCTrack& track : tracks) {
         const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
         const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
@@ -311,7 +312,7 @@ namespace Belle2 {
       tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [this](const CDCTrack & track) -> bool {
         double filterResult = m_ptrTrackFilter->operator()(track);
         return isNotACell(filterResult);
-      }));
+      }), tracks.end());
 
       // Recover the new segments
       for (CDCRecoSegment2D& segment : segments) {

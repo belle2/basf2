@@ -9,13 +9,21 @@
 **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/Ptr.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    /// Mixin class to attach a mark that is shared among many instances.
     template<class T>
-    class WithSharedMark : public T {
+    class WithSharedMark : public StarToPtr<T> {
+    private:
+      /// Base class of the mixin
+      using Super = StarToPtr<T>;
+
     public:
       /// Mixin class Wraps an object including r the mark is provided from a shared position.
-      WithSharedMark(const T& obj, bool* isMarked) : T(obj), m_isMarked(isMarked)
+      WithSharedMark(const T& obj, bool* isMarked) : Super(obj), m_isMarked(isMarked)
       {;}
 
       /// Check if the object has been marked

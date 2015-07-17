@@ -44,5 +44,26 @@ namespace Belle2 {
       /// Reference to the marked items.
       T* m_obj;
     };
+
+
+    /// Helper trait to replace a T* with Ptr<T> when needed.
+    template<class T>
+    struct ReplaceStarWithPtrImpl {
+      /// Base implementation just forwards the original type.
+      using Type = T;
+    };
+
+    /// Helper trait to replace a T* with Ptr<T> when needed.
+    template<class T>
+    struct ReplaceStarWithPtrImpl<T*> {
+      /// Specilisation replaces T* with Ptr<T>.
+      using Type = Ptr<T>;
+    };
+
+
+    /// Helper trait to replace a T* with Ptr<T> when needed.
+    template<class T>
+    using StarToPtr = typename ReplaceStarWithPtrImpl<T>::Type;
+
   }
 }

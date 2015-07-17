@@ -19,7 +19,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class Hit,
+    template<class HitPtr,
              size_t phi0Divisions = 2, // Division at each level
              size_t curvDivisions = 2> // Division at each level
     class HitPhi0CurvLegendre {
@@ -28,7 +28,7 @@ namespace Belle2 {
       using Phi0CurvBoxDivision = LinearDivision<Phi0CurvBox, phi0Divisions, curvDivisions>;
 
       /// Type of the fast hough tree structure
-      using HitPhi0CurvFastHoughTree = WeightedFastHoughTree<Hit, Phi0CurvBox, Phi0CurvBoxDivision>;
+      using HitPhi0CurvFastHoughTree = WeightedFastHoughTree<HitPtr, Phi0CurvBox, Phi0CurvBoxDivision>;
 
     public:
       /// Constructor using the default values
@@ -86,14 +86,14 @@ namespace Belle2 {
       }
 
       /// Prepare the leave finding by filling the top node with given hits
-      void seed(std::vector<Hit*>& hits)
+      void seed(std::vector<HitPtr>& hits)
       {
         if (not m_hitPhi0CurvFastHoughTree) { initialize(); }
         m_hitPhi0CurvFastHoughTree->seed(hits);
       }
 
       /// Find disjoint leaves heavier than minWeight
-      std::vector<std::pair<Phi0CurvBox,  std::vector<Ptr<Hit> > > >
+      std::vector<std::pair<Phi0CurvBox,  std::vector<HitPtr> > >
       find(const Weight& minWeight, const double& maxCurv = NAN)
       {
         typedef typename HitPhi0CurvFastHoughTree::Node Node;

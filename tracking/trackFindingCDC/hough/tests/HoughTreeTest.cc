@@ -33,14 +33,14 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   // const size_t phiDivisions = 3;
   // const size_t curvDivisions = 3;
 
-  using TrackHitPhi0CurvQuadLegendre = HitPhi0CurvLegendre<TrackHit, phi0Divisions, curvDivisions>;
+  using TrackHitPhi0CurvQuadLegendre = HitPhi0CurvLegendre<const TrackHit*, phi0Divisions, curvDivisions>;
   TrackHitPhi0CurvQuadLegendre trackHitPhi0CurvQuadLegendre(maxLevel);
   trackHitPhi0CurvQuadLegendre.initialize();
 
   // Get the hits form the test event
   markAllHitsAsUnused();
   std::set<TrackHit*>& hits_set = getHitSet();
-  std::vector<TrackHit*> hitVector;
+  std::vector<const TrackHit*> hitVector;
 
   for (TrackHit* trackHit : hits_set) {
     if (trackHit->getSuperlayerId() % 2 == 0)
@@ -48,7 +48,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   }
 
   // Execute the finding a couple of time to find a stable execution time.
-  vector< pair<Phi0CurvBox, vector<Ptr<TrackHit> > > > candidates;
+  vector< pair<Phi0CurvBox, vector<const TrackHit*> > > candidates;
 
   // Is this still C++? Looks like JavaScript to me :-).
   TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -73,7 +73,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 
   trackHitPhi0CurvQuadLegendre.raze();
 
-  for (std::pair<Phi0CurvBox, std::vector<Ptr<TrackHit> > >& candidate : candidates) {
+  for (std::pair<Phi0CurvBox, std::vector<const TrackHit*> >& candidate : candidates) {
     B2INFO("Candidate");
     B2INFO("size " << candidate.second.size());
     B2INFO("Phi " << candidate.first.getLowerBound<0>().getAngle());

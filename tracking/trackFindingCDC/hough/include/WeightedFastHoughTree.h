@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/hough/DynTree.h>
 #include <tracking/trackFindingCDC/hough/WithWeightedItems.h>
 #include <tracking/trackFindingCDC/hough/WithSharedMark.h>
-#include <tracking/trackFindingCDC/utilities/Ptr.h>
 
 #include <framework/logging/Logger.h>
 
@@ -22,16 +21,16 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type of tree for paritioning the hough space
-    template<class Item, class Domain, class DomainDivsion>
-    using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, Item>, DomainDivsion>;
+    template<class T, class Domain, class DomainDivsion>
+    using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, T>, DomainDivsion>;
 
-    template<class Item, class Domain, class DomainDivsion>
+    template<class T, class Domain, class DomainDivsion>
     class WeightedFastHoughTree :
-      public WeightedParititioningDynTree< WithSharedMark<Ptr<Item> >, Domain, DomainDivsion> {
+      public WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion> {
 
     private:
       /// Type of the Tree the partitions using markable items the hough space
-      using Super = WeightedParititioningDynTree<WithSharedMark<Ptr<Item> >, Domain, DomainDivsion>;
+      using Super = WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion>;
 
     public:
       /// Inheriting the constructor from the base class.
@@ -47,11 +46,11 @@ namespace Belle2 {
       {
         fell();
         Node& topNode = this->getTopNode();
-        for (Ptr<Item> item : items) {
+        for (const auto& item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
           Weight weight = HIGHEST_WEIGHT;
-          topNode.insert(WithSharedMark<Ptr<Item> >(item, &markOfItem), weight);
+          topNode.insert(WithSharedMark<T>(item, &markOfItem), weight);
         }
       }
 
@@ -61,7 +60,7 @@ namespace Belle2 {
       {
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.
-          auto isMarked = [](const WithSharedMark<Ptr<Item> >& item) -> bool {
+          auto isMarked = [](const WithSharedMark<T>& item) -> bool {
             return item.isMarked();
           };
           node->eraseIf(isMarked);
@@ -72,7 +71,7 @@ namespace Belle2 {
       }
 
       template<class ItemInDomainMeasure>
-      std::vector<std::pair<Domain,  std::vector<Ptr<Item> > > >
+      std::vector<std::pair<Domain,  std::vector<T> > >
       findHeavyLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
                               const size_t maxLevel,
                               const double minWeight)
@@ -84,12 +83,12 @@ namespace Belle2 {
       }
 
       template<class ItemInDomainMeasure, class SkipNodePredicate>
-      std::vector<std::pair<Domain,  std::vector<Ptr<Item > > > >
+      std::vector<std::pair<Domain,  std::vector<T> > >
       findLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
                          const size_t maxLevel,
                          SkipNodePredicate& skipNode)
       {
-        std::vector<std::pair<Domain,  std::vector<Ptr<Item> > > > found;
+        std::vector<std::pair<Domain,  std::vector<T> > > found;
 
         auto walker = [&](Node * node) {
           // Node does not have enough items
@@ -102,8 +101,8 @@ namespace Belle2 {
           // Do not walk children
           if (node->getLevel() >= maxLevel) {
             const Domain* domain = node;
-            found.emplace_back(*domain, std::vector<Ptr<Item> >(node->begin(), node->end()));
-            for (WithSharedMark<Ptr<Item> >& markableItem : *node) {
+            found.emplace_back(*domain, std::vector<T>(node->begin(), node->end()));
+            for (WithSharedMark<T>& markableItem : *node) {
               markableItem.mark();
             }
             return false;
@@ -119,7 +118,9 @@ namespace Belle2 {
             for (Node& childNode : *children) {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
-              auto measure = [&childNode, &weightItemInDomain](const Ptr<Item>& item) {
+              auto measure =
+              [&childNode, &weightItemInDomain](const WithSharedMark<T>& item) -> Weight {
+                // Weighting function should not see the mark, but only the item itself.
                 return weightItemInDomain(item, &childNode);
               };
               childNode.insert(*node, measure);

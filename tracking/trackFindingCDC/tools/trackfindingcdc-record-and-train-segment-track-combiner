@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]; then
 	echo "usage: $0 training_root_file";
-	echo "   This script creates all weight files for the SegmentTrackCombinerModule from the giben root file with events."; 
+	echo "   This script creates all weight files for the SegmentTrackCombinerModule from the given root file with events."; 
 	exit;
 fi
 

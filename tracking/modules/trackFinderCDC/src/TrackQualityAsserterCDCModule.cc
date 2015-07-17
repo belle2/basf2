@@ -20,16 +20,20 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
     const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
     const double radius = fabs(trajectory2D.getGlobalCircle().radius());
 
-    // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
-    // especially for curlers. For this, we go through all hits and look for negative perpS. If we have found one, we shift it to positive values
-    for (CDCRecoHit3D& recoHit : track) {
-      double currentPerpS = recoHit.getPerpS();
-      if (currentPerpS < 0) {
-        recoHit.setPerpS(2 * TMath::Pi() * radius + currentPerpS);
+    /*// Check if the second hit has a negative perpS. If yes, the trajectory is reversed
+    if(track.size() < 2) continue;
+    const CDCRecoHit3D & secondHit = track[1];
+    if(secondHit.getPerpS() < 0) {
+      const CDCTrajectory2D & reversedTrajectory2D = trajectory2D.reversed();
+      for(CDCRecoHit3D & recoHit : track) {
+        recoHit.setPerpS(-recoHit.getPerpS());
       }
-    }
 
-    track.sortByPerpS();
+      CDCTrajectory3D reversedTrajectory3D(reversedTrajectory2D, trajectorySZ);
+      track.setStartTrajectory3D(reversedTrajectory3D);
+    }*/
+
+
 
     // Skip this track if it is no curler
     if (not trajectory2D.getOuterExit().hasNAN()) {
@@ -59,5 +63,19 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
     track.erase(std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & recoHit) -> bool {
       return recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag();
     }), track.end());
+  }
+
+  tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
+    bool hasStereoHit = false;
+    for (const CDCRecoHit3D& recoHit : track)
+    {
+      if (recoHit.getStereoType() != AXIAL)
+        hasStereoHit = true;
+    }
+    return track.size() < 3;
+  }));
+
+  for (const CDCTrack& track : tracks) {
+    B2INFO(track.size());
   }
 }

@@ -225,6 +225,8 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackChooserSe
       }
     }
 
+    /*
+
     // Go through all tracks and delete the cases were we have more than one train/segment
     for (TrackInformation* trackInformation : m_trackLookUp) {
       // Try to find the longest trains of segments
@@ -259,7 +261,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackChooserSe
         tryToCombineSegmentTrainAndMatchedTracks(goodTrain, segmentTrackFilter);
 
       trackInformation->clearGoodSegmentTrain();
-    }
+    }*/
   }
 }
 

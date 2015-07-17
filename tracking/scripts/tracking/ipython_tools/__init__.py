@@ -91,19 +91,15 @@ class IPythonHandler:
         TODO
         ----
 
-        Create a pool of workers! Return a CalculationList with some small helper functions!
+        Create a pool of workers!
         """
 
         calculation_list = calculation.Basf2CalculationList(path_creator_function, *list_of_parameters)
         all_paths, all_queues = calculation_list.create_all_paths()
-        process_list = [
-            Basf2Process(
-                path=path,
-                result_queue=q,
-                log_file_name=self.next_log_file_name()) for path,
-            q in zip(
-                all_paths,
-                all_queues)]
+        process_list = [Basf2Process(path=path,
+                                     result_queue=q,
+                                     log_file_name=self.next_log_file_name())
+                        for path, q in zip(all_paths, all_queues)]
         return calculation.Basf2Calculation(process_list)
 
     def next_log_file_name(self):

@@ -262,17 +262,15 @@ class Basf2CalculationList():
         every_parameter_combination = list(every_parameter_combination)
         all_queues = [queue.Basf2CalculationQueue() for combination in every_parameter_combination]
 
-        args, vargs, vwargs, defaults = inspect.getargspec(self.path_function)
-        if "queue" in args:
-            all_paths = [
-                self.path_function(
-                    queue=q,
-                    *parameter_combination) for q,
-                parameter_combination in zip(
-                    all_queues,
-                    list(every_parameter_combination))]
-        else:
-            all_paths = [self.path_function(*parameter_combination) for parameter_combination
-                         in every_parameter_combination]
+        def f(queue, parameter_combination):
+            args, vargs, vwargs, defaults = inspect.getargspec(self.path_function)
+            queue.put("basf2.parameter", parameter_combination)
+            if "queue" in args:
+                queue_index = args.index("queue")
+                parameter_list = list(parameter_combination)
+                parameter_list.insert(queue_index, queue)
+                parameter_combination = tuple(parameter_list)
+            return self.path_function(*parameter_combination)
 
+        all_paths = [f(q, parameter_combination) for q, parameter_combination in zip(all_queues, list(every_parameter_combination))]
         return all_paths, all_queues

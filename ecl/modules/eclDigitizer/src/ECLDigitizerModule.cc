@@ -1146,11 +1146,11 @@ void ECLDigitizerModule::readDSPDB()
 
 
         if (dgg1[j1] != 0) {
+          if (j1 < 24) {
 
-
-          fg41[j1][i] = (g2g2[j1] * sg[i][j1] - gg2[j1] * sg2[i][j1]) / dgg1[j1];
-          fg43[j1][i] = (gg[j1] * sg2[i][j1] - gg2[j1] * sg[i][j1]) / dgg1[j1];
-
+            fg41[j1][i] = (g2g2[j1] * sg[i][j1] - gg2[j1] * sg2[i][j1]) / dgg1[j1];
+            fg43[j1][i] = (gg[j1] * sg2[i][j1] - gg2[j1] * sg[i][j1]) / dgg1[j1];
+          }
 
         }
 

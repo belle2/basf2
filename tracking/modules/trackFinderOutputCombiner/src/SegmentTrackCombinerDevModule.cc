@@ -27,7 +27,8 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   m_newSegmentsFilterFactory("none"),
   m_segmentTrackChooserSecondStepFactory("none"),
   m_segmentTrainFilterFactory("none"),
-  m_segmentTrackFilterFactory("none")
+  m_segmentTrackFilterFactory("none"),
+  m_trackFilterFactory("all")
 {
   setDescription("Versatile module with adjustable filters for segment track combination.");
 
@@ -37,6 +38,7 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
   m_segmentTrackChooserSecondStepFactory.exposeParameters(this);
   m_segmentTrainFilterFactory.exposeParameters(this);
   m_segmentTrackFilterFactory.exposeParameters(this);
+  m_trackFilterFactory.exposeParameters(this);
 }
 
 void SegmentTrackCombinerDevModule::initialize()
@@ -60,6 +62,9 @@ void SegmentTrackCombinerDevModule::initialize()
   std::unique_ptr<BaseSegmentInformationListTrackFilter> ptrSegmentTrackFilter = m_segmentTrackFilterFactory.create();
   setSegmentTrackFilter(std::move(ptrSegmentTrackFilter));
 
+  std::unique_ptr<BaseTrackFilter> ptrTrackFilter = m_trackFilterFactory.create();
+  setTrackFilter(std::move(ptrTrackFilter));
+
   SegmentTrackCombinerImplModule<>::initialize();
 
   if (getSegmentTrackChooserFirstStep()->needsTruthInformation() or
@@ -67,7 +72,8 @@ void SegmentTrackCombinerDevModule::initialize()
       getNewSegmentFilter()->needsTruthInformation() or
       getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
-      getSegmentTrackFilter()->needsTruthInformation()) {
+      getSegmentTrackFilter()->needsTruthInformation() or
+      getTrackFilter()->needsTruthInformation()) {
     StoreArray <CDCSimHit>::required();
     StoreArray <MCParticle>::required();
   }
@@ -81,7 +87,8 @@ void SegmentTrackCombinerDevModule::event()
       getNewSegmentFilter()->needsTruthInformation() or
       getSegmentTrackChooserSecondStep()->needsTruthInformation() or
       getSegmentTrainFilter()->needsTruthInformation() or
-      getSegmentTrackFilter()->needsTruthInformation()) {
+      getSegmentTrackFilter()->needsTruthInformation() or
+      getTrackFilter()->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 

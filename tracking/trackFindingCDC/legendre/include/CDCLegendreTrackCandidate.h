@@ -39,7 +39,7 @@ namespace Belle2 {
       TrackCandidate(TrackCandidate& candidate);
 
       /** Construct track candidate using information from CDCLegendreQuadTree nodes */
-      TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList);
+      explicit TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList);
 
       /**
        * @brief Get charge assumption based on the provided Hits

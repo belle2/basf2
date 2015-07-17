@@ -48,7 +48,7 @@ namespace Belle2 {
       {;}
 
       /// Constructs a trajectory from a helix with reference point equivalent to the origin.
-      CDCTrajectory3D(const UncertainHelix& helix) :
+      explicit CDCTrajectory3D(const UncertainHelix& helix) :
         m_localOrigin(0.0, 0.0, 0.0),
         m_localHelix(helix)
       {;}
@@ -76,7 +76,7 @@ namespace Belle2 {
       CDCTrajectory3D(const MCParticle& mcParticle, const FloatType& bZ);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
-      CDCTrajectory3D(const MCParticle& mcParticle);
+      explicit CDCTrajectory3D(const MCParticle& mcParticle);
 
       /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz linear trajectory
       CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,

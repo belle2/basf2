@@ -37,7 +37,7 @@ namespace Belle2 {
        * Initialize the object with the underlying instance that should be matched.
        * @param input
        */
-      MatchingInformation(OwnType* input) : m_object(input), m_isSorted(true)
+      explicit MatchingInformation(OwnType* input) : m_object(input), m_isSorted(true)
       {
         m_listOfMatches.reserve(5);
       };
@@ -128,7 +128,7 @@ namespace Belle2 {
     class TrackInformation : public MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation> {
     public:
       /** Initialize with a track cand pointer. We do not have the ownership */
-      TrackInformation(TrackFindingCDC::CDCTrack* trackCand) :
+      explicit TrackInformation(TrackFindingCDC::CDCTrack* trackCand) :
         MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation>(trackCand),
         m_perpSList(), m_goodFittingSegmentTrain(), m_minPerpS(0), m_maxPerpS(0)
       {
@@ -229,7 +229,7 @@ namespace Belle2 {
     class SegmentInformation : public MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation> {
     public:
       /** Initialize with a segmentpointer. We do not have the ownership */
-      SegmentInformation(TrackFindingCDC::CDCRecoSegment2D* segment) :
+      explicit SegmentInformation(TrackFindingCDC::CDCRecoSegment2D* segment) :
         MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation>(segment)
       {
       }

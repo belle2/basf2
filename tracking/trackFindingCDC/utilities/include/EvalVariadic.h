@@ -29,7 +29,8 @@ namespace Belle2 {
      */
     struct EvalVariadic {
       /// Constructor taking the variadic initalizer list.
-      template<typename ...T> EvalVariadic(T...) {}
+      template<typename ...T>
+      explicit EvalVariadic(T...) {}
     };
 
 

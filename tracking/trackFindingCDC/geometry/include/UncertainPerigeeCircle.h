@@ -189,7 +189,7 @@ namespace Belle2 {
       PerigeeCovariance passiveMovedCovarianceBy(const Vector2D& by) const
       {
         TMatrixD jacobian = passiveMoveByJacobian(by);
-        return perigeeCovariance().similarityTransformed(jacobian);
+        return PerigeeCovariance(perigeeCovariance().similarityTransformed(jacobian));
       }
 
 

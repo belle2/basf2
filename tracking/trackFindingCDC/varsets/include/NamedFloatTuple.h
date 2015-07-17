@@ -23,7 +23,7 @@ namespace Belle2 {
 
     public:
       /// Constructor taking an optional prefix that is prepended to all names if requested.
-      NamedFloatTuple(const std::string& prefix = "");
+      explicit NamedFloatTuple(const std::string& prefix = "");
 
       /// Marking the destructor virtual since we are using virtual functions.
       virtual ~NamedFloatTuple();

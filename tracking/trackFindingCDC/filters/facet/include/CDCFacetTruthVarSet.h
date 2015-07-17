@@ -46,7 +46,7 @@ namespace Belle2 {
 
     public:
       /// Construct the varset and take an optional prefix.
-      CDCFacetTruthVarSet(const std::string& prefix = "");
+      explicit CDCFacetTruthVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet
       virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);

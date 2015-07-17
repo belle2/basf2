@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
-      PairVarSet(const std::string& prefix = "") :
+      explicit PairVarSet(const std::string& prefix = "") :
         m_firstVarSet(prefix + "first_"),
         m_secondVarSet(prefix + "second_")
       {;}

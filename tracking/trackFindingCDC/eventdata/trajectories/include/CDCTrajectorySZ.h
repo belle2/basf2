@@ -37,13 +37,13 @@ namespace Belle2 {
 
 
       /// Constructs the trajectory from the given two dimensional sz line.
-      CDCTrajectorySZ(const UncertainSZLine& szLine) :
+      explicit CDCTrajectorySZ(const UncertainSZLine& szLine) :
         m_szLine(szLine)
       {;}
 
 
       /// Constructs the trajectory from the given two dimensional sz line.
-      CDCTrajectorySZ(const Line2D& szLine) :
+      explicit CDCTrajectorySZ(const Line2D& szLine) :
         m_szLine(szLine)
       {;}
 

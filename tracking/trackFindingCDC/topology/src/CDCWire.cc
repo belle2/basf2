@@ -41,6 +41,10 @@ CDCWire::CDCWire(
   m_phiRangeToRef(0.0, 0.0)
 { initialize(); }
 
+
+const CDCWire* CDCWire::getInstance(const WireID& wireID)
+{ return &(CDCWireTopology::getInstance().getWire(wireID)); }
+
 const CDCWire* CDCWire::getInstance(const CDCWire& wire)
 { return &(CDCWireTopology::getInstance().getWire(wire.getWireID())); }
 

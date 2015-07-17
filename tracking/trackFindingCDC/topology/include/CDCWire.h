@@ -54,7 +54,7 @@ namespace Belle2 {
       CDCWire() {;}
 
       /// Constructor taking the WireID convenience object. Use rather getInstance() to avoid instance constructions.
-      CDCWire(const WireID& wireID);
+      explicit CDCWire(const WireID& wireID);
 
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
       CDCWire(const ISuperLayerType& iSuperLayer,
@@ -68,6 +68,9 @@ namespace Belle2 {
        *  Getter for the already constructed instances form the CDCWireTopology::getInstance() object.
        */
       /**@{*/
+      /// Getter from the wireID convinience object. Does not construct a new object.
+      static const CDCWire* getInstance(const WireID& wireID);
+
       /// Getter from the wireID convinience object. Does not construct a new object.
       static const CDCWire* getInstance(const CDCWire& wire);
 

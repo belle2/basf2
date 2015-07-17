@@ -73,7 +73,7 @@ namespace Belle2 {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCFacetFitVarSet(const std::string& prefix = "");
+      explicit CDCFacetFitVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet
       virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);

@@ -56,7 +56,7 @@ namespace Belle2 {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      CDCWireHitClusterBkgTruthVarSet(const std::string& prefix = "");
+      explicit CDCWireHitClusterBkgTruthVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCWireHitCluster* cluster) IF_NOT_CINT(override final);

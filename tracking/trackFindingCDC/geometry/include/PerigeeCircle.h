@@ -46,7 +46,7 @@ namespace Belle2 {
                     const FloatType& impact);
 
       /// Constructor from the perigee parammeters.
-      PerigeeCircle(const TVectorD& parameters);
+      explicit PerigeeCircle(const TVectorD& parameters);
 
 
     private:
@@ -59,13 +59,13 @@ namespace Belle2 {
 
     public:
       /// Constructor from a two dimensional line
-      PerigeeCircle(const Line2D& n012);
+      explicit PerigeeCircle(const Line2D& n012);
 
       /// Constructor pomoting the generalized circle
-      PerigeeCircle(const GeneralizedCircle& n0123);
+      explicit PerigeeCircle(const GeneralizedCircle& n0123);
 
       /// Constructor from a two dimensional circle in center / radius representation
-      PerigeeCircle(const Circle2D& circle);
+      explicit PerigeeCircle(const Circle2D& circle);
 
       /// Constructor with the four parameters of the generalized circle
       static PerigeeCircle fromN(const FloatType& n0,

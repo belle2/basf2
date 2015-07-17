@@ -34,7 +34,7 @@ namespace Belle2 {
 
 
       /// Setup the covariance with the given covariance matrx
-      PerigeeCovariance(const TMatrixDSym& covarianceMatrix) :
+      explicit PerigeeCovariance(const TMatrixDSym& covarianceMatrix) :
         m_matrix(covarianceMatrix)
       { checkMatrix(); }
 

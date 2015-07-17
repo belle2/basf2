@@ -47,7 +47,7 @@ namespace Belle2 {
 
     public:
       /// Create the union varset with the given prefix to all variables.
-      VariadicUnionVarSet(const std::string& prefix = "")
+      explicit VariadicUnionVarSet(const std::string& prefix = "")
       {
         EvalVariadic{
           (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new VarSets_(prefix))) , true)...

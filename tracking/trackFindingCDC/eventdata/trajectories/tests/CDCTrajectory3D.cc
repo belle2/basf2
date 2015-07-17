@@ -114,8 +114,8 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
   genfit::TrackCand gfTrackCand;
   trajectory3D.fillInto(gfTrackCand, bZ);
 
-  Vector3D position = gfTrackCand.getPosSeed();
-  Vector3D momentum = gfTrackCand.getMomSeed();
+  Vector3D position(gfTrackCand.getPosSeed());
+  Vector3D momentum(gfTrackCand.getMomSeed());
   SignType charge = gfTrackCand.getChargeSeed();
   TMatrixDSym cov6 = gfTrackCand.getCovSeed();
 

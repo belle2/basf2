@@ -28,7 +28,7 @@ namespace Belle2 {
 
     public:
       /// Constructor taking a flag if boarderline feasable cases should be excluded.
-      FitlessFacetFilter(bool hardCut = true);
+      explicit FitlessFacetFilter(bool hardCut = true);
 
     public:
       /** Main filter method returning the weight of the facet.

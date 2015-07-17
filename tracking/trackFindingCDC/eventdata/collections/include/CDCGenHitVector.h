@@ -63,7 +63,7 @@ namespace Belle2 {
       class HasWirePredicate {
       public:
         /// Constructor of the helper class taking the sought wire.
-        HasWirePredicate(const Belle2::TrackFindingCDC::CDCWire& wire) : m_wire(wire) {;}
+        explicit HasWirePredicate(const Belle2::TrackFindingCDC::CDCWire& wire) : m_wire(wire) {;}
 
         /// Evaluates if the given item has the sought wire.
         bool operator()(const T& item) { return item->hasWire(m_wire); }
@@ -76,7 +76,7 @@ namespace Belle2 {
       class HasWireHitPredicate {
       public:
         /// Constructor of the helper class taking the sought wire hit.
-        HasWireHitPredicate(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
+        explicit HasWireHitPredicate(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) : m_wirehit(wirehit) {;}
 
         /// Evaluates if the given item has the sought wire hit.
         bool operator()(const T& item) { return item->hasWireHit(m_wirehit); }

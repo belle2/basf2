@@ -60,10 +60,10 @@ namespace Belle2 {
                         const FloatType& n3 = 0);
 
       /// Constructor from a two dimensional line
-      GeneralizedCircle(const Line2D& n012);
+      explicit GeneralizedCircle(const Line2D& n012);
 
       /// Constructor from a two dimensional circle
-      GeneralizedCircle(const Circle2D& circle);
+      explicit GeneralizedCircle(const Circle2D& circle);
 
       /**
       Constructor from center, radius and a optional orientation.

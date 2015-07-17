@@ -114,7 +114,7 @@ namespace Belle2 {
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
-      FixedSizeNamedFloatTuple(const std::string& prefix = "") :
+      explicit FixedSizeNamedFloatTuple(const std::string& prefix = "") :
         NamedFloatTuple(prefix)
       {;}
 

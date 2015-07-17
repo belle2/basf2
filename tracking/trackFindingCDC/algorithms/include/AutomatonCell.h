@@ -61,7 +61,7 @@ namespace Belle2 {
         m_state(0) {;}
 
       /// Constructor with a certain cell weight
-      AutomatonCell(const CellState& weight) :
+      explicit AutomatonCell(const CellState& weight) :
         m_weight(weight),
         m_flags(0),
         m_state(0) {;}

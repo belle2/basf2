@@ -49,7 +49,7 @@ namespace Belle2 {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      CDCRecoSegment2DTruthVarSet(const std::string& prefix = "") : VarSet<CDCRecoSegment2DTruthVarNames>(prefix) { }
+      explicit CDCRecoSegment2DTruthVarSet(const std::string& prefix = "") : VarSet<CDCRecoSegment2DTruthVarNames>(prefix) { }
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override);

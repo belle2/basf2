@@ -250,7 +250,7 @@ UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observati
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);
 
-  TMatrixDSym tPerigeeCovariance(3);
+  PerigeeCovariance tPerigeeCovariance;
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       tPerigeeCovariance(i, j) = perigeeCovariance(i, j);

@@ -51,7 +51,7 @@ namespace Belle2 {
       /** Construct for a dummy CDCWireHit. The wire hit is still assoziated with a wire
       but has no hit attached to it.
           The getHit() will yield nullptr. The getStoreIHit() yields -1 for this case. */
-      CDCWireHit(const CDCWire* ptrWire);
+      explicit CDCWireHit(const CDCWire* ptrWire);
 
     public:
       /// Constructor for augmenting the CDCHit with the geometry information of the CDCWire.

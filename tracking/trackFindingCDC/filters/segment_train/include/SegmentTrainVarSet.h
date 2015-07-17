@@ -59,7 +59,7 @@ namespace Belle2 {
 
     public:
       /// Construct the peeler and take an optional prefix.
-      SegmentTrainVarSet(const std::string& prefix = "") : VarSet<SegmentTrainVarNames>(prefix) { }
+      explicit SegmentTrainVarSet(const std::string& prefix = "") : VarSet<SegmentTrainVarNames>(prefix) { }
 
       const float m_param_percentageForPerpSMeasurements = 0.05; /**< We use this amount of overlap when defining a segment train */
 

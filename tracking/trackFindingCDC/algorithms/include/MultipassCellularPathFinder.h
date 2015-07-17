@@ -41,7 +41,7 @@ namespace Belle2 {
 
     public:
       /// Empty constructor
-      MultipassCellularPathFinder(const CellState& minStateToFollow = -std::numeric_limits<CellState>::infinity()):
+      explicit MultipassCellularPathFinder(const CellState& minStateToFollow = -std::numeric_limits<CellState>::infinity()):
         m_minStateToFollow(minStateToFollow) {;}
 
       /// Empty destructor

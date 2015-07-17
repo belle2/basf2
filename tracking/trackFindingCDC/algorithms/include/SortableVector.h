@@ -46,7 +46,7 @@ namespace Belle2 {
       class range : public std::pair<iterator, iterator> {
       public:
         /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
-        range(const std::pair<iterator, iterator>& iterator_pair) : std::pair<iterator, iterator>(iterator_pair) {;}
+        explicit range(const std::pair<iterator, iterator>& iterator_pair) : std::pair<iterator, iterator>(iterator_pair) {;}
 
         /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
         range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
@@ -62,7 +62,7 @@ namespace Belle2 {
       class const_range : public std::pair<const_iterator, const_iterator> {
       public:
         /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
-        const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>
+        explicit const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>
           (iterator_pair) {;}
 
         /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
@@ -96,7 +96,7 @@ namespace Belle2 {
       class const_reverse_range : public std::pair<const_reverse_iterator, const_reverse_iterator> {
       public:
         /// Constructor translating a pair of iterators to a range usable with range based for.
-        const_reverse_range(const std::pair<const_reverse_iterator, const_reverse_iterator>& iterator_reverse_pair) :
+        explicit const_reverse_range(const std::pair<const_reverse_iterator, const_reverse_iterator>& iterator_reverse_pair) :
           std::pair<const_reverse_iterator, const_reverse_iterator>(iterator_reverse_pair) {;}
 
         /// Constructor translating two iterators (e.g. rbegin, rend) to a range usable with range based for.
@@ -357,7 +357,11 @@ namespace Belle2 {
        *  The passed entity must support operator< as both arguments, meaning it is coaligned with items of this vector.*/
       template<class Coaligned>
       range equal_range(const Coaligned& coaligned)
-      { return isSorted() ? std::equal_range(begin(), end(), coaligned) : range(end() , end()); }
+      {
+        return isSorted() ?
+               range(std::equal_range(begin(), end(), coaligned)) :
+               range(end(), end());
+      }
 
       /// Returns returns the equal range constant iterator pair for the item in the constant vector.
       /** The equal range is only available in sorted vectors. If the isSorted state is not set \n
@@ -365,7 +369,11 @@ namespace Belle2 {
        *  The passed entity must support operator< as both arguments, meaning it is coaligned with items of this vector.*/
       template<class Coaligned>
       const_range equal_range(const Coaligned& coaligned) const
-      { return isSorted() ? std::equal_range(begin(), end(), coaligned) : const_range(end() , end()); }
+      {
+        return isSorted() ?
+               const_range(std::equal_range(begin(), end(), coaligned)) :
+               const_range(end(), end());
+      }
 
 
       // Note if you have to remove lots of items from the collection at random positions, better use sets.

@@ -129,8 +129,10 @@ namespace Belle2 {
       /// Iterator range type for a pair of iterators representing all the neighbors of a specific item.
       class range : public std::pair<iterator, iterator> {
       public:
+        /// Constructor from two iterators.
         range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
-        range(const std::pair<iterator, iterator>& itPair) : std::pair<iterator, iterator>(itPair) {;}
+        /// Constructor from iterator pair.
+        explicit range(const std::pair<iterator, iterator>& itPair) : std::pair<iterator, iterator>(itPair) {;}
 
         /// Begin of the range for range based for.
         iterator begin() const

@@ -69,7 +69,7 @@ namespace Belle2 {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCFacetFitlessVarSet(const std::string& prefix = "");
+      explicit CDCFacetFitlessVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);

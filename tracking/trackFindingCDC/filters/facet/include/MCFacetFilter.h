@@ -27,7 +27,7 @@ namespace Belle2 {
       /** Constructor also setting the switch ,
        *  if the reversed version of a facet (in comparision to MC truth) shall be accepted.
        */
-      MCFacetFilter(bool allowReverse = true) : Super(allowReverse) {;}
+      explicit MCFacetFilter(bool allowReverse = true) : Super(allowReverse) {;}
 
     public:
       /** Main filter method returning the weight of the facet.

@@ -45,7 +45,7 @@ namespace Belle2 {
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
        * (e.g. the position of the hit wire in normal space and in the conformal plane).
        */
-      TrackHit(const CDCWireHit* wireHit)
+      explicit TrackHit(const CDCWireHit* wireHit)
       {
         initializeFromWireHit(wireHit);
       }

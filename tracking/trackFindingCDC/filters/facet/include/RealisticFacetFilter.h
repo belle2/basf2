@@ -27,7 +27,7 @@ namespace Belle2 {
       RealisticFacetFilter();
 
       /// Constructor using given direction of flight deviation cut off.
-      RealisticFacetFilter(FloatType phiPullCut);
+      explicit RealisticFacetFilter(FloatType phiPullCut);
 
     public:
       /** Set the parameter with key to value.

@@ -135,11 +135,13 @@ namespace Belle2 {
 
       /// Getter for a coaligned subrange of wire hits.
       template<class Coaligned>
-      CDCWireHitRange getWireHits(const Coaligned& coaligned) const { return m_wireHits.equal_range(coaligned); }
+      CDCWireHitRange getWireHits(const Coaligned& coaligned) const
+      { return CDCWireHitRange(m_wireHits.equal_range(coaligned)); }
 
       /// Getter for a coaligned subrange of oriented wire hits
       template<class Coaligned>
-      CDCRLWireHitRange getRLWireHits(const Coaligned& coaligned) const { return m_rlWireHits.equal_range(coaligned); }
+      CDCRLWireHitRange getRLWireHits(const Coaligned& coaligned) const
+      { return CDCRLWireHitRange(m_rlWireHits.equal_range(coaligned)); }
 
       /// Getter for the wire hits
       const Belle2::TrackFindingCDC::SortableVector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits() const

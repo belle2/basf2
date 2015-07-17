@@ -19,7 +19,7 @@ namespace Belle2 {
 
       typedef typeData TypeData;
 
-      QuadTreeItem(typeData* data) : m_usedFlag(false), m_pointer(data) {};
+      explicit QuadTreeItem(typeData* data) : m_usedFlag(false), m_pointer(data) {};
 
       /**
        * Do not copy!

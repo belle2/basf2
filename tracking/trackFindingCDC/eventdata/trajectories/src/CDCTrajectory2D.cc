@@ -95,10 +95,11 @@ FloatType CDCTrajectory2D::getAbsMom2D() const
 
 
 
-Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine, const FloatType& distance) const
+Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
+                                        const FloatType& distance) const
 {
   Vector2D globalRefPos2D = globalSkewLine.refPos2D();
-  PerigeeCircle globalCircle = getGlobalCircle();
+  PerigeeCircle globalCircle(getGlobalCircle());
 
   // Translate the proper distance to the linearized distances measure
   FloatType fastDistance = distance != 0.0 ? globalCircle.fastDistance(distance) : 0.0;

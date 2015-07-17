@@ -146,7 +146,7 @@ namespace Belle2 {
       SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const
       {
         TMatrixD jacobian = passiveMoveByJacobian(bySZ);
-        return szCovariance().similarityTransformed(jacobian);
+        return SZCovariance(szCovariance().similarityTransformed(jacobian));
       }
 
 

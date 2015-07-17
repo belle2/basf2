@@ -69,7 +69,7 @@ namespace Belle2 {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCFacetRelationBasicVarSet(const std::string& prefix = "");
+      explicit CDCFacetRelationBasicVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet relation
       virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) IF_NOT_CINT(override final);

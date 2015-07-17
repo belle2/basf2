@@ -34,7 +34,7 @@ namespace Belle2 {
 
 
       /// Setup the covariance with the given covariance matrx
-      SZCovariance(const TMatrixDSym& covarianceMatrix) :
+      explicit SZCovariance(const TMatrixDSym& covarianceMatrix) :
         m_matrix(covarianceMatrix)
       { checkMatrix(); }
 

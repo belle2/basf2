@@ -53,7 +53,7 @@ namespace Belle2 {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCRecoSegment2DVarSet(const std::string& prefix = "");
+      explicit CDCRecoSegment2DVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet relation
       virtual bool extract(const CDCRecoSegment2D* ptrSegment) IF_NOT_CINT(override final);

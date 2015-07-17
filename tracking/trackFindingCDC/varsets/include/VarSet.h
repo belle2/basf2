@@ -49,7 +49,7 @@ namespace Belle2 {
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
-      VarSet(const std::string& prefix = "") :
+      explicit VarSet(const std::string& prefix = "") :
         m_superLayerCenters(),
         m_variables(prefix),
         m_nestedVarSet(prefix)

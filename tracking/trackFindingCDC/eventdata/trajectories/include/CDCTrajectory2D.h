@@ -40,7 +40,7 @@ namespace Belle2 {
       /// Constructs a trajectory from a generalized circle.
       /** Constructs a trajectory which is described by the given circle \n
        *  The start point is set to the closest approach to the origin */
-      CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle) :
+      explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle) :
         m_localOrigin(0.0, 0.0),
         m_localPerigeeCircle(perigeeCircle)
       {;}

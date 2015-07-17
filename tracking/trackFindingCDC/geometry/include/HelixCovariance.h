@@ -81,7 +81,7 @@ namespace Belle2 {
     public:
       /// Setter for the whole covariance matrix of the helix parameters
       inline void setMatrix(const TMatrixDSym& covarianceMatrix)
-      { m_matrix = covarianceMatrix; }
+      { m_matrix = covarianceMatrix; checkMatrix(); }
 
 
 
@@ -103,14 +103,14 @@ namespace Belle2 {
       PerigeeCovariance perigeeCovariance() const
       {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
-        return matrix().GetSub(iCurv, iI, iCurv, iI);
+        return PerigeeCovariance(matrix().GetSub(iCurv, iI, iCurv, iI));
       }
 
       /// Getter for the sz subcovariance
       SZCovariance szCovariance() const
       {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
-        return matrix().GetSub(iSZ, iZ0, iSZ, iZ0);
+        return SZCovariance(matrix().GetSub(iSZ, iZ0, iSZ, iZ0));
       }
 
 

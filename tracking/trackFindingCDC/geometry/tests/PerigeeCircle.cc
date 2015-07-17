@@ -29,7 +29,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
   FloatType impact = 1.0;
 
   // Checks if the normal parameters n follow the same sign convention
-  PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact);
+  PerigeeCircle perigeeCircle(curvature, tangentialPhi, impact);
 
   const GeneralizedCircle& generalizedCircle = perigeeCircle;
   //(perigeeCircle.n0(), perigeeCircle.n12(), perigeeCircle.n3());
@@ -68,7 +68,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
   FloatType impact = -1.0;
 
   // Checks if the normal parameters n follow the same sign convention
-  PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(curvature, tangtialPhi, impact);
+  PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
 
   EXPECT_EQ(1, perigeeCircle.minimalCylindricalR());
 }
@@ -81,7 +81,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
   FloatType impact = -1.0;
 
   // Checks if the normal parameters n follow the same sign convention
-  PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(curvature, tangtialPhi, impact);
+  PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
 
   EXPECT_EQ(3, perigeeCircle.maximalCylindricalR());
 }
@@ -112,7 +112,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
   FloatType tangentialPhi = 3. * PI / 4.;
   FloatType impact = 1. - sqrt(2.);
 
-  PerigeeCircle circle = PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact);
+  PerigeeCircle circle(curvature, tangentialPhi, impact);
 
   EXPECT_TRUE(circle.isCircle());
   EXPECT_FALSE(circle.isLine());
@@ -160,7 +160,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
   FloatType tangentialPhi = 3. * PI / 4.;
   FloatType impact = 1. - sqrt(2.0);
 
-  PerigeeCircle circle = PerigeeCircle::fromPerigeeParameters(curvature, tangentialPhi, impact);
+  PerigeeCircle circle(curvature, tangentialPhi, impact);
 
   circle.setNull();
 
@@ -281,9 +281,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
   FloatType impact = 0;
 
   // Checks if the normal parameters n follow the same sign convention
-  const PerigeeCircle perigeeCircle = PerigeeCircle::fromPerigeeParameters(expectedCurvature,
-                                      expectedPhi0,
-                                      impact);
+  const PerigeeCircle perigeeCircle(expectedCurvature,
+                                    expectedPhi0,
+                                    impact);
   const Vector2D& expectedPhi0Vec = perigeeCircle.tangential();
 
   FloatType randomArcLength = 2.0;

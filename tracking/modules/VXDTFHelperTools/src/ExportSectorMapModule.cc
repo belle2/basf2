@@ -51,31 +51,13 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
 //   setPropertyFlags(c_ParallelProcessingCertified); /// WARNING this module should _not_ be used for parallel processing! Its task is to create the sector maps only once...
 
   /// setting standard values for steering parameters
-  std::vector<double> defaultConfigU; // sector sizes
-  defaultConfigU.push_back(0.0);
-  defaultConfigU.push_back(0.5);
-  defaultConfigU.push_back(1.0);
-  std::vector<double> defaultConfigV;
-  defaultConfigV.push_back(0.0);
-  defaultConfigV.push_back(0.33);
-  defaultConfigV.push_back(0.67);
-  defaultConfigV.push_back(1.0);
-  std::vector<double> originVec;
-  originVec.push_back(0);
-  originVec.push_back(0);
-  originVec.push_back(0);
-  std::vector<int> sampleThreshold;
-  sampleThreshold.push_back(1);
-  sampleThreshold.push_back(100);
-  std::vector<double> smallSampleQuantiles;
-  smallSampleQuantiles.push_back(0.);
-  smallSampleQuantiles.push_back(1.);
-  std::vector<double> sampleQuantiles;
-  sampleQuantiles.push_back(0.001);
-  sampleQuantiles.push_back(0.999);
-  std::vector<double> stretchFactor;
-  stretchFactor.push_back(0.02); // change by 2%
-  stretchFactor.push_back(0.);
+  std::vector<double> defaultConfigU = {0., 0.5, 1.}; // sector sizes
+  std::vector<double> defaultConfigV = {0., 0.33, 0.67, 1.};
+  std::vector<double> originVec = {0., 0., 0.};
+  std::vector<int> sampleThreshold = {1, 100};
+  std::vector<double> smallSampleQuantiles = {0., 1.};
+  std::vector<double> sampleQuantiles = {0.001, 0.999};
+  std::vector<double> stretchFactor = {0.02, 0.}; // lower stretchFactor: change by 2%
   std::string rootFileName = "FilterCalculatorResults";
 
 
@@ -131,7 +113,8 @@ ExportSectorMapModule::ExportSectorMapModule() : Module()
   addParam("rootFileName", m_PARAMrootFileName, "only needed if importROOTorXML = true: sets the root filename", rootFileName);
 
   addParam("printFinalMaps", m_PARAMprintFinalMaps,
-           "if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen", bool(true));
+           "only needed if importROOTorXML = true: if true, a complete list of sectors (B2INFO) and its friends (B2DEBUG-1) will be printed on screen",
+           bool(true));
 }
 
 
@@ -154,13 +137,13 @@ void ExportSectorMapModule::initialize()
     if (int(m_PARAMstretchFactor.size()) != 2) { B2FATAL(" parameter stretchFactor is wrong, only exactly 2 entries allowed!")}
   } else { /// import via xml file
     if (int(m_PARAMsetOrigin.size()) != 3) {
-      B2WARNING("ExportSectorMapModule::terminate: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
+      B2WARNING("ExportSectorMapModule::initialize: origin is set wrong, please set only 3 values (x,y,z). Rejecting user defined value and reset to (0,0,0)!")
       m_PARAMsetOrigin.clear();
       m_PARAMsetOrigin.push_back(0);
       m_PARAMsetOrigin.push_back(0);
       m_PARAMsetOrigin.push_back(0);
     }
-    B2INFO("ExportSectorMapModule::terminate: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << ","
+    B2INFO("ExportSectorMapModule::initialize: origin is set to: (x,y,z) (" << m_PARAMsetOrigin[0] << "," << m_PARAMsetOrigin[1] << ","
            << m_PARAMsetOrigin[2] << ", magnetic field set to " << m_PARAMmagneticFieldStrength << "T")
   }
 }

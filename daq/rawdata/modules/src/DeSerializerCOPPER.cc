@@ -557,8 +557,6 @@ void DeSerializerCOPPERModule::event()
 
     // Fill header and trailer
     try {
-      printf("eve %.8x prev run %.8x cur run %.8x : %d %d %d\n", m_prev_ftsweve32, m_prev_exprunsubrun_no, m_exprunsubrun_no
-             , g_run_stop, g_run_recovery, g_run_restarting); fflush(stdout);
       m_prev_ftsweve32 = temp_rawcopper.FillTopBlockRawHeader(m_nodeid, m_data_type, m_trunc_mask,
                                                               m_prev_ftsweve32, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
       m_prev_exprunsubrun_no = m_exprunsubrun_no;

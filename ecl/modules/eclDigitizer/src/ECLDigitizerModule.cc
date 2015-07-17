@@ -59,10 +59,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
   setDescription("Creates ECLDigiHits from ECLHits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Background", m_background, "Flag to use the Digitizer configuration with backgrounds; Default is no background", false);
-
-//  addParam("RandomSeed", m_randSeed, "User-supplied random seed; Default 0 for ctime", (unsigned int)(0));
-
-
+  addParam("Calibration", m_calibration, "Flag to use the Digitizer for Waveform fit Covariance Matrix calibration; Default is false",
+           false);
 }
 
 
@@ -73,14 +71,14 @@ ECLDigitizerModule::~ECLDigitizerModule()
 
 void ECLDigitizerModule::initialize()
 {
-  if (m_background)
-    m_nEvent  = 0 ;
+  m_nEvent  = 0 ;
+  StoreArray<ECLDsp> ecldsp;
+  StoreArray<ECLDigit> ecldigi;
+  StoreArray<ECLTrig> ecltrig;
+  ecldsp.registerInDataStore();
+  ecldigi.registerInDataStore();
+  ecltrig.registerInDataStore();
   readDSPDB();
-
-  StoreArray<ECLDsp>::registerPersistent();
-  StoreArray<ECLDigit>::registerPersistent();
-  StoreArray<ECLTrig>::registerPersistent();
-
 }
 
 void ECLDigitizerModule::beginRun()
@@ -139,54 +137,53 @@ void ECLDigitizerModule::event()
   int n = 1250;//provide a shape array for interpolation
   double DeltaT =  gRandom->Uniform(0, 144);
 
-  for (const auto& eclHit : eclHits) {
-    int hitCellId       =  eclHit.getCellId() - 1; //0~8735
-    double hitE         =  eclHit.getEnergyDep()  / Unit::GeV;
-    double hitTimeAve   =  eclHit.getTimeAve() / Unit::us;
-    double sampleTime;
 
-    if (hitTimeAve > 8.5) { continue;}
-    E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
+  if (! m_calibration) { // normal running
 
-    for (int T_clock = 0; T_clock < 31; T_clock++) {
-      double timeInt =  DeltaT * 2. / 508.; //us
-      sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
-                   ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
-      DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
-      HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
-    }//for T_clock 31 clock
+    for (const auto& eclHit : eclHits) {
+      int hitCellId       =  eclHit.getCellId() - 1; //0~8735
+      double hitE         =  eclHit.getEnergyDep()  / Unit::GeV;
+      double hitTimeAve   =  eclHit.getTimeAve() / Unit::us;
 
-    /* This has been added by Alex Bobrov for calibration
-    of covariance matrix and should be removed when we will have a proper
-    calibration procedure
+      if (hitTimeAve > 8.5) { continue;}
+      E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
 
-    if(ii == 0){
+      for (int T_clock = 0; T_clock < 31; T_clock++) {
+        double timeInt =  DeltaT * 2. / 508.; //us
+        double sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
+                            ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
+        DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
+        HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
+      }//for T_clock 31 clock
 
-      int JiP;
-      for(JiP=0;JiP<8736;JiP++){
-    hitE=0.1;
-    hitTimeAve=0.0;
-    E_tmp[JiP] = hitE + E_tmp[JiP];//for summation deposit energy; do fit if this summation > 0.1 MeV
+    } //end loop over eclHitArray ii
 
-    for (int T_clock = 0; T_clock < 31; T_clock++) {
-    double timeInt =  DeltaT*2. / 508.; //us
+  } else { // calibration mode
 
-    sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32 ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
-    DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
-    HitEnergy[JiP][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[JiP][T_clock];
-    }//for T_clock 31 clock
+    // This has been added by Alex Bobrov for calibration
+    // of covariance matrix artificially generate 100 MeV in time for each crystal
 
-      }
+    int JiP;
+    for (JiP = 0; JiP < 8736; JiP++) {
+      double hitE = 0.1;
+      double hitTimeAve = 0.0;
+      E_tmp[JiP] = hitE + E_tmp[JiP];//for summation deposit energy; do fit if this summation > 0.1 MeV
+
+      for (int T_clock = 0; T_clock < 31; T_clock++) {
+        double timeInt =  DeltaT * 2. / 508.; //us
+        double sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
+                            ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
+        DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
+        HitEnergy[JiP][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[JiP][T_clock];
+      }//for T_clock 31 clock
     }
+    // end of Alex Bobrov ad-hoc calibration...
 
-    end of Alex Bobrov ad-hoc calibration...
-    */
-
-  } //end loop over eclHitArray ii
+  } // end of normal / calibration mode branches
 
 
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    if (E_tmp[iECLCell] > 0.0001) { // Bobrov removes this cut in calibration
+    if (m_calibration || E_tmp[iECLCell] > 0.0001) { // Bobrov removes this cut in calibration
       //Noise generation
       for (int iCal = 0; iCal < 31; iCal++) {
         genNoise[iCal] =  gRandom->Gaus(0, 1);

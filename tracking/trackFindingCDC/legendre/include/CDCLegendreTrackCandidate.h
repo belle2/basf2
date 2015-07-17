@@ -159,6 +159,16 @@ namespace Belle2 {
       }
 
       /**
+       * Sort hits by their cylindrical R information
+       */
+      void sortHitsByR()
+      {
+        std::sort(m_TrackHits.begin(), m_TrackHits.end(), [](TrackHit * hit1, TrackHit * hit2) {
+          return hit1->getWirePosition().Mag2() < hit2->getWirePosition().Mag2();
+        });
+      }
+
+      /**
        * set reference point, with respect to which track was found
        */
       TVector3 getReferencePoint() const {return TVector3(m_ref_x, m_ref_y, 0);}

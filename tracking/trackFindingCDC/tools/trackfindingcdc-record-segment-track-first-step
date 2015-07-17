@@ -21,7 +21,9 @@ class SegmentTrackFirstStepRecordingRun(StandardEventGenerationRun):
                                                    first_filter="recording",
                                                    second_filter="none",
                                                    background_filter="none",
-                                                   new_segments_filter="none"))
+                                                   new_segments_filter="none",
+                                                   track_filter="none",
+                                                   use_pair_finder=False))
         return main_path
 
 

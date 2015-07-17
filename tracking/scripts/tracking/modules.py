@@ -104,36 +104,43 @@ class CDCFullFinder(metamodules.PathModule):
                  background_filter="tmva", background_filter_tmva_cut=0.3,
                  new_segments_filter="none", new_segments_filter_tmva_cut=0,
                  second_filter="none", second_tmva_cut=0,
-                 track_filter="tmva", track_filter_cut=0.3):
+                 track_filter="tmva", track_filter_cut=0.3,
+                 use_pair_finder=True):
 
         modules = [
             CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
-                debug_output=False),
-            CDCSegmentTrackCombiner(output_track_cands_store_array_name=None,
-
-                                    segment_track_filter_first_step_cut=first_tmva_cut,
-                                    segment_track_filter_first_step_filter=first_filter,
-
-                                    background_segment_filter=background_filter,
-                                    background_segment_cut=background_filter_tmva_cut,
-
-                                    new_segment_filter=new_segments_filter,
-                                    new_segment_cut=new_segments_filter_tmva_cut,
-
-                                    segment_track_filter_second_step_cut=second_tmva_cut,
-                                    segment_track_filter_second_step_filter=second_filter,
-
-                                    segment_train_filter="none",
-
-                                    segment_information_list_track_filter="none",
-
-                                    track_filter=track_filter,
-                                    track_filter_cut=track_filter_cut),
-
-            CDCSegmentPairAutomatonFinder(output_track_cands_store_array_name=output_track_cands_store_array_name)
+                debug_output=False)
         ]
+
+        filter_parameters_for_combiner = dict(segment_track_filter_first_step_cut=first_tmva_cut,
+                                              segment_track_filter_first_step_filter=first_filter,
+
+                                              background_segment_filter=background_filter,
+                                              background_segment_cut=background_filter_tmva_cut,
+
+                                              new_segment_filter=new_segments_filter,
+                                              new_segment_cut=new_segments_filter_tmva_cut,
+
+                                              segment_track_filter_second_step_cut=second_tmva_cut,
+                                              segment_track_filter_second_step_filter=second_filter,
+
+                                              segment_train_filter="none",
+
+                                              segment_information_list_track_filter="none",
+
+                                              track_filter=track_filter,
+                                              track_filter_cut=track_filter_cut)
+
+        if use_pair_finder:
+            modules.append(CDCSegmentTrackCombiner(output_track_cands_store_array_name=None, **filter_parameters_for_combiner))
+            modules.append(CDCSegmentPairAutomatonFinder(output_track_cands_store_array_name=output_track_cands_store_array_name))
+        else:
+            modules.append(
+                CDCSegmentTrackCombiner(
+                    output_track_cands_store_array_name=output_track_cands_store_array_name,
+                    **filter_parameters_for_combiner))
 
         metamodules.PathModule.__init__(self, modules=modules)
 

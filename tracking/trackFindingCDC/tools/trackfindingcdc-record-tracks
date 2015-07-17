@@ -13,7 +13,7 @@ class TracksRecordingRun(StandardEventGenerationRun):
     Record the variables for the TrackFilter in the SegmentsTrackCombinerModule
     """
     
-    n_events = 500
+    n_events = 2000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):
@@ -22,7 +22,8 @@ class TracksRecordingRun(StandardEventGenerationRun):
         main_path = StandardEventGenerationRun.create_path(self)
 
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
-                                                   track_filter="recording"))
+                                                   track_filter="recording",
+                                                   use_pair_finder=False))
         return main_path
 
 

@@ -24,7 +24,9 @@ class BackgroundSegmentsRecordingRun(StandardEventGenerationRun):
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
                                                    background_filter="recording",
                                                    new_segments_filter="none",
-                                                   second_filter="none"))
+                                                   second_filter="none",
+                                                   track_filter="none",
+                                                   use_pair_finder=False))
         return main_path
 
 

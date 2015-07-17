@@ -19,7 +19,9 @@ class SegmentTrackSecondStepRecordingRun(StandardEventGenerationRun):
         main_path = super(SegmentTrackSecondStepRecordingRun, self).create_path()
 
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
-                                                   second_filter="recording"))
+                                                   second_filter="recording",
+                                                   track_filter="none",
+                                                   use_pair_finder=False))
         return main_path
 
 

@@ -305,7 +305,6 @@ TrackCandidate* TrackMerger::splitBack2BackTrack(TrackCandidate* trackCandidate)
 
       for (TrackHit* hit : trackHits) {
         double phiOfHit = hit->getWirePosition().Phi();
-        B2INFO(phiOfTrack << " " << phiOfHit)
         if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
           secondTrackHits.push_back(hit);
           hit->setHitUsage(TrackHit::c_bad);

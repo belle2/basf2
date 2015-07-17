@@ -45,7 +45,16 @@ class IPythonHandler:
     """
 
     def __init__(self):
-        pass
+        """
+        Create 1000 log files for later logging.
+        We use a logrotate system to not create too many log files.
+        If you need more than 1000 log files at the same time, consider changing your code
+        """
+        self.started_calculations = []
+        self.log_file_names = []
+        self.log_file_name_counter = 0
+
+        self.create_log_files()
 
     def process(self, path, result_queue=None):
         """
@@ -61,7 +70,7 @@ class IPythonHandler:
         if result_queue is None:
             result_queue = queue.Basf2CalculationQueue()
 
-        basf2_process = Basf2Process(path=path, result_queue=result_queue)
+        basf2_process = Basf2Process(path=path, result_queue=result_queue, log_file_name=self.next_log_file_name())
         return calculation.Basf2Calculation([basf2_process])
 
     def process_parameter_space(self, path_creator_function, *list_of_parameters):
@@ -93,8 +102,23 @@ class IPythonHandler:
 
         calculation_list = calculation.Basf2CalculationList(path_creator_function, *list_of_parameters)
         all_paths, all_queues = calculation_list.create_all_paths()
-        process_list = [Basf2Process(path=path, result_queue=q) for path, q in zip(all_paths, all_queues)]
+        process_list = [
+            Basf2Process(
+                path=path,
+                result_queue=q,
+                log_file_name=self.next_log_file_name()) for path,
+            q in zip(
+                all_paths,
+                all_queues)]
         return calculation.Basf2Calculation(process_list)
+
+    def next_log_file_name(self):
+        next_log_file_name = self.log_file_names[self.log_file_name_counter]
+        self.log_file_name_counter = (self.log_file_name_counter + 1) % len(self.log_file_names)
+        return next_log_file_name
+
+    def create_log_files(self):
+        self.log_file_names = [tempfile.mktemp() for i in xrange(1000)]
 
     def create_queue(self):
         """
@@ -115,7 +139,7 @@ class Basf2Process(Process):
     Do not create instances on your own but rather use the IPythonHandler for this.
     """
 
-    def __init__(self, path, result_queue, **kwargs):
+    def __init__(self, path, result_queue, log_file_name, **kwargs):
         self.path = path
 
         if result_queue is None:
@@ -123,20 +147,20 @@ class Basf2Process(Process):
 
         self.result_queue = result_queue
         self.already_run = False
+        self.log_file_name = log_file_name
 
         if self.path:
             self.progress_queue_local, self.progress_queue_remote = Pipe()
             self.path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
             self.path.add_module(python_modules.PrintCollections(result_queue))
 
-            self._log_file_name = tempfile.mktemp()
-            Process.__init__(self, target=self.start_process, kwargs={"file_name": self._log_file_name}, **kwargs)
+            Process.__init__(self, target=self.start_process, kwargs={"file_name": self.log_file_name}, **kwargs)
         else:
             Process.__init__(self, target=lambda: None, **kwargs)
 
     def start_process(self, file_name):
         """
-        The function given ti the process to start the calculation.
+        The function given to the process to start the calculation.
         Do not call by yourself.
         Resets the logging system, logs onto console and a file and sets the queues
         (the result queue and the process queue) correctly.
@@ -158,7 +182,7 @@ class Basf2Process(Process):
         Return the log file content.
         Use the methods of the Basf2Calculation for a better handling.
         """
-        return open(self._log_file_name).read()
+        return open(self.log_file_name).read()
 
     def get(self, name):
         """

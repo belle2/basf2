@@ -200,13 +200,13 @@ void ECLReconstructorModule::event()
       eclRecShower->setError(ErrorMatrix);
 
       // For ECLCluster, keep room for off-diagonals though for a while 0.
-      double Mdst_Error[6] = {
-        errorEnergy(sEnergy),
+      float Mdst_Error[6] = {
+        static_cast<float>(errorEnergy(sEnergy)),
         0,
-        errorPhi(sEnergy, sTheta),
+        static_cast<float>(errorPhi(sEnergy, sTheta)),
         0,
         0,
-        errorTheta(sEnergy, sTheta)
+        static_cast<float>(errorTheta(sEnergy, sTheta))
       };
 
       // Fill ECLCluster here

@@ -277,16 +277,16 @@ namespace Belle2 {
       AutomatonCell m_automatonCell;
 
       /// Memory for the drift length at the wire reference point
-      FloatType m_refDriftLength;
+      FloatType m_refDriftLength = 0;
 
       /// Memory for the variance of the drift length at the wire reference point
-      FloatType m_refDriftLengthVariance;
+      FloatType m_refDriftLengthVariance = SIMPLE_DRIFT_LENGTH_VARIANCE;
 
       /// Memory for the CDCWire reference
-      const CDCWire* m_wire;
+      const CDCWire* m_wire = nullptr;
 
       /// Memory for the CDCWire reference
-      const CDCHit* m_hit;
+      const CDCHit* m_hit = nullptr;
 
     }; //class CDCWireHit
 

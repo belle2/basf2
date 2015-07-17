@@ -122,7 +122,8 @@ void ECLDigitizerModule::event()
   int energyFit[8736] = {0}; //fit output : Amplitude
   int tFit[8736] = {0};    //fit output : T_ave
   int qualityFit[8736] = {0};    //fit output : T_ave
-  double HitEnergy[8736][31] = {{0}};
+  array2d HitEnergy(boost::extents[8736][31]);
+  std::fill(HitEnergy.origin(), HitEnergy.origin() + HitEnergy.size(), 0.0);
   double E_tmp[8736] = {0};
   double test_A[31] = {0};
   float AdcNoise[31];

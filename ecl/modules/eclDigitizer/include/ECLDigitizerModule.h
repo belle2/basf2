@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <ecl/dataobjects/ECLWaveformData.h>
 #include <vector>
+#include <boost/multi_array.hpp>
 
 namespace Belle2 {
   namespace ECL {
@@ -105,6 +106,7 @@ namespace Belle2 {
 
     protected:
     private:
+      typedef boost::multi_array<double, 2> array2d;
 
       /** Matrix allocation helper function */
       int** allocateMatrix(unsigned int , unsigned int) const;

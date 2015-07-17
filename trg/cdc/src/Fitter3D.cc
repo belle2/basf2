@@ -285,7 +285,7 @@ namespace Belle2 {
         } else {
           if (priorityHitTS == 0) {
             useAxSl[iAx] = 0;
-            cout<<" priority is 0 for Ax"<<iAx<<endl;
+            //cout<<" priority is 0 for Ax"<<iAx<<endl;
           }
         }
       } // End superlayer loop
@@ -399,13 +399,13 @@ namespace Belle2 {
         } else {
           if (priorityHitTS == 0) {
             useStSl[iSt] = 0;
-            cout<<" priority is 0 for St"<<iSt<<endl;
+            //cout<<" priority is 0 for St"<<iSt<<endl;
           }
         }
         // Check if rho is large enough for stereo super layer.
         if(2*m_mDouble["rho"] < m_mConstV["rr3D"][iSt] ) {
           useStSl[iSt] = 0;
-          cout<<"rho is too low"<<endl;
+          //cout<<"rho is too low"<<endl;
         }
       } // End superlayer loop
       // Check if number of stereo super layer hits is smaller or equal to 1.

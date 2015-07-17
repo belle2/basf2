@@ -73,8 +73,13 @@ void ECLElectronIdModule::event()
   StoreArray<ECLPidLikelihood> eclPidLikelihoods;
 
   for (const auto& track : tracks) {
+    const TrackFitResult* fitRes = track.getTrackFitResult(Const::pion);
+    if (fitRes == nullptr) continue;
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
+
+    const double p = fitRes->getMomentum().Mag();
+    const double costheta = fitRes->getMomentum().CosTheta();
     double energy = 0;
     double maxEnergy = 0;
     double e9e25 = 0;
@@ -92,27 +97,19 @@ void ECLElectronIdModule::event()
     }
 
     float likelihoods[Const::ChargedStable::c_SetSize];
-    double eop = 0;
-    for (const auto& hypo : Const::chargedStableSet) {
-      const TrackFitResult* fitRes = track.getTrackFitResult(hypo);
-      if (fitRes == 0) fitRes = track.getTrackFitResult(Const::pion);
-      const double p = fitRes->getMomentum().Mag();
-      eop = energy / p;
-      const double costheta = fitRes->getMomentum().CosTheta();
+    double eop = energy / p;
 
-      if (fitRes != 0) {
-        ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
-        if (currentpdf == 0) {
-          currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
-        }
-        likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p, costheta));
-      } else {
-        likelihoods[hypo.getIndex()] = -700;
+    for (const auto& hypo : Const::chargedStableSet) {
+      ECLAbsPdf* currentpdf = m_pdf[hypo.getIndex()];
+      if (currentpdf == 0) {
+        currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }
+      likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p, costheta));
     } // end loop on hypo
 
     const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e25, nCrystals, nClusters);
     track.addRelationTo(eclPidLikelihood);
+
   } // end loop on tracks
 }
 

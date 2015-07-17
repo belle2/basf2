@@ -114,10 +114,16 @@ void ECLDigitizerModule::event()
   StoreObjPtr< ECLLookupTable> eclWFAlgoParamsTable("ECLWFAlgoParamsTable", DataStore::c_Persistent);
 
   //Input Array
-  StoreArray<ECLHit>  eclArray;
-  if (!eclArray) {
+  StoreArray<ECLHit> eclHits;
+  if (!eclHits) {
     B2DEBUG(100, "ECLHit in empty in event " << m_nEvent);
   }
+
+  // Output Arrays
+  StoreArray<ECLDigit> eclDigits;
+  StoreArray<ECLDsp> eclDsps;
+  StoreArray<ECLTrig> eclTrigs;
+
 
   int energyFit[8736] = {0}; //fit output : Amplitude
   int tFit[8736] = {0};    //fit output : T_ave
@@ -133,13 +139,11 @@ void ECLDigitizerModule::event()
   int n = 1250;//provide a shape array for interpolation
   double DeltaT =  gRandom->Uniform(0, 144);
 
-  for (int ii = 0; ii <  eclArray.getEntries(); ii++) {
-
-    ECLHit* aECLHit = eclArray[ii];
-    int hitCellId       =  aECLHit->getCellId() - 1; //0~8735
-    double hitE         =  aECLHit->getEnergyDep()  / Unit::GeV;
-    double hitTimeAve       =  aECLHit->getTimeAve() / Unit::us;
-    double sampleTime ;
+  for (const auto& eclHit : eclHits) {
+    int hitCellId       =  eclHit.getCellId() - 1; //0~8735
+    double hitE         =  eclHit.getEnergyDep()  / Unit::GeV;
+    double hitTimeAve   =  eclHit.getTimeAve() / Unit::us;
+    double sampleTime;
 
     if (hitTimeAve > 8.5) { continue;}
     E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
@@ -219,32 +223,23 @@ void ECLDigitizerModule::event()
       qualityFit[iECLCell] = m_lq;    //fit output : quality 2 bits
 
       if (energyFit[iECLCell] > 0) {
-        StoreArray<ECLDsp> eclDspArray;
-        if (!eclDspArray) eclDspArray.create();
-        eclDspArray.appendNew();
-        m_hitNum = eclDspArray.getEntries() - 1;
-        eclDspArray[m_hitNum]->setCellId(iECLCell + 1);
-        eclDspArray[m_hitNum]->setDspA(FitA);
+        const auto eclDsp = eclDsps.appendNew();
+        eclDsp->setCellId(iECLCell + 1);
+        eclDsp->setDspA(FitA);
 
-        StoreArray<ECLDigit> eclDigiArray;
-        if (!eclDigiArray) eclDigiArray.create();
-        eclDigiArray.appendNew();
-        m_hitNum1 = eclDigiArray.getEntries() - 1;
-        eclDigiArray[m_hitNum1]->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
-        eclDigiArray[m_hitNum1]->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
-        eclDigiArray[m_hitNum1]->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
-        eclDigiArray[m_hitNum1]->setQuality(qualityFit[iECLCell]);
+        const auto eclDigit = eclDigits.appendNew();
+        eclDigit->setCellId(iECLCell + 1);//iECLCell + 1= 1~8736
+        eclDigit->setAmp(energyFit[iECLCell]);//E (GeV) = energyFit/20000;
+        eclDigit->setTimeFit(tFit[iECLCell]);//t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
+        eclDigit->setQuality(qualityFit[iECLCell]);
       }
 
     }//if Energy > 0.1 MeV
   } //store  each crystal hit
 
-  StoreArray<ECLTrig> eclTrigArray;
-  if (!eclTrigArray) eclTrigArray.create();
-  eclTrigArray.appendNew();
-  m_hitNum2 = eclTrigArray.getEntries() - 1;
+  const auto eclTrig = eclTrigs.appendNew();
   //  eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT * 12. / 508.); //t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
-  eclTrigArray[m_hitNum2]->setTimeTrig(DeltaT  / 508.); //t0 (us)= (1520 - m_ltr)*24.*
+  eclTrig->setTimeTrig(DeltaT  / 508.); //t0 (us)= (1520 - m_ltr)*24.*
 
   m_nEvent++;
 }

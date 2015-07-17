@@ -117,12 +117,6 @@ namespace Belle2 {
 
       /** Event number */
       int    m_nEvent;
-      /** index of eclDsp */
-      int    m_hitNum;
-      /** index of Digitized result*/
-      int    m_hitNum1;
-      /** index of trig*/
-      int    m_hitNum2;
 
       /** input trigger time 0-23 (*m_ttrig=delta/T*24;    */
       int m_ttrig ;

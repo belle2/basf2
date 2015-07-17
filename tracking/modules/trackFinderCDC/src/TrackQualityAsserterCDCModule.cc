@@ -66,12 +66,6 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
   }
 
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
-    bool hasStereoHit = false;
-    for (const CDCRecoHit3D& recoHit : track)
-    {
-      if (recoHit.getStereoType() != AXIAL)
-        hasStereoHit = true;
-    }
     return track.size() < 3;
   }));
 

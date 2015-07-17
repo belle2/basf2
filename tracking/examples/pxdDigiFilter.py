@@ -26,7 +26,7 @@ useMCTrackCandFinder = False
 
 set_random_seed(seed)
 
-## register the modules
+# register the modules
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -68,11 +68,9 @@ vxd_trackfinder_pre.param('GFTrackCandidatesColName', 'vxdtftracks_pre')
 vxd_trackfinder_pre.param('TESTERexpandedTestingRoutines', False)
 # settings from VXDTFModuleDemo.py (check)
 vxd_trackfinder_pre.param('sectorSetup',
-                          ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD'
-                          ,
-                          'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD'
-                          , 'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD'
-                          ])
+                          ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
+                           'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
+                           'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'])
 vxd_trackfinder_pre.param('tuneCutoffs', 0.06)
 
 # PXD Data Reduction (ROI production)
@@ -109,12 +107,9 @@ vxd_trackfinder_post.param('TESTERexpandedTestingRoutines', False)
 vxd_trackfinder_post.param('pxdClustersName', 'PXDFilteredClustersName')
 # settings from VXDTFModuleDemo.py (check)
 vxd_trackfinder_post.param('sectorSetup',
-                           ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD'
-                           ,
-                           'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD'
-                           ,
-                           'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD'
-                           ])
+                           ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+                            'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
+                            'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'])
 vxd_trackfinder_post.param('tuneCutoffs', 0.22)
 
 rootOutput = register_module('RootOutput')

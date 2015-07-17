@@ -22,6 +22,7 @@
 #include "trg/cdc/Link.h"
 #include <cstdlib>
 #include <bitset>
+#include <iomanip>
 
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
@@ -73,39 +74,15 @@ namespace Belle2 {
 
   void TRGCDCFitter3D::initialize(){
     // [TODO] move to TRGCDC steering file
+    // If we are using Monte Carlo information.
     m_mBool["fMc"] = 1;
     m_mBool["fVerbose"] = 0;
     m_mBool["fIsPrintError"] = 0;
     m_mBool["fIsIntegerEffect"] = 1;
-
+    // LR is from MC.
+    m_mBool["fmcLR"] = 0;
     // Init values
     m_mConstD["Trg_PI"] = 3.141592653589793;
-    m_mConstV["wirePhi2DError"] = vector<double> (5);
-    m_mConstV["wirePhi2DError"][0] = 0.0085106;
-    m_mConstV["wirePhi2DError"][1] = 0.0039841;
-    m_mConstV["wirePhi2DError"][2] = 0.0025806;
-    m_mConstV["wirePhi2DError"][3] = 0.0019084; 
-    m_mConstV["wirePhi2DError"][4] = 0.001514;
-    m_mConstV["driftPhi2DError"] = vector<double> (5);
-    m_mConstV["driftPhi2DError"][0] = 0.0085106;
-    m_mConstV["driftPhi2DError"][1] = 0.0039841;
-    m_mConstV["driftPhi2DError"][2] = 0.0025806;
-    m_mConstV["driftPhi2DError"][3] = 0.0019084;
-    m_mConstV["driftPhi2DError"][4] = 0.001514;
-    // KT study
-    //m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
-    //m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
-    // Orginal study
-    m_mConstV["wireZError"] = vector<double> (4);
-    m_mConstV["wireZError"][0] = 3.19263;
-    m_mConstV["wireZError"][1] = 2.8765;
-    m_mConstV["wireZError"][2] = 2.90057;
-    m_mConstV["wireZError"][3] = 3.96206;
-    m_mConstV["driftZError"] = vector<double> (4);
-    m_mConstV["driftZError"][0] = 3.19263; 
-    m_mConstV["driftZError"][1] = 2.8765; 
-    m_mConstV["driftZError"][2] = 2.90057;
-    m_mConstV["driftZError"][3] = 3.96206;
 
     // Get rr,zToStraw,angleSt,nWire
     CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
@@ -133,6 +110,47 @@ namespace Belle2 {
     m_mConstV["rr3D"] = vector<double> (4);
     for(int iAx=0; iAx<5; iAx++) m_mConstV["rr2D"][iAx] = m_mConstV["rr"][iAx*2];
     for(int iSt=0; iSt<4; iSt++) m_mConstV["rr3D"][iSt] = m_mConstV["rr"][iSt*2+1];
+
+    m_mConstV["wirePhi2DError"] = vector<double> (5);
+    m_mConstV["driftPhi2DError"] = vector<double> (5);
+    //// Ideal case of phi2DError. Not used. Fit phi_c becomes strange.
+    //m_mConstD["driftResolution"] = 2 * 40 * 0.0001; // (cm)
+    //m_mConstV["cellResolution"] = vector<double> (5);
+    //for(unsigned iAx=0; iAx<5; iAx++){
+    //  m_mConstV["cellResolution"][iAx] = m_mConstV["rr2D"][iAx] * 2 * m_mConstD["Trg_PI"] / (m_mConstV["nWires"][iAx*2]/2); // (cm)
+    //}
+    //for(unsigned iAx=0; iAx<5; iAx++){
+    //  m_mConstV["wirePhi2DError"][iAx] = m_mConstV["cellResolution"][iAx]/m_mConstV["rr2D"][iAx] / sqrt(12);
+    //}
+    //for(unsigned iAx=0; iAx<5; iAx++){
+    //  m_mConstV["driftPhi2DError"][iAx] = m_mConstD["driftResolution"]/m_mConstV["rr2D"][iAx] / sqrt(12);
+    //}
+
+    m_mConstV["wirePhi2DError"][0] = 0.00085106;
+    m_mConstV["wirePhi2DError"][1] = 0.00039841;
+    m_mConstV["wirePhi2DError"][2] = 0.00025806;
+    m_mConstV["wirePhi2DError"][3] = 0.00019084; 
+    m_mConstV["wirePhi2DError"][4] = 0.0001514;
+    m_mConstV["driftPhi2DError"][0] = 0.00085106;
+    m_mConstV["driftPhi2DError"][1] = 0.00039841;
+    m_mConstV["driftPhi2DError"][2] = 0.00025806;
+    m_mConstV["driftPhi2DError"][3] = 0.00019084;
+    m_mConstV["driftPhi2DError"][4] = 0.0001514;
+
+    // KT study
+    //m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
+    //m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
+    // Orginal study
+    m_mConstV["wireZError"] = vector<double> (4);
+    m_mConstV["wireZError"][0] = 3.19263;
+    m_mConstV["wireZError"][1] = 2.8765;
+    m_mConstV["wireZError"][2] = 2.90057;
+    m_mConstV["wireZError"][3] = 3.96206;
+    m_mConstV["driftZError"] = vector<double> (4);
+    m_mConstV["driftZError"][0] = 3.19263; 
+    m_mConstV["driftZError"][1] = 2.8765; 
+    m_mConstV["driftZError"][2] = 2.90057;
+    m_mConstV["driftZError"][3] = 3.96206;
     
 
     if(m_mBool["fVerbose"]) {
@@ -151,6 +169,7 @@ namespace Belle2 {
       cout<<"wireZError:   "<<m_mConstV["wireZError"][0]<<" "<<m_mConstV["wireZError"][1]<<" "<<m_mConstV["wireZError"][2]<<" "<<m_mConstV["wireZError"][3]<<endl;
       cout<<"driftZError:  "<<m_mConstV["driftZError"][0]<<" "<<m_mConstV["driftZError"][1]<<" "<<m_mConstV["driftZError"][2]<<" "<<m_mConstV["driftZError"][3]<<endl;
       cout<<"wirePhiError: "<<m_mConstV["wirePhi2DError"][0]<<" "<<m_mConstV["wirePhi2DError"][1]<<" "<<m_mConstV["wirePhi2DError"][2]<<" "<<m_mConstV["wirePhi2DError"][3]<<" "<<m_mConstV["wirePhi2DError"][4]<<endl;
+      cout<<"driftPhiError: "<<m_mConstV["driftPhi2DError"][0]<<" "<<m_mConstV["driftPhi2DError"][1]<<" "<<m_mConstV["driftPhi2DError"][2]<<" "<<m_mConstV["driftPhi2DError"][3]<<" "<<m_mConstV["driftPhi2DError"][4]<<endl;
     }
     
 
@@ -354,7 +373,8 @@ namespace Belle2 {
       // Fit2D
       m_mDouble["rho"] = 0;
       m_mDouble["phi0"] = 0;
-      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"]); 
+      m_mDouble["fit2DChi2"] = 0;
+      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"],m_mDouble["fit2DChi2"]); 
       m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
 
       /////////////////////////////////
@@ -502,6 +522,8 @@ namespace Belle2 {
         a[3] = m_mDouble["z0"];  
         a[4] = m_mDouble["cot"]; 
         helix.a(a); 
+        aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
+        aTrack.set3DFitChi2(m_mDouble["zChi2"]);
         aTrack.setHelix(helix); 
 
         //cout<<"charge="<<m_mDouble["charge"]<<" pt="<<m_mDouble["pt"]<<" phi_c="<<m_mDouble["phi0"]<<" z0="<<m_mDouble["z0"]<<" cot="<<m_mDouble["cot"]<<endl;
@@ -665,7 +687,8 @@ namespace Belle2 {
       // Fit2D
       m_mDouble["rho"] = 0;
       m_mDouble["phi0"] = 0;
-      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"]); 
+      m_mDouble["fit2DChi2"] = 0;
+      Fitter3DUtility::rPhiFitter(&m_mConstV["rr2D"][0],&m_mVector["phi2D"][0],&m_mVector["phi2DInvError"][0],m_mDouble["rho"], m_mDouble["phi0"], m_mDouble["fit2DChi2"]); 
       m_mDouble["pt"] = 0.3*1.5*m_mDouble["rho"]/100;
 
 
@@ -834,6 +857,8 @@ namespace Belle2 {
         a[4] = m_mDouble["cot"]; 
         helix.a(a); 
         aTrack.setHelix(helix); 
+        aTrack.set2DFitChi2(m_mDouble["fit2DChi2"]);
+        aTrack.set3DFitChi2(m_mDouble["zChi2"]);
 
       } else { //Reject low pt.
         aTrack.setFitted(0);

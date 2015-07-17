@@ -67,6 +67,18 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     /// returns position vector.
     virtual const CLHEP::Hep3Vector & x(void) const;
 
+    /// Set 2D fit chi2
+    void set2DFitChi2(double);
+
+    /// Returns 2D fit chi2
+    double get2DFitChi2(void) const;
+
+    /// Set 3D fit chi2
+    void set3DFitChi2(double);
+
+    /// Returns 3D fit chi2
+    double get3DFitChi2(void) const;
+
   public:
 
     /// returns perfect position from GEANT.
@@ -87,6 +99,12 @@ class TRGCDCTrack : public TRGCDCTrackBase {
 
     /// Position.
     mutable CLHEP::Hep3Vector _x;
+
+    /// 2D fit chi2
+    double m_2DFitChi2;
+
+    /// 3D fit chi2
+    double m_3DFitChi2;
 };
 
 //-----------------------------------------------------------------------------
@@ -134,6 +152,27 @@ TRGCDCTrack::x(void) const {
     _x = _helix.x();
     return _x;
 }
+
+inline
+void TRGCDCTrack::set2DFitChi2(double in2DFitChi2) {
+     m_2DFitChi2 = in2DFitChi2;
+}
+
+inline
+double TRGCDCTrack::get2DFitChi2(void) const {
+     return m_2DFitChi2;
+}
+
+inline
+void TRGCDCTrack::set3DFitChi2(double in3DFitChi2) {
+     m_3DFitChi2 = in3DFitChi2;
+}
+
+inline
+double TRGCDCTrack::get3DFitChi2(void) const {
+     return m_3DFitChi2;
+}
+
 
 } // namespace Belle2
 

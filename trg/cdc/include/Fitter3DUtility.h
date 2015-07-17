@@ -26,8 +26,11 @@ class Fitter3DUtility{
     /// A circle fitter
     static void rPhiFit(double *rr, double *phi2, double *phierror, double &rho, double &myphi0);
 
-    /// A circle fitter with invPhiError
+    /// A circle fitter with invPhiError without fit chi2 output.
     static void rPhiFitter(double *rr, double *phi2, double *invphierror, double &rho, double &myphi0);
+
+    /// A circle fitter with invPhiError with fit chi2 output.
+    static void rPhiFitter(double *rr, double *phi2, double *invphierror, double &rho, double &myphi0, double &chi2);
 
     /// A circle fitter
     static void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS);

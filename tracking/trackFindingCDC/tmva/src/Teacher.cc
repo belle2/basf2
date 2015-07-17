@@ -1,5 +1,6 @@
 #include <tracking/trackFindingCDC/tmva/Teacher.h>
 
+#include <tracking/trackFindingCDC/tmva/TMVA.h>
 #include <TFile.h>
 #include <TCut.h>
 #include <TSystem.h>

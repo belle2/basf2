@@ -20,7 +20,7 @@ namespace Belle2 {
     DAFRecoFitterModule() : BaseRecoFitterModule()
     {
       addParam("ProbCut", m_param_probabilityCut,
-               "Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001",
+               "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
                double(0.001));
     }
 

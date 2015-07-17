@@ -48,7 +48,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   }
 
   // Execute the finding a couple of time to find a stable execution time.
-  vector< pair<Phi0CurvBox, vector<TrackHit*> > > candidates;
+  vector< pair<Phi0CurvBox, vector<Ptr<TrackHit> > > > candidates;
 
   // Is this still C++? Looks like JavaScript to me :-).
   TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -73,7 +73,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 
   trackHitPhi0CurvQuadLegendre.raze();
 
-  for (std::pair<Phi0CurvBox, std::vector<TrackHit*> >& candidate : candidates) {
+  for (std::pair<Phi0CurvBox, std::vector<Ptr<TrackHit> > >& candidate : candidates) {
     B2INFO("Candidate");
     B2INFO("size " << candidate.second.size());
     B2INFO("Phi " << candidate.first.getLowerBound<0>().getAngle());

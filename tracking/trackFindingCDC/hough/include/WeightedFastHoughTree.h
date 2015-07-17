@@ -11,7 +11,8 @@
 
 #include <tracking/trackFindingCDC/hough/DynTree.h>
 #include <tracking/trackFindingCDC/hough/WithWeightedItems.h>
-#include <tracking/trackFindingCDC/hough/SharedMarkPtr.h>
+#include <tracking/trackFindingCDC/hough/WithSharedMark.h>
+#include <tracking/trackFindingCDC/utilities/Ptr.h>
 
 #include <framework/logging/Logger.h>
 
@@ -26,11 +27,11 @@ namespace Belle2 {
 
     template<class Item, class Domain, class DomainDivsion>
     class WeightedFastHoughTree :
-      public WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> {
+      public WeightedParititioningDynTree< WithSharedMark<Ptr<Item> >, Domain, DomainDivsion> {
 
     private:
       /// Type of the Tree the partitions using markable items the hough space
-      typedef WeightedParititioningDynTree<SharedMarkPtr<Item>, Domain, DomainDivsion> Super;
+      using Super = WeightedParititioningDynTree<WithSharedMark<Ptr<Item> >, Domain, DomainDivsion>;
 
     public:
       /// Inheriting the constructor from the base class.
@@ -41,37 +42,26 @@ namespace Belle2 {
 
     public:
       /// Take the item set and insert them into the top node of the hough space.
-      void seed(std::vector<Item>& items)
+      template<class Ts>
+      void seed(Ts& items)
       {
         fell();
         Node& topNode = this->getTopNode();
-        for (Item& item : items) {
+        for (Ptr<Item> item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
           Weight weight = HIGHEST_WEIGHT;
-          topNode.insert(SharedMarkPtr<Item>(&item, &markOfItem), weight);
+          topNode.insert(WithSharedMark<Ptr<Item> >(item, &markOfItem), weight);
         }
       }
 
-      /// Take the item set and insert them into the top node of the hough space.
-      void seed(std::vector<Item*>& items)
-      {
-        fell();
-        Node& topNode = this->getTopNode();
-        for (Item* item : items) {
-          m_marks.push_back(false);
-          bool& markOfItem = m_marks.back();
-          Weight weight = HIGHEST_WEIGHT;
-          topNode.insert(SharedMarkPtr<Item>(item, &markOfItem), weight);
-        }
-      }
-
+      /// Walk the tree investigating the heaviest children with priority.
       template<class TreeWalker>
       void walkHeighWeightFirst(TreeWalker& walker)
       {
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.
-          auto isMarked = [](const SharedMarkPtr<Item>& item) -> bool {
+          auto isMarked = [](const WithSharedMark<Ptr<Item> >& item) -> bool {
             return item.isMarked();
           };
           node->eraseIf(isMarked);
@@ -82,7 +72,7 @@ namespace Belle2 {
       }
 
       template<class ItemInDomainMeasure>
-      std::vector<std::pair<Domain,  std::vector<Item*> > >
+      std::vector<std::pair<Domain,  std::vector<Ptr<Item> > > >
       findHeavyLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
                               const size_t maxLevel,
                               const double minWeight)
@@ -94,13 +84,12 @@ namespace Belle2 {
       }
 
       template<class ItemInDomainMeasure, class SkipNodePredicate>
-      std::vector<std::pair<Domain,  std::vector<Item*> > >
+      std::vector<std::pair<Domain,  std::vector<Ptr<Item > > > >
       findLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
                          const size_t maxLevel,
                          SkipNodePredicate& skipNode)
       {
-
-        std::vector<std::pair<Domain,  std::vector<Item*> > > found;
+        std::vector<std::pair<Domain,  std::vector<Ptr<Item> > > > found;
 
         auto walker = [&](Node * node) {
           // Node does not have enough items
@@ -113,8 +102,8 @@ namespace Belle2 {
           // Do not walk children
           if (node->getLevel() >= maxLevel) {
             const Domain* domain = node;
-            found.emplace_back(*domain, std::vector<Item*>(node->begin(), node->end()));
-            for (SharedMarkPtr<Item>& markableItem : *node) {
+            found.emplace_back(*domain, std::vector<Ptr<Item> >(node->begin(), node->end()));
+            for (WithSharedMark<Ptr<Item> >& markableItem : *node) {
               markableItem.mark();
             }
             return false;
@@ -130,7 +119,7 @@ namespace Belle2 {
             for (Node& childNode : *children) {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
-              auto measure = [&childNode, &weightItemInDomain](const Item * item) {
+              auto measure = [&childNode, &weightItemInDomain](const Ptr<Item>& item) {
                 return weightItemInDomain(item, &childNode);
               };
               childNode.insert(*node, measure);
@@ -165,7 +154,7 @@ namespace Belle2 {
     private:
       /// Memory of the used marks of the items.
       std::deque<bool> m_marks;
-      // Note have to use a deque here because std::vector<bool> is special
+      // Note: Have to use a deque here because std::vector<bool> is special
       // std::vector<bool> m_marks;
     };
   }

@@ -12,13 +12,17 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /** Class that behaves like T*.
+     *  Needed because you cannot inherit from T* directly in
+     *  a mixin based inheritance structure.
+     *  I cannot believe I have to write this in C++ though...
+     */
     template<class T>
-    class SharedMarkPtr {
+    class Ptr {
     public:
       /// Wrap the object. Memory for the mark is provided from a shared position.
-      SharedMarkPtr(T* obj, bool* isMarked) : m_obj(obj), m_isMarked(isMarked)
-      {
-      }
+      Ptr(T* obj) : m_obj(obj)
+      {;}
 
       /// Allow automatic unpacking.
       operator T* ()
@@ -36,22 +40,9 @@ namespace Belle2 {
       const T* operator->() const
       { return m_obj;}
 
-      /// Check if the object has been marked
-      bool isMarked() const { return *m_isMarked; }
-
-      /// Mark this object
-      void mark(bool mark = true) { *m_isMarked = mark; }
-
-      /// Unmark this object
-      void unmark() { *m_isMarked = false; }
-
     private:
       /// Reference to the marked items.
       T* m_obj;
-
-      /// Reference to the shared marks.
-      bool* m_isMarked;
     };
-
   }
 }

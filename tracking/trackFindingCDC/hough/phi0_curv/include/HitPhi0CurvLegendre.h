@@ -93,7 +93,7 @@ namespace Belle2 {
       }
 
       /// Find disjoint leaves heavier than minWeight
-      std::vector<std::pair<Phi0CurvBox,  std::vector<Hit*> > >
+      std::vector<std::pair<Phi0CurvBox,  std::vector<Ptr<Hit> > > >
       find(const Weight& minWeight, const double& maxCurv = NAN)
       {
         typedef typename HitPhi0CurvFastHoughTree::Node Node;

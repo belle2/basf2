@@ -59,14 +59,11 @@ namespace Belle2 {
 
     TrackFindingCDC::QuadTreeLegendre m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
     TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
-
-    TrackFindingCDC::FastHough* m_cdcLegendreFastHough; /**< Fast Hough transformer */
     TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 
     unsigned int m_param_threshold;         /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_param_stepScale;           /**< Scale of steps for SteppedHough*/
     int m_maxLevel;               /**< Maximum Level of FastHough Algorithm*/
-    bool m_reconstructCurler;     /**< Stores, curlers shall be reconstructed*/
     bool m_drawCandidates;        /**< Draw each candidate in interactive mode*/
     bool m_drawCandInfo;          /**< Set whether TrackDrawer class will bw used at all*/
     bool m_deleteHitsWhileFinding;    /**< Try to delete bad hits from track candidate */
@@ -117,8 +114,6 @@ namespace Belle2 {
      */
     void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
                       unsigned int);
-
-
 
   };
 

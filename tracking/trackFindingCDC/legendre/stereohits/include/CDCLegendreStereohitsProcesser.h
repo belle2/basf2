@@ -41,19 +41,7 @@ namespace Belle2 {
       // has to be refactored?
       std::pair<StereoHit, StereoHit> getDisplacements(TrackCandidate* cand, TrackHit* hit, int trackCharge = 0);
 
-      /** Assign stereohits to the track with known polar angle */
-      // has to be refactored? unused?
-      void assignStereohitsByAngle(TrackCandidate* cand, double theta, std::vector<TrackHit*>& stereohits, double Z0 = 0.);
-
     private:
-
-      /** Return displacement (inner or outer) of the stereohit against the track */
-      // has to be refactored
-      StereoHit getDisplacement(TrackCandidate* cand, TrackHit* hit, int InnerOuter);
-
-      /** Return position of the hit on the track expressed in rads */
-      // has to be refactored
-      double getAlpha(TrackCandidate* cand, std::pair<double, double> pos);
 
       /** Returns a bool if the rlWire can be matched to a track. This is calculated with the track charge and the superlayer information */
       bool rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D);

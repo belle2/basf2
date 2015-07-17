@@ -34,21 +34,12 @@ namespace Belle2 {
       enum HitUsage {
         c_notUsed = 0,
         c_usedInTrack = 1,
-        c_usedInCand = 2,
-        c_bad = 3,
-        c_background = 4
+        c_bad = 2
       };
 
       /** For root: */
       TrackHit() : m_underlayingWireHit(nullptr), m_wirePosition(), m_conformalPosition(),
-        m_conformalDriftLength(), m_zReference(0), m_hitUsage(HitUsage::c_notUsed) { }
-
-      /** Constructor to create a TrackHit from a CDCHit object.
-       * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
-       * (e.g. the position of the hit wire in normal space and in the conformal plane).
-       * The parameter iHit is unused!
-       */
-      TrackHit(const CDCHit* hit, int iHit);
+        m_conformalDriftLength(), m_hitUsage(HitUsage::c_notUsed) { }
 
       /** Constructor to create a TrackHit from a CDCWireHit object.
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
@@ -106,19 +97,6 @@ namespace Belle2 {
 
       const CDCWireHit* getUnderlayingCDCWireHit() const { return m_underlayingWireHit; }
 
-      /** Get Z reference */
-      double getZReference() const { return m_zReference; }
-
-      /** Returns the phi angle of the center wire position.
-        * From the Hit position (= center of the wire) the angle is calculated so that it goes from 0 to 2*pi.
-        * With the cases:
-        *   x > 0, y > 0: phi in 0, pi/2
-        *   x < 0, y > 0: phi in pi/2, pi
-        *   x < 0, y < 0: phi in pi, 3/2 pi
-        *   x > 0, y < 0: phi in 3/2 pi, 2 pi
-        */
-      double getPhi() const;
-
       /** Return curvature sign with respect to a certain point in the conformal plain.*/
       int getCurvatureSignWrt(double xc, double yc) const;
 
@@ -131,14 +109,8 @@ namespace Belle2 {
         return calculateFractionedPosition(0);
       }
 
-      /** Us the forward and backward position of the wire to calculate the position with the given z referenz.  */
-      TVector3 calculateFractionedPosition(double zReferenz) const;
-
       /** Check hit drift lenght; if it's greater than cell size - set m_hitUsage == TrackHit::c_background*/
       bool checkHitDriftLength();
-
-      /** Assigns the Z coordinate of the hit wire and update XY coordinates*/
-      void setZReference(double zReference);
 
 #ifndef __CINT__
       /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
@@ -147,6 +119,19 @@ namespace Belle2 {
 
 
     private:
+      /** Returns the phi angle of the center wire position.
+        * From the Hit position (= center of the wire) the angle is calculated so that it goes from 0 to 2*pi.
+        * With the cases:
+        *   x > 0, y > 0: phi in 0, pi/2
+        *   x < 0, y > 0: phi in pi/2, pi
+        *   x < 0, y < 0: phi in pi, 3/2 pi
+        *   x > 0, y < 0: phi in 3/2 pi, 2 pi
+        */
+      double getPhi() const;
+
+      /** Use the forward and backward position of the wire to calculate the position with the given z referenz.  */
+      TVector3 calculateFractionedPosition(double zReferenz) const;
+
       /** Set all parameters from the given wire hit */
       void initializeFromWireHit(const CDCWireHit* wireHit);
 
@@ -162,7 +147,6 @@ namespace Belle2 {
       Vector3D m_wirePosition;           /**< Coordinates of the center (!) of the hit wire. */
       Vector2D m_conformalPosition;      /**< Position in the conformal space of the drift center (not the wire!) */
       double m_conformalDriftLength;     /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
-      double m_zReference;               /**< Reference z position for wire position determination*/
       HitUsage m_hitUsage;               /**< Indicates whether hit was used */
 
     }; //end class CDCTrackHit

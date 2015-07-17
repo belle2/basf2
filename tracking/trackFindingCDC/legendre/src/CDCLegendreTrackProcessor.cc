@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackingSortHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -27,30 +26,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNode(QuadTreeLegendre* node)
-{
-  QuadTreeProcessor qtProcessor(13);
-  // Remove used or bad hits
-  node->cleanUpItems(qtProcessor);
-
-  // Clean hits in the neighborhood
-  std::vector<QuadTreeLegendre*> nodeList;
-  nodeList.push_back(node);
-
-  /*  node->findNeighbors();
-    for (QuadTreeLegendre * nodeNeighbor : node->getNeighborsVector()) {
-      if (nodeNeighbor->getNItems() == 0) nodeNeighbor->fillChildrenForced<QuadTreeProcessor>();
-      nodeNeighbor->cleanUpItems<QuadTreeProcessor>();
-    }*/
-
-  // Create the legendre Track Candidate from the nodes
-  TrackCandidate* trackCandidate = createLegendreTrackCandidateFromQuadNodeList(nodeList);
-
-  B2DEBUG(90, "Found new track with " << trackCandidate->getNHits() << " hits.")
-
-  return trackCandidate;
-}
-
 TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList)
 {
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
@@ -62,53 +37,19 @@ TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNodeList(con
   return trackCandidate;
 }
 
-TrackCandidate* TrackProcessor::createTracklet(std::vector<TrackHit*>& hits)
-{
-  std::pair<double, double> track_par;
-  std::pair<double, double> ref_point;
-  TrackFitter cdcLegendreTrackFitter;
-  cdcLegendreTrackFitter.fitTrackCandidateFast(hits, track_par, ref_point);
-  int m_charge = TrackCandidate::getChargeAssumption(track_par.first, track_par.second, hits);
-
-  TrackCandidate* trackCandidate = new TrackCandidate(track_par.first, track_par.second, m_charge, hits);
-  processTrack(trackCandidate);
-
-  trackCandidate->setCandidateType(TrackCandidate::tracklet);
-  return trackCandidate;
-}
-
 void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 {
   //check if the number has enough axial hits (might be less due to the curvature check).
-  if (fullfillsQualityCriteria(trackCandidate)) {
-    m_trackList.push_back(trackCandidate);
+  m_trackList.push_back(trackCandidate);
 
-    m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
+  m_cdcLegendreTrackDrawer->drawTrackCand(trackCandidate);
 
-    for (TrackHit* hit : trackCandidate->getTrackHits()) {
-      hit->setHitUsage(TrackHit::c_usedInTrack);
-    }
-
-    m_cdcLegendreTrackDrawer->showPicture();
-    m_cdcLegendreTrackDrawer->drawListOfTrackCands(m_trackList);
-
+  for (TrackHit* hit : trackCandidate->getTrackHits()) {
+    hit->setHitUsage(TrackHit::c_usedInTrack);
   }
 
-  else {
-    for (TrackHit* hit : trackCandidate->getTrackHits()) {
-      hit->setHitUsage(TrackHit::c_bad);
-    }
-
-    //memory management, since we cannot use smart pointers in function interfaces
-    delete trackCandidate;
-    trackCandidate = NULL;
-  }
-
-}
-
-bool TrackProcessor::fullfillsQualityCriteria(TrackCandidate* /*trackCandidate*/)
-{
-  return true;
+  m_cdcLegendreTrackDrawer->showPicture();
+  m_cdcLegendreTrackDrawer->drawListOfTrackCands(m_trackList);
 }
 
 void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
@@ -125,8 +66,6 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
     //find indices of the Hits
     std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
-
-    sortHits(trackHitVector, trackCand->getChargeSign());
 
     TVector3 position = trackCand->getReferencePoint();
     TVector3 momentum = trackCand->getMomentumEstimation(true);
@@ -166,54 +105,6 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
   }
 }
 
-void TrackProcessor::createGFTrackCandidates(const string& m_gfTrackCandsColName)
-{
-  StoreArray<genfit::TrackCand> gfTrackCandidates(m_gfTrackCandsColName);
-  gfTrackCandidates.create();
-
-  int createdTrackCandidatesCounter = 0;
-
-  for (TrackCandidate* trackCand : m_trackList) {
-    if (trackCand->getTrackHits().size() < 5) continue;
-    genfit::TrackCand* newTrackCandidate = gfTrackCandidates.appendNew();
-
-    TVector3 position = trackCand->getReferencePoint();
-    TVector3 momentum = trackCand->getMomentumEstimation(true);
-
-    //Pattern recognition can determine only the charge, so here some dummy pdg value is set (with the correct charge), the pdg hypothesis can be then overwritten in the GenFitterModule
-    int pdg = trackCand->getChargeSign() * (211);
-
-    //set the start parameters
-    newTrackCandidate->setPosMomSeedAndPdgCode(position, momentum, pdg);
-
-    B2DEBUG(100, "Create genfit::TrackCandidate " << createdTrackCandidatesCounter << "  with pdg " << pdg);
-    B2DEBUG(100,
-            "position seed:  (" << position.x() << ", " << position.y() << ", " << position.z() << ")");
-    B2DEBUG(100,
-            "momentum seed:  (" << momentum.x() << ", " << momentum.y() << ", " << momentum.z() << ")");
-
-    //find indices of the Hits
-    std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
-
-    sortHits(trackHitVector, trackCand->getChargeSign());
-
-    unsigned int sortingParameter = 0;
-    for (TrackHit* trackHit : trackHitVector) {
-      int hitID = trackHit->getStoreIndex();
-      // TODO: Can we determine the plane?
-      newTrackCandidate->addHit(Const::CDC, hitID, -1, sortingParameter);
-      sortingParameter++;
-    }
-    ++createdTrackCandidatesCounter;
-  }
-}
-
-void TrackProcessor::sortHits(std::vector<TrackHit*>& hits, int charge)
-{
-  SortHits sorter(charge);
-  stable_sort(hits.begin(), hits.end(), sorter);
-}
-
 std::set<TrackHit*> TrackProcessor::createHitSet()
 {
   for (TrackCandidate* cand : m_trackList) {
@@ -221,12 +112,10 @@ std::set<TrackHit*> TrackProcessor::createHitSet()
       hit->setHitUsage(TrackHit::c_usedInTrack);
     }
   }
-  std::sort(m_axialHitList.begin(), m_axialHitList.end());
   std::set<TrackHit*> hits_set;
   std::set<TrackHit*>::iterator it = hits_set.begin();
   for (TrackHit* trackHit : m_axialHitList) {
-    if ((trackHit->getHitUsage() != TrackHit::c_usedInTrack)
-        && (trackHit->getHitUsage() != TrackHit::c_background))
+    if (trackHit->getHitUsage() != TrackHit::c_usedInTrack)
       it = hits_set.insert(it, trackHit);
   }
   B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
@@ -266,7 +155,7 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
   if (cdcWireHits.size() == 0) {
     B2WARNING("cdcHitsCollection is empty!");
   }
-  m_axialHitList.reserve(2048);
+  m_axialHitList.reserve(cdcWireHits.size());
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
     TrackHit* trackHit = new TrackHit(cdcWireHit);

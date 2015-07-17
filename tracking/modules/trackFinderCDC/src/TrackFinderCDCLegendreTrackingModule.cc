@@ -27,8 +27,7 @@ REG_MODULE(CDCLegendreTracking)
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   TrackFinderCDCBaseModule(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
-  m_cdcLegendreTrackProcessor(),
-  m_cdcLegendreFastHough(nullptr), m_cdcLegendreTrackDrawer(nullptr)
+  m_cdcLegendreTrackProcessor(), m_cdcLegendreTrackDrawer(nullptr)
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -39,9 +38,6 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 
   addParam("MaxLevel", m_maxLevel,
            "Maximal level of recursive calling of FastHough algorithm", 12);
-
-  addParam("ReconstructCurler", m_reconstructCurler,
-           "Flag, whether curlers should be reconstructed", false);
 
   addParam("DeleteHitsInTheEnd", m_deleteHitsInTheEnd,
            "Try to delete bad hits from track candidate in the end.", true);
@@ -82,9 +78,6 @@ void CDCLegendreTrackingModule::initialize()
   m_cdcLegendreTrackDrawer = new TrackDrawer(m_drawCandInfo, m_drawCandidates, m_batchMode);
   m_cdcLegendreTrackDrawer->initialize();
 
-  // initialize fast hough
-  m_cdcLegendreFastHough = new FastHough(m_reconstructCurler, m_maxLevel, m_nbinsTheta, m_rMax);
-
   // set parameters of track processor
   m_cdcLegendreTrackProcessor.setTrackDrawer(m_cdcLegendreTrackDrawer);
 }
@@ -124,11 +117,6 @@ void CDCLegendreTrackingModule::findTracks()
 
 void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  for (TrackCandidate* cand : m_cdcLegendreTrackProcessor.getTrackList()) {
-    B2DEBUG(100, "R value: " << cand->getR() << "; theta: " << cand->getTheta() << "; radius: " << cand->getRadius() << "; phi: "
-            << cand->getPhi() << "; charge: " << cand->getChargeSign() << "; Xc = " << cand->getXc() << "; Yc = " << cand->getYc() <<
-            "Hitsize: " << cand->getNHits());
-  }
   //create GenFit Track candidates
   m_cdcLegendreTrackProcessor.createCDCTrackCandidates(tracks);
   m_cdcLegendreTrackDrawer->finalizeFile();
@@ -173,9 +161,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   double rCDC = 113.;
 
   if (increaseThreshold) {
-    for (TrackHit* hit : m_cdcLegendreTrackProcessor.getAxialHitsList()) {
-      if (hit->getHitUsage() == TrackHit::c_bad) hit->setHitUsage(TrackHit::c_notUsed);
-    }
+    m_cdcLegendreTrackProcessor.resetBadHits();
   }
 
   std::set<TrackHit*> hits_set = m_cdcLegendreTrackProcessor.createHitSet();
@@ -186,6 +172,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   int nSteps = 0;
 
   std::vector<QuadTreeLegendre*> listOfCandidates;
+
 
 
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
@@ -334,9 +321,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   } while (limit >= m_param_threshold && hits_set.size() >= m_param_threshold);
 
   //sort tracks by value of curvature
-  m_cdcLegendreTrackProcessor.getTrackList().sort([](const TrackCandidate * a, const TrackCandidate * b) {
-    return static_cast <bool>(a->getRadius() > b->getRadius());
-  });
+  m_cdcLegendreTrackProcessor.sortTrackList();
 
   // ?????
   std::vector<TrackHit*> hits_vector; //temporary array;
@@ -367,7 +352,6 @@ void CDCLegendreTrackingModule::postprocessTracks()
 void CDCLegendreTrackingModule::terminate()
 {
   delete m_cdcLegendreTrackDrawer;
-  delete m_cdcLegendreFastHough;
 }
 
 void CDCLegendreTrackingModule::clearVectors()

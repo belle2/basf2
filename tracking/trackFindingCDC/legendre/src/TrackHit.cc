@@ -21,16 +21,9 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-TrackHit::TrackHit(const CDCHit* hit, int) : TrackHit()
-{
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  initializeFromWireHit(wireHitTopology.getWireHit(hit));
-}
-
 void TrackHit::initializeFromWireHit(const CDCWireHit* wireHit)
 {
   m_underlayingWireHit = wireHit;
-  m_zReference = 0;
 
   //set hit coordinates in normal space and conformal plane
   setWirePosition();
@@ -54,8 +47,6 @@ bool TrackHit::checkHitDriftLength()
     wireBeginNeighbor = cdcg.wireForwardPosition(getLayerId(), getWireId() + 1);
   }
 
-//  double delta = sqrt((wireBegin.x() - wireBeginNeighbor.x()) * (wireBegin.x() - wireBeginNeighbor.x()) +
-//                      (wireBegin.y() - wireBeginNeighbor.y()) * (wireBegin.y() - wireBeginNeighbor.y()));
   double delta = fabs(TVector3(wireBegin - wireBeginNeighbor).Pt());
 
   double coef = 1.;
@@ -65,25 +56,15 @@ bool TrackHit::checkHitDriftLength()
 
 
   if (getDriftLength() > delta * coef) {
-    m_hitUsage = TrackHit::c_background;
-//    B2INFO("Bad hit!");
     return false;
   }
 
   return true;
 }
 
-/** Assigns the Z coordinate of the hit wire and update XY coordinates*/
-void TrackHit::setZReference(double zReference)
-{
-  m_zReference = zReference;
-
-  setWirePosition();
-}
-
 void TrackHit::setWirePosition()
 {
-  m_wirePosition = calculateFractionedPosition(getZReference());
+  m_wirePosition = calculateFractionedPosition(0);
   performConformalTransformation();
 }
 

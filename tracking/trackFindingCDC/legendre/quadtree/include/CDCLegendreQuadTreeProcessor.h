@@ -24,7 +24,6 @@
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreConformalPosition.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <framework/logging/Logger.h>

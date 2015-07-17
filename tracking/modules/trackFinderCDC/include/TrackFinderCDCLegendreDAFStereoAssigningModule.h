@@ -6,7 +6,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <vector>
 
-#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreTrackWithStereohits.h>
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
@@ -59,22 +58,6 @@ namespace Belle2 {
      *  Use this method for cleaning up, closing files, etc.
      */
     virtual void terminate() {};
-
-
-  protected:
-
-
-  private:
-    static constexpr double m_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
-
-    std::vector<TrackFindingCDC::TrackHit*>
-    m_AxialHitList; /**< List of the axial hits used for track finding. This is the vector, which is used for memory management! */
-    std::vector<TrackFindingCDC::TrackHit*>
-    m_StereoHitList; /**< List of the stereo hits used for track finding. This is the vector, which is used for memory management! */
-    std::list<TrackFindingCDC::TrackCandidateWithStereoHits*>
-    m_trackList; /**< List of track candidates. Mainly used for memory management! */
-
-    void clear_pointer_vectors();
 
   };
 

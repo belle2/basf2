@@ -82,10 +82,16 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
 
 void SimpleFilter::deleteAllMarkedHits(TrackCandidate* trackCandidate)
 {
-  trackCandidate->getTrackHits().erase(
-    std::remove_if(trackCandidate->getTrackHits().begin(), trackCandidate->getTrackHits().end(),
-  [&](TrackHit * hit) { return hit->getHitUsage() == TrackHit::c_bad; }),
-  trackCandidate->getTrackHits().end());
+  assert(trackCandidate);
+
+  std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
+
+  trackHits.erase(
+  std::remove_if(trackHits.begin(), trackHits.end(), [](TrackHit * hit) {
+    assert(hit);
+    return hit->getHitUsage() == TrackHit::c_bad;
+  }),
+  trackHits.end());
 
 }
 
@@ -94,7 +100,7 @@ void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::
 {
 
   for (TrackHit* hit : axialHitList) {
-    if (hit->getHitUsage() == TrackHit::c_usedInTrack or hit->getHitUsage() == TrackHit::c_usedInCand) continue;
+    if (hit->getHitUsage() == TrackHit::c_usedInTrack) continue;
 
     // Search for best candidate to assign to
     double bestHitProb = 0;
@@ -119,11 +125,14 @@ void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::
 
 void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double minimal_assignment_probability)
 {
+  assert(trackCandidate);
+
   std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
 
   if (trackHits.size() == 0) return;
 
   for (TrackHit* hit : trackHits) {
+    assert(hit);
     hit->setHitUsage(TrackHit::c_usedInTrack);
   }
 
@@ -131,11 +140,12 @@ void SimpleFilter::deleteWrongHitsOfTrack(TrackCandidate* trackCandidate, double
 
   if (ndf <= 0) return;
 
-  for (auto hitIterator = trackHits.begin(); hitIterator != trackHits.end(); hitIterator++) {
-    double assignment_probability = getAssigmentProbability(*hitIterator, trackCandidate);
+  for (TrackHit* trackHit : trackHits) {
+    assert(trackHit);
+    double assignment_probability = getAssigmentProbability(trackHit, trackCandidate);
 
     if (assignment_probability < minimal_assignment_probability) {
-      (*hitIterator)->setHitUsage(TrackHit::c_bad);
+      trackHit->setHitUsage(TrackHit::c_bad);
     }
   }
 

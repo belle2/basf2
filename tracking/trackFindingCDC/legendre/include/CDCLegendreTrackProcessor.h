@@ -53,36 +53,31 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /**
-       * Using a node from the quad tree we create a new track candidate with all hits.
-       */
-      TrackCandidate* createLegendreTrackCandidateFromQuadNode(QuadTreeLegendre* node);
-
-      /**
        * Create track candidate using CDCLegendreQuadTree nodes and return pointer to created candidate
        */
       TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
 
-      /** Create tracklet using vector of hits and store it
-       * UNUSED AS THE CLASS PATTERN_CHECKER IS UNUSED*/
-      TrackCandidate* createTracklet(std::vector<TrackHit*>& hits);
-
-      /** Creates GeantFit Track Candidates from the stored CDCLegendreTrackCandidates */
-      void createGFTrackCandidates(const string& m_gfTrackCandsColName);
-
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
       void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
-      /** Sort hits for fitting.
-       * This method sorts hits to bring them in a correct order, which is needed for the fitting
+      /**
+       * Sort the currently found tracks.
        */
-      static void sortHits(std::vector<TrackHit*>& hits, int charge);
+      void sortTrackList()
+      {
+        m_trackList.sort([](const TrackCandidate * a, const TrackCandidate * b) {
+          return static_cast <bool>(a->getRadius() > b->getRadius());
+        });
+      }
 
       /**
-       * Get the list with currently processed tracks.
+       * Reset all bad hits to the status notUsed.
        */
-      list<TrackCandidate*>& getTrackList()
+      void resetBadHits()
       {
-        return m_trackList;
+        for (TrackHit* hit : m_axialHitList) {
+          if (hit->getHitUsage() == TrackHit::c_bad) hit->setHitUsage(TrackHit::c_notUsed);
+        }
       }
 
       /**
@@ -92,6 +87,7 @@ namespace Belle2 {
       {
         return m_axialHitList;
       }
+
 
       /**
        * Compile the hitList from the wire it topology.
@@ -179,12 +175,6 @@ namespace Belle2 {
       std::list<TrackCandidate*> m_trackList; /**< List of track candidates. */
       TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which performs in-module drawing */
       TrackFitter m_cdcLegendreTrackFitter; /**< Used for fitting the tracks */
-
-      /**
-       * @brief Implementation of check for quality criteria after the track candidate was produced.
-       * @warning not used in the moment
-       */
-      bool fullfillsQualityCriteria(TrackCandidate* cand);
 
       /**
        * @brief Perform the necessary operations after the track candidate has been constructed

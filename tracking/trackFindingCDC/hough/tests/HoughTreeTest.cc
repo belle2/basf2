@@ -33,7 +33,8 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   // const size_t phiDivisions = 3;
   // const size_t curvDivisions = 3;
 
-  using TrackHitPhi0CurvQuadLegendre = HitPhi0CurvLegendre<TrackHit*, phi0Divisions, curvDivisions>;
+  using TrackHitPhi0CurvQuadLegendre =
+    HitPhi0CurvLegendre<RLTagged<const TrackHit*>, phi0Divisions, curvDivisions>;
   TrackHitPhi0CurvQuadLegendre trackHitPhi0CurvQuadLegendre(maxLevel);
   trackHitPhi0CurvQuadLegendre.initialize();
 
@@ -48,7 +49,7 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
   }
 
   // Execute the finding a couple of time to find a stable execution time.
-  vector< pair<Phi0CurvBox, vector<TrackHit*> > > candidates;
+  vector< pair<Phi0CurvBox, vector<RLTagged<const TrackHit*> > > > candidates;
 
   // Is this still C++? Looks like JavaScript to me :-).
   TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -73,11 +74,20 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 
   trackHitPhi0CurvQuadLegendre.raze();
 
-  for (std::pair<Phi0CurvBox, std::vector<TrackHit*> >& candidate : candidates) {
+  for (std::pair<Phi0CurvBox, std::vector<RLTagged<const TrackHit*> > >& candidate : candidates) {
+    const Phi0CurvBox& phi0CurvBox = candidate.first;
+    const std::vector<RLTagged<const TrackHit*> >& taggedHits = candidate.second;
+
     B2INFO("Candidate");
-    B2INFO("size " << candidate.second.size());
-    B2INFO("Phi " << candidate.first.getLowerBound<0>().getAngle());
-    B2INFO("Curv " << static_cast<float>(candidate.first.getLowerBound<1>()));
+    B2INFO("size " << taggedHits.size());
+    B2INFO("Phi " << phi0CurvBox.getLowerPhi0Vec());
+    B2INFO("Curv " << phi0CurvBox.getLowerCurv());
+    B2INFO("Tags of the hits");
+
+    for (const RLTagged<const TrackHit*>& rlTaggedTrackHit : taggedHits) {
+      B2INFO("    rl = " << rlTaggedTrackHit.getRLInfo() <<
+             " dl = " << rlTaggedTrackHit->getDriftLength());
+    }
   }
 
   B2INFO("First execution took " << timeItResult.getSeconds(0) << " seconds ");

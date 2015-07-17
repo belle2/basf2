@@ -7,11 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
-
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
+
+#include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/phi0_curv/RLTagged.h>
 
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -42,14 +43,45 @@ namespace Belle2 {
       /** Checks if the track hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const TrackHit* hit,
+      inline Weight operator()(const TrackHit* trackHit,
                                const Phi0CurvBox* phi0CurvBox)
       {
-        const CDCWireHit* wireHit = hit->getUnderlayingCDCWireHit();
+        const CDCWireHit* wireHit = trackHit->getUnderlayingCDCWireHit();
         return operator()(wireHit, phi0CurvBox);
       }
 
-      /** Checks if the track hit is contained in a phi0 curv hough space.
+      /** Checks if the wire hit is contained in a phi0 curv hough space.
+       *  If the wire hit was already determined to be right or left of all tracks
+       *  in a wider hough box up the hierarchy only evaluate for that orientation.
+       *  If one of the right left passage hypothesis can be ruled out in this box
+       *  signal so by tagging it.
+       *  Note the that the RLTagged<WireHit*> is obtained as non-const reference to
+       *  be able to write back the new right left passage hypothesis.
+       *  Returns 1.0 if it is contained, returns NAN if it is not contained.
+       *  Accepts if either the right passage hypothesis or the left passage hypothesis
+       *  is in the box.
+       */
+      inline Weight operator()(RLTagged<const TrackHit*>& rlTaggedTrackHit,
+                               const Phi0CurvBox* phi0CurvBox)
+      {
+        const RightLeftInfo& rlInfo = rlTaggedTrackHit.getRLInfo();
+
+        const TrackHit* trackHit = rlTaggedTrackHit;
+        const CDCWireHit* wireHit = trackHit->getUnderlayingCDCWireHit();
+
+        const FloatType driftLength = wireHit->getRefDriftLength();
+        const Vector2D& pos2D =  wireHit->getRefPos2D();
+        const FloatType r = wireHit->getRefCylindricalR();
+
+        RightLeftInfo newRLInfo =
+          isRightOrLeftObservationIn(r, pos2D, driftLength, phi0CurvBox, rlInfo);
+
+        rlTaggedTrackHit.setRLInfo(newRLInfo);
+        return isValidInfo(newRLInfo) ? 1 : NAN;
+      }
+
+
+      /** Checks if the wire hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the box.
@@ -65,6 +97,35 @@ namespace Belle2 {
         bool leftIn = this->isObservationIn(r, pos2D, -driftLength, phi0CurvBox);
         return (rightIn or leftIn) ? 1 : NAN;
       }
+
+      /** Checks if the wire hit is contained in a phi0 curv hough space.
+       *  If the wire hit was already determined to be right or left of all tracks
+       *  in a wider hough box up the hierarchy only evaluate for that orientation.
+       *  If one of the right left passage hypothesis can be ruled out in this box
+       *  signal so by tagging it.
+       *  Note the that the RLTagged<WireHit*> is obtained as non-const reference to
+       *  be able to write back the new right left passage hypothesis.
+       *  Returns 1.0 if it is contained, returns NAN if it is not contained.
+       *  Accepts if either the right passage hypothesis or the left passage hypothesis
+       *  is in the box.
+       */
+      inline Weight operator()(RLTagged<const CDCWireHit*>& rlTaggedWireHit,
+                               const Phi0CurvBox* phi0CurvBox)
+      {
+        const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
+        const CDCWireHit* wireHit = rlTaggedWireHit;
+
+        const FloatType driftLength = wireHit->getRefDriftLength();
+        const Vector2D& pos2D =  wireHit->getRefPos2D();
+        const FloatType r = wireHit->getRefCylindricalR();
+
+        RightLeftInfo newRLInfo =
+          isRightOrLeftObservationIn(r, pos2D, driftLength, phi0CurvBox, rlInfo);
+
+        rlTaggedWireHit.setRLInfo(newRLInfo);
+        return isValidInfo(newRLInfo) ? 1 : NAN;
+      }
+
 
       /** Checks if the track hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
@@ -82,18 +143,72 @@ namespace Belle2 {
         return in ? 1 : NAN;
       }
 
+      /** Checks if an observation (in the CDC)
+       *  can be assoziated as left or right of a trajectory in the phi0 curvature hough space box.
+       *  The evaluation can be limited by the optional rlInfo parameter.
+       *
+       *  @param r           (Precomputed) Cylindrical radius of the observed position
+       *  @param pos2D       Position of the observation
+       *  @param dirftLength Drift radius around position of the observation
+       *  @param phi0CurvBox The phi0 curvature hough space region.
+       *  @param rlInfo      If rlInfo is RIGHT or LEFT the observations is only checked
+       *                     for this hypothesis. All other values lead to checks of both
+       *                     orientations.
+       *  @returns
+       *      * UNKNOWN if both right and left are still possible.
+       *      * LEFT if only left is still possible.
+       *      * RIGHT if only right is still possible.
+       *      * INVALID_INFO if non of the orientations is possible.
+       */
+      inline RightLeftInfo isRightOrLeftObservationIn(const FloatType& r,
+                                                      const Vector2D& pos2D,
+                                                      const FloatType& driftLength,
+                                                      const Phi0CurvBox* phi0CurvBox,
+                                                      const RightLeftInfo rlInfo = UNKNOWN)
+      {
+        bool rightIn = rlInfo != LEFT and this->isObservationIn(r, pos2D, driftLength, phi0CurvBox);
+        bool leftIn = rlInfo != RIGHT and this->isObservationIn(r, pos2D, -driftLength, phi0CurvBox);
 
+        if (rightIn and leftIn) {
+          return UNKNOWN;
+        } else if (rightIn) {
+          return RIGHT;
+        } else if (leftIn) {
+          return LEFT;
+        } else {
+          return INVALID_INFO;
+        }
+      }
+
+      /** Checks if an observation (in the CDC)
+       *  can be assoziated to a trajectory in the phi0 curvature hough space box.
+       *
+       *  @param pos2D             Position of the observation
+       *  @param signedDirftLength Drift radius around position of the observation
+       *  @param phi0CurvBox       The phi0 curvature hough space region.
+       *  @returns                 True if the observation can be linked to a trajectory in the box.
+       */
       inline bool isObservationIn(const Vector2D& pos2D,
-                                  const FloatType signedDriftLength,
+                                  const FloatType& signedDriftLength,
                                   const Phi0CurvBox* phi0CurvBox)
       {
         const FloatType r = pos2D.norm();
         return isObservationIn(r, pos2D, signedDriftLength, phi0CurvBox);
       }
 
+
+      /** Checks if an observation (in the CDC)
+       *  can be assoziated to a trajectory in the phi0 curvature hough space box.
+       *
+       *  @param r                 (Precomputed) Cylindrical radius of the observed position
+       *  @param pos2D             Position of the observation
+       *  @param signedDirftLength Drift radius around position of the observation
+       *  @param phi0CurvBox       The phi0 curvature hough space region.
+       *  @returns                 True if the observation can be linked to a trajectory in the box.
+       */
       inline bool isObservationIn(const FloatType& r,
                                   const Vector2D& pos2D,
-                                  const FloatType signedDriftLength,
+                                  const FloatType& signedDriftLength,
                                   const Phi0CurvBox* phi0CurvBox)
       {
         const FloatType rReducedSquared = (r + signedDriftLength) * (r - signedDriftLength);

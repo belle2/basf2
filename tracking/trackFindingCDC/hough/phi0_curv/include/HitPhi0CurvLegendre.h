@@ -86,7 +86,8 @@ namespace Belle2 {
       }
 
       /// Prepare the leave finding by filling the top node with given hits
-      void seed(std::vector<HitPtr>& hits)
+      template<class HitPtrs>
+      void seed(HitPtrs& hits)
       {
         if (not m_hitPhi0CurvFastHoughTree) { initialize(); }
         m_hitPhi0CurvFastHoughTree->seed(hits);

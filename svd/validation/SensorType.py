@@ -15,6 +15,7 @@
 
 import xml.etree.ElementTree as ET
 from basf2 import *
+from ROOT import Belle2
 
 
 def getSensorType(sensorID):
@@ -22,7 +23,8 @@ def getSensorType(sensorID):
     sensorNum = sensorID.getSensorNumber()
     sensorType = ''
 
-    tree = ET.parse('../../../../data/SVD-Components.xml')
+    filename = Belle2.FileSystem.findFile("/data/svd/SVD-Components.xml")
+    tree = ET.parse(filename)
     root = tree.getroot()
 
     # Parse the XML tree to get the sensor type string
@@ -33,5 +35,3 @@ def getSensorType(sensorID):
                     sensorType = sensor.get('type')
 
     return sensorType
-
-

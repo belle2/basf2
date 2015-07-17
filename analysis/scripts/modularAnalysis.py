@@ -594,10 +594,10 @@ def applyTMVAMethod(
 def isTMVAMethodAvailable(prefix='TMVA'):
     """
     True of a TMVA method with the given prefix was trained
-    @param prefix prefix which is used to identify the weight files created by TMVA
+    @param prefix which is used to identify the weight files created by TMVA
     """
 
-    return os.path.isfile(prefix + '.config')
+    return os.path.isfile(prefix + '_1.config')
 
 
 def fitVertex(
@@ -1017,24 +1017,6 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
     path.add_module(qqBuilder)
-
-
-def FlavTag(list_name, path=analysis_main):
-    """
-    For each Particle in the given Breco ParticleList:
-    Tag the flavour of the tag side using the Track, the ECLCluster and the KLMCluster list from the RestOfEvent dataobject
-    The flavour is predicted by trained Neural Networks
-    Module under development (not ready for users)
-
-    @param list_name name of the input Breco ParticleList
-    @param path      modules are added to this path
-    """
-
-    flavtag = register_module('FlavorTagging')
-    flavtag.set_name('FlavorTagging_' + list_name)
-    flavtag.param('usingMode', mode)
-    flavtag.param('listName', list_name)
-    path.add_module(flavtag)
 
 
 def calibratePhotonEnergy(list_name, energy_bias=0.030, path=analysis_main):

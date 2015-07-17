@@ -104,10 +104,11 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
         mcTrackCands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
-        cdcHits = Belle2.PyStoreArray(self.cdcHitsColumnname)
-        if not cdcHits:
-            print "No CDC hits available, hit analysis incomplete"
+        if self.cdcHitsColumnname not in Belle2.PyStoreArray.list():
+            # No CDC hits available, hit analysis incomplete, don't perform
+            # hit analysis
             return
+        cdcHits = Belle2.PyStoreArray(self.cdcHitsColumnname)
 
         totalHitListMC = set([cdcHitID for mcTrackCand in mcTrackCands
                               for cdcHitID in

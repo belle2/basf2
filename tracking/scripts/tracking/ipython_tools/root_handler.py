@@ -17,18 +17,23 @@ def _get_pandas_branches(filename, tree, branches):
     # TODO: others also??
     structure = list_structures(filename, tree)
     if branches is None or len(branches) == 0:
-        all_numerical_branches = filter(lambda branch_name: structure[branch_name][0][1] in [u"int", u"float"], structure)
+        all_numerical_branches = filter(
+            lambda branch_name: structure[branch_name][0][1] in [
+                u"int",
+                u"float",
+                u"double"],
+            structure)
     else:
-        all_numerical_branches = filter(lambda branch_name: structure[branch_name][0][1] in [u"int", u"float"], branches)
+        all_numerical_branches = filter(lambda branch_name: structure[branch_name][0][1] in [u"int", u"float", u"double"], branches)
     if len(all_numerical_branches) == 0:
-        raise ValueError("Could not find any numerical branch in the tree %d. Can not export this tree." % tree)
+        raise ValueError("Could not find any numerical branch in the tree %s. Can not export this tree." % tree)
 
     # Filter out the branches which are not one dimensional in the first column
     first_row = root2array(filenames=filename, treename=tree, branches=all_numerical_branches, start=0, stop=1, step=1)[0]
     good_indices = map(lambda x: x[0], filter(lambda element_with_index: element_with_index[1].size == 1, enumerate(first_row)))
     good_branches = [all_numerical_branches[b] for b in good_indices]
     if len(good_branches) == 0:
-        raise ValueError("Could not find any useable branch in the tree %d. Can not export this tree." % tree)
+        raise ValueError("Could not find any useable branch in the tree %s. Can not export this tree." % tree)
     return good_branches
 
 
@@ -62,21 +67,21 @@ class RootReader():
         return dataframe
 
 
-def read_root(filename, branches=None, tree=None, chunksize=None):
+def read_root(filename, branches=None, tree_key=None, chunksize=None):
     """
     Export the given root file to a pandas dataframe.
     Coded after the root_pandas project on github.
 
     Arguments
     ---------
-    If tree is not None use only the given tree -
+    If tree_key is not None use only the given tree -
        else use all trees and return a dict tree_name->dataframe if the number of trees os bigger than one.
     If branches is not None use only the given branches (if they are numerical and one dimensional), else use all branches.
     If chunksize is not None return a ReadRoot-object - an iterator - which can be uses to receive the data in chunks.
     """
     # TODO: Moredimensional to one dimensional?
-    if tree is not None:
-        trees = [tree]
+    if tree_key is not None:
+        trees = [tree_key]
     else:
         trees = list_trees(filename)
     result_dataframes = {}

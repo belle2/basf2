@@ -35,7 +35,7 @@ namespace Belle2 {
         std::vector<Belle2::TrackFindingCDC::TrackHit*>& hits,
         std::pair<double, double>& track_par,
         std::pair<double, double>& ref_point,
-        bool with_drift_time = false);
+        bool with_drift_time = false) const;
 
       /**
        * @brief Perform fast circular fitting
@@ -44,7 +44,7 @@ namespace Belle2 {
        */
       void fitTrackCandidateFast(
         TrackCandidate* track,
-        bool with_drift_time = false);
+        bool with_drift_time = false) const;
     };
   }
 }

@@ -20,14 +20,14 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* track)
+double SimpleFilter::getAssigmentProbability(const TrackHit* hit, const TrackCandidate* track)
 {
   double x0_track = track->getXc();
   double y0_track = track->getYc();
   double R = track->getRadius();
 
-  double x0_hit = hit->getOriginalWirePosition().X();
-  double y0_hit = hit->getOriginalWirePosition().Y();
+  double x0_hit = hit->getWirePosition().X();
+  double y0_hit = hit->getWirePosition().Y();
   double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) *
                                    (y0_track - y0_hit))) - hit->getDriftLength());
 
@@ -36,7 +36,7 @@ double SimpleFilter::getAssigmentProbability(TrackHit* hit, TrackCandidate* trac
 
 
 
-void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_trackList)
+void SimpleFilter::reassignHitsFromOtherTracks(const std::list<TrackCandidate*>& m_trackList)
 {
 
   B2DEBUG(100, "NCands = " << m_trackList.size());
@@ -82,41 +82,39 @@ void SimpleFilter::reassignHitsFromOtherTracks(std::list<TrackCandidate*>& m_tra
 
 void SimpleFilter::deleteAllMarkedHits(TrackCandidate* trackCandidate)
 {
-  assert(trackCandidate);
-
   std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
 
   trackHits.erase(
   std::remove_if(trackHits.begin(), trackHits.end(), [](TrackHit * hit) {
-    assert(hit);
     return hit->getHitUsage() == TrackHit::c_bad;
   }),
   trackHits.end());
 
 }
 
-void SimpleFilter::appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& axialHitList,
+void SimpleFilter::appendUnusedHits(const std::list<TrackCandidate*>& trackList, const std::vector<TrackHit*>& axialHitList,
                                     double minimal_assignment_probability)
 {
 
   for (TrackHit* hit : axialHitList) {
-    if (hit->getHitUsage() == TrackHit::c_usedInTrack) continue;
+    if (hit->getHitUsage() == TrackHit::c_usedInTrack or
+        hit->getHitUsage() == TrackHit::c_bad) continue;
 
     // Search for best candidate to assign to
     double bestHitProb = 0;
-    TrackCandidate* BestCandidate = nullptr;
+    TrackCandidate* bestCandidate = nullptr;
 
     for (TrackCandidate* cand : trackList) {
       double probTemp = getAssigmentProbability(hit, cand);
 
       if (probTemp > bestHitProb) {
-        BestCandidate = cand;
+        bestCandidate = cand;
         bestHitProb = probTemp;
       }
     }
 
-    if (bestHitProb > minimal_assignment_probability) {
-      BestCandidate->addHit(hit);
+    if (bestCandidate != nullptr and bestHitProb > minimal_assignment_probability) {
+      bestCandidate->addHit(hit);
       hit->setHitUsage(TrackHit::c_usedInTrack);
     }
 

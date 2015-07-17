@@ -146,7 +146,7 @@ namespace Belle2 {
 
 
       void fillNodeWithRespectToGivenPoint(QuadTreeTemplate<float, float, TrackFindingCDC::TrackHit>* m_node,
-                                           std::vector<TrackHit*>& m_hits, std::pair<double, double>& ref_point) const
+                                           const std::vector<TrackHit*>& m_hits, std::pair<double, double>& ref_point) const
       {
 
         double dist_1[3][3];

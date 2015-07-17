@@ -31,13 +31,14 @@ namespace Belle2 {
       /** Returns the probability of hit assignment to the track. Actually this is not a probability at all but only a number between 0 and 1.
        * 1 is best.
        * TODO: more robust criteria should be implemented */
-      static double getAssigmentProbability(TrackHit* hit, TrackCandidate* track);
+      static double getAssigmentProbability(const TrackHit* hit, const TrackCandidate* track);
 
       /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(std::list<TrackCandidate*>& trackList);
+      static void reassignHitsFromOtherTracks(const std::list<TrackCandidate*>& trackList);
 
       /** Append unused hits to tracks */
-      static void appendUnusedHits(std::list<TrackCandidate*>& trackList, std::vector<TrackHit*>& AxialHitList, double minimal_assignment_probability = m_minimal_assignment_probability);
+      static void appendUnusedHits(const std::list<TrackCandidate*>& trackList, const std::vector<TrackHit*>& AxialHitList,
+                                   double minimal_assignment_probability = m_minimal_assignment_probability);
 
       /** Tries to find and delete all "bad" hits in a track.
        * By doing so we will loose hit efficiency, but gain a low fake rate. */

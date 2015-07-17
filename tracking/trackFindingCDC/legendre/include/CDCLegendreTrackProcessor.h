@@ -58,7 +58,7 @@ namespace Belle2 {
       TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
 
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
-      void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
+      void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) const;
 
       /**
        * Sort the currently found tracks.
@@ -73,19 +73,35 @@ namespace Belle2 {
       /**
        * Reset all bad hits to the status notUsed.
        */
-      void resetBadHits()
+      void resetBadHits() const
       {
-        for (TrackHit* hit : m_axialHitList) {
+        doForAllHits([](TrackHit * hit) {
           if (hit->getHitUsage() == TrackHit::c_bad) hit->setHitUsage(TrackHit::c_notUsed);
-        }
+        });
       }
 
       /**
        * Get the list with currently stored axial hits.
        */
-      std::vector<TrackHit*>& getAxialHitsList()
+      const std::vector<TrackHit*>& getAxialHitsList() const
       {
         return m_axialHitList;
+      }
+
+      /**
+       * Get the list with currently stored tracks.
+       */
+      const std::list<TrackCandidate*>& getTrackList() const
+      {
+        return m_trackList;
+      }
+
+      /**
+       * Get the list with currently stored tracks.
+       */
+      const std::list<TrackCandidate*>& getTrackList()
+      {
+        return m_trackList;
       }
 
 
@@ -99,21 +115,21 @@ namespace Belle2 {
        */
       void clearVectors()
       {
-        for (TrackHit* hit : m_axialHitList) {
+        doForAllHits([](TrackHit * hit) {
           delete hit;
-        }
+        });
         m_axialHitList.clear();
 
-        for (TrackCandidate* track : m_trackList) {
+        doForAllTracks([](TrackCandidate * track) {
           delete track;
-        }
+        });
         m_trackList.clear();
       }
 
       /**
        * Postprocessing: Delete axial hits that do not "match" to the tracks.
        */
-      void deleteHitsOfAllBadTracks();
+      void deleteHitsOfAllBadTracks() const;
 
       /**
        * Postprocessing: Delete axial hits that do not "match" to the given track.
@@ -133,21 +149,20 @@ namespace Belle2 {
       /**
        * Postprocessing: Try to reassign axial hits between all tracks.
        */
-      void appendHitsOfAllTracks();
+      void appendHitsOfAllTracks() const;
 
       /**
        * Fit all tracks and reestimate charge.
        */
-      void fitAllTracks();
+      void fitAllTracks() const;
 
       /**
        * Fits one track and reestimates the charge.
        * @param trackCandidate
        */
-      void fitOneTrack(TrackCandidate* trackCandidate)
+      void fitOneTrack(TrackCandidate* trackCandidate) const
       {
         m_cdcLegendreTrackFitter.fitTrackCandidateFast(trackCandidate);
-        trackCandidate->reestimateCharge();
       }
 
       /**
@@ -167,7 +182,7 @@ namespace Belle2 {
        * For the use in the QuadTree use this hit set.
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
-      std::set<TrackHit*> createHitSet();
+      std::set<TrackHit*> createHitSet() const;
 
 
     private:
@@ -183,6 +198,26 @@ namespace Belle2 {
        * This function leaves room for other operations like further quality checks or even the actual fitting of the track candidate.
        */
       void processTrack(TrackCandidate* track);
+
+      /**
+       * Do a certain function for each hit in the axial hits list
+       */
+      void doForAllHits(std::function<void(TrackHit* trackHit)> function) const
+      {
+        for (TrackHit* hit : getAxialHitsList()) {
+          function(hit);
+        }
+      }
+
+      /**
+       * Do a certain function for each track in the track list
+       */
+      void doForAllTracks(std::function<void(TrackCandidate* track)> function) const
+      {
+        for (TrackCandidate* track : getTrackList()) {
+          function(track);
+        }
+      }
 
     };
   }

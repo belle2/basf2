@@ -72,10 +72,10 @@ namespace Belle2 {
       inline bool getIsAxial() const { return m_underlayingWireHit->getStereoType() == AXIAL; }
 
       /** Returns position of forward wire end */
-      inline TVector3 getForwardWirePosition() const { return m_underlayingWireHit->getWire().getSkewLine().forward3D(); }
+      inline Vector3D getForwardWirePosition() const { return m_underlayingWireHit->getWire().getSkewLine().forward3D(); }
 
       /** Returns position of backward wire end */
-      inline TVector3 getBackwardWirePosition() const { return m_underlayingWireHit->getWire().getSkewLine().backward3D(); }
+      inline Vector3D getBackwardWirePosition() const { return m_underlayingWireHit->getWire().getSkewLine().backward3D(); }
 
       /** Returns the Hit position (X coordinate) in the conformal plane.*/
       inline double getConformalX() const { return m_conformalPosition.x(); }
@@ -100,16 +100,10 @@ namespace Belle2 {
       /** Return curvature sign with respect to a certain point in the conformal plain.*/
       int getCurvatureSignWrt(double xc, double yc) const;
 
-      /** Returns the position of the center(!!!) of the wire. */
+      /** Returns the position of the wire for z = 0. */
       inline TVector3 getWirePosition() const { return m_wirePosition; }
 
-      /** Returns the original wire position (before the finding of the z-position, so z = 0) */
-      inline TVector3 getOriginalWirePosition() const
-      {
-        return calculateFractionedPosition(0);
-      }
-
-      /** Check hit drift lenght; if it's greater than cell size - set m_hitUsage == TrackHit::c_background*/
+      /** Check hit drift lenght; if it's greater than cell size return false */
       bool checkHitDriftLength();
 
 #ifndef __CINT__
@@ -130,13 +124,10 @@ namespace Belle2 {
       double getPhi() const;
 
       /** Use the forward and backward position of the wire to calculate the position with the given z referenz.  */
-      TVector3 calculateFractionedPosition(double zReferenz) const;
+      Vector3D calculateFractionedPosition(double zReferenz) const;
 
       /** Set all parameters from the given wire hit */
       void initializeFromWireHit(const CDCWireHit* wireHit);
-
-      /** Assigns the coordinates of the hit wire (from CDC Geometry database) and updates wire vector according to assigned Z position.*/
-      void setWirePosition();
 
       /** Assigns values for conformal coordinates by transforming the wire coordinates. */
       void performConformalTransformation();

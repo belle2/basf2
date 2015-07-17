@@ -23,10 +23,11 @@ using namespace TrackFindingCDC;
 
 void TrackHit::initializeFromWireHit(const CDCWireHit* wireHit)
 {
+  assert(wireHit);
   m_underlayingWireHit = wireHit;
 
   //set hit coordinates in normal space and conformal plane
-  setWirePosition();
+  m_wirePosition = calculateFractionedPosition(0);
   performConformalTransformation();
   m_hitUsage = TrackHit::c_notUsed;
   checkHitDriftLength();
@@ -37,9 +38,9 @@ bool TrackHit::checkHitDriftLength()
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
-  TVector3 wireBegin = cdcg.wireForwardPosition(getLayerId(), getWireId());
+  Vector3D wireBegin = cdcg.wireForwardPosition(getLayerId(), getWireId());
 
-  TVector3 wireBeginNeighbor;
+  Vector3D wireBeginNeighbor;
 
   if (getWireId() != 0) {
     wireBeginNeighbor = cdcg.wireForwardPosition(getLayerId(), getWireId() - 1);
@@ -47,7 +48,7 @@ bool TrackHit::checkHitDriftLength()
     wireBeginNeighbor = cdcg.wireForwardPosition(getLayerId(), getWireId() + 1);
   }
 
-  double delta = fabs(TVector3(wireBegin - wireBeginNeighbor).Pt());
+  double delta = fabs(Vector3D(wireBegin - wireBeginNeighbor).xy().norm());
 
   double coef = 1.;
 
@@ -62,20 +63,14 @@ bool TrackHit::checkHitDriftLength()
   return true;
 }
 
-void TrackHit::setWirePosition()
+Vector3D TrackHit::calculateFractionedPosition(double zReferenz) const
 {
-  m_wirePosition = calculateFractionedPosition(0);
-  performConformalTransformation();
-}
-
-TVector3 TrackHit::calculateFractionedPosition(double zReferenz) const
-{
-  const TVector3& wireForwardPosition = getForwardWirePosition();
-  const TVector3& wireBackwardPosition = getBackwardWirePosition();
+  const Vector3D& wireForwardPosition = getForwardWirePosition();
+  const Vector3D& wireBackwardPosition = getBackwardWirePosition();
 
   double fraction = (zReferenz - wireForwardPosition.z()) / (wireBackwardPosition.z() - wireForwardPosition.z());
 
-  return wireForwardPosition + fraction * (wireBackwardPosition - wireForwardPosition);
+  return wireForwardPosition + (wireBackwardPosition - wireForwardPosition).scaled(fraction);
 }
 
 void TrackHit::performConformalTransformation()

@@ -31,7 +31,6 @@ TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNodeList(con
   TrackCandidate* trackCandidate = new TrackCandidate(nodeList);
   TrackFitter cdcLegendreTrackFitter;
   cdcLegendreTrackFitter.fitTrackCandidateFast(trackCandidate);
-  trackCandidate->setCandidateType(TrackCandidate::goodTrack);
 
   processTrack(trackCandidate);
   return trackCandidate;
@@ -52,7 +51,7 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
   m_cdcLegendreTrackDrawer->drawListOfTrackCands(m_trackList);
 }
 
-void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) const
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
@@ -67,11 +66,11 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     //find indices of the Hits
     std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
 
-    TVector3 position = trackCand->getReferencePoint();
-    TVector3 momentum = trackCand->getMomentumEstimation(true);
+    Vector3D position = trackCand->getReferencePoint();
+    Vector2D momentum = trackCand->getMomentumEstimation();
 
     //set the start parameters
-    CDCTrajectory2D trajectory2D(Vector2D(position.x(), position.y()), Vector2D(momentum.x(), momentum.y()),
+    CDCTrajectory2D trajectory2D(position.xy(), momentum,
                                  trackCand->getChargeSign());
 
     for (TrackHit* trackHit : trackHitVector) {
@@ -105,19 +104,19 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
   }
 }
 
-std::set<TrackHit*> TrackProcessor::createHitSet()
+std::set<TrackHit*> TrackProcessor::createHitSet() const
 {
-  for (TrackCandidate* cand : m_trackList) {
+  doForAllTracks([](TrackCandidate * cand) {
     for (TrackHit* hit : cand->getTrackHits()) {
       hit->setHitUsage(TrackHit::c_usedInTrack);
     }
-  }
+  });
   std::set<TrackHit*> hits_set;
   std::set<TrackHit*>::iterator it = hits_set.begin();
-  for (TrackHit* trackHit : m_axialHitList) {
+  doForAllHits([&hits_set, &it](TrackHit * trackHit) {
     if (trackHit->getHitUsage() != TrackHit::c_usedInTrack)
       it = hits_set.insert(it, trackHit);
-  }
+  });
   B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
   return hits_set;
 }
@@ -138,11 +137,11 @@ void TrackProcessor::deleteTracksWithASmallNumberOfHits()
   }), m_trackList.end());
 }
 
-void TrackProcessor::fitAllTracks()
+void TrackProcessor::fitAllTracks() const
 {
-  for (TrackCandidate* cand : m_trackList) {
+  doForAllTracks([this](TrackCandidate * cand) {
     fitOneTrack(cand);
-  }
+  });
 }
 
 void TrackProcessor::initializeHitListFromWireHitTopology()
@@ -166,16 +165,16 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
     }
   }
   B2DEBUG(90,
-          "Number of hits to be used by track finder: " << m_axialHitList.size() << " axial.");
+          "Number of hits to be used by track finder: " << getAxialHitsList().size() << " axial.");
 }
 
-void TrackProcessor::deleteHitsOfAllBadTracks()
+void TrackProcessor::deleteHitsOfAllBadTracks() const
 {
-  SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.8);
+  SimpleFilter::appendUnusedHits(getTrackList(), getAxialHitsList(), 0.8);
   fitAllTracks();
-  for (TrackCandidate* trackCandidate : m_trackList) {
+  doForAllTracks([](TrackCandidate * trackCandidate) {
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
-  }
+  });
   fitAllTracks();
 }
 
@@ -200,31 +199,30 @@ void TrackProcessor::mergeOneTrack(TrackCandidate* trackCandidate)
   if (trackCandidate == nullptr)
     return;
 
-  for (TrackCandidate* cand : m_trackList) {
+  doForAllTracks([this](TrackCandidate * cand) {
     SimpleFilter::deleteWrongHitsOfTrack(cand, 0.8);
     m_cdcLegendreTrackFitter.fitTrackCandidateFast(cand);
-    cand->reestimateCharge();
-  }
+  });
 }
 
 void TrackProcessor::mergeAllTracks()
 {
   TrackMerger::doTracksMerging(m_trackList);
-  for (TrackCandidate* trackCandidate : m_trackList) {
+  doForAllTracks([](TrackCandidate * trackCandidate) {
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
-  }
+  });
   fitAllTracks();
 }
 
-void TrackProcessor::appendHitsOfAllTracks()
+void TrackProcessor::appendHitsOfAllTracks() const
 {
-  SimpleFilter::reassignHitsFromOtherTracks(m_trackList);
+  SimpleFilter::reassignHitsFromOtherTracks(getTrackList());
   fitAllTracks();
-  SimpleFilter::appendUnusedHits(m_trackList, m_axialHitList, 0.90);
+  SimpleFilter::appendUnusedHits(getTrackList(), getAxialHitsList(), 0.90);
   fitAllTracks();
-  for (TrackCandidate* trackCandidate : m_trackList) {
+  doForAllTracks([this](TrackCandidate * trackCandidate) {
     SimpleFilter::deleteWrongHitsOfTrack(trackCandidate, 0.8);
     fitOneTrack(trackCandidate);
-  }
+  });
 }
 

@@ -704,19 +704,14 @@ namespace Belle2 {
         std::pair<double, double> track_par;
         std::pair<double, double> ref_point;
 
-        double chi2 = fitter.fitTrackCandidateFast(trackCandidate->getTrackHits(), track_par, ref_point, false);
+        fitter.fitTrackCandidateFast(trackCandidate->getTrackHits(), track_par, ref_point, false);
 
         trackCandidate->setTheta(track_par.first);
         trackCandidate->setR(track_par.second);
-        trackCandidate->setChi2(chi2);
         trackCandidate->setReferencePoint(ref_point.first, ref_point.second);
 
-        // Recalculate the momentum
-        trackCandidate->getMomentumEstimation(true);
-
-        EXPECT_FALSE(std::isnan(trackCandidate->getMomentumEstimation().X()));
-        EXPECT_FALSE(std::isnan(trackCandidate->getMomentumEstimation().Y()));
-        EXPECT_FALSE(std::isnan(trackCandidate->getMomentumEstimation().Z()));
+        EXPECT_FALSE(std::isnan(trackCandidate->getMomentumEstimation().x()));
+        EXPECT_FALSE(std::isnan(trackCandidate->getMomentumEstimation().y()));
 
         EXPECT_FALSE(std::isnan(trackCandidate->getReferencePoint().X()));
         EXPECT_FALSE(std::isnan(trackCandidate->getReferencePoint().Y()));

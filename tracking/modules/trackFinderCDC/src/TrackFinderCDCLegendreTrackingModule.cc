@@ -253,7 +253,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
         numberOfUsedHits++;
     }
 
-    B2DEBUG(90, "Number of used hits: " << numberOfUsedHits)
+    B2DEBUG(200, "Number of used hits: " << numberOfUsedHits)
 
     // Postprocessing of one track candidate
     m_cdcLegendreTrackProcessor.fitOneTrack(trackCandidate);
@@ -276,6 +276,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     m_cdcLegendreTrackProcessor.deleteTracksWithASmallNumberOfHits();
 
 
+    m_cdcLegendreTrackProcessor.sortTrackList();
   };
 
   QuadTreeLegendre::CandidateProcessorLambda lmdCandidateProcessing = [&](QuadTreeLegendre * qt) -> void {

@@ -127,7 +127,7 @@ void TrackDrawer::drawTrackCand(TrackCandidate* TrackCand)
 
   std::stringstream ss;
   std::string trackColor = getColor(m_iTrack);
-  TVector2 momentum(TrackCand->getMomentumEstimation().X(), TrackCand->getMomentumEstimation().Y());
+  TVector2 momentum(TrackCand->getMomentumEstimation().x(), TrackCand->getMomentumEstimation().y());
   TVector2 position(TrackCand->getReferencePoint().X(), TrackCand->getReferencePoint().Y());
   int charge = TrackCand->getChargeSign() * 1.1;
 
@@ -187,7 +187,7 @@ void TrackDrawer::drawListOfTrackCands(std::list<TrackCandidate*>& trackList)
 
   for (TrackCandidate* TrackCand : trackList) {
     std::string trackColor = getColor(iTrack);
-    TVector2 momentum(TrackCand->getMomentumEstimation().X(), TrackCand->getMomentumEstimation().Y());
+    TVector2 momentum(TrackCand->getMomentumEstimation().x(), TrackCand->getMomentumEstimation().y());
     TVector2 position(TrackCand->getReferencePoint().X(), TrackCand->getReferencePoint().Y());
     int charge = TrackCand->getChargeSign() * 1.1;
 

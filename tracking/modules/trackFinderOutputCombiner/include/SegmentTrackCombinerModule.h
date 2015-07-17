@@ -276,6 +276,11 @@ namespace Belle2 {
         track.sortByPerpS();
       }
 
+      // Delete all taken segments
+      segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCRecoSegment2D & segment) {
+        return segment.getAutomatonCell().hasTakenFlag();
+      }), segments.end());
+
     }
   }
 }

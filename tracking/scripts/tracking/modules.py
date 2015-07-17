@@ -111,7 +111,7 @@ class CDCFullFinder(metamodules.PathModule):
                 tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
                 tmva_cut=tmva_cut), CDCLegendreTrackFinder(
                 debug_output=False),
-            CDCSegmentTrackCombiner(output_track_cands_store_array_name=output_track_cands_store_array_name,
+            CDCSegmentTrackCombiner(output_track_cands_store_array_name=None,
 
                                     segment_track_filter_first_step_cut=first_tmva_cut,
                                     segment_track_filter_first_step_filter=first_filter,
@@ -130,7 +130,9 @@ class CDCFullFinder(metamodules.PathModule):
                                     segment_information_list_track_filter="none",
 
                                     track_filter=track_filter,
-                                    track_filter_cut=track_filter_cut)
+                                    track_filter_cut=track_filter_cut),
+
+            CDCSegmentPairAutomatonFinder(output_track_cands_store_array_name=output_track_cands_store_array_name)
         ]
 
         metamodules.PathModule.__init__(self, modules=modules)
@@ -251,6 +253,28 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
         module_list.append(last_tracking_module)
 
         super(CDCLegendreTrackFinder, self).__init__(modules=module_list)
+
+
+class CDCSegmentPairAutomatonFinder(metamodules.WrapperModule):
+
+    def __init__(self, output_track_cands_store_array_name=None,
+                 input_track_cands_store_vector_name="CDCTrackVector",
+                 input_segments_store_vector_name="CDCRecoSegment2DVector"):
+
+        segment_pair_finder_module = StandardEventGenerationRun.get_basf2_module(
+            "TrackFinderCDCSegmentPairAutomatonDev",
+            SegmentsStoreObjName=input_segments_store_vector_name,
+            WriteGFTrackCands=False,
+            SkipHitsPreparation=True,
+            TracksStoreObjNameIsInput=True,
+            TracksStoreObjName=input_track_cands_store_vector_name
+        )
+
+        if output_track_cands_store_array_name is not None:
+            segment_pair_finder_module.param({'WriteGFTrackCands': True,
+                                              'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        super(CDCSegmentPairAutomatonFinder, self).__init__(segment_pair_finder_module)
 
 
 class CDCLocalTrackFinder(metamodules.WrapperModule):

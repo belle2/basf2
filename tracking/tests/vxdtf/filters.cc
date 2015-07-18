@@ -24,7 +24,15 @@ using namespace Belle2;
 namespace VXDTFfilterTest {
 
   /** just a small proto-container storing coordinates */
-  typedef tuple<float, float, float> spacePoint;
+  class spacePoint: public tuple<float, float, float> {
+  public:
+    spacePoint(float x, float y, float z): tuple<float, float, float>(x, y, z)
+    {};
+  private:
+    // private copy constructor to test that all the
+    // arguments are passed by reference
+    spacePoint(const spacePoint&) = delete;
+  };
 
 
   /** a small filter illustrating the behavior of a distance3D-filter */
@@ -100,7 +108,7 @@ namespace VXDTFfilterTest {
   public:
     template<class Var, typename ... otherTypes>
     static void notify(const Var&,
-                       otherTypes ...)
+                       const otherTypes& ...)
     {
       counter<Var>::N ++ ;
     }

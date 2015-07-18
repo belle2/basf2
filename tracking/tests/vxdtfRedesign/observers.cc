@@ -424,9 +424,9 @@ namespace VXDTFObserversTest {
     template<class Var, class RangeType>
     static void notify(const Var&,
                        typename Var::variableType fResult,
+                       const RangeType& range,
                        const typename Var::argumentType&,
-                       const typename Var::argumentType&,
-                       const RangeType& range)
+                       const typename Var::argumentType&)
     {
       if (range.contains(fResult)) {
         counter<Var>::accepted ++;
@@ -468,9 +468,9 @@ namespace VXDTFObserversTest {
     template<class Var, class RangeType>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,
+                       const RangeType& range,
                        const typename Var::argumentType& outerHit,
-                       const typename Var::argumentType& innerHit,
-                       const RangeType& range)
+                       const typename Var::argumentType& innerHit)
     {
 
       stringstream outputStream;
@@ -515,10 +515,20 @@ namespace VXDTFObserversTest {
     template<class Var, class RangeType>
     static void notify(const Var&,
                        typename Var::variableType fResult,
+                       const RangeType& range,
                        const typename Var::argumentType& outerHit,
-                       const typename Var::argumentType& innerHit,
-                       const RangeType& range)
+                       const typename Var::argumentType& innerHit)
     {
+      B2INFO("CountAcceptedRejectedMCParticleObserver called"  << endl
+             << "range: (  " << range.getInf() << " , " << range.getSup() << " )" << endl
+             << "var =     " << fResult << endl
+             << "outerHit: (" << outerHit.X() << " , "
+             << outerHit.Y() << " , "
+             << outerHit.Z() << " ) (x,y,z) " << endl
+             << "innerHit: (" << innerHit.X() << " , "
+             << innerHit.Y() << " , "
+             << innerHit.Z() << " ) (x,y,z) " << endl
+            );
 
       // we use the pdgCodes of the particles as identifier (not unique, since more than one primary particle can have the same PDG-code) and count their acceptance rate:
       CountContainer::Key myPDGs = createKey(outerHit, innerHit, true);
@@ -659,14 +669,14 @@ namespace VXDTFObserversTest {
     template<class Var, class RangeType>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,
+                       const RangeType& range,
                        const typename Var::argumentType& outerHit,
-                       const typename Var::argumentType& innerHit,
-                       const RangeType& range)
+                       const typename Var::argumentType& innerHit)
     {
       CountUsedObserver::notify(filterType);
-      CountAcceptRejectObserver::notify(filterType, fResult, outerHit, innerHit, range);
-      CountBadCaseObserver::notify(filterType, fResult, outerHit, innerHit);
-      InfoObserver::notify(filterType, fResult, outerHit, innerHit, range);
+      CountAcceptRejectObserver::notify(filterType, fResult, range, outerHit, innerHit);
+      CountBadCaseObserver::notify(filterType, fResult, range, outerHit, innerHit);
+      InfoObserver::notify(filterType, fResult, range, outerHit, innerHit);
     }
   };
 
@@ -700,9 +710,10 @@ namespace VXDTFObserversTest {
                                           const FilterType&, typename FilterType::variableType) ;
 
     /** iterate over all stored Observers and execute their notify-function */
-    template<typename ... otherTypes>
+    template<typename range, typename ... otherTypes>
     static void notify(const FilterType& filterType,
                        typename FilterType::variableType filterResult,
+                       const range&,
                        const typename FilterType::argumentType& outerHit,
                        const typename FilterType::argumentType& innerHit,
                        otherTypes ...)

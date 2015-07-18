@@ -126,9 +126,10 @@ namespace VXDTFtwoHitFilterTest {
   /** this observer does simply print the name of the SelectionVariable and the result of its value-function as an Error */
   class ErrorObserver : public VoidObserver {
   public:
-    template<class Var, typename ... otherTypes>
+    template<class Var, class Range, typename ... otherTypes>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,
+                       const Range& range,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
                        otherTypes ...)
@@ -145,9 +146,10 @@ namespace VXDTFtwoHitFilterTest {
   /** this observer does simply print the name of the SelectionVariable and the result of its value-function as a Warning */
   class InfoObserver : public VoidObserver {
   public:
-    template<class Var, typename ... otherTypes>
+    template<class Var, class Range, typename ... otherTypes>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,
+                       const Range&,
                        const typename Var::argumentType& outerHit,
                        const typename Var::argumentType& innerHit,
                        otherTypes ...)

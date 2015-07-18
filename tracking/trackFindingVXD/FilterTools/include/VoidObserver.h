@@ -31,7 +31,7 @@ namespace Belle2 {
     /** _static_ method used by the observed object to notify the observer
      */
     template <  typename ... types >
-    static void notify(types ...) {};
+    static void notify(const types& ...) {};
 
     /** An empty constructor for an empty class */
     VoidObserver() {};

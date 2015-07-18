@@ -13,16 +13,32 @@
 #include <TBranch.h>
 #include <TTree.h>
 #include <string>
-
+#include <type_traits>
 
 namespace Belle2 {
 
+
+  template< typename ... typePack >
+  class Filter { /* Empty: just specialized templates are interesting */
+  };
+
   template< typename ... types >
-  class Filter { /* Empty: just specialized templates are interesting */  };
+  struct all_same : std::false_type {};
+
+  template< >
+  struct all_same< > : std::true_type {};
+
+  template<typename T >
+  struct all_same< T > : std::true_type {};
+
+  template<typename T, typename ... types >
+  struct all_same< T, T, types ...> : all_same< T, types ...> {};
+
 
   /** these are just classnames to be leveraged in the template parameters pack  */
   class BypassableFilter;
   class ActivableFilter;
+
 
   /** Basic building block of the Filter tools
    *
@@ -81,15 +97,20 @@ namespace Belle2 {
     /** Handy typedef */
     typedef  typename Variable::argumentType argumentType;
 
-    /** All the real computations are occuring here */
-    bool accept(const argumentType& arg1,
-                const argumentType& arg2) const
+    /** All the real computations are occuring in this method */
+    template< typename ... argsType >
+    /* this typename expands to bool only if all the argsType are
+     of the same type of the argument of the filter*/
+    typename std::enable_if< all_same< argumentType  , argsType ... >::value, bool >::type
+    accept(const argsType& ... args) const
     {
-      typename Variable::variableType value = Variable::value(arg1, arg2);
-      Observer::notify(Variable(), value, arg1, arg2, m_range);
+      typename Variable::variableType value = Variable::value(args ...);
+      Observer::notify(Variable(), value, m_range, args ...);
       return m_range.contains(value);
 
     }
+
+
 
     /** This method persists the range.
      * @param t is the TTree under which the TBranch will be created
@@ -229,12 +250,18 @@ namespace Belle2 {
     { m_bypass = &bypass; };
     Filter()  {};
 
-    /** All the real computations are occuring here */
-    bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
-                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const
+    typedef  typename Variable::argumentType argumentType;
+
+    /** All the real computations are occuring in this method */
+    template< typename ... argsType >
+    /* this typename expands to bool only if all the argsType are
+     of the same type of the argument of the filter*/
+    typename std::enable_if< all_same< argumentType, argsType ... >::value,
+             bool >::type
+             accept(const argsType& ... args) const
     {
-      typename Variable::variableType value = Variable::value(arg1, arg2);
-      Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
+      typename Variable::variableType value = Variable::value(args ...);
+      Observer::notify(Variable(), value, Filter< Variable, Range, Observer >::m_range, args ...);
       return (*m_bypass) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 
@@ -317,15 +344,18 @@ namespace Belle2 {
 
     Filter() { };
 
+    /** Handy typedef */
+    typedef  typename Variable::argumentType argumentType;
 
     /** All the real computations are occuring here */
-    bool accept(const typename Filter< Variable, Range, Observer>::argumentType& arg1,
-                const typename Filter< Variable, Range, Observer>::argumentType& arg2) const
+    template< typename ... argsType >
+    typename std::enable_if <
+    all_same< argumentType, argsType ... >::value, bool >::type
+    accept(const argsType& ... args) const
     {
-      typename Variable::variableType value = Variable::value(arg1, arg2);
-      cout << (*m_enable) << " | ";
-      Observer::notify(Variable(), value, arg1, arg2, Filter< Variable, Range, Observer >::m_range);
-
+      typename Variable::variableType value = Variable::value(args ...);
+      Observer::notify(Variable(), value, Filter< Variable, Range, Observer >::m_range,
+                       args ...);
       return (!(*m_enable)) || Filter< Variable, Range, Observer >::m_range.contains(value);
     }
 
@@ -357,11 +387,13 @@ namespace Belle2 {
 
     typedef  typename someFilter::argumentType argumentType;
 
-    bool accept(const argumentType& arg1,
-                const argumentType& arg2) const
-    {
-      return ! m_filter.accept(arg1, arg2);
 
+    template< typename ... argsType >
+    typename std::enable_if< all_same< argumentType,
+             argsType ... >::value, bool >::type
+             accept(const argsType& ... args) const
+    {
+      return ! m_filter.accept(args ...);
     }
 
     void persist(TTree* t, const string& branchName)
@@ -406,12 +438,16 @@ namespace Belle2 {
   public:
 
     typedef  typename FilterA::argumentType argumentType;
+    typedef  typename FilterB::argumentType argumentTypeB;
 
-    bool accept(const argumentType& arg1,
-                const argumentType& arg2) const
+    template< typename ... argsType >
+    typename std::enable_if <
+    all_same< argumentType, argumentTypeB,
+              argsType ... >::value, bool >::type
+              accept(const argsType& ... args) const
     {
 
-      return m_filterA.accept(arg1, arg2) && m_filterB.accept(arg1, arg2);
+      return m_filterA.accept(args ...) && m_filterB.accept(args ...);
 
     }
 
@@ -470,12 +506,18 @@ namespace Belle2 {
   public:
 
     typedef  typename FilterA::argumentType argumentType;
+    typedef  typename FilterB::argumentType argumentTypeB;
 
-    bool accept(const argumentType& arg1,
-                const argumentType& arg2) const
+
+
+    template< typename ... argsType >
+    typename std::enable_if <
+    all_same<  argumentType, argumentTypeB,
+               argsType ... >::value, bool >::type
+               accept(const argsType& ... args) const
     {
 
-      return m_filterA.accept(arg1, arg2) || m_filterB.accept(arg1, arg2);
+      return m_filterA.accept(args ...) || m_filterB.accept(args ...);
 
     }
 

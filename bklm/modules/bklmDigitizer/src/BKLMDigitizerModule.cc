@@ -104,7 +104,8 @@ void BKLMDigitizerModule::event()
   // Get BKLM hits collection from the data store
   //---------------------------------------------
   StoreArray<BKLMSimHit> simHits;
-  if (simHits.getEntries() == 0) return;
+  int nSimHit = simHits.getEntries();
+  if (nSimHit == 0) return;
 
   StoreArray<BKLMDigit> digits;
 
@@ -112,7 +113,7 @@ void BKLMDigitizerModule::event()
   unsigned int d = 0;
 
   std::map<int, std::vector<std::pair<int, BKLMSimHit*> > > volIDToSimHits;
-  for (int h = 0; h < simHits.getEntries(); ++h) {
+  for (int h = 0; h < nSimHit; ++h) {
     BKLMSimHit* simHit = simHits[h];
     if (simHit->inRPC()) {
       if (simHit->getStripMin() > 0) {
@@ -186,12 +187,7 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
   digit->isAboveThreshold(false);
 
   int nPE = 0;
-  float amplitude[m_nDigitizations];
-  int   adcPulse[m_nDigitizations];
-  for (unsigned int i = 0; i < m_nDigitizations; ++i) {
-    amplitude[i] = 0.0;
-    adcPulse[i] = 0;
-  }
+  std::vector<double> adcPulse(m_nDigitizations, 0.0);
 
   GeometryPar* geoPar = GeometryPar::instance();
   BKLMSimHit* simHit = vHits.front().second;
@@ -203,29 +199,30 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
     simHit = iHit->second;
     double hitDist = simHit->getPropagationTime() * m_fiberLightSpeed;
     double nPEmean = simHit->getEDep() * m_nPEperMeV; // Poisson mean for # of SiPM pixels
-    nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), false, hitDist, amplitude);
+    nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), false, hitDist, adcPulse);
     if (m_mirrorReflectiveIndex > 0)
-      nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), true, scintLength2 - hitDist, amplitude);
+      nPE += fillAmplitude(gRandom->Poisson(nPEmean), simHit->getTime(), true, scintLength2 - hitDist, adcPulse);
   }
 
   // incorporate SiPM noise
   if (m_meanSiPMNoise > 0) {
     for (unsigned int i = 0; i < m_nDigitizations; ++i) {
-      amplitude[i] += gRandom->Poisson(m_meanSiPMNoise);
+      adcPulse[i] += gRandom->Poisson(m_meanSiPMNoise);
     }
   }
 
   // digitize the pulse(s)
-  simulateADC(adcPulse, amplitude);
+  for (unsigned int i = 0; i < m_nDigitizations; ++i)
+    adcPulse[i] = (int)(0.5 * m_ADCRange * adcPulse[i]);
 
   // "Fit" the digitized pulse(s), i.e., extract the relevant features
   // Calculate integral above threshold and simultaneously find
   // first and last point above threshold.
-  int sum = 0;
+  double sum = 0.0;
   unsigned int first = m_nDigitizations;
   unsigned int last = 0;
-  int peakAmplitude = 0;
-  const int thr = 100 * m_PEAttenuationFreq;
+  double peakAmplitude = 0.0;
+  const double thr = 100.0 * m_PEAttenuationFreq;
   for (unsigned int i = 0; i < m_nDigitizations; ++i) {
     sum += adcPulse[i];
     if (adcPulse[i] > thr) {
@@ -243,7 +240,7 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
   digit->setTime(first * m_ADCSamplingTime);
   digit->setSimNPixel(nPE);
 
-  int bkgArea = 0;
+  double bkgArea = 0.0;
   int bkgCount = 0;
   double cfd = -1.0;
   double cfdAmplitude = 0.05 * peakAmplitude;
@@ -267,7 +264,7 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
 }
 
 int BKLMDigitizerModule::fillAmplitude(int nPEsample, double timeShift,
-                                       bool isReflected, double dist, float* hist)
+                                       bool isReflected, double dist, std::vector<double>& adcPulse)
 {
   int nPE = 0;
   double attenuation = exp(-m_PEAttenuationFreq * m_ADCSamplingTime);
@@ -289,22 +286,16 @@ int BKLMDigitizerModule::fillAmplitude(int nPEsample, double timeShift,
       jMin = (unsigned int)(hitTime / m_ADCSamplingTime);
       if (jMin < m_nDigitizations) {
         f = exp(-m_PEAttenuationFreq * (jMin * m_ADCSamplingTime - hitTime));
-        hist[jMin] += 1.0 - f * attenuation; // partial bin
+        adcPulse[jMin] += 1.0 - f * attenuation; // partial bin
       }
     } else {
       f = exp(m_PEAttenuationFreq * hitTime);
-      hist[0] += norm * f; // full bin starting at t=0
+      adcPulse[0] += norm * f; // full bin starting at t=0
     }
     for (unsigned int j = jMin + 1; j < m_nDigitizations; ++j) {
       f *= attenuation;
-      hist[j] += norm * f;
+      adcPulse[j] += norm * f;
     }
   }
   return nPE;
-}
-
-void BKLMDigitizerModule::simulateADC(int adcPulse[], float amplitude[])
-{
-  for (unsigned int i = 0; i < m_nDigitizations; ++i)
-    adcPulse[i] = (int)(0.5 * m_ADCRange * amplitude[i]);
 }

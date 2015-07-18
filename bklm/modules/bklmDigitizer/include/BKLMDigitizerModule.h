@@ -69,21 +69,10 @@ namespace Belle2 {
      * @param[in] nPEsample Sampled number of photoelectrons
      * @param[in] timeShift Time of the SimHit
      * @param[in] isReflected Whether the hit is direct (false) or reflected (true)
-     * @param[out] hist Pulse-shape histogram
+     * @param[out] adcPulse Pulse-shape histogram
      * @return Number of surviving photoelectrons
      */
-    int fillAmplitude(int nPEsample, double timeShift, bool isReflected, double dist, float* hist);
-
-    /**
-     * Reflect time-shape of 1p.e. signal
-     * Amplitude should be 1, exp tail defined by 1 parameter
-     * @param[in] t Time.
-     * @return Signal shape.
-     */
-    double signalShape(double t);
-
-    //! Create digital signal from analog
-    void simulateADC(int [], float []);
+    int fillAmplitude(int nPEsample, double timeShift, bool isReflected, double dist, std::vector<double>& adcPulse);
 
     //! ADC sampling time (ns)
     double m_ADCSamplingTime;

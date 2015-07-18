@@ -34,7 +34,6 @@ RunManager* RunManager::m_instance = NULL;
 
 RunManager& RunManager::Instance()
 {
-  static SingletonDestroyer siDestroyer;
   if (!m_instance) m_instance = new RunManager();
   return *m_instance;
 }

@@ -34,11 +34,11 @@ namespace Belle2 {
 
   };
 
-
-  // The following stuff is for the random number gererator
+  /**
+   *Wrapper for RNG to be used with framework generator.
+   */
   template<class T> class RNGWrapper {
   public:
-
     /** set object. */
     static void set(T* object, double (T::*func)(void));
     /** random generator. */

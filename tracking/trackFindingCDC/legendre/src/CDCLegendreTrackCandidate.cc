@@ -25,9 +25,10 @@ TrackCandidate::TrackCandidate(TrackCandidate& candidate) :
   m_theta(candidate.getTheta()), m_r(candidate.getR()), m_xc(candidate.getXc()), m_yc(candidate.getYc()),
   m_ref_x(candidate.getReferencePoint().X()), m_ref_y(candidate.getReferencePoint().Y()), m_charge(candidate.getCharge())
 {
-
-  // TODO!!
-  //m_TrackHits = candidate.getTrackHits();
+  m_TrackHits.reserve(candidate.getNHits());
+  for (TrackHit* trackHit : candidate.getTrackHits()) {
+    m_TrackHits.push_back(trackHit);
+  }
 }
 
 TrackCandidate::TrackCandidate(double theta, double r, int charge,

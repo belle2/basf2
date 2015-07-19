@@ -92,7 +92,7 @@ namespace Belle2 {
         }
 
         for (TrackHit* trackHit : someHits)  {
-          trackHit->setHitUsage(TrackHit::c_bad);
+          trackHit->setHitUsage(TrackHit::c_notUsed);
         }
 
         trackHitList.clear();

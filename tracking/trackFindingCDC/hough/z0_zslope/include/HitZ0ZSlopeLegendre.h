@@ -46,27 +46,35 @@ namespace Belle2 {
         // Setup three discrete values for phi0
         assert(m_discreteZ0Width > m_discreteZ0Overlap);
         const size_t nZ0Bins = std::pow(z0Divisions, m_maxLevel);
+        B2INFO("z0 bins " << nZ0Bins)
         const size_t nDiscreteZ0s = (m_discreteZ0Width - m_discreteZ0Overlap) * nZ0Bins + m_discreteZ0Overlap + 1;
+        B2INFO("number discrete values in z0 " << nDiscreteZ0s)
         const double z0Overlap = 2 * m_maximumAbsZ0 / (nZ0Bins * (static_cast<double>(m_discreteZ0Width) / m_discreteZ0Overlap - 1) + 1);
-
+        B2INFO("z0 overlap " << z0Overlap)
         // Adjust the z0 bounds such that overlap occures at the wrap around of the z0 range as well
         const double z0LowerBound = -m_maximumAbsZ0 - z0Overlap;
         const double z0UpperBound = +m_maximumAbsZ0 + z0Overlap;
+        B2INFO("z0 lower/upper bound " << z0LowerBound << " " << z0UpperBound)
 
         m_discreteZ0s = DiscreteZ0Array(z0LowerBound, z0UpperBound, nDiscreteZ0s);
+        for (unsigned int i = 0; i < nDiscreteZ0s; i++) {
+          B2INFO(m_discreteZ0s[i].getValue())
+        }
         std::pair<DiscreteZ0, DiscreteZ0> z0Range(m_discreteZ0s.getRange());
 
         // Setup three discrete values for the two dimensional curvature
         assert(m_discreteZSlopeWidth > m_discreteZSlopeOverlap);
         const size_t nZSlopeBins = std::pow(zSlopeDivisions, m_maxLevel);
+        B2INFO("z slope bins " << nZSlopeBins)
         const size_t nDiscreteZSlopes = (m_discreteZSlopeWidth - m_discreteZSlopeOverlap) * nZSlopeBins + m_discreteZSlopeOverlap + 1;
+        B2INFO("number discrete values in z slope " << nDiscreteZSlopes)
 
         const double zSlopeOverlap = 2 * m_maximumAbsZSlope / (nZSlopeBins * (static_cast<double>(m_discreteZSlopeWidth) /
                                                                m_discreteZSlopeOverlap - 1) + 1);
-
-        // Since the lower bound is slightly prefered we can bias to high momenta by putting them at the lower bound.
+        B2INFO("zSlope overlap " << zSlopeOverlap)
         const double zSlopeLowerBound = -m_maximumAbsZSlope - zSlopeOverlap;
         const double zSlopeUpperBound = +m_maximumAbsZSlope + zSlopeOverlap;
+        B2INFO("z slope lower/upper bound " << zSlopeLowerBound << " " << zSlopeUpperBound)
 
         m_discreteZSlopes = DiscreteZSlopeArray(zSlopeLowerBound, zSlopeUpperBound, nDiscreteZSlopes);
         std::pair<DiscreteZSlope, DiscreteZSlope > zSlopeRange(m_discreteZSlopes.getRange());
@@ -120,19 +128,19 @@ namespace Belle2 {
       size_t m_discreteZ0Overlap = 0;
 
       /// Width of the leaves at the maximal level in z0 counted in number of discrete values.
-      size_t m_discreteZ0Width = 2;
+      size_t m_discreteZ0Width = 1;
 
       /// Overlap of the leaves in the inverse z slope counted in number of discrete values
       size_t m_discreteZSlopeOverlap = 0;
 
       /// Width of the leaves at the maximal level in the inverse z slope counted in number of discrete values.
-      size_t m_discreteZSlopeWidth = 2;
+      size_t m_discreteZSlopeWidth = 1;
 
       /// Maximal absolute z0 value the tree should cover.
-      double m_maximumAbsZ0 = std::tan(75.0 * PI / 180.0);
+      double m_maximumAbsZ0 = 20.0;
 
       /// Maximal absolute z slope value the tree should cover.
-      double m_maximumAbsZSlope = 20.0;
+      double m_maximumAbsZSlope = std::tan(75.0 * PI / 180.0);
 
       // Dummy initialisation of the other constructs
 

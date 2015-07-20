@@ -109,8 +109,8 @@ namespace Belle2 {
           bool walkChildren = walker(this);
           Children* children = getChildren();
           if (children and walkChildren) {
-            for (Node* childNode : children) {
-              childNode->walk(walker);
+            for (Node& childNode : *children) {
+              childNode.walk(walker);
             }
           }
         }

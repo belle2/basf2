@@ -24,11 +24,15 @@ namespace Belle2 {
              size_t curvDivisions = 2> // Division at each level
     class HitPhi0CurvLegendre {
 
+    public:
       /// Type of the box division strategy
       using Phi0CurvBoxDivision = LinearDivision<Phi0CurvBox, phi0Divisions, curvDivisions>;
 
       /// Type of the fast hough tree structure
       using HitPhi0CurvFastHoughTree = WeightedFastHoughTree<HitPtr, Phi0CurvBox, Phi0CurvBoxDivision>;
+
+      /// Type of the nodes used in the tree for the search.
+      using Node = typename HitPhi0CurvFastHoughTree::Node;
 
     public:
       /// Constructor using the default values
@@ -124,6 +128,13 @@ namespace Belle2 {
       /// Release all memory that the tree aquired during the runs.
       void raze()
       { m_hitPhi0CurvFastHoughTree->raze(); }
+
+    public:
+      /// Getter for the tree used in the search in the hough plane.
+      HitPhi0CurvFastHoughTree* getTree() const
+      {
+        return m_hitPhi0CurvFastHoughTree.get();
+      }
 
     private:
       // Default parameters

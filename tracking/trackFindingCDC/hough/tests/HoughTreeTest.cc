@@ -53,6 +53,9 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
 
   // Is this still C++? Looks like JavaScript to me :-).
   TimeItResult timeItResult = timeIt(100, true, [&]() {
+    // Exclude the timing of the resource release for comparision with the legendre test.
+    trackHitPhi0CurvQuadLegendre.fell();
+
     trackHitPhi0CurvQuadLegendre.seed(hitVector);
 
     const double minWeight = 30.0;
@@ -68,11 +71,20 @@ TEST_F(CDCLegendreTestFixture, phi0CurvHoughTreeOnTrackHits)
     EXPECT_GE(candidates[0].second.size(), 30);
     EXPECT_GE(candidates[1].second.size(), 30);
 
-    // Exclude the timing of the resource release for comparision with the legendre test.
-    trackHitPhi0CurvQuadLegendre.fell();
   });
 
+  /// Test idiom to output statistics about the tree.
+  std::size_t nNodes = 0;
+  using Node = TrackHitPhi0CurvQuadLegendre::Node;
+  auto countNodes = [&nNodes](Node*) -> bool {
+    ++nNodes;
+    return true;
+  };
+  trackHitPhi0CurvQuadLegendre.getTree()->walk(countNodes);
+  B2INFO("Tree generated " << nNodes << " nodes");
+  trackHitPhi0CurvQuadLegendre.fell();
   trackHitPhi0CurvQuadLegendre.raze();
+
 
   for (std::pair<Phi0CurvBox, std::vector<RLTagged<const TrackHit*> > >& candidate : candidates) {
     const Phi0CurvBox& phi0CurvBox = candidate.first;

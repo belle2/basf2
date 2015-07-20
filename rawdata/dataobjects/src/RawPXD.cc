@@ -13,18 +13,16 @@ using namespace Belle2;
 
 ClassImp(RawPXD);
 
-RawPXD::RawPXD()
+RawPXD::RawPXD() : m_nwords(0), m_buffer(NULL)
 {
-  m_nwords = 0;
-  m_buffer = NULL; // new int[1];
-  m_allocated = false;
 }
 
 RawPXD::RawPXD(int* buffer, int length_in_Bytes)
+  : m_nwords(0), m_buffer(NULL)
 {
   m_nwords = (length_in_Bytes + 3) / 4;
-  m_buffer = buffer;
-  m_allocated = false;
+  m_buffer = new int[m_nwords];
+  memcpy(m_buffer, buffer, m_nwords * sizeof(int));
 }
 
 unsigned int RawPXD::endian_swap(unsigned int x)
@@ -37,8 +35,9 @@ unsigned int RawPXD::endian_swap(unsigned int x)
 }
 
 RawPXD::RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <unsigned char>>& payload)
+  : m_nwords(0), m_buffer(NULL)
 {
-
+  // This function is only used by the PXDPacker in simulations. Does not make sense for other cases
   // Now create header from payload , this can be done with less loops, but speed is not the issue here
   int nr_frames = header.size();
   int payload_size = 0; // in 32 bit words
@@ -47,8 +46,8 @@ RawPXD::RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <uns
   }
 
   m_nwords = 2 + nr_frames + payload_size; // 321 bit words
+
   m_buffer = new int[m_nwords];
-  m_allocated = true;
 
   B2INFO("RawPXD Frames " << header.size() << " Data " << payload_size << " (32 bitword)");
 
@@ -71,30 +70,14 @@ RawPXD::RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <uns
 
 RawPXD::~RawPXD()
 {
-  if (m_allocated)
-    delete[] m_buffer;
+  if (m_buffer != NULL) delete[] m_buffer;
 }
 
 int RawPXD::size()
 {
   return m_nwords;
 }
-/*at the moment not used
-int* RawPXD::allocate_buffer(int nwords)
-{
-    m_nwords = nwords;
-    m_buffer = new int[nwords];
-    m_allocated = true;
-    return m_buffer;
-}
 
-void RawPXD::data(int nwords, int* data)
-{
-    memcpy(m_buffer, data, nwords);
-
-    m_buffer[0] = nwords;
-}
-*/
 int* RawPXD::data(void)
 {
   int* ptr = &m_buffer[0];

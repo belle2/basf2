@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include "tracking/trackFindingVXD/FilterTools/SelectionVariable.h"
-
-#include <tracking/spacePointCreation/SpacePoint.h>
-
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariable.h>
 #include <math.h>
 
 namespace Belle2 {
@@ -34,6 +31,6 @@ namespace Belle2 {
   };
 
   /** typedef for common usage with SpacePoints */
-  typedef Distance1DZTemplate<SpacePoint> SPDistance1DZ;
+//   typedef Distance1DZTemplate<SpacePoint> SPDistance1DZ;
 
 }

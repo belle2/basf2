@@ -11,29 +11,34 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariable.h>
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelperFunctions.h>
 #include <math.h>
+
+
+// in fw:
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
-  /** This is the specialization for SpacePoints with returning floats, where value calculates the  slope in R-Z for a given pair of hits.
+  /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees.
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class SlopeRZ : public SelectionVariable< PointType , float > {
+  class Angle3DFull : public SelectionVariable< PointType , float > {
   public:
 
-    /** calculates the distance between the hits in z (1D), returning unit: cm */
-    static float value(const PointType& outerHit, const PointType& innerHit)
+    /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
+    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      float result = atan(
-                       std::sqrt(
-                         std::pow((outerHit.X() - innerHit.X()), 2)
-                         + std::pow((outerHit.Y() - innerHit.Y()), 2)
-                       ) / (outerHit.Z() - innerHit.Z())
-                     );
-      return
-        (std::isnan(result) || std::isinf(result)) ? 0 : result;
+      using namespace SelVarHelper;
+
+      B2Vector3<float> outerVector = doAMinusB<PointType, float>(outerHit, centerHit);
+      B2Vector3<float> innerVector = doAMinusB<PointType, float>(centerHit, innerHit);
+
+      double result = acos(outerVector.Dot(innerVector) / (outerVector.Mag() * innerVector.Mag())); // 0-pi
+      result = (result * (180. / M_PI));
+      return (std::isnan(result) || std::isinf(result)) ? 0 : result;
     }
   };
 

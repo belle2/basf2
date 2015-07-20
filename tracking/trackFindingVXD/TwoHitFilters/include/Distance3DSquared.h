@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include "tracking/trackFindingVXD/FilterTools/SelectionVariable.h"
-
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariable.h>
 #include <math.h>
 
 namespace Belle2 {

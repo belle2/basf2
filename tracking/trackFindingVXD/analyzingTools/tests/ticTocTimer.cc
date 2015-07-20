@@ -12,10 +12,8 @@
 
 #include <tracking/trackFindingVXD/analyzingTools/TicTocTimer.h>
 
-#include <iostream>
 #include <chrono>
 #include <string>
-#include <ratio>
 
 using namespace std::chrono;
 

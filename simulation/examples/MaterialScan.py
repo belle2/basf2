@@ -93,7 +93,7 @@ materialscan.param({  # Filename for output File
         1,
         0,
         0,
-        ],
+    ],
     'planar.maxDepth': 32,
     'planar.nU': 2000,
     'planar.minU': -50.0,
@@ -103,7 +103,7 @@ materialscan.param({  # Filename for output File
     'planar.maxV': 16,
     'planar.splitByMaterials': True,
     'planar.ignored': ['Air', 'G4_AIR', 'ColdAir'],
-    })
+})
 
 # Create a path and add all modules
 main = create_path()

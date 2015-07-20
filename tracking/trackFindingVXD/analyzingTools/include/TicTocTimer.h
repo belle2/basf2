@@ -53,6 +53,13 @@ namespace Belle2 {
     std::string getUnit() const { return m_unit; } /**< get the unit of the timer */
 
   protected:
+
+    /**
+     * define the internally used clock.
+     * Using steady_clock because it's easier to test and it should have the same resolution as the high_resolution_clock
+    */
+    using internal_clock = std::chrono::steady_clock;
+
     unsigned int m_convFactor; /**< conversion factor to be used to convert from nanoseconds to any other unit by division */
 
     std::string m_name; /**< name of the instance */
@@ -61,9 +68,9 @@ namespace Belle2 {
 
     std::string m_unit; /**< the unit used for the time measurement */
 
-    std::chrono::high_resolution_clock::time_point m_start{}; /**< starting time point of the current time measurement */
+    internal_clock::time_point m_start{}; /**< starting time point of the current time measurement */
 
-    std::chrono::high_resolution_clock::time_point m_end{}; /**< end time point of the current time measurement */
+    internal_clock::time_point m_end{}; /**< end time point of the current time measurement */
 
     friend class TicTocTimerTest; /**< test class is friend to have access to private members in tests
                                    */
@@ -95,13 +102,13 @@ namespace Belle2 {
   void TicTocTimer::tic()
   {
     m_tocked = false;
-    m_start = std::chrono::high_resolution_clock::now();
+    m_start = internal_clock::now();
   }
 
   void TicTocTimer::toc()
   {
     m_tocked = true;
-    m_end = std::chrono::high_resolution_clock::now();
+    m_end = internal_clock::now();
   }
 
   double TicTocTimer::time()

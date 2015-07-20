@@ -15,6 +15,7 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <ratio>
 
 using namespace std::chrono;
 
@@ -23,6 +24,7 @@ namespace Belle2 {
   class TicTocTimerTest : public ::testing::Test {
 
   protected:
+    using internal_clock = TicTocTimer::internal_clock; /**< typedef for less writing effort */
 
     void testConstructorStartsTiming(); /**< test if the constructor starts the clock */
 
@@ -60,22 +62,31 @@ namespace Belle2 {
     testTocStopsTiming();
   }
 
+  /** assert expectations needed for the timer and the tests to work */
+  TEST_F(TicTocTimerTest, testClockAssertions)
+  {
+    ASSERT_TRUE(internal_clock::is_steady); // need steady clock for the tests to work
+    // assert that the resolution is the same for the internal clock and the high_resolution_clock
+    ASSERT_EQ(high_resolution_clock::period::den, internal_clock::period::den);
+    ASSERT_EQ(high_resolution_clock::period::num, internal_clock::period::num);
+  }
+
   void TicTocTimerTest::testConstructorStartsTiming()
   {
-    high_resolution_clock::time_point before = high_resolution_clock::now();
+    internal_clock::time_point before = internal_clock::now();
     TicTocTimer timer;
+    EXPECT_TRUE(timer.m_start < internal_clock::now());
     EXPECT_FALSE(timer.m_tocked);
-    EXPECT_TRUE(timer.m_start < high_resolution_clock::now());
     EXPECT_TRUE(timer.m_start > before);
   }
 
   void TicTocTimerTest::testTicStartsTiming()
   {
     TicTocTimer timer;
-    high_resolution_clock::time_point before = high_resolution_clock::now();
+    internal_clock::time_point before = internal_clock::now();
     timer.tic();
     EXPECT_FALSE(timer.m_tocked);
-    EXPECT_TRUE(timer.m_start < high_resolution_clock::now());
+    EXPECT_TRUE(timer.m_start < internal_clock::now());
     EXPECT_TRUE(timer.m_start > before);
   }
 
@@ -91,10 +102,11 @@ namespace Belle2 {
   void TicTocTimerTest::testTocStopsTiming()
   {
     TicTocTimer timer;
-    high_resolution_clock::time_point before = high_resolution_clock::now();
+    internal_clock::time_point before = internal_clock::now();
     timer.toc();
     EXPECT_TRUE(timer.m_tocked);
-    EXPECT_TRUE(timer.m_end < high_resolution_clock::now());
+    EXPECT_TRUE(timer.m_end < internal_clock::now());
     EXPECT_TRUE(timer.m_end > before);
   }
+
 }

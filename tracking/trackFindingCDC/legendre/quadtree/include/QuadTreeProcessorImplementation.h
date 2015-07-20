@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

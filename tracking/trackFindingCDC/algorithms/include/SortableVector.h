@@ -9,14 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
-#include <algorithm>
-
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <framework/logging/Logger.h>
-//Unpacked version for ROOT dictionary generation
-#include <tracking/trackFindingCDC/topology/CDCWireUnpackedFromNamespaces.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCEntitiesUnpackedFromNamespaces.h>
+
+#include <vector>
+#include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

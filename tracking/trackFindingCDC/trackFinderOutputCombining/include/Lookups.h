@@ -10,12 +10,15 @@
 
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <vector>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class CDCRecoHit3D;
     class CDCRecoSegment2D;
     class CDCTrack;
 

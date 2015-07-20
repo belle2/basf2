@@ -87,6 +87,7 @@ void EKLMTimeCalibrationModule::Prepare()
     return;
   int i;
   char str[128];
+  float* len;
   TTree* t;
   StoreArray<EKLMHit2d>::required();
   StoreArray<EKLMDigit>::required();
@@ -108,13 +109,14 @@ void EKLMTimeCalibrationModule::Prepare()
   }
   t = new TTree("t_strips", "");
   t->Branch("n", &m_nStripDifferent, "n/I");
-  float len[m_nStripDifferent];
+  len = new float[m_nStripDifferent];
   for (i = 0; i < m_nStripDifferent; i++)
     len[i] = m_geoDat.getStripLength(m_geoDat.getStripPositionIndex(i) + 1);
   t->Branch("len", &len, "len[n]/F");
   t->Fill();
   m_outputFile->cd();
   t->Write();
+  delete[] len;
   delete t;
 }
 

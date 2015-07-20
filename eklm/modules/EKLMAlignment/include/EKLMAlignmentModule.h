@@ -15,6 +15,7 @@
 #include <string>
 
 /* Belle2 headers. */
+#include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -67,6 +68,9 @@ namespace Belle2 {
 
     /** Output file. */
     std::string m_out;
+
+    /** Geometry data. */
+    EKLM::GeometryData m_geoDat;
 
   };
 

@@ -48,12 +48,11 @@ void EKLMAlignmentModule::event()
 
 void EKLMAlignmentModule::endRun()
 {
-  EKLM::GeometryData dat;
-  if (dat.save(m_out.c_str()) != 0)
-    B2ERROR("Cannot save geometry data.");
 }
 
 void EKLMAlignmentModule::terminate()
 {
+  if (m_geoDat.save(m_out.c_str()) != 0)
+    B2ERROR("Cannot save geometry data.");
 }
 

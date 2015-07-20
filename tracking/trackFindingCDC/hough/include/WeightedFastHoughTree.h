@@ -24,6 +24,12 @@ namespace Belle2 {
     template<class T, class Domain, class DomainDivsion>
     using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, T>, DomainDivsion>;
 
+    /** Dynamic tree structure with weighted items in each node which are markable through out the tree.
+     *  Used to build fast hough type algorithms, where objects are allowed to carry weights relative to
+     *  the hough space part (here called a Domain) they are contained in.
+     *  The shared marks allow for interrative extraction of hough peaks such that other areas of the
+     *  hough space notice that certain element have already been consumed.
+     */
     template<class T, class Domain, class DomainDivsion>
     class WeightedFastHoughTree :
       public WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion> {
@@ -34,7 +40,7 @@ namespace Belle2 {
 
     public:
       /// Inheriting the constructor from the base class.
-      using Super::Super;
+      using WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion>::WeightedParititioningDynTree;
 
       /// Type of the node in the tree.
       using Node = typename Super::Node;

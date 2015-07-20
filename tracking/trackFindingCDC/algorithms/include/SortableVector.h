@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
+#include <tracking/trackFindingCDC/utilities/Range.h>
+
 #include <framework/logging/Logger.h>
 
 #include <vector>
@@ -24,91 +26,40 @@ namespace Belle2 {
     class SortableVector  {
 
     private:
-      typedef std::vector<T> Container; ///< std::vector to be wrapped
+      /// std::vector to be wrapped
+      typedef std::vector<T> Container;
 
     public:
-      typedef T Item; ///< Value type of this container
-      typedef const T ConstItem; ///< Value type of this container
+      /// Value type of this container
+      typedef T Item;
+
+      /// Value type of this container
+      typedef const T ConstItem;
 
     public:
-      //typedef T& StoredItemRef;  ///< Reference type to a stored item.
+      /// Value type of this container
+      typedef T value_type;
 
-      typedef T value_type; ///< Value type of this container
+      /// Iterator type of this container
+      typedef typename Container::iterator iterator;
 
-      typedef typename Container::iterator iterator; ///< Iterator type of this container
-      typedef typename Container::const_iterator const_iterator;    ///< Constant iterator type of this container
+      /// Constant iterator type of this container
+      typedef typename Container::const_iterator const_iterator;
 
-      typedef typename Container::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
-      typedef typename Container::const_reverse_iterator const_reverse_iterator;  ///< Constant reversed iterator type of this container
+      /// Reversed iterator type of this container
+      typedef typename Container::reverse_iterator reverse_iterator;
+
+      /// Constant reversed iterator type of this container
+      typedef typename Container::const_reverse_iterator const_reverse_iterator;
 
       /// Type for a pair of iterators which are iterable with range based for.
-      class range : public std::pair<iterator, iterator> {
-      public:
-        /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
-        explicit range(const std::pair<iterator, iterator>& iterator_pair) : std::pair<iterator, iterator>(iterator_pair) {;}
-
-        /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
-        range(const iterator& begin, const iterator& end) : std::pair<iterator, iterator>(begin, end) {;}
-
-        /// Begin of the range for range based for.
-        iterator begin() const { return this->first;}
-
-        /// End of the range for range based for.
-        iterator end() const { return this->second;}
-      };
+      typedef Range<iterator> range;
 
       /// Type for a pair of constant iterators which are iterable with range based for.
-      class const_range : public std::pair<const_iterator, const_iterator> {
-      public:
-        /// Constructor translating a pair of iterators (as returned by equal_range) to a range usable with range based for.
-        explicit const_range(const std::pair<const_iterator, const_iterator>& iterator_pair) : std::pair<const_iterator, const_iterator>
-          (iterator_pair) {;}
-
-        /// Constructor translating two iterators (e.g. lower_bound, upper_bound) to a range usable with range based for.
-        const_range(const const_iterator& begin, const const_iterator& end) : std::pair<const_iterator, const_iterator>(begin, end) {;}
-
-        /// Begin of the range for range based for.
-        const_iterator begin() const { return this->first;}
-
-        /// End of the range for range based for.
-        const_iterator end() const { return this->second;}
-
-        /// Checks if the begin equals the end iterator, hence if the range is empty.
-        bool empty() const { return this->first == this->second; }
-
-        /// Returns the derefenced begin iterator.
-        const T& front() const { return *begin(); }
-
-        /// Returns the derefenced end iterator
-        const T& back() const { return *end(); }
-
-        /// Returns the object at index i
-        const T& at(size_t pos) const { return *(begin() + pos); }
-
-        /// Returns the total number of objects in this range
-        size_t size() const { return std::distance(begin(), end()); }
-
-      };
-
+      typedef Range<const_iterator> const_range;
 
       /// Type for a pair of constant reverse iterators which are iterable with range based for.
-      class const_reverse_range : public std::pair<const_reverse_iterator, const_reverse_iterator> {
-      public:
-        /// Constructor translating a pair of iterators to a range usable with range based for.
-        explicit const_reverse_range(const std::pair<const_reverse_iterator, const_reverse_iterator>& iterator_reverse_pair) :
-          std::pair<const_reverse_iterator, const_reverse_iterator>(iterator_reverse_pair) {;}
-
-        /// Constructor translating two iterators (e.g. rbegin, rend) to a range usable with range based for.
-        const_reverse_range(const const_reverse_iterator& begin, const const_reverse_iterator& end) :
-          std::pair<const_reverse_iterator, const_reverse_iterator>(begin, end) {;}
-
-        /// Begin of the range for range based for.
-        const_reverse_iterator begin() const { return this->first;}
-
-        /// End of the range for range based for.
-        const_reverse_iterator end() const { return this->second;}
-      };
-
+      typedef Range<const_reverse_iterator> const_reverse_range;
 
       /// Input iterator type for the sortable vector usable with stl algorithms
       class input_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
@@ -137,7 +88,6 @@ namespace Belle2 {
         { return *this; }
       };
 
-
     public:
       /// Default constructor for ROOT compatibility.
       SortableVector() : m_isSorted(true) {;}
@@ -145,7 +95,7 @@ namespace Belle2 {
       /// Empty deconstructor
       ~SortableVector() {;}
 
-      operator const_range() { return const_range(begin(), end()); }
+      //operator const_range() { return const_range(begin(), end()); }
 
       ///Defines an ordering of sortable vector instance by lexicographical comparison
       bool operator<(SortableVector<T> const& rhs) const

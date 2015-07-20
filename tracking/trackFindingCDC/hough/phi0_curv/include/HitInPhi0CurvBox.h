@@ -13,6 +13,7 @@
 
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/RLTagged.h>
+#include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -25,20 +26,6 @@ namespace Belle2 {
      */
     template<bool refined = false>
     class HitInPhi0CurvBox {
-
-    public:
-      /// Check if four values have the same sign.
-      static inline bool sameSign(float n1, float n2, float n3, float n4)
-      {
-        return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0) or
-                (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0));
-      }
-
-      /// Check if two values have the same sign.
-      static inline bool sameSign(float n1, float n2)
-      {
-        return ((n1 > 0 and n2 > 0) or (n1 < 0 and n2 < 0));
-      }
     public:
       /** Checks if the track hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
@@ -233,7 +220,7 @@ namespace Belle2 {
         dist[1][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[1] - signedDriftLength;
 
         // Sinogram separates at least on of the edges from the others.
-        if (not sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) return true;
+        if (not SameSignChecker::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) return true;
         if (not refined) return false;
 
         // Continue to check if the extrema of the sinogram are in the box,
@@ -241,7 +228,7 @@ namespace Belle2 {
         // (but not crossing two what the check above actually means).
         // Currently only checking the positive curvature branch correctly
         FloatType extremR = r - signedDriftLength;
-        bool extremRInCurvRange = not sameSign(extremR * lowerCurv - 1, extremR * upperCurv - 1);
+        bool extremRInCurvRange = not SameSignChecker::sameSign(extremR * lowerCurv - 1, extremR * upperCurv - 1);
         if (not extremRInCurvRange) return false;
 
         Vector2D extremPhi0Vec = pos2D.orthogonal(CCW); // Not normalised but does not matter.

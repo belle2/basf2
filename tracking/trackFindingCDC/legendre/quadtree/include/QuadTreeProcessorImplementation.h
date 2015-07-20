@@ -110,7 +110,7 @@ namespace Belle2 {
      * The two axis are the inverse slope in z direction and the z0.
      * We loop over the z0 and calculate the z-slope with the x-y-z-position the recoHit has.
      *  */
-    class StereoHitQuadTreeProcessor : public QuadTreeProcessorTemplate<float, float, CDCRecoHit3D, 2, 2> {
+    class StereoHitQuadTreeProcessor : public QuadTreeProcessorTemplate<float, float, const CDCRecoHit3D, 2, 2> {
 
     public:
       StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
@@ -119,7 +119,8 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if the slope and z information calculated from this hit belongs into this node
        */
-      bool insertItemInNode(QuadTree* node, CDCRecoHit3D* hit, unsigned int /*slope_index*/, unsigned int /*z0_index*/) const override
+      bool insertItemInNode(QuadTree* node, const CDCRecoHit3D* hit, unsigned int /*slope_index*/,
+                            unsigned int /*z0_index*/) const override
       {
         float dist[2][2];
 

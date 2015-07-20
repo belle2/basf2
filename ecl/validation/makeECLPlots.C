@@ -122,7 +122,7 @@ void ECLMuon(TTree* muon_tree)
 
   TH1F* hMuonsFake = new TH1F("hMuonsFake","Fake reconstructed gamma for 1000 muons should be less than 5%", 10,0,10);
   // hMuonsFake->SetMaximum(6);
-  muon_tree->Draw("eclGammaIdx>>hMuonsFake","eclGammaMultip>0");
+  muon_tree->Draw("eclClusterIdx>>hMuonsFake","eclClusterMultip>0");
   hMuonsFake->GetXaxis()->SetTitle("Gamma Idx");
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Fake reconstructed gamma every 1000 muons")); 
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be low"));

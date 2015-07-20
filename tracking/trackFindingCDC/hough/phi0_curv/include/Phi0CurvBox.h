@@ -14,10 +14,37 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Type for discrete float values
-    typedef DiscreteValue<float> DiscreteCurvature;
+    using DiscreteCurvature = DiscreteValue<float>;
 
     /// Type for the container of the discrete values
-    typedef DiscreteValueArray<float> DiscreteCurvatureArray;
+    class DiscreteCurvatureArray : public DiscreteValueArray<float> {
+
+    public:
+      /// Inheriting the constuctor
+      using DiscreteValueArray<float>::DiscreteValueArray;
+
+    public:
+      /** Constructs equally spaced discrete curvature values
+       *  for searches in the positive curvature range.
+       *
+       *  The bounds are constructed such that the first bin
+       *  corresponds to near zero curvature values.
+       *  To avoid cut of effects for hits that spill over to the
+       *  subzero curvature values due to their uncertainty, the
+       *  lowest bin is slightly expanded such that its is symmetric around zero.
+       *  To maintain an equal spacing all other bound are expanded accordingly.
+       *
+       *  @param maxCurv  Upper bound of the positive curvature range
+       *  @param nBins    Total number of final bins to be constructed
+       *  @param nWidth   Number of discrete values in each bin
+       *                  (counted semi open [start, stop)).
+       *  @param nOverlap Number of discrete values that overlapping bins have in common
+       *                  (counted semi open [start, stop)).
+       */
+      static
+      DiscreteCurvatureArray
+      forPositiveCurvatureBinsWithOverlap(float maxCurv, size_t nBins, size_t nWidth, size_t nOverlap);
+    };
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
     class Phi0CurvBox : public Box<DiscreteAngle, DiscreteCurvature > {

@@ -44,41 +44,31 @@ namespace Belle2 {
       {;}
 
     public:
-
       /// Initialise the algorithm by constructing the hough tree from the parameters
       void initialize()
       {
-        // Setup thre discrete values for phi0
-        assert(m_discretePhi0Width > m_discretePhi0Overlap);
+        // Setup the discrete values for phi0
         const size_t nPhi0Bins = std::pow(phi0Divisions, m_maxLevel);
-        const size_t nDiscretePhi0s = (m_discretePhi0Width - m_discretePhi0Overlap) * nPhi0Bins + m_discretePhi0Overlap + 1;
-        const double phi0Overlap = 2 * PI / (nPhi0Bins * (static_cast<double>(m_discretePhi0Width) / m_discretePhi0Overlap - 1) + 1);
+        m_discretePhi0s = DiscreteAngleArray::forBinsWithOverlaps(nPhi0Bins,
+                                                                  m_discretePhi0Width,
+                                                                  m_discretePhi0Overlap);
 
-        B2INFO("phi0Overlap " << phi0Overlap);
-
-        // Adjust the phi0 bounds such that overlap occures at the wrap around of the phi0 range as well
-        const double phi0LowerBound = -PI - phi0Overlap;
-        const double phi0UpperBound = +PI + phi0Overlap;
-
-        m_discretePhi0s = DiscreteAngleArray(phi0LowerBound, phi0UpperBound, nDiscretePhi0s);
-        std::pair<DiscreteAngle, DiscreteAngle> phi0Range(m_discretePhi0s.getRange());
-
-        // Setup thre discrete values for the two dimensional curvature
+        // Setup the discrete values for the two dimensional curvature
         assert(m_discreteCurvWidth > m_discreteCurvOverlap);
         const size_t nCurvBins = std::pow(curvDivisions, m_maxLevel);
-        const size_t nDiscreteCurvs = (m_discreteCurvWidth - m_discreteCurvOverlap) * nCurvBins + m_discreteCurvOverlap + 1;
+        m_discreteCurvs =
+          DiscreteCurvatureArray::forPositiveCurvatureBinsWithOverlap(m_maxCurv,
+              nCurvBins,
+              m_discreteCurvWidth,
+              m_discreteCurvOverlap);
 
-        const double curvOverlap = m_maxCurv / (nCurvBins * (static_cast<double>(m_discreteCurvWidth) / m_discreteCurvOverlap - 1) + 1);
-        B2INFO("curvOverlap " << curvOverlap);
-
-        // Since the lower bound is slightly prefered we can bias to high momenta by putting them at the lower bound.
-        const double curvLowerBound = -curvOverlap;
-        const double curvUpperBound = m_maxCurv + curvOverlap;
-
-        m_discreteCurvs = DiscreteCurvatureArray(curvLowerBound, curvUpperBound, nDiscreteCurvs);
-        std::pair<DiscreteCurvature, DiscreteCurvature > curvRange(m_discreteCurvs.getRange());
+        B2INFO("First bin should be symmetric around zero")
+        B2INFO("First bin lower bound " << m_discreteCurvs[0].getValue());
+        B2INFO("First bin upper bound " << m_discreteCurvs[m_discreteCurvWidth].getValue());
 
         // Compose the hough space
+        std::pair<DiscreteAngle, DiscreteAngle> phi0Range(m_discretePhi0s.getRange());
+        std::pair<DiscreteCurvature, DiscreteCurvature > curvRange(m_discreteCurvs.getRange());
         m_phi0CurvHoughPlain = Phi0CurvBox(phi0Range, curvRange);
 
         Phi0CurvBox::Delta phi0CurvOverlaps{m_discretePhi0Overlap, m_discreteCurvOverlap};
@@ -86,7 +76,6 @@ namespace Belle2 {
 
         m_hitPhi0CurvFastHoughTree.reset(new HitPhi0CurvFastHoughTree(m_phi0CurvHoughPlain,
                                          phi0CurvBoxDivision));
-
       }
 
       /// Prepare the leave finding by filling the top node with given hits

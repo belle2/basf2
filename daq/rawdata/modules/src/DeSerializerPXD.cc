@@ -30,7 +30,7 @@ DeSerializerPXDModule::DeSerializerPXDModule() : Module()
 
   addParam("Ports", m_ports, "default port number");
   addParam("Hosts", m_hosts, "default host names");
-  m_nsent = 0;
+  m_nEvents = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
   //   events_processed = 0;
@@ -90,23 +90,20 @@ void DeSerializerPXDModule::event()
       };
     } while (stat == 0);
 
-    // Fill RawPXD
-    RawPXD rawpxd(m_buffer, stat); //stat=lenght_in_Bytes
-
-    // Put it in DataStore
-    rawpxdary.appendNew(rawpxd);
+    // Put RawPXD in DataStore, stat=lenght_in_Bytes
+    rawpxdary.appendNew(m_buffer, stat);
 
     // What we do NOT check here (yet) is, if all Packets belong to the same event! TODO
   }
 
 
-  // Update EventMetaData
+  // Create EventMetaData - warning, this is only o.k. if this module is the only one!
   m_eventMetaDataPtr.create();
   m_eventMetaDataPtr->setExperiment(1);
   m_eventMetaDataPtr->setRun(1);
-  m_eventMetaDataPtr->setEvent(m_nsent);
+  m_eventMetaDataPtr->setEvent(m_nEvents);
 
-  m_nsent++;
+  m_nEvents++;
 
   return;
 }

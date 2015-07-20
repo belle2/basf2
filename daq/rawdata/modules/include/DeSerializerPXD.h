@@ -78,8 +78,8 @@ namespace Belle2 {
     //! Compression Level
     int m_compressionLevel;
 
-    //! No. of sent events
-    int m_nsent;
+    //! No. of rcvd events
+    int m_nEvents;
 
     //! buffer
     int* m_buffer;

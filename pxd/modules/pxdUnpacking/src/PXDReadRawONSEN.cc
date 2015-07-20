@@ -145,11 +145,8 @@ void PXDReadRawONSENModule::event()
     };
   } while (stat == 0);
 
-  // Fill RawPXD
-  RawPXD rawpxd(m_buffer, stat); //stat=lenght_in_Bytes
-
-  // Put it in DataStore
-  rawpxdary.appendNew(rawpxd);
+  // Fill RawPXD in DataStore, stat=lenght_in_Bytes
+  rawpxdary.appendNew(m_buffer, stat);
 
 
   // Update EventMetaData

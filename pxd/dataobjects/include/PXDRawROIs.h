@@ -26,7 +26,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawROIs():
-      m_2timesNrROIs(0), m_rois(0), m_allocated(false) {};
+      m_2timesNrROIs(0), m_rois(NULL) {};
 
 
     /** Constructor with data
@@ -111,7 +111,6 @@ namespace Belle2 {
   private:
     unsigned int m_2timesNrROIs;/**< Number of ROIs times two (size of one ROI is 2*32bit) */
     int* m_rois; // [m_2timesNrROIs] /**< Buffer of size 2*m_NrROIs ints  */
-    bool m_allocated;//! /**< local allocated buffer / copied over flag*/
 
     ClassDef(PXDRawROIs, 3)
   };

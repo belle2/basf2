@@ -68,25 +68,24 @@ namespace Belle2 {
       std::vector<duration<double>> timeSpans;
       timeSpans.reserve(nExecutions);
 
-      for (size_t iExecution = 0;  iExecution < nExecutions; ++iExecution) {
+      for (std::size_t iExecution = 0; iExecution < nExecutions; ++iExecution) {
         setUp();
 
-        // Feed the hits to the hough plain and execute the search
         auto now = std::chrono::high_resolution_clock::now();
 
-#ifdef HAS_CALLGRIND
         if (activateCallgrind) {
+#ifdef HAS_CALLGRIND
           CALLGRIND_START_INSTRUMENTATION;
-        }
 #endif
+        }
 
         function();
 
-#ifdef HAS_CALLGRIND
         if (activateCallgrind) {
+#ifdef HAS_CALLGRIND
           CALLGRIND_STOP_INSTRUMENTATION;
-        }
 #endif
+        }
 
         auto later = std::chrono::high_resolution_clock::now();
 

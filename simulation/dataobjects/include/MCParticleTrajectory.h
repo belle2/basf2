@@ -49,7 +49,8 @@ namespace Belle2 {
      * @param y y coordinate
      * @param z z coordinate
      */
-    void addPoint(float x, float y, float z, float px, float py, float pz) {
+    void addPoint(float x, float y, float z, float px, float py, float pz)
+    {
       //Reserve a decent amount of space to avoid lots of relocations
       m_points.emplace_back(x, y, z, px, py, pz);
     }

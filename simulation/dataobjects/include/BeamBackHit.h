@@ -40,7 +40,8 @@ namespace Belle2 {
       m_E_end(0.),
       m_energyDeposit(0),
       m_trackLength(0.),
-      m_neutronWeight(0.) {
+      m_neutronWeight(0.)
+    {
     }
 
     /*!  Full constructor
@@ -71,7 +72,8 @@ namespace Belle2 {
       double eDep,
       double trackLength,
       double nWeight
-    )  {
+    )
+    {
       m_subDet = subDet;
       m_identifier = iden;
       m_PDG = PDG;
@@ -87,7 +89,8 @@ namespace Belle2 {
     }
 
     //! Get the subdetector name in which the hit occured
-    TString getSubDetName() const {
+    TString getSubDetName() const
+    {
       switch (m_subDet) {
         case 0: return "IR";
         case 1: return "PDX";

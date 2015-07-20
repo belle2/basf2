@@ -438,6 +438,10 @@ namespace Belle2 {
         }
       }
 
+      if (classes.size() == 1) {
+        B2FATAL("Encountered only 1 class, cannot train anything!")
+      }
+
       if (classes.size() ==  2) {
         int maxId = *classes.begin();
         for (const auto& value : classes) {

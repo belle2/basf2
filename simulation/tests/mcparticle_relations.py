@@ -12,6 +12,7 @@ from ROOT import Belle2
 
 
 class TestModule(Module):
+
     """Test to read relations."""
 
     def __init__(self):

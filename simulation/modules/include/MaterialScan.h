@@ -134,7 +134,9 @@ namespace Belle2 {
      * @param params Parameters of the scan
      */
     MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, ScanParams params, bool doCosTheta):
-      MaterialScan(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin), m_doCosTheta(doCosTheta) {
+      MaterialScan(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin),
+      m_doCosTheta(doCosTheta)
+    {
       if (doCosTheta) {
         m_params.minU = cos(m_params.minU * Unit::deg);
         m_params.maxU = cos(m_params.maxU * Unit::deg);
@@ -170,8 +172,11 @@ namespace Belle2 {
      * @param dirV Direction of the v coordinate
      * @param params Parameters of the scan
      */
-    MaterialScanPlanar(TFile* rootFile, const G4ThreeVector& origin, const G4ThreeVector& dirU, const G4ThreeVector& dirV, ScanParams params):
-      MaterialScan(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()), m_dirW(m_dirU.cross(m_dirV)) {
+    MaterialScanPlanar(TFile* rootFile, const G4ThreeVector& origin, const G4ThreeVector& dirU, const G4ThreeVector& dirV,
+                       ScanParams params):
+      MaterialScan(rootFile, "Planar", "u [cm];v [cm]", params), m_origin(origin), m_dirU(dirU.unit()), m_dirV(dirV.unit()),
+      m_dirW(m_dirU.cross(m_dirV))
+    {
     }
   protected:
     /** Create a ray with the current parameter values according to a planar distribution */

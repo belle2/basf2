@@ -279,8 +279,8 @@ void MaterialScanModule::initialize()
   }
 
   //Convert plane definition to mm since Geant4 is of course using other units
-  for (double & value : m_customPlane) value /= Unit::mm;
-  for (double & value : m_sphericalOrigin) value /= Unit::mm;
+  for (double& value : m_customPlane) value /= Unit::mm;
+  for (double& value : m_sphericalOrigin) value /= Unit::mm;
 }
 
 void MaterialScanModule::terminate()
@@ -330,7 +330,7 @@ void MaterialScanModule::beginRun()
   }
 
   //Do each configured scan
-  for (MaterialScan * scan : scans) {
+  for (MaterialScan* scan : scans) {
     //Set the Scan as steppingaction to see material
     eventManager->SetUserAction(scan);
     //Now we can scan

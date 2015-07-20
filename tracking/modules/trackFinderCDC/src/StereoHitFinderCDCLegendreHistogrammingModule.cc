@@ -17,10 +17,16 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
   //create object which will add stereohits to tracks
   StereohitsProcesser stereohitsProcesser(m_param_debugOutput);
 
-  for (CDCTrack& track : tracks) {
-    //assign stereohits to the track
-    stereohitsProcesser.makeHistogramming(track, m_param_quadTreeLevel, m_param_minimumHitsInQuadTree);
-    track.sort();
+  if (m_param_useOldImplementation) {
+    for (CDCTrack& track : tracks) {
+      stereohitsProcesser.makeHistogramming(track, m_param_quadTreeLevel, m_param_minimumHitsInQuadTree);
+      track.sort();
+    }
+  } else {
+    for (CDCTrack& track : tracks) {
+      stereohitsProcesser.makeHistogrammingWithNewQuadTree(track, m_param_quadTreeLevel, m_param_minimumHitsInQuadTree);
+      track.sort();
+    }
   }
 
   // Fit the tracks

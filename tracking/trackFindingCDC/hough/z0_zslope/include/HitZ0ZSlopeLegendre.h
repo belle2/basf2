@@ -43,45 +43,42 @@ namespace Belle2 {
       /// Initialise the algorithm by constructing the hough tree from the parameters
       void initialize()
       {
-        /*// Setup thre discrete values for phi0
+        // Setup three discrete values for phi0
         assert(m_discreteZ0Width > m_discreteZ0Overlap);
-        const size_t nPhi0Bins = std::pow(z0Divisions, m_maxLevel);
-        const size_t nDiscretePhi0s = (m_discreteZ0Width - m_discreteZ0Overlap) * nPhi0Bins + m_discreteZ0Overlap + 1;
-        const double phi0Overlap = 2 * PI / (nPhi0Bins * (static_cast<double>(m_discreteZ0Width) / m_discreteZ0Overlap - 1) + 1);
+        const size_t nZ0Bins = std::pow(z0Divisions, m_maxLevel);
+        const size_t nDiscreteZ0s = (m_discreteZ0Width - m_discreteZ0Overlap) * nZ0Bins + m_discreteZ0Overlap + 1;
+        const double z0Overlap = 2 * m_maximumAbsZ0 / (nZ0Bins * (static_cast<double>(m_discreteZ0Width) / m_discreteZ0Overlap - 1) + 1);
 
-        B2INFO("phi0Overlap " << phi0Overlap);
+        // Adjust the z0 bounds such that overlap occures at the wrap around of the z0 range as well
+        const double z0LowerBound = -m_maximumAbsZ0 - z0Overlap;
+        const double z0UpperBound = +m_maximumAbsZ0 + z0Overlap;
 
-        // Adjust the phi0 bounds such that overlap occures at the wrap around of the phi0 range as well
-        const double phi0LowerBound = -PI - phi0Overlap;
-        const double phi0UpperBound = +PI + phi0Overlap;
+        m_discreteZ0s = DiscreteZ0Array(z0LowerBound, z0UpperBound, nDiscreteZ0s);
+        std::pair<DiscreteZ0, DiscreteZ0> z0Range(m_discreteZ0s.getRange());
 
-        m_discreteZ0s = DiscreteAngleArray(phi0LowerBound, phi0UpperBound, nDiscretePhi0s);
-        std::pair<DiscreteAngle, DiscreteAngle> phi0Range(m_discreteZ0s.getRange());
-
-        // Setup thre discrete values for the two dimensional curvature
+        // Setup three discrete values for the two dimensional curvature
         assert(m_discreteZSlopeWidth > m_discreteZSlopeOverlap);
-        const size_t nCurvBins = std::pow(zSlopeDivisions, m_maxLevel);
-        const size_t nDiscreteCurvs = (m_discreteZSlopeWidth - m_discreteZSlopeOverlap) * nCurvBins + m_discreteZSlopeOverlap + 1;
+        const size_t nZSlopeBins = std::pow(zSlopeDivisions, m_maxLevel);
+        const size_t nDiscreteZSlopes = (m_discreteZSlopeWidth - m_discreteZSlopeOverlap) * nZSlopeBins + m_discreteZSlopeOverlap + 1;
 
-        const double curvOverlap = m_maxCurv / (nCurvBins * (static_cast<double>(m_discreteZSlopeWidth) / m_discreteZSlopeOverlap - 1) + 1);
-        B2INFO("curvOverlap " << curvOverlap);
+        const double zSlopeOverlap = 2 * m_maximumAbsZSlope / (nZSlopeBins * (static_cast<double>(m_discreteZSlopeWidth) /
+                                                               m_discreteZSlopeOverlap - 1) + 1);
 
         // Since the lower bound is slightly prefered we can bias to high momenta by putting them at the lower bound.
-        const double curvLowerBound = -curvOverlap;
-        const double curvUpperBound = m_maxCurv + curvOverlap;
+        const double zSlopeLowerBound = -m_maximumAbsZSlope - zSlopeOverlap;
+        const double zSlopeUpperBound = +m_maximumAbsZSlope + zSlopeOverlap;
 
-        m_discreteZSlopes = DiscreteCurvatureArray(curvLowerBound, curvUpperBound, nDiscreteCurvs);
-        std::pair<DiscreteCurvature, DiscreteCurvature > curvRange(m_discreteZSlopes.getRange());
+        m_discreteZSlopes = DiscreteZSlopeArray(zSlopeLowerBound, zSlopeUpperBound, nDiscreteZSlopes);
+        std::pair<DiscreteZSlope, DiscreteZSlope > zSlopeRange(m_discreteZSlopes.getRange());
 
         // Compose the hough space
-        m_z0ZSlopeHoughPlain = Z0ZSlopeBox(phi0Range, curvRange);
+        m_z0ZSlopeHoughPlain = Z0ZSlopeBox(z0Range, zSlopeRange);
 
-        Z0ZSlopeBox::Delta phi0CurvOverlaps{m_discreteZ0Overlap, m_discreteZSlopeOverlap};
-        Z0ZSlopeBoxDivision phi0CurvBoxDivision(phi0CurvOverlaps);
+        Z0ZSlopeBox::Delta z0ZSlopeOverlaps{m_discreteZ0Overlap, m_discreteZSlopeOverlap};
+        Z0ZSlopeBoxDivision z0ZSlopeBoxDivision(z0ZSlopeOverlaps);
 
         m_hitZ0ZSlopeFastHoughTree.reset(new HitZ0ZSlopeFastHoughTree(m_z0ZSlopeHoughPlain,
-                                         phi0CurvBoxDivision));*/
-
+                                         z0ZSlopeBoxDivision));
       }
 
       /// Prepare the leave finding by filling the top node with given hits
@@ -120,19 +117,19 @@ namespace Belle2 {
       size_t m_maxLevel = 6;
 
       /// Overlap of the leaves in z0 counted in number of discrete values.
-      size_t m_discreteZ0Overlap = 1;
+      size_t m_discreteZ0Overlap = 0;
 
       /// Width of the leaves at the maximal level in z0 counted in number of discrete values.
       size_t m_discreteZ0Width = 2;
 
       /// Overlap of the leaves in the inverse z slope counted in number of discrete values
-      size_t m_discreteZSlopeOverlap = 1;
+      size_t m_discreteZSlopeOverlap = 0;
 
       /// Width of the leaves at the maximal level in the inverse z slope counted in number of discrete values.
       size_t m_discreteZSlopeWidth = 2;
 
       /// Maximal absolute z0 value the tree should cover.
-      double m_maximumAbsZ0 = std::tan(-75.0 * PI / 180.0);
+      double m_maximumAbsZ0 = std::tan(75.0 * PI / 180.0);
 
       /// Maximal absolute z slope value the tree should cover.
       double m_maximumAbsZSlope = 20.0;

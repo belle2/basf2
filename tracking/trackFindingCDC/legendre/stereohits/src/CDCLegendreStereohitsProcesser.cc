@@ -128,6 +128,8 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   }
   /* DEBUG */
 
+  B2INFO(possibleStereoSegments.size());
+
   if (possibleStereoSegments.size() == 0)
     return;
 
@@ -181,9 +183,10 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   std::vector<HitType*> hitsVector;
   fillHitsVector(hitsVector, track);
 
+  hitZ0ZSlopeQuadLegendre.seed(hitsVector);
+
   typedef pair<Z0ZSlopeBox, vector<HitType*>> Result;
   vector<Result> possibleStereoSegments;
-  hitZ0ZSlopeQuadLegendre.seed(hitsVector);
   possibleStereoSegments = hitZ0ZSlopeQuadLegendre.find(m_param_minimumHits);
 
   hitZ0ZSlopeQuadLegendre.fell();
@@ -191,6 +194,8 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
 
   if (possibleStereoSegments.size() == 0)
     return;
+
+  B2INFO(possibleStereoSegments.size());
 
   auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Result & a,
   const Result & b) {

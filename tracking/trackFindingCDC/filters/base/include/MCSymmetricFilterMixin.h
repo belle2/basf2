@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      MCSymmetricFilterMixin(bool allowReverse = true) :
+      explicit MCSymmetricFilterMixin(bool allowReverse = true) :
         Super(),
         m_param_allowReverse(allowReverse)
       {

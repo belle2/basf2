@@ -47,7 +47,7 @@ namespace Belle2 {
 
 
       /// Constructor taking the line that shall be superimposed with the sin curve.
-      SinEqLine(const Line2D& line2D) :
+      explicit SinEqLine(const Line2D& line2D) :
         m_slope(line2D.slope()),
         m_intercept(line2D.intercept())
       {;}

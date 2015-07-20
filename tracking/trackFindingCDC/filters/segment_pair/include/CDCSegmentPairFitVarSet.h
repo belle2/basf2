@@ -119,7 +119,7 @@ namespace Belle2 {
 
     public:
       /// Construct the varset and take an optional prefix to be prepended to all variable names.
-      CDCSegmentPairFitVarSet(const std::string& prefix = "");
+      explicit CDCSegmentPairFitVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the segment pair
       virtual bool extract(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);

@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor initializing the symmetry flag.
-      MCSegmentTripleFilter(bool allowReverse = true);
+      explicit MCSegmentTripleFilter(bool allowReverse = true);
 
     public:
       /// May be used to clear information from former events. Currently unused.

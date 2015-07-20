@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
-      SkimmedVarSet(const std::string& prefix = "") :
+      explicit SkimmedVarSet(const std::string& prefix = "") :
         Super(prefix)
       {;}
 

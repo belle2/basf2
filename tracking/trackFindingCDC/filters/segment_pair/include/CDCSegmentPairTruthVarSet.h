@@ -21,7 +21,7 @@ namespace Belle2 {
     class  CDCSegmentPairTruthVarSet : public FilterVarSet<MCSegmentPairFilter> {
     public:
       /// Construct the varset and take an optional prefix.
-      CDCSegmentPairTruthVarSet(const std::string& prefix = "");
+      explicit CDCSegmentPairTruthVarSet(const std::string& prefix = "");
     };
   }
 }

@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      MCAxialSegmentPairFilter(bool allowReverse = true);
+      explicit MCAxialSegmentPairFilter(bool allowReverse = true);
 
       /// Checks if a pair of axial segments is a good combination
       virtual CellWeight operator()(const Belle2::TrackFindingCDC::CDCAxialSegmentPair& axialSegmentPair) IF_NOT_CINT(

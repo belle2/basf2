@@ -59,7 +59,7 @@ namespace Belle2 {
       CDCTangent();
 
       /// Construct a tangent from a pair of oriented wire hits
-      CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
+      explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Construct a tangent from two oriented wire hits.
       CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit);

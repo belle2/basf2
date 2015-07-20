@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/VariableManager/FlavourTaggingVariables.h>
+#include <analysis/VariableManager/FlavorTaggingVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -675,14 +675,16 @@ namespace Belle2 {
           int maximum_PDG_Mother_Mother = 0;
           const MCParticle* MCp = particle ->getRelated<MCParticle>();
           maximum_q = particle -> getCharge();
-          if (MCp->getMother() != nullptr && MCp->getMother()->getMother() != nullptr)
+          if (MCp != nullptr)
           {
             maximum_PDG = TMath::Abs(MCp->getPDG());
-            maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
+            if (particleName != "Lambda" && MCp->getMother() != nullptr) {
+              maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
+            }
             //for Kaons and SlowPions we need the mother of the mother for the particle
-            if (particleName == "Kaon" || particleName == "SlowPion" || particleName == "Lambda" || particleName == "IntermediateElectron"
-            || particleName == "IntermediateMuon" || particleName == "FastPion"
-            || particleName == "FSC") maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
+            if ((particleName == "Kaon" || particleName == "SlowPion" || particleName == "IntermediateElectron"
+                 || particleName == "IntermediateMuon" || particleName == "FastPion")
+                && MCp->getMother()->getMother() != nullptr) maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
           } else {
             maximum_PDG = 0;
             maximum_PDG_Mother = 0;

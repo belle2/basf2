@@ -264,39 +264,6 @@ namespace Belle2 {
     double particleMCPrimaryParticle(const Particle* particle);
 
     /**
-     * return 1 if Particle was in RestOfEventObject, 0 otherwise
-     */
-    double isInRestOfEvent(const Particle* particle);
-
-    /**
-     * return number of remaining tracks as given by the related RestOfEvent object
-     *
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-    double nROETracks(const Particle* particle);
-
-    /**
-     * return number of remaining ECL clusters as given by the related RestOfEvent object
-     *
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-    double nROEECLClusters(const Particle* particle);
-
-    /**
-     * return number of remaining KLM clusters as given by the related RestOfEvent object
-     *
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-    double pionVeto(const Particle* particle);
-
-    /**
-     * returns 1 if the invariant mass of a combination of a photon in RestOfEvent with
-     * the signal photon yields the mass of the a neutral Pion.
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-
-    double nROEKLMClusters(const Particle* particle);
-    /**
      * return X component of the tag vertex
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)

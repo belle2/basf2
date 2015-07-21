@@ -633,102 +633,6 @@ namespace Belle2 {
       }
     }
 
-    // RestOfEvent related --------------------------------------------------
-
-    double nRemainingTracksInRestOfEvent(const Particle* particle)
-    {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (not roe.isValid())
-        return 0.0;
-      int roe_tracks = roe->getTracks().size();
-      int par_tracks = 0;
-      const auto& daughters = particle->getFinalStateDaughters();
-      for (const auto& daughter : daughters) {
-        int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
-          par_tracks++;
-      }
-      return roe_tracks - par_tracks;
-    }
-
-    double isInRestOfEvent(const Particle* particle)
-    {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (not roe.isValid())
-        return 1.0;
-      const auto& tracks = roe->getTracks();
-      if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
-        return 1.0;
-      }
-      const auto& klm = roe->getKLMClusters();
-      if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
-        return 1.0;
-      }
-      const auto& ecl = roe->getECLClusters();
-      if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
-        return 1.0;
-      }
-      return 0;
-    }
-
-    double nROETracks(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-      if (roe)
-        result = roe->getNTracks();
-
-      return result;
-    }
-
-    double nROEECLClusters(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-      if (roe)
-        result = roe->getNECLClusters();
-
-      return result;
-    }
-
-    double nROEKLMClusters(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-
-      if (roe)
-        result = roe->getNKLMClusters();
-      return result;
-    }
-
-    double pionVeto(const Particle* particle)
-    {
-      double pion0Mass = 0.135;           // neutral pion mass from PDG
-      double deltaE = 0.03;               // mass range around pion0Mass that will be accepted
-
-      StoreObjPtr<ParticleList> PhotonList("gamma:veto");
-
-      const Particle* sig_Photon = particle->getDaughter(1)->getDaughter(0);
-      TLorentzVector vec = sig_Photon->get4Vector();
-
-      for (unsigned int i = 0; i < PhotonList->getListSize(); i++) {
-        Particle* p_Photon = PhotonList->getParticle(i);
-        if ((p_Photon->getEnergy() >= 0.1) && (p_Photon->getMdstArrayIndex() != sig_Photon->getMdstArrayIndex())) {
-          double tempCombination = (p_Photon->get4Vector() + vec).M();
-          if (abs(tempCombination - pion0Mass) <= deltaE) {
-            return 1;
-          }
-        }
-      }
-
-      return 0;
-    }
-
     // TDCPV related ---------------------------------------------------------
 
     double particleTagVx(const Particle* particle)
@@ -1264,17 +1168,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("ECLEnergy", ECLEnergy, "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy, "[Eventbased] total energy in KLM in the event");
 
-    VARIABLE_GROUP("Rest Of Event");
-    REGISTER_VARIABLE("nROETracks",  nROETracks,  "number of remaining tracks as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEECLClusters", nROEECLClusters,
-                      "number of remaining ECL clusters as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
-                      "number of remaining KLM clusters as given by the related RestOfEvent object");
-    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
-                      "Returns number of tracks in ROE - number of tracks of given particle");
-
-    REGISTER_VARIABLE("pionVeto", pionVeto, "Returns the Flag 1 if a combination of photons has the invariant mass of a neutral pion");
-
     VARIABLE_GROUP("TDCPV");
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
@@ -1296,9 +1189,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("eRecoil",  recoilEnergy,   "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil",  recoilMass,        "invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared, "invariant mass squared of the system recoiling against given Particle");
-
-    REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
-                      "1.0 of track, cluster of given particle is found in rest of event. 0 otherwise.");
 
     REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
 

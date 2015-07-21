@@ -67,12 +67,12 @@ TVector3 CMSFrame::getVertex(const Particle* particle) const
   // 1. Use Lorentz Transformation to Boost Vertex vector into cms frame
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
-  TLorentzVector a = T.rotateLabToCms() * TLorentzVector(particle->getVertex(), 0);
-  return a.Vect() - T.getBoostVector().BoostVector() * a.T();
+  TLorentzVector a = m_transform.rotateLabToCms() * TLorentzVector(particle->getVertex(), 0);
+  return a.Vect() - m_transform.getBoostVector().BoostVector() * a.T();
 }
 
 TLorentzVector CMSFrame::getMomentum(const Particle* particle) const
 {
   // 1. Boost momentum into cms frame
-  return T.rotateLabToCms() * particle->get4Vector();
+  return m_transform.rotateLabToCms() * particle->get4Vector();
 }

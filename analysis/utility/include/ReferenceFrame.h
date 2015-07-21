@@ -145,7 +145,7 @@ namespace Belle2 {
     virtual TLorentzVector getMomentum(const Particle* particle) const;
 
   private:
-    PCmsLabTransform T; /**< Lab to CMS Transform */
+    PCmsLabTransform m_transform; /**< Lab to CMS Transform */
   };
 
   template<class T>

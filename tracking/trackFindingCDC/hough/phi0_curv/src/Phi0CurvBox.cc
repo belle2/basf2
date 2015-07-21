@@ -28,9 +28,8 @@ DiscreteCurvatureArray::forPositiveCurvatureBinsWithOverlap(float maxCurv,
   // Determining the lower bound such that the first bin is symmetric around zero
   // This prevents some cut of effects if the hit happens to lean to
   // the negative curvature spaces.
-  const double widthOverlapRatio = static_cast<double>(nWidth) / nOverlap;
-
-  const double width = maxCurv * widthOverlapRatio / ((nBins - 0.5) * (widthOverlapRatio - 1) + 0.5);
+  const double overlapWidthRatio = static_cast<double>(nOverlap) / nWidth;
+  const double width = maxCurv / (nBins * (1 - overlapWidthRatio) + overlapWidthRatio - 0.5);
   const double lowerBound = -width / 2;
   const double upperBound = maxCurv;
   return DiscreteCurvatureArray(lowerBound, upperBound, nPositions);

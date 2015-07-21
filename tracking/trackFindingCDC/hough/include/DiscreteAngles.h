@@ -87,11 +87,13 @@ namespace Belle2 {
       {;}
 
     public:
-      static DiscreteAngleArray forBinsWithOverlaps(size_t nBins, size_t nWidth = 1, size_t nOverlap = 0)
+      static DiscreteAngleArray forBinsWithOverlaps(size_t nBins,
+                                                    size_t nWidth = 1,
+                                                    size_t nOverlap = 0)
       {
         assert(nWidth > nOverlap);
         const size_t nPositions = (nWidth - nOverlap) * nBins + nOverlap + 1;
-        const double overlap = 2 * PI / (nBins * (static_cast<double>(nWidth) / nOverlap - 1));
+        const double overlap = 2.0 * PI * nOverlap / (nBins * (nWidth - nOverlap));
 
         // Adjust the angle bounds such that overlap occures at the wrap around as well
         const double lowerBound = -PI - overlap / 2;

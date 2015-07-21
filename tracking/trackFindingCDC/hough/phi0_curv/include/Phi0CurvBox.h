@@ -43,7 +43,10 @@ namespace Belle2 {
        */
       static
       DiscreteCurvatureArray
-      forPositiveCurvatureBinsWithOverlap(float maxCurv, size_t nBins, size_t nWidth, size_t nOverlap);
+      forPositiveCurvatureBinsWithOverlap(float maxCurv,
+                                          size_t nBins,
+                                          size_t nWidth = 1,
+                                          size_t nOverlap = 0);
     };
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.

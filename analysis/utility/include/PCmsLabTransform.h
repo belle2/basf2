@@ -79,6 +79,7 @@ namespace Belle2 {
      */
     static TLorentzVector cmsToLab(const TLorentzVector& vec);
 
+    /** Get currently valid beam parameters from DataStore, or from gearbox if not available. */
     const BeamParameters& getBeamParams() const;
 
   private:

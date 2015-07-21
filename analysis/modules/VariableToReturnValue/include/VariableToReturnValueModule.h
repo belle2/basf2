@@ -31,6 +31,7 @@ namespace Belle2 {
   private:
     /** function pointer corresponding to given variable. */
     Variable::Manager::FunctionPtr m_function;
+    /** variable name (module parameter) */
     std::string m_variable;
 
   };

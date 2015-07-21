@@ -28,7 +28,7 @@ VariableToReturnValueModule::VariableToReturnValueModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("variable", m_variable,
-           "Variable taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.", std::string(""));
+           "Variable taken from Variable::Manager, see output of 'basf2 variables.py'.", std::string(""));
 }
 
 void VariableToReturnValueModule::initialize()

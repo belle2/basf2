@@ -182,9 +182,9 @@ class DAG(object):
         """
         Creates a new DAG object
         """
-        # dictionary containing all resources
+        #: dictionary containing all Resource objects
         self.resources = {}
-        # dictionary containing environment variables
+        #: dictionary containing environment variables
         self.env = {}
 
     def add(self, identifier, provider, *args, **kwargs):
@@ -205,6 +205,9 @@ class DAG(object):
         self.resources[identifier].needed = True
 
     def load_cached_resources(self, cacheFile):
+        """
+        Fills self.resources from given cache file
+        """
         if os.path.isfile(cacheFile):
             with open(cacheFile, 'r') as f:
                 cache = cPickle.load(f)
@@ -213,6 +216,9 @@ class DAG(object):
                     self.resources[resource.identifier] = resource
 
     def save_cached_resources(self, cacheFile):
+        """
+        Saves self.resources to cacheFile
+        """
         if os.path.isfile(cacheFile):
             shutil.copyfile(cacheFile, cacheFile + '.bkp')
         with open(cacheFile, 'w') as f:

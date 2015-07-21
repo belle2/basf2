@@ -48,7 +48,7 @@ set_random_seed(12345)
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
 # Specify number of events to be generated
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
 
 # Show progress of processing
 progress = register_module('Progress')

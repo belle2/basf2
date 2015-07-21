@@ -57,7 +57,7 @@ TLorentzVector BeamParameters::getFourVector(double energy, double angle)
   return vec;
 }
 
-TMatrixDSym BeamParameters::getCovMatrix(const Double32_t* member) const
+TMatrixDSym BeamParameters::getCovMatrix(const Double32_t* member)
 {
   TMatrixDSym matrix(3);
   for (int iRow = 0; iRow < 3; ++iRow) {

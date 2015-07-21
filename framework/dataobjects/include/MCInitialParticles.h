@@ -45,8 +45,7 @@ namespace Belle2 {
     /** Free memory of the LorentzRotation if it was created */
     virtual ~MCInitialParticles()
     {
-      delete m_labToCMS;
-      m_labToCMS = nullptr;
+      resetBoost();
     }
 
     /** Set the initial event values, i.e. the four momenta of both beams
@@ -59,22 +58,19 @@ namespace Belle2 {
     {
       m_her = her; m_ler = ler;
       m_vertex = vertex;
-      delete m_labToCMS;
-      m_labToCMS = nullptr;
+      resetBoost();
     }
     /** Set the High Energy Beam 4-momentum */
     void setHER(const TLorentzVector& her)
     {
       m_her = her;
-      delete m_labToCMS;
-      m_labToCMS = nullptr;
+      resetBoost();
     }
     /** Set the Low Energy Beam 4-momentum */
     void setLER(const TLorentzVector& ler)
     {
       m_ler = ler;
-      delete m_labToCMS;
-      m_labToCMS = nullptr;
+      resetBoost();
     }
     /** Set the vertex position */
     void setVertex(const TVector3& vertex)
@@ -102,11 +98,13 @@ namespace Belle2 {
     /** Get the generation flags to be used for event generation */
     int getGenerationFlags() const { return m_generationFlags; }
     /** Check if a certain set of Generation flags is set */
-    bool hasGenerationFlags(int flags) { return (m_generationFlags & flags) == flags; }
+    bool hasGenerationFlags(int flags) const { return (m_generationFlags & flags) == flags; }
 
   private:
     /** Calculate the boost */
     void calculateBoost() const;
+    /** Reset cached transformations after changing parameters. */
+    void resetBoost();
     /** HER 4vector */
     TLorentzVector m_her;
     /** LER 4vector */
@@ -134,6 +132,12 @@ namespace Belle2 {
     TVector3 rotaxis = zaxis.Cross(electronCMS.Vect()) * (1. / electronCMS.Vect().Mag());
     double rotangle = TMath::ASin(rotaxis.Mag());
     m_labToCMS->Rotate(-rotangle, rotaxis);
+  }
+
+  inline void MCInitialParticles::resetBoost()
+  {
+    delete m_labToCMS;
+    m_labToCMS = nullptr;
   }
 
 } //Belle2 namespace

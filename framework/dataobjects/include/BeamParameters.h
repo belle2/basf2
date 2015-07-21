@@ -116,7 +116,7 @@ namespace Belle2 {
      * @param energy beam energy
      * @param angle angle wrt z-axis
      */
-    TLorentzVector getFourVector(double energy, double angle);
+    static TLorentzVector getFourVector(double energy, double angle);
     /** Set covariance matrix from vector of entries.
      *
      * The vector for the covariance matrix can have either 0, 1, 3, 6 or 9 entries:
@@ -139,7 +139,7 @@ namespace Belle2 {
     /** Set covariance matrix from ROOT Matrix object */
     void setCovMatrix(Double32_t* member, const TMatrixDSym& cov);
     /** Obtain covariance matrix from a given float array */
-    TMatrixDSym getCovMatrix(const Double32_t* member) const;
+    static TMatrixDSym getCovMatrix(const Double32_t* member);
     /** Covariance matrix of the high energy beam at the IP */
     Double32_t m_covHER[6];
     /** Covariance matrix of the low energy beam at the IP */

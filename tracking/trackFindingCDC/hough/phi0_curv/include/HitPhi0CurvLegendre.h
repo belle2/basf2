@@ -62,10 +62,6 @@ namespace Belle2 {
               m_discreteCurvWidth,
               m_discreteCurvOverlap);
 
-        B2INFO("First bin should be symmetric around zero")
-        B2INFO("First bin lower bound " << m_discreteCurvs[0].getValue());
-        B2INFO("First bin upper bound " << m_discreteCurvs[m_discreteCurvWidth].getValue());
-
         // Compose the hough space
         std::pair<DiscreteAngle, DiscreteAngle> phi0Range(m_discretePhi0s.getRange());
         std::pair<DiscreteCurvature, DiscreteCurvature > curvRange(m_discreteCurvs.getRange());
@@ -76,6 +72,26 @@ namespace Belle2 {
 
         m_hitPhi0CurvFastHoughTree.reset(new HitPhi0CurvFastHoughTree(m_phi0CurvHoughPlain,
                                          phi0CurvBoxDivision));
+
+
+        B2INFO("Initialize hough plan");
+
+        B2INFO("First curvature bin should be symmetric around zero");
+        B2INFO("First curvature bin lower bound " << m_discreteCurvs[0].getValue());
+        B2INFO("First curvature bin upper bound " << m_discreteCurvs[m_discreteCurvWidth].getValue());
+        B2INFO("Curvature bin width " << m_discreteCurvs[m_discreteCurvWidth].getValue() - m_discreteCurvs[0].getValue());
+        B2INFO("Curvature bin overlap " << m_discreteCurvs[m_discreteCurvOverlap].getValue() - m_discreteCurvs[0].getValue());
+
+        double phi0Width = m_discretePhi0s[m_discretePhi0Width].getAngleVec().phi() - m_discretePhi0s[0].getAngleVec().phi();
+        // need modulo 2 * Pi because of the wrap around of the lowest bin.
+        phi0Width = std::remainder(phi0Width, 2 * PI);
+
+        double phi0Overlap = m_discretePhi0s[m_discretePhi0Overlap].getAngleVec().phi() - m_discretePhi0s[0].getAngleVec().phi();
+        // need modulo 2 * Pi because of the wrap around of the lowest bin.
+        phi0Overlap = std::remainder(phi0Overlap, 2 * PI);
+
+        B2INFO("Phi0 bin width " << phi0Width);
+        B2INFO("Phi0 bin overlap " << phi0Overlap);
       }
 
       /// Prepare the leave finding by filling the top node with given hits
@@ -134,19 +150,19 @@ namespace Belle2 {
       size_t m_maxLevel = 13;
 
       /// Overlap of the leaves in phi0 counted in number of discrete values.
-      size_t m_discretePhi0Overlap = 1;
+      size_t m_discretePhi0Overlap = 2;
 
       /// Width of the leaves at the maximal level in phi0 counted in number of discrete values.
-      size_t m_discretePhi0Width = 2;
+      size_t m_discretePhi0Width = 3;
 
       /// Overlap of the leaves in the curvature counted in number of discrete values
-      size_t m_discreteCurvOverlap = 1;
+      size_t m_discreteCurvOverlap = 4;
 
       /// Width of the leaves at the maximal level in teh curvature counted in number of discrete values.
-      size_t m_discreteCurvWidth = 2;
+      size_t m_discreteCurvWidth = 5;
 
       /// Maximal curvature value the tree should cover.
-      double m_maxCurv = 3.0;
+      double m_maxCurv = 2.75;
 
       // Dummy initialisation of the other constructs
 

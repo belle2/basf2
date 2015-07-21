@@ -1,6 +1,7 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/PIDVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/VariableManager/ROEVariables.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
@@ -9,6 +10,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
@@ -16,6 +18,9 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -23,6 +28,7 @@
 #include <gtest/gtest.h>
 
 #include <TRandom3.h>
+#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -255,6 +261,113 @@ namespace {
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
 
+  }
+
+  TEST(ROEVariablesTest, Variable)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<ECLCluster>::registerPersistent();
+    StoreArray<KLMCluster>::registerPersistent();
+    StoreArray<TrackFitResult>::registerPersistent();
+    StoreArray<Track>::registerPersistent();
+    StoreArray<PIDLikelihood>::registerPersistent();
+    StoreArray<Particle>::registerPersistent();
+    StoreArray<RestOfEvent>::registerPersistent();
+    StoreArray<ECLCluster> myECLClusters;
+    StoreArray<KLMCluster> myKLMClusters;
+    StoreArray<TrackFitResult> myTFRs;
+    StoreArray<Track> myTracks;
+    StoreArray<Particle> myParticles;
+    StoreArray<RestOfEvent> myROEs;
+    StoreArray<PIDLikelihood> myPIDLikelihoods;
+    myParticles.registerRelationTo(myROEs);
+    myTracks.registerRelationTo(myPIDLikelihoods);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Neutral ECLCluster on reconstructed side
+    ECLCluster myECL;
+    myECL.setisTrack(false);
+    myECL.setEnergy(0.5);
+    ECLCluster* savedECL = myECLClusters.appendNew(myECL);
+
+    // Particle on reconstructed side from ECLCluster
+    Particle p(savedECL);
+    Particle* part = myParticles.appendNew(p);
+
+    // Create ECLCluster on ROE side
+    ECLCluster myROEECL;
+    myROEECL.setisTrack(false);
+    float eclE = 1.0;
+    myROEECL.setEnergy(eclE);
+    ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
+
+    // Create KLMCluster on ROE side
+    KLMCluster myROEKLM;
+    KLMCluster* savedROEKLM = myKLMClusters.appendNew(myROEKLM);
+
+    // Create Track on ROE side
+    // - create TFR
+    TRandom3 generator;
+
+    const float pValue = 0.5;
+    const float bField = 1.5;
+    const int charge = 1;
+    TMatrixDSym cov6(6);
+
+    TVector3 position(1.0, 0, 0);
+    TVector3 momentum(0, 1.0, 0);
+
+    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+    myTFRs.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
+
+    // - create Track
+    Track myROETrack;
+    myROETrack.setTrackFitResultIndex(Const::muon, 1);
+    Track* savedROETrack = myTracks.appendNew(myROETrack);
+
+    // - create PID information, add relation
+    PIDLikelihood myPID;
+    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.5);
+    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.52);
+    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.54);
+    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.56);
+    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    PIDLikelihood* savedPID = myPIDLikelihoods.appendNew(myPID);
+
+    savedROETrack->addRelationTo(savedPID);
+
+    // Create ROE object, append tracks, clusters, add relation to particle
+    RestOfEvent roe;
+    roe.addTrack(savedROETrack);
+    roe.addECLCluster(savedROEECL);
+    roe.addKLMCluster(savedROEKLM);
+    RestOfEvent* savedROE = myROEs.appendNew(roe);
+
+    part->addRelationTo(savedROE);
+
+    // ROE variables
+    PCmsLabTransform T;
+
+    TLorentzVector p1lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + momentum.Mag2()));
+    TLorentzVector p2lab(0, 0, eclE, eclE);
+
+    TLorentzVector p1 = T.rotateLabToCms() * p1lab;
+    TLorentzVector p2 = T.rotateLabToCms() * p2lab;
+
+    float Etag = p1.E() + p2.E();
+    float Ptag2 = (p1.Vect() + p2.Vect()).Mag2();
+
+    // TESTS
+    EXPECT_FLOAT_EQ(0.0, isInRestOfEvent(part));
+    EXPECT_FLOAT_EQ(1.0, nROETracks(part));
+    EXPECT_FLOAT_EQ(1.0, nROEECLClusters(part));
+    EXPECT_FLOAT_EQ(1.0, nROENeutralECLClusters(part));
+    EXPECT_FLOAT_EQ(1.0, nROEKLMClusters(part));
+    EXPECT_FLOAT_EQ(1.0, nROELeptons(part));
+    EXPECT_FLOAT_EQ(1.0, ROECharge(part));
+    EXPECT_FLOAT_EQ(T.getCMSEnergy() / 2 - Etag, ROEDeltaEnergyTag(part));
+    EXPECT_FLOAT_EQ(TMath::Sqrt(T.getCMSEnergy()*T.getCMSEnergy() / 4 - Ptag2), ROEMassTag(part));
   }
 
 

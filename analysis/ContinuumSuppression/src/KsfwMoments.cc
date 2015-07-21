@@ -22,18 +22,16 @@
 //                                      //
 //////////////////////////////////////////
 
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/ContinuumSuppression/KsfwMoments.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <analysis/dataobjects/Particle.h>
 #include <iostream>
 #include <iomanip>
 #include <math.h>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <analysis/ContinuumSuppression/KsfwMoments.h>
 
 namespace Belle2 {
 

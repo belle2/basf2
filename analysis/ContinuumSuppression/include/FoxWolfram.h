@@ -20,15 +20,6 @@
 #include <iostream>
 #include <sstream>
 
-#include <analysis/VariableManager/Manager.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/ContinuumSuppression/FuncPtr.h>
-
-#include <analysis/utility/PCmsLabTransform.h>
-
 namespace Belle2 {
 
   class FoxWolfram {
@@ -37,11 +28,13 @@ namespace Belle2 {
     ~FoxWolfram() {};
 
     // H(i) = i-th Fox-Wolfram moment
-    double H(int i) {
+    double H(int i)
+    {
       return (i < 0 || i > 4) ? 0 : sum[i];
     }
     // R(i) = i-th normalized Fox-Wolfram moment
-    double R(int i) {
+    double R(int i)
+    {
       return (i < 0 || i > 4 || sum[0] == 0) ? 0 : sum[i] / sum[0];
     }
     void add(const double mag, const double costh);

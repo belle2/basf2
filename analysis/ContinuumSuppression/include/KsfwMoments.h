@@ -32,27 +32,18 @@
 #include <iostream>
 #include <sstream>
 
-#include <analysis/VariableManager/Manager.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/ContinuumSuppression/FuncPtr.h>
-
-#include <analysis/utility/PCmsLabTransform.h>
+#include <TVector3.h>
+#include <TLorentzVector.h>
 
 namespace Belle2 {
-
-// TODO: are these necessary? doesn't compile if include 'class TVector3'.
-  class Particle;
-//class TVector3;
 
 // ----------------------------------------------------------------------
 // KsfwMoments
 // ----------------------------------------------------------------------
   class KsfwMoments {
   public:
-    KsfwMoments() : m_uf(0) {
+    KsfwMoments() : m_uf(0)
+    {
 
       for (int i = 0; i < 2; i++)
         for (int j = 0; j < 3; j++)
@@ -84,13 +75,16 @@ namespace Belle2 {
     int usefinal() const { return m_uf; }
     double mm2(int uf = -1) const { return m_mm2[uf < 0 ? m_uf : uf]; }
     double et(int uf = -1) const { return m_et[uf < 0 ? m_uf : uf]; }
-    double Hoo(int i, int uf = -1) const {
+    double Hoo(int i, int uf = -1) const
+    {
       return m_Hoo[uf < 0 ? m_uf : uf][i];
     }
-    double Hso(int i, int j, int uf = -1) const {
+    double Hso(int i, int j, int uf = -1) const
+    {
       return m_Hso[uf < 0 ? m_uf : uf][i][j];
     }
-    double var(int i) { // the same order as the original k_sfw.cc
+    double var(int i)   // the same order as the original k_sfw.cc
+    {
       if (i < 0)  return 0;
       if (i < 1)  return et();
       if (i < 4)  return Hso(i - 1, 0);

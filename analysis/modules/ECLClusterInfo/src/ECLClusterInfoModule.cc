@@ -41,7 +41,7 @@ REG_MODULE(ECLClusterInfo)
 ECLClusterInfoModule::ECLClusterInfoModule() : Module()
 {
   // Set module properties
-  setDescription("Creates an output root file which contains info from ECL clusters. Used for b2bii conversion validation.");
+  setDescription("Creates an output root file which contains info from ECL clusters.");
 
   // Parameter definition
   addParam("outputFileName", m_fileName, "The name of the output .root file", string("ECLClusterInfo.root"));

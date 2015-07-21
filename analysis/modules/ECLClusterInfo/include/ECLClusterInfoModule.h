@@ -25,7 +25,7 @@
 
 namespace Belle2 {
   /**
-   * Creates an output root file which contains info from ECL clusters. Used for b2bii conversion validation.
+   * Creates an output root file which contains info from ECL clusters.
    *
    *    *
    */

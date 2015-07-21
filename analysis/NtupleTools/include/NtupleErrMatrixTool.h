@@ -20,8 +20,8 @@
 
 namespace Belle2 {
 
-  /** NtupleTool to write the kinematics of a Particle
-  (momentum, energy) to a flat ntuple. */
+  /** NtupleTool to write the elements of the 7x7
+   * error matrix of a particle to a flat ntuple. */
   class NtupleErrMatrixTool : public NtupleFlatTool {
   private:
 

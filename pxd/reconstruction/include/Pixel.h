@@ -35,7 +35,7 @@ namespace Belle2 {
     class Pixel {
     public:
       /** Construct using only an index, used for testing. */
-      Pixel(unsigned int index = 0): m_index(index), m_u(0), m_v(0),
+      explicit Pixel(unsigned int index = 0): m_index(index), m_u(0), m_v(0),
         m_charge(0) {}
       /** Construct from a given PXDDigit and its store index */
       Pixel(const PXDDigit* digit, unsigned int index): m_index(index),

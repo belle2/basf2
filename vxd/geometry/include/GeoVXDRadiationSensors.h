@@ -26,9 +26,10 @@ namespace Belle2 {
     /** construct the creator with the correct subdetector type
      * @param subdetector one of "PXD" or "SVD"
      */
-    GeoVXDRadiationSensors(const std::string& subdetector): m_subdetector(subdetector) {}
+    explicit GeoVXDRadiationSensors(const std::string& subdetector): m_subdetector(subdetector) {}
     /** delete sensitive detector implementations */
-    ~GeoVXDRadiationSensors() {
+    ~GeoVXDRadiationSensors()
+    {
       for (auto sensitive : m_sensitive) delete sensitive;
     }
 

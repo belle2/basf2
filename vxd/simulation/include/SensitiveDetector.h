@@ -64,7 +64,7 @@ namespace Belle2 {
     template <class SimHitClass, class TrueHitClass> class SensitiveDetector: public SensitiveDetectorBase {
     public:
       /** Construct instance and take over ownership of the sensorInfo pointer */
-      SensitiveDetector(VXD::SensorInfoBase* sensorInfo);
+      explicit SensitiveDetector(VXD::SensorInfoBase* sensorInfo);
 
     private:
       /** Save the actual TrueHit for a given sensor traversal information.
@@ -99,7 +99,8 @@ namespace Belle2 {
        * @param vec vector to convert
        * @return array containing x,y,z as floats
        */
-      std::array<float, 3> vecToFloat(const G4ThreeVector& vec) {
+      std::array<float, 3> vecToFloat(const G4ThreeVector& vec)
+      {
         return std::array<float, 3> {{(float)vec.x(), (float)vec.y(), (float)vec.z()}};
       }
 

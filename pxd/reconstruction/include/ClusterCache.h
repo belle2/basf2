@@ -87,7 +87,7 @@ namespace Belle2 {
         c_defaultNumberColumns = 768
       };
       /** Create a new cache */
-      ClusterCache(unsigned int maxU = c_defaultNumberColumns);
+      explicit ClusterCache(unsigned int maxU = c_defaultNumberColumns);
 
       /** No copy construction. */
       ClusterCache(const ClusterCache&) = delete;

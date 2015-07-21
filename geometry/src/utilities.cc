@@ -22,8 +22,6 @@
 #include <vector>
 #include <limits>
 #include <list>
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
 
 using namespace std;
 
@@ -108,13 +106,13 @@ namespace Belle2 {
         B2ERROR("Polycone needs at least two planes");
         return 0;
       }
-      double z[nPlanes];
-      double rMin[nPlanes];
-      double rMax[nPlanes];
+      std::vector<double> z(nPlanes, 0);
+      std::vector<double> rMin(nPlanes, 0);
+      std::vector<double> rMax(nPlanes, 0);
       int index(0);
       minZ = numeric_limits<double>::infinity();
       maxZ = -numeric_limits<double>::infinity();
-      BOOST_FOREACH(const GearDir & plane, planes) {
+      for (const GearDir& plane : planes) {
         z[index]    = plane.getLength("posZ") / Unit::mm;
         minZ = min(minZ, z[index]);
         maxZ = max(maxZ, z[index]);
@@ -122,7 +120,7 @@ namespace Belle2 {
         rMax[index] = plane.getLength("outerRadius") / Unit::mm;
         ++index;
       }
-      G4Polycone* polycone = new G4Polycone(name, minPhi, dPhi, nPlanes, z, rMin, rMax);
+      G4Polycone* polycone = new G4Polycone(name, minPhi, dPhi, nPlanes, z.data(), rMin.data(), rMax.data());
       return polycone;
     }
 
@@ -148,7 +146,7 @@ namespace Belle2 {
       void subdivideSegments(const PointList& points, PointList& segments)
       {
         double lastZ = -numeric_limits<double>::infinity();
-        BOOST_FOREACH(const ZXPoint p, points) {
+        for (const ZXPoint p : points) {
           if (p.first < lastZ) {
             B2FATAL("createRotationSolid: Points have to be given with ascending z positions");
           }
@@ -159,7 +157,7 @@ namespace Belle2 {
           //the list of points
           PointList::iterator segStart = segments.begin();
           PointList::iterator segEnd = segStart;
-          segEnd++;
+          ++segEnd;
           for (; segEnd != segments.end(); ++segEnd) {
             if ((p.first > segStart->first && p.first < segEnd->first) ||
                 (p.first < segStart->first && p.first > segEnd->first)) {
@@ -189,10 +187,10 @@ namespace Belle2 {
       //Make a list of all the points (ZX coordinates)
       PointList innerPoints;
       PointList outerPoints;
-      BOOST_FOREACH(const GearDir point, params.getNodes("InnerPoints/point")) {
+      for (const GearDir point : params.getNodes("InnerPoints/point")) {
         innerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
       }
-      BOOST_FOREACH(const GearDir point, params.getNodes("OuterPoints/point")) {
+      for (const GearDir point : params.getNodes("OuterPoints/point")) {
         outerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
       }
       //Subdivide the segments to have an x position for each z specified for
@@ -213,7 +211,7 @@ namespace Belle2 {
       double outerX;
       //We go through both lists until both are empty
       while (!(innerPoints.empty() && outerPoints.empty())) {
-        double popInner = false;
+        bool popInner = false;
         //We could have more than one point at the same z position for segments
         //going directly along x. because of that we check that the z
         //coordinates for inner and outer line are always the same, reusing one

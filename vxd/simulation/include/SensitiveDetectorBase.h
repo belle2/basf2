@@ -40,8 +40,9 @@ namespace Belle2 {
        * handle. Ownership of the SensorInfo goes to the sensitive detector
        * instance
        */
-      SensitiveDetectorBase(SensorInfoBase* info):
-        Simulation::SensitiveDetectorBase((info->getType() == SensorInfoBase::PXD ? "PXD " : "SVD ") + (std::string)info->getID(), info->getType() == SensorInfoBase::PXD ? Const::PXD : Const::SVD), m_info(info) {};
+      explicit SensitiveDetectorBase(SensorInfoBase* info):
+        Simulation::SensitiveDetectorBase((info->getType() == SensorInfoBase::PXD ? "PXD " : "SVD ") + (std::string)info->getID(),
+                                          info->getType() == SensorInfoBase::PXD ? Const::PXD : Const::SVD), m_info(info) {};
 
       /** Set all common options.
        * @param seeNeutrons if true, simhits are also stored for neutrons
@@ -55,7 +56,8 @@ namespace Belle2 {
        * before SimHits are created.
        */
       void setOptions(bool seeNeutrons, bool onlyPrimaryTrueHits, float distanceTolerance,
-                      float electronTolerance, float minimumElectrons) {
+                      float electronTolerance, float minimumElectrons)
+      {
         m_seeNeutrons = seeNeutrons;
         m_onlyPrimaryTrueHits = onlyPrimaryTrueHits;
         m_distanceTolerance = distanceTolerance;
@@ -64,7 +66,8 @@ namespace Belle2 {
       }
 
       /** Destructor freeing the sensor Info */
-      virtual ~SensitiveDetectorBase() {
+      virtual ~SensitiveDetectorBase()
+      {
         if (m_info) delete m_info;
       }
 

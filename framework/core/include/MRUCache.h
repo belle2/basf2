@@ -67,7 +67,7 @@ namespace Belle2 {
      * Constructor setting the maximum number of cached items
      * @param maxSize Maximum number of cached Items
      */
-    MRUCache(size_t maxSize): m_maxSize(maxSize), m_hits(0), m_misses(0), m_overflows(0) {}
+    explicit MRUCache(size_t maxSize): m_maxSize(maxSize), m_hits(0), m_misses(0), m_overflows(0) {}
 
     /**
      * Insert a key value pair into the cache. If the maximum size is

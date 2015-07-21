@@ -39,7 +39,7 @@ namespace Belle2 {
     class GeoVXDCreator : public geometry::CreatorBase {
     public:
       /** Constructor of the GeoVXDCreator class. */
-      GeoVXDCreator(const std::string& prefix);
+      explicit GeoVXDCreator(const std::string& prefix);
 
       /** The destructor of the GeoVXDCreator class. */
       virtual ~GeoVXDCreator();

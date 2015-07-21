@@ -51,12 +51,16 @@ namespace Belle2 {
     /** Iterator pair for a set of points */
     typedef std::pair<iterator, iterator> range;
 
+    /** Use default constructor */
+    SensorTraversal() = default;
+
     /** add a new step
      * @param position position of the step
      * @param momentum momentum of the step
      * @param electrons number of deposited electrons during step
      */
-    void add(const G4ThreeVector& position, const G4ThreeVector& momentum, double electrons, double time, double length) {
+    void add(const G4ThreeVector& position, const G4ThreeVector& momentum, double electrons, double time, double length)
+    {
       m_electrons += electrons;
       m_length += length;
       emplace_back(position, momentum, m_electrons, time, m_length);
@@ -81,14 +85,16 @@ namespace Belle2 {
     void hasLeft() { m_contained = false; }
 
     /** set initial values for a new track */
-    void setInitial(int trackID, int pdgCode, bool primary) {
+    void setInitial(int trackID, int pdgCode, bool primary)
+    {
       m_trackID = trackID;
       m_pdgCode = pdgCode;
       m_primary = primary;
     }
 
     /** reset to be used again */
-    void reset() {
+    void reset()
+    {
       m_trackID = 0;
       m_pdgCode = 0;
       m_electrons = 0;

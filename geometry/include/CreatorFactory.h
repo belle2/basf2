@@ -29,7 +29,8 @@ namespace Belle2 {
      */
     template<class T> struct CreatorFactory {
       /** Constructor to register the Creator with the CreatorManager */
-      CreatorFactory(const std::string& name) {
+      explicit CreatorFactory(const std::string& name)
+      {
         CreatorManager::registerCreatorFactory(name, factory);
       }
       /**
@@ -37,7 +38,8 @@ namespace Belle2 {
        * class. Ownership of the object goes to the caller who is responsible
        * of freeing the creator once it is done
        */
-      static CreatorBase* factory() {
+      static CreatorBase* factory()
+      {
         return new T();
       }
     };

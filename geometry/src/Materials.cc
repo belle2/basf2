@@ -15,7 +15,6 @@
 
 #include <memory>
 #include <limits>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <G4Material.hh>
@@ -38,9 +37,9 @@ namespace Belle2 {
 
     Materials::~Materials()
     {
-      for (G4MaterialPropertiesTable * propTable : m_PropTables) delete propTable;
+      for (G4MaterialPropertiesTable* propTable : m_PropTables) delete propTable;
       m_PropTables.clear();
-      for (G4OpticalSurface * optSurf : m_OptSurfaces) delete optSurf;
+      for (G4OpticalSurface* optSurf : m_OptSurfaces) delete optSurf;
       m_OptSurfaces.clear();
     }
 
@@ -111,7 +110,7 @@ namespace Belle2 {
       //Prepare vector with all component materials
       vector<G4Material*> componentMaterials;
       vector<double> fractionMaterials;
-      BOOST_FOREACH(const GearDir & material, parameters.getNodes("Components/Material")) {
+      for (const GearDir& material : parameters.getNodes("Components/Material")) {
         G4Material* mat = getMaterial(material.getString());
         double fraction = material.getDouble("@fraction", 1.0);
         if (!mat) {
@@ -129,7 +128,7 @@ namespace Belle2 {
       //Prepare vector with all component elements
       vector<G4Element*> componentElements;
       vector<double> fractionElements;
-      BOOST_FOREACH(const GearDir & element, parameters.getNodes("Components/Element")) {
+      for (const GearDir& element : parameters.getNodes("Components/Element")) {
         G4Element* elm = getElement(element.getString());
         double fraction = element.getDouble("@fraction", 1.0);
         if (!elm) {
@@ -185,7 +184,7 @@ namespace Belle2 {
         //Apparantly we have properties, so lets add them to the Material
         G4MaterialPropertiesTable* g4PropTable = new G4MaterialPropertiesTable();
         m_PropTables.push_back(g4PropTable);
-        BOOST_FOREACH(const GearDir & property, parameters.getNodes("Property")) {
+        for (const GearDir& property : parameters.getNodes("Property")) {
           string name;
           try {
             name = property.getString("@name");
@@ -197,14 +196,14 @@ namespace Belle2 {
           //Geant4 uses MeV as default energy
           conversionFactor /= Unit::MeV;
           unsigned int nValues = property.getNumberNodes("value");
-          double energies[nValues];
-          double values[nValues];
+          std::vector<double> energies(nValues, 0);
+          std::vector<double> values(nValues, 0);
           for (unsigned int i = 0; i < nValues; ++i) {
             GearDir value(property, "value", i + 1);
             energies[i] = value.getDouble("@energy") * conversionFactor;
             values[i] = value.getDouble();
           }
-          g4PropTable->AddProperty(name.c_str(), energies, values, nValues);
+          g4PropTable->AddProperty(name.c_str(), energies.data(), values.data(), nValues);
         }
         return g4PropTable;
       }

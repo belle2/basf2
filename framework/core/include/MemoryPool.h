@@ -36,7 +36,7 @@ namespace Belle2 {
      * Constructor.
      * @param n Reserve space for n elements on construction
      */
-    MemoryPool(int n = 0): m_entries(0) { reserve(n); }
+    explicit MemoryPool(int n = 0): m_entries(0) { reserve(n); }
 
     /** Free allocated memory. */
     ~MemoryPool() { release_memory(); }

@@ -55,9 +55,9 @@ namespace Belle2 {
 
     void GeometryManager::clear()
     {
-      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
+      for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
-      for (CreatorBase * creator : m_creators) delete creator;
+      for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
       //FIXME: Geometry is now run independent, don't delete anything, let Geant4 care about freeing stuff
@@ -71,7 +71,7 @@ namespace Belle2 {
       G4LogicalSkinSurface::CleanSurfaceTable();
       //FIXME: The MaterialPropertyTables associated with the surfaces won't get deleted.
       G4SurfaceProperty::CleanSurfacePropertyTable();
-      for (CreatorBase * creator : m_creators) delete creator;
+      for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
     }
@@ -84,15 +84,15 @@ namespace Belle2 {
       try {
         string detectorName = detectorDir.getString("Name");
         B2INFO("Creating geometry for detector: " << detectorName);
-      } catch (gearbox::PathEmptyError e) {
+      } catch (gearbox::PathEmptyError& e) {
         B2FATAL("Could not read detector name, make sure gearbox is connected and "
                 << detectorDir.getPath() << " points to the geometry description");
       }
 
       Materials& materials = Materials::getInstance();
       //Set up Materials first since we possibly need them for the top volume
-      for (const GearDir & matlist : detectorDir.getNodes("Materials")) {
-        for (const GearDir & mat : matlist.getNodes("Material")) {
+      for (const GearDir& matlist : detectorDir.getNodes("Materials")) {
+        for (const GearDir& mat : matlist.getNodes("Material")) {
           materials.createMaterial(mat);
         }
       }
@@ -119,13 +119,13 @@ namespace Belle2 {
       }
 
       //Now create all subcomponents
-      for (const GearDir & component : detectorDir.getNodes("DetectorComponent")) {
+      for (const GearDir& component : detectorDir.getNodes("DetectorComponent")) {
         string name;
         string creatorName;
         try {
           name        = component.getString("@name");
           creatorName = component.getString("Creator");
-        } catch (gearbox::PathEmptyError e) {
+        } catch (gearbox::PathEmptyError& e) {
           B2ERROR("Could not find required element Name or Creator for " << component.getPath());
           continue;
         }
@@ -135,7 +135,7 @@ namespace Belle2 {
         componentNames.erase(name);
         excludedNames.erase(name);
         additionalNames.erase(name);
-        if (m_components.size() > 0 && m_components.count(name) == 0) {
+        if (!m_components.empty() && m_components.count(name) == 0) {
           B2INFO("DetectorComponent " << name << " not in list of components, skipping");
           continue;
         }
@@ -147,7 +147,7 @@ namespace Belle2 {
             B2INFO("DectorComponent " << name << " is enabled in addition to the default components");
           }
         }
-        if (m_excluded.size() > 0 && m_excluded.count(name) > 0) {
+        if (!m_excluded.empty() && m_excluded.count(name) > 0) {
           B2INFO("DetectorComponent " << name << " in list of excluded components, skipping");
           continue;
         }
@@ -194,7 +194,7 @@ namespace Belle2 {
       //additionalNames there is probably an typo in the respective component
       //list. Throw an error for each name left using a small lambda function
       auto checkRemaining = [](const std::string & type, const std::set<std::string> componentNames) {
-        for (const std::string & name : componentNames) {
+        for (const std::string& name : componentNames) {
           B2ERROR("'" << name << "' is specified in list of "
                   << type << " but could not be found");
         }

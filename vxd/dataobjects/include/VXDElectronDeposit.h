@@ -45,25 +45,28 @@ namespace Belle2 {
 
     /** Create a new instance from a packed value
      * @param packed value to be interpreted as packed fraction/electrons */
-    VXDElectronDeposit(unsigned int packed): m_packed(packed) {}
+    explicit VXDElectronDeposit(unsigned int packed): m_packed(packed) {}
 
     /** create a new instance from a fraction along the path and a number of
      * electrons.
      * @param fraction fraction along the path, should be 0<=x<=1
      * @param electrons number of electrons deposited
      */
-    VXDElectronDeposit(float fraction, float electrons) {
+    VXDElectronDeposit(float fraction, float electrons)
+    {
       const unsigned int intfrac = std::round(std::max(0.f, fraction) * c_MaxFraction);
       const unsigned int intelec = std::round(std::max(0.f, electrons));
       m_packed = std::min(intfrac, (unsigned int) c_MaxFraction)
                  + (std::min(intelec, (unsigned int) c_MaxElectrons) << c_FractionBits);
     }
     /** get the fraction along the path */
-    float getFraction() const {
+    float getFraction() const
+    {
       return (m_packed & c_MaxFraction) * 1.0 / c_MaxFraction;
     }
     /** get the number of deposited electrons */
-    unsigned int getElectrons() const {
+    unsigned int getElectrons() const
+    {
       return (m_packed >> c_FractionBits) & c_MaxElectrons;
     }
     /** get the packed value */

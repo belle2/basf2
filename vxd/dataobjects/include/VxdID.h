@@ -58,18 +58,21 @@ namespace Belle2 {
     };
 
     /** Constructor using the unique id */
-    VxdID(baseType id = 0) {
+    // cppcheck-suppress noExplicitConstructor
+    VxdID(baseType id = 0)
+    {
       m_id.id = id;
     }
     /** Constructor using layer, ladder and sensor ids */
-    VxdID(baseType layer, baseType ladder, baseType sensor, baseType segment = 0) {
+    VxdID(baseType layer, baseType ladder, baseType sensor, baseType segment = 0)
+    {
       m_id.parts.layer   = layer;
       m_id.parts.ladder  = ladder;
       m_id.parts.sensor  = sensor;
       m_id.parts.segment = segment;
     }
     /** Construct ID from string representing the structure */
-    VxdID(const std::string& sensor) throw(std::invalid_argument);
+    explicit VxdID(const std::string& sensor) throw(std::invalid_argument);
     /** Copy constructor */
     VxdID(const VxdID& b): m_id(b.m_id) {}
 

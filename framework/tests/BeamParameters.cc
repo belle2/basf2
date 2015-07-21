@@ -1,4 +1,5 @@
 #include <framework/utilities/TestHelpers.h>
+#include <framework/logging/Logger.h>
 #include <framework/dataobjects/BeamParameters.h>
 #include <TRandom.h>
 #include <TMath.h>
@@ -25,6 +26,8 @@ namespace {
     EXPECT_TRUE(fabs(upsVecCMS.X()) < 1e-15);
     EXPECT_TRUE(fabs(upsVecCMS.Y()) < 1e-15);
     EXPECT_TRUE(fabs(upsVecCMS.Z()) < 1e-15);
+
+    EXPECT_TRUE(fabs(beamparams.getMass() - mUpsilon) < 1e-2);
   }
 
   TEST(BeamParameters, BoostIntoCMSAndBack)

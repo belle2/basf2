@@ -41,7 +41,7 @@ namespace Belle2 {
     };
 
     /** Default constructor */
-    MCInitialParticles(): m_labToCMS(nullptr), m_CMSToLab(nullptr), m_generationFlags(0) {}
+    MCInitialParticles(): m_labToCMS(nullptr), m_CMSToLab(nullptr), m_invariantMass(0.0), m_generationFlags(0) {}
     /** Free memory of the LorentzRotation if it was created */
     virtual ~MCInitialParticles() { resetBoost(); }
 
@@ -80,10 +80,10 @@ namespace Belle2 {
     const TLorentzVector& getLER() const { return m_ler; }
     /** Get the position of the collision */
     const TVector3& getVertex() const { return m_vertex; }
-    /** Get the the actual collision energy */
+    /** Get the the actual collision energy (in lab system)*/
     double getEnergy() const { return (m_her + m_ler).E(); }
-    /** Get the invariant mass of the collision */
-    double getMass() const { return (m_her + m_ler).M(); }
+    /** Get the invariant mass of the collision (= energy in CMS) */
+    double getMass() const { calculateBoost(); return m_invariantMass; }
     /** Return the LorentzRotation to convert from lab to CMS frame */
     const TLorentzRotation& getLabToCMS() const
     {
@@ -113,12 +113,12 @@ namespace Belle2 {
     TLorentzVector m_ler;
     /** collision position */
     TVector3 m_vertex;
-    /** Boost from Lab into CMS. This is calculated on first use and cached
-     * but not written to file */
+    /** Boost from Lab into CMS. (calculated on first use, not saved to file) */
     mutable TLorentzRotation* m_labToCMS; //!transient
-    /** Boost from CMS into lab. This is calculated on first use and cached
-     * but not written to file */
+    /** Boost from CMS into lab. (calculated on first use, not saved to file) */
     mutable TLorentzRotation* m_CMSToLab; //!transient
+    /** invariant mass of HER+LER (calculated on first use, not saved to file) */
+    mutable double m_invariantMass; //!transient
     /** Flags to be used when generating events */
     int m_generationFlags;
     /** ROOT Dictionary */
@@ -135,7 +135,7 @@ namespace Belle2 {
     m_labToCMS = new TLorentzRotation(-beam.BoostVector());
     // boost HER e- from Lab system to CMS system
     const TLorentzVector electronCMS = (*m_labToCMS) * m_her;
-    // now rotate CMS such that incomming e- is parallel to z-axis
+    // now rotate CMS such that incoming e- is parallel to z-axis
     const TVector3 zaxis(0., 0., 1.);
     TVector3 rotaxis = zaxis.Cross(electronCMS.Vect()) * (1. / electronCMS.Vect().Mag());
     double rotangle = TMath::ASin(rotaxis.Mag());
@@ -143,6 +143,7 @@ namespace Belle2 {
 
     //cache derived quantities
     m_CMSToLab = new TLorentzRotation(m_labToCMS->Inverse());
+    m_invariantMass = beam.M();
   }
 
   inline void MCInitialParticles::resetBoost()
@@ -151,6 +152,7 @@ namespace Belle2 {
     delete m_CMSToLab;
     m_labToCMS = nullptr;
     m_CMSToLab = nullptr;
+    m_invariantMass = 0.0;
   }
 
 } //Belle2 namespace

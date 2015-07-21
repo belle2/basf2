@@ -9,10 +9,10 @@ env['LIBS'] = [
     'Geom',
     'boost_regex',
 
-    #'genfit2',
-    #'svd_dataobjects',
+    'genfit2',
+    'svd_dataobjects',
     #'tracking_dataobjects',
-    #'vxd_dataobjects',
+    'vxd_dataobjects',
     ]
 
 Return('env')

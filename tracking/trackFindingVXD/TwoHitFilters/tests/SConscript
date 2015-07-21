@@ -14,6 +14,8 @@ env['LIBS'] = [
     'Geom',
     '$ROOT_LIBS',
     'boost_regex',
+    'genfit2',
+    'tracking_dataobjects'
     ]
 
 Return('env')

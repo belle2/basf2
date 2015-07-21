@@ -41,12 +41,9 @@ namespace Belle2 {
     };
 
     /** Default constructor */
-    MCInitialParticles(): m_labToCMS(0), m_generationFlags(0) {}
+    MCInitialParticles(): m_labToCMS(nullptr), m_CMSToLab(nullptr), m_generationFlags(0) {}
     /** Free memory of the LorentzRotation if it was created */
-    virtual ~MCInitialParticles()
-    {
-      resetBoost();
-    }
+    virtual ~MCInitialParticles() { resetBoost(); }
 
     /** Set the initial event values, i.e. the four momenta of both beams
      * and the vertex
@@ -87,21 +84,26 @@ namespace Belle2 {
     double getEnergy() const { return (m_her + m_ler).E(); }
     /** Get the invariant mass of the collision */
     double getMass() const { return (m_her + m_ler).M(); }
-    /** Return the LorentzRotation to convert from Lab to CMS frame */
+    /** Return the LorentzRotation to convert from lab to CMS frame */
     const TLorentzRotation& getLabToCMS() const
     {
-      if (!m_labToCMS) calculateBoost(); return *m_labToCMS;
+      calculateBoost(); return *m_labToCMS;
+    }
+    /** Return the LorentzRotation to convert from CMS to lab frame */
+    const TLorentzRotation& getCMSToLab() const
+    {
+      calculateBoost(); return *m_CMSToLab;
     }
 
-    /** Set the generation flags to be used for event generation */
+    /** Set the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
     void setGenerationFlags(int flags) { m_generationFlags = flags; }
-    /** Get the generation flags to be used for event generation */
+    /** Get the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
     int getGenerationFlags() const { return m_generationFlags; }
-    /** Check if a certain set of Generation flags is set */
+    /** Check if a certain set of EGenerationFlags is set */
     bool hasGenerationFlags(int flags) const { return (m_generationFlags & flags) == flags; }
 
   private:
-    /** Calculate the boost */
+    /** Calculate the boost if necessary */
     void calculateBoost() const;
     /** Reset cached transformations after changing parameters. */
     void resetBoost();
@@ -114,6 +116,9 @@ namespace Belle2 {
     /** Boost from Lab into CMS. This is calculated on first use and cached
      * but not written to file */
     mutable TLorentzRotation* m_labToCMS; //!transient
+    /** Boost from CMS into lab. This is calculated on first use and cached
+     * but not written to file */
+    mutable TLorentzRotation* m_CMSToLab; //!transient
     /** Flags to be used when generating events */
     int m_generationFlags;
     /** ROOT Dictionary */
@@ -122,6 +127,9 @@ namespace Belle2 {
 
   inline void MCInitialParticles::calculateBoost() const
   {
+    if (m_labToCMS)
+      return;
+
     TLorentzVector beam = m_her + m_ler;
     // Transformation from Lab system to CMS system
     m_labToCMS = new TLorentzRotation(-beam.BoostVector());
@@ -132,12 +140,17 @@ namespace Belle2 {
     TVector3 rotaxis = zaxis.Cross(electronCMS.Vect()) * (1. / electronCMS.Vect().Mag());
     double rotangle = TMath::ASin(rotaxis.Mag());
     m_labToCMS->Rotate(-rotangle, rotaxis);
+
+    //cache derived quantities
+    m_CMSToLab = new TLorentzRotation(m_labToCMS->Inverse());
   }
 
   inline void MCInitialParticles::resetBoost()
   {
     delete m_labToCMS;
+    delete m_CMSToLab;
     m_labToCMS = nullptr;
+    m_CMSToLab = nullptr;
   }
 
 } //Belle2 namespace

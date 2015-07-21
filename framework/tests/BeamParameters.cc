@@ -16,13 +16,30 @@ namespace {
     beamparams.setLER(3.49841, M_PI, std::vector<double>());
     beamparams.setHER(7.99638, 0.022, std::vector<double>());
 
-    TLorentzVector upsVec = beamparams.getHER() + beamparams.getLER();
+    const TLorentzVector upsVec = beamparams.getHER() + beamparams.getLER();
+    TLorentzVector upsVecCMS = upsVec;
+    upsVecCMS.Transform(beamparams.getLabToCMS());
+
     const double mUpsilon = 10.5794;
-    TLorentzVector upsVecCMS = upsVec.Transform(beamparams.getLabToCMS());
     EXPECT_TRUE(fabs(upsVecCMS.E() - mUpsilon) < 1e-2);
     EXPECT_TRUE(fabs(upsVecCMS.X()) < 1e-15);
     EXPECT_TRUE(fabs(upsVecCMS.Y()) < 1e-15);
     EXPECT_TRUE(fabs(upsVecCMS.Z()) < 1e-15);
+  }
+
+  TEST(BeamParameters, BoostIntoCMSAndBack)
+  {
+    BeamParameters beamparams;
+    //some values from Belle
+    beamparams.setLER(3.49841, M_PI, std::vector<double>());
+    beamparams.setHER(7.99638, 0.022, std::vector<double>());
+
+    auto backAndForth = beamparams.getCMSToLab().MatrixMultiplication(beamparams.getLabToCMS());
+    TLorentzVector vec(1, 1, 1, 1);
+    vec.Transform(backAndForth);
+    EXPECT_TRUE(fabs(vec.X() - 1) < 1e-15);
+    EXPECT_TRUE(fabs(vec.Y() - 1) < 1e-15);
+    EXPECT_TRUE(fabs(vec.Z() - 1) < 1e-15);
   }
 
   /** Check if covariance matrix can be set from TMatrixDSym and that the upper

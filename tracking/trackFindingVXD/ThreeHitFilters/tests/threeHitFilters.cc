@@ -14,6 +14,17 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/ThreeHitFilters/Angle3DSimple.h>
 #include <tracking/trackFindingVXD/ThreeHitFilters/Angle3DFull.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/AngleXYSimple.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/AngleXYFull.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/AngleRZFull.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/Pt.h>
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelper.h>
 
 #include <tracking/trackFindingVXD/FilterTools/Shortcuts.h>
 
@@ -79,7 +90,7 @@ namespace VXDTFthreeHitFilterTest {
                        typename Var::variableType fResult,
                        otherTypes ...)
     {
-      B2INFO(" Filter " << filterType.name() << " got result of " << fResult)
+      B2INFO("ResultsObserver: Filter " << filterType.name() << " got result of " << fResult)
       lastResult = fResult;
     }
 
@@ -125,25 +136,32 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
     SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
 
-//  EXPECT_DOUBLE_EQ(31.4821541052938556040832384555411729852856, aFilter.fullAngle3D());       //angle in degrees
-//  EXPECT_DOUBLE_EQ(0.090909090909090909091, aFilter.calcAngle3D());
+
     Filter< Angle3DSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngle3D(Range<double, double>(0.09, 0.091));
     EXPECT_TRUE(filterAngle3D.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0.090909090909090909091, lastResult); // last result is what filterAngle3D had calculated
 
-
     Filter< Angle3DFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngle3Dfull(Range<double, double>(31.48, 31.49));
     EXPECT_TRUE(filterAngle3Dfull.accept(outerSP, centerSP, innerSP));
-    EXPECT_FLOAT_EQ(31.4821541052938556040832384555411729852856, lastResult); // last result is what filterFullAngle3D had calculated
+    EXPECT_FLOAT_EQ(31.4821541052938556040832384555411729852856, lastResult);
 
-//  EXPECT_DOUBLE_EQ(26.5650511770779893515721937204532946712042, aFilter.fullAngleXY());       //angle in degrees
-//  EXPECT_DOUBLE_EQ(.1, aFilter.calcAngleXY());
 
-//  EXPECT_FLOAT_EQ(17.54840061379229806435203716652846677620, aFilter.fullAngleRZ());
-//  EXPECT_FLOAT_EQ(cos(17.54840061379229806435203716652846677620 * M_PI / 180.), aFilter.calcAngleRZ());
+    Filter< AngleXYFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleXYfull(Range<double, double>(26.5, 26.6));
+    EXPECT_TRUE(filterAngleXYfull.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(26.5650511770779893515721937204532946712042, lastResult);
 
-//  EXPECT_DOUBLE_EQ(0.4636476090008061162142562314612144020285, aFilter.fullAngle2D(outer_center, cent_inner));  //angle in radians
-//  EXPECT_DOUBLE_EQ(0.89442719099991586, aFilter.calcAngle2D(outer_center, cent_inner));
+    Filter< AngleXYSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleXY(Range<double, double>(0.099, 0.101));
+    EXPECT_TRUE(filterAngleXY.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(0.1, lastResult);
+
+
+    Filter< AngleRZFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleRZfull(Range<double, double>(17.5, 17.6));
+    EXPECT_TRUE(filterAngleRZfull.accept(outerSP, centerSP, innerSP));
+    EXPECT_NEAR(17.548400613792298064, lastResult, 0.001);
+
+    Filter< AngleRZSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleRZ(Range<double, double>(0.94, 0.96));
+    EXPECT_TRUE(filterAngleRZ.accept(outerSP, centerSP, innerSP));
+    EXPECT_NEAR(cos(17.54840061379229806435203716652846677620 * M_PI / 180.), lastResult, 0.001);
   }
 
 
@@ -151,6 +169,9 @@ namespace VXDTFthreeHitFilterTest {
   /** test sign, helixFit and calcDeltaSlopeRZ filters */
   TEST_F(ThreeHitFilterTest, TestSignAndOtherFilters)
   {
+    SpacePoint outerSP = provideSpacePointDummy(6., 4., 1.);
+    SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
+    SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
 //  TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.), sigma(.01, .01, .01), unrealsigma(2, 2, 2),
 //  outerhighHit(4., 6., 1.);
 //
@@ -158,7 +179,9 @@ namespace VXDTFthreeHitFilterTest {
 //
 //  EXPECT_DOUBLE_EQ(0.30627736916966945608, aFilter.calcDeltaSlopeRZ());
 //
-//  EXPECT_DOUBLE_EQ(0., aFilter.calcHelixFit());
+    Filter< HelixParameterFit<SpacePoint>, Range<double, double>, ResultsObserver > filterHelixFit(Range<double, double>(-0.01, 0.01));
+    EXPECT_TRUE(filterHelixFit.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(0., lastResult);
 //
 //  EXPECT_DOUBLE_EQ(1., aFilter.calcSign(outerHit, centerHit, innerHit, sigma, sigma, sigma));
 //  EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(outerhighHit, centerHit, innerHit, sigma, sigma, sigma));
@@ -200,169 +223,29 @@ namespace VXDTFthreeHitFilterTest {
   /** test cramer method in calcPt */
   TEST_F(ThreeHitFilterTest, TestCalcPt)
   {
-//  // calcCircleCenterV2 had problems when x_1==x_2 or y_1==y_2
-//  TVector3 innerHit(1., 2., 0.), centerHit(3., 2., 1.), outerHit(3., 4., 3.);
-//  TVector3 cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
-//  ThreeHitFilters aFilter = ThreeHitFilters();
-//  TVector3 innerHit2(1., 1., 0.), centerHit2(3., 3., 0.), outerHitEvil(6., 3., 0.);
-//
-//  double pt = 0, ptTrue = 0;
-//
-//  aFilter.resetValues(outerHit, centerHit, innerHit);
-//  ptTrue = aFilter.calcPt(1.414213562373095048801688724209698078570);
-//  aFilter.resetValues(outerHit, centerHit, innerHit);
-//  pt = aFilter.calcPt();
-//  EXPECT_DOUBLE_EQ(ptTrue, pt);
-//
-//  ptTrue = 0.017118925181688543;
-//  aFilter.resetValues(outerHitEvil, centerHit2, innerHit2);
-//  pt = aFilter.calcPt();
-//  EXPECT_DOUBLE_EQ(ptTrue, pt);
-//
-//  aFilter.resetValues(outerHit, outerHit, innerHit);
-//  //B2WARNING("MUST produce errors: 2 hits are the same: " << ptTrue << ", Pt: " << pt );
-//  ptTrue = aFilter.calcPt(1.414213562373095048801688724209698078570);
-//  aFilter.resetValues(outerHit, outerHit, innerHit);
-//  EXPECT_ANY_THROW(aFilter.calcPt());
-  }
+    typedef SelVarHelper<SpacePoint, float> Helper;
 
+    SpacePoint outerSP = provideSpacePointDummy(3., 4., 3.);
+    SpacePoint centerSP = provideSpacePointDummy(3., 2., 1.);
+    SpacePoint innerSP = provideSpacePointDummy(1., 2., 0.);
 
+    SpacePoint outerSPEvil = provideSpacePointDummy(6., 3., 0.);
+    SpacePoint centerSP2 = provideSpacePointDummy(3., 3., 0.);
+    SpacePoint innerSP2 = provideSpacePointDummy(1., 1., 0.);
 
+    double ptTrue = 0;
 
+    ptTrue = Helper::calcPt(1.414213562373095048801688724209698078570);
+    Filter< Pt<SpacePoint>, Range<double, double>, ResultsObserver > filtePt(Range<double, double>(0.005, 0.05));
+    EXPECT_TRUE(filtePt.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(ptTrue, lastResult);
 
+    ptTrue = 0.017118925181688543;
+    EXPECT_TRUE(filtePt.accept(outerSPEvil, centerSP2, innerSP2));
+    EXPECT_FLOAT_EQ(ptTrue, lastResult);
 
-
-
-
-
-
-  /** shows how to attach an observer to a filter of interest */
-  TEST_F(ThreeHitFilterTest, ObservedFilter)
-  {
-//  // Very verbose declaration, see below for convenient shortcuts
-//  Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
-//
-//  Filter< Distance3DSquared<SpacePoint>, Range<double, double>, CountingObserver > filter(unobservedFilter);
-//  SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
-//  SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
-//  SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-//  counter< Distance3DSquared<SpacePoint> >::resetCounter();
-//
-//  EXPECT_TRUE(filter.accept(x1, x2));
-//  EXPECT_FALSE(filter.accept(x1, x3));
-//  EXPECT_EQ(2 , counter< Distance3DSquared<SpacePoint> >::used);
-  }
-
-
-  /** shows how to bypass a filter which itself was not initially planned to be bypassed */
-  TEST_F(ThreeHitFilterTest, BypassableFilter)
-  {
-//  bool bypassControl(false);
-//  // Very verbose declaration, see below for convenient shortcuts
-//  Filter< Distance3DSquared<SpacePoint>, Range<double, double>, CountingObserver > nonBypassableFilter(Range<double, double>(0., 1.));
-//  auto filter = nonBypassableFilter.bypass(bypassControl);
-//  SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
-//  SpacePoint x2 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-//  counter< Distance3DSquared<SpacePoint> >::resetCounter();
-//
-//  EXPECT_FALSE(filter.accept(x1, x2));
-//  EXPECT_EQ(1 , counter< Distance3DSquared<SpacePoint> >::used);
-//
-//  bypassControl = true;
-//  EXPECT_TRUE(filter.accept(x1, x2));
-//  EXPECT_EQ(2 , counter< Distance3DSquared<SpacePoint> >::used);
-//
-  }
-
-
-  /** shows how to write compact code using the new filter design */
-  TEST_F(ThreeHitFilterTest, Shortcuts)
-  {
-    /*
-      SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
-      SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
-      SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-
-      auto filterSup = (Distance3DSquared<SpacePoint>() < 1.) ;
-      EXPECT_TRUE(filterSup.accept(x1, x2));
-      EXPECT_FALSE(filterSup.accept(x1, x3));
-
-      auto filterSup2 = (1 > Distance3DSquared<SpacePoint>()) ;
-      EXPECT_TRUE(filterSup2.accept(x1, x2));
-      EXPECT_FALSE(filterSup2.accept(x1, x3));
-
-      auto filterInf = (Distance3DSquared<SpacePoint>() > 1.) ;
-      EXPECT_TRUE(filterInf.accept(x1, x3));
-      EXPECT_FALSE(filterInf.accept(x1, x2));
-
-      auto filterInf2 = (1 < Distance3DSquared<SpacePoint>()) ;
-      EXPECT_TRUE(filterInf2.accept(x1, x3));
-      EXPECT_FALSE(filterInf2.accept(x1, x2));
-
-      auto filterRange = (0.1 < Distance3DSquared<SpacePoint>() < 1);
-      EXPECT_FALSE(filterRange.accept(x1, x1));
-      EXPECT_TRUE(filterRange.accept(x1, x2));
-      EXPECT_FALSE(filterRange.accept(x1, x3));
-      */
-  }
-
-
-  /** tests compatibility of filters with boolean operations for easy coupling of filters */
-  TEST_F(ThreeHitFilterTest, BooleanOperations)
-  {
-    /*
-      SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
-      SpacePoint x2 = provideSpacePointDummy(1.0f , 0.0f, 0.0f);
-      SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-
-      auto filter = !(Distance3DSquared<SpacePoint>() > 1.);
-      EXPECT_TRUE(filter.accept(x1, x2));
-      EXPECT_TRUE(filter.accept(x1, x1));
-      EXPECT_FALSE(filter.accept(x1, x3));
-
-      auto filter2 =
-      !(Distance3DSquared<SpacePoint>() > 1.) &&
-      !(Distance3DSquared<SpacePoint>() < 1);
-      // i.e. Distance3DSquared == 1
-      EXPECT_TRUE(filter2.accept(x1, x2));
-      EXPECT_FALSE(filter2.accept(x1, x1));
-      EXPECT_FALSE(filter2.accept(x1, x3));
-
-
-      auto filter3 =
-      (Distance3DSquared<SpacePoint>() > 1.) ||
-      (Distance3DSquared<SpacePoint>() < 1);
-      // i.e. Distance3DSquared != 1
-      EXPECT_FALSE(filter3.accept(x1, x2));
-      EXPECT_TRUE(filter3.accept(x1, x1));
-      EXPECT_TRUE(filter3.accept(x1, x3));
-      */
-  }
-
-
-  /** evaluating compatibility of filters with lazy evaluation */
-  TEST_F(ThreeHitFilterTest, ShortCircuitsEvaluation)
-  {
-//  auto filter(
-//    (Distance2DXYSquared<SpacePoint>() < 1).observe(CountingObserver()) &&
-//    (Distance3DSquared<SpacePoint>()   < 1).observe(CountingObserver())
-//  );
-//
-//  SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
-//  SpacePoint x2 = provideSpacePointDummy(1.0f , 0.0f, 0.0f);
-//  SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-//
-//  counter< Distance3DSquared<SpacePoint>   >::used = 0;
-//  counter< Distance2DXYSquared<SpacePoint> >::used = 0;
-//
-//  EXPECT_FALSE(filter.accept(x1, x3));
-//  EXPECT_EQ(1 , counter< Distance2DXYSquared<SpacePoint> >::used);
-//  EXPECT_EQ(0 , counter< Distance3DSquared<SpacePoint> >::used);
-//
-//  EXPECT_TRUE(filter.accept(x1, x1));
-//  EXPECT_EQ(2 , counter< Distance2DXYSquared<SpacePoint> >::used);
-//  EXPECT_EQ(1 , counter< Distance3DSquared<SpacePoint> >::used);
-//
+    //B2WARNING("MUST produce errors: 2 hits are the same: " << ptTrue << ", Pt: " << pt );
+    EXPECT_ANY_THROW(filtePt.accept(outerSP, outerSP, innerSP));
   }
 
 }

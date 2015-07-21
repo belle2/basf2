@@ -17,15 +17,15 @@
 
 namespace Belle2 {
 
-  /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees.
+  /** calculates the angle between the hits/vectors (RZ), returning unit: angle in degrees.
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class Angle3DFull : public SelectionVariable< PointType , float > {
+  class AngleRZFull : public SelectionVariable< PointType , float > {
   public:
 
-    /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
+    /** calculates the angle between the hits/vectors (RZ), returning unit: angle in degrees */
     static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, float> Helper;
@@ -33,10 +33,13 @@ namespace Belle2 {
       B2Vector3<float> outerVector = Helper::doAMinusB(outerHit, centerHit);
       B2Vector3<float> innerVector = Helper::doAMinusB(centerHit, innerHit);
 
-      double result = acos(outerVector.Dot(innerVector) / (outerVector.Mag() * innerVector.Mag())); // 0-pi
-      result = (result * (180. / M_PI));
+      B2Vector3<float> rzVecAB(outerVector.Perp(), outerVector[2], 0.);
+      B2Vector3<float> rzVecBC(innerVector.Perp(), innerVector[2], 0.);
+
+      float result = Helper::fullAngle2D(rzVecAB, rzVecBC); // 0-pi
+      result *= (180. / M_PI);
       return Helper::checkValid(result);
-    }
+    } // return unit: ° (0 - 180°)
   };
 
 }

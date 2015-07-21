@@ -17,26 +17,32 @@
 
 namespace Belle2 {
 
-  /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees.
+  /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none.
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class Angle3DFull : public SelectionVariable< PointType , float > {
+  class HelixParameterFit : public SelectionVariable< PointType , float > {
   public:
 
-    /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
+    /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
     static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, float> Helper;
 
-      B2Vector3<float> outerVector = Helper::doAMinusB(outerHit, centerHit);
-      B2Vector3<float> innerVector = Helper::doAMinusB(centerHit, innerHit);
+      B2Vector3<float> cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
 
-      double result = acos(outerVector.Dot(innerVector) / (outerVector.Mag() * innerVector.Mag())); // 0-pi
-      result = (result * (180. / M_PI));
+      B2Vector3<float> vecOuter2cC(outerHit.X() - cCenter.X(), outerHit.Y() - cCenter.Y(), outerHit.Z() - cCenter.Z());
+      B2Vector3<float> vecCenter2cC(centerHit.X() - cCenter.X(), centerHit.Y() - cCenter.Y(), centerHit.Z() - cCenter.Z());
+      B2Vector3<float> vecInner2cC(innerHit.X() - cCenter.X(), innerHit.Y() - cCenter.Y(), innerHit.Z() - cCenter.Z());
+      double alfaAB = Helper::calcAngle2D(vecOuter2cC, vecCenter2cC);
+      double alfaBC = Helper::calcAngle2D(vecCenter2cC, vecInner2cC);
+
+      // real calculation: ratio is (m_vecij[2] = deltaZ): alfaAB/deltaZab : alfaBC/deltaZbc, the following equation saves two times '/'
+      float result = (alfaAB * (centerHit.Z() - innerHit.Z())) / (alfaBC * (outerHit.Z() - centerHit.Z()));
+
       return Helper::checkValid(result);
-    }
+    } // return unit: none
   };
 
 }

@@ -11,12 +11,9 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariable.h>
-#include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelperFunctions.h>
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelper.h>
+#include <tracking/vectorTools/B2Vector3.h>
 #include <math.h>
-
-
-// in fw:
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -31,15 +28,14 @@ namespace Belle2 {
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use Angle3DFull instead) */
     static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      using namespace SelVarHelper;
+      typedef SelVarHelper<PointType, float> Helper;
 
-      B2Vector3<float> outerVector = doAMinusB<PointType, float>(outerHit, centerHit);
-      B2Vector3<float> innerVector = doAMinusB<PointType, float>(centerHit, innerHit);
+      B2Vector3<float> outerVector = Helper::doAMinusB(outerHit, centerHit);
+      B2Vector3<float> innerVector = Helper::doAMinusB(centerHit, innerHit);
 
       // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag()), but here time-consuming parts have been neglected
       float result = outerVector.Dot(innerVector) / (outerVector.Mag2() * innerVector.Mag2());
-      return
-        (std::isnan(result) || std::isinf(result)) ? 0 : result;
+      return Helper::checkValid(result);
     }
   };
 

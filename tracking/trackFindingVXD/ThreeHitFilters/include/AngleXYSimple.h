@@ -17,15 +17,17 @@
 
 namespace Belle2 {
 
-  /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees.
+  /** calculates the angle between the hits/vectors (XY),
+   * returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead):
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class Angle3DFull : public SelectionVariable< PointType , float > {
+  class AngleXYSimple : public SelectionVariable< PointType , float > {
   public:
 
-    /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
+    /** calculates the angle between the hits/vectors (XY),
+     * returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead) */
     static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, float> Helper;
@@ -33,10 +35,11 @@ namespace Belle2 {
       B2Vector3<float> outerVector = Helper::doAMinusB(outerHit, centerHit);
       B2Vector3<float> innerVector = Helper::doAMinusB(centerHit, innerHit);
 
-      double result = acos(outerVector.Dot(innerVector) / (outerVector.Mag() * innerVector.Mag())); // 0-pi
-      result = (result * (180. / M_PI));
+      float result = (outerVector.X() * innerVector.X() + outerVector.Y() * innerVector.Y()) / (outerVector.Perp2() *
+                     innerVector.Perp2());
+
       return Helper::checkValid(result);
-    }
+    } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead)
   };
 
 }

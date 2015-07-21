@@ -11,6 +11,9 @@
 #ifndef PCMSLABTRANSFORM_H
 #define PCMSLABTRANSFORM_H
 
+#include <framework/dataobjects/BeamParameters.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <TLorentzRotation.h>
 #include <TLorentzVector.h>
 
@@ -29,21 +32,12 @@ namespace Belle2 {
     PCmsLabTransform();
 
     /**
-     * Update method
-     * @param Eher energy of High Energy Ring
-     * @param Eler energy of Low Energy Ring
-     * @param cross_angle beam crossing angle
-     * @param angle_ler angle between inverse direction of low energy beam and z-axis
-     */
-    void update(double Eher, double Eler, double cross_angle, double angle_ler);
-
-    /**
      * Returns Lorentz transformation from CMS to Lab
      * @return const reference to Lorentz rotation matrix
      */
     const TLorentzRotation& rotateCmsToLab() const
     {
-      return m_cms2lab;
+      return getBeamParams().getCMSToLab();
     }
 
     /**
@@ -52,25 +46,23 @@ namespace Belle2 {
      */
     const TLorentzRotation& rotateLabToCms() const
     {
-      return m_lab2cms;
+      return getBeamParams().getLabToCMS();
     }
 
     /**
      * Returns boost vector
-     * @return const reference to Lorentz vector
      */
-    const TLorentzVector& getBoostVector() const
+    TLorentzVector getBoostVector() const
     {
-      return m_boost;
+      return getBeamParams().getHER() + getBeamParams().getLER();
     }
 
     /**
-     * Returns CMS energy of e+e-
-     * @return CMS energy of e+e-
+     * Returns CMS energy of e+e- (aka. invariant mass in any system)
      */
     double getCMSEnergy() const
     {
-      return m_cmsEnergy;
+      return getBeamParams().getMass();
     }
 
     /**
@@ -87,12 +79,10 @@ namespace Belle2 {
      */
     static TLorentzVector cmsToLab(const TLorentzVector& vec);
 
+    const BeamParameters& getBeamParams() const;
+
   private:
-    static bool m_initialized;          /**< true when class initialized */
-    static TLorentzRotation m_cms2lab;  /**< from CMS to Lab */
-    static TLorentzRotation m_lab2cms;  /**< from Lab to CMS */
-    static TLorentzVector m_boost;      /**< boost vector */
-    static double m_cmsEnergy;          /**< CMS energy of e+e- */
+    const StoreObjPtr<BeamParameters> m_beamParams; /**< actually performs calculations. */
   };
 
 } // Belle2 namespace

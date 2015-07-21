@@ -135,9 +135,9 @@ namespace Belle2 {
      * @param cov entries for the covariance matrix
      * @return covariance matrix determined from the given entries
      */
-    void setCovMatrix(Double32_t* member, const std::vector<double>& cov, bool common);
+    static void setCovMatrix(Double32_t* member, const std::vector<double>& cov, bool common);
     /** Set covariance matrix from ROOT Matrix object */
-    void setCovMatrix(Double32_t* member, const TMatrixDSym& cov);
+    static void setCovMatrix(Double32_t* member, const TMatrixDSym& cov);
     /** Obtain covariance matrix from a given float array */
     static TMatrixDSym getCovMatrix(const Double32_t* member);
     /** Covariance matrix of the high energy beam at the IP */
@@ -147,8 +147,7 @@ namespace Belle2 {
     /** Covariance matrix of the vertex position */
     Double32_t m_covVertex[6];
 
-    /** ROOT Dictionary */
-    ClassDef(BeamParameters, 2);
+    ClassDef(BeamParameters, 2); /**< nominal beam and primary vertex parameters (including smearing). */
   };
 
 } //Belle2 namespace

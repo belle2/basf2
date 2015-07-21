@@ -317,17 +317,11 @@ void DedxPIDModule::event()
         const CDCHit* cdcHit = cdcRecoHit->getCDCHit();
 
         // get the poca on the wire and track momentum for this hit
+        // make sure the fitter info exists
         const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo(trackrep);
         if (!fi) {
           B2WARNING("No fitter info, skipping...");
           continue;
-        }
-        const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
-        B2Vector3D fittedPoca = mop.getPos();
-        const TVector3& pocaMom = mop.getMom();
-        if (tp == gftrackPoints.begin() || cdcMom == 0) {
-          cdcMom = pocaMom.Mag();
-          dedxTrack->m_p_cdc = cdcMom;
         }
 
         // get the global wire ID (between 0 and 14336) and the layer info
@@ -380,62 +374,74 @@ void DedxPIDModule::event()
         const DedxPoint bl = DedxPoint(-bottomHalfWidth, -bottomHeight);
         DedxDriftCell c = DedxDriftCell(tl, tr, br, bl);
 
-        // get the doca and entrance angle information.
-        // constructPlane places the coordinate center in the POCA to the
-        // wire.  Using this is the default behavior.  If this should be too
-        // slow, as it has to re-evaluate the POCA
-        //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
+        // make sure the MOP is reasonable (an exception is thrown for bad numerics)
+        try {
+          const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
 
-        // uses the plane determined by the track fit.
-        B2Vector3D pocaOnWire = mop.getPlane()->getO();
+          // use the MOP to determine the DOCA and entrance angle
+          B2Vector3D fittedPoca = mop.getPos();
+          const TVector3& pocaMom = mop.getMom();
+          if (tp == gftrackPoints.begin() || cdcMom == 0) {
+            cdcMom = pocaMom.Mag();
+            dedxTrack->m_p_cdc = cdcMom;
+          }
 
-        // The vector from the wire to the track.
-        B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
+          // get the doca and entrance angle information.
+          // constructPlane places the coordinate center in the POCA to the
+          // wire.  Using this is the default behavior.  If this should be too
+          // slow, as it has to re-evaluate the POCA
+          //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
 
-        // the sign of the doca is defined here to be positive in the +x dir
-        double doca = B2WireDoca.Perp();
-        if (B2WireDoca.X() < 0) doca = -1.0 * doca;
+          // uses the plane determined by the track fit.
+          B2Vector3D pocaOnWire = mop.getPlane()->getO();
 
-        // The opening angle of the track momentum direction
-        const double px = pocaMom.x();
-        const double py = pocaMom.y();
-        const double wx = pocaOnWire.x();
-        const double wy = pocaOnWire.y();
-        const double cross = wx * py - wy * px;
-        const double dot   = wx * px + wy * py;
-        double entAng = atan2(cross, dot);
+          // The vector from the wire to the track.
+          B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
 
-        LinearGlobalADCCountTranslator translator;
-        double adcCount = cdcHit->getADCCount(); // pedestal subtracted?
-        double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
-        int driftT = cdcHit->getTDCCount();
+          // the sign of the doca is defined here to be positive in the +x dir
+          double doca = B2WireDoca.Perp();
+          if (B2WireDoca.X() < 0) doca = -1.0 * doca;
 
-        RealisticTDCCountTranslator realistictdc;
-        double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
-        double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, pocaOnWire.Z(), pocaMom.Phi(),
-                                    pocaMom.Theta());
+          // The opening angle of the track momentum direction
+          const double px = pocaMom.x();
+          const double py = pocaMom.y();
+          const double wx = pocaOnWire.x();
+          const double wy = pocaOnWire.y();
+          const double cross = wx * py - wy * px;
+          const double dot   = wx * px + wy * py;
+          double entAng = atan2(cross, dot);
 
-        // now calculate the path length for this hit
-        double celldx = c.dx(doca, entAng);
-        if (!c.isValid()) continue;
+          LinearGlobalADCCountTranslator translator;
+          double adcCount = cdcHit->getADCCount(); // pedestal subtracted?
+          double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
+          int driftT = cdcHit->getTDCCount();
 
-        layerdE += adcCount;
-        layerdx += celldx;
+          RealisticTDCCountTranslator realistictdc;
+          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
+          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, pocaOnWire.Z(), pocaMom.Phi(),
+                                      pocaMom.Theta());
 
-        // save individual hits
-        double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
-        if (m_enableDebugOutput)
-          dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                            driftDRealistic, driftDRealisticRes);
+          // now calculate the path length for this hit
+          double celldx = c.dx(doca, entAng);
+          if (!c.isValid()) continue;
+
+          layerdE += adcCount;
+          layerdx += celldx;
+
+          // save individual hits
+          double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
+          if (m_enableDebugOutput)
+            dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                              driftDRealistic, driftDRealisticRes);
+        } catch (genfit::Exception) {
+          B2WARNING("Event " << m_eventID << ", Track: " << m_trackID << ": genfit::MeasuredStateOnPlane exception...");
+          continue;
+        }
 
         // check if there are any more hits in this layer
         if (lastHitInCurrentLayer) {
           double totalDistance = layerdx / sin(trackMom.Theta());
           double layerDedx = layerdE / totalDistance;
-          // drop hits with path lengths less than 20% of the cell height
-          //    if (layerdx / cellHeight < 0.2) {
-          //      continue;
-          //    }
 
           // save the information for this layer
           if (layerDedx > 0) {

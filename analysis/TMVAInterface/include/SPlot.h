@@ -37,6 +37,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <TTree.h>
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -55,10 +57,26 @@ namespace Belle2 {
        */
       SPlot(std::string modelFileName, const std::map<std::string, std::vector<float>>& discriminatingVariables);
 
+      /**
+       * Destructor
+       */
+      ~SPlot();
+
+      /**
+       * Returns calculated sPlot weights
+       */
       std::vector<float> getSPlotWeights() const { return splot_weights; }
 
+      /**
+       * Returns calculated CDF values of signal distribution
+       */
       std::vector<float> getCDFWeights() const { return cdf_weights; }
 
+      /**
+       * Create plot of fitted signal and background yields
+       * @param prefix prefix used for the plot filename
+       * @param discriminatingVariable which discriminating variable to use
+       */
       void plot(std::string prefix, std::string discriminatingVariable);
 
 
@@ -76,6 +94,7 @@ namespace Belle2 {
       std::vector<std::string>
       m_modelPlotComponentNames; /**< Name of RooAbsPdf objects that are part of the model and should be plotted additionally in the control plot. */
 
+      TTree* temp_tree_data; /**< Temporary root tree */
 
     };
   }

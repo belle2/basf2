@@ -33,22 +33,29 @@ namespace Belle2 {
       // the range and binning is just as the user set it.
       RooArgSet vars;
       for (auto& variable : discriminatingVariables) {
-        RooRealVar* variableInModel = new RooRealVar(*workspace->var(variable.first.c_str()), variable.first.c_str());
-        vars.add(*variableInModel);
+        vars.add(*workspace->var(variable.first.c_str()), variable.first.c_str());
       }
-      // for each discriminating variable, remember the values, as this information is needed within the sPlot algorithm
 
-      discriminating_values = std::unique_ptr<RooDataSet>(new RooDataSet("discriminating_values", "discriminating_values", vars));
-
-      int numberOfEvents = discriminatingVariables.begin()->second.size();
-      for (int i = 0; i < numberOfEvents; ++i) {
-        RooArgSet row;
-        for (auto& variable : discriminatingVariables) {
-          RooRealVar v(variable.first.c_str(), variable.first.c_str(), variable.second[i]);
-          row.add(v);
-        }
-        discriminating_values->add(row);
+      // We only support one discriminating variable at the moment
+      if (discriminatingVariables.size() != 1) {
+        B2FATAL("SPlot supports only one discriminating variable at the moment, sorry.")
       }
+
+      temp_tree_data = new TTree("temp_data_tree", "beschreibung");
+      std::string leaf_name = discriminatingVariables.begin()->first;
+      auto vec = discriminatingVariables.begin()->second;
+
+      float current_fit_var;
+      temp_tree_data->Branch(leaf_name.c_str(), &current_fit_var, (leaf_name + "/F").c_str());
+
+      for (const auto& x : vec) {
+        current_fit_var = x;
+        temp_tree_data->Fill();
+      }
+      discriminating_values = std::unique_ptr<RooDataSet>(new RooDataSet("discriminating_values", "discriminating_values", temp_tree_data,
+                                                          vars));
+
+      int numberOfEvents = vec.size();
 
       auto yields = new RooArgList("yields");
       for (auto& yield : m_modelYieldsObjectNames) {
@@ -107,6 +114,12 @@ namespace Belle2 {
         cdf_weights[i] = signal_cdf->getVal();// * 0.8 + 0.1;
       }
 
+    }
+
+    SPlot::~SPlot()
+    {
+      discriminating_values.reset();
+      delete temp_tree_data;
     }
 
     void SPlot::plot(std::string prefix, std::string discriminatingVariable)

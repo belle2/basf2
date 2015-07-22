@@ -168,7 +168,7 @@ class Plotter(object):
         @param axis default draw axis which is used
         """
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(20, 20))
+            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
@@ -181,7 +181,7 @@ class Plotter(object):
         self.plots = []
         self.labels = []
         self.xmin, self.xmax = float(0), float(1)
-        self.ymin, self.ymax = float(0), float(0)
+        self.ymin, self.ymax = float(0), float(1)
 
         self.set_plot_options()
         self.set_errorbar_options()
@@ -390,7 +390,7 @@ class Diagonal(Plotter):
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths, yerr=purity_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths/2, yerr=purity_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -413,6 +413,17 @@ class Distribution(Plotter):
     """
     Plots distribution of a quantity
     """
+
+    def __init__(self, figure=None, axis=None):
+        """
+        Creates a new figure and axis if None is given, sets the default plot parameters
+        @param figure default draw figure which is used
+        @param axis default draw axis which is used
+        """
+        super(Distribution, self).__init__(figure, axis)
+        self.xmin = float('inf')
+        self.xmax = float('-inf')
+
     def add(self, data, column, mask=None, weight_column=None):
         """
         Add a new distribution to the plots
@@ -429,7 +440,7 @@ class Distribution(Plotter):
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin, self.ymax = numpy.nanmin([hist.min(), self.ymin]), numpy.nanmax([(hist + hist_error).max(), self.ymax])
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths, yerr=hist_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths/2, yerr=hist_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -467,6 +478,7 @@ class Box(Plotter):
                               # medianprobs=dict(color='blue'),
                               # meanprobs=dict(color='red'),
                               )
+        """
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
         self.axis.text(0.4, 0.9, (r'$  \sigma = {:.2f}$' + '\n' + r'$IQD = {:.2f}$').format(x.std(),
@@ -474,6 +486,7 @@ class Box(Plotter):
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
         self.axis.text(0.7, 0.9, (r'$min = {:.2f}$' + '\n' + r'$max = {:.2f}$').format(x.min(), x.max()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
+        """
         self.plots.append(p)
         self.labels.append(column)
 
@@ -511,7 +524,7 @@ class Difference(Plotter):
         self.ymin = min((difference - difference_error).min(), self.ymin)
         self.ymax = max((difference + difference_error).max(), self.ymax)
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths, yerr=difference_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths/2, yerr=difference_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -574,6 +587,9 @@ class Overtraining(Plotter):
         @param weight_column column in data containing the weights for each event
         """
         distribution = Distribution(self.figure, self.axis)
+        distribution.set_plot_options(self.plot_kwargs)
+        distribution.set_errorbar_options(self.errorbar_kwargs)
+        distribution.set_errorband_options(self.errorband_kwargs)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
         distribution.add(data, column, test_mask & signal_mask, weight_column)
@@ -582,11 +598,17 @@ class Overtraining(Plotter):
         distribution.finish()
 
         difference_signal = Difference(self.figure, self.axis_d1)
+        difference_signal.set_plot_options(self.plot_kwargs)
+        difference_signal.set_errorbar_options(self.errorbar_kwargs)
+        difference_signal.set_errorband_options(self.errorband_kwargs)
         difference_signal.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column)
         self.axis_d1.set_xlim((difference_signal.xmin, difference_signal.xmax))
         self.axis_d1.set_ylim((difference_signal.ymin, difference_signal.ymax))
 
         difference_bckgrd = Difference(self.figure, self.axis_d2)
+        difference_bckgrd.set_plot_options(self.plot_kwargs)
+        difference_bckgrd.set_errorbar_options(self.errorbar_kwargs)
+        difference_bckgrd.set_errorband_options(self.errorband_kwargs)
         difference_bckgrd.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column)
         self.axis_d2.set_xlim((difference_bckgrd.xmin, difference_bckgrd.xmax))
         self.axis_d2.set_ylim((difference_bckgrd.ymin, difference_bckgrd.ymax))
@@ -639,6 +661,9 @@ class VerboseDistribution(Plotter):
         @param weight_column column in data containing the weights for each event
         """
         distribution = Distribution(self.figure, self.axis)
+        distribution.set_plot_options(self.plot_kwargs)
+        distribution.set_errorbar_options(self.errorbar_kwargs)
+        distribution.set_errorband_options(self.errorband_kwargs)
         distribution.add(data, column, mask, weight_column)
         distribution.finish()
         self.plots += distribution.plots
@@ -684,6 +709,9 @@ class Correlation(Plotter):
         """
         percentiles = numpy.percentile(data[cut_column], q=quantiles)
         distribution = Distribution(self.figure, self.axis)
+        distribution.set_plot_options(self.plot_kwargs)
+        distribution.set_errorbar_options(self.errorbar_kwargs)
+        distribution.set_errorband_options(self.errorband_kwargs)
         for p in percentiles:
             distribution.add(data, column, data[cut_column] > p, weight_column)
         if mask is not None:

@@ -23,7 +23,7 @@ namespace Belle2 {
     public:
 
       /** Simple Constructor */
-      StereohitsProcesser(bool debugOutput = false) : m_param_debugOutput(debugOutput) { }
+      explicit StereohitsProcesser(bool debugOutput = false) : m_param_debugOutput(debugOutput) { }
 
       /**
        * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
@@ -56,7 +56,7 @@ namespace Belle2 {
        *
        */
       void addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
-                                              const std::vector<HitType*> doubledRecoHits, const std::vector<HitType*> hitsVector) const;
+                                              const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const;
 
 
       bool m_param_debugOutput; /// Flag to turn on debug output

@@ -64,7 +64,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
 }
 
 void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
-    const std::vector<HitType*> doubledRecoHits, const std::vector<HitType*> hitsVector) const
+    const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const
 {
   foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
   foundStereoHits.end(), [&doubledRecoHits](HitType * recoHit3D) -> bool {

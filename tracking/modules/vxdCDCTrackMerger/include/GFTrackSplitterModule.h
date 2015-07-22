@@ -54,10 +54,10 @@ namespace Belle2 {
     virtual void terminate();
   private:
 
-    std::string m_SiGFTracksColName;
-    std::string m_CDCGFTracksColName;
-    std::string m_GFTracksColName;
-    std::string m_storeTrackCandName;
+    std::string m_SiGFTracksColName; /**< Name of output GFtrack collection from vertex detector*/
+    std::string m_CDCGFTracksColName;  /**< Name of output GFtrack collection from CDC*/
+    std::string m_GFTracksColName; /**< Name of input GFtrack collection*/
+    std::string m_storeTrackCandName; /**< Name of output GFTrackCand collection*/
   };
 }
 #endif

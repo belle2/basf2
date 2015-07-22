@@ -40,13 +40,10 @@ namespace Belle2 {
 
     double isInRestOfEvent(const Particle* particle)
     {
-      // Get related ROE object
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
-      if (!roe) {
-        B2ERROR("Relation between particle and ROE doesn't exist!");
-        return -1.0;
-      }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (not roe.isValid())
+        return 1.0;
 
       // Check for Tracks
       const auto& tracks = roe->getTracks();
@@ -81,26 +78,24 @@ namespace Belle2 {
       return roe->getNTracks();
     }
 
-    /* double nRemainingTracksInRestOfEvent(const Particle* particle)
-     {
-       // Get related ROE object
-       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+    double nRemainingTracksInRestOfEvent(const Particle* particle)
+    {
 
-       if (!roe) {
-         B2ERROR("Relation between particle and ROE doesn't exist!");
-         return -1;
-       }
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (not roe.isValid())
+        return 0.0;
 
-       int roe_tracks = roe->getNTracks();
-       int par_tracks = 0;
-       const auto& daughters = particle->getFinalStateDaughters();
-       for (const auto& daughter : daughters) {
-         int pdg = abs(daughter->getPDGCode());
-         if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
-           par_tracks++;
-       }
-       return roe_tracks - par_tracks;
-     }*/
+
+      int roe_tracks = roe->getNTracks();
+      int par_tracks = 0;
+      const auto& daughters = particle->getFinalStateDaughters();
+      for (const auto& daughter : daughters) {
+        int pdg = abs(daughter->getPDGCode());
+        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
+          par_tracks++;
+      }
+      return roe_tracks - par_tracks;
+    }
 
     double nROEECLClusters(const Particle* particle)
     {
@@ -296,13 +291,15 @@ namespace Belle2 {
     VARIABLE_GROUP("Rest Of Event");
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
-                      "Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.");
+                      "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("nROETracks",  nROETracks,
                       "Returns number of tracks in the related RestOfEvent object.");
 
-    /*REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
-                      "Returns number of tracks in ROE - number of tracks of given particle");*/
+    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
+                      "Returns number of tracks in ROE - number of tracks of given particle"
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("nROEECLClusters", nROEECLClusters,
                       "Returns number of ECL clusters in the related RestOfEvent object.");

@@ -27,9 +27,10 @@ namespace Belle2 {
      */
     double nROETracks(const Particle* particle);
 
-    /*
+    /**
+     * Returns number of tracks in the event minus in the current RestOfEvent object
+     */
     double nRemainingTracksInRestOfEvent(const Particle* particle);
-    */
 
     /**
      * Returns number of ECL clusters in the related RestOfEvent object

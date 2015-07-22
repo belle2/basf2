@@ -359,7 +359,6 @@ namespace {
     float Ptag2 = (p1.Vect() + p2.Vect()).Mag2();
 
     // TESTS
-    EXPECT_FLOAT_EQ(0.0, isInRestOfEvent(part));
     EXPECT_FLOAT_EQ(1.0, nROETracks(part));
     EXPECT_FLOAT_EQ(1.0, nROEECLClusters(part));
     EXPECT_FLOAT_EQ(1.0, nROENeutralECLClusters(part));

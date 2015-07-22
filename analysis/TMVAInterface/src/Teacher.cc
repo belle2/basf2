@@ -348,6 +348,7 @@ namespace Belle2 {
       }
 
       setSPlotClass(2);
+      std::cerr << "Use following weight " << signal_cdf_weight << " " << background_cdf_weight << std::endl;
       train(factoryOption, prepareOption, "", signal_cdf_weight, background_cdf_weight);
 
       // Perform splot training using inverse classifier-output multiplied with splot weights and cdf_weights
@@ -356,7 +357,8 @@ namespace Belle2 {
         B2WARNING("Train more than one method with advanced sPlot technique, the output of the first method is used as sPlot anti-correlation boost!");
       }
 
-      TMVAInterface::ExpertConfig config(m_config.getPrefix(), std::string("."), methodName, 1);
+      // Apply second training
+      TMVAInterface::ExpertConfig config(m_config.getPrefix(), std::string("."), methodName, 2, 0.5);
       auto expert = std::unique_ptr<TMVAInterface::Expert>(new TMVAInterface::Expert(config, true));
 
       // Just to be save, we reset all branch addresses before we access them via getRow!
@@ -365,16 +367,21 @@ namespace Belle2 {
       unsigned int nEvents = splot.getSPlotWeights().size();
       std::vector<float> probability(nEvents);
       for (unsigned int i = 0; i < nEvents; ++i) {
-        // Regularisation: Map output to [0.1, 0.9]
-        probability[i] = expert->analyse(getRow(i)) * 0.8 + 0.1;
+        probability[i] = expert->analyse(getRow(i));
       }
       addVariable("__weight__probability__", probability);
 
       //SAC sPlot anti-correlation training
+      // Michael's Formula?
       //std::string signal_sac_weight = "__weight__ *  __weight__splot__ / __weight__probability__ * __weight__cdf__";
       //std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) / (1 - __weight__probability__) * (1 - __weight__cdf__)";
-      std::string signal_sac_weight = "__weight__ *  __weight__splot__ / __weight__probability__ * __weight__cdf__";
-      std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) / (1 - __weight__probability__) * (1 - __weight__cdf__)";
+      // Naiv ansatz
+      //std::string signal_sac_weight = "__weight__ *  __weight__splot__ * __weight__probability__ / (1 - __weight__probability__)";
+      //std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) * __weight__probability__ / (1 - __weight__probability__)";
+      // Educated guess
+      std::string signal_sac_weight = "__weight__ *  __weight__splot__ * __weight__probability__ * (1 - __weight__probability__) * 4";
+      std::string background_sac_weight =
+        "__weight__ *  (1 - __weight__splot__) * __weight__probability__ * (1 - __weight__probability__) * 4";
 
       if (weight != "") {
         signal_sac_weight += " * (" + weight + ")";
@@ -382,6 +389,7 @@ namespace Belle2 {
       }
 
       setSPlotClass(3);
+      std::cerr << "Use following weight " << signal_sac_weight << " " << background_sac_weight << std::endl;
       train(factoryOption, prepareOption, "", signal_sac_weight, background_sac_weight);
 
 

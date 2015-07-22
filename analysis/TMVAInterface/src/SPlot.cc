@@ -104,7 +104,7 @@ namespace Belle2 {
       for (int i = 0; i < numberOfEvents; i++) {
         v.setVal(vector[i]);
         //REgularisation of cdf values
-        cdf_weights[i] = signal_cdf->getVal() * 0.8 + 0.1;
+        cdf_weights[i] = signal_cdf->getVal();// * 0.8 + 0.1;
       }
 
     }

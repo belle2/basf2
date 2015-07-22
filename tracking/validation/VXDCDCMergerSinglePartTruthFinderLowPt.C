@@ -225,4 +225,5 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   //h3->Write();
   //c1->SaveAs("plots/VXDCDCTrk_5GeV_muons_1000_Theta.jpg");
 
+  output->Close();
 }

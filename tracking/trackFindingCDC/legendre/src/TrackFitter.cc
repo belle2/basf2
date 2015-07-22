@@ -528,8 +528,8 @@ void TrackFitter::fitTrackCandidateFast(TrackCandidate* track,
   std::pair<double, double> ref_point = make_pair(track->getReferencePoint().X(), track->getReferencePoint().Y());
   std::pair<double, double> track_par = std::make_pair(track->getTheta(), track->getR());
 
-  double chi2 = fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, with_drift_time);
-  if (not with_drift_time) chi2 = fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, true);
+  fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, with_drift_time);
+  if (not with_drift_time) fitTrackCandidateFast(track->getTrackHits(), track_par, ref_point, true);
 
   track->setTheta(track_par.first);
   track->setR(track_par.second);

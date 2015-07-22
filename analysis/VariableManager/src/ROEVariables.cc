@@ -285,7 +285,8 @@ namespace Belle2 {
 
       // Add all momentum from neutral ECLClusters
       for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-        ROE4Vector += roeClusters[iEcl]->get4Vector();
+        if (roeClusters[iEcl]->isNeutral())
+          ROE4Vector += roeClusters[iEcl]->get4Vector();
       }
 
       return ROE4Vector;

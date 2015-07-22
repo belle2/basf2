@@ -73,9 +73,9 @@ namespace Belle2 {
   {
     internal_clock::time_point before = internal_clock::now();
     TicTocTimer timer;
-    EXPECT_TRUE(timer.m_start < internal_clock::now());
+    EXPECT_TRUE(timer.m_start <= internal_clock::now()); // using <= instead of < in case some optimization kicks in
     EXPECT_FALSE(timer.m_tocked);
-    EXPECT_TRUE(timer.m_start > before);
+    EXPECT_TRUE(timer.m_start >= before);
   }
 
   void TicTocTimerTest::testTicStartsTiming()
@@ -84,8 +84,8 @@ namespace Belle2 {
     internal_clock::time_point before = internal_clock::now();
     timer.tic();
     EXPECT_FALSE(timer.m_tocked);
-    EXPECT_TRUE(timer.m_start < internal_clock::now());
-    EXPECT_TRUE(timer.m_start > before);
+    EXPECT_TRUE(timer.m_start <= internal_clock::now());
+    EXPECT_TRUE(timer.m_start >= before);
   }
 
   void TicTocTimerTest::testTicResetsTocked()
@@ -103,8 +103,8 @@ namespace Belle2 {
     internal_clock::time_point before = internal_clock::now();
     timer.toc();
     EXPECT_TRUE(timer.m_tocked);
-    EXPECT_TRUE(timer.m_end < internal_clock::now());
-    EXPECT_TRUE(timer.m_end > before);
+    EXPECT_TRUE(timer.m_end <= internal_clock::now());
+    EXPECT_TRUE(timer.m_end >= before);
   }
 
 }

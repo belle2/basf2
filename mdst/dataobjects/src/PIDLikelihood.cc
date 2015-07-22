@@ -38,7 +38,9 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
     return;
   }
   if (logl != logl or logl == INFINITY) {
-    B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is " << logl << " (i.e. +inf or NaN)! Ignoring this value. (" << Const::CDC << "=CDC, " << Const::TOP << "=TOP, " << Const::ARICH << "=ARICH, " << Const::ECL << "=ECL)");
+    B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is " << logl <<
+            " (i.e. +inf or NaN)! Ignoring this value. (" << Const::CDC << "=CDC, " << Const::TOP << "=TOP, " << Const::ARICH << "=ARICH, " <<
+            Const::ECL << "=ECL)");
 
     return;
   }
@@ -89,8 +91,7 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
                                      const double* fractions,
                                      Const::PIDDetectorSet detSet) const
 {
-  const unsigned int n = Const::chargedStableSet.size();
-  double prob[n];
+  double prob[Const::ChargedStable::c_SetSize];
   probability(prob, fractions, detSet);
 
   int k = part.getIndex();
@@ -103,7 +104,7 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
 Const::ChargedStable PIDLikelihood::getMostLikely(const double* fractions,
                                                   Const::PIDDetectorSet detSet) const
 {
-  const unsigned int n = Const::chargedStableSet.size();
+  const unsigned int n = Const::ChargedStable::c_SetSize;
   double prob[n];
   probability(prob, fractions, detSet);
 
@@ -121,7 +122,7 @@ void PIDLikelihood::probability(double probabilities[],
                                 const double* fractions,
                                 Const::PIDDetectorSet detSet) const
 {
-  const unsigned int n = Const::chargedStableSet.size();
+  const unsigned int n = Const::ChargedStable::c_SetSize;
   double frac[n];
   if (!fractions) {
     for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // normalization not needed

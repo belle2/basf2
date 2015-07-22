@@ -62,11 +62,11 @@ namespace Belle2 {
       m_energy = energy; m_eop = eop; m_e9e25 = e9e25; m_nCrystals = ncrystals; m_nClusters = nclusters;
     }
 
-    double energy() const { return m_energy; }
-    double eop() const { return m_eop; }
-    double e9e25() const { return m_e9e25; }
-    int nCrystals() const { return m_nCrystals; }
-    int nClusters() const { return m_nClusters; }
+    double energy() const { return m_energy; } /**< Cluster energy*/
+    double eop() const { return m_eop; } /**< E/p ratio for cluster */
+    double e9e25() const { return m_e9e25; } /**< Ratio of energies of the (central) 3x3 crystal matrix and outermost 5x5 matrix */
+    int nCrystals() const { return m_nCrystals; } /**< Number of crystals per candidate */
+    int nClusters() const { return m_nClusters; } /**< Number of clusters per candidate */
   private:
     float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 

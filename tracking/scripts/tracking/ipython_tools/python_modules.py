@@ -27,29 +27,34 @@ class PrintCollections(basf2.Module):
         import ROOT
         self.total_number_of_events = ROOT.Belle2.Environment.Instance().getNumberOfEvents()
 
+    def store_content(self):
+        registered_store_arrays = Belle2.PyStoreArray.list()
+        registered_store_objects = Belle2.PyStoreObj.list()
+
+        event_store_content_list = []
+
+        for store_array_name in registered_store_arrays:
+            store_array = Belle2.PyStoreArray(store_array_name)
+            event_store_content_list.append([store_array_name, len(store_array)])
+
+        for store_array_name in registered_store_objects:
+            event_store_content_list.append([store_array_name, 0])
+
+        self.store_content_list.append({"number": self.event_number, "store_content": event_store_content_list})
+
     def event(self):
         """
         Write the store array content into a list for later.
         """
         if self.total_number_of_events == 0:
-            return
+            if self.event_number % 1000 == 0:
+                self.store_content()
 
-        current_percentage = 1.0 * self.event_number / self.total_number_of_events
+        else:
+            current_percentage = 1.0 * self.event_number / self.total_number_of_events
 
-        if 100 * current_percentage % 10 == 0:
-            registered_store_arrays = Belle2.PyStoreArray.list()
-            registered_store_objects = Belle2.PyStoreObj.list()
-
-            event_store_content_list = []
-
-            for store_array_name in registered_store_arrays:
-                store_array = Belle2.PyStoreArray(store_array_name)
-                event_store_content_list.append([store_array_name, len(store_array)])
-
-            for store_array_name in registered_store_objects:
-                event_store_content_list.append([store_array_name, 0])
-
-            self.store_content_list.append({"number": self.event_number, "store_content": event_store_content_list})
+            if 100 * current_percentage % 10 == 0:
+                self.store_content()
 
         self.event_number += 1
 

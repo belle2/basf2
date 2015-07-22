@@ -172,50 +172,70 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint outerSP = provideSpacePointDummy(6., 4., 1.);
     SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
     SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
-//  TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHit(6., 4., 1.), sigma(.01, .01, .01), unrealsigma(2, 2, 2),
-//  outerhighHit(4., 6., 1.);
-//
-//  ThreeHitFilters aFilter = ThreeHitFilters(outerHit, centerHit, innerHit);
-//
-//  EXPECT_DOUBLE_EQ(0.30627736916966945608, aFilter.calcDeltaSlopeRZ());
-//
+    SpacePoint outerHighSP = provideSpacePointDummy(4., 6., 1.);
+    B2Vector3<float> sigma(.01, .01, .01), unrealsigma(2, 2, 2);
+
+    typedef SelVarHelper<SpacePoint, float> Helper;
+
+
+    Filter< DeltaSlopeRZ<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSlopeRZ(Range<double, double>(0.3, 0.31));
+    EXPECT_TRUE(filterDeltaSlopeRZ.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(0.30627736916966945608, lastResult);
+
     Filter< HelixParameterFit<SpacePoint>, Range<double, double>, ResultsObserver > filterHelixFit(Range<double, double>(-0.01, 0.01));
     EXPECT_TRUE(filterHelixFit.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0., lastResult);
-//
-//  EXPECT_DOUBLE_EQ(1., aFilter.calcSign(outerHit, centerHit, innerHit, sigma, sigma, sigma));
-//  EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(outerhighHit, centerHit, innerHit, sigma, sigma, sigma));
-//  EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(innerHit, centerHit, outerHit, sigma, sigma, sigma));
-//  EXPECT_DOUBLE_EQ(0., aFilter.calcSign(outerHit, centerHit, innerHit, unrealsigma, unrealsigma,
-//                      unrealsigma)); //for very large sigma, this track is approximately straight.
-//
-//  EXPECT_LT(0., aFilter.calcSign(outerHit, centerHit, innerHit));
-//  EXPECT_GT(0., aFilter.calcSign(outerhighHit, centerHit, innerHit));
-//  EXPECT_GT(0., aFilter.calcSign(innerHit, centerHit, outerHit));
-//  EXPECT_LT(0., aFilter.calcSign(outerHit, centerHit, innerHit));
-//
-//  EXPECT_DOUBLE_EQ(1., aFilter.calcSign(outerHit, centerHit, innerHit));
-//  EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(outerhighHit, centerHit, innerHit));
-//  EXPECT_DOUBLE_EQ(-1., aFilter.calcSign(innerHit, centerHit, outerHit));
+
+    EXPECT_DOUBLE_EQ(1., Helper::calcSign(outerSP, centerSP, innerSP, sigma, sigma, sigma));
+    EXPECT_DOUBLE_EQ(-1., Helper::calcSign(outerHighSP, centerSP, innerSP, sigma, sigma, sigma));
+    EXPECT_DOUBLE_EQ(-1., Helper::calcSign(innerSP, centerSP, outerSP, sigma, sigma, sigma));
+    //for very large sigma, this track is approximately straight:
+    EXPECT_DOUBLE_EQ(0., Helper::calcSign(outerSP, centerSP, innerSP, unrealsigma, unrealsigma, unrealsigma));
+
+    EXPECT_LT(0., Helper::calcSign(outerSP, centerSP, innerSP));
+    EXPECT_GT(0., Helper::calcSign(outerHighSP, centerSP, innerSP));
+    EXPECT_GT(0., Helper::calcSign(innerSP, centerSP, outerSP));
+    EXPECT_LT(0., Helper::calcSign(outerSP, centerSP, innerSP));
+
+    EXPECT_DOUBLE_EQ(1., Helper::calcSign(outerSP, centerSP, innerSP));
+    EXPECT_DOUBLE_EQ(-1., Helper::calcSign(outerHighSP, centerSP, innerSP));
+    EXPECT_DOUBLE_EQ(-1., Helper::calcSign(innerSP, centerSP, outerSP));
   }
 
 
 
-  /** test DeltaSOverZ */
+  /** test DeltaSOverZ, DeltaSlopeZoverS */
   TEST_F(ThreeHitFilterTest, TestDeltaSOverZ)
   {
-//  TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 1.), outerHit(6., 4., 3.);
-//  TVector3 cent_inner = centerHit - innerHit, outer_center = outerHit - centerHit;
-//  ThreeHitFilters aFilter = ThreeHitFilters(outerHit, centerHit, innerHit);
-//
-//  EXPECT_FLOAT_EQ(0.31823963, aFilter.calcDeltaSlopeZOverS());
-//
-//  outerHit.RotateZ(.4);
-//  centerHit.RotateZ(.4);
-//  innerHit.RotateZ(.4);
-//  aFilter.resetValues(outerHit, centerHit, innerHit); //calcDeltaSOverZV2 is invariant under rotations in the r-z plane
-//
-//  EXPECT_FLOAT_EQ(0.31823963, aFilter.calcDeltaSlopeZOverS());
+    lastResult = 0;
+    B2Vector3<float> iVec(1., 1., 0.), cVec(3., 3., 1.), oVec(6., 4., 3.);
+    SpacePoint outerSP = provideSpacePointDummy(oVec.X(), oVec.Y(), oVec.Z());
+    SpacePoint centerSP = provideSpacePointDummy(cVec.X(), cVec.Y(), cVec.Z());
+    SpacePoint innerSP = provideSpacePointDummy(iVec.X(), iVec.Y(), iVec.Z());
+
+    Filter< DeltaSlopeZoverS<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSlopeZOverS(Range<double, double>(0.31,
+        0.32));
+    EXPECT_TRUE(filterDeltaSlopeZOverS.accept(outerSP, centerSP, innerSP));
+    EXPECT_NEAR(0.31823963, lastResult, 0.00001);
+
+    Filter< DeltaSoverZ<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSOverZ(Range<double, double>(-0.39, -0.38));
+    EXPECT_TRUE(filterDeltaSOverZ.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(-0.38471845, lastResult);
+
+
+    //calcDeltaSOverZV2 is invariant under rotations in the r-z plane:
+    oVec.RotateZ(.4);
+    cVec.RotateZ(.4);
+    iVec.RotateZ(.4);
+    SpacePoint outerSP2 = provideSpacePointDummy(oVec.X(), oVec.Y(), oVec.Z());
+    SpacePoint centerSP2 = provideSpacePointDummy(cVec.X(), cVec.Y(), cVec.Z());
+    SpacePoint innerSP2 = provideSpacePointDummy(iVec.X(), iVec.Y(), iVec.Z());
+
+    EXPECT_TRUE(filterDeltaSlopeZOverS.accept(outerSP2, centerSP2, innerSP2));
+    EXPECT_NEAR(0.31823963, lastResult, 0.00001);
+
+    EXPECT_TRUE(filterDeltaSOverZ.accept(outerSP2, centerSP2, innerSP2));
+    EXPECT_FLOAT_EQ(-0.38471845, lastResult);
   }
 
 
@@ -246,6 +266,58 @@ namespace VXDTFthreeHitFilterTest {
 
     //B2WARNING("MUST produce errors: 2 hits are the same: " << ptTrue << ", Pt: " << pt );
     EXPECT_ANY_THROW(filtePt.accept(outerSP, outerSP, innerSP));
+  }
+
+
+
+  /** Test CircleDist2IP. */
+  TEST_F(ThreeHitFilterTest, TestCircleDist2IP)
+  {
+    SpacePoint outerSPEvil = provideSpacePointDummy(6., 3., 0.);
+    SpacePoint outerSPSimple = provideSpacePointDummy(6., 4., 0.);
+    SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
+    SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
+//     TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
+
+//     ThreeHitFilters aFilter = ThreeHitFilters(outerHitSimple, centerHit, innerHit);
+    Filter< CircleDist2IP<SpacePoint>, Range<double, double>, ResultsObserver > filteCircleDist2IP(Range<double, double>(0.44, 0.45));
+    EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
+    EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
+
+//    B2INFO("now comparing values of calcCircleDist2IP using simple outerHit: \n calcPt: " << aFilter.calcCircleDist2IP())
+//    aFilter.resetValues(outerHitSimple,centerHit,innerHit);
+//     EXPECT_FLOAT_EQ(0.44499173338941, aFilter.calcCircleDist2IP());
+
+//     aFilter.resetValues(outerHitEvil, centerHit, innerHit);
+    EXPECT_FALSE(filteCircleDist2IP.accept(outerSPEvil, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
+//    B2INFO("now comparing values of calcCircleDist2IP using evil outerHit: \n calcPt: " << aFilter.calcPt())
+//    aFilter.resetValues(outerHitEvil,centerHit,innerHit);
+//     EXPECT_FLOAT_EQ(0.719806016136754, aFilter.calcCircleDist2IP());
+
+//    B2INFO("now tests with 0.976T (and reset between each step): \n")
+//  typedef SelVarHelper<SpacePoint, float> Helper;
+//  Helper::resetMagneticField(0.976);
+
+    EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
+    EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
+
+//     aFilter.resetMagneticField(0.976);
+//     aFilter.resetValues(outerHitSimple, centerHit, innerHit);
+//    B2INFO("now comparing values of calcCircleDist2IP using simple outerHit: \n calcPt: " << aFilter.calcCircleDist2IP() )
+//    aFilter.resetValues(outerHitSimple,centerHit,innerHit);
+//     EXPECT_FLOAT_EQ(0.44499173338941, aFilter.calcCircleDist2IP());
+
+
+    EXPECT_FALSE(filteCircleDist2IP.accept(outerSPEvil, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
+
+//     aFilter.resetValues(outerHitEvil, centerHit, innerHit);
+//    B2INFO("now comparing values of calcCircleDist2IP using evil outerHit: \n calcPt: " << aFilter.calcPt() )
+//    aFilter.resetValues(outerHitEvil,centerHit,innerHit);
+//     EXPECT_FLOAT_EQ(0.719806016136754, aFilter.calcCircleDist2IP());
+
+//  Helper::resetMagneticField(1.5);
   }
 
 }

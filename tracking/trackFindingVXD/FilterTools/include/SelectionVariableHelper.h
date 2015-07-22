@@ -14,6 +14,7 @@
 
 #include <tracking/vectorTools/B2Vector3.h>
 #include <boost/math/special_functions/sign.hpp>
+#include <framework/core/FrameworkExceptions.h>
 
 
 namespace Belle2 {
@@ -82,6 +83,17 @@ namespace Belle2 {
     { return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z()); }
 
 
+    /** calculates the angle of the slope of the hits in RZ, returnValue = theta = atan(r/z)
+    * WARNING: returns 0 if no valid value could be found! */
+    static DataType calcSlopeRZ(const PointType& outerHit, const PointType& innerHit)
+    {
+      float result = atan(
+                       sqrt(std::pow((outerHit.X() - innerHit.X()), 2)
+                            + std::pow((outerHit.Y() - innerHit.Y()), 2)
+                           ) / (outerHit.Z() - innerHit.Z())
+                     );
+      return checkValid(result);
+    }
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none (incomplete calculation). */
     static DataType calcAngle2D(const PointType& vecA, const PointType& vecB)
     {
@@ -139,7 +151,7 @@ namespace Belle2 {
 
       if (a11 * a22 == a12 * a21) { throw Straight_Line(); }
 
-      DataType s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21); //the determinant is zero iff the three hits are on a line in (x,y).
+      DataType s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21); //the determinant is zero if the three hits are on a line in (x,y).
 
       return B2Vector3<DataType>(c.X() + inX * 0.5 + s * inY, c.Y() + inY * 0.5 - s * inX, 0.);
     }

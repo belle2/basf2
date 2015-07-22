@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariable.h>
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelper.h>
 #include <math.h>
 
 namespace Belle2 {
@@ -23,17 +24,12 @@ namespace Belle2 {
   class SlopeRZ : public SelectionVariable< PointType , float > {
   public:
 
-    /** calculates the distance between the hits in z (1D), returning unit: cm */
+    /** value calculates the slope in R-Z for a given pair of hits. */
     static float value(const PointType& outerHit, const PointType& innerHit)
     {
-      float result = atan(
-                       std::sqrt(
-                         std::pow((outerHit.X() - innerHit.X()), 2)
-                         + std::pow((outerHit.Y() - innerHit.Y()), 2)
-                       ) / (outerHit.Z() - innerHit.Z())
-                     );
-      return
-        (std::isnan(result) || std::isinf(result)) ? 0 : result;
+      typedef SelVarHelper<PointType, float> Helper;
+
+      return Helper::calcSlopeRZ(outerHit, innerHit);
     }
   };
 

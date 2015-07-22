@@ -33,6 +33,28 @@ namespace {
 
   }
 
+  TEST(ConfigTest, ExtraData)
+  {
+    Config config("prefix", "workingDirectory/");
+    config.addExtraData("Test", std::vector<float> {1.0, 2.0, 3.0});
+    EXPECT_TRUE(config.hasExtraData("Test"));
+    EXPECT_FALSE(config.hasExtraData("Missing"));
+    std::vector<float> vector = config.getExtraData("Test");
+    EXPECT_FLOAT_EQ(vector.size(), 3);
+    EXPECT_FLOAT_EQ(vector[0], 1.0f);
+    EXPECT_FLOAT_EQ(vector[1], 2.0f);
+    EXPECT_FLOAT_EQ(vector[2], 3.0f);
+
+    EXPECT_EQ(config.getPrefix(), "prefix");
+    EXPECT_EQ(config.getWorkingDirectory(), "workingDirectory/");
+    EXPECT_EQ(config.getFileName(), "prefix.root");
+    EXPECT_EQ(config.getConfigFileName(1), "prefix_1.config");
+    EXPECT_EQ(config.getTreeName(), "prefix_tree");
+    EXPECT_EQ(config.getVariables().size(), 0);
+    EXPECT_EQ(config.getSpectators().size(), 0);
+
+  }
+
   TEST(ConfigTest, ConfigAddMissingSlashInWorkingDirectory)
   {
     Config config("prefix", "workingDirectory");
@@ -151,6 +173,80 @@ namespace {
     EXPECT_EQ(read.getWeightfile(), "weights/prefix_2_BoostedDecisionTrees.weights.xml");
 
     ExpertConfig read2("prefix", tempDirectory.getTempDir(), "BoostedDecisionTrees2", 2);
+
+    EXPECT_EQ(read2.getPrefix(), "prefix");
+    EXPECT_EQ(read2.getWorkingDirectory(), tempDirectory.getTempDir() + "/");
+    EXPECT_EQ(read2.getFileName(), "prefix.root");
+    EXPECT_EQ(read2.getConfigFileName(2), "prefix_2.config");
+    EXPECT_EQ(read2.getSignalClass(), 2);
+    EXPECT_FLOAT_EQ(read2.getSignalFraction(), 0.6f);
+    EXPECT_EQ(read2.getTreeName(), "prefix_tree");
+    EXPECT_EQ(read2.getMethod(), "BoostedDecisionTrees2");
+    EXPECT_EQ(read2.getWeightfile(), "weights/prefix_2_BoostedDecisionTrees2.weights.xml");
+
+    auto variables = read.getVariablesFromManager();
+    EXPECT_EQ(variables.size(), 2);
+    EXPECT_EQ(variables[0]->name, "p");
+    EXPECT_EQ(variables[1]->name, "pt");
+
+    auto spectators = read.getSpectatorsFromManager();
+    EXPECT_EQ(spectators.size(), 1);
+    EXPECT_EQ(spectators[0]->name, "M");
+
+  }
+
+
+  TEST(ConfigTest, ExpertConfigReadXMLAndTeacherConfigWriteXMLWithExtraData)
+  {
+    TestHelpers::TempDirCreator tempDirectory;
+
+    std::vector<Method> methods{Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100"),
+                                Method("BoostedDecisionTrees2", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100")};
+
+    TeacherConfig write("prefix", tempDirectory.getTempDir(), {"p", "pt"}, {"M"}, methods);
+    write.addExtraData("Test", std::vector<float> {1.0, 2.0, 3.0});
+    write.addExtraData("Test2", std::vector<float> { -1.0, 4.0});
+    write.save(2, 0.6f);
+
+    ExpertConfig read("prefix", tempDirectory.getTempDir(), "BoostedDecisionTrees", 2);
+
+    EXPECT_TRUE(read.hasExtraData("Test"));
+    EXPECT_TRUE(read.hasExtraData("Test2"));
+    EXPECT_FALSE(read.hasExtraData("Missing"));
+    std::vector<float> vector1 = read.getExtraData("Test");
+    EXPECT_FLOAT_EQ(vector1.size(), 3);
+    EXPECT_FLOAT_EQ(vector1[0], 1.0f);
+    EXPECT_FLOAT_EQ(vector1[1], 2.0f);
+    EXPECT_FLOAT_EQ(vector1[2], 3.0f);
+    std::vector<float> vector2 = read.getExtraData("Test2");
+    EXPECT_FLOAT_EQ(vector2.size(), 2);
+    EXPECT_FLOAT_EQ(vector2[0], -1.0f);
+    EXPECT_FLOAT_EQ(vector2[1], 4.0f);
+
+    EXPECT_EQ(read.getPrefix(), "prefix");
+    EXPECT_EQ(read.getWorkingDirectory(), tempDirectory.getTempDir() + "/");
+    EXPECT_EQ(read.getFileName(), "prefix.root");
+    EXPECT_EQ(read.getConfigFileName(2), "prefix_2.config");
+    EXPECT_EQ(read.getSignalClass(), 2);
+    EXPECT_FLOAT_EQ(read.getSignalFraction(), 0.6f);
+    EXPECT_EQ(read.getTreeName(), "prefix_tree");
+    EXPECT_EQ(read.getMethod(), "BoostedDecisionTrees");
+    EXPECT_EQ(read.getWeightfile(), "weights/prefix_2_BoostedDecisionTrees.weights.xml");
+
+    ExpertConfig read2("prefix", tempDirectory.getTempDir(), "BoostedDecisionTrees2", 2);
+
+    EXPECT_TRUE(read2.hasExtraData("Test"));
+    EXPECT_TRUE(read2.hasExtraData("Test2"));
+    EXPECT_FALSE(read2.hasExtraData("Missing"));
+    vector1 = read2.getExtraData("Test");
+    EXPECT_FLOAT_EQ(vector1.size(), 3);
+    EXPECT_FLOAT_EQ(vector1[0], 1.0f);
+    EXPECT_FLOAT_EQ(vector1[1], 2.0f);
+    EXPECT_FLOAT_EQ(vector1[2], 3.0f);
+    vector2 = read2.getExtraData("Test2");
+    EXPECT_FLOAT_EQ(vector2.size(), 2);
+    EXPECT_FLOAT_EQ(vector2[0], -1.0f);
+    EXPECT_FLOAT_EQ(vector2[1], 4.0f);
 
     EXPECT_EQ(read2.getPrefix(), "prefix");
     EXPECT_EQ(read2.getWorkingDirectory(), tempDirectory.getTempDir() + "/");

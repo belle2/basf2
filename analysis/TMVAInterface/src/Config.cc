@@ -23,8 +23,9 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Config::Config(const std::string& prefix, const std::string& workingDirectory) : m_prefix(prefix),
-      m_workingDirectory(workingDirectory)
+    Config::Config(const std::string& prefix, const std::string& workingDirectory,
+                   const std::map<std::string, std::vector<float>>& extraData) : m_prefix(prefix),
+      m_workingDirectory(workingDirectory), m_extraData(extraData)
     {
       if (m_workingDirectory.back() != '/') {
         m_workingDirectory += '/';
@@ -76,11 +77,18 @@ namespace Belle2 {
       return vars;
     }
 
+    void Config::addExtraData(const std::string& key, const std::vector<float>& data)
+    {
+      m_extraData[key] = data;
+    }
+
+
     TeacherConfig::TeacherConfig(const std::string& prefix, const std::string& workingDirectory,
                                  const std::vector<std::string>& variables,
                                  const std::vector<std::string>& spectators,
-                                 const std::vector<Method>& methods) :
-      Config(prefix, workingDirectory), m_methods(methods)
+                                 const std::vector<Method>& methods,
+                                 const std::map<std::string, std::vector<float>>& extraData) :
+      Config(prefix, workingDirectory, extraData), m_methods(methods)
     {
       m_variables = variables;
       m_spectators = spectators;
@@ -91,7 +99,6 @@ namespace Belle2 {
     {
       return m_methods;
     }
-
 
     void TeacherConfig::save(int signalClass, float signalFraction) const
     {
@@ -115,6 +122,15 @@ namespace Belle2 {
         boost::property_tree::ptree node;
         node.put("Name", x);
         pt.add_child("Spectators.Spectator", node);
+      }
+
+      for (auto& x : m_extraData) {
+        boost::property_tree::ptree node;
+        node.put("Name", x.first);
+        node.put("Size", x.second.size());
+        for (unsigned int i = 0; i < x.second.size(); ++i)
+          node.put(std::to_string(i), x.second[i]);
+        pt.add_child("ExtraData.ExtraDatum", node);
       }
 
       // Append the trained methods to the config xml file
@@ -159,6 +175,8 @@ namespace Belle2 {
         if (signal_fraction < 0) {
           m_signal_fraction = getSignalFractionFromXML(pt);
         }
+
+        m_extraData = getExtraDataFromXML(pt);
 
       } else {
         // Legacy mode
@@ -267,6 +285,28 @@ namespace Belle2 {
       }
       return variables;
     }
+
+    std::map<std::string, std::vector<float>> ExpertConfig::getExtraDataFromXML(const boost::property_tree::ptree& pt) const
+    {
+      std::map<std::string, std::vector<float>> extraData;
+      boost::optional< const boost::property_tree::ptree& > child = pt.get_child_optional("ExtraData");
+      if (!child)
+        return extraData;
+
+      for (const auto& f : pt.get_child("ExtraData")) {
+        if (f.first.data() != std::string("ExtraDatum"))
+          continue;
+        unsigned int size = f.second.get<int>("Size");
+        std::vector<float> temp(size, 0);
+        for (unsigned int i = 0; i < size; ++i) {
+          temp[i] = f.second.get<float>(std::to_string(i));
+        }
+        std::string name = f.second.get<std::string>("Name");
+        extraData[name] = temp;
+      }
+      return extraData;
+    }
+
 
     std::vector<std::string> ExpertConfig::getSpectatorsFromXML(const boost::property_tree::ptree& pt) const
     {

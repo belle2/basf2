@@ -185,6 +185,7 @@ namespace Belle2 {
     void Teacher::addVariable(const std::string& branchName, const std::vector<float>& values)
     {
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
+      m_tree->get().SetBranchStatus("*", 1);
 
       std::cout << "Teacher: Set values of branch " << branchName << std::endl;
       int nentries = m_tree->get().GetEntries();
@@ -217,6 +218,7 @@ namespace Belle2 {
         newBranch->Fill();
       }
       newBranch->ResetAddress();
+      m_tree->get().SetBranchStatus("*", 1);
       m_file->Write(branchName.c_str());
 
     }
@@ -286,8 +288,9 @@ namespace Belle2 {
       if (target != "")
         cut = (std::string("abs(") + Variable::makeROOTCompatible(target) + " - " + std::to_string(classID) +
                std::string(") < 1e-2")).c_str();
-
+      m_tree->get().SetBranchStatus("*", 1);
       TTree* tree = m_tree->get().CopyTree(cut);
+      tree->SetBranchStatus("*", 1);
 
       if (tree->GetEntries() == 0) {
         B2WARNING("Tree containing class " << classID << " has no entries!");
@@ -315,6 +318,10 @@ namespace Belle2 {
 
       addVariable("__weight__splot__", splot.getSPlotWeights());
       addVariable("__weight__cdf__", splot.getCDFWeights());
+      addVariable("__weight__pdf__", splot.getPDFWeights());
+
+      m_config.addExtraData("SPlotPriorValues", splot.getProbabilityBinned());
+      m_config.addExtraData("SPlotPriorBinning", splot.getProbabilityBins());
 
       // Perform splot training with __weight__cdf__
       std::string signal_splot_weight = "__weight__ * __weight__splot__";
@@ -326,6 +333,7 @@ namespace Belle2 {
       }
 
       // Perform ordinary splot training
+      m_tree->get().SetBranchStatus("*", 1);
       setSPlotClass(1);
       std::cerr << "Use following weight " << signal_splot_weight << " " << background_splot_weight << std::endl;
       train(factoryOption, prepareOption, "", signal_splot_weight, background_splot_weight);
@@ -347,6 +355,7 @@ namespace Belle2 {
         background_cdf_weight += " * (" + weight + ")";
       }
 
+      m_tree->get().SetBranchStatus("*", 1);
       setSPlotClass(2);
       std::cerr << "Use following weight " << signal_cdf_weight << " " << background_cdf_weight << std::endl;
       train(factoryOption, prepareOption, "", signal_cdf_weight, background_cdf_weight);
@@ -388,6 +397,7 @@ namespace Belle2 {
         background_sac_weight += " * (" + weight + ")";
       }
 
+      m_tree->get().SetBranchStatus("*", 1);
       setSPlotClass(3);
       std::cerr << "Use following weight " << signal_sac_weight << " " << background_sac_weight << std::endl;
       train(factoryOption, prepareOption, "", signal_sac_weight, background_sac_weight);
@@ -422,7 +432,7 @@ namespace Belle2 {
       }
 
       m_config = TeacherConfig(m_config.getPrefix(), m_config.getWorkingDirectory(), cleaned_variables, m_config.getSpectators(),
-                               m_config.getMethods());
+                               m_config.getMethods(), m_config.getExtraData());
       m_variables = m_config.getVariablesFromManager();
 
       std::set<int> classes = getDistinctIntegerValues(target);

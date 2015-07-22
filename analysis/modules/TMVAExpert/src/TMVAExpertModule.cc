@@ -17,7 +17,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
-#include <analysis/VariableManager/Manager.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -30,7 +29,7 @@ namespace Belle2 {
 
   REG_MODULE(TMVAExpert)
 
-  TMVAExpertModule::TMVAExpertModule() : Module()
+  TMVAExpertModule::TMVAExpertModule() : Module(), m_splotPrior_func(nullptr)
   {
     setDescription("Adds an ExtraInfo to the Particle objects in given ParticleLists. The ExtraInfo is calculated by a TMVA method "
                    "and represents the SignalProbability of the Particle with respect to the training. "
@@ -60,6 +59,9 @@ namespace Belle2 {
              "Transform classifier output to a probability using given signalFraction."
              "WARNING: If you want to use this feature you have to set the options createMVAPDFs and NbinsMVAPdf in the method config string provided to TMVATeacher to reasonable values!"
              "The default values of TMVA will result in a unusable classifier output!", true);
+    addParam("sPlotPrior", m_splotPrior,
+             "If set, in addition to the network output the prior calculated from the variable used during the sPlot training is also saved under the name $expertOutputName_$sPlotPrior",
+             std::string(""));
 
   }
 
@@ -79,11 +81,36 @@ namespace Belle2 {
     TMVAInterface::ExpertConfig config(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass, m_signalFraction);
     m_method = std::unique_ptr<TMVAInterface::Expert>(new TMVAInterface::Expert(config, m_transformToProbability));
 
+    if (m_splotPrior != "") {
+      Variable::Manager& manager = Variable::Manager::Instance();
+      m_splotPrior_func = manager.getVariable(m_splotPrior);
+      if (not config.hasExtraData("SPlotPriorBinning"))
+        B2FATAL("Missing sPlotPrior binning in given config file, are you sure this was an sPlot training?");
+      m_splotPrior_binning = config.getExtraData("SPlotPriorBinning");
+      if (not config.hasExtraData("SPlotPriorValues"))
+        B2FATAL("Missing sPlotPrior values in given config file, are you sure this was an sPlot training?");
+      m_splotPrior_values = config.getExtraData("SPlotPriorValues");
+    }
+
   }
 
   void TMVAExpertModule::terminate()
   {
     m_method.reset();
+  }
+
+  float TMVAExpertModule::sPlotPrior(const Particle* p) const
+  {
+    float v = m_splotPrior_func->function(p);
+    if (v < *m_splotPrior_binning.begin() or v >* m_splotPrior_binning.end()) {
+      return 0.0;
+    }
+    for (unsigned int i = 1; i < m_splotPrior_binning.size(); ++i) {
+      if (v > m_splotPrior_binning[i]) {
+        return m_splotPrior_values[i - 1];
+      }
+    }
+    return 0.0;
   }
 
   void TMVAExpertModule::event()
@@ -100,6 +127,16 @@ namespace Belle2 {
         } else {
           particle->addExtraInfo(m_expertOutputName, targetValue);
         }
+        if (m_splotPrior_func != nullptr) {
+          std::string name = m_expertOutputName + std::string("_") + m_splotPrior;
+          float prior = sPlotPrior(particle);
+          if (particle->hasExtraInfo(name)) {
+            B2WARNING("Extra Info with given name is already set! Overwriting old value!")
+            particle->setExtraInfo(name, prior);
+          } else {
+            particle->addExtraInfo(name, prior);
+          }
+        }
       }
     }
     if (m_listNames.empty()) {
@@ -111,6 +148,15 @@ namespace Belle2 {
       } else {
         float targetValue = m_method->analyse(nullptr);
         eventExtraInfo->addExtraInfo(m_expertOutputName, targetValue);
+      }
+      if (m_splotPrior_func != nullptr) {
+        std::string name = m_expertOutputName + std::string("_") + m_splotPrior;
+        if (eventExtraInfo->hasExtraInfo(name)) {
+          B2WARNING("Extra Info with given name is already set! I won't set it again!")
+        } else {
+          float prior = sPlotPrior(nullptr);
+          eventExtraInfo->addExtraInfo(name, prior);
+        }
       }
     }
   }

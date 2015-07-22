@@ -564,6 +564,7 @@ def applyTMVAMethod(
     signalClass=1,
     prefix='TMVA',
     transformToProbability=True,
+    sPlotPrior='',
     workingDirectory='.',
     path=analysis_main,
 ):
@@ -587,6 +588,7 @@ def applyTMVAMethod(
     expert.param('expertOutputName', expertOutputName)
     expert.param('signalFraction', signalFraction)
     expert.param('transformToProbability', transformToProbability)
+    expert.param('sPlotPrior', sPlotPrior)
     expert.param('signalClass', signalClass)
     path.add_module(expert)
 

@@ -73,6 +73,21 @@ namespace Belle2 {
       std::vector<float> getCDFWeights() const { return cdf_weights; }
 
       /**
+       * Returns calculated PDF values of signal distribution
+       */
+      std::vector<float> getPDFWeights() const { return pdf_weights; }
+
+      /**
+       * Returns calculated binned signal probability S/(S+B)
+       */
+      std::vector<float> getProbabilityBinned() const { return probability_binned; }
+
+      /**
+       * Returns bins of the signal probability S/(S+B)
+       */
+      std::vector<float> getProbabilityBins() const { return probability_bins; }
+
+      /**
        * Create plot of fitted signal and background yields
        * @param prefix prefix used for the plot filename
        * @param discriminatingVariable which discriminating variable to use
@@ -87,6 +102,9 @@ namespace Belle2 {
       RooAbsPdf* model;
       std::vector<float> splot_weights;
       std::vector<float> cdf_weights;
+      std::vector<float> pdf_weights;
+      std::vector<float> probability_bins;
+      std::vector<float> probability_binned;
 
       std::string m_modelObjectName; /**< Name of the RooAbsPdf object which represents the model. */
       std::vector<std::string>
@@ -95,6 +113,7 @@ namespace Belle2 {
       m_modelPlotComponentNames; /**< Name of RooAbsPdf objects that are part of the model and should be plotted additionally in the control plot. */
 
       TTree* temp_tree_data; /**< Temporary root tree */
+      TFile* modelFile; /**< Model file */
 
     };
   }

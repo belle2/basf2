@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/TMVAInterface/SPlot.h>
+#include "TH1.h"
 
 namespace Belle2 {
 
@@ -19,10 +20,11 @@ namespace Belle2 {
     {
 
       workspace = std::unique_ptr<RooWorkspace>(new RooWorkspace("SPlotWorkspace"));
-      TFile modelFile(modelFileName.c_str());
+      modelFile = new TFile(modelFileName.c_str(), "UPDATE");
+      modelFile->cd();
 
       // Check if it's derived from RooAbsPdf
-      model = dynamic_cast<RooAbsPdf*>(modelFile.Get(m_modelObjectName.c_str()));
+      model = dynamic_cast<RooAbsPdf*>(modelFile->Get(m_modelObjectName.c_str()));
       if (!model) {
         B2FATAL("SPlot: The object " << m_modelObjectName << " is either not present in the file " << modelFileName <<
                 " or not derived from RooAbsPdf.");
@@ -99,8 +101,10 @@ namespace Belle2 {
         splot_weights[i] = sData->GetSWeight(i, yields->at(0)->GetName());
       }
 
+      pdf_weights.resize(numberOfEvents);
       cdf_weights.resize(numberOfEvents);
       RooAbsPdf* signal_pdf = workspace->pdf("sig");
+      RooAbsPdf* bckgrd_pdf = workspace->pdf("bkg");
       std::string dim = discriminatingVariables.begin()->first;
       RooRealVar v(dim.c_str(), dim.c_str(), 1.8);
       RooArgSet row;
@@ -110,9 +114,23 @@ namespace Belle2 {
       auto vector = discriminatingVariables.begin()->second;
       for (int i = 0; i < numberOfEvents; i++) {
         v.setVal(vector[i]);
-        //REgularisation of cdf values
-        cdf_weights[i] = signal_cdf->getVal();// * 0.8 + 0.1;
+        cdf_weights[i] = signal_cdf->getVal();
+        pdf_weights[i] = signal_pdf->getVal(&row);
       }
+
+      TH1* signal_hist = signal_pdf->createHistogram(dim.c_str(), 100);
+      TH1* bckgrd_hist = bckgrd_pdf->createHistogram(dim.c_str(), 100);
+      bckgrd_hist->Add(signal_hist);
+      signal_hist->Divide(bckgrd_hist);
+
+      unsigned int nbins = signal_hist->GetNbinsX();
+      probability_bins.resize(nbins + 1);
+      probability_binned.resize(nbins);
+      for (unsigned int i = 0; i < signal_hist->GetNbinsX(); ++i) {
+        probability_bins[i] = signal_hist->GetBinLowEdge(i + 1);
+        probability_binned[i] = signal_hist->GetBinContent(i + 1);
+      }
+      probability_bins[nbins] = signal_hist->GetBinLowEdge(nbins + 1);
 
     }
 
@@ -120,6 +138,8 @@ namespace Belle2 {
     {
       discriminating_values.reset();
       delete temp_tree_data;
+      modelFile->Close();
+      delete modelFile;
     }
 
     void SPlot::plot(std::string prefix, std::string discriminatingVariable)

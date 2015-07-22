@@ -33,8 +33,9 @@ namespace Belle2 {
        * @param prefix which used to identify the outputted training files weights/$prefix_$method.class.C,
        *        weights/$prefix_$method.weights.xml as well the config file $prefix.config
        * @param workingDirectory where the config file and weight file directory is stored
+       * @param extraData optional extra data
        */
-      Config(const std::string& prefix, const std::string& workingDirectory);
+      Config(const std::string& prefix, const std::string& workingDirectory, const std::map<std::string, std::vector<float>>& extraData = {});
 
       /**
        * Load feature variables from VariableManager
@@ -55,6 +56,30 @@ namespace Belle2 {
        * Load spectator spectators
        */
       std::vector<std::string> getSpectators() const { return m_spectators; }
+
+      /**
+       * Adds extra data to the config
+       * @param key used to save this data
+       * @param data as std::vector
+       */
+      void addExtraData(const std::string& key, const std::vector<float>& data);
+
+      /**
+       * Checks if key is available in the extra data
+       * @param key of the extra data
+       */
+      bool hasExtraData(const std::string& key) const { return m_extraData.find(key) != m_extraData.end(); }
+
+      /**
+       * Gets the extra data
+       */
+      std::map<std::string, std::vector<float>> getExtraData() const { return m_extraData; }
+
+      /**
+       * Gets the extra data stored under the given key
+       * @param key of the extra data
+       */
+      std::vector<float> getExtraData(const std::string& key) { return m_extraData[key]; }
 
       /**
        * Return working directory
@@ -86,6 +111,7 @@ namespace Belle2 {
       std::string m_workingDirectory; /**< where the config file and weight file directory is stored */
       std::vector<std::string> m_variables; /**< input variables */
       std::vector<std::string> m_spectators; /**< input spectators */
+      std::map<std::string, std::vector<float>> m_extraData; /**< map of additional data */
 
     };
 
@@ -105,16 +131,16 @@ namespace Belle2 {
        * @param variables the names of the feature variables (registered in Variable::Manager), which are used as input for the chosen TMVA methods
        * @param spectators the names of the spectator variables (registered in Variable::Manager), which are saved as additional spectators
        * @param methods vector of Method config objects
+       * @param extraData optional additional data
        */
       TeacherConfig(const std::string& prefix, const std::string& workingDirectory,
                     const std::vector<std::string>& variables, const std::vector<std::string>& spectators,
-                    const std::vector<Method>& methods);
+                    const std::vector<Method>& methods, const std::map<std::string, std::vector<float>>& extraData = {});
 
       /**
        * Return TMVA Methods
        */
       const std::vector<Method>& getMethods() const;
-
 
       /**
        * Save config file for given signal class and fraction
@@ -177,6 +203,11 @@ namespace Belle2 {
        * Return weight file from XML config file
        */
       std::string getMethodPropertyFromXML(const boost::property_tree::ptree& pt, const std::string& property) const;
+
+      /**
+       * Load extraData from config file
+       */
+      std::map<std::string, std::vector<float>> getExtraDataFromXML(const boost::property_tree::ptree& pt) const;
 
       /**
        * Return Signal fraction from XML config file

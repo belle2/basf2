@@ -11,6 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <analysis/TMVAInterface/Expert.h>
+#include <analysis/VariableManager/Manager.h>
 
 #include <memory>
 
@@ -50,11 +51,21 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Calculates the sPlotPrior
+     */
+    float sPlotPrior(const Particle* p) const;
+
+
     std::vector<std::string> m_listNames; /**< input particle list names */
     std::string m_methodName; /**< name of the TMVA method specified in the training by TMVATeacher */
     std::string m_methodPrefix; /**< common prefix for the methods trained by TMVATeacher */
     std::string m_workingDirectory; /**< Working directory in which the expert finds the config file and the weight file directory */
     std::string m_expertOutputName; /**< Name under which the SignalProbability is stored in the ExtraInfo of the Particle object. */
+    std::string m_splotPrior; /**< sPlotPrior variable name */
+    const Variable::Manager::Var* m_splotPrior_func; /**< sPlotPrior function */
+    std::vector<float> m_splotPrior_binning; /**< sPlotPrior binning */
+    std::vector<float> m_splotPrior_values; /**< sPlotPrior values */
     int m_signalClass; /**< Class which is considered signal.  */
     float m_signalFraction; /**< signalFraction to calculate probability, -1 the training signal fraction is used */
     bool m_transformToProbability; /**< Transform classifier output to a porbability using given signal fraction */

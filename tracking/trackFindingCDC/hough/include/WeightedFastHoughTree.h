@@ -30,17 +30,17 @@ namespace Belle2 {
      *  The shared marks allow for interrative extraction of hough peaks such that other areas of the
      *  hough space notice that certain element have already been consumed.
      */
-    template<class T, class Domain, class DomainDivsion>
+    template<class T, class Domain, class DomainDivsion, template <typename> class SharedMarkTemplate = WithSharedMark>
     class WeightedFastHoughTree :
-      public WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion> {
+      public WeightedParititioningDynTree<SharedMarkTemplate<T>, Domain, DomainDivsion> {
 
     private:
       /// Type of the Tree the partitions using markable items the hough space
-      using Super = WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion>;
+      using Super = WeightedParititioningDynTree<SharedMarkTemplate<T>, Domain, DomainDivsion>;
 
     public:
       /// Inheriting the constructor from the base class.
-      using WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion>::WeightedParititioningDynTree;
+      using WeightedParititioningDynTree<SharedMarkTemplate<T>, Domain, DomainDivsion>::WeightedParititioningDynTree;
 
       /// Type of the node in the tree.
       using Node = typename Super::Node;
@@ -56,7 +56,7 @@ namespace Belle2 {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
           Weight weight = HIGHEST_WEIGHT;
-          topNode.insert(WithSharedMark<T>(item, &markOfItem), weight);
+          topNode.insert(SharedMarkTemplate<T>(item, &markOfItem), weight);
         }
       }
 
@@ -66,7 +66,7 @@ namespace Belle2 {
       {
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.
-          auto isMarked = [](const WithSharedMark<T>& item) -> bool {
+          auto isMarked = [](const SharedMarkTemplate<T>& item) -> bool {
             return item.isMarked();
           };
           node->eraseIf(isMarked);
@@ -108,7 +108,7 @@ namespace Belle2 {
           if (node->getLevel() >= maxLevel) {
             const Domain* domain = node;
             found.emplace_back(*domain, std::vector<T>(node->begin(), node->end()));
-            for (WithSharedMark<T>& markableItem : *node) {
+            for (SharedMarkTemplate<T>& markableItem : *node) {
               markableItem.mark();
             }
             return false;
@@ -125,7 +125,7 @@ namespace Belle2 {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
               auto measure =
-              [&childNode, &weightItemInDomain](WithSharedMark<T>& item) -> Weight {
+              [&childNode, &weightItemInDomain](SharedMarkTemplate<T>& item) -> Weight {
                 // Weighting function should not see the mark, but only the item itself.
                 return weightItemInDomain(item, &childNode);
               };

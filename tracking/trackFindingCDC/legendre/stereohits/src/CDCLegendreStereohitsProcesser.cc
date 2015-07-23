@@ -128,8 +128,6 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   }
   /* DEBUG */
 
-  B2INFO(possibleStereoSegments.size());
-
   if (possibleStereoSegments.size() == 0)
     return;
 
@@ -194,8 +192,6 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
 
   if (possibleStereoSegments.size() == 0)
     return;
-
-  B2INFO(possibleStereoSegments.size());
 
   auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Result & a,
   const Result & b) {

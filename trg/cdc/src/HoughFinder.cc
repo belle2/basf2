@@ -1074,6 +1074,21 @@ TRGCDCHoughFinder::doFinding2(std::vector<std::vector<unsigned>> peaks[],
     _plane[0]->merge();
     _plane[1]->merge();
 
+#ifdef TRGCDC_DISPLAY_HOUGH
+    string stg = "2D : Hough : Results of Peak Finding";
+    string inf = "   ";
+    H0->stage(stg);
+    H0->information(inf);
+    H0->clear();
+    H0->area().append(_plane[0]);
+    H0->show();
+    H1->stage(stg);
+    H1->information(inf);
+    H1->clear();
+    H1->area().append(_plane[1]);
+    H1->show();
+#endif
+
     //...Look for peaks which have 5 hits...
 //  vector<vector<unsigned>> peaks[2];
     _peakFinder.peaks7(* _plane[0], _peakMin, peaks[0]);

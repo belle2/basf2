@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen, Guglielmo De Nardo                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -80,16 +80,17 @@ namespace Belle2 {
       void readDSPDB();
 
       /** Shaper-DSP Output  Map */
-      double ShaperDSP(double Ti);
+      //double ShaperDSP(double Ti);
 
       /** Shaper-DSP Output  Map */
-      double ShaperDSP_F(double Ti, float* ss);
+      //double ShaperDSP_F(double Ti, float* ss);
 
       /** read Shaper array */
-      void DspSamplingArray(int* n, double* t, double* dt, double* ft, double* ff);
+      //      double DspSamplingArray(int n, double t, double dt, const double* ft) const;
+      //      void DspSamplingArray(int* n, double* t, double* dt, double* ft, double* ff);
 
       /** Shaper-DSP Output  basic */
-      double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1);
+      //double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1);
 
       /** Shaper-DSP Fitter */
       void shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig,
@@ -130,7 +131,7 @@ namespace Belle2 {
       int m_lq ;
 
       /** array of shape function looking up table      */
-      double m_ft[1250] ;
+      std::vector<double>* m_ft;
 
       // Lookup Table to get aux matrices used in WF fit algorithm
       ECLLookupTable m_funcTable;
@@ -155,8 +156,8 @@ namespace Belle2 {
 
       //input array to fit
       int FitA[31];
-      /** array for calculation of random noise for FitA[31]      */
-      float m_vmat[31][31];
+      /** array for calculation of random (electronics) noise for FitA[31]      */
+      float m_elecNoiseM[31][31];
       //** pow for int
       int myPow(int x, int y);
 

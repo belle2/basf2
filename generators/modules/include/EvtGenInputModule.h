@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Susanne Koblitz                                          *
+ * Contributors: Susanne Koblitz, Torben Ferber                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenInterface.h>
+
+#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -55,9 +57,9 @@ namespace Belle2 {
      * CMS if needed
      * @param minMass minimum mass for the beam particle to be accepted
      * @param maxMass maximum mass for the beam particle to be accepted
-     * @return lorenz vector of the compound beam particle
+     * @return lorentzvector of the compound beam particle
      */
-    TLorentzVector createBeamParticle(double minMass = 0,
+    TLorentzVector createBeamParticle(double minMass = 0.0,
                                       double maxMass = std::numeric_limits<double>::infinity());
 
     MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
@@ -68,17 +70,12 @@ namespace Belle2 {
     std::string m_parentParticle;  /**<  Standard input parent particle. */
     int m_inclusiveType;        /**< Inclusive type 0 : generic, 1 : m_inclusiveParticle inclusive, 2 : m_inclusiveParticle + c.c. inclusive */
     std::string m_inclusiveParticle; /**< inclusive Particle */
-    bool m_boost2LAB;              /**<  Boosted to LAB frame. */
-    double m_EHER;              /**< Energy for HER [GeV]. */
-    double m_ELER;              /**< Energy for LER [GeV]. */
-    double m_HER_Espread;       /**< Energy spread for HER [GeV]. */
-    double m_LER_Espread;       /**< Energy spread for LER [GeV]. */
-    double m_crossing_angle;    /**< Crossing angle between beams */
-    double m_angle;             /**< Angle between LER and z-axis */
-    double m_angleHerToB;       /**< Angle between HER and z-axis */
-    double m_angleLerToB;       /**< Angle between LER and z-axis */
     int m_maxTries; /**< Maximum number of tries for generating the parent particle */
     EvtId m_parentId; /**< EvtGen Id of the parent particle we want to generate */
+    TVector3 m_PrimaryVertex; /**< primary vertex incl. spread */
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
   };
 
 } // end namespace Belle2

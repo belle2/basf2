@@ -52,16 +52,18 @@ namespace Belle2 {
     int setup(const std::string& decayFileName, const std::string& pdlFileName,
               const std::string& parentParticle,
               const std::string& userFileName = std::string(""));
+
     /** Generate a single event */
     int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
-                      int inclusiveType, const std::string& inclusiveParticle);
+                      TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
-    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph);
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex);
+
     /** Copy parameters from EvtParticle to MCParticle */
     void updateGraphParticle(EvtParticle* eParticle,
-                             MCParticleGraph::GraphParticle* gParticle);
+                             MCParticleGraph::GraphParticle* gParticle, TVector3 pPrimaryVertex);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */

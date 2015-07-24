@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Susanne Koblitz, Martin Ritter                           *
+ * Contributors: Susanne Koblitz, Martin Ritter, Torben Ferber            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,7 @@
 #include <generators/modules/EvtGenInputModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/utilities/cm2LabBoost.h>
+// #include <generators/utilities/cm2LabBoost.h>
 #include <framework/core/Environment.h>
 
 #include <framework/datastore/DataStore.h>
@@ -35,7 +35,7 @@ REG_MODULE(EvtGenInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtGenInputModule::EvtGenInputModule() : Module()
+EvtGenInputModule::EvtGenInputModule() : Module(), m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
   //setDescription("EvtGen input");
@@ -51,21 +51,11 @@ EvtGenInputModule::EvtGenInputModule() : Module()
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("InclusiveType", m_inclusiveType, "inclusive decay type (0: generic, 1: inclusive, 2: inclusive (charge conjugate)", 0);
   addParam("InclusiveParticle", m_inclusiveParticle, "Inclusive Particle Name", string(""));
-  addParam("boost2LAB", m_boost2LAB, "Boolean to indicate whether the particles should be boosted to LAB frame", true);
   addParam("maxTries", m_maxTries, "Number of tries to generate a parent "
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
 
-  //initialize member variables
-  m_ELER           = 0.0;
-  m_EHER           = 0.0;
-  m_LER_Espread    = 0.0;
-  m_HER_Espread    = 0.0;
-  m_angleLerToB    = 0.0;
-  m_angleHerToB    = 0.0;
-  m_crossing_angle = 0.0;
-  m_angle          = 0.0;
-
+  m_PrimaryVertex = TVector3(0., 0., 0.);
 
 }
 
@@ -91,79 +81,50 @@ void EvtGenInputModule::initialize()
             << "' does not exist");
   }
 
+  //initial particle for beam parameters
+  m_initial.initialize();
+
   B2DEBUG(10, "finished initialising the EvtGen Input Module.");
 }
 
 
 void EvtGenInputModule::beginRun()
 {
-  // Get beam information and save it to generate events with correct energy
-  // and energy spread
-  GearDir ler("/Detector/SuperKEKB/LER/");
-  GearDir her("/Detector/SuperKEKB/HER/");
-  m_ELER = ler.getEnergy("energy");
-  m_EHER = her.getEnergy("energy");
-  m_LER_Espread = ler.getEnergy("energyError");
-  m_HER_Espread = her.getEnergy("energyError");
-  m_angleLerToB = ler.getAngle("angle") + M_PI;
-  m_angleHerToB = her.getAngle("angle");
-  // These two are redundant but needed for current boost function. Remove once
-  // boost function is fixed to take the same parameters as stored in DB
-  m_crossing_angle = her.getAngle("angle") - ler.getAngle("angle");
-  m_angle = her.getAngle("angle");
+
 }
 
 TLorentzVector EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
 {
-  // so we need to generate the collision 4-momentum including beamspread
-  double eLER(0), eHER(0);
-  TLorentzVector vHER, vLER;
-  // calculate sine/cosine here since they do not change
-  const double cHER = cos(m_angleHerToB);
-  const double sHER = sin(m_angleHerToB);
-  const double cLER = cos(m_angleLerToB);
-  const double sLER = sin(m_angleLerToB);
-  // we try to generate the 4 momentum a maximum amount of times before we give
-  // up
+  // try to generate the 4 momentum a m_maxTries amount of times before we give up
   for (int i = 0; i < m_maxTries; ++i) {
-    // assume gaussian energy spread
-    eHER = gRandom->Gaus(m_EHER, m_HER_Espread);
-    eLER = gRandom->Gaus(m_ELER, m_LER_Espread);
-    // set 4-vectors for the beams
-    vHER.SetXYZM(eHER * sHER, 0., eHER * cHER, Const::electronMass);
-    vLER.SetXYZM(eLER * sLER, 0., eLER * cLER, Const::electronMass);
-    // calculate collision 4-vector
-    TLorentzVector beam = (vHER + vLER);
+    MCInitialParticles& initial = m_initial.generate();
+
     // check if we fullfill the mass window
-    if (beam.M() >= minMass && beam.M() < maxMass) {
-      // if we don't boost2Lab we need to boost to CMS because we are already
-      // in lab. So get the boost and apply it
-      if (!m_boost2LAB) {
-        TLorentzRotation boost = getBoost(eHER, eLER, m_crossing_angle, m_angle).Inverse();
-        beam = boost * beam;
-      }
-      // return the 4-vector
+    if (initial.getMass() >= minMass && initial.getMass() < maxMass) {
+
+      TLorentzVector beam = initial.getLER() + initial.getHER();
+      m_PrimaryVertex = initial.getVertex();
       return beam;
     }
   }
+
   //Apparently the beam energies don't match the particle mass we want to generate
   B2FATAL("Could not create parent particle within mass window: "
-          << "HER=" << m_EHER << "+-" << m_HER_Espread  << " GeV, "
-          << "LER=" << m_ELER << "+-" << m_LER_Espread  << " GeV, "
           << "minMass=" << minMass << " GeV, "
           << "maxMass=" << maxMass << " GeV");
+
   //This will never be reached so return empty to avoid warning
   return TLorentzVector(0, 0, 0, 0);
 }
-
 
 void EvtGenInputModule::event()
 {
   B2DEBUG(10, "Starting event generation");
   TLorentzVector pParentParticle;
+
   //Initialize the beam energy for each event separatly
   if (m_parentId.getId() == 93) {
-    //virtual photon, no mass window we accept everything
+    //virtual photon (vpho), no mass window, we accept everything
     pParentParticle = createBeamParticle();
   } else {
     //everything else needs to be in the mass window
@@ -174,9 +135,10 @@ void EvtGenInputModule::event()
 
   //clear existing MCParticles
   mpg.clear();
+
   //generate event.
-  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle,  m_inclusiveType,
-                                       m_inclusiveParticle);
+  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle, m_PrimaryVertex,
+                                       m_inclusiveType, m_inclusiveParticle);
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }

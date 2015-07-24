@@ -12,7 +12,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <generators/evtgen/EvtGenInterface.h>
-#include <generators/utilities/cm2LabBoost.h>
+// #include <generators/utilities/cm2LabBoost.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenModelRegister.h>
 
@@ -23,7 +23,6 @@
 #include <EvtGenBase/EvtAbsRadCorr.hh>
 #include <evtgen/EvtGenBase/EvtDecayTable.hh>
 #include <EvtGenBase/EvtDecayBase.hh>
-
 
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -77,8 +76,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, int inclusiveType,
-                                   const std::string& inclusiveParticle)
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, TVector3 pPrimaryVertex,
+                                   int inclusiveType, const std::string& inclusiveParticle)
 {
   //Init evtgen
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
@@ -118,7 +117,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 
   //  B2INFO("after generate Decay.");
 
-  int iPart = addParticles2Graph(m_parent, graph);
+  int iPart = addParticles2Graph(m_parent, graph, pPrimaryVertex);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
   //  B2INFO("convert EvtGen particles to MCParticle list using MCParticleGraph");
@@ -132,14 +131,14 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 
 
 
-int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph)
+int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex)
 {
   //Fill top particle in the tree & starting the queue:
   int position = graph.size();
   int nParticles = 0;
   graph.addParticle(); nParticles++;
   MCParticleGraph::GraphParticle* p = &graph[position];
-  updateGraphParticle(top, p);
+  updateGraphParticle(top, p, pPrimaryVertex);
 
   typedef pair<MCParticleGraph::GraphParticle*, EvtParticle*> halfFamily;
   halfFamily currFamily;
@@ -163,7 +162,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
     position = graph.size();
     graph.addParticle(); nParticles++;
     MCParticleGraph::GraphParticle* graphDaughter = &graph[position];
-    updateGraphParticle(currDaughter, graphDaughter);
+    updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex);
     position = graph.size();
 
     //add relation between mother and daughter to graph:
@@ -189,7 +188,8 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 }
 
 
-void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle)
+void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
+                                          TVector3 pPrimaryVertex)
 {
   //updating the GraphParticle information from the EvtParticle information
 
@@ -203,14 +203,17 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
 
   EvtVector4R Evtpos = eParticle->get4Pos();
   //  B2INFO("position EVT: "<<EvtPDL::getStdHep(eParticle->getId())<<"  "<<Evtpos);
-  gParticle->setProductionVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
+
+  TVector3 pVertex(Evtpos.get(1)*Unit::mm, Evtpos.get(2)*Unit::mm, Evtpos.get(3)*Unit::mm);
+  pVertex = pVertex + pPrimaryVertex;
+
+  gParticle->setProductionVertex(pVertex(0), pVertex(1), pVertex(2));
   gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
 
   //add PHOTOS flag
   if (eParticle->getAttribute("FSR")) {
     gParticle->addStatus(MCParticle::c_IsPHOTOSPhoton);
-    //B2DEBUG("FSR!");
   }
 
 }

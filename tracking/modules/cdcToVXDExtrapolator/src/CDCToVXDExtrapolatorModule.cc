@@ -173,9 +173,9 @@ static bool extrapolateToSensor(SVDCluster* scluster, PXDCluster* pcluster, genf
     // extrapolation failed
     return false;
   }
-  B2DEBUG(121, "Old posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
+  B2DEBUG(171, "<-----> SensorExtrap: Old posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
   mop.getPosMomCov(posAtLayer, momAtLayer, covAtLayer);
-  B2DEBUG(121, "New posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
+  B2DEBUG(171, "<-----> SensorExtrap: New posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
   return true;
 }
 
@@ -202,16 +202,16 @@ static bool extrapolateToCylinder(float radius, genfit::Track* track, TVector3& 
     // extrapolation failed
     return false;
   }
-  B2DEBUG(121, "Old posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
+  B2DEBUG(171, "Old posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
   mop.getPosMomCov(posAtLayer, momAtLayer, covAtLayer);
-  B2DEBUG(121, "New posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
+  B2DEBUG(171, "New posAtLayer " << posAtLayer.X() << " " << posAtLayer.Y() << " " << posAtLayer.Z());
   return true;
 }
 
 bool CDCToVXDExtrapolatorModule::extrapolateToPXDLayer(genfit::Track* track, int searchLayer, StoreArray<PXDCluster>& clusters)
 {
   bool found = false;
-  B2DEBUG(50, "**<><> In extrapolateToPXDLayer N clusters:" << clusters.getEntries() << " <><>***");
+  B2DEBUG(95, "<----> PXD extrapolateToLayer " << searchLayer << " <---->")
 
   static float layerRadii[7] = {0, 1.421, 2.179, 3.799, 8.0, 10.4, 13.51};
 
@@ -326,11 +326,14 @@ bool CDCToVXDExtrapolatorModule::extrapolateToPXDLayer(genfit::Track* track, int
     }
   }
 
+  B2DEBUG(95, "<----> End PXD extrapolateToLayer " << searchLayer << " <---->")
+
   return found;
 }
 
 bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int searchLayer, StoreArray<SVDCluster>& clusters)
 {
+  B2DEBUG(95, "<----> extrapolateToLayer " << searchLayer << " <---->")
   TVector3 zaxis(0, 0, 1);
   TVector3 mzaxis(0, 0, -1);
   TVector3 origin(0, 0, 0);
@@ -367,30 +370,29 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       return false;
     }
     try {
-      B2DEBUG(90, "extrapolate to cone on layer " << searchLayer << " svd. On cylinder: " << posAtLayer.X() << " " << posAtLayer.Y() <<
+      B2DEBUG(190, "extrapolate to cone on layer " << searchLayer << " svd. On cylinder: " << posAtLayer.X() << " " << posAtLayer.Y() <<
               " " << posAtLayer.Z() << " " << " ConeV: " << coneVertex.Z() << " openingA: " << openingAngle[searchLayer]);
       mop.extrapolateToCone(openingAngle[searchLayer], coneVertex, mzaxis);
     } catch (...) {
       B2DEBUG(90, ">>>>> Conical extrapolation failed!");
     }
     mop.getPosMomCov(posAtLayer, momAtLayer, covAtLayer);
-    B2DEBUG(90, ">>>>>>>>>>>> extrapolate to cone on layer " << searchLayer << " svd. On cone: " << posAtLayer.X() << " " <<
+    B2DEBUG(190, ">>>>>>>>>>>> extrapolate to cone on layer " << searchLayer << " svd. On cone: " << posAtLayer.X() << " " <<
             posAtLayer.Y() << " " << posAtLayer.Z());
   }
 
-  B2DEBUG(90, "end of extrapolation");
-  B2DEBUG(90, "extrapolated to layer " << searchLayer << " svd");
-  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 90, PACKAGENAME()) == true) {
-    posAtLayer.Print();
-    momAtLayer.Print();
-    covAtLayer.Print();
-  }
+  B2DEBUG(190, "end of extrapolation");
+  B2DEBUG(190, "extrapolated to layer " << searchLayer << " svd");
+  B2DEBUG(101, "------------<> Extrapolation result: Position " << posAtLayer.x() << " " << posAtLayer.y() << " " << posAtLayer.z() <<
+          " Momentum " << momAtLayer.x() << " " << momAtLayer.y() << " " << momAtLayer.z() << " Cov_ii " << covAtLayer[0][0] << " " <<
+          covAtLayer[1][1]
+          << " " << covAtLayer[2][2] << " " << covAtLayer[3][3] << " " << covAtLayer[4][4] << " " << covAtLayer[5][5]);
 
   int bestv = -1, bestu = -1; float bestDist = 1e10;
 
   float zSigma = sqrt(covAtLayer[2][2]);
   double r = sqrt(pow(posAtLayer.X(), 2) + pow(posAtLayer.Y(), 2));
-  B2DEBUG(90, "Track Position r: " << r << " " << posAtLayer.Perp() << " z:" << posAtLayer.Z() <<
+  B2DEBUG(190, "--->Track Position r: " << r << " " << posAtLayer.Perp() << " z:" << posAtLayer.Z() <<
           " zsigma:" << sqrt(covAtLayer[2][2]) << " VXX:" << covAtLayer[0][0] << " sXX:" << sqrt(covAtLayer[0][0]) << " VYY:" <<
           covAtLayer[1][1] << " sYY:" << sqrt(covAtLayer[1][1]) << " VXY:" << covAtLayer[0][1]);
   // try to find a v cluster
@@ -458,13 +460,13 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
     }
   }
   if (bestv >= 0) {
-    B2DEBUG(90, "FOUND A V CLUSTER");
+    B2DEBUG(190, "FOUND A V CLUSTER");
     const auto vCluster = clusters[bestv];
     auto aSensorInfo = VXD::GeoCache::getInstance().getSensorInfo(vCluster->getSensorID());
     TVector3 svdPos = getGlobalPosition(0, vCluster->getPosition(), aSensorInfo);
     TVector3 svdPos1Sig = getGlobalPosition(0, vCluster->getPosition() + vCluster->getPositionSigma(), aSensorInfo);
     TVector3 svdErr = svdPos1Sig - svdPos;
-    B2DEBUG(90, "Sensor Id: " << vCluster->getSensorID() << " PosOnSensor: " << vCluster->getPosition() <<
+    B2DEBUG(190, "Sensor Id: " << vCluster->getSensorID() << " PosOnSensor: " << vCluster->getPosition() <<
             " PosSigma: " << vCluster->getPositionSigma() <<
             " GloablPos: " << svdPos.X() << " " << svdPos.Y() << " " << svdPos.Z() <<
             " GloablPos1Sig: " << svdPos1Sig.X() << " " << svdPos1Sig.Y() << " " << svdPos1Sig.Z() <<
@@ -516,7 +518,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       }
     }
     if (bestu >= 0) {
-      B2DEBUG(90, "FOUND A U CLUSTER");
+      B2DEBUG(190, "FOUND A U CLUSTER");
       const auto uCluster = clusters[bestu];
       auto aSensorInfo = VXD::GeoCache::getInstance().getSensorInfo(uCluster->getSensorID());
       TVector3 svdPos = getGlobalPosition(uCluster->getPosition(), vCluster->getPosition(), aSensorInfo);
@@ -524,7 +526,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
                                               aSensorInfo);
       TVector3 svdErr = svdPos1Sig - svdPos;
       TVector3 trkInlocal = aSensorInfo.pointToLocal(posAtLayer);
-      B2DEBUG(90, "Sensor Id: " << uCluster->getSensorID() << " PosOnSensor: " << uCluster->getPosition() <<
+      B2DEBUG(190, "Sensor Id: " << uCluster->getSensorID() << " PosOnSensor: " << uCluster->getPosition() <<
               " PosSigma: " << uCluster->getPositionSigma() <<
               " GloablPos: " << svdPos.X() << " " << svdPos.Y() << " " << svdPos.Z() <<
               " GloablPos1Sig: " << svdPos1Sig.X() << " " << svdPos1Sig.Y() << " " << svdPos1Sig.Z() <<
@@ -537,25 +539,73 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       TVector3 spErr = spPositionError.GetTVector3();
 
       TVector3 orr = TVector3(0, 0, 0);
-      B2DEBUG(90, "Errors: r:" << r << " dr:" << deltaXYDist(posAtLayer, svdPos) << " d(dr):" <<
+      B2DEBUG(190, "Errors: r:" << r << " dr:" << deltaXYDist(posAtLayer, svdPos) << " d(dr):" <<
               errDeltaXYDist(posAtLayer, covAtLayer) << " d(dr)svd:" << errDeltaXYDistSVD(posAtLayer, covAtLayer, svdErr) <<
               " ddrsvdsp:" << errDeltaXYDistSVD(posAtLayer, covAtLayer, spErr) << " d(dr) from 0:" <<
               errDeltaXYDist(posAtLayer, covAtLayer) << " d(dr) from 0[corr]:" << errDeltaXYDistSVD(posAtLayer, covAtLayer, spErr));
       TVector3 pos2d = getGlobalPosition(uCluster->getPosition(), vCluster->getPosition(), aSensorInfo);
-      TVector3 pos2d1s = getGlobalPosition(uCluster->getPosition() + uCluster->getPositionSigma(),
-                                           vCluster->getPosition() + vCluster->getPositionSigma(), aSensorInfo);
-      TVector3 pos2derr = pos2d1s - pos2d;
-      B2DEBUG(90, "Final CLUSTER Position: ");
-      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 90, PACKAGENAME()) == true) {
-        pos2d.Print();
-        pos2d1s.Print();
-        pos2derr.Print();
-      }
+      B2DEBUG(90, "<-----> Final CLUSTER Position: " << pos2d.x() << " " << pos2d.y() << " " << pos2d.z());
+
       // add hits to track
       auto vHit = new SVDRecoHit(vCluster);
       auto uHit = new SVDRecoHit(uCluster);
       track->insertMeasurement(vHit, 0);
       track->insertMeasurement(uHit, 0);
+
+      // Do a partial refit step
+      bool fitSuccess = false;
+      // following the GenFitter.cc code
+      auto fitter = new genfit::KalmanFitter();
+      fitter->setMinIterations(3);
+      fitter->setMaxIterations(10);
+      fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
+      fitter->setMaxFailedHits(5);
+      try {
+        if (!track->checkConsistency()) {
+          B2DEBUG(50, "Inconsistent track found, attempting to sort!")
+          bool sorted = track->sort();
+          if (!sorted) {
+            B2DEBUG(50, "Track points NOT SORTED! Still inconsistent, I can't be held responsible for assertion failure!");
+          } else {
+            B2DEBUG(50, "Track points SORTED!! Hopefully this works now!");
+          }
+        }
+        fitter->processTrackPartially(track, track->getCardinalRep(), 2, 0);
+
+        genfit::FitStatus* fs = 0;
+        genfit::KalmanFitStatus* kfs = 0;
+        fitSuccess = track->hasFitStatus();
+        if (fitSuccess) {
+          fs = track->getFitStatus();
+          fitSuccess = fitSuccess && fs->isFitted();
+          fitSuccess = fitSuccess && fs->isFitConverged();
+          kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+          fitSuccess = fitSuccess && kfs;
+          double fchi2(0), bchi2(0), fndf(0), bndf(0);
+          // fitter->getChiSquNdf(track, track->getCardinalRep(), bchi2, fchi2, bndf, fndf);
+          B2DEBUG(100, "<------> Track partial fit. isFitted: " << fs->isFitted() << " isFitConverged:" << fs->isFitConverged() <<
+                  " isFitConverged(false):"
+                  << fs->isFitConverged(false) << " nFailedPoints:" << fs->getNFailedPoints() << " numPointsWithMeasurement (from track): " <<
+                  track->getNumPointsWithMeasurement() << " chi2: " << fitter->getChiSqu(track,
+                      track->getCardinalRep()) << " Ndof: " << fitter->getNdf(track,
+                          track->getCardinalRep()) << " redchi2: " << fitter->getRedChiSqu(track, track->getCardinalRep()) <<
+                  " bchi2 " << bchi2 << " bndf " << bndf << " fchi2 " << fchi2 << " fndf " << fndf);
+          trkInfo.pval = fs->getPVal();
+        } else {
+          B2WARNING("Bad Fit in CDCToVXDExtrapolatorModule");
+        }
+      } catch (...) {
+        B2WARNING("Track fitting has failed.");
+      }
+      delete fitter;
+
+      TMatrixDSym cov(6, 6);
+      TVector3 pos, mom;
+      track->getFittedState().getPosMomCov(pos, mom, cov);
+      B2DEBUG(101, "<---------> Track partial fit result: Position " << pos.x() << " " << pos.y() << " " << pos.z() <<
+              " Momentum " << mom.x() << " " << mom.y() << " " << mom.z() << " Cov_ii " << cov[0][0] << " " << cov[1][1]
+              << " " << cov[2][2] << " " << cov[3][3] << " " << cov[4][4] << " " << cov[5][5]);
+
       if (m_saveInfo) {
         // fill hit info
         stHitInfo.z = posAtLayer.Z() - pos2d.Z();
@@ -584,11 +634,12 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
         HitInfo->Fill();
       }
     } else {
-      B2DEBUG(90, "NO MATCHING U CLUSTER FOUND FOR TRACK");
+      B2DEBUG(190, "NO MATCHING U CLUSTER FOUND FOR TRACK");
     }
   } else {
-    B2DEBUG(90, "NO MATCHING V CLUSTER FOUND FOR TRACK");
+    B2DEBUG(190, "NO MATCHING V CLUSTER FOUND FOR TRACK");
   }
+  B2DEBUG(95, "<----> End extrapolateToLayer " << searchLayer << " <---->")
   return (bestv >= 0) && (bestu >= 0);
 }
 
@@ -667,7 +718,7 @@ bool CDCToVXDExtrapolatorModule::refitTrack(genfit::Track* track)
       fitSuccess = fitSuccess && fs->isFitConverged();
       kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
       fitSuccess = fitSuccess && kfs;
-      B2DEBUG(100, "<> Track fit. isFitted: " << fs->isFitted() << " isFitConverged:" << fs->isFitConverged() << " isFitConverged(false):"
+      B2DEBUG(100, "> Track fit. isFitted: " << fs->isFitted() << " isFitConverged:" << fs->isFitConverged() << " isFitConverged(false):"
               << fs->isFitConverged(false) << " nFailedPoints:" << fs->getNFailedPoints() << " numPointsWithMeasurement (from track): " <<
               track->getNumPointsWithMeasurement());
       trkInfo.pval = fs->getPVal();
@@ -773,7 +824,7 @@ void CDCToVXDExtrapolatorModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(80, "----> CDCToVXDExtrapolatorModule::event() : " << eventCounter);
+  B2DEBUG(80, "<--> CDCToVXDExtrapolatorModule::event() : " << eventCounter << " <-->");
   StoreArray<genfit::Track> gfTracks(m_GFTrackColName);
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   int nTracks = gfTracks.getEntries();
@@ -793,7 +844,7 @@ void CDCToVXDExtrapolatorModule::event()
   uint nPxd = 0, nSvd2 = 0, nSvd = 0, nCdc = 0, nUnk = 0;
   nOutTracks = 0; // number of tracks in our output array
   for (genfit::Track& crnt : gfTracks) {
-    B2DEBUG(110, "<----> Processing next track <---->");
+    B2DEBUG(110, "<---> Processing next track " << nOutTracks << " <--->");
 
     if (m_saveInfo) {
       trkInfo.refit = false;
@@ -1008,7 +1059,9 @@ void CDCToVXDExtrapolatorModule::event()
       trkInfo.EndHitIdx = HitInfo->GetEntries();
       TrackInfo->Fill();
     }
+    B2DEBUG(110, "<---> Finished track " << nOutTracks << " <--->");
   }
+  B2DEBUG(110, "<--> Finished Event " << eventCounter << " <-->");
 }
 
 void CDCToVXDExtrapolatorModule::terminate()

@@ -102,9 +102,9 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 main.add_module(eventinfosetter)
 
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
-main.add_module(evtgeninput)
+from beamparameters import add_beamparameters
+add_beamparameters(main, "Y4S")
+main.add_module('EvtGenInput')
 
 from simulation import add_simulation
 from reconstruction import add_reconstruction

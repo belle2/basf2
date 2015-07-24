@@ -18,6 +18,7 @@ from ROOT import Belle2
 
 
 class PyTrigger(Module):
+
     """Returns 1 if current event contains at least one K_L^0, 0 otherwise"""
 
     def initialize(self):
@@ -55,7 +56,6 @@ geometry = register_module('Geometry')
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
 
-evtgeninput.param('boost2LAB', True)
 
 # simulation
 g4sim = register_module('FullSim')
@@ -71,6 +71,8 @@ main.add_module(eventinfoprinter)
 
 main.add_module(gearbox)
 main.add_module(geometry)
+from beamparameters import add_beamparameters
+add_beamparameters(main, "Y4S")
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 

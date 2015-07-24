@@ -20,8 +20,6 @@ gearbox = register_module('Gearbox')
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
 
-evtgeninput.param('boost2LAB', True)
-
 
 # create paths
 main = create_path()
@@ -31,6 +29,8 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 
 main.add_module(gearbox)
+from beamparameters import add_beamparameters
+add_beamparameters(main, "Y4S")
 main.add_module(evtgeninput)
 
 add_simulation(main)

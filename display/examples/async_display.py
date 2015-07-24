@@ -7,21 +7,22 @@
 # once the buffer is full.
 
 from basf2 import *
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from beamparameters import add_beamparameters
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [5000])
 
-eventinfoprinter = register_module('EventInfoPrinter')
-
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
+
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
 
-evtgeninput.param('boost2LAB', True)
 
 # simulation
 g4sim = register_module('FullSim')
@@ -33,29 +34,31 @@ main = create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+main.add_module('ProgressBar')
 
 main.add_module(gearbox)
 main.add_module(geometry)
+
+add_beamparameters(main, "Y4S")
+
 main.add_module(evtgeninput)
-main.add_module(g4sim)
 
-cdcdigi = register_module('CDCDigitizer')
-main.add_module(cdcdigi)
+# detecor simulation
+components = [
+    'MagneticField',
+    'BeamPipe',
+    'PXD',
+    'SVD',
+    'CDC',
+    'TOP',
+    'ARICH',
+    'BKLM',
+    'ECL',
+]
+add_simulation(main, components)
 
-pxd_digi = register_module('PXDDigitizer')
-main.add_module(pxd_digi)
-
-main.add_module(register_module('PXDClusterizer'))
-
-mctrackfinder = register_module('TrackFinderMCTruth')
-mctrackfinder.param('UsePXDHits', True)
-mctrackfinder.param('UseSVDHits', True)
-mctrackfinder.param('UseCDCHits', True)
-main.add_module(mctrackfinder)
-
-genfit = register_module('GenFitter')
-main.add_module(genfit)
+# reconstruction
+add_reconstruction(main, components)
 
 # default parameters
 display = register_module('AsyncDisplay')

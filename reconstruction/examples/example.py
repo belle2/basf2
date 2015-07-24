@@ -15,9 +15,10 @@ eventinfosetter.param('expList', [1])  # and experiment number 1
 main.add_module(eventinfosetter)
 
 # generate BBbar events
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
-main.add_module(evtgeninput)
+from beamparameters import add_beamparameters
+add_beamparameters(main, "Y4S")
+
+main.add_module('EvtGenInput')
 
 # detecor simulation
 components = [
@@ -42,6 +43,7 @@ add_reconstruction(main, components)
 output = register_module('RootOutput')
 output.param('outputFileName', 'output.root')
 main.add_module(output)
+main.add_module('ProgressBar')
 
 process(main)
 

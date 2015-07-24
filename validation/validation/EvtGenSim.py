@@ -12,6 +12,7 @@
 
 from basf2 import *
 from simulation import add_simulation
+from beamparameters import add_beamparameters
 import glob
 
 set_random_seed(12345)
@@ -25,9 +26,12 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("smearVertex", False)
+
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # detector simulation

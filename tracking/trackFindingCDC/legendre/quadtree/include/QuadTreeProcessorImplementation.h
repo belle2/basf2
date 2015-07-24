@@ -130,18 +130,18 @@ namespace Belle2 {
       {
         float dist[2][2];
 
+        const float& radius = hit->getRecoPos2D().norm();
+        const float& reconstructedZ = hit->getRecoZ();
+
         float inverseSlopeMin = node->getXMin();
         float inverseSlopeMax = node->getXMax();
         float zMin = node->getYMin();
         float zMax = node->getYMax();
 
-        float inverseSlopeForMinimum = 1 / hit->calculateZSlopeWithZ0(zMin);
-        float inverseSlopeForMaximum = 1 / hit->calculateZSlopeWithZ0(zMax);
-
-        dist[0][0] = inverseSlopeMin - inverseSlopeForMinimum;
-        dist[0][1] = inverseSlopeMin - inverseSlopeForMaximum;
-        dist[1][0] = inverseSlopeMax - inverseSlopeForMinimum;
-        dist[1][1] = inverseSlopeMax - inverseSlopeForMaximum;
+        dist[0][0] = radius * inverseSlopeMin - reconstructedZ + zMin;
+        dist[0][1] = radius * inverseSlopeMin - reconstructedZ + zMax;
+        dist[1][0] = radius * inverseSlopeMax - reconstructedZ + zMin;
+        dist[1][1] = radius * inverseSlopeMax - reconstructedZ + zMax;
 
         return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
       }

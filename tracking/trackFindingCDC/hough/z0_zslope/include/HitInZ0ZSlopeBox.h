@@ -31,17 +31,20 @@ namespace Belle2 {
         const float& lowerZ0 = z0ZSlopeBox->getLowerZ0();
         const float& upperZ0 = z0ZSlopeBox->getUpperZ0();
 
-        const float& inverseSlopeForMinimum = 1 / recoHit->calculateZSlopeWithZ0(lowerZ0);
-        const float& inverseSlopeForMaximum = 1 / recoHit->calculateZSlopeWithZ0(upperZ0);
+        /*const float& inverseSlopeForMinimum = 1 / recoHit->calculateZSlopeWithZ0(lowerZ0);
+        const float& inverseSlopeForMaximum = 1 / recoHit->calculateZSlopeWithZ0(upperZ0);*/
 
-        const float& lowerInverseZSlope = z0ZSlopeBox->getLowerZSlope();
-        const float& upperInverseZSlope = z0ZSlopeBox->getUpperZSlope();
+        const float& radius = recoHit->getRecoPos2D().norm();
+        const float& reconstructedZ = recoHit->getRecoZ();
+
+        const float& lowerZSlope = z0ZSlopeBox->getLowerZSlope();
+        const float& upperZSlope = z0ZSlopeBox->getUpperZSlope();
 
         float dist[2][2];
-        dist[0][0] = lowerInverseZSlope - inverseSlopeForMinimum;
-        dist[0][1] = lowerInverseZSlope - inverseSlopeForMaximum;
-        dist[1][0] = upperInverseZSlope - inverseSlopeForMinimum;
-        dist[1][1] = upperInverseZSlope - inverseSlopeForMaximum;
+        dist[0][0] = radius * lowerZSlope - reconstructedZ + lowerZ0;
+        dist[0][1] = radius * lowerZSlope - reconstructedZ + upperZ0;
+        dist[1][0] = radius * upperZSlope - reconstructedZ + lowerZ0;
+        dist[1][1] = radius * upperZSlope - reconstructedZ + upperZ0;
 
         if (not SameSignChecker::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
           return 1.0;

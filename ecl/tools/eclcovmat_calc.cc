@@ -8,8 +8,10 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
+#include <vector>
 #include "TCL1.h"
-
+#include <cassert>
 
 using namespace std;
 
@@ -17,30 +19,25 @@ using namespace std;
 void sim(double* ss, int* N, double* aa, double* sb)
 {
   int i, k, j;
-  int n, n1, n2;
+  int n, n2;
+  vector<double> svec(*N, 0), rvec(*N, 0);
 
-  double s[80000];
-  double b[80000];
-  double r[80000];
-  memset(s, 0, sizeof(s));
-  memset(b, 0, sizeof(b));
-  memset(r, 0, sizeof(r));
+  double* s = & svec[0];
+  double* r = & rvec[0];
+
   double dbs;
 
   n = *N;
-  n1 = (n * (n + 1)) / 2;
   n2 = n * n;
-
 
   for (i = 0; i < n2; i++) {
     *(aa + i) = *(ss + i);
-
   }
 
   TCL::trpck(aa, s, *N);
   TCL::trsinv(s, r, *N);
-
   TCL::trupck(r, aa, *N);
+
   *sb = 0.;
   for (j = 0; j < n; j++) {
     for (i = 0; i < n; i++) {
@@ -50,24 +47,13 @@ void sim(double* ss, int* N, double* aa, double* sb)
       }
       if (!(i == j) && fabs(dbs) > *sb) {*sb = fabs(dbs);}
       if (i == j && fabs(dbs - 1.) > *sb) {*sb = fabs(1. - dbs);}
-
-
     }
-
   }   // for j
 
   for (j = 0; j < n2; j++) {
-
-
     *(ss + j) = *(aa + j);
   }
-
-
-
 }
-
-
-
 
 class DoubleArray3D {
 public:
@@ -111,87 +97,24 @@ private:
 
 
 
-void matrix_cal(int cortyp)
+void matrix_cal(int cortyp, const char* inputRootFilename,
+                const char* corrDirSuffix, const char* cutFilename)
 {
+
   TChain fChain("m_tree");
-  char treeroot[256];
-
-  FILE* BMcoIN;
-  Char_t BMin[256];
-
-  FILE* cutIN;
-  Char_t cutin[256];
-
-  FILE* McoIN;
-  Char_t Min[256];
-
   Int_t poq;
 
-  double xx[16][16];
+  cout << "file for calibration:" << inputRootFilename << endl;
+  fChain.Add(inputRootFilename);
 
-  sprintf(BMin, "/gpfs/home/belle/avbobrov/belle2/j15/ecl/examples/rootfile.txt");
-
-  if ((BMcoIN = fopen(BMin, "r")) == NULL) {
-    printf(" file %s is absent \n", BMin);
-    exit(1);
-  }
-
-  while (!feof(BMcoIN)) {
-    fscanf(BMcoIN, "%s", &treeroot);
-
-  }
-  fclose(BMcoIN);
-
-
-
-
-//        sprintf(treeroot,"/gpfs/home/belle/avbobrov/spool/beaux2/m15/GammaAnalysis_usual005.root");
-
-  std::cout << "file for calibration:" << treeroot << std::endl;
-
-  fChain.Add(treeroot);
-
-
-  Double_t        energy;
-  Double_t        theta;
-  Double_t        phi;
   Int_t           nhits;
-  Int_t           cellID[8736];   //[nhits]
   Int_t           hitA[8736][31];   //[nhits]
-  Double_t        hitT[8736];   //[nhits]
-  Double_t        digiE[8736];   //[nhits]
-  Int_t           digiT[8736];   //[nhits]
-  Double_t        deltaT[8736];   //[nhits]
-  Int_t           necl;
-  Int_t           cID[493];   //[necl]
-  Float_t         Edep[493];   //[necl]
-  Float_t         TimeAve[493];   //[necl]
 
-  // List of branches
-  TBranch*        b_energy;   //!
-  TBranch*        b_theta;   //!
-  TBranch*        b_phi;   //!
-  TBranch*        b_nhits;   //!
-  TBranch*        b_cellID;   //!
-  TBranch*        b_hitA;   //!
-  TBranch*        b_hitT;   //!
-  TBranch*        b_digiE;   //!
-  TBranch*        b_digiT;   //!
-  TBranch*        b_deltaT;   //!
-  TBranch*        b_necl;   //!
-  TBranch*        b_cID;   //!
-  TBranch*        b_Edep;   //!
-  TBranch*        b_TimeAve;   //!
+  TBranch*        b_nhits;
+  TBranch*        b_hitA;
 
-  fChain.SetBranchAddress("energy", &energy, &b_energy);
-  fChain.SetBranchAddress("theta", &theta, &b_theta);
-  fChain.SetBranchAddress("phi", &phi, &b_phi);
   fChain.SetBranchAddress("nhits", &nhits, &b_nhits);
-  fChain.SetBranchAddress("cellID", cellID, &b_cellID);
   fChain.SetBranchAddress("hitA", hitA, &b_hitA);
-  fChain.SetBranchAddress("hitT", hitT, &b_hitT);
-
-
 
   double dec;
 
@@ -247,9 +170,6 @@ void matrix_cal(int cortyp)
 
   ifstream ctoecldatafile("CIdToEclData.txt");
 
-
-
-
   int cid, group;
   bool readerr = false;
   vector<int> grmap[252];
@@ -266,28 +186,17 @@ void matrix_cal(int cortyp)
     DS[cid] = group;
   }
 
-
   int ia, ib;
 
   int max = 8736;
   int j;
   int trun;
 
-
-
   double Y[16];
-
-
-
 
   // red mean and rms for channels
 // sprintf(cutin,"/home/belle/avbobrov/ecl/covmat/chdatu005.txt");
-
-  sprintf(cutin, "/home/belle/avbobrov/ecl/covmat/chdatxx.txt");
-
-  if ((cutIN = fopen(cutin, "r")) == NULL) {
-    std::cout << "file" << cutIN << " not found" << std::endl;
-  }
+  ifstream cutFile(cutFilename);
 
   int jk;
   double mn;
@@ -296,26 +205,15 @@ void matrix_cal(int cortyp)
   double er;
   double ch2;
 
-  while (!feof(cutIN)) {
-
-    fscanf(cutIN, "%d %lf %lf  %lf %lf %lf ", &jk, &mn, &rs, &el, &er, &ch2);
+  while (true) {
+    cutFile >> jk >> mn >> rs >> el >> er >> ch2;
+    if (cutFile.eof()) break;
     Mean[jk] = mn;
     rms[jk] = rs;
     sr[jk] = er;
     sl[jk] = el;
-
-//printf("%d %f %f %f %f %f \n",jk,mn,rs,el,er,ch2);
-
-//Mean[jk]=3000;
-//rms[jk]=10;
-
-
   }
-
-
-
-
-
+  cutFile.close();
 
   for (icn = 0; icn < mapmax; icn++) {
     inmt[icn] = 0.;
@@ -332,19 +230,13 @@ void matrix_cal(int cortyp)
   }
 
 
-
-
   Int_t nevent = fChain.GetEntries();
   std::cout << "! nevent=" << nevent << std::endl;
 
-//               for (Int_t i=0;i<nevent;i++) {
-  for (Int_t i = 0; i < 250; i++) {
+  for (Int_t i = 0; i < nevent; i++) {
     fChain.GetEntry(i);
-
-    if (i % 1000 == 0) {std::cout << " nevent=" << i << std::endl;}
-
+    if (i % 1000 == 0) { cout << " nevent=" << i << endl; }
     for (icn = 0; icn < max; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
-
       index = 1;
       for (id = 0; id < 16; id++) {
         Y[it] = 0.;
@@ -355,20 +247,13 @@ void matrix_cal(int cortyp)
         if (j < 16) {
           A0 = A0 + (double)hitA[icn][j] / 16.;
           if ((double)hitA[icn][j] - Mean[icn] < -Nsigcut * sl[icn]) {index = 0;}
-
           if ((double)hitA[icn][j] - Mean[icn] > Nsigcut * sr[icn]) {index = 0;}
-
-
         } else {
           if ((double)hitA[icn][j] - Mean[icn] > Nsigcut * sr[icn] || (double)hitA[icn][j] - Mean[icn] < -Nsigcut * sl[icn]) {index = 0;}
-
         }
-
       }  // points cicle for selection events
 
-
       if (index == 1) {
-
         inmt[DS[icn]] = inmt[DS[icn]] + 1.;
         A0 = 0.;
 
@@ -400,17 +285,10 @@ void matrix_cal(int cortyp)
             WW[DS[icn]][it][id] = WW[DS[icn]][it][id] + Y[it] * Y[id];
           }
         }
-        //        printf(" \n");
-
-
-
 
       }  // index
 
-
     }  //channels cilce
-
-
 
   } // events cicle
 
@@ -428,9 +306,15 @@ void matrix_cal(int cortyp)
 
 
     if (0 == 0) { // conventional comment
-      if (icn % 10 == 0) {printf("icn=%d inmt=%lf \n ", icn, inmt[icn]);}
+      if (icn % 10 == 0) {
+        cout << "icn= " << icn << " imnt= " << inmt[icn] << endl;
+        // printf("icn=%d inmt=%lf \n ", icn, inmt[icn]);
+      }
 
-      if (inmt[icn] == 0) {printf("bad icn=%d\n", icn);}
+      if (inmt[icn] == 0) {
+        cout << "bad icn= " << icn << endl;
+        // printf("bad icn=%d\n", icn);
+      }
 
       // WRITE DATA INTO ARRAY
       for (ia = 0; ia < 16; ia++) {
@@ -474,111 +358,100 @@ void matrix_cal(int cortyp)
           if (ia != ib && fabs(FF[ia][ib]) > dt[icn]) {dt[icn] = fabs(FF[ia][ib]);}
         }
       }
-      if (dt[icn] < 1.e-33 || dt[icn] > 1.e-9) {         printf("icn=%d inmt=%lf cut=%lf delta= %e \n  ", icn, inmt[icn], dt[icn]);      }
+      if (dt[icn] < 1.e-33 || dt[icn] > 1.e-9) {
+        cout << "icn=" << icn <<  " inmt=" << inmt[icn] << " cut=??" << "delta=" << dt[icn] << endl;
+        //  printf("icn=%d inmt=%lf cut=%lf delta= %e \n  ", icn, inmt[icn], dt[icn]);
+      }
 
+      // can be improved....
       if (0 == 1) { //convetrinal commnet
-        printf("\n");
+        cout << endl;
 
         for (ia = 0; ia < 16; ia++) {
-          printf("\n");
+          cout << endl;
           for (ib = 0; ib < 16; ib++) {
-            printf("%.2e ", FF[ia][ib]);
+            cout << setprecision(2) << FF[ia][ib] << endl;
+            // printf("%.2e ", FF[ia][ib]);
           }
         }
 
 
       }  //conventinal comment
 
-    }
+    } // largest conventional comment, but what is this for???
 
     // WRITE INVERS MATRICES
 
-
-
     if (0 == 0) { // conventional comment
-      sprintf(Min, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/mcor%d_L.dat", cortyp, icn);
 
-      McoIN = fopen(Min, "w");
+      string mcorFilename(corrDirSuffix);
+      mcorFilename += to_string(cortyp) + "/mcor" + to_string(icn) + "_L.dat";
+      // sprintf(Min, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/mcor%d_L.dat", cortyp, icn);
+      ofstream mcorFile(mcorFilename);
+
       for (poq = 0; poq < 16; poq++) {
-        fprintf(McoIN,
-                "%.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \n  ",
-                UU[0][poq], UU[1][poq], UU[2][poq], UU[3][poq], UU[4][poq], UU[5][poq], UU[6][poq], UU[7][poq], UU[8][poq], UU[9][poq], UU[10][poq],
-                UU[11][poq], UU[12][poq], UU[13][poq], UU[14][poq], UU[15][poq]);
+        mcorFile << setprecision(5)
+                 << UU[0][poq] << "\t" << UU[1][poq] << "\t" <<  UU[2][poq] << "\t"
+                 << UU[3][poq] << "\t" << UU[4][poq] << "\t" <<  UU[5][poq] << "\t"
+                 << UU[6][poq] << "\t" << UU[7][poq] << "\t" <<  UU[8][poq] << "\t"
+                 << UU[9][poq] << "\t" << UU[10][poq]
+                 << UU[11][poq]  << "\t" << UU[12][poq]  << "\t"
+                 << UU[13][poq]  << "\t" << UU[14][poq] << "\t" <<  UU[15][poq] << endl;
+        // fprintf(McoIN,
+        // "%.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \t %.5e \n  ",
+        //       UU[0][poq], UU[1][poq], UU[2][poq], UU[3][poq], UU[4][poq], UU[5][poq], UU[6][poq], UU[7][poq], UU[8][poq], UU[9][poq], UU[10][poq],
+        //      UU[11][poq], UU[12][poq], UU[13][poq], UU[14][poq], UU[15][poq]);
 
 
 
       }
-      fclose(McoIN);
+      mcorFile.close();
 
+      string inmcorFilename(corrDirSuffix);
+      inmcorFilename += to_string(cortyp) + "/inmcor" + to_string(icn) + "_L.dat";
+      //      sprintf(Min, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/inmcor%d_L.dat", cortyp, icn);
 
-      sprintf(Min, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/inmcor%d_L.dat", cortyp, icn);
-
-      McoIN = fopen(Min, "w");
+      ofstream inmcorFile(inmcorFilename);
       for (poq = 0; poq < 16; poq++) {
-        fprintf(McoIN,
-                "%.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \n  ",
-                IM[0][poq], IM[1][poq], IM[2][poq], IM[3][poq], IM[4][poq], IM[5][poq], IM[6][poq], IM[7][poq], IM[8][poq], IM[9][poq], IM[10][poq],
-                IM[11][poq], IM[12][poq], IM[13][poq], IM[14][poq], IM[15][poq]);
+        inmcorFile << setprecision(3)
+                   << IM[0][poq] << "\t" << IM[1][poq] << "\t" <<  IM[2][poq] << "\t"
+                   << IM[3][poq] << "\t" << IM[4][poq] << "\t" <<  IM[5][poq] << "\t"
+                   << IM[6][poq] << "\t" << IM[7][poq] << "\t" <<  IM[8][poq] << "\t"
+                   << IM[9][poq] << "\t" << IM[10][poq]
+                   << IM[11][poq]  << "\t" << IM[12][poq]  << "\t"
+                   << IM[13][poq]  << "\t" << IM[14][poq] << "\t" <<  IM[15][poq] << endl;
 
-
-
+        // fprintf(McoIN,
+        //                "%.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \t %.3e \n  ",
+        //         IM[0][poq], IM[1][poq], IM[2][poq], IM[3][poq], IM[4][poq], IM[5][poq], IM[6][poq], IM[7][poq], IM[8][poq], IM[9][poq], IM[10][poq],
+        //IM[11][poq], IM[12][poq], IM[13][poq], IM[14][poq], IM[15][poq]);
       }
-      fclose(McoIN);
+      inmcorFile.close();
 
-
-
-      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", cortyp, icn);
-
-
-      if ((BMcoIN = fopen(BMin, "wb")) == NULL) {
-        fprintf(stderr, "Error opening file 1");
-        exit(1);
-      }
-
-      if (fwrite(IM, sizeof(double), 256, BMcoIN) != 256)
-        //      if (fwrite(UU, sizeof(double), 256, BMcoIN) != 256)
-      {
-        fprintf(stderr, "Error writing to file.");
-        exit(1);
-      }
-
-      fclose(BMcoIN);
-
-
-
-      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", cortyp, icn);
-
-
-
-      if ((BMcoIN = fopen(BMin, "rb")) == NULL) {
-        fprintf(stderr, "Error opening file 21");
-        exit(1);
-      }
-
-      //
-      if (fread(xx, sizeof(double), 256, BMcoIN) != 256) {
-        fprintf(stderr, "Error reading file.");
-        exit(1);
-      }
-      fclose(BMcoIN);
-
-
-
-
+      string binmcorFilename(corrDirSuffix);
+      binmcorFilename += to_string(cortyp) + "/Binmcor" + to_string(icn) + "_L.dat";
+      //      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", cortyp, icn);
+      ofstream binmcorFile(binmcorFilename, ofstream::binary);
+      binmcorFile.write(reinterpret_cast<char*>(IM), sizeof(double) * 16 * 16);
+      binmcorFile.close();
     }  // converional cooment
     //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
 
   }  // icn
 
-
-  printf("\n ");
-  printf("delta= %e \n  ", delta);
+  cout << endl;
+  cout << "delta= " <<  delta << endl;
 
 }
 
 int main(int argc, char** argv)
 {
-  matrix_cal(10);
+  // first argument is cortype : what does it mean?
+  // second argument is input root file name
+  // third argument is (existing) directory to put the output files (cor matrices)
+  // fourth argument is the cut file name
+  assert(argc == 4);
+  matrix_cal(10, argv[1], argv[2], argv[3]);
 }
 
 

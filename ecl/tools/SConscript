@@ -1,6 +1,6 @@
 Import('env')
-env['TOOLS_LIBS']['writetestWF'] = ['framework','ecl','ecl_dataobjects','$ROOT_LIBS'];
-env['TOOLS_LIBS']['cut'] = ['$ROOT_LIBS'];
-env['TOOLS_LIBS']['matrix_cal'] = ['$ROOT_LIBS'];
-env['TOOLS_LIBS']['bit'] = ['$ROOT_LIBS'];
+env['TOOLS_LIBS']['ecldigiconfigfile'] = ['framework','ecl','ecl_dataobjects','$ROOT_LIBS'];
+env['TOOLS_LIBS']['eclcovmat_cut'] = ['$ROOT_LIBS'];
+env['TOOLS_LIBS']['eclcovmat_calc'] = ['$ROOT_LIBS'];
+env['TOOLS_LIBS']['eclcovmat_bit'] = ['$ROOT_LIBS'];
 Return('env')

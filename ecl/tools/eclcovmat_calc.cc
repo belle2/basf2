@@ -13,12 +13,7 @@
 
 using namespace std;
 
-// construction 3D array with large volume
-
-
-
 // function for inversion simmetric matrix
-
 void sim(double* ss, int* N, double* aa, double* sb)
 {
   int i, k, j;

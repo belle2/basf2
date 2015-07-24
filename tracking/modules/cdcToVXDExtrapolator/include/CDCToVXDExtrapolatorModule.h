@@ -104,6 +104,7 @@ namespace Belle2 {
     float m_hitNSigmaPix; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable for pxd*/
     bool m_extrapolateToDetector; /**< true: will try to extrapolate to the detector plane, false: extrapolates to the abstract cylinder or cone representing the detector */
     bool m_allLayers; /**< true: will try to extrapolate to all layers and find hits, false: stop extrapolation when a layer without compatible hits reached */
+    bool m_stepwiseKalman; /**< "When true refits the track with a Kalman update after each hit is added, rather than simply doing the refit at the end. Shoudl improve the extrapolation quality, particularly to the PXD."*/
 
     // information gatherers
     int nTotalTracks;

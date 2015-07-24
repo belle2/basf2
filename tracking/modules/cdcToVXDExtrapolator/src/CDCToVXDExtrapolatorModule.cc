@@ -103,6 +103,9 @@ CDCToVXDExtrapolatorModule::CDCToVXDExtrapolatorModule() :
   addParam("ExtrapolateToPxd", m_extrapolateToPxd, "Extrapolate to the PXD as well as the SVD", true);
   addParam("HitNSigmaPix", m_hitNSigmaPix,
            "When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable (for PXD)", float(5.));
+  addParam("StepwiseKalmanRefit", m_stepwiseKalman,
+           "When true refits the track with a Kalman update after each hit is added, rather than simply doing the refit at the end. Shoudl improve the extrapolation quality, particularly to the PXD.",
+           true);
 
   // Input
   addParam("GFTrackColName", m_GFTrackColName, "Name of genfit::Track collection (input)", std::string(""));
@@ -383,7 +386,8 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
 
   B2DEBUG(190, "end of extrapolation");
   B2DEBUG(190, "extrapolated to layer " << searchLayer << " svd");
-  B2DEBUG(101, "------------<> Extrapolation result: Position " << posAtLayer.x() << " " << posAtLayer.y() << " " << posAtLayer.z() <<
+  B2DEBUG(101, "   ------------<> Extrapolation result: Position " << posAtLayer.x() << " " << posAtLayer.y() << " " << posAtLayer.z()
+          <<
           " Momentum " << momAtLayer.x() << " " << momAtLayer.y() << " " << momAtLayer.z() << " Cov_ii " << covAtLayer[0][0] << " " <<
           covAtLayer[1][1]
           << " " << covAtLayer[2][2] << " " << covAtLayer[3][3] << " " << covAtLayer[4][4] << " " << covAtLayer[5][5]);
@@ -392,7 +396,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
 
   float zSigma = sqrt(covAtLayer[2][2]);
   double r = sqrt(pow(posAtLayer.X(), 2) + pow(posAtLayer.Y(), 2));
-  B2DEBUG(190, "--->Track Position r: " << r << " " << posAtLayer.Perp() << " z:" << posAtLayer.Z() <<
+  B2DEBUG(190, "   --->Track Position r: " << r << " " << posAtLayer.Perp() << " z:" << posAtLayer.Z() <<
           " zsigma:" << sqrt(covAtLayer[2][2]) << " VXX:" << covAtLayer[0][0] << " sXX:" << sqrt(covAtLayer[0][0]) << " VYY:" <<
           covAtLayer[1][1] << " sYY:" << sqrt(covAtLayer[1][1]) << " VXY:" << covAtLayer[0][1]);
   // try to find a v cluster
@@ -552,59 +556,65 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       track->insertMeasurement(vHit, 0);
       track->insertMeasurement(uHit, 0);
 
-      // Do a partial refit step
-      bool fitSuccess = false;
-      // following the GenFitter.cc code
-      auto fitter = new genfit::KalmanFitter();
-      fitter->setMinIterations(3);
-      fitter->setMaxIterations(10);
-      fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
-      fitter->setMaxFailedHits(5);
-      try {
-        if (!track->checkConsistency()) {
-          B2DEBUG(50, "Inconsistent track found, attempting to sort!")
-          bool sorted = track->sort();
-          if (!sorted) {
-            B2DEBUG(50, "Track points NOT SORTED! Still inconsistent, I can't be held responsible for assertion failure!");
-          } else {
-            B2DEBUG(50, "Track points SORTED!! Hopefully this works now!");
+      if (m_stepwiseKalman) {
+        // Do a partial refit step
+        bool fitSuccess = false;
+        // following the GenFitter.cc code
+        auto fitter = new genfit::KalmanFitter();
+        fitter->setMinIterations(3);
+        fitter->setMaxIterations(10);
+        fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
+        fitter->setMaxFailedHits(5);
+        try {
+          if (!track->checkConsistency()) {
+            B2DEBUG(50, "Inconsistent track found, attempting to sort!")
+            bool sorted = track->sort();
+            if (!sorted) {
+              B2DEBUG(50, "Track points NOT SORTED! Still inconsistent, I can't be held responsible for assertion failure!");
+            } else {
+              B2DEBUG(50, "Track points SORTED!! Hopefully this works now!");
+            }
           }
-        }
-        fitter->processTrackPartially(track, track->getCardinalRep(), 2, 0);
+          fitter->processTrackPartially(track, track->getCardinalRep(), 1, 0);
 
-        genfit::FitStatus* fs = 0;
-        genfit::KalmanFitStatus* kfs = 0;
-        fitSuccess = track->hasFitStatus();
-        if (fitSuccess) {
-          fs = track->getFitStatus();
-          fitSuccess = fitSuccess && fs->isFitted();
-          fitSuccess = fitSuccess && fs->isFitConverged();
-          kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
-          fitSuccess = fitSuccess && kfs;
-          double fchi2(0), bchi2(0), fndf(0), bndf(0);
-          // fitter->getChiSquNdf(track, track->getCardinalRep(), bchi2, fchi2, bndf, fndf);
-          B2DEBUG(100, "<------> Track partial fit. isFitted: " << fs->isFitted() << " isFitConverged:" << fs->isFitConverged() <<
-                  " isFitConverged(false):"
-                  << fs->isFitConverged(false) << " nFailedPoints:" << fs->getNFailedPoints() << " numPointsWithMeasurement (from track): " <<
-                  track->getNumPointsWithMeasurement() << " chi2: " << fitter->getChiSqu(track,
-                      track->getCardinalRep()) << " Ndof: " << fitter->getNdf(track,
-                          track->getCardinalRep()) << " redchi2: " << fitter->getRedChiSqu(track, track->getCardinalRep()) <<
-                  " bchi2 " << bchi2 << " bndf " << bndf << " fchi2 " << fchi2 << " fndf " << fndf);
-          trkInfo.pval = fs->getPVal();
-        } else {
-          B2WARNING("Bad Fit in CDCToVXDExtrapolatorModule");
+          genfit::FitStatus* fs = 0;
+          genfit::KalmanFitStatus* kfs = 0;
+          fitSuccess = track->hasFitStatus();
+          if (fitSuccess) {
+            fs = track->getFitStatus();
+            fitSuccess = fitSuccess && fs->isFitted();
+            fitSuccess = fitSuccess && fs->isFitConverged();
+            kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+            fitSuccess = fitSuccess && kfs;
+            double fchi2(0), bchi2(0), fndf(0), bndf(0);
+            auto up0 = track->getPointWithMeasurementAndFitterInfo(0, track->getCardinalRep())->getKalmanFitterInfo(0)->getUpdate(-1);
+            auto up1 = track->getPointWithMeasurementAndFitterInfo(1, track->getCardinalRep())->getKalmanFitterInfo(0)->getUpdate(-1);
+            // fitter->getChiSquNdf(track, track->getCardinalRep(), bchi2, fchi2, bndf, fndf);
+            B2DEBUG(100, "<------> Track partial fit. isFitted: " << fs->isFitted() << " isFitConverged:" << fs->isFitConverged() <<
+                    " isFitConverged(false):"
+                    << fs->isFitConverged(false) << " nFailedPoints:" << fs->getNFailedPoints() << " numPointsWithMeasurement (from track): " <<
+                    track->getNumPointsWithMeasurement() << " chi2 " << track->getFitStatus(track->getCardinalRep())->getChi2() << " ndof " <<
+                    track->getFitStatus(track->getCardinalRep())->getNdf() <<
+                    " chi2 up0 " << up0->getChiSquareIncrement() << " chi2 up1 " << up1->getChiSquareIncrement() <<
+                    // " chi2: " << fitter->getChiSqu(track, track->getCardinalRep()) <<
+                    // << " Ndof: " << fitter->getNdf(track, track->getCardinalRep()) << " redchi2: " << fitter->getRedChiSqu(track, track->getCardinalRep()) <<
+                    " bchi2 " << bchi2 << " bndf " << bndf << " fchi2 " << fchi2 << " fndf " << fndf);
+            trkInfo.pval = fs->getPVal();
+          } else {
+            B2WARNING("Bad Fit in CDCToVXDExtrapolatorModule");
+          }
+        } catch (...) {
+          B2WARNING("Track fitting has failed.");
         }
-      } catch (...) {
-        B2WARNING("Track fitting has failed.");
+        delete fitter;
+
+        TMatrixDSym cov(6, 6);
+        TVector3 pos, mom;
+        track->getFittedState().getPosMomCov(pos, mom, cov);
+        B2DEBUG(101, "<---------> Track partial fit result: Position " << pos.x() << " " << pos.y() << " " << pos.z() <<
+                " Momentum " << mom.x() << " " << mom.y() << " " << mom.z() << " Cov_ii " << cov[0][0] << " " << cov[1][1]
+                << " " << cov[2][2] << " " << cov[3][3] << " " << cov[4][4] << " " << cov[5][5]);
       }
-      delete fitter;
-
-      TMatrixDSym cov(6, 6);
-      TVector3 pos, mom;
-      track->getFittedState().getPosMomCov(pos, mom, cov);
-      B2DEBUG(101, "<---------> Track partial fit result: Position " << pos.x() << " " << pos.y() << " " << pos.z() <<
-              " Momentum " << mom.x() << " " << mom.y() << " " << mom.z() << " Cov_ii " << cov[0][0] << " " << cov[1][1]
-              << " " << cov[2][2] << " " << cov[3][3] << " " << cov[4][4] << " " << cov[5][5]);
 
       if (m_saveInfo) {
         // fill hit info

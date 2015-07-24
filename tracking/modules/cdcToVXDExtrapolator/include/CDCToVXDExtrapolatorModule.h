@@ -101,7 +101,7 @@ namespace Belle2 {
     bool m_extrapolateToPxd; /**< Extrapolate to the PXD as well as the SVD */
     float m_hitNSigmaZ; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable */
     float m_hitNSigmaXY; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable */
-
+    float m_hitNSigmaPix; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable for pxd*/
     bool m_extrapolateToDetector; /**< true: will try to extrapolate to the detector plane, false: extrapolates to the abstract cylinder or cone representing the detector */
     bool m_allLayers; /**< true: will try to extrapolate to all layers and find hits, false: stop extrapolation when a layer without compatible hits reached */
 

@@ -100,7 +100,9 @@ CDCToVXDExtrapolatorModule::CDCToVXDExtrapolatorModule() :
   addParam("AllLayers", m_allLayers,
            "true: will try to extrapolate to all layers and find hits, false: stop extrapolation when a layer without compatible hits reached",
            false);
-  addParam("ExrtapolateToPxd", m_extrapolateToPxd, "Extrapolate to the PXD as well as the SVD", true);
+  addParam("ExtrapolateToPxd", m_extrapolateToPxd, "Extrapolate to the PXD as well as the SVD", true);
+  addParam("HitNSigmaPix", m_hitNSigmaPix,
+           "When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable (for PXD)", float(5.));
 
   // Input
   addParam("GFTrackColName", m_GFTrackColName, "Name of genfit::Track collection (input)", std::string(""));
@@ -271,7 +273,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToPXDLayer(genfit::Track* track, int
           bestDist = newDist;
         }
       } else {
-        if ((dz < m_hitNSigmaZ * zSigma) && (dxy < m_hitNSigmaXY * xySigma)) {
+        if ((dz < m_hitNSigmaPix * zSigma) && (dxy < m_hitNSigmaPix * xySigma)) {
           if ((besti < 0) || (newDist < bestDist)) {
             B2DEBUG(81, "New best");
             besti = i;
@@ -928,7 +930,7 @@ void CDCToVXDExtrapolatorModule::event()
       }
 
       if (refitExtrap) {
-        storeTrack(crnt, outGfTracks, outGfTrackCands, gfTrackCandidatesTogfTracks, gfTracksToMCPart);
+        storeTrack(*extrapolatedTrack, outGfTracks, outGfTrackCands, gfTrackCandidatesTogfTracks, gfTracksToMCPart);
         isSaved = true;
         trkInfo.refit = true;
       } else {

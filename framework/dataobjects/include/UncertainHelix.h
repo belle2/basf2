@@ -78,9 +78,9 @@ namespace Belle2 {
 
     /** Getter for the position and Momentum Covariance Matrix.
      *
-     *  @param bZ
+     *  @param bZ_tesla                     Magnetic field to be used for the calculation from the curvature;
      */
-    TMatrixDSym getCartesianCovariance(const double bZ = 1.5) const;
+    TMatrixDSym getCartesianCovariance(const double bZ_tesla = 1.5) const;
 
     /** Getter for Chi2 Probability of the track fit. */
     double getPValue() const
@@ -88,9 +88,8 @@ namespace Belle2 {
 
     /** Getter for covariance matrix of perigee parameters in matrix form.
      *
-     *  @param bZ                     Magnetic field to be used for the calculation from the curvature;
      */
-    TMatrixDSym getCovariance() const
+    const TMatrixDSym& getCovariance() const
     { return m_covariance; }
 
     /** Reverses the direction of travel of the helix in place.

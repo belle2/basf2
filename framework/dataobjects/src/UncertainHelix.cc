@@ -116,7 +116,7 @@ UncertainHelix::UncertainHelix(const double& d0,
 
 
 
-TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ) const
+TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
 {
   // 0. Define indices
   // Maybe push these out of this function:
@@ -149,7 +149,7 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ) const
   const double& omega = getOmega();
   const double& tanLambda = getTanLambda();
 
-  const double alpha = getAlpha(bZ);
+  const double alpha = getAlpha(bZ_tesla);
   const double absAlphaOmega = alpha * std::fabs(omega);
   const double signedAlphaOmega2 =  absAlphaOmega  * omega;
 

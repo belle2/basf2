@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <framework/dataobjects/Helix.h>
 
-#include <framework/logging/Logger.h>
-
 #include <boost/math/special_functions/sign.hpp>
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/tools/precision.hpp>
@@ -25,7 +23,12 @@ using namespace HelixParameterIndex;
 
 ClassImp(Helix);
 
-Helix::Helix()
+Helix::Helix():
+  m_d0(0.0),
+  m_phi0(0.0),
+  m_omega(0.0),
+  m_z0(0.0),
+  m_tanLambda(0.0)
 {
 }
 

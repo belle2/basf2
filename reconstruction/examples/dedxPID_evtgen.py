@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+######################################################
+# This steering file generates several events and
+# does a simple dE/dx measurement with path length
+# correction. The results are stored in a ROOT file.
+#
+# Example steering file - 2011 Belle II Collaboration
+######################################################
+
 import os
 import random
 from basf2 import *

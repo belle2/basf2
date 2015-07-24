@@ -2,18 +2,15 @@
 # -*- coding: utf-8 -*-
 
 ######################################################
-# This steering file generates several D* events
-# and does a simple dE/dx measurement with path
-# correction. The results are stored in a ROOT file.
+# This steering file runs the DedxScanModule, which
+# loops over CDC wires and creates dE/dx drift cells
+# for debugging purposes. No particles are generated.
 #
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
 import os
 from basf2 import *
-
-# change to True if you want to use PXD hits (fairly small benefit, if any)
-use_pxd = False
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -44,7 +41,7 @@ main.add_module(dedx)
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'dedxPID_scan.root')
-# output.param('branchNames','DedxTracks')
+output.param('branchNames', 'DedxTracks')
 main.add_module(output)
 process(main)
 print statistics

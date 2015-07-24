@@ -346,18 +346,19 @@ const Particle* Particle::getDaughter(unsigned i) const
   return static_cast<Particle*>(getArrayPointer()->At(m_daughterIndices[i]));
 }
 
-const std::vector<Belle2::Particle*> Particle::getDaughters() const
+std::vector<Belle2::Particle*> Particle::getDaughters() const
 {
-  std::vector<Particle*> daughters(getNDaughters());
+  const unsigned int nDaughters = getNDaughters();
+  std::vector<Particle*> daughters(nDaughters);
 
   const TClonesArray* array = getArrayPointer();
-  for (unsigned i = 0; i < getNDaughters(); i++)
+  for (unsigned i = 0; i < nDaughters; i++)
     daughters[i] = static_cast<Particle*>(array->At(m_daughterIndices[i]));
 
   return daughters;
 }
 
-const std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
+std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
 {
   std::vector<const Particle*> fspDaughters;
   fillFSPDaughters(fspDaughters);
@@ -368,11 +369,7 @@ const std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() co
 std::vector<int> Particle::getMdstArrayIndices(EParticleType type) const
 {
   std::vector<int> mdstIndices;
-  std::vector<const Particle*> fspDaughters = this->getFinalStateDaughters();
-
-  for (unsigned i = 0; i < fspDaughters.size(); i++) {
-    const Particle* fsp = fspDaughters[i];
-
+  for (const Particle* fsp : getFinalStateDaughters()) {
     // is this FSP daughter constructed from given MDST type
     if (fsp->getParticleType() == type)
       mdstIndices.push_back(fsp->getMdstArrayIndex());

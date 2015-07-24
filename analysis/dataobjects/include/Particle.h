@@ -506,14 +506,14 @@ namespace Belle2 {
      * Returns a vector of pointers to daughter particles
      * @return vector of pointers to daughter particles
      */
-    const std::vector<Belle2::Particle*> getDaughters() const;
+    std::vector<Belle2::Particle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
      * Returns a vector of pointers to Final State daughter particles
      * @return vector of pointers to final state daughter particles
      */
-    const std::vector<const Belle2::Particle*> getFinalStateDaughters() const;
+    std::vector<const Belle2::Particle*> getFinalStateDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**

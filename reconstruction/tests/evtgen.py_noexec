@@ -15,13 +15,12 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
-# generate BBbar events
-evtgeninput = register_module('EvtGenInput')
-main.add_module(evtgeninput)
+main.add_module('Gearbox')
 
-# GearBox
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+# generate BBbar events
+from beamparameters import add_beamparameters
+add_beamparameters(main, "Y4S")
+main.add_module('EvtGenInput')
 
 add_simulation(main)
 

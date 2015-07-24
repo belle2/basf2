@@ -272,26 +272,26 @@ TMatrixFSym Particle::getMomentumVertexErrorMatrix() const
 
 TMatrixFSym Particle::getMomentumErrorMatrix() const
 {
-  TMatrixFSym m_mom;
-  TMatrixFSym m_full = getMomentumVertexErrorMatrix();
+  TMatrixFSym mom;
+  const TMatrixFSym& full = getMomentumVertexErrorMatrix();
 
   // get 4x4 (momentum) submatrix from the full error matrix
   // momentum related elements are in [0,...,3]x[0,...,3] block
-  m_full.GetSub(0, 3, m_mom, "S");
+  full.GetSub(0, 3, mom, "S");
 
-  return m_mom;
+  return mom;
 }
 
 TMatrixFSym Particle::getVertexErrorMatrix() const
 {
-  TMatrixFSym m_pos;
-  TMatrixFSym m_full = getMomentumVertexErrorMatrix();
+  TMatrixFSym pos;
+  const TMatrixFSym& full = getMomentumVertexErrorMatrix();
 
   // get 3x3 (position) submatrix from the full error matrix
   // vertex related elements are in [4,5,6]x[4,5,6] block
-  m_full.GetSub(4, 6, m_pos, "S");
+  full.GetSub(4, 6, pos, "S");
 
-  return m_pos;
+  return pos;
 }
 
 /*

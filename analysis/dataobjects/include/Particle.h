@@ -163,19 +163,19 @@ namespace Belle2 {
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
      * @param eclCluster pointer to ECLCluster object
      */
-    Particle(const ECLCluster* eclCluster);
+    explicit Particle(const ECLCluster* eclCluster);
 
     /**
      * Constructor of a KLong from a reconstructed KLM cluster that is not matched to any charged track.
      * @param klmCluster pointer to KLMCluster object
      */
-    Particle(const KLMCluster* klmCluster);
+    explicit Particle(const KLMCluster* klmCluster);
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
      * @param MCparticle pointer to MCParticle object
      */
-    Particle(const MCParticle* MCparticle);
+    explicit Particle(const MCParticle* MCparticle);
 
     /**
      * Destructor

@@ -100,11 +100,11 @@ class CDCFullFinder(metamodules.PathModule):
 
     def __init__(self, output_track_cands_store_array_name="TrackCands",
                  tmva_cut=0.1,
-                 first_filter="tmva", first_tmva_cut=0.70,
-                 background_filter="tmva", background_filter_tmva_cut=0.3,
+                 first_filter="tmva", first_tmva_cut=0.75,
+                 background_filter="tmva", background_filter_tmva_cut=0.7,
                  new_segments_filter="none", new_segments_filter_tmva_cut=0,
                  second_filter="none", second_tmva_cut=0,
-                 track_filter="tmva", track_filter_cut=0.3,
+                 track_filter="all", track_filter_cut=0,
                  use_pair_finder=True):
 
         modules = [

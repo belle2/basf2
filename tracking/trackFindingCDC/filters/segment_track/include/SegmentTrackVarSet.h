@@ -51,7 +51,9 @@ namespace Belle2 {
       "max_hit_z_distance",
       "stereo_quad_tree_distance",
       "segment_super_layer",
-      "phi_between_track_and_segment"
+      "phi_between_track_and_segment",
+      "perp_s_of_front",
+      "perp_s_of_back"
     };
 
     /** Class that specifies the names of the variables
@@ -61,7 +63,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 22;
+      static const size_t nNames = 24;
 
       IF_NOT_CINT(constexpr)
       static char const* getName(int iName)

@@ -10,7 +10,7 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 
 class SegmentTrackSecondStepRecordingRun(StandardEventGenerationRun):
-    n_events = 500
+    n_events = 2000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):

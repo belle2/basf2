@@ -27,7 +27,7 @@ if [ ! -e "NewSegmentsFilter.root" ]; then
 	trackfindingcdc-record-new-segments -i "$1"
 fi
 trackfindingcdc-train NewSegmentsFilter.root
-mv weights/NewSegments_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
+mv weights/NewSegmentsFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
 rm -rf weights
 
 # SegmentTrackFilterSecondStep

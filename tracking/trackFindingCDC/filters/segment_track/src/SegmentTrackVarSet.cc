@@ -43,7 +43,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   // Calculate distances
   const CDCTrajectory2D& trajectoryTrack = track->getStartTrajectory3D().getTrajectory2D();
   const CDCTrajectorySZ& szTrajectoryTrack = track->getStartTrajectory3D().getTrajectorySZ();
-
+  double radius = trajectoryTrack.getGlobalCircle().radius();
 
   maxmimumTrajectoryDistanceFront = trajectoryTrack.getDist2D(front.getWireHit().getRefPos2D());
   maxmimumTrajectoryDistanceBack = trajectoryTrack.getDist2D(back.getWireHit().getRefPos2D());
@@ -93,8 +93,17 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     }
   }
 
+  // Get perpS of track in the beginning and the end
+  double perpSOfFront = trajectoryTrack.calcPerpS(segment->front().getRecoPos2D());
+  double perpSOfBack = trajectoryTrack.calcPerpS(segment->back().getRecoPos2D());
+
+  double perpSMinimum = std::min(perpSOfFront, perpSOfBack);
+  double perpSMaximum = std::max(perpSOfFront, perpSOfBack);
+
   // Count number of hits in the same region
   for (const CDCRecoHit3D& recoHit : track->items()) {
+    if (recoHit.getPerpS() < 0.8 * perpSMinimum or recoHit.getPerpS() > 1.2 * perpSMaximum)
+      continue;
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
     } else if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) == 1) {
@@ -215,24 +224,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("track_size")>() = track->size();
   var<named("mean_hit_z_distance")>() = sum_hit_z_distance;
   var<named("max_hit_z_distance")>() = max_hit_z_distance;
-  var<named("stereo_quad_tree_distance")>() = stereo_quad_tree_distance;
+  setVariableIfNotNaN<named("stereo_quad_tree_distance")>(stereo_quad_tree_distance);
 
   var<named("pt_of_track")>() = std::isnan(trajectoryTrack.getAbsMom2D()) ? 0.0 : trajectoryTrack.getAbsMom2D();
   var<named("track_is_curler")>() = trajectoryTrack.getExit().hasNAN();
 
   var<named("superlayer_already_full")>() = not trajectoryTrack.getOuterExit().hasNAN() and hitsInSameRegion > 5;
 
-  if (std::isnan(maxmimumTrajectoryDistanceFront)) {
-    var<named("maxmimum_trajectory_distance_front")>() = 999;
-  } else {
-    var<named("maxmimum_trajectory_distance_front")>() = maxmimumTrajectoryDistanceFront;
-  }
-
-  if (std::isnan(maxmimumTrajectoryDistanceBack)) {
-    var<named("maxmimum_trajectory_distance_back")>() = 999;
-  } else {
-    var<named("maxmimum_trajectory_distance_back")>() = maxmimumTrajectoryDistanceBack;
-  }
+  setVariableIfNotNaN<named("maxmimum_trajectory_distance_front")>(maxmimumTrajectoryDistanceFront, 999);
+  setVariableIfNotNaN<named("maxmimum_trajectory_distance_back")>(maxmimumTrajectoryDistanceBack, 999);
 
   var<named("maxmimum_hit_distance_front")>() = maxmimumHitDistanceFront;
   var<named("maxmimum_hit_distance_back")>() = maxmimumHitDistanceBack;
@@ -246,7 +246,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   double phiBetweenTrackAndSegment = trajectoryTrack.getStartMom2D().angleWith(segment->front().getRecoPos2D());
 
-  var<named("phi_between_track_and_segment")>() = phiBetweenTrackAndSegment;
+  setVariableIfNotNaN<named("phi_between_track_and_segment")>(phiBetweenTrackAndSegment);
+  setVariableIfNotNaN<named("perp_s_of_front")>(perpSOfFront / radius);
+  setVariableIfNotNaN<named("perp_s_of_back")>(perpSOfBack / radius);
 
   return true;
 }

@@ -250,6 +250,24 @@ namespace Belle2 {
          TrackFilter>::generate(
            std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks)
     {
+      // Resort the perpS information
+      for (CDCTrack& track : tracks) {
+        const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+        const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+        const double radius = fabs(trajectory2D.getGlobalCircle().radius());
+
+        // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
+        // especially for curlers. For this, we go through all hits and look for negative perpS. If we have found one, we shift it to positive values
+        for (CDCRecoHit3D& recoHit : track) {
+          double currentPerpS = recoHit.getPerpS();
+          if (currentPerpS < 0) {
+            recoHit.setPerpS(2 * TMath::Pi() * radius + currentPerpS);
+          }
+        }
+
+        track.sortByPerpS();
+      }
+
       m_combiner.fillWith(tracks, segments);
       m_combiner.match(*m_ptrSegmentTrackFilterFirstStep);
       m_combiner.filterSegments(*m_ptrBackgroundSegmentFilter);

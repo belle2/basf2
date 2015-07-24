@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
-#include <genfit/KalmanFitter.h>
+#include <genfit/KalmanFitterRefTrack.h>
 
 namespace Belle2 {
 
@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Create a Kalman fitter */
     std::shared_ptr<genfit::AbsFitter> createFitter() const override
     {
-      std::shared_ptr<genfit::KalmanFitter> fitter = std::make_shared<genfit::KalmanFitter>();
+      std::shared_ptr<genfit::KalmanFitterRefTrack> fitter = std::make_shared<genfit::KalmanFitterRefTrack>();
       fitter->setMaxFailedHits(m_param_maximumFailedHits);
       fitter->setMinIterations(m_param_minimumIterations);
       fitter->setMaxIterations(m_param_maximumIterations);

@@ -115,7 +115,12 @@ namespace Belle2 {
 
     public:
       StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
-                                 bool debugOutput = false) : QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput, false) { }
+                                 bool debugOutput = false) : QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput, false)
+      {
+
+        B2INFO(ranges.first.first << " " << ranges.first.second << " " << ranges.second.first << " " << ranges.second.second)
+
+      }
 
       /**
        * Do only insert the hit into a node if the slope and z information calculated from this hit belongs into this node

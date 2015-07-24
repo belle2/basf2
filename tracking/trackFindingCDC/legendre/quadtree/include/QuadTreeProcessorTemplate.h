@@ -139,6 +139,7 @@ namespace Belle2 {
        */
       virtual void provideItemsSet(std::vector<typeData*>& itemsVector) final {
         std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
+        quadtreeItemsVector.reserve(itemsVector.size());
         for (typeData* item : itemsVector)
         {
           quadtreeItemsVector.push_back(new ItemType(item));

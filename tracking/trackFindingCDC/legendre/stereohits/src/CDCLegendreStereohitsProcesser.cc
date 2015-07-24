@@ -1,11 +1,9 @@
 #include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 
-// New Quad Tree
-#include <tracking/trackFindingCDC/hough/z0_zslope/HitZ0ZSlopeLegendre.h>
 
 #include <TFile.h>
 #include <TH2F.h>
@@ -82,54 +80,33 @@ void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, st
   }
 }
 
-void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_param_level, unsigned int m_param_minimumHits)
+void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_param_minimumHits)
 {
-  typedef TrackFindingCDC::StereoHitQuadTreeProcessor Processor;
-
-  // Ranges: slope, z0
-  Processor::ChildRanges ranges(Processor::rangeX(tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)),
-                                Processor::rangeY(-20, 20));
-
-
-  typedef std::pair<Processor::QuadTree*, Processor::ReturnList> Result;
+  typedef std::pair<StereoHitQuadTreeProcessor::QuadTree*, StereoHitQuadTreeProcessor::ReturnList> Result;
   std::vector<Result> possibleStereoSegments;
 
-  Processor::ReturnList hitsVector;
+  StereoHitQuadTreeProcessor::ReturnList hitsVector;
   fillHitsVector(hitsVector, track);
 
-  Processor::CandidateProcessorLambda lmdCandidateProcessing = [&](const Processor::ReturnList & items,
-  Processor::QuadTree * node) -> void {
+  StereoHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessing = [&](const StereoHitQuadTreeProcessor::ReturnList &
+      items,
+  StereoHitQuadTreeProcessor::QuadTree * node) -> void {
     possibleStereoSegments.push_back(std::make_pair(node, std::move(items)));
-    B2DEBUG(100, "Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
+    B2INFO("Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
   };
 
-  unsigned int level = m_param_level;
-  Processor qtProcessor(level, ranges, m_param_debugOutput);
-  qtProcessor.provideItemsSet(hitsVector);
-  qtProcessor.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
+  B2INFO("New Track")
 
-  /* DEBUG */
-  if (m_param_debugOutput) {
-    // Debug output
-    const auto& debugMap = qtProcessor.getDebugInformation();
+  StereoHitQuadTreeProcessor::ChildRanges childRanges = StereoHitQuadTreeProcessor::ChildRanges(StereoHitQuadTreeProcessor::rangeX(
+                                                          tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-20, 20));
+  StereoHitQuadTreeProcessor m_oldQuadTree(m_level, childRanges, m_param_debugOutput);
+  m_oldQuadTree.provideItemsSet(hitsVector);
+  m_oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
 
-    TFile file("quadtree_content.root", "RECREATE");
-    TH2F hist("hist", "QuadTreeContent", std::pow(2, level), ranges.first.first, ranges.first.second, std::pow(2, level),
-              ranges.second.first, ranges.second.second);
-
-    for (const auto& debug : debugMap) {
-      const auto& positionInformation = debug.first;
-      const auto& quadItemsVector = debug.second;
-      hist.Fill(positionInformation.first, positionInformation.second, quadItemsVector.size());
-    }
-
-    hist.Write();
-    file.Clone();
-  }
-  /* DEBUG */
-
-  if (possibleStereoSegments.size() == 0)
+  if (possibleStereoSegments.size() == 0) {
+    B2WARNING("Found no stereo segments!")
     return;
+  }
 
   auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Result & a,
   const Result & b) {
@@ -166,29 +143,19 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
 }
 
 
-void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int m_param_level,
-                                                           unsigned int m_param_minimumHits)
+void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int m_param_minimumHits)
 {
-  // Prepare the hough algorithm
-  const size_t maxLevel = m_param_level;
-  const size_t z0Divisions = 2;
-  const size_t inverseZSlopeDivisions = 2;
-
-  using HitZ0ZSlopeQuadLegendre = HitZ0ZSlopeLegendre<const HitType*, z0Divisions, inverseZSlopeDivisions>;
-  HitZ0ZSlopeQuadLegendre hitZ0ZSlopeQuadLegendre(maxLevel);
-  hitZ0ZSlopeQuadLegendre.initialize();
-
   std::vector<HitType*> hitsVector;
   fillHitsVector(hitsVector, track);
 
-  hitZ0ZSlopeQuadLegendre.seed(hitsVector);
+  m_newQuadTree.seed(hitsVector);
 
   typedef pair<Z0ZSlopeBox, vector<HitType*>> Result;
-  vector<Result> possibleStereoSegments;
-  possibleStereoSegments = hitZ0ZSlopeQuadLegendre.find(m_param_minimumHits);
+  std::vector<Result> possibleStereoSegments = m_newQuadTree.findHighest(m_param_minimumHits);
 
-  hitZ0ZSlopeQuadLegendre.fell();
-  hitZ0ZSlopeQuadLegendre.raze();
+  m_newQuadTree.fell();
+
+  B2INFO(possibleStereoSegments.size())
 
   if (possibleStereoSegments.size() == 0)
     return;

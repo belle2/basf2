@@ -1,4 +1,5 @@
 #pragma once
+#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace Belle2 {
   class StereoHitFinderCDCLegendreHistogrammingModule: public TrackFinderCDCBaseModule {
 
   public:
-    StereoHitFinderCDCLegendreHistogrammingModule() : TrackFinderCDCBaseModule()
+    StereoHitFinderCDCLegendreHistogrammingModule() : TrackFinderCDCBaseModule(), m_stereohitsProcesser(nullptr)
     {
       addParam("DebugOutput",
                m_param_debugOutput,
@@ -34,6 +35,20 @@ namespace Belle2 {
                true);
     }
 
+    void initialize() override
+    {
+      m_stereohitsProcesser = new TrackFindingCDC::StereohitsProcesser(m_param_quadTreeLevel, m_param_debugOutput);
+
+      TrackFinderCDCBaseModule::initialize();
+    }
+
+    void terminate() override
+    {
+      delete m_stereohitsProcesser;
+
+      TrackFinderCDCBaseModule::terminate();
+    }
+
   private:
     /**
      * Do a QuadTreeHistogramming with all the StereoHits
@@ -45,6 +60,8 @@ namespace Belle2 {
     unsigned int m_param_quadTreeLevel; /**< The number of levels for the quad tree search */
     unsigned int m_param_minimumHitsInQuadTree; /**< The minimum number of hits in a quad tree bin to be called as result. */
     bool m_param_useOldImplementation; /**< Whether to use the old implementation o the quad tree. */
+
+    TrackFindingCDC::StereohitsProcesser* m_stereohitsProcesser;
   };
 
 }

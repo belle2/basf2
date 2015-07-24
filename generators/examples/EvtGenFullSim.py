@@ -1,44 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+########################################################
+# 10 generic BBbar events using EvtGen incl. FullSim
+#
+# Example steering file
+########################################################
+
 from basf2 import *
+from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
-# to run the framework the used modules need to be registered
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
-eventinfosetter = register_module('EventInfoSetter')
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
-g4sim = register_module('FullSim')
-simpleoutput = register_module('RootOutput')
-mcparticleprinter = register_module('PrintMCParticles')
-
-# Setting the option for all non-hepevt reader modules:
-eventinfosetter.param('evtNumList', [3])  # we want to process 100 events
-eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
-simpleoutput.param('outputFileName', 'EvtGenOutput.root')
-mcparticleprinter.set_log_level(0)
-
-# creating the path for the processing
 main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(paramloader)
-main.add_module(geobuilder)
 
-# Add hepevtreader module to path:
-main.add_module(evtgeninput)
-# and print parameters for hepevtreader on startup of process
-print_params(evtgeninput)
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
-# Add all other modules for simple processing to path
-main.add_module(mcparticleprinter)
-main.add_module(g4sim)
-main.add_module(simpleoutput)
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
+# to run the framework the used modules need to be registered
+evtgen = register_module('EvtGenInput')
+evtgen.set_log_level(LogLevel.INFO)
+
+# run
+main.add_module("Progress")
+main.add_module("Gearbox")
+main.add_module("Geometry")
+main.add_module(evtgen)
+main.add_module("FullSim")
+main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("RootOutput", outputFileName="evtgen_upsilon4s_fullsim.root")
 
 # Process the events
 process(main)
-# if there are less events in the input file the processing will be stopped at
-# EOF.
+
+# show call statistics
+print statistics

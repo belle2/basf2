@@ -1,39 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+########################################################
+# 100 generic BBbar events using EvtGen
+#
+# Example steering file
+########################################################
+
 from basf2 import *
+from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.INFO)
 
-# to run the framework the used modules need to be registered
-evtgeninput = register_module('EvtGenInput')
-# evtgeninput.param('userDECFile',
-# os.path.join(basf2datadir,'generators/belle/MIX.DEC'))
-evtgeninput.param('boost2LAB', True)
-eventinfosetter = register_module('EventInfoSetter')
-paramloader = register_module('Gearbox')
-geobuilder = register_module('Geometry')
-
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
-eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
-mcparticleprinter = register_module('PrintMCParticles')
-mcparticleprinter.logging.log_level = LogLevel.ERROR
-
-# creating the path for the processing
+# main path
 main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(paramloader)
-main.add_module(geobuilder)
 
-## Add hepevtreader module to path:
-# main.add_module(evtgeninput)
-## and print parameters for hepevtreader on startup of process
-# print_params(evtgeninput)
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
-main.add_module(evtgeninput)
-main.add_module(mcparticleprinter)
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
 
-# Process the events
+# EvtGen
+evtgen = register_module('EvtGenInput')
+# evtgen.param('userDECFile', os.path.join(basf2datadir,'generators/belle/MIX.DEC'))
+evtgen.set_log_level(LogLevel.INFO)
+
+# run
+main.add_module("Progress")
+main.add_module("Gearbox")
+main.add_module(evtgen)
+main.add_module("RootOutput", outputFileName="evtgen_upsilon4s.root")
+main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+
+# generate events
 process(main)
+
+# show call statistics
+print statistics

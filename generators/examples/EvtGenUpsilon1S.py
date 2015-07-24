@@ -1,51 +1,46 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+########################################################
+# 100 Upsilon(1) events using EvtGen
+#
+# Example steering file
+########################################################
+
 from basf2 import *
-import os
-import sys
+from beamparameters import add_beamparameters
 
-# suppress messages and during processing:
-set_log_level(LogLevel.WARNING)
+# suppress messages and warnings during processing:
+set_log_level(LogLevel.INFO)
 
-# set event info for generated events
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
-
-# load parameters (i.e. beam energies)
-gearbox = register_module('Gearbox')
-# Find the path to this script so it also works when called from another
-# directory
-path = os.path.dirname(sys.argv[0])
-# Look for xml files also in the current directory for files beginning with
-# Upsilon1S (so geometry/SuperKEKB.xml will also be found as
-# Upsilon1S-geometry-SuperKEKB.xml)
-prefix = os.path.join(path, "Upsilon1S")
-gearbox.param("backends", ["file:%s" % prefix, "file:"])
-
-# to generate other parent particles with different energies one would need to
-# make a copy of Upsilon1S-geometry-SuperKEKB.xml and change the beam energies
-# to match the target energy, save it using a suitable prefix and ending in
-# "-geometry-SuperKEKB.xml" and change the prefix above to match that prefix
-
-# one can set the loglevel of gearbox to debug which will cause it to print
-# which files are opened to check if the correct SuperKEKB.xml is used
-#gearbox.logging.log_level = LogLevel.DEBUG
-
-# configure evtgen to generate Upsilon as top particle
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('ParentParticle', "Upsilon")
-
-# print generated particles
-mcparticleprinter = register_module('PrintMCParticles')
-mcparticleprinter.logging.log_level = LogLevel.INFO
-
-# creating the path for the processing
+# main path
 main = create_path()
-# and all modules we created
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-main.add_module(evtgeninput)
-main.add_module(mcparticleprinter)
 
-# process the events
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
+# EvtGen
+evtgen = register_module('EvtGenInput')
+# parent particle name from evt.pdl: Upsilon = Y(1S)
+evtgen.param('ParentParticle', "Upsilon")
+evtgen.set_log_level(LogLevel.INFO)
+
+# run
+main.add_module("Progress")
+main.add_module("Gearbox")
+main.add_module(evtgen)
+main.add_module("RootOutput", outputFileName="evtgen_upsilon1s.root")
+main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+
+# generate events
 process(main)
+
+# show call statistics
+print statistics

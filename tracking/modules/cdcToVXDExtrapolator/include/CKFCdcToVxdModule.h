@@ -83,6 +83,9 @@ namespace Belle2 {
 
     bool m_saveAllTracks;
 
+    int m_maxHoles; /**< maximum number of holes per added hit in the CKF */
+    double m_maxChi2Increment; /**< maximum chi2 per added hit in the CKF */
+
     // input
     std::string m_GFTrackColName; /**< genfit::Track input collection name */
     std::string m_mcParticlesColName; /**< MCParticle collection name */
@@ -92,16 +95,6 @@ namespace Belle2 {
 
     std::string m_rootOutputFilename; /**< Filename for the ROOT file of module information. If "" then won't output ROOT file. */
     bool m_saveInfo;
-    bool m_refitMcHits;
-    bool m_useKalman; /**< true - refit with Kalman, false - refit with DAF */
-    bool m_searchSensorDimensions; /**< true - look for hits within a sensor width/length, false - search within n sigma of the track extrap. */
-    bool m_extrapolateToPxd; /**< Extrapolate to the PXD as well as the SVD */
-    float m_hitNSigmaZ; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable */
-    float m_hitNSigmaXY; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable */
-    float m_hitNSigmaPix; /**< When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable for pxd*/
-    bool m_extrapolateToDetector; /**< true: will try to extrapolate to the detector plane, false: extrapolates to the abstract cylinder or cone representing the detector */
-    bool m_allLayers; /**< true: will try to extrapolate to all layers and find hits, false: stop extrapolation when a layer without compatible hits reached */
-    bool m_stepwiseKalman; /**< "When true refits the track with a Kalman update after each hit is added, rather than simply doing the refit at the end. Shoudl improve the extrapolation quality, particularly to the PXD."*/
 
     // information gatherers
     int nTotalTracks;
@@ -111,6 +104,8 @@ namespace Belle2 {
     int nTracksWithAddedPxdHits;
     int nStoredTracks;
 
+    int hitCount;
+
     TTree* HitInfo;
     TTree* TrackInfo;
     struct {
@@ -118,6 +113,7 @@ namespace Belle2 {
       Float_t rphi;
       Float_t pull_z;
       Float_t pull_rphi;
+      Float_t chi2Inc;
 
       Float_t du;
       Float_t dv;
@@ -126,8 +122,7 @@ namespace Belle2 {
       Int_t layer;
       Int_t cone;
 
-      Int_t truR;
-      Int_t truZ;
+      Int_t tru;
       Bool_t isPxd;
     } stHitInfo;
     struct {

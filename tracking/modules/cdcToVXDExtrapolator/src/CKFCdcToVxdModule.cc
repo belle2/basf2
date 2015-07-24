@@ -66,7 +66,6 @@ REG_MODULE(CKFCdcToVxd)
 CKFCdcToVxdModule::CKFCdcToVxdModule() :
   Module(),
   m_saveInfo(false),
-  nTotalTracks(0),
   nCdcRecoOnlyTracks(0),
   nCdcRecoOnlyTracksWithVxdMcHits(0),
   nTracksWithAddedHits(0),
@@ -83,32 +82,10 @@ CKFCdcToVxdModule::CKFCdcToVxdModule() :
   setDescription("For the given track collection input, finds the set of CDC-only tracks, tries to find VXD hits compatible with the tracks.");
 
   // Parameter definitions
-  addParam("SaveAllTracks", m_saveAllTracks,
-           "Save tracks which didn't need VXD hit recovery. If false, only those tracks for which hits were found and the refit was successful are saved.",
-           true);
   addParam("RootOutputFilename", m_rootOutputFilename,
            "Filename for the ROOT file of module information. If \"\" then won't output ROOT file.", std::string(""));
-  addParam("RefitMcHits", m_refitMcHits, "[DEBUG] Refit the CDC-only tracks with the MC particle VXD hits for debugging purposes.",
-           false);
-  addParam("UseKalman", m_useKalman, "true - refit with Kalman, false - refit with DAF", false);
-  addParam("SearchSensorDimensions", m_searchSensorDimensions,
-           "true - look for hits within a sensor width/length, false - search within n sigma of the track extrap.", true);
-  addParam("HitNSigmaXY", m_hitNSigmaXY,
-           "When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable", float(5.));
-  addParam("HitNSigmaZ", m_hitNSigmaZ,
-           "When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable", float(5.));
-  addParam("ExtrapolateToDetector", m_extrapolateToDetector,
-           "true: will try to extrapolate to the detector plane, false: extrapolates to the abstract cylinder or cone representing the detector",
-           false);
-  addParam("AllLayers", m_allLayers,
-           "true: will try to extrapolate to all layers and find hits, false: stop extrapolation when a layer without compatible hits reached",
-           false);
-  addParam("ExtrapolateToPxd", m_extrapolateToPxd, "Extrapolate to the PXD as well as the SVD", true);
-  addParam("HitNSigmaPix", m_hitNSigmaPix,
-           "When searching within track extrap. this is the number of sigma a hit needs to be within to be acceptable (for PXD)", float(5.));
-  addParam("StepwiseKalmanRefit", m_stepwiseKalman,
-           "When true refits the track with a Kalman update after each hit is added, rather than simply doing the refit at the end. Shoudl improve the extrapolation quality, particularly to the PXD.",
-           true);
+  addParam("MaxHoles", m_maxHoles, "maximum number of holes per added hit in the CKF", 3);
+  addParam("MaxChi2Increment", m_maxChi2Increment, "maximum chi2 per added hit in the CKF", 10.0);
 
   // Input
   addParam("GFTrackColName", m_GFTrackColName, "Name of genfit::Track collection (input)", std::string(""));
@@ -195,7 +172,9 @@ bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, unsigned sea
     B2DEBUG(90, "---- findHits(): Pix cluster position: " << pos.X() << " " << pos.Y() << " " << pos.Z());
     B2DEBUG(101, "Good cluster. dZ:" << dz << " dXY:" << dxy << " swidth:" << sensorWidth << " lng:" << aSensorInfo.getLength());
     if ((fabs(dz) < aSensorInfo.getLength() / 2) && (dxy < sensorWidth)) {
-      hits.push_back(new PXDRecoHit(cluster));
+      auto nxtHit = new PXDRecoHit(cluster);
+      nxtHit->setHitId(hitCount++);
+      hits.push_back(nxtHit);
     }
   }
 
@@ -228,10 +207,10 @@ bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, unsigned sea
   }
 
   // check for slant layer
-  bool isCone = false;
+  //  bool isCone = false;
   if ((searchLayer > 3) && (posAtLayer.Z() > bentZ[searchLayer])) {
     // extrapolate to cone
-    isCone = true;
+    //isCone = true;
 
     /// at bentZ[layer], the radius should match the cylinder, and given the opening angle, should know the beginning of the cone
     genfit::MeasuredStateOnPlane mop;
@@ -306,7 +285,9 @@ bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, unsigned sea
 
         B2DEBUG(90, "---- findHits(): V: " << pos.X() << " " << pos.Y() << " " << pos.Z() << " : " << aSensorInfo.getWidth() / 2. << " T "
                 << truHit << " id:" << cluster->getSensorID());
-        hits.push_back(new SVDRecoHit(cluster));
+        auto nxtHit = new SVDRecoHit(cluster);
+        nxtHit->setHitId(hitCount++);
+        hits.push_back(nxtHit);
       }
     }
   } else { // look for a u cluster
@@ -337,7 +318,9 @@ bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, unsigned sea
 
         B2DEBUG(90, "---- findHits(): U: " << pos.X() << " " << pos.Y() << " " << pos.Z() << " : " << aSensorInfo.getLength() / 2. << " T "
                 << truHit << " id:" << cluster->getSensorID());
-        hits.push_back(new SVDRecoHit(cluster));
+        auto nxtHit = new SVDRecoHit(cluster);
+        nxtHit->setHitId(hitCount++);
+        hits.push_back(nxtHit);
       }
     }
   }
@@ -360,58 +343,6 @@ bool CKFCdcToVxdModule::findHits(genfit::Track* track, unsigned counter, std::ve
   if (counter == 9)
     return module->extrapolateToPXDLayer(track, 3, *module->pxdClusters, hits);
   return false;
-}
-
-
-bool CKFCdcToVxdModule::refitTrack(genfit::Track* track)
-{
-  bool fitSuccess = false;
-  // following the GenFitter.cc code
-  genfit::AbsKalmanFitter* fitter = 0;
-  if (m_useKalman) {
-    fitter = new genfit::KalmanFitterRefTrack();
-    fitter->setMinIterations(3);
-    fitter->setMaxIterations(10);
-    fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
-    fitter->setMaxFailedHits(5);
-  } else {
-    fitter = new genfit::DAF(true);
-    ((genfit::DAF*) fitter)->setProbCut(0.001);
-    fitter->setMaxFailedHits(5);
-  }
-  try {
-    if (!track->checkConsistency()) {
-      B2DEBUG(50, "Inconsistent track found, attempting to sort!")
-      bool sorted = track->sort();
-      if (!sorted) {
-        B2DEBUG(50, "Track points NOT SORTED! Still inconsistent, I can't be held responsible for assertion failure!");
-      } else {
-        B2DEBUG(50, "Track points SORTED!! Hopefully this works now!");
-      }
-    }
-    fitter->processTrack(track);
-
-    genfit::FitStatus* fs = 0;
-    genfit::KalmanFitStatus* kfs = 0;
-    fitSuccess = track->hasFitStatus();
-    if (fitSuccess) {
-      fs = track->getFitStatus();
-      fitSuccess = fitSuccess && fs->isFitted();
-      fitSuccess = fitSuccess && fs->isFitConverged();
-      kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
-      fitSuccess = fitSuccess && kfs;
-      B2DEBUG(100, "> Track fit. isFitted: " << fs->isFitted() << " isFitConverged:" << fs->isFitConverged() << " isFitConverged(false):"
-              << fs->isFitConverged(false) << " nFailedPoints:" << fs->getNFailedPoints() << " numPointsWithMeasurement (from track): " <<
-              track->getNumPointsWithMeasurement());
-      trkInfo.pval = fs->getPVal();
-    } else {
-      B2WARNING("Bad Fit in CKFCdcToVxdModule");
-    }
-  } catch (...) {
-    B2WARNING("Track fitting has failed.");
-  }
-  delete fitter;
-  return fitSuccess;
 }
 
 void CKFCdcToVxdModule::initialize()
@@ -454,7 +385,7 @@ void CKFCdcToVxdModule::initialize()
 
     HitInfo = new TTree("HitInfo", "HitInfo");
     HitInfo->Branch("stHitInfo", &stHitInfo,
-                    "z/F:rphi/F:pull_z/F:pull_rphi/F:du/F:dv/F:dw/F:layer/I:cone/I:truR/I:truZ/I:isPxd/O");
+                    "z/F:rphi/F:pull_z/F:pull_rphi/F:chi2Inc/F:du/F:dv/F:dw/F:layer/I:cone/I:tru/I:isPxd/O");
     TrackInfo = new TTree("TrackInfo", "TrackInfo");
     TrackInfo->Branch("trkInfo", &trkInfo,
                       "StartHitIdx/i:EndHitIdx/i:pt/F:th/F:d0/F:pval/F:truPxd/i:truSvd/i:nRec/i:cdconly/O:refit/O");
@@ -534,6 +465,7 @@ void CKFCdcToVxdModule::event()
 
   B2DEBUG(80, "Number of tracks in the genfit::Track StoreArray: " <<  nTracks);
   nOutTracks = 0; // number of tracks in our output array
+  hitCount = 0; // unique id for each genfit::AbsMeasurement we create in findHits()
 
   /// --- Run the CKF over the output tracks which are CDC only
   for (genfit::Track& crnt : gfTracks) {
@@ -541,19 +473,78 @@ void CKFCdcToVxdModule::event()
     nTotalTracks++;
 
     RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsFromObj<MCParticle>(&crnt);
+    if (cdcHitsFromMC) delete cdcHitsFromMC;
     cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsFromObj<CDCHit>(MCParticles_fromTrack[0]));
+    if (svdClustersFromMC) delete svdClustersFromMC;
     svdClustersFromMC =  new RelationVector<SVDCluster>(DataStore::getRelationsToObj<SVDCluster>(MCParticles_fromTrack[0]));
+    if (pxdClustersFromMC) delete pxdClustersFromMC;
     pxdClustersFromMC =  new RelationVector<PXDCluster>(DataStore::getRelationsToObj<PXDCluster>(MCParticles_fromTrack[0]));
     B2DEBUG(100, "--- Number of related MC particles: " << MCParticles_fromTrack.size() << " npxd " << pxdClustersFromMC->size() <<
             " nsvd " << svdClustersFromMC->size() << " ncdc " << cdcHitsFromMC->size());
 
+    trkInfo.cdconly = trkInfo.refit = false;
     if (isCdcOnly(crnt)) {
+      trkInfo.cdconly = true;
       B2DEBUG(100, "<----> CDCOnly Track Found Running CKF " << " <--->");
-      CKF ckf(&crnt, findHits, (void*) this);
+      CKF ckf(&crnt, findHits, (void*) this, m_maxChi2Increment, m_maxHoles);
       genfit::Track* newTrk = ckf.processTrack();
       if (newTrk) {
         storeTrack(*newTrk, outGfTracks, outGfTrackCands, gfTrackCandidatesTogfTracks, gfTracksToMCPart);
-        delete newTrk;
+        if (newTrk != &crnt) {
+          trkInfo.refit = true;
+          trkInfo.nRec = newTrk->getNumPointsWithMeasurement() - crnt.getNumPointsWithMeasurement();
+          trkInfo.truSvd = svdClustersFromMC->size();
+          trkInfo.truPxd = pxdClustersFromMC->size();
+
+          // store added hit info
+          for (unsigned i = 0; i < newTrk->getNumPointsWithMeasurement(); ++i) {
+            genfit::AbsMeasurement* meas = newTrk->getPointWithMeasurement(i)->getRawMeasurement();
+            SVDRecoHit* svd = dynamic_cast<SVDRecoHit*>(meas);
+            PXDRecoHit* pxd = dynamic_cast<PXDRecoHit*>(meas);
+            if (svd) {
+              auto clus = svd->getCluster();
+              bool truHit = false;
+              for (auto& clu : *svdClustersFromMC) {
+                if ((clus->getSensorID() == clu.getSensorID()) && (clu.isUCluster() == clus->isUCluster())
+                    && (clu.getPosition() == clus->getPosition())) {
+                  truHit  = true;
+                  break;
+                } else if ((clus->getSensorID() == clu.getSensorID()) && (clu.isUCluster() == clus->isUCluster())
+                           && (clu.getPosition() == clus->getPosition())) {
+                  truHit  = true;
+                  break;
+                }
+              }
+              stHitInfo.layer = clus->getSensorID().getLayerNumber();
+              stHitInfo.tru = truHit;
+              stHitInfo.isPxd = false;
+              stHitInfo.chi2Inc = ckf.getChi2Inc(meas->getHitId());
+              stHitInfo.pull_z = newTrk->getPointWithMeasurement(i)->getKalmanFitterInfo(newTrk->getCardinalRep())->getUpdate(
+                                   -1)->getChiSquareIncrement();
+              stHitInfo.pull_rphi = newTrk->getPointWithMeasurement(i)->getKalmanFitterInfo(newTrk->getCardinalRep())->getUpdate(
+                                      -1)->getChiSquareIncrement();
+              HitInfo->Fill();
+            } else if (pxd) {
+              auto cluster = pxd->getCluster();
+              bool truHit = false;
+              for (auto& clu : *pxdClustersFromMC) {
+                if ((cluster->getSensorID() == clu.getSensorID()) && (clu.getU() == cluster->getU()) && (clu.getV() == cluster->getV()))
+                  truHit  = true;
+              }
+              stHitInfo.layer = cluster->getSensorID().getLayerNumber();
+              stHitInfo.tru = truHit;
+              stHitInfo.isPxd = false;
+
+              HitInfo->Fill();
+            }
+          }
+
+          // new track created by the CKF module, and storeTrack
+          // appendNew's onto the output. Need to keep crnt alive
+          // because it stored in the StoreArray and referenced by
+          // other modules
+          delete newTrk;
+        }
       } else
         storeTrack(crnt, outGfTracks, outGfTrackCands, gfTrackCandidatesTogfTracks, gfTracksToMCPart);
     } else {
@@ -563,6 +554,8 @@ void CKFCdcToVxdModule::event()
     delete svdClustersFromMC; svdClustersFromMC = 0;
     delete pxdClustersFromMC; pxdClustersFromMC = 0;
 
+    if (m_saveInfo)
+      TrackInfo->Fill();
     B2DEBUG(110, "<---> Finished track " << nOutTracks << " <--->");
   }
   B2DEBUG(110, "<--> Finished Event " << eventCounter << " <-->");

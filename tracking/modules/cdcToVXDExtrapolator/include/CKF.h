@@ -11,6 +11,7 @@
 #pragma once
 
 #include<vector>
+#include<map>
 
 namespace genfit { class Track; class AbsMeasurement; }
 
@@ -36,10 +37,13 @@ namespace Belle2 {
      * representing the number of steps already processed. data will
      * be passed unmolested to each invocation of findHits
      */
-    CKF(genfit::Track* track, bool (*findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*), void* data);
+    CKF(genfit::Track* track, bool (*findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*), void* data,
+        double _maxChi2Increment = 20, int _maxHoles = 3);
 
     /// find hits, run extrapolations, trim outputs, find a best track candidate
     genfit::Track* processTrack();
+
+    double getChi2Inc(int hitId) {return chi2Map[hitId];}
 
   private:
     genfit::Track* seedTrack;
@@ -61,5 +65,13 @@ namespace Belle2 {
 
     /// how many findHits steps we've already taken
     unsigned step;
+
+    /// maximum number of holes we allow in a track
+    int maxHoles;
+    /// maximum chi2 increment per added hit
+    double maxChi2Increment;
+
+    /// stores the chi2 increment of the added hit when it was added (i.e. not after refit)
+    std::map<int, double> chi2Map;
   };
 }

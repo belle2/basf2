@@ -26,11 +26,13 @@
 using namespace Belle2;
 
 CKF::CKF(genfit::Track* _track, bool (*_findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*),
-         void* _data) :
+         void* _data, double _maxChi2Increment, int _maxHoles) :
   seedTrack(_track),
   findHits(_findHits),
   data(_data),
-  step(0)
+  step(0),
+  maxHoles(_maxHoles),
+  maxChi2Increment(_maxChi2Increment)
 {
 }
 
@@ -58,14 +60,23 @@ genfit::Track* CKF::processTrack()
       B2DEBUG(90, "-- In CKF::processTrack(): At step " << step << " no hits found, continuing search");
       continue;
     }
-    for (unsigned i = 0; i < newHits.size(); ++i)
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 90, PACKAGENAME()) == true) {
+      std::cerr << "-- In CKF::processTrack(): At step " << step << " given " << newHits.size() << " hits" << " ";
+    }
+    for (unsigned i = 0; i < newHits.size(); ++i) {
       allHits.push_back(newHits[i]);
+      if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 90, PACKAGENAME()) == true) {
+        std::cerr << newHits[i]->getHitId() << " ";
+      }
+    }
+    if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 90, PACKAGENAME()) == true) {
+      std::cerr << std::endl;
+    }
 
     bool any = false;
     std::vector<genfit::Track*>* newtracks = new std::vector<genfit::Track*>;
 
     for (auto& track : *tracks) {
-      B2DEBUG(90, "-- In CKF::processTrack(): At step " << step << " given " << newHits.size() << " hits");
       // copy the no-added-hit case
       newtracks->push_back(track);
       /// if the track is bad, don't try to add hits
@@ -76,7 +87,8 @@ genfit::Track* CKF::processTrack()
       if (newHits.size() != 0) {
         for (auto& hit : newHits) {
           genfit::Track* newtrack = new genfit::Track(*track);
-          newtrack->insertMeasurement(hit->clone(), 0);
+          auto newhit = hit->clone();
+          newtrack->insertMeasurement(newhit, 0);
           try {
             fitter->processTrackPartially(newtrack, newtrack->getCardinalRep(), 1, 0);
             auto up0 = newtrack->getPointWithMeasurementAndFitterInfo(0, newtrack->getCardinalRep())->getKalmanFitterInfo(0)->getUpdate(-1);
@@ -87,6 +99,8 @@ genfit::Track* CKF::processTrack()
               TVector3 pos, mom, pos2, mom2;
               track->getFittedState().getPosMomCov(pos, mom, cov);
               up0->getPosMomCov(pos2, mom2, cov2);
+
+              chi2Map[hit->getHitId()] = up0->getChiSquareIncrement();
               B2DEBUG(70, "--- In CKF::processTrack(): Added partial track step " << newtrack->getFitStatus(
                         newtrack->getCardinalRep())->getChi2() <<
                       "[" << newtrack->getFitStatus(newtrack->getCardinalRep())->getNdf() << "] " << up0->getChiSquareIncrement() << "{" << up0->getNdf()
@@ -150,7 +164,7 @@ bool CKF::passPreUpdateTrim(genfit::Track* track, unsigned step)
   // Check for holes
   int nadded = track->getNumPointsWithMeasurement() - seedTrack->getNumPointsWithMeasurement();
   int nholes = step - nadded;
-  if (nholes > 3) {
+  if (nholes > maxHoles) {
     B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
             track->getNumPointsWithMeasurement() << " " << seedTrack->getNumPointsWithMeasurement() << " " << nadded << "}");
     return false;
@@ -161,7 +175,7 @@ bool CKF::passPreUpdateTrim(genfit::Track* track, unsigned step)
 bool CKF::passPostUpdateTrim(genfit::Track* track, unsigned)
 {
   auto up0 = track->getPointWithMeasurementAndFitterInfo(0, track->getCardinalRep())->getKalmanFitterInfo(0)->getUpdate(-1);
-  if ((up0->getChiSquareIncrement() / up0->getNdf()) > 20) {
+  if ((up0->getChiSquareIncrement() / up0->getNdf()) > maxChi2Increment) {
     B2DEBUG(70, "--- In CKF::postUpdateTrim(): Filtering track with chi2 " << up0->getChiSquareIncrement() << "{" << up0->getNdf() <<
             "}");
     return false;
@@ -172,10 +186,15 @@ bool CKF::passPostUpdateTrim(genfit::Track* track, unsigned)
 void chiSqNdf(genfit::Track* track, double& chi2, int& ndf)
 {
   chi2 = 0; ndf = 0;
-  for (int i = 0; i < track->getNumPointsWithMeasurement(); ++i) {
-    auto up = track->getPointWithMeasurementAndFitterInfo(i, track->getCardinalRep())->getKalmanFitterInfo(0)->getUpdate(-1);
-    chi2 += up->getChiSquareIncrement();
-    ndf += up->getNdf();
+  for (unsigned i = 0; i < track->getNumPointsWithMeasurement(); ++i) {
+    auto fi = track->getPointWithMeasurementAndFitterInfo(i, track->getCardinalRep());
+    if (fi) {
+      auto up = fi->getKalmanFitterInfo(0)->getUpdate(-1);
+      chi2 += up->getChiSquareIncrement();
+      ndf += up->getNdf();
+    } else {
+      B2WARNING("FitterInfo missing in track!");
+    }
   }
 }
 

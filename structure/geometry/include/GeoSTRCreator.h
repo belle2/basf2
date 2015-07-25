@@ -36,6 +36,7 @@ namespace Belle2 {
       //! Constructor of the GeoSTRCreator class.
       GeoSTRCreator();
 
+
       //! The destructor of the GeoSTRCreator class.
       virtual ~GeoSTRCreator();
 
@@ -48,7 +49,14 @@ namespace Belle2 {
     protected:
 
     private:
-
+      //! The methods that reads the GearBox directory and puts the shield in the G4 Top Volume
+      /*!
+      \param content directory where to read shield info from the xml
+        \param topVolume: Gean4 Top volume (where to include shields)
+        \param side: string corresponding to the shield type
+      \return the mass of the shield in kg
+      */
+      float BuildShield(const GearDir& content, G4LogicalVolume& topVolume, std::string side);
     };
   }
 }

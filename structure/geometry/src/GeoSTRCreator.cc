@@ -1,4 +1,3 @@
-
 /**************************************************************************
  *  BASF2 (Belle Analysis Framework 2)                                    *
  *  Copyright(C) 2010 - Belle II Collaboration                            *
@@ -39,6 +38,7 @@
 #include <G4VisAttributes.hh>
 
 using namespace std;
+using namespace boost;
 
 namespace Belle2 {
 
@@ -92,130 +92,64 @@ namespace Belle2 {
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0),
                         logi_PolePieceR, "phys_PolePieceR", &topVolume, false, 0);
 
+      //Default value: Belle shield. Defined in STR.xml as e.g.:
+      //      <ForwardShieldType>FWD0</ForwardShieldType>
+      string strForwardShield = content.getString("ForwardShieldType", "FWD0");
+      string strBackwardShield = content.getString("BackwardShieldType", "BWD0");
+      BuildShield(content, topVolume, strForwardShield);
+      BuildShield(content, topVolume, strBackwardShield);
 
-      double m_phi = content.getAngle("Phi") / Unit::rad;
-      double m_dphi = content.getAngle("Dphi") / Unit::rad;
+    }
+
+    float GeoSTRCreator::BuildShield(const GearDir& content, G4LogicalVolume& topVolume, string side)
+    {
+
+      string gearPath = (format("%1%/Layers/Layer") % side).str();
+      int nFwdShieldLayers = content.getNumberNodes(gearPath);
+      float _mass = 0;
+
+      //Build the volumes
+      for (int iLayer = 1 ; iLayer <= nFwdShieldLayers ; ++iLayer) {
+
+        //Thread the strings
+        string layerPath   = (format("/%1%[%2%]/") % gearPath % iLayer).str();
+        string shapeName   = (format("%1%Layer_%2%") % side % iLayer).str();
+        string logiVolName = (format("logi%1%Layer_%2%") % side % iLayer).str();
+        string physVolName = (format("phys%1%Layer_%2%") % side % iLayer).str();
+
+        // Connect the appropriate Gearbox path
+        GearDir layerContent(content);
+        layerContent.append(layerPath);
+
+        // read and create material
+        string strMatLayer = layerContent.getString("Material", "Air");
+        G4Material* LayerMat = Materials::get(strMatLayer);
+
+        // Create the shapw
+        const std::vector<GearDir> planes = layerContent.getNodes("Plane");
+        int nPlanes = planes.size();
+        B2INFO("Number of planes on side  " << side << " layer " << iLayer
+               << " : " << nPlanes);
 
 
+        double _minZ(0), _maxZ(0);
+        G4Polycone* LayerShape = geometry::createPolyCone(shapeName.c_str(),
+                                                          layerContent, _minZ, _maxZ);
+        // Create logical volume
+        G4LogicalVolume* logiShieldLayer = new G4LogicalVolume(LayerShape, LayerMat, logiVolName, 0, 0, 0);
 
+        //Place physical volume
+        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logiShieldLayer, physVolName, &topVolume, false, 0);
 
-      int m_nBoundarySR1 = content.getNumberNodes("ShieldR1/ZBoundary");
-      double m_zSR1[m_nBoundarySR1];
-      double m_rminSR1[m_nBoundarySR1];
-      double m_rmaxSR1[m_nBoundarySR1];
-      for (int izBoundary  = 0; izBoundary < m_nBoundarySR1; izBoundary++) {
-        m_zSR1[izBoundary]    =
-          content.getLength((boost::format("ShieldR1/ZBoundary[%1%]/Zposition") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rminSR1[izBoundary] =
-          content.getLength((boost::format("ShieldR1/ZBoundary[%1%]/InnerRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rmaxSR1[izBoundary] =
-          content.getLength((boost::format("ShieldR1/ZBoundary[%1%]/OuterRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-      }
-      int m_nBoundarySR2 = content.getNumberNodes("ShieldR2/ZBoundary");
-      double m_zSR2[m_nBoundarySR2];
-      double m_rminSR2[m_nBoundarySR2];
-      double m_rmaxSR2[m_nBoundarySR2];
-      for (int izBoundary  = 0; izBoundary < m_nBoundarySR2; izBoundary++) {
-        m_zSR2[izBoundary]    =
-          content.getLength((boost::format("ShieldR2/ZBoundary[%1%]/Zposition") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rminSR2[izBoundary] =
-          content.getLength((boost::format("ShieldR2/ZBoundary[%1%]/InnerRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rmaxSR2[izBoundary] =
-          content.getLength((boost::format("ShieldR2/ZBoundary[%1%]/OuterRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-      }
-      int m_nBoundarySL1 = content.getNumberNodes("ShieldL1/ZBoundary");
-      double m_zSL1[m_nBoundarySL1];
-      double m_rminSL1[m_nBoundarySL1];
-      double m_rmaxSL1[m_nBoundarySL1];
-      for (int izBoundary  = 0; izBoundary < m_nBoundarySL1; izBoundary++) {
-        m_zSL1[izBoundary]    =
-          content.getLength((boost::format("ShieldL1/ZBoundary[%1%]/Zposition") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rminSL1[izBoundary] =
-          content.getLength((boost::format("ShieldL1/ZBoundary[%1%]/InnerRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rmaxSL1[izBoundary] =
-          content.getLength((boost::format("ShieldL1/ZBoundary[%1%]/OuterRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-      }
-      int m_nBoundarySL2 = content.getNumberNodes("ShieldL2/ZBoundary");
-      double m_zSL2[m_nBoundarySL2];
-      double m_rminSL2[m_nBoundarySL2];
-      double m_rmaxSL2[m_nBoundarySL2];
-      for (int izBoundary  = 0; izBoundary < m_nBoundarySL2; izBoundary++) {
-        m_zSL2[izBoundary]    =
-          content.getLength((boost::format("ShieldL2/ZBoundary[%1%]/Zposition") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rminSL2[izBoundary] =
-          content.getLength((boost::format("ShieldL2/ZBoundary[%1%]/InnerRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
-        m_rmaxSL2[izBoundary] =
-          content.getLength((boost::format("ShieldL2/ZBoundary[%1%]/OuterRadius") %
-                             (izBoundary + 1)).str()) / Unit::mm;
+        B2INFO("Mass of " << side << " layer " << iLayer
+               << " = " << logiShieldLayer->GetMass() / CLHEP::kg << ".kg.");
+
+        _mass += (logiShieldLayer->GetMass() / CLHEP::kg);
       }
 
-      G4Polycone* ShieldPconR1 =
-        new G4Polycone("ShieldOR1", m_phi, m_dphi, m_nBoundarySR1, m_zSR1, m_rminSR1, m_rmaxSR1);
-      G4Polycone* ShieldPconR2 =
-        new G4Polycone("ShieldOR2", m_phi, m_dphi, m_nBoundarySR2, m_zSR2, m_rminSR2, m_rmaxSR2);
-      G4Polycone* ShieldPconL1 =
-        new G4Polycone("ShieldOL1", m_phi, m_dphi, m_nBoundarySL1, m_zSL1, m_rminSL1, m_rmaxSL1);
-      G4Polycone* ShieldPconL2 =
-        new G4Polycone("ShieldOR2", m_phi, m_dphi, m_nBoundarySL2, m_zSL2, m_rminSL2, m_rmaxSL2);
+      B2INFO("Total mass of " << side << " = " << _mass << " kg");
 
-      // Grab material names from the XML file
-      // TODO: use indexing and loop over all regions (ref. the two ARICH layers)
-      string shieldR1MatStr = content.getString("ShieldR1/Material");
-      G4Material* shieldR1Mat = Materials::get(shieldR1MatStr);
-      string shieldR2MatStr = content.getString("ShieldR2/Material");
-      G4Material* shieldR2Mat = Materials::get(shieldR2MatStr);
-
-      string shieldL1MatStr = content.getString("ShieldL1/Material");
-      G4Material* shieldL1Mat = Materials::get(shieldL1MatStr);
-      string shieldL2MatStr = content.getString("ShieldL2/Material");
-      G4Material* shieldL2Mat = Materials::get(shieldL2MatStr);
-
-
-      // Create logical volumes
-      G4LogicalVolume* ShieldLVR1 =
-        new G4LogicalVolume(ShieldPconR1, shieldR1Mat, "LVShieldR1", 0, 0, 0);
-      G4LogicalVolume* ShieldLVR2 =
-        new G4LogicalVolume(ShieldPconR2, shieldR2Mat, "LVShieldR2", 0, 0, 0);
-      G4LogicalVolume* ShieldLVL1 =
-        new G4LogicalVolume(ShieldPconL1, shieldL1Mat, "LVShieldL1", 0, 0, 0);
-      G4LogicalVolume* ShieldLVL2 =
-        new G4LogicalVolume(ShieldPconL2, shieldL2Mat, "LVShieldL2", 0, 0, 0);
-
-
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR1, "PVShieldR1", &topVolume, false, 0);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVR2, "PVShieldR2", &topVolume, false, 0);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL1, "PVShieldL1", &topVolume, false, 0);
-      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVL2, "PVShieldL2", &topVolume, false, 0);
-
-
-
-
-      /*
-       int m_nBoundarySD1 = content.getNumberNodes("ShieldD1/ZBoundary");
-       double m_zSD1[m_nBoundarySD1];
-       double m_rminSD1[m_nBoundarySD1];
-       double m_rmaxSD1[m_nBoundarySD1];
-       for (int izBoundary  = 0; izBoundary < m_nBoundarySD1; izBoundary++) {
-       m_zSD1[izBoundary]    = content.getLength((boost::format("ShieldD1/ZBoundary[%1%]/Zposition") % (izBoundary + 1)).str()) / Unit::mm;
-       m_rminSD1[izBoundary] = content.getLength((boost::format("ShieldD1/ZBoundary[%1%]/InnerRadius") % (izBoundary + 1)).str()) / Unit::mm;
-       m_rmaxSD1[izBoundary] = content.getLength((boost::format("ShieldD1/ZBoundary[%1%]/OuterRadius") % (izBoundary + 1)).str()) / Unit::mm;
-       }
-
-       G4Polycone* ShieldPconD1 = new G4Polycone("ShieldOD1", m_phi, m_dphi, m_nBoundarySD1, m_zSD1, m_rminSD1, m_rmaxSD1);
-       G4LogicalVolume* ShieldLVD1 = new G4LogicalVolume(ShieldPconD1, Materials::get("G4_POLYETHYLENE"), "LVShieldD1", 0, 0, 0);
-       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), ShieldLVD1, "PVShieldD1", &topVolume, false, 0);
-      */
+      return _mass;
     }
   }
 }

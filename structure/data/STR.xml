@@ -138,297 +138,72 @@
 	    <OuterRadius unit="cm">46.7</OuterRadius>
 	  </ZBoundary>
 	</ShieldD1>
-	
 
 
-	<!--
-	<ShieldR1>
-		<Material desc="Material for top part of the FW ECL Shield">STR-Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">206</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">42.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">216</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">44.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">240</Zposition>
-			<InnerRadius unit="cm">42.0</InnerRadius>
-			<OuterRadius unit="cm">44.5</OuterRadius>
-		</ZBoundary>
-	</ShieldR1>
-	<ShieldR2>
-		<Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">216</Zposition>
-			<InnerRadius unit="cm">44.5</InnerRadius>
-			<OuterRadius unit="cm">44.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">226</Zposition>
-			<InnerRadius unit="cm">44.5</InnerRadius>
-			<OuterRadius unit="cm">47.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">240</Zposition>
-			<InnerRadius unit="cm">44.5</InnerRadius>
-			<OuterRadius unit="cm">47.0</OuterRadius>
-		</ZBoundary>
-	</ShieldR2>
-	-->
+	<!-- Add all the shields -->
 
-	<!--
-	<ShieldL1>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">-145</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">49</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">-114</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">49.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">-108</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">46.5</OuterRadius>
-		</ZBoundary>
-	</ShieldL1>
-	<ShieldL2>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">-145</Zposition>
-			<InnerRadius unit="cm">49.0</InnerRadius>
-			<OuterRadius unit="cm">51.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">-120</Zposition>
-			<InnerRadius unit="cm">49.0</InnerRadius>
-			<OuterRadius unit="cm">51.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">-114</Zposition>
-			<InnerRadius unit="cm">49.0</InnerRadius>
-			<OuterRadius unit="cm">49.0</OuterRadius>
-		</ZBoundary>
-	</ShieldL2>-->
+	<!-- Default Values -->
+	<!-- (Should be changed in the Python steering script and not directly in this file-->
+	<ForwardShieldType>FWDA1</ForwardShieldType>
+	<BackwardShieldType>BWDA1</BackwardShieldType>
 
-	<!-- both2 -->
+	<xi:include href="SHIELD-FWD0.xml"/>	
+	<xi:include href="SHIELD-BWD0.xml"/>	
+
+	<xi:include href="SHIELD-FWDA1.xml"/>	
+	<xi:include href="SHIELD-BWDA1.xml"/>	
+
+	<xi:include href="SHIELD-FWDA2.xml"/>	
+	<xi:include href="SHIELD-BWDA2.xml"/>	
+
+	<xi:include href="SHIELD-FWDB1.xml"/>	
+	<xi:include href="SHIELD-BWDB1.xml"/>	
+
+	<xi:include href="SHIELD-FWDB2.xml"/>	
+	<xi:include href="SHIELD-BWDB2.xml"/>	
+
+	<xi:include href="SHIELD-FWDC1.xml"/>	
+	<xi:include href="SHIELD-BWDC1.xml"/>	
+
+	<xi:include href="SHIELD-FWDC2.xml"/>	
+	<xi:include href="SHIELD-BWDC2.xml"/>	
 
 
-	<!--	
-	<ShieldR1>
-	  <Material desc="Top (outer) part of the FW ECL Shield">STR-Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">211.78</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">231.95</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">47.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">241.75</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">47.5</OuterRadius>
-		</ZBoundary>
-	</ShieldR1>
-	<ShieldR2>
-		<Material desc="Bottom (inner) part of the FW ECL Shield">STR-HDPE</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">216</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">226</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="4">
-			<Zposition unit="cm">241.75</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-	</ShieldR2>
-	-->
+	<xi:include href="SHIELD-FWDA1-065.xml"/>	
+	<xi:include href="SHIELD-FWDA1-165.xml"/>	
+	<xi:include href="SHIELD-FWDA1-265.xml"/>	
+	<xi:include href="SHIELD-FWDA1-315.xml"/>	
+	<xi:include href="SHIELD-FWDA1-365.xml"/>	
+	<xi:include href="SHIELD-FWDA1-415.xml"/>	
+	<xi:include href="SHIELD-FWDA1-465.xml"/>	
 
-	<!--Chris Shield 1 "USED FOR PRELIMINARY STUDY" -->
-	<ShieldR1>
-		<Material desc="Material for top part of the FW ECL Shield">STR-Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">211.78</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">44.0</OuterRadius>
-		</ZBoundary>
-	
-		<ZBoundary id="3">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">40.35</InnerRadius>
-			<OuterRadius unit="cm">44.0</OuterRadius>
-		</ZBoundary>	
-		<ZBoundary id="4">
-			<Zposition unit="cm">231.95</Zposition>
-			<InnerRadius unit="cm">43.85</InnerRadius>
-			<OuterRadius unit="cm">47.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="5">
-			<Zposition unit="cm">241.75</Zposition>
-			<InnerRadius unit="cm">43.85</InnerRadius>
-			<OuterRadius unit="cm">47.5</OuterRadius>
-		</ZBoundary>
-	</ShieldR1>
+	<xi:include href="SHIELD-BWDA1-100.xml"/>	
+	<xi:include href="SHIELD-BWDA1-200.xml"/>	
+	<xi:include href="SHIELD-BWDA1-300.xml"/>	
+	<xi:include href="SHIELD-BWDA1-350.xml"/>	
+	<xi:include href="SHIELD-BWDA1-400.xml"/>	
+	<xi:include href="SHIELD-BWDA1-450.xml"/>	
+	<xi:include href="SHIELD-BWDA1-500.xml"/>	
 
-	<ShieldR2>
-		<Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">40.35</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">231.95</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">43.85</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">241.75</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">43.85</OuterRadius>
-		</ZBoundary>
-	</ShieldR2>
+	<xi:include href="SHIELD-FWDA1-001B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-003B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-005B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-010B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-015B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-020B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-025B.xml"/>	
+	<xi:include href="SHIELD-FWDA1-030B.xml"/>	
 
+	<xi:include href="SHIELD-BWDA1-001B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-003B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-005B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-010B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-015B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-020B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-025B.xml"/>	
+	<xi:include href="SHIELD-BWDA1-030B.xml"/>	
 
+	<xi:include href="SHIELD-BWDB1-005B.xml"/>	
 
-
-	<!--Chris Shield 2
-	<ShieldR1>
-	 	<Material desc="material of the Shield of the Belle II detector">Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">41.25</OuterRadius>
-		</ZBoundary>	
-		<ZBoundary id="3">
-			<Zposition unit="cm">241.75</Zposition>
-			<InnerRadius unit="cm">36.7</InnerRadius>
-			<OuterRadius unit="cm">41.25</OuterRadius>
-		</ZBoundary>
-	</ShieldR1>
-
-
-	<ShieldR2>
-		<Material desc="material of the Shield of the Belle II detector">Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">211.78</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">42.8</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">42.8</InnerRadius>
-			<OuterRadius unit="cm">44.0</OuterRadius>
-		</ZBoundary>
-	
-		<ZBoundary id="3">
-			<Zposition unit="cm">216.95</Zposition>
-			<InnerRadius unit="cm">41.25</InnerRadius>
-			<OuterRadius unit="cm">44.0</OuterRadius>
-		</ZBoundary>	
-		<ZBoundary id="4">
-			<Zposition unit="cm">231.95</Zposition>
-			<InnerRadius unit="cm">41.25</InnerRadius>
-			<OuterRadius unit="cm">47.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="5">
-			<Zposition unit="cm">241.75</Zposition>
-			<InnerRadius unit="cm">41.25</InnerRadius>
-			<OuterRadius unit="cm">47.5</OuterRadius>
-		</ZBoundary>
-	</ShieldR2>
-
-	-->
-	<ShieldL1>
-		<Material desc="Material for bottom part of the BW ECL Shield">STR-HDPE</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">-145</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">49</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">-120</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">49.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">-114</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">46.5</OuterRadius>
-		</ZBoundary>
-	</ShieldL1>
-	<ShieldL2>
-		<Material desc="Material for top part of the BW ECL Shield">STR-Lead</Material>
-		<Phi unit="deg">0</Phi>
-		<Dphi unit="deg">360.0</Dphi>
-		<ZBoundary id="1">
-			<Zposition unit="cm">-145</Zposition>
-			<InnerRadius unit="cm">49.0</InnerRadius>
-			<OuterRadius unit="cm">51.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="2">
-			<Zposition unit="cm">-120</Zposition>
-			<InnerRadius unit="cm">49.0</InnerRadius>
-			<OuterRadius unit="cm">51.5</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="3">
-			<Zposition unit="cm">-114</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">49.0</OuterRadius>
-		</ZBoundary>
-		<ZBoundary id="4">
-			<Zposition unit="cm">-108</Zposition>
-			<InnerRadius unit="cm">46.5</InnerRadius>
-			<OuterRadius unit="cm">46.5</OuterRadius>
-		</ZBoundary>
-	</ShieldL2>
     </Content>
 </DetectorComponent>

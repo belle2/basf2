@@ -3,8 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni (eugenio.paoloni@pi.infn.it)             *
- *               Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at)     *
+ * Contributors: Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at)     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -266,6 +265,15 @@ namespace VXDTFthreeHitFilterTest {
 
     //B2WARNING("MUST produce errors: 2 hits are the same: " << ptTrue << ", Pt: " << pt );
     EXPECT_ANY_THROW(filtePt.accept(outerSP, outerSP, innerSP));
+
+    Helper::resetMagneticField(0.976);
+    double ptTrue1p5 = ptTrue;
+    ptTrue = Helper::calcPt(1.414213562373095048801688724209698078570);
+    EXPECT_FALSE(filtePt.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(ptTrue, lastResult);
+    EXPECT_LT(ptTrue, ptTrue1p5);
+
+    Helper::resetMagneticField(1.5);
   }
 
 
@@ -296,8 +304,8 @@ namespace VXDTFthreeHitFilterTest {
 //     EXPECT_FLOAT_EQ(0.719806016136754, aFilter.calcCircleDist2IP());
 
 //    B2INFO("now tests with 0.976T (and reset between each step): \n")
-//  typedef SelVarHelper<SpacePoint, float> Helper;
-//  Helper::resetMagneticField(0.976);
+    typedef SelVarHelper<SpacePoint, float> Helper;
+    Helper::resetMagneticField(0.976);
 
     EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
     EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
@@ -317,7 +325,7 @@ namespace VXDTFthreeHitFilterTest {
 //    aFilter.resetValues(outerHitEvil,centerHit,innerHit);
 //     EXPECT_FLOAT_EQ(0.719806016136754, aFilter.calcCircleDist2IP());
 
-//  Helper::resetMagneticField(1.5);
+    Helper::resetMagneticField(1.5);
   }
 
 }

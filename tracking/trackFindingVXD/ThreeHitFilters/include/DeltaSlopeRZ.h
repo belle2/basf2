@@ -38,15 +38,3 @@ namespace Belle2 {
   };
 
 }
-
-
-/** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
-// double calcDeltaSlopeRZ()
-// {
-//   m_twoHitFilter.resetValues(m_hitA, m_hitB);
-//   double slopeAB = m_twoHitFilter.calcSlopeRZ();
-//   m_twoHitFilter.resetValues(m_hitB, m_hitC);
-//   double slopeBC = m_twoHitFilter.calcSlopeRZ();
-//
-//   return filterNan(slopeBC - slopeAB);
-// } // return unit: none

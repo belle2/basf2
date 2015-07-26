@@ -53,19 +53,3 @@ namespace Belle2 {
   };
 
 }
-
-
-
-/** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
-// double calcDeltaSlopeZOverS()
-// {
-//   checkCalcRadius();
-//
-//   TVector3 points2hitA = m_hitA - m_centerABC;
-//   TVector3 points2hitB = m_hitB - m_centerABC;
-//   TVector3 points2hitC = m_hitC - m_centerABC;
-//   double alfaABr = fullAngle2D(points2hitA, points2hitB) * m_radius;
-//   double alfaBCr = fullAngle2D(points2hitB, points2hitC) * m_radius;
-//
-//   return filterNan((asin(m_vecAB[2] / alfaABr)) - asin(m_vecBC[2] / alfaBCr)); // Beware of z>r!
-// }

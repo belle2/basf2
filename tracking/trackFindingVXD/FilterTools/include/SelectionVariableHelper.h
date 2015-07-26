@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni                                          *
+ * Contributors: Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -39,7 +39,7 @@ namespace Belle2 {
      * The standard value assumes a magnetic field of 1.5 Tesla.
      * Value can be changed using the resetMagneticField-Function, where a new value for the magnetic field in Tesla has to be passed
      * TODO WARNING hardcoded value!  */
-    static constexpr DataType s_MagneticFieldFactor = 1.5 * 0.00299710;
+    static DataType s_MagneticFieldFactor; //  = 1.5 * 0.00299710;
 
 
     /** Overrides standard-Setup for magnetic field.
@@ -196,4 +196,9 @@ namespace Belle2 {
       else  { return 0; }
     }
   };
+
+
+  template<typename PointType, typename DataType> DataType SelVarHelper<PointType, DataType>::s_MagneticFieldFactor = 1.5 *
+      0.00299710;
+
 }

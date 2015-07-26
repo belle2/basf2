@@ -44,7 +44,7 @@ class SVDValidationTTreeEfficiency(Module):
 
         super(SVDValidationTTreeEfficiency, self).__init__()
         # Output ROOT file
-        self.file = ROOT.TFile('SVDValidationTTreeEfficiency.root', 'recreate')
+        self.file = ROOT.TFile('../SVDValidationTTreeEfficiency.root', 'recreate')
         # TTrees for output data
         self.treeU = ROOT.TTree('treeU', 'Event data of SVD validation events')
         self.treeV = ROOT.TTree('treeV', 'Event data of SVD validation events')

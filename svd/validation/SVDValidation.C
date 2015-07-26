@@ -47,10 +47,10 @@ void SVDValidation()
 
 //-------------------------------------------------------------
   // open the files with simulated and reconstructed events data
-  TFile* input = TFile::Open("SVDValidationTTree.root");
-  TFile* inputDigit = TFile::Open("SVDValidationTTreeDigit.root");
-  TFile* inputSimhit = TFile::Open("SVDValidationTTreeSimhit.root");
-  TFile* inputEff = TFile::Open("SVDValidationTTreeEfficiency.root");
+  TFile* input = TFile::Open("../SVDValidationTTree.root");
+  TFile* inputDigit = TFile::Open("../SVDValidationTTreeDigit.root");
+  TFile* inputSimhit = TFile::Open("../SVDValidationTTreeSimhit.root");
+  TFile* inputEff = TFile::Open("../SVDValidationTTreeEfficiency.root");
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("SVDValidationPlots.root", "recreate");

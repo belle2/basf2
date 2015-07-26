@@ -47,7 +47,7 @@ class SVDValidationTTreeDigit(Module):
 
         super(SVDValidationTTreeDigit, self).__init__()
         # Output ROOT file
-        self.file = ROOT.TFile('SVDValidationTTreeDigit.root', 'recreate')
+        self.file = ROOT.TFile('../SVDValidationTTreeDigit.root', 'recreate')
         # TTrees for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
 

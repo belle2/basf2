@@ -46,7 +46,7 @@ class SVDValidationTTreeSimhit(Module):
 
         super(SVDValidationTTreeSimhit, self).__init__()
         # Output ROOT file
-        self.file = ROOT.TFile('SVDValidationTTreeSimhit.root', 'recreate')
+        self.file = ROOT.TFile('../SVDValidationTTreeSimhit.root', 'recreate')
         # TTrees for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
 

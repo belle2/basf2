@@ -162,6 +162,27 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_RefCylindricalRVersusZInSuperLa
   }
 }
 
+TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
+{
+  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
+
+  FloatType outerR = theWireTopology.getOuterCylindricalR();
+  FloatType innerR = theWireTopology.getInnerCylindricalR();
+
+  FloatType innerOriginCurv = 1 / (innerR / 2);
+  FloatType outerOriginCurv = 1 / (outerR / 2);
+
+  FloatType innerCurlCurv = 1 / innerR;
+  FloatType outerCurlCurv = 1 / outerR;
+
+  B2INFO("Maximal curvature reaching the CDC from IP : " << innerOriginCurv);
+  B2INFO("Maximal curvature leaving the CDC from IP : " << outerOriginCurv);
+
+  B2INFO("Minimal curvature not reaching the CDC from VXD : " << innerCurlCurv);
+  B2INFO("Minimal curvature not leaving the CDC from inside the CDC : " << outerCurlCurv);
+}
+
+
 
 TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
 {

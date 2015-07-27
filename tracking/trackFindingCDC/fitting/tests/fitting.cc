@@ -225,20 +225,3 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
   }
 
 }
-
-
-
-TEST(DISABLED_TrackFindingCDCTestWithTopology, fitting_SIMPLE_DRIFT_LENGTH_VARIANCE_isConsistent)
-{
-  CDC::RealisticTDCCountTranslator tdcCountTranslator;
-
-  FloatType driftLength = 0.0;
-  const WireID wireID;
-  bool rl = false;
-
-  FloatType defaultDriftLengthVariance = tdcCountTranslator.getDriftLengthResolution(driftLength, wireID, rl, 0.0, 0.0);
-  EXPECT_NEAR(SIMPLE_DRIFT_LENGTH_VARIANCE, defaultDriftLengthVariance, 10e-7);
-
-}
-
-

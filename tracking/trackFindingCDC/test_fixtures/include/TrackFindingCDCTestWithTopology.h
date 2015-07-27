@@ -46,6 +46,10 @@ namespace Belle2 {
       static void TearDownTestCase();
 
     }; //end class
+
+    /// Equivalent to \sa TrackFindingCDCTestWithTopology for disabled tests.
+    class DISABLED_Long_TrackFindingCDCTestWithTopology : public TrackFindingCDCTestWithTopology {;};
+
   } //end namespace TrackFindingCDC
 } //end namespace Belle2
 

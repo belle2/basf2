@@ -22,6 +22,7 @@
 
 #include <assert.h>
 
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -75,14 +76,15 @@ namespace Belle2 {
 
       /// Equality comparision based the wire and the hit id.
       bool operator==(const CDCWireHit& other) const
-      { return getWire() == other.getWire() and getStoreIHit() == other.getStoreIHit(); }
+      { return getWire() == other.getWire() and getRefDriftLength() == other.getRefDriftLength(); }
 
 
       /// Total ordering relation based on the wire and the hit id.
       bool operator<(const CDCWireHit& other) const
       {
-        return (getWire() < other.getWire() or (
-                  getWire() == other.getWire() and getStoreIHit() < other.getStoreIHit()));
+        return
+          std::make_pair(getWire(), getRefDriftLength()) <
+          std::make_pair(other.getWire(), other.getRefDriftLength());
       }
 
       /// Defines wires and wire hits to be coaligned on the wire on which they are based.

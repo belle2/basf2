@@ -43,7 +43,7 @@ function Y1000 calculated covarian matrices from data and signal
 #include <string>
 #include <fstream>
 #include <vector>
-
+#include <cassert>
 #include <framework/utilities/FileSystem.h>
 
 using namespace std;
@@ -226,8 +226,6 @@ float par[10] = {0.5, 0.6483, 0.4017, 0.3741, 0.8494, 0.00144547, 4.7071, 0.8156
 void writetestWF(int typ, const char* dataFileDir)
 {
 
-  char BMin[256];
-  FILE* BMcoIN;
   double ss1[16][16];
 
   Int_t kA[252];
@@ -280,7 +278,6 @@ void writetestWF(int typ, const char* dataFileDir)
 
   int cid, group;
   int maxGroup = 0;
-  bool readerr = false;
 
   //first find the largest group number (numbering goes from 0 to N-1)
 
@@ -420,6 +417,7 @@ void writetestWF(int typ, const char* dataFileDir)
 int main(int argc, char** argv)
 
 {
+  assert(argc == 2);
   writetestWF(3, argv[1]);
 }
 

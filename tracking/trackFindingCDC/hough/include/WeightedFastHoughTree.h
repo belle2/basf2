@@ -60,22 +60,6 @@ namespace Belle2 {
         }
       }
 
-      /// Walk the tree investigating the heaviest children with priority.
-      template<class TreeWalker>
-      void walkHeighWeightFirst(TreeWalker& walker)
-      {
-        auto priority = [](Node * node) -> float {
-          /// Clear items that have been marked as used before evaluating the weight.
-          auto isMarked = [](const SharedMarkTemplate<T>& item) -> bool {
-            return item.isMarked();
-          };
-          node->eraseIf(isMarked);
-          return node->getWeight();
-        };
-
-        this->walk(walker, priority);
-      }
-
       template<class ItemInDomainMeasure>
       std::vector<std::pair<Domain,  std::vector<T> > >
       findHeavyLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
@@ -95,13 +79,12 @@ namespace Belle2 {
                          SkipNodePredicate& skipNode)
       {
         std::vector<std::pair<Domain,  std::vector<T> > > found;
-
-        auto walker = [&](Node * node) {
-          // Node does not have enough items
-          // Do not walk children
+        auto isLeaf = [&](Node * node) {
+          // Skip the expansion and the filling of the children
           if (skipNode(node)) {
-            return false;
+            return true;
           }
+
           // Node is a leaf at the maximum level
           // Save its content
           // Do not walk children
@@ -111,10 +94,31 @@ namespace Belle2 {
             for (SharedMarkTemplate<T>& markableItem : *node) {
               markableItem.mark();
             }
+            return true;
+          }
+
+          // Else to node has enough weight and is not at the lowest level
+          // Signal that it is not a leaf
+          // Continue to create and fill children.
+          return false;
+        };
+        fillWalk(weightItemInDomain, isLeaf);
+        return found;
+      }
+
+      template<class ItemInDomainMeasure, class IsLeafPredicate>
+      void fillWalk(ItemInDomainMeasure& weightItemInDomain,
+                    IsLeafPredicate& isLeaf)
+      {
+        auto walker = [&](Node * node) {
+          // Check if node is a leaf
+          // Do not create children in this case
+          if (isLeaf(node)) {
+            // Do not walk children.
             return false;
           }
 
-          // Node is not a leave.
+          // Node is not a leaf.
           // Check if it has childen.
           // If children have not been created, create and fill them.
           typename Node::Children* children = node->getChildren();
@@ -125,6 +129,7 @@ namespace Belle2 {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
               auto measure =
+
               [&childNode, &weightItemInDomain](SharedMarkTemplate<T>& item) -> Weight {
                 // Weighting function should not see the mark, but only the item itself.
                 return weightItemInDomain(item, &childNode);
@@ -135,12 +140,24 @@ namespace Belle2 {
           // Continue to walk the children.
           return true;
         };
-
         walkHeighWeightFirst(walker);
-
-        return found;
       }
 
+      /// Walk the tree investigating the heaviest children with priority.
+      template<class TreeWalker>
+      void walkHeighWeightFirst(TreeWalker& walker)
+      {
+        auto priority = [](Node * node) -> float {
+          /// Clear items that have been marked as used before evaluating the weight.
+          auto isMarked = [](const SharedMarkTemplate<T>& item) -> bool {
+            return item.isMarked();
+          };
+          node->eraseIf(isMarked);
+          return node->getWeight();
+        };
+
+        this->walk(walker, priority);
+      }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
       void fell()

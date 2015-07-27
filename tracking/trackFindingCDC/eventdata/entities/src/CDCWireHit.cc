@@ -83,10 +83,12 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslat
 
 }
 
-CDCWireHit::CDCWireHit(const WireID& wireID, const FloatType& driftLength):
+CDCWireHit::CDCWireHit(const WireID& wireID,
+                       const FloatType& driftLength,
+                       const FloatType& driftLengthVariance):
   m_automatonCell(1),
   m_refDriftLength(driftLength),
-  m_refDriftLengthVariance(getTDCCountTranslator().getDriftLengthResolution(driftLength, wireID, false, NAN, NAN)),
+  m_refDriftLengthVariance(driftLengthVariance),
   m_wire(CDCWire::getInstance(wireID)),
   m_hit(nullptr)
 {;}

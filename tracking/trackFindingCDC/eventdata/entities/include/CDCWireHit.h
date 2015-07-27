@@ -67,7 +67,9 @@ namespace Belle2 {
       CDCWireHit(const CDCHit* ptrHit, CDC::TDCCountTranslatorBase* ptrTranslator = nullptr);
 
       /// Constructor to taking a wire ID and a driftlength at the reference. For testing only!
-      CDCWireHit(const WireID& wireID, const FloatType& driftLength);
+      CDCWireHit(const WireID& wireID,
+                 const FloatType& driftLength,
+                 const FloatType& driftlengthVariance = SIMPLE_DRIFT_LENGTH_VARIANCE);
 
     public:
       /// Make the wire hit automatically castable to its underlying cdcHit

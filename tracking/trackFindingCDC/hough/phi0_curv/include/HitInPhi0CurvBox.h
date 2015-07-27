@@ -26,7 +26,16 @@ namespace Belle2 {
      */
     template<bool refined = false>
     class HitInPhi0CurvBox {
+
     public:
+      /** Constructor taking a curvature below which the trajectory is specially treated as a non curler.
+       *  Non curling trajectories generally excipit two different arms which should not be mixed.
+       *  On the other hand curlers are allowed to have hits on both arms joined together.
+       *  Default is that arms are allowed to be joined together.
+       */
+      explicit HitInPhi0CurvBox(float curlCurv = NAN) : m_curlCurv(fabs(curlCurv))
+      {;}
+
       /** Checks if the track hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
@@ -198,29 +207,42 @@ namespace Belle2 {
                                   const FloatType& signedDriftLength,
                                   const Phi0CurvBox* phi0CurvBox)
       {
-        const FloatType rReducedSquared = (r + signedDriftLength) * (r - signedDriftLength);
-
         const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
         const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
-        const FloatType orthoToPhi0[2] = { pos2D.cross(lowerPhi0Vec), pos2D.cross(upperPhi0Vec) };
-
         const float& lowerCurv = phi0CurvBox->getLowerCurv();
         const float& upperCurv = phi0CurvBox->getUpperCurv();
+
+        const FloatType parallelToPhi0[2] = { pos2D.dot(lowerPhi0Vec), pos2D.dot(upperPhi0Vec) };
+        const bool isNonCurler = upperCurv <= m_curlCurv and lowerCurv >= -m_curlCurv;
+        if (isNonCurler) {
+          // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
+          if (parallelToPhi0[0] < 0 and parallelToPhi0[1] < 0) return false;
+        }
+
+        const FloatType rReducedSquared = (r + signedDriftLength) * (r - signedDriftLength);
 
         const FloatType rSquareTimesHalfCurv[2] = {
           rReducedSquared* (lowerCurv / 2),
           rReducedSquared* (upperCurv / 2)
         };
 
+        const FloatType orthoToPhi0[2] = { pos2D.cross(lowerPhi0Vec), pos2D.cross(upperPhi0Vec) };
+
+        // Calculate (approximate) distances of the observed position to
+        // the trajectories represented by the corners of the box
         float dist[2][2];
         dist[0][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[0] - signedDriftLength;
         dist[0][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[0] - signedDriftLength;
         dist[1][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[1] - signedDriftLength;
         dist[1][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[1] - signedDriftLength;
 
-        // Sinogram separates at least on of the edges from the others.
-        if (not SameSignChecker::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) return true;
+        // Sinogram separates at least one of the edges from the others.
+        const bool excludesOneEdge = not SameSignChecker::sameSign(dist[0][0],
+                                                                   dist[0][1],
+                                                                   dist[1][0],
+                                                                   dist[1][1]);
+        if (excludesOneEdge) return true;
         if (not refined) return false;
 
         // Continue to check if the extrema of the sinogram are in the box,
@@ -236,6 +258,9 @@ namespace Belle2 {
         return extremRInCurvRange and extremPhi0VecInPhi0Range;
       }
 
+    private:
+      /// The curvature above which the trajectory is considered a curler.
+      float m_curlCurv = NAN;
     };
 
   } // end namespace TrackFindingCDC

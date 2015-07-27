@@ -36,7 +36,8 @@ namespace Belle2 {
 
     public:
       /// Constructor using the default values
-      HitPhi0CurvLegendre()
+      HitPhi0CurvLegendre() :
+        m_hitInPhi0CurvBox(m_curlCurv)
       {;}
 
       /// Constructor using the given maximal level.
@@ -45,7 +46,8 @@ namespace Belle2 {
                           double maxCurv = 0.13) :
         m_maxLevel(maxLevel),
         m_minCurv(minCurv),
-        m_maxCurv(maxCurv)
+        m_maxCurv(maxCurv),
+        m_hitInPhi0CurvBox(m_curlCurv)
       {;}
 
     public:
@@ -178,11 +180,14 @@ namespace Belle2 {
       /// Width of the leaves at the maximal level in teh curvature counted in number of discrete values.
       size_t m_discreteCurvWidth = 5;
 
-      /// Minimal curvature value the tree should cover. Default is the minimal non curler curvature.
+      /// Minimal curvature value the tree should cover. Default is (minus) the maximal curvature to leave the CDC.
       double m_minCurv = -0.018;
 
-      /// Maximal curvature value the tree should cover. Default is the minimal curvature to reach the CDC.
+      /// Maximal curvature value the tree should cover. Default is the maximal curvature to reach the CDC.
       double m_maxCurv = 0.13;
+
+      /// Curvature below which a trajectory is considered non curling
+      double m_curlCurv = 0.018;
 
       /// Predicate checking if hit is in a gievn phi0 curvature box
       static const bool s_refined = false;

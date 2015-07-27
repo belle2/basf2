@@ -31,8 +31,11 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
   CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   CDCSimpleSimulation simpleSimulation(&wireHitTopology);
 
-  Helix lowerCurvOriginHelix(0.015, Vector2D(-0.813144, 0.582062), 0, 1, 0);
-  Helix higherCurvOriginHelix(0.027, Vector2D(-0.997565, 0.0697395), 0, 1, 0);
+  // Helix lowerCurvOriginHelix(0.015, 2.52033, 0, 0, 0);
+  // Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0, 0);
+
+  Helix lowerCurvOriginHelix(0.012, 1.4, 0, 1, 0);
+  Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0.95, 0);
 
   CDCTrajectory3D lowerCurvTrajectory(lowerCurvOriginHelix);
   CDCTrajectory3D higherCurvTrajectory(higherCurvOriginHelix);
@@ -46,24 +49,33 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
     plotter.draw(mcTrack);
   }
 
+  // plotter.draw(lowerCurvTrajectory.getTrajectory2D());
+  // plotter.draw(lowerCurvTrajectory.reversed().getTrajectory2D());
+  // plotter.draw(higherCurvTrajectory.getTrajectory2D());
+
   plotter.save("legendre_event.svg");
 
   B2INFO("Size mc track 0 : " << mcTracks[0].size());
   B2INFO("Size mc track 1 : " << mcTracks[1].size());
 
   // Prepare the hough algorithm
-  const size_t maxLevel = 13;
+  // const size_t maxLevel = 12;
+  // const size_t phi0Divisions = 2;
+  // const size_t curvDivisions = 2;
+  // const double maxCurv = 2.75;
+  // const double minCurv = 0;
+
+  const size_t maxLevel = 12;
   const size_t phi0Divisions = 2;
   const size_t curvDivisions = 2;
   const double maxCurv = 2.75;
-  const double minCurv = 0;
+  const double minCurv = -0.018;
 
   // const size_t maxLevel = 9;
   // const size_t phi0Divisions = 3;
   // const size_t curvDivisions = 2;
   // const double maxCurv = 0.13;
-  // const double minCurv = 0;
-
+  // const double minCurv = -0.018;
 
   // const size_t maxLevel = 8;
   // const size_t phiDivisions = 3;
@@ -76,8 +88,9 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
 
   std::vector<const CDCWireHit*> axialWireHits;
   for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
-    if (wireHit.isAxial() == 0)
+    if (wireHit.isAxial()) {
       axialWireHits.push_back(&wireHit);
+    }
   }
 
   // Execute the finding a couple of time to find a stable execution time.
@@ -92,8 +105,8 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
 
     const double minWeight = 30.0;
     const double maxCurv = NAN;
-    candidates = wireHitPhi0CurvQuadLegendre.find(minWeight, maxCurv);
-    //candidates = wireHitPhi0CurvQuadLegendre.findBest(minWeight, maxCurv);
+    // candidates = wireHitPhi0CurvQuadLegendre.find(minWeight, maxCurv);
+    candidates = wireHitPhi0CurvQuadLegendre.findBest(minWeight, maxCurv);
 
     // B2INFO("Execution " << iExecution);
     /// Check if exactly two candidates have been found
@@ -150,10 +163,11 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
     EventDataPlotter::AttributeMap rl {{"stroke", "blue"}};
     plotter.draw(*wireHit, rl);
   }
+  plotter.save("legendre_event.svg");
 
   for (const RLTagged<const CDCWireHit*>& rlTaggedWireHit : candidates.at(1).second) {
     const CDCWireHit* wireHit = rlTaggedWireHit;
-    EventDataPlotter::AttributeMap rl {{"stroke", "purple"}};
+    EventDataPlotter::AttributeMap rl {{"stroke", "red"}};
     plotter.draw(*wireHit, rl);
   }
 

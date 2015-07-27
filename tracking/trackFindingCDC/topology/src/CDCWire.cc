@@ -131,6 +131,8 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   if (not inCylindricalR) return false;
 
   IWireType iWire = CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
+  // Safety measure against error in the cellId function
+  iWire %= wireLayer.size();
   bool inPhi = iWire == getIWire();
   return inPhi;
 }

@@ -18,6 +18,7 @@
 """
 
 from basf2 import *
+from beamparameters import add_beamparameters
 # Individual validation packages
 from SVDValidationTTree import *
 from SVDValidationTTreeDigit import *
@@ -62,9 +63,12 @@ geometry = register_module('Geometry')
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 # geometry.param("excludedComponents", "MagneticField")
 
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("smearVertex", False)
+
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 
 # Run simulation
 fullsim = register_module('FullSim')
@@ -80,7 +84,7 @@ svdclusterizer = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')
 # Set output filename
-output.param('outputFileName', 'simulationOutput.root')
+output.param('outputFileName', '../simulationOutput.root')
 
 # SVD validation modules
 svdvalidation = SVDValidationTTree()

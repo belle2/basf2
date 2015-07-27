@@ -106,6 +106,73 @@ namespace Belle2 {
         return found;
       }
 
+
+      template<class ItemInDomainMeasure>
+      std::vector<std::pair<Domain,  std::vector<T> > >
+      findHeaviestLeafRepeated(ItemInDomainMeasure& weightItemInDomain,
+                               const size_t maxLevel,
+                               const Weight minWeight = NAN)
+      {
+        auto skipLowWeightNode = [minWeight](const Node * node) {
+          return not(node->getWeight() >= minWeight);
+        };
+        return findHeaviestLeafRepeated(weightItemInDomain, maxLevel, skipLowWeightNode);
+      }
+
+      template<class ItemInDomainMeasure, class SkipNodePredicate>
+      std::vector<std::pair<Domain,  std::vector<T> > >
+      findHeaviestLeafRepeated(ItemInDomainMeasure& weightItemInDomain,
+                               const size_t maxLevel,
+                               SkipNodePredicate& skipNode)
+      {
+        std::vector<std::pair<Domain,  std::vector<T> > > found;
+        Node* node = findHeaviestLeaf(weightItemInDomain, maxLevel, skipNode);
+        while (node) {
+          const Domain* domain = node;
+          found.emplace_back(*domain, std::vector<T>(node->begin(), node->end()));
+          for (WithSharedMark<T>& markableItem : *node) {
+            markableItem.mark();
+          }
+          node = findHeaviestLeaf(weightItemInDomain, maxLevel, skipNode);
+        }
+        return found;
+      }
+
+    private:
+      template<class ItemInDomainMeasure, class SkipNodePredicate>
+      Node* findHeaviestLeaf(ItemInDomainMeasure& weightItemInDomain,
+                             const size_t maxLevel,
+                             SkipNodePredicate& skipNode)
+      {
+        Node* heaviestNode = nullptr;
+        Weight heighestWeigth = NAN;
+        auto isLeaf = [&heaviestNode, &heighestWeigth, maxLevel, &skipNode](Node * node) {
+          // Skip the expansion and the filling of the children
+          if (skipNode(node)) {
+            return true;
+          }
+
+          Weight nodeWeight = node->getWeight();
+          // Skip the expansion and filling of the children if the node has not enough weight
+          if (not std::isnan(heighestWeigth) and not(nodeWeight > heighestWeigth)) {
+            return true;
+          }
+
+          // Node is a leaf at the maximum level and is heavier than everything seen before.
+          // Save its content
+          // Do not walk children
+          if (node->getLevel() >= maxLevel) {
+            heaviestNode = node;
+            heighestWeigth = nodeWeight;
+            return true;
+          }
+          return false;
+        };
+        fillWalk(weightItemInDomain, isLeaf);
+        return heaviestNode;
+      }
+
+    public:
       template<class ItemInDomainMeasure, class IsLeafPredicate>
       void fillWalk(ItemInDomainMeasure& weightItemInDomain,
                     IsLeafPredicate& isLeaf)

@@ -107,24 +107,27 @@ namespace Belle2 {
       find(const Weight& minWeight, const double& maxCurv = NAN)
       {
         typedef typename HitPhi0CurvFastHoughTree::Node Node;
-
-        const bool refined = false;
-        HitInPhi0CurvBox<refined> hitInPhi0CurvBox;
-
-        if (not std::isnan(maxCurv)) {
-          auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
-            return (not(node->getWeight() >= minWeight) or
-                    static_cast<float>(node->template getLowerBound<1>()) > maxCurv);
-          };
-          return m_hitPhi0CurvFastHoughTree->findLeavesDisjoint(hitInPhi0CurvBox, m_maxLevel, skipHighCurvatureAndLowWeightNode);
-
-        } else {
-          auto skipLowWeightNode = [minWeight](const Node * node) {
-            return not(node->getWeight() >= minWeight);
-          };
-          return m_hitPhi0CurvFastHoughTree->findLeavesDisjoint(hitInPhi0CurvBox, m_maxLevel, skipLowWeightNode);
-        }
+        auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
+          return not(node->getWeight() >= minWeight and not(node->getLowerCurv() > maxCurv));
+        };
+        return getTree()->findLeavesDisjoint(m_hitInPhi0CurvBox,
+                                             m_maxLevel,
+                                             skipHighCurvatureAndLowWeightNode);
       }
+
+      /// Find the best trajectory and repeat the process until no bin heavier than minWeight can be found
+      std::vector<std::pair<Phi0CurvBox,  std::vector<HitPtr> > >
+      findBest(const Weight& minWeight, const double& maxCurv = NAN)
+      {
+        typedef typename HitPhi0CurvFastHoughTree::Node Node;
+        auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
+          return not(node->getWeight() >= minWeight and not(node->getLowerCurv() > maxCurv));
+        };
+        return getTree()->findHeaviestLeafRepeated(m_hitInPhi0CurvBox,
+                                                   m_maxLevel,
+                                                   skipHighCurvatureAndLowWeightNode);
+      }
+
 
       /// Terminates the processing by striping all hit information from the tree
       void fell()
@@ -163,6 +166,10 @@ namespace Belle2 {
 
       /// Maximal curvature value the tree should cover.
       double m_maxCurv = 2.75;
+
+      /// Predicate checking if hit is in a gievn phi0 curvature box
+      static const bool s_refined = false;
+      HitInPhi0CurvBox<s_refined> m_hitInPhi0CurvBox;
 
       // Dummy initialisation of the other constructs
 

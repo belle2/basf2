@@ -110,14 +110,17 @@ namespace Belle2 {
       //Vector3D sameCylindricalR(const Vector3D& point) const;
       //Vector3D sameCylindricalRForwardOf(const Vector3D& startPoint, const FloatType& cylindricalR) const;
 
-      /// Moves the coordinates system by the given vector. Updates support point in place.
-      void passiveMoveBy(const Vector3D& by)
+      /** Moves the coordinates system by the given vector. Updates support point in place.
+       *  @return arcLength2D that has to be traversed to the new origin
+       */
+      FloatType passiveMoveBy(const Vector3D& by)
       {
         // First keep the necessary shift of the perpendicular travel distance to the new support point.
         FloatType byS = circleXY().arcLengthBetween(perigeeXY(), by.xy());
         m_circleXY.passiveMoveBy(by.xy());
         Vector2D bySZ(byS, by.z());
         m_lineSZ.passiveMoveBy(bySZ);
+        return byS;
       }
 
 

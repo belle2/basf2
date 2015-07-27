@@ -28,7 +28,7 @@ namespace Belle2 {
       using Z0ZSlopeBoxDivision = LinearDivision<Z0ZSlopeBox, z0Divisions, zSlopeDivisions>;
 
       /// Type of the fast hough tree structure
-      using HitZ0ZSlopeFastHoughTree = WeightedFastHoughTree<HitPointerType, Z0ZSlopeBox, Z0ZSlopeBoxDivision, Unmarkable>;
+      using HitZ0ZSlopeFastHoughTree = WeightedFastHoughTree<HitPointerType, Z0ZSlopeBox, Z0ZSlopeBoxDivision>;
 
     public:
       /// Constructor using the default values
@@ -96,44 +96,26 @@ namespace Belle2 {
       }
 
       /// Find disjoint leaves heavier than minWeight = number of items
-      std::vector<std::pair<Z0ZSlopeBox, std::vector<HitPointerType>>>
-      find(const Weight& minWeight)
-      {
-        typedef typename HitZ0ZSlopeFastHoughTree::Node Node;
-        HitInZ0ZSlopeBox hitInZ0ZSlopeBox;
+      // std::vector<std::pair<Z0ZSlopeBox, std::vector<HitPointerType>>>
+      // find(const Weight& minWeight)
+      // {
+      //   typedef typename HitZ0ZSlopeFastHoughTree::Node Node;
+      //   HitInZ0ZSlopeBox hitInZ0ZSlopeBox;
 
-        auto skipLowWeightNode = [&minWeight](const Node * node) {
-          return not(node->getWeight() >= minWeight);
-        };
-        return m_hitZ0ZSlopeFastHoughTree->findLeavesDisjoint(hitInZ0ZSlopeBox, m_maxLevel, skipLowWeightNode);
-      }
+      //   auto skipLowWeightNode = [&minWeight](const Node * node) {
+      //     return not(node->getWeight() >= minWeight);
+      //   };
+      //   return m_hitZ0ZSlopeFastHoughTree->findLeavesDisjoint(hitInZ0ZSlopeBox, m_maxLevel, skipLowWeightNode);
+      // }
 
       /// Find only the leave with the highest weight = number of items
       std::vector<std::pair<Z0ZSlopeBox, std::vector<HitPointerType>>>
       findHighest(const Weight& minWeight)
       {
-        typedef typename HitZ0ZSlopeFastHoughTree::Node Node;
         HitInZ0ZSlopeBox hitInZ0ZSlopeBox;
-
-
-        Weight heighestFoundWeightSoFar = minWeight;
-        const Node* heighestNodeSoFar = nullptr;
-
-        auto skipLowWeightAndNotMaximumWeightNode = [&heighestFoundWeightSoFar, &heighestNodeSoFar, this](const Node * node) {
-          const Weight& nodeWeight = node->getWeight();
-
-          if (nodeWeight >= heighestFoundWeightSoFar) {
-            // We are at the lowest level. If the node is higher than the highest node, set this as the new highest node.
-            if (node->getLevel() >= m_maxLevel) {
-              heighestFoundWeightSoFar  = nodeWeight;
-              heighestNodeSoFar = node;
-            }
-            return false;
-          } else {
-            return true;
-          }
-        };
-        return m_hitZ0ZSlopeFastHoughTree->findLeavesDisjoint(hitInZ0ZSlopeBox, m_maxLevel, skipLowWeightAndNotMaximumWeightNode);
+        return m_hitZ0ZSlopeFastHoughTree->findHeaviestLeafRepeated(hitInZ0ZSlopeBox,
+                                                                    m_maxLevel,
+                                                                    minWeight);
       }
 
 

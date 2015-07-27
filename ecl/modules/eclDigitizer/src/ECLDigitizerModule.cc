@@ -125,13 +125,12 @@ void ECLDigitizerModule::event()
   StoreArray<ECLDsp> eclDsps;
   StoreArray<ECLTrig> eclTrigs;
 
-
-  int energyFit[8736] = {0}; //fit output : Amplitude
-  int tFit[8736] = {0};    //fit output : T_ave
-  int qualityFit[8736] = {0};    //fit output : T_ave
+  vector<int> energyFit(8736, 0); //fit output : Amplitude
+  vector<int> tFit(8736, 0);   //fit output : T_ave
+  vector<int> qualityFit(8736, 0);   //fit output : T_ave
   array2d HitEnergy(boost::extents[8736][31]);
   std::fill(HitEnergy.origin(), HitEnergy.origin() + HitEnergy.size(), 0.0);
-  double E_tmp[8736] = {0};
+  vector<double> E_tmp(8736, 0);
   double test_A[31] = {0};
   float AdcNoise[31];
   float genNoise[31];
@@ -140,29 +139,26 @@ void ECLDigitizerModule::event()
   int n = 1250;//provide a shape array for interpolation
   double DeltaT =  gRandom->Uniform(0, 144);
 
+  for (const auto& eclHit : eclHits) {
+    int hitCellId       =  eclHit.getCellId() - 1; //0~8735
+    double hitE         =  eclHit.getEnergyDep()  / Unit::GeV;
+    double hitTimeAve   =  eclHit.getTimeAve() / Unit::us;
 
-  if (! m_calibration) { // normal running
+    if (hitTimeAve > 8.5) { continue;}
+    E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
 
-    for (const auto& eclHit : eclHits) {
-      int hitCellId       =  eclHit.getCellId() - 1; //0~8735
-      double hitE         =  eclHit.getEnergyDep()  / Unit::GeV;
-      double hitTimeAve   =  eclHit.getTimeAve() / Unit::us;
+    for (int T_clock = 0; T_clock < 31; T_clock++) {
+      double timeInt =  DeltaT * 2. / 508.; //us
+      double sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
+                          ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
+      //        DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
+      test_A[T_clock] = DspSamplingArray(n, sampleTime, dt, & (*m_ft)[0]);//interpolation from shape array n=1250; dt =20ns
+      HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
+    }//for T_clock 31 clock
 
-      if (hitTimeAve > 8.5) { continue;}
-      E_tmp[hitCellId] = hitE + E_tmp[hitCellId];//for summation deposit energy; do fit if this summation > 0.1 MeV
+  } //end loop over eclHitArray ii
 
-      for (int T_clock = 0; T_clock < 31; T_clock++) {
-        double timeInt =  DeltaT * 2. / 508.; //us
-        double sampleTime = (24. * 12. / 508.)  * (T_clock - 15) - hitTimeAve - timeInt + 0.32
-                            ;//There is some time shift~0.32 us that is found Alex 2013.06.19.
-        //        DspSamplingArray(&n, &sampleTime, &dt, m_ft, &test_A[T_clock]);//interpolation from shape array n=1250; dt =20ns
-        test_A[T_clock] = DspSamplingArray(n, sampleTime, dt, & (*m_ft)[0]);//interpolation from shape array n=1250; dt =20ns
-        HitEnergy[hitCellId][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[hitCellId][T_clock];
-      }//for T_clock 31 clock
-
-    } //end loop over eclHitArray ii
-
-  } else { // calibration mode
+  if (m_calibration) {
 
     // This has been added by Alex Bobrov for calibration
     // of covariance matrix artificially generate 100 MeV in time for each crystal
@@ -182,10 +178,8 @@ void ECLDigitizerModule::event()
         HitEnergy[JiP][T_clock] = test_A[T_clock]  * hitE  +  HitEnergy[JiP][T_clock];
       }//for T_clock 31 clock
     }
-    // end of Alex Bobrov ad-hoc calibration...
-
-  } // end of normal / calibration mode branches
-
+  }
+  // end of Alex Bobrov ad-hoc calibration...
 
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
     if (m_calibration || E_tmp[iECLCell] > 0.0001) { // Bobrov removes this cut in calibration
@@ -801,24 +795,25 @@ void ECLDigitizerModule::readDSPDB()
     B2FATAL("Data not found");
 
   Int_t ncellId;
-  Int_t cellId[8736];
+  vector<Int_t> cellId(8736, 0);
   Int_t ncellId2;
-  Int_t cellId2[8736];
+  vector<Int_t> cellId2(8736, 0);
   Int_t ncellId3;
-  Int_t cellId3[8736];
+  vector<Int_t> cellId3(8736, 0);
+
 
 
   tree->GetBranch("CovarianceM")->SetAutoDelete(kFALSE);
   tree->SetBranchAddress("ncellId", &ncellId);
-  tree->SetBranchAddress("cellId", cellId);
+  tree->SetBranchAddress("cellId", &(cellId[0]));
 
   tree2->GetBranch("Algopars")->SetAutoDelete(kFALSE);
   tree2->SetBranchAddress("ncellId", &ncellId2);
-  tree2->SetBranchAddress("cellId", cellId2);
+  tree2->SetBranchAddress("cellId", &(cellId2[0]));
 
   tree3->GetBranch("NoiseM")->SetAutoDelete(kFALSE);
   tree3->SetBranchAddress("ncellId", &ncellId3);
-  tree3->SetBranchAddress("cellId", cellId3);
+  tree3->SetBranchAddress("cellId", &(cellId3[0]));
 
   ECLWaveformData* info = new ECLWaveformData;
   tree->SetBranchAddress("CovarianceM", &info);

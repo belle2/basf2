@@ -11,6 +11,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
 
@@ -158,7 +160,19 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_RefCylindricalRVersusZInSuperLa
           );
 
   }
+}
 
 
+TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
+{
+  // Testing for a discrepancy in the cellId method of CDCGeometryPar
+  // Example in layer four
+  unsigned iCLayer = 4;
 
+  // Middle of the layer four
+  TVector3 posInMiddle(0, 0, 20.8);
+
+  unsigned iWireInFourthLayer = CDC::CDCGeometryPar::Instance().cellId(iCLayer, posInMiddle);
+  EXPECT_TRUE(iWireInFourthLayer < 160);
+  EXPECT_LT(iWireInFourthLayer, 160);
 }

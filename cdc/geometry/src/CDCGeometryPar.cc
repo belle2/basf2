@@ -834,7 +834,7 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
                   + phiSize / 2.;
     while (dPhi < 0) dPhi += (2. * M_PI);
     j = int(dPhi / phiSize);
-    while (j > nWires) j -= nWires;
+    while (j >= nWires) j -= nWires;
   }
 
   return j;

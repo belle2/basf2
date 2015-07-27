@@ -39,16 +39,13 @@ EclCovMatrixNtupleModule::EclCovMatrixNtupleModule() : Module()
 
   //Parameters definition
   addParam("outputFileName", m_dataOutFileName,
-           "Output root file name of this module. Suffixes to distinguish them will be added automatically", string("EclCovMatrixNtuple"));
+           "Output root file name of this module", string("EclCovMatrixNtuple"));
 
 }
 
 void EclCovMatrixNtupleModule::initialize()
 {
   B2INFO("[EclCovMatrixNtuple Module]: Starting initialization of EclCovMatrixNtuple Module.");
-
-  // Initialize store arrays
-  // Why is it necessary to do here????
 
   // Initializing the output root file
   string dataFileName = m_dataOutFileName + ".root";

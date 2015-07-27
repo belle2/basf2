@@ -4,6 +4,7 @@
 #include <TH1.h>
 #include <TF1.h>
 #include <TMath.h>
+#include <TCanvas.h>
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -33,13 +34,17 @@ Double_t glog(Double_t* x, Double_t* par)
   return fitval;
 }
 
-void cut(const char* inputRootFilename, const char* outputCutFilename)
+void cut(const char* inputRootFilename, const char* outputCutFilename,
+         const char* outputpdfdir, int crystalMin, int crystalMax)
 {
 
   TChain fChain("m_tree");
   Int_t poq;
   cout << "!!! file for calibration:" << inputRootFilename << endl;
   fChain.Add(inputRootFilename);
+
+  string outputpdffile(outputpdfdir);
+  outputpdffile += "/amplitudefits.pdf";
 
   Int_t           nhits;
   Int_t          hitA[8736][31];
@@ -70,9 +75,9 @@ void cut(const char* inputRootFilename, const char* outputCutFilename)
   Int_t nevent = fChain.GetEntries();
   std::cout << "! nevent=" << nevent << std::endl;
   //fill 2D historgamm
-  //         for (Int_t i=0;i<nevent;i++) {
+  //         for (Int_t i=0;i<250;i++) {
 
-  for (Int_t i = 0; i < 250; i++) {
+  for (Int_t i = 0; i < nevent; i++) {
     fChain.GetEntry(i);
     for (k = 0; k < nhits; k++) {
       for (u = 0; u < 31; u++) {
@@ -82,25 +87,34 @@ void cut(const char* inputRootFilename, const char* outputCutFilename)
     if (i % 100 == 0) {std::cout << " event=" << i << std::endl;}
   }  //event cicle
 
+  // open output pdf file
+  TCanvas* plot = new TCanvas;
+  plot->SaveAs((outputpdffile + string("[")).c_str());
   //fill 1D histigramm and fit
-  //       for(k=0;k<8736;k++){
-  for (k = 0; k < 86; k++) {
+  for (k = crystalMin ; k <= crystalMax; k++) {
+    cout << "Crystal " << k << endl;
+
+    //  for (k = 0; k < 86; k++) {
     InT = 0.;
     for (u = 1; u < 2901; u++) {
       Double_t Ty = Box->GetBinContent(k + 1, u);
       if (u < 3001) {
         Ms->SetBinContent(u, Ty);
         InT = InT + Ty;
+        //cout << Ty << endl;
       }
     }
     rg = Ms->GetRMS();
-    mug = Ms->GetMean();
-
+    // both choices do not converge
+    //mug = Ms->GetMean();
+    mug = Ms->GetXaxis()->GetBinCenter(Ms->GetMaximumBin());
     TF1* func = new TF1("glog", glog, 2990., 3500., 4);
     func->SetParNames("Nornamisation", "Maximum", "Sigma", "Assimetry");
     func->SetParameters(InT, mug, rg, 0.1);
     Ms->Fit(func, "l");
+    Ms->Draw();
 
+    plot->SaveAs(outputpdffile.c_str());
     Double_t par[4];
     func->GetParameters(par);
     Mu[k] = par[1];
@@ -117,7 +131,8 @@ void cut(const char* inputRootFilename, const char* outputCutFilename)
     Sl[k] = (1. - 1. / (As[k] * cc + TMath::Sqrt(1. + cc * cc * As[k] * As[k]))) * Sg[k] / As[k] / cc;
   }   // channels cicle
 
-
+  // close output pdf file
+  plot->SaveAs((outputpdffile + string("]")).c_str());
   // write data
 
   ofstream outputCutFile(outputCutFilename);
@@ -133,10 +148,17 @@ void cut(const char* inputRootFilename, const char* outputCutFilename)
 int main(int argc, char** argv)
 
 {
-  assert(argc == 3);
+  assert(argc > 3 && argc < 7);
   // first argument is input root file
   // second argument is output cut text file
-  cut(argv[1], argv[2]);
+  // third argument output plot file
+  // 4th argument crystal min = 0
+  // 5th argument crystal max = 8735
+  int crystalMin = 0;
+  int crystalMax = 8735;;
+  if (argc >= 5) crystalMin = stoi(argv[4]);
+  if (argc == 6) crystalMax = stoi(argv[5]);
+  cut(argv[1], argv[2], argv[3], crystalMin, crystalMax);
   //cut("/gpfs/home/belle/avbobrov/belle2/j15/ecl/examples/rootfile.txt");
   // sprintf(Min, "/home/belle/avbobrov/binp2/chdatuXX.txt");
 }

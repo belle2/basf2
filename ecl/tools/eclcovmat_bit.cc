@@ -6,8 +6,11 @@
 #include <TMath.h>
 #include <stdio.h>
 #include <iostream>
+#include <ecl/digitization/algorithms.h>
 
-
+using namespace std;
+using namespace Belle2;
+using namespace ECL;
 
 int myPow(int x, int p)
 {
@@ -15,149 +18,6 @@ int myPow(int x, int p)
   if (p == 1) return x;
   return x * myPow(x, p - 1);
 }
-
-
-
-double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1)
-{
-
-  double sv123 = 0.;
-  double  dks0, dks1, dksm,
-          dw0, dw1, dwp, dwm, das1, dac1, das0, dac0, dzna, dksm2, ds, dd,
-          dcs0, dsn0, dzn0, td, ts, dr,
-          dcs0s, dsn0s, dcs0d, dsn0d, dcs1s, dsn1s, dcs1d, dsn1d;
-
-
-  if (t < 0.) return 0.;
-
-  dr = (ts1 - td1) / td1;
-  if (abs(dr) >= 0.0000001) {
-    td = td1;
-    ts = ts1;
-  } else {
-    td = td1;
-    if (ts1 > td1) {
-      ts = td1 * 1.00001;
-    } else {
-      ts = td1 * 0.99999;
-    }
-  }
-
-  dr = ((t01 - t02) * (t01 - t02) + (tb1 - tb2) * (tb1 - tb2)) / ((t01) * (t01) + (tb1) * (tb1));
-  dks0 = 1.0 / t01;
-  dks1 = 1.0 / t02;
-
-  if (dr < 0.0000000001) {
-
-    if (dks0 > dks1) {
-      dks0 = dks1 * 1.00001;
-    } else {
-      dks0 = dks1 * 0.99999;
-    }
-  }
-
-  if (t < 0.) return 0;
-
-
-
-  dksm = dks1 - dks0;
-
-  ds = 1. / ts;
-  dd = 1. / td;
-
-  dw0 = 1. / tb1;
-  dw1 = 1. / tb2;
-  dwp = dw0 + dw1;
-  dwm = dw1 - dw0;
-
-  dksm2 = dksm * dksm;
-
-  dzna = (dksm2 + dwm * dwm) * (dksm2 + dwp * dwp);
-
-
-  das0 = dw1 * (dksm2 + dwp * dwm);
-  dac0 = -2 * dksm * dw0 * dw1;
-  das1 = dw0 * (dksm2 - dwp * dwm);
-  dac1 = -dac0;
-
-
-
-
-
-  dsn0 = (ds - dks0);
-  dcs0 = -dw0;
-  dzn0 = dcs0 * dcs0 + dsn0 * dsn0;
-
-  dsn0s = (dsn0 * das0 - dcs0 * dac0) / dzn0;
-  dcs0s = (dcs0 * das0 + dsn0 * dac0) / dzn0;
-
-  dsn0 = (ds - dks1);
-  dcs0 = -dw1;
-  dzn0 = dcs0 * dcs0 + dsn0 * dsn0;
-
-  dsn1s = (dsn0 * das1 - dcs0 * dac1) / dzn0;
-  dcs1s = (dcs0 * das1 + dsn0 * dac1) / dzn0;
-
-
-  dsn0 = (dd - dks0);
-  dcs0 = -dw0;
-  dzn0 = dcs0 * dcs0 + dsn0 * dsn0;
-
-  dsn0d = (dsn0 * das0 - dcs0 * dac0) / dzn0;
-  dcs0d = (dcs0 * das0 + dsn0 * dac0) / dzn0;
-
-  dsn0 = (dd - dks1);
-  dcs0 = -dw1;
-  dzn0 = dcs0 * dcs0 + dsn0 * dsn0;
-
-  dsn1d = (dsn0 * das1 - dcs0 * dac1) / dzn0;
-  dcs1d = (dcs0 * das1 + dsn0 * dac1) / dzn0;
-
-  //cppcheck dr = (ts - td) / td;
-
-
-
-
-  sv123 = ((((dsn0s - dsn0d) * sin(dw0 * t)
-             + (dcs0s - dcs0d) * cos(dw0 * t)) * exp(-t * dks0)
-            - (dcs0s + dcs1s) * exp(-t * ds) + (dcs0d + dcs1d) * exp(-t * dd)
-            + ((dsn1s - dsn1d) * sin(dw1 * t)
-               + (dcs1s - dcs1d) * cos(dw1 * t)) * exp(-t * dks1)) / dzna / (ts - td));
-
-  return sv123;
-
-
-}
-
-
-
-double ShaperDSP(double Ti)
-{
-  double svp = 0;
-  double tr1 = Ti * 0.881944444;
-
-  double s[12] = {0, 27.7221, 0.5, 0.6483, 0.4017, 0.3741, 0.8494, 0.00144547, 4.7071, 0.8156, 0.5556, 0.2752};
-
-
-  double tr = tr1 - s[2];
-  double tr2 = tr + .2;
-  double tr3 = tr - .2;
-  if (tr2 > 0.) {
-
-    svp = (Sv123(tr , s[4], s[5], s[9], s[10], s[3], s[6]) * (1 - s[11])
-           + s[11] * .5 * (Sv123(tr2, s[4], s[5], s[9], s[10], s[3], s[6])
-                           + Sv123(tr3, s[4], s[5], s[9], s[10], s[3], s[6])));
-    double x = tr / s[4];
-
-
-    svp = s[1] * (svp - s[7] * (exp(-tr / s[8]) *
-                                (1 - exp(-x) * (1 + x + x * x / 2 + x * x * x / 6 + x * x * x * x / 24 + x * x * x * x * x / 120))));
-  } else svp = 0 ;
-  return svp;
-
-}
-
-
 
 short  int bit_val(double f, int idd, short int bit, int a, int b, int lim)
 {

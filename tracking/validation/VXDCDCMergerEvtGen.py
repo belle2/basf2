@@ -20,6 +20,7 @@ from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
+from beamparameters import add_beamparameters
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -303,6 +304,7 @@ main.add_module(eventinfoprinter)
 # main.add_module(geometry)
 # main.add_module(pGun)
 # main.add_module(mcparticleprinter)
+beamparameters = add_beamparameters(main, "Y4S")
 main.add_module(evtgeninput)
 # main.add_module(g4sim)
 add_simulation(main)

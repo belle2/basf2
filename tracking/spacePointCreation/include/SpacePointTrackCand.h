@@ -135,6 +135,11 @@ namespace Belle2 {
     unsigned int getNHits() const { return m_trackSpacePoints.size(); }
 
     /**
+    * get the number of hits (space points) in the track candidate
+    */
+    unsigned int size() const { return m_trackSpacePoints.size(); }
+
+    /**
      * get pdg code
      */
     int getPdgCode() const { return m_pdg; }

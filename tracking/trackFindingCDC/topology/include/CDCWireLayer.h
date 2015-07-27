@@ -74,7 +74,6 @@ namespace Belle2 {
       /// Intializes the wire layer variables to the average of according variables in the wire range
       void initialize();
 
-
       /** @name Layer index
        */
       /**@{*/
@@ -147,6 +146,9 @@ namespace Belle2 {
       /// Setter for the range of the wires
       void setWireRange(const const_iterator& begin, const const_iterator& end)
       { m_begin = begin; m_end = end; initialize(); }
+
+      /// Gets the wire in this layer that is closest to the given position
+      const CDCWire& getClosestWire(const Vector3D& pos3D) const;
       /**@}*/
 
 

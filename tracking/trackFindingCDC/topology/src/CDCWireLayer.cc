@@ -166,3 +166,10 @@ const CDCWire* CDCWireLayer::nextWire(const CDCWire* wire) const
 }
 
 
+const CDCWire& CDCWireLayer::getClosestWire(const Vector3D& pos3D) const
+{
+  IWireType iWire = CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
+  // Safety measure against error in the cellId function
+  iWire %= size();
+  return getWire(iWire);
+}

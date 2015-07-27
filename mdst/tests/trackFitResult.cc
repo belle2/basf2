@@ -140,35 +140,4 @@ namespace Belle2 {
     }
   } // Testcases error propagation
 
-  /** Helix -> Cartesian -> Helix -> Cartesian */
-  TEST_F(TrackFitResultTest, H2C2H2C)
-  {
-    double absError = 1e-6;
-    double bField = 1.5;
-
-    // perigee helix parameters
-    std::vector<float> hp(5);
-    hp[0] = 51.8142;
-    hp[1] = 6.99831e-01;
-    hp[2] = -2.40505e-02;
-    hp[3] = 320.652;
-    hp[4] = 3.50734;
-    std::vector<float> hpErr(15);
-
-    auto pType = Belle2::Const::pion;
-
-    TrackFitResult fromHelixP(hp, hpErr, pType, 0.5, 0, 0);
-
-    TMatrixDSym cov6(6);
-    TrackFitResult fromHelixP2Cartesian(fromHelixP.getPosition(), fromHelixP.getMomentum(bField), cov6, fromHelixP.getChargeSign(),
-                                        pType, 0.5, bField, 0, 0);
-
-    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Px(), fromHelixP.getMomentum(bField).Px(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Py(), fromHelixP.getMomentum(bField).Py(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getMomentum(bField).Pz(), fromHelixP.getMomentum(bField).Pz(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().X(), fromHelixP.getPosition().X(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Y(), fromHelixP.getPosition().Y(), absError);
-    EXPECT_NEAR(fromHelixP2Cartesian.getPosition().Z(), fromHelixP.getPosition().Z(), absError);
-  }
-
 }  // namespace

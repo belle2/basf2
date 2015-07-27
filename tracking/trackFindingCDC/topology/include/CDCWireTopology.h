@@ -582,9 +582,14 @@ namespace Belle2 {
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborTwelveOClock(iLayer, iWire); }
       /**@}*/
 
+    public:
+      /// Getter for the outer radius of the outer most wire layer.
+      FloatType getOuterCylindricalR() const
+      { return m_wireLayers.back().getOuterCylindricalR(); }
 
-
-
+      /// Getter for the inner radius of the inner most wire layer.
+      FloatType getInnerClindricalR() const
+      { return m_wireLayers.front().getInnerCylindricalR(); }
 
     private:
       /// Storage for all wires in the CDC

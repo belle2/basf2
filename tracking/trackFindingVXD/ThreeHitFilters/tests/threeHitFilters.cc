@@ -110,6 +110,17 @@ namespace VXDTFthreeHitFilterTest {
   TEST_F(ThreeHitFilterTest, SelectionVariableName)
   {
     EXPECT_EQ("Belle2__Angle3DSimple{Belle2__SpacePoint}" , Angle3DSimple<SpacePoint>().name());
+    EXPECT_EQ("Belle2__Angle3DFull{Belle2__SpacePoint}" , Angle3DFull<SpacePoint>().name());
+    EXPECT_EQ("Belle2__AngleXYFull{Belle2__SpacePoint}" , AngleXYFull<SpacePoint>().name());
+    EXPECT_EQ("Belle2__AngleXYSimple{Belle2__SpacePoint}" , AngleXYSimple<SpacePoint>().name());
+    EXPECT_EQ("Belle2__AngleRZFull{Belle2__SpacePoint}" , AngleRZFull<SpacePoint>().name());
+    EXPECT_EQ("Belle2__AngleRZSimple{Belle2__SpacePoint}" , AngleRZSimple<SpacePoint>().name());
+    EXPECT_EQ("Belle2__DeltaSlopeRZ{Belle2__SpacePoint}" , DeltaSlopeRZ<SpacePoint>().name());
+    EXPECT_EQ("Belle2__HelixParameterFit{Belle2__SpacePoint}" , HelixParameterFit<SpacePoint>().name());
+    EXPECT_EQ("Belle2__DeltaSlopeZoverS{Belle2__SpacePoint}" , DeltaSlopeZoverS<SpacePoint>().name());
+    EXPECT_EQ("Belle2__DeltaSoverZ{Belle2__SpacePoint}" , DeltaSoverZ<SpacePoint>().name());
+    EXPECT_EQ("Belle2__Pt{Belle2__SpacePoint}" , Pt<SpacePoint>().name());
+    EXPECT_EQ("Belle2__CircleDist2IP{Belle2__SpacePoint}" , CircleDist2IP<SpacePoint>().name());
   }
 
 
@@ -285,45 +296,23 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint outerSPSimple = provideSpacePointDummy(6., 4., 0.);
     SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
     SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
-//     TVector3 innerHit(1., 1., 0.), centerHit(3., 3., 0.), outerHitEvil(6., 3., 0.), outerHitSimple(6., 4., 0.);
 
-//     ThreeHitFilters aFilter = ThreeHitFilters(outerHitSimple, centerHit, innerHit);
     Filter< CircleDist2IP<SpacePoint>, Range<double, double>, ResultsObserver > filteCircleDist2IP(Range<double, double>(0.44, 0.45));
     EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
     EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
 
-//    B2INFO("now comparing values of calcCircleDist2IP using simple outerHit: \n calcPt: " << aFilter.calcCircleDist2IP())
-//    aFilter.resetValues(outerHitSimple,centerHit,innerHit);
-//     EXPECT_FLOAT_EQ(0.44499173338941, aFilter.calcCircleDist2IP());
-
-//     aFilter.resetValues(outerHitEvil, centerHit, innerHit);
     EXPECT_FALSE(filteCircleDist2IP.accept(outerSPEvil, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
-//    B2INFO("now comparing values of calcCircleDist2IP using evil outerHit: \n calcPt: " << aFilter.calcPt())
-//    aFilter.resetValues(outerHitEvil,centerHit,innerHit);
-//     EXPECT_FLOAT_EQ(0.719806016136754, aFilter.calcCircleDist2IP());
 
-//    B2INFO("now tests with 0.976T (and reset between each step): \n")
+
     typedef SelVarHelper<SpacePoint, float> Helper;
     Helper::resetMagneticField(0.976);
 
     EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
     EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
 
-//     aFilter.resetMagneticField(0.976);
-//     aFilter.resetValues(outerHitSimple, centerHit, innerHit);
-//    B2INFO("now comparing values of calcCircleDist2IP using simple outerHit: \n calcPt: " << aFilter.calcCircleDist2IP() )
-//    aFilter.resetValues(outerHitSimple,centerHit,innerHit);
-//     EXPECT_FLOAT_EQ(0.44499173338941, aFilter.calcCircleDist2IP());
-
-
     EXPECT_FALSE(filteCircleDist2IP.accept(outerSPEvil, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
-
-//     aFilter.resetValues(outerHitEvil, centerHit, innerHit);
-//    B2INFO("now comparing values of calcCircleDist2IP using evil outerHit: \n calcPt: " << aFilter.calcPt() )
-//    aFilter.resetValues(outerHitEvil,centerHit,innerHit);
-//     EXPECT_FLOAT_EQ(0.719806016136754, aFilter.calcCircleDist2IP());
 
     Helper::resetMagneticField(1.5);
   }

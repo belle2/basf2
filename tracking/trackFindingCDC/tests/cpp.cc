@@ -16,6 +16,7 @@ Its purpose is mainly to asure the programmer that his assumptions about run tim
 
 #include <cmath>
 #include <gtest/gtest.h>
+#include <functional>
 
 #include <map>
 
@@ -107,4 +108,10 @@ TEST(TrackFindingCDCTest, cpp_remainer)
     EXPECT_FLOAT_EQ(1.0 / 2.0, reduced_value);
   }
 
+}
+
+TEST(TrackFindingCDCTest, cpp_covariance_std_function)
+{
+  auto funcWithConstPtrArgument = [](const int*) -> bool { return true;};
+  std::function<bool(int*)> funcWithNonConstPtrArgument = funcWithConstPtrArgument;
 }

@@ -33,7 +33,9 @@ namespace Belle2 {
        *  On the other hand curlers are allowed to have hits on both arms joined together.
        *  Default is that arms are allowed to be joined together.
        */
-      explicit HitInPhi0CurvBox(float curlCurv = NAN) : m_curlCurv(fabs(curlCurv))
+      explicit HitInPhi0CurvBox(float curlCurv = NAN, float rlWeightGain = 0) :
+        m_curlCurv(fabs(curlCurv)),
+        m_rlWeightGain(rlWeightGain)
       {;}
 
       /** Checks if the track hit is contained in a phi0 curv hough space.
@@ -73,7 +75,7 @@ namespace Belle2 {
           isRightOrLeftObservationIn(r, pos2D, driftLength, phi0CurvBox, rlInfo);
 
         rlTaggedTrackHit.setRLInfo(newRLInfo);
-        return isValidInfo(newRLInfo) ? 1 : NAN;
+        return isValidInfo(newRLInfo) ? 1 + abs(newRLInfo) * m_rlWeightGain : NAN;
       }
 
 
@@ -91,7 +93,7 @@ namespace Belle2 {
 
         bool rightIn = this->isObservationIn(r, pos2D, driftLength, phi0CurvBox);
         bool leftIn = this->isObservationIn(r, pos2D, -driftLength, phi0CurvBox);
-        return (rightIn or leftIn) ? 1 : NAN;
+        return (rightIn or leftIn) ? 1 + (leftIn xor rightIn) * m_rlWeightGain : NAN;
       }
 
       /** Checks if the wire hit is contained in a phi0 curv hough space.
@@ -119,7 +121,7 @@ namespace Belle2 {
           isRightOrLeftObservationIn(r, pos2D, driftLength, phi0CurvBox, rlInfo);
 
         rlTaggedWireHit.setRLInfo(newRLInfo);
-        return isValidInfo(newRLInfo) ? 1 : NAN;
+        return isValidInfo(newRLInfo) ? 1 + abs(newRLInfo) * m_rlWeightGain : NAN;
       }
 
 
@@ -261,6 +263,10 @@ namespace Belle2 {
     private:
       /// The curvature above which the trajectory is considered a curler.
       float m_curlCurv = NAN;
+
+      /** Weight gain for a hit which right left passage hypotheses could be uniquely resolved. */
+      float m_rlWeightGain = 0;
+
     };
 
   } // end namespace TrackFindingCDC

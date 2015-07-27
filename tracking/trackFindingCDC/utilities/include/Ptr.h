@@ -25,11 +25,11 @@ namespace Belle2 {
       {;}
 
       /// Allow automatic unpacking.
-      operator T* ()
-      { return m_obj;}
+      operator T*& ()
+      { return m_obj; }
 
       /// Allow automatic unpacking.
-      operator T const* () const
+      operator T* const& () const
       { return m_obj; }
 
       /// Mimic the original item pointer access.

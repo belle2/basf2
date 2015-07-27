@@ -259,6 +259,10 @@ namespace Belle2 {
       inline FloatType parallelComp(const Vector3D& relativTo) const
       { return relativTo.dot(*this) / relativTo.norm(); }
 
+      /// Calculates the part of this vector that is parallel to the given vector
+      inline Vector3D parallelVector(const Vector3D& relativTo) const
+      { return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared()); }
+
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
@@ -272,6 +276,10 @@ namespace Belle2 {
        *  component is meaningless and is always set to positiv */
       inline FloatType orthogonalComp(const Vector3D& relativTo) const
       { return relativTo.cross(*this).norm() / relativTo.norm(); }
+
+      /// Calculates the part of this vector that is parallel to the given vector
+      inline Vector3D orthogonalVector(const Vector3D& relativTo) const
+      { return *this - parallelVector(relativTo); }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n

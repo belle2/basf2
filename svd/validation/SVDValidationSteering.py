@@ -27,6 +27,8 @@ from SVDValidationTTreeEfficiency import *
 
 set_random_seed(12345)
 
+main = create_path()
+
 # Particle gun module
 # particlegun = register_module('ParticleGun')
 # particlegun.param({
@@ -94,7 +96,6 @@ svdefficiency = SVDValidationTTreeEfficiency()
 
 # ============================================================================
 # create processing path
-main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 # main.add_module(particlegun)

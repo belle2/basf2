@@ -9,8 +9,7 @@
 #include <fstream>
 #include <cassert>
 
-TH2F* Box = new TH2F("Box", "box", 8736, 0., 8736., 2900, 2000, 4900);
-TH1F* Ms = new TH1F("Ms", "ev", 2900, 2000., 4900.);
+
 
 using namespace std;
 
@@ -35,15 +34,21 @@ Double_t glog(Double_t* x, Double_t* par)
 }
 
 void cut(const char* inputRootFilename, const char* outputCutFilename,
-         const char* outputpdfdir, int crystalMin, int crystalMax)
+         const char* outputpdfdir, int crystalMin, int crystalMax,
+         int ampMin, int ampMax)
 {
 
+  int nbins = ampMax - ampMin;
+  TH2F* Box = new TH2F("Box", "box", 8736, 0., 8736., nbins, float(ampMin), float(ampMax));
+  TH1F* Ms = new TH1F("Ms", "ev", nbins, float(ampMin), float(ampMax));
   TChain fChain("m_tree");
   Int_t poq;
   cout << "!!! file for calibration:" << inputRootFilename << endl;
   fChain.Add(inputRootFilename);
 
+
   string outputpdffile(outputpdfdir);
+  bool doplot = !(outputpdffile == "noplot");
   outputpdffile += "/amplitudefits.pdf";
 
   Int_t           nhits;
@@ -88,8 +93,12 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
   }  //event cicle
 
   // open output pdf file
-  TCanvas* plot = new TCanvas;
-  plot->SaveAs((outputpdffile + string("[")).c_str());
+
+  TCanvas* plot;
+  if (doplot) {
+    plot = new TCanvas;
+    plot->SaveAs((outputpdffile + string("[")).c_str());
+  }
   //fill 1D histigramm and fit
   for (k = crystalMin ; k <= crystalMax; k++) {
     cout << "Crystal " << k << endl;
@@ -106,15 +115,15 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
     }
     rg = Ms->GetRMS();
     // both choices do not converge
-    //mug = Ms->GetMean();
-    mug = Ms->GetXaxis()->GetBinCenter(Ms->GetMaximumBin());
+    mug = Ms->GetMean();
+    // mug = Ms->GetXaxis()->GetBinCenter(Ms->GetMaximumBin());
     TF1* func = new TF1("glog", glog, 2990., 3500., 4);
     func->SetParNames("Nornamisation", "Maximum", "Sigma", "Assimetry");
     func->SetParameters(InT, mug, rg, 0.1);
     Ms->Fit(func, "l");
     Ms->Draw();
 
-    plot->SaveAs(outputpdffile.c_str());
+    if (doplot) plot->SaveAs(outputpdffile.c_str());
     Double_t par[4];
     func->GetParameters(par);
     Mu[k] = par[1];
@@ -132,7 +141,7 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
   }   // channels cicle
 
   // close output pdf file
-  plot->SaveAs((outputpdffile + string("]")).c_str());
+  if (doplot) plot->SaveAs((outputpdffile + string("]")).c_str());
   // write data
 
   ofstream outputCutFile(outputCutFilename);
@@ -151,14 +160,18 @@ int main(int argc, char** argv)
   assert(argc > 3 && argc < 7);
   // first argument is input root file
   // second argument is output cut text file
-  // third argument output plot file
+  // third argument output plot file or "noplot"
   // 4th argument crystal min = 0
   // 5th argument crystal max = 8735
   int crystalMin = 0;
-  int crystalMax = 8735;;
+  int crystalMax = 8735;
+  int ampMin = 2000;
+  int ampMax = 4900;
   if (argc >= 5) crystalMin = stoi(argv[4]);
-  if (argc == 6) crystalMax = stoi(argv[5]);
-  cut(argv[1], argv[2], argv[3], crystalMin, crystalMax);
+  if (argc >= 6) crystalMax = stoi(argv[5]);
+  if (argc >= 7) ampMin = stoi(argv[6]);
+  if (argc >= 8) ampMax = stoi(argv[7]);
+  cut(argv[1], argv[2], argv[3], crystalMin, crystalMax, ampMin, ampMax);
   //cut("/gpfs/home/belle/avbobrov/belle2/j15/ecl/examples/rootfile.txt");
   // sprintf(Min, "/home/belle/avbobrov/binp2/chdatuXX.txt");
 }

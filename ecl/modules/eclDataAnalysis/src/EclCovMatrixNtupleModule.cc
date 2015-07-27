@@ -36,7 +36,7 @@ EclCovMatrixNtupleModule::EclCovMatrixNtupleModule() : Module()
 {
   //Set module properties
   setDescription("EclCovMatrixNtuple: write ECL waveform and fitted time and amplitude in a root file");
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   //Parameters definition
   addParam("outputFileName", m_dataOutFileName,
            "Output root file name of this module", string("EclCovMatrixNtuple"));

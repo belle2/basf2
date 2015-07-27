@@ -12,23 +12,26 @@
 #include <vector>
 #include "TCL1.h"
 #include <cassert>
+#include <framework/utilities/FileSystem.h>
 
 using namespace std;
+using namespace Belle2;
 
 // function for inversion simmetric matrix
 void sim(double* ss, int* N, double* aa, double* sb)
 {
   int i, k, j;
-  int n, n2;
-  vector<double> svec(*N, 0), rvec(*N, 0);
-
-  double* s = & svec[0];
-  double* r = & rvec[0];
+  int n, n1, n2;
 
   double dbs;
 
   n = *N;
+  n1 = n * (n + 1) / 2;
   n2 = n * n;
+
+  vector<double> svec(n1, 0), rvec(n1, 0);
+  double* s = & svec[0];
+  double* r = & rvec[0];
 
   for (i = 0; i < n2; i++) {
     *(aa + i) = *(ss + i);
@@ -50,8 +53,11 @@ void sim(double* ss, int* N, double* aa, double* sb)
     }
   }   // for j
 
+
   for (j = 0; j < n2; j++) {
+
     *(ss + j) = *(aa + j);
+
   }
 }
 
@@ -123,8 +129,9 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   double delta;
   delta = 0.;
 
-  double SI[16][16];
-  double IS[16][16];
+  // not used commented to silence warning
+  // double SI[16][16];
+  // double IS[16][16];
 
   double MI[16][16];
   double IM[16][16];
@@ -147,7 +154,10 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   double Q[mapmax][16];
   double Mean[8736];
-  double rms[8736];
+
+  // not used commented to silence warning
+  // double rms[8736];
+
   double sr[8736];
   double sl[8736];
 
@@ -168,14 +178,15 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   int DS[8736];
 
-  ifstream ctoecldatafile("CIdToEclData.txt");
+  string crystalGroupsFilename = FileSystem::findFile("/data/ecl/CIdToEclData.txt");
+  assert(! crystalGroupsFilename.empty());
+  ifstream ctoecldatafile(crystalGroupsFilename);
 
   int cid, group;
   bool readerr = false;
   vector<int> grmap[252];
   while (! ctoecldatafile.eof()) {
     ctoecldatafile >> cid >> group;
-//    cout << cid << " " << group << endl;
 
     if (ctoecldatafile.eof()) break;
     if (group <= -1 || group >= 252 || cid <= -1 || cid >= 8736) {
@@ -185,7 +196,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
     }
     DS[cid] = group;
   }
-
+  assert(!readerr);
   int ia, ib;
 
   int max = 8736;
@@ -209,7 +220,8 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
     cutFile >> jk >> mn >> rs >> el >> er >> ch2;
     if (cutFile.eof()) break;
     Mean[jk] = mn;
-    rms[jk] = rs;
+    // not used: commented to silence warnings
+    //    rms[jk] = rs;
     sr[jk] = er;
     sl[jk] = el;
   }
@@ -253,7 +265,10 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
         }
       }  // points cicle for selection events
 
-      if (index == 1) {
+      // selection not applied because seems to cut all events
+      // to be checked
+
+      if (index == 1 || index == 0) {
         inmt[DS[icn]] = inmt[DS[icn]] + 1.;
         A0 = 0.;
 
@@ -323,20 +338,23 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
             MI[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
 
             UU[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
-            SI[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
+            // not used commented to silence warning
+            // SI[ia][ib] = (WW[icn][ia][ib] - W[icn][ia][0] * W[icn][ib][0] / inmt[icn]) / inmt[icn];
 
 
 
           }
 
         }
-        IS[ia][ib] = 0;
+        // not used commented to silence warning
+        // IS[ia][ib] = 0;
 
       }
 
 
       // INVERSION
       N1 = 16;
+
       sim(*MI, &N1, *IM, &dec);
 
 

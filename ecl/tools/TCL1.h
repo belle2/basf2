@@ -190,7 +190,7 @@ public:
 };
 //// Alexander Bobrov addition:
 
-
+#include <iostream>
 double* TCL::trpck(double* s, double* u, int n)
 {
   // trpck.F -- translated by f2c (version 19970219).
@@ -217,6 +217,8 @@ double* TCL::trpck(double* s, double* u, int n)
     do {
       ++ia;
       ++ind;
+      //std::cout << "s[" << ia << "]=" << s[ia] << " i__=" << i__ << " ia="
+      //    << ia << " ind=" << ind << " ipiv " << ipiv << std::endl;
       //  printf("s[%d]= %f i__=%d ia=%d ind=%d ipiv=%d \n",ia,s[ia],i__,ia,ind,ipiv);
       u[ind] = s[ia];
 

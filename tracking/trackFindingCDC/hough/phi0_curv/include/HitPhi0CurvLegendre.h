@@ -40,7 +40,12 @@ namespace Belle2 {
       {;}
 
       /// Constructor using the given maximal level.
-      HitPhi0CurvLegendre(size_t maxLevel) : m_maxLevel(maxLevel)
+      HitPhi0CurvLegendre(size_t maxLevel,
+                          double minCurv = -0.018,
+                          double maxCurv = 0.13) :
+        m_maxLevel(maxLevel),
+        m_minCurv(minCurv),
+        m_maxCurv(maxCurv)
       {;}
 
     public:
@@ -56,11 +61,20 @@ namespace Belle2 {
         // Setup the discrete values for the two dimensional curvature
         assert(m_discreteCurvWidth > m_discreteCurvOverlap);
         const size_t nCurvBins = std::pow(curvDivisions, m_maxLevel);
-        m_discreteCurvs =
-          DiscreteCurvatureArray::forPositiveCurvatureBinsWithOverlap(m_maxCurv,
-              nCurvBins,
-              m_discreteCurvWidth,
-              m_discreteCurvOverlap);
+        if (m_minCurv == 0) {
+          m_discreteCurvs =
+            DiscreteCurvatureArray::forPositiveCurvatureBinsWithOverlap(m_maxCurv,
+                nCurvBins,
+                m_discreteCurvWidth,
+                m_discreteCurvOverlap);
+        } else {
+          m_discreteCurvs =
+            DiscreteCurvatureArray::forCurvatureBinsWithOverlap(m_minCurv,
+                                                                m_maxCurv,
+                                                                nCurvBins,
+                                                                m_discreteCurvWidth,
+                                                                m_discreteCurvOverlap);
+        }
 
         // Compose the hough space
         std::pair<DiscreteAngle, DiscreteAngle> phi0Range(m_discretePhi0s.getRange());
@@ -164,8 +178,11 @@ namespace Belle2 {
       /// Width of the leaves at the maximal level in teh curvature counted in number of discrete values.
       size_t m_discreteCurvWidth = 5;
 
-      /// Maximal curvature value the tree should cover.
-      double m_maxCurv = 2.75;
+      /// Minimal curvature value the tree should cover. Default is the minimal non curler curvature.
+      double m_minCurv = -0.018;
+
+      /// Maximal curvature value the tree should cover. Default is the minimal curvature to reach the CDC.
+      double m_maxCurv = 0.13;
 
       /// Predicate checking if hit is in a gievn phi0 curvature box
       static const bool s_refined = false;

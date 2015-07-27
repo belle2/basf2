@@ -55,6 +55,15 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
   const size_t maxLevel = 13;
   const size_t phi0Divisions = 2;
   const size_t curvDivisions = 2;
+  const double maxCurv = 2.75;
+  const double minCurv = 0;
+
+  // const size_t maxLevel = 9;
+  // const size_t phi0Divisions = 3;
+  // const size_t curvDivisions = 2;
+  // const double maxCurv = 0.13;
+  // const double minCurv = 0;
+
 
   // const size_t maxLevel = 8;
   // const size_t phiDivisions = 3;
@@ -62,7 +71,7 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
 
   using WireHitPhi0CurvQuadLegendre =
     HitPhi0CurvLegendre<RLTagged<const CDCWireHit*>, phi0Divisions, curvDivisions>;
-  WireHitPhi0CurvQuadLegendre wireHitPhi0CurvQuadLegendre(maxLevel);
+  WireHitPhi0CurvQuadLegendre wireHitPhi0CurvQuadLegendre(maxLevel, minCurv, maxCurv);
   wireHitPhi0CurvQuadLegendre.initialize();
 
   std::vector<const CDCWireHit*> axialWireHits;
@@ -137,7 +146,8 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
     } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
       color = "red";
     }
-    EventDataPlotter::AttributeMap rl {{"stroke", color}};
+    //EventDataPlotter::AttributeMap rl {{"stroke", color}};
+    EventDataPlotter::AttributeMap rl {{"stroke", "blue"}};
     plotter.draw(*wireHit, rl);
   }
 

@@ -24,6 +24,24 @@ namespace Belle2 {
       using DiscreteValueArray<float>::DiscreteValueArray;
 
     public:
+      /** Constructs equally spaced discrete curvature values with discrete overlap specification
+       *
+       *  @param minCurv  Lower bound of the curvature range
+       *  @param maxCurv  Upper bound of the curvature range
+       *  @param nBins    Total number of final bins to be constructed
+       *  @param nWidth   Number of discrete values in each bin
+       *                  (counted semi open [start, stop)).
+       *  @param nOverlap Number of discrete values that overlapping bins have in common
+       *                  (counted semi open [start, stop)).
+       */
+      static
+      DiscreteCurvatureArray
+      forCurvatureBinsWithOverlap(float minCurv,
+                                  float maxCurv,
+                                  size_t nBins,
+                                  size_t nWidth,
+                                  size_t nOverlap);
+
       /** Constructs equally spaced discrete curvature values
        *  for searches in the positive curvature range.
        *

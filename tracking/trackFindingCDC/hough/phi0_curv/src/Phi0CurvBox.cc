@@ -13,6 +13,20 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+DiscreteCurvatureArray
+DiscreteCurvatureArray::forCurvatureBinsWithOverlap(float minCurv,
+                                                    float maxCurv,
+                                                    size_t nBins,
+                                                    size_t nWidth,
+                                                    size_t nOverlap)
+{
+  const size_t nPositions = (nWidth - nOverlap) * nBins + nOverlap + 1;
+  const float lowerBound = minCurv;
+  const float upperBound = maxCurv;
+  return DiscreteCurvatureArray(lowerBound, upperBound, nPositions);
+}
+
+
 
 DiscreteCurvatureArray
 DiscreteCurvatureArray::forPositiveCurvatureBinsWithOverlap(float maxCurv,

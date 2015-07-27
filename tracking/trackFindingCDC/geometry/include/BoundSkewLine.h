@@ -174,32 +174,34 @@ namespace Belle2 {
       /// Returns the closest approach to the give point
       /** This calculates the point of closest approach on the line. It does not care about the boundaries of the line. */
       inline Vector3D closest3D(const Vector3D& point) const
-      {
-        Vector3D unitLineVector = tangential3D();
-        unitLineVector.normalize();
+      { return  refPos3D() - (point - refPos3D()).parallelVector(tangential3D()); }
 
-        FloatType parallelCompPoint = point.unnormalizedParallelComp(unitLineVector);
-        FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
+      //   Vector3D unitLineVector = tangential3D();
+      //   unitLineVector.normalize();
 
-        //same memory , only different name
-        Vector3D& parallelVec = unitLineVector.scale(parallelCompPoint - parallelCompRef);
+      //   FloatType parallelCompPoint = point.unnormalizedParallelComp(unitLineVector);
+      //   FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
 
-        return refPos3D() - parallelVec;
-      }
+      //   //same memory , only different name
+      //   Vector3D& parallelVec = unitLineVector.scale(parallelCompPoint - parallelCompRef);
+
+      //   return refPos3D() - parallelVec;
+      // }
 
       /// Returns the point of closest approach to the origin on the line
       inline Vector3D closestToOrigin3D() const
-      {
-        Vector3D unitLineVector = tangential3D();
-        unitLineVector.normalize();
+      { return refPos3D() - refPos3D().parallelVector(tangential3D()); }
+      // {
+      //   Vector3D unitLineVector = tangential3D();
+      //   unitLineVector.normalize();
 
-        FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
+      //   FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
 
-        //same memory , only different name
-        Vector3D& parallelVecOfRef = unitLineVector.scale(parallelCompRef);
+      //   //same memory , only different name
+      //   Vector3D& parallelVecOfRef = unitLineVector.scale(parallelCompRef);
 
-        return refPos3D() - parallelVecOfRef;
-      }
+      //   return refPos3D() - parallelVecOfRef;
+      // }
 
       /// Calculates the distance of the given point to the line
       inline FloatType distance(const Vector3D& pos3D) const

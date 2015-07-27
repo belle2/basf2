@@ -190,6 +190,10 @@ namespace Belle2 {
       FloatType getDistance(const Vector3D& pos3D) const
       { return getSkewLine().distance(pos3D); }
 
+      /// Calculates the closest approach in the wire to the position
+      Vector3D getClosest(const Vector3D& pos3D) const
+      { return getSkewLine().closest3D(pos3D); }
+
       /** Calculates the straight drift length from the position to the wire
        *  This is essentially the same as the distance to the wire
        *  but returns NAN if either

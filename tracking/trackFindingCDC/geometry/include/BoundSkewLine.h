@@ -200,6 +200,11 @@ namespace Belle2 {
 
         return refPos3D() - parallelVecOfRef;
       }
+
+      /// Calculates the distance of the given point to the line
+      inline FloatType distance(const Vector3D& pos3D) const
+      { return (pos3D - refPos3D()).orthogonalComp(tangential3D()); }
+
       /// Return the skew parameter
       inline const FloatType& skew() const
       { return m_skew; }

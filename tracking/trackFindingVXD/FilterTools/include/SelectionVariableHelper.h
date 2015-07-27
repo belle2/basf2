@@ -169,6 +169,7 @@ namespace Belle2 {
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet.
      * a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
+    * 0 means that it is exactly straight or that two hits are identical.
      * first vector should be outer hit, second = center hit, third is inner hit */
     static int calcSign(const PointType& a, const PointType& b, const PointType& c)
     {

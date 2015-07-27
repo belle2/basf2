@@ -110,9 +110,6 @@ namespace VXDTFfourHitFilterTest {
     SpacePoint outerCenterSP = provideSpacePointDummy(-2, 0, 0.);
     SpacePoint innerCenterSP = provideSpacePointDummy(0, 2, 0.);
     SpacePoint innerSP = provideSpacePointDummy(2, 0, 0.);
-    /*  TVector3 hit2(-2, 0, 0.), hit3(0, 2, 0.), hit1(0, 0, 0.), hit4(2, 0, 0.);
-      FourHitFilters aFilter = FourHitFilters(hit1, hit2, hit3, hit4);
-      */
 
 
     Filter< DeltaDistCircleCenter<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaDistCircleCenter(
@@ -124,38 +121,7 @@ namespace VXDTFfourHitFilterTest {
     EXPECT_TRUE(filteDeltaPt.accept(outerSP, outerCenterSP, innerCenterSP, innerSP));
     EXPECT_FLOAT_EQ(0.00263349, lastResult);
 
-//  EXPECT_FLOAT_EQ(sqrt(2), aFilter.deltaDistCircleCenter());
-//  EXPECT_FLOAT_EQ(0.00263349, aFilter.deltapT());     //aFilter.calcPt(2)-aFilter.calcPt(sqrt(2))= 0.00263349
-//
   }
-
-  /** Test CircleDist2IP. */
-//   TEST_F(ThreeHitFilterTest, TestCircleDist2IP)
-//   {
-//  SpacePoint outerSPEvil = provideSpacePointDummy(6., 3., 0.);
-//  SpacePoint outerSPSimple = provideSpacePointDummy(6., 4., 0.);
-//  SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
-//  SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
-//
-//  Filter< CircleDist2IP<SpacePoint>, Range<double, double>, ResultsObserver > filteCircleDist2IP(Range<double, double>(0.44, 0.45));
-//  EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
-//  EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
-//
-//  EXPECT_FALSE(filteCircleDist2IP.accept(outerSPEvil, centerSP, innerSP));
-//  EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
-//
-//
-//  typedef SelVarHelper<SpacePoint, float> Helper;
-//  Helper::resetMagneticField(0.976);
-//
-//  EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
-//  EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
-//
-//  EXPECT_FALSE(filteCircleDist2IP.accept(outerSPEvil, centerSP, innerSP));
-//  EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
-//
-//  Helper::resetMagneticField(1.5);
-//   }
 
 }
 

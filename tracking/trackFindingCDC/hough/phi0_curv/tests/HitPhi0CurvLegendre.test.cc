@@ -31,11 +31,11 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
   CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   CDCSimpleSimulation simpleSimulation(&wireHitTopology);
 
-  // Helix lowerCurvOriginHelix(0.015, 2.52033, 0, 0, 0);
-  // Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0, 0);
+  Helix lowerCurvOriginHelix(0.015, 2.52033, 0, 1, 0);
+  Helix higherCurvOriginHelix(0.027, 3.0718, 0, 1, 0);
 
-  Helix lowerCurvOriginHelix(0.012, 1.4, 0, 1, 0);
-  Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0.95, 0);
+  // Helix lowerCurvOriginHelix(0.012, 1.4, 0, 1, 0);
+  // Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0.95, 0);
 
   CDCTrajectory3D lowerCurvTrajectory(lowerCurvOriginHelix);
   CDCTrajectory3D higherCurvTrajectory(higherCurvOriginHelix);
@@ -65,7 +65,7 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
   // const double maxCurv = 2.75;
   // const double minCurv = 0;
 
-  const size_t maxLevel = 12;
+  const size_t maxLevel = 13;
   const size_t phi0Divisions = 2;
   const size_t curvDivisions = 2;
   const double maxCurv = 2.75;
@@ -159,15 +159,22 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0Cur
     } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
       color = "red";
     }
-    //EventDataPlotter::AttributeMap rl {{"stroke", color}};
-    EventDataPlotter::AttributeMap rl {{"stroke", "blue"}};
+    EventDataPlotter::AttributeMap rl {{"stroke", color}};
+    //EventDataPlotter::AttributeMap rl {{"stroke", "blue"}};
     plotter.draw(*wireHit, rl);
   }
   plotter.save("legendre_event.svg");
 
   for (const RLTagged<const CDCWireHit*>& rlTaggedWireHit : candidates.at(1).second) {
     const CDCWireHit* wireHit = rlTaggedWireHit;
-    EventDataPlotter::AttributeMap rl {{"stroke", "red"}};
+    std::string color = "blue";
+    if (rlTaggedWireHit.getRLInfo() == RIGHT) {
+      color = "green";
+    } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
+      color = "red";
+    }
+    EventDataPlotter::AttributeMap rl {{"stroke", color}};
+    //EventDataPlotter::AttributeMap rl {{"stroke", "red"}};
     plotter.draw(*wireHit, rl);
   }
 

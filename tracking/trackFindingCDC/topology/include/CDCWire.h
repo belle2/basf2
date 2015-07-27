@@ -182,10 +182,22 @@ namespace Belle2 {
       Vector2D getWirePos2DAtZ(const FloatType& z) const
       { return getSkewLine().pos2DAtZ(z); }
 
-      /// Gives the xy projected position of the wire at the given z coordinate
+      /// Gives position of the wire at the given z coordinate
       Vector3D getWirePos3DAtZ(const FloatType& z) const
       { return getSkewLine().pos3DAtZ(z); }
 
+      /// Calculates the distance from the position to the wire
+      FloatType getDistance(const Vector3D& pos3D) const
+      { return getSkewLine().distance(pos3D); }
+
+      /** Calculates the straight drift length from the position to the wire
+       *  This is essentially the same as the distance to the wire
+       *  but returns NAN if either
+       *  * the position is outside of the CDC
+       *  * the position is outside of the drift cell
+       */
+      FloatType getDriftLength(const Vector3D& pos3D) const
+      { return isInCell(pos3D) ? getDistance(pos3D) : NAN; }
 
       /// Getter for the wire reference position.
       /** Gives the wire's reference position
@@ -234,13 +246,16 @@ namespace Belle2 {
       FloatType getForwardZ() const { return getSkewLine().forwardZ(); }
 
       /// Getter for the z coordinate at the backward joint points of the wires
-      FloatType  getBackwardZ() const { return getSkewLine().backwardZ(); }
+      FloatType getBackwardZ() const { return getSkewLine().backwardZ(); }
 
       /** Indicator if the given position near the wire is already outside the CDC.
        *  If one component of the vector is NaN false is returned.
        */
       bool isOutsideCDC(const Vector3D& recoPos3D) const
       { return recoPos3D.z() > getForwardZ() or recoPos3D.z() < getBackwardZ(); }
+
+      /// Checks whether the position is in the drift cell surrounding the wire
+      bool isInCell(const Vector3D& pos3D) const;
 
       /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference
       const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }

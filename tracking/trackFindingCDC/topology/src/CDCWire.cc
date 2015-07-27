@@ -115,6 +115,27 @@ void CDCWire::initialize()
 
 }
 
+
+bool CDCWire::isInCell(const Vector3D& pos3D) const
+{
+  bool inZ = getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
+  if (not inZ) return false;
+
+  ILayerType iCLayer = getICLayer();
+  const CDCWireLayer& wireLayer = CDCWireTopology::getInstance().getWireLayer(iCLayer);
+  const FloatType& innerCylindricalR = wireLayer.getInnerCylindricalR();
+  const FloatType& outerCylindricalR = wireLayer.getOuterCylindricalR();
+  FloatType cylindricalR = pos3D.cylindricalR();
+
+  bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
+  if (not inCylindricalR) return false;
+
+  IWireType iWire = CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
+  bool inPhi = iWire == getIWire();
+  return inPhi;
+}
+
+
 WireNeighborType CDCWire::isNeighborWith(const CDCWire& wire) const
 { return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID()); }
 

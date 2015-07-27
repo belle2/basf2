@@ -15,7 +15,6 @@
 
 #include <TMatrixD.h>
 #include <TVectorD.h>
-
 #include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -268,6 +267,12 @@ namespace Belle2 {
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector2D atArcLength(const FloatType& arcLength) const;
 
+      /** Calculates the two dimensional arc length till the cylindrical radius is reached
+       *  If the radius can not be reached return NAN.
+       *  Note that there are two solutions which have equivalent arc lengths with different sign
+       *  Always return the positive solution. */
+      FloatType arcLengthToCylindricalR(const FloatType& cylindricalR) const;
+
       ///Getter for the signed curvature.
       inline const FloatType& curvature() const
       { return m_curvature; }
@@ -275,6 +280,10 @@ namespace Belle2 {
       /// Gives the signed distance of the origin to the circle.
       inline FloatType impact() const
       { return m_impact; }
+
+      /// Getter for the absolute distance to the z axes at the support point
+      FloatType d0() const
+      { return -impact(); }
 
       /// Gets the azimuth angle of the direction of flight at the perigee
       inline const FloatType& tangentialPhi() const

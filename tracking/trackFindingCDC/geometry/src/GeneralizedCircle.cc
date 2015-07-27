@@ -333,6 +333,21 @@ FloatType GeneralizedCircle::arcLengthTo(const Vector2D& to) const
 }
 
 
+FloatType GeneralizedCircle::arcLengthToCylindricalR(const FloatType& cylindricalR) const
+{
+  // Slight trick here
+  // Since the sought point is on the helix we treat it as the perigee
+  // and the origin as the point to extrapolate to.
+  // We know the distance of the origin to the circle, which is just d0
+  // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
+  const FloatType dr = d0();
+  const FloatType directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
+  const FloatType arcLength = arcLengthFactor(directDistance) * directDistance;
+  return arcLength;
+}
+
+
+
 
 FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) const
 {

@@ -441,7 +441,11 @@ namespace Belle2 {
 
       /// Gives the signed distance of the origin to the circle
       inline FloatType impact() const
-      { return distance(Vector2D(0.0, 0.0)); }
+      { return distance(fastImpact()); }
+
+      /// Getter for the absolute distance to the z axes at the support point
+      FloatType d0() const
+      { return -impact(); }
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
       inline Vector2D tangential() const
@@ -545,6 +549,12 @@ namespace Belle2 {
 
       /// Calculates the arc length between the perigee and the given point.
       FloatType arcLengthTo(const Vector2D& point) const;
+
+      /** Calculates the two dimensional arc length till the cylindrical radius is reached
+       *  If the radius can not be reached return NAN.
+       *  Note that there are two solutions which have equivalent arc lengths with different sign
+       *  Always return the positive solution. */
+      FloatType arcLengthToCylindricalR(const FloatType& cylindricalR) const;
 
       /**
       Helper function the calculate the factor between the length of a secant line and

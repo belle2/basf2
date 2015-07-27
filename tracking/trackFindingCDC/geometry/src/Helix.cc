@@ -20,21 +20,15 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
-
-
-
-
-
-FloatType Helix::arcLengthAtClosest(const Vector3D& point) const
+FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
 {
   // TODO: Introduce special case for curvatureXY == 0
 
 
-  FloatType byArcLength = circleXY().arcLengthBetween(perigeeXY(), point.xy());
+  FloatType byArcLength2D = circleXY().arcLengthTo(point.xy());
 
   // Handle z coordinate
-  FloatType transformedZ0 = byArcLength * szSlope() + z0();
+  FloatType transformedZ0 = byArcLength2D * szSlope() + z0();
   FloatType deltaZ = point.z() - transformedZ0;
   // FloatType iPeriod = floor(deltaZ / zPeriod());
 
@@ -48,7 +42,7 @@ FloatType Helix::arcLengthAtClosest(const Vector3D& point) const
   FloatType denominator = 1 + curvatureXY() * d0;
   //B2INFO("denominator = " << denominator);
   if (denominator == 0) {
-    return deltaZ / szSlope() + byArcLength;
+    return deltaZ / szSlope() + byArcLength2D;
   }
 
   FloatType slope = - szSlope() * szSlope() / denominator;
@@ -97,13 +91,13 @@ FloatType Helix::arcLengthAtClosest(const Vector3D& point) const
   // B2INFO("arcLength * curvature = " << solutions[iSmallestSol]);
   // B2INFO("distance = " << distances[iSmallestSol]);
 
-  FloatType curvatureXYTimesArcLength = solutions[iSmallestSol] ;
+  FloatType curvatureXYTimesArcLength2D = solutions[iSmallestSol] ;
 
-  FloatType arcLength = curvatureXYTimesArcLength / curvatureXY();
+  FloatType arcLength2D = curvatureXYTimesArcLength2D / curvatureXY();
 
   // Correct for the periods off set before
-  arcLength += byArcLength;
-  return arcLength;
+  arcLength2D += byArcLength2D;
+  return arcLength2D;
 
 }
 

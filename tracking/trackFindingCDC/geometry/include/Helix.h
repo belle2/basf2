@@ -96,19 +96,32 @@ namespace Belle2 {
 
     public:
       /// Calculates the perpendicular travel distance at which the helix has the closest approach to the given point.
-      FloatType arcLengthAtClosest(const Vector3D& point) const;
+      FloatType arcLength2DToClosest(const Vector3D& point) const;
+
+      /** Calculates the two dimensional arc length that is closest to two dimensional point
+       *  in the xy projection.
+       *  Always gives a solution in the first half period in the positive or negative direction
+       */
+      FloatType arcLength2DToXY(const Vector2D& point) const
+      { return circleXY().arcLengthTo(point); }
+
+      /** Calculates the two dimensional arc length that first reaches a cylindrical radius on the helix
+       *  Returns NAN if the radius cannot be reached.*/
+      FloatType arcLength2DToCylindricalR(const FloatType& cylindricalR) const
+      { return circleXY().arcLengthToCylindricalR(cylindricalR); }
 
       /// Calculates the point of closest approach on the helix to the given point.
       Vector3D closest(const Vector3D& point) const
       {
-        FloatType arcLength = arcLengthAtClosest(point);
-        return atArcLength(arcLength);
+        FloatType arcLength2D = arcLength2DToClosest(point);
+        return atArcLength2D(arcLength2D);
       }
 
-      //FloatType distance(const Vector3D& point) const;
+      /// Calculates the distance of the point to the point of closest approach on the helix.
+      FloatType distance(const Vector3D& point) const
+      { return point.distance(closest(point));}
+
       //FloatType lengthOnCurve(const Vector3D& from, const Vector3D& to) const;
-      //Vector3D sameCylindricalR(const Vector3D& point) const;
-      //Vector3D sameCylindricalRForwardOf(const Vector3D& startPoint, const FloatType& cylindricalR) const;
 
       /** Moves the coordinates system by the given vector. Updates support point in place.
        *  @return arcLength2D that has to be traversed to the new origin
@@ -116,7 +129,7 @@ namespace Belle2 {
       FloatType passiveMoveBy(const Vector3D& by)
       {
         // First keep the necessary shift of the perpendicular travel distance to the new support point.
-        FloatType byS = circleXY().arcLengthBetween(perigeeXY(), by.xy());
+        FloatType byS = circleXY().arcLengthTo(by.xy());
         m_circleXY.passiveMoveBy(by.xy());
         Vector2D bySZ(byS, by.z());
         m_lineSZ.passiveMoveBy(bySZ);
@@ -136,8 +149,8 @@ namespace Belle2 {
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector3D atArcLength(const FloatType& arcLength) const
-      { return Vector3D(circleXY().atArcLength(arcLength), lineSZ().map(arcLength)); }
+      Vector3D atArcLength2D(const FloatType& s) const
+      { return Vector3D(circleXY().atArcLength(s), lineSZ().map(s)); }
 
       /// Calculates the point, which lies at the given z coordinate
       Vector3D atZ(const FloatType& z) const
@@ -164,9 +177,9 @@ namespace Belle2 {
       FloatType impactXY() const
       { return circleXY().impact(); }
 
-      /// Getter for the absolute distance to the z axes at the support point
+      /// Getter for the signed distance to the z axes at the support point
       FloatType d0() const
-      { return impactXY(); }
+      { return circleXY().d0(); }
 
       /// Getter for the perigee point in the xy projection.
       Vector2D perigeeXY() const
@@ -195,13 +208,17 @@ namespace Belle2 {
       FloatType z0() const
       { return m_lineSZ.intercept(); }
 
-      /// Getter for the distance in z at which the two points on the helix coincide in the xy projection.
+      /// Getter for the distance in z at which the two points on the helix coincide in the xy projection
       FloatType zPeriod() const
       { return lineSZ().map(perimeterXY()); }
 
       /// Getter for the perimeter of the circle in the xy projection
       FloatType perimeterXY() const
       { return circleXY().perimeter(); }
+
+      /// Getter for the radius of the circle in the xy projection
+      FloatType radiusXY() const
+      { return circleXY().radius(); }
 
       /// Getter for the unit three dimensional tangential vector at the support point of the helix.
       Vector3D tangential() const

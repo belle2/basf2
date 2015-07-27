@@ -215,3 +215,16 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
   jacobian(iI, iI) = 2 * mu * nu;
 
 }
+
+FloatType PerigeeCircle::arcLengthToCylindricalR(const FloatType& cylindricalR) const
+{
+  // Slight trick here
+  // Since the sought point is on the helix we treat it as the perigee
+  // and the origin as the point to extrapolate to.
+  // We know the distance of the origin to the circle, which is just d0
+  // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
+  const FloatType dr = d0();
+  const FloatType directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
+  const FloatType arcLength = arcLengthFactor(directDistance) * directDistance;
+  return arcLength;
+}

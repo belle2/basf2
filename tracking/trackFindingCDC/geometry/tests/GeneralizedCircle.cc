@@ -202,6 +202,49 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 
 }
 
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
+{
+  FloatType radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
+  {
+    FloatType closestArcLength = circle.arcLengthToCylindricalR(1);
+    EXPECT_NEAR(0, closestArcLength, 10e-7);
+
+    FloatType widestArcLength = circle.arcLengthToCylindricalR(3);
+    EXPECT_NEAR(PI, widestArcLength, 10e-7);
+
+    FloatType halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
+    EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
+
+    FloatType unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
+    EXPECT_TRUE(std::isnan(unreachableHighArcLength));
+
+    FloatType unreachableLowArcLength = circle.arcLengthToCylindricalR(0.5);
+    EXPECT_TRUE(std::isnan(unreachableLowArcLength));
+  }
+
+  GeneralizedCircle reversedCircle = circle.reversed();
+  {
+    FloatType closestArcLength = reversedCircle.arcLengthToCylindricalR(1);
+    EXPECT_NEAR(0, closestArcLength, 10e-7);
+
+    FloatType widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
+    EXPECT_NEAR(PI, widestArcLength, 10e-7);
+
+    FloatType halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
+    EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
+
+    FloatType unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
+    EXPECT_TRUE(std::isnan(unreachableHighArcLength));
+
+    FloatType unreachableLowArcLength = reversedCircle.arcLengthToCylindricalR(0.5);
+    EXPECT_TRUE(std::isnan(unreachableLowArcLength));
+  }
+
+}
+
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
 {

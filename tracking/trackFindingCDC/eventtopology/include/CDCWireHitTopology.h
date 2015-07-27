@@ -29,6 +29,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    class CDCSimpleSimulation;
+
     /// Class representating the wire hit arrangement in the current event in the whole of the central drift chamber.
     /** This class stores the hits in the CDC that have been unpacked from the raw CDCHits and geometrical information
      *  of the wire position an initial estimate of the drift length is attached.
@@ -169,6 +171,8 @@ namespace Belle2 {
       m_initialTDCCountTranslator; ///< Reference of the tdc count translator used at the beginning of this event.
 
     private:
+      /// Allow the simple simulation to manipulate the objects directly
+      friend CDCSimpleSimulation;
 
     }; //class
 

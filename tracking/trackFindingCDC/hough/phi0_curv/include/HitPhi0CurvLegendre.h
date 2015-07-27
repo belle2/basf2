@@ -43,11 +43,13 @@ namespace Belle2 {
       /// Constructor using the given maximal level.
       HitPhi0CurvLegendre(size_t maxLevel,
                           double minCurv = -0.018,
-                          double maxCurv = 0.13) :
+                          double maxCurv = 0.13,
+                          double curlCurv = 0.018) :
         m_maxLevel(maxLevel),
         m_minCurv(minCurv),
         m_maxCurv(maxCurv),
-        m_hitInPhi0CurvBox(m_curlCurv)
+        m_curlCurv(curlCurv),
+        m_hitInPhi0CurvBox(curlCurv)
       {;}
 
     public:
@@ -169,13 +171,13 @@ namespace Belle2 {
       size_t m_maxLevel = 13;
 
       /// Overlap of the leaves in phi0 counted in number of discrete values.
-      size_t m_discretePhi0Overlap = 2;
+      size_t m_discretePhi0Overlap = 1;
 
       /// Width of the leaves at the maximal level in phi0 counted in number of discrete values.
       size_t m_discretePhi0Width = 3;
 
       /// Overlap of the leaves in the curvature counted in number of discrete values
-      size_t m_discreteCurvOverlap = 4;
+      size_t m_discreteCurvOverlap = 2;
 
       /// Width of the leaves at the maximal level in teh curvature counted in number of discrete values.
       size_t m_discreteCurvWidth = 5;

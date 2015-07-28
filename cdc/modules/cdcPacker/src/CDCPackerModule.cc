@@ -154,8 +154,9 @@ void CDCPackerModule::event()
 
   //  printf("NumHits    %d\n", cdcHits.getEntries() ); fflush(stdout);
 
-  int eWire_nhit[36882];
-  memset(eWire_nhit, 0, sizeof(int) * 36882);
+  //  int eWire_nhit[36882];
+  //  memset(eWire_nhit, 0, sizeof(int) * 36882);
+  std::vector<int> eWire_nhit(36882, 0);
 
   int tot_chdata_bytes[302];
   memset(tot_chdata_bytes, 0, sizeof(int) * 302);
@@ -171,7 +172,7 @@ void CDCPackerModule::event()
     int ily = (eWire % 4096) / 512;
     int iwire = (eWire % 512);
     short tdc = cdcHits[i]->getTDCCount();
-    short tdc2 = cdcHits[i]->getTDCCount2ndHit();
+    //    short tdc2 = cdcHits[i]->getTDCCount2ndHit();
     short adc = cdcHits[i]->getADCCount();
 
     //

@@ -324,7 +324,10 @@ void CDCDigitizerModule::event()
 //    unsigned short tdcCount = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
     unsigned short tdcCount = static_cast<unsigned short>((m_cdcp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv);
-    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
+    //    //set tdcCount2ndHit = tdcCount
+    //    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
+    //set tdcCount2ndHit = default value
+    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first);
 
     //    std::cout <<"t0= " << m_cdcp->getT0(iterSignalMap->first) << std::endl;
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);

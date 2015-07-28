@@ -146,6 +146,7 @@ namespace Belle2 {
     bool m_param_usePXDHits;                                          /**< Boolean to select if PXDHits should be used*/
     bool m_param_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_param_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
+    bool m_param_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
 
     bool m_param_useClusters;                                         /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
 

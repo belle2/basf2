@@ -102,6 +102,11 @@ MCMatcherTracksModule::MCMatcherTracksModule() : Module()
   addParam("UsePXDHits", m_param_usePXDHits, "Set true if PXDHits or PXDClusters should be used", bool(true));
   addParam("UseSVDHits", m_param_useSVDHits, "Set true if SVDHits or SVDClusters should be used", bool(true));
   addParam("UseCDCHits", m_param_useCDCHits, "Set true if CDCHits should be used", bool(true));
+  addParam("UseOnlyAxialCDCHits",
+           m_param_useOnlyAxialCDCHits,
+           "Set true if only the axial CDCHits should be used",
+           false);
+
 
   addParam("MinimalPurity",
            m_param_minimalPurity,
@@ -361,6 +366,15 @@ void MCMatcherTracksModule::event()
 
     for (HitId hitId = 0; hitId < nHits; ++hitId) {
       pair<DetId, HitId> detId_hitId_pair(detId, hitId);
+
+      if (m_param_useOnlyAxialCDCHits and detId == Const::CDC) {
+        StoreArray<CDCHit> cdcHits;
+        const CDCHit* cdcHit = cdcHits[hitId];
+        if (cdcHit->getISuperLayer() % 2 != 0) {
+          // Skip stereo hits
+          continue;
+        }
+      }
 
       // First search the unique mcTrackCandId for the hit.
       // If the hit is not assigned to any mcTrackCand to Id is set iMC to the background column.

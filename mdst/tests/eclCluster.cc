@@ -164,8 +164,8 @@ namespace Belle2 {
     // Pick some arbitrary numbers to test with
     const bool isTrack = true;
     const double energy = 1.165;
-    const double theta = 1.2;
-    const double phi = 1.2;
+    const float theta = 1.2;
+    const float phi = 1.2;
     const double r = 1.2;
     const double energyDepSum = 123.3;
     const double timing = 17.2;

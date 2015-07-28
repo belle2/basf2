@@ -153,6 +153,29 @@ namespace Belle2 {
       DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex, object, toEntry, toIndex, weight);
     }
 
+    /** Copies all relations of sourceObj (pointing from or to sourceObj) to this object (including weights).
+     *
+     * Useful if you want to make a complete copy of a StoreArray object to
+     * make modifications to it, but retain all information on linked objects.
+     *
+     * Note: this only works if sourceObj inherits from the same base (e.g. RelationsObject),
+     *       and only for related objects that also inherit from the same base.
+     */
+    void copyRelations(const RelationsInterface<BASE>* sourceObj)
+    {
+      if (!sourceObj)
+        return;
+      auto fromRels = sourceObj->getRelationsFrom<RelationsInterface<BASE>>("ALL");
+      for (unsigned int iRel = 0; iRel < fromRels.size(); iRel++) {
+        fromRels.object(iRel)->addRelationTo(this, fromRels.weight(iRel));
+      }
+
+      auto toRels = sourceObj->getRelationsTo<RelationsInterface<BASE>>("ALL");
+      for (unsigned int iRel = 0; iRel < toRels.size(); iRel++) {
+        this->addRelationTo(toRels.object(iRel), toRels.weight(iRel));
+      }
+    }
+
     //===========================================================================
     //These return a vector of relations:
 

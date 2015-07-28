@@ -105,7 +105,7 @@ class CDCFullFinder(metamodules.PathModule):
                  new_segments_filter="none", new_segments_filter_tmva_cut=0,
                  second_filter="none", second_tmva_cut=0,
                  track_filter="all", track_filter_cut=0,
-                 use_pair_finder=True):
+                 use_pair_finder=False):
 
         modules = [
             CDCBackgroundHitFinder(
@@ -529,7 +529,7 @@ class CDCRecoFitter(metamodules.PathModule):
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
                  input_track_cands_store_array_name="TrackCands",
-                 prob_cut=0.001):
+                 prob_cut=0.001, pdg_code=211):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
@@ -537,7 +537,8 @@ class CDCRecoFitter(metamodules.PathModule):
         reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
             "RecoTrackCreator",
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
-        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", ProbCut=prob_cut)
+        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", ProbCut=prob_cut,
+                                                                         pdgCodeToUseForFitting=pdg_code)
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)

@@ -32,6 +32,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("RecoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
            std::string("RecoTracks"));
+
+  addParam("pdgCodeToUseForFitting", m_param_pdgCodeToUseForFitting,
+           "Use this particle hypothesis for fitting. Please use the positive pdg code only.", static_cast<unsigned int>(211));
 }
 
 void BaseRecoFitterModule::initialize()
@@ -62,6 +65,6 @@ void BaseRecoFitterModule::event()
   const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
 
   for (RecoTrack& recoTrack : recoTracks) {
-    recoTrack.fit(fitter, 211);
+    recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting);
   }
 }

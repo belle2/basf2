@@ -898,29 +898,24 @@ void ECLDigitizerModule::readDSPDB()
 
   unsigned int ChN;
 
+  array2d sg(boost::extents[16][192]), sg1(boost::extents[16][192]), sg2(boost::extents[16][192]);
+  fill(sg.origin(), sg.origin() + sg.size(), 0.0);
+  fill(sg1.origin(), sg1.origin() + sg1.size(), 0.0);
+  fill(sg2.origin(), sg2.origin() + sg2.size(), 0.0);
+
+  array2d f(boost::extents[192][16]), f1(boost::extents[192][16]),
+          fg31(boost::extents[192][16]), fg32(boost::extents[192][16]), fg33(boost::extents[192][16]);
+  array2d fg41(boost::extents[24][16]), fg43(boost::extents[192][16]);
+
+
   double  g1g1[192], gg[192], gg1[192], dgg[192];
-  double  sg1[16][192], sg[16][192], sg2[16][192], gg2[192], g1g2[192], g2g2[192];
+  double  gg2[192], g1g2[192], g2g2[192];
   double  dgg1[192], dgg2[192];
-
-
-  double f[192][16];
-  double f1[192][16];
-  double fg31[192][16];
-  double fg32[192][16];
-  double fg33[192][16];
-
-  double fg41[24][16];
-  double fg43[24][16];
-
-
 
   memset(g1g1, 0, sizeof(g1g1));
   memset(gg, 0, sizeof(gg));
   memset(gg1, 0, sizeof(gg1));
   memset(dgg, 0, sizeof(dgg));
-  memset(sg1, 0, sizeof(sg1));
-  memset(sg, 0, sizeof(sg));
-  memset(sg2, 0, sizeof(sg2));
   memset(gg2, 0, sizeof(gg2));
   memset(g1g2, 0, sizeof(g1g2));
   memset(g2g2, 0, sizeof(g2g2));

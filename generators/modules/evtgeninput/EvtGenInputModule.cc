@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/EvtGenInputModule.h>
+#include <generators/modules/evtgeninput/EvtGenInputModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 // #include <generators/utilities/cm2LabBoost.h>

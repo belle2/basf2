@@ -1,10 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry',
-               '$ROOT_LIBS','EvtGen','pythia8','PhotosCxxInterface.a', 'HepMC',
-               'TauolaCxxInterface', 'TauolaFortran',
-               'PhotosFortran', 'EvtGenExternal', 'Geom', 'CLHEP',
-               'mdst_dataobjects']
-
+env['LIBS'] = ['framework', 'mdst_dataobjects', 'geometry']
 
 Return('env')

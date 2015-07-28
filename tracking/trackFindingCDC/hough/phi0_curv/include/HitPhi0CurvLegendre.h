@@ -192,8 +192,7 @@ namespace Belle2 {
       double m_curlCurv = 0.018;
 
       /// Predicate checking if hit is in a gievn phi0 curvature box
-      static const bool s_refined = false;
-      HitInPhi0CurvBox<s_refined> m_hitInPhi0CurvBox;
+      HitInPhi0CurvBox m_hitInPhi0CurvBox;
 
       // Dummy initialisation of the other constructs
 

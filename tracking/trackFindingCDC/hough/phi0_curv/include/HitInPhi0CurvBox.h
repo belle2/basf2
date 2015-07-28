@@ -24,7 +24,6 @@ namespace Belle2 {
      *  Note this part this code defines the performance of
      *  the search in the hough plain quite significantly and there is probably room for improvement.
      */
-    template<bool refined = false>
     class HitInPhi0CurvBox {
 
     public:
@@ -245,8 +244,9 @@ namespace Belle2 {
                                                                    dist[1][0],
                                                                    dist[1][1]);
         if (excludesOneEdge) return true;
-        if (not refined) return false;
 
+        // Currently disable:
+        if (not m_refined) return false;
         // Continue to check if the extrema of the sinogram are in the box,
         // while only touching only one boundary of the box
         // (but not crossing two what the check above actually means).
@@ -267,6 +267,8 @@ namespace Belle2 {
       /** Weight gain for a hit which right left passage hypotheses could be uniquely resolved. */
       float m_rlWeightGain = 0;
 
+      /// Switch to also check for the maximum of the sinogram.
+      bool m_refined = false;
     };
 
   } // end namespace TrackFindingCDC

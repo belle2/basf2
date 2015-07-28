@@ -39,6 +39,7 @@ namespace Belle2 {
     class CDCSimpleSimulation  {
 
     private:
+      /// Structure to accomdate information about the individual hits.
       struct SimpleSimHit {
         CDCWireHit wireHit;
         size_t iMCTrack;
@@ -104,8 +105,15 @@ namespace Belle2 {
       void activateInWireSignalDelay(const bool& activate = true)
       { m_addInWireSignalDelay = activate; }
 
-    private:
+      /// Getter for the maximal number of hits that are allowed on each layer
+      size_t getMaxNHitOnWire() const
+      { return m_maxNHitOnWire; }
 
+      /// Setter for the maximal number of hits that are allowed on each layer
+      void setMaxNHitOnWire(const size_t& maxNHitOnWire)
+      { m_maxNHitOnWire = maxNHitOnWire; }
+
+    private:
       /// Reference to the wireHitTopology to be filled with hits
       CDCWireHitTopology* m_wireHitTopology;
 
@@ -121,7 +129,16 @@ namespace Belle2 {
       /// Maximal number of hits allowed on each wire (0 means all).
       size_t m_maxNHitOnWire = 0;
 
-      // TODO: make them freely setable
+      /// A global event time
+      double m_eventTime = 0;
+
+      /// Switch to activate the addition of the time of flight.
+      double m_addTOFDelay = false;
+
+      /// Switch to activate the in wire signal delay.
+      double m_addInWireSignalDelay = false;
+
+      // TODO: make them freely setable ?
       /// Variance by which the drift length should be smeared.
       double m_driftLengthVariance = s_nominalDriftLengthVariance;
 
@@ -133,15 +150,6 @@ namespace Belle2 {
 
       /// Electron drift speed in the cdc gas
       double m_driftSpeed = s_nominalDriftSpeed;
-
-      /// A global event time
-      double m_eventTime = 0;
-
-      /// Switch to activate the addition of the time of flight.
-      double m_addTOFDelay = false;
-
-      /// Switch to activate the in wire signal delay.
-      double m_addInWireSignalDelay = false;
     }; // class
 
   } // namespace TrackFindingCDC

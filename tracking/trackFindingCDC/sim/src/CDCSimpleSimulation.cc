@@ -137,6 +137,21 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
     mcTrack.sortByPerpS();
   }
 
+  /// Assign mc trajectories to the tracks
+  for (size_t iMCTrack = 0;  iMCTrack < nMCTracks; ++iMCTrack) {
+    CDCTrack& mcTrack = mcTracks[iMCTrack];
+    CDCTrajectory3D mcTrajectory = trajectories3D[iMCTrack];
+    if (not mcTrack.empty()) {
+      mcTrajectory.setLocalOrigin(mcTrack.front().getRecoPos3D());
+      mcTrack.setStartTrajectory3D(mcTrajectory);
+      mcTrajectory.setLocalOrigin(mcTrack.back().getRecoPos3D());
+      mcTrack.setEndTrajectory3D(mcTrajectory);
+    } else {
+      mcTrack.setStartTrajectory3D(mcTrajectory);
+      mcTrack.setEndTrajectory3D(mcTrajectory);
+    }
+  }
+
   return mcTracks;
 }
 
@@ -351,3 +366,4 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
     trueDriftLength
   };
 }
+

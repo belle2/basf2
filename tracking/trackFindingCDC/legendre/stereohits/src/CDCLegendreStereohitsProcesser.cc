@@ -97,9 +97,9 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
 
   StereoHitQuadTreeProcessor::ChildRanges childRanges = StereoHitQuadTreeProcessor::ChildRanges(StereoHitQuadTreeProcessor::rangeX(
                                                           tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-20, 20));
-  StereoHitQuadTreeProcessor m_oldQuadTree(m_level, childRanges, m_param_debugOutput);
-  m_oldQuadTree.provideItemsSet(hitsVector);
-  m_oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
+  StereoHitQuadTreeProcessor oldQuadTree(m_level, childRanges, m_param_debugOutput);
+  oldQuadTree.provideItemsSet(hitsVector);
+  oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
 
   if (possibleStereoSegments.size() == 0) {
     B2WARNING("Found no stereo segments!")
@@ -149,21 +149,16 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   m_newQuadTree.seed(hitsVector);
 
   typedef pair<Z0ZSlopeBox, vector<HitType*>> Result;
-  std::vector<Result> possibleStereoSegments = m_newQuadTree.findHighest(m_param_minimumHits);
+  const std::vector<Result>& possibleStereoSegments = m_newQuadTree.findHighest(m_param_minimumHits);
 
   m_newQuadTree.fell();
 
-  if (possibleStereoSegments.size() == 0)
+  if (possibleStereoSegments.size() != 1)
     return;
 
-  auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Result & a,
-  const Result & b) {
-    return a.second.size() < b.second.size();
-  });
-
   // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
-  auto& foundStereoHits = maxList->second;
-  auto node = maxList->first;
+  auto foundStereoHits = possibleStereoSegments[0].second;
+  auto node = possibleStereoSegments[0].first;
 
   std::vector<HitType*> doubledRecoHits;
   doubledRecoHits.reserve(foundStereoHits.size() / 2);

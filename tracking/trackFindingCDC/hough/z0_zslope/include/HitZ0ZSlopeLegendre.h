@@ -112,10 +112,19 @@ namespace Belle2 {
       std::vector<std::pair<Z0ZSlopeBox, std::vector<HitPointerType>>>
       findHighest(const Weight& minWeight)
       {
+        std::vector<std::pair<Z0ZSlopeBox, std::vector<HitPointerType>>> found;
         HitInZ0ZSlopeBox hitInZ0ZSlopeBox;
-        return m_hitZ0ZSlopeFastHoughTree->findHeaviestLeafRepeated(hitInZ0ZSlopeBox,
-                                                                    m_maxLevel,
-                                                                    minWeight);
+        auto skipLowWeightNode = [minWeight](const typename HitZ0ZSlopeFastHoughTree::Node * node) {
+          return not(node->getWeight() >= minWeight);
+        };
+        typename HitZ0ZSlopeFastHoughTree::Node* node = m_hitZ0ZSlopeFastHoughTree->findHeaviestLeaf(hitInZ0ZSlopeBox, m_maxLevel,
+                                                        skipLowWeightNode);
+
+        if (node) {
+          found.emplace_back(*node, std::vector<HitPointerType>(node->begin(), node->end()));
+        }
+
+        return found;
       }
 
 

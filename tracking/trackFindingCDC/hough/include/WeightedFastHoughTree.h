@@ -138,7 +138,7 @@ namespace Belle2 {
         return found;
       }
 
-    private:
+
       template<class ItemInDomainMeasure, class SkipNodePredicate>
       Node* findHeaviestLeaf(ItemInDomainMeasure& weightItemInDomain,
                              const size_t maxLevel,

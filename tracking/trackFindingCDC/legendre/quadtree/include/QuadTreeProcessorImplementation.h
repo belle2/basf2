@@ -117,9 +117,6 @@ namespace Belle2 {
       StereoHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
                                  bool debugOutput = false) : QuadTreeProcessorTemplate(lastLevel, ranges, debugOutput, false)
       {
-
-        B2INFO(ranges.first.first << " " << ranges.first.second << " " << ranges.second.first << " " << ranges.second.second)
-
       }
 
       /**

@@ -92,10 +92,8 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
       items,
   StereoHitQuadTreeProcessor::QuadTree * node) -> void {
     possibleStereoSegments.push_back(std::make_pair(node, std::move(items)));
-    B2INFO("Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
+    B2DEBUG(100, "Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
   };
-
-  B2INFO("New Track")
 
   StereoHitQuadTreeProcessor::ChildRanges childRanges = StereoHitQuadTreeProcessor::ChildRanges(StereoHitQuadTreeProcessor::rangeX(
                                                           tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-20, 20));
@@ -154,8 +152,6 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   std::vector<Result> possibleStereoSegments = m_newQuadTree.findHighest(m_param_minimumHits);
 
   m_newQuadTree.fell();
-
-  B2INFO(possibleStereoSegments.size())
 
   if (possibleStereoSegments.size() == 0)
     return;

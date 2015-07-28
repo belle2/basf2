@@ -65,25 +65,25 @@ beamparameter_presets = {
         "energyHER": 7.200,
         "energyLER": 4.114,
     }),
-    "Y1S-off": ("Y1S", {  # m(Y1S) - 50 MeV = 9.410 GeV
-        "energyHER": 6.230,
-        "energyLER": 3.560,
+    "Y1S-off": ("Y1S", {  # m(Y1S) - 60 MeV = 9.400 GeV
+        "energyHER": 6.223,
+        "energyLER": 3.556,
     }),
-    "Y2S-off": ("Y2S", {  # m(Y2S) - 50 MeV = 9.973 GeV
-        "energyHER": 6.602,
-        "energyLER": 3.773,
+    "Y2S-off": ("Y2S", {  # m(Y2S) - 60 MeV = 9.963 GeV
+        "energyHER": 6.596,
+        "energyLER": 3.769,
     }),
-    "Y3S-off": ("Y3S", {  # m(Y3S) - 50 MeV = 10.305 GeV
-        "energyHER": 6.822,
-        "energyLER": 3.898,
+    "Y3S-off": ("Y3S", {  # m(Y3S) - 60 MeV = 10.295 GeV
+        "energyHER": 6.816,
+        "energyLER": 3.895,
     }),
-    "Y4S-off": ("Y4S", {  # m(Y4S) - 50 MeV = 10.529 GeV
-        "energyHER": 6.971,
-        "energyLER": 3.983,
+    "Y4S-off": ("Y4S", {  # m(Y4S) - 60 MeV = 10.519 GeV
+        "energyHER": 6.964,
+        "energyLER": 3.979,
     }),
-    "Y5S-off": ("Y5S", {  # m(Y5S) - 50 MeV = 10.826 GeV
-        "energyHER": 7.167,
-        "energyLER": 4.095,
+    "Y5S-off": ("Y5S", {  # m(Y5S) - 60 MeV = 10.816 GeV
+        "energyHER": 7.160,
+        "energyLER": 4.092,
     }),
     "KEKB-Belle": (None, {
         "energyHER": 7.998213,
@@ -310,10 +310,10 @@ if __name__ == "__main__":
             }),""" % (name, name, energy, eher * scale, eler * scale))
 
     for name, energy in sorted(targets.items()):
-        #: scaling between nominal and target CMS energy for off resoncane, i.e. 50MeV lower
-        scale = (energy - 50e-3) / mass
+        #: scaling between nominal and target CMS energy for off resoncane, i.e. 60MeV lower
+        scale = (energy - 60e-3) / mass
         print("""\
-            "%s-off": ("%s", {  # m(%s) - 50 MeV = %.3f GeV
+            "%s-off": ("%s", {  # m(%s) - 60 MeV = %.3f GeV
                 "energyHER": %.3f,
                 "energyLER": %.3f,
-            }),""" % (name, name, name, energy - 50e-3, eher * scale, eler * scale))
+            }),""" % (name, name, name, energy - 60e-3, eher * scale, eler * scale))

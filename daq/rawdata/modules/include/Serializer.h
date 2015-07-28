@@ -96,8 +96,11 @@ namespace Belle2 {
     //! send buffer
     int Send(int socket, char* buf, int size_bytes);
 
-    //!
+    //! print data contents
     void printData(int* buf, int nwords);
+
+    //! check RunStop
+    void callCheckRunStop();
 
     //! file descripter for shm
     int m_shmfd_cfg;

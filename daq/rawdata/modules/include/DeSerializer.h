@@ -42,6 +42,7 @@
 #include <fcntl.h>
 
 
+
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
@@ -235,13 +236,14 @@ namespace Belle2 {
     int* m_ptr;
 
     //! for nonstop DAQ
+    virtual void openRunStopNshm();
+
+    //! for nonstop DAQ
     virtual int checkRunStop();
 
     //! for nonstop DAQ
     virtual int checkRunRecovery();
 
-    //! for nonstop DAQ
-    virtual void openRunStopNshm();
 
     //! for nonstop DAQ
     virtual void restartRun();

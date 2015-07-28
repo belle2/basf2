@@ -224,6 +224,32 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
 }
 
 
+void SerializerModule::callCheckRunStop()
+{
+
+#ifdef NONSTOP
+#ifdef NONSTOP_DEBUG
+  printf("\033[34m");
+  printf("###########(Ser) TIMEOUT during send()  ###############\n");
+  fflush(stdout);
+  printf("\033[0m");
+#endif
+  if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+    printf("\033[31m");
+    printf("###########(Ser) Stop is detected after return from send ###############\n");
+    fflush(stdout);
+    printf("\033[0m");
+#endif
+    string err_str = "EAGAIN";
+    g_run_stop = 1;
+    throw (err_str);
+  }
+#endif
+  return;
+}
+
+
 int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 {
   SendHeader send_header;
@@ -257,27 +283,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-#ifdef NONSTOP
-#ifdef NONSTOP_DEBUG
-        printf("\033[34m");
-        printf("###########(Ser) TIMEOUT durin writev  ############### sent %d bytes\n", n);
-        fflush(stdout);
-        printf("\033[0m");
-#endif
-        if (checkRunStop()) {
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(Ser) Stop is detected after return from writev ###############\n");
-          fflush(stdout);
-          printf("\033[0m");
-
-#endif
-          B2INFO("RunStop is detected.");
-          string err_str = "RunPause";
-          g_run_stop = 1;
-          throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
-        }
-#endif
+        callCheckRunStop();
         continue;
       } else {
         perror("Connection Error");
@@ -350,24 +356,7 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-#ifdef NONSTOP
-#ifdef NONSTOP_DEBUG
-        printf("\033[34m");
-        printf("###########(Ser) TIMEOUT during send()  ###############\n");
-        fflush(stdout);
-        printf("\033[0m");
-#endif
-        if (checkRunStop()) {
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(Ser) Stop is detected after return from send ###############\n");
-          fflush(stdout);
-          printf("\033[0m");
-#endif
-          string err_str = "EAGAIN";
-          throw (err_str);
-        }
-#endif
+        callCheckRunStop();
         continue;
       } else {
 #ifdef NONSTOP
@@ -375,6 +364,7 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
 #endif
         char err_buf[500];
 #ifdef NONSTOP
+        g_run_error = 1;
         sprintf(err_buf, "SEND ERROR1.(%s) ", strerror(errno));
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         string err_str = "ECONNRESET";

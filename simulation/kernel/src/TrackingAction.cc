@@ -27,7 +27,7 @@ using namespace Belle2::Simulation;
 TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   G4UserTrackingAction(), m_mcParticleGraph(mcParticleGraph),
   m_IgnoreOpticalPhotons(false), m_IgnoreSecondaries(false),
-  m_EnergyCut(0.0), m_storeTrajectories(false), m_angularTolerance(0), m_distanceTolerance(0),
+  m_EnergyCut(0.0), m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
   if (false) {
@@ -43,10 +43,9 @@ TrackingAction::~TrackingAction()
 
 }
 
-void TrackingAction::setStoreTrajectories(int store, double angularTolerance, double distanceTolerance)
+void TrackingAction::setStoreTrajectories(int store, double distanceTolerance)
 {
   m_storeTrajectories = store;
-  m_angularTolerance = angularTolerance;
   m_distanceTolerance = distanceTolerance;
   if (store) {
     // registration of store arrays and relations
@@ -181,7 +180,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
     if (m_storeTrajectories) {
       MCParticleTrajectory* tr = dynamic_cast<TrackInfo*>(track->GetUserInformation())->getTrajectory();
       if (tr) {
-        tr->simplify(m_angularTolerance, m_distanceTolerance);
+        tr->simplify(m_distanceTolerance);
       }
     }
   } catch (CouldNotFindUserInfo& exc) {

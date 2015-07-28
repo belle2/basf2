@@ -76,7 +76,7 @@ namespace Belle2 {
       void setKineticEnergyCut(double cut_MeV) {m_EnergyCut = cut_MeV;}
 
       /** Sets the trajectory option to enable storing of the simulated particle trajectories */
-      void setStoreTrajectories(int store, double angularTolerance, double distanceTolerance);
+      void setStoreTrajectories(int store, double distanceTolerance);
 
     protected:
 
@@ -86,7 +86,6 @@ namespace Belle2 {
       double m_EnergyCut;          /**< kinetic energy cut for stored secondaries [MeV] */
 
       int m_storeTrajectories;    /**< Store trajectories for 0=none, 1=primary or 2=all particles */
-      double m_angularTolerance;   /**< angular tolerance to merge trajectory points */
       double m_distanceTolerance;  /**< distance tolerance to merge trajectory points */
 
       /** Store array for the Trajectories */

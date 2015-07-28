@@ -55,14 +55,11 @@ namespace Belle2 {
       m_points.emplace_back(x, y, z, px, py, pz);
     }
 
-    /** Simplify the trajectory by merging all steps which do not change the
-     * direction below a given tolerance.
-     * @param angular_tolerance merge steps if their direction differs by less than
-     * tolerance in radian
-     * @param distance_tolerance maximum distance of the simplified path to
+    /** Simplify the trajectory using the Ramer-Douglas-Peuker algorithm.
+     * @param distanceTolerance maximum distance of the simplified path to
      * the points of the original path
      */
-    void simplify(float angular_tolerance, float distance_tolerance);
+    void simplify(float distanceTolerance);
 
   private:
     //! Collection of points along the trajectory

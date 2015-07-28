@@ -121,9 +121,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
 
   addParam("trajectoryStore", m_trajectoryStore,
            "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
-  addParam("trajectoryAngularTolerance", m_trajectoryAngularTolerance,
-           "If >0 the saved trajectory will be simplified by merging segments "
-           "which change direction by less than this value in radian", 1e-2);
   addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
            "Maximum deviation from the real trajectory points when merging "
            "segments (in cm)", 5e-4);
@@ -314,7 +311,7 @@ void FullSimModule::initialize()
 
   //Store Trajectories?
   if (m_trajectoryStore) {
-    trackingAction->setStoreTrajectories(m_trajectoryStore, m_trajectoryAngularTolerance, m_trajectoryDistanceTolerance);
+    trackingAction->setStoreTrajectories(m_trajectoryStore, m_trajectoryDistanceTolerance);
     steppingAction->setStoreTrajectories(true);
   }
 

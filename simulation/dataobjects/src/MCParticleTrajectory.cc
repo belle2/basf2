@@ -11,6 +11,8 @@
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <TVector3.h>
 #include <iostream>
+#include <stack>
+#include <tuple>
 
 using namespace Belle2;
 
@@ -33,60 +35,58 @@ namespace {
   }
 }
 
-void MCParticleTrajectory::simplify(float angular_tolerance, float distance_tolerance)
+void MCParticleTrajectory::simplify(float distance_tolerance)
 {
-  //We can only simplify if there is a tolerance and at least three points
-  if (angular_tolerance <= 0 || distance_tolerance <= 0 || m_points.size() < 3) return;
+  // cannot simplify anything, return
+  if (distance_tolerance <= 0 || m_points.size() < 3) return;
 
-  //Now we loop over all points: we have a reference point r, a final point f
-  //and at least one intermediate point, i_0...i_n, between r and f
-  //
-  // - if the angle between i_0 - r and f - i_n is larger than
-  //   angular_tolerance, i_n is added to the list and becomes the new
-  //   reference point
-  // - if the maximum distance between the points i_0...i_n and the line f - r
-  //   exceeds distance_tolerance, the point i_n is added to the list and
-  //   becomes the new reference, r
-  // - in both cases, f becomes r + 2
-
-  //iterator to the current reference point
-  iterator referencePoint = begin();
-  //iterator to the current final point
-  iterator finalPoint = referencePoint + 2;
-  //iterator to the next "free" position in the vector
-  iterator nextPoint = begin() + 1;
-
-  //Temporary vectors for angle and distance calculations
-  TVector3 vec1, vec2;
-
-  for (; finalPoint != end(); ++finalPoint) {
-    //Calculate angle between the two segments
-    setVector(vec1, *(referencePoint + 1), *referencePoint);
-    setVector(vec2, *finalPoint, *(finalPoint - 1));
-    const double angle = vec1.Angle(vec2);
-    //Calculate distances between intermediate points p and line segment,
-    //x = a + t*n, where a is a point on the line and n is the unit vector
-    //pointing in line direction. distance = ||(p-a) - ((p-a)*n)*n||
-    setVector(vec1, *finalPoint, *referencePoint, true);
-    double dist(0);
-    for (iterator intermediate = referencePoint + 1;
-         intermediate != finalPoint; ++intermediate) {
-      setVector(vec2, *intermediate, *referencePoint);
-      dist = std::max(dist, (vec2 - (vec2 * vec1) * vec1).Mag());
+  // stack with all segments to be investigated
+  std::stack<std::pair<iterator, iterator>> stack;
+  // push full trajectory on the stack
+  stack.push(make_pair(m_points.begin(), m_points.end() - 1));
+  // next free point: we always want the starting point so start at index 1
+  iterator nextPoint = m_points.begin() + 1;
+  // iterators used for the segment inspection
+  iterator firstPoint, splitPoint, finalPoint;
+  // segment direction and vector between segment start and mid point
+  TVector3 n, pa;
+  // investigate all segments until all fulfill the distance requirement
+  while (!stack.empty()) {
+    //Get first and last point
+    std::tie(firstPoint, finalPoint) = stack.top();
+    //Remove segment from stack
+    stack.pop();
+    //Direction of the segment
+    setVector(n, *firstPoint, *finalPoint, true);
+    //Calculate maximum distance of all intermediate points to the segment
+    double maxDistance(0);
+    for (auto nextPoint = firstPoint + 1; nextPoint != finalPoint; ++nextPoint) {
+      //vector from segment start (p) to point (a)
+      setVector(pa, *firstPoint, *nextPoint);
+      //3D distance between point a and line p + x*n
+      const double dist = (pa - (pa * n) * n).Mag();
+      //check if this is the maximum distance so far
+      if (dist > maxDistance) {
+        splitPoint = nextPoint;
+        maxDistance = dist;
+      }
     }
-    if (angle > angular_tolerance || dist > distance_tolerance) {
-      //Update reference point
-      referencePoint = finalPoint - 1;
-      //add reference point to final list of points
-      *(nextPoint++) = *referencePoint;
-      //and set new final-point to be reference + 1, will get incremented to
-      //reference +2 by the for loop to give us one intermediate point
-      finalPoint = referencePoint + 1;
+    //Are all points close enough? if not split the segment at the largest distance
+    if (maxDistance > distance_tolerance) {
+      //If we split in this order, all points will be in correct order since we
+      //use a stack: last thing put in is first thing to get out. So initially
+      //we inspect everything, if we divide we put in the second part and then
+      //the first and in the next round we take out the first and repeat. So
+      //effectively we look at all segments in an ordered way.
+      stack.push(make_pair(splitPoint, finalPoint));
+      stack.push(make_pair(firstPoint, splitPoint));
       continue;
     }
+    //Ok, all points close enough, add the final point to list of points. Due
+    //to the order in which we look at the points in a ordered way we can
+    //replace the points in place
+    *(nextPoint++) = *finalPoint;
   }
-  //We are still missing the last point
-  *(nextPoint++) = m_points.back();
 
   //Now delete all remaining elements
   m_points.erase(nextPoint, end());

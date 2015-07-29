@@ -15,6 +15,8 @@
 #include <deque>
 #include <algorithm>
 
+#include <assert.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

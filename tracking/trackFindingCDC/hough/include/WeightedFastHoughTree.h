@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 
 #include <deque>
+#include <assert.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

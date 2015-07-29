@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>

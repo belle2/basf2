@@ -14,6 +14,7 @@
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHit-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHit-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCRLTaggedWireHit-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRecoHit2D-;
 

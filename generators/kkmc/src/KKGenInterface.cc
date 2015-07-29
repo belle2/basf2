@@ -67,7 +67,6 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   int irand = 0;
   kk_init_(DatX_d, DatX_u, DatX_p, &irand, DatX_o);
 
-
   // seed of random generator should be set here
   kk_init_seed_();
 
@@ -93,9 +92,8 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
 void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER, double Espread_HER)
 {
 
-  // Beam 4 momenta settiongs
-
-  double crossing_angle = 0.;
+  // Beam 4 momenta settings
+//   double crossing_angle = 0.;
   double ph = P4_HER.Vect().Mag();
   double pl = P4_LER.Vect().Mag();
   double eh = P4_HER.E();
@@ -118,9 +116,14 @@ void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TL
 
     kk_putbeam_(&pxh, &pyh, &pzh, &eh, &pxl, &pyl, &pzl, &el);
 
-    crossing_angle = P4_HER.Vect().Dot(P4_LER.Vect()) / ph / pl;
-    double Espread_CM = getBeamEnergySpreadCM(el, Espread_LER,
-                                              eh, Espread_HER, crossing_angle);
+    B2INFO("Espread_LER=" << Espread_LER);
+    B2INFO("Espread_HER=" << Espread_HER);
+
+//     crossing_angle = P4_HER.Vect().Dot(P4_LER.Vect()) / ph / pl;
+    /*    double Espread_CM = getBeamEnergySpreadCM(el, Espread_LER,
+                                                  eh, Espread_HER, crossing_angle);*/
+    double Espread_CM = 0.0;
+
     sprintf(buf,
             "Set Beam Energy spread: %9.4f", Espread_CM);
     B2DEBUG(100, buf);
@@ -135,8 +138,7 @@ void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TL
 
 }
 
-
-int KKGenInterface::simulateEvent(MCParticleGraph& graph)
+int KKGenInterface::simulateEvent(MCParticleGraph& graph, TVector3 vertex)
 {
   B2INFO("Start simulation of KKGen Interface.");
   int status = 0;
@@ -155,17 +157,9 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph)
             hepevt_.phep[i][1], hepevt_.phep[i][2],
             hepevt_.phep[i][3], hepevt_.phep[i][4]);
     B2DEBUG(100, buf);
-    /*
-        B2DEBUG(100, boost::format("IntA: %3ld %4ld %8ld %4ld %4ld %4ld %9.4lf %9.4lf %9.4f %9.4lf %9.4lf")
-                % i + 1 %  hepevt_.isthep[i] %  hepevt_.idhep[i]
-                % hepevt_.jmohep[i][0] %  hepevt_.jdahep[i][0]
-                % hepevt_.jdahep[i][1] %  hepevt_.phep[i][0]
-                % hepevt_.phep[i][1] %  hepevt_.phep[i][2]
-                % hepevt_.phep[i][3] %  hepevt_.phep[i][4]);
-    */
   }
 
-  int npar = addParticles2Graph(graph);
+  int npar = addParticles2Graph(graph, vertex);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   B2DEBUG(100, "GraphParticles:");
 
@@ -181,13 +175,6 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph)
             p->get4Vector().Pz() ,  p->get4Vector().E());
     B2DEBUG(100, buf);
 
-    /*
-        B2DEBUG(100, boost::format("IntB: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f") %
-                p->getIndex() %  p->getStatus() %  p->getPDG() %  moID %
-                p->getFirstDaughter() %  p->getLastDaughter() %
-                p->get4Vector().Px() %  p->get4Vector().Py() %
-                p->get4Vector().Pz() %  p->get4Vector().E());
-    */
   }
 
   B2INFO("End simulation of KKGen Interface.");
@@ -196,10 +183,10 @@ int KKGenInterface::simulateEvent(MCParticleGraph& graph)
 
 
 
-int KKGenInterface::addParticles2Graph(MCParticleGraph& graph)
+int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
 {
-  // at least, KKMC generates 5 particles,
-  // i.e., beam (e+ e-), intermidiate gamma, f+ f- (f=mu,tau)
+  // KKMC generates at least five particles:
+  // beam (e+ e-), intermediate gamma/Z, f+ f- (f=mu, tau, ...)
   if (hepevt_.nhep < 5) {
     B2ERROR("KKMC-generated event has not been produced correctty!");
     return hepevt_.nhep;
@@ -213,7 +200,7 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph)
     int position = graph.size();
     graph.addParticle(); nParticles++;
     MCParticleGraph::GraphParticle* p = &graph[position];
-    updateGraphParticle(i, p);
+    updateGraphParticle(i, p, vertex);
     MCPList.push_back(p);
   }
 
@@ -230,7 +217,7 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph)
 }
 
 
-void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle)
+void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, TVector3 vertex)
 {
   if (index < 1 || index > hepevt_.nhep) return;
   //updating the GraphParticle information from /hepevt/ common block information
@@ -244,19 +231,6 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   } else {
     gParticle->setPDG(myevtpdl->getStdHep(evtid));
   }
-
-  TLorentzVector p4(hepevt_.phep[index - 1][0],
-                    hepevt_.phep[index - 1][1],
-                    hepevt_.phep[index - 1][2],
-                    hepevt_.phep[index - 1][3]);
-  gParticle->setMass(hepevt_.phep[index - 1][4]);
-  gParticle->set4Vector(p4);
-
-  gParticle->setProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
-                                 hepevt_.vhep[index - 1][1]*Unit::mm,
-                                 hepevt_.vhep[index - 1][2]*Unit::mm);
-  gParticle->setProductionTime(hepevt_.vhep[index - 1][3]*Unit::mm / Const::speedOfLight);
-  gParticle->setValidVertex(true);
 
   //all(!) particles from the generator have to be primary
   gParticle->addStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
@@ -285,6 +259,25 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
       gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
     }
   }
+
+  TLorentzVector p4(hepevt_.phep[index - 1][0],
+                    hepevt_.phep[index - 1][1],
+                    hepevt_.phep[index - 1][2],
+                    hepevt_.phep[index - 1][3]);
+  gParticle->setMass(hepevt_.phep[index - 1][4]);
+  gParticle->set4Vector(p4);
+
+  //set vertex including smearing (if user requested)
+  TVector3 pProductionVertex(hepevt_.vhep[index - 1][0]*Unit::mm,
+                             hepevt_.vhep[index - 1][1]*Unit::mm,
+                             hepevt_.vhep[index - 1][2]*Unit::mm);
+  if (!gParticle->hasStatus(MCParticle::c_Initial)) {
+    pProductionVertex = pProductionVertex + vertex;
+  }
+  gParticle->setProductionVertex(pProductionVertex);
+  gParticle->setProductionTime(hepevt_.vhep[index - 1][3]*Unit::mm / Const::speedOfLight);
+  gParticle->setValidVertex(true);
+
 
   return;
 }

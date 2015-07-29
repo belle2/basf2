@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka
+ * Contributors: Kiyoshi Hayasaka, Torben Ferber                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/kkmc/KKGenInterface.h>
+
+#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -60,12 +62,9 @@ namespace Belle2 {
     std::string m_taudecaytableFileName; /**<  tau decay tables in PYTHIA6 manner.  */
     std::string m_EvtPDLFileName; /**<  pdl file.  */
     std::string m_KKMCOutputFileName; /**<  KKMC output file previously as set "fort.16".  */
-    double m_EHER; /**< Energy for HER [GeV]. */
-    double m_ELER; /**< Energy for LER [GeV]. */
-    double m_HER_Espread; /**< Energy spread for HER [GeV]. */
-    double m_LER_Espread; /**< Energy spread for LER [GeV]. */
-    double m_crossing_angle; /**< Beam pipe crossing angle [rad]. */
-    double m_angle;  /**< Rotation with respect to e- beampie [rad]. */
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };
 

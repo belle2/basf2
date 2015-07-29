@@ -16,8 +16,6 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <evtgen/EvtGenBase/EvtPDL.hh>
-#include <generators/utilities/cm2LabBoost.h>
-
 
 #include <string>
 #include <fstream>
@@ -36,6 +34,7 @@ struct hepevt_type {
   double phep[nmxhep][5];   /**< four-momentum, mass [GeV]. */
   double vhep[nmxhep][4];   /**<  vertex [mm]. */
 }; /**< /HEPEVT/ common block of PYTHIA6. */
+
 struct pydat2_type {
   int KCHG[4][500];  /**< particle information such as spin, charge... */
   double PMAS[4][500]; /**< particle information such as mass, width... */
@@ -53,16 +52,13 @@ extern "C" {
   void kk_init_seed_();
   void kk_term_(double*, double*);
   void kk_event_(int*);
-
   void kk_getbeam_(double*, double*, double*, double*,
                    double*, double*, double*, double*);
   void kk_putbeam_(double*, double*, double*, double*,
                    double*, double*, double*, double*);
-
   int pycomp_(int&);
 
 }
-
 
 namespace Belle2 {
 
@@ -89,7 +85,7 @@ namespace Belle2 {
     void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER,
                        double Espread_HER); /**< Setup for beam inforamtion to KKMC */
 
-    int simulateEvent(MCParticleGraph& graph); /**< MC simulation function */
+    int simulateEvent(MCParticleGraph& graph, TVector3 vertex); /**< MC simulation function */
 
     /**
     * Terminates the generator.
@@ -98,8 +94,9 @@ namespace Belle2 {
 
 
   private:
-    int addParticles2Graph(MCParticleGraph& graph);  /**< Function to add particle decays */
-    void updateGraphParticle(int, MCParticleGraph::GraphParticle* gParticle);  /**< Function to update particle decays */
+    int addParticles2Graph(MCParticleGraph& graph, TVector3 vertex);  /**< Function to add particle decays */
+    void updateGraphParticle(int, MCParticleGraph::GraphParticle* gParticle,
+                             TVector3 vertex);  /**< Function to update particle decays */
     bool getPythiaCharge(int, double&); /**< Function to get charge from Pythia ID. */
     int getPythiaSpinType(int); /**< Function to get SpinType from Pythia ID. */
 

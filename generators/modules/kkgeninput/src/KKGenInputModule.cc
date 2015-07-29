@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka
+ * Contributors: Kiyoshi Hayasaka, Torben Ferber                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,8 +11,8 @@
 #include <generators/kkmc/KKGenInterface.h>
 #include <generators/modules/kkgeninput/KKGenInputModule.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/utilities/cm2LabBoost.h>
 #include <framework/core/Environment.h>
+// #include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -41,11 +41,12 @@ REG_MODULE(KKGenInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-KKGenInputModule::KKGenInputModule() : Module()
+KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("KKGenInput module. This an interface for KK2f Event Generator for basf2. The generated events are stored into MCParticles. You can find an expample of its decay file (tau_decaytable.dat) for tau-pair events at ${BELLE2_RELEASE_DIR}/data/generators/kkmc. On the other hand, when you like to generate mu-pair events, ${BELLE2_RELEASE_DIR}/data/generators/kkmc/mu.input.dat should be set to tauinputFile in your steering file.");
   setPropertyFlags(c_Input);
+
   //Get ENVIRONMENTs
   char* belle2_release_dir = std::getenv("BELLE2_RELEASE_DIR");
   char* belle2_local_dir = std::getenv("BELLE2_LOCAL_DIR");
@@ -61,7 +62,7 @@ KKGenInputModule::KKGenInputModule() : Module()
   string default_KKdefaultFileName = string("");
   string default_tauinputFileName = string("");
   string default_taudecaytableFileName = string("");
-  string default_KKMCOutputFileName = string("fort.16");
+  string default_KKMCOutputFileName = string("kkmc.txt");
   B2DEBUG(100, "Default setting files are set: empty...");
 
   if (belle2_release_dir != NULL) {
@@ -101,14 +102,6 @@ KKGenInputModule::KKGenInputModule() : Module()
   addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", default_KKMCOutputFileName);
 
-  //Initialize member variables
-  m_ELER           = 0.0;
-  m_EHER           = 0.0;
-  m_LER_Espread    = 0.0;
-  m_HER_Espread    = 0.0;
-  m_crossing_angle = 0.0;
-  m_angle          = 0.0;
-
 }
 
 
@@ -135,65 +128,46 @@ void KKGenInputModule::initialize()
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_EvtPDLFileName, m_KKMCOutputFileName);
 
+  //initial particle for beam parameters
+  m_initial.initialize();
+  MCInitialParticles& initial = m_initial.generate();
+  TLorentzVector v_ler = initial.getLER();
+  TLorentzVector v_her = initial.getHER();
+
+  //KKMC handles lorentz vectors in any reference system, we have to provide CMS if the user requests it
+  if (initial.hasGenerationFlags(MCInitialParticles::c_generateCMS)) {
+    v_ler = initial.getLabToCMS() * v_ler;
+    v_her = initial.getLabToCMS() * v_her;
+  }
+
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
 
-  B2INFO("finished initialising the KKGen Input Module. ");
+  //set the beam parameters, ignoring beam energy spread for the moment
+  B2INFO("Energy spread is ignored!");
+  m_Ikkgen.set_beam_info(v_ler, 0.0, v_her, 0.0);
+
+  B2INFO("Finished initialising the KKGen Input Module. ");
 
 }
 
 void KKGenInputModule::beginRun()
 {
-  //Initialize the beam energy for each run separatly
-  GearDir ler("/Detector/SuperKEKB/LER/");
-  GearDir her("/Detector/SuperKEKB/HER/");
-  m_ELER = ler.getDouble("energy");
-  m_EHER = her.getDouble("energy");
-  m_LER_Espread = ler.getDouble("energyError");
-  m_HER_Espread = her.getDouble("energyError");
-  m_crossing_angle = her.getDouble("angle") - ler.getDouble("angle");
-  m_angle = her.getDouble("angle");
-  B2INFO("KKGenInputModule::beginRun() called.");
-  char buf[100];
-  sprintf(buf, "ELER = %f, LER beam energy spread = %f", m_ELER, m_LER_Espread);
-  B2DEBUG(100, buf);
-  sprintf(buf, "EHER = %f, HER beam energy spread = %f", m_EHER, m_HER_Espread);
-  B2DEBUG(100, buf);
-  sprintf(buf, "Crossing angls = %f, Detector tilted angle = %f", m_crossing_angle, m_angle);
-  B2DEBUG(100, buf);
 
-  double mEle = Const::electronMass;
-
-  double angleLerToB = M_PI - m_angle;
-  double Eler = m_ELER;
-  double pLerZ = Eler * cos(angleLerToB);
-  double pLerX = Eler * sin(angleLerToB);
-  double pLerY = 0.;
-
-  double angleHerToB = m_crossing_angle - m_angle;
-  double Eher = m_EHER;
-  double pHerZ = Eher * cos(angleHerToB);
-  double pHerX = Eher * sin(angleHerToB);
-  double pHerY = 0.;
-
-  TLorentzVector vlLer, vlHer;
-  vlLer.SetXYZM(pLerX, pLerY, pLerZ, mEle);
-  vlHer.SetXYZM(pHerX, pHerY, pHerZ, mEle);
-
-  sprintf(buf, "roots = %f", (vlLer + vlHer).Mag());
-  B2DEBUG(100, buf);
-  m_Ikkgen.set_beam_info(vlLer, m_LER_Espread, vlHer, m_HER_Espread);
 }
-
 
 void KKGenInputModule::event()
 {
 
-  B2INFO("Starting event simulation.");
+  B2INFO("Starting event generation.");
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
+  //generate an MCInitialEvent (for vertex smearing)
+  MCInitialParticles& initial = m_initial.generate();
+  TVector3 vertex = initial.getVertex();
+
   mpg.clear();
-  int nPart =  m_Ikkgen.simulateEvent(mpg);
+  int nPart =  m_Ikkgen.simulateEvent(mpg, vertex);
 
   // to check surely generated events are received or not
   for (int i = 0; i < nPart; ++i) {
@@ -206,15 +180,9 @@ void KKGenInputModule::event()
             p->get4Vector().Px(), p->get4Vector().Py(),
             p->get4Vector().Pz(), p->get4Vector().E());
     B2DEBUG(100, buf);
-    /*
-        B2DEBUG(100, boost::format("IntC: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f" %
-                                   p->getIndex() % p->getStatus() % p->getPDG() % moID %
-                                   p->getFirstDaughter() % p->getLastDaughter() %
-                                   p->get4Vector().Px() % p->get4Vector().Py() %
-                                   p->get4Vector().Pz() % p->get4Vector().E()));
-    */
   }
-  B2INFO("Simulated event " << eventMetaDataPtr->getEvent() << " with " << nPart << " particles.");
+
+  B2INFO("Generated event " << eventMetaDataPtr->getEvent() << " with " << nPart << " particles.");
 }
 
 void KKGenInputModule::terminate()

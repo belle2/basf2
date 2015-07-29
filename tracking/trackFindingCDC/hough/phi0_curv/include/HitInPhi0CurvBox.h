@@ -168,9 +168,10 @@ namespace Belle2 {
       inline Weight operator()(const CDCRLWireHit* rlWireHit,
                                const Phi0CurvBox* phi0CurvBox)
       {
-        const FloatType signedDriftLength = rlWireHit-> getSignedRefDriftLength();
-        const Vector2D& pos2D =  rlWireHit->getRefPos2D();
         const FloatType r = rlWireHit->getRefCylindricalR();
+        const Vector2D& pos2D =  rlWireHit->getRefPos2D();
+
+        const FloatType signedDriftLength = rlWireHit->getSignedRefDriftLength();
 
         bool in = this->isObservationIn(r, pos2D, signedDriftLength, phi0CurvBox);
         return in ? 1 : NAN;
@@ -200,6 +201,7 @@ namespace Belle2 {
                                                       const RightLeftInfo rlInfo = UNKNOWN)
       {
         bool rightIn = rlInfo != LEFT and this->isObservationIn(r, pos2D, driftLength, phi0CurvBox);
+
         bool leftIn = rlInfo != RIGHT and this->isObservationIn(r, pos2D, -driftLength, phi0CurvBox);
 
         if (rightIn and leftIn) {
@@ -239,32 +241,36 @@ namespace Belle2 {
        *  @param phi0CurvBox       The phi0 curvature hough space region.
        *  @returns                 True if the observation can be linked to a trajectory in the box.
        */
-      inline bool isObservationIn(const FloatType& r,
-                                  const Vector2D& pos2D,
+      inline bool isObservationIn(const FloatType& globalR,
+                                  const Vector2D& globalPos2D,
                                   const FloatType& signedDriftLength,
                                   const Phi0CurvBox* phi0CurvBox)
       {
+        Vector2D localPos2D = globalPos2D - m_localOrigin;
+        FloatType localRSquare = globalR * globalR - 2 * globalPos2D.dot(m_localOrigin) + m_localOriginNormSquared;
+
         const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();
         const Vector2D& upperPhi0Vec = phi0CurvBox->getUpperPhi0Vec();
 
         const float& lowerCurv = phi0CurvBox->getLowerCurv();
         const float& upperCurv = phi0CurvBox->getUpperCurv();
 
-        const FloatType parallelToPhi0[2] = { pos2D.dot(lowerPhi0Vec), pos2D.dot(upperPhi0Vec) };
+        const FloatType parallelToPhi0[2] = { localPos2D.dot(lowerPhi0Vec), localPos2D.dot(upperPhi0Vec) };
         const bool isNonCurler = upperCurv <= m_curlCurv and lowerCurv >= -m_curlCurv;
         if (isNonCurler) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
           if (parallelToPhi0[0] < 0 and parallelToPhi0[1] < 0) return false;
         }
 
-        const FloatType rReducedSquared = (r + signedDriftLength) * (r - signedDriftLength);
+        //const FloatType rReducedSquared = (localRSquare + signedDriftLength) * (localRSquare - signedDriftLength);
+        const FloatType rReducedSquared = localRSquare - square(signedDriftLength);
 
         const FloatType rSquareTimesHalfCurv[2] = {
           rReducedSquared* (lowerCurv / 2),
           rReducedSquared* (upperCurv / 2)
         };
 
-        const FloatType orthoToPhi0[2] = { pos2D.cross(lowerPhi0Vec), pos2D.cross(upperPhi0Vec) };
+        const FloatType orthoToPhi0[2] = { localPos2D.cross(lowerPhi0Vec), localPos2D.cross(upperPhi0Vec) };
 
         // Calculate (approximate) distances of the observed position to
         // the trajectories represented by the corners of the box
@@ -280,21 +286,31 @@ namespace Belle2 {
                                                                    dist[1][0],
                                                                    dist[1][1]);
         if (excludesOneEdge) return true;
+        return false;
 
         // Currently disable:
-        if (not m_refined) return false;
-        // Continue to check if the extrema of the sinogram are in the box,
-        // while only touching only one boundary of the box
-        // (but not crossing two what the check above actually means).
-        // Currently only checking the positive curvature branch correctly
-        FloatType extremR = r - signedDriftLength;
-        bool extremRInCurvRange = not SameSignChecker::sameSign(extremR * lowerCurv - 1, extremR * upperCurv - 1);
-        if (not extremRInCurvRange) return false;
+        // if (not m_refined) return false;
+        // // Continue to check if the extrema of the sinogram are in the box,
+        // // while only touching only one boundary of the box
+        // // (but not crossing two what the check above actually means).
+        // // Currently only checking the positive curvature branch correctly
+        // FloatType extremR = r - signedDriftLength;
+        // bool extremRInCurvRange = not SameSignChecker::sameSign(extremR * lowerCurv - 1, extremR * upperCurv - 1);
+        // if (not extremRInCurvRange) return false;
 
-        Vector2D extremPhi0Vec = pos2D.orthogonal(CCW); // Not normalised but does not matter.
-        bool extremPhi0VecInPhi0Range = extremPhi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
-        return extremRInCurvRange and extremPhi0VecInPhi0Range;
+        // Vector2D extremPhi0Vec = pos2D.orthogonal(CCW); // Not normalised but does not matter.
+        // bool extremPhi0VecInPhi0Range = extremPhi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
+        // return extremRInCurvRange and extremPhi0VecInPhi0Range;
       }
+
+    public:
+      /// Getter for the local origin relative to which the parameters of the hough space are understood
+      const Vector2D& getLocalOrigin() const
+      { return m_localOrigin; }
+
+      /// Setter for the local origin relative to which the parameters of the hough space are understood
+      void setLocalOrigin(const Vector2D& localOrigin)
+      { m_localOrigin = localOrigin; }
 
     private:
       /// The curvature above which the trajectory is considered a curler.
@@ -305,6 +321,13 @@ namespace Belle2 {
 
       /// Switch to also check for the maximum of the sinogram.
       bool m_refined = false;
+
+      /// A displaced origin to search for off origin circles
+      Vector2D m_localOrigin = Vector2D(0.0, 0.0);
+
+      /// Precomputed norm of the displaced origin point
+      double m_localOriginNormSquared = m_localOrigin.normSquared();
+
     };
 
   } // end namespace TrackFindingCDC

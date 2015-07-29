@@ -67,10 +67,16 @@ namespace Belle2 {
       string value = getString(path);
       try {
         //hide spurious warning in boost
+#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
         return boost::lexical_cast<int>(value);
+#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#else
 #pragma GCC diagnostic pop
+#endif
       } catch (boost::bad_lexical_cast) {
         throw ConversionError() << path << value;
       }

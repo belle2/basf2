@@ -45,7 +45,7 @@ void MCParticleTrajectory::simplify(float distance_tolerance)
   // push full trajectory on the stack
   stack.push(make_pair(m_points.begin(), m_points.end() - 1));
   // next free point: we always want the starting point so start at index 1
-  iterator nextPoint = m_points.begin() + 1;
+  iterator nextFreePoint = m_points.begin() + 1;
   // iterators used for the segment inspection
   iterator firstPoint, splitPoint, finalPoint;
   // segment direction and vector between segment start and mid point
@@ -85,9 +85,9 @@ void MCParticleTrajectory::simplify(float distance_tolerance)
     //Ok, all points close enough, add the final point to list of points. Due
     //to the order in which we look at the points in a ordered way we can
     //replace the points in place
-    *(nextPoint++) = *finalPoint;
+    *(nextFreePoint++) = *finalPoint;
   }
 
   //Now delete all remaining elements
-  m_points.erase(nextPoint, end());
+  m_points.erase(nextFreePoint, end());
 }

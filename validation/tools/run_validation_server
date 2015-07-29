@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+
+import validationserver
+
+# Only execute if the file is not imported
+if __name__ == '__main__':
+    validationserver.configure_and_run(parseCommandLine=True)

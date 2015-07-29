@@ -26,7 +26,7 @@ from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
     find_creator, parse_cmd_line_arguments, draw_progress_bar
 
-import run_validation_server
+import validationserver
 
 ###############################################################################
 #                              Class Definition                               #
@@ -694,7 +694,7 @@ try:
 
     if cmd_arguments.view:
         # run local webserver
-        run_validation_server.configure_and_run(openSite=True)
+        validationserver.configure_and_run(openSite=True)
 
 except KeyboardInterrupt:
     validation.log.note('Validation terminated by user!')

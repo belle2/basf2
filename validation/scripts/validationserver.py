@@ -490,7 +490,3 @@ def configure_and_run(ip='localhost', port=8000, parseCommandLine=False, openSit
     # Terminate upon KeyboardInterrupt
     except KeyboardInterrupt as k:
         print "Server: Terminated by user!"
-
-# Only execute if the file is not imported
-if __name__ == '__main__':
-    configure_and_run(parseCommandLine=True)

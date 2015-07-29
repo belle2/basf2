@@ -73,7 +73,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
     CDCTrajectory2D trajectory;
 
     for (Processor::ItemType::TypeData* item : track) {
-      observations.append(*item);
+      observations.appendRange(*item);
     }
 
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();

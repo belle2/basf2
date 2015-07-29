@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
-
+#include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -132,7 +132,21 @@ namespace Belle2 {
         return appended_hit;
       }
 
-      /// Appends the hit circle at wire reference position without a right left passage hypotheses.
+      /// Appends the hit circle at wire reference position with a right left passage hypotheses.
+      /** \note Observations are skipped, if one of the contained variables is NAN.
+      \note The left right passage information is always set to the right left passage hypotheses of the give hit.
+      @param wireHit      Hit information to be appended as observation. XY position, signed drift length and inverse variance are taken at the wire reference position.
+      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
+      */
+      size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlTaggedWireHit)
+      {
+        const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
+        const CDCWireHit* ptrWireHit = rlTaggedWireHit.getWireHit();
+        size_t appended_hit = append(*ptrWireHit, rlInfo);
+        return appended_hit;
+      }
+
+      /// Appends the hit circle at wire reference position with a right left passage hypotheses.
       /** \note Observations are skipped, if one of the contained variables is NAN.
       \note The left right passage information is always set to the right left passage hypotheses of the give hit.
       @param wireHit      Hit information to be appended as observation. XY position, signed drift length and inverse variance are taken at the wire reference position.
@@ -221,7 +235,7 @@ namespace Belle2 {
 
 
       /// Appends all reconstructed hits from the two dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information
-      size_t append(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false)
+      size_t appendRange(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false)
       {
         size_t result = 0;
         for (const CDCRecoHit2D& recoHit2D :  recoSegment2D) {
@@ -231,7 +245,7 @@ namespace Belle2 {
       }
 
       /// Appends all reconstructed hits from the three dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information next to the reconstructed position
-      size_t append(const CDCRecoSegment3D& recoSegment3D, bool usePosition = false)
+      size_t appendRange(const CDCRecoSegment3D& recoSegment3D, bool usePosition = false)
       {
         size_t result = 0;
         for (const CDCRecoHit3D& recoHit3D :  recoSegment3D) {
@@ -242,27 +256,27 @@ namespace Belle2 {
 
 
       /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
-      size_t append(const CDCAxialSegmentPair& axialSegmentPair,
-                    bool usePosition = false)
+      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair,
+                         bool usePosition = false)
       {
         size_t result = 0;
         const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStart();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
-          result += append(startSegment2D, usePosition);
+          result += appendRange(startSegment2D, usePosition);
         }
 
         const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEnd();
         if (ptrEndSegment2D) {
           const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
-          result += append(endSegment2D, usePosition);
+          result += appendRange(endSegment2D, usePosition);
         }
         return result;
       }
 
       /// Appends all the reference wire positions. Always use position since there is no other mode. For cross check to legendre finder.
-      size_t append(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires,
-                    bool usePosition  __attribute__((__unused__)) = false)
+      size_t appendRange(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires,
+                         bool usePosition  __attribute__((__unused__)) = false)
       {
         size_t result = 0;
         for (const CDCWire* ptrWire : wires) {
@@ -276,7 +290,7 @@ namespace Belle2 {
         return result;
       }
 
-      size_t append(const CDCWireHitSegment& wireHits, bool usePosition  = false)
+      size_t appendRange(const CDCWireHitSegment& wireHits, bool usePosition  = false)
       {
         size_t result = 0;
         for (const CDCWireHit* ptrWireHit : wireHits) {
@@ -300,21 +314,32 @@ namespace Belle2 {
 
 #ifndef __CINT__
       /// Appends all wire positions of the hits in the legendre track hits. Always use position since there is no other mode as long as there are no right left passage information available.
-      size_t append(const std::vector<TrackFindingCDC::TrackHit*>& legendreTrackHits,
-                    bool usePosition  __attribute__((unused)) = false)
+      size_t appendRange(const std::vector<TrackFindingCDC::TrackHit*>& legendreTrackHits,
+                         bool usePosition  __attribute__((unused)) = false)
       {
         size_t result = 0;
         for (const TrackFindingCDC::TrackHit* ptrLegendreTrackHit : legendreTrackHits) {
           if (not ptrLegendreTrackHit) continue;
-          const TrackFindingCDC::TrackHit& legendreTrackHit = *ptrLegendreTrackHit;
-          const TVector3 wirePos = legendreTrackHit.getWirePosition();
-          const FloatType driftLength = 0.0;
-          const FloatType weight = 1.0;
-          result += append(wirePos.X(), wirePos.Y(), driftLength, weight);
+          const CDCWireHit* wireHit = ptrLegendreTrackHit->getUnderlayingCDCWireHit();
+          result += append(*wireHit);
         }
         return result;
       }
 #endif
+
+      /// Append all hits from a generic range.
+      template<class Range>
+      size_t appendRange(const Range& range, bool usePosition  __attribute__((unused)) = false)
+      {
+        size_t result = 0;
+        using std::begin;
+        using std::end;
+        for (const auto& item : range) {
+          result += append(item);
+        }
+        return result;
+      }
+
       /// Get the postion of the first observation.
       Vector2D getFrontPos2D() const
       { return empty() ? Vector2D() : Vector2D(getX(0), getY(0)); }

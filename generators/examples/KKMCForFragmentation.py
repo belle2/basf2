@@ -2,46 +2,44 @@
 # -*- coding: utf-8 -*-
 
 ########################################################
-# Run PYTHIA on unfragmented final states
+# Run KKMC to generate uu events
 #
 # Example steering file
 ########################################################
 
 from basf2 import *
 from ROOT import Belle2
+from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.WARNING)
 
+# main path
+main = create_path()
+
 # event info setter
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10])  # we want to process 100 events
-eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
 
 # use KKMC generated uubar pair as input
 kkgeninput = register_module('KKGenInput')
 kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/uubar_nohadronization.input.dat'))
 kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
 kkgeninput.param('taudecaytableFile', '')
-kkgeninput.param('kkmcoutputfilename', 'testoutput.txt')
+kkgeninput.param('kkmcoutputfilename', 'kkmc_uu.txt')
 
-# get the gearbox
-gearbox = register_module('Gearbox')
-
-# Register the Progress module and the Python histogram module
-progress = register_module('Progress')
-
-# add root output module
-rootoutput = register_module('RootOutput')
-rootoutput.param('outputFileName', './kkmc_uubar.root')
-
-# main
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(progress)
-main.add_module(gearbox)
+# run
+main.add_module("Progress")
 main.add_module(kkgeninput)
-main.add_module(rootoutput)
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("RootOutput", outputFileName="kkmc_uu.root")
+main.add_module("PrintMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)
+
+# generate events
 process(main)
+
+# show call statistics
+print statistics

@@ -31,7 +31,7 @@
       <ThetaStart unit="deg">35.0</ThetaStart>
       <ThetaEnd  unit="deg">37.5</ThetaEnd>
       <Polynomial1>9.47695E-01</Polynomial1>
-      <Polynomial2>-4.00680E-0</Polynomial2>
+      <Polynomial2>-4.00680E-03</Polynomial2>
       <Polynomial3>-6.62361E-04</Polynomial3>
       <Polynomial4>3.51879E-04</Polynomial4>
     </ThetaBins>

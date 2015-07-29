@@ -1,5 +1,5 @@
 #include <iostream>
-#include "histio.c"
+#include "histio.C"
 #include "TCanvas.h"
 #include "TText.h"
 #include "TChain.h"

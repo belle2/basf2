@@ -1,4 +1,4 @@
-#include "histio.c"
+#include "histio.C"
 #include "TCanvas.h"
 #include "TChain.h"
 #include "TH1.h"

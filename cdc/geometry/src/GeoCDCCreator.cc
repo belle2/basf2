@@ -86,8 +86,8 @@ namespace Belle2 {
       //------------------------
       //      double globalRotAngle = (180.0 / M_PI) * content.getAngle("Rotation");
       double globalOffsetZ  = content.getLength("OffsetZ");
-      string Helium  = content.getString("Helium");
-      string Ethane  = content.getString("Ethane");
+      //      string Helium  = content.getString("Helium");
+      //      string Ethane  = content.getString("Ethane");
       string Aluminum  = content.getString("Aluminum");
       string Tungsten  = content.getString("Tungsten");
       string CFRP  = content.getString("CFRP");
@@ -1084,13 +1084,16 @@ namespace Belle2 {
           if (coverID == 0) { // Outer cover (backward).
             const double rmin1 = coverInnerR1;
             const double rmax1 = coverOuterR1;
+            // cppcheck-suppress zerodiv
             G4Tubs* coverTubeShape = new G4Tubs((format("solidBackwardCover%1%") % coverID).str().c_str(), rmin1 * CLHEP::cm, rmax1 * CLHEP::cm,
                                                 coverThick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
             G4LogicalVolume* coverTube = new G4LogicalVolume(coverTubeShape, medAluminum,
+                                                             // cppcheck-suppress zerodiv
                                                              (format("logicalBackwardCover%1%") % coverID).str().c_str(), 0, 0, 0);
             coverTube->SetVisAttributes(m_VisAttributes.back());
 
             new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, coverPosZ * CLHEP::cm - coverThick * CLHEP::cm / 2.0), coverTube,
+                              // cppcheck-suppress zerodiv
                               (format("physicalBackwardCover%1%") % coverID).str().c_str(), logical_cdc, false, coverID);
 
           } else if (coverID == 2) { // Middle cover (backward).

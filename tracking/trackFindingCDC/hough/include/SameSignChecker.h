@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
 
 namespace Belle2 {

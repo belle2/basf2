@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
 #include <tracking/trackFindingCDC/utilities/Ptr.h>
 #include <tracking/trackFindingCDC/typedefs/InfoTypes.h>

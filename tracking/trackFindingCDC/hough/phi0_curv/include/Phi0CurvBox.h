@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <tracking/trackFindingCDC/hough/Box.h>
 #include <tracking/trackFindingCDC/hough/DiscreteAngles.h>
 #include <tracking/trackFindingCDC/hough/DiscreteValues.h>

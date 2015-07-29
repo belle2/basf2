@@ -7,5 +7,7 @@ namespace Belle2 {
     double ShaperDSP_F(double time, float* parameters);
     double DspSamplingArray(int templateSignalNBins, double time, double templateSignalBinLen, const double* templateFun);
     std::vector<double>* createDefSampledSignalWF();
+    void shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y,
+                     int* ttrig2, int* n16,  int* lar, int* ltr, int* lq);
   }
 }

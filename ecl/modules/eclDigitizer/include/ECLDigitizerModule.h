@@ -58,7 +58,7 @@ namespace Belle2 {
       ~ECLDigitizerModule();
 
 
-      /** Initialize variables, print info, and start CPU clock. */
+      /** Initialize variables  */
       virtual void initialize();
 
       /** Nothing so far.*/
@@ -73,39 +73,12 @@ namespace Belle2 {
       /** Nothing so far. */
       virtual void endRun();
 
-      /** Stopping of CPU clock.*/
+      /** Free memory */
       virtual void terminate();
 
-      /** read Shaper-DSP DataBass */
+      /** read Shaper-DSP data from root file */
       void readDSPDB();
 
-      /** Shaper-DSP Output  Map */
-      //double ShaperDSP(double Ti);
-
-      /** Shaper-DSP Output  Map */
-      //double ShaperDSP_F(double Ti, float* ss);
-
-      /** read Shaper array */
-      //      double DspSamplingArray(int n, double t, double dt, const double* ft) const;
-      //      void DspSamplingArray(int* n, double* t, double* dt, double* ft, double* ff);
-
-      /** Shaper-DSP Output  basic */
-      //double  Sv123(double t, double t01, double tb1, double t02, double tb2, double td1, double ts1);
-
-      /** Shaper-DSP Fitter */
-      void shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig,
-                       int* n16, int* lar, int* ltr, int* lq);
-
-
-      /** Shaper-DSP Fitter */
-      void shapeFitterD(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y, int* ttrig,
-                        int* n16, int* ch, int* lar, int* ltr, int* lq);
-
-
-
-
-
-    protected:
     private:
       typedef boost::multi_array<double, 2> array2d;
 

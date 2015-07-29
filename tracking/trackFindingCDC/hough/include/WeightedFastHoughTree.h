@@ -177,7 +177,7 @@ namespace Belle2 {
       void fillWalk(ItemInDomainMeasure& weightItemInDomain,
                     IsLeafPredicate& isLeaf)
       {
-        auto walker = [&](Node * node) {
+        auto walker = [&weightItemInDomain, &isLeaf](Node * node) {
           // Check if node is a leaf
           // Do not create children in this case
           if (isLeaf(node)) {

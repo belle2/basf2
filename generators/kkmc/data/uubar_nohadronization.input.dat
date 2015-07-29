@@ -11,11 +11,11 @@ BeginX
 *     Center-of-mass energy [GeV]
     1        10.58D0      CMSene =xpar( 1) Average Center of mass energy [GeV]
     2       0.0049e0      DelEne =xpar( 2) Beam energy spread [GeV]
-   16           1e-4      vvmin =xpar(16)  may  be put to  vvmin < 1e-5
+   16           1e-5      vvmin =xpar(16)  may  be put to  vvmin < 1e-5
    20              1      KeyISR=xpar(20)  Default is  1, ISR
-   21              1      KeyFSR=xpar(21)  Default is  1, FSR
-   27              2      KeyINT=xpar(27)  Default is  2, Interference ISR/FSR
-   29              1      KeyQSR=xpar(29)  Photon emission from final quarks
+   21              0      KeyFSR=xpar(21)  Default is  1, FSR
+   27              0      KeyINT=xpar(27)  Default is  2, Interference ISR/FSR
+   29              0      KeyQSR=xpar(29)  Photon emission from final quarks
    50              0      Hadronization switch (in add. to KKMC-JETSET switch)
 ********************************************************************************
 *   61       0.7071d0      spin1x  polarization vector beam 1

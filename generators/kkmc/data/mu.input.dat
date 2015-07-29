@@ -11,7 +11,7 @@ BeginX
 *     Center-of-mass energy [GeV]
     1        10.58D0      CMSene =xpar( 1) Average Center of mass energy [GeV]
     2       0.0049e0      DelEne =xpar( 2)  Beam energy spread [GeV]
-   16           1e-4      vvmin =xpar(16)  may  be put to  vvmin < 1e-5
+   16           1e-5      vvmin =xpar(16)  may  be put to  vvmin < 1e-5
 ********************************************************************************
 *   61       0.7071d0      spin1x  polarization vector beam 1
 *   62            0d0      spin1y  polarization vector beam 1

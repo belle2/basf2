@@ -409,12 +409,7 @@ def create_momentum_resolution_plot(data_tree):
     hist_resolution.GetListOfFunctions().Add(TNamed('Check', check))
     hist_resolution.GetListOfFunctions().Add(TNamed('Contact',
                                                     CONTACT_PERSON['Email']))
-
-    # Get a log scale on the plot.  The first way is my hackish way of
-    # doing this, which is currently available on the buildbot
-    # (2014-10-08).  The second is the way suggested for the future.
-    hist_resolution.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'))
-    hist_resolution.GetListOfFunctions().Add(TNamed('Options', 'logy'))
+    hist_resolution.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
 
     hist_resolution.Write()
 
@@ -604,13 +599,7 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_d0.SetTitle('d0 resolution')
     hist_impact_parameter_d0.SetXTitle('pt in GeV/c')
     hist_impact_parameter_d0.SetYTitle('#sigma_{d0} [cm]')
-    # Get a log scale on the plot.  The first way is my hackish way of
-    # doing this, which is currently available on the buildbot
-    # (2014-10-08).  The second is the way suggested for the future.
-    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'
-                                                             ))
-    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Options', 'logy'
-                                                             ))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
     hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Contact',
                                                              CONTACT_PERSON['Email']))
 
@@ -619,11 +608,7 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_z.SetTitle('z resolution')
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
     hist_impact_parameter_z.SetYTitle('#sigma_{z} [cm]')
-    # Get a log scale on the plot.  The first way is my hackish way of
-    # doing this, which is currently available on the buildbot
-    # (2014-10-08).  The second is the way suggested for the future.
-    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('LogScale', 'Yes'))
-    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Options', 'logy'))
+    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
     hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Contact',
                                                             CONTACT_PERSON['Email']))
 

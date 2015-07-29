@@ -8,7 +8,6 @@ import time
 
 
 def create_image_matrix(imidzes, package, size):
-
     """!
     A function that creates the image matrix as .png image
     """
@@ -20,7 +19,7 @@ def create_image_matrix(imidzes, package, size):
 
     # from our form, we get image width in %,
     # so we need to convert the number to integer
-    n = math.floor(100/size)
+    n = math.floor(100 / size)
 
     # initialize all images in a package
     imgs = sorted(glob.glob("./plots/" + package + "/*.png"))
@@ -45,7 +44,7 @@ def create_image_matrix(imidzes, package, size):
     if not size:
         print "Error: No size input."
         return 0
-    if not os.path.isdir("./plots/"+package):
+    if not os.path.isdir("./plots/" + package):
         print "Error: The requested directory does not exist."
         return 0
 
@@ -82,46 +81,46 @@ def create_image_matrix(imidzes, package, size):
     # every image to have the same width, so we don't care if they have
     # different heights, if we put a minimum width to paste() and the
     # image is of a bigger width, paste() should scale it down in x-coord
-    element_size.append(N*min_x)
+    element_size.append(N * min_x)
     es = [min_x, max_y]
-    k = int(math.ceil(len(images)/N))
+    k = int(math.ceil(len(images) / N))
     # But, obviously, we care about image height.
     if len(element_size_y) >= 2:
 
-        element_size.append(int(k*math.ceil(1.01*max_y) +
-                            math.ceil(0.01*es[1])))
+        element_size.append(int(k * math.ceil(1.01 * max_y) +
+                                math.ceil(0.01 * es[1])))
         # Add a little border to the x-coordinate
-        element_size[0] = int(math.ceil(1.01*element_size[0]) +
-                              math.ceil(0.01*es[0]))
+        element_size[0] = int(math.ceil(1.01 * element_size[0]) +
+                              math.ceil(0.01 * es[0]))
     else:
 
         # get the final width and height of the image
-        element_size.append(k*max_y)
+        element_size.append(k * max_y)
 
         # add a little border(1%)
         for i in [0, 1]:
-            element_size[i] = int(math.ceil(1.01*element_size[i]) +
-                                  math.ceil(0.01*es[i]))
+            element_size[i] = int(math.ceil(1.01 * element_size[i]) +
+                                  math.ceil(0.01 * es[i]))
 
     # create a new white image, our canvas
     img = Image.new('RGB', element_size, "white")
 
     # loop over all images and paste them to our canvas
-    border = (int(math.ceil(min_x*0.01)), int(math.ceil(min_y*0.01)))
+    border = (int(math.ceil(min_x * 0.01)), int(math.ceil(min_y * 0.01)))
     if len(element_size_y) >= 2:
 
         # If we do have images of diferent height, we will split the image
         # into boxes, first we define elementary box width and height
-        im_sx = int(math.ceil(min_x*1.01))
-        im_sy = int(math.ceil(min_y*1.01))
+        im_sx = int(math.ceil(min_x * 1.01))
+        im_sy = int(math.ceil(min_y * 1.01))
         vacant_spaces = []
         # Then we split the image
-        for i in range(int(element_size[1]/im_sy)):
+        for i in range(int(element_size[1] / im_sy)):
             for j in range(int(N)):
-                vacant_spaces.append((j*im_sx,
-                                      i*im_sy,
-                                      (j+1)*im_sx,
-                                      (i+1)*im_sy))
+                vacant_spaces.append((j * im_sx,
+                                      i * im_sy,
+                                      (j + 1) * im_sx,
+                                      (i + 1) * im_sy))
 
         # We want them sorted according to y-coordinate(in rows)
         vacant_spaces = sorted(vacant_spaces, key=lambda x: x[1])
@@ -180,34 +179,34 @@ def create_image_matrix(imidzes, package, size):
                 continue
         w = max(height)
     else:
-        x = int(math.ceil(es[0]*0.01))
-        y = int(math.ceil(es[1]*0.01))
+        x = int(math.ceil(es[0] * 0.01))
+        y = int(math.ceil(es[1] * 0.01))
         for i, element in enumerate(images):
             # get the x coordinate of an image
             # if we are dealing with the first row, as x coordinate,
             # we want the border only
             if i % n == 0:
-                x = int(math.ceil(es[0]*0.01))
+                x = int(math.ceil(es[0] * 0.01))
             else:
                 # if not, just add the new image width to the x coordinate
-                x += es[0]+int(math.ceil(es[0]*0.01))
+                x += es[0] + int(math.ceil(es[0] * 0.01))
 
             # now this is a little aesthetic workaround, so the first column
             # is aligned with the other columns and it is not "stepped down"
             if not i or not i % n:
-                j = i+1
+                j = i + 1
             else:
                 j = i
 
             # get the y coordinate of the image
-            y = int(math.floor(i/n)*es[1]+math.ceil(j/n)*es[1]*0.01)
+            y = int(math.floor(i / n) * es[1] + math.ceil(j / n) * es[1] * 0.01)
 
             # since Image.paste gets a 4-tuple(it could accept a 2-tuple,
             # but it is safer to hand it a 4-tuple),
             # we need also coordinates of lower corner
             # and right corner of the image
-            v = x+int(es[0])
-            w = y+int(es[1])
+            v = x + int(es[0])
+            w = y + int(es[1])
             # If we have different widths, resize images
             if len(element_size_x) > 1:
                 element = element.resize((v - x, w - y))
@@ -234,7 +233,6 @@ def create_image_matrix(imidzes, package, size):
 
 
 def merge_multiple_plots(package, pdfs):
-
     """!
     A function that merges plots into a single .pdf file
     """

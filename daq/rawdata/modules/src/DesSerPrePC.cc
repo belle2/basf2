@@ -154,17 +154,35 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
   int n = 0;
   int read_size = 0;
   while (1) {
-    errno = 0;
-    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) <= 0) {
-      if (errno == EINTR || errno == EAGAIN) {
+    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
+      if (errno == EINTR) {
+        continue;
+      } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+#ifdef NONSTOP
+        char err_buf[500];
+        sprintf(err_buf, "Failed toa receive data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
+                __PRETTY_FUNCTION__, __LINE__);
+        string err_str = err_buf;
+        callCheckRunStop(err_str);
+#endif
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Failed to receive data(%s). %d %d. Exiting...", strerror(errno), read_size, errno);
+        sprintf(err_buf, "Failedbb to receive data(%s). %d %d. Exiting...", strerror(errno), read_size, errno);
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);
       }
+    } else if (read_size == 0) {
+      // Connection is closed ( error )
+#ifdef NONSTOP
+      char err_buf[500];
+      sprintf(err_buf, "Connection is closed by peer(%s). readsize = %d %d. Exiting...: %s %s %d",
+              strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      string err_str = err_buf;
+      g_run_error = 1;
+      throw (err_str);
+#endif
     } else {
       n += read_size;
       if (n == data_size_byte)break;
@@ -323,9 +341,17 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
   //
   int total_recvd_byte = 0;
   for (int i = 0; i < (int)(m_socket_recv.size()); i++) {
-    total_recvd_byte += recvFD(m_socket_recv[ i ], (char*)temp_buf + total_recvd_byte,
-                               each_buf_nwords[ i ] * sizeof(int), flag);
 
+    try {
+      total_recvd_byte += recvFD(m_socket_recv[ i ], (char*)temp_buf + total_recvd_byte,
+                                 each_buf_nwords[ i ] * sizeof(int), flag);
+    } catch (string err_str) {
+      if (*delete_flag) {
+        B2WARNING("Delete buffer before going to Run-pause state");
+        delete temp_buf;
+      }
+      throw (err_str);
+    }
     //
     // Data length check
     //
@@ -361,7 +387,15 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
   // Read Traeiler
   int send_trl_buf[(unsigned int)(SendTrailer::SENDTRL_NWORDS) ];
   for (int i = 0; i < (int)(m_socket_recv.size()); i++) {
-    recvFD(m_socket_recv[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
+    try {
+      recvFD(m_socket_recv[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
+    } catch (string err_str) {
+      if (*delete_flag) {
+        B2WARNING("Delete buffer before going to Run-pause state");
+        delete temp_buf;
+      }
+      throw (err_str);
+    }
   }
 
   return temp_buf;
@@ -616,8 +650,13 @@ void DesSerPrePC::DataAcquisition()
       eve_copper_0 = 0;
       int delete_flag_from = 0, delete_flag_to = 0;
       RawDataBlock temp_rawdatablk;
-      setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
-      checkData(&temp_rawdatablk, &eve_copper_0);
+      try {
+        setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
+        checkData(&temp_rawdatablk, &eve_copper_0);
+      } catch (string err_str) {
+        printf("Error was detected\n"); fflush(stdout);
+        exit(1);
+      }
       //     PreRawCOPPERFormat_latest pre_rawcopper_latest;
       //     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
       //                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
@@ -1015,31 +1054,26 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
-#ifdef NONSTOP_DEBUG
-        printf("\033[34m");
-        printf("###########(Ser) TIMEOUT durin writev  ############### sent %d bytes\n", n);
-        fflush(stdout);
-        printf("\033[0m");
-#endif
-        if (checkRunStop()) {
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(Ser) Stop is detected after return from writev ###############\n");
-          fflush(stdout);
-          printf("\033[0m");
-#endif
-          pauseRun();
-          waitRestart();
-        }
+        char err_buf[500];
+        sprintf(err_buf, "Failed to send data(%s). %d. Exiting...: %s %s %d", strerror(errno),  errno, __FILE__, __PRETTY_FUNCTION__,
+                __LINE__);
+        string err_str = err_buf;
+        callCheckRunStop(err_str);
 #endif
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d tailer %d\n" ,
+        sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d trailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
+#ifdef NONSTOP
+        string err_str = err_buf;
+        g_run_error = 1;
+        throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
+#else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(1);
+#endif
       }
     }
     break;
@@ -1096,30 +1130,26 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
-#ifdef NONSTOP_DEBUG
-        printf("\033[34m");
-        printf("###########(Ser) TIMEOUT during send()  ###############\n");
-        fflush(stdout);
-        printf("\033[0m");
-#endif
-        if (checkRunStop()) {
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(Ser) Stop is detected after return from send ###############\n");
-          fflush(stdout);
-          printf("\033[0m");
-#endif
-          pauseRun();
-          waitRestart();
-        }
+        char err_buf[500];
+        sprintf(err_buf, "Failed to send data(%s). %d. Exiting...: %s %s %d", strerror(errno), errno, __FILE__, __PRETTY_FUNCTION__,
+                __LINE__);
+        string err_str = err_buf;
+        callCheckRunStop(err_str);
 #endif
         continue;
       } else {
         char err_buf[500];
         sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
+
+#ifdef NONSTOP
+        string err_str = err_buf;
+        g_run_error = 1;
+        throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
+#else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(1);
+#endif
       }
     }
     sent_bytes += ret;
@@ -1344,6 +1374,30 @@ void DesSerPrePC::waitRestart()
   }
   return;
 }
+
+
+void DesSerPrePC::callCheckRunStop(string& err_str)
+{
+#ifdef NONSTOP_DEBUG
+  printf("\033[34m");
+  printf("###########(Ser) TIMEOUT during send()  ###############\n");
+  fflush(stdout);
+  printf("\033[0m");
+#endif
+  if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+    printf("\033[31m");
+    printf("###########(Ser) Stop is detected after return from send ###############\n");
+    fflush(stdout);
+    printf("\033[0m");
+#endif
+    g_run_stop = 1;
+    throw (err_str);
+  }
+  return;
+}
+
+
 #endif
 
 void DesSerPrePC::shmOpen(char*, char*)
@@ -1383,3 +1437,6 @@ void DesSerPrePC::shmOpen(char*, char*)
   ftruncate(m_shmfd_sta, size);
     */
 }
+
+
+

@@ -253,6 +253,10 @@ namespace Belle2 {
 
     //! for nonstop DAQ
     virtual void waitRestart();
+
+    //! check RunStop
+    void callCheckRunStop(std::string& err_str);
+
 #endif
 
   private:

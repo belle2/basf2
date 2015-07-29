@@ -263,6 +263,7 @@ namespace Belle2 {
     //! check data contents
     void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
 
+
     //! check data contents
     //   StoreArray<RawDataBlock> raw_datablkarray;
 
@@ -340,6 +341,9 @@ namespace Belle2 {
 
     //! for nonstop DAQ
     void waitRestart();
+
+    //! call checkrunstop
+    void callCheckRunStop(std::string& err_str);
 #endif
 
     //! which format is used

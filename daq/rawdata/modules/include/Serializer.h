@@ -99,9 +99,6 @@ namespace Belle2 {
     //! print data contents
     void printData(int* buf, int nwords);
 
-    //! check RunStop
-    void callCheckRunStop();
-
     //! file descripter for shm
     int m_shmfd_cfg;
 
@@ -202,6 +199,9 @@ namespace Belle2 {
 
     /*     //! for nonstop DAQ */
     /*     virtual void waitRestart(); */
+
+    //! check RunStop
+    void callCheckRunStop(std::string& err_str);
 
     //! connection is reset or not
     int m_conn_alive;

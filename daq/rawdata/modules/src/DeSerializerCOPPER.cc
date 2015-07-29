@@ -193,14 +193,13 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   temp_buf[0] =  BUF_SIZE_WORD ;
   *delete_flag = 0;
 
-#ifndef DUMMY
   //
   // Read data from HSLB
   //
-
+#ifndef DUMMY
   int recvd_byte = (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int);
 
-
+  // Firstly, read data with an allocated buffer.
   while (1) {
     int read_size = 0;
     if ((read_size = read(m_cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
@@ -215,25 +214,14 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
           exit(-1);
         }
 #ifdef NONSTOP
-#ifdef NONSTOP_DEBUG
-        printf("\033[34m");
-        printf("###########(DesCpr) Return from read with EAGAIN  ###############\n");
-        fflush(stdout);
-        printf("\033[0m");
-#endif
-        if (checkRunStop()) {
-#ifdef NONSTOP_DEBUG
-          printf("\033[31m");
-          printf("###########(DesCpr) Stop is detected after return with EAGAIN  ###############\n");
-          printf("\033[0m");
-          fflush(stdout);
-#endif
-          g_run_stop = 1;
-          string err_str = "EAGAIN";
-          throw (err_str);
-        }
+        char err_buf[500];
+        sprintf(err_buf, "Failed to read data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
+                __PRETTY_FUNCTION__, __LINE__);
+        string err_str = err_buf;
+        callCheckRunStop(err_str);
 #endif
         continue;
+
       } else {
         char err_buf[500];
         sprintf("Failed to read data from COPPER(%s). Exiting...", strerror(errno));
@@ -256,10 +244,11 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
                  m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
 
   //
-  // Allocate buffer if needed
+  // If there are data remaining to be read, continue reading
   //
   if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) > recvd_byte) {
-    // Check buffer size
+
+    // If event size is larger than BUF_SIZE_WORD, allocate a new buffer
     if (*m_size_word >  BUF_SIZE_WORD) {
       *delete_flag = 1;
       temp_buf = new int[ *m_size_word ];
@@ -379,28 +368,23 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
+
 #ifdef NONSTOP
-#ifdef NONSTOP_DEBUG
-        printf("###########(DesCpr) Return from readFD with EAGAIN  ###############\n");
-        fflush(stdout);
-#endif
-        if (checkRunStop()) {
-#ifdef NONSTOP_DEBUG
-          printf("###########(DesCpr) Stop is detected after return from readFD with EAGAIN ##\n");
-          fflush(stdout);
-#endif
-          g_run_stop = 1;
-
-
+        char err_buf[500];
+        sprintf(err_buf, "Failed to read data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
+                __PRETTY_FUNCTION__, __LINE__);
+        string err_str = err_buf;
+        try {
+          callCheckRunStop(err_str);
+        } catch (string err_str) {
           if (delete_flag) {
             B2WARNING("Delete buffer before going to Run-pause state");
             delete buf;
           }
-
-          string err_str = "EAGAIN";
           throw (err_str);
         }
 #endif
+
         continue;
       } else {
         char err_buf[500];
@@ -531,10 +515,7 @@ void DeSerializerCOPPERModule::event()
         printf("###########(DesCpr) caught Exception ###############\n");
         fflush(stdout);
 #endif
-        g_run_stop = 1;
         return;
-        //        pauseRun();
-        //        break;
       }
 #endif
       print_err.PrintError(m_shmflag, &g_status, err_str);

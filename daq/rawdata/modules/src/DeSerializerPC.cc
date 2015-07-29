@@ -115,6 +115,14 @@ void DeSerializerPCModule::initialize()
   m_prev_copper_ctr = 0xFFFFFFFF;
   m_prev_evenum = 0xFFFFFFFF;
 
+#ifdef NONSTOP
+  openRunStopNshm();
+#ifdef NONSTOP_DEBUG
+  printf("###########(DesCpr) prepare shm  ###############\n");
+  fflush(stdout);
+#endif
+#endif
+
   B2INFO("DeSerializerPC: initialize() done.");
 }
 
@@ -127,6 +135,18 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
     if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n , flag)) < 0) {
       if (errno == EINTR) {
         continue;
+      } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+
+#ifdef NONSTOP
+        // No data received within SO_RCVTIMEO
+        char err_buf[500];
+        sprintf(err_buf, "Failed to receive data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
+                __PRETTY_FUNCTION__, __LINE__);
+        printf("%s\n", err_buf); fflush(stdout);
+        string err_str = err_buf;
+        callCheckRunStop(err_str);
+#endif
+        continue;
       } else {
         char err_buf[500];
         sprintf(err_buf, "Failed to receive data(%s). Exiting...", strerror(errno));
@@ -134,6 +154,17 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
         sleep(1234567);
         exit(-1);
       }
+
+    } else if (read_size == 0) {
+#ifdef NONSTOP
+      // Connection is closed ( error )
+      char err_buf[500];
+      sprintf(err_buf, "Connection is closed by peer(%s). readsize = %d %d. Exiting...: %s %s %d",
+              strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      string err_str = err_buf;
+      g_run_error = 1;
+      throw (err_str);
+#endif
     } else {
       n += read_size;
       if (n == data_size_byte)break;
@@ -167,6 +198,11 @@ int DeSerializerPCModule::Connect()
 
     int val1 = 0;
     setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &val1, sizeof(val1));
+
+    struct timeval timeout;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &timeout, (socklen_t)sizeof(timeout));
 
     printf("[DEBUG] Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]);
     while (1) {
@@ -308,8 +344,17 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
   //
   int total_recvd_byte = 0;
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-    total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
-                               each_buf_nwords[ i ] * sizeof(int), flag);
+
+    try {
+      total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
+                                 each_buf_nwords[ i ] * sizeof(int), flag);
+    } catch (string err_str) {
+      if (*delete_flag) {
+        B2WARNING("Delete buffer before going to Run-pause state");
+        delete temp_buf;
+      }
+      throw (err_str);
+    }
 
     //
     // Data length check
@@ -346,7 +391,15 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
   // Read Traeiler
   int send_trl_buf[(unsigned int)(SendTrailer::SENDTRL_NWORDS) ];
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-    recvFD(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
+    try {
+      recvFD(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
+    } catch (string err_str) {
+      if (*delete_flag) {
+        B2WARNING("Delete buffer before going to Run-pause state");
+        delete temp_buf;
+      }
+      throw (err_str);
+    }
   }
 
   return temp_buf;
@@ -586,8 +639,6 @@ void DeSerializerPCModule::event()
   unsigned int eve_copper_0 = 0;
   int error_bit_flag = 0;
 
-
-
   clearNumUsedBuf();
 
   if (m_start_flag == 0) {
@@ -620,10 +671,14 @@ void DeSerializerPCModule::event()
     //
     int delete_flag_from = 0, delete_flag_to = 0;
     RawDataBlock temp_rawdatablk;
-    setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
-    //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
-    checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
-
+    try {
+      setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
+      //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
+      checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
+    } catch (string err_str) {
+      printf("%s\n", err_str.c_str()); fflush(stdout);
+      sleep(12345);
+    }
 #ifndef USE_DESERIALIZER_PREPC
     PreRawCOPPERFormat_latest pre_rawcopper_latest;
     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),

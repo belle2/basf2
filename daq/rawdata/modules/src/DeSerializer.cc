@@ -329,6 +329,10 @@ void DeSerializerModule::openRunStopNshm()
 
 int DeSerializerModule::checkRunStop()
 {
+  if (m_ptr == NULL) {
+    B2INFO("Shared memory is not assigned.");
+    return 0;
+  }
   if (*m_ptr) {
     return 1;
   } else {
@@ -338,6 +342,10 @@ int DeSerializerModule::checkRunStop()
 
 int DeSerializerModule::checkRunRecovery()
 {
+  if (m_ptr == NULL) {
+    B2INFO("Shared memory is not assigned.");
+    return 0;
+  }
   if (*m_ptr) {
     return 0;
   } else {
@@ -390,6 +398,29 @@ void DeSerializerModule::waitRestart()
   return;
 }
 
+
+
+void DeSerializerModule::callCheckRunStop(string& err_str)
+{
+#ifdef NONSTOP_DEBUG
+  printf("\033[34m");
+  printf("###########(Ser) TIMEOUT during send()  ###############\n");
+  fflush(stdout);
+  printf("\033[0m");
+#endif
+  if (checkRunStop()) {
+#ifdef NONSTOP_DEBUG
+    printf("\033[31m");
+    printf("###########(Ser) Stop is detected after return from send ###############\n");
+    fflush(stdout);
+    printf("\033[0m");
+#endif
+    g_run_stop = 1;
+
+    throw (err_str);
+  }
+  return;
+}
 
 
 #endif

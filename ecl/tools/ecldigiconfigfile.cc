@@ -1,31 +1,3 @@
-/*
-test scropt to calculated covariance matrices and write matrices and waveform
-parameters   into root tree
-
-The file CIdToEclData.txt defining the mapping of the crystal to
-ECLWaveformData object has to be present in the same directory
-
-
-function  writetestWF() read data from binary file and write into root tree
-function  matrix_cal() calculate matrices and write inverse cavariance matrices into binary files
-function  bit() read inverse cavariance matrices into binary files and calculate matrices capacity.
-These parameters write into tree and using for calculation calibration parameters inside simulation.
-function cut() calculation parameters from amplitude spectra for using in matrix_cal()
-
-
-gSystem->Load("libdataobjects")
-.L ecl/examples/writetestWF.C++
-writetestWF()
-matrix_cal(10)
-bit(10)
-cut()
-
-The file CIdToEclData.txt defining the mapping of the crystal to
-ECLWaveformData object has to be present in the same directory
-
-function Y1000 calculated covarian matrices from data and signal
-
-*/
 #include <TFile.h>
 #include <TTree.h>
 #include <ecl/dataobjects/ECLWaveformData.h>
@@ -223,16 +195,16 @@ float par[10] = {0.5, 0.6483, 0.4017, 0.3741, 0.8494, 0.00144547, 4.7071, 0.8156
 
 
 
-void writetestWF(int typ, const char* dataFileDir)
+void writeWF(int typ, char* dataFileDir, char* paramsDir)
 {
 
   double ss1[16][16];
 
-  Int_t kA[252];
-  Int_t kB[252];
-  Int_t kC[252];
-  Int_t k1[252];
-  Int_t k2[252];
+  vector<Int_t> kA(252, 0);
+  vector<Int_t> kB(252, 0);
+  vector<Int_t> kC(252, 0);
+  vector<Int_t> k1(252, 0);
+  vector<Int_t> k2(252, 0);
 
   int id0;
   int id1;
@@ -248,15 +220,11 @@ void writetestWF(int typ, const char* dataFileDir)
   // ORIGINAL files were at
   //  sprintf(BMin,"/gpfs/home/belle/avbobrov/ecl/covmat/eclwaveform2/bitst%d.dat",typ);
 
-  string inputFile("data/ecl/bitst");
+  string inputFile(paramsDir);
+  inputFile += "/bitst";
   inputFile += to_string(typ) + ".dat";
-  const string fileName = FileSystem::findFile(inputFile);
-  if (fileName.empty()) {
-    cout << "File " << inputFile << "not Found." << endl;
-    exit(1);
-  }
 
-  ifstream inputData(fileName.c_str());
+  ifstream inputData(inputFile);
   while (true) {
     inputData >> ifile >> id0 >> id1 >> id2 >> id3 >> id4 >> id5 >> id6;
     if (inputData.eof()) break;
@@ -309,45 +277,45 @@ void writetestWF(int typ, const char* dataFileDir)
 
 
   //    TFile f("ECL-WF.root","recreate");
-  TFile f("ECL-WF-BG-XX.root", "recreate");
+  TFile* f = new TFile("ECL-WF-BG-XX.root", "recreate");
 
-  TTree t("EclWF", "Waveform and covariance matrix");
-  TTree t2("EclAlgo", "Fitting algorithm parameters");
-  TTree t3("EclNoise", "Electronic noise matrix");
-  TTree t4("EclSampledSignalWF", "Signal Waveform in fine bins");
+  TTree* t =  new TTree("EclWF", "Waveform and covariance matrix");
+  TTree* t2 = new TTree("EclAlgo", "Fitting algorithm parameters");
+  TTree* t3 = new TTree("EclNoise", "Electronic noise matrix");
+  TTree* t4 = new TTree("EclSampledSignalWF", "Signal Waveform in fine bins");
 
   ECLWaveformData* data = new ECLWaveformData;
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   ECLNoiseData* noise = new ECLNoiseData;
 
   Int_t ncellId1;
-  Int_t cellId1[8736];
+  vector<Int_t> cellId1(8736);
   Int_t ncellId2;
-  Int_t cellId2[8736];
+  vector<Int_t> cellId2(8736);
   Int_t ncellId3;
-  Int_t cellId3[8736];
+  vector<Int_t> cellId3(8736);
 
-  t.Branch("CovarianceM", &data, 256000);
-  t.Branch("ncellId", &ncellId1, "ncellId/I");
-  t.Branch("cellId", cellId1, "cellId[ncellId]/I");
+  t->Branch("CovarianceM", &data, 256000);
+  t->Branch("ncellId", &ncellId1, "ncellId/I");
+  t->Branch("cellId", & cellId1[0], "cellId[ncellId]/I");
 
   cout << " t "  << endl;
 
-  t2.Branch("Algopars", &algo, 256000);
-  t2.Branch("ncellId", &ncellId2, "ncellId/I");
-  t2.Branch("cellId", cellId2, "cellId[ncellId]/I");
+  t2->Branch("Algopars", &algo, 256000);
+  t2->Branch("ncellId", &ncellId2, "ncellId/I");
+  t2->Branch("cellId", & cellId2[0], "cellId[ncellId]/I");
   cout << " t2 "  << endl;
 
-  t3.Branch("NoiseM", &noise, 256000);
-  t3.Branch("ncellId", &ncellId3, "ncellId/I");
-  t3.Branch("cellId", cellId3, "cellId[ncellId]/I");
+  t3->Branch("NoiseM", &noise, 256000);
+  t3->Branch("ncellId", &ncellId3, "ncellId/I");
+  t3->Branch("cellId", & cellId3[0], "cellId[ncellId]/I");
 
   cout << " t3 "  << endl;
 
   //  Int_t nbins = par_shape.size();
   auto shapeP = createDefSampledSignalWF();
-  t4.Branch("SignalShape", "std::vector<double>", &shapeP);
-  t4.Fill();
+  t4->Branch("SignalShape", "std::vector<double>", &shapeP);
+  t4->Fill();
 
   for (int n = 0; n < nGroups; n++) {
     cout << " !n: " << n << endl;
@@ -378,10 +346,10 @@ void writetestWF(int typ, const char* dataFileDir)
     }
     cout << " write 136+10 "  << endl;
 
-    t.Fill();
+    t->Fill();
 
 
-    cout << " t.Fill "  << endl;
+
     algo->ka = kA[n];
     algo->kb = kB[n];
     algo->kc = kC[n];
@@ -393,8 +361,8 @@ void writetestWF(int typ, const char* dataFileDir)
     algo->lowAmpThresh = 5;
     algo->skipThresh = -20;
 
-    t2.Fill();
-    cout << " t2.Fill "  << endl;
+    t2->Fill();
+
   }
 
   ncellId3 = 0;
@@ -406,10 +374,10 @@ void writetestWF(int typ, const char* dataFileDir)
   }
 
   cout << " write 496 "  << endl;
-  t3.Fill();
-  cout << " t3.Fill "  << endl;
+  t3->Fill();
 
-  t.Write(); t2.Write(); t3.Write(); t4.Write();
+  t->Write(); t2->Write(); t3->Write(); t4->Write();
+  f->Close();
 
 }
 
@@ -417,7 +385,15 @@ void writetestWF(int typ, const char* dataFileDir)
 int main(int argc, char** argv)
 
 {
-  assert(argc == 2);
-  writetestWF(3, argv[1]);
+  assert(argc == 4 || argc == 1);
+  if (argc == 1) {
+    cout << "Usage " << endl;
+    cout << argv[0] << " <type>  <covar_mat_path> <parameters_path>" << endl;
+    cout << "type is an integer idenfifying the source of the calibration" << endl;
+    cout << "cov_mat_path is the path to find where the directory corr<type> where the Binmcor*_L.dat files are located." << endl;
+    cout << "These files contain the covariance matrices." << endl;
+    cout << "parameters_path is the path to find bitst<type>.dat file that contains define parameters of the fit algorithms" << endl;
+  } else
+    writeWF(atoi(argv[1]), argv[2], argv[3]);
 }
 

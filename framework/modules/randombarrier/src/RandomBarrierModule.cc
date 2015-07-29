@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/modules/randombarrier/RandomBarrierModule.h>
+#include <framework/core/RandomNumbers.h>
 
 
 using namespace Belle2;
@@ -22,25 +23,18 @@ REG_MODULE(RandomBarrier)
 //                 Implementation
 //-----------------------------------------------------------------
 
-RandomBarrierModule::RandomBarrierModule() : Module(), m_random(NULL)
+RandomBarrierModule::RandomBarrierModule() : Module()
 {
   setDescription("Sets gRandom to an independent generator for the following modules.  E.g. a module chain of the sort [ParticleGun -> RandomBarrier -> FullSim] would use one RNG instance for the ParticleGun, and another for FullSim and all following modules. You may find this useful if you want to change the simulation, but don't want differences to affect the particle generation.  The output is equivalent to saving the output of ParticleGun in a file, and reading it again to do the simulation.  Correct separation is not provided for terminate(), don't use random numbers there.");
 }
 
 RandomBarrierModule::~RandomBarrierModule()
 {
-  delete m_random;
 }
 
 void RandomBarrierModule::initialize()
 {
-  //initialize from existing RNG (using a subset of the current state)
-  //if no random numbers have been used yet, m_random and gRandom now have the same state.
-  //Since they're used for different things, this should be ok.
-  delete m_random;
-  m_random = new TRandom3(gRandom->GetSeed());
-
-  gRandom = m_random;
+  RandomNumbers::barrier();
 }
 void RandomBarrierModule::terminate()
 {
@@ -49,13 +43,13 @@ void RandomBarrierModule::terminate()
 
 void RandomBarrierModule::beginRun()
 {
-  gRandom = m_random;
+  RandomNumbers::barrier();
 }
 void RandomBarrierModule::endRun()
 {
-  gRandom = m_random;
+  RandomNumbers::barrier();
 }
 void RandomBarrierModule::event()
 {
-  gRandom = m_random;
+  RandomNumbers::barrier();
 }

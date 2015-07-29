@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2015  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Christian Pulvermacher, Martin Ritter      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -130,7 +130,6 @@ namespace Belle2 {
 
     const Module* m_master;  /**< The master module that determines the experiment/run/event number **/
     ModulePtrList m_moduleList; /**< List of all modules in order initialized. */
-    TRandom* m_mainRNG; /**< The main random number generator. A copy of the gRandom pointer, to reset it at the beginning of module execution when using RandomBarrierModule. */
 
     /** Name of the module which should be profiled, empty if no profiling is requested */
     std::string m_profileModuleName;

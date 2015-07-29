@@ -67,7 +67,7 @@ void RandomSeedRestoreModule::initialize()
   }
 
   // Restore the random number generator
-  RandomNumbers::initialize(fileMetaData->getRandomSeed(), fileMetaData->getRandom());
+  RandomNumbers::initialize(fileMetaData->getRandomSeed());
   B2INFO("The random number seed was restored from the file " << m_fileName << ".");
 
   // Clean up

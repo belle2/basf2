@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2015  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Christian Pulvermacher, Martin Ritter      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/RandomNumbers.h>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
@@ -40,12 +41,9 @@
 #define CALL_MODULE(module, x) module->x()
 #endif
 
-#include <TRandom.h>
-
 #include <signal.h>
 #include <unistd.h>
 #include <cstring>
-
 
 using namespace std;
 using namespace Belle2;
@@ -81,7 +79,7 @@ void EventProcessor::writeToStdErr(const char msg[])
 }
 
 
-EventProcessor::EventProcessor() : m_master(NULL), m_mainRNG(NULL), m_processStatisticsPtr("", DataStore::c_Persistent),
+EventProcessor::EventProcessor() : m_master(NULL), m_processStatisticsPtr("", DataStore::c_Persistent),
   m_inRun(false)
 {
 
@@ -159,9 +157,6 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList)
 {
-  //store main RNG to be able to restore it later
-  m_mainRNG = gRandom;
-
   LogSystem& logSystem = LogSystem::Instance();
 
   m_processStatisticsPtr.registerInDataStore();
@@ -269,6 +264,8 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
 
       m_previousEventMetaData = *m_eventMetaDataPtr;
 
+      //initialize random number state for the event
+      RandomNumbers::initializeEvent();
       DBStore::Instance().updateEvent();
 
     } else {
@@ -314,8 +311,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
     if (collectStats)
       m_processStatisticsPtr->startGlobal();
 
-    gRandom = m_mainRNG;
-
     PathIterator moduleIter(startPath);
     endProcess = processEvent(moduleIter);
 
@@ -336,8 +331,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
 void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 {
-  gRandom = m_mainRNG;
-
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_reverse_iterator listIter;
   m_processStatisticsPtr->startGlobal();
@@ -364,13 +357,15 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
 void EventProcessor::processBeginRun()
 {
   m_inRun = true;
-  gRandom = m_mainRNG;
 
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
 
   DBStore::Instance().update();
+
+  //initialize random generator for end run
+  RandomNumbers::initializeBeginRun();
 
   for (listIter = m_moduleList.begin(); listIter != m_moduleList.end(); ++listIter) {
     Module* module = listIter->get();
@@ -386,7 +381,6 @@ void EventProcessor::processBeginRun()
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
   }
-  gRandom = m_mainRNG;
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_BeginRun);
 }
@@ -398,14 +392,15 @@ void EventProcessor::processEndRun()
     return;
   m_inRun = false;
 
-  gRandom = m_mainRNG;
-
   LogSystem& logSystem = LogSystem::Instance();
   ModulePtrList::const_iterator listIter;
   m_processStatisticsPtr->startGlobal();
 
   const EventMetaData newEventMetaData = *m_eventMetaDataPtr;
   *m_eventMetaDataPtr = m_previousEventMetaData;
+
+  //initialize random generator for end run
+  RandomNumbers::initializeEndRun();
 
   for (listIter = m_moduleList.begin(); listIter != m_moduleList.end(); ++listIter) {
     Module* module = listIter->get();
@@ -421,7 +416,6 @@ void EventProcessor::processEndRun()
     //Set the global log level
     logSystem.setModuleLogConfig(NULL);
   }
-  gRandom = m_mainRNG;
   *m_eventMetaDataPtr = newEventMetaData;
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_EndRun);

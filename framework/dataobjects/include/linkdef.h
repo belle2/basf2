@@ -21,4 +21,9 @@
 #pragma link C++ class Belle2::Helix+;
 #pragma link C++ class Belle2::UncertainHelix+;
 
+#pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
+  source="unsigned int m_randomSeed" \
+  targetClass="Belle2::FileMetaData" target="m_randomSeed" \
+  code="{m_randomSeed = TString::Format("%d", onfile.m_randomSeed);}"
+
 #endif

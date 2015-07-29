@@ -11,6 +11,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/RandomGenerator.h>
 
 
 namespace Belle2 {
@@ -52,6 +54,7 @@ namespace Belle2 {
     /** Current event number. */
     int m_nrecv;
 
+    StoreObjPtr<RandomGenerator> m_randomgenerator;
   };
 
 } // end namespace Belle2

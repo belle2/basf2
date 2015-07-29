@@ -232,7 +232,7 @@ void RootOutputModule::fillFileMetaData()
   if (!user) user = getlogin();
   if (!user) user = "unknown";
   fileMetaDataPtr->setCreationData(release, time(0), site, user);
-  fileMetaDataPtr->setRandom(RandomNumbers::getInitialSeed(), RandomNumbers::getInitialRandom());
+  fileMetaDataPtr->setRandomSeed(RandomNumbers::getSeed());
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
 
   //register the file in the catalog

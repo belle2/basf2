@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2015 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -28,7 +28,7 @@ ClassImp(FileMetaData)
 FileMetaData::FileMetaData() :
   m_id(0), m_guid(""), m_lfn(""), m_events(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
   m_experimentHigh(0), m_runHigh(0), m_eventHigh(0), m_release(""), m_timeStamp(0), m_site(""), m_user(""), m_logFile(0),
-  m_randomSeed(0), m_random(0), m_steering("")
+  m_randomSeed(""), m_steering("")
 {
 }
 
@@ -98,7 +98,6 @@ void FileMetaData::Print(Option_t* option) const
     cout << "  user   : " << m_user << endl;
     cout << "  log    : " << m_logFile << endl;
     cout << "  seed   : " << m_randomSeed << endl;
-    cout << "  random : " << m_random.GetSeed() << endl;
   }
 }
 

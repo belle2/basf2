@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2013 - Belle II Collaboration                        *
+ * Copyright(C) 2010-2015 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -110,11 +110,7 @@ namespace Belle2 {
 
     /** Random seed getter.
      */
-    unsigned int getRandomSeed() const {return m_randomSeed;}
-
-    /** Initital random number generator object getter.
-     */
-    const TRandom3& getRandom() const {return m_random;}
+    std::string getRandomSeed() const {return m_randomSeed;}
 
     /** Steering file content getter.
      */
@@ -173,7 +169,7 @@ namespace Belle2 {
      *  @param seed The random seed.
      *  @param random The random number generator object.
      */
-    void setRandom(unsigned int seed, const TRandom3& random) {m_randomSeed = seed; m_random = random;}
+    void setRandomSeed(const std::string& seed) {m_randomSeed = seed;}
 
     /** Steering file content setter.
      *
@@ -274,17 +270,13 @@ namespace Belle2 {
 
     /** The random seed.
      */
-    unsigned int m_randomSeed;
-
-    /** The initial random number generator object.
-     */
-    TRandom3 m_random;
+    std::string m_randomSeed;
 
     /** The steering file content.
      */
     std::string m_steering;
 
-    ClassDef(FileMetaData, 3); /**< Metadata information about a file. */
+    ClassDef(FileMetaData, 4); /**< Metadata information about a file. */
 
   }; //class
 

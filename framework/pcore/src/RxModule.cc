@@ -9,6 +9,7 @@
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/DataStoreStreamer.h>
+#include <framework/core/RandomNumbers.h>
 
 #include <TSystem.h>
 
@@ -45,6 +46,10 @@ void RxModule::readEvent()
       // Restore objects in DataStore
       EvtMessage evtmsg(evtbuf);
       m_streamer->restoreDataStore(&evtmsg);
+      // Restore the event dependent random number object from Datastore
+      if (m_randomgenerator.isValid()) {
+        RandomNumbers::getEventRandomGenerator() = *m_randomgenerator;
+      }
       break;
     }
     usleep(20);
@@ -56,6 +61,8 @@ void RxModule::readEvent()
 void RxModule::initialize()
 {
   gSystem->Load("libdataobjects");
+
+  m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);

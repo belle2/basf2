@@ -15,7 +15,6 @@
 #include <framework/pcore/DataStoreStreamer.h>
 
 #include <framework/core/Environment.h>
-#include <framework/core/RandomNumbers.h>
 #include <framework/logging/LogSystem.h>
 
 #include <TROOT.h>
@@ -168,10 +167,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     return;
   }
 
-  if (RandomNumbers::getInitialSeed() != 0) {
-    B2WARNING("You have manually specified a random seed to be used. Note that with parallel processing enabled, the order in which events are processed by which process is not defined, so results will not be reproducible. The specified seed will still be used for the input process (e.g. EvtGen) so the input should be fixed, but it will most likely be different compared to running the same file with -p0.");
-  }
-
   setupSignalHandler();
 
   //inserts Rx/Tx modules into path (sets up IPC structures)
@@ -251,9 +246,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (m_procHandler->isEventProcess()) {
       localPath = m_mainpathlist[m_mainpathlist.size() - 1];
       m_master = localPath->getModules().begin()->get(); //set Rx as master
-
-      //reinitialize random seed
-      RandomNumbers::initialize();
     }
   }
 

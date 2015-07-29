@@ -13,9 +13,6 @@
 
 #include <framework/core/Module.h>
 
-#include <TRandom3.h>
-
-
 namespace Belle2 {
   /**
    * Sets gRandom to an independent generator for the following modules.
@@ -46,8 +43,6 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-
-    TRandom* m_random; /**< the RNG to be used for modules following this one. */
   };
 }
 

@@ -11,6 +11,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/RandomGenerator.h>
 
 
 namespace Belle2 {
@@ -62,6 +64,7 @@ namespace Belle2 {
     /** Wether to block until we can insert data into the ring buffer in event(). */
     bool m_blockingInsert;
 
+    StoreObjPtr<RandomGenerator> m_randomgenerator;
   };
 
 } // end namespace Belle2

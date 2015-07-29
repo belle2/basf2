@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
@@ -36,6 +37,41 @@ namespace Belle2 {
         m_curlCurv(fabs(curlCurv)),
         m_rlWeightGain(rlWeightGain)
       {;}
+
+      /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
+       *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
+      inline Weight operator()(const CDCRecoSegment2D* recoSegment2D,
+                               const Phi0CurvBox* phi0CurvBox)
+      {
+        size_t nHits = recoSegment2D->size();
+        auto weightOfHit = [this, &phi0CurvBox](const Weight & totalWeight,
+        const CDCRecoHit2D & recoHit2D) -> Weight {
+          Weight hitWeight = this->operator()(&recoHit2D, phi0CurvBox);
+          return std::isnan(hitWeight) ? totalWeight : totalWeight + hitWeight;
+        };
+
+        Weight totalWeight = std::accumulate(recoSegment2D->begin(),
+                                             recoSegment2D->end(),
+                                             static_cast<Weight>(0.0),
+                                             weightOfHit);
+
+        // Require a efficiency of 66%
+        constexpr const Weight minEfficiency = 2.0 / 3;
+        if (totalWeight > nHits * minEfficiency) {
+          return totalWeight;
+        } else {
+          return NAN;
+        }
+      }
+
+      /** Checks if the two dimensional reconstructed hit is contained in a phi0 curv hough space.
+       *  Returns 1.0 if it is contained, returns NAN if it is not contained.
+       */
+      inline Weight operator()(const CDCRecoHit2D* recoHit2D,
+                               const Phi0CurvBox* phi0CurvBox)
+      {
+        return operator()(&(recoHit2D->getRLWireHit()), phi0CurvBox);
+      }
 
       /** Checks if the track hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.

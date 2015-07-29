@@ -52,16 +52,17 @@ namespace Belle2 {
 
     };
 
+    /// Placeholder for function call that should do nothing.
+    const std::function<void()> doNothing = []() {;};
+
     /// Execute a function n time and collect timing information about the duration of the execution.
-    template<class Function,
-             class SetUpFunction = std::function<void()>,
-             class TearDownFunction = std::function<void()> >
+    template<class Function >
     TimeItResult
     timeIt(size_t nExecutions,
            bool activateCallgrind,
            const Function& function,
-    const SetUpFunction& setUp = []() {;},
-    const TearDownFunction& tearDown = []() {;})
+           const std::function<void()>& setUp = doNothing,
+           const std::function<void()>& tearDown = doNothing)
     {
       using namespace std::chrono;
 

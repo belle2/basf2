@@ -55,6 +55,11 @@ namespace Belle2 {
       /// Copies the hit and trajectory content of this track to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
 
+      /** Splits the track into segments.
+       *  Note : No trajectory information is copied*/
+      std::vector<Belle2::TrackFindingCDC::CDCRecoSegment3D>
+      splitIntoSegments() const;
+
       /// Getter for the first reconstructed hit in the track.
       const Belle2::TrackFindingCDC::CDCRecoHit3D& getStartRecoHit3D() const
       { return front(); }

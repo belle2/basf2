@@ -222,7 +222,9 @@ namespace Belle2 {
       CDCRecoHit2D getRecoHit2D() const
       { return CDCRecoHit2D(m_rlWireHit, getRecoDisp2D()); }
 
-
+      /// Constructs a two dimensional reconstructed hit by carrying out the stereo ! projection to the wire reference postion
+      CDCRecoHit2D projectXY() const
+      { return getRecoHit2D(); }
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in
       Vector2D getRecoWirePos2D() const

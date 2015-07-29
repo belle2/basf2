@@ -11,5 +11,6 @@
 #pragma link C++ class vector<Belle2::ModuleStatistics>+;
 #pragma link C++ class Belle2::ProcessStatistics+;
 #pragma link C++ class Belle2::Environment+;
+#pragma link C++ class Belle2::RandomGenerator+;
 
 #endif

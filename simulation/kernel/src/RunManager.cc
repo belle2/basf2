@@ -9,15 +9,15 @@
  **************************************************************************/
 
 #include <simulation/kernel/RunManager.h>
+#include <simulation/kernel/RandomEngine.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/RandomNumbers.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/pcore/ProcHandler.h>
 
 #include <boost/foreach.hpp>
-#include "Random/Random.h"
+#include <CLHEP/Random/Random.h>
 
 #include <G4LogicalVolumeStore.hh>
 #include <G4RegionStore.hh>
@@ -40,11 +40,13 @@ RunManager& RunManager::Instance()
 
 void RunManager::Initialize()
 {
+  //Set the random number engine
+  CLHEP::HepRandom::setTheEngine(new RandomEngine());
+
   SetGeometryToBeOptimized(true);
   //Set geometry to be Initialized because there won't be any before the beginRun
   //FIXME: reverted to run independent
   //geometryInitialized = true;
-  CLHEP::HepRandom::setTheSeed(abs(static_cast<long>(RandomNumbers::getSeed())));
   G4RunManager::Initialize();
 }
 

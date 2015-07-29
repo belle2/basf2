@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/typedefs/SignType.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -15,15 +17,36 @@ namespace Belle2 {
     class SameSignChecker {
 
     public:
+      /** Check if four values have a common sign.
+       *  Returns PLUS if all signs are positive.
+       *  Returns MINUS if all signs are negative.
+       *  Returns ZERO for mixed signs.
+       */
+      static inline SignType commonSign(double n1, double n2, double n3, double n4)
+      {
+        return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0) -
+                (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0));
+      }
+
+      /** Check if two values have a common sign.
+       *  Returns PLUS if all signs are positive.
+       *  Returns MINUS if all signs are negative.
+       *  Returns ZERO for mixed signs.
+       */
+      static inline SignType commonSign(double n1, double n2)
+      {
+        return ((n1 > 0 and n2 > 0) - (n1 < 0 and n2 < 0));
+      }
+
       /// Check if four values have the same sign.
-      static inline bool sameSign(float n1, float n2, float n3, float n4)
+      static inline bool sameSign(double n1, double n2, double n3, double n4)
       {
         return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0) or
                 (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0));
       }
 
       /// Check if two values have the same sign.
-      static inline bool sameSign(float n1, float n2)
+      static inline bool sameSign(double n1, double n2)
       {
         return ((n1 > 0 and n2 > 0) or (n1 < 0 and n2 < 0));
       }

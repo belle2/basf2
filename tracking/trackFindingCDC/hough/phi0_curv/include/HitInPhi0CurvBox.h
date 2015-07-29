@@ -246,6 +246,25 @@ namespace Belle2 {
                                   const FloatType& signedDriftLength,
                                   const Phi0CurvBox* phi0CurvBox)
       {
+        SignType passes = passesObservation(globalR, globalPos2D, signedDriftLength, phi0CurvBox);
+        return passes == ZERO;
+      }
+
+      /** Checks if an observation (in the CDC)
+       *  can be assoziated to a trajectory in the phi0 curvature hough space box.
+       *
+       *  @param r                 (Precomputed) Cylindrical radius of the observed position
+       *  @param pos2D             Position of the observation
+       *  @param signedDirftLength Drift radius around position of the observation
+       *  @param phi0CurvBox       The phi0 curvature hough space region.
+       *  @returns                 True if the observation can be linked to a trajectory in the box.
+       */
+      SignType passesObservation(const FloatType& globalR,
+                                 const Vector2D& globalPos2D,
+                                 const FloatType& signedDriftLength,
+                                 const Phi0CurvBox* phi0CurvBox)
+
+      {
         Vector2D localPos2D = globalPos2D - m_localOrigin;
         FloatType localRSquare = globalR * globalR - 2 * globalPos2D.dot(m_localOrigin) + m_localOriginNormSquared;
 
@@ -259,10 +278,9 @@ namespace Belle2 {
         const bool isNonCurler = upperCurv <= m_curlCurv and lowerCurv >= -m_curlCurv;
         if (isNonCurler) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
-          if (parallelToPhi0[0] < 0 and parallelToPhi0[1] < 0) return false;
+          if (parallelToPhi0[0] < 0 and parallelToPhi0[1] < 0) return INVALID_SIGN;
         }
 
-        //const FloatType rReducedSquared = (localRSquare + signedDriftLength) * (localRSquare - signedDriftLength);
         const FloatType rReducedSquared = localRSquare - square(signedDriftLength);
 
         const FloatType rSquareTimesHalfCurv[2] = {
@@ -274,21 +292,21 @@ namespace Belle2 {
 
         // Calculate (approximate) distances of the observed position to
         // the trajectories represented by the corners of the box
-        float dist[2][2];
+        double dist[2][2];
         dist[0][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[0] - signedDriftLength;
         dist[0][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[0] - signedDriftLength;
         dist[1][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[1] - signedDriftLength;
         dist[1][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[1] - signedDriftLength;
 
-        // Sinogram separates at least one of the edges from the others.
-        const bool excludesOneEdge = not SameSignChecker::sameSign(dist[0][0],
-                                                                   dist[0][1],
-                                                                   dist[1][0],
-                                                                   dist[1][1]);
-        if (excludesOneEdge) return true;
-        return false;
+        // Ask if sinogram is completely outside the box.
+        SignType passingSide(SameSignChecker::commonSign(dist[0][0], dist[0][1],
+                                                         dist[1][0], dist[1][1]));
 
-        // Currently disable:
+        return passingSide;
+
+        // Currently disable and not ported to retain the sign.
+        // if (passingSide == ZERO) return ZERO;
+        // if (not m_refined) return passingSide;
         // if (not m_refined) return false;
         // // Continue to check if the extrema of the sinogram are in the box,
         // // while only touching only one boundary of the box

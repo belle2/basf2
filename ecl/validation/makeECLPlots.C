@@ -7,7 +7,7 @@
 /*
 <header>
 <input>ECLBkgOutput.root, ECLClusterOutput.root, ECLMuonOutput.root, ECLPionOutput.root</input>
-<output>ECLBkg.root, ECLCluster.root, ECLMuon.root, ECLPion.root</output>
+<output>ECLBkg.root, ECL2D.root, ECLMuon.root, ECLPion.root, ECLCluster.root</output>
 <contact>ecl2ml@bpost.kek.jp</contact>
 </header>
 */
@@ -256,6 +256,7 @@ void ECL2D(TTree* bkg_tree)
 
   BDyz->GetXaxis()->SetTitle("x (m)");
   BDyz->GetYaxis()->SetTitle("y (m)");
+  BDyz->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the ecl (upper part is phi<0, lower part phi>0)")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
@@ -270,6 +271,7 @@ void ECL2D(TTree* bkg_tree)
 
   BDyz7->GetXaxis()->SetTitle("x (m)");
   BDyz7->GetYaxis()->SetTitle("y (m)");
+  BDyz7->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz7->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the FWD ecl")); 
   BDyz7->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz7->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
@@ -281,6 +283,7 @@ void ECL2D(TTree* bkg_tree)
 
   BDyz8->GetXaxis()->SetTitle("x (m)");
   BDyz8->GetYaxis()->SetTitle("y (m)");
+  BDyz8->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz8->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in the BWD ecl")); 
   BDyz8->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz8->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
@@ -292,6 +295,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz9->Draw("colz");
   BDyz9->GetXaxis()->SetTitle("x (m)");
   BDyz9->GetYaxis()->SetTitle("y (m)");
+  BDyz9->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz9->GetListOfFunctions()->Add(new TNamed("Description","Cluster position in barrel ecl")); 
   BDyz9->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
   BDyz9->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 

@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/geometry/Helix.h>
-#include <tracking/trackFindingCDC/hough/phi0_curv/HitPhi0CurvLegendre.h>
+#include <tracking/trackFindingCDC/hough/phi0_curv/SimpleHitBasedPhi0CurvHough.h>
 #include <tracking/trackFindingCDC/utilities/TimeIt.h>
 
 #include <vector>
@@ -27,7 +27,7 @@ using namespace TrackFindingCDC;
 
 namespace {
 
-  TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0CurvLegendre_onHits)
+  TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_SimpleHitBasedPhi0CurvHough_onHits)
   {
     // Prepare event
     CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -55,7 +55,7 @@ namespace {
     // plotter.draw(lowerCurvTrajectory.reversed().getTrajectory2D());
     // plotter.draw(higherCurvTrajectory.getTrajectory2D());
 
-    plotter.save("legendre_event.svg");
+    plotter.save("simple_hit_event.svg");
 
     B2INFO("Size mc track 0 : " << mcTracks[0].size());
     B2INFO("Size mc track 1 : " << mcTracks[1].size());
@@ -83,10 +83,10 @@ namespace {
     // const size_t phiDivisions = 3;
     // const size_t curvDivisions = 3;
 
-    using WireHitPhi0CurvQuadLegendre =
-      HitPhi0CurvLegendre<RLTagged<const CDCWireHit*>, phi0Divisions, curvDivisions>;
-    WireHitPhi0CurvQuadLegendre wireHitPhi0CurvQuadLegendre(maxLevel, minCurv, maxCurv);
-    wireHitPhi0CurvQuadLegendre.initialize();
+    using RLTaggedWireHitPhi0CurvHough =
+      SimpleHitBasedPhi0CurvHough<CDCRLTaggedWireHit, phi0Divisions, curvDivisions>;
+    RLTaggedWireHitPhi0CurvHough rlTaggedWireHitPhi0CurvHough(maxLevel, minCurv, maxCurv);
+    rlTaggedWireHitPhi0CurvHough.initialize();
 
     std::vector<const CDCWireHit*> axialWireHits;
     for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
@@ -96,19 +96,18 @@ namespace {
     }
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<Phi0CurvBox, vector<RLTagged<const CDCWireHit*> > > > candidates;
+    vector< pair<Phi0CurvBox, vector<CDCRLTaggedWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
-      wireHitPhi0CurvQuadLegendre.fell();
-
-      wireHitPhi0CurvQuadLegendre.seed(axialWireHits);
+      rlTaggedWireHitPhi0CurvHough.fell();
+      rlTaggedWireHitPhi0CurvHough.seed(axialWireHits);
 
       const double minWeight = 30.0;
       const double maxCurv = NAN;
-      // candidates = wireHitPhi0CurvQuadLegendre.find(minWeight, maxCurv);
-      candidates = wireHitPhi0CurvQuadLegendre.findBest(minWeight, maxCurv);
+      // candidates = rlTaggedWireHitPhi0CurvHough.find(minWeight, maxCurv);
+      candidates = rlTaggedWireHitPhi0CurvHough.findBest(minWeight, maxCurv);
 
       // B2INFO("Execution " << iExecution);
       /// Check if exactly two candidates have been found
@@ -123,19 +122,19 @@ namespace {
 
     /// Test idiom to output statistics about the tree.
     std::size_t nNodes = 0;
-    using Node = WireHitPhi0CurvQuadLegendre::Node;
+    using Node = RLTaggedWireHitPhi0CurvHough::Node;
     auto countNodes = [&nNodes](Node*) -> bool {
       ++nNodes;
       return true;
     };
-    wireHitPhi0CurvQuadLegendre.getTree()->walk(countNodes);
+    rlTaggedWireHitPhi0CurvHough.getTree()->walk(countNodes);
     B2INFO("Tree generated " << nNodes << " nodes");
-    wireHitPhi0CurvQuadLegendre.fell();
-    wireHitPhi0CurvQuadLegendre.raze();
+    rlTaggedWireHitPhi0CurvHough.fell();
+    rlTaggedWireHitPhi0CurvHough.raze();
 
-    for (std::pair<Phi0CurvBox, std::vector<RLTagged<const CDCWireHit*> > >& candidate : candidates) {
+    for (std::pair<Phi0CurvBox, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;
-      const std::vector<RLTagged<const CDCWireHit*> >& taggedHits = candidate.second;
+      const std::vector<CDCRLTaggedWireHit>& taggedHits = candidate.second;
 
       B2INFO("Candidate");
       B2INFO("size " << taggedHits.size());
@@ -143,7 +142,7 @@ namespace {
       B2INFO("Curv " << phi0CurvBox.getLowerCurv());
       B2INFO("Tags of the hits");
 
-      for (const RLTagged<const CDCWireHit*>& rlTaggedWireHit : taggedHits) {
+      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
         B2INFO("    rl = " << rlTaggedWireHit.getRLInfo() <<
                " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
@@ -153,8 +152,8 @@ namespace {
     B2INFO("On average execution took " << timeItResult.getAverageSeconds() << " seconds " <<
            "in " << timeItResult.getNExecutions() << " executions.");
 
-    for (const RLTagged<const CDCWireHit*>& rlTaggedWireHit : candidates.at(0).second) {
-      const CDCWireHit* wireHit = rlTaggedWireHit;
+    for (const CDCRLTaggedWireHit& rlTaggedWireHit : candidates.at(0).second) {
+      const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
       std::string color = "blue";
       if (rlTaggedWireHit.getRLInfo() == RIGHT) {
         color = "green";
@@ -165,10 +164,10 @@ namespace {
       //EventDataPlotter::AttributeMap rl {{"stroke", "blue"}};
       plotter.draw(*wireHit, rl);
     }
-    plotter.save("legendre_event.svg");
+    plotter.save("simple_hit_event.svg");
 
-    for (const RLTagged<const CDCWireHit*>& rlTaggedWireHit : candidates.at(1).second) {
-      const CDCWireHit* wireHit = rlTaggedWireHit;
+    for (const CDCRLTaggedWireHit& rlTaggedWireHit : candidates.at(1).second) {
+      const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
       std::string color = "blue";
       if (rlTaggedWireHit.getRLInfo() == RIGHT) {
         color = "green";
@@ -179,14 +178,13 @@ namespace {
       //EventDataPlotter::AttributeMap rl {{"stroke", "red"}};
       plotter.draw(*wireHit, rl);
     }
-
-    plotter.save("legendre_event.svg");
+    plotter.save("simple_hit_event.svg");
 
   }
 }
 
 namespace {
-  TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_HitPhi0CurvLegendre_onSegments)
+  TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, hough_phi0_curv_SimpleHitBasedPhi0CurvHough_onSegments)
   {
     // Prepare event
     CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -250,10 +248,10 @@ namespace {
     // const size_t phiDivisions = 3;
     // const size_t curvDivisions = 3;
 
-    using SegmentPhi0CurvQuadLegendre =
-      HitPhi0CurvLegendre<const CDCRecoSegment2D*, phi0Divisions, curvDivisions>;
-    SegmentPhi0CurvQuadLegendre segmentPhi0CurvQuadLegendre(maxLevel, minCurv, maxCurv);
-    segmentPhi0CurvQuadLegendre.initialize();
+    using SegmentPhi0CurvHough =
+      SimpleHitBasedPhi0CurvHough<const CDCRecoSegment2D*, phi0Divisions, curvDivisions>;
+    SegmentPhi0CurvHough segmentPhi0CurvHough(maxLevel, minCurv, maxCurv);
+    segmentPhi0CurvHough.initialize();
 
     std::vector<const CDCRecoSegment2D*> axialSegments;
     for (const CDCRecoSegment2D& recoSegment2D : recoSegment2Ds) {
@@ -268,14 +266,14 @@ namespace {
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
-      segmentPhi0CurvQuadLegendre.fell();
+      segmentPhi0CurvHough.fell();
 
-      segmentPhi0CurvQuadLegendre.seed(axialSegments);
+      segmentPhi0CurvHough.seed(axialSegments);
 
       const double minWeight = 30.0;
       const double maxCurv = NAN;
-      // candidates = segmentPhi0CurvQuadLegendre.find(minWeight, maxCurv);
-      candidates = segmentPhi0CurvQuadLegendre.findBest(minWeight, maxCurv);
+      // candidates = segmentPhi0CurvHough.find(minWeight, maxCurv);
+      candidates = segmentPhi0CurvHough.findBest(minWeight, maxCurv);
 
       // B2INFO("Execution " << iExecution);
       /// Check if exactly two candidates have been found
@@ -290,16 +288,16 @@ namespace {
 
     /// Test idiom to output statistics about the tree.
     std::size_t nNodes = 0;
-    using Node = SegmentPhi0CurvQuadLegendre::Node;
+    using Node = SegmentPhi0CurvHough::Node;
     auto countNodes = [&nNodes](Node*) -> bool {
       ++nNodes;
       return true;
     };
-    segmentPhi0CurvQuadLegendre.getTree()->walk(countNodes);
+    segmentPhi0CurvHough.getTree()->walk(countNodes);
     B2INFO("Tree generated " << nNodes << " nodes");
 
-    segmentPhi0CurvQuadLegendre.fell();
-    segmentPhi0CurvQuadLegendre.raze();
+    segmentPhi0CurvHough.fell();
+    segmentPhi0CurvHough.raze();
 
     for (std::pair<Phi0CurvBox, std::vector<const CDCRecoSegment2D*> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;

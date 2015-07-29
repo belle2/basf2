@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
@@ -144,11 +145,11 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the box.
        */
-      inline Weight operator()(RLTagged<const CDCWireHit*>& rlTaggedWireHit,
+      inline Weight operator()(CDCRLTaggedWireHit& rlTaggedWireHit,
                                const Phi0CurvBox* phi0CurvBox)
       {
         const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
-        const CDCWireHit* wireHit = rlTaggedWireHit;
+        const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
 
         const FloatType driftLength = wireHit->getRefDriftLength();
         const Vector2D& pos2D =  wireHit->getRefPos2D();

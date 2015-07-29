@@ -12,18 +12,21 @@
 #define TPCDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
 
-//ROOT
 #include <TRandom3.h>
 #include <TF1.h>
 #include <TVector3.h>
+#include <TVector2.h>
+#include <TLorentzVector.h>
+
+#include <vector>
+#include <map>
+#include <tuple>
 
 /** size of hit */
-const Int_t MAXSIZE         = 30000;
+constexpr int MAXSIZE = 30000;
 /** size of pixel hit */
-const Int_t MAXtSIZE        = 1000;
+constexpr int MAXtSIZE = 1000;
 
 namespace Belle2 {
   namespace microtpc {
@@ -45,47 +48,51 @@ namespace Belle2 {
       /**  */
       virtual ~TpcDigitizerModule();
 
-      /**  */
-      virtual void initialize();
+      /** Initialize the Module.
+       * This method is called only once before the actual event processing starts.
+       */
+      virtual void initialize() override;
 
-      /**  */
-      virtual void beginRun();
+      /** Called when entering a new run.
+       */
+      virtual void beginRun() override;
 
-      /**  */
-      virtual void event();
+      /** This method is the core of the module.
+       * This method is called for each event. All processing of the event has to take place in this method.
+       */
+      virtual void event() override;
 
-      /**  */
-      virtual void endRun();
-      /**  */
-      virtual void terminate();
+      /** This method is called if the current run ends.
+       */
+      virtual void endRun() override;
+
+      /** This method is called at the end of the event processing.
+       */
+      virtual void terminate() override;
 
 
     private:
 
       /** reads data from MICROTPC.xml: tube location, drift data filename, sigma of impulse response function */
-      virtual void getXMLData();
+      void getXMLData();
 
       /** Produces the pixelization */
-      virtual bool Pixelization(int);
+      bool Pixelization(int);
 
-      /** Drift ionization */
-      virtual void Drift(double, double, double, double&, double&, double&, double&, double, double, double);
-
-      /** Drift 2 ionization */
-      virtual void Drift2(double, double, double, double&, double&, double&, double&, double, double, double, double, double, double,
-                          double, double, double);
+      /** Drift ionization
+       * Make the ionization drifting from (x,y,z) to GEM1 top plane
+       * */
+      TLorentzVector Drift(
+        double x1, double y1, double z1,
+        double st, double sl, double vd
+      );
 
       /** GEMazition of GEM1 */
-      virtual void GEMGeo1(double, double, double&, double&);
+      TVector2 GEMGeo1(double x1, double y1);
 
       /** GEMazition of GEM2 */
-      virtual void GEMGeo2(double, double, double&, double&);
+      TVector2 GEMGeo2(double x1, double y1);
 
-      /** Pseudo-gaus calculated from a uniformly random numbers between -1 and 1 */
-      virtual double pseudo_gaus(double, double, double, double);
-
-      /** Define random variable */
-      //TRandom3* fRandom;
       /** Define ToT calib 1 */
       TF1* fctToT_Calib1;
       /** Define ToT calib 2 */
@@ -160,8 +167,6 @@ namespace Belle2 {
       double m_v_TG;
       /** Drift velocity in collection gap */
       double m_v_CG;
-      /** Pressure in vessel */
-      double m_P_vessel;
       /** Work function */
       double m_Workfct;
       /** Fano factor */
@@ -169,29 +174,14 @@ namespace Belle2 {
       /** Absorption in gas */
       double m_GasAbs;
       /** chip store arrays */
-      int dchip[10][80][336][MAXtSIZE];
-      //int dchip[80][336][MAXtSIZE];
-      /** Particle ID array */
-      //int partID[10][80][336][MAXtSIZE];
+//      int m_dchip[10][80][336][MAXtSIZE];
+      std::map<std::tuple<int, int, int, int>, int> m_dchip;
       /** Flag 0/1 only look at nuclear recoils*/
       int m_LookAtRec;
       /** number of detectors. Read from MICROTPC.xml*/
-      int nTPC = 0;
+      int m_nTPC = 0;
       /** TPC coordinate */
-      std::vector<TVector3> TPCCenter;
-      /** Event counter */
-      int Event = 0;
-      /** col vector */
-      //std::vector<int> colArray;
-      /** row vector */
-      //std::vector<int> rowArray;
-      /** tot vector */
-      //std::vector<int> totArray;
-      /** bci vector */
-      //std::vector<int> bciArray;
-      /** Random Array */
-      //double RNDnb[MAXtSIZE];
-
+      std::vector<TVector3> m_TPCCenter;
     };
 
   }

@@ -26,10 +26,6 @@
 //c++
 #include <cmath>
 #include <boost/foreach.hpp>
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <fstream>
 #include <vector>
 
 // ROOT
@@ -39,7 +35,6 @@
 #include <TFile.h>
 
 
-using namespace std;
 using namespace Belle2;
 using namespace microtpc;
 
@@ -95,7 +90,6 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   addParam("v_DG", m_v_DG, "Drift velocity in gap distance [cm/ns]", 0.00100675);
   addParam("v_TG", m_v_TG, "Drift velocity in transfer gap [cm/ns]", 0.0004079);
   addParam("v_CG", m_v_CG, "Drift velocity in collection gap [cm/ns]", 0.00038828);
-  //addParam("P_vessel", m_P_vessel,"Pressure in vessel [atm]",1.0);
   addParam("Workfct", m_Workfct, "Work function", 35.075);
   addParam("Fanofac", m_Fanofac, "Fano factor", 0.19);
   addParam("GasAbs", m_GasAbs, "Gas absorption", 0.05);
@@ -121,18 +115,6 @@ void TpcDigitizerModule::initialize()
   fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
 
-  //for (int i = 0; i < MAXtSIZE; i++) RNDnb[i] = gRandom->Uniform(-1., 1.);
-
-  for (int i = 0; i < nTPC; i++) {
-    for (int j = 0; j < 80; j++) {
-      for (int k = 0; k < 336; k++) {
-        for (int l = 0; l < MAXtSIZE; l++) {
-          dchip[i][j][k][l] = 0;
-          //dchip[j][k][l] = 0;
-        }
-      }
-    }
-  }
 }
 
 void TpcDigitizerModule::beginRun()
@@ -141,165 +123,106 @@ void TpcDigitizerModule::beginRun()
 
 void TpcDigitizerModule::event()
 {
+  StoreArray<MCParticle> mcParticles;
+  StoreArray<MicrotpcSimHit> microtpcSimHits;
 
-  StoreArray<MCParticle> particles;
-  StoreArray<MicrotpcSimHit> TpcSimHits;
+  std::vector<double> T0(m_nTPC, 1000000.);  // TODO: why this number? it should defined somewhere else more clearly
+  std::vector<bool> PixelFired(m_nTPC, false);
 
-  //Skip events with no TpcSimHits, but continue the event counter
-  if (TpcSimHits.getEntries() == 0) {
-    Event++;
-    return;
+  for (const auto& microtpcSimHit : microtpcSimHits) {
+    const int detNb = microtpcSimHit.getdetNb();
+    const TVector3 trackPosition = microtpcSimHit.gettkPos();
+    const double T = trackPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG;
+    if (T < T0[detNb]) {
+      T0[detNb] = T;
+    }
   }
 
-  //Determine T0 for each TPC
-  int nentries = TpcSimHits.getEntries();
-
-  double T0[nTPC];
-  bool PixelFired[nTPC];
-  for (int i = 0; i < nTPC; i++) {
-    T0[i] = 1000000.;
-    PixelFired[i] = false;
+  for (auto& val : T0) {
+    if (0. < val && val < 1000000.) {
+      val = val / m_v_DG;
+    } else {
+      val = -1.;
+    }
   }
-  for (int i = 0; i < nentries; i++) {
-    MicrotpcSimHit* aHit = TpcSimHits[i];
-    int detNb = aHit->getdetNb();
-    TVector3 posn = aHit->gettkPos() ;
-    double T = posn.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
-    if (T < T0[detNb])T0[detNb] = T;
-  }
-
-  for (int i = 0; i < nTPC; i++) {
-    if (0. < T0[i] && T0[i] < 1000000.) {
-      T0[i] = T0[i] / m_v_DG;
-    } else T0[i] = -1.;
-  }
-
 
   //loop on all entries to store in 3D the ionization for each TPC
-  int i_rnd = 0;
-  for (int i = 0; i < nentries; i++) {
-    MicrotpcSimHit* aHit = TpcSimHits[i];
+  for (const auto& microtpcSimHit : microtpcSimHits) {
 
-    int PDGid = aHit->gettkPDG();
-    if (m_LookAtRec == 1)
-      if (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212)continue;
-    //if(oldPID!=PDGid && iPID[i]<100){
-    //partID[detNb][iPID[i]]=PDGid;
-    //oldPID = PDGid;
-    //iPID[i]++;
-    //}
+    const int PDGid = microtpcSimHit.gettkPDG();
+    if (m_LookAtRec == 1) {
+      if (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212) {
+        continue;
+      }
+    }
 
-    int detNb = aHit->getdetNb();
-    double edep = aHit->getEnergyDep();
-    double niel = aHit->getEnergyNiel();
+    const int detNb = microtpcSimHit.getdetNb();
+    const double edep = microtpcSimHit.getEnergyDep();
+    const double niel = microtpcSimHit.getEnergyNiel();
 
-    TVector3 position = aHit->gettkPos();
-    double xpos = position.X() / 100. - TPCCenter[detNb].X();
-    double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
-    double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
+    const TVector3 position = microtpcSimHit.gettkPos();
+    const TVector3 realPosition(  // TODO: Is this name representing what it really is?
+      position.X() / 100. - m_TPCCenter[detNb].X(),
+      position.Y() / 100. - m_TPCCenter[detNb].Y(),
+      position.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG
+    );
 
     //check if ionization within sensitive volume
-    if ((-m_ChipColumnX < xpos && xpos < m_ChipColumnX) &&
-        (-m_ChipRowY < ypos && ypos <  m_ChipRowY) &&
-        (0. < zpos && zpos <  m_z_DG) &&
+    if ((-m_ChipColumnX < realPosition.X() && realPosition.X() < m_ChipColumnX) &&
+        (-m_ChipRowY < realPosition.Y() && realPosition.Y() <  m_ChipRowY) &&
+        (0. < realPosition.Z() && realPosition.Z() <  m_z_DG) &&
         (0. < T0[detNb] && T0[detNb] < 1000000.)) {
 
       //ionization energy
       //MeV -> keV
-      double ionEn = (edep - niel) * 1e3;
+      const double ionEn = (edep - niel) * 1e3; // TODO: Use Unit constants instead of self made magic numbers
       // check if enough energy to ionize if not break
       // keV -> eV
 
-      if ((ionEn * 1e3) <  m_Workfct) break;
+      if ((ionEn * 1e3) <  m_Workfct) break; // TODO: Use Unit constants instead of self made magic numbers
       ////////////////////////////////
       // check if enough energy to ionize
-      else if ((ionEn * 1e3) >  m_Workfct) {
+      else if ((ionEn * 1e3) >  m_Workfct) { // TODO: Use Unit constants instead of self made magic numbers
 
-        double meanEl = ionEn * 1e3 /  m_Workfct;
-        double sigma = sqrt(m_Fanofac * meanEl);
-        int NbEle = (int)gRandom->Gaus(meanEl, sigma);
-        /*
-        if (i_rnd > MAXtSIZE - 2)i_rnd = 0;
-        int NbEle = (int)pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], meanEl, sigma);
-        i_rnd = i_rnd + 2;
-        */
-        double  NbEle_real = 0;
-        NbEle_real  = NbEle - NbEle * m_GasAbs * zpos;
+        const double meanEl = ionEn * 1e3 /  m_Workfct;
+        const double sigma = sqrt(m_Fanofac * meanEl);
+        const int NbEle = (int)gRandom->Gaus(meanEl, sigma);
+        const double NbEle_real = NbEle - NbEle * m_GasAbs * realPosition.Z();
+
         // start loop on the number of electron-ion-pairs at each interaction point
-
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
-          double x_DG, y_DG, z_DG, t_DG;
-          //drift ionization to GEM 1 plane
 
-          Drift(xpos,
-                ypos,
-                zpos,
-                x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
-          /*
-          if (i_rnd > MAXtSIZE - 6)i_rnd = 0;
-                Drift2(xpos,
-                       ypos,
-                       zpos,
-                       x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG,
-                       RNDnb[i_rnd], RNDnb[i_rnd + 1],
-                       RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
-                       RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
-                i_rnd = i_rnd + 6;
-          */
+          //drift ionization to GEM 1 plane
+          const TLorentzVector DG(Drift(realPosition.X(), realPosition.Y(), realPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
+
           //calculate and scale 1st GEM gain
-          double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
-          /*
-          if (i_rnd > MAXtSIZE - 2)i_rnd = 0;
-          double GEM_gain1 = pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
-          i_rnd = i_rnd + 2;
-          */
+          const double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
+
           //calculate and scale 2nd GEM gain
-          double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
-          /*
-          if (i_rnd > MAXtSIZE - 2)i_rnd = 0;
-          double GEM_gain2 = pseudo_gaus(RNDnb[i_rnd], RNDnb[i_rnd + 1], m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
-          i_rnd = i_rnd + 2;
-          */
+          const double GEM_gain2 = gRandom->Gaus(m_GEMGain2, m_GEMGain2 * m_GEMGainRMS2) / m_ScaleGain2;
+
           ///////////////////////////////
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
-            double x_GEM1, y_GEM1;
             //1st GEM geometrical effect
-            GEMGeo1(x_DG, y_DG, x_GEM1, y_GEM1);
-            double x_TG, y_TG, z_TG, t_TG;
+            const TVector2 GEM1(GEMGeo1(DG.X(), DG.Y()));
             //drift 1st amplication to 2nd GEM
-            Drift(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
-            /*
-            if (i_rnd > MAXtSIZE - 6)i_rnd = 0;
-            Drift2(x_GEM1, y_GEM1, m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG,
-                   RNDnb[i_rnd], RNDnb[i_rnd + 1],
-                   RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
-                   RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
-            i_rnd = i_rnd + 6;
-            */
+            const TLorentzVector TG(Drift(GEM1.X(), GEM1.Y(), m_z_TG, m_Dt_TG, m_Dl_TG, m_v_TG));
+
             ///////////////////////////////
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
-              double x_GEM2, y_GEM2;
               //2nd GEN geometrical effect
-              GEMGeo2(x_TG, y_TG, x_GEM2, y_GEM2);
-              double x_CG, y_CG, z_CG, t_CG;
+              const TVector2 GEM2(GEMGeo2(TG.X(), TG.Y()));
               //drift 2nd amplification to chip
-              Drift(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
-              /*
-              if (i_rnd > MAXtSIZE - 6)i_rnd = 0;
-              Drift2(x_GEM2, y_GEM2, m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG,
-                     RNDnb[i_rnd], RNDnb[i_rnd + 1],
-                     RNDnb[i_rnd + 2], RNDnb[i_rnd + 3],
-                     RNDnb[i_rnd + 4], RNDnb[i_rnd + 5]);
-              i_rnd = i_rnd + 6;
-              */
+              const TLorentzVector CG(Drift(GEM2.X(), GEM2.Y(), m_z_CG, m_Dt_CG, m_Dl_CG, m_v_CG));
+
               //determine col, row, and bc
-              int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
-              int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
-              int pix = col +  m_ChipColumnNb * row;
-              int quT = gRandom->Uniform(-1, 1);
-              int bci = (int)((t_DG + t_TG + t_CG - T0[detNb]) / (double)m_PixelTimeBin) + quT;
+              const int col = (int)((CG.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
+              const int row = (int)((CG.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
+              const int pix = col +  m_ChipColumnNb * row;
+              const int quT = gRandom->Uniform(-1, 1);
+              int bci = (int)((DG.T() + TG.T() + CG.T() - T0[detNb]) / (double)m_PixelTimeBin) + quT;
               if (bci < 0)bci = 0;
 
               //check if amplified drifted electron are within pixel boundaries
@@ -309,11 +232,9 @@ void TpcDigitizerModule::event()
                   (0 <= bci && bci < MAXtSIZE)) {
                 PixelFired[detNb] = true;
                 //store info into 3D array for each TPCs
-                dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
-                //partID[detNb][col][row][bci] = PDGid;
-                // ( detNb + 1 ) * (bci + 1 ) * ( col * m_ChipRowNb + row)
+//                m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
               }
-              i_rnd++;
             }
           }
         }
@@ -322,27 +243,23 @@ void TpcDigitizerModule::event()
   }
 
   //Pixelization of the 3D ionization cloud
-  for (int i = 0; i < nTPC; i++) {
+  for (int i = 0; i < m_nTPC; i++) {
     if (0. < T0[i] && T0[i] < 1000000. && PixelFired[i]) {
       Pixelization(i);
-      for (int j = 0; j < 80; j++) {
-        for (int k = 0; k < 336; k++) {
-          for (int l = 0; l < MAXtSIZE; l++) {
-            dchip[i][j][k][l] = 0;
-          }
-        }
-      }
     }
   }
-
-  Event++;
-
+  m_dchip.clear();
 }
-//Make the ionization drifting from (x,y,z) to GEM1 top plane
-void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, double& y2, double& z2, double& t2, double st,
-                               double sl, double vd)
+
+TLorentzVector TpcDigitizerModule::Drift(
+  double x1, double y1, double z1,
+  double st, double sl, double vd
+)
 {
-  //check if
+  double x2 = 0;
+  double y2 = 0;
+  double z2 = 0;
+  double t2 = 0;
   if (z1 > 0.) {
     //transverse diffusion
     x2 = x1 + gRandom->Gaus(0., sqrt(z1) * st);
@@ -355,72 +272,59 @@ void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, doub
   } else {
     x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
   }
+  return TLorentzVector(x2, y2, z2, t2);
 }
-//Make the ionization drifting from (x,y,z) to GEM1 top plane
-void TpcDigitizerModule::Drift2(double x1, double y1, double z1, double& x2, double& y2, double& z2, double& t2, double st,
-                                double sl, double vd, double rnd1, double rnd2, double rnd3, double rnd4, double rnd5, double rnd6)
+
+TVector2 TpcDigitizerModule::GEMGeo1(double x1, double y1)
 {
-  //check if
-  if (z1 > 0.) {
-    //transverse diffusion
-    x2 = x1 + pseudo_gaus(rnd1, rnd2, 0.0, sqrt(z1) * st);
-    //transverse diffusion
-    y2 = y1 + pseudo_gaus(rnd3, rnd4, 0.0, sqrt(z1) * st);
-    //longitidinal diffusion
-    z2 = z1 + pseudo_gaus(rnd5, rnd6, 0.0, sqrt(z1) * sl);
-    //time to diffuse
-    t2 = z2 / vd;
-  } else {
-    x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
-  }
-}
-//Make GEMization of GEM1
-void TpcDigitizerModule::GEMGeo1(double x1, double y1, double& x2, double& y2)
-{
-  y2 = (int)(y1 / (sqrt(3. / 4.) * m_GEMpitch) + (y1 < 0 ? -0.5 : 0.5)) * sqrt(3. / 4.) * m_GEMpitch;
-  int yint  = (int)(y1 / (sqrt(3. / 4.) * m_GEMpitch) + 0.5);
-  if (yint % 2)
+  static const double sqrt3o4 = std::sqrt(3. / 4.);
+  double x2 = 0;
+  double y2 = (int)(y1 / (sqrt3o4 * m_GEMpitch) + (y1 < 0 ? -0.5 : 0.5)) * sqrt3o4 * m_GEMpitch;
+  int yint  = (int)(y1 / (sqrt3o4 * m_GEMpitch) + 0.5);
+  if (yint % 2) {
     x2 =  static_cast<int>(x1 / m_GEMpitch + (x1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
-  else
+  } else {
     //everysecond row is shifted with half a pitch
     x2 = (static_cast<int>(x1 / m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
+  }
+  return TVector2(x2, y2);
 }
-//Make GEMization of GEM2
-void TpcDigitizerModule::GEMGeo2(double x1, double y1, double& x2, double& y2)
+
+TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
 {
-  x2 = (int)(x1 / (sqrt(3. / 4.) * m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * sqrt(3. / 4.) * m_GEMpitch;
-  int yint  = (int)(x1 / (sqrt(3. / 4.) * m_GEMpitch) + 0.5);
-  if (yint % 2)
+  static const double sqrt3o4 = std::sqrt(3. / 4.);
+  double x2 = (int)(x1 / (sqrt3o4 * m_GEMpitch) + (x1 < 0 ? -0.5 : 0.5)) * sqrt3o4 * m_GEMpitch;
+  double y2 = 0;
+  int yint  = (int)(x1 / (sqrt3o4 * m_GEMpitch) + 0.5);
+  if (yint % 2) {
     y2 =  static_cast<int>(y1 / m_GEMpitch + (y1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
-  else
+  } else {
     //everysecond row is shifted with half a pitch
     y2 = (static_cast<int>(y1 / m_GEMpitch) + (y1 < 0 ? -0.5 : 0.5)) * m_GEMpitch;
+  }
+  return TVector2(x2, y2);
 }
-//Make pixel hit
+
 bool TpcDigitizerModule::Pixelization(int detNb)
 {
-  vector <int> t0; t0.clear();
-  vector <int> col; col.clear();
-  vector <int> row; row.clear();
-  vector <int> ToT; ToT.clear();
-  vector <int> bci; bci.clear();
-  vector <int> ran; ran.clear();
-  //vector <int> pid; pid.clear();
-  //int pid[100];
-  //for(int i=0;i<20;i++)pid[i]=partID[detNb][i]
-  StoreArray<MicrotpcHit> TpcHits;
+  std::vector<int> t0;
+  std::vector<int> col;
+  std::vector<int> row;
+  std::vector<int> ToT;
+  std::vector<int> bci;
+
+  StoreArray<MicrotpcHit> microtpcHits;
 
   //loop on col.
   for (int i = 0; i < (int)m_ChipColumnNb; i++) {
     //loop on row
     for (int j = 0; j < (int)m_ChipRowNb; j++) {
       int k0 = -10;
-      int quE = gRandom->Uniform(0, 2);
-      double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
+      const int quE = gRandom->Uniform(0, 2);
+      const double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
       //determined t0 ie first time above pixel threshold
       for (int k = 0; k < MAXtSIZE; k++) {
-        if (dchip[detNb][i][j][k] > thresEl) {
-          //if (dchip[i][j][k] > thresEl) {
+        if (m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)] > thresEl) {
           k0 = k;
           break;
         }
@@ -434,27 +338,23 @@ bool TpcDigitizerModule::Pixelization(int detNb)
         for (int k = k0; k < MAXtSIZE; k++) {
           //sum up charge with 16 cycles
           if (ik < 16) {
-            NbOfEl += dchip[detNb][i][j][k];
-            //NbOfEl += dchip[i][j][k];
+            NbOfEl += m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)];
           } else {
             //calculate ToT
             int tot = -1;
-            //tot = (int) ( (NbOfEl - iPixelThreshold[0]) * PixelGAIN) + quE;
-            if (NbOfEl > thresEl && NbOfEl <= 45.*m_TOTQ1)
+            if (NbOfEl > thresEl && NbOfEl <= 45.*m_TOTQ1) {
               tot = (int)fctToT_Calib1->Eval((double)NbOfEl) + quE;
-            else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1)
+            } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
               tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
-            else if (NbOfEl > 800.*m_TOTQ1)
+            } else if (NbOfEl > 800.*m_TOTQ1) {
               tot = 14;
-            if (tot > 13)tot = 14;
+            }
+            if (tot > 13) {
+              tot = 14;
+            }
             if (tot >= 0) {
-              int nbofel = NbOfEl;
-              ran.push_back(nbofel);
               ToT.push_back(tot);
-
-              //find start time
               t0.push_back(k0);
-              //pid.push_back(partID[detNb][i][j][k]);
               col.push_back(i);
               row.push_back(j);
               bci.push_back(k0);
@@ -465,10 +365,9 @@ bool TpcDigitizerModule::Pixelization(int detNb)
           ik++;
         }
       }
-    }
-    //end loop on row
-  }
-  // end loop on col
+    } //end loop on row
+  } // end loop on col
+
   bool PixHit = false;
   //if entry
   if (bci.size() > 0) {
@@ -478,16 +377,13 @@ bool TpcDigitizerModule::Pixelization(int detNb)
 
     //loop on nb of hit
     for (int i = 0; i < (int)bci.size(); i++) {
-
-      if ((bci[i] - t0[0]) > (m_PixelTimeBinNb - 1))continue;
-
+      if ((bci[i] - t0[0]) > (m_PixelTimeBinNb - 1)) {
+        continue;
+      }
       //create MicrotpcHit
-      //TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb, pid[i]));
-      TpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb));
-    }
-    //end on loop nb of hit
-  }
-  //end if entry
+      microtpcHits.appendNew(MicrotpcHit(col[i], row[i], bci[i] - t0[0], ToT[i], detNb));
+    } //end on loop nb of hit
+  } //end if entry
 
   return PixHit;
 }
@@ -501,9 +397,9 @@ void TpcDigitizerModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
-                                 activeParams.getLength("TPCpos_z")));
-    nTPC++;
+    m_TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
+                                   activeParams.getLength("TPCpos_z")));
+    m_nTPC++;
   }
   m_LookAtRec = content.getDouble("LookAtRec");
   m_GEMGain1 = content.getDouble("GEMGain1");
@@ -546,25 +442,8 @@ void TpcDigitizerModule::getXMLData()
   m_GasAbs = content.getDouble("GasAbs");
 
   B2INFO("TpcDigitizer: Aquired tpc locations and gas parameters");
-  B2INFO("              from MICROTPC.xml. There are " << nTPC << " TPCs implemented");
+  B2INFO("              from MICROTPC.xml. There are " << m_nTPC << " TPCs implemented");
 
-}
-double TpcDigitizerModule::pseudo_gaus(double rnd1, double rnd2, double mean, double sigma)
-{
-  static double n2 = 0.0;
-  static int n2_cached = 0;
-  if (!n2_cached) {
-    double r = rnd1 * rnd1 + rnd2 * rnd2;
-    double d = sqrt(-2.0 * log(r) / r);
-    double n1 = rnd1 * d;
-    n2 = rnd2 * d;
-    double result = n1 * sigma + mean;
-    n2_cached = 1;
-    return result;
-  } else {
-    n2_cached = 0;
-    return n2 * sigma + mean;
-  }
 }
 
 void TpcDigitizerModule::endRun()

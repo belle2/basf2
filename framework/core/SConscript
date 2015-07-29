@@ -1,0 +1,7 @@
+Import('env')
+# Add sha3 headers so that they can be found by Hash.h and Hash.cc, they are not
+# needed by anyone else.
+# TODO: this should be in utilities/keccak_sha3 but that would require some
+# changes in how process_dir creates the object files
+env.Append(CPPPATH=["include/framework/utilities/keccak_sha3"])
+Return('env')

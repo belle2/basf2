@@ -264,5 +264,5 @@ Targets:
                                   where the target can be lib, bin, etc.
   <package>/<dir>               Build only the code in the given subdirectory.
   <package>/<dir>.<target>      Build only the target in the given
-                                  subdirectory.                                
+                                  subdirectory.
 """)

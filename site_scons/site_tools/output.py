@@ -20,7 +20,7 @@ color_map_none = {
     'map': '',
     'dict': '',
     'cleanup': '',
-    }
+}
 color_map_light = {
     'end': '\033[0m',
     'compile': '\033[94m',
@@ -29,7 +29,7 @@ color_map_light = {
     'map': '\033[96m',
     'dict': '\033[93m',
     'cleanup': '\033[37m',
-    }
+}
 color_map_dark = {
     'end': '\033[0m',
     'compile': '\033[2m\033[34m',
@@ -38,7 +38,7 @@ color_map_dark = {
     'map': '\033[2m\033[36m',
     'dict': '\033[2m\033[33m',
     'cleanup': '\033[30m',
-    }
+}
 
 
 def generate(env):
@@ -55,20 +55,17 @@ def generate(env):
             install_text = 'symlinking'
         env.Replace(
             SHCXXCOMSTR='${CXXCOMSTR}',
-            CXXCOMSTR=color_map['compile'] + '*** compiling  : ${SOURCE}'
-                + color_map['end'],
+            CXXCOMSTR=color_map['compile'] + '*** compiling  : ${SOURCE}' + color_map['end'],
             FORTRANPPCOMSTR='${CXXCOMSTR}',
             SHFORTRANPPCOMSTR='${CXXCOMSTR}',
+            CCCOMSTR='${CXXCOMSTR}',
+            SHCCCOMSTR='${CXXCOMSTR}',
             SHLINKCOMSTR='${LINKCOMSTR}',
-            LINKCOMSTR=color_map['link'] + '*** linking    : ${TARGET}'
-                + color_map['end'],
-            INSTALLSTR=color_map['install'] + '*** ' + install_text
-                + ' : ${TARGET}' + color_map['end'],
-            MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}'
-                + color_map['end'],
-            ROOTCINTCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}'
-                + color_map['end'],
-            )
+            LINKCOMSTR=color_map['link'] + '*** linking    : ${TARGET}' + color_map['end'],
+            INSTALLSTR=color_map['install'] + '*** ' + install_text + ' : ${TARGET}' + color_map['end'],
+            MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}' + color_map['end'],
+            ROOTCINTCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}' + color_map['end'],
+        )
 
     env['CLEANUPCOMSTR'] = color_map['cleanup'] + '*** removing   : %s' \
         + color_map['end']
@@ -76,5 +73,3 @@ def generate(env):
 
 def exists(env):
     return True
-
-

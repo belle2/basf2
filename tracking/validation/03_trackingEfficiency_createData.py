@@ -16,7 +16,7 @@
 """
 <header>
     <output>trackingEfficiency_pt_0.05GeV.root</output>
-    <contact>michael.ziegler2@kit.edu</contact>
+    <contact>thomas.hauth@kit.edu</contact>
     <description>Create events with 10 muon tracks with fixed pt value.</description>
 </header>
 """

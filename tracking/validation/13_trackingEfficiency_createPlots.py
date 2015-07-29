@@ -22,7 +22,7 @@
     trackingEfficiency_pt_2.00GeV.root,trackingEfficiency_pt_3.00GeV.root,
     trackingEfficiency_pt_4.00GeV.root</input>
     <output>TrackingValidation.root</output>
-    <contact>michael.ziegler2@kit.edu</contact>
+    <contact>thomas.hauth@kit.edu</contact>
     <description>Create momentum resolution, impact parameter resolution and efficiency plots.</description>
 </header>
 """
@@ -47,8 +47,8 @@ PT_VALUES = get_generated_pt_values()
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Michael Ziegler',
-                  'Email': 'michael.ziegler2@kit.edu'}
+CONTACT_PERSON = {'Name': 'Thomas Hauth',
+                  'Email': 'thomas.hauth@kit.edu'}
 
 
 def main():

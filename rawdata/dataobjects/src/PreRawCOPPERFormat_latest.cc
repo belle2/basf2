@@ -697,7 +697,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
 #ifndef NO_DATA_CHECK
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %d crun %d\n %s %s %d\n",
+      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %u crun %u\n %s %s %d\n",
               cur_ftsw_eve32, prev_eve32,
               prev_exprunsubrun_no, *cur_exprunsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);

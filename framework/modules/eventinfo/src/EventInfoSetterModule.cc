@@ -31,6 +31,7 @@ REG_MODULE(EventInfoSetter)
 EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
   m_evtNumber = 0;
+  m_eventsToSkip = 0;
   m_colIndex = 0;
 
   //Set module properties
@@ -46,6 +47,10 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
   addParam("runList",      m_runList,      "List of run numbers.",        defaultExpRunList);
   addParam("evtNumList",   m_evtNumList,
            "List of the number of events which should be processed. Can be overridden via -n argument to basf2.", defaultEvtNum);
+
+  addParam("skipNEvents", m_skipNEvents,
+           "Skip this number of events before starting. Equivalent to running over this many events without performing any action, to allow starting at higher event numbers.",
+           0ul);
 }
 
 
@@ -87,24 +92,41 @@ void EventInfoSetterModule::initialize()
   }
 
   m_evtNumber = 0;
-  m_colIndex = 0;
+  m_eventsToSkip = m_skipNEvents;
+  m_colIndex = 0; //adjusted in event() if mismatched
 }
 
 
 void EventInfoSetterModule::event()
 {
-  if (m_evtNumber >= static_cast<unsigned long>(m_evtNumList[m_colIndex])) {
+  while (true) {
+    if (m_evtNumber >= static_cast<unsigned long>(m_evtNumList[m_colIndex])) {
 
-    //Search for a column where the event number is greater than 0.
-    do {
-      m_colIndex++;
-    } while ((m_colIndex < static_cast<int>(m_expList.size())) &&
-             (m_evtNumList[m_colIndex] <= 0));
+      //Search for a column where the event number is greater than 0.
+      do {
+        m_colIndex++;
+      } while ((m_colIndex < static_cast<int>(m_expList.size())) &&
+               (m_evtNumList[m_colIndex] <= 0));
 
-    if (m_colIndex < static_cast<int>(m_expList.size())) {
-      m_evtNumber = 0;
-    } else { //no experiment/run with non-zero number of events found
-      return;
+      if (m_colIndex < static_cast<int>(m_expList.size())) {
+        m_evtNumber = 0;
+      } else { //no experiment/run with non-zero number of events found
+        return;
+      }
+    }
+
+    if (m_eventsToSkip != 0) { //are we still skipping?
+      unsigned long nskip = 1;
+      const unsigned long eventsInList = m_evtNumList[m_colIndex];
+      if (m_evtNumber < eventsInList) //skip to end of current run?
+        nskip = eventsInList - m_evtNumber;
+      if (nskip > m_eventsToSkip)
+        nskip = m_eventsToSkip;
+
+      m_eventsToSkip -= nskip;
+      m_evtNumber += nskip;
+    } else { //no? then stop.
+      break;
     }
   }
 

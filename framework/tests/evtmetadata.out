@@ -22,3 +22,134 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
 
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 1	0	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	1	1
+[INFO] 1	1	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	3	3
+[INFO] 1	3	3
+[INFO] 2	3	3
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	1	1
+[INFO] 1	1	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	3	3
+[INFO] 1	3	3
+[INFO] 2	3	3
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 1	1	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	3	3
+[INFO] 1	3	3
+[INFO] 2	3	3
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	3	3
+[INFO] 1	3	3
+[INFO] 2	3	3
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 1	3	3
+[INFO] 2	3	3
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 2	3	3
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 3	3	3
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)  { module: -global- }
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] ================================================================================
+[INFO] Error summary: 0 errors and 1 warnings occurred.
+[WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
+[INFO] ================================================================================
+
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 4	3	3
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::terminate()

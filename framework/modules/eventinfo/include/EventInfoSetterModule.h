@@ -65,6 +65,8 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< Output object. */
 
     unsigned long m_evtNumber; /**< The current event number. */
+    unsigned long m_skipNEvents; /**< Skip this number of events before starting. */
+    unsigned long m_eventsToSkip; /**< counter that starts at m_skipNEvents. */
     int m_colIndex;  /**< The current index for the exp and run lists. */
 
     std::vector<int> m_expList;      /**< The list (column) of experiments. */

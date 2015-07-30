@@ -245,11 +245,12 @@ double* TCL::trsinv(double* g, double* gi, int n)
 
   // Function Body
 
+  /*
   int n2;
   int i;
   n2 = (n * (n + 1)) / 2;
 
-  /*
+
   for(i=0;i<n2;i++){
          printf("input gi[%d]=%f g[%d]=%f \n",i,gi[i],i,g[i]);
   }

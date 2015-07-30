@@ -100,7 +100,25 @@ private:
   size_t m_N1, m_N2, m_N3;
 };
 
-
+// class to allocate memory dynamically to save stack space
+// replace POD 2D arrays.
+template <typename T>
+class WrapArray2D {
+public:
+  WrapArray2D(unsigned int rows, unsigned int cols) :
+    m_data(new T[rows * cols]), m_ncols(cols)
+  {}
+  ~WrapArray2D()
+  {  delete [] m_data;  }
+  T* operator[](unsigned int irow)
+  {
+    return m_data + irow * m_ncols;
+  }
+  operator T* () { return m_data; }
+private:
+  T* m_data;
+  unsigned int m_ncols;
+};
 
 
 void matrix_cal(int cortyp, const char* inputRootFilename,
@@ -114,8 +132,8 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   fChain.Add(inputRootFilename);
 
   Int_t           nhits;
-  Int_t           hitA[8736][31];   //[nhits]
-
+  //  Int_t           hitA[8736][31];   //[nhits]
+  WrapArray2D<Int_t> hitA(8736, 31);
   TBranch*        b_nhits;
   TBranch*        b_hitA;
 
@@ -140,8 +158,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
 
 
-  int mapmax;
-  mapmax = 252;
+  const int mapmax = 252;
 
   /*
   typedef boost::multi_array<double, 3> array3d;
@@ -152,19 +169,19 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   DoubleArray3D WW(mapmax, 16, 16, 0.0);
 
-  double Q[mapmax][16];
-  double Mean[8736];
+  WrapArray2D<double> Q(mapmax, 16);
+  vector<double> Mean(8736, 0);
 
   // not used commented to silence warning
-  // double rms[8736];
+  // double rms(8736,0);
 
-  double sr[8736];
-  double sl[8736];
+  vector<double> sr(8736, 0);
+  vector<double> sl(8736, 0);
 
-  double dt[mapmax];
+  vector<double> dt(mapmax, 0);
 
 
-  double inmt[mapmax];
+  vector<double> inmt(mapmax, 0);
   int it;
   double A0;
   cortyp = 43;
@@ -176,7 +193,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   int icn, id;
 
 
-  int DS[8736];
+  vector<int> DS(8736, 0);
 
   string crystalGroupsFilename = FileSystem::findFile("/data/ecl/CIdToEclData.txt");
   assert(! crystalGroupsFilename.empty());

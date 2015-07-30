@@ -155,7 +155,7 @@ namespace VXDTFMinMaxCollectorTest {
     unsigned vecSize = vectorCollector.size();
 
     /** helper function for retrieving cutoffs in a vector. */
-    auto getIndex = [&](double quantile) -> unsigned int { return floor(double(vecSize - 1) * quantile + 0.5); };
+    auto getIndex = [&](double quantile) -> unsigned int { return (double(vecSize - 1) * quantile + 0.5); };
 
 
     EXPECT_EQ(0, newCollector.size());
@@ -220,7 +220,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    EXPECT_EQ(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
 
 
@@ -241,7 +241,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    EXPECT_EQ(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
 
 
@@ -284,7 +284,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.00001);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.0001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
   }
 }

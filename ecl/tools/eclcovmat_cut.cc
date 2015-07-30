@@ -8,10 +8,12 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>
-
+#include <ecl/digitization/WrapArray2D.h>
 
 
 using namespace std;
+using namespace Belle2;
+using namespace ECL;
 
 Double_t glog(Double_t* x, Double_t* par)
 {
@@ -52,8 +54,7 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
   outputpdffile += "/amplitudefits.pdf";
 
   Int_t           nhits;
-  Int_t          hitA[8736][31];
-
+  WrapArray2D<Int_t>  hitA(8736, 31);
 
   TBranch*        b_nhits;
   TBranch*        b_hitA;
@@ -68,12 +69,12 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
   Double_t mug;
   Double_t rg;
 
-  Double_t Mu[8736];
-  Double_t Sg[8736];
-  Double_t As[8736];
-  Double_t Sr[8736];
-  Double_t Sl[8736];
-  Double_t Chi[8736]
+  vector<Double_t> Mu(8736, 0);
+  vector<Double_t> Sg(8736, 0);
+  vector<Double_t> As(8736, 0);
+  vector<Double_t> Sr(8736, 0);
+  vector<Double_t> Sl(8736, 0);
+  vector<Double_t> Chi(8736, 0)
   ;
   Double_t cc = TMath::Sqrt(2.*TMath::Log(2.));
 
@@ -135,6 +136,8 @@ void cut(const char* inputRootFilename, const char* outputCutFilename,
     if (ndf > 0) {
       Chi[k] = chi2 / ndf;
     } else {Chi[k] = -1.;}
+
+    cout << "Chi[ " << k << "] = " << Chi[k] << "calculated but not used." << endl;
 
     Sr[k] = (-1. + As[k] * cc + TMath::Sqrt(1. + cc * cc * As[k] * As[k])) * Sg[k] / As[k] / cc;
     Sl[k] = (1. - 1. / (As[k] * cc + TMath::Sqrt(1. + cc * cc * As[k] * As[k]))) * Sg[k] / As[k] / cc;

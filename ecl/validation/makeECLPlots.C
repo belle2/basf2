@@ -97,6 +97,7 @@ void ECLPion(TTree* pion_tree){
 
   TH1F* hPionMultip = new TH1F("hPionMultip", "Cluster multiplicity, 1GeV charged pion", 10,0,10);
   pion_tree->Draw("eclClusterMultip>>hPionMultip","eclClusterMultip>0");
+  hPionMultip->SetMaximum(600);
   hPionMultip->GetXaxis()->SetTitle("ECL cluster multiplicity");
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for 1 GeV charged pion")); 
   hPionMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be low"));
@@ -121,8 +122,9 @@ void ECLMuon(TTree* muon_tree)
   hMuonsE->Write();
 
   TH1F* hMuonsFake = new TH1F("hMuonsFake","Fake reconstructed gamma for 1000 muons should be less than 5%", 10,0,10);
-  // hMuonsFake->SetMaximum(6);
+  hMuonsFake->SetMaximum(100);
   muon_tree->Draw("eclClusterIdx>>hMuonsFake","eclClusterMultip>0");
+  hMuonsFake->SetMaximum(100);
   hMuonsFake->GetXaxis()->SetTitle("Gamma Idx");
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Fake reconstructed gamma every 1000 muons")); 
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Should be low"));

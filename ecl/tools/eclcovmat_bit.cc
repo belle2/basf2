@@ -6,7 +6,10 @@
 #include <TMath.h>
 #include <stdio.h>
 #include <iostream>
+#include <cassert>
+#include <string>
 #include <ecl/digitization/algorithms.h>
+#include <ecl/digitization/WrapArray2D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -116,10 +119,10 @@ int ThetR(int k)
 
 
 
-void bit(int num)
+void bit(int num, char* inputPath)
 {
 
-  char BMin[256];
+
   FILE* BMcoIN;
 
   // varible for one channel
@@ -130,27 +133,28 @@ void bit(int num)
 
 
   double  g1g1[192], gg[192], gg1[192], dgg[192];
-  double  sg1[16][192], sg[16][192], sg2[16][192], gg2[192], g1g2[192], g2g2[192];
+  WrapArray2D<double>  sg1(16, 192), sg(16, 192), sg2(16, 192);
+  double  gg2[192], g1g2[192], g2g2[192];
   double  dgg1[192], dgg2[192];
 
-  double f[192][16];
-  double f1[192][16];
-  double fg31[192][16];
-  double fg32[192][16];
-  double fg33[192][16];
+  WrapArray2D<double> f(192, 16);
+  WrapArray2D<double> f1(192, 16);
+  WrapArray2D<double> fg31(192, 16);
+  WrapArray2D<double> fg32(192, 16);
+  WrapArray2D<double> fg33(192, 16);
 
-  double fg41[24][16];
-  double fg43[24][16];
+  WrapArray2D<double> fg41(24, 16);
+  WrapArray2D<double> fg43(24, 16);
 
 
-  int m_f[192][16];
-  int m_f1[192][16];
-  int m_fg31[192][16];
-  int m_fg32[192][16];
-  int m_fg33[192][16];
+  WrapArray2D<int> m_f(192, 16);
+  WrapArray2D<int> m_f1(192, 16);
+  WrapArray2D<int> m_fg31(192, 16);
+  WrapArray2D<int> m_fg32(192, 16);
+  WrapArray2D<int> m_fg33(192, 16);
 
-  int m_fg41[24][16];
-  int m_fg43[24][16];
+  WrapArray2D<int> m_fg41(24, 16);
+  WrapArray2D<int> m_fg43(24, 16);
 
 
   double val_f;
@@ -223,8 +227,7 @@ void bit(int num)
   bitfg43 = 19;
 
 
-  int mapsize;
-  mapsize = 252;
+  const int mapsize = 252;
 
   short int bfg31[mapsize];
 
@@ -324,7 +327,7 @@ void bit(int num)
     t = t0 - dt - del;
 
     tin = t + dt;
-
+    cout << "tin set but unused. Fix me. tin = " << tin << endl;
     for (j = 0; j < 16; j++) {
       t = t + dt;
 
@@ -385,16 +388,22 @@ void bit(int num)
     //read matrix
 
     if (0 == 0) {
-      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", num, ChN);
+      string filename(inputPath);
+      filename += "/corr";
+      filename += to_string(num);
+      filename += "/Binmcor";
+      filename += to_string(ChN);
 
-      if ((BMcoIN = fopen(BMin, "rb")) == NULL) {
-        printf(" file %s is absent \n", BMin);
+      //      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", num, ChN);
+
+      if ((BMcoIN = fopen(filename.c_str(), "rb")) == NULL) {
+        printf(" file %s is absent \n", filename.c_str());
         exit(1);
       }
 
       //     2
       if (fread(ss1, sizeof(double), 256, BMcoIN) != 256) {
-        printf("Error writing file %s \n", BMin);
+        printf("Error writing file %s \n", filename.c_str());
         exit(1);
       }
 
@@ -514,10 +523,13 @@ void bit(int num)
 
     ia = myPow(2, iaa);
     ib = myPow(2, ibb);
+    cout << "ib set but unused. Fix me. ib = " << ib << endl;
+
     ic = myPow(2, icc);
+    cout << "ic set but unused. Fix me. ic = " << ic << endl;
     i16 = myPow(2, 15);
     ilim = myPow(2, 15);
-
+    cout << "ilim set but unused. Fix me. ilim = " << ilim << endl;
 
     for (i = 0; i < 16; i++) {
       if (i == 0) {
@@ -941,10 +953,8 @@ void bit(int num)
     }
   }
 
-
-
-
-  sprintf(BMin, "/gpfs/home/belle/avbobrov/ecl/test/bitst%d.dat", num);
+  char BMin[256];
+  sprintf(BMin, "bitst%d.dat", num);
 
   if ((BMcoIN = fopen(BMin, "w")) == NULL) {
     printf(" file %s is absent \n", BMin);
@@ -961,5 +971,13 @@ void bit(int num)
 
 int main(int argc, char** argv)
 {
-  bit(10);
+  assert(argc == 1 || argc == 3);
+  if (argc == 1) {
+    cout << "Usage:" << endl;
+    cout << argv[0] << " <type> <covmat_path>" << endl;
+    cout << "type is a numerical integer value to define the source of the calibration" << endl;
+    cout << "covmat_path is the path to look for the directory corr<type> that contains the covariance matrix files Binmcorr<type>_L.dat"
+         << endl;
+    cout << " An output file with the translation to integers in written in the work directory" << endl;
+  } else bit(atoi(argv[1]), argv[2]);
 }

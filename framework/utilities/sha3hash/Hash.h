@@ -29,8 +29,8 @@ namespace Belle2 {
       c_SHA3_384 = 384 / 8, /** 384bit output size */
       c_SHA3_512 = 512 / 8 /** 512bit output size */
     };
-
-    SHA3Hash(EHashMode length);
+    /** Constructor initializing the hash structure with a given output size */
+    explicit SHA3Hash(EHashMode length);
     ~SHA3Hash();
     /** reinit the hash structure to create a new hash sum */
     void clear();
@@ -60,7 +60,7 @@ namespace Belle2 {
       c_SHAKE256, /**< variable hash size with up to 256 bit collision resistance */
     };
     /** constructor initializing the hash structure */
-    ShakeHash(EHashMode mode);
+    explicit ShakeHash(EHashMode mode);
     /** destructor freeing the memory */
     ~ShakeHash();
     /** reinit the hash structure to create a new hash sum */

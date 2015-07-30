@@ -34,12 +34,7 @@ namespace Belle2 {
   class RandomGenerator: public TRandom {
   public:
     /** Default constructor, does not initialize the generator. */
-    explicit RandomGenerator(bool eventDependent = true): TRandom(), m_index(0),
-      m_barrier(0), m_eventDependent(eventDependent), m_useEventData(false)
-    {
-      SetName("B2Random");
-      SetTitle("Belle2 Random Generator");
-    }
+    explicit RandomGenerator(bool eventDependent = true);
 
     /** Destructor to free the seed information */
     virtual ~RandomGenerator() {}
@@ -175,7 +170,7 @@ namespace Belle2 {
     /** if true use eventMetaData for setting the state, otherwise just seed
      * and barrier index */
     bool m_useEventData;
-
+    /** and the root dictionary macro needs to be documented as well :) */
     ClassDef(RandomGenerator, 1);
   };
 

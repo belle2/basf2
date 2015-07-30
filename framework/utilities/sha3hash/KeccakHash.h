@@ -23,9 +23,14 @@ typedef unsigned char BitSequence;
 typedef size_t DataLength;
 typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2 } HashReturn;
 
+/** Struct to wrap the Keccak_Sponge instance with additional information
+ * needed for FIPS 202 mode */
 typedef struct {
+  /** underlying Sponge instance */
   Keccak_SpongeInstance sponge;
+  /** output size in case of SHA3, 0 in case of SHAKE */
   unsigned int fixedOutputLength;
+  /** padding delimiter to separate SHA3 and SHAKE */
   unsigned char delimitedSuffix;
 } Keccak_HashInstance;
 

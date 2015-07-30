@@ -54,6 +54,7 @@ namespace Belle2 {
     /** Current event number. */
     int m_nrecv;
 
+    /** Random Generator object to receive from TxModule */
     StoreObjPtr<RandomGenerator> m_randomgenerator;
   };
 

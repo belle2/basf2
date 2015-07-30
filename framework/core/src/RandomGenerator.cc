@@ -34,6 +34,13 @@ namespace {
   }
 };
 
+RandomGenerator::RandomGenerator(bool eventDependent): TRandom(), m_state{0},
+  m_index(0), m_barrier(0), m_eventDependent(eventDependent), m_useEventData(false)
+{
+  SetName("B2Random");
+  SetTitle("Belle2 Random Generator");
+}
+
 void RandomGenerator::setSeed(const unsigned char* seed, unsigned int n)
 {
   //Copy the seed information and set the seed length

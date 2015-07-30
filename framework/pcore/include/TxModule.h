@@ -64,6 +64,7 @@ namespace Belle2 {
     /** Wether to block until we can insert data into the ring buffer in event(). */
     bool m_blockingInsert;
 
+    /** Random Generator object to pass to RxModule */
     StoreObjPtr<RandomGenerator> m_randomgenerator;
   };
 

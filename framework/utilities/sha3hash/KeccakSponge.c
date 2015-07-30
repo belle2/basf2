@@ -26,7 +26,7 @@ int Keccak_SpongeInitialize(Keccak_SpongeInstance *instance, unsigned int rate, 
 {
     if (rate+capacity != SnP_width)
         return 1;
-    if ((rate <= 0) || (rate > SnP_width) || ((rate % 8) != 0))
+    if ((rate == 0) || (rate > SnP_width) || ((rate % 8) != 0))
         return 1;
     SnP_StaticInitialize();
     SnP_Initialize(instance->state);

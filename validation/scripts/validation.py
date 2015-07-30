@@ -803,12 +803,12 @@ class Validation:
         # restore original working directory
         os.chdir(save_dir)
 
-###############################################################################
-#                       Actual program starts here!                           #
-###############################################################################
-
 
 def execute():
+    """!
+    Parses the comnmand line and executes the full validation suite
+    """
+
     # If there is no release of basf2 set up, we can stop the execution right here!
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')

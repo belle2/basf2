@@ -14,6 +14,11 @@ from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed
 
 
 def generateTestPlots(prefix):
+    """!
+    Generates a fixed amount of Plots and Ntuples the prefix in naming
+    as provided in the parameter.
+    A root TFile must be openend before a call to this method.
+    """
     tntuple = TNtuple("ntuple_test", "ntuple test", "x:y:z:k")
 
     array_of_values = array.array('f', [23.4, 4.4, 5.12, -23.0])

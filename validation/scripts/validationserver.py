@@ -452,6 +452,10 @@ def run(ip='localhost', port=8000):
 
 
 def configure_and_run(ip='localhost', port=8000, parseCommandLine=False, openSite=False):
+    """!
+    Checks for correct basf2 setup, parses the command line and opens a http server
+    on the indicated ip and port.
+    """
     # Only execute the program if a basf2 release is set up!
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')

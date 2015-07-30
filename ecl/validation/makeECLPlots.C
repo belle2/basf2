@@ -217,7 +217,7 @@ void ECLBkg(TTree* bkg_tree)
   bkg_tree->Draw("eclClusterMultip>>bkgClusterMultip","eclClusterMultip>0");
   bkgClusterMultip->GetXaxis()->SetTitle("ECL cluster multiplicity Bkg");
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Description","ECL cluster multiplicity for bkg")); 
-  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2016)"));
+  bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Check","Cluster multiplicity should be around 50 (Jun 2014)"));
   bkgClusterMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
   bkgClusterMultip->Write();
  

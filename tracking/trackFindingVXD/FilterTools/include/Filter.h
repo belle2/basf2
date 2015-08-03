@@ -14,6 +14,7 @@
 #include <TTree.h>
 #include <string>
 #include <type_traits>
+#include <iostream>
 
 namespace Belle2 {
 
@@ -339,7 +340,9 @@ namespace Belle2 {
      */
     Filter(const Range& range , const bool& enable):
       Filter< Variable, Range, Observer >(range)
-    { m_enable = & enable ;};
+    {
+      m_enable = & enable ;
+    };
 
 
     Filter() { };

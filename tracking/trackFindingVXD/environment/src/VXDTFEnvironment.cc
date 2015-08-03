@@ -1,7 +1,7 @@
 #include "tracking/trackFindingVXD/environment/VXDTFEnvironment.h"
 
 #ifndef __CINT__
-#include "tracking/trackFindingVXD/environment/VXDTFSegmentFilter.h"
+#include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include <unordered_map>
 #endif
 
@@ -9,13 +9,13 @@ using namespace std;
 using namespace Belle2;
 
 #ifndef __CINT__
-typedef unordered_map< string, VXDTFSegmentFilter*> stringToSegmentFilter_t;
+typedef unordered_map< string, VXDTFFilters*> setupNameToFilters_t;
 #endif
 
-VXDTFEnvironment::VXDTFEnvironment(): m_SegmentFilters(NULL)
+VXDTFEnvironment::VXDTFEnvironment(): m_allSetupsFilters(NULL)
 {
 #ifndef __CINT__
-  m_SegmentFilters = new stringToSegmentFilter_t;
+  m_allSetupsFilters = new setupNameToFilters_t;
 #endif
 }
 
@@ -23,23 +23,23 @@ VXDTFEnvironment::~VXDTFEnvironment()
 {
 #ifndef __CINT__
 
-  auto filters = (stringToSegmentFilter_t*) m_SegmentFilters;
-  for (auto& filter : * filters)
+  auto all_filters = (setupNameToFilters_t*) m_allSetupsFilters;
+  for (auto& filter : * all_filters)
     delete filter.second;
 
 #endif
 }
 
 
-const VXDTFSegmentFilter*
-VXDTFEnvironment::getSegmentFilter(const std::string& name)
+const VXDTFFilters*
+VXDTFEnvironment::getFilters(const std::string& setupName)
 {
 #ifndef __CINT__
 
-  auto filters = (stringToSegmentFilter_t*) m_SegmentFilters;
+  auto all_filters = (setupNameToFilters_t*) m_allSetupsFilters;
 
-  auto  result = filters->find(name);
-  if (result == filters->end())
+  auto  result = all_filters->find(setupName);
+  if (result == all_filters->end())
     return NULL;
   return result->second;
 
@@ -48,11 +48,11 @@ VXDTFEnvironment::getSegmentFilter(const std::string& name)
 }
 
 void
-VXDTFEnvironment::assignSegmentFilter(const string& name, VXDTFSegmentFilter* theFilter)
+VXDTFEnvironment::assignFilters(const string& setupName, VXDTFFilters* filters)
 {
 #ifndef __CINT__
-  auto filters = (stringToSegmentFilter_t*) m_SegmentFilters;
-  (*filters)[ name ] = theFilter;
+  auto all_filters = (setupNameToFilters_t*) m_allSetupsFilters;
+  (*all_filters)[ setupName ] = filters;
 #endif
 }
 

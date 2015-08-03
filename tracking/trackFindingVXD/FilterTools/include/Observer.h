@@ -29,10 +29,10 @@ namespace Belle2 {
 
     template< class T>
     //    static void notify( Belle2::Distance3DSquared<Belle2::VXDTFHit> , double val, const Belle2::VXDTFHit &,
-    static void notify(T , double val, const Belle2::VXDTFHit&,
-                       const Belle2::VXDTFHit&, Belle2::Range< float, float> m_range)
+    static void notify(T , double val,  Belle2::Range< float, float> m_range,
+                       const Belle2::VXDTFHit&, const Belle2::VXDTFHit&)
     {
-      std::cout << m_range.getInf() << " < " << val  << " < " << m_range.getSup() << " | ";
+      //std::cout << m_range.getInf() << " < " << val  << " < " << m_range.getSup() << " | ";
     };
 
     Observer() {};

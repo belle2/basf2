@@ -47,7 +47,14 @@ namespace Belle2 {
 
   /** all the information of a pass is stored within a copy of that class. This allows grouping of that information. WARNING: at the moment, this class is still a hybrid between a struct and a class. A full set of setters and getters is missing yet and since there are so many member variables, it will probably never implemented...*/
   class PassData {
+
   public:
+
+    /** Return the name of this PassData, needed to link the
+    current pass to the set of Filters */
+    const std::string getName() { return sectorSetup; };
+
+
     /** an exception thrown if sector not found */
     BELLE2_DEFINE_EXCEPTION(Bad_Sector, "secMap - could not find centersector!");
     /**
@@ -246,8 +253,6 @@ namespace Belle2 {
     HitsOfEvent hitVector; /**< carries total number of hits of current event. */
     std::vector<VXDTFHit> fullHitsVector; /**< carries hits of event (no pointers), used by baselineTF */
     TCsOfEvent tcVector; /**< carries track candidates of current pass */
-
-
 
   protected:
     /** storing direct pointers to each friend for all sectors should only be called by importSectorMap - should be called only once! */

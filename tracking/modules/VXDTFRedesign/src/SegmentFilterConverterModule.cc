@@ -21,7 +21,7 @@
 #include "tracking/trackFindingVXD/FilterTools/Observer.h"
 
 #include "tracking/trackFindingVXD/environment/VXDTFEnvironment.h"
-#include "tracking/trackFindingVXD/environment/VXDTFSegmentFilter.h"
+#include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/VXDTFRedesign/SegmentFilterConverterModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
 #include "tracking/dataobjects/VXDTFSecMap.h"
@@ -176,7 +176,45 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
 
   const VXDTFSecMap* sectorMap = m_SectorMaps[ setupIndex ];
   StoreObjPtr< VXDTFEnvironment > environment("", DataStore::c_Persistent);
-  VXDTFSegmentFilter* segmentFilter = new VXDTFSegmentFilter();
+  VXDTFFilters* segmentFilters = new VXDTFFilters();
+
+  {
+    CompactSecIDs compactSecIds;
+    vector<int> layers  = { 1, 2, 3, 4, 5, 6};
+    vector<int> ladders = { 8, 12, 7, 10, 12, 16};
+    vector<int> sensors = { 2, 2, 2, 3, 4, 5};
+
+    vector< float > uSup = { 1. / 3., 2. / 3. };
+    vector< float > vSup = { 1. / 3., 2. / 3. };
+
+
+    vector< vector< FullSecID > > sectors;
+
+    sectors.resize(uSup.size() + 1);
+
+
+    for (auto layer : layers)
+      for (int ladder = 1 ; ladder <= ladders[layer - 1] ; ladder++)
+        for (int sensor = 1 ; sensor <=  sensors[layer - 1] ; sensor++) {
+          int counter = 0;
+          for (unsigned int i = 0; i < uSup.size() + 1; i++) {
+            sectors[i].resize(vSup.size() + 1);
+            for (unsigned int j = 0; j < vSup.size() + 1 ; j++) {
+              sectors[i][j] = FullSecID(VxdID(layer, ladder , sensor),
+                                        false, counter);
+              counter ++;
+            }
+          }
+          segmentFilters->addSectorsOnSensor(uSup , vSup, sectors) ;
+
+        }
+
+    uSup = {};
+    vSup = {};
+    sectors = {{0}};
+    segmentFilters->addSectorsOnSensor(uSup, vSup, sectors);
+  }
+
 
   for (auto friendsBlob : sectorMap->getSectorMap()) {
     FullSecID innerSectorID = FullSecID(friendsBlob.first);
@@ -236,11 +274,14 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
 
         );
 
-      segmentFilter->addFriendsSectorFilter(innerSectorID, outerSectorID,
-                                            friendSectorsSegmentFilter);
+      if (
+        segmentFilters->addFriendsSectorFilter(innerSectorID, outerSectorID,
+                                               friendSectorsSegmentFilter) == 0)
+        B2WARNING("Problem adding the friendship relation from the inner sector:" <<
+                  innerSectorID << " -> " << outerSectorID << " outer sector");
     }
   }
-  environment->assignSegmentFilter(sectorMap->getMapName(), segmentFilter);
+  environment->assignFilters(sectorMap->getMapName(), segmentFilters);
 }
 
 

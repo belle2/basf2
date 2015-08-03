@@ -5,11 +5,11 @@ env['LIBS'] = [
     'framework',
     '$ROOT_LIBS',
     #'geometry',
-    #'pxd', 'pxd_dataobjects',
-    #'svd', 'svd_dataobjects',
+    'pxd',# 'pxd_dataobjects',
+    'svd',# 'svd_dataobjects',
     #'vxd', 'vxd_dataobjects',
     #'genfit2',
     #'tracking',
-    #'tracking_dataobjects',
+    'tracking_dataobjects'
     ]
 Return('env')

@@ -112,7 +112,7 @@ namespace Belle2 {
 
 
     /** the correct access-index for given quantile will be determined */
-    unsigned getIndex(DataType aQuantile)
+    unsigned getIndex(DataType aQuantile) const
 //  { return floor(double(vecSize-1) * quantile + 0.5); };
     { return unsigned(double(m_sampleSize/*-1*/) * double(aQuantile) + 0.5); }
 
@@ -178,7 +178,7 @@ namespace Belle2 {
 
 
     /** for given pair of quantiles, the according cuts (min, max) will be returned. */
-    std::pair<DataType, DataType> getMinMax(DataType minQuantile = 0., DataType maxQuantile = 1.)
+    std::pair<DataType, DataType> getMinMax(DataType minQuantile = 0., DataType maxQuantile = 1.) const
     {
       if (m_biggestValues.empty() or m_smallestValues.empty()) { throw (Request_in_empty_Container()); }
       if (0 > minQuantile or 1 < minQuantile) { throw (Quantile_out_of_bounds() << minQuantile); }
@@ -238,35 +238,35 @@ namespace Belle2 {
 
 
     /** returns the combined size of the containers storing the values */
-    unsigned totalSize()
+    unsigned totalSize() const
     { return m_smallestValues.size() + m_biggestValues.size(); }
 
 
 
     /** returns the size (in a sense of roughly collected data) */
-    unsigned size()
+    unsigned size() const
     { return m_smallestValues.size() > m_biggestValues.size() ? m_smallestValues.size() : m_biggestValues.size(); }
 
 
 
     /** returns if internal containers are empty */
-    bool empty() { return (m_smallestValues.empty() and m_biggestValues.empty()); }
+    bool empty() const { return (m_smallestValues.empty() and m_biggestValues.empty()); }
 
 
 
     /** returns actual sampleSize */
-    unsigned sampleSize() { return m_sampleSize; }
+    unsigned sampleSize() const { return m_sampleSize; }
 
 
 
     /** print an overview of the entries collected. if parameter given is 'true' full print will be done, if false, the values will be sketched with means. */
-    void print(bool printFull = false)
+    void print(bool printFull = false) const
     { B2INFO(getName(printFull)); }
 
 
 
     /** return a string of an overview of the entries collected. if parameter given is 'true' full print will be done, if false, the values will be sketched with means. */
-    std::string getName(bool printFull = false)
+    std::string getName(bool printFull = false) const
     {
       unsigned nSmallest = m_smallestValues.size();
       unsigned nBiggest = m_biggestValues.size();

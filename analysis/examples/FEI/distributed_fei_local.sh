@@ -92,9 +92,18 @@ function create_ntuples_with_finished_training {
 
 function run_basf2 {
   cd "$collectionDirectory"
-  basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- --verbose --nThreads 20 --cache cache.pkl --summary || return 1
+  basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- --verbose --nThreads 8 --cache cache.pkl --summary || return 1
   cd - > /dev/null
 }
+
+function create_summary {
+  cd "$collectionDirectory"
+  cp cache.pkl cache.pkl_
+  basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- --verbose --cache cache.pkl --summary --rerunCached || return 1
+  mv cache.pkl_ cache.pkl
+  cd - > /dev/null
+}
+
 function save_finished_path {
   cd "$collectionDirectory"
   basf2 $steeringFile --dump-path apply_fei_path.pickle  -- --verbose --cache cache.pkl || return 1
@@ -145,10 +154,21 @@ function submit_jobs {
   
   for i in $(seq "$nJobs")
   do
+    min=$(($i - $nProcesses))
+    while [ $(ls -l "$jobDirectory"/*/basf2_finished_successfully 2> /dev/null | wc -l ) -lt "$min" ]
+    do
+      if [ $(ls -l "$jobDirectory"/*/basf2_job_error 2> /dev/null | wc -l) -ne 0 ]
+      then
+        echo "basf2 execution failed! Error occurred in:"
+        ls -l "$jobDirectory"/*/basf2_job_error
+        return 1
+      fi
+      echo -n "."
+      sleep 40
+    done
     echo "submitting $i"
     cd "$jobDirectory"/"$i"
-    #qsub -cwd -q express,short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid
-    bsub -q s -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid
+    ./basf2_script.sh > output.log 2> error.log &
     cd - > /dev/null
   done
 }
@@ -210,6 +230,9 @@ function next_act {
   run_basf2 || return 1
   echo "Finished running actors locally -- wait 3 seconds"
   sleep 3
+  echo "Cleaning up..."
+  clean_jobDirectory
+  echo "Setup job directories..."
   setup_jobDirectory
   echo "Starting job submission..."
   submit_jobs

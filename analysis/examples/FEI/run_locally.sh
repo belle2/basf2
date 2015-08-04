@@ -9,7 +9,7 @@ set -e
 
 
 # Execute repeatedly until summary PDF is generated
-while [ ! -f FEIsummary.pdf ]; do
+while [ ! -f FEI_finished_its_training ]; do
   # After the first run, reuse particles in tmpdata.root
   if [ -f tmpdata.root ]
   then

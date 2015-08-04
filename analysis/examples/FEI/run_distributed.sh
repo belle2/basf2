@@ -45,6 +45,6 @@ source $BELLE2_LOCAL_DIR/analysis/examples/FEI/distributed_fei.sh
 
 create_play
 
-while [ ! -f $collectionDirectory/FEIsummary.tex ]; do
+while [ ! -f $collectionDirectory/FEI_finished_its_training ]; do
   next_act
 done

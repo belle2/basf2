@@ -637,12 +637,39 @@ void DesSerPrePC::DataAcquisition()
     n_basf2evt = 0;
   }
 
+  //
+  // Main loop
+  //
   while (1) {
+
+    //
+    // Stand-by loop
+    //
+#ifdef NONSTOP
+    if (g_run_stop != 0 || g_run_error != 0) {
+      if (g_run_stop == 0) {
+        while (true) {
+          if (checkRunStop()) break;
+#ifdef NONSTOP_DEBUG
+          printf("\033[31m");
+          printf("###########(DesSerPrePC) Waiting for Runstop()  ###############\n");
+          fflush(stdout);
+          printf("\033[0m");
+#endif
+          sleep(1);
+        }
+      }
+      waitRestart();
+      restartRun();
+    }
+#endif
+
     clearNumUsedBuf();
-    //
-    // Main loop
-    //
     RawDataBlock raw_datablk[ NUM_EVT_PER_BASF2LOOP_PC ];
+
+    //
+    // Recv loop
+    //
     for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
       //
       // Receive data from COPPER
@@ -655,7 +682,7 @@ void DesSerPrePC::DataAcquisition()
         checkData(&temp_rawdatablk, &eve_copper_0);
       } catch (string err_str) {
         printf("Error was detected\n"); fflush(stdout);
-        exit(1);
+        break;
       }
       //     PreRawCOPPERFormat_latest pre_rawcopper_latest;
       //     pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
@@ -699,34 +726,21 @@ void DesSerPrePC::DataAcquisition()
       }
 
 #endif
-
     }
+
+#ifdef NONSTOP
+    // Goto Stand-by loop when run is paused or stopped by error
+    if (g_run_stop != 0 || g_run_error != 0) continue;
+#endif
 
 
     ///////////////////////////////////////////////////////////////
     // From Serializer.cc
     //////////////////////////////////////////////////////////////
-#ifdef NONSTOP
-    if (g_run_restarting == 1) {
-      restartRun();
-    } else if (g_run_recovery == 1) {
-#ifdef NONSTOP_DEBUG
-      printf("\033[31m");
-      printf("###########(Ser) Go back to Deseializer()  ###############\n");
-      fflush(stdout);
-      printf("\033[0m");
-#endif
-      return; // Nothing to do here
-    }
-#endif
-
     if (m_start_flag == 0) {
       m_start_time = getTimeSec();
       n_basf2evt = 0;
-
     }
-
-
     //  StoreArray<RawCOPPER> rawcprarray;
     //  StoreArray<RawDataBlock> raw_dblkarray;
 
@@ -741,15 +755,11 @@ void DesSerPrePC::DataAcquisition()
 
       try {
         m_totbytes += sendByWriteV(&(raw_datablk[ j ]));
-        //      printf("Ser len %d numeve %d node %d\n", raw_dblkarray[ j ]->TotalBufNwords(), raw_dblkarray[ j ]->GetNumEvents(), raw_dblkarray[ j ]->GetNumNodes() );
       } catch (string err_str) {
 #ifdef NONSTOP
-        if (err_str == "EAGAIN") {
-          pauseRun();
-          break;
-        }
+        printf("Error was detected while sending data.\n"); fflush(stdout);
+        break;
 #endif
-        //      print_err.PrintError( &m_status, err_str);
         exit(1);
       }
       if (m_start_flag == 0) {
@@ -758,9 +768,10 @@ void DesSerPrePC::DataAcquisition()
       }
     }
 
-
-
-    //////////////////////////////////////////////////////////////
+#ifdef NONSTOP
+    // Goto Stand-by loop when run is paused or stopped by error
+    if (g_run_stop != 0 || g_run_error != 0) continue;
+#endif
 
     //
     // Monitor
@@ -1160,12 +1171,9 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
 
 void DesSerPrePC::Accept()
 {
-
-
   //
   // Connect to cprtb01
   //
-
   struct hostent* host;
   host = gethostbyname(m_hostname_local.c_str());
   if (host == NULL) {
@@ -1176,9 +1184,6 @@ void DesSerPrePC::Accept()
     sleep(1234567);
     exit(1);
   }
-
-
-
 
   //
   // Bind and listen

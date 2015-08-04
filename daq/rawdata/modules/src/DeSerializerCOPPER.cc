@@ -515,6 +515,8 @@ void DeSerializerCOPPERModule::event()
         printf("###########(DesCpr) caught Exception ###############\n");
         fflush(stdout);
 #endif
+        // Update EventMetaData otherwise basf2 stops.
+        m_eventMetaDataPtr.create();
         return;
       }
 #endif

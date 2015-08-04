@@ -118,7 +118,7 @@ void DeSerializerPCModule::initialize()
 #ifdef NONSTOP
   openRunStopNshm();
 #ifdef NONSTOP_DEBUG
-  printf("###########(DesCpr) prepare shm  ###############\n");
+  printf("###########(DeSerializerPC) prepare shm  ###############\n");
   fflush(stdout);
 #endif
 #endif
@@ -140,7 +140,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
 #ifdef NONSTOP
         // No data received within SO_RCVTIMEO
         char err_buf[500];
-        sprintf(err_buf, "Failed to receive data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
+        sprintf(err_buf, "Failed to receive data(%s). %d %d. : %s %s %d", strerror(errno), read_size, errno, __FILE__,
                 __PRETTY_FUNCTION__, __LINE__);
         printf("%s\n", err_buf); fflush(stdout);
         string err_str = err_buf;
@@ -159,7 +159,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
 #ifdef NONSTOP
       // Connection is closed ( error )
       char err_buf[500];
-      sprintf(err_buf, "Connection is closed by peer(%s). readsize = %d %d. Exiting...: %s %s %d",
+      sprintf(err_buf, "Connection is closed by peer(%s). Move to standby-loop. readsize = %d %d. :  %s %s %d",
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;
       g_run_error = 1;
@@ -454,7 +454,6 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
   int data_size_copper_0 = -1;
   int data_size_copper_1 = -1;
 
-
   //
   // Data check
   //
@@ -477,7 +476,6 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
     int num_nodes_in_sendblock = raw_datablk->GetNumNodes();
     for (int l = 0; l < num_nodes_in_sendblock; l++) {
       int entry_id = l + k * num_nodes_in_sendblock;
-
       //
       // RawFTSW
       //
@@ -537,8 +535,6 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         delete temp_rawtlu;
       } else {
 
-
-
         //
         // RawCOPPER
         //
@@ -585,8 +581,6 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 
         // Check Error bit flag
         if (temp_rawcopper->GetErrorBitFlag(0))(*error_bit_flag)++;
-
-
         delete temp_rawcopper;
       }
     }
@@ -631,8 +625,8 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 
 void DeSerializerPCModule::event()
 {
-  // For data check
 
+  // For data check
   unsigned int exp_copper_0 = 0;
   unsigned int run_copper_0 = 0;
   unsigned int subrun_copper_0 = 0;
@@ -653,6 +647,26 @@ void DeSerializerPCModule::event()
     m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
+
+
+#ifdef NONSTOP
+  if (g_run_stop + g_run_error > 0 || checkRunStop()) {
+    if (g_run_stop == 0) {
+      while (true) {
+        if (checkRunStop()) break;
+#ifdef NONSTOP_DEBUG
+        printf("\033[31m");
+        printf("###########(DesSerPrePC) Waiting for Runstop()  ###############\n");
+        fflush(stdout);
+        printf("\033[0m");
+#endif
+        sleep(1);
+      }
+    }
+    waitRestart();
+    restartRun();
+  }
+#endif
 
   // Make rawdatablk array
   raw_datablkarray.create();
@@ -676,8 +690,11 @@ void DeSerializerPCModule::event()
       //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
       checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
     } catch (string err_str) {
-      printf("%s\n", err_str.c_str()); fflush(stdout);
-      sleep(12345);
+      printf("Going to somewhere. %s\n", err_str.c_str()); fflush(stdout);
+
+      // Update EventMetaData otherwise basf2 stops.
+      m_eventMetaDataPtr.create();
+      return;
     }
 #ifndef USE_DESERIALIZER_PREPC
     PreRawCOPPERFormat_latest pre_rawcopper_latest;
@@ -739,9 +756,6 @@ void DeSerializerPCModule::event()
     m_eventMetaDataPtr->setSubrun(0xFFFFFFFF);
   }
   m_eventMetaDataPtr->setEvent(eve_copper_0);
-
-
-
 
   //
   // Run stop via NSM (Already obsolete. Need to ask Konno-san about implementation)

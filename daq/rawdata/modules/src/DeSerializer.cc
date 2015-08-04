@@ -358,7 +358,7 @@ void DeSerializerModule::restartRun()
 {
 
 #ifdef NONSTOP_DEBUG
-  printf("###########(DesCpr) Restart from PAUSE  ###############\n");
+  printf("###########(Des) Restart from PAUSE  ###############\n");
   fflush(stdout);
 #endif
   //    initializeCOPPER();
@@ -390,7 +390,7 @@ void DeSerializerModule::waitRestart()
       break;
     }
 #ifdef NONSTOP_DEBUG
-    printf("###########(DesCpr) Waiting for RESTART  ###############\n");
+    printf("###########(Des) Waiting for RESTART  ###############\n");
     fflush(stdout);
 #endif
     sleep(1);

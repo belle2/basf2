@@ -17,7 +17,7 @@ from fei import preCutDetermination
 # Temporary hack until automaticReporting is finished with refactoring
 # use createUniqueFilename instead afterwards.
 def removeJPsiSlash(string):
-    return string
+    return string.replace('/', '')
 
 
 import re

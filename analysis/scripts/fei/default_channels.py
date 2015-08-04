@@ -1,4 +1,4 @@
-from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
+from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, UserCutConfiguration, PlotConfiguration
 
 
 def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True):
@@ -361,7 +361,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_B0 = MVAConfiguration(
         variables=B_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_B0 = PreCutConfiguration(
@@ -404,7 +403,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_B0Semileptonic = MVAConfiguration(
         variables=B_vars,
         target='isSignalAcceptMissingNeutrino',
-        **mvaDefaults
     )
 
     pre_B0Semileptonic = PreCutConfiguration(

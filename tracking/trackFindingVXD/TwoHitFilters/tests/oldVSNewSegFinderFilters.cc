@@ -95,7 +95,7 @@ namespace VXDTFsegFinderTest {
   TEST_F(OldVSNewSegFinderFiltersTest, BasicFilter)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
@@ -120,7 +120,7 @@ namespace VXDTFsegFinderTest {
     SegFinderFilters segFinderBox(outerHit1, innerHit, &testSector, 11);
 
     // Very verbose declaration:
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -169,7 +169,7 @@ namespace VXDTFsegFinderTest {
     SegFinderFilters segFinderBox(outerHit1, innerHit, &testSector, 11);
 
     // Very verbose declaration:
-    Filter< Distance2DXYSquared<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
+    Filter< Distance2DXYSquared<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -223,7 +223,7 @@ namespace VXDTFsegFinderTest {
     SegFinderFilters segFinderBox(outerHit1, innerHit, &testSector, 11);
 
     // Very verbose declaration:
-    Filter< Distance1DZ<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(1., 2.));
+    Filter< Distance1DZ<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(1., 2.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -285,7 +285,8 @@ namespace VXDTFsegFinderTest {
     TwoHitFilters twoHitFilterBox(outerHit1, innerHit);
 
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< SlopeRZ<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(atan(2.), atan(3.)));
+    Filter< SlopeRZ<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(atan(2.), atan(3.)));
+    auto sRZ = SlopeRZ<SpacePoint, double>();
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -307,7 +308,7 @@ namespace VXDTFsegFinderTest {
     EXPECT_EQ(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP1, innerSP));
 
     twoHitFilterBox.resetValues(outerHit1, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP1, innerSP));
 
 
     EXPECT_TRUE(filter.accept(outerSP2, innerSP));
@@ -319,9 +320,9 @@ namespace VXDTFsegFinderTest {
 
     twoHitFilterBox.resetValues(outerHit2, innerHit);
 //  B2WARNING(" outerHit2 vs innerHit old/new: " << twoHitFilterBox.calcSlopeRZ() << "/" << SlopeRZ().value(outerSP2, innerSP))
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP2, innerSP));
-    EXPECT_NE(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP2,
-              innerSP)); // they are float equal but not double equal
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP2, innerSP));
+    EXPECT_NE(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP2,
+                                                       innerSP)); // they are float equal but not double equal
 
 
     EXPECT_FALSE(filter.accept(outerSP3, innerSP));
@@ -330,7 +331,7 @@ namespace VXDTFsegFinderTest {
     EXPECT_EQ(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP3, innerSP));
 
     twoHitFilterBox.resetValues(outerHit3, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP3, innerSP));
 
 
     EXPECT_TRUE(filter.accept(outerSP4, innerSP));
@@ -340,7 +341,7 @@ namespace VXDTFsegFinderTest {
 
     twoHitFilterBox.resetValues(outerHit4, innerHit);
 //  B2WARNING(" outerHit4 vs innerHit old/new: " << twoHitFilterBox.calcSlopeRZ() << "/" << SlopeRZ().value(outerSP4, innerSP))
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP4, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP4, innerSP));
 
 
     EXPECT_FALSE(filter.accept(outerSP5, innerSP));
@@ -349,7 +350,7 @@ namespace VXDTFsegFinderTest {
     EXPECT_EQ(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP5, innerSP));
 
     twoHitFilterBox.resetValues(outerHit5, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP5, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP5, innerSP));
 
 
     EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7,
@@ -359,7 +360,7 @@ namespace VXDTFsegFinderTest {
     EXPECT_EQ(segFinderBox.checkDist3D(FilterID::slopeRZ), filter.accept(outerSP7, innerSP));
 
     twoHitFilterBox.resetValues(outerHit7, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), SlopeRZ<SpacePoint>().value(outerSP7, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcSlopeRZ(), sRZ.value(outerSP7, innerSP));
   }
 
 
@@ -381,7 +382,8 @@ namespace VXDTFsegFinderTest {
     TwoHitFilters twoHitFilterBox(outerHit1, innerHit);
 
     // Very verbose declaration, the old normed distance 3D has only an upper cut, no lower one:
-    Filter< Distance3DNormed<SpacePoint>, UpperBoundedSet<float>, VoidObserver > filter(UpperBoundedSet<float>(1.));
+    Filter< Distance3DNormed<SpacePoint, double>, UpperBoundedSet<float>, VoidObserver > filter(UpperBoundedSet<float>(1.));
+    auto d3Dn = Distance3DNormed<SpacePoint, double>();
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -398,8 +400,8 @@ namespace VXDTFsegFinderTest {
     EXPECT_TRUE(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D));
     EXPECT_EQ(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D), filter.accept(outerSP1, innerSP));
     twoHitFilterBox.resetValues(outerHit1, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), Distance3DNormed<SpacePoint>().value(outerSP1, innerSP));
-    EXPECT_FLOAT_EQ(2. / 3., Distance3DNormed<SpacePoint>().value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), d3Dn.value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(2. / 3., d3Dn.value(outerSP1, innerSP));
     EXPECT_FLOAT_EQ(2. / 3., twoHitFilterBox.calcNormedDist3D());
 
 
@@ -408,8 +410,8 @@ namespace VXDTFsegFinderTest {
     EXPECT_TRUE(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D));
     EXPECT_EQ(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D), filter.accept(outerSP2, innerSP));
     twoHitFilterBox.resetValues(outerHit2, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), Distance3DNormed<SpacePoint>().value(outerSP2, innerSP));
-    EXPECT_FLOAT_EQ(0., Distance3DNormed<SpacePoint>().value(outerSP2, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), d3Dn.value(outerSP2, innerSP));
+    EXPECT_FLOAT_EQ(0., d3Dn.value(outerSP2, innerSP));
     EXPECT_FLOAT_EQ(0., twoHitFilterBox.calcNormedDist3D());
 
 
@@ -418,8 +420,8 @@ namespace VXDTFsegFinderTest {
     EXPECT_FALSE(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D));
     EXPECT_EQ(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D), filter.accept(outerSP3, innerSP));
     twoHitFilterBox.resetValues(outerHit3, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), Distance3DNormed<SpacePoint>().value(outerSP3, innerSP));
-    EXPECT_FLOAT_EQ(1., Distance3DNormed<SpacePoint>().value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), d3Dn.value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(1., d3Dn.value(outerSP3, innerSP));
     EXPECT_FLOAT_EQ(1., twoHitFilterBox.calcNormedDist3D());
 
 
@@ -429,8 +431,8 @@ namespace VXDTFsegFinderTest {
     EXPECT_TRUE(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D));
     EXPECT_EQ(segFinderBox.checkNormedDist3D(FilterID::normedDistance3D), filter.accept(innerSP, innerSP));
     twoHitFilterBox.resetValues(innerHit, innerHit);
-    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), Distance3DNormed<SpacePoint>().value(innerSP, innerSP));
-    EXPECT_FLOAT_EQ(0., Distance3DNormed<SpacePoint>().value(innerSP, innerSP));
+    EXPECT_FLOAT_EQ(twoHitFilterBox.calcNormedDist3D(), d3Dn.value(innerSP, innerSP));
+    EXPECT_FLOAT_EQ(0., d3Dn.value(innerSP, innerSP));
     EXPECT_FLOAT_EQ(0., twoHitFilterBox.calcNormedDist3D());
   }
 }

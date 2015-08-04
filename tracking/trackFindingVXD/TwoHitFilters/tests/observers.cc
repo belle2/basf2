@@ -816,9 +816,11 @@ namespace VXDTFObserversTest {
   /** tests possibility of accessing MCData */
   TEST_F(ObserversTest, TestMCDataAccess)
   {
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilter(Range<float, float>(2.5, 3.5));
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilter(
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(2.5,
+        3.5));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, CountAcceptedRejectedMCParticleObserver > observedFilter(
       unobservedFilter);
+    auto mcCounter = counterMC< Distance3DSquared<SpacePoint, double> >();
 
     for (int i = 1 ; i < spacePointData.getEntries(); i++) {
       SpacePoint& spA = *spacePointData[i];
@@ -828,36 +830,38 @@ namespace VXDTFObserversTest {
       observedFilter.accept(spA, spB);
     }
 
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.size());
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.size());
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.size());
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.size());
 
-    counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.PrintResults("pdgCode");
+    mcCounter.pdGacceptedRejected.PrintResults("pdgCode");
 
     /// TODO further tests!
     // the filter was too loose, everything is accepted
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).accept);
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).accept);
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({11}).accept);
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({13}).accept);
     // and nothing was rejected...
-    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).reject);
-    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).reject);
-    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).reject);
+    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult({11}).reject);
+    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).reject);
+    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult({13}).reject);
 
 
-    counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.PrintResults("pID");
+    mcCounter.mcIDacceptedRejected.PrintResults("pID");
 
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).accept);
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).accept);
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({1}).accept);
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({2}).accept);
 
-    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).reject);
-    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).reject);
-    EXPECT_EQ(0, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).reject);
+    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult({1}).reject);
+    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).reject);
+    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult({2}).reject);
 
 
     // now we set the filter using values which are too strict
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > unobservedFilterStrict(Range<float, float>(3.1, 3.5));
-    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, CountAcceptedRejectedMCParticleObserver > observedFilterStrict(
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilterStrict(Range<double, double>
+        (3.1, 3.5));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, CountAcceptedRejectedMCParticleObserver >
+    observedFilterStrict(
       unobservedFilterStrict);
 
     for (int i = 1 ; i < spacePointData.getEntries(); i++) {
@@ -866,26 +870,26 @@ namespace VXDTFObserversTest {
       observedFilterStrict.accept(spA, spB);
     }
 
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.size());
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.size());
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.size());
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.size());
 
     // first filter does write into the same container, therefore values didn't change for accepted
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).accept);
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).accept);
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({11}).accept);
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({13}).accept);
 
     // second filter does reject everything:
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11}).reject);
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({11, 13}).reject);
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::pdGacceptedRejected.ReturnResult({13}).reject);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({11}).reject);
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).reject);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({13}).reject);
 
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).accept);
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).accept);
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({1}).accept);
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({2}).accept);
 
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1}).reject);
-    EXPECT_EQ(3, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({1, 2}).reject);
-    EXPECT_EQ(1, counterMC< Distance3DSquared<SpacePoint> >::mcIDacceptedRejected.ReturnResult({2}).reject);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({1}).reject);
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).reject);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({2}).reject);
 
   }
 
@@ -897,22 +901,25 @@ namespace VXDTFObserversTest {
   TEST_F(ObserversTest, TestObserverFlexibility)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0.,
+        1.));
 
     //     Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VectorOfObservers<Distance3DSquared> > filter(unobservedFilter);
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, InfoObserver > observedFilter(unobservedFilter);
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, InfoObserver > observedFilter(unobservedFilter);
     SpacePoint x1 = provideSpacePointDummy(1, 0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(1, 0.5f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(1, 2.0f , 0.0f, 0.0f);
-    counter< Distance3DSquared<SpacePoint> >::resetCounter();
+    auto myCounter = counter<Distance3DSquared<SpacePoint, double>>();
+    myCounter.resetCounter();
 
     /// variant A (doesn't work, because of static function(?)):
 //  auto storeFuncVariantA = std::bind( ((VectorOfObservers<Distance3DSquared>::observerFunction) &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
     //  VectorOfObservers<Distance3DSquared>::sm_collectedObservers.push_back(storeFuncVariantA);
 
     /// variant B:
-    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer)
-                                        &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(), std::placeholders::_3);
+    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint, double>>::CStyleFunctionPointer)
+                                        &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint, double>(),
+                                       std::placeholders::_3);
 
     char* realname(NULL);
     int status(0);
@@ -933,17 +940,18 @@ namespace VXDTFObserversTest {
 
     observedFilter.accept(x2, x1);
     observedFilter.accept(x3, x1);
-    EXPECT_EQ(0 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(0 , myCounter.used);
 
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, ProvideBasicInfoObserver > anotherObservedFilter(unobservedFilter);
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, ProvideBasicInfoObserver > anotherObservedFilter(
+      unobservedFilter);
 
     anotherObservedFilter.accept(x2, x1);
     anotherObservedFilter.accept(x3, x1);
-    EXPECT_EQ(2 , counter< Distance3DSquared<SpacePoint> >::used);
-    EXPECT_EQ(1 , counter< Distance3DSquared<SpacePoint> >::accepted);
-    EXPECT_EQ(1 , counter< Distance3DSquared<SpacePoint> >::rejected);
-    EXPECT_EQ(0 , counter< Distance3DSquared<SpacePoint> >::wasInf);
-    EXPECT_EQ(0 , counter< Distance3DSquared<SpacePoint> >::wasNan);
+    EXPECT_EQ(2 , myCounter.used);
+    EXPECT_EQ(1 , myCounter.accepted);
+    EXPECT_EQ(1 , myCounter.rejected);
+    EXPECT_EQ(0 , myCounter.wasInf);
+    EXPECT_EQ(0 , myCounter.wasNan);
   }
 
 

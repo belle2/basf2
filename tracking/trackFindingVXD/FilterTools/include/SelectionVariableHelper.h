@@ -87,11 +87,11 @@ namespace Belle2 {
     * WARNING: returns 0 if no valid value could be found! */
     static DataType calcSlopeRZ(const PointType& outerHit, const PointType& innerHit)
     {
-      float result = atan(
-                       sqrt(std::pow((outerHit.X() - innerHit.X()), 2)
-                            + std::pow((outerHit.Y() - innerHit.Y()), 2)
-                           ) / (outerHit.Z() - innerHit.Z())
-                     );
+      double result = atan(
+                        sqrt(std::pow(double(outerHit.X() - innerHit.X()), 2)
+                             + std::pow(double(outerHit.Y() - innerHit.Y()), 2)
+                            ) / double(outerHit.Z() - innerHit.Z())
+                      );
       return checkValid(result);
     }
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none (incomplete calculation). */

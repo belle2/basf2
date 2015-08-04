@@ -74,16 +74,6 @@ namespace Belle2 {
     /** Sets the default settings for the BhWide Fortran generator. */
     void setDefaultSettings();
 
-    /** Sets the Lorentz boost vector which should be applied to the generated particles.
-     * @param boostVector The Lorentz boost vector which is applied to the generated particles.
-     */
-    void setBoost(TLorentzRotation boostVector) { m_boostVector = boostVector; }
-
-    /** Enables the boost of the generated particles.
-     * @param applyBoost Set to true to enabled the boost. Also make sure you have set the boost vector using setBoost().
-     */
-    void enableBoost(bool applyBoost = true) { m_applyBoost = applyBoost; }
-
     /** Enabled the Z contribution.
      * @param zContribution Set to true to enabled the Z contribution.
      */
@@ -196,8 +186,10 @@ namespace Belle2 {
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
+     * @param vertex generated vertex.
+     * @param boost generated boost.
      */
-    void generateEvent(MCParticleGraph& mcGraph);
+    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -243,9 +235,6 @@ namespace Belle2 {
     double m_massTop;   /**< top quark mass [GeV]. */
     double m_massHiggs; /**< Higgs mass [GeV] */
 
-    bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
-    TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */
-
     double m_crossSection;      /**< The cross section of the generated bhabha scattering events. */
     double m_crossSectionError; /**< The error on the cross section of the generated bhabha scattering events. */
 
@@ -257,10 +246,10 @@ namespace Belle2 {
      * @param mom The 3-momentum of the particle in [GeV].
      * @param pdg The PDG code of the particle.
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
-     *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual = false, bool isInitial = false);
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                       bool isVirtual = false, bool isInitial = false);
 
   private:
 

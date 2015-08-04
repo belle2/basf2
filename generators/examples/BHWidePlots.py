@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################################## This steering file
+# This steering file
 # shows all options for the generation of radiative Bhabha scattering.
 #
 # 10000 radiative Bhabha events are generated using the BHWide Fortran
@@ -13,19 +13,20 @@
 import sys
 import math
 from basf2 import *
+from beamparameters import add_beamparameters
 
-## reenable GUI thread for our canvas
+# reenable GUI thread for our canvas
 from ROOT import PyConfig
 PyConfig.StartGuiThread = True
 
-## Set the global log level
+# Set the global log level
 logging.log_level = LogLevel.WARNING
 
-## Load the required libraries
+# Load the required libraries
 import ROOT
 from ROOT import Belle2
 
-## Create some histograms to be filled
+# Create some histograms to be filled
 h_nTracks = ROOT.TH1D('nTracks', 'Number of Tracks per Event;#', 20, 0, 20)
 h_pdg = ROOT.TH1D('pid', 'Particle code of particles', 100, -50, 50)
 h_momentum = ROOT.TH1D('momentum', 'Momentum of particles', 200, 0, 8)
@@ -43,7 +44,7 @@ h_vertex = ROOT.TH2D(
     200,
     -10,
     10,
-    )
+)
 
 
 class ShowMCParticles(Module):
@@ -69,17 +70,20 @@ class ShowMCParticles(Module):
                 h_vertex.Fill(mc.getProductionVertex().X(),
                               mc.getProductionVertex().Y())
 
+# Create the main path and add the modules
+main = create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
-paramloader = register_module('Gearbox')
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
-## Register the BHWideInput module
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("generateCMS", True)
+# print_params(beamparameters)
+
+# Register the BHWideInput module
 bhwide = register_module('BHWideInput')
-
-# Set the mode for the boost of the generated particles 0 = no boost 1 = BELLE
-# II 2 = BELLE
-bhwide.param('BoostMode', 1)
 
 # Set the min and max values for the theta scattering angle of the Positrons
 bhwide.param('ScatteringAngleRangePositron', [5.7, 174.3])
@@ -91,15 +95,10 @@ bhwide.param('ScatteringAngleRangeElectron', [5.7, 174.3])
 # cross section
 bhwide.set_log_level(LogLevel.INFO)
 
-## Register the Progress module and the Python histogram module
-progress = register_module('Progress')
+# Register the Progress module and the Python histogram module
 showMCPart = ShowMCParticles()
 
-## Create the main path and add the modules
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(paramloader)
-main.add_module(progress)
+main.add_module("Progress")
 main.add_module(bhwide)
 main.add_module(showMCPart)
 
@@ -122,7 +121,7 @@ histograms = [
     h_theta,
     h_costheta,
     h_phi,
-    ]
+]
 for (i, h) in enumerate(histograms):
     c.cd(i + 1)
     h.SetMinimum(0)

@@ -3,7 +3,7 @@
  * Copyright(C) 2011  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll n                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,6 +18,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <vector>
 
@@ -76,6 +78,10 @@ namespace Belle2 {
 
     template <typename T>
     std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
+
   }; /**< vectorToPair. */
 
   template <typename T>

@@ -82,7 +82,6 @@ BHWide::~BHWide()
 
 void BHWide::setDefaultSettings()
 {
-  m_applyBoost = true;
 
   m_zContribution = true;
   m_channel = CH_BOTH;
@@ -117,24 +116,24 @@ void BHWide::init()
 }
 
 
-void BHWide::generateEvent(MCParticleGraph& mcGraph)
+void BHWide::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
   //Generate event
   int mode = 0;
   bhwide_(&mode, m_xpar, m_npar);
 
   //Store the initial particles as virtual particles into the MCParticleGraph
-  storeParticle(mcGraph, momset_.q1, 11, true);
-  storeParticle(mcGraph, momset_.p1, -11, true);
+  storeParticle(mcGraph, momset_.q1, 11, vertex, boost, true);
+  storeParticle(mcGraph, momset_.p1, -11, vertex, boost, true);
 
   //Store the final state positron and electron into the MCParticleGraph
-  storeParticle(mcGraph, momset_.q2, 11);
-  storeParticle(mcGraph, momset_.p2, -11);
+  storeParticle(mcGraph, momset_.q2, 11, vertex, boost);
+  storeParticle(mcGraph, momset_.p2, -11, vertex, boost);
 
   //Store the real photons into the MCParticleGraph
   for (int iPhot = 0; iPhot <  momset_.nphot; ++iPhot) {
     double photMom[4] = {momset_.phit[0][iPhot], momset_.phit[1][iPhot], momset_.phit[2][iPhot], momset_.phit[3][iPhot]};
-    storeParticle(mcGraph, photMom, 22);
+    storeParticle(mcGraph, photMom, 22, vertex, boost);
   }
 }
 
@@ -188,7 +187,8 @@ void BHWide::applySettings()
 }
 
 
-void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual, bool isInitial)
+void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                           bool isVirtual, bool isInitial)
 {
   //  //Create particle
   //MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
@@ -204,9 +204,20 @@ void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
     part.setStatus(MCParticle::c_IsVirtual);
   } else if (isInitial) {
     part.setStatus(MCParticle::c_Initial);
-  } else {
-    part.setStatus(MCParticle::c_PrimaryParticle);
   }
+
+  // every particle from a generator is primary
+  part.addStatus(MCParticle::c_PrimaryParticle);
+
+  // all particles produced by BHWIDE are stable
+  part.addStatus(MCParticle::c_StableInGenerator);
+
+  // all photons from BHWIDE are ISR or FSR
+  if (pdg == 22 && !isVirtual) {
+    part.addStatus(MCParticle::c_IsISRPhoton);
+    part.addStatus(MCParticle::c_IsFSRPhoton);
+  }
+
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
@@ -214,9 +225,17 @@ void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
-  //Mirror Pz and if boosting is enable boost the particles to the lab frame
+  //boost
   TLorentzVector p4 = part.get4Vector();
-  p4.SetPz(-1.0 * p4.Pz());
-  if (m_applyBoost) p4 = m_boostVector * p4;
+  p4.SetPz(-1.0 * p4.Pz()); //BHWIDE uses other direction convention
+  p4 = boost * p4;
   part.set4Vector(p4);
+
+  //set vertex
+  if (!isInitial) {
+    TVector3 v3 = part.getProductionVertex();
+    v3 = v3 + vertex;
+    part.setProductionVertex(v3);
+    part.setValidVertex(true);
+  }
 }

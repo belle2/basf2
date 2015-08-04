@@ -459,6 +459,11 @@ def fullEventInterpretation(selection_path, particles):
 
     # Create the automatic reporting summary pdf
     if args.summary:
+
+        from automaticReporting import loadCoveredBranchingFractionsDataFrame
+        df = loadCoveredBranchingFractionsDataFrame(particles, include_daughter_fractions=True)
+        dag.add('CoveredBranchingFractions', df)
+
         for particle in particles:
             if particle.isFSP:
                 dag.add('Placeholders_' + particle.identifier, automaticReporting.createFSPReport,
@@ -495,7 +500,8 @@ def fullEventInterpretation(selection_path, particles):
                         signalProbabilities=['SignalProbability_' + channel.name for channel in particle.channels],
                         nTuple='VariablesToNTuple_' + particle.identifier,
                         listCounts='listCounts',
-                        mcCounts='mcCounts')
+                        mcCounts='mcCounts',
+                        coveredBranchingFractions='CoveredBranchingFractions')
 
         dag.add('FEISummary.pdf', automaticReporting.createSummary,
                 finalStateSummaries=['Placeholders_' + p.identifier for p in particles if p.isFSP],

@@ -264,14 +264,16 @@ def loadCoveredBranchingFractionsDataFrame(particles, filename=None, include_dau
     """
     import pandas
     mc = loadBranchingFractionsDataFrame(filename).groupby(['particle', 'channel'])['fraction'].sum()
-    covered = pandas.DataFrame(columns=['particle', 'channel', 'fraction'])
-    covered = covered.append([{'particle': 'nu_e:generic', 'channel': (), 'fraction': 1.0},
-                              {'particle': 'nu_mu:generic', 'channel': (), 'fraction': 1.0},
-                              {'particle': 'nu_tau:generic', 'channel': (), 'fraction': 1.0}], ignore_index=True)
+    covered = pandas.DataFrame(columns=['particle', 'channel', 'channelName', 'fraction'])
+    covered = covered.append([{'particle': 'nu_e:generic', 'channel': (), 'channelName': 'nu_e:generic', 'fraction': 1.0},
+                              {'particle': 'nu_mu:generic', 'channel': (), 'channelName': 'nu_mu:generic', 'fraction': 1.0},
+                              {'particle': 'nu_tau:generic', 'channel': (), 'channelName': 'nu_tau:generic', 'fraction': 1.0}],
+                             ignore_index=True)
     remaining = []
     for particle in particles:
         if particle.isFSP:
-            covered = covered.append([{'particle': particle.identifier, 'channel': tuple(), 'fraction': 1.0}], ignore_index=True)
+            d = [{'particle': particle.identifier, 'channel': tuple(), 'channelName': particle.identifier, 'fraction': 1.0}]
+            covered = covered.append(d, ignore_index=True)
         else:
             for channel in particle.channels:
                 mychannel = [daughter for daughter in channel.daughters]
@@ -286,7 +288,7 @@ def loadCoveredBranchingFractionsDataFrame(particles, filename=None, include_dau
                         mychannel += ['nu_' + i[:-1] + ':generic'] * m
                     elif m < 0:
                         mychannel += ['anti-nu_' + i[:-1] + ':generic'] * (-m)
-                remaining.append((particle.identifier, tuple(sorted(mychannel))))
+                remaining.append((particle.identifier, tuple(sorted(mychannel)), channel.name))
 
     def conjugate(particle):
         n, l = particle.split(':')
@@ -295,8 +297,8 @@ def loadCoveredBranchingFractionsDataFrame(particles, filename=None, include_dau
     while remaining:
         old_remaining = remaining
         remaining = []
-        blacklist = [name for name, _ in old_remaining]
-        for name, channel in old_remaining:
+        blacklist = [name for name, _, _ in old_remaining]
+        for name, channel, channelName in old_remaining:
             if all(daughter not in blacklist and conjugate(daughter) not in blacklist for daughter in channel):
                 rawname = name.split(':')[0]
                 rawchannel = tuple(sorted([n.split(':')[0] for n in channel]))
@@ -310,9 +312,10 @@ def loadCoveredBranchingFractionsDataFrame(particles, filename=None, include_dau
                     for daughter in channel:
                         mask = (covered.particle == daughter) | (covered.particle == conjugate(daughter))
                         fraction *= covered[mask]['fraction'].sum()
-                covered = covered.append([{'particle': name, 'channel': channel, 'fraction': fraction}], ignore_index=True)
+                d = [{'particle': name, 'channel': channel, 'channelName': channelName, 'fraction': fraction}]
+                covered = covered.append(d, ignore_index=True)
             else:
-                remaining.append((name, channel))
+                remaining.append((name, channel, channelName))
 
     return covered
 
@@ -327,7 +330,7 @@ def createUniqueFilename(name, hash, suffix='png'):
         @return string unique and save to use filename
     """
     filename = '{name}_{hash}.{suffix}'.format(name=name, hash=hash, suffix=suffix)
-    return filename.replace('/', '')
+    return filename.replace('/', '').replace(':', '').replace(' ', '').replace('=', '').replace('>', '')
 
 
 def createSummary(resource, finalStateSummaries, combinedSummaries, particles, mcCounts, listCounts, moduleStatisticsFile):
@@ -343,38 +346,38 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
         @return dictionary of placeholders used in the .tex file
     """
 
-    o = latex.String()
+    o = b2latex.LatexFile()
 
-    o += latex.TitlePage(title='Full Event Interpretation Report',
-                         authors=['Thomas Keck', 'Christian Pulvermacher'],
-                         abstract=r"""
-                            This report contains key performance indicators and control plots of the Full Event Interpretation.
-                            The user-, pre-, and post-cuts as well as trained multivariate selection methods are described.
-                            Furthermore the resulting purities and efficiencies are stated.
-                                """,
-                         add_table_of_contents=True).finish()
+    o += b2latex.TitlePage(title='Full Event Interpretation Report',
+                           authors=['Thomas Keck', 'Christian Pulvermacher'],
+                           abstract=r"""
+                           This report contains key performance indicators and control plots of the Full Event Interpretation.
+                           The user-, pre-, and post-cuts as well as trained multivariate selection methods are described.
+                           Furthermore the resulting purities and efficiencies are stated.
+                              """,
+                           add_table_of_contents=True).finish()
 
     channelSummaries = sum(map(lambda x: x['channels'], combinedSummaries), [])
 
-    o += latex.Section("Summary").finish()
-    o += latex.String(r"""
+    o += b2latex.Section("Summary").finish()
+    o += b2latex.String(r"""
         For each final-state particle a multivariate selection method is trained without any previous cuts
         on the candidates. Afterwards, a post cut is applied on the signal probability calculated by the method.
         This reduces combinatorics in the following stages of the Full
         Event Interpretation.
         """).finish()
 
-    table = latex.LongTable(columnspecs=r'c|rr|rr',
-                            caption='Final-state particle efficiency and purity before and after the applied post-cut.',
-                            head=r'Final-state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\' +
-                                 r' particle    &  detector & post-cut   &  detector & post-cut \\',
-                            format=r'{name} & {user_efficiency:.2f} & {post_efficiency:.2f}'
-                                   r'& {user_purity:.2f} & {post_purity:.2f} ')
+    table = b2latex.LongTable(columnspecs=r'c|rr|rr',
+                              caption='Final-state particle efficiency and purity before and after the applied post-cut.',
+                              head=r'Final-state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\' +
+                                   r' particle    &  detector & post-cut   &  detector & post-cut \\',
+                              format_string=r'{name} & {user_efficiency:.2f} & {post_efficiency:.2f}'
+                                            r'& {user_purity:.2f} & {post_purity:.2f} ')
     for summary in finalStateSummaries:
         table.add(**summary)
     o += table.finish()
 
-    o += latex.String(r"""
+    o += b2latex.String(r"""
         For each decay channel of each intermediate particle a multivariate selection method is trained after applying
         a fast pre-cut on the candidates. Afterwards, a post-cut is applied on the signal probability calculated by the method.
         This reduces combinatorics in the following stages of the Full
@@ -382,15 +385,15 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
         is applied before all other cuts.
         """).finish()
 
-    table = latex.LongTable(columnspecs=r'c|r|rrrr|rrrr',
-                            caption='Per-particle efficiency and purity before and after the applied user-, pre- and post-cut.',
-                            head=r'Particle & Covered BR '
-                                 r' & \multicolumn{4}{c}{Efficiency in \%}  &  \multicolumn{4}{c}{Purity in \%} \\'
-                                 r' &  reconstruction & user-cut & pre-cut & post-cut '
-                                 r' & reconstruction & user-cut & pre-cut & post-cut \\',
-                            format=r'{name} & {covered:.2f} & {detector_efficiency:.2f} & {user_efficiency:.2f}'
-                                   r' & {pre_efficiency:.2f}  & {post_efficiency:.2f}'
-                                   r' & {detector_purity:.2f} & {user_purity:.2f} & {pre_purity:.2f} & {post_purity:.2f} ')
+    table = b2latex.LongTable(columnspecs=r'c|r|rrrr|rrrr',
+                              caption='Per-particle efficiency and purity before and after the applied user-, pre- and post-cut.',
+                              head=r'Particle & Covered BR in \%'
+                                   r' & \multicolumn{4}{c}{Efficiency in \%}  &  \multicolumn{4}{c}{Purity in \%} \\'
+                                   r' & &  recon. & user-cut & pre-cut & post-cut '
+                                   r' & recon. & user-cut & pre-cut & post-cut \\',
+                              format_string=r'{name} & {covered:.2f} & {detector_efficiency:.2f} & {user_efficiency:.2f}'
+                                            r' & {pre_efficiency:.2f}  & {post_efficiency:.2f}'
+                                            r' & {detector_purity:.2f} & {user_purity:.2f} & {pre_purity:.2f} & {post_purity:.2f}')
     for summary in combinedSummaries:
         table.add(**summary)
     o += table.finish()
@@ -398,14 +401,14 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
     # If you change the number of colors, than change below \ifnum5 accordingly
     colours = ["orange", "blue", "red", "green", "cyan", "purple"]
 
-    o += latex.Section("CPU time per channel").finish()
+    o += b2latex.Section("CPU time per channel").finish()
 
-    colour_list = latex.DefineColourList()
+    colour_list = b2latex.DefineColourList()
     o += colour_list.finish()
 
-    listCountsData = getListCountsDataFrame(listCounts)
+    listCountsData = loadListCountsDataFrame(listCounts)
     stats = loadModuleStatisticsDataFrame(moduleStatisticsFile)
-    sum_time_seconds = stats.sum()
+    sum_time_seconds = stats['time'].sum()
     moduleTypes = list(stats.type.unique())
     stats = stats.groupby(['listname', 'type'])['time'].sum()
 
@@ -419,22 +422,22 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
         allCandidates = listCountsData[plist + '_All'].sum()
         statTable.append([name, stats[plist].sum(), stats[plist], trueCandidates, allCandidates])
 
-    table = latex.LongTable(columnspecs=r'lrcrr',
-                            caption='Total CPU time spent in event() calls for each channel. Bars show ' +
-                                    ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours, moduleTypes)) +
-                                    ', in this order. Does not include I/O, initalisation, training, post-cuts etc.',
-                            head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
-                            format=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
+    table = b2latex.LongTable(columnspecs=r'lrcrr',
+                              caption='Total CPU time spent in event() calls for each channel. Bars show ' +
+                                      ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours, moduleTypes)) +
+                                      ', in this order. Does not include I/O, initalisation, training, post-cuts etc.',
+                              head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
+                              format_string=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
     for name, time, timePerModule, trueCandidates, allCandidates in statTable:
-        percents = tuple(timePerModule[key] / time * 100.0 for key in moduleTypes)
-        timePerCandidate = formatTime(numpy.float64(time) / trueCandidates)
-        timePerCandidate += ' (' + formatTime(numpy.float64(time) / allCandidates) + ')'
+        percents = tuple(timePerModule[key] / time * 100.0 if key in timePerModule else 0.0 for key in moduleTypes)
+        timePerCandidate = format.duration(numpy.float64(time) / trueCandidates)
+        timePerCandidate += ' (' + format.duration(numpy.float64(time) / allCandidates) + ')'
         table.add(name=name,
                   bargraph=r'\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % percents,
-                  time=formatTime(time),
+                  time=format.duration(time),
                   timePerCandidate=timePerCandidate,
                   timePercent=time / sum_time_seconds * 100 if sum_time_seconds > 0 else 0)
-    o += table.finish(tail='Total & & ' + formatTime(sum_time_seconds) + ' & & 100 ')
+    o += table.finish(tail='Total & & ' + format.duration(sum_time_seconds) + ' & & 100 ')
 
     for ph in finalStateSummaries:
         o += ph['page']
@@ -447,18 +450,19 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
     return
 
 
-def createTMVASection(filename, tmvaTraining, plotConfig):
+def createTMVASection(filename, tmvaTraining, mvaConfig, plotConfig):
     """
     Create TMVA section, with information about used methods,
     overtraining, ROC and diagonal plots.
         @param filename used as suffix for all plots
         @param tmvaTraining data used to create the plots
+        @param mvaConfig used to extract config information
         @param plotConfig which defines which plots are included
     """
-    o = latex.LatexFile()
-    o += latex.SubSubSection("MC-based MVA")
+    o = b2latex.LatexFile()
+    o += b2latex.SubSubSection("MC-based MVA")
     if tmvaTraining is None:
-        o += latex.String(r"""
+        o += b2latex.String(r"""
                 There is no MC-based TMVA training data available for this final state particle.
                 Usually this means there wasn't enough statistics to perform a training,
                 or the training failed due to other reasons (cpu-, memory-, disk-, limitations?)
@@ -472,23 +476,25 @@ def createTMVASection(filename, tmvaTraining, plotConfig):
         logFilename = tmvaTraining[:-9] + '.log'  # Strip _1.config of filename
         ranking = loadMVARankingDataFrame(logFilename)
 
-        table = latex.LongTable(columnspecs=r'lp{5cm}rrr',
-                                caption='List of variables used in the training',
-                                head=r'No. & Name & Importance & \multicolumn{2}{c}{mean $\pm$ std} \\ & & & Signal & Background ',
-                                format=r'{no} & {name} & {v:.2f} & $({ms:.3f} \pm {es:.3f})$ & $({mb:.3f} \pm {eb:.3f})$')
+        table = b2latex.LongTable(columnspecs=r'lp{5cm}rrr',
+                                  caption='List of variables used in the training',
+                                  head=r'No. & Name & Importance & \multicolumn{2}{c}{mean $\pm$ std} \\'
+                                       r' & & & Signal & Background ',
+                                  format_string=r'{no} & {name} & {v:.2f} & $({ms:.3f} \pm {es:.3f})$'
+                                                r' & $({mb:.3f} \pm {eb:.3f})$')
 
         for number, (n, value) in ranking.iterrows():
             table.add(no=number+1,
-                      name=addHyphenations(escapeForLatex(n)),
+                      name=format.variable(format.string(n)),
                       v=value,
                       ms=tmvaData[tmvaData['__isSignal__']][n].mean(),
                       es=tmvaData[tmvaData['__isSignal__']][n].std(),
                       mb=tmvaData[~tmvaData['__isSignal__']][n].mean(),
                       eb=tmvaData[~tmvaData['__isSignal__']][n].std())
         for n in mvaConfig.variables:
-            if n not in ranking.importance.unique():
+            if n not in ranking.name.unique():
                 table.add(no='---',
-                          name=addHyphenations(escapeForLatex(n)),
+                          name=format.variable(format.string(n)),
                           v=float('nan'),
                           ms=float('nan'),
                           es=float('nan'),
@@ -500,24 +506,24 @@ def createTMVASection(filename, tmvaTraining, plotConfig):
             correlationMatrixPlotSignal = 'corMSig_' + filename
             correlationMatrixPlotBackground = 'corMBkg_' + filename
             plot = b2plot.CorrelationMatrix()
-            plot.add(tmvaData[tmvaData['__isSignal__']], ranking.keys())
+            plot.add(tmvaData[tmvaData['__isSignal__']], ranking.name.unique())
             plot.finish()
             plot.axis.set_title('Correlation Matrix for Signal')
             plot.save(correlationMatrixPlotSignal)
 
             plot = b2plot.CorrelationMatrix()
-            plot.add(tmvaData[~tmvaData['__isSignal__']], ranking.keys())
+            plot.add(tmvaData[~tmvaData['__isSignal__']], ranking.name.unique())
             plot.finish()
             plot.axis.set_title('Correlation Matrix for Background')
             plot.save(correlationMatrixPlotBackground)
-            o += latex.Graphics().add(correlationMatrixPlotSignal).add(correlationMatrixPlotBackground).finish()
+            o += b2latex.Graphics().add(correlationMatrixPlotSignal).add(correlationMatrixPlotBackground).finish()
 
         caption = 'Method ' + mvaConfig.type + '/' + mvaConfig.name + ' was used with the following configuration '
-        caption += addHyphenations(mvaConfig.config) + r'and with target variable \emph{' + mvaConfig.target + r'}'
-        table = latex.LongTable(columnspecs=r'lp{5cm}rr',
-                                caption=caption,
-                                head=r'Name & Signal & Background',
-                                format=r'{name} & {signal} & {background}')
+        caption += format.variable(mvaConfig.config) + r'and with target variable \emph{' + mvaConfig.target + r'}'
+        table = b2latex.LongTable(columnspecs=r'lp{5cm}rr',
+                                  caption=caption,
+                                  head=r'Name & Signal & Background',
+                                  format_string=r'{name} & {signal} & {background}')
         table.add(name='Training',
                   signal=numpy.sum(tmvaTrainingData['__isSignal__']),
                   background=numpy.sum(~tmvaTestData['__isSignal__']))
@@ -552,7 +558,7 @@ def createTMVASection(filename, tmvaTraining, plotConfig):
                  tmvaData['__isSignal__'], ~tmvaData['__isSignal__'])
         plot.finish()
         plot.save(mvaOvertrainingPlot)
-        o += latex.Graphics().add(mvaOvertrainingPlot, width=0.7).add(mvaROCPlot, width=0.7).add(mvaDiagPlot, width=0.7).finish()
+        o += b2latex.Graphics().add(mvaOvertrainingPlot, width=0.7).add(mvaROCPlot, width=0.7).add(mvaDiagPlot, width=0.7).finish()
 
     return o.finish()
 
@@ -564,8 +570,8 @@ def createDiagonalPlot(filename, nTupleData, mvaConfig):
         @param nTupleData used to create the diagonal plot
         @param mvaConfig used to define the target variable
     """
-    o += latex.LatexFile()
-    o += latex.SubSection("Diagonal plot")
+    o = b2latex.LatexFile()
+    o += b2latex.SubSection("Diagonal plot")
     diagonalPlot = 'diag_' + filename
     plot = b2plot.Diagonal()
     plot.set_plot_options({'linestyle': '-', 'lw': 3})
@@ -573,7 +579,7 @@ def createDiagonalPlot(filename, nTupleData, mvaConfig):
              nTupleData[mvaConfig.target] > 0, nTupleData[mvaConfig.target] == 0)
     plot.finish()
     plot.save(diagonalPlot)
-    o += latex.Graphics().add(diagonalPlot, width=0.7).finish()
+    o += b2latex.Graphics().add(diagonalPlot, width=0.7).finish()
     return o.finish()
 
 
@@ -610,7 +616,7 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     mcCountsData = loadMCCountsDataFrame(mcCounts)
     mcCountsData = mcCountsData[pdgcode]
 
-    listCountsData = getListCountsDataFrame(listCounts)
+    listCountsData = loadListCountsDataFrame(listCounts)
     listCountsData = listCountsData[[matchedList + '_Signal', matchedList + '_Background', matchedList + '_All']]
     listCountsData.columns = ["Signal", "Background", "All"]
 
@@ -625,20 +631,20 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     raw_name = particleName
     if particleLabel != '':
         raw_name += ':' + particleLabel
-    name = prettifyDecayString(raw_name)
+    name = format.decayDescriptor(raw_name)
 
-    o = latex.LatexFile()
-    o += latex.Section(name).finish()
+    o = b2latex.LatexFile()
+    o += b2latex.Section(name).finish()
 
-    o += latex.SubSection("Statistic").finish()
+    o += b2latex.SubSection("Statistic").finish()
     if userCutConfig.userCut != '':
-        string = latex.String(r"Quantities (except MC truth) are calculated after applying the user-defined cut {cut}")
+        string = b2latex.String(r"Quantities (except MC truth) are calculated after applying the user-defined cut {cut}")
         o += string.finish(cut=userCutConfig.userCut)
-    table = latex.LongTable(columnspecs=r'p{5cm}rrrrr',
-                            caption='Statistical quantities per Monte Carlo event',
-                            head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
-                            format=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
-                                   r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
+    table = b2latex.LongTable(columnspecs=r'p{5cm}rrrrr',
+                              caption='Statistical quantities per Monte Carlo event',
+                              head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
+                              format_string=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
+                                            r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
     table.add(quantity='MC-Particles',
               mean=mcCountsData.sum() / mcCountsData.count(),
               error=b2stat.poisson_error(mcCountsData.sum()) / nEvents,
@@ -682,10 +688,10 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     post_purity = nSignalAfterPostCut / nCandidatesAfterPostCut * 100.0
     post_purity_error = b2stat.binom_error(nSignalAfterPostCut, nCandidatesAfterPostCut) * 100.0
 
-    table = latex.LongTable(columnspecs=r'p{5cm}rr',
-                            caption='Efficiencies and Purities',
-                            head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
-                            format=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
+    table = b2latex.LongTable(columnspecs=r'p{5cm}rr',
+                              caption='Efficiencies and Purities',
+                              head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
+                              format_string=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
     table.add(cut='User',
               efficiency=user_efficiency,
               eerr=user_efficiency_error,
@@ -701,18 +707,19 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     if plotConfig.Diagonal:
         o += createDiagonalPlot(createUniqueFilename(raw_name, resource.hash), nTupleData, mvaConfig)
 
-    o += latex.SubSection("MVA").finish()
-    o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, plotConfig)
+    o += b2latex.SubSection("MVA").finish()
+    o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, mvaConfig, plotConfig)
 
     resource.needed = False
     resource.cache = True
     return {'name': name, 'list': matchedList, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
-            'post_efficiency': post_efficiency, 'post_purity': post_purity}
+            'post_efficiency': post_efficiency, 'post_purity': post_purity, 'covered': 100.0}
 
 
 def createParticleReport(resource, particleName, particleLabel, channelNames, matchedLists, mvaConfig, mvaConfigs,
                          userCutConfig, userConfigs, preCutConfig, preCut, preCutHistograms, postCutConfig, postCut,
-                         plotConfig, tmvaTrainings, splotTrainings, signalProbabilities, nTuple, listCounts, mcCounts):
+                         plotConfig, tmvaTrainings, splotTrainings, signalProbabilities, nTuple, listCounts, mcCounts,
+                         coveredBranchingFractions):
     """
     Creates a pdf document with the PreCut and Training plots
         @param resource object
@@ -754,35 +761,48 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     raw_name = particleName
     if particleLabel != '':
         raw_name += ':' + particleLabel
-    name = prettifyDecayString(raw_name)
+    name = format.decayDescriptor(raw_name)
 
-    o = latex.LatexFile()
+    o = b2latex.LatexFile()
 
-    o += latex.Section(name).finish()
+    o += b2latex.Section(name).finish()
 
-    o += latex.SubSection("Channels").finish()
-    o += latex.String(r"In the reconstruction of " + name + " " + str(len([t for t in signalProbabilities if t is not None])) +
-                      r" out of " + str(len(signalProbabilities)) + " possible channels were used.")
+    o += b2latex.SubSection("Channels").finish()
+    string = b2latex.String(r"In the reconstruction of {name} {nChannels} out of {max_nChannels} possible channels were used. "
+                            r"Therefore the covered branching fraction in percent is {covBR}, whereas {max_covBR} was the upper"
+                            r" limit.")
 
-    itemize = latex.Itemize()
+    df = coveredBranchingFractions.groupby(['channelName'])['fraction'].sum()
+    nChannels = len([t for t in signalProbabilities if t is not None])
+    max_nChannels = len(signalProbabilities)
+    covBR = 0
+    max_covBR = 0
     for channelName, s in zip(channelNames, signalProbabilities):
-        niceDecayChannel = prettifyDecayString(channelName)
+        if s is not None:
+            covBR += df[channelName]
+        max_covBR += df[channelName]
+    o += string.finish(name=name, nChannels=nChannels, max_nChannels=max_nChannels, covBR=covBR, max_covBR=max_covBR)
+
+    itemize = b2latex.Itemize()
+    for channelName, s in zip(channelNames, signalProbabilities):
+        niceDecayChannel = format.decayDescriptor(channelName)
+        s = r"{name} BR: {BR:.2f}".format(name=niceDecayChannel, BR=df[channelName])
         if s is None:
-            itemize.add(r"{name} was ignored".format(name=niceDecayChannel))
+            itemize.add(s + ' \t was ignored')
         else:
-            itemize.add(r"{name}".format(name=niceDecayChannel))
+            itemize.add(s)
     o += itemize.finish()
 
-    o += latex.SubSection("Statistic").finish()
+    o += b2latex.SubSection("Statistic").finish()
     if userCutConfig.userCut != '':
-        string = latex.String(r"Quantities (except MC truth) are calculated after applying the user-defined {cut}")
+        string = b2latex.String(r"Quantities (except MC truth) are calculated after applying the user-defined {cut}")
         o += string.finish(cut=userCutConfig.userCut)
-    o += latex.String(r"Quantities (except MC truth) are calculated after applying the automatic pre-cuts.").finish()
-    table = latex.LongTable(columnspecs=r'p{5cm}rrrrr',
-                            caption='Statistical quantities per Monte Carlo event',
-                            head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
-                            format=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
-                                   r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
+    o += b2latex.String(r"Quantities (except MC truth) are calculated after applying the automatic pre-cuts.").finish()
+    table = b2latex.LongTable(columnspecs=r'p{5cm}rrrrr',
+                              caption='Statistical quantities per Monte Carlo event',
+                              head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
+                              format_string=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
+                                            r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
     table.add(quantity='MC-Particles',
               mean=mcCountsData.sum() / mcCountsData.count(),
               error=b2stat.poisson_error(mcCountsData.sum()) / nEvents,
@@ -827,10 +847,10 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     post_purity = nSignalAfterPostCut / nCandidatesAfterPostCut * 100.0
     post_purity_error = b2stat.binom_error(nSignalAfterPostCut, nCandidatesAfterPostCut) * 100.0
 
-    table = latex.LongTable(columnspecs=r'p{5cm}rr',
-                            caption='Efficiencies and Purities',
-                            head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
-                            format=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
+    table = b2latex.LongTable(columnspecs=r'p{5cm}rr',
+                              caption='Efficiencies and Purities',
+                              head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
+                              format_string=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
     table.add(cut='User',
               efficiency=user_efficiency,
               eerr=user_efficiency_error,
@@ -851,17 +871,17 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     for i, channelName in enumerate(channelNames):
         tmvaTraining = tmvaTrainings[i]
         plist = matchedLists[i]
-        channels.append(dict(name=prettifyDecayString(channelName), list=plist))
+        channels.append(dict(name=format.decayDescriptor(channelName), list=plist))
 
-        o += latex.SubSection(prettifyDecayString(channelName)).finish()
+        o += b2latex.SubSection(format.decayDescriptor(channelName)).finish()
 
-        o += latex.SubSubSection("MC-based MVA").finish()
-        o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, plotConfig)
+        o += b2latex.SubSubSection("MC-based MVA").finish()
+        o += createTMVASection(createUniqueFilename(channelName, resource.hash), tmvaTraining, mvaConfigs[i], plotConfig)
 
     resource.needed = False
     resource.cache = True
     return {'name': name, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
-            'pre_efficiency': 0, 'pre_purity': 0,
+            'pre_efficiency': 0, 'pre_purity': 0, 'covered': covBR,
             'post_efficiency': post_efficiency, 'post_purity': post_purity,
             'detector_efficiency': 0, 'detector_purity': 0, 'channels': channels}
 

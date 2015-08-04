@@ -299,6 +299,8 @@ class TestLoadBranchingFractionsDataFrame(unittest.TestCase):
         particles = default_channels.get_default_channnels()
         df = automaticReporting.loadCoveredBranchingFractionsDataFrame(particles, include_daughter_fractions=True)
 
+        self.assertListEqual(sorted(df.columns), sorted(['particle', 'channel', 'channelName', 'fraction']))
+
         sdf = df.groupby(['particle'])['fraction'].sum()
 
         # In total we reconstruct 21, if new ones are added, don't forget to add test for

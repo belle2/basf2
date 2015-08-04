@@ -118,8 +118,8 @@ namespace Belle2 {
         pdf_weights[i] = signal_pdf->getVal(&row);
       }
 
-      TH1* signal_hist = signal_pdf->createHistogram(dim.c_str(), 100);
-      TH1* bckgrd_hist = bckgrd_pdf->createHistogram(dim.c_str(), 100);
+      TH1* signal_hist = signal_pdf->createHistogram(dim.c_str(), 1000);
+      TH1* bckgrd_hist = bckgrd_pdf->createHistogram(dim.c_str(), 1000);
       bckgrd_hist->Add(signal_hist);
       signal_hist->Divide(bckgrd_hist);
 

@@ -58,11 +58,11 @@ class Histograms(object):
                      used for the creation of histograms with these names
         @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
         """
-        self.hist, self.bins = numpy.histogram(data[column], bins=100,
+        self.hist, self.bins = numpy.histogram(data[column], bins=200,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
         # Subtract a small number from the bin width, otherwise the errorband plot is unstable.
-        self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] / 2.0 - 0.001
+        self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] / 2.0 - 0.00001
         self.hists = dict()
         for name, mask in masks.iteritems():
             self.hists[name] = numpy.histogram(data.loc[mask, column], bins=self.bins,

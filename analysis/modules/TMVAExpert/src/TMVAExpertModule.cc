@@ -102,11 +102,11 @@ namespace Belle2 {
   float TMVAExpertModule::sPlotPrior(const Particle* p) const
   {
     float v = m_splotPrior_func->function(p);
-    if (v < *m_splotPrior_binning.begin() or v >* m_splotPrior_binning.end()) {
+    if (v < m_splotPrior_binning[0] or v > m_splotPrior_binning[m_splotPrior_binning.size() - 1]) {
       return 0.0;
     }
     for (unsigned int i = 1; i < m_splotPrior_binning.size(); ++i) {
-      if (v > m_splotPrior_binning[i]) {
+      if (v >= m_splotPrior_binning[i - 1] and v <= m_splotPrior_binning[i]) {
         return m_splotPrior_values[i - 1];
       }
     }

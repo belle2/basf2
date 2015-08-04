@@ -2,490 +2,868 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-import ROOT
 import pdg
 
-import math
-from fei import dagFramework
+from B2Tools import b2plot
+from B2Tools import b2stat
+from B2Tools import b2latex
+from B2Tools import format
+
 from fei import preCutDetermination
 import os
 import re
 import sys
 import subprocess
 import copy
-from string import Template
-from functools import reduce
+import itertools
+import numpy
+
+from ROOT import gSystem
+gSystem.Load('libanalysis.so')
+from ROOT import Belle2
 
 
-def removeJPsiSlash(filename):
+def loadMCCountsDataFrame(filename):
     """
-    Removes the character / from the given filename
+    Load MCCounts into a pandas.DataFrame.
+    Columns are named by the absolute value of the PDG code of each particle.
+        @param filename name of the ROOT file containing the MCCounts
+        @return pandas.DataFrame with MCCounts
     """
+    from root_pandas import read_root
+    df = read_root(filename, 'mccounts', columns='*')
+
+    def rename(name):
+        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
+        return old_name[len('NumberOfMCParticlesInEvent('):-len(")")]
+
+    df.columns = map(rename, df.columns)
+    return df
+
+
+def loadListCountsDataFrame(filename):
+    """
+    Load ListCounts into a pandas.DataFrame.
+    Columns are named by the MatchedParticleList name plus the suffixes _Signal, _Background, _All.
+        @param filename name of the ROOT file containing the ListCounts
+        @return pandas.DataFrame with ListCounts
+    """
+    from root_pandas import read_root
+    df = read_root(filename, 'listcounts', columns='*')
+
+    def rename(name):
+        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
+        if ',' in old_name:
+            if old_name[-2] == '1':
+                return old_name.split(',')[0][len('countInList('):] + '_Signal'
+            if old_name[-2] == '0':
+                return old_name.split(',')[0][len('countInList('):] + '_Background'
+            raise RuntimeError("Given listCount name is not valid " + old_name)
+        else:
+            return old_name[len('countInList('):-1] + '_All'
+
+    df.columns = map(rename, df.columns)
+    return df
+
+
+def loadModuleStatisticsDataFrame(filename):
+    """
+    Load ModuleStatistics into a pandas.DataFrame.
+    Columns are named name, time and type.
+        @param filename name of the ROOT file containing the ModuleStatistics
+        @return pandas.DataFrame with ModuleStatistics
+    """
+    import ROOT
+    tfile = ROOT.TFile(filename)
+    persistentTree = tfile.Get('persistent')
+    persistentTree.GetEntry(0)
+    # Clone() needed so we actually own the object (original dies when tfile is deleted)
+    stats = persistentTree.ProcessStatistics.Clone()
+
+    # merge statistics from all persistent trees into 'stats'
+    numEntries = persistentTree.GetEntriesFast()
+    for i in range(1, numEntries):
+        persistentTree.GetEntry(i)
+        stats.merge(persistentTree.ProcessStatistics)
+
+    import pandas
+    statistics = pandas.DataFrame(columns=['name', 'listname', 'time', 'type'])
+    for m in stats.getAll():
+        modtype = 'Other'
+        listname = 'Other'
+        for mt in ['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other']:
+            splitted = m.getName().split('_')
+            if splitted[0] in mt:
+                modtype = mt
+                listname = splitted[1]
+        statistics = statistics.append([dict(name=m.getName(),
+                                             type=modtype,
+                                             listname=listname,
+                                             time=m.getTimeSum(m.c_Event) / 1e9)],
+                                       ignore_index=True)
+    return statistics
+
+
+def loadNTupleDataFrame(filename):
+    """
+    Load NTuple data of a Particle into a pandas.DataFrame.
+    Columns are named by the original variable names written into the NTuple.
+        @param filename name of the ROOT file containing the NTuple
+        @return pandas.DataFrame with NTuple data
+    """
+    from root_pandas import read_root
+    df = read_root(filename, 'variables', columns='*')
+
+    def rename(name):
+        return Belle2.Variable.invertMakeROOTCompatible(name)
+
+    df.columns = map(rename, df.columns)
+    return df
+
+
+def loadTMVADataFrame(filename):
+    """
+    Load TMVA training and test data into a pandas.DataFrame.
+    Columns are named by the original variable names used in the training.
+        @param filename name of the ROOT file containing the TMVA data
+        @return pandas.DataFrame with TMVA data
+    """
+    from root_pandas import read_root
+    train_df = read_root(filename, 'TrainTree', columns='*')
+    test_df = read_root(filename, 'TestTree', columns='*')
+
+    def rename(name):
+        return Belle2.Variable.invertMakeROOTCompatible(name)
+
+    train_df.columns = map(rename, train_df.columns)
+    test_df.columns = map(rename, test_df.columns)
+    train_df['__isTrain__'] = True
+    test_df['__isTrain__'] = False
+    df = train_df.append(test_df, ignore_index=True)
+    df['__isSignal__'] = df['className'] == "Signal"
+    return df
+
+
+def loadMVARankingDataFrame(logfile):
+    """
+    Load TMVA variable ranking into a pandas.DataFrame.
+    Columns are named name (of the original variable) and importance.
+        @param filename name of the log file produced by the TMVA training
+        @return pandas.DataFrame with ranking
+    """
+    import pandas
+    ranking = pandas.DataFrame(columns=['name', 'importance'])
+    ranking_mode = 0
+    with open(logfile, 'r') as f:
+        for line in f:
+            if 'Variable Importance' in line:
+                ranking_mode = 1
+            elif ranking_mode == 1:
+                ranking_mode = 2
+            elif ranking_mode == 2 and '-------' in line:
+                ranking_mode = 0
+            elif ranking_mode == 2:
+                v = line.split(':')
+                if int(v[1]) - 1 != len(ranking):
+                    B2WARNING("Error during read out of TMVA ranking from " + logfile)
+                oldname = Belle2.Variable.invertMakeROOTCompatible(v[2].strip())
+                ranking = ranking.append([{'name': oldname, 'importance': float(v[3])}], ignore_index=True)
+    return ranking
+
+
+def isFloat(element):
+    """ Checks if element is a convertible to float"""
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
+
+
+def isValidParticle(element):
+    """ Checks if element is a valid pdg name for a particle"""
+    try:
+        pdg.from_name(element)
+        return True
+    except LookupError:
+        return False
+
+
+def loadBranchingFractionsDataFrame(filename=None):
+    """
+    TODO In Python >=3.2 we can use functools.lru_cache here for speedup
+    Load branching fraction frm MC decay-file.
+    Columns are, particle, channel, fraction
+        @param filename of the decay file default is $BELLE2_EXTERNALS_DIR/share/evtgen/DECAY.DEC
+        @return pandas.DataFrame with the branching fractions
+    """
+    import pandas
+    if filename is None:
+        filename = os.getenv('BELLE2_EXTERNALS_DIR') + '/share/evtgen/DECAY.DEC'
+
+    branching_fractions = pandas.DataFrame(columns=['particle', 'channel', 'fraction'])
+    mother = 'UNKOWN'
+    with open(filename, 'r') as f:
+        for line in f:
+            fields = line.split(' ')
+            fields = filter(lambda x: x != '', fields)
+            if len(fields) < 2:
+                continue
+            if fields[0][0] == '#':
+                continue
+            if fields[0] == 'Decay':
+                mother = fields[1].strip()
+                continue
+            if fields[0] == 'Enddecay':
+                mother = 'UNKOWN'
+                continue
+            if mother == 'UNKOWN':
+                continue
+            fields = fields[:-1]
+            if len(fields) < 1:
+                continue
+            if not isFloat(fields[0]):
+                continue
+            while len(fields) > 1:
+                if not isValidParticle(fields[-1]):
+                    fields = fields[:-1]
+                else:
+                    break
+            if len(fields) < 1:
+                continue
+            if not all(isValidParticle(p) for p in fields[1:]):
+                continue
+            daughters = tuple(sorted(p for p in fields[1:]))
+            row = [{'particle': mother, 'channel': daughters, 'fraction': float(fields[0])}]
+            branching_fractions = branching_fractions.append(row, ignore_index=True)
+
+    # Add some theoretical branching fractions which are not in the DECAY file
+    # TODO But these are produced anyway, wtf?
+    rows = [{'particle': 'D0', 'channel': tuple(sorted(('K-', 'pi+', 'pi0', 'pi0'))), 'fraction': 0.0},  # UNKOWN
+            {'particle': 'anti-D0', 'channel': tuple(sorted(('K+', 'pi-', 'pi0', 'pi0'))), 'fraction': 0.0},  # UNKOWN
+            {'particle': 'D_s+', 'channel': tuple(sorted(('K-', 'K_S0', 'pi+', 'pi+'))), 'fraction': 0.0164},  # From PDG
+            {'particle': 'D_s+', 'channel': tuple(sorted(('K_S0', 'pi+', 'pi0'))), 'fraction': 0.005},  # Mode D_s->K0 pi- pi0 1%
+            {'particle': 'D_s-', 'channel': tuple(sorted(('K+', 'K_S0', 'pi-', 'pi-'))), 'fraction': 0.0164},  # From PDG
+            {'particle': 'D_s-', 'channel': tuple(sorted(('K_S0', 'pi-', 'pi0'))), 'fraction': 0.005},  # Mode D_s->K0 pi- pi0 1%
+            {'particle': 'B+', 'channel': tuple(sorted(('J/psi', 'K_S0', 'pi+'))), 'fraction': 0.00094},
+            {'particle': 'B-', 'channel': tuple(sorted(('J/psi', 'K_S0', 'pi-'))), 'fraction': 0.00094},
+            {'particle': 'B0', 'channel': tuple(sorted(('J/psi', 'K_S0', 'pi+', 'pi-'))), 'fraction': 0.001},
+            {'particle': 'anti-B0', 'channel': tuple(sorted(('J/psi', 'K_S0', 'pi+', 'pi-'))), 'fraction': 0.001}]
+    branching_fractions = branching_fractions.append(rows, ignore_index=True)
+    return branching_fractions
+
+
+def loadCoveredBranchingFractionsDataFrame(particles, filename=None, include_daughter_fractions=True):
+    """
+    Load covered branching fractions from MC decay-file and given particle definitions.
+    Columns are, particle, channel, fraction
+        @param particles list of Particle objects
+        @param filename of the decay file default is $BELLE2_EXTERNALS_DIR/share/evtgen/DECAY.DEC
+        @param include_daughter_fractions if true the branching fraction is multiplied with the branching fraction of the daughters
+        @return pandas.DataFrame with the branching fractions
+    """
+    import pandas
+    mc = loadBranchingFractionsDataFrame(filename).groupby(['particle', 'channel'])['fraction'].sum()
+    covered = pandas.DataFrame(columns=['particle', 'channel', 'fraction'])
+    covered = covered.append([{'particle': 'nu_e:generic', 'channel': (), 'fraction': 1.0},
+                              {'particle': 'nu_mu:generic', 'channel': (), 'fraction': 1.0},
+                              {'particle': 'nu_tau:generic', 'channel': (), 'fraction': 1.0}], ignore_index=True)
+    remaining = []
+    for particle in particles:
+        if particle.isFSP:
+            covered = covered.append([{'particle': particle.identifier, 'channel': tuple(), 'fraction': 1.0}], ignore_index=True)
+        else:
+            for channel in particle.channels:
+                mychannel = [daughter for daughter in channel.daughters]
+                for i, j in [('e+', 'e-'), ('mu+', 'mu-'), ('tau+', 'tau-')]:
+                    m = 0
+                    for daughter in channel.daughters:
+                        if daughter.startswith(i):
+                            m += 1
+                        if daughter.startswith(j):
+                            m -= 1
+                    if m > 0:
+                        mychannel += ['nu_' + i[:-1] + ':generic'] * m
+                    elif m < 0:
+                        mychannel += ['anti-nu_' + i[:-1] + ':generic'] * (-m)
+                remaining.append((particle.identifier, tuple(sorted(mychannel))))
+
+    def conjugate(particle):
+        n, l = particle.split(':')
+        return pdg.conjugate(n) + ':' + l
+
+    while remaining:
+        old_remaining = remaining
+        remaining = []
+        blacklist = [name for name, _ in old_remaining]
+        for name, channel in old_remaining:
+            if all(daughter not in blacklist and conjugate(daughter) not in blacklist for daughter in channel):
+                rawname = name.split(':')[0]
+                rawchannel = tuple(sorted([n.split(':')[0] for n in channel]))
+                try:
+                    fraction = mc[rawname][rawchannel]
+                except KeyError:
+                    B2WARNING("Monte Carlo branching fraction for " + rawname +
+                              " and channel " + str(channel) + " is not available. Assume 0.")
+                    fraction = 0.0
+                if include_daughter_fractions:
+                    for daughter in channel:
+                        mask = (covered.particle == daughter) | (covered.particle == conjugate(daughter))
+                        fraction *= covered[mask]['fraction'].sum()
+                covered = covered.append([{'particle': name, 'channel': channel, 'fraction': fraction}], ignore_index=True)
+            else:
+                remaining.append((name, channel))
+
+    return covered
+
+
+def createUniqueFilename(name, hash, suffix='png'):
+    """
+    Create a unique filename, which is save to use.
+    In particular it removes the symbol / which is introduced by J/Psi
+        @param name often the raw_name of the particle or channel
+        @param hash often provided by resource.hash
+        @param suffix defaults to png
+        @return string unique and save to use filename
+    """
+    filename = '{name}_{hash}.{suffix}'.format(name=name, hash=hash, suffix=suffix)
     return filename.replace('/', '')
 
 
-def prettifyDecayString(decayString):
-    decayString = decayString.replace(':generic', '')
-    substitutes = {
-        '==>': '$\\to$',
-        'gamma': r'$\gamma$',
-        'pi+': r'$\pi^+$',
-        'pi-': r'$\pi^-$',
-        'pi0': r'$\pi^0$',
-        'K_S0': r'$K^0_S$',
-        'mu+': r'$\mu^+$',
-        'mu-': r'$\mu^-$',
-        'K+': r'$K^+$',
-        'K-': r'$K^-$',
-        'e+': r'$e^+$',
-        'e-': r'$e^-$',
-        'J/psi': r'$J/\psi$',
-        'D+': r'$D^+$',
-        'D-': r'$D^-$',
-        'D0': r'$D^0$',
-        'D*+': r'$D^{+*}$',
-        'D*-': r'$D^{-*}$',
-        'D*0': r'$D^{0*}$',
-        'D_s+': r'$D^+_s$',
-        'D_s-': r'$D^-_s$',
-        'D_s*+': r'$D^{+*}_s$',
-        'D_s*-': r'$D^{-*}_s$',
-        'anti-D0': r'$\bar{D^0}$',
-        'anti-D*0': r'$\bar{D^{0*}}$',
-        'B+': r'$B^+$',
-        'B-': r'$B^-$',
-        'B0': r'$B^0$',
-        'anti-B0': r'$\bar{B^0}$'}
-    texString = decayString
-    for key, value in substitutes.iteritems():
-        texString = texString.replace(key, value)
-    return '\\texorpdfstring{%s}{%s}' % (texString, decayString)
-
-
-def getConfigurationString(particles):
-    """
-    Prettify config output
-    """
-    input = '\n\n'.join([convertParticleObjectToString(p) for p in particles])
-    output = ''
-    count = 0
-    first_sep = 0
-    for c in input:
-        output += c
-        count += 1
-        if first_sep == 0 and c in ':':
-            first_sep = count
-        if c == '\n':
-            count = 0
-            first_sep = 0
-        if count >= 75:
-            if c in ':, ' or count == 90:
-                output += '\n' + ' ' * first_sep
-                count = first_sep
-    return output
-
-
-def formatTime(seconds):
-    """
-    Return string describing a duration in a natural format
-    """
-    minutes = int(seconds / 60)
-    hours = int(minutes / 60)
-    minutes %= 60
-    ms = int(seconds * 1000) % 1000
-    us = int(seconds * 1000 * 1000) % 1000
-    seconds = int(seconds % 60)
-    string = ''
-    if hours != 0:
-        string += "%dh" % (hours)
-    if minutes != 0:
-        string += "%dm" % (minutes)
-    if seconds != 0 and hours == 0:
-        string += "%ds" % (seconds)
-    if ms != 0 and hours == 0 and minutes == 0 and seconds == 0:
-        string += "%dms" % (ms)
-    if us != 0 and hours == 0 and minutes == 0 and seconds == 0 and ms == 0:
-        string += "%d$\mu$s" % (us)
-
-    if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
-        string += '$<1\mu$s'
-    return string
-
-
-def convertParticleObjectToString(particle):
-    """ Convert particle object in a readable string which contains all configuration informations """
-    output = '{identifier}\n'.format(identifier=particle.identifier)
-
-    def compareMVAConfig(x, y):
-        return x.name == y.name and x.type == y.type and x.config == y.config and x.target == y.target
-
-    def compareCutConfig(x, y):
-        if x is None and y is None:
-            return True
-        return x == y
-
-    if particle.isFSP:
-        if particle.postCutConfig is None:
-            output += '    PostCutConfiguration: None\n'
-        else:
-            output += '    PostCutConfiguration: value={p.value}\n'.format(p=particle.postCutConfig)
-        output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
-            m=particle.mvaConfig)
-        output += '    Variables: ' + ', '.join(particle.mvaConfig.variables) + '\n'
-    else:
-        sameMVAConfig = all(compareMVAConfig(channel.mvaConfig, particle.mvaConfig) for channel in particle.channels)
-        commonVariables = reduce(
-            lambda x, y: set(x).intersection(y), [
-                channel.mvaConfig.variables for channel in particle.channels])
-        if sameMVAConfig:
-            output += '    All channels use the same MVA configuration\n'
-            output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, config={m.config}\n'.format(
-                m=particle.mvaConfig)
-        output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
-        if particle.preCutConfig is None:
-            output += '    PreCutConfiguration: None\n'
-        else:
-            output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
-                p=particle.preCutConfig)
-            output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
-
-        if particle.userCutConfig is None:
-            output += '    UserCutConfiguration: None\n'
-        else:
-            output += '    UserCutConfiguration: userCut={p.userCut} vertexCut={p.vertexCut}\n'.format(p=particle.userCutConfig)
-
-        if particle.postCutConfig is None:
-            output += '    PostCutConfiguration: None\n'
-        else:
-            output += '    PostCutConfiguration: value={p.value}\n'.format(p=particle.postCutConfig)
-
-        for channel in particle.channels:
-            output += '    {name} (decayModeID: {id})\n'.format(name=channel.name, id=channel.decayModeID)
-            if not sameMVAConfig:
-                output += '    MVAConfiguration: name={m.name}, type={m.type}, config={m.config}, target={m.target}\n'.format(
-                    m=channel.mvaConfig)
-            output += '        Individual Variables: ' + \
-                ', '.join(set(channel.mvaConfig.variables).difference(commonVariables)) + '\n'
-    return output
-
-
-def purity(nSig, nBg):
-    if nSig == 0:
-        return 0.0
-    if nSig + nBg == 0:
-        return 0.0
-    return nSig / float(nSig + nBg)
-
-
-def efficiency(nSig, nTrueSig):
-    if nSig == 0:
-        return 0.0
-    if nTrueSig == 0:
-        return float('inf')
-    return nSig / float(nTrueSig)
-
-
-def efficiencyError(nSig, nTrueSig):
-    """
-    for an efficiency eps = nSig/nTrueSig, this function calculates the
-    standard deviation according to http://arxiv.org/abs/physics/0701199 .
-    """
-    if nTrueSig == 0:
-        return float('inf')
-
-    k = float(nSig)
-    n = float(nTrueSig)
-    variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
-    return math.sqrt(variance)
-
-
-def purityError(nSig, nBg):
-    nTot = nSig + nBg
-    if nTot == 0:
-        return 0.0
-    return efficiencyError(nSig, nTot)
-
-
-def createTexFile(filename, templateFilename, placeholders):
-    """
-    Creates tex file from template with the given placeholder values
-    @param filename name of the file which is created
-    @param templateFilename name of the template file
-    @param placeholders dictionary with values for every palceholder in the template
-    """
-    placeholders = copy.copy(placeholders)
-    if 'particleName' in placeholders:
-        placeholders['particleName'] = prettifyDecayString(placeholders['particleName'])
-    if 'channelName' in placeholders:
-        placeholders['channelName'] = prettifyDecayString(placeholders['channelName'])
-    template = Template(file(ROOT.Belle2.FileSystem.findFile(templateFilename), 'r').read())
-    page = template.substitute(placeholders)
-    file(filename, 'w').write(page)
-    B2INFO("Write tex file " + filename + ".")
-
-
-def createSummaryTexFile(
-        finalStateParticlePlaceholders,
-        combinedParticlePlaceholders,
-        finalParticlePlaceholders,
-        cpuTimeSummaryPlaceholders,
-        mcCounts,
-        particles):
+def createSummary(resource, finalStateSummaries, combinedSummaries, particles, mcCounts, listCounts, moduleStatisticsFile):
     """
     Creates combined summary .tex file for FEIR
-
-    @param finalStateParticlePlaceholders list of placeholder dictonaries (for each FSP)
-    @param combinedParticlePlaceholders list of placeholder dictonaries (for each combined particle)
-    @param finalParticlePlaceholders list of placeholder dictonaries with Mbc, CosBDL, ...  plots
-    @param cpuTimeSummaryPlaceholders placeholder dictonary with CPU statistics
-    @param mcCounts dictionary with MCParticle counts
-    @param particles List of Particle objects
+        @param resource object
+        @param finalStateSummaries list of placeholder dictonaries (for each FSP)
+        @param combinedSummaries list of placeholder dictonaries (for each combined particle)
+        @param particles List of Particle objects
+        @param mcCounts filename containing MCParticle counts
+        @param listCounts filename containing List counts
+        @param moduleStatisticsFilefile name of the TFile containing actual statistics
+        @return dictionary of placeholders used in the .tex file
     """
 
-    placeholders = {}
+    o = latex.String()
 
-    placeholders['particleConfigurations'] = getConfigurationString(particles)
+    o += latex.TitlePage(title='Full Event Interpretation Report',
+                         authors=['Thomas Keck', 'Christian Pulvermacher'],
+                         abstract=r"""
+                            This report contains key performance indicators and control plots of the Full Event Interpretation.
+                            The user-, pre-, and post-cuts as well as trained multivariate selection methods are described.
+                            Furthermore the resulting purities and efficiencies are stated.
+                                """,
+                         add_table_of_contents=True).finish()
 
-    placeholders['finalStateParticleInputs'] = ""
-    placeholders['finalStateParticleEPTable'] = ""
-    for particlePlaceholder in finalStateParticlePlaceholders:
-        placeholders['finalStateParticleInputs'] += '\input{"' + particlePlaceholder['texFile'] + '"}\n'
-        placeholders['finalStateParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(
-            efficiency(
-                particlePlaceholder['particleNSignal'],
-                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.2f}'.format(
-            efficiency(
-                particlePlaceholder['particleNSignalAfterPostCut'],
-                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(
-            purity(
-                particlePlaceholder['particleNSignal'],
-                particlePlaceholder['particleNBackground']) * 100) + ' & '
-        placeholders['finalStateParticleEPTable'] += '{:.3f}'.format(
-            purity(
-                particlePlaceholder['particleNSignalAfterPostCut'],
-                particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
+    channelSummaries = sum(map(lambda x: x['channels'], combinedSummaries), [])
 
-    placeholders['combinedParticleInputs'] = ""
-    placeholders['combinedParticleEPTable'] = ""
-    for particlePlaceholder in combinedParticlePlaceholders:
-        placeholders['combinedParticleInputs'] += '\input{"' + particlePlaceholder['texFile'] + '"}\n'
-        placeholders['combinedParticleEPTable'] += prettifyDecayString(particlePlaceholder['particleName']) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
-            efficiency(
-                particlePlaceholder['particleNSignal'],
-                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        has_usercut = (
-            particlePlaceholder['particleNSignal'] != particlePlaceholder['particleNSignalAfterUserCut']) or (
-            particlePlaceholder['particleNBackground'] != particlePlaceholder['particleNBackgroundAfterUserCut'])
-        if has_usercut:
-            placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
-                efficiency(
-                    particlePlaceholder['particleNSignalAfterUserCut'],
-                    particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        else:
-            placeholders['combinedParticleEPTable'] += ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
-            efficiency(
-                particlePlaceholder['particleNSignalAfterPreCut'],
-                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.2f}'.format(
-            efficiency(
-                particlePlaceholder['particleNSignalAfterPostCut'],
-                particlePlaceholder['particleNTrueSignal']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
-            purity(
-                particlePlaceholder['particleNSignal'],
-                particlePlaceholder['particleNBackground']) * 100) + ' & '
-        if has_usercut:
-            placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
-                purity(
-                    particlePlaceholder['particleNSignalAfterUserCut'],
-                    particlePlaceholder['particleNBackgroundAfterUserCut']) * 100) + ' & '
-        else:
-            placeholders['combinedParticleEPTable'] += ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
-            purity(
-                particlePlaceholder['particleNSignalAfterPreCut'],
-                particlePlaceholder['particleNBackgroundAfterPreCut']) * 100) + ' & '
-        placeholders['combinedParticleEPTable'] += '{:.3f}'.format(
-            purity(
-                particlePlaceholder['particleNSignalAfterPostCut'],
-                particlePlaceholder['particleNBackgroundAfterPostCut']) * 100) + r'\\' + '\n'
+    o += latex.Section("Summary").finish()
+    o += latex.String(r"""
+        For each final-state particle a multivariate selection method is trained without any previous cuts
+        on the candidates. Afterwards, a post cut is applied on the signal probability calculated by the method.
+        This reduces combinatorics in the following stages of the Full
+        Event Interpretation.
+        """).finish()
 
-    placeholders['finalParticleInputs'] = ''
-    finalParticleNames = set()
-    for particlePlaceholder in finalParticlePlaceholders:
-        finalParticleNames.add(particlePlaceholder['particleName'])
-        placeholders['finalParticleInputs'] += '\input{"' + particlePlaceholder['texFile'] + '"}\n'
+    table = latex.LongTable(columnspecs=r'c|rr|rr',
+                            caption='Final-state particle efficiency and purity before and after the applied post-cut.',
+                            head=r'Final-state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\' +
+                                 r' particle    &  detector & post-cut   &  detector & post-cut \\',
+                            format=r'{name} & {user_efficiency:.2f} & {post_efficiency:.2f}'
+                                   r'& {user_purity:.2f} & {post_purity:.2f} ')
+    for summary in finalStateSummaries:
+        table.add(**summary)
+    o += table.finish()
 
-    placeholders['finalParticleNames'] = ', '.join(finalParticleNames)
-    placeholders['cpuTimeSummary'] = '\input{"' + cpuTimeSummaryPlaceholders['texFile'] + '"}\n'
+    o += latex.String(r"""
+        For each decay channel of each intermediate particle a multivariate selection method is trained after applying
+        a fast pre-cut on the candidates. Afterwards, a post-cut is applied on the signal probability calculated by the method.
+        This reduces combinatorics in the following stages of the Full
+        Event Interpretation. For some intermediate particles, in particular the final B mesons, an additional user-cut
+        is applied before all other cuts.
+        """).finish()
 
-    placeholders['NUniqueSignal'] = 0
-    placeholders['NBackground'] = 0
-    placeholders['NEvents'] = mcCounts['NEvents']
+    table = latex.LongTable(columnspecs=r'c|r|rrrr|rrrr',
+                            caption='Per-particle efficiency and purity before and after the applied user-, pre- and post-cut.',
+                            head=r'Particle & Covered BR '
+                                 r' & \multicolumn{4}{c}{Efficiency in \%}  &  \multicolumn{4}{c}{Purity in \%} \\'
+                                 r' &  reconstruction & user-cut & pre-cut & post-cut '
+                                 r' & reconstruction & user-cut & pre-cut & post-cut \\',
+                            format=r'{name} & {covered:.2f} & {detector_efficiency:.2f} & {user_efficiency:.2f}'
+                                   r' & {pre_efficiency:.2f}  & {post_efficiency:.2f}'
+                                   r' & {detector_purity:.2f} & {user_purity:.2f} & {pre_purity:.2f} & {post_purity:.2f} ')
+    for summary in combinedSummaries:
+        table.add(**summary)
+    o += table.finish()
 
-    for bPlaceholder in combinedParticlePlaceholders:
-        if bPlaceholder['particleName'] in finalParticleNames:
-            placeholders['NUniqueSignal'] += int(bPlaceholder['particleNUniqueSignalAfterPostCut'])
-            placeholders['NBackground'] += int(bPlaceholder['particleNBackgroundAfterPostCut'])
+    # If you change the number of colors, than change below \ifnum5 accordingly
+    colours = ["orange", "blue", "red", "green", "cyan", "purple"]
 
-    placeholders['overallSignalEfficiencyInPercent'] = '{:.2f}'.format(
-        efficiency(
-            placeholders['NUniqueSignal'],
-            placeholders['NEvents']) *
-        100)
+    o += latex.Section("CPU time per channel").finish()
 
-    hash = dagFramework.create_hash([placeholders])
-    placeholders['texFile'] = 'FEIsummary.tex'
-    if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/SummaryTemplate.tex', placeholders)
-    return placeholders
+    colour_list = latex.DefineColourList()
+    o += colour_list.finish()
+
+    listCountsData = getListCountsDataFrame(listCounts)
+    stats = loadModuleStatisticsDataFrame(moduleStatisticsFile)
+    sum_time_seconds = stats.sum()
+    moduleTypes = list(stats.type.unique())
+    stats = stats.groupby(['listname', 'type'])['time'].sum()
+
+    statTable = []
+    for summary in itertools.chain(finalStateSummaries, channelSummaries):
+        name = summary['name']
+        plist = summary['list']
+        if plist is None:
+            continue
+        trueCandidates = listCountsData[plist + '_Signal'].sum()
+        allCandidates = listCountsData[plist + '_All'].sum()
+        statTable.append([name, stats[plist].sum(), stats[plist], trueCandidates, allCandidates])
+
+    table = latex.LongTable(columnspecs=r'lrcrr',
+                            caption='Total CPU time spent in event() calls for each channel. Bars show ' +
+                                    ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours, moduleTypes)) +
+                                    ', in this order. Does not include I/O, initalisation, training, post-cuts etc.',
+                            head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
+                            format=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
+    for name, time, timePerModule, trueCandidates, allCandidates in statTable:
+        percents = tuple(timePerModule[key] / time * 100.0 for key in moduleTypes)
+        timePerCandidate = formatTime(numpy.float64(time) / trueCandidates)
+        timePerCandidate += ' (' + formatTime(numpy.float64(time) / allCandidates) + ')'
+        table.add(name=name,
+                  bargraph=r'\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % percents,
+                  time=formatTime(time),
+                  timePerCandidate=timePerCandidate,
+                  timePercent=time / sum_time_seconds * 100 if sum_time_seconds > 0 else 0)
+    o += table.finish(tail='Total & & ' + formatTime(sum_time_seconds) + ' & & 100 ')
+
+    for ph in finalStateSummaries:
+        o += ph['page']
+    for ph in combinedSummaries:
+        o += ph['page']
+
+    o.save('FEIsummary.tex', compile=True)
+    resource.needed = False
+    resource.cache = True
+    return
 
 
-def createMoneyPlotTexFile(nTuple, type, mcCounts, target):
+def createTMVASection(filename, tmvaTraining, plotConfig):
     """
-    Creates a tex document with MBC or CosBDL Plot from the given nTuple
-        @param nTuple the ntuple containing the needed information
-        @param type string identifier of plot type
-        @param mcCounts number of MCParticles for each particle
-        @param target name of target (signal) variable for this plot
+    Create TMVA section, with information about used methods,
+    overtraining, ROC and diagonal plots.
+        @param filename used as suffix for all plots
+        @param tmvaTraining data used to create the plots
+        @param plotConfig which defines which plots are included
     """
-    placeholders = {}
-    prefix = nTuple[:-5] + '_' + type
-    plotFile = prefix + '_money.pdf'
-    placeholders['particleName'] = plotFile[4:].split(':', 1)[0]
-    if type == 'Mbc':
-        template_file = 'analysis/scripts/fei/templates/MBCTemplate.tex'
-        if not os.path.isfile(plotFile):
-            makeMbcPlot(nTuple, plotFile, target)
-    elif type == 'CosBDL':
-        template_file = 'analysis/scripts/fei/templates/CosBDLTemplate.tex'
-        if not os.path.isfile(plotFile):
-            makeCosBDLPlot(nTuple, plotFile, target)
-    elif type == 'ROC':
-        template_file = 'analysis/scripts/fei/templates/ROCTemplate.tex'
-        if not os.path.isfile(plotFile):
-            nTrueSignal = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
-            makeROCPlotFromNtuple(nTuple, plotFile, nTrueSignal, target)
+    o = latex.LatexFile()
+    o += latex.SubSubSection("MC-based MVA")
+    if tmvaTraining is None:
+        o += latex.String(r"""
+                There is no MC-based TMVA training data available for this final state particle.
+                Usually this means there wasn't enough statistics to perform a training,
+                or the training failed due to other reasons (cpu-, memory-, disk-, limitations?)
+                """)
     else:
-        raise RuntimeError('Unknown money plot type')
-    placeholders['moneyPlot'] = plotFile
-    placeholders['texFile'] = prefix + '_money.tex'
+        TMVAFilename = tmvaTraining[:-7] + '.root'  # Strip .config of filename
+        tmvaData = loadTMVADataFrame(TMVAFilename)
+        tmvaTrainingData = tmvaData[tmvaData['__isTrain__']]
+        tmvaTestData = tmvaData[~tmvaData['__isTrain__']]
 
-    if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], template_file, placeholders)
-    return placeholders
+        logFilename = tmvaTraining[:-9] + '.log'  # Strip _1.config of filename
+        ranking = loadMVARankingDataFrame(logFilename)
+
+        table = latex.LongTable(columnspecs=r'lp{5cm}rrr',
+                                caption='List of variables used in the training',
+                                head=r'No. & Name & Importance & \multicolumn{2}{c}{mean $\pm$ std} \\ & & & Signal & Background ',
+                                format=r'{no} & {name} & {v:.2f} & $({ms:.3f} \pm {es:.3f})$ & $({mb:.3f} \pm {eb:.3f})$')
+
+        for number, (n, value) in ranking.iterrows():
+            table.add(no=number+1,
+                      name=addHyphenations(escapeForLatex(n)),
+                      v=value,
+                      ms=tmvaData[tmvaData['__isSignal__']][n].mean(),
+                      es=tmvaData[tmvaData['__isSignal__']][n].std(),
+                      mb=tmvaData[~tmvaData['__isSignal__']][n].mean(),
+                      eb=tmvaData[~tmvaData['__isSignal__']][n].std())
+        for n in mvaConfig.variables:
+            if n not in ranking.importance.unique():
+                table.add(no='---',
+                          name=addHyphenations(escapeForLatex(n)),
+                          v=float('nan'),
+                          ms=float('nan'),
+                          es=float('nan'),
+                          mb=float('nan'),
+                          eb=float('nan'))
+        o += table.finish()
+
+        if plotConfig.Correlation:
+            correlationMatrixPlotSignal = 'corMSig_' + filename
+            correlationMatrixPlotBackground = 'corMBkg_' + filename
+            plot = b2plot.CorrelationMatrix()
+            plot.add(tmvaData[tmvaData['__isSignal__']], ranking.keys())
+            plot.finish()
+            plot.axis.set_title('Correlation Matrix for Signal')
+            plot.save(correlationMatrixPlotSignal)
+
+            plot = b2plot.CorrelationMatrix()
+            plot.add(tmvaData[~tmvaData['__isSignal__']], ranking.keys())
+            plot.finish()
+            plot.axis.set_title('Correlation Matrix for Background')
+            plot.save(correlationMatrixPlotBackground)
+            o += latex.Graphics().add(correlationMatrixPlotSignal).add(correlationMatrixPlotBackground).finish()
+
+        caption = 'Method ' + mvaConfig.type + '/' + mvaConfig.name + ' was used with the following configuration '
+        caption += addHyphenations(mvaConfig.config) + r'and with target variable \emph{' + mvaConfig.target + r'}'
+        table = latex.LongTable(columnspecs=r'lp{5cm}rr',
+                                caption=caption,
+                                head=r'Name & Signal & Background',
+                                format=r'{name} & {signal} & {background}')
+        table.add(name='Training',
+                  signal=numpy.sum(tmvaTrainingData['__isSignal__']),
+                  background=numpy.sum(~tmvaTestData['__isSignal__']))
+        table.add(name='Test',
+                  signal=numpy.sum(tmvaTestData['__isSignal__']),
+                  background=numpy.sum(~tmvaTestData['__isSignal__']))
+        o += table.finish()
+
+        mvaROCPlot = 'mva_roc_' + filename
+        plot = b2plot.RejectionOverEfficiency()
+        plot.set_plot_options({'linestyle': '-', 'lw': 3})
+        plot.add(tmvaTestData, mvaConfig.name, tmvaTestData['__isSignal__'], ~tmvaTestData['__isSignal__'])
+        plot.add(tmvaTrainingData, mvaConfig.name, tmvaTrainingData['__isSignal__'], ~tmvaTrainingData['__isSignal__'])
+        plot.labels = ["Test", "Training"]
+        plot.finish()
+        plot.save(mvaROCPlot)
+
+        mvaDiagPlot = 'mva_diag_' + filename
+        plot = b2plot.Diagonal()
+        plot.set_plot_options({'linestyle': '-', 'lw': 3})
+        plot.add(tmvaTestData, mvaConfig.name, tmvaTestData['__isSignal__'], ~tmvaTestData['__isSignal__'])
+        plot.add(tmvaTrainingData, mvaConfig.name, tmvaTrainingData['__isSignal__'], ~tmvaTrainingData['__isSignal__'])
+        plot.labels = ["Test", "Training"]
+        plot.finish()
+        plot.save(mvaDiagPlot)
+
+        mvaOvertrainingPlot = 'mva_overtraining_' + filename
+        plot = b2plot.Overtraining()
+        plot.set_plot_options({'linestyle': '-', 'lw': 3})
+        plot.add(tmvaData, 'FastBDT',
+                 tmvaData['__isTrain__'], ~tmvaData['__isTrain__'],
+                 tmvaData['__isSignal__'], ~tmvaData['__isSignal__'])
+        plot.finish()
+        plot.save(mvaOvertrainingPlot)
+        o += latex.Graphics().add(mvaOvertrainingPlot, width=0.7).add(mvaROCPlot, width=0.7).add(mvaDiagPlot, width=0.7).finish()
+
+    return o.finish()
 
 
-def createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaConfig):
+def createDiagonalPlot(filename, nTupleData, mvaConfig):
     """
-    Creates a tex document with Training plots
+    Create diagonal plot and returns latex code embedding the plot
+        @param filename used as suffix for the plot
+        @param nTupleData used to create the diagonal plot
+        @param mvaConfig used to define the target variable
+    """
+    o += latex.LatexFile()
+    o += latex.SubSection("Diagonal plot")
+    diagonalPlot = 'diag_' + filename
+    plot = b2plot.Diagonal()
+    plot.set_plot_options({'linestyle': '-', 'lw': 3})
+    plot.add(nTupleData, 'extraInfo(SignalProbability)',
+             nTupleData[mvaConfig.target] > 0, nTupleData[mvaConfig.target] == 0)
+    plot.finish()
+    plot.save(diagonalPlot)
+    o += latex.Graphics().add(diagonalPlot, width=0.7).finish()
+    return o.finish()
+
+
+def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfig, userCutConfig, postCutConfig, postCut,
+                    plotConfig, tmvaTraining, nTuple, listCounts, mcCounts):
+    """
+    Creates a pdf document for this final state particle
+        @param resource object
+        @param particleName valid pdg particle name
+        @param particleLabel user defined label
+        @param matchedList name of matched particle list
         @param mvaConfig configuration for mva
+        @param userCutConfig user cut configuration
+        @param postCutConfig post cut configuration
+        @param postCut post cut detemined by postCutDetermination
+        @param plotConfig plot configuration
+        @param tmvaTraining config filename for TMVA training
+        @param mcCounts MC-Particle statistics
+        @param listCounts particle count in all particle lists
+        @param nTuple data with the finished data
+        @return dictionary containing latex placeholders of this particle
     """
-    placeholders['particleNTrueSignal'] = mcCounts.get(str(abs(pdg.from_name(placeholders['particleName']))), 0)
-    placeholders['particleNSignal'] = distribution['nSignal']
-    placeholders['particleNBackground'] = distribution['nBackground']
-    placeholders['particleNSignalAfterPreCut'] = distribution['nSignal']
-    placeholders['particleNBackgroundAfterPreCut'] = distribution['nBackground']
+    import seaborn
+    import pandas
+    import numpy
+    from root_pandas import read_root
+    # Set nice searborn settings
+    seaborn.set(font_scale=5)
+    seaborn.set_style('whitegrid')
 
-    rootfile = ROOT.TFile(nTuple)
-    tree = rootfile.Get('variables')
-    placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries('isSignal'))
-    placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!isSignal'))
+    nTupleData = loadNTupleDataFrame(nTuple)
 
-    hash = dagFramework.create_hash([placeholders])
-    placeholders['particleDiagPlot'] = removeJPsiSlash(
-        '{name}_combined_{hash}_diag.png'.format(
-            name=placeholders['particleName'],
-            hash=hash))
-    if not os.path.isfile(placeholders['particleDiagPlot']):
-        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'], mvaConfig)
-    placeholders['texFile'] = '{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash)
-    if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/FSParticleTemplate.tex', placeholders)
+    pdgcode = str(abs(pdg.from_name(particleName)))
+    mcCountsData = loadMCCountsDataFrame(mcCounts)
+    mcCountsData = mcCountsData[pdgcode]
 
-    return placeholders
+    listCountsData = getListCountsDataFrame(listCounts)
+    listCountsData = listCountsData[[matchedList + '_Signal', matchedList + '_Background', matchedList + '_All']]
+    listCountsData.columns = ["Signal", "Background", "All"]
+
+    nEvents = mcCountsData.count()
+    nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count())
+    nSignalAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] > 0))
+    nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0))
+
+    if(nEvents != listCountsData['All'].count()):
+        B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong.")
+
+    raw_name = particleName
+    if particleLabel != '':
+        raw_name += ':' + particleLabel
+    name = prettifyDecayString(raw_name)
+
+    o = latex.LatexFile()
+    o += latex.Section(name).finish()
+
+    o += latex.SubSection("Statistic").finish()
+    if userCutConfig.userCut != '':
+        string = latex.String(r"Quantities (except MC truth) are calculated after applying the user-defined cut {cut}")
+        o += string.finish(cut=userCutConfig.userCut)
+    table = latex.LongTable(columnspecs=r'p{5cm}rrrrr',
+                            caption='Statistical quantities per Monte Carlo event',
+                            head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
+                            format=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
+                                   r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
+    table.add(quantity='MC-Particles',
+              mean=mcCountsData.sum() / mcCountsData.count(),
+              error=b2stat.poisson_error(mcCountsData.sum()) / nEvents,
+              std=mcCountsData.std(),
+              min=mcCountsData.min(),
+              max=mcCountsData.max(),
+              meanPostCut=mcCountsData.sum() / nEvents,
+              errorPostCut=b2stat.poisson_error(mcCountsData.sum()) / nEvents)
+    table.add(quantity='Candidates',
+              mean=listCountsData['All'].sum() / nEvents,
+              error=b2stat.poisson_error(listCountsData['All'].sum()) / nEvents,
+              std=listCountsData['All'].std(),
+              min=listCountsData['All'].min(),
+              max=listCountsData['All'].max(),
+              meanPostCut=nCandidatesAfterPostCut / nEvents,
+              errorPostCut=b2stat.poisson_error(nCandidatesAfterPostCut) / nEvents)
+    table.add(quantity='Candidates (Signal)',
+              mean=listCountsData['Signal'].sum() / nEvents,
+              error=b2stat.poisson_error(listCountsData['Signal'].sum()) / nEvents,
+              std=listCountsData['Signal'].std(),
+              min=listCountsData['Signal'].min(),
+              max=listCountsData['Signal'].max(),
+              meanPostCut=nSignalAfterPostCut / nEvents,
+              errorPostCut=b2stat.poisson_error(nSignalAfterPostCut) / nEvents)
+    table.add(quantity='Candidates (Background)',
+              mean=listCountsData['Background'].sum() / nEvents,
+              error=b2stat.poisson_error(listCountsData['Background'].sum()) / nEvents,
+              std=listCountsData['Background'].std(),
+              min=listCountsData['Background'].min(),
+              max=listCountsData['Background'].max(),
+              meanPostCut=nBackgroundAfterPostCut / nEvents,
+              errorPostCut=b2stat.poisson_error(nBackgroundAfterPostCut) / nEvents)
+    o += table.finish()
+
+    user_efficiency = listCountsData['Signal'].sum() / mcCountsData.sum() * 100.0
+    user_efficiency_error = b2stat.binom_error(listCountsData['Signal'].sum(), mcCountsData.sum()) * 100.0
+    user_purity = listCountsData['Signal'].sum() / (listCountsData['All'].sum()) * 100.0
+    user_purity_error = b2stat.binom_error(listCountsData['Signal'].sum(), listCountsData['All'].sum()) * 100.0
+    post_efficiency = nSignalAfterPostCut / mcCountsData.sum() * 100.0
+    post_efficiency_error = b2stat.binom_error(nSignalAfterPostCut, mcCountsData.sum()) * 100.0
+    post_purity = nSignalAfterPostCut / nCandidatesAfterPostCut * 100.0
+    post_purity_error = b2stat.binom_error(nSignalAfterPostCut, nCandidatesAfterPostCut) * 100.0
+
+    table = latex.LongTable(columnspecs=r'p{5cm}rr',
+                            caption='Efficiencies and Purities',
+                            head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
+                            format=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
+    table.add(cut='User',
+              efficiency=user_efficiency,
+              eerr=user_efficiency_error,
+              purity=user_purity,
+              perr=user_purity_error)
+    table.add(cut='Post',
+              efficiency=post_efficiency,
+              eerr=post_efficiency_error,
+              purity=post_purity,
+              perr=post_purity_error)
+    o += table.finish()
+
+    if plotConfig.Diagonal:
+        o += createDiagonalPlot(createUniqueFilename(raw_name, resource.hash), nTupleData, mvaConfig)
+
+    o += latex.SubSection("MVA").finish()
+    o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, plotConfig)
+
+    resource.needed = False
+    resource.cache = True
+    return {'name': name, 'list': matchedList, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
+            'post_efficiency': post_efficiency, 'post_purity': post_purity}
 
 
-def createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts, mvaConfig):
+def createParticleReport(resource, particleName, particleLabel, channelNames, matchedLists, mvaConfig, mvaConfigs,
+                         userCutConfig, userConfigs, preCutConfig, preCut, preCutHistograms, postCutConfig, postCut,
+                         plotConfig, tmvaTrainings, splotTrainings, signalProbabilities, nTuple, listCounts, mcCounts):
     """
-    Creates a tex document with the PreCut and Training plots
-        @param placeholders dictionary with values for every placeholder in the latex-template
+    Creates a pdf document with the PreCut and Training plots
+        @param resource object
+        @param particleName valid pdg particle name
+        @param particleLabel user defined label
         @param channelPlaceholders list of all tex placeholder dictionaries of all channels
+        @param mcCounts
+        @param listCounts particle count in all particle lists
+        @return dictionary containing latex placeholders of this particle
     """
-    print channelPlaceholders
-    placeholders['NChannels'] = len(channelPlaceholders)
-    placeholders['NUsedChannels'] = len([y for y in channelPlaceholders if not y['isIgnored']])
+    import seaborn
+    import pandas
+    import numpy
+    from root_pandas import read_root
+    # Set nice searborn settings
+    seaborn.set(font_scale=5)
+    seaborn.set_style('whitegrid')
 
-    placeholders['channelListAsItems'] = ""
-    for channelPlaceholder in channelPlaceholders:
-        niceDecayChannel = prettifyDecayString(channelPlaceholder['channelName'])
-        if channelPlaceholder['isIgnored']:
-            placeholders[
-                'channelListAsItems'] += "\\item {name} was ignored\n".format(name=niceDecayChannel)
+    nTupleData = loadNTupleDataFrame(nTuple)
+
+    pdgcode = str(abs(pdg.from_name(particleName)))
+    mcCountsData = loadMCCountsDataFrame(mcCounts)
+    mcCountsData = mcCountsData[pdgcode]
+
+    listCountsData = loadListCountsDataFrame(listCounts)
+    valid_lists = [matchedList for matchedList in matchedLists if matchedList is not None]
+    listCountsData['Signal'] = listCountsData[[matchedList + '_Signal' for matchedList in valid_lists]].sum(axis=1)
+    listCountsData['Background'] = listCountsData[[matchedList + '_Background' for matchedList in valid_lists]].sum(axis=1)
+    listCountsData['All'] = listCountsData[[matchedList + '_All' for matchedList in valid_lists]].sum(axis=1)
+
+    nEvents = mcCountsData.count()
+    nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count())
+    nSignalAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] > 0))
+    nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0))
+
+    if(nEvents != listCountsData['All'].count()):
+        B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong.")
+
+    raw_name = particleName
+    if particleLabel != '':
+        raw_name += ':' + particleLabel
+    name = prettifyDecayString(raw_name)
+
+    o = latex.LatexFile()
+
+    o += latex.Section(name).finish()
+
+    o += latex.SubSection("Channels").finish()
+    o += latex.String(r"In the reconstruction of " + name + " " + str(len([t for t in signalProbabilities if t is not None])) +
+                      r" out of " + str(len(signalProbabilities)) + " possible channels were used.")
+
+    itemize = latex.Itemize()
+    for channelName, s in zip(channelNames, signalProbabilities):
+        niceDecayChannel = prettifyDecayString(channelName)
+        if s is None:
+            itemize.add(r"{name} was ignored".format(name=niceDecayChannel))
         else:
-            placeholders[
-                'channelListAsItems'] += "\\item {name}\n".format(name=niceDecayChannel)
+            itemize.add(r"{name}".format(name=niceDecayChannel))
+    o += itemize.finish()
 
-    placeholders['channelInputs'] = ""
-    placeholders['particleNSignal'] = 0
-    placeholders['particleNBackground'] = 0
-    placeholders['particleNSignalAfterUserCut'] = 0
-    placeholders['particleNBackgroundAfterUserCut'] = 0
-    placeholders['particleNSignalAfterPreCut'] = 0
-    placeholders['particleNBackgroundAfterPreCut'] = 0
-    placeholders['particleNSignalAfterPostCut'] = 0
-    placeholders['particleNBackgroundAfterPostCut'] = 0
-    placeholders['particleNTrueSignal'] = mcCounts.get(str(pdg.from_name(placeholders['particleName'])), 0)
+    o += latex.SubSection("Statistic").finish()
+    if userCutConfig.userCut != '':
+        string = latex.String(r"Quantities (except MC truth) are calculated after applying the user-defined {cut}")
+        o += string.finish(cut=userCutConfig.userCut)
+    o += latex.String(r"Quantities (except MC truth) are calculated after applying the automatic pre-cuts.").finish()
+    table = latex.LongTable(columnspecs=r'p{5cm}rrrrr',
+                            caption='Statistical quantities per Monte Carlo event',
+                            head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
+                            format=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
+                                   r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
+    table.add(quantity='MC-Particles',
+              mean=mcCountsData.sum() / mcCountsData.count(),
+              error=b2stat.poisson_error(mcCountsData.sum()) / nEvents,
+              std=mcCountsData.std(),
+              min=mcCountsData.min(),
+              max=mcCountsData.max(),
+              meanPostCut=mcCountsData.sum() / nEvents,
+              errorPostCut=b2stat.poisson_error(mcCountsData.sum()) / nEvents)
+    table.add(quantity='Candidates',
+              mean=listCountsData['All'].sum() / nEvents,
+              error=b2stat.poisson_error(listCountsData['All'].sum()) / nEvents,
+              std=listCountsData['All'].std(),
+              min=listCountsData['All'].min(),
+              max=listCountsData['All'].max(),
+              meanPostCut=nCandidatesAfterPostCut / nEvents,
+              errorPostCut=b2stat.poisson_error(nCandidatesAfterPostCut) / nEvents)
+    table.add(quantity='Candidates (Signal)',
+              mean=listCountsData['Signal'].sum() / nEvents,
+              error=b2stat.poisson_error(listCountsData['Signal'].sum()) / nEvents,
+              std=listCountsData['Signal'].std(),
+              min=listCountsData['Signal'].min(),
+              max=listCountsData['Signal'].max(),
+              meanPostCut=nSignalAfterPostCut / nEvents,
+              errorPostCut=b2stat.poisson_error(nSignalAfterPostCut) / nEvents)
+    table.add(quantity='Candidates (Background)',
+              mean=listCountsData['Background'].sum() / nEvents,
+              error=b2stat.poisson_error(listCountsData['Background'].sum()) / nEvents,
+              std=listCountsData['Background'].std(),
+              min=listCountsData['Background'].min(),
+              max=listCountsData['Background'].max(),
+              meanPostCut=nBackgroundAfterPostCut / nEvents,
+              errorPostCut=b2stat.poisson_error(nBackgroundAfterPostCut) / nEvents)
 
-    if placeholders['NUsedChannels'] > 0:
-        ranges = [channelPlaceholder['postCutRange']
-                  for channelPlaceholder in channelPlaceholders if channelPlaceholder['postCutRange'] != 'Ignored']
-        if len(ranges) == 0:
-            placeholders['postCutRange'] = 'Deactivated'
-        else:
-            if not all(ranges[0] == r for r in ranges):
-                B2WARNING("Showing different post cuts for channels of the same particle in"
-                          "the summary file, isn't supported at the moment. Show only first cut.")
-            placeholders['postCutRange'] = ranges[0]
-    else:
-        placeholders['postCutRange'] = 'Ignored'
+    o += table.finish()
 
-    if nTuple is not None:
-        rootfile = ROOT.TFile(nTuple)
-        tree = rootfile.Get('variables')
-        placeholders['particleNSignalAfterPostCut'] = int(tree.GetEntries(mvaConfig.target))
-        placeholders['particleNBackgroundAfterPostCut'] = int(tree.GetEntries('!' + mvaConfig.target))
-    else:
-        placeholders['particleNSignalAfterPostCut'] = 0
-        placeholders['particleNBackgroundAfterPostCut'] = 0
+    user_efficiency = listCountsData['Signal'].sum() / mcCountsData.sum() * 100.0
+    user_efficiency_error = b2stat.binom_error(listCountsData['Signal'].sum(), mcCountsData.sum()) * 100.0
+    user_purity = listCountsData['Signal'].sum() / (listCountsData['All'].sum()) * 100.0
+    user_purity_error = b2stat.binom_error(listCountsData['Signal'].sum(), listCountsData['All'].sum()) * 100.0
+    post_efficiency = nSignalAfterPostCut / mcCountsData.sum() * 100.0
+    post_efficiency_error = b2stat.binom_error(nSignalAfterPostCut, mcCountsData.sum()) * 100.0
+    post_purity = nSignalAfterPostCut / nCandidatesAfterPostCut * 100.0
+    post_purity_error = b2stat.binom_error(nSignalAfterPostCut, nCandidatesAfterPostCut) * 100.0
 
-    for channelPlaceholder in channelPlaceholders:
-        placeholders['particleNSignal'] += int(channelPlaceholder['channelNSignal'])
-        placeholders['particleNBackground'] += int(channelPlaceholder['channelNBackground'])
-        if not placeholders['isIgnored']:
-            placeholders['particleNSignalAfterPreCut'] += int(channelPlaceholder['channelNSignalAfterPreCut'])
-            placeholders['particleNBackgroundAfterPreCut'] += int(channelPlaceholder['channelNBackgroundAfterPreCut'])
-            placeholders['particleNSignalAfterUserCut'] += int(channelPlaceholder['channelNSignalAfterUserCut'])
-            placeholders['particleNBackgroundAfterUserCut'] += int(channelPlaceholder['channelNBackgroundAfterUserCut'])
-        placeholders['channelInputs'] += '\input{"' + channelPlaceholder['texFile'] + '"}\n'
+    table = latex.LongTable(columnspecs=r'p{5cm}rr',
+                            caption='Efficiencies and Purities',
+                            head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
+                            format=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
+    table.add(cut='User',
+              efficiency=user_efficiency,
+              eerr=user_efficiency_error,
+              purity=user_purity,
+              perr=user_purity_error)
+    table.add(cut='Post',
+              efficiency=post_efficiency,
+              eerr=post_efficiency_error,
+              purity=post_purity,
+              perr=post_purity_error)
 
-    hash = dagFramework.create_hash([placeholders])
-    placeholders['particleDiagPlot'] = removeJPsiSlash(
-        '{name}_combined_{hash}_diag.png'.format(
-            name=placeholders['particleName'],
-            hash=hash))
-    if not os.path.isfile(placeholders['particleDiagPlot']):
-        makeDiagPlotPerParticle(nTuple, placeholders['particleDiagPlot'], mvaConfig)
-    placeholders['texFile'] = removeJPsiSlash('{name}_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-    if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/CombinedParticleTemplate.tex', placeholders)
+    o += table.finish()
 
-    return placeholders
+    if plotConfig.Diagonal:
+        o += createDiagonalPlot(createUniqueFilename(raw_name, resource.hash), nTupleData, mvaConfig)
+
+    channels = []
+    for i, channelName in enumerate(channelNames):
+        tmvaTraining = tmvaTrainings[i]
+        plist = matchedLists[i]
+        channels.append(dict(name=prettifyDecayString(channelName), list=plist))
+
+        o += latex.SubSection(prettifyDecayString(channelName)).finish()
+
+        o += latex.SubSubSection("MC-based MVA").finish()
+        o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, plotConfig)
+
+    resource.needed = False
+    resource.cache = True
+    return {'name': name, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
+            'pre_efficiency': 0, 'pre_purity': 0,
+            'post_efficiency': post_efficiency, 'post_purity': post_purity,
+            'detector_efficiency': 0, 'detector_purity': 0, 'channels': channels}
 
 
 def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
@@ -605,501 +983,6 @@ def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
     return placeholders
 
 
-def getKey(rootFile, regexp):
-    """
-    Return TKey in given TFile that matches regexp. If not exactly one matching key is found, throw exception.
-    """
-    keys = [key for key in rootFile.GetListOfKeys() if re.match(regexp, key.GetName()) is not None]
-    if len(keys) != 1:
-        raise RuntimeError("Couldn't find key matching {regexp} in root file {f}".format(regexp=regexp, f=rootFile.GetName()))
-    return keys[0]
-
-
-def makePreCutPlot(rootFilename, plotName, prefix, preCut, preCutConfig):
-    ROOT.gROOT.SetBatch(True)
-    ROOT.gStyle.SetOptStat(0)
-    ROOT.gStyle.SetHistMinimumZero(True)
-    rootfile = ROOT.TFile(rootFilename)
-    canvas = ROOT.TCanvas(plotName + '_canvas', plotName, 1200, 800)
-    canvas.cd()
-    hist = getKey(rootfile, '^{name}.*$'.format(name=prefix)).ReadObj()
-    unit = ' (GeV) ' if preCutConfig.variable in ['M', 'Q'] else ''
-    if prefix == 'ratio':
-        unit += ';S/B'
-    else:
-        unit += ';N'
-    title = prefix.capitalize()
-    if prefix == 'bckgrd':
-        title = 'Background'
-    hist.SetTitle(title + ';' + preCutConfig.variable + unit)
-    hist.SetLabelSize(0.05, "X")
-    hist.SetLabelSize(0.05, "Y")
-    hist.SetTitleSize(0.05, "X")
-    hist.SetTitleSize(0.05, "Y")
-    hist.SetFillColor(ROOT.kBlue - 2)
-    if preCut is not None:
-        lc, uc = preCut['range']
-        d = uc - lc
-        lr = lc - 4 * d
-        ur = uc + 4 * d
-        lm = hist.GetXaxis().GetXmin()
-        um = hist.GetXaxis().GetXmax()
-        hist.GetXaxis().SetRangeUser(max(lr, lm), min(ur, um))
-        hist.Draw()
-        ll = ROOT.TLine(max(lc, lm), 0, max(lc, lm), hist.GetMaximum())
-        ul = ROOT.TLine(min(uc, um), 0, min(uc, um), hist.GetMaximum())
-        ll.SetLineWidth(2)
-        ul.SetLineWidth(2)
-        ll.Draw()
-        ul.Draw()
-    else:
-        hist.Draw()
-    canvas.SaveAs(plotName)
-
-
-def createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postCut):
-    """
-    Creates tex file for the MVA of a channel. Adds necessary items to the placeholder dictionary
-    and returns the modified dictionary.
-    @param placeholders dictionary with values for every placeholder in the latex-template
-    @param mvaConfig MVAConfiguration object containing the config for the mva
-    @param tmvaTraining config file of the TMVATeacher module
-    @param postCut used postCut
-    @param postCutConfig configuration of the postCut
-    """
-
-    if tmvaTraining is None:
-        hash = dagFramework.create_hash([placeholders])
-        placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-        placeholders['mvaTemplateFile'] = 'analysis/scripts/fei/templates/MissingMVATemplate.tex'
-        placeholders['isIgnored'] = True
-        placeholders['postCutRange'] = 'Ignored'
-        placeholders['mvaNSignal'] = 0
-        placeholders['mvaNBackground'] = 0
-        placeholders['mvaNSignalAfterPostCut'] = 0
-        placeholders['mvaNBackgroundAfterPostCut'] = 0
-        if 'ignoreReason' not in placeholders:
-            placeholders['ignoreReason'] = ("Due too low statistics after the pre cut, we didn\'t perfom a training in"
-                                            " this channel. This means there were less than 1000 signal or"
-                                            " 1000 background events in the given sample.")
-    else:
-        ROOT.gROOT.SetBatch(True)
-
-        # Set mva placeholders
-        placeholders['mvaROOTFilename'] = tmvaTraining[:-9] + '.root'  # Strip _1.config of filename
-        placeholders['mvaTMVAFilename'] = tmvaTraining[:-7] + '.root'  # Strip .config of filename
-        placeholders['mvaLogFilename'] = tmvaTraining[:-9] + '.log'  # Strip _1.config of filename
-        placeholders['mvaName'] = mvaConfig.name
-        placeholders['mvaType'] = mvaConfig.type
-        placeholders['mvaConfig'] = addHyphenations(mvaConfig.config)
-        placeholders['mvaTarget'] = mvaConfig.target
-
-        from variables import variables
-        ranking = getMVARankingFromLogfile(placeholders['mvaLogFilename'])
-        lines_by_rank = dict()
-        for v in mvaConfig.variables:
-            rootName = ROOT.Belle2.Variable.makeROOTCompatible(v)
-            if rootName in ranking:
-                rank, value = ranking[rootName]
-                rankStr = str(rank)
-                value = '{:.2f}'.format(value)
-            else:
-                rank = 900 + len(lines_by_rank)  # nonsensical value to add it at the end
-                rankStr = ''
-                value = ''
-            varName = addHyphenations(escapeForLatex(v))
-            description = escapeForLatex(variables.getVariable(v).description)
-            if rank in lines_by_rank:
-                raise RuntimeError(
-                    "Rank %d occurs more than once! Something is wrong in TMVA or in our parsing of the variable ranking." %
-                    (rank))
-            lines_by_rank[rank] = varName + ' & ' + description + ' & ' + rankStr + '& ' + value + r' \\'
-
-        placeholders['mvaVariables'] = ''
-        for key in sorted(lines_by_rank):
-            placeholders['mvaVariables'] += lines_by_rank[key]
-
-        rootfile = ROOT.TFile(placeholders['mvaTMVAFilename'])
-
-        trainTree = rootfile.Get('TrainTree')
-        placeholders['mvaNTrainSignal'] = int(trainTree.GetEntries('className == "Signal"'))
-        placeholders['mvaNTrainBackground'] = int(trainTree.GetEntries('className == "Background"'))
-
-        testTree = rootfile.Get('TestTree')
-        placeholders['mvaNTestSignal'] = int(testTree.GetEntries('className == "Signal"'))
-        placeholders['mvaNTestBackground'] = int(testTree.GetEntries('className == "Background"'))
-
-        variablefile = ROOT.TFile(placeholders['mvaROOTFilename'])
-        escapedName = removeJPsiSlash(escapeForRegExp(placeholders['particleName']))
-        keys = [key for key in variablefile.GetListOfKeys()
-                if re.match('^{name}.*_tree$'.format(name=escapedName), key.GetName()) is not None]
-        if len(keys) != 1:
-            print [k for k in variablefile.GetListOfKeys()]
-            raise RuntimeError(
-                "Couldn't find original tree for particle {name} in root file {f} created by tmva".format(
-                    name=placeholders['particleName'],
-                    f=placeholders['mvaROOTFilename']))
-        originalTree = keys[0].ReadObj()
-        placeholders['mvaNCandidates'] = originalTree.GetEntries()
-
-        signalSelector = '({isSignal} == 1)'.format(isSignal=placeholders['mvaTarget'])
-        backgroundSelector = '({isSignal} != 1)'.format(isSignal=placeholders['mvaTarget'])
-        placeholders['mvaNSignal'] = originalTree.GetEntries(signalSelector)
-        placeholders['mvaNBackground'] = originalTree.GetEntries(backgroundSelector)
-
-        if postCut is not None:
-            a, b = postCut['range']
-            placeholders['postCutRange'] = '({:.5f},'.format(a) + ' {:.5f}'.format(b) + ')'
-            postCutSelector = '(prob_{name} > {postCut})'.format(name=placeholders['mvaName'], postCut=postCut['range'][0])
-            placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"' + ' && ' + postCutSelector)
-            placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries(
-                'className == "Background"' +
-                ' && ' +
-                postCutSelector)
-        else:
-            placeholders['postCutRange'] = 'Ignored'
-            placeholders['mvaNTestSignalAfterPostCut'] = testTree.GetEntries('className == "Signal"')
-            placeholders['mvaNTestBackgroundAfterPostCut'] = testTree.GetEntries('className == "Background"')
-
-        placeholders['mvaPostCutSignalEfficiency'] = efficiency(
-            placeholders['mvaNTestSignalAfterPostCut'],
-            placeholders['mvaNTestSignal'])
-        placeholders['mvaPostCutBackgroundEfficiency'] = efficiency(
-            placeholders['mvaNTestBackgroundAfterPostCut'],
-            placeholders['mvaNTestBackground'])
-
-        placeholders['mvaNSignalAfterPostCut'] = placeholders['mvaPostCutSignalEfficiency'] * placeholders['mvaNSignal']
-        placeholders['mvaNBackgroundAfterPostCut'] = placeholders['mvaPostCutBackgroundEfficiency'] * placeholders['mvaNBackground']
-
-        # Create plots and texfile if hash changed
-        hash = dagFramework.create_hash([placeholders])
-
-        placeholders['mvaOvertrainingPlot'] = removeJPsiSlash(
-            '{name}_mva_{hash}_overtraining.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['mvaOvertrainingPlot']):
-            makeOvertrainingPlot(placeholders['mvaTMVAFilename'], placeholders['mvaOvertrainingPlot'])
-
-        placeholders['mvaROCPlot'] = removeJPsiSlash(
-            '{name}_mva_{hash}_roc.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['mvaROCPlot']):
-            makeROCPlot(placeholders['mvaTMVAFilename'], placeholders['mvaROCPlot'])
-
-        placeholders['mvaDiagPlot'] = removeJPsiSlash(
-            '{name}_mva_{hash}_diag.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['mvaDiagPlot']):
-            makeDiagPlotPerChannel(placeholders['mvaTMVAFilename'], placeholders['mvaDiagPlot'], placeholders['mvaName'])
-
-        placeholders['mvaTexFile'] = removeJPsiSlash('{name}_mva_{hash}.tex'.format(name=placeholders['particleName'], hash=hash))
-        placeholders['mvaTemplateFile'] = 'analysis/scripts/fei/templates/MVATemplate.tex'
-
-    if not os.path.isfile(placeholders['mvaTexFile']):
-        createTexFile(placeholders['mvaTexFile'], placeholders['mvaTemplateFile'], placeholders)
-    return placeholders
-
-
-def escapeForLatex(someString):
-    """
-    Used to escape user strings for LaTex.
-    """
-    return someString.replace('\\', r'\\').replace('_', r'\_').replace('^', r'\^{}')
-
-
-def addHyphenations(someString):
-    """
-    Adds hyphenations after brackets, and for common variables.
-    """
-    substitutes = {
-        '=': r'=\allowbreak ',
-        ':': r':\allowbreak ',
-        '(': r'(\allowbreak ',
-        'extraInfo': r'ex\-tra\-In\-fo',
-        'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty',
-        'cosAngleBetweenMomentumAndVertexVector': r'cosAngle\-Between\-Momentum\-And\-Vertex\-Vector'}
-    for key, value in substitutes.iteritems():
-        someString = someString.replace(key, value)
-    return someString
-
-
-def escapeForRegExp(someString):
-    """
-    Used to escape user strings for regular expressions.
-    """
-    return someString.replace('*', r'\*').replace('+', r'\+')
-
-
-def makeOvertrainingPlot(tmvaFilename, plotName):
-    subprocess.call(
-        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/share/root/tmva/mvas.C(\\"{f}\\",3)"'.format(f=tmvaFilename)], shell=True)
-    subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
-
-
-def makeROCPlot(tmvaFilename, plotName):
-    subprocess.call(
-        ['root -l -q -b "$BELLE2_EXTERNALS_DIR/share/root/tmva/efficiencies.C(\\"{f}\\")"'.format(f=tmvaFilename)], shell=True)
-    subprocess.call(['cp plots/$(ls -t plots/ | head -1) {name}'.format(name=plotName)], shell=True)
-
-
-def makeDiagPlotPerParticle(nTuple, plotName, mvaConfig):
-
-    nbins = 100
-    probabilityVar = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
-
-    if nTuple is not None:
-        nTupleFile = ROOT.TFile(nTuple)
-        variables = nTupleFile.Get('variables')
-        bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-        signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
-
-        if variables.GetEntries() == 0:
-            raise RuntimeError('variables is empty')
-        variables.Project('background' + probabilityVar, probabilityVar, '!' + mvaConfig.target)
-        variables.Project('signal' + probabilityVar, probabilityVar, mvaConfig.target)
-        # Create filled plot, its important to do this in the same scope as nTupleFile!
-        makeDiagPlot(signalHist, bgHist, plotName)
-    else:
-        # Create empty plot
-        bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-        signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
-        makeDiagPlot(signalHist, bgHist, plotName)
-
-
-def makeDiagPlotPerChannel(tmvaFilename, plotName, methodName):
-
-    tmvaFile = ROOT.TFile(tmvaFilename)
-    testTree = tmvaFile.Get('TestTree')
-
-    if testTree.GetEntries() == 0:
-        raise RuntimeError('TestTree is empty')
-
-    nbins = 100
-    varPrefix = ''  # there's also a prob_MethodName variable, but not sure what it is. it definitely looks odd.
-    probabilityVar = varPrefix + methodName
-    bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-    testTree.Project('background' + probabilityVar, probabilityVar, 'className == "Background"')
-    signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
-    testTree.Project('signal' + probabilityVar, probabilityVar, 'className == "Signal"')
-    plotLabel = ';raw classifier output;purity per bin'
-    makeDiagPlot(signalHist, bgHist, plotName, plotLabel)
-
-
-def makeDiagPlot(signalHist, bgHist, plotName, plotLabel=None):
-    ROOT.gROOT.SetBatch(True)
-    nbins = 100
-    import array
-
-    x = array.array('d')
-    y = array.array('d')
-    xerr = array.array('d')
-    yerr = array.array('d')
-
-    for i in range(1, nbins + 1):  # no under/overflow bins
-        nSig = 1.0 * signalHist.GetBinContent(i)
-        nBg = 1.0 * bgHist.GetBinContent(i)
-
-        binCenter = signalHist.GetXaxis().GetBinCenter(i)
-        x.append(binCenter)
-        y.append(purity(nSig, nBg))
-        xerr.append(signalHist.GetXaxis().GetBinWidth(i) / 2)
-        yerr.append(purityError(nSig, nBg))
-
-    purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
-
-    plotTitle = 'Diagonal plot'
-    canvas = ROOT.TCanvas(plotTitle + plotName, plotTitle, 1200, 800)
-    canvas.cd()
-
-    if not plotLabel:
-        plotLabel = ';classifier output;purity per bin'
-    purityPerBin.SetTitle(plotLabel)
-    purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
-    purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
-    purityPerBin.GetXaxis().SetTitleSize(0.05)
-    purityPerBin.GetXaxis().SetLabelSize(0.05)
-    purityPerBin.GetYaxis().SetTitleSize(0.05)
-    purityPerBin.GetYaxis().SetLabelSize(0.05)
-    purityPerBin.Draw('APZ')
-    diagonal = ROOT.TLine(0.0, 0.0, 1.0, 1.0)
-    diagonal.SetLineColor(ROOT.kAzure)
-    diagonal.SetLineWidth(2)
-    diagonal.Draw()
-    canvas.SaveAs(plotName)
-
-
-def makeCosBDLPlot(fileName, outputFileName, targetVar):
-    """
-    Using the TNTuple in 'fileName', save CosThetaBDL plot in 'outputFileName'.
-    Shows effect of different cuts on SignalProbability, plus signal distribution.
-    """
-    ROOT.gROOT.SetBatch(True)
-    ntupleFile = ROOT.TFile(fileName)
-    ntupleName = 'variables'
-
-    testTree = ntupleFile.Get(ntupleName)
-    if testTree.GetEntries() == 0:
-        raise RuntimeError('Couldn\'t find TNtuple "' + ntupleName + '" in file ' + ntupleFile)
-
-    plotTitle = 'CosThetaBDL plot'
-    ROOT.gStyle.SetOptStat(0)
-    canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
-    canvas.cd()
-
-    color = ROOT.kRed + 4
-    first_plot = True
-    for cut in [0.01, 0.1, 0.5]:
-        testTree.SetLineColor(int(color))
-        testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw(
-            'cosThetaBetweenParticleAndTrueB',
-            'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' +
-            str(cut),
-            '' if first_plot else 'same')
-        first_plot = False
-
-        testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw(
-            'cosThetaBetweenParticleAndTrueB',
-            'abs(cosThetaBetweenParticleAndTrueB) < 10 && extraInfoSignalProbability > ' +
-            str(cut) +
-            ' && !' +
-            targetVar,
-            'same')
-        color -= 1
-
-    l = canvas.GetListOfPrimitives()
-    for i in range(l.GetEntries()):
-        hist = l[i]
-        if isinstance(hist, ROOT.TH1D):
-            hist.GetXaxis().SetRangeUser(-10, 10)
-            break
-
-    legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
-    legend.SetFillStyle(0)
-
-    canvas.SaveAs(outputFileName)
-
-
-def makeMbcPlot(fileName, outputFileName, targetVar):
-    """
-    Using the TNTuple in 'fileName', save M_bc plot in 'outputFileName'.
-    Shows effect of different cuts on SignalProbability, plus signal distribution.
-    """
-    ROOT.gROOT.SetBatch(True)
-    ntupleFile = ROOT.TFile(fileName)
-    ntupleName = 'variables'
-
-    testTree = ntupleFile.Get(ntupleName)
-    if testTree.GetEntries() == 0:
-        raise RuntimeError('Couldn\'t find TNtuple "' + ntupleName + '" in file ' + ntupleFile)
-
-    plotTitle = 'Mbc plot'
-    ROOT.gStyle.SetOptStat(0)
-    canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
-    canvas.cd()
-
-    color = ROOT.kRed + 4
-    first_plot = True
-    for cut in [0.01, 0.1, 0.5]:
-        testTree.SetLineColor(int(color))
-        testTree.SetLineStyle(ROOT.kSolid)
-        testTree.Draw('Mbc', 'Mbc > 5.23 && extraInfoSignalProbability > ' + str(cut), '' if first_plot else 'same')
-        first_plot = False
-
-        testTree.SetLineStyle(ROOT.kDotted)
-        testTree.Draw('Mbc', 'Mbc > 5.23 && extraInfoSignalProbability > ' + str(cut) + ' && !' + targetVar, 'same')
-        color -= 1
-
-    l = canvas.GetListOfPrimitives()
-    for i in range(l.GetEntries()):
-        hist = l[i]
-        if isinstance(hist, ROOT.TH1D):
-            hist.GetXaxis().SetRangeUser(5.24, 5.29)
-            break
-
-    legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
-    legend.SetFillStyle(0)
-    canvas.SaveAs(outputFileName)
-
-
-def makeROCPlotFromNtuple(fileName, outputFileName, nTrueSignal, targetVar):
-    """
-    Using the TNTuple in 'fileName', save an efficiency over purity plot in 'outputFileName'.
-
-    @param nTrueSignal number of true signal particles in the sample.
-    """
-    ROOT.gROOT.SetBatch(True)
-    ntupleFile = ROOT.TFile(fileName)
-    ntupleName = 'variables'
-
-    tree = ntupleFile.Get(ntupleName)
-    if tree.GetEntries() == 0:
-        raise RuntimeError('Couldn\'t find TNtuple "' + ntupleName + '" in file ' + ntupleFile)
-
-    plotTitle = 'ROC curve'
-    canvas = ROOT.TCanvas(outputFileName, plotTitle, 600, 400)
-    canvas.cd()
-
-    nbins = 100
-    import array
-
-    bgHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
-    signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
-
-    probabilityVar = 'extraInfoSignalProbability'
-    tree.Project('ROCbackground', probabilityVar, '!' + targetVar)
-    tree.Project('ROCsignal', probabilityVar, targetVar)
-
-    x = array.array('d')
-    y = array.array('d')
-    xerr = array.array('d')
-    yerr = array.array('d')
-
-    for cutBin in range(nbins + 1):
-        nSig = signalHist.Integral(cutBin, nbins + 1)
-        nBg = bgHist.Integral(cutBin, nbins + 1)
-
-        x.append(100 * purity(nSig, nBg))
-        y.append(100 * efficiency(nSig, nTrueSignal))
-        xerr.append(100 * purityError(nSig, nBg))
-        yerr.append(100 * efficiencyError(nSig, nTrueSignal))
-
-    rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
-    rocgraph.SetLineColor(ROOT.kBlue - 2)
-    rocgraph.SetTitle(';purity (%);efficiency (%)')
-    rocgraph.GetXaxis().SetTitleSize(0.05)
-    rocgraph.GetXaxis().SetLabelSize(0.05)
-    rocgraph.GetYaxis().SetTitleSize(0.05)
-    rocgraph.GetYaxis().SetLabelSize(0.05)
-    rocgraph.Draw('ALPZ')
-
-    canvas.SaveAs(outputFileName)
-
-
-def getMVARankingFromLogfile(logfile):
-    """
-    Extracts ranking from TMVA logfile and returns dictionary with variable:(rank, value)
-    """
-    ranking = {}
-    ranking_mode = 0
-    with open(logfile, 'r') as f:
-        for line in f:
-            if 'Variable Importance' in line:
-                ranking_mode = 1
-            elif ranking_mode == 1:
-                ranking_mode = 2
-            elif ranking_mode == 2 and '-------' in line:
-                ranking_mode = 0
-            elif ranking_mode == 2:
-                v = line.split(':')
-                ranking[v[2].strip()] = (int(v[1]), float(v[3]))
-    return ranking
-
-
 def sendMail():
     import smtplib
     from email.MIMEMultipart import MIMEMultipart
@@ -1191,211 +1074,3 @@ def sendMail():
     # server.login(fromMail, 'Not necessary for kit.edu :-)')
     server.sendmail(fromMail, toMails, msg.as_string())
     server.quit()
-
-
-def isFloat(element):
-    try:
-        float(element)
-        return True
-    except ValueError:
-        return False
-
-
-def isValidParticle(element):
-    try:
-        pdg.from_name(element)
-        return True
-    except LookupError:
-        return False
-
-
-def getBranchingFractions(filename):
-    branching_fractions = {}
-    mother = 'UNKOWN'
-    with open(filename, 'r') as f:
-        for line in f:
-            fields = line.split(' ')
-            fields = filter(lambda x: x != '', fields)
-            if len(fields) < 2:
-                continue
-            if fields[0][0] == '#':
-                continue
-            if fields[0] == 'Decay':
-                mother = fields[1].strip()
-                if mother not in branching_fractions:
-                    branching_fractions[mother] = dict()
-                continue
-            if fields[0] == 'Enddecay':
-                mother = 'UNKOWN'
-                continue
-            if mother == 'UNKOWN':
-                continue
-            fields = fields[:-1]
-            if len(fields) < 1:
-                continue
-            if not isFloat(fields[0]):
-                continue
-            while len(fields) > 1:
-                if not isValidParticle(fields[-1]):
-                    fields = fields[:-1]
-                else:
-                    break
-            if len(fields) < 1:
-                continue
-            if not all(isValidParticle(p) for p in fields[1:]):
-                continue
-            daughters = tuple(sorted(p for p in fields[1:]))
-            if daughters in branching_fractions[mother]:
-                # print "WARNING: decay ", mother, " -> ", " ".join(daughters), "is specified twice"
-                branching_fractions[mother][daughters] += float(fields[0])
-            else:
-                branching_fractions[mother][daughters] = float(fields[0])
-    branching_fractions['D0'][('K-', 'pi+', 'pi0', 'pi0')] = 0.0  # UNKOWN
-    branching_fractions['anti-D0'][('K+', 'pi-', 'pi0', 'pi0')] = 0.0  # UNKOWN
-    branching_fractions['D_s+'][('K-', 'K_S0', 'pi+', 'pi+')] = 0.0164  # From PDG
-    branching_fractions['D_s+'][('K_S0', 'pi+', 'pi0')] = 0.005  # From PDG Mode D_s -> K0 pi- pi0 1%
-    branching_fractions['D_s-'][('K+', 'K_S0', 'pi-', 'pi-')] = 0.0164  # From PDG
-    branching_fractions['D_s-'][('K_S0', 'pi-', 'pi0')] = 0.005  # From PDG Mode D_s -> K0 pi- pi0 1%
-    branching_fractions['B+'][('J/psi', 'K_S0', 'pi+')] = 0.00094
-    branching_fractions['B-'][('J/psi', 'K_S0', 'pi-')] = 0.00094
-    branching_fractions['B0'][('J/psi', 'K_S0', 'pi+', 'pi-')] = 0.001
-    branching_fractions['anti-B0'][('J/psi', 'K_S0', 'pi+', 'pi-')] = 0.001
-    return branching_fractions
-
-
-def getCoveredBranchingFraction(
-    particles,
-    identifier,
-    include_daughter_fractions=False,
-    branching_fractions=getBranchingFractions(
-        os.getenv('BELLE2_EXTERNALS_DIR') +
-        '/share/evtgen/DECAY.DEC')):
-    n, l = identifier.split(':')
-    particle = [p for p in particles if p.identifier == identifier or p.identifier == pdg.conjugate(n) + ':' + l][0]
-    if len(particle.channels) == 0:
-        return 1.0
-    if particle.name not in branching_fractions:
-        return 0.0
-    pbr = branching_fractions[particle.name]
-    total = 0
-    for channel in particle.channels:
-        factor = 1
-        if include_daughter_fractions:
-            for d in channel.daughters:
-                factor *= getCoveredBranchingFraction(particles, d, True)
-        key = tuple(sorted(d.split(':')[0] for d in channel.daughters))
-        for i in ['e+', 'mu+', 'tau+']:
-            m = key.count(i) - key.count(pdg.conjugate(i))
-            if m > 0:
-                key = tuple(sorted(key + ('nu_' + i[:-1], ) * m))
-            elif m < 0:
-                key = tuple(sorted(key + ('anti-nu_' + i[:-1], ) * (-m)))
-        if key not in branching_fractions[particle.name]:
-            print "Missing information about", key
-        else:
-            total += branching_fractions[particle.name][key] * factor
-    return total
-
-
-def getModuleStatsFromFile(filename):
-    """
-    Gets a vector of ModuleStatistics objects from given file.
-    """
-
-    tfile = ROOT.TFile(filename)
-    persistentTree = tfile.Get('persistent')
-    persistentTree.GetEntry(0)
-    # Clone() needed so we actually own the object (original dies when tfile is deleted)
-    stats = persistentTree.ProcessStatistics.Clone()
-
-    # merge statistics from all persistent trees into 'stats'
-    numEntries = persistentTree.GetEntriesFast()
-    for i in range(1, numEntries):
-        persistentTree.GetEntry(i)
-        stats.merge(persistentTree.ProcessStatistics)
-
-    return stats.getAll()
-
-
-def createCPUTimeTexFile(channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile, stats):
-    """
-    Creates CPU time summary .tex file
-        @param stats ProcessStatistics object to interpret
-        @return placeholders
-    """
-
-    sum_time_seconds = 0
-    sum_trueCandidates = 0
-    sum_allCandidates = 0
-    statTable = []
-    moduleTypes = ('ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other')
-    for name, plist, currentPlaceholders in zip(channelNames, inputLists, channelPlaceholders):
-        if plist is None:
-            continue
-        cpuPerModuleType = {}
-        for mType in moduleTypes:
-            cpuPerModuleType[mType] = 0.0
-
-        matchingModules = [m for m in stats if plist in m.getName()]
-        time_total_seconds = 0
-        for m in matchingModules:
-            moduleName = m.getName().split('_')[0]
-            time_seconds = m.getTimeSum(m.c_Event) / 1e9
-            if moduleName in cpuPerModuleType:
-                cpuPerModuleType[moduleName] += time_seconds
-            else:
-                cpuPerModuleType['Other'] += time_seconds
-            time_total_seconds += time_seconds
-
-        for m in cpuPerModuleType:
-            cpuPerModuleType[m] /= time_total_seconds
-            cpuPerModuleType[m] *= 100
-
-        shortName = prettifyDecayString(name)
-        trueCandidates = currentPlaceholders['mvaNSignal']
-        allCandidates = trueCandidates + currentPlaceholders['mvaNBackground']
-        statTable.append([shortName, time_total_seconds, cpuPerModuleType, trueCandidates, allCandidates])
-        sum_time_seconds += time_total_seconds
-        sum_trueCandidates += trueCandidates
-        sum_allCandidates += allCandidates
-
-    # fill cpuTimeStatistics placeholder
-    placeholders = {}
-    colours = ["orange", "blue", "red", "green", "cyan", "purple"]
-    placeholders['colourList'] = ', '.join('"%s"' % (c) for c in colours)
-    placeholders['numColoursMinusOne'] = len(colours) - 1
-    placeholders['barLegend'] = '' + ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colours, moduleTypes))
-    placeholders['cpuTimeStatistics'] = ''
-    rowString = '{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\\% \\\\\n'
-    for row in statTable:
-        cpuPerModuleType = row[2]
-        bargraph = '\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % tuple(cpuPerModuleType[key] for key in moduleTypes)
-        if row[4] == 0:
-            timePerCandidate = ' --- '
-        else:
-            timePerCandidate = formatTime(row[1] * 1.0 / row[4])
-        if row[3] == 0:
-            timePerCandidate += ' ( --- )'
-        else:
-            timePerCandidate += ' (' + formatTime(row[1] * 1.0 / row[3]) + ')'
-        if sum_time_seconds == 0:
-            timePercent = 0
-        else:
-            timePercent = row[1] / sum_time_seconds * 100
-        placeholders['cpuTimeStatistics'] += rowString.format(name=row[0],
-                                                              bargraph=bargraph,
-                                                              time=formatTime(row[1]),
-                                                              timePerCandidate=timePerCandidate,
-                                                              timePercent=timePercent)
-    placeholders['cpuTimeStatistics'] += '\\bottomrule\n'
-    placeholders['cpuTimeStatistics'] += rowString.format(name='Total',
-                                                          bargraph='',
-                                                          time=formatTime(sum_time_seconds),
-                                                          timePerCandidate='',
-                                                          timePercent=100)
-
-    placeholders['texFile'] = 'CPUTimeSummary_' + moduleStatisticsFile + '.tex'
-    if not os.path.isfile(placeholders['texFile']):
-        createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/CPUTimeTemplate.tex', placeholders)
-
-    return placeholders

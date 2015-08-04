@@ -1,0 +1,339 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import unittest
+import os
+import tempfile
+import atexit
+import shutil
+import contextlib
+import IPython
+
+import numpy
+import pandas
+
+from fei import automaticReporting
+from ROOT import Belle2
+# @cond
+
+
+class TestLoadMCCountsDataFrame(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/mcParticlesCount.root')
+
+    def test_loadMCCountsDataFrame(self):
+        df = automaticReporting.loadMCCountsDataFrame(self.filename)
+
+        self.assertEqual(len(df), 100)
+        self.assertListEqual(sorted(df.columns), sorted(['211', '321', '22', '111', '421', '411', '413']))
+        sdf = df.sum()
+        # The following numbers were independently checked with:
+        # root -l mcParticlesCount.root
+        # TH1F h("h", "h", 100, 0, 100);
+        # for(int i = 0; i < 7; ++i) {
+        #   std::string test = mccounts->GetListOfBranches().At(i).GetName();
+        #   cout << test << " = ";
+        #   mccounts->Project("h", test.c_str(), test.c_str());
+        #   cout << h.Integral() << endl;
+        # }
+        self.assertEqual(sdf['211'], 791.0)
+        self.assertEqual(sdf['321'], 161.0)
+        self.assertEqual(sdf['22'], 1134.0)
+        self.assertEqual(sdf['111'], 479.0)
+        self.assertEqual(sdf['421'], 181.0)
+        self.assertEqual(sdf['411'], 26.0)
+        self.assertEqual(sdf['413'], 25.0)
+
+
+class TestLoadListCountsDataFrame(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/listCounts.root')
+        self.lists = ['pi+:9c603352f1c7f8cde7437866da4fc795b72c9467',
+                      'K+:cbc5cbc816a18f1d5658701bc3322ff9c9791c99',
+                      'gamma:baf4804bf3e3d401ed05cc469497b0fe83377d24',
+                      'pi0:90786ffc748ea3b11ae9dab84cbe4fbeb49443d9',
+                      'D0:3a61b0b85d0bf1497c5bfed8ab2dc66c957dffc3',
+                      'D0:aa6a0fae9aaf8cdcefb8e22ff96c4c8d62ecb6b3',
+                      'D0:90a21bf28c01481c3dd3d8847ebacff6ec7e8bbf',
+                      'D0:c756a1fdbbe75673bf78b71a90e726a11202a50e',
+                      'D+:5144c31f84e6c83c673259778908aad82b62844b',
+                      'D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35']
+        self.keys = [l + '_All' for l in self.lists] + [l + '_Signal' for l in self.lists] + [l + '_Background' for l in self.lists]
+
+    def test_loadListCountsDataFrame(self):
+        df = automaticReporting.loadListCountsDataFrame(self.filename)
+
+        self.assertEqual(len(df), 100)
+        self.assertListEqual(sorted(df.columns), sorted(self.keys))
+        sdf = df.sum()
+        # The following numbers were independently checked with:
+        # root -l listCounts.root
+        # TH1F h("h", "h", 100, 0, 100);
+        # for(int i = 0; i < 30; ++i) {
+        #   std::string test = listcounts->GetListOfBranches().At(i).GetName();
+        #   cout << test << " = ";
+        #   listcounts->Project("h", test.c_str(), test.c_str());
+        #   cout << h.Integral() << endl;
+        # }
+        #  TODO Why does the sum of signal and background is not equal to all??
+        self.assertEqual(sdf['pi+:9c603352f1c7f8cde7437866da4fc795b72c9467_All'], 954.0)
+        self.assertEqual(sdf['pi+:9c603352f1c7f8cde7437866da4fc795b72c9467_Signal'], 670.0)
+        self.assertEqual(sdf['pi+:9c603352f1c7f8cde7437866da4fc795b72c9467_Background'], 284.0)
+        self.assertEqual(sdf['K+:cbc5cbc816a18f1d5658701bc3322ff9c9791c99_All'], 954.0)
+        self.assertEqual(sdf['K+:cbc5cbc816a18f1d5658701bc3322ff9c9791c99_Signal'], 130.0)
+        self.assertEqual(sdf['K+:cbc5cbc816a18f1d5658701bc3322ff9c9791c99_Background'], 824.0)
+        self.assertEqual(sdf['gamma:baf4804bf3e3d401ed05cc469497b0fe83377d24_All'], 1830.0)
+        self.assertEqual(sdf['gamma:baf4804bf3e3d401ed05cc469497b0fe83377d24_Signal'], 1002.0)
+        self.assertEqual(sdf['gamma:baf4804bf3e3d401ed05cc469497b0fe83377d24_Background'], 828.0)
+        self.assertEqual(sdf['pi0:90786ffc748ea3b11ae9dab84cbe4fbeb49443d9_All'], 6009.0)
+        self.assertEqual(sdf['pi0:90786ffc748ea3b11ae9dab84cbe4fbeb49443d9_Signal'], 341.0)
+        self.assertEqual(sdf['pi0:90786ffc748ea3b11ae9dab84cbe4fbeb49443d9_Background'], 5668.0)
+        self.assertEqual(sdf['D0:3a61b0b85d0bf1497c5bfed8ab2dc66c957dffc3_All'], 23.0)
+        self.assertEqual(sdf['D0:3a61b0b85d0bf1497c5bfed8ab2dc66c957dffc3_Signal'], 4.0)
+        self.assertEqual(sdf['D0:3a61b0b85d0bf1497c5bfed8ab2dc66c957dffc3_Background'], 19.0)
+        self.assertEqual(sdf['D0:aa6a0fae9aaf8cdcefb8e22ff96c4c8d62ecb6b3_All'], 231.0)
+        self.assertEqual(sdf['D0:aa6a0fae9aaf8cdcefb8e22ff96c4c8d62ecb6b3_Signal'], 3.0)
+        self.assertEqual(sdf['D0:aa6a0fae9aaf8cdcefb8e22ff96c4c8d62ecb6b3_Background'], 228.0)
+        self.assertEqual(sdf['D0:90a21bf28c01481c3dd3d8847ebacff6ec7e8bbf_All'], 4.0)
+        self.assertEqual(sdf['D0:90a21bf28c01481c3dd3d8847ebacff6ec7e8bbf_Signal'], 1.0)
+        self.assertEqual(sdf['D0:90a21bf28c01481c3dd3d8847ebacff6ec7e8bbf_Background'], 3.0)
+        self.assertEqual(sdf['D0:c756a1fdbbe75673bf78b71a90e726a11202a50e_All'], 2.0)
+        self.assertEqual(sdf['D0:c756a1fdbbe75673bf78b71a90e726a11202a50e_Signal'], 0.0)
+        self.assertEqual(sdf['D0:c756a1fdbbe75673bf78b71a90e726a11202a50e_Background'], 2.0)
+        self.assertEqual(sdf['D+:5144c31f84e6c83c673259778908aad82b62844b_All'], 45.0)
+        self.assertEqual(sdf['D+:5144c31f84e6c83c673259778908aad82b62844b_Signal'], 0.0)
+        self.assertEqual(sdf['D+:5144c31f84e6c83c673259778908aad82b62844b_Background'], 45.0)
+        self.assertEqual(sdf['D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35_All'], 5.0)
+        self.assertEqual(sdf['D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35_Signal'], 0.0)
+        self.assertEqual(sdf['D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35_Background'], 5.0)
+
+
+class TestLoadModuleStatisticsDataFrame(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/moduleStatistics.root')
+        self.lists = ['pi+:9c603352f1c7f8cde7437866da4fc795b72c9467',
+                      'K+:cbc5cbc816a18f1d5658701bc3322ff9c9791c99',
+                      'gamma:baf4804bf3e3d401ed05cc469497b0fe83377d24',
+                      'pi0:90786ffc748ea3b11ae9dab84cbe4fbeb49443d9',
+                      'D0:3a61b0b85d0bf1497c5bfed8ab2dc66c957dffc3',
+                      'D0:aa6a0fae9aaf8cdcefb8e22ff96c4c8d62ecb6b3',
+                      'D0:90a21bf28c01481c3dd3d8847ebacff6ec7e8bbf',
+                      'D0:c756a1fdbbe75673bf78b71a90e726a11202a50e',
+                      'D+:5144c31f84e6c83c673259778908aad82b62844b',
+                      'D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35']
+
+    def test_loadModuleStatisticsDataFrame(self):
+        df = automaticReporting.loadModuleStatisticsDataFrame(self.filename)
+
+        self.assertEqual(len(df), 141)
+        self.assertListEqual(sorted(df.columns), sorted(['name', 'time', 'type', 'listname']))
+        self.assertListEqual(sorted(df.type.unique()), sorted(['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter',
+                                                               'MCMatching', 'TMVAExpert', 'Other']))
+        unique = df.listname.unique()
+        for l in self.lists + ['Other']:
+            self.assertTrue(l in unique)
+
+        sdf = df.groupby(['type'])['time'].sum()
+        self.assertAlmostEqual(sdf['ParticleLoader'], 348.587310, delta=0.001)
+        self.assertAlmostEqual(sdf['ParticleCombiner'], 608.436537, delta=0.001)
+        self.assertAlmostEqual(sdf['ParticleVertexFitter'], 9545.304479, delta=0.001)
+        self.assertAlmostEqual(sdf['MCMatching'], 406.493269, delta=0.001)
+        self.assertAlmostEqual(sdf['TMVAExpert'], 1036.668055, delta=0.001)
+        self.assertAlmostEqual(sdf['Other'], 18281.310939, delta=0.001)
+
+        sdf = df.groupby(['listname'])['time'].sum()
+        self.assertAlmostEqual(sdf['pi+:9c603352f1c7f8cde7437866da4fc795b72c9467'], 275.136933, delta=0.001)
+        self.assertAlmostEqual(sdf['K+:cbc5cbc816a18f1d5658701bc3322ff9c9791c99'], 318.912922, delta=0.001)
+        self.assertAlmostEqual(sdf['gamma:baf4804bf3e3d401ed05cc469497b0fe83377d24'], 317.925720, delta=0.001)
+        self.assertAlmostEqual(sdf['pi0:90786ffc748ea3b11ae9dab84cbe4fbeb49443d9'], 6667.722236, delta=0.001)
+        self.assertAlmostEqual(sdf['D0:3a61b0b85d0bf1497c5bfed8ab2dc66c957dffc3'], 79.856503, delta=0.001)
+        self.assertAlmostEqual(sdf['D0:aa6a0fae9aaf8cdcefb8e22ff96c4c8d62ecb6b3'], 3259.807874, delta=0.001)
+        self.assertAlmostEqual(sdf['D0:90a21bf28c01481c3dd3d8847ebacff6ec7e8bbf'], 38.665225, delta=0.001)
+        self.assertAlmostEqual(sdf['D0:c756a1fdbbe75673bf78b71a90e726a11202a50e'], 35.042606, delta=0.001)
+        self.assertAlmostEqual(sdf['D+:5144c31f84e6c83c673259778908aad82b62844b'], 263.403086, delta=0.001)
+        self.assertAlmostEqual(sdf['D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35'], 80.580009, delta=0.001)
+
+
+class TestLoadNTupleDataFrame(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/'
+                                                   'var_K+:2ec3c4d182fc3c427642f9fc648355f410dd141d_'
+                                                   'afacdbbcf37285eb16b17d43afb91f2d536ecfef.root')
+
+    def test_loadNTupleDataFrame(self):
+        df = automaticReporting.loadNTupleDataFrame(self.filename)
+
+        self.assertEqual(len(df), 100)
+        self.assertListEqual(sorted(df.columns), sorted(['isSignal', 'mcErrors', 'extraInfo(SignalProbability)',
+                                                         'Mbc', 'cosThetaBetweenParticleAndTrueB']))
+        sdf = df.sum()
+        # The following numbers were independently checked with:
+        # root -l mcParticlesCount.root
+        # TH1F h("h", "h", 100, -1000000, 10000000);
+        # for(int i = 0; i < 7; ++i) {
+        #   std::string test = variables->GetListOfBranches().At(i).GetName();
+        #   cout << test << " = ";
+        #   variables->Project("h", test.c_str(), test.c_str());
+        #   cout << h.Integral() << endl;
+        # }
+        # And afterwards added some more digits given by pandas
+        self.assertEqual(sdf['isSignal'], 76.0)
+        self.assertEqual(sdf['extraInfo(SignalProbability)'], 75.246215395629406)
+        self.assertEqual(sdf['Mbc'], 521.66232776641846)
+        self.assertEqual(sdf['mcErrors'], 2952)
+        self.assertEqual(sdf['cosThetaBetweenParticleAndTrueB'], -6846.8998398780823)
+
+
+class TestLoadTMVADataFrame(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/TMVATraining_1.root')
+
+    def test_loadTMVADataFrame(self):
+        df = automaticReporting.loadTMVADataFrame(self.filename)
+
+        self.assertEqual(len(df), 200)
+        self.assertTrue(numpy.all(df.iloc[:100]['__isTrain__']))
+        self.assertFalse(numpy.any(df.iloc[100:]['__isTrain__']))
+        self.assertListEqual(sorted(df.columns), sorted(['__isSignal__', '__isTrain__', 'className', 'classID', 'M', 'weight',
+                                                         'isSignal', 'daughter(0,extraInfo(SignalProbability))', 'FastBDT',
+                                                         'prob_FastBDT', 'daughter(1,extraInfo(SignalProbability))',
+                                                         'daughterAngle(0,1)', 'Q']))
+        sdf = df[df['__isTrain__']].sum()
+        # The following numbers were independently checked with TBrowser
+        self.assertAlmostEqual(sdf['classID'], 72.0, delta=0.01)
+        self.assertAlmostEqual(sdf['M'], 12.35, delta=0.01)
+        self.assertAlmostEqual(sdf['daughter(0,extraInfo(SignalProbability))'], 60.20, delta=0.01)
+        self.assertAlmostEqual(sdf['daughter(1,extraInfo(SignalProbability))'], 57.73, delta=0.01)
+        self.assertAlmostEqual(sdf['daughterAngle(0,1)'], 17.96, delta=0.01)
+        self.assertAlmostEqual(sdf['Q'], 12.35, delta=0.01)
+        self.assertAlmostEqual(sdf['isSignal'], 28.0, delta=0.01)
+        self.assertAlmostEqual(sdf['__isSignal__'], 28.0, delta=0.01)
+        self.assertAlmostEqual(sdf['__isTrain__'], 100.0, delta=0.01)
+        self.assertAlmostEqual(sdf['weight'], 53.22, delta=0.01)
+        self.assertAlmostEqual(sdf['FastBDT'], 39.91, delta=0.01)
+        self.assertAlmostEqual(sdf['prob_FastBDT'], 39.41, delta=0.01)
+
+        sdf = df[~df['__isTrain__']].sum()
+        # The following numbers were independently checked with TBrowser
+        self.assertAlmostEqual(sdf['classID'], 81.0, delta=0.01)
+        self.assertAlmostEqual(sdf['M'], 12.49, delta=0.01)
+        self.assertAlmostEqual(sdf['daughter(0,extraInfo(SignalProbability))'], 62.52, delta=0.01)
+        self.assertAlmostEqual(sdf['daughter(1,extraInfo(SignalProbability))'], 55.93, delta=0.01)
+        self.assertAlmostEqual(sdf['daughterAngle(0,1)'], -2.133, delta=0.01)
+        self.assertAlmostEqual(sdf['Q'], 12.49, delta=0.01)
+        self.assertAlmostEqual(sdf['isSignal'], 19.0, delta=0.01)
+        self.assertAlmostEqual(sdf['__isSignal__'], 19.0, delta=0.01)
+        self.assertAlmostEqual(sdf['__isTrain__'], 0.0, delta=0.01)
+        self.assertAlmostEqual(sdf['weight'], 505.0, delta=0.01)
+        self.assertAlmostEqual(sdf['FastBDT'], 39.10, delta=0.01)
+        self.assertAlmostEqual(sdf['prob_FastBDT'], 38.40, delta=0.01)
+
+
+class TestLoadMVARankingDataFrame(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/TMVAlogfile.log')
+
+    def test_loadMVARankingDataFrame(self):
+        df = automaticReporting.loadMVARankingDataFrame(self.filename)
+
+        self.assertEqual(len(df), 4)
+        self.assertListEqual(sorted(df.columns), sorted(['name', 'importance']))
+
+        self.assertEqual(df.iloc[0]['name'], 'daughter(0,extraInfo(SignalProbability))')
+        self.assertAlmostEqual(df.iloc[0]['importance'], 6.51500, delta=0.01)
+        self.assertEqual(df.iloc[1]['name'], 'Q')
+        self.assertAlmostEqual(df.iloc[1]['importance'], 6.14100, delta=0.01)
+        self.assertEqual(df.iloc[2]['name'], 'daughterAngle(0,1)')
+        self.assertAlmostEqual(df.iloc[2]['importance'], 0.10970, delta=0.01)
+        self.assertEqual(df.iloc[3]['name'], 'daughter(1,extraInfo(SignalProbability))')
+        self.assertAlmostEqual(df.iloc[3]['importance'], 0.03015, delta=0.01)
+
+
+class TestLoadBranchingFractionsDataFrame(unittest.TestCase):
+
+    def test_isFloat(self):
+        self.assertTrue(automaticReporting.isFloat("1.0"))
+        self.assertTrue(automaticReporting.isFloat("-1.5"))
+        self.assertTrue(automaticReporting.isFloat("1e-7"))
+        self.assertTrue(automaticReporting.isFloat("50"))
+        self.assertFalse(automaticReporting.isFloat("1f10"))
+        self.assertFalse(automaticReporting.isFloat("5,6"))
+        self.assertFalse(automaticReporting.isFloat("asd"))
+        self.assertFalse(automaticReporting.isFloat("1.0f"))
+        self.assertTrue(automaticReporting.isFloat("inf"))
+        self.assertTrue(automaticReporting.isFloat("-inf"))
+        self.assertTrue(automaticReporting.isFloat("nan"))
+
+    def test_isValidParticle(self):
+        self.assertTrue(automaticReporting.isValidParticle("e+"))
+        self.assertTrue(automaticReporting.isValidParticle("J/psi"))
+        self.assertTrue(automaticReporting.isValidParticle("K_S0"))
+        self.assertTrue(automaticReporting.isValidParticle("D*+"))
+        self.assertTrue(automaticReporting.isValidParticle("D_s*+"))
+        self.assertTrue(automaticReporting.isValidParticle("gamma"))
+        self.assertFalse(automaticReporting.isValidParticle("D_f+"))
+        self.assertFalse(automaticReporting.isValidParticle("WW"))
+        self.assertFalse(automaticReporting.isValidParticle("Z'"))
+        self.assertFalse(automaticReporting.isValidParticle("gam"))
+        self.assertFalse(automaticReporting.isValidParticle("hypergraviton"))
+        self.assertFalse(automaticReporting.isValidParticle("Thomas'Particle"))  # TODO Fix this, should be true
+
+    def test_loadBranchingFractionsDataFrame(self):
+        df = automaticReporting.loadBranchingFractionsDataFrame()
+
+        self.assertEqual(len(df), len(df.drop_duplicates()))
+        self.assertListEqual(sorted(df.columns), sorted(['particle', 'channel', 'fraction']))
+
+        sdf = df.groupby(['particle'])['fraction'].sum()
+        for fraction in sdf:
+            self.assertAlmostEqual(fraction, 1.0, delta=0.03)
+
+    def test_loadCoveredBranchingFractionsDataFrame(self):
+        from fei import default_channels
+        particles = default_channels.get_default_channnels()
+        df = automaticReporting.loadCoveredBranchingFractionsDataFrame(particles, include_daughter_fractions=True)
+
+        sdf = df.groupby(['particle'])['fraction'].sum()
+
+        # In total we reconstruct 21, if new ones are added, don't forget to add test for
+        # the branching fractions below, do NOT just increase this number ;-)
+        self.assertEqual(len(sdf), 21)
+
+        # Make covered branching fraction will only rise from this point on!
+        # Upper boundary should prevent unreasonable high values to be accepted (due to bugs)
+        self.assertTrue(0.0148 < sdf['B+:generic'] < 0.016)
+        self.assertTrue(0.0083 < sdf['B0:generic'] < 0.01)
+        self.assertTrue(0.0450 < sdf['B+:semileptonic'] < 0.05)
+        self.assertTrue(0.0293 < sdf['B0:semileptonic'] < 0.035)
+        self.assertTrue(0.1840 < sdf['D*+:generic'] < 0.2)
+        self.assertTrue(0.2699 < sdf['D*0:generic'] < 0.3)
+        self.assertTrue(0.1908 < sdf['D+:generic'] < 0.22)
+        self.assertTrue(0.2719 < sdf['D0:generic'] < 0.3)
+        self.assertTrue(0.0512 < sdf['D_s*+:generic'] < 0.06)
+        self.assertTrue(0.0513 < sdf['D_s+:generic'] < 0.06)
+        self.assertTrue(0.1186 < sdf['J/psi:generic'] < 0.14)
+        self.assertTrue(0.9882 < sdf['pi0:generic'] < 1.0)
+        self.assertTrue(0.6913 < sdf['K_S0:generic'] < 0.9)
+
+        # Final state particles have always branching fraction 1.0
+        self.assertEqual(sdf['e+:generic'], 1.0)
+        self.assertEqual(sdf['mu+:generic'], 1.0)
+        self.assertEqual(sdf['pi+:generic'], 1.0)
+        self.assertEqual(sdf['K+:generic'], 1.0)
+        self.assertEqual(sdf['gamma:generic'], 1.0)
+
+
+if __name__ == '__main__':
+    tempdir = tempfile.mkdtemp()
+    os.chdir(tempdir)
+    # main() never returns, so install exit handler to do our cleanup
+    atexit.register(shutil.rmtree, tempdir)
+    unittest.main()
+
+# @endcond

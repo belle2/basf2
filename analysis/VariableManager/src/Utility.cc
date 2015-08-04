@@ -20,7 +20,7 @@ namespace Belle2 {
     {
       return std::map<std::string, std::string> {
         {" ", "__sp"},
-        {",", "__co"},
+        {",", "__cm"},
         {":", "__cl"},
         {"=", "__eq"},
         {"<", "__st"},
@@ -28,14 +28,14 @@ namespace Belle2 {
         {".", "__pt"},
         {"+", "__pl"},
         {"-", "__mi"},
-        {"(", "__ar"},
-        {")", "__zr"},
-        {"{", "__ac"},
-        {"}", "__zc"},
-        {"[", "__as"},
-        {"]", "__zs"},
-        {"`", "__at"},
-        {"´", "__zt"},
+        {"(", "__bo"},
+        {")", "__bc"},
+        {"{", "__co"},
+        {"}", "__cc"},
+        {"[", "__so"},
+        {"]", "__sc"},
+        {"`", "__to"},
+        {"´", "__tc"},
         {"^", "__ha"},
         {"°", "__ci"},
         {"$", "__do"},
@@ -43,22 +43,28 @@ namespace Belle2 {
         {"%", "__pr"},
         {"!", "__em"},
         {"?", "__qm"},
-        {";", "__ps"},
+        {";", "__sm"},
         {"#", "__hs"},
         {"*", "__mu"},
         {"/", "__sl"},
         {"\\", "__bl"},
-        {"'", "__ea"},
-        {"\"", "__da"},
+        {"'", "__sq"},
+        {"\"", "__dq"},
         {"~", "__ti"},
-        {"-", "__bi"},
+        {"-", "__da"},
         {"|", "__pi"},
-        {"&", "__un"},
+        {"&", "__am"},
+        {"@", "__at"},
       };
     }
 
     std::string makeROOTCompatible(std::string str)
     {
+      if (str.find("__") != std::string::npos) {
+        B2WARNING("String passed to makeROOTCompatible contains double-underscore __, which is used internally for escaping special characters. "
+                  "It is recommended to avoid this. However escaping a string twice with makeROOTCompatible is safe, but will print this warning. "
+                  "Passed string: " + str);
+      }
       auto replace = getSubstitutionMap();
       for (auto& pair : replace) {
         boost::replace_all(str, pair.first, pair.second);

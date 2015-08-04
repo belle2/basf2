@@ -9,18 +9,40 @@ class LatexObject(object):
     Common base class of all Latex Wrapper objects
     """
     def __init__(self):
+        """
+        Constructor, initialize output with empty string
+        """
+        #: Stores the outputted latex-code
         self.output = ''
 
     def __str__(self):
+        """
+        Transform object to string, in this case, just returns .the generated latex-code
+        """
         return self.output
 
     def add(self):
+        """
+        Add latex-code to the output string.
+        This method is usually overriden in the subclasses
+        """
         return self
 
     def finish(self):
+        """
+        Finishes the generation of latex-code.
+        E.g. adds end latex-commands
+        This method is usually overriden in the subclasses
+        """
         return self
 
     def save(self, filename, compile=True):
+        """
+        Saves the latex-code into a file, adds preamble and end of document,
+        and compiles the code if requested.
+            @param filename latex-code is stored in this file, should end on .tex
+            @param compile compile the .tex file using pdflatex into a .pdf file
+        """
         output = r"""
             \documentclass[10pt,a4paper]{article}
             \usepackage[latin1]{inputenc}
@@ -56,33 +78,73 @@ class LatexObject(object):
 
 
 class LatexFile(LatexObject):
+    """
+    Convinience class implementing += operator, can be used instead of raw LatexObject to collect
+    all the latex code in your project which should go into a common file.
+    """
     def add(self, text=''):
+        """
+        Adds an object to the output
+            @param text string or object with implicit string conversion (like LatexObject)
+        """
         self.output += str(text)
         return self
 
     def __iadd__(self, text):
+        """
+        Adds an object to the output
+            @param text string or object with implicit string conversion (like LatexObject)
+        """
         self.add(text)
         return self
 
 
 class String(LatexObject):
+    """
+    Used for wrapping conventionel text into latex-code.
+    Has to possibility to handle python-style format-placeholders
+    """
     def __init__(self, text=''):
+        """
+        Calls super-class initialize and adds initial text to output
+            @param text intial text, usually you want to give a raw string r"some text"
+        """
         super(String, self).__init__()
         self.output += str(text)
 
     def add(self, text=''):
+        """
+        Adds an object to the output, can contain python-placeholders
+            @param text string or object with implicit string conversion (like LatexObject)
+        """
         self.output += str(text)
         return self
 
     def finish(self, **kwargs):
+        """
+        Finish the generation of the string by replacing possible placehholders with the given dictionary
+            @param kwargs dictionary used to replace placeholders
+        """
         self.output = self.output.format(kwargs) + '\n'
         return self
 
 
 class DefineColourList(LatexObject):
+    """
+    Defines the colourlist latex-command, which draws a bargraph with relative
+    fractions indicated by colours using tikz.
+    After including this object in you latex code the command \\bargraph is available.
+    You should include only one of these objects in your latex code.
+    """
+
+    #: 6 default colours used for the bargraph
+    colours = ["red", "green", "blue", "orange", "cyan", "purple"]
+
     def __init__(self):
+        """
+        Calls super-class init, adds definition of colourlist to latex code.
+        """
         super(DefineColourList, self).__init__()
-        self.colours = ["red", "green", "blue", "orange", "cyan", "purple"]
         self.output += r"\def\colourlist{{" + ', '.join('"%s"' % (c) for c in self.colours) + r"}}" + '\n'
         self.output += r"""
             \tikzset{nodeStyle/.style={text height=\heightof{A},text depth=\depthof{g}, inner sep = 0pt, node distance = -0.15mm}}
@@ -111,7 +173,14 @@ class DefineColourList(LatexObject):
 
 
 class Section(LatexObject):
+    """
+    Adds a new section to your latex code with some additional commands
+    to force a pagebreak and add a barrier for figure objects.
+    """
     def __init__(self, name):
+        """
+        Calls super-class init and adds necessary latex commands to output.
+        """
         super(Section, self).__init__()
         self.output += r"\raggedbottom" + '\n'
         self.output += r"\pagebreak[0]" + '\n'
@@ -120,38 +189,74 @@ class Section(LatexObject):
 
 
 class SubSection(LatexObject):
+    """
+    Adds a new subsection to your latex code.
+    """
     def __init__(self, name):
+        """
+        Calls super-class init and adds necessary latex commands to output.
+        """
         super(SubSection, self).__init__()
         self.output += r"\subsection{" + str(name) + r"}" + '\n'
 
 
 class SubSubSection(LatexObject):
+    """
+    Adds a new subsubsection to your latex code.
+    """
     def __init__(self, name):
+        """
+        Calls super-class init and adds necessary latex commands to output.
+        """
         super(SubSubSection, self).__init__()
         self.output += r"\subsubsection{" + str(name) + r"}" + '\n'
 
 
 class Graphics(LatexObject):
+    """
+    Includes a series of image files into your latex code and centers them.
+    """
     def __init__(self):
+        """
+        Calls super-class init and begins centered environment.
+        """
         super(Graphics, self).__init__()
         self.output += r"\begin{center}" + '\n'
 
     def add(self, filename, width=0.7):
+        """
+        Include a image file.
+            @filename containing the image
+            @width texwidth argument of includegraphics
+        """
         self.output += r"\includegraphics[width=" + str(width) + r"\textwidth]"
         self.output += r"{" + str(filename) + r"}" + '\n'
         return self
 
     def finish(self):
+        """
+        Ends centered environment
+        """
         self.output += r"\end{center}" + '\n'
         return self
 
 
 class Itemize(LatexObject):
+    """
+    Creates a itemized list in latex.
+    """
     def __init__(self):
+        """
+        Calls super-class init and begins itemize
+        """
         super(Itemize, self).__init__()
         self.output += r"\begin{itemize}"
 
     def add(self, item):
+        """
+        Adds another item.
+            @param item string or object with implicit string conversion used as item
+        """
         self.output += r"\item " + str(item) + '\n'
         return self
 
@@ -161,7 +266,20 @@ class Itemize(LatexObject):
 
 
 class LongTable(LatexObject):
+    """
+    Creates a longtable in latex. A longtable can span multiple pages
+    and is automatically wrapped.
+    """
     def __init__(self, columnspecs, caption, format_string, head):
+        """
+        Calls super-class init, begins centered environment and longtable environment.
+        Defines caption and head of the table.
+            @param columnspecs of the longtable, something like:
+                    rclp{7cm} 4 columns, right-center-left aligned and one paragraph column with a width of 7cm
+            @param caption string or object with implicit string conversion used as caption.
+            @param format_string  python-style format-string used to generate a new row out of a given dictionary.
+            @param head of the table
+        """
         super(LongTable, self).__init__()
         self.output += r"\begin{center}" + '\n'
         self.output += r"\begin{longtable}{" + str(columnspecs) + r"}" + '\n'
@@ -172,10 +290,19 @@ class LongTable(LatexObject):
         self.format_string = format_string
 
     def add(self, **kwargs):
+        """
+        Add a new row to the longtable by generating the row using the format_string given in init
+        and the provided dictionary.
+            @param kwargs dictionary used to generate the row using the python-style format-string.
+        """
         self.output += self.format_string.format(**kwargs) + r"\\" + '\n'
         return self
 
     def finish(self, tail=''):
+        """
+        Adds optional tail of the table, ends longtable and centered environment.
+            @param tail optional tail, like head but at the bottom of the table.
+        """
         self.output += r"\bottomrule" + '\n'
         if str(tail) != '':
             self.output += str(tail) + r"\\" + '\n'
@@ -186,7 +313,18 @@ class LongTable(LatexObject):
 
 
 class TitlePage(LatexObject):
+    """
+    Creates a latex title-page and optionally abstract and table-of-contents.
+    You should include only one of these objects in your latex code.
+    """
     def __init__(self, title, authors, abstract, add_table_of_contents=True):
+        """
+        Sets author, date, title property, calls maketitle, optionalla adds abstract and table-of-contents.
+            @param title of the latex file.
+            @param authors of the latex file, so the person who write the corresponding python-code with this framework :-)
+            @param abstract optional abstract placed on the title-page.
+            @param add_table_of_contents bool indicating of table-of-contents should be included.
+        """
         super(TitlePage, self).__init__()
         self.output += r"\author{"
         for author in authors:

@@ -843,6 +843,47 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, countInList)
+  {
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    StoreObjPtr<ParticleList> outputList("pList1");
+    DataStore::Instance().setInitializeActive(true);
+    outputList.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    outputList.create();
+    outputList->initialize(22, "pList1");
+
+    particles.appendNew(Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
+    particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
+    particles.appendNew(Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
+    particles.appendNew(Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 5));
+    particles.appendNew(Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 6));
+
+    outputList->addParticle(0, 22, Particle::c_Unflavored);
+    outputList->addParticle(1, 22, Particle::c_Unflavored);
+    outputList->addParticle(2, 22, Particle::c_Unflavored);
+    outputList->addParticle(3, 22, Particle::c_Unflavored);
+    outputList->addParticle(4, 22, Particle::c_Unflavored);
+
+    const Manager::Var* var = Manager::Instance().getVariable("countInList(pList1, E < 0.85)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(nullptr), 2);
+
+    var = Manager::Instance().getVariable("countInList(pList1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
+
+    var = Manager::Instance().getVariable("countInList(pList1, E > 5)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(nullptr), 0);
+
+    var = Manager::Instance().getVariable("countInList(pList1, E < 5)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
+  }
+
   TEST_F(MetaVariableTest, veto)
   {
     StoreArray<Particle> particles;

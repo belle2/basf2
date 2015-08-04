@@ -17,6 +17,16 @@ namespace Belle2 {
     std::string makeROOTCompatible(std::string str);
 
     /**
+     * Invert makeROOTCompatible operation
+     */
+    std::string invertMakeROOTCompatible(std::string str);
+
+    /**
+     * Substituation map for makeROOTCompatible
+     */
+    std::map<std::string, std::string> getSubstitutionMap();
+
+    /**
      * Returns position of the matched closing parenthesis if the first character in the given
      * string contains an opening parenthesis. Otherwise return 0.
      */

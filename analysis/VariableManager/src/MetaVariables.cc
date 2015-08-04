@@ -270,6 +270,39 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr countInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1 or arguments.size() == 2) {
+
+        std::string listName = arguments[0];
+        std::string cutString = "";
+
+        if (arguments.size() == 2) {
+          cutString = arguments[1];
+        }
+
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+
+        auto func = [listName, cut](const Particle*) -> double {
+
+          StoreObjPtr<ParticleList> list(listName);
+          double sum = 0;
+          for (unsigned int i = 0; i < list->getListSize(); i++)
+          {
+            const Particle* particle = list->getParticle(i);
+            if (cut->check(particle)) {
+              sum++;
+            }
+          }
+          return sum;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function countInList");
+      }
+    }
+
+
     Manager::FunctionPtr veto(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 or arguments.size() == 3) {
@@ -520,6 +553,11 @@ namespace Belle2 {
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. matchedMC(p) returns the total momentum of the related MCParticle.\n"
                       "Returns -999 if no matched MCParticle exists.");
+    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
+                      "Returns number of particle which pass given in cut in the specified particle list.\n"
+                      "Useful for creating statistics about the number of particles in a list.\n"
+                      "E.g. countInList(e+, isSignal == 1) returns the number of correctly reconstructed electrons in the event.\n"
+                      "The variable is event-based and does not need a valid particle pointer as input.");
 
   }
 }

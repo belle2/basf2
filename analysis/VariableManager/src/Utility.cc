@@ -6,6 +6,7 @@
 #include <string>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
 
 #include <iostream>
@@ -15,10 +16,64 @@ namespace Belle2 {
 
   namespace Variable {
 
+    std::map<std::string, std::string> getSubstitutionMap()
+    {
+      return std::map<std::string, std::string> {
+        {" ", "__sp"},
+        {",", "__co"},
+        {":", "__cl"},
+        {"=", "__eq"},
+        {"<", "__st"},
+        {">", "__gt"},
+        {".", "__pt"},
+        {"+", "__pl"},
+        {"-", "__mi"},
+        {"(", "__ar"},
+        {")", "__zr"},
+        {"{", "__ac"},
+        {"}", "__zc"},
+        {"[", "__as"},
+        {"]", "__zs"},
+        {"`", "__at"},
+        {"´", "__zt"},
+        {"^", "__ha"},
+        {"°", "__ci"},
+        {"$", "__do"},
+        {"§", "__pa"},
+        {"%", "__pr"},
+        {"!", "__em"},
+        {"?", "__qm"},
+        {";", "__ps"},
+        {"#", "__hs"},
+        {"*", "__mu"},
+        {"/", "__sl"},
+        {"\\", "__bl"},
+        {"'", "__ea"},
+        {"\"", "__da"},
+        {"~", "__ti"},
+        {"-", "__bi"},
+        {"|", "__pi"},
+        {"&", "__un"},
+      };
+    }
+
     std::string makeROOTCompatible(std::string str)
     {
+      auto replace = getSubstitutionMap();
+      for (auto& pair : replace) {
+        boost::replace_all(str, pair.first, pair.second);
+      }
       const static boost::regex blackList("[^a-zA-Z0-9_]");
       return boost::regex_replace(str, blackList, "");
+    }
+
+    std::string invertMakeROOTCompatible(std::string str)
+    {
+      auto replace = getSubstitutionMap();
+      for (auto& pair : replace) {
+        boost::replace_all(str, pair.second, pair.first);
+      }
+      return str;
     }
 
     bool almostEqualFloat(const float& a, const float& b)

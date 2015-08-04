@@ -283,10 +283,54 @@ namespace {
   TEST(VariableTest, makeROOTCompatible)
   {
     EXPECT_EQ("", makeROOTCompatible(""));
-    EXPECT_EQ("", makeROOTCompatible(":() (),"));
-    EXPECT_EQ("cba", makeROOTCompatible("c:()b (),a"));
-    EXPECT_EQ("c8951aBZWVZUEOH_Rhtnsqba", makeROOTCompatible("c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a"));
-    EXPECT_EQ("foobar012394", makeROOTCompatible("foo(bar,-0.123, 94)"));
+    EXPECT_EQ("test", makeROOTCompatible("test"));
+    EXPECT_EQ("test213", makeROOTCompatible("test213"));
+    EXPECT_EQ("test_23", makeROOTCompatible("test_23"));
+
+    EXPECT_EQ("", makeROOTCompatible(""));
+    EXPECT_EQ("test", makeROOTCompatible("test"));
+    EXPECT_EQ("test213", makeROOTCompatible("test213"));
+    EXPECT_EQ("test_23", makeROOTCompatible("test_23"));
+
+    EXPECT_EQ("test__ar23__zr", makeROOTCompatible("test(23)"));
+    EXPECT_EQ("test__as23__zs", makeROOTCompatible("test[23]"));
+    EXPECT_EQ("test__ac23__zc", makeROOTCompatible("test{23}"));
+    EXPECT_EQ("test__are__pl__clgamma__co__spM__sp__st__sp3__zr", makeROOTCompatible("test(e+:gamma, M < 3)"));
+    EXPECT_EQ("__cl__ar__zr__sp__ar__zr__co", makeROOTCompatible(":() (),"));
+    EXPECT_EQ("c__cl__ar__zrb__sp__ar__zr__coa", makeROOTCompatible("c:()b (),a"));
+    EXPECT_EQ("c__cl__ar__co__pl8951aBZWVZUEOH_Rhtnsq__zrb__sp__ar__zr__coa", makeROOTCompatible("c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a"));
+    EXPECT_EQ("foo__arbar__co__mi0__pt123__co__sp94__zr", makeROOTCompatible("foo(bar,-0.123, 94)"));
+
+    for (auto pair : getSubstitutionMap()) {
+      EXPECT_EQ(pair.second, makeROOTCompatible(pair.first));
+    }
+  }
+
+  TEST(VariableTest, invertMakeROOTCompatible)
+  {
+    EXPECT_EQ(invertMakeROOTCompatible(""), "");
+    EXPECT_EQ(invertMakeROOTCompatible("test"), "test");
+    EXPECT_EQ(invertMakeROOTCompatible("test213"), "test213");
+    EXPECT_EQ(invertMakeROOTCompatible("test_23"), "test_23");
+
+    EXPECT_EQ(invertMakeROOTCompatible(""), "");
+    EXPECT_EQ(invertMakeROOTCompatible("test"), "test");
+    EXPECT_EQ(invertMakeROOTCompatible("test213"), "test213");
+    EXPECT_EQ(invertMakeROOTCompatible("test_23"), "test_23");
+
+    EXPECT_EQ(invertMakeROOTCompatible("test__ar23__zr"), "test(23)");
+    EXPECT_EQ(invertMakeROOTCompatible("test__as23__zs"), "test[23]");
+    EXPECT_EQ(invertMakeROOTCompatible("test__ac23__zc"), "test{23}");
+    EXPECT_EQ(invertMakeROOTCompatible("test__are__pl__clgamma__co__spM__sp__st__sp3__zr"), "test(e+:gamma, M < 3)");
+    EXPECT_EQ(invertMakeROOTCompatible("__cl__ar__zr__sp__ar__zr__co"), ":() (),");
+    EXPECT_EQ(invertMakeROOTCompatible("c__cl__ar__zrb__sp__ar__zr__coa"), "c:()b (),a");
+    EXPECT_EQ(invertMakeROOTCompatible("c__cl__ar__co__pl8951aBZWVZUEOH_Rhtnsq__zrb__sp__ar__zr__coa"),
+              "c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a");
+    EXPECT_EQ(invertMakeROOTCompatible("foo__arbar__co__mi0__pt123__co__sp94__zr"), "foo(bar,-0.123, 94)");
+
+    for (auto pair : getSubstitutionMap()) {
+      EXPECT_EQ(pair.first, invertMakeROOTCompatible(pair.second));
+    }
   }
 
 }  // namespace

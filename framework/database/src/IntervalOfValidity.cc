@@ -38,6 +38,36 @@ IntervalOfValidity::IntervalOfValidity(int experimentLow, int runLow, int experi
   }
 }
 
+
+int IntervalOfValidity::checkLowerBound(int experiment, int run) const
+{
+  // check for empty interval
+  if (empty()) return false;
+
+  if ((m_experimentLow == experiment) && (m_runLow == run)) return 0;
+  if (m_experimentLow < 0) return 1;
+  if (experiment < m_experimentLow) return -1;
+  if (experiment == m_experimentLow) {
+    if (run < m_runLow) return -1;
+  }
+  return 1;
+}
+
+int IntervalOfValidity::checkUpperBound(int experiment, int run) const
+{
+  // check for empty interval
+  if (empty()) return false;
+
+  if ((m_experimentHigh == experiment) && (m_runHigh == run)) return 0;
+  if (m_experimentHigh < 0) return -1;
+  if ((experiment < 0) || (experiment > m_experimentHigh)) return 1;
+  if (experiment == m_experimentHigh) {
+    if ((m_runHigh >= 0) && ((run > m_runHigh) || (run < 0))) return 1;
+  }
+  return -1;
+}
+
+
 bool IntervalOfValidity::contains(const EventMetaData& event) const
 {
   int experiment = (int) event.getExperiment();
@@ -47,31 +77,32 @@ bool IntervalOfValidity::contains(const EventMetaData& event) const
   if (empty()) return false;
 
   // check lower bound
-  if (m_experimentLow >= 0) {
-    if (experiment < m_experimentLow) return false;
-    if (experiment == m_experimentLow) {
-      if (run >= 0) {
-        if ((m_runLow >= 0) && (run < m_runLow)) return false;
-      } else {
-        if (m_runLow > 0) return false;
-      }
-    }
-  }
-
-  // check upper bound
-  if (m_experimentHigh >= 0) {
-    if (experiment > m_experimentHigh) return false;
-    if ((experiment == m_experimentHigh) && (m_runHigh >= 0) && (run > m_runHigh)) return false;
-    if (experiment == m_experimentHigh) {
-      if (run >= 0) {
-        if ((m_runHigh >= 0) && (run > m_runHigh)) return false;
-      } else {
-        if (m_runHigh >= 0) return false;
-      }
-    }
-  }
-
+  if (checkLowerBound(experiment, run) < 0) return false;
+  if (checkUpperBound(experiment, run) > 0) return false;
   return true;
+}
+
+IntervalOfValidity IntervalOfValidity::overlap(const IntervalOfValidity& iov) const
+{
+  IntervalOfValidity emptyResult;
+  if (empty() || iov.empty()) return emptyResult;
+
+  IntervalOfValidity result(*this);
+  if (checkLowerBound(iov.m_experimentLow, iov.m_runLow) > 0) {
+    result.m_experimentLow = iov.m_experimentLow;
+    result.m_runLow = iov.m_runLow;
+  }
+  if (checkUpperBound(iov.m_experimentHigh, iov.m_runHigh) < 0) {
+    result.m_experimentHigh = iov.m_experimentHigh;
+    result.m_runHigh = iov.m_runHigh;
+  }
+
+  // check for no overlap
+  int runLow = result.m_runLow;
+  if (runLow < 0) runLow = 0;
+  if (result.checkUpperBound(result.m_experimentLow, runLow) > 0) return emptyResult;
+
+  return result;
 }
 
 

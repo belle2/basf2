@@ -67,6 +67,27 @@ namespace Belle2 {
       return !(*this == other);
     }
 
+    /**
+     * Function that checks the validity interval contains another interval of validity.
+     * @param iov   the other validity interval
+     * @return      true if the given other interval of validity is inside the validity interval.
+     */
+    bool contains(const IntervalOfValidity& iov) const {return overlap(iov) == iov;};
+
+    /**
+     * Function that checks the validity interval overlaps with another interval of validity.
+     * @param iov   the other validity interval
+     * @return      true if both intervals of validity have a common range.
+     */
+    bool overlaps(const IntervalOfValidity& iov) const {return !overlap(iov).empty();};
+
+    /**
+     * Function that determines the overlap of the validity interval with another interval of validity.
+     * @param iov   the other validity interval
+     * @return      the interval that is common to both intervals of validity.
+     */
+    IntervalOfValidity overlap(const IntervalOfValidity& iov) const;
+
     /** Input stream operator for reading IoV data from a text file.
      *
      *  @param input The input stream.
@@ -98,6 +119,22 @@ namespace Belle2 {
     /** Highest run number. 0 means no bound.
      */
     int m_runHigh;
+
+    /**
+     * Helper function to check whether a given experiment/run number is above or below the lower bound of the interval of validity.
+     * @param experiement   the experiment number
+     * @param run           the run number
+     * @return              0 if the given experiment/run number is equal to the lower bound, -1 if it is below the lower bound, 1 if it is above the lower bound.
+     */
+    int checkLowerBound(int experiment, int run) const;
+
+    /**
+     * Helper function to check whether a given experiment/run number is above or below the upper bound of the interval of validity.
+     * @param experiement   the experiment number
+     * @param run           the run number
+     * @return              0 if the given experiment/run number is equal to the upper bound, -1 if it is below the upper bound, 1 if it is above the upper bound.
+     */
+    int checkUpperBound(int experiment, int run) const;
 
     ClassDef(IntervalOfValidity, 2);  /**< describes the interval of experiments/runs for which an object in the database is valid. */
   };

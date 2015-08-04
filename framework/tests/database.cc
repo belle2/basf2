@@ -118,6 +118,38 @@ namespace {
     EXPECT_FALSE(IntervalOfValidity(-1, -1, 14, 1).contains(event));
   }
 
+  /** Test operations of validity intervals */
+  TEST_F(DataBaseTest, IntervalOfValidityOperations)
+  {
+    IntervalOfValidity iov(1, 1, 3, 10);
+    EXPECT_TRUE(IntervalOfValidity(1, 1, 3, 10).contains(iov));
+    EXPECT_TRUE(IntervalOfValidity(1, -1, 3, 10).contains(iov));
+    EXPECT_TRUE(IntervalOfValidity(-1, -1, 3, 10).contains(iov));
+    EXPECT_TRUE(IntervalOfValidity(1, 1, 3, -1).contains(iov));
+    EXPECT_TRUE(IntervalOfValidity(1, 1, -1, -1).contains(iov));
+    EXPECT_FALSE(IntervalOfValidity(1, 2, 3, 10).contains(iov));
+    EXPECT_FALSE(IntervalOfValidity(2, -1, 3, 10).contains(iov));
+    EXPECT_FALSE(IntervalOfValidity(1, 1, 3, 9).contains(iov));
+    EXPECT_FALSE(IntervalOfValidity(1, 1, 2, -1).contains(iov));
+    EXPECT_TRUE(iov.contains(IntervalOfValidity(2, -1, 2, -1)));
+    EXPECT_FALSE(iov.contains(IntervalOfValidity(1, -1, 2, 1)));
+    EXPECT_FALSE(iov.contains(IntervalOfValidity(-1, -1, 3, 10)));
+    EXPECT_FALSE(iov.contains(IntervalOfValidity(1, 1, 3, -1)));
+    EXPECT_FALSE(iov.contains(IntervalOfValidity(1, 1, -1, -1)));
+
+    EXPECT_TRUE(IntervalOfValidity(1, 1, 3, 10).overlaps(iov));
+    EXPECT_TRUE(IntervalOfValidity(1, -1, 1, 1).overlaps(iov));
+    EXPECT_TRUE(IntervalOfValidity(-1, -1, 1, 1).overlaps(iov));
+    EXPECT_TRUE(IntervalOfValidity(-1, -1, 1, -1).overlaps(iov));
+    EXPECT_TRUE(IntervalOfValidity(3, -1, -1, -1).overlaps(iov));
+    EXPECT_TRUE(IntervalOfValidity(3, 10, -1, -1).overlaps(iov));
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, -1, -1).overlaps(iov));
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, 0, -1).overlaps(iov));
+    EXPECT_FALSE(IntervalOfValidity(-1, -1, 1, 0).overlaps(iov));
+    EXPECT_FALSE(IntervalOfValidity(3, 11, 3, -1).overlaps(iov));
+    EXPECT_FALSE(IntervalOfValidity(4, -1, 4, -1).overlaps(iov));
+  }
+
   /** Test database access via DBObjPtr */
   TEST_F(DataBaseTest, DBObjPtr)
   {

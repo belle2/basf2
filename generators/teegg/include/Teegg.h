@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014  Belle II Collaboration                              *
+ * Copyright(C) 2015  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -35,16 +35,6 @@ namespace Belle2 {
 
     /** Sets the default settings for the TEEGG Fortran generator. */
     void setDefaultSettings();
-
-    /** Sets the Lorentz boost vector which should be applied to the generated particles.
-     * @param boostVector The Lorentz boost vector which is applied to the generated particles.
-     */
-    void setBoost(TLorentzRotation boostVector) { m_boostVector = boostVector; }
-
-    /** Enables the boost of the generated particles.
-     * @param applyBoost Set to true to enabled the boost. Also make sure you have set the boost vector using setBoost().
-     */
-    void enableBoost(bool applyBoost = true) { m_applyBoost = applyBoost; }
 
     /** specifies which vacuum polarization code (NOT IMPLEMENTED YET)
     * @param vacpol vacuum polarization code (NOT IMPLEMENTED YET)
@@ -156,8 +146,6 @@ namespace Belle2 {
       */
     void setUNWGHT(int unwght = 1) { m_UNWGHT = unwght; }
 
-
-
     /** Sets the CMS energy.
      * @param cmsEnergy The CMS energy in [GeV].
      */
@@ -168,7 +156,7 @@ namespace Belle2 {
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      */
-    void generateEvent(MCParticleGraph& mcGraph);
+    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
 
     /** returns kinematic variable T.
     */
@@ -189,7 +177,6 @@ namespace Belle2 {
     void term();
 
   protected:
-    bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
     double m_pi;                    /**< pi=3.1415.... */
     double m_conversionFactor;      /**< Conversion factor for hbarc to nb. */
     double m_alphaQED0;             /**< QED coupling constant at Q=0. */
@@ -229,9 +216,7 @@ namespace Belle2 {
     double m_t;  /**< T=-Q2 */
     double m_w2;  /**< W2 */
     double m_weight;  /**< weight per event */
-
-//     bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
-    TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */
+    double m_vp2;  /**< vacuum polarization squared (multiply with this to correcty for VP) */
 
     /** Apply the settings to the internal Fortran generator. */
     void applySettings();
@@ -243,7 +228,8 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual = false, bool isInitial = false);
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                       bool isVirtual = false, bool isInitial = false);
 
   private:
 

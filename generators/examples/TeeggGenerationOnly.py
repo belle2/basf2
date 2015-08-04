@@ -3,42 +3,45 @@
 
 ########################################################
 # 100 radiative Bhabha events are generated using the
-# TEEGG generator
+# TEEGG generator, configuration: GAMMA-SOFT
 #
 # Example steering file
 ########################################################
 
 from basf2 import *
+from beamparameters import add_beamparameters
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
 
+# main path
 main = create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
-eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
 
 # Register the BABAYAGA.NLO module
 teegg = register_module('TeeggInput')
 
-# Set the mode for the boost of the generated particles: 0 = no boost, 1 = BELLE II, 2 = BELLE
-teegg.param('BoostMode', 1)
-
-# CMS energy [GeV]  (default: from gearbox), set BoostMode to 0 if you want to use this option
-# teegg.param('CMSEnergy', 1.3)
+# WEIGHTED (0) or UNWEIGHTED (1)
+teegg.param('UNWEIGHTED', 1)
 
 # CONFIG
 teegg.param('CONFIG', 'GAMMA')
 
 # RADCOR and MAXWEIGHTS
-teegg.param('RADCOR', 'SOFT')
+teegg.param('RADCOR', 'HARD')
 teegg.param('WGHT1M', 1.001)  # SOFT
 teegg.param('WGHTMX', 1.150)  # SOFT
 
 # TEVETO
-teegg.param('TEVETO', 10.0)
+teegg.param('TEVETO', 5.0)
+teegg.param('EEVETO', 0.5)
 
 # TGMIN
 teegg.param('TGMIN', 12.5)
@@ -61,28 +64,16 @@ teegg.param('EGMIN', 0.50)
 # UNWGHT
 # teegg.param('UNWGHT', 1)
 
-# extra outfile (contains the used weights, user should check against FMax value)
-teegg.param('ExtraFile', './teegg-extra.root')
-
-# geometry parameter database
-gearbox = register_module('Gearbox')
-
-# Register the Progress module and the Python histogram module
-progress = register_module('Progress')
-
 # output
 output = register_module('RootOutput')
 output.param('outputFileName', './teegg-outfile.root')
 
 # Create the main path and add the modules
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(progress)
-main.add_module(gearbox)
+main.add_module("Progress")
 main.add_module(teegg)
 main.add_module(output)
 # uncomment the following line if you want event by event info
-# main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
 process(main)

@@ -12,6 +12,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
+
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <TDatabasePDG.h>
@@ -45,9 +47,10 @@ extern "C" {
 
 //   extrainfo
   extern struct {
-    double t;
-    double w2;
-    double weight;
+    double tt;
+    double tw2;
+    double tweight;
+    double tvp2;
   } teeggextra_;
 
 
@@ -68,7 +71,6 @@ extern "C" {
 
   /** FORTRAN routine based on main.f */
   void teeggm_(int* mode, double* xpar, int* npar);
-//   void teeggx_(int* mode, double* xpar, int* npar);
 
   /** Callback to show warning */
   void teegg_warning_generic_(double* weight, double* max)
@@ -97,8 +99,7 @@ void Teegg::setDefaultSettings()
 {
   m_cmsEnergy = 5.28695 * 2.0 * Unit::GeV;
 
-  m_applyBoost = true;
-  m_pi               = 3.1415926535897932384626433832795029;
+  m_pi              = 3.1415926535897932384626433832795029;
   m_conversionFactor = 0.389379660e6;
   m_alphaQED0        = 1.0 / 137.0359895;
   m_massElectron     = 0.51099906 * Unit::MeV;
@@ -139,38 +140,48 @@ void Teegg::setDefaultSettings()
 
 void Teegg::init()
 {
+  StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+
   applySettings();
 }
 
 
-void Teegg::generateEvent(MCParticleGraph& mcGraph)
+void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
   //Generate event
   int mode = 1;
   teeggm_(&mode, m_xpar, m_npar);
 
-  //Store the initial particles as virtual particles into the MCParticleGraph
-//   storeParticle(mcGraph, momset_.bq1, 11, true);
-//   storeParticle(mcGraph, momset_.bp1, -11, true);
-
   //Store the final state fermions as real particle into the MCParticleGraph
-  storeParticle(mcGraph, momset_.tq2, 11);
-  storeParticle(mcGraph, momset_.tp2, -11);
+  storeParticle(mcGraph, momset_.tq2, 11, vertex, boost, false, false);
+  storeParticle(mcGraph, momset_.tp2, -11, vertex, boost, false, false);
 
   //Store the real photon(s) into the MCParticleGraph
   for (int iPhot = 0; iPhot <  momset_.tnphot; ++iPhot) {
     double photMom[4] = {momset_.tphot[0][iPhot], momset_.tphot[1][iPhot], momset_.tphot[2][iPhot], momset_.tphot[3][iPhot]};
-    storeParticle(mcGraph, photMom, 22);
+    storeParticle(mcGraph, photMom, 22, vertex, boost, false, false);
   }
 
   // Get extra information
-  m_t      = teeggextra_.t;
-  m_w2     = teeggextra_.w2;
-  m_weight = teeggextra_.weight;
+  m_t      = teeggextra_.tt;
+  m_w2     = teeggextra_.tw2;
+  m_weight = teeggextra_.tweight;
+  m_vp2    = teeggextra_.tvp2;
 
   // Fill event weight
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   eventMetaDataPtr->setGeneratedWeight(m_weight);
+
+  // Fill vacuum polarization correction
+  StoreObjPtr<EventExtraInfo> eventExtraInfo;
+  if (not eventExtraInfo.isValid())
+    eventExtraInfo.create();
+  if (eventExtraInfo->hasExtraInfo("GeneratorVP2")) {
+    B2WARNING("EventExtraInfo with given name is already set! I won't set it again!")
+  } else {
+    eventExtraInfo->addExtraInfo("GeneratorVP2", m_vp2);
+  }
+
 }
 
 void Teegg::term()
@@ -178,11 +189,11 @@ void Teegg::term()
   int mode = 2;
   teeggm_(&mode, m_xpar, m_npar);
 
-  B2INFO(">>> xsec    = (" << teeggresults_.rescross << " +/- " << teeggresults_.rescrosserr << ") pb")
-  B2INFO(">>> events  = " << teeggresults_.resngen)
-  B2INFO(">>> trials  = " << teeggresults_.resntrials)
-  B2INFO(">>>    eff  = " << 100.*teeggresults_.reseff << " %")
-  B2INFO(">>> avg. Q2 = " << teeggresults_.avgq2)
+  B2RESULT("Cross-section (nb)  = " << teeggresults_.rescross << " +/- " << teeggresults_.rescrosserr << "")
+  B2RESULT("Events (unweighted) = " << teeggresults_.resngen)
+  B2RESULT("Trials              = " << teeggresults_.resntrials)
+  B2RESULT("Efficiency          = " << 100.*teeggresults_.reseff << " %")
+  B2RESULT("Average Q2          = " << teeggresults_.avgq2)
 
 }
 
@@ -257,14 +268,15 @@ void Teegg::applySettings()
 }
 
 
-void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual, bool isInitial)
+void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                          bool isVirtual, bool isInitial)
 {
   // Create particle
   MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
   if (isVirtual) {
-    part.setStatus(MCParticle::c_IsVirtual);
+    part.addStatus(MCParticle::c_IsVirtual);
   } else if (isInitial) {
-    part.setStatus(MCParticle::c_Initial);
+    part.addStatus(MCParticle::c_Initial);
   }
 
   // All particles from a generator are primary
@@ -286,9 +298,17 @@ void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, 
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
-  // Mirror Pz and if boosting is enable boost the particles to the lab frame
+  //boost
   TLorentzVector p4 = part.get4Vector();
-  p4.SetPz(-1.0 * p4.Pz());
-  if (m_applyBoost) p4 = m_boostVector * p4;
+  p4.SetPz(-1.0 * p4.Pz()); //TEEGG uses other direction convention
+  p4 = boost * p4;
   part.set4Vector(p4);
+
+  //set vertex
+  if (!isInitial) {
+    TVector3 v3 = part.getProductionVertex();
+    v3 = v3 + vertex;
+    part.setProductionVertex(v3);
+    part.setValidVertex(true);
+  }
 }

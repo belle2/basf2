@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 
 #include <generators/teegg/Teegg.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -53,14 +54,10 @@ namespace Belle2 {
     virtual void terminate();
 
   protected:
-    /** Returns beam energy given HER, LER and crossing angle. */
-    double getBeamEnergyCM(double e1, double e2, double angle);
 
     /** Module parameters */
     std::string m_sVACPOL; /**< Vacuum polarization: off, hlmnt (default) or nsk via weights. */
     double m_cmsEnergy; /**< CMS energy. */
-    int m_boostMode; /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
-    std::string m_fileNameExtraInfo; /**< Extra ROOT file that contains the weight distribution to check overweight bias. */
     double m_TEVETO; /**< maximum theta of e+ in final state (in radians)*/
     double m_TEMIN;  /**< minimum angle between the e- and -z axis (egamma conf. only)*/
     double m_TGMIN;  /**< minimum angle between the gamma and -z axis*/
@@ -87,14 +84,15 @@ namespace Belle2 {
     Teegg m_generator;   /**< The Teegg generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
 
-    TFile* m_fileExtraInfo; /**< file for special event by event weights. */
-    TNtuple* m_ntuple; /**< ntuple with weights. */
-
     template <typename T>
     std::vector<T> make_vector(T const& t1, T const& t2);  /**< make_vector. */
 
     template <typename T>
     std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
+
   }; /**< vectorToPair. */
 
   template <typename T>

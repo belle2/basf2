@@ -430,6 +430,8 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
                               format_string=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
     for name, time, timePerModule, trueCandidates, allCandidates in statTable:
         percents = tuple(timePerModule[key] / time * 100.0 if key in timePerModule else 0.0 for key in moduleTypes)
+        if len(percents) < 6:
+            percents = percents + (0,) * (6 - len(percents))
         timePerCandidate = format.duration(numpy.float64(time) / trueCandidates)
         timePerCandidate += ' (' + format.duration(numpy.float64(time) / allCandidates) + ')'
         table.add(name=name,

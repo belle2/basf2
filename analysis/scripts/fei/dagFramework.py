@@ -186,6 +186,8 @@ class DAG(object):
         self.resources = {}
         #: dictionary containing environment variables
         self.env = {}
+        #: All original needed resources
+        self.user_flaged_needed = []
 
     def add(self, identifier, provider, *args, **kwargs):
         """
@@ -202,6 +204,7 @@ class DAG(object):
         Mark a resource as needed
             @param identifier of the resource
         """
+        self.user_flaged_needed.append(identifier)
         self.resources[identifier].needed = True
 
     def load_cached_resources(self, cacheFile):
@@ -311,7 +314,7 @@ class DAG(object):
             self.createDotGraphic(needed)
             self.printMissingDependencies([r for r in resources if r not in chain], results.keys())
 
-        return nDone == nResources
+        return (nDone == nResources) and all([i in results for i in self.user_flaged_needed])
 
     def optimizeForParallelProcessing(self, needed):
         """

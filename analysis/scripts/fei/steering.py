@@ -527,8 +527,7 @@ def fullEventInterpretation(selection_path, particles):
     if args.cache is not None:
         dag.load_cached_resources(args.cache)
     finished_training = dag.run(fei_path)
-    # TODO finished_training is maybe not trough at this point?
-    finished_training = False
+
     if args.cache is not None:
         dag.save_cached_resources(args.cache)
 

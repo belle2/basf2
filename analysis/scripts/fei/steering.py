@@ -289,13 +289,13 @@ def fullEventInterpretation(selection_path, particles):
         # Determine PreCut for non FSPs
         if not particle.isFSP:
             for channel in particle.channels:
-                additionalDependencies = []
-                if 'SignalProbability' in particle.preCutConfig.variable:
-                    additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
-
                 if particle.preCutConfig is None:
                     dag.add('PreCut_' + channel.name, {'cutstring': '', 'nSignal': 0, 'nBackground': 0})
+                    dag.add('PreCutHistogram_' + channel.name, None)
                 else:
+                    additionalDependencies = []
+                    if 'SignalProbability' in particle.preCutConfig.variable:
+                        additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
                     dag.add('PreCutHistogram_' + channel.name, provider.CreatePreCutHistogram,
                             particleName='Name_' + particle.identifier,
                             channelName='Name_' + channel.name,
@@ -309,10 +309,15 @@ def fullEventInterpretation(selection_path, particles):
                             channelName='Name_' + channel.name,
                             preCut='PreCut_' + particle.identifier)
 
-                    dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
-                            channelNames=['Name_' + channel.name for channel in particle.channels],
-                            preCutConfig='PreCutConfig_' + particle.identifier,
-                            preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
+            if particle.preCutConfig is None:
+                pass
+                # TODO collect precuts of channels
+                # dag.add('PreCut_' + particle.identifier, {'cutstring': '', 'nSignal': 0, 'nBackground': 0})
+            else:
+                dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
+                        channelNames=['Name_' + channel.name for channel in particle.channels],
+                        preCutConfig='PreCutConfig_' + particle.identifier,
+                        preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
 
     # Trains multivariate classifiers (MVC) methods and provides signal probabilities
     for particle in particles:

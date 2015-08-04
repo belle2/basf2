@@ -142,11 +142,17 @@ def convertParticleObjectToString(particle):
             output += '    MVAConfiguration: name={m.name}, type={m.type}, target={m.target}, config={m.config}\n'.format(
                 m=particle.mvaConfig)
         output += '    Shared Variables: ' + ', '.join(commonVariables) + '\n'
+        if particle.preCutConfig is None:
+            output += '    PreCutConfiguration: None\n'
+        else:
+            output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
+                p=particle.preCutConfig)
+            output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
 
-        output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
-            p=particle.preCutConfig)
-        output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
-        # output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=particle.preCutConfig)
+        if particle.userCutConfig is None:
+            output += '    UserCutConfiguration: None\n'
+        else:
+            output += '    UserCutConfiguration: userCut={p.userCut} vertexCut={p.vertexCut}\n'.format(p=particle.userCutConfig)
 
         if particle.postCutConfig is None:
             output += '    PostCutConfiguration: None\n'

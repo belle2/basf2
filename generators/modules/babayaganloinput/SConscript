@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['generators_babayaganlo', 'mdst_dataobjects', 'generators', 'framework']
-
-Return('env')

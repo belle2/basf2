@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /** This is the specialization for SpacePoints with returning floats, where value calculates the normed distance between two hits in 3D */
-  template <typename PointType >
+  template <typename PointType, typename VariableType >
   class Distance3DNormed : public SelectionVariable< PointType , float > {
   public:
 

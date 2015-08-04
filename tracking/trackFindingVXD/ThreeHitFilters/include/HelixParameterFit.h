@@ -21,25 +21,25 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class HelixParameterFit : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class HelixParameterFit : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
 
-      B2Vector3<float> vecOuter2cC(outerHit.X() - cCenter.X(), outerHit.Y() - cCenter.Y(), outerHit.Z() - cCenter.Z());
-      B2Vector3<float> vecCenter2cC(centerHit.X() - cCenter.X(), centerHit.Y() - cCenter.Y(), centerHit.Z() - cCenter.Z());
-      B2Vector3<float> vecInner2cC(innerHit.X() - cCenter.X(), innerHit.Y() - cCenter.Y(), innerHit.Z() - cCenter.Z());
+      B2Vector3D vecOuter2cC(outerHit.X() - cCenter.X(), outerHit.Y() - cCenter.Y(), outerHit.Z() - cCenter.Z());
+      B2Vector3D vecCenter2cC(centerHit.X() - cCenter.X(), centerHit.Y() - cCenter.Y(), centerHit.Z() - cCenter.Z());
+      B2Vector3D vecInner2cC(innerHit.X() - cCenter.X(), innerHit.Y() - cCenter.Y(), innerHit.Z() - cCenter.Z());
       double alfaAB = Helper::calcAngle2D(vecOuter2cC, vecCenter2cC);
       double alfaBC = Helper::calcAngle2D(vecCenter2cC, vecInner2cC);
 
       // real calculation: ratio is (m_vecij[2] = deltaZ): alfaAB/deltaZab : alfaBC/deltaZbc, the following equation saves two times '/'
-      float result = (alfaAB * (centerHit.Z() - innerHit.Z())) / (alfaBC * (outerHit.Z() - centerHit.Z()));
+      double result = (alfaAB * double(centerHit.Z() - innerHit.Z())) / (alfaBC * double(outerHit.Z() - centerHit.Z()));
 
       return Helper::checkValid(result);
     } // return unit: none

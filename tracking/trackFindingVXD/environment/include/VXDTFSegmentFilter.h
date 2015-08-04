@@ -27,11 +27,11 @@ namespace Belle2 {
   public:
 
     typedef
-    decltype((0.f < Distance3DSquared<VXDTFHit>()   < 0.f).observe(Observer()).enable()&&
-             (0.f < Distance2DXYSquared<VXDTFHit>() < 0.f).observe(Observer()).enable()&&
-             (0.f < Distance1DZ<VXDTFHit>()         < 0.f)/*.observe(Observer())*/.enable()&&
-             (0.f < SlopeRZ<VXDTFHit>()             < 0.f).observe(Observer()).enable()&&
-             (Distance3DNormed<VXDTFHit>() < 0.f).enable()) filter_t;
+    decltype((0. < Distance3DSquared<VXDTFHit, double>()   < 0.).observe(Observer()).enable()&&
+             (0. < Distance2DXYSquared<VXDTFHit, double>() < 0.).observe(Observer()).enable()&&
+             (0. < Distance1DZ<VXDTFHit, double>()         < 0.)/*.observe(Observer())*/.enable()&&
+             (0. < SlopeRZ<VXDTFHit, double>()             < 0.).observe(Observer()).enable()&&
+             (Distance3DNormed<VXDTFHit, double>() < 0.).enable()) filter_t;
 
     typedef std::pair< FullSecID, FullSecID > key_t;
 

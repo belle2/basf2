@@ -18,7 +18,7 @@ namespace Belle2 {
   /** This is the specialization for SpacePoints with returning floats, where value calculates the  distance between two hits in 1D on the Z-axis.
    *
    * (please note that this is defined for positive and negative values) */
-  template <typename PointType >
+  template <typename PointType, typename VariableType >
   class Distance1DZTemplate : public SelectionVariable< PointType , float > {
   public:
 

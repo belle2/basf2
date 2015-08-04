@@ -18,15 +18,14 @@ namespace Belle2 {
   /** This is the specialization for SpacePoints with returning floats, where value calculates the  distance between two hits in 1D on the Z-axis.
    *
    * (please note that this is defined for positive and negative values) */
-  template <typename PointType >
-  class Distance1DZ : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class Distance1DZ : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the distance between the hits in z (1D), returning unit: cm */
-    static float value(const PointType& outerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& innerHit)
     {
-      return
-        outerHit.Z() - innerHit.Z();
+      return outerHit.Z() - innerHit.Z();
     }
   };
 

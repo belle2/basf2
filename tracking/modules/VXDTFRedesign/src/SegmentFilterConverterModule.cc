@@ -221,8 +221,8 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
 
     for (auto outerSectorBlob : friendsBlob.second) {
       FullSecID outerSectorID = FullSecID(outerSectorBlob.first);
-      float min[ FilterID::numFilters ] = { -INFINITY };
-      float max[ FilterID::numFilters ] = { +INFINITY };
+      double min[ FilterID::numFilters ] = { -INFINITY };
+      double max[ FilterID::numFilters ] = { +INFINITY };
 
       for (auto filterBlob :  outerSectorBlob.second) {
         unsigned int filterID = filterBlob.first;
@@ -244,31 +244,31 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
         (
           (
             min[ FilterID::distance3D ] <
-            Distance3DSquared<VXDTFHit>() <
+            Distance3DSquared<VXDTFHit, double>() <
             max[ FilterID::distance3D ]
           ).observe(Observer()).enable(VariableEnable(FilterID::distance3D, setupIndex)) &&
 
           (
             min[ FilterID::distanceXY ] <
-            Distance2DXYSquared<VXDTFHit>() <
+            Distance2DXYSquared<VXDTFHit, double>() <
             max[ FilterID::distanceXY ]
           ).observe(Observer()).enable(VariableEnable(FilterID::distanceXY, setupIndex)) &&
 
           (
             min[ FilterID::distanceZ ] <
-            Distance1DZ<VXDTFHit>() <
+            Distance1DZ<VXDTFHit, double>() <
             max[ FilterID::distanceZ ]
           )/*.observe(Observer())*/.enable(VariableEnable(FilterID::distanceZ, setupIndex)) &&
 
 
           (
             min[ FilterID::slopeRZ ] <
-            SlopeRZ<VXDTFHit>() <
+            SlopeRZ<VXDTFHit, double>() <
             max[ FilterID::slopeRZ ]
           ).observe(Observer()).enable(VariableEnable(FilterID::slopeRZ, setupIndex)) &&
 
           (
-            Distance3DNormed<VXDTFHit>() <
+            Distance3DNormed<VXDTFHit, double>() <
             max[ FilterID::normedDistance3D ]
           ).enable(VariableEnable(FilterID::normedDistance3D, setupIndex))
 
@@ -304,12 +304,12 @@ SegmentFilterConverterModule::endRun()
     TTree* tree = new TTree(m_PARAMsectorSetup.at(i).c_str(),
                             m_PARAMsectorSetup.at(i).c_str());
     i++;
-    float dummyLim = 1.;
-    auto filterPersistent(dummyLim < Distance3DSquared<VXDTFHit>() < -dummyLim  &&
-                          dummyLim < Distance2DXYSquared<VXDTFHit>() < -dummyLim &&
-                          dummyLim < Distance1DZ<VXDTFHit>() < -dummyLim &&
-                          dummyLim < SlopeRZ<VXDTFHit>() < -dummyLim &&
-                          Distance3DNormed<VXDTFHit>() < -dummyLim
+    double dummyLim = 1.;
+    auto filterPersistent(dummyLim < Distance3DSquared<VXDTFHit, double>() < -dummyLim  &&
+                          dummyLim < Distance2DXYSquared<VXDTFHit, double>() < -dummyLim &&
+                          dummyLim < Distance1DZ<VXDTFHit, double>() < -dummyLim &&
+                          dummyLim < SlopeRZ<VXDTFHit, double>() < -dummyLim &&
+                          Distance3DNormed<VXDTFHit, double>() < -dummyLim
                          );
 
 
@@ -320,8 +320,8 @@ SegmentFilterConverterModule::endRun()
 
       for (auto outerSectorBlob : friendsBlob.second) {
         unsigned int outerSectorID = outerSectorBlob.first;
-        float min[ FilterID::numFilters ] = { -INFINITY };
-        float max[ FilterID::numFilters ] = { +INFINITY };
+        double min[ FilterID::numFilters ] = { -INFINITY };
+        double max[ FilterID::numFilters ] = { +INFINITY };
 
         for (auto filterBlob :  outerSectorBlob.second) {
           unsigned int filterID = filterBlob.first;
@@ -340,22 +340,22 @@ SegmentFilterConverterModule::endRun()
 
         filterPersistent = (
                              min[ FilterID::distance3D ] <
-                             Distance3DSquared<VXDTFHit>() <
+                             Distance3DSquared<VXDTFHit, double>() <
                              max[ FilterID::distance3D ] &&
 
                              min[ FilterID::distanceXY ] <
-                             Distance2DXYSquared<VXDTFHit>() <
+                             Distance2DXYSquared<VXDTFHit, double>() <
                              max[ FilterID::distanceXY ] &&
 
                              min[ FilterID::distanceZ ] <
-                             Distance1DZ<VXDTFHit>() <
+                             Distance1DZ<VXDTFHit, double>() <
                              max[ FilterID::distanceZ ] &&
 
                              min[ FilterID::slopeRZ ] <
-                             SlopeRZ<VXDTFHit>() <
+                             SlopeRZ<VXDTFHit, double>() <
                              max[ FilterID::slopeRZ ] &&
 
-                             Distance3DNormed<VXDTFHit>() <
+                             Distance3DNormed<VXDTFHit, double>() <
                              max[ FilterID::normedDistance3D ]
 
                            );

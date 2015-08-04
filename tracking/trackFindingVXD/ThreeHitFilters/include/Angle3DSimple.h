@@ -21,20 +21,20 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class Angle3DSimple : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class Angle3DSimple : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use Angle3DFull instead) */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> outerVector = Helper::doAMinusB(outerHit, centerHit);
-      B2Vector3<float> innerVector = Helper::doAMinusB(centerHit, innerHit);
+      B2Vector3D outerVector = Helper::doAMinusB(outerHit, centerHit);
+      B2Vector3D innerVector = Helper::doAMinusB(centerHit, innerHit);
 
       // fullCalc would be acos(m_vecAB.Dot(m_vecBC) / m_vecAB.Mag()*m_vecBC.Mag()), but here time-consuming parts have been neglected
-      float result = outerVector.Dot(innerVector) / (outerVector.Mag2() * innerVector.Mag2());
+      double result = outerVector.Dot(innerVector) / (outerVector.Mag2() * innerVector.Mag2());
       return Helper::checkValid(result);
     }
   };

@@ -231,22 +231,25 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, TestObserverFlexibility)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0.,
+        1.));
 
     //     Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VectorOfObservers<Distance3DSquared> > filter(unobservedFilter);
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, InfoObserver > filter(unobservedFilter);
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, InfoObserver > filter(unobservedFilter);
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-    counter< Distance3DSquared<SpacePoint> >::resetCounter();
+    auto myCounter = counter<Distance3DSquared<SpacePoint, double>>();
+    myCounter.resetCounter();
 
     /// variant A (doesn't work, because of static function(?)):
 //  auto storeFuncVariantA = std::bind( ((VectorOfObservers<Distance3DSquared>::observerFunction) &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared(), std::placeholders::_3);
     //  VectorOfObservers<Distance3DSquared>::sm_collectedObservers.push_back(storeFuncVariantA);
 
     /// variant B:
-    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer)
-                                        &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(), std::placeholders::_3);
+    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint, double>>::CStyleFunctionPointer)
+                                        &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint, double>(),
+                                       std::placeholders::_3);
 
     char* realname(NULL);
     int status(0);
@@ -267,7 +270,7 @@ namespace VXDTFtwoHitFilterTest {
 
     filter.accept(x2, x1);
     filter.accept(x3, x1);
-    EXPECT_EQ(0 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(0 , myCounter.used);
   }
 
 
@@ -322,11 +325,14 @@ namespace VXDTFtwoHitFilterTest {
   /** shows the functionality of the auto naming capability of the Filter */
   TEST_F(TwoHitFilterTest, SelectionVariableName)
   {
-
-    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__SpacePoint}" , Distance3DSquared<SpacePoint>().name());
-    EXPECT_EQ("Belle2__Distance2DXYSquared{Belle2__SpacePoint}" , Distance2DXYSquared<SpacePoint>().name());
-    EXPECT_EQ("Belle2__Distance1DZ{Belle2__SpacePoint}" , Distance1DZ<SpacePoint>().name());
-    EXPECT_EQ("Belle2__SlopeRZ{Belle2__SpacePoint}" , SlopeRZ<SpacePoint>().name());
+    auto dist3D = Distance3DSquared<SpacePoint, double>();
+    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__SpacePoint, double}" , dist3D.name());
+    auto dist2DXY = Distance2DXYSquared<SpacePoint, double>();
+    EXPECT_EQ("Belle2__Distance2DXYSquared{Belle2__SpacePoint, double}" , dist2DXY.name());
+    auto dist1DZ = Distance1DZ<SpacePoint, double>();
+    EXPECT_EQ("Belle2__Distance1DZ{Belle2__SpacePoint, double}" , dist1DZ.name());
+    auto slopeRZ = SlopeRZ<SpacePoint, double>();
+    EXPECT_EQ("Belle2__SlopeRZ{Belle2__SpacePoint, double}" , slopeRZ.name());
 
   }
 
@@ -335,7 +341,7 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, BasicFilterTestDistance3DSquared)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
     SpacePoint x2 = provideSpacePointDummy(.5 , 0., 0.);
@@ -351,7 +357,7 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, BasicFilterTestDistance2DXYSquared)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance2DXYSquared<SpacePoint>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
+    Filter< Distance2DXYSquared<SpacePoint, double>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
     SpacePoint x2 = provideSpacePointDummy(.5 , 0., 0.);
@@ -369,7 +375,7 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, BasicFilterTestDistance1DZ)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance1DZ<SpacePoint>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
+    Filter< Distance1DZ<SpacePoint, double>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
     SpacePoint x2 = provideSpacePointDummy(0. , 0., .5);
@@ -388,7 +394,7 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, TemplateFilterTestDistance1DZ)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance1DZTemplate<SpacePoint>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
+    Filter< Distance1DZTemplate<SpacePoint, double>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
     SpacePoint x2 = provideSpacePointDummy(0. , 0., .5);
@@ -407,7 +413,7 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, BasicFilterTestSlopeRZ)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< SlopeRZ<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(atan(2.), atan(3.)));
+    Filter< SlopeRZ<SpacePoint, double>, Range<double, double>, VoidObserver > filter(Range<double, double>(atan(2.), atan(3.)));
 
     SpacePoint innerSP = provideSpacePointDummy(1 , 2, 3);
     SpacePoint outerSP1 = provideSpacePointDummy(1 , 4, 4);
@@ -418,28 +424,29 @@ namespace VXDTFtwoHitFilterTest {
     SpacePoint outerSP6 = provideSpacePointDummy(1 , 4, 3);
     SpacePoint outerSP7 = provideSpacePointDummy(1 , 0, 4);
 
-    EXPECT_FALSE(filter.accept(outerSP1, innerSP));
+    EXPECT_FALSE(filter.accept(outerSP3, innerSP));
+    EXPECT_TRUE(filter.accept(outerSP1, innerSP));
     EXPECT_TRUE(filter.accept(outerSP2, innerSP));
     EXPECT_FALSE(filter.accept(innerSP, outerSP2)); // reverse order not same result (because of z)
-    EXPECT_FALSE(filter.accept(outerSP3, innerSP));
     EXPECT_TRUE(filter.accept(outerSP4, innerSP));
     EXPECT_FALSE(filter.accept(outerSP5, innerSP));
     EXPECT_EQ(filter.accept(outerSP1, innerSP), filter.accept(outerSP7,
                                                               innerSP)); // (direction of r-vector not relevant, only its length)
 
 
-    EXPECT_FLOAT_EQ(0., SlopeRZ<SpacePoint>().value(innerSP, innerSP));
-    EXPECT_FLOAT_EQ(atan(2.), SlopeRZ<SpacePoint>().value(outerSP1, innerSP));
-    EXPECT_FLOAT_EQ(atan(2. / 0.95), SlopeRZ<SpacePoint>().value(outerSP2, innerSP));
-    EXPECT_FLOAT_EQ(- SlopeRZ<SpacePoint>().value(outerSP2, innerSP), SlopeRZ<SpacePoint>().value(innerSP,
-                    outerSP2)); // reverse order changes sign
-    EXPECT_FLOAT_EQ(atan(2. / 1.05), SlopeRZ<SpacePoint>().value(outerSP3, innerSP));
-    EXPECT_FLOAT_EQ(atan(1. / 0.45), SlopeRZ<SpacePoint>().value(outerSP4, innerSP));
-    EXPECT_FLOAT_EQ(atan(1. / 0.55), SlopeRZ<SpacePoint>().value(outerSP5, innerSP));
-    EXPECT_FLOAT_EQ(M_PI * 0.5, SlopeRZ<SpacePoint>().value(outerSP6, innerSP)); // no problem with division by 0 in Z
-    EXPECT_FLOAT_EQ(atan(2. / 1.05), SlopeRZ<SpacePoint>().value(outerSP3, innerSP));
-    EXPECT_FLOAT_EQ(SlopeRZ<SpacePoint>().value(outerSP1, innerSP), SlopeRZ<SpacePoint>().value(outerSP7,
-                    innerSP)); // (direction of r-vector not relevant, only its length)
+    auto sRZ = SlopeRZ<SpacePoint, double>();
+    EXPECT_FLOAT_EQ(0., sRZ.value(innerSP, innerSP));
+    EXPECT_FLOAT_EQ(atan(2.), sRZ.value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(atan(2. / 0.95), sRZ.value(outerSP2, innerSP));
+    EXPECT_FLOAT_EQ(- sRZ.value(outerSP2, innerSP),
+                    sRZ.value(innerSP, outerSP2)); // reverse order changes sign
+    EXPECT_FLOAT_EQ(atan(2. / 1.05), sRZ.value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(atan(1. / 0.45), sRZ.value(outerSP4, innerSP));
+    EXPECT_FLOAT_EQ(atan(1. / 0.55), sRZ.value(outerSP5, innerSP));
+    EXPECT_FLOAT_EQ(M_PI * 0.5, sRZ.value(outerSP6, innerSP)); // no problem with division by 0 in Z
+    EXPECT_FLOAT_EQ(atan(2. / 1.05), sRZ.value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(sRZ.value(outerSP1, innerSP), sRZ.value(outerSP7,
+                                                            innerSP)); // (direction of r-vector not relevant, only its length)
 
   }
 
@@ -448,7 +455,7 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, BasicFilterTestDistance3DNormed)
   {
     // Very verbose declaration, the old normed distance 3D has only an upper cut, no lower one:
-    Filter< Distance3DNormed<SpacePoint>, UpperBoundedSet<float>, VoidObserver > filter(UpperBoundedSet<float>(1.));
+    Filter< Distance3DNormed<SpacePoint, double>, UpperBoundedSet<double>, VoidObserver > filter(UpperBoundedSet<double>(1.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(1 , 2, 3);
@@ -456,10 +463,11 @@ namespace VXDTFtwoHitFilterTest {
     SpacePoint outerSP2 = provideSpacePointDummy(1 , 2, 4);
     SpacePoint outerSP3 = provideSpacePointDummy(2 , 3, 3);
 
-    EXPECT_FLOAT_EQ(2. / 3., Distance3DNormed<SpacePoint>().value(outerSP1, innerSP));
-    EXPECT_FLOAT_EQ(0., Distance3DNormed<SpacePoint>().value(outerSP2, innerSP));
-    EXPECT_FLOAT_EQ(1., Distance3DNormed<SpacePoint>().value(outerSP3, innerSP));
-    EXPECT_FLOAT_EQ(0., Distance3DNormed<SpacePoint>().value(innerSP, innerSP));
+    auto d3Dn = Distance3DNormed<SpacePoint, double>();
+    EXPECT_FLOAT_EQ(2. / 3., d3Dn.value(outerSP1, innerSP));
+    EXPECT_FLOAT_EQ(0., d3Dn.value(outerSP2, innerSP));
+    EXPECT_FLOAT_EQ(1., d3Dn.value(outerSP3, innerSP));
+    EXPECT_FLOAT_EQ(0., d3Dn.value(innerSP, innerSP));
 
   }
 
@@ -468,17 +476,19 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, ObservedFilter)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0.,
+        1.));
 
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, CountingObserver > filter(unobservedFilter);
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, CountingObserver > filter(unobservedFilter);
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-    counter< Distance3DSquared<SpacePoint> >::resetCounter();
+    auto myCounter = counter<Distance3DSquared<SpacePoint, double>>();
+    myCounter.resetCounter();
 
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_FALSE(filter.accept(x1, x3));
-    EXPECT_EQ(2 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(2 , myCounter.used);
   }
 
 
@@ -487,18 +497,20 @@ namespace VXDTFtwoHitFilterTest {
   {
     bool bypassControl(false);
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, CountingObserver > nonBypassableFilter(Range<double, double>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, CountingObserver > nonBypassableFilter(Range<double, double>
+        (0., 1.));
     auto filter = nonBypassableFilter.bypass(bypassControl);
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
-    counter< Distance3DSquared<SpacePoint> >::resetCounter();
+    auto myCounter = counter<Distance3DSquared<SpacePoint, double>>();
+    myCounter.resetCounter();
 
     EXPECT_FALSE(filter.accept(x1, x2));
-    EXPECT_EQ(1 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(1 , myCounter.used);
 
     bypassControl = true;
     EXPECT_TRUE(filter.accept(x1, x2));
-    EXPECT_EQ(2 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(2 , myCounter.used);
 
   }
 
@@ -511,23 +523,23 @@ namespace VXDTFtwoHitFilterTest {
     SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
 
-    auto filterSup = (Distance3DSquared<SpacePoint>() < 1.) ;
+    auto filterSup = (Distance3DSquared<SpacePoint, double>() < 1.) ;
     EXPECT_TRUE(filterSup.accept(x1, x2));
     EXPECT_FALSE(filterSup.accept(x1, x3));
 
-    auto filterSup2 = (1 > Distance3DSquared<SpacePoint>()) ;
+    auto filterSup2 = (1 > Distance3DSquared<SpacePoint, double>()) ;
     EXPECT_TRUE(filterSup2.accept(x1, x2));
     EXPECT_FALSE(filterSup2.accept(x1, x3));
 
-    auto filterInf = (Distance3DSquared<SpacePoint>() > 1.) ;
+    auto filterInf = (Distance3DSquared<SpacePoint, double>() > 1.) ;
     EXPECT_TRUE(filterInf.accept(x1, x3));
     EXPECT_FALSE(filterInf.accept(x1, x2));
 
-    auto filterInf2 = (1 < Distance3DSquared<SpacePoint>()) ;
+    auto filterInf2 = (1 < Distance3DSquared<SpacePoint, double>()) ;
     EXPECT_TRUE(filterInf2.accept(x1, x3));
     EXPECT_FALSE(filterInf2.accept(x1, x2));
 
-    auto filterRange = (0.1 < Distance3DSquared<SpacePoint>() < 1);
+    auto filterRange = (0.1 < Distance3DSquared<SpacePoint, double>() < 1);
     EXPECT_FALSE(filterRange.accept(x1, x1));
     EXPECT_TRUE(filterRange.accept(x1, x2));
     EXPECT_FALSE(filterRange.accept(x1, x3));
@@ -543,14 +555,14 @@ namespace VXDTFtwoHitFilterTest {
     SpacePoint x2 = provideSpacePointDummy(1.0f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
 
-    auto filter = !(Distance3DSquared<SpacePoint>() > 1.);
+    auto filter = !(Distance3DSquared<SpacePoint, double>() > 1.);
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_TRUE(filter.accept(x1, x1));
     EXPECT_FALSE(filter.accept(x1, x3));
 
     auto filter2 =
-      !(Distance3DSquared<SpacePoint>() > 1.) &&
-      !(Distance3DSquared<SpacePoint>() < 1);
+      !(Distance3DSquared<SpacePoint, double>() > 1.) &&
+      !(Distance3DSquared<SpacePoint, double>() < 1);
     // i.e. Distance3DSquared == 1
     EXPECT_TRUE(filter2.accept(x1, x2));
     EXPECT_FALSE(filter2.accept(x1, x1));
@@ -558,8 +570,8 @@ namespace VXDTFtwoHitFilterTest {
 
 
     auto filter3 =
-      (Distance3DSquared<SpacePoint>() > 1.) ||
-      (Distance3DSquared<SpacePoint>() < 1);
+      (Distance3DSquared<SpacePoint, double>() > 1.) ||
+      (Distance3DSquared<SpacePoint, double>() < 1);
     // i.e. Distance3DSquared != 1
     EXPECT_FALSE(filter3.accept(x1, x2));
     EXPECT_TRUE(filter3.accept(x1, x1));
@@ -572,24 +584,26 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, ShortCircuitsEvaluation)
   {
     auto filter(
-      (Distance2DXYSquared<SpacePoint>() < 1).observe(CountingObserver()) &&
-      (Distance3DSquared<SpacePoint>()   < 1).observe(CountingObserver())
+      (Distance2DXYSquared<SpacePoint, double>() < 1).observe(CountingObserver()) &&
+      (Distance3DSquared<SpacePoint, double>()   < 1).observe(CountingObserver())
     );
 
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(1.0f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(2.0f , 0.0f, 0.0f);
 
-    counter< Distance3DSquared<SpacePoint>   >::used = 0;
-    counter< Distance2DXYSquared<SpacePoint> >::used = 0;
+    auto counter3D = counter<Distance3DSquared<SpacePoint, double>>();
+    auto counter2D = counter<Distance2DXYSquared<SpacePoint, double>>();
+    counter3D.used = 0;
+    counter2D.used = 0;
 
     EXPECT_FALSE(filter.accept(x1, x3));
-    EXPECT_EQ(1 , counter< Distance2DXYSquared<SpacePoint> >::used);
-    EXPECT_EQ(0 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(1 , counter2D.used);
+    EXPECT_EQ(0 , counter3D.used);
 
     EXPECT_TRUE(filter.accept(x1, x1));
-    EXPECT_EQ(2 , counter< Distance2DXYSquared<SpacePoint> >::used);
-    EXPECT_EQ(1 , counter< Distance3DSquared<SpacePoint> >::used);
+    EXPECT_EQ(2 , counter2D.used);
+    EXPECT_EQ(1 , counter3D.used);
 
   }
 

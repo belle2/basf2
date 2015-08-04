@@ -19,32 +19,32 @@ namespace Belle2 {
 
   /** calculates the helixparameter describing the deviation in arc length per unit in z.
    * returning unit: radians*cm. */
-  template <typename PointType >
-  class DeltaSoverZ : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class DeltaSoverZ : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the helixparameter describing the deviation in arc length per unit in z.
      * returning unit: radians*cm */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> circleCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
-      B2Vector3<float> points2outerHit((outerHit.X() - circleCenter.X()),
-                                       (outerHit.Y() - circleCenter.Y()),
-                                       (outerHit.Z() - circleCenter.Z()));
-      B2Vector3<float> points2centerHit((centerHit.X() - circleCenter.X()),
-                                        (centerHit.Y() - circleCenter.Y()),
-                                        (centerHit.Z() - circleCenter.Z()));
-      B2Vector3<float> points2innerHit((innerHit.X() - circleCenter.X()),
-                                       (innerHit.Y() - circleCenter.Y()),
-                                       (innerHit.Z() - circleCenter.Z()));
+      B2Vector3D circleCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D points2outerHit((outerHit.X() - circleCenter.X()),
+                                 (outerHit.Y() - circleCenter.Y()),
+                                 (outerHit.Z() - circleCenter.Z()));
+      B2Vector3D points2centerHit((centerHit.X() - circleCenter.X()),
+                                  (centerHit.Y() - circleCenter.Y()),
+                                  (centerHit.Z() - circleCenter.Z()));
+      B2Vector3D points2innerHit((innerHit.X() - circleCenter.X()),
+                                 (innerHit.Y() - circleCenter.Y()),
+                                 (innerHit.Z() - circleCenter.Z()));
 
-      float alfaOC = Helper::fullAngle2D(points2outerHit, points2centerHit);
-      float alfaCI = Helper::fullAngle2D(points2centerHit, points2innerHit);
+      double alfaOC = Helper::fullAngle2D(points2outerHit, points2centerHit);
+      double alfaCI = Helper::fullAngle2D(points2centerHit, points2innerHit);
 
       // equals to alfaAB/dZAB and alfaBC/dZBC, but this solution here can not produce a division by zero:
-      return (alfaOC * (centerHit.Z() - innerHit.Z())) - (alfaCI * (outerHit.Z() - centerHit.Z()));
+      return (alfaOC * double(centerHit.Z() - innerHit.Z())) - (alfaCI * double(outerHit.Z() - centerHit.Z()));
     } // return unit: radians*cm
   };
 

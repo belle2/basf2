@@ -21,17 +21,17 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class DeltaSlopeRZ : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class DeltaSlopeRZ : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      float slopeOC = Helper::calcSlopeRZ(outerHit, centerHit);
-      float slopeCI = Helper::calcSlopeRZ(centerHit, innerHit);
+      double slopeOC = Helper::calcSlopeRZ(outerHit, centerHit);
+      double slopeCI = Helper::calcSlopeRZ(centerHit, innerHit);
 
       return slopeCI - slopeOC;
     } // return unit: none

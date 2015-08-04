@@ -21,32 +21,32 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class DeltaSlopeZoverS : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class DeltaSlopeZoverS : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
-      float circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, cCenter);
-      B2Vector3<float> vecOuter2cC((outerHit.X() - cCenter.X()),
-                                   (outerHit.Y() - cCenter.Y()),
-                                   (outerHit.Z() - cCenter.Z()));
-      B2Vector3<float> vecCenter2cC((centerHit.X() - cCenter.X()),
-                                    (centerHit.Y() - cCenter.Y()),
-                                    (centerHit.Z() - cCenter.Z()));
-      B2Vector3<float> vecInner2cC((innerHit.X() - cCenter.X()),
-                                   (innerHit.Y() - cCenter.Y()),
-                                   (innerHit.Z() - cCenter.Z()));
+      B2Vector3D cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      double circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, cCenter);
+      B2Vector3D vecOuter2cC((outerHit.X() - cCenter.X()),
+                             (outerHit.Y() - cCenter.Y()),
+                             (outerHit.Z() - cCenter.Z()));
+      B2Vector3D vecCenter2cC((centerHit.X() - cCenter.X()),
+                              (centerHit.Y() - cCenter.Y()),
+                              (centerHit.Z() - cCenter.Z()));
+      B2Vector3D vecInner2cC((innerHit.X() - cCenter.X()),
+                             (innerHit.Y() - cCenter.Y()),
+                             (innerHit.Z() - cCenter.Z()));
 
-      float alfaOCr = Helper::fullAngle2D(vecOuter2cC, vecCenter2cC) * circleRadius;
-      float alfaCIr = Helper::fullAngle2D(vecCenter2cC, vecInner2cC) * circleRadius;
+      double alfaOCr = Helper::fullAngle2D(vecOuter2cC, vecCenter2cC) * circleRadius;
+      double alfaCIr = Helper::fullAngle2D(vecCenter2cC, vecInner2cC) * circleRadius;
 
       // Beware of z>r!:
-      float result = (asin((outerHit.Z() - centerHit.Z()) / alfaOCr)) - asin((centerHit.Z() - innerHit.Z()) / alfaCIr);
+      double result = (asin(double(outerHit.Z() - centerHit.Z()) / alfaOCr)) - asin(double(centerHit.Z() - innerHit.Z()) / alfaCIr);
 
       return Helper::checkValid(result);
     }

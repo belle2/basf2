@@ -16,11 +16,11 @@
 
 namespace Belle2 {
 
-  /** This is the specialization for SpacePoints with returning floats, where value calculates the  slope in R-Z for a given pair of hits.
+  /** This is the specialization for SpacePoints with returning floats, where value calculates the slope in R-Z for a given pair of hits.
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
+  template <typename PointType, typename VariableType >
   class SlopeRZ : public SelectionVariable< PointType , float > {
   public:
 

@@ -21,17 +21,17 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class CircleDist2IP : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class CircleDist2IP : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
-      float circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, cCenter);
+      B2Vector3D cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      double circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, cCenter);
 
       // distance of closest approach of circle to the IP:
       return (fabs(cCenter.Perp() - circleRadius));

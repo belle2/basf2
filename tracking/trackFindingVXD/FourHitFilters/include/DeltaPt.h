@@ -19,21 +19,21 @@ namespace Belle2 {
 
   /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c.
    * */
-  template <typename PointType >
-  class DeltaPt : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class DeltaPt : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c */
-    static float value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
-                       const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
+                              const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> outerCircleCenter = Helper::calcCircleCenter(outerHit, outerCenterHit, innerCenterHit);
-      float outerCircleRadius = Helper::calcRadius(outerHit, outerCenterHit, innerCenterHit, outerCircleCenter);
+      B2Vector3D outerCircleCenter = Helper::calcCircleCenter(outerHit, outerCenterHit, innerCenterHit);
+      double outerCircleRadius = Helper::calcRadius(outerHit, outerCenterHit, innerCenterHit, outerCircleCenter);
 
-      B2Vector3<float> innerCircleCenter = Helper::calcCircleCenter(outerCenterHit, innerCenterHit, innerHit);
-      float innerCircleRadius = Helper::calcRadius(outerCenterHit, innerCenterHit, innerHit, innerCircleCenter);
+      B2Vector3D innerCircleCenter = Helper::calcCircleCenter(outerCenterHit, innerCenterHit, innerHit);
+      double innerCircleRadius = Helper::calcRadius(outerCenterHit, innerCenterHit, innerHit, innerCircleCenter);
 
       return fabs(Helper::calcPt(outerCircleRadius - innerCircleRadius));
     } // return unit: GeV/c

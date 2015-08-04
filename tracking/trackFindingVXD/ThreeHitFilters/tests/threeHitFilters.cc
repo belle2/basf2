@@ -109,18 +109,30 @@ namespace VXDTFthreeHitFilterTest {
   /** shows the functionality of the auto naming capability of the Filter */
   TEST_F(ThreeHitFilterTest, SelectionVariableName)
   {
-    EXPECT_EQ("Belle2__Angle3DSimple{Belle2__SpacePoint}" , Angle3DSimple<SpacePoint>().name());
-    EXPECT_EQ("Belle2__Angle3DFull{Belle2__SpacePoint}" , Angle3DFull<SpacePoint>().name());
-    EXPECT_EQ("Belle2__AngleXYFull{Belle2__SpacePoint}" , AngleXYFull<SpacePoint>().name());
-    EXPECT_EQ("Belle2__AngleXYSimple{Belle2__SpacePoint}" , AngleXYSimple<SpacePoint>().name());
-    EXPECT_EQ("Belle2__AngleRZFull{Belle2__SpacePoint}" , AngleRZFull<SpacePoint>().name());
-    EXPECT_EQ("Belle2__AngleRZSimple{Belle2__SpacePoint}" , AngleRZSimple<SpacePoint>().name());
-    EXPECT_EQ("Belle2__DeltaSlopeRZ{Belle2__SpacePoint}" , DeltaSlopeRZ<SpacePoint>().name());
-    EXPECT_EQ("Belle2__HelixParameterFit{Belle2__SpacePoint}" , HelixParameterFit<SpacePoint>().name());
-    EXPECT_EQ("Belle2__DeltaSlopeZoverS{Belle2__SpacePoint}" , DeltaSlopeZoverS<SpacePoint>().name());
-    EXPECT_EQ("Belle2__DeltaSoverZ{Belle2__SpacePoint}" , DeltaSoverZ<SpacePoint>().name());
-    EXPECT_EQ("Belle2__Pt{Belle2__SpacePoint}" , Pt<SpacePoint>().name());
-    EXPECT_EQ("Belle2__CircleDist2IP{Belle2__SpacePoint}" , CircleDist2IP<SpacePoint>().name());
+    auto angle3DS = Angle3DSimple<SpacePoint, double>();
+    EXPECT_EQ("Belle2__Angle3DSimple{Belle2__SpacePoint, double}" , angle3DS.name());
+    auto angle3DF = Angle3DFull<SpacePoint, double>();
+    EXPECT_EQ("Belle2__Angle3DFull{Belle2__SpacePoint, double}" , angle3DF.name());
+    auto angleXYF = AngleXYFull<SpacePoint, double>();
+    EXPECT_EQ("Belle2__AngleXYFull{Belle2__SpacePoint, double}" , angleXYF.name());
+    auto angleXYS = AngleXYSimple<SpacePoint, double>();
+    EXPECT_EQ("Belle2__AngleXYSimple{Belle2__SpacePoint, double}" , angleXYS.name());
+    auto angleRZF = AngleRZFull<SpacePoint, double>();
+    EXPECT_EQ("Belle2__AngleRZFull{Belle2__SpacePoint, double}" , angleRZF.name());
+    auto angleRZS = AngleRZSimple<SpacePoint, double>();
+    EXPECT_EQ("Belle2__AngleRZSimple{Belle2__SpacePoint, double}" , angleRZS.name());
+    auto dSlopeRZ = DeltaSlopeRZ<SpacePoint, double>();
+    EXPECT_EQ("Belle2__DeltaSlopeRZ{Belle2__SpacePoint, double}" , dSlopeRZ.name());
+    auto helixFit = HelixParameterFit<SpacePoint, double>();
+    EXPECT_EQ("Belle2__HelixParameterFit{Belle2__SpacePoint, double}" , helixFit.name());
+    auto dSlopeZS = DeltaSlopeZoverS<SpacePoint, double>();
+    EXPECT_EQ("Belle2__DeltaSlopeZoverS{Belle2__SpacePoint, double}" , dSlopeZS.name());
+    auto dSZ = DeltaSoverZ<SpacePoint, double>();
+    EXPECT_EQ("Belle2__DeltaSoverZ{Belle2__SpacePoint, double}" , dSZ.name());
+    auto pT = Pt<SpacePoint, double>();
+    EXPECT_EQ("Belle2__Pt{Belle2__SpacePoint, double}" , pT.name());
+    auto cDist2IP = CircleDist2IP<SpacePoint, double>();
+    EXPECT_EQ("Belle2__CircleDist2IP{Belle2__SpacePoint, double}" , cDist2IP.name());
   }
 
 
@@ -128,7 +140,7 @@ namespace VXDTFthreeHitFilterTest {
   TEST_F(ThreeHitFilterTest, BasicFilterTestAngle3DSimple)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Angle3DSimple<SpacePoint>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
+    Filter< Angle3DSimple<SpacePoint, double>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
     SpacePoint x2 = provideSpacePointDummy(.5 , 0., 0.);
@@ -147,29 +159,35 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
 
 
-    Filter< Angle3DSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngle3D(Range<double, double>(0.09, 0.091));
+    Filter< Angle3DSimple<SpacePoint, double>, Range<double, double>, ResultsObserver > filterAngle3D(Range<double, double>(0.09,
+        0.091));
     EXPECT_TRUE(filterAngle3D.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0.090909090909090909091, lastResult); // last result is what filterAngle3D had calculated
 
-    Filter< Angle3DFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngle3Dfull(Range<double, double>(31.48, 31.49));
+    Filter< Angle3DFull<SpacePoint, double>, Range<double, double>, ResultsObserver > filterAngle3Dfull(Range<double, double>(31.48,
+        31.49));
     EXPECT_TRUE(filterAngle3Dfull.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(31.4821541052938556040832384555411729852856, lastResult);
 
 
-    Filter< AngleXYFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleXYfull(Range<double, double>(26.5, 26.6));
+    Filter< AngleXYFull<SpacePoint, double>, Range<double, double>, ResultsObserver > filterAngleXYfull(Range<double, double>(26.5,
+        26.6));
     EXPECT_TRUE(filterAngleXYfull.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(26.5650511770779893515721937204532946712042, lastResult);
 
-    Filter< AngleXYSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleXY(Range<double, double>(0.099, 0.101));
+    Filter< AngleXYSimple<SpacePoint, double>, Range<double, double>, ResultsObserver > filterAngleXY(Range<double, double>(0.099,
+        0.101));
     EXPECT_TRUE(filterAngleXY.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0.1, lastResult);
 
 
-    Filter< AngleRZFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleRZfull(Range<double, double>(17.5, 17.6));
+    Filter< AngleRZFull<SpacePoint, double>, Range<double, double>, ResultsObserver > filterAngleRZfull(Range<double, double>(17.5,
+        17.6));
     EXPECT_TRUE(filterAngleRZfull.accept(outerSP, centerSP, innerSP));
     EXPECT_NEAR(17.548400613792298064, lastResult, 0.001);
 
-    Filter< AngleRZSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleRZ(Range<double, double>(0.94, 0.96));
+    Filter< AngleRZSimple<SpacePoint, double>, Range<double, double>, ResultsObserver > filterAngleRZ(Range<double, double>(0.94,
+        0.96));
     EXPECT_TRUE(filterAngleRZ.accept(outerSP, centerSP, innerSP));
     EXPECT_NEAR(cos(17.54840061379229806435203716652846677620 * M_PI / 180.), lastResult, 0.001);
   }
@@ -183,16 +201,18 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
     SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
     SpacePoint outerHighSP = provideSpacePointDummy(4., 6., 1.);
-    B2Vector3<float> sigma(.01, .01, .01), unrealsigma(2, 2, 2);
+    B2Vector3D sigma(.01, .01, .01), unrealsigma(2, 2, 2);
 
-    typedef SelVarHelper<SpacePoint, float> Helper;
+    typedef SelVarHelper<SpacePoint, double> Helper;
 
 
-    Filter< DeltaSlopeRZ<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSlopeRZ(Range<double, double>(0.3, 0.31));
+    Filter< DeltaSlopeRZ<SpacePoint, double>, Range<double, double>, ResultsObserver > filterDeltaSlopeRZ(Range<double, double>(0.3,
+        0.31));
     EXPECT_TRUE(filterDeltaSlopeRZ.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0.30627736916966945608, lastResult);
 
-    Filter< HelixParameterFit<SpacePoint>, Range<double, double>, ResultsObserver > filterHelixFit(Range<double, double>(-0.01, 0.01));
+    Filter< HelixParameterFit<SpacePoint, double>, Range<double, double>, ResultsObserver > filterHelixFit(Range<double, double>(-0.01,
+        0.01));
     EXPECT_TRUE(filterHelixFit.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(0., lastResult);
 
@@ -218,17 +238,19 @@ namespace VXDTFthreeHitFilterTest {
   TEST_F(ThreeHitFilterTest, TestDeltaSOverZ)
   {
     lastResult = 0;
-    B2Vector3<float> iVec(1., 1., 0.), cVec(3., 3., 1.), oVec(6., 4., 3.);
+    B2Vector3D iVec(1., 1., 0.), cVec(3., 3., 1.), oVec(6., 4., 3.);
     SpacePoint outerSP = provideSpacePointDummy(oVec.X(), oVec.Y(), oVec.Z());
     SpacePoint centerSP = provideSpacePointDummy(cVec.X(), cVec.Y(), cVec.Z());
     SpacePoint innerSP = provideSpacePointDummy(iVec.X(), iVec.Y(), iVec.Z());
 
-    Filter< DeltaSlopeZoverS<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSlopeZOverS(Range<double, double>(0.31,
-        0.32));
+    Filter< DeltaSlopeZoverS<SpacePoint, double>, Range<double, double>, ResultsObserver > filterDeltaSlopeZOverS(Range<double, double>
+        (0.31,
+         0.32));
     EXPECT_TRUE(filterDeltaSlopeZOverS.accept(outerSP, centerSP, innerSP));
     EXPECT_NEAR(0.31823963, lastResult, 0.00001);
 
-    Filter< DeltaSoverZ<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaSOverZ(Range<double, double>(-0.39, -0.38));
+    Filter< DeltaSoverZ<SpacePoint, double>, Range<double, double>, ResultsObserver > filterDeltaSOverZ(Range<double, double>(-0.39,
+        -0.38));
     EXPECT_TRUE(filterDeltaSOverZ.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(-0.38471845, lastResult);
 
@@ -253,7 +275,7 @@ namespace VXDTFthreeHitFilterTest {
   /** test cramer method in calcPt */
   TEST_F(ThreeHitFilterTest, TestCalcPt)
   {
-    typedef SelVarHelper<SpacePoint, float> Helper;
+    typedef SelVarHelper<SpacePoint, double> Helper;
 
     SpacePoint outerSP = provideSpacePointDummy(3., 4., 3.);
     SpacePoint centerSP = provideSpacePointDummy(3., 2., 1.);
@@ -266,21 +288,21 @@ namespace VXDTFthreeHitFilterTest {
     double ptTrue = 0;
 
     ptTrue = Helper::calcPt(1.414213562373095048801688724209698078570);
-    Filter< Pt<SpacePoint>, Range<double, double>, ResultsObserver > filtePt(Range<double, double>(0.005, 0.05));
-    EXPECT_TRUE(filtePt.accept(outerSP, centerSP, innerSP));
+    Filter< Pt<SpacePoint, double>, Range<double, double>, ResultsObserver > filterPt(Range<double, double>(0.005, 0.05));
+    EXPECT_TRUE(filterPt.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(ptTrue, lastResult);
 
     ptTrue = 0.017118925181688543;
-    EXPECT_TRUE(filtePt.accept(outerSPEvil, centerSP2, innerSP2));
+    EXPECT_TRUE(filterPt.accept(outerSPEvil, centerSP2, innerSP2));
     EXPECT_FLOAT_EQ(ptTrue, lastResult);
 
     //B2WARNING("MUST produce errors: 2 hits are the same: " << ptTrue << ", Pt: " << pt );
-    EXPECT_ANY_THROW(filtePt.accept(outerSP, outerSP, innerSP));
+    EXPECT_ANY_THROW(filterPt.accept(outerSP, outerSP, innerSP));
 
     Helper::resetMagneticField(0.976);
     double ptTrue1p5 = ptTrue;
     ptTrue = Helper::calcPt(1.414213562373095048801688724209698078570);
-    EXPECT_FALSE(filtePt.accept(outerSP, centerSP, innerSP));
+    EXPECT_FALSE(filterPt.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(ptTrue, lastResult);
     EXPECT_LT(ptTrue, ptTrue1p5);
 
@@ -297,7 +319,8 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint centerSP = provideSpacePointDummy(3., 3., 0.);
     SpacePoint innerSP = provideSpacePointDummy(1., 1., 0.);
 
-    Filter< CircleDist2IP<SpacePoint>, Range<double, double>, ResultsObserver > filteCircleDist2IP(Range<double, double>(0.44, 0.45));
+    Filter< CircleDist2IP<SpacePoint, double>, Range<double, double>, ResultsObserver > filteCircleDist2IP(Range<double, double>(0.44,
+        0.45));
     EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));
     EXPECT_NEAR(0.44499173338941, lastResult, 0.00001);
 
@@ -305,7 +328,7 @@ namespace VXDTFthreeHitFilterTest {
     EXPECT_FLOAT_EQ(0.719806016136754, lastResult);
 
 
-    typedef SelVarHelper<SpacePoint, float> Helper;
+    typedef SelVarHelper<SpacePoint, double> Helper;
     Helper::resetMagneticField(0.976);
 
     EXPECT_TRUE(filteCircleDist2IP.accept(outerSPSimple, centerSP, innerSP));

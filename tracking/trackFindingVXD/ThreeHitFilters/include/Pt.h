@@ -21,17 +21,17 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class Pt : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class Pt : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> circleCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
-      float circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, circleCenter);
+      B2Vector3D circleCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      double circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, circleCenter);
 
       return circleRadius * Helper::s_MagneticFieldFactor;
     } // return unit: GeV/c

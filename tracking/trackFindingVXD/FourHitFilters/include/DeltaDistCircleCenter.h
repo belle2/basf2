@@ -19,19 +19,19 @@ namespace Belle2 {
 
   /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm.
    * */
-  template <typename PointType >
-  class DeltaDistCircleCenter : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class DeltaDistCircleCenter : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm */
-    static float value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
-                       const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
+                              const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> outerCircleCenter = Helper::calcCircleCenter(outerHit, outerCenterHit, innerCenterHit);
+      B2Vector3D outerCircleCenter = Helper::calcCircleCenter(outerHit, outerCenterHit, innerCenterHit);
 
-      B2Vector3<float> innerCircleCenter = Helper::calcCircleCenter(outerCenterHit, innerCenterHit, innerHit);
+      B2Vector3D innerCircleCenter = Helper::calcCircleCenter(outerCenterHit, innerCenterHit, innerHit);
 
       return fabs(outerCircleCenter.Perp() - innerCircleCenter.Perp());
     } // return unit: GeV/c

@@ -35,13 +35,13 @@ namespace Belle2 {
       const unsigned nHits = hitContainer.size();
       if (nHits < 4) return 1;
 
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
       using boost::math::sign;
 
-      std::vector<B2Vector3F> vecRZ;
+      std::vector<B2Vector3D> vecRZ;
       vecRZ.reserve(nHits);
       for (const auto* hit : hitContainer) { // collect RZ-Vrsions of the hits:
-        vecRZ.push_back(B2Vector3F(Helper::calcPerp(*hit) , hit->Z(), 0.));
+        vecRZ.push_back(B2Vector3D(Helper::calcPerp(*hit) , hit->Z(), 0.));
       }
 
       std::vector<int> chargeSigns;
@@ -59,32 +59,3 @@ namespace Belle2 {
   };
 
 }
-/*
-using boost::math::sign;
-B2Vector3<DataType> ba = doAMinusB(a, b); ba.SetZ(0.);
-B2Vector3<DataType> bc = doAMinusB(b, c); bc.SetZ(0.);
-return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
-
-bool TrackletFilters::ziggZaggRZ()
-{
-  if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggRZ: hits not set, therefore no calculation possible - please check that!")
-  list<int> chargeSigns;
-  bool isZiggZagging = false; // good: not ziggZagging
-  vector<TVector3> rzHits;
-  TVector3 currentVector;
-  for (PositionInfo* aHit : *m_hits) {
-  currentVector.SetXYZ(aHit->hitPosition.Perp(), aHit->hitPosition[1], 0.);
-  rzHits.push_back(currentVector);
-  }
-  for (int i = 0; i < m_numHits - 2; ++i) {
-  int signValue = m_3hitFilterBox.calcSign(rzHits.at(i), rzHits.at(i + 1), rzHits.at(i + 2));
-  chargeSigns.push_back(signValue);
-  }
-  chargeSigns.sort();
-  chargeSigns.unique();
-  if (int(chargeSigns.size()) != 1) {
-  isZiggZagging = true;
-  }
-  return isZiggZagging;
-}
-*/

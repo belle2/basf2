@@ -21,23 +21,23 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType >
-  class AngleRZFull : public SelectionVariable< PointType , float > {
+  template <typename PointType, typename VariableType >
+  class AngleRZFull : public SelectionVariable< PointType , VariableType > {
   public:
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: angle in degrees */
-    static float value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3<float> outerVector = Helper::doAMinusB(outerHit, centerHit);
-      B2Vector3<float> innerVector = Helper::doAMinusB(centerHit, innerHit);
+      B2Vector3D outerVector = Helper::doAMinusB(outerHit, centerHit);
+      B2Vector3D innerVector = Helper::doAMinusB(centerHit, innerHit);
 
-      B2Vector3<float> rzVecAB(outerVector.Perp(), outerVector[2], 0.);
-      B2Vector3<float> rzVecBC(innerVector.Perp(), innerVector[2], 0.);
+      B2Vector3D rzVecAB(outerVector.Perp(), outerVector[2], 0.);
+      B2Vector3D rzVecBC(innerVector.Perp(), innerVector[2], 0.);
 
-      float result = Helper::fullAngle2D(rzVecAB, rzVecBC); // 0-pi
-      result *= (180. / M_PI);
+      double result = Helper::fullAngle2D(rzVecAB, rzVecBC); // 0-pi
+      result *= double(180. / M_PI);
       return Helper::checkValid(result);
     } // return unit: ° (0 - 180°)
   };

@@ -33,7 +33,7 @@ namespace Belle2 {
     {
       if (hitContainer.size() < 4) return 1;
 
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
       std::vector<int> chargeSigns;
       chargeSigns.reserve(hitContainer.size() - 2);

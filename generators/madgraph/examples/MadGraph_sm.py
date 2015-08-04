@@ -11,12 +11,13 @@
 ########################################################
 
 from basf2 import *
+from beamparameters import add_beamparameters
 import os
 import subprocess
 
 # parameters that can be modified
 mg_nevents = '100'
-mg_beamenergy = '5.28695'
+mg_beamenergy = '10.355/2.'
 mg_generate = 'e+ e- > mu+ mu-'
 
 # full path to steering template file (full path to model must be inside the template steering file)
@@ -83,7 +84,13 @@ lhereader.param('boost2Lab', True)
 lhereader.param('wrongSignPz', True)
 
 # creating the path for the processing
+set_log_level(LogLevel.ERROR)
+
+# creating the path for the processing
 main = create_path()
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y3S")
 
 # Add lhereader module
 main.add_module(lhereader)

@@ -11,12 +11,13 @@
 ########################################################
 
 from basf2 import *
+from beamparameters import add_beamparameters
 import os
 import subprocess
 
 # parameters that can be modified
 mg_nevents = '100'
-mg_beamenergy = '5.28695'
+mg_beamenergy = '10.355/2.'
 mg_generate = 'e+ e- > u u~'
 mg_seed = '1'
 
@@ -70,8 +71,15 @@ subprocess.check_call([mg_externals, mg_steeringfile])
 subprocess.check_call(['gunzip', mg_outputdir
                       + '/Events/run_01/unweighted_events.lhe.gz'])
 
-# read in via basf2
+# creating the path for the processing
 set_log_level(LogLevel.ERROR)
+
+# creating the path for the processing
+main = create_path()
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y3S")
+
 lhereader = register_module('LHEInput')
 lhereader.param('makeMaster', True)
 lhereader.param('runNum', 1)
@@ -83,9 +91,6 @@ lhereader.param('nInitialParticles', 2)
 lhereader.param('nVirtualParticles', 0)
 lhereader.param('boost2Lab', False)
 lhereader.param('wrongSignPz', True)
-
-# creating the path for the processing
-main = create_path()
 
 # Add lhereader module
 main.add_module(lhereader)
@@ -102,8 +107,7 @@ rootoutput.param('outputFileName', 'LHEReaderMasterOutputSM.root')
 main.add_module(rootoutput)
 
 # Add mcparticleprinter module
-#main.add_module('PrintMCParticles', logLevel=LogLevel.DEBUG,
-                #onlyPrimaries=False)
+# main.add_module('PrintMCParticles', logLevel=LogLevel.DEBUG, onlyPrimaries=False)
 
 # Process
 process(main)

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2015  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -16,7 +16,9 @@
 #include <string>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
+
 #include <generators/lhe/LHEReader.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -60,6 +62,9 @@ namespace Belle2 {
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };
 

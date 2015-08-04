@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2015  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -8,7 +8,6 @@
  **************************************************************************/
 
 #include <generators/modules/LHEInputModule.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
@@ -32,7 +31,7 @@ REG_MODULE(LHEInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1)
+LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
 {
   //Set module properties
   setDescription("LHE file input. This module loads an event record from HEPEVT format and store the content into the MCParticle collection. HEPEVT format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
@@ -54,6 +53,9 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1)
 
 void LHEInputModule::initialize()
 {
+  //Beam Parameters, initial particl
+  m_initial.initialize();
+
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {
     //something is wrong with the file list.
@@ -73,15 +75,11 @@ void LHEInputModule::initialize()
   m_lhe.m_nInitial    = m_nInitial;
   m_lhe.m_wrongSignPz = m_wrongSignPz;
 
-  //Do we need to boost?
+  //boost
   if (m_boost2Lab) {
-    //@TODO: get this from a central place instead of hard coded: framework issue
-    // this is hard coded!!!!!! should be provided somewhere -> run meta data
-    double Eher = 7.0 * Unit::GeV;
-    double Eler = 4.0 * Unit::GeV;
-    double cross_angle = 83.0 * Unit::mrad;
-    double angle = 41.5 * Unit::mrad;
-    m_lhe.m_labboost = getBoost(Eher, Eler, cross_angle, angle);
+    MCInitialParticles& initial = m_initial.generate();
+    TLorentzRotation boost = initial.getCMSToLab();
+    m_lhe.m_labboost = boost;
   }
 
   //are we the master module? And do we have all infos?

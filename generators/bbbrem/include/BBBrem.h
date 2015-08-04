@@ -37,17 +37,21 @@ namespace Belle2 {
 
     BBBrem() :
       m_eventCount(0),
-      m_applyBoost(false),
       m_unweighted(true),
       m_weightCount(0),
+      m_weightCountOver(0),
       m_maxWeight(0.0),
       m_maxWeightDelivered(0.0),
       m_sumWeightDelivered(0.0),
       m_sumWeightDeliveredSqr(0.0),
+      m_sumWeightDeliveredOver(0.0),
+      m_sumWeightDeliveredSqrOver(0.0),
       m_cmsEnergy(10.58),
       m_photonEFrac(0.000001),
       m_crossSection(0.0),
       m_crossSectionError(0.0),
+      m_crossSectionOver(0.0),
+      m_crossSectionErrorOver(0.0),
       alpha(0.0),
       rme(0.0),
       s(0.0),
@@ -71,16 +75,6 @@ namespace Belle2 {
     /** Destructor. */
     ~BBBrem() {};
 
-    /** Sets the Lorentz boost vector which should be applied to the generated particles.
-     * @param boostVector The Lorentz boost vector which is applied to the generated particles.
-     */
-    void setBoost(TLorentzRotation boostVector) { m_boostVector = boostVector; }
-
-    /** Enables the boost of the generated particles.
-     * @param applyBoost Set to true to enabled the boost. Also make sure you have set the boost vector using setBoost().
-     */
-    void enableBoost(bool applyBoost = true) { m_applyBoost = applyBoost; }
-
     /** Initializes the generator.
      * @cmsEnergy The center of mass energy in [GeV].
      * @minPhotonEFrac The minimum photon energy fraction. The min. photon energy is this fraction * beam energy.
@@ -93,7 +87,7 @@ namespace Belle2 {
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      * @return Returns the weight of the event.
      */
-    double generateEvent(MCParticleGraph& mcGraph);
+    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
 
     /** Returns the total cross section of the generated process in millibarn.
      * @return The total cross section.
@@ -104,6 +98,16 @@ namespace Belle2 {
      * @return The error on the total cross section.
      */
     double getCrossSectionError() { return m_crossSectionError; }
+
+    /** Returns the total overweight bias cross section of the generated process in millibarn.
+     * @return The total overweight bias cross section.
+     */
+    double getCrossSectionOver() { return m_crossSectionOver; }
+
+    /** Returns the error on the total overweight bias cross section of the generated process  in millibarn.
+     * @return The error on the total overweight bias cross section.
+     */
+    double getCrossSectionErrorOver() { return m_crossSectionErrorOver; }
 
     /** Returns the maximum weight given by the BBBrem generation.
      * @return The maximum weight given by the BBBrem generation.
@@ -124,20 +128,22 @@ namespace Belle2 {
   protected:
 
     int m_eventCount;               /**< Internal event counter. Used to calculate the cross-section. */
-    bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
     bool m_unweighted;              /**< True if BBBrem should produce unweighted events. */
     long m_weightCount;             /**< Internal weighted event counter. Used to calculate the cross-section. */
+    long m_weightCountOver;         /**< Internal overweighted event counter. Used to calculate the cross-section. */
     double m_maxWeight;             /**< The maximum weight. Used for the event rejection procedure to produce unweighted events. */
     double m_maxWeightDelivered;    /**< The maximum weight given by the BBBrem generation. */
     double m_sumWeightDelivered;    /**< The sum of all weights returned by the BBBrem generation.*/
     double m_sumWeightDeliveredSqr; /**< The square of the sum of all weights returned by the BBBrem generation.*/
+    double m_sumWeightDeliveredOver;    /**< The sum of all overweights.*/
+    double m_sumWeightDeliveredSqrOver; /**< The square of the sum of all overweights.*/
     double m_cmsEnergy;             /**< Center of mass energy (sqrt(s)). */
     double m_photonEFrac;           /**< Minimum photon energy fraction. */
 
     double m_crossSection;          /**< The cross-section in millibarns. */
     double m_crossSectionError;     /**< The error on the cross-section in millibarns. */
-
-    TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */
+    double m_crossSectionOver;      /**< The overweight bias cross-section in millibarns. */
+    double m_crossSectionErrorOver; /**< The overweight bias error on the cross-section in millibarns. */
 
     /** Calculate the outgoing leptons and the event weight for one single radiative Bhabha scattering.
      * The main method. A direct translation from the BBBrem Fortran source code.
@@ -153,7 +159,8 @@ namespace Belle2 {
      *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual = false, bool isInitial = false);
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                       bool isVirtual = false, bool isInitial = false);
 
   private:
 

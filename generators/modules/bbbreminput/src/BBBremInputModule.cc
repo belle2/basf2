@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <generators/modules/bbbreminput/BBBremInputModule.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
@@ -18,7 +17,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/GearDir.h>
 
 #include <TLorentzVector.h>
 
@@ -35,13 +33,12 @@ REG_MODULE(BBBremInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-BBBremInputModule::BBBremInputModule() : Module()
+BBBremInputModule::BBBremInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("Generates low scattering angle radiative Bhabha events (Beam-Beam Bremsstrahlung).");
 
   //Parameter definition
-  addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
   addParam("MinPhotonEnergyFraction", m_photonEFrac, "Fraction of the minimum photon energy.", 0.000001);
   addParam("Unweighted", m_unweighted, "Produce unweighted or weighted events.", true);
   addParam("MaxWeight", m_maxWeight, "The max weight (only for Unweighted=True).", 2000.0);
@@ -58,24 +55,13 @@ void BBBremInputModule::initialize()
 {
   StoreArray<MCParticle>::registerPersistent();
 
-  GearDir ler("/Detector/SuperKEKB/LER/");
-  GearDir her("/Detector/SuperKEKB/HER/");
-
-  double centerOfMassEnergy = 2.0 * sqrt(her.getDouble("energy") * ler.getDouble("energy"));
+  //Beam Parameters, initial particle - BBBREM cannot handle beam energy spread
+  m_initial.initialize();
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  double centerOfMassEnergy = nominal.getMass();
 
   m_generator.init(centerOfMassEnergy, m_photonEFrac, m_unweighted, m_maxWeight);
 
-  //Depending on the settings use the Belle II or Belle boost
-  if (m_boostMode == 1) {
-    m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
-                                  her.getDouble("angle") - ler.getDouble("angle"), her.getDouble("angle")));
-  } else {
-    if (m_boostMode == 2) {
-      m_generator.setBoost(getBoost(7.998213, 3.499218, 22.0 * Unit::mrad, 0.0));
-    }
-  }
-
-  m_generator.enableBoost(m_boostMode > 0);
 }
 
 
@@ -83,10 +69,21 @@ void BBBremInputModule::event()
 {
   StoreObjPtr<EventMetaData> evtMetaData("EventMetaData", DataStore::c_Event);
 
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
   m_mcGraph.clear();
-  double weight = m_generator.generateEvent(m_mcGraph);
+  double weight = m_generator.generateEvent(m_mcGraph, vertex, boost);
+
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
+  //store the weight (1.0 for unweighted events)
   evtMetaData->setGeneratedWeight(weight);
 }
 
@@ -95,6 +92,9 @@ void BBBremInputModule::terminate()
 {
   m_generator.term();
 
-  B2INFO("Maximum weight delivered: " << m_generator.getMaxWeightDelivered())
-  B2INFO("Cross-section:            " << m_generator.getCrossSection() << " +- " << m_generator.getCrossSectionError() << " [mb]")
+  B2RESULT("Cross-section (weighted):                   " << m_generator.getCrossSection() << " +/- " <<
+           m_generator.getCrossSectionError() << " [mb]")
+  B2RESULT("Maximum weight delivered:                   " << m_generator.getMaxWeightDelivered())
+  B2RESULT("Overweight bias cross-section (unweighted): " << m_generator.getCrossSectionOver() << " +/- " <<
+           m_generator.getCrossSectionErrorOver() << " [mb]")
 }

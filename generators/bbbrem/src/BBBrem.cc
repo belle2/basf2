@@ -73,14 +73,23 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 }
 
 
-double BBBrem::generateEvent(MCParticleGraph& mcGraph)
+double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
   double ran = 0.0;
+
+
+
 
   if (m_unweighted) {
     do {
       calcOutgoingLeptonsAndWeight();
       if (weight > m_maxWeightDelivered) m_maxWeightDelivered = weight;
+      if (weight > m_maxWeight) {
+        B2INFO("OVERWEIGHT, w=" << weight << ", nw=" << m_weightCountOver << ", sumw=" << m_sumWeightDeliveredOver);
+        m_weightCountOver++;
+        m_sumWeightDeliveredOver = m_sumWeightDeliveredOver + (weight - m_maxWeight);
+        m_sumWeightDeliveredSqrOver = m_sumWeightDeliveredSqrOver + (weight - m_maxWeight) * (weight - m_maxWeight);
+      }
       m_weightCount++;
       m_sumWeightDelivered += weight;
       m_sumWeightDeliveredSqr += weight * weight;
@@ -96,8 +105,8 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph)
   }
 
   //Store the incoming particles as virtual particles, the outgoing particles as real particles
-  storeParticle(mcGraph, p1, 11, true);
-  storeParticle(mcGraph, q1, -11, true);
+  storeParticle(mcGraph, p1, 11, vertex, boost, false, true);
+  storeParticle(mcGraph, q1, -11, vertex, boost, false, true);
 
   // BBBrem emits gammma only from electron(p1)
   // To emit gamma from positron we need to swap electron and positron here
@@ -113,9 +122,9 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph)
   }
 
   //Store the outgoing particles as real particles
-  storeParticle(mcGraph, p2, 11);
-  storeParticle(mcGraph, q2, -11);
-  storeParticle(mcGraph, qk, 22);
+  storeParticle(mcGraph, p2, 11, vertex, boost, false, false);
+  storeParticle(mcGraph, q2, -11, vertex, boost, false, false);
+  storeParticle(mcGraph, qk, 22, vertex, boost, false, false);
 
   if (!m_unweighted) return weight;
   return 1.0;
@@ -124,8 +133,17 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph)
 
 void BBBrem::term()
 {
-  m_crossSection = m_sumWeightDelivered / m_weightCount;
-  m_crossSectionError = sqrt(m_sumWeightDeliveredSqr - m_sumWeightDelivered * m_sumWeightDelivered / m_weightCount) / m_weightCount;
+  if (m_weightCount > 0.0) {
+    m_crossSection          = m_sumWeightDelivered / m_weightCount;
+    m_crossSectionError     = sqrt(m_sumWeightDeliveredSqr - m_sumWeightDelivered * m_sumWeightDelivered / m_weightCount) /
+                              m_weightCount;
+
+    if (m_unweighted) {
+      m_crossSectionOver      = m_sumWeightDeliveredOver / m_weightCount;
+      m_crossSectionErrorOver = sqrt(abs(((m_sumWeightDeliveredSqrOver) / m_weightCount - m_crossSectionOver * m_crossSectionOver) /
+                                         m_weightCount));
+    }
+  }
 }
 
 
@@ -349,15 +367,9 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 }
 
 
-void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual, bool isInitial)
+void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                           bool isVirtual, bool isInitial)
 {
-  //  //Create particle
-  //MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
-  //if (!isVirtual) {
-  //  part.setStatus(MCParticle::c_PrimaryParticle);
-  //} else {
-  //  part.setStatus(MCParticle::c_IsVirtual);
-  //}
 
   // RG 6/25/14 Add new flag for ISR "c_Initial"
   MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
@@ -365,19 +377,35 @@ void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
     part.setStatus(MCParticle::c_IsVirtual);
   } else if (isInitial) {
     part.setStatus(MCParticle::c_Initial);
-  } else {
-    part.setStatus(MCParticle::c_PrimaryParticle);
   }
+
+  //all particles from a generator are primary
+  part.addStatus(MCParticle::c_PrimaryParticle);
+
+  //all non virtual photons from BBBREM are ISR or FSR
+  if (pdg == 22 && !isVirtual) {
+    part.addStatus(MCParticle::c_IsISRPhoton);
+    part.addStatus(MCParticle::c_IsFSRPhoton);
+  }
+
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
   part.setMomentum(TVector3(mom[0], mom[1], -mom[2])); //Switch direction, because electrons fly into the +z direction at Belle II
   part.setEnergy(mom[3]);
   part.setMassFromPDG();
-  part.setDecayVertex(0.0, 0.0, 0.0);
+//   part.setDecayVertex(0.0, 0.0, 0.0);
+
+  //set the production vertex of non initial particles
+  if (!isInitial) {
+    TVector3 v3 = part.getProductionVertex();
+    v3 = v3 + vertex;
+    part.setProductionVertex(v3);
+    part.setValidVertex(true);
+  }
 
   //If boosting is enable boost the particles to the lab frame
   TLorentzVector p4 = part.get4Vector();
-  if (m_applyBoost) p4 = m_boostVector * p4;
+  p4 = boost * p4;
   part.set4Vector(p4);
 }

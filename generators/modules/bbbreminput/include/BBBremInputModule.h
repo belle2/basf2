@@ -12,7 +12,9 @@
 #define BBBREMINPUTMODULE_H
 
 #include <framework/core/Module.h>
+
 #include <generators/bbbrem/BBBrem.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -51,7 +53,6 @@ namespace Belle2 {
   protected:
 
     /** Module parameters */
-    int m_boostMode;      /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     double m_photonEFrac; /**< Minimum photon energy fraction. */
     bool m_unweighted;    /**< True if BBBrem should produce unweighted events. */
     double m_maxWeight;   /**< The maximum weight. Used for the event rejection procedure to produce unweighted events. */
@@ -59,6 +60,9 @@ namespace Belle2 {
     /** Variables */
     BBBrem m_generator;        /**< The BBBrem generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };
 

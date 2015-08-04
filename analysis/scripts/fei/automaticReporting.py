@@ -612,6 +612,18 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     seaborn.set(font_scale=5)
     seaborn.set_style('whitegrid')
 
+    resource.needed = False
+    resource.cache = True
+
+    raw_name = particleName
+    if particleLabel != '':
+        raw_name += ':' + particleLabel
+    name = format.decayDescriptor(raw_name)
+
+    if nTuple is None:
+        return {'name': name, 'list': matchedList, 'page': '', 'user_efficiency': 0.0, 'user_purity': 0.0,
+                'post_efficiency': 0.0, 'post_purity': 0.0, 'covered': 0.0}
+
     nTupleData = loadNTupleDataFrame(nTuple)
 
     pdgcode = str(abs(pdg.from_name(particleName)))
@@ -629,11 +641,6 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
 
     if(nEvents != listCountsData['All'].count()):
         B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong.")
-
-    raw_name = particleName
-    if particleLabel != '':
-        raw_name += ':' + particleLabel
-    name = format.decayDescriptor(raw_name)
 
     o = b2latex.LatexFile()
     o += b2latex.Section(name).finish()
@@ -712,8 +719,6 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     o += b2latex.SubSection("MVA").finish()
     o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, mvaConfig, plotConfig)
 
-    resource.needed = False
-    resource.cache = True
     return {'name': name, 'list': matchedList, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
             'post_efficiency': post_efficiency, 'post_purity': post_purity, 'covered': 100.0}
 
@@ -740,6 +745,20 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     seaborn.set(font_scale=5)
     seaborn.set_style('whitegrid')
 
+    resource.needed = False
+    resource.cache = True
+
+    raw_name = particleName
+    if particleLabel != '':
+        raw_name += ':' + particleLabel
+    name = format.decayDescriptor(raw_name)
+
+    if nTuple is None:
+        return {'name': name, 'page': '', 'user_efficiency': 0.0, 'user_purity': 0.0,
+                'pre_efficiency': 0, 'pre_purity': 0, 'covered': 0.0,
+                'post_efficiency': 0.0, 'post_purity': 0.0,
+                'detector_efficiency': 0, 'detector_purity': 0, 'channels': []}
+
     nTupleData = loadNTupleDataFrame(nTuple)
 
     pdgcode = str(abs(pdg.from_name(particleName)))
@@ -759,11 +778,6 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
 
     if(nEvents != listCountsData['All'].count()):
         B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong.")
-
-    raw_name = particleName
-    if particleLabel != '':
-        raw_name += ':' + particleLabel
-    name = format.decayDescriptor(raw_name)
 
     o = b2latex.LatexFile()
 
@@ -880,8 +894,6 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
         o += b2latex.SubSubSection("MC-based MVA").finish()
         o += createTMVASection(createUniqueFilename(channelName, resource.hash), tmvaTraining, mvaConfigs[i], plotConfig)
 
-    resource.needed = False
-    resource.cache = True
     return {'name': name, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
             'pre_efficiency': 0, 'pre_purity': 0, 'covered': covBR,
             'post_efficiency': post_efficiency, 'post_purity': post_purity,

@@ -12,11 +12,11 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     """
 
     if BlevelExtraCut != '':
-        hadronicUserCut = UserCutConfiguration('Mbc > 5.2 and abs(deltaE) < 0.5')
-        semileptonicUserCut = UserCutConfiguration(BlevelExtraCut)
-    else:
         hadronicUserCut = UserCutConfiguration('Mbc > 5.2 and abs(deltaE) < 0.5 and [' + BlevelExtraCut + ']')
         semileptonicUserCut = UserCutConfiguration(BlevelExtraCut)
+    else:
+        hadronicUserCut = UserCutConfiguration('Mbc > 5.2 and abs(deltaE) < 0.5')
+        semileptonicUserCut = UserCutConfiguration()
 
     postCut = PostCutConfiguration(
         value=0.1

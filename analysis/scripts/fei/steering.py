@@ -22,8 +22,6 @@ import pdg
 from fei import dagFramework
 # The different tasks themselves are defined in the provider module
 from fei import provider
-# automatic Reporting
-from fei import automaticReporting
 
 # Standard python modules
 import collections
@@ -460,6 +458,8 @@ def fullEventInterpretation(selection_path, particles):
     # Create the automatic reporting summary pdf
     if args.summary:
 
+        # automatic Reporting
+        from fei import automaticReporting
         from automaticReporting import loadCoveredBranchingFractionsDataFrame
         df = loadCoveredBranchingFractionsDataFrame(particles, include_daughter_fractions=True)
         dag.add('CoveredBranchingFractions', df)

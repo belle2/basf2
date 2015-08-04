@@ -166,6 +166,7 @@ namespace Belle2 {
     Cut::Cut(std::string str) : operation(EMPTY), number(0), isNumeric(false), var(nullptr)
     {
 
+      boost::algorithm::trim(str);
       if (str.empty()) {
         operation = EMPTY;
         return;

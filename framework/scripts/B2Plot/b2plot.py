@@ -58,11 +58,11 @@ class Histograms(object):
                      used for the creation of histograms with these names
         @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
         """
-        self.hist, self.bins = numpy.histogram(data[column], bins=200,
+        self.hist, self.bins = numpy.histogram(data[column], bins=100,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
         # Subtract a small number from the bin width, otherwise the errorband plot is unstable.
-        self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] / 2.0 - 0.00001
+        self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
         self.hists = dict()
         for name, mask in masks.iteritems():
             self.hists[name] = numpy.histogram(data.loc[mask, column], bins=self.bins,
@@ -206,7 +206,7 @@ class Plotter(object):
         """
         from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
         canvas = FigureCanvas(self.figure)
-        canvas.print_figure(filename, dpi=100)
+        canvas.print_figure(filename, dpi=50)
         return self
 
     def set_plot_options(self, plot_kwargs={'linestyle': ''}):
@@ -217,7 +217,7 @@ class Plotter(object):
         self.plot_kwargs = plot_kwargs
         return self
 
-    def set_errorbar_options(self, errorbar_kwargs={'fmt': '.', 'elinewidth': 0.5, 'alpha': 0.5}):
+    def set_errorbar_options(self, errorbar_kwargs={'fmt': '.', 'elinewidth': 3, 'alpha': 1}):
         """
         Overrides default errorbar options for datapoint errorbars
         @param errorbar_kwargs keyword arguments for the errorbar function
@@ -390,7 +390,7 @@ class Diagonal(Plotter):
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths/2, yerr=purity_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths/2.0, yerr=purity_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -567,10 +567,10 @@ class Overtraining(Plotter):
         else:
             self.figure = figure
 
-        gs = matplotlib.gridspec.GridSpec(5, 1)
-        self.axis = self.figure.add_subplot(gs[:3, :])
-        self.axis_d1 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
-        self.axis_d2 = self.figure.add_subplot(gs[4, :], sharex=self.axis)
+        gs = matplotlib.gridspec.GridSpec(4, 1)
+        self.axis = self.figure.add_subplot(gs[:2, :])
+        self.axis_d1 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
+        self.axis_d2 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
 
         super(Overtraining, self).__init__(self.figure, self.axis)
 

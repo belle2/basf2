@@ -6,6 +6,7 @@ import os
 from sys import argv
 from basf2 import *
 from time import time
+from beamparameters import add_beamparameters
 
 numEvents = 200
 initialValue = 1
@@ -40,10 +41,6 @@ if len(argv) > 4:
     print '4th argument given, new value for numTracks: ' + str(numTracks)
 
 tuneValue = 0.06
-# old geometry for SVD:
-# secSetup = ['secMapEvtGenOnR10933June2014SVDStd-moreThan500MeV_SVD',
-# 'secMapEvtGenOnR10933June2014SVDStd-125to500MeV_SVD',
-# 'secMapEvtGenOnR10933June2014SVDStd-30to125MeV_SVD']
 # new 2.2 geometry for SVD:
 secSetup = [
     'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
@@ -51,16 +48,12 @@ secSetup = [
     'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
 
 if usePXD:
-  # new 2.2 geometry for SVD:
+    # new 2.2 geometry for SVD:
     secSetup = \
         ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
          'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
          'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
          ]
-  # old geometry for SVD:
-  # secSetup = ['secMapEvtGenOnR10933June2014VXDStd-moreThan500MeV_PXDSVD',
-    # 'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
-    # 'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
     tuneValue = 0.22
 print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
                                                                         theSeed=initialValue)
@@ -86,8 +79,7 @@ evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
 
 particlegun = register_module('ParticleGun')
-param_pGun = {  # 13: muons, 211: charged pions
-                # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
+param_pGun = {
     'pdgCodes': [13, -13],
     'nTracks': numTracks,
     'momentumGeneration': 'uniformPt',
@@ -115,16 +107,9 @@ vxdtf.logging.log_level = LogLevel.DEBUG
 vxdtf.logging.debug_level = 1
 param_vxdtf = {'sectorSetup': secSetup,
                'GFTrackCandidatesColName': 'caTracks',
-               'tuneCutoffs': tuneValue}  # 'writeToRoot': True,
-# 'activateSlopeRZ': False,
-# 'activateDistanceXY': False,
-# 'activateDistance3D': False,
-# , 'calcQIType': 'kalman'
+               'tuneCutoffs': tuneValue}
 vxdtf.param(param_vxdtf)
 
-# VXDTF DQM module
-# vxdtf_dqm = register_module('VXDTFDQM')
-# vxdtf_dqm.param('GFTrackCandidatesColName', 'caTracks')
 
 doPXD = 0
 if usePXD:
@@ -159,23 +144,28 @@ analyzer.param(param_analyzer)
 
 # Create paths
 main = create_path()
-# histo = register_module('HistoManager')
-# histo.param('histoFileName', 'DQM-VXDTFdemo.root')  # File to save histograms
-# main.add_module(histo)
-# Add modules to paths
 
-# main.add_module(inputM)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
+
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
 if useEvtGen:
-  # following modules only for evtGen:
+    # following modules only for evtGen:
     main.add_module(evtgeninput)
     if usePGun:
         main.add_module(particlegun)
 else:
-  # following modules only for pGun:
+    # following modules only for pGun:
     main.add_module(particlegun)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)

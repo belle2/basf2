@@ -5,6 +5,7 @@
 import os
 from sys import argv
 from basf2 import *
+from beamparameters import add_beamparameters
 from time import time
 
 
@@ -110,6 +111,16 @@ analyzer.param(param_analyzer)
 # Create paths
 main = create_path()
 # Add modules to paths
+
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
 
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)

@@ -4,8 +4,9 @@
 # This steering file will
 import os
 from sys import argv
-from basf2 import *
 from time import time
+from basf2 import *
+from beamparameters import add_beamparameters
 
 numEvents = 200
 initialValue = 1
@@ -106,7 +107,7 @@ vxdtf.logging.debug_level = 1
 param_vxdtf = {'sectorSetup': secSetup,
                'GFTrackCandidatesColName': 'caTracks',
                'tuneCutoffs': tuneValue,
-               #'calcQIType': 'kalman'
+               # 'calcQIType': 'kalman'
                }
 
 vxdtf.param(param_vxdtf)
@@ -147,17 +148,27 @@ log_to_file('demoOutput.txt', append=False)
 
 # Create paths
 main = create_path()
-# Add modules to paths
 
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
+
+# Add modules to paths
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 if useEvtGen:
-  # following modules only for evtGen:
+    # following modules only for evtGen:
     main.add_module(evtgeninput)
     if usePGun:
         main.add_module(particlegun)
 else:
-  # following modules only for pGun:
+    # following modules only for pGun:
     main.add_module(particlegun)
 main.add_module(gearbox)
 main.add_module(geometry)

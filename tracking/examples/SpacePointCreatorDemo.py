@@ -6,6 +6,7 @@ import os
 from sys import argv
 from basf2 import *
 from time import time
+from beamparameters import add_beamparameters
 
 numEvents = 25
 initialValue = 42
@@ -66,6 +67,17 @@ spCreatorTest.param('AllSpacePointContainers', ['singlesOnly', 'couplesAllowed',
 
 # Create paths
 main = create_path()
+
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
+
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)

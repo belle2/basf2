@@ -211,9 +211,9 @@ analizer.param('testTCname', 'SPTracks')
 analizer.param('referenceTCname', 'SPTracksReference')
 analizer.param('writeToRoot', True)
 
-analizer.param('trackedParametersDouble', [
-    [["Perfect"], ["AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"]]
-    ])
+# analizer.param('trackedParametersDouble', [
+#    [["Perfect"], ["AnalyzingAlgorithmResidualP", "AnalyzingAlgorithmResidualPosition", "AnalyzingAlgorithmValuePT"]]
+#    ])
 
 
 log_to_file('sptcNetworkDemoOutput.txt', append=False)

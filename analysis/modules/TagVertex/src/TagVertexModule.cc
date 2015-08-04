@@ -182,8 +182,12 @@ namespace Belle2 {
 
     ok = getTagTracks(Breco);
     if (!ok) return false;
-    ok = makeGeneralFit();
-
+    try {
+      ok = makeGeneralFit();
+    } catch (rave::CheckedFloatException) {
+      B2ERROR("Invalid inputs (nan/inf)?");
+      ok = false;
+    }
     if (!ok) return false;
 
 

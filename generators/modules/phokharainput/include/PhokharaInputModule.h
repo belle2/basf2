@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 
 #include <generators/phokhara/Phokhara.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -55,8 +56,6 @@ namespace Belle2 {
 
   protected:
 
-    double getBeamEnergyCM(double e1, double e2, double angle); /**< get beam energy in CM from LER, HER and crossing angle */
-
     /** Module parameters */
     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */
     int m_nMaxTrials; /**< Events before loop is aborted. */
@@ -74,7 +73,6 @@ namespace Belle2 {
     int m_protonff;  /**< ProtonFormFactor old(0), ProtonFormFactor new(1) */
 
     double m_cmsEnergy; /**< CMS energy. */
-    int m_boostMode; /**< Mode of the boost: no boost (0), Belle II (1, default), Belle (2). */
     std::vector<double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::vector<double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
     double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV]. */
@@ -100,6 +98,10 @@ namespace Belle2 {
 
     template <typename T>
     std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
+
   }; /**< vectorToPair. */
 
   template <typename T>

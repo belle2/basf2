@@ -11,16 +11,19 @@
 ########################################################
 
 from basf2 import *
+from beamparameters import add_beamparameters
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
 
 main = create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
-eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
 
 # Register the PHOKHARA module
 phokhara = register_module('PhokharaInput')
@@ -36,22 +39,16 @@ phokhara.set_log_level(LogLevel.INFO)
 # K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)
 phokhara.param('FinalState', 0)
 
-# Set the mode for the boost of the generated particles: 0 = no boost, 1 = BELLE II, 2 = BELLE
-phokhara.param('BoostMode', 1)
-
 # soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
 # photon multiplicity (and exclusive cross sections depent on that parameter)
 # EXPERTS ONLY
 phokhara.param('Epsilon', 0.0001)
 
 # Events (weighted) to be used for maximum weight search before generation
-phokhara.param('SearchMax', 50000)
+phokhara.param('SearchMax', 5000)
 
 # Events (unweighted) before event loop is aborted
 phokhara.param('nMaxTrials', 25000)
-
-# CMS energy [GeV] (under devlopment, currently calculated from xml file)
-# phokhara.param('CMSEnergy', 10.580)
 
 # LO switch --> Born corresponds to 1 photon (0), Born corresponds to 0 photons (1), only Born: 0 photons (-1)
 # original comment: ph0  Born: 1ph(0), Born: 0ph(1), only Born: 0ph(-1)
@@ -116,21 +113,12 @@ phokhara.param('MaxInvMassHadrons', 105.0)
 # original comment: minimal photon energy/missing energy
 phokhara.param('MinEnergyGamma', 0.25)
 
-# geometry parameter database
-gearbox = register_module('Gearbox')
-
-# Register the Progress module and the Python histogram module
-progress = register_module('Progress')
-
 # output
 output = register_module('RootOutput')
 output.param('outputFileName', './phokhara_out.root')
 
 # Create the main path and add the modules
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(progress)
-main.add_module(gearbox)
+main.add_module("Progress")
 main.add_module(phokhara)
 main.add_module(output)
 main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)

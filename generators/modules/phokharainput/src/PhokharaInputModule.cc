@@ -9,7 +9,6 @@
 **************************************************************************/
 
 #include <generators/modules/phokharainput/PhokharaInputModule.h>
-#include <generators/utilities/cm2LabBoost.h> //REMOMVE SOON!
 
 #include <framework/utilities/FileSystem.h>
 
@@ -33,7 +32,7 @@ REG_MODULE(PhokharaInput)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-PhokharaInputModule::PhokharaInputModule() : Module()
+PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("Generates radiative return events with PHOKHARA.");
@@ -59,9 +58,6 @@ PhokharaInputModule::PhokharaInputModule() : Module()
            "Kaon FF: KaonFormFactor constrained(0, default), KaonFormFactor unconstrained(1) KaonFormFactor old(2)", 0);
   addParam("NarrowRes", m_narres, "Only for m_finalState = 0,1,6,7: No narrow resonances (0, default), J/Psi (1) and Psi(2S) (2)", 0);
   addParam("ProtonFF", m_protonff, "ProtonFormFactor old(0), ProtonFormFactor new(1)", 1);
-
-  addParam("CMSEnergy", m_cmsEnergy, " [GeV], Only for m_boostMode = 0: ", 10.580);
-  addParam("BoostMode", m_boostMode, "Mode of the boost: no boost (0), Belle II (1, default), Belle (2)", 1);
 
   addParam("ScatteringAngleRangePhoton", m_ScatteringAngleRangePhoton,
            "Min [0] and Max [1] value for the scattering angle of photons [deg], default (0, 180)", make_vector(60.0, 120.0));
@@ -95,53 +91,12 @@ void PhokharaInputModule::initialize()
 {
   StoreArray<MCParticle>::registerPersistent();
 
-  //Depending on the settings, use the Belle II or Belle boost
-  double ecm = -1.; //center of mass energy, >0 if boost is set
+  //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
+  m_initial.initialize();
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  m_cmsEnergy = nominal.getMass();
 
-  if (m_boostMode == 1) {
-    GearDir ler("/Detector/SuperKEKB/LER/");
-    GearDir her("/Detector/SuperKEKB/HER/");
-
-    m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
-                                  her.getDouble("angle") - ler.getDouble("angle"), her.getDouble("angle")));
-
-    //get CMS energy
-    ecm = getBeamEnergyCM(her.getDouble("energy"), ler.getDouble("energy"), her.getDouble("angle") - ler.getDouble("angle"));
-
-  } else {
-    if (m_boostMode == 2) {
-
-      //electron and positron beam energies (magic numbers from Jeremy)
-      double electronBeamEnergy = 7.998213; // [GeV]
-      double positronBeamEnergy = 3.499218; // [GeV]
-      double crossingAngle = 22.0; //[mrad]
-
-      double pzP = sqrt(positronBeamEnergy * positronBeamEnergy - 0.000510998918 * 0.000510998918);
-      double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
-      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP,
-                                 electronBeamEnergy + positronBeamEnergy);
-
-      m_generator.setBoost(boostVector.BoostVector());
-
-      //get CMS energy
-      ecm = getBeamEnergyCM(electronBeamEnergy, positronBeamEnergy, crossingAngle);
-    }
-  }
-
-  m_generator.enableBoost(m_boostMode > 0);
-
-  //overwrite user setting if boost is enabled!
-  if (m_boostMode) {
-    if (m_cmsEnergy > 0.) { //user has set a cms energy... should not be
-      B2WARNING("CM energy set manually, but boost mode enabled, resetting ECM to " << ecm);
-      m_generator.setCMSEnergy(ecm);
-    }
-  } else {
-    if (m_cmsEnergy < 0.) {
-      B2FATAL("CM energy not set: " << m_cmsEnergy);
-    }
-    m_generator.setCMSEnergy(m_cmsEnergy);
-  }
+  m_generator.setCMSEnergy(m_cmsEnergy);
 
   m_generator.setNSearchMax(m_nSearchMax);
   m_generator.setFinalState(m_finalState);
@@ -174,31 +129,19 @@ void PhokharaInputModule::initialize()
 //-----------------------------------------------------------------
 void PhokharaInputModule::event()
 {
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
   m_mcGraph.clear();
-  m_generator.generateEvent(m_mcGraph);
+  m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
-//   if (m_fileExtraInfo) {
-//     m_th1dSDif->Fill(m_generator.getSDif(), 1.);
-//   }
 }
 
-//-----------------------------------------------------------------
-//                 Beam energy
-//-----------------------------------------------------------------
-double PhokharaInputModule::getBeamEnergyCM(double E1,
-                                            double E2,
-                                            double crossing_angle)
-{
-
-  double m = Const::electronMass;
-  double ca = cos(crossing_angle);
-
-  double P1 = sqrt(E1 * E1 - m * m);
-  double P2 = sqrt(E2 * E2 - m * m);
-  Double_t Etotcm = sqrt(2.*m * m + 2.*(E1 * E2 + P1 * P2 * ca));
-  return Etotcm;
-}
 
 //-----------------------------------------------------------------
 //                 Terminate

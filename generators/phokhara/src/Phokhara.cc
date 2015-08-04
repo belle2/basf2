@@ -139,8 +139,6 @@ void Phokhara::setDefaultSettings()
 //   m_MaxInvMassHadrons = 0.5;
 //   m_MinEnergyGamma = 4.0;
 
-  m_cmsEnergy = 10.577 * Unit::GeV;
-  m_applyBoost = true;
   m_finalState = -1;
   m_nMaxTrials = -1;
   m_nSearchMax = -1;
@@ -189,7 +187,7 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-void Phokhara::generateEvent(MCParticleGraph& mcGraph)
+void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
 
   //Generate event
@@ -200,20 +198,20 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph)
   double eMom[4] = {momset_.bp1[1], momset_.bp1[2], momset_.bp1[3], momset_.bp1[0]};
   double pMom[4] = {momset_.bq1[1], momset_.bq1[2], momset_.bq1[3], momset_.bq1[0]};
 
-  storeParticle(mcGraph, eMom, 11, false, true);
-  storeParticle(mcGraph, pMom, -11, false, true);
+  storeParticle(mcGraph, eMom, 11, vertex, boost, false, true);
+  storeParticle(mcGraph, pMom, -11, vertex, boost, false, true);
 
   //Store the real photons into the MCParticleGraph
   for (int iPhot = 0; iPhot <  momset_.bnphot; ++iPhot) {
     double photMom[4] = {momset_.bphot[1][iPhot], momset_.bphot[2][iPhot], momset_.bphot[3][iPhot], momset_.bphot[0][iPhot]};
-    storeParticle(mcGraph, photMom, 22, false, false);
+    storeParticle(mcGraph, photMom, 22, vertex, boost, false, false);
   }
 
   //Store the other final state particles into the MCParticleGraph
   for (int iPart = 0; iPart <  momset_.bnhad; ++iPart) {
     double partMom[4] = {momset_.bp2[1][iPart], momset_.bp2[2][iPart], momset_.bp2[3][iPart], momset_.bp2[0][iPart]};
 
-    storeParticle(mcGraph, partMom, momset_.bp2[4][iPart], false, false);
+    storeParticle(mcGraph, partMom, momset_.bp2[4][iPart], vertex, boost, false, false);
   }
 
   //some PHOKHARA final states contain unstable particle
@@ -308,7 +306,8 @@ void Phokhara::applySettings()
 }
 
 
-void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, bool isVirtual, bool isInitial)
+void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+                             bool isVirtual, bool isInitial)
 {
 
   //   Create particle
@@ -339,9 +338,16 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
 
-  //Mirror Pz and if boosting is enable boost the particles to the lab frame - ALSO FOR PHOKHARA!??
+  //boost
   TLorentzVector p4 = part.get4Vector();
-//   p4.SetPz(-1.0 * p4.Pz());
-  if (m_applyBoost) p4 = m_boostVector * p4;
+  p4 = boost * p4;
   part.set4Vector(p4);
+
+  //set vertex
+  if (!isInitial) {
+    TVector3 v3 = part.getProductionVertex();
+    v3 = v3 + vertex;
+    part.setProductionVertex(v3);
+    part.setValidVertex(true);
+  }
 }

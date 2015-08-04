@@ -1,136 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Thomas Keck 2015
+
+import copy
+
 import numpy
+import pandas
+import scipy
+import scipy.stats
 import matplotlib
 import matplotlib.artist
 import matplotlib.figure
 import matplotlib.gridspec
 import matplotlib.colors
 import matplotlib.patches
-import pandas
-import scipy
-import scipy.stats
-import copy
+import matplotlib.ticker
 import seaborn
 
-
-def binom_error(n_sig, n_tot):
-    """
-    for an efficiency = nSig/nTrueSig or purity = nSig / (nSig + nBckgrd), this function calculates the
-    standard deviation according to http://arxiv.org/abs/physics/0701199 .
-    """
-    variance = numpy.where(n_tot > 0, (n_sig + 1) * (n_sig + 2) / ((n_tot + 2) * (n_tot + 3))
-                           - (n_sig + 1) ** 2 / ((n_tot + 2) ** 2), 0)
-    return numpy.sqrt(variance)
-
-
-def poisson_error(n_tot):
-    """
-    use poisson error, except for 0 we use an 68% CL upper limit
-    """
-    return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0/(1-0.6827)))
-
-
-class Histograms(object):
-    """
-    Extracts information from a pandas.DataFrame and stores it
-    in a binned format.
-    Therefore the size independent from the size of the pandas.DataFrame.
-    Used by the plotting routines below.
-    """
-
-    #: Histogram of the full data
-    hist = None
-    #: Binning
-    bins = None
-    #: Bin centers
-    bin_centers = None
-    #: Bin widths
-    bin_widths = None
-    #: Dictionary of histograms for the given masks
-    hists = None
-
-    def __init__(self, data, column, masks=dict(), weight_column=None):
-        """
-        Creates a common binning of the given column of the given pandas.Dataframe,
-        and stores for each given mask the histogram of the column
-        @param data pandas.DataFrame containing column and weight_column
-        @param column string identifiying the column in the pandas.DataFrame which is binned.
-        @param masks dictionary of names and boolean arrays, which select the data
-                     used for the creation of histograms with these names
-        @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
-        """
-        self.hist, self.bins = numpy.histogram(data[column], bins=100,
-                                               weights=None if weight_column is None else data[weight_column])
-        self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
-        # Subtract a small number from the bin width, otherwise the errorband plot is unstable.
-        self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
-        self.hists = dict()
-        for name, mask in masks.iteritems():
-            self.hists[name] = numpy.histogram(data.loc[mask, column], bins=self.bins,
-                                               weights=None if weight_column is None else data.loc[mask, weight_column])[0]
-
-    def get_hist(self, name=None):
-        """
-        Return histogram with the given name. If none returns histogram of the full data.
-        @param name name of the histogram
-        @return numpy.array with hist data, numpy.array with corresponding poisson errors
-        """
-        if name is None:
-            return self.hist, poisson_error(self.hist)
-        return self.get_summed_hist([name])
-
-    def get_summed_hist(self, names):
-        """
-        Return the sum of histograms with the given names.
-        @param names names of the histograms
-        @return numpy.array with hist data, numpy.array with corresponding poisson errors
-        """
-        default = numpy.zeros(len(self.bin_centers))
-        hist = numpy.sum(self.hists.get(v, default) for v in names)
-        hist_error = poisson_error(hist)
-        return hist, hist_error
-
-    def get_efficiency(self, signal_names):
-        """
-        Return the cumulative efficiency in each bin of the sum of the histograms with the given names.
-        @param names names of the histograms
-        @return numpy.array with hist data, numpy.array with corresponding binomial errors
-        """
-        signal, _ = self.get_summed_hist(signal_names)
-        cumsignal = (signal.sum() - signal.cumsum()).astype('float')
-
-        efficiency = cumsignal / signal.sum()
-        efficiency_error = binom_error(cumsignal, signal.sum())
-        return efficiency, efficiency_error
-
-    def get_purity(self, signal_names, bckgrd_names):
-        """
-        Return the cumulative purity in each bin of the sum of the histograms with the given names.
-        @param names names of the histograms
-        @return numpy.array with hist data, numpy.array with corresponding binomial errors
-        """
-        signal, _ = self.get_summed_hist(signal_names)
-        bckgrd, _ = self.get_summed_hist(bckgrd_names)
-        cumsignal = (signal.sum() - signal.cumsum()).astype('float')
-        cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
-
-        purity = cumsignal / (cumsignal + cumbckgrd)
-        purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
-        return purity, purity_error
-
-    def get_purity_per_bin(self, signal_names, bckgrd_names):
-        """
-        Return the purity in each bin of the sum of the histograms with the given names.
-        @param names names of the histograms
-        @return numpy.array with hist data, numpy.array with corresponding binomial errors
-        """
-        signal, _ = self.get_summed_hist(signal_names)
-        bckgrd, _ = self.get_summed_hist(bckgrd_names)
-        signal = signal.astype('float')
-        bckgrd = bckgrd.astype('float')
-
-        purity = signal / (signal + bckgrd)
-        purity_error = binom_error(signal, signal + bckgrd)
-        return purity, purity_error
+import b2stat
 
 
 class Plotter(object):
@@ -150,12 +37,6 @@ class Plotter(object):
     ymin = None
     #: Maximum y value
     ymax = None
-    #: Default keyword arguments for plot function
-    plot_kwargs = None
-    #: Default keyword arguments for errorbar function
-    errorbar_kwargs = None
-    #: Default keyword arguments for fill_between function
-    errorband_kwargs = None
     #: figure which is used to draw
     figure = None
     #: Main axis which is used to draw
@@ -169,7 +50,7 @@ class Plotter(object):
         """
         if figure is None:
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
-            self.figure.set_tight_layout(True)
+            self.figure.set_tight_layout(False)
         else:
             self.figure = figure
 
@@ -182,6 +63,13 @@ class Plotter(object):
         self.labels = []
         self.xmin, self.xmax = float(0), float(1)
         self.ymin, self.ymax = float(0), float(1)
+
+        #: Default keyword arguments for plot function
+        self.plot_kwargs = None
+        #: Default keyword arguments for errorbar function
+        self.errorbar_kwargs = None
+        #: Default keyword arguments for fill_between function
+        self.errorband_kwargs = None
 
         self.set_plot_options()
         self.set_errorbar_options()
@@ -214,7 +102,7 @@ class Plotter(object):
         Overrides default plot options for datapoint plot
         @param plot_kwargs keyword arguments for the plot function
         """
-        self.plot_kwargs = plot_kwargs
+        self.plot_kwargs = copy.copy(plot_kwargs)
         return self
 
     def set_errorbar_options(self, errorbar_kwargs={'fmt': '.', 'elinewidth': 3, 'alpha': 1}):
@@ -222,7 +110,7 @@ class Plotter(object):
         Overrides default errorbar options for datapoint errorbars
         @param errorbar_kwargs keyword arguments for the errorbar function
         """
-        self.errorbar_kwargs = errorbar_kwargs
+        self.errorbar_kwargs = copy.copy(errorbar_kwargs)
         return self
 
     def set_errorband_options(self, errorband_kwargs={'alpha': 0.5}):
@@ -230,7 +118,7 @@ class Plotter(object):
         Overrides default errorband options for datapoint errorband
         @param errorbar_kwargs keyword arguments for the fill_between function
         """
-        self.errorband_kwargs = errorband_kwargs
+        self.errorband_kwargs = copy.copy(errorband_kwargs)
         return self
 
     def _plot_datapoints(self, axis, x, y, xerr=None, yerr=None):
@@ -307,7 +195,7 @@ class PurityOverEfficiency(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        hists = Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+        hists = b2stat.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         purity, purity_error = hists.get_purity(['Signal'], ['Background'])
 
@@ -345,7 +233,7 @@ class RejectionOverEfficiency(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        hists = Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+        hists = b2stat.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
@@ -384,7 +272,7 @@ class Diagonal(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        hists = Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+        hists = b2stat.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
         purity, purity_error = hists.get_purity_per_bin(['Signal'], ['Background'])
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
@@ -414,13 +302,19 @@ class Distribution(Plotter):
     Plots distribution of a quantity
     """
 
-    def __init__(self, figure=None, axis=None):
+    def __init__(self, figure=None, axis=None, normed=False):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
+        @param normed true if histograms should be normed before drawing
         """
         super(Distribution, self).__init__(figure, axis)
+        #: Normalize histograms before drawing them
+        self.normed = normed
+        if self.normed:
+            self.ymin = float(0)
+            self.ymax = float('-inf')
         self.xmin = float('inf')
         self.xmax = float('-inf')
 
@@ -434,8 +328,13 @@ class Distribution(Plotter):
         """
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
-        hists = Histograms(data, column, {'Total': mask}, weight_column=weight_column)
+        hists = b2stat.Histograms(data, column, {'Total': mask}, weight_column=weight_column)
         hist, hist_error = hists.get_hist('Total')
+
+        if self.normed:
+            normalization = float(numpy.sum(hist))
+            hist = hist / normalization
+            hist_error = hist_error / normalization
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin, self.ymax = numpy.nanmin([hist.min(), self.ymin]), numpy.nanmax([(hist + hist_error).max(), self.ymax])
@@ -453,7 +352,10 @@ class Distribution(Plotter):
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Distribution Plot")
         self.axis.get_xaxis().set_label_text('Classifier Output')
-        self.axis.get_yaxis().set_label_text('# Entries')
+        if self.normed:
+            self.axis.get_yaxis().set_label_text('# Entries per Bin / # Entries')
+        else:
+            self.axis.get_yaxis().set_label_text('# Entries per Bin')
         self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
@@ -515,10 +417,11 @@ class Difference(Plotter):
         @param subtrahend_mask boolean numpy.array defining which events are for the subtrahend histogram
         @param weight_column column in data containing the weights for each event
         """
-        hists = Histograms(data, column, {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask}, weight_column=weight_column)
+        hists = b2stat.Histograms(data, column,
+                                  {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask}, weight_column=weight_column)
         minuend, minuend_error = hists.get_hist('Minuend')
         subtrahend, subtrahend_error = hists.get_hist('Subtrahend')
-        difference, difference_error = minuend - subtrahend, poisson_error(minuend + subtrahend)
+        difference, difference_error = minuend - subtrahend, b2stat.poisson_error(minuend + subtrahend)
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin = min((difference - difference_error).min(), self.ymin)
@@ -529,13 +432,15 @@ class Difference(Plotter):
         self.labels.append(column)
         return self
 
-    def finish(self):
+    def finish(self, line_color='black'):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
+        self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4)
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Difference Plot")
+        self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text('Classifier Output')
         self.axis.get_yaxis().set_label_text('Difference')
         self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
@@ -562,15 +467,15 @@ class Overtraining(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
-            self.figure = matplotlib.figure.Figure(figsize=(20, 20))
+            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
-        gs = matplotlib.gridspec.GridSpec(4, 1)
-        self.axis = self.figure.add_subplot(gs[:2, :])
-        self.axis_d1 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
-        self.axis_d2 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
+        gs = matplotlib.gridspec.GridSpec(5, 1)
+        self.axis = self.figure.add_subplot(gs[:3, :])
+        self.axis_d1 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
+        self.axis_d2 = self.figure.add_subplot(gs[4, :], sharex=self.axis)
 
         super(Overtraining, self).__init__(self.figure, self.axis)
 
@@ -586,7 +491,7 @@ class Overtraining(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        distribution = Distribution(self.figure, self.axis)
+        distribution = Distribution(self.figure, self.axis, normed=True)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
@@ -597,6 +502,7 @@ class Overtraining(Plotter):
         distribution.labels = ['Train-Signal', 'Train-Background', 'Test-Signal', 'Test-Background']
         distribution.finish()
 
+        self.plot_kwargs['color'] = distribution.plots[2][0].get_color()
         difference_signal = Difference(self.figure, self.axis_d1)
         difference_signal.set_plot_options(self.plot_kwargs)
         difference_signal.set_errorbar_options(self.errorbar_kwargs)
@@ -604,14 +510,19 @@ class Overtraining(Plotter):
         difference_signal.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column)
         self.axis_d1.set_xlim((difference_signal.xmin, difference_signal.xmax))
         self.axis_d1.set_ylim((difference_signal.ymin, difference_signal.ymax))
+        difference_signal.plots = difference_signal.labels = []
+        difference_signal.finish(line_color=distribution.plots[0][0].get_color())
 
+        self.plot_kwargs['color'] = distribution.plots[3][0].get_color()
         difference_bckgrd = Difference(self.figure, self.axis_d2)
         difference_bckgrd.set_plot_options(self.plot_kwargs)
         difference_bckgrd.set_errorbar_options(self.errorbar_kwargs)
         difference_bckgrd.set_errorband_options(self.errorband_kwargs)
-        difference_bckgrd.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column)
+        difference_bckgrd.add(data, column, train_mask & bckgrd_mask, test_mask & bckgrd_mask, weight_column)
         self.axis_d2.set_xlim((difference_bckgrd.xmin, difference_bckgrd.xmax))
         self.axis_d2.set_ylim((difference_bckgrd.ymin, difference_bckgrd.ymax))
+        difference_bckgrd.plots = difference_bckgrd.labels = []
+        difference_bckgrd.finish(line_color=distribution.plots[1][0].get_color())
 
         # Kolmogorov smirnov test
         ks = scipy.stats.ks_2samp(data.loc[train_mask & signal_mask, column], data.loc[test_mask & signal_mask, column])
@@ -630,6 +541,8 @@ class Overtraining(Plotter):
         matplotlib.artist.setp(self.axis.get_xaxis(), visible=False)
         matplotlib.artist.setp(self.axis_d1.get_xaxis(), visible=False)
         self.axis.set_title("Overtraining Plot")
+        self.axis_d1.set_title("")
+        self.axis_d2.set_title("")
         self.axis_d2.get_xaxis().set_label_text('Classifier Output')
         return self
 
@@ -642,13 +555,16 @@ class VerboseDistribution(Plotter):
     #: Axes for the boxplots
     box_axes = None
 
-    def __init__(self, figure=None, axis=None):
+    def __init__(self, figure=None, axis=None, normed=False):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
+        @param normed true if the histograms should be normed before drawing
         """
         super(VerboseDistribution, self).__init__(figure, axis)
+        #: Normalize histograms before drawing them
+        self.normed = normed
         self.box_axes = []
 
     def add(self, data, column, mask=None, weight_column=None):
@@ -660,7 +576,7 @@ class VerboseDistribution(Plotter):
         @param mask boolean numpy.array defining which events are used for the distribution histogram
         @param weight_column column in data containing the weights for each event
         """
-        distribution = Distribution(self.figure, self.axis)
+        distribution = Distribution(self.figure, self.axis, self.normed)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
@@ -708,7 +624,7 @@ class Correlation(Plotter):
         @param weight_column column in data containing the weights for each event
         """
         percentiles = numpy.percentile(data[cut_column], q=quantiles)
-        distribution = Distribution(self.figure, self.axis)
+        distribution = Distribution(self.figure, self.axis, normed=False)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
@@ -724,6 +640,33 @@ class Correlation(Plotter):
         distribution.plots = distribution.plots[:len(quantiles)]
         distribution.labels = [str(q) + '% Quantiles' for q in quantiles]
         distribution.finish()
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        return self
+
+
+class CorrelationMatrix(Plotter):
+    """
+    Plots correlation matrix
+    """
+    def add(self, data, columns):
+        """
+        Add a new correlation plot.
+        @param data pandas.DataFrame containing all data
+        @param columns which are used to calculate the correlations
+        """
+        import seaborn
+        corr = data[columns].corr()
+        # Generate a custom diverging colormap
+        cmap = seaborn.diverging_palette(220, 10, as_cmap=True)
+        # Draw the heatmap with the mask and correct aspect ratio
+        seaborn.heatmap(corr, cmap=cmap,
+                        square=True, xticklabels=range(1, len(columns)+1), yticklabels=range(1, len(columns)+1), annot=True,
+                        linewidths=.5, cbar_kws={"shrink": .5}, ax=self.axis)
         return self
 
     def finish(self):
@@ -809,3 +752,14 @@ if __name__ == '__main__':
     p.add(data, 'FastBDT', 'NeuroBayes', [0, 20, 40, 60, 80, 100], data['isSignal'] == 0)
     p.finish()
     p.save('correlation_plot.png')
+
+    """
+    p = CorrelationMatrix()
+    data['FastBDT2'] = data['FastBDT']**2
+    data['NeuroBayes2'] = data['NeuroBayes']**2
+    data['FastBDT3'] = data['FastBDT']**3
+    data['NeuroBayes3'] = data['NeuroBayes']**3
+    p.add(data, ['FastBDT', 'NeuroBayes', 'FastBDT2', 'NeuroBayes2', 'FastBDT3', 'NeuroBayes3'])
+    p.finish()
+    p.save('correlation_matrix.png')
+    """

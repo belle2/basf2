@@ -134,12 +134,6 @@ void KKGenInputModule::initialize()
   TLorentzVector v_ler = initial.getLER();
   TLorentzVector v_her = initial.getHER();
 
-  //KKMC handles lorentz vectors in any reference system, we have to provide CMS if the user requests it
-  if (initial.hasGenerationFlags(MCInitialParticles::c_generateCMS)) {
-    v_ler = initial.getLabToCMS() * v_ler;
-    v_her = initial.getLabToCMS() * v_her;
-  }
-
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
 

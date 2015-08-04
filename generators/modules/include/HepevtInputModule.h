@@ -14,9 +14,12 @@
 #include <framework/core/Module.h>
 
 #include <string>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
+
 #include <generators/hepevt/HepevtReader.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -59,6 +62,9 @@ namespace Belle2 {
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };
 

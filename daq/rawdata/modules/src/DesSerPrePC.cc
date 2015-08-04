@@ -35,10 +35,14 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
 {
   m_num_connections = 1;
 
-  //  m_hostname_from.push_back( "localhost");
-  m_hostname_from.push_back(host_recv);
-  //  m_port_from.push_back(33000);
-  m_port_from.push_back(port_recv) ;
+  for (int i = 0 ; i < m_num_connections; i++) {
+    //  m_hostname_from.push_back( "localhost");
+    m_hostname_from.push_back(host_recv);
+    //  m_port_from.push_back(33000);
+    m_port_from.push_back(port_recv) ;
+    m_socket_recv.push_back(-1);
+  }
+
 
   //  m_port_to = 34001;
   m_port_to = port_send;
@@ -120,14 +124,12 @@ void DesSerPrePC::initialize()
   }
   m_buffer = new int[ BUF_SIZE_WORD ];
 
-
   // initialize buffer
   for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
     memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
   }
 
   // Open message handler
-
   clearNumUsedBuf();
 
   // Shared memory
@@ -191,16 +193,54 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
   return n;
 }
 
+
+int DesSerPrePC::CheckConnection(int socket)
+{
+  // Modify Yamagata-san's eb/iseof.cc
+
+
+  int ret;
+  char buffer[1];
+  while (true) {
+
+    //
+    // Extract data in the socket buffer of a peer
+    //
+    //    ret = recv( socket, buffer, sizeof(buffer), MSG_PEEK|MSG_DONTWAIT );
+    ret = recv(socket, buffer, sizeof(buffer), MSG_DONTWAIT);
+    switch (ret) {
+      case 0: /* EOF */
+        printf("EOF %d\n", socket); fflush(stdout);
+        close(socket);
+        return -1;
+      case -1:
+        if (errno == EAGAIN) {
+          printf("EAGAIN %d\n", socket); fflush(stdout);
+          /* not EOF, no data in queue */
+          return 0;
+        } else {
+          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+          close(socket);
+          return -1;
+        }
+        break;
+      default:
+        printf("Reading data from socket %d\n", socket); fflush(stdout);
+    }
+  }
+
+}
+
 int DesSerPrePC::Connect()
 {
 
   for (int i = 0; i < m_num_connections; i++) {
+
+    if (m_socket_recv[ i ] >= 0) continue;   // Already have an established socket
+
     //
     // Connect to a downstream node
     //
-    struct sockaddr_in socPC;
-    socPC.sin_family = AF_INET;
-
     struct hostent* host;
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
@@ -211,12 +251,15 @@ int DesSerPrePC::Connect()
       sleep(1234567);
       exit(1);
     }
+
+    struct sockaddr_in socPC;
+    socPC.sin_family = AF_INET;
     socPC.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
     socPC.sin_port = htons(m_port_from[ i ]);
     int sd = socket(PF_INET, SOCK_STREAM, 0);
-
     int val1 = 0;
     setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &val1, sizeof(val1));
+
 
     B2INFO("[DEBUG] Connecting to " << m_hostname_from[ i ].c_str() << " port " << m_port_from[ i ]);
     while (1) {
@@ -228,7 +271,8 @@ int DesSerPrePC::Connect()
         break;
       }
     }
-    m_socket_recv.push_back(sd);
+    //    m_socket_recv.push_back(sd);
+    m_socket_recv[ i ] = sd;
 
     // check socket paramters
     int val, len;
@@ -1344,6 +1388,8 @@ void DesSerPrePC::restartRun()
   fflush(stdout);
   printf("\033[0m");
 #endif
+  g_run_error = 0;
+  g_run_stop = 0;
   g_run_restarting = 0;
 
   return;
@@ -1363,6 +1409,10 @@ void DesSerPrePC::pauseRun()
 
 void DesSerPrePC::waitRestart()
 {
+
+  for (int i = 0; i < m_num_connections; i++) {
+    if (CheckConnection(m_socket_recv[ i ]) < 0)  m_socket_recv[ i ] = -1;
+  }
   while (true) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
@@ -1377,6 +1427,10 @@ void DesSerPrePC::waitRestart()
     }
     sleep(1);
   }
+
+  Connect();
+  if (!CheckConnection(m_socket_send) < 0) Accept();
+
   return;
 }
 

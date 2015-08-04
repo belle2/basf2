@@ -251,6 +251,9 @@ namespace Belle2 {
     //! Accept connection
     int Connect();
 
+    //! Read data/check a connection
+    int CheckConnection(int socket);
+
     //! receive data
     int recvFD(int fd, char* buf, int data_size_byte, int flag);
 

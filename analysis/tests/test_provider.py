@@ -1120,15 +1120,6 @@ class MockTFileAndTH1D(object):
         return 65
 
 
-# If you're afraid of black magic, ignore the following lines
-class InjectMockTFileAndTH1D(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'ROOT':
-            return ast.copy_location(ast.Name(id='MockTFileAndTH1D', ctx=node.ctx), node)
-        return node
-
-
 class TestCountMCParticles(unittest.TestCase):
 
     def setUp(self):
@@ -1145,261 +1136,38 @@ class TestCountMCParticles(unittest.TestCase):
         self.assertEqual(self.resource, result)
 
     def test_CountMCParticlesWithFile(self):
-        # I call upon the mighty god of Python!
-        exec compile(InjectMockTFileAndTH1D().visit(ast.parse(inspect.getsource(CountMCParticles))), '<string>', 'exec')
         with temporary_file('mcParticlesCount.root'):
             # Returns counts if file already exists
-            self.assertDictEqual(CountMCParticles(self.resource, ['e+', 'mu+']), {'11': 42, '13': 23, 'NEvents': 65})
+            self.assertEqual(CountMCParticles(self.resource, ['e+', 'mu+']), "mcParticlesCount.root")
             # Enables caching
             result = MockResource(cache=True)
             self.assertEqual(self.resource, result)
 
 
-args_list = []
-result_list = []
-
-
-def MockAutomaticReporting(*args):
-    global args_list
-    global result_list
-    x = args_list.pop()
-    assert all(a == b for a, b in zip(args, x)), str(list(zip(args, x)))
-    return result_list.pop()
-
-
-class TestWriteAnalysisFileForChannel(unittest.TestCase):
+class TestCountParticleLists(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        global args_list
-        args_list = []
-        global result_list
-        result_list = []
 
-    def test_WriteAnalysisFileForChannel(self):
-        global args_list
-        global result_list
-        from fei import automaticReporting
-        automaticReporting.createPreCutTexFile = MockAutomaticReporting
-        automaticReporting.createMVATexFile = MockAutomaticReporting
-        automaticReporting.createTexFile = MockAutomaticReporting
-
-        placeholders = {'particleName': 'D0', 'particleLabel': 'generic', 'channelName': 'D0 -> K+ pi-',
-                        'isIgnored': False, 'mvaConfigObject': 'mvaConfig',
-                        'texFile': 'D0_D0 -> K+ pi-_42.tex',
-                        'mvaSPlotTexFile': 'empty.tex',
-                        'mvaTexFile': 'empty.tex'}
-        args_list.append([placeholders['texFile'], 'analysis/scripts/fei/templates/ChannelTemplate.tex', placeholders])
-        args_list.append([placeholders, 'mvaConfig', 'tmvaTraining', 'postCutConfig', 'postCut'])
-        args_list.append([placeholders, 'mvaConfig', 'splotTraining', 'postCutConfig', 'postCut'])
-        args_list.append([placeholders, 'preCutHistogram', 'preCutConfig', 'preCut'])
-        result_list.append(placeholders)
-        result_list.append(placeholders)
-        result_list.append(placeholders)
-        result_list.append(placeholders)
-        # Returns dictionary with placeholders
-        self.assertDictEqual(WriteAnalysisFileForChannel(self.resource, 'D0', 'generic', 'D0 -> K+ pi-',
-                                                         'preCutConfig', 'preCut', 'preCutHistogram', 'userCutConfig', 'mvaConfig',
-                                                         'tmvaTraining', 'splotTraining', 'postCutConfig', 'postCut'), placeholders)
-        self.assertEqual(len(args_list), 0)
-        # Enables caching
-        result = MockResource(cache=True)
+    def test_CountParticleLists(self):
+        # Returns None if file does not exists
+        self.assertEqual(CountParticleLists(self.resource, ['isSignal', 'isSignal2'], ['e+:1', 'mu+:2']), None)
+        # Enables caching, halt and condition
+        result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
+        # Add VariablestoNtuple module for statistics
+        result.path.add_module('VariablesToNtuple', fileName='listCounts.root', treeName='listcounts',
+                               variables=['countInList(e+:1)', 'countInList(mu+:2)', 'countInList(e+:1, isSignal == 1)',
+                                          'countInList(mu+:2, isSignal2 == 1)', 'countInList(e+:1, isSignal == 0)',
+                                          'countInList(mu+:2, isSignal2 == 0)'])
         self.assertEqual(self.resource, result)
 
-
-class TestWriteAnalysisFileForFSParticle(unittest.TestCase):
-
-    def setUp(self):
-        self.resource = MockResource()
-        global args_list
-        args_list = []
-        global result_list
-        result_list = []
-
-    def test_WriteAnalysisFileForFSParticle(self):
-        global args_list
-        global result_list
-        from fei import automaticReporting
-        automaticReporting.createMVATexFile = MockAutomaticReporting
-        automaticReporting.createFSParticleTexFile = MockAutomaticReporting
-
-        placeholders = {'particleName': 'D0', 'particleLabel': 'generic', 'isIgnored': False}
-        args_list.append([placeholders, 'nTuple', 'mccounts', 'distribution', 'mvaConfig'])
-        args_list.append([placeholders, 'mvaConfig', 'tmvaTraining', 'postCutConfig', 'postCut'])
-        result_list.append(placeholders)
-        result_list.append(placeholders)
-        # Returns dictionary with placeholders
-        self.assertDictEqual(WriteAnalysisFileForFSParticle(self.resource, 'D0', 'generic', 'mvaConfig',
-                                                            'tmvaTraining', 'postCutConfig', 'postCut', 'userCutConfig',
-                                                            'distribution', 'nTuple', 'mccounts'), placeholders)
-        self.assertEqual(len(args_list), 0)
-        # Enables caching
-        result = MockResource(cache=True)
-        self.assertEqual(self.resource, result)
-
-
-class TestWriteAnalysisFileForCombinedParticle(unittest.TestCase):
-
-    def setUp(self):
-        self.resource = MockResource()
-        global args_list
-        args_list = []
-        global result_list
-        result_list = []
-
-    def test_WriteAnalysisFileForCombinedParticle(self):
-        global args_list
-        global result_list
-        from fei import automaticReporting
-        automaticReporting.createCombinedParticleTexFile = MockAutomaticReporting
-
-        channelPlaceholders = [{'mvaConfigObject': 'mvaConfig'}]
-        placeholders = {'channels': channelPlaceholders, 'particleName': 'D0', 'particleLabel': 'generic', 'isIgnored': False}
-        args_list.append([placeholders, channelPlaceholders, 'nTuple', 'mccounts', 'mvaConfig'])
-        result_list.append(placeholders)
-        # Returns dictionary with placeholders
-        self.assertDictEqual(WriteAnalysisFileForCombinedParticle(self.resource, 'D0', 'generic', channelPlaceholders,
-                                                                  'nTuple', 'mccounts'), placeholders)
-        self.assertEqual(len(args_list), 0)
-        # Enables caching
-        result = MockResource(cache=True)
-        self.assertEqual(self.resource, result)
-
-
-class TestWriteCPUTimeSummary(unittest.TestCase):
-
-    def setUp(self):
-        self.resource = MockResource()
-        global args_list
-        args_list = []
-        global result_list
-        result_list = []
-
-    def test_WriteCPUTimeSummary(self):
-        global args_list
-        global result_list
-        from fei import automaticReporting
-        automaticReporting.getModuleStatsFromFile = MockAutomaticReporting
-        automaticReporting.createCPUTimeTexFile = MockAutomaticReporting
-
-        placeholders = 'Placeholders'
-        args_list.append(['ChannelNames', 'InputLists', 'channelPlaceholders', 'mccounts', 'moduleStatisticsFile', 'stats'])
-        args_list.append(['moduleStatisticsFile'])
-        result_list.append(placeholders)
-        result_list.append('stats')
-        # Returns dictionary with placeholders
-        self.assertEqual(WriteCPUTimeSummary(self.resource, 'ChannelNames', 'InputLists', 'channelPlaceholders',
-                                             'mccounts', 'moduleStatisticsFile'), placeholders)
-        self.assertEqual(len(args_list), 0)
-        # Enables caching
-        result = MockResource()
-        self.assertEqual(self.resource, result)
-
-
-subprocess_call = 0
-
-
-def MockSummarySubprocessCall(command, shell=False):
-    global subprocess_call
-    if subprocess_call == 0:
-        assert command == 'cp ' + ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/nordbert.pdf') + ' .'
-        assert shell
-    elif subprocess_call == 1:
-        assert command == 'cp ' + ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/empty.tex') + ' .'
-        assert shell
-    elif subprocess_call > 1:
-        assert command == ['pdflatex', '-halt-on-error', '-interaction=nonstopmode', 'myTexFile.tex']
-        assert shell is False
-    subprocess_call += 1
-    return 0
-
-
-class MockSummaryTFile(object):
-
-    def __init__(self, ntuple):
-        assert ntuple == "semileptonic.root" or ntuple == "hadronic.root"
-
-    def Get(self, branch):
-        assert branch == "variables"
-        return self
-
-    def GetEntries(self, selection):
-        assert selection == "isSignal && extraInfouniqueSignal" or\
-            selection == "isSignalAcceptMissingNeutrino && extraInfouniqueSignal"
-        return 42
-
-
-# If you're afraid of black magic, ignore the following lines
-class InjectMockSummary(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'subprocess':
-            return ast.copy_location(ast.Name(id='MockSummarySubprocessCall', ctx=node.ctx), node)
-        if hasattr(
-                node,
-                'value') and hasattr(
-                node.value,
-                'id') and node.value.id == 'ROOT' and not hasattr(
-                self,
-                'stop_fixing_ROOT'):
-            self.stop_fixing_ROOT = True
-            return ast.copy_location(ast.Name(id='MockSummaryTFile', ctx=node.ctx), node)
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'automaticReporting':
-            return ast.copy_location(ast.Name(id='MockAutomaticReporting', ctx=node.ctx), node)
-        return node
-
-
-class TestWriteAnalysisFileSummary(unittest.TestCase):
-
-    def setUp(self):
-        self.resource = MockResource()
-        global args_list
-        args_list = []
-        global result_list
-        result_list = []
-        if os.path.isfile("sent_mail"):
-            os.remove("sent_mail")
-
-    def test_WriteAnalysisFileSummary(self):
-        global args_list
-        global result_list
-        exec compile(InjectMockSummary().visit(ast.parse(inspect.getsource(WriteAnalysisFileSummary))), '<string>', 'exec')
-        placeholders = {'texFile': "myTexFile.tex"}
-        finalStateParticlePlaceholders = 'finalStateParticlePlaceholders'
-        combinedParticlePlaceholders = [{'particleName': 'B+:semileptonic'}, {'particleName': 'B0:hadronic'}]
-
-        finalParticleNTuples = ['semileptonic.root', None, 'hadronic.root']
-        finalParticleTargets = ['isSignalAcceptMissingNeutrino', 'isSignal', 'isSignal']
-
-        filled_finalParticlePlaceholders = [{'particleName': 'B+:semileptonic'}, {'particleName': 'B+:semileptonic'},
-                                            {'particleName': 'B0:hadronic'}, {'particleName': 'B0:hadronic'}]
-        args_list.append([finalStateParticlePlaceholders, combinedParticlePlaceholders, filled_finalParticlePlaceholders,
-                          'cpuTimeSummaryPlaceholders', 'mcCounts', 'particles'])
-        args_list.append(['hadronic.root', 'ROC', 'mcCounts', 'isSignal'])
-        args_list.append(['hadronic.root', 'Mbc', 'mcCounts', 'isSignal'])
-        args_list.append(['semileptonic.root', 'ROC', 'mcCounts', 'isSignalAcceptMissingNeutrino'])
-        args_list.append(['semileptonic.root', 'CosBDL', 'mcCounts', 'isSignalAcceptMissingNeutrino'])
-        result_list.append(placeholders)
-        result_list.append({'particleName': 'B0:hadronic'})
-        result_list.append({'particleName': 'B0:hadronic'})
-        result_list.append({'particleName': 'B+:semileptonic'})
-        result_list.append({'particleName': 'B+:semileptonic'})
-        # Returns always None
-        self.assertEqual(WriteAnalysisFileSummary(self.resource, finalStateParticlePlaceholders,
-                                                  combinedParticlePlaceholders,
-                                                  finalParticleNTuples, finalParticleTargets,
-                                                  'cpuTimeSummaryPlaceholders',
-                                                  'mcCounts',
-                                                  'particles'), None)
-        self.assertEqual(len(args_list), 0)
-        self.assertEqual(combinedParticlePlaceholders[0]['particleNUniqueSignalAfterPostCut'], 42)
-        self.assertEqual(combinedParticlePlaceholders[1]['particleNUniqueSignalAfterPostCut'], 42)
-        # Enables caching
-        result = MockResource(cache=True)
-        self.assertEqual(self.resource, result)
-        # Check if sent mail lock is created and remove it afterwards
-        self.assertTrue(os.path.isfile("sent_mail"))
-        os.remove("sent_mail")
+    def test_CountParticlesListsWithFile(self):
+        with temporary_file('listCounts.root'):
+            # Returns counts if file already exists
+            self.assertEqual(CountParticleLists(self.resource, ['isSignal', 'isSignal2'], ['e+', 'mu+']), "listCounts.root")
+            # Enables caching
+            result = MockResource(cache=True)
+            self.assertEqual(self.resource, result)
 
 
 if __name__ == '__main__':

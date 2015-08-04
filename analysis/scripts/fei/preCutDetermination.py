@@ -31,9 +31,12 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         maximum = hist.GetMaximumBin()
         if hist.GetBinContent(maximum) < cut:
             return [0, -1]
+        minimum = hist.GetMinimumBin()
+        axis = hist.GetXaxis()
+        if hist.GetBinContent(minimum) > cut:
+            return [axis.GetBinLowEdge(1), axis.GetBinUpEdge(hist.GetNbinsX())]
         low = [bin for bin in xrange(1, maximum + 1) if hist.GetBinContent(bin) < cut]
         high = [bin for bin in xrange(maximum, hist.GetNbinsX() + 1) if hist.GetBinContent(bin) < cut]
-        axis = hist.GetXaxis()
         return [axis.GetBinLowEdge(max(low) + 1 if low else 1), axis.GetBinUpEdge(min(high) - 1 if high else hist.GetNbinsX())]
 
     print "Total number of signals", sum([value.GetEntries() for value in signal.values()])
@@ -135,9 +138,11 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
         return s / float(s + b)
 
     rootEfficiencyFunc = ROOT.TF1('EfficiencyFunction', pythonEfficiencyFunc, 0, 1, 0)
-    ycut = rootEfficiencyFunc.GetX(efficiency, 0.0, 1.0)
+    ycut = -1
+    if efficiency is not None:
+        ycut = rootEfficiencyFunc.GetX(efficiency, 0.0, 1.0)
 
-    if pythonPurityFunc([ycut]) < purity:
+    if purity is not None and pythonPurityFunc([ycut]) < purity:
         rootPurityFunc = ROOT.TF1('PurityFunction', pythonPurityFunc, 0, 1, 0)
         ycut = rootPurityFunc.GetX(purity, 0.0, 1.0)
 

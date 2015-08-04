@@ -22,6 +22,8 @@ import pdg
 from fei import dagFramework
 # The different tasks themselves are defined in the provider module
 from fei import provider
+# automatic Reporting
+from fei import automaticReporting
 
 # Standard python modules
 import collections
@@ -63,13 +65,16 @@ MVAConfiguration.__new__.__defaults__ = ('FastBDT', 'Plugin',
                                          '', 'isSignal', None)
 # Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
 PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity')
-PreCutConfiguration.__new__.__defaults__ = ('M', (1000, 0, 6), 1, 0)
+PreCutConfiguration.__new__.__defaults__ = ('M', (1000, 0, 6), None, None)
 # Create new class called UserCutConfiguration via namedtuple. namedtuples are like a struct in C
-UserCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut')
+UserCutConfiguration = collections.namedtuple('UserCutConfiguration', 'userCut, vertexCut')
 UserCutConfiguration.__new__.__defaults__ = ('', -2)
 # Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
 PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
 PostCutConfiguration.__new__.__defaults__ = (0.0,)
+# Create new class called PlotConfiguration via namedtuple. namedtuples are like a struct in C
+PlotConfiguration = collections.namedtuple('PlotConfiguration', 'Diagonal, ROC, M, Mbc, CosBDl, Correlation')
+PlotConfiguration.__new__.__defaults__ = (True, True, False, False, False, True)
 # Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
 DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, userCutConfig, decayModeID')
 
@@ -81,8 +86,8 @@ class Particle(object):
     and provides MVAConfiguration, PreCutConfiguration and PostCutConfiguration. These can be overwritten per channel.
     """
 
-    def __init__(self, identifier, mvaConfig, preCutConfig=None, userCutConfig=UserCutConfiguration(),
-                 postCutConfig=PostCutConfiguration()):
+    def __init__(self, identifier, mvaConfig, preCutConfig=PreCutConfiguration(), userCutConfig=UserCutConfiguration(),
+                 postCutConfig=PostCutConfiguration(), plotConfig=PlotConfiguration()):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param identifier is the pdg name of the particle as a string
@@ -109,6 +114,8 @@ class Particle(object):
         self.userCutConfig = userCutConfig
         #: post cut configuration (see PostCutConfiguration)
         self.postCutConfig = postCutConfig
+        #: plot configuration (see PlotConfiguration)
+        self.plotConfig = plotConfig
 
     @property
     def charge_conjugated_identifier(self):
@@ -198,6 +205,7 @@ def fullEventInterpretation(selection_path, particles):
         dag.add('UserCutConfig_' + particle.identifier, particle.userCutConfig)
         dag.add('UserCut_' + particle.identifier, particle.userCutConfig.userCut)
         dag.add('PostCutConfig_' + particle.identifier, particle.postCutConfig)
+        dag.add('PlotConfig_' + particle.identifier, particle.plotConfig)
 
         for channel in particle.channels:
             dag.add('Name_' + channel.name, channel.name)
@@ -207,7 +215,6 @@ def fullEventInterpretation(selection_path, particles):
             dag.add('UserCut_' + channel.name, channel.userCutConfig.userCut)
             dag.add('VertexCut_' + channel.name, channel.userCutConfig.vertexCut)
             dag.add('DecayModeID_' + channel.name, channel.decayModeID)
-        dag.add('MVAConfigTarget_' + particle.identifier, particle.mvaConfig.target)
 
     # Add Modules which are always needed
     dag.add('gearbox', provider.LoadGearbox)
@@ -289,35 +296,27 @@ def fullEventInterpretation(selection_path, particles):
         # Determine PreCut for non FSPs
         if not particle.isFSP:
             for channel in particle.channels:
-                if particle.preCutConfig is None:
-                    dag.add('PreCut_' + channel.name, {'cutstring': '', 'nSignal': 0, 'nBackground': 0})
-                    dag.add('PreCutHistogram_' + channel.name, None)
-                else:
-                    additionalDependencies = []
-                    if 'SignalProbability' in particle.preCutConfig.variable:
-                        additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
-                    dag.add('PreCutHistogram_' + channel.name, provider.CreatePreCutHistogram,
-                            particleName='Name_' + particle.identifier,
-                            channelName='Name_' + channel.name,
-                            mvaTarget='MVATarget_' + channel.name,
-                            preCutConfig='PreCutConfig_' + particle.identifier,
-                            userCut='UserCut_' + channel.name,
-                            daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
-                            additionalDependencies=additionalDependencies)
 
-                    dag.add('PreCut_' + channel.name, provider.PreCutDeterminationPerChannel,
-                            channelName='Name_' + channel.name,
-                            preCut='PreCut_' + particle.identifier)
-
-            if particle.preCutConfig is None:
-                pass
-                # TODO collect precuts of channels
-                # dag.add('PreCut_' + particle.identifier, {'cutstring': '', 'nSignal': 0, 'nBackground': 0})
-            else:
-                dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
-                        channelNames=['Name_' + channel.name for channel in particle.channels],
+                additionalDependencies = []
+                if particle.preCutConfig is not None and 'SignalProbability' in particle.preCutConfig.variable:
+                    additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
+                dag.add('PreCutHistogram_' + channel.name, provider.CreatePreCutHistogram,
+                        particleName='Name_' + particle.identifier,
+                        channelName='Name_' + channel.name,
+                        mvaTarget='MVATarget_' + channel.name,
                         preCutConfig='PreCutConfig_' + particle.identifier,
-                        preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
+                        userCut='UserCut_' + channel.name,
+                        daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
+                        additionalDependencies=additionalDependencies)
+
+                dag.add('PreCut_' + channel.name, provider.PreCutDeterminationPerChannel,
+                        channelName='Name_' + channel.name,
+                        preCut='PreCut_' + particle.identifier)
+
+            dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
+                    channelNames=['Name_' + channel.name for channel in particle.channels],
+                    preCutConfig='PreCutConfig_' + particle.identifier,
+                    preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
 
     # Trains multivariate classifiers (MVC) methods and provides signal probabilities
     for particle in particles:
@@ -428,6 +427,13 @@ def fullEventInterpretation(selection_path, particles):
             'gearbox',
             names=['Name_' + particle.identifier for particle in particles])
 
+    dag.add('listCounts', provider.CountParticleLists,
+            targets=['MVATarget_' + particle.identifier for particle in particles if particle.isFSP] +
+                    ['MVATarget_' + channel.name for particle in particles if not particle.isFSP for channel in particle.channels],
+            lists=['MatchedParticleList_' + particle.identifier for particle in particles if particle.isFSP] +
+                  ['MatchedParticleList_' + channel.name for particle in particles if not particle.isFSP
+                   for channel in particle.channels])
+
     dag.add('ModuleStatisticsFile', provider.SaveModuleStatistics,
             ['SignalProbability_' + finalParticle.identifier for finalParticle in finalParticles])
 
@@ -448,66 +454,56 @@ def fullEventInterpretation(selection_path, particles):
                 particleList='ParticleList_' + particle.identifier,
                 signalProbability='SignalProbability_' + particle.identifier,
                 extraVars=extraVars,
-                target='MVAConfigTarget_' + particle.identifier)
+                target='MVATarget_' + particle.identifier)
+        dag.addNeeded('VariablesToNTuple_' + particle.identifier)
 
     # Create the automatic reporting summary pdf
     if args.summary:
         for particle in particles:
-            for channel in particle.channels:
-                dag.add('Placeholders_' + channel.name, provider.WriteAnalysisFileForChannel,
-                        particleName='Name_' + particle.identifier,
-                        particleLabel='Label_' + particle.identifier,
-                        channelName='Name_' + channel.name,
-                        preCutConfig='PreCutConfig_' + particle.identifier,
-                        preCut='PreCut_' + channel.name,
-                        preCutHistogram='PreCutHistogram_' + channel.name,
-                        userCutConfig='UserCutConfig_' + channel.name,
-                        mvaConfig='MVAConfig_' + channel.name,
-                        tmvaTraining='TrainedMVC_' + channel.name,
-                        splotTraining='SPlotTrainedMVC_' + channel.name,
-                        postCutConfig='PostCutConfig_' + particle.identifier,
-                        postCut='PostCut_' + particle.identifier)
-
             if particle.isFSP:
-                dag.add('Placeholders_' + particle.identifier, provider.WriteAnalysisFileForFSParticle,
+                dag.add('Placeholders_' + particle.identifier, automaticReporting.createFSPReport,
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
+                        matchedList='MatchedParticleList_' + particle.identifier,
                         mvaConfig='MVAConfig_' + particle.identifier,
-                        tmvaTraining='TrainedMVC_' + particle.identifier,
+                        userCutConfig='UserCutConfig_' + particle.identifier,
                         postCutConfig='PostCutConfig_' + particle.identifier,
                         postCut='PostCut_' + particle.identifier,
-                        userCutConfig='UserCutConfig_' + particle.identifier,
-                        distribution='Distribution_' + particle.identifier,
-                        nTuple='VariablesToNTuple_' + particle.identifier)
+                        plotConfig='PlotConfig_' + particle.identifier,
+                        tmvaTraining='TrainedMVC_' + particle.identifier,
+                        nTuple='VariablesToNTuple_' + particle.identifier,
+                        listCounts='listCounts',
+                        mcCounts='mcCounts')
             else:
-                dag.add('Placeholders_' + particle.identifier, provider.WriteAnalysisFileForCombinedParticle,
+                dag.add('Placeholders_' + particle.identifier, automaticReporting.createParticleReport,
                         particleName='Name_' + particle.identifier,
                         particleLabel='Label_' + particle.identifier,
-                        channelPlaceholders=['Placeholders_' + channel.name for channel in particle.channels],
-                        nTuple='VariablesToNTuple_' + particle.identifier)
+                        channelNames=['Name_' + channel.name for channel in particle.channels],
+                        matchedLists=['MatchedParticleList_' + channel.name for channel in particle.channels],
+                        mvaConfig='MVAConfig_' + particle.identifier,
+                        mvaConfigs=['MVAConfig_' + channel.name for channel in particle.channels],
+                        userCutConfig='UserCutConfig_' + particle.identifier,
+                        userConfigs=['UserCutConfig_' + channel.name for channel in particle.channels],
+                        preCutConfig='PreCutConfig_' + particle.identifier,
+                        preCut=['PreCut_' + channel.name for channel in particle.channels],
+                        preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels],
+                        postCutConfig='PostCutConfig_' + particle.identifier,
+                        postCut='PostCut_' + particle.identifier,
+                        plotConfig='PlotConfig_' + particle.identifier,
+                        tmvaTrainings=['TrainedMVC_' + channel.name for channel in particle.channels],
+                        splotTrainings=['SPlotTrainedMVC_' + channel.name for channel in particle.channels],
+                        signalProbabilities=['SignalProbability_' + channel.name for channel in particle.channels],
+                        nTuple='VariablesToNTuple_' + particle.identifier,
+                        listCounts='listCounts',
+                        mcCounts='mcCounts')
 
-        # get channelName and corresponding inputList and placeholders (in separate lists, sadly)
-        channelNames = ['Name_' + p.identifier for p in particles if p.isFSP]
-        channelNames += ['Name_' + channel.name for p in particles for channel in p.channels]
-        inputLists = ['RawParticleList_' + p.identifier for p in particles if p.isFSP]
-        inputLists += ['RawParticleList_' + channel.name for p in particles for channel in p.channels]
-        channelPlaceholders = ['Placeholders_' + p.identifier for p in particles if p.isFSP]
-        channelPlaceholders += ['Placeholders_' + channel.name for p in particles for channel in p.channels]
-        dag.add('CPUTimeSummary', provider.WriteCPUTimeSummary,
-                channelNames=channelNames,
-                inputLists=inputLists,
-                channelPlaceholders=channelPlaceholders,
+        dag.add('FEISummary.pdf', automaticReporting.createSummary,
+                finalStateSummaries=['Placeholders_' + p.identifier for p in particles if p.isFSP],
+                combinedSummaries=['Placeholders_' + p.identifier for p in particles if not p.isFSP],
+                particles=['Object_' + particle.identifier for particle in particles],
                 mcCounts='mcCounts',
+                listCounts='listCounts',
                 moduleStatisticsFile='ModuleStatisticsFile')
-
-        dag.add('FEISummary.pdf', provider.WriteAnalysisFileSummary,
-                finalStateParticlePlaceholders=['Placeholders_' + p.identifier for p in particles if p.isFSP],
-                combinedParticlePlaceholders=['Placeholders_' + p.identifier for p in particles if not p.isFSP],
-                finalParticleNTuples=['VariablesToNTuple_' + finalParticle.identifier for finalParticle in finalParticles],
-                finalParticleTargets=['MVAConfigTarget_' + finalParticle.identifier for finalParticle in finalParticles],
-                cpuTimeSummaryPlaceholders='CPUTimeSummary',
-                mcCounts='mcCounts',
-                particles=['Object_' + particle.identifier for particle in particles])
         dag.addNeeded('FEISummary.pdf')
 
     # Finally we add the final particles (normally B+ B0) as needed to the dag
@@ -515,6 +511,9 @@ def fullEventInterpretation(selection_path, particles):
         dag.addNeeded('SignalProbability_' + finalParticle.identifier)
         dag.addNeeded('ParticleList_' + finalParticle.identifier)
         dag.addNeeded('HumanReadableParticleList_' + finalParticle.identifier)
+    dag.addNeeded('listCounts')
+    dag.addNeeded('mcCounts')
+    dag.addNeeded('ModuleStatisticsFile')
 
     fei_path = create_path()
 
@@ -522,6 +521,8 @@ def fullEventInterpretation(selection_path, particles):
     if args.cache is not None:
         dag.load_cached_resources(args.cache)
     finished_training = dag.run(fei_path)
+    # TODO finished_training is maybe not trough at this point?
+    finished_training = False
     if args.cache is not None:
         dag.save_cached_resources(args.cache)
 

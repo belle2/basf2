@@ -133,7 +133,7 @@ class Resource(object):
         hash = create_hash([arguments[r] for r in self.requires])
         if self.value is not None and self.hash == hash and not self.halt and not self.env.get('rerunCachedProviders', False):
             if self.env.get('verbose', False):
-                basf2.B2INFO(self.identifier + " provided from cached value")
+                basf2.B2INFO(self.identifier + " provided from cached value " + repr(self.value))
             return self.value
         # Reset hash
         self.hash = hash
@@ -213,6 +213,8 @@ class DAG(object):
                 cache = cPickle.load(f)
                 for resource in cache:
                     resource.env = self.env
+                    # if 'TagUniqueSignal' in resource.identifier:
+                    #    continue
                     self.resources[resource.identifier] = resource
 
     def save_cached_resources(self, cacheFile):

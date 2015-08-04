@@ -12,8 +12,13 @@ import modularAnalysis
 import pdg
 
 from fei import preCutDetermination
-from fei import automaticReporting
-from fei.automaticReporting import removeJPsiSlash
+
+
+# Temporary hack until automaticReporting is finished with refactoring
+# use createUniqueFilename instead afterwards.
+def removeJPsiSlash(string):
+    return string
+
 
 import re
 import os
@@ -100,6 +105,9 @@ def MatchParticleList(resource, particleList):
         return
     resource.condition = ('EventType', '==0')
     modularAnalysis.matchMCTruth(particleList, path=resource.path)
+    # If the MatchedParticleList is different from the RawParticleList the CPU Statistics will work not correctly,
+    # because the name of the MatchedParticleList is used to identify all modules which process this channel.
+    # You have to fix this issue before changing the returned value in this function.
     return particleList
 
 
@@ -196,8 +204,8 @@ def FitVertex(resource, channelName, particleList, vertexCut):
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
     pvfit.param('confidenceLevel', vertexCut)
-    # pvfit.param('vertexFitter', 'kfitter')
-    pvfit.param('vertexFitter', 'rave')
+    pvfit.param('vertexFitter', 'kfitter')
+    # pvfit.param('vertexFitter', 'rave')
     pvfit.param('fitType', 'vertex')
     pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
     resource.path.add_module(pvfit)
@@ -656,6 +664,7 @@ def CountMCParticles(resource, names):
 
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
+        output.set_name("VariablesToNtuple_MCCount")
         output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=abs(pdg.from_name(name))) for name in names])
         output.param('fileName', filename)
         output.param('treeName', 'mccounts')
@@ -663,218 +672,31 @@ def CountMCParticles(resource, names):
         resource.condition = ('EventType', '==0')
         resource.halt = True
         return
-
-    rootfile = ROOT.TFile(filename)
-    countNtuple = rootfile.Get('mccounts')
-    # makeROOTCompatible removes parenthesis from variable so we don't worry about them here
-    getpdg = lambda x: x[len('NumberOfMCParticlesInEvent'):]
-
-    counter = {}
-    for branch in [str(k.GetName()) for k in countNtuple.GetListOfBranches()]:
-        allMCParticles = ROOT.TH1D('allMCParticles', 'allMCParticles', 1, 0, countNtuple.GetMaximum(branch) + 1)
-        countNtuple.Project('allMCParticles', branch, branch)
-        counter[getpdg(branch)] = int(allMCParticles.Integral())
-        del allMCParticles
-    counter['NEvents'] = int(countNtuple.GetEntries())
-    return counter
+    return filename
 
 
-def WriteAnalysisFileForChannel(
-        resource,
-        particleName,
-        particleLabel,
-        channelName,
-        preCutConfig,
-        preCut,
-        preCutHistogram,
-        userCutConfig,
-        mvaConfig,
-        tmvaTraining,
-        splotTraining,
-        postCutConfig,
-        postCut):
+def CountParticleLists(resource, targets, lists):
     """
-    Creates a pdf document with the PreCut and Training plots
+    Counts the number of particles in all given mc-matched lists.
         @param resource object
-        @param particleName valid pdg particle name
-        @param particleLabel user defined label
-        @param channelName name of the channel
-        @param preCutConfig configuration for pre cut
-        @param preCut used preCuts for this channel
-        @param preCutHistogram preCutHistogram (filename, histogram postfix)
-        @param userCutConfig user-defined cut configuration
-        @param mvaConfig configuration for mva
-        @param tmvaTraining config filename for TMVA training
-        @param postCutConfig configuration for postCut
-        @param postCut
-        @return dictionary containing latex placeholders of this channel
+        @param targets mva target variable
+        @param lists list of all FSP particles and channels
     """
-    placeholders = {}
-    placeholders['particleName'] = particleName
-    placeholders['particleLabel'] = particleLabel
-    placeholders['channelName'] = channelName
-    placeholders['isIgnored'] = False
-    placeholders['mvaConfigObject'] = mvaConfig
-    placeholders['texFile'] = removeJPsiSlash('{name}_{channel}_{hash}.tex'.format(
-        name=particleName, channel=channelName, hash=resource.hash))
-    placeholders['mvaSPlotTexFile'] = 'empty.tex'
-    placeholders['mvaTexFile'] = 'empty.tex'
-
-    placeholders = automaticReporting.createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut)
-    if splotTraining is not None:
-        placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, splotTraining, postCutConfig, postCut)
-        placeholders['mvaSPlotTexFile'] = placeholders['mvaTexFile']
-    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postCut)
-    automaticReporting.createTexFile(placeholders['texFile'], 'analysis/scripts/fei/templates/ChannelTemplate.tex', placeholders)
-
-    resource.needed = False
     resource.cache = True
-    return placeholders
+    filename = 'listCounts.root'
 
-
-def WriteAnalysisFileForFSParticle(
-        resource,
-        particleName,
-        particleLabel,
-        mvaConfig,
-        tmvaTraining,
-        postCutConfig,
-        postCut,
-        userCutConfig,
-        distribution,
-        nTuple,
-        mcCounts):
-    """
-    Creates a pdf document with the PreCut and Training plots
-        @param resource object
-        @param particleName valid pdg particle name
-        @param particleLabel user defined label
-        @param mvaConfig configuration for mva
-        @param tmvaTraining config filename for TMVA training
-        @param postCutConfig configuration for postCut
-        @param postCut
-        @param userCutConfig user-defined cut configuration
-        @param mcCounts
-        @param distribution
-        @return dictionary containing latex placeholders of this particle
-    """
-    placeholders = {}
-    placeholders['particleName'] = particleName
-    placeholders['particleLabel'] = particleLabel
-    placeholders['isIgnored'] = False
-
-    placeholders = automaticReporting.createMVATexFile(placeholders, mvaConfig, tmvaTraining, postCutConfig, postCut)
-    placeholders = automaticReporting.createFSParticleTexFile(placeholders, nTuple, mcCounts, distribution, mvaConfig)
-
-    resource.needed = False
-    resource.cache = True
-    return placeholders
-
-
-def WriteAnalysisFileForCombinedParticle(resource, particleName, particleLabel, channelPlaceholders, nTuple, mcCounts):
-    """
-    Creates a pdf document with the PreCut and Training plots
-        @param resource object
-        @param particleName valid pdg particle name
-        @param particleLabel user defined label
-        @param channelPlaceholders list of all tex placeholder dictionaries of all channels
-        @param mcCounts
-        @return dictionary containing latex placeholders of this particle
-    """
-    placeholders = {'channels': channelPlaceholders}
-    placeholders['particleName'] = particleName
-    placeholders['particleLabel'] = particleLabel
-    placeholders['isIgnored'] = False
-
-    mvaConfig = channelPlaceholders[0]['mvaConfigObject']
-    placeholders = automaticReporting.createCombinedParticleTexFile(placeholders, channelPlaceholders, nTuple, mcCounts, mvaConfig)
-
-    resource.needed = False
-    resource.cache = True
-    return placeholders
-
-
-def WriteAnalysisFileSummary(
-        resource,
-        finalStateParticlePlaceholders,
-        combinedParticlePlaceholders,
-        finalParticleNTuples,
-        finalParticleTargets,
-        cpuTimeSummaryPlaceholders,
-        mcCounts,
-        particles):
-    """
-    Creates a pdf summarizing all networks trained.
-        @param resource object
-        @param finalStateParticlePlaceholders list of all tex placeholder dictionaries of fsp
-        @param combinedParticlePlaceholders list of all tex placeholder dictionaries of intermediate particles
-        @param finalParticleNTuples list of ntuples of all final particles
-        @param finalParticleTargets list of target variables of all final particles (corresponding to ntuple list)
-        @param mcCounts
-        @param particles particle objects
-    """
-    finalParticlePlaceholders = []
-    for (ntuple, target) in zip(finalParticleNTuples, finalParticleTargets):
-        if ntuple is not None:
-            type = 'CosBDL' if 'AcceptMissingNeutrino' in target else 'Mbc'
-            plot = automaticReporting.createMoneyPlotTexFile(ntuple, type, mcCounts, target)
-            rocPlot = automaticReporting.createMoneyPlotTexFile(ntuple, "ROC", mcCounts, target)
-            finalParticlePlaceholders.append(plot)
-            finalParticlePlaceholders.append(rocPlot)
-
-            rootfile = ROOT.TFile(ntuple)
-            tree = rootfile.Get('variables')
-            uniqueSignal = ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(uniqueSignal)')
-            nUniqueSignal = int(tree.GetEntries(target + ' && ' + uniqueSignal))
-
-            # add nUniqueSignal back in corresponding combined particle placeholder
-            for cplaceholder in combinedParticlePlaceholders:
-                if cplaceholder['particleName'] == plot['particleName']:
-                    cplaceholder['particleNUniqueSignalAfterPostCut'] = nUniqueSignal
-
-    placeholders = automaticReporting.createSummaryTexFile(
-        finalStateParticlePlaceholders,
-        combinedParticlePlaceholders,
-        finalParticlePlaceholders,
-        cpuTimeSummaryPlaceholders,
-        mcCounts,
-        particles)
-
-    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/nordbert.pdf')), shell=True)
-    subprocess.call('cp {f} .'.format(f=ROOT.Belle2.FileSystem.findFile('analysis/scripts/fei/templates/empty.tex')), shell=True)
-    for i in range(0, 2):
-        ret = subprocess.call(['pdflatex', '-halt-on-error', '-interaction=nonstopmode', placeholders['texFile']])
-        if ret == 0:
-            B2INFO("Created FEI summary PDF.")
-        else:
-            B2ERROR("pdflatex failed to create FEI summary PDF, please check.")
-
-    if ret == 0:
-        filename = 'sent_mail'
-        if not os.path.isfile(filename):
-            # automaticReporting.sendMail()
-            open(filename, 'w').close()
-
-    resource.needed = False
-    resource.cache = True
-    return
-
-
-def WriteCPUTimeSummary(resource, channelNames, inputLists, channelPlaceholders, mcCounts, moduleStatisticsFile):
-    """
-    Creates CPU time summary
-        @param resource object
-        @param mcCounts
-        @param moduleStatisticsFile file name of the TFile containing actual statistics
-        @return dictionary of placeholders used in the .tex file
-    """
-    stats = automaticReporting.getModuleStatsFromFile(moduleStatisticsFile)
-    placeholders = automaticReporting.createCPUTimeTexFile(
-        channelNames,
-        inputLists,
-        channelPlaceholders,
-        mcCounts,
-        moduleStatisticsFile,
-        stats)
-
-    return placeholders
+    if not os.path.isfile(filename):
+        output = register_module('VariablesToNtuple')
+        output.set_name("VariablesToNtuple_ListCount")
+        output.param('variables', ['countInList({l})'.format(l=l) for l in lists if l is not None] +
+                                  ['countInList({l}, {t} == 1)'.format(l=l, t=target)
+                                      for l, target in zip(lists, targets) if l is not None] +
+                                  ['countInList({l}, {t} == 0)'.format(l=l, t=target)
+                                      for l, target in zip(lists, targets) if l is not None])
+        output.param('fileName', filename)
+        output.param('treeName', 'listcounts')
+        resource.path.add_module(output)
+        resource.condition = ('EventType', '==0')
+        resource.halt = True
+        return
+    return filename

@@ -249,15 +249,21 @@ void AAFHInterface::initialize(double beamEnergy, EMode mode, ERejection rejecti
   aafhdiag36_init_();
 }
 
-void AAFHInterface::updateParticle(MCParticleGraph::GraphParticle& p, double* q, int pdg)
+void AAFHInterface::updateParticle(MCParticleGraph::GraphParticle& p, double* q, int pdg, bool isInitial)
 {
   // all values in q are in units of beam energy
-  TLorentzVector vec(q[0]*input_.eb, q[1]*input_.eb, q[2]*input_.eb, q[3]*input_.eb);
+  // z-direction inversed since AAFH uses different convention
+  TLorentzVector vec(-q[0]*input_.eb, -q[1]*input_.eb, -q[2]*input_.eb, q[3]*input_.eb);
   p.set4Vector(vec);
+
   // mass is multiplied by charge sign so take the absolute
   p.setMass(fabs(q[4])*input_.eb);
   p.setPDG(pdg);
   p.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
+
+  if (isInitial) {
+    p.addStatus(MCParticle::c_Initial);
+  }
 }
 
 void AAFHInterface::generateEvent(MCParticleGraph& mpg)
@@ -268,9 +274,11 @@ void AAFHInterface::generateEvent(MCParticleGraph& mpg)
     B2ERROR("Failed to generate event after " << status << " tries, giving up");
     return;
   }
-  //initial beam particles, ignore
-  //auto &p1 = mpg.addParticle();
-  //auto &p2 = mpg.addParticle();
+
+  //initial beam particles
+  auto& p1 = mpg.addParticle();
+  auto& p2 = mpg.addParticle();
+
   //generated particles
   auto& p3 = mpg.addParticle();
   auto& p4 = mpg.addParticle();
@@ -297,6 +305,8 @@ void AAFHInterface::generateEvent(MCParticleGraph& mpg)
       break;
   }
 
+  updateParticle(p1, momenz_.q1, 11, true);
+  updateParticle(p2, momenz_.q2, -11, true);
   updateParticle(p3, momenz_.q3, pdg[0]);
   updateParticle(p4, momenz_.q4, pdg[1]);
   updateParticle(p5, momenz_.q5, pdg[2]);

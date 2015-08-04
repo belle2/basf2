@@ -1,20 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+########################################################
+# 100 eeee events are generated using the AAFH
+# generator and the preselection module
+#
+# Example steering file
+########################################################
+
 from basf2 import *
+from beamparameters import add_beamparameters
 import os
 import sys
 
 # suppress messages and during processing:
 set_log_level(LogLevel.INFO)
 
-# set event info for generated events
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])  # we want to process 10000 events
+main = create_path()
 
-# load parameters (i.e. beam energies)
-gearbox = register_module('Gearbox')
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+beamparameters.param("smearVertex", False)
+beamparameters.param("generateCMS", False)
+# print_params(beamparameters)
+
+# generator
 aafh = register_module('AafhInput')
 aafh.param({  # decay mode to generate.
               # 1: e+e- -> mu+mu-L+L- where L is a user defined particle (default: tau)
@@ -78,9 +91,6 @@ output = register_module('RootOutput')
 output.param('outputFileName', './aafh_out.root')
 
 # creating the path for the processing
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
 main.add_module(aafh)
 main.add_module(generatorpreselection)
 # create an empty path and check the return value of the the preselection
@@ -95,4 +105,3 @@ process(main)
 
 # show call statistics
 print statistics
-

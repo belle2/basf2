@@ -25,10 +25,10 @@ REG_MODULE(AafhInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-AafhInputModule::AafhInputModule() : Module()
+AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   // Set module properties
-  setDescription("AAFH Generator to generate 2-photon events like e+e- -> e+e-e+e-");
+  setDescription("AAFH Generator to generate non-radiative two-photon events like e+e- -> e+e-e+e-");
 
   // Parameter definitions
   addParam("mode", m_mode,
@@ -92,25 +92,10 @@ void AafhInputModule::initialize()
 {
   m_mcparticles.registerInDataStore();
 
-  //FIXME: This is lot of unneeded code. We need general utilities to get the
-  //CMS energy and the boost without reading the gearbox
-  //FIXME more: This should be in beginRun or we need to check if beam energy
-  //changed between runs and find out if aafh can be reinitialized
-  GearDir ler("/Detector/SuperKEKB/LER/");
-  GearDir her("/Detector/SuperKEKB/HER/");
-  const double ELER = ler.getDouble("energy");
-  const double EHER = her.getDouble("energy");
-  const double crossingAngle = her.getDouble("angle") - ler.getDouble("angle");
-  const double angle = her.getDouble("angle");
-  m_labBoost = getBoost(EHER, ELER, crossingAngle, angle);
-  const double angleLerToB = M_PI - angle;
-  const double angleHerToB = crossingAngle - angle;
-  TLorentzVector vLer, vHer;
-  vLer.SetXYZM(ELER * sin(angleLerToB), 0., ELER * cos(angleLerToB), Const::electronMass);
-  vHer.SetXYZM(EHER * sin(angleHerToB), 0., EHER * cos(angleHerToB), Const::electronMass);
-  TLorentzVector beamParticle = m_labBoost.Inverse() * (vHer + vLer);
-  beamParticle.Print();
-  const double beamEnergy = beamParticle.E() / 2.;
+  //Beam Parameters, initial particle - AAFH cannot handle beam energy spread
+  m_initial.initialize();
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  const double beamEnergy = nominal.getMass() / 2.;
 
   //Set Generator options
   if (m_mode < 1 || m_mode > 5) {
@@ -131,13 +116,28 @@ void AafhInputModule::initialize()
 
 void AafhInputModule::event()
 {
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
   MCParticleGraph mpg;
+
   //Generate event
   m_generator.generateEvent(mpg);
-  //Boost to lab
+
+  //Boost to lab and set vertex
   for (size_t i = 0; i < mpg.size(); ++i) {
-    mpg[i].set4Vector(m_labBoost * mpg[i].get4Vector());
+    mpg[i].set4Vector(boost * mpg[i].get4Vector());
+
+    TVector3 v3 = mpg[i].getProductionVertex();
+    v3 = v3 + vertex;
+    mpg[i].setProductionVertex(v3);
+    mpg[i].setValidVertex(true);
   }
+
   //Fill MCParticle List
   mpg.generateList(m_mcparticles.getName(), MCParticleGraph::c_setDecayInfo);
 }

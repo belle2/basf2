@@ -13,8 +13,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
 #include <mdst/dataobjects/MCParticle.h>
+
 #include <generators/aafh/AAFHInterface.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <string>
 #include <TLorentzRotation.h>
@@ -64,8 +67,8 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcparticles;
     /** interface to the generator */
     AAFHInterface m_generator;
-    /** Lorentz transformation to go from CMS to lab after generation */
-    TLorentzRotation m_labBoost;
+    /**< initial particle used by BeamParameter class */
+    InitialParticleGeneration m_initial;
   };
 }
 

@@ -97,8 +97,9 @@ namespace Belle2 {
      * @param p MCParticle to be updated
      * @param q 4-Vector + mass from the generator
      * @param pdg pdgcode of the particle
+     * @param isInitial incoming beam particles
      */
-    void updateParticle(MCParticleGraph::GraphParticle& p, double* q, int pdg);
+    void updateParticle(MCParticleGraph::GraphParticle& p, double* q, int pdg, bool isInitial = false);
     /** minimum invariant mass */
     double m_minMass {0};
     /** name of the particle for modes c_MuonParticle and c_ElectronParticle */

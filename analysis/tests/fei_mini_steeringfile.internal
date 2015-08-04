@@ -28,30 +28,21 @@ chargedTrackVars = [
     'chiProb']
 
 mvaConfig_chargedFSP = MVAConfiguration(
-    #name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
-    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
     variables=chargedTrackVars,
     target='isSignal',
-    model=None
 )
 
 mvaConfig_D = MVAConfiguration(
-    name='FastBDT', type='Plugin', config='!H:CreateMVAPdfs:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-    #name='NeuroBayes', type='Plugin', config='!H:V:CreateMVAPdfs:NtrainingIter=0:Preprocessing=122:ShapeTreat=DIAG:TrainingMethod=BFGS',
     variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughterAngle(0, 1)', 'p', 'pt', 'M', 'dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb'],
     target='isSignal',
-    model=None
 )
 
 preCutConfiguration_nonFSP = PreCutConfiguration(
-    #variable='daughterProductOfSignalProbability',
     variable='M',
     binning=(500, 0.0, 6.0),
     efficiency=0.8,
     purity=0.0001,
-    userCut=''
 )
-
 
 particles = []
 particles.append(Particle('pi+', mvaConfig_chargedFSP))

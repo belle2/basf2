@@ -63,22 +63,22 @@ def LoadGeometry(resource):
     resource.path.add_module(geometry)
 
 
-def SelectParticleList(resource, particleName, particleLabel, preCutConfig):
+def SelectParticleList(resource, particleName, particleLabel, userCut):
     """
     Creates a ParticleList gathering up all Particles with the given particleName
         @param resource object
         @param particleName valid pdg particle name
         @param particleLabel user defined label
-        @param preCutConfig
+        @param userCut user defined cut
         @return name of ParticleList
     """
     resource.cache = True
     particleList = particleName + ':' + resource.hash
 
-    if preCutConfig is not None and resource.env['ROE']:
-        cut = '[' + preCutConfig.userCut + '] and isInRestOfEvent > 0.5'
-    elif preCutConfig is not None:
-        cut = preCutConfig.userCut
+    if userCut != '' and resource.env['ROE']:
+        cut = '[' + userCut + '] and isInRestOfEvent > 0.5'
+    elif userCut != '':
+        cut = userCut
     elif resource.env['ROE']:
         cut = 'isInRestOfEvent > 0.5'
     else:
@@ -103,7 +103,7 @@ def MatchParticleList(resource, particleList):
     return particleList
 
 
-def MakeParticleList(resource, particleName, daughterParticleLists, preCut, decayModeID):
+def MakeParticleList(resource, particleName, daughterParticleLists, preCut, userCut, decayModeID):
     """
     Creates a ParticleList by combining other ParticleLists via the ParticleCombiner module.
         @param resource object
@@ -111,15 +111,24 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, deca
         @param daughterParticleLists list of ParticleList name of every daughter particles
         @param preCut dictionary containing 'cutstring', a string which defines the cut which is applied
                before the combination of the daughter particles.
+        @param userCut user-defined cut
         @param decayModeID integer ID of this decay channel, added to extra-info of Particles
         @return name of new ParticleList
     """
     resource.cache = True
     if preCut is None:
         return
+    if userCut != '' and preCut['cutstring'] != '':
+        cut = '[' + preCut['cutstring'] + '] and [' + userCut + ']'
+    elif userCut != '':
+        cut = userCut
+    elif preCut['cutstring'] != '':
+        cut = preCut['cutstring']
+    else:
+        cut = ''
     particleList = particleName + ':' + resource.hash
     decayString = particleList + ' ==> ' + ' '.join(daughterParticleLists)
-    modularAnalysis.reconstructDecay(decayString, preCut['cutstring'], decayModeID, writeOut=True, path=resource.path)
+    modularAnalysis.reconstructDecay(decayString, cut, decayModeID, writeOut=True, path=resource.path)
     return particleList
 
 
@@ -143,7 +152,7 @@ def CopyParticleLists(resource, particleName, particleLabel, particleLists, post
     modularAnalysis.cutAndCopyLists(
         particleList,
         particleLists,
-        postCut['cutstring'] if postCut is not None else '',
+        postCut['cutstring'],
         writeOut=True,
         path=resource.path)
     return particleList
@@ -166,12 +175,13 @@ def CopyIntoHumanReadableParticleList(resource, particleName, particleLabel, par
     return humanReadableParticleList
 
 
-def FitVertex(resource, channelName, particleList):
+def FitVertex(resource, channelName, particleList, vertexCut):
     """
     Fit secondary vertex of all particles in this ParticleList
         @param resource object
         @param channelName unique name describing the channel
         @param particleList ParticleList name
+        @param vertexCut user-defined vertex cut
         @return hash
     """
     resource.cache = True
@@ -185,7 +195,7 @@ def FitVertex(resource, channelName, particleList):
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + particleList)
     pvfit.param('listName', particleList)
-    pvfit.param('confidenceLevel', -2)  # don't remove Particles with failed fit (pValue = -1, happens more often than >=0))
+    pvfit.param('confidenceLevel', vertexCut)
     pvfit.param('vertexFitter', 'kfitter')
     pvfit.param('fitType', 'vertex')
     pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
@@ -194,7 +204,7 @@ def FitVertex(resource, channelName, particleList):
     return resource.hash
 
 
-def CreatePreCutHistogram(resource, particleName, channelName, mvaConfigTarget, preCutConfig, daughterParticleLists,
+def CreatePreCutHistogram(resource, particleName, channelName, mvaTarget, preCutConfig, userCut, daughterParticleLists,
                           additionalDependencies):
     """
     Creates ROOT file with chosen pre cut variable histogram of this channel (signal/background)
@@ -202,7 +212,9 @@ def CreatePreCutHistogram(resource, particleName, channelName, mvaConfigTarget, 
         @param resource object
         @param particleName valid pdg particle name
         @param channelName unique name describing the channel
-        @param mvaConfigTarget variable which defines signal and background
+        @param mvaTarget variable which defines signal and background
+        @param preCutConfig intermediate cut configuration
+        @param userCut user-defined cut
         @param daughterParticleLists list of ParticleList names defining all daughter particles
         @param additionalDependencies Additional dependencies on signal probability if necessary
         @return ROOT filename 'CutHistograms_{channelName}:{hash}.root' and tree key {particleName}:{hash}
@@ -222,8 +234,8 @@ def CreatePreCutHistogram(resource, particleName, channelName, mvaConfigTarget, 
     pmake.set_name('PreCutHistMaker_{c}'.format(c=channelName))
     pmake.param('fileName', filename)
     pmake.param('decayString', outputList)
-    pmake.param('cut', preCutConfig.userCut)
-    pmake.param('target', mvaConfigTarget)
+    pmake.param('cut', userCut)
+    pmake.param('target', mvaTarget)
     pmake.param('variable', preCutConfig.variable)
     if isinstance(preCutConfig.binning, tuple):
         pmake.param('histParams', preCutConfig.binning)
@@ -272,8 +284,6 @@ def PreCutDetermination(resource, channelNames, preCutConfig, preCutHistograms):
     #    of this function.
     commonPreCuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
     for (channelName, cut) in commonPreCuts.iteritems():
-        if preCutConfig.userCut != '':
-            cut['cutstring'] += ' and [' + preCutConfig.userCut + ']'
         results[channelName] = None if cut['isIgnored'] else cut
     return results
 
@@ -286,19 +296,19 @@ def PostCutDetermination(resource, postCutConfig):
         @param dictionary with the key 'cutstring' and 'range'
     """
     resource.cache = True
-    if postCutConfig is None:
-        return
+    if postCutConfig.value <= 0.0:
+        return {'cutstring': '', 'range': (0, 1)}
     return {'cutstring': str(postCutConfig.value) + ' < extraInfo(SignalProbability)',
             'range': (postCutConfig.value, 1)}
 
 
-def FSPDistribution(resource, inputList, mvaConfigTarget):
+def FSPDistribution(resource, inputList, mvaTarget):
     """
     Returns signal and background distribution of FSP
     Counts the number of MC Particles for every pdg code in all events
         @param resource object
         @param inputList particle list name
-        @param mvaConfigTarget configuration for the multivariate analysis
+        @param mvaTarget configuration for the multivariate analysis
     """
     resource.cache = True
     filename = removeJPsiSlash('{i}_{h}.root'.format(i=inputList, h=resource.hash))
@@ -306,7 +316,7 @@ def FSPDistribution(resource, inputList, mvaConfigTarget):
     if not os.path.isfile(filename):
         output = register_module('VariablesToNtuple')
         output.param('particleList', inputList)
-        output.param('variables', [mvaConfigTarget])
+        output.param('variables', [mvaTarget])
         output.param('fileName', filename)
         output.param('treeName', 'distribution')
         resource.path.add_module(output)
@@ -316,8 +326,8 @@ def FSPDistribution(resource, inputList, mvaConfigTarget):
 
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
-    return {'nSignal': int(distribution.GetEntries(mvaConfigTarget + ' == 1')),
-            'nBackground': int(distribution.GetEntries(mvaConfigTarget + ' == 0'))}
+    return {'nSignal': int(distribution.GetEntries(mvaTarget + ' == 1')),
+            'nBackground': int(distribution.GetEntries(mvaTarget + ' == 0'))}
 
 
 def CalculateInverseSamplingRate(resource, distribution):
@@ -506,6 +516,7 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
     resource.cache = True
     if trainingData is None:
         return
+
     configFilename = trainingData[:-5] + '_1.config'
 
     if not os.path.isfile(configFilename):
@@ -521,12 +532,14 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
                 prefix=trainingData[:-5]))
         B2INFO("Used following command to invoke teacher\n" + command)
         # The training of the MVC can run in parallel!
-        # FIXME Bug?
+        # FIXME Bug? Because subprocess is not thread-safe, did not cause any problems so far.
         with resource.EnableMultiThreading():
             subprocess.call(command, shell=True)
 
     if not os.path.isfile(configFilename):
-        raise RuntimeError("Training of MVC failed")
+        B2ERROR("Training of MVC failed. Ignoring channel.")
+        return
+        # raise RuntimeError("Training of MVC failed")
 
     return configFilename
 
@@ -673,6 +686,7 @@ def WriteAnalysisFileForChannel(
         preCutConfig,
         preCut,
         preCutHistogram,
+        userCutConfig,
         mvaConfig,
         tmvaTraining,
         splotTraining,
@@ -687,6 +701,7 @@ def WriteAnalysisFileForChannel(
         @param preCutConfig configuration for pre cut
         @param preCut used preCuts for this channel
         @param preCutHistogram preCutHistogram (filename, histogram postfix)
+        @param userCutConfig user-defined cut configuration
         @param mvaConfig configuration for mva
         @param tmvaTraining config filename for TMVA training
         @param postCutConfig configuration for postCut
@@ -724,6 +739,7 @@ def WriteAnalysisFileForFSParticle(
         tmvaTraining,
         postCutConfig,
         postCut,
+        userCutConfig,
         distribution,
         nTuple,
         mcCounts):
@@ -736,6 +752,7 @@ def WriteAnalysisFileForFSParticle(
         @param tmvaTraining config filename for TMVA training
         @param postCutConfig configuration for postCut
         @param postCut
+        @param userCutConfig user-defined cut configuration
         @param mcCounts
         @param distribution
         @return dictionary containing latex placeholders of this particle

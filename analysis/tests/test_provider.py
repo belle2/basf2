@@ -116,8 +116,7 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_SelectParticleList(self):
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic',
-                                            PreCutConfiguration(None, None, None, None, 'eid > 0.2')), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', 'eid > 0.2'), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': False}, cache=True)
         # Adds ParticleLoader
@@ -126,7 +125,7 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_SelectParticleListWithoutCut(self):
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', None), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', ''), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': False}, cache=True)
         # Adds ParticleLoader
@@ -137,8 +136,7 @@ class TestSelectParticleList(unittest.TestCase):
         # Set environment to ROE
         self.resource.env['ROE'] = True
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic',
-                                            PreCutConfiguration(None, None, None, None, 'eid > 0.2')), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', 'eid > 0.2'), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': True}, cache=True)
         # Adds ParticleLoader with cut
@@ -150,7 +148,7 @@ class TestSelectParticleList(unittest.TestCase):
         # Set environment to ROE
         self.resource.env['ROE'] = True
         # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', None), 'e+:42')
+        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', ''), 'e+:42')
         # Enables caching
         result = MockResource(env={'ROE': True}, cache=True)
         # Adds ParticleLoader with cut
@@ -185,21 +183,50 @@ class TestMakeParticleList(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.preCut = {'cutstring': '1.5 < M < 2.0'}
 
     def test_MakeParticleList(self):
         # Returns name of ParticleList
-        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], self.preCut, 23), 'D0:42')
+        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': '1.5 < M < 2.0'}, 'p > 3', 23), 'D0:42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
-                               decayMode=23, cut=self.preCut['cutstring'])
+                               decayMode=23, cut='[1.5 < M < 2.0] and [p > 3]')
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListEmptyUserCut(self):
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': '1.5 < M < 2.0'}, '', 23), 'D0:42')
+        # Enables caching
+        result = MockResource(cache=True)
+        # Adds ParticleCombiner for given decay
+        result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               decayMode=23, cut='1.5 < M < 2.0')
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListEmptyPreCut(self):
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': ''}, 'p > 3', 23), 'D0:42')
+        # Enables caching
+        result = MockResource(cache=True)
+        # Adds ParticleCombiner for given decay
+        result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               decayMode=23, cut='p > 3')
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListEmptyPreCutEmptyUserCut(self):
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': ''}, '', 23), 'D0:42')
+        # Enables caching
+        result = MockResource(cache=True)
+        # Adds ParticleCombiner for given decay
+        result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               decayMode=23, cut='')
         self.assertEqual(self.resource, result)
 
     def test_MakeParticleListWithNone(self):
         # Returns None if given PreCut is None
-        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], None, 23), None)
+        self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], None, '', 23), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -220,17 +247,6 @@ class TestCopyParticleLists(unittest.TestCase):
         # Adds ParticleListManipulator for given decay
         result.path.add_module('ParticleListManipulator', outputListName='D0:42', inputListNames=['D0:1', 'D0:2', 'D0:3'],
                                writeOut=True, cut=self.postCut['cutstring'])
-        self.assertEqual(self.resource, result)
-
-    def test_CopyParticleListsWithoutPostCut(self):
-        # Returns name of ParticleList
-        self.assertEqual(CopyParticleLists(self.resource, 'D0', 'generic', ['D0:1', 'D0:2', 'D0:3'],
-                                           None, ['S1', 'S2', 'S3']), 'D0:42')
-        # Enables caching
-        result = MockResource(cache=True)
-        # Adds ParticleListManipulator for given decay
-        result.path.add_module('ParticleListManipulator', outputListName='D0:42', inputListNames=['D0:1', 'D0:2', 'D0:3'],
-                               writeOut=True, cut='')
         self.assertEqual(self.resource, result)
 
     def test_CopyParticleListsSomeNone(self):
@@ -301,7 +317,7 @@ class TestFitVertex(unittest.TestCase):
 
     def test_FitVertex(self):
         # Returns hash
-        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi-', 'D0:generic -> K+ pi-'), '42')
+        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi-', 'D0:generic -> K+ pi-', -2), '42')
         # Enables caching
         result = MockResource(cache=True)
         # Adds ParticleVertexFitter for given ParticleList
@@ -309,16 +325,26 @@ class TestFitVertex(unittest.TestCase):
                                vertexFitter='kfitter', fitType='vertex')
         self.assertEqual(self.resource, result)
 
+    def test_FitVertexOtherConfidenceLevel(self):
+        # Returns hash
+        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi-', 'D0:generic -> K+ pi-', 0.001), '42')
+        # Enables caching
+        result = MockResource(cache=True)
+        # Adds ParticleVertexFitter for given ParticleList
+        result.path.add_module('ParticleVertexFitter', listName='D0:generic -> K+ pi-', confidenceLevel=0.001,
+                               vertexFitter='kfitter', fitType='vertex')
+        self.assertEqual(self.resource, result)
+
     def test_FitVertexWithNone(self):
         # Returns None if ParticleList is None
-        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi-', None), None)
+        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi-', None, -2), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
     def test_FitVertexWithTwoPi0(self):
         # Returns None if ParticleList contains pi0 pi0
-        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi- pi0 pi0', 'D0:generic -> K+ pi-'), None)
+        self.assertEqual(FitVertex(self.resource, 'D0 -> K+ pi- pi0 pi0', 'D0:generic -> K+ pi-', -2), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -335,32 +361,33 @@ class TestCreatePreCutHistogram(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.preCutConfig = PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'M > 0.2')
+        self.preCutConfig = PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01)
+        self.userCut = 'M > 0.2'
 
     def test_CreatePreCutHistogram(self):
         # Returns None if Histogram does not exists
         self.assertEqual(CreatePreCutHistogram(self.resource, 'D+', 'UniqueChannelName', 'isSignal',
-                                               self.preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo']), None)
+                                               self.preCutConfig, self.userCut, ['pi+:1', 'K+:1'], ['bar', 'foo']), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds PreCutHistMaker for given ParticleList
         result.path.add_module('PreCutHistMaker', fileName='CutHistograms_UniqueChannelName:42.root',
-                               decayString='D+:42 ==> pi+:1 K+:1', cut=self.preCutConfig.userCut,
+                               decayString='D+:42 ==> pi+:1 K+:1', cut=self.userCut,
                                target='isSignal', variable=self.preCutConfig.variable,
                                histParams=self.preCutConfig.binning)
         self.assertEqual(self.resource, result)
 
     def test_CreatePreCutHistogramCustomBinning(self):
         # Set Custom binning
-        self.preCutConfig = PreCutConfiguration('M', list(range(10)), 0.7, 0.01, 'M > 0.2')
+        self.preCutConfig = PreCutConfiguration('M', list(range(10)), 0.7, 0.01)
         # Returns None if Histogram does not exists
         self.assertEqual(CreatePreCutHistogram(self.resource, 'D+', 'UniqueChannelName', 'isSignal',
-                                               self.preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo']), None)
+                                               self.preCutConfig, self.userCut, ['pi+:1', 'K+:1'], ['bar', 'foo']), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds PreCutHistMaker for given ParticleList
         result.path.add_module('PreCutHistMaker', fileName='CutHistograms_UniqueChannelName:42.root',
-                               decayString='D+:42 ==> pi+:1 K+:1', cut=self.preCutConfig.userCut,
+                               decayString='D+:42 ==> pi+:1 K+:1', cut=self.userCut,
                                target='isSignal', variable=self.preCutConfig.variable,
                                customBinning=self.preCutConfig.binning)
         self.assertEqual(self.resource, result)
@@ -369,7 +396,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
         with temporary_file('CutHistograms_UniqueChannelName:42.root'):
             # Returns Tuple if Histogram does exists
             self.assertEqual(CreatePreCutHistogram(self.resource, 'D+', 'UniqueChannelName', 'isSignal',
-                                                   self.preCutConfig, ['pi+:1', 'K+:1'], ['bar', 'foo']),
+                                                   self.preCutConfig, self.userCut, ['pi+:1', 'K+:1'], ['bar', 'foo']),
                              ('CutHistograms_UniqueChannelName:42.root', 'D+:42'))
             # Enables caching, halt and condition
             result = MockResource(cache=True)
@@ -378,7 +405,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
     def test_CreatePreCutHistogramMissingDaughter(self):
         # Returns None if daughter particle is missing
         self.assertEqual(CreatePreCutHistogram(self.resource, 'D+', 'UniqueChannelName', 'isSignal',
-                                               self.preCutConfig, [None, 'K+:1'], ['bar', 'foo']), None)
+                                               self.preCutConfig, self.userCut, [None, 'K+:1'], ['bar', 'foo']), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -386,7 +413,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
     def test_CreatePreCutHistogramMissingAdditionalDependency(self):
         # Returns None if additional dependency is missing
         self.assertEqual(CreatePreCutHistogram(self.resource, 'D+', 'UniqueChannelName', 'isSignal',
-                                               self.preCutConfig, ['pi+:1', 'K+:1'], [None, 'foo']), None)
+                                               self.preCutConfig, self.userCut, ['pi+:1', 'K+:1'], [None, 'foo']), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -414,7 +441,7 @@ class TestPreCutDeterminationPerChannel(unittest.TestCase):
 
 def MockCalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     B2INFO('Called MockCalculatePreCuts')
-    assert preCutConfig == PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'p > 0.2')
+    assert preCutConfig == PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01)
     assert channelNames == ('D0:1 ==> K+ pi-', 'D0:2 ==> K+ pi- pi0', 'D0:3 ==> K+ pi+ pi- pi-')
     assert preCutHistograms == ('Dummy1', 'Dummy2', 'Dummy3')
     return {'D0:1 ==> K+ pi-': {'cutstring': '0.1 < M < 0.2', 'isIgnored': False},
@@ -426,7 +453,7 @@ class TestPreCutDetermination(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.preCutConfig = PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01, 'p > 0.2')
+        self.preCutConfig = PreCutConfiguration('M', (500, 2, 4), 0.7, 0.01)
         self.channelNames = ['D0:1 ==> K+ pi-', 'D0:2 ==> K+ pi- pi0', 'D0:3 ==> K+ pi+ pi- pi-', 'D0:4 ==> K+ K-']
         self.preCutHistograms = ['Dummy1', 'Dummy2', 'Dummy3', None]
 
@@ -435,8 +462,8 @@ class TestPreCutDetermination(unittest.TestCase):
         preCutDetermination.CalculatePreCuts = MockCalculatePreCuts
         # Returns value (preCut) stored in given dictionary (preCuts for all channels) under key (channelName)
         self.assertDictEqual(PreCutDetermination(self.resource, self.channelNames, self.preCutConfig, self.preCutHistograms),
-                             {'D0:1 ==> K+ pi-': {'cutstring': '0.1 < M < 0.2 and [p > 0.2]', 'isIgnored': False},
-                              'D0:2 ==> K+ pi- pi0': {'cutstring': '0.15 < M < 0.18 and [p > 0.2]', 'isIgnored': False},
+                             {'D0:1 ==> K+ pi-': {'cutstring': '0.1 < M < 0.2', 'isIgnored': False},
+                              'D0:2 ==> K+ pi- pi0': {'cutstring': '0.15 < M < 0.18', 'isIgnored': False},
                               'D0:3 ==> K+ pi+ pi- pi-': None,
                               'D0:4 ==> K+ K-': None})
         # Enables caching
@@ -455,19 +482,19 @@ class TestPostCutDetermination(unittest.TestCase):
 
     def setUp(self):
         self.resource = MockResource()
-        self.postCutConfig = PostCutConfiguration(0.123)
 
     def test_PostCutDetermination(self):
         # Returns PostCut dictionary with cutstring and range
-        self.assertDictEqual(PostCutDetermination(self.resource, self.postCutConfig),
+        self.assertDictEqual(PostCutDetermination(self.resource, PostCutConfiguration(0.123)),
                              {'cutstring': '0.123 < extraInfo(SignalProbability)', 'range': (0.123, 1)})
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
-    def test_PostCutDeterminationWithNone(self):
+    def test_PostCutDeterminationWithZero(self):
         # Returns None if given PostCutConfig is None
-        self.assertEqual(PostCutDetermination(self.resource, None), None)
+        self.assertEqual(PostCutDetermination(self.resource, PostCutConfiguration(0.0)),
+                         {'cutstring': '', 'range': (0.0, 1)})
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
@@ -882,9 +909,9 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         exec compile(InjectMockSubprocessFail().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
                      '<string>', 'exec')
         # Returns None if training was did not create correct file
-        with self.assertRaises(RuntimeError):
-            TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
-                                        'trainingData.root')
+        # with self.assertRaises(RuntimeError):
+        self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
+                                                     'trainingData.root'), None)
 
     def test_TrainMultivariateClassifierTrainingSuccessfull(self):
         # I call upon the mighty god of Python!
@@ -1172,7 +1199,7 @@ class TestWriteAnalysisFileForChannel(unittest.TestCase):
         result_list.append(placeholders)
         # Returns dictionary with placeholders
         self.assertDictEqual(WriteAnalysisFileForChannel(self.resource, 'D0', 'generic', 'D0 -> K+ pi-',
-                                                         'preCutConfig', 'preCut', 'preCutHistogram', 'mvaConfig',
+                                                         'preCutConfig', 'preCut', 'preCutHistogram', 'userCutConfig', 'mvaConfig',
                                                          'tmvaTraining', 'splotTraining', 'postCutConfig', 'postCut'), placeholders)
         self.assertEqual(len(args_list), 0)
         # Enables caching
@@ -1203,7 +1230,7 @@ class TestWriteAnalysisFileForFSParticle(unittest.TestCase):
         result_list.append(placeholders)
         # Returns dictionary with placeholders
         self.assertDictEqual(WriteAnalysisFileForFSParticle(self.resource, 'D0', 'generic', 'mvaConfig',
-                                                            'tmvaTraining', 'postCutConfig', 'postCut',
+                                                            'tmvaTraining', 'postCutConfig', 'postCut', 'userCutConfig',
                                                             'distribution', 'nTuple', 'mccounts'), placeholders)
         self.assertEqual(len(args_list), 0)
         # Enables caching

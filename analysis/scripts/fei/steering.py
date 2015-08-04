@@ -38,6 +38,8 @@ def getCommandLineOptions():
     parser.add_argument('-verbose', '--verbose', dest='verbose', action='store_true', help='Output additional information')
     parser.add_argument('-summary', '--summary', dest='summary', action='store_true', help='Create FEI report as PDF file')
     parser.add_argument('-nThreads', '--nThreads', dest='nThreads', type=int, default=1, help='Number of threads')
+    parser.add_argument('-dump-path', '--dump-path', dest='dumpPath', action='store_true',
+                        help='Set if you want to dump the path for analysis usage')
     parser.add_argument('-cache', '--cache', dest='cache', type=str, default=None,
                         help='Use the given file to cache results between multiple executions.'
                              'Data from previous runs has to be provided as input!')
@@ -56,12 +58,20 @@ def getCommandLineOptions():
 # Define classes at top level to make them pickable
 # Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, model')
+MVAConfiguration.__new__.__defaults__ = ('FastBDT', 'Plugin',
+                                         '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
+                                         '', 'isSignal', None)
 # Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity, userCut')
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity')
+PreCutConfiguration.__new__.__defaults__ = ('M', (1000, 0, 6), 1, 0)
+# Create new class called UserCutConfiguration via namedtuple. namedtuples are like a struct in C
+UserCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut')
+UserCutConfiguration.__new__.__defaults__ = ('', -2)
 # Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
 PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
+PostCutConfiguration.__new__.__defaults__ = (0.0,)
 # Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
-DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, decayModeID')
+DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, userCutConfig, decayModeID')
 
 
 class Particle(object):
@@ -71,13 +81,15 @@ class Particle(object):
     and provides MVAConfiguration, PreCutConfiguration and PostCutConfiguration. These can be overwritten per channel.
     """
 
-    def __init__(self, identifier, mvaConfig, preCutConfig=None, postCutConfig=None):
+    def __init__(self, identifier, mvaConfig, preCutConfig=None, userCutConfig=UserCutConfiguration(),
+                 postCutConfig=PostCutConfiguration()):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param identifier is the pdg name of the particle as a string
                    with an optional additional user label seperated by ':'
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate pre cut configuration
+            @param userCutConfig user defined cuts
             @param postCutConfig post cut configuration
         """
         #: pdg name of the particle with an optional additional user label seperated by :
@@ -93,6 +105,8 @@ class Particle(object):
         self.channels = []
         #: intermediate cut configuration (see PreCutConfiguration)
         self.preCutConfig = preCutConfig
+        #: user defined cut configuration (see UserCutConfiguration)
+        self.userCutConfig = userCutConfig
         #: post cut configuration (see PostCutConfiguration)
         self.postCutConfig = postCutConfig
 
@@ -111,7 +125,7 @@ class Particle(object):
         """ Property returning true if the particle is a final state particle """
         return self.channels == []
 
-    def addChannel(self, daughters, mvaConfig=None):
+    def addChannel(self, daughters, mvaConfig=None, userCutConfig=None):
         """
         Appends a new decay channel to the Particle object.
             @param daughters is a list of pdg particle names e.g. ['pi+','K-']
@@ -121,6 +135,8 @@ class Particle(object):
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]
         # Use default mvaConfig of this particle if no channel-specific config is given
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
+        # Use default userCutConfig of this particle if no channel-specific config is given
+        userCutConfig = copy.deepcopy(self.userCutConfig if userCutConfig is None else userCutConfig)
         # At the moment all channels must have the same target variable. Why?
         if mvaConfig is not None and mvaConfig.target != self.mvaConfig.target:
             B2FATAL(
@@ -137,6 +153,7 @@ class Particle(object):
         self.channels.append(DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
                                           daughters=daughters,
                                           mvaConfig=mvaConfig,
+                                          userCutConfig=userCutConfig,
                                           decayModeID=len(self.channels)))
         return self
 
@@ -162,7 +179,7 @@ def fullEventInterpretation(selection_path, particles):
     dag = dagFramework.DAG()
 
     # Set environment variables
-    dag.env['ROE'] = selection_path is not None
+    dag.env['ROE'] = selection_path is not None and not args.dumpPath
     dag.env['prune'] = args.prune
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
@@ -176,13 +193,19 @@ def fullEventInterpretation(selection_path, particles):
         dag.add('Identifier_' + particle.identifier, particle.identifier)
         dag.add('Object_' + particle.identifier, particle)
         dag.add('MVAConfig_' + particle.identifier, particle.mvaConfig)
+        dag.add('MVATarget_' + particle.identifier, particle.mvaConfig.target)
         dag.add('PreCutConfig_' + particle.identifier, particle.preCutConfig)
+        dag.add('UserCutConfig_' + particle.identifier, particle.userCutConfig)
+        dag.add('UserCut_' + particle.identifier, particle.userCutConfig.userCut)
         dag.add('PostCutConfig_' + particle.identifier, particle.postCutConfig)
 
         for channel in particle.channels:
             dag.add('Name_' + channel.name, channel.name)
             dag.add('MVAConfig_' + channel.name, channel.mvaConfig)
-            dag.add('MVAConfigTarget_' + channel.name, channel.mvaConfig.target)
+            dag.add('MVATarget_' + channel.name, channel.mvaConfig.target)
+            dag.add('UserCutConfig_' + channel.name, channel.userCutConfig)
+            dag.add('UserCut_' + channel.name, channel.userCutConfig.userCut)
+            dag.add('VertexCut_' + channel.name, channel.userCutConfig.vertexCut)
             dag.add('DecayModeID_' + channel.name, channel.decayModeID)
         dag.add('MVAConfigTarget_' + particle.identifier, particle.mvaConfig.target)
 
@@ -196,7 +219,7 @@ def fullEventInterpretation(selection_path, particles):
             dag.add('RawParticleList_' + particle.identifier, provider.SelectParticleList,
                     particleName='Name_' + particle.identifier,
                     particleLabel='Label_' + particle.identifier,
-                    preCutConfig='PreCutConfig_' + particle.identifier)
+                    userCut='UserCut_' + particle.identifier)
             dag.add('MatchedParticleList_' + particle.identifier, provider.MatchParticleList,
                     particleList='RawParticleList_' + particle.identifier)
         else:
@@ -206,6 +229,7 @@ def fullEventInterpretation(selection_path, particles):
                         particleName='Name_' + particle.identifier,
                         daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
                         preCut='PreCut_' + channel.name,
+                        userCut='UserCut_' + channel.name,
                         decayModeID='DecayModeID_' + channel.name)
                 dag.add('MatchedParticleList_' + channel.name, provider.MatchParticleList,
                         particleList='RawParticleList_' + channel.name)
@@ -242,7 +266,8 @@ def fullEventInterpretation(selection_path, particles):
                         'geometry',
                         ['VertexFit_' + daughter for daughter in channel.daughters],
                         channelName='Name_' + channel.name,
-                        particleList='RawParticleList_' + channel.name)
+                        particleList='RawParticleList_' + channel.name,
+                        vertexCut='VertexCut_' + channel.name)
             # Create common VertexFit Resource for this particle, thereby its easy to state the dependency
             # on the VertexFit of a daughter particle in the line above!
             dag.add('VertexFit_' + particle.identifier, provider.HashRequirements,
@@ -268,22 +293,26 @@ def fullEventInterpretation(selection_path, particles):
                 if 'SignalProbability' in particle.preCutConfig.variable:
                     additionalDependencies = ['SignalProbability_' + daughter for daughter in channel.daughters]
 
-                dag.add('PreCutHistogram_' + channel.name, provider.CreatePreCutHistogram,
-                        particleName='Name_' + particle.identifier,
-                        channelName='Name_' + channel.name,
-                        mvaConfigTarget='MVAConfigTarget_' + channel.name,
-                        preCutConfig='PreCutConfig_' + particle.identifier,
-                        daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
-                        additionalDependencies=additionalDependencies)
+                if particle.preCutConfig is None:
+                    dag.add('PreCut_' + channel.name, {'cutstring': '', 'nSignal': 0, 'nBackground': 0})
+                else:
+                    dag.add('PreCutHistogram_' + channel.name, provider.CreatePreCutHistogram,
+                            particleName='Name_' + particle.identifier,
+                            channelName='Name_' + channel.name,
+                            mvaTarget='MVATarget_' + channel.name,
+                            preCutConfig='PreCutConfig_' + particle.identifier,
+                            userCut='UserCut_' + channel.name,
+                            daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
+                            additionalDependencies=additionalDependencies)
 
-                dag.add('PreCut_' + channel.name, provider.PreCutDeterminationPerChannel,
-                        channelName='Name_' + channel.name,
-                        preCut='PreCut_' + particle.identifier)
+                    dag.add('PreCut_' + channel.name, provider.PreCutDeterminationPerChannel,
+                            channelName='Name_' + channel.name,
+                            preCut='PreCut_' + particle.identifier)
 
-                dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
-                        channelNames=['Name_' + channel.name for channel in particle.channels],
-                        preCutConfig='PreCutConfig_' + particle.identifier,
-                        preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
+                    dag.add('PreCut_' + particle.identifier, provider.PreCutDetermination,
+                            channelNames=['Name_' + channel.name for channel in particle.channels],
+                            preCutConfig='PreCutConfig_' + particle.identifier,
+                            preCutHistograms=['PreCutHistogram_' + channel.name for channel in particle.channels])
 
     # Trains multivariate classifiers (MVC) methods and provides signal probabilities
     for particle in particles:
@@ -292,7 +321,7 @@ def fullEventInterpretation(selection_path, particles):
             dag.add('Distribution_' + particle.identifier, provider.FSPDistribution,
                     'gearbox',
                     inputList='MatchedParticleList_' + particle.identifier,
-                    mvaConfigTarget='MVAConfigTarget_' + particle.identifier)
+                    mvaTarget='MVATarget_' + particle.identifier)
             # Calculate inverse sampling rate, thereby limit the maximum amount of statistic
             dag.add('InverseSamplingRate_' + particle.identifier, provider.CalculateInverseSamplingRate,
                     distribution='Distribution_' + particle.identifier)
@@ -406,7 +435,7 @@ def fullEventInterpretation(selection_path, particles):
                     'gearbox',
                     particleList='ParticleList_' + particle.identifier,
                     signalProbability='SignalProbability_' + particle.identifier,
-                    target='MVAConfigTarget_' + particle.identifier)
+                    target='MVATarget_' + particle.identifier)
             extraVars = ['TagUniqueSignal_' + particle.identifier]
 
         dag.add('VariablesToNTuple_' + particle.identifier, provider.VariablesToNTuple,
@@ -427,6 +456,7 @@ def fullEventInterpretation(selection_path, particles):
                         preCutConfig='PreCutConfig_' + particle.identifier,
                         preCut='PreCut_' + channel.name,
                         preCutHistogram='PreCutHistogram_' + channel.name,
+                        userCutConfig='UserCutConfig_' + channel.name,
                         mvaConfig='MVAConfig_' + channel.name,
                         tmvaTraining='TrainedMVC_' + channel.name,
                         splotTraining='SPlotTrainedMVC_' + channel.name,
@@ -441,6 +471,7 @@ def fullEventInterpretation(selection_path, particles):
                         tmvaTraining='TrainedMVC_' + particle.identifier,
                         postCutConfig='PostCutConfig_' + particle.identifier,
                         postCut='PostCut_' + particle.identifier,
+                        userCutConfig='UserCutConfig_' + particle.identifier,
                         distribution='Distribution_' + particle.identifier,
                         nTuple='VariablesToNTuple_' + particle.identifier)
             else:

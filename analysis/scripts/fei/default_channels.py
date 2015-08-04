@@ -10,15 +10,13 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     @param chargedB wether to include B+
     @param semileptonicB wether to include semileptonic B decays
     """
-    hadronicBuserCut = 'Mbc > 5.2 and abs(deltaE) < 0.5'
+
     if BlevelExtraCut != '':
-        hadronicBuserCut += ' and [' + BlevelExtraCut + ']'
-    mvaDefaults = {
-        'name': 'FastBDT',
-        'type': 'Plugin',
-        'config': '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
-        'model': None
-    }
+        hadronicUserCut = UserCutConfiguration('Mbc > 5.2 and abs(deltaE) < 0.5')
+        semileptonicUserCut = None
+    else:
+        hadronicUserCut = UserCutConfiguration('Mbc > 5.2 and abs(deltaE) < 0.5 and [' + BlevelExtraCut + ']')
+        semileptonicUserCut = UserCutConfiguration(BlevelExtraCut)
 
     postCut = PostCutConfiguration(
         value=0.1
@@ -56,7 +54,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
                    'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)',
                    'dr', 'dz', 'chiProb'],
         target='isSignal',
-        **mvaDefaults
     )
 
     particles.append(Particle('pi+', mva_chargedFSP, postCutConfig=postCut))
@@ -71,7 +68,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
                    'clusterNHits', 'clusterTrackMatch', 'clusterE9E25',
                    'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)'],
         target='isSignal',
-        **mvaDefaults
     )
 
     particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))
@@ -80,7 +76,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_pi0 = MVAConfiguration(
         variables=['M', 'daughter({},extraInfo(SignalProbability))', 'daughterAngle(0,1)', 'Q'],
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_pi0 = PreCutConfiguration(
@@ -89,11 +84,10 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 0.08, 0.18),
         efficiency=0.95,
         purity=0.0001,
-        userCut=''
     )
 
     particles.append(
-        Particle('pi0', mva_pi0, pre_pi0, postCut).addChannel(['gamma', 'gamma']))
+        Particle('pi0', mva_pi0, pre_pi0, postCutConfig=postCut).addChannel(['gamma', 'gamma']))
 
 # ################## KS0 ###############################
     mva_KS0 = MVAConfiguration(
@@ -103,13 +97,11 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
                    'cosAngleBetweenMomentumAndVertexVector',
                    'daughter({}, dz)', 'daughter({}, dr)', 'Q'],
         target='isSignal',
-        **mvaDefaults
     )
 
     mva_KS0_pi0pi0 = MVAConfiguration(
         variables=['M', 'useCMSFrame(E)', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))'],
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_KS0 = PreCutConfiguration(
@@ -118,10 +110,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 0.4, 0.6),
         efficiency=0.95,
         purity=0.0001,
-        userCut=''
     )
 
-    p = Particle('K_S0', mva_KS0, pre_KS0, postCut)
+    p = Particle('K_S0', mva_KS0, pre_KS0, postCutConfig=postCut)
     p.addChannel(['pi+', 'pi-'])
     # p.addChannel(['pi0', 'pi0'], mva_KS0_pi0pi0)
     particles.append(p)
@@ -130,7 +121,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_D0 = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_D0 = PreCutConfiguration(
@@ -139,10 +129,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 1.70, 1.95),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
-    p = Particle('D0', mva_D0, pre_D0, postCutSoft)
+    p = Particle('D0', mva_D0, pre_D0, postCutConfig=postCutSoft)
     p.addChannel(['K-', 'pi+'])
     p.addChannel(['K-', 'pi+', 'pi0'])
     p.addChannel(['K-', 'pi+', 'pi0', 'pi0'])
@@ -165,7 +154,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_DPlus = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_DPlus = PreCutConfiguration(
@@ -173,10 +161,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 1.7, 1.95),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
-    p = Particle('D+', mva_DPlus, pre_DPlus, postCutSoft)
+    p = Particle('D+', mva_DPlus, pre_DPlus, postCutConfig=postCutSoft)
     p.addChannel(['K-', 'pi+', 'pi+'])
     p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
     p.addChannel(['K-', 'K+', 'pi+'])
@@ -196,7 +183,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_DStarPlus = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_DStarPlus = PreCutConfiguration(
@@ -205,10 +191,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 0, 0.3),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
-    p = Particle('D*+', mva_DStarPlus, pre_DStarPlus, postCutSoft)
+    p = Particle('D*+', mva_DStarPlus, pre_DStarPlus, postCutConfig=postCutSoft)
     p.addChannel(['D0', 'pi+'])
     # p.addChannel(['D+', 'pi0'], mva_DStarPlus_withoutVertex)
     # p.addChannel(['D+', 'gamma'], mva_DStarPlus_withoutVertex)
@@ -218,7 +203,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_DStar0 = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_DStar0 = PreCutConfiguration(
@@ -227,10 +211,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 0, 0.3),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
-    p = Particle('D*0', mva_DStar0, pre_DStar0, postCutSoft)
+    p = Particle('D*0', mva_DStar0, pre_DStar0, postCutConfig=postCutSoft)
     p.addChannel(['D0', 'pi0'])
     p.addChannel(['D0', 'gamma'])
     particles.append(p)
@@ -240,7 +223,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_DS = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_DS = PreCutConfiguration(
@@ -249,10 +231,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 1.68, 2.1),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
-    p = Particle('D_s+', mva_DS, pre_DS, postCutSoft)
+    p = Particle('D_s+', mva_DS, pre_DS, postCutConfig=postCutSoft)
     p.addChannel(['K+', 'K_S0'])
     p.addChannel(['K+', 'pi+', 'pi-'])
     p.addChannel(['K+', 'K-', 'pi+'])
@@ -270,7 +251,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_DStarS = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_DStarS = PreCutConfiguration(
@@ -279,10 +259,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 0, 0.3),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
-    p = Particle('D_s*+', mva_DStarS, pre_DStarS, postCutSoft)
+    p = Particle('D_s*+', mva_DStarS, pre_DStarS, postCutConfig=postCutSoft)
     p.addChannel(['D_s+', 'gamma'])
     p.addChannel(['D_s+', 'pi0'])
     particles.append(p)
@@ -292,7 +271,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_J = MVAConfiguration(
         variables=intermediate_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_J = PreCutConfiguration(
@@ -301,7 +279,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=(500, 2.8, 3.5),
         efficiency=0.95,
         purity=0.001,
-        userCut=''
     )
 
     p = Particle('J/psi', mva_J, pre_J)
@@ -313,7 +290,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_BPlus = MVAConfiguration(
         variables=B_vars,
         target='isSignal',
-        **mvaDefaults
     )
 
     pre_BPlus = PreCutConfiguration(
@@ -321,10 +297,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
-        userCut=hadronicBuserCut
     )
 
-    p = Particle('B+', mva_BPlus, pre_BPlus)
+    p = Particle('B+', mva_BPlus, pre_BPlus, hadronicUserCut)
     p.addChannel(['anti-D0', 'pi+'])
     p.addChannel(['anti-D0', 'pi+', 'pi0'])
     p.addChannel(['anti-D0', 'pi+', 'pi0', 'pi0'])
@@ -360,7 +335,6 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
     mva_BPlusSemileptonic = MVAConfiguration(
         variables=B_vars,
         target='isSignalAcceptMissingNeutrino',
-        **mvaDefaults
     )
 
     pre_BPlusSemileptonic = PreCutConfiguration(
@@ -368,11 +342,10 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
-        userCut=BlevelExtraCut
     )
 
     p = Particle(
-        'B+:semileptonic', mva_BPlusSemileptonic, pre_BPlusSemileptonic)
+        'B+:semileptonic', mva_BPlusSemileptonic, pre_BPlusSemileptonic, semileptonicUserCut)
     p.addChannel(['anti-D0', 'e+'])
     p.addChannel(['anti-D0', 'mu+'])
     p.addChannel(['anti-D*0', 'e+'])
@@ -396,10 +369,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
-        userCut=hadronicBuserCut
     )
 
-    p = Particle('B0', mva_B0, pre_B0)
+    p = Particle('B0', mva_B0, pre_B0, hadronicUserCut)
     p.addChannel(['D-', 'pi+'])
     p.addChannel(['D-', 'pi+', 'pi0'])
     p.addChannel(['D-', 'pi+', 'pi0', 'pi0'])
@@ -440,10 +412,9 @@ def get_default_channnels(BlevelExtraCut='', neutralB=True, chargedB=True, semil
         binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
-        userCut=BlevelExtraCut
     )
 
-    p = Particle('B0:semileptonic', mva_B0Semileptonic, pre_B0Semileptonic)
+    p = Particle('B0:semileptonic', mva_B0Semileptonic, pre_B0Semileptonic, semileptonicUserCut)
     p.addChannel(['D-', 'e+'])
     p.addChannel(['D-', 'mu+'])
     p.addChannel(['D*-', 'e+'])

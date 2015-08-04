@@ -146,7 +146,7 @@ def convertParticleObjectToString(particle):
         output += '    PreCutConfiguration: variables={p.variable}, efficiency={p.efficiency}, purity={p.purity}\n'.format(
             p=particle.preCutConfig)
         output += '    PreCutConfiguration: binning={p.binning}\n'.format(p=particle.preCutConfig)
-        output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=particle.preCutConfig)
+        # output += '    PreCutConfiguration: userCut={p.userCut}\n'.format(p=particle.preCutConfig)
 
         if particle.postCutConfig is None:
             output += '    PostCutConfiguration: None\n'

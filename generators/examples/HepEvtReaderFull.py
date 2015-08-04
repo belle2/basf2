@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################################## This is a steering
+########################################################
+# This is a steering
 # file which shows all usage options for the hepevt file reader module in the
 # generators package. The generated particles are taken from an input file and
 # fed through the Geant4 simulation and the output is stored in a root file.
@@ -16,10 +17,17 @@
 ########################################################
 
 from basf2 import *
+from beamparameters import add_beamparameters
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.DEBUG)
+
+# creating the path for the processing
+main = create_path()
+
+# beam parameters
+beamparameters = add_beamparameters(main, "SuperKEKB")
 
 # to run the framework the used modules need to be registered
 hepevtreader = register_module('HepevtInput')
@@ -88,7 +96,6 @@ eventinfosetter.param('expList', [1])  # and experiment number 1
 simpleoutput.param('outputFileName', 'HepEvtReaderOutput.root')
 
 # creating the path for the processing
-main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 

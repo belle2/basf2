@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################################## This steering file
+########################################################
+# This steering file
 # gives an example for the use of the HepEvtReader as a master module. The
 # master module sets event, run and experiment number for the event in process.
 # There can only be one master module. In most cases with simulated events this
@@ -12,9 +13,16 @@
 ########################################################
 
 from basf2 import *
+from beamparameters import add_beamparameters
 
-# suppress messages and warnings during processing:
+# creating the path for the processing
 set_log_level(LogLevel.ERROR)
+
+# creating the path for the processing
+main = create_path()
+
+# beam parameters
+beamparameters = add_beamparameters(main, "SuperKEKB")
 
 # to run the framework the used modules need to be registered
 hepevtreader = register_module('HepevtInput')
@@ -56,7 +64,6 @@ progress.set_log_level(LogLevel.INFO)
 simpleoutput.param('outputFileName', 'HepEvtReaderMasterOutput.root')
 
 # creating the path for the processing
-main = create_path()
 
 # Add hepevtreader module to path:
 main.add_module(hepevtreader)
@@ -65,7 +72,7 @@ print_params(hepevtreader)
 
 # Add all other modules for simple processing to path
 main.add_module(progress)
-# main.add_module(paramloader)
+main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 main.add_module(simpleoutput)

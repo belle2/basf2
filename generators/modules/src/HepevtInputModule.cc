@@ -33,7 +33,7 @@ REG_MODULE(HepevtInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
+HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1), m_initial(0)
 {
   //Set module properties
   setDescription("HepEvt file input. This module loads an event record from HEPEVT format and store the content into the MCParticle collection. HEPEVT format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
@@ -54,6 +54,9 @@ HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
 
 void HepevtInputModule::initialize()
 {
+  //Beam Parameters, initial particl
+  m_initial.initialize();
+
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {
     //something is wrong with the file list.
@@ -74,13 +77,9 @@ void HepevtInputModule::initialize()
 
   //Do we need to boost?
   if (m_boost2Lab) {
-    //@TODO: get this from a central place instead of hard coded: framework issue
-    // this is hard coded!!!!!! should be provided somewhere -> run meta data
-    double Eher = 7.0 * Unit::GeV;
-    double Eler = 4.0 * Unit::GeV;
-    double cross_angle = 83 * Unit::mrad;
-    double angle = 41.5 * Unit::mrad;
-    m_hepevt.m_labboost = getBoost(Eher, Eler, cross_angle, angle);
+    MCInitialParticles& initial = m_initial.generate();
+    TLorentzRotation boost = initial.getCMSToLab();
+    m_hepevt.m_labboost = boost;
   }
 
   //are we the master module? And do we have all infos?
@@ -103,6 +102,8 @@ void HepevtInputModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   if (!eventMetaDataPtr) eventMetaDataPtr.create();
   // B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
+
+  MCInitialParticles& initial = m_initial.generate();
 
   try {
     mpg.clear();

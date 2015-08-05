@@ -497,7 +497,7 @@ class CDCValidation(metamodules.PathModule):
             use_svd=False,
             queue=None):
 
-        if queue:
+        if queue is not None:
             queue.put(self.__class__.__name__ + "_output_file_name", output_file_name)
 
         from tracking.validation.module import SeparatedTrackingValidationModule
@@ -553,9 +553,13 @@ class CDCRecoFitter(metamodules.PathModule):
         reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
             "RecoTrackCreator",
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
+
+        measurement_creator_module = StandardEventGenerationRun.get_basf2_module(
+            "MeasurementCreator",
+            useVXDMomentumEstimation=useVXDMomentumEstimation)
+
         reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter",
                                                                          ProbCut=prob_cut,
-                                                                         useVXDMomentumEstimation=useVXDMomentumEstimation,
                                                                          pdgCodeToUseForFitting=pdg_code)
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
@@ -566,6 +570,7 @@ class CDCRecoFitter(metamodules.PathModule):
             module_list.append(setup_genfit_extrapolation_module)
 
         module_list.append(reco_track_creator_module)
+        module_list.append(measurement_creator_module)
         module_list.append(reco_fitter_module)
         module_list.append(track_builder)
 

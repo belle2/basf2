@@ -74,33 +74,33 @@ namespace Belle2 {
  *  \sa EXPECT_B2WARNING
  */
 #define EXPECT_LOGMESSAGE(x, loglevel) \
-  { \
+  do { \
     int nmessages_before = Belle2::LogSystem::Instance().getMessageCounter(loglevel); \
     { \
       x; \
     } \
     int nmessages_after = Belle2::LogSystem::Instance().getMessageCounter(loglevel); \
     EXPECT_TRUE(nmessages_after > nmessages_before) << "Message of level " << #loglevel << " expected, but not found."; \
-  }
+  } while(0)
 
 /** \def EXPECT_B2FATAL(x)
  *
  * command x should exit using B2FATAL.
  * Note than due to a bug in root versions before 6, this will also pass if x causes a segmentation fault or similar crash. Please check manually that you do get a B2FATAL message.
  */
-#define EXPECT_B2FATAL(x) EXPECT_EXIT(x, ::testing::ExitedWithCode(1),"");
+#define EXPECT_B2FATAL(x) EXPECT_EXIT(x, ::testing::ExitedWithCode(1),"")
 
 /** \def EXPECT_B2ERROR(x)
  *
  *  command x should print at least one B2ERROR.
  */
-#define EXPECT_B2ERROR(x) EXPECT_LOGMESSAGE(x, Belle2::LogConfig::c_Error);
+#define EXPECT_B2ERROR(x) EXPECT_LOGMESSAGE(x, Belle2::LogConfig::c_Error)
 
 /** \def EXPECT_B2WARNING(x)
  *
  *  command x should print at least one B2WARNING.
  */
-#define EXPECT_B2WARNING(x) EXPECT_LOGMESSAGE(x, Belle2::LogConfig::c_Warning);
+#define EXPECT_B2WARNING(x) EXPECT_LOGMESSAGE(x, Belle2::LogConfig::c_Warning)
 
 /** \def EXPECT_NO_LOGMESSAGE(x, loglevel)
  *
@@ -110,32 +110,32 @@ namespace Belle2 {
  *  \sa EXPECT_NO_B2WARNING
  */
 #define EXPECT_NO_LOGMESSAGE(x, loglevel) \
-  { \
+  do { \
     int nmessages_before = Belle2::LogSystem::Instance().getMessageCounter(loglevel); \
     { \
       x; \
     } \
     int nmessages_after = Belle2::LogSystem::Instance().getMessageCounter(loglevel); \
     EXPECT_TRUE(nmessages_after == nmessages_before) << "Message of level " << #loglevel << " found, but non expected."; \
-  }
+  } while(0)
 
 /** \def EXPECT_NO_B2FATAL(x)
  *
  *  command x should print no B2FATAL.
  */
-#define EXPECT_NO_B2FATAL(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Fatal);
+#define EXPECT_NO_B2FATAL(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Fatal)
 
 /** \def EXPECT_NO_B2ERROR(x)
  *
  *  command x should print no B2ERROR.
  */
-#define EXPECT_NO_B2ERROR(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Error);
+#define EXPECT_NO_B2ERROR(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Error)
 
 /** \def EXPECT_NO_B2WARNING(x)
  *
  *  command x should print no B2WARNING.
  */
-#define EXPECT_NO_B2WARNING(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Warning);
+#define EXPECT_NO_B2WARNING(x) EXPECT_NO_LOGMESSAGE(x, Belle2::LogConfig::c_Warning)
 
 /** \def TEST_CONTEXT(x)
  *
@@ -148,7 +148,7 @@ namespace Belle2 {
  *
  *  @example TEST_CONTEXT("for my value set to "  << myValue);
  */
-#define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}());
+#define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}())
 
 
 /** \def EXPECT_ANGLE_NEAR(expected, actual, tolerance)

@@ -4,9 +4,13 @@ from tracking.validation import refiners
 from ROOT import Belle2
 import numpy as np
 import ROOT
+from tracking.validation.pr_side_module import PRSideTrackingValidationModule
+from tracking.validation.module import TrackingValidationModule
 
 
 class VXDMomentumEnergyEstimator:
+
+    """ The base class with all static methods to use. Should be implemented in C++! """
     calibration = 0.653382
     layer_positions = [1.42, 2.18, 3.81, 8.0, 10.51, 13.51]
 
@@ -139,6 +143,8 @@ class VXDMomentumEnergyEstimator:
 
 class MCTrajectoryHarvester(HarvestingModule):
 
+    """ A harvester to check for the positions of the track points in the MCParticleTrajectories"""
+
     def __init__(self):
         HarvestingModule.__init__(self, foreach="MCParticleTrajectorys", output_file_name="mc_trajectory.root")
 
@@ -150,6 +156,8 @@ class MCTrajectoryHarvester(HarvestingModule):
 
 
 class MCParticleHarvester(HarvestingModule):
+
+    """ A harvester to redo parts of the analysis in the Belle II Paper by Robert """
 
     def __init__(self):
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name="mc_particle.root")
@@ -200,7 +208,6 @@ class MCParticleHarvester(HarvestingModule):
                                                              pxd_normalized_charges + svd_normalized_charges,
                                                              name="combined")
 
-        result = dict(p=momentum.Mag(), theta=momentum.Theta())
         result.update(pxd_cluster_dicts)
         result.update(svd_cluster_dicts)
         result.update(combined_cluster_dicts)
@@ -211,6 +218,8 @@ class MCParticleHarvester(HarvestingModule):
 
 
 class VXDHarvester(HarvestingModule):
+
+    """ A base class for the VXD hitwise analysis. Collect dE/dX and the correct p of each hit of the MC particles. """
 
     def __init__(self, foreach, output_file_name):
         HarvestingModule.__init__(self, foreach=foreach, output_file_name=output_file_name)
@@ -273,3 +282,36 @@ class SVDHarvester(VXDHarvester):
 
     def __init__(self):
         VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name="svd.root")
+
+
+class FitHarvester(HarvestingModule):
+
+    def __init__(self, output_file_name):
+        HarvestingModule.__init__(self, foreach="TrackFitResults", output_file_name=output_file_name)
+        self.data_store = Belle2.DataStore.Instance()
+
+    def pick(self, track_fit_result):
+        mc_track_cands = track_fit_result.getRelationsFrom("TrackCands")
+        if len(mc_track_cands) != 1:
+            return False
+
+        mc_track_cand = mc_track_cands[0]
+        mc_particle = self.data_store.getRelated(mc_track_cand, "MCParticles")
+
+        return mc_particle is not None
+
+    def peel(self, track_fit_result):
+        mc_track_cand = track_fit_result.getRelationsFrom("TrackCands")[0]
+        mc_particle = self.data_store.getRelated(mc_track_cand, "MCParticles")
+
+        fit_momentum = track_fit_result.getMomentum()
+        true_momentum = mc_particle.getMomentum()
+
+        return dict(fit_momentum_x=fit_momentum.X(),
+                    fit_momentum_y=fit_momentum.Y(),
+                    fit_momentum_z=fit_momentum.Z(),
+                    true_momentum_x=true_momentum.X(),
+                    true_momentum_y=true_momentum.Y(),
+                    true_momentum_z=true_momentum.Z())
+
+    save_tree = refiners.SaveTreeRefiner()

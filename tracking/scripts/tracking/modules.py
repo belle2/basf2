@@ -494,7 +494,12 @@ class CDCValidation(metamodules.PathModule):
             track_candidates_store_array_name="TrackCands",
             use_pxd=False,
             use_cdc=True,
-            use_svd=False):
+            use_svd=False,
+            queue=None):
+
+        if queue:
+            queue.put(self.__class__.__name__ + "_output_file_name", output_file_name)
+
         from tracking.validation.module import SeparatedTrackingValidationModule
 
         mc_track_finder_module_if_module = CDCMCFinder(use_cdc=use_cdc, use_pxd=use_pxd, use_svd=use_svd)

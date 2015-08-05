@@ -138,7 +138,7 @@ def statistics_plots(
             ROOT.TNamed(
                 'Check',
                 """The virtual memory usage should be flat for high event numbers. If it keeps rising this is an
-                idication of a memory leak.<br>There should also be no significant increases with respect
+                indication of a memory leak.<br>There should also be no significant increases with respect
                 to the reference (or previous revisions if no reference exists)."""))
         if contact:
             memoryProfile.obj().GetListOfFunctions().Add(ROOT.TNamed('Contact',
@@ -154,8 +154,9 @@ def statistics_plots(
             ROOT.TNamed(
                 'Check',
                 """The rss memory usage should be flat for high event numbers. If it keeps rising this is an
-                idication of a memory leak.<br>There should also be no significant increases with respect
-                to the reference (or previous revisions if no reference exists)."""))
+                indication of a memory leak.<br>There should also be no significant increases with respect
+                to the reference (or previous revisions if no reference exists). In the (rare) case that
+                memory is swapped by the OS, the rss memory usage can decrease."""))
         if contact:
             memoryProfile.obj().GetListOfFunctions().Add(ROOT.TNamed('Contact',
                                                                      contact))

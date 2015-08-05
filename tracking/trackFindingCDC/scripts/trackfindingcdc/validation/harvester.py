@@ -276,3 +276,52 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
                     difference_phi=segment_phi - track_phi)
 
     save_tree = refiners.save_tree(folder_name="tree")
+
+
+class SeedsAnalyser(HarvestingModule):
+
+    def __init__(self, output_file_name, track_cands):
+        HarvestingModule.__init__(self, foreach=track_cands, output_file_name=output_file_name)
+
+    def peel(self, legendre_track_cand):
+        # Reconstruct the z0 of the origin
+        Vector3D = Belle2.TrackFindingCDC.Vector3D
+        Vector2D = Belle2.TrackFindingCDC.Vector2D
+
+        position = Vector3D(legendre_track_cand.getPosSeed())
+        momentum = Vector3D(legendre_track_cand.getMomSeed())
+        trajectory3D = Belle2.TrackFindingCDC.CDCTrajectory3D(position, momentum, legendre_track_cand.getChargeSeed())
+        trajectory3D.setLocalOrigin(Vector3D())
+        trajectorySZ = trajectory3D.getTrajectorySZ()
+
+        perpSOrigin = trajectory3D.calcPerpS(Vector3D(0, 0, 0))
+
+        if legendre_track_cand.getChargeSeed() > 0:
+            helix = Belle2.Helix(legendre_track_cand.getPosSeed(), legendre_track_cand.getMomSeed(), 1, 1.5)
+        if legendre_track_cand.getChargeSeed() < 0:
+            helix = Belle2.Helix(legendre_track_cand.getPosSeed(), legendre_track_cand.getMomSeed(), -1, 1.5)
+
+        matcher = Belle2.TrackMatchLookUp("MCTrackCands", self.foreach)
+        mc_track_cand = matcher.getMatchedMCTrackCand(legendre_track_cand)
+
+        if mc_track_cand:
+            mc_x = mc_track_cand.getPosSeed().X()
+            mc_y = mc_track_cand.getPosSeed().Y()
+            mc_z = mc_track_cand.getPosSeed().Z()
+            mc_mom_x = mc_track_cand.getMomSeed().X()
+            mc_mom_y = mc_track_cand.getMomSeed().Y()
+            mc_mom_z = mc_track_cand.getMomSeed().Z()
+        else:
+            mc_x = np.NaN
+            mc_y = np.NaN
+            mc_z = np.NaN
+            mc_mom_x = np.NaN
+            mc_mom_y = np.NaN
+            mc_mom_z = np.NaN
+
+        return dict(helix_z=helix.getZ0(), helix_x=helix.getPerigeeX(), helix_y=helix.getPerigeeY(),
+                    helix_mom_z=helix.getMomentumZ(1.5), helix_mom_x=helix.getMomentumX(1.5), helix_mom_y=helix.getMomentumY(1.5),
+                    mc_x=mc_x, mc_y=mc_y, mc_z=mc_z,
+                    mc_mom_x=mc_mom_x, mc_mom_y=mc_mom_y, mc_mom_z=mc_mom_z)
+
+    save_tree = refiners.SaveTreeRefiner()

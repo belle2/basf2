@@ -133,7 +133,7 @@ class VXDHarvester(QueueHarvester):
 
     """ A base class for the VXD hitwise analysis. Collect dE/dX and the correct p of each hit of the MC particles. """
 
-    def __init__(self, clusters, detector, output_file_name):
+    def __init__(self, clusters, detector, output_file_name, use_mc_info=True):
         HarvestingModule.__init__(self, foreach="TrackCands", output_file_name=output_file_name)
 
         self.svd_tools = Belle2.VXDMomentumEstimationTools("Belle2::SVDCluster").getInstance()
@@ -141,6 +141,8 @@ class VXDHarvester(QueueHarvester):
 
         self.clusters = clusters
         self.detector = detector
+
+        self.use_mc_info = use_mc_info
 
     def is_valid_cluster(self, cluster):
         mc_particles = cluster.getRelationsTo("MCParticles")
@@ -174,9 +176,15 @@ class VXDHarvester(QueueHarvester):
             for mc_particle in mc_particles:
                 if (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and abs(mc_particle.getPDG()) == 211):
 
-                    momentum = mc_particle.getMomentum()
-                    position = mc_particle.getProductionVertex()
-                    charge = mc_particle.getCharge()
+                    if self.use_mc_info:
+                        momentum = mc_particle.getMomentum()
+                        position = mc_particle.getProductionVertex()
+                        charge = mc_particle.getCharge()
+                    else:
+                        momentum = track_cand.getMomSeed()
+                        position = track_cand.getPosSeed()
+                        charge = track_cand.getChargeSeed()
+
                     helix = Belle2.Helix(position, momentum, int(charge), 1.5)
 
                     charge = VXDMomentumEnergyEstimator.do_for_each_hit_type(
@@ -213,14 +221,16 @@ class VXDHarvester(QueueHarvester):
 
 class PXDHarvester(VXDHarvester):
 
-    def __init__(self, output_file_name):
-        VXDHarvester.__init__(self, clusters="PXDClusters", detector=Belle2.Const.PXD, output_file_name=output_file_name)
+    def __init__(self, output_file_name, use_mc_info):
+        VXDHarvester.__init__(self, clusters="PXDClusters", detector=Belle2.Const.PXD, output_file_name=output_file_name,
+                              use_mc_info=use_mc_info)
 
 
 class SVDHarvester(VXDHarvester):
 
-    def __init__(self, output_file_name):
-        VXDHarvester.__init__(self, clusters="SVDClusters", detector=Belle2.Const.SVD, output_file_name=output_file_name)
+    def __init__(self, output_file_name, use_mc_info):
+        VXDHarvester.__init__(self, clusters="SVDClusters", detector=Belle2.Const.SVD, output_file_name=output_file_name,
+                              use_mc_info=use_mc_info)
 
 
 class FitHarvester(QueueHarvester):

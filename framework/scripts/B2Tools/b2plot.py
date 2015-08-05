@@ -405,7 +405,7 @@ class Box(Plotter):
         """
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
-        x = data.loc[mask, column]
+        x = data.loc[mask, column].reset_index(drop=True)
         p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
                               boxprops=dict(facecolor='blue', alpha=0.5),
                               # medianprobs=dict(color='blue'),

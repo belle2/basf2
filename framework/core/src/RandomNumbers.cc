@@ -44,10 +44,10 @@ void RandomNumbers::initialize(const std::string& seed)
 {
   s_initialSeed = seed;
   if (!s_evtRng) {
-    s_evtRng = new RandomGenerator(true);
+    s_evtRng = new RandomGenerator();
   }
   if (!s_runRng) {
-    s_runRng = new RandomGenerator(false);
+    s_runRng = new RandomGenerator();
   }
   RandomGenerator* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
@@ -78,14 +78,14 @@ void RandomNumbers::setSeed(const std::string& seed)
 void RandomNumbers::initializeBeginRun()
 {
   gRandom = s_runRng;
-  s_runRng->setUseEventData(true);
+  s_runRng->setMode(RandomGenerator::c_runDependent);
   s_runRng->initialize();
 };
 
 void RandomNumbers::initializeEndRun()
 {
   gRandom = s_runRng;
-  s_runRng->setUseEventData(true);
+  s_runRng->setMode(RandomGenerator::c_runDependent);
   //We set the barrier index to it's minimum possible value: usually barrier
   //index starts at 0 but for endRun we set it to a negative number large
   //enough that there is no realistic chance that beginRun had the same barrier
@@ -100,7 +100,7 @@ void RandomNumbers::initializeEvent()
   //want to initialize it in the input process (or if there is no multi processing)
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isInputProcess()) {
     // when in event loop we want an error if there is no EventMetaData
-    s_evtRng->setUseEventData(true);
+    s_evtRng->setMode(RandomGenerator::c_eventDependent);
     s_evtRng->initialize();
   }
 }

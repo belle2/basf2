@@ -34,8 +34,8 @@ namespace {
   }
 };
 
-RandomGenerator::RandomGenerator(bool eventDependent): TRandom(), m_state{0},
-  m_index(0), m_barrier(0), m_eventDependent(eventDependent), m_useEventData(false)
+RandomGenerator::RandomGenerator(): TRandom(), m_state{0}, m_index(0), m_barrier(0),
+  m_mode(c_independent)
 {
   SetName("B2Random");
   SetTitle("Belle2 Random Generator");
@@ -68,7 +68,7 @@ void RandomGenerator::setState(int barrier)
   //add the barrier to the buffer
   addValueToBuffer(buffer, m_barrier);
   //do we want to use EventMetaData at all?
-  if (m_useEventData) {
+  if (m_mode != c_independent) {
     //check if we have event data
     StoreObjPtr<EventMetaData> evt;
     if (!evt) {
@@ -79,7 +79,7 @@ void RandomGenerator::setState(int barrier)
       addValueToBuffer(buffer, evt->getExperiment());
       addValueToBuffer(buffer, evt->getRun());
       // and if we are in run dependent mode add also event number to the hash
-      if (m_eventDependent) {
+      if (m_mode == c_eventDependent) {
         addValueToBuffer(buffer, evt->getEvent());
       }
     }
@@ -93,6 +93,7 @@ void RandomGenerator::setState(int barrier)
   //Only prepare debugoutput if we actually want to show it. This is almost
   //equivalent to B2DEBUG(10, ...); but we need to loop over states for
   //printing so we could not put it in a normal B2DEBUG statement easily.
+#ifndef LOG_NO_B2DEBUG
   if (Belle2::LogSystem::Instance().isLevelEnabled(Belle2::LogConfig::c_Debug, 100, PACKAGENAME())) {
     std::stringstream info;
     info << "Random Generator State info:\n";
@@ -107,6 +108,7 @@ void RandomGenerator::setState(int barrier)
     info << "\n";
     B2LOGMESSAGE(Belle2::LogConfig::c_Debug, 100, info.str(), PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
   }
+#endif
 }
 
 void RandomGenerator::RndmArray(Int_t n, unsigned char* array)

@@ -33,8 +33,17 @@ namespace Belle2 {
    */
   class RandomGenerator: public TRandom {
   public:
+    enum EGeneratorMode {
+      /** Don't use event info to generate state */
+      c_independent,
+      /** Use experiment and run number to generate state */
+      c_runDependent,
+      /** Use experiment, run and event number to generate state */
+      c_eventDependent
+    };
+
     /** Default constructor, does not initialize the generator. */
-    explicit RandomGenerator(bool eventDependent = true);
+    RandomGenerator();
 
     /** Destructor to free the seed information */
     virtual ~RandomGenerator() {}
@@ -50,8 +59,8 @@ namespace Belle2 {
      */
     void setSeed(const unsigned char* seed, unsigned int n);
 
-    /** Set the generator to use EventMetaData */
-    void setUseEventData(bool use) { m_useEventData = use; }
+    /** Set the generator mode */
+    void setMode(EGeneratorMode mode) { m_mode = mode; }
 
     /** return the seed object */
     const std::vector<unsigned char>& getSeed() const { return m_seed; }
@@ -164,14 +173,13 @@ namespace Belle2 {
     int m_barrier;
     /** seed information */
     std::vector<unsigned char> m_seed;
-    /** if true use event info for setting the state, otherwise just experiment
-     * and run info */
-    bool m_eventDependent;
-    /** if true use eventMetaData for setting the state, otherwise just seed
-     * and barrier index */
-    bool m_useEventData;
-    /** and the root dictionary macro needs to be documented as well :) */
-    ClassDef(RandomGenerator, 1);
+    /** Current generator mode */
+    EGeneratorMode m_mode;
+    /** and the root dictionary macro needs to be documented as well :)
+     * Version 2: merge m_eventDependent and m_useEventData into a general
+     * generator mode m_mode
+     */
+    ClassDef(RandomGenerator, 2);
   };
 
   inline uint64_t RandomGenerator::random64()

@@ -46,7 +46,7 @@ class Histograms(object):
     #: Dictionary of histograms for the given masks
     hists = None
 
-    def __init__(self, data, column, masks=dict(), weight_column=None):
+    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100):
         """
         Creates a common binning of the given column of the given pandas.Dataframe,
         and stores for each given mask the histogram of the column
@@ -55,9 +55,10 @@ class Histograms(object):
         @param masks dictionary of names and boolean arrays, which select the data
                      used for the creation of histograms with these names
         @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
+        @param bins use given bins instead of default 100
         """
         isfinite = numpy.isfinite(data[column])
-        self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=100,
+        self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
         # Subtract a small number from the bin width, otherwise the errorband plot is unstable.

@@ -302,12 +302,13 @@ class Distribution(Plotter):
     Plots distribution of a quantity
     """
 
-    def __init__(self, figure=None, axis=None, normed=False):
+    def __init__(self, figure=None, axis=None, normed=False, keep_first_binning=False):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
         @param normed true if histograms should be normed before drawing
+        @param keep_first_binning use the binning of the first distribution for further plots
         """
         super(Distribution, self).__init__(figure, axis)
         #: Normalize histograms before drawing them
@@ -317,6 +318,10 @@ class Distribution(Plotter):
             self.ymax = float('-inf')
         self.xmin = float('inf')
         self.xmax = float('-inf')
+        #: Keep first binning if user wants so
+        self.keep_first_binning = keep_first_binning
+        #: first binning
+        self.first_binning = None
 
     def add(self, data, column, mask=None, weight_column=None):
         """
@@ -328,7 +333,13 @@ class Distribution(Plotter):
         """
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
-        hists = b2stat.Histograms(data, column, {'Total': mask}, weight_column=weight_column)
+
+        bins = 100
+        if self.keep_first_binning and self.first_binning is not None:
+            bins = self.first_binning
+        hists = b2stat.Histograms(data, column, {'Total': mask}, weight_column=weight_column, bins=bins)
+        if self.keep_first_binning and self.first_binning is None:
+            self.first_binning = hists.bins
         hist, hist_error = hists.get_hist('Total')
 
         if self.normed:

@@ -5,23 +5,29 @@ import fit_functions
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
+from sklearn import tree
+
 
 class DEDXEstimationTrainer:
 
+    def __init__(self):
+        self.dedx_estimator_function = None
+
     def train(self, data):
+        # We have everything
         raise NotImplementedError("Use this class as a base class only")
 
     def test(self, data):
-        raise NotImplementedError("Use this class as a base class only")
+        if self.dedx_estimator_function is None:
+            raise ValueError("Train the estimator first!")
+
+        return self.dedx_estimator_function(data.dedx)
 
 
 class GroupedDEDXEstimationTrainer(DEDXEstimationTrainer):
-    number_of_bins_in_dedx = 15
+    number_of_bins_in_dedx = 20
     number_of_bins_in_p = 29
     number_of_head_values_used_to_fit = 20
-
-    def __init__(self, train_function, ):
-        self.train_function = train_function
 
     def create_dedx_bins(self, data):
         dedx_bins = np.linspace(data.dedx.min(), data.dedx.max(), GroupedDEDXEstimationTrainer.number_of_bins_in_dedx)
@@ -62,7 +68,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         self.result_parameters_for_each_dedx_bin = {}
         self.use_sigma_for_result_fitting = use_sigma_for_result_fitting
 
-        self.dedx_estimator_function = None
+        GroupedDEDXEstimationTrainer.__init__(self)
 
     def create_result_dataframe(self):
         result_df = pd.DataFrame([{"dedx_bin_center": dedx_bin_center,
@@ -106,9 +112,6 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
             self.result_parameters_for_each_dedx_bin.update(result)
 
         self.dedx_estimator_function = self.fit_result_parameters()
-
-    def test(self, data):
-        return self.dedx_estimator_function(data.dedx)
 
     def plot_fit_result(self, data):
         plt.figure()
@@ -226,3 +229,26 @@ class MaximumEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
             return [None, [None, max_value, None]]
 
         self.train_function = train_function
+
+
+class MVADEDXEstimationTrainer(DEDXEstimationTrainer):
+
+    def __init__(self):
+        self.tree = tree.DecisionTreeRegressor()
+        DEDXEstimationTrainer.__init__(self)
+
+    def train(self, data):
+
+        train_data = data.copy()
+        del train_data["p"]
+
+        p_values = data["p"]
+
+        self.tree.fit(train_data.values, p_values.values)
+
+    def test(self, data):
+
+        test_data = data.copy()
+        del test_data["p"]
+
+        return self.tree.predict(test_data.values)

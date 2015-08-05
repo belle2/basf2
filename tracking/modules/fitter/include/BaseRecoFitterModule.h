@@ -9,13 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <genfit/MeasurementFactory.h>
-#include <framework/gearbox/Const.h>
 #include <framework/core/Module.h>
 #include <string>
 
 namespace genfit {
-  class AbsMeasurement;
   class AbsKalmanFitter;
 }
 
@@ -65,20 +62,8 @@ namespace Belle2 {
     std::string m_param_recoTracksStoreArrayName;
     /** Use this particle hypothesis for fitting. Please use the positive pdg code only. */
     unsigned int m_param_pdgCodeToUseForFitting;
-    /** Use the momentum estimation from VXD */
-    bool m_param_useVXDMomentumEstimation;
 
     unsigned int m_param_maxNumberOfFailedHits = 5;
-    genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
-    std::string m_param_storeArrayNameOfCDCHits = "CDCHits";
-    std::string m_param_storeArrayNameOfSVDHits = "SVDClusters";
-    std::string m_param_storeArrayNameOfPXDHits = "PXDClusters";
-
-    /**
-     * Helper function to construct the measurements for the added hits of a reco track.
-     * @param recoTrack
-     */
-    void constructHitsForTrack(RecoTrack& recoTrack) const;
   };
 }
 

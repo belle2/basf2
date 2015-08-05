@@ -359,7 +359,7 @@ class TrackingValidationModule(basf2.Module):
         track_finding_efficiency = np.mean(self.mc_matches)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
         # can only be computed if there are entries
-        if len(self.pr_clones_and_matches) > 0:
+        if len(self.pr_clones_and_matches) > 0 and sum(self.pr_clones_and_matches) > 0:
             clone_rate = 1.0 - np.average(self.pr_matches,
                                           weights=self.pr_clones_and_matches)
         else:

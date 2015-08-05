@@ -16,6 +16,7 @@
 #include <framework/core/EventProcessor.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/database/DBStore.h>
 #include <framework/pcore/pEventProcessor.h>
 
 #include <framework/logging/Logger.h>
@@ -110,6 +111,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
     LogSystem::Instance().resetMessageCounter();
     DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
+    DBStore::Instance().reset();
 
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {

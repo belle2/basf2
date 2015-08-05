@@ -148,6 +148,37 @@ namespace {
     EXPECT_FALSE(IntervalOfValidity(-1, -1, 1, 0).overlaps(iov));
     EXPECT_FALSE(IntervalOfValidity(3, 11, 3, -1).overlaps(iov));
     EXPECT_FALSE(IntervalOfValidity(4, -1, 4, -1).overlaps(iov));
+
+    IntervalOfValidity iov1, iov2;
+    iov1 = IntervalOfValidity(1, 1, 3, 10);
+    iov2 = IntervalOfValidity(1, 1, 3, 10);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, true));
+    EXPECT_TRUE(iov1.empty());
+    EXPECT_TRUE(iov2 == IntervalOfValidity(1, 1, 3, 10));
+
+    iov1 = IntervalOfValidity(1, 1, 3, 10);
+    iov2 = IntervalOfValidity(2, -1, 4, -1);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, true));
+    EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 1, -1));
+    EXPECT_TRUE(iov2 == IntervalOfValidity(2, -1, 4, -1));
+
+    iov1 = IntervalOfValidity(1, 1, 3, 11);
+    iov2 = IntervalOfValidity(1, 1, 3, 10);
+    EXPECT_FALSE(iov1.trimOverlap(iov2, true));
+    EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 3, 11));
+    EXPECT_TRUE(iov2 == IntervalOfValidity(1, 1, 3, 10));
+
+    iov1 = IntervalOfValidity(1, 1, 3, 10);
+    iov2 = IntervalOfValidity(1, 1, 3, 10);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, false));
+    EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 3, 10));
+    EXPECT_TRUE(iov2.empty());
+
+    iov1 = IntervalOfValidity(1, 1, 3, 10);
+    iov2 = IntervalOfValidity(2, -1, 4, -1);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, false));
+    EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 3, 10));
+    EXPECT_TRUE(iov2 == IntervalOfValidity(3, 11, 4, -1));
   }
 
   /** Test database access via DBObjPtr */

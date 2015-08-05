@@ -67,6 +67,17 @@ int IntervalOfValidity::checkUpperBound(int experiment, int run) const
   return -1;
 }
 
+void IntervalOfValidity::makeValid()
+{
+  if (m_experimentLow < 0) m_runLow = -1;
+  if (m_experimentHigh < 0) m_runHigh = -1;
+  if ((m_experimentLow >= 0) && (m_experimentHigh >= 0)) {
+    if ((m_experimentLow > m_experimentHigh) || ((m_experimentLow == m_experimentHigh) && (m_runHigh >= 0) && (m_runLow > m_runHigh))) {
+      m_experimentLow = m_runLow = m_experimentHigh = m_runHigh = -1;
+    }
+  }
+}
+
 
 bool IntervalOfValidity::contains(const EventMetaData& event) const
 {
@@ -84,8 +95,7 @@ bool IntervalOfValidity::contains(const EventMetaData& event) const
 
 IntervalOfValidity IntervalOfValidity::overlap(const IntervalOfValidity& iov) const
 {
-  IntervalOfValidity emptyResult;
-  if (empty() || iov.empty()) return emptyResult;
+  if (empty() || iov.empty()) return IntervalOfValidity();
 
   IntervalOfValidity result(*this);
   if (checkLowerBound(iov.m_experimentLow, iov.m_runLow) > 0) {
@@ -97,12 +107,40 @@ IntervalOfValidity IntervalOfValidity::overlap(const IntervalOfValidity& iov) co
     result.m_runHigh = iov.m_runHigh;
   }
 
-  // check for no overlap
-  int runLow = result.m_runLow;
-  if (runLow < 0) runLow = 0;
-  if (result.checkUpperBound(result.m_experimentLow, runLow) > 0) return emptyResult;
-
+  result.makeValid();
   return result;
+}
+
+bool IntervalOfValidity::trimOverlap(IntervalOfValidity& iov, bool trimOlder)
+{
+  if (!overlaps(iov)) return true;
+
+  bool thisOlder = checkLowerBound(iov.m_experimentLow, iov.m_runLow) >= 0;
+  IntervalOfValidity& older = (thisOlder) ? *this : iov;
+  IntervalOfValidity& younger = (thisOlder) ? iov : *this;
+
+  if (trimOlder) {
+    // check for the case where trimming is not possible because the interval would be split
+    if (older.checkUpperBound(younger.m_experimentHigh, younger.m_runHigh) < 0) return false;
+
+    older.m_experimentHigh = younger.m_experimentLow;
+    older.m_runHigh = younger.m_runLow - 1;
+    if (older.m_runHigh < 0) {
+      older.m_experimentHigh--;
+      older.m_runHigh = -1;
+    }
+    older.makeValid();
+  } else {
+    younger.m_experimentLow = older.m_experimentHigh;
+    younger.m_runLow = older.m_runHigh + 1;
+    if (younger.m_runLow == 0) {
+      younger.m_experimentLow++;
+      younger.m_runHigh = -1;
+    }
+    younger.makeValid();
+  }
+
+  return true;
 }
 
 

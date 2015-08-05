@@ -88,6 +88,14 @@ namespace Belle2 {
      */
     IntervalOfValidity overlap(const IntervalOfValidity& iov) const;
 
+    /**
+     * Remove the overlap between two intervals of validity by shortening one of them. This does not work if an interval would be cut into two.
+     * @param iov         the other validity interval
+     * @param trimOlder   flag to determine which validity interval should be trimmed based on the comparison of the lower range bound
+     * @return            true if the overlap could be removed.
+     */
+    bool trimOverlap(IntervalOfValidity& iov, bool trimOlder = true);
+
     /** Input stream operator for reading IoV data from a text file.
      *
      *  @param input The input stream.
@@ -135,6 +143,11 @@ namespace Belle2 {
      * @return              0 if the given experiment/run number is equal to the upper bound, -1 if it is below the upper bound, 1 if it is above the upper bound.
      */
     int checkUpperBound(int experiment, int run) const;
+
+    /**
+     * Helper function to set the interval to empty if the upper bound is below the lower one.
+     */
+    void makeValid();
 
     ClassDef(IntervalOfValidity, 2);  /**< describes the interval of experiments/runs for which an object in the database is valid. */
   };

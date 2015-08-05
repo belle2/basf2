@@ -79,7 +79,7 @@ namespace Belle2 {
           rawHitCoordinates(0) = estimatedMomentum;
 
           TMatrixDSym rawHitCovariance(1);
-          rawHitCovariance(0, 0) = 0.2;
+          rawHitCovariance(0, 0) = 5;
 
           genfit::PlanarMomentumMeasurement* momentumMeasurement = new genfit::PlanarMomentumMeasurement(*planarMeasurement);
           momentumMeasurement->setRawHitCoords(rawHitCoordinates);

@@ -39,10 +39,16 @@ namespace Belle2 {
     double getClock();
 
     /**
-     * Returns currently used virtual memory in KB.
-     *
+     * Returns currently used virtual memory in KB, includes swapped and not occupied memory
+     * pages and memory-mapped files.
      */
-    unsigned long getMemoryKB();
+    unsigned long getVirtualMemoryKB();
+
+    /**
+     * Returns the amount of memory the process actually occupies in the physical RAM of
+     * the machine.
+     */
+    unsigned long getRssMemoryKB();
 
     /** Small helper class that prints its lifetime when destroyed. */
     class Timer {

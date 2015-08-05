@@ -22,22 +22,31 @@ namespace Belle2 {
 
     /** Constructor.
      *
-     *  Initilises meta data of event with Nulls.
+     *  Initializes meta data of event with Nulls.
      */
-    ProfileInfo(unsigned long memory = 0, double timeInSec = 0)
-      : m_memory(memory), m_timeInSec(timeInSec) {}
+    ProfileInfo(unsigned long virtualMemory = 0, unsigned long rssMemory = 0, double timeInSec = 0)
+      : m_virtualMemory(virtualMemory), m_rssMemory(rssMemory), m_timeInSec(timeInSec) {}
 
     /** Obtain the current profile values.
      */
     void set(double timeOffset = 0);
 
-    /** Memory size getter.
+    /** Virtual Memory size getter.
      *
-     *  @return The memory size in kB.
+     *  @return The virtual memory size in kB.
      */
-    unsigned long getMemory() const
+    unsigned long getVirtualMemory() const
     {
-      return m_memory;
+      return m_virtualMemory;
+    }
+
+    /** Rss Memory size getter.
+     *
+     *  @return The Rss memory size in kB.
+     */
+    unsigned long getRssMemory() const
+    {
+      return m_rssMemory;
     }
 
     /** Time getter.
@@ -51,9 +60,13 @@ namespace Belle2 {
 
   private:
 
-    /** Memory size in kB.
+    /** Virtual Memory size in kB.
      */
-    unsigned long m_memory;
+    unsigned long m_virtualMemory;
+
+    /** Resident Memory size in kB.
+     */
+    unsigned long m_rssMemory;
 
     /** Time used by this process in seconds.
      */

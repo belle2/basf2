@@ -20,7 +20,8 @@ ClassImp(ProfileInfo)
 
 void ProfileInfo::set(double timeOffset)
 {
-  m_memory = Utils::getMemoryKB();
+  m_virtualMemory = Utils::getVirtualMemoryKB();
+  m_rssMemory = Utils::getRssMemoryKB();
 
   m_timeInSec = Utils::getClock() / Unit::s - timeOffset;
 }

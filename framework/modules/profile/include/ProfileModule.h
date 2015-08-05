@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <vector>
-
+#include <functional>
 
 namespace Belle2 {
   /**
@@ -58,6 +58,12 @@ namespace Belle2 {
      */
     std::string m_outputFileName;
 
+    /** Name for rss image output file.
+     *
+     *  The name of the file for the rss memory usage plot.
+     */
+    std::string m_rssOutputFileName;
+
     static const int k_burnIn = 1;         /**< number of events before the average time measurement is started */
     static const int k_maxPoints = 100;    /**< maximal number of profile points */
 
@@ -68,10 +74,16 @@ namespace Belle2 {
       /**
        * Constructor with initialization of memory usage and time to zero.
        */
-      MemTime(unsigned long m = 0, double t = 0) : mem(m), time(t) {};
-      unsigned long mem;  /**< memory usage */
+      MemTime(unsigned long vm = 0, unsigned long rssm = 0, double t = 0) : virtualMem(vm), rssMem(rssm), time(t) {};
+      unsigned long virtualMem;  /**< virtual memory usage */
+      unsigned long rssMem;  /**< rss memory usage */
       double time;        /**< execution time */
     };
+
+    typedef std::function< unsigned long (MemTime const&) > MemoryExtractLambda;
+
+    void storeMemoryGraph(std::string name, std::string title, std::string xAxisName, std::string imgOutput,
+                          MemoryExtractLambda lmdMemoryExtract);
 
     double m_timeOffset;      /**< time at module creation */
     MemTime m_initializeInfo; /**< memory usage and time at initialization */

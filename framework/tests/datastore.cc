@@ -39,7 +39,7 @@ namespace {
       evtDataDifferentDurability.create();
       profileInfo.create();
 
-      ProfileInfo profileInfoObject(128, 60.0);
+      ProfileInfo profileInfoObject(128, 64, 60.0);
       for (int i = 0; i < 10; ++i) {
         //direct construction
         EventMetaData* newobj = evtData.appendNew();
@@ -187,7 +187,7 @@ namespace {
       EXPECT_EQ((int)evtDataDifferentName[i]->getEvent(), 20 + i);
       EXPECT_EQ((int)evtDataDifferentDurability[i]->getEvent(), 30 + i);
 
-      EXPECT_EQ(profileInfo[i]->getMemory(), 128u);
+      EXPECT_EQ(profileInfo[i]->getVirtualMemory(), 128u);
       EXPECT_FLOAT_EQ(profileInfo[i]->getTimeInSec(), 60.0);
     }
 

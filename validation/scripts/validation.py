@@ -130,36 +130,52 @@ def statistics_plots(
         hModuleTiming.GetListOfFunctions().RemoveLast()
 
     # Memory usage profile
-    memoryProfile = ROOT.Belle2.PyStoreObj('MemoryProfile', 1)
+    memoryProfile = ROOT.Belle2.PyStoreObj('VirtualMemoryProfile', 1)
     if memoryProfile:
         memoryProfile.obj().GetListOfFunctions().Add(ROOT.TNamed('Description',
-                                                                 'The memory usage vs. the event number for %s.' % jobDesc))
+                                                                 'The virtual memory usage vs. the event number for %s.' % jobDesc))
         memoryProfile.obj().GetListOfFunctions().Add(
             ROOT.TNamed(
                 'Check',
-                """The memory usage should be flat for high event numbers. If it keeps rising this is an
+                """The virtual memory usage should be flat for high event numbers. If it keeps rising this is an
                 idication of a memory leak.<br>There should also be no significant increases with respect
                 to the reference (or previous revisions if no reference exists)."""))
         if contact:
             memoryProfile.obj().GetListOfFunctions().Add(ROOT.TNamed('Contact',
                                                                      contact))
-        memoryProfile.obj().Write(prefix + 'MemoryProfile')
+        memoryProfile.obj().Write(prefix + 'VirtualMemoryProfile')
+
+    # Rss Memory usage profile
+    memoryProfile = ROOT.Belle2.PyStoreObj('RssMemoryProfile', 1)
+    if memoryProfile:
+        memoryProfile.obj().GetListOfFunctions().Add(ROOT.TNamed('Description',
+                                                                 'The rss memory usage vs. the event number for %s.' % jobDesc))
+        memoryProfile.obj().GetListOfFunctions().Add(
+            ROOT.TNamed(
+                'Check',
+                """The rss memory usage should be flat for high event numbers. If it keeps rising this is an
+                idication of a memory leak.<br>There should also be no significant increases with respect
+                to the reference (or previous revisions if no reference exists)."""))
+        if contact:
+            memoryProfile.obj().GetListOfFunctions().Add(ROOT.TNamed('Contact',
+                                                                     contact))
+        memoryProfile.obj().Write(prefix + 'RssMemoryProfile')
 
     # Memory usage per module for the different methods
     sqrtN = 1 / math.sqrt(statistics.getGlobal().calls() - 1)
-    hModuleMemory = ROOT.TH1D(prefix + 'ModuleMemory', 'Module Memory',
+    hModuleMemory = ROOT.TH1D(prefix + 'ModuleMemory', 'Virtual Module Memory',
                               len(modules), 0, len(modules))
     hModuleMemory.SetStats(0)
     hModuleMemory.GetXaxis().SetTitle('module')
     hModuleMemory.GetYaxis().SetTitle('memory increase/call [kB]')
     hModuleMemory.GetListOfFunctions().Add(
         ROOT.TNamed(
-            'Description', 'The (average) increase in memory usage per call of the %s method of modules for %s.' %
+            'Description', 'The (average) increase in virtual memory usage per call of the %s method of modules for %s.' %
             (methodName[method], jobDesc)))
     hModuleMemory.GetListOfFunctions().Add(
         ROOT.TNamed(
             'Check',
-            'The increase in memory usage per call for each module should be consistent with zero or the reference.'))
+            'The increase in virtual memory usage per call for each module should be consistent with zero or the reference.'))
     if contact:
         hModuleMemory.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
     for method in memoryMethods:

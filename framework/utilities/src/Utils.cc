@@ -21,12 +21,20 @@ namespace Belle2 {
       return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
     }
 
-    unsigned long getMemoryKB()
+    unsigned long getVirtualMemoryKB()
     {
       ProcInfo_t meminfo;
       gSystem->GetProcInfo(&meminfo);
 
       return meminfo.fMemVirtual;
+    }
+
+    unsigned long getRssMemoryKB()
+    {
+      ProcInfo_t meminfo;
+      gSystem->GetProcInfo(&meminfo);
+
+      return meminfo.fMemResident;
     }
 
     Timer::Timer(std::string text):

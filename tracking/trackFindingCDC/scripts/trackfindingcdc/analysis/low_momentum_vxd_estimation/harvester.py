@@ -222,9 +222,9 @@ class FitHarvester(QueueHarvester):
             return False
 
         mc_track_cand = mc_track_cands[0]
-        mc_particle = self.data_store.getRelated(mc_track_cand, "MCParticles")
+        mc_particles = self.data_store.getRelationsFromObj(mc_track_cand, "MCParticles")
 
-        return mc_particle is not None
+        return len(mc_particles) == 1
 
     def peel(self, track_fit_result):
         mc_track_cand = track_fit_result.getRelationsFrom("TrackCands")[0]
@@ -233,11 +233,46 @@ class FitHarvester(QueueHarvester):
         fit_momentum = track_fit_result.getMomentum()
         true_momentum = mc_particle.getMomentum()
 
+        related_reco_track = track_fit_result.getRelated("RecoTracks")
+        cardinal_rep = related_reco_track.getCardinalRep()
+
+        number_of_measurements_in_total = 0
+        number_of_measurements_with_smaller_weight = 0
+
+        number_of_momentum_measurements_in_total = 0
+        number_of_momentum_measurements_with_smaller_weight = 0
+
+        for track_point_ID in xrange(related_reco_track.getNumPointsWithMeasurement()):
+            track_point = related_reco_track.getPointWithMeasurement(track_point_ID)
+
+            is_momentum_measurement = track_point.getRawMeasurement().__class__.__name__ == "genfit::PlanarMomentumMeasurement"
+
+            if is_momentum_measurement:
+                number_of_momentum_measurements_in_total += 1
+
+            if track_point.hasFitterInfo(cardinal_rep):
+                fitter_info = track_point.getFitterInfo(cardinal_rep)
+                num_measurements = fitter_info.getNumMeasurements()
+
+                for measurement_id in xrange(num_measurements):
+                    number_of_measurements_in_total += 1
+                    weight = fitter_info.getMeasurementOnPlane(measurement_id).getWeight()
+                    if weight != 1:
+                        number_of_measurements_with_smaller_weight += 1
+
+                        if is_momentum_measurement:
+                            number_of_momentum_measurements_with_smaller_weight += 1
+
         return dict(fit_momentum_x=fit_momentum.X(),
                     fit_momentum_y=fit_momentum.Y(),
                     fit_momentum_z=fit_momentum.Z(),
+                    p_value=track_fit_result.getPValue(),
                     true_momentum_x=true_momentum.X(),
                     true_momentum_y=true_momentum.Y(),
-                    true_momentum_z=true_momentum.Z())
+                    true_momentum_z=true_momentum.Z(),
+                    number_of_measurements_in_total=number_of_measurements_in_total,
+                    number_of_measurements_with_smaller_weight=number_of_measurements_with_smaller_weight,
+                    number_of_momentum_measurements_in_total=number_of_momentum_measurements_in_total,
+                    number_of_momentum_measurements_with_smaller_weight=number_of_momentum_measurements_with_smaller_weight)
 
     save_tree = refiners.SaveTreeRefiner()

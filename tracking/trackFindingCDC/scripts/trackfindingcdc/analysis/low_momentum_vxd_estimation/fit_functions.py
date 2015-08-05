@@ -59,3 +59,7 @@ def norm_plus_lin(x, a, mu, sigma, b, c):
 def inverse_squared(x, a, b, c, d):
     # A 1/x^2 function
     return a / (x - b) ** 2 + c + d * x
+
+
+def inverse_sqrt(x, a, b, c, d):
+    return a / (np.sqrt(x - b)) + c + d * x

@@ -245,6 +245,56 @@ class MedianEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
         self.train_function = train_function
 
 
+class GaussianEstimatorTrainerSQRT(FunctionFittedGroupedDEDXEstimatorTrainer):
+
+    def __init__(self):
+        FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
+            self,
+            fit_functions.norm,
+            3,
+            fit_functions.inverse_sqrt,
+            use_sigma_for_result_fitting=True)
+
+
+class LandauEstimatorTrainerSQRT(FunctionFittedGroupedDEDXEstimatorTrainer):
+
+    def __init__(self):
+        FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
+            self,
+            fit_functions.landau,
+            3,
+            fit_functions.inverse_sqrt,
+            use_sigma_for_result_fitting=True)
+
+
+class MaximumEstimatorTrainerSQRT(FittedGroupedDEDXEstimatorTrainer):
+
+    def __init__(self):
+        FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_sqrt, use_sigma_for_result_fitting=False)
+
+        def train_function(fit_data):
+            max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
+
+            return [None, [None, max_value, None]]
+
+        self.train_function = train_function
+
+
+class MedianEstimatorTrainerSQRT(FittedGroupedDEDXEstimatorTrainer):
+
+    def __init__(self):
+        FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_sqrt, use_sigma_for_result_fitting=True)
+
+        def train_function(fit_data):
+            weighted_p_values = fit_data.apply(lambda data: [data.p_bin_centers] * int(data.number_of_p_values), axis=1).sum()
+            median_value = np.median(weighted_p_values)
+            iqr = np.percentile(weighted_p_values, 75) - np.percentile(weighted_p_values, 50)
+
+            return [iqr, [None, median_value, None]]
+
+        self.train_function = train_function
+
+
 class MVADEDXEstimationTrainer(DEDXEstimationTrainer):
 
     def __init__(self):

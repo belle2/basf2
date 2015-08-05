@@ -50,7 +50,7 @@ void SVDValidation()
   TFile* input = TFile::Open("../SVDValidationTTree.root");
   TFile* inputDigit = TFile::Open("../SVDValidationTTreeDigit.root");
   TFile* inputSimhit = TFile::Open("../SVDValidationTTreeSimhit.root");
-  TFile* inputEff = TFile::Open("../SVDValidationTTreeEfficiency.root");
+  //TFile* inputEff = TFile::Open("../SVDValidationTTreeEfficiency.root");
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("SVDValidationPlots.root", "recreate");
@@ -60,8 +60,8 @@ void SVDValidation()
   TTree* tree = (TTree*) input->Get("tree");
   TTree* treeDigit = (TTree*) inputDigit->Get("tree");
   TTree* treeSimhit = (TTree*) inputSimhit->Get("tree");
-  TTree* treeUEff = (TTree*) inputEff->Get("treeU");
-  TTree* treeVEff = (TTree*) inputEff->Get("treeV");
+  //TTree* treeUEff = (TTree*) inputEff->Get("treeU");
+  //TTree* treeVEff = (TTree*) inputEff->Get("treeV");
 
 //------------------------------------------------------------------  
   // Histograms declarations
@@ -72,8 +72,8 @@ void SVDValidation()
   TH1F *hValidSeedCharge[nLayers][nTypes][nSides];
   TH1F *hValidSimhitdEdX[nLayers][nTypes];
   TH2F *hValidTrueHitDepChargevsEnLost[nLayers][nTypes];
-  TH2F *hValidEffTotal[nLayers][nTypes][nSides];
-  TH2F *hValidEffPassed[nLayers][nTypes][nSides];
+  //TH2F *hValidEffTotal[nLayers][nTypes][nSides];
+  //TH2F *hValidEffPassed[nLayers][nTypes][nSides];
   TH1F *hValidDigitSignalToNoise[nLayers][nTypes][nSides];
 
 //----------------------------------------------------------------
@@ -386,6 +386,8 @@ void SVDValidation()
     mycanvas->Write(canvasName);
 } // layer loop ends
 
+/*
+
 //-------------------------------------------------------------------
 // Truehits: Efficiency for finding clusters
 
@@ -467,6 +469,8 @@ void SVDValidation()
     mycanvas->Write(canvasName);
     //mycanvas->Print(pdfFilename);
  } //layers loop ends
+
+*/
 
 //-------------------------------------------------------------------
 // Digits: Signal to Noise plots 

@@ -90,8 +90,9 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
 
     def fit_result_parameters(self):
         result_df = self.create_result_dataframe()
+        result_df = result_df[result_df.dedx_bin_center > 5e5]
 
-        p0 = (2e+8, -1000, 0, 0)
+        p0 = (2e+11, -1323267, 0, 0)
 
         if self.use_sigma_for_result_fitting:
             popt, pcov = curve_fit(self.result_function, result_df.dedx_bin_center, result_df.mu, p0=p0,
@@ -114,7 +115,6 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         self.dedx_estimator_parameters, self.dedx_estimator_function = self.fit_result_parameters()
 
     def plot_fit_result(self, data):
-        plt.figure()
         plot_dedx_data = np.linspace(data.dedx.min(), data.dedx.max(), 100)
         result_df = self.create_result_dataframe()
 
@@ -128,7 +128,6 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         plt.legend()
 
     def plot_grouped_result(self, data):
-        plt.figure()
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
 
         # List to prevent bug in pd.DataFrame.apply
@@ -227,6 +226,21 @@ class MaximumEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             return [None, [None, max_value, None]]
+
+        self.train_function = train_function
+
+
+class MedianEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
+
+    def __init__(self):
+        FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_squared, use_sigma_for_result_fitting=True)
+
+        def train_function(fit_data):
+            weighted_p_values = fit_data.apply(lambda data: [data.p_bin_centers] * int(data.number_of_p_values), axis=1).sum()
+            median_value = np.median(weighted_p_values)
+            iqr = np.percentile(weighted_p_values, 75) - np.percentile(weighted_p_values, 50)
+
+            return [iqr, [None, median_value, None]]
 
         self.train_function = train_function
 

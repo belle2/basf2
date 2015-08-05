@@ -72,7 +72,7 @@ namespace Belle2 {
      */
     double m_timeInSec;
 
-    ClassDef(ProfileInfo, 1); /**< Store execution time and memory usage. */
+    ClassDef(ProfileInfo, 2); /**< Store execution time and memory usage. */
 
   }; //class
 } // namespace Belle2

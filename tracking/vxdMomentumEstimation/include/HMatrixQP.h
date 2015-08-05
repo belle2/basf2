@@ -12,7 +12,7 @@
 
 #include <genfit/AbsHMatrix.h>
 
-namespace genfit {
+namespace Belle2 {
 
   /**
    * @brief AbsHMatrix implementation for one-dimensional MeasurementOnPlane and RKTrackRep parameterization.
@@ -20,7 +20,7 @@ namespace genfit {
    * This projects out q/p.
    * H = (1, 0, 0, 0, 0)
    */
-  class HMatrixQP : public AbsHMatrix {
+  class HMatrixQP : public genfit::AbsHMatrix {
 
   public:
 
@@ -45,14 +45,10 @@ namespace genfit {
     virtual HMatrixQP* clone() const {return new HMatrixQP(*this);}
 
     // Check for equality. Is this right????
-    virtual bool isEqual(const AbsHMatrix& other) const {return (dynamic_cast<const HMatrixQP*>(&other) != NULL);}
+    virtual bool isEqual(const genfit::AbsHMatrix& other) const {return (dynamic_cast<const HMatrixQP*>(&other) != NULL);}
 
     // Print a symbol for the matrix
     virtual void Print(const Option_t* = "") const;
-
-    ClassDef(HMatrixQP, 1)
-
   };
 
-} /* End of namespace genfit */
-/** @} */
+}

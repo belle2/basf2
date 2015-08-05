@@ -5,7 +5,10 @@
 #include <tracking/vxdMomentumEstimation/HMatrixQP.h>
 #include <cassert>
 
-namespace genfit {
+using namespace genfit;
+
+namespace Belle2 {
+
   const AbsHMatrix* PlanarMomentumMeasurement::constructHMatrix(const AbsTrackRep* rep) const
   {
 
@@ -15,11 +18,6 @@ namespace genfit {
     }
 
     return new HMatrixQP();
-  }
-
-  void PlanarMomentumMeasurement::Streamer(TBuffer& R__b)
-  {
-    PlanarMeasurement::Streamer(R__b);
   }
 
 } /* End of namespace genfit */

@@ -3,7 +3,9 @@
 #include <alloca.h>
 #include <iostream>
 
-namespace genfit {
+using namespace genfit;
+
+namespace Belle2 {
 
 
 // 1, 0, 0, 0, 0
@@ -73,4 +75,4 @@ namespace genfit {
     std::cout << "V" << std::endl;
   }
 
-} /* End of namespace genfit */
+}

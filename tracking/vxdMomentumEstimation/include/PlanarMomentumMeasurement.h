@@ -13,7 +13,7 @@
 #include <genfit/PlanarMeasurement.h>
 
 
-namespace genfit {
+namespace Belle2 {
 
 
   /** @brief Measurement class implementing a planar hit geometry (1 or 2D) with only a momentum measurement.
@@ -24,24 +24,19 @@ namespace genfit {
    *  @author Nils Braun (KIT, editor)
    *
    */
-  class PlanarMomentumMeasurement : public PlanarMeasurement {
+  class PlanarMomentumMeasurement : public genfit::PlanarMeasurement {
 
   public:
-    PlanarMomentumMeasurement(const PlanarMeasurement& parentElement) : PlanarMeasurement(parentElement)
+    PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement) : genfit::PlanarMeasurement(parentElement)
     {
       rawHitCoords_.ResizeTo(1);
       rawHitCov_.ResizeTo(1, 1);
     }
 
-    virtual AbsMeasurement* clone() const {return new PlanarMomentumMeasurement(*this);}
+    virtual genfit::AbsMeasurement* clone() const {return new PlanarMomentumMeasurement(*this);}
 
-    virtual const AbsHMatrix* constructHMatrix(const AbsTrackRep*) const;
-
-  public:
-
-    ClassDef(PlanarMomentumMeasurement, 1)
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const;
 
   };
 
-} /* End of namespace genfit */
-/** @} */
+}

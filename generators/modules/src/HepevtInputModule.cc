@@ -103,7 +103,7 @@ void HepevtInputModule::event()
   if (!eventMetaDataPtr) eventMetaDataPtr.create();
   // B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
 
-  MCInitialParticles& initial = m_initial.generate();
+  //MCInitialParticles& initial = m_initial.generate();
 
   try {
     mpg.clear();

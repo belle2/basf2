@@ -24,11 +24,11 @@ namespace Belle2 {
   {
     assert(v.GetNrows() == 5);
 
-    double* retValArray = (double*)alloca(sizeof(double) * 1);
+    TVectorD returnValue(1);
 
-    retValArray[0] = v(0); // q/p
+    returnValue(0) = v(0);
 
-    return TVectorD(1, retValArray);
+    return returnValue;
   }
 
 
@@ -36,14 +36,13 @@ namespace Belle2 {
   {
     assert(M.GetNcols() == 5);
 
-    double* retValArray = (double*)alloca(sizeof(double) * 5);
-    const double* MatArray = M.GetMatrixArray();
+    TMatrixD returnVector(5, 1);
 
     for (unsigned int i = 0; i < 5; ++i) {
-      retValArray[i] = MatArray[i * 5 + 0];
+      returnVector(i, 0) = M(0, i);
     }
 
-    return TMatrixD(5, 1, retValArray);
+    return returnVector;
   }
 
 
@@ -51,14 +50,13 @@ namespace Belle2 {
   {
     assert(M.GetNcols() == 5);
 
-    double* retValArray = (double*)alloca(sizeof(double) * M.GetNrows());
-    const double* MatArray = M.GetMatrixArray();
+    TMatrixD returnMatrix(M.GetNrows(), 1);
 
     for (int i = 0; i < M.GetNrows(); ++i) {
-      retValArray[i] = MatArray[i * 5 + 0];
+      returnMatrix(i, 0) = M(0, i);
     }
 
-    return TMatrixD(M.GetNrows(), 1, retValArray);
+    return returnMatrix;
   }
 
 

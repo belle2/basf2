@@ -148,17 +148,17 @@ void RecoTrack::addVXDMomentumEstimationToGenfitTrack(Const::EDetector detector,
   if (planarMeasurement == nullptr) {
     B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
   }
+
   genfit::PlanarMomentumMeasurement* momentumMeasurement = new genfit::PlanarMomentumMeasurement(*planarMeasurement);
 
   TVectorD rawHitCoordinates(1);
   rawHitCoordinates(0) = 0;
 
   TMatrixDSym rawHitCovariance(1);
-  rawHitCovariance(0, 0) = 0;
+  rawHitCovariance(0, 0) = 100;
 
   momentumMeasurement->setRawHitCoords(rawHitCoordinates);
   momentumMeasurement->setRawHitCov(rawHitCovariance);
-
 
   genfit::TrackPoint* momentumTrackPoint = new genfit::TrackPoint(momentumMeasurement, this);
   momentumTrackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
@@ -222,10 +222,6 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int 
   // then create a TrackPoint from that and set the sorting parameter
   mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedCDCHit>, this, Const::CDC,
                                                              std::placeholders::_1, std::placeholders::_2));
-  mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedSVDHit>, this, Const::SVD,
-                                                             std::placeholders::_1, std::placeholders::_2));
-  mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
-                                                             std::placeholders::_1, std::placeholders::_2));
 
   if (useVXDMomentumEstimation) {
     mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addVXDMomentumEstimationToGenfitTrack<UsedSVDHit>, this,
@@ -233,6 +229,11 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int 
                                                                std::placeholders::_1, std::placeholders::_2));
     mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addVXDMomentumEstimationToGenfitTrack<UsedPXDHit>, this,
                                                                Const::PXD,
+                                                               std::placeholders::_1, std::placeholders::_2));
+  } else {
+    mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedSVDHit>, this, Const::SVD,
+                                                               std::placeholders::_1, std::placeholders::_2));
+    mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
                                                                std::placeholders::_1, std::placeholders::_2));
   }
 

@@ -69,10 +69,11 @@ void BaseRecoFitterModule::event()
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
 
-  for (RecoTrack& recoTrack : recoTracks) {
-    const std::shared_ptr<genfit::AbsKalmanFitter>& fitter = createFitter();
-    fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
+  const std::shared_ptr<genfit::AbsKalmanFitter>& fitter = createFitter();
+  fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
 
+
+  for (RecoTrack& recoTrack : recoTracks) {
     B2DEBUG(100, "Fitting reco track candidate number " << recoTrackCounter);
     B2DEBUG(100, "Reco track candidate has start values: ")
     B2DEBUG(100, "Momentum: " << recoTrack.getMomentum().X() << " " << recoTrack.getMomentum().Y() << " " <<
@@ -82,7 +83,6 @@ void BaseRecoFitterModule::event()
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits())
 
     recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting, m_param_useVXDMomentumEstimation);
-
 
     B2DEBUG(100, "-----> Fit results:");
     B2DEBUG(100, "       Fitted and converged: " << recoTrack.wasLastFitSucessfull());

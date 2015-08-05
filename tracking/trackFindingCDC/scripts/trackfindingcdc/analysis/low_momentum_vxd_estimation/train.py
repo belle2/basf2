@@ -3,6 +3,7 @@ import numpy as np
 
 import fit_functions
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 
 
 class DEDXEstimationTrainer:
@@ -38,7 +39,7 @@ class GroupedDEDXEstimationTrainer(DEDXEstimationTrainer):
         else:
             return data.sort("number_of_p_values", ascending=False).head(number_of_values).sort()
 
-    def fit_p_to_dedx_bin(self, dedx_bin):
+    def create_fit_data(self, dedx_bin):
         p_binned_data, p_bins = self.create_p_bins(dedx_bin)
 
         number_of_p_values = pd.Series(p_binned_data.count().p.values, name="number_of_p_values")
@@ -47,21 +48,23 @@ class GroupedDEDXEstimationTrainer(DEDXEstimationTrainer):
         all_fit_data = pd.DataFrame([number_of_p_values, p_bin_centers]).T
         fit_data = self.use_only_the_highest_values(all_fit_data, GroupedDEDXEstimationTrainer.number_of_head_values_used_to_fit)
 
+        return fit_data
+
+    def fit_p_to_dedx_bin(self, dedx_bin):
+        fit_data = self.create_fit_data(dedx_bin)
         return self.train_function(fit_data)
 
 
-class FittedGroupedDEDXEstmatorTrainer(GroupedDEDXEstimationTrainer):
+class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
 
-    def __init__(self, fit_function, dimension_of_fit_function, result_function, use_sigma_for_result_fitting):
-        self.dimension_of_fit_function = dimension_of_fit_function
-        self.fit_function = fit_function
+    def __init__(self, result_function, use_sigma_for_result_fitting):
         self.result_function = result_function
         self.result_parameters_for_each_dedx_bin = {}
         self.use_sigma_for_result_fitting = use_sigma_for_result_fitting
 
         self.dedx_estimator_function = None
 
-    def fit_result_parameters(self):
+    def create_result_dataframe(self):
         result_df = pd.DataFrame([{"dedx_bin_center": dedx_bin_center,
                                    "mu": fit_parameters[1][1],
                                    "sigma": fit_parameters[0]} for dedx_bin_center,
@@ -71,16 +74,24 @@ class FittedGroupedDEDXEstmatorTrainer(GroupedDEDXEstimationTrainer):
         if len(result_df) == 0:
             raise ValueError("Could not find any fitted parameters!")
 
+        if self.use_sigma_for_result_fitting:
+            result_df["mu_plus_sigma"] = result_df.mu + result_df.sigma
+            result_df["mu_minus_sigma"] = result_df.mu - result_df.sigma
+
         result_df.sort("dedx_bin_center", inplace=True)
 
+        return result_df
+
+    def fit_result_parameters(self):
+        result_df = self.create_result_dataframe()
+
+        p0 = (10000, 1, 1)
+
         if self.use_sigma_for_result_fitting:
-            result_df["mupsigma"] = result_df.mu + result_df.sigma
-            result_df["mumsigma"] = result_df.mu - result_df.sigma
-            popt, pcov = curve_fit(
-                self.result_function, result_df.dedx_bin_center, result_df.mu, p0=(
-                    10000, 1, 1), sigma=result_df.sigma, absolute_sigma=True)
+            popt, pcov = curve_fit(self.result_function, result_df.dedx_bin_center, result_df.mu, p0=p0,
+                                   sigma=result_df.sigma, absolute_sigma=True)
         else:
-            popt, pcov = curve_fit(self.result_function, result_df.dedx_bin_center, result_df.mu, p0=(10000, 1, 1))
+            popt, pcov = curve_fit(self.result_function, result_df.dedx_bin_center, result_df.mu, p0=p0)
 
         return lambda dedx: self.result_function(dedx, *popt)
 
@@ -88,13 +99,59 @@ class FittedGroupedDEDXEstmatorTrainer(GroupedDEDXEstimationTrainer):
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
 
         def fit_and_save_results(dedx_bin):
-            # Do not fit the first entry twice (bug in pandas.DataFrame.apply)
-            if dedx_bin.dedx.mean() in self.result_parameters_for_each_dedx_bin:
-                return
-
             fit_result = self.fit_p_to_dedx_bin(dedx_bin)
-
             return {dedx_bin.mean().dedx: fit_result}
+
+        for result in dedx_binned_data.apply(fit_and_save_results):
+            self.result_parameters_for_each_dedx_bin.update(result)
+
+        self.dedx_estimator_function = self.fit_result_parameters()
+
+    def test(self, data):
+        return self.dedx_estimator_function(data.dedx)
+
+    def plot_fit_result(self, data):
+        plt.figure()
+        plot_dedx_data = np.linspace(data.dedx.min(), data.dedx.max(), 100)
+        result_df = self.create_result_dataframe()
+
+        plt.plot(plot_dedx_data, self.dedx_estimator_function(plot_dedx_data), color="black", label="fitted")
+        plt.plot(result_df.dedx_bin_center, result_df.mu, marker="o", ls="", label="data points")
+        if self.use_sigma_for_result_fitting:
+            plt.plot(result_df.dedx_bin_center, result_df.mu + result_df.sigma, marker=".", ls="", color="green")
+            plt.plot(result_df.dedx_bin_center, result_df.mu - result_df.sigma, marker=".", ls="", color="green")
+
+        plt.ylim(0, 0.14)
+        plt.legend()
+
+    def plot_grouped_result(self, data):
+        plt.figure()
+        dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
+
+        # List to prevent bug in pd.DataFrame.apply
+        already_plotted_list = []
+
+        def plot_fitted_results(dedx_bin):
+            dedx_bin_center = dedx_bin.mean().values[0]
+
+            if dedx_bin_center not in already_plotted_list:
+                already_plotted_list.append(dedx_bin_center)
+
+                fit_data = self.create_fit_data(dedx_bin)
+                plt.plot(fit_data.p_bin_centers, fit_data.number_of_p_values, ls="", marker=".", color="black")
+
+            return True
+
+        dedx_binned_data.apply(plot_fitted_results)
+
+
+class FunctionFittedGroupedDEDXEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
+
+    def __init__(self, fit_function, dimension_of_fit_function, result_function, use_sigma_for_result_fitting):
+        self.dimension_of_fit_function = dimension_of_fit_function
+        self.fit_function = fit_function
+
+        FittedGroupedDEDXEstimatorTrainer.__init__(self, result_function, use_sigma_for_result_fitting)
 
         def train_function(fit_data):
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
@@ -110,19 +167,36 @@ class FittedGroupedDEDXEstmatorTrainer(GroupedDEDXEstimationTrainer):
 
         self.train_function = train_function
 
-        for result in dedx_binned_data.apply(fit_and_save_results):
-            self.result_parameters_for_each_dedx_bin.update(result)
+    def plot_grouped_result(self, data):
+        FittedGroupedDEDXEstimatorTrainer.plot_grouped_result(self, data)
 
-        self.dedx_estimator_function = self.fit_result_parameters()
+        dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
 
-    def test(self, data):
-        return self.dedx_estimator_function(data.dedx)
+        p_plot_data = np.linspace(data.p.min(), data.p.max(), 1000)
+
+        # List to prevent bug in pd.DataFrame.apply
+        already_plotted_list = []
+
+        def plot_fitted_results(dedx_bin):
+            dedx_bin_center = dedx_bin.mean().values[0]
+
+            if dedx_bin_center not in already_plotted_list:
+                fitted_results = self.result_parameters_for_each_dedx_bin[dedx_bin.mean().dedx]
+                already_plotted_list.append(dedx_bin_center)
+                unneeded, fit_options = fitted_results
+
+                dedx_plot_data = self.fit_function(p_plot_data, *fitted_results[1])
+                plt.plot(p_plot_data, dedx_plot_data)
+
+            return True
+
+        dedx_binned_data.apply(plot_fitted_results)
 
 
-class GaussianEstimatorTrainer(FittedGroupedDEDXEstmatorTrainer):
+class GaussianEstimatorTrainer(FunctionFittedGroupedDEDXEstimatorTrainer):
 
     def __init__(self):
-        FittedGroupedDEDXEstmatorTrainer.__init__(
+        FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
             self,
             fit_functions.norm,
             3,
@@ -130,10 +204,10 @@ class GaussianEstimatorTrainer(FittedGroupedDEDXEstmatorTrainer):
             use_sigma_for_result_fitting=True)
 
 
-class LandauEstimatorTrainer(FittedGroupedDEDXEstmatorTrainer):
+class LandauEstimatorTrainer(FunctionFittedGroupedDEDXEstimatorTrainer):
 
     def __init__(self):
-        FittedGroupedDEDXEstmatorTrainer.__init__(
+        FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
             self,
             fit_functions.landau,
             3,
@@ -141,12 +215,14 @@ class LandauEstimatorTrainer(FittedGroupedDEDXEstmatorTrainer):
             use_sigma_for_result_fitting=True)
 
 
-class MaximumEstimatorTrainer(FittedGroupedDEDXEstmatorTrainer):
+class MaximumEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
 
     def __init__(self):
-        FittedGroupedDEDXEstmatorTrainer.__init__(
-            self,
-            fit_functions.landau,
-            3,
-            fit_functions.inverse_squared,
-            use_sigma_for_result_fitting=False)
+        FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_squared, use_sigma_for_result_fitting=False)
+
+        def train_function(fit_data):
+            max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
+
+            return [None, [None, max_value, None]]
+
+        self.train_function = train_function

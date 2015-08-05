@@ -8,6 +8,8 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 
 
+#include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>
+
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;
@@ -15,21 +17,7 @@ using namespace Belle2;
 REG_MODULE(MeasurementCreator)
 
 namespace {
-  /** Create a measurement from a hit */
-  template <class HitType>
-  genfit::AbsMeasurement* createMeasurement(Const::EDetector detector,
-                                            RecoHitInformation& recoHitInformation, HitType* const hit,
-                                            const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory)
-  {
-    genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, hit->getArrayIndex(), -1,
-        recoHitInformation.getSortingParameter());
-
-    genfit::AbsMeasurement* coordinateMeasurement = measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
-                                                    trackCandHit);
-    return coordinateMeasurement;
-  }
-
-  /** Create a TrackPOint from a measurement */
+  /** Helper: Create a TrackPoint from a measurement */
   genfit::TrackPoint* createTrackPoint(genfit::AbsMeasurement* coordinateMeasurement, RecoTrack& recoTrack,
                                        const RecoHitInformation& recoHitInformation)
   {
@@ -39,41 +27,26 @@ namespace {
     return coordinateTrackPoint;
   }
 
-  /** Create for VXD measurements another measurement with a momentum estimation */
-  template <class HitType>
-  genfit::AbsMeasurement* createVXDMomentumMeasurement(genfit::AbsMeasurement* coordinateMeasurement, HitType* const hit,
-                                                       RecoTrack& recoTrack)
+  /** Helper: Go through all measurement creators in the given list and create the measurement with a given hit */
+  template <class HitType, Const::EDetector detector>
+  void measurementAdder(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation, HitType* const hit,
+                        const std::vector<std::unique_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators)
   {
-    genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(coordinateMeasurement);
-    if (planarMeasurement == nullptr) {
-      B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
+    for (const auto& measurementCreator : measurementCreators) {
+      const std::vector<genfit::AbsMeasurement*>& measurements = measurementCreator->createMeasurements(hit, recoTrack,
+                                                                 recoHitInformation);
+      for (genfit::AbsMeasurement* measurement : measurements) {
+        genfit::TrackPoint* trackPointFromMeasurement = createTrackPoint(measurement, recoTrack, recoHitInformation);
+        recoTrack.insertPoint(trackPointFromMeasurement);
+      }
     }
-
-    const VXDMomentumEstimation<HitType>& momentumEstimation = VXDMomentumEstimation<HitType>::getInstance();
-
-    const TVector3& momentum = recoTrack.getMomentum();
-    const TVector3& position = recoTrack.getPosition();
-    short charge = recoTrack.getCharge();
-
-    if (momentum.Mag() < 0.1) {
-      TVectorD rawHitCoordinates(1);
-      rawHitCoordinates(0) = momentumEstimation.estimateQOverP(*hit, momentum, position, charge);
-
-      TMatrixDSym rawHitCovariance(1);
-      rawHitCovariance(0, 0) = 0.2;
-
-      genfit::PlanarMomentumMeasurement* momentumMeasurement = new genfit::PlanarMomentumMeasurement(*planarMeasurement);
-      momentumMeasurement->setRawHitCoords(rawHitCoordinates);
-      momentumMeasurement->setRawHitCov(rawHitCovariance);
-      return momentumMeasurement;
-    }
-
-    return nullptr;
   }
-
 }
 
-MeasurementCreatorModule::MeasurementCreatorModule() : Module()
+MeasurementCreatorModule::MeasurementCreatorModule() : Module(),
+  m_cdcMeasurementCreatorFactory(m_measurementFactory),
+  m_svdMeasurementCreatorFactory(m_measurementFactory),
+  m_pxdMeasurementCreatorFactory(m_measurementFactory)
 {
   setDescription("Create measurements from the hits added to the RecoTracks and add them to the genfit tracks. Can also create new measurements like momentum estimations.");
   addParam("useVXDMomentumEstimation", m_param_useVXDMomentumEstimation, "Use the momentum estimation from VXD.", false);
@@ -84,6 +57,13 @@ MeasurementCreatorModule::MeasurementCreatorModule() : Module()
            std::string("SVDClusters"));
   addParam("storeArrayNameOfPXDHits", m_param_storeArrayNameOfPXDHits, "Store array name for the pxd hits.",
            std::string("PXDClusters"));
+
+  addParam("usedCDCMeasurementCreators", m_cdcMeasurementCreatorFactory.getParameters(),
+           "Dictionary with the used CDC measurement creators and their parameters (as dict also)");
+  addParam("usedSVDMeasurementCreators", m_svdMeasurementCreatorFactory.getParameters(),
+           "Dictionary with the used SVD measurement creators and their parameters (as dict also)");
+  addParam("usedPXDMeasurementCreators", m_pxdMeasurementCreatorFactory.getParameters(),
+           "Dictionary with the used PXD measurement creators and their parameters (as dict also)");
 }
 
 void MeasurementCreatorModule::initialize()
@@ -103,6 +83,11 @@ void MeasurementCreatorModule::initialize()
     m_measurementFactory.addProducer(Const::SVD, new genfit::MeasurementProducer<RecoTrack::UsedSVDHit, SVDRecoHit>(svdHits.getPtr()));
   if (cdcHits.isOptional())
     m_measurementFactory.addProducer(Const::CDC, new genfit::MeasurementProducer<RecoTrack::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
+
+  // Create the measurement creators
+  m_cdcMeasurementCreatorFactory.initialize();
+  m_svdMeasurementCreatorFactory.initialize();
+  m_pxdMeasurementCreatorFactory.initialize();
 }
 
 
@@ -114,59 +99,23 @@ void MeasurementCreatorModule::event()
   }
 }
 
-void MeasurementCreatorModule::addCDCMeasurement(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation,
-                                                 RecoTrack::UsedCDCHit* const hit) const
-{
-  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::CDC, recoHitInformation, hit, m_measurementFactory);
-  genfit::TrackPoint* coordinateTrackPoint = createTrackPoint(coordinateMeasurement, recoTrack, recoHitInformation);
-  recoTrack.insertPoint(coordinateTrackPoint);
-}
-
-void MeasurementCreatorModule::addSVDMeasurement(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation,
-                                                 RecoTrack::UsedSVDHit* const hit) const
-{
-  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::SVD, recoHitInformation, hit, m_measurementFactory);
-  genfit::TrackPoint* coordinateTrackPoint = createTrackPoint(coordinateMeasurement, recoTrack, recoHitInformation);
-  recoTrack.insertPoint(coordinateTrackPoint);
-
-  if (m_param_useVXDMomentumEstimation) {
-    genfit::AbsMeasurement* momentumMeasurement = createVXDMomentumMeasurement(coordinateMeasurement, hit, recoTrack);
-    if (momentumMeasurement != nullptr) {
-      genfit::TrackPoint* momentumTrackPoint = createTrackPoint(momentumMeasurement, recoTrack, recoHitInformation);
-      recoTrack.insertPoint(momentumTrackPoint);
-    }
-  }
-}
-
-void MeasurementCreatorModule::addPXDMeasurement(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation,
-                                                 RecoTrack::UsedPXDHit* const hit) const
-{
-  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::PXD, recoHitInformation, hit, m_measurementFactory);
-  genfit::TrackPoint* coordinateTrackPoint = createTrackPoint(coordinateMeasurement, recoTrack, recoHitInformation);
-  recoTrack.insertPoint(coordinateTrackPoint);
-
-  if (m_param_useVXDMomentumEstimation) {
-    genfit::AbsMeasurement* momentumMeasurement = createVXDMomentumMeasurement(coordinateMeasurement, hit, recoTrack);
-    if (momentumMeasurement != nullptr) {
-      genfit::TrackPoint* momentumTrackPoint = createTrackPoint(momentumMeasurement, recoTrack, recoHitInformation);
-      recoTrack.insertPoint(momentumTrackPoint);
-    }
-  }
-}
 
 void MeasurementCreatorModule::constructHitsForTrack(RecoTrack& recoTrack) const
 {
   // create TrackPoints
-  // Loop over all hits and create an abs measurement with the factory.
+  // Loop over all hits and create an abs measurement with the creators.
   // then create a TrackPoint from that and set the sorting parameter
   recoTrack.mapOnHits<RecoTrack::UsedCDCHit>(recoTrack.getStoreArrayNameOfCDCHits(),
-                                             std::bind(&MeasurementCreatorModule::addCDCMeasurement, this, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2));
+                                             std::bind(measurementAdder<RecoTrack::UsedCDCHit, Const::CDC>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
+                                                       std::cref(m_cdcMeasurementCreatorFactory.getCreators())));
 
   recoTrack.mapOnHits<RecoTrack::UsedSVDHit>(recoTrack.getStoreArrayNameOfSVDHits(),
-                                             std::bind(&MeasurementCreatorModule::addSVDMeasurement, this, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2));
+                                             std::bind(measurementAdder<RecoTrack::UsedSVDHit, Const::SVD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
+                                                       std::cref(m_svdMeasurementCreatorFactory.getCreators())));
 
   recoTrack.mapOnHits<RecoTrack::UsedPXDHit>(recoTrack.getStoreArrayNameOfPXDHits(),
-                                             std::bind(&MeasurementCreatorModule::addPXDMeasurement, this, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2));
+                                             std::bind(measurementAdder<RecoTrack::UsedPXDHit, Const::PXD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
+                                                       std::cref(m_pxdMeasurementCreatorFactory.getCreators())));
 
   recoTrack.sort();
 }

@@ -85,6 +85,33 @@ class Printer(metamodules.WrapperModule):
         metamodules.WrapperModule.__init__(self, StandardEventGenerationRun.get_basf2_module("PrintCollections"))
 
 
+class VXDFinder(metamodules.PathModule):
+
+    def __init__(self, sectorSetup=None, tuneCutoffs=0.22, track_candidates_store_array_name="TrackCands",
+                 setup_geometry=True, fit_geometry="Geant4",):
+
+        setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
+                                                                                        whichGeometry=fit_geometry)
+
+        if sectorSetup is None:
+            sectorSetup = ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+                           'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
+                           'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD']
+
+        vxd_module = StandardEventGenerationRun.get_basf2_module("VXDTF",
+                                                                 sectorSetup=sectorSetup,
+                                                                 tuneCutoffs=tuneCutoffs,
+                                                                 GFTrackCandidatesColName=track_candidates_store_array_name)
+
+        modules = []
+        if setup_geometry:
+            modules.append(setup_genfit_extrapolation_module)
+
+        modules.append(vxd_module)
+
+        metamodules.PathModule.__init__(self, modules=modules)
+
+
 class CDCFullFinder(metamodules.PathModule):
 
     """
@@ -554,8 +581,19 @@ class CDCRecoFitter(metamodules.PathModule):
             "RecoTrackCreator",
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
 
+        usedCDCMeasurementCreators = {"RecoHitCreator": {}}
+        usedSVDMeasurementCreators = {"RecoHitCreator": {}}
+        usedPXDMeasurementCreators = {"RecoHitCreator": {}}
+
+        if useVXDMomentumEstimation:
+            usedSVDMeasurementCreators.update({"MomentumEstimationCreator": {}})
+            usedPXDMeasurementCreators.update({"MomentumEstimationCreator": {}})
+
         measurement_creator_module = StandardEventGenerationRun.get_basf2_module(
             "MeasurementCreator",
+            usedCDCMeasurementCreators=usedCDCMeasurementCreators,
+            usedSVDMeasurementCreators=usedSVDMeasurementCreators,
+            usedPXDMeasurementCreators=usedPXDMeasurementCreators,
             useVXDMomentumEstimation=useVXDMomentumEstimation)
 
         reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter",

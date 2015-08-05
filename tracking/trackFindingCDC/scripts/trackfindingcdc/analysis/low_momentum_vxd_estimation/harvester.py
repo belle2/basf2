@@ -200,14 +200,14 @@ class VXDHarvester(QueueHarvester):
 
 class PXDHarvester(VXDHarvester):
 
-    def __init__(self):
-        VXDHarvester.__init__(self, foreach="PXDClusters", output_file_name="~/data/pxd.root")
+    def __init__(self, output_file_name):
+        VXDHarvester.__init__(self, foreach="PXDClusters", output_file_name=output_file_name)
 
 
 class SVDHarvester(VXDHarvester):
 
-    def __init__(self):
-        VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name="~/data/svd.root")
+    def __init__(self, output_file_name):
+        VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name=output_file_name)
 
 
 class FitHarvester(QueueHarvester):

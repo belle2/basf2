@@ -44,19 +44,21 @@ namespace Belle2 {
       double dEdX = tools.getDEDX(cluster, momentum, position, charge);
 
       // These numbers are fit results from the Analyse_Hitwise.ipynb ipython notebook and can not be calculated.
-      double aE = 2.580303775e+11;
-      double bE = -1331389.323;
-      double cE = 0.01794688749;
-      double dE = 8.418982912e-10;
+      double aE = 1.049925575e+11;
+      double bE = -738645.4502;
+      double cE = 0.03691275027;
+      double dE = -3.155086281e-09;
       double estimation = aE / (dEdX - bE) / (dEdX - bE) + cE + dE * dEdX;
 
-      double aM = -6.463843867;
-      double bM = 0.8176824267;
-      double cM = -0.02627362886;
+
+      double aM = 103.3845985;
+      double bM = -4.812561153;
+      double cM = 0.08154437323;
       double mediumCorrection = aM * estimation * estimation + bM * estimation + cM;
       double estimationWithMediumCalibration = estimation - mediumCorrection;
 
-      return estimationWithMediumCalibration;
+
+      return estimation;
     }
 
   };

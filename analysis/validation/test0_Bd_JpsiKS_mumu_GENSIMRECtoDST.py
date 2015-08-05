@@ -12,6 +12,7 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
+from beamparameters import add_beamparameters
 from ROOT import Belle2
 
 set_random_seed(12345)
@@ -25,9 +26,12 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
+# set the BeamParameters for running at Y(4S)
+beamparameters = add_beamparameters(main, "Y4S")
+print_params(beamparameters)
+
 # generate Bd->J/psi(-> mu mu) KS0 events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/generators/evtgen/decayfiles/Bd_JpsiKS,mumu.dec'))
 
 main.add_module(evtgeninput)

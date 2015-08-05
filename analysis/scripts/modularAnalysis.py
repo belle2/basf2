@@ -94,7 +94,6 @@ def generateY4S(noEvents, decayTable=None, path=analysis_main):
             evtgeninput.param('userDECFile', decayTable)
         else:
             B2ERROR('The specifed decay table file does not exist:' + decayTable)
-    evtgeninput.param('boost2LAB', True)
     path.add_module(evtnumbers)
     path.add_module(evtgeninput)
 
@@ -135,7 +134,6 @@ def generateContinuum(
     evtgeninput.param('ParentParticle', 'vpho')
     evtgeninput.param('InclusiveParticle', inclusiveP)
     evtgeninput.param('InclusiveType', inclusiveT)
-    evtgeninput.param('boost2LAB', True)
     path.add_module(evtnumbers)
     path.add_module(evtgeninput)
 

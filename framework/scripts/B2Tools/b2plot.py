@@ -3,6 +3,7 @@
 # Thomas Keck 2015
 
 import copy
+import math
 
 import numpy
 import pandas
@@ -37,6 +38,10 @@ class Plotter(object):
     ymin = None
     #: Maximum y value
     ymax = None
+    #: y limit scale
+    yscale = 0.0
+    #: x limit scale
+    xscale = 0.0
     #: figure which is used to draw
     figure = None
     #: Main axis which is used to draw
@@ -63,6 +68,8 @@ class Plotter(object):
         self.labels = []
         self.xmin, self.xmax = float(0), float(1)
         self.ymin, self.ymax = float(0), float(1)
+        self.yscale = 0.1
+        self.xscale = 0.0
 
         #: Default keyword arguments for plot function
         self.plot_kwargs = None
@@ -181,6 +188,16 @@ class Plotter(object):
         """
         return NotImplemented
 
+    def scale_limits(self):
+        """
+        Scale limits to increase distance to boundaries
+        """
+        self.ymin *= 1.0 - math.copysign(self.yscale, self.ymin)
+        self.ymax *= 1.0 + math.copysign(self.yscale, self.ymax)
+        self.xmin *= 1.0 - math.copysign(self.xscale, self.xmin)
+        self.xmax *= 1.0 + math.copysign(self.xscale, self.xmax)
+        return self
+
 
 class PurityOverEfficiency(Plotter):
     """
@@ -276,7 +293,8 @@ class Diagonal(Plotter):
         purity, purity_error = hists.get_purity_per_bin(['Signal'], ['Background'])
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
+        # self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
+        self.ymin, self.ymax = 0, 1
 
         p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths/2.0, yerr=purity_error)
         self.plots.append(p)
@@ -287,7 +305,8 @@ class Diagonal(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.plot((self.xmin, self.xmax), (0, 1), color='black')
+        self.scale_limits()
+        self.axis.plot((self.xmin, self.xmax), (self.ymin, self.ymax), color='black')
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Diagonal Plot")
@@ -359,6 +378,7 @@ class Distribution(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
+        self.scale_limits()
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Distribution Plot")
@@ -448,6 +468,7 @@ class Difference(Plotter):
         Sets limits, title, axis-labels and legend of the plot
         """
         self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4)
+        self.scale_limits()
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Difference Plot")
@@ -538,10 +559,10 @@ class Overtraining(Plotter):
         # Kolmogorov smirnov test
         ks = scipy.stats.ks_2samp(data.loc[train_mask & signal_mask, column], data.loc[test_mask & signal_mask, column])
         props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-        self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=28, bbox=props,
+        self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
                           verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
         ks = scipy.stats.ks_2samp(data.loc[train_mask & bckgrd_mask, column], data.loc[test_mask & bckgrd_mask, column])
-        self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=28, bbox=props,
+        self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
                           verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
         return self
 
@@ -549,11 +570,13 @@ class Overtraining(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        matplotlib.artist.setp(self.axis.get_xaxis(), visible=False)
-        matplotlib.artist.setp(self.axis_d1.get_xaxis(), visible=False)
         self.axis.set_title("Overtraining Plot")
         self.axis_d1.set_title("")
         self.axis_d2.set_title("")
+        matplotlib.artist.setp(self.axis.get_xticklabels(), visible=False)
+        matplotlib.artist.setp(self.axis_d1.get_xticklabels(), visible=False)
+        self.axis.get_xaxis().set_label_text('')
+        self.axis_d1.get_xaxis().set_label_text('')
         self.axis_d2.get_xaxis().set_label_text('Classifier Output')
         return self
 
@@ -613,9 +636,13 @@ class VerboseDistribution(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        for box_axis in self.box_axes:
-            matplotlib.artist.setp(box_axis.get_xaxis(), visible=False)
-            box_axis.set_title('')
+        matplotlib.artist.setp(self.axis.get_xticklabels(), visible=False)
+        self.axis.get_xaxis().set_label_text('')
+        for box_axis in self.box_axes[:-1]:
+            matplotlib.artist.setp(box_axis.get_xticklabels(), visible=False)
+            box_axis.set_title("")
+            box_axis.get_xaxis().set_label_text('')
+        self.box_axes[-1].set_title("")
         self.axis.set_title("Distribution Plot")
         self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self

@@ -131,6 +131,17 @@ namespace Belle2 {
       return;
 
     TLorentzVector beam = m_her + m_ler;
+    // Save the invariant mass because it's used very often in analysis
+    m_invariantMass = beam.M();
+
+    // If we generate events in CMS we already are in CMS and there is no
+    // transformation so let's use the identity
+    if (hasGenerationFlags(c_generateCMS)) {
+      m_labToCMS = new TLorentzRotation();
+      m_CMSToLab = new TLorentzRotation();
+      return;
+    }
+
     // Transformation from Lab system to CMS system
     m_labToCMS = new TLorentzRotation(-beam.BoostVector());
     // boost HER e- from Lab system to CMS system
@@ -143,7 +154,6 @@ namespace Belle2 {
 
     //cache derived quantities
     m_CMSToLab = new TLorentzRotation(m_labToCMS->Inverse());
-    m_invariantMass = beam.M();
   }
 
   inline void MCInitialParticles::resetBoost()

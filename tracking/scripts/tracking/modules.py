@@ -514,13 +514,24 @@ class CDCValidation(metamodules.PathModule):
 
 class CDCMCFinder(metamodules.IfStoreArrayNotPresentModule):
 
-    def __init__(self, use_cdc=True, use_svd=False, use_pxd=False):
-        mc_track_finder_module = StandardEventGenerationRun.get_basf2_module('TrackFinderMCTruth',
-                                                                             UseCDCHits=use_cdc,
-                                                                             UseSVDHits=use_svd,
-                                                                             UsePXDHits=use_pxd,
-                                                                             WhichParticles=[],
-                                                                             GFTrackCandidatesColName="MCTrackCands")
+    def __init__(
+            self,
+            use_cdc=True,
+            use_svd=False,
+            use_pxd=False,
+            only_primaries=False,
+            track_candidates_store_array_name="MCTrackCands"):
+        mc_track_finder_module = StandardEventGenerationRun.get_basf2_module(
+            'TrackFinderMCTruth',
+            UseCDCHits=use_cdc,
+            UseSVDHits=use_svd,
+            UsePXDHits=use_pxd,
+            GFTrackCandidatesColName=track_candidates_store_array_name)
+
+        if only_primaries:
+            mc_track_finder_module.param("WhichParticles", ["primary"])
+        else:
+            mc_track_finder_module.param("WhichParticles", [])
 
         metamodules.IfStoreArrayNotPresentModule.__init__(self, mc_track_finder_module, storearray_name="MCTrackCands")
 
@@ -529,7 +540,7 @@ class CDCRecoFitter(metamodules.PathModule):
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
                  input_track_cands_store_array_name="TrackCands",
-                 prob_cut=0.001, pdg_code=211):
+                 prob_cut=0.001, pdg_code=211, useVXDMomentumEstimation=False):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
@@ -537,7 +548,9 @@ class CDCRecoFitter(metamodules.PathModule):
         reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
             "RecoTrackCreator",
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
-        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", ProbCut=prob_cut,
+        reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter",
+                                                                         ProbCut=prob_cut,
+                                                                         useVXDMomentumEstimation=useVXDMomentumEstimation,
                                                                          pdgCodeToUseForFitting=pdg_code)
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
@@ -574,10 +587,7 @@ class CDCFitter(metamodules.PathModule):
                                                                         PDGCodes=[211],
                                                                         BuildBelle2Tracks=False)
 
-        gen_fitter_module.set_log_level(basf2.LogLevel.DEBUG)
-
         track_builder = StandardEventGenerationRun.get_basf2_module('TrackBuilder')
-        track_builder.set_log_level(basf2.LogLevel.DEBUG)
 
         module_list = []
         if setup_geometry:

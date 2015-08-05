@@ -133,13 +133,16 @@ class VXDHarvester(QueueHarvester):
 
     """ A base class for the VXD hitwise analysis. Collect dE/dX and the correct p of each hit of the MC particles. """
 
-    def __init__(self, foreach, output_file_name):
-        HarvestingModule.__init__(self, foreach=foreach, output_file_name=output_file_name)
+    def __init__(self, clusters, detector, output_file_name):
+        HarvestingModule.__init__(self, foreach="TrackCands", output_file_name=output_file_name)
 
         self.svd_tools = Belle2.VXDMomentumEstimationTools("Belle2::SVDCluster").getInstance()
         self.pxd_tools = Belle2.VXDMomentumEstimationTools("Belle2::PXDCluster").getInstance()
 
-    def pick(self, cluster):
+        self.clusters = clusters
+        self.detector = detector
+
+    def is_valid_cluster(self, cluster):
         mc_particles = cluster.getRelationsTo("MCParticles")
 
         space_point = cluster.getRelated("SpacePoints")
@@ -155,45 +158,55 @@ class VXDHarvester(QueueHarvester):
 
         return False
 
-    def peel(self, cluster):
-        mc_particles = cluster.getRelationsTo("MCParticles")
+    def peel(self, track_cand):
+        vxd_hit_ids = track_cand.getHitIDs(self.detector)
 
-        for mc_particle in mc_particles:
-            if (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and abs(mc_particle.getPDG()) == 211):
+        vxd_hits = Belle2.PyStoreArray(self.clusters)
 
-                momentum = mc_particle.getMomentum()
-                position = mc_particle.getProductionVertex()
-                charge = mc_particle.getCharge()
-                helix = Belle2.Helix(position, momentum, int(charge), 1.5)
+        for vxd_hit_id in vxd_hit_ids:
+            cluster = vxd_hits[vxd_hit_id]
 
-                charge = VXDMomentumEnergyEstimator.do_for_each_hit_type(
-                    cluster,
-                    lambda cluster: self.svd_tools.getCalibratedCharge(cluster),
-                    lambda cluster: self.pxd_tools.getCalibratedCharge(cluster))
-                path_length = VXDMomentumEnergyEstimator.do_for_each_hit_type(
-                    cluster, lambda cluster: self.svd_tools.getPathLength(
-                        cluster, helix), lambda cluster: self.pxd_tools.getPathLength(
-                        cluster, helix))
+            if not self.is_valid_cluster(cluster):
+                continue
 
-                mc_momentum = VXDMomentumEnergyEstimator.do_for_each_hit_type(
-                    cluster,
-                    lambda cluster: self.svd_tools.getMomentumOfMCParticle(cluster),
-                    lambda cluster: self.pxd_tools.getMomentumOfMCParticle(cluster))
+            mc_particles = cluster.getRelationsTo("MCParticles")
 
-                p = mc_momentum.Mag()
+            for mc_particle in mc_particles:
+                if (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and abs(mc_particle.getPDG()) == 211):
 
-                is_u = VXDMomentumEnergyEstimator.do_for_each_hit_type(
-                    cluster,
-                    lambda cluster: cluster.isUCluster(),
-                    lambda cluster: np.NaN)
-                is_pxd = VXDMomentumEnergyEstimator.do_for_each_hit_type(cluster, lambda cluster: False, lambda cluster: True)
+                    momentum = mc_particle.getMomentum()
+                    position = mc_particle.getProductionVertex()
+                    charge = mc_particle.getCharge()
+                    helix = Belle2.Helix(position, momentum, int(charge), 1.5)
 
-        return dict(charge=charge,
-                    p=p,
-                    path_length=path_length,
-                    is_u=is_u,
-                    p_origin=mc_particle.getMomentum().Mag(),
-                    is_pxd=is_pxd)
+                    charge = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                        cluster,
+                        lambda cluster: self.svd_tools.getCalibratedCharge(cluster),
+                        lambda cluster: self.pxd_tools.getCalibratedCharge(cluster))
+                    path_length = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                        cluster, lambda cluster: self.svd_tools.getPathLength(
+                            cluster, helix), lambda cluster: self.pxd_tools.getPathLength(
+                            cluster, helix))
+
+                    mc_momentum = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                        cluster,
+                        lambda cluster: self.svd_tools.getMomentumOfMCParticle(cluster),
+                        lambda cluster: self.pxd_tools.getMomentumOfMCParticle(cluster))
+
+                    p = mc_momentum.Mag()
+
+                    is_u = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                        cluster,
+                        lambda cluster: cluster.isUCluster(),
+                        lambda cluster: np.NaN)
+                    is_pxd = VXDMomentumEnergyEstimator.do_for_each_hit_type(cluster, lambda cluster: False, lambda cluster: True)
+
+            yield dict(charge=charge,
+                       p=p,
+                       path_length=path_length,
+                       is_u=is_u,
+                       p_origin=mc_particle.getMomentum().Mag(),
+                       is_pxd=is_pxd)
 
     save_tree = refiners.SaveTreeRefiner()
 
@@ -201,13 +214,13 @@ class VXDHarvester(QueueHarvester):
 class PXDHarvester(VXDHarvester):
 
     def __init__(self, output_file_name):
-        VXDHarvester.__init__(self, foreach="PXDClusters", output_file_name=output_file_name)
+        VXDHarvester.__init__(self, clusters="PXDClusters", detector=Belle2.Const.PXD, output_file_name=output_file_name)
 
 
 class SVDHarvester(VXDHarvester):
 
     def __init__(self, output_file_name):
-        VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name=output_file_name)
+        VXDHarvester.__init__(self, clusters="SVDClusters", detector=Belle2.Const.SVD, output_file_name=output_file_name)
 
 
 class FitHarvester(QueueHarvester):

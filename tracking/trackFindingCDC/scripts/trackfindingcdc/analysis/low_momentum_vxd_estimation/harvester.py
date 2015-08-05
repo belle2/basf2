@@ -7,12 +7,12 @@ import ROOT
 from tracking.validation.pr_side_module import PRSideTrackingValidationModule
 from tracking.validation.module import TrackingValidationModule
 
+from tracking.ipython_tools import QueueHarvester
+
 
 class VXDMomentumEnergyEstimator:
 
-    """ The base class with all static methods to use. Should be implemented in C++! """
-    calibration = 0.653382
-    layer_positions = [1.42, 2.18, 3.81, 8.0, 10.51, 13.51]
+    """ The base class with all static methods to use. """
 
     @staticmethod
     def do_for_each_hit_type(cluster, svd_function, pxd_function):
@@ -25,72 +25,22 @@ class VXDMomentumEnergyEstimator:
             raise TypeError("Unknown hit type")
 
     @staticmethod
-    def get_thickness_of_cluster(cluster):
-        vxdID = cluster.getSensorID()
-        sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-
-        return sensorInfoBase.getThickness() / 100
-
-    @staticmethod
-    def get_radius_of_cluster(cluster):
-        space_point = cluster.getRelated("SpacePoints")
-        if not space_point:
-            sensor_id = cluster.getSensorID()
-            layer = sensor_id.getLayerNumber()
-            radius = VXDMomentumEnergyEstimator.layer_positions[layer - 1]
-        else:
-            radius = space_point.getPosition().Perp()
-
-        return radius / 100
-
-    @staticmethod
-    def calculate_charge_and_path_length(cluster, trajectory2D, trajectorySZ):
-        Vector2D = Belle2.TrackFindingCDC.Vector2D
-
-        def pxd_function(cluster):
-            calibration = VXDMomentumEnergyEstimator.calibration
-            return calibration
-
-        def svd_function(cluster):
-            calibration = 1
-            return calibration
-
-        calibration = VXDMomentumEnergyEstimator.do_for_each_hit_type(cluster, svd_function, pxd_function)
-
-        thickness = VXDMomentumEnergyEstimator.get_thickness_of_cluster(cluster)
-
-        charge = cluster.getCharge()
-        radius = VXDMomentumEnergyEstimator.get_radius_of_cluster(cluster)
-
-        layer_inner_position_on_x_axis = Vector2D(radius - thickness / 2.0, 0)
-        layer_outer_position_on_x_axis = Vector2D(radius + thickness / 2.0, 0)
-
-        cluster_layer_entry = trajectory2D.getCloseSameCylindricalR(layer_inner_position_on_x_axis)
-        cluster_layer_exit = trajectory2D.getCloseSameCylindricalR(layer_outer_position_on_x_axis)
-
-        perp_s_at_cluster_entry = trajectory2D.calcPerpS(cluster_layer_entry)
-        perp_s_at_cluster_exit = trajectory2D.calcPerpS(cluster_layer_exit)
-
-        z_at_cluster_entry = trajectorySZ.mapSToZ(perp_s_at_cluster_entry)
-        z_at_cluster_exit = trajectorySZ.mapSToZ(perp_s_at_cluster_exit)
-
-        distance_2D = trajectory2D.calcPerpSBetween(cluster_layer_entry, cluster_layer_exit)
-        distance_Z = z_at_cluster_entry - z_at_cluster_exit
-        distance_3D = np.sqrt(distance_2D ** 2 + distance_Z ** 2)
-
-        return calibration * charge, distance_3D
-
-    @staticmethod
-    def calculate_charges_and_path_lengths_for_one_type(clusters, trajectory_of_particle):
+    def calculate_charges_and_path_lengths_for_one_type(clusters, mc_particle):
         charge_list = []
         path_length_list = []
 
-        trajectory2D = trajectory_of_particle.getTrajectory2D()
-        trajectorySZ = trajectory_of_particle.getTrajectorySZ()
+        tools = Belle2.VXDMomentumEstimationTools(clusters[0].__class__.__name__).getInstance()
+
+        momentum = mc_particle.getMomentum()
+        position = mc_particle.getProductionVertex()
+        charge = mc_particle.getCharge()
+        helix = Belle2.Helix(position, momentum, charge, 1.5)
 
         for cluster in clusters:
-            calibrated_charge, path_length = VXDMomentumEnergyEstimator.calculate_charge_and_path_length(
-                cluster, trajectory2D, trajectorySZ)
+
+            charge = tools.getCalibratedCharge(cluster)
+            path_length = tools.getPathLength(cluster, helix)
+
             charge_list.append(calibrated_charge)
             path_length_list.append(path_length)
 
@@ -103,42 +53,6 @@ class VXDMomentumEnergyEstimator:
             return sorted_list[:-2], sorted_list[:4], sorted_list[:6]
         else:
             return sorted_list, sorted_list[:4], sorted_list[:6]
-
-    @staticmethod
-    def calculate_trajectory(mc_particle, cluster):
-
-        # We use the momentum at the origin. This is wrong - but later we will have about the same information!
-        momentum = mc_particle.getMomentum()
-        position = mc_particle.getProductionVertex()
-
-        charge = mc_particle.getCharge()
-
-        CDCTrajectory3D = Belle2.TrackFindingCDC.CDCTrajectory3D
-        Vector3D = Belle2.TrackFindingCDC.Vector3D
-
-        trajectory3D = CDCTrajectory3D(Vector3D(position), Vector3D(momentum), charge)
-
-        return trajectory3D
-
-    @staticmethod
-    def get_momentum(cluster):
-        def svd_function(cluster):
-            true_hit = cluster.getRelated("SVDTrueHits")
-            vxdID = cluster.getSensorID()
-            sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-            momentum = sensorInfoBase.vectorToGlobal(true_hit.getMomentum())
-
-            return momentum
-
-        def pxd_function(cluster):
-            true_hit = cluster.getRelated("PXDTrueHits")
-            vxdID = cluster.getSensorID()
-            sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-            momentum = sensorInfoBase.vectorToGlobal(true_hit.getMomentum())
-
-            return momentum
-
-        return VXDMomentumEnergyEstimator.do_for_each_hit_type(cluster, svd_function, pxd_function)
 
 
 class MCTrajectoryHarvester(HarvestingModule):
@@ -172,7 +86,7 @@ class MCParticleHarvester(HarvestingModule):
     def generate_cluster_dicts(self, charge_list, path_length_list, normalized_charge_list, name):
         result = dict()
 
-        truncated, first4, first6 = self.generate_truncated(normalized_charge_list)
+        truncated, first4, first6 = VXDMomentumEnergyEstimator.generate_truncated(normalized_charge_list)
 
         result.update({"sum_%s_charges" % name: sum(charge_list)})
         result.update({"mean_%s_charges" % name: np.mean(charge_list)})
@@ -192,10 +106,8 @@ class MCParticleHarvester(HarvestingModule):
         pxd_clusters = mc_particle.getRelationsFrom("PXDClusters")
         svd_clusters = mc_particle.getRelationsFrom("SVDClusters")
 
-        trajectory3D = VXDMomentumEnergyEstimator.calculate_trajectory(mc_particle)
-
-        pxd_results = self.calculate_charges_and_path_lengths_for_one_type(pxd_clusters, trajectory3D)
-        svd_results = self.calculate_charges_and_path_lengths_for_one_type(svd_clusters, trajectory3D)
+        pxd_results = VXDMomentumEnergyEstimator.calculate_charges_and_path_lengths_for_one_type(pxd_clusters, mc_particle)
+        svd_results = VXDMomentumEnergyEstimator.calculate_charges_and_path_lengths_for_one_type(svd_clusters, mc_particle)
 
         pxd_cluster_dicts = self.generate_cluster_dicts(*pxd_results, name="pxd")
         pxd_charges, pxd_path_length, pxd_normalized_charges = pxd_results
@@ -217,12 +129,15 @@ class MCParticleHarvester(HarvestingModule):
     save_tree = refiners.SaveTreeRefiner()
 
 
-class VXDHarvester(HarvestingModule):
+class VXDHarvester(QueueHarvester):
 
     """ A base class for the VXD hitwise analysis. Collect dE/dX and the correct p of each hit of the MC particles. """
 
     def __init__(self, foreach, output_file_name):
         HarvestingModule.__init__(self, foreach=foreach, output_file_name=output_file_name)
+
+        self.svd_tools = Belle2.VXDMomentumEstimationTools("Belle2::SVDCluster").getInstance()
+        self.pxd_tools = Belle2.VXDMomentumEstimationTools("Belle2::PXDCluster").getInstance()
 
     def pick(self, cluster):
         mc_particles = cluster.getRelationsTo("MCParticles")
@@ -245,14 +160,25 @@ class VXDHarvester(HarvestingModule):
 
         for mc_particle in mc_particles:
             if (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and abs(mc_particle.getPDG()) == 211):
-                trajectory3D = VXDMomentumEnergyEstimator.calculate_trajectory(mc_particle, cluster)
-                trajectory2D = trajectory3D.getTrajectory2D()
-                trajectorySZ = trajectory3D.getTrajectorySZ()
 
-                charge, path_length = VXDMomentumEnergyEstimator.calculate_charge_and_path_length(
-                    cluster, trajectory2D, trajectorySZ)
+                momentum = mc_particle.getMomentum()
+                position = mc_particle.getProductionVertex()
+                charge = mc_particle.getCharge()
+                helix = Belle2.Helix(position, momentum, int(charge), 1.5)
 
-                mc_momentum = VXDMomentumEnergyEstimator.get_momentum(cluster)
+                charge = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                    cluster,
+                    lambda cluster: self.svd_tools.getCalibratedCharge(cluster),
+                    lambda cluster: self.pxd_tools.getCalibratedCharge(cluster))
+                path_length = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                    cluster, lambda cluster: self.svd_tools.getPathLength(
+                        cluster, helix), lambda cluster: self.pxd_tools.getPathLength(
+                        cluster, helix))
+
+                mc_momentum = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                    cluster,
+                    lambda cluster: self.svd_tools.getMomentumOfMCParticle(cluster),
+                    lambda cluster: self.pxd_tools.getMomentumOfMCParticle(cluster))
 
                 p = mc_momentum.Mag()
 
@@ -275,19 +201,19 @@ class VXDHarvester(HarvestingModule):
 class PXDHarvester(VXDHarvester):
 
     def __init__(self):
-        VXDHarvester.__init__(self, foreach="PXDClusters", output_file_name="pxd.root")
+        VXDHarvester.__init__(self, foreach="PXDClusters", output_file_name="~/data/pxd.root")
 
 
 class SVDHarvester(VXDHarvester):
 
     def __init__(self):
-        VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name="svd.root")
+        VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name="~/data/svd.root")
 
 
-class FitHarvester(HarvestingModule):
+class FitHarvester(QueueHarvester):
 
-    def __init__(self, output_file_name):
-        HarvestingModule.__init__(self, foreach="TrackFitResults", output_file_name=output_file_name)
+    def __init__(self, output_file_name, queue):
+        QueueHarvester.__init__(self, queue, foreach="TrackFitResults", output_file_name=output_file_name)
         self.data_store = Belle2.DataStore.Instance()
 
     def pick(self, track_fit_result):

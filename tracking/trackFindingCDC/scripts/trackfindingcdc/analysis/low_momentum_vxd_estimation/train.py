@@ -91,7 +91,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
     def fit_result_parameters(self):
         result_df = self.create_result_dataframe()
 
-        p0 = (10000, 1, 1)
+        p0 = (2e+8, -1000, 0, 0)
 
         if self.use_sigma_for_result_fitting:
             popt, pcov = curve_fit(self.result_function, result_df.dedx_bin_center, result_df.mu, p0=p0,
@@ -99,7 +99,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         else:
             popt, pcov = curve_fit(self.result_function, result_df.dedx_bin_center, result_df.mu, p0=p0)
 
-        return lambda dedx: self.result_function(dedx, *popt)
+        return popt, lambda dedx: self.result_function(dedx, *popt)
 
     def train(self, data):
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
@@ -111,7 +111,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         for result in dedx_binned_data.apply(fit_and_save_results):
             self.result_parameters_for_each_dedx_bin.update(result)
 
-        self.dedx_estimator_function = self.fit_result_parameters()
+        self.dedx_estimator_parameters, self.dedx_estimator_function = self.fit_result_parameters()
 
     def plot_fit_result(self, data):
         plt.figure()

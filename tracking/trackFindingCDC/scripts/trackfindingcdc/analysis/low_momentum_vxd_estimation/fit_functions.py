@@ -56,6 +56,6 @@ def norm_plus_lin(x, a, mu, sigma, b, c):
     return norm(x, a, mu, sigma) + b * x + c
 
 
-def inverse_squared(x, a, b, c):
+def inverse_squared(x, a, b, c, d):
     # A 1/x^2 function
-    return a / (x - b) ** 2 + c
+    return a / (x - b) ** 2 + c + d * x

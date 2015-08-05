@@ -22,7 +22,7 @@ namespace Belle2 {
     class SimpleTDCCountTranslator : public TDCCountTranslatorBase {
     public:
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
-      SimpleTDCCountTranslator(bool useInWirePropagationDelay = false) :
+      explicit SimpleTDCCountTranslator(bool useInWirePropagationDelay = false) :
         m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0)
       {
         B2FATAL("This translator is disabled; please use realisticTDCCountTranslator instead.");

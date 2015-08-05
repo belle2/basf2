@@ -20,7 +20,7 @@ namespace Belle2 {
     class RealisticCDCGeometryTranslator  : public CDCGeometryTranslatorBase {
     public:
       /** Constructor, with the additional parameter to control wire sag */
-      RealisticCDCGeometryTranslator(bool wireSag = false) : m_wireSag(wireSag) {}
+      explicit RealisticCDCGeometryTranslator(bool wireSag = false) : m_wireSag(wireSag) {}
 
       /** Destructor. */
       ~RealisticCDCGeometryTranslator() {}

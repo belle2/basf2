@@ -19,7 +19,7 @@ namespace Belle2 {
     class LinearGlobalADCCountTranslator : public ADCCountTranslatorBase {
     public:
       /** Constructor with a default calibration constant. */
-      LinearGlobalADCCountTranslator(const float conversionFactor = 3.2 * 1e-8) :
+      explicit LinearGlobalADCCountTranslator(const float conversionFactor = 3.2 * 1e-8) :
         m_conversionFactor(conversionFactor)
       {}
 

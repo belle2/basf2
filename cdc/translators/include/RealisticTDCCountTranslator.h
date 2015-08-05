@@ -22,7 +22,7 @@ namespace Belle2 {
     class RealisticTDCCountTranslator : public TDCCountTranslatorBase {
     public:
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
-      RealisticTDCCountTranslator(bool useInWirePropagationDelay = false);
+      explicit RealisticTDCCountTranslator(bool useInWirePropagationDelay = false);
 
       /** Destructor. */
       ~RealisticTDCCountTranslator() {};

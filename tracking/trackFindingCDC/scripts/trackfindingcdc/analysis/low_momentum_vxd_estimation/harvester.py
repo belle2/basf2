@@ -210,42 +210,66 @@ class MCParticleHarvester(HarvestingModule):
     save_tree = refiners.SaveTreeRefiner()
 
 
-class SVDHarvester(HarvestingModule):
+class VXDHarvester(HarvestingModule):
 
-    def __init__(self):
-        HarvestingModule.__init__(self, foreach="SVDClusters", output_file_name="svd.root")
+    def __init__(self, foreach, output_file_name):
+        HarvestingModule.__init__(self, foreach=foreach, output_file_name=output_file_name)
 
-    def pick(self, svd_cluster):
-        mc_particles = svd_cluster.getRelationsTo("MCParticles")
+    def pick(self, cluster):
+        mc_particles = cluster.getRelationsTo("MCParticles")
+
+        space_point = cluster.getRelated("SpacePoints")
+
+        if space_point is None:
+            return False
 
         for mc_particle in mc_particles:
             if (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and
                     abs(mc_particle.getPDG()) == 211):
+
                 return True
 
         return False
 
-    def peel(self, svd_cluster):
-        mc_particles = svd_cluster.getRelationsTo("MCParticles")
+    def peel(self, cluster):
+        mc_particles = cluster.getRelationsTo("MCParticles")
 
         for mc_particle in mc_particles:
             if (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and abs(mc_particle.getPDG()) == 211):
-                trajectory3D = VXDMomentumEnergyEstimator.calculate_trajectory(mc_particle, svd_cluster)
+                trajectory3D = VXDMomentumEnergyEstimator.calculate_trajectory(mc_particle, cluster)
                 trajectory2D = trajectory3D.getTrajectory2D()
                 trajectorySZ = trajectory3D.getTrajectorySZ()
 
                 charge, path_length = VXDMomentumEnergyEstimator.calculate_charge_and_path_length(
-                    svd_cluster, trajectory2D, trajectorySZ)
+                    cluster, trajectory2D, trajectorySZ)
 
-                mc_momentum = VXDMomentumEnergyEstimator.get_momentum(svd_cluster)
+                mc_momentum = VXDMomentumEnergyEstimator.get_momentum(cluster)
 
                 p = mc_momentum.Mag()
-                is_u = svd_cluster.isUCluster()
+
+                is_u = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                    cluster,
+                    lambda cluster: cluster.isUCluster(),
+                    lambda cluster: np.NaN)
+                is_pxd = VXDMomentumEnergyEstimator.do_for_each_hit_type(cluster, lambda cluster: False, lambda cluster: True)
 
         return dict(charge=charge,
                     p=p,
                     path_length=path_length,
                     is_u=is_u,
-                    p_origin=mc_particle.getMomentum().Mag())
+                    p_origin=mc_particle.getMomentum().Mag(),
+                    is_pxd=is_pxd)
 
     save_tree = refiners.SaveTreeRefiner()
+
+
+class PXDHarvester(VXDHarvester):
+
+    def __init__(self):
+        VXDHarvester.__init__(self, foreach="PXDClusters", output_file_name="pxd.root")
+
+
+class SVDHarvester(VXDHarvester):
+
+    def __init__(self):
+        VXDHarvester.__init__(self, foreach="SVDClusters", output_file_name="svd.root")

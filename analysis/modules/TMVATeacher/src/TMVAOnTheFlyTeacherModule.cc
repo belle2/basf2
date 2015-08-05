@@ -66,9 +66,9 @@ namespace Belle2 {
       }
     } else {
       if (m_discriminatingVariables.size() > 0 or m_modelFileName != "") {
-        B2ERROR("Target variable is given: However discriminating variables or a sPlot model is given in addition, but these won't be used!")
+        B2ERROR("Target variable is given: However discriminating variables or a sPlot model is given in addition, but these won't be used!");
       } else {
-        B2INFO("TMVA Teacher uses normal classification mode.")
+        B2INFO("TMVA Teacher uses normal classification mode.");
       }
     }
 

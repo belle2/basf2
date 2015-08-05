@@ -39,7 +39,7 @@ std::string MCMatching::explainFlags(unsigned int flags)
         case c_InternalError       : s += "c_InternalError"; break;
         default:
           s += to_string(f);
-          B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.")
+          B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.");
       }
       flags -= f; //remove flag
       if (flags != 0)
@@ -317,7 +317,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
 
-  for (const MCParticle * genPart : genParts) {
+  for (const MCParticle* genPart : genParts) {
     const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
     if (missing) {
 

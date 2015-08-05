@@ -40,7 +40,7 @@ namespace Belle2 {
 
       // We only support one discriminating variable at the moment
       if (discriminatingVariables.size() != 1) {
-        B2FATAL("SPlot supports only one discriminating variable at the moment, sorry.")
+        B2FATAL("SPlot supports only one discriminating variable at the moment, sorry.");
       }
 
       temp_tree_data = new TTree("temp_data_tree", "beschreibung");

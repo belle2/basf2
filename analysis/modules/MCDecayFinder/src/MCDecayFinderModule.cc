@@ -204,7 +204,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
   // If the decay is NOT INCLUSIVE,  no unmatched MCParticles should be left
   bool isInclusive = d->isInclusive();
   if (!isInclusive) {
-    B2DEBUG(1, "Decay is not inclusive, check for left over MCParticles!\n")
+    B2DEBUG(1, "Decay is not inclusive, check for left over MCParticles!\n");
     for (vector<int>::iterator itDP = daughtersPIndex.begin(); itDP != daughtersPIndex.end(); ++itDP) {
       // Check if additional photons are to be ignored
       if (isIgnorePhotons && daughtersP[*itDP]->getPDG() == 22) continue;

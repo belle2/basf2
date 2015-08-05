@@ -122,7 +122,7 @@ namespace Belle2 {
         Particle* particle = list->getParticle(i);
         float targetValue = m_method->analyse(particle);
         if (particle->hasExtraInfo(m_expertOutputName)) {
-          B2WARNING("Extra Info with given name is already set! Overwriting old value!")
+          B2WARNING("Extra Info with given name is already set! Overwriting old value!");
           particle->setExtraInfo(m_expertOutputName, targetValue);
         } else {
           particle->addExtraInfo(m_expertOutputName, targetValue);
@@ -131,7 +131,7 @@ namespace Belle2 {
           std::string name = m_expertOutputName + std::string("_") + m_splotPrior;
           float prior = sPlotPrior(particle);
           if (particle->hasExtraInfo(name)) {
-            B2WARNING("Extra Info with given name is already set! Overwriting old value!")
+            B2WARNING("Extra Info with given name is already set! Overwriting old value!");
             particle->setExtraInfo(name, prior);
           } else {
             particle->addExtraInfo(name, prior);
@@ -144,7 +144,7 @@ namespace Belle2 {
       if (not eventExtraInfo.isValid())
         eventExtraInfo.create();
       if (eventExtraInfo->hasExtraInfo(m_expertOutputName)) {
-        B2WARNING("Extra Info with given name is already set! I won't set it again!")
+        B2WARNING("Extra Info with given name is already set! I won't set it again!");
       } else {
         float targetValue = m_method->analyse(nullptr);
         eventExtraInfo->addExtraInfo(m_expertOutputName, targetValue);
@@ -152,7 +152,7 @@ namespace Belle2 {
       if (m_splotPrior_func != nullptr) {
         std::string name = m_expertOutputName + std::string("_") + m_splotPrior;
         if (eventExtraInfo->hasExtraInfo(name)) {
-          B2WARNING("Extra Info with given name is already set! I won't set it again!")
+          B2WARNING("Extra Info with given name is already set! I won't set it again!");
         } else {
           float prior = sPlotPrior(nullptr);
           eventExtraInfo->addExtraInfo(name, prior);

@@ -43,7 +43,7 @@ namespace Belle2 {
         gPluginMgr->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
 
         m_type_enum = TMVA::Types::kPlugins;
-        B2INFO("Loaded plugin " << m_name)
+        B2INFO("Loaded plugin " << m_name);
       } else {
         m_type_enum = TMVA::Types::Instance().GetMethodType(m_type);
       }

@@ -126,7 +126,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   m_iDaughter_p = -1;
 
   if (!p) {
-    B2WARNING("NULL pointer provided instead of particle.")
+    B2WARNING("NULL pointer provided instead of particle.");
     return 0;
   }
 
@@ -273,7 +273,9 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
     int daughterPDG = abs(daughter->getPDGCode());
     int decayDescriptorDaughterPDG = abs(m_daughters[iDaughter_d].getMother()->getPDGCode());
     if (daughterPDG != decayDescriptorDaughterPDG) {
-      B2ERROR("The PDG code of the particle daughter (" << daughterPDG << ") does not match the PDG code of the DecayDescriptor daughter (" << decayDescriptorDaughterPDG << ")! Check the order of the decay string is the same you expect in the reconstructed Particles.");
+      B2ERROR("The PDG code of the particle daughter (" << daughterPDG <<
+              ") does not match the PDG code of the DecayDescriptor daughter (" << decayDescriptorDaughterPDG <<
+              ")! Check the order of the decay string is the same you expect in the reconstructed Particles.");
       break;
     }
     vector<const Particle*> seldaughters = m_daughters[iDaughter_d].getSelectionParticles(daughter);

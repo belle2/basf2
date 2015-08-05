@@ -427,7 +427,7 @@ namespace Belle2 {
         if (m_tree->get().GetMinimum(varname.c_str()) < m_tree->get().GetMaximum(varname.c_str())) {
           cleaned_variables.push_back(x);
         } else {
-          B2WARNING("Removed variable " << x << " from TMVA training because it's constant!")
+          B2WARNING("Removed variable " << x << " from TMVA training because it's constant!");
         }
       }
 
@@ -457,7 +457,7 @@ namespace Belle2 {
       }
 
       if (classes.size() == 1) {
-        B2FATAL("Encountered only 1 class, cannot train anything!")
+        B2FATAL("Encountered only 1 class, cannot train anything!");
       }
 
       if (classes.size() ==  2) {

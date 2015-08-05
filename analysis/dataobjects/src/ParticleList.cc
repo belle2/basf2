@@ -56,7 +56,7 @@ void ParticleList::addParticle(const Particle* particle)
 
   int iparticle = particle->getArrayIndex();
   if (iparticle < 0) {
-    B2ERROR("ParticleList::addParticle particle is not in a store array, not added")
+    B2ERROR("ParticleList::addParticle particle is not in a store array, not added");
     return;
   }
 

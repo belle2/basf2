@@ -123,7 +123,7 @@ namespace {
     ExpertConfig config("TMVA", FileSystem::findFile("/analysis/TMVAInterface/tests/"), "MockPlugin", 1);
     Expert expert(config, false);
 
-    EXPECT_B2WARNING(expert.analyse(&p))
+    EXPECT_B2WARNING(expert.analyse(&p));
     EXPECT_FLOAT_EQ(-999, expert.analyse(&p));
   }
 
@@ -136,7 +136,7 @@ namespace {
     ExpertConfig config("TMVA", FileSystem::findFile("/analysis/TMVAInterface/tests/"), "MockPlugin", 1);
     Expert expert(config, true);
 
-    EXPECT_B2WARNING(expert.analyse(&p))
+    EXPECT_B2WARNING(expert.analyse(&p));
     EXPECT_FLOAT_EQ(-999, expert.analyse(&p));
   }
 

@@ -72,7 +72,7 @@ namespace Belle2 {
     if (m_sample != "") {
       m_sample_var = manager.getVariable(m_sample);
       if (m_sample_var == nullptr) {
-        B2ERROR("Couldn't find sample variable " << m_sample << " via the Variable::Manager. Check the name!")
+        B2ERROR("Couldn't find sample variable " << m_sample << " via the Variable::Manager. Check the name!");
       }
 
       if (m_sample != "" and std::find(m_spectators.begin(), m_spectators.end(), m_sample) == m_spectators.end()) {

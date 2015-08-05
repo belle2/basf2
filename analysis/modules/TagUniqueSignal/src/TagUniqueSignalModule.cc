@@ -41,7 +41,7 @@ void TagUniqueSignalModule::initialize()
 
   m_targetVar = manager.getVariable(m_targetVariable);
   if (m_targetVar == nullptr) {
-    B2ERROR("TagUniqueSignal: Variable::Manager doesn't have variable" <<  m_targetVariable)
+    B2ERROR("TagUniqueSignal: Variable::Manager doesn't have variable" <<  m_targetVariable);
   }
 }
 
@@ -64,7 +64,7 @@ void TagUniqueSignalModule::event()
         extraInfoValue = 1.0;
     }
     if (part->hasExtraInfo(m_extraInfoName)) {
-      B2FATAL("Extra Info with given name is already set! This module can only be used once per particle.")
+      B2FATAL("Extra Info with given name is already set! This module can only be used once per particle.");
     } else {
       part->addExtraInfo(m_extraInfoName, extraInfoValue);
     }

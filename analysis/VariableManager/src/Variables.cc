@@ -413,7 +413,7 @@ namespace Belle2 {
         s << " (no MC match)";
       }
       s << ", mdst-source " << p->getMdstSource();
-      B2INFO(s.str())
+      B2INFO(s.str());
       for (const auto* daughter : p->getDaughters()) {
         printParticleInternal(daughter, depth + 1);
       }

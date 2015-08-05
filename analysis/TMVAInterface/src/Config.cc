@@ -62,7 +62,7 @@ namespace Belle2 {
       Variable::Manager& manager = Variable::Manager::Instance();
       const auto& vars =  manager.getVariables(m_variables);
       if (vars.size() != m_variables.size()) {
-        B2ERROR("One or more feature variables could not be loaded via the Variable::Manager. Check the names!")
+        B2ERROR("One or more feature variables could not be loaded via the Variable::Manager. Check the names!");
       }
       return vars;
     }
@@ -72,7 +72,7 @@ namespace Belle2 {
       Variable::Manager& manager = Variable::Manager::Instance();
       const auto& vars =  manager.getVariables(m_spectators);
       if (vars.size() != m_spectators.size()) {
-        B2ERROR("One or more feature variables could not be loaded via the Variable::Manager. Check the names!")
+        B2ERROR("One or more feature variables could not be loaded via the Variable::Manager. Check the names!");
       }
       return vars;
     }
@@ -183,7 +183,7 @@ namespace Belle2 {
         B2WARNING("Failed to load config file. Fallback to legacy mode!");
         std::ifstream legacyconfigstream(m_workingDirectory + m_prefix + ".config");
         if (not legacyconfigstream.good()) {
-          B2FATAL("Couldn't open config file '" << m_workingDirectory << getConfigFileName(signal_class) << "'")
+          B2FATAL("Couldn't open config file '" << m_workingDirectory << getConfigFileName(signal_class) << "'");
         }
 
         B2WARNING("Found legacy config file. In legacy mode the signalFraction can be wrong if you used inverseSamplingRates or weights!");

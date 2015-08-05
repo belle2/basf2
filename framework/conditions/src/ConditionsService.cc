@@ -421,7 +421,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
         fclose(fp);
 
         if (res != CURLE_OK) {
-          B2ERROR("libcurl error code " << res << " trying to download file.")
+          B2ERROR("libcurl error code " << res << " trying to download file.");
         }
       }
       checksum = TMD5::FileChecksum(local_file.c_str()); // check checksum

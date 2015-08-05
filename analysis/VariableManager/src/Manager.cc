@@ -66,13 +66,13 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   assertValidName(alias);
 
   if (m_alias.find(alias) != m_alias.end()) {
-    B2WARNING("Another alias with the name'" << alias << "' is already set! I overwrite it!")
+    B2WARNING("Another alias with the name'" << alias << "' is already set! I overwrite it!");
     m_alias[alias] = variable;
     return true;
   }
 
   if (m_variables.find(alias) != m_variables.end()) {
-    B2ERROR("Variable with the name '" << alias << "' exists already, cannot add it as an alias!")
+    B2ERROR("Variable with the name '" << alias << "' exists already, cannot add it as an alias!");
     return false;
   }
 
@@ -146,7 +146,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
 
-  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?")
+  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;
 }
 
@@ -162,7 +162,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
     auto var = std::make_shared<Var>(name, f, description, m_currentGroup);
-    B2DEBUG(100, "Registered Variable " << name)
+    B2DEBUG(100, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {
@@ -182,7 +182,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
-    B2DEBUG(100, "Registered parameter Variable " << rawName)
+    B2DEBUG(100, "Registered parameter Variable " << rawName);
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {
@@ -202,7 +202,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
-    B2DEBUG(100, "Registered meta Variable " << rawName)
+    B2DEBUG(100, "Registered meta Variable " << rawName);
     m_meta_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {

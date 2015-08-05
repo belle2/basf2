@@ -48,7 +48,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useRestFrame")
+        B2WARNING("Wrong number of arguments for meta function useRestFrame");
         return nullptr;
       }
     }
@@ -64,7 +64,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useCMSFrame")
+        B2WARNING("Wrong number of arguments for meta function useCMSFrame");
         return nullptr;
       }
     }
@@ -80,7 +80,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useLabFrame")
+        B2WARNING("Wrong number of arguments for meta function useLabFrame");
         return nullptr;
       }
     }
@@ -99,7 +99,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function extraInfo")
+        B2WARNING("Wrong number of arguments for meta function extraInfo");
         return nullptr;
       }
     }
@@ -311,7 +311,7 @@ namespace Belle2 {
         std::string cutString = arguments[1];
         int pdgCode = 11;
         if (arguments.size() == 2) {
-          B2INFO("Use pdgCode 11 as default in meta variable veto, other arguments: " << roeListName << ", " << cutString)
+          B2INFO("Use pdgCode 11 as default in meta variable veto, other arguments: " << roeListName << ", " << cutString);
         } else {
           try {
             pdgCode = Belle2::convertString<int>(arguments[2]);;
@@ -462,7 +462,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function transformedNetworkOutput")
+        B2WARNING("Wrong number of arguments for meta function transformedNetworkOutput");
         return nullptr;
       }
     }

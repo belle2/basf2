@@ -149,13 +149,13 @@ void PreCutHistMakerModule::initialize()
   m_var = manager.getVariable(m_variable);
 
   if (m_var == nullptr) {
-    B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_variable)
+    B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_variable);
   }
 
   m_targetVar = manager.getVariable(m_targetVariable);
 
   if (m_targetVar == nullptr) {
-    B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_targetVariable)
+    B2ERROR("PreCutHistMaker: Variable::Manager doesn't have variable" <<  m_targetVariable);
   }
 
   m_cut = Variable::Cut::Compile(m_cutParameter);

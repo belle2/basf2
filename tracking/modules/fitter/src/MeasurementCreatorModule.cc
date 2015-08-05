@@ -12,6 +12,8 @@
 
 using namespace Belle2;
 
+REG_MODULE(MeasurementCreator)
+
 namespace {
   /** Create a measurement from a hit */
   template <class HitType>
@@ -75,6 +77,13 @@ MeasurementCreatorModule::MeasurementCreatorModule() : Module()
 {
   setDescription("Create measurements from the hits added to the RecoTracks and add them to the genfit tracks. Can also create new measurements like momentum estimations.");
   addParam("useVXDMomentumEstimation", m_param_useVXDMomentumEstimation, "Use the momentum estimation from VXD.", false);
+  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,
+           "Store array name for the reco tracks to add the measurements to.", std::string("RecoTracks"));
+  addParam("storeArrayNameOfCDCHits", m_param_storeArrayNameOfCDCHits, "Store array name for the cdc hits.", std::string("CDCHits"));
+  addParam("storeArrayNameOfSVDHits", m_param_storeArrayNameOfSVDHits, "Store array name for the svd hits.",
+           std::string("SVDClusters"));
+  addParam("storeArrayNameOfPXDHits", m_param_storeArrayNameOfPXDHits, "Store array name for the pxd hits.",
+           std::string("PXDClusters"));
 }
 
 void MeasurementCreatorModule::initialize()
@@ -96,6 +105,15 @@ void MeasurementCreatorModule::initialize()
     m_measurementFactory.addProducer(Const::CDC, new genfit::MeasurementProducer<RecoTrack::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
 }
 
+
+void MeasurementCreatorModule::event()
+{
+  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
+  for (RecoTrack& recoTrack : recoTracks) {
+    constructHitsForTrack(recoTrack);
+  }
+}
+
 void MeasurementCreatorModule::addCDCMeasurement(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation,
                                                  RecoTrack::UsedCDCHit* const hit) const
 {
@@ -107,7 +125,7 @@ void MeasurementCreatorModule::addCDCMeasurement(RecoTrack& recoTrack, RecoHitIn
 void MeasurementCreatorModule::addSVDMeasurement(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation,
                                                  RecoTrack::UsedSVDHit* const hit) const
 {
-  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::CDC, recoHitInformation, hit, m_measurementFactory);
+  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::SVD, recoHitInformation, hit, m_measurementFactory);
   genfit::TrackPoint* coordinateTrackPoint = createTrackPoint(coordinateMeasurement, recoTrack, recoHitInformation);
   recoTrack.insertPoint(coordinateTrackPoint);
 
@@ -123,7 +141,7 @@ void MeasurementCreatorModule::addSVDMeasurement(RecoTrack& recoTrack, RecoHitIn
 void MeasurementCreatorModule::addPXDMeasurement(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation,
                                                  RecoTrack::UsedPXDHit* const hit) const
 {
-  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::CDC, recoHitInformation, hit, m_measurementFactory);
+  genfit::AbsMeasurement* coordinateMeasurement = createMeasurement(Const::PXD, recoHitInformation, hit, m_measurementFactory);
   genfit::TrackPoint* coordinateTrackPoint = createTrackPoint(coordinateMeasurement, recoTrack, recoHitInformation);
   recoTrack.insertPoint(coordinateTrackPoint);
 
@@ -142,13 +160,13 @@ void MeasurementCreatorModule::constructHitsForTrack(RecoTrack& recoTrack) const
   // Loop over all hits and create an abs measurement with the factory.
   // then create a TrackPoint from that and set the sorting parameter
   recoTrack.mapOnHits<RecoTrack::UsedCDCHit>(recoTrack.getStoreArrayNameOfCDCHits(),
-                                             std::bind(&MeasurementCreatorModule::addCDCMeasurement, this, recoTrack, std::placeholders::_1, std::placeholders::_2));
+                                             std::bind(&MeasurementCreatorModule::addCDCMeasurement, this, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2));
 
   recoTrack.mapOnHits<RecoTrack::UsedSVDHit>(recoTrack.getStoreArrayNameOfSVDHits(),
-                                             std::bind(&MeasurementCreatorModule::addSVDMeasurement, this, recoTrack, std::placeholders::_1, std::placeholders::_2));
+                                             std::bind(&MeasurementCreatorModule::addSVDMeasurement, this, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2));
 
-  recoTrack.mapOnHits<RecoTrack::UsedPXDHit>(recoTrack.getStoreArrayNameOfSVDHits(),
-                                             std::bind(&MeasurementCreatorModule::addPXDMeasurement, this, recoTrack, std::placeholders::_1, std::placeholders::_2));
+  recoTrack.mapOnHits<RecoTrack::UsedPXDHit>(recoTrack.getStoreArrayNameOfPXDHits(),
+                                             std::bind(&MeasurementCreatorModule::addPXDMeasurement, this, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2));
 
   recoTrack.sort();
 }

@@ -19,9 +19,36 @@ namespace Belle2 {
   class VXDMomentumEstimationMeasurementCreator : public BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector> {
   public:
     VXDMomentumEstimationMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
-      BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory) {}
+      BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory), m_minimumMomentum(0.1) {}
 
     virtual ~VXDMomentumEstimationMeasurementCreator() { }
+
+    void setParameter(const std::string& parameterName, const std::string& parameterValue) override
+    {
+      // there are only double values, so this should be ok:
+      double value = std::stod(parameterValue);
+      if (parameterName == "MinimumMomentum") {
+        m_minimumMomentum = value;
+      } else if (parameterName == "aE") {
+        m_fitParameters.aE = value;
+      } else if (parameterName == "bE") {
+        m_fitParameters.bE = value;
+      } else if (parameterName == "cE") {
+        m_fitParameters.cE = value;
+      } else if (parameterName == "dE") {
+        m_fitParameters.dE = value;
+      } else if (parameterName == "aM") {
+        m_correctionFitParameters.aM = value;
+      } else if (parameterName == "bM") {
+        m_correctionFitParameters.bM = value;
+      } else if (parameterName == "cM") {
+        m_correctionFitParameters.cM = value;
+      } else if (parameterName == "dM") {
+        m_correctionFitParameters.dM = value;
+      } else {
+        B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.")
+      }
+    }
 
   protected:
     /**
@@ -31,7 +58,6 @@ namespace Belle2 {
         const RecoTrack& recoTrack, const RecoHitInformation&,
         const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement) const override
     {
-
       genfit::AbsMeasurement* absCoordinateMeasurement = coordinateMeasurement.first;
       genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(absCoordinateMeasurement);
       if (planarMeasurement == nullptr) {
@@ -44,9 +70,10 @@ namespace Belle2 {
       const TVector3& position = recoTrack.getPosition();
       short charge = recoTrack.getCharge();
 
-      if (momentum.Mag() < 0.1) {
+      if (momentum.Mag() < m_minimumMomentum) {
         TVectorD rawHitCoordinates(1);
-        double estimatedMomentum = momentumEstimation.estimateQOverP(*hit, momentum, position, charge);
+        double estimatedMomentum = momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters,
+                                   m_correctionFitParameters);
 
         if (not std::isnan(estimatedMomentum)) {
           rawHitCoordinates(0) = estimatedMomentum;
@@ -64,5 +91,9 @@ namespace Belle2 {
       return {};
     }
 
+  private:
+    typename VXDMomentumEstimation<HitType>::FitParameters m_fitParameters;
+    typename VXDMomentumEstimation<HitType>::CorrectionFitParameters m_correctionFitParameters;
+    double m_minimumMomentum;
   };
 }

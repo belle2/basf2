@@ -1,6 +1,5 @@
 #include <tracking/modules/fitter/MeasurementCreatorModule.h>
 
-#include <genfit/PlanarMomentumMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>

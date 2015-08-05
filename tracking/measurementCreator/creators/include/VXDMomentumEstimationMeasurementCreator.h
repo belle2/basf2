@@ -11,7 +11,7 @@
 
 #include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromCoordinateMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
-#include <genfit/PlanarMomentumMeasurement.h>
+#include <tracking/vxdMomentumEstimation/PlanarMomentumMeasurement.h>
 #include <genfit/PlanarMeasurement.h>
 
 namespace Belle2 {

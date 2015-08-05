@@ -34,7 +34,7 @@ REG_MODULE(LHEInput)
 LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
 {
   //Set module properties
-  setDescription("LHE file input. This module loads an event record from HEPEVT format and store the content into the MCParticle collection. HEPEVT format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
+  setDescription("LHE file input. This module loads an event record from LHE format and store the content into the MCParticle collection. LHE format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
   setPropertyFlags(c_Input);
 
   //Parameter definition
@@ -84,9 +84,9 @@ void LHEInputModule::initialize()
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {
-    B2INFO("HEPEVT reader acts as master module for data processing.");
+    B2INFO("LHE reader acts as master module for data processing.");
     if (m_runNum == 0 && m_expNum == 0)
-      B2WARNING("HEPEVT reader acts as master module, but no run and experiment number set. Using defaults.");
+      B2WARNING("LHE reader acts as master module, but no run and experiment number set. Using defaults.");
     //register EventMetaData object in data store
     StoreObjPtr<EventMetaData>::registerPersistent("EventMetaData");
   }
@@ -101,7 +101,7 @@ void LHEInputModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   if (!eventMetaDataPtr) eventMetaDataPtr.create();
-  // B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
+  // B2INFO("LHE processes event NR " << eventMetaDataPtr->getEvent());
 
   try {
     mpg.clear();

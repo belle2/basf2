@@ -12,6 +12,8 @@
 
 #include <TObject.h>
 
+class TCollection;
+
 namespace Belle2 {
   /** Abstract base class for objects that can be merged.
    *
@@ -51,6 +53,12 @@ namespace Belle2 {
      * it can stay attached (and grow as much as it likes).
      */
     virtual void removeSideEffects() {}
+
+    /** Allow merging using TFileMerger if saved directly to a file.
+     *
+     * \note dictionaries containing your Mergeable class need to be loaded, so 'hadd' will not work currently.
+     */
+    virtual Long64_t Merge(TCollection* hlist);
   private:
     ClassDef(Mergeable, 0); /**< Abstract base class for objects that can be merged. */
   };

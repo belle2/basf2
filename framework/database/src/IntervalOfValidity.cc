@@ -32,8 +32,8 @@ IntervalOfValidity::IntervalOfValidity(int experimentLow, int runLow, int experi
     if ((experimentLow > experimentHigh) || ((experimentLow == experimentHigh) && (runHigh >= 0) && (runLow > runHigh))) {
       B2ERROR("The given lower and higher experiment/run numbers of " << experimentLow << "/" << runLow << " and " << experimentHigh <<
               "/" << runHigh << ", respectively, are in the wrong order, Swapping them.");
-      std::swap(experimentLow, experimentHigh);
-      std::swap(runLow, runHigh);
+      std::swap(m_experimentLow, m_experimentHigh);
+      std::swap(m_runLow, m_runHigh);
     }
   }
 }

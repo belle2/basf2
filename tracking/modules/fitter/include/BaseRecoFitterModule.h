@@ -9,15 +9,20 @@
  **************************************************************************/
 #pragma once
 
+#include <genfit/MeasurementFactory.h>
+#include <framework/gearbox/Const.h>
 #include <framework/core/Module.h>
-
 #include <string>
 
 namespace genfit {
+  class AbsMeasurement;
   class AbsKalmanFitter;
 }
 
+
 namespace Belle2 {
+
+  class RecoTrack;
 
   class BaseRecoFitterModule : public Module {
 
@@ -25,9 +30,6 @@ namespace Belle2 {
     /** Constructor .
      */
     BaseRecoFitterModule();
-
-    /** Empty destructor. */
-    ~BaseRecoFitterModule() { }
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
@@ -59,11 +61,24 @@ namespace Belle2 {
     virtual std::shared_ptr<genfit::AbsKalmanFitter> createFitter() const = 0;
 
   private:
-    std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input and output reco tracks */
-    unsigned int
-    m_param_pdgCodeToUseForFitting; /**< Use this particle hypothesis for fitting. Please use the positive pdg code only. */
-    bool m_param_useVXDMomentumEstimation; /**< Use the momentum estimation from VXD */
+    /** StoreArray name of the input and output reco tracks */
+    std::string m_param_recoTracksStoreArrayName;
+    /** Use this particle hypothesis for fitting. Please use the positive pdg code only. */
+    unsigned int m_param_pdgCodeToUseForFitting;
+    /** Use the momentum estimation from VXD */
+    bool m_param_useVXDMomentumEstimation;
+
     unsigned int m_param_maxNumberOfFailedHits = 5;
+    genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
+    std::string m_param_storeArrayNameOfCDCHits = "CDCHits";
+    std::string m_param_storeArrayNameOfSVDHits = "SVDClusters";
+    std::string m_param_storeArrayNameOfPXDHits = "PXDClusters";
+
+    /**
+     * Helper function to construct the measurements for the added hits of a reco track.
+     * @param recoTrack
+     */
+    void constructHitsForTrack(RecoTrack& recoTrack) const;
   };
 }
 

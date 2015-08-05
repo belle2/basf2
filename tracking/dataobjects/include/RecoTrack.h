@@ -13,7 +13,6 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-#include <framework/dataobjects/Helix.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <framework/datastore/RelationsObject.h>
 
@@ -504,9 +503,8 @@ namespace Belle2 {
      * Fit the track with the given abs fitter from genfit.
      * @param fitter the preinitialized fitter
      * @param pdgCodeForFit the pdg code we use for fitting. If you set the wrong charge, the method will turn it the other way round.
-     * @param useVXDMomentumEstimation Use the VXD momentum estimation from dEdX
      */
-    void fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation);
+    void fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit);
 #endif
 
     /**
@@ -518,15 +516,32 @@ namespace Belle2 {
       return m_lastFitSucessfull;
     }
 
+    const std::string& getStoreArrayNameOfCDCHits() const
+    {
+      return m_storeArrayNameOfCDCHits;
+    }
+
+    const std::string& getStoreArrayNameOfSVDHits() const
+    {
+      return m_storeArrayNameOfSVDHits;
+    }
+
+    const std::string& getStoreArrayNameOfPXDHits() const
+    {
+      return m_storeArrayNameOfPXDHits;
+    }
+
+    const std::string& getStoreArrayNameOfRecoHitInformation() const
+    {
+      return m_storeArrayNameOfRecoHitInformation;
+    }
+
   private:
     unsigned short int m_charge; /**< Storage for the charge. All other helix parameters are saved in the genfit::Track */
     std::string m_storeArrayNameOfCDCHits; /**< Store array of added cdc hits */
     std::string m_storeArrayNameOfSVDHits; /**< Store array of added svd hits */
     std::string m_storeArrayNameOfPXDHits; /**< Store array of added pxd hits */
     std::string m_storeArrayNameOfRecoHitInformation;  /**< Store array of added reco hit information */
-#ifndef __CINT__
-    genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
-#endif
     bool m_lastFitSucessfull; /**< Bool if the last fit was sucessfull */
 
 
@@ -553,6 +568,7 @@ namespace Belle2 {
     }
 #endif
 
+  public:
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track.
      * @param storeArrayNameOfHits
@@ -621,6 +637,7 @@ namespace Belle2 {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType * const) -> bool { return true; });
     }
 
+  private:
     /**
      * Add a generic hit with the given hit information.
      * @param hit
@@ -656,25 +673,6 @@ namespace Belle2 {
 
       return nullptr;
     }
-
-    /**
-     * Helper function to add the hits to the genfit track.
-     * @param detector
-     * @param recoHitInformation
-     * @param hit
-     */
-    template <class HitType>
-    void addHitToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation, HitType* const hit);
-
-    /**
-     * Helper function to add the momentum estimation from the VXDEstimator to the track.
-     * @param detector
-     * @param recoHitInformation
-     * @param vxdHit
-     */
-    template <class HitType>
-    void addVXDMomentumEstimationToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation,
-                                               HitType* const vxdHit);
 
     /**
      * Calculate the time seed before fitting.

@@ -14,7 +14,7 @@
 #include <string>
 
 namespace genfit {
-  class AbsFitter;
+  class AbsKalmanFitter;
 }
 
 namespace Belle2 {
@@ -56,13 +56,14 @@ namespace Belle2 {
      * This method has to by implemented by the derived class
      * @return The fitter we will use for fitting.
      */
-    virtual std::shared_ptr<genfit::AbsFitter> createFitter() const = 0;
+    virtual std::shared_ptr<genfit::AbsKalmanFitter> createFitter() const = 0;
 
   private:
     std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input and output reco tracks */
     unsigned int
     m_param_pdgCodeToUseForFitting; /**< Use this particle hypothesis for fitting. Please use the positive pdg code only. */
     bool m_param_useVXDMomentumEstimation; /**< Use the momentum estimation from VXD */
+    unsigned int m_param_maxNumberOfFailedHits = 5;
   };
 }
 

@@ -10,6 +10,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <genfit/AbsKalmanFitter.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/FitStatus.h>
 #include <genfit/DAF.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/FieldManager.h>
@@ -64,9 +66,36 @@ void BaseRecoFitterModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 
-  const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
+  B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
+  unsigned int recoTrackCounter = 0;
 
   for (RecoTrack& recoTrack : recoTracks) {
+    const std::shared_ptr<genfit::AbsKalmanFitter>& fitter = createFitter();
+    fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
+
+    B2DEBUG(100, "Fitting reco track candidate number " << recoTrackCounter);
+    B2DEBUG(100, "Reco track candidate has start values: ")
+    B2DEBUG(100, "Momentum: " << recoTrack.getMomentum().X() << " " << recoTrack.getMomentum().Y() << " " <<
+            recoTrack.getMomentum().Z())
+    B2DEBUG(100, "Position: " << recoTrack.getPosition().X() << " " << recoTrack.getPosition().Y() << " " <<
+            recoTrack.getPosition().Z())
+    B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits())
+
     recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting, m_param_useVXDMomentumEstimation);
+
+
+    B2DEBUG(100, "-----> Fit results:");
+    B2DEBUG(100, "       Fitted and converged: " << recoTrack.wasLastFitSucessfull());
+
+    if (recoTrack.wasLastFitSucessfull()) {
+      genfit::FitStatus* fs = recoTrack.getFitStatus(recoTrack.getCardinalRep());
+      genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
+
+      B2DEBUG(100, "       Chi2 of the fit: " << kfs->getChi2());
+      B2DEBUG(100, "       NDF of the fit: " << kfs->getBackwardNdf());
+      B2DEBUG(100, "       pValue of the fit: " << kfs->getPVal());
+    }
+
+    recoTrackCounter += 1;
   }
 }

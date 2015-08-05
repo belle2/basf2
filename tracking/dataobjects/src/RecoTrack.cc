@@ -10,6 +10,8 @@
 #include <genfit/AbsTrackRep.h>
 #include <genfit/KalmanFitStatus.h>
 
+#include <genfit/PlanarMomentumMeasurement.h>
+
 using namespace Belle2;
 
 ClassImp(RecoTrack);
@@ -120,8 +122,11 @@ void RecoTrack::addHitToGenfitTrack(Const::EDetector detector,
       recoHitInformation.getSortingParameter());
   genfit::AbsMeasurement* measurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
                                         trackCandHit);
+
   genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
   trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
+
+  B2DEBUG(100, "Sorting parameter " << recoHitInformation.getSortingParameter())
   insertPoint(trackPoint);
 };
 
@@ -132,11 +137,32 @@ void RecoTrack::addVXDMomentumEstimationToGenfitTrack(Const::EDetector detector,
   genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, hit->getArrayIndex(), -1,
       recoHitInformation.getSortingParameter());
 
-  // TODO: Create AbsMeasurement somehow!
-  genfit::AbsMeasurement* measurement;
-  genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
-  trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
-  insertPoint(trackPoint);
+  genfit::AbsMeasurement* coordinateMeasurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
+                                                  trackCandHit);
+
+  genfit::TrackPoint* coordinateTrackPoint = new genfit::TrackPoint(coordinateMeasurement, this);
+  coordinateTrackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
+  insertPoint(coordinateTrackPoint);
+
+  genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(coordinateMeasurement);
+  if (planarMeasurement == nullptr) {
+    B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
+  }
+  genfit::PlanarMomentumMeasurement* momentumMeasurement = new genfit::PlanarMomentumMeasurement(*planarMeasurement);
+
+  TVectorD rawHitCoordinates(1);
+  rawHitCoordinates(0) = 0;
+
+  TMatrixDSym rawHitCovariance(1);
+  rawHitCovariance(0, 0) = 0;
+
+  momentumMeasurement->setRawHitCoords(rawHitCoordinates);
+  momentumMeasurement->setRawHitCov(rawHitCovariance);
+
+
+  genfit::TrackPoint* momentumTrackPoint = new genfit::TrackPoint(momentumMeasurement, this);
+  momentumTrackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
+  insertPoint(momentumTrackPoint);
 };
 
 void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
@@ -172,7 +198,7 @@ void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
   setTimeSeed(timeSeed);
 }
 
-void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation)
+void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation)
 {
   m_lastFitSucessfull = false;
 
@@ -210,6 +236,8 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
                                                                std::placeholders::_1, std::placeholders::_2));
   }
 
+  sort();
+
   TMatrixDSym covSeed = getCovSeed();
   if (covSeed(0, 0) == 0 and covSeed(1, 1) == 0 and covSeed(2, 2) == 0 and covSeed(3, 3) == 0 and covSeed(4, 4) == 0
       and covSeed(5, 5) == 0) {
@@ -236,5 +264,6 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
     genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
     fitSuccess = fitSuccess && kfs;
   }
+
   m_lastFitSucessfull = fitSuccess;
 }

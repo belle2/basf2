@@ -27,7 +27,7 @@
 #include <framework/gearbox/Const.h>
 
 namespace genfit {
-  class AbsFitter;
+  class AbsKalmanFitter;
 }
 
 namespace Belle2 {
@@ -81,8 +81,8 @@ namespace Belle2 {
        */
     RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
               const std::string& storeArrayNameOfCDCHits = "CDCHits",
-              const std::string& storeArrayNameOfSVDHits = "SVDHits",
-              const std::string& storeArrayNameOfPXDHits = "PXDHits",
+              const std::string& storeArrayNameOfSVDHits = "SVDClusters",
+              const std::string& storeArrayNameOfPXDHits = "PXDClusters",
               const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations");
 
     /**
@@ -98,8 +98,8 @@ namespace Belle2 {
     static RecoTrack* createFromTrackCand(const genfit::TrackCand* trackCand,
                                           const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
                                           const std::string& storeArrayNameOfCDCHits = "CDCHits",
-                                          const std::string& storeArrayNameOfSVDHits = "SVDHits",
-                                          const std::string& storeArrayNameOfPXDHits = "PXDHits",
+                                          const std::string& storeArrayNameOfSVDHits = "SVDClusters",
+                                          const std::string& storeArrayNameOfPXDHits = "PXDClusters",
                                           const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations"
                                          );
 
@@ -506,7 +506,7 @@ namespace Belle2 {
      * @param pdgCodeForFit the pdg code we use for fitting. If you set the wrong charge, the method will turn it the other way round.
      * @param useVXDMomentumEstimation Use the VXD momentum estimation from dEdX
      */
-    void fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation);
+    void fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation);
 #endif
 
     /**

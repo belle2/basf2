@@ -29,8 +29,10 @@ RecoTrackCreatorModule::RecoTrackCreatorModule() :
            "StoreArray name of the output reco hit information.", std::string("RecoHitInformations"));
 
   addParam("CDCHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.", std::string("CDCHits"));
-  addParam("PXDHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.", std::string("PXDHits"));
-  addParam("SVDHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input svd hits.", std::string("SVDHits"));
+  addParam("PXDHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.",
+           std::string("PXDClusters"));
+  addParam("SVDHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input svd hits.",
+           std::string("SVDClusters"));
 }
 
 void RecoTrackCreatorModule::initialize()

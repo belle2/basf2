@@ -26,7 +26,7 @@ namespace Belle2 {
 
   protected:
     /** Create a DAF fitter */
-    std::shared_ptr<genfit::AbsFitter> createFitter() const override
+    std::shared_ptr<genfit::AbsKalmanFitter> createFitter() const override
     {
       std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>();
       fitter->setProbCut(m_param_probabilityCut);

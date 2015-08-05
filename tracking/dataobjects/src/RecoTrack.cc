@@ -114,12 +114,26 @@ genfit::TrackCand* RecoTrack::createGenfitTrackCand() const
 
 template <class HitType>
 void RecoTrack::addHitToGenfitTrack(Const::EDetector detector,
-                                    RecoHitInformation& recoHitInformation, HitType* const cdcHit)
+                                    RecoHitInformation& recoHitInformation, HitType* const hit)
 {
-  genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, cdcHit->getArrayIndex(), -1,
+  genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, hit->getArrayIndex(), -1,
       recoHitInformation.getSortingParameter());
   genfit::AbsMeasurement* measurement = m_measurementFactory.createOne(trackCandHit->getDetId(), trackCandHit->getHitId(),
                                         trackCandHit);
+  genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
+  trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
+  insertPoint(trackPoint);
+};
+
+template <class HitType>
+void RecoTrack::addVXDMomentumEstimationToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation,
+                                                      HitType* const hit)
+{
+  genfit::TrackCandHit* trackCandHit = new genfit::TrackCandHit(detector, hit->getArrayIndex(), -1,
+      recoHitInformation.getSortingParameter());
+
+  // TODO: Create AbsMeasurement somehow!
+  genfit::AbsMeasurement* measurement;
   genfit::TrackPoint* trackPoint = new genfit::TrackPoint(measurement, this);
   trackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
   insertPoint(trackPoint);
@@ -158,7 +172,7 @@ void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
   setTimeSeed(timeSeed);
 }
 
-void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit)
+void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation)
 {
   m_lastFitSucessfull = false;
 
@@ -187,8 +201,14 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCod
   mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addHitToGenfitTrack<UsedPXDHit>, this, Const::PXD,
                                                              std::placeholders::_1, std::placeholders::_2));
 
-  // TODO!
-  // Set the covariance seed
+  if (useVXDMomentumEstimation) {
+    mapOnHits<UsedSVDHit>(m_storeArrayNameOfSVDHits, std::bind(&RecoTrack::addVXDMomentumEstimationToGenfitTrack<UsedSVDHit>, this,
+                                                               Const::SVD,
+                                                               std::placeholders::_1, std::placeholders::_2));
+    mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, std::bind(&RecoTrack::addVXDMomentumEstimationToGenfitTrack<UsedPXDHit>, this,
+                                                               Const::PXD,
+                                                               std::placeholders::_1, std::placeholders::_2));
+  }
 
   TMatrixDSym covSeed = getCovSeed();
   if (covSeed(0, 0) == 0 and covSeed(1, 1) == 0 and covSeed(2, 2) == 0 and covSeed(3, 3) == 0 and covSeed(4, 4) == 0

@@ -504,8 +504,9 @@ namespace Belle2 {
      * Fit the track with the given abs fitter from genfit.
      * @param fitter the preinitialized fitter
      * @param pdgCodeForFit the pdg code we use for fitting. If you set the wrong charge, the method will turn it the other way round.
+     * @param useVXDMomentumEstimation Use the VXD momentum estimation from dEdX
      */
-    void fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit);
+    void fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool useVXDMomentumEstimation);
 #endif
 
     /**
@@ -659,12 +660,21 @@ namespace Belle2 {
     /**
      * Helper function to add the hits to the genfit track.
      * @param detector
-     * @param measurementFactory
      * @param recoHitInformation
-     * @param cdcHit
+     * @param hit
      */
     template <class HitType>
-    void addHitToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation, HitType* const cdcHit);
+    void addHitToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation, HitType* const hit);
+
+    /**
+     * Helper function to add the momentum estimation from the VXDEstimator to the track.
+     * @param detector
+     * @param recoHitInformation
+     * @param vxdHit
+     */
+    template <class HitType>
+    void addVXDMomentumEstimationToGenfitTrack(Const::EDetector detector, RecoHitInformation& recoHitInformation,
+                                               HitType* const vxdHit);
 
     /**
      * Calculate the time seed before fitting.

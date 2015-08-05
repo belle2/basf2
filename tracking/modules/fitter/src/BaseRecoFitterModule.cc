@@ -35,6 +35,8 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("pdgCodeToUseForFitting", m_param_pdgCodeToUseForFitting,
            "Use this particle hypothesis for fitting. Please use the positive pdg code only.", static_cast<unsigned int>(211));
+
+  addParam("useVXDMomentumEstimation", m_param_useVXDMomentumEstimation, "Use the momentum estimation from VXD.", false);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -65,6 +67,6 @@ void BaseRecoFitterModule::event()
   const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
 
   for (RecoTrack& recoTrack : recoTracks) {
-    recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting);
+    recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting, m_param_useVXDMomentumEstimation);
   }
 }

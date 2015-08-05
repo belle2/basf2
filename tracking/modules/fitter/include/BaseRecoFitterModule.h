@@ -62,6 +62,7 @@ namespace Belle2 {
     std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input and output reco tracks */
     unsigned int
     m_param_pdgCodeToUseForFitting; /**< Use this particle hypothesis for fitting. Please use the positive pdg code only. */
+    bool m_param_useVXDMomentumEstimation; /**< Use the momentum estimation from VXD */
   };
 }
 

@@ -42,9 +42,17 @@ namespace Belle2 {
     double getDEDX(const ClusterType& cluster, const TVector3& momentum, const TVector3& position, short charge) const
     {
 
-      Helix trajectory(position, momentum, charge, 1.5);
-      double calibratedCharge = getCalibratedCharge(cluster);
-      double pathLength = getPathLength(cluster, trajectory);
+      const Helix trajectory(position, momentum, charge, 1.5);
+      const double calibratedCharge = getCalibratedCharge(cluster);
+      const double pathLength = getPathLength(cluster, trajectory);
+
+      return calibratedCharge / pathLength;
+    }
+
+    double getDEDXWithThickness(const ClusterType& cluster) const
+    {
+      const double calibratedCharge = getCalibratedCharge(cluster);
+      const double pathLength = getThicknessOfCluster(cluster);
 
       return calibratedCharge / pathLength;
     }
@@ -73,8 +81,8 @@ namespace Belle2 {
 
     double getCalibratedCharge(const ClusterType& cluster) const
     {
-      double charge = cluster.getCharge();
-      double calibration = getCalibration();
+      const double charge = cluster.getCharge();
+      const double calibration = getCalibration();
 
       return calibration * charge;
     }
@@ -102,16 +110,16 @@ namespace Belle2 {
     double getPathLength(const ClusterType& cluster, const Helix& trajectory) const
     {
 
-      double thickness = getThicknessOfCluster(cluster);
-      double radius = getRadiusOfCluster(cluster);
+      const double thickness = getThicknessOfCluster(cluster);
+      const double radius = getRadiusOfCluster(cluster);
 
-      double perp_s_at_cluster_entry = trajectory.getArcLength2DAtCylindricalR(radius - thickness / 2.0);
-      double perp_s_at_cluster_exit = trajectory.getArcLength2DAtCylindricalR(radius + thickness / 2.0);
+      const double perp_s_at_cluster_entry = trajectory.getArcLength2DAtCylindricalR(radius - thickness / 2.0);
+      const double perp_s_at_cluster_exit = trajectory.getArcLength2DAtCylindricalR(radius + thickness / 2.0);
 
       const TVector3& position_at_inner_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_entry);
       const TVector3& position_at_outer_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_exit);
 
-      double distance_3D = (position_at_outer_radius - position_at_inner_radius).Mag();
+      const double distance_3D = (position_at_outer_radius - position_at_inner_radius).Mag();
 
       return distance_3D;
     }

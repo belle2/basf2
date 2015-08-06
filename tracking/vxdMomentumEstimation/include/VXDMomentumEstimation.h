@@ -45,26 +45,43 @@ namespace Belle2 {
     double estimateQOverP(const ClusterType& cluster, const TVector3& momentum, const TVector3& position, short charge,
                           const FitParameters& fitParameters, const CorrectionFitParameters& correctionFitParameters) const
     {
-      double momentumEstimation = estimateMomentum(cluster, momentum, position, charge, fitParameters, correctionFitParameters);
-      double QOverP = charge / momentumEstimation;
+      const VXDMomentumEstimationTools<ClusterType>& tools = VXDMomentumEstimationTools<ClusterType>::getInstance();
+
+      const double dEdX = tools.getDEDX(cluster, momentum, position, charge);
+      const double momentumEstimation = convertDEDXToMomentum(dEdX, fitParameters, correctionFitParameters);
+      const double QOverP = charge / momentumEstimation;
+
+      return QOverP;
+    }
+
+    double estimateQOverPWithThickness(const ClusterType& cluster, short charge, const FitParameters& fitParameters,
+                                       const CorrectionFitParameters& correctionFitParameters) const
+    {
+      const VXDMomentumEstimationTools<ClusterType>& tools = VXDMomentumEstimationTools<ClusterType>::getInstance();
+
+      const double dEdX = tools.getDEDXWithThickness(cluster);
+      const double momentumEstimation = convertDEDXToMomentum(dEdX, fitParameters, correctionFitParameters);
+      const double QOverP = charge / momentumEstimation;
 
       return QOverP;
     }
 
   private:
-    double estimateMomentum(const ClusterType& cluster, const TVector3& momentum, const TVector3& position, short charge,
-                            const FitParameters& fitParameters, const CorrectionFitParameters& correctionFitParameters) const
+
+    double convertDEDXToMomentum(double dEdX, const FitParameters& fitParameters,
+                                 const CorrectionFitParameters& correctionFitParameters) const
     {
-      const VXDMomentumEstimationTools<ClusterType>& tools = VXDMomentumEstimationTools<ClusterType>::getInstance();
+      const double firstPart = fitParameters.aE / (dEdX - fitParameters.bE) / (dEdX - fitParameters.bE);
+      const double lastPart = fitParameters.cE + fitParameters.dE * dEdX;
+      const double estimation = firstPart + lastPart;
 
-      double dEdX = tools.getDEDX(cluster, momentum, position, charge);
+      const double quadPart = correctionFitParameters.aM * estimation * estimation;
+      const double linearPart = correctionFitParameters.bM * estimation;
+      const double constantPart = correctionFitParameters.cM;
+      const double cubicPart = correctionFitParameters.dM * estimation * estimation * estimation;
+      const double mediumCorrection = cubicPart + quadPart + linearPart + constantPart;
 
-      // These numbers are fit results from the Analyse_Hitwise.ipynb ipython notebook and can not be calculated from scratch.
-      double estimation = fitParameters.aE / (dEdX - fitParameters.bE) / (dEdX - fitParameters.bE) + fitParameters.cE + fitParameters.dE *
-                          dEdX;
-      double mediumCorrection = correctionFitParameters.aM * estimation * estimation + correctionFitParameters.bM * estimation +
-                                correctionFitParameters.cM + correctionFitParameters.dM * estimation * estimation * estimation;
-      double estimationWithMediumCalibration = estimation - mediumCorrection;
+      const double estimationWithMediumCalibration = estimation - mediumCorrection;
       return estimationWithMediumCalibration;
     }
 

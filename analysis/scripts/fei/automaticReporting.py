@@ -23,6 +23,119 @@ gSystem.Load('libanalysis.so')
 from ROOT import Belle2
 
 
+class BinnedData(object):
+    """
+    BinnedData object should look similar to a pandas.DataFrame,
+    and is used for mcCounts and listCounts, which were previously pandas.DataFrames,
+    but due to the extreme memory consumption I replaced them with simple histograms.
+
+    So the idea is to hold only a binned version of the data instead of the data itself,
+    but to return the result of the defined operations sum, count, ... as if they were
+    executed on the unbinned pandas.DataFrame.
+    """
+    def __init__(self, array, patch):
+        """
+        BinnedData contains an array with bin content values and patches defining the bin centers
+        @param array bin content
+        @param patch bin centers
+        """
+        self.array = array
+        self.patch = patch
+
+    def min(self):
+        """
+        Returns minimum of binned data (so first nonzero bin-center)
+        """
+        return self.patch[numpy.nonzero(self.array)[0]]
+
+    def max(self):
+        """
+        Returns maximum of binned data (so last nonzero bin-center)
+        """
+        return self.patch[numpy.nonzero(self.array)[-1]]
+
+    def sum(self):
+        """
+        Returns sum of binned data
+        """
+        return numpy.sum(self.array*self.patch)
+
+    def count(self):
+        """
+        Returns length of binned data (so the sum of all bins!)
+        """
+        return numpy.sum(self.array)
+
+    def std(self):
+        """
+        Returns standard deviation of binned data
+        """
+        mean = self.sum() / self.count()
+        return numpy.sum(self.array*(self.patch-mean)**2) / (self.count() - 1.0)
+
+
+def loadHistsFromRootFile(filename):
+    """
+    Load all TH1F out of a root file
+    @param filename of the ROOT file containing the histograms
+    @return dictionary of name of histogram and BinnedData object
+    """
+    import root_numpy
+    import ROOT
+    f = ROOT.TFile(filename)
+    keys = [str(i.GetName()) for i in file.GetListOfKeys()]
+    root_hists = [f.Get(key) for key in keys]
+
+    # Convert hists to arrays dropping underflow and overflow bin
+    patches = []
+    for hist in root_hists:
+        patch = [hist.GetBinLowEdge(i) for i in range(1, hist.GetNbinsX()+1)]
+        patches.append(patch)
+    arrays = [root_numpy.hist2array(hist)[1:-1] for hist in root_hists]
+
+    # Put arrays and patches into own Hist class to simplify usage
+    binnedDataList = [BinnedData(array, patch) for array, patch in zip(arrays, patches)]
+    return dict(zip(keys, binnedDataList))
+
+
+def loadMCCountsDictionary(filename):
+    """
+    Load MCCounts into a dictionary of pdg code and BinnedData objects
+        @param filename name of the ROOT file containing the MCCounts
+        @return dictionary of pdg code and BinnedData objects with MCCounts
+    """
+    hists = loadHistsFromRootFile(filename)
+
+    def rename(name):
+        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
+        return old_name[len('NumberOfMCParticlesInEvent('):-len(")")]
+
+    return {rename(key): hist for key, hist in hists.iteritems()}
+
+
+def loadListCountsDictionary(filename):
+    """
+    Load ListCounts into a dictionary containting BinnedData objects
+    Keys are named by the MatchedParticleList name plus the suffixes _Signal, _Background, _All.
+        @param filename name of the ROOT file containing the ListCounts
+        @return dictionary of ParticleListNames and BinnedData objects
+    """
+    hists = loadHistsFromRootFile(filename)
+
+    def rename(name):
+        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
+        if ',' in old_name:
+            if old_name[-2] == '1':
+                return old_name.split(',')[0][len('countInList('):] + '_Signal'
+            if old_name[-2] == '0':
+                return old_name.split(',')[0][len('countInList('):] + '_Background'
+            raise RuntimeError("Given listCount name is not valid " + old_name)
+        else:
+            return old_name[len('countInList('):-1] + '_All'
+
+    return {rename(key): hist for key, hist in hists.iteritems()}
+
+
 def loadMCCountsDataFrame(filename):
     """
     Load MCCounts into a pandas.DataFrame.
@@ -406,7 +519,7 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
     colour_list = b2latex.DefineColourList()
     o += colour_list.finish()
 
-    listCountsData = loadListCountsDataFrame(listCounts)
+    listCountsData = loadListCountsDictionary(listCounts)
     stats = loadModuleStatisticsDataFrame(moduleStatisticsFile)
     sum_time_seconds = stats['time'].sum()
     moduleTypes = list(stats.type.unique())
@@ -630,9 +743,10 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     mcCountsData = loadMCCountsDataFrame(mcCounts)
     mcCountsData = mcCountsData[pdgcode]
 
-    listCountsData = loadListCountsDataFrame(listCounts)
-    listCountsData = listCountsData[[matchedList + '_Signal', matchedList + '_Background', matchedList + '_All']]
-    listCountsData.columns = ["Signal", "Background", "All"]
+    listCountsData = loadListCountsDictionary(listCounts)
+    listCountsData = {"Signal": listCountsData[matchedList + '_Signal'],
+                      "Background": listCountsData[matchedList + '_Background'],
+                      "All": listCountsData[matchedList + '_All']}
 
     nEvents = mcCountsData.count()
     nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count())
@@ -765,11 +879,19 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     mcCountsData = loadMCCountsDataFrame(mcCounts)
     mcCountsData = mcCountsData[pdgcode]
 
-    listCountsData = loadListCountsDataFrame(listCounts)
+    listCountsData = loadListCountsDictionary(listCounts)
     valid_lists = [matchedList for matchedList in matchedLists if matchedList is not None]
-    listCountsData['Signal'] = listCountsData[[matchedList + '_Signal' for matchedList in valid_lists]].sum(axis=1)
-    listCountsData['Background'] = listCountsData[[matchedList + '_Background' for matchedList in valid_lists]].sum(axis=1)
-    listCountsData['All'] = listCountsData[[matchedList + '_All' for matchedList in valid_lists]].sum(axis=1)
+    signal_hist = listCountsData[valid_lists[0] + '_Signal']
+    background_hist = listCountsData[valid_lists[0] + '_Background']
+    all_hist = listCountsData[valid_lists[0] + '_All']
+    for matchedList in valid_lists[1:]:
+        signal_hist.array += listCountsData[matchedList + '_Signal'].array
+        background_hist.array += listCountsData[matchedList + '_Background'].array
+        all_hist.array += listCountsData[matchedList + '_All'].array
+    listCountsData = {}
+    listCountsData['Signal'] = signal_hist
+    listCountsData['Background'] = background_hist
+    listCountsData['All'] = all_hist
 
     nEvents = mcCountsData.count()
     nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count())

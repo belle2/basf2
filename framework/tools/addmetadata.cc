@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
   fileMetaData->setIds(id, guid, lfn, logFile);
   if (newTree) {
     newTree->Fill();
-    newTree->Write();
+    newTree->Write(newTree->GetName(), TObject::kWriteDelete);
   } else {
     fileMetaData->Write("FileMetaData");
   }

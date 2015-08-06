@@ -104,15 +104,15 @@ void MeasurementCreatorModule::constructHitsForTrack(RecoTrack& recoTrack) const
   // Loop over all hits and create an abs measurement with the creators.
   // then create a TrackPoint from that and set the sorting parameter
   recoTrack.mapOnHits<RecoTrack::UsedCDCHit>(recoTrack.getStoreArrayNameOfCDCHits(),
-                                             std::bind(measurementAdder<RecoTrack::UsedCDCHit, Const::CDC>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
+                                             std::bind(&measurementAdder<RecoTrack::UsedCDCHit, Const::CDC>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
                                                        std::cref(m_cdcMeasurementCreatorFactory.getCreators())));
 
   recoTrack.mapOnHits<RecoTrack::UsedSVDHit>(recoTrack.getStoreArrayNameOfSVDHits(),
-                                             std::bind(measurementAdder<RecoTrack::UsedSVDHit, Const::SVD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
+                                             std::bind(&measurementAdder<RecoTrack::UsedSVDHit, Const::SVD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
                                                        std::cref(m_svdMeasurementCreatorFactory.getCreators())));
 
   recoTrack.mapOnHits<RecoTrack::UsedPXDHit>(recoTrack.getStoreArrayNameOfPXDHits(),
-                                             std::bind(measurementAdder<RecoTrack::UsedPXDHit, Const::PXD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
+                                             std::bind(&measurementAdder<RecoTrack::UsedPXDHit, Const::PXD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
                                                        std::cref(m_pxdMeasurementCreatorFactory.getCreators())));
 
   recoTrack.sort();

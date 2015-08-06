@@ -306,7 +306,7 @@ class Diagonal(Plotter):
         Sets limits, title, axis-labels and legend of the plot
         """
         self.scale_limits()
-        self.axis.plot((self.xmin, self.xmax), (self.ymin, self.ymax), color='black')
+        self.axis.plot((0.0, 1.0), (0.0, 1.0), color='black')
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Diagonal Plot")

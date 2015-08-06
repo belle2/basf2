@@ -607,6 +607,7 @@ def fitVertex(
     fitter='rave',
     fit_type='vertex',
     constraint='',
+    daughtersUpdate=False,
     path=analysis_main,
 ):
     """
@@ -618,6 +619,7 @@ def fitVertex(
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
     @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube)
+    @updateDaughters    meke copy of the daughters and update them after the vertex fit
     @param path         modules are added to this path
     """
 
@@ -635,6 +637,7 @@ def fitVertex(
     pvfit.param('vertexFitter', fitter)
     pvfit.param('fitType', fit_type)
     pvfit.param('withConstraint', constraint)
+    pvfit.param('updateDaughters', daughtersUpdate)
     pvfit.param('decayString', decay_string)
     path.add_module(pvfit)
 
@@ -663,6 +666,34 @@ def vertexKFit(
         'kfitter',
         'vertex',
         constraint,
+        False,
+        path,
+    )
+
+
+def vertexKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    constraint='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the Daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        '',
+        'kfitter',
+        'vertex',
+        constraint,
+        True,
         path,
     )
 
@@ -689,6 +720,7 @@ def massVertexKFit(
         'kfitter',
         'massvertex',
         '',
+        False,
         path,
     )
 
@@ -715,6 +747,7 @@ def massKFit(
         'kfitter',
         'mass',
         '',
+        False,
         path,
     )
 
@@ -743,6 +776,34 @@ def vertexRave(
         'rave',
         'vertex',
         constraint,
+        False,
+        path,
+    )
+
+
+def vertexRaveDaughtersUpdate(
+    list_name,
+    conf_level,
+    constraint='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using RAVE for each Particle in the given ParticleList and update the Daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        '',
+        'rave',
+        'vertex',
+        constraint,
+        True,
         path,
     )
 
@@ -769,6 +830,7 @@ def massVertexRave(
         'rave',
         'massvertex',
         '',
+        False,
         path,
     )
 
@@ -796,6 +858,7 @@ def massRave(
         'rave',
         'mass',
         '',
+        False,
         path,
     )
 

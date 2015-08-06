@@ -1140,7 +1140,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
             o += b2latex.Graphics().add(signalPlot, 0.49).add(allPlot, 0.49).add(ratioPlot, 0.49).finish()
 
             if channelName in preCutCut:
-                o += b2latex.String(r"PreCut-String: \verb{" + preCutCut[channelName]['cutstring'] + r"}")  # no finish
+                o += b2latex.String(r"PreCut-String: \verb+" + preCutCut[channelName]['cutstring'] + r"+")  # no finish
             else:
                 o += b2latex.String(r"The channel was ignored. No PreCut is available, but the histograms are.").finish()
         else:

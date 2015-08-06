@@ -46,13 +46,13 @@ class BinnedData(object):
         """
         Returns minimum of binned data (so first nonzero bin-center)
         """
-        return self.patch[numpy.nonzero(self.array)[0]]
+        return self.patch[numpy.nonzero(self.array)[0][0]]
 
     def max(self):
         """
         Returns maximum of binned data (so last nonzero bin-center)
         """
-        return self.patch[numpy.nonzero(self.array)[-1]]
+        return self.patch[numpy.nonzero(self.array)[0][-1]]
 
     def sum(self):
         """
@@ -83,15 +83,15 @@ def loadHistsFromRootFile(filename):
     import root_numpy
     import ROOT
     f = ROOT.TFile(filename)
-    keys = [str(i.GetName()) for i in file.GetListOfKeys()]
+    keys = [str(i.GetName()) for i in f.GetListOfKeys()]
     root_hists = [f.Get(key) for key in keys]
 
     # Convert hists to arrays dropping underflow and overflow bin
     patches = []
     for hist in root_hists:
-        patch = [hist.GetBinLowEdge(i) for i in range(1, hist.GetNbinsX()+1)]
+        patch = numpy.asarray([hist.GetBinCenter(i) for i in range(1, hist.GetNbinsX()+1)])
         patches.append(patch)
-    arrays = [root_numpy.hist2array(hist)[1:-1] for hist in root_hists]
+    arrays = [root_numpy.hist2array(hist) for hist in root_hists]
 
     # Put arrays and patches into own Hist class to simplify usage
     binnedDataList = [BinnedData(array, patch) for array, patch in zip(arrays, patches)]
@@ -740,7 +740,7 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     nTupleData = loadNTupleDataFrame(nTuple)
 
     pdgcode = str(abs(pdg.from_name(particleName)))
-    mcCountsData = loadMCCountsDataFrame(mcCounts)
+    mcCountsData = loadMCCountsDictionary(mcCounts)
     mcCountsData = mcCountsData[pdgcode]
 
     listCountsData = loadListCountsDictionary(listCounts)
@@ -876,7 +876,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     nTupleData = loadNTupleDataFrame(nTuple)
 
     pdgcode = str(abs(pdg.from_name(particleName)))
-    mcCountsData = loadMCCountsDataFrame(mcCounts)
+    mcCountsData = loadMCCountsDictionary(mcCounts)
     mcCountsData = mcCountsData[pdgcode]
 
     listCountsData = loadListCountsDictionary(listCounts)
@@ -941,6 +941,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
                               head=r'Quantity & Average $\pm$ Error & Deviation & Minimum & Maximum & PostCut',
                               format_string=r'{quantity} & $({mean:.3f} \pm {error:.3f})$ & ${std:.3f}$ & ${min:.3f}$ &'
                                             r' ${max:.3f}$ & $({meanPostCut:.3f} \pm {errorPostCut:.3f})$')
+
     table.add(quantity='MC-Particles',
               mean=mcCountsData.sum() / mcCountsData.count(),
               error=b2stat.poisson_error(mcCountsData.sum()) / nEvents,

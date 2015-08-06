@@ -411,7 +411,7 @@ class Box(Plotter):
             weight = data.loc[mask, column].reset_index(drop=True)
             x = numpy.asarray(list(itertools.chain.from_iterable([i]*int(j) for i, j in zip(x, weight))))
 
-        if x:
+        if len(x) != 0:
             p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
                                   boxprops=dict(facecolor='blue', alpha=0.5),
                                   # medianprobs=dict(color='blue'),

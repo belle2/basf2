@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/legendre/tests_fixtures/CDCLegendreTestFixture.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
 #include <set>
@@ -29,9 +29,9 @@ using namespace TrackFindingCDC;
 
 TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
 {
-  HitQuadTreeProcessor::ChildRanges ranges(HitQuadTreeProcessor::rangeX(0, std::pow(2, 13)),
-                                           HitQuadTreeProcessor::rangeY(-1.5, 1.5));
-  std::vector<HitQuadTreeProcessor::ReturnList> candidates;
+  AxialHitQuadTreeProcessor::ChildRanges ranges(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 13)),
+                                                AxialHitQuadTreeProcessor::rangeY(-0.15, 0.15));
+  std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 
   markAllHitsAsUnused();
   std::set<TrackHit*>& hits_set = getHitSet();
@@ -42,17 +42,23 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
       hitVector.push_back(trackHit);
   }
 
-  HitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidates](const HitQuadTreeProcessor::ReturnList & hits,
-  HitQuadTreeProcessor::QuadTree*) {
+  AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
+  AxialHitQuadTreeProcessor::QuadTree*) {
     candidates.push_back(hits);
   };
 
   auto now = std::chrono::high_resolution_clock::now();
-  HitQuadTreeProcessor qtProcessor(13, ranges);
-  qtProcessor.provideItemsSet(hitVector);
+  AxialHitQuadTreeProcessor qtProcessor1(13, ranges);
+  qtProcessor1.provideItemsSet(hitVector);
 
   // actual filling of the hits into the quad tree structure
-  qtProcessor.fillGivenTree(lmdProcessor, 30);
+  qtProcessor1.fillGivenTree(lmdProcessor, 30);
+
+  AxialHitQuadTreeProcessor qtProcessor2(11, ranges);
+  qtProcessor2.provideItemsSet(hitVector);
+
+  // actual filling of the hits into the quad tree structure
+  qtProcessor2.fillGivenTree(lmdProcessor, 30);
   auto later = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());

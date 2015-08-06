@@ -112,75 +112,10 @@ namespace Belle2 {
         }
       }
 
-    public:
-      /**
-       * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       * @param rThreshold the threshold in the y variable
-       */
-      virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                                 unsigned int nHitsThreshold, typeY rThreshold) final {
-        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, rThreshold, true);
-      }
-
-      /**
-       * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       */
-      virtual void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                                 unsigned int nHitsThreshold) final {
-        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
-      }
-
-      /**
-       * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
-       */
-      virtual void provideItemsSet(std::vector<typeData*>& itemsVector) final {
-        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
-        quadtreeItemsVector.reserve(itemsVector.size());
-        for (typeData* item : itemsVector)
-        {
-          quadtreeItemsVector.push_back(new ItemType(item));
-        }
-      }
-
-    protected:
-      /**
-       * Return the parameter last level.
-       */
-      virtual unsigned int getLastLevel() const final
-      {
-        return m_lastLevel;
-      }
-
-    private:
-      /**
-       * Delete all the QuadTreeItems in the tree and clear the tree.
-       */
-      virtual void clear()
-      {
-        const std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
-        for (ItemType* item : quadtreeItemsVector) {
-          delete item;
-        }
-        m_quadTree->clearTree();
-      }
-
-      /**
-       * Create a quad tree with the given parameters ranges.
-       */
-      virtual void createQuadTree(const ChildRanges& ranges) final {
-        const rangeX& x = ranges.first;
-        const rangeY& y = ranges.second;
-        m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
-      }
-
       /**
        * Before making a new search we have to clean up the items that are already used from the items list.
        */
-      virtual void cleanUpItems(std::vector<ItemType*>& items) const final
+      void cleanUpItems(std::vector<ItemType*>& items) const
       {
         items.erase(std::remove_if(items.begin(), items.end(),
         [&](ItemType * hit) {
@@ -189,104 +124,64 @@ namespace Belle2 {
         items.end());
       };
 
+
+    public:
       /**
-       * When a node is accepted as a result, we extract a vector with the items (back transformed to typeData*)
-       * and pass it together with the result node to the given lambda function.
+       * Start filling the already created tree.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       * @param rThreshold the threshold in the y variable
        */
-      virtual void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const final
+      void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
+                         unsigned int nHitsThreshold, typeY rThreshold)
       {
-        ReturnList resultItems;
-        const std::vector<ItemType*>& quadTreeItems = node->getItemsVector();
-        resultItems.reserve(quadTreeItems.size());
-
-        for (ItemType* quadTreeItem : quadTreeItems) {
-          quadTreeItem->setUsedFlag(m_param_setUsedFlag);
-          resultItems.push_back(quadTreeItem->getPointer());
-        }
-
-        lambda(resultItems, node);
+        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, rThreshold, true);
       }
 
       /**
-       * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
-       * process further and go one level deeper.
+       * Start filling the already created tree.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
        */
-      virtual void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
-                                 bool checkThreshold) final {
-        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
-        (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
-        if (node->getItemsVector().size() < nItemsThreshold)
-          return;
-        if (checkThreshold)
-        {
-          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
-            return;
+      void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
+                         unsigned int nHitsThreshold)
+      {
+        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
+      }
+
+
+      /**
+       * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
+       */
+      virtual void provideItemsSet(std::vector<typeData*>& itemsVector)
+      {
+        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
+        quadtreeItemsVector.reserve(itemsVector.size());
+        for (typeData* item : itemsVector) {
+          quadtreeItemsVector.push_back(new ItemType(item));
         }
+      }
 
-        if (node->getLevel() >= m_lastLevel)
-        {
-          callResultFunction(node, lmdProcessor);
-          return;
-        }
-
-        if (node->getChildren() == nullptr)
-          node->initializeChildren(*this);
-
-        if (!node->checkFilled())
-        {
-          fillChildren(node, node->getItemsVector());
-          node->setFilled();
-        }
-
-        constexpr int m_nbins_theta = binCountX;
-        constexpr int m_nbins_r = binCountY;
-
-        bool binUsed[m_nbins_theta][m_nbins_r];
-        for (int iX = 0; iX < m_nbins_theta; iX++)
-          for (int iY = 0; iY < m_nbins_r; iY++)
-            binUsed[iX][iY] = false;
-
-        //Processing, which bins are further investigated
-        for (int bin_loop = 0; bin_loop < binCountX* binCountY; bin_loop++)
-        {
-
-          // Search for the bin with the highest bin content.
-          int xIndexMax = 0;
-          int yIndexMax = 0;
-          size_t maxValue = 0;
-          for (int xIndexLoop = 0; xIndexLoop < binCountX; ++xIndexLoop) {
-            for (int yIndexLoop = 0; yIndexLoop < binCountY; ++yIndexLoop) {
-              if ((maxValue < node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems())
-              && (!binUsed[xIndexLoop][yIndexLoop])) {
-                maxValue = node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems();
-                xIndexMax = xIndexLoop;
-                yIndexMax = yIndexLoop;
-              }
-            }
-          }
-
-          // Go down one level for the bin with the maximum number of items in it
-          binUsed[xIndexMax][yIndexMax] = true;
-          this->fillGivenTree(node->getChildren()->get(xIndexMax, yIndexMax), lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
-
-          // After we have processed the children we need to get rid of the already used hits in all the children, because this can change the number of items drastically
-          node->getChildren()->apply([&](QuadTree * childNode) {
-            childNode->cleanUpItems(*this);
-          });
-        }
+    protected:
+      /**
+       * Return the parameter last level.
+       */
+      inline unsigned int getLastLevel() const
+      {
+        return m_lastLevel;
       }
 
       /**
        * This function is called by fillGivenTree and fills the items into the corresponding children.
        * For this the user-defined method insertItemInNode is called.
        */
-      virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items) final {
+      virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items)
+      {
         const size_t neededSize = 2 * items.size();
         node->getChildren()->apply([neededSize](QuadTree * qt) {qt->reserveHitsVector(neededSize);});
 
         //Voting within the four bins
-        for (ItemType* item : items)
-        {
+        for (ItemType* item : items) {
           if (item->isUsed())
             continue;
 
@@ -303,10 +198,134 @@ namespace Belle2 {
       }
 
       /**
+       * Function which checks if given node is leaf
+       * Implemented as virtual to keep possibility of changing lastLevel values depending on region is phase-space
+       * (i.e. setting lastLevel as a function of Y-variable)
+       */
+      virtual bool checkIfLastLevel(QuadTree* node)
+      {
+        if (node->getLevel() >= getLastLevel()) return true;
+        else return false;
+      }
+
+
+      /**
+       * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
+       * process further and go one level deeper.
+       */
+      void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
+                         bool checkThreshold)
+      {
+        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
+                (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
+        if (node->getItemsVector().size() < nItemsThreshold)
+          return;
+        if (checkThreshold) {
+          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
+            return;
+        }
+
+        if (checkIfLastLevel(node)) {
+          callResultFunction(node, lmdProcessor);
+          return;
+        }
+
+        if (node->getChildren() == nullptr)
+          node->initializeChildren(*this);
+
+        if (!node->checkFilled()) {
+          fillChildren(node, node->getItemsVector());
+          node->setFilled();
+        }
+
+        constexpr int m_nbins_theta = binCountX;
+        constexpr int m_nbins_r = binCountY;
+
+        bool binUsed[m_nbins_theta][m_nbins_r];
+        for (int iX = 0; iX < m_nbins_theta; iX++)
+          for (int iY = 0; iY < m_nbins_r; iY++)
+            binUsed[iX][iY] = false;
+
+        //Processing, which bins are further investigated
+        for (int bin_loop = 0; bin_loop < binCountX * binCountY; bin_loop++) {
+
+          // Search for the bin with the highest bin content.
+          int xIndexMax = 0;
+          int yIndexMax = 0;
+          size_t maxValue = 0;
+          for (int xIndexLoop = 0; xIndexLoop < binCountX; ++xIndexLoop) {
+            for (int yIndexLoop = 0; yIndexLoop < binCountY; ++yIndexLoop) {
+              if ((maxValue < node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems())
+                  && (!binUsed[xIndexLoop][yIndexLoop])) {
+                maxValue = node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems();
+                xIndexMax = xIndexLoop;
+                yIndexMax = yIndexLoop;
+              }
+            }
+          }
+
+          // Go down one level for the bin with the maximum number of items in it
+          binUsed[xIndexMax][yIndexMax] = true;
+
+          // After we have processed the children we need to get rid of the already used hits in all the children, because this can change the number of items drastically
+          node->getChildren()->get(xIndexMax, yIndexMax)->cleanUpItems(*this);
+
+          this->fillGivenTree(node->getChildren()->get(xIndexMax, yIndexMax), lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
+
+        }
+      }
+
+      /**
+       * Delete all the QuadTreeItems in the tree and clear the tree.
+       */
+      void clear()
+      {
+        const std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
+        for (ItemType* item : quadtreeItemsVector) {
+          delete item;
+        }
+        m_quadTree->clearTree();
+      }
+
+      QuadTree* m_quadTree; /**< The quad tree we work with */
+
+    private:
+
+      /**
+       * Create a quad tree with the given parameters ranges.
+       */
+      void createQuadTree(const ChildRanges& ranges)
+      {
+        const rangeX& x = ranges.first;
+        const rangeY& y = ranges.second;
+        m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
+      }
+
+
+      /**
+       * When a node is accepted as a result, we extract a vector with the items (back transformed to typeData*)
+       * and pass it together with the result node to the given lambda function.
+       */
+      void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const
+      {
+        ReturnList resultItems;
+        const std::vector<ItemType*>& quadTreeItems = node->getItemsVector();
+        resultItems.reserve(quadTreeItems.size());
+
+        for (ItemType* quadTreeItem : quadTreeItems) {
+          quadTreeItem->setUsedFlag(m_param_setUsedFlag);
+          resultItems.push_back(quadTreeItem->getPointer());
+        }
+
+        lambda(resultItems, node);
+      }
+
+
+      /**
        * Creates the sub node of a given node. This function is called by fillGivenTree.
        * To calculate the ranges of the children nodes the user-defined function createChiildWithParent is used.
        */
-      virtual void initializeChildren(QuadTree* node, QuadTreeChildren* m_children) const final
+      void initializeChildren(QuadTree* node, QuadTreeChildren* m_children) const
       {
         for (unsigned int i = 0; i < binCountX; ++i) {
           for (unsigned int j = 0; j < binCountY; ++j) {
@@ -318,17 +337,7 @@ namespace Belle2 {
         }
       }
 
-      // depricated
-      virtual void provideItemsSet(const std::set<ItemType*>& items_set, std::vector<ItemType*>& items_vector) const final
-      {
-        items_vector.clear();
-        items_vector.reserve(items_set.size());
-        std::copy_if(items_set.begin(), items_set.end(), std::back_inserter(items_vector),
-        [&](ItemType * item) {return not item->isUsed();});
-      };
-
       unsigned int m_lastLevel; /**< The last level to be filled */
-      QuadTree* m_quadTree; /**< The quad tree we work with */
       bool m_debugOutput; /**< A flag to control the creation of the debug output */
       std::map<std::pair<typeX, typeY>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
       bool m_param_setUsedFlag; /**< Set the used flag after every lambda function call */

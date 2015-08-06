@@ -332,6 +332,7 @@ namespace Belle2 {
 
           node->getChildren()->get(t_index, r_index)->cleanUpItems(*this);
           this->fillGivenTree(node->getChildren()->get(t_index, r_index), lmdProcessor, nHitsThreshold, rThreshold, checkThreshold);
+//          node->getChildren()->get(t_index, r_index)->cleanUpItems(*this);
         }
       }
 

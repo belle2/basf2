@@ -12,7 +12,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 
 namespace Belle2 {
@@ -114,6 +114,8 @@ namespace Belle2 {
      */
     void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
                       unsigned int);
+
+    void postprocessSingleNode(std::vector<TrackFindingCDC::TrackHit*>&, bool, TrackFindingCDC::AxialHitQuadTreeProcessor::QuadTree*);
 
   };
 

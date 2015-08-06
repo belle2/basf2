@@ -109,7 +109,8 @@ namespace Belle2 {
     std::pair<T, T> vectorToPair(std::vector<T>& vec, const std::string& name = "");
 
   private:
-    static InitialParticleGeneration s_initial;
+    static InitialParticleGeneration
+    s_initial;   /**< Initial particle for beam parameters, static because we need to call it from FORTRAN here. */
   };
 
 

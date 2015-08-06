@@ -2,15 +2,6 @@ Import('env')
 
 import os
 
-# Currently only builds with clang
-# Wait for gcc 4.9.2 in externals v00-06-00 be activated
-option = os.environ['BELLE2_OPTION']
-ext_version = os.environ.get('BELLE2_EXTERNALS_VERSION')
-
-if option != "clang" and ext_version < "v00-06-00":
-    print "Skip tracking/trackFindingCDC/hough till externals v00-06-00 (gcc4.9.2) become available"
-    env.Dictionary()['CONTINUE'] = False
-
 # env.Prepend(CCFLAGS = ['-O1'])
 # env.Append(CCFLAGS = ['-O1'])
 env.Append(CCFLAGS = ['-g'])

@@ -48,6 +48,7 @@ TrackCandidate::TrackCandidate(double theta, double r, int charge,
   }
 }
 
+
 TrackCandidate::TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList) :
   m_theta(0), m_r(0), m_xc(0), m_yc(0), m_ref_x(0), m_ref_y(0), m_charge(0)
 {

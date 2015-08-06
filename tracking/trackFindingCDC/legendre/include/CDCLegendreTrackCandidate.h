@@ -41,6 +41,17 @@ namespace Belle2 {
       /** Construct track candidate using information from CDCLegendreQuadTree nodes */
       explicit TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList);
 
+      /**Construct a Track Candidate from give theta and r value (in conformal plane)
+       * Do only use for testing purposes!
+       * @param theta theta value of track
+       * @param r r value of track
+       * @param charge charge assumption of track, defined by enum ChargeHypotheses
+       * @param trackHitList List of Hits, which are assigned to the track
+       */
+      TrackCandidate(double theta, double r, int charge,
+                     const std::vector<TrackHit*>& trackHitList);
+
+
       /**
        * @brief Get charge assumption based on the provided Hits
        * @param theta theta value of the potential track candidate
@@ -184,16 +195,6 @@ namespace Belle2 {
       double m_ref_y; /**< yc value in conformal plane*/
       int m_charge; /**< charge assumption of track*/
 
-
-      /**Construct a Track Candidate from give theta and r value (in conformal plane)
-       * Do only use for testing purposes!
-       * @param theta theta value of track
-       * @param r r value of track
-       * @param charge charge assumption of track, defined by enum ChargeHypotheses
-       * @param trackHitList List of Hits, which are assigned to the track
-       */
-      TrackCandidate(double theta, double r, int charge,
-                     const std::vector<TrackHit*>& trackHitList);
 
 
       friend class CDCLegendreTestFixture;

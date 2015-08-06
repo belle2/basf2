@@ -36,6 +36,16 @@ TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromQuadNodeList(con
   return trackCandidate;
 }
 
+TrackCandidate* TrackProcessor::createLegendreTrackCandidateFromHits(const std::vector<TrackHit*>& trackHits)
+{
+  TrackCandidate* trackCandidate = new TrackCandidate(0, 0, 0, trackHits);
+  TrackFitter cdcLegendreTrackFitter;
+  cdcLegendreTrackFitter.fitTrackCandidateFast(trackCandidate);
+
+  processTrack(trackCandidate);
+  return trackCandidate;
+}
+
 void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 {
   //check if the number has enough axial hits (might be less due to the curvature check).
@@ -56,6 +66,8 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
   tracks.clear();
+
+  if (m_trackList.size() == 0) return;
   tracks.reserve(m_trackList.size());
 
   for (TrackCandidate* trackCand : m_trackList) {
@@ -88,7 +100,10 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
     // Set the start point of the trajectory to the first hit
     newTrackCandidate.sort();
-
+    if (newTrackCandidate.size() < 5) {
+      tracks.pop_back();
+      continue;
+    }
     trajectory2D.setLocalOrigin(newTrackCandidate.front().getRecoPos2D());
 
     // Maybe we should reverse the trajectory here, is this right?

@@ -57,6 +57,8 @@ namespace Belle2 {
        */
       TrackCandidate* createLegendreTrackCandidateFromQuadNodeList(const std::vector<QuadTreeLegendre*>& nodeList);
 
+      TrackCandidate* createLegendreTrackCandidateFromHits(const std::vector<TrackHit*>& trackHits);
+
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
       void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) const;
 

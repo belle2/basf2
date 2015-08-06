@@ -663,11 +663,10 @@ def CountMCParticles(resource, names):
     filename = 'mcParticlesCount.root'
 
     if not os.path.isfile(filename):
-        output = register_module('VariablesToNtuple')
-        output.set_name("VariablesToNtuple_MCCount")
+        output = register_module('VariablesToHistogram')
+        output.set_name("VariablesToHistogram_MCCount")
         output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=abs(pdg.from_name(name))) for name in names])
         output.param('fileName', filename)
-        output.param('treeName', 'mccounts')
         resource.path.add_module(output)
         resource.condition = ('EventType', '==0')
         resource.halt = True
@@ -686,15 +685,14 @@ def CountParticleLists(resource, targets, lists):
     filename = 'listCounts.root'
 
     if not os.path.isfile(filename):
-        output = register_module('VariablesToNtuple')
-        output.set_name("VariablesToNtuple_ListCount")
+        output = register_module('VariablesToHistogram')
+        output.set_name("VariablesToHistogram_ListCount")
         output.param('variables', ['countInList({l})'.format(l=l) for l in lists if l is not None] +
                                   ['countInList({l}, {t} == 1)'.format(l=l, t=target)
                                       for l, target in zip(lists, targets) if l is not None] +
                                   ['countInList({l}, {t} == 0)'.format(l=l, t=target)
                                       for l, target in zip(lists, targets) if l is not None])
         output.param('fileName', filename)
-        output.param('treeName', 'listcounts')
         resource.path.add_module(output)
         resource.condition = ('EventType', '==0')
         resource.halt = True

@@ -1131,7 +1131,7 @@ class TestCountMCParticles(unittest.TestCase):
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Add VariablestoNtuple module for statistics
-        result.path.add_module('VariablesToNtuple', fileName='mcParticlesCount.root', treeName='mccounts',
+        result.path.add_module('VariablesToHistogram', fileName='mcParticlesCount.root',
                                variables=['NumberOfMCParticlesInEvent(11)', 'NumberOfMCParticlesInEvent(13)'])
         self.assertEqual(self.resource, result)
 
@@ -1155,7 +1155,7 @@ class TestCountParticleLists(unittest.TestCase):
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Add VariablestoNtuple module for statistics
-        result.path.add_module('VariablesToNtuple', fileName='listCounts.root', treeName='listcounts',
+        result.path.add_module('VariablesToHistogram', fileName='listCounts.root',
                                variables=['countInList(e+:1)', 'countInList(mu+:2)', 'countInList(e+:1, isSignal == 1)',
                                           'countInList(mu+:2, isSignal2 == 1)', 'countInList(e+:1, isSignal == 0)',
                                           'countInList(mu+:2, isSignal2 == 0)'])

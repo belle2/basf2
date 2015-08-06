@@ -111,7 +111,7 @@ def pretty_print_description_list(rows):
     """
     term_width = get_terminal_width()
     # indentation width
-    module_width = 40
+    module_width = 24
     # text wrapper class to format description to terminal width
     import textwrap
     wrapper = textwrap.TextWrapper(width=term_width, initial_indent="",
@@ -135,14 +135,17 @@ def pretty_print_description_list(rows):
             print bold(subheading).center(term_width)
         else:
             name, description = row
-            # set indent of the first description line to have enough space for the
-            # module name (at least module_width)
-            wrapper.initial_indent = max(module_width, len(name) + 1) * " "
-            # and output a bold module name and the description next to it
             for i, line in enumerate(description.splitlines()):
                 if i == 0:
+                    # set indent of the first description line to have enough
+                    # space for the module name (at least module_width) and
+                    # output a bold module name and the description next to it
+                    wrapper.initial_indent = max(module_width, len(name) + 1) * " "
                     print bold(name.ljust(module_width - 1)), wrapper.fill(line).lstrip()
                 else:
+                    # not first line anymore, no module name in front so initial
+                    # indent is equal to subsequent indent
+                    wrapper.initial_indent = wrapper.subsequent_indent
                     print wrapper.fill(line)
 
     print term_width * '-'
@@ -225,8 +228,8 @@ def print_all_modules(moduleList, package=''):
             if package == '' or current_module.package() == package:
                 modules.append((current_module.package(), moduleName, current_module.description()))
         except:
-            B2ERROR('The module could not be loaded. This is most likely '
-                    + 'caused by a library with missing links.')
+            B2ERROR('The module could not be loaded. This is most likely ' +
+                    'caused by a library with missing links.')
 
     table = []
     current_package = ''
@@ -236,8 +239,8 @@ def print_all_modules(moduleList, package=''):
             table.append((current_package,))
         table.append((moduleName, description))
     if package != '' and len(table) == 0:
-        B2FATAL('Print module information: No module or package named "'
-                + package + '" found!')
+        B2FATAL('Print module information: No module or package named "' +
+                package + '" found!')
 
     pretty_print_description_list(table)
 

@@ -33,7 +33,7 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TH1F.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  vector<string> emptylist;
+  std::vector<std::tuple<std::string, int, float, float>> emptylist;
   addParam("particleList", m_particleList,
            "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
            std::string(""));
@@ -60,11 +60,16 @@ void VariablesToHistogramModule::initialize()
 
   m_file->cd();
 
-  for (const string& varStr : m_variables) {
+  for (const auto& varTuple : m_variables) {
+    std::string varStr;
+    int varNbins = 0;
+    float low = 0;
+    float high = 0;
+    std::tie(varStr, varNbins, low, high) = varTuple;
     std::string compatibleName = Variable::makeROOTCompatible(varStr);
     auto ptr = std::unique_ptr<StoreObjPtr<RootMergeable<TH1F>>>(new StoreObjPtr<RootMergeable<TH1F>>("", DataStore::c_Persistent));
     ptr->registerInDataStore(m_fileName + varStr, DataStore::c_DontWriteOut);
-    ptr->construct(compatibleName.c_str(), compatibleName.c_str(), 1000, 0, 1000);
+    ptr->construct(compatibleName.c_str(), compatibleName.c_str(), varNbins, low, high);
     m_hists.push_back(std::move(ptr));
 
     //also collection function pointers

@@ -665,7 +665,8 @@ def CountMCParticles(resource, names):
     if not os.path.isfile(filename):
         output = register_module('VariablesToHistogram')
         output.set_name("VariablesToHistogram_MCCount")
-        output.param('variables', ['NumberOfMCParticlesInEvent({i})'.format(i=abs(pdg.from_name(name))) for name in names])
+        output.param('variables', [('NumberOfMCParticlesInEvent({i})'.format(i=abs(pdg.from_name(name))), 100, -0.5, 99.5)
+                                   for name in names])
         output.param('fileName', filename)
         resource.path.add_module(output)
         resource.condition = ('EventType', '==0')
@@ -687,11 +688,12 @@ def CountParticleLists(resource, targets, lists):
     if not os.path.isfile(filename):
         output = register_module('VariablesToHistogram')
         output.set_name("VariablesToHistogram_ListCount")
-        output.param('variables', ['countInList({l})'.format(l=l) for l in lists if l is not None] +
-                                  ['countInList({l}, {t} == 1)'.format(l=l, t=target)
-                                      for l, target in zip(lists, targets) if l is not None] +
-                                  ['countInList({l}, {t} == 0)'.format(l=l, t=target)
-                                      for l, target in zip(lists, targets) if l is not None])
+        output.param('variables', [('countInList({l})'.format(l=l), 100, -0.5, 99.5)
+                                   for l in lists if l is not None] +
+                                  [('countInList({l}, {t} == 1)'.format(l=l, t=target), 100, -0.5, 99.5)
+                                   for l, target in zip(lists, targets) if l is not None] +
+                                  [('countInList({l}, {t} == 0)'.format(l=l, t=target), 100, -0.5, 99.5)
+                                   for l, target in zip(lists, targets) if l is not None])
         output.param('fileName', filename)
         resource.path.add_module(output)
         resource.condition = ('EventType', '==0')

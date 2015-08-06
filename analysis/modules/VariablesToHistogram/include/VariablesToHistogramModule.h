@@ -45,7 +45,7 @@ namespace Belle2 {
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
-    std::vector<std::string> m_variables;
+    std::vector<std::tuple<std::string, int, float, float>> m_variables;
     /** Name of ROOT file for output. */
     std::string m_fileName;
     /** Name of the TTree. */

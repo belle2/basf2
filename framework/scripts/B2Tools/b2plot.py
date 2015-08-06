@@ -411,11 +411,12 @@ class Box(Plotter):
             weight = data.loc[mask, column].reset_index(drop=True)
             x = numpy.asarray(list(itertools.chain.from_iterable([i]*int(j) for i, j in zip(x, weight))))
 
-        p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
-                              boxprops=dict(facecolor='blue', alpha=0.5),
-                              # medianprobs=dict(color='blue'),
-                              # meanprobs=dict(color='red'),
-                              )
+        if x:
+            p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
+                                  boxprops=dict(facecolor='blue', alpha=0.5),
+                                  # medianprobs=dict(color='blue'),
+                                  # meanprobs=dict(color='red'),
+                                  )
         """
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)

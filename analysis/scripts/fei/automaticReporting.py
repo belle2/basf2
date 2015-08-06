@@ -49,13 +49,19 @@ class BinnedData(object):
         """
         Returns minimum of binned data (so first nonzero bin-center)
         """
-        return self.patch[numpy.nonzero(self.array)[0][0]]
+        nz, = numpy.nonzero(self.array)
+        if len(nz) == 0:
+            return float('-inf')
+        return self.patch[nz[0]]
 
     def max(self):
         """
         Returns maximum of binned data (so last nonzero bin-center)
         """
-        return self.patch[numpy.nonzero(self.array)[0][-1]]
+        nz, = numpy.nonzero(self.array)
+        if len(nz) == 0:
+            return float('inf')
+        return self.patch[nz[-1]]
 
     def sum(self):
         """

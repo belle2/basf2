@@ -4,6 +4,7 @@
 
 import copy
 import math
+import itertools
 
 import numpy
 import pandas
@@ -395,7 +396,7 @@ class Box(Plotter):
     """
     Create a boxplot
     """
-    def add(self, data, column, mask=None):
+    def add(self, data, column, mask=None, weight_column=None):
         """
         Add a new boxplot to the plots
         @param data pandas.DataFrame containing all data
@@ -406,6 +407,10 @@ class Box(Plotter):
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
         x = data.loc[mask, column].reset_index(drop=True)
+        if weight_column is not None:
+            weight = data.loc[mask, column].reset_index(drop=True)
+            x = numpy.asarray(list(itertools.chain.from_iterable([i]*int(j) for i, j in zip(x, weight))))
+
         p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
                               boxprops=dict(facecolor='blue', alpha=0.5),
                               # medianprobs=dict(color='blue'),
@@ -625,7 +630,7 @@ class VerboseDistribution(Plotter):
         box_axis = self.add_subplot(gridspecs)
 
         box = Box(self.figure, box_axis)
-        box.add(data, column, mask)
+        box.add(data, column, mask, weight_column)
         box.plots[0]['boxes'][0].set_facecolor(distribution.plots[0][0].get_color())
         box.finish()
 

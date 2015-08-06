@@ -17,6 +17,26 @@ from ROOT import Belle2
 # @cond
 
 
+class TestLoadPreCutDictionary(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/precuthist.root')
+
+    def test_loadPreCutDictionary(self):
+        df = automaticReporting.loadPreCutDictionary(self.filename)
+
+        self.assertEqual(len(df), 5)
+        self.assertListEqual(sorted(df.keys()), sorted(['Signal', 'WithoutCut', 'Background', 'All', 'Ratio']))
+
+        # Numbers were tested TBrowser
+        self.assertEqual(len(df['WithoutCut'].array), 2)
+        self.assertEqual(df['WithoutCut'].array[0], 170312934.0)
+        self.assertEqual(df['WithoutCut'].array[1], 4262288.0)
+        self.assertEqual(df['WithoutCut'].count(), 174575222)
+        self.assertEqual(df['WithoutCut'].min(), 0.0)
+        self.assertEqual(df['WithoutCut'].max(), 1.0)
+
+
 class TestLoadMCCountsDictionary(unittest.TestCase):
 
     def setUp(self):

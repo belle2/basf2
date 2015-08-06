@@ -42,6 +42,9 @@ class BinnedData(object):
         self.array = array
         self.patch = patch
 
+    def __repr__(self):
+        return "Array: " + str(self.array) + " Patches: " + str(self.patch)
+
     def min(self):
         """
         Returns minimum of binned data (so first nonzero bin-center)
@@ -89,9 +92,9 @@ def loadHistsFromRootFile(filename):
     # Convert hists to arrays dropping underflow and overflow bin
     patches = []
     for hist in root_hists:
-        patch = numpy.asarray([hist.GetBinCenter(i) for i in range(1, hist.GetNbinsX()+1)])
+        patch = numpy.asarray([hist.GetBinCenter(i) for i in range(0, hist.GetNbinsX()+2)])
         patches.append(patch)
-    arrays = [root_numpy.hist2array(hist) for hist in root_hists]
+    arrays = [root_numpy.hist2array(hist, include_overflow=True) for hist in root_hists]
 
     # Put arrays and patches into own Hist class to simplify usage
     binnedDataList = [BinnedData(array, patch) for array, patch in zip(arrays, patches)]
@@ -132,6 +135,34 @@ def loadListCountsDictionary(filename):
             raise RuntimeError("Given listCount name is not valid " + old_name)
         else:
             return old_name[len('countInList('):-1] + '_All'
+
+    return {rename(key): hist for key, hist in hists.iteritems()}
+
+
+def loadPreCutDictionary(filename):
+    """
+    Load preCut into a dictionary containting BinnedData objects
+    Keys are named by WithoutCut, Signal, All, Background, Ratio
+        @param filename name of the ROOT file containing the ListCounts
+        @return dictionary of keys and BinnedData objects
+    """
+    hists = loadHistsFromRootFile(filename)
+
+    def rename(name):
+        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
+        if old_name.startswith('withoutCut'):
+            return 'WithoutCut'
+        elif old_name.startswith('signal'):
+            return 'Signal'
+        elif old_name.startswith('all'):
+            return 'All'
+        elif old_name.startswith('bckgrd'):
+            return 'Background'
+        elif old_name.startswith('ratio'):
+            return 'Ratio'
+        else:
+            B2ERROR("Unkown histogram encountered in preCut file " + old_name + ' ' + filename)
+            return old_name
 
     return {rename(key): hist for key, hist in hists.iteritems()}
 
@@ -899,7 +930,8 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0))
 
     if(nEvents != listCountsData['All'].count()):
-        B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong.")
+        B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong."
+                  "mcCounts data says " + str(nEvents) + " and listCounts says " + str(listCountsData['All'].count()))
 
     o = b2latex.LatexFile()
 
@@ -910,11 +942,20 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
                             r"Therefore the covered branching fraction in percent is {covBR}, whereas {max_covBR} was the upper"
                             r" limit.")
 
+    preCutDf = {}
+    preCutCut = {}
+    for channelName, preCutHistogram, pc in zip(channelNames, preCutHistograms, preCut):
+        if preCutHistogram is not None:
+            preCutDf[channelName] = loadPreCutDictionary(preCutHistogram[0])
+        if pc is not None:
+            preCutCut[channelName] = pc
+
     df = coveredBranchingFractions.groupby(['channelName'])['fraction'].sum()
     nChannels = len([t for t in signalProbabilities if t is not None])
     max_nChannels = len(signalProbabilities)
     covBR = 0
     max_covBR = 0
+
     for channelName, s in zip(channelNames, signalProbabilities):
         if s is not None:
             covBR += df[channelName]
@@ -977,10 +1018,30 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
 
     o += table.finish()
 
-    user_efficiency = listCountsData['Signal'].sum() / mcCountsData.sum() * 100.0
-    user_efficiency_error = b2stat.binom_error(listCountsData['Signal'].sum(), mcCountsData.sum()) * 100.0
-    user_purity = listCountsData['Signal'].sum() / (listCountsData['All'].sum()) * 100.0
-    user_purity_error = b2stat.binom_error(listCountsData['Signal'].sum(), listCountsData['All'].sum()) * 100.0
+    recon_signal = 0
+    recon_bckgrd = 0
+    user_signal = 0
+    user_bckgrd = 0
+    for channelName, df in preCutDf.iteritems():
+        recon_signal += df['WithoutCut'].array[1]
+        recon_bckgrd += df['WithoutCut'].array[0]
+        user_signal += df['Signal'].count()
+        user_bckgrd += df['Background'].count()
+
+    recon_efficiency = recon_signal / mcCountsData.sum() * 100.0
+    recon_efficiency_error = b2stat.binom_error(recon_signal, mcCountsData.sum()) * 100.0
+    recon_purity = recon_signal / (recon_signal + recon_bckgrd) * 100.0
+    recon_purity_error = b2stat.binom_error(recon_signal, recon_signal + recon_bckgrd) * 100.0
+
+    user_efficiency = user_signal / mcCountsData.sum() * 100.0
+    user_efficiency_error = b2stat.binom_error(user_signal, mcCountsData.sum()) * 100.0
+    user_purity = user_signal / (user_signal + user_bckgrd) * 100.0
+    user_purity_error = b2stat.binom_error(user_signal, user_signal + user_bckgrd) * 100.0
+
+    precut_efficiency = listCountsData['Signal'].sum() / mcCountsData.sum() * 100.0
+    precut_efficiency_error = b2stat.binom_error(listCountsData['Signal'].sum(), mcCountsData.sum()) * 100.0
+    precut_purity = listCountsData['Signal'].sum() / (listCountsData['All'].sum()) * 100.0
+    precut_purity_error = b2stat.binom_error(listCountsData['Signal'].sum(), listCountsData['All'].sum()) * 100.0
     post_efficiency = nSignalAfterPostCut / mcCountsData.sum() * 100.0
     post_efficiency_error = b2stat.binom_error(nSignalAfterPostCut, mcCountsData.sum()) * 100.0
     post_purity = nSignalAfterPostCut / nCandidatesAfterPostCut * 100.0
@@ -990,6 +1051,16 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
                               caption='Efficiencies and Purities',
                               head=r'Cut & Efficiency $\pm$ Error & Purity $\pm$ Error',
                               format_string=r'{cut} & $({efficiency:.2f} \pm {eerr:.2f})$ & $({purity:.2f} \pm {perr:.2f})$')
+    table.add(cut='Reconstruction',
+              efficiency=recon_efficiency,
+              eerr=recon_efficiency_error,
+              purity=recon_purity,
+              perr=recon_purity_error)
+    table.add(cut='Pre',
+              efficiency=precut_efficiency,
+              eerr=precut_efficiency_error,
+              purity=precut_purity,
+              perr=precut_purity_error)
     table.add(cut='User',
               efficiency=user_efficiency,
               eerr=user_efficiency_error,
@@ -1014,130 +1085,67 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
 
         o += b2latex.SubSection(format.decayDescriptor(channelName)).finish()
 
-        o += b2latex.SubSubSection("MC-based MVA").finish()
+        o += b2latex.SubSubSection("PreCut").finish()
+        if channelName in preCutDf:
+
+            o += b2latex.String(r"PreCutHistos").finish()
+            df = pandas.DataFrame()
+            df['signal'] = preCutDf[channelName]['Signal'].patch
+            df['signal_weight'] = preCutDf[channelName]['Signal'].array
+            df['all'] = preCutDf[channelName]['All'].patch
+            df['all_weight'] = preCutDf[channelName]['All'].array
+            df['ratio'] = preCutDf[channelName]['Ratio'].patch
+            df['ratio_weight'] = preCutDf[channelName]['Ratio'].array
+
+            signalPlot = 'precut_signal_' + createUniqueFilename(raw_name, resource.hash)
+            allPlot = 'precut_all_' + createUniqueFilename(raw_name, resource.hash)
+            ratioPlot = 'precut_ratio_' + createUniqueFilename(raw_name, resource.hash)
+
+            plot = b2plot.VerboseDistribution()
+            plot.set_plot_options({'linestyle': '-', 'lw': 3})
+            plot.add(df, 'signal', weight_column='signal_weight')
+            plot.finish()
+            if channelName in preCutCut:
+                low, high = preCutCut[channelName]['range']
+                plot.axis.plot((low, low), (0.0, plot.ymax), color='black')
+                plot.axis.plot((high, high), (0.0, plot.ymax), color='black')
+            plot.save(signalPlot)
+
+            plot = b2plot.VerboseDistribution()
+            plot.set_plot_options({'linestyle': '-', 'lw': 3})
+            plot.add(df, 'all', weight_column='all_weight')
+            plot.finish()
+            if channelName in preCutCut:
+                low, high = preCutCut[channelName]['range']
+                plot.axis.plot((low, low), (0.0, plot.ymax), color='black')
+                plot.axis.plot((high, high), (0.0, plot.ymax), color='black')
+            plot.save(allPlot)
+
+            plot = b2plot.VerboseDistribution()
+            plot.set_plot_options({'linestyle': '-', 'lw': 3})
+            plot.add(df, 'ratio', weight_column='ratio_weight')
+            plot.finish()
+            if channelName in preCutCut:
+                low, high = preCutCut[channelName]['range']
+                plot.axis.plot((low, low), (0.0, plot.ymax), color='black')
+                plot.axis.plot((high, high), (0.0, plot.ymax), color='black')
+            plot.save(ratioPlot)
+
+            o += b2latex.Graphics().add(signalPlot, 0.49).add(allPlot, 0.49).add(ratioPlot, 0.49).finish()
+
+            if channelName in preCutCut:
+                o += b2latex.String(r"PreCut-String: \verb{" + preCutCut[channelName]['cutstring'] + r"}").finish()
+            else:
+                o += b2latex.String(r"The channel was ignored. No PreCut is available, but the histograms are.").finish()
+        else:
+            o += b2latex.String(r"The channel was ignored. No PreCut histograms are available.").finish()
+
         o += createTMVASection(createUniqueFilename(channelName, resource.hash), tmvaTraining, mvaConfigs[i], plotConfig)
 
     return {'name': name, 'page': o.finish(), 'user_efficiency': user_efficiency, 'user_purity': user_purity,
-            'pre_efficiency': 0, 'pre_purity': 0, 'covered': covBR,
+            'pre_efficiency': precut_efficiency, 'pre_purity': precut_purity, 'covered': covBR,
             'post_efficiency': post_efficiency, 'post_purity': post_purity,
-            'detector_efficiency': 0, 'detector_purity': 0, 'channels': channels}
-
-
-def createPreCutTexFile(placeholders, preCutHistogram, preCutConfig, preCut):
-    """
-    Creates tex file for the PreCuts of this channel. Adds necessary items to the placeholder dictionary
-    and returns the modified dictionary.
-    @param placeholders dictionary with values for every placeholder in the latex-template
-    @param preCutHistogram preCutHistogram (filename, histogram postfix)
-    @param preCutConfig configuration for pre cut
-    @param preCut used preCuts for this channel
-    """
-    if preCutHistogram is None:
-        hash = dagFramework.create_hash([placeholders])
-        placeholders['preCutTexFile'] = removeJPsiSlash(
-            '{name}_preCut_{hash}.tex'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        placeholders['preCutTemplateFile'] = 'analysis/scripts/fei/templates/MissingPreCutTemplate.tex'
-        placeholders['isIgnored'] = True
-        placeholders['channelPurity'] = 0
-        placeholders['channelNSignal'] = 0
-        placeholders['channelNBackground'] = 0
-        placeholders['channelNSignalAfterPreCut'] = 0
-        placeholders['channelNBackgroundAfterPreCut'] = 0
-        placeholders['channelNSignalAfterUserCut'] = 0
-        placeholders['channelNBackgroundAfterUserCut'] = 0
-        placeholders['channelPurityAfterPreCut'] = 0
-        placeholders['channelEfficiencyAfterPreCut'] = 0
-        placeholders['channelPurityAfterUserCut'] = 0
-        placeholders['channelEfficiencyAfterUserCut'] = 0
-
-        if 'ignoreReason' not in placeholders:
-            placeholders['ignoreReason'] = """This channel was ignored because one or more daughter particles were ignored."""
-    else:
-        placeholders['preCutROOTFile'] = preCutHistogram[0]
-        rootfile = ROOT.TFile(placeholders['preCutROOTFile'])
-        # Calculate purity and efficiency for this channel
-        without_userCut_hist = rootfile.GetListOfKeys().At(0).ReadObj()
-        signal_hist = rootfile.GetListOfKeys().At(1).ReadObj()
-        background_hist = rootfile.GetListOfKeys().At(3).ReadObj()
-
-        placeholders['channelNSignal'] = without_userCut_hist.GetBinContent(2)
-        placeholders['channelNBackground'] = without_userCut_hist.GetBinContent(1) - without_userCut_hist.GetBinContent(2)
-        placeholders['channelPurity'] = '{:.5f}'.format(purity(placeholders['channelNSignal'], placeholders['channelNBackground']))
-
-        placeholders['channelNSignalAfterUserCut'] = preCutDetermination.GetNumberOfEvents(signal_hist)
-        placeholders['channelNBackgroundAfterUserCut'] = preCutDetermination.GetNumberOfEvents(background_hist)
-        placeholders['channelAfterUserPurity'] = '{:.5f}'.format(
-            purity(
-                placeholders['channelNSignalAfterUserCut'],
-                placeholders['channelNBackgroundAfterUserCut']))
-
-        if preCut is not None:
-            lc, uc = preCut['range']
-            placeholders['preCutRange'] = '({:.2f},'.format(lc) + ' {:.2f}'.format(uc) + ')'
-            placeholders['channelNSignalAfterPreCut'] = preCutDetermination.GetNumberOfEventsInRange(signal_hist, (lc, uc))
-            placeholders['channelNBackgroundAfterPreCut'] = preCutDetermination.GetNumberOfEventsInRange(background_hist, (lc, uc))
-            placeholders['channelPurityAfterPreCut'] = '{:.5f}'.format(
-                purity(
-                    placeholders['channelNSignalAfterPreCut'],
-                    placeholders['channelNBackgroundAfterPreCut']))
-            placeholders['channelEfficiencyAfterPreCut'] = '{:.5f}'.format(
-                placeholders['channelNSignalAfterPreCut'] /
-                placeholders['channelNSignal'])
-        else:
-            placeholders['preCutRange'] = '---'
-            placeholders['channelNSignalAfterPreCut'] = 0
-            placeholders['channelNBackgroundAfterPreCut'] = 0
-            placeholders['channelPurityAfterPreCut'] = 0
-            placeholders['channelEfficiencyAfterPreCut'] = 0
-
-        placeholders['preCutVariable'] = preCutConfig.variable
-        placeholders['preCutEfficiency'] = '{:.5f}'.format(preCutConfig.efficiency)
-        placeholders['preCutPurity'] = '{:.5f}'.format(preCutConfig.purity)
-
-        hash = dagFramework.create_hash([placeholders])
-
-        ROOT.gROOT.SetBatch(True)
-
-        placeholders['preCutAllPlot'] = removeJPsiSlash(
-            '{name}_preCut_{hash}_all.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['preCutAllPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutAllPlot'], 'all', preCut, preCutConfig)
-
-        placeholders['preCutSignalPlot'] = removeJPsiSlash(
-            '{name}_preCut_{hash}_signal.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['preCutSignalPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutSignalPlot'], 'signal', preCut, preCutConfig)
-
-        placeholders['preCutBackgroundPlot'] = removeJPsiSlash(
-            '{name}_preCut_{hash}_background.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['preCutBackgroundPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutBackgroundPlot'], 'bckgrd', preCut, preCutConfig)
-
-        placeholders['preCutRatioPlot'] = removeJPsiSlash(
-            '{name}_preCut_{hash}_ratio.png'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        if not os.path.isfile(placeholders['preCutRatioPlot']):
-            makePreCutPlot(placeholders['preCutROOTFile'], placeholders['preCutRatioPlot'], 'ratio', preCut, preCutConfig)
-
-        placeholders['preCutTexFile'] = removeJPsiSlash(
-            '{name}_preCut_{hash}.tex'.format(
-                name=placeholders['particleName'],
-                hash=hash))
-        placeholders['preCutTemplateFile'] = 'analysis/scripts/fei/templates/PreCutTemplate.tex'
-
-    if not os.path.isfile(placeholders['preCutTexFile']):
-        createTexFile(placeholders['preCutTexFile'], placeholders['preCutTemplateFile'], placeholders)
-
-    return placeholders
+            'detector_efficiency': recon_efficiency, 'detector_purity': recon_purity, 'channels': channels}
 
 
 def sendMail():

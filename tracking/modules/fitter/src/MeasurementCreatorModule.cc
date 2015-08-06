@@ -48,7 +48,6 @@ MeasurementCreatorModule::MeasurementCreatorModule() : Module(),
   m_pxdMeasurementCreatorFactory(m_measurementFactory)
 {
   setDescription("Create measurements from the hits added to the RecoTracks and add them to the genfit tracks. Can also create new measurements like momentum estimations.");
-  addParam("useVXDMomentumEstimation", m_param_useVXDMomentumEstimation, "Use the momentum estimation from VXD.", false);
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,
            "Store array name for the reco tracks to add the measurements to.", std::string("RecoTracks"));
   addParam("storeArrayNameOfCDCHits", m_param_storeArrayNameOfCDCHits, "Store array name for the cdc hits.", std::string("CDCHits"));

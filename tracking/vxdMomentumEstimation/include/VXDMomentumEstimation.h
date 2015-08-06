@@ -59,17 +59,12 @@ namespace Belle2 {
 
       double dEdX = tools.getDEDX(cluster, momentum, position, charge);
 
-      // These numbers are fit results from the Analyse_Hitwise.ipynb ipython notebook and can not be calculated.
+      // These numbers are fit results from the Analyse_Hitwise.ipynb ipython notebook and can not be calculated from scratch.
       double estimation = fitParameters.aE / (dEdX - fitParameters.bE) / (dEdX - fitParameters.bE) + fitParameters.cE + fitParameters.dE *
                           dEdX;
-      B2INFO(estimation);
-
       double mediumCorrection = correctionFitParameters.aM * estimation * estimation + correctionFitParameters.bM * estimation +
                                 correctionFitParameters.cM + correctionFitParameters.dM * estimation * estimation * estimation;
       double estimationWithMediumCalibration = estimation - mediumCorrection;
-
-      B2INFO(estimationWithMediumCalibration);
-
       return estimationWithMediumCalibration;
     }
 

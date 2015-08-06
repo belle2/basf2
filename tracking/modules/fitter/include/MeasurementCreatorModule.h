@@ -55,8 +55,6 @@ namespace Belle2 {
   private:
     /** StoreArray name of the input and output reco tracks */
     std::string m_param_recoTracksStoreArrayName;
-    /** Use the momentum estimation from VXD */
-    bool m_param_useVXDMomentumEstimation;
     /** The name of the store array for the cdc hits */
     std::string m_param_storeArrayNameOfCDCHits;
     /** The name of the store array for the svd hits */

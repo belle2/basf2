@@ -179,13 +179,13 @@ class VXDHarvester(QueueHarvester):
                     if self.use_mc_info:
                         momentum = mc_particle.getMomentum()
                         position = mc_particle.getProductionVertex()
-                        charge = mc_particle.getCharge()
+                        track_charge = mc_particle.getCharge()
                     else:
                         momentum = track_cand.getMomSeed()
                         position = track_cand.getPosSeed()
-                        charge = track_cand.getChargeSeed()
+                        track_charge = track_cand.getChargeSeed()
 
-                    helix = Belle2.Helix(position, momentum, int(charge), 1.5)
+                    helix = Belle2.Helix(position, momentum, int(track_charge), 1.5)
 
                     charge = VXDMomentumEnergyEstimator.do_for_each_hit_type(
                         cluster,
@@ -195,6 +195,12 @@ class VXDHarvester(QueueHarvester):
                         cluster, lambda cluster: self.svd_tools.getPathLength(
                             cluster, helix), lambda cluster: self.pxd_tools.getPathLength(
                             cluster, helix))
+
+                    thickness = VXDMomentumEnergyEstimator.do_for_each_hit_type(
+                        cluster,
+                        lambda cluster: self.svd_tools.getThicknessOfCluster(cluster),
+                        lambda cluster: self.pxd_tools.getThicknessOfCluster(cluster),
+                    )
 
                     mc_momentum = VXDMomentumEnergyEstimator.do_for_each_hit_type(
                         cluster,
@@ -211,6 +217,8 @@ class VXDHarvester(QueueHarvester):
 
             yield dict(charge=charge,
                        p=p,
+                       thickness=thickness,
+                       track_charge=track_charge,
                        path_length=path_length,
                        is_u=is_u,
                        p_origin=mc_particle.getMomentum().Mag(),

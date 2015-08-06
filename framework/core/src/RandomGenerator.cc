@@ -99,13 +99,21 @@ void RandomGenerator::setState(int barrier)
     info << "Random Generator State info:\n";
     info << "  seed (" << std::dec << m_seed.size() << "):\n    ";
     for (auto c : m_seed) { info << std::setw(2) << std::setfill('0') << std::hex << (int)c << " "; }
-    info << "\n  event (" << std::dec << buffer.size() << "):\n    ";
+    info << "\n  event info (mode=" << m_mode << "): \n";
+    info << "    barrier:" << std::dec << m_barrier;
+    if (m_mode != c_independent) {
+      StoreObjPtr<EventMetaData> evt;
+      info << " EXP:" << evt->getExperiment() << " RUN:" << evt->getRun();
+      if (m_mode == c_eventDependent) {
+        info << " EVT:" << evt->getEvent();
+      }
+    }
+    info << "\n  event bytes (" << std::dec << buffer.size() << "):\n    ";
     for (auto c : buffer) { info << std::setw(2) << std::setfill('0') << std::hex << (int)c << " "; }
     info << "\n  state (index=" << m_index << "): ";
     for (int i = 0; i < 16; ++i) {
       info << ((i % 4 == 0) ? "\n    " : " ") << std::setw(16) << std::setfill('0') << std::hex << m_state[i];
     }
-    info << "\n";
     B2LOGMESSAGE(Belle2::LogConfig::c_Debug, 100, info.str(), PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__);
   }
 #endif

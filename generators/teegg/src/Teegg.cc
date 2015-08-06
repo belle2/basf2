@@ -136,6 +136,7 @@ void Teegg::setDefaultSettings()
   m_t         = 0.0;
   m_w2        = 1.0;
   m_weight    = 1.0;
+  m_vp2 = 1.0;
 }
 
 void Teegg::init()

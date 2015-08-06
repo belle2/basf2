@@ -665,8 +665,9 @@ def CountMCParticles(resource, names):
     if not os.path.isfile(filename):
         output = register_module('VariablesToHistogram')
         output.set_name("VariablesToHistogram_MCCount")
-        output.param('variables', [('NumberOfMCParticlesInEvent({i})'.format(i=abs(pdg.from_name(name))), 100, -0.5, 99.5)
-                                   for name in names])
+        unique_abs_pdgs = set([abs(pdg.from_name(name)) for name in names])
+        output.param('variables', [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
+                                   for pdgcode in unique_abs_pdgs])
         output.param('fileName', filename)
         resource.path.add_module(output)
         resource.condition = ('EventType', '==0')

@@ -1127,7 +1127,7 @@ class TestCountMCParticles(unittest.TestCase):
 
     def test_CountMCParticles(self):
         # Returns None if file does not exists
-        self.assertEqual(CountMCParticles(self.resource, ['e+', 'mu+']), None)
+        self.assertEqual(CountMCParticles(self.resource, ['e+', 'mu+', 'e-']), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Add VariablestoNtuple module for statistics
@@ -1139,7 +1139,7 @@ class TestCountMCParticles(unittest.TestCase):
     def test_CountMCParticlesWithFile(self):
         with temporary_file('mcParticlesCount.root'):
             # Returns counts if file already exists
-            self.assertEqual(CountMCParticles(self.resource, ['e+', 'mu+']), "mcParticlesCount.root")
+            self.assertEqual(CountMCParticles(self.resource, ['e+', 'mu+', 'e-']), "mcParticlesCount.root")
             # Enables caching
             result = MockResource(cache=True)
             self.assertEqual(self.resource, result)

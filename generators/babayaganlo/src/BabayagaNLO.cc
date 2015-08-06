@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014  Belle II Collaboration                              *
+ * Copyright(C) 2015  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -280,10 +280,20 @@ void BabayagaNLO::setDefaultSettings()
   m_ScatteringAngleRange = make_pair(15.0, 165.0); //in [deg]
   m_ScatteringAngleRangePhoton = make_pair(15.0, 165.0); //in [deg] (unused in original babayaga)
 
-  m_nPhot  = -1;
+  m_nPhot      = -1;
   m_nSearchMax = 50000;
   m_fMax       = -1.;
-
+  m_EnergySpread = 5e-3;
+  m_VPUncertainty = false;
+  m_eemin = 0.0;
+  m_temin = 0.0;
+  m_egmin = 0.0;
+  m_tgmin = 0.0;
+  m_eeveto = 0.0;
+  m_teveto = 0.0;
+  m_egveto = 0.0;
+  m_tgveto = 0.0;
+  m_maxprescale = 1.0;
 }
 
 void BabayagaNLO::init()

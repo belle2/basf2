@@ -122,6 +122,10 @@ class Resource(object):
         (self.value, serialized_path, self.condition, self.env, self.halt, self.needed, self.cache,
             self.identifier, self.provider, self.positional_requirements, self.keyword_requirements,
             self.automatic_requirements, self.requires, self.hash) = state
+        if 'mcCounts' in self.identifier:
+            return
+        if 'listCounts' in self.identifier:
+            return
         self.path = basf2.deserialize_path(serialized_path) if serialized_path is not None else None
         self.loaded_from_cache = True
 
@@ -216,8 +220,10 @@ class DAG(object):
                 cache = cPickle.load(f)
                 for resource in cache:
                     resource.env = self.env
-                    # if 'TagUniqueSignal' in resource.identifier:
-                    #    continue
+                    if 'mcCounts' in resource.identifier:
+                        continue
+                    if 'listCounts' in resource.identifier:
+                        continue
                     self.resources[resource.identifier] = resource
 
     def save_cached_resources(self, cacheFile):

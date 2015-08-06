@@ -300,4 +300,5 @@ def add_mdst_output(
                      'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
     branches += additionalBranches
     output.param('branchNames', branches)
+    output.param('branchNamesPersistent', ['FileMetaData'])
     path.add_module(output)

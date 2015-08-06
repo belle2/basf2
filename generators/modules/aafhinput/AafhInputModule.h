@@ -67,7 +67,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcparticles;
     /** interface to the generator */
     AAFHInterface m_generator;
-    /**< initial particle used by BeamParameter class */
+    /** initial particle used by BeamParameter class */
     InitialParticleGeneration m_initial;
   };
 }

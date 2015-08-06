@@ -38,7 +38,8 @@ using namespace analysis;
 
 
 
-RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""), m_massConstFit(false), m_vertFit(true)
+RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""),
+  m_massConstFit(false), m_vertFit(true)
 {
   if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveKinematicVertexFitter are used");
@@ -67,7 +68,8 @@ void RaveKinematicVertexFitter::setVertFit(bool isVertFit)
 
 void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
 {
-  rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(), aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
+  rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(),
+                           aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
   TMatrixDSym covP = aParticlePtr->getMomentumVertexErrorMatrix();
 
   TMatrixDSym covE(7);
@@ -141,12 +143,14 @@ int RaveKinematicVertexFitter::fit()
     const TVector3& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
     const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
-    RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()), bsCovRave));
+    RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),
+        bsCovRave));
   }
 
   if (m_vertFit && m_massConstFit && m_inputParticles.size() == 2) {
 
-    rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createTwoTrackMassKinematicConstraint((m_motherParticlePtr->getPDGMass()));
+    rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createTwoTrackMassKinematicConstraint((
+                                      m_motherParticlePtr->getPDGMass()));
     try {
       m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, cs2, "", m_useBeamSpot);
       m_fittedParticle = m_fittedResult.topParticle();
@@ -167,10 +171,12 @@ int RaveKinematicVertexFitter::fit()
 
       if (m_massConstFit) {
         try {
-          rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
+          rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(),
+                                         0.);
           m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, "", m_useBeamSpot);
           std::vector< rave::KinematicParticle > parts; parts.push_back(m_fittedResult.topParticle());
-          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(parts, cs, "ppf:lppf");
+          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(
+                                                                     parts, cs, "ppf:lppf");
           m_fittedParticle = m_fittedResult2[0];
         } catch (...) {
           B2ERROR("[RaveKinematicVertexFitter]: Mass fit error ");
@@ -186,7 +192,8 @@ int RaveKinematicVertexFitter::fit()
 
         Particle* aParticlePtr = m_motherParticlePtr;
 
-        rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(), aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
+        rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(),
+                                 aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());
         TMatrixFSym covP = aParticlePtr->getMomentumVertexErrorMatrix();
 
         float chi2 = 1;
@@ -219,11 +226,13 @@ int RaveKinematicVertexFitter::fit()
 
         std::vector< rave::KinematicParticle > parts; parts.push_back(aRaveParticle);
 
-        rave::KinematicConstraint constraint = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(), 0.);
+        rave::KinematicConstraint constraint = rave::KinematicConstraintBuilder().createMassKinematicConstraint(
+                                                 m_motherParticlePtr->getPDGMass(), 0.);
 
         if (m_motherParticlePtr->getMomentumVertexErrorMatrix().Determinant() != 0) {
 
-          std::vector< rave::KinematicParticle > refitted = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(parts, constraint, "ppf:lppf");
+          std::vector< rave::KinematicParticle > refitted = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(parts,
+                                                            constraint, "ppf:lppf");
 
           m_fittedParticle = refitted[0];
 
@@ -250,6 +259,11 @@ int RaveKinematicVertexFitter::fit()
   } catch (...) {
     nOfVertices = 0;
   }
+
+
+  for (auto& i : m_inputParticles) i.unlink();
+  m_inputParticles.clear();
+  //
 
   if (nOfVertices == 0) { // vertex fit not successful
     return 0;
@@ -385,7 +399,8 @@ TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(TLorentzVector p4
   TMatrix jac(7, 7);
   for (int i = 0; i < 7; i++) {
     for (int j = 0; j < 7; j++) {
-      if (i == j) jac(i, j) = 1; else jac(i, j) = 0;
+      if (i == j) jac(i, j) = 1;
+      else jac(i, j) = 0;
     }
   }
   jac(6, 3) = p4.Px() / p4.E();
@@ -414,7 +429,8 @@ TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(TLorentzVector p4
   TMatrix jac(7, 7);
   for (int i = 0; i < 7; i++) {
     for (int j = 0; j < 7; j++) {
-      if (i == j) jac(i, j) = 1; else jac(i, j) = 0;
+      if (i == j) jac(i, j) = 1;
+      else jac(i, j) = 0;
     }
   }
   jac(6, 3) = -1 * p4.Px() / p4.M();

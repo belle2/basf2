@@ -21,6 +21,7 @@
 #include <rave/KinematicTreeFactory.h>
 
 
+
 //framework genfit and root stuff for GFRave setup
 //#include <genfit/ConstField.h>
 //#include <genfit/FieldManager.h>
@@ -55,12 +56,15 @@ void RaveSetup::initialize(int verbosity, double magneticField)
 //  getRawInstance()->m_GFRaveVertexFactory = new GFRaveVertexFactory(verbosity, true);
 
 
-  getRawInstance()->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, magneticField), rave::VacuumPropagator(), "kalman", verbosity);
-  getRawInstance()->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, magneticField), rave::VacuumPropagator(), verbosity);
+  getRawInstance()->m_raveVertexFactory = new rave::VertexFactory(rave::ConstantMagneticField(0, 0, magneticField),
+      rave::VacuumPropagator(), "kalman", verbosity);
+  getRawInstance()->m_raveKinematicTreeFactory = new rave::KinematicTreeFactory(rave::ConstantMagneticField(0, 0, magneticField),
+      rave::VacuumPropagator(), verbosity);
   getRawInstance()->m_initialized = true;
 }
 
-RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL)*/, m_raveKinematicTreeFactory(NULL), m_initialized(false)
+RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(NULL)/*, m_GFRaveVertexFactory(NULL)*/,
+  m_raveKinematicTreeFactory(NULL), m_initialized(false)
 {
 }
 
@@ -72,8 +76,9 @@ RaveSetup::~RaveSetup()
 void RaveSetup::reset()
 {
   //delete everything that could have potentially created with new in this class
-  //delete m_raveVertexFactory; // workaround to avoid crashes with V0 finder
-  //m_raveVertexFactory = nullptr;
+
+  delete m_raveVertexFactory; // workaround to avoid crashes with V0 finder
+  m_raveVertexFactory = nullptr;
   delete m_raveKinematicTreeFactory;
   m_raveKinematicTreeFactory = nullptr;
   //    delete m_GFRaveVertexFactory;

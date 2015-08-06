@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014  Belle II Collaboration                              *
+ * Copyright(C) 2015  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -30,25 +30,6 @@ extern "C" {
     int bnphot;           /**< Number of photons. */
     int bnhad;            /**< Number of hadrons/muons. */
   } momset_;
-
-  //results for cross section and photon multiplicity
-//   extern struct {
-//     double rescross;
-//     double rescrosserr;
-//     double rescrossphot[3];
-//     double rescrossphoterr[3];
-//     double rescrossphotfrac[3];
-//   } bresults_;
-
-  //results and statistics for hit/miss
-//   extern struct {
-//     double hnmcross;
-//     double hnmcrosserr;
-//     double hnmcrossphot[3];
-//     double hnmcrossphoterr[3];
-//     double hnmcrossphotfrac[3];
-//     double hnmeff[3];
-//   } bhitnmiss_;
 
   /** Replace internal random generator with the framework random generator */
   double phokhara_rndm_(int*)
@@ -139,6 +120,7 @@ void Phokhara::setDefaultSettings()
 //   m_MaxInvMassHadrons = 0.5;
 //   m_MinEnergyGamma = 4.0;
 
+  m_cmsEnergy = 0.0;
   m_finalState = -1;
   m_nMaxTrials = -1;
   m_nSearchMax = -1;

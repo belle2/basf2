@@ -4,7 +4,6 @@
 <input>SVDValidationTTreeDigit.root</input>
 <input>SVDValidationTTreeSimhit.root</input>
 <input>SVDValidationTTreeEfficiency.root</input>
-<output>SVDValidationPlots.root</output>
 <description>
     This ROOT macro is used for the SVD validation. It creates several
     histograms, divided by variable,layer number, strip direction (U, V), 
@@ -12,10 +11,9 @@
     and saves them to a ROOT file.
 </description>
 <contact>G.Caria, gcaria@student.unimelb.edu.au</contact>
-
 </header>
 */
-
+#include <TStyle.h>
 #include "TMath.h"
 #include "TFile.h"
 #include "TTree.h"
@@ -24,6 +22,14 @@
 #include "TCanvas.h"
 #include "TLine.h"
 #include "TEfficiency.h"
+
+// Function that converts layer number into layer index used in for loops
+int layerToIndex(int layer){
+  int layermin = 3;
+  int layerIndex;
+  layerIndex = layer - layermin;	      
+  return layerIndex;
+}
 
 void SVDValidation()
 {
@@ -38,19 +44,24 @@ void SVDValidation()
   int layerMax = 6;
   int canvasWidth = 900;
   int canvasHeight = 700;
-  TObjString *Side[2] = {"U","V"}; 
-  TObjString *Type[2] = {"Slanted","Barrel"};
+
+  const char *Side[] = {"U","V"};
+  const char *Type[] = {"Slanted","Barrel"};
+  
   float minTheta = 10;
   float maxTheta = 160;
   float minPhi = -20;
   float maxPhi = 360;
+
+  // Function declaration
+  int layerToIndex(int layer);
 
 //-------------------------------------------------------------
   // open the files with simulated and reconstructed events data
   TFile* input = TFile::Open("../SVDValidationTTree.root");
   TFile* inputDigit = TFile::Open("../SVDValidationTTreeDigit.root");
   TFile* inputSimhit = TFile::Open("../SVDValidationTTreeSimhit.root");
-  //TFile* inputEff = TFile::Open("../SVDValidationTTreeEfficiency.root");
+  TFile* inputEff = TFile::Open("../SVDValidationTTreeEfficiency.root");
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("SVDValidationPlots.root", "recreate");
@@ -60,8 +71,8 @@ void SVDValidation()
   TTree* tree = (TTree*) input->Get("tree");
   TTree* treeDigit = (TTree*) inputDigit->Get("tree");
   TTree* treeSimhit = (TTree*) inputSimhit->Get("tree");
-  //TTree* treeUEff = (TTree*) inputEff->Get("treeU");
-  //TTree* treeVEff = (TTree*) inputEff->Get("treeV");
+  TTree* treeUEff = (TTree*) inputEff->Get("treeU");
+  TTree* treeVEff = (TTree*) inputEff->Get("treeV");
 
 //------------------------------------------------------------------  
   // Histograms declarations
@@ -72,18 +83,11 @@ void SVDValidation()
   TH1F *hValidSeedCharge[nLayers][nTypes][nSides];
   TH1F *hValidSimhitdEdX[nLayers][nTypes];
   TH2F *hValidTrueHitDepChargevsEnLost[nLayers][nTypes];
-  //TH2F *hValidEffTotal[nLayers][nTypes][nSides];
-  //TH2F *hValidEffPassed[nLayers][nTypes][nSides];
+  TH2F *hValidEffTotal[nLayers][nTypes][nSides];
+  TH2F *hValidEffPassed[nLayers][nTypes][nSides];
   TH1F *hValidDigitSignalToNoise[nLayers][nTypes][nSides];
 
 //----------------------------------------------------------------
-  // Function that converts layer number into layer index used in for loops
-  int layerToIndex(int layer){
-    int layermin = 3;
-    int layerIndex;
-    layerIndex = layer - layermin;	      
-    return layerIndex;
-  }
 
 //********************************PLOTS********************************
   
@@ -99,16 +103,17 @@ void SVDValidation()
       // build canvas name
       TString canvasName(Form("cValidEtaDistributionLayer%d", layer));
       TString canvasTitle(Form("Eta Distributions, Layer %d", layer));
-      mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-      mycanvas->Divide(2,2);
-      mycanvas->Draw();
+      TCanvas *cValidEtaDist;
+      cValidEtaDist = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+      cValidEtaDist->Divide(2,2);
+      cValidEtaDist->Draw();
       int k=0;	    
       for (int m=1; m>=0; m--) { // loop over types
           for (int i=0; i<=1; i++) { //loop over sides
               TString histoTitle(Form("Validation: Eta, layer %d, %s, %s side", layer,Type[m],Side[i]));
               TString histoName(Form("hValidEta%s_Layer%d_%s",Side[i], layer,Type[m]));
               k=k+1;
-              mycanvas->cd(k);
+              cValidEtaDist->cd(k);
               if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
               // build histogram
               hValidEta[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minEta,maxEta);
@@ -122,14 +127,13 @@ void SVDValidation()
       	      tree->Draw(expr,cond);
 
               hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
-                      TNamed("Description", "Validation: Eta = (cluster_pos %
-                  pitch / pitch) distributions"));
+                      TNamed("Description", "Validation: Eta = (cluster_pos %% pitch / pitch) distributions"));
               hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
-                      TNamed("Check", "Should show peak at 0.5"));
+                      TNamed("Check", "In ideal world should be a uniform distribution"));
               hValidEta[layerIndex][m][i]->Write(histoName);
           } // sides loop ends
       } // types loop ends
-         mycanvas->Write(canvasName);
+         cValidEtaDist->Write(canvasName);
   } // layers loop ends
 
 //---------------------------------------------------------------------
@@ -143,16 +147,17 @@ void SVDValidation()
       // build canvas name
       TString canvasName(Form("cValidPullDistributionLayer%d", layer));
       TString canvasTitle(Form("Pull Distributions, Layer %d", layer));
-      mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-      mycanvas->Divide(2,2);
-      mycanvas->Draw();
+      TCanvas *cValidPullDist;
+      cValidPullDist = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+      cValidPullDist->Divide(2,2);
+      cValidPullDist->Draw();
       int k=0;	    
       for (int m=1; m>=0; m--) { // loop over types
           for (int i=0; i<=1; i++) { //loop over sides
               TString histoTitle(Form("Validation: Pull, layer %d, %s, %s side", layer,Type[m],Side[i]));
               TString histoName(Form("hValidPull%s_Layer%d_%s",Side[i], layer,Type[m]));
               k=k+1;
-              mycanvas->cd(k);
+              cValidPullDist->cd(k);
               if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
               // build histogram
               hValidPull[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minPull,maxPull);
@@ -170,7 +175,7 @@ void SVDValidation()
               hValidPull[layerIndex][m][i]->Write(histoName);
           } // sides loop ends
       } // types loop ends
-         mycanvas->Write(canvasName);
+         cValidPullDist->Write(canvasName);
   } // layers loop ends
 
 //----------------------------------------------------------------------
@@ -184,16 +189,17 @@ void SVDValidation()
     // build canvas name 
     TString canvasName(Form("cValidSizeDistributionLayer%d", layer));
     TString canvasTitle(Form("Cluster Size Distributions, Layer %d", layer));
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,2);
-    mycanvas->Draw();
+    TCanvas *cValidSizeDist;
+    cValidSizeDist = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidSizeDist->Divide(2,2);
+    cValidSizeDist->Draw();
     int k=0;        
     for (int  m=1; m>=0; m--) { // loop over types
         for (int i=0; i<=1; i++) { // loop over sides
 	        TString histoTitle(Form("Validation: Cluster size, Layer %d, %s, %s side", layer,Type[m],Side[i]));
             TString histoName(Form("hValidClusterSize%s_Layer%d_%s",Side[i], layer,Type[m]));
             k=k+1;            
-            mycanvas->cd(k);
+            cValidSizeDist->cd(k);
             if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
             // build histogram
             hValidClusterSize[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minSize,maxSize);
@@ -210,7 +216,7 @@ void SVDValidation()
             hValidClusterSize[layerIndex][m][i]->Write(histoName);
         } // side loop ends
      } // type loop ends
-    mycanvas->Write(canvasName);
+    cValidSizeDist->Write(canvasName);
   } // layers loop ends
 
 //----------------------------------------------------------------------
@@ -225,17 +231,17 @@ void SVDValidation()
     TString canvasName(Form("cValidChargeDistribution%d", layer));
     TString canvasTitle(Form("Cluster Charge Distributions, Layer %d", layer));
     TString pdfFilename(Form("ClusterChargesvd%d.pdf", layer));
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,2);
-    mycanvas->Draw();
-    gStyle->SetOptStat(101010);
+    TCanvas *cValidClusterCharge;
+    cValidClusterCharge = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidClusterCharge->Divide(2,2);
+    cValidClusterCharge->Draw();
     int k=0;	    
     for (int  m=1; m>=0; m--) { // loop over types
         for (int i=0; i<=1; i++) { //loop over sydes
 	        TString histoTitle(Form("Validation: Cluster charge, layer %d, %s, %s side", layer,Type[m],Side[i]));
             TString histoName(Form("hValidCharge%s_Layer%d_%s",Side[i], layer,Type[m]));
 	        k=k+1;
-            mycanvas->cd(k);
+            cValidClusterCharge->cd(k);
             if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
 	        // build histogram
             hValidClusterCharge[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minCharge,maxCharge);
@@ -245,6 +251,7 @@ void SVDValidation()
             // draw histograms
             TString expr(Form("cluster_charge>>%s",histoName.Data()));
             TString cond(Form("layer==%d&&strip_dir==%d&&sensor_type==%d", layer, i, m)); 
+            gStyle->SetOptStat(101010);
             tree->Draw(expr,cond);
  
 	        hValidClusterCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Cluster charge distributions."));
@@ -252,15 +259,15 @@ void SVDValidation()
             hValidClusterCharge[layerIndex][m][i]->Write(histoName);
         } // types loop ends
     } // side loop ends
-            mycanvas->Write(canvasName);
-    //mycanvas->Print(pdfFilename);
+            cValidClusterCharge->Write(canvasName);
+    //cValidClusterCharge->Print(pdfFilename);
  } // layer loop ends
 	    
 //---------------------------------------------------------------------
 // Clusters: Seed charge plots     
 //
- int minCharge = 0;
- int maxCharge = 300;
+ int minSeedCharge = 0;
+ int maxSeedCharge = 300;
   
  for (int layer=layerMin; layer<=layerMax; layer++) { // loop on layers  
     int layerIndex = layerToIndex(layer);
@@ -268,20 +275,20 @@ void SVDValidation()
     TString canvasName(Form("cValidSeedDistribution%d", layer));
     TString canvasTitle(Form("Seed Charge Distributions, Layer %d", layer));
     TString pdfFilename(Form("SeedChargesvd%d.pdf", layer));
-
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,2);
-    mycanvas->Draw();
+    TCanvas *cValidSeedCharge;
+    cValidSeedCharge = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidSeedCharge->Divide(2,2);
+    cValidSeedCharge->Draw();
     int k=0;	    
     for (int  m=1; m>=0; m--) { // loop over types
         for (int i=0; i<=1; i++) { //loop over sydes
 	        TString histoTitle(Form("Validation: Seed charge, layer %d, %s, %s side", layer,Type[m],Side[i]));
             TString histoName(Form("hValidSeedCharge%s_Layer%d_%s",Side[i], layer,Type[m]));
 	        k=k+1;
-            mycanvas->cd(k);
+            cValidSeedCharge->cd(k);
             if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
 	        // build histogram
-            hValidSeedCharge[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minCharge,maxCharge);
+            hValidSeedCharge[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minSeedCharge,maxSeedCharge);
             // set axes labels
             hValidSeedCharge[layerIndex][m][i]->GetXaxis()->SetTitle("Seed charge (# of electrons)");
             hValidSeedCharge[layerIndex][m][i]->GetYaxis()->SetTitle("counts");
@@ -296,8 +303,8 @@ void SVDValidation()
             hValidSeedCharge[layerIndex][m][i]->Write(histoName);
         } // sides loop ends
     } // types loop ends
-    mycanvas->Write(canvasName);
-    // mycanvas->Print(pdfFilename);
+    cValidSeedCharge->Write(canvasName);
+    // cValidSeedCharge->Print(pdfFilename);
 } // layer loop ends
 
 //--------------------------------------------------------------------
@@ -311,15 +318,16 @@ void SVDValidation()
     // build canvas name 
     TString canvasName(Form("cValiddEdxDistribution%d", layer));
     TString canvasTitle(Form("SimHit dE/dx Distributions, Layer %d", layer));
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,1);
-    mycanvas->Draw();
+    TCanvas *cValidEnergyLoss;
+    cValidEnergyLoss = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidEnergyLoss->Divide(2,1);
+    cValidEnergyLoss->Draw();
     int k=0;	    
     for (int  m=1; m>=0; m--) { // loop over types
 	        TString histoTitle(Form("Validation: Simhit dE/dx, layer %d, %s", layer,Type[m]));
             TString histoName(Form("hValiddEdx_Layer%d_%s", layer,Type[m]));
             k=k+1;
- 	        mycanvas->cd(k);
+ 	        cValidEnergyLoss->cd(k);
             if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
             // build histogram
             hValidSimhitdEdX[layerIndex][m] = new TH1F(histoName, histoTitle, bins,mindEdx,maxdEdx);
@@ -336,7 +344,7 @@ void SVDValidation()
             hValidSimhitdEdX[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Check", "Should be landau distributed with MPV around 2.8"));
             hValidSimhitdEdX[layerIndex][m]->Write(histoName);
     } // types loop ends
-    mycanvas->Write(canvasName);
+    cValidEnergyLoss->Write(canvasName);
 } // layer loop ends
 
 //--------------------------------------------------------------------
@@ -352,16 +360,17 @@ void SVDValidation()
     // build canvas name 
     TString canvasName(Form("cValidTrueHitDepChargevsEnLost%d", layer));
     TString canvasTitle(Form("Truehits: energy lost vs energy deposition, Layer %d", layer));
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,1);
-    mycanvas->Draw();
+    TCanvas *cValidDepChargevsEnLost;
+    cValidDepChargevsEnLost = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidDepChargevsEnLost->Divide(2,1);
+    cValidDepChargevsEnLost->Draw();
     int k=0;
     for (int  m=1; m>=0; m--) { // loop over types
 
             TString histoTitle(Form("Validation: Truehits: energy lost vs energy deposition, layer %d, %s", layer,Type[m]));
             TString histoName(Form("hValidTrueHitDepChargevsEnLost_Layer%d_%s",layer,Type[m]));
             k=k+1;
-            mycanvas->cd(k);
+            cValidDepChargevsEnLost->cd(k);
             if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
             // build histogram
             hValidTrueHitDepChargevsEnLost[layerIndex][m] = new TH2F(histoName, histoTitle, bins,minEnLost,maxEnLost, bins, minEnLost, maxEnLost);
@@ -383,10 +392,10 @@ void SVDValidation()
             hValidTrueHitDepChargevsEnLost[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Check", "Should be below the red angle with slope = pi/4"));
             hValidTrueHitDepChargevsEnLost[layerIndex][m]->Write(histoName);
         } // side loop ends
-    mycanvas->Write(canvasName);
+    cValidDepChargevsEnLost->Write(canvasName);
 } // layer loop ends
 
-/*
+
 
 //-------------------------------------------------------------------
 // Truehits: Efficiency for finding clusters
@@ -399,15 +408,16 @@ void SVDValidation()
     TString canvasName(Form("cValidEfficiencyLayer%d", layer));
     TString canvasTitle(Form("EfficiencyClustersLayer %d", layer));
     TString pdfFilename(Form("SVDEfficiencyLayer%d.pdf", layer));
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,2);
-    mycanvas->Draw();
+    TCanvas *cValidEfficiency;
+    cValidEfficiency = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidEfficiency->Divide(2,2);
+    cValidEfficiency->Draw();
     int k = 0; // counter to change subdivisions of canvas
     for (int  m=1; m>=0; m--) { // loop over types
         for (int i=0; i<=1; i++) { // loop over sides
 
             k = k+1;
-            mycanvas->cd(k);
+            cValidEfficiency->cd(k);
             // build histograms
  	        if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
 
@@ -453,12 +463,12 @@ void SVDValidation()
             {
             pEff = new TEfficiency(*hValidEffPassed[layerIndex][m][i],*hValidEffTotal[layerIndex][m][i]);
             pEff->Draw("colz");
-            gStyle->SetOptStat(10);
 	        pEff->SetTitle(histoTitleEff);
             pEff->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Signal to noise ratio for the digits"));
             pEff->GetListOfFunctions()->Add(new TNamed("Check", "Should have peak around 20"));
             pEff->Write(histoNameEff);
                }
+            gStyle->SetOptStat(10);
             //gStyle->SetNumberContours(30);
             //gStyle->SetOptStat("e");
             //gStyle->SetStatY(0.95);
@@ -466,11 +476,11 @@ void SVDValidation()
 
         } //sides loop ends
     } //types loop ends   
-    mycanvas->Write(canvasName);
-    //mycanvas->Print(pdfFilename);
+    cValidEfficiency->Write(canvasName);
+    //cValidEfficiency->Print(pdfFilename);
  } //layers loop ends
 
-*/
+
 
 //-------------------------------------------------------------------
 // Digits: Signal to Noise plots 
@@ -484,17 +494,17 @@ void SVDValidation()
     TString canvasName(Form("cValidDigitSignalToNoiseLayer%d", layer));
     TString canvasTitle(Form("Digits: Signal to Noise Ratio, Layer %d", layer));
     TString pdfFilename(Form("SNsvd%d.pdf", layer));
-
-    mycanvas = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-    mycanvas->Divide(2,2);
-    mycanvas->Draw();
+    TCanvas *cValidSN;
+    cValidSN = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+    cValidSN->Divide(2,2);
+    cValidSN->Draw();
     int k=0;        
     for (int  m=1; m>=0; m--) { // loop over types
         for (int i=0; i<=1; i++) { // loop over sides
             TString histoTitle(Form("Validation: Digits: Signal to Noise Ratio, Layer %d, %s side", layer,Type[m],Side[i]));
             TString histoName(Form("hValidDigitSignalToNoise%s_Layer%d_%s",Side[i], layer,Type[m]));
             k=k+1;            
-            mycanvas->cd(k);
+            cValidSN->cd(k);
             if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
             // build histogram
             hValidDigitSignalToNoise[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minSNRatio,maxSNRatio);
@@ -512,8 +522,8 @@ void SVDValidation()
             hValidDigitSignalToNoise[layerIndex][m][i]->Write(histoName);
         } // side loop ends
      } // type loop ends
-    mycanvas->Write(canvasName);
-    // mycanvas->Print(pdfFilename);
+    cValidSN->Write(canvasName);
+    // cValidSN->Print(pdfFilename);
   } // layers loop ends
 
 

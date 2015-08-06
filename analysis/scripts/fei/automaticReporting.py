@@ -1023,8 +1023,8 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     user_signal = 0
     user_bckgrd = 0
     for channelName, df in preCutDf.iteritems():
-        recon_signal += df['WithoutCut'].array[1]
-        recon_bckgrd += df['WithoutCut'].array[0]
+        recon_signal += df['WithoutCut'].array[2]
+        recon_bckgrd += df['WithoutCut'].array[1]
         user_signal += df['Signal'].count()
         user_bckgrd += df['Background'].count()
 
@@ -1134,7 +1134,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
             o += b2latex.Graphics().add(signalPlot, 0.49).add(allPlot, 0.49).add(ratioPlot, 0.49).finish()
 
             if channelName in preCutCut:
-                o += b2latex.String(r"PreCut-String: \verb{" + preCutCut[channelName]['cutstring'] + r"}").finish()
+                o += b2latex.String(r"PreCut-String: \verb{" + preCutCut[channelName]['cutstring'] + r"}")  # no finish
             else:
                 o += b2latex.String(r"The channel was ignored. No PreCut is available, but the histograms are.").finish()
         else:

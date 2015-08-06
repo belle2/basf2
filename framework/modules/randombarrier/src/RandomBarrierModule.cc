@@ -26,6 +26,7 @@ REG_MODULE(RandomBarrier)
 RandomBarrierModule::RandomBarrierModule() : Module()
 {
   setDescription("Sets gRandom to an independent generator for the following modules.  E.g. a module chain of the sort [ParticleGun -> RandomBarrier -> FullSim] would use one RNG instance for the ParticleGun, and another for FullSim and all following modules. You may find this useful if you want to change the simulation, but don't want differences to affect the particle generation.  The output is equivalent to saving the output of ParticleGun in a file, and reading it again to do the simulation.  Correct separation is not provided for terminate(), don't use random numbers there.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 RandomBarrierModule::~RandomBarrierModule()

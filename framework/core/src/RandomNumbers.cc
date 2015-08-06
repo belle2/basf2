@@ -27,6 +27,8 @@ std::string RandomNumbers::s_initialSeed;
 RandomGenerator* RandomNumbers::s_evtRng{nullptr};
 /** event independent random generator to be used for begin/end run processing */
 RandomGenerator* RandomNumbers::s_runRng{nullptr};
+/** barrier index offset to be used in begin/endRun. Obtained from event dependent generator */
+int RandomNumbers::s_barrierOffset;
 
 void RandomNumbers::initialize()
 {
@@ -79,7 +81,12 @@ void RandomNumbers::initializeBeginRun()
 {
   gRandom = s_runRng;
   s_runRng->setMode(RandomGenerator::c_runDependent);
-  s_runRng->initialize();
+  //This might be called in in main or output process. In that case we don't
+  //know how many random barriers came before but we can look at the s_evtRng
+  //as this was passed from the previous process and contains the current
+  //barrier number in the event flow. We save it in intializeEvent so let's use
+  //it now.
+  s_runRng->setBarrier(s_barrierOffset);
 };
 
 void RandomNumbers::initializeEndRun()
@@ -90,12 +97,12 @@ void RandomNumbers::initializeEndRun()
   //index starts at 0 but for endRun we set it to a negative number large
   //enough that there is no realistic chance that beginRun had the same barrier
   //index.
-  s_runRng->setBarrier(INT_MIN);
+  s_runRng->setBarrier(INT_MIN + s_barrierOffset);
 }
 
 void RandomNumbers::initializeEvent()
 {
-  gRandom = s_evtRng;
+  useEventDependent();
   //we pass the random generator to other processes in multiprocessing so we only
   //want to initialize it in the input process (or if there is no multi processing)
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isInputProcess()) {
@@ -103,6 +110,16 @@ void RandomNumbers::initializeEvent()
     s_evtRng->setMode(RandomGenerator::c_eventDependent);
     s_evtRng->initialize();
   }
+  //Ok, now we either have reset the barrier to 0 if we are an input process or
+  //have decided to keep the state from the previous process. In any case, this
+  //is the start barrier we want to use for begin/end of run processing so we
+  //keep it.
+  s_barrierOffset = s_evtRng->getBarrier();
+}
+
+void RandomNumbers::useEventDependent()
+{
+  gRandom = s_evtRng;
 }
 
 //=====================================================================

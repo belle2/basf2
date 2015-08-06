@@ -248,6 +248,9 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
     //Handle EventMetaData changes by master module
     if (module == m_master) {
 
+      //initialize random number state for the event
+      RandomNumbers::initializeEvent();
+
       //Check for a change of the run
       if ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) ||
           (m_eventMetaDataPtr->getRun() != m_previousEventMetaData.getRun())) {
@@ -264,8 +267,9 @@ bool EventProcessor::processEvent(PathIterator moduleIter)
 
       m_previousEventMetaData = *m_eventMetaDataPtr;
 
-      //initialize random number state for the event
-      RandomNumbers::initializeEvent();
+      //make sure we use the event dependent generator again
+      RandomNumbers::useEventDependent();
+
       DBStore::Instance().updateEvent();
 
     } else {

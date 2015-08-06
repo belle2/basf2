@@ -52,6 +52,12 @@ namespace Belle2 {
      */
     static void initializeEvent();
 
+    /**
+     * Set Event dependent Random Generator as current one. Called by EventProcessor, should not be
+     * called by other users
+     */
+    static void useEventDependent();
+
     /** return reference to the event dependent random generator */
     static RandomGenerator& getEventRandomGenerator() { return *s_evtRng; }
 
@@ -92,6 +98,8 @@ namespace Belle2 {
     /** The random number generator seed set by the user. initialized to a
      * non-deterministic 64byte hex string if not set by user  */
     static std::string s_initialSeed;
+    /** barrier index offset to be used in begin/endRun. Obtained from event dependent generator */
+    static int s_barrierOffset;
   };
 
 } //end of namespace Belle2

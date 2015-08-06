@@ -80,6 +80,9 @@ namespace Belle2 {
     /** manually set the barrier index to a fixed value */
     void setBarrier(int barrierIndex) { setState(barrierIndex); }
 
+    /** obtain the currently active barrier id */
+    int getBarrier() const { return m_barrier; }
+
     /** Generate one 64bit unsigned integer between 0 and
      * UINT64_MAX (both inclusive).
      * @return random value in [0, UINT64_MAX]

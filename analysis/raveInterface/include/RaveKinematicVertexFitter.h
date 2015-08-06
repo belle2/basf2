@@ -96,6 +96,9 @@ namespace Belle2 {
       /** update the mother particle */
       void updateMother();
 
+      /** update the Daughters particles */
+      void updateDaughters();
+
       /** Delete all information of previously added tracks and fitted results*/
       void clearTracks()
       {

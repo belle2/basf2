@@ -63,6 +63,7 @@ namespace Belle2 {
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
     addParam("withConstraint", m_withConstraint, "additional constraint on vertex: ipprofile, iptube, iptubecut", string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
+    addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
   }
 
   void ParticleVertexFitterModule::initialize()
@@ -117,6 +118,8 @@ namespace Belle2 {
       return;
     }
 
+
+
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
@@ -124,6 +127,12 @@ namespace Belle2 {
     unsigned int n = plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
+
+      if (m_updateDaughters == true) {
+        if (m_decayString.empty())copyDaughters(particle);
+        else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
+      }
+
       bool ok = doVertexFit(particle);
       if (!ok) particle->setPValue(-1);
       if (particle->getPValue() < m_confidenceLevel)toRemove.push_back(particle->getArrayIndex());
@@ -134,6 +143,24 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::getInstance()->reset();
   }
+
+
+  void ParticleVertexFitterModule::copyDaughters(Particle* mother)
+  {
+    StoreArray<Particle> particles;
+
+    std::vector<Belle2::Particle*> oldDaughters = mother->getDaughters();
+    for (unsigned iOld = 0; iOld < oldDaughters.size(); iOld++) {
+
+      Particle* dauCopy = particles.appendNew(*oldDaughters[iOld]);
+      dauCopy->copyRelations(oldDaughters[iOld]);
+      mother->removeDaughter(oldDaughters[iOld]);
+      mother->appendDaughter(dauCopy);
+
+    }
+
+  }
+
 
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)
   {
@@ -769,6 +796,7 @@ namespace Belle2 {
       okFT = true;
       nVert = rf.fit();
       rf.updateMother();
+      if (m_decayString.empty() && m_updateDaughters == true) rf.updateDaughters();
       if (nVert != 1) return false;
     }
     if (m_fitType == "mass") {
@@ -785,6 +813,7 @@ namespace Belle2 {
       rf.setMassConstFit(true);
       nVert = rf.fit();
       rf.updateMother();
+      if (m_decayString.empty() && m_updateDaughters == true) rf.updateDaughters();
       if (nVert != 1) return false;
     };
     if (!okFT) {

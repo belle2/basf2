@@ -67,10 +67,17 @@ namespace Belle2 {
     std::string m_vertexFitter;   /**< Vertex Fitter name */
     std::string m_fitType;        /**< type of the kinematic fit */
     std::string m_withConstraint; /**< additional constraint on vertex */
-    std::string m_decayString   ; /**< daughter particles selection */
+    std::string m_decayString;    /**< daughter particles selection */
+    bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
+
+    /**
+     * copy of the daughters
+     * @param p pointer to particle
+     */
+    void copyDaughters(Particle* p);
 
     /**
      * Main steering routine

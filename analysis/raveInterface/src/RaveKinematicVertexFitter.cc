@@ -147,10 +147,10 @@ int RaveKinematicVertexFitter::fit()
         bsCovRave));
   }
 
-  if (m_vertFit && m_massConstFit && m_inputParticles.size() == 2) {
+  if (m_vertFit && m_massConstFit) {
 
-    rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createTwoTrackMassKinematicConstraint((
-                                      m_motherParticlePtr->getPDGMass()));
+    rave::KinematicConstraint cs2 = rave::KinematicConstraintBuilder().createMultiTrackMassKinematicConstraint(
+                                      m_motherParticlePtr->getPDGMass(), m_inputParticles.size());
     try {
       m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, cs2, "", m_useBeamSpot);
       m_fittedParticle = m_fittedResult.topParticle();
@@ -165,21 +165,6 @@ int RaveKinematicVertexFitter::fit()
           m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, "", m_useBeamSpot);
           m_fittedParticle = m_fittedResult.topParticle();
         } catch (...) {
-          nOfVertices = 0;
-        }
-      }
-
-      if (m_massConstFit) {
-        try {
-          rave::KinematicConstraint cs = rave::KinematicConstraintBuilder().createMassKinematicConstraint(m_motherParticlePtr->getPDGMass(),
-                                         0.);
-          m_fittedResult = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useVertexFitter(m_inputParticles, "", m_useBeamSpot);
-          std::vector< rave::KinematicParticle > parts; parts.push_back(m_fittedResult.topParticle());
-          std::vector< rave::KinematicParticle > m_fittedResult2 = RaveSetup::getRawInstance()->m_raveKinematicTreeFactory->useParticleFitter(
-                                                                     parts, cs, "ppf:lppf");
-          m_fittedParticle = m_fittedResult2[0];
-        } catch (...) {
-          B2ERROR("[RaveKinematicVertexFitter]: Mass fit error ");
           nOfVertices = 0;
         }
       }
@@ -346,6 +331,83 @@ void RaveKinematicVertexFitter::updateMother()
   m_motherParticlePtr->updateMomentum(m_fitted4Vector, m_fittedPos, m_fitted7Cov, m_fittedPValue);
 }
 
+void RaveKinematicVertexFitter::updateDaughters()
+{
+
+  m_fittedResult.topParticle();
+  std::vector< rave::KinematicParticle > rDau = m_fittedResult.daughterParticles();
+  std::vector<Belle2::Particle*> bDau = m_motherParticlePtr->getDaughters();
+  if (rDau.size() == bDau.size()) {
+    for (unsigned ii = 0; ii < bDau.size(); ii++) {
+      rave::Vector7D fittedState;
+      rave::Covariance7D fittedCov;
+      fittedState = rDau[ii].fullstate();
+      fittedCov = rDau[ii].fullerror();
+
+      TLorentzVector p4;
+      p4.SetXYZT(fittedState.p4().p3().x(), fittedState.p4().p3().y(), fittedState.p4().p3().z(), fittedState.p4().energy());
+
+      TVector3 x3(fittedState.x(), fittedState.y(), fittedState.z());
+
+
+      TMatrixDSym fitted7CovM(7);
+      fitted7CovM(3, 6) = fittedCov.dpxm();  fitted7CovM(6, 3) = fitted7CovM(3, 6);
+      fitted7CovM(4, 6) = fittedCov.dpym();  fitted7CovM(6, 4) = fitted7CovM(4, 6);
+      fitted7CovM(5, 6) = fittedCov.dpzm();  fitted7CovM(6, 5) = fitted7CovM(5, 6);
+      fitted7CovM(6, 6) = fittedCov.dmm();   fitted7CovM(6, 6) = fitted7CovM(6, 6);
+      fitted7CovM(0, 6) = fittedCov.dxm();   fitted7CovM(6, 0) = fitted7CovM(0, 6);
+      fitted7CovM(1, 6) = fittedCov.dym();   fitted7CovM(6, 1) = fitted7CovM(1, 6);
+      fitted7CovM(2, 6) = fittedCov.dzm();   fitted7CovM(6, 2) = fitted7CovM(2, 6);
+
+      fitted7CovM(3, 3) = fittedCov.dpxpx(); fitted7CovM(3, 3) = fitted7CovM(3, 3);
+      fitted7CovM(3, 4) = fittedCov.dpxpy(); fitted7CovM(4, 3) = fitted7CovM(3, 4);
+      fitted7CovM(3, 5) = fittedCov.dpxpz(); fitted7CovM(5, 3) = fitted7CovM(3, 5);
+      fitted7CovM(3, 0) = fittedCov.dxpx();  fitted7CovM(0, 3) = fitted7CovM(3, 0);
+      fitted7CovM(3, 1) = fittedCov.dypx();  fitted7CovM(1, 3) = fitted7CovM(3, 1);
+      fitted7CovM(3, 2) = fittedCov.dzpx();  fitted7CovM(2, 3) = fitted7CovM(3, 2);
+
+      fitted7CovM(4, 4) = fittedCov.dpypy(); fitted7CovM(4, 4) = fitted7CovM(4, 4);
+      fitted7CovM(4, 5) = fittedCov.dpypz(); fitted7CovM(5, 4) = fitted7CovM(4, 5);
+      fitted7CovM(4, 0) = fittedCov.dxpy();  fitted7CovM(0, 4) = fitted7CovM(4, 0);
+      fitted7CovM(4, 1) = fittedCov.dypy();  fitted7CovM(1, 4) = fitted7CovM(4, 1);
+      fitted7CovM(4, 2) = fittedCov.dzpy();  fitted7CovM(2, 4) = fitted7CovM(4, 2);
+
+      fitted7CovM(5, 5) = fittedCov.dpzpz(); fitted7CovM(5, 5) = fitted7CovM(5, 5);
+      fitted7CovM(5, 0) = fittedCov.dxpz();  fitted7CovM(0, 5) = fitted7CovM(5, 0);
+      fitted7CovM(5, 1) = fittedCov.dypz();  fitted7CovM(1, 5) = fitted7CovM(5, 1);
+      fitted7CovM(5, 2) = fittedCov.dzpz();  fitted7CovM(2, 5) = fitted7CovM(5, 2);
+
+      fitted7CovM(0, 0) = fittedCov.dxx();   fitted7CovM(0, 0) = fitted7CovM(0, 0);
+      fitted7CovM(0, 1) = fittedCov.dxy();   fitted7CovM(1, 0) = fitted7CovM(0, 1);
+      fitted7CovM(0, 2) = fittedCov.dxz();   fitted7CovM(2, 0) = fitted7CovM(0, 2);
+
+      fitted7CovM(1, 1) = fittedCov.dyy();   fitted7CovM(1, 1) = fitted7CovM(1, 1);
+      fitted7CovM(1, 2) = fittedCov.dyz();   fitted7CovM(2, 1) = fitted7CovM(1, 2);
+
+      fitted7CovM(2, 2) = fittedCov.dzz();   fitted7CovM(2, 2) = fitted7CovM(2, 2);
+
+      TMatrixDSym fitted7CovE = ErrorMatrixMassToEnergy(m_fitted4Vector, fitted7CovM);
+
+      TMatrixDSym fitted7CovDauM(7);
+      for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 7; j++) {
+          if (i < 4 && j < 4) fitted7CovDauM(i, j) = fitted7CovE(i + 3, j + 3);
+          if (i > 3 && j > 3) fitted7CovDauM(i, j) = fitted7CovE(i - 4, j - 4);
+          if (i < 4 && j > 3) fitted7CovDauM(i, j) = fitted7CovE(i + 3, j - 4);
+          if (i > 3 && j < 4) fitted7CovDauM(i, j) = fitted7CovE(i - 4, j + 3);
+        }
+      }
+
+      float pValDau = rDau[ii].chi2();
+
+      bDau[ii]->updateMomentum(p4, x3, fitted7CovDauM, pValDau);
+
+    }
+
+  } else B2ERROR("Error in Daughters update");
+
+}
+
 Particle* RaveKinematicVertexFitter::getMother()
 {
   return m_motherParticlePtr;
@@ -452,9 +514,3 @@ TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(TLorentzVector p4
   return MassErr;
 }
 
-
-// int RaveKinematicVertexFitter::updateDauthers()
-// {
-//   std::vector< rave::KinematicParticle > finalStateParticles();
-
-// }

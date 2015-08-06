@@ -1,4 +1,7 @@
 from root_numpy import root2array, list_trees, list_branches, list_structures
+import os
+import pandas as pd
+import numpy as np
 
 
 def _get_pandas_branches(filename, tree, branches):
@@ -17,7 +20,7 @@ def _get_pandas_branches(filename, tree, branches):
     TODO: Are there more possibilities for "wrong" branches?
     """
 
-    usable_column_types = [u"int", u"float", u"double"]
+    usable_column_types = [u"int", u"float", u"double", u"char"]
 
     structure = list_structures(filename, tree)
     if branches is None or len(branches) == 0:

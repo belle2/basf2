@@ -175,7 +175,7 @@ def loadMCCountsDataFrame(filename):
         @return pandas.DataFrame with MCCounts
     """
     from root_pandas import read_root
-    df = read_root(filename, 'mccounts', columns='*')
+    df = read_root(filename, tree_key='mccounts')
 
     def rename(name):
         old_name = Belle2.Variable.invertMakeROOTCompatible(name)
@@ -193,7 +193,7 @@ def loadListCountsDataFrame(filename):
         @return pandas.DataFrame with ListCounts
     """
     from root_pandas import read_root
-    df = read_root(filename, 'listcounts', columns='*')
+    df = read_root(filename, tree_key='listcounts')
 
     def rename(name):
         old_name = Belle2.Variable.invertMakeROOTCompatible(name)
@@ -256,7 +256,7 @@ def loadNTupleDataFrame(filename):
         @return pandas.DataFrame with NTuple data
     """
     from root_pandas import read_root
-    df = read_root(filename, 'variables', columns='*')
+    df = read_root(filename, tree_key='variables')
 
     def rename(name):
         return Belle2.Variable.invertMakeROOTCompatible(name)
@@ -273,8 +273,8 @@ def loadTMVADataFrame(filename):
         @return pandas.DataFrame with TMVA data
     """
     from root_pandas import read_root
-    train_df = read_root(filename, 'TrainTree', columns='*')
-    test_df = read_root(filename, 'TestTree', columns='*')
+    train_df = read_root(filename, tree_key='TrainTree')
+    test_df = read_root(filename, tree_key='TestTree')
 
     def rename(name):
         return Belle2.Variable.invertMakeROOTCompatible(name)

@@ -11,7 +11,6 @@
 #include <generators/modules/evtgeninput/EvtGenInputModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-// #include <generators/utilities/cm2LabBoost.h>
 #include <framework/core/Environment.h>
 
 #include <framework/datastore/DataStore.h>

@@ -12,7 +12,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <generators/lhe/LHEReader.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <string>
 #include <stdexcept>

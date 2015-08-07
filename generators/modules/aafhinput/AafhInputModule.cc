@@ -12,7 +12,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 using namespace Belle2;
 

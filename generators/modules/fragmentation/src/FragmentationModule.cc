@@ -23,7 +23,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <generators/utilities/cm2LabBoost.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <string>

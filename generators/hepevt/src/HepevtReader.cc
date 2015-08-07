@@ -12,7 +12,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <generators/hepevt/HepevtReader.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <string>
 #include <stdexcept>
@@ -36,7 +35,8 @@ void HepevtReader::open(const string& filename) throw(HepEvtCouldNotOpenFileErro
 }
 
 
-int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(HepEvtInvalidDaughterIndicesError, HepEvtEmptyEventError)
+int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(HepEvtInvalidDaughterIndicesError,
+    HepEvtEmptyEventError)
 {
   int eventID = -1;
   int nparticles = readEventHeader(eventID, eventWeight);
@@ -193,7 +193,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(
       particle.setMass(fields[4]);
       particle.setEnergy(fields[3]);
       break;
-      //modified Pit
+    //modified Pit
     case 9:
       particle.setStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[8]));
@@ -204,7 +204,7 @@ void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(
       particle.setMass(fields[6]);
       particle.setEnergy(fields[7]);
       break;
-      //end modified Pit
+    //end modified Pit
     case 15:
       particle.setStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[1]));

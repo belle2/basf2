@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <generators/modules/HepevtInputModule.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>

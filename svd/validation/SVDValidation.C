@@ -130,6 +130,8 @@ void SVDValidation()
                       TNamed("Description", "Validation: Eta = (cluster_pos %% pitch / pitch) distributions"));
               hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
                       TNamed("Check", "In ideal world should be a uniform distribution"));
+              hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
+                      TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
               hValidEta[layerIndex][m][i]->Write(histoName);
           } // sides loop ends
       } // types loop ends
@@ -172,6 +174,7 @@ void SVDValidation()
 
               hValidPull[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Pull (clusterPos - truehitPos/clusterPosSignma) distributions"));
               hValidPull[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Check", "Should be centered at 0 with RMS less than 2.0"));
+              hValidPull[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
               hValidPull[layerIndex][m][i]->Write(histoName);
           } // sides loop ends
       } // types loop ends
@@ -213,6 +216,7 @@ void SVDValidation()
   
             hValidClusterSize[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Cluster size distributions"));
             hValidClusterSize[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Check", "Should have peak in range 2-4"));
+            hValidClusterSize[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             hValidClusterSize[layerIndex][m][i]->Write(histoName);
         } // side loop ends
      } // type loop ends
@@ -256,6 +260,7 @@ void SVDValidation()
  
 	        hValidClusterCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Cluster charge distributions."));
             hValidClusterCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Check", "Should have peak at around 5000 electrons"));
+            hValidClusterCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             hValidClusterCharge[layerIndex][m][i]->Write(histoName);
         } // types loop ends
     } // side loop ends
@@ -300,6 +305,7 @@ void SVDValidation()
  
 	        hValidSeedCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Seed charge distributions"));
             hValidSeedCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Check", "Should have peak at around 6000 electrons"));
+            hValidSeedCharge[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             hValidSeedCharge[layerIndex][m][i]->Write(histoName);
         } // sides loop ends
     } // types loop ends
@@ -342,6 +348,7 @@ void SVDValidation()
             
 	        hValidSimhitdEdX[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: dE/dx distributions"));
             hValidSimhitdEdX[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Check", "Should be landau distributed with MPV around 2.8"));
+            hValidSimhitdEdX[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             hValidSimhitdEdX[layerIndex][m]->Write(histoName);
     } // types loop ends
     cValidEnergyLoss->Write(canvasName);
@@ -390,6 +397,7 @@ void SVDValidation()
 
             hValidTrueHitDepChargevsEnLost[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: For the truehits: simulated energy lost in the detector vs reconstructed energy deposition"));
             hValidTrueHitDepChargevsEnLost[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Check", "Should be below the red angle with slope = pi/4"));
+            hValidTrueHitDepChargevsEnLost[layerIndex][m]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             hValidTrueHitDepChargevsEnLost[layerIndex][m]->Write(histoName);
         } // side loop ends
     cValidDepChargevsEnLost->Write(canvasName);
@@ -464,8 +472,9 @@ void SVDValidation()
             pEff = new TEfficiency(*hValidEffPassed[layerIndex][m][i],*hValidEffTotal[layerIndex][m][i]);
             pEff->Draw("colz");
 	        pEff->SetTitle(histoTitleEff);
-            pEff->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Signal to noise ratio for the digits"));
-            pEff->GetListOfFunctions()->Add(new TNamed("Check", "Should have peak around 20"));
+            pEff->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Cluster efficiency for truehits"));
+            pEff->GetListOfFunctions()->Add(new TNamed("Check", "Should be approx 1 everywhere"));
+            pEff->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             pEff->Write(histoNameEff);
                }
             gStyle->SetOptStat(10);
@@ -519,6 +528,7 @@ void SVDValidation()
   
             hValidDigitSignalToNoise[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Signal to noise ratio for the digits"));
             hValidDigitSignalToNoise[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Check", "Should have peak around 20"));
+            hValidDigitSignalToNoise[layerIndex][m][i]->GetListOfFunctions()->Add(new TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
             hValidDigitSignalToNoise[layerIndex][m][i]->Write(histoName);
         } // side loop ends
      } // type loop ends

@@ -12,13 +12,16 @@
 """
 <header>
   <output>SVDValidationOutput.root</output>
+  <output>SVDValidationTTree.root</output>
+  <output>SVDValidationTTreeDigit.root</output>
+  <output>SVDValidationTTreeSimhit.root</output>
+  <output>SVDValidationTTreeEfficiency.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
 """
 
 from basf2 import *
-from beamparameters import add_beamparameters
 # Individual validation packages
 from SVDValidationTTree import *
 from SVDValidationTTreeDigit import *
@@ -47,68 +50,60 @@ main = create_path()
 #    'zVertexParams': [0.0, 0.02],
 #    'independentVertices': False,
 #    })
+# main.add_module(particlegun)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
 # Specify number of events to be generated
 eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
+main.add_module(eventinfosetter)
 
 # Show progress of processing
 progress = register_module('Progress')
+main.add_module(progress)
 
 # Load parameters
 gearbox = register_module('Gearbox')
+main.add_module(gearbox)
 
 # Create geometry
 geometry = register_module('Geometry')
 # Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
 # geometry.param("excludedComponents", "MagneticField")
+main.add_module(geometry)
 
 # beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
+from beamparameters import add_beamparameters
+add_beamparameters(main, "Y4S")
 # beamparameters.param("smearVertex", False)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
+main.add_module(evtgeninput)
 
 # Run simulation
 fullsim = register_module('FullSim')
+main.add_module(fullsim)
 
 # SVD modules
 svddigitizer = register_module('SVDDigitizer')
+main.add_module(svddigitizer)
 svdclusterizer = register_module('SVDClusterizer')
 # OldValues = { 'NoiseSN'  : 2.5,
 #             'SeedSN'   : 5.0,
 #             'ClusterSN': 8.0 }
 # svdclusterizer.param(OldValues)
-
-# Save output of simulation
-output = register_module('RootOutput')
-# Set output filename
-output.param('outputFileName', '../simulationOutput.root')
+main.add_module(svdclusterizer)
 
 # SVD validation modules
 svdvalidation = SVDValidationTTree()
-svdvalidationdigit = SVDValidationTTreeDigit()
-svdvalidationsimhit = SVDValidationTTreeSimhit()
-svdefficiency = SVDValidationTTreeEfficiency()
-
-# ============================================================================
-# create processing path
-main.add_module(eventinfosetter)
-main.add_module(progress)
-# main.add_module(particlegun)
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(evtgeninput)
-main.add_module(fullsim)
-main.add_module(svddigitizer)
-main.add_module(svdclusterizer)
-# main.add_module(output)
 main.add_module(svdvalidation)
+svdvalidationdigit = SVDValidationTTreeDigit()
 main.add_module(svdvalidationdigit)
+svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
+svdefficiency = SVDValidationTTreeEfficiency()
 main.add_module(svdefficiency)
 
 process(main)

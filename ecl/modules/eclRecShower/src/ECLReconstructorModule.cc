@@ -86,6 +86,43 @@ void ECLReconstructorModule::initialize()
   eclShowers.registerInDataStore();
   eclClusters.registerInDataStore();
   eclClusters.registerRelationTo(eclShowers);
+
+  ReadCorrection(); // read correction accounting shower leakage to get unbiased photon energy
+}
+
+void ECLReconstructorModule::ReadCorrection()
+{
+  /*Register the ECL.xml file, which further register the
+    ECL-FirstCorrection.xml file and use GearDir to access the elements*/
+  string path("Detector/DetectorComponent[@name=\"ECL\"]/Content/ECLFirstCorrection/ThetaBins/");
+  GearDir ThetaBins(path);
+
+  // The number of bins the detector is divided into
+  const int Nbins = ThetaBins.getNumberNodes("ThetaBins");
+  m_ecorr.resize(Nbins * 4); // 4 is a polynomial degree
+
+  vector<pair<double, double> > ranges;
+  ranges.reserve(Nbins);
+  string p("Polynomial");
+  for (int i = 0; i < Nbins; i++) { // We assumed here theta ranges is in ascending order
+    GearDir T(path + "/ThetaBins[" + to_string(i + 1) + "]");
+    ranges.push_back(pair<double, double>(T.getAngle("ThetaStart"), T.getAngle("ThetaEnd")));
+    for (int j = 0; j < 4; j++) {
+      m_ecorr[4 * i + j] = T.getDouble(p + to_string(j + 1));
+    }
+  }
+
+  m_ranges.resize(Nbins + 1);
+  m_ranges[0] = ranges[0].first; // to detect out of range case
+  for (int i = 0; i < Nbins - 1; i++) {
+    if (ranges[i].second != ranges[i + 1].first) // Sanity check
+      B2ERROR("Energy correction is not continuous in theta range! Bin = " << i << " " << ranges[i].second << " " << ranges[i + 1].first);
+    m_ranges[i + 1] = ranges[i].second;
+  }
+  m_ranges[Nbins] = ranges[Nbins - 1].second;
+
+  if (abs(m_ranges[0]) > 1e-7 || abs(m_ranges[Nbins] - M_PI) > 1e-7) // Sanity check
+    B2ERROR("Energy correction does not cover full theta range! Theta_min = " << m_ranges[0] << " Theta_max = " << m_ranges[Nbins]);
 }
 
 void ECLReconstructorModule::beginRun()
@@ -246,75 +283,17 @@ void ECLReconstructorModule::terminate()
   m_timeCPU = clock() * Unit::us - m_timeCPU;
 }
 
-
-
-//... Correction are now in ECL-FirstCorrection.xml
-//...  Read using GearDir : Vishal
-
 double ECLReconstructorModule::correctionFactor(double Energy, double Theta)
 {
-  //Used to break free of loop and also to check for any mistake in logic
-  int  eCorrId = -10;
-  //Corrections
-  double energyCorrectPolynomial[4] = {1.0, 0.0, 0.0, 0.0};
-  //... The above initialiation (1,0,0,0) will provide calibration factor of 1
-  //... i.e. is no correction : Vishal
-
-  /*Register the ECL.xml file, which further register the
-    ECL-FirstCorrection.xml file and use GearDir to access the elements*/
-  GearDir ThetaBins("Detector/DetectorComponent[@name=\"ECL\"]/Content/ECLFirstCorrection/ThetaBins/");
-  GearDir ThetaBinsContent(ThetaBins);
-
-  /* Below section help in reducing the looping time
-     checks which bin theta  should be, above or below
-     the middle of detector. This may help in speed up
-     of code. LoopStart is the first from where loop
-     will start and LoopStop is the last. */
-
-  // This is kept 1 as first entry is 1 in xml file
-  int LoopStart = 1;
-  // The number of bins the detector is divided into
-  int LoopStop  = ThetaBinsContent.getNumberNodes("ThetaBins");
-  int MiddleBin = int((LoopStop) / 2); // Take in between the bins
-
-  ThetaBinsContent.append((boost::format("ThetaBins[%1%]/") % (MiddleBin)).str());
-  if (Theta <  ThetaBinsContent.getAngle("ThetaEnd")) {
-    LoopStop = MiddleBin;
-  } else {
-    LoopStart = MiddleBin + 1;
-  }
-
-  for (int iThetaBins = LoopStart; iThetaBins <= LoopStop; ++iThetaBins) {
-    GearDir ThetaBinsContent(ThetaBins);
-
-    ThetaBinsContent.append((boost::format("ThetaBins[%1%]/") % (iThetaBins)).str());
-
-    if (Theta >= ThetaBinsContent.getAngle("ThetaStart")
-        && Theta < ThetaBinsContent.getAngle("ThetaEnd")) {
-      eCorrId = iThetaBins;
-      energyCorrectPolynomial[0] = ThetaBinsContent.getDouble("Polynomial1");
-      energyCorrectPolynomial[1] = ThetaBinsContent.getDouble("Polynomial2");
-      energyCorrectPolynomial[2] = ThetaBinsContent.getDouble("Polynomial3");
-      energyCorrectPolynomial[3] = ThetaBinsContent.getDouble("Polynomial4");
-    }
-
-    if (eCorrId > 0) break;
-    //break loop Here as now we have got correction,
-    //Save Time No need of looping more.
-  }
-
-
-  //Check, if there is some problem to get proper Theta !!!
-  if (eCorrId < 1 || eCorrId > 15) {
-    B2ERROR("ECLShower theta out of range " << (Theta / TMath::Pi() * 180))
-  }
-
-  double  preliminaryCalibration = energyCorrectPolynomial[0]
-                                   + energyCorrectPolynomial[1] * pow(log(Energy), 1)
-                                   + energyCorrectPolynomial[2] * pow(log(Energy), 2)
-                                   + energyCorrectPolynomial[3] * pow(log(Energy), 3);
-
-  return preliminaryCalibration;
+  vector<double>::const_iterator it = upper_bound(m_ranges.begin(), m_ranges.end(), Theta);
+  double x = log(Energy);
+  // not really necessary check
+  // if(it==m_ranges.begin()||it==m_ranges.end()){
+  //   B2ERROR("Theta is out of range! Theta = "<<Theta<<" Theta_min = "<<m_ranges.front()<<" Theta_max = "<<m_ranges.back());
+  //   return 1.0;
+  // }
+  double* c = &m_ecorr[0] + 4 * ((it - m_ranges.begin()) - 1);
+  return c[0] + x * (c[1] + x * (c[2] + x * (c[3])));
 }
 
 

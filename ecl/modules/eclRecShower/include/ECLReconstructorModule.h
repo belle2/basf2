@@ -94,6 +94,13 @@ namespace Belle2 {
 
       /** Calculate Pz using Energy, Theta  */
       double Pz(double energy, double theta);
+
+      // read correction accounting shower leakage to get unbiased photon energy
+      void ReadCorrection();
+
+      // m_ranges -- theta ranges for the correction
+      // m_ecorr  -- correction polynomial coefficients storage
+      std::vector<double> m_ranges, m_ecorr;
     };
   }//ECL
 }//Belle2

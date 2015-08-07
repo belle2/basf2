@@ -3,7 +3,6 @@
 
 """
 <header>
-  <output> SVDValidationTTreeEfficiency.root </output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>
     This module is used for the SVD validation. It creates efficiency

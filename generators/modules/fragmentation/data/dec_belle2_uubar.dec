@@ -34,16 +34,8 @@ PythiaBothParam StringZ:rFactC=1.0
 
 #control radiation
 yesPhotos
-PythiaBothParam ParticleDecays:FSRinDecays=off
 
 PythiaBothParam ParticleDecays:multIncrease=4.5
 PythiaBothParam ParticleDecays:multIncreaseWeak=2.0
-
-
-#Decay vpho
-# Pythia6 definition "32" for "vpho -> q qbar" should be used.
-#   (this is automatically converted to Pythia8 definition "91")
-#1.000 u anti-u PYTHIA 32;
-#Enddecay
 
 End

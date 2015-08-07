@@ -1075,7 +1075,7 @@ TRGCDCHoughFinder::doFinding2(std::vector<std::vector<unsigned>> peaks[],
     _plane[1]->merge();
 
 #ifdef TRGCDC_DISPLAY_HOUGH
-    string stg = "2D : Hough : Results of Peak Finding";
+    string stg = "2D : Hough";
     string inf = "   ";
     H0->stage(stg);
     H0->information(inf);

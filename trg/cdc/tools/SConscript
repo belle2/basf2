@@ -6,8 +6,11 @@ env['TOOLS_LIBS']['TRGCDCFrontEndImplementation'] = ['trg_cdc','trg_trg']
 env['TOOLS_LIBS']['TRGCDCTRGPackerTB'] = ['trg_cdc','trg_trg']
 env['TOOLS_LIBS']['TRGCDCTSStreamReader'] = ['Core', 'trg_cdc','trg_trg', 'framework']
 env['TOOLS_LIBS']['TRGCDCDisplay'] = ['trg_cdc','trg_trg', 'framework']
+env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'] = ['trg_cdc','trg_trg', 'framework']
+env['TOOLS_LIBS']['TRGCDCHoughMapConverter'] = ['trg_cdc','trg_trg', 'framework']
 
 env['TOOLS_LIBS']['TRGCDCTSStreamReader'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4', 'Core'])
 env['TOOLS_LIBS']['TRGCDCDisplay'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4', 'Core'])
+env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4', 'Core'])
 
 Return('env')

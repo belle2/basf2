@@ -177,6 +177,13 @@ TRGState::active(unsigned a) const {
 inline
 bool
 TRGState::operator[](unsigned a) const {
+#ifdef TRG_DEBUG
+    if (a >= _size)
+	std::cout << "TRGState::operator[] !!! bit size overflow"
+		  << ":bit size=" << _size << ",specified position=" << a
+                  << std::endl;
+#endif
+
     const unsigned wp = a / _bsu;
     const unsigned bp = a % _bsu;
     if (_state[wp] & (1 << bp))

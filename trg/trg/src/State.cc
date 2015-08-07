@@ -124,19 +124,45 @@ TRGState::TRGState(const char * inChar, unsigned inType)
       _state(0) {
 
   if(inType == 0) {
-    _size = strlen(inChar);
-    // Check if all values are binary
-    for(unsigned iBit=0; iBit<_size; iBit++){
-      if(!(inChar[iBit] == '0' || inChar[iBit] == '1')) return;
-    }
+      _size = strlen(inChar);
+      // Check if all values are binary
+      for(unsigned iBit=0; iBit<_size; iBit++){
+          if(!(inChar[iBit] == '0' || inChar[iBit] == '1')) {
+#ifdef TRG_DEBUG
+              cout << "TRGState::TRGState !!! invalid char found : aborted"
+                   << endl;
+              cout << "                       invalid char = [" << inChar[iBit]
+                   << "]" << endl;
+#endif
+              return;
+          }
+      }
   }
   else if (inType == 1) {
-    _size = strlen(inChar)*4;
-    // Check if all values are hex
-    for(unsigned iChar=0; iChar<_size/4; iChar++){
-      if(!isxdigit(inChar[iChar])) return;
-    }
-  } else return;
+      _size = strlen(inChar)*4;
+      // Check if all values are hex
+      for(unsigned iChar=0; iChar<_size/4; iChar++){
+          if(!isxdigit(inChar[iChar])) {
+#ifdef TRG_DEBUG
+              cout << "TRGState::TRGState !!! invalid char found : aborted"
+                   << endl;
+              cout << "                       invalid char = ["
+                   << inChar[iChar] << "]" << endl;
+#endif
+              return;
+          }
+      }
+  }
+  else {
+#ifdef TRG_DEBUG
+              cout << "TRGState::TRGState !!! invalid type : aborted"
+                   << endl;
+              cout << "                       invalid type = " << inType
+                   << endl;
+#endif
+      return;
+  }
+ 
   _n = _size / _bsu;
   if (_size % _bsu) ++_n;
   _state = (unsigned *) calloc(_n, _su);
@@ -159,7 +185,6 @@ TRGState::TRGState(const char * inChar, unsigned inType)
       _state[iChar/8] += t_int << ((iChar%8)*4);
     }
   }
-
 }
 
 TRGState::~TRGState() {

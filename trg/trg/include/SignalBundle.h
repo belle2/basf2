@@ -93,6 +93,9 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
     /// changes clock.
     const TRGClock & clock(const TRGClock &);
 
+    /// reads data from a file.
+    void readCOE(const std::string & fileName = "");
+
   private:
 
     /// Name

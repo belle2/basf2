@@ -51,6 +51,8 @@ class TRGChannel {
     void dump(const std::string & message = "",
               const std::string & pre = "") const;
 
+    const TRGBoard & sender(void) const;
+
   public:// Modifiers.
 
     /// sets input data.
@@ -91,6 +93,12 @@ inline
 TRGSignalBundle *
 TRGChannel::signal(void) const {
     return _data;
+}
+
+inline
+const TRGBoard &
+TRGChannel::sender(void) const {
+    return _sender;
 }
 
 } // namespace Belle2

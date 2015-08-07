@@ -403,7 +403,8 @@ class TRGCDC {
     const TRGCDCMerger * merger(unsigned id) const;
 
     /// returns a TSF board.
-    const TRGCDCTrackSegmentFinder * tsfboard(unsigned id) const;
+//  const TRGCDCTrackSegmentFinder * tsfboard(unsigned id) const;
+    TRGCDCTrackSegmentFinder * tsfboard(unsigned id) const;
 
     /// returns a 2D tracker board.
     const TRGCDCTracker2D * tracker2D(unsigned id) const;
@@ -896,7 +897,7 @@ TRGCDC::merger(unsigned a) const {
 }
 
 inline
-const TRGCDCTrackSegmentFinder *
+TRGCDCTrackSegmentFinder *
 TRGCDC::tsfboard(unsigned a)const{
 	return _tsfboards[a];
 }

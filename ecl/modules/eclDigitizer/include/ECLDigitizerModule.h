@@ -127,10 +127,6 @@ namespace Belle2 {
       //array for iteration ped. reconstr. (for fixed t)
       std::vector<int**> m_fg43; // int [24][16];
 
-      //input array to fit
-      int FitA[31];
-      /** array for calculation of random (electronics) noise for FitA[31]      */
-      float m_elecNoiseM[31][31];
       //** pow for int
       int myPow(int x, int y);
 

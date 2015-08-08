@@ -119,6 +119,8 @@ void ECLDigitizerModule::event()
   if (!eclHits) {
     B2DEBUG(100, "ECLHit in empty in event " << m_nEvent);
   }
+  StoreArray<ECLNoiseData> eclNoiseData("ECLNoiseData", DataStore::c_Persistent);
+  const ECLNoiseData* eclNoise = eclNoiseData[0];
 
   // Output Arrays
   StoreArray<ECLDigit> eclDigits;
@@ -132,8 +134,6 @@ void ECLDigitizerModule::event()
   std::fill(HitEnergy.origin(), HitEnergy.origin() + HitEnergy.size(), 0.0);
   vector<double> totalEnergyDeposit(8736, 0);
   double test_A[31] = {0};
-  float AdcNoise[31];
-  float genNoise[31];
 
   double dt = .02; //delta t for interpolation
   int n = 1250;//provide a shape array for interpolation
@@ -184,18 +184,15 @@ void ECLDigitizerModule::event()
 
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
     if (m_calibration || totalEnergyDeposit[iECLCell] > 0.0001) { // Bobrov removes this cut in calibration
+
       //Noise generation
-      for (int iCal = 0; iCal < 31; iCal++) {
-        genNoise[iCal] =  gRandom->Gaus(0, 1);
-      }
+      float z[31];
+      for (int i = 0; i < 31; i++) z[i] = gRandom->Gaus(0, 1);
 
-      for (int T_clock = 0; T_clock < 31; T_clock++) {
-        AdcNoise[T_clock] = 0;
-        for (int iCal = 0; iCal < T_clock; iCal++) {
-          AdcNoise[T_clock] = m_elecNoiseM[T_clock][iCal] * genNoise[iCal] + AdcNoise[T_clock];
-        }
-      }
+      float AdcNoise[31];
+      eclNoise->generateCorrelatedNoise(z, AdcNoise);
 
+      int FitA[31];
       for (int  T_clock = 0; T_clock < 31; T_clock++) {
         FitA[T_clock] = (int)(HitEnergy[iECLCell][T_clock] * 20000 + 3000 + AdcNoise[T_clock] * 20) ;
       }
@@ -746,8 +743,6 @@ void ECLDigitizerModule::readDSPDB()
 
   }
 
-  const ECLNoiseData* eclNoise = eclNoiseData[0];
-  eclNoise->getMatrix(m_elecNoiseM);
 
   TTree* tree4 = (TTree*) rootfile.Get("EclSampledSignalWF");
   if (tree4 != 0) {

@@ -11,6 +11,7 @@
 
 """
 <header>
+  <input>EvtGenSimRec.root</input>
   <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
   <output>SVDValidationTTreeDigit.root</output>
@@ -28,7 +29,7 @@ from SVDValidationTTreeDigit import *
 from SVDValidationTTreeSimhit import *
 from SVDValidationTTreeEfficiency import *
 
-set_random_seed(12345)
+# set_random_seed(12345)
 
 main = create_path()
 
@@ -53,48 +54,53 @@ main = create_path()
 # main.add_module(particlegun)
 
 # Create Event information
-eventinfosetter = register_module('EventInfoSetter')
+# eventinfosetter = register_module('EventInfoSetter')
 # Specify number of events to be generated
-eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
-main.add_module(eventinfosetter)
+# eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
+# main.add_module(eventinfosetter)
 
+# main.add_module('EventInfoPrinter')
 # Show progress of processing
-progress = register_module('Progress')
-main.add_module(progress)
+# progress = register_module('Progress')
+# main.add_module(progress)
 
 # Load parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+# gearbox = register_module('Gearbox')
+# main.add_module(gearbox)
 
 # Create geometry
-geometry = register_module('Geometry')
+# geometry = register_module('Geometry')
 # Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
+# geometry.param('components', ['MagneticField', 'BeamPipe', 'PXD', 'SVD'])
 # geometry.param("excludedComponents", "MagneticField")
-main.add_module(geometry)
+# main.add_module(geometry)
 
 # beam parameters
-from beamparameters import add_beamparameters
-add_beamparameters(main, "Y4S")
+# from beamparameters import add_beamparameters
+# add_beamparameters(main, "Y4S")
 # beamparameters.param("smearVertex", False)
 
 # generate BBbar events
-evtgeninput = register_module('EvtGenInput')
-main.add_module(evtgeninput)
+# evtgeninput = register_module('EvtGenInput')
+# main.add_module(evtgeninput)
 
 # Run simulation
-fullsim = register_module('FullSim')
-main.add_module(fullsim)
+# fullsim = register_module('FullSim')
+# main.add_module(fullsim)
 
 # SVD modules
-svddigitizer = register_module('SVDDigitizer')
-main.add_module(svddigitizer)
-svdclusterizer = register_module('SVDClusterizer')
+# svddigitizer = register_module('SVDDigitizer')
+# main.add_module(svddigitizer)
+# svdclusterizer = register_module('SVDClusterizer')
 # OldValues = { 'NoiseSN'  : 2.5,
 #             'SeedSN'   : 5.0,
 #             'ClusterSN': 8.0 }
 # svdclusterizer.param(OldValues)
-main.add_module(svdclusterizer)
+# main.add_module(svdclusterizer)
+
+input = register_module('RootInput')
+input.param('inputFileName', '../EvtGenSimRec.root')
+main.add_module(input)
 
 # SVD validation modules
 svdvalidation = SVDValidationTTree()

@@ -86,6 +86,37 @@ class BinnedData(object):
         return numpy.sum(self.array*(self.patch-mean)**2) / (self.count() - 1.0)
 
 
+def read_root_scaled(filename, tree_key, limit_average):
+    """
+    Read root-file into pandas.DataFrame, if file contains more entries than the given limit
+    the file is randomly sampled, so that in total the limit is met on average,
+    so the returned pandas.DataFrame will have more or less events than this limit (but not much...)!
+    @param filename of the ROOT file
+    @param tree_key name of the TTree in the ROOT file
+    @param limit_average the limit which should hold on average
+    """
+    import ROOT
+    from root_pandas import read_root
+    import pandas
+
+    if not os.path.exists(filename):
+        raise IOError("File %s does not exists." % filename)
+
+    tfile = ROOT.TFile(filename)
+    tree = tfile.Get(tree_key)
+    nEntries = tree.GetEntries()
+
+    percentage = limit_average / float(nEntries)
+    if percentage > 1.0:
+        return read_root(filename, tree_key=tree_key), 1.0
+
+    dataframe = pandas.DataFrame()
+    for df in read_root(filename, tree_key=tree_key, chunksize=limit_average):
+        dataframe = dataframe.append(df.sample(frac=percentage))
+
+    return dataframe, float(nEntries) / len(dataframe)
+
+
 def loadHistsFromRootFile(filename):
     """
     Load all TH1F out of a root file
@@ -264,14 +295,13 @@ def loadNTupleDataFrame(filename):
         @param filename name of the ROOT file containing the NTuple
         @return pandas.DataFrame with NTuple data
     """
-    from root_pandas import read_root
-    df = read_root(filename, tree_key='variables')
+    df, scale = read_root_scaled(filename, tree_key='variables', limit_average=1000000)
 
     def rename(name):
         return Belle2.Variable.invertMakeROOTCompatible(name)
 
     df.columns = map(rename, df.columns)
-    return df
+    return df, scale
 
 
 def loadTMVADataFrame(filename):
@@ -281,9 +311,8 @@ def loadTMVADataFrame(filename):
         @param filename name of the ROOT file containing the TMVA data
         @return pandas.DataFrame with TMVA data
     """
-    from root_pandas import read_root
-    train_df = read_root(filename, tree_key='TrainTree')
-    test_df = read_root(filename, tree_key='TestTree')
+    train_df, train_scale = read_root_scaled(filename, tree_key='TrainTree', limit_average=1000000)
+    test_df, test_scale = read_root_scaled(filename, tree_key='TestTree', limit_average=1000000)
 
     def rename(name):
         return Belle2.Variable.invertMakeROOTCompatible(name)
@@ -294,7 +323,7 @@ def loadTMVADataFrame(filename):
     test_df['__isTrain__'] = False
     df = train_df.append(test_df, ignore_index=True)
     df['__isSignal__'] = df['className'] == "Signal"
-    return df
+    return df, train_scale, test_scale
 
 
 def loadMVARankingDataFrame(logfile):
@@ -624,7 +653,7 @@ def createTMVASection(filename, tmvaTraining, mvaConfig, plotConfig):
                 """)
     else:
         TMVAFilename = tmvaTraining[:-7] + '.root'  # Strip .config of filename
-        tmvaData = loadTMVADataFrame(TMVAFilename)
+        tmvaData, train_scale, test_scale = loadTMVADataFrame(TMVAFilename)
         tmvaTrainingData = tmvaData[tmvaData['__isTrain__']]
         tmvaTestData = tmvaData[~tmvaData['__isTrain__']]
 
@@ -680,11 +709,11 @@ def createTMVASection(filename, tmvaTraining, mvaConfig, plotConfig):
                                   head=r'Name & Signal & Background',
                                   format_string=r'{name} & {signal} & {background}')
         table.add(name='Training',
-                  signal=numpy.sum(tmvaTrainingData['__isSignal__']),
-                  background=numpy.sum(~tmvaTestData['__isSignal__']))
+                  signal=numpy.sum(tmvaTrainingData['__isSignal__']) * train_scale,
+                  background=numpy.sum(~tmvaTestData['__isSignal__']) * test_scale)
         table.add(name='Test',
-                  signal=numpy.sum(tmvaTestData['__isSignal__']),
-                  background=numpy.sum(~tmvaTestData['__isSignal__']))
+                  signal=numpy.sum(tmvaTestData['__isSignal__']) * train_scale,
+                  background=numpy.sum(~tmvaTestData['__isSignal__']) * test_scale)
         o += table.finish()
 
         mvaROCPlot = 'mva_roc_' + filename
@@ -777,7 +806,7 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
         return {'name': name, 'list': matchedList, 'page': '', 'user_efficiency': 0.0, 'user_purity': 0.0,
                 'post_efficiency': 0.0, 'post_purity': 0.0, 'covered': 0.0}
 
-    nTupleData = loadNTupleDataFrame(nTuple)
+    nTupleData, scale = loadNTupleDataFrame(nTuple)
 
     pdgcode = str(abs(pdg.from_name(particleName)))
     mcCountsData = loadMCCountsDictionary(mcCounts)
@@ -789,9 +818,9 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
                       "All": listCountsData[matchedList + '_All']}
 
     nEvents = mcCountsData.count()
-    nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count())
-    nSignalAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] > 0))
-    nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0))
+    nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count() * scale)
+    nSignalAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] > 0) * scale)
+    nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0) * scale)
 
     if(nEvents != listCountsData['All'].count()):
         B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong.")
@@ -913,7 +942,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
                 'post_efficiency': 0.0, 'post_purity': 0.0,
                 'detector_efficiency': 0, 'detector_purity': 0, 'channels': []}
 
-    nTupleData = loadNTupleDataFrame(nTuple)
+    nTupleData, scale = loadNTupleDataFrame(nTuple)
 
     pdgcode = str(abs(pdg.from_name(particleName)))
     mcCountsData = loadMCCountsDictionary(mcCounts)
@@ -934,9 +963,9 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     listCountsData['All'] = all_hist
 
     nEvents = mcCountsData.count()
-    nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count())
-    nSignalAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] > 0))
-    nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0))
+    nCandidatesAfterPostCut = float(nTupleData[mvaConfig.target].count() * scale)
+    nSignalAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] > 0) * scale)
+    nBackgroundAfterPostCut = float(numpy.sum(nTupleData[mvaConfig.target] == 0) * scale)
 
     if(nEvents != listCountsData['All'].count()):
         B2WARNING("Number of Events is different in created ntuples, statistical quantities which are calculated may be wrong."

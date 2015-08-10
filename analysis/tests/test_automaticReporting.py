@@ -260,6 +260,25 @@ class TestLoadModuleStatisticsDataFrame(unittest.TestCase):
         self.assertAlmostEqual(sdf['D*+:b30dfc431cd31b7ffed733dceb0f7f0cb5642d35'], 80.580009, delta=0.001)
 
 
+class TestReadRootScaled(unittest.TestCase):
+
+    def setUp(self):
+        self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/'
+                                                   'var_K+:2ec3c4d182fc3c427642f9fc648355f410dd141d_'
+                                                   'afacdbbcf37285eb16b17d43afb91f2d536ecfef.root')
+
+    def test_read_root_scaled(self):
+        df, scale = automaticReporting.read_root_scaled(self.filename, 'variables', limit_average=25)
+        self.assertTrue(20.0 < len(df) < 30.0)
+        self.assertTrue(3.8 < scale < 4.2)
+
+        self.assertListEqual(sorted(df.columns), sorted(['isSignal', 'mcErrors', 'extraInfo__boSignalProbability__bc',
+                                                         'Mbc', 'cosThetaBetweenParticleAndTrueB']))
+        sdf = df.sum()
+        self.assertTrue(50 < sdf['isSignal'] * scale < 100)
+        self.assertTrue(sdf['cosThetaBetweenParticleAndTrueB'] * scale < -6000)
+
+
 class TestLoadNTupleDataFrame(unittest.TestCase):
 
     def setUp(self):
@@ -268,8 +287,9 @@ class TestLoadNTupleDataFrame(unittest.TestCase):
                                                    'afacdbbcf37285eb16b17d43afb91f2d536ecfef.root')
 
     def test_loadNTupleDataFrame(self):
-        df = automaticReporting.loadNTupleDataFrame(self.filename)
+        df, scale = automaticReporting.loadNTupleDataFrame(self.filename)
 
+        self.assertEqual(scale, 1.0)
         self.assertEqual(len(df), 100)
         self.assertListEqual(sorted(df.columns), sorted(['isSignal', 'mcErrors', 'extraInfo(SignalProbability)',
                                                          'Mbc', 'cosThetaBetweenParticleAndTrueB']))
@@ -285,10 +305,10 @@ class TestLoadNTupleDataFrame(unittest.TestCase):
         # }
         # And afterwards added some more digits given by pandas
         self.assertEqual(sdf['isSignal'], 76.0)
-        self.assertEqual(sdf['extraInfo(SignalProbability)'], 75.246215395629406)
-        self.assertEqual(sdf['Mbc'], 521.66232776641846)
+        self.assertAlmostEqual(sdf['extraInfo(SignalProbability)'], 75.2462, delta=0.001)
+        self.assertAlmostEqual(sdf['Mbc'], 521.6623, delta=0.001)
         self.assertEqual(sdf['mcErrors'], 2952)
-        self.assertEqual(sdf['cosThetaBetweenParticleAndTrueB'], -6846.8998398780823)
+        self.assertAlmostEqual(sdf['cosThetaBetweenParticleAndTrueB'], -6846.8998, delta=0.001)
 
 
 class TestLoadTMVADataFrame(unittest.TestCase):
@@ -297,8 +317,10 @@ class TestLoadTMVADataFrame(unittest.TestCase):
         self.filename = Belle2.FileSystem.findFile('analysis/tests/testfiles_automaticReporting/TMVATraining_1.root')
 
     def test_loadTMVADataFrame(self):
-        df = automaticReporting.loadTMVADataFrame(self.filename)
+        df, train_scale, test_scale = automaticReporting.loadTMVADataFrame(self.filename)
 
+        self.assertEqual(train_scale, 1.0)
+        self.assertEqual(test_scale, 1.0)
         self.assertEqual(len(df), 200)
         self.assertTrue(numpy.all(df.iloc[:100]['__isTrain__']))
         self.assertFalse(numpy.any(df.iloc[100:]['__isTrain__']))

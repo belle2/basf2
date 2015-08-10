@@ -17,6 +17,10 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/logging/Logger.h>
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 using namespace calibration;
@@ -62,36 +66,95 @@ void CalibrationManager::setNumberOfIterations(int numberOfIterations)
 
 void CalibrationManager::register_module(CalibrationModule* module)
 {
-  // Correct order of registration is checked here
-  if (!checkDependencies(module, true)) {
-    B2FATAL("Dependencies not fullfiled.");
-  }
-
   m_calibrationModules.push_back(module);
 
-  // Refresh states of all registered modules
-  for (CalibrationModule* mod : m_calibrationModules) {
-    // Only if the module is in waiting state (default), set it
-    // to running state (if done/failed/monitoring - do not change the state)
-    if (checkDependencies(mod, false) && mod->getState() == CalibrationModule::c_Waiting)
-      mod->setState(CalibrationModule::c_Running);
+  int iter = 0;
+  bool someStateChanged = true;
+  while (someStateChanged) {
+    someStateChanged = false;
+    if (iter++ > 10000)
+      B2FATAL("Over 10000 iterations performed in resolving module dependencies. Some fancy circular dependency turning modules on/off continously?");
+    // Refresh states of all registered modules
+    for (CalibrationModule* mod : m_calibrationModules) {
+      // Only if the module is in waiting state (default), set it
+      // to running state (if done/failed/monitoring - do not change the state)
+
+      for (ExpRunRange& iov : mod->getCalibrationIOVs()) {
+        if (checkDependencies(mod, iov)) {
+          if (mod->getState(iov) == CalibrationModule::c_Waiting) {
+            mod->setState(iov, CalibrationModule::c_Running, mod->getNumberOfIterations(iov));
+            someStateChanged = true;
+          }
+        } else if (mod->getState(iov) == CalibrationModule::c_Running) {
+          mod->setState(iov, CalibrationModule::c_Waiting, mod->getNumberOfIterations(iov));
+          someStateChanged = true;
+        }
+      }
+    }
   }
 }
 
-bool CalibrationManager::checkDependencies(CalibrationModule* module, bool ignoreState)
+bool CalibrationManager::checkDependencies(CalibrationModule* module, const ExpRunRange& iov)
 {
-  for (auto& dep : module->getDependencies()) {
-    bool depOK = false;
-    for (CalibrationModule* mod : m_calibrationModules) {
-      if ((mod->getName() == dep.first)) {
-        if (ignoreState)
-          depOK = true;
-        else if (mod->getState() == dep.second)
-          depOK = true;
-      }
+  for (auto& dep : module->getDependencies())
+    for (CalibrationModule* mod : m_calibrationModules)
+      if ((mod->getName() == dep.first))
+        for (ExpRunRange& modiov : mod->getCalibrationIOVs())
+          if (iov.overlaps(modiov))
+            if (mod->getState(modiov) != dep.second)
+              return false;
+
+  return true;
+}
+
+void CalibrationManager::loadCachedState(std::string module_to_find, ExpRunRange iov_to_find,
+                                         CalibrationModule::ECalibrationModuleState& state_to_load, int& iteration_to_load)
+{
+  ifstream cache(m_stateFileName);
+  if (!cache.is_open())
+    return;
+
+  string line;
+
+  while (getline(cache, line)) {
+    string module = "";
+    ExpRunRange iov;
+    string state = "blocked";
+    int iteration = 0;
+
+    stringstream stream;
+    stream << line;
+    stream >> module >> iov >> state >> iteration;
+
+    if (module == module_to_find && iov == iov_to_find) {
+      state_to_load = CalibrationModule::stringToState(state);
+      iteration_to_load = iteration;
+      return;
     }
-    if (!depOK)
-      return false;
+  }
+}
+
+void CalibrationManager::saveCachedStates()
+{
+  ofstream cache(m_stateFileName);
+  for (CalibrationModule* module : m_calibrationModules) {
+    if (!module->isCalibrator())
+      continue;
+    for (ExpRunRange& iov : module->getCalibrationIOVs()) {
+      cache << module->getName() << " " << iov << " " << CalibrationModule::stateToString(module->getState(
+              iov)) << " " << module->getNumberOfIterations(iov) << endl;
+    }
+  }
+}
+
+bool CalibrationManager::done()
+{
+  for (CalibrationModule* module : m_calibrationModules) {
+    for (ExpRunRange& iov : module->getCalibrationIOVs()) {
+      if (module->isCalibrator() && (module->getState(iov) != CalibrationModule::c_Done
+                                     && module->getState(iov) != CalibrationModule::c_Failed))
+        return false;
+    }
   }
   return true;
 }

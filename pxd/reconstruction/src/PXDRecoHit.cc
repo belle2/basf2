@@ -116,74 +116,24 @@ void PXDRecoHit::setDetectorPlane()
   const PXD::SensorInfo& geometry = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
+  TVector3 uLocal(1, 0, 0);
+  TVector3 vLocal(0, 1, 0);
   TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0));
-  TVector3 uGlobal = geometry.vectorToGlobal(TVector3(1, 0, 0));
-  TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
+  TVector3 uGlobal = geometry.vectorToGlobal(uLocal);
+  TVector3 vGlobal = geometry.vectorToGlobal(vLocal);
 
   //Construct the detector plane
-  genfit::DetPlane* p = new genfit::DetPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20));
-  genfit::SharedPlanePtr detPlane(p);
+  VXD::SensorPlane* finitePlane = new VXD::SensorPlane(m_sensorID, 20.0, 20.0);
+  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin, uGlobal, vGlobal, finitePlane));
   setPlane(detPlane, m_sensorID);
 }
 
 
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())));
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+                                                  state.getRep(), this->constructHMatrix(state.getRep())));
 }
 
-TMatrixD PXDRecoHit::derivatives(const genfit::StateOnPlane* sop)
-{
 
-  // values for global derivatives
-  //TMatrixD derGlobal(2, 6);
-  TMatrixD derGlobal(2, 6);
-  derGlobal.Zero();
-
-  // track u-slope in local sensor system
-  double uSlope = sop->getState()[1];
-  // track v-slope in local sensor system
-  double vSlope = sop->getState()[2];
-  // Predicted track u-position in local sensor system
-  double uPos = sop->getState()[3];
-  // Predicted track v-position in local sensor system
-  double vPos = sop->getState()[4];
-
-  //Global derivatives for alignment in sensor local coordinates
-
-  derGlobal(0, 0) = 1.0;
-  derGlobal(0, 1) = 0.0;
-  derGlobal(0, 2) = - uSlope;
-  derGlobal(0, 3) = vPos * uSlope;
-  derGlobal(0, 4) = -uPos * uSlope;
-  derGlobal(0, 5) = vPos;
-
-  derGlobal(1, 0) = 0.0;
-  derGlobal(1, 1) = 1.0;
-  derGlobal(1, 2) = - vSlope;
-  derGlobal(1, 3) = vPos * vSlope;
-  derGlobal(1, 4) = -uPos * vSlope;
-  derGlobal(1, 5) = -uPos;
-
-  return derGlobal;
-
-}
-
-vector< int > PXDRecoHit::labels()
-{
-  VxdID vxdid(getPlaneId());
-  int sensorId = (int) vxdid;
-  std::vector<int> labGlobal;
-  // sensor label = sensorID * 10, then last digit is label for global derivative for the sensor
-  int label = sensorId * 10;
-
-  labGlobal.push_back(label + 1); // du
-  labGlobal.push_back(label + 2); // dv
-  labGlobal.push_back(label + 3); // dw
-  labGlobal.push_back(label + 4); // dalpha
-  labGlobal.push_back(label + 5); // dbeta
-  labGlobal.push_back(label + 6); // dgamma
-
-  return labGlobal;
-}
 

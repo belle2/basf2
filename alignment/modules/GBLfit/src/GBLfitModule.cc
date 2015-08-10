@@ -31,9 +31,9 @@
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
+#include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
+#include <alignment/reconstruction/AlignablePXDRecoHit.h>
+#include <alignment/reconstruction/AlignableSVDRecoHit.h>
 
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
 #include <testbeam/vxd/dataobjects/TelCluster.h>
@@ -61,7 +61,9 @@
 #include <genfit/Exception.h>
 #include <genfit/MeasurementFactory.h>
 
-#include <tracking/gfbfield/GFGeant4Field.h>
+//#include <tracking/gfbfield/GFGeant4Field.h>
+#include <alignment/gfbfield/GFGeant4RecoField.h>
+
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
@@ -87,9 +89,6 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>
 
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <framework/dataobjects/Helix.h>
@@ -106,7 +105,7 @@ TH1F *chi2ondf;
 REG_MODULE(GBLfit)
 
 GBLfitModule::GBLfitModule() :
-  Module(), m_usePdgCodeFromTrackCand(true), m_milleFile(0)
+  Module(), m_usePdgCodeFromTrackCand(true)
 {
 
   setDescription(
@@ -180,6 +179,8 @@ GBLfitModule::GBLfitModule() :
            "If set, time for the seed will be recalculated based on a helix approximation.  Only makes a difference if UseTrackTime is set.",
            true);
 
+  addParam("misalignment", m_misalignment, "Name of misalignment object in DB to be used by recohits (temporary simplified solution)",
+           std::string(""));
 
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
@@ -242,7 +243,7 @@ void GBLfitModule::initialize()
       geoManager.createTGeoRepresentation();
     }
     //pass the magnetic field to genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    genfit::FieldManager::getInstance()->init(new GFGeant4RecoField());
     genfit::FieldManager::getInstance()->useCache();
 
     genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
@@ -288,17 +289,15 @@ void GBLfitModule::initialize()
   // Set GBL parameters
   m_gbl.setOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer, m_gblExternalIterations,
                    m_recalcJacobians);
-  m_oldGbl.setGBLOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer);
-  m_oldGbl.setMP2Options(m_gblPvalueCut, m_gblMinNdf, m_gblMilleFileName, m_chi2Cut);
 
-  if (!m_useOldGbl)
-    m_milleFile = new gbl::MilleBinary(m_gblMilleFileName);
+  AlignablePXDRecoHit::setMisalignmentDBObjPtrName(m_misalignment);
+  AlignableSVDRecoHit::setMisalignmentDBObjPtrName(m_misalignment);
+  AlignableSVDRecoHit2D::setMisalignmentDBObjPtrName(m_misalignment);
 
 }
 
 void GBLfitModule::beginRun()
 {
-  m_oldGbl.beginRun();
 }
 
 void GBLfitModule::event()
@@ -474,8 +473,8 @@ void GBLfitModule::event()
       //create MeasurementProducers for PXD, SVD and CDC and add producers to the factory with correct detector Id
       if (m_useClusters == false) { // use the trueHits
         if (pxdTrueHits.getEntries()) {
-          genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit>* PXDProducer =  NULL;
-          PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit> (pxdTrueHits.getPtr());
+          genfit::MeasurementProducer <PXDTrueHit, AlignablePXDRecoHit>* PXDProducer =  NULL;
+          PXDProducer =  new genfit::MeasurementProducer <PXDTrueHit, AlignablePXDRecoHit> (pxdTrueHits.getPtr());
           factory.addProducer(Const::PXD, PXDProducer);
         }
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
@@ -486,14 +485,14 @@ void GBLfitModule::event()
         }
 #endif
         if (svdTrueHits.getEntries()) {
-          genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
-          SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D> (svdTrueHits.getPtr());
+          genfit::MeasurementProducer <SVDTrueHit, AlignableSVDRecoHit2D>* SVDProducer =  NULL;
+          SVDProducer =  new genfit::MeasurementProducer <SVDTrueHit, AlignableSVDRecoHit2D> (svdTrueHits.getPtr());
           factory.addProducer(Const::SVD, SVDProducer);
         }
       } else {
         if (nPXDClusters) {
-          genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
-          pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, PXDRecoHit> (pxdClusters.getPtr());
+          genfit::MeasurementProducer <PXDCluster, AlignablePXDRecoHit>* pxdClusterProducer = NULL;
+          pxdClusterProducer =  new genfit::MeasurementProducer <PXDCluster, AlignablePXDRecoHit> (pxdClusters.getPtr());
           factory.addProducer(Const::PXD, pxdClusterProducer);
         }
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
@@ -504,8 +503,8 @@ void GBLfitModule::event()
         }
 #endif
         if (nSVDClusters) {
-          genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
-          svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, SVDRecoHit> (svdClusters.getPtr());
+          genfit::MeasurementProducer <SVDCluster, AlignableSVDRecoHit>* svdClusterProducer = NULL;
+          svdClusterProducer =  new genfit::MeasurementProducer <SVDCluster, AlignableSVDRecoHit> (svdClusters.getPtr());
           factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
@@ -583,12 +582,12 @@ void GBLfitModule::event()
                 planarMeas1->getDetId() == planarMeas2->getDetId() &&
                 planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
                 planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
-              Belle2::SVDRecoHit* hit1 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas1);
-              Belle2::SVDRecoHit* hit2 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas2);
+              Belle2::AlignableSVDRecoHit* hit1 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas1);
+              Belle2::AlignableSVDRecoHit* hit2 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas2);
               if (hit1 && hit2) {
-                Belle2::SVDRecoHit* hitU(NULL);
-                Belle2::SVDRecoHit* hitV(NULL);
-                // We have to decide U/V now (else SVDRecoHit2D could throw FATAL)
+                Belle2::AlignableSVDRecoHit* hitU(NULL);
+                Belle2::AlignableSVDRecoHit* hitV(NULL);
+                // We have to decide U/V now (else AlignableSVDRecoHit2D could throw FATAL)
                 if (hit1->isU() && !hit2->isU()) {
                   hitU = hit1;
                   hitV = hit2;
@@ -598,7 +597,7 @@ void GBLfitModule::event()
                 } else {
                   continue;
                 }
-                Belle2::SVDRecoHit2D* hit = new Belle2::SVDRecoHit2D(*hitU, *hitV);
+                Belle2::AlignableSVDRecoHit2D* hit = new Belle2::AlignableSVDRecoHit2D(*hitU, *hitV);
                 // insert measurement before point i (increases number of currect point to i+1)
                 gfTrack.insertMeasurement(hit, i);
                 // now delete current point (at its original place, we have the new 2D recohit)
@@ -680,29 +679,8 @@ void GBLfitModule::event()
       //now fit the track
       try {
 
-        if (m_useOldGbl) {
-          try {
-            // Prepare the the track (set ReferenceStates)
-            genfit::KalmanFitterRefTrack* refKalman = new genfit::KalmanFitterRefTrack();
-            int failedHits = 0;
-            refKalman->prepareTrack(&gfTrack, trackRep, true, failedHits);
-            if (failedHits > 0 && (nHitsInTrack - failedHits) < 3)
-              continue;
-            // Let's try to pass the track to GBL
-            // Reference state (and planes) are used by GBL.
-            m_oldGbl.processTrack(&gfTrack);
+        m_gbl.processTrack(&gfTrack, m_resortHits);
 
-          } catch (...) {
-            B2WARNING("Something went wrong during the fit!");
-            ++m_failedFitCounter;
-          }
-          // Nothing more can be done here with old GBL interface
-          return;
-
-        } else {
-          // New GBL interface
-          m_gbl.processTrack(&gfTrack, m_resortHits);
-        }
 
         //gfTrack.Print();
         bool fitSuccess = gfTrack.hasFitStatus(trackRep);
@@ -739,6 +717,7 @@ void GBLfitModule::event()
           //chi2ondf->Fill(gfs->getChi2()/gfs->getNdf());
 
           //If cuts are fullfilled, create GBL trajectory and out to Mille binary
+          /*
           if (m_milleFile && gfs->getPVal() >= m_gblPvalueCut && gfs->getNdf() >= m_gblMinNdf) {
             bool overChi2Cut = false;
             for (auto tp : gfTrack.getPoints()) {
@@ -760,7 +739,7 @@ void GBLfitModule::event()
               traj.milleOut(*m_milleFile);
             }
           }
-
+          */
 
         }// end if(fitSuccess)
 
@@ -1006,15 +985,12 @@ void GBLfitModule::event()
 
 void GBLfitModule::endRun()
 {
-  if (m_milleFile)
-    delete m_milleFile;
 
 }
 
 void GBLfitModule::terminate()
 {
-  m_oldGbl.endRun();
-  //delete m_milleFile;
+
 }
 
 HitPatternVXD GBLfitModule::getHitPatternVXD(genfit::Track track)
@@ -1051,9 +1027,9 @@ HitPatternVXD GBLfitModule::getHitPatternVXD(genfit::Track track)
       //if (weight == 0)
       //  continue;
 
-      PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
-      SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
-      SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
+      AlignablePXDRecoHit* pxdHit =  dynamic_cast<AlignablePXDRecoHit*>(absMeas);
+      AlignableSVDRecoHit2D* svdHit2D =  dynamic_cast<AlignableSVDRecoHit2D*>(absMeas);
+      AlignableSVDRecoHit* svdHit =  dynamic_cast<AlignableSVDRecoHit*>(absMeas);
 
       if (pxdHit) {
         VxdID sensor = pxdHit->getSensorID();

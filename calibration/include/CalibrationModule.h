@@ -16,81 +16,56 @@
 #include <vector>
 #include <TFile.h>
 
+#include <framework/database/IntervalOfValidity.h>
+
 namespace Belle2 {
   namespace calibration {
+    typedef IntervalOfValidity ExpRunRange;
     /**
      * Calibration module base class
      */
     class CalibrationModule: public Module {
 
     public:
-      /**
-       * @brief State of the CalibrationModule
-       *
-       */
+      /** State of the CalibrationModule */
       enum ECalibrationModuleState {
         c_Waiting,
         c_Running,
         c_Monitoring,
         c_Done,
-        c_Failed
+        c_Failed,
+        c_Blocked
       };
-      /**
-       * @brief Result of Calibrate()
-       *
-       */
+      /** Result of Calibrate() */
       enum ECalibrationModuleResult {
         c_Success,
         c_NotEnoughData,
         c_NoChange,
         c_Failure
       };
-      /**
-       * @brief Result of Monitor()
-       *
-       */
+      /** Result of Monitor() */
       enum ECalibrationModuleMonitoringResult {
         c_MonitoringSuccess,
         c_MonitoringIterateCalibration,
         c_MonitoringIterateMonitor
       };
 
-      /**
-       * Constructor.
-       */
+      /**  Typedef for module dependencies pairs (module_name, module_mode). */
+      typedef std::pair<std::string, ECalibrationModuleState> ModuleDependency;
+
+      /**  Constructor. */
       CalibrationModule();
-
-      /**
-       * Destructor.
-       */
+      /** Destructor. */
       virtual ~CalibrationModule();
-
-      /**
-       * Initialize the Module.
-       * This method is called only once before the actual event processing starts.
-       */
+      /** Initialize the Module. */
       void initialize() final;
-
-      /**
-       * This method is the core of the module.
-       * This method is called for each event.
-       * All processing of the event has to take place in this method.
-       */
+      /** This method is called for each event. */
       void event() final;
-
-      /**
-       * This method is called if the run begins.
-       */
+      /** This method is called if the run begins. */
       void beginRun() final;
-
-      /**
-       * This method is called if the current run ends.
-       */
+      /** This method is called if the current run ends. */
       void endRun() final;
-
-      /**
-       * This method is called at the end of the event processing.
-       */
+      /** This method is called at the end of the event processing. */
       void terminate() final;
 
       /**
@@ -98,25 +73,26 @@ namespace Belle2 {
        * Should be defined in the individual calibration module class derived from this base class.
        */
       virtual void Prepare();
-
       /**
        * This function is called in order to fill ntuples and/or histograms.
        * Should be defined in the individual calibration module class derived from this base class.
        */
       virtual void CollectData();
-
+      /** A function to close files in parallel processing before calibration. */
+      virtual void closeParallelFiles() {};
+      virtual void storeData() {};
+      virtual void resetData() {};
+      virtual void loadData() {};
       /**
        * This function is called when data are accumulated and ready for calibration.
        * Should be defined in the individual calibration module class derived from this base class.
        */
       virtual ECalibrationModuleResult Calibrate();
-
       /**
        * This function is called in order to monitor the obtained calibration.
        * Should be defined in the individual calibration module class derived from this base class.
        */
       virtual ECalibrationModuleMonitoringResult Monitor();
-
       /**
        * This function is called in order to write calibration data to data base.
        * Should be defined in the individual calibration module class derived from this base class.
@@ -124,144 +100,123 @@ namespace Belle2 {
       virtual bool StoreInDataBase();
 
       /**
-       * @brief Typedef for module dependencies pairs (module_name, module_mode).
-       *
+       * Get the dependencies of the module.
+       * @return Vector of module dependencies
        */
-      typedef std::pair<std::string, ECalibrationModuleState> ModuleDependency;
+      const std::vector<ModuleDependency>& getDependencies() const { return m_dependencies; }
 
       /**
-       * @brief Get the dependencies of the module.
-       *
-       * @return const std::vector< Belle2::calibration::CalibrationModule::ModuleDependency, std::allocator< void > >&
+       * Get current state of the module.
+       * @return Current module state if active, c_Blocked else
        */
-      const std::vector<ModuleDependency>& getDependencies() const
-      {
-        return m_dependencies;
-      }
+      ECalibrationModuleState getState();
+      /**
+       * Get current number of iterations (for active IOV).
+       * @return Number of iterations performed so far if active,
+       * 0 otherwise
+       */
+      int getNumberOfIterations();
+      /** Increase number of iterations for active module state */
+      void increaseIterations();
 
       /**
-       * @brief Get state of the module.
-       *
-       * @return Belle2::calibration::CalibrationModule::ECalibrationModuleState
+       * Get state of the module for its
+       * particular calibration IOV.
+       * @return Module state for given IOV, c_Blocked if not found
        */
-      ECalibrationModuleState getState()
-      {
-        return m_state;
-      }
+      ECalibrationModuleState getState(const ExpRunRange& iov);
+      /**
+       * Get number of iterations for give calibration IOV.
+       * @return Number of iterations performed so far in IOV,
+       * 0 otherwise (not found or no iterations so far finished)
+       */
+      int getNumberOfIterations(const ExpRunRange& iov);
 
       /**
        * @brief Set the state of the module.
        *
        * @return void
        */
-      void setState(ECalibrationModuleState state)
-      {
-        m_state = state;
-      }
+      void setState(ECalibrationModuleState state);
 
       /**
        * @brief Convert state from string to enum.
        *
-       * @param state ...
+       * @param state Module state
        * @return Belle2::calibration::CalibrationModule::ECalibrationModuleState
        */
       static ECalibrationModuleState stringToState(std::string state);
 
+      static std::string stateToString(ECalibrationModuleState state);
 
+      void setState(ExpRunRange iov, ECalibrationModuleState state, int iteration);
+
+      std::vector<ExpRunRange> getCalibrationIOVs();
+
+      bool isCalibrator() const { return m_isCalibrator; }
+      bool isCollector() const { return m_isCollector; }
+
+
+
+      static const std::map<ECalibrationModuleState, std::string> m_stateNames;
     protected:
 
       /**
-       * @brief Add default list of module dependencies as parameter to the module
+       * Add default list of module dependencies as parameter to the module
        * Parameter name, description and binding to variable is done automatically.
-       *
-       * @return void
        */
       void addDefaultDependencyList(std::string list = "");
-
-      /**
-       * Get the calibration file.
-       */
+      /** Get the calibration file. */
       TFile* getCalibrationFile();
 
-      /**
-       * A function to close files in parallel processing.
-       */
-      virtual void closeParallelFiles() {};
 
-      /**
-       * Get the calibration file name.
-       */
+      /** Get the calibration file name. */
       std::string getCalibrationFileName() const
       {
         return m_calibrationFileName;
       }
 
+      ExpRunRange m_calibration_iov;
+
+      std::string getBaseName() const { return m_baseName; }
+
     private:
 
-      /**
-        * Try to start calibration.
-        */
+
+      /** Try to start calibration. */
       bool tryStartCalibration();
 
-      /**
-       * Calibration mode: online or offline.
-       */
+      /** Calibration mode: online or offline. */
       std::string m_mode;
 
-      /**
-       * Calibration state: waiting, running, monitoring, done, failed.
-       */
-      ECalibrationModuleState m_state;
-
-      /**
-       * Iteration counter.
-       */
-      int m_iterationNumber;
-
-      /**
-       * Calibration parameter: category of dataset.
-       */
+      /** Calibration parameter: category of dataset. */
       std::string m_datasetCategory;
 
-      /**
-       * Calibration parameter: granularity of calibration (run, experiment, or other).
-       */
+      /** Calibration parameter: granularity of calibration (run, experiment, or other). */
       std::string m_granularityOfCalibration;
 
-      /**
-       * Calibration parameter: maximal number of iterations.
-       */
+      /** Calibration parameter: maximal number of iterations. */
       int m_numberOfIterations;
-      /**
-       * Calibration parameter: name of calibration file.
-       */
-      std::string m_calibrationFileName;
-      /**
-       * True if Calibration Module is already initialized.
-       */
-      //bool m_calibrationModuleInitialized;
 
-      /**
-       * True if Calibration Manager is already initialized.
-       */
-      //bool m_calibrationManagerInitialized;
-      /**
-       * @brief Dependencies of the module to be set on initialization
-       * from module parameter "Dependencies".
-       */
+      /** Calibration parameter: name of calibration file. */
+      std::string m_calibrationFileName;
+
+      /** Dependencies of the module to be set on initialization */
       std::vector< ModuleDependency > m_dependencies;
 
-
-      /**
-       * Calibration parameter: dependencies on other calibration modules.
-       */
+      /** Calibration parameter: dependencies on other calibration modules. */
       std::string m_dependencyList;
 
-      /**
-       * File for the calibration.
-       */
-      TFile* m_calibrationFile;
+      /** File for the calibration. */
+      TFile* m_calibrationFile = nullptr;
+      std::vector< std::tuple< ExpRunRange, ECalibrationModuleState, int> > m_states = {};
+      int m_currentStateIndex = -1;
+      bool m_isCollector = true;
+      bool m_isCalibrator = true;
 
+      std::string m_baseName = "";
+
+      long int m_lastRun = -1;
     };
   }
 } //Belle2 namespace

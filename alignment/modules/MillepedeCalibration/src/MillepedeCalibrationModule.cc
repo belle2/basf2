@@ -13,6 +13,9 @@
 #include <calibration/CalibrationManager.h>
 #include <calibration/CalibrationModule.h>
 
+#include <alignment/PedeResult.h>
+#include <alignment/GlobalLabel.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <genfit/Track.h>
 #include <genfit/GblFitter.h>
@@ -22,9 +25,22 @@
 #include <genfit/GblFitStatus.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
+#include "alignment/dbobjects/VXDAlignment.h"
 #include <TH1D.h>
 #include <TFile.h>
 #include <TSystem.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/Database.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <alignment/dataobjects/MilleData.h>
+
+#include <vxd/geometry/GeoCache.h>
+
+#include <alignment/dataobjects/PedeSteering.h>
+#include <alignment/PedeApplication.h>
+
+#include <string>
+#include <algorithm>
 
 class TH1D;
 
@@ -42,11 +58,13 @@ REG_MODULE(MillepedeCalibration)
 //-----------------------------------------------------------------
 
 MillepedeCalibrationModule::MillepedeCalibrationModule() : CalibrationModule(),
-  m_milleFile(0),
-  m_histoProcID("", DataStore::c_Persistent),
-  m_histoPval("", DataStore::c_Persistent),
-  m_histoNormChi2("", DataStore::c_Persistent),
-  m_histoNdf("", DataStore::c_Persistent)
+  m_histoProcID("ProcID", DataStore::c_Persistent),
+  m_histoPval("Pval", DataStore::c_Persistent),
+  m_histoNormChi2("NormChi2", DataStore::c_Persistent),
+  m_histoNdf("Ndf", DataStore::c_Persistent),
+  m_histoRun("Run", DataStore::c_Persistent),
+  m_treeResidual("ResidualMisalignment", DataStore::c_Persistent),
+  m_mille("Mille", DataStore::c_Persistent)
 {
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   // Set module properties
@@ -54,8 +72,7 @@ MillepedeCalibrationModule::MillepedeCalibrationModule() : CalibrationModule(),
 
   // Parameter definitions
   addParam("tracks", m_tracks, "Name of collection of genfit::Tracks for calibration", std::string(""));
-  addParam("binary", m_binary, "Name of Mille binary file with calibration data", std::string("belle.mille"));
-  addParam("steering", m_steering, "Name of text steering file for Pede to run calibration", std::string("steer.txt"));
+  addParam("steering", m_steering, "Name of PedeSteering persistent object. Produced binary are added by the module.");
   addParam("minPvalue", m_minPvalue, "Minimum p-value to write trajectory to Mille binary", double(0.));
 
   // Dependecies  (empty here)
@@ -65,21 +82,22 @@ MillepedeCalibrationModule::MillepedeCalibrationModule() : CalibrationModule(),
 
 void MillepedeCalibrationModule::Prepare()
 {
-  StoreArray<genfit::Track> tracks(m_tracks);
-  tracks.isRequired();
+  if (isCollector())
+    StoreArray<genfit::Track>::required(m_tracks);
 
-  m_histoProcID.registerInDataStore(getName() + "_" + "processID", DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  m_histoProcID.construct("processID", "MillepedeCalibration: ProcessID in which track was written to Mille file", 65, -1., 64.);
+  if (isCalibrator())
+    StoreObjPtr<PedeSteering>::required(m_steering, DataStore::c_Persistent);
 
-  m_histoPval.registerInDataStore(getName() + "_" + "Pval", DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  m_histoPval.construct("Pval", "MillepedeCalibration: P-value of tracks in Mille file", 100, 0., 1.);
 
-  m_histoNormChi2.registerInDataStore(getName() + "_" + "normChi2",
-                                      DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  m_histoNormChi2.construct("normChi2", "MillepedeCalibration: Chi2/Ndf of tracks in Mille file", 100, 0., 10.);
-
-  m_histoNdf.registerInDataStore(getName() + "_" + "ndf", DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  m_histoNdf.construct("ndf", "MillepedeCalibration: NDF of tracks in Mille file", 201, -1., 200.);
+  storables.setBaseName(getBaseName());
+  storables.manage<MilleData>(m_mille);
+  storables.manage<TH1D>(m_histoProcID, "processID", "MillepedeCalibration: ProcessID in which track was written to Mille file", 65,
+                         -1., 64.);
+  storables.manage<TH1D>(m_histoPval, "Pval", "MillepedeCalibration: P-value of tracks in Mille file", 100, 0., 1.);
+  storables.manage<TH1D>(m_histoNormChi2, "normChi2", "MillepedeCalibration: Chi2/Ndf of tracks in Mille file", 100, 0., 10.);
+  storables.manage<TH1D>(m_histoNdf, "ndf", "MillepedeCalibration: NDF of tracks in Mille file", 201, -1., 200.);
+  storables.manage<TH1D>(m_histoRun, "runs", "Input runs", 100, 0, 100);
+  storables.manage<TTree>(m_treeResidual, "residual_misalignment", "Residual misalignment AFTER calibration");
 }
 
 
@@ -87,33 +105,21 @@ void MillepedeCalibrationModule::CollectData()
 {
   // Input tracks (have to be fitted by GBL)
   StoreArray<genfit::Track> tracks(m_tracks);
-  std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
-  // If m_milleFile is null, this is first call to CollectData.
-  // We need to create the file for this process here, because
-  // Prepare() is called before processes are forkewithoutCutNamed.
-  if (!m_milleFile) {
-    int processID = ProcHandler::EvtProcID();
 
-
-    if (ProcHandler::parallelProcessingUsed()) {
-      if (ProcHandler::isEventProcess()) {
-        //TODO: do not include processID to file extension, better
-        // place it at the end of filename (like 'file1.mille')
-        m_binary = m_binary + std::to_string(processID);
-
-        B2INFO("Creating Mille file for process " << processID << " with name '" << m_binary << "'");
-        m_milleFile = new gbl::MilleBinary(m_binary);
-      } else if (ProcHandler::isOutputProcess()) {
-        B2INFO("Creating Mille file with name '" << m_binary << "'");
-        m_milleFile = new gbl::MilleBinary(m_binary);
-      }
-
-    } else {
-      B2INFO("Creating Mille file with name '" << m_binary << "'");
-      m_milleFile = new gbl::MilleBinary(m_binary);
-    }
-
+  if (!m_mille->isOpen()) {
+    stringstream str;
+    str << m_calibration_iov;
+    string iov;
+    str >> iov;
+    std::replace(iov.begin(), iov.end(), ',', '_');
+    m_mille->open(getBaseName() + "_" + iov
+                  + ".mille" + ((ProcHandler::parallelProcessingUsed()) ? to_string(ProcHandler::EvtProcID()) : ""));
   }
+
+  std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
+
+  StoreObjPtr<EventMetaData> emd;
+  m_histoRun->get().Fill(emd->getRun());
 
   for (auto track : tracks) {
     if (!track.hasFitStatus())
@@ -128,182 +134,154 @@ void MillepedeCalibrationModule::CollectData()
     if (fs->getPVal() >= m_minPvalue) {
       using namespace gbl;
       GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
-      trajectory.milleOut(*m_milleFile);
+      //trajectory.milleOut(*m_milleFile);
 
-      if (m_histoProcID.isValid())
-        m_histoProcID->get().Fill(double(ProcHandler::EvtProcID()));
-      if (m_histoPval.isValid())
-        m_histoPval->get().Fill(double(fs->getPVal()));
-      if (m_histoNormChi2.isValid())
-        m_histoNormChi2->get().Fill(double(fs->getChi2() / fs->getNdf()));
-      if (m_histoNdf.isValid())
-        m_histoNdf->get().Fill(double(fs->getNdf()));
+      m_mille->fill(trajectory);
+      m_histoProcID->get().Fill(double(ProcHandler::EvtProcID()));
+      m_histoProcID->get().Fill(double(ProcHandler::EvtProcID()));
+      m_histoPval->get().Fill(double(fs->getPVal()));
+      m_histoNormChi2->get().Fill(double(fs->getChi2() / fs->getNdf()));
+      m_histoNdf->get().Fill(double(fs->getNdf()));
     }
 
   }
 }
 
-bool MillepedeCalibrationModule::StoreInDataBase()
-{
-  B2INFO("Starting StoreInDataBase for calibration module " << getName());
-  return readResultWriteXml("millepede.xml");
-}
-
-CalibrationModule::ECalibrationModuleMonitoringResult MillepedeCalibrationModule::Monitor()
-{
-  B2INFO("Starting Monitoring for calibration module " << getName());
-  // Here we are actually in single processing mode or in output path
-  B2INFO("Accumulated mean of Chi2/Ndf histogram: " << m_histoNormChi2->get().GetMean());
-
-  if (getCalibrationFile()) {
-    m_histoProcID->get().SetDirectory(getCalibrationFile());
-    m_histoProcID->write(getCalibrationFile());
-    m_histoPval->get().SetDirectory(getCalibrationFile());
-    m_histoPval->write(getCalibrationFile());
-    m_histoNormChi2->get().SetDirectory(getCalibrationFile());
-    m_histoNormChi2->write(getCalibrationFile());
-    m_histoNdf->get().SetDirectory(getCalibrationFile());
-    m_histoNdf->write(getCalibrationFile());
-  }
-
-  return CalibrationModule::c_MonitoringSuccess;
-}
-
 void MillepedeCalibrationModule::closeParallelFiles()
 {
-  // We have to properly close the file here
-  if (m_milleFile) {
-    B2INFO("Closing Mille file with name '" << m_binary << "'");
+  m_mille->close();
+}
 
-    delete m_milleFile;
-    m_milleFile = nullptr;
-  }
+void MillepedeCalibrationModule::storeData()
+{
+  storables.writeAll(getCalibrationFile());
+}
+
+void MillepedeCalibrationModule::resetData()
+{
+  storables.resetAll();
+}
+
+void MillepedeCalibrationModule::loadData()
+{
+  storables.readAll(getCalibrationFile());
 }
 
 CalibrationModule::ECalibrationModuleResult MillepedeCalibrationModule::Calibrate()
 {
-  B2INFO("Starting Calibration for calibration module " << getName());
-  // We have to properly close the file here if not yet closed (deleted)
-  // That actually means we are in single processing mode or in output path
-  if (m_milleFile) {
-    B2INFO("Closing Mille file with name '" << m_binary << "'");
+  m_mille->close();
+  //if (m_histoPval->get().GetEntries() < 10)
+  //  return CalibrationModule::c_NotEnoughData;
 
-    delete m_milleFile;
-    m_milleFile = nullptr;
+  StoreObjPtr<PedeSteering> steer(m_steering, DataStore::c_Persistent);
+  // Make a copy of the steering and add our files only to it
+  PedeSteering mysteer(*steer);
+  vector<string> allFiles = m_mille->getFiles();
+  vector<string> files;
+  stringstream str;
+  str << m_calibration_iov;
+  string iov;
+  str >> iov;
+  std::replace(iov.begin(), iov.end(), ',', '_');
+  string basename = getBaseName() + "_" + iov + ".mille" ;
+  for (auto file : allFiles) {
+    if (file.compare(0, basename.length(), basename) == 0)
+      files.push_back(file);
   }
+  mysteer.getFiles() = files;
 
 
-  std::cout << "Starting Millepede II Alignment/Calibration..." << std::endl;
-  std::string cmd("pede");
-  cmd = cmd + " " + m_steering;
-  std::system(cmd.c_str());
-  ifstream result("millepede.end");
-  int resultID = -1;
-  result >> resultID;
+  alignment::PedeApplication pede;
+  pede.run(mysteer);
 
-  std::stringstream buffer;
-  buffer << result.rdbuf();
+  B2INFO("Millepede exit code: " << pede.getExitCode());
+  B2INFO(pede.getExitMessage());
 
-  std::string message(buffer.str());
-
-  B2INFO("Millepede finished with code " << resultID << " and message:\n" << message);
-  if (resultID >= 0)
+  if (pede.success())
     return CalibrationModule::c_Success;
   else
     return CalibrationModule::c_Failure;
 }
 
-bool MillepedeCalibrationModule::readResultWriteXml(const string& xml_filename)
+bool MillepedeCalibrationModule::StoreInDataBase()
 {
-  ifstream result("millepede.end");
-  int resultID = -1;
-  result >> resultID;
+  B2INFO("Starting StoreInDataBase for calibration module " << getName());
+  VXDAlignment* alignment = new VXDAlignment();
 
-  std::stringstream buffer;
-  buffer << result.rdbuf();
+  DBObjPtr<VXDAlignment> init;
+  if (!init.isValid()) {
+    alignment::PedeResult result("millepede.res");
+    for (int ipar = 0; ipar < result.getNoParameters(); ipar++) {
+      if (!result.isParameterDetermined(ipar)) continue;
 
-  std::string message(buffer.str());
-
-  ofstream xml(xml_filename);
-  string line;
-  ifstream res("millepede.res");
-
-  std::map<int, std::string>paramNames;
-  paramNames.insert(std::pair<int, std::string>(1, "du"));
-  paramNames.insert(std::pair<int, std::string>(2, "dv"));
-  paramNames.insert(std::pair<int, std::string>(3, "dw"));
-  paramNames.insert(std::pair<int, std::string>(4, "alpha"));
-  paramNames.insert(std::pair<int, std::string>(5, "beta"));
-  paramNames.insert(std::pair<int, std::string>(6, "gamma"));
-  // skip fortran line
-  getline(res, line);
-
-  xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
-  xml << "<Alignment xmlns:xi=\"http://www.w3.org/2001/XInclude\">" << endl;
-  xml << "  <Millepede>" << endl;
-  xml << "    <ExitCode>" << resultID << "</ExitCode>" << endl;
-  xml << "    <ExitMessage>" << message << "</ExitMessage>" << endl;
-  xml << "  </Millepede>" << endl;
-
-  unsigned int lastSensor = 0;
-  bool startComp = false;
-  while (getline(res, line)) {
-    int label = -1;
-    double param = 0.;
-    double presigma = 0.;
-    double differ = 0.;
-    double error = 0.;
-    stringstream lineSTream;
-    lineSTream << line;
-    lineSTream >> label >> param >> presigma >> differ >> error;
-
-    // Now decode vxd id
-    if (label < 10) continue;
-
-    unsigned int id(floor(label / 10));
-    unsigned int vxdId = id;
-    unsigned int paramId = label - 10 * id;
-    // skip segment (5 bits)
-    id = id >> 5;
-    unsigned int sensor = id & 7;
-    id = id >> 3;
-    unsigned int ladder = id & 31;
-    id = id >> 5;
-    unsigned int layer = id & 7;
-
-    if (lastSensor != vxdId) {
-      if (startComp) {
-        xml << "  </Align>" << endl;
-        startComp = false;
-      }
-      xml << "  <Align component=\"" << layer << "." << ladder << "." << sensor << "\">" << endl;
-      lastSensor = vxdId;
-      startComp = true;
+      GlobalLabel param(result.getParameterLabel(ipar));
+      double old = 0.;
+      alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar),
+                     result.getParameterError(ipar));
     }
-    xml << "    <" << paramNames.find(paramId)->second;
-    if (presigma < 0.) xml << " fixed=\"true\"";
+  } else {
+    alignment::PedeResult result("millepede.res");
+    for (int ipar = 0; ipar < result.getNoParameters(); ipar++) {
+      if (!result.isParameterDetermined(ipar)) continue;
 
-
-
-    if (paramId >= 1 && paramId <= 3)
-      xml << " unit=\"cm\"";
-    if (paramId >= 4 && paramId <= 6)
-      xml << " unit=\"rad\"";
-
-    if (error) xml << " error=\"" << error << "\"";
-
-
-    xml << ">" << param << "</" << paramNames.find(paramId)->second << ">" << endl;
+      GlobalLabel param(result.getParameterLabel(ipar));
+      double old = init->get(param.getVxdID(), param.getParameterId() - 1);
+      alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar),
+                     result.getParameterError(ipar));
+    }
   }
-  if (startComp) {
-    xml << "  </Align>" << endl;
-  }
-  xml << "</Alignment>" << endl;
-
-  return true;
+  IntervalOfValidity storeIOV = m_calibration_iov;
+  m_finalAlignment = *alignment;
+  return Database::Instance().storeData("VXDAlignment", (TObject*) alignment, storeIOV);
 }
 
+CalibrationModule::ECalibrationModuleMonitoringResult MillepedeCalibrationModule::Monitor()
+{
+  B2INFO("Accumulated mean of Chi2/Ndf histogram: " << m_histoNormChi2->get().GetMean());
+  B2INFO("                     Number of entries: " << m_histoNormChi2->get().GetEntries());
 
+  //TODO: Hard-coded name
+  DBObjPtr<VXDAlignment> misalignment("VXDMisalignment");
 
+  if (misalignment.isValid()) {
+    int layer, ladder, sensor, param;
+    double x, y, z;
+    double residual, error;
+    m_treeResidual->get().Branch<int>("layer", &layer);
+    m_treeResidual->get().Branch<int>("ladder", &ladder);
+    m_treeResidual->get().Branch<int>("sensor", &sensor);
+    m_treeResidual->get().Branch<int>("param", &param);
+    m_treeResidual->get().Branch<double>("residual", &residual);
+    m_treeResidual->get().Branch<double>("error", &error);
+    m_treeResidual->get().Branch<double>("x", &x);
+    m_treeResidual->get().Branch<double>("y", &y);
+    m_treeResidual->get().Branch<double>("z", &z);
 
+    for (VxdID vxdid : VXD::GeoCache::getInstance().getListOfSensors()) {
+      layer = vxdid.getLayerNumber();
+      ladder = vxdid.getLadderNumber();
+      sensor = vxdid.getSensorNumber();
+      // Center of the sensor in global coordinates
+      TVector3 position = VXD::GeoCache::getInstance().get(vxdid).pointToGlobal(TVector3(0., 0., 0.));
+      x = position[0];
+      y = position[1];
+      z = position[2];
+      for (int ipar = 0; ipar < 6; ipar++) {
+        param = ipar;
+        residual = misalignment->get(vxdid, ipar) - m_finalAlignment.get(vxdid, ipar);
+        error = m_finalAlignment.getError(vxdid, ipar);
+        m_treeResidual->get().Fill();
+      }
+    }
+  }
+
+  alignment::PedeResult result("millepede.res");
+  for (int ipar = 0; ipar < result.getNoParameters(); ipar++) {
+    if (!result.isParameterDetermined(ipar)) continue;
+    if (fabs(result.getParameterCorrection(ipar)) > 1.e-2)
+      return CalibrationModule::c_MonitoringIterateCalibration;
+  }
+
+  return CalibrationModule::c_MonitoringSuccess;
+}
 

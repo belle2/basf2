@@ -102,7 +102,6 @@ namespace Belle2 {
     std::vector<double>
     m_beamSpot;                  /**< The coordinates of the point whose POCA will define the parameters of the TrackFitResults.  */
     genfit::GblFitter m_gbl;                         /**< General Broken Line interface class object. */
-    genfit::GFGbl m_oldGbl;                          /**< General Broken Line interface class object. Old version*/
 
     std::string m_gblInternalIterations;             /**< GBL internal downweighting setting */
     int m_gblExternalIterations;                     /**< GBL: Real GBL iteration with state updates */
@@ -112,7 +111,6 @@ namespace Belle2 {
     double m_chi2Cut;                                /**< GBL: Cut on single measurement Chi2", double(50.)) */
     bool m_enableScatterers;                         /**< GBL: Enable scattering in GBL trajectory", bool(true)) */
     bool m_enableIntermediateScatterer;              /**< GBL: Enable intermediate scatterers for simulation of thick scatterer", bool(true)) */
-    gbl::MilleBinary* m_milleFile;                   /**< Millepede: Name of Mille binary file for output of GBL data */
     bool m_resortHits;                               /**< GBL: Sort hits by extrapolation before init of GBL fit */
     int m_recalcJacobians;                           /**< Recalculate Jacobians: 0=do not recalc, 1=after 1st fit, 2=1+after 2nd fit, etc. */
     bool m_storeFailed;                              /**< Store tracks where the fit failed */
@@ -128,6 +126,8 @@ namespace Belle2 {
     bool m_enableWireSag;                            /**< Wire sag in CDCGeometryTranslator.  */
     bool m_useTrackTime;                             /**< If true, CDCRecoHits will use the track propagation time.  */
     bool m_estimateSeedTime;                         /**< If true, the starting time of each track will be estimated from its seed.  */
+    std::string m_misalignment;                      /**< Name of misalignment object in DB to be used by RecoHits  */
+
   };
 }
 

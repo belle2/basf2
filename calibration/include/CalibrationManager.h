@@ -15,8 +15,11 @@
 #include <framework/pcore/ProcHandler.h>
 #include <calibration/CalibrationModule.h>
 
+#include <framework/database/IntervalOfValidity.h>
+
 namespace Belle2 {
   namespace calibration {
+    typedef IntervalOfValidity ExpRunRange;
     /**
      * A base (singleton) class for the calibration framework.
      * Should communicate with individual calibration modules.
@@ -89,7 +92,7 @@ namespace Belle2 {
        * @param ignoreStates Check states of modules for dependencies? True: states are checked. False: Only dependence on particular is checked (no matter its state)
        * @return bool True: dependencies OK. False: not OK.
        */
-      bool checkDependencies(CalibrationModule* module, bool ignoreStates = false);
+      bool checkDependencies(CalibrationModule* module, const ExpRunRange& iov);
 
       /**
        * @brief Get current number of iterations
@@ -106,34 +109,34 @@ namespace Belle2 {
        */
       void setNumberOfIterations(int numberOfIterations);
 
-      /**
-      void notifyInitiliaze(CalibrationModule* module);
-      void notifyBeginRun(CalibrationModule* module);
-      void notifyEvent(CalibrationModule* module);
-      void notifyEndRun(CalibrationModule* module);
-      void notifyTerminate(CalibrationModule* module);
+      void loadCachedState(std::string moduleName, ExpRunRange iov, CalibrationModule::ECalibrationModuleState& state, int& iteration);
+      void saveCachedStates();
 
-      void notifyInitiliaze();
-      void notifyBeginRun();
-      void notifyEvent();
-      void notifyEndRun();
-      void notifyTerminate();
+      bool done();
 
+      void setRange(ExpRunRange iov) {m_calibration_range = iov;}
+      ExpRunRange getFullRange() {return m_calibration_range;}
+      void setStateFileName(std::string filename) {m_stateFileName = filename;}
 
-      enum eCalibrationModules {
-        AlignmentModule,
-        PXDCalibrationModule,
-        SVDCalibrationModule,
-        CDCCalibrationModule
-      };
-      */
-
+      void setJobType(bool collection, bool calibration)
+      {
+        m_doCollection = collection;
+        m_doCalibration = calibration;
+      }
+      bool doCollection() { return m_doCollection; }
+      bool doCalibration() { return m_doCalibration; }
     private:
 
+      ExpRunRange m_calibration_range{0, 0, -1, -1};
       /** Number of iterations for calibration or alignment procedures */
       int m_numberOfIterations;
       /** Registered calibration modules */
       std::vector<CalibrationModule*> m_calibrationModules;
+
+      std::string m_stateFileName = "calibration_state.txt";
+
+      bool m_doCollection = true;
+      bool m_doCalibration = true;
 
     };
   } //end of namespace calibration

@@ -22,6 +22,9 @@ from ROOT import gSystem
 gSystem.Load('libanalysis.so')
 from ROOT import Belle2
 
+# workaround to make Belle2.Variables namespace available in root6
+import variables
+
 
 class BinnedData(object):
     """

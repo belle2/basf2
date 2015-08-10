@@ -17,6 +17,10 @@ import matplotlib.gridspec
 import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
+
+# Do not use standard backend TkAgg, because it is NOT thread-safe
+# You will get an RuntimeError: main thread is not in main loop otherwise!
+matplotlib.use("svg")
 import seaborn
 
 import b2stat
@@ -56,6 +60,7 @@ class Plotter(object):
         @param figure default draw figure which is used
         @param axis default draw axis which is used
         """
+        B2INFO("Create new figure for class " + str(type(self)))
         if figure is None:
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(False)
@@ -102,6 +107,7 @@ class Plotter(object):
         Save the figure into a file
         @param filename of the file
         """
+        B2INFO("Save figure for class " + str(type(self)))
         from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
         canvas = FigureCanvas(self.figure)
         canvas.print_figure(filename, dpi=50)

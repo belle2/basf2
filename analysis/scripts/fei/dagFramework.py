@@ -157,6 +157,8 @@ class Resource(object):
                     parameters[key] = [arguments[v] for v in value]
 
             self.path = basf2.create_path()
+            if self.env.get('verbose', False):
+                basf2.B2INFO(self.identifier + " called.")
             self.value = self.provider(self, **parameters)
             if self.env.get('verbose', False):
                 if self.halt:

@@ -144,8 +144,8 @@
 
 	<!-- Default Values -->
 	<!-- (Should be changed in the Python steering script and not directly in this file-->
-	<ForwardShieldType>FWDA1</ForwardShieldType>
-	<BackwardShieldType>BWDA1</BackwardShieldType>
+	<ForwardShieldType>FWD0</ForwardShieldType>
+	<BackwardShieldType>BWD0</BackwardShieldType>
 
 	<xi:include href="SHIELD-FWD0.xml"/>	
 	<xi:include href="SHIELD-BWD0.xml"/>	

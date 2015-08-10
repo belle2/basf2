@@ -21,6 +21,8 @@ import seaborn
 
 import b2stat
 
+from basf2 import *
+
 
 class Plotter(object):
     """
@@ -411,12 +413,15 @@ class Box(Plotter):
             weight = data.loc[mask, column].reset_index(drop=True)
             x = numpy.asarray(list(itertools.chain.from_iterable([i]*int(j) for i, j in zip(x, weight))))
 
-        if len(x) != 0:
-            p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
-                                  boxprops=dict(facecolor='blue', alpha=0.5),
-                                  # medianprobs=dict(color='blue'),
-                                  # meanprobs=dict(color='red'),
-                                  )
+        if len(x) == 0:
+            B2WARNING("Ignore empty boxplot.")
+            return self
+
+        p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
+                              boxprops=dict(facecolor='blue', alpha=0.5),
+                              # medianprobs=dict(color='blue'),
+                              # meanprobs=dict(color='red'),
+                              )
         """
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
@@ -563,13 +568,19 @@ class Overtraining(Plotter):
         difference_bckgrd.finish(line_color=distribution.plots[1][0].get_color())
 
         # Kolmogorov smirnov test
-        ks = scipy.stats.ks_2samp(data.loc[train_mask & signal_mask, column], data.loc[test_mask & signal_mask, column])
-        props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
-        self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
-                          verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
-        ks = scipy.stats.ks_2samp(data.loc[train_mask & bckgrd_mask, column], data.loc[test_mask & bckgrd_mask, column])
-        self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
-                          verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
+        if data.loc[train_mask & signal_mask, column].empty or data.loc[test_mask & signal_mask, column].empty:
+            B2WARNING("Cannot calculate kolmogorov smirnov test for signal due to missing data")
+        else:
+            ks = scipy.stats.ks_2samp(data.loc[train_mask & signal_mask, column], data.loc[test_mask & signal_mask, column])
+            props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
+            self.axis_d1.text(0.1, 0.9, r'signal (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
+                              verticalalignment='top', horizontalalignment='left', transform=self.axis_d1.transAxes)
+        if data.loc[train_mask & bckgrd_mask, column].empty or data.loc[test_mask & bckgrd_mask, column].empty:
+            B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
+        else:
+            ks = scipy.stats.ks_2samp(data.loc[train_mask & bckgrd_mask, column], data.loc[test_mask & bckgrd_mask, column])
+            self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
+                              verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
         return self
 
     def finish(self):
@@ -632,7 +643,8 @@ class VerboseDistribution(Plotter):
 
         box = Box(self.figure, box_axis)
         box.add(data, column, mask, weight_column)
-        box.plots[0]['boxes'][0].set_facecolor(distribution.plots[0][0].get_color())
+        if len(box.plots) > 0:
+            box.plots[0]['boxes'][0].set_facecolor(distribution.plots[0][0].get_color())
         box.finish()
 
         self.box_axes.append(box_axis)
@@ -667,6 +679,9 @@ class Correlation(Plotter):
         @param quantiles list of quantiles between 0 and 100, defining the different cuts
         @param weight_column column in data containing the weights for each event
         """
+        if data[cut_column].empty:
+            B2WARNING("Ignore empty Correlation.")
+            return self
         percentiles = numpy.percentile(data[cut_column], q=quantiles)
         distribution = Distribution(self.figure, self.axis, normed=False)
         distribution.set_plot_options(self.plot_kwargs)
@@ -704,7 +719,12 @@ class CorrelationMatrix(Plotter):
         @param columns which are used to calculate the correlations
         """
         import seaborn
+
+        if data[columns].empty:
+            B2WARNING("Ignore empty CorrelationMatrix.")
+            return self
         corr = data[columns].corr()
+
         # Generate a custom diverging colormap
         cmap = seaborn.diverging_palette(220, 10, as_cmap=True)
         # Draw the heatmap with the mask and correct aspect ratio
@@ -741,10 +761,11 @@ if __name__ == '__main__':
     seaborn.set_style('whitegrid')
 
     # Standard plots
-    data = get_data(100000, columns=['FastBDT', 'NeuroBayes', 'isSignal'])
+    N = 100000
+    data = get_data(N, columns=['FastBDT', 'NeuroBayes', 'isSignal'])
     data['type'] = ''
-    data.type.iloc[:50000] = 'Train'
-    data.type.iloc[50000:] = 'Test'
+    data.type.iloc[:N/2] = 'Train'
+    data.type.iloc[N/2:] = 'Test'
 
     p = Box()
     p.add(data, 'FastBDT')
@@ -797,7 +818,6 @@ if __name__ == '__main__':
     p.finish()
     p.save('correlation_plot.png')
 
-    """
     p = CorrelationMatrix()
     data['FastBDT2'] = data['FastBDT']**2
     data['NeuroBayes2'] = data['NeuroBayes']**2
@@ -806,4 +826,3 @@ if __name__ == '__main__':
     p.add(data, ['FastBDT', 'NeuroBayes', 'FastBDT2', 'NeuroBayes2', 'FastBDT3', 'NeuroBayes3'])
     p.finish()
     p.save('correlation_matrix.png')
-    """

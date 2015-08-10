@@ -945,8 +945,8 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
 
     o += b2latex.SubSection("Channels").finish()
     string = b2latex.String(r"In the reconstruction of {name} {nChannels} out of {max_nChannels} possible channels were used. "
-                            r"Therefore the covered branching fraction in percent is {covBR}, whereas {max_covBR} was the upper"
-                            r" limit.")
+                            r"Therefore the covered branching fraction in percent is {covBR:.3f}, whereas {max_covBR:.3f} "
+                            r"was the upper limit.")
 
     preCutDf = {}
     preCutCut = {}
@@ -971,7 +971,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     itemize = b2latex.Itemize()
     for channelName, s in zip(channelNames, signalProbabilities):
         niceDecayChannel = format.decayDescriptor(channelName)
-        s = r"{name} BR: {BR:.2f}".format(name=niceDecayChannel, BR=df[channelName])
+        s = r"{name} BR: {BR:.4f}".format(name=niceDecayChannel, BR=df[channelName])
         if s is None:
             itemize.add(s + ' \t was ignored')
         else:

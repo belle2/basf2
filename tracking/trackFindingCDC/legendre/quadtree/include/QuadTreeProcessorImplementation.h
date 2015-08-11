@@ -11,11 +11,7 @@
 
 #pragma once
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
 
 namespace Belle2 {
@@ -37,25 +33,7 @@ namespace Belle2 {
        * Do only insert the hit into a node if the slope and z information calculated from this hit belongs into this node
        */
       bool insertItemInNode(QuadTree* node, const CDCRecoHit3D* hit, unsigned int /*slope_index*/,
-                            unsigned int /*z0_index*/) const override final
-      {
-        float dist[2][2];
-
-        const float& radius = hit->getRecoPos2D().norm();
-        const float& reconstructedZ = hit->getRecoZ();
-
-        float inverseSlopeMin = node->getXMin();
-        float inverseSlopeMax = node->getXMax();
-        float zMin = node->getYMin();
-        float zMax = node->getYMax();
-
-        dist[0][0] = radius * inverseSlopeMin - reconstructedZ + zMin;
-        dist[0][1] = radius * inverseSlopeMin - reconstructedZ + zMax;
-        dist[1][0] = radius * inverseSlopeMax - reconstructedZ + zMin;
-        dist[1][1] = radius * inverseSlopeMax - reconstructedZ + zMax;
-
-        return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
-      }
+                            unsigned int /*z0_index*/) const override final;
     };
 
 
@@ -75,66 +53,7 @@ namespace Belle2 {
        * Also we can intersect the sinograms of the front and the back and get an intersection point, which should lay in the node also.
        */
       bool insertItemInNode(QuadTree* node, CDCRecoSegment2D* recoItem, unsigned int /*t_index*/,
-                            unsigned int /*r_index*/) const override final
-      {
-        float dist[2][2];
-
-        TrigonometricalLookupTable& lookupTable = TrigonometricalLookupTable::Instance();
-
-        float bin_width = TMath::Pi() / lookupTable.getNBinsTheta();
-
-        int thetaIndexMin = node->getXMin();
-        int thetaIndexMax = node->getXMax();
-        float rMin = node->getYMin();
-        float rMax = node->getYMax();
-
-        float thetaMin = thetaIndexMin * bin_width;
-        float thetaMax = thetaIndexMax * bin_width;
-
-        Vector2D conformalTransformFront = recoItem->front().getRecoPos2D().subtract(m_origin).conformalTransformed();
-        Vector2D conformalTransformBack = recoItem->back().getRecoPos2D().subtract(m_origin).conformalTransformed();
-
-        double thetaIntersection = std::atan2((conformalTransformBack - conformalTransformFront).x(),
-                                              (conformalTransformFront - conformalTransformBack).y());
-
-        while (thetaIntersection < 0) {
-          thetaIntersection += TMath::Pi();
-        }
-
-        if (thetaIntersection < thetaMin or thetaIntersection > thetaMax) {
-          return false;
-        }
-
-        Vector2D trigonometryMin(lookupTable.cosTheta(thetaIndexMin), lookupTable.sinTheta(thetaIndexMin));
-        Vector2D trigonometryMax(lookupTable.cosTheta(thetaIndexMax), lookupTable.sinTheta(thetaIndexMax));
-
-        float rHitFrontMin = conformalTransformFront.dot(trigonometryMin);
-        float rHitFrontMax = conformalTransformFront.dot(trigonometryMax);
-
-        dist[0][0] = rMin - rHitFrontMin;
-        dist[0][1] = rMin - rHitFrontMax;
-        dist[1][0] = rMax - rHitFrontMin;
-        dist[1][1] = rMax - rHitFrontMax;
-
-        if (FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
-          return false;
-        }
-
-        float rHitBackMin = conformalTransformBack.dot(trigonometryMin);
-        float rHitBackMax = conformalTransformBack.dot(trigonometryMax);
-
-        dist[0][0] = rMin - rHitBackMin;
-        dist[0][1] = rMin - rHitBackMax;
-        dist[1][0] = rMax - rHitBackMin;
-        dist[1][1] = rMax - rHitBackMax;
-
-        if (FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
-          return false;
-        }
-
-        return true;
-      }
-
+                            unsigned int /*r_index*/) const override final;
     private:
       Vector2D m_origin; /**< The origin of the conformal transformation */
     };

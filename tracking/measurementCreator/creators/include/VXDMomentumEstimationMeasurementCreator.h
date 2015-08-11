@@ -84,7 +84,7 @@ namespace Belle2 {
         rawHitCoordinates(0) = estimatedMomentum;
 
         TMatrixDSym rawHitCovariance(1);
-        rawHitCovariance(0, 0) = 5;
+        rawHitCovariance(0, 0) = 0.23;
 
         PlanarMomentumMeasurement* momentumMeasurement = new PlanarMomentumMeasurement(*planarMeasurement);
         momentumMeasurement->setRawHitCoords(rawHitCoordinates);

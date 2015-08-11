@@ -121,7 +121,14 @@ namespace Belle2 {
 
       const double distance_3D = (position_at_outer_radius - position_at_inner_radius).Mag();
 
-      return distance_3D;
+      if (std::isnan(distance_3D)) {
+        // This is not quete correct but we can not do better.
+        // If the distance_3D is nan, it means that the helix does not reach into the cluster. This is strange
+        // because the track is associated with the cluster (so it should normally reach it).
+        return thickness;
+      } else {
+        return distance_3D;
+      }
     }
 
   private:

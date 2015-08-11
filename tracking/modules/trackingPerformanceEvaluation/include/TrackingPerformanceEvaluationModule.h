@@ -93,7 +93,8 @@ namespace Belle2 {
 
 
     //list of functions to fill histograms
-    void fillTrackParams1DHistograms(const TrackFitResult* fitResult, MCParticleInfo mcParticleInfo); /**< fills err, resid and pull TH1F for each of the 5 track parameters*/
+    void fillTrackParams1DHistograms(const TrackFitResult* fitResult,
+                                     MCParticleInfo mcParticleInfo); /**< fills err, resid and pull TH1F for each of the 5 track parameters*/
 
     void fillTrackErrParams2DHistograms(const TrackFitResult* fitResult); /**< fills TH2F*/
 
@@ -195,8 +196,9 @@ namespace Belle2 {
     TH3F* m_h3_TracksPerMCTrackCand_minus;
 
     //histograms used for purity plots
-    TH1F* m_h1_HitsMCTrackCandPerTrackCand;
-    TH1F* m_h1_HitsTrackCand;
+    // -- Disabled as they are unused --
+    //TH1F* m_h1_HitsMCTrackCandPerTrackCand;
+    //TH1F* m_h1_HitsTrackCand;
 
     TH3F* m_h3_MCParticlesPerTrack;
     TH3F* m_h3_Tracks;

@@ -341,7 +341,8 @@ namespace Belle2 {
       float m_rlWeightGain = 0;
 
       /// Switch to also check for the maximum of the sinogram.
-      bool m_refined = false;
+      /// Disabled in the moment.
+      //bool m_refined = false;
 
       /// A displaced origin to search for off origin circles
       Vector2D m_localOrigin = Vector2D(0.0, 0.0);

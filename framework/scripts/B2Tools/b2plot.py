@@ -416,7 +416,7 @@ class Box(Plotter):
             mask = numpy.ones(len(data)).astype('bool')
         x = data.loc[mask, column].reset_index(drop=True)
         if weight_column is not None:
-            weight = data.loc[mask, column].reset_index(drop=True)
+            weight = data.loc[mask, weight_column].reset_index(drop=True)
             x = numpy.asarray(list(itertools.chain.from_iterable([i]*int(j) for i, j in zip(x, weight))))
 
         if len(x) == 0:

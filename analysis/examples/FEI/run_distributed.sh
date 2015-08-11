@@ -39,6 +39,23 @@ allMcFiles=(/hsm/belle2/bdata/MC/generic/{mixed,charged}/mcprod1405/BGx0/*_s{40.
 #allMcFiles=(/hsm/belle2/bdata/MC/generic/{mixed,charged}/mcprod1405/BGx1/*_s{0{0..9},{10..49}}/*.root)
 ################################################################################
 
+#Reducing the numberof jobs if necessary
+fileCount=0
+for mcFile in ${allMcFiles[@]}
+do
+  fileCount=$((fileCount + 1))
+done
+
+if [ $fileCount -lt $nJobs ]; then
+  echo "Less input files than number of jobs!"
+  echo "Reducing numberof jobs to fit amount of files..."
+  nJobs=$fileCount
+  echo "Working with " $nJobs " jobs."
+fi
+################################################################################
+
+
+
 
 
 source $BELLE2_LOCAL_DIR/analysis/examples/FEI/distributed_fei.sh

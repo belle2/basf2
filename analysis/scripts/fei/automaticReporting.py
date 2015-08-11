@@ -126,8 +126,8 @@ def loadHistsFromRootFile(filename):
     import root_numpy
     import ROOT
     f = ROOT.TFile(filename)
-    keys = [str(i.GetName()) for i in f.GetListOfKeys()]
-    root_hists = [f.Get(key) for key in keys]
+    keys_str = [str(i.GetName()) for i in f.GetListOfKeys()]
+    root_hists = [key.ReadObj() for key in f.GetListOfKeys()]
 
     # Convert hists to arrays dropping underflow and overflow bin
     patches = []
@@ -1128,12 +1128,12 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
 
             o += b2latex.String(r"PreCutHistos").finish()
             df = pandas.DataFrame()
-            df['signal'] = preCutDf[channelName]['Signal'].patch
-            df['signal_weight'] = preCutDf[channelName]['Signal'].array
-            df['all'] = preCutDf[channelName]['All'].patch
-            df['all_weight'] = preCutDf[channelName]['All'].array
-            df['ratio'] = preCutDf[channelName]['Ratio'].patch
-            df['ratio_weight'] = preCutDf[channelName]['Ratio'].array
+            df['signal'] = preCutDf[channelName]['Signal'].patch[1:-1]
+            df['signal_weight'] = preCutDf[channelName]['Signal'].array[1:-1]
+            df['all'] = preCutDf[channelName]['All'].patch[1:-1]
+            df['all_weight'] = preCutDf[channelName]['All'].array[1:-1]
+            df['ratio'] = preCutDf[channelName]['Ratio'].patch[1:-1]
+            df['ratio_weight'] = preCutDf[channelName]['Ratio'].array[1:-1]
 
             signalPlot = 'precut_signal_' + createUniqueFilename(raw_name, resource.hash)
             allPlot = 'precut_all_' + createUniqueFilename(raw_name, resource.hash)

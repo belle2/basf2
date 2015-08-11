@@ -600,6 +600,8 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
         plist = summary['list']
         if plist is None:
             continue
+        if plist not in stats:
+            continue
         trueCandidates = listCountsData[plist + '_Signal'].sum()
         allCandidates = listCountsData[plist + '_All'].sum()
         statTable.append([name, stats[plist].sum(), stats[plist], trueCandidates, allCandidates])

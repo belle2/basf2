@@ -180,6 +180,19 @@ def fullEventInterpretation(selection_path, particles):
     """
     args = getCommandLineOptions()
 
+    # Add user cut if specific training is used
+    if selection_path:
+        for particle in particles:
+            if particle.userCutConfig.userCut:
+                particle.userCutConfig.userCut = "[ " + particle.userCutConfig.userCut + "] and [ SpecificFEIUserCut == 1 ]"
+            else:
+                particle.userCutConfig.userCut = "[ SpecificFEIUserCut == 1 ]"
+            for channel in particle.channels:
+                if channel.userCutConfig.userCut:
+                    channel.userCutConfig.userCut = "[ " + channel.userCutConfig.userCut + "] and [ SpecificFEIUserCut == 1 ]"
+                else:
+                    channel.userCutConfig.userCut = "[ SpecificFEIUserCut == 1 ]"
+
     # Create a new directed acyclic graph
     dag = dagFramework.DAG()
 

@@ -14,6 +14,7 @@
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/core/InputController.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -150,6 +151,33 @@ namespace {
     }
 
 
+  }
+
+  class FEIVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreArray<Particle>::registerPersistent();
+      StoreArray<MCParticle>::registerPersistent();
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST(FEIVariableTest, Variable)
+  {
+    // TODO
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    specificFEIUserCut(&p);
+    specificFEIROESelection(&p);
   }
 
   TEST(VertexVariableTest, Variable)

@@ -39,6 +39,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/InputController.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <TLorentzVector.h>
@@ -527,6 +528,52 @@ namespace Belle2 {
           return 0;
       } else {
         return -1;
+      }
+    }
+
+    double specificFEIUserCut(const Particle* part)
+    {
+      StoreObjPtr<EventExtraInfo> eventExtraInfo;
+      if (not eventExtraInfo->hasExtraInfo("isSignalMC")) {
+        std::string filename = InputController::getCurrentFileName();
+        float value = (filename.find("signal") == std::string::npos) ? 0.0 : 1.0;
+        eventExtraInfo->addExtraInfo("isSignalMC", value);
+      }
+
+      double isSignalMC = eventExtraInfo->getExtraInfo("isSignalMC");
+      double isSignalCandidate = isSignalAcceptMissingNeutrino(part);
+      if (isSignalMC < 0.5 and isSignalCandidate < 0.5) {
+        // background candidate in non signal mc is used
+        return 1.0;
+      } else if (isSignalMC < 0.5 and isSignalCandidate > 0.5) {
+        // signal candidate in non signal mc is NOT used
+        return 0.0;
+      } else if (isSignalMC > 0.5 and isSignalCandidate < 0.5) {
+        // background candidate in signal mc is NOT used
+        return 0.0;
+      } else {
+        // signal candidate in signal mc is used
+        return 1.0;
+      }
+    }
+
+    double specificFEIROESelection(const Particle* part)
+    {
+      StoreObjPtr<EventExtraInfo> eventExtraInfo;
+      if (not eventExtraInfo->hasExtraInfo("isSignalMC")) {
+        std::string filename = InputController::getCurrentFileName();
+        float value = (filename.find("signal") == std::string::npos) ? 0.0 : 1.0;
+        eventExtraInfo->addExtraInfo("isSignalMC", value);
+      }
+
+      double isSignalMC = eventExtraInfo->getExtraInfo("isSignalMC");
+      double isSignalCandidate = isSignalAcceptMissingNeutrino(part);
+      if (isSignalMC > 0.5 and isSignalCandidate < 0.5) {
+        // incorrect signal-side in signal mc is NOT used
+        return 0.0;
+      } else {
+        // All other cases are used: generic mc, signal mc + correct signal-side
+        return 1.0;
       }
     }
 
@@ -1158,6 +1205,14 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle.")
+
+    VARIABLE_GROUP("Full Event Interpretation")
+    REGISTER_VARIABLE("SpecificFEIROESelection", specificFEIROESelection,
+                      "Returns 0 if candidate is not correctly reconstructed in a signal mc event, otherwise 0.\n"
+                      "Should only be used in the specific training mode of the FEI in the selection path before building the ROE of the signal-side candidates.");
+    REGISTER_VARIABLE("SpecificFEIUserCut", specificFEIUserCut,
+                      "Returns 1 if candidate is correctly reconstructed in a signal mc event, or candidate is not correctly reconstructed in other mc events. Otherwise 0.\n"
+                      "Should only be used in the specific training mode of the FEI as a user cut, to remove signal from generic mc and background from signal mc.");
 
     VARIABLE_GROUP("Event");
     REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");

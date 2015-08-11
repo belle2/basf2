@@ -280,8 +280,10 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
 
 class SeedsAnalyser(HarvestingModule):
 
-    def __init__(self, output_file_name, track_cands):
+    def __init__(self, output_file_name, track_cands, use_vxd_hits=True):
         HarvestingModule.__init__(self, foreach=track_cands, output_file_name=output_file_name)
+
+        self.use_vxd_hits = use_vxd_hits
 
     def peel(self, legendre_track_cand):
         if legendre_track_cand.getChargeSeed() > 0:
@@ -310,39 +312,52 @@ class SeedsAnalyser(HarvestingModule):
             mc_mom_y = np.NaN
             mc_mom_z = np.NaN
 
-        first_hit = legendre_track_cand.getHit(0)
-        if first_hit.getDetId() == Belle2.Const.PXD:
-            first_cluster = pxd_clusters[first_hit.getHitId()]
-            first_true_hit = first_cluster.getRelated("PXDTrueHits")
-        elif first_hit.getDetId() == Belle2.Const.SVD:
-            first_cluster = svd_clusters[first_hit.getHitId()]
-            first_true_hit = first_cluster.getRelated("SVDTrueHits")
+        return_dict = dict(
+            helix_z=helix.getZ0(),
+            helix_x=helix.getPerigeeX(),
+            helix_y=helix.getPerigeeY(),
+            helix_mom_z=helix.getMomentumZ(1.5),
+            helix_mom_x=helix.getMomentumX(1.5),
+            helix_mom_y=helix.getMomentumY(1.5),
+            mc_x=mc_x,
+            mc_y=mc_y,
+            mc_z=mc_z,
+            mc_mom_x=mc_mom_x,
+            mc_mom_y=mc_mom_y,
+            mc_mom_z=mc_mom_z)
 
-        vxdID = first_cluster.getSensorID()
-        sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-        first_momentum = sensorInfoBase.vectorToGlobal(first_true_hit.getMomentum())
+        if self.use_vxd_hits:
+            first_hit = legendre_track_cand.getHit(0)
+            if first_hit.getDetId() == Belle2.Const.PXD:
+                first_cluster = pxd_clusters[first_hit.getHitId()]
+                first_true_hit = first_cluster.getRelated("PXDTrueHits")
+            elif first_hit.getDetId() == Belle2.Const.SVD:
+                first_cluster = svd_clusters[first_hit.getHitId()]
+                first_true_hit = first_cluster.getRelated("SVDTrueHits")
 
-        last_hit = legendre_track_cand.getHit(-1)
-        if last_hit.getDetId() == Belle2.Const.PXD:
-            last_cluster = pxd_clusters[last_hit.getHitId()]
-            last_true_hit = last_cluster.getRelated("PXDTrueHits")
-        elif last_hit.getDetId() == Belle2.Const.SVD:
-            last_cluster = svd_clusters[last_hit.getHitId()]
-            last_true_hit = last_cluster.getRelated("SVDTrueHits")
+            vxdID = first_cluster.getSensorID()
+            sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
+            first_momentum = sensorInfoBase.vectorToGlobal(first_true_hit.getMomentum())
 
-        vxdID = first_cluster.getSensorID()
-        sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-        last_momentum = sensorInfoBase.vectorToGlobal(last_true_hit.getMomentum())
+            last_hit = legendre_track_cand.getHit(-1)
+            if last_hit.getDetId() == Belle2.Const.PXD:
+                last_cluster = pxd_clusters[last_hit.getHitId()]
+                last_true_hit = last_cluster.getRelated("PXDTrueHits")
+            elif last_hit.getDetId() == Belle2.Const.SVD:
+                last_cluster = svd_clusters[last_hit.getHitId()]
+                last_true_hit = last_cluster.getRelated("SVDTrueHits")
 
-        return dict(helix_z=helix.getZ0(), helix_x=helix.getPerigeeX(), helix_y=helix.getPerigeeY(),
-                    helix_mom_z=helix.getMomentumZ(1.5), helix_mom_x=helix.getMomentumX(1.5), helix_mom_y=helix.getMomentumY(1.5),
-                    first_hit_mom_x=first_momentum.X(),
-                    first_hit_mom_y=first_momentum.Y(),
-                    first_hit_mom_z=first_momentum.Z(),
-                    last_hit_mom_x=last_momentum.X(),
-                    last_hit_mom_y=last_momentum.Y(),
-                    last_hit_mom_z=last_momentum.Z(),
-                    mc_x=mc_x, mc_y=mc_y, mc_z=mc_z,
-                    mc_mom_x=mc_mom_x, mc_mom_y=mc_mom_y, mc_mom_z=mc_mom_z)
+            vxdID = first_cluster.getSensorID()
+            sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
+            last_momentum = sensorInfoBase.vectorToGlobal(last_true_hit.getMomentum())
+
+            return_dict.update(dict(first_hit_mom_x=first_momentum.X(),
+                                    first_hit_mom_y=first_momentum.Y(),
+                                    first_hit_mom_z=first_momentum.Z(),
+                                    last_hit_mom_x=last_momentum.X(),
+                                    last_hit_mom_y=last_momentum.Y(),
+                                    last_hit_mom_z=last_momentum.Z()))
+
+        return return_dict
 
     save_tree = refiners.SaveTreeRefiner()

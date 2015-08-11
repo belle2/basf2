@@ -115,12 +115,15 @@ namespace Belle2 {
 
       const TVector3& momentum = recoTrack.getMomentum();
       const TVector3& position = recoTrack.getPosition();
-      short charge = recoTrack.getCharge();
+      const short charge = recoTrack.getCharge();
 
-      if (momentum.Mag() < m_minimumMomentum) {
+      const double estimation = momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters,
+                                                                  m_correctionFitParameters);
+
+      if (momentum.Mag() > m_minimumMomentum or charge / estimation > 1.5 * m_minimumMomentum) {
         return std::nan("");
       } else {
-        return momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters, m_correctionFitParameters);
+        return estimation;
       }
     }
 
@@ -136,12 +139,15 @@ namespace Belle2 {
 
       const TVector3& momentum = relatedMCParticle->getMomentum();
       const TVector3& position = relatedMCParticle->getProductionVertex();
-      short charge = relatedMCParticle->getCharge();
+      const short charge = relatedMCParticle->getCharge();
 
-      if (momentum.Mag() < m_minimumMomentum) {
+      const double estimation = momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters,
+                                                                  m_correctionFitParameters);
+
+      if (momentum.Mag() > m_minimumMomentum or charge / estimation > 1.5 * m_minimumMomentum) {
         return std::nan("");
       } else {
-        return momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters, m_correctionFitParameters);
+        return estimation;
       }
     }
 
@@ -151,12 +157,14 @@ namespace Belle2 {
       const VXDMomentumEstimation<HitType>& momentumEstimation = VXDMomentumEstimation<HitType>::getInstance();
 
       const TVector3& momentum = recoTrack.getMomentum();
-      short charge = recoTrack.getCharge();
+      const short charge = recoTrack.getCharge();
 
-      if (momentum.Mag() < m_minimumMomentum) {
+      const double estimation = momentumEstimation.estimateQOverPWithThickness(*hit, charge, m_fitParameters, m_correctionFitParameters);
+
+      if (momentum.Mag() > m_minimumMomentum or charge / estimation > 1.5 * m_minimumMomentum) {
         return std::nan("");
       } else {
-        return momentumEstimation.estimateQOverPWithThickness(*hit, charge, m_fitParameters, m_correctionFitParameters);
+        return estimation;
       }
     }
   };

@@ -19,7 +19,7 @@ namespace Belle2 {
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>> {
 
   public:
-    SVDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+    explicit SVDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>>(),
           m_measurementFactory(measurementFactory) {}
 

@@ -15,7 +15,7 @@ namespace Belle2 {
   template <class HitType, Const::EDetector detector>
   class CoordinateMeasurementCreator : public BaseMeasurementCreatorFromHit<HitType, detector> {
   public:
-    CoordinateMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+    explicit CoordinateMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreatorFromHit<HitType, detector>(measurementFactory) {}
 
     /** Create measurements based on coordinate measurements */

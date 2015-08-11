@@ -27,7 +27,7 @@ namespace Belle2 {
   class PlanarMomentumMeasurement : public genfit::PlanarMeasurement {
 
   public:
-    PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement) : genfit::PlanarMeasurement(parentElement)
+    explicit PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement) : genfit::PlanarMeasurement(parentElement)
     {
       rawHitCoords_.ResizeTo(1);
       rawHitCov_.ResizeTo(1, 1);

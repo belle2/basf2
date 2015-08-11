@@ -61,7 +61,7 @@ namespace Belle2 {
 
     public:
 
-      QuadTreeProcessor(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
+      explicit QuadTreeProcessor(unsigned char lastLevel) : m_lastLevel(lastLevel) {}
 
       // version with a threshold on r
       void fillGivenTree(QuadTreeLegendre* node, QuadTreeLegendre::CandidateProcessorLambda& lmdProcessor,

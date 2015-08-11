@@ -83,7 +83,7 @@ namespace Belle2 {
        *  Note to get n bins you have to give  nPositions = nBins + 1 in this constructor
        *  Hence for a typical use case in a hough grid nPositions should be 2^(levels) + 1.
        */
-      DiscreteAngleArray(size_t nPositions) : DiscreteAngleArray(-PI, PI, nPositions)
+      explicit DiscreteAngleArray(size_t nPositions) : DiscreteAngleArray(-PI, PI, nPositions)
       {;}
 
     public:

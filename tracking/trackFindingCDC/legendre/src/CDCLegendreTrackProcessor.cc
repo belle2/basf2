@@ -67,7 +67,7 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
   tracks.clear();
 
-  if (m_trackList.size() == 0) return;
+  if (m_trackList.empty()) return;
   tracks.reserve(m_trackList.size());
 
   for (TrackCandidate* trackCand : m_trackList) {

@@ -18,7 +18,7 @@ namespace Belle2 {
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>> {
 
   public:
-    CDCMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+    explicit CDCMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>>(),
           m_measurementFactory(measurementFactory) {}
 

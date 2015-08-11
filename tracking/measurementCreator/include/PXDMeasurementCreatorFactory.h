@@ -19,7 +19,7 @@ namespace Belle2 {
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>> {
 
   public:
-    PXDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+    explicit PXDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>>(),
           m_measurementFactory(measurementFactory) {}
 

@@ -26,7 +26,7 @@ namespace Belle2 {
   class BaseMeasurementCreatorFromHit : public BaseMeasurementCreator {
   public:
     /** Creates a MeasurementCreator which handles the creation of measurements of a given kind **/
-    BaseMeasurementCreatorFromHit(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+    explicit BaseMeasurementCreatorFromHit(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreator(), m_measurementFactory(measurementFactory) {}
 
     /** Destructor **/

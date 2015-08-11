@@ -48,10 +48,21 @@ class RootReader():
     """ An interator class to read out root files in chunks of data. See read_root for usage"""
 
     def __init__(self, filename, tree, branches, chunksize):
+        """ Construcor with the filename, the tree and the branches (for reference) and the chunksize """
+
+        #: Filename of the root file to handle
         self.filename = filename
+
+        #: Treename of the root TTree to handle
         self.tree = tree
+
+        #: List of branches to handle
         self.branches = branches
+
+        #: Chunksize (in lines) each chunk of retuned data should have
         self.chunksize = chunksize
+
+        #: Counter for the current chunk
         self.current_chunk = 0
 
     def __iter__(self):

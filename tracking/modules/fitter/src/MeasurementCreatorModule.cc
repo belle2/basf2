@@ -5,6 +5,7 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
+#include <framework/gearbox/Const.h>
 
 
 #include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>

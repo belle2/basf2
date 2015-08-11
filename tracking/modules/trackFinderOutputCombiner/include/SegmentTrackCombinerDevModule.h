@@ -49,7 +49,7 @@ namespace Belle2 {
     /// Initialize the Module before event processing
     virtual void initialize() override;
 
-    /// Event method exectured for each event.
+    /// Event method executed for each event.
     virtual void event() override;
 
   private:

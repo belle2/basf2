@@ -15,7 +15,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasurementFactory.h>
-#include <framework/gearbox/Const.h>
 #include <framework/core/Module.h>
 #include <string>
 
@@ -32,22 +31,28 @@ namespace Belle2 {
 
 
   /**
-   * If you want to provide another measurement type to the tracks, use the add*Measurement functions for that.
+   * If you want to provide another measurement type to the tracks, use the parameter used*Creators for that.
+   * You have to implement a BaseMeasurementCreatorFromHit derived class for that and add it to the *MeasurementCreatorFactory.
+   * Then you can choose it and its parameters from a steering file.
+   *
+   * TODO: Implement the possibility to add measurements without an underlaying hit!
    */
   class MeasurementCreatorModule : public Module {
 
   public:
-    /** Constructor .
+    /**
+     * Constructor .
      */
     MeasurementCreatorModule();
 
-    /** Initialize the Module.
-     * This method is called only once before the actual event processing starts.
+    /**
+     * Initialize the Module.
+     * Setup the used measurement creators from the factories.
      */
     void initialize() override;
 
-    /** This method is the core of the module.
-     * This method is called for each event. All processing of the event has to take place in this method.
+    /**
+     * Add the measurements to the factories.
      */
     void event() override;
 

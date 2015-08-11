@@ -23,7 +23,7 @@ namespace Belle2 {
       MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>>(),
           m_measurementFactory(measurementFactory) {}
 
-    /** Only a simple reco hit creator is implemented in the moment */
+    /** Only a simple reco hit creator and the momentum estimation is implemented in the moment */
     BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>* createMeasurementCreatorFromName(
       const std::string& creatorName) const
     {

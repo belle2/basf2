@@ -33,12 +33,14 @@ namespace Belle2 {
     VXDMomentumEstimationTools& operator = (const VXDMomentumEstimationTools&);
 
   public:
+    /** Us this class as singleton */
     static const VXDMomentumEstimationTools& getInstance()
     {
       static VXDMomentumEstimationTools instance;
       return instance;
     }
 
+    /** Main function: return dEdX for a cluster and the given momentum, position and charge seeds */
     double getDEDX(const ClusterType& cluster, const TVector3& momentum, const TVector3& position, short charge) const
     {
 
@@ -49,6 +51,7 @@ namespace Belle2 {
       return calibratedCharge / pathLength;
     }
 
+    /** Return dEdX but not with dX = path length but with dX = thickness of cluster */
     double getDEDXWithThickness(const ClusterType& cluster) const
     {
       const double calibratedCharge = getCalibratedCharge(cluster);
@@ -57,6 +60,7 @@ namespace Belle2 {
       return calibratedCharge / pathLength;
     }
 
+    /** Return the thickness of a cluster */
     double getThicknessOfCluster(const ClusterType& cluster) const
     {
       const VxdID&   vxdID = cluster.getSensorID();
@@ -64,6 +68,7 @@ namespace Belle2 {
       return sensorInfoBase.getThickness() / 100;
     }
 
+    /** Returns the distance from the interaction point to the cluster in the r-phi-plane */
     double getRadiusOfCluster(const ClusterType& cluster) const
     {
       const SpacePoint* spacePoint = cluster.template getRelated<SpacePoint>("SpacePoints");
@@ -79,6 +84,9 @@ namespace Belle2 {
       return radius / 100;
     }
 
+    /** Return the charge of the cluster (in ADC count) calibrated with a factor of ~0.6 for pxd hits.
+     * This factor can be seen in data (and is calculated from that) and has probably something to do with
+     * the different readout of the hit types. */
     double getCalibratedCharge(const ClusterType& cluster) const
     {
       const double charge = cluster.getCharge();
@@ -87,26 +95,18 @@ namespace Belle2 {
       return calibration * charge;
     }
 
-    TVector3 getMomentumOfMCParticle(const SVDCluster& cluster) const
+    /** Return the momentum of the simulated MCParticle at this cluster (by using the TrueHit associated with this cluster)
+     * This method is implemented for the two cluster types differently below. */
+    TVector3 getMomentumOfMCParticle(const ClusterType&) const
     {
-      SVDTrueHit* trueHit = cluster.template getRelated<SVDTrueHit>("SVDTrueHits");
-      const VxdID& vxdID = cluster.getSensorID();
-      const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-      const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum());
-
-      return momentum;
+      B2FATAL("Can not deal with this cluster type!")
+      return TVector3();
     }
 
-    TVector3 getMomentumOfMCParticle(const PXDCluster& cluster) const
-    {
-      PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
-      const VxdID& vxdID = cluster.getSensorID();
-      const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-      const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum());
-
-      return momentum;
-    }
-
+    /** Return the path length of a particle with the given helix that goes through the cluster.
+     * If the helix does not pass the cluster, return the thickness of the cluster instead.
+     * It is assumed that the cluster is passed from bottom to top and not transverse or something.
+     */
     double getPathLength(const ClusterType& cluster, const Helix& trajectory) const
     {
 
@@ -132,17 +132,44 @@ namespace Belle2 {
     }
 
   private:
+    /** the layer positions in the case we do not have a SpacePoint we can look at */
     double m_layerPositions[6];
 
+    /** For SVD the calibration is 1, for PXD (see below) it is ~0.6 */
     double getCalibration() const
     {
       return 1;
     }
   };
 
+  /** We only need a calibration for the PXD Clusters */
   template<>
   double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const
   {
     return 0.653382;
+  }
+
+  /** We have to hanlde PXD and SVD differently here */
+  template <>
+  TVector3 VXDMomentumEstimationTools<PXDCluster>::getMomentumOfMCParticle(const PXDCluster& cluster) const
+  {
+    PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
+    const VxdID& vxdID = cluster.getSensorID();
+    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum());
+
+    return momentum;
+  }
+
+  /** We have to hanlde PXD and SVD differently here */
+  template <>
+  TVector3 VXDMomentumEstimationTools<SVDCluster>::getMomentumOfMCParticle(const SVDCluster& cluster) const
+  {
+    SVDTrueHit* trueHit = cluster.getRelated<SVDTrueHit>("SVDTrueHits");
+    const VxdID& vxdID = cluster.getSensorID();
+    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum());
+
+    return momentum;
   }
 }

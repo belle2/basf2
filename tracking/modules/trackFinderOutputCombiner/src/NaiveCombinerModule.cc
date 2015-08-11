@@ -20,7 +20,8 @@ REG_MODULE(NaiveCombiner);
 
 NaiveCombinerModule::NaiveCombinerModule() : TrackFinderCDCFromSegmentsModule()
 {
-  setDescription("Tries to combine the two outputs of two implementations of the track finder algorithm.");
+  setDescription("Tries to combine the two outputs of two implementations of the track finder algorithm."
+                 "Does so by just throwing everything together in one list (naive approach) or by using mc info (best approach)");
 
   addParam("UseMCInformation",
            m_param_useMCInformation,

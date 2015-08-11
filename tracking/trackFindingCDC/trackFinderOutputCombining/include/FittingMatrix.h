@@ -23,6 +23,11 @@ namespace Belle2 {
     class CDCRecoSegment2D;
     class CDCTrack;
 
+    /**
+     * This class has some functions to merge tracks from the legendre
+     * and the automaon track finder by using their fit information.
+     * It is used in the NotAssignedHitsCombinerModule.
+     */
     class FittingMatrix {
 
     public:

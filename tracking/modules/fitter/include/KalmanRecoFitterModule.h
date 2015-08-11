@@ -19,6 +19,10 @@ namespace Belle2 {
     /** Module for the Kalman Fitter */
     KalmanRecoFitterModule() : BaseRecoFitterModule()
     {
+      setDescription("Kalman Fitter using Genfit. If you have TrackCands, you have to convert them to RecoTracks"
+                     "using the RecoTrackCreatorModule first. After that, you probably want to add the measurements from the"
+                     "hits using the MeasurementCreatorModule.");
+
       addParam("MinimumIterations", m_param_minimumIterations,
                "Minimum number of iterations for the Kalman filter", static_cast<unsigned int>(3));
       addParam("MaximumIterations", m_param_maximumIterations,

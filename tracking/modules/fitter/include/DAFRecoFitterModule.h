@@ -19,6 +19,10 @@ namespace Belle2 {
     /** Module for the DAF fitter */
     DAFRecoFitterModule() : BaseRecoFitterModule()
     {
+      setDescription("DAF Fitter using Genfit. If you have TrackCands, you have to convert them to RecoTracks"
+                     "using the RecoTrackCreatorModule first. After that, you probably want to add the measurements from the"
+                     "hits using the MeasurementCreatorModule.");
+
       addParam("ProbCut", m_param_probabilityCut,
                "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
                double(0.001));

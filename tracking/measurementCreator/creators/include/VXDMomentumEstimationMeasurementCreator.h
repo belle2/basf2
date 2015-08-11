@@ -24,6 +24,7 @@ namespace Belle2 {
 
     virtual ~VXDMomentumEstimationMeasurementCreator() { }
 
+    /** Set the parameters of the fit functions and whether to use the thickness or not or the tracking seeds or not */
     void setParameter(const std::string& parameterName, const std::string& parameterValue) override
     {
       if (parameterName == "MinimumMomentum") {
@@ -96,10 +97,15 @@ namespace Belle2 {
     }
 
   private:
+    /** Parameters for the main function */
     typename VXDMomentumEstimation<HitType>::FitParameters m_fitParameters;
+    /** Parameters for the correction function. Set them to zero to not use a correction function */
     typename VXDMomentumEstimation<HitType>::CorrectionFitParameters m_correctionFitParameters;
+    /** Use the seeds of the track finder or the seeds of the MC particles */
     bool m_useTrackFinderSeeds = true;
+    /** Use the thickness of the clusters of the path length for estimating dX */
     bool m_useThickness = false;
+    /** Minimal value for the momentum below the estimation is used */
     double m_minimumMomentum;
 
     /** Use the seeds from the track finder to estimate the momentum from dedx */

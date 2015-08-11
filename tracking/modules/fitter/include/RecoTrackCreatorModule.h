@@ -20,23 +20,11 @@ namespace Belle2 {
     /** Initilialize the module parameters */
     RecoTrackCreatorModule();
 
-    /** Empty destructor */
-    ~RecoTrackCreatorModule() { }
-
     /** Initialize the needed StoreArrays and ensure they are created properly */
     void initialize() override;
 
-    /** We do not need a beginRun. */
-    void beginRun() override { }
-
     /** Loop over all track candidates and create a recotrack. */
     void event() override;
-
-    /** We do not need a endRun. */
-    void endRun() override { }
-
-    /** We do not need a terminate */
-    void terminate() override { }
 
   private:
     std::string m_param_trackCandidatesStoreArrayName; /**< StoreArray name of the input track candidates. */

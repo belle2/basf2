@@ -25,34 +25,20 @@ namespace Belle2 {
   class TrackBuilderFromRecoTracksModule : public Module {
 
   public:
-    /** Constructor .
+    /** Constructor.
      */
     TrackBuilderFromRecoTracksModule();
 
-    /** Empty destructor. */
-    ~TrackBuilderFromRecoTracksModule() { }
-
-    /** Initialize the Module.
-     * This method is called only once before the actual event processing starts.
+    /**
+     * Initialize the needed StoreArrays.
      */
     void initialize() override;
 
-    /** Called when entering a new run.
-     */
-    void beginRun() override { }
 
-    /** This method is the core of the module.
-     * This method is called for each event. All processing of the event has to take place in this method.
+    /**
+     * Convert the RecoTracks to Belle2::Tracks.
      */
     void event() override;
-
-    /** This method is called if the current run ends.
-     */
-    void endRun() override { }
-
-    /** This method is called at the end of the event processing.
-     */
-    void terminate() override { }
 
   private:
     std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input reco tracks */

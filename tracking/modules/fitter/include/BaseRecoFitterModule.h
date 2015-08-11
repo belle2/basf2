@@ -24,34 +24,25 @@ namespace Belle2 {
   class BaseRecoFitterModule : public Module {
 
   public:
-    /** Constructor .
+    /**
+     * Constructor .
      */
     BaseRecoFitterModule();
 
-    /** Initialize the Module.
-     * This method is called only once before the actual event processing starts.
+    /**
+     * Initialize the store ararys and check for the material effects.
      */
     void initialize() override;
 
-    /** Called when entering a new run.
-     */
-    void beginRun() override { }
-
-    /** This method is the core of the module.
-     * This method is called for each event. All processing of the event has to take place in this method.
+    /**
+     * Do the fitting using the created fitter
      */
     void event() override;
 
-    /** This method is called if the current run ends.
-     */
-    void endRun() override { }
-
-    /** This method is called at the end of the event processing.
-     */
-    void terminate() override { }
 
   protected:
-    /** Method do create the used filter
+    /**
+     * Method do create the used filter
      * This method has to by implemented by the derived class
      * @return The fitter we will use for fitting.
      */

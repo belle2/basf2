@@ -16,6 +16,16 @@
 #include <memory>
 
 namespace Belle2 {
+
+  /**
+   * This is the base class for all MeasurementCreatorFactories used in the MeasurementCreatorModule.
+   * It knows about all MeasurementCreators for a given HitType and can setup the creators from the
+   * module parameters.
+   * You have to implement the createMeasurementCreatorFromName function - all other functions
+   * are already implemented in this base class.
+   * See for example the CDCMeasurementCreatorFactory for an example.
+   */
+
   template <class BaseMeasurementCreatorType>
   class MeasurementCreatorFactory {
   public:
@@ -32,7 +42,7 @@ namespace Belle2 {
         const std::string& creatorName = creatorWithParameterDictionary.first;
         const std::map<std::string, std::string>& parameterDictionary = creatorWithParameterDictionary.second;
 
-        B2INFO("Creating measurement creator with name " << creatorName);
+        B2DEBUG(100, "Creating measurement creator with name " << creatorName);
 
         BaseMeasurementCreatorType* creatorPointer = createMeasurementCreatorFromName(creatorName);
         if (creatorPointer == nullptr) {
@@ -51,12 +61,13 @@ namespace Belle2 {
     /** Overload this method to create the measurement creators by their name */
     virtual BaseMeasurementCreatorType* createMeasurementCreatorFromName(const std::string& creatorName) const = 0;
 
-    /** Return the creators to tht module */
+    /** Return the creators to the module */
     const std::vector<std::unique_ptr<BaseMeasurementCreatorType>>& getCreators() const
     {
       return m_measurementCreators;
     }
 
+    /** Return a reference to the parameters you can use in the module */
     std::map<std::string, std::map<std::string, std::string>>& getParameters()
     {
       return m_creatorsWithParametersDictionary;
@@ -66,7 +77,7 @@ namespace Belle2 {
     /** A vector with the measurement creators. Is filled in initialize */
     std::vector<std::unique_ptr<BaseMeasurementCreatorType>> m_measurementCreators;
 
-    /** The map of dictionaries of the parameters */
+    /** The map of dictionaries of the parameters. Fill it with the module parameters. */
     std::map<std::string, std::map<std::string, std::string>> m_creatorsWithParametersDictionary;
   };
 }

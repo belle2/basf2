@@ -138,7 +138,7 @@ def loadHistsFromRootFile(filename):
 
     # Put arrays and patches into own Hist class to simplify usage
     binnedDataList = [BinnedData(array, patch) for array, patch in zip(arrays, patches)]
-    return dict(zip(keys, binnedDataList))
+    return dict(zip(keys_str, binnedDataList))
 
 
 def loadMCCountsDictionary(filename):

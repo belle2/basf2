@@ -31,7 +31,7 @@ param_conditionsdb = {'experimentName': '0',
                       }
 conditionsdb.param(param_conditionsdb)
 
-# load parameters from xml files - available at https://belle2.cc.kek.jp/browse/viewvc.cgi/svn/groups/arich/dbdata
+# load parameters from xml files - available at https://belle2.cc.kek.jp/browse/viewvc.cgi/svn/groups/arich/database/data/aerogel
 paramloader = register_module('Gearbox')
 xmlfile = 'file://%s/arich/dbdata/AerogelData.xml' % (os.getcwd())
 paramloader.param('fileName', xmlfile)

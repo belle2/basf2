@@ -78,7 +78,6 @@ void MisalignmentGeneratorModule::initialize()
       if (idMask.getLadderNumber() && id.getLadderNumber() != idMask.getLadderNumber()) continue;
       if (idMask.getSensorNumber() && id.getSensorNumber() != idMask.getSensorNumber()) continue;
 
-      if (distro == "fix") value = value;
       if (distro == "gaus") value = gRandom->Gaus(0., value);
 
       data.set(id, paramID, value);

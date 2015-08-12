@@ -213,9 +213,9 @@ void SGCosmic::mkdist_v1(const int charge, double* parameters)
 {
   double rand1;
   double rand2;
-  int success;
 
   for (int i = 0; i < 5; i++) {
+    int success;
     success = 0;
     do {
       rand1 = gRandom->Uniform(0., 1.);
@@ -598,9 +598,9 @@ void SGCosmic::mkdist_v2(const int charge, double* parameters)
 {
   double rand1;
   double rand2;
-  int success;
 
   for (int i = 0; i < 5; i++) {
+    int success;
     success = 0;
     do {
       rand1 = gRandom->Uniform(0., 1.);

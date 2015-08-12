@@ -207,6 +207,9 @@ class Plotter(object):
         self.xmax *= 1.0 + math.copysign(self.xscale, self.xmax)
         return self
 
+# trying to get doxygen to shut up
+# \{
+
 
 class PurityOverEfficiency(Plotter):
     """
@@ -835,3 +838,5 @@ if __name__ == '__main__':
     p.add(data, ['FastBDT', 'NeuroBayes', 'FastBDT2', 'NeuroBayes2', 'FastBDT3', 'NeuroBayes3'])
     p.finish()
     p.save('correlation_matrix.png')
+
+# \}

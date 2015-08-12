@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = [ 'framework', 'genfit2', 'calibration', '$ROOT_LIBS', 'alignment', 'vxd']
+env['LIBS'] = [ 'framework', '$ROOT_LIBS', 'alignment', 'vxd', 'vxd_dataobjects']
 
 
 Return('env')

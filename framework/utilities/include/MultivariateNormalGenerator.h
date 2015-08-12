@@ -108,7 +108,7 @@ namespace Belle2 {
      * size() elements of the TVector3 are set and the remaining elements are
      * zero. If size() is bigger than 3 the remaining values will be discarded.
      */
-    TVector3 generateVec3()
+    TVector3 generateVec3() const
     {
       Eigen::VectorXd x = generate();
       TVector3 output(0, 0, 0);
@@ -121,7 +121,7 @@ namespace Belle2 {
     /** Generate a set of correlated random numbers with the previouly set
      * mean and covariance and return a TVectorT<double>
      */
-    TVectorD generateVecT()
+    TVectorD generateVecT() const
     {
       Eigen::VectorXd x = generate();
       TVectorD output(x.rows());

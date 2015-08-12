@@ -316,6 +316,10 @@ void AAFHInterface::generateEvent(MCParticleGraph& mpg)
 void AAFHInterface::finish()
 {
   aafhdiag36_finish_();
+  // The following code just prints the results. If B2RESULT has been compiled
+  // out this is unneccesary and cppcheck complains so we enclose this in an
+  // ifdef to only be executed if B2RESULT might actually be shown
+#ifndef LOG_NO_B2RESULT
   B2RESULT("AAFH Generation finished.");
   B2RESULT("Final cross section:         "
            << std::setprecision(3) << output_.crosec << "+-"
@@ -380,4 +384,5 @@ void AAFHInterface::finish()
            << std::setprecision(3) << idealWBP[1] << ", "
            << std::setprecision(3) << idealWBP[2] << ", "
            << std::setprecision(3) << idealWBP[3] << "],");
+#endif
 }

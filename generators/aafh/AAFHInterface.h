@@ -49,6 +49,8 @@ namespace Belle2 {
       c_Twice = 2,
     };
 
+    /** Default Constructor */
+    AAFHInterface() = default;
     /** Set the maximum number of tries to generate an event */
     void setMaxTries(int tries);
     /** Set the relative weights for the sub generators */

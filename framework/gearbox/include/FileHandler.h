@@ -70,7 +70,7 @@ namespace Belle2 {
        * If uri is empty, the default data search path will be used.
        * @param uri * path to search files in
        */
-      FileHandler(const std::string& uri);
+      explicit FileHandler(const std::string& uri);
       /** empty, virtual destructor */
       virtual ~FileHandler() {}
       /** create a new FileContext by searching the file system for a file

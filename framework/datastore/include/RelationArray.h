@@ -104,7 +104,7 @@ namespace Belle2 {
     public:
 
       /** Set reference to used replacement map */
-      ReplaceMap(MapType& replace): m_replace(replace) {}
+      explicit ReplaceMap(MapType& replace): m_replace(replace) {}
 
       /** Take old index and return the new index */
       consolidation_type operator()(index_type old) const
@@ -132,7 +132,7 @@ namespace Belle2 {
     public:
 
       /** Set reference to used replacement vector */
-      ReplaceVec(VecType& replace): m_replace(replace) {}
+      explicit ReplaceVec(VecType& replace): m_replace(replace) {}
 
       /** Take old index and return the new index */
       consolidation_type operator()(index_type old) const { return m_replace[old];  }

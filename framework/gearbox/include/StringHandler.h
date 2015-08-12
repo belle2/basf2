@@ -20,7 +20,7 @@ namespace Belle2 {
     class StringContext: public InputContext {
     public:
       /** Take an XML fragment as parameter and create a context for it */
-      StringContext(const std::string& data): m_stream(data) {};
+      explicit StringContext(const std::string& data): m_stream(data) {};
       /** Return a block of the data */
       virtual int readXmlData(char* buffer, int buffsize)
       {
@@ -41,7 +41,7 @@ namespace Belle2 {
     class StringHandler: public InputHandler {
     public:
       /** Create a new InputHandler which always returns uri as XML content */
-      StringHandler(const std::string& uri): InputHandler(uri) {}
+      explicit StringHandler(const std::string& uri): InputHandler(uri) {}
       /** empty, virtual destructor */
       virtual ~StringHandler() {}
       /** Create a new context, path will be ignored */

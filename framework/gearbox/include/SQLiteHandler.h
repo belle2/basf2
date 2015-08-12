@@ -25,7 +25,7 @@ namespace Belle2 {
       /**
        * Create a new context from an (already executed) sqlite3 statement
        * Statement is owned by SQLiteHandler and will only be used*/
-      SQLiteContext(sqlite3_stmt* m_statement);
+      explicit SQLiteContext(sqlite3_stmt* m_statement);
       /** Reset the statement to be ready for execution again */
       virtual ~SQLiteContext();
       /** Read a block of data */
@@ -51,7 +51,7 @@ namespace Belle2 {
        * Create a new SQLiteHandler opening a given database file
        * @param uri name of the database file
        */
-      SQLiteHandler(const std::string& uri);
+      explicit SQLiteHandler(const std::string& uri);
       /** Close database connection */
       ~SQLiteHandler();
       /**

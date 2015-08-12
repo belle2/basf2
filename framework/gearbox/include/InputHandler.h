@@ -59,7 +59,7 @@ namespace Belle2 {
        * base directory, a database host, an archive filename or any combination.
        * Parsing of this string is left to the actual implementation
        */
-      InputHandler(const std::string& uri): m_uri(uri) {};
+      explicit InputHandler(const std::string& uri): m_uri(uri) {};
 
       /** empty, virtual destructor */
       virtual ~InputHandler() {}

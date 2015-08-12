@@ -40,7 +40,7 @@ PedeSteeringCreatorModule::PedeSteeringCreatorModule() : Module()
   setDescription("Create PedeSteering to configure Millepede");
 
   // Parameter definitions
-  addParam("name", m_name, "Name of the persistent PedeSteering StoreObjPtr to be created", std::string("pede_steering"));
+  addParam("name", m_name, "Name of the persistent PedeSteering StoreObjPtr to be created", std::string("PedeSteering"));
   addParam("commands", m_commands, "List of plain Pede commands", commands);
   addParam("parameters", m_parameters, "List of 'layer.ladder.sensor.param:value,presigma' (ints) to be set/fixed(presigma<0)",
            parameters);

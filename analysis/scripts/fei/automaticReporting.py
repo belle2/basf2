@@ -105,15 +105,22 @@ def read_root_scaled(filename, tree_key, limit_average):
     tfile = ROOT.TFile(filename)
     tree = tfile.Get(tree_key)
     nEntries = tree.GetEntries()
+    dataframe = pandas.DataFrame()
+
+    if nEntries == 0:
+        B2WARNING("Tree used by read_root_scaled is empty")
+        return dataframe, 1.0
 
     percentage = limit_average / float(nEntries)
     if percentage > 1.0:
         return read_root(filename, tree_key=tree_key), 1.0
 
-    dataframe = pandas.DataFrame()
     for df in read_root(filename, tree_key=tree_key, chunksize=limit_average):
         dataframe = dataframe.append(df.sample(frac=percentage))
 
+    if len(dataframe) == 0:
+        B2WARNING("Dataframe returned by read_root_scaled is empty")
+        return dataframe, 1.0
     return dataframe, float(nEntries) / len(dataframe)
 
 
@@ -901,6 +908,8 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
     if plotConfig.Diagonal:
         o += createDiagonalPlot(createUniqueFilename(raw_name, resource.hash), nTupleData, mvaConfig)
 
+    del nTupleData
+
     o += b2latex.SubSection("MVA").finish()
     o += createTMVASection(createUniqueFilename(raw_name, resource.hash), tmvaTraining, mvaConfig, plotConfig)
 
@@ -1116,6 +1125,8 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
 
     if plotConfig.Diagonal:
         o += createDiagonalPlot(createUniqueFilename(raw_name, resource.hash), nTupleData, mvaConfig)
+
+    del nTupleData
 
     channels = []
     for i, channelName in enumerate(channelNames):

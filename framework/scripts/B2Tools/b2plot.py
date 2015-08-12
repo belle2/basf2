@@ -417,7 +417,7 @@ class Box(Plotter):
         x = data.loc[mask, column].reset_index(drop=True)
         if weight_column is not None:
             weight = data.loc[mask, weight_column].reset_index(drop=True)
-            x = numpy.asarray(list(itertools.chain.from_iterable([i]*int(j) for i, j in zip(x, weight))))
+            B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
 
         if len(x) == 0:
             B2WARNING("Ignore empty boxplot.")
@@ -428,6 +428,8 @@ class Box(Plotter):
                               # medianprobs=dict(color='blue'),
                               # meanprobs=dict(color='red'),
                               )
+        self.plots.append(p)
+        self.labels.append(column)
         """
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
@@ -437,8 +439,6 @@ class Box(Plotter):
         self.axis.text(0.7, 0.9, (r'$min = {:.2f}$' + '\n' + r'$max = {:.2f}$').format(x.min(), x.max()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
         """
-        self.plots.append(p)
-        self.labels.append(column)
 
         return self
 
@@ -734,9 +734,12 @@ class CorrelationMatrix(Plotter):
         # Generate a custom diverging colormap
         cmap = seaborn.diverging_palette(220, 10, as_cmap=True)
         # Draw the heatmap with the mask and correct aspect ratio
-        seaborn.heatmap(corr, cmap=cmap,
-                        square=True, xticklabels=range(1, len(columns)+1), yticklabels=range(1, len(columns)+1), annot=True,
-                        linewidths=.5, cbar_kws={"shrink": .5}, ax=self.axis)
+        try:
+            seaborn.heatmap(corr, cmap=cmap,
+                            square=True, xticklabels=range(1, len(columns)+1), yticklabels=range(1, len(columns)+1), annot=True,
+                            linewidths=.5, cbar_kws={"shrink": .5}, ax=self.axis)
+        except ValueError:
+            pass
         return self
 
     def finish(self):

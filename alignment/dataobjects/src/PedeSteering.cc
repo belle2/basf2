@@ -1,5 +1,4 @@
 #include <alignment/dataobjects/PedeSteering.h>
-#include <alignment/GlobalLabel.h>
 #include <fstream>
 
 using namespace Belle2;
@@ -57,8 +56,7 @@ void PedeSteering::fixParameters(vector< int > labels, vector< double > values, 
     if (usePresigmas)
       presigma = presigmas[i];
 
-    command(to_string(labels[i]) + " " + to_string(value) + " " + to_string(presigma) + " ! " + (string)GlobalLabel(
-              labels[i]).getVxdID());
+    command(to_string(labels[i]) + " " + to_string(value) + " " + to_string(presigma));
   }
 }
 /*

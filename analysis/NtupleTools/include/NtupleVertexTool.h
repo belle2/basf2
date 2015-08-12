@@ -38,11 +38,16 @@ namespace Belle2 {
     float* m_fDRho;
     /** Vertex fit P-value */
     float* m_fPvalue;
+    /** Production vertex position */
+    float** m_fProdV;
+    /** Production vertex covariance matrix */
+    float*** m_fProdCov;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
     /** Constructor. */
-    NtupleVertexTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor), m_fDX(0), m_fDY(0), m_fDZ(0), m_fDRho(0), m_fPvalue(0) {setupTree();}
+    NtupleVertexTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor), m_fDX(0), m_fDY(0),
+      m_fDZ(0), m_fDRho(0), m_fPvalue(0) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

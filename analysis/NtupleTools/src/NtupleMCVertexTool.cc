@@ -23,12 +23,20 @@ void NtupleMCVertexTool::setupTree()
   m_fTruthY = new float[nDecayProducts];
   m_fTruthZ = new float[nDecayProducts];
   m_fTruthRho = new float[nDecayProducts];
+  m_fTruthProdV = new float*[nDecayProducts];
+
+
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_TruthX").c_str(), &m_fTruthX[iProduct], (strNames[iProduct] + "_TruthX/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthY").c_str(), &m_fTruthY[iProduct], (strNames[iProduct] + "_TruthY/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthZ").c_str(), &m_fTruthZ[iProduct], (strNames[iProduct] + "_TruthZ/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_TruthRho").c_str(), &m_fTruthRho[iProduct], (strNames[iProduct] + "_TruthRho/F").c_str());
+
+    m_fTruthProdV[iProduct] = new float[3];
+    m_tree->Branch((strNames[iProduct] + "_TruthVtxProd").c_str(), &m_fTruthProdV[iProduct][0],
+                   (strNames[iProduct] + "_TruthVtxProd[3]/F").c_str());
   }
+
 }
 
 void NtupleMCVertexTool::eval(const Particle* particle)
@@ -47,12 +55,19 @@ void NtupleMCVertexTool::eval(const Particle* particle)
       m_fTruthY[iProduct]   = 0.0;
       m_fTruthZ[iProduct]   = 0.0;
       m_fTruthRho[iProduct] = 0.0;
+      m_fTruthProdV[iProduct][0] = 0.0;
+      m_fTruthProdV[iProduct][1] = 0.0;
+      m_fTruthProdV[iProduct][2] = 0.0;
     } else {
       const TVector3 mcparticle_vert = mcparticle->getDecayVertex();
       m_fTruthX[iProduct] = mcparticle_vert.X();
       m_fTruthY[iProduct] = mcparticle_vert.Y();
       m_fTruthZ[iProduct] = mcparticle_vert.Z();
       m_fTruthRho[iProduct] = TMath::Sqrt(mcparticle_vert.Perp2());
+      const TVector3 mcparticle_prodvert = mcparticle->getVertex();
+      m_fTruthProdV[iProduct][0] = mcparticle_prodvert.X();
+      m_fTruthProdV[iProduct][1] = mcparticle_prodvert.Y();
+      m_fTruthProdV[iProduct][2] = mcparticle_prodvert.Z();
     }
   }
 }

@@ -31,11 +31,14 @@ namespace Belle2 {
     float* m_fTruthZ;
     /** Truth Vertex position Sqrt(X^2+Y^2). */
     float* m_fTruthRho;
+    /** Truth production vertex position */
+    float** m_fTruthProdV;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
     /** Constuctor. */
-    NtupleMCVertexTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor), m_fTruthX(0), m_fTruthY(0), m_fTruthZ(0) , m_fTruthRho(0) {setupTree();}
+    NtupleMCVertexTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor), m_fTruthX(0),
+      m_fTruthY(0), m_fTruthZ(0) , m_fTruthRho(0) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

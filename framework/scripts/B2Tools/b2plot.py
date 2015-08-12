@@ -18,14 +18,13 @@ import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
 
-# Do not use standard backend TkAgg, because it is NOT thread-safe
-# You will get an RuntimeError: main thread is not in main loop otherwise!
-matplotlib.use("svg")
-import seaborn
-
 import b2stat
 
 from basf2 import *
+
+# Do not use standard backend TkAgg, because it is NOT thread-safe
+# You will get an RuntimeError: main thread is not in main loop otherwise!
+matplotlib.use("svg")
 
 
 class Plotter(object):
@@ -166,17 +165,17 @@ class Plotter(object):
             if 'color' not in errorbar_kwargs:
                 errorbar_kwargs['color'] = color
             if 'ecolor' not in errorbar_kwargs:
-                errorbar_kwargs['ecolor'] = map(lambda x: 0.5*x, color)
+                errorbar_kwargs['ecolor'] = map(lambda x: 0.5 * x, color)
             e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, **errorbar_kwargs)
 
         if errorband_kwargs is not None and yerr is not None:
             if 'color' not in errorband_kwargs:
                 errorband_kwargs['color'] = color
             x1 = x
-            y1 = y-yerr
-            y2 = y+yerr
+            y1 = y - yerr
+            y2 = y + yerr
             if xerr is not None:
-                boundaries = numpy.r_[numpy.c_[x-xerr, y1, y2], numpy.c_[x+xerr, y1, y2]]
+                boundaries = numpy.r_[numpy.c_[x - xerr, y1, y2], numpy.c_[x + xerr, y1, y2]]
                 boundaries = boundaries[boundaries[:, 0].argsort()]
                 x1 = boundaries[:, 0]
                 y1 = boundaries[:, 1]
@@ -215,6 +214,7 @@ class PurityOverEfficiency(Plotter):
     """
     Plots the purity over the efficiency also known as ROC curve
     """
+
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
         """
         Add a new curve to the ROC plot
@@ -253,6 +253,7 @@ class RejectionOverEfficiency(Plotter):
     """
     Plots the rejection over the efficiency also known as ROC curve
     """
+
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
         """
         Add a new curve to the ROC plot
@@ -292,6 +293,7 @@ class Diagonal(Plotter):
     """
     Plots the purity in each bin over the classifier output.
     """
+
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
         """
         Add a new curve to the Diagonal plot
@@ -308,7 +310,7 @@ class Diagonal(Plotter):
         # self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(purity), self.ymin]), numpy.nanmax([numpy.nanmax(purity), self.ymax])
         self.ymin, self.ymax = 0, 1
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths/2.0, yerr=purity_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, purity, xerr=hists.bin_widths / 2.0, yerr=purity_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -333,7 +335,7 @@ class Distribution(Plotter):
     Plots distribution of a quantity
     """
 
-    def __init__(self, figure=None, axis=None, normed=False, keep_first_binning=False):
+    def __init__(self, figure=None, axis=None, normed_to_all_entries=False, normed_to_bin_width=False, keep_first_binning=False):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
@@ -343,10 +345,11 @@ class Distribution(Plotter):
         """
         super(Distribution, self).__init__(figure, axis)
         #: Normalize histograms before drawing them
-        self.normed = normed
-        if self.normed:
-            self.ymin = float(0)
-            self.ymax = float('-inf')
+        self.normed_to_all_entries = normed_to_all_entries
+        self.normed_to_bin_width = normed_to_bin_width
+        # if self.normed_to_all_entries or self.normed_to_bin_width:
+        self.ymin = float(0)
+        self.ymax = float('-inf')
         self.xmin = float('inf')
         self.xmax = float('-inf')
         #: Keep first binning if user wants so
@@ -373,15 +376,19 @@ class Distribution(Plotter):
             self.first_binning = hists.bins
         hist, hist_error = hists.get_hist('Total')
 
-        if self.normed:
+        if self.normed_to_all_entries:
             normalization = float(numpy.sum(hist))
             hist = hist / normalization
             hist_error = hist_error / normalization
 
+        if self.normed_to_bin_width:
+            hist = hist / hists.bin_widths
+            hist_error = hist_error / hists.bin_widths
+
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin, self.ymax = numpy.nanmin([hist.min(), self.ymin]), numpy.nanmax([(hist + hist_error).max(), self.ymax])
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths/2, yerr=hist_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -395,8 +402,12 @@ class Distribution(Plotter):
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Distribution Plot")
         self.axis.get_xaxis().set_label_text('Classifier Output')
-        if self.normed:
+        if self.normed_to_all_entries and self.normed_to_bin_width:
+            self.axis.get_yaxis().set_label_text('# Entries per Bin / (# Entries * Bin Width)')
+        elif self.normed_to_all_entries:
             self.axis.get_yaxis().set_label_text('# Entries per Bin / # Entries')
+        elif self.normed_to_bin_width:
+            self.axis.get_yaxis().set_label_text('# Entries per Bin / Bin Width')
         else:
             self.axis.get_yaxis().set_label_text('# Entries per Bin')
         self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
@@ -407,6 +418,7 @@ class Box(Plotter):
     """
     Create a boxplot
     """
+
     def add(self, data, column, mask=None, weight_column=None):
         """
         Add a new boxplot to the plots
@@ -459,6 +471,7 @@ class Difference(Plotter):
     """
     Plots the difference between two histograms
     """
+
     def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None):
         """
         Add a new difference plot
@@ -478,7 +491,7 @@ class Difference(Plotter):
         self.ymin = min((difference - difference_error).min(), self.ymin)
         self.ymax = max((difference + difference_error).max(), self.ymax)
 
-        p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths/2, yerr=difference_error)
+        p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths / 2, yerr=difference_error)
         self.plots.append(p)
         self.labels.append(column)
         return self
@@ -645,9 +658,9 @@ class VerboseDistribution(Plotter):
         self.plots += distribution.plots
         self.labels += distribution.labels
 
-        n = len(self.box_axes)+1
-        gs = matplotlib.gridspec.GridSpec(4*n, 1)
-        gridspecs = [gs[:3*n, :]] + [gs[3*n+i, :] for i in range(n)]
+        n = len(self.box_axes) + 1
+        gs = matplotlib.gridspec.GridSpec(4 * n, 1)
+        gridspecs = [gs[:3 * n, :]] + [gs[3 * n + i, :] for i in range(n)]
         box_axis = self.add_subplot(gridspecs)
 
         box = Box(self.figure, box_axis)
@@ -679,6 +692,7 @@ class Correlation(Plotter):
     """
     Plots distribution of a quantity multiple times with different cuts on the quantiles of another quantity
     """
+
     def add(self, data, column, cut_column, quantiles, mask=None, weight_column=None):
         """
         Add a new correlation plot.
@@ -721,6 +735,7 @@ class CorrelationMatrix(Plotter):
     """
     Plots correlation matrix
     """
+
     def add(self, data, columns):
         """
         Add a new correlation plot.
@@ -739,7 +754,7 @@ class CorrelationMatrix(Plotter):
         # Draw the heatmap with the mask and correct aspect ratio
         try:
             seaborn.heatmap(corr, cmap=cmap,
-                            square=True, xticklabels=range(1, len(columns)+1), yticklabels=range(1, len(columns)+1), annot=True,
+                            square=True, xticklabels=range(1, len(columns) + 1), yticklabels=range(1, len(columns) + 1), annot=True,
                             linewidths=.5, cbar_kws={"shrink": .5}, ax=self.axis)
         except ValueError:
             pass
@@ -776,8 +791,8 @@ if __name__ == '__main__':
     N = 100000
     data = get_data(N, columns=['FastBDT', 'NeuroBayes', 'isSignal'])
     data['type'] = ''
-    data.type.iloc[:N/2] = 'Train'
-    data.type.iloc[N/2:] = 'Test'
+    data.type.iloc[:N / 2] = 'Train'
+    data.type.iloc[N / 2:] = 'Test'
 
     p = Box()
     p.add(data, 'FastBDT')

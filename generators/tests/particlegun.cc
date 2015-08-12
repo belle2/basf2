@@ -9,7 +9,8 @@ namespace Belle2 {
   class ParticleGunTest : public ::testing::Test {
   protected:
     /** Set up parameters which work for all distributions */
-    virtual void SetUp() {
+    virtual void SetUp()
+    {
       parameters.momentumParams = {1, 1};
       parameters.xVertexParams  = {1, 1};
       parameters.yVertexParams  = {1, 1};
@@ -23,10 +24,12 @@ namespace Belle2 {
     ParticleGun::Parameters parameters;
 
     /** check one of the variables given a list of allowed and excluded distributions */
-    void checkVariable(const std::string& name, const std::map<int, bool> allowed, ParticleGun::EDistribution& dist, std::vector<double>& pars);
+    void checkVariable(const std::string& name, const std::map<int, bool>& allowed, ParticleGun::EDistribution& dist,
+                       std::vector<double>& pars);
   };
 
-  void ParticleGunTest::checkVariable(const std::string& name, const std::map<int, bool> allowed, ParticleGun::EDistribution& dist, std::vector<double>& pars)
+  void ParticleGunTest::checkVariable(const std::string& name, const std::map<int, bool>& allowed, ParticleGun::EDistribution& dist,
+                                      std::vector<double>& pars)
   {
     parameters = ParticleGun::Parameters();
     parameters.pdgCodes = {11};
@@ -59,9 +62,11 @@ namespace Belle2 {
         pars = {1, 1};
         ASSERT_TRUE(pgun.setParameters(parameters));
         pars = {1, 0};
-        ASSERT_FALSE(pgun.setParameters(parameters)) << name << ": "  << parameters.momentumParams[0] << ", " << parameters.momentumParams[1];
+        ASSERT_FALSE(pgun.setParameters(parameters)) << name << ": "  << parameters.momentumParams[0] << ", " <<
+                                                     parameters.momentumParams[1];
         pars = {0, 1};
-        ASSERT_FALSE(pgun.setParameters(parameters)) << name << ": "  << parameters.momentumParams[0] << ", " << parameters.momentumParams[1];
+        ASSERT_FALSE(pgun.setParameters(parameters)) << name << ": "  << parameters.momentumParams[0] << ", " <<
+                                                     parameters.momentumParams[1];
       }
       //Check polyline stuff
       if ((dist == ParticleGun::c_polylineDistribution || dist == ParticleGun::c_polylinePtDistribution

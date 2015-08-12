@@ -40,20 +40,6 @@ def stdPi0(path=analysis_main):
     massKFit('pi0:all', 0.0, '', path)
     matchMCTruth('pi0:all', path)
 
-    expert = register_module('TMVAExpert')
-    expert.param('prefix', 'PI0-MC3.5')
-    expert.param('workingDirectory', os.environ['BELLE2_LOCAL_DIR']
-                 + '/analysis/data/TMVA/StandardPi0/')
-    expert.param('method', 'BDTG')
-    expert.param('listNames', ['pi0:all'])
-    expert.param('expertOutputName', 'BDT')
-    path.add_module(expert)
-
-    cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0',
-                   True, path)
-    cutAndCopyList('pi0:good', 'pi0:all', '0.5 < extraInfo(BDT) < 1.0', True,
-                   path)
-
 
 def loosePi0(path=analysis_main):
     stdPi0(path)
@@ -91,24 +77,3 @@ def stdKs(path=analysis_main):
     vertexKFit('K_S0:all', 0.0)
     applyCuts('K_S0:all', '0.477614<M<0.517614')
     matchMCTruth('K_S0:all')
-
-    expert_v0 = register_module('TMVAExpert')
-    expert_v0.param('prefix', 'v0_TMVA')
-    expert_v0.param('workingDirectory',
-                    '/home/belle2/pjaeger/public/StandardKs/')
-    expert_v0.param('method', 'FastBDT')
-    expert_v0.param('listNames', ['K_S0:all'])
-    expert_v0.param('expertOutputName', 'BDT_v0')
-    path.add_module(expert_v0)
-
-    expert_l = register_module('TMVAExpert')
-    expert_l.param('prefix', 'lambda_TMVA')
-    expert_l.param('workingDirectory',
-                   '/home/belle2/pjaeger/public/StandardKs/')
-    expert_l.param('method', 'FastBDT')
-    expert_l.param('listNames', ['K_S0:all'])
-    expert_l.param('expertOutputName', 'BDT_l')
-    path.add_module(expert_l)
-
-    cutAndCopyList('K_S0:good', 'K_S0:all',
-                   '0.51 < extraInfo(BDT_v0) < 1.0 and 0.91 < extraInfo(BDT_l) < 1.0', True, path)

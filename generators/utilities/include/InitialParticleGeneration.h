@@ -34,7 +34,7 @@ namespace Belle2 {
      * @param allowedFlags allowed generation flags from MCInitialParticles.
      *        Default is to allow no smearing. Generation in CMS is always permitted
      */
-    InitialParticleGeneration(int allowedFlags = 0): m_allowedFlags(allowedFlags | MCInitialParticles::c_generateCMS) {};
+    explicit InitialParticleGeneration(int allowedFlags = 0): m_allowedFlags(allowedFlags | MCInitialParticles::c_generateCMS) {};
 
     /** Generate a new event */
     MCInitialParticles& generate();

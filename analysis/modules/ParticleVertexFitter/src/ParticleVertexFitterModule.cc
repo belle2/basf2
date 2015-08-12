@@ -19,6 +19,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/dataobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -118,6 +119,12 @@ namespace Belle2 {
       return;
     }
 
+    // get IP center and covariace matrix  (TO BE DEVOPED)
+    //Belle2::BeamParameters a;
+    //TMatrixDSym Vc = a.getCovVertex();
+    //TMatrixDSym Vc = a.getCovHER();
+    //Vc.Print();
+    //std::cout<<a.energyHER()<<std::endl;
 
 
     if (m_vertexFitter == "rave")
@@ -668,7 +675,8 @@ namespace Belle2 {
 
   bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
   {
-    if (mother->getNDaughters() < 2) return false;
+    if ((m_decayString.empty() ||
+         (m_withConstraint == "" && m_fitType != "mass")) && mother->getNDaughters() < 2) return false;
 
     if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
     if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
@@ -705,7 +713,7 @@ namespace Belle2 {
 
         // Fit one particle constrained to originate from the beam spot
         bool mothIPfit = false;
-        if (tracksVertex.size() == 1 && mothSel == true && m_withConstraint == "ipprofile" && nTrk == 0) {
+        if (tracksVertex.size() == 1 && mothSel == true && m_withConstraint != "" && nTrk == 0) {
           rsf.addTrack(tracksVertex[0]);
           if (tracksVertex[0] != mother)
             B2FATAL("ParticleVertexFitterModule: FATAL Error in IP constrained mother fit");

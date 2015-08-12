@@ -14,6 +14,7 @@ import ROOT
 
 # Import basf2
 from basf2 import *
+from modularAnalysis import applyCuts, buildRestOfEvent
 # Should come after basf2 import
 import pdg
 
@@ -167,7 +168,7 @@ class Particle(object):
 FeiState = collections.namedtuple('FeiState', 'path, is_trained')
 
 
-def fullEventInterpretation(selection_path, particles):
+def fullEventInterpretation(signalParticleList, selection_path, particles):
     """
     The Full Event Interpretation algorithm has to be executed multiple times, because of the dependencies between
     the MVCs among each other and PreCuts on Histograms.
@@ -180,24 +181,11 @@ def fullEventInterpretation(selection_path, particles):
     """
     args = getCommandLineOptions()
 
-    # Add user cut if specific training is used
-    if selection_path:
-        for particle in particles:
-            if particle.userCutConfig.userCut:
-                particle.userCutConfig.userCut = "[ " + particle.userCutConfig.userCut + "] and [ SpecificFEIUserCut == 1 ]"
-            else:
-                particle.userCutConfig.userCut = "[ SpecificFEIUserCut == 1 ]"
-            for channel in particle.channels:
-                if channel.userCutConfig.userCut:
-                    channel.userCutConfig.userCut = "[ " + channel.userCutConfig.userCut + "] and [ SpecificFEIUserCut == 1 ]"
-                else:
-                    channel.userCutConfig.userCut = "[ SpecificFEIUserCut == 1 ]"
-
     # Create a new directed acyclic graph
     dag = dagFramework.DAG()
 
     # Set environment variables
-    dag.env['ROE'] = selection_path is not None and not args.dumpPath
+    dag.env['ROE'] = str(signalParticleList) if selection_path is not None and not args.dumpPath else False
     dag.env['prune'] = args.prune
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
@@ -237,7 +225,8 @@ def fullEventInterpretation(selection_path, particles):
             dag.add('RawParticleList_' + particle.identifier, provider.SelectParticleList,
                     particleName='Name_' + particle.identifier,
                     particleLabel='Label_' + particle.identifier,
-                    userCut='UserCut_' + particle.identifier)
+                    userCut='UserCut_' + particle.identifier,
+                    mvaTarget='MVATarget_' + particle.identifier)
             dag.add('MatchedParticleList_' + particle.identifier, provider.MatchParticleList,
                     particleList='RawParticleList_' + particle.identifier)
         else:
@@ -248,7 +237,8 @@ def fullEventInterpretation(selection_path, particles):
                         daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
                         preCut='PreCut_' + channel.name,
                         userCut='UserCut_' + channel.name,
-                        decayModeID='DecayModeID_' + channel.name)
+                        decayModeID='DecayModeID_' + channel.name,
+                        mvaTarget='MVATarget_' + particle.identifier)
                 dag.add('MatchedParticleList_' + channel.name, provider.MatchParticleList,
                         particleList='RawParticleList_' + channel.name)
 
@@ -556,6 +546,10 @@ def fullEventInterpretation(selection_path, particles):
         fei_path.add_module("RootOutput")
         if is_first_run and selection_path is not None:
             path.add_path(selection_path)
+            cut = 'isSignalAcceptMissingNeutrino == 1'
+            cut += ' or eventCached(countInList(' + dag.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1)) == 0'
+            applyCuts(signalParticleList, cut, path=path)
+            buildRestOfEvent(signalParticleList, path=path)
             path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
         else:
             if selection_path is not None:

@@ -42,6 +42,12 @@ namespace Belle2 {
      */
     void addExtraInfo(const std::string& name, float value);
 
+    /** Sets the user-defined data of given name to the given value.
+     * Does not throw anything if the value is already set.
+     * Overrides existing values
+     */
+    void setExtraInfo(const std::string& name, float value);
+
   private:
     std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 

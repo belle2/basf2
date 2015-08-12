@@ -119,6 +119,55 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr eventCached(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        auto func = [var, key](const Particle*) -> double {
+
+          StoreObjPtr<EventExtraInfo> eventExtraInfo;
+          if (not eventExtraInfo.isValid())
+            eventExtraInfo.create();
+          if (eventExtraInfo->hasExtraInfo(key))
+          {
+            return eventExtraInfo->getExtraInfo(key);
+          } else {
+            double value = var->function(nullptr);
+            eventExtraInfo->addExtraInfo(key, value);
+            return value;
+          }
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function eventCached");
+        return nullptr;
+      }
+    }
+
+    /* Cannot be used at the moment because given particle object is const
+    Manager::FunctionPtr particleCached(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        auto func = [var, key](const Particle *particle) -> double {
+
+          if (particle->hasExtraInfo(key)) {
+            return particle->getExtraInfo(key);
+          } else {
+            double value = var->function(particle);
+            particle->addExtraInfo(key, value);
+            return value;
+          }
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function particleCached");
+        return nullptr;
+      }
+    }*/
+
     Manager::FunctionPtr formula(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -539,10 +588,16 @@ namespace Belle2 {
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like TMVAExpert.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the TMVAExpert.");
-    REGISTER_VARIABLE("eventExtraInfo(name)", extraInfo,
+    REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like TMVAExpert in event mode.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the TMVAExpert for an event.");
+    REGISTER_VARIABLE("eventCached(variable)", eventCached,
+                      "[eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
+                      "The result of second call to this variable in the same event will be provided from the cache.");
+    /*REGISTER_VARIABLE("particleCached(variable)", particleCached,
+                      "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
+                      "The result of second call to this variable on the same particle will be provided from the cache.");*/
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");

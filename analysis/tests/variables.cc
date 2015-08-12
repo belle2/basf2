@@ -544,6 +544,37 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
   }
 
+  TEST_F(MetaVariableTest, eventCached)
+  {
+    const Manager::Var* var = Manager::Instance().getVariable("eventCached(constant(3.14))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    EXPECT_TRUE(eventExtraInfo.isValid());
+    EXPECT_TRUE(eventExtraInfo->hasExtraInfo("__constant__bo3__pt14__bc"));
+    EXPECT_FLOAT_EQ(eventExtraInfo->getExtraInfo("__constant__bo3__pt14__bc"), 3.14);
+    eventExtraInfo->addExtraInfo("__eventExtraInfo__bopi__bc", 3.14);
+    var = Manager::Instance().getVariable("eventCached(eventExtraInfo(pi))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
+  }
+
+  /*
+  TEST_F(MetaVariableTest, particleCached)
+  {
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    const Manager::Var* var = Manager::Instance().getVariable("particleCached(px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), 0.1);
+    EXPECT_TRUE(p.hasExtraInfo("__px"));
+    EXPECT_FLOAT_EQ(p.getExtraInfo("__px"), 0.1);
+    p.addExtraInfo("__py", -0.5); // NOT -0.4 because we want to see if the cache is used instead of py!
+    var = Manager::Instance().getVariable("particleCached(py)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(&p), -0.5);
+  }
+  */
+
   TEST_F(MetaVariableTest, formula)
   {
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);

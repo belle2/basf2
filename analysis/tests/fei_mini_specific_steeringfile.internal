@@ -58,9 +58,8 @@ particles.append(p)
 selection_path = create_path()
 selection_path.add_module("RootInput")
 fillParticleLists([('mu+', 'muid > 0.1')], True, selection_path)
-buildRestOfEvent('mu+', path=selection_path)
 
-feistate = fullEventInterpretation(selection_path, particles)
+feistate = fullEventInterpretation('mu+', selection_path, particles)
 
 if feistate.is_trained:
     feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)

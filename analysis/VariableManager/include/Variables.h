@@ -219,16 +219,6 @@ namespace Belle2 {
     double McFlavorOfTagSide(const Particle* part);
 
     /**
-     * return 1 if particle should be used to construct a ROE in the specific training of the FEI
-     */
-    double specificFEIROESelection(const Particle* part);
-
-    /**
-     * return 1 if particle should be used in the specific training of the FEI
-     */
-    double specificFEIUserCut(const Particle* part);
-
-    /**
      * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
      */
     double isSignal(const Particle* part);

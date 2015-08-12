@@ -7,7 +7,7 @@ from basf2 import *
 from modularAnalysis import *
 
 particles = get_default_channnels()
-feistate = fullEventInterpretation(None, particles)
+feistate = fullEventInterpretation(None, None, particles)
 
 if feistate.is_trained:
     open('FEI_finished_its_training', 'a').close()

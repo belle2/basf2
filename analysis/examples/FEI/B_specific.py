@@ -13,12 +13,10 @@ reconstructDecay('tau+ ->  mu+', '', writeOut=True, path=selection_path)
 matchMCTruth('tau+', path=selection_path)
 reconstructDecay('B+:sig -> tau+', '', writeOut=True, path=selection_path)
 matchMCTruth('B+:sig', path=selection_path)
-applyCuts('B+:sig', 'SpecificFEIROESelection == 1', path=selection_path)
-buildRestOfEvent('B+:sig', path=selection_path)
 
 # neutral B channels disabled, since we only intend to use B+/B- for our decay
 particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0', neutralB=False)
-feistate = fullEventInterpretation(selection_path, particles)
+feistate = fullEventInterpretation('B+:sig', selection_path, particles)
 
 if feistate.is_trained:
     # Add your analysis path

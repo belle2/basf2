@@ -205,9 +205,9 @@ def process(path, max_event=0):
 
 def set_nprocesses(nproc):
     """
-    Sets number of processes for parallel processing
+    Sets number of worker processes for parallel processing
 
-    nproc: number of processes
+    nproc: number of worker processes
     """
 
     fw.set_nprocesses(nproc)

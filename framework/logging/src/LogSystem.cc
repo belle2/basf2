@@ -111,6 +111,7 @@ int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 
 const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 {
+  //TODO why is this before module config??
   //package specific config?
   if (package && !m_packageLogConfigs.empty()) {
     map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(package);

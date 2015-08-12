@@ -136,9 +136,9 @@ void Framework::process(PathPtr startPath, long maxEvent)
 }
 
 
-void Framework::setNumberProcesses(int number)
+void Framework::setNumberProcesses(int numProcesses)
 {
-  Environment::Instance().setNumberProcesses(number);
+  Environment::Instance().setNumberProcesses(numProcesses);
 }
 
 

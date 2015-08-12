@@ -22,8 +22,7 @@
 
 namespace Belle2 {
   /**
-   * The main Framework class.
-   * This class combines all subsystems of the framework.
+   * This class combines all subsystems of the framework, and exports the main interface to Python.
    */
   class Framework {
   public:
@@ -100,16 +99,12 @@ namespace Belle2 {
     void process(PathPtr startPath, long maxEvent = 0);
 
     /**
-     * Function to set number of processes for parallel processing.
-     *
-     * @param number Number of processes for parallel processing
+     * Function to set number of worker processes for parallel processing.
     */
-    void setNumberProcesses(int number);
+    void setNumberProcesses(int numProcesses);
 
     /**
-     * Function to get number of processes for parallel processing.
-     *
-     * @return Number of processes for parallel processing
+     * Function to get number of worker processes for parallel processing.
     */
     int getNumberProcesses() const;
 

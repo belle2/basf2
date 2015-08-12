@@ -72,7 +72,8 @@ MillepedeCalibrationModule::MillepedeCalibrationModule() : CalibrationModule(),
 
   // Parameter definitions
   addParam("tracks", m_tracks, "Name of collection of genfit::Tracks for calibration", std::string(""));
-  addParam("steering", m_steering, "Name of PedeSteering persistent object. Produced binary are added by the module.");
+  addParam("steering", m_steering, "Name of PedeSteering persistent object. Produced binary are added by the module.",
+           std::string(""));
   addParam("minPvalue", m_minPvalue, "Minimum p-value to write trajectory to Mille binary", double(0.));
 
   // Dependecies  (empty here)
@@ -215,6 +216,8 @@ bool MillepedeCalibrationModule::StoreInDataBase()
       if (!result.isParameterDetermined(ipar)) continue;
 
       GlobalLabel param(result.getParameterLabel(ipar));
+      if (!param.isVXD())
+        continue;
       double old = 0.;
       alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar),
                      result.getParameterError(ipar));
@@ -225,6 +228,8 @@ bool MillepedeCalibrationModule::StoreInDataBase()
       if (!result.isParameterDetermined(ipar)) continue;
 
       GlobalLabel param(result.getParameterLabel(ipar));
+      if (!param.isVXD())
+        continue;
       double old = init->get(param.getVxdID(), param.getParameterId() - 1);
       alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar),
                      result.getParameterError(ipar));

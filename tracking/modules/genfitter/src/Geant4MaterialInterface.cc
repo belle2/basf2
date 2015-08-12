@@ -208,7 +208,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   genfit::M1x3 SA;
   genfit::M1x7 state7, oldState7;
-  memcpy(oldState7, stateOrig, sizeof(state7));
+  oldState7 = stateOrig;
 
   int stepSign(sMax < 0 ? -1 : 1);
 
@@ -265,7 +265,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
     // Follow curved arch, then see if we may have missed a boundary.
     // Always propagate complete way from original start to avoid
     // inconsistent extrapolations.  This is always a single RK step.
-    memcpy(state7, stateOrig, sizeof(state7));
+    state7 = stateOrig;
     rep->RKPropagate(state7, NULL, SA, stepSign * (s + step), varField);
 
     G4ThreeVector pos(state7[0] * CLHEP::cm, state7[1] * CLHEP::cm, state7[2] * CLHEP::cm);
@@ -353,7 +353,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
     // We're in the new place, the step was safe, advance.
     s += step;
 
-    memcpy(oldState7, state7, sizeof(state7));
+    oldState7 = state7;
     pointOld = pos;
     slDist = nav_->CheckNextStep(pos, dir,
                                  (fabs(sMax) - s) * CLHEP::cm, safety);

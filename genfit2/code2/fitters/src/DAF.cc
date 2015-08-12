@@ -415,7 +415,7 @@ void DAF::Streamer(TBuffer &R__b)
       R__b << deltaWeight_;
       {
          std::vector<double> &R__stl =  betas_;
-         int R__n=(&R__stl) ? int(R__stl.size()) : 0;
+         int R__n=int(R__stl.size());
          R__b << R__n;
          if(R__n) {
             std::vector<double>::iterator R__k;

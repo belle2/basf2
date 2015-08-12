@@ -103,6 +103,8 @@ class Track : public TObject {
   virtual ~Track();
   virtual void Clear(Option_t* = "");
 
+  void createMeasurements(const TrackCand& trackCand, const MeasurementFactory<genfit::AbsMeasurement>& factory);
+
   TrackPoint* getPoint(int id) const;
   const std::vector< genfit::TrackPoint* > & getPoints() const {return trackPoints_;}
   unsigned int getNumPoints() const {return trackPoints_.size();}
@@ -111,7 +113,7 @@ class Track : public TObject {
   const std::vector< genfit::TrackPoint* > & getPointsWithMeasurement() const  {return trackPointsWithMeasurement_;}
   unsigned int getNumPointsWithMeasurement() const {return trackPointsWithMeasurement_.size();}
 
-  TrackPoint* getPointWithMeasurementAndFitterInfo(int id, const AbsTrackRep* rep) const;
+  TrackPoint* getPointWithMeasurementAndFitterInfo(int id, const AbsTrackRep* rep = NULL) const;
   TrackPoint* getPointWithFitterInfo(int id, const AbsTrackRep* rep = NULL) const;
 
   /**

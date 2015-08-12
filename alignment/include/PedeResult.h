@@ -15,7 +15,7 @@ namespace Belle2 {
       PedeResult() : data(), eigenNumbers(), valid(false), labelIndices() {}
       //! Constructor which loads given file
       //! @param filename Name of the result file (millepede.res)
-      PedeResult(string filename);
+      explicit PedeResult(string filename);
       //! Reads the result file and inits the object
       void read(string filename = "millepede.res");
       //! Reads file with eigen-vector/numbers

@@ -108,7 +108,7 @@ namespace Belle2 {
     /**
      * @brief Assignment operator
      */
-    void operator=(const GlobalLabel& rhs) {gid = rhs.gid, eid = rhs.eid, pid = rhs.pid, tid = rhs.tid, tif = rhs.tif;};
+    GlobalLabel& operator=(const GlobalLabel& rhs) {gid = rhs.gid, eid = rhs.eid, pid = rhs.pid, tid = rhs.tid, tif = rhs.tif; return *this; };
     //! Get the VxdID (returns default if not VXD label)
     VxdID   getVxdID()       const;
     //! Get the WireID (returns default if not CDC label)
@@ -167,7 +167,7 @@ namespace Belle2 {
   private:
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)
-    GlobalLabel(gidTYPE elementId, gidTYPE paramId);
+    void construct(gidTYPE elementId, gidTYPE paramId);
     //! Struct to hold intervals of validity
     struct TimeInterval {
     private:

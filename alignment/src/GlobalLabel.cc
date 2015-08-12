@@ -28,8 +28,8 @@ namespace Belle2 {
       tid = gid % tifOffset / tidOffset;
     }
   }
-  GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): GlobalLabel(vxdid.getID() + vxdOffset, paramId) {}
-  GlobalLabel::GlobalLabel(WireID cdcid, GlobalLabel::gidTYPE paramId): GlobalLabel(cdcid.getEWire() + cdcOffset, paramId) {}
+  GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): gid(0), eid(0), pid(0), tid(0), tif(0) { construct(vxdid.getID() + vxdOffset, paramId); }
+  GlobalLabel::GlobalLabel(WireID cdcid, GlobalLabel::gidTYPE paramId): gid(0), eid(0), pid(0), tid(0), tif(0) { construct(cdcid.getEWire() + cdcOffset, paramId); }
   void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start, GlobalLabel::gidTYPE end)
   {
     auto& dict = GlobalLabel::getDictionary();
@@ -75,7 +75,7 @@ namespace Belle2 {
       return WireID();
     return WireID(eid - cdcOffset);
   }
-  GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE elementId, GlobalLabel::gidTYPE paramId) : gid(0), eid(0), pid(0), tid(0), tif(0)
+  void GlobalLabel::construct(GlobalLabel::gidTYPE elementId, GlobalLabel::gidTYPE paramId)
   {
     if (elementId > maxEID || paramId > maxPID)
       return;

@@ -11,8 +11,8 @@ if not testbeam and 'BELLE2_LOCAL_DIR' in os.environ.keys():
 if testbeam:
     env['CPPDEFINES']['ALLOW_TELESCOPES_IN_GBLFITMODULE'] = True
 
-env['LIBS'] = ['framework', 'geometry', 'mdst_dataobjects', 'cdc', 'cdc_dataobjects',
-               'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', 'EG', 'tracking_dataobjects', 'svd', 'pxd',
+env['LIBS'] = ['framework', 'cdc_dataobjects',
+               'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd',
                'alignment_dataobjects']
 Return('env')
 

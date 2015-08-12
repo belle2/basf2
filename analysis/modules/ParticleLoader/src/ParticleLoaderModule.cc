@@ -28,6 +28,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
@@ -81,9 +82,11 @@ namespace Belle2 {
     StoreArray<MCParticle> mcparticles;
     StoreArray<PIDLikelihood> pidlikelihoods;
     StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
     particles.registerInDataStore();
     extraInfoMap.registerInDataStore();
+    eventExtraInfo.registerInDataStore();
     //register relations if these things exists
     if (mcparticles.isOptional()) {
       particles.registerRelationTo(mcparticles);

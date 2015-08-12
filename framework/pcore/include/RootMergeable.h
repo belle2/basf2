@@ -118,7 +118,7 @@ namespace Belle2 {
       m_wrapped->Reset();
     }
 
-    /** An ugly little method that is called before event() for input and parallel processes.
+    /** An ugly little method that is called before event() for input and worker processes.
      *
      * Main use case is to detach any attached TFile from this object. In the output process,
      * it can stay attached (and grow as much as it likes).

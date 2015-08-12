@@ -8,7 +8,7 @@ then
 fi
 
 
-#set to input/event/output
+#set to input/worker/output
 PROCTYPE="input"
 
 while true

@@ -95,9 +95,7 @@ namespace Belle2 {
     void setNumberProcesses(int number) { m_numberProcesses = number; }
 
     /**
-     * Returns the number of processors which should be used for the parallel processing.
-     *
-     * @return  The number of processors used for the parallel processing.
+     * Returns the number of worker processes which should be used for the parallel processing.
      */
     int getNumberProcesses() const
     {
@@ -172,7 +170,7 @@ namespace Belle2 {
   private:
 
     std::string m_externalsPath;  /**< The path in which the externals are located. */
-    int m_numberProcesses;        /**< The number of processes that should be used for the parallel processing. */
+    int m_numberProcesses;        /**< The number of worker processes that should be used for the parallel processing. */
     std::string m_steering;       /**< The content of the steering file. */
     int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::vector<std::string> m_inputFilesOverride; /**< Override input file names for input modules */

@@ -22,8 +22,8 @@ namespace Belle2 {
 
     /** Fork and initialize an input process */
     void startInputProcess();
-    /** Fork and initialize an event process */
-    void startEventProcesses(int nproc);
+    /** Fork and initialize 'nproc' worker processes. */
+    void startWorkerProcesses(int nproc);
     /** There is no real output process, but marks current process as output. */
     void startOutputProcess();
 
@@ -31,8 +31,8 @@ namespace Belle2 {
     void waitForAllProcesses();
     /** Wait until input process is completed */
     void waitForInputProcesses();
-    /** Wait until all event processes are completed */
-    void waitForEventProcesses();
+    /** Wait until all worker processes are completed */
+    void waitForWorkerProcesses();
     /** Wait until output processes are completed */
     void waitForOutputProcesses();
 
@@ -40,8 +40,10 @@ namespace Belle2 {
     static bool parallelProcessingUsed();
     /** Return true if the process is an input process */
     static bool isInputProcess();
-    /** Return true if the process is an event process */
-    static bool isEventProcess();
+    /** Return true if the process is a worker process */
+    static bool isWorkerProcess();
+    /** Return true if the process is a worker process */
+    static bool isEventProcess() __attribute__((deprecated("Please use isWorkerProcess() instead."))) { return isWorkerProcess(); }
     /** Return true if the process is an output process */
     static bool isOutputProcess();
 
@@ -51,7 +53,7 @@ namespace Belle2 {
      *
      * Return values mean:
      *  -1:     no parallel processing used
-     *  <10000  one of the main processes (between input and output paths). In range 0..Environment::getInstance().getNumberProcesses()-1.
+     *  <10000  one of the worker processes (between input and output paths). In range 0..Environment::getInstance().getNumberProcesses()-1.
      *  >=10000 input path
      *  >=20000 output path
      */
@@ -65,7 +67,7 @@ namespace Belle2 {
     void waitForProcesses(std::vector<pid_t>& pids);
 
     std::vector<pid_t> m_inputProcessList;  /**< PIDs of input processes. */
-    std::vector<pid_t> m_eventProcessList;  /**< PIDs of event processes. */
+    std::vector<pid_t> m_workerProcessList;  /**< PIDs of worker processes. */
     std::vector<pid_t> m_outputProcessList; /**< PIDs of output processes. */
 
     static int s_processID;       ///< ID of current process

@@ -241,9 +241,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   if (localPath == nullptr) { //not forked yet
-    // 5. Fork out main path (parallel part)
-    m_procHandler->startEventProcesses(numProcesses);
-    if (m_procHandler->isEventProcess()) {
+    // 5. Fork out worker path (parallel section)
+    m_procHandler->startWorkerProcesses(numProcesses);
+    if (m_procHandler->isWorkerProcess()) {
       localPath = m_mainpathlist[m_mainpathlist.size() - 1];
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
@@ -309,7 +309,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //TODO: still needed? might be important for cleaning up after crashes
   m_procHandler->waitForInputProcesses();
-  m_procHandler->waitForEventProcesses();
+  m_procHandler->waitForWorkerProcesses();
   B2INFO("All processes completed");
 
   //finished, disable handler again

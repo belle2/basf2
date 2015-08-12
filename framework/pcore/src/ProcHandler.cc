@@ -43,19 +43,19 @@ void ProcHandler::startInputProcess()
   }
 }
 
-void ProcHandler::startEventProcesses(int nproc)
+void ProcHandler::startWorkerProcesses(int nproc)
 {
   for (int i = 0; i < nproc; i++) {
     fflush(stdout);
     fflush(stderr);
     pid_t pid = fork();
     if (pid > 0) {   // Mother process
-      m_eventProcessList.push_back(pid);
-      B2INFO("ProcHandler: event process " << i << " forked. pid = " << pid);
+      m_workerProcessList.push_back(pid);
+      B2INFO("ProcHandler: worker process " << i << " forked. pid = " << pid);
       fflush(stdout);
     } else if (pid < 0) {
       B2FATAL("fork() failed: " << strerror(errno));
-    } else { // Event Process
+    } else { // In worker process
       s_processID = i;
       //die when parent dies
       prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -80,7 +80,7 @@ bool ProcHandler::isInputProcess()
   return (s_processID >= 10000 and s_processID < 20000);
 }
 
-bool ProcHandler::isEventProcess()
+bool ProcHandler::isWorkerProcess()
 {
   return (parallelProcessingUsed() and s_processID < 10000);
 }
@@ -97,8 +97,8 @@ int ProcHandler::EvtProcID()
 
 std::string ProcHandler::getProcessName()
 {
-  if (isEventProcess())
-    return "event";
+  if (isWorkerProcess())
+    return "worker";
   if (isInputProcess())
     return "input";
   if (isOutputProcess())
@@ -135,10 +135,10 @@ void ProcHandler::waitForProcesses(std::vector<pid_t>& pids)
 void ProcHandler::waitForAllProcesses()
 {
   waitForInputProcesses();
-  waitForEventProcesses();
+  waitForWorkerProcesses();
   waitForOutputProcesses();
 }
 
 void ProcHandler::waitForInputProcesses() { waitForProcesses(m_inputProcessList); }
-void ProcHandler::waitForEventProcesses() { waitForProcesses(m_eventProcessList); }
+void ProcHandler::waitForWorkerProcesses() { waitForProcesses(m_workerProcessList); }
 void ProcHandler::waitForOutputProcesses() { waitForProcesses(m_outputProcessList); }

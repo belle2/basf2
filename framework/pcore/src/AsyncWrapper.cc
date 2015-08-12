@@ -74,8 +74,8 @@ void AsyncWrapper::initialize()
   m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process
 
   //fork out one extra process
-  m_procHandler->startEventProcesses(1);
-  if (m_procHandler->isEventProcess()) {
+  m_procHandler->startWorkerProcesses(1);
+  if (m_procHandler->isWorkerProcess()) {
     //forked thread:
     //allow access to async parts
     s_isAsync = true;
@@ -99,14 +99,14 @@ void AsyncWrapper::initialize()
 
 void AsyncWrapper::event()
 {
-  if (!m_procHandler->isEventProcess()) {
+  if (!m_procHandler->isWorkerProcess()) {
     m_tx->event();
   }
 }
 
 void AsyncWrapper::terminate()
 {
-  if (!m_procHandler->isEventProcess()) {
+  if (!m_procHandler->isWorkerProcess()) {
     m_tx->terminate();
 
     B2INFO("Waiting for asynchronous process...");
@@ -114,7 +114,7 @@ void AsyncWrapper::terminate()
     while (m_ringBuffer->insq((int*)term.buffer(), (term.size() - 1) / sizeof(int) + 1) < 0) {
       usleep(200);
     }
-    m_procHandler->waitForEventProcesses();
+    m_procHandler->waitForWorkerProcesses();
     B2INFO("Done, cleaning up...");
     delete m_tx;
     delete m_rx;

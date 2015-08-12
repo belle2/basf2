@@ -6,6 +6,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -14,7 +15,6 @@
 #include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
-#include <framework/core/InputController.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -153,32 +153,6 @@ namespace {
 
   }
 
-  class FEIVariableTest : public ::testing::Test {
-  protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
-    {
-      DataStore::Instance().setInitializeActive(true);
-      StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
-      StoreArray<MCParticle>::registerPersistent();
-      DataStore::Instance().setInitializeActive(false);
-    }
-
-    /** clear datastore */
-    virtual void TearDown()
-    {
-      DataStore::Instance().reset();
-    }
-  };
-
-  TEST(FEIVariableTest, Variable)
-  {
-    // TODO
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
-    specificFEIUserCut(&p);
-    specificFEIROESelection(&p);
-  }
 
   TEST(VertexVariableTest, Variable)
   {
@@ -405,6 +379,7 @@ namespace {
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
+      StoreObjPtr<EventExtraInfo>::registerPersistent();
       StoreArray<Particle>::registerPersistent();
       StoreArray<MCParticle>::registerPersistent();
       DataStore::Instance().setInitializeActive(false);
@@ -549,6 +524,24 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("extraInfo(pi)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), 3.14);
+
+    // If nullptr is given event extra info should be returned
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    if (not eventExtraInfo.isValid())
+      eventExtraInfo.create();
+    eventExtraInfo->addExtraInfo("pi", 3.15);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 3.15);
+  }
+
+  TEST_F(MetaVariableTest, eventExtraInfo)
+  {
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    if (not eventExtraInfo.isValid())
+      eventExtraInfo.create();
+    eventExtraInfo->addExtraInfo("pi", 3.14);
+    const Manager::Var* var = Manager::Instance().getVariable("eventExtraInfo(pi)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
   }
 
   TEST_F(MetaVariableTest, formula)

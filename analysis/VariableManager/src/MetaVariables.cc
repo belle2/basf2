@@ -104,6 +104,21 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr eventExtraInfo(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto extraInfoName = arguments[0];
+        auto func = [extraInfoName](const Particle*) -> double {
+          StoreObjPtr<EventExtraInfo> eventExtraInfo;
+          return eventExtraInfo->getExtraInfo(extraInfoName);
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function extraInfo");
+        return nullptr;
+      }
+    }
+
     Manager::FunctionPtr formula(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -524,6 +539,10 @@ namespace Belle2 {
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like TMVAExpert.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the TMVAExpert.");
+    REGISTER_VARIABLE("eventExtraInfo(name)", extraInfo,
+                      "[eventbased] Returns extra info stored under the given name in the event extra info.\n"
+                      "The extraInfo has to be set first by another module like TMVAExpert in event mode.\n"
+                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the TMVAExpert for an event.");
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");

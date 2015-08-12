@@ -16,15 +16,13 @@ using namespace Belle2;
 
 TLorentzVector PCmsLabTransform::labToCms(const TLorentzVector& vector)
 {
-  //TODO: probably dangerous, consider StoreObjPtr lifetime
-  static PCmsLabTransform T;
+  PCmsLabTransform T;
   return T.rotateLabToCms() * vector;
 }
 
 TLorentzVector PCmsLabTransform::cmsToLab(const TLorentzVector& vector)
 {
-  //TODO: probably dangerous, consider StoreObjPtr lifetime
-  static PCmsLabTransform T;
+  PCmsLabTransform T;
   return T.rotateCmsToLab() * vector;
 }
 

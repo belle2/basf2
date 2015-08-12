@@ -33,6 +33,8 @@ namespace Belle2 {
    */
   class RandomGenerator: public TRandom {
   public:
+    /** Generator mode: determines which information is used to generate the
+     * internal state */
     enum EGeneratorMode {
       /** Don't use event info to generate state */
       c_independent,

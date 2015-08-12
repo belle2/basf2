@@ -576,9 +576,9 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
 
     table = b2latex.LongTable(columnspecs=r'c|r|rrrr|rrrr',
                               caption='Per-particle efficiency and purity before and after the applied user-, pre- and post-cut.',
-                              head=r'Particle & Covered BR in \%'
+                              head=r'Particle & Covered '
                                    r' & \multicolumn{4}{c}{Efficiency in \%}  &  \multicolumn{4}{c}{Purity in \%} \\'
-                                   r' & &  recon. & user-cut & pre-cut & post-cut '
+                                   r' & BR in \% &  recon. & user-cut & pre-cut & post-cut '
                                    r' & recon. & user-cut & pre-cut & post-cut \\',
                               format_string=r'{name} & {covered:.2f} & {detector_efficiency:.2f} & {user_efficiency:.2f}'
                                             r' & {pre_efficiency:.2f}  & {post_efficiency:.2f}'
@@ -712,11 +712,11 @@ def createTMVASection(filename, tmvaTraining, mvaConfig, plotConfig):
             o += b2latex.Graphics().add(correlationMatrixPlotSignal).add(correlationMatrixPlotBackground).finish()
 
         caption = 'Method ' + mvaConfig.type + '/' + mvaConfig.name + ' was used with the following configuration '
-        caption += format.variable(mvaConfig.config) + r'and with target variable \emph{' + mvaConfig.target + r'}'
+        caption += format.variable(mvaConfig.config) + r' and with target variable \emph{' + mvaConfig.target + r'}'
         table = b2latex.LongTable(columnspecs=r'lp{5cm}rr',
                                   caption=caption,
                                   head=r'Name & Signal & Background',
-                                  format_string=r'{name} & {signal} & {background}')
+                                  format_string=r'{name} & {signal:.0f} & {background:.0f}')
         table.add(name='Training',
                   signal=numpy.sum(tmvaTrainingData['__isSignal__']) * train_scale,
                   background=numpy.sum(~tmvaTestData['__isSignal__']) * test_scale)

@@ -81,14 +81,14 @@ void NtupleFlightInfoTool::evalFlightDistance(const Particle* mother, const Part
   TMatrixFSym mumCov = mother->getVertexErrorMatrix();   //order: x,y,z
   if (mother == daughter) {
     if (mother->hasExtraInfo("prodVertSxx")) mumCov[0][0] = mother->getExtraInfo("prodVertSxx");
-    if (mother->hasExtraInfo("prodVertSxy")) mumCov[0][0] = mother->getExtraInfo("prodVertSxy");
-    if (mother->hasExtraInfo("prodVertSxz")) mumCov[0][0] = mother->getExtraInfo("prodVertSxz");
-    if (mother->hasExtraInfo("prodVertSyx")) mumCov[0][0] = mother->getExtraInfo("prodVertSyx");
-    if (mother->hasExtraInfo("prodVertSyy")) mumCov[0][0] = mother->getExtraInfo("prodVertSyy");
-    if (mother->hasExtraInfo("prodVertSyz")) mumCov[0][0] = mother->getExtraInfo("prodVertSyz");
-    if (mother->hasExtraInfo("prodVertSzx")) mumCov[0][0] = mother->getExtraInfo("prodVertSzx");
-    if (mother->hasExtraInfo("prodVertSzy")) mumCov[0][0] = mother->getExtraInfo("prodVertSzy");
-    if (mother->hasExtraInfo("prodVertSzz")) mumCov[0][0] = mother->getExtraInfo("prodVertSzz");
+    if (mother->hasExtraInfo("prodVertSxy")) mumCov[0][1] = mother->getExtraInfo("prodVertSxy");
+    if (mother->hasExtraInfo("prodVertSxz")) mumCov[0][2] = mother->getExtraInfo("prodVertSxz");
+    if (mother->hasExtraInfo("prodVertSyx")) mumCov[1][0] = mother->getExtraInfo("prodVertSyx");
+    if (mother->hasExtraInfo("prodVertSyy")) mumCov[1][1] = mother->getExtraInfo("prodVertSyy");
+    if (mother->hasExtraInfo("prodVertSyz")) mumCov[1][2] = mother->getExtraInfo("prodVertSyz");
+    if (mother->hasExtraInfo("prodVertSzx")) mumCov[2][0] = mother->getExtraInfo("prodVertSzx");
+    if (mother->hasExtraInfo("prodVertSzy")) mumCov[2][1] = mother->getExtraInfo("prodVertSzy");
+    if (mother->hasExtraInfo("prodVertSzz")) mumCov[2][2] = mother->getExtraInfo("prodVertSzz");
   }
 
   //mother vertex

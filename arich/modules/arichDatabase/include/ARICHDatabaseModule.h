@@ -94,7 +94,6 @@ namespace Belle2 {
     int lambda;
     double val;
     GearDir m_content;
-    ARICHAerogelInfo* m_info;
     std::string m_wr;
   };
 

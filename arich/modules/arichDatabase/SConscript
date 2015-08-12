@@ -1,6 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', '$ROOT_LIBS', 'arich_dbobjects']
-env['SUBLIBS'] = True
+env['LIBS'] = ['framework', '$ROOT_LIBS', 'arich_dbobjects', 'arich']
 
 Return('env')

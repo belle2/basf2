@@ -38,10 +38,6 @@
 #include <string>
 #include <TClonesArray.h>
 
-#ifdef __MAKECINT__
-#pragma link C++ class vector<double>;
-#endif
-
 using namespace std;
 //using namespace boost;
 

@@ -11,12 +11,17 @@
 </header>
 """
 from basf2 import *
+from beamparameters import add_beamparameters
 import ROOT
 
 logging.log_level = LogLevel.WARNING
 
 main = create_path()
+
 main.add_module("EventInfoSetter", evtNumList=[100])
+
+beamparameters = add_beamparameters(main, "Y4S")
+
 main.add_module("Gearbox")
 main.add_module("Geometry", assignRegions=True)
 main.add_module("EvtGenInput")

@@ -89,7 +89,7 @@ class IPythonHandler:
         self.log_files = []
         self.basf2 = Basf2Information()
 
-    def process(self, path, result_queue=None):
+    def process(self, path, result_queue=None, random_seed=None):
         """
         Turn a path into a Basf2Calculation that you can start, stop or whatever you want.
 
@@ -103,10 +103,12 @@ class IPythonHandler:
         if result_queue is None:
             result_queue = queue.Basf2CalculationQueue()
 
-        basf2_process = Basf2Process(path=path, result_queue=result_queue, log_file_name=self.next_log_file_name())
+        basf2_process = Basf2Process(path=path, result_queue=result_queue,
+                                     log_file_name=self.next_log_file_name(),
+                                     random_seed=random_seed)
         return calculation.Basf2Calculation([basf2_process])
 
-    def process_parameter_space(self, path_creator_function, *list_of_parameters):
+    def process_parameter_space(self, path_creator_function, **kwargs):
         """
         Create a list of calculations by combining all parameters with all parameters you provide and
         feeding the tuple into the path_creator_function.
@@ -135,12 +137,29 @@ class IPythonHandler:
             calculations = handler.process_parameter_space(creator_function, [1, 2, 3], ["x", "y", "z"], [3, 4, 5])
         """
 
-        calculation_list = calculation.Basf2CalculationList(path_creator_function, *list_of_parameters)
-        all_paths, all_queues = calculation_list.create_all_paths()
+        if "random_seeds" in kwargs:
+            random_seeds = kwargs["random_seeds"]
+            del kwargs["random_seeds"]
+        else:
+            random_seeds = None
+
+        calculation_list = calculation.Basf2CalculationList(path_creator_function, kwargs)
+        all_paths, all_queues, all_parameters = calculation_list.create_all_paths()
+
+        if isinstance(random_seeds, list):
+            all_seeds = random_seeds
+            while len(all_seeds) < len(all_paths):
+                all_seeds += all_seeds
+
+        else:
+            all_seeds = [random_seeds] * len(all_paths)
+
         process_list = [Basf2Process(path=path,
-                                     result_queue=q,
+                                     result_queue=queue,
+                                     random_seed=random_seed,
+                                     parameters=parameters,
                                      log_file_name=self.next_log_file_name())
-                        for path, q in zip(all_paths, all_queues)]
+                        for path, queue, random_seed, parameters in zip(all_paths, all_queues, all_seeds, all_parameters)]
         return calculation.Basf2Calculation(process_list)
 
     def next_log_file_name(self):
@@ -157,7 +176,10 @@ class IPythonHandler:
             log_file_name = first_log_file[1]
 
             os.close(f)
-            os.unlink(log_file_name)
+            try:
+                os.unlink(log_file_name)
+            except OSError:
+                pass
         return next_log_file[1]
 
     def create_queue(self):
@@ -179,15 +201,17 @@ class Basf2Process(Process):
     Do not create instances on your own but rather use the IPythonHandler for this.
     """
 
-    def __init__(self, path, result_queue, log_file_name, **kwargs):
+    def __init__(self, path, result_queue, log_file_name, random_seed=None, parameters=None, **kwargs):
         if result_queue is None:
             raise ValueError("Invalid result_queue")
 
         self.result_queue = result_queue
         self.already_run = False
         self.log_file_name = log_file_name
+        self.random_seed = random_seed
         self.log_file_content = None
         self.path = path
+        self.parameters = parameters
 
         if path:
             # Append the needed ToFileLogger module
@@ -211,11 +235,13 @@ class Basf2Process(Process):
             # Add the print collections python module
             self.path.add_module(python_modules.PrintCollections(result_queue))
 
-            Process.__init__(self, target=self.start_process, kwargs={"file_name": self.log_file_name}, **kwargs)
+            Process.__init__(self, target=self.start_process,
+                             kwargs={"file_name": self.log_file_name, "random_seed": self.random_seed},
+                             **kwargs)
         else:
             Process.__init__(self, target=lambda: None, **kwargs)
 
-    def start_process(self, file_name):
+    def start_process(self, file_name, random_seed=None):
         """
         The function given to the process to start the calculation.
         Do not call by yourself.
@@ -224,6 +250,9 @@ class Basf2Process(Process):
         """
 
         try:
+            if random_seed is not None:
+                basf2.set_random_seed(random_seed)
+
             basf2.reset_log()
             basf2.logging.zero_counters()
             basf2.log_to_file(file_name)
@@ -272,7 +301,7 @@ class Basf2Process(Process):
 
 
 """
-TODO
+TODO: Comments
 """
 
 

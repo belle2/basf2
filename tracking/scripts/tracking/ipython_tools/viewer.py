@@ -122,7 +122,7 @@ class PathViewer(Basf2Widget):
                         + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
             html.value += "</table>"
             children.append(html)
-            if isinstance(module.name, string):
+            if isinstance(module.name, str):
                 a.set_title(i, module.name)
             else:
                 a.set_title(i, module.name())

@@ -7,7 +7,7 @@ import time
 class Basf2Calculation():
 
     """
-    Create a _Basf2Calculation from the given _Basf2Process that handles
+    Create a _Basf2Calculation from the given Basf2Process that handles
     the status of the process and the actions like start, stop or wait_for_end
     Do not create instances of this class by yourself but rather use the IPythonHandler for this.
     """
@@ -32,8 +32,6 @@ class Basf2Calculation():
         def f(process):
             if self.is_running(process):
                 process.terminate()
-            else:
-                raise AssertionError("Calculation has not been started or has finished.")
 
         self.map_on_processes(f, index)
 
@@ -69,7 +67,7 @@ class Basf2Calculation():
 
         # Initialize all process bars
         process_bars = {process: viewer.ProgressBarViewer()
-                        for process in self.process_list if process.path is not None and self.is_running(process)}
+                        for process in self.process_list if process.path is not None}
 
         # Update all process bars as long as minimum one process is running
         while True:
@@ -153,7 +151,7 @@ class Basf2Calculation():
         """
         Return the saved queue item with the given name
         """
-        return self.map_on_processes(lambda process: process.get(name) if process.path is not None else None, index)
+        return self.map_on_processes(lambda process: process.get(name), index)
 
     def get_keys(self, index=None):
         """
@@ -201,6 +199,9 @@ class Basf2Calculation():
 
         return self.map_on_processes(f, index)
 
+    def get_parameters(self, index=None):
+        return self.map_on_processes(lambda process: process.parameters, index)
+
     def create_widgets_for_all_processes(self, widget_function, index=None):
         """
         Create a overview widget for all processes or only one for the given process.
@@ -229,6 +230,8 @@ class Basf2Calculation():
         def f(process):
             if process.path is not None:
                 return viewer.PathViewer(process.path)
+            else:
+                return None
 
         self.create_widgets_for_all_processes(f, index)
 
@@ -239,7 +242,10 @@ class Basf2Calculation():
         """
 
         def f(process):
-            return viewer.CollectionsViewer(self.get("basf2.store_content", process))
+            if "basf2.store_content" in self.get_keys(process):
+                return viewer.CollectionsViewer(self.get("basf2.store_content", process))
+            else:
+                return None
 
         self.create_widgets_for_all_processes(f, index)
 
@@ -249,7 +255,10 @@ class Basf2Calculation():
         """
 
         def f(process):
-            return viewer.StatisticsViewer(self.get_statistics(process))
+            if "basf2.statistics" in self.get_keys(process):
+                return viewer.StatisticsViewer(self.get("basf2.statistics", process))
+            else:
+                return None
 
         self.create_widgets_for_all_processes(f, index)
 
@@ -260,7 +269,7 @@ class Basf2CalculationList():
     Creates a whole list of paths by combining every list element in every list in lists with every other list in lists.
     """
 
-    def __init__(self, path_function, *lists):
+    def __init__(self, path_function, lists):
         self.path_function = path_function
         self.lists = lists
 
@@ -270,19 +279,23 @@ class Basf2CalculationList():
         """
         import itertools
 
-        every_parameter_combination = itertools.product(*(self.lists))
-        every_parameter_combination = list(every_parameter_combination)
-        all_queues = [queue.Basf2CalculationQueue() for combination in every_parameter_combination]
+        parameter_names_in_list = list(self.lists.iterkeys())
+        parameter_values_in_list = list(self.lists.itervalues())
+
+        every_parameter_combination = itertools.product(*parameter_values_in_list)
+
+        every_parameter_combination_with_names = [{parameter_name: parameter_value for parameter_name, parameter_value in zip(
+            parameter_names_in_list, parameter_values)} for parameter_values in list(every_parameter_combination)]
+
+        all_queues = [queue.Basf2CalculationQueue() for combination in every_parameter_combination_with_names]
 
         def f(queue, parameter_combination):
             args, vargs, vwargs, defaults = inspect.getargspec(self.path_function)
-            queue.put("basf2.parameter", parameter_combination)
             if "queue" in args:
-                queue_index = args.index("queue")
-                parameter_list = list(parameter_combination)
-                parameter_list.insert(queue_index, queue)
-                parameter_combination = tuple(parameter_list)
-            return self.path_function(*parameter_combination)
+                parameter_combination.update({"queue": queue})
 
-        all_paths = [f(q, parameter_combination) for q, parameter_combination in zip(all_queues, list(every_parameter_combination))]
-        return all_paths, all_queues
+            return self.path_function(**parameter_combination)
+
+        all_paths = [f(q, parameter_combination)
+                     for q, parameter_combination in zip(all_queues, list(every_parameter_combination_with_names))]
+        return all_paths, all_queues, list(every_parameter_combination_with_names)

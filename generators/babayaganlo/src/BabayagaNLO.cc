@@ -96,140 +96,145 @@ extern "C" {
   /** Callback to show warning if weights are not sufficient --> bias*/
   void babayaganlo_warning_overweight_(double* weight, double* max)
   {
-    B2WARNING("Maximum weight " << *max  << " to small, increase fmax to at least " << *weight);
+    B2WARNING("Babayaga.NLO: Maximum weight " << *max  << " to small, increase fmax to at least " << *weight);
   }
 
   /** Callback to show error if event is rejected*/
   void babayaganlo_error_rejection_(double* ratio)
   {
-    B2ERROR("Event rejected! Ratio of cross section error increase too large: " << *ratio);
+    B2ERROR("Babayaga.NLO: Event rejected! Ratio of cross section error increase too large: " << *ratio);
   }
 
   /** Callback to show error if weight is negative*/
   void babayaganlo_error_negative_(double* weight)
   {
-    B2ERROR("Event has negative weight: " << *weight);
+    B2ERROR("Babayaga.NLO: Event has negative weight: " << *weight);
   }
 
   /** Callback results */
+  void babayaganlo_result_nominalcmsenergy_(double* energy)
+  {
+    B2RESULT("Babayaga.NLO: Nominal CMS energy (GeV): " << *energy);
+  }
+
   void babayaganlo_result_weightedxsec_(double* xsec, double* xsecerr)
   {
-    B2RESULT("Weighted cross section (nb): " << *xsec << " +/- " << *xsecerr);
+    B2RESULT("Babayaga.NLO: Weighted cross section (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
   void babayaganlo_result_unweightedxsec_(double* xsec, double* xsecerr)
   {
-    B2RESULT("Unweighted cross section (nb): " << *xsec << " +/- " << *xsecerr);
+    B2RESULT("Babayaga.NLO: Unweighted cross section (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
   void babayaganlo_result_unweightedxsec_biascorrected_(double* xsec, double* xsecerr)
   {
-    B2RESULT("Unweighted cross section, bias corrected (nb): " << *xsec << " +/- " << *xsecerr);
+    B2RESULT("Babayaga.NLO: Unweighted cross section, bias corrected (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
   void babayaganlo_result_unweightedxsec_overweight_(double* xsec, double* xsecerr)
   {
-    B2RESULT("Unweighted cross section overweight (nb): " << *xsec << " +/- " << *xsecerr);
+    B2RESULT("Babayaga.NLO: Unweighted cross section overweight (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
   void babayaganlo_result_unweightedxsec_underweight_(double* xsec, double* xsecerr)
   {
-    B2RESULT("Unweighted cross section underweight (nb): " << -*xsec << " +/- " << *xsecerr);
+    B2RESULT("Babayaga.NLO: Unweighted cross section underweight (nb): " << -*xsec << " +/- " << *xsecerr);
   }
 
   void babayaganlo_result_hitormisseff_(double* eff)
   {
-    B2RESULT("Hit or miss efficiency: " << *eff * 100. << " % ");
+    B2RESULT("Babayaga.NLO: Hit or miss efficiency: " << *eff * 100. << " % ");
   }
 
   void babayaganlo_result_nover_(int* nover)
   {
-    B2RESULT("Points with w > fmax (bias): " << *nover);
+    B2RESULT("Babayaga.NLO: Points with w > fmax (bias): " << *nover);
   }
 
   void babayaganlo_result_biashit_(double* biashit)
   {
-    B2RESULT("Bias/hit: " << *biashit * 100. << " % ");
+    B2RESULT("Babayaga.NLO: Bias/hit: " << *biashit * 100. << " % ");
   }
 
   void babayaganlo_result_biashitpmiss_(double* biashitpmiss)
   {
-    B2RESULT("Bias/(hit+missed): " << *biashitpmiss * 100. << " % ");
+    B2RESULT("Babayaga.NLO: Bias/(hit+missed): " << *biashitpmiss * 100. << " % ");
   }
 
   void babayaganlo_result_nneg_(int* nneg)
   {
-    B2RESULT("Points with w > fmax (bias): " << *nneg);
+    B2RESULT("Babayaga.NLO: Points with w > fmax (bias): " << *nneg);
   }
 
   void babayaganlo_result_biasneghit_(double* biasneghit)
   {
-    B2RESULT("Neg. bias/hit: " << *biasneghit * 100. << " % ");
+    B2RESULT("Babayaga.NLO: Neg. bias/hit: " << *biasneghit * 100. << " % ");
   }
 
   void babayaganlo_result_biasneghitmiss_(double* biasneghitmiss)
   {
-    B2RESULT("Neg. bias/(hit+missed): " << *biasneghitmiss * 100. << " % ");
+    B2RESULT("Babayaga.NLO: Neg. bias/(hit+missed): " << *biasneghitmiss * 100. << " % ");
   }
 
   void babayaganlo_result_maxweight_(double* sdifmax, double* fmax)
   {
-    B2RESULT("Maximum weight (sdifmax): " << *sdifmax << ", user maximum weight(fmax): " << *fmax);
+    B2RESULT("Babayaga.NLO: Maximum weight (sdifmax): " << *sdifmax << ", user maximum weight(fmax): " << *fmax);
   }
 
   void babayaganlo_result_vpmin_(double* xsec, double* xsecerr, double* frac)
   {
-    B2RESULT("VP Uncertainty, minimum: " << *xsec << " +/- " << *xsecerr << "(" << *frac << " %)");
+    B2RESULT("Babayaga.NLO: VP Uncertainty, minimum (nb): " << *xsec << " +/- " << *xsecerr << " (" << *frac << " %)");
   }
 
   void babayaganlo_result_vpcentral_(double* xsec, double* xsecerr)
   {
-    B2RESULT("VP Uncertainty, central: " << *xsec << " +/- " << *xsecerr << "( 0.0 %)");
+    B2RESULT("Babayaga.NLO: VP Uncertainty, central (nb): " << *xsec << " +/- " << *xsecerr);
   }
 
   void babayaganlo_result_vpmax_(double* xsec, double* xsecerr, double* frac)
   {
-    B2RESULT("VP Uncertainty, maximum: " << *xsec << " +/- " << *xsecerr << " ( " << *frac << " %)");
+    B2RESULT("Babayaga.NLO: VP Uncertainty, maximum (nb): " << *xsec << " +/- " << *xsecerr << " ( " << *frac << " %)");
   }
 
   void babayaganlo_finishedmaxsearch_(double* fmax)
   {
-    B2INFO("Finished maximum search: " << *fmax << ", starting now unweighted generation");
+    B2INFO("Babayaga.NLO: Finished maximum search: " << *fmax << ", starting now unweighted generation");
   }
 
   void babayaganlo_fatal_usercuts_()
   {
-    B2FATAL("UserMode is selected but wrong user cuts are provided!");
+    B2FATAL("Babayaga.NLO: UserMode is selected but wrong user cuts are provided!");
   }
 
   void babayaganlo_fatal_usercutsfs_()
   {
-    B2FATAL("UserMode is only possible for ee final states!");
+    B2FATAL("Babayaga.NLO: UserMode is only possible for ee final states!");
   }
 
   void babayaganlo_fatal_usercutsprescale_()
   {
-    B2FATAL("Prescale value must be larger than 0 (zero), hint: ~100 is reasonable!");
+    B2FATAL("Babayaga.NLO: Prescale value must be larger than 0 (zero), hint: ~100 is reasonable!");
   }
 
   void babayaganlo_fatal_weightedprescale_()
   {
-    B2FATAL("Generator prescale is not allowed with usermode = weighted");
+    B2FATAL("Babayaga.NLO: Generator prescale is not allowed with usermode = weighted");
   }
 
   void babayaganlo_result_weightsum_(double* wsum)
   {
-    B2RESULT("Sum of weights: " << *wsum);
+    B2RESULT("Babayaga.NLO: Sum of weights: " << *wsum);
   }
 
   void babayaganlo_result_intlum_(double* lum, double* lumerr)
   {
-    B2RESULT("Luminosity equivalent (using calc. xsec) (fb-1): " << *lum << " +/- " << *lumerr);
+    B2RESULT("Babayaga.NLO: Luminosity equivalent (using calc. xsec) (fb-1): " << *lum << " +/- " << *lumerr);
   }
 
   void babayaganlo_warning_prescaleweight_(double* weight)
   {
-    B2WARNING("Prescale of less than one, increase prescale safety margin " << *weight);
+    B2WARNING("Babayaga.NLO: Prescale of less than one, increase prescale safety margin " << *weight);
   }
 
 }
@@ -356,12 +361,12 @@ void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 v
 void BabayagaNLO::term()
 {
 
-  B2RESULT("final state: " << m_finalState);
-  B2RESULT("mode:        " << m_mode);
-  B2RESULT("order:       " << m_order);
-  B2RESULT("model:       " << m_model);
-  B2RESULT("vac. pol.:   " << m_vacPol);
-  B2RESULT("usercuts:    " << m_userMode);
+  B2RESULT("Babayaga.NLO: Final state:    " << m_finalState);
+  B2RESULT("Babayaga.NLO: Mode:           " << m_mode);
+  B2RESULT("Babayaga.NLO: Order:          " << m_order);
+  B2RESULT("Babayaga.NLO: Model:          " << m_model);
+  B2RESULT("Babayaga.NLO: Vac. pol. (VP): " << m_vacPol);
+  B2RESULT("Babayaga.NLO: Usercuts:       " << m_userMode);
 
   // all other results are displayed from fortran using a callback to C extern logging
 

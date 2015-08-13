@@ -609,6 +609,7 @@ c     END OF RUN (see below) (MODE.EQ.1)
 c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
       ELSEIF (MODE.EQ.2) THEN
 !         write(*,*) "MODE.EQ.2, FINALIZE"
+        CALL babayaganlo_result_nominalcmsenergy(ecmsnom)
 
 ! weighted cross section
 	xsec = sum/k

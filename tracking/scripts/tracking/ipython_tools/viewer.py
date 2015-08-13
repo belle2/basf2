@@ -93,11 +93,11 @@ class PathViewer(Basf2Widget):
         <style>
             .path-table table{
               border-collapse: separate;
-              border-spacing: 50px 0;
+              border-spacing: 50px;
             }
 
             .path-table td {
-              padding: 10px 0;
+              padding: 10px;
               }
         </style>"""
 
@@ -105,18 +105,27 @@ class PathViewer(Basf2Widget):
         """
         Create the widget
         """
+        if self.path is None:
+            return widgets.HTML("")
+
         a = widgets.Accordion()
         children = []
 
         for i, module in enumerate(self.path.modules()):
             html = widgets.HTML()
             html.value = self.styling_text + "<table class=\"path-table\">"
-            for param in module.available_params():
-                html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td>" + str(param.values) + "</td>" \
-                    + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
+            if len(module.available_params()) == 0:
+                html.value += "<tr><td>No parameter available.</td></tr>"
+            else:
+                for param in module.available_params():
+                    html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td>" + str(param.values) + "</td>" \
+                        + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
             html.value += "</table>"
             children.append(html)
-            a.set_title(i, module.name())
+            if isinstance(module.name, string):
+                a.set_title(i, module.name)
+            else:
+                a.set_title(i, module.name())
 
         a.children = children
 
@@ -143,14 +152,14 @@ class ProgressBarViewer(Basf2Widget):
 
         js = """
         <script type="text/Javascript">
-        function set_event_number(number) {
+        function set_event_number(number, js_name) {
             if(isNaN(number)) {
-                $("#""" + self.js_name + """ > .event_number").html("Status: " + number + "");
+                $("#" + js_name + " > .event_number").html("Status: " + number + "");
             } else {
-                $("#""" + self.js_name + """ > .event_number").html("Percentage: " + 100 * number + "");
+                $("#" + js_name + " > .event_number").html("Percentage: " + 100 * number + "");
             }
 
-            var progressbar = $("#""" + self.js_name + """ > .progressbar");
+            var progressbar = $("#" + js_name + " > .progressbar");
             var progressbarValue = progressbar.find( ".ui-progressbar-value" );
 
             if(number == "finished") {
@@ -161,7 +170,7 @@ class ProgressBarViewer(Basf2Widget):
                 progressbarValue.css({"background": '#CC3300'});
             } else {
                 progressbar.progressbar({value: 100*number});
-                progressbarValue.css({"background": '#000000'});
+                progressbarValue.css({"background": '#CCCCCC'});
             }
         }
 
@@ -180,7 +189,7 @@ class ProgressBarViewer(Basf2Widget):
         """
         Update the widget with a new event number
         """
-        js = "set_event_number(\"" + str(text) + "\"); "
+        js = "set_event_number(\"" + str(text) + "\", \"" + self.js_name + "\"); "
         return display(Javascript(js))
 
     def show(self):
@@ -219,6 +228,9 @@ class CollectionsViewer(Basf2Widget):
         """
         Create the widget
         """
+
+        if self.collections is None:
+            return widgets.HTML("")
 
         a = widgets.Tab()
         children = []
@@ -264,6 +276,9 @@ class StatisticsViewer(Basf2Widget):
         </style>"""
 
     def create(self):
+        if self.statistics is None:
+            return widgets.HTML("")
+
         html = widgets.HTML()
         html.value = self.styling_text + "<table class=\"stat-table\"><tr>"
         html.value += "<td>Name</td>"
@@ -304,7 +319,7 @@ class ProcessViewer(object):
         a = widgets.Tab()
         for i in xrange(len(self.children)):
             a.set_title(i, "Process " + str(i))
-        a.children = [children.create() for children in self.children]
+        a.children = [children.create() for children in self.children if children is not None]
         return a
 
     def show(self):

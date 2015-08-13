@@ -19,7 +19,43 @@ from multiprocessing import Process, Pipe
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from IPython.core.display import Image, display
-from tracking.ipython_tools.queue import Basf2CalculationQueueStatistics
+from tracking.validation.harvesting import HarvestingModule
+
+
+class Basf2Information:
+
+    """
+    Helper class for acessing the information about basf2
+    from the environment variables.
+    """
+
+    def __init__(self):
+        """
+        Get the variables from the environment variables.
+        """
+        self.externals_version = os.environ.get("BELLE2_EXTERNALS_VERSION")
+        self.externals_option = os.environ.get("BELLE2_EXTERNALS_OPTION")
+        self.option = os.environ.get("BELLE2_OPTION")
+        self.architecture = os.environ.get("BELLE2_ARCH")
+        self.release = os.environ.get("BELLE2_RELEASE")
+
+    def __str__(self):
+        """
+        A nice representation.
+        """
+        result = ""
+        result += "externals_version: " + self.externals_version + "\n"
+        result += "externals_option: " + self.externals_option + "\n"
+        result += "option: " + self.option + "\n"
+        result += "architecture: " + self.architecture + "\n"
+        result += "release: " + self.release + "\n"
+        return result
+
+    def __repr__(self):
+        """
+        Also for ipython.
+        """
+        return self.__str__()
 
 
 class IPythonHandler:
@@ -33,7 +69,7 @@ class IPythonHandler:
     -----
 
     Create a handler object in the beginning of your NB and use the two methods `process`
-    and `process_parameter_space` to turn a path or a path creator function into a _Basf2Calculation.
+    and `process_parameter_space` to turn a path or a path creator function into a Basf2Calculation.
     Do not create calculations on you own.
 
         from tracking.validation.ipython_handler import handler
@@ -46,18 +82,21 @@ class IPythonHandler:
 
     def __init__(self):
         """
-        Each created log file gets registered and deleted if there are more than 100 log files present
+        Each created log file gets registered and deleted if there are more than 20 log files present
+        or if the get_log function of the process is called (the log is saved elsewhere).
+        As the log files are saved to /tmp you have probably not to care about deleting them.
         """
         self.log_files = []
+        self.basf2 = Basf2Information()
 
     def process(self, path, result_queue=None):
         """
-        Turn a path into a _Basf2Calculation that you can start, stop or whatever you want.
+        Turn a path into a Basf2Calculation that you can start, stop or whatever you want.
 
         Arguments
         ---------
         path: The basf2 path
-        result_queue: The _Basf2CalculationQueue you want to use. Without giving this as a parameter
+        result_queue: The Basf2CalculationQueue you want to use. Without giving this as a parameter
            the function creates one for you. Create one on your own with the function create_queue.
         """
 
@@ -71,27 +110,29 @@ class IPythonHandler:
         """
         Create a list of calculations by combining all parameters with all parameters you provide and
         feeding the tuple into the path_creator_function.
+        If the path_creator_function has a parameter named queue, the function feeds the corresponding
+        created queue into the path_creator_function.
+
+        Please note that a list of calculations acts the same as a single calculation you would get from
+        the process function. You can handle 10 calculations the same way you would handle a single one.
 
         Arguments
         ---------
-        path_creator_function: A function with as many input parameters as parameters you provide
+        path_creator_function: A function with as many input parameters as parameters you provide.
+           If the function has an additional queue parameter it is fed with the corresponding queue for this path.
         list_of_parameters: As many lists as you want. Every list is one parameter. If you do not want a
-           specific parameter constellation to occur, you can return None in your parameter_creator for
+           specific parameter constellation to occur, you can return None in your path_creator_function for
            this combination.
 
         Usage
         -----
 
-            def creator_function(par_1, par_2, par_3):
+            def creator_function(par_1, par_2, par_3, queue):
                 path = ... par_1 ... par_2 ... par_3
+                queue.put(..., ...)
                 return path
 
             calculations = handler.process_parameter_space(creator_function, [1, 2, 3], ["x", "y", "z"], [3, 4, 5])
-
-        TODO
-        ----
-
-        Create a pool of workers!
         """
 
         calculation_list = calculation.Basf2CalculationList(path_creator_function, *list_of_parameters)
@@ -103,14 +144,19 @@ class IPythonHandler:
         return calculation.Basf2Calculation(process_list)
 
     def next_log_file_name(self):
+        """
+        Return the name of the next log file.
+        If there are more thann 20 log files present,
+        start deleting the oldes ones.
+        """
         next_log_file = tempfile.mkstemp()
         self.log_files.append(next_log_file)
-        while len(self.log_files) > 100:
+        while len(self.log_files) > 20:
             first_log_file = self.log_files.pop(0)
             f = first_log_file[0]
             log_file_name = first_log_file[1]
 
-            f.close()
+            os.close(f)
             os.unlink(log_file_name)
         return next_log_file[1]
 
@@ -134,18 +180,35 @@ class Basf2Process(Process):
     """
 
     def __init__(self, path, result_queue, log_file_name, **kwargs):
-        self.path = path
-
         if result_queue is None:
             raise ValueError("Invalid result_queue")
 
         self.result_queue = result_queue
         self.already_run = False
         self.log_file_name = log_file_name
+        self.log_file_content = None
+        self.path = path
 
-        if self.path:
+        if path:
+            # Append the needed ToFileLogger module
+            created_path = basf2.create_path()
+            file_logger_module = basf2.register_module("ToFileLogger")
+            file_logger_module.param("fileName", log_file_name)
+            created_path.add_module(file_logger_module)
+
+            # Copy the modules from the path
+            for module in path.modules():
+                created_path.add_module(module)
+
+            self.path = created_path
+
+            # Create the queue for the progress python module
             self.progress_queue_local, self.progress_queue_remote = Pipe()
+
+            # Add the progress python module
             self.path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
+
+            # Add the print collections python module
             self.path.add_module(python_modules.PrintCollections(result_queue))
 
             Process.__init__(self, target=self.start_process, kwargs={"file_name": self.log_file_name}, **kwargs)
@@ -165,18 +228,31 @@ class Basf2Process(Process):
             basf2.logging.zero_counters()
             basf2.log_to_file(file_name)
             basf2.process(self.path)
-            self.result_queue.put("basf2.statistics", Basf2CalculationQueueStatistics(basf2.statistics))
+            self.result_queue.put("basf2.statistics", queue.Basf2CalculationQueueStatistics(basf2.statistics))
         except:
             raise
         finally:
             self.progress_queue_remote.send("end")
+
+    def save_log(self):
+        """
+        Delete the log file and copy its content to the class.
+        """
+        if self.log_file_content is None:
+            self.log_file_content = open(self.log_file_name).read()
+            os.unlink(self.log_file_name)
+            self.log_file_name = None
 
     def get_log(self):
         """
         Return the log file content.
         Use the methods of the Basf2Calculation for a better handling.
         """
-        return open(self.log_file_name).read()
+        if self.is_alive():
+            return open(self.log_file_name).read()
+        else:
+            self.save_log()
+            return self.log_file_content
 
     def get(self, name):
         """
@@ -198,6 +274,16 @@ class Basf2Process(Process):
 """
 TODO
 """
+
+
+class QueueHarvester(HarvestingModule):
+
+    def __init__(self, queue, foreach, output_file_name, name=None, title=None, contact=None, expert_level=None):
+        queue.put(self.__class__.__name__ + "_output_file_name", output_file_name)
+        HarvestingModule.__init__(self, foreach=foreach,
+                                  output_file_name=output_file_name,
+                                  name=name, title=title, contact=contact,
+                                  expert_level=expert_level)
 
 
 def tail_file(file_name):

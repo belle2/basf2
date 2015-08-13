@@ -52,44 +52,56 @@ class Basf2Calculation():
 
         self.map_on_processes(f, index)
 
-    def wait_for_end(self, index=None, display_bar=True):
+    def wait_for_end(self, display_bar=True):
         """
         Send the calculation into the foreground by halting the notebook as long as the process is running.
         Shows a progress bar with the number of processed events.
         Please keep in mind that you can not execute cells in the notebook when having called wait_for_end
         (but before - although a calculation is running.).
-
-        TODO: Show all status bars and show them smaller
         """
-        def f(process):
+
+        def initialize_process_bar(process):
             if process.path is None:
                 return
+
             if process.already_run:
-                f = None
-                if display_bar:
-                    f = viewer.ProgressBarViewer()
-                while self.is_running(process):
-                    if process.progress_queue_local.poll():
-                        result = process.progress_queue_local.recv()
-                        if result == "end":
-                            break
-                        if display_bar:
-                            f.update(result)
+                return viewer.ProgressBarViewer()
 
-                    time.sleep(0.001)
+        # Initialize all process bars
+        process_bars = {process: viewer.ProgressBarViewer()
+                        for process in self.process_list if process.path is not None and self.is_running(process)}
 
-                process.join()
-                if display_bar:
-                    if self.has_failed(process):
-                        f.update("failed!")
-                    else:
-                        f.update("finished")
+        # Update all process bars as long as minimum one process is running
+        while True:
+            running_list = filter(lambda p: self.is_running(p) and p.path is not None, self.process_list)
+            if len(running_list) == 0:
+                break
 
-                process.join()
-            else:
-                raise AssertionError("Calculation has not been started.")
+            for process in running_list:
+                process_bar = process_bars[process]
+                if process.progress_queue_local.poll():
+                    result = process.progress_queue_local.recv()
+                    if result == "end":
+                        process.join()
+                        if self.has_failed(process):
+                            process_bar.update("failed!")
+                        else:
+                            process_bar.update("finished")
 
-        self.map_on_processes(f, index)
+                    elif display_bar:
+                        process_bar.update(result)
+
+            time.sleep(0.01)
+            running_list = filter(lambda p: self.is_running(p), self.process_list)
+
+        # Join all processes and set the result correctly
+        for process in self.process_list:
+            if process in process_bars:
+                process_bar = process_bars[process]
+                if self.has_failed(process):
+                    process_bar.update("failed!")
+                else:
+                    process_bar.update("finished")
 
     def map_on_processes(self, map_function, index):
         """
@@ -141,7 +153,7 @@ class Basf2Calculation():
         """
         Return the saved queue item with the given name
         """
-        return self.map_on_processes(lambda process: process.get(name), index)
+        return self.map_on_processes(lambda process: process.get(name) if process.path is not None else None, index)
 
     def get_keys(self, index=None):
         """

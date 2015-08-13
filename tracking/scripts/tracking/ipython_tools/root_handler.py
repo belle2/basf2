@@ -4,6 +4,7 @@ import seaborn as sb
 sb.set()
 import pandas as pd
 import numpy as np
+import os
 
 from root_numpy import root2array, list_trees, list_branches, list_structures
 
@@ -79,7 +80,10 @@ def read_root(filename, branches=None, tree_key=None, chunksize=None):
     If branches is not None use only the given branches (if they are numerical and one dimensional), else use all branches.
     If chunksize is not None return a ReadRoot-object - an iterator - which can be uses to receive the data in chunks.
     """
-    # TODO: Moredimensional to one dimensional?
+
+    if not os.path.exists(filename):
+        raise IOError("File %s does not exists." % filename)
+
     if tree_key is not None:
         trees = [tree_key]
     else:
@@ -170,14 +174,18 @@ class TrackingValidationResult:
         if mc_data is None:
             mc_data = self.mc_data
 
-        pt_values = pd.cut(mc_data.pt_truth, np.arange(0, 2, 0.1))
+        pt_values = pd.cut(mc_data.pt_truth, np.linspace(mc_data.pt_truth.min(), mc_data.pt_truth.max(), 10))
         grouped = mc_data.groupby(pt_values)
 
         return grouped
 
-    def plot(self, data_x, data_y, loc=4):
-        plt.plot(data_x, data_y, ls="-", marker="o",
-                 color=self.color, label=self.label)
+    def plot(self, data_x, data_y, loc=4, yerr=None):
+        if yerr is not None:
+            plt.errorbar(data_x, data_y, ls="-", marker="o",
+                         color=self.color, label=self.label, yerr=yerr)
+        else:
+            plt.plot(data_x, data_y, ls="-", marker="o",
+                     color=self.color, label=self.label)
 
         if self.label is not None:
             plt.legend(loc=loc)
@@ -185,14 +193,14 @@ class TrackingValidationResult:
     def plot_finding_efficiency(self, data=None):
         grouped = self.grouped_by_pt_data(data)
 
-        self.plot(grouped.median().pt_truth, grouped.mean().is_matched)
+        self.plot(grouped.median().pt_truth, grouped.mean().is_matched, yerr=grouped.std().is_matched)
         plt.xlabel("pt")
         plt.ylabel("finding efficiency")
 
     def plot_hit_efficiency(self, data=None):
         grouped = self.grouped_by_pt_data(data)
 
-        self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency)
+        self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency, yerr=grouped.std().hit_efficiency)
         plt.xlabel("pt")
         plt.ylabel("hit efficiency")
 

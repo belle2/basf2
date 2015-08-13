@@ -13,6 +13,7 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from beamparameters import add_beamparameters
 import glob
 
 set_random_seed(12345)
@@ -30,6 +31,9 @@ main.add_module(eventinfosetter)
 # geometry parameter database
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
 
 # generate Bhabha events
 babayaganlo = register_module('BabayagaNLOInput')

@@ -1,8 +1,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <genfit/AbsKalmanFitter.h>
+#include <genfit/AbsFitter.h>
 #include <genfit/RKTrackRep.h>
-#include <genfit/KalmanFitStatus.h>
+#include <genfit/FitStatus.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -129,7 +129,7 @@ void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
   setTimeSeed(timeSeed);
 }
 
-void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool resortHits)
+void RecoTrack::fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool resortHits)
 {
   m_lastFitSucessfull = false;
 
@@ -169,8 +169,6 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int 
     genfit::FitStatus* fs = getFitStatus(trackRep);
     fitSuccess = fitSuccess && fs->isFitted();
     fitSuccess = fitSuccess && fs->isFitConverged();
-    genfit::KalmanFitStatus* kfs = dynamic_cast<genfit::KalmanFitStatus*>(fs);
-    fitSuccess = fitSuccess && kfs;
   }
 
   m_lastFitSucessfull = fitSuccess;

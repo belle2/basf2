@@ -13,7 +13,7 @@
 #include <string>
 
 namespace genfit {
-  class AbsKalmanFitter;
+  class AbsFitter;
 }
 
 
@@ -46,7 +46,7 @@ namespace Belle2 {
      * This method has to by implemented by the derived class
      * @return The fitter we will use for fitting.
      */
-    virtual std::shared_ptr<genfit::AbsKalmanFitter> createFitter() const = 0;
+    virtual std::shared_ptr<genfit::AbsFitter> createFitter() const = 0;
 
   private:
     /** StoreArray name of the input and output reco tracks */
@@ -55,8 +55,6 @@ namespace Belle2 {
     unsigned int m_param_pdgCodeToUseForFitting = 211;
     /** Resort the hits while fitting */
     bool m_param_resortHits = false;
-    /** Maximum number of failed hits before aborting the fit */
-    unsigned int m_param_maxNumberOfFailedHits = 5;
   };
 }
 

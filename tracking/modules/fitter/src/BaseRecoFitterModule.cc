@@ -40,9 +40,6 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("resortHits", m_param_resortHits,
            "Resort the hits while fitting.", false);
-
-  addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,
-           "Maximum number of failed hits before aborting the fit.", static_cast<unsigned int>(5));
 }
 
 void BaseRecoFitterModule::initialize()
@@ -73,8 +70,7 @@ void BaseRecoFitterModule::event()
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
 
-  const std::shared_ptr<genfit::AbsKalmanFitter>& fitter = createFitter();
-  fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
+  const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
 
   for (RecoTrack& recoTrack : recoTracks) {
     B2DEBUG(100, "Fitting reco track candidate number " << recoTrackCounter);

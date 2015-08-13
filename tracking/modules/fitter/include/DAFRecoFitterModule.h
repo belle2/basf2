@@ -26,19 +26,25 @@ namespace Belle2 {
       addParam("ProbCut", m_param_probabilityCut,
                "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
                double(0.001));
+
+      addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,
+               "Maximum number of failed hits before aborting the fit.", static_cast<unsigned int>(5));
     }
 
   protected:
     /** Create a DAF fitter */
-    std::shared_ptr<genfit::AbsKalmanFitter> createFitter() const override
+    std::shared_ptr<genfit::AbsFitter> createFitter() const override
     {
       std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>();
       fitter->setProbCut(m_param_probabilityCut);
+      fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
 
       return fitter;
     }
 
   private:
     double m_param_probabilityCut; /**< Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001 */
+    /** Maximum number of failed hits before aborting the fit */
+    unsigned int m_param_maxNumberOfFailedHits = 5;
   };
 }

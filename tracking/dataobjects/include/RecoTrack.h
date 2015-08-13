@@ -26,7 +26,7 @@
 #include <framework/gearbox/Const.h>
 
 namespace genfit {
-  class AbsKalmanFitter;
+  class AbsFitter;
 }
 
 namespace Belle2 {
@@ -505,7 +505,7 @@ namespace Belle2 {
      * @param pdgCodeForFit the pdg code we use for fitting. If you set the wrong charge, the method will turn it the other way round.
      * @param resortHits Whether the fitter should try to resort the hits
      */
-    void fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool resortHits);
+    void fit(const std::shared_ptr<genfit::AbsFitter>& fitter, int pdgCodeForFit, bool resortHits);
 #endif
 
     /**

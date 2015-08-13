@@ -57,7 +57,9 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 
   //Approximate total cross section
   a1 = log((1.0 + z0) / z0);
-  a2 = (log(1.0 + z0)) / z0;
+//   a2 = (log(1.0 + z0)) / z0;
+// Expression 'log(1 + x)' is replaced by 'log1p(x)' to avoid loss of precision.
+  a2 = (log1p(z0)) / z0;
   ac = a1 / (a1 + a2);
   sigapp = 8.0 * (alpha * alpha * alpha) / rme2 * (-log(rme2s)) * (a1 + a2) * tomb;
   B2DEBUG(100, "BBBrem: Approximate cross section: " << sigapp << " millibarn")
@@ -79,12 +81,9 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 
 double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
-  double ran = 0.0;
-
-
-
 
   if (m_unweighted) {
+    double ran = 0.0;
     do {
       calcOutgoingLeptonsAndWeight();
       if (weight > m_maxWeightDelivered) m_maxWeightDelivered = weight;
@@ -161,7 +160,9 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
   double z;
   if (gRandom->Uniform() < ac) {
     double temp1 = gRandom->Uniform();
-    z = 1.0 / (temp1 * (exp(a1 * gRandom->Uniform()) - 1.0));
+//     z = 1.0 / (temp1 * (exp(a1 * gRandom->Uniform()) - 1.0));
+// Expression 'exp(x) - 1' is replaced by 'expm1(x)' to avoid loss of precision.
+    z = 1.0 / (temp1 * (expm1(a1 * gRandom->Uniform())));
   } else {
     z = z0 / gRandom->Uniform();
   }
@@ -194,7 +195,9 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 
     double b, t;
     do {
-      b = exp(gRandom->Uniform() * log(1.0 + 2.0 * sy / temp1));
+//       b = exp(gRandom->Uniform() * log(1.0 + 2.0 * sy / temp1));
+// Expression 'log(1 + x)' is replaced by 'log1p(x)' to avoid loss of precision.
+      b = exp(gRandom->Uniform() * log1p(2.0 * sy / temp1));
       t = -b * z * z * rme2 / ((b - 1) * (b * z + b - 1));
     } while (t <= tmin);
 
@@ -202,7 +205,9 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
     double rlam = sqrt((sy - t) * (sy - t) - 4 * rme2 * t);
     double eps = 4 * rme2 * w2 / (rlam * (rlam + w2 + rme2 - t));
     double rl = log((2 + eps) / eps);
-    double vgam = eps * (exp(gRandom->Uniform() * rl) - 1.0);
+//     double vgam = eps * (exp(gRandom->Uniform() * rl) - 1.0);
+// Expression 'exp(x) - 1' is replaced by 'expm1(x)' to avoid loss of precision.
+    double vgam = eps * (expm1(gRandom->Uniform() * rl));
     double cgam = 1.0 - vgam;
     double sgam = sqrt(vgam * (2 - vgam));
 
@@ -285,7 +290,9 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
     } else {
       //The event is now accepted: compute matrix element and weight
       //Compute fudge factor c1
-      double c1 = log(1 + z) / log((2 + eps) / eps);
+//       double c1 = log(1 + z) / log((2 + eps) / eps);
+//       Expression 'log(1 + x)' is replaced by 'log1p(x)' to avoid loss of precision.
+      double c1 = log1p(z) / log((2.0 + eps) / eps);
 
       //Compute fudge factor c2
       temp1 = sy - tmax;

@@ -106,11 +106,17 @@ namespace Belle2 {
       //! Get module's phi-strip maximum index
       int getPhiStripMax() const { return m_PhiStripMax; }
 
+      //! Get phi-strip width
+      int getPhiStripWidth() const { return m_PhiStripWidth; }
+
       //! Get module's z-strip minimum index
       int getZStripMin() const { return m_ZStripMin; }
 
       //! Get module's z-strip maximum index
       int getZStripMax() const { return m_ZStripMax; }
+
+      //! Get z-strip width
+      int getZStripWidth() const { return m_ZStripWidth; }
 
       //! Add one phi-measuring scintillator strip to the module
       void addPhiScint(int scint, double length, double offset, double position);
@@ -156,6 +162,9 @@ namespace Belle2 {
 
       //! Return the local-coordinate real-vs-ideal translation of this module's sensitive volume; nominally (0,0,0)
       const CLHEP::Hep3Vector getLocalReconstructionShift() const { return m_LocalReconstructionShift; }
+
+      //! Return the position (in global coordinates) of this module's sensitive-volume origin
+      const CLHEP::Hep3Vector getGlobalOrigin() const {return m_GlobalOrigin;}
 
     private:
 

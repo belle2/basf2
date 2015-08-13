@@ -3,7 +3,7 @@
  * Copyright(C) 2012  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -56,6 +56,8 @@ namespace Belle2 {
     double m_photonEFrac; /**< Minimum photon energy fraction. */
     bool m_unweighted;    /**< True if BBBrem should produce unweighted events. */
     double m_maxWeight;   /**< The maximum weight. Used for the event rejection procedure to produce unweighted events. */
+    int m_densityCorrectionMode;   /**< Mode for bunch density correction. */
+    double m_DensityCorrectionParameter;   /**< Density correction parameter tc. */
 
     /** Variables */
     BBBrem m_generator;        /**< The BBBrem generator. */

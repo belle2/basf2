@@ -20,25 +20,29 @@ using namespace std;
 using namespace Belle2;
 
 
-void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, double maxWeight)
+void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, double maxWeight, int densitymode,
+                  double densityparameter)
 {
   m_cmsEnergy = cmsEnergy;
   m_photonEFrac = minPhotonEFrac;
 
   m_unweighted = unweighted;
   m_maxWeight = maxWeight;
+  m_densityCorrectionMode = densitymode;
+  m_DensityCorrectionParameter = densityparameter;
+
   m_maxWeightDelivered = 0.0;
   m_sumWeightDelivered = 0.0;
   m_sumWeightDeliveredSqr = 0.0;
   m_weightCount = 0;
 
   if ((minPhotonEFrac <= 0.0) || (minPhotonEFrac >= 1.0)) {
-    B2ERROR("The minimum photon energy fraction has to be in the range ]0,1[ !")
+    B2ERROR("BBBrem: The minimum photon energy fraction has to be in the range ]0,1[ !")
     return;
   }
 
-  B2DEBUG(100, "Center of mass energy:     " << cmsEnergy)
-  B2DEBUG(100, "Minimum photon energy:     " << minPhotonEFrac << " * beam energy")
+  B2DEBUG(100, "BBBrem: Center of mass energy:     " << cmsEnergy)
+  B2DEBUG(100, "BBBrem: Minimum photon energy:     " << minPhotonEFrac << " * beam energy")
 
   //Initialize the constants (in order to be consistent with the FORTRAN source code)
   alpha = Const::fineStrConst;
@@ -56,7 +60,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
   a2 = (log(1.0 + z0)) / z0;
   ac = a1 / (a1 + a2);
   sigapp = 8.0 * (alpha * alpha * alpha) / rme2 * (-log(rme2s)) * (a1 + a2) * tomb;
-  B2DEBUG(100, "Approximate cross section: " << sigapp << " millibarn")
+  B2DEBUG(100, "BBBrem: Approximate cross section: " << sigapp << " millibarn")
 
   //Initial-state momenta
   eb     = 0.5 * cmsEnergy;
@@ -85,7 +89,7 @@ double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
       calcOutgoingLeptonsAndWeight();
       if (weight > m_maxWeightDelivered) m_maxWeightDelivered = weight;
       if (weight > m_maxWeight) {
-        B2INFO("OVERWEIGHT, w=" << weight << ", nw=" << m_weightCountOver << ", sumw=" << m_sumWeightDeliveredOver);
+        B2INFO("BBBrem: OVERWEIGHT, w=" << weight << ", nw=" << m_weightCountOver << ", sumw=" << m_sumWeightDeliveredOver);
         m_weightCountOver++;
         m_sumWeightDeliveredOver = m_sumWeightDeliveredOver + (weight - m_maxWeight);
         m_sumWeightDeliveredSqrOver = m_sumWeightDeliveredSqrOver + (weight - m_maxWeight) * (weight - m_maxWeight);
@@ -170,7 +174,7 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 
   //If temp2<0 (very very rare): set weight to 0
   if (temp2 < 0.0) {
-    B2ERROR("y too large: delta_t^2 = " << temp2 << " !!!")
+    B2WARNING("BBBrem: y too large: delta_t^2 = " << temp2 << " !!!")
     weight = 0.0;
   } else {
     double tmin = -2.0 * (temp1 + sqrt(temp2));
@@ -343,7 +347,7 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 
       //Isnan check (not sure if this is ok)
       if (std::isnan(weight)) {
-        B2WARNING("Weight is nan! Setting the weight to zero.");
+        B2WARNING("BBBrem: Weight is nan! Setting the weight to zero.");
         weight = 0.0;
       }
 
@@ -353,13 +357,15 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
       // ref: arxiv:hep-ph/9401333
 
       // tc = (hbarc/simga_y)^2
-      double tc = 1.68e-17;  //SuperKEKB LER (sigma_y*=48nm)
+//       double tc = 1.68e-17;  //SuperKEKB LER (sigma_y*=48nm)
       //double tc = 9.81e-18;  //SuperKEKB HER (sigma_y*=63nm)
-
-      int cutflag = 0 ;  // 0: no cut, 1: hard cut, 2: soft cut
-
-      if (cutflag == 1) if (abs(t) < tc) weight = 0.0;
-      if (cutflag == 2) if (t != tc) weight *= t * t / (t - tc) / (t - tc); // t<0<tc, always t!=tc
+      double tc = m_DensityCorrectionParameter;
+//       int cutflag = 0 ;  // 0: no cut, 1: hard cut, 2: soft cut
+      if (m_densityCorrectionMode == 1) {
+        if (abs(t) < tc) weight = 0.0;
+      } else if (m_densityCorrectionMode == 2) {
+        if (t != tc) weight *= t * t / (t - tc) / (t - tc); // t<0<tc, always t!=tc
+      }
       //========================================================
 
     }

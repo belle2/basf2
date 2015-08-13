@@ -81,7 +81,8 @@ namespace Belle2 {
      * @unweighted Set to true to generate unweighted events (e.g. for detector simulation), set to false for weighted events.
      * @maxWeight The maximum weight. Only required in the case of unweighted events.
      */
-    void init(double cmsEnergy, double minPhotonEFrac, bool unweighted = true, double maxWeight = 2000.0);
+    void init(double cmsEnergy, double minPhotonEFrac, bool unweighted = true, double maxWeight = 2000.0, int densitymode = 1,
+              double densityparameter = 1.68e-17);
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
@@ -144,6 +145,9 @@ namespace Belle2 {
     double m_crossSectionError;     /**< The error on the cross-section in millibarns. */
     double m_crossSectionOver;      /**< The overweight bias cross-section in millibarns. */
     double m_crossSectionErrorOver; /**< The overweight bias error on the cross-section in millibarns. */
+
+    int m_densityCorrectionMode;   /**< Mode for bunch density correction. */
+    double m_DensityCorrectionParameter;   /**< Density correction parameter tc. */
 
     /** Calculate the outgoing leptons and the event weight for one single radiative Bhabha scattering.
      * The main method. A direct translation from the BBBrem Fortran source code.

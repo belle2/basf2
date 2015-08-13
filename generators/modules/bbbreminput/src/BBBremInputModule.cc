@@ -3,7 +3,7 @@
  * Copyright(C) 2012  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,6 +42,10 @@ BBBremInputModule::BBBremInputModule() : Module(), m_initial(BeamParameters::c_s
   addParam("MinPhotonEnergyFraction", m_photonEFrac, "Fraction of the minimum photon energy.", 0.000001);
   addParam("Unweighted", m_unweighted, "Produce unweighted or weighted events.", true);
   addParam("MaxWeight", m_maxWeight, "The max weight (only for Unweighted=True).", 2000.0);
+  addParam("DensityCorrectionMode", m_densityCorrectionMode, "Mode for bunch density correction (none=0, hard=1 (default), soft=2)",
+           1);
+  addParam("DensityCorrectionParameter", m_DensityCorrectionParameter, "Density correction parameter tc (=(hbarc/sigma_y)^2)",
+           1.68e-17);
 }
 
 
@@ -60,7 +64,8 @@ void BBBremInputModule::initialize()
   const BeamParameters& nominal = m_initial.getBeamParameters();
   double centerOfMassEnergy = nominal.getMass();
 
-  m_generator.init(centerOfMassEnergy, m_photonEFrac, m_unweighted, m_maxWeight);
+  m_generator.init(centerOfMassEnergy, m_photonEFrac, m_unweighted, m_maxWeight, m_densityCorrectionMode,
+                   m_DensityCorrectionParameter);
 
 }
 

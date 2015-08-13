@@ -34,7 +34,13 @@ bbbrem = register_module('BBBremInput')
 bbbrem.param('Unweighted', True)
 
 # Set the max weight (only for Unweighted=True).
-bbbrem.param('MaxWeight', 5.0e4)
+bbbrem.param('MaxWeight', 5.0e6)
+
+# Set the mode for bunch density correction (none=0, hard=1 (default), soft=2).
+bbbrem.param('DensityCorrectionMode', 1)
+
+# Set the Density correction parameter tc.
+bbbrem.param('DensityCorrectionParameter', 1.68e-17)
 
 # Set the logging level for the BBBREM module to INFO
 # bbbrem.set_log_level(LogLevel.INFO)

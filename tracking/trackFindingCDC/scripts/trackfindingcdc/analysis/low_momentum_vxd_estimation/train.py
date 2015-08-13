@@ -125,6 +125,8 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
             plt.plot(result_df.dedx_bin_center, result_df.mu - result_df.sigma, marker=".", ls="", color="green")
 
         plt.ylim(0, 0.14)
+        plt.xlabel("dEdX in ADC count/cm")
+        plt.ylabel("p in GeV/c")
         plt.legend()
 
     def plot_grouped_result(self, data):
@@ -143,6 +145,9 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
                 plt.plot(fit_data.p_bin_centers, fit_data.number_of_p_values, ls="", marker=".", color="black")
 
             return True
+
+        plt.xlabel("p in GeV/c")
+        plt.ylabel("Entries")
 
         dedx_binned_data.apply(plot_fitted_results)
 

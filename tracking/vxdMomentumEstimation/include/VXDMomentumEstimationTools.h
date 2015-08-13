@@ -122,9 +122,13 @@ namespace Belle2 {
       const double distance_3D = (position_at_outer_radius - position_at_inner_radius).Mag();
 
       if (std::isnan(distance_3D)) {
-        // This is not quete correct but we can not do better.
-        // If the distance_3D is nan, it means that the helix does not reach into the cluster. This is strange
-        // because the track is associated with the cluster (so it should normally reach it).
+        // This is not quite correct but we can not do better without doing an extrapolation with material effects.
+        // If the distance_3D is nan, it means that the helix does not reach into the cluster or curls that much
+        // that it does not reach the far end of the cluster. The first case is strange
+        // because the track is associated with the cluster (so it should normally reach it). The second case should be
+        // really rare (because the clusters are that thin), but we have to deal with it.
+        // There is also the possibility that the track curls that much that it interacts with the same sensor twice.
+        // This can not be handled properly in this stage.
         return thickness;
       } else {
         return distance_3D;
@@ -142,34 +146,14 @@ namespace Belle2 {
     }
   };
 
-  /** We only need a calibration for the PXD Clusters */
   template<>
-  double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const
-  {
-    return 0.653382;
-  }
+  double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const;
 
-  /** We have to hanlde PXD and SVD differently here */
+  /** We have to handle PXD and SVD differently here */
   template <>
-  TVector3 VXDMomentumEstimationTools<PXDCluster>::getMomentumOfMCParticle(const PXDCluster& cluster) const
-  {
-    PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
-    const VxdID& vxdID = cluster.getSensorID();
-    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum());
+  TVector3 VXDMomentumEstimationTools<PXDCluster>::getMomentumOfMCParticle(const PXDCluster& cluster) const;
 
-    return momentum;
-  }
-
-  /** We have to hanlde PXD and SVD differently here */
+  /** We have to handle PXD and SVD differently here */
   template <>
-  TVector3 VXDMomentumEstimationTools<SVDCluster>::getMomentumOfMCParticle(const SVDCluster& cluster) const
-  {
-    SVDTrueHit* trueHit = cluster.getRelated<SVDTrueHit>("SVDTrueHits");
-    const VxdID& vxdID = cluster.getSensorID();
-    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum());
-
-    return momentum;
-  }
+  TVector3 VXDMomentumEstimationTools<SVDCluster>::getMomentumOfMCParticle(const SVDCluster& cluster) const;
 }

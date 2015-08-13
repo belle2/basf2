@@ -59,7 +59,7 @@ namespace Belle2 {
      * Create a measurement based on the momentum estimation given by the VXDMomentumEstimation class
      */
     virtual std::vector<genfit::AbsMeasurement*> createMeasurementFromCoordinateMeasurement(HitType* hit,
-        const RecoTrack& recoTrack, const RecoHitInformation&,
+        const RecoTrack& /*recoTrack*/, const RecoHitInformation&,
         const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement) const override
     {
       genfit::AbsMeasurement* absCoordinateMeasurement = coordinateMeasurement.first;
@@ -68,32 +68,9 @@ namespace Belle2 {
         B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
       }
 
-      TVectorD rawHitCoordinates(1);
-      double estimatedMomentum = 0;
-
-      if (m_useThickness) {
-        estimatedMomentum = estimateMomentumWithThickness(hit, recoTrack);
-      } else {
-        if (m_useTrackFinderSeeds) {
-          estimatedMomentum = estimateMomentumWithTrackFinderSeeds(hit, recoTrack);
-        } else {
-          estimatedMomentum = estimateMomentumWithMCParticleSeeds(hit);
-        }
-      }
-
-      if (not std::isnan(estimatedMomentum)) {
-        rawHitCoordinates(0) = estimatedMomentum;
-
-        TMatrixDSym rawHitCovariance(1);
-        rawHitCovariance(0, 0) = 0.23;
-
-        PlanarMomentumMeasurement* momentumMeasurement = new PlanarMomentumMeasurement(*planarMeasurement);
-        momentumMeasurement->setRawHitCoords(rawHitCoordinates);
-        momentumMeasurement->setRawHitCov(rawHitCovariance);
-        return {momentumMeasurement};
-      } else {
-        return {};
-      }
+      PlanarMomentumMeasurement<HitType>* momentumMeasurement = new PlanarMomentumMeasurement<HitType>(*planarMeasurement, hit,
+          m_fitParameters, m_correctionFitParameters, m_useTrackFinderSeeds, m_useThickness);
+      return {momentumMeasurement};
     }
 
   private:
@@ -107,65 +84,5 @@ namespace Belle2 {
     bool m_useThickness = false;
     /** Minimal value for the momentum below the estimation is used */
     double m_minimumMomentum;
-
-    /** Use the seeds from the track finder to estimate the momentum from dedx */
-    double estimateMomentumWithTrackFinderSeeds(HitType* hit, const RecoTrack& recoTrack) const
-    {
-      const VXDMomentumEstimation<HitType>& momentumEstimation = VXDMomentumEstimation<HitType>::getInstance();
-
-      const TVector3& momentum = recoTrack.getMomentum();
-      const TVector3& position = recoTrack.getPosition();
-      const short charge = recoTrack.getCharge();
-
-      const double estimation = momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters,
-                                                                  m_correctionFitParameters);
-
-      if (momentum.Mag() > m_minimumMomentum or charge / estimation > 1.5 * m_minimumMomentum) {
-        return std::nan("");
-      } else {
-        return estimation;
-      }
-    }
-
-    /** Use the information of the related MCParticle to estimate the momentum from dedx */
-    double estimateMomentumWithMCParticleSeeds(HitType* hit) const
-    {
-      const VXDMomentumEstimation<HitType>& momentumEstimation = VXDMomentumEstimation<HitType>::getInstance();
-
-      MCParticle* relatedMCParticle = hit->template getRelated<MCParticle>("MCParticles");
-      if (relatedMCParticle == nullptr) {
-        return std::nan("");
-      }
-
-      const TVector3& momentum = relatedMCParticle->getMomentum();
-      const TVector3& position = relatedMCParticle->getProductionVertex();
-      const short charge = relatedMCParticle->getCharge();
-
-      const double estimation = momentumEstimation.estimateQOverP(*hit, momentum, position, charge, m_fitParameters,
-                                                                  m_correctionFitParameters);
-
-      if (momentum.Mag() > m_minimumMomentum or charge / estimation > 1.5 * m_minimumMomentum) {
-        return std::nan("");
-      } else {
-        return estimation;
-      }
-    }
-
-    /** Use the thickness of the sensor to estimate the momentum from dedx */
-    double estimateMomentumWithThickness(HitType* hit, const RecoTrack& recoTrack) const
-    {
-      const VXDMomentumEstimation<HitType>& momentumEstimation = VXDMomentumEstimation<HitType>::getInstance();
-
-      const TVector3& momentum = recoTrack.getMomentum();
-      const short charge = recoTrack.getCharge();
-
-      const double estimation = momentumEstimation.estimateQOverPWithThickness(*hit, charge, m_fitParameters, m_correctionFitParameters);
-
-      if (momentum.Mag() > m_minimumMomentum or charge / estimation > 1.5 * m_minimumMomentum) {
-        return std::nan("");
-      } else {
-        return estimation;
-      }
-    }
   };
 }

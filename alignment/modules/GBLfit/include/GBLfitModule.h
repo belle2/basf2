@@ -72,6 +72,7 @@ namespace Belle2 {
     std::string m_svdHitsColName;                    /**< SVDHits collection name */
     std::string m_pxdHitsColName;                    /**< PXDHits collection name */
     std::string m_telHitsColName;                    /**< TelHits collection name */
+    std::string m_bklmHitsColName;                   /**< BKLMHits2d collection name */
 
     std::string m_gfTrackCandsColName;               /**< genfit::TrackCandidates collection name */
     std::string m_mcParticlesColName;                /**< MCParticles collection name */
@@ -127,6 +128,7 @@ namespace Belle2 {
     bool m_useTrackTime;                             /**< If true, CDCRecoHits will use the track propagation time.  */
     bool m_estimateSeedTime;                         /**< If true, the starting time of each track will be estimated from its seed.  */
     std::string m_misalignment;                      /**< Name of misalignment object in DB to be used by RecoHits  */
+    bool m_buildBelle2Tracks;                        /**< Create Belle2::Tracks in the DataStore? */
 
   };
 }

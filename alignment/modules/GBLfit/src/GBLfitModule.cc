@@ -35,6 +35,9 @@
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/dataobjects/BKLMRecoHit.h>
+
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
 #include <testbeam/vxd/dataobjects/TelCluster.h>
 #include <testbeam/vxd/dataobjects/TelTrueHit.h>
@@ -120,6 +123,7 @@ GBLfitModule::GBLfitModule() :
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
   addParam("TelHitsColName", m_telHitsColName, "TelHits collection", string(""));
+  addParam("BKLMHitsColName", m_bklmHitsColName, "BKLMHits2d collection", string(""));
 
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
@@ -181,6 +185,9 @@ GBLfitModule::GBLfitModule() :
 
   addParam("misalignment", m_misalignment, "Name of misalignment object in DB to be used by recohits (temporary simplified solution)",
            std::string(""));
+  addParam("BuildBelle2Tracks", m_buildBelle2Tracks,
+           "Option to build Belle2::Tracks. Not needed by default if the module is used only for refit.",
+           bool(false));
 
   m_failedFitCounter = 0;
   m_successfulFitCounter = 0;
@@ -224,16 +231,20 @@ void GBLfitModule::initialize()
 
   trackcands.isRequired();
 
-  tracks.registerPersistent();
-  trackfitresults.registerPersistent();
   gf2tracks.registerPersistent();
   trackcands.registerPersistent();
-
   gf2tracks.registerRelationTo(mcparticles);
-  mcparticles.registerRelationTo(tracks);
-  gf2tracks.registerRelationTo(trackfitresults);
-  trackcands.registerRelationTo(trackfitresults);
   trackcands.registerRelationTo(gf2tracks);
+
+  if (m_buildBelle2Tracks) {
+    tracks.registerPersistent();
+    trackfitresults.registerPersistent();
+
+    mcparticles.registerRelationTo(tracks);
+    gf2tracks.registerRelationTo(trackfitresults);
+    trackcands.registerRelationTo(trackfitresults);
+
+  }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2WARNING("Material effects not set up, doing this myself with default values.");
@@ -315,6 +326,11 @@ void GBLfitModule::event()
   if (trackCandidates.getEntries() == 0)
     B2DEBUG(100, "GBLfit: genfit::TrackCandidatesCollection is empty!");
 
+  StoreArray< BKLMHit2d > bklmHits(m_bklmHitsColName);
+  B2DEBUG(149, "GBLfit: Number of BKLMHits2d: " << bklmHits.getEntries());
+  if (bklmHits.getEntries() == 0)
+    B2DEBUG(100, "GBLfit: BKLMHits2d Collection is empty!");
+
   StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
   B2DEBUG(149, "GBLfit: Number of CDCHits: " << cdcHits.getEntries());
   if (cdcHits.getEntries() == 0)
@@ -359,11 +375,13 @@ void GBLfitModule::event()
 
   //StoreArrays to store the fit results
   StoreArray < Track > tracks;
-  if (!tracks.isValid())
-    tracks.create();
   StoreArray <TrackFitResult> trackFitResults;
-  if (!trackFitResults.isValid())
-    trackFitResults.create();
+  if (m_buildBelle2Tracks) {
+    if (!tracks.isValid())
+      tracks.create();
+    if (!trackFitResults.isValid())
+      trackFitResults.create();
+  }
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
   if (!gfTracks.isValid())
     gfTracks.create();
@@ -513,6 +531,11 @@ void GBLfitModule::event()
         CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
         factory.addProducer(Const::CDC, CDCProducer);
       }
+      if (bklmHits.getEntries()) {
+        genfit::MeasurementProducer <BKLMHit2d, BKLMRecoHit>* BKLMProducer =  NULL;
+        BKLMProducer =  new genfit::MeasurementProducer <BKLMHit2d, BKLMRecoHit> (bklmHits.getPtr());
+        factory.addProducer(Const::KLM, BKLMProducer);
+      }
 
       // The track fit needs an initial guess for the resolution.  The
       // values should roughly match the actual resolution (squared),
@@ -540,6 +563,7 @@ void GBLfitModule::event()
       int nSVD = 0;
       int nPXD = 0;
       int nTel = 0;
+      int nBKLM = 0;
 
       for (unsigned int hit = 0; hit < aTrackCandPointer->getNHits(); hit++) {
         int detId = 0;
@@ -553,12 +577,15 @@ void GBLfitModule::event()
           nSVD++;
         } else if (detId == Const::CDC) {
           nCDC++;
+        } else if (detId == Const::KLM) {
+          nBKLM++;
         } else {
           B2WARNING("Hit from unknown detectorID has contributed to this track! The unknown id is: " << detId);
         }
       }
 
-      B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ")");
+      B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ", BKLM: " << nBKLM <<
+              ")");
 
       if (aTrackCandPointer->getNHits() <
           3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
@@ -803,12 +830,17 @@ void GBLfitModule::event()
           //TODO: This caused incosistent relations! Inspect!
           //if (gfs->getPVal() > m_gblPvalueCut)
           gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
-          tracks.appendNew(); //Track is created empty, parameters are set later on
 
           //Create relation
           if (aTrackCandPointer->getMcTrackId() >= 0) {
             gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
           }
+
+          if (!m_buildBelle2Tracks)
+            continue;
+
+          tracks.appendNew(); //Track is created empty, parameters are set later on
+
 
           //else B2WARNING("No MCParticle contributed to this track! No genfit::Track<->MCParticle relation will be created!");
           //FIXME: disabled, makes no sense for real data

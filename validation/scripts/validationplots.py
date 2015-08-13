@@ -27,6 +27,8 @@ import ROOT
 import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
+# Token used to separate the package name from the plot name in strings
+PackageSeperatorToken = "__:__"
 
 ##############################################################################
 #                          Function definitions                              #
@@ -421,7 +423,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                                         pre1))
                 # save which plots we are using, this string will
                 # be then pasted into id="" html tag
-                ident.append(package + "__" + plts)
+                ident.append(package + PackageSeperatorToken + plts)
 
         # lots of spaghetti-looking code that creates the hide/show button,
         # the information at the beginning and the select all/none button.
@@ -466,7 +468,11 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
         # and now we create the table
         for el in sorted(ident):
             # split the package from the plot key
-            plts = el.split("__")[1]
+
+            print "el" + str(el)
+
+            plts = el.split(PackageSeperatorToken)[1]
+            print "plts" + str(plts)
             # prepare the ends of lines
             if (i % k) == 0:
                 end = "\n</tr>\n<tr>"
@@ -481,7 +487,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
             if p_value[plts] <= 0.01:
                 classes.append('p_value_leq_0_01')
             # the code for the actual name table
-            pre = "_".join(el.split("__")).replace(".", "_")
+            pre = "_".join(el.split(PackageSeperatorToken)).replace(".", "_")
             html.append("<td style='width:{5}%' class='{4}'>"
                         "<input type='checkbox' name='matrix' "
                         "class='matrix-toggle matrix-{6}' "
@@ -1806,7 +1812,7 @@ def create_plots(revisions=None, force=False):
         # and the references). If this is the case, copy these files to the
         # base directory
         if (sorted(list_of_revisions) ==
-           sorted(['reference'] + available_revisions())):
+                sorted(['reference'] + available_revisions())):
 
             # The path where the content.html and packages.html should be
             src = './plots/{0}/'.format('_'.join(sorted(list_of_revisions)))

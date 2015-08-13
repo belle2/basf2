@@ -50,10 +50,12 @@ namespace Belle2 {
 
   private:
     /** StoreArray name of the input and output reco tracks */
-    std::string m_param_recoTracksStoreArrayName;
+    std::string m_param_recoTracksStoreArrayName = "RecoTracks";
     /** Use this particle hypothesis for fitting. Please use the positive pdg code only. */
-    unsigned int m_param_pdgCodeToUseForFitting;
-
+    unsigned int m_param_pdgCodeToUseForFitting = 211;
+    /** Resort the hits while fitting */
+    bool m_param_resortHits = false;
+    /** Maximum number of failed hits before aborting the fit */
     unsigned int m_param_maxNumberOfFailedHits = 5;
   };
 }

@@ -37,6 +37,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("pdgCodeToUseForFitting", m_param_pdgCodeToUseForFitting,
            "Use this particle hypothesis for fitting. Please use the positive pdg code only.", static_cast<unsigned int>(211));
+
+  addParam("resortHits", m_param_resortHits,
+           "Resort the hits while fitting.", false);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -79,7 +82,7 @@ void BaseRecoFitterModule::event()
             recoTrack.getPosition().Z())
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits())
 
-    recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting);
+    recoTrack.fit(fitter, m_param_pdgCodeToUseForFitting, m_param_resortHits);
 
     B2DEBUG(100, "-----> Fit results:");
     B2DEBUG(100, "       Fitted and converged: " << recoTrack.wasLastFitSucessfull());

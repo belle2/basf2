@@ -503,8 +503,9 @@ namespace Belle2 {
      * Fit the track with the given abs fitter from genfit.
      * @param fitter the preinitialized fitter
      * @param pdgCodeForFit the pdg code we use for fitting. If you set the wrong charge, the method will turn it the other way round.
+     * @param resortHits Whether the fitter should try to resort the hits
      */
-    void fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit);
+    void fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool resortHits);
 #endif
 
     /**

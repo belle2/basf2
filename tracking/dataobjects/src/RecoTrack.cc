@@ -129,7 +129,7 @@ void RecoTrack::calculateTimeSeed(TParticlePDG* particleWithPDGCode)
   setTimeSeed(timeSeed);
 }
 
-void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit)
+void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int pdgCodeForFit, bool resortHits)
 {
   m_lastFitSucessfull = false;
 
@@ -161,7 +161,7 @@ void RecoTrack::fit(const std::shared_ptr<genfit::AbsKalmanFitter>& fitter, int 
   calculateTimeSeed(particleWithPDGCode);
 
   // Fit the track
-  fitter->processTrack(this);
+  fitter->processTrack(this, resortHits);
 
   // Postprocessing of the fitted track: Set the fit status flag
   bool fitSuccess = hasFitStatus(trackRep);

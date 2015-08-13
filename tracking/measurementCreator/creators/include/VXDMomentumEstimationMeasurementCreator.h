@@ -59,13 +59,19 @@ namespace Belle2 {
      * Create a measurement based on the momentum estimation given by the VXDMomentumEstimation class
      */
     virtual std::vector<genfit::AbsMeasurement*> createMeasurementFromCoordinateMeasurement(HitType* hit,
-        const RecoTrack& /*recoTrack*/, const RecoHitInformation&,
+        const RecoTrack& recoTrack, const RecoHitInformation&,
         const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement) const override
     {
       genfit::AbsMeasurement* absCoordinateMeasurement = coordinateMeasurement.first;
       genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(absCoordinateMeasurement);
       if (planarMeasurement == nullptr) {
         B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
+      }
+
+      const TVector3& momentum = recoTrack.getMomentum();
+
+      if (momentum.Mag() > m_minimumMomentum) {
+        return {};
       }
 
       PlanarMomentumMeasurement<HitType>* momentumMeasurement = new PlanarMomentumMeasurement<HitType>(*planarMeasurement, hit,

@@ -60,8 +60,6 @@ namespace Belle2 {
     bool m_useTrackFinderSeeds = true;
     /** Use the thickness of the clusters of the path length for estimating dX */
     bool m_useThickness = false;
-    /** Minimal value for the momentum below the estimation is used */
-    double m_minimumMomentum = 0.1;
     /** Underlaying hit/cluster */
     HitType* m_hit;
   };
@@ -89,10 +87,6 @@ namespace Belle2 {
     const TVector3& momentum(state.getMom());
     short charge = state.getCharge();
 
-    if (momentum.Mag() > m_minimumMomentum) {
-      return {};
-    }
-
     if (m_useThickness) {
       rawHitCoordinates(0) = momentumEstimation.estimateQOverPWithThickness(*m_hit, charge, m_fitParameters, m_correctionFitParameters);
     } else {
@@ -107,10 +101,6 @@ namespace Belle2 {
 
     // TODO
     rawHitCovariance(0, 0) = 0.23;
-
-    if (rawHitCoordinates(0) > m_minimumMomentum) {
-      return {};
-    }
 
     genfit::MeasurementOnPlane* mop = new genfit::MeasurementOnPlane(rawHitCoordinates, rawHitCovariance,
         state.getPlane(), state.getRep(), constructHMatrix(state.getRep()));

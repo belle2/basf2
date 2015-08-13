@@ -40,6 +40,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("resortHits", m_param_resortHits,
            "Resort the hits while fitting.", false);
+
+  addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,
+           "Maximum number of failed hits before aborting the fit.", static_cast<unsigned int>(5));
 }
 
 void BaseRecoFitterModule::initialize()

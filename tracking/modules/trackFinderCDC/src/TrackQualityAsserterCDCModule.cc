@@ -8,68 +8,101 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(TrackQualityAsserterCDC);
 
+unsigned int removeSecondHalfOfTrack(CDCTrack& track)
+{
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+  const double radius = fabs(trajectory2D.getGlobalCircle().radius());
+
+  const Vector2D origin(0, 0);
+
+  const double distanceToOrigin = trajectory2D.getDist2D(origin);
+
+  /*if(distanceToOrigin > 5) {
+    B2INFO("Skipping track as distance is " << distanceToOrigin)
+    return 0;
+  }*/
+
+  const double perpSOfOrigin = trajectory2D.calcPerpS(origin);
+
+  unsigned int hitsWithPositivePerpS = 0;
+  unsigned int hitsWithNegativePerpS = 0;
+
+  for (CDCRecoHit3D& recoHit : track) {
+    const double currentPerpS = recoHit.getPerpS(trajectory2D) - perpSOfOrigin;
+    recoHit.setPerpS(currentPerpS);
+
+    if (currentPerpS > 0) {
+      hitsWithPositivePerpS++;
+    } else {
+      hitsWithNegativePerpS++;
+    }
+  }
+
+  bool negativeHitsAreMore = hitsWithNegativePerpS > hitsWithPositivePerpS;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    const double currentPerpS = recoHit.getPerpS();
+    if ((negativeHitsAreMore and currentPerpS > 0) or (not negativeHitsAreMore and currentPerpS < 0)) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+    }
+  }
+
+  track.sortByPerpS();
+
+  if (negativeHitsAreMore) {
+    return hitsWithPositivePerpS;
+  } else {
+    return hitsWithNegativePerpS;
+  }
+}
+
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
+  std::vector<CDCTrack> newTracks;
+
   for (CDCTrack& track : tracks) {
     // Reset all hits to not have a background hit (what they should not have anyway)
     for (const CDCRecoHit3D& recoHit : track) {
       recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
     }
 
-    const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
-    const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-    const double radius = fabs(trajectory2D.getGlobalCircle().radius());
+    unsigned int removableHits = removeSecondHalfOfTrack(track);
 
-    /*// Check if the second hit has a negative perpS. If yes, the trajectory is reversed
-    if(track.size() < 2) continue;
-    const CDCRecoHit3D & secondHit = track[1];
-    if(secondHit.getPerpS() < 0) {
-      const CDCTrajectory2D & reversedTrajectory2D = trajectory2D.reversed();
-      for(CDCRecoHit3D & recoHit : track) {
-        recoHit.setPerpS(-recoHit.getPerpS());
-      }
+    m_numberOfHits += track.size();
+    m_numberOfDeletedHits += removableHits;
 
-      CDCTrajectory3D reversedTrajectory3D(reversedTrajectory2D, trajectorySZ);
-      track.setStartTrajectory3D(reversedTrajectory3D);
-    }*/
-
-
-
-    // Skip this track if it is no curler
-    if (not trajectory2D.getOuterExit().hasNAN()) {
-      continue;
-    }
-
-    // Find large holes in the perpS of the tracks
-    double lastPerpS = std::nan("");
-    bool deleteHitsAfterThat = false;
-
-    for (const CDCRecoHit3D& recoHit : track) {
-      if (deleteHitsAfterThat) {
-        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      } else {
-        double currentPerpS = recoHit.getPerpS() / radius;
-        if (not std::isnan(lastPerpS)) {
-          if (fabs(currentPerpS - lastPerpS) > m_param_minimalPerpSCut) {
-            deleteHitsAfterThat = true;
-            recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-          }
-        }
-        lastPerpS = currentPerpS;
-      }
-    }
+    SortableVector<CDCRecoHit3D> newTrackHits;
+    newTrackHits.reserve(track.size());
 
     // Delete all hits that were marked
-    track.erase(std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & recoHit) -> bool {
-      return recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag();
+    track.erase(std::remove_if(track.begin(), track.end(), [&newTrackHits](const CDCRecoHit3D & recoHit) -> bool {
+      if (recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag())
+      {
+        newTrackHits.push_back(move(recoHit));
+        return true;
+      } else {
+        return false;
+      }
     }), track.end());
+
+    if (newTrackHits.size() > 20) {
+      CDCTrack newTrack;
+      newTrack.swap(newTrackHits);
+
+      CDCTrajectory3D newTrajectory = track.getStartTrajectory3D();
+      newTrajectory.setLocalOrigin(newTrack.front().getRecoPos3D());
+      newTrack.setStartTrajectory3D(newTrajectory);
+
+      newTracks.push_back(move(newTrack));
+      B2INFO("Adding new track")
+    }
   }
+
+  /*for(CDCTrack & newTrack : newTracks)
+    tracks.push_back(move(newTrack));*/
 
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
     return track.size() < 3;
   }));
-
-  for (const CDCTrack& track : tracks) {
-    B2INFO(track.size());
-  }
 }

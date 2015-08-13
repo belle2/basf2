@@ -596,7 +596,8 @@ class CDCRecoFitter(metamodules.PathModule):
             usedPXDMeasurementCreators=usedPXDMeasurementCreators)
 
         if use_daf:
-            reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter",
+            reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", resortHits=True,
+                                                                             numberOfFailedHits=2,
                                                                              pdgCodeToUseForFitting=pdg_code)
         else:
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module("KalmanRecoFitter",

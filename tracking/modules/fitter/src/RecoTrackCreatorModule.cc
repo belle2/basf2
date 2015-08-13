@@ -81,6 +81,12 @@ void RecoTrackCreatorModule::event()
   recoHitInformations.create();
 
   for (const genfit::TrackCand& trackCandidate : trackCandidates) {
+
+    if (trackCandidate.getNHits() < 3) {
+      B2WARNING("Number of hits of track candidate is smaller than 3. Not creating track out of it.")
+      continue;
+    }
+
     RecoTrack* newRecoTrack = RecoTrack::createFromTrackCand(&trackCandidate, m_param_recoTracksStoreArrayName,
                                                              m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
                                                              m_param_recoHitInformationStoreArrayName);

@@ -12,16 +12,7 @@ unsigned int removeSecondHalfOfTrack(CDCTrack& track)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-  const double radius = fabs(trajectory2D.getGlobalCircle().radius());
-
   const Vector2D origin(0, 0);
-
-  const double distanceToOrigin = trajectory2D.getDist2D(origin);
-
-  /*if(distanceToOrigin > 5) {
-    B2INFO("Skipping track as distance is " << distanceToOrigin)
-    return 0;
-  }*/
 
   const double perpSOfOrigin = trajectory2D.calcPerpS(origin);
 

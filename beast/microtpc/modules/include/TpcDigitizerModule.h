@@ -182,6 +182,12 @@ namespace Belle2 {
       int m_nTPC = 0;
       /** TPC coordinate */
       std::vector<TVector3> m_TPCCenter;
+
+      /** Lower timing cut */
+      double m_lowerTimingCut = 0;
+      /** Upper timing cut */
+      double m_upperTimingCut = 1000000;
+
     };
 
   }

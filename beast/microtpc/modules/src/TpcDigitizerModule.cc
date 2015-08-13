@@ -93,7 +93,8 @@ TpcDigitizerModule::TpcDigitizerModule() : Module()
   addParam("Workfct", m_Workfct, "Work function", 35.075);
   addParam("Fanofac", m_Fanofac, "Fano factor", 0.19);
   addParam("GasAbs", m_GasAbs, "Gas absorption", 0.05);
-
+  addParam("LowerTimingCut", m_lowerTimingCut, "Lower timing cut", 0.);
+  addParam("UpperTimingCut", m_upperTimingCut, "Upper timing cut", 1000000.);
 }
 
 TpcDigitizerModule::~TpcDigitizerModule()
@@ -126,7 +127,8 @@ void TpcDigitizerModule::event()
   StoreArray<MCParticle> mcParticles;
   StoreArray<MicrotpcSimHit> microtpcSimHits;
 
-  std::vector<double> T0(m_nTPC, 1000000.);  // TODO: why this number? it should defined somewhere else more clearly
+  std::vector<double> T0(m_nTPC,
+                         m_upperTimingCut);  // TODO: why this number? Maybe pick something larger the the upperTiming cut? e.g. m_upperTimingCut + 1
   std::vector<bool> PixelFired(m_nTPC, false);
 
   for (const auto& microtpcSimHit : microtpcSimHits) {
@@ -139,7 +141,7 @@ void TpcDigitizerModule::event()
   }
 
   for (auto& val : T0) {
-    if (0. < val && val < 1000000.) {
+    if (m_lowerTimingCut < val && val < m_upperTimingCut) {
       val = val / m_v_DG;
     } else {
       val = -1.;
@@ -160,18 +162,18 @@ void TpcDigitizerModule::event()
     const double edep = microtpcSimHit.getEnergyDep();
     const double niel = microtpcSimHit.getEnergyNiel();
 
-    const TVector3 position = microtpcSimHit.gettkPos();
-    const TVector3 realPosition(  // TODO: Is this name representing what it really is?
-      position.X() / 100. - m_TPCCenter[detNb].X(),
-      position.Y() / 100. - m_TPCCenter[detNb].Y(),
-      position.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG
+    const TVector3 simHitPosition = microtpcSimHit.gettkPos();
+    const TVector3 chipPosition(
+      simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
+      simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
+      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG
     );
 
     //check if ionization within sensitive volume
-    if ((-m_ChipColumnX < realPosition.X() && realPosition.X() < m_ChipColumnX) &&
-        (-m_ChipRowY < realPosition.Y() && realPosition.Y() <  m_ChipRowY) &&
-        (0. < realPosition.Z() && realPosition.Z() <  m_z_DG) &&
-        (0. < T0[detNb] && T0[detNb] < 1000000.)) {
+    if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
+        (-m_ChipRowY < chipPosition.Y() && chipPosition.Y() <  m_ChipRowY) &&
+        (0. < chipPosition.Z() && chipPosition.Z() <  m_z_DG) &&
+        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {
 
       //ionization energy
       //MeV -> keV
@@ -187,13 +189,13 @@ void TpcDigitizerModule::event()
         const double meanEl = ionEn * 1e3 /  m_Workfct;
         const double sigma = sqrt(m_Fanofac * meanEl);
         const int NbEle = (int)gRandom->Gaus(meanEl, sigma);
-        const double NbEle_real = NbEle - NbEle * m_GasAbs * realPosition.Z();
+        const double NbEle_real = NbEle - NbEle * m_GasAbs * chipPosition.Z();
 
         // start loop on the number of electron-ion-pairs at each interaction point
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
 
           //drift ionization to GEM 1 plane
-          const TLorentzVector DG(Drift(realPosition.X(), realPosition.Y(), realPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
+          const TLorentzVector driftGap(Drift(chipPosition.X(), chipPosition.Y(), chipPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
 
           //calculate and scale 1st GEM gain
           const double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
@@ -205,24 +207,24 @@ void TpcDigitizerModule::event()
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
             //1st GEM geometrical effect
-            const TVector2 GEM1(GEMGeo1(DG.X(), DG.Y()));
+            const TVector2 GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
             //drift 1st amplication to 2nd GEM
-            const TLorentzVector TG(Drift(GEM1.X(), GEM1.Y(), m_z_TG, m_Dt_TG, m_Dl_TG, m_v_TG));
+            const TLorentzVector transferGap(Drift(GEM1.X(), GEM1.Y(), m_z_TG, m_Dt_TG, m_Dl_TG, m_v_TG));
 
             ///////////////////////////////
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
               //2nd GEN geometrical effect
-              const TVector2 GEM2(GEMGeo2(TG.X(), TG.Y()));
+              const TVector2 GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
               //drift 2nd amplification to chip
-              const TLorentzVector CG(Drift(GEM2.X(), GEM2.Y(), m_z_CG, m_Dt_CG, m_Dl_CG, m_v_CG));
+              const TLorentzVector collectionGap(Drift(GEM2.X(), GEM2.Y(), m_z_CG, m_Dt_CG, m_Dl_CG, m_v_CG));
 
               //determine col, row, and bc
-              const int col = (int)((CG.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
-              const int row = (int)((CG.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
+              const int col = (int)((collectionGap.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
+              const int row = (int)((collectionGap.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
               const int pix = col +  m_ChipColumnNb * row;
               const int quT = gRandom->Uniform(-1, 1);
-              int bci = (int)((DG.T() + TG.T() + CG.T() - T0[detNb]) / (double)m_PixelTimeBin) + quT;
+              int bci = (int)((driftGap.T() + transferGap.T() + collectionGap.T() - T0[detNb]) / (double)m_PixelTimeBin) + quT;
               if (bci < 0)bci = 0;
 
               //check if amplified drifted electron are within pixel boundaries
@@ -244,7 +246,7 @@ void TpcDigitizerModule::event()
 
   //Pixelization of the 3D ionization cloud
   for (int i = 0; i < m_nTPC; i++) {
-    if (0. < T0[i] && T0[i] < 1000000. && PixelFired[i]) {
+    if (m_lowerTimingCut < T0[i] && T0[i] < m_upperTimingCut && PixelFired[i]) {
       Pixelization(i);
     }
   }

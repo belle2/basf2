@@ -1,10 +1,10 @@
-from unittest import TestCase
+import unittest
 
-from tracking.ipython_tools.calculation import Basf2CalculationList
+from ipython_tools.calculation import Basf2CalculationList
 import basf2
 
 
-class TestBasf2CalculationList(TestCase):
+class TestBasf2CalculationList(unittest.TestCase):
 
     def path_creator_no_queue(self, value1, value2):
         return value1, value2
@@ -13,9 +13,10 @@ class TestBasf2CalculationList(TestCase):
         return value1, value2, queue
 
     def test_create_all_paths_with_queue(self):
-        calculation_list = Basf2CalculationList(self.path_creator_queue, [1, 2, 3], ["a", "b", "c"])
+        lists = dict(value1=[1, 2, 3], value2=["a", "b", "c"])
+        calculation_list = Basf2CalculationList(self.path_creator_queue, lists)
 
-        results, queues = calculation_list.create_all_paths()
+        results, queues, parameter_combination = calculation_list.create_all_paths()
 
         self.assertEqual(len(queues), len(results))
         self.assertEqual(len(queues), 9)
@@ -29,9 +30,10 @@ class TestBasf2CalculationList(TestCase):
         self.assertEqual(results[8][2], queues[8])
 
     def test_create_all_paths_without_queue(self):
-        calculation_list = Basf2CalculationList(self.path_creator_no_queue, [1, 2, 3], ["a", "b", "c"])
+        lists = dict(value1=[1, 2, 3], value2=["a", "b", "c"])
+        calculation_list = Basf2CalculationList(self.path_creator_no_queue, lists)
 
-        results, queues = calculation_list.create_all_paths()
+        results, queues, parameter_combination = calculation_list.create_all_paths()
 
         self.assertEqual(len(queues), len(results))
         self.assertEqual(len(queues), 9)
@@ -41,3 +43,7 @@ class TestBasf2CalculationList(TestCase):
 
         self.assertEqual(results[8][0], 3)
         self.assertEqual(results[8][1], "c")
+
+
+if __name__ == "__main__":
+    unittest.main()

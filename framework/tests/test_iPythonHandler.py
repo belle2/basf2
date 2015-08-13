@@ -1,9 +1,9 @@
-from unittest import TestCase
-from tracking.ipython_tools import handler
+import unittest
+from ipython_tools import handler
 import basf2
 
 
-class TestIPythonHandler(TestCase):
+class TestIPythonHandler(unittest.TestCase):
 
     def create_path(self):
         path = basf2.create_path()
@@ -15,10 +15,6 @@ class TestIPythonHandler(TestCase):
 
         return path
 
-    def test_empty_path(self):
-        empty_path = None
-        self.assertRaises(ValueError, handler.process, empty_path)
-
     def test_process_no_start(self):
         path = self.create_path()
 
@@ -28,7 +24,6 @@ class TestIPythonHandler(TestCase):
         self.assertRaises(AssertionError, calculation.has_failed)
         self.assertFalse(calculation.is_finished())
         self.assertRaises(AssertionError, calculation.wait_for_end)
-        self.assertRaises(AssertionError, calculation.stop)
         self.assertEqual(calculation.get_status(), "not started")
 
         # All the output should lead to nothing
@@ -39,7 +34,7 @@ class TestIPythonHandler(TestCase):
 
         # The modules
         modules = calculation.get_modules()
-        self.assertEqual(len(modules), 5)
+        self.assertEqual(len(modules), 6)
 
     def test_process_with_start(self):
         path = self.create_path()
@@ -57,17 +52,19 @@ class TestIPythonHandler(TestCase):
 
         self.assertFalse(calculation.has_failed())
         self.assertTrue(calculation.is_finished())
-        self.assertRaises(AssertionError, calculation.stop)
 
         # All the output should lead to something
-        self.assertGreater(len(calculation.get_statistics()), 0)
+        self.assertGreater(len(str(calculation.get_statistics())), 0)
         self.assertGreater(len(calculation.get_log()), 0)
 
         self.assertEqual(len(calculation.get_keys()), 2)
 
         self.assertEqual(calculation.get("basf2.statistics"), calculation.get_statistics())
-        self.assertEqual(calculation.get("basf2.store_content"), [])
+        self.assertEqual(calculation.get("basf2.store_content"), [{'number': 0, 'store_content': [['EventMetaData', 0]]}])
 
         # The modules
         modules = calculation.get_modules()
-        self.assertEqual(len(modules), 5)
+        self.assertEqual(len(modules), 6)
+
+if __name__ == "__main__":
+    unittest.main()

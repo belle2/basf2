@@ -67,17 +67,11 @@ class Basf2CalculationQueueItem():
         self.item = item
 
 
-class dotdict(dict):
-
-    """dot.notation access to dictionary attributes"""
-
-    def __getattr__(self, attr):
-        return self.get(attr)
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-
-
 class ModuleStatistics():
+
+    """
+    Dictionary list holding the module statistics (like the C++ class ModuleStatistics)
+    """
 
     def __init__(self, stats, categories):
         self.name = stats.name
@@ -96,17 +90,20 @@ class ModuleStatistics():
 class Basf2CalculationQueueStatistics():
 
     """
-    As the basf2 statistics is not pickable, wa can not store it into the result_queue.
+    As the basf2 statistics is not pickable, we can not store it into the queue.
     So we write a wrapper which unpacks the needed properties.
     """
 
     def __str__(self):
+        """ Make the str behave like before """
         return self.str
 
     def __repr__(self):
+        """ Make the repr behave like before """
         return self.str
 
     def __init__(self, statistics):
+        """ Initialize with the C++ statistics """
         self.module = []
 
         categories = [("INIT", statistics.INIT),
@@ -124,4 +121,5 @@ class Basf2CalculationQueueStatistics():
         self.str = statistics()
 
     def append_module_statistics(self, stats, categories):
+        """ Helper function to append modulewise stats """
         self.module.append(ModuleStatistics(stats, categories))

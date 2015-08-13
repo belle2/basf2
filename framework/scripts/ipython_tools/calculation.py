@@ -13,6 +13,7 @@ class Basf2Calculation():
     """
 
     def __init__(self, process_list):
+        """ Init with the list of processes (possibly empty) """
         self.process_list = process_list
 
     def __iter__(self):
@@ -23,6 +24,7 @@ class Basf2Calculation():
             yield Basf2Calculation([process])
 
     def __len__(self):
+        """ Return the number of handled processes """
         return len(self.process_list)
 
     def stop(self, index=None):
@@ -200,6 +202,9 @@ class Basf2Calculation():
         return self.map_on_processes(f, index)
 
     def get_parameters(self, index=None):
+        """
+        Return the parameters used to start this calculation
+        """
         return self.map_on_processes(lambda process: process.parameters, index)
 
     def create_widgets_for_all_processes(self, widget_function, index=None):
@@ -270,6 +275,7 @@ class Basf2CalculationList():
     """
 
     def __init__(self, path_function, lists):
+        """ Init with the path_function and the lists of named parameters """
         self.path_function = path_function
         self.lists = lists
 

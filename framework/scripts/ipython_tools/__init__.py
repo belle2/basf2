@@ -1,8 +1,9 @@
+# The needed scrips from this package
 import python_modules
 import calculation
 import queue
 
-# System import
+# System imports
 import sys
 import time
 import os
@@ -15,11 +16,6 @@ from ROOT import Belle2
 
 # multiprocessing imports
 from multiprocessing import Process, Pipe
-
-# Nice display features imports
-from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
-from IPython.core.display import Image, display
-from tracking.validation.harvesting import HarvestingModule
 
 
 class Basf2Information:
@@ -189,7 +185,7 @@ class IPythonHandler:
         """
         return queue.Basf2CalculationQueue()
 
-# Create a single instance
+#: Create a single instance
 handler = IPythonHandler()
 
 
@@ -298,60 +294,3 @@ class Basf2Process(Process):
         """
         if not self.is_alive():
             return self.result_queue.get_keys()
-
-
-"""
-TODO: Comments
-"""
-
-
-class QueueHarvester(HarvestingModule):
-
-    def __init__(self, queue, foreach, output_file_name, name=None, title=None, contact=None, expert_level=None):
-        queue.put(self.__class__.__name__ + "_output_file_name", output_file_name)
-        HarvestingModule.__init__(self, foreach=foreach,
-                                  output_file_name=output_file_name,
-                                  name=name, title=title, contact=contact,
-                                  expert_level=expert_level)
-
-
-def tail_file(file_name):
-    f = open(file_name, 'r')
-    if not f:
-        return
-
-    while True:
-        line = f.readline()
-        if line:
-            print line,
-            sys.stdout.flush()
-        else:
-            time.sleep(0.01)
-
-
-class QueueDrawer(CDCSVGDisplayModule):
-
-    def __init__(self, queue, label, *args, **kwargs):
-        self.queue = queue
-        self.label = label
-        CDCSVGDisplayModule.__init__(self, interactive=False, *args, **kwargs)
-        self.use_cpp = True
-
-        self.file_list = []
-
-    def terminate(self):
-        CDCSVGDisplayModule.terminate(self)
-        self.queue.put(self.label, self.file_list)
-
-    def new_output_filename(self):
-        output_file_name = CDCSVGDisplayModule.new_output_filename(self)
-        self.file_list.append(output_file_name)
-        return output_file_name
-
-
-def show_image(filename, show=True):
-    os.system("convert " + filename + " " + filename[:-3] + str("png"))
-    image = Image(filename[:-3] + str("png"))
-    if show:
-        display(image)
-    return image

@@ -1,5 +1,7 @@
 from IPython.core.display import display, Javascript
 from IPython.core.display import Image as display_Image
+
+# Widgets can change in future versions, I know
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", category=FutureWarning)
@@ -32,11 +34,19 @@ class Basf2Widget(object):
 
 class ComparisonImageViewer(Basf2Widget):
 
+    """
+    A widget for comparing two images
+    """
+
     def __init__(self, images1, images2):
+        """
+        Initialize with the image file names
+        """
         self.images1 = images1
         self.images2 = images2
 
     def create(self):
+        """ Create the widget """
         a = widgets.Accordion()
 
         children = []
@@ -251,7 +261,13 @@ class CollectionsViewer(Basf2Widget):
 
 class StatisticsViewer(Basf2Widget):
 
+    """
+    A viewer widget for displaying the
+    basf2 statistics in a nicer way in ipython
+    """
+
     def __init__(self, statistics):
+        """ Init the widget with the statistics from the basf2 process """
         self.statistics = statistics
 
         self.styling_text = """
@@ -276,6 +292,9 @@ class StatisticsViewer(Basf2Widget):
         </style>"""
 
     def create(self):
+        """
+        Create the widget
+        """
         if self.statistics is None:
             return widgets.HTML("")
 

@@ -253,7 +253,7 @@ void CRY::generateEvent(MCParticleGraph& mcGraph)
         double px = ptot * (*ev)[j]->v();
         double py = ptot * (*ev)[j]->w();
         double pz = ptot * (*ev)[j]->u();
-        double p4[4] = {px, py, pz, etot};
+//         double p4[4] = {px, py, pz, etot};
 
         // Vertex
         double vx = (*ev)[j]->y() * Belle2::Unit::m;
@@ -277,6 +277,7 @@ void CRY::generateEvent(MCParticleGraph& mcGraph)
         } else check = 1;
 
         if (check > 0) {
+          double p4[4] = {px, py, pz, etot};
           storeParticle(mcGraph, p4, m_newvtx, ptime, pdg, false, false);
         }
 
@@ -384,8 +385,8 @@ bool CRY::InBox(TVector3 hit, TVector3 B1, TVector3 B2, int axis)
 
 void CRY::term()
 {
-  double timeSimulated = m_cryGenerator->timeSimulated();
-  B2RESULT("Total time simulated: " << timeSimulated << "s");
+//   double timeSimulated = m_cryGenerator->timeSimulated();
+  B2RESULT("Total time simulated: " << m_cryGenerator->timeSimulated() << "s");
   B2RESULT("Total number of events simulated: " << m_totalTrials);
 
   delete m_crySetup;

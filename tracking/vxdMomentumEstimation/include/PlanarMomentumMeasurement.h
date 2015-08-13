@@ -16,7 +16,8 @@
 #include <genfit/RKTrackRep.h>
 #include <tracking/vxdMomentumEstimation/HMatrixQP.h>
 #include <cassert>
-
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/dataobjects/Helix.h>
 #include <framework/logging/Logger.h>
 
 
@@ -87,15 +88,31 @@ namespace Belle2 {
     const TVector3& momentum(state.getMom());
     short charge = state.getCharge();
 
+    Helix helix(position, momentum, charge, 1.5);
+
     if (m_useThickness) {
       rawHitCoordinates(0) = momentumEstimation.estimateQOverPWithThickness(*m_hit, charge, m_fitParameters, m_correctionFitParameters);
     } else {
       if (m_useTrackFinderSeeds) {
-        rawHitCoordinates(0) = momentumEstimation.estimateQOverP(*m_hit, momentum, position, charge, m_fitParameters,
+        rawHitCoordinates(0) = momentumEstimation.estimateQOverP(*m_hit, helix.getMomentum(1.5), helix.getPerigee(), charge,
+                                                                 m_fitParameters,
                                                                  m_correctionFitParameters);
       } else {
-        rawHitCoordinates(0) = momentumEstimation.estimateQOverP(*m_hit, momentum, position, charge, m_fitParameters,
-                                                                 m_correctionFitParameters);
+        MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");
+
+        if (relatedMCParticle == nullptr) {
+          B2WARNING("Hit has no related MCParticle!")
+          rawHitCoordinates(0) = momentumEstimation.estimateQOverP(*m_hit, helix.getMomentum(1.5), helix.getPerigee(), charge,
+                                                                   m_fitParameters,
+                                                                   m_correctionFitParameters);
+        } else {
+          const TVector3& momentumMC = relatedMCParticle->getMomentum();
+          const TVector3& positionMC = relatedMCParticle->getProductionVertex();
+          const short chargeMC = relatedMCParticle->getCharge();
+
+          rawHitCoordinates(0) = momentumEstimation.estimateQOverP(*m_hit, momentumMC, positionMC, chargeMC, m_fitParameters,
+                                                                   m_correctionFitParameters);
+        }
       }
     }
 

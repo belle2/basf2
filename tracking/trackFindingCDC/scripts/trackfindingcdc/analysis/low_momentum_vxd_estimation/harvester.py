@@ -7,7 +7,7 @@ import ROOT
 from tracking.validation.pr_side_module import PRSideTrackingValidationModule
 from tracking.validation.module import TrackingValidationModule
 
-from tracking.ipython_tools import QueueHarvester
+from ipython_tools.wrapper import QueueHarvester
 
 
 class VXDMomentumEnergyEstimator:

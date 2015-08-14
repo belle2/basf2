@@ -1,15 +1,10 @@
 #include <tracking/modules/fitter/MeasurementCreatorModule.h>
 
-#include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
-#include <framework/gearbox/Const.h>
-
-
-#include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>
-
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;
@@ -17,27 +12,16 @@ using namespace Belle2;
 REG_MODULE(MeasurementCreator)
 
 namespace {
-  /** Helper: Create a TrackPoint from a measurement */
-  genfit::TrackPoint* createTrackPoint(genfit::AbsMeasurement* coordinateMeasurement, RecoTrack& recoTrack,
-                                       const RecoHitInformation& recoHitInformation)
-  {
-    genfit::TrackPoint* coordinateTrackPoint = new genfit::TrackPoint(coordinateMeasurement, &recoTrack);
-    coordinateTrackPoint->setSortingParameter(recoHitInformation.getSortingParameter());
-
-    return coordinateTrackPoint;
-  }
-
   /** Helper: Go through all measurement creators in the given list and create the measurement with a given hit */
   template <class HitType, Const::EDetector detector>
   void measurementAdder(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation, HitType* const hit,
                         const std::vector<std::unique_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators)
   {
     for (const auto& measurementCreator : measurementCreators) {
-      const std::vector<genfit::AbsMeasurement*>& measurements = measurementCreator->createMeasurements(hit, recoTrack,
-                                                                 recoHitInformation);
-      for (genfit::AbsMeasurement* measurement : measurements) {
-        genfit::TrackPoint* trackPointFromMeasurement = createTrackPoint(measurement, recoTrack, recoHitInformation);
-        recoTrack.insertPoint(trackPointFromMeasurement);
+      const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(hit, recoTrack,
+                                                            recoHitInformation);
+      for (genfit::TrackPoint* trackPoint : trackPoints) {
+        recoTrack.insertPoint(trackPoint);
       }
     }
   }
@@ -46,7 +30,8 @@ namespace {
 MeasurementCreatorModule::MeasurementCreatorModule() : Module(),
   m_cdcMeasurementCreatorFactory(m_measurementFactory),
   m_svdMeasurementCreatorFactory(m_measurementFactory),
-  m_pxdMeasurementCreatorFactory(m_measurementFactory)
+  m_pxdMeasurementCreatorFactory(m_measurementFactory),
+  m_additionalMeasurementCreatorFactory()
 {
   setDescription("Create measurements from the hits added to the RecoTracks and add them to the genfit tracks. Can also create new measurements like momentum estimations.");
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,
@@ -63,6 +48,8 @@ MeasurementCreatorModule::MeasurementCreatorModule() : Module(),
            "Dictionary with the used SVD measurement creators and their parameters (as dict also)");
   addParam("usedPXDMeasurementCreators", m_pxdMeasurementCreatorFactory.getParameters(),
            "Dictionary with the used PXD measurement creators and their parameters (as dict also)");
+  addParam("usedAdditionalMeasurementCreators", m_additionalMeasurementCreatorFactory.getParameters(),
+           "Dictionary with the used additional measurement creators and their parameters (as dict also)");
 }
 
 void MeasurementCreatorModule::initialize()
@@ -83,10 +70,11 @@ void MeasurementCreatorModule::initialize()
   if (cdcHits.isOptional())
     m_measurementFactory.addProducer(Const::CDC, new genfit::MeasurementProducer<RecoTrack::UsedCDCHit, CDCRecoHit>(cdcHits.getPtr()));
 
-  // Create the measurement creators
+  // Init the measurement creators
   m_cdcMeasurementCreatorFactory.initialize();
   m_svdMeasurementCreatorFactory.initialize();
   m_pxdMeasurementCreatorFactory.initialize();
+  m_additionalMeasurementCreatorFactory.initialize();
 }
 
 
@@ -115,6 +103,14 @@ void MeasurementCreatorModule::constructHitsForTrack(RecoTrack& recoTrack) const
   recoTrack.mapOnHits<RecoTrack::UsedPXDHit>(recoTrack.getStoreArrayNameOfPXDHits(),
                                              std::bind(&measurementAdder<RecoTrack::UsedPXDHit, Const::PXD>, std::ref(recoTrack), std::placeholders::_1, std::placeholders::_2,
                                                        std::cref(m_pxdMeasurementCreatorFactory.getCreators())));
+
+  // Special case is with the additional measurement creator factories. They do not need any hits:
+  for (const auto& measurementCreator : m_additionalMeasurementCreatorFactory.getCreators()) {
+    const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(recoTrack);
+    for (genfit::TrackPoint* trackPoint : trackPoints) {
+      recoTrack.insertPoint(trackPoint);
+    }
+  }
 
   recoTrack.sort();
 }

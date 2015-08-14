@@ -25,7 +25,7 @@ namespace Belle2 {
     {}
 
     /** No creator is implemented in the moment */
-    BaseMeasurementCreator* createMeasurementCreatorFromName(const std::string& creatorName) const
+    BaseMeasurementCreator* createMeasurementCreatorFromName(const std::string& /*creatorName*/) const
     {
       return nullptr;
     }

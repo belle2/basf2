@@ -12,6 +12,7 @@
 #include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
 
 namespace Belle2 {
+  /** A measurement creator for normal coordinate measurements */
   template <class HitType, Const::EDetector detector>
   class CoordinateMeasurementCreator : public BaseMeasurementCreatorFromHit<HitType, detector> {
   public:
@@ -19,15 +20,15 @@ namespace Belle2 {
       BaseMeasurementCreatorFromHit<HitType, detector>(measurementFactory) {}
 
     /** Create measurements based on coordinate measurements */
-    std::vector<genfit::AbsMeasurement*> createMeasurements(HitType* hit, const RecoTrack&,
-                                                            const RecoHitInformation& recoHitInformation) const override
+    std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
+                                                             const RecoHitInformation& recoHitInformation) const override
     {
-      const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement = this->createCoordinateMeasurement(hit,
-          recoHitInformation);
+      genfit::AbsMeasurement* coordinateMeasurement = this->createCoordinateMeasurement(hit, recoHitInformation);
 
-      genfit::AbsMeasurement* absCoordinateMeasurement = coordinateMeasurement.first;
+      genfit::TrackPoint* trackPoint =
+        this->createTrackPointWithRecoHitInformation(coordinateMeasurement, recoTrack, recoHitInformation);
 
-      return {absCoordinateMeasurement};
+      return {trackPoint};
     }
 
     /** Destructor */

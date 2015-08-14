@@ -16,11 +16,14 @@
 #include <genfit/PlanarMeasurement.h>
 
 namespace Belle2 {
+  /**
+   * Creator for VXDMeasurements with momentum estimation based on the dEdX information.
+   */
   template <class HitType, Const::EDetector detector>
   class VXDMomentumEstimationMeasurementCreator : public BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector> {
   public:
     explicit VXDMomentumEstimationMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
-      BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory), m_minimumMomentum(0.1) {}
+      BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory) {}
 
     virtual ~VXDMomentumEstimationMeasurementCreator() { }
 
@@ -60,10 +63,9 @@ namespace Belle2 {
      */
     virtual std::vector<genfit::AbsMeasurement*> createMeasurementFromCoordinateMeasurement(HitType* hit,
         const RecoTrack& recoTrack, const RecoHitInformation&,
-        const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement) const override
+        genfit::AbsMeasurement* coordinateMeasurement) const override
     {
-      genfit::AbsMeasurement* absCoordinateMeasurement = coordinateMeasurement.first;
-      genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(absCoordinateMeasurement);
+      genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(coordinateMeasurement);
       if (planarMeasurement == nullptr) {
         B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
       }
@@ -89,6 +91,6 @@ namespace Belle2 {
     /** Use the thickness of the clusters of the path length for estimating dX */
     bool m_useThickness = false;
     /** Minimal value for the momentum below the estimation is used */
-    double m_minimumMomentum;
+    double m_minimumMomentum = 0.1;
   };
 }

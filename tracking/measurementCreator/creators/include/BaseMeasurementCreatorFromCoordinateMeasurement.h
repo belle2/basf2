@@ -12,21 +12,37 @@
 #include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
 
 namespace Belle2 {
+  /** Class to create measurement track points based on the coordinate measurements.
+  * All measurements that you create by overloading the createMeasurementFromCoordinateMeasurement
+  * function get their own TrackPoint.
+  */
   template <class HitType, Const::EDetector detector>
   class BaseMeasurementCreatorFromCoordinateMeasurement : public BaseMeasurementCreatorFromHit<HitType, detector> {
   public:
+
+    /** Needs the genfit MeasurementFactory for this */
     explicit BaseMeasurementCreatorFromCoordinateMeasurement(const genfit::MeasurementFactory<genfit::AbsMeasurement>&
                                                              measurementFactory) :
       BaseMeasurementCreatorFromHit<HitType, detector>(measurementFactory) {}
 
     /** Create measurements based on coordinate measurements */
-    std::vector<genfit::AbsMeasurement*> createMeasurements(HitType* hit, const RecoTrack& recoTrack,
-                                                            const RecoHitInformation& recoHitInformation) const override
+    std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
+                                                             const RecoHitInformation& recoHitInformation) const override
     {
-      const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement = this->createCoordinateMeasurement(hit,
-          recoHitInformation);
+      genfit::AbsMeasurement* coordinateMeasurement = this->createCoordinateMeasurement(hit,
+                                                      recoHitInformation);
 
-      return std::move(createMeasurementFromCoordinateMeasurement(hit, recoTrack, recoHitInformation, coordinateMeasurement));
+      const std::vector<genfit::AbsMeasurement*>& measurements =
+        this->createMeasurementFromCoordinateMeasurement(hit, recoTrack, recoHitInformation, coordinateMeasurement);
+
+      // TODO: Do we want to create one track point for each or one track point for all?
+      std::vector<genfit::TrackPoint*> trackPoints;
+      trackPoints.reserve(measurements.size());
+      for (genfit::AbsMeasurement* measurement : measurements) {
+        trackPoints.push_back(this->createTrackPointWithRecoHitInformation(measurement, recoTrack, recoHitInformation));
+      }
+
+      return trackPoints;
     }
 
     /** Destructor */
@@ -34,17 +50,17 @@ namespace Belle2 {
 
   protected:
     /** Overload this method if you want to create measurements from coordinate measurements.
-     * You have to delete the content of the coordinateMeasurement pair if you do not plan to
+     * You have to delete the content of the coordinateMeasurement if you do not plan to
      * use them. This method gets called in the createMeasurements method.
      * @param hit
      * @param recoTrack
      * @param recoHitInformation
      * @param coordinateMeasurement
-     * @return
+     * @return a vector of measurements that get used to create as many track points.
      */
     virtual std::vector<genfit::AbsMeasurement*> createMeasurementFromCoordinateMeasurement(HitType* hit,
         const RecoTrack& recoTrack, const RecoHitInformation& recoHitInformation,
-        const std::pair<genfit::AbsMeasurement*, genfit::TrackCandHit*>& coordinateMeasurement) const = 0;
+        genfit::AbsMeasurement* coordinateMeasurement) const = 0;
 
   };
 }

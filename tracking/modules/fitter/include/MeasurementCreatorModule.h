@@ -12,8 +12,8 @@
 #include <tracking/measurementCreator/factories/CDCMeasurementCreatorFactory.h>
 #include <tracking/measurementCreator/factories/SVDMeasurementCreatorFactory.h>
 #include <tracking/measurementCreator/factories/PXDMeasurementCreatorFactory.h>
+#include <tracking/measurementCreator/factories/AdditionalMeasurementCreatorFactory.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasurementFactory.h>
 #include <framework/core/Module.h>
 #include <string>
@@ -26,16 +26,12 @@ namespace genfit {
 
 namespace Belle2 {
 
-  class RecoHitInformation;
-  class CDCRecoHit;
-
+  class RecoTrack;
 
   /**
    * If you want to provide another measurement type to the tracks, use the parameter used*Creators for that.
    * You have to implement a BaseMeasurementCreatorFromHit derived class for that and add it to the *MeasurementCreatorFactory.
    * Then you can choose it and its parameters from a steering file.
-   *
-   * TODO: Implement the possibility to add measurements without an underlaying hit!
    */
   class MeasurementCreatorModule : public Module {
 
@@ -76,7 +72,8 @@ namespace Belle2 {
     SVDMeasurementCreatorFactory m_svdMeasurementCreatorFactory;
     /** The factory for creating the measurement creators for pxd hits */
     PXDMeasurementCreatorFactory m_pxdMeasurementCreatorFactory;
-
+    /** The factory for creating the measurement creators which are not base on a hit type */
+    AdditionalMeasurementCreatorFactory m_additionalMeasurementCreatorFactory;
 
     /**
      * Helper function to construct the measurements for the added hits of a reco track.
